@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "stereo_renderer_r7.inc"
+#include "../state/depth_target_state.hpp"
 
 namespace OutRunVRStereo
 {
@@ -977,5 +978,20 @@ namespace OutRunVRStereo
 	{
 		InvalidateRightDepthSync();
 		InvalidateRightStencilSync();
+	}
+
+	OutRunVR::State::DepthTargetSnapshot MainDepthTargetSnapshot() noexcept
+	{
+		OutRunVR::State::DepthTargetSnapshot snapshot{};
+		snapshot.identity = R9MainDepthIdentity;
+		snapshot.desc = R9MainDepthDesc;
+		snapshot.known = R9MainDepthKnown;
+		snapshot.generation = R9MainDepthGeneration;
+		return snapshot;
+	}
+
+	void NoteMainDepthContentWrite() noexcept
+	{
+		++R9MainDepthContentSerial;
 	}
 }

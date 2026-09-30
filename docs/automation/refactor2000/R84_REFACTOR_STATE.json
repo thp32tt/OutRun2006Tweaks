@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 465,
+  "cycle": 470,
   "totalCycles": 2000,
   "applyEvery": 5,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -65,10 +65,11 @@
     "R84-REF-HOOKSET-0002",
     "R84-REF-LIFECYCLE-0014",
     "R84-REF-DISPATCH-0008",
-    "R84-REF-STATE-0011"
+    "R84-REF-STATE-0011",
+    "R84-REF-STATE-0012"
   ],
-  "next": "Cycles 466-470: isolate R9 depth target identity/generation/format behind neutral depth-target snapshot API.",
-  "updatedKst": "2026-10-01T08:38:00+09:00",
+  "next": "Cycles 471-475: isolate R9 draw accounting, mono-gap and failure reporting behind neutral frame accounting API.",
+  "updatedKst": "2026-10-01T08:42:00+09:00",
   "batchStatus": "R84_MATRIX_CYCLE_400_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",

@@ -18,6 +18,7 @@
 #include "../render/fast_path_support.hpp"
 #include "../render/lower_draw_api.hpp"
 #include "../state/right_depth_stencil_sync.hpp"
+#include "../state/depth_target_state.hpp"
 #include "../lifecycle/mono_safety.hpp"
 #include "../state/depth_stencil_write_state.hpp"
 #include "../telemetry/depth_stencil_metrics.hpp"
@@ -111,10 +112,11 @@ namespace OutRunVRStereo
 
         bool R33TrackedDepthHasStencil() noexcept
         {
-            if (!TrackedDepthStencil || !R9MainDepthKnown ||
-                TrackedDepthStencil != R9MainDepthIdentity)
+            const auto depthTarget = MainDepthTargetSnapshot();
+            if (!TrackedDepthStencil || !depthTarget.known ||
+                TrackedDepthStencil != depthTarget.identity)
                 return false;
-            return FormatHasStencil(R9MainDepthDesc.Format);
+            return FormatHasStencil(depthTarget.desc.Format);
         }
 
         bool R33ReadDepthStencilWriteState(IDirect3DDevice9* device) noexcept
@@ -123,12 +125,13 @@ namespace OutRunVRStereo
                 return false;
 
             R33DepthStencilWriteState next{};
+            const auto depthTarget = MainDepthTargetSnapshot();
             const auto stateBlock =
                 OutRunVR::State::StateBlockTracker::Snapshot();
             if (!TrackedDepthStencil)
             {
                 next.valid = true;
-                next.depthGeneration = R9MainDepthGeneration;
+                next.depthGeneration = depthTarget.generation;
                 next.stateBlockRecordings = stateBlock.recordings;
                 next.stateBlockApplies = stateBlock.applies;
                 R33DepthStencilState = next;
@@ -175,7 +178,7 @@ namespace OutRunVRStereo
             }
 
             next.valid = true;
-            next.depthGeneration = R9MainDepthGeneration;
+            next.depthGeneration = depthTarget.generation;
             next.stateBlockRecordings = stateBlock.recordings;
             next.stateBlockApplies = stateBlock.applies;
             R33DepthStencilState = next;
@@ -192,10 +195,11 @@ namespace OutRunVRStereo
 
         bool R33DepthStencilCacheCurrent() noexcept
         {
+            const auto depthTarget = MainDepthTargetSnapshot();
             const auto stateBlock =
                 OutRunVR::State::StateBlockTracker::Snapshot();
             return R33DepthStencilState.valid &&
-                R33DepthStencilState.depthGeneration == R9MainDepthGeneration &&
+                R33DepthStencilState.depthGeneration == depthTarget.generation &&
                 R33DepthStencilState.stateBlockRecordings ==
                     stateBlock.recordings &&
                 R33DepthStencilState.stateBlockApplies == stateBlock.applies;
@@ -403,7 +407,7 @@ namespace OutRunVRStereo
             ++R9DrawCalls;
             R9MonoBackupGap = true;
             if (mayWriteDepth || mayWriteStencil)
-                ++R9MainDepthContentSerial;
+                NoteMainDepthContentWrite();
 
             OutRunVR::Core::DispatchResult result{ true, actualDraw() };
             if (FAILED(result.hr))
@@ -570,7 +574,7 @@ namespace OutRunVRStereo
             ++R9DrawCalls;
             R9MonoBackupGap = true;
             if (mayWriteDepth || mayWriteStencil)
-                ++R9MainDepthContentSerial;
+                NoteMainDepthContentWrite();
 
             OutRunVR::Core::DispatchResult result{ true, actualDraw() };
             if (FAILED(result.hr))
