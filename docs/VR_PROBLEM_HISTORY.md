@@ -164,3 +164,11 @@ Task `CONVERSION-DXVK-00037` produced cumulative DXVK visual candidate `ebb37652
 The existing blur ping-pong result selection and composite strength `0.38` were intentionally left unchanged. Initial Backend Gate `36514602393` exposed only a verifier initialization-order bug; repair SHA `ebb37652...` passed Backend Gate `36514745469`, Build `36514749636`, OpenXR architecture `36514749555`, and HUD Inspector `36514749597`.
 
 This remains **AUTOMATION_VERIFIED / RUNTIME UNTESTED**. Quest 3 / VDXR must verify sky/cloud detail, haze, HUD/menu opacity, protected world stereo, startup/recenter safety, and the cumulative white-HUD ownership candidate from `CONVERSION-DXVK-00035`.
+
+## 2026-09-30 — DXVK menu/gameplay cadence analysis separated
+
+Task `CONVERSION-DXVK-00137` implemented the diagnostics-only follow-up required by the 2026-09-30 HMD evidence in `RUNTIME-DXVK-20260930-HMD-d7017310.json`. That earlier user session had healthy menu cadence near the runtime refresh rate while gameplay repeatedly occupied roughly 29.57-31.52 ms XR intervals; the legacy all-window aggregate (~43 Hz) mixed those phases and could hide the gameplay-only collapse.
+
+Validation-bearing result `72e8002cc2b578a2a2340ea130c68489193ff7e3` classifies each R23 five-second pipeline window as pure `MENU`, pure `GAMEPLAY`, or `MIXED_OR_UNKNOWN` using `actualSubmits` first and `requestedLayer` only as fallback. Mixed transition windows are excluded from both pure-phase averages. `ApproxAverageXrHz` remains compatibility-only and is explicitly marked `LEGACY_ALL_PIPELINE_WINDOWS_DO_NOT_USE_FOR_PHASE_HEALTH`. At least two pure DXVK gameplay windows averaging >=1.5x the observed display period emit `DXVK_GAMEPLAY_CADENCE_DEGRADED`.
+
+The regression fixture verifies one 11.1 ms menu window, two gameplay windows at 30.0/31.0 ms, and one mixed transition window remain separated. Backend Conversion Gate `36731657965`, Build `36731664102`, OpenXR architecture `36731664089` (6/6), HUD Inspector `36731664200`, and Hosted Test Package push/PR `36731657753`/`36731664483` all passed on the exact result SHA. This is **AUTOMATION_VERIFIED / RUNTIME UNTESTED** and does not close `VR-DXVK-D3D9EX-SHARED-HANDLE-001` or Issue #81.

@@ -592,6 +592,26 @@
         "verifier": "tools/verify_dxvk_host_owned_transport_contract.py",
         "runtime_performance_effect": "UNTESTED",
         "runtime_problem_status_unchanged": true
+      ,
+      "phaseCadenceAnalyzer": {
+        "status": "AUTOMATION_VERIFIED",
+        "task_id": "CONVERSION-DXVK-00137",
+        "result_sha": "72e8002cc2b578a2a2340ea130c68489193ff7e3",
+        "validation_run_id": 36731657965,
+        "input_runtime_evidence": "docs/automation/runs/RUNTIME-DXVK-20260930-HMD-d7017310.json",
+        "fields": [
+          "ApproxAverageXrHzScope",
+          "PresentationCadence.Menu",
+          "PresentationCadence.Gameplay",
+          "PresentationCadence.MixedOrUnknown",
+          "DxvkGameplayCadenceStatus",
+          "DxvkGameplayCadenceDegraded",
+          "DxvkGameplayCadenceRatio"
+        ],
+        "rule": "Classify R23 5-second pipeline windows from actualSubmits first and requestedLayer only as fallback. Pure MENU and pure GAMEPLAY windows are averaged separately; mixed transition windows are excluded from both pure phase averages. Flag degraded DXVK gameplay only with at least two pure gameplay windows averaging >=1.5x the observed display period.",
+        "legacy_aggregate_rule": "ApproxAverageXrHz is compatibility-only and marked LEGACY_ALL_PIPELINE_WINDOWS_DO_NOT_USE_FOR_PHASE_HEALTH.",
+        "runtime_performance_effect": "UNTESTED",
+        "runtime_problem_status_unchanged": true
       }
     },
     {
