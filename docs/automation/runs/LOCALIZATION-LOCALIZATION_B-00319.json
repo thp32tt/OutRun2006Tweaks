@@ -21,7 +21,13 @@
     "automation_validation": "PASS",
     "validation_mode": "C_BATCH_GATE",
     "runnable_production": [],
-    "candidate_qa_pending_indices": [121, 159, 163, 198, 201]
+    "candidate_qa_pending_indices": [
+      121,
+      159,
+      163,
+      198,
+      201
+    ]
   },
   "target": {
     "index": 94,
@@ -105,8 +111,8 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "2268b621f7fd8f0ee07a7b4c6c31aa7b5c287fae",
+  "authoritative_result_sha": "2268b621f7fd8f0ee07a7b4c6c31aa7b5c287fae",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(B): advance index94 exact-source mask segmentation [AUTO:LOCALIZATION-LOCALIZATION_B-00319]",
   "precommit_refresh": {
@@ -114,5 +120,8 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Latest head is C00317/Q00067 bookkeeping after its passing batch Gate. No shared files will be changed; only new B00319 lane-local evidence and its unique task record will be added."
   },
-  "bookkeeping_note": "RESULT_SHA will be bound after the immutable producer result commit. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Immutable producer result SHA bound after durable result commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate and does not own a Gate.",
+  "durable_task_record_in_result_commit": true,
+  "bookkeeping_recorded_at_kst": "2026-10-01T04:16:29+09:00",
+  "bookkeeping_base_head_sha": "2268b621f7fd8f0ee07a7b4c6c31aa7b5c287fae"
 }
