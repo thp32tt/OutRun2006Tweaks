@@ -53,6 +53,23 @@ namespace OutRunVRStereo
         OutRunVR::Lifecycle::ResetReplayState R34ResetReplay{};
         OutRunVR::Telemetry::RasterGuardMetrics R34RasterGuard{};
 
+        HRESULT CallFinalReset(
+            IDirect3DDevice9* device,
+            D3DPRESENT_PARAMETERS* params)
+        {
+            return R34ResetR33Hook.stdcall<HRESULT>(device, params);
+        }
+
+        HRESULT CallFinalPresent(
+            IDirect3DDevice9* device,
+            const RECT* sourceRect, const RECT* destRect,
+            HWND destWindowOverride, const RGNDATA* dirtyRegion)
+        {
+            return R34PresentR33Hook.stdcall<HRESULT>(
+                device, sourceRect, destRect,
+                destWindowOverride, dirtyRegion);
+        }
+
         HRESULT CallFinalDrawPrimitive(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT startVertex, UINT primitiveCount)
@@ -226,7 +243,7 @@ namespace OutRunVRStereo
             D3DPRESENT_PARAMETERS* params)
         {
             const bool gameDevice = IsGameDevice(device);
-            const HRESULT hr = R34ResetR33Hook.stdcall<HRESULT>(device, params);
+            const HRESULT hr = CallFinalReset(device, params);
 
             if (!gameDevice)
                 return hr;
@@ -280,7 +297,7 @@ namespace OutRunVRStereo
             if (blocked)
                 R34ForceResetReplayFailClosed(device, "Present/pre");
 
-            const HRESULT hr = R34PresentR33Hook.stdcall<HRESULT>(device,
+            const HRESULT hr = CallFinalPresent(device,
                 sourceRect, destRect, destWindowOverride, dirtyRegion);
 
             if (blocked)
