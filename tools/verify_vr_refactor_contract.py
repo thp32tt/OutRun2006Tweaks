@@ -53,6 +53,15 @@ for marker in (
 if "SameRasterSnapshot" not in raster:
     errors.append("neutral raster snapshot comparison missing")
 
+for rel in (
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/d3d9/stereo_renderer_r34.cpp",
+):
+    source = text(rel)
+    if re.search(r"\(\)s\b", source):
+        errors.append(f"{rel}: malformed accessor substitution token '()s'")
+
 for p in (ROOT / "src/vr/d3d9").glob("stereo_renderer_r*.cpp"):
     m = re.fullmatch(r"stereo_renderer_r(\d+)\.cpp", p.name)
     if m and int(m.group(1)) > 34:

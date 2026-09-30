@@ -1083,4 +1083,14 @@ namespace OutRunVRStereo
     {
         R31FlushPendingStateBlockResync(device);
     }
+
+    std::uint64_t StateBlockRecordingCount() noexcept
+    {
+        return R31StateBlockRecordings;
+    }
+
+    std::uint64_t StateBlockApplyCount() noexcept
+    {
+        return R31StateBlockApplies;
+    }
 }

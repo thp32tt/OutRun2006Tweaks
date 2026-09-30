@@ -80,8 +80,8 @@ namespace OutRunVRStereo
             {
                 next.valid = true;
                 next.depthGeneration = R9MainDepthGeneration;
-                next.stateBlockRecordings = IsGameStateBlockRecording()s;
-                next.stateBlockApplies = R31StateBlockApplies;
+                next.stateBlockRecordings = StateBlockRecordingCount();
+                next.stateBlockApplies = StateBlockApplyCount();
                 R33DepthStencilState = next;
                 if (R33TelemetryEnabled())
                     ++R33DepthStencilSyncs;
@@ -127,8 +127,8 @@ namespace OutRunVRStereo
 
             next.valid = true;
             next.depthGeneration = R9MainDepthGeneration;
-            next.stateBlockRecordings = IsGameStateBlockRecording()s;
-            next.stateBlockApplies = R31StateBlockApplies;
+            next.stateBlockRecordings = StateBlockRecordingCount();
+            next.stateBlockApplies = StateBlockApplyCount();
             R33DepthStencilState = next;
             if (R33TelemetryEnabled())
                 ++R33DepthStencilSyncs;
@@ -146,8 +146,8 @@ namespace OutRunVRStereo
             return R33DepthStencilState.valid &&
                 R33DepthStencilState.depthGeneration == R9MainDepthGeneration &&
                 R33DepthStencilState.stateBlockRecordings ==
-                    IsGameStateBlockRecording()s &&
-                R33DepthStencilState.stateBlockApplies == R31StateBlockApplies;
+                    StateBlockRecordingCount() &&
+                R33DepthStencilState.stateBlockApplies == StateBlockApplyCount();
         }
 
         bool R33GetWriteFlags(IDirect3DDevice9* device,
