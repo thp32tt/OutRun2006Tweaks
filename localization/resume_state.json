@@ -14,7 +14,7 @@
     "PREFLIGHT_ONLY: index232 canonical semantics complete; next full six-region removal-mask/CLEAN_PLATE/safe-bbox QA. Index147 source bytes must pass exact canonical verifier before pixel work.",
     "A-LANE FRONTIER: A00305 accepted only historical scope; current dispatch/frontier is A00313@2ed25784.",
     "THROUGHPUT v16: production_complete new=0; candidate_awaiting_c=159/198/201; runnable_production=121/163; runtime_validated=none.",
-    "Q00066 validation-bearing result pending Localization Automation Gate. AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
+    "Q00066 validation-bearing result fe6532b1f39325d664cb5aae2104a8ae6c64ac84 passed Localization Automation Gate 36760411205. AUTOMATION_VALIDATION=PASS; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -2523,11 +2523,19 @@
       "blocked_exception": [],
       "runtime_validated": []
     },
-    "automation_validation": "PENDING",
+    "automation_validation": "PASS",
     "runtime_validation": "UNTESTED",
-    "result_sha": null,
-    "authoritative_result_sha": null,
-    "validation_bearing_result_sha": null,
-    "automation_gate": null
+    "result_sha": "fe6532b1f39325d664cb5aae2104a8ae6c64ac84",
+    "authoritative_result_sha": "fe6532b1f39325d664cb5aae2104a8ae6c64ac84",
+    "validation_bearing_result_sha": "fe6532b1f39325d664cb5aae2104a8ae6c64ac84",
+    "automation_gate": {
+      "workflow": "Localization Automation Gate",
+      "run_id": 36760411205,
+      "head_sha": "fe6532b1f39325d664cb5aae2104a8ae6c64ac84",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_at_kst": "2026-10-01T03:42:07+09:00"
+    }
   }
 }
