@@ -1,0 +1,201 @@
+{
+  "schema_version": 15,
+  "schema": "outrun-a00301-p00181-index111-random-cross-asset-protected-art-template-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00301",
+  "wave_id": "P00181",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-10-01T02:15:41+09:00",
+  "base_head_sha": "0e4e952cb6eb86dad46a21548d9bfc18472493f9",
+  "selection": {
+    "controller_schema_version": 15,
+    "controller_config_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_index": 111,
+    "selected_asset": "C075FB49",
+    "selected_priority": "PREFLIGHT_ONLY_PROTECTED_ART_MODEL_READY_CLEAN_PLATE_RECONSTRUCTION_REMAINS",
+    "direct_rework_required_runnable": [],
+    "render_ready": [],
+    "one_stage_to_render": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "cross_lane_rework_not_stolen": [
+      163
+    ],
+    "concurrent_b00300_index163_republish_observed": true
+  },
+  "c_basis": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00302",
+    "qa_batch_id": "Q00064",
+    "validation_bearing_result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "index111_readiness": "PREFLIGHT_ONLY_PROTECTED_ART_MODEL_READY_CLEAN_PLATE_RECONSTRUCTION_REMAINS"
+  },
+  "source_identity": {
+    "target": {
+      "asset": "C075FB49",
+      "drive_account": "ezflash557",
+      "drive_file_id": "1pIGMl0fCgtlkEo0vwfIr8nTGjpe1BTLB",
+      "drive_relative_path": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+      "drive_reported_size_bytes": 16777344,
+      "sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "git_blob_sha": "fa1787d8d27a724621286e63c022a05ca51c49eb",
+      "decoded_size": [
+        2048,
+        2048
+      ],
+      "format": "RGBA32",
+      "mip_count": 1,
+      "raw_orientation": "mirror_y",
+      "readable_transform": "flip_y"
+    },
+    "donor": {
+      "asset": "411827E",
+      "drive_account": "ezflash557",
+      "drive_file_id": "1H3T8RKgbV164FhIRtjBnkYqeSmSRNWvU",
+      "drive_relative_path": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+      "drive_reported_size_bytes": 16777344,
+      "sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "git_blob_sha": "d488d1a0ccd71b0f38410ece0b90e530e2c8ff71",
+      "decoded_size": [
+        2048,
+        2048
+      ],
+      "format": "RGBA32",
+      "mip_count": 1,
+      "raw_orientation": "mirror_y",
+      "readable_transform": "flip_y",
+      "prior_git_evidence": "localization/graphics/role_A/20260927-1730-A85/A85_411827E_PRODUCTION_REPORT.json"
+    },
+    "identity": "PASS_EXACT_DRIVE_CANONICAL_SOURCE_BYTES_MATCH_CURRENT_GIT_CANONICAL_LINEAGE"
+  },
+  "method": {
+    "source_only": true,
+    "candidate_pixels_used": false,
+    "coordinate_space": "readable/display after exact raw mirror_y -> flip_y normalization",
+    "protected_palette": {
+      "light_blue_rgba": [
+        103,
+        152,
+        220,
+        255
+      ],
+      "question_mark_white_rgba": [
+        255,
+        255,
+        255,
+        255
+      ]
+    },
+    "purpose": "Use another exact English HD selector-family RANDOM panel only as a protected-art geometry constraint for the C075 RANDOM clean-plate reconstruction. Never copy translated/candidate pixels.",
+    "registration_derivation": "Bounded source-only affine registration was measured against the target's still-visible lower protected art; the committed replay script verifies the fixed transforms and support metrics on exact canonical bytes.",
+    "validation_band_y_min": 1500
+  },
+  "cross_asset_registration": {
+    "light_blue_protected_body": {
+      "donor_component_pixels": 8388,
+      "target_visible_component_pixels": 4944,
+      "transform": {
+        "sx": 0.755,
+        "sy": 0.675,
+        "tx": 533.4325,
+        "ty": 858.425
+      },
+      "exact_support": {
+        "tolerance_chebyshev_px": 0,
+        "predicted_pixels": 3741,
+        "target_visible_pixels": 4648,
+        "predicted_supported_pixels": 3654,
+        "target_supported_pixels": 3654,
+        "precision": 0.9767441860465116,
+        "recall": 0.786144578313253,
+        "f1": 0.8711407795923233
+      },
+      "one_pixel_support": {
+        "tolerance_chebyshev_px": 1,
+        "predicted_pixels": 3741,
+        "target_visible_pixels": 4648,
+        "predicted_supported_pixels": 3738,
+        "target_supported_pixels": 4055,
+        "precision": 0.9991980753809142,
+        "recall": 0.8724182444061962,
+        "f1": 0.9315142441555778
+      },
+      "result": "PASS_STRONG_SOURCE_ONLY_GEOMETRY_TEMPLATE"
+    },
+    "question_mark_white": {
+      "donor_component_pixels": 3902,
+      "target_visible_component_pixels": 942,
+      "transform": {
+        "sx": 0.66,
+        "sy": 0.635,
+        "tx": 698.3,
+        "ty": 896.6675
+      },
+      "exact_support": {
+        "tolerance_chebyshev_px": 0,
+        "predicted_pixels": 1361,
+        "target_visible_pixels": 819,
+        "predicted_supported_pixels": 582,
+        "target_supported_pixels": 582,
+        "precision": 0.4276267450404115,
+        "recall": 0.7106227106227107,
+        "f1": 0.5339449541284403
+      },
+      "two_pixel_support": {
+        "tolerance_chebyshev_px": 2,
+        "predicted_pixels": 1361,
+        "target_visible_pixels": 819,
+        "predicted_supported_pixels": 1159,
+        "target_supported_pixels": 732,
+        "precision": 0.8515797207935342,
+        "recall": 0.8937728937728938,
+        "f1": 0.872166306085975
+      },
+      "result": "HOLD_APPROXIMATE_GEOMETRY_CONSTRAINT_NOT_PIXEL_EXACT_CLEAN_PLATE_AUTHORITY"
+    }
+  },
+  "advancement": {
+    "before": "PREFLIGHT_ONLY_PROTECTED_ART_MODEL_READY_CLEAN_PLATE_RECONSTRUCTION_REMAINS",
+    "after": "PREFLIGHT_ONLY_RANDOM_CROSS_ASSET_SOURCE_TEMPLATE_REGISTERED__LIGHTBLUE_GEOMETRY_STRONG__WHITE_QMARK_APPROXIMATE__CLEAN_PLATE_RECONSTRUCTION_STILL_REQUIRED",
+    "materially_reduces_unresolved_work": true,
+    "new_reconstruction_input": true,
+    "new_fact": "Exact canonical 411827E provides an independent English-source RANDOM protected-art family template. Its light-blue protected body maps to C075's unobscured lower body with 97.6744% exact precision and 99.9198% 1px Chebyshev precision; the white question-mark mapping remains approximate and therefore cannot authorize pixel replacement."
+  },
+  "required_next": {
+    "action": "Construct a target-native RANDOM clean plate using the registered donor geometry only to constrain the text-occluded corridor; preserve every target-visible protected pixel exactly, reconstruct panel/question-mark RGB+alpha inside the source-text footprint, and run independent clean-plate QA.",
+    "forbidden": [
+      "simple text-mask dilation into protected art",
+      "direct donor pixel copy without target-palette/geometry validation",
+      "Korean render before CLEAN_PLATE PASS",
+      "candidate promotion from approximate white-question-mark registration"
+    ],
+    "clean_plate_status": "HOLD_NOT_GENERATED",
+    "candidate_dds_status": "HOLD_NOT_AUTHORIZED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "764867c8448a94d335932247a870cb69637eba0d",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "controller_roles_blob_sha": "aaef0d3224fbfef4b4dfdc63218a5bf673788580",
+    "analysis_script_sha256": "707ffafe20fb96679d525e81117ae2dfe6eb6bfe593e32d994767ffe534337a5"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false
+}

@@ -1,96 +1,59 @@
 {
   "schema_version": 15,
-  "schema": "outrun-a00301-p00181-index111-cleanplate-gap-preflight-v1",
+  "schema": "outrun-a00301-p00181-index111-random-cross-asset-protected-art-template-v1",
   "task_id": "LOCALIZATION-LOCALIZATION_A-00301",
   "wave_id": "P00181",
   "lane": "LOCALIZATION_A",
   "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
-  "recorded_at_kst": "2026-10-01T01:56:17+09:00",
-  "base_head_sha": "bb31454b0c6b84d5f8c791e28bbc4bae13a1eafa",
-  "base_sha": "bb31454b0c6b84d5f8c791e28bbc4bae13a1eafa",
-  "result": "PASS_MATERIAL_A_MOD3_INDEX111_SOURCE_ONLY_CLEANPLATE_GAP_PREFLIGHT_RUNTIME_UNTESTED",
-  "summary": "Fresh C166/Q00064-aware A-shard scan has no A-owned runnable DIRECT_REWORK_REQUIRED candidate, RENDER_READY, ONE_STAGE_TO_RENDER or existing-candidate material rework. Index163 REWORK_REQUIRED is B-owned and is not stolen; A-owned candidates159/198/201 remain C-QA pending and are not repeated. Index111/C075FB49 is the only A-owned actionable PREFLIGHT_ONLY asset. The approved ezflash557 Drive object exactly matches canonical source SHA/canvas/RGBA identity. Source-only Tuned/Normal registration reproduces Jaccard 0.9000653168, but 2,971 English-fill pixels are shared and 27 of them occupy the 1px protected-car envelope in both sources; RANDOM independently reproduces 31 English-fill pixels inside its protected envelope. Therefore sibling copying/dilation cannot produce an exact CLEAN_PLATE. No Korean DDS is authorized or modified; runtime remains UNTESTED.",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-10-01T02:15:41+09:00",
+  "base_head_sha": "0e4e952cb6eb86dad46a21548d9bfc18472493f9",
+  "base_sha": "0e4e952cb6eb86dad46a21548d9bfc18472493f9",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX111_RANDOM_CROSS_ASSET_PROTECTED_ART_TEMPLATE_REGISTERED_CLEAN_PLATE_STILL_HOLD_RUNTIME_UNTESTED",
+  "summary": "Rollover 1 reconstructed A00301 from current GitHub SSOT; no prior durable A00301 run record or tagged commit existed. C166/Q00064 has no A-owned DIRECT_REWORK_REQUIRED, RENDER_READY or ONE_STAGE_TO_RENDER item; A-owned candidates 159/198/201 remain C-QA-pending and were not repeated. A00301 therefore advances index111/C075FB49, whose C165-accepted RANDOM protected-art model still requires a CLEAN_PLATE. Exact canonical Drive bytes for C075FB49 and source-only sibling selector asset 411827E were independently read and matched current canonical hashes. The sibling RANDOM protected light-blue body registers strongly against C075 visible target pixels (97.6744% exact precision; 99.9198% at 1px Chebyshev), establishing a new source-only reconstruction template. The white question-mark registration is only approximate (85.1580% precision / 89.3773% recall at 2px), so CLEAN_PLATE and Korean DDS promotion remain fail-closed. No DDS/shared state/runtime/build/N100/local clone/VR/FFB/DX changes; runtime UNTESTED.",
   "selection": {
     "shard_rule": "asset_queue.index % 3 == 0",
-    "latest_authoritative_c_gate": "C166/Q00064 624b504f9ddfeea77fe72f0fb7f155b3fce3832d Gate 36747306315 PASS",
-    "direct_rework_required_runnable": [],
-    "render_ready_runnable": [],
-    "one_stage_to_render_runnable": [],
-    "existing_candidate_material_rework_runnable": [],
-    "cross_lane_rework_not_stolen": [
-      163
-    ],
+    "selected_index": 111,
+    "selected_asset": "C075FB49",
+    "selected_priority": "PREFLIGHT_ONLY_AFTER_ZERO_A_RUNNABLE_CANDIDATE_TIERS",
     "candidate_qa_pending_not_repeated": [
       159,
       198,
       201
     ],
-    "source_blocked_not_reprobed": [
-      30,
-      36,
-      48,
-      132,
-      135,
-      175,
-      217,
-      219
+    "cross_lane_rework_not_stolen": [
+      163
     ],
-    "selected_index": 111,
-    "selected_asset": "C075FB49",
-    "selected_priority": "PREFLIGHT_ONLY_ACTIONABLE_AFTER_ZERO_A_RUNNABLE_CANDIDATE_TIERS",
     "new_preflight_batches_this_invocation": 1
   },
-  "source_transport": {
-    "state_ssot": "github:korean-localization-clean",
-    "provider": "google_drive",
-    "account": "ezflash557",
-    "drive_file_id": "1pIGMl0fCgtlkEo0vwfIr8nTGjpe1BTLB",
-    "drive_parent_folder_id": "1eaD_4udVHcPsa7ufbRS7gYMUlllwZU-l",
-    "drive_relative_path": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
-    "drive_reported_size_bytes": 16777344,
-    "read_only": true,
-    "drive_write_performed": false,
-    "canonical_source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
-    "canonical_source_git_blob_sha": "fa1787d8d27a724621286e63c022a05ca51c49eb",
-    "decoded_size": [
-      2048,
-      2048
-    ],
-    "mode": "RGBA",
-    "raw_orientation": "mirror_y",
-    "readable_transform": "flip_y",
-    "identity": "PASS_EXACT_CANONICAL_DRIVE_OBJECT_SHA_CANVAS_MODE",
-    "pinned_bundle_identity_crosscheck": {
-      "size_bytes": 306223257,
-      "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
-      "used_for_pixel_analysis": false
-    }
-  },
-  "readiness_before": "PREFLIGHT_ONLY_PROTECTED_ART_MODEL_READY_CLEAN_PLATE_RECONSTRUCTION_REMAINS",
-  "readiness_after": "PREFLIGHT_ONLY_EXACT_CLEANPLATE_UNOBSERVABLE_CORRIDORS_QUANTIFIED__CONSTRAINED_RECONSTRUCTION_AND_INDEPENDENT_C_CLEANPLATE_QA_REQUIRED",
-  "same_task_completion_gate": {
-    "render_ready_reached": false,
-    "one_stage_to_render_reached": false,
-    "reason": "No independently passing CLEAN_PLATE exists for tuned_setting/normal_setting/random; Korean render remains forbidden."
-  },
   "evidence": [
-    "localization/graphics/role_A/20261001-A00301-P00181/audit_index111_cleanplate_gap.py",
-    "localization/graphics/role_A/20261001-A00301-P00181/A00301_P00181_INDEX111_CLEANPLATE_GAP_MACHINE.json",
-    "localization/graphics/role_A/20261001-A00301-P00181/A00301_P00181_INDEX111_CLEANPLATE_PREFLIGHT.json"
+    "localization/graphics/role_A/20261001-A00301-P00181/analyze_index111_random_cross_asset_template.py",
+    "localization/graphics/role_A/20261001-A00301-P00181/A00301_P00181_INDEX111_RANDOM_CROSS_ASSET_TEMPLATE.json"
   ],
   "material_deliverable": {
-    "type": "INDEX111_EXACT_SOURCE_ONLY_CLEANPLATE_RECONSTRUCTION_GAP_MACHINE_EVIDENCE",
-    "machine_report": "localization/graphics/role_A/20261001-A00301-P00181/A00301_P00181_INDEX111_CLEANPLATE_GAP_MACHINE.json",
-    "role_report": "localization/graphics/role_A/20261001-A00301-P00181/A00301_P00181_INDEX111_CLEANPLATE_PREFLIGHT.json",
+    "fallback_ladder_step": 4,
+    "type": "INDEX111_RANDOM_EXACT_ENGLISH_CROSS_ASSET_PROTECTED_ART_REGISTRATION_AND_MACHINE_REPLAY",
     "candidate_dds_modified": false,
+    "new_reconstruction_input": true,
     "materially_reduces_unresolved_work": true,
-    "new_preflight_batches": 1
+    "source_only": true
   },
-  "current_disposition": "PREFLIGHT_ONLY_EXACT_CLEANPLATE_RECONSTRUCTION_GAP_QUANTIFIED",
-  "clean_plate": "HOLD_EXACT_UNOBSERVABLE_PROTECTED_CORRIDOR",
-  "candidate_rebuild_authorized": false,
+  "readiness_before": "PREFLIGHT_ONLY_PROTECTED_ART_MODEL_READY_CLEAN_PLATE_RECONSTRUCTION_REMAINS",
+  "readiness_after": "PREFLIGHT_ONLY_RANDOM_CROSS_ASSET_SOURCE_TEMPLATE_REGISTERED__LIGHTBLUE_GEOMETRY_STRONG__WHITE_QMARK_APPROXIMATE__CLEAN_PLATE_RECONSTRUCTION_STILL_REQUIRED",
+  "source_fingerprint": {
+    "target_asset": "C075FB49",
+    "target_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "target_git_blob_sha": "fa1787d8d27a724621286e63c022a05ca51c49eb",
+    "target_drive_file_id": "1pIGMl0fCgtlkEo0vwfIr8nTGjpe1BTLB",
+    "donor_asset": "411827E",
+    "donor_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "donor_git_blob_sha": "d488d1a0ccd71b0f38410ece0b90e530e2c8ff71",
+    "donor_drive_file_id": "1H3T8RKgbV164FhIRtjBnkYqeSmSRNWvU",
+    "structure": "both 2048x2048 RGBA32 mip1 / raw mirror_y"
+  },
+  "self_qa": "PASS_A_MOD3_INDEX111__EXACT_DRIVE_CANONICAL_TARGET_AND_DONOR__SOURCE_ONLY_CROSS_ASSET_RANDOM_TEMPLATE__LIGHTBLUE_EXACT_PRECISION_0.976744__LIGHTBLUE_1PX_PRECISION_0.999198__WHITE_QMARK_2PX_PRECISION_0.851580_RECALL_0.893773__NO_FALSE_CLEAN_PLATE_PROMOTION__NO_SHARED_STATE__NO_DDS_WRITE__RUNTIME_UNTESTED",
   "candidate_dds_modified": false,
   "shared_state_modified": false,
   "peer_lane_files_modified": false,
@@ -101,23 +64,14 @@
   "local_clone_used": false,
   "google_drive_used": true,
   "google_drive_write_performed": false,
-  "uploaded_archive_used": true,
+  "uploaded_archive_used": false,
   "gpt_library_used_as_source_or_ssot": false,
   "work_stolen_from_lane": null,
   "vr_ffb_dx_changes": false,
-  "self_qa": "PASS_A_MOD3_INDEX111__CURRENT_C166_Q00064__ZERO_A_RUNNABLE_READY_REWORK_TIERS__CROSS_LANE_163_NOT_STOLEN__QA_PENDING_159_198_201_NOT_REPEATED__EXACT_DRIVE_SOURCE__TUNED_NORMAL_JACCARD_0_9000653168__2971_SHARED_ENGLISH__27_SHARED_ENGLISH_IN_1PX_PROTECTED_ENVELOPE__RANDOM_C165_31_REPRODUCED__CLEAN_PLATE_HOLD__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": "51fed90a4af3ba713dd99b0815e468f845e93196",
-  "authoritative_result_sha": "51fed90a4af3ba713dd99b0815e468f845e93196",
+  "result_sha": "PENDING_SELF_REFERENCE",
+  "authoritative_result_sha": "PENDING_SELF_REFERENCE",
   "validation_bearing_result_sha": null,
-  "result_commit_message": "localization(A): narrow index111 CLEAN_PLATE gap [AUTO:LOCALIZATION-LOCALIZATION_A-00301]",
-  "precommit_refresh": {
-    "head_sha": "bb31454b0c6b84d5f8c791e28bbc4bae13a1eafa",
-    "stale_state_overwrite": false,
-    "concurrent_changes_reviewed": "HEAD advanced during task from e48ef843... to C166/Q00064 bookkeeping bb31454b...; C166 was re-read. Index111 remained A-owned PREFLIGHT_ONLY; B-owned index163 REWORK was not stolen; shared state is untouched."
-  },
-  "bookkeeping_note": "Producer immutable result SHA recorded after durable material commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
-  "bookkeeping_recorded_at_kst": "2026-10-01T01:58:00+09:00",
-  "bookkeeping_base_head_sha": "51fed90a4af3ba713dd99b0815e468f845e93196"
+  "result_commit_message": "localization(A): register index111 RANDOM cross-asset template [AUTO:LOCALIZATION-LOCALIZATION_A-00301]"
 }
