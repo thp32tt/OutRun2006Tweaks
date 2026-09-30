@@ -7,6 +7,7 @@
 #include "r32_policy.hpp"
 #include "../telemetry/performance_types.hpp"
 #include "../telemetry/performance_clock.hpp"
+#include "../render/effect_state_snapshot.hpp"
 #include "stereo_renderer_r31.cpp"
 
 namespace OutRunVRStereo
@@ -253,14 +254,7 @@ namespace OutRunVRStereo
                 frame.fenceWaitUs, frame.fencePolls);
         }
 
-        struct R32EffectSnapshot
-        {
-            DWORD alphaBlend = FALSE;
-            DWORD alphaTest = FALSE;
-            DWORD zWrite = TRUE;
-            DWORD zEnable = D3DZB_TRUE;
-            DWORD cullMode = D3DCULL_CCW;
-        };
+        using R32EffectSnapshot = OutRunVR::Render::EffectStateSnapshot;
 
         bool R32ReadEffectSnapshot(IDirect3DDevice9* device,
             R32EffectSnapshot& out) noexcept
