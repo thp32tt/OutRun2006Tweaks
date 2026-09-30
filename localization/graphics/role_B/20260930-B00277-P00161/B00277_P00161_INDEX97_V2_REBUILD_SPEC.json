@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-b00277-p00161-index97-v2-native-rerender-rebuild-spec-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00277",
+  "wave_id": "P00161",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 4,
+  "recorded_at_kst": "2026-09-30T21:40:00+09:00",
+  "base_head_sha": "9efb8ddfeb62ffe1e2bb0d79c631cdedfcb47bc3",
+  "asset": "411827E",
+  "index": 97,
+  "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "priority": "DIRECT_C_REWORK_REQUIRED",
+    "c_return": "Q00059/C161 REWORK_REQUIRED_CURRENT_POLICY_SOURCE_STYLE",
+    "reason": "Existing index97 candidate is structurally contained but fails source-style fidelity for seconds/TUNED/NORMAL/RANDOM and contains a forbidden flattened-raster Lanczos repair for seconds."
+  },
+  "fingerprint": {
+    "source_repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+    "source_git_blob_sha": "d488d1a0ccd71b0f38410ece0b90e530e2c8ff71",
+    "source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+    "candidate_git_blob_sha": "34dd3b33440ceb4396336f62db21ba0110b2be8b",
+    "candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
+    "structure": "RGBA32 2048x2048 mip1",
+    "raw_orientation": "mirror_y",
+    "source_candidate_unchanged_at_base_head": true,
+    "a00004_visual_proof_git_blob_sha": "57fde77f9a7a7b565f29b0d7cbbe24d568c8311a"
+  },
+  "scope_lock": {
+    "rerender_only": ["seconds", "tuned", "normal", "random"],
+    "leave_current_candidate_unchanged": ["automatic", "engine", "recommendation"],
+    "protected_original": ["288GTO", "Testarossa", "F40", "Enzo Ferrari", "2P/4P/3P/1P", "vehicle/control artwork"],
+    "no_song_or_model_translation": true
+  },
+  "elements": [
+    {
+      "key": "seconds",
+      "source": "seconds",
+      "korean": "초",
+      "source_effect_bbox_readable_inclusive": [1237, 62, 1584, 144],
+      "candidate_safe_bbox_readable_inclusive": [1239, 64, 1582, 142],
+      "current_candidate_bbox_readable_inclusive": [1359, 63, 1442, 143],
+      "current_defect": "A00004 used localized_patch_minimal_lanczos scale_x=0.807692 scale_y=0.81; flattened-raster shrink is forbidden by v2.",
+      "source_style": {
+        "fill": "white",
+        "outline": "dark navy",
+        "slant_direction": "right",
+        "width_character": "condensed/italic",
+        "slant_angle_deg": null,
+        "slant_angle_status": "MEASURE_FROM_EXACT_SOURCE_PIXELS_BEFORE_RENDER"
+      },
+      "required_render": "Native glyph render at final font size; no resizing/shrinking of a flattened lettering raster. Preserve source outline hierarchy and measured right-slant."
+    },
+    {
+      "key": "tuned",
+      "source": "TUNED",
+      "korean": "튜닝",
+      "source_effect_bbox_readable_inclusive": [843, 851, 1154, 965],
+      "candidate_safe_bbox_readable_inclusive": [845, 853, 1152, 963],
+      "current_candidate_bbox_readable_inclusive": [843, 851, 1146, 965],
+      "current_defect": "Current Korean lettering is materially upright/rounder than the visibly right-slanted condensed English source and consumes zero safety margin on left/top/bottom.",
+      "source_style": {
+        "fill": "orange/yellow family",
+        "outline": "dark",
+        "slant_direction": "right",
+        "width_character": "condensed",
+        "slant_angle_deg": null,
+        "slant_angle_status": "MEASURE_FROM_EXACT_SOURCE_PIXELS_BEFORE_RENDER"
+      },
+      "required_render": "Native Korean render plus deterministic affine slant/width adjustment only within measured source proportions; effect-inclusive bbox must remain inside the 2px safe bbox."
+    },
+    {
+      "key": "normal",
+      "source": "NORMAL",
+      "korean": "일반",
+      "source_effect_bbox_readable_inclusive": [1235, 851, 1546, 965],
+      "candidate_safe_bbox_readable_inclusive": [1237, 853, 1544, 963],
+      "current_candidate_bbox_readable_inclusive": [1269, 851, 1508, 950],
+      "current_defect": "Current Korean lettering is materially upright/rounder than the right-slanted condensed source.",
+      "source_style": {
+        "fill": "pale yellow family",
+        "outline": "dark",
+        "slant_direction": "right",
+        "width_character": "condensed",
+        "slant_angle_deg": null,
+        "slant_angle_status": "MEASURE_FROM_EXACT_SOURCE_PIXELS_BEFORE_RENDER"
+      },
+      "required_render": "Native Korean render matching source slant/weight/corner character and effect hierarchy, with 2px safe containment."
+    },
+    {
+      "key": "random",
+      "source": "RANDOM",
+      "korean": "무작위",
+      "source_effect_bbox_readable_inclusive": [1627, 856, 1901, 965],
+      "candidate_safe_bbox_readable_inclusive": [1629, 858, 1899, 963],
+      "current_candidate_bbox_readable_inclusive": [1641, 856, 1886, 965],
+      "current_defect": "Current Korean lettering is materially upright/rounder than the right-slanted condensed source; panel artwork beneath/around the word is protected.",
+      "source_style": {
+        "fill": "white",
+        "outline": "dark navy",
+        "slant_direction": "right",
+        "width_character": "condensed",
+        "slant_angle_deg": null,
+        "slant_angle_status": "MEASURE_FROM_EXACT_SOURCE_PIXELS_BEFORE_RENDER"
+      },
+      "required_render": "Build/verify an exact clean plate that preserves the blue panel/question-mark artwork, then native-render Korean with measured right-slant; no cover rectangle or invented panel."
+    }
+  ],
+  "required_pipeline": [
+    "Acquire exact source/current candidate bytes matching the recorded Git blobs.",
+    "Normalize raw mirror-Y DDS to readable coordinates.",
+    "Build and independently verify CLEAN_PLATE for the four scoped elements without changing protected panel/artwork pixels.",
+    "Measure signed source slant, width character, stroke/effect colors and baseline from exact source pixels.",
+    "Render Korean natively at final size using a Korean-capable source-like font, then apply only deterministic source-proportion slant/width adjustment if required.",
+    "Measure effect-inclusive bbox after each native render; rerender at a minimally smaller native font size only when needed for the 2px safety margin.",
+    "Encode exact RGBA32 2048x2048 mip1 DDS with source header/orientation preserved.",
+    "Decode final DDS and require zero changed pixels outside permitted source/edit regions, zero protected-art changes, zero alpha escape, no English residue, no cover-box seam, and source-vs-candidate visual PASS.",
+    "Store source_display.png, clean_plate_display.png, candidate_display.png, comparison.png, generation_prompt.json and qa_report.json under KOREAN_PNG_REVIEW/411827E/."
+  ],
+  "runtime_blocker": {
+    "candidate_write_performed": false,
+    "reason": "The current session can verify GitHub blob identity and read the existing QA proof, but the available GitHub connector does not materialize the oversized non-UTF8 16,777,344-byte DDS payload into the raster compute runtime, and the session raster/container runtime is unavailable. N100/local clone/worktree fallback is prohibited. No unsafe byte rewrite was attempted.",
+    "b_shard_ready_scan": {
+      "index97_411827E": "DIRECT_REWORK_REQUIRED; blocked in this invocation by exact binary materialization/raster execution availability",
+      "index121_FD90AA9": "DIRECT_REWORK_REQUIRED; exact current 67,108,992-byte source/candidate fingerprints are known but the same binary materialization/raster execution blocker applies",
+      "qa_pending_not_repeated": [133, 163, 232],
+      "dependency_blocked_not_reprobed": [175, 217]
+    }
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX97_411827E_MACHINE_READABLE_NATIVE_V2_REBUILD_SPEC",
+    "new_exact_safe_bboxes": true,
+    "new_four_element_scope_lock": true,
+    "new_source_style_requirements": true,
+    "materially_reduces_unresolved_work": true,
+    "candidate_dds_modified": false
+  },
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
