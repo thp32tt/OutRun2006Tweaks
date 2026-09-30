@@ -788,4 +788,14 @@ namespace OutRunVRStereo
         return R13InstallState.load(std::memory_order_acquire) ==
             R13InstallFailed;
     }
+
+    bool IsForcedMonoShadow() noexcept
+    {
+        return R13ForceMonoShadow;
+    }
+
+    void NoteDrawTimeZeroDisparity() noexcept
+    {
+        ++R13DrawTimeZeroDisparityDraws;
+    }
 }

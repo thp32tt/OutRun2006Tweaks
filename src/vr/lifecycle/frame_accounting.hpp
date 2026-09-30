@@ -12,4 +12,7 @@ namespace OutRunVRStereo
     void ReportStereoFailure(
         OutRunVR::StereoFailureReason reason,
         const char* site, HRESULT hr = E_FAIL) noexcept;
+    void ObserveLegacyStereoFailure(
+        OutRunVR::StereoFailureReason before,
+        const char* site, HRESULT hr) noexcept;
 }

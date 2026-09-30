@@ -1018,4 +1018,21 @@ namespace OutRunVRStereo
 	{
 		return R9StereoSeeded;
 	}
+
+	bool IsMainDepthDeferred() noexcept
+	{
+		return R9DeferredDepth;
+	}
+
+	bool CurrentDepthCanMirror() noexcept
+	{
+		return R9CurrentDepthCanMirror();
+	}
+
+	void ObserveLegacyStereoFailure(
+		OutRunVR::StereoFailureReason before,
+		const char* site, HRESULT hr) noexcept
+	{
+		R9ObserveLegacyFailure(before, site, hr);
+	}
 }

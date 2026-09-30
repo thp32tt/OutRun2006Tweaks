@@ -14,6 +14,10 @@
 // a third mono replay.
 
 #include "stereo_renderer_r26.cpp"
+#include "../lifecycle/frame_lifecycle.hpp"
+#include "../lifecycle/frame_accounting.hpp"
+#include "../lifecycle/mono_safety.hpp"
+#include "../state/depth_target_state.hpp"
 #include "../render/cached_effect_state.hpp"
 #include "vr/game/render_semantics.hpp"\n
 namespace OutRunVRRenderer
@@ -75,8 +79,8 @@ namespace OutRunVRStereo
             // per Present plus a sparse 64-draw bound covers StateBlock::Apply,
             // which can bypass the setter hook, without four getters per draw.
             if (R29Effect.valid && R29Effect.presentEpoch == PresentEpoch &&
-                R23GameDrawSerial >= R29Effect.drawSerial &&
-                R23GameDrawSerial - R29Effect.drawSerial < 64)
+                TopLevelDrawSerial() >= R29Effect.drawSerial &&
+                TopLevelDrawSerial() - R29Effect.drawSerial < 64)
                 return true;
 
             DWORD alphaBlend = FALSE;
@@ -103,7 +107,7 @@ namespace OutRunVRStereo
             R29Effect.cullMode = cullMode;
             R29Effect.valid = true;
             R29Effect.presentEpoch = PresentEpoch;
-            R29Effect.drawSerial = R23GameDrawSerial;
+            R29Effect.drawSerial = TopLevelDrawSerial();
             ++R29EffectStateSyncs;
             return true;
         }
@@ -143,9 +147,9 @@ namespace OutRunVRStereo
             if (PresentEpoch <= R29MonoSafetyThroughEpoch)
                 return false;
 
-            if (FrameStereoIncomplete || R9DeferredDepth ||
-                !R9CurrentDepthCanMirror() || AnyAuxRenderTargetActive() ||
-                R13ForceMonoShadow ||
+            if (FrameStereoIncomplete || IsMainDepthDeferred() ||
+                !CurrentDepthCanMirror() || AnyAuxRenderTargetActive() ||
+                IsForcedMonoShadow() ||
                 OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire) ||
                 ActiveOcclusionQueries.load(std::memory_order_acquire) > 0)
             {
@@ -200,12 +204,12 @@ namespace OutRunVRStereo
                     std::memory_order_acq_rel, std::memory_order_acquire);
             }
 
-            R9ObserveLegacyFailure(before, site, hr);
+            ObserveLegacyStereoFailure(before, site, hr);
             ++R29StableTwoEyeDraws;
             if (zeroDisparity)
             {
                 ++R29ZeroDisparityTwoEyeDraws;
-                ++R13DrawTimeZeroDisparityDraws;
+                NoteDrawTimeZeroDisparity();
                 if (!R29FirstZeroDisparityLogged)
                 {
                     R29FirstZeroDisparityLogged = true;
@@ -454,7 +458,7 @@ namespace OutRunVRStereo
             if (R29Effect.valid)
             {
                 R29Effect.presentEpoch = PresentEpoch;
-                R29Effect.drawSerial = R23GameDrawSerial;
+                R29Effect.drawSerial = TopLevelDrawSerial();
             }
             return hr;
         }

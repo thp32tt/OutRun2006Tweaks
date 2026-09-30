@@ -20,4 +20,6 @@ namespace OutRunVRStereo
     MainDepthTargetSnapshot() noexcept;
 
     void NoteMainDepthContentWrite() noexcept;
+    bool IsMainDepthDeferred() noexcept;
+    bool CurrentDepthCanMirror() noexcept;
 }
