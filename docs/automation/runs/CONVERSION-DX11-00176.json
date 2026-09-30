@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00176",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "d9e1fc8cd43874ba0268478ae9b0007db8a01fe1",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R176_182194_PREFIX_CONTROL_FLOW",
+  "selection_reason": "CONVERSION-DX11-00174 captured the exact 96-byte 0x182194 .text window and explicitly named complete-instruction decode as the next runnable F13 unit. The window contains 95 bytes of complete instructions and a lone 0x8B opcode at the probe boundary, making a bounded complete-prefix/control-flow proof the smallest independent task that needs no HMD/runtime evidence. DXVK-00175 independently validated the same public-EXE proof design; DX11 must pass separate exact-result Actions.",
+  "summary": "Add a fail-closed DX11 exact-EXE proof for the first 95 complete instruction bytes in the 0x182194 probe. Pin all complete instruction bytes and four rel8 branch/jump targets, prove exact prefix/probe boundary arithmetic, and require the lone 0x8B incomplete opcode at 0x1821F3. Do not decode beyond the capture or promote function-entry identity, higher-level semantics or render/HUD ownership.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00175",
+    "source_result_sha": "7f70d30fd8644e1c73b829ebf5eb5e54309c59e5",
+    "source_proof_status": "EXACT_182194_PREFIX_CONTROL_FLOW_PROVEN",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Reuse only the bounded instruction/control-flow proof design. DX11 depends on its own R174 exact provenance and independent exact-result validation."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00176.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00174 result 003e099127352c744e0b85d4271e30986a5c4a44 established EXACT_EXE_182194_CALL_PROVENANCE_CAPTURED from aligned CALL 0x2839D and a complete 96-byte .text probe.",
+    "The exact R174 capture contains 95 bytes of complete instructions through JMP 0x1821F1 followed by only opcode 0x8B at 0x1821F3, so the proof deliberately stops at that boundary.",
+    "DXVK-00175 result 7f70d30fd8644e1c73b829ebf5eb5e54309c59e5 independently validated the same public-EXE prefix/control-flow shape; DX11 validation remains separate.",
+    "Regression/history review found no runtime-source change: no protected DX9Ex/HUD/world invariant or runtime problem state is modified by this analyzer/verifier-only task.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Run exact-result GitHub Actions. If the prefix proof passes, persist EXACT_182194_PREFIX_CONTROL_FLOW_PROVEN with continuation_status=INCOMPLETE_OPCODE_AT_PROBE_END, function_entry_status=UNRESOLVED, semantic_effect=BOUNDED_CONTROL_FLOW_ONLY and ownership_effect=NONE. A later independent task may capture an overlapping continuation to finish the 0x1821F3 instruction and reach common target 0x182207."
+}
