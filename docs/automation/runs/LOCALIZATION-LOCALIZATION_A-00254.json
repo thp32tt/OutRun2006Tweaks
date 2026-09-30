@@ -1,0 +1,76 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00254-p00141-index111-source-effect-mask-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00254",
+  "wave_id": "P00141",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T13:48:38+09:00",
+  "base_head_sha": "dcb6cea2f9953570b3e41df06166d8dc787cb2f9",
+  "base_sha": "dcb6cea2f9953570b3e41df06166d8dc787cb2f9",
+  "commit_mode": "ATOMIC_LANE_LOCAL_INDEX111_SOURCE_EFFECT_MASK_PREFLIGHT_AND_DURABLE_TASK_RECORD",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX111_THREE_EXACT_SOURCE_MASKS_READY_THREE_PANEL_ARTWORK_BLOCKERS_RUNTIME_UNTESTED",
+  "summary": "Fresh A modulo-3 scan keeps candidate-QA-pending indices 159/198/201 untouched and reuses C157 acceptance of A00241@index111 geometry. On exact canonical C075FB49 source bytes, this pass resolves deterministic source-effect masks and transparent clean-plate rules for keep_passing, drift and maximum_speed while proving tuned_setting, normal_setting and random cannot be safely alpha-segmented because each source region is a single panel/artwork-connected alpha component. No DDS bytes are changed. Index111 remains PREFLIGHT_ONLY; protected-artwork reconstruction for the three panel-connected elements and current-candidate-preserving merge remain required before any production rewrite. Runtime remains UNTESTED.",
+  "evidence": [
+    "localization/graphics/role_A/20260930-A00254-P00141/A00254_P00141_INDEX111_SOURCE_EFFECT_MASK_PREFLIGHT.json"
+  ],
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX111_C075FB49_THREE_EXACT_SOURCE_EFFECT_MASKS_AND_THREE_PANEL_ARTWORK_BLOCKER_PROOFS",
+    "reviewed_indices": [
+      111
+    ],
+    "reviewed_assets": [
+      "C075FB49"
+    ],
+    "source_masks_ready": [
+      "keep_passing",
+      "drift",
+      "maximum_speed"
+    ],
+    "transparent_clean_plates_ready": [
+      "keep_passing",
+      "drift",
+      "maximum_speed"
+    ],
+    "protected_artwork_reconstruction_required": [
+      "tuned_setting",
+      "normal_setting",
+      "random"
+    ],
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "readiness_audit": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "selected_indices": [
+      111
+    ],
+    "readiness_before": "PREFLIGHT_ONLY_REWORK_NARROWED_GEOMETRY_LOCKED_MASK_CLEAN_PLATE_STYLE_STILL_REQUIRED",
+    "readiness_after": "PREFLIGHT_ONLY__3_OF_6_SOURCE_MASK_CLEAN_PLATE_READY__3_PANEL_ARTWORK_RECONSTRUCTION_REQUIRED"
+  },
+  "self_qa": "PASS_A_MOD3_INDEX111__EXACT_CANONICAL_ARCHIVE_AND_GIT_SOURCE_IDENTITY__SOURCE_CANDIDATE_BLOBS_UNCHANGED__3_EXACT_MASKS_HASHED__3_TRANSPARENT_CLEAN_PLATES_HASHED__3_PANEL_CONNECTED_ARTWORK_BLOCKERS_PROVEN__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "result_commit_message": "localization(A): resolve index111 source masks [AUTO:LOCALIZATION-LOCALIZATION_A-00254]"
+}

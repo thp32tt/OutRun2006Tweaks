@@ -1,0 +1,410 @@
+{
+  "schema_version": 14,
+  "schema": "outrun-a00254-p00141-index111-source-effect-mask-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00254",
+  "wave_id": "P00141",
+  "lane": "LOCALIZATION_A",
+  "role": "CONTINUOUS_PRODUCTION_LANE_A_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-09-30T13:48:38+09:00",
+  "base_head_sha": "dcb6cea2f9953570b3e41df06166d8dc787cb2f9",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX111_THREE_EXACT_SOURCE_MASKS_READY_THREE_PANEL_ARTWORK_BLOCKERS_RUNTIME_UNTESTED",
+  "summary": "Fresh A modulo-3 scan keeps candidate-QA-pending indices 159/198/201 untouched and reuses C157 acceptance of A00241@index111 geometry. On exact canonical C075FB49 source bytes, this pass resolves deterministic source-effect masks and transparent clean-plate rules for keep_passing, drift and maximum_speed while proving tuned_setting, normal_setting and random cannot be safely alpha-segmented because each source region is a single panel/artwork-connected alpha component. No DDS bytes are changed. Index111 remains PREFLIGHT_ONLY; protected-artwork reconstruction for the three panel-connected elements and current-candidate-preserving merge remain required before any production rewrite. Runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "current_controller_roles_blob_sha": "fb2b6b4c6ac7a214892fd92950fb747c58a8bb5c",
+    "latest_authoritative_c_gate": "C157/Q00055 ca2830cdc03c7aa8e6ff72e61a737a4037cd8f61 / Localization Automation Gate 36647301188 success",
+    "qa_pending_not_repeated": {
+      "159": "candidate QA pending",
+      "198": "candidate QA pending",
+      "201": "candidate QA pending"
+    },
+    "selected_index": 111,
+    "selected_asset": "C075FB49",
+    "selected_priority": "PREFLIGHT_ONLY_REWORK_CONTINUATION_AFTER_ZERO_RUNNABLE_RENDER_READY_ONE_STAGE_TIERS"
+  },
+  "fingerprint": {
+    "uploaded_archive": "OR2-HD-GUI-v0.25.10a.zip",
+    "uploaded_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "canonical_source_member": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "source_repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "source_git_blob_sha": "fa1787d8d27a724621286e63c022a05ca51c49eb",
+    "candidate_repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+    "candidate_sha256": "b020c3e8ebd88a9519ec012d58797564ef1da19fd66daecb64ef7cadf0f23791",
+    "candidate_git_blob_sha": "de1ad4cdcf2e26ddd5265e495b821e8b98f4199e",
+    "structure": "2048x2048 RGBA32 mip1 / raw mirror_y",
+    "automation_contract_blob_sha": "19f5bb4ade80ee5ae110637b146ef1bb367d2fe4",
+    "orientation_policy_blob_sha": "1b5588dcd0514cdbb8cee6a1b1eb26ca3ac26926"
+  },
+  "mask_method": {
+    "coordinate_space": "readable/display coordinates after raw mirror_y normalization",
+    "connectivity": "8-neighbor on source alpha>0 inside the locked sprite cell",
+    "exactness": "selected source-effect component is hashed as row-major bit-packed mask; clean-plate hash is RGBA bytes after zeroing only that mask",
+    "foreign_fragment_policy": "components crossing from neighboring sprites are excluded; no pixels outside selected mask are altered",
+    "safe_fit_source": "A00241/C157 accepted 2px candidate_safe_bbox geometry remains authoritative"
+  },
+  "resolved_elements": [
+    {
+      "key": "keep_passing",
+      "source": "Keep passing the cars!",
+      "korean": "계속 차량을 추월하세요!",
+      "sprite_cell": [
+        0,
+        120,
+        520,
+        245
+      ],
+      "source_full_effect_bbox": [
+        1,
+        143,
+        520,
+        236
+      ],
+      "alpha_positive_pixels_in_cell": 36248,
+      "alpha_component_count": 2,
+      "selected_component_index": 0,
+      "selected_pixels": 35978,
+      "mask_bbox_global": [
+        1,
+        143,
+        504,
+        236
+      ],
+      "foreign_component": {
+        "pixels": 270,
+        "bbox_local": [
+          516,
+          31,
+          520,
+          104
+        ]
+      },
+      "mask_bitpack_sha256": "416428de8a921026f9626a6b86e8b509629407cb9e244c24a10118010c7dbda8",
+      "mask_row_run_count": 209,
+      "dominant_source_rgb": [
+        [
+          0,
+          10,
+          57
+        ],
+        [
+          246,
+          205,
+          12
+        ],
+        [
+          255,
+          255,
+          255
+        ]
+      ],
+      "clean_plate_rule": "copy canonical source cell byte-for-byte then set selected mask RGBA to 0,0,0,0",
+      "clean_plate_rgba_sha256": "ca3c4c319ff6f13b3ddfc6c669600f55c96b3e5dcc9012702907cbb4c1b6ec1b",
+      "outside_mask_rgba_identity": "PASS_BY_CONSTRUCTION",
+      "status": "SOURCE_EFFECT_MASK_AND_TRANSPARENT_CLEAN_PLATE_READY"
+    },
+    {
+      "key": "drift",
+      "source": "Drift!",
+      "korean": "드리프트!",
+      "sprite_cell": [
+        500,
+        120,
+        720,
+        245
+      ],
+      "source_full_effect_bbox": [
+        500,
+        120,
+        720,
+        228
+      ],
+      "alpha_positive_pixels_in_cell": 14045,
+      "alpha_component_count": 4,
+      "selected_component_index": 0,
+      "selected_pixels": 13423,
+      "mask_bbox_global": [
+        516,
+        146,
+        691,
+        228
+      ],
+      "excluded_foreign_components": [
+        {
+          "pixels": 267,
+          "bbox_local": [
+            0,
+            27,
+            4,
+            99
+          ]
+        },
+        {
+          "pixels": 233,
+          "bbox_local": [
+            207,
+            58,
+            220,
+            93
+          ]
+        },
+        {
+          "pixels": 122,
+          "bbox_local": [
+            202,
+            0,
+            220,
+            9
+          ]
+        }
+      ],
+      "mask_bitpack_sha256": "9e1064ea6b8ae85e7167fdd9955ae92fc0b46431dbd4541f77c514797ab4b50b",
+      "mask_row_run_count": 111,
+      "dominant_source_rgb": [
+        [
+          0,
+          10,
+          57
+        ],
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          246,
+          205,
+          12
+        ]
+      ],
+      "clean_plate_rule": "copy canonical source cell byte-for-byte then set selected mask RGBA to 0,0,0,0",
+      "clean_plate_rgba_sha256": "79a76846e71010036d496a62b9b2450a9efb2d1e6a339e45e8f41b6ccb396add",
+      "outside_mask_rgba_identity": "PASS_BY_CONSTRUCTION",
+      "a00241_translation_fit_range": {
+        "dx": [
+          -15,
+          -2
+        ],
+        "dy": [
+          -26,
+          -19
+        ],
+        "minimal_shift": [
+          -2,
+          -19
+        ]
+      },
+      "status": "SOURCE_EFFECT_MASK_AND_TRANSPARENT_CLEAN_PLATE_READY"
+    },
+    {
+      "key": "maximum_speed",
+      "source": "Maximum Speed",
+      "korean": "최고 속도",
+      "sprite_cell": [
+        680,
+        120,
+        1160,
+        245
+      ],
+      "source_full_effect_bbox": [
+        680,
+        120,
+        1137,
+        227
+      ],
+      "alpha_positive_pixels_in_cell": 13660,
+      "alpha_component_count": 10,
+      "selected_component_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        9
+      ],
+      "selected_pixels": 12448,
+      "mask_bbox_global": [
+        707,
+        162,
+        1137,
+        225
+      ],
+      "excluded_foreign_components": [
+        {
+          "pixels": 812,
+          "bbox_local": [
+            0,
+            27,
+            11,
+            107
+          ]
+        },
+        {
+          "pixels": 400,
+          "bbox_local": [
+            22,
+            0,
+            78,
+            9
+          ]
+        }
+      ],
+      "mask_bitpack_sha256": "3dff278a392d07b0ca089b2ef17df5c1b07d852e939ee6954d895b45c9ab0f3a",
+      "mask_row_run_count": 761,
+      "dominant_source_rgb": [
+        [
+          255,
+          255,
+          255
+        ]
+      ],
+      "clean_plate_rule": "copy canonical source cell byte-for-byte then set selected mask RGBA to 0,0,0,0",
+      "clean_plate_rgba_sha256": "da5c5ea55eb2601f6e8d190ee4f649c87573863fc2cc916ecd1405cdd2ba1d97",
+      "outside_mask_rgba_identity": "PASS_BY_CONSTRUCTION",
+      "a00241_native_rerender_limit": {
+        "max_final_effect_width": 453,
+        "max_final_effect_height": 103
+      },
+      "status": "SOURCE_EFFECT_MASK_AND_TRANSPARENT_CLEAN_PLATE_READY"
+    }
+  ],
+  "blocked_panel_elements": [
+    {
+      "key": "tuned_setting",
+      "source": "Tuned Setting",
+      "korean": "튜닝 / 설정",
+      "sprite_cell": [
+        40,
+        1170,
+        245,
+        1305
+      ],
+      "source_full_effect_bbox": [
+        40,
+        1195,
+        245,
+        1305
+      ],
+      "alpha_positive_pixels_in_cell": 21933,
+      "alpha_component_count": 1,
+      "connected_component_bbox_local": [
+        0,
+        25,
+        205,
+        135
+      ],
+      "blocker": "PANEL_AND_PROTECTED_CAR_ICON_SHARE_ALPHA_CONNECTIVITY_WITH_TEXT",
+      "unsafe_action_forbidden": "alpha-component erase or flattened-raster shrink",
+      "next_required": "derive protected artwork/background reconstruction mask before CLEAN_PLATE"
+    },
+    {
+      "key": "normal_setting",
+      "source": "Normal Setting",
+      "korean": "일반 / 설정",
+      "sprite_cell": [
+        375,
+        1170,
+        600,
+        1305
+      ],
+      "source_full_effect_bbox": [
+        381,
+        1195,
+        600,
+        1305
+      ],
+      "alpha_positive_pixels_in_cell": 21868,
+      "alpha_component_count": 1,
+      "connected_component_bbox_local": [
+        6,
+        25,
+        225,
+        135
+      ],
+      "blocker": "PANEL_AND_PROTECTED_CAR_ICON_SHARE_ALPHA_CONNECTIVITY_WITH_TEXT",
+      "unsafe_action_forbidden": "alpha-component erase or flattened-raster shrink",
+      "next_required": "derive protected artwork/background reconstruction mask before CLEAN_PLATE"
+    },
+    {
+      "key": "random",
+      "source": "RANDOM",
+      "korean": "무작위",
+      "sprite_cell": [
+        1710,
+        1410,
+        2008,
+        1515
+      ],
+      "source_full_effect_bbox": [
+        1710,
+        1435,
+        2008,
+        1515
+      ],
+      "alpha_positive_pixels_in_cell": 22749,
+      "alpha_component_count": 1,
+      "connected_component_bbox_local": [
+        0,
+        25,
+        298,
+        105
+      ],
+      "blocker": "PANEL_AND_PROTECTED_QUESTION_MARK_ARTWORK_SHARE_ALPHA_CONNECTIVITY_WITH_TEXT",
+      "unsafe_action_forbidden": "alpha-component erase or flattened-raster shrink",
+      "next_required": "derive protected artwork/background reconstruction mask before CLEAN_PLATE"
+    }
+  ],
+  "readiness_before": "PREFLIGHT_ONLY_REWORK_NARROWED_GEOMETRY_LOCKED_MASK_CLEAN_PLATE_STYLE_STILL_REQUIRED",
+  "readiness_after": "PREFLIGHT_ONLY__3_OF_6_SOURCE_MASK_CLEAN_PLATE_READY__3_PANEL_ARTWORK_RECONSTRUCTION_REQUIRED",
+  "same_task_completion_gate": {
+    "render_ready_reached": false,
+    "reason": "Three panel-connected elements still lack source-faithful protected-artwork clean plates; rewriting the asset now would violate background/artwork preservation and zero-pixel rules."
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX111_C075FB49_THREE_EXACT_SOURCE_EFFECT_MASKS_AND_THREE_PANEL_ARTWORK_BLOCKER_PROOFS",
+    "reviewed_indices": [
+      111
+    ],
+    "reviewed_assets": [
+      "C075FB49"
+    ],
+    "source_masks_ready": [
+      "keep_passing",
+      "drift",
+      "maximum_speed"
+    ],
+    "transparent_clean_plates_ready": [
+      "keep_passing",
+      "drift",
+      "maximum_speed"
+    ],
+    "protected_artwork_reconstruction_required": [
+      "tuned_setting",
+      "normal_setting",
+      "random"
+    ],
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_A_MOD3_INDEX111__EXACT_CANONICAL_ARCHIVE_AND_GIT_SOURCE_IDENTITY__SOURCE_CANDIDATE_BLOBS_UNCHANGED__3_EXACT_MASKS_HASHED__3_TRANSPARENT_CLEAN_PLATES_HASHED__3_PANEL_CONNECTED_ARTWORK_BLOCKERS_PROVEN__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_purpose": "Exact pinned v0.25.10a canonical HD source bytes only after SHA-256 identity verification; GitHub remains state/progress/QA SSOT.",
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
