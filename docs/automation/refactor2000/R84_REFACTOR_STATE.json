@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 110,
+  "cycle": 115,
   "totalCycles": 2000,
   "applyEvery": 5,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -32,9 +32,10 @@
     "R84-REF-LIFECYCLE-0004",
     "R84-REF-DISPATCH-0002",
     "R84-REF-GUARD-0001",
-    "R84-REF-LIFECYCLE-0005"
+    "R84-REF-LIFECYCLE-0005",
+    "R84-REF-STATE-0006"
   ],
-  "next": "Cycles 111-115: remove R34 direct R22 raster shadow mutation.",
+  "next": "Cycles 116-120: hide R33 depth/stencil cache invalidation behind neutral state API.",
   "updatedKst": "2026-10-01T07:10:00+09:00",
   "batchStatus": "R84_CORRECT_BASELINE_CYCLE_100_CHECKPOINT",
   "notes": [

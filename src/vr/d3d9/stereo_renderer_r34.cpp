@@ -11,6 +11,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "../lifecycle/reset_replay_state.hpp"
 #include "../lifecycle/recovery_api.hpp"
+#include "../state/d3d9_raster_tracking.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -42,7 +43,7 @@ namespace OutRunVRStereo
             OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
             FailClosedStereoEligibility();
             ResetStereoBaselineTracking();
-            R22ShadowState = {};
+            InvalidateTrackedRasterShadow();
             R33InvalidateDepthStencilCache();
             R29ArmMonoSafety();
             RightDepthSynchronized = false;
