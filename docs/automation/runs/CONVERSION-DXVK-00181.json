@@ -1,0 +1,68 @@
+{
+  "task_id": "CONVERSION-DXVK-00181",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "bbdd3838e8c4992df05f9075781a5ae3b2fd9516",
+  "result_sha": "PENDING",
+  "validation_bearing_result_sha": "PENDING",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R181_182251_CONTINUATION_PROVENANCE",
+  "selection_reason": "CONVERSION-DXVK-00179 completed the bounded 0x1821F3 control-flow proof and explicitly left the incomplete 83 e0 instruction at 0x182251 plus forward targets 0x182254/0x182258/0x1822BF as the next independent F13 evidence boundary. A fresh exact-EXE capture from 0x182251 is the smallest runnable step that advances disassembly provenance without making runtime/HMD claims.",
+  "summary": "PENDING automatic validation. Adds a fail-closed exact-EXE 128-byte continuation provenance capture starting at 0x182251, overlapping the R179 incomplete bytes 83 e0. The window intentionally includes the already-encoded forward targets 0x182254, 0x182258 and 0x1822BF while preserving raw-bytes/rel32-census-only semantics. No renderer/provider/runtime source or render/HUD ownership is changed.",
+  "evidence": [
+    "Base bbdd3838e8c4992df05f9075781a5ae3b2fd9516 is the completed CONVERSION-DXVK-00179 bookkeeping descendant; validation-bearing ancestor a776dd87 proved the exact 0x1821F3 continuation control-flow prefix through 0x182250 and left 83 e0 at 0x182251 incomplete.",
+    "R181 requires the exact R179 predecessor proof, exact .text placement, overlap bytes 83 e0, exact 128-byte probe arithmetic through 0x1822D1, and inclusion of forward targets 0x182254/0x182258/0x1822BF.",
+    "The collector records raw inbound/outbound rel32 candidates only and leaves function-entry identity, higher-level semantics, callee meaning and render/HUD ownership unresolved.",
+    "No Quest 3 / VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00181.json"
+  ],
+  "proof_contract": {
+    "predecessor_status": "EXACT_1821F3_CONTINUATION_CONTROL_FLOW_PROVEN",
+    "target_rva": "0x00182251",
+    "probe_len": 128,
+    "probe_end_rva": "0x001822D1",
+    "overlap_opcode": "83 e0",
+    "forward_target_rvas": [
+      "0x00182254",
+      "0x00182258",
+      "0x001822BF"
+    ],
+    "expected_status": "EXACT_EXE_182251_CONTINUATION_PROVENANCE_CAPTURED",
+    "function_entry_status": "UNRESOLVED",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "ownership_effect": "NONE",
+    "continuation_scope": "RAW_BYTES_AND_REL32_CENSUS_ONLY"
+  },
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE_UNCHANGED",
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no renderer/provider/selector/package/transport/backend activation behavior changes.",
+    "ownership": "Raw continuation bytes and rel32 candidates do not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Proof fails closed unless the exact R179 predecessor remains valid, the continuation begins at 0x182251, overlap bytes remain 83 e0, all 128 bytes are readable in .text through 0x1822D1, probe arithmetic matches, and all three previously encoded forward targets remain inside the evidence window."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_1821F3_CONTINUATION_CONTROL_FLOW_PROVEN",
+    "after": "PENDING_182251_CONTINUATION_PROVENANCE",
+    "runtime_claim": false
+  },
+  "blocker": "Instruction-boundary decode and higher-level semantics of the new 0x182251 continuation remain intentionally unresolved until exact bytes are captured and reviewed. The 0x186906 callee semantics, 0x182194 function-entry identity and all render/HUD ownership also remain unresolved.",
+  "next_action": "Wait for exact-SHA automatic validation. Do not publish another ordinary same-branch commit until Backend Conversion Gate completes because cancel-in-progress is enabled.",
+  "validation": {
+    "automation_validation": "PENDING",
+    "runtime_validation": "UNTESTED"
+  }
+}
