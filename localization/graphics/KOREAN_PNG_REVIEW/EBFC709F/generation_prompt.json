@@ -1,0 +1,365 @@
+{
+  "contract": "outrun-first-pass-edit-v2",
+  "contract_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00332",
+  "wave_id": "P00206",
+  "queue_index": 232,
+  "asset_id": "EBFC709F",
+  "source_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+  "source_dimensions": [
+    2048,
+    1024
+  ],
+  "raw_orientation": "flip_y",
+  "display_transform": "flip_y_to_readable",
+  "background_class": "transparent text-only/menu-label atlas",
+  "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold (font bytes not distributed)",
+  "source_style": {
+    "weight": "bold block sans",
+    "slant_angle_deg": 0.0,
+    "slant_direction": "none",
+    "baseline_vector": [
+      1,
+      0
+    ],
+    "outline": "none",
+    "shadow": "none",
+    "glow": "none",
+    "red_fill_rgb": [
+      186,
+      0,
+      0
+    ],
+    "gray_fill_rgb": [
+      63,
+      71,
+      74
+    ]
+  },
+  "alpha_behavior": "C-Q00070 accepted all-zero clean plate; Korean alpha is introduced only inside each C-accepted 2px safe bbox. Source effect removal is exact and all other pixels remain transparent.",
+  "elements": [
+    {
+      "element_id": "big_join",
+      "source_text": "JOIN GAME",
+      "korean": "게임 참가",
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0.0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "colors": {
+        "fill_rgb": [
+          186,
+          0,
+          0
+        ]
+      },
+      "font_size_nominal_hd_px": 136,
+      "font_size_used_hd_px": 136,
+      "source_bbox": [
+        9,
+        874,
+        979,
+        1019
+      ],
+      "candidate_safe_bbox": [
+        11,
+        876,
+        977,
+        1017
+      ],
+      "candidate_bbox": [
+        17,
+        882,
+        540,
+        1010
+      ],
+      "safe_margins_ltrb_px": [
+        6,
+        6,
+        437,
+        7
+      ],
+      "style_class": "red_heading",
+      "source_text_transform": "flip_y raw / normal readable"
+    },
+    {
+      "element_id": "big_create",
+      "source_text": "CREATE GAME",
+      "korean": "게임 만들기",
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0.0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "colors": {
+        "fill_rgb": [
+          186,
+          0,
+          0
+        ]
+      },
+      "font_size_nominal_hd_px": 136,
+      "font_size_used_hd_px": 136,
+      "source_bbox": [
+        24,
+        695,
+        1245,
+        840
+      ],
+      "candidate_safe_bbox": [
+        26,
+        697,
+        1243,
+        838
+      ],
+      "candidate_bbox": [
+        32,
+        704,
+        669,
+        831
+      ],
+      "safe_margins_ltrb_px": [
+        6,
+        7,
+        574,
+        7
+      ],
+      "style_class": "red_heading",
+      "source_text_transform": "flip_y raw / normal readable"
+    },
+    {
+      "element_id": "desc_join",
+      "source_text": "Join your friends in a game of OutRun!",
+      "korean": "친구들과 함께 아웃런 게임에 참가하세요!",
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0.0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "colors": {
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ]
+      },
+      "font_size_nominal_hd_px": 48,
+      "font_size_used_hd_px": 48,
+      "source_bbox": [
+        4,
+        527,
+        1138,
+        597
+      ],
+      "candidate_safe_bbox": [
+        6,
+        529,
+        1136,
+        595
+      ],
+      "candidate_bbox": [
+        10,
+        539,
+        815,
+        585
+      ],
+      "safe_margins_ltrb_px": [
+        4,
+        10,
+        321,
+        10
+      ],
+      "style_class": "gray_description",
+      "source_text_transform": "flip_y raw / normal readable"
+    },
+    {
+      "element_id": "desc_create",
+      "source_text": "Create a game and invite your friends!",
+      "korean": "게임을 만들고 친구를 초대하세요!",
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0.0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "colors": {
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ]
+      },
+      "font_size_nominal_hd_px": 48,
+      "font_size_used_hd_px": 48,
+      "source_bbox": [
+        7,
+        367,
+        1120,
+        437
+      ],
+      "candidate_safe_bbox": [
+        9,
+        369,
+        1118,
+        435
+      ],
+      "candidate_bbox": [
+        12,
+        379,
+        675,
+        425
+      ],
+      "safe_margins_ltrb_px": [
+        3,
+        10,
+        443,
+        10
+      ],
+      "style_class": "gray_description",
+      "source_text_transform": "flip_y raw / normal readable"
+    },
+    {
+      "element_id": "small_join",
+      "source_text": "JOIN GAME",
+      "korean": "게임 참가",
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0.0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "colors": {
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ]
+      },
+      "font_size_nominal_hd_px": 44,
+      "font_size_used_hd_px": 44,
+      "source_bbox": [
+        14,
+        287,
+        418,
+        350
+      ],
+      "candidate_safe_bbox": [
+        16,
+        289,
+        416,
+        348
+      ],
+      "candidate_bbox": [
+        19,
+        297,
+        188,
+        339
+      ],
+      "safe_margins_ltrb_px": [
+        3,
+        8,
+        228,
+        9
+      ],
+      "style_class": "gray_label",
+      "source_text_transform": "flip_y raw / normal readable"
+    },
+    {
+      "element_id": "small_create",
+      "source_text": "CREATE GAME",
+      "korean": "게임 만들기",
+      "alignment": "left",
+      "baseline_vector": [
+        1,
+        0
+      ],
+      "slant_angle_deg": 0.0,
+      "effects": {
+        "outline": "none",
+        "shadow": "none",
+        "glow": "none"
+      },
+      "colors": {
+        "fill_rgb": [
+          63,
+          71,
+          74
+        ]
+      },
+      "font_size_nominal_hd_px": 44,
+      "font_size_used_hd_px": 44,
+      "source_bbox": [
+        898,
+        291,
+        1420,
+        354
+      ],
+      "candidate_safe_bbox": [
+        900,
+        293,
+        1418,
+        352
+      ],
+      "candidate_bbox": [
+        903,
+        301,
+        1109,
+        343
+      ],
+      "safe_margins_ltrb_px": [
+        3,
+        8,
+        309,
+        9
+      ],
+      "style_class": "gray_label",
+      "source_text_transform": "flip_y raw / normal readable"
+    }
+  ],
+  "protected_regions": [
+    "all readable pixels outside the union of the six C-Q00070 source-effect masks and six candidate safe bboxes",
+    "all pixels outside the six bound atlas cells",
+    "DDS header bytes 0..127"
+  ],
+  "forbidden": [
+    "visible English/source glyph residue",
+    "cover rectangles or invented panels",
+    "blur/smudge concealment",
+    "changes outside C-Q00070 accepted masks/safe boxes",
+    "cropping/padding/resizing the DDS canvas",
+    "generic outline/shadow/glow",
+    "fallback glyph boxes",
+    "1px overflow beyond original source-effect bbox"
+  ],
+  "single_pass_self_check": "Render at source-family native scale, refit only if necessary, encode exact RGBA32 DDS preserving the 128-byte header and flip_y orientation, decode it again, and require zero changed/alpha pixels outside allowed regions plus exact English-source side-by-side review."
+}

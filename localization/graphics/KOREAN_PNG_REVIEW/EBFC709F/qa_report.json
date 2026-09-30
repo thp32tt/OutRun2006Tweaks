@@ -1,0 +1,376 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-b00332-p00206-index232-ebfc709f-candidate-qa-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00332",
+  "wave_id": "P00206",
+  "lane": "LOCALIZATION_B",
+  "queue_index": 232,
+  "asset": "EBFC709F",
+  "source_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "source": {
+    "sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+    "header_128_sha256": "532576d0ccd0d1eb3392c6754f1d13cf0afb4d34d02dd4fd9e1c14c2c4ea0a0f",
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "mip_count": 1,
+    "raw_orientation": "flip_y",
+    "source_effect_removal_pixels": 245840
+  },
+  "candidate": {
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE",
+    "drive_folder_id": "1RU3lfr7cYLdT4Jn2ADZqN8YPY10YiKeE",
+    "drive_file_id": "1aXXwPc92KyLm-w8r8nwC8qhLfg_-HdSc",
+    "drive_file_name": "EBFC709F_512x256.dds",
+    "bytes": 8388736,
+    "sha256": "41334c7d5ae5692e232fd9dfe25b75119419187f096566a8beae22eb74dc8026",
+    "header_128_sha256": "532576d0ccd0d1eb3392c6754f1d13cf0afb4d34d02dd4fd9e1c14c2c4ea0a0f",
+    "drive_readback_size_verified": 8388736,
+    "drive_readback_sha256_verified": "41334c7d5ae5692e232fd9dfe25b75119419187f096566a8beae22eb74dc8026",
+    "drive_readback_byte_identical_to_local_candidate": true,
+    "format": "RGBA32",
+    "mip_count": 1,
+    "raw_orientation": "flip_y"
+  },
+  "render": {
+    "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold (font bytes not distributed)",
+    "source_family_reference": "index237/FF514CEB current-v2 accepted style lineage",
+    "baseline_vector": [
+      1,
+      0
+    ],
+    "slant_angle_deg": 0,
+    "effects": {
+      "outline": "none",
+      "shadow": "none",
+      "glow": "none"
+    },
+    "red_heading_rgb": [
+      186,
+      0,
+      0
+    ],
+    "gray_text_rgb": [
+      63,
+      71,
+      74
+    ],
+    "elements": [
+      {
+        "element_id": "big_join",
+        "source": "JOIN GAME",
+        "korean": "게임 참가",
+        "font_size_px": 136,
+        "family_nominal_px": 136,
+        "font_name": [
+          "Noto Sans CJK KR",
+          "Bold"
+        ],
+        "candidate_bbox_readable_xyxy": [
+          17,
+          882,
+          540,
+          1010
+        ],
+        "candidate_safe_bbox_readable_xyxy": [
+          11,
+          876,
+          977,
+          1017
+        ],
+        "source_effect_bbox_readable_xyxy": [
+          9,
+          874,
+          979,
+          1019
+        ],
+        "safe_margins_ltrb_px": [
+          6,
+          6,
+          437,
+          7
+        ],
+        "source_containment_margins_ltrb_px": [
+          8,
+          8,
+          439,
+          9
+        ],
+        "containment": "PASS",
+        "candidate_nonzero_rgba_pixels": 27376
+      },
+      {
+        "element_id": "big_create",
+        "source": "CREATE GAME",
+        "korean": "게임 만들기",
+        "font_size_px": 136,
+        "family_nominal_px": 136,
+        "font_name": [
+          "Noto Sans CJK KR",
+          "Bold"
+        ],
+        "candidate_bbox_readable_xyxy": [
+          32,
+          704,
+          669,
+          831
+        ],
+        "candidate_safe_bbox_readable_xyxy": [
+          26,
+          697,
+          1243,
+          838
+        ],
+        "source_effect_bbox_readable_xyxy": [
+          24,
+          695,
+          1245,
+          840
+        ],
+        "safe_margins_ltrb_px": [
+          6,
+          7,
+          574,
+          7
+        ],
+        "source_containment_margins_ltrb_px": [
+          8,
+          9,
+          576,
+          9
+        ],
+        "containment": "PASS",
+        "candidate_nonzero_rgba_pixels": 34628
+      },
+      {
+        "element_id": "desc_join",
+        "source": "Join your friends in a game of OutRun!",
+        "korean": "친구들과 함께 아웃런 게임에 참가하세요!",
+        "font_size_px": 48,
+        "family_nominal_px": 48,
+        "font_name": [
+          "Noto Sans CJK KR",
+          "Bold"
+        ],
+        "candidate_bbox_readable_xyxy": [
+          10,
+          539,
+          815,
+          585
+        ],
+        "candidate_safe_bbox_readable_xyxy": [
+          6,
+          529,
+          1136,
+          595
+        ],
+        "source_effect_bbox_readable_xyxy": [
+          4,
+          527,
+          1138,
+          597
+        ],
+        "safe_margins_ltrb_px": [
+          4,
+          10,
+          321,
+          10
+        ],
+        "source_containment_margins_ltrb_px": [
+          6,
+          12,
+          323,
+          12
+        ],
+        "containment": "PASS",
+        "candidate_nonzero_rgba_pixels": 16501
+      },
+      {
+        "element_id": "desc_create",
+        "source": "Create a game and invite your friends!",
+        "korean": "게임을 만들고 친구를 초대하세요!",
+        "font_size_px": 48,
+        "family_nominal_px": 48,
+        "font_name": [
+          "Noto Sans CJK KR",
+          "Bold"
+        ],
+        "candidate_bbox_readable_xyxy": [
+          12,
+          379,
+          675,
+          425
+        ],
+        "candidate_safe_bbox_readable_xyxy": [
+          9,
+          369,
+          1118,
+          435
+        ],
+        "source_effect_bbox_readable_xyxy": [
+          7,
+          367,
+          1120,
+          437
+        ],
+        "safe_margins_ltrb_px": [
+          3,
+          10,
+          443,
+          10
+        ],
+        "source_containment_margins_ltrb_px": [
+          5,
+          12,
+          445,
+          12
+        ],
+        "containment": "PASS",
+        "candidate_nonzero_rgba_pixels": 13650
+      },
+      {
+        "element_id": "small_join",
+        "source": "JOIN GAME",
+        "korean": "게임 참가",
+        "font_size_px": 44,
+        "family_nominal_px": 44,
+        "font_name": [
+          "Noto Sans CJK KR",
+          "Bold"
+        ],
+        "candidate_bbox_readable_xyxy": [
+          19,
+          297,
+          188,
+          339
+        ],
+        "candidate_safe_bbox_readable_xyxy": [
+          16,
+          289,
+          416,
+          348
+        ],
+        "source_effect_bbox_readable_xyxy": [
+          14,
+          287,
+          418,
+          350
+        ],
+        "safe_margins_ltrb_px": [
+          3,
+          8,
+          228,
+          9
+        ],
+        "source_containment_margins_ltrb_px": [
+          5,
+          10,
+          230,
+          11
+        ],
+        "containment": "PASS",
+        "candidate_nonzero_rgba_pixels": 3212
+      },
+      {
+        "element_id": "small_create",
+        "source": "CREATE GAME",
+        "korean": "게임 만들기",
+        "font_size_px": 44,
+        "family_nominal_px": 44,
+        "font_name": [
+          "Noto Sans CJK KR",
+          "Bold"
+        ],
+        "candidate_bbox_readable_xyxy": [
+          903,
+          301,
+          1109,
+          343
+        ],
+        "candidate_safe_bbox_readable_xyxy": [
+          900,
+          293,
+          1418,
+          352
+        ],
+        "source_effect_bbox_readable_xyxy": [
+          898,
+          291,
+          1420,
+          354
+        ],
+        "safe_margins_ltrb_px": [
+          3,
+          8,
+          309,
+          9
+        ],
+        "source_containment_margins_ltrb_px": [
+          5,
+          10,
+          311,
+          11
+        ],
+        "containment": "PASS",
+        "candidate_nonzero_rgba_pixels": 4060
+      }
+    ]
+  },
+  "integrated_self_qa": {
+    "source_identity": "PASS_EXACT_CANONICAL",
+    "c_q00070_render_ready_prerequisites": "PASS_REUSED_C_ACCEPTED_SOURCE_MASK_CLEAN_PLATE_SAFE_BBOX_SEMANTICS",
+    "source_effect_pixels_reused": 245840,
+    "source_nonzero_rgba_pixels_outside_bound_cells": 0,
+    "changed_pixels_total": 256078,
+    "changed_pixels_outside_allowed": 0,
+    "alpha_changed_pixels_outside_allowed": 0,
+    "dds_header_128_identical": true,
+    "decoded_roundtrip_pixel_exact": true,
+    "elements_containment_pass": 6,
+    "elements_total": 6,
+    "one_pixel_overflow_count": 0,
+    "visible_english_residue": "PASS_NONE_IN_TARGET_REGIONS_BY_SOURCE_VS_CANDIDATE_REVIEW",
+    "broken_hangul_or_fallback_boxes": "PASS_NONE_VISIBLE",
+    "clipping": "PASS_NONE_VISIBLE",
+    "opaque_cover_box_or_patch": "PASS_NONE",
+    "wrong_artwork_or_neighbor_change": "PASS_NONE",
+    "material_resolution_or_scale": "PASS_SOURCE_FAMILY_NATIVE_HD_SCALE",
+    "readable_orientation_visual_review": "PASS",
+    "raw_orientation_contract": "PASS_FLIP_Y",
+    "english_source_side_by_side": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "review_artifacts": {
+    "source_display.png": {
+      "sha256": "039f17e45c0b16e33e11a7e9cb17d0188d177d2a79c85763ba5acf04900c47f9"
+    },
+    "clean_plate_display.png": {
+      "sha256": "3b6e81de0315b96aa068570a66a500172c96a9a273e72dcf9bfeb5c095108347"
+    },
+    "candidate_display.png": {
+      "sha256": "da8095487a6f120805a3fe91e9c2f8e36aa605f8fc6533eb1c190f40228ae04f"
+    },
+    "comparison.png": {
+      "sha256": "975b013f450c8fa2fa0f2fa127dfaf1aa5db5d17446ee71d84c3ea0bee2ea353"
+    },
+    "element_comparison.png": {
+      "sha256": "3d59c67954cf786e57581205209b3cbdb9bbd85ca72311e918e112b0802569e2"
+    },
+    "diff_display.png": {
+      "sha256": "4b8beb0da181468952c7d29b19dfa3346f118db3fe221f949ddbfefe349fd762"
+    },
+    "alpha_comparison.png": {
+      "sha256": "6f0e28252a4171ff9b075d037d8bdf9b39a0c578e82b163b1010b8ad9da100a8"
+    }
+  },
+  "generation_prompt_sha256": "880d71aa8c20126be02afe1da908720098a057b6d05ce37a01ea1c8c43f70c28",
+  "final_approved": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "recorded_at_kst": "2026-10-01T05:41:08+09:00",
+  "base_head_sha": "1b3a893aa81899a38018aef31507c2f177f20182",
+  "precommit_base_head_sha": "1b3a893aa81899a38018aef31507c2f177f20182"
+}
