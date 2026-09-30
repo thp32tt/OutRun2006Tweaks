@@ -548,6 +548,15 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_2_INSTRUCTIONS = (
     (0x001822D0, "c9", "leave"),
 )
 
+# R186/F13: fresh exact-EXE continuation provenance begins at the first byte
+# not covered by the R182/R184 0x182251 window. R184 proves 0x1822D0 is a
+# complete leave instruction and stops exactly at 0x1822D1. Capture the next
+# 96 bytes plus raw rel32 candidates only. The first captured byte is reported
+# as evidence but is not interpreted as ret/function-boundary semantics here.
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_3_RVA = 0x001822D1
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_3_PROBE_LEN = 96
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_3_PROBE_END_RVA = 0x00182331
+
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS = (
     (0x000283DE, "b9 00 00 80 3f", "mov ecx, 0x3f800000"),
     (0x000283E3, "d9 58 1c", "fstp dword [eax+0x1c]"),
@@ -2007,6 +2016,79 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_2_prefix_proo
         "call_semantics": "UNRESOLVED",
         "ownership_effect": "NONE",
         "continuation_status": "NEXT_BYTE_AFTER_LEAVE_NOT_CAPTURED",
+    }
+
+
+def collect_guarded_gf_target_c_helper_1_third_callee_continuation_3_provenance(pe: PE) -> dict:
+    """Capture exact bytes immediately after the R184 0x1822D0 leave.
+
+    The predecessor proof must consume its entire 128-byte window through the
+    leave at 0x1822D0 and end exactly at 0x1822D1. This collector then captures
+    96 fresh bytes and raw rel32 candidates. The first byte is surfaced only as
+    raw evidence; ret/function-boundary, callee, and render/HUD semantics remain
+    unresolved until a separate instruction-boundary proof reviews these bytes.
+    """
+
+    predecessor = collect_guarded_gf_target_c_helper_1_third_callee_continuation_2_prefix_proof(pe)
+    target_rva = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_3_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    probe = pe.bytes_at_rva(
+        target_rva, GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_3_PROBE_LEN
+    )
+    inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
+    outbound = collect_raw_rel32_call_candidates(
+        pe,
+        target_rva,
+        GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_3_PROBE_LEN,
+    )
+    predecessor_exact = (
+        predecessor["status"] == "EXACT_182251_CONTINUATION_CONTROL_FLOW_PROVEN"
+        and predecessor["prefix_end_rva"] == target_rva
+        and predecessor["probe_end_rva"] == target_rva
+        and predecessor["leave_rva"] == target_rva - 1
+        and predecessor["leave_matches"]
+        and predecessor["terminal_status"] == "LEAVE_PROVEN_RET_NOT_CAPTURED"
+        and predecessor["continuation_status"] == "NEXT_BYTE_AFTER_LEAVE_NOT_CAPTURED"
+        and predecessor["target_section"] == ".text"
+    )
+    probe_end_matches = (
+        target_rva + len(probe)
+        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_3_PROBE_END_RVA
+    )
+    captured = bool(
+        predecessor_exact
+        and target_section == ".text"
+        and len(probe) == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_3_PROBE_LEN
+        and probe_end_matches
+    )
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "predecessor_status": predecessor["status"],
+        "predecessor_exact": predecessor_exact,
+        "predecessor_leave_rva": predecessor["leave_rva"],
+        "predecessor_leave_bytes": predecessor["leave_bytes"],
+        "probe_len": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_3_PROBE_LEN,
+        "probe_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_3_PROBE_END_RVA,
+        "probe_end_matches": probe_end_matches,
+        "first_byte": probe[:1].hex(" "),
+        "first_16_bytes": probe[:16].hex(" "),
+        "bytes": probe.hex(" "),
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "status": (
+            "EXACT_EXE_1822D1_CONTINUATION_PROVENANCE_CAPTURED"
+            if captured
+            else "CALLEE_1822D1_CONTINUATION_PROVENANCE_CAPTURE_FAILED"
+        ),
+        "function_entry_status": "UNRESOLVED",
+        "terminal_status": "UNRESOLVED_RAW_FIRST_BYTE_ONLY",
+        "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+        "ownership_effect": "NONE",
+        "continuation_scope": "RAW_BYTES_AND_REL32_CENSUS_ONLY",
     }
 
 
@@ -3817,6 +3899,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_third_callee_continuation_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_2_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_2_provenance(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_2_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_2_prefix_proof(pe),
+        "guarded_gf_target_c_helper_1_third_callee_continuation_3_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_3_provenance(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -4463,6 +4546,37 @@ def main() -> int:
         f"ownership_effect={helper_1_third_cont_2_proof['ownership_effect']} "
         f"continuation={helper_1_third_cont_2_proof['continuation_status']}"
     )
+    helper_1_third_cont_3 = report[
+        "guarded_gf_target_c_helper_1_third_callee_continuation_3_provenance"
+    ]
+    helper_1_third_cont_3_outbound = ",".join(
+        f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+        f"{call['known_target'] or 'unknown'}:{call['target_section']}"
+        for call in helper_1_third_cont_3["raw_outbound_rel32_candidates"]
+    ) or "none"
+    print(
+        f"gf_target_c_helper_1_third_callee_continuation_3=0x{helper_1_third_cont_3['target_rva']:08X} "
+        f"status={helper_1_third_cont_3['status']} "
+        f"predecessor={helper_1_third_cont_3['predecessor_status']} "
+        f"predecessor_exact={helper_1_third_cont_3['predecessor_exact']} "
+        f"predecessor_leave=0x{helper_1_third_cont_3['predecessor_leave_rva']:08X}:"
+        f"{helper_1_third_cont_3['predecessor_leave_bytes']} "
+        f"section={helper_1_third_cont_3['target_section'] or 'none'} "
+        f"probe_len={helper_1_third_cont_3['probe_len']} "
+        f"probe_end=0x{helper_1_third_cont_3['probe_end_rva']:08X} "
+        f"probe_end_match={helper_1_third_cont_3['probe_end_matches']} "
+        f"first_byte={helper_1_third_cont_3['first_byte']} "
+        f"first16={helper_1_third_cont_3['first_16_bytes']} "
+        f"inbound_raw={len(helper_1_third_cont_3['raw_inbound_rel32_candidates'])} "
+        f"outbound_raw={len(helper_1_third_cont_3['raw_outbound_rel32_candidates'])} "
+        f"outbound={helper_1_third_cont_3_outbound} "
+        f"function_entry={helper_1_third_cont_3['function_entry_status']} "
+        f"terminal_status={helper_1_third_cont_3['terminal_status']} "
+        f"semantic_effect={helper_1_third_cont_3['semantic_effect']} "
+        f"ownership_effect={helper_1_third_cont_3['ownership_effect']} "
+        f"scope={helper_1_third_cont_3['continuation_scope']} "
+        f"bytes={helper_1_third_cont_3['bytes']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
@@ -4540,6 +4654,9 @@ def main() -> int:
     if helper_1_third_cont_2_proof["status"] != "EXACT_182251_CONTINUATION_CONTROL_FLOW_PROVEN":
         print("guarded_gf_target_c_helper_1_third_callee_continuation_2_prefix_proof=FAILED")
         return 25
+    if helper_1_third_cont_3["status"] != "EXACT_EXE_1822D1_CONTINUATION_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_c_helper_1_third_callee_continuation_3_provenance=FAILED")
+        return 26
     return 0
 
 
