@@ -258,8 +258,7 @@ namespace OutRunVRStereo
             if (device && IsGameDevice(device))
             {
                 const HRESULT cooperative = device->TestCooperativeLevel();
-                if (cooperative == D3DERR_DEVICELOST ||
-                    cooperative == D3DERR_DEVICENOTRESET)
+                if (OutRunVR::Lifecycle::DeviceNeedsResetBypass(cooperative))
                 {
                     ++R34ResetReplay.lostDeviceBypasses;
                     R34ResetReplay.blocked.store(
