@@ -1245,9 +1245,24 @@ class UIScaling : public Hook
 	}
 
 	static inline SafetyHookMid DispTempHeartNum_AdjustPosition_hk{};
-	static void DispTempHeartNum_AdjustPosition(safetyhook::Context& ctx)
+	template<std::uintptr_t CallerRva>
+	static void DispTempHeartNum_AdjustPositionAndHud(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((int*)(ctx.esp), false);
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"DispTempHeartNum callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R128 TEMP HEART HUD: shared producer-map handoff rva=0x{:x} hits={}",
+				CallerRva, hit);
 	}
 
 	static inline SafetyHookMid C2CSpeechBubble_AdjustPositionESP0_hk1{};
@@ -1486,8 +1501,12 @@ public:
 			(void*)0x460A21,
 			ctrl_icon_work_AdjustPosition2AndHud<0x00060A21u>); // set_icon_work keeps the same stack-write correction
 
-		// "-" text when negative heart score
-		DispTempHeartNum_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BBA89, DispTempHeartNum_AdjustPosition);
+		// R128/F13: exact DispTempHeartNum edge 0xBBA89 is canonical
+		// SCREEN_HUD. Preserve the existing negative-heart X correction and
+		// source only the immediate next-draw owner from the shared producer map.
+		DispTempHeartNum_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x4BBA89,
+			DispTempHeartNum_AdjustPositionAndHud<0x000BBA89u>);
 
 		// C2C-specific speech bubbles
 		C2CSpeechBubble_AdjustPositionESP0_hk1 = safetyhook::create_mid((void*)0x496AC7, C2CSpeechBubble_AdjustPositionESP0);
