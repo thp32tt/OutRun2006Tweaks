@@ -1200,18 +1200,30 @@ class UIScaling : public Hook
 	static inline SafetyHookMid NaviPub_Disp_RivalOnlineEnableScaling_hk{};
 
 	static inline SafetyHookMid ctrl_icon_work_AdjustPosition_hk{};
-	static void ctrl_icon_work_AdjustPosition(safetyhook::Context& ctx)
-	{
-		AddSpriteSpacing(&ctx.xmm0.f32[0], false);
-	}
-
 	static inline SafetyHookMid ctrl_icon_work_AdjustPosition2_hk{};
 	static inline SafetyHookMid set_icon_work_AdjustPosition_hk{};
-	static void ctrl_icon_work_AdjustPosition2(safetyhook::Context& ctx)
+
+	template<std::uintptr_t CallerRva, bool MirrorXmm0ToStack>
+	static void CtrlIcon_AdjustPositionAndHud(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing(&ctx.xmm0.f32[0], false);
 
-		*(float*)(ctx.esp) = ctx.xmm0.f32[0];
+		if constexpr (MirrorXmm0ToStack)
+			*(float*)(ctx.esp) = ctx.xmm0.f32[0];
+
+		constexpr auto scope =
+			OutRunVR::GameSemantic::ClassifyCriticalProducer(CallerRva);
+		static_assert(
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			"ctrl_icon_work callsite must remain canonical SCREEN_HUD");
+		OutRunVR::GameSemantic::ArmNextDraw(scope);
+
+		static std::atomic<std::uint64_t> hits{ 0 };
+		const auto hit = hits.fetch_add(1, std::memory_order_relaxed) + 1;
+		if ((hit & (hit - 1)) == 0)
+			spdlog::info(
+				"VR R129 CTRL ICON HUD: shared producer-map handoff rva=0x{:x} stackMirror={} hits={}",
+				CallerRva, MirrorXmm0ToStack, hit);
 	}
 
 	static inline SafetyHookMid DispTempHeartNum_AdjustPosition_hk{};
@@ -1456,10 +1468,18 @@ public:
 			Module::exe_ptr(0xBEA5F),
 			GoalTime_Help150, Memory::HookType::Call);
 
-		// adjusts the girlfriend request speech bubble
-		ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460D40, ctrl_icon_work_AdjustPosition);
-		ctrl_icon_work_AdjustPosition2_hk = safetyhook::create_mid((void*)0x460FBC, ctrl_icon_work_AdjustPosition2);
-		set_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460A21, ctrl_icon_work_AdjustPosition2); // set_icon_work can use same logic as ctrl_icon_work_AdjustPosition2
+		// R129/F13: exact ctrl_icon_work/set_icon_work producer edges are all
+		// canonical SCREEN_HUD. Preserve the original XMM0 spacing behavior and
+		// the stack mirror on the two callsites that previously used AdjustPosition2.
+		ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x460D40,
+			CtrlIcon_AdjustPositionAndHud<0x00060D40u, false>);
+		ctrl_icon_work_AdjustPosition2_hk = safetyhook::create_mid(
+			(void*)0x460FBC,
+			CtrlIcon_AdjustPositionAndHud<0x00060FBCu, true>);
+		set_icon_work_AdjustPosition_hk = safetyhook::create_mid(
+			(void*)0x460A21,
+			CtrlIcon_AdjustPositionAndHud<0x00060A21u, true>);
 
 		// R128/F13: exact DispTempHeartNum edge 0xBBA89 is canonical
 		// SCREEN_HUD. Preserve the existing negative-heart X correction and

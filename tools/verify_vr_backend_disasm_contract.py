@@ -119,6 +119,10 @@ def main() -> None:
             "VR R127 GHOST GAP FORCE HUD: shared producer-map handoff",
             "DispTempHeartNum_AdjustPositionAndHud<0x000BBA89u>",
             "VR R128 TEMP HEART HUD: shared producer-map handoff",
+            "CtrlIcon_AdjustPositionAndHud<0x00060D40u, false>",
+            "CtrlIcon_AdjustPositionAndHud<0x00060FBCu, true>",
+            "CtrlIcon_AdjustPositionAndHud<0x00060A21u, true>",
+            "VR R129 CTRL ICON HUD: shared producer-map handoff",
         ],
     )
     hooks_text = (ROOT / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
@@ -184,6 +188,19 @@ def main() -> None:
     if "DispTempHeartNum_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BBA89, DispTempHeartNum_AdjustPosition);" in hooks_text:
         raise SystemExit(
             "F13 DispTempHeartNum ownership regressed to spacing-only callback"
+        )
+    legacy_ctrl_icon_hooks = [
+        "ctrl_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460D40, ctrl_icon_work_AdjustPosition);",
+        "ctrl_icon_work_AdjustPosition2_hk = safetyhook::create_mid((void*)0x460FBC, ctrl_icon_work_AdjustPosition2);",
+        "set_icon_work_AdjustPosition_hk = safetyhook::create_mid((void*)0x460A21, ctrl_icon_work_AdjustPosition2);",
+    ]
+    stale_ctrl_icon_hooks = [
+        hook for hook in legacy_ctrl_icon_hooks if hook in hooks_text
+    ]
+    if stale_ctrl_icon_hooks:
+        raise SystemExit(
+            "F13 ctrl_icon_work ownership regressed to legacy spacing-only callbacks: "
+            f"{stale_ctrl_icon_hooks}"
         )
     require(
         "tools/analyze_outrun_exe.py",
