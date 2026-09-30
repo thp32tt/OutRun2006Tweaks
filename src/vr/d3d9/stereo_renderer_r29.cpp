@@ -585,4 +585,25 @@ namespace OutRunVRStereo
 
         VRStereoR29Hook VRStereoR29Hook::instance;
     }
-}
+
+    bool StereoBaseStable(IDirect3DDevice9* device) noexcept
+    {
+        return R29StableStereoBase(device);
+    }
+
+    bool FragileEffectCached(
+        IDirect3DDevice9* device, bool& fragile) noexcept
+    {
+        return R29FragileEffectCached(device, fragile);
+    }
+
+    void ArmMonoSafety(std::uint64_t extraPresents = 2) noexcept
+    {
+        R29ArmMonoSafety(extraPresents);
+    }
+
+    void NoteStableTwoEyeDraw() noexcept
+    {
+        ++R29StableTwoEyeDraws;
+    }
+}}

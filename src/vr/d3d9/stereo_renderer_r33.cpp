@@ -262,7 +262,7 @@ namespace OutRunVRStereo
         OutRunVR::Core::DispatchResult R33TryFastWorld(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
-            if (IsGameStateBlockRecording() || !R29StableStereoBase(device))
+            if (IsGameStateBlockRecording() || !StereoBaseStable(device))
             {
                 if (R33TelemetryEnabled() && IsGameDevice(device) &&
                     !InternalStereoPass && TargetIsBackBuffer())
@@ -274,7 +274,7 @@ namespace OutRunVRStereo
             const bool stateBlocksReliable =
                 IsStateBlockTrackingReliable();
             const bool effectKnown = stateBlocksReliable
-                ? R29FragileEffectCached(device, fragile)
+                ? FragileEffectCached(device, fragile)
                 : R32EffectIsFragileLive(device, fragile);
             if (!effectKnown)
                 return {};
@@ -335,7 +335,7 @@ namespace OutRunVRStereo
                     R9Poison(OutRunVR::StereoFailureRestoreFailed,
                         "R33/fast-left-WVP-rollback");
                     NoteRestoreFailure("R33 fast left-eye c64 rollback");
-                    R29ArmMonoSafety();
+                    ArmMonoSafety();
                     return { true, E_FAIL };
                 }
                 return {};
@@ -359,7 +359,7 @@ namespace OutRunVRStereo
                 }
                 if (!restored)
                     NoteRestoreFailure("R33 fast left draw c64");
-                R29ArmMonoSafety();
+                ArmMonoSafety();
                 return result;
             }
 
@@ -399,7 +399,7 @@ namespace OutRunVRStereo
             FrameHadWorldStereo = true;
             ++DuplicatedDraws;
             ++WorldStereoDraws;
-            ++R29StableTwoEyeDraws;
+            NoteStableTwoEyeDraw();
             if (R33TelemetryEnabled())
             {
                 NoteTelemetryFastWorld();
@@ -417,14 +417,14 @@ namespace OutRunVRStereo
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
                 R9Poison(rightFailure, site, rightHr);
-                R29ArmMonoSafety();
+                ArmMonoSafety();
             }
             if (!restoreOk)
             {
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
                 NoteRestoreFailure("R33 fast right-eye draw");
-                R29ArmMonoSafety();
+                ArmMonoSafety();
             }
             return result;
         }
@@ -435,7 +435,7 @@ namespace OutRunVRStereo
         {
             const R30ScreenSpaceKind screenKind =
                 R30ClassifyScreenSpacePass(device);
-            if (IsGameStateBlockRecording() || !R29StableStereoBase(device) ||
+            if (IsGameStateBlockRecording() || !StereoBaseStable(device) ||
                 screenKind == R30ScreenSpaceKind::None)
                 return {};
 
@@ -502,7 +502,7 @@ namespace OutRunVRStereo
                     R9Poison(OutRunVR::StereoFailureRestoreFailed,
                         "R33/HUD-left-WVP-rollback");
                     NoteRestoreFailure("R33 HUD left-eye c64 rollback");
-                    R29ArmMonoSafety();
+                    ArmMonoSafety();
                     return { true, E_FAIL };
                 }
                 return {};
@@ -527,7 +527,7 @@ namespace OutRunVRStereo
                     site, result.hr);
                 if (!restored)
                     NoteRestoreFailure("R33 HUD left draw c64");
-                R29ArmMonoSafety();
+                ArmMonoSafety();
                 return result;
             }
 
@@ -565,7 +565,7 @@ namespace OutRunVRStereo
             FrameHadDuplicatedDraw = true;
             ++DuplicatedDraws;
             ++NonWorldDuplicatedDraws;
-            ++R29StableTwoEyeDraws;
+            NoteStableTwoEyeDraw();
             ++R30ScreenSpaceFovDraws;
             if (R33TelemetryEnabled())
             {
@@ -578,14 +578,14 @@ namespace OutRunVRStereo
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
                 R9Poison(rightFailure, site, rightHr);
-                R29ArmMonoSafety();
+                ArmMonoSafety();
             }
             if (!restoreOk)
             {
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
                 NoteRestoreFailure("R33 HUD right-eye draw");
-                R29ArmMonoSafety();
+                ArmMonoSafety();
             }
             return result;
         }
