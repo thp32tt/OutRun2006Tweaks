@@ -114,8 +114,8 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "fabe52f2b943665933b7da0e75972676c6dfa3fc",
+  "authoritative_result_sha": "fabe52f2b943665933b7da0e75972676c6dfa3fc",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(B): advance index133 clean-plate preflight [AUTO:LOCALIZATION-LOCALIZATION_B-00324]",
   "precommit_refresh": {
@@ -124,6 +124,8 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "A00323 bookkeeping/material was already present at refreshed base 13a08264 and is preserved. Only unique B00324 lane-local report and task record are added."
   },
-  "bookkeeping_note": "Result SHA will be bound by a separate bookkeeping commit after the durable producer task commit. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
-  "durable_task_record_in_result_commit": true
+  "bookkeeping_note": "Durable producer result SHA is bound here. AUTOMATION_VALIDATION remains PENDING for C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is separate and does not own a Localization Automation Gate.",
+  "durable_task_record_in_result_commit": true,
+  "bookkeeping_recorded_at_kst": "2026-10-01T04:45:30+09:00",
+  "bookkeeping_base_head_sha": "fabe52f2b943665933b7da0e75972676c6dfa3fc"
 }
