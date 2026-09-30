@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00146",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "01e24bcb85c40e62d7d876be48156f9c4017aadb",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R146_HELPER_28460_LOOKUP_PREFIX",
+  "selection_reason": "CONVERSION-DX11-00144 completed all three target-C outbound CALL alignment proofs and explicitly left helper 0x28460/0x28320/0x28800 semantics unresolved. Reuse the independently validated exact-EXE DXVK-00143 evidence, but adapt the proof to the DX11 branch's consolidated target-C alignment contract and independently run DX11 Actions.",
+  "summary": "Add a fail-closed exact-EXE proof for the first target-C helper 0x28460 through 0x284AF: packed selector split, high-word range guards, low-word mask, table lookup, local -1 miss cleanup, and first non-null success continuation at 0x284B0. Full helper/callee semantics and render ownership remain unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00143",
+    "source_result_sha": "f70c5f8d719cf5cc4727173380e7137d3578c6c9",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE; reuse reviewed bytes/branch targets only, with independent DX11 fail-closed validation."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00146.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "DX11-00144 proved exact aligned caller 0x65997->0x28460 and left helper semantics unresolved.",
+    "DXVK-00143 independently validated the same exact-EXE helper prefix and control-flow targets.",
+    "This result commit must be independently validated on vr-dx11-native-r71 before AUTOMATION_VALIDATION may become PASS.",
+    "No HMD/game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "next_action": "Consume exact-result-sha GitHub Actions. If green, record PASS in a separate bookkeeping checkpoint. Keep guarded GF ownership unchanged; a later task may continue from success path 0x284B0 or analyze 0x28320/0x28800."
+}
