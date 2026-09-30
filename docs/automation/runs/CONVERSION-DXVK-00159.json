@@ -1,0 +1,32 @@
+{
+  "task_id": "CONVERSION-DXVK-00159",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "ff926d94c898ca524ab334abef1ffb30619d8551",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R159_HELPER_2837E_CONTINUATION_PROVENANCE",
+  "selection_reason": "DXVK runtime promotion remains Quest 3/VDXR-dependent. CONVERSION-DXVK-00157 proved complete instructions only through 0x2837D and explicitly required fresh exact bytes beginning at 0x2837E before further decoding. This provenance capture is the smallest independent HMD-free next step.",
+  "summary": "Add a bounded exact-EXE continuation provenance capture beginning at 0x2837E, the exact exclusive end of the validated 0x28320 instruction prefix. Capture a fresh 96-byte .text window, function-start guess, and raw inbound/outbound rel32 candidates, guarded by predecessor status/end/call-target continuity. No continuation semantics or ownership are inferred.",
+  "evidence": [
+    "CONVERSION-DXVK-00157 validation-bearing result 317211876f1fc4c4a540c216ec9fa845351904d8 proved the 0x28320..0x2837D prefix and aligned 0x28379->0x282B0 call, stopping at exclusive RVA 0x2837E because the prior window truncated the next instruction.",
+    "This task captures fresh exact bytes at 0x2837E rather than extrapolating from the truncated prior provenance window.",
+    "No Quest 3 / VDXR or in-game execution is performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00159.json"
+  ],
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE",
+  "next_action": "Run exact-result GitHub Actions. If the 0x2837E continuation capture passes, persist exact bytes/call census while keeping function_entry_status=UNRESOLVED, semantic_effect=UNRESOLVED_CONTINUATION_BYTES_ONLY and ownership_effect=NONE. A later bounded task may decode only complete instructions from that fresh window."
+}
