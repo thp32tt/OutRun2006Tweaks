@@ -115,6 +115,20 @@ for legacy in (
         errors.append(f"R31 regained lower-layer implementation dependency: {legacy}*")
 
 for legacy in (
+    "R9",
+    "R13",
+    "R20",
+    "R21",
+    "R22",
+    "R23",
+    "R26",
+    "R29",
+):
+    import re
+    if re.search(rf"\\b{legacy}[A-Za-z0-9_]+", read("src/vr/d3d9/stereo_renderer_r30.cpp")):
+        errors.append(f"R30 regained lower-layer implementation dependency: {legacy}*")
+
+for legacy in (
     "R29StableStereoBase",
     "R29FragileEffectCached",
     "R29ArmMonoSafety",
