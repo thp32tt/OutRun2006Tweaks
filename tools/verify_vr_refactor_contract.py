@@ -328,6 +328,18 @@ if "attempt < 4800" in r32 or "Sleep(25)" in r32:
 if "attempt < R32PrerequisiteWaitAttempts" not in r32 or \
         "Sleep(R32PrerequisiteWaitMs)" not in r32:
     errors.append("R32 install thread no longer consumes prerequisite wait policy")
+if "void R32PublishInstallState(" not in r32:
+    errors.append("R32 install-state publication boundary missing")
+if r32.count("R32InstallState.store(") != 1:
+    errors.append("R32 install-state store escaped publication boundary")
+for marker in (
+    "R32PublishInstallState(State::Pending)",
+    "R32PublishInstallState(State::Failed)",
+    "R32PublishInstallState(State::Ready)",
+):
+    if marker not in r32:
+        errors.append(f"R32 install-state publication path missing: {marker}")
+
 if "R32ClassifyPrerequisite(" not in r32:
     errors.append("R32 install thread bypassed prerequisite classifier")
 

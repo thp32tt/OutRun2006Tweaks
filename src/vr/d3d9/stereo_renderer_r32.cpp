@@ -1398,10 +1398,16 @@ namespace OutRunVRStereo
             return R32PrerequisiteDecision::Wait;
         }
 
+        void R32PublishInstallState(
+            OutRunVR::RuntimeEligibility::InstallState state) noexcept
+        {
+            R32InstallState.store(state, std::memory_order_release);
+        }
+
         DWORD WINAPI R32InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
-            R32InstallState.store(State::Pending, std::memory_order_release);
+            R32PublishInstallState(State::Pending);
             for (int attempt = 0; attempt < R32PrerequisiteWaitAttempts; ++attempt)
             {
                 const auto r31 = DispatchSupportInstallState();
@@ -1412,7 +1418,7 @@ namespace OutRunVRStereo
                     r31, r22, r13Failed, r13Ready);
                 if (prerequisite == R32PrerequisiteDecision::Fail)
                 {
-                    R32InstallState.store(State::Failed, std::memory_order_release);
+                    R32PublishInstallState(State::Failed);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", false);
                     return 0;
                 }
@@ -1442,8 +1448,7 @@ namespace OutRunVRStereo
                     if (!R32EnableHooks())
                     {
                         R32RollbackHooks();
-                        R32InstallState.store(State::Failed,
-                            std::memory_order_release);
+                        R32PublishInstallState(State::Failed);
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR32Review", false);
                         spdlog::error(
@@ -1451,7 +1456,7 @@ namespace OutRunVRStereo
                         return 0;
                     }
 
-                    R32InstallState.store(State::Ready, std::memory_order_release);
+                    R32PublishInstallState(State::Ready);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", true);
                     spdlog::info(
                         "VR R32 REVIEW2: R22-owned Reset lifecycle + fail-closed state reads + batched WVP + cached D3D9Ex interop + pending-fence-safe producer ring + delta telemetry READY");
@@ -1460,7 +1465,7 @@ namespace OutRunVRStereo
                 Sleep(R32PrerequisiteWaitMs);
             }
 
-            R32InstallState.store(State::Failed, std::memory_order_release);
+            R32PublishInstallState(State::Failed);
             HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", false);
             spdlog::error("VR R32: timed out waiting for R31/R22/R13 prerequisites");
             return 0;
@@ -1480,9 +1485,8 @@ namespace OutRunVRStereo
                     nullptr, 0, R32InstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
-                    R32InstallState.store(
-                        OutRunVR::RuntimeEligibility::InstallState::Failed,
-                        std::memory_order_release);
+                    R32PublishInstallState(
+                        OutRunVR::RuntimeEligibility::InstallState::Failed);
                     return false;
                 }
                 CloseHandle(thread);
