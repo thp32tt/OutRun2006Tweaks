@@ -367,6 +367,37 @@ class NativeControllerTests(unittest.TestCase):
         self.assertFalse(asyncio.run(f(None, {}, {'active':active}, active)))
         self.assertEqual(ns['queue_send_same_chat_control_message'].call_count,1)
 
+    def test_retry_surface_stable_response_preempts_generic_retry_cooldown(self):
+        native = AsyncMock(return_value=True)
+        f, ns = load_function(
+            'queue_handle_retry_surface',
+            first_visible=AsyncMock(return_value=object()),
+            RETRY_SELECTORS=[],
+            detect_busy=AsyncMock(return_value=False),
+            retry_surface_text=AsyncMock(return_value='Retry'),
+            RATE_LIMIT_PATTERNS=[],
+            current_assistant_text=AsyncMock(return_value='상태 재구성 완료. 다음 단계 진행. RESULT_SHA=NOT_CREATED'),
+            queue_handle_native_response=native,
+            GENERIC_RETRY_ROLLOVER_CLICKS=2,
+            GENERIC_RETRY_COOLDOWN_SECONDS=300,
+            RETRY_BUTTON_COOLDOWN_SECONDS=45,
+            rate_limit_active=lambda *args: False,
+            send_guard_reason=lambda *args: None,
+            click_retry_generation=AsyncMock(return_value=False),
+            save_registry=Mock(),
+        )
+        active = self.active()
+        text_value = '상태 재구성 완료. 다음 단계 진행. RESULT_SHA=NOT_CREATED'
+        active['last_hash'] = ns['stable_hash'](text_value)
+        active['last_hash_changed_at'] = (
+            datetime.now(timezone.utc) - timedelta(seconds=60)
+        ).isoformat()
+        active['generic_retry_clicks'] = 2
+        slot = SimpleNamespace(name='A')
+        self.assertTrue(asyncio.run(f(None, {}, None, None, slot, active, {'active': active})))
+        native.assert_awaited_once()
+        self.assertNotIn('generic_retry_cooldown_until', active)
+
     def test_retry_surface_does_not_interrupt_busy_generation(self):
         f, ns=load_function('queue_handle_retry_surface',
             first_visible=AsyncMock(return_value=object()), RETRY_SELECTORS=[],
