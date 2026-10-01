@@ -221,18 +221,30 @@
   "uploaded_archive_used": true,
   "heavy_qa_repeated": false,
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
+  "authoritative_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
+  "validation_bearing_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
   "precommit_refresh": {
     "head_sha": "cc16fb4b320308e72b078cfd3d1e221c910bb794",
     "stale_state_overwrite": false,
-    "concurrent_changes_reviewed": "Schema23 HEAD re-read before merge; newer commits preserved and only fixed Q00074 inputs dispositioned."
+    "concurrent_changes_reviewed": "Schema23 HEAD re-read before merge; newer commits preserved and only fixed Q00074 inputs dispositioned.",
+    "bookkeeping_head_sha": "518852ccf1082abf253a1efeba7fda0462432526",
+    "bookkeeping_concurrent_changes": "Fresh latest HEAD preserved concurrent producer/controller bookkeeping; this checkpoint only synchronizes the lane-local C176 role report with the already-authoritative Q00074 Gate PASS."
   },
   "result_commit_message": "localization(C): QA Q00074 producer batch [AUTO:LOCALIZATION-LOCALIZATION_C-00356]",
-  "bookkeeping_note": "Bind RESULT_SHA/Gate metadata only after this exact C result commit passes Localization Automation Gate. Runtime UNTESTED.",
-  "report_kind": "ROLE_C_INDEPENDENT_QA_BATCH_EVIDENCE"
+  "bookkeeping_note": "Q00074 authoritative Gate PASS is owned by validation-bearing result 507a781c4ac309fc7435c9f7064faa238b2278c5 (Localization Automation Gate run 36827181087 attempt 1). This lane-local report sync is bookkeeping only and does not replace validation ownership. Runtime remains UNTESTED.",
+  "report_kind": "ROLE_C_INDEPENDENT_QA_BATCH_EVIDENCE",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36827181087,
+    "head_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-10-01T15:53:26+09:00"
+  },
+  "bookkeeping_recorded_at_kst": "2026-10-01T15:53:38+09:00"
 }
