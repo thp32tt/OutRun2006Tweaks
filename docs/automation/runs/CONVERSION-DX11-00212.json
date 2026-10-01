@@ -20,7 +20,7 @@
   },
   "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R212_18244E_EXACT_DECODE",
   "selection_reason": "CONVERSION-DX11-00210 proved immutable canonical bytes for 0x0018244E..0x001824AD and explicitly named exact forward decode from 0x0018244E as the next independent F13 action.",
-  "summary": "ATTEMPT=1 completed. Exact-byte control-flow proof covers 24 complete instructions at 0x0018244E..0x001824AA, verifies seven decoded branch destinations and three raw-backed rel32 calls, and deliberately leaves 0x001824AB:e8 5e 46 as an incomplete rel32 call at the R210 capture end. Exact-SHA Backend Conversion Gate, HUD Inspector, Build, and OpenXR architecture validation all passed. Runtime renderer/native DX11 draw/transport source is unchanged.",
+  "summary": "ATTEMPT=1 automation validation passed on exact result SHA da1f60d9d67e5732b0c40102f40da597ae7a24e3. Exact-byte proof covers 24 complete instructions from 0x0018244E through 0x001824AA, verifies seven decoded branch destinations and three raw-backed rel32 calls, and deliberately leaves 0x001824AB:e8 5e 46 as an incomplete rel32 call at the R210 capture end. Runtime renderer/native DX11 draw/transport source is unchanged.",
   "changed_paths": [
     "tools/analyze_outrun_exe.py",
     "tools/verify_vr_backend_disasm_contract.py",
@@ -51,7 +51,13 @@
     "OpenXR VR architecture run 36833399429: SUCCESS with host-x64 plus all five x86 variants successful (6/6 jobs).",
     "VR PC Fast Test Build run 36833394238: SKIPPED by branch policy and is not runtime validation.",
     "No N100 clone/worktree, Google Drive DDS transport, Quest 3/VDXR, or in-game execution was used. RUNTIME_VALIDATION remains UNTESTED.",
-    "No function/callee semantic effect, render/HUD ownership, native DX11 draw activation, or runtime behavior is promoted by this proof."
+    "No function/callee semantic effect, render/HUD ownership, native DX11 draw activation, or runtime behavior is promoted by this proof.",
+    "Exact-SHA Backend Conversion Gate run 36833394202 validate job 110274944048 completed SUCCESS.",
+    "Exact-SHA OutRun EXE HUD Inspector CI run 36833399411 completed SUCCESS: build-hud-inspector job 110274960737 and static-exe-analysis job 110274960912.",
+    "Static EXE analyzer emitted EXACT_18244E_TO_1824AB_CONTROL_FLOW_PREFIX_PROVEN with provenance_exact=True, layout_contiguous=True, bytes_match=True, instruction_count=24, branch_targets_match=True, internal_boundaries=True, call_targets_match=True, raw_calls=True, and exact incomplete tail 0x001824AB:e8 5e 46.",
+    "Exact-SHA Build run 36833399409 / Win32 Release job 110274960464 completed SUCCESS.",
+    "Exact-SHA OpenXR VR architecture run 36833399429 completed SUCCESS with all six jobs successful.",
+    "VR PC Fast Test Build run 36833394238 was SKIPPED by branch policy and was not used as runtime validation."
   ],
   "proof_contract": {
     "predecessor_status": "EXACT_EXE_18244E_TO_1824AE_PROVENANCE_CAPTURED",
@@ -108,36 +114,35 @@
     "after": "PARTIAL_PLUS_18244E_TO_1824AB_EXACT_CONTROL_FLOW_PROVEN",
     "runtime_claim": false
   },
-  "blocker": "None for this bounded exact-decode proof. The rel32 call beginning at 0x001824AB is truncated by the R210 capture end and remains intentionally unresolved.",
-  "next_action": "Future independent F13 work may acquire fresh canonical bytes beginning at 0x001824AB with exact e8 5e 46 overlap, then exact-decode that rel32 call and a bounded continuation. Do not promote function/callee/render/HUD semantics without separate exact evidence.",
+  "blocker": "No automatic-validation blocker remains. The rel32 call beginning at 0x001824AB remains intentionally incomplete because the R210 canonical capture ends at 0x001824AE; bytes beyond 0x001824AD require a fresh provenance capture before decode.",
+  "next_action": "Future independent F13 work may acquire fresh canonical bytes beginning at 0x001824AB with exact E8 5E 46 overlap, then decode only when the missing rel32 displacement bytes are captured. Do not promote function/callee/render/HUD semantics without separate exact instruction-boundary and effect proof.",
   "checkpoint": "C6_STATE",
   "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "task_started_kst": "2026-10-01T16:52:00+09:00",
   "validation_completed_kst": "2026-10-01T17:03:51+09:00",
   "validation": {
-    "result_sha": "da1f60d9d67e5732b0c40102f40da597ae7a24e3",
     "backend_conversion_gate": {
       "run_id": 36833394202,
       "job_id": 110274944048,
-      "conclusion": "SUCCESS",
+      "conclusion": "success",
       "artifact_id": 11148099405,
       "artifact_digest": "sha256:b09ddcc9f1e3a9c4c1a75b9bd02fbef3ad673b4f18fde690a938589ba08ef390"
     },
     "hud_inspector": {
       "run_id": 36833399411,
-      "static_job_id": 110274960912,
+      "conclusion": "success",
       "build_job_id": 110274960737,
-      "conclusion": "SUCCESS",
+      "static_job_id": 110274960912,
       "analysis_artifact_id": 11148413369,
       "analysis_artifact_digest": "sha256:3da72dbd930ad0bdd6edfada659cdd857cf2674ad7cfe5a90e2d26c00234d77b",
-      "inspector_artifact_id": 11148575245,
-      "inspector_artifact_digest": "sha256:566f131f50b3bd2013bba6600261b5d00e24530a27df565b2f169959a10987d5"
+      "game_artifact_id": 11148575245,
+      "game_artifact_digest": "sha256:566f131f50b3bd2013bba6600261b5d00e24530a27df565b2f169959a10987d5"
     },
     "build": {
       "run_id": 36833399409,
       "job_id": 110274960464,
-      "conclusion": "SUCCESS",
+      "conclusion": "success",
       "binary_artifact_id": 11148232599,
       "binary_artifact_digest": "sha256:9651d400be641c079ffde9535a0608086b1e450bc32a2a66541a22d829bba76b",
       "source_artifact_id": 11148182718,
@@ -145,13 +150,15 @@
     },
     "openxr_architecture": {
       "run_id": 36833399429,
-      "conclusion": "SUCCESS",
-      "jobs_success": "6/6"
+      "conclusion": "success",
+      "jobs": "6/6 success",
+      "host_artifact_id": 11148367800,
+      "host_artifact_digest": "sha256:c31d633d702edd1399e2f3d25cb7bedf4da15d170622e8229bd52ce6f3c5120e"
     },
     "pc_fast": {
       "run_id": 36833394238,
-      "conclusion": "SKIPPED",
-      "runtime_validation": false
+      "conclusion": "skipped",
+      "used_as_runtime_validation": false
     }
   }
 }
