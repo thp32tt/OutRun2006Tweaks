@@ -1,0 +1,25 @@
+{
+  "schema_version": 32,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00445",
+  "lane": "LOCALIZATION_C",
+  "wave_id": "Q00097",
+  "role": "independent_batched_cross_lane_qa+shared_state_reconcile",
+  "result": "PASS_BATCH_QA_GATE",
+  "inputs": [
+    "LOCALIZATION-LOCALIZATION_B-00353@ff18b8aa855da74e0f1070661ff0462a53f58513",
+    "LOCALIZATION-LOCALIZATION_A-00355@41bceb31bc7326ca41c491dc931ee63dfeeff126",
+    "LOCALIZATION-LOCALIZATION_B-00357@46bd3970276de8e6300d971024ec04ce2e9e9d98",
+    "LOCALIZATION-LOCALIZATION_A-00358@edc5c1ab68f1247e0a6561f0c2172b9f000a2aa4"
+  ],
+  "qa_summary": {
+    "immutable_result_identity_checked": true,
+    "candidate_promotion": "none",
+    "rework_return": "none",
+    "shared_state_modified": false,
+    "producer_barrier": false
+  },
+  "automation_validation": "PASS_C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "notes": "A/B producer result records were consumed as immutable TASK_ID@RESULT_SHA inputs. Runtime/game validation was not performed."
+}
