@@ -48,13 +48,16 @@ jobs:
 
       - name: Verify hybrid GitHub broker contract
         run: |
-          grep -Fq 'GITHUB_ACCESS_MODE=PLUGIN_PREFERRED_CONTROLLER_BROKER_FALLBACK' /tmp/controller.py
+          grep -Fq 'GITHUB_ACCESS_MODE=CONTROLLER_BROKER_PRIMARY_PLUGIN_OPTIONAL' /tmp/controller.py
           grep -Fq 'CONTROLLER_GITHUB_BROKER=' /tmp/controller.py
           grep -Fq 'PUBLIC_GITHUB_ACCESS=DO_NOT_USE' /tmp/controller.py
-          grep -Fq 'FIRST_ACTION=CALL_GITHUB_PLUGIN_IF_AVAILABLE' /tmp/controller.py
+          grep -Fq 'FIRST_ACTION=USE_PROVIDED_BROKER_CONTEXT' /tmp/controller.py
           grep -Fq 'def github_api_mutation_json' /tmp/controller.py
           grep -Fq 'def github_broker_apply_changeset' /tmp/controller.py
           grep -Fq 'async def queue_handle_broker_response' /tmp/controller.py
+          grep -Fq 'def github_broker_initial_context' /tmp/controller.py
+          grep -Fq 'CONTROLLER_GITHUB_BROKER는 ChatGPT tool/schema/interface가 아니다' /tmp/controller.py
+          grep -Fq 'BROKER_READ_RESULT' /tmp/controller.py
           grep -Fq 'status="github_broker_commit_created"' /tmp/controller.py
           grep -Fq 'class GitHubBrokerPermissionError' /tmp/controller.py
           grep -Fq 'def github_broker_spool_pending' /tmp/controller.py
@@ -94,7 +97,12 @@ jobs:
           assert body.index('current_head = github_branch_head(branch)') < body.index('github_api_mutation_json(')
           assert '"force": False' in body
           assert 'broker result commit must not contain CI-skip directives' in body
-          print('hybrid broker and semantic refusal classifier verified')
+          q=src[src.index('def queue_dynamic_prefix'):src.index('async def first_visible')]
+          assert 'github_broker_initial_context(active)' in q
+          assert 'FIRST_ACTION=USE_PROVIDED_BROKER_CONTEXT' in q
+          r=src[src.index('def queue_rollover_prompt'):src.index('async def queue_rollover_chat')]
+          assert 'github_broker_initial_context(active)' in r
+          print('broker-primary initial context and semantic refusal classifier verified')
           PY2
 
       - name: Verify broker protocol parser
@@ -128,6 +136,8 @@ jobs:
             conversion_dx11.md conversion_dxvk.md \
             localization_A.md localization_B.md localization_C.md localization_E.md; do
             grep -Fq 'CONTROLLER_GITHUB_BROKER' "tools/chat-controller/v0.4/$prompt"
+            grep -Fq 'Broker는 ChatGPT에 노출되는 tool/schema/interface가 아니라' "tools/chat-controller/v0.4/$prompt"
+            grep -Fq 'BROKER_READ_RESULT' "tools/chat-controller/v0.4/$prompt"
             if grep -Fq '연결된 GitHub 플러그인을 실제 호출해 수행하고' "tools/chat-controller/v0.4/$prompt"; then
               echo "legacy plugin-only prompt remains: $prompt"
               exit 1
