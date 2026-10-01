@@ -473,6 +473,22 @@ else:
         if escaped in apply_body:
             errors.append(f"R30 apply regained startup ownership: {escaped}")
 
+r33_read_begin = r33.find("ReadFinalDispatchInstallState() noexcept")
+r33_public_read_begin = r33.find("FinalDispatchInstallState() noexcept", r33_read_begin + 1)
+if r33_read_begin < 0 or r33_public_read_begin <= r33_read_begin:
+    errors.append("R33 final-dispatch install-state read boundary missing")
+else:
+    r33_read_body = r33[r33_read_begin:r33_public_read_begin]
+    if "return R33InstallState.load(std::memory_order_acquire);" not in r33_read_body:
+        errors.append("R33 install-state read boundary lost sole acquire-load")
+    if "return ReadFinalDispatchInstallState();" in r33_read_body:
+        errors.append("R33 install-state read boundary became recursively self-referential")
+    r33_public_read = r33[r33_public_read_begin:]
+    if "return ReadFinalDispatchInstallState();" not in r33_public_read:
+        errors.append("R33 public install-state facade bypassed read boundary")
+    if "R33InstallState.load(" in r33_public_read:
+        errors.append("R33 public install-state facade regained direct atomic load")
+
 for legacy in (
     "R29StableStereoBase",
     "R29FragileEffectCached",

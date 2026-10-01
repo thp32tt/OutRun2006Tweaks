@@ -57,7 +57,7 @@ namespace OutRunVRStereo
         OutRunVR::RuntimeEligibility::InstallState
         ReadFinalDispatchInstallState() noexcept
         {
-            return ReadFinalDispatchInstallState();
+            return R33InstallState.load(std::memory_order_acquire);
         }
 
         using R33DepthStencilWriteState =
@@ -953,6 +953,6 @@ namespace OutRunVRStereo
     OutRunVR::RuntimeEligibility::InstallState
     FinalDispatchInstallState() noexcept
     {
-        return R33InstallState.load(std::memory_order_acquire);
+        return ReadFinalDispatchInstallState();
     }
 }
