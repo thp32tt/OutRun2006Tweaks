@@ -58,6 +58,7 @@ class StatusHandler(BaseHTTPRequestHandler):
 <p><b>Liveness bounds:</b> Actions max {WAIT_ACTIONS_MAX_SECONDS}s / heartbeat fatal {PROCESS_HEARTBEAT_FATAL_SECONDS}s / queue errors {QUEUE_ERROR_RESTART_THRESHOLD} / watchdog errors {WATCHDOG_ERROR_RESTART_THRESHOLD}</p>
 <p><b>Rate limit:</b> attempts {reg.rate_limit_attempts} / until {html.escape(str(reg.rate_limit_until))} / backoff {html.escape(str(RATE_LIMIT_BACKOFF_SECONDS))}s / global-gap {MIN_SEND_GAP_SECONDS}s / slot-dedup {SLOT_DEDUP_SECONDS}s</p>
 <p><b>GitHub REST:</b> token {html.escape(str(bool(GITHUB_TOKEN)))} / task-cache {GITHUB_TASK_COMMIT_CACHE_SECONDS}s / actions-cache {GITHUB_ACTIONS_CACHE_SECONDS}s / remaining {html.escape(str(runtime.get('github_rate_limit_remaining')))} / blocked-until {html.escape(str(runtime.get('github_api_blocked_until')))}</p>
+<p><b>GitHub Broker:</b> enabled {html.escape(str(GITHUB_BROKER_ENABLED))} / write-capable {html.escape(str(runtime.get('github_broker_write_capable')))} / active-task {html.escape(str(runtime.get('github_broker_active_task')))} / last-commit {html.escape(str(runtime.get('github_broker_last_commit_sha')))}</p>
 <p><b>Thinking:</b> required {html.escape(PREFERRED_THINKING_LEVEL)} / strict {html.escape(str(STRICT_THINKING_LEVEL))} / last {html.escape(str(runtime.get('last_thinking_level_result')))}</p>
 <p><b>Logical date:</b> {html.escape(reg.logical_date)}</p>
 <p><b>Next slot:</b> {html.escape(reg.slots[reg.next_slot].name)}</p>
@@ -168,20 +169,18 @@ def queue_rollover_prompt(active: dict) -> str:
         f"TARGET_BRANCH={active['branch']}",
         "CONTROLLER_GITHUB_PREFLIGHT=OK",
         f"CONTROLLER_GITHUB_HEAD_SHA={active.get('base_sha') or ''}",
-        "GITHUB_ACCESS_MODE=CONNECTED_GITHUB_PLUGIN",
-        "GITHUB_PLUGIN_AVAILABLE=TRUE",
+        "GITHUB_ACCESS_MODE=PLUGIN_PREFERRED_CONTROLLER_BROKER_FALLBACK",
+        f"CONTROLLER_GITHUB_BROKER={'AVAILABLE' if GITHUB_BROKER_ENABLED else 'DISABLED'}",
         "PUBLIC_GITHUB_ACCESS=DO_NOT_USE",
-        "FIRST_ACTION=CALL_GITHUB_PLUGIN",
+        "FIRST_ACTION=CALL_GITHUB_PLUGIN_IF_AVAILABLE",
         f"ATTEMPT={active['attempt']}/{MAX_TASK_ATTEMPTS}",
         f"CHAT_ROLLOVER={rollover}",
         "",
         "이전 채팅이 대화 길이 한도에 도달해서 같은 프로젝트의 새 채팅으로 자동 전환했다.",
         "이 롤오버는 작업 실패나 재시도가 아니므로 ATTEMPT를 증가시키지 마.",
         "GitHub 최신 HEAD와 docs/automation/runs/ 아래 해당 TASK_ID 기록을 직접 확인해 현재 상태를 재구성해.",
-        "GitHub 접근은 공개 웹/비인증 HTTP가 아니라 이 ChatGPT 프로젝트에 연결된 GitHub 플러그인으로 수행한다. GitHub 플러그인은 사용 가능하다고 전제하고 반드시 실제 플러그인 호출부터 해.",
-        "GitHub 함수/schema가 바로 보이지 않는다고 중단하지 마. 현재 세션의 도구/connector 목록에서 GitHub action을 탐색한 뒤 실제 호출해. schema 노출 여부를 GitHub 연결 여부로 판단하지 마.",
-        "컨트롤러가 위 HEAD를 확인했다. 첫 행동은 설명/중단이 아니라 연결된 GitHub 플러그인 실제 호출이어야 한다. 플러그인 호출 전에는 GitHub unavailable/CAPABILITY_BLOCKED/BLOCKED_TOOLING을 출력하지 마.",
-        "공개 GitHub 접속 실패나 파일 404를 GitHub 연결 실패로 해석하지 마. 404는 path/ref 문제로 TARGET_BRANCH/ref에서 다시 조회하고 작업을 계속해.",
+        "연결된 GitHub 플러그인이 보이면 우선 사용해. 보이지 않으면 중단/BLOCKED 처리하지 말고 컨트롤러 GitHub Broker로 같은 TASK_ID를 계속해.",
+        "파일 404는 연결 실패가 아니라 path/ref 문제다.",
         "한글화라면 CONTROLLER_CONFIG_BLOB_SHA의 localization/controller_roles.json과 canonical contract를 다시 읽고 현재 정책으로 프롬프트를 재해석해. 캐시된 과거 정책은 사용하지 마.",
         "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
         "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 clone/worktree로 우회하지 마. 단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용하며 GitHub-only라는 이유로 차단하지 마.",
