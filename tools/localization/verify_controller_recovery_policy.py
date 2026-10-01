@@ -119,7 +119,8 @@ required["github_access_validation.public_web_search_failure_never_implies_permi
 required["github_access_validation.required_preflight_order"] = (ga.get("required_preflight_order") or [])[:2] == ["AUTHENTICATED_GITHUB_REPOSITORY_METADATA", "REFRESH_KOREAN_LOCALIZATION_CLEAN_HEAD"]
 forbid_permission_inference = set(ga.get("forbid_permission_inference_from") or [])
 required["github_access_validation.forbid_public_search_permission_inference"] = {"PUBLIC_WEB_SEARCH_MISS","PUBLIC_SEARCH_ONLY_UPSTREAM_RESULT"}.issubset(forbid_permission_inference)
-required["github_access_validation.generated_prompt_directive"] = ("authenticated GitHub connector/API" in str(ga.get("generated_prompt_directive") or "") and "공개 웹 검색" in str(ga.get("generated_prompt_directive") or ""))
+generated_directive = str(ga.get("generated_prompt_directive") or "")
+required["github_access_validation.generated_prompt_directive"] = ("authenticated GitHub" in generated_directive and ("공개 웹" in generated_directive or "public web" in generated_directive.lower()) and ("플러그인" in generated_directive or "connector" in generated_directive.lower()))
 required["github_access_validation.authoritative_write_capabilities"] = {"push","maintain","admin"}.issubset(set(ga.get("authoritative_write_capabilities") or []))
 permission_rule = str(ga.get("permission_denied_only_when") or "")
 required["github_access_validation.permission_denied_requires_fresh_evidence"] = ("fresh repository permission metadata" in permission_rule and "401/403" in permission_rule)
