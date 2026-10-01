@@ -1,0 +1,30 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00471",
+  "lane": "LOCALIZATION_C",
+  "validation_mode": "C_BATCH_GATE",
+  "automation_validation": "PENDING_UNTIL_C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00340",
+      "result_sha": "4e3438375ede35e458e19303c5733710c71c608e"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00339",
+      "result_sha": "9d0a36f8f6e951d955f10fc3bdefedd343edbeae"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00344",
+      "result_sha": "bea28331bbdbe605dea3f6c8fb4e27892b48f56d"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00345",
+      "result_sha": "5f72a88cbcf98873f4181a6d2e378c7f08f4f6c7"
+    }
+  ],
+  "previous_failure": {
+    "run_id": 36916415642,
+    "failed_step": "Verify exact producer SHAs in C batch",
+    "failure_reason": "C_BATCH_GATE: qa_batch_inputs must be non-empty"
+  }
+}
