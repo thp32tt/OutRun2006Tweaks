@@ -7,8 +7,8 @@
   "role": "PRODUCER_A",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
-  "recorded_at_kst": null,
-  "recorded_at_source": "RESULT_COMMIT_METADATA_PENDING_BOOKKEEPING_BIND",
+  "recorded_at_kst": "2026-10-01T19:31:53.000+09:00",
+  "recorded_at_source": "GITHUB_RESULT_COMMIT_COMMITTER_DATE",
   "incoming_controller_schema_version": 30,
   "incoming_controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
   "applied_controller_schema_version": 31,
@@ -121,10 +121,10 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA31__ZERO_COMPLETION_TIER_SHARED_FINGERPRINT_UNCHANGED__QA_PENDING_AND_UNCONSUMED_A_RESULTS_NOT_REPEATED__INDEX30_CURRENT_C165_GUARD__SOURCE_TRANSPORT_SEMANTICS_BOUND__GITHUB_ACCESS_POLICY_CHURN_EXCLUDED__NO_SOURCE_REPROBE__NO_SHARED_STATE__NO_DDS__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "9e3f20a35072c1c2b0824a5a2183b974e13cf745",
+  "authoritative_result_sha": "9e3f20a35072c1c2b0824a5a2183b974e13cf745",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_RESULT_COMMIT_CREATION",
+  "result_binding_state": "BOUND_TO_PRODUCER_RESULT_PENDING_C_BATCH_GATE",
   "result_commit_message": "localization(A): upgrade index30 source dependency guard [AUTO:LOCALIZATION-LOCALIZATION_A-00383]",
   "durable_task_record_in_result_commit": true,
   "precommit_refresh": {
@@ -132,5 +132,6 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Current branch HEAD refreshed immediately before claim. Shared queue/inventory/progress/resume fingerprints are unchanged; current schema31 source-transport/candidate policies are applied."
   },
-  "bookkeeping_note": "Initial durable result commit intentionally leaves self-SHA/timestamp fields null. A separate bookkeeping-only commit will bind the immutable producer RESULT_SHA and result commit time. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Immutable producer result 9e3f20a35072c1c2b0824a5a2183b974e13cf745 atomically contains the schema31 index30 executable semantic dependency guard, machine report, and durable A00383 task record with the exact AUTO marker. This bookkeeping-only commit binds RESULT_SHA/timestamp. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes LOCALIZATION-LOCALIZATION_A-00383@9e3f20a35072c1c2b0824a5a2183b974e13cf745; no real-game validation was performed, so RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_from_head": "9e3f20a35072c1c2b0824a5a2183b974e13cf745"
 }
