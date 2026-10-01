@@ -23,7 +23,7 @@
   "prior_rollover_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00363-rollover3-reconcile.json",
   "prior_rollover_commit_sha": "97609aec7518188ce0776d2f245dec93d3cef790",
   "reconciliation_result": "TASK_ALREADY_DURABLE_NO_DUPLICATE_PRODUCER_WORK_SCHEMA26_REFRESH_ROLLOVER4_REVIEW_ONLY",
-  "review_summary": "Rollover-4 refreshed authenticated GitHub korean-localization-clean HEAD and re-verified the exact incoming schema25 controller blob 1af15dff0b201752dc9afe6281b8d4d5eb9edbdd at the prior rollover-3 head. Current HEAD has advanced to controller schema26 blob 8326697db58d9060601ca28813f0803b52ba30cb. The schema26 delta only assigns queue-mode watchdog UI ownership to QUEUE_ENGINE and disables watchdog UI observation/actions; it does not change producer-B modulo-3 shard ownership, QA-pending retention/skip rules, the two-candidate target, completion-tier selection, source-retry dependency rules, or completed-task durable-result precedence. Since rollover3, only localization/controller_roles.json changed; asset_queue, canonical progress/mirror, resume_state, WORKLOG, graphics README, orientation policy, and candidate state identities remain unchanged. Therefore immutable B00363 result 3fd5125f1ec4b98aacc1f488a3df08fa85be28f5 remains authoritative, the prior zero-runnable B completion-tier conclusion remains valid, and producer work must not be repeated. No DDS rewrite, source acquisition, speculative preflight expansion, shared-state mutation, build, runtime test, N100 clone/worktree, Google Drive use, uploaded archive use, or VR/FFB/DX work is performed. This unique rollover-4 review record is the only intended change.",
+  "review_summary": "Rollover-4 refreshed authenticated GitHub korean-localization-clean HEAD and re-verified the exact incoming schema25 controller blob 1af15dff0b201752dc9afe6281b8d4d5eb9edbdd at the prior rollover-3 head. Current HEAD policy had advanced to controller schema26 blob 8326697db58d9060601ca28813f0803b52ba30cb. The schema26 delta only assigns queue-mode watchdog UI ownership to QUEUE_ENGINE and disables watchdog UI observation/actions; it does not change producer-B modulo-3 shard ownership, QA-pending retention/skip rules, the two-candidate target, completion-tier selection, source-retry dependency rules, or completed-task durable-result precedence. Between rollover3 and the refreshed pre-reconcile HEAD, a late rollover2 review record for this same already-durable task also appeared, and localization/controller_roles.json changed to schema26; no asset_queue, canonical progress/mirror, resume_state, WORKLOG, graphics README, orientation policy, or candidate identity changed. The late rollover2 record independently agrees that B00363 is already durable and must not be repeated. Therefore immutable B00363 result 3fd5125f1ec4b98aacc1f488a3df08fa85be28f5 remains authoritative, the prior zero-runnable B completion-tier conclusion remains valid, and producer work must not be repeated. No DDS rewrite, source acquisition, speculative preflight expansion, shared-state mutation, build, runtime test, N100 clone/worktree, Google Drive use, uploaded archive use, or VR/FFB/DX work is performed. This rollover-4 review record is bookkeeping/reconciliation only.",
   "policy_refresh": {
     "incoming_schema_matches_current_schema": false,
     "incoming_config_matches_current_head_blob": false,
@@ -70,8 +70,9 @@
     "runnable_b_completion_tier": []
   },
   "continuity": {
-    "commits_since_prior_rollover": 3,
+    "commits_since_prior_rollover": 4,
     "changed_files_since_prior_rollover": [
+      "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00363-rollover2-reconcile.json",
       "localization/controller_roles.json"
     ],
     "shared_localization_state_changed": false,
@@ -79,7 +80,8 @@
     "asset_queue_changed": false,
     "canonical_progress_changed": false,
     "resume_state_changed": false,
-    "schema26_controller_change_reinterpreted": true
+    "schema26_controller_change_reinterpreted": true,
+    "late_rollover2_review_record_observed": true
   },
   "producer_work_repeated": false,
   "candidate_dds_modified": false,
@@ -103,6 +105,7 @@
   "evidence": [
     "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00363.json",
     "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00363-rollover3-reconcile.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00363-rollover2-reconcile.json",
     "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00356.json",
     "localization/controller_roles.json",
     "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
@@ -115,5 +118,8 @@
     "localization/graphics/README.md",
     "localization/graphics/ORIENTATION_POLICY.md"
   ],
-  "note": "Conversation rollover 4 does not increment ATTEMPT. Incoming schema25/controller blob was verified but is stale versus current schema26 HEAD policy, which was applied. This review-only commit does not replace immutable B00363 RESULT_SHA 3fd5125f1ec4b98aacc1f488a3df08fa85be28f5. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE. No real-game test was performed; RUNTIME_VALIDATION=UNTESTED."
+  "note": "Conversation rollover 4 does not increment ATTEMPT. Incoming schema25/controller blob was verified but is stale versus current schema26 HEAD policy, which was applied. A late rollover2 review record appeared before this rollover4 reconciliation and independently confirms the same immutable B00363 result; it does not reopen producer work. This review-only record does not replace immutable B00363 RESULT_SHA 3fd5125f1ec4b98aacc1f488a3df08fa85be28f5. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE. No real-game test was performed; RUNTIME_VALIDATION=UNTESTED.",
+  "late_rollover2_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00363-rollover2-reconcile.json",
+  "late_rollover2_blob_sha": "7ba016a105335d47ef8580c723396dcce9f5945a",
+  "late_rollover2_reconciliation_result": "TASK_ALREADY_DURABLE_NO_DUPLICATE_PRODUCER_WORK_LATE_ROLLOVER2_REFRESHED_TO_SCHEMA26_REVIEW_ONLY"
 }
