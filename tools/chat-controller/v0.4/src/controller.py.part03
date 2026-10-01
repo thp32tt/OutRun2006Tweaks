@@ -2580,6 +2580,34 @@ def reconcile_localization_blocked_producer_commits(q: dict) -> int:
             kept.append(task)
             continue
 
+        valid, guard_reasons, _record = localization_validate_producer_result_commit(
+            task_id, str(commit.get("sha") or "")
+        )
+        if not valid:
+            slot_key = slot if slot in {"A", "B", "D"} else {
+                "LOCALIZATION_A": "A",
+                "LOCALIZATION_B": "B",
+                "LOCALIZATION_E": "D",
+            }.get(lane)
+            active_by_lane = q.setdefault("active_by_lane", {})
+            if slot_key and slot_key not in active_by_lane:
+                rearmed = dict(task)
+                rearmed["branch"] = branch
+                rearmed["slot"] = slot_key
+                rearmed["phase"] = "WAIT_CHAT"
+                rearmed["terminal"] = None
+                rearmed["result_sha"] = None
+                rearmed["automation_validation"] = "PENDING"
+                rearmed["producer_no_work_rejected_sha"] = commit.get("sha")
+                rearmed["producer_no_work_guard_reasons"] = guard_reasons
+                rearmed.pop("blocked_at", None)
+                rearmed["failure_context"] = "NO_WORK_GUARD_REARMED_ON_STARTUP"
+                active_by_lane[slot_key] = rearmed
+                recovered += 1
+                continue
+            kept.append(task)
+            continue
+
         fixed = dict(task)
         fixed["branch"] = branch
         fixed["recovered_from_false_blocked"] = True
