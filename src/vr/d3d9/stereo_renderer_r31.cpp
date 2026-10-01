@@ -957,6 +957,15 @@ namespace OutRunVRStereo
                 DrawIndexedPrimitiveUPDestR31, disabled);
         }
 
+        bool R31InstallDrawHookTransaction() noexcept
+        {
+            R31CreateDisabledDrawHooks();
+            if (R31EnableDrawHooks())
+                return true;
+            R31RollbackDrawHooks();
+            return false;
+        }
+
         void R31PublishInstallState(
             OutRunVR::RuntimeEligibility::InstallState state) noexcept
         {
@@ -985,11 +994,8 @@ namespace OutRunVRStereo
 
                 if (prerequisite == R31PrerequisiteDecision::Install)
                 {
-                    R31CreateDisabledDrawHooks();
-
-                    if (!R31EnableDrawHooks())
+                    if (!R31InstallDrawHookTransaction())
                     {
-                        R31RollbackDrawHooks();
                         R31PublishInstallState(State::Failed);
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR31Perf", false);
