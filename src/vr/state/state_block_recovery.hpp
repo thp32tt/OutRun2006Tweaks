@@ -27,7 +27,7 @@ namespace OutRunVR::State
 
         static void FlushPendingResync(IDirect3DDevice9* device) noexcept
         {
-            if (!device || !StateBlockTracker::ConsumeResync())
+            if (!device)
                 return;
 
             const auto resynchronizeShaderEpoch =
@@ -40,6 +40,12 @@ namespace OutRunVR::State
                 StateBlockTracker::MarkCoverageLost();
                 return;
             }
+
+            // Do not consume the pending request until recovery can actually
+            // execute. This keeps the request retryable if providers are not
+            // configured yet.
+            if (!StateBlockTracker::ConsumeResync())
+                return;
 
             resynchronizeShaderEpoch(device);
             if (!primeShadowState(device))

@@ -115,6 +115,26 @@ for marker in (
     if marker not in state_block_recovery:
         errors.append(f"StateBlockRecovery missing API marker: {marker}")
 
+flush_match = re.search(
+    r"static void FlushPendingResync\(IDirect3DDevice9\* device\) noexcept\s*\{(?P<body>.*?)\n        \}",
+    state_block_recovery,
+    re.DOTALL,
+)
+if not flush_match:
+    errors.append("StateBlockRecovery FlushPendingResync body missing")
+else:
+    flush_body = flush_match.group("body")
+    callback_ready = flush_body.find("if (!resynchronizeShaderEpoch || !primeShadowState)")
+    consume = flush_body.find("StateBlockTracker::ConsumeResync()")
+    shader_resync = flush_body.find("resynchronizeShaderEpoch(device)")
+    shadow_prime = flush_body.find("primeShadowState(device)")
+    if min(callback_ready, consume, shader_resync, shadow_prime) < 0:
+        errors.append("StateBlockRecovery recovery-order marker missing")
+    elif not callback_ready < consume < shader_resync < shadow_prime:
+        errors.append(
+            "StateBlockRecovery must validate callbacks before consuming resync "
+            "and preserve shader-resync before shadow-prime ordering")
+
 for rel, source in (("R33", r33), ("R34", r34)):
     if "R31FlushPendingStateBlockResync" in source:
         errors.append(
