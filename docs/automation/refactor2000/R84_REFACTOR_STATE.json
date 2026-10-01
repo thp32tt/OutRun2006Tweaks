@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 756,
+  "cycle": 768,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -116,11 +116,13 @@
     "R84-REF-HOOKSET-0005",
     "R84-REF-HOOKSET-0006",
     "R84-REF-HOOKSET-0007",
-    "R84-REF-HOOKSET-0008"
+    "R84-REF-HOOKSET-0008",
+    "R84-REF-HOOKSET-0009",
+    "R84-REF-LIFECYCLE-0038"
   ],
-  "next": "Cycles 757-759: inspect R31 draw-hook enable/rollback transaction ownership separately from StateBlock physical hook ownership; do not alter StateBlock Apply/Begin/End synchronization; APPLY_GATE at 759.",
-  "updatedKst": "2026-10-02T07:39:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_756_CHECKPOINT",
+  "next": "Cycles 769-771: inspect R32 hook creation ownership versus existing R32EnableHooks/R32RollbackHooks, preserving Reset->Direct resolve->Present->draw order and DirectGPU transport semantics; APPLY_GATE at 771.",
+  "updatedKst": "2026-10-02T07:43:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_768_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -184,6 +186,10 @@
     "Cycles 745-747 R84-REF-HOOKSET-0006: R33 create+enable+rollback grouped under R33InstallHookTransaction; exact transaction order and R32-authoritative failure fallback preserved. APPLY_GATE 747 SOURCE_CHANGED=YES commit d79170ac973304f64f2d0293592ee3baf8907890 [skip ci]. Runtime UNTESTED.",
     "Cycles 748-750 R84-REF-HOOKSET-0007: R34 create+enable+rollback grouped under R34InstallHookTransaction; Reset guard post-install health synchronization remains after successful transaction. APPLY_GATE 750 SOURCE_CHANGED=YES commit 23ea3c26813db09b2d7f15ce44cbd7a20891ae40 [skip ci]. Runtime UNTESTED.",
     "Cycles 751-753 R84-REF-STATE-0004: R31 install-state publication isolated behind R31PublishInstallState; release ordering and all Pending/Failed/Ready routes preserved. APPLY_GATE 753 SOURCE_CHANGED=YES commit 6e7bfe51865e0139d367a2d3c1681f757e06dfd8 [skip ci]. Runtime UNTESTED.",
-    "Cycles 754-756 R84-REF-HOOKSET-0008: R31 disabled draw-hook creation isolated in R31CreateDisabledDrawHooks; DP/DIP/DPUP/DIPUP order unchanged and StateBlock hook setup untouched. First write attempt hit transient RemoteProtocolError; HEAD re-read confirmed no commit, retry succeeded commit 5cc34048e5712b69ed170dec59fdc1408b200c3f [skip ci]. Runtime UNTESTED."
+    "Cycles 754-756 R84-REF-HOOKSET-0008: R31 disabled draw-hook creation isolated in R31CreateDisabledDrawHooks; DP/DIP/DPUP/DIPUP order unchanged and StateBlock hook setup untouched. First write attempt hit transient RemoteProtocolError; HEAD re-read confirmed no commit, retry succeeded commit 5cc34048e5712b69ed170dec59fdc1408b200c3f [skip ci]. Runtime UNTESTED.",
+    "Cycles 757-759 R84-REF-HOOKSET-0009: R31 draw-hook create/enable/rollback grouped under R31InstallDrawHookTransaction; physical StateBlock hook setup/Apply synchronization deliberately left untouched. APPLY_GATE 759 SOURCE_CHANGED=YES commit d4a5702b5abfed415a389cfdfa61f65c54dc194a [skip ci]. Runtime UNTESTED.",
+    "Cycles 760-762 R84-REF-STATE-0005: cross-checked R31 StateBlock ownership references against R32/R33/R34. Physical Create/Begin/End/Apply interception remains concentrated in R31; consumers only read tracker state/snapshot. APPLY_GATE 762 SOURCE_CHANGED=NO NO_SAFE_CHANGE because moving physical StateBlock ownership without runtime evidence is high-risk.",
+    "Cycles 763-765 R84-REF-DISPATCH-0006: cross-checked R31/R32/R33 dispatch ownership and install-state boundaries after publication/transaction changes. No duplicate state store escaped R31/R32 publication boundaries; R33 already owns final-dispatch state. APPLY_GATE 765 SOURCE_CHANGED=NO NO_SAFE_CHANGE.",
+    "Cycles 766-768 R84-REF-LIFECYCLE-0038: reviewed R29/R30 start-thread and prerequisite/failure boundaries as lower-layer baseline. Existing R29/R30 helpers already isolate hook transaction/result publication; no safe additional structural move justified. APPLY_GATE 768 SOURCE_CHANGED=NO NO_SAFE_CHANGE."
   ]
 }
