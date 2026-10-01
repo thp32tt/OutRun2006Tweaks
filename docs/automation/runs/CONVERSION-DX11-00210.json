@@ -57,7 +57,9 @@
     "HUD Inspector analysis artifact 11147049661 digest sha256:a348629e1b7aa36eeec4096da4697c74cb385c565297f7a3701b1015ec6eabbc; inspector artifact 11147840188 digest sha256:36c3495733a13ff7670e14456c78f02b43dbc07efc3c036dafa7d02055fda4e9.",
     "Exact-SHA Build run 36831104332 SUCCESS; binary artifact 11148020211 digest sha256:36cc4a426004fc86769461f9ea69e5ee61758ca0e0cfae94526941e1e6d325e3; source artifact 11148025152 digest sha256:f99d9b78da5612283280ed348f5a10be3b2a8be7b91904b6fd91a24e6307134e.",
     "Exact-SHA OpenXR VR architecture run 36831104355 SUCCESS 6/6 jobs.",
-    "No Quest 3/VDXR or in-game execution was performed; RUNTIME_VALIDATION remains UNTESTED."
+    "No Quest 3/VDXR or in-game execution was performed; RUNTIME_VALIDATION remains UNTESTED.",
+    "Exact-SHA Backend Conversion Gate run 36831098765 / validate job 110267647113: SUCCESS; artifact 11146339904 digest sha256:fabe7da9d44b07e930541e3bef753fb850a16efd310aa8745676fd76043cd2a8.",
+    "VR PC Fast Test Build run 36831098764: SKIPPED by branch policy and is not runtime validation."
   ],
   "proof_contract": {
     "predecessor_status": "EXACT_1823EF_TO_18244E_CONTROL_FLOW_PREFIX_PROVEN",
@@ -127,12 +129,25 @@
       "binary_artifact_id": 11148020211,
       "binary_artifact_digest": "sha256:36cc4a426004fc86769461f9ea69e5ee61758ca0e0cfae94526941e1e6d325e3",
       "source_artifact_id": 11148025152,
-      "source_artifact_digest": "sha256:f99d9b78da5612283280ed348f5a10be3b2a8be7b91904b6fd91a24e6307134e"
+      "source_artifact_digest": "sha256:f99d9b78da5612283280ed348f5a10be3b2a8be7b91904b6fd91a24e6307134e",
+      "job_id": 110267665815
     },
     "openxr_architecture": {
       "run_id": 36831104355,
       "conclusion": "SUCCESS",
       "jobs_success": "6/6"
+    },
+    "backend_conversion_gate": {
+      "run_id": 36831098765,
+      "job_id": 110267647113,
+      "conclusion": "SUCCESS",
+      "artifact_id": 11146339904,
+      "artifact_digest": "sha256:fabe7da9d44b07e930541e3bef753fb850a16efd310aa8745676fd76043cd2a8"
+    },
+    "pc_fast": {
+      "run_id": 36831098764,
+      "conclusion": "SKIPPED",
+      "runtime_validation": false
     }
   }
 }
