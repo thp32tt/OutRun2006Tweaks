@@ -14,6 +14,7 @@ def read(rel: str) -> str:
 
 tracker = read("src/vr/state/state_block_tracker.hpp")
 r22 = read("src/vr/d3d9/stereo_renderer_r22.cpp")
+r29 = read("src/vr/d3d9/stereo_renderer_r29.cpp")
 r31 = read("src/vr/d3d9/stereo_renderer_r31.cpp")
 r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = read("src/vr/d3d9/stereo_renderer_r33.cpp")
@@ -113,6 +114,21 @@ for legacy in (
     import re
     if re.search(rf"\\b{legacy}[A-Za-z0-9_]+", r31):
         errors.append(f"R31 regained lower-layer implementation dependency: {legacy}*")
+
+for legacy in (
+    "R26InstallState",
+    "R29RendererState",
+    "R29InvalidateRawWvpGeneration",
+    "R29InvalidateRendererStateAfterExternalRestore",
+):
+    if legacy in r29:
+        errors.append(f"R29 regained lower-layer prerequisite/recovery dependency: {legacy}")
+
+for required in (
+    "src/vr/lifecycle/correction_overlay_state.hpp",
+    "src/vr/game/renderer_recovery.hpp",
+):
+    read(required)
 
 for legacy in (
     "R9",

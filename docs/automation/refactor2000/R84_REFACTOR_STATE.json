@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 595,
+  "cycle": 600,
   "totalCycles": 2000,
   "applyEvery": 5,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -91,11 +91,12 @@
     "R84-REF-DISPATCH-0010",
     "R84-REF-LIFECYCLE-0022",
     "R84-REF-RENDER-0008",
-    "R84-REF-LIFECYCLE-0023"
+    "R84-REF-LIFECYCLE-0023",
+    "R84-REF-GUARD-0008"
   ],
-  "next": "Cycles 596-600: lock R29 prerequisite/recovery boundaries in source verifier and checkpoint.",
-  "updatedKst": "2026-10-01T11:08:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_500_CHECKPOINT",
+  "next": "Cycles 601-605: isolate R30 install-state storage and prerequisite lifecycle reporting.",
+  "updatedKst": "2026-10-01T11:11:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_600_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
