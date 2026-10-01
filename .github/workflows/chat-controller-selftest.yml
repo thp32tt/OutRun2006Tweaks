@@ -83,6 +83,12 @@ jobs:
           print('semantic GitHub refusal classifier verified')
           PY2
 
+      - name: Verify all task prompts require connected GitHub plugin
+        run: |
+          for prompt in             conversion_dx11.md conversion_dxvk.md             localization_A.md localization_B.md localization_C.md localization_E.md; do
+            grep -Fq '연결된 GitHub 플러그인을 실제 호출해 수행하고' "tools/chat-controller/v0.4/$prompt"
+          done
+
       - name: Verify browser transport self-recovery
         run: |
           grep -Fq 'mem_limit: 5g' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
