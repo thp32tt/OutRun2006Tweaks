@@ -73,14 +73,22 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "result_sha": "cf19c8e03d67306523c4fc0936c1c02368c4baf8",
+  "authoritative_result_sha": "cf19c8e03d67306523c4fc0936c1c02368c4baf8",
+  "validation_bearing_result_sha": "cf19c8e03d67306523c4fc0936c1c02368c4baf8",
   "durable_task_record_in_result_commit": true,
   "result_commit_message": "localization(B): terminalize index139 source identity [AUTO:LOCALIZATION-LOCALIZATION_B-00377]",
   "evidence": [
     "localization/graphics/role_B/20261001-B00377-P00245/B00377_P00245_INDEX139_313DB8CB_SOURCE_IDENTITY_TERMINAL.json",
     "localization/graphics/role_B/20261001-B00377-P00245/verify_index139_source_identity.py"
   ],
-  "bookkeeping_note": "RESULT_SHA will be bound by a separate bookkeeping-only commit after the atomic material result commit. Producer validation remains PENDING until C_BATCH_GATE; runtime remains UNTESTED."
+  "bookkeeping_note": "Authoritative producer result is cf19c8e03d67306523c4fc0936c1c02368c4baf8. This bookkeeping-only record binds RESULT_SHA after the atomic material result commit; producer automatic validation remains PENDING until C_BATCH_GATE and runtime remains UNTESTED.",
+  "precommit_refresh": {
+    "result_base_head_sha": "ee920f6c316c87192a299304e6dc33c72bb15cb3",
+    "result_commit_parent_sha": "ee920f6c316c87192a299304e6dc33c72bb15cb3",
+    "result_commit_sha": "cf19c8e03d67306523c4fc0936c1c02368c4baf8",
+    "stale_state_overwrite": false,
+    "concurrent_changes_preserved": true
+  },
+  "bookkeeping_recorded_at_kst": "2026-10-01T18:46:48+09:00"
 }
