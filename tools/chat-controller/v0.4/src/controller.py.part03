@@ -2156,16 +2156,88 @@ def _queue_nonterminal_records(q: dict) -> list[dict]:
     return records
 
 
+def reconcile_localization_blocked_producer_commits(q: dict) -> int:
+    """Recover producer work falsely BLOCKED by stale ChatGPT UI after Git already persisted it."""
+    if CONTROLLER_MODE != "localization":
+        return 0
+    now = datetime.now(TZ)
+    blocked = list(q.get("blocked", []))
+    if not blocked:
+        return 0
+    kept = []
+    recovered = 0
+    completed_keys = {
+        (str(item.get("task_id") or ""), str(item.get("result_sha") or ""))
+        for item in q.get("completed", [])
+        if isinstance(item, dict)
+    }
+    for task in blocked:
+        if not isinstance(task, dict):
+            kept.append(task)
+            continue
+        lane = str(task.get("lane") or "")
+        slot = str(task.get("slot") or "")
+        is_producer = slot in {"A", "B", "D"} or lane in {
+            "LOCALIZATION_A", "LOCALIZATION_B", "LOCALIZATION_E"
+        }
+        task_id = str(task.get("task_id") or "")
+        if not is_producer or not task_id:
+            kept.append(task)
+            continue
+        branch = str(task.get("branch") or "korean-localization-clean")
+        invalidate_task_commit_cache(branch, task_id)
+        commit = github_find_task_commit(branch, task_id, allow_ci_skip_fallback=True)
+        if not commit:
+            kept.append(task)
+            continue
+
+        fixed = dict(task)
+        fixed["branch"] = branch
+        fixed["recovered_from_false_blocked"] = True
+        fixed["recovered_from_false_blocked_at"] = now.isoformat()
+        fixed["recovered_blocked_reason"] = task.get("failure_context")
+        fixed.pop("blocked_at", None)
+        fixed["failure_context"] = ""
+        key = (task_id, str(commit.get("sha") or ""))
+        if key not in completed_keys:
+            finalize_localization_producer_commit(q, fixed, commit, now)
+            completed_keys.add(key)
+        else:
+            fixed["result_sha"] = commit["sha"]
+            fixed["result_message"] = commit.get("message")
+            fixed["automation_validation"] = "PENDING"
+            fixed["validation_mode"] = "C_BATCH_GATE"
+            fixed["batch_validation_pending"] = True
+            fixed["runtime_validation"] = "UNTESTED"
+            fixed["completed_at"] = fixed.get("completed_at") or now.isoformat()
+            fixed["terminal"] = "PRODUCED"
+            fixed["phase"] = "DONE"
+        enqueue_producer_result_for_qa(q, fixed)
+        recovered += 1
+
+    if recovered:
+        q["blocked"] = kept[-100:]
+        q["startup_blocked_producer_recovered_count"] = int(
+            q.get("startup_blocked_producer_recovered_count", 0)
+        ) + recovered
+        q["startup_blocked_producer_recovered_at"] = now.isoformat()
+    return recovered
+
+
 def startup_reconcile_queue_state() -> None:
-    """Invalidate stale caches and rebind persisted WAIT_ACTIONS to the latest TASK_ID commit."""
+    """Invalidate stale caches and reconcile persisted queue state against durable Git."""
     _github_commit_list_cache.clear()
     _github_task_commit_cache.clear()
     _github_actions_cache.clear()
     q = load_queue_state()
+    recovered_producers = 0
     if CONTROLLER_MODE == "localization":
         restored_blocked = reconcile_blocked_qa_inputs(q)
         if restored_blocked:
             q["startup_qa_blocked_requeued"] = restored_blocked
+        recovered_producers = reconcile_localization_blocked_producer_commits(q)
+        if recovered_producers:
+            q["startup_blocked_producer_recovered"] = recovered_producers
     now = datetime.now(TZ)
     records = _queue_nonterminal_records(q)
     branches = sorted({r.get("branch") for r in records if r.get("branch")})

@@ -331,6 +331,9 @@ jobs:
           grep -Fq 'def start_process_liveness_monitor' /tmp/controller.py
           grep -Fq 'queue_error_restart' /tmp/controller.py
           grep -Fq 'watchdog_error_restart' /tmp/controller.py
+          grep -Fq 'def reconcile_localization_blocked_producer_commits' /tmp/controller.py
+          grep -Fq 'startup_blocked_producer_recovered' /tmp/controller.py
+          grep -Fq 'recovered_from_false_blocked' /tmp/controller.py
           grep -Fq 'GITHUB_TASK_COMMIT_SCAN_PAGES' /tmp/controller.py
           grep -Fq 'for page_no in range(1, GITHUB_TASK_COMMIT_SCAN_PAGES + 1)' /tmp/controller.py
           grep -Fq '"per_page": GITHUB_ACTIONS_DISCOVERY_PER_PAGE' /tmp/controller.py
@@ -387,8 +390,14 @@ jobs:
           else_pos=cfinal.index('else:', pass_pos)
           assert pass_pos < consume_pos < else_pos
           assert 'Keep every immutable TASK_ID@RESULT_SHA input pending' in cfinal
+          blocked_producers=src[src.index('def reconcile_localization_blocked_producer_commits'):src.index('def startup_reconcile_queue_state')]
+          assert 'allow_ci_skip_fallback=True' in blocked_producers
+          assert 'finalize_localization_producer_commit' in blocked_producers
+          assert 'enqueue_producer_result_for_qa' in blocked_producers
+          assert 'q["blocked"] = kept[-100:]' in blocked_producers
           startup=src[src.index('def startup_reconcile_queue_state'):src.index('def watchdog_rearm_queue_state')]
           assert 'reconcile_blocked_qa_inputs(q)' in startup
+          assert 'reconcile_localization_blocked_producer_commits(q)' in startup
           assert src.count('remained busy without durable Git progress') >= 2
           assert src.count('WAIT_ACTIONS_MAX_SECONDS') >= 5
           assert 'never orphan' in src
