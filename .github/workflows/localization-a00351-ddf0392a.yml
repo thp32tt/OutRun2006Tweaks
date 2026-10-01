@@ -39,14 +39,6 @@ jobs:
           sudo apt-get install -y -qq fontconfig fonts-noto-cjk unzip
           python -m pip install --disable-pip-version-check 'pillow==12.3.0' 'numpy==2.3.5'
 
-      - name: Reconstruct durable generator
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p localization/graphics/role_A/20261001-A00351-P00221
-          printf '%s' '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' | base64 -d | gzip -d > localization/graphics/role_A/20261001-A00351-P00221/generate_a00351_index222.py
-          chmod +x localization/graphics/role_A/20261001-A00351-P00221/generate_a00351_index222.py
-
       - name: Acquire exact pinned v0.25.10a source member
         shell: bash
         run: |
@@ -56,12 +48,187 @@ jobs:
           unzip -p /tmp/OR2-HD-GUI-v0.25.10a.zip textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds > /tmp/DDF0392A_256x512.dds
           echo 'bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72  /tmp/DDF0392A_256x512.dds' | sha256sum -c -
 
-      - name: Generate v20 index222 candidate and QA evidence
+      - name: Normalize exact-source song-title family at locked 43px
         shell: bash
         run: |
           set -euo pipefail
-          REPO_ROOT="$GITHUB_WORKSPACE" SOURCE_DDS=/tmp/DDF0392A_256x512.dds python localization/graphics/role_A/20261001-A00351-P00221/generate_a00351_index222.py
-          echo 'e8dadfb5a976a9addafa08fe7a9dd1d94d4979ac387c496c98983e2d01e68b83  localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds' | sha256sum -c -
+          python - <<'PY'
+          from __future__ import annotations
+          import hashlib, json, subprocess
+          from collections import Counter
+          from datetime import datetime
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+          import numpy as np
+          from PIL import Image, ImageDraw, ImageFont
+
+          ROOT=Path.cwd()
+          SRC=Path('/tmp/DDF0392A_256x512.dds')
+          CAND=ROOT/'localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds'
+          REVIEW=ROOT/'localization/graphics/KOREAN_PNG_REVIEW/DDF0392A'
+          RUN=ROOT/'localization/graphics/role_A/20261001-A00351-P00221'
+          TASK=ROOT/'docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00351.json'
+          REPORT=RUN/'A00351_P00221_INDEX222_V20_SONG_TITLE_FAMILY_NORMALIZE.json'
+          W,H=1024,2048
+          SOURCE_SHA='bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72'
+          BASE_SHA='c2938974e9dbde92b05eab319f85e9dd226b7f89b037d24b67b463b312a92878'
+          OUT_SHA='570cdb0884bc3495c06fd0de1d397be925e8c3506cd331f98ecbfa45053e8917'
+          FONT_SHA='faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb'
+          FAMILY_ID='DDF0392A_SONG_TITLE_SELECTOR_V20'
+          FAMILY_FS=43
+          SONGS=[
+            (3,'sprite_404','Who Are You?',[0,1744,960,76]),
+            (4,'sprite_405','Splash Wave',[0,1668,960,76]),
+            (5,'sprite_406','Shiny World',[0,1592,960,76]),
+            (6,'sprite_407','Shake The Street',[0,1516,960,76]),
+            (7,'sprite_408','Rush A Difficulty',[0,1440,960,76]),
+            (8,'sprite_409','Risky Ride',[0,1364,960,76]),
+            (9,'sprite_410','Passing Breeze',[0,1288,960,76]),
+          ]
+          UI=[
+            (0,'OutRun Mode / 15 C.','아웃런 모드 / 15코스',[0,1972,960,76]),
+            (1,'OutRun 1986','아웃런 1986',[0,1896,960,76]),
+            (2,'Journey Mode / Random','저니 모드 / 무작위',[0,1820,960,76]),
+          ]
+          def sha(b): return hashlib.sha256(b).hexdigest()
+          def fsha(p): return sha(Path(p).read_bytes())
+          def rawbox(rect):
+              x,yb,w,h=rect
+              return x,H-(yb+h),w,h
+          def cell(a,rect):
+              x,y,w,h=rawbox(rect)
+              return a[y:y+h,x:x+w]
+          def readable(a,rect):
+              return cell(a,rect)[::-1].copy()
+          def save_rgba(a,p):
+              p.parent.mkdir(parents=True,exist_ok=True)
+              Image.fromarray(a.astype(np.uint8),'RGBA').save(p,optimize=False)
+
+          sb=SRC.read_bytes(); bb=CAND.read_bytes()
+          if sha(sb)!=SOURCE_SHA: raise SystemExit('canonical source mismatch')
+          if sha(bb)!=BASE_SHA: raise SystemExit('prior candidate lineage mismatch: '+sha(bb))
+          if sb[:128]!=bb[:128]: raise SystemExit('DDS header mismatch before rework')
+          src=np.array(Image.open(SRC).convert('RGBA'),dtype=np.uint8)
+          base=np.array(Image.open(CAND).convert('RGBA'),dtype=np.uint8)
+          if src.shape!=(H,W,4) or base.shape!=(H,W,4): raise SystemExit('canvas mismatch')
+          fm=subprocess.check_output(['fc-match','-f','%{file}|%{index}\n','Noto Sans CJK KR:style=Bold'],text=True).splitlines()[0]
+          fp,fi=fm.rsplit('|',1); fp=Path(fp); fi=int(fi)
+          if fsha(fp)!=FONT_SHA: raise SystemExit('font fingerprint mismatch: '+fsha(fp))
+          target=base.copy(); metrics=[]; song_raw_mask=np.zeros((H,W),bool)
+          for idx,sprite,title,rect in SONGS:
+              x,y,w,h=rawbox(rect); song_raw_mask[y:y+h,x:x+w]=True
+              sdisp=readable(src,rect); ys,xs=np.where(sdisp[:,:,3]>0)
+              srcbb=[int(xs.min()),int(ys.min()),int(xs.max()),int(ys.max())]
+              safe=[srcbb[0]+2,srcbb[1]+2,srcbb[2]-2,srcbb[3]-2]
+              rb=[safe[0]+1,safe[1]+1,safe[2]-1,safe[3]-1]
+              target[y:y+h,x:x+w]=0
+              f=ImageFont.truetype(str(fp),FAMILY_FS,index=fi); tbb=f.getbbox(title)
+              tw,th=tbb[2]-tbb[0],tbb[3]-tbb[1]; rw,rh=rb[2]-rb[0]+1,rb[3]-rb[1]+1
+              if tw>rw or th>rh: raise SystemExit('locked family size does not fit '+title)
+              glyph=Image.new('RGBA',(tw+8,th+8),(0,0,0,0)); d=ImageDraw.Draw(glyph)
+              d.text((4-tbb[0],4-tbb[1]),title,font=f,fill=(66,64,66,255)); glyph=glyph.crop(glyph.getbbox())
+              px=rb[0]; py=rb[1]+(rh-glyph.height)//2
+              layer=Image.new('RGBA',(w,h),(0,0,0,0)); layer.alpha_composite(glyph,(px,py))
+              target[y:y+h,x:x+w]=np.array(layer,dtype=np.uint8)[::-1]
+              metrics.append({'region_index':idx,'sprite':sprite,'source_title':title,'typography_family_id':FAMILY_ID,'family_target_font_size_px':FAMILY_FS,'actual_font_size_px':FAMILY_FS,'fit_reduction_reason':'NONE','source_effect_bbox_readable_local':srcbb,'candidate_safe_bbox_readable_local':safe,'preencode_bbox_readable_local':[px,py,px+glyph.width-1,py+glyph.height-1]})
+
+          tmp=RUN/'_a00351_full.dds'; RUN.mkdir(parents=True,exist_ok=True)
+          Image.fromarray(target,'RGBA').save(tmp,format='DDS',pixel_format='DXT5')
+          tb=tmp.read_bytes(); tmp.unlink()
+          bx=W//4; by=H//4; BLOCK=16
+          outpay=bytearray(bb[128:]); song_blocks=np.zeros((by,bx),bool)
+          for _,_,_,rect in SONGS:
+              x,y,w,h=rawbox(rect)
+              for yy in range(y//4,(y+h)//4):
+                  for xx in range(x//4,(x+w)//4):
+                      song_blocks[yy,xx]=True
+                      off=(yy*bx+xx)*BLOCK
+                      outpay[off:off+BLOCK]=tb[128+off:128+off+BLOCK]
+          out=sb[:128]+bytes(outpay)
+          if sha(out)!=OUT_SHA: raise SystemExit('candidate fingerprint drift '+sha(out))
+          CAND.write_bytes(out)
+          cand=np.array(Image.open(CAND).convert('RGBA'),dtype=np.uint8)
+          # No compressed block outside the seven song-title cells may differ from the accepted predecessor.
+          changed_blocks=0
+          for yy in range(by):
+              for xx in range(bx):
+                  off=(yy*bx+xx)*BLOCK
+                  a=bb[128+off:128+off+BLOCK]; b=out[128+off:128+off+BLOCK]
+                  if a!=b:
+                      changed_blocks+=1
+                      if not song_blocks[yy,xx]: raise SystemExit('block escape outside song family')
+          # Inherited UI rows 0/1/2 remain byte/pixel-identical to accepted predecessor.
+          for _,en,ko,rect in UI:
+              if not np.array_equal(cell(cand,rect),cell(base,rect)): raise SystemExit('inherited UI changed '+en)
+          # Ferrari model rows 10..24 remain exact source.
+          for idx in range(10,25):
+              rect=[0,1288-(idx-9)*76,960,76]
+              if not np.array_equal(cell(cand,rect),cell(src,rect)): raise SystemExit('protected model row changed '+str(idx))
+          for m,(_,_,title,rect) in zip(metrics,SONGS):
+              disp=readable(cand,rect); ys,xs=np.where(disp[:,:,3]>0)
+              cb=[int(xs.min()),int(ys.min()),int(xs.max()),int(ys.max())]; safe=m['candidate_safe_bbox_readable_local']
+              if not (cb[0]>=safe[0] and cb[1]>=safe[1] and cb[2]<=safe[2] and cb[3]<=safe[3]): raise SystemExit('decoded containment fail '+title)
+              m['decoded_final_bbox_readable_local']=cb
+              m['decoded_final_safe_margins_ltrb']=[cb[0]-safe[0],cb[1]-safe[1],safe[2]-cb[2],safe[3]-cb[3]]
+              m['containment_decoded_final']='PASS'
+          srcd=np.flipud(src).copy(); candd=np.flipud(cand).copy()
+          permitted=np.zeros((H,W),bool)
+          for _,_,_,rect in UI:
+              x,y,w,h=rawbox(rect); permitted[y:y+h,x:x+w]=True
+          permitted|=song_raw_mask
+          changed=np.any(cand!=src,axis=2); alpha_changed=cand[:,:,3]!=src[:,:,3]
+          if changed[~permitted].any() or alpha_changed[~permitted].any(): raise SystemExit('decoded pixel escape outside UI/song family')
+          clean=src.copy(); lettering=np.zeros_like(src); source_mask=np.zeros((H,W),bool)
+          for _,_,_,rect in UI:
+              x,y,w,h=rawbox(rect); source_mask[y:y+h,x:x+w]|=src[y:y+h,x:x+w,3]>0; clean[y:y+h,x:x+w]=0; lettering[y:y+h,x:x+w]=cand[y:y+h,x:x+w]
+          for _,_,_,rect in SONGS:
+              x,y,w,h=rawbox(rect); source_mask[y:y+h,x:x+w]|=src[y:y+h,x:x+w,3]>0; clean[y:y+h,x:x+w]=0; lettering[y:y+h,x:x+w]=cand[y:y+h,x:x+w]
+          REVIEW.mkdir(parents=True,exist_ok=True)
+          save_rgba(srcd,REVIEW/'source_display.png'); save_rgba(np.flipud(clean),REVIEW/'clean_plate_display.png'); save_rgba(candd,REVIEW/'candidate_display.png'); save_rgba(np.flipud(lettering),REVIEW/'lettering_display.png')
+          Image.fromarray((np.flipud(source_mask)*255).astype(np.uint8),'L').save(REVIEW/'source_text_mask_display.png',optimize=False)
+          Image.fromarray((np.flipud(~permitted)*255).astype(np.uint8),'L').save(REVIEW/'protected_mask_display.png',optimize=False)
+          delta=np.zeros_like(srcd); delta[np.any(srcd!=candd,axis=2)]=[255,255,255,255]; save_rgba(delta,REVIEW/'diff_display.png')
+          lf=ImageFont.truetype(str(fp),18,index=fi)
+          rows=[]
+          for _,_,title,rect in SONGS:
+              x,yb,w,h=rect; s=srcd[yb:yb+h,x:x+w]; c=candd[yb:yb+h,x:x+w]
+              row=Image.new('RGBA',(w*2,h+30),(20,20,20,255)); dr=ImageDraw.Draw(row)
+              dr.text((6,4),'SOURCE '+title,font=lf,fill='white'); dr.text((w+6,4),'LOCKED 43px '+title,font=lf,fill='white')
+              row.alpha_composite(Image.fromarray(s),(0,30)); row.alpha_composite(Image.fromarray(c),(w,30)); rows.append(row)
+          fam=Image.new('RGBA',(1920,sum(r.height for r in rows)),(20,20,20,255)); yy=0
+          for r in rows: fam.alpha_composite(r,(0,yy)); yy+=r.height
+          fam.save(REVIEW/'title_family_comparison.png',optimize=False)
+          erows=[]
+          for _,en,ko,rect in UI:
+              x,yb,w,h=rect; s=srcd[yb:yb+h,x:x+w]; c=candd[yb:yb+h,x:x+w]
+              row=Image.new('RGBA',(w*2,h+30),(20,20,20,255)); dr=ImageDraw.Draw(row)
+              dr.text((6,4),'SOURCE '+en,font=lf,fill='white'); dr.text((w+6,4),'INHERITED KOREAN '+ko,font=lf,fill='white')
+              row.alpha_composite(Image.fromarray(s),(0,30)); row.alpha_composite(Image.fromarray(c),(w,30)); erows.append(row)
+          elems=Image.new('RGBA',(1920,sum(r.height for r in erows)),(20,20,20,255)); yy=0
+          for r in erows: elems.alpha_composite(r,(0,yy)); yy+=r.height
+          elems.save(REVIEW/'element_comparison.png',optimize=False)
+          panel=Image.new('RGBA',(W*2,H+34),(24,24,24,255)); pd=ImageDraw.Draw(panel); head=ImageFont.truetype(str(fp),20,index=fi)
+          pd.text((8,5),'ENGLISH SOURCE',font=head,fill='white'); pd.text((W+8,5),'KOREAN UI + EXACT-SOURCE SONG TITLES @ LOCKED 43px',font=head,fill='white')
+          panel.alpha_composite(Image.fromarray(srcd),(0,34)); panel.alpha_composite(Image.fromarray(candd),(W,34)); panel.save(REVIEW/'comparison.png',optimize=False)
+          base_head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          now=datetime.now(ZoneInfo('Asia/Seoul')).replace(microsecond=0).isoformat()
+          prompt={'contract':'outrun-first-pass-edit-v2','policy_version':20,'task_id':'LOCALIZATION-LOCALIZATION_A-00351','wave_id':'P00221','queue_index':222,'asset':'DDF0392A','source_sha256':SOURCE_SHA,'predecessor_candidate_sha256':BASE_SHA,'typography_family_id':FAMILY_ID,'family_target_font_size_px':FAMILY_FS,'song_titles':[m['source_title'] for m in metrics],'rule':'PRESERVE_EXACT_SOURCE_TITLE_TEXT; RERENDER_ALL_SONG_FAMILY_MEMBERS_AT_ONE_LOCKED_NATIVE_FONT_SIZE; NO_PER_STRING_SIZE_OVERRIDE','font_identifier':'NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold','font_sha256':FONT_SHA,'runtime_validation':'UNTESTED'}
+          pb=(json.dumps(prompt,ensure_ascii=False,indent=2)+'\n').encode(); (REVIEW/'generation_prompt.json').write_bytes(pb)
+          candidate_info={'sha256':OUT_SHA,'bytes':len(out),'header_128_exact':out[:128]==sb[:128],'format':'DXT5','mipmaps':1,'changed_blocks_from_predecessor':changed_blocks,'changed_pixels_vs_source':int(changed.sum()),'changed_pixels_outside_permitted_regions':0,'alpha_changed_pixels_outside_permitted_regions':0,'orientation':'PASS_FLIP_Y_RAW_TO_READABLE','raster_resampling':'NOT_USED'}
+          qa={'schema_version':20,'schema':'outrun-a00351-index222-v20-song-title-family-normalize-v1','task_id':'LOCALIZATION-LOCALIZATION_A-00351','wave_id':'P00221','lane':'LOCALIZATION_A','queue_index':222,'asset':'DDF0392A','recorded_at_kst':now,'base_head_sha':base_head,'source':{'archive':'OR2-HD-GUI-v0.25.10a.zip','archive_sha256':'76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958','member':'textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds','sha256':SOURCE_SHA,'dimensions':[W,H],'format':'DXT5','mipmaps':1,'raw_to_readable':'flip_y'},'predecessor_candidate_sha256':BASE_SHA,'song_title_family_evidence':metrics,'inherited_ui_rows':UI,'candidate':candidate_info,'visual_review':{'title_family_comparison':'title_family_comparison.png','element_comparison':'element_comparison.png','comparison':'comparison.png','status':'PASS_PRODUCER_VISUAL_PENDING_INDEPENDENT_C'},'status':'PASS_PRODUCER_SELF_QA_PENDING_C','runtime_validation':'UNTESTED','automation_validation':'PENDING','validation_mode':'C_BATCH_GATE'}
+          (REVIEW/'qa_report.json').write_text(json.dumps(qa,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          selection={'shard_rule':'asset_queue.index % 3 == 0','selected_priority':'DIRECT_REWORK_REQUIRED_V20_TITLE_POLICY','selected_indices':[222],'second_runnable_completion_tier_after_rescan':[],'batch_disposition':'PARTIAL_BATCH_ONE_CANDIDATE_SHARD_EXHAUSTED','not_repeated_candidate_qa_pending':[159,198,201],'hold_not_promoted':[51],'cross_lane_rework_not_stolen':[163]}
+          summary='Current-HEAD v20 retrospective audit makes index222/DDF0392A the only runnable A-lane completion-tier rework. The three previously translated song titles are restored to exact source-language strings, and all seven song-title family members are natively rerendered at one locked 43px family size with no per-title size override. Generic UI rows 0/1/2 remain byte/pixel-identical to the accepted predecessor; Ferrari model rows remain exact source. DDS DXT5/header/mip/orientation are preserved; every song-title decoded bbox stays inside its source-derived 2px safe bbox; no compressed block changes outside the seven song cells and no decoded changes escape the permitted UI/song regions. Fresh A-shard rescan exposes no second runnable completion-tier candidate, so this is PARTIAL_BATCH. Runtime remains UNTESTED.'
+          material={'type':'INDEX222_DDF0392A_V20_LOCKED_SONG_TITLE_FAMILY_CANDIDATE','candidate_dds_sha256':OUT_SHA,'candidate_dds_modified':True,'song_title_family_members':7,'song_title_fixed_font_size_px':43,'translated_song_titles_remaining':0,'localized_generic_ui_rows_inherited':3,'changed_blocks_outside_song_family':0,'one_pixel_overflow':0,'material_payload_in_result_commit':True,'durable_task_record_in_result_commit':True}
+          evidence=[str(CAND.relative_to(ROOT)),str(REVIEW.relative_to(ROOT))+'/title_family_comparison.png',str(REVIEW.relative_to(ROOT))+'/element_comparison.png',str(REVIEW.relative_to(ROOT))+'/comparison.png',str(REVIEW.relative_to(ROOT))+'/generation_prompt.json',str(REVIEW.relative_to(ROOT))+'/qa_report.json',str(REPORT.relative_to(ROOT)),str(TASK.relative_to(ROOT)),'.github/workflows/localization-a00351-ddf0392a.yml']
+          common={'schema_version':20,'task_id':'LOCALIZATION-LOCALIZATION_A-00351','wave_id':'P00221','lane':'LOCALIZATION_A','target_branch':'korean-localization-clean','attempt':'1/3','chat_rollover':1,'recorded_at_kst':now,'base_head_sha':base_head,'controller_schema_version':20,'result':'PARTIAL_BATCH_INDEX222_V20_LOCKED_SONG_TITLE_FAMILY_STATIC_SELF_QA_RUNTIME_UNTESTED','summary':summary,'selection':selection,'material_deliverable':material,'evidence':evidence,'candidate_dds_modified':True,'shared_state_modified':False,'peer_lane_files_modified':False,'runtime_test_performed':False,'runtime_validation':'UNTESTED','build_performed':False,'n100_used':False,'local_clone_used':False,'google_drive_used':False,'pinned_release_transport_used':True,'vr_ffb_dx_changes':False,'automation_validation':'PENDING','validation_mode':'C_BATCH_GATE'}
+          report=dict(common); report['schema']='outrun-a00351-p00221-index222-v20-locked-song-title-family-v1'; report['role']='CONTINUOUS_PRODUCTION_LANE_A_SELF_QA'; report['candidate']=candidate_info; report['song_title_family_evidence']=metrics; report['self_qa']='PASS_A_MOD3_SCHEMA20__INDEX222_V20_REWORK__7_OF_7_EXACT_SOURCE_TITLES__LOCKED_FAMILY_43PX__NO_PER_STRING_OVERRIDE__3_UI_ROWS_INHERITED_UNCHANGED__DXT5_HEADER_MIP_ORIENTATION_PRESERVED__ZERO_BLOCK_ESCAPE__ZERO_PIXEL_ESCAPE__ZERO_OVERFLOW__PARTIAL_BATCH_SHARD_EXHAUSTED__RUNTIME_UNTESTED'
+          REPORT.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          task=dict(common); task['schema']='outrun-a00351-p00221-producer-result-v1'; task['commit_mode']='GITHUB_ACTIONS_ATOMIC_LANE_LOCAL_V20_CANDIDATE_REVIEW_REPORT_AND_DURABLE_TASK_RECORD'; task['result_sha']=None; task['authoritative_result_sha']=None; task['validation_bearing_result_sha']=None; task['retry_required']=False; task['result_commit_message']='localization(A): normalize index222 song-title family [AUTO:LOCALIZATION-LOCALIZATION_A-00351]'
+          TASK.write_text(json.dumps(task,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps({'status':'PASS','candidate_sha256':OUT_SHA,'changed_blocks_from_predecessor':changed_blocks,'family_size_px':FAMILY_FS,'runtime_validation':'UNTESTED'}))
+          PY
+          echo '570cdb0884bc3495c06fd0de1d397be925e8c3506cd331f98ecbfa45053e8917  localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds' | sha256sum -c -
 
       - name: Commit atomic lane-local A00351 result
         shell: bash
@@ -70,6 +237,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00351.json localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds localization/graphics/role_A/20261001-A00351-P00221 localization/graphics/KOREAN_PNG_REVIEW/DDF0392A
-          git commit -m "localization(A): restore index222 source song titles [AUTO:LOCALIZATION-LOCALIZATION_A-00351]"
+          git commit -m "localization(A): normalize index222 song-title family [AUTO:LOCALIZATION-LOCALIZATION_A-00351]"
           git pull --rebase origin korean-localization-clean
           git push origin HEAD:korean-localization-clean
