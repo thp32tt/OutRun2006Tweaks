@@ -1,0 +1,260 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-b00375-p00243-schema30-source-transport-narrowing-v30",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00375",
+  "wave_id": "P00243",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCER_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T18:31:00+09:00",
+  "base_head_sha": "fb23e5fe50231eb9b2a408a9424b98d366f563ab",
+  "policy_resolution": {
+    "controller_schema_version": 30,
+    "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+    "resolution": "LATEST_HEAD_SCHEMA30_POLICY_APPLIED"
+  },
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "fresh_completion_tier_scan": "ZERO_RUNNABLE_COMPLETION_TIER",
+    "direct_rework_runnable_indices": [],
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "existing_candidate_rework_runnable_indices": [],
+    "excluded_pending_or_current_candidate_scopes": [
+      {
+        "index": 61,
+        "asset": "C4A2937B",
+        "reason": "current producer candidate remains QA_PENDING_C"
+      },
+      {
+        "index": 94,
+        "asset": "2DA43E41",
+        "reason": "newer B00370 reconstruction evidence remains QA_PENDING_C; do not build on unaccepted same-asset evidence"
+      },
+      {
+        "index": 163,
+        "asset": "59A79158",
+        "reason": "newer V19 producer candidate remains pending independent C"
+      }
+    ],
+    "fallback_ladder_step": 4,
+    "selected_indices": [
+      28,
+      220
+    ],
+    "selected_assets": [
+      "A05BF610",
+      "D657C2EB"
+    ],
+    "selection_reason": "fallback step 3 was exhausted by B00372; these are B-owned unfinished PREFLIGHT_ONLY assets whose prior source work predates the current schema30 approved-Drive transport policy and whose source ladder can be narrowed without repeating sticky SOURCE_ACQUISITION_EXHAUSTED/IDENTITY_MISMATCH probes"
+  },
+  "source_transport_policy": {
+    "approved_drive_account": "ezflash557",
+    "approved_drive_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "pinned_repository": "envido32/OR2006Sprites",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "pinned_release_tag": "v0.25.10a",
+    "release_asset_id": 306630789,
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "archive_size": 306223257,
+    "release_metadata_identity": "PASS"
+  },
+  "assets": [
+    {
+      "queue_index": 28,
+      "asset": "A05BF610",
+      "queue_path": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+      "canonical_inventory": {
+        "sha256": "ede0367228e0a97bbbdbc58f71c03ff0e044826e17fd7697b74d852aff7a3e64",
+        "width": 2047,
+        "height": 2048,
+        "mode": "RGBA"
+      },
+      "semantics": [
+        {
+          "source": "Total Rank",
+          "korean": "종합 랭크"
+        }
+      ],
+      "prior_authority": {
+        "task": "LOCALIZATION-LOCALIZATION_B-00125",
+        "c_disposition": "C118_Q00016_PASS_CANONICAL_SOURCE_REACQUISITION_PREFLIGHT_ONLY"
+      },
+      "acquisition": {
+        "google_drive_exact_relative_path": {
+          "root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+          "load_folder_id": "1M_zaCiIOP1S7khgRynMLxc_iLCAMKfib",
+          "required_parent": "spr_sprani_CLAR_RANK_Exst",
+          "observed_load_children": [
+            "spr_sprani_sumo_fe_cvt_Exst",
+            "spr_sprani_selector_cvt_Exst",
+            "spr_sprani_loading_cvt_Exst",
+            "spr_sprani_game_cvt_Exst",
+            "spr_sprani_fruity_cvt_Exst",
+            "spr_etc_xst",
+            "spr_font_xst",
+            "spr_sprani_etc_cvt_Exst"
+          ],
+          "outcome": "SOURCE_TRANSPORT_MISS",
+          "reason": "required exact parent absent under approved Drive textures/load; no historical localized-output folders searched"
+        },
+        "pinned_upstream_direct_file": {
+          "repository": "envido32/OR2006Sprites",
+          "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+          "path": "textures/load/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+          "outcome": "SOURCE_TRANSPORT_MISS",
+          "http_semantics": "404 exact-path miss; not identity mismatch"
+        },
+        "pinned_release_fallback": {
+          "release_tag": "v0.25.10a",
+          "release_asset_id": 306630789,
+          "archive_name": "OR2-HD-GUI-v0.25.10a.zip",
+          "archive_size": 306223257,
+          "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+          "release_metadata_identity": "PASS",
+          "immutable_repo_release_tree_probe": {
+            "path": "Release/spr_sprani_CLAR_RANK_Exst/A05BF610_512x512.dds",
+            "git_blob_sha": "1ed3fc83fc0501ac6420c0b3e3c51b7f0c9b1374",
+            "status": "PRESENT_AT_PINNED_COMMIT_METADATA_ONLY"
+          },
+          "member_sha256_verification": "HOLD_BINARY_MEMBER_BYTES_NOT_MATERIALIZED",
+          "outcome": "PENDING_MEMBER_IDENTITY_VERIFICATION"
+        }
+      },
+      "terminal_source_state": "PREFLIGHT_ONLY_RELEASE_MEMBER_IDENTITY_PENDING"
+    },
+    {
+      "queue_index": 220,
+      "asset": "D657C2EB",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+      "canonical_inventory": {
+        "sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+        "width": 2048,
+        "height": 512,
+        "mode": "RGBA"
+      },
+      "semantics": [
+        {
+          "source": "REMOVE FRIEND",
+          "korean": "친구 삭제"
+        },
+        {
+          "source": "SEND GAME INVITE",
+          "korean": "게임 초대 보내기"
+        },
+        {
+          "source": "TIME ATTACK",
+          "korean": "타임 어택"
+        },
+        {
+          "source": "COAST 2 COAST",
+          "korean": "코스트 2 코스트"
+        },
+        {
+          "source": "OUTRUN",
+          "korean": "아웃런"
+        },
+        {
+          "source": "HEART ATTACK",
+          "korean": "하트 어택"
+        }
+      ],
+      "prior_authority": {
+        "task": "LOCALIZATION-LOCALIZATION_B-00134",
+        "c_disposition": "C121_Q00019_PASS_PREFLIGHT_ONLY_CANONICAL_IDENTITY_CURRENT"
+      },
+      "acquisition": {
+        "google_drive_exact_relative_path": {
+          "root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+          "exact_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+          "required_name": "D657C2EB_512x128.dds",
+          "observed_exact_parent_children": [
+            "9F060EC1_512x512.dds"
+          ],
+          "outcome": "SOURCE_TRANSPORT_MISS",
+          "reason": "exact required DDS absent from approved parent; no filename-similarity substitution"
+        },
+        "pinned_upstream_direct_file": {
+          "repository": "envido32/OR2006Sprites",
+          "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+          "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+          "outcome": "SOURCE_TRANSPORT_MISS",
+          "http_semantics": "404 exact-path miss; not identity mismatch"
+        },
+        "pinned_release_fallback": {
+          "release_tag": "v0.25.10a",
+          "release_asset_id": 306630789,
+          "archive_name": "OR2-HD-GUI-v0.25.10a.zip",
+          "archive_size": 306223257,
+          "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+          "release_metadata_identity": "PASS",
+          "immutable_repo_release_tree_probe": {
+            "path": "Release/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+            "git_blob_sha": "0b3bdc37870e75da3290f2d5587cebd9cd73655c",
+            "status": "PRESENT_AT_PINNED_COMMIT_METADATA_ONLY"
+          },
+          "member_sha256_verification": "HOLD_BINARY_MEMBER_BYTES_NOT_MATERIALIZED",
+          "outcome": "PENDING_MEMBER_IDENTITY_VERIFICATION"
+        }
+      },
+      "terminal_source_state": "PREFLIGHT_ONLY_RELEASE_MEMBER_IDENTITY_PENDING"
+    }
+  ],
+  "uploaded_bundle_transport_note": {
+    "conversation_archive_name": "OR2-HD-GUI-v0.25.10a.zip",
+    "observed_files_materialize_failure": "FILE_TOO_LARGE_306223257_BYTES_LIMIT_104857600",
+    "state_ssot": false,
+    "canonical_identity_claim": false,
+    "interpretation": "transport/tooling limitation only; size equality does not substitute for SHA-256 or member verification"
+  },
+  "new_executable_input": {
+    "exact_remaining_stage": "EXTRACT_ONLY_REQUIRED_RELEASE_MEMBER__COMPUTE_SHA256__VERIFY_CANONICAL_INVENTORY_BINDING__THEN_DECODE_HEADER_PIXELS",
+    "fail_closed_rule": "DO_NOT_USE_REPOSITORY_RELEASE_TREE_BLOB_AS_CANONICAL_SOURCE_UNLESS_MEMBER_BYTES_MATCH_CANONICAL_SHA256_DIMENSIONS_FORMAT",
+    "source_exhaustion_not_claimed": true,
+    "source_identity_mismatch_not_claimed": true
+  },
+  "material_deliverable": {
+    "type": "TWO_B_SHARD_SCHEMA30_CANONICAL_SOURCE_TRANSPORT_NARROWING_MANIFESTS",
+    "fallback_ladder_step": 4,
+    "reviewed_indices": [
+      28,
+      220
+    ],
+    "tier1_drive_exact_misses": 2,
+    "tier2_pinned_direct_exact_misses": 2,
+    "tier3_release_bundle_identity_pass": 2,
+    "tier3_member_identity_pending": 2,
+    "candidate_dds_modified": false,
+    "heavy_static_qa_repeated": false,
+    "materially_reduces_unresolved_work": true,
+    "material_reduction": "closes schema30 acquisition tiers 1 and 2 for both assets and binds the only remaining legal source route to the exact pinned release bundle/member-verification step"
+  },
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_RELEASE_MEMBER_SHA256_NOT_VERIFIED",
+    "dds_header_alpha_mips": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "source_effect_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "candidate_safe_bbox": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_NO_CURRENT_V2_CANDIDATE",
+    "static_candidate_qa": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": "PASS_B_MOD3_SCHEMA30__ZERO_RUNNABLE_COMPLETION_TIER__FALLBACK4_AFTER_B00372_STEP3_EXHAUSTION__INDEX28_INDEX220_TIER1_DRIVE_MISS__TIER2_PINNED_DIRECT_MISS__PINNED_RELEASE_BUNDLE_METADATA_IDENTITY_PASS__MEMBER_SHA_FAIL_CLOSED__NO_STICKY_REPROBE__NO_SHARED_STATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used_as_state_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
