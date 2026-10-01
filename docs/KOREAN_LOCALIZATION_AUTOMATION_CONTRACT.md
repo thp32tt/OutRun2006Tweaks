@@ -231,6 +231,22 @@ When the current candidate cannot safely be rewritten, do not end the run. Selec
 5. If a QA/tooling deficiency is the blocker, add or improve deterministic asset-specific QA/rebuild tooling and produce its machine-readable output for at least one unfinished DDS.
 A fallback deliverable must materially reduce unresolved work or create new executable/reproducible input for the next production step. Generic prose saying why work is blocked is not a deliverable.
 
+## Fail-closed NO_WORK completion guard
+
+A/B/E and the controller MUST treat `NO_WORK`, `NO_ACTION`, `NO_NEW_PRODUCER_WORK`, zero-runnable review-only output, or equivalent claims as **non-terminal** unless the current authoritative Git state proves the entire localization completion guard is clear.
+
+NO_WORK is forbidden when **any** of the following is true:
+
+- `final_artwork_completed < final_artwork_total`.
+- `final_artwork_percent < 100`.
+- A current authoritative status is `REWORK_REQUIRED`, `ZERO_PIXEL_BBOX_REWORK_REQUIRED`, `QA_PENDING`, or an equivalent typed status containing `REWORK_REQUIRED` / `QA_PENDING`.
+- Any authoritative current `pending_*` array is non-empty.
+- `packaging.status != done`; a missing packaging status is not equivalent to `done`.
+
+Field authority is `localization/resume_state.json`: `graphics_checkpoint.final_artwork_completed`; `graphics_checkpoint.final_artwork_total` with `artwork_targets` as compatibility fallback; `graphics_checkpoint.final_artwork_percent` with computed percentage as compatibility fallback; and `packaging.status`. Current status/pending scopes are defined by `localization/controller_roles.json`.
+
+A missing `docs/automation/runs/<TASK_ID>.json` is **not** evidence that no work exists. A newly dispatched TASK with no result is work-required state. Text such as "no changes to commit", "nothing to commit", or equivalent is never a terminal reason. While the guard is blocked, a review-only/zero-material task record may be kept as diagnostic evidence, but it MUST NOT release the producer lane, enter C QA as a produced result, or cause a new TASK to replace the unfinished TASK. Continue the **same TASK_ID** until a material deliverable is committed or the global completion guard genuinely becomes clear.
+
 ## No-action suppression and C batching
 - Repeated no-action producer tasks are forbidden. A/B terminal results named `NO_ACTION`, `BLOCKED_NO_ACTION`, or equivalent zero-output states are invalid while any graphics work remains.
 - If a lane has no immediately runnable DDS after dependency-blocked skips, it MUST execute the mandatory fallback ladder and commit a material deliverable. A unique controller TASK_ID still requires its durable task record, but that record must accompany the material deliverable rather than replace it.
@@ -244,7 +260,7 @@ A fallback deliverable must materially reduce unresolved work or create new exec
 Do not repeat completed work. Resume from current Git progress/resume state.
 - A/B/E production completion is represented by lane-local machine-readable evidence plus a unique `docs/automation/runs/<TASK_ID>` record. A/B/E do not update shared resume/worklog/progress/asset_queue state; their PASS releases that producer slot immediately and adds the immutable result to C's QA backlog.
 - C batch completion reconciles only its QA_BATCH_INPUTS into `localization/resume_state.json`, `localization/WORKLOG.md`, `localization/progress/STATUS.md`, `localization/graphics/asset_queue.csv` and other shared summaries as applicable. It refreshes HEAD before merge and must preserve any newer producer candidate.
-- A no-action or blocker result is still durable: write a unique task record and commit it with the required `[AUTO:<TASK_ID>]` marker; do not create an empty commit.
+- A no-action or blocker record may be durable diagnostic evidence, but while the fail-closed NO_WORK guard is blocked it is **not producer completion**: keep the same TASK_ID active, do not release the lane, and do not enqueue it to C as produced work. Never create an empty commit.
 Before static approval inspect raw DDS and readable/game orientation and require the exact English-HD-source vs current-Korean-candidate side-by-side proof. Production runs do not require in-game testing; keep `RUNTIME_VALIDATION=UNTESTED` until the user's final integrated game test supplies runtime evidence.
 Git synchronization is mandatory at the end of each role: re-fetch latest `korean-localization-clean`, preserve peer-lane commits, commit/push only the role's permitted localization changes, and verify the resulting task commit SHA. Never import VR/FFB changes.
 
