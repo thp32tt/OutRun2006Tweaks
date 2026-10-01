@@ -12,12 +12,14 @@
   "runtime_test_required": false,
   "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R209_18242E_FRESH_PROVENANCE",
   "selection_reason": "CONVERSION-DXVK-00207 proved the 0x18242E e9 capture-edge start and explicitly named a fresh exact-byte capture beginning at 0x18242E with that overlap fixed and extension beyond 0x18242F as the next independent F13 action.",
-  "summary": "PENDING automatic validation. Adds a fail-closed exact-EXE raw-byte provenance window from 0x18242E through exclusive end 0x18246E, requires the R207 predecessor proof and exact e9 overlap, and records raw rel32 census only. No instruction/function/callee/render/HUD semantics are promoted.",
+  "summary": "PENDING automatic revalidation after deterministic reporting repair. The provenance collector itself reached the R207 predecessor proof, but the first exact-SHA HUD Inspector run failed while formatting raw outbound candidates because the new print path used nonexistent target_label instead of the established known_target key. This repair changes logging only; the 0x18242E..0x18246E provenance contract is unchanged.",
   "evidence": [
     "Base 175ea7d6a8dc2dea18870c127f946ccf9816d40b is the completed CONVERSION-DXVK-00207 bookkeeping descendant; validation-bearing ancestor d0f446ba6200cbf86d6818c69dd223fc084fa22e proved the 0x18242E incomplete rel32-jump start.",
     "The branch OutRun EXE HUD Inspector contract downloads the pinned public replacement OR2006C2C.EXE from emoose/OutRun2006Tweaks v0.1 and runs tools/analyze_outrun_exe.py against that exact analysis input.",
     "R209 only captures 64 exact .text bytes at 0x18242E, requires the prior capture edge 0x18242F, exact e9 overlap, exact 0x18246E end, and strict extension beyond the old edge; it does not decode the newly captured bytes.",
-    "No Quest 3 / VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+    "No Quest 3 / VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED.",
+    "First validation-bearing candidate 70850d29374ac83560c506db802bd756214ac2eb: HUD Inspector static-exe-analysis job 110260348638 failed after R207 predecessor proof with KeyError: 'target_label' in the newly added continuation_7 outbound formatting. Existing candidate dictionaries use known_target and target_section.",
+    "Repair is bounded to replacing target_label with the existing known_target field in the R209 print-only path; provenance capture predicates, byte range, verifier contract, runtime source and semantics are unchanged."
   ],
   "changed_paths": [
     "tools/analyze_outrun_exe.py",
@@ -59,9 +61,14 @@
     "runtime_claim": false
   },
   "blocker": "Bytes beyond 0x18242F were not previously captured. This task only establishes immutable exact provenance through 0x18246E; jump target, subsequent instruction boundaries, function/callee identity and render/HUD semantics remain unresolved until a separate decode proof.",
-  "next_action": "Wait for exact-SHA automatic validation. Do not publish another ordinary same-branch commit until Backend Conversion Gate completes because cancel-in-progress is enabled.",
+  "next_action": "Wait for the repaired exact-SHA automatic validation. Do not publish another ordinary same-branch commit until Backend Conversion Gate completes because cancel-in-progress is enabled.",
   "validation": {
     "automation_validation": "PENDING",
+    "first_result_sha": "70850d29374ac83560c506db802bd756214ac2eb",
+    "first_hud_inspector_run_id": 36828776639,
+    "first_hud_static_analysis_job_id": 110260348638,
+    "first_failure": "KeyError: 'target_label' in continuation_7 diagnostic formatting",
+    "repair_scope": "PRINT_ONLY_FIELD_NAME",
     "runtime_validation": "UNTESTED"
   }
 }

@@ -7279,7 +7279,7 @@ def main() -> int:
     ]
     helper_1_third_cont_7_outbound = ",".join(
         f"0x{item['call_rva']:08X}->0x{item['target_rva']:08X}:"
-        f"{item['target_label'] or 'unknown'}:{item['target_section'] or 'none'}"
+        f"{item['known_target'] or 'unknown'}:{item['target_section']}"
         for item in helper_1_third_cont_7["raw_outbound_rel32_candidates"]
     ) or "none"
     print(
