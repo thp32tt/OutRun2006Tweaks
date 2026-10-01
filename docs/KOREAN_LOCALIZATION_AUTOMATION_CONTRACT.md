@@ -122,10 +122,10 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - C is an independent QA consumer, not a synchronization barrier and not a third candidate producer. It may run while A/B continue producing. Its single commit is the only runner-backed Localization Automation Gate for that batch.
 - C consumes up to 4 producer task results per QA invocation by default, with a short 60-second coalesce window so repeated source/header/atlas/shared-state work is done once for the batch.
 - C MUST review the candidate/evidence as it existed at each exact producer RESULT_SHA. If current HEAD contains a newer candidate SHA for the same asset, the older result is `SUPERSEDED` and must not overwrite newer shared state.
-- C does not rewrite candidate DDS bytes while A/B are active. Candidate defects are returned as `REWORK_REQUIRED` for the appropriate producer lane. C may update shared metadata/progress/QA state after refreshing current HEAD.
+- C does not rewrite candidate DDS bytes while A/B/E are active. Candidate defects are returned as `REWORK_REQUIRED` for the appropriate producer lane. C may update shared metadata/progress/QA state after refreshing current HEAD.
 - A/B/E MUST treat producer results awaiting C as QA-pending and skip those assets until C returns `REWORK_REQUIRED` or a material source/candidate/QA-contract fingerprint changes.
-- C failure or backlog does not stop A/B. A failed C batch may be recorded separately for diagnosis while producers continue.
-- If the controller runtime cannot actually launch A/B concurrently, fall back to sequential producer execution and report that mode accurately; C remains an independent QA backlog consumer.
+- C failure or backlog does not stop A/B/E. A failed C batch may be recorded separately for diagnosis while producers continue.
+- If the controller runtime cannot actually launch A/B/E concurrently, fall back to sequential producer execution and report that mode accurately; C remains an independent QA backlog consumer.
 
 ## One-pass QA and de-duplication
 - Self-QA and C QA remain strict; optimization means removing duplicate checks, not weakening gates.
@@ -224,7 +224,7 @@ A fallback deliverable must materially reduce unresolved work or create new exec
 
 ## State and completion
 Do not repeat completed work. Resume from current Git progress/resume state.
-- A/B/E production completion is represented by lane-local machine-readable evidence plus a unique `docs/automation/runs/<TASK_ID>` record. A/B do not update shared resume/worklog/progress/asset_queue state; their PASS releases that producer slot immediately and adds the immutable result to C's QA backlog.
+- A/B/E production completion is represented by lane-local machine-readable evidence plus a unique `docs/automation/runs/<TASK_ID>` record. A/B/E do not update shared resume/worklog/progress/asset_queue state; their PASS releases that producer slot immediately and adds the immutable result to C's QA backlog.
 - C batch completion reconciles only its QA_BATCH_INPUTS into `localization/resume_state.json`, `localization/WORKLOG.md`, `localization/progress/STATUS.md`, `localization/graphics/asset_queue.csv` and other shared summaries as applicable. It refreshes HEAD before merge and must preserve any newer producer candidate.
 - A no-action or blocker result is still durable: write a unique task record and commit it with the required `[AUTO:<TASK_ID>]` marker; do not create an empty commit.
 Before static approval inspect raw DDS and readable/game orientation and require the exact English-HD-source vs current-Korean-candidate side-by-side proof. Production runs do not require in-game testing; keep `RUNTIME_VALIDATION=UNTESTED` until the user's final integrated game test supplies runtime evidence.
