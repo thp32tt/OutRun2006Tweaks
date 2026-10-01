@@ -395,7 +395,7 @@
     },
     "one_stage_to_render_definition": "one deterministic reconstruction/style stage remains and can be completed before rendering",
     "forbid_new_preflight_while_ready_exists": true,
-    "max_new_preflight_only_batches_when_no_ready_assets": 1,
+    "max_new_preflight_only_batches_when_no_ready_assets": 999999,
     "candidate_target_per_invocation_when_ready_exists": 2,
     "continue_to_next_ready_asset_after_fail_closed": true,
     "primary_throughput_metric": "NEW_OR_MATERIALLY_REWORKED_V2_KOREAN_DDS_CANDIDATES_TO_C_QA",
