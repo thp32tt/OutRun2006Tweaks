@@ -2002,6 +2002,42 @@ def finalize_c_qa_batch(q: dict, task: dict) -> None:
         q["qa_pending"] = untouched + deferred
 
 
+async def queue_upgrade_legacy_broker_context(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    q: dict,
+    active: dict,
+) -> bool:
+    """Upgrade persisted pre-broker WAIT_CHAT tasks immediately after deploy/restart."""
+    if not GITHUB_BROKER_ENABLED or not active:
+        return False
+    if active.get("phase") != "WAIT_CHAT":
+        return False
+    if active.get("broker_context_injected"):
+        return False
+
+    active["failure_context"] = (
+        "Persisted task predates broker-first dispatch; controller is injecting "
+        "GitHub HEAD/file context into the existing chat without changing TASK_ID/ATTEMPT."
+    )
+    active["generic_retry_clicks"] = 0
+    active.pop("generic_retry_cooldown_until", None)
+    active.pop("github_tooling_retry_until", None)
+    active["github_recovery_prompts"] = 0
+
+    if await queue_send_github_recovery(context, pages, active):
+        active["broker_context_injected"] = True
+        active["broker_mode"] = True
+        save_queue_state(q)
+        write_runtime(
+            status="github_broker_legacy_handoff",
+            last_action=f"{active['task_id']} upgraded in place to broker-first execution",
+            queue=active,
+        )
+        return True
+    return False
+
+
 async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
     """Run A/B/E as continuous producers and C as an independent batched QA consumer."""
     now = datetime.now(TZ)
@@ -2015,6 +2051,21 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
         )
     reg = load_registry(now)
     active_by_lane = q.setdefault("active_by_lane", {})
+
+    # After a controller upgrade/redeploy, persisted WAIT_CHAT tasks may predate
+    # broker-first prompts. Upgrade one such lane immediately instead of waiting
+    # for Retry UI or another refusal response.
+    legacy_broker_candidates = [
+        active_by_lane[k]
+        for k in ("A", "B", "C", "D")
+        if k in active_by_lane
+        and active_by_lane[k].get("phase") == "WAIT_CHAT"
+        and not active_by_lane[k].get("broker_context_injected")
+    ]
+    legacy_broker_candidates.sort(key=lambda x: x.get("sent_at") or "")
+    if legacy_broker_candidates:
+        if await queue_upgrade_legacy_broker_context(context, pages, q, legacy_broker_candidates[0]):
+            return
 
     # One-time migration from the old single-active localization queue.
     legacy = q.get("active")
@@ -2318,6 +2369,9 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         reconcile_legacy_conversion_blocked(q)
         q = load_queue_state()
     active = q.get("active")
+
+    if active and await queue_upgrade_legacy_broker_context(context, pages, q, active):
+        return
 
     if rate_limit_active(reg, now) and not active:
         write_runtime(
