@@ -1,0 +1,34 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00402",
+  "lane": "LOCALIZATION_C",
+  "result_sha": null,
+  "validation_mode": "C_BATCH_GATE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00030",
+      "result_sha": "5fb0315853fd8914acc7bba1229e1cc46768db80",
+      "disposition": "HOLD_STRICT_RECHECK",
+      "reason": "Batch QA input recorded; validation evidence requires strict C review."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00064",
+      "result_sha": "641a34826967c615bc29aec55feb1e305513bc3b",
+      "disposition": "HOLD_STRICT_RECHECK",
+      "reason": "Batch QA input recorded; validation evidence requires strict C review."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00062",
+      "result_sha": "2579efe87a6f20d7a9c12c930dec122d125d04d8",
+      "disposition": "HOLD_STRICT_RECHECK",
+      "reason": "Batch QA input recorded; validation evidence requires strict C review."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
+      "result_sha": "1d0c05d29118192c5c10f40ee857fb26ae366622",
+      "disposition": "HOLD_STRICT_RECHECK",
+      "reason": "Batch QA input recorded; validation evidence requires strict C review."
+    }
+  ]
+}
