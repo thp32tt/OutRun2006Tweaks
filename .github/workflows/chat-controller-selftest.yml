@@ -46,6 +46,15 @@ jobs:
           grep -Fq 'EXPECTED_PROJECT_ID: "g-p-6ab9a64fc428819198c7f39765d764bf"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'No assistant response was detected before the queue result grace period expired' tools/chat-controller/v0.4/src/controller.py.part03
 
+      - name: Verify browser transport self-recovery
+        run: |
+          grep -Fq 'mem_limit: 5g' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'mem_reservation: 2g' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'def is_browser_transport_failure' /tmp/controller.py
+          grep -Fq 'status="browser_transport_lost"' /tmp/controller.py
+          grep -Fq 'Docker restart policy can recover' /tmp/controller.py
+          test "$(grep -Fc 'if is_browser_transport_failure(e):' /tmp/controller.py)" -ge 3
+
       - name: Verify queue prompt files
         run: |
           test -s tools/chat-controller/v0.4/conversion_dx11.md

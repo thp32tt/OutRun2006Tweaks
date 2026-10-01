@@ -1448,6 +1448,28 @@ def watchdog_rearm_queue_state(now: datetime) -> Optional[str]:
     return None
 
 
+BROWSER_TRANSPORT_FAILURE_PATTERNS = (
+    "connection closed while reading from the driver",
+    "target page, context or browser has been closed",
+    "browser has been closed",
+)
+
+
+def is_browser_transport_failure(exc: BaseException) -> bool:
+    text = f"{type(exc).__name__}: {exc}".lower()
+    return any(pattern in text for pattern in BROWSER_TRANSPORT_FAILURE_PATTERNS)
+
+
+def record_browser_transport_failure(where: str, exc: BaseException):
+    message = f"Browser automation transport lost in {where}; exiting so Docker restart policy can recover"
+    log.critical("%s: %r", message, exc)
+    write_runtime(
+        status="browser_transport_lost",
+        last_action=message,
+        last_error=repr(exc),
+    )
+
+
 async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: bool):
     if QUEUE_MODE:
         startup_reconcile_queue_state()
@@ -1483,6 +1505,9 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
                 else:
                     await queue_cycle(context, pages)
             except Exception as e:
+                if is_browser_transport_failure(e):
+                    record_browser_transport_failure("queue_cycle", e)
+                    raise
                 log.exception("queue cycle failed")
                 write_runtime(
                     status="queue_error",
@@ -1498,6 +1523,9 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
                 try:
                     await run_cycle(context, pages)
                 except Exception as e:
+                    if is_browser_transport_failure(e):
+                        record_browser_transport_failure("scheduled_cycle", e)
+                        raise
                     log.exception("scheduled cycle failed")
                     write_runtime(status="error", last_error=repr(e))
         elif not AUTO_SEND:
@@ -1509,6 +1537,9 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
             try:
                 await watchdog_cycle(context, pages)
             except Exception as e:
+                if is_browser_transport_failure(e):
+                    record_browser_transport_failure("watchdog_cycle", e)
+                    raise
                 log.exception("watchdog cycle failed")
                 write_runtime(status="watchdog_error", last_error=repr(e))
         await asyncio.sleep(5)
