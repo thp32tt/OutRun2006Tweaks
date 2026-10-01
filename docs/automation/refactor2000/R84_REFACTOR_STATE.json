@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 646,
+  "cycle": 696,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -105,11 +105,12 @@
     "R84-REF-LIFECYCLE-0029",
     "R84-REF-LIFECYCLE-0030",
     "R84-REF-LIFECYCLE-0031",
-    "R84-REF-HOOKSET-0004"
+    "R84-REF-HOOKSET-0004",
+    "R84-REF-LIFECYCLE-0032"
   ],
-  "next": "Cycles 647-649: inspect R29 terminal failure cleanup/publication ownership after hook-transaction isolation; preserve mono-safety/WVP invalidation ordering and protected R26+R30 runtime graph; APPLY_GATE at 649.",
-  "updatedKst": "2026-10-02T06:05:48+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_646_CHECKPOINT",
+  "next": "Cycles 697-699: continue R30 screen-space route ownership review from GuardScreenSpace into lower-draw/public facade boundaries; preserve R26+R30 protected runtime graph and exact state-restore/stereo ordering; APPLY_GATE at 699.",
+  "updatedKst": "2026-10-02T06:20:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_696_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -134,6 +135,23 @@
     "Cycles 635-637 (R84-REF-LIFECYCLE-0029): isolated R29 CreateThread startup publication behind R29StartInstallThread, preserving Pending/CreateThread/Failed-or-CloseHandle and apply() return semantics. APPLY_GATE 637 SOURCE_CHANGED=YES; commit 74baea356005f6bda048435e35ca87de7d35233a [skip ci].",
     "Cycles 638-640 (R84-REF-LIFECYCLE-0030): isolated R29 prerequisite Wait/Fail/Install classification and exact 4800-attempt/25 ms timing policy; hook, mono-safety and WVP invalidation order unchanged. APPLY_GATE 640 SOURCE_CHANGED=YES; commit 4b5be21d26bd04d8fdc61bc6128a968eeb623cda [skip ci].",
     "Cycles 641-643 (R84-REF-LIFECYCLE-0031): centralized four existing R29 install-thread terminal state+async-result publication pairs behind R29PublishInstallResult; CreateThread failure intentionally retains its previous no-async-report behavior. APPLY_GATE 643 SOURCE_CHANGED=YES; commit c9616b57d4b2fd10490cee25dbd8dad14635b5d2 [skip ci].",
-    "Cycles 644-646 (R84-REF-HOOKSET-0004): isolated R29 disabled-first DP/DIP/DPUP/DIPUP/SetRenderState create+enable+rollback ownership behind R29InstallHookTransaction, preserving exact creation order and existing rollback helper. APPLY_GATE 646 SOURCE_CHANGED=YES; commit 8ba2b7bfd5627fd1a848fae799ad34724e5f680e [skip ci]. Static connector inspection passed all newly added source-only contract markers; executable verifier/build capability was not invoked per DO_NOT_BUILD policy. Runtime validation remains UNTESTED."
+    "Cycles 644-646 (R84-REF-HOOKSET-0004): isolated R29 disabled-first DP/DIP/DPUP/DIPUP/SetRenderState create+enable+rollback ownership behind R29InstallHookTransaction, preserving exact creation order and existing rollback helper. APPLY_GATE 646 SOURCE_CHANGED=YES; commit 8ba2b7bfd5627fd1a848fae799ad34724e5f680e [skip ci]. Static connector inspection passed all newly added source-only contract markers; executable verifier/build capability was not invoked per DO_NOT_BUILD policy. Runtime validation remains UNTESTED.",
+    "Cycles 647-649 (R84-REF-LIFECYCLE-0032): inspected R29 successful terminal path from hook transaction through first-frame mono safety, raw-WVP invalidation and Ready publication. Isolated that exact sequence behind R29CompleteSuccessfulInstall without changing ordering. APPLY_GATE 649 SOURCE_CHANGED=YES; source commit 2daa1cf7c63118993c5d1d8833ac1fe021a8d7f6 [skip ci]. Verifier now guards mono-safety -> WVP invalidation -> Ready publication. Runtime validation UNTESTED; no build started.",
+    "Cycles 650-652: inspected R29StableStereoBase, R29DirectTwoEye and R29GuardStableDraw. These jointly own stereo eligibility, LEFT/RIGHT replay/depth accounting and fallback/semantic decisions; further extraction would cross runtime-visible draw ordering. APPLY_GATE 652 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 653-655: inspected R29SyncEffectState, R29FragileEffectCached and R29ArmMonoSafety. Cache refresh bound, effect classification and PresentEpoch safety lifetime remain coupled to draw correctness; no behavior-neutral atomic extraction identified. APPLY_GATE 655 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 656-658: inspected R29RollbackStereoHooks, R29EnableStereoHooks and R29InstallHookTransaction. Disabled-first create/enable/rollback ownership is already isolated and verifier-guarded; no duplicate ownership remained. APPLY_GATE 658 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 659-661: inspected R29ClassifyPrerequisite, R29StartInstallThread and public StereoBaseInstallState facade. Timing/startup/read boundaries are already isolated; changing them would duplicate completed LIFECYCLE-0029/0030/STATE-0016 work. APPLY_GATE 661 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 662-664: inspected R30MergeValidRange, R30RangeValid and R30BeginObservedLock. Valid-range mutation and lock observation are shadow-registry semantics and must not be merged with physical hooks without build/runtime evidence. APPLY_GATE 664 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 665-667: inspected R30FinishObservedLock, R30CopyVertexShadow and R30CopyIndexShadow. Unlock/write accounting and read-hit/miss semantics are coherent shadow ownership; no safe extraction beyond current boundary. APPLY_GATE 667 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 668-670: inspected R30EnsureVertexBufferHooks, R30EnsureIndexBufferHooks and R30InstallBufferCreationHooks. These are physical vtable-hook lifetime paths previously blocked from registry-lifetime merge; blocker unchanged. APPLY_GATE 670 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 671-673: inspected R30RollbackBufferShadowHooks, R30ReleaseSkyGlowResources and R30CompilePixelShader. They belong to independent buffer-hook and SkyGlow resource lifetimes; combining cleanup would violate independent Golden contracts. APPLY_GATE 673 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 674-676: inspected R30EnsureSkyGlowResources, R30DrawSkyGlowPass and R30CaptureSkyGlowSceneBeforeHud. Resource creation, pass state mutation and pre-HUD capture ordering are runtime-visible and intentionally separate. APPLY_GATE 676 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 677-679: inspected R30ApplyStereoSkyGlow, R30ShouldApplySkyGlow and R30PrepareSkyGlowForReset. Eligibility/reset ownership is already separated while state-block restore remains inside apply; no safe further move without runtime evidence. APPLY_GATE 679 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 680-682: inspected R30MaybeLogTelemetry, R30HudContainScale and R30TransformHudScissor. Telemetry cadence is isolated; HUD contain/scissor math is Golden-contract-sensitive and not a safe generic semantic extraction. APPLY_GATE 682 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 683-685: inspected R30BuildEyeAffine, R30PrepareXyzrhwState and R30XyzrhwHasProjectedDepthSignature. Eye transform, captured D3D state and depth-signature classification form distinct runtime responsibilities; no ownership-only change justified. APPLY_GATE 685 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 686-688: inspected R30ConfigureXyzrhwWorldEffect, R30TransformXyzrhwVertices and R30TransformXyzrhwStereo. World-effect eligibility, vertex transform and bilateral transform are large behavior-sensitive paths; broad promotion/tuning remains prohibited. APPLY_GATE 688 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 689-691: inspected R30ExecuteXyzrhwStereo, R30TryXyzrhwPrimitiveUP and R30TryXyzrhwIndexedPrimitiveUP. Execution owns left/right depth/stencil accounting and failure fallback while UP wrappers own input extraction; current separation is appropriate. APPLY_GATE 691 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 692-694: inspected R30TryXyzrhwPrimitiveVB, R30TryXyzrhwIndexedPrimitiveVB and R30BuildScreenSpaceEyeConstants. VB/IB shadow transport and screen-space constants are independent; merging would cross transport/render contracts. APPLY_GATE 694 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
+    "Cycles 695-696: inspected R30TryScreenSpaceFovDraw and R30GuardScreenSpace. Guard remains a thin boundary over the behavior-heavy FOV stereo path; no source change counted before next APPLY_GATE 699. Runtime validation remains UNTESTED."
   ]
 }
