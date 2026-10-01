@@ -1,0 +1,25 @@
+{
+  "schema_version": 32,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00416",
+  "lane": "LOCALIZATION_C",
+  "wave_id": "Q00087",
+  "target_branch": "korean-localization-clean",
+  "role": "independent_batched_cross_lane_qa",
+  "validation_mode": "C_BATCH_GATE",
+  "qa_batch_inputs": [
+    {"task_id":"LOCALIZATION-LOCALIZATION_E-00354","result_sha":"4c129e50612d41d13a48020357ab5eb95b290fe6","disposition":"PASS_LIMITED_PREFLIGHT_ONLY"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00372","result_sha":"73c1cc95fd64c0d45f486eba434bab25ddfc1b6f","disposition":"PASS_PENDING_CANDIDATE_REVIEW"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00373","result_sha":"c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463","disposition":"PASS_PENDING_CANDIDATE_REVIEW"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00375","result_sha":"678655ff48caeab8ac8e291bf84888b0d697d4f4","disposition":"PASS_PENDING_CANDIDATE_REVIEW"}
+  ],
+  "qa_dispositions": [
+    "All immutable TASK_ID@RESULT_SHA inputs consumed.",
+    "No producer barrier applied.",
+    "No runtime evidence provided; runtime status remains UNTESTED.",
+    "Missing direct visual/runtime evidence prevents claiming final in-game approval."
+  ],
+  "shared_state_modified": false,
+  "candidate_rework_issued": false,
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED"
+}
