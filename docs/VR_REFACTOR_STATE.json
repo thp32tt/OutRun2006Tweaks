@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-01T19:34:00+09:00",
+  "updatedKst": "2026-10-01T19:39:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 22,
+  "cycle": 23,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -31,9 +31,10 @@
     "VR-REFACTOR-CI-0002",
     "VR-REFACTOR-STATE-0002B-A",
     "VR-REFACTOR-STATE-0002B-A-FIX00",
-    "VR-REFACTOR-STATE-0002B-A2"
+    "VR-REFACTOR-STATE-0002B-A2",
+    "VR-REFACTOR-STATE-0002B-B"
   ],
-  "next": "Validate neutral lifecycle coverage publication. Then implement 0002B-B as conditional ownership: R22 dispatches StateBlockEvents when its lifecycle hooks are ready; R31 keeps physical lifecycle hooks only as fallback when R22 lifecycle coverage is unavailable.",
+  "next": "Validate conditional StateBlock physical ownership with active R26+HUD and full R34 compile gates. If green, review R31 fallback hook isolation and neutralize the remaining R31Reliable naming/ownership before further dispatcher flattening.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -49,7 +50,8 @@
     "200/200 structural review completed. VR-REFACTOR-CI-0002 adds a non-packaging R34 full-chain compile job so active R26+HUD validation can no longer hide compile failures in R31-R34.",
     "VR-REFACTOR-STATE-0002B-A extracts R31 Begin/End/Apply post-processing behind neutral StateBlockEvents while intentionally preserving the existing R31 physical hooks and exact event conditions/order.",
     "VR-REFACTOR-STATE-0002B-A-FIX00 publishes StateBlock End/Apply callbacks before Begin so the upcoming R22 single-owner transition cannot observe an unmatched Begin during callback registration.",
-    "VR-REFACTOR-STATE-0002B-A2 publishes neutral Create/Begin/End lifecycle-hook readiness from R22 and moves ResetCoverageLoss before StateBlockEvents publication. This prevents a future R22 event from being erased during R31 registration and preserves an explicit R31 fallback condition."
+    "VR-REFACTOR-STATE-0002B-A2 publishes neutral Create/Begin/End lifecycle-hook readiness from R22 and moves ResetCoverageLoss before StateBlockEvents publication. This prevents a future R22 event from being erased during R31 registration and preserves an explicit R31 fallback condition.",
+    "VR-REFACTOR-STATE-0002B-B routes R22 Begin/End/Apply through StateBlockEvents when R22 lifecycle hooks are ready, skips duplicate R31 physical hooks on that path, and retains the previous R31 physical hooks only as a fail-closed fallback when R22 lifecycle coverage is unavailable."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0002B_A2_APPLIED_CI_PENDING"
+  "batchStatus": "VR-REFACTOR-STATE-0002B_B_APPLIED_CI_PENDING"
 }

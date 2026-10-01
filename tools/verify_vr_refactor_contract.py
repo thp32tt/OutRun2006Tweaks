@@ -100,6 +100,8 @@ for rel, source in (
 ):
     if '../state/state_block_tracker.hpp' not in source:
         errors.append(f"{rel} missing neutral StateBlockTracker include")
+if '../state/state_block_events.hpp' not in r22:
+    errors.append("R22 missing neutral StateBlock event boundary include")
 
 for rel, source in (("R32", r32), ("R33", r33)):
     if "R31StateBlockTrackingReliable" in source:
@@ -195,8 +197,31 @@ for marker in (
     "StateBlockEvents::NotifyEnd(device, hr)",
     "StateBlockEvents::NotifyApply(device, hr)",
 ):
+    if marker not in r22:
+        errors.append(f"R22 StateBlock owner missing neutral event dispatch: {marker}")
     if marker not in r31:
-        errors.append(f"R31 physical StateBlock hook missing neutral event dispatch: {marker}")
+        errors.append(f"R31 fallback StateBlock hook missing neutral event dispatch: {marker}")
+
+if "StateBlockTracker::LifecycleHooksReady()" not in r31:
+    errors.append("R31 missing conditional R22 StateBlock ownership gate")
+if "R22 lifecycle hooks are authoritative" not in r31:
+    errors.append("R31 missing authoritative R22 lifecycle-owner path")
+if "R31 fallback StateBlock hooks armed" not in r31:
+    errors.append("R31 missing fallback physical StateBlock hook path")
+if "StateBlockTracker::SetR31Reliable(" not in r31 or         "StateBlockEvents::Configured()" not in r31:
+    errors.append("R31 missing neutral event-consumer readiness publication")
+
+r22_apply_owner = re.search(
+    r"bool R22EnsureStateBlockApplyHook\(.*?\n        \}",
+    r22,
+    re.DOTALL,
+)
+if not r22_apply_owner:
+    errors.append("R22 shared StateBlock Apply hook owner body missing")
+elif "StateBlockTracker::MarkCoverageLost()" not in r22_apply_owner.group(0):
+    errors.append(
+        "R22 shared StateBlock Apply owner must preserve coverage-loss semantics")
+
 if "R31FlushPendingStateBlockResync" in r31:
     errors.append("R31 retained obsolete StateBlock resync execution wrapper")
 

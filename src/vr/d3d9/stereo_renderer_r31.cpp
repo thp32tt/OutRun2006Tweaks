@@ -1003,43 +1003,53 @@ namespace OutRunVRStereo
                         &R31OnStateBlockEnd,
                         &R31OnStateBlockApply);
 
-                    IDirect3DDevice9* const device =
-                        StereoInstalledDevice.load(std::memory_order_acquire);
-                    if (device)
+                    if (OutRunVR::State::StateBlockTracker::LifecycleHooksReady())
                     {
-                        void** vtable = *reinterpret_cast<void***>(device);
-                        if (vtable)
+                        OutRunVR::State::StateBlockTracker::SetR31Reliable(
+                            OutRunVR::State::StateBlockEvents::Configured());
+                        spdlog::info(
+                            "VR R31 STATE: R22 lifecycle hooks are authoritative; R31 physical StateBlock hooks are not installed");
+                    }
+                    else
+                    {
+                        IDirect3DDevice9* const device =
+                            StereoInstalledDevice.load(std::memory_order_acquire);
+                        if (device)
                         {
-                            R31CreateStateBlockHook = safetyhook::create_inline(
-                                vtable[CreateStateBlockVtableIndex],
-                                CreateStateBlockDestR31, disabled);
-                            R31BeginStateBlockHook = safetyhook::create_inline(
-                                vtable[BeginStateBlockVtableIndex],
-                                BeginStateBlockDestR31, disabled);
-                            R31EndStateBlockHook = safetyhook::create_inline(
-                                vtable[EndStateBlockVtableIndex],
-                                EndStateBlockDestR31, disabled);
-                            const bool stateHooks = R31CreateStateBlockHook &&
-                                R31BeginStateBlockHook &&
-                                R31EndStateBlockHook &&
-                                // Arm End before Begin so a render-thread race
-                                // can never observe an unmatched recording start.
-                                R31EndStateBlockHook.enable().has_value() &&
-                                R31BeginStateBlockHook.enable().has_value() &&
-                                R31CreateStateBlockHook.enable().has_value();
-                            if (!stateHooks)
+                            void** vtable = *reinterpret_cast<void***>(device);
+                            if (vtable)
                             {
-                                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                                R31CreateStateBlockHook = {};
-                                R31BeginStateBlockHook = {};
-                                R31EndStateBlockHook = {};
-                                spdlog::warn(
-                                    "VR R31 STATE: Begin/Create/End StateBlock hooks unavailable; every fast-path candidate will live-validate WVP, shader, render state and viewport");
-                            }
-                            else
-                            {
-                                spdlog::info(
-                                    "VR R31 STATE: Begin/Create/End StateBlock recording hooks armed; per-draw validation remains active until Apply interception is proven");
+                                R31CreateStateBlockHook = safetyhook::create_inline(
+                                    vtable[CreateStateBlockVtableIndex],
+                                    CreateStateBlockDestR31, disabled);
+                                R31BeginStateBlockHook = safetyhook::create_inline(
+                                    vtable[BeginStateBlockVtableIndex],
+                                    BeginStateBlockDestR31, disabled);
+                                R31EndStateBlockHook = safetyhook::create_inline(
+                                    vtable[EndStateBlockVtableIndex],
+                                    EndStateBlockDestR31, disabled);
+                                const bool stateHooks = R31CreateStateBlockHook &&
+                                    R31BeginStateBlockHook &&
+                                    R31EndStateBlockHook &&
+                                    // Fallback only: arm End before Begin so a
+                                    // render-thread race cannot strand recording.
+                                    R31EndStateBlockHook.enable().has_value() &&
+                                    R31BeginStateBlockHook.enable().has_value() &&
+                                    R31CreateStateBlockHook.enable().has_value();
+                                if (!stateHooks)
+                                {
+                                    OutRunVR::State::StateBlockTracker::MarkCoverageLost();
+                                    R31CreateStateBlockHook = {};
+                                    R31BeginStateBlockHook = {};
+                                    R31EndStateBlockHook = {};
+                                    spdlog::warn(
+                                        "VR R31 STATE: R22 lifecycle coverage unavailable and fallback StateBlock hooks failed; every fast-path candidate will live-validate");
+                                }
+                                else
+                                {
+                                    spdlog::info(
+                                        "VR R31 STATE: R22 lifecycle coverage unavailable; R31 fallback StateBlock hooks armed");
+                                }
                             }
                         }
                     }

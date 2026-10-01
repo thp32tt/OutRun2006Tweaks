@@ -13,6 +13,7 @@
 #include "stereo_renderer_r21.cpp"
 #include "../state/d3d9_raster_state.hpp"
 #include "../state/state_block_tracker.hpp"
+#include "../state/state_block_events.hpp"
 
 namespace OutRunVRStereo
 {
@@ -65,6 +66,7 @@ namespace OutRunVRStereo
 #endif
         bool R22FirstSeedRejectLogged = false;
         bool R22FirstReplayStateCaptureFailureLogged = false;
+        bool R22FirstAlternateStateBlockLogged = false;
 
         void R22FailClosedEligibility() noexcept
         {
@@ -153,13 +155,18 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device = nullptr;
             if (block && SUCCEEDED(block->GetDevice(&device)) && device)
             {
-                if (IsGameDevice(device) && SUCCEEDED(hr))
-                    R22InvalidateAfterStateBlockApply(device);
+                if (IsGameDevice(device))
+                {
+                    if (SUCCEEDED(hr))
+                        R22InvalidateAfterStateBlockApply(device);
+                    OutRunVR::State::StateBlockEvents::NotifyApply(device, hr);
+                }
                 device->Release();
             }
             else
             {
                 OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
+                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
             }
             return hr;
         }
@@ -168,16 +175,33 @@ namespace OutRunVRStereo
             IDirect3DStateBlock9* block) noexcept
         {
             if (!block)
+            {
+                OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
+                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
                 return false;
+            }
             void** vtable = *reinterpret_cast<void***>(block);
             if (!vtable)
+            {
+                OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
+                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
                 return false;
+            }
             void* target = vtable[R22StateBlockApplyVtableIndex];
             if (R22StateBlockApplyHook)
             {
                 const bool same = R22StateBlockApplyTarget == target;
                 if (!same)
+                {
                     OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
+                    OutRunVR::State::StateBlockTracker::MarkCoverageLost();
+                    if (!R22FirstAlternateStateBlockLogged)
+                    {
+                        R22FirstAlternateStateBlockLogged = true;
+                        spdlog::warn(
+                            "VR STATE: alternate StateBlock::Apply implementation observed; shared fast-path trust is disabled for the process");
+                    }
+                }
                 return same;
             }
             R22StateBlockApplyHook = safetyhook::create_inline(
@@ -189,6 +213,7 @@ namespace OutRunVRStereo
                 R22StateBlockApplyHook = {};
                 R22StateBlockApplyTarget = nullptr;
                 OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
+                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
                 return false;
             }
             R22StateBlockApplyTarget = target;
@@ -216,6 +241,7 @@ namespace OutRunVRStereo
             {
                 R22ShadowState = {};
                 InvalidateTrackedRenderStates();
+                OutRunVR::State::StateBlockEvents::NotifyBegin(device);
             }
             return hr;
         }
@@ -225,10 +251,17 @@ namespace OutRunVRStereo
         {
             const HRESULT hr =
                 R22EndStateBlockHook.stdcall<HRESULT>(device, block);
-            if (IsGameDevice(device) && !InternalStereoPass)
+            const bool game = IsGameDevice(device);
+            const bool recording =
+                OutRunVR::State::StateBlockTracker::Recording();
+            if (game && !InternalStereoPass)
             {
                 R22ShadowState = {};
                 InvalidateTrackedRenderStates();
+            }
+            if (game && (!InternalStereoPass || recording))
+            {
+                OutRunVR::State::StateBlockEvents::NotifyEnd(device, hr);
                 if (SUCCEEDED(hr) && block && *block)
                     R22EnsureStateBlockApplyHook(*block);
             }
