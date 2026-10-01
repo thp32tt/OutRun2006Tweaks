@@ -33,6 +33,14 @@ namespace OutRunVR::State
                 R31Reliable() &&
                 !CoverageLost();
         }
+        static void SetLifecycleHooksReady(bool ready) noexcept
+        {
+            LifecycleHooksReadyFlag().store(ready, std::memory_order_release);
+        }
+        static bool LifecycleHooksReady() noexcept
+        {
+            return LifecycleHooksReadyFlag().load(std::memory_order_acquire);
+        }
         static void MarkCoverageLost() noexcept
         {
             CoverageLostFlag().store(true, std::memory_order_release);
@@ -94,6 +102,11 @@ namespace OutRunVR::State
             return value;
         }
         static std::atomic<bool>& CoverageLostFlag() noexcept
+        {
+            static std::atomic<bool> value{false};
+            return value;
+        }
+        static std::atomic<bool>& LifecycleHooksReadyFlag() noexcept
         {
             static std::atomic<bool> value{false};
             return value;

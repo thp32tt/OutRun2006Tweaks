@@ -673,6 +673,7 @@ namespace OutRunVRStereo
             R22EndStateBlockHook = {};
             R22StateBlockApplyHook = {};
             R22StateBlockApplyTarget = nullptr;
+            OutRunVR::State::StateBlockTracker::SetLifecycleHooksReady(false);
             OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
             R22ResetR13Hook = {};
             R22ClearR20Hook = {};
@@ -702,6 +703,7 @@ namespace OutRunVRStereo
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
             R22InstallState.store(State::Pending, std::memory_order_release);
+            OutRunVR::State::StateBlockTracker::SetLifecycleHooksReady(false);
             R22FailClosedEligibility();
 
             for (int attempt = 0; attempt < 4800; ++attempt)
@@ -795,6 +797,8 @@ namespace OutRunVRStereo
                         R22EndStateBlockHook.enable().has_value() &&
                         R22BeginStateBlockHook.enable().has_value() &&
                         R22CreateStateBlockHook.enable().has_value();
+                    OutRunVR::State::StateBlockTracker::SetLifecycleHooksReady(
+                        stateBlockHooks);
                     if (!stateBlockHooks)
                     {
                         R22CreateStateBlockHook = {};

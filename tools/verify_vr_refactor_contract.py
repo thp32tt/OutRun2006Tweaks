@@ -34,6 +34,12 @@ for banned in ("R22ShadowState", "R22StateBlockTrackingReliable"):
         errors.append(f"R23 regained direct lower-layer state dependency: {banned}")
 if "R22StateBlockTrackingReliable" in r22:
     errors.append("R22 retained removed StateBlock reliability authority")
+if "StateBlockTracker::SetLifecycleHooksReady(stateBlockHooks)" not in r22.replace("\n", " ").replace("  ", " "):
+    # Whitespace-independent fallback below checks the two required markers.
+    if not ("SetLifecycleHooksReady(" in r22 and "stateBlockHooks" in r22):
+        errors.append("R22 missing neutral StateBlock lifecycle coverage publication")
+if "StateBlockTracker::SetLifecycleHooksReady(false)" not in r22:
+    errors.append("R22 rollback/install path missing lifecycle coverage reset")
 
 for banned in ("R23GameDrawSerial", "R23BeforeTopLevelDraw", "GetTopLevelDrawSerial()"):
     if banned in r26:
@@ -70,6 +76,8 @@ for marker in (
     "SetR31Reliable(",
     "R31Reliable()",
     "Reliable()",
+    "SetLifecycleHooksReady(",
+    "LifecycleHooksReady()",
     "MarkCoverageLost()",
     "ResetCoverageLoss()",
     "CoverageLost()",
@@ -177,6 +185,11 @@ if "StateBlockRecovery::Configure(" not in r31:
     errors.append("R31 missing neutral StateBlock recovery callback registration")
 if "StateBlockEvents::Configure(" not in r31:
     errors.append("R31 missing neutral StateBlock event callback registration")
+coverage_reset = r31.find("StateBlockTracker::ResetCoverageLoss()")
+event_configure = r31.find("StateBlockEvents::Configure(")
+if min(coverage_reset, event_configure) < 0 or not coverage_reset < event_configure:
+    errors.append(
+        "R31 must reset stale coverage before publishing StateBlock event callbacks")
 for marker in (
     "StateBlockEvents::NotifyBegin(device)",
     "StateBlockEvents::NotifyEnd(device, hr)",

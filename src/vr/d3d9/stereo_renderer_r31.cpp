@@ -996,6 +996,8 @@ namespace OutRunVRStereo
                         return 0;
                     }
 
+                    OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
+                    OutRunVR::State::StateBlockTracker::ResetCoverageLoss();
                     OutRunVR::State::StateBlockEvents::Configure(
                         &R31OnStateBlockBegin,
                         &R31OnStateBlockEnd,
@@ -1003,8 +1005,6 @@ namespace OutRunVRStereo
 
                     IDirect3DDevice9* const device =
                         StereoInstalledDevice.load(std::memory_order_acquire);
-                    OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
-                    OutRunVR::State::StateBlockTracker::ResetCoverageLoss();
                     if (device)
                     {
                         void** vtable = *reinterpret_cast<void***>(device);
