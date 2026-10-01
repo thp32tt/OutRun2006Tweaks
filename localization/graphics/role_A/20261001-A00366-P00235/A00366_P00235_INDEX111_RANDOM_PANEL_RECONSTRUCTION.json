@@ -1,0 +1,111 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-a00366-index111-random-dark-panel-source-only-reconstruction-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00366",
+  "wave_id": "P00235",
+  "lane": "LOCALIZATION_A",
+  "queue_index": 111,
+  "asset": "C075FB49",
+  "coordinate_space": "readable/display after raw mirror_y -> flip_y",
+  "source_identity": {
+    "pinned_release_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "target_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "donor411_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "donor53_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+    "canvas": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mip_count": 1
+  },
+  "accepted_prior": {
+    "c176_a00346_status": "PASS_PREFLIGHT_ONLY_PARTIAL_RECONSTRUCTION_5734_UNRESOLVED",
+    "tuned_remaining_pixels": 463,
+    "normal_remaining_pixels": 79,
+    "random_remaining_pixels": 5192,
+    "aggregate_remaining_pixels": 5734
+  },
+  "method": {
+    "scope": "RANDOM_REMAINDER_DARK_PANEL_ONLY__TUNED_NORMAL_UNCHANGED",
+    "random_analysis_roi": [
+      1680,
+      1380,
+      2030,
+      1620
+    ],
+    "panel_base_rgba": [
+      0,
+      79,
+      159,
+      255
+    ],
+    "protected_circle_visible_rgba": [
+      103,
+      152,
+      220,
+      255
+    ],
+    "protected_white_rgba": [
+      255,
+      255,
+      255,
+      255
+    ],
+    "panel_interior_rule": "fill RETR_EXTERNAL contour of the largest exact dark-panel connected component, then intersect only with the C176-accepted RANDOM unresolved mask",
+    "protected_circle_rule": "convex hull of every exact light-blue source pixel in RANDOM_ROI, filled conservatively across text-occluded gaps and dilated 4px before any dark-panel proposal",
+    "protected_white_rule": "all exact white source pixels in RANDOM_ROI (question-mark/border family) dilated 4px",
+    "fill_rule": "proposed pixels are set only to the exact dark-panel base RGBA; no inferred circle/question-mark reconstruction is attempted",
+    "candidate_pixels_used": false,
+    "clean_plate_status": "NOT_APPROVED_PREFLIGHT_ONLY"
+  },
+  "random": {
+    "prior_unresolved_pixels": 5192,
+    "visible_light_blue_source_pixels": 5255,
+    "circle_hull_pixels": 11119,
+    "circle_guard_pixels": 13151,
+    "exact_white_source_pixels_in_roi": 4356,
+    "white_guard_pixels": 15216,
+    "panel_interior_pixels": 35563,
+    "new_dark_panel_proposal_pixels": 3144,
+    "new_actual_changed_pixels": 1874,
+    "proposal_bbox": [
+      1761,
+      1451,
+      1943,
+      1481
+    ],
+    "actual_changed_bbox": [
+      1761,
+      1452,
+      1939,
+      1481
+    ],
+    "remaining_unresolved_pixels": 2048,
+    "remaining_bbox": [
+      1774,
+      1448,
+      1941,
+      1481
+    ],
+    "proposal_circle_guard_overlap_pixels": 0,
+    "proposal_white_guard_overlap_pixels": 0,
+    "proposal_mask_sha256_packbits": "cd9341a9efdaee4a7bbf0ec54a800cf7accbc18ecd23655fd8590b7154a6fbd4",
+    "remaining_mask_sha256_packbits": "240e1fa52362d5ebb1c52525e7c8a99ed083c492c67578efe60bccdc66d6e37e"
+  },
+  "aggregate": {
+    "prior_c176_unresolved_pixels": 5734,
+    "new_proposal_resolved_pixels": 3144,
+    "new_actual_changed_pixels": 1874,
+    "remaining_unresolved_pixels": 2590,
+    "unresolved_reduction_ratio": 0.5483083362399721,
+    "outside_accepted_mask_changed_pixels": 0,
+    "alpha_changed_pixels": 0,
+    "protected_circle_guard_overlap_pixels": 0,
+    "protected_white_guard_overlap_pixels": 0
+  },
+  "readiness_after": "PREFLIGHT_ONLY__RANDOM_DARK_PANEL_RECONSTRUCTION_ADVANCED__2590_UNRESOLVED__CIRCLE_QUESTION_MARK_CORRIDOR_AND_TUNED_NORMAL_FRINGE_HOLD",
+  "candidate_dds_authorized": false,
+  "candidate_dds_modified": false,
+  "runtime_validation": "UNTESTED"
+}
