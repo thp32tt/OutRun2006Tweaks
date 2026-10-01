@@ -135,10 +135,10 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA30__FRESH_HEAD_ZERO_COMPLETION_TIER_BY_UNCHANGED_SHARED_FINGERPRINT__QA_PENDING_AND_UNCONSUMED_A_RESULTS_NOT_REPEATED__INDEX135_C152_SOURCE_EXHAUSTION_REUSED__NO_SOURCE_REPROBE__NONCANONICAL_RELEASE_SUBSTITUTION_FORBIDDEN__EXECUTABLE_FAIL_CLOSED_REACTIVATION_GUARD_ADDED__NO_SHARED_STATE__NO_DDS__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "318c34fe1e21522b3b2846e6fd5828b97f4ae88a",
+  "authoritative_result_sha": "318c34fe1e21522b3b2846e6fd5828b97f4ae88a",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_RESULT_COMMIT_CREATION",
+  "result_binding_state": "BOUND_TO_PRODUCER_RESULT_PENDING_C_BATCH_GATE",
   "result_commit_message": "localization(A): add index135 source reactivation guard [AUTO:LOCALIZATION-LOCALIZATION_A-00378]",
   "durable_task_record_in_result_commit": true,
   "precommit_refresh": {
@@ -146,5 +146,12 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Latest shared fingerprints equal A00376 scan. Intervening B00375 changes are lane-B task/tool/report only; no queue/progress/resume/controller/contract/A-shard fingerprint changed. A00378 adds only lane-A index135 verifier/report and unique task record."
   },
-  "bookkeeping_note": "Initial durable result commit intentionally leaves self-SHA fields null. A separate bookkeeping-only commit will bind immutable RESULT_SHA. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; no real-game validation was performed and RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Immutable producer result 318c34fe1e21522b3b2846e6fd5828b97f4ae88a atomically contains the index135 executable reactivation verifier, machine report, and durable A00378 task record. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes A00378@318c34fe; no real-game validation was performed, so RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping": {
+    "recorded_at_kst": "2026-10-01T18:45:00+09:00",
+    "producer_result_sha": "318c34fe1e21522b3b2846e6fd5828b97f4ae88a",
+    "automation_validation": "PENDING",
+    "validation_mode": "C_BATCH_GATE",
+    "runtime_validation": "UNTESTED"
+  }
 }
