@@ -59,7 +59,8 @@ jobs:
           grep -Fq 'schema 노출 여부를 GitHub 연결 여부로 판단하지 마' /tmp/controller.py
           grep -Fq 'def assistant_claims_github_tooling_absent' /tmp/controller.py
           grep -Fq 'BLOCKED_TOOLING' /tmp/controller.py
-          grep -Fq 'roll the same TASK_ID to a fresh project chat' /tmp/controller.py
+          grep -Fq 'Keep the same TASK_ID/chat' /tmp/controller.py
+          grep -Fq 'status="github_tooling_circuit_wait"' /tmp/controller.py
 
       - name: Verify browser transport self-recovery
         run: |
@@ -74,9 +75,13 @@ jobs:
         run: |
           grep -Fq 'GENERIC_RETRY_ROLLOVER_CLICKS: "2"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'GENERIC_RETRY_ROLLOVER_CLICKS: "2"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'generic_retry_clicks' /tmp/controller.py
-          grep -Fq 'persistent Retry -> fresh chat rollover' /tmp/controller.py
-          grep -Fq 'rolling the same task into a fresh project chat to break the retry loop' /tmp/controller.py
+          grep -Fq 'GENERIC_RETRY_COOLDOWN_SECONDS: "300"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'GENERIC_RETRY_COOLDOWN_SECONDS: "300"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS: "300"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS: "300"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'generic_retry_cooldown_until' /tmp/controller.py
+          grep -Fq 'status="generic_retry_circuit_wait"' /tmp/controller.py
+          grep -Fq 'same TASK_ID/chat and cooling down instead of opening another chat' /tmp/controller.py
           test "$(grep -Fc 'queue_handle_retry_surface(context, pages, page, reg, slot, active, q)' /tmp/controller.py)" -eq 2
 
       - name: Verify queue prompt files and image packaging
