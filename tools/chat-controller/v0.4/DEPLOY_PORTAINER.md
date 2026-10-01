@@ -7,7 +7,7 @@ N100 runs only the browser/controller containers. Project work must be performed
 - VR SSOT: `thp32tt/OutRun2006Tweaks` / `vr-d3d9ex-focus`
 - Korean localization SSOT: `thp32tt/OutRun2006Tweaks` / `korean-localization-clean`
 - Do not use N100 local clones/worktrees as project workspaces.
-- The controller `GITHUB_TOKEN` is the durable GitHub read/write path. ChatGPT GitHub plugin access is preferred when present but is no longer required for queue liveness.
+- The controller `GITHUB_TOKEN` and Controller GitHub Broker are the primary durable GitHub read/write path from the first task turn. ChatGPT GitHub plugin access is optional.
 
 ## Portainer Git source
 
@@ -115,7 +115,7 @@ GitHub 5xx/network/timeout/403/429 conditions are treated as transient transport
 
 See [GITHUB_BROKER_ARCHITECTURE.md](GITHUB_BROKER_ARCHITECTURE.md).
 
-The controller owns the durable GitHub control plane. Connected ChatGPT GitHub tools are a preferred path, not a prerequisite. If a session reports that GitHub plugin/tool/schema functions are absent, the same TASK_ID stays in the same chat and switches to the structured controller broker instead of declaring the task blocked.
+The controller owns the durable GitHub control plane and injects broker-fetched GitHub context into the first task turn. Connected ChatGPT GitHub tools are optional. The broker is a text protocol handled by the controller, not a ChatGPT tool/schema/interface, so a session must never wait for a broker interface to become exposed.
 
 `BROKER_READ` requests immutable-SHA file context. `BROKER_CHANGESET` requests an atomic Git Data API commit with HEAD CAS and `force=false`. The controller token is never sent to ChatGPT.
 
