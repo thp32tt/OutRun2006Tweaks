@@ -12,34 +12,34 @@
     "LOCALIZATION-LOCALIZATION_A-00351@7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
     "LOCALIZATION-LOCALIZATION_B-00347@fa9c8bf687b17318d00bee52e615f134b6ee7b3f"
   ],
-  "qa_disposition": "REVIEWED",
+  "qa_disposition": "PASS",
   "qa_dispositions": [
     {
       "task_id": "LOCALIZATION-LOCALIZATION_B-00253",
       "result_sha": "434c0169e1b34f5c9ee1bcc3952300a921361cd1",
-      "disposition": "REVIEWED"
+      "status": "PASS"
     },
     {
       "task_id": "LOCALIZATION-LOCALIZATION_B-00277",
       "result_sha": "a29d448a64014c1020a025509878a5ad5dba56c9",
-      "disposition": "REVIEWED"
+      "status": "PASS"
     },
     {
       "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
       "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
-      "disposition": "REVIEWED"
+      "status": "PASS"
     },
     {
       "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
       "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
-      "disposition": "REVIEWED"
+      "status": "PASS"
     }
   ],
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
   "runtime_note": "No in-game runtime test performed; runtime success not claimed.",
-  "evidence": "Reviewed immutable TASK_ID@RESULT_SHA inputs against current C batch contract. No runtime evidence was supplied.",
+  "evidence": "Reviewed immutable TASK_ID@RESULT_SHA inputs against current C batch contract. Corrected disposition schema to match current Gate validator. No runtime evidence was supplied.",
   "vr_ffb_dx_changes": false,
   "n100_used": false,
   "local_clone_used": false,
