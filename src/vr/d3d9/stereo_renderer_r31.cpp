@@ -940,10 +940,16 @@ namespace OutRunVRStereo
             return R31PrerequisiteDecision::Wait;
         }
 
+        void R31PublishInstallState(
+            OutRunVR::RuntimeEligibility::InstallState state) noexcept
+        {
+            R31InstallState.store(state, std::memory_order_release);
+        }
+
         DWORD WINAPI R31InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
-            R31InstallState.store(State::Pending, std::memory_order_release);
+            R31PublishInstallState(State::Pending);
 
             for (int attempt = 0; attempt < R31PrerequisiteWaitAttempts; ++attempt)
             {
@@ -953,7 +959,7 @@ namespace OutRunVRStereo
                     R31ClassifyPrerequisite(r30, renderer);
                 if (prerequisite == R31PrerequisiteDecision::Fail)
                 {
-                    R31InstallState.store(State::Failed, std::memory_order_release);
+                    R31PublishInstallState(State::Failed);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR31Perf", false);
                     spdlog::error(
                         "VR R31 PERF: R30 or renderer prerequisite failed; R30 remains authoritative");
@@ -979,8 +985,7 @@ namespace OutRunVRStereo
                     if (!R31EnableDrawHooks())
                     {
                         R31RollbackDrawHooks();
-                        R31InstallState.store(State::Failed,
-                            std::memory_order_release);
+                        R31PublishInstallState(State::Failed);
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR31Perf", false);
                         return 0;
@@ -1029,7 +1034,7 @@ namespace OutRunVRStereo
                         }
                     }
 
-                    R31InstallState.store(State::Ready, std::memory_order_release);
+                    R31PublishInstallState(State::Ready);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR31Perf", true);
                     spdlog::info(
                         "VR R31 PERF: cached world stereo + draw-route telemetry READY; R30 HUD sentinel path superseded");
@@ -1038,7 +1043,7 @@ namespace OutRunVRStereo
                 Sleep(R31PrerequisiteWaitMs);
             }
 
-            R31InstallState.store(State::Failed, std::memory_order_release);
+            R31PublishInstallState(State::Failed);
             HookManager::ReportAsyncResult("OpenXRVRStereoR31Perf", false);
             spdlog::error("VR R31 PERF: timed out waiting for R30");
             return 0;
@@ -1058,9 +1063,8 @@ namespace OutRunVRStereo
                     R31InstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
-                    R31InstallState.store(
-                        OutRunVR::RuntimeEligibility::InstallState::Failed,
-                        std::memory_order_release);
+                    R31PublishInstallState(
+                        OutRunVR::RuntimeEligibility::InstallState::Failed);
                     return false;
                 }
                 CloseHandle(thread);
