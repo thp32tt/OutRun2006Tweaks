@@ -8,11 +8,11 @@
   "role": "CONTINUOUS_PRODUCTION_SELF_QA_MOD3_1",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
-  "recorded_at_kst": "2026-10-01T18:31:00+09:00",
-  "base_head_sha": "fb23e5fe50231eb9b2a408a9424b98d366f563ab",
-  "result": "PASS_MATERIAL_B_MOD3_FALLBACK4_INDEX28_INDEX220_SCHEMA30_SOURCE_TRANSPORT_NARROWED_RUNTIME_UNTESTED",
-  "summary": "Fresh schema30 B-shard scan again found no runnable DIRECT_REWORK/RENDER_READY/ONE_STAGE_TO_RENDER/existing-candidate material rework outside newer QA-pending scopes. With B00372 having exhausted current static-pass runtime-isolation refreshes, fallback step 4 advances unfinished indices 28/A05BF610 and 220/D657C2EB under the current source-transport contract. Approved Drive exact paths miss, pinned immutable direct queue paths 404, and the pinned v0.25.10a release bundle metadata exactly matches asset ID/size/SHA-256. Release-member bytes remain unmaterialized in this tool session, so both assets are narrowed to the single legal remaining member-verification stage without claiming SOURCE_ACQUISITION_EXHAUSTED, SOURCE_IDENTITY_MISMATCH, candidate/static PASS, or runtime success.",
-  "report": "localization/graphics/role_B/20261001-B00375-P00243/B00375_P00243_SCHEMA30_SOURCE_TRANSPORT_NARROWING.json",
+  "recorded_at_kst": "2026-10-01T18:39:00+09:00",
+  "base_head_sha": "df24c4c7fc813160b0154c9a4a617a86d6eaf797",
+  "result": "PASS_MATERIAL_B_MOD3_RELEASE_MEMBER_VERIFICATION_INDEX28_IDENTITY_MISMATCH_INDEX220_GEOMETRY_MEASURED_RUNTIME_UNTESTED",
+  "summary": "Pinned v0.25.10a archive bytes were materialized in the current tool session and verified against the exact 306223257-byte / SHA-256 76f85ed... bundle identity. Index28/A05BF610 release member fails the canonical inventory gate on both SHA-256 and decoded width, so pixel work is fail-closed as SOURCE_IDENTITY_MISMATCH. Index220/D657C2EB matches canonical SHA-256/dimensions/mode exactly; all seven accepted inspection guards now have deterministic multi-threshold alpha-support/component measurements. Semantic/protected component classification, authoritative removal masks, clean plate, candidate_safe_bbox and typography remain unresolved, so it is not render-ready and no Korean DDS is fabricated.",
+  "report": "localization/graphics/role_B/20261001-B00375-P00243/B00375_P00243_RELEASE_MEMBER_VERIFICATION_AND_GEOMETRY.json",
   "policy_resolution": {
     "dispatch_controller_schema_version": 30,
     "dispatch_controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
@@ -66,25 +66,23 @@
     "selection_reason": "fallback step 3 was exhausted by B00372; these are B-owned unfinished PREFLIGHT_ONLY assets whose prior source work predates the current schema30 approved-Drive transport policy and whose source ladder can be narrowed without repeating sticky SOURCE_ACQUISITION_EXHAUSTED/IDENTITY_MISMATCH probes"
   },
   "material_deliverable": {
-    "type": "TWO_B_SHARD_SCHEMA30_CANONICAL_SOURCE_TRANSPORT_NARROWING_MANIFESTS",
+    "type": "PINNED_RELEASE_MEMBER_IDENTITY_RESOLUTION_PLUS_CANONICAL_SOURCE_GEOMETRY_MEASUREMENT",
     "fallback_ladder_step": 4,
     "reviewed_indices": [
       28,
       220
     ],
-    "tier1_drive_exact_misses": 2,
-    "tier2_pinned_direct_exact_misses": 2,
-    "tier3_release_bundle_identity_pass": 2,
-    "tier3_member_identity_pending": 2,
+    "index28_source_identity": "FAIL_MISMATCH",
+    "index220_source_identity": "PASS_EXACT",
+    "index220_geometry_regions_measured": 7,
     "candidate_dds_modified": false,
     "heavy_static_qa_repeated": false,
     "materially_reduces_unresolved_work": true,
-    "material_reduction": "closes schema30 acquisition tiers 1 and 2 for both assets and binds the only remaining legal source route to the exact pinned release bundle/member-verification step",
     "evidence": [
-      "localization/graphics/role_B/20261001-B00375-P00243/B00375_P00243_SCHEMA30_SOURCE_TRANSPORT_NARROWING.json"
+      "localization/graphics/role_B/20261001-B00375-P00243/B00375_P00243_RELEASE_MEMBER_VERIFICATION_AND_GEOMETRY.json"
     ]
   },
-  "self_qa": "PASS_B_MOD3_SCHEMA30__ZERO_RUNNABLE_COMPLETION_TIER__FALLBACK4_AFTER_B00372_STEP3_EXHAUSTION__INDEX28_INDEX220_TIER1_DRIVE_MISS__TIER2_PINNED_DIRECT_MISS__PINNED_RELEASE_BUNDLE_METADATA_IDENTITY_PASS__MEMBER_SHA_FAIL_CLOSED__NO_STICKY_REPROBE__NO_SHARED_STATE_WRITE__RUNTIME_UNTESTED",
+  "self_qa": "PASS_B_MOD3_SCHEMA30__PINNED_ARCHIVE_EXACT__INDEX28_MEMBER_FAILS_CANONICAL_SHA_AND_DIMENSIONS_FAIL_CLOSED__INDEX220_MEMBER_EXACT_CANONICAL__7_REGIONS_GEOMETRY_MEASURED__NO_EFFECT_BBOX_PROMOTION_BEFORE_SEMANTIC_CLASSIFICATION__NO_CANDIDATE__NO_SHARED_STATE_WRITE__RUNTIME_UNTESTED",
   "candidate_dds_modified": false,
   "candidate_binary_persisted": false,
   "shared_state_modified": false,
@@ -102,12 +100,13 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": "e003dbbcc6fe5a85e8ed500e67f7a01bd39d9272",
-  "authoritative_result_sha": "e003dbbcc6fe5a85e8ed500e67f7a01bd39d9272",
+  "result_sha": null,
+  "authoritative_result_sha": null,
   "validation_bearing_result_sha": null,
   "durable_task_record_in_result_commit": true,
-  "result_commit_message": "localization(B): narrow canonical source transport [AUTO:LOCALIZATION-LOCALIZATION_B-00375]",
-  "bookkeeping_note": "Immutable producer material result e003dbbcc6fe5a85e8ed500e67f7a01bd39d9272 contains the schema30 source-transport narrowing report plus the same-commit durable task record and exact AUTO marker. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; no real-game test was performed, so RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit does not replace material result identity.",
-  "bookkeeping_base_head_sha": "e003dbbcc6fe5a85e8ed500e67f7a01bd39d9272",
-  "bookkeeping_recorded_at_kst": "2026-10-01T18:32:00+09:00"
+  "result_commit_message": "localization(B): verify pinned release members [AUTO:LOCALIZATION-LOCALIZATION_B-00375]",
+  "bookkeeping_note": "This material repair result resolves the previously pending pinned-release member bytes. Bind the immutable result SHA in a separate bookkeeping commit; C_BATCH_GATE remains pending and runtime remains UNTESTED.",
+  "chat_rollover": 5,
+  "prior_authoritative_result_sha": "e003dbbcc6fe5a85e8ed500e67f7a01bd39d9272",
+  "uploaded_archive_used_as_source_transport": true
 }
