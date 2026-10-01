@@ -1191,7 +1191,7 @@ def queue_dynamic_prefix() -> str:
         f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
         *([f"WAVE_ID={wave_id}"] if wave_id else []),
         "GitHub HEAD=SSOT; N100 clone/worktree 금지. 실제 변경/검토를 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 포함.",
-        "Gate 대상 result commit에는 CI-skip 금지. 자동/실기 검증을 분리하고 미실기=RUNTIME_VALIDATION=UNTESTED.",
+        "Gate 대상 result commit에는 CI-skip 지시어를 넣지 마. 자동/실기 검증을 분리하고 미실기=RUNTIME_VALIDATION=UNTESTED.",
         "종료 출력: TASK_ID/RESULT_SHA/AUTOMATION_VALIDATION/RUNTIME_VALIDATION 각 1줄.",
     ]
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B", "LOCALIZATION_E"}:
