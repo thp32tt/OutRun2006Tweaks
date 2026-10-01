@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00204",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "bceb2e6b9819ed885d9176f3e473470985047045",
+  "result_sha": "PENDING_VALIDATION_BEARING_COMMIT",
+  "validation_bearing_result_sha": "PENDING_VALIDATION_BEARING_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "google_drive_canonical_hd_source_transport": {
+    "approved_by_current_git_head": true,
+    "used": false,
+    "reason": "Selected F13 continuation proof consumes canonical EXE bytes already captured in GitHub Actions evidence; no DDS acquisition is required."
+  },
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R204_1823D0_TAIL_PREFIX",
+  "selection_reason": "CONVERSION-DX11-00202 proved the first complete 0x182391 block, ret/padding, and the next exact code boundary at 0x1823D0, then explicitly named exact decode from 0x1823D0 as the next bounded action. R200 GitHub Actions evidence already captured the 0x1823D0..0x1823F0 bytes and raw rel32 candidates at 0x1823D6, 0x1823DB and 0x1823E8.",
+  "summary": "ATTEMPT=1 implementation committed for exact 0x1823D0 tail decoding. The proof covers ten complete instructions through 0x1823EE, including ret at 0x1823E3, the next contiguous sequence at 0x1823E4, raw-backed calls 0x1823D6->0x188948, 0x1823DB->0x1823ED and 0x1823E8->0x188905, and local call-target boundary 0x1823ED. The two captured bytes at 0x1823EF are deliberately retained as raw tail only. GitHub Actions exact-SHA validation is pending; no runtime renderer source changed and no HMD/game test was performed.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00204.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false,
+    "hd_source_transport_changed": false
+  },
+  "evidence": [
+    "Base bceb2e6b9819ed885d9176f3e473470985047045 is the current GitHub branch HEAD recovered before implementation.",
+    "CONVERSION-DX11-00202 validation-bearing result df76f001d2518aa589ec16dada080fae806a7183 proved EXACT_182391_SEQUENCE_RET_PADDING_NEXT_BOUNDARY_PROVEN and exact next-code bytes 83 ec 0c at 0x1823D0.",
+    "R200 HUD Inspector job 110229430984 captured canonical bytes from 0x182391 through exclusive end 0x1823F1. Tail bytes decode as 83 ec 0c / dd 14 24 / e8 6d 65 00 00 / e8 0d 00 00 00 / 83 c4 0c / c3 / 8d 54 24 04 / e8 18 65 00 00 / 52 / 9b, followed by raw bytes d9 3c at the capture end.",
+    "The same R200 raw rel32 census records 0x1823D6->0x188948, 0x1823DB->0x1823ED and 0x1823E8->0x188905.",
+    "Implementation intentionally makes no function-entry, callee-semantic, render/HUD ownership, stereo, performance or runtime behavior claim."
+  ],
+  "proof_contract": {
+    "predecessor_status": "EXACT_182391_SEQUENCE_RET_PADDING_NEXT_BOUNDARY_PROVEN",
+    "start_rva": "0x001823D0",
+    "prefix_end_rva": "0x001823EF",
+    "instruction_count": 10,
+    "calls": [
+      "0x001823D6->0x00188948",
+      "0x001823DB->0x001823ED",
+      "0x001823E8->0x00188905"
+    ],
+    "ret_rva": "0x001823E3",
+    "next_sequence_rva": "0x001823E4",
+    "inner_call_target_rva": "0x001823ED",
+    "capture_tail_rva": "0x001823EF",
+    "capture_tail_bytes": "d9 3c",
+    "expected_status": "EXACT_1823D0_TO_1823EF_PREFIX_CONTROL_FLOW_PROVEN",
+    "function_entry_status": "UNRESOLVED_AT_1823D0_1823E4_1823ED_AND_EXTERNAL_CALLEES",
+    "semantic_effect": "BOUNDED_TWO_SEQUENCE_PREFIX_CONTROL_FLOW_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_182391_SEQUENCE_BOUNDARY_PROVEN",
+    "after": "PENDING_1823D0_TAIL_PREFIX_PROOF",
+    "runtime_claim": false
+  },
+  "blocker": "Exact-SHA GitHub Actions validation is pending. The capture ends after two raw bytes at 0x1823EF, so the instruction beginning there and all later continuation/function/render/HUD semantics remain unresolved.",
+  "next_action": "Wait for exact-SHA GitHub Actions validation. If green, persist result SHA and CI evidence in a separate bookkeeping commit without changing the validation-bearing result.",
+  "checkpoint": "C4_COMMIT_PENDING_C3_REMOTE_VALIDATION",
+  "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE",
+  "recorded_kst": "2026-10-01T14:54:00+09:00"
+}
