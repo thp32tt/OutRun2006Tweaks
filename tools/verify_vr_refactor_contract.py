@@ -175,10 +175,32 @@ if r29_install_begin < 0 or r29_startup_boundary <= r29_install_begin:
     errors.append("R29 install thread boundary missing")
 else:
     install = r29[r29_install_begin:r29_startup_boundary]
-    if install.count("R29PublishInstallResult(") != 4:
-        errors.append("R29 install thread must publish exactly four terminal result routes")
+    if install.count("R29PublishInstallResult(") != 3:
+        errors.append("R29 install thread must publish exactly three failure result routes")
+    if install.count("R29CompleteSuccessfulInstall();") != 1:
+        errors.append("R29 install thread must delegate exactly one successful terminal route")
     if 'HookManager::ReportAsyncResult("OpenXRVRStereoR29"' in install:
         errors.append("R29 install thread regained direct async publication")
+
+r29_success_begin = r29.find("void R29CompleteSuccessfulInstall() noexcept")
+r29_success_end = r29.find("enum class R29PrerequisiteDecision", r29_success_begin)
+if r29_success_begin < 0 or r29_success_end <= r29_success_begin:
+    errors.append("R29 successful-install publication boundary missing")
+else:
+    successful = r29[r29_success_begin:r29_success_end]
+    order = [
+        successful.find("R29ArmMonoSafety(2)"),
+        successful.find("InvalidateRawWvpGeneration()"),
+        successful.find("R29PublishInstallResult("),
+    ]
+    if min(order) < 0 or order != sorted(order):
+        errors.append(
+            "R29 successful install changed mono-safety/WVP/Ready publication order")
+    if "InstallState::Ready, true" not in successful:
+        errors.append("R29 successful install must publish Ready=true")
+    if "R29ArmMonoSafety(2);" in install or \
+            "InvalidateRawWvpGeneration();" in install:
+        errors.append("R29 install thread regained successful cleanup ownership")
 
 for marker in (
     "enum class R29PrerequisiteDecision",

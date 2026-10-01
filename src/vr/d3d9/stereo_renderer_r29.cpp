@@ -531,6 +531,14 @@ namespace OutRunVRStereo
             HookManager::ReportAsyncResult("OpenXRVRStereoR29", success);
         }
 
+        void R29CompleteSuccessfulInstall() noexcept
+        {
+            R29ArmMonoSafety(2);
+            OutRunVRRenderer::InvalidateRawWvpGeneration();
+            R29PublishInstallResult(
+                OutRunVR::RuntimeEligibility::InstallState::Ready, true);
+        }
+
         enum class R29PrerequisiteDecision
         {
             Wait,
@@ -586,9 +594,7 @@ namespace OutRunVRStereo
                     // the old complete mono safety path. R23's authoritative
                     // baseline copies the current backbuffer into RightEyeSurface
                     // and clears private right depth/stencil before this opens.
-                    R29ArmMonoSafety(2);
-                    OutRunVRRenderer::InvalidateRawWvpGeneration();
-                    R29PublishInstallResult(State::Ready, true);
+                    R29CompleteSuccessfulInstall();
                     spdlog::info(
                         "VR R29 STEREO: conservative effect classification + cached render state + steady-state two-eye path ACTIVE");
                     return 0;
