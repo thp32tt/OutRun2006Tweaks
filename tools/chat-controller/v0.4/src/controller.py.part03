@@ -1282,9 +1282,31 @@ def _qa_completed_input_keys(q: dict) -> set[str]:
     keys: set[str] = set()
     for record in q.get("qa_completed", []):
         keys.update(record.get("input_keys", []))
-    for record in q.get("qa_blocked", []):
-        keys.update(record.get("input_keys", []))
+    # qa_blocked is diagnostic only: those inputs were never validated and must
+    # remain eligible for a later C batch.
     return keys
+
+
+def reconcile_blocked_qa_inputs(q: dict) -> int:
+    """Restore legacy C-blocked inputs that older controller versions consumed."""
+    completed = _qa_completed_input_keys(q)
+    pending = q.setdefault("qa_pending", [])
+    pending_keys = {_qa_item_key(x) for x in pending}
+    restored = 0
+    for record in q.get("qa_blocked", []):
+        for item in record.get("inputs", []) or []:
+            key = _qa_item_key(item)
+            if not item.get("task_id") or not item.get("result_sha"):
+                continue
+            if key in completed or key in pending_keys:
+                continue
+            pending.append(dict(item))
+            pending_keys.add(key)
+            restored += 1
+    if restored:
+        q["qa_blocked_requeued_count"] = int(q.get("qa_blocked_requeued_count", 0)) + restored
+        q["qa_blocked_requeued_at"] = datetime.now(TZ).isoformat()
+    return restored
 
 
 def enqueue_producer_result_for_qa(q: dict, task: dict) -> bool:
@@ -1330,16 +1352,26 @@ def finalize_c_qa_batch(q: dict, task: dict) -> None:
                 producer["batch_validation_pending"] = False
                 producer["validated_by_qa_task_id"] = task.get("task_id")
                 producer["validated_by_qa_result_sha"] = task.get("result_sha")
+        consumed = set(input_keys)
+        q["qa_pending"] = [x for x in q.get("qa_pending", []) if _qa_item_key(x) not in consumed]
     else:
+        # C infrastructure/controller/Gate failure is diagnostic, not validation.
+        # Keep every immutable TASK_ID@RESULT_SHA input pending so a later C batch
+        # retries validation instead of silently dropping unvalidated producer work.
         q["qa_blocked"] = (q.get("qa_blocked", []) + [record])[-100:]
-    consumed = set(input_keys)
-    q["qa_pending"] = [x for x in q.get("qa_pending", []) if _qa_item_key(x) not in consumed]
 
 
 async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
     """Run A/B/E as continuous producers and C as an independent batched QA consumer."""
     now = datetime.now(TZ)
     q = load_queue_state()
+    restored_blocked = reconcile_blocked_qa_inputs(q)
+    if restored_blocked:
+        save_queue_state(q)
+        write_runtime(
+            qa_blocked_requeued_last=restored_blocked,
+            last_action=f"Restored {restored_blocked} legacy C-blocked QA input(s) to qa_pending",
+        )
     reg = load_registry(now)
     active_by_lane = q.setdefault("active_by_lane", {})
 
@@ -2076,6 +2108,10 @@ def startup_reconcile_queue_state() -> None:
     _github_task_commit_cache.clear()
     _github_actions_cache.clear()
     q = load_queue_state()
+    if CONTROLLER_MODE == "localization":
+        restored_blocked = reconcile_blocked_qa_inputs(q)
+        if restored_blocked:
+            q["startup_qa_blocked_requeued"] = restored_blocked
     now = datetime.now(TZ)
     records = _queue_nonterminal_records(q)
     branches = sorted({r.get("branch") for r in records if r.get("branch")})
