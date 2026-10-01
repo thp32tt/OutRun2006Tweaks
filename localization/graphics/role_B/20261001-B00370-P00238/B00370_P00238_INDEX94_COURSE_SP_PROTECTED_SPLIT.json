@@ -1,0 +1,213 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-b00370-p00238-index94-course-sp-protected-inline-split-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00370",
+  "wave_id": "P00238",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_PREFLIGHT_FALLBACK",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "controller_schema_version": 30,
+  "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+  "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+  "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+  "base_head_sha": "8d5a836b99f86ee0eff3c0e8e297df3d22bc7f20",
+  "target": {
+    "index": 94,
+    "asset": "2DA43E41",
+    "path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "owned_by_lane": true
+  },
+  "freshness": {
+    "latest_prior_b_task": "LOCALIZATION-LOCALIZATION_B-00367",
+    "latest_prior_b_result_sha": "0cbd8a0dd20ec2a7e59c74385f6d8bf21760145b",
+    "latest_c_task": "LOCALIZATION-LOCALIZATION_C-00368",
+    "latest_c_batch": "Q00075",
+    "latest_c_disposition_relevant_to_b00319": "UNCHANGED__Q00075_CONSUMES_A_ONLY",
+    "completion_tier_scan": "NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_OUTSIDE_QA_PENDING_OR_STICKY_STATE",
+    "qa_pending_not_repeated": [
+      {
+        "index": 61,
+        "producer_task": "LOCALIZATION-LOCALIZATION_B-00342",
+        "reason": "newer semantic-rework candidate still awaits independent C disposition"
+      },
+      {
+        "index": 133,
+        "producer_task": "LOCALIZATION-LOCALIZATION_B-00367",
+        "reason": "new isolation input awaits C"
+      },
+      {
+        "index": 232,
+        "producer_task": "LOCALIZATION-LOCALIZATION_B-00367",
+        "reason": "new isolation input awaits C"
+      }
+    ]
+  },
+  "authoritative_prior_evidence": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00319",
+    "producer_result_sha": "2268b621f7fd8f0ee07a7b4c6c31aa7b5c287fae",
+    "c_acceptance": "LOCALIZATION-LOCALIZATION_C-00321/Q00069",
+    "source_git_blob_sha": "7e0e7368ea5ca75112209cc21210b201f6caedaf",
+    "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+    "source_structure": "4096x4096 RGBA32 mip1 FLIP_Y",
+    "previous_state": "6_OF_7_REMOVAL_MASKS_RESOLVED__COURSE_SP_PROTECTED_INLINE_PREFIX_SPLIT_REMAINED"
+  },
+  "source_replay": {
+    "mode": "REUSE_ACCEPTED_CANONICAL_SOURCE_FINGERPRINT_PLUS_EXACT_PINNED_ARCHIVE_REHASH",
+    "drive_binding_reused_from_b00306": {
+      "provider": "GOOGLE_DRIVE_APPROVED_EXACT_RELATIVE_PATH",
+      "file_id": "1C8zRAuBRhKrklwE2cDCvsZclKLjWMm25",
+      "exact_path_binding": true,
+      "size_bytes": 67108992
+    },
+    "pinned_archive": {
+      "name": "OR2-HD-GUI-v0.25.10a.zip",
+      "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "size_bytes": 306223257
+    },
+    "member": {
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+      "sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "size_bytes": 67108992
+    },
+    "source_identity": "PASS_EXACT_ACCEPTED_CANONICAL_FINGERPRINT"
+  },
+  "method": {
+    "coordinate_space": "READABLE_DISPLAY",
+    "readable_transform": "flip_y",
+    "pixel_rule": "alpha>0 inside source-only regions; exact transparent gaps define protected/localizable separation",
+    "candidate_or_historical_korean_used_as_construction_input": false
+  },
+  "course_sp": {
+    "source": "OutRun2: SP · 15 Continuous Course has been selected.",
+    "korean": "OutRun2: SP · 15코스 연속 / 선택되었습니다.",
+    "source_bbox_display_ltrb": [
+      132,
+      488,
+      2078,
+      717
+    ],
+    "line_support_y_intervals_inclusive": [
+      [
+        488,
+        591
+      ],
+      [
+        617,
+        716
+      ]
+    ],
+    "first_line_support_x_intervals_inclusive": [
+      [
+        132,
+        628
+      ],
+      [
+        650,
+        800
+      ],
+      [
+        827,
+        868
+      ],
+      [
+        908,
+        954
+      ],
+      [
+        970,
+        1046
+      ],
+      [
+        1075,
+        1675
+      ],
+      [
+        1703,
+        2077
+      ]
+    ],
+    "protected_inline_token": "OutRun2: SP",
+    "protected_prefix_region_display_ltrb": [
+      132,
+      488,
+      801,
+      592
+    ],
+    "protected_prefix_alpha_pixels": 46776,
+    "transparent_split_gap_display_ltrb": [
+      801,
+      488,
+      827,
+      592
+    ],
+    "transparent_split_gap_alpha_pixels": 0,
+    "localizable_first_line_region_display_ltrb": [
+      827,
+      488,
+      2078,
+      592
+    ],
+    "localizable_first_line_alpha_pixels": 75892,
+    "second_line_region_display_ltrb": [
+      132,
+      617,
+      2078,
+      717
+    ],
+    "second_line_alpha_pixels": 63718,
+    "first_line_alpha_pixels_total": 122668,
+    "partition_check": "PASS",
+    "removal_mask_pixels": 139610,
+    "removal_mask_u8_fullatlas_sha256": "40f9d5c2eb12beac8641252e118a17dd975a5266059d3e95360f3f1f4fd6bba8"
+  },
+  "aggregate_7_element_removal_mask": {
+    "pixels": 433092,
+    "u8_fullatlas_sha256": "9b03e71b77b6c39d670817fbccd8996b6c4676fa8fd7c74a80a8d63b4c6cf515",
+    "protected_prefix_overlap_pixels": 0,
+    "reconstruction_rule": "Reuse B00319 six accepted alpha-support regions; for course_sp add alpha>0 in first-line [827,488,2078,592) and second-line [132,617,2078,717), preserving [132,488,801,592)."
+  },
+  "self_qa": {
+    "exact_source_hash_match": "PASS",
+    "exact_dds_structure_match": "PASS",
+    "first_line_partition": "PASS",
+    "transparent_split_gap_alpha_pixels": 0,
+    "protected_prefix_overlap_pixels": 0,
+    "removal_masks_resolved": "7/7",
+    "zero_pixel_escape_claim": "MASK_ONLY_PREGENERATION__NO_CANDIDATE_PIXELS_WRITTEN",
+    "clean_plate_generated": false,
+    "source_style_measurement_completed": false,
+    "candidate_render_attempted": false,
+    "candidate_dds_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "readiness_before": "PREFLIGHT_ONLY__6_OF_7_REMOVAL_MASKS_PIXEL_RESOLVED__COURSE_SP_PROTECTED_PREFIX_SPLIT_CLEAN_PLATE_STYLE_REMAIN",
+  "readiness_after": "PREFLIGHT_ONLY__7_OF_7_REMOVAL_MASKS_PIXEL_RESOLVED__CLEAN_PLATE_AND_SOURCE_STYLE_MEASUREMENT_REMAIN",
+  "material_deliverable": {
+    "fallback_ladder_step": 4,
+    "type": "INDEX94_EXACT_SOURCE_PROTECTED_INLINE_SPLIT_AND_COMPLETE_7_OF_7_REMOVAL_MASK_REBUILD_SPEC",
+    "candidate_dds_modified": false,
+    "material_payload_in_result_commit": true,
+    "materially_reduces_unresolved_work": true,
+    "newly_resolved_blocker": "course_sp protected OutRun2: SP first-line split",
+    "remaining_blockers": [
+      "VERIFIED_CLEAN_PLATE",
+      "CURRENT_SOURCE_STYLE_BASELINE_SLANT_EFFECT_MEASUREMENT"
+    ],
+    "reason_zero_candidate": "Fresh B-shard scan has no runnable completion-tier candidate outside QA-pending/sticky state. This material preflight closes the sole remaining removal-mask ambiguity but intentionally stops before CLEAN_PLATE/style because those are still independent prerequisites."
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "uploaded_pinned_archive_used": true,
+  "google_drive_write_performed": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED"
+}
