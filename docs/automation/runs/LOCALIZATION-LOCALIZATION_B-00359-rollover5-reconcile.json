@@ -1,0 +1,103 @@
+{
+  "schema_version": 24,
+  "schema": "outrun-b00359-rollover5-durable-result-reconcile-v24",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00359",
+  "wave_id": "P00228",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "incoming_controller_schema_version": 24,
+  "incoming_controller_config_blob_sha": "2f9822297d5c03f1f8c70b6136fd5f5194286c1f",
+  "latest_controller_schema_version": 24,
+  "latest_controller_roles_blob_sha": "2f9822297d5c03f1f8c70b6136fd5f5194286c1f",
+  "current_canonical_contract_blob_sha": "874e79a51843a24e891776b6d13f1f292e06b5c7",
+  "refreshed_head_before_reconcile": "03f5bbad4c62d280188eb037c2d6516947d445b6",
+  "refreshed_head_message": "chore(localization): bind A00360 result SHA [AUTO:LOCALIZATION-LOCALIZATION_A-00360] [skip ci]",
+  "authoritative_result_sha": "bf1b6c87fc2a0f999d894e78c2b60a75d546f047",
+  "result_binding_commit_sha": "c22f3d9050c240e3b4b0c269745880714eacbd10",
+  "result_commit_message": "localization(B): record schema23 zero-runnable shard review [AUTO:LOCALIZATION-LOCALIZATION_B-00359]",
+  "reconciliation_result": "TASK_ALREADY_DURABLE_NO_DUPLICATE_PRODUCER_WORK_SCHEMA24_CURRENT_POLICY_CURRENT_C_AUTHORITY_UNCHANGED",
+  "review_summary": "Rollover-5 refreshed authenticated korean-localization-clean and re-read current schema24 controller_roles blob 2f982229... plus canonical contract 874e79a5.... B00359 already has immutable producer result bf1b6c87... and binding c22f3d90.... Since that result, no queue/progress/resume/candidate DDS or newer C validation-bearing state has changed; later commits are task/rollover bookkeeping and controller recovery policy. The schema24 delta adds lane exception isolation and parallel active-state recovery semantics but does not change B modulo-3 ownership, candidate-completion-first selection, producer QA-pending skip semantics, C_BATCH_GATE validation, or runtime-validation separation. Latest durable C authority remains C00356/Q00074 result 507a781c. Therefore completed-task reexecution is forbidden: no DDS rewrite, source acquisition, preflight expansion, shared-state mutation, peer-lane modification, build, runtime test, N100 clone/worktree, or VR/FFB/DX work is repeated. This unique rollover-5 review record is the only change.",
+  "policy_refresh": {
+    "incoming_config_matches_current_blob": true,
+    "current_schema_applied_for_rollover_reconcile": 24,
+    "schema24_latest_change_scope": "CONTROLLER_LIVENESS_EXCEPTION_ISOLATION_AND_PARALLEL_ACTIVE_STATE_RECOVERY_ONLY",
+    "producer_selection_semantics_changed": false,
+    "durable_git_precedes_ui_recovery": true,
+    "completed_task_reexecution_forbidden": true,
+    "producer_skip_qa_pending_assets": true,
+    "candidate_completion_first_preserved": true,
+    "stable_shard_rule": "asset_queue.index % 3: A=0, B=1, E=2",
+    "lane_exception_isolation": true,
+    "validation_mode": "C_BATCH_GATE"
+  },
+  "current_authority": {
+    "latest_checked_c_task_id": "LOCALIZATION-LOCALIZATION_C-00356",
+    "latest_checked_c_batch": "Q00074",
+    "latest_c_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
+    "latest_c_validation_bearing_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
+    "latest_c_automation_validation": "PASS",
+    "latest_c_runtime_validation": "UNTESTED",
+    "b00359_result_sha": "bf1b6c87fc2a0f999d894e78c2b60a75d546f047",
+    "b00359_binding_commit_sha": "c22f3d9050c240e3b4b0c269745880714eacbd10",
+    "b_owned_unconsumed_candidate_results_not_repeated": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+        "index": 61,
+        "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
+        "state": "QA_PENDING"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+        "indices": [
+          94,
+          163
+        ],
+        "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
+        "state": "QA_PENDING_NEWER_CANDIDATES"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00353",
+        "indices": [
+          230,
+          236
+        ],
+        "result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513",
+        "state": "PREFLIGHT_RESULT_AWAITING_C_OR_DEPENDENCY_CHANGE"
+      }
+    ]
+  },
+  "producer_work_repeated": false,
+  "candidate_dds_modified": false,
+  "candidate_binary_persisted": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "material_change": false,
+  "review_record_only": true,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "evidence": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00359.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00359-rollover4-reconcile.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00356.json",
+    "localization/controller_roles.json",
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/progress/progress.json",
+    "localization/resume_state.json",
+    "localization/WORKLOG.md",
+    "localization/graphics/README.md",
+    "localization/graphics/ORIENTATION_POLICY.md",
+    "localization/graphics/asset_queue.csv"
+  ],
+  "note": "Conversation rollover 5 does not increment ATTEMPT. This review/bookkeeping commit does not replace immutable B00359 RESULT_SHA bf1b6c87fc2a0f999d894e78c2b60a75d546f047. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE. No real-game test was performed; RUNTIME_VALIDATION=UNTESTED."
+}
