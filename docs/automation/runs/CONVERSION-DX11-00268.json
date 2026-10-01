@@ -5,10 +5,11 @@
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
   "base_sha": "5fec9408235642fc3a4fc2c9a4bd195b77a2f8e3",
-  "result_sha": "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
-  "validation_bearing_result_sha": "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
+  "result_sha": "30dd0f796f9124114a2450451bad5f12fda59f48",
+  "validation_bearing_result_sha": "30dd0f796f9124114a2450451bad5f12fda59f48",
   "source_commits": [
-    "cc73e01fd29dbd42da2f8a782d9598539bed1de3"
+    "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
+    "30dd0f796f9124114a2450451bad5f12fda59f48"
   ],
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
@@ -18,7 +19,7 @@
   "pc_fast_used": false,
   "selected_work": "DX11_DORMANT_ACTIVATION_SURFACE_COVERAGE",
   "selection_reason": "Consumed CONVERSION-DX11-00266 exact-SHA automation results first. All four required 00266 gates succeeded. Remaining activation-proof review found verify_dx11_activation_boundary.py scanned only top-level src/vr/d3d11/*.cpp, leaving header-inline and future nested C/C++ surfaces outside the fail-closed Draw* boundary.",
-  "summary": "Expanded the dormant native DX11 Draw* activation guard to recursively scan C/C++ implementation, header and inline source surfaces under src/vr/d3d11 and added representative .cpp/.hpp coverage assertions. No native game draw routing or runtime rendering path was activated.",
+  "summary": "Hardened the dormant native DX11 activation boundary in two steps: recursive C/C++ source/header/inline scanning under src/vr/d3d11, then per-family enforcement that all four active D3D9 draw hooks feed observe_source_draw and remain wired. No native game draw routing or runtime rendering path was activated.",
   "changed_paths": [
     "tools/verify_dx11_activation_boundary.py",
     "docs/automation/runs/CONVERSION-DX11-00268.json"
@@ -42,36 +43,29 @@
     "Pre-change guard used DX11.glob(\"*.cpp\"), so .hpp/.inl and nested future source directories were outside activation-boundary scanning.",
     "Current seven native DX11 headers were checked and contained no Draw* dispatch before broadening the scan.",
     "Commit cc73e01fd29dbd42da2f8a782d9598539bed1de3 recursively scans C/C++ source/header/inline suffixes and requires representative implementation/header members to remain in the scan set.",
-    "Issue #14 production change ledger appended from CHAT_DIRECT."
+    "Issue #14 production change ledger appended from CHAT_DIRECT.",
+    "Second 00268 commit 30dd0f796f9124114a2450451bad5f12fda59f48 requires DrawPrimitiveDest, DrawIndexedPrimitiveDest, DrawPrimitiveUPDest and DrawIndexedPrimitiveUPDest each to contain the diagnostic census observer, and requires all four hook-wiring expressions to remain present.",
+    "The analyzer remains fail-closed with ExhaustiveDrawCoverage=false; structural hook coverage is not promoted to runtime activation proof."
   ],
   "related_finding_or_regression_keys": [
     "CONVERSION-DX11-00266",
-    "DX11-DRAW-ACTIVATION-SURFACE-001"
+    "DX11-DRAW-ACTIVATION-SURFACE-001",
+    "DX11-CENSUS-DRAW-FAMILY-COVERAGE-001"
   ],
   "validation": {
     "backend_conversion_gate": {
-      "run_id": 36940764751,
-      "head_sha": "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
-      "conclusion": "in_progress"
+      "run_id": 36941031399,
+      "head_sha": "30dd0f796f9124114a2450451bad5f12fda59f48",
+      "conclusion": "pending"
     },
     "build": {
-      "run_id": 36940768664,
-      "head_sha": "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
-      "conclusion": "in_progress"
-    },
-    "openxr_architecture": {
-      "run_id": 36940768656,
-      "head_sha": "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
-      "conclusion": "queued"
-    },
-    "hud_inspector": {
-      "run_id": 36940768700,
-      "head_sha": "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
-      "conclusion": "in_progress"
+      "run_id": 36941036801,
+      "head_sha": "30dd0f796f9124114a2450451bad5f12fda59f48",
+      "conclusion": "pending"
     }
   },
-  "blocker": "Exact-SHA automation for cc73e01fd29dbd42da2f8a782d9598539bed1de3 is still running. Native DX11 activation remains deliberately disabled and exhaustive runtime draw coverage is not proven.",
-  "next_action": "Consume exact-SHA CI for cc73e01fd29dbd42da2f8a782d9598539bed1de3. If green, continue review of remaining exhaustive activation-proof gaps and the known menu fallback analyzer false-negative; do not permit native Draw* routing without explicit proof and runtime gate.",
+  "blocker": "Exact-SHA automation for 30dd0f796f9124114a2450451bad5f12fda59f48 is pending. Native DX11 activation remains deliberately disabled and runtime/exhaustive draw coverage is not proven.",
+  "next_action": "Consume exact-SHA CI for 30dd0f796f9124114a2450451bad5f12fda59f48. If green, continue bounded review of activation proof/readiness without enabling native Draw* routing. Keep RUNTIME_VALIDATION=UNTESTED.",
   "checkpoint": "C3_VALIDATION_PENDING",
   "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
   "runtime_claim": "NONE"
