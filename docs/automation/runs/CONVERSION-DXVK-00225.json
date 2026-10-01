@@ -12,14 +12,15 @@
   "runtime_test_required": false,
   "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R225_182529_FRESH_PROVENANCE_CAPTURE",
   "selection_reason": "CONVERSION-DXVK-00223 proved exact control flow through exclusive 0x00182529 and preserved 0x00182529:83 as an incomplete capture edge. Its validation-bearing HEAD c0131a9d8516af000b40bf3c998d985cceb1524d has successful Build, OpenXR VR architecture, OutRun EXE HUD Inspector CI and VR Hosted Test Package runs, so the next bounded F13 action is fresh exact replacement-EXE provenance beginning at 0x00182529 with exact 83 overlap before any further decode.",
-  "summary": "ATTEMPT=1 implementation staged. Extend exact canonical replacement-EXE provenance from 0x00182529 through exclusive 0x00182569 with exact 83 overlap, strict predecessor identity, .text membership, exact probe length/end and raw rel32 census. Do not decode the new window or promote function/callee/render/HUD semantics or runtime behavior.",
+  "summary": "ATTEMPT=1 implementation staged. Extend exact canonical replacement-EXE provenance from 0x00182529 through exclusive 0x00182569 with exact 83 overlap, strict predecessor identity, .text membership, exact probe length/end and raw rel32 census. Preserve raw-only semantics. The analyzer also indexes raw inbound rel32 offsets once per PE instance to remove repeated full-.text scans without changing evidence semantics.",
   "evidence": [
     "C0 GitHub branch HEAD was c0131a9d8516af000b40bf3c998d985cceb1524d; GitHub branch state and Actions artifacts were used as SSOT and no N100 clone/worktree was used.",
     "CONVERSION-DXVK-00223 result commit c0131a9d8516af000b40bf3c998d985cceb1524d passed OpenXR VR architecture, OutRun EXE HUD Inspector CI, Build and VR Hosted Test Package workflows.",
     "R223 proves EXACT_1824EA_TO_182529_CONTROL_FLOW_CAPTURE_EDGE_PROVEN and preserves 0x00182529:83 as an incomplete instruction byte.",
     "R225 stages a fresh 64-byte .text provenance collector at 0x00182529 with exclusive end 0x00182569 and requires the predecessor capture end 0x0018252A plus exact 83 overlap.",
     "The collector records raw bytes and raw rel32 candidates only; instruction/function/callee/render/HUD semantics remain unresolved.",
-    "No renderer/provider/selector/package/transport/runtime source is modified; runtime_validation remains UNTESTED."
+    "No renderer/provider/selector/package/transport/runtime source is modified; runtime_validation remains UNTESTED.",
+    "R225 additionally caches raw inbound rel32 byte offsets once per PE instance so the 21 current inbound-candidate queries no longer rescan the complete .text section; semantic classification and function-start guesses remain query-local."
   ],
   "changed_paths": [
     "tools/analyze_outrun_exe.py",
@@ -84,6 +85,13 @@
       "sha": "21b2ece4edb1179b2418a5d99054fb041c4bb4aa",
       "message": "vr: stage 0x182529 provenance verifier [AUTO:CONVERSION-DXVK-00225] [skip ci]",
       "role": "staging",
+      "validation_bearing": false,
+      "ci_skip": true
+    },
+    {
+      "sha": "34af7a88cb124d7eacc9837e1065e7cf35fe76e0",
+      "message": "perf: cache raw inbound rel32 index [AUTO:CONVERSION-DXVK-00225] [skip ci]",
+      "role": "staging_performance",
       "validation_bearing": false,
       "ci_skip": true
     }
