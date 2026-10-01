@@ -1,5 +1,5 @@
 {
-  "schema_version": 30,
+  "schema_version": 31,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -189,7 +189,11 @@
       "terminal_failure_without_attempts": "BLOCKED",
       "never_wait_for_chat_expiry_after_terminal_action": true,
       "reload_controller_config": true,
-      "reject_stale_schema_prompt": true
+      "reject_stale_schema_prompt": true,
+      "recover_blocked_producer_with_durable_commit": true,
+      "recovered_blocked_producer_terminal": "PRODUCED",
+      "recovered_blocked_producer_reenqueue_qa": true,
+      "recovered_blocked_producer_remove_from_blocked": true
     },
     "continuous_progression": {
       "producer_commit_releases_same_lane": true,
@@ -340,7 +344,12 @@
       "last_qa_blocked_task_id",
       "last_qa_blocked_at"
     ],
-    "controller_restart_status": "controller_restart_requested"
+    "controller_restart_status": "controller_restart_requested",
+    "blocked_producer_recovery_fields": [
+      "recovered_from_false_blocked",
+      "recovered_from_false_blocked_at",
+      "recovered_blocked_reason"
+    ]
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
