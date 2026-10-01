@@ -796,7 +796,7 @@ async def localization_safe_send_lane_task(
             save_queue_state(q)
         return sent
     except Exception as e:
-        if is_browser_transport_failure(e):
+        if isinstance(e, ControllerRestartRequested) or is_browser_transport_failure(e):
             raise
         signature = f"{type(e).__name__}:{e}"
         count = int(previous.get("count", 0)) + 1 if previous.get("signature") == signature else 1
@@ -1222,7 +1222,7 @@ async def localization_process_lane_isolated(
             save_queue_state(q)
         return
     except Exception as e:
-        if is_browser_transport_failure(e):
+        if isinstance(e, ControllerRestartRequested) or is_browser_transport_failure(e):
             raise
         now = datetime.now(TZ)
         log.exception("localization active lane failed lane=%s task=%s", lane_key, active.get("task_id"))
@@ -2313,6 +2313,9 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
                 queue_error_signature = None
                 queue_error_count = 0
             except Exception as e:
+                if isinstance(e, ControllerRestartRequested):
+                    write_runtime(status="controller_restart_requested", last_action=str(e), last_error=repr(e))
+                    raise
                 if is_browser_transport_failure(e):
                     record_browser_transport_failure("queue_cycle", e)
                     raise
@@ -2342,6 +2345,9 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
                 try:
                     await run_cycle(context, pages)
                 except Exception as e:
+                    if isinstance(e, ControllerRestartRequested):
+                        write_runtime(status="controller_restart_requested", last_action=str(e), last_error=repr(e))
+                        raise
                     if is_browser_transport_failure(e):
                         record_browser_transport_failure("scheduled_cycle", e)
                         raise
@@ -2358,6 +2364,9 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
                 watchdog_error_signature = None
                 watchdog_error_count = 0
             except Exception as e:
+                if isinstance(e, ControllerRestartRequested):
+                    write_runtime(status="controller_restart_requested", last_action=str(e), last_error=repr(e))
+                    raise
                 if is_browser_transport_failure(e):
                     record_browser_transport_failure("watchdog_cycle", e)
                     raise

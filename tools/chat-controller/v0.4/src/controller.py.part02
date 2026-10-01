@@ -209,7 +209,17 @@ async def recover_slot_composer(context: BrowserContext, pages: dict[str, Page],
             slot.url = None
             slot.last_assistant_hash = None
             slot.last_assistant_change_at = None
-            save_registry(load_registry(datetime.now(TZ)))
+            # Persist the cleared URL into the canonical registry rather than
+            # re-saving an unrelated freshly loaded copy that still has the stale URL.
+            current_reg = load_registry(datetime.now(TZ))
+            current_slot = next((s for s in current_reg.slots if s.name == slot.name), None)
+            if current_slot is not None:
+                current_slot.url = None
+                current_slot.last_assistant_hash = None
+                current_slot.last_assistant_change_at = None
+                current_slot.last_watchdog_at = None
+                current_slot.watchdog_resumes_since_schedule = 0
+                save_registry(current_reg)
     except Exception:
         log.exception("composer recovery clean-home failed slot=%s", slot.name)
     return page
