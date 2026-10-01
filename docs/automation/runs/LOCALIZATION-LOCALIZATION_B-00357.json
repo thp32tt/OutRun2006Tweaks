@@ -84,9 +84,12 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "46bd3970276de8e6300d971024ec04ce2e9e9d98",
+  "authoritative_result_sha": "46bd3970276de8e6300d971024ec04ce2e9e9d98",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_SEPARATE_BOOKKEEPING_COMMIT",
-  "result_commit_message": "localization(B): record zero-runnable shard hold [AUTO:LOCALIZATION-LOCALIZATION_B-00357]"
+  "result_binding_state": "BOUND_BY_SEPARATE_BOOKKEEPING_COMMIT",
+  "result_commit_message": "localization(B): record zero-runnable shard hold [AUTO:LOCALIZATION-LOCALIZATION_B-00357]",
+  "bookkeeping_note": "Immutable producer review result 46bd3970276de8e6300d971024ec04ce2e9e9d98 is authoritative for B00357. This bookkeeping update only binds the result SHA; producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE and RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T15:48:30+09:00",
+  "bookkeeping_base_result_sha": "46bd3970276de8e6300d971024ec04ce2e9e9d98"
 }
