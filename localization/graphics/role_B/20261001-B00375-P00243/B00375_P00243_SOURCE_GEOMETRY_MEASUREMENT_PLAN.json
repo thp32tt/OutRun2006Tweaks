@@ -1,0 +1,264 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-b00375-source-geometry-measurement-plan-output-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00375",
+  "wave_id": "P00243",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-10-01T18:18:00+09:00",
+  "base_head_sha": "5733e0d392af328b3ac0192e2fb0e63abfc1e246",
+  "controller_schema_version": 30,
+  "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "canonical_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+  "source_authority": {
+    "reused_task": "LOCALIZATION-LOCALIZATION_B-00365",
+    "reused_report_blob_sha": "9b4e12ef7080375a82e7a96fc4b853dbd64aad5c",
+    "source_probe_repeated": false,
+    "drive_probe_repeated": false,
+    "pinned_archive": {
+      "name": "OR2-HD-GUI-v0.25.10a.zip",
+      "size_bytes": 306223257,
+      "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+    }
+  },
+  "accepted_inputs": {
+    "index_52": {
+      "canonical_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+      "decoded_dimensions": [
+        2048,
+        1024
+      ],
+      "storage_format": "DXT5_BC3",
+      "work_order_blob_sha": "9f1157671946c4cf08ee95cb71998403287b5c96",
+      "regions": [
+        {
+          "work_unit": 14,
+          "sprite": "sprite_26",
+          "cell_ltrb": [
+            0,
+            200,
+            504,
+            304
+          ],
+          "guard_ltrb": [
+            2,
+            202,
+            502,
+            302
+          ],
+          "semantics": [
+            "Extra Time -> 추가 시간"
+          ]
+        },
+        {
+          "work_unit": 15,
+          "sprite": "sprite_24",
+          "cell_ltrb": [
+            0,
+            304,
+            776,
+            408
+          ],
+          "guard_ltrb": [
+            2,
+            306,
+            774,
+            406
+          ],
+          "semantics": [
+            "Start -> 시작",
+            "Goal -> 골"
+          ],
+          "shared_cell": true
+        },
+        {
+          "work_unit": 16,
+          "sprite": "sprite_25",
+          "cell_ltrb": [
+            776,
+            304,
+            1552,
+            408
+          ],
+          "guard_ltrb": [
+            778,
+            306,
+            1550,
+            406
+          ],
+          "semantics": [
+            "Start -> 시작",
+            "Goal -> 골"
+          ],
+          "shared_cell": true
+        }
+      ]
+    },
+    "index_220": {
+      "canonical_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "decoded_dimensions": [
+        2048,
+        512
+      ],
+      "storage_format": "RGBA32",
+      "work_order_blob_sha": "714b9dacbb097ea0cd3ba26dbb1b5014b3113538",
+      "canonical_semantics": [
+        "REMOVE FRIEND -> 친구 삭제",
+        "SEND GAME INVITE -> 게임 초대 보내기",
+        "TIME ATTACK -> 타임 어택",
+        "COAST 2 COAST -> 코스트 2 코스트",
+        "OUTRUN -> 아웃런",
+        "HEART ATTACK -> 하트 어택"
+      ],
+      "regions": [
+        {
+          "region_index": 0,
+          "sprite": "sprite_131",
+          "cell_ltrb": [
+            0,
+            340,
+            1780,
+            512
+          ],
+          "guard_ltrb": [
+            2,
+            342,
+            1778,
+            510
+          ]
+        },
+        {
+          "region_index": 1,
+          "sprite": "sprite_132",
+          "cell_ltrb": [
+            0,
+            252,
+            1004,
+            340
+          ],
+          "guard_ltrb": [
+            2,
+            254,
+            1002,
+            338
+          ]
+        },
+        {
+          "region_index": 2,
+          "sprite": "sprite_133",
+          "cell_ltrb": [
+            1004,
+            252,
+            1804,
+            340
+          ],
+          "guard_ltrb": [
+            1006,
+            254,
+            1802,
+            338
+          ]
+        },
+        {
+          "region_index": 3,
+          "sprite": "sprite_134",
+          "cell_ltrb": [
+            0,
+            164,
+            788,
+            252
+          ],
+          "guard_ltrb": [
+            2,
+            166,
+            786,
+            250
+          ]
+        },
+        {
+          "region_index": 4,
+          "sprite": "sprite_135",
+          "cell_ltrb": [
+            788,
+            164,
+            1456,
+            252
+          ],
+          "guard_ltrb": [
+            790,
+            166,
+            1454,
+            250
+          ]
+        },
+        {
+          "region_index": 5,
+          "sprite": "sprite_136",
+          "cell_ltrb": [
+            0,
+            100,
+            1116,
+            164
+          ],
+          "guard_ltrb": [
+            2,
+            102,
+            1114,
+            162
+          ]
+        },
+        {
+          "region_index": 6,
+          "sprite": "sprite_137",
+          "cell_ltrb": [
+            0,
+            36,
+            1116,
+            100
+          ],
+          "guard_ltrb": [
+            2,
+            38,
+            1114,
+            98
+          ]
+        }
+      ]
+    }
+  },
+  "new_material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "TWO_ASSET_SHA_GATED_SOURCE_GEOMETRY_MEASUREMENT_EXECUTOR_AND_PLAN",
+    "executable": "localization/graphics/role_B/20261001-B00375-P00243/measure_b00375_source_geometry.py",
+    "plan_output": "localization/graphics/role_B/20261001-B00375-P00243/B00375_P00243_SOURCE_GEOMETRY_MEASUREMENT_PLAN.json",
+    "assets": [
+      52,
+      220
+    ],
+    "adds_unique_archive_member_resolution": true,
+    "adds_exact_member_hash_gate": true,
+    "adds_dds_decode_dimension_gate": true,
+    "adds_multi_threshold_alpha_support_measurement": true,
+    "adds_connected_component_geometry": true,
+    "adds_guard_projection_runs": true,
+    "source_effect_bbox_not_fabricated": true,
+    "clean_plate_not_fabricated": true,
+    "candidate_dds_modified": false,
+    "readiness_after": "PREFLIGHT_ONLY_SOURCE_GEOMETRY_MEASUREMENT_EXECUTABLE"
+  },
+  "execution_note": {
+    "source_measurement_executed_in_this_chat": false,
+    "reason": "Current local analysis runtime was unavailable; no pixel measurement values are asserted. The executable remains deterministic and fail-closed against accepted canonical archive/member identities.",
+    "next_legal_action": "Run analyzer on exact pinned archive; classify semantic/protected alpha components; then materialize authoritative source-effect masks/CLEAN_PLATE or retain HOLD."
+  },
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_reprobed": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
