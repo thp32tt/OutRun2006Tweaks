@@ -2236,3 +2236,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Validation-bearing result `507a781c4ac309fc7435c9f7064faa238b2278c5` passed **Localization Automation Gate** run `36827181087` attempt 1.
 - Final dispositions remain **A00344 PASS / A00345 PASS / B00342@4e409a54 SUPERSEDED / A00346 PASS**. A00344/A00345 are fail-closed source-mismatch preflight; A00346@index111 is authoritative PREFLIGHT_ONLY at 5,734 unresolved; the newer B00342@89231474 index61 candidate remains separate QA_PENDING.
 - This bookkeeping checkpoint is separate from the Gate-owning result commit. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.
+
+
+## 2026-10-01 17:21 KST - C177 Q00075 independent batch QA
+- Immutable inputs A00348 `206f8c43...`, A00350 `033ef6c4...`, A00364 `923a70de...`: **PASS / PASS / REWORK_REQUIRED**.
+- A00348@index24 PASS only as **PREFLIGHT_ONLY runtime-binder regression QA**. Exact 48-glyph geometry/binder lineage and positive/conflict/invalid/empty fail-closed cases are accepted; synthetic fixtures are not runtime evidence and do not authorize a DDS.
+- A00350@index225 PASS only as **PREFLIGHT_ONLY SOURCE_ACQUISITION_EXHAUSTED reactivation guard**. Canonical source identity and C142 exhaustion remain unchanged; no repeated source probes, noncanonical substitution, or candidate rebuild is authorized.
+- A00364 is **REWORK_REQUIRED** at the producer-contract level: its exact validation-bearing SHA adds only its task record and declares `material_change=false`, `review_record_only=true`, `materially_reduces_unresolved_work=false`. The current no-action contract requires a material deliverable in addition to the durable task record.
+- C rewrites no candidate DDS. Pre-Gate `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
