@@ -3116,18 +3116,39 @@ namespace OutRunVRStereo
                 "OpenXRVRStereoR30HUD", success);
         }
 
+        enum class R30PrerequisiteDecision
+        {
+            Wait,
+            Fail,
+            Install
+        };
+
+        constexpr int R30PrerequisiteWaitAttempts = 4800;
+        constexpr DWORD R30PrerequisiteWaitMs = 25;
+
+        R30PrerequisiteDecision R30ClassifyPrerequisite(
+            R30InstallStateValue state) noexcept
+        {
+            if (state == R30InstallStateValue::Failed)
+                return R30PrerequisiteDecision::Fail;
+            if (state == R30InstallStateValue::Ready)
+                return R30PrerequisiteDecision::Install;
+            return R30PrerequisiteDecision::Wait;
+        }
+
         DWORD WINAPI R30InstallThread(void*)
         {
             using State = R30InstallStateValue;
             R30SetInstallState(State::Pending);
 
-            for (int attempt = 0; attempt < 4800; ++attempt)
+            for (int attempt = 0; attempt < R30PrerequisiteWaitAttempts; ++attempt)
             {
                 if (Game::D3DDevice_ptr && *Game::D3DDevice_ptr)
                     R30InstallBufferCreationHooks(*Game::D3DDevice_ptr);
 
-                const auto r29 = StereoBaseInstallState();
-                if (r29 == State::Failed)
+                const auto prerequisite =
+                    R30ClassifyPrerequisite(StereoBaseInstallState());
+                if (prerequisite == R30PrerequisiteDecision::Fail)
                 {
                     R30RollbackBufferShadowHooks();
                     R30PublishInstallResult(State::Failed, false);
@@ -3136,7 +3157,7 @@ namespace OutRunVRStereo
                     return 0;
                 }
 
-                if (r29 == State::Ready)
+                if (prerequisite == R30PrerequisiteDecision::Install)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
                     R30PresentR29Hook = safetyhook::create_inline(
@@ -3174,7 +3195,7 @@ namespace OutRunVRStereo
                         R30HudScaleValue());
                     return 0;
                 }
-                Sleep(25);
+                Sleep(R30PrerequisiteWaitMs);
             }
 
             R30RollbackBufferShadowHooks();

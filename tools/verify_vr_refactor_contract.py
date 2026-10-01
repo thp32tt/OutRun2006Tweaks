@@ -163,6 +163,26 @@ if r30.count('HookManager::ReportAsyncResult(\n                "OpenXRVRStereoR3
 if "R30InstallState.store(" in r30 or "R30InstallState.load(" in r30:
     errors.append("R30 legacy direct install-state access reintroduced")
 
+for marker in (
+    "enum class R30PrerequisiteDecision",
+    "R30PrerequisiteWaitAttempts = 4800",
+    "R30PrerequisiteWaitMs = 25",
+    "R30ClassifyPrerequisite(",
+    "R30PrerequisiteDecision::Wait",
+    "R30PrerequisiteDecision::Fail",
+    "R30PrerequisiteDecision::Install",
+):
+    if marker not in r30:
+        errors.append(f"R30 prerequisite wait-policy boundary missing marker: {marker}")
+
+if "attempt < 4800" in r30 or "Sleep(25)" in r30:
+    errors.append("R30 prerequisite timing literal escaped the wait-policy boundary")
+if "attempt < R30PrerequisiteWaitAttempts" not in r30 or \
+        "Sleep(R30PrerequisiteWaitMs)" not in r30:
+    errors.append("R30 install thread no longer consumes the prerequisite wait policy")
+if "R30ClassifyPrerequisite(StereoBaseInstallState())" not in r30:
+    errors.append("R30 install thread bypassed prerequisite classification boundary")
+
 for legacy in (
     "R29StableStereoBase",
     "R29FragileEffectCached",
