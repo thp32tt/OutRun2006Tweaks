@@ -33,6 +33,15 @@ namespace OutRunVR::State
                 ApplyCallback().load(std::memory_order_acquire);
         }
 
+        static void Clear() noexcept
+        {
+            // Stop new Begin notifications first so no new recording interval
+            // can start while the matching terminal callbacks are withdrawn.
+            BeginCallback().store(nullptr, std::memory_order_release);
+            ApplyCallback().store(nullptr, std::memory_order_release);
+            EndCallback().store(nullptr, std::memory_order_release);
+        }
+
         static void NotifyBegin(IDirect3DDevice9* device) noexcept
         {
             if (const auto callback =

@@ -121,12 +121,31 @@ for marker in (
     "class StateBlockEvents",
     "Configure(",
     "Configured()",
+    "Clear()",
     "NotifyBegin(",
     "NotifyEnd(",
     "NotifyApply(",
 ):
     if marker not in state_block_events:
         errors.append(f"StateBlockEvents missing API marker: {marker}")
+
+clear_events = re.search(
+    r"static void Clear\(\) noexcept\s*\{(?P<body>.*?)\n        \}",
+    state_block_events,
+    re.DOTALL,
+)
+if not clear_events:
+    errors.append("StateBlockEvents Clear body missing")
+else:
+    clear_body = clear_events.group("body")
+    begin_clear = clear_body.find("BeginCallback().store(nullptr")
+    end_clear = clear_body.find("EndCallback().store(nullptr")
+    apply_clear = clear_body.find("ApplyCallback().store(nullptr")
+    if min(begin_clear, end_clear, apply_clear) < 0:
+        errors.append("StateBlockEvents callback clear marker missing")
+    elif not (begin_clear < end_clear and begin_clear < apply_clear):
+        errors.append(
+            "StateBlockEvents must clear Begin before terminal callbacks")
 
 configure_events = re.search(
     r"static void Configure\(BeginFn begin, EndFn end, ApplyFn apply\) noexcept\s*\{(?P<body>.*?)\n        \}",
@@ -211,6 +230,16 @@ if "R31 fallback StateBlock hooks armed" not in r31:
 if "StateBlockTracker::SetEventConsumerReady(" not in r31 or \
         "StateBlockEvents::Configured()" not in r31:
     errors.append("R31 missing neutral event-consumer readiness publication")
+configure_pos = r31.find("StateBlockEvents::Configure(")
+enable_draw_pos = r31.find("R31EnableDrawHooks()")
+consumer_ready_pos = r31.find("StateBlockTracker::SetEventConsumerReady(true)")
+if min(configure_pos, enable_draw_pos, consumer_ready_pos) < 0 or not (
+        configure_pos < enable_draw_pos < consumer_ready_pos):
+    errors.append(
+        "R31 must configure StateBlock events before enabling draw hooks "
+        "and publish consumer readiness only after draw hooks are enabled")
+if "StateBlockEvents::Clear()" not in r31:
+    errors.append("R31 draw-hook failure path missing StateBlock event rollback")
 if "SetR31Reliable" in state_block_tracker or "R31Reliable" in state_block_tracker:
     errors.append("StateBlockTracker retained obsolete R31 reliability naming")
 if "SetR31Reliable" in r31 or "R31Reliable" in r31:

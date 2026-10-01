@@ -979,8 +979,15 @@ namespace OutRunVRStereo
                         reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30),
                         DrawIndexedPrimitiveUPDestR31, disabled);
 
-                    if (!R31EnableDrawHooks())
+                    OutRunVR::State::StateBlockTracker::SetEventConsumerReady(false);
+                    OutRunVR::State::StateBlockTracker::ResetCoverageLoss();
+                    OutRunVR::State::StateBlockEvents::Configure(
+                        &R31OnStateBlockBegin,
+                        &R31OnStateBlockEnd,
+                        &R31OnStateBlockApply);
+                    if (!OutRunVR::State::StateBlockEvents::Configured())
                     {
+                        OutRunVR::State::StateBlockEvents::Clear();
                         R31RollbackDrawHooks();
                         R31InstallState.store(State::Failed,
                             std::memory_order_release);
@@ -989,14 +996,18 @@ namespace OutRunVRStereo
                         return 0;
                     }
 
+                    if (!R31EnableDrawHooks())
+                    {
+                        R31RollbackDrawHooks();
+                        OutRunVR::State::StateBlockEvents::Clear();
                         OutRunVR::State::StateBlockTracker::SetEventConsumerReady(false);
-                    OutRunVR::State::StateBlockTracker::ResetCoverageLoss();
-                    OutRunVR::State::StateBlockEvents::Configure(
-                        &R31OnStateBlockBegin,
-                        &R31OnStateBlockEnd,
-                        &R31OnStateBlockApply);
-                    OutRunVR::State::StateBlockTracker::SetEventConsumerReady(
-                        OutRunVR::State::StateBlockEvents::Configured());
+                        R31InstallState.store(State::Failed,
+                            std::memory_order_release);
+                        HookManager::ReportAsyncResult(
+                            "OpenXRVRStereoR31Perf", false);
+                        return 0;
+                    }
+                    OutRunVR::State::StateBlockTracker::SetEventConsumerReady(true);
 
                     if (OutRunVR::State::StateBlockTracker::LifecycleHooksReady())
                     {
