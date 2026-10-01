@@ -165,9 +165,21 @@ required["execution.qa_batch_size"] = int(execution.get("qa_batch_size", 0)) == 
 required["execution.qa_coalesce_seconds"] = int(execution.get("qa_coalesce_seconds", 9999)) <= 60
 required["execution.max_parallel_production"] = int(execution.get("max_parallel_production", 0)) == 3
 required["execution.concurrent_group"] = execution.get("concurrent_group") == ["A", "B", "E"]
-required["execution.e_backlog_throttle"] = (execution.get("extra_producer_backlog_throttle") or {}).get("lane") == "E"
+ethrottle = execution.get("extra_producer_backlog_throttle") or {}
+required["execution.e_backlog_throttle_disabled"] = ethrottle.get("lane") == "E" and ethrottle.get("enabled") is False
 qprio = execution.get("qa_priority_policy") or {}
 required["execution.candidate_bearing_qa_first"] = qprio.get("primary") == "CANDIDATE_BEARING_RESULTS_FIRST" and qprio.get("preflight_must_not_delay_candidate_batch") is True
+required["execution.qa_pending_not_production_stop"] = qprio.get("qa_pending_is_not_production_stop") is True
+required["execution.producer_full_shard_scan_before_none"] = qprio.get("producer_scan_full_own_shard_before_none") is True
+sep = cfg.get("producer_qa_separation") or {}
+required["producer_qa_separation.c_backlog_consumer_only"] = sep.get("qa_pending_is_c_consumer_only") is True and sep.get("candidate_awaiting_c_is_c_consumer_only") is True
+required["producer_qa_separation.producers_continue"] = sep.get("producer_must_continue_after_qa_pending") is True and sep.get("producer_must_ignore_c_backlog_as_stop_signal") is True
+required["producer_qa_separation.no_backlog_throttle"] = sep.get("qa_backlog_throttle_for_producers") is False
+required["producer_qa_separation.no_work_guard"] = sep.get("producer_stop_requires_global_no_work_guard_clear") is True
+guard = cfg.get("no_work_guard") or {}
+required["no_work_guard.fail_closed"] = guard.get("mode") == "FAIL_CLOSED_GLOBAL_COMPLETION_GUARD" and guard.get("no_work_allowed_only_when_all_clear") is True
+required["no_work_guard.missing_result_is_work"] = guard.get("task_result_file_missing") == "WORK_REQUIRED_NOT_NO_WORK" and guard.get("new_task_without_result") == "WORK_REQUIRED"
+required["no_work_guard.no_changes_not_terminal"] = guard.get("no_commit_changes_statement") == "NOT_A_TERMINAL_REASON"
 pb = execution.get("producer_batch_completion") or {}
 required["execution.producer_batch_hard_min"] = int(pb.get("normal_success_min_candidate_dds", 0)) >= 2 and pb.get("first_candidate_must_not_release_lane_when_second_runnable_exists") is True
 required["execution.partial_requires_exhaustion"] = pb.get("partial_batch_requires_fresh_shard_exhaustion") is True
@@ -237,4 +249,5 @@ print("controller recovery policy PASS")
 print("bound Actions poll <=30s, WAIT_ACTIONS recovery <=90s, idle rearm <=90s")
 print("A/B/E release on durable commit; only C batch consumes runner-backed Actions validation")
 print("candidate-completion-first production; no new preflight while render-ready work exists")
-print("pressure-tuned three-producer dispatch; E backlog throttle enabled; heartbeat <=15s")
+print("three-producer dispatch independent from C QA backlog; E backlog throttle disabled; heartbeat <=15s")
+print("fail-closed NO_WORK guard and full-shard producer scan policy verified")
