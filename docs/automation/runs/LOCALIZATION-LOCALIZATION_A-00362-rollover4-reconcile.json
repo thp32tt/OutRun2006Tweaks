@@ -1,0 +1,129 @@
+{
+  "schema_version": 25,
+  "schema": "outrun-a00362-rollover4-durable-result-reconcile-v25",
+  "record_type": "CHAT_ROLLOVER_RECONCILIATION",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00362",
+  "wave_id": "P00231",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 4,
+  "reconciled_at_kst": "2026-10-01T16:43:00+09:00",
+  "incoming_controller_schema_version": 24,
+  "incoming_controller_config_blob_sha": "f889aca1d5c7b540393d801d66169c7434ce1a14",
+  "current_controller_schema_version": 25,
+  "current_controller_roles_blob_sha": "1af15dff0b201752dc9afe6281b8d4d5eb9edbdd",
+  "current_canonical_contract_blob_sha": "874e79a51843a24e891776b6d13f1f292e06b5c7",
+  "refreshed_head_before_reconcile": "896de3350799d6b018a0a87af0ef93076e6027f7",
+  "refreshed_head_message": "localization: document active-lane fairness schema 25",
+  "authoritative_result_sha": "59b738ab300acbd6612e0202fc33568f0d87eff1",
+  "validation_bearing_result_sha": "59b738ab300acbd6612e0202fc33568f0d87eff1",
+  "result_binding_commit_sha": "40973e003231fdd26839a35cd1176bafceb65148",
+  "result_commit_message": "localization(A): record schema24 zero-runnable shard hold [AUTO:LOCALIZATION-LOCALIZATION_A-00362]",
+  "reconciliation_result": "TASK_ALREADY_DURABLE_NO_DUPLICATE_PRODUCER_WORK_REFRESHED_TO_SCHEMA25_RUNTIME_FAIRNESS_ONLY_ROLLOVER4_REVIEW",
+  "review_summary": "Rollover-4 refreshed authenticated GitHub HEAD and detected that the incoming schema24/config blob had become stale. Current HEAD controller_roles.json is schema25/blob 1af15dff..., while the canonical automation contract and localization state fingerprints remain unchanged. The schema24->25 delta only adds controller-runtime active-lane retry fairness fields (oldest effective send first using last_retry_click_at/last_rollover_at/sent_at) and does not change producer sharding, candidate-completion policy, QA-pending skip/retention, source transport, naming/typography, or DDS QA rules. A00362 therefore remains complete at immutable result 59b738ab... with self-SHA binding 40973e00.... No current localization/candidate/C-disposition change makes A-owned completion-tier work newly runnable, so producer work is not repeated. This unique rollover-4 review record is the only change.",
+  "policy_refresh": {
+    "incoming_schema_matches_current_schema": false,
+    "incoming_config_matches_current_head_blob": false,
+    "stale_incoming_config_detected": true,
+    "stale_prompt_behavior_applied": "REFRESH_CURRENT_HEAD_AND_REINTERPRET_WITH_SCHEMA25",
+    "schema25_delta_scope": "CONTROLLER_RUNTIME_ACTIVE_LANE_RETRY_FAIRNESS_ONLY",
+    "schema25_delta": {
+      "active_lane_retry_fairness": true,
+      "active_lane_recovery_order": "OLDEST_EFFECTIVE_SEND_FIRST",
+      "active_lane_effective_send_fields": [
+        "last_retry_click_at",
+        "last_rollover_at",
+        "sent_at"
+      ],
+      "runtime_observability_active_lane_recovery_order_field": "active_lane_recovery_order"
+    },
+    "conversation_rollover_does_not_increment_attempt": true,
+    "completed_task_reexecution_forbidden": true,
+    "producer_skip_qa_pending_assets": true,
+    "qa_pending_retention": "UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA",
+    "candidate_batch_target": 2,
+    "shard_rule": "asset_queue.index % 3: A=0, B=1, E=2"
+  },
+  "state_snapshot": {
+    "controller_roles_blob_sha": "1af15dff0b201752dc9afe6281b8d4d5eb9edbdd",
+    "canonical_contract_blob_sha": "874e79a51843a24e891776b6d13f1f292e06b5c7",
+    "asset_queue_blob_sha": "2c06c2b6ae303c385b62e0360dcda88a543f4a2f",
+    "progress_blob_sha": "2aaa9dc258f1527a5e8b0f51adef781c847448fc",
+    "progress_compatibility_mirror_blob_sha": "2aaa9dc258f1527a5e8b0f51adef781c847448fc",
+    "progress_mirror_identical": true,
+    "resume_state_blob_sha": "2706b7fec8e64a3d4e2a47c6a2c8ab043da99f87",
+    "worklog_blob_sha": "3354179355056c1500b9ab56e2cea4c0c3a84052",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "authoritative_c_task_id": "LOCALIZATION-LOCALIZATION_C-00356",
+    "authoritative_c_batch_id": "Q00074",
+    "authoritative_c_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
+    "authoritative_c_gate_run_id": 36827181087,
+    "authoritative_c_gate_conclusion": "success",
+    "a_owned_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "a_newer_results_awaiting_c_not_repeated": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+        "index": 222,
+        "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
+        "index": 51,
+        "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b"
+      }
+    ],
+    "runnable_a_completion_tier": []
+  },
+  "continuity": {
+    "task_result_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00362.json",
+    "previous_rollover_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00362-rollover3-reconcile.json",
+    "result_binding_commit_sha": "40973e003231fdd26839a35cd1176bafceb65148",
+    "commits_since_result_binding_before_this_record": 10,
+    "schema25_commits_since_rollover3": 3,
+    "changed_files_since_rollover3": [
+      "localization/controller_roles.json"
+    ],
+    "shared_localization_state_changed": false,
+    "candidate_dds_changed": false,
+    "c_disposition_changed": false
+  },
+  "producer_work_repeated": false,
+  "candidate_dds_modified": false,
+  "candidate_binary_persisted": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "material_change": false,
+  "review_record_only": true,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "evidence": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00362.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00362-rollover3-reconcile.json",
+    "localization/controller_roles.json",
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION.md",
+    "localization/WORKLOG.md",
+    "localization/progress/progress.json",
+    "localization/progress.json",
+    "localization/resume_state.json",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/README.md",
+    "localization/graphics/ORIENTATION_POLICY.md"
+  ],
+  "note": "Conversation rollover 4 does not increment ATTEMPT. The incoming schema24 prompt was refreshed to current schema25 before deciding work. This review-only bookkeeping commit does not replace immutable A00362 RESULT_SHA 59b738ab300acbd6612e0202fc33568f0d87eff1. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE. No real-game test was performed; RUNTIME_VALIDATION=UNTESTED."
+}
