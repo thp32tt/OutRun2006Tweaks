@@ -84,6 +84,7 @@ LOCALIZATION_E_QA_PAUSE_THRESHOLD = max(1, int(os.getenv("LOCALIZATION_E_QA_PAUS
 LOCALIZATION_E_QA_RESUME_THRESHOLD = max(0, min(LOCALIZATION_E_QA_PAUSE_THRESHOLD - 1, int(os.getenv("LOCALIZATION_E_QA_RESUME_THRESHOLD", "12"))))
 LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS", "90")))
 LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_SECONDS", "30")))
+SAME_TASK_CONTROL_GAP_SECONDS = max(5, int(os.getenv("SAME_TASK_CONTROL_GAP_SECONDS", "15")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
 CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
 MAX_CHAT_ROLLOVERS_PER_TASK = max(1, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "2")))
@@ -299,6 +300,7 @@ runtime = {
     "localization_qa_coalesce_seconds": LOCALIZATION_QA_COALESCE_SECONDS,
     "localization_same_slot_send_gap_seconds": LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS,
     "localization_slot_dedup_seconds": LOCALIZATION_SLOT_DEDUP_SECONDS,
+    "same_task_control_gap_seconds": SAME_TASK_CONTROL_GAP_SECONDS,
     "configured_slot_count": CHAT_SLOTS,
     "max_task_attempts": MAX_TASK_ATTEMPTS,
     "conversation_rollover_enabled": CONVERSATION_ROLLOVER_ENABLED,
@@ -1472,6 +1474,32 @@ def send_guard_reason(reg: Registry, slot: Optional[Slot], now: datetime) -> Opt
                 if age < slot_gap:
                     return f"slot_dedup:{int(slot_gap - age)}s"
     return None
+
+
+def same_task_control_send_guard_reason(reg: Registry, slot: Optional[Slot], now: datetime) -> Optional[str]:
+    """Rate-limit-aware guard for continuation/recovery traffic on the current TASK_ID.
+
+    Control messages are not new work dispatches, so they must not inherit the
+    long localization same-slot/new-task dedup window. They still respect the
+    account-wide rate-limit circuit and a short anti-burst interval.
+    """
+    if rate_limit_active(reg, now):
+        return f"rate_limit_backoff:{rate_limit_seconds_remaining(reg, now)}s"
+
+    last_global = _parse_iso(reg.last_global_send_at)
+    if last_global:
+        age = (now - last_global).total_seconds()
+        if age < SAME_TASK_CONTROL_GAP_SECONDS:
+            return f"same_task_control_gap:{int(SAME_TASK_CONTROL_GAP_SECONDS - age)}s"
+
+    if slot and slot.last_sent_at:
+        last_slot = _parse_iso(slot.last_sent_at)
+        if last_slot:
+            age = (now - last_slot).total_seconds()
+            if age < SAME_TASK_CONTROL_GAP_SECONDS:
+                return f"same_task_control_slot_gap:{int(SAME_TASK_CONTROL_GAP_SECONDS - age)}s"
+    return None
+
 
 async def detect_busy(page: Page) -> bool:
     for sel in BUSY_SELECTORS:
