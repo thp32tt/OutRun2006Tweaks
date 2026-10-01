@@ -166,12 +166,16 @@ def queue_rollover_prompt(active: dict) -> str:
         *schema_lines,
         f"LANE={active['lane']}",
         f"TARGET_BRANCH={active['branch']}",
+        "CONTROLLER_GITHUB_PREFLIGHT=OK",
+        f"CONTROLLER_GITHUB_HEAD_SHA={active.get('base_sha') or ''}",
+        "FIRST_ACTION=CALL_GITHUB_TOOL",
         f"ATTEMPT={active['attempt']}/{MAX_TASK_ATTEMPTS}",
         f"CHAT_ROLLOVER={rollover}",
         "",
         "이전 채팅이 대화 길이 한도에 도달해서 같은 프로젝트의 새 채팅으로 자동 전환했다.",
         "이 롤오버는 작업 실패나 재시도가 아니므로 ATTEMPT를 증가시키지 마.",
         "GitHub 최신 HEAD와 docs/automation/runs/ 아래 해당 TASK_ID 기록을 직접 확인해 현재 상태를 재구성해.",
+        "컨트롤러가 위 HEAD를 GitHub에서 직접 확인했다. 첫 행동은 설명/중단이 아니라 GitHub tool 실제 호출이어야 한다. tool 호출 전에는 GitHub unavailable/CAPABILITY_BLOCKED를 출력하지 마.",
         "GitHub 사용 불가라고 추정하지 마. 실제 GitHub tool 호출로 확인하고 파일 404는 연결 실패가 아니라 path/ref 문제로 TARGET_BRANCH/ref에서 다시 조회해.",
         "한글화라면 CONTROLLER_CONFIG_BLOB_SHA의 localization/controller_roles.json과 canonical contract를 다시 읽고 현재 정책으로 프롬프트를 재해석해. 캐시된 과거 정책은 사용하지 마.",
         "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
@@ -552,6 +556,7 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
     active["base_sha"] = latest_head
     active["retry_parent_head_sha"] = latest_head
 
+    runtime["queue_base_sha"] = latest_head
     runtime["queue_task_id"] = active["task_id"]
     runtime["queue_lane"] = active["lane"]
     runtime["queue_branch"] = active["branch"]
@@ -781,6 +786,7 @@ async def localization_send_lane_task(
     runtime["queue_task_id"] = task_id
     runtime["queue_lane"] = target["lane"]
     runtime["queue_branch"] = target["branch"]
+    runtime["queue_base_sha"] = base_sha
     runtime["queue_attempt"] = 1
     runtime["queue_wave_id"] = wave_id
     runtime["queue_failure_context"] = ""
@@ -1929,6 +1935,7 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         runtime["queue_task_id"] = task_id
         runtime["queue_lane"] = target["lane"]
         runtime["queue_branch"] = target["branch"]
+        runtime["queue_base_sha"] = base_sha
         runtime["queue_attempt"] = 1
         runtime["queue_failure_context"] = ""
         slot_name = slot.name
