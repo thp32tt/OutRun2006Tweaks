@@ -159,10 +159,12 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "22e17186664d3b693c7d1a3140d43fcfffafab6c",
+  "authoritative_result_sha": "22e17186664d3b693c7d1a3140d43fcfffafab6c",
   "validation_bearing_result_sha": null,
   "durable_task_record_in_result_commit": true,
   "result_commit_message": "localization(B): refresh current static-pass isolation inputs [AUTO:LOCALIZATION-LOCALIZATION_B-00372]",
-  "bookkeeping_note": "Producer result SHA is bound after immutable material commit. Producer automation validation remains PENDING for independent C batch Gate; runtime remains UNTESTED."
+  "bookkeeping_note": "Immutable producer material result 22e17186664d3b693c7d1a3140d43fcfffafab6c contains both current-candidate DDS_ONLY isolation manifests plus the same-commit durable task record and exact AUTO marker. Producer validation remains PENDING under C_BATCH_GATE; no real-game test was performed, so runtime remains UNTESTED. This bookkeeping commit does not replace the material result SHA.",
+  "bookkeeping_base_head_sha": "1e41a1aba49370a29a897e5a0317ac6942a00e22",
+  "bookkeeping_recorded_at_kst": "2026-10-01T18:11:00+09:00"
 }
