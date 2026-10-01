@@ -8,27 +8,17 @@
   "automation_validation": "PENDING_UNTIL_C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
   "qa_batch_inputs": [
-    {
-      "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
-      "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b",
-      "automation_validation": "PENDING"
-    },
-    {
-      "task_id": "LOCALIZATION-LOCALIZATION_B-00353",
-      "result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513",
-      "automation_validation": "PENDING"
-    },
-    {
-      "task_id": "LOCALIZATION-LOCALIZATION_A-00355",
-      "result_sha": "41bceb31bc7326ca41c491dc931ee63dfeeff126",
-      "automation_validation": "PENDING"
-    },
-    {
-      "task_id": "LOCALIZATION-LOCALIZATION_B-00357",
-      "result_sha": "46bd3970276de8e6300d971024ec04ce2e9e9d98",
-      "automation_validation": "PENDING"
-    }
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00352","result_sha":"b5d39094ce2f9941e7807349b563e31f4d19654b","automation_validation":"PENDING"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00353","result_sha":"ff18b8aa855da74e0f1070661ff0462a53f58513","automation_validation":"PENDING"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00355","result_sha":"41bceb31bc7326ca41c491dc931ee63dfeeff126","automation_validation":"PENDING"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00357","result_sha":"46bd3970276de8e6300d971024ec04ce2e9e9d98","automation_validation":"PENDING"}
   ],
-  "qa_disposition": "RECORD_RECONCILED_AFTER_GATE_FAILURE",
-  "notes": "Created missing immutable C task run record required by C_BATCH_GATE exact producer SHA validation."
+  "qa_dispositions": [
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00352","result_sha":"b5d39094ce2f9941e7807349b563e31f4d19654b","status":"HOLD_STRICT_RECHECK"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00353","result_sha":"ff18b8aa855da74e0f1070661ff0462a53f58513","status":"HOLD_STRICT_RECHECK"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00355","result_sha":"41bceb31bc7326ca41c491dc931ee63dfeeff126","status":"HOLD_STRICT_RECHECK"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00357","result_sha":"46bd3970276de8e6300d971024ec04ce2e9e9d98","status":"HOLD_STRICT_RECHECK"}
+  ],
+  "qa_disposition":"RECONCILED_WITH_STRICT_HOLD",
+  "notes":"C batch gate repair: added exact TASK_ID@RESULT_SHA dispositions after previous failure caused by empty qa_dispositions. Runtime not tested."
 }
