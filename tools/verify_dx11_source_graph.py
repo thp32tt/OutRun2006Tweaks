@@ -190,7 +190,8 @@ def main() -> None:
         "SignatureHashCapHitSamples": "R114 signature hash-cap saturation evidence",
         "DetailedSignatureLogSkippedSignatures": "R114 detailed-log saturation evidence",
         "mix_sample_ordinal": "R114 hashed draw-ordinal sampler",
-        "(sampleKey & (SampleStride - 1u)) != 0u": "R114 hashed 1/64 sampling gate",
+        "(sampleKey & (sampleStride - 1u)) != 0u": "R114 hashed sampled-mode gate",
+        "sampleStride > 1u": "R114 exhaustive-mode sampling bypass gate",
         "unique <= DetailedSignatureLogCap": "R114 compile instrumentation uses named detail cap",
         "shaderTranslationExact = false": "native shader translation remains fail-closed",
     }
