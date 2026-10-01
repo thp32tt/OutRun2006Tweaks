@@ -1,5 +1,5 @@
 {
-  "schema_version": 24,
+  "schema_version": 25,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -207,7 +207,14 @@
       "lane_exception_block_threshold": 3,
       "dispatch_exception_backoff_max_seconds": 300,
       "browser_transport_failure_global_restart": true,
-      "qa_pending_unconsumed_never_truncated": true
+      "qa_pending_unconsumed_never_truncated": true,
+      "active_lane_retry_fairness": true,
+      "active_lane_recovery_order": "OLDEST_EFFECTIVE_SEND_FIRST",
+      "active_lane_effective_send_fields": [
+        "last_retry_click_at",
+        "last_rollover_at",
+        "sent_at"
+      ]
     },
     "state_persistence": {
       "atomic_primary_writes": true,
@@ -296,7 +303,8 @@
     "queue_active_null_allowed_in_parallel_mode": true,
     "queue_active_legacy_field_must_not_gate_parallel_lanes": true,
     "qa_pending_retention": "UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA",
-    "health_includes_memory_pressure": true
+    "health_includes_memory_pressure": true,
+    "active_lane_recovery_order_field": "active_lane_recovery_order"
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
