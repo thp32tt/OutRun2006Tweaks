@@ -15,22 +15,22 @@ namespace OutRunVR::State
         {
             R22ReliableFlag().store(reliable, std::memory_order_release);
         }
-        static void SetR31Reliable(bool reliable) noexcept
+        static void SetEventConsumerReady(bool reliable) noexcept
         {
-            R31ReliableFlag().store(reliable, std::memory_order_release);
+            EventConsumerReadyFlag().store(reliable, std::memory_order_release);
         }
         static bool R22Reliable() noexcept
         {
             return R22ReliableFlag().load(std::memory_order_acquire);
         }
-        static bool R31Reliable() noexcept
+        static bool EventConsumerReady() noexcept
         {
-            return R31ReliableFlag().load(std::memory_order_acquire);
+            return EventConsumerReadyFlag().load(std::memory_order_acquire);
         }
         static bool Reliable() noexcept
         {
             return R22Reliable() &&
-                R31Reliable() &&
+                EventConsumerReady() &&
                 !CoverageLost();
         }
         static void SetLifecycleHooksReady(bool ready) noexcept
@@ -44,7 +44,6 @@ namespace OutRunVR::State
         static void MarkCoverageLost() noexcept
         {
             CoverageLostFlag().store(true, std::memory_order_release);
-            R31ReliableFlag().store(false, std::memory_order_release);
         }
         static void ResetCoverageLoss() noexcept
         {
@@ -96,7 +95,7 @@ namespace OutRunVR::State
             static std::atomic<bool> value{false};
             return value;
         }
-        static std::atomic<bool>& R31ReliableFlag() noexcept
+        static std::atomic<bool>& EventConsumerReadyFlag() noexcept
         {
             static std::atomic<bool> value{false};
             return value;

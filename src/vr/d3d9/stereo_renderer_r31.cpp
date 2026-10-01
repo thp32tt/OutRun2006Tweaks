@@ -800,7 +800,6 @@ namespace OutRunVRStereo
             else if (OutRunVR::State::StateBlockTracker::Recording())
             {
                 OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
             }
             R31MarkStateBlockCachesDirty();
         }
@@ -833,7 +832,6 @@ namespace OutRunVRStereo
             else
             {
                 OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
             }
             return hr;
         }
@@ -843,14 +841,12 @@ namespace OutRunVRStereo
             if (!block)
             {
                 OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
                 return false;
             }
             void** vtable = *reinterpret_cast<void***>(block);
             if (!vtable)
             {
                 OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
                 return false;
             }
 
@@ -872,7 +868,6 @@ namespace OutRunVRStereo
                             "VR R31 STATE: alternate StateBlock::Apply implementation observed; fast-path cache trust is disabled for the process");
                     }
                 }
-                OutRunVR::State::StateBlockTracker::SetR31Reliable(reliable);
                 return reliable;
             }
             R31StateBlockApplyHook = safetyhook::create_inline(
@@ -884,7 +879,6 @@ namespace OutRunVRStereo
                 R31StateBlockApplyHook = {};
                 R31StateBlockApplyTarget = nullptr;
                 OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
                 spdlog::warn(
                     "VR R31 STATE: could not hook StateBlock::Apply; per-draw live WVP/shader/render-state validation remains active");
                 return false;
@@ -894,7 +888,6 @@ namespace OutRunVRStereo
             const bool reliable = R31CreateStateBlockHook &&
                 R31BeginStateBlockHook && R31EndStateBlockHook &&
                 !OutRunVR::State::StateBlockTracker::CoverageLost();
-            OutRunVR::State::StateBlockTracker::SetR31Reliable(reliable);
             return reliable;
         }
 
@@ -996,17 +989,17 @@ namespace OutRunVRStereo
                         return 0;
                     }
 
-                    OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
+                        OutRunVR::State::StateBlockTracker::SetEventConsumerReady(false);
                     OutRunVR::State::StateBlockTracker::ResetCoverageLoss();
                     OutRunVR::State::StateBlockEvents::Configure(
                         &R31OnStateBlockBegin,
                         &R31OnStateBlockEnd,
                         &R31OnStateBlockApply);
+                    OutRunVR::State::StateBlockTracker::SetEventConsumerReady(
+                        OutRunVR::State::StateBlockEvents::Configured());
 
                     if (OutRunVR::State::StateBlockTracker::LifecycleHooksReady())
                     {
-                        OutRunVR::State::StateBlockTracker::SetR31Reliable(
-                            OutRunVR::State::StateBlockEvents::Configured());
                         spdlog::info(
                             "VR R31 STATE: R22 lifecycle hooks are authoritative; R31 physical StateBlock hooks are not installed");
                     }

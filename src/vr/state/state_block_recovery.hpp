@@ -36,7 +36,6 @@ namespace OutRunVR::State
                 PrimeShadowState().load(std::memory_order_acquire);
             if (!resynchronizeShaderEpoch || !primeShadowState)
             {
-                StateBlockTracker::SetR31Reliable(false);
                 StateBlockTracker::MarkCoverageLost();
                 return;
             }
@@ -50,7 +49,6 @@ namespace OutRunVR::State
             resynchronizeShaderEpoch(device);
             if (!primeShadowState(device))
             {
-                StateBlockTracker::SetR31Reliable(false);
                 StateBlockTracker::MarkCoverageLost();
             }
         }

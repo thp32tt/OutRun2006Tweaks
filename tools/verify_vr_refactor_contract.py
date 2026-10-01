@@ -73,8 +73,8 @@ for marker in (
     "class StateBlockTracker",
     "SetR22Reliable(",
     "R22Reliable()",
-    "SetR31Reliable(",
-    "R31Reliable()",
+    "SetEventConsumerReady(",
+    "EventConsumerReady()",
     "Reliable()",
     "SetLifecycleHooksReady(",
     "LifecycleHooksReady()",
@@ -208,8 +208,13 @@ if "R22 lifecycle hooks are authoritative" not in r31:
     errors.append("R31 missing authoritative R22 lifecycle-owner path")
 if "R31 fallback StateBlock hooks armed" not in r31:
     errors.append("R31 missing fallback physical StateBlock hook path")
-if "StateBlockTracker::SetR31Reliable(" not in r31 or         "StateBlockEvents::Configured()" not in r31:
+if "StateBlockTracker::SetEventConsumerReady(" not in r31 or \
+        "StateBlockEvents::Configured()" not in r31:
     errors.append("R31 missing neutral event-consumer readiness publication")
+if "SetR31Reliable" in state_block_tracker or "R31Reliable" in state_block_tracker:
+    errors.append("StateBlockTracker retained obsolete R31 reliability naming")
+if "SetR31Reliable" in r31 or "R31Reliable" in r31:
+    errors.append("R31 retained obsolete overloaded StateBlock reliability producer")
 
 r22_apply_owner = re.search(
     r"bool R22EnsureStateBlockApplyHook\(.*?\n        \}",
