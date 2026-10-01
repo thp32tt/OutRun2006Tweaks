@@ -1375,24 +1375,48 @@ namespace OutRunVRStereo
             return true;
         }
 
+        enum class R32PrerequisiteDecision
+        {
+            Wait,
+            Fail,
+            Install
+        };
+
+        constexpr int R32PrerequisiteWaitAttempts = 4800;
+        constexpr DWORD R32PrerequisiteWaitMs = 25;
+
+        R32PrerequisiteDecision R32ClassifyPrerequisite(
+            OutRunVR::RuntimeEligibility::InstallState r31,
+            OutRunVR::RuntimeEligibility::InstallState r22,
+            bool directFailed, bool directReady) noexcept
+        {
+            using State = OutRunVR::RuntimeEligibility::InstallState;
+            if (r31 == State::Failed || r22 == State::Failed || directFailed)
+                return R32PrerequisiteDecision::Fail;
+            if (r31 == State::Ready && r22 == State::Ready && directReady)
+                return R32PrerequisiteDecision::Install;
+            return R32PrerequisiteDecision::Wait;
+        }
+
         DWORD WINAPI R32InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
             R32InstallState.store(State::Pending, std::memory_order_release);
-            for (int attempt = 0; attempt < 4800; ++attempt)
+            for (int attempt = 0; attempt < R32PrerequisiteWaitAttempts; ++attempt)
             {
                 const auto r31 = DispatchSupportInstallState();
                 const auto r22 = SafetyOverlayInstallState();
                 const bool r13Failed = IsDirectTransportInstallFailed();
-                if (r31 == State::Failed || r22 == State::Failed ||
-                    r13Failed)
+                const bool r13Ready = IsDirectTransportInstallReady();
+                const auto prerequisite = R32ClassifyPrerequisite(
+                    r31, r22, r13Failed, r13Ready);
+                if (prerequisite == R32PrerequisiteDecision::Fail)
                 {
                     R32InstallState.store(State::Failed, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", false);
                     return 0;
                 }
-                if (r31 == State::Ready && r22 == State::Ready &&
-                    IsDirectTransportInstallReady())
+                if (prerequisite == R32PrerequisiteDecision::Install)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
                     R32ResetR22Hook = safetyhook::create_inline(
@@ -1433,7 +1457,7 @@ namespace OutRunVRStereo
                         "VR R32 REVIEW2: R22-owned Reset lifecycle + fail-closed state reads + batched WVP + cached D3D9Ex interop + pending-fence-safe producer ring + delta telemetry READY");
                     return 0;
                 }
-                Sleep(25);
+                Sleep(R32PrerequisiteWaitMs);
             }
 
             R32InstallState.store(State::Failed, std::memory_order_release);

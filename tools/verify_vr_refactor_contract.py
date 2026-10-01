@@ -312,6 +312,25 @@ if "attempt < 4800" in r30 or "Sleep(25)" in r30:
 if "attempt < R30PrerequisiteWaitAttempts" not in r30 or \
         "Sleep(R30PrerequisiteWaitMs)" not in r30:
     errors.append("R30 install thread no longer consumes the prerequisite wait policy")
+for marker in (
+    "enum class R32PrerequisiteDecision",
+    "R32PrerequisiteWaitAttempts = 4800",
+    "R32PrerequisiteWaitMs = 25",
+    "R32ClassifyPrerequisite(",
+    "R32PrerequisiteDecision::Wait",
+    "R32PrerequisiteDecision::Fail",
+    "R32PrerequisiteDecision::Install",
+):
+    if marker not in r32:
+        errors.append(f"R32 prerequisite wait-policy boundary missing marker: {marker}")
+if "attempt < 4800" in r32 or "Sleep(25)" in r32:
+    errors.append("R32 prerequisite timing literal escaped the wait-policy boundary")
+if "attempt < R32PrerequisiteWaitAttempts" not in r32 or \
+        "Sleep(R32PrerequisiteWaitMs)" not in r32:
+    errors.append("R32 install thread no longer consumes prerequisite wait policy")
+if "R32ClassifyPrerequisite(" not in r32:
+    errors.append("R32 install thread bypassed prerequisite classifier")
+
 if "R30ClassifyPrerequisite(StereoBaseInstallState())" not in r30:
     errors.append("R30 install thread bypassed prerequisite classification boundary")
 
