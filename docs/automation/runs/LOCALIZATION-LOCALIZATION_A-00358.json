@@ -91,9 +91,14 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_SELF_SHA_BINDING",
-  "result_commit_message": "localization(A): record schema23 zero-runnable shard hold [AUTO:LOCALIZATION-LOCALIZATION_A-00358]"
+  "result_sha": "edc5c1ab68f1247e0a6561f0c2172b9f000a2aa4",
+  "authoritative_result_sha": "edc5c1ab68f1247e0a6561f0c2172b9f000a2aa4",
+  "validation_bearing_result_sha": "edc5c1ab68f1247e0a6561f0c2172b9f000a2aa4",
+  "result_binding_state": "BOUND_TO_VALIDATION_BEARING_RESULT",
+  "result_commit_message": "localization(A): record schema23 zero-runnable shard hold [AUTO:LOCALIZATION-LOCALIZATION_A-00358]",
+  "bookkeeping": {
+    "recorded_at_kst": "2026-10-01T15:55:00+09:00",
+    "head_before_bookkeeping": "edc5c1ab68f1247e0a6561f0c2172b9f000a2aa4",
+    "note": "Bookkeeping-only self-SHA binding. Producer automation validation remains PENDING until independent C batch Gate. Runtime remains UNTESTED."
+  }
 }
