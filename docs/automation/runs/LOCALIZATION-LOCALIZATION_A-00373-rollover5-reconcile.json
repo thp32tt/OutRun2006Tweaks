@@ -1,0 +1,79 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-a00373-rollover5-existing-durable-result-reconcile-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00373",
+  "wave_id": "P00241",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "recorded_at_kst": "2026-10-01T18:15:00+09:00",
+  "controller_schema_version": 30,
+  "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "canonical_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+  "observed_head_sha": "499da6d26a174d21268e3d7cc7e4ea67e9f2a933",
+  "result": "ROLLOVER_RECONCILED_EXISTING_DURABLE_RESULT_NO_REEXECUTION",
+  "summary": "Rollover5 refreshed korean-localization-clean, re-read schema30 controller_roles from the exact incoming blob and the canonical automation contract, and directly re-read the durable A00373 task record. The branch HEAD is still the rollover4 review-only commit, so there is no post-rollover4 branch delta to invalidate the prior reconciliation. Producer result c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463 remains authoritative, carries the exact required [AUTO:LOCALIZATION-LOCALIZATION_A-00373] marker, and bookkeeping commit 3ff9dfd5353c20cf95e7f97cda133eb07d27df9e remains its immutable binding. Repeating producer work, the exhausted canonical-source probe, or source acquisition is forbidden. No DDS, shared state, runtime test, N100/local clone/worktree, Drive write, or VR/FFB/DX work is repeated.",
+  "authoritative_result": {
+    "result_sha": "c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463",
+    "binding_commit_sha": "3ff9dfd5353c20cf95e7f97cda133eb07d27df9e",
+    "result_commit_message": "localization(A): add index54 source identity guard [AUTO:LOCALIZATION-LOCALIZATION_A-00373]",
+    "task_record_path": "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00373.json",
+    "task_record_blob_sha": "4d3d8cea29bbaf29269feab5bfdb85017757b24e",
+    "selected_index": 54,
+    "asset": "FA7BBB13",
+    "candidate_dds_modified": false,
+    "material_deliverable": "INDEX54_SCHEMA30_SOURCE_IDENTITY_REACTIVATION_GUARD_AND_MACHINE_OUTPUT",
+    "automation_validation": "PENDING",
+    "validation_mode": "C_BATCH_GATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "policy_recheck": {
+    "producer_lane_mode": "continuous_production+self_qa",
+    "modulo_3_owner": 0,
+    "next_task_after": "OWN_DURABLE_COMMIT",
+    "producer_individual_actions_gate": false,
+    "automation_validation": "PENDING_UNTIL_C_BATCH_GATE",
+    "unchanged_blocker_reexecution_allowed": false,
+    "source_acquisition_exhausted_retry_requires_dependency_change": true,
+    "candidate_completion_first": true,
+    "producer_skip_qa_pending_assets": true,
+    "rollover_refresh_policy_applied": true
+  },
+  "branch_delta_since_rollover4": {
+    "base_sha": "499da6d26a174d21268e3d7cc7e4ea67e9f2a933",
+    "observed_head_sha": "499da6d26a174d21268e3d7cc7e4ea67e9f2a933",
+    "ahead_by": 0,
+    "changed_paths": [],
+    "a_lane_state_fingerprint_changed": false
+  },
+  "state_fingerprints": {
+    "progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
+    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed"
+  },
+  "latest_c_seen": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00368",
+    "wave_id": "Q00075",
+    "result_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
+    "automation_validation": "PASS",
+    "consumed_a00373": false,
+    "reason": "No newer durable C batch consuming A00373 is present in the authoritative task record/state reviewed for this rollover."
+  },
+  "reconciliation": {
+    "reexecuted_producer_work": false,
+    "source_probe_repeated": false,
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED",
+    "n100_used": false,
+    "local_clone_used": false,
+    "google_drive_used": false,
+    "google_drive_write_performed": false,
+    "vr_ffb_dx_changes": false
+  },
+  "commit_role": "ROLLOVER_RECONCILIATION_REVIEW_ONLY",
+  "result_identity_preserved": "LOCALIZATION-LOCALIZATION_A-00373@c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463",
+  "note": "This rollover reconciliation is not a new producer result and must not create a second QA identity. The original c28f3ccb producer result remains authoritative and already carries the exact required AUTO marker; this review-only checkpoint intentionally uses a non-result commit message."
+}
