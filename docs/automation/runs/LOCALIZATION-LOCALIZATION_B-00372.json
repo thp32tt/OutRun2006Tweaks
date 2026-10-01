@@ -10,7 +10,7 @@
   "controller_schema_version": 30,
   "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
   "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
-  "base_head_sha": "5df01ba2d6a96683042b0b6be21f5e98565b7216",
+  "base_head_sha": "b42129b90ae7f3d579de28f2fd83386aaf349ec7",
   "result": "PASS_MATERIAL_B_MOD3_TWO_SOURCE_TRANSPORT_TIERS_CLOSED_RELEASE_VERIFIER_ADDED_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
   "summary": "Fresh B-shard scan at schema30 found no runnable completion-tier work after preserving unconsumed/QA-pending producer results. B00372 materially advances indices 28 and 139 by closing the approved-Drive and immutable pinned-direct acquisition tiers with typed SOURCE_TRANSPORT_MISS evidence, while deliberately leaving the pinned-Release tier open because both available local binary runtimes fail before execution. A deterministic pinned-Release bundle/member SHA + DDS verifier is committed alongside the evidence so the remaining tier can be completed without repeating lower tiers. No source exhaustion, Korean DDS, static QA, runtime PASS, shared-state update, work-steal, N100/local clone, or VR/FFB/DX work is claimed.",
   "report": "localization/graphics/role_B/20261001-B00372-P00240/B00372_P00240_INDICES28_139_SOURCE_TRANSPORT_PREFLIGHT.json",
@@ -108,13 +108,12 @@
   "producing_role": "LOCALIZATION_B",
   "bookkeeping_note": "RESULT_SHA will be bound in a separate bookkeeping-only commit after the atomic material result commit; producer AUTOMATION_VALIDATION remains PENDING until C consumes TASK_ID@RESULT_SHA. RUNTIME_VALIDATION remains UNTESTED.",
   "precommit_refresh": {
-    "safe_anchor": "3ff9dfd5353c20cf95e7f97cda133eb07d27df9e",
-    "head": "5df01ba2d6a96683042b0b6be21f5e98565b7216",
+    "safe_anchor": "5df01ba2d6a96683042b0b6be21f5e98565b7216",
+    "head": "b42129b90ae7f3d579de28f2fd83386aaf349ec7",
     "delta_files": [
-      "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00373-rollover3-reconcile.json",
       "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00372.json",
-      "localization/graphics/role_B/20261001-B00372-P00240/P00240_B00372_INDEX121_FD90AA9_SINGLE_DDS_ISOLATION.json",
-      "localization/graphics/role_B/20261001-B00372-P00240/P00240_B00372_INDEX97_411827E_SINGLE_DDS_ISOLATION.json"
+      "localization/graphics/role_B/20261001-B00372-P00240/B00372_P00240_INDICES28_139_SOURCE_TRANSPORT_PREFLIGHT.json",
+      "localization/graphics/role_B/20261001-B00372-P00240/verify_release_sources_28_139.py"
     ],
     "shared_state_change": false
   }

@@ -15,14 +15,14 @@
   "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
   "progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
   "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed",
-  "base_head_sha": "5df01ba2d6a96683042b0b6be21f5e98565b7216",
+  "base_head_sha": "b42129b90ae7f3d579de28f2fd83386aaf349ec7",
   "result": "PASS_MATERIAL_B_MOD3_TWO_SOURCE_TRANSPORT_TIERS_CLOSED_RELEASE_VERIFIER_ADDED_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
   "summary": "Fresh schema30 B-shard reconciliation finds no newly runnable DIRECT_REWORK_REQUIRED, EXPLICIT_RENDER_NEXT, RENDER_READY, ONE_STAGE_TO_RENDER, or EXISTING_CANDIDATE_REWORK after B00370. No queue/progress/resume/C/candidate state changed after B00370; newer branch commits are lane-local A/B/E records only. B00372 therefore uses the allowed PREFLIGHT_ONLY fallback on B-owned indices 28 and 139. For index28 the approved Drive load folder has no exact spr_sprani_CLAR_RANK_Exst parent; for index139 the approved spr_sprani_sumo_fe_cvt_Exst parent exists but an exact parent-scoped name query returns no 313DB8CB_512x256.dds. The immutable pinned-direct tier returns 404 for both exact paths. Release fallback is not misclassified as exhausted: the supplied pinned ZIP is visible to the Project, but container/python execution fails before execution with ClientError, so archive/member hashes were not recomputed. A deterministic stdlib verifier is committed to perform the remaining pinned-Release bundle/member SHA and DDS-header checks without repeating Drive/direct probes when binary execution is available. No candidate DDS, shared state, or runtime result is claimed.",
   "freshness": {
     "latest_prior_b_task": "LOCALIZATION-LOCALIZATION_B-00370",
     "latest_prior_b_result_sha": "25e854c140aedd2920878c2433895b55b6dd1c9b",
-    "current_head_sha": "5df01ba2d6a96683042b0b6be21f5e98565b7216",
-    "commits_ahead_of_b00370_result": 15,
+    "current_head_sha": "b42129b90ae7f3d579de28f2fd83386aaf349ec7",
+    "commits_ahead_of_b00370_result": 16,
     "queue_progress_resume_or_c_candidate_changed": false,
     "changed_scope_since_b00370": "LANE_LOCAL_A_B_E_RECORDS_AND_B00370_BOOKKEEPING_ONLY__A00373_ADDED_NO_SHARED_STATE_CHANGE",
     "completion_tier_scan": {
@@ -70,13 +70,12 @@
       }
     ],
     "precommit_refresh": {
-      "safe_anchor": "3ff9dfd5353c20cf95e7f97cda133eb07d27df9e",
-      "head": "5df01ba2d6a96683042b0b6be21f5e98565b7216",
+      "safe_anchor": "5df01ba2d6a96683042b0b6be21f5e98565b7216",
+      "head": "b42129b90ae7f3d579de28f2fd83386aaf349ec7",
       "delta_files": [
-        "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00373-rollover3-reconcile.json",
         "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00372.json",
-        "localization/graphics/role_B/20261001-B00372-P00240/P00240_B00372_INDEX121_FD90AA9_SINGLE_DDS_ISOLATION.json",
-        "localization/graphics/role_B/20261001-B00372-P00240/P00240_B00372_INDEX97_411827E_SINGLE_DDS_ISOLATION.json"
+        "localization/graphics/role_B/20261001-B00372-P00240/B00372_P00240_INDICES28_139_SOURCE_TRANSPORT_PREFLIGHT.json",
+        "localization/graphics/role_B/20261001-B00372-P00240/verify_release_sources_28_139.py"
       ],
       "shared_state_change": false
     }
