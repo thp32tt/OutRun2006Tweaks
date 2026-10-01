@@ -1,0 +1,27 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00402",
+  "lane": "LOCALIZATION_C",
+  "schema_version": 32,
+  "role": "independent_batched_cross_lane_qa+shared_state_reconcile",
+  "input_identity": "TASK_ID@RESULT_SHA",
+  "qa_batch_inputs": [
+    "LOCALIZATION-LOCALIZATION_B-00030@5fb0315853fd8914acc7bba1229e1cc46768db80",
+    "LOCALIZATION-LOCALIZATION_A-00064@641a34826967c615bc29aec55feb1e305513bc3b",
+    "LOCALIZATION-LOCALIZATION_B-00062@2579efe87a6f20d7a9c12c930dec122d125d04d8",
+    "LOCALIZATION-LOCALIZATION_B-00167@1d0c05d29118192c5c10f40ee857fb26ae366622"
+  ],
+  "disposition": "QA_REVIEW_RECORDED",
+  "qa_result": {
+    "LOCALIZATION-LOCALIZATION_B-00030": "HOLD_STRICT_RECHECK",
+    "LOCALIZATION-LOCALIZATION_A-00064": "HOLD_STRICT_RECHECK",
+    "LOCALIZATION-LOCALIZATION_B-00062": "HOLD_STRICT_RECHECK",
+    "LOCALIZATION-LOCALIZATION_B-00167": "HOLD_STRICT_RECHECK"
+  },
+  "dedup": "NO_DUPLICATE_CONSUMPTION",
+  "shared_state": "NO_STALE_OVERWRITE",
+  "automation_validation": "C_BATCH_GATE_RECORDED",
+  "runtime_validation": "UNTESTED",
+  "runtime_note": "No in-game runtime test performed; runtime success not claimed.",
+  "evidence": "Reviewed immutable TASK_ID@RESULT_SHA inputs against current contract. Missing final visual/runtime evidence remains non-promotable.",
+  "commit_task_tag": "[AUTO:LOCALIZATION-LOCALIZATION_C-00402]"
+}
