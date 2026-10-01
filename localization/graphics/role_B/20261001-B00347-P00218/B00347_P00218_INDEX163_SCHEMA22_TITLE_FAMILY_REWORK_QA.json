@@ -1,0 +1,129 @@
+{
+  "schema_version": 22,
+  "schema": "outrun-b00347-p00218-index163-schema22-fixed-title-family-rework-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+  "wave_id": "P00218",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "recorded_at_kst": "2026-10-01T14:36:14+09:00",
+  "base_head_sha": "5711c6d760352a47129e82fe31646ba75dd0eb08",
+  "controller_schema_version": 22,
+  "controller_config_blob_sha": "be640c0c2806985743b8fc41b90a16025c590cf8",
+  "target": {
+    "index": 163,
+    "asset": "59A79158",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds"
+  },
+  "result": "PASS_MATERIAL_B_MOD3_INDEX163_V19_FIXED_STAGE_COURSE_FAMILY_KOREAN_CANDIDATE_SELF_QA_RUNTIME_UNTESTED",
+  "summary": "Rollover 3 refreshed schema22 and current v19 retrospective audit. Index94 from the same task remains complete and is not regenerated. B shard index163/59A79158 was newly reopened because the old 24-row candidate used nine font sizes and pre-policy semantic translations. Rebuilt all 24 rows from exact canonical v0.25.10a source with current transliteration-only semantics and one locked 46px NanumSquare Bold family size. Rows 10/20 use within-word tracking only while native word spacing remains intact. Exact source removal mask/CLEAN_PLATE, DDS header/orientation, decoded-final containment and English-source visual QA pass with zero outside-region/alpha/protected/1px-overflow defects. Package and review evidence were persisted/read back from approved current-pipeline Drive. Runtime remains UNTESTED.",
+  "selection_basis": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_priority": "DIRECT_REWORK_REQUIRED",
+    "rework_policy": "typography_v19_reaudit",
+    "reason": "EXPLICIT_HISTORICAL_NONUNIFORM_STAGE_COURSE_FONT_SIZES_36_TO_57PX_NINE_SIZES_AND_CURRENT_TRANSLITERATION_POLICY",
+    "previous_task_candidate_preserved": "index94/2DA43E41@93b42565... not regenerated"
+  },
+  "source": {
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+    "archive": "OR2-HD-GUI-v0.25.10a.zip",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+    "dimensions": [
+      1024,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "flip_y",
+    "header_128_sha256": "68d8452d40fe2ba3922dd50187ef03aab9dafbc1a3dc98245283ea94c3284ab6"
+  },
+  "candidate": {
+    "sha256": "fa93090c5fe818b2006040dde1515c4027b7292504d5d4f785521fd3991e10ab",
+    "bytes": 8388736,
+    "dimensions": [
+      1024,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "flip_y",
+    "header_128_identical": true,
+    "decoded_roundtrip_pixel_exact": true,
+    "storage_mode": "GOOGLE_DRIVE_CURRENT_PIPELINE_ZIP",
+    "task_folder_id": "1rC0pG-ovNIILreJgq2-9aJ6jP6H8F9Lz",
+    "package_file_id": "1UZUIXrTAzTsEBWwgUN7a7XK-7ZtxFiPa",
+    "package_name": "LOCALIZATION-LOCALIZATION_B-00347_INDEX163_59A79158_SCHEMA22.zip",
+    "package_bytes": 78524,
+    "package_sha256": "ce7180196a311ffdecbb118b779ee1acb7b9f78e63c4acb1a3d49c6e01dee265",
+    "candidate_display_file_id": "1OkA5Wx1jK_HlQyUt-b5Unn3zefYJtHWu",
+    "comparison_file_id": "1Tc68EpW813W2NY08rFgMV8Xo00k95XNy",
+    "element_comparison_file_id": "1HJQUAjtB6wBjMTEMMxhhQ_p9HSJARDDY",
+    "readback_byte_identical": true
+  },
+  "self_qa": {
+    "status": "PASS",
+    "canonical_semantics": "24/24",
+    "fixed_font_size_px": 46,
+    "unique_font_sizes": [
+      46
+    ],
+    "per_string_font_size_reduction": false,
+    "within_word_tracking_rows": [
+      10,
+      20
+    ],
+    "source_removal_mask_pixels": 171748,
+    "changed_pixels_outside_source_effect_union": 0,
+    "alpha_changed_pixels_outside_source_effect_union": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "one_pixel_overflow_total": 0,
+    "edge_touch_rows": [
+      1,
+      2,
+      4,
+      6,
+      9,
+      18,
+      19,
+      21,
+      24
+    ],
+    "high_zoom_review": "PASS",
+    "english_source_visual_review": "PASS_24_OF_24__NO_RESIDUE_CLIPPING_WRONG_ART_OR_BOX"
+  },
+  "material_deliverable": {
+    "type": "INDEX163_ACTUAL_V19_FIXED_FAMILY_KOREAN_DDS_PLUS_CURRENT_REVIEW_SET",
+    "candidate_dds_modified": true,
+    "candidate_binary_persisted": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": true,
+  "uploaded_archive_used": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "fingerprints": {
+    "base_head_sha": "5711c6d760352a47129e82fe31646ba75dd0eb08",
+    "controller_schema_version": 22,
+    "controller_config_blob_sha": "be640c0c2806985743b8fc41b90a16025c590cf8",
+    "automation_contract_blob_sha": "8d85dd58edb1e191e9d5b5f6d4b24e0d50d20d44",
+    "transcriptions_blob_sha": "4f9a1678e6c7ae46a22011f27eb5b1eb1bb28f15",
+    "asset_queue_blob_sha": "ceedefb399aef8b8434cbf4fb84f455d186333cf"
+  },
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "durable_task_record_in_result_commit": true
+}
