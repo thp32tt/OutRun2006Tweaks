@@ -20,6 +20,8 @@ r26 = text("src/vr/d3d9/stereo_renderer_r26.cpp")
 r31 = text("src/vr/d3d9/stereo_renderer_r31.cpp")
 r32 = text("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = text("src/vr/d3d9/stereo_renderer_r33.cpp")
+r34 = text("src/vr/d3d9/stereo_renderer_r34.cpp")
+renderer_r29 = text("src/vr/game/outrun_renderer_r29.cpp")
 draw_class = text("src/vr/render/draw_class.hpp")
 raster = text("src/vr/state/d3d9_raster_state.hpp")
 state_block_tracker = text("src/vr/state/state_block_tracker.hpp")
@@ -75,6 +77,8 @@ for marker in (
     "NoteApply()",
     "RecordingGeneration()",
     "ApplyGeneration()",
+    "SetRecording(",
+    "Recording()",
 ):
     if marker not in state_block_tracker:
         errors.append(f"StateBlockTracker missing API marker: {marker}")
@@ -100,6 +104,21 @@ for banned in ("R31StateBlockRecordings", "R31StateBlockApplies"):
     if banned in r31:
         errors.append(
             f"R31 retained migrated StateBlock generation owner: {banned}")
+
+for rel, source in (("R31", r31), ("R32", r32), ("R33", r33), ("R34", r34)):
+    if "R31StateBlockRecording" in source:
+        errors.append(
+            f"{rel} regained R31 StateBlock recording-state dependency")
+
+for banned in ("IsGameStateBlockRecording", "IsStateBlockTrackingReliable"):
+    if banned in r31:
+        errors.append(f"R31 retained obsolete StateBlock status export: {banned}")
+    if banned in renderer_r29:
+        errors.append(f"renderer R29 retained stereo StateBlock status dependency: {banned}")
+
+for marker in ("StateBlockTracker::Recording()", "StateBlockTracker::Reliable()"):
+    if marker not in renderer_r29:
+        errors.append(f"renderer R29 missing neutral StateBlock status access: {marker}")
 
 misplaced_tracker = ROOT / "src/vr/d3d9/state/state_block_tracker.hpp"
 if misplaced_tracker.exists():
