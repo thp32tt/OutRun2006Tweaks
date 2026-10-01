@@ -1,17 +1,23 @@
 {
   "task_id": "LOCALIZATION-LOCALIZATION_C-00416",
   "lane": "LOCALIZATION_C",
-  "attempt": "2/3",
+  "attempt": "3/3",
   "wave_id": "Q00087",
   "result_message": "localization(C): batch gate reconcile exact producer SHAs [AUTO:LOCALIZATION-LOCALIZATION_C-00416]",
+  "qa_batch_inputs": [
+    {"task_id":"LOCALIZATION-LOCALIZATION_E-00354","lane":"LOCALIZATION_E","result_sha":"4c129e50612d41d13a48020357ab5eb95b290fe6","result_message":"localization(E): guard index119 canonical source [AUTO:LOCALIZATION-LOCALIZATION_E-00354]","completed_at":"2026-10-01T19:57:46.883899+09:00","producer_id":"P00224","automation_validation":"PENDING","validation_mode":"C_BATCH_GATE"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00372","lane":"LOCALIZATION_B","result_sha":"73c1cc95fd64c0d45f486eba434bab25ddfc1b6f","result_message":"localization(B): advance source transport preflight 28 139 [AUTO:LOCALIZATION-LOCALIZATION_B-00372]","completed_at":"2026-10-01T19:57:46.883899+09:00","producer_id":"P00240","automation_validation":"PENDING","validation_mode":"C_BATCH_GATE"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00373","lane":"LOCALIZATION_A","result_sha":"c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463","result_message":"localization(A): add index54 source identity guard [AUTO:LOCALIZATION-LOCALIZATION_A-00373]","completed_at":"2026-10-01T19:57:46.883899+09:00","producer_id":"P00241","automation_validation":"PENDING","validation_mode":"C_BATCH_GATE"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00375","lane":"LOCALIZATION_B","result_sha":"678655ff48caeab8ac8e291bf84888b0d697d4f4","result_message":"localization(B): advance index220 canonical source geometry [AUTO:LOCALIZATION-LOCALIZATION_B-00375]","completed_at":"2026-10-01T19:57:46.883899+09:00","producer_id":"P00243","automation_validation":"PENDING","validation_mode":"C_BATCH_GATE"}
+  ],
   "qa_inputs": [
-    {"task_id":"LOCALIZATION-LOCALIZATION_E-00354","result_sha":"4c129e50612d41d13a48020357ab5eb95b290fe6","automation_validation":"PENDING"},
-    {"task_id":"LOCALIZATION-LOCALIZATION_B-00372","result_sha":"73c1cc95fd64c0d45f486eba434bab25ddfc1b6f","automation_validation":"PENDING"},
-    {"task_id":"LOCALIZATION-LOCALIZATION_A-00373","result_sha":"c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463","automation_validation":"PENDING"},
-    {"task_id":"LOCALIZATION-LOCALIZATION_B-00375","result_sha":"678655ff48caeab8ac8e291bf84888b0d697d4f4","automation_validation":"PENDING"}
+    {"task_id":"LOCALIZATION-LOCALIZATION_E-00354","result_sha":"4c129e50612d41d13a48020357ab5eb95b290fe6"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00372","result_sha":"73c1cc95fd64c0d45f486eba434bab25ddfc1b6f"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00373","result_sha":"c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00375","result_sha":"678655ff48caeab8ac8e291bf84888b0d697d4f4"}
   ],
   "automation_validation": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "failure_recovery": "added missing changed task record required by verify_c_batch_inputs.py from run 36870665454",
-  "created_at": "2026-10-01T22:45:00+09:00"
+  "failure_recovery": "run 36871167762 failed because qa_batch_inputs was missing; restored canonical C batch field",
+  "created_at": "2026-10-01T22:48:00+09:00"
 }
