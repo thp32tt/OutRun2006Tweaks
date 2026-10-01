@@ -75,7 +75,7 @@ required["state_persistence.no_destructive_empty_reset"] = state.get("destructiv
 required["state_persistence.daily_rollover_preserves_active_slots"] = state.get("daily_logical_date_rollover_preserves_active_slots") is True
 required["process_recovery.queue_exception_threshold"] = int(proc.get("repeated_identical_queue_exception_restart_threshold", 0)) == 3
 required["process_recovery.watchdog_exception_threshold"] = int(proc.get("repeated_identical_watchdog_exception_restart_threshold", 0)) == 3
-required["process_recovery.queue_heartbeat_fatal_seconds"] = int(proc.get("queue_heartbeat_fatal_seconds", 0)) == 300
+required["process_recovery.queue_heartbeat_fatal_seconds"] = int(proc.get("queue_heartbeat_fatal_seconds", 0)) == 180
 required["process_recovery.restart_owner"] = proc.get("restart_owner") == "DOCKER_UNLESS_STOPPED"
 
 expected_failures = {"failure","cancelled","timed_out","action_required","stale"}
