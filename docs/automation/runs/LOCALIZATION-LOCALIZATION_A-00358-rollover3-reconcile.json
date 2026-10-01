@@ -1,0 +1,91 @@
+{
+  "schema_version": 24,
+  "schema": "outrun-a00358-rollover3-durable-result-reconcile-v24",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00358",
+  "wave_id": "P00227",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "reconciled_at_kst": "2026-10-01T16:08:33+09:00",
+  "origin_controller_schema_version": 23,
+  "origin_controller_config_blob_sha": "0c6498a84619421a9c306354561b9e5a86645c8f",
+  "current_controller_schema_version": 24,
+  "current_controller_config_blob_sha": "7ecf4a40d91feb330425f3c6c38ca5411f0d98ca",
+  "current_canonical_contract_blob_sha": "874e79a51843a24e891776b6d13f1f292e06b5c7",
+  "refreshed_head_before_reconcile": "abd7d7b437a2245fc1c95bf9b22ac65884cd2f9b",
+  "authoritative_result_sha": "edc5c1ab68f1247e0a6561f0c2172b9f000a2aa4",
+  "result_binding_commit_sha": "e0310a8835f2260f9b77fec500b93e305dd86260",
+  "result_commit_message": "localization(A): record schema23 zero-runnable shard hold [AUTO:LOCALIZATION-LOCALIZATION_A-00358]",
+  "reconciliation_result": "TASK_ALREADY_DURABLE_NO_DUPLICATE_PRODUCER_WORK_STALE_SCHEMA23_REFRESHED_TO_SCHEMA24_Q00074_PASS",
+  "review_summary": "Rollover-3 refreshed authenticated GitHub HEAD abd7d7b4 and detected that the incoming schema23/config 0c6498a8 prompt is stale under current schema 24/config 7ecf4a40. Current dispatch_freshness requires stale prompt refresh, so this rollover is reinterpreted using current HEAD policy without changing ATTEMPT. The immutable A00358 result edc5c1ab... and binding commit e0310a88... are already durable and must not be re-executed. Latest shared QA authority remains C00356/Q00074 result 507a781c... with Gate PASS and runtime UNTESTED. A-owned indices159/198/201 remain QA-pending, A00351@index222 and A00352@index51 remain newer producer inputs awaiting independent C disposition, and index111 remains PREFLIGHT_ONLY with 5,734 unresolved pixels. No current C disposition opens an A-owned completion-tier item, so no DDS production, source acquisition, preflight expansion, shared-state mutation, or runtime testing is performed; this unique bookkeeping review record is the only change.",
+  "policy_refresh": {
+    "stale_origin_prompt_detected": true,
+    "stale_prompt_behavior": "REFRESH_CURRENT_HEAD_AND_REGENERATE_PROMPT",
+    "origin_schema": 23,
+    "current_schema": 24,
+    "durable_git_precedes_ui_recovery": true,
+    "completed_task_reexecution_forbidden": true,
+    "producer_skip_qa_pending_assets": true,
+    "candidate_completion_first_policy": "candidate_completion_first",
+    "shard_rule": "asset_queue.index % 3: A=0, B=1, E=2"
+  },
+  "current_authority": {
+    "latest_checked_c_task_id": "LOCALIZATION-LOCALIZATION_C-00356",
+    "latest_checked_c_batch": "Q00074",
+    "latest_c_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
+    "latest_c_validation_bearing_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
+    "latest_c_automation_validation": "PASS",
+    "latest_c_runtime_validation": "UNTESTED",
+    "a_owned_candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "a_newer_results_awaiting_c_not_repeated": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+        "index": 222,
+        "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
+        "index": 51,
+        "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b"
+      }
+    ],
+    "index111": "PREFLIGHT_ONLY_5734_UNRESOLVED",
+    "runnable_a_completion_tier": []
+  },
+  "producer_work_repeated": false,
+  "candidate_dds_modified": false,
+  "candidate_binary_persisted": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "material_change": false,
+  "review_record_only": true,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "evidence": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00358.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00358-rollover2-reconcile.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00356.json",
+    "localization/controller_roles.json",
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/progress/progress.json",
+    "localization/resume_state.json",
+    "localization/WORKLOG.md",
+    "localization/graphics/README.md",
+    "localization/graphics/ORIENTATION_POLICY.md"
+  ],
+  "note": "Conversation rollover does not increment ATTEMPT. Schema23 prompt/config was refreshed to current schema24 per dispatch_freshness. This reconciliation is bookkeeping/review only and does not replace immutable A00358 RESULT_SHA edc5c1ab68f1247e0a6561f0c2172b9f000a2aa4. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE. No real-game test was performed; RUNTIME_VALIDATION=UNTESTED."
+}
