@@ -1,5 +1,5 @@
 {
-  "schema_version": 28,
+  "schema_version": 29,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -226,7 +226,16 @@
       "live_page_url_reconciles_stale_registry": true,
       "c_blocked_inputs_remain_qa_pending": true,
       "qa_blocked_is_diagnostic_not_consumed": true,
-      "startup_requeues_legacy_qa_blocked_inputs": true
+      "startup_requeues_legacy_qa_blocked_inputs": true,
+      "qa_blocked_retry_backoff_seconds": [
+        300,
+        600,
+        1200,
+        1800
+      ],
+      "qa_blocked_retry_rotates_to_tail": true,
+      "qa_ready_selection_skips_backoff_items": true,
+      "qa_blocked_retry_does_not_block_other_ready_inputs": true
     },
     "state_persistence": {
       "atomic_primary_writes": true,
@@ -320,7 +329,13 @@
     "queue_mode_watchdog_role": "STATE_REARM_ONLY",
     "dispatch_confirmation_field": "dispatch_confirmed",
     "dispatch_started_at_field": "dispatch_started_at",
-    "qa_blocked_semantics": "DIAGNOSTIC_UNVALIDATED_INPUTS_REMAIN_PENDING"
+    "qa_blocked_semantics": "DIAGNOSTIC_UNVALIDATED_INPUTS_REMAIN_PENDING",
+    "qa_retry_fields": [
+      "qa_retry_count",
+      "qa_retry_not_before",
+      "last_qa_blocked_task_id",
+      "last_qa_blocked_at"
+    ]
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
