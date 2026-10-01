@@ -346,32 +346,31 @@ async def queue_handle_retry_surface(context: BrowserContext, pages: dict[str, P
             write_runtime(status="retry_wait", last_action=f"Rate-limit Retry for {active['task_id']} waiting for {guard}")
             return True
     else:
-        # Generic Retry is usually transient, but a persistent Retry surface must not
-        # refresh sent_at forever. Bound controlled clicks, then move the same TASK_ID
-        # to a fresh project chat without consuming a repair attempt.
+        # Generic Retry is usually transient. Repeated Retry must not create
+        # endless fresh chats. Keep the same TASK_ID/chat and open a cooldown circuit.
         if generic_clicks >= GENERIC_RETRY_ROLLOVER_CLICKS:
-            reason = (
-                f"Generic Retry remained visible after {generic_clicks} controlled clicks; "
-                "rolling the same task into a fresh project chat to break the retry loop."
-            )
-            active["failure_context"] = reason
-            if await queue_rollover_chat(context, pages, active, reason):
+            retry_until = _parse_iso(active.get("generic_retry_cooldown_until"))
+            if retry_until and now >= retry_until:
+                active["generic_retry_clicks"] = 0
+                active.pop("generic_retry_cooldown_until", None)
+                generic_clicks = 0
                 save_queue_state(q)
+            else:
+                if retry_until is None:
+                    retry_until = now + timedelta(seconds=GENERIC_RETRY_COOLDOWN_SECONDS)
+                    active["generic_retry_cooldown_until"] = retry_until.isoformat()
+                    active["failure_context"] = (
+                        f"Generic Retry remained visible after {generic_clicks} controlled clicks; "
+                        "preserving the same TASK_ID/chat and cooling down instead of opening another chat."
+                    )
+                    save_queue_state(q)
+                remaining = max(1, int((retry_until - now).total_seconds()))
                 write_runtime(
-                    status="generic_retry_rollover_sent",
-                    last_action=f"{active['task_id']} persistent Retry -> fresh chat rollover",
+                    status="generic_retry_circuit_wait",
+                    last_action=f"{active['task_id']} persistent Retry; same chat preserved, retry resumes in {remaining}s",
                     queue=active,
                 )
                 return True
-            if active.get("phase") == "BLOCKED":
-                save_queue_state(q)
-            else:
-                write_runtime(
-                    status="generic_retry_rollover_wait",
-                    last_action=f"{active['task_id']} persistent Retry waiting for fresh-chat rollover guard",
-                    queue=active,
-                )
-            return True
 
         last_click = _parse_iso(active.get("last_retry_click_at"))
         if last_click:
@@ -474,9 +473,30 @@ def assistant_claims_github_tooling_absent(text: str) -> bool:
 
 
 async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, Page], active: dict) -> bool:
+    now = datetime.now(TZ)
+    wait_until = _parse_iso(active.get("github_tooling_retry_until"))
+    if wait_until and now < wait_until:
+        remaining = max(1, int((wait_until - now).total_seconds()))
+        write_runtime(
+            status="github_tooling_circuit_wait",
+            last_action=f"{active['task_id']} GitHub plugin tooling recovery paused in same chat for {remaining}s",
+            queue=active,
+        )
+        return True
+    if wait_until and now >= wait_until:
+        active.pop("github_tooling_retry_until", None)
+        active["github_recovery_prompts"] = 0
+
     count = int(active.get("github_recovery_prompts", 0) or 0)
     if count >= GITHUB_ASSISTANT_RECOVERY_MAX:
-        return False
+        wait_until = now + timedelta(seconds=GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS)
+        active["github_tooling_retry_until"] = wait_until.isoformat()
+        write_runtime(
+            status="github_tooling_circuit_wait",
+            last_action=f"{active['task_id']} GitHub plugin recovery reached {count} attempts; same chat/task preserved for cooldown",
+            queue=active,
+        )
+        return True
 
     latest_head = github_branch_head(active["branch"])
     if not latest_head:
@@ -488,7 +508,6 @@ async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, P
             )
         return False
 
-    now = datetime.now(TZ)
     reg = load_registry(now)
     slot = next((s for s in reg.slots if s.name == active["slot"]), None)
     if slot is None:
@@ -1246,15 +1265,11 @@ async def localization_process_lane(
                 return
 
             if assistant_claims_github_tooling_absent(text):
-                reason = (
-                    "Assistant incorrectly treated GitHub plugin function/schema visibility as a tooling block. "
-                    "The connected GitHub plugin is required; roll the same TASK_ID to a fresh project chat and retry plugin discovery without consuming ATTEMPT."
+                active["failure_context"] = (
+                    "Assistant treated GitHub plugin function/schema visibility as a tooling block. "
+                    "Keep the same TASK_ID/chat; retry connected-plugin discovery without consuming ATTEMPT."
                 )
-                active["failure_context"] = reason
-                if await queue_rollover_chat(context, pages, active, reason):
-                    save_queue_state(q)
-                    return
-                if active.get("phase") == "BLOCKED":
+                if await queue_send_github_recovery(context, pages, active):
                     save_queue_state(q)
                     return
             if assistant_claims_github_unavailable(text):
@@ -2196,15 +2211,11 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         task_commit = github_find_task_commit(active["branch"], active["task_id"])
         if not task_commit:
             if assistant_claims_github_tooling_absent(text):
-                reason = (
-                    "Assistant incorrectly treated GitHub plugin function/schema visibility as a tooling block. "
-                    "The connected GitHub plugin is required; roll the same TASK_ID to a fresh project chat and retry plugin discovery without consuming ATTEMPT."
+                active["failure_context"] = (
+                    "Assistant treated GitHub plugin function/schema visibility as a tooling block. "
+                    "Keep the same TASK_ID/chat; retry connected-plugin discovery without consuming ATTEMPT."
                 )
-                active["failure_context"] = reason
-                if await queue_rollover_chat(context, pages, active, reason):
-                    save_queue_state(q)
-                    return
-                if active.get("phase") == "BLOCKED":
+                if await queue_send_github_recovery(context, pages, active):
                     save_queue_state(q)
                     return
             if assistant_claims_github_unavailable(text):
