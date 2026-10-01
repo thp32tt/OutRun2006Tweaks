@@ -438,7 +438,7 @@ async def queue_send_same_chat_control_message(
     slot = next((s for s in reg.slots if s.name == active["slot"]), None)
     if slot is None:
         return False
-    guard = send_guard_reason(reg, slot, now)
+    guard = same_task_control_send_guard_reason(reg, slot, now)
     if guard:
         write_runtime(
             status=f"{status}_wait",
