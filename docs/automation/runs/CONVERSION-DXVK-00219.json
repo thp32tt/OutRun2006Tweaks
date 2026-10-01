@@ -1,0 +1,72 @@
+{
+  "task_id": "CONVERSION-DXVK-00219",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 1,
+  "base_sha": "07f9924385145164bb39cf5c4baab4d8a344cf54",
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R219_1824AB_CONTROL_FLOW_CAPTURE_EDGE",
+  "selection_reason": "CONVERSION-DXVK-00217 captured exact replacement-EXE bytes for 0x001824AB..0x001824EB and explicitly named bounded exact-decode of complete instructions from 0x001824AB as the next independent F13 action.",
+  "summary": "ATTEMPT=1 implementation staged. Exact-decode complete instructions from the R217-proven 64-byte window only; preserve the trailing e8 at 0x001824EA as an incomplete rel32 CALL capture edge. No runtime/provider/selector/renderer behavior is modified.",
+  "evidence": [
+    "R217 exact provenance bytes are immutable input for this task: e8 5e 46 00 00 83 78 28 01 7e 13 68 03 01 00 00 ff 74 24 08 50 e8 41 44 00 00 83 c4 0c c3 8b 40 48 8b 4c 24 04 0f b7 04 48 25 03 01 00 00 c3 e8 0d 37 00 00 8b 40 64 3b 05 5c 5e 73 00 74 05 e8.",
+    "Decoder proves only complete instructions through exclusive 0x001824EA; the final byte e8 at 0x001824EA remains an incomplete rel32 CALL and no target is inferred.",
+    "Expected exact branches are 0x001824B4->0x001824C9 and 0x001824E8->0x001824EF; only 0x001824C9 is inside the proven capture and required to be an instruction boundary.",
+    "Expected exact calls are 0x001824AB->0x00186B0E, 0x001824C0->0x00186906 and 0x001824DA->0x00185BEC; all must also exist in R217 raw rel32 provenance.",
+    "R215 predecessor branch 0x001824A9->0x001824B0 is used only to prove the incoming 0x001824B0 instruction boundary. Function/callee/render/HUD semantics remain unresolved.",
+    "No Quest 3/VDXR or in-game execution is part of this static proof; runtime_validation remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00219.json"
+  ],
+  "proof_contract": {
+    "predecessor_provenance_status": "EXACT_EXE_1824AB_TO_1824EB_PROVENANCE_CAPTURED",
+    "predecessor_control_flow_status": "EXACT_18246D_TO_1824AB_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "start_rva": "0x001824AB",
+    "prefix_end_rva": "0x001824EA",
+    "capture_end_rva": "0x001824EB",
+    "incomplete_rva": "0x001824EA",
+    "incomplete_bytes": "e8",
+    "expected_status": "EXACT_1824AB_TO_1824EA_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "expected_calls": [
+      "0x001824AB->0x00186B0E",
+      "0x001824C0->0x00186906",
+      "0x001824DA->0x00185BEC"
+    ],
+    "expected_branches": [
+      "0x001824B4->0x001824C9",
+      "0x001824E8->0x001824EF"
+    ],
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_AND_CAPTURE_EDGE_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE_UNCHANGED",
+  "review_lenses": {
+    "architecture": "Analyzer/verifier only; no renderer/provider/selector/package/transport/backend activation behavior changes.",
+    "ownership": "Exact instruction/control-flow proof does not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Proof fails closed unless R217 provenance and R215 predecessor control-flow remain exact, all 18 complete instruction bytes match, branch/call targets match, all three calls are present in raw provenance, RET/post-RET boundaries are exact, and the final 0x001824EA e8 remains an incomplete capture edge."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_1824AB_FRESH_PROVENANCE_CAPTURED",
+    "after": "PENDING_1824AB_CONTROL_FLOW_CAPTURE_EDGE_PROOF",
+    "runtime_claim": false
+  },
+  "blocker": "The R217 window ends one byte into a rel32 CALL at 0x001824EA. Its displacement/target and all instruction boundaries beyond 0x001824EB remain unresolved pending a future fresh overlapping provenance capture.",
+  "next_action": "Run exact-source GitHub Actions validation. If PASS, update this record in a separate CI-skipped bookkeeping commit with the validation-bearing result SHA, exact decode evidence and workflow run evidence. Runtime remains UNTESTED."
+}
