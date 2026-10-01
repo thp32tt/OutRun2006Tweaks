@@ -6,8 +6,8 @@ import pathlib
 root = pathlib.Path(__file__).resolve().parents[2]
 cfg = json.loads((root / "localization" / "controller_roles.json").read_text(encoding="utf-8"))
 
-if int(cfg.get("schema_version", 0)) < 31:
-    raise SystemExit("controller_roles schema_version must be >= 31")
+if int(cfg.get("schema_version", 0)) < 32:
+    raise SystemExit("controller_roles schema_version must be >= 32")
 
 rr = cfg.get("runtime_recovery") or {}
 wa = rr.get("wait_actions") or {}
@@ -29,6 +29,8 @@ required = {
     "wait_actions.retry_increments_attempt": wa.get("retry_increments_attempt") is True,
     "wait_actions.ci_failure_consumes_chat_rollover": wa.get("ci_failure_consumes_chat_rollover") is False,
     "conversation_rollover.applies_to_ci_failure": cr.get("applies_to_ci_failure") is False,
+    "conversation_rollover.max_rollovers_per_task": int(cr.get("max_rollovers_per_task", 0)) == 2,
+    "conversation_rollover.new_task_chat_policy": cr.get("new_task_chat_policy") == "BOUNDED_REUSE_COMPLETED_CHAT",
     "watchdog.observe_only_allowed_for_wait_actions": wd.get("observe_only_allowed_for_wait_actions") is False,
     "watchdog.queue_idle_rearm_seconds": int(wd.get("queue_idle_rearm_seconds", 9999)) <= 90,
     "watchdog.queue_idle_requires_unfinished_work": wd.get("queue_idle_requires_unfinished_work") is True,
@@ -48,6 +50,16 @@ required = {
     "continuous_progression.lane_exception_block_threshold": int(cp.get("lane_exception_block_threshold", 0)) == 3,
     "continuous_progression.dispatch_exception_backoff_max_seconds": int(cp.get("dispatch_exception_backoff_max_seconds", 0)) == 300,
     "continuous_progression.browser_transport_failure_global_restart": cp.get("browser_transport_failure_global_restart") is True,
+    "continuous_progression.previous_task_ui_must_settle_before_next_send": cp.get("previous_task_ui_must_settle_before_next_send") is True,
+    "continuous_progression.previous_task_ui_settle_seconds": int(cp.get("previous_task_ui_settle_seconds", 0)) == 180,
+    "continuous_progression.bounded_chat_reuse": cp.get("bounded_chat_reuse") is True,
+    "continuous_progression.chat_reuse_max_tasks": int(cp.get("chat_reuse_max_tasks", 0)) == 4,
+    "continuous_progression.chat_reuse_max_age_minutes": int(cp.get("chat_reuse_max_age_minutes", 0)) == 90,
+    "continuous_progression.github_transient_errors_never_consume_task_attempt": cp.get("github_transient_errors_never_consume_task_attempt") is True,
+    "continuous_progression.github_transient_errors_never_trigger_chat_rollover": cp.get("github_transient_errors_never_trigger_chat_rollover") is True,
+    "continuous_progression.github_transient_retry_forever_across_cycles": cp.get("github_transient_retry_forever_across_cycles") is True,
+    "continuous_progression.github_transient_internal_retry_delays": cp.get("github_transient_internal_retry_delays") == [2,5,10,20],
+    "continuous_progression.github_transient_cooldown_seconds": int(cp.get("github_transient_cooldown_seconds", 0)) == 60,
     "continuous_progression.qa_pending_unconsumed_never_truncated": cp.get("qa_pending_unconsumed_never_truncated") is True,
     "startup_reconcile.enabled": sr.get("enabled") is True,
     "startup_reconcile.refresh_branch_head_first": sr.get("refresh_branch_head_first") is True,
@@ -66,17 +78,27 @@ required = {
     "runtime_tuning.memory_fatal_restart_percent": int(rt.get("memory_fatal_restart_percent", 0)) == 92,
     "runtime_tuning.queue_next_task_delay_seconds": int(rt.get("queue_next_task_delay_seconds", 9999)) <= 30,
     "runtime_tuning.parallel_lane_stagger_seconds": int(rt.get("parallel_lane_stagger_seconds", 9999)) <= 45,
-    "runtime_tuning.parallel_distinct_slot_send_gap_seconds": int(rt.get("parallel_distinct_slot_send_gap_seconds", 9999)) <= 60,
+    "runtime_tuning.parallel_distinct_slot_send_gap_seconds": int(rt.get("parallel_distinct_slot_send_gap_seconds", 0)) == 30,
     "runtime_tuning.localization_qa_batch_size": int(rt.get("localization_qa_batch_size", 0)) == 4,
     "runtime_tuning.localization_qa_coalesce_seconds": int(rt.get("localization_qa_coalesce_seconds", 9999)) <= 60,
-    "runtime_tuning.localization_same_slot_send_gap_seconds": int(rt.get("localization_same_slot_send_gap_seconds", 9999)) <= 30,
+    "runtime_tuning.localization_same_slot_send_gap_seconds": int(rt.get("localization_same_slot_send_gap_seconds", 0)) == 90,
     "runtime_tuning.localization_slot_dedup_seconds": int(rt.get("localization_slot_dedup_seconds", 9999)) <= 30,
+    "runtime_tuning.fresh_chat_each_task": rt.get("fresh_chat_each_task") is False,
+    "runtime_tuning.chat_reuse_max_tasks": int(rt.get("chat_reuse_max_tasks", 0)) == 4,
+    "runtime_tuning.chat_reuse_max_age_minutes": int(rt.get("chat_reuse_max_age_minutes", 0)) == 90,
+    "runtime_tuning.previous_task_ui_settle_seconds": int(rt.get("previous_task_ui_settle_seconds", 0)) == 180,
+    "runtime_tuning.max_chat_rollovers_per_task": int(rt.get("max_chat_rollovers_per_task", 0)) == 2,
+    "runtime_tuning.github_transient_retry_delays": rt.get("github_transient_retry_delays") == [2,5,10,20],
+    "runtime_tuning.github_transient_cooldown_seconds": int(rt.get("github_transient_cooldown_seconds", 0)) == 60,
     "runtime_observability.queue_loop_heartbeat_seconds": int(obs.get("queue_loop_heartbeat_seconds", 9999)) <= 15,
     "runtime_observability.heartbeat_stale_after_seconds": int(obs.get("heartbeat_stale_after_seconds", 9999)) <= 45,
     "runtime_observability.heartbeat_fatal_after_seconds": int(obs.get("heartbeat_fatal_after_seconds", 0)) == 180,
     "runtime_observability.runtime_asset_validation": obs.get("runtime_asset_validation") == "FAIL_FAST_BEFORE_BROWSER_DISPATCH",
     "runtime_observability.health_endpoint": obs.get("health_endpoint") == "/healthz",
     "runtime_observability.health_includes_memory_pressure": obs.get("health_includes_memory_pressure") is True,
+    "runtime_observability.task_chat_lifecycle": obs.get("task_chat_lifecycle") == "BOUNDED_REUSE_4_TASKS_OR_90_MINUTES",
+    "runtime_observability.previous_task_ui_settle_status": obs.get("previous_task_ui_settle_status") == "previous_task_ui_settle_wait",
+    "runtime_observability.github_transient_status": obs.get("github_transient_status") == "github_retry_wait",
     "runtime_observability.qa_pending_retention": obs.get("qa_pending_retention") == "UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA",
     "runtime_observability.active_state_source_of_truth": obs.get("active_state_source_of_truth") == "active_by_lane",
     "runtime_observability.queue_active_semantics": obs.get("queue_active_semantics") == "derived_summary_with_independent_qa",
