@@ -386,7 +386,7 @@ namespace OutRunVRStereo
         {
             if (!device)
                 return false;
-            if (R31StateBlockTrackingReliable.load(std::memory_order_acquire))
+            if (OutRunVR::State::StateBlockTracker::Reliable())
                 return R31GetSavedViewport(device, viewport);
             return SUCCEEDED(device->GetViewport(&viewport));
         }
@@ -422,7 +422,7 @@ namespace OutRunVRStereo
 
             bool fragile = true;
             const bool stateBlocksReliable =
-                R31StateBlockTrackingReliable.load(std::memory_order_acquire);
+                OutRunVR::State::StateBlockTracker::Reliable();
             const bool effectKnown = stateBlocksReliable
                 ? R29FragileEffectCached(device, fragile)
                 : R32EffectIsFragileLive(device, fragile);
@@ -575,7 +575,7 @@ namespace OutRunVRStereo
             if (R31StateBlockRecording || !R29StableStereoBase(device) ||
                 screenKind == R30ScreenSpaceKind::None)
                 return {};
-            if (!R31StateBlockTrackingReliable.load(std::memory_order_acquire))
+            if (!OutRunVR::State::StateBlockTracker::Reliable())
             {
                 R31DiscardUnreliableDrawCaches();
                 const std::uintptr_t cachedShader =
@@ -1218,8 +1218,8 @@ namespace OutRunVRStereo
                 R32Counters.lastLogMs = now;
                 R32Counters.liveWvp = R31FastWorldLiveValidations;
                 R32Counters.liveReject = R31FastWorldValidationRejects;
-                R32Counters.stateRecord = R31StateBlockRecordings;
-                R32Counters.stateApply = R31StateBlockApplies;
+                R32Counters.stateRecord = OutRunVR::State::StateBlockTracker::RecordingGeneration();
+                R32Counters.stateApply = OutRunVR::State::StateBlockTracker::ApplyGeneration();
                 R32Counters.batch = R32BatchWvpUploads;
                 R32Counters.batchFail = R32BatchWvpFailures;
                 R32Counters.stateFail = R32StateSnapshotFailures;
@@ -1281,8 +1281,8 @@ namespace OutRunVRStereo
                 R32PerfWindowCounters.maxParticleLikePrimitives,
                 R31FastWorldLiveValidations - R32Counters.liveWvp,
                 R31FastWorldValidationRejects - R32Counters.liveReject,
-                R31StateBlockRecordings - R32Counters.stateRecord,
-                R31StateBlockApplies - R32Counters.stateApply,
+                OutRunVR::State::StateBlockTracker::RecordingGeneration() - R32Counters.stateRecord,
+                OutRunVR::State::StateBlockTracker::ApplyGeneration() - R32Counters.stateApply,
                 R32BatchWvpUploads - R32Counters.batch,
                 R32BatchWvpFailures - R32Counters.batchFail,
                 R32StateSnapshotFailures - R32Counters.stateFail,
@@ -1304,8 +1304,8 @@ namespace OutRunVRStereo
             R32Counters.lastLogMs = now;
             R32Counters.liveWvp = R31FastWorldLiveValidations;
             R32Counters.liveReject = R31FastWorldValidationRejects;
-            R32Counters.stateRecord = R31StateBlockRecordings;
-            R32Counters.stateApply = R31StateBlockApplies;
+            R32Counters.stateRecord = OutRunVR::State::StateBlockTracker::RecordingGeneration();
+            R32Counters.stateApply = OutRunVR::State::StateBlockTracker::ApplyGeneration();
             R32Counters.batch = R32BatchWvpUploads;
             R32Counters.batchFail = R32BatchWvpFailures;
             R32Counters.stateFail = R32StateSnapshotFailures;

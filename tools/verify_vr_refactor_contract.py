@@ -18,6 +18,7 @@ r22 = text("src/vr/d3d9/stereo_renderer_r22.cpp")
 r23 = text("src/vr/d3d9/stereo_renderer_r23.cpp")
 r26 = text("src/vr/d3d9/stereo_renderer_r26.cpp")
 r31 = text("src/vr/d3d9/stereo_renderer_r31.cpp")
+r32 = text("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = text("src/vr/d3d9/stereo_renderer_r33.cpp")
 draw_class = text("src/vr/render/draw_class.hpp")
 raster = text("src/vr/state/d3d9_raster_state.hpp")
@@ -86,14 +87,16 @@ for rel, source in (
     if '../state/state_block_tracker.hpp' not in source:
         errors.append(f"{rel} missing neutral StateBlockTracker include")
 
-if "R31StateBlockTrackingReliable" in r33:
-    errors.append(
-        "R33 regained removed R31 StateBlock reliability dependency")
+for rel, source in (("R32", r32), ("R33", r33)):
+    if "R31StateBlockTrackingReliable" in source:
+        errors.append(
+            f"{rel} regained removed R31 StateBlock reliability dependency")
 
 for banned in ("R31StateBlockRecordings", "R31StateBlockApplies"):
-    if banned in r33:
-        errors.append(
-            f"R33 regained R31 StateBlock generation dependency: {banned}")
+    for rel, source in (("R32", r32), ("R33", r33)):
+        if banned in source:
+            errors.append(
+                f"{rel} regained R31 StateBlock generation dependency: {banned}")
     if banned in r31:
         errors.append(
             f"R31 retained migrated StateBlock generation owner: {banned}")

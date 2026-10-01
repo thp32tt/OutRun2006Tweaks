@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-01T11:38:00+09:00",
+  "updatedKst": "2026-10-01T11:44:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 17,
+  "cycle": 18,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -22,9 +22,10 @@
     "VR-REFACTOR-STATE-0002A-FIX00",
     "VR-REFACTOR-STATE-0002A-FIX01",
     "VR-REFACTOR-STATE-0003A",
-    "VR-REFACTOR-STATE-0003A-FIX00"
+    "VR-REFACTOR-STATE-0003A-FIX00",
+    "VR-REFACTOR-STATE-0003A-FIX01B"
   ],
-  "next": "Validate 0003A-FIX00 with DX9Ex Active Validation; if green, review/migrate R31StateBlockRecording authority as VR-REFACTOR-STATE-0003B before any physical hook consolidation.",
+  "next": "Validate R32 neutral StateBlock reliability/generation migration, then perform VR-REFACTOR-STATE-0003B recording-state authority migration across R31/R32/R33/R34; afterwards remove renderer->stereo StateBlock status exports before physical hook consolidation.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -34,7 +35,8 @@
     "FIX00 restored StateBlockTracker to src/vr/state, added explicit R31Reliable(), and added verifier required-file/API/misplaced-copy guards.",
     "FIX01 replaced the removed R31 StateBlock reliability references in R33 with StateBlockTracker::Reliable().",
     "VR-REFACTOR-STATE-0003A moved StateBlock recording/apply monotonic generations from R31 globals into neutral StateBlockTracker; R33 now depends only on the neutral generation API. R31StateBlockRecording remains intentionally deferred to 0003B.",
-    "VR-REFACTOR-STATE-0003A-FIX00 removed the final stale R22StateBlockTrackingReliable compile reference and added a deterministic verifier guard."
+    "VR-REFACTOR-STATE-0003A-FIX00 removed the final stale R22StateBlockTrackingReliable compile reference and added a deterministic verifier guard.",
+    "200-cycle review loop checkpoint 100/200: R32 was the remaining full-chain consumer of removed R31 StateBlock reliability and generation globals; migrated those reads to StateBlockTracker and guarded recurrence."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0003A_FIX00_APPLIED_CI_PENDING"
+  "batchStatus": "VR-REFACTOR-STATE-0003A_FIX01B_APPLIED_CI_PENDING"
 }
