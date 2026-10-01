@@ -74,8 +74,8 @@
   "retry_required": false,
   "self_qa": "PASS_B_MOD3__NO_READY_TIERS__ZERO_CANDIDATE_EXCEPTION_ONE_PREFLIGHT_BATCH__DRIVE_EXACT_MISS__PINNED_ARCHIVE_IDENTITY_EXACT__INDEX230_DIRECT_RELEASE_SAME_BLOB_SOURCE_IDENTITY_MISMATCH__INDEX236_DIRECT_RELEASE_SAME_BLOB_CANONICAL_EXACT__RGBA32_2048X2048_MIP1_FLIP_Y__15_OF_15_CURRENT_SEMANTIC_BINDINGS__511728_OF_511728_VISIBLE_ALPHA_MASKED__ZERO_OUTSIDE_MASK__ZERO_ALPHA_ESCAPE__ZERO_VISIBLE_ALPHA_AFTER_CLEAN_PLATE__NO_SHARED_STATE__RUNTIME_UNTESTED",
   "previous_result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
-  "result_sha": "PENDING_POST_COMMIT",
-  "authoritative_result_sha": "PENDING_POST_COMMIT",
+  "result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513",
+  "authoritative_result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(B): advance index230/236 canonical source preflight [AUTO:LOCALIZATION-LOCALIZATION_B-00353]",
   "durable_task_record_in_result_commit": true,
@@ -85,7 +85,7 @@
     "head_message": "chore(localization): bind B00347 schema22 result SHA [AUTO:LOCALIZATION-LOCALIZATION_B-00347] [skip ci]",
     "peer_commits_preserved": true
   },
-  "bookkeeping_note": "Result commit is the durable producer output. Producer AUTOMATION_VALIDATION remains PENDING and final authority belongs to a later C_BATCH_GATE. Record immutable RESULT_SHA in a separate bookkeeping commit without changing material evidence; do not wait for an individual producer Actions Gate.",
-  "bookkeeping_base_result_sha": null,
-  "bookkeeping_head_before_update": null
+  "bookkeeping_note": "Immutable producer result SHA bound after persistence. The result commit contains the exact AUTO marker and lane-local material evidence/task record atomically. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit is CI-skipped and is not the material producer result.",
+  "bookkeeping_base_result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513",
+  "bookkeeping_head_before_update": "ff18b8aa855da74e0f1070661ff0462a53f58513"
 }
