@@ -115,7 +115,9 @@ CHAT_REUSE_MAX_AGE_MINUTES = max(15, int(os.getenv("CHAT_REUSE_MAX_AGE_MINUTES",
 PREVIOUS_TASK_UI_SETTLE_SECONDS = max(30, int(os.getenv("PREVIOUS_TASK_UI_SETTLE_SECONDS", "180")))
 RETRY_BUTTON_COOLDOWN_SECONDS = max(10, int(os.getenv("RETRY_BUTTON_COOLDOWN_SECONDS", "45")))
 GENERIC_RETRY_ROLLOVER_CLICKS = max(1, int(os.getenv("GENERIC_RETRY_ROLLOVER_CLICKS", "2")))
+GENERIC_RETRY_COOLDOWN_SECONDS = max(60, int(os.getenv("GENERIC_RETRY_COOLDOWN_SECONDS", "300")))
 GITHUB_ASSISTANT_RECOVERY_MAX = max(1, int(os.getenv("GITHUB_ASSISTANT_RECOVERY_MAX", "2")))
+GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS = max(60, int(os.getenv("GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS", "300")))
 PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
 STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "true"
 THINKING_VERIFY_FAILURE_RESTART_THRESHOLD = max(2, int(os.getenv("THINKING_VERIFY_FAILURE_RESTART_THRESHOLD", "4")))
@@ -333,7 +335,9 @@ runtime = {
     "previous_task_ui_settle_seconds": PREVIOUS_TASK_UI_SETTLE_SECONDS,
     "retry_button_cooldown_seconds": RETRY_BUTTON_COOLDOWN_SECONDS,
     "generic_retry_rollover_clicks": GENERIC_RETRY_ROLLOVER_CLICKS,
+    "generic_retry_cooldown_seconds": GENERIC_RETRY_COOLDOWN_SECONDS,
     "github_assistant_recovery_max": GITHUB_ASSISTANT_RECOVERY_MAX,
+    "github_tooling_retry_cooldown_seconds": GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS,
     "rate_limit_attempts": 0,
     "rate_limit_until": None,
 }
