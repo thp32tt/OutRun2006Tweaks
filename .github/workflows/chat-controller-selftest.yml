@@ -55,6 +55,15 @@ jobs:
           grep -Fq 'Docker restart policy can recover' /tmp/controller.py
           test "$(grep -Fc 'if is_browser_transport_failure(e):' /tmp/controller.py)" -ge 3
 
+      - name: Verify bounded generic Retry recovery
+        run: |
+          grep -Fq 'GENERIC_RETRY_ROLLOVER_CLICKS: "2"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'GENERIC_RETRY_ROLLOVER_CLICKS: "2"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'generic_retry_clicks' /tmp/controller.py
+          grep -Fq 'persistent Retry -> fresh chat rollover' /tmp/controller.py
+          grep -Fq 'rolling the same task into a fresh project chat to break the retry loop' /tmp/controller.py
+          test "$(grep -Fc 'queue_handle_retry_surface(context, pages, page, reg, slot, active, q)' /tmp/controller.py)" -eq 2
+
       - name: Verify queue prompt files
         run: |
           test -s tools/chat-controller/v0.4/conversion_dx11.md

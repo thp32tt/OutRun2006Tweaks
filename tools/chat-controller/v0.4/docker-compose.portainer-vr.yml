@@ -41,6 +41,7 @@ services:
       STRICT_THINKING_LEVEL: "true"
       FRESH_CHAT_EACH_RUN: "false"
       RETRY_BUTTON_COOLDOWN_SECONDS: "45"
+      GENERIC_RETRY_ROLLOVER_CLICKS: "2"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
       STATUS_PORT: "8787"
       NOVNC_PUBLIC_URL: "http://192.168.0.48:6080/vnc.html"

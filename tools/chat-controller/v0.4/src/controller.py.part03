@@ -146,6 +146,9 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     active["sent_at"] = sent_at.isoformat()
     active["last_hash"] = None
     active["last_hash_changed_at"] = sent_at.isoformat()
+    active["generic_retry_clicks"] = 0
+    active["last_retry_click_at"] = None
+    active["last_retry_backoff_at"] = None
     active["phase"] = "WAIT_CHAT"
     slot.last_sent_at = sent_at.isoformat()
     slot.last_assistant_hash = None
@@ -161,7 +164,7 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     return True
 
 
-async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, active: dict, q: dict) -> bool:
+async def queue_handle_retry_surface(context: BrowserContext, pages: dict[str, Page], page: Page, reg: Registry, slot: Slot, active: dict, q: dict) -> bool:
     """Serialize Retry handling while distinguishing real rate pressure from generic transient Retry."""
     retry = await first_visible(page, RETRY_SELECTORS, total_wait_ms=500)
     if retry is None:
@@ -170,6 +173,7 @@ async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, acti
     now = datetime.now(TZ)
     retry_text = await retry_surface_text(page)
     is_rate = any(re.search(p, retry_text, flags=re.I | re.S) for p in RATE_LIMIT_PATTERNS)
+    generic_clicks = int(active.get("generic_retry_clicks", 0) or 0)
 
     if is_rate:
         if rate_limit_active(reg, now):
@@ -197,7 +201,33 @@ async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, acti
             write_runtime(status="retry_wait", last_action=f"Rate-limit Retry for {active['task_id']} waiting for {guard}")
             return True
     else:
-        # Generic Retry is usually a transient generation/UI failure. Keep it fast.
+        # Generic Retry is usually transient, but a persistent Retry surface must not
+        # refresh sent_at forever. Bound controlled clicks, then move the same TASK_ID
+        # to a fresh project chat without consuming a repair attempt.
+        if generic_clicks >= GENERIC_RETRY_ROLLOVER_CLICKS:
+            reason = (
+                f"Generic Retry remained visible after {generic_clicks} controlled clicks; "
+                "rolling the same task into a fresh project chat to break the retry loop."
+            )
+            active["failure_context"] = reason
+            if await queue_rollover_chat(context, pages, active, reason):
+                save_queue_state(q)
+                write_runtime(
+                    status="generic_retry_rollover_sent",
+                    last_action=f"{active['task_id']} persistent Retry -> fresh chat rollover",
+                    queue=active,
+                )
+                return True
+            if active.get("phase") == "BLOCKED":
+                save_queue_state(q)
+            else:
+                write_runtime(
+                    status="generic_retry_rollover_wait",
+                    last_action=f"{active['task_id']} persistent Retry waiting for fresh-chat rollover guard",
+                    queue=active,
+                )
+            return True
+
         last_click = _parse_iso(active.get("last_retry_click_at"))
         if last_click:
             age = (now - last_click).total_seconds()
@@ -216,6 +246,8 @@ async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, acti
         request_now = datetime.now(TZ)
         note_successful_request(reg, request_now, slot.name)
         active["last_retry_click_at"] = request_now.isoformat()
+        if not is_rate:
+            active["generic_retry_clicks"] = generic_clicks + 1
         active["sent_at"] = request_now.isoformat()
         active["last_hash"] = None
         active["last_hash_changed_at"] = request_now.isoformat()
@@ -554,7 +586,7 @@ async def localization_process_lane(
         page = await slot_page(context, pages, slot)
 
         if active["phase"] == "WAIT_CHAT":
-            if await queue_handle_retry_surface(page, reg, slot, active, q):
+            if await queue_handle_retry_surface(context, pages, page, reg, slot, active, q):
                 return
 
             if not slot.url or not is_project_scoped_chat_url(slot.url):
@@ -597,6 +629,7 @@ async def localization_process_lane(
             clear_rate_limit_after_response(reg)
             active["last_retry_backoff_at"] = None
             active["last_retry_click_at"] = None
+            active["generic_retry_clicks"] = 0
             h = stable_hash(text)
             changed_at = _parse_iso(active.get("last_hash_changed_at")) or now
             if h != active.get("last_hash"):
@@ -1125,7 +1158,7 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             )
             return
 
-        if await queue_handle_retry_surface(page, reg, slot, active, q):
+        if await queue_handle_retry_surface(context, pages, page, reg, slot, active, q):
             return
         if not slot.url or not is_project_scoped_chat_url(slot.url):
             reason = "Active task chat URL is missing or outside the configured project after restart/project-scope reconciliation."
@@ -1163,6 +1196,7 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         clear_rate_limit_after_response(reg)
         active["last_retry_backoff_at"] = None
         active["last_retry_click_at"] = None
+        active["generic_retry_clicks"] = 0
         h = stable_hash(text)
         changed_at = _parse_iso(active.get("last_hash_changed_at")) or now
         if h != active.get("last_hash"):

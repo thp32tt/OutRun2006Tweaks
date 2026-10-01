@@ -97,6 +97,7 @@ MIN_SEND_GAP_SECONDS = max(0, int(os.getenv("MIN_SEND_GAP_SECONDS", "45")))
 SLOT_DEDUP_SECONDS = max(0, int(os.getenv("SLOT_DEDUP_SECONDS", "120")))
 FRESH_CHAT_EACH_RUN = os.getenv("FRESH_CHAT_EACH_RUN", "true").lower() == "true"
 RETRY_BUTTON_COOLDOWN_SECONDS = max(10, int(os.getenv("RETRY_BUTTON_COOLDOWN_SECONDS", "45")))
+GENERIC_RETRY_ROLLOVER_CLICKS = max(1, int(os.getenv("GENERIC_RETRY_ROLLOVER_CLICKS", "2")))
 PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
 STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "true"
 PROFILE_DIR = Path("/data/browser-profile")
@@ -281,6 +282,7 @@ runtime = {
     "slot_dedup_seconds": SLOT_DEDUP_SECONDS,
     "fresh_chat_each_run": FRESH_CHAT_EACH_RUN,
     "retry_button_cooldown_seconds": RETRY_BUTTON_COOLDOWN_SECONDS,
+    "generic_retry_rollover_clicks": GENERIC_RETRY_ROLLOVER_CLICKS,
     "rate_limit_attempts": 0,
     "rate_limit_until": None,
 }

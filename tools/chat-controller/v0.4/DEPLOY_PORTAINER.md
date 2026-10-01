@@ -192,6 +192,7 @@ The localization stack now uses these controller-runtime values directly:
 - scheduler heartbeat: 15s
 - active-generation busy-stall protection: 30m
 - explicit rate-limit backoff: 90/180/300/600s
+- generic Retry: at most 2 controlled clicks, then same TASK_ID rolls over to a fresh project chat
 
 On startup, persisted nonterminal queue records are reconciled. WAIT_ACTIONS poll guards are cleared so the next queue cycle checks the stored GitHub Actions run ID directly. A failed terminal run retries the same TASK_ID while retry budget remains, after refreshing the current target-branch HEAD.
 
