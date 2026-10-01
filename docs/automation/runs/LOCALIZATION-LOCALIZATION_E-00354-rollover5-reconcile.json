@@ -1,0 +1,80 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-e00354-rollover5-existing-durable-result-reconcile-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_E-00354",
+  "lane": "LOCALIZATION_E",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "recorded_at_kst": "2026-10-01T18:05:58+09:00",
+  "controller_schema_version": 30,
+  "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "canonical_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+  "base_head_sha": "1e9fd11fd253928d68246d52ac520393780aadca",
+  "result": "ROLLOVER_RECONCILED_EXISTING_DURABLE_RESULT_NO_REEXECUTION",
+  "summary": "Rollover5 refreshed the current GitHub HEAD and schema30 controller/canonical contract, then verified that E00354 had already completed durably before this conversation resumed. Producer result 4c129e50612d41d13a48020357ab5eb95b290fe6 contains the exact required [AUTO:LOCALIZATION-LOCALIZATION_E-00354] token and the index119 canonical-source acquisition/identity-guard evidence. Contract next_task_after=OWN_DURABLE_COMMIT and anti-duplication rules therefore forbid repeating producer work. No DDS, shared state, peer-lane state, runtime claim, source probe, N100/local clone, Google Drive reprobe, or VR/FFB/DX work is repeated.",
+  "authoritative_result": {
+    "result_sha": "4c129e50612d41d13a48020357ab5eb95b290fe6",
+    "result_commit_message": "localization(E): guard index119 canonical source [AUTO:LOCALIZATION-LOCALIZATION_E-00354]",
+    "task_record_path": "docs/automation/runs/LOCALIZATION-LOCALIZATION_E-00354.json",
+    "task_record_blob_sha": "e43ddb38e4fb5b1d99a9a42e7b29c40df1013c49",
+    "material_report": "localization/graphics/role_E/20261001-E00354-P00224/E00354_P00224_INDEX119_SOURCE_ACQUISITION_REPORT.json",
+    "verifier": "localization/graphics/role_E/20261001-E00354-P00224/verify_index119_canonical_source.py",
+    "selected_index": 119,
+    "asset": "F6811E94",
+    "source_outcome": "SOURCE_IDENTITY_MISMATCH",
+    "candidate_dds_modified": false,
+    "automation_validation": "PENDING",
+    "validation_mode": "C_BATCH_GATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "policy_recheck": {
+    "producer_lane_mode": "continuous_production+self_qa",
+    "modulo_3_owner": 2,
+    "next_task_after": "OWN_DURABLE_COMMIT",
+    "automation_validation": "PENDING_UNTIL_C_BATCH_GATE",
+    "candidate_completion_first": true,
+    "producer_skip_qa_pending_assets": true,
+    "canonical_source_transport_order": [
+      "GOOGLE_DRIVE_EXACT_RELATIVE_PATH",
+      "PINNED_UPSTREAM_DIRECT_FILE",
+      "PINNED_V0.25.10A_RELEASE"
+    ],
+    "duplicate_execution_allowed": false
+  },
+  "latest_c_seen": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00368",
+    "wave_id": "Q00075",
+    "result_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
+    "gate_run_id": 36836426454,
+    "automation_validation": "PASS",
+    "consumed_e00354": false,
+    "reason": "No newer C task record exists at the precommit GitHub HEAD; C00368 predates the E00354 producer result."
+  },
+  "state_recheck": {
+    "canonical_progress_path": "localization/progress/progress.json",
+    "compatibility_progress_path": "localization/progress.json",
+    "progress_mirror_identical": true,
+    "canonical_progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
+    "runtime_validation": "UNTESTED"
+  },
+  "reconciliation": {
+    "reexecuted_producer_work": false,
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED",
+    "n100_used": false,
+    "local_clone_used": false,
+    "google_drive_reprobed": false,
+    "vr_ffb_dx_changes": false
+  },
+  "observed_head_before_reconcile": {
+    "sha": "1e9fd11fd253928d68246d52ac520393780aadca",
+    "message": "chore(localization): record B00370 rollover2 correction [skip ci]"
+  },
+  "commit_role": "ROLLOVER_RECONCILIATION_BOOKKEEPING_ONLY",
+  "result_identity_preserved": "LOCALIZATION-LOCALIZATION_E-00354@4c129e50612d41d13a48020357ab5eb95b290fe6",
+  "note": "This rollover reconciliation is not a new producer result. The original result commit remains authoritative and already carries the exact required AUTO marker; this bookkeeping commit intentionally does not create a second result identity."
+}
