@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DX11 = ROOT / "src" / "vr" / "d3d11"
+ACTIVATION_SOURCE_SUFFIXES = {".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".hxx", ".inl", ".ipp"}
 
 DRAW_DISPATCH = re.compile(
     r"(?:->|\.)\s*Draw(?:Auto|IndexedInstancedIndirect|InstancedIndirect|IndexedInstanced|Indexed|Instanced)?\s*\("
@@ -20,6 +21,15 @@ def require_text(path: Path, needles: list[str], label: str) -> str:
     if missing:
         raise SystemExit(f"{label}: missing dormant-boundary evidence: {missing}")
     return text
+
+
+def iter_activation_sources() -> list[Path]:
+    """Return every C/C++ activation surface under the native DX11 tree."""
+    return [
+        path
+        for path in sorted(DX11.rglob("*"))
+        if path.is_file() and path.suffix.lower() in ACTIVATION_SOURCE_SUFFIXES
+    ]
 
 
 def main() -> None:
@@ -51,8 +61,28 @@ def main() -> None:
     # native backend is still evidence-only. A real D3D11 Draw* dispatch is an
     # explicit activation event and must not arrive accidentally under a
     # readiness/census task.
+    activation_sources = iter_activation_sources()
+    if not activation_sources:
+        raise SystemExit("native DX11 activation source set is empty")
+
+    required_scan_members = [
+        DX11 / "native_backend.cpp",
+        DX11 / "native_backend.hpp",
+        DX11 / "runtime_census.cpp",
+        DX11 / "runtime_census.hpp",
+    ]
+    missing_scan_members = [
+        str(path.relative_to(ROOT))
+        for path in required_scan_members
+        if path not in activation_sources
+    ]
+    if missing_scan_members:
+        raise SystemExit(
+            "DX11 activation source coverage drift: " + ", ".join(missing_scan_members)
+        )
+
     violations: list[str] = []
-    for path in sorted(DX11.glob("*.cpp")):
+    for path in activation_sources:
         text = path.read_text(encoding="utf-8")
         for match in DRAW_DISPATCH.finditer(text):
             line = text.count("\n", 0, match.start()) + 1
