@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 600,
+  "cycle": 605,
   "totalCycles": 2000,
   "applyEvery": 5,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -92,11 +92,12 @@
     "R84-REF-LIFECYCLE-0022",
     "R84-REF-RENDER-0008",
     "R84-REF-LIFECYCLE-0023",
-    "R84-REF-GUARD-0008"
+    "R84-REF-GUARD-0008",
+    "R84-REF-LIFECYCLE-0024"
   ],
-  "next": "Cycles 601-605: isolate R30 install-state storage and prerequisite lifecycle reporting.",
-  "updatedKst": "2026-10-01T11:11:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_600_CHECKPOINT",
+  "next": "Cycles 606-610: isolate R30 prerequisite classification/wait policy from the hook transaction while preserving the 25 ms / 4800-attempt timing contract.",
+  "updatedKst": "2026-10-02T04:48:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_605_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -104,6 +105,8 @@
     "Ported FIX01 onto recovered R84 lineage: R33 no longer references removed R31 reliability storage; source-only verifier now requires tracker file/API and rejects legacy authority symbols.",
     "STATE-0003 ported to recovered R84 lineage: recording state plus recording/apply generations now live behind StateBlockTracker; R33 depth/stencil cache key no longer reads R31 storage directly.",
     "Physical StateBlock hook ownership merge (0002B) remains blocked because builds are disabled by user request; only source/static contract validation is performed.",
-    "Cycle 506 fixed malformed IsRecording()s introduced by the prior broad legacy-symbol replacement before any build was run."
+    "Cycle 506 fixed malformed IsRecording()s introduced by the prior broad legacy-symbol replacement before any build was run.",
+    "Cycles 601-605 (R84-REF-LIFECYCLE-0024): isolated R30 install-state storage behind R30SetInstallState/R30GetInstallState and centralized existing async install result publication through R30PublishInstallResult. The prerequisite Ready/Failed decisions, 25 ms wait, 4800-attempt timeout, hook transaction, rollback order, and CreateThread failure reporting behavior are unchanged.",
+    "APPLY_GATE 605: SOURCE_CHANGED=YES. Source commit 5d0b8cdb718ade4fee572fc6827bab5453f58183; source-only regression guard commit d900ddf758621c3acefdb01a749831d84bb1b96a. Static source inspection confirms one install-state write boundary, one read boundary, no legacy direct R30InstallState.store/load access, and centralized existing OpenXRVRStereoR30HUD async result publication. Runtime validation remains UNTESTED; no build was started per campaign policy."
   ]
 }
