@@ -66,8 +66,8 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "678655ff48caeab8ac8e291bf84888b0d697d4f4",
+  "authoritative_result_sha": "678655ff48caeab8ac8e291bf84888b0d697d4f4",
   "validation_bearing_result_sha": null,
   "durable_task_record_in_result_commit": true,
   "result_commit_message": "localization(B): advance index220 canonical source geometry [AUTO:LOCALIZATION-LOCALIZATION_B-00375]",
@@ -75,5 +75,8 @@
     "localization/graphics/role_B/20261001-B00375-P00243/B00375_P00243_INDEX220_D657C2EB_CANONICAL_SOURCE_GEOMETRY.json",
     "localization/graphics/role_B/20261001-B00375-P00243/verify_index220_source_geometry.py"
   ],
-  "bookkeeping_note": "RESULT_SHA will be bound by a separate bookkeeping-only commit after the atomic material result commit. This record plus material report/tool are present in the result commit. Producer validation remains PENDING until C_BATCH_GATE; runtime remains UNTESTED."
+  "bookkeeping_note": "Authoritative producer material result 678655ff48caeab8ac8e291bf84888b0d697d4f4 atomically contains the B00375 task record, index220 canonical-source/geometry report and deterministic verifier. This bookkeeping-only update binds RESULT_SHA without replacing the material result identity. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; no real-game test was performed, so RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T18:41:21+09:00",
+  "bookkeeping_base_result_sha": "678655ff48caeab8ac8e291bf84888b0d697d4f4",
+  "bookkeeping_head_before_update": "678655ff48caeab8ac8e291bf84888b0d697d4f4"
 }
