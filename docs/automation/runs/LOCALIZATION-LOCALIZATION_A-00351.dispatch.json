@@ -1,14 +1,15 @@
 {
-  "schema_version": 20,
+  "schema_version": 22,
   "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
   "wave_id": "P00221",
   "lane": "LOCALIZATION_A",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
   "chat_rollover": 1,
-  "action": "RUN_INDEX222_V20_LOCKED_SONG_TITLE_FAMILY_NORMALIZE",
-  "runner_setup_commit": "3dbbe1a769360f992a60c574b09ac128b63e0656",
-  "infrastructure_retry": 1,
-  "infrastructure_retry_reason": "PRIOR_RUNNER_PAYLOAD_TRANSPORT_CRC_FAILURE_BEFORE_SOURCE_OR_CANDIDATE_STAGE",
+  "action": "RUN_INDEX222_V19_SOURCE_NATIVE_SONG_TITLE_REWORK",
+  "authoritative_runner": ".github/workflows/localization-a00351-ddf0392a-v19.yml",
+  "runner_setup_commit": "db7a24e2f1646ef2c9b9c1af09cb4cf96a4c05aa",
+  "infrastructure_retry": 2,
+  "infrastructure_retry_reason": "RECONCILE_LATE_ARRIVING_SAME_TASK_RUNNER_AND_PREFER_EXACT_SOURCE_ARTWORK_PRESERVATION_OVER_DUPLICATE_RERENDER",
   "runtime_validation": "UNTESTED"
 }
