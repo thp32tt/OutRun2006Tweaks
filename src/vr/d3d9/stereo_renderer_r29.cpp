@@ -497,16 +497,40 @@ namespace OutRunVRStereo
             return true;
         }
 
+        enum class R29PrerequisiteDecision
+        {
+            Wait,
+            Fail,
+            Install
+        };
+
+        constexpr int R29PrerequisiteWaitAttempts = 4800;
+        constexpr DWORD R29PrerequisiteWaitMs = 25;
+
+        R29PrerequisiteDecision R29ClassifyPrerequisite(
+            OutRunVR::RuntimeEligibility::InstallState overlay,
+            OutRunVR::RuntimeEligibility::InstallState renderer) noexcept
+        {
+            using State = OutRunVR::RuntimeEligibility::InstallState;
+            if (overlay == State::Failed || renderer == State::Failed)
+                return R29PrerequisiteDecision::Fail;
+            if (overlay == State::Ready && renderer == State::Ready)
+                return R29PrerequisiteDecision::Install;
+            return R29PrerequisiteDecision::Wait;
+        }
+
         DWORD WINAPI R29StereoInstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
             SetStereoBaseInstallState(State::Pending);
 
-            for (int attempt = 0; attempt < 4800; ++attempt)
+            for (int attempt = 0; attempt < R29PrerequisiteWaitAttempts; ++attempt)
             {
                 const auto r26 = CorrectionOverlayInstallState();
                 const auto rendererR29 = OutRunVRRenderer::RendererInstallState();
-                if (r26 == State::Failed || rendererR29 == State::Failed)
+                const auto prerequisite =
+                    R29ClassifyPrerequisite(r26, rendererR29);
+                if (prerequisite == R29PrerequisiteDecision::Fail)
                 {
                     SetStereoBaseInstallState(State::Failed);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR29", false);
@@ -515,7 +539,7 @@ namespace OutRunVRStereo
                     return 0;
                 }
 
-                if (r26 == State::Ready && rendererR29 == State::Ready)
+                if (prerequisite == R29PrerequisiteDecision::Install)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
                     R29DrawPrimitiveR27Hook = safetyhook::create_inline(
@@ -556,7 +580,7 @@ namespace OutRunVRStereo
                         "VR R29 STEREO: conservative effect classification + cached render state + steady-state two-eye path ACTIVE");
                     return 0;
                 }
-                Sleep(25);
+                Sleep(R29PrerequisiteWaitMs);
             }
 
             SetStereoBaseInstallState(State::Failed);

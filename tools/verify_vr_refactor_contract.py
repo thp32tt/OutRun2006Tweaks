@@ -134,6 +134,25 @@ public_state_begin = r29.rfind("StereoBaseInstallState() noexcept")
 if public_state_begin < 0 or "return ReadStereoBaseInstallState();" not in r29[public_state_begin:]:
     errors.append("R29 public install-state facade bypassed read boundary")
 
+for marker in (
+    "enum class R29PrerequisiteDecision",
+    "R29PrerequisiteWaitAttempts = 4800",
+    "R29PrerequisiteWaitMs = 25",
+    "R29ClassifyPrerequisite(",
+    "R29PrerequisiteDecision::Wait",
+    "R29PrerequisiteDecision::Fail",
+    "R29PrerequisiteDecision::Install",
+):
+    if marker not in r29:
+        errors.append(f"R29 prerequisite wait-policy boundary missing marker: {marker}")
+if "attempt < 4800" in r29 or "Sleep(25)" in r29:
+    errors.append("R29 prerequisite timing literal escaped wait-policy boundary")
+if "attempt < R29PrerequisiteWaitAttempts" not in r29 or \
+        "Sleep(R29PrerequisiteWaitMs)" not in r29:
+    errors.append("R29 install thread bypassed prerequisite timing policy")
+if "R29ClassifyPrerequisite(r26, rendererR29)" not in r29:
+    errors.append("R29 install thread bypassed prerequisite classification boundary")
+
 r29_startup_begin = r29.find("bool R29StartInstallThread() noexcept")
 r29_hook_begin = r29.find("class VRStereoR29Hook", r29_startup_begin)
 if r29_startup_begin < 0 or r29_hook_begin <= r29_startup_begin:
