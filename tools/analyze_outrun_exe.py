@@ -4900,6 +4900,8 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_10_provenance
         "target_section": target_section,
         "predecessor_status": predecessor["status"],
         "predecessor_exact": predecessor_exact,
+        "predecessor_prefix_end_rva": predecessor["prefix_end_rva"],
+        "predecessor_probe_end_rva": predecessor["probe_end_rva"],
         "starts_at_predecessor_boundary": starts_at_predecessor_boundary,
         "probe_len": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_10_PROBE_LEN,
         "probe_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_10_PROBE_END_RVA,
@@ -8078,6 +8080,8 @@ def main() -> int:
         f"status={helper_1_third_cont_10['status']} "
         f"predecessor={helper_1_third_cont_10['predecessor_status']} "
         f"predecessor_exact={helper_1_third_cont_10['predecessor_exact']} "
+        f"predecessor_prefix_end=0x{helper_1_third_cont_10['predecessor_prefix_end_rva']:08X} "
+        f"predecessor_probe_end=0x{helper_1_third_cont_10['predecessor_probe_end_rva']:08X} "
         f"boundary_match={helper_1_third_cont_10['starts_at_predecessor_boundary']} "
         f"section={helper_1_third_cont_10['target_section'] or 'none'} "
         f"probe_len={helper_1_third_cont_10['probe_len']} "
