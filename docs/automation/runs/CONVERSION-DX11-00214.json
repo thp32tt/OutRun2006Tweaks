@@ -57,7 +57,8 @@
     "Exact-SHA Build run 36835776839 / Win32 Release job 110282923303 completed SUCCESS; binary artifact 11148834509 digest sha256:5b4298c18d17add6c33fcc1402c1e6688c3cc06981c0eaa540e2f9fdecfe6ca7; source artifact 11149132811 digest sha256:28c27f1ab814cacb9f52b08fa95cd45efd15656abc2059a5064329a32e96950e.",
     "Exact-SHA OpenXR VR architecture run 36835776764 completed SUCCESS with host-x64 plus all five x86 variants successful (6/6 jobs); host artifact 11149506446 digest sha256:0a8f3e045f83db7d068b19c9b8ec277eab2509d3f8f78659ee6971a8ada72d7a.",
     "VR PC Fast Test Build run 36835774573 was SKIPPED by branch policy and was not used as runtime validation.",
-    "No N100 clone/worktree, Google Drive DDS transport, Quest 3/VDXR, PC-fast runner, or in-game execution was used. RUNTIME_VALIDATION remains UNTESTED."
+    "No N100 clone/worktree, Google Drive DDS transport, Quest 3/VDXR, PC-fast runner, or in-game execution was used. RUNTIME_VALIDATION remains UNTESTED.",
+    "Production change ledger Issue #14 comment 5927758772 appended with sourceMode=CHAT_DIRECT, base/result identity, changed paths, exact-SHA validation, runtime UNTESTED label, and next action."
   ],
   "proof_contract": {
     "predecessor_status": "EXACT_18244E_TO_1824AB_CONTROL_FLOW_PREFIX_PROVEN",
