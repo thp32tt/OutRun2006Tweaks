@@ -56,6 +56,10 @@ jobs:
           test "$(grep -Fc 'GITHUB_PLUGIN_AVAILABLE=TRUE' /tmp/controller.py)" -ge 3
           test "$(grep -Fc 'PUBLIC_GITHUB_ACCESS=DO_NOT_USE' /tmp/controller.py)" -ge 3
           grep -Fq '연결된 GitHub 플러그인' /tmp/controller.py
+          grep -Fq 'schema 노출 여부를 GitHub 연결 여부로 판단하지 마' /tmp/controller.py
+          grep -Fq 'def assistant_claims_github_tooling_absent' /tmp/controller.py
+          grep -Fq 'BLOCKED_TOOLING' /tmp/controller.py
+          grep -Fq 'roll the same TASK_ID to a fresh project chat' /tmp/controller.py
 
       - name: Verify browser transport self-recovery
         run: |
