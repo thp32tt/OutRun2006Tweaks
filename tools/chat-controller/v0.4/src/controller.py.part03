@@ -264,6 +264,7 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     active["last_rollover_reason"] = reason
     active["last_rollover_at"] = sent_at.isoformat()
     active["sent_at"] = sent_at.isoformat()
+    active["dispatch_confirmed"] = True
     active["last_hash"] = None
     active["last_hash_changed_at"] = sent_at.isoformat()
     active["generic_retry_clicks"] = 0
@@ -476,6 +477,7 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
             active["active_chat_url"] = new_url
     note_successful_request(reg, now, slot.name)
     active["sent_at"] = now.isoformat()
+    active["dispatch_confirmed"] = True
     active["last_hash"] = None
     active["last_hash_changed_at"] = now.isoformat()
     active["result_sha"] = None
@@ -684,8 +686,48 @@ async def localization_send_lane_task(
         return False
     if q.get("lane_dispatch_errors", {}).pop(slot_name, None) is not None:
         save_queue_state(q)
+
+    # Persist TASK_ID ownership before touching the ChatGPT composer. If the
+    # controller/container dies after the browser accepts the prompt but before
+    # post-send bookkeeping, restart recovery can still find the exact task and
+    # must not reuse this TASK_ID.
+    previous_counter = int(q.get("counter", 0))
+    dispatch_started_at = datetime.now(TZ)
+    provisional = {
+        "task_id": task_id,
+        "slot": slot_name,
+        "lane": target["lane"],
+        "branch": target["branch"],
+        "workflow": target["workflow"],
+        "base_sha": base_sha,
+        "result_sha": None,
+        "attempt": 1,
+        "wave_id": wave_id,
+        "chat_rollovers": 0,
+        "previous_chat_urls": [],
+        "active_chat_url": slot.url,
+        "phase": "WAIT_CHAT",
+        "terminal": None,
+        "sent_at": dispatch_started_at.isoformat(),
+        "dispatch_started_at": dispatch_started_at.isoformat(),
+        "dispatch_confirmed": False,
+        "last_hash": None,
+        "last_hash_changed_at": dispatch_started_at.isoformat(),
+        "last_gate_poll_at": None,
+        "failure_context": "",
+        "qa_batch": [dict(item) for item in (qa_batch or [])],
+    }
+    q["counter"] = task_counter
+    q.setdefault("active_by_lane", {})[slot_name] = provisional
+    save_queue_state(q)
+
     result = await send_message(page, prompt)
     if result != "sent":
+        current = q.setdefault("active_by_lane", {}).get(slot_name)
+        if current and current.get("task_id") == task_id and current.get("dispatch_confirmed") is False:
+            q["active_by_lane"].pop(slot_name, None)
+            q["counter"] = previous_counter
+            save_queue_state(q)
         write_runtime(status="ui_changed", last_action=f"Wave {wave_id} lane {slot_name}: send failed at {result}")
         return False
 
@@ -714,29 +756,15 @@ async def localization_send_lane_task(
     slot.last_result = "parallel_sent_rate_limited" if post_send_rate_limited else "parallel_sent"
     save_registry(reg)
 
-    q["counter"] = task_counter
-    q.setdefault("active_by_lane", {})[slot_name] = {
-        "task_id": task_id,
-        "slot": slot_name,
-        "lane": target["lane"],
-        "branch": target["branch"],
-        "workflow": target["workflow"],
-        "base_sha": base_sha,
-        "result_sha": None,
-        "attempt": 1,
-        "wave_id": wave_id,
-        "chat_rollovers": 0,
-        "previous_chat_urls": [],
-        "active_chat_url": slot.url,
-        "phase": "WAIT_CHAT",
-        "terminal": None,
-        "sent_at": sent_at.isoformat(),
-        "last_hash": None,
-        "last_hash_changed_at": sent_at.isoformat(),
-        "last_gate_poll_at": None,
-        "failure_context": "",
-        "qa_batch": [dict(item) for item in (qa_batch or [])],
-    }
+    active_record = q.setdefault("active_by_lane", {}).get(slot_name)
+    if not active_record or active_record.get("task_id") != task_id:
+        # Defensive reconstruction only; normal flow always has the provisional record.
+        active_record = provisional
+        q["active_by_lane"][slot_name] = active_record
+    active_record["dispatch_confirmed"] = True
+    active_record["sent_at"] = sent_at.isoformat()
+    active_record["last_hash_changed_at"] = sent_at.isoformat()
+    active_record["active_chat_url"] = slot.url
     save_queue_state(q)
     write_runtime(
         status="parallel_wave_running",
@@ -885,6 +913,33 @@ async def localization_process_lane(
                             queue=active,
                         )
                     return
+
+            if active.get("dispatch_confirmed") is False:
+                dispatch_started = _parse_iso(active.get("dispatch_started_at")) or _parse_iso(active.get("sent_at")) or now
+                dispatch_age = (now - dispatch_started).total_seconds()
+                if dispatch_age < QUEUE_RESULT_GRACE_SECONDS:
+                    write_runtime(
+                        status="dispatch_uncertain_wait",
+                        last_action=f"{active['task_id']} provisional dispatch is {int(dispatch_age)}s old; checking Git before any resend",
+                        queue=active,
+                    )
+                    return
+                reason = (
+                    "Controller restarted or failed during ChatGPT dispatch before post-send confirmation; "
+                    "no durable task commit appeared within the grace period. Re-send the same TASK_ID in a fresh chat."
+                )
+                active["failure_context"] = reason
+                if await queue_rollover_chat(context, pages, active, reason):
+                    save_queue_state(q)
+                elif active.get("phase") == "BLOCKED":
+                    save_queue_state(q)
+                return
+
+            if (not slot.url or not is_project_scoped_chat_url(slot.url)) and is_project_scoped_chat_url(page.url):
+                slot.url = page.url
+                active["active_chat_url"] = page.url
+                save_registry(reg)
+                save_queue_state(q)
 
             if await queue_handle_retry_surface(context, pages, page, reg, slot, active, q):
                 return
@@ -1601,7 +1656,8 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         if not base_sha:
             write_runtime(status="queue_github_unavailable", last_action=f"Could not read branch {target['branch']}")
             return
-        q["counter"] = int(q.get("counter", 0)) + 1
+        previous_counter = int(q.get("counter", 0))
+        q["counter"] = previous_counter + 1
         task_id = f"{CONTROLLER_MODE.upper()}-{target['lane']}-{q['counter']:05d}"
         runtime["queue_task_id"] = task_id
         runtime["queue_lane"] = target["lane"]
@@ -1609,11 +1665,7 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         runtime["queue_attempt"] = 1
         runtime["queue_failure_context"] = ""
         slot_name = slot.name
-        await run_cycle(context, pages)
-        if runtime.get("status") != "sent":
-            q["counter"] -= 1
-            save_queue_state(q)
-            return
+        dispatch_started_at = datetime.now(TZ)
         q["active"] = {
             "task_id": task_id,
             "slot": slot_name,
@@ -1627,14 +1679,44 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             "previous_chat_urls": [],
             "active_chat_url": slot.url,
             "phase": "WAIT_CHAT",
-            "sent_at": datetime.now(TZ).isoformat(),
+            "sent_at": dispatch_started_at.isoformat(),
+            "dispatch_started_at": dispatch_started_at.isoformat(),
+            "dispatch_confirmed": False,
             "last_hash": None,
-            "last_hash_changed_at": datetime.now(TZ).isoformat(),
+            "last_hash_changed_at": dispatch_started_at.isoformat(),
             "last_gate_poll_at": None,
             "failure_context": "",
         }
         save_queue_state(q)
-        write_runtime(status="queue_wait_chat", last_action=f"Sent {task_id}", queue=q["active"])
+        write_runtime(
+            status="queue_dispatching",
+            last_action=f"Reserved {task_id} before ChatGPT send; awaiting explicit send confirmation",
+            queue=q["active"],
+        )
+        await run_cycle(context, pages)
+        if runtime.get("status") != "sent":
+            current = q.get("active")
+            if current and current.get("task_id") == task_id and current.get("dispatch_confirmed") is False:
+                q["active"] = None
+                q["counter"] = previous_counter
+                save_queue_state(q)
+            return
+
+        # run_cycle owns the registry and may have rotated to a fresh chat. Reload
+        # it before confirming the provisional record so URL/send-time are exact.
+        confirmed_reg = load_registry(datetime.now(TZ))
+        confirmed_slot = next((s for s in confirmed_reg.slots if s.name == slot_name), None)
+        confirmed_at = _parse_iso(confirmed_slot.last_sent_at) if confirmed_slot else None
+        confirmed_at = confirmed_at or datetime.now(TZ)
+        current = q.get("active")
+        if not current or current.get("task_id") != task_id:
+            raise RuntimeError(f"provisional queue identity lost after dispatch: {task_id}")
+        current["dispatch_confirmed"] = True
+        current["sent_at"] = confirmed_at.isoformat()
+        current["last_hash_changed_at"] = confirmed_at.isoformat()
+        current["active_chat_url"] = confirmed_slot.url if confirmed_slot else current.get("active_chat_url")
+        save_queue_state(q)
+        write_runtime(status="queue_wait_chat", last_action=f"Sent {task_id}", queue=current)
         return
 
     slot = next((s for s in reg.slots if s.name == active["slot"]), None)
@@ -1683,6 +1765,33 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
                     queue=active,
                 )
             return
+
+        if active.get("dispatch_confirmed") is False:
+            dispatch_started = _parse_iso(active.get("dispatch_started_at")) or _parse_iso(active.get("sent_at")) or now
+            dispatch_age = (now - dispatch_started).total_seconds()
+            if dispatch_age < QUEUE_RESULT_GRACE_SECONDS:
+                write_runtime(
+                    status="dispatch_uncertain_wait",
+                    last_action=f"{active['task_id']} provisional dispatch is {int(dispatch_age)}s old; checking Git before any resend",
+                    queue=active,
+                )
+                return
+            reason = (
+                "Controller restarted or failed during ChatGPT dispatch before post-send confirmation; "
+                "no durable task commit appeared within the grace period. Re-send the same TASK_ID in a fresh chat."
+            )
+            active["failure_context"] = reason
+            if await queue_rollover_chat(context, pages, active, reason):
+                save_queue_state(q)
+            elif active.get("phase") == "BLOCKED":
+                save_queue_state(q)
+            return
+
+        if (not slot.url or not is_project_scoped_chat_url(slot.url)) and is_project_scoped_chat_url(page.url):
+            slot.url = page.url
+            active["active_chat_url"] = page.url
+            save_registry(reg)
+            save_queue_state(q)
 
         if await queue_handle_retry_surface(context, pages, page, reg, slot, active, q):
             return

@@ -188,14 +188,14 @@ jobs:
           print("four-slot A/B/E producers + C QA with fresh-task chats verified")
           PY2
 
-      - name: Verify schema 26 policy alignment
+      - name: Verify schema 27 policy alignment
         run: |
           git fetch --force origin refs/heads/korean-localization-clean:refs/remotes/origin/korean-localization-clean
           git show refs/remotes/origin/korean-localization-clean:localization/controller_roles.json > /tmp/controller_roles.json
           python - <<'PY2'
           import json, pathlib, re
           cfg=json.loads(pathlib.Path('/tmp/controller_roles.json').read_text())
-          assert cfg['schema_version'] >= 26
+          assert cfg['schema_version'] >= 27
           ex=cfg['execution']; rt=cfg['runtime_tuning']; obs=cfg['runtime_observability']
           assert ex['controller_slot_count'] == 4
           assert ex['slot_map'] == {'A':'A','B':'B','C':'C','D':'E'}
@@ -231,6 +231,13 @@ jobs:
           assert wd['queue_mode_ui_observation'] is False
           assert wd['queue_mode_ui_actions'] is False
           assert obs['queue_mode_watchdog_role'] == 'STATE_REARM_ONLY'
+          assert cp['pre_send_task_identity_persisted'] is True
+          assert cp['dispatch_confirmation_after_send'] is True
+          assert cp['uncertain_dispatch_grace_seconds'] == 180
+          assert cp['uncertain_dispatch_same_task_rollover'] is True
+          assert cp['live_page_url_reconciles_stale_registry'] is True
+          assert obs['dispatch_confirmation_field'] == 'dispatch_confirmed'
+          assert obs['dispatch_started_at_field'] == 'dispatch_started_at'
           assert cp['qa_pending_unconsumed_never_truncated'] is True
           assert obs['qa_pending_retention'] == 'UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA'
           assert obs['queue_active_null_allowed_only_when_active_by_lane_empty'] is False
@@ -285,7 +292,7 @@ jobs:
             m=re.search(rf'^\s+{re.escape(key)}:\s+"?(\d+)"?\s*$',text,re.M)
             assert m and int(m.group(1))==int(val), (key,val,m.group(1) if m else None)
           assert re.search(r'^\s+FRESH_CHAT_EACH_RUN:\s+"true"\s*$',text,re.M)
-          print('schema 26 policy and deployment values aligned')
+          print('schema 27 policy and deployment values aligned')
           PY2
 
       - name: Verify end-to-end liveness bounds
@@ -349,6 +356,16 @@ jobs:
           assert src.count('WAIT_ACTIONS_MAX_SECONDS') >= 5
           assert 'never orphan' in src
           assert 'Preserve the TASK_ID as active' in src
+          assert src.count('"dispatch_confirmed": False') >= 2
+          assert src.count('active.get("dispatch_confirmed") is False') >= 2
+          assert src.count('"dispatch_confirmed"] = True') >= 3
+          assert src.count('dispatch_started_at') >= 6
+          locsend=src[src.index('async def localization_send_lane_task'):src.index('async def localization_safe_send_lane_task')]
+          assert locsend.index('save_queue_state(q)') < locsend.index('result = await send_message(page, prompt)')
+          qdispatch=src[src.index('if not active:', src.index('async def queue_cycle')):src.index('slot = next((s for s in reg.slots', src.index('async def queue_cycle'))]
+          assert qdispatch.index('save_queue_state(q)') < qdispatch.index('await run_cycle(context, pages)')
+          assert 'status="queue_dispatching"' in qdispatch
+          assert 'provisional queue identity lost after dispatch' in qdispatch
           qcycle=src[src.index('async def queue_cycle'):src.index('def refresh_wait_actions_task_binding')]
           assert 'Git/Actions reconciliation continues' in qcycle
           lcycle=src[src.index('async def localization_parallel_cycle'):src.index('def reconcile_legacy_conversion_blocked')]
