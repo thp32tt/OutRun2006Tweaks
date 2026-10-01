@@ -1,5 +1,5 @@
 {
-  "schema_version": 21,
+  "schema_version": 22,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -194,7 +194,9 @@
       "c_batch_waits_for_actions": true,
       "c_completion_gates_producers": false,
       "qa_failure_gates_producers": false,
-      "terminal_transition_target_seconds": 30
+      "terminal_transition_target_seconds": 30,
+      "missing_lane_dispatch_precedes_retry_traffic": true,
+      "preserve_send_gap_for_missing_lane": true
     }
   },
   "runtime_tuning": {
@@ -245,7 +247,8 @@
       "WAIT_ACTIONS",
       "RETRY_PENDING"
     ],
-    "task_chat_lifecycle": "FRESH_CHAT_PER_NEW_TASK_ID"
+    "task_chat_lifecycle": "FRESH_CHAT_PER_NEW_TASK_ID",
+    "dispatch_fairness": "FILL_READY_C_OR_MISSING_PRODUCER_BEFORE_ACTIVE_RETRY_TRAFFIC"
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
