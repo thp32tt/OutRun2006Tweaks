@@ -107,10 +107,15 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "result_binding_state": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "a3acb3a219de76f41464c9aa83b3f461b9d2600c",
+  "authoritative_result_sha": "a3acb3a219de76f41464c9aa83b3f461b9d2600c",
+  "result_binding_state": "BOUND_TO_PRODUCER_RESULT_PENDING_C_BATCH_GATE",
   "result_commit_message": "localization(B): add source geometry measurement tool [AUTO:LOCALIZATION-LOCALIZATION_B-00375]",
   "durable_task_record_in_result_commit": true,
-  "bookkeeping_note": "Initial atomic producer result leaves self-SHA fields null; separate bookkeeping may bind immutable RESULT_SHA without changing producer result."
+  "bookkeeping_note": "Initial atomic producer result leaves self-SHA fields null; separate bookkeeping may bind immutable RESULT_SHA without changing producer result.",
+  "validation_bearing_result_sha": null,
+  "bookkeeping": {
+    "producer_result_sha": "a3acb3a219de76f41464c9aa83b3f461b9d2600c",
+    "note": "Bookkeeping-only immutable RESULT_SHA binding. Atomic result commit contains the analyzer, machine plan, and durable B00375 task record. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; no real-game validation was performed and RUNTIME_VALIDATION remains UNTESTED."
+  }
 }
