@@ -162,7 +162,7 @@ If Portainer does not auto-pull Git changes, use **Pull and redeploy** for each 
 
 ## Localization continuous production + independent batch QA
 
-When `LOCALIZATION_PARALLEL=true`, localization no longer serializes C behind completion of an A/B production pair.
+When `LOCALIZATION_PARALLEL=true`, localization no longer serializes C behind completion of an A/B/E production set.
 
 1. Lane A continuously produces the odd-index shard. After its exact durable task commit exists, the slot becomes available for the next A task immediately; A does not wait for a per-producer Actions Gate.
 2. Lane B does the same for the even-index shard and also does not wait for a per-producer Actions Gate.
@@ -170,7 +170,7 @@ When `LOCALIZATION_PARALLEL=true`, localization no longer serializes C behind co
 4. Lane C is an independent QA consumer. It coalesces up to `LOCALIZATION_QA_BATCH_SIZE` producer results (default 4) for up to `LOCALIZATION_QA_COALESCE_SECONDS` (default 30s), reviews them in one task, reconciles shared state once, and its single commit is the only Actions Gate that consumes a runner for that batch.
 5. QA de-duplication key is the exact producer `TASK_ID@RESULT_SHA`. The C prompt additionally requires heavy source/DDS/visual checks to be reused for identical source SHA + candidate SHA + QA-contract fingerprints.
 6. A/B must skip candidates still awaiting C QA unless C later records `REWORK_REQUIRED` or the relevant fingerprint changed.
-7. A C failure never stops A/B production. Exhausted C batches move to `qa_blocked` for later diagnosis while producers continue.
+7. A C failure never stops A/B/E production. Exhausted C batches move to `qa_blocked` for later diagnosis while producers continue.
 8. On restart, persisted completed A/B tasks are migrated into `qa_pending`; existing in-flight lanes are preserved.
 
 This model allows QA backlog to grow temporarily without reducing production throughput to zero.

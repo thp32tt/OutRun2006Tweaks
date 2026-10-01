@@ -152,7 +152,7 @@ jobs:
           print("four-slot A/B/E producers + C QA with fresh-task chats verified")
           PY2
 
-      - name: Verify schema 21 policy alignment
+      - name: Verify schema 22 policy alignment
         run: |
           git fetch --force origin refs/heads/korean-localization-clean:refs/remotes/origin/korean-localization-clean
           git show refs/remotes/origin/korean-localization-clean:localization/controller_roles.json > /tmp/controller_roles.json
@@ -193,7 +193,7 @@ jobs:
             m=re.search(rf'^\s+{re.escape(key)}:\s+"?(\d+)"?\s*$',text,re.M)
             assert m and int(m.group(1))==int(val), (key,val,m.group(1) if m else None)
           assert re.search(r'^\s+FRESH_CHAT_EACH_RUN:\s+"true"\s*$',text,re.M)
-          print('schema 21 policy and deployment values aligned')
+          print('schema 22 policy and deployment values aligned')
           PY2
 
       - name: Verify queue recovery ordering

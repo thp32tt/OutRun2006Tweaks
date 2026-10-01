@@ -10,7 +10,7 @@ class StatusHandler(BaseHTTPRequestHandler):
         q = load_queue_state()
         execution = (
             (
-                f"QUEUE / localization continuous A+B producers + independent batched C QA (check every {QUEUE_CHECK_SECONDS}s)"
+                f"QUEUE / localization continuous A/B/E producers + independent batched C QA (check every {QUEUE_CHECK_SECONDS}s)"
                 if CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL
                 else f"QUEUE / event-driven (check every {QUEUE_CHECK_SECONDS}s; legacy schedule ignored)"
             )
