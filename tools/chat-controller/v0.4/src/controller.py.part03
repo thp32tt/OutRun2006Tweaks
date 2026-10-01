@@ -1351,13 +1351,17 @@ async def localization_process_lane(
             if lane_key in {"A", "B", "D"}:
                 task_commit = github_find_task_commit(active["branch"], active["task_id"])
                 if task_commit:
-                    finalize_localization_producer_commit(q, active, task_commit, now)
-                    save_queue_state(q)
-                    write_runtime(
-                        status="producer_wait_actions_migrated",
-                        last_action=f"{active['task_id']} migrated from legacy WAIT_ACTIONS to C batch validation",
-                        queue=q,
+                    active["phase"] = "WAIT_CHAT"
+                    accepted = await localization_handle_producer_commit(
+                        context, pages, q, active, task_commit, now
                     )
+                    save_queue_state(q)
+                    if accepted:
+                        write_runtime(
+                            status="producer_wait_actions_migrated",
+                            last_action=f"{active['task_id']} migrated from legacy WAIT_ACTIONS to C batch validation",
+                            queue=q,
+                        )
                 return
             # C alone waits for the batched GitHub Actions Gate. Persisted C state
             # may still point at an older failed attempt, so rebind by TASK_ID.
