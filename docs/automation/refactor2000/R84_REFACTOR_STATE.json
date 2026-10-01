@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 729,
+  "cycle": 732,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -109,11 +109,12 @@
     "R84-REF-LIFECYCLE-0032",
     "R84-REF-LIFECYCLE-0033",
     "R84-REF-STATE-0017",
-    "R84-REF-LIFECYCLE-0034"
+    "R84-REF-LIFECYCLE-0034",
+    "R84-REF-LIFECYCLE-0035"
   ],
-  "next": "Cycles 730-732: inspect R32 prerequisite/install publication ownership and timing literals; preserve protected R26 world + R30 HUD/XYZRHW/SkyGlow graph; APPLY_GATE at 732.",
-  "updatedKst": "2026-10-02T07:11:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_729_CHECKPOINT",
+  "next": "Cycles 733-735: isolate R32 install-state read/write/publication ownership while preserving prerequisite timing, hook transaction, DirectGPU/ACK transport and protected R26+R30 runtime graph; APPLY_GATE at 735.",
+  "updatedKst": "2026-10-02T07:20:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_732_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -167,6 +168,8 @@
     "Cycles 721-723: R34 Reset/Present replay fail-close lifecycle reviewed. APPLY_GATE 723 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; device-loss/raw-Present/recovery ordering is critical.",
     "Cycles 724-726: R34 raster guard and forced reset fail-close reviewed. APPLY_GATE 726 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; semantic consumption, resync and replay scope must stay at final draw boundary.",
     "Cycles 727-729: R30 buffer-shadow rollback, SkyGlow Present/Reset and XYZRHW->screen-space->R29 routes rechecked. APPLY_GATE 729 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; physical hook/state restore refactor still needs executable/HMD evidence.",
-    "STATIC_VALIDATION=connector source re-read/contract inspection; verifier source updated but not executed. No build/Actions started. RUNTIME_VALIDATION=UNTESTED."
+    "STATIC_VALIDATION=connector source re-read/contract inspection; verifier source updated but not executed. No build/Actions started. RUNTIME_VALIDATION=UNTESTED.",
+    "Build validation requested at cycle 729: empty trigger commit 8f4a27ecd52f40ae3991ae560230d45611e1e9fe without [skip ci] pushed to work branch. build.yml push trigger applies to this branch. Connector workflow-run wrapper exposes PR-triggered runs only and returned no push run; combined status was also empty at immediate check, so build result remains PENDING/UNCONFIRMED rather than PASS.",
+    "Cycles 730-732 (R84-REF-LIFECYCLE-0035): inspected R32 prerequisite state inputs, 4800-attempt/25ms wait policy and install-thread branching. Isolated exact existing prerequisite classification behind R32ClassifyPrerequisite and named timing constants without changing R31/R22/R13 readiness semantics, hook creation, DirectGPU/ACK transport, or success/failure publication. APPLY_GATE 732 SOURCE_CHANGED=YES; commit 8681432cf8761af5261092ac63bfa6dfd456caf7 [skip ci]. Runtime validation UNTESTED."
   ]
 }
