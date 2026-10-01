@@ -1,6 +1,6 @@
 OutRun 2006 DX11 전환 자동 작업을 진행해줘.
 
-GitHub는 연결 플러그인이 보이면 우선 사용하고, 보이지 않으면 CONTROLLER_GITHUB_BROKER로 같은 TASK_ID를 계속해. GitHub 도구 부재를 이유로 중단/BLOCKED 처리하지 마.
+GitHub는 CONTROLLER_GITHUB_BROKER가 기본 경로다. Broker는 ChatGPT에 노출되는 tool/schema/interface가 아니라 컨트롤러가 처리하는 채팅 텍스트 프로토콜이다. 제공된 BROKER_READ_RESULT로 즉시 작업하고, 추가 파일은 BROKER_READ, 수정은 BROKER_CHANGESET 태그로 요청해. 연결 플러그인은 선택사항이며 tool/interface 부재를 이유로 중단/BLOCKED 처리하지 마.
 
 TARGET_BRANCH는 vr-dx11-native-r71이다. 기존 검증된 VR 기준은 참조만 하고 vr-d3d9ex-focus를 직접 수정하지 마. 시작 즉시 현재 branch HEAD, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, VR 자동화/상태 문서를 읽고 가장 우선순위가 높은 실행 가능한 DX11 전환 작업 하나만 선택해 끝까지 처리해.
 
