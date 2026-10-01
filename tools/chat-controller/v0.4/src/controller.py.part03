@@ -293,6 +293,7 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     active["last_retry_click_at"] = None
     active["last_retry_backoff_at"] = None
     active["phase"] = "WAIT_CHAT"
+    active["broker_context_injected"] = bool(GITHUB_BROKER_ENABLED)
     slot.last_sent_at = sent_at.isoformat()
     slot.chat_task_count = 1
     if not slot.chat_started_at:
@@ -330,6 +331,18 @@ async def queue_handle_retry_surface(context: BrowserContext, pages: dict[str, P
         if assistant_text and await queue_handle_broker_response(context, pages, active, q, assistant_text):
             save_queue_state(q)
             return True
+        if GITHUB_BROKER_ENABLED and not active.get("broker_context_injected"):
+            if await queue_send_github_recovery(context, pages, active):
+                active["broker_context_injected"] = True
+                active["generic_retry_clicks"] = 0
+                active.pop("generic_retry_cooldown_until", None)
+                save_queue_state(q)
+                write_runtime(
+                    status="github_broker_legacy_handoff",
+                    last_action=f"{active['task_id']} pre-broker active chat upgraded in place with controller GitHub context",
+                    queue=active,
+                )
+                return True
         if assistant_text and (
             assistant_claims_github_tooling_absent(assistant_text)
             or assistant_claims_github_unavailable(assistant_text)
@@ -1263,6 +1276,7 @@ async def localization_send_lane_task(
         "last_gate_poll_at": None,
         "failure_context": "",
         "qa_batch": [dict(item) for item in (qa_batch or [])],
+        "broker_context_injected": bool(GITHUB_BROKER_ENABLED),
     }
     q["counter"] = task_counter
     q.setdefault("active_by_lane", {})[slot_name] = provisional
@@ -2373,6 +2387,7 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             "last_hash_changed_at": dispatch_started_at.isoformat(),
             "last_gate_poll_at": None,
             "failure_context": "",
+            "broker_context_injected": bool(GITHUB_BROKER_ENABLED),
         }
         save_queue_state(q)
         write_runtime(
