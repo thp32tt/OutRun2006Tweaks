@@ -1,47 +1,43 @@
 {
-  "schema_version": 27,
-  "schema": "outrun-producer-b00365-zero-runnable-review-v27",
+  "schema_version": 30,
+  "schema": "outrun-producer-b00365-canonical-source-reactivation-v30",
   "task_id": "LOCALIZATION-LOCALIZATION_B-00365",
   "wave_id": "P00234",
   "lane": "LOCALIZATION_B",
   "role": "PRODUCER_B",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
-  "chat_rollover": 1,
-  "recorded_at_kst": "2026-10-01T16:58:00+09:00",
-  "incoming_controller_schema_version": 27,
-  "incoming_controller_config_blob_sha": "5d7d1dfb390a89aeb49fc5650ae410058afc5214",
-  "applied_controller_schema_version": 27,
-  "applied_controller_config_blob_sha": "5d7d1dfb390a89aeb49fc5650ae410058afc5214",
-  "canonical_contract_blob_sha": "874e79a51843a24e891776b6d13f1f292e06b5c7",
-  "base_head_sha": "f212ccbfac85b9e2963ac03c17bd387e44c27ee1",
+  "chat_rollover": 4,
+  "recorded_at_kst": "2026-10-01T17:18:00+09:00",
+  "incoming_controller_schema_version": 28,
+  "incoming_controller_config_blob_sha": "4a784a4381916207af85687f53e756f7f7fd03b6",
+  "applied_controller_schema_version": 30,
+  "applied_controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "canonical_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+  "base_head_sha": "d8f733d9da5cdd66ff0165337bf18bba8eea9f47",
   "input_fingerprint": {
     "asset_queue_blob_sha": "2c06c2b6ae303c385b62e0360dcda88a543f4a2f",
     "canonical_progress_blob_sha": "2aaa9dc258f1527a5e8b0f51adef781c847448fc",
     "resume_state_blob_sha": "2706b7fec8e64a3d4e2a47c6a2c8ab043da99f87",
-    "controller_roles_blob_sha": "5d7d1dfb390a89aeb49fc5650ae410058afc5214",
-    "automation_contract_blob_sha": "874e79a51843a24e891776b6d13f1f292e06b5c7",
+    "controller_roles_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
     "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
-    "authoritative_c_task_record_blob_sha": "db40e95e25f1b97047efe3bdc0bfaa660077446c"
+    "evidence_blob_sha": "9b4e12ef7080375a82e7a96fc4b853dbd64aad5c"
   },
   "policy_resolution": {
-    "resolution": "CURRENT_SCHEMA27_HEAD_POLICY_APPLIED",
+    "resolution": "LATEST_SCHEMA30_HEAD_POLICY_APPLIED_OVER_INCOMING_SCHEMA28_WITHOUT_CHANGING_B_SHARD_OWNERSHIP",
     "stale_cached_policy_used": false,
-    "schema_transition": "NONE_27_TO_27",
-    "schema27_change_scope": "DURABLE_DISPATCH_IDENTITY_AND_CONFIRMATION_OBSERVABILITY_ONLY",
-    "schema27_material_effect_on_b_selection": false,
+    "incoming_schema28_reloaded_from_blob": true,
+    "current_head_schema30_reloaded": true,
+    "candidate_completion_first": true,
+    "successive_independent_preflight_batches_allowed_after_fresh_completion_tier_exhaustion": true,
+    "producers_skip_qa_pending_assets": true,
     "stable_shard_rule": "asset_queue.index % 3 == 1",
     "owning_shard_rows": 46,
-    "producer_batch_target_candidate_dds": 2,
-    "producer_normal_success_min_candidate_dds": 2,
-    "producers_skip_qa_pending_assets": true,
-    "candidate_completion_first": true,
-    "partial_batch_requires_fresh_shard_exhaustion": true,
-    "preflight_suppression_when_completion_tier_or_unconsumed_producer_result_exists": true,
     "work_steal_allowed_for_this_task": false
   },
-  "result": "PASS_REVIEW_NO_RUNNABLE_B_COMPLETION_TIER_SCHEMA27_CANDIDATE_FIRST_HOLD_RUNTIME_UNTESTED",
-  "summary": "Fresh authenticated producer-B scan on current schema27 applies only asset_queue.index % 3 == 1 and performs no work-steal. Since authoritative B00363 result 3fd5125f, branch changes affect only automation/task rollover records and controller dispatch/recovery policy; asset_queue, canonical progress/resume, authoritative C disposition, candidate DDS payloads, canonical contract and orientation policy are unchanged. Current B00342 index61 candidate 89231474/e31487c2 and B00347 index94/index163 candidate-bearing result fa9c8bf6 remain C-QA-pending and must not be repeated. B00353 preflight result ff18b8aa for indices230/236 remains unconsumed and is not extended. A fresh owning-shard completion-tier scan therefore finds no B-owned DIRECT_REWORK_REQUIRED runnable after newer-candidate reconciliation, no EXPLICIT_RENDER_NEXT, no RENDER_READY, no ONE_STAGE_TO_RENDER, and no existing-candidate material rework outside QA-pending state. Candidate-first, QA-pending retention, sticky dependency/source rules, and preflight suppression forbid speculative unrelated production. No DDS/source transport/shared state/runtime/VR/FFB/DX content is modified; this durable task record is the required no-repeat review evidence.",
+  "result": "PASS_MATERIAL_PREFLIGHT_CANONICAL_SOURCE_REACTIVATION_INDICES_52_220_RUNTIME_UNTESTED",
+  "summary": "Schema30/current-contract rescan supersedes the prior schema27 no-new-work hold. Fresh B-shard readiness still has no runnable DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rewrite outside QA-pending results, so an independent PREFLIGHT_ONLY batch is legal. Contract-approved source acquisition for indices 52 and 220 proceeds Drive exact miss -> pinned-tag direct 404 -> pinned v0.25.10a Release fallback. The supplied pinned archive matches the contract SHA-256/size exactly, and both target member bytes exactly match current canonical inventory SHA-256. This retires their stale 'Release source non-authoritative / exact SHA equivalence unproven' source holds. Exact DDS headers are recorded, but effect/removal masks, verified CLEAN_PLATE and final candidate_safe_bbox remain incomplete, so both assets stay PREFLIGHT_ONLY and no Korean DDS is fabricated. Runtime remains UNTESTED.",
   "selection": {
     "shard_rule": "asset_queue.index % 3 == 1",
     "owning_shard_rows": 46,
@@ -49,31 +45,21 @@
     "latest_automation_validated_c_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
     "latest_c_gate_run_id": 36827181087,
     "latest_c_gate_conclusion": "success",
-    "authoritative_c_candidate_awaiting_c": [
-      61,
-      159,
-      198,
-      201
-    ],
     "b_candidate_qa_pending_not_repeated": [
       {
         "index": 61,
         "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
-        "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
-        "candidate_sha256": "e31487c2d8023ce79a07999bec3fa673517dcc1332f69074c05bea3f4b4417d7",
-        "state": "QA_PENDING"
+        "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6"
       },
       {
         "index": 94,
         "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
-        "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
-        "state": "QA_PENDING_NEWER_CANDIDATE"
+        "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f"
       },
       {
         "index": 163,
         "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
-        "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
-        "state": "QA_PENDING_V19_TYPOGRAPHY_FAMILY_REWORK_CANDIDATE"
+        "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f"
       }
     ],
     "unconsumed_b_preflight_not_repeated": {
@@ -82,47 +68,69 @@
       "indices": [
         230,
         236
-      ],
-      "state": "PREFLIGHT_RESULT_AWAITING_C_CONSUMPTION_OR_DEPENDENCY_CHANGE"
+      ]
     },
     "completion_tier_scan": {
       "direct_rework_required_runnable": [],
-      "explicit_render_next": [],
       "render_ready": [],
       "one_stage_to_render": [],
       "existing_candidate_material_rework_runnable": []
     },
-    "selected_indices": [],
-    "selected_action": "NO_NEW_PRODUCER_WORK_UNTIL_AUTHORITATIVE_C_DISPOSITION_OR_MATERIAL_DEPENDENCY_FINGERPRINT_CHANGE",
+    "selected_indices": [
+      52,
+      220
+    ],
+    "selected_action": "PREFLIGHT_ONLY_CANONICAL_SOURCE_REACTIVATION",
+    "readiness_after": {
+      "52": "PREFLIGHT_ONLY_SOURCE_IDENTITY_RESOLVED_EFFECT_MASK_CLEAN_PLATE_SAFE_BBOX_PENDING",
+      "220": "PREFLIGHT_ONLY_SOURCE_IDENTITY_RESOLVED_BINDING_EFFECT_MASK_CLEAN_PLATE_SAFE_BBOX_PENDING"
+    },
     "candidate_batch_target": 2,
     "candidate_dds_completed": 0,
     "fresh_shard_exhaustion_proven": true,
-    "new_preflight_batches_started": 0,
+    "new_preflight_batches_started": 1,
     "source_probe_repeated": false,
     "work_stolen_from_lane": null
   },
-  "branch_delta_since_b00363_result": {
-    "base_result_sha": "3fd5125f1ec4b98aacc1f488a3df08fa85be28f5",
-    "head_before_b00365_result": "f212ccbfac85b9e2963ac03c17bd387e44c27ee1",
-    "queue_progress_resume_candidate_or_c_disposition_changed": false,
-    "changed_scope": "CONTROLLER_ROLES_SCHEMA24_TO_27_AND_A_B_C_ROLLOVER_OR_BOOKKEEPING_RECORDS_ONLY"
+  "evidence": [
+    "localization/graphics/role_B/20261001-1717-B00365-P00234/B00365_P00234_CANONICAL_SOURCE_REACTIVATION.json"
+  ],
+  "source_reactivation": {
+    "pinned_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "pinned_archive_size_bytes": 306223257,
+    "index_52": {
+      "canonical_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+      "release_member_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+      "identity": "PASS_EXACT",
+      "dds": "2048x1024 DXT5 mip1"
+    },
+    "index_220": {
+      "canonical_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "release_member_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "identity": "PASS_EXACT",
+      "dds": "2048x512 BGRA32 mip1"
+    }
   },
   "no_repeat_basis": {
-    "producer_qa_pending_rule": "A/B/E skip producer results awaiting C until C consumes TASK_ID@RESULT_SHA and returns a disposition or a material dependency fingerprint changes.",
-    "candidate_first_rule": "Candidate-bearing QA backlog remains ahead of unrelated PREFLIGHT_ONLY expansion.",
-    "preflight_suppression": "B00353 is already an unconsumed B preflight result; no second speculative preflight batch is started.",
-    "sticky_source_rule": "Unchanged SOURCE_ACQUISITION_EXHAUSTED or SOURCE_IDENTITY_MISMATCH inputs are not reprobed.",
-    "completion_tier_scan": "ZERO_RUNNABLE_B_COMPLETION_TIER_AT_CURRENT_AUTHORITATIVE_C_STATE"
+    "qa_pending_results": "B00342/B00347 candidates were not regenerated or re-QA'd.",
+    "unconsumed_preflight": "B00353 indices230/236 were not extended.",
+    "sticky_source_rows": "Previously terminal SOURCE_ACQUISITION_EXHAUSTED/SOURCE_IDENTITY_MISMATCH rows were not reprobed.",
+    "current_material_change": "Only indices52/220 received new source-identity resolution because the exact pinned Release archive/member bytes were newly verified against current canonical inventory."
   },
   "material_deliverable": {
-    "type": "B_SCHEMA27_FRESH_SHARD_NO_ACTION_REVIEW",
-    "reviewed_shard_rows": 46,
+    "type": "TWO_B_SHARD_CANONICAL_SOURCE_REACTIVATIONS",
+    "indices": [
+      52,
+      220
+    ],
+    "evidence_blob_sha": "9b4e12ef7080375a82e7a96fc4b853dbd64aad5c",
+    "exact_canonical_source_identities_resolved": 2,
     "candidate_dds_modified": false,
     "candidate_binary_persisted": false,
-    "materially_reduces_unresolved_work": false
+    "materially_reduces_unresolved_work": true
   },
-  "material_change": false,
-  "review_record_only": true,
+  "material_change": true,
+  "review_record_only": false,
   "producer_work_repeated": false,
   "candidate_dds_modified": false,
   "candidate_binary_persisted": false,
@@ -133,22 +141,18 @@
   "build_performed": false,
   "n100_used": false,
   "local_clone_used": false,
-  "google_drive_used": false,
+  "google_drive_used": true,
   "google_drive_write_performed": false,
-  "uploaded_archive_used": false,
+  "uploaded_archive_used": true,
   "gpt_library_used_as_source_or_ssot": false,
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": "fbc8b4107ef49c9fe3e41bbc672a77f8b67d94b7",
-  "authoritative_result_sha": "fbc8b4107ef49c9fe3e41bbc672a77f8b67d94b7",
-  "validation_bearing_result_sha": "fbc8b4107ef49c9fe3e41bbc672a77f8b67d94b7",
-  "result_binding_state": "BOUND_TO_VALIDATION_BEARING_RESULT",
-  "result_commit_message": "localization(B): record schema27 zero-runnable shard hold [AUTO:LOCALIZATION-LOCALIZATION_B-00365]",
-  "bookkeeping": {
-    "recorded_at_kst": "2026-10-01T17:00:00+09:00",
-    "head_before_bookkeeping": "0335934048eb692bfeb8945062e72274ab22b12f",
-    "note": "Bookkeeping-only self-SHA binding. Producer AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA. RUNTIME_VALIDATION remains UNTESTED."
-  }
+  "material_evidence_commit_sha": "d8f733d9da5cdd66ff0165337bf18bba8eea9f47",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_binding_state": "PENDING_BOOKKEEPING_SELF_SHA_BIND",
+  "result_commit_message": "localization(B): reactivate canonical sources 52 and 220 [AUTO:LOCALIZATION-LOCALIZATION_B-00365]"
 }
