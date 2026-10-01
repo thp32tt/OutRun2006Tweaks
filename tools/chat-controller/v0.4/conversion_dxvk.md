@@ -1,6 +1,6 @@
 OutRun 2006 DXVK 전환 자동 작업을 진행해줘.
 
-GitHub 관련 작업은 공개 웹이 아니라 연결된 GitHub 플러그인을 실제 호출해 수행하고, 도구/schema/리소스 결과가 바로 보이지 않는다는 이유로 작업을 중단하지 마.
+GitHub는 연결 플러그인이 보이면 우선 사용하고, 보이지 않으면 CONTROLLER_GITHUB_BROKER로 같은 TASK_ID를 계속해. GitHub 도구 부재를 이유로 중단/BLOCKED 처리하지 마.
 
 TARGET_BRANCH는 vr-dxvk-r71-disasm이다. 기존 검증된 VR 기준은 참조만 하고 vr-d3d9ex-focus를 직접 수정하지 마. 시작 즉시 현재 branch HEAD, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, VR 자동화/상태 문서를 읽고 가장 우선순위가 높은 실행 가능한 DXVK 전환 작업 하나만 선택해 끝까지 처리해.
 
