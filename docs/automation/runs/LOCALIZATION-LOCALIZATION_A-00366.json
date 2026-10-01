@@ -129,13 +129,17 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "aab1ed0904775fa6e2ea0f0e5bf3c32385043732",
+  "authoritative_result_sha": "aab1ed0904775fa6e2ea0f0e5bf3c32385043732",
   "validation_bearing_result_sha": null,
   "precommit_refresh": {
     "head_sha": "ab6b07279b0cb9f56affa2e65d8a31960df681b5",
     "stale_state_overwrite": false,
-    "concurrent_changes_reviewed": "Fresh latest schema30 HEAD/Q00075 authority refreshed immediately before tree preparation. Only A00366 lane-local analyzer/material evidence and durable task record are added; shared state, peer candidates and VR/FFB/DX files are untouched."
+    "concurrent_changes_reviewed": "Fresh latest schema30 HEAD/Q00075 authority refreshed immediately before tree preparation. Only A00366 lane-local analyzer/material evidence and durable task record are added; shared state, peer candidates and VR/FFB/DX files are untouched.",
+    "bookkeeping_head_sha": "aab1ed0904775fa6e2ea0f0e5bf3c32385043732",
+    "bookkeeping_concurrent_changes": "Result SHA bound without changing material evidence, shared state, peer candidates, or runtime status."
   },
-  "result_commit_message": "localization(A): advance index111 random panel reconstruction [AUTO:LOCALIZATION-LOCALIZATION_A-00366]"
+  "result_commit_message": "localization(A): advance index111 random panel reconstruction [AUTO:LOCALIZATION-LOCALIZATION_A-00366]",
+  "bookkeeping_recorded_at_kst": "2026-10-01T17:43:00+09:00",
+  "bookkeeping_base_head_sha": "aab1ed0904775fa6e2ea0f0e5bf3c32385043732"
 }
