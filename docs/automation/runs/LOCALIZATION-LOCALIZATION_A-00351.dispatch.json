@@ -6,7 +6,9 @@
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
   "chat_rollover": 1,
-  "action": "RUN_INDEX222_V20_SONG_TITLE_SOURCE_RESTORE",
-  "runner_setup_commit": "4c46eb29009218e59008483293ca9cabbfb78349",
+  "action": "RUN_INDEX222_V20_LOCKED_SONG_TITLE_FAMILY_NORMALIZE",
+  "runner_setup_commit": "3dbbe1a769360f992a60c574b09ac128b63e0656",
+  "infrastructure_retry": 1,
+  "infrastructure_retry_reason": "PRIOR_RUNNER_PAYLOAD_TRANSPORT_CRC_FAILURE_BEFORE_SOURCE_OR_CANDIDATE_STAGE",
   "runtime_validation": "UNTESTED"
 }
