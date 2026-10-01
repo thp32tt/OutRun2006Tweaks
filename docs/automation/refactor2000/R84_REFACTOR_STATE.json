@@ -4,9 +4,9 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 610,
+  "cycle": 616,
   "totalCycles": 2000,
-  "applyEvery": 5,
+  "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
   "runtimeValidation": "UNTESTED",
   "protectedRuntimeGraph": "R26 world + R30 HUD/XYZRHW/SkyGlow (OUTRUN_VR_R26_HUD_COMPARE=ON)",
@@ -94,11 +94,13 @@
     "R84-REF-LIFECYCLE-0023",
     "R84-REF-GUARD-0008",
     "R84-REF-LIFECYCLE-0024",
-    "R84-REF-LIFECYCLE-0025"
+    "R84-REF-LIFECYCLE-0025",
+    "R84-REF-HOOKSET-0003",
+    "R84-REF-LIFECYCLE-0026"
   ],
-  "next": "Cycles 611-615: isolate the R30 disabled-first hook create/enable/rollback transaction behind one ownership boundary while preserving exact hook creation order, enable order, rollback order, and protected R26+R30 runtime behavior.",
-  "updatedKst": "2026-10-02T05:04:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_610_CHECKPOINT",
+  "next": "Cycles 617-619: inspect and isolate the R30 CreateThread/startup failure publication boundary, preserving existing apply() return semantics and all protected R26+R30 runtime behavior; APPLY_GATE at 619.",
+  "updatedKst": "2026-10-02T05:08:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_616_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -110,6 +112,9 @@
     "Cycles 601-605 (R84-REF-LIFECYCLE-0024): isolated R30 install-state storage behind R30SetInstallState/R30GetInstallState and centralized existing async install result publication through R30PublishInstallResult. The prerequisite Ready/Failed decisions, 25 ms wait, 4800-attempt timeout, hook transaction, rollback order, and CreateThread failure reporting behavior are unchanged.",
     "APPLY_GATE 605: SOURCE_CHANGED=YES. Source commit 5d0b8cdb718ade4fee572fc6827bab5453f58183; source-only regression guard commit d900ddf758621c3acefdb01a749831d84bb1b96a. Static source inspection confirms one install-state write boundary, one read boundary, no legacy direct R30InstallState.store/load access, and centralized existing OpenXRVRStereoR30HUD async result publication. Runtime validation remains UNTESTED; no build was started per campaign policy.",
     "Cycles 606-610 (R84-REF-LIFECYCLE-0025): isolated R30 prerequisite Pending/Failed/Ready classification and wait constants from the hook transaction. The existing 4800-attempt limit, 25 ms sleep interval, buffer-creation observation before prerequisite classification, Failed/Ready branch behavior, hook transaction, rollback, and result publication order are unchanged.",
-    "APPLY_GATE 610: SOURCE_CHANGED=YES. Source commit c4af42ea6ebe217e716b5dbe7e4c8c0bcaf40503 [skip ci]. Files: src/vr/d3d9/stereo_renderer_r30.cpp and tools/verify_vr_refactor_contract.py. Static connector re-read confirms decision boundary present, 4800/25 timing preserved through named policy constants, install thread consumes the classifier, old inline timing literals are absent, and the source-only verifier guards the boundary. Runtime validation remains UNTESTED; no build was started."
+    "APPLY_GATE 610: SOURCE_CHANGED=YES. Source commit c4af42ea6ebe217e716b5dbe7e4c8c0bcaf40503 [skip ci]. Files: src/vr/d3d9/stereo_renderer_r30.cpp and tools/verify_vr_refactor_contract.py. Static connector re-read confirms decision boundary present, 4800/25 timing preserved through named policy constants, install thread consumes the classifier, old inline timing literals are absent, and the source-only verifier guards the boundary. Runtime validation remains UNTESTED; no build was started.",
+    "Campaign cadence updated per current instruction: applyEvery=3 from cycle 611 onward; prior completed checkpoints remain unchanged.",
+    "Cycles 611-613 (R84-REF-HOOKSET-0003): isolated the R30 disabled-first Present/Reset/DP/DIP/DPUP/DIPUP hook create+enable+rollback ownership behind R30InstallHookTransaction without changing create order, enable order, existing R30RollbackHooks order, prerequisite timing, buffer-shadow cleanup, or result publication. APPLY_GATE 613 SOURCE_CHANGED=YES; source commit 6780df43f1ce51fa09c86d5bbd2e6a81952630d7 [skip ci]. Source-only verifier guards the ownership boundary and exact creation ordering. Runtime validation UNTESTED; no build started.",
+    "Cycles 614-616 (R84-REF-LIFECYCLE-0026): confirmed all three R30 install-thread failure exits perform buffer-shadow rollback before Failed publication, then centralized that exact pair behind R30FailInstall while preserving each distinct log/return site. APPLY_GATE 616 SOURCE_CHANGED=YES; source commit ac0ad52271678e429c15dc2d945a43f34b7bb47b [skip ci]. Verifier guards three failure routes and rollback-before-publication order. Runtime validation UNTESTED; no build started."
   ]
 }
