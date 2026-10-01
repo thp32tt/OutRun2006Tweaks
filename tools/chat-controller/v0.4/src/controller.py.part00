@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import asyncio
 import html
 import json
@@ -659,6 +660,21 @@ def queue_target_for_slot(slot_name: str) -> dict:
     }
 
 
+def localization_controller_contract_fingerprint() -> tuple[str, str]:
+    """Return the live localization controller schema and config blob SHA used for dispatch."""
+    path = "/repos/" + GITHUB_REPO + "/contents/localization/controller_roles.json?ref=korean-localization-clean"
+    payload = github_api_json(path)
+    blob_sha = str(payload.get("sha") or "").strip()
+    encoded = str(payload.get("content") or "").replace("\\n", "")
+    if not blob_sha or not encoded:
+        raise RuntimeError("localization controller_roles.json freshness metadata unavailable")
+    config = json.loads(base64.b64decode(encoded).decode("utf-8"))
+    schema = str(config.get("schema_version") or "").strip()
+    if not schema:
+        raise RuntimeError("localization controller schema_version unavailable")
+    return schema, blob_sha
+
+
 def queue_dynamic_prefix() -> str:
     task_id = str(runtime.get("queue_task_id") or "").strip()
     if not task_id:
@@ -669,8 +685,13 @@ def queue_dynamic_prefix() -> str:
     failure = str(runtime.get("queue_failure_context") or "").strip()
     wave_id = str(runtime.get("queue_wave_id") or "").strip()
     qa_batch = runtime.get("queue_qa_batch") or []
+    schema_version = ""
+    config_blob_sha = ""
+    if CONTROLLER_MODE == "localization":
+        schema_version, config_blob_sha = localization_controller_contract_fingerprint()
     lines = [
         f"[자동 큐 작업] TASK_ID={task_id}",
+        *([f"CONTROLLER_SCHEMA_VERSION={schema_version}", f"CONTROLLER_CONFIG_BLOB_SHA={config_blob_sha}"] if CONTROLLER_MODE == "localization" else []),
         f"LANE={lane}",
         f"TARGET_BRANCH={branch}",
         f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
