@@ -1,5 +1,5 @@
 {
-  "schema_version": 26,
+  "schema_version": 27,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -218,7 +218,12 @@
         "last_retry_click_at",
         "last_rollover_at",
         "sent_at"
-      ]
+      ],
+      "pre_send_task_identity_persisted": true,
+      "dispatch_confirmation_after_send": true,
+      "uncertain_dispatch_grace_seconds": 180,
+      "uncertain_dispatch_same_task_rollover": true,
+      "live_page_url_reconciles_stale_registry": true
     },
     "state_persistence": {
       "atomic_primary_writes": true,
@@ -309,7 +314,9 @@
     "qa_pending_retention": "UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA",
     "health_includes_memory_pressure": true,
     "active_lane_recovery_order_field": "active_lane_recovery_order",
-    "queue_mode_watchdog_role": "STATE_REARM_ONLY"
+    "queue_mode_watchdog_role": "STATE_REARM_ONLY",
+    "dispatch_confirmation_field": "dispatch_confirmed",
+    "dispatch_started_at_field": "dispatch_started_at"
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
