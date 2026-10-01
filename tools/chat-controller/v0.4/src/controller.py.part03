@@ -1287,25 +1287,53 @@ def _qa_completed_input_keys(q: dict) -> set[str]:
     return keys
 
 
+def _qa_retry_delay_seconds(retry_count: int) -> int:
+    return min(1800, 300 * (2 ** min(max(retry_count - 1, 0), 3)))
+
+
+def _qa_item_ready(item: dict, now: datetime) -> bool:
+    retry_at = _parse_iso(item.get("qa_retry_not_before"))
+    return retry_at is None or now >= retry_at
+
+
+def select_ready_qa_batch(q: dict, now: datetime) -> list[dict]:
+    return [item for item in q.get("qa_pending", []) if _qa_item_ready(item, now)][:LOCALIZATION_QA_BATCH_SIZE]
+
+
+def next_qa_retry_wait_seconds(q: dict, now: datetime) -> Optional[int]:
+    waits = []
+    for item in q.get("qa_pending", []):
+        retry_at = _parse_iso(item.get("qa_retry_not_before"))
+        if retry_at and retry_at > now:
+            waits.append((retry_at - now).total_seconds())
+    return max(1, int(min(waits))) if waits else None
+
+
 def reconcile_blocked_qa_inputs(q: dict) -> int:
     """Restore legacy C-blocked inputs that older controller versions consumed."""
     completed = _qa_completed_input_keys(q)
     pending = q.setdefault("qa_pending", [])
     pending_keys = {_qa_item_key(x) for x in pending}
     restored = 0
+    now = datetime.now(TZ)
     for record in q.get("qa_blocked", []):
-        for item in record.get("inputs", []) or []:
-            key = _qa_item_key(item)
-            if not item.get("task_id") or not item.get("result_sha"):
+        for source in record.get("inputs", []) or []:
+            key = _qa_item_key(source)
+            if not source.get("task_id") or not source.get("result_sha"):
                 continue
             if key in completed or key in pending_keys:
                 continue
-            pending.append(dict(item))
+            item = dict(source)
+            item["qa_retry_count"] = max(1, int(item.get("qa_retry_count", 0) or 0))
+            item["qa_retry_not_before"] = (now + timedelta(seconds=_qa_retry_delay_seconds(item["qa_retry_count"]))).isoformat()
+            item["last_qa_blocked_task_id"] = record.get("qa_task_id")
+            item["last_qa_blocked_at"] = record.get("completed_at") or now.isoformat()
+            pending.append(item)
             pending_keys.add(key)
             restored += 1
     if restored:
         q["qa_blocked_requeued_count"] = int(q.get("qa_blocked_requeued_count", 0)) + restored
-        q["qa_blocked_requeued_at"] = datetime.now(TZ).isoformat()
+        q["qa_blocked_requeued_at"] = now.isoformat()
     return restored
 
 
@@ -1356,9 +1384,26 @@ def finalize_c_qa_batch(q: dict, task: dict) -> None:
         q["qa_pending"] = [x for x in q.get("qa_pending", []) if _qa_item_key(x) not in consumed]
     else:
         # C infrastructure/controller/Gate failure is diagnostic, not validation.
-        # Keep every immutable TASK_ID@RESULT_SHA input pending so a later C batch
-        # retries validation instead of silently dropping unvalidated producer work.
+        # Keep every immutable TASK_ID@RESULT_SHA input pending, but rotate the
+        # failed inputs behind other QA work and apply bounded exponential backoff.
         q["qa_blocked"] = (q.get("qa_blocked", []) + [record])[-100:]
+        blocked_keys = set(input_keys)
+        untouched = []
+        deferred = []
+        retry_now = datetime.now(TZ)
+        for item in q.get("qa_pending", []):
+            if _qa_item_key(item) not in blocked_keys:
+                untouched.append(item)
+                continue
+            updated = dict(item)
+            retry_count = int(updated.get("qa_retry_count", 0) or 0) + 1
+            retry_delay = _qa_retry_delay_seconds(retry_count)
+            updated["qa_retry_count"] = retry_count
+            updated["qa_retry_not_before"] = (retry_now + timedelta(seconds=retry_delay)).isoformat()
+            updated["last_qa_blocked_task_id"] = task.get("task_id")
+            updated["last_qa_blocked_at"] = retry_now.isoformat()
+            deferred.append(updated)
+        q["qa_pending"] = untouched + deferred
 
 
 async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
@@ -1409,12 +1454,13 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
     priority_batch = None
     pending = q.get("qa_pending", [])
     if "C" not in active_by_lane and pending:
-        batch = pending[:LOCALIZATION_QA_BATCH_SIZE]
-        oldest = _parse_iso(batch[0].get("completed_at")) or now
-        age = (now - oldest).total_seconds()
-        if len(batch) >= LOCALIZATION_QA_BATCH_SIZE or age >= LOCALIZATION_QA_COALESCE_SECONDS:
-            priority_lane = "C"
-            priority_batch = batch
+        batch = select_ready_qa_batch(q, now)
+        if batch:
+            oldest = _parse_iso(batch[0].get("completed_at")) or now
+            age = (now - oldest).total_seconds()
+            if len(batch) >= LOCALIZATION_QA_BATCH_SIZE or age >= LOCALIZATION_QA_COALESCE_SECONDS:
+                priority_lane = "C"
+                priority_batch = batch
 
     if priority_lane is None:
         slot_by_name = {slot.name: slot for slot in reg.slots}
@@ -1530,13 +1576,21 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
     active_by_lane = q.setdefault("active_by_lane", {})
     pending = q.get("qa_pending", [])
     if "C" not in active_by_lane and pending:
-        batch = pending[:LOCALIZATION_QA_BATCH_SIZE]
+        batch = select_ready_qa_batch(q, now)
+        if not batch:
+            wait_sec = next_qa_retry_wait_seconds(q, now)
+            write_runtime(
+                status="qa_batch_retry_backoff",
+                last_action=f"C QA pending={len(pending)} but all eligible inputs are in retry backoff for about {wait_sec or 0}s",
+                queue=q,
+            )
+            return
         oldest = _parse_iso(batch[0].get("completed_at")) or now
         age = (now - oldest).total_seconds()
         if len(batch) < LOCALIZATION_QA_BATCH_SIZE and age < LOCALIZATION_QA_COALESCE_SECONDS:
             write_runtime(
                 status="qa_batch_coalescing",
-                last_action=f"C QA collecting batch: {len(batch)}/{LOCALIZATION_QA_BATCH_SIZE}, oldest {int(age)}s",
+                last_action=f"C QA collecting ready batch: {len(batch)}/{LOCALIZATION_QA_BATCH_SIZE}, oldest {int(age)}s",
                 queue=q,
             )
             return
@@ -1546,7 +1600,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
             save_queue_state(q)
             write_runtime(
                 status="qa_batch_running",
-                last_action=f"{qa_id}: C reviewing {len(batch)} producer results while A/B/E continue",
+                last_action=f"{qa_id}: C reviewing {len(batch)} ready producer results while A/B/E continue",
                 queue=q,
             )
             return

@@ -189,14 +189,14 @@ jobs:
           print("four-slot A/B/E producers + C QA with fresh-task chats verified")
           PY2
 
-      - name: Verify schema 28 policy alignment
+      - name: Verify schema 29 policy alignment
         run: |
           git fetch --force origin refs/heads/korean-localization-clean:refs/remotes/origin/korean-localization-clean
           git show refs/remotes/origin/korean-localization-clean:localization/controller_roles.json > /tmp/controller_roles.json
           python - <<'PY2'
           import json, pathlib, re
           cfg=json.loads(pathlib.Path('/tmp/controller_roles.json').read_text())
-          assert cfg['schema_version'] >= 28
+          assert cfg['schema_version'] >= 29
           ex=cfg['execution']; rt=cfg['runtime_tuning']; obs=cfg['runtime_observability']
           assert ex['controller_slot_count'] == 4
           assert ex['slot_map'] == {'A':'A','B':'B','C':'C','D':'E'}
@@ -243,6 +243,11 @@ jobs:
           assert cp['qa_blocked_is_diagnostic_not_consumed'] is True
           assert cp['startup_requeues_legacy_qa_blocked_inputs'] is True
           assert obs['qa_blocked_semantics'] == 'DIAGNOSTIC_UNVALIDATED_INPUTS_REMAIN_PENDING'
+          assert cp['qa_blocked_retry_backoff_seconds'] == [300,600,1200,1800]
+          assert cp['qa_blocked_retry_rotates_to_tail'] is True
+          assert cp['qa_ready_selection_skips_backoff_items'] is True
+          assert cp['qa_blocked_retry_does_not_block_other_ready_inputs'] is True
+          assert obs['qa_retry_fields'] == ['qa_retry_count','qa_retry_not_before','last_qa_blocked_task_id','last_qa_blocked_at']
           assert cp['qa_pending_unconsumed_never_truncated'] is True
           assert obs['qa_pending_retention'] == 'UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA'
           assert obs['queue_active_null_allowed_only_when_active_by_lane_empty'] is False
@@ -297,7 +302,7 @@ jobs:
             m=re.search(rf'^\s+{re.escape(key)}:\s+"?(\d+)"?\s*$',text,re.M)
             assert m and int(m.group(1))==int(val), (key,val,m.group(1) if m else None)
           assert re.search(r'^\s+FRESH_CHAT_EACH_RUN:\s+"true"\s*$',text,re.M)
-          print('schema 28 policy and deployment values aligned')
+          print('schema 29 policy and deployment values aligned')
           PY2
 
       - name: Verify end-to-end liveness bounds
@@ -356,8 +361,13 @@ jobs:
           assert 'lane_exception_count' in isolated and 'QUEUE_ERROR_RESTART_THRESHOLD' in isolated
           qakeys=src[src.index('def _qa_completed_input_keys'):src.index('def reconcile_blocked_qa_inputs')]
           assert 'q.get("qa_blocked"' not in qakeys
+          retryhelpers=src[src.index('def _qa_retry_delay_seconds'):src.index('def reconcile_blocked_qa_inputs')]
+          assert 'min(1800, 300 *' in retryhelpers
+          assert 'def select_ready_qa_batch' in retryhelpers and '_qa_item_ready(item, now)' in retryhelpers
+          assert 'def next_qa_retry_wait_seconds' in retryhelpers
           reconcile=src[src.index('def reconcile_blocked_qa_inputs'):src.index('def enqueue_producer_result_for_qa')]
-          assert 'qa_blocked_requeued_count' in reconcile and 'pending.append(dict(item))' in reconcile
+          assert 'qa_blocked_requeued_count' in reconcile and 'pending.append(item)' in reconcile
+          assert 'qa_retry_not_before' in reconcile and '_qa_retry_delay_seconds' in reconcile
           enqueue=src[src.index('def enqueue_producer_result_for_qa'):src.index('def finalize_c_qa_batch')]
           assert 'qa_pending"][-200:]' not in enqueue
           assert 'Never truncate unconsumed QA work' in enqueue
