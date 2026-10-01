@@ -3074,7 +3074,17 @@ async def main_async(once: bool):
             raise RuntimeError("Could not attach to Google Chrome on CDP port 9222")
 
         context = browser.contexts[0] if browser.contexts else await browser.new_context()
-        write_runtime(status="browser_attached", last_action="Chrome attached; restoring queue/chat state")
+        write_runtime(status="browser_attached", last_action="Chrome attached; probing controller GitHub broker")
+        if GITHUB_BROKER_ENABLED:
+            capable = await asyncio.to_thread(github_broker_write_capable, True)
+            write_runtime(
+                github_broker_write_capable=capable,
+                last_action=(
+                    "GitHub broker permission probe complete; restoring queue/chat state"
+                    if capable
+                    else "GitHub broker read path available but write capability was not confirmed; restoring queue/chat state"
+                ),
+            )
         reg = load_registry(datetime.now(TZ))
         pages = await prepare_slot_pages(context, reg)
         write_runtime(status="controller_ready", last_action="Queue/chat state restored; checking login and starting scheduler")
