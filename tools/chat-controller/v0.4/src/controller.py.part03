@@ -3,6 +3,31 @@ class StatusHandler(BaseHTTPRequestHandler):
         return
 
     def do_GET(self):
+        if self.path == "/healthz":
+            now = datetime.now(TZ)
+            heartbeat = _parse_iso(runtime.get("queue_loop_heartbeat_at"))
+            started = _parse_iso(runtime.get("started_at")) or now
+            reference = heartbeat or started
+            age = max(0, int((now - reference).total_seconds()))
+            memory_fields = _cgroup_memory_runtime_fields()
+            memory_percent = memory_fields.get("container_memory_percent")
+            healthy = (
+                age < PROCESS_HEARTBEAT_FATAL_SECONDS
+                and (memory_percent is None or memory_percent < MEMORY_FATAL_RESTART_PERCENT)
+            )
+            body = json.dumps({
+                "healthy": healthy,
+                "heartbeat_age_seconds": age,
+                "fatal_after_seconds": PROCESS_HEARTBEAT_FATAL_SECONDS,
+                "memory_percent": memory_percent,
+                "memory_fatal_percent": MEMORY_FATAL_RESTART_PERCENT,
+                "status": runtime.get("status"),
+            }, ensure_ascii=False).encode("utf-8")
+            self.send_response(200 if healthy else 503)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers(); self.wfile.write(body)
+            return
         if self.path not in ("/", "/status"):
             self.send_response(404); self.end_headers(); return
         now = datetime.now(TZ)
@@ -62,6 +87,44 @@ def start_process_liveness_monitor():
             if not AUTO_SEND or not QUEUE_MODE:
                 continue
             now = datetime.now(TZ)
+            memory_fields = _cgroup_memory_runtime_fields()
+            runtime.update(memory_fields)
+            memory_percent = memory_fields.get("container_memory_percent")
+            has_active = True
+            try:
+                q = load_queue_state()
+                active = q.get("active")
+                lanes = q.get("active_by_lane") or {}
+                has_active = bool(active) or any(
+                    task and task.get("phase") != "DONE" for task in lanes.values()
+                )
+            except Exception:
+                log.exception("liveness monitor could not inspect queue activity; treating queue as active")
+
+            memory_restart = False
+            memory_status = None
+            if memory_percent is not None and memory_percent >= MEMORY_FATAL_RESTART_PERCENT:
+                memory_restart = True
+                memory_status = "memory_pressure_fatal_restart"
+            elif memory_percent is not None and memory_percent >= MEMORY_IDLE_RESTART_PERCENT and not has_active:
+                memory_restart = True
+                memory_status = "memory_pressure_idle_restart"
+            if memory_restart:
+                message = (
+                    f"Container memory reached {memory_percent:.1f}% "
+                    f"(idle={MEMORY_IDLE_RESTART_PERCENT:.1f}%, fatal={MEMORY_FATAL_RESTART_PERCENT:.1f}%); "
+                    f"active={has_active}; exiting for clean Docker restart before OOM"
+                )
+                log.warning(message)
+                try:
+                    runtime["status"] = memory_status
+                    runtime["last_action"] = message
+                    runtime["last_error"] = None
+                    RUNTIME_FILE.write_text(json.dumps(runtime, ensure_ascii=False, indent=2), encoding="utf-8")
+                except Exception:
+                    log.exception("failed to persist memory-pressure restart state")
+                os._exit(71)
+
             heartbeat = _parse_iso(runtime.get("queue_loop_heartbeat_at"))
             started = _parse_iso(runtime.get("started_at")) or now
             reference = heartbeat or started
@@ -168,8 +231,11 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     runtime["queue_wave_id"] = active.get("wave_id")
     runtime["queue_failure_context"] = active.get("failure_context", "")
 
-    if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
-        write_runtime(status="thinking_level_blocked", last_action=f"{active['task_id']}: rollover chat thinking level unverified")
+    thinking_ok = await ensure_thinking_level(page)
+    if thinking_ok:
+        track_thinking_verification(reg, slot, True, "conversation_rollover")
+    elif STRICT_THINKING_LEVEL:
+        track_thinking_verification(reg, slot, False, "conversation_rollover")
         return False
 
     try:
@@ -389,7 +455,11 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
             )
             return False
         raise
-    if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
+    thinking_ok = await ensure_thinking_level(page)
+    if thinking_ok:
+        track_thinking_verification(reg, slot, True, "queue_retry")
+    elif STRICT_THINKING_LEVEL:
+        track_thinking_verification(reg, slot, False, "queue_retry")
         active["base_sha"] = previous_base
         return False
     result = await send_message(page, prompt)
@@ -574,8 +644,11 @@ async def localization_send_lane_task(
     runtime["queue_failure_context"] = ""
     runtime["queue_qa_batch"] = qa_batch or []
 
-    if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
-        write_runtime(status="thinking_level_blocked", last_action=f"Wave {wave_id} lane {slot_name}: High not verified")
+    thinking_ok = await ensure_thinking_level(page)
+    if thinking_ok:
+        track_thinking_verification(reg, slot, True, f"parallel_dispatch:{slot_name}")
+    elif STRICT_THINKING_LEVEL:
+        track_thinking_verification(reg, slot, False, f"parallel_dispatch:{slot_name}")
         return False
 
     try:
@@ -671,6 +744,51 @@ async def localization_send_lane_task(
         queue=q,
     )
     return True
+
+
+async def localization_safe_send_lane_task(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    q: dict,
+    slot_name: str,
+    wave_id: str,
+    qa_batch: Optional[list[dict]] = None,
+) -> bool:
+    """Isolate one localization dispatch failure so the other lanes keep progressing."""
+    touch_queue_heartbeat()
+    now = datetime.now(TZ)
+    errors = q.setdefault("lane_dispatch_errors", {})
+    previous = errors.get(slot_name) or {}
+    retry_after = _parse_iso(previous.get("retry_not_before"))
+    if retry_after and now < retry_after:
+        return False
+    try:
+        sent = await localization_send_lane_task(context, pages, q, slot_name, wave_id, qa_batch=qa_batch)
+        if sent and errors.pop(slot_name, None) is not None:
+            save_queue_state(q)
+        return sent
+    except Exception as e:
+        if is_browser_transport_failure(e):
+            raise
+        signature = f"{type(e).__name__}:{e}"
+        count = int(previous.get("count", 0)) + 1 if previous.get("signature") == signature else 1
+        delay = min(300, 30 * count)
+        errors[slot_name] = {
+            "at": now.isoformat(),
+            "signature": signature,
+            "count": count,
+            "retry_not_before": (now + timedelta(seconds=delay)).isoformat(),
+            "wave_id": wave_id,
+        }
+        save_queue_state(q)
+        log.exception("localization dispatch failed lane=%s wave=%s count=%s", slot_name, wave_id, count)
+        write_runtime(
+            status="lane_dispatch_error",
+            last_action=f"Lane {slot_name} dispatch failed ({count}); retry in {delay}s while other lanes continue",
+            last_error=repr(e),
+            queue=q,
+        )
+        return False
 
 
 def finalize_localization_producer_commit(q: dict, active: dict, task_commit: dict, now: datetime) -> None:
@@ -1028,6 +1146,79 @@ async def localization_process_lane(
         save_queue_state(q)
 
 
+async def localization_process_lane_isolated(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    q: dict,
+    lane_key: str,
+) -> None:
+    """Keep one broken localization lane from stopping the other three workers."""
+    touch_queue_heartbeat()
+    active = q.get("active_by_lane", {}).get(lane_key)
+    if not active:
+        return
+    try:
+        await localization_process_lane(context, pages, q, lane_key)
+        changed = False
+        for key in ("lane_exception_signature", "lane_exception_count", "lane_exception_at"):
+            if active.pop(key, None) is not None:
+                changed = True
+        if changed:
+            save_queue_state(q)
+        return
+    except Exception as e:
+        if is_browser_transport_failure(e):
+            raise
+        now = datetime.now(TZ)
+        log.exception("localization active lane failed lane=%s task=%s", lane_key, active.get("task_id"))
+
+        commit = github_find_task_commit(
+            str(active.get("branch") or ""),
+            str(active.get("task_id") or ""),
+            allow_ci_skip_fallback=lane_key in {"A", "B", "D"},
+        )
+        if commit:
+            if lane_key in {"A", "B", "D"}:
+                finalize_localization_producer_commit(q, active, commit, now)
+            else:
+                active["result_sha"] = commit["sha"]
+                active["result_message"] = commit.get("message")
+                active["phase"] = "WAIT_ACTIONS"
+                active["wait_actions_started_at"] = now.isoformat()
+                active["last_gate_poll_at"] = None
+            save_queue_state(q)
+            write_runtime(
+                status="lane_exception_commit_recovered",
+                last_action=f"{active.get('task_id')} durable commit recovered after lane exception",
+                last_error=repr(e),
+                queue=q,
+            )
+            return
+
+        signature = f"{type(e).__name__}:{e}"
+        previous_signature = active.get("lane_exception_signature")
+        count = int(active.get("lane_exception_count", 0)) + 1 if previous_signature == signature else 1
+        active["lane_exception_signature"] = signature
+        active["lane_exception_count"] = count
+        active["lane_exception_at"] = now.isoformat()
+        if count >= QUEUE_ERROR_RESTART_THRESHOLD:
+            reason = f"Lane-local controller failure repeated {count} times: {signature}"
+            active["failure_context"] = reason
+            active["automation_validation"] = "FAIL"
+            active["runtime_validation"] = "UNTESTED"
+            active["blocked_at"] = now.isoformat()
+            active["terminal"] = "BLOCKED"
+            active["phase"] = "DONE"
+            q["blocked"] = (q.get("blocked", []) + [dict(active)])[-100:]
+            status = "lane_exception_blocked"
+            action = f"{active.get('task_id')} blocked after {count} lane-local controller failures; other lanes continue"
+        else:
+            status = "lane_exception"
+            action = f"{active.get('task_id')} lane-local failure {count}/{QUEUE_ERROR_RESTART_THRESHOLD}; other lanes continue"
+        save_queue_state(q)
+        write_runtime(status=status, last_action=action, last_error=repr(e), queue=q)
+
+
 def _qa_item_key(item: dict) -> str:
     return f"{item.get('task_id','')}@{item.get('result_sha','')}"
 
@@ -1059,7 +1250,8 @@ def enqueue_producer_result_for_qa(q: dict, task: dict) -> bool:
     if key in pending_keys or key in _qa_completed_input_keys(q):
         return False
     q.setdefault("qa_pending", []).append(item)
-    q["qa_pending"] = q["qa_pending"][-200:]
+    # Never truncate unconsumed QA work. Git is the durable SSOT, but dropping an
+    # in-memory pending key here could permanently skip C validation during a long backlog.
     return True
 
 
@@ -1165,7 +1357,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
             if priority_lane == "C"
             else f"P{int(q.get('producer_counter', 0)) + 1:05d}"
         )
-        if await localization_send_lane_task(context, pages, q, priority_lane, dispatch_id, qa_batch=priority_batch):
+        if await localization_safe_send_lane_task(context, pages, q, priority_lane, dispatch_id, qa_batch=priority_batch):
             if priority_lane == "C":
                 q["qa_batch_counter"] = int(q.get("qa_batch_counter", 0)) + 1
             else:
@@ -1185,7 +1377,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
     # Advance A/B/E producers plus C independently after missing-worker fairness.
     for lane_key in ("A", "B", "C", "D"):
         if lane_key in active_by_lane:
-            await localization_process_lane(context, pages, q, lane_key)
+            await localization_process_lane_isolated(context, pages, q, lane_key)
 
     active_by_lane = q.setdefault("active_by_lane", {})
 
@@ -1226,7 +1418,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
         if lane_key == "D" and e_throttled:
             continue
         producer_id = f"P{int(q.get('producer_counter', 0)) + 1:05d}"
-        if await localization_send_lane_task(context, pages, q, lane_key, producer_id):
+        if await localization_safe_send_lane_task(context, pages, q, lane_key, producer_id):
             q["producer_counter"] = int(q.get("producer_counter", 0)) + 1
             save_queue_state(q)
 
@@ -1246,7 +1438,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
             )
             return
         qa_id = f"Q{int(q.get('qa_batch_counter', 0)) + 1:05d}"
-        if await localization_send_lane_task(context, pages, q, "C", qa_id, qa_batch=batch):
+        if await localization_safe_send_lane_task(context, pages, q, "C", qa_id, qa_batch=batch):
             q["qa_batch_counter"] = int(q.get("qa_batch_counter", 0)) + 1
             save_queue_state(q)
             write_runtime(
@@ -1911,11 +2103,8 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
                     raise
                 log.exception("queue cycle failed")
                 signature = f"{type(e).__name__}:{e}"
-                if signature == queue_error_signature:
-                    queue_error_count += 1
-                else:
-                    queue_error_signature = signature
-                    queue_error_count = 1
+                queue_error_signature = signature
+                queue_error_count += 1
                 write_runtime(
                     status="queue_error",
                     last_action=f"Queue cycle failed ({queue_error_count}/{QUEUE_ERROR_RESTART_THRESHOLD}): {type(e).__name__}: {e}",
@@ -1959,11 +2148,8 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
                     raise
                 log.exception("watchdog cycle failed")
                 signature = f"{type(e).__name__}:{e}"
-                if signature == watchdog_error_signature:
-                    watchdog_error_count += 1
-                else:
-                    watchdog_error_signature = signature
-                    watchdog_error_count = 1
+                watchdog_error_signature = signature
+                watchdog_error_count += 1
                 write_runtime(
                     status="watchdog_error",
                     last_action=f"Watchdog failed ({watchdog_error_count}/{WATCHDOG_ERROR_RESTART_THRESHOLD}): {type(e).__name__}: {e}",
@@ -1982,8 +2168,8 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
 
 async def main_async(once: bool):
     start_status_server()
-    start_process_liveness_monitor()
-    write_runtime(status="browser_connecting", last_action="Attaching controller to Chrome DevTools")
+    validate_runtime_assets()
+    write_runtime(status="browser_connecting", last_action="Runtime assets validated; attaching controller to Chrome DevTools")
     async with async_playwright() as p:
         browser = None
         for _ in range(60):
@@ -2005,6 +2191,7 @@ async def main_async(once: bool):
         first_page = pages[reg.slots[0].name]
         if not await ensure_logged_in(first_page):
             write_runtime(status="login_required", last_action="Open noVNC and log in to ChatGPT")
+        start_process_liveness_monitor()
         await scheduler_loop(context, pages, once=once)
 
 

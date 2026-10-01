@@ -137,7 +137,7 @@ The existing `docker-compose.portainer-vr.yml` path is retained for compatibilit
 - C uses `Localization Automation Gate`; runtime validation remains `UNTESTED` until user game testing
 
 ### Controller completion rule
-A chat response is never completion authority. The controller resolves the durable `[AUTO:<TASK_ID>]` commit first, using normal branch history plus the exact `docs/automation/runs/<TASK_ID>.json` history so high-throughput branches cannot hide an older task beyond the first 100 commits.
+A chat response is never completion authority. The controller resolves the durable `[AUTO:<TASK_ID>]` commit first, scanning up to 3 branch-history pages (up to 300 commits) plus the exact `docs/automation/runs/<TASK_ID>.json` history (up to 100 path commits) so high-throughput branches cannot hide an older task.
 
 - Conversion DX11/DXVK: the validation-bearing task commit must have the exact `Backend Conversion Gate` run and that run must conclude `success`.
 - Localization C: the validation-bearing C commit must have the exact `Localization Automation Gate` run and that run must conclude `success`.
@@ -191,21 +191,22 @@ The localization stack now uses these controller-runtime values directly:
 - stale WAIT_ACTIONS rearm: 75s
 - idle queue rearm: 90s
 - next-task delay: 15s
-- A/B lane stagger: 15s
+- A/B/E producer lane stagger: 15s
 - distinct-slot send gap: 15s
 - localization same-slot next-task send gap: 30s
 - localization slot dedup: 30s
 - C QA batch size: 4 producer results
 - C QA coalesce window: 60s
-- scheduler heartbeat: 15s; fatal event-loop heartbeat stall: 300s -> process exit / Docker restart
+- scheduler heartbeat: 15s; fatal event-loop heartbeat stall: 180s -> process exit / Docker restart; `/healthz` reports heartbeat freshness
+- proactive memory recovery: idle queue at >=80% container memory -> clean restart; >=92% -> state-preserving emergency restart even with active work, before OOM kills Chrome/Playwright
 - active-generation busy-stall protection: 30m -> same TASK_ID fresh-chat rollover instead of infinite WAIT_CHAT
 - existing nonterminal Actions-run maximum wait: 1800s
-- repeated identical queue exception: 3 cycles -> process exit / Docker restart
-- repeated identical watchdog exception: 3 cycles -> process exit / Docker restart
+- consecutive queue exceptions: 3 cycles -> process exit / Docker restart (signature is diagnostic only)
+- consecutive watchdog exceptions: 3 cycles -> process exit / Docker restart (signature is diagnostic only)
 - explicit ChatGPT rate-limit backoff: 90/180/300/600s; Git/Actions reconciliation continues during backoff
 - generic Retry: at most 2 controlled clicks, then same TASK_ID rolls over to a fresh project chat
 
-On startup, persisted nonterminal queue records are reconciled against Git before UI recovery. Queue and registry JSON keep last-known-good backups and are restored from backup on primary-file corruption/missing-primary cases; the controller refuses a destructive empty reset when both copies are unreadable. Daily logical-date rollover preserves active slot URLs and send/rate state. A prompt that was already submitted is always represented by an active TASK_ID even when a rate-limit/Retry surface appears immediately after send, preventing orphan work and TASK_ID reuse.
+On startup, required mode-specific prompt assets are validated before any browser dispatch, then persisted nonterminal queue records are reconciled against Git before UI recovery. Localization lane-local exceptions are isolated: A/B/C/E continue independently, with repeated lane-local failures bounded to 3 occurrences while browser transport failure remains a whole-container restart condition. Queue and registry JSON keep last-known-good backups and are restored from backup on primary-file corruption/missing-primary cases; the controller refuses a destructive empty reset when both copies are unreadable. Daily logical-date rollover preserves active slot URLs and send/rate state. A prompt that was already submitted is always represented by an active TASK_ID even when a rate-limit/Retry surface appears immediately after send, preventing orphan work and TASK_ID reuse.
 
 When redeploying in Portainer, retain the existing localization /data volume so persisted W00018 state can be reconciled instead of discarded.
 

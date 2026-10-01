@@ -238,6 +238,22 @@ async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str,
     return page
 
 
+def required_runtime_prompt_files() -> list[str]:
+    if CONTROLLER_MODE == "conversion":
+        return ["conversion_dx11.md", "conversion_dxvk.md"]
+    return ["localization_A.md", "localization_B.md", "localization_C.md", "localization_E.md"]
+
+
+def validate_runtime_assets() -> None:
+    missing = [name for name in required_runtime_prompt_files() if not (PROMPTS_DIR / name).is_file()]
+    if missing:
+        raise RuntimeError(f"required runtime prompt assets missing: {missing}")
+    write_runtime(
+        runtime_assets_validated=True,
+        runtime_prompt_files=required_runtime_prompt_files(),
+    )
+
+
 def prompt_for_slot(slot: Slot, phase: str) -> str:
     """Select a queue-isolated prompt and prepend the current task contract."""
     if CONTROLLER_MODE == "conversion":

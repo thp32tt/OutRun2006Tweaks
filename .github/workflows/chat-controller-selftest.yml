@@ -79,6 +79,32 @@ jobs:
           grep -Fq 'COPY localization_B.md /opt/outrun/prompts/localization_B.md' "$dockerfile"
           grep -Fq 'COPY localization_C.md /opt/outrun/prompts/localization_C.md' "$dockerfile"
           grep -Fq 'COPY localization_E.md /opt/outrun/prompts/localization_E.md' "$dockerfile"
+          grep -Fq 'def validate_runtime_assets()' /tmp/controller.py
+          grep -Fq 'validate_runtime_assets()' /tmp/controller.py
+          python - <<'PY2'
+          from pathlib import Path
+          import re
+          root = Path('tools/chat-controller/v0.4')
+          dockerfile = (root/'Dockerfile.portainer').read_text(encoding='utf-8')
+          for line in dockerfile.splitlines():
+              line=line.strip()
+              if not line.startswith('COPY ') or '*' in line:
+                  continue
+              parts=line.split()
+              if len(parts) < 3:
+                  continue
+              src=parts[1]
+              if src.startswith('--'):
+                  continue
+              assert (root/src).exists(), f'Dockerfile COPY source missing: {src}'
+          src=Path('/tmp/controller.py').read_text(encoding='utf-8')
+          required={'conversion_dx11.md','conversion_dxvk.md','localization_A.md','localization_B.md','localization_C.md','localization_E.md'}
+          copied=set(re.findall(r'^COPY\s+([^\s]+\.md)\s+/opt/outrun/prompts/', dockerfile, re.M))
+          assert required.issubset(copied), (required-copied)
+          main=src[src.index('async def main_async'):]
+          assert main.index('validate_runtime_assets()') < main.index('async_playwright()')
+          print('runtime prompt assets and Docker COPY sources verified')
+          PY2
 
       - name: Verify authorized game-mod context
         run: |
@@ -162,14 +188,14 @@ jobs:
           print("four-slot A/B/E producers + C QA with fresh-task chats verified")
           PY2
 
-      - name: Verify schema 23 policy alignment
+      - name: Verify schema 24 policy alignment
         run: |
           git fetch --force origin refs/heads/korean-localization-clean:refs/remotes/origin/korean-localization-clean
           git show refs/remotes/origin/korean-localization-clean:localization/controller_roles.json > /tmp/controller_roles.json
           python - <<'PY2'
           import json, pathlib, re
           cfg=json.loads(pathlib.Path('/tmp/controller_roles.json').read_text())
-          assert cfg['schema_version'] >= 23
+          assert cfg['schema_version'] >= 24
           ex=cfg['execution']; rt=cfg['runtime_tuning']; obs=cfg['runtime_observability']
           assert ex['controller_slot_count'] == 4
           assert ex['slot_map'] == {'A':'A','B':'B','C':'C','D':'E'}
@@ -191,15 +217,40 @@ jobs:
           assert cp['post_send_task_identity_preserved'] is True
           assert cp['chat_rate_limit_blocks_sends_not_git_reconcile'] is True
           assert cp['negative_task_commit_lookup_not_cached'] is True
+          assert cp['lane_exception_isolation'] is True
+          assert cp['lane_exception_block_threshold'] == 3
+          assert cp['dispatch_exception_backoff_max_seconds'] == 300
+          assert cp['browser_transport_failure_global_restart'] is True
+          assert cp['qa_pending_unconsumed_never_truncated'] is True
+          assert obs['qa_pending_retention'] == 'UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA'
+          assert obs['queue_active_null_allowed_only_when_active_by_lane_empty'] is False
+          assert obs['queue_active_null_allowed_in_parallel_mode'] is True
+          assert obs['queue_active_legacy_field_must_not_gate_parallel_lanes'] is True
           state=cfg['runtime_recovery']['state_persistence']
           proc=cfg['runtime_recovery']['process_recovery']
           assert state['last_known_good_backup'] is True and state['destructive_empty_reset_on_unreadable_state'] is False
           assert proc['repeated_identical_queue_exception_restart_threshold'] == 3
           assert proc['repeated_identical_watchdog_exception_restart_threshold'] == 3
-          assert proc['queue_heartbeat_fatal_seconds'] == 300
+          assert proc['consecutive_queue_exception_restart_threshold'] == 3
+          assert proc['consecutive_watchdog_exception_restart_threshold'] == 3
+          assert proc['exception_signature_is_diagnostic_only'] is True
+          assert proc['queue_heartbeat_fatal_seconds'] == 180
+          assert proc['memory_idle_restart_percent'] == 80
+          assert proc['memory_fatal_restart_percent'] == 92
+          assert proc['memory_idle_restart_requires_no_active_task'] is True
+          assert proc['memory_fatal_restart_preserves_queue_state'] is True
+          assert obs['health_includes_memory_pressure'] is True
           assert rt['wait_actions_max_seconds'] == 1800
-          assert rt['process_heartbeat_fatal_seconds'] == 300
-          assert obs['heartbeat_fatal_after_seconds'] == 300
+          assert rt['process_heartbeat_fatal_seconds'] == 180
+          assert rt['github_task_commit_scan_pages'] == 3
+          assert rt['github_actions_discovery_per_page'] == 100
+          assert rt['memory_idle_restart_percent'] == 80
+          assert rt['memory_fatal_restart_percent'] == 92
+          assert cp['task_commit_branch_scan_pages'] == 3
+          assert cp['actions_discovery_per_page'] == 100
+          assert obs['heartbeat_fatal_after_seconds'] == 180
+          assert obs['runtime_asset_validation'] == 'FAIL_FAST_BEFORE_BROWSER_DISPATCH'
+          assert obs['health_endpoint'] == '/healthz'
           assert obs['dispatch_fairness'] == 'FILL_READY_C_OR_MISSING_PRODUCER_BEFORE_ACTIVE_RETRY_TRAFFIC'
           text=pathlib.Path('tools/chat-controller/v0.4/docker-compose.portainer-localization.yml').read_text()
           expected={
@@ -215,12 +266,16 @@ jobs:
             'QUEUE_ERROR_RESTART_THRESHOLD':rt['queue_error_restart_threshold'],
             'WATCHDOG_ERROR_RESTART_THRESHOLD':rt['watchdog_error_restart_threshold'],
             'PROCESS_HEARTBEAT_FATAL_SECONDS':rt['process_heartbeat_fatal_seconds'],
+            'GITHUB_TASK_COMMIT_SCAN_PAGES':rt['github_task_commit_scan_pages'],
+            'GITHUB_ACTIONS_DISCOVERY_PER_PAGE':rt['github_actions_discovery_per_page'],
+            'MEMORY_IDLE_RESTART_PERCENT':rt['memory_idle_restart_percent'],
+            'MEMORY_FATAL_RESTART_PERCENT':rt['memory_fatal_restart_percent'],
           }
           for key,val in expected.items():
             m=re.search(rf'^\s+{re.escape(key)}:\s+"?(\d+)"?\s*$',text,re.M)
             assert m and int(m.group(1))==int(val), (key,val,m.group(1) if m else None)
           assert re.search(r'^\s+FRESH_CHAT_EACH_RUN:\s+"true"\s*$',text,re.M)
-          print('schema 23 policy and deployment values aligned')
+          print('schema 24 policy and deployment values aligned')
           PY2
 
       - name: Verify end-to-end liveness bounds
@@ -231,7 +286,7 @@ jobs:
             grep -Fq 'WAIT_ACTIONS_MAX_SECONDS: "1800"' "$compose"
             grep -Fq 'QUEUE_ERROR_RESTART_THRESHOLD: "3"' "$compose"
             grep -Fq 'WATCHDOG_ERROR_RESTART_THRESHOLD: "3"' "$compose"
-            grep -Fq 'PROCESS_HEARTBEAT_FATAL_SECONDS: "300"' "$compose"
+            grep -Fq 'PROCESS_HEARTBEAT_FATAL_SECONDS: "180"' "$compose"
           done
           grep -Fq 'REGISTRY_BACKUP_FILE' /tmp/controller.py
           grep -Fq 'QUEUE_BACKUP_FILE' /tmp/controller.py
@@ -244,6 +299,23 @@ jobs:
           grep -Fq 'def start_process_liveness_monitor' /tmp/controller.py
           grep -Fq 'queue_error_restart' /tmp/controller.py
           grep -Fq 'watchdog_error_restart' /tmp/controller.py
+          grep -Fq 'GITHUB_TASK_COMMIT_SCAN_PAGES' /tmp/controller.py
+          grep -Fq 'for page_no in range(1, GITHUB_TASK_COMMIT_SCAN_PAGES + 1)' /tmp/controller.py
+          grep -Fq '"per_page": GITHUB_ACTIONS_DISCOVERY_PER_PAGE' /tmp/controller.py
+          grep -Fq 'GITHUB_TASK_COMMIT_SCAN_PAGES: "3"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'GITHUB_TASK_COMMIT_SCAN_PAGES: "3"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'GITHUB_ACTIONS_DISCOVERY_PER_PAGE: "100"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'GITHUB_ACTIONS_DISCOVERY_PER_PAGE: "100"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'MEMORY_IDLE_RESTART_PERCENT: "80"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'MEMORY_IDLE_RESTART_PERCENT: "80"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'MEMORY_FATAL_RESTART_PERCENT: "92"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'MEMORY_FATAL_RESTART_PERCENT: "92"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'memory_pressure_idle_restart' /tmp/controller.py
+          grep -Fq 'memory_pressure_fatal_restart' /tmp/controller.py
+          grep -Fq 'os._exit(71)' /tmp/controller.py
+          grep -Fq 'self.path == "/healthz"' /tmp/controller.py
+          grep -Fq '/healthz >/dev/null' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq '/healthz >/dev/null' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
           grep -Fq 'controller-ui-ready' tools/chat-controller/v0.4/entrypoint.direct.sh
           grep -Fq 'Chrome DevTools unavailable twice' tools/chat-controller/v0.4/entrypoint.direct.sh
           bash -n tools/chat-controller/v0.4/entrypoint.direct.sh
@@ -253,6 +325,16 @@ jobs:
           loc=src[src.index('async def localization_process_lane'):src.index('def _qa_item_key')]
           assert loc.index('task_commit = github_find_task_commit(') < loc.index('queue_handle_retry_surface(')
           assert 'allow_ci_skip_fallback=lane_key in {"A", "B", "D"}' in loc
+          assert 'async def localization_process_lane_isolated' in src
+          assert 'async def localization_safe_send_lane_task' in src
+          assert src.count('localization_safe_send_lane_task(') >= 4
+          assert 'await localization_process_lane_isolated(context, pages, q, lane_key)' in src
+          isolated=src[src.index('async def localization_process_lane_isolated'):src.index('def _qa_item_key')]
+          assert 'if is_browser_transport_failure(e):' in isolated and 'raise' in isolated
+          assert 'lane_exception_count' in isolated and 'QUEUE_ERROR_RESTART_THRESHOLD' in isolated
+          enqueue=src[src.index('def enqueue_producer_result_for_qa'):src.index('def finalize_c_qa_batch')]
+          assert 'qa_pending"][-200:]' not in enqueue
+          assert 'Never truncate unconsumed QA work' in enqueue
           assert src.count('remained busy without durable Git progress') >= 2
           assert src.count('WAIT_ACTIONS_MAX_SECONDS') >= 5
           assert 'never orphan' in src
@@ -264,7 +346,14 @@ jobs:
           scheduler=src[src.index('async def scheduler_loop'):src.index('async def main_async')]
           assert 'QUEUE_ERROR_RESTART_THRESHOLD' in scheduler
           assert 'WATCHDOG_ERROR_RESTART_THRESHOLD' in scheduler
+          assert 'queue_error_count += 1' in scheduler
+          assert 'watchdog_error_count += 1' in scheduler
+          assert 'if signature == queue_error_signature' not in scheduler
+          assert 'if signature == watchdog_error_signature' not in scheduler
           assert 'raise' in scheduler
+          main=src[src.index('async def main_async'):]
+          assert main.index('validate_runtime_assets()') < main.index('async_playwright()')
+          assert main.index('prepare_slot_pages(context, reg)') < main.index('start_process_liveness_monitor()')
           assert 'registry read failed; recreating' not in src
           assert 'queue state read failed; recreating' not in src
           print('bounded end-to-end liveness invariants verified')

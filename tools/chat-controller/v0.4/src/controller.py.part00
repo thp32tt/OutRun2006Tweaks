@@ -56,6 +56,7 @@ GITHUB_POLL_SECONDS = max(15, int(os.getenv("GITHUB_POLL_SECONDS", "60")))
 GITHUB_BOUND_RUN_POLL_SECONDS = max(10, int(os.getenv("GITHUB_BOUND_RUN_POLL_SECONDS", "30")))
 GITHUB_TASK_COMMIT_CACHE_SECONDS = max(15, int(os.getenv("GITHUB_TASK_COMMIT_CACHE_SECONDS", "60")))
 GITHUB_TASK_COMMIT_SCAN_PAGES = max(1, min(5, int(os.getenv("GITHUB_TASK_COMMIT_SCAN_PAGES", "3"))))
+GITHUB_ACTIONS_DISCOVERY_PER_PAGE = max(30, min(100, int(os.getenv("GITHUB_ACTIONS_DISCOVERY_PER_PAGE", "100"))))
 GITHUB_ACTIONS_CACHE_SECONDS = max(10, int(os.getenv("GITHUB_ACTIONS_CACHE_SECONDS", "60")))
 WAIT_ACTIONS_STALE_SECONDS = max(GITHUB_BOUND_RUN_POLL_SECONDS, int(os.getenv("WAIT_ACTIONS_STALE_SECONDS", "75")))
 WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS = max(GITHUB_POLL_SECONDS, int(os.getenv("WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS", "600")))
@@ -69,6 +70,8 @@ PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECO
 PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS", "15")))
 HEARTBEAT_SECONDS = max(5, int(os.getenv("HEARTBEAT_SECONDS", "15")))
 PROCESS_HEARTBEAT_FATAL_SECONDS = max(120, int(os.getenv("PROCESS_HEARTBEAT_FATAL_SECONDS", "300")))
+MEMORY_IDLE_RESTART_PERCENT = max(50.0, min(95.0, float(os.getenv("MEMORY_IDLE_RESTART_PERCENT", "80"))))
+MEMORY_FATAL_RESTART_PERCENT = max(MEMORY_IDLE_RESTART_PERCENT + 1.0, min(99.0, float(os.getenv("MEMORY_FATAL_RESTART_PERCENT", "92"))))
 LOCALIZATION_QA_BATCH_SIZE = max(1, int(os.getenv("LOCALIZATION_QA_BATCH_SIZE", "4")))
 LOCALIZATION_QA_COALESCE_SECONDS = max(0, int(os.getenv("LOCALIZATION_QA_COALESCE_SECONDS", "60")))
 LOCALIZATION_E_QA_PAUSE_THRESHOLD = max(1, int(os.getenv("LOCALIZATION_E_QA_PAUSE_THRESHOLD", "16")))
@@ -105,6 +108,7 @@ RETRY_BUTTON_COOLDOWN_SECONDS = max(10, int(os.getenv("RETRY_BUTTON_COOLDOWN_SEC
 GENERIC_RETRY_ROLLOVER_CLICKS = max(1, int(os.getenv("GENERIC_RETRY_ROLLOVER_CLICKS", "2")))
 PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
 STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "true"
+THINKING_VERIFY_FAILURE_RESTART_THRESHOLD = max(2, int(os.getenv("THINKING_VERIFY_FAILURE_RESTART_THRESHOLD", "4")))
 PROFILE_DIR = Path("/data/browser-profile")
 STATE_DIR = Path("/data/state")
 REGISTRY_FILE = STATE_DIR / "chat_registry.json"
@@ -221,6 +225,12 @@ class Slot:
     last_assistant_change_at: Optional[str] = None
     watchdog_resumes_since_schedule: int = 0
     last_watchdog_at: Optional[str] = None
+    thinking_verify_failures: int = 0
+    last_thinking_failure_at: Optional[str] = None
+
+class ControllerRestartRequested(RuntimeError):
+    pass
+
 
 @dataclass
 class Registry:
@@ -245,6 +255,7 @@ runtime = {
     "github_bound_run_poll_seconds": GITHUB_BOUND_RUN_POLL_SECONDS,
     "github_task_commit_cache_seconds": GITHUB_TASK_COMMIT_CACHE_SECONDS,
     "github_task_commit_scan_pages": GITHUB_TASK_COMMIT_SCAN_PAGES,
+    "github_actions_discovery_per_page": GITHUB_ACTIONS_DISCOVERY_PER_PAGE,
     "github_actions_cache_seconds": GITHUB_ACTIONS_CACHE_SECONDS,
     "wait_actions_stale_seconds": WAIT_ACTIONS_STALE_SECONDS,
     "wait_actions_no_run_timeout_seconds": WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS,
@@ -259,6 +270,8 @@ runtime = {
     "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
     "heartbeat_seconds": HEARTBEAT_SECONDS,
     "process_heartbeat_fatal_seconds": PROCESS_HEARTBEAT_FATAL_SECONDS,
+    "memory_idle_restart_percent": MEMORY_IDLE_RESTART_PERCENT,
+    "memory_fatal_restart_percent": MEMORY_FATAL_RESTART_PERCENT,
     "localization_qa_batch_size": LOCALIZATION_QA_BATCH_SIZE,
     "localization_qa_coalesce_seconds": LOCALIZATION_QA_COALESCE_SECONDS,
     "localization_same_slot_send_gap_seconds": LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS,
@@ -289,6 +302,7 @@ runtime = {
     "watchdog_force_stop_stalled": WATCHDOG_FORCE_STOP_STALLED,
     "preferred_thinking_level": PREFERRED_THINKING_LEVEL,
     "strict_thinking_level": STRICT_THINKING_LEVEL,
+    "thinking_verify_failure_restart_threshold": THINKING_VERIFY_FAILURE_RESTART_THRESHOLD,
     "last_thinking_level_result": None,
     "rate_limit_backoff_seconds": RATE_LIMIT_BACKOFF_SECONDS,
     "min_send_gap_seconds": MIN_SEND_GAP_SECONDS,
@@ -333,6 +347,12 @@ def write_runtime(**updates):
     runtime.update(updates)
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     RUNTIME_FILE.write_text(json.dumps(runtime, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def touch_queue_heartbeat() -> None:
+    """Refresh in-memory liveness while a bounded queue sub-operation is making progress."""
+    runtime["queue_loop_heartbeat_at"] = datetime.now(TZ).isoformat()
+
 
 def logical_date(now: datetime) -> str:
     shifted = now - timedelta(days=1) if now.hour < ROLLOVER_HOUR else now
@@ -448,6 +468,36 @@ def save_registry(reg: Registry):
     backup_tmp.replace(REGISTRY_BACKUP_FILE)
 
 
+def track_thinking_verification(reg: Registry, slot: Slot, verified: bool, where: str) -> bool:
+    if verified:
+        if slot.thinking_verify_failures or slot.last_thinking_failure_at:
+            slot.thinking_verify_failures = 0
+            slot.last_thinking_failure_at = None
+            save_registry(reg)
+        return True
+    if not STRICT_THINKING_LEVEL:
+        return False
+    slot.thinking_verify_failures = int(slot.thinking_verify_failures or 0) + 1
+    slot.last_thinking_failure_at = datetime.now(TZ).isoformat()
+    slot.last_result = "thinking_level_unverified"
+    save_registry(reg)
+    write_runtime(
+        status="thinking_level_blocked",
+        last_action=(
+            f"Slot {slot.name} High verification failed at {where} "
+            f"({slot.thinking_verify_failures}/{THINKING_VERIFY_FAILURE_RESTART_THRESHOLD})"
+        ),
+        thinking_failure_slot=slot.name,
+        thinking_failure_count=slot.thinking_verify_failures,
+    )
+    if slot.thinking_verify_failures >= THINKING_VERIFY_FAILURE_RESTART_THRESHOLD:
+        raise ControllerRestartRequested(
+            f"Slot {slot.name} repeated High verification failure reached "
+            f"{THINKING_VERIFY_FAILURE_RESTART_THRESHOLD}; restart browser/controller stack"
+        )
+    return False
+
+
 def read_prompt(filename: str) -> str:
     path = PROMPTS_DIR / filename
     return path.read_text(encoding="utf-8").strip()
@@ -557,6 +607,7 @@ def _github_blocked_seconds() -> int:
 
 def github_api_json(path: str) -> dict:
     global _github_rest_block_until_epoch
+    touch_queue_heartbeat()
     now_epoch = time.time()
     if now_epoch < _github_rest_block_until_epoch:
         raise RuntimeError(f"github REST temporarily paused for {_github_blocked_seconds()}s after rate limit")
@@ -681,8 +732,18 @@ def github_find_task_commit(branch: str, task_id: str, per_page: int = 100, allo
         if cached and now_mono - cached[0] < GITHUB_TASK_COMMIT_CACHE_SECONDS:
             data = cached[1]
         else:
-            q = urllib.parse.urlencode({"sha": branch, "per_page": max(1, min(per_page, 100))})
-            data = github_api_json(f"/repos/{GITHUB_REPO}/commits?{q}")
+            data = []
+            page_size = max(1, min(per_page, 100))
+            for page_no in range(1, GITHUB_TASK_COMMIT_SCAN_PAGES + 1):
+                q = urllib.parse.urlencode({"sha": branch, "per_page": page_size, "page": page_no})
+                page_data = github_api_json(f"/repos/{GITHUB_REPO}/commits?{q}")
+                if not isinstance(page_data, list):
+                    break
+                data.extend(page_data)
+                if len(page_data) < page_size:
+                    break
+                if _select_task_commit(page_data, task_id, allow_ci_skip_fallback=True):
+                    break
             if isinstance(data, list):
                 _github_commit_list_cache[branch] = (now_mono, data)
         result = _select_task_commit(data if isinstance(data, list) else [], task_id, allow_ci_skip_fallback=False)
@@ -695,7 +756,7 @@ def github_find_task_commit(branch: str, task_id: str, per_page: int = 100, allo
             task_data = targeted[1]
         else:
             task_path = f"docs/automation/runs/{task_id}.json"
-            q = urllib.parse.urlencode({"sha": branch, "path": task_path, "per_page": 30})
+            q = urllib.parse.urlencode({"sha": branch, "path": task_path, "per_page": 100})
             task_data = github_api_json(f"/repos/{GITHUB_REPO}/commits?{q}")
             if isinstance(task_data, list) and task_data:
                 # Cache only positive path history. A negative lookup must be retried
@@ -765,7 +826,7 @@ def github_gate_run(branch: str, sha: str, workflow_name: str, run_id: Optional[
         if cached and not force_discovery and now_mono - cached[0] < GITHUB_ACTIONS_CACHE_SECONDS:
             payload = cached[1]
         else:
-            q = urllib.parse.urlencode({"branch": branch, "per_page": 30})
+            q = urllib.parse.urlencode({"branch": branch, "per_page": GITHUB_ACTIONS_DISCOVERY_PER_PAGE})
             payload = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs?{q}")
             if isinstance(payload, dict):
                 _github_actions_cache[branch] = (now_mono, payload)
