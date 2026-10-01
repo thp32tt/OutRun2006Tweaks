@@ -1011,6 +1011,18 @@ def main() -> None:
             'UNRESOLVED_AT_182529_AND_FORWARD_BYTES',
             'gf_target_c_helper_1_third_callee_continuation_11=',
             'guarded_gf_target_c_helper_1_third_callee_continuation_11_provenance=FAILED',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_RVA = 0x00182569',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PROBE_LEN = 64',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PROBE_END_RVA = 0x001825A9',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PRIOR_CAPTURE_END_RVA = (',
+            'def collect_guarded_gf_target_c_helper_1_third_callee_continuation_12_provenance(pe: PE) -> dict:',
+            '"guarded_gf_target_c_helper_1_third_callee_continuation_12_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_12_provenance(pe)',
+            'EXACT_EXE_182569_TO_1825A9_PROVENANCE_CAPTURED',
+            'EXACT_182569_CONTIGUOUS_BOUNDARY_PROVEN',
+            'R261_EXACT_CAPTURE_END_INSTRUCTION_BOUNDARY',
+            'UNRESOLVED_AT_182569_AND_FORWARD_BYTES',
+            'gf_target_c_helper_1_third_callee_continuation_12=',
+            'guarded_gf_target_c_helper_1_third_callee_continuation_12_provenance=FAILED',
             'def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:',
             '"guarded_gf_hook_provenance": collect_guarded_gf_hook_provenance(pe, calls)',
             '"## Guarded GF hook provenance census"',
@@ -1020,6 +1032,15 @@ def main() -> None:
             '0x0BB0FB: "RankMarker sprani #1"',
             '0x0BB2D0: "RankMarker clip #5"',
             '(0x0BAD20, 0x0BB320, "RankMarker/sub_4BAD20", "WORLD_RIVAL_MARKER", "WORLD_BILLBOARD")',
+        ],
+    )
+    require(
+        "docs/automation/runs/CONVERSION-DXVK-00261.json",
+        [
+            '"status": "COMPLETE_AUTOMATION_PASS_RUNTIME_UNTESTED"',
+            '"after": "EXACT_182529_TO_182569_CONTROL_FLOW_PREFIX_PROVEN"',
+            '"capture_end_is_instruction_boundary": true',
+            '"runtime_validation": "UNTESTED"',
         ],
     )
     print("VR backend disassembly contract: OK")
