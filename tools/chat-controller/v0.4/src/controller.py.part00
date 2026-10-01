@@ -869,7 +869,7 @@ def github_api_mutation_json(method: str, path: str, payload: dict) -> dict:
         raise GitHubTransientError("GitHub mutation transport unavailable; retry scheduled") from e
 
 
-def github_broker_write_capable(force: bool = False) -> bool:
+def github_broker_write_capable(force: bool = False, strict: bool = False) -> bool:
     global _github_broker_capability_cache
     if not GITHUB_BROKER_ENABLED or not GITHUB_TOKEN:
         runtime["github_broker_write_capable"] = False
@@ -889,6 +889,11 @@ def github_broker_write_capable(force: bool = False) -> bool:
             if isinstance(perms, dict) and perms
             else True
         )
+    except GitHubTransientError:
+        runtime["github_broker_write_capable"] = None
+        if strict:
+            raise
+        return False
     except Exception as e:
         log.warning("github broker permission probe failed error=%r", e)
         capable = False
@@ -1052,7 +1057,7 @@ def github_broker_clear_pending(active: dict) -> None:
 def github_broker_apply_changeset(active: dict, changeset: dict) -> dict:
     if not GITHUB_BROKER_ENABLED:
         raise GitHubBrokerConflict("controller GitHub broker is disabled")
-    if not github_broker_write_capable():
+    if not github_broker_write_capable(strict=True):
         raise GitHubBrokerPermissionError("controller GitHub token is not write-capable")
 
     branch = str(active.get("branch") or "").strip()
