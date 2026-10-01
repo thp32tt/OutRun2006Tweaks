@@ -27,6 +27,8 @@ def load_function(name, **overrides):
               github_find_task_commit=Mock(return_value=None), CONTROLLER_MODE='conversion',
               github_transient_retry_pending=lambda: False,
               native_plugin_instructions=lambda active: 'ALL_TOOLS tool search TOOL_NOT_EXPOSED 404 TARGET_BRANCH',
+              _is_localization_producer=lambda active: False,
+              queue_send_producer_execution_continuation=AsyncMock(return_value=False),
               queue_send_same_chat_control_message=AsyncMock(return_value=True))
     ns.update(overrides)
     node = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), FUNCTIONS[name]], type_ignores=[])
@@ -51,7 +53,11 @@ class NativeControllerTests(unittest.TestCase):
             if name in ('localization_A', 'localization_B', 'localization_E'):
                 self.assertIn('qa_pending/candidate_awaiting_C', prompt)
                 self.assertIn('producer 종료 조건이 아니다', prompt)
-            self.assertLessEqual(len(prompt.encode()), 650)
+                self.assertIn('RESULT_SHA=NOT_CREATED', prompt)
+                self.assertIn('같은 응답에서 실제 material 작업', prompt)
+                self.assertLessEqual(len(prompt.encode()), 1100)
+            else:
+                self.assertLessEqual(len(prompt.encode()), 650)
 
     def test_preflight_does_not_claim_browser_plugin_connected(self):
         f, ns = load_function('queue_send_github_recovery')
@@ -270,6 +276,51 @@ class NativeControllerTests(unittest.TestCase):
         self.assertNotIn('completed_at', active)
         finalize.assert_not_called()
         invalidate.assert_called_once()
+
+    def test_localization_producer_identity(self):
+        f, _ = load_function('_is_localization_producer', CONTROLLER_MODE='localization')
+        self.assertTrue(f({'slot': 'A', 'lane': 'LOCALIZATION_A'}))
+        self.assertTrue(f({'slot': 'D', 'lane': 'LOCALIZATION_E'}))
+        self.assertFalse(f({'slot': 'C', 'lane': 'LOCALIZATION_C'}))
+        f2, _ = load_function('_is_localization_producer', CONTROLLER_MODE='conversion')
+        self.assertFalse(f2({'slot': 'A', 'lane': 'LOCALIZATION_A'}))
+
+    def test_producer_no_commit_response_forces_execution_continuation(self):
+        continuation = AsyncMock(return_value=True)
+        recovery = AsyncMock(return_value=True)
+        f, ns = load_function(
+            'queue_handle_native_response',
+            _is_localization_producer=lambda active: True,
+            queue_send_producer_execution_continuation=continuation,
+            queue_send_github_recovery=recovery,
+        )
+        active = self.active()
+        text_value = (
+            '현재까지는 상태 재구성 단계이며 아직 결과 커밋은 생성하지 않았다. '
+            '다음 단계: E shard 스캔. RESULT_SHA=NOT_CREATED'
+        )
+        self.assertTrue(asyncio.run(f(None, {}, active, text_value)))
+        continuation.assert_awaited_once()
+        recovery.assert_not_awaited()
+        self.assertEqual(active['attempt'], 1)
+        self.assertEqual(active['phase'], 'WAIT_CHAT')
+
+    def test_producer_execution_continuation_prompt_forbids_plan_only_stop(self):
+        f, ns = load_function(
+            'queue_send_producer_execution_continuation',
+            CONTROLLER_MODE='localization',
+        )
+        active = self.active()
+        active.update(branch='korean-localization-clean', lane='LOCALIZATION_A')
+        sent = asyncio.run(f(None, {}, active, 'h1'))
+        self.assertTrue(sent)
+        prompt = ns['queue_send_same_chat_control_message'].call_args.args[3]
+        self.assertIn('INTERMEDIATE_STATUS_NOT_TERMINAL', prompt)
+        self.assertIn('RESULT_SHA=NOT_CREATED', prompt)
+        self.assertIn('실제 material 작업', prompt)
+        self.assertIn('사용자 확인을 기다리지 말고', prompt)
+        self.assertIn('[AUTO:TASK_ID]', prompt)
+        self.assertIn('도구 호출과 실제 변경부터 수행', prompt)
 
     def test_no_progress_is_handled_even_when_send_deferred(self):
         self.assertTrue('queue_handle_native_response' in FUNCTIONS)
