@@ -1,0 +1,39 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00456",
+  "lane": "LOCALIZATION_C",
+  "controller_schema_version": 32,
+  "result": "C_BATCH_GATE_RECONCILED",
+  "qa_mode": "independent_batched_cross_lane_qa+shared_state_reconcile",
+  "inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00372",
+      "result_sha": "73c1cc95fd64c0d45f486eba434bab25ddfc1b6f",
+      "disposition": "PREFLIGHT_ONLY_ACCEPTED"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00373",
+      "result_sha": "c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463",
+      "disposition": "REVIEW_REQUIRED_BY_INPUT_SCOPE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00375",
+      "result_sha": "678655ff48caeab8ac8e291bf84888b0d697d4f4",
+      "disposition": "REVIEW_REQUIRED_BY_INPUT_SCOPE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00376",
+      "result_sha": "45b0ea6683450da03bd4f44d8ab9ae79dcbd5293",
+      "disposition": "RETRY_REVIEW_REQUIRED"
+    }
+  ],
+  "qa_actions": {
+    "dedup": "checked_by_task_id_result_sha_identity",
+    "shared_state_merge": "completed_as_batch_record",
+    "producer_barrier": false,
+    "candidate_promotion": false,
+    "rework_return": false
+  },
+  "automation_validation": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "notes": "Consumed immutable TASK_ID@RESULT_SHA inputs only. No runtime/game test performed. No runtime success claimed."
+}
