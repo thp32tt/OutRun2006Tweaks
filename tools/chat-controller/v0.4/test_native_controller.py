@@ -56,7 +56,8 @@ class NativeControllerTests(unittest.TestCase):
                 self.assertIn('producer 종료 조건이 아니다', prompt)
                 self.assertIn('RESULT_SHA=NOT_CREATED', prompt)
                 self.assertIn('같은 응답에서 실제 material 작업', prompt)
-                self.assertLessEqual(len(prompt.encode()), 1100)
+                self.assertIn('FINAL_ARTWORK_FIRST', prompt)
+                self.assertLessEqual(len(prompt.encode()), 1500)
             else:
                 self.assertLessEqual(len(prompt.encode()), 650)
 
@@ -107,6 +108,66 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('C QA backlog is consumer-only state. It must never pause A/B/E producer dispatch.', SOURCE)
         self.assertNotIn('pending_count >= LOCALIZATION_E_QA_PAUSE_THRESHOLD', SOURCE)
         self.assertNotIn('lane_key == "D" and e_throttled', SOURCE)
+
+    def test_runtime_only_manifest_is_not_producer_completion(self):
+        f, _ = load_function('producer_result_claims_no_work')
+        self.assertTrue(f({
+            'candidate_dds_modified': False,
+            'material_deliverable': {
+                'type': 'INDEX102_CURRENT_WORKFLOW_CONSUMABLE_SINGLE_DDS_MANIFEST',
+                'candidate_dds_modified': False,
+                'materially_reduces_unresolved_work': True,
+            },
+        }))
+        self.assertFalse(f({
+            'candidate_dds_modified': False,
+            'material_deliverable': {
+                'type': 'INDEX111_SOURCE_ONLY_PANEL_INTERIOR_RECONSTRUCTION_ADVANCE',
+                'candidate_dds_modified': False,
+                'materially_reduces_unresolved_work': True,
+            },
+        }))
+
+    def test_final_artwork_progress_hint_is_runtime_independent(self):
+        f, _ = load_function(
+            'localization_final_artwork_progress_hint',
+            github_json_file_at_ref=lambda path, ref: {
+                'graphics_checkpoint': {
+                    'final_artwork_completed': 0,
+                    'final_artwork_total': 95,
+                    'final_artwork_percent': 0,
+                }
+            },
+        )
+        hint = f('korean-localization-clean')
+        self.assertIn('FINAL_ARTWORK_PROGRESS=0/95', hint)
+        self.assertIn('MODE=FINAL_ARTWORK_CONVERGENCE', hint)
+        self.assertIn('runtime UNTESTED', hint)
+
+    def test_localization_prefix_injects_final_artwork_convergence(self):
+        native, _ = load_function('native_plugin_instructions')
+        f, _ = load_function(
+            'queue_dynamic_prefix',
+            runtime=dict(
+                queue_task_id='LOCALIZATION-LOCALIZATION_E-00479',
+                queue_lane='LOCALIZATION_E',
+                queue_branch='korean-localization-clean',
+                queue_base_sha='a' * 40,
+                queue_attempt=1,
+                queue_failure_context='',
+                queue_wave_id='P00313',
+                queue_qa_batch=[],
+            ),
+            CONTROLLER_MODE='localization',
+            MAX_TASK_ATTEMPTS=3,
+            localization_controller_contract_fingerprint=lambda: ('38', 'b' * 40),
+            localization_final_artwork_progress_hint=lambda branch: 'FINAL_ARTWORK_PROGRESS=0/95 (0%); MODE=FINAL_ARTWORK_CONVERGENCE',
+            native_plugin_instructions=native,
+        )
+        prefix = f()
+        self.assertIn('FINAL_ARTWORK_PROGRESS=0/95', prefix)
+        self.assertIn('FINAL_ARTWORK_FIRST', prefix)
+        self.assertIn('runtime-only/DDS_ONLY', prefix)
 
     def test_no_work_guard_blocks_incomplete_authoritative_state(self):
         status_fn, _ = load_function('_collect_current_status_blockers')
