@@ -940,6 +940,31 @@ namespace OutRunVRStereo
             return R31PrerequisiteDecision::Wait;
         }
 
+        bool R31InstallRecordingHooks(IDirect3DDevice9* device) noexcept
+        {
+            if (!device)
+                return false;
+            void** vtable = *reinterpret_cast<void***>(device);
+            if (!vtable)
+                return false;
+
+            const auto disabled = safetyhook::InlineHook::StartDisabled;
+            R31CreateStateBlockHook = safetyhook::create_inline(
+                vtable[CreateStateBlockVtableIndex],
+                CreateStateBlockDestR31, disabled);
+            R31BeginStateBlockHook = safetyhook::create_inline(
+                vtable[BeginStateBlockVtableIndex],
+                BeginStateBlockDestR31, disabled);
+            R31EndStateBlockHook = safetyhook::create_inline(
+                vtable[EndStateBlockVtableIndex],
+                EndStateBlockDestR31, disabled);
+            return R31CreateStateBlockHook &&
+                R31BeginStateBlockHook && R31EndStateBlockHook &&
+                R31EndStateBlockHook.enable().has_value() &&
+                R31BeginStateBlockHook.enable().has_value() &&
+                R31CreateStateBlockHook.enable().has_value();
+        }
+
         void R31CreateDisabledDrawHooks() noexcept
         {
             const auto disabled = safetyhook::InlineHook::StartDisabled;
@@ -1006,43 +1031,21 @@ namespace OutRunVRStereo
                         StereoInstalledDevice.load(std::memory_order_acquire);
                     OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
                     OutRunVR::State::StateBlockTracker::ResetCoverageLoss();
-                    if (device)
+                    const bool stateHooks =
+                        R31InstallRecordingHooks(device);
+                    if (!stateHooks)
                     {
-                        void** vtable = *reinterpret_cast<void***>(device);
-                        if (vtable)
-                        {
-                            R31CreateStateBlockHook = safetyhook::create_inline(
-                                vtable[CreateStateBlockVtableIndex],
-                                CreateStateBlockDestR31, disabled);
-                            R31BeginStateBlockHook = safetyhook::create_inline(
-                                vtable[BeginStateBlockVtableIndex],
-                                BeginStateBlockDestR31, disabled);
-                            R31EndStateBlockHook = safetyhook::create_inline(
-                                vtable[EndStateBlockVtableIndex],
-                                EndStateBlockDestR31, disabled);
-                            const bool stateHooks = R31CreateStateBlockHook &&
-                                R31BeginStateBlockHook &&
-                                R31EndStateBlockHook &&
-                                // Arm End before Begin so a render-thread race
-                                // can never observe an unmatched recording start.
-                                R31EndStateBlockHook.enable().has_value() &&
-                                R31BeginStateBlockHook.enable().has_value() &&
-                                R31CreateStateBlockHook.enable().has_value();
-                            if (!stateHooks)
-                            {
-                                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                                R31CreateStateBlockHook = {};
-                                R31BeginStateBlockHook = {};
-                                R31EndStateBlockHook = {};
-                                spdlog::warn(
-                                    "VR R31 STATE: Begin/Create/End StateBlock hooks unavailable; every fast-path candidate will live-validate WVP, shader, render state and viewport");
-                            }
-                            else
-                            {
-                                spdlog::info(
-                                    "VR R31 STATE: Begin/Create/End StateBlock recording hooks armed; per-draw validation remains active until Apply interception is proven");
-                            }
-                        }
+                        OutRunVR::State::StateBlockTracker::MarkCoverageLost();
+                        R31CreateStateBlockHook = {};
+                        R31BeginStateBlockHook = {};
+                        R31EndStateBlockHook = {};
+                        spdlog::warn(
+                            "VR R31 STATE: Begin/Create/End StateBlock hooks unavailable; every fast-path candidate will live-validate WVP, shader, render state and viewport");
+                    }
+                    else
+                    {
+                        spdlog::info(
+                            "VR R31 STATE: Begin/Create/End StateBlock recording hooks armed; per-draw validation remains active until Apply interception is proven");
                     }
 
                     R31PublishInstallState(State::Ready);

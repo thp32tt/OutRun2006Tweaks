@@ -355,6 +355,16 @@ for marker in (
     if marker not in r31:
         errors.append(f"R31 draw hook transaction boundary missing: {marker}")
 
+for marker in (
+    "bool R31InstallRecordingHooks(IDirect3DDevice9* device) noexcept",
+    "R31EndStateBlockHook.enable().has_value()",
+    "R31BeginStateBlockHook.enable().has_value()",
+    "R31CreateStateBlockHook.enable().has_value()",
+    "R31InstallRecordingHooks(device)",
+):
+    if marker not in r31:
+        errors.append(f"R31 recording-hook ownership/order guard missing: {marker}")
+
 if "void R31CreateDisabledDrawHooks() noexcept" not in r31:
     errors.append("R31 disabled draw-hook creation boundary missing")
 if "R31CreateDisabledDrawHooks();" not in r31:
