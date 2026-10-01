@@ -195,10 +195,10 @@
     "after": "EXACT_182569_TO_1825A6_CONTROL_FLOW_PREFIX_PROVEN",
     "runtime_claim": false
   },
-  "blocker": "Automatic validation is pending for exact control-flow proof commit d21d85cfdbedc762ff01b917115b3efcc4796cc5. Runtime remains UNTESTED.",
-  "next_action": "After exact-SHA proof validation, capture fresh canonical EXE bytes from 0x001825E5 with required 0x74 overlap through at least 0x0018262F so the incomplete short Jcc and forward targets 0x001825F6/0x0018261A/0x0018262E can be resolved without inference.",
+  "blocker": "Automatic validation is pending for exact continuation proof commit 75d91a42fa8fd6d08ab2d0e9048cd42cfd9a9b0b. Runtime remains UNTESTED.",
+  "next_action": "If exact-SHA validation passes, continue contiguously from exact instruction boundary 0x00182635 with a fresh bounded canonical-EXE provenance window. Do not infer function/render/HUD semantics from this memcpy-like control-flow sequence.",
   "checkpoint": "C3_VALIDATE",
-  "status": "CONTROL_FLOW_1825A6_PROOF_IMPLEMENTED_VALIDATION_PENDING_RUNTIME_UNTESTED",
+  "status": "CONTROL_FLOW_1825E5_2635_PROOF_IMPLEMENTED_VALIDATION_PENDING_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "runtime_source_changed": false,
   "semantic_ownership_promoted": false,
@@ -221,6 +221,13 @@
       "sha": "d21d85cfdbedc762ff01b917115b3efcc4796cc5",
       "message": "vr: prove 0x1825a6 control-flow prefix [AUTO:CONVERSION-DXVK-00267]",
       "role": "control-flow-proof",
+      "validation_bearing": true,
+      "ci_skip": false
+    },
+    {
+      "sha": "75d91a42fa8fd6d08ab2d0e9048cd42cfd9a9b0b",
+      "message": "vr: prove 0x1825e5 continuation block [AUTO:CONVERSION-DXVK-00267]",
+      "role": "continuation-14-provenance-and-control-flow-proof",
       "validation_bearing": true,
       "ci_skip": false
     }
@@ -353,5 +360,28 @@
     "next_provenance_start_rva": "0x001825E5",
     "required_overlap": "74",
     "minimum_required_end_rva": "0x0018262F"
+  },
+  "continuation_14": {
+    "start_rva": "0x001825E5",
+    "probe_len": 80,
+    "probe_end_rva": "0x00182635",
+    "required_overlap": "74",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "bytes": "74 29 f7 c6 03 00 00 00 75 e5 8b d9 c1 e9 02 75 38 8b cb 83 e1 03 74 13 8a 16 83 c6 01 88 17 83 c7 01 84 d2 74 07 83 e9 01 75 ed 88 0f 5b 5e 8b 44 24 08 5f c3 88 17 8b 44 24 10 5b 5e 5f c3 89 17 83 c7 04 83 e9 01 74 c8 ba ff fe fe 7e 8b 06",
+    "provenance_status": "EXACT_EXE_1825E5_TO_182635_PROVENANCE_CAPTURED",
+    "proof_status": "EXACT_1825E5_TO_182635_CONTROL_FLOW_PREFIX_PROVEN",
+    "instruction_count": 35,
+    "capture_end_is_instruction_boundary": true,
+    "ret_rvas": [
+      "0x00182619",
+      "0x00182623"
+    ],
+    "resolved_predecessor_targets": [
+      "0x001825F6",
+      "0x0018261A",
+      "0x0018262E"
+    ],
+    "backedge_target": "0x001825D4",
+    "next_provenance_start_rva": "0x00182635"
   }
 }
