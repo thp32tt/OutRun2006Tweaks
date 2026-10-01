@@ -15,7 +15,10 @@ RUN python -m pip install --upgrade pip --index-url https://pypi.org/simple && p
 RUN mkdir -p /opt/outrun/app /opt/outrun/prompts /tmp/controller-parts && touch /opt/outrun/app/__init__.py
 
 COPY src/controller.py.part* /tmp/controller-parts/
-RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py && python -m py_compile /opt/outrun/app/controller.py && rm -rf /tmp/controller-parts
+COPY src/broker_protocol.py /opt/outrun/app/broker_protocol.py
+RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py \
+    && python -m py_compile /opt/outrun/app/controller.py /opt/outrun/app/broker_protocol.py \
+    && rm -rf /tmp/controller-parts
 
 COPY entrypoint.direct.sh /opt/outrun/entrypoint.sh
 COPY bootstrap_review.override.md /opt/outrun/prompts/bootstrap_review.md
