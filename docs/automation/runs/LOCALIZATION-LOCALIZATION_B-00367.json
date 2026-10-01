@@ -122,11 +122,16 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_POST_COMMIT_BIND",
+  "result_sha": "0cbd8a0dd20ec2a7e59c74385f6d8bf21760145b",
+  "authoritative_result_sha": "0cbd8a0dd20ec2a7e59c74385f6d8bf21760145b",
+  "validation_bearing_result_sha": "0cbd8a0dd20ec2a7e59c74385f6d8bf21760145b",
+  "result_binding_state": "BOUND_TO_VALIDATION_BEARING_RESULT",
   "result_commit_message": "localization(B): add exact runtime isolation inputs [AUTO:LOCALIZATION-LOCALIZATION_B-00367]",
   "durable_task_record_in_result_commit": true,
-  "producing_role": "LOCALIZATION_B"
+  "producing_role": "LOCALIZATION_B",
+  "bookkeeping": {
+    "recorded_at_kst": "2026-10-01T17:23:00+09:00",
+    "head_before_bookkeeping": "0cbd8a0dd20ec2a7e59c74385f6d8bf21760145b",
+    "note": "Bookkeeping-only immutable result-SHA binding. Producer AUTOMATION_VALIDATION remains PENDING until an independent C batch Gate consumes TASK_ID@RESULT_SHA. RUNTIME_VALIDATION remains UNTESTED. No candidate DDS or shared localization state is changed."
+  }
 }
