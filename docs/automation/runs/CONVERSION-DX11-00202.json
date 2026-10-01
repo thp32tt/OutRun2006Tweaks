@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00202",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "5d6486f8819214b68d626278f1cbede6809ecb0a",
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "google_drive_canonical_hd_source_transport": {
+    "approved_by_current_git_head": true,
+    "used": false,
+    "reason": "Selected F13 exact-EXE decode requires no DDS source material; approved canonical HD source transport remains available and unchanged."
+  },
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R202_182391_SEQUENCE_BOUNDARY",
+  "selection_reason": "CONVERSION-DX11-00200 captured exact canonical-EXE bytes 0x182391..0x1823F0 and explicitly named exact decode as the next bounded F13 action. The first complete sequence ends at ret 0x1823CA, followed by five INT3 bytes and the next code boundary at 0x1823D0. DXVK-00201 independently proved the same public-EXE proof design; DX11 result/CI remains independent.",
+  "summary": "PENDING automatic validation. Adds a fail-closed exact-byte proof for the 14-instruction 0x182391..0x1823CA sequence, upgrades 0x182391/0x18239F/0x1823AC to instruction-boundary facts only when prior references and bytes agree, verifies both back-branches to prior instruction 0x18238A, external branch 0x1823B3->0x18895E, raw-backed call 0x1823C4->0x188877, ret 0x1823CA, five INT3 padding bytes, and next code boundary 0x1823D0. Function/callee/render/HUD semantics remain unresolved.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00202.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false,
+    "hd_source_transport_changed": false
+  },
+  "evidence": [
+    "Base 5d6486f8819214b68d626278f1cbede6809ecb0a is the completed CONVERSION-DX11-00200 bookkeeping HEAD; its validation-bearing ancestor a09c9c09bfd02c29acd76935295e8a1cd5d04dbc captured exact bytes 0x182391..0x1823F0.",
+    "R202 requires 14 exact contiguous instruction byte chunks from 0x182391 through ret 0x1823CA and refuses promotion if prior references, branch arithmetic, raw call provenance, padding, or next-boundary bytes disagree.",
+    "Back-branches 0x182396 and 0x18239D must both target the already proven predecessor instruction 0x18238A; external branch 0x1823B3->0x18895E remains control-flow only.",
+    "Call 0x1823C4->0x188877 must match the R200 raw rel32 census; callee semantics remain unresolved.",
+    "DXVK CONVERSION-DXVK-00201 result 4c2e5f722fbc364cdbe09e62b286f0b4574b0ab7 is reused only as same-canonical-EXE proof-design reference; DX11 exact-result Actions are required independently.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00201",
+    "source_result_sha": "4c2e5f722fbc364cdbe09e62b286f0b4574b0ab7",
+    "source_validation_state_at_selection": "PASS",
+    "source_proof_target": "EXACT_182391_SEQUENCE_RET_PADDING_NEXT_BOUNDARY_PROVEN",
+    "reason": "Reuse only the fail-closed exact-byte proof design for the same canonical EXE. DX11 predecessor state and GitHub Actions are validated independently."
+  },
+  "proof_contract": {
+    "predecessor_proof_status": "EXACT_182331_TO_182391_CONTROL_FLOW_PREFIX_PROVEN",
+    "predecessor_provenance_status": "EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED",
+    "start_rva": "0x00182391",
+    "prefix_end_rva": "0x001823CB",
+    "instruction_count": 14,
+    "referenced_boundary_rvas": [
+      "0x00182391",
+      "0x0018239F",
+      "0x001823AC"
+    ],
+    "branches": [
+      "0x00182396->0x0018238A",
+      "0x0018239D->0x0018238A",
+      "0x001823B3->0x0018895E"
+    ],
+    "call": "0x001823C4->0x00188877",
+    "ret_rva": "0x001823CA",
+    "padding_rva": "0x001823CB",
+    "padding_len": 5,
+    "padding_bytes": "cc cc cc cc cc",
+    "next_code_rva": "0x001823D0",
+    "next_code_bytes": "83 ec 0c",
+    "expected_status": "EXACT_182391_SEQUENCE_RET_PADDING_NEXT_BOUNDARY_PROVEN",
+    "terminal_status": "EXACT_RET_AT_1823CA_PROVEN",
+    "padding_status": "EXACT_5_BYTE_INT3_PADDING_PROVEN",
+    "next_boundary_status": "EXACT_1823D0_CODE_BOUNDARY_PROVEN",
+    "function_entry_status": "UNRESOLVED_AT_182391_1823D0_AND_CALLEES",
+    "semantic_effect": "BOUNDED_SEQUENCE_CONTROL_FLOW_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no native DX11 renderer activation, game draw routing, transport, provider, selector, package or HD-source transport behavior changes.",
+    "ownership": "Instruction-boundary/terminal proof does not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Proof fails closed unless the R198/R200 predecessors remain exact, all 14 instruction chunks match contiguously, prior target references exist, back-branches land on prior decoded 0x18238A, call provenance matches, ret/padding are exact, and 0x1823D0 remains 83 ec 0c."
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_182391_TO_1823F1_PROVENANCE_CAPTURED",
+    "after": "PENDING_182391_SEQUENCE_BOUNDARY",
+    "runtime_claim": false
+  },
+  "blocker": "Even if this bounded sequence proof passes, 0x182391/0x1823D0 function identity, subsequent continuation/callees and all render/HUD ownership remain unresolved.",
+  "next_action": "Wait for exact-SHA GitHub Actions validation; do not claim runtime behavior. If green, persist the exact result SHA and PASS evidence in a separate bookkeeping commit.",
+  "checkpoint": "C4_COMMIT_PENDING_C3_REMOTE_VALIDATION",
+  "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE"
+}
