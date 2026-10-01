@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 952,
+  "cycle": 962,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -163,11 +163,15 @@
     "R84-REF-STATE-0023",
     "R84-REF-GUARD-0009",
     "R84-REF-LIFECYCLE-0049",
-    "R84-REF-PERF-0017"
+    "R84-REF-PERF-0017",
+    "R84-REF-VERIFY-0007",
+    "R84-REF-DISPATCH-0011",
+    "R84-REF-LIFECYCLE-0050",
+    "R84-REF-VERIFY-0008"
   ],
-  "next": "Cycles 953-955: final 10-cycle portion: verify protected graph and contract guards, inspect remaining safe lifecycle/dispatch ownership, then final checkpoint at 962.",
-  "updatedKst": "2026-10-02T08:22:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_952_CHECKPOINT",
+  "next": "Cycles 963-965: resume normal campaign from remaining independent ownership seams; prioritize verifier-backed behavior-neutral extraction only, otherwise continue review. APPLY_GATE at 965.",
+  "updatedKst": "2026-10-02T08:25:00+09:00",
+  "batchStatus": "R84_USER_BATCH_100_COMPLETE_CYCLE_962",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -298,6 +302,10 @@
     "Cycles 941-943 R84-REF-DISPATCH-0010: R31 draw transaction versus R33 final dispatch reviewed; R31 remains cached-world layer while R33 owns final route selection. APPLY_GATE 943 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 944-946 R84-REF-GUARD-0009: Cross-layer StateBlock recording bypass reviewed R31->R33->R34; no layer may force stereo while recording. APPLY_GATE 946 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 947-949 R84-REF-LIFECYCLE-0049: Reset chain R22->R32->R33->R34 reviewed for ownership leakage; responsibilities remain distinct. APPLY_GATE 949 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
-    "Cycles 950-952 R84-REF-PERF-0017: Telemetry ownership R31/R32/R33 reviewed; aggregation cadence differs and should not be merged. APPLY_GATE 952 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
+    "Cycles 950-952 R84-REF-PERF-0017: Telemetry ownership R31/R32/R33 reviewed; aggregation cadence differs and should not be merged. APPLY_GATE 952 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 953-955 R84-REF-VERIFY-0007: Protected graph source cross-check passed by inspection: R30 ScreenSpace boundary, R31 Apply interception, R33 fail-closed fallback and R34 resync->raster replay ordering remain present. APPLY_GATE 955 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 956-958 R84-REF-DISPATCH-0011: Final dispatch ownership pass found no duplicate route owner suitable for behavior-neutral removal; R30/R31/R33/R34 layers retain distinct contracts. APPLY_GATE 958 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 959-961 R84-REF-LIFECYCLE-0050: Final lifecycle pass found no safe Reset/StateBlock/DirectGPU ownership move without runtime validation. APPLY_GATE 961 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycle 962 R84-REF-VERIFY-0008: durable final verification for requested 100-cycle batch. Re-read critical R30/R31/R33/R34 source and verifier at current branch; protected boundaries present. SOURCE_CHANGED=NO. Batch advanced exactly 100 cycles from 862 to 962. Runtime UNTESTED."
   ]
 }
