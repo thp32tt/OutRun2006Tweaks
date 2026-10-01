@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 696,
+  "cycle": 699,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -106,11 +106,12 @@
     "R84-REF-LIFECYCLE-0030",
     "R84-REF-LIFECYCLE-0031",
     "R84-REF-HOOKSET-0004",
-    "R84-REF-LIFECYCLE-0032"
+    "R84-REF-LIFECYCLE-0032",
+    "R84-REF-LIFECYCLE-0033"
   ],
-  "next": "Cycles 697-699: continue R30 screen-space route ownership review from GuardScreenSpace into lower-draw/public facade boundaries; preserve R26+R30 protected runtime graph and exact state-restore/stereo ordering; APPLY_GATE at 699.",
-  "updatedKst": "2026-10-02T06:20:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_696_CHECKPOINT",
+  "next": "Cycles 700-702: inspect R30 public lower-draw/TryXyzrhw facade ownership against internal R30 hook dispatch; preserve exact lower-hook targets, XYZRHW fallback semantics and R26+R30 Golden Behavior Contract; APPLY_GATE at 702.",
+  "updatedKst": "2026-10-02T06:24:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_699_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -152,6 +153,7 @@
     "Cycles 686-688: inspected R30ConfigureXyzrhwWorldEffect, R30TransformXyzrhwVertices and R30TransformXyzrhwStereo. World-effect eligibility, vertex transform and bilateral transform are large behavior-sensitive paths; broad promotion/tuning remains prohibited. APPLY_GATE 688 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
     "Cycles 689-691: inspected R30ExecuteXyzrhwStereo, R30TryXyzrhwPrimitiveUP and R30TryXyzrhwIndexedPrimitiveUP. Execution owns left/right depth/stencil accounting and failure fallback while UP wrappers own input extraction; current separation is appropriate. APPLY_GATE 691 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
     "Cycles 692-694: inspected R30TryXyzrhwPrimitiveVB, R30TryXyzrhwIndexedPrimitiveVB and R30BuildScreenSpaceEyeConstants. VB/IB shadow transport and screen-space constants are independent; merging would cross transport/render contracts. APPLY_GATE 694 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
-    "Cycles 695-696: inspected R30TryScreenSpaceFovDraw and R30GuardScreenSpace. Guard remains a thin boundary over the behavior-heavy FOV stereo path; no source change counted before next APPLY_GATE 699. Runtime validation remains UNTESTED."
+    "Cycles 695-696: inspected R30TryScreenSpaceFovDraw and R30GuardScreenSpace. Guard remains a thin boundary over the behavior-heavy FOV stereo path; no source change counted before next APPLY_GATE 699. Runtime validation remains UNTESTED.",
+    "Cycles 697-699 (R84-REF-LIFECYCLE-0033): re-reviewed R30 GuardScreenSpace/lower-draw facade, install success publication and existing failure/startup ownership. Buffer-shadow/XYZRHW/SkyGlow physical paths remain NO_SAFE_CHANGE without build/HMD evidence. Isolated the behavior-neutral R30 successful terminal Ready publication behind R30CompleteSuccessfulInstall, symmetric with existing failure/startup boundaries. APPLY_GATE 699 SOURCE_CHANGED=YES; source commit 5b8f5edc16f3269ea13618e6a1e63ded5c502c02 [skip ci]. Verifier requires exactly one delegated successful terminal route and exactly one Ready=true publication in the helper. Runtime validation UNTESTED; no build/Actions started."
   ]
 }
