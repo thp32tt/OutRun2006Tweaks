@@ -1,0 +1,82 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-a00373-p00241-index54-source-identity-reactivation-guard-output-v30",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00373",
+  "wave_id": "P00241",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCER_A",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-10-01T18:00:00+09:00",
+  "queue_index": 54,
+  "asset": "FA7BBB13",
+  "queue_path": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+  "purpose": "Add the missing executable schema30 reactivation guard for the C172-accepted SOURCE_IDENTITY_MISMATCH without repeating Drive/direct/Release acquisition.",
+  "selection_basis": {
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00368",
+    "latest_authoritative_c_wave": "Q00075",
+    "latest_authoritative_c_result_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
+    "latest_a_completion_tier_scan_task": "LOCALIZATION-LOCALIZATION_A-00371",
+    "latest_a_completion_tier_scan_result_sha": "ffd813d876bb83b21d02af41c4bad726bd5ea913",
+    "direct_rework_required_runnable_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "qa_pending_or_unconsumed_not_repeated": [
+      51,
+      111,
+      159,
+      198,
+      201,
+      228
+    ],
+    "fallback_ladder_step": 5
+  },
+  "canonical_inventory": {
+    "sha256": "f7695f10b8761ab00ff988c443fd864340d5569a7047cc7342c3e1e3e96db7b6",
+    "width": 4096,
+    "height": 2048,
+    "format": "RGBA32"
+  },
+  "accepted_noncanonical_source": {
+    "sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+    "width": 4096,
+    "height": 2048,
+    "transport_evidence": "A00323 + C172/Q00070",
+    "canonical_match": false
+  },
+  "authoritative_evidence": {
+    "a00323_task_id": "LOCALIZATION-LOCALIZATION_A-00323",
+    "a00323_result_sha": "d40716564a256cf6425b62dcf01038550769269f",
+    "c172_task_id": "LOCALIZATION-LOCALIZATION_C-00333",
+    "c172_validation_bearing_result_sha": "b0388771ec0f8835898c4300c061b16a0fca8af7",
+    "c172_automation_validation": "PASS",
+    "c172_production_readiness": "PREFLIGHT_ONLY"
+  },
+  "checks": {
+    "queue_identity_current_a_shard": true,
+    "queue_retains_c172_identity_mismatch": true,
+    "canonical_inventory_identity": true,
+    "a00323_result_identity": true,
+    "a00323_gate_identity": true,
+    "c172_consumed_exact_a00323_result": true,
+    "c172_validation_identity": true,
+    "current_schema30_a_ownership": true,
+    "source_transport_policy_current": true,
+    "pinned_source_policy_unchanged": true,
+    "sticky_dependency_policy_present": true
+  },
+  "source_reprobe_performed": false,
+  "source_reprobe_authorized": false,
+  "noncanonical_source_substitution_authorized": false,
+  "historical_candidate_reuse_authorized": false,
+  "candidate_rebuild_authorized": false,
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "material_change": true,
+  "material_deliverable": "NEW_EXECUTABLE_INDEX54_SCHEMA30_SOURCE_IDENTITY_REACTIVATION_GUARD",
+  "materially_reduces_unresolved_work": true,
+  "production_readiness": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH",
+  "result": "PASS_FAIL_CLOSED_INDEX54_SOURCE_IDENTITY_GUARD_CREATED_WITHOUT_REPROBE",
+  "runtime_validation": "UNTESTED"
+}
