@@ -49,6 +49,7 @@ for banned in ("R23GameDrawSerial", "R23BeforeTopLevelDraw", "GetTopLevelDrawSer
 for marker, source, owner in (
     ("InvalidateLiveStateSample()", r23, "R23"),
     ("InvalidateEffectStateCache()", r29, "R29"),
+    ("ArmStereoRecoverySafety(", r29, "R29"),
 ):
     if marker not in source:
         errors.append(f"{owner} missing explicit cache invalidation API: {marker}")
@@ -58,6 +59,7 @@ for banned in (
     "R23LastStateSampleDrawSerial",
     "R23LastStateSampleEpoch",
     "R22ShadowState",
+    "R29ArmMonoSafety",
 ):
     if banned in r31:
         errors.append(
@@ -68,6 +70,7 @@ for marker in (
     "InvalidateTrackedRasterShadow()",
     "InvalidateLiveStateSample()",
     "TryGetTrackedViewport(viewport)",
+    "ArmStereoRecoverySafety()",
 ):
     if marker not in r31:
         errors.append(

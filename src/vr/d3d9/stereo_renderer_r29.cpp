@@ -590,4 +590,10 @@ namespace OutRunVRStereo
     {
         R29Effect = {};
     }
+
+    inline void ArmStereoRecoverySafety(
+        std::uint64_t extraPresents = 2) noexcept
+    {
+        R29ArmMonoSafety(extraPresents);
+    }
 }
