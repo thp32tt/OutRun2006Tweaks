@@ -154,45 +154,26 @@ def start_process_liveness_monitor():
 
 def queue_rollover_prompt(active: dict) -> str:
     rollover = int(active.get("chat_rollovers", 0)) + 1
-    schema_lines = []
+    lines = [
+        "[롤오버 재개]",
+        f"TASK_ID={active['task_id']}",
+        f"LANE={active['lane']}",
+        f"TARGET_BRANCH={active['branch']}",
+        f"ATTEMPT={active['attempt']}/{MAX_TASK_ATTEMPTS}",
+        f"CHAT_ROLLOVER={rollover}",
+    ]
     if CONTROLLER_MODE == "localization":
         schema_version, config_blob_sha = localization_controller_contract_fingerprint()
-        schema_lines = [
+        lines += [
             f"CONTROLLER_SCHEMA_VERSION={schema_version}",
             f"CONTROLLER_CONFIG_BLOB_SHA={config_blob_sha}",
         ]
-    lines = [
-        "[대화 자동 롤오버 재개]",
-        f"TASK_ID={active['task_id']}",
-        *schema_lines,
-        f"LANE={active['lane']}",
-        f"TARGET_BRANCH={active['branch']}",
-        "CONTROLLER_GITHUB_PREFLIGHT=OK",
-        f"CONTROLLER_GITHUB_HEAD_SHA={active.get('base_sha') or ''}",
-        "GITHUB_ACCESS_MODE=CONTROLLER_BROKER_PRIMARY_PLUGIN_OPTIONAL",
-        f"CONTROLLER_GITHUB_BROKER={'AVAILABLE' if GITHUB_BROKER_ENABLED else 'DISABLED'}",
-        "PUBLIC_GITHUB_ACCESS=DO_NOT_USE",
-        "FIRST_ACTION=USE_PROVIDED_BROKER_CONTEXT",
-        f"ATTEMPT={active['attempt']}/{MAX_TASK_ATTEMPTS}",
-        f"CHAT_ROLLOVER={rollover}",
-        "",
-        "이전 채팅이 대화 길이 한도에 도달해서 같은 프로젝트의 새 채팅으로 자동 전환했다.",
-        "이 롤오버는 작업 실패나 재시도가 아니므로 ATTEMPT를 증가시키지 마.",
-        "GitHub 최신 HEAD와 docs/automation/runs/ 아래 해당 TASK_ID 기록을 직접 확인해 현재 상태를 재구성해.",
-        "컨트롤러가 아래에 제공하는 GitHub Broker HEAD/파일 내용을 기준으로 즉시 재개해. 연결된 GitHub 플러그인은 선택적 추가 조회 수단일 뿐 필수 조건이 아니다.",
-        "파일 404는 연결 실패가 아니라 path/ref 문제다.",
-        "한글화라면 CONTROLLER_CONFIG_BLOB_SHA의 localization/controller_roles.json과 canonical contract를 다시 읽고 현재 정책으로 프롬프트를 재해석해. 캐시된 과거 정책은 사용하지 마.",
-        "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
-        "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 clone/worktree로 우회하지 마. 단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용하며 GitHub-only라는 이유로 차단하지 마.",
-        "실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED를 유지해.",
-        "실제 변경 또는 검토 기록을 Git에 남기고 결과 커밋 메시지에 정확히 [AUTO:" + active["task_id"] + "] 를 포함해.",
+    lines += [
+        "같은 TASK_ID를 계속해. 완료 작업 반복 금지. 실기 미검증이면 RUNTIME_VALIDATION=UNTESTED.",
     ]
-    if CONTROLLER_MODE == "conversion":
-        lines = [GAME_MOD_CONTEXT, ""] + lines
-    prompt = "\n".join(lines)
     if GITHUB_BROKER_ENABLED:
-        prompt += "\n\n" + github_broker_initial_context(active)
-    return prompt
+        lines += ["", github_broker_initial_context(active)]
+    return "\n".join(lines)
 
 
 async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
