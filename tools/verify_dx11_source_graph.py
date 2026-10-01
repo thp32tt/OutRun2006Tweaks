@@ -458,8 +458,12 @@ def main() -> None:
             "R113 sampled census exactness evidence object",
         '"DiagnosticOnly": True':
             "R113 census evidence is diagnostic-only",
-        '"ExhaustiveDrawCoverage": False':
-            "R113 sampled census is explicitly non-exhaustive",
+        '"ExhaustiveDrawCoverage": exhaustive_draw_coverage':
+            "R113/R114 census reports coverage from the explicit sampling contract",
+        '"EXHAUSTIVE_V1"':
+            "R114 opt-in exhaustive sampling identity",
+        '"OBSERVED_EXHAUSTIVE_TRANSLATION_EXACT_DIAGNOSTIC_ONLY"':
+            "R114 exhaustive exact status remains explicitly diagnostic-only",
         '"ActivationProof": False':
             "R113 census exactness cannot be an activation proof",
         '"OBSERVED_SAMPLED_TRANSLATION_EXACT_DIAGNOSTIC_ONLY"':
