@@ -6,8 +6,8 @@ import pathlib
 root = pathlib.Path(__file__).resolve().parents[2]
 cfg = json.loads((root / "localization" / "controller_roles.json").read_text(encoding="utf-8"))
 
-if int(cfg.get("schema_version", 0)) < 23:
-    raise SystemExit("controller_roles schema_version must be >= 23")
+if int(cfg.get("schema_version", 0)) < 24:
+    raise SystemExit("controller_roles schema_version must be >= 24")
 
 rr = cfg.get("runtime_recovery") or {}
 wa = rr.get("wait_actions") or {}
@@ -42,6 +42,13 @@ required = {
     "continuous_progression.c_completion_gates_producers": cp.get("c_completion_gates_producers") is False,
     "continuous_progression.qa_failure_gates_producers": cp.get("qa_failure_gates_producers") is False,
     "continuous_progression.terminal_transition_target_seconds": int(cp.get("terminal_transition_target_seconds", 9999)) <= 30,
+    "continuous_progression.task_commit_branch_scan_pages": int(cp.get("task_commit_branch_scan_pages", 0)) == 3,
+    "continuous_progression.actions_discovery_per_page": int(cp.get("actions_discovery_per_page", 0)) == 100,
+    "continuous_progression.lane_exception_isolation": cp.get("lane_exception_isolation") is True,
+    "continuous_progression.lane_exception_block_threshold": int(cp.get("lane_exception_block_threshold", 0)) == 3,
+    "continuous_progression.dispatch_exception_backoff_max_seconds": int(cp.get("dispatch_exception_backoff_max_seconds", 0)) == 300,
+    "continuous_progression.browser_transport_failure_global_restart": cp.get("browser_transport_failure_global_restart") is True,
+    "continuous_progression.qa_pending_unconsumed_never_truncated": cp.get("qa_pending_unconsumed_never_truncated") is True,
     "startup_reconcile.enabled": sr.get("enabled") is True,
     "startup_reconcile.refresh_branch_head_first": sr.get("refresh_branch_head_first") is True,
     "startup_reconcile.clear_discovery_cache_first": sr.get("clear_discovery_cache_first") is True,
@@ -52,6 +59,11 @@ required = {
     "runtime_tuning.github_bound_run_poll_seconds": int(rt.get("github_bound_run_poll_seconds", 9999)) <= 30,
     "runtime_tuning.github_discovery_poll_seconds": int(rt.get("github_discovery_poll_seconds", 9999)) <= 60,
     "runtime_tuning.bound_run_nonterminal_cache_ttl_seconds": rt.get("bound_run_nonterminal_cache_ttl_seconds") == 0,
+    "runtime_tuning.github_task_commit_scan_pages": int(rt.get("github_task_commit_scan_pages", 0)) == 3,
+    "runtime_tuning.github_actions_discovery_per_page": int(rt.get("github_actions_discovery_per_page", 0)) == 100,
+    "runtime_tuning.process_heartbeat_fatal_seconds": int(rt.get("process_heartbeat_fatal_seconds", 0)) == 180,
+    "runtime_tuning.memory_idle_restart_percent": int(rt.get("memory_idle_restart_percent", 0)) == 80,
+    "runtime_tuning.memory_fatal_restart_percent": int(rt.get("memory_fatal_restart_percent", 0)) == 92,
     "runtime_tuning.queue_next_task_delay_seconds": int(rt.get("queue_next_task_delay_seconds", 9999)) <= 30,
     "runtime_tuning.parallel_lane_stagger_seconds": int(rt.get("parallel_lane_stagger_seconds", 9999)) <= 45,
     "runtime_tuning.parallel_distinct_slot_send_gap_seconds": int(rt.get("parallel_distinct_slot_send_gap_seconds", 9999)) <= 60,
@@ -61,9 +73,16 @@ required = {
     "runtime_tuning.localization_slot_dedup_seconds": int(rt.get("localization_slot_dedup_seconds", 9999)) <= 30,
     "runtime_observability.queue_loop_heartbeat_seconds": int(obs.get("queue_loop_heartbeat_seconds", 9999)) <= 15,
     "runtime_observability.heartbeat_stale_after_seconds": int(obs.get("heartbeat_stale_after_seconds", 9999)) <= 45,
+    "runtime_observability.heartbeat_fatal_after_seconds": int(obs.get("heartbeat_fatal_after_seconds", 0)) == 180,
+    "runtime_observability.runtime_asset_validation": obs.get("runtime_asset_validation") == "FAIL_FAST_BEFORE_BROWSER_DISPATCH",
+    "runtime_observability.health_endpoint": obs.get("health_endpoint") == "/healthz",
+    "runtime_observability.health_includes_memory_pressure": obs.get("health_includes_memory_pressure") is True,
+    "runtime_observability.qa_pending_retention": obs.get("qa_pending_retention") == "UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA",
     "runtime_observability.active_state_source_of_truth": obs.get("active_state_source_of_truth") == "active_by_lane",
     "runtime_observability.queue_active_semantics": obs.get("queue_active_semantics") == "derived_summary_with_independent_qa",
-    "runtime_observability.queue_active_null_allowed_only_when_active_by_lane_empty": obs.get("queue_active_null_allowed_only_when_active_by_lane_empty") is True,
+    "runtime_observability.queue_active_null_allowed_only_when_active_by_lane_empty": obs.get("queue_active_null_allowed_only_when_active_by_lane_empty") is False,
+    "runtime_observability.queue_active_null_allowed_in_parallel_mode": obs.get("queue_active_null_allowed_in_parallel_mode") is True,
+    "runtime_observability.queue_active_legacy_field_must_not_gate_parallel_lanes": obs.get("queue_active_legacy_field_must_not_gate_parallel_lanes") is True,
 }
 
 state = rr.get("state_persistence") or {}
