@@ -93,6 +93,16 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - `Korean single-DDS isolation payload` is an auxiliary runtime-test artifact workflow. Its failure MUST NOT block A/B/E production or C batch QA and MUST NOT be mapped to GitHub permission denial.
 - A manifest whose candidate is intentionally stored only in the approved current-pipeline Drive area may be retained as runtime-isolation evidence without forcing GitHub Actions to download Drive content. The auxiliary workflow packages only repository-backed candidates and emits a typed skip for external candidates; runtime remains UNTESTED.
 
+
+## Controller slot and chat lifecycle v21
+- Runtime topology is exactly four logical workers: producer A, producer B, QA consumer C, and physical slot D mapped to producer E.
+- A/B/E are the three concurrent producer lanes; C is an independent batch-QA consumer. D is never a fourth logical role: it is the browser slot used for logical role E.
+- Every new TASK_ID MUST start in a fresh project chat. The previous completed task page for that slot is closed before dispatch so long-running ChatGPT DOM/renderer state does not accumulate indefinitely.
+- Retry of the same TASK_ID reuses the current chat while healthy. A persistent generic Retry surface is limited to two controlled Retry clicks; after that the same TASK_ID rolls over to a fresh project chat without consuming a task attempt.
+- Fresh-chat rotation must preserve persistent queue/Git state; conversation history is not an SSOT and must not be required to resume work.
+- The controller must keep at most one active page per configured slot under normal operation: four localization pages total.
+- Runtime tuning authority is `localization/controller_roles.json`; Docker/controller selftests must fail when duplicated environment values drift from that SSOT.
+
 ## Controller liveness and GitHub Actions authority
 - A lane in `WAIT_ACTIONS` MUST be driven by the exact GitHub Actions run bound to that lane's task/result commit. Generic workflow-run list/discovery cache is never authoritative after `gate_run.id` is known.
 - Exact run-by-ID polling MUST bypass the generic Actions cache. This prevents a stale cached `queued` or `in_progress` snapshot from pinning a completed run indefinitely.
@@ -107,10 +117,10 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - A, B, and E are independent continuous production workers and SHOULD run concurrently when the controller runtime supports multiple active conversations/workers.
 - Stable three-way shard: use numeric `asset_queue.index % 3`; A owns remainder 0, B owns remainder 1, E owns remainder 2. Do not work-steal while all three producer lanes are enabled.
 - A/B/E: after the exact durable task commit exists, immediately continue to another independent runnable item in the lane's modulo shard; do not wait for an individual Actions Gate, peer producers, or C.
-- E is the elastic third producer. The controller MUST pause new E dispatches when `qa_pending >= 8` and resume E only after `qa_pending < 6`; already-running E work may finish normally. A/B remain active while E is throttled.
+- E is the elastic third producer. The controller MUST pause new E dispatches when `qa_pending >= 16` and resume E only after `qa_pending < 12`; already-running E work may finish normally. A/B remain active while E is throttled.
 - Every durable A/B/E task commit becomes one immutable QA input identified by `TASK_ID@RESULT_SHA`. Producer task records remain `automation_validation=PENDING` with `validation_mode=C_BATCH_GATE` until covered by a passing C batch.
 - C is an independent QA consumer, not a synchronization barrier and not a third candidate producer. It may run while A/B continue producing. Its single commit is the only runner-backed Localization Automation Gate for that batch.
-- C consumes up to 4 producer task results per QA invocation by default, with a short 30-second coalesce window so repeated source/header/atlas/shared-state work is done once for the batch.
+- C consumes up to 4 producer task results per QA invocation by default, with a short 60-second coalesce window so repeated source/header/atlas/shared-state work is done once for the batch.
 - C MUST review the candidate/evidence as it existed at each exact producer RESULT_SHA. If current HEAD contains a newer candidate SHA for the same asset, the older result is `SUPERSEDED` and must not overwrite newer shared state.
 - C does not rewrite candidate DDS bytes while A/B are active. Candidate defects are returned as `REWORK_REQUIRED` for the appropriate producer lane. C may update shared metadata/progress/QA state after refreshing current HEAD.
 - A/B/E MUST treat producer results awaiting C as QA-pending and skip those assets until C returns `REWORK_REQUIRED` or a material source/candidate/QA-contract fingerprint changes.
@@ -206,7 +216,7 @@ A fallback deliverable must materially reduce unresolved work or create new exec
 ## No-action suppression and C batching
 - Repeated no-action producer tasks are forbidden. A/B terminal results named `NO_ACTION`, `BLOCKED_NO_ACTION`, or equivalent zero-output states are invalid while any graphics work remains.
 - If a lane has no immediately runnable DDS after dependency-blocked skips, it MUST execute the mandatory fallback ladder and commit a material deliverable. A unique controller TASK_ID still requires its durable task record, but that record must accompany the material deliverable rather than replace it.
-- C is batch-oriented and independent. Default controller target is up to 4 immutable producer results per C task, with a 30-second coalesce window; this batching does not pause producers.
+- C is batch-oriented and independent. Default controller target is up to 4 immutable producer results per C task, with a 60-second coalesce window; this batching does not pause producers.
 - C should inspect each unique asset/candidate fingerprint once per batch, reuse unchanged PASS evidence, and update shared state once for the entire batch.
 - A producer result already present in `qa_pending`, `qa_completed`, or an active C batch MUST NOT be enqueued or reviewed again under the same TASK_ID@RESULT_SHA.
 - C invoked on metadata/reconstruction-only producer results should validate only the new material evidence and resulting eligibility change; it must not recreate unchanged full DDS QA merely to restate a previous PASS/HOLD.
@@ -221,14 +231,14 @@ Before static approval inspect raw DDS and readable/game orientation and require
 Git synchronization is mandatory at the end of each role: re-fetch latest `korean-localization-clean`, preserve peer-lane commits, commit/push only the role's permitted localization changes, and verify the resulting task commit SHA. Never import VR/FFB changes.
 
 ## Controller idle-time elimination profile
-Controller liveness and batch-validation values are defined in `localization/controller_roles.json` schema v6 and are mandatory.
+Controller liveness and batch-validation values are defined in `localization/controller_roles.json` schema v21 and are mandatory.
 
 - Poll a bound Automation Gate run by exact run ID every 30 seconds with zero cache TTL.
 - Recover non-progressing `WAIT_ACTIONS` by exact run + jobs refresh within 75 seconds.
 - Re-arm an empty scheduler with unfinished graphics work within 90 seconds.
 - Use a 15-second next-task delay and 15-second A/B distinct-slot stagger.
 - Emit a queue heartbeat every 15 seconds and treat >45 seconds without heartbeat as a liveness failure.
-- A or B durable task commit -> same producer lane next task is event-driven, with a <=30-second dispatch target; producer Actions PASS is not required.
+- A/B/E durable task commit -> same producer lane next task is event-driven, with a <=30-second dispatch target; producer Actions PASS is not required.
 - C independently consumes qa_pending. C waits for the one batch Gate; C PASS/FAIL never gates producer dispatch.
 - On controller restart, reconcile all nonterminal lanes from current GitHub HEAD and exact Actions state before new dispatch.
 - `active_by_lane` is the active-state source of truth; a null active summary while a lane is nonterminal is invalid.
@@ -237,8 +247,8 @@ Controller liveness and batch-validation values are defined in `localization/con
 ## Continuous QA backlog controller profile (schema v5)
 - Persistent queue state includes `qa_pending`, `qa_completed`, and `qa_blocked`.
 - Producer-to-QA identity is `TASK_ID@RESULT_SHA`; identical identities are de-duplicated.
-- Default C batch size is 4 producer results; coalesce window is 30 seconds.
-- Localization same-slot next-task send gap is 15 seconds and slot de-dup window is 30 seconds after an authoritative durable producer commit.
+- Default C batch size is 4 producer results; coalesce window is 60 seconds.
+- Localization same-slot next-task send gap is 30 seconds and slot de-dup window is 30 seconds after an authoritative durable producer commit.
 - A/B/E producer tasks and C QA may coexist in `active_by_lane`; this is expected and is no longer a barrier violation.
 - On restart, completed producer records that were not yet consumed must be recoverable into `qa_pending` without repeating production.
 
