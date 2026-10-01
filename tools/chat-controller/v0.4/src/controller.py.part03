@@ -1524,6 +1524,10 @@ async def localization_process_lane(
             if (now - changed_at).total_seconds() < QUEUE_STABLE_SECONDS:
                 return
 
+            if await queue_handle_broker_response(context, pages, active, q, text):
+                save_queue_state(q)
+                return
+
             task_commit = task_commit or github_find_task_commit(active["branch"], active["task_id"])
             if task_commit:
                 if lane_key in {"A", "B", "D"}:
@@ -2501,6 +2505,10 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             save_queue_state(q)
             return
         if (now - changed_at).total_seconds() < QUEUE_STABLE_SECONDS:
+            return
+
+        if await queue_handle_broker_response(context, pages, active, q, text):
+            save_queue_state(q)
             return
 
         task_commit = github_find_task_commit(active["branch"], active["task_id"])
