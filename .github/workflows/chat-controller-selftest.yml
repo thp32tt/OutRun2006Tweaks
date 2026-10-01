@@ -61,7 +61,26 @@ jobs:
           grep -Fq 'BLOCKED_TOOLING' /tmp/controller.py
           grep -Fq 'Keep the same TASK_ID/chat' /tmp/controller.py
           grep -Fq 'status="github_tooling_circuit_wait"' /tmp/controller.py
-          grep -Fq 'GitHub 연결되어 있어. 공개 웹 말고 연결된 GitHub 플러그인 도구를 다시 탐색해서 실제 호출부터 하고' /tmp/controller.py
+          grep -Fq 'GitHub 연결돼 있어. 연결된 GitHub 플러그인으로 다시 시도하고 TASK_ID=' /tmp/controller.py
+          python - <<'PY2'
+          import ast
+          from pathlib import Path
+          src = Path('/tmp/controller.py').read_text(encoding='utf-8')
+          tree = ast.parse(src)
+          fn = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'assistant_claims_github_tooling_absent')
+          ns = {}
+          exec(compile(ast.Module(body=[fn], type_ignores=[]), '<classifier>', 'exec'), ns)
+          detect = ns['assistant_claims_github_tooling_absent']
+          samples = [
+              'GitHub 플러그인의 실제 호출 함수(schema)가 노출되지 않아 branch 조회: 실행 불가, commit 생성 불가',
+              '연결 GitHub connector를 사용할 수 없어 HEAD 조회 불가. RESULT_SHA=NOT_CREATED AUTOMATION_VALIDATION=NOT_RUN',
+              'GitHub 도구 접근이 불가능해서 소스 수정 불가, Git commit 생성 불가, Actions Gate 확인 불가',
+              '플러그인 함수가 보이지 않아 진행하지 못했습니다. GitHub 저장소 조회 불가, 커밋 없음',
+          ]
+          assert all(detect(x) for x in samples)
+          assert not detect('GitHub 플러그인으로 HEAD를 확인했고 소스 수정과 commit을 완료했습니다. RESULT_SHA=abc123')
+          print('semantic GitHub refusal classifier verified')
+          PY2
 
       - name: Verify browser transport self-recovery
         run: |
