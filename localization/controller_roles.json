@@ -1,5 +1,5 @@
 {
-  "schema_version": 32,
+  "schema_version": 33,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -771,5 +771,50 @@
       ],
       "c_must_audit_before_runtime_isolation_reuse": true
     }
+  },
+  "no_work_guard": {
+    "mode": "FAIL_CLOSED_GLOBAL_COMPLETION_GUARD",
+    "state_file": "localization/resume_state.json",
+    "no_work_allowed_only_when_all_clear": true,
+    "block_if": [
+      "final_artwork_completed < final_artwork_total",
+      "final_artwork_percent < 100",
+      "current status is REWORK_REQUIRED or ZERO_PIXEL_BBOX_REWORK_REQUIRED or QA_PENDING",
+      "any authoritative current pending_* array is non-empty",
+      "packaging.status != done"
+    ],
+    "field_resolution": {
+      "final_artwork_completed": "graphics_checkpoint.final_artwork_completed",
+      "final_artwork_total": [
+        "graphics_checkpoint.final_artwork_total",
+        "graphics_checkpoint.artwork_targets"
+      ],
+      "final_artwork_percent": [
+        "graphics_checkpoint.final_artwork_percent",
+        "COMPUTE(final_artwork_completed/final_artwork_total*100)"
+      ],
+      "packaging_status": [
+        "packaging.status",
+        "graphics_checkpoint.packaging.status"
+      ]
+    },
+    "current_status_scopes": [
+      "latest_qa_batch",
+      "graphics_checkpoint.strict_qa_current",
+      "graphics_checkpoint.next_hd_rework",
+      "typography_v19_reaudit"
+    ],
+    "current_pending_scopes": [
+      "graphics_checkpoint direct pending_* arrays",
+      "latest_qa_batch",
+      "typography_v19_reaudit"
+    ],
+    "status_match": "REWORK_REQUIRED substring or QA_PENDING substring; explicit ZERO_PIXEL_BBOX_REWORK_REQUIRED included",
+    "task_result_file_missing": "WORK_REQUIRED_NOT_NO_WORK",
+    "new_task_without_result": "WORK_REQUIRED",
+    "no_commit_changes_statement": "NOT_A_TERMINAL_REASON",
+    "review_only_or_zero_material_result": "REJECT_AS_PRODUCER_COMPLETION_WHILE_BLOCKED",
+    "same_task_recovery": true,
+    "attempt_increment_on_guard_rejection": false
   }
 }
