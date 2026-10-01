@@ -6,8 +6,8 @@ import pathlib
 root = pathlib.Path(__file__).resolve().parents[2]
 cfg = json.loads((root / "localization" / "controller_roles.json").read_text(encoding="utf-8"))
 
-if int(cfg.get("schema_version", 0)) < 17:
-    raise SystemExit("controller_roles schema_version must be >= 17")
+if int(cfg.get("schema_version", 0)) < 23:
+    raise SystemExit("controller_roles schema_version must be >= 23")
 
 rr = cfg.get("runtime_recovery") or {}
 wa = rr.get("wait_actions") or {}
@@ -65,6 +65,18 @@ required = {
     "runtime_observability.queue_active_semantics": obs.get("queue_active_semantics") == "derived_summary_with_independent_qa",
     "runtime_observability.queue_active_null_allowed_only_when_active_by_lane_empty": obs.get("queue_active_null_allowed_only_when_active_by_lane_empty") is True,
 }
+
+state = rr.get("state_persistence") or {}
+proc = rr.get("process_recovery") or {}
+required["state_persistence.atomic_primary_writes"] = state.get("atomic_primary_writes") is True
+required["state_persistence.last_known_good_backup"] = state.get("last_known_good_backup") is True
+required["state_persistence.restore_missing_or_corrupt_primary_from_backup"] = state.get("restore_missing_or_corrupt_primary_from_backup") is True
+required["state_persistence.no_destructive_empty_reset"] = state.get("destructive_empty_reset_on_unreadable_state") is False
+required["state_persistence.daily_rollover_preserves_active_slots"] = state.get("daily_logical_date_rollover_preserves_active_slots") is True
+required["process_recovery.queue_exception_threshold"] = int(proc.get("repeated_identical_queue_exception_restart_threshold", 0)) == 3
+required["process_recovery.watchdog_exception_threshold"] = int(proc.get("repeated_identical_watchdog_exception_restart_threshold", 0)) == 3
+required["process_recovery.queue_heartbeat_fatal_seconds"] = int(proc.get("queue_heartbeat_fatal_seconds", 0)) == 300
+required["process_recovery.restart_owner"] = proc.get("restart_owner") == "DOCKER_UNLESS_STOPPED"
 
 expected_failures = {"failure","cancelled","timed_out","action_required","stale"}
 required["wait_actions.retry_terminal_failure_conclusions"] = expected_failures.issubset(set(wa.get("retry_terminal_failure_conclusions") or []))
