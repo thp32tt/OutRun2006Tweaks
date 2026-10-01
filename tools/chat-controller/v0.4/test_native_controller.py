@@ -19,6 +19,7 @@ def load_function(name, **overrides):
     ns = dict(re=re, datetime=datetime, timedelta=timedelta, TZ=timezone.utc,
               GITHUB_BROKER_ENABLED=False, NATIVE_PLUGIN_PROTOCOL_VERSION=2,
               GITHUB_ASSISTANT_RECOVERY_MAX=2, GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS=300,
+              SAME_TASK_CONTROL_GAP_SECONDS=15,
               QUEUE_STABLE_SECONDS=30, QUEUE_RESULT_GRACE_SECONDS=180,
               _parse_iso=lambda x: datetime.fromisoformat(x) if x else None,
               stable_hash=lambda x: hashlib.sha256(x.encode()).hexdigest(),
@@ -285,6 +286,32 @@ class NativeControllerTests(unittest.TestCase):
         f2, _ = load_function('_is_localization_producer', CONTROLLER_MODE='conversion')
         self.assertFalse(f2({'slot': 'A', 'lane': 'LOCALIZATION_A'}))
 
+    def test_exact_e00479_planning_only_response_is_not_terminal(self):
+        continuation = AsyncMock(return_value=True)
+        recovery = AsyncMock(return_value=True)
+        f, _ = load_function(
+            'queue_handle_native_response',
+            _is_localization_producer=lambda active: True,
+            queue_send_producer_execution_continuation=continuation,
+            queue_send_github_recovery=recovery,
+        )
+        active = self.active()
+        active.update(slot='D', lane='LOCALIZATION_E', task_id='LOCALIZATION-LOCALIZATION_E-00479')
+        text_value = (
+            'TASK_ID=LOCALIZATION-LOCALIZATION_E-00479 작업 재개. '
+            '현재까지는 상태 재구성 단계이며, 아직 이 TASK_ID 결과 커밋은 생성하지 않았다. '
+            '다음 단계: E shard 미완료 material 후보 스캔, C qa_pending 제외, DDS 후보 제작. '
+            'TASK_ID=LOCALIZATION-LOCALIZATION_E-00479 '
+            'RESULT_SHA=NOT_CREATED AUTOMATION_VALIDATION=PENDING RUNTIME_VALIDATION=UNTESTED'
+        )
+        self.assertTrue(asyncio.run(f(None, {}, active, text_value)))
+        continuation.assert_awaited_once()
+        recovery.assert_not_awaited()
+        self.assertEqual(active['task_id'], 'LOCALIZATION-LOCALIZATION_E-00479')
+        self.assertEqual(active['attempt'], 1)
+        self.assertEqual(active['phase'], 'WAIT_CHAT')
+        self.assertNotIn('result_sha', active)
+
     def test_producer_no_commit_response_forces_execution_continuation(self):
         continuation = AsyncMock(return_value=True)
         recovery = AsyncMock(return_value=True)
@@ -366,6 +393,24 @@ class NativeControllerTests(unittest.TestCase):
         self.assertEqual(active['native_plugin_protocol_version'],2)
         self.assertFalse(asyncio.run(f(None, {}, {'active':active}, active)))
         self.assertEqual(ns['queue_send_same_chat_control_message'].call_count,1)
+
+    def test_same_task_control_guard_uses_short_gap_not_new_task_gap(self):
+        f, _ = load_function(
+            'same_task_control_send_guard_reason',
+            rate_limit_active=lambda *args: False,
+            rate_limit_seconds_remaining=lambda *args: 0,
+        )
+        now = datetime.now(timezone.utc)
+        reg = SimpleNamespace(last_global_send_at=(now - timedelta(seconds=20)).isoformat())
+        slot = SimpleNamespace(last_sent_at=(now - timedelta(seconds=20)).isoformat())
+        self.assertIsNone(f(reg, slot, now))
+        reg.last_global_send_at = (now - timedelta(seconds=5)).isoformat()
+        self.assertTrue(f(reg, slot, now).startswith('same_task_control_gap:'))
+
+    def test_same_chat_control_message_uses_same_task_guard(self):
+        node_source = ast.get_source_segment(SOURCE, FUNCTIONS['queue_send_same_chat_control_message']) or ''
+        self.assertIn('same_task_control_send_guard_reason', node_source)
+        self.assertNotIn('guard = send_guard_reason(', node_source)
 
     def test_retry_surface_stable_response_preempts_generic_retry_cooldown(self):
         native = AsyncMock(return_value=True)
