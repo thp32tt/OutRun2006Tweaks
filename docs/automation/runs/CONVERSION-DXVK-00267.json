@@ -6,9 +6,9 @@
   "controller_attempt": "1/3",
   "chat_rollover": 2,
   "base_sha": "d67ded2e23dd45ee26ddebb186e75b1558ca6715",
-  "result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING",
+  "result_sha": "f4bd99b4672148fb3622aceb7219ec9c7312c5a5",
+  "validation_bearing_result_sha": "f4bd99b4672148fb3622aceb7219ec9c7312c5a5",
+  "automation_validation": "PASS_CORE_GATES_INSPECTOR_PENDING",
   "runtime_validation": "UNTESTED",
   "runtime_test_required": false,
   "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R267_182569_EXACT_DECODE_REVIEW",
@@ -69,28 +69,116 @@
     "ownership_effect": "NONE"
   },
   "instructions": [
-    {"rva":"0x00182569","bytes":"74 11","asm":"je 0x0018257C"},
-    {"rva":"0x0018256B","bytes":"8a 07","asm":"mov al, byte ptr [edi]"},
-    {"rva":"0x0018256D","bytes":"83 c7 01","asm":"add edi, 1"},
-    {"rva":"0x00182570","bytes":"84 c0","asm":"test al, al"},
-    {"rva":"0x00182572","bytes":"74 39","asm":"je 0x001825AD"},
-    {"rva":"0x00182574","bytes":"f7 c7 03 00 00 00","asm":"test edi, 3"},
-    {"rva":"0x0018257A","bytes":"75 ef","asm":"jne 0x0018256B"},
-    {"rva":"0x0018257C","bytes":"8b 07","asm":"mov eax, dword ptr [edi]"},
-    {"rva":"0x0018257E","bytes":"ba ff fe fe 7e","asm":"mov edx, 0x7EFEFEFF"},
-    {"rva":"0x00182583","bytes":"03 d0","asm":"add edx, eax"},
-    {"rva":"0x00182585","bytes":"83 f0 ff","asm":"xor eax, 0xFFFFFFFF"},
-    {"rva":"0x00182588","bytes":"33 c2","asm":"xor eax, edx"},
-    {"rva":"0x0018258A","bytes":"83 c7 04","asm":"add edi, 4"},
-    {"rva":"0x0018258D","bytes":"a9 00 01 01 81","asm":"test eax, 0x81010100"},
-    {"rva":"0x00182592","bytes":"74 e8","asm":"je 0x0018257C"},
-    {"rva":"0x00182594","bytes":"8b 47 fc","asm":"mov eax, dword ptr [edi-4]"},
-    {"rva":"0x00182597","bytes":"84 c0","asm":"test al, al"},
-    {"rva":"0x00182599","bytes":"74 21","asm":"je 0x001825BC"},
-    {"rva":"0x0018259B","bytes":"84 e4","asm":"test ah, ah"},
-    {"rva":"0x0018259D","bytes":"74 18","asm":"je 0x001825B7"},
-    {"rva":"0x0018259F","bytes":"a9 00 00 ff 00","asm":"test eax, 0x00FF0000"},
-    {"rva":"0x001825A4","bytes":"74 0c","asm":"je 0x001825B2"}
+    {
+      "rva": "0x00182569",
+      "bytes": "74 11",
+      "asm": "je 0x0018257C"
+    },
+    {
+      "rva": "0x0018256B",
+      "bytes": "8a 07",
+      "asm": "mov al, byte ptr [edi]"
+    },
+    {
+      "rva": "0x0018256D",
+      "bytes": "83 c7 01",
+      "asm": "add edi, 1"
+    },
+    {
+      "rva": "0x00182570",
+      "bytes": "84 c0",
+      "asm": "test al, al"
+    },
+    {
+      "rva": "0x00182572",
+      "bytes": "74 39",
+      "asm": "je 0x001825AD"
+    },
+    {
+      "rva": "0x00182574",
+      "bytes": "f7 c7 03 00 00 00",
+      "asm": "test edi, 3"
+    },
+    {
+      "rva": "0x0018257A",
+      "bytes": "75 ef",
+      "asm": "jne 0x0018256B"
+    },
+    {
+      "rva": "0x0018257C",
+      "bytes": "8b 07",
+      "asm": "mov eax, dword ptr [edi]"
+    },
+    {
+      "rva": "0x0018257E",
+      "bytes": "ba ff fe fe 7e",
+      "asm": "mov edx, 0x7EFEFEFF"
+    },
+    {
+      "rva": "0x00182583",
+      "bytes": "03 d0",
+      "asm": "add edx, eax"
+    },
+    {
+      "rva": "0x00182585",
+      "bytes": "83 f0 ff",
+      "asm": "xor eax, 0xFFFFFFFF"
+    },
+    {
+      "rva": "0x00182588",
+      "bytes": "33 c2",
+      "asm": "xor eax, edx"
+    },
+    {
+      "rva": "0x0018258A",
+      "bytes": "83 c7 04",
+      "asm": "add edi, 4"
+    },
+    {
+      "rva": "0x0018258D",
+      "bytes": "a9 00 01 01 81",
+      "asm": "test eax, 0x81010100"
+    },
+    {
+      "rva": "0x00182592",
+      "bytes": "74 e8",
+      "asm": "je 0x0018257C"
+    },
+    {
+      "rva": "0x00182594",
+      "bytes": "8b 47 fc",
+      "asm": "mov eax, dword ptr [edi-4]"
+    },
+    {
+      "rva": "0x00182597",
+      "bytes": "84 c0",
+      "asm": "test al, al"
+    },
+    {
+      "rva": "0x00182599",
+      "bytes": "74 21",
+      "asm": "je 0x001825BC"
+    },
+    {
+      "rva": "0x0018259B",
+      "bytes": "84 e4",
+      "asm": "test ah, ah"
+    },
+    {
+      "rva": "0x0018259D",
+      "bytes": "74 18",
+      "asm": "je 0x001825B7"
+    },
+    {
+      "rva": "0x0018259F",
+      "bytes": "a9 00 00 ff 00",
+      "asm": "test eax, 0x00FF0000"
+    },
+    {
+      "rva": "0x001825A4",
+      "bytes": "74 0c",
+      "asm": "je 0x001825B2"
+    }
   ],
   "review_lenses": {
     "architecture": "Review-only durable evidence; no backend/provider/selector/package/runtime activation path changes.",
@@ -105,12 +193,80 @@
     "after": "EXACT_182569_TO_1825A6_CONTROL_FLOW_PREFIX_PROVEN",
     "runtime_claim": false
   },
-  "blocker": "The instruction beginning at 0x001825A6 is incomplete in the validated R263 capture, and four conditional branch targets at 0x001825AD/0x001825B2/0x001825B7/0x001825BC lie outside it. No bytes or semantics beyond 0x001825A9 are inferred.",
+  "blocker": "No implementation blocker. The next provenance step still requires bytes beyond the validated 0x001825A9 capture because the instruction beginning at 0x001825A6 is incomplete and four branch targets lie outside the window. Runtime behavior remains UNTESTED.",
   "next_action": "Capture a fresh canonical replacement-EXE provenance window beginning at 0x001825A6, require the known a9 00 00 three-byte overlap, obtain enough bytes to complete TEST EAX, imm32 and cover the nearby external branch targets, then exact-decode only after that provenance passes.",
-  "checkpoint": "C3_VALIDATE",
-  "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+  "checkpoint": "C6_STATE",
+  "status": "CORE_VALIDATED_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "runtime_source_changed": false,
   "semantic_ownership_promoted": false,
-  "source_commits": []
+  "source_commits": [
+    {
+      "sha": "f4bd99b4672148fb3622aceb7219ec9c7312c5a5",
+      "message": "vr: exact-decode 0x182569 continuation [AUTO:CONVERSION-DXVK-00267]",
+      "role": "validation-bearing-result",
+      "validation_bearing": true,
+      "ci_skip": false
+    }
+  ],
+  "validation_evidence": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 36932796521,
+      "run_number": 498,
+      "event": "push",
+      "conclusion": "success",
+      "required_for_completion": true
+    },
+    {
+      "workflow": "Build",
+      "run_id": 36932804380,
+      "run_number": 4329,
+      "event": "pull_request",
+      "conclusion": "success",
+      "required_for_completion": true
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 36932804283,
+      "run_number": 1684,
+      "event": "pull_request",
+      "conclusion": "success",
+      "required_for_completion": true
+    },
+    {
+      "workflow": "VR Hosted Test Package",
+      "run_id": 36932796486,
+      "run_number": 231,
+      "event": "push",
+      "conclusion": "success",
+      "required_for_completion": true
+    },
+    {
+      "workflow": "VR Hosted Test Package",
+      "run_id": 36932804317,
+      "run_number": 232,
+      "event": "pull_request",
+      "conclusion": "success",
+      "required_for_completion": true
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 36932804356,
+      "run_number": 1528,
+      "event": "pull_request",
+      "conclusion": "IN_PROGRESS_AT_C6",
+      "required_for_completion": false,
+      "reason": "R267 changes only its durable run JSON; exact EXE bytes were already obtained from successful R263 exact-head static analysis job 110552914236 at d67ded2e23dd45ee26ddebb186e75b1558ca6715."
+    },
+    {
+      "workflow": "VR PC Fast Test Build",
+      "run_id": 36932796498,
+      "run_number": 870,
+      "event": "push",
+      "conclusion": "skipped",
+      "required_for_completion": false,
+      "reason": "No explicitly authorized evening PC-fast test session."
+    }
+  ]
 }
