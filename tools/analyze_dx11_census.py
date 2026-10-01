@@ -366,6 +366,14 @@ def main() -> int:
         ]
         unsupported_total = sum(latest[key] for key in unsupported_keys)
 
+    exhaustive_draw_coverage = bool(
+        latest
+        and latest["samplingScheme"] == 2
+        and latest["samplingStride"] == 1
+        and latest["samplingDrawsSeen"] > 0
+        and latest["samples"] == latest["samplingDrawsSeen"]
+    )
+
     sampled_exactness = {
         "Samples": latest["samples"] if latest else 0,
         "ExactSamples": latest["exact"] if latest else 0,
@@ -377,7 +385,7 @@ def main() -> int:
             and unsupported_total == 0
         ),
         "DiagnosticOnly": True,
-        "ExhaustiveDrawCoverage": False,
+        "ExhaustiveDrawCoverage": exhaustive_draw_coverage,
         "ActivationProof": False,
     }
 
@@ -388,9 +396,13 @@ def main() -> int:
         "Stride": latest["samplingStride"] if latest else 0,
         "SchemeId": sampling_scheme_id,
         "Scheme": (
-            "HASHED_ORDINAL_V1"
-            if sampling_scheme_id == 1
-            else "LEGACY_OR_UNSPECIFIED"
+            "EXHAUSTIVE_V1"
+            if sampling_scheme_id == 2
+            else (
+                "HASHED_ORDINAL_V1"
+                if sampling_scheme_id == 1
+                else "LEGACY_OR_UNSPECIFIED"
+            )
         ),
         "SignatureHashCap": latest["signatureHashCap"] if latest else 0,
         "SignatureHashCapHitSamples": (
@@ -408,7 +420,8 @@ def main() -> int:
         "DetailedSignatureLogCapSaturated": bool(
             latest and latest["signatureDetailSkipped"] > 0
         ),
-        "NonExhaustive": True,
+        "NonExhaustive": not exhaustive_draw_coverage,
+        "ExhaustiveDrawCoverage": exhaustive_draw_coverage,
         "ActivationProof": False,
     }
 
@@ -418,6 +431,8 @@ def main() -> int:
         status = "CENSUS_ACTIVE_NO_PERIODIC_SUMMARY"
     elif unsupported_total != 0:
         status = "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    elif sampled_exactness["AllSampledExact"] and exhaustive_draw_coverage:
+        status = "OBSERVED_EXHAUSTIVE_TRANSLATION_EXACT_DIAGNOSTIC_ONLY"
     elif (
         sampled_exactness["AllSampledExact"]
         and sampling_coverage["SignatureHashCapSaturated"]
@@ -475,11 +490,13 @@ def main() -> int:
             "ManagedTextureShadow": managed_texture_shadow_evidence,
         },
         "ActivationNote": (
-            "R114 replaces the fixed-phase 1/64 selector with hashed-ordinal sampling "
-            "to reduce periodic draw-order alias, but sampling remains non-exhaustive. "
-            "Signature hash/detail caps are explicit evidence and hash-cap saturation "
-            "prevents the normal exact-sampled status. NativeDrawPathActivationAllowed "
-            "remains false; exact-build HMD graphics parity is still required."
+            "R114 defaults to hashed-ordinal sampled diagnostics. "
+            "When the runtime explicitly reports scheme=2, stride=1, and samples equal "
+            "drawsSeen, the report records exhaustive source-draw census coverage. "
+            "Signature hash/detail caps remain separate diagnostic-detail evidence. "
+            "Even exhaustive exact census remains diagnostic only: ActivationProof and "
+            "NativeDrawPathActivationAllowed stay false, and exact-build HMD graphics "
+            "parity is still required before native draw routing."
         ),
         "SourceLogs": source_logs,
         "Startup": startup,
