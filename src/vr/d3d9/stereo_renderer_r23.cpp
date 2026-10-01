@@ -856,6 +856,12 @@ namespace OutRunVRStereo
         VRRecoveryBaselineR23Hook VRRecoveryBaselineR23Hook::instance;
     }
 
+    inline void InvalidateLiveStateSample() noexcept
+    {
+        R23LastStateSampleDrawSerial = 0;
+        R23LastStateSampleEpoch = 0;
+    }
+
     void NotifyTopLevelDraw(IDirect3DDevice9* device) noexcept
     {
         R23BeforeTopLevelDraw(device);

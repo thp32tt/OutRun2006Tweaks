@@ -16,6 +16,7 @@ def text(rel: str) -> str:
 
 r22 = text("src/vr/d3d9/stereo_renderer_r22.cpp")
 r23 = text("src/vr/d3d9/stereo_renderer_r23.cpp")
+r29 = text("src/vr/d3d9/stereo_renderer_r29.cpp")
 r26 = text("src/vr/d3d9/stereo_renderer_r26.cpp")
 r31 = text("src/vr/d3d9/stereo_renderer_r31.cpp")
 r32 = text("src/vr/d3d9/stereo_renderer_r32.cpp")
@@ -44,6 +45,32 @@ if "StateBlockTracker::SetLifecycleHooksReady(false)" not in r22:
 for banned in ("R23GameDrawSerial", "R23BeforeTopLevelDraw", "GetTopLevelDrawSerial()"):
     if banned in r26:
         errors.append(f"R26 regained R23 implementation dependency: {banned}")
+
+for marker, source, owner in (
+    ("InvalidateLiveStateSample()", r23, "R23"),
+    ("InvalidateEffectStateCache()", r29, "R29"),
+):
+    if marker not in source:
+        errors.append(f"{owner} missing explicit cache invalidation API: {marker}")
+
+for banned in (
+    "R29Effect",
+    "R23LastStateSampleDrawSerial",
+    "R23LastStateSampleEpoch",
+    "R22ShadowState = {};",
+):
+    if banned in r31:
+        errors.append(
+            f"R31 regained direct lower-layer cache mutation: {banned}")
+
+for marker in (
+    "InvalidateEffectStateCache()",
+    "InvalidateTrackedRasterShadow()",
+    "InvalidateLiveStateSample()",
+):
+    if marker not in r31:
+        errors.append(
+            f"R31 missing owner cache invalidation boundary: {marker}")
 
 required_r22 = (
     '#include "../state/d3d9_raster_state.hpp"',

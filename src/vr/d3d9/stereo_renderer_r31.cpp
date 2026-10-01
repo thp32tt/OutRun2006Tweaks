@@ -190,10 +190,9 @@ namespace OutRunVRStereo
         {
             if (OutRunVR::State::StateBlockTracker::Reliable())
                 return;
-            R29Effect.valid = false;
-            R22ShadowState = {};
-            R23LastStateSampleDrawSerial = 0;
-            R23LastStateSampleEpoch = 0;
+            InvalidateEffectStateCache();
+            InvalidateTrackedRasterShadow();
+            InvalidateLiveStateSample();
         }
 
         bool R31PrepareEyeTailCache(
@@ -774,10 +773,9 @@ namespace OutRunVRStereo
         {
             R31BlockCurrentVerifiedGeneration();
             OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
-            R29Effect = {};
-            R22ShadowState = {};
-            R23LastStateSampleDrawSerial = 0;
-            R23LastStateSampleEpoch = 0;
+            InvalidateEffectStateCache();
+            InvalidateTrackedRasterShadow();
+            InvalidateLiveStateSample();
             R31EyeCache.valid = false;
             OutRunVR::State::StateBlockTracker::RequireResync();
         }

@@ -585,4 +585,9 @@ namespace OutRunVRStereo
 
         VRStereoR29Hook VRStereoR29Hook::instance;
     }
+
+    inline void InvalidateEffectStateCache() noexcept
+    {
+        R29Effect = {};
+    }
 }

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-01T20:55:00+09:00",
+  "updatedKst": "2026-10-01T21:10:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 27,
+  "cycle": 28,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -36,9 +36,10 @@
     "VR-REFACTOR-STATE-0002B-C",
     "VR-REFACTOR-STATE-0002B-C-FIX00",
     "VR-REFACTOR-CI-0002-FIX00",
-    "VR-REFACTOR-STATE-0004A"
+    "VR-REFACTOR-STATE-0004A",
+    "VR-REFACTOR-STATE-0004B"
   ],
-  "next": "Validate install-time StateBlockRecovery callback registration with policy, active R26+HUD, R34 full-chain, host and package gates. If green, continue extracting R31MarkStateBlockCachesDirty cross-layer invalidations behind neutral boundaries.",
+  "next": "Validate owner-API cache invalidation boundaries with policy, active R26+HUD, R34 full-chain, host and package gates. If green, continue reducing remaining R31 direct lower-layer reads and R29 mono-safety coupling in isolated steps.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -59,7 +60,8 @@
     "VR-REFACTOR-STATE-0002B-C replaces overloaded R31Reliable state with neutral EventConsumerReady. Aggregate fast-path trust is now R22 physical Apply reliability + event-consumer readiness + intact coverage; fallback hook failures use CoverageLost without pretending consumer registration failed.",
     "VR-REFACTOR-STATE-0002B-C-FIX00 makes event-consumer registration transactional: configure callbacks before draw-hook enable, publish EventConsumerReady only after successful enable, and clear callbacks on failed installation with Begin withdrawn first.",
     "VR-REFACTOR-CI-0002-FIX00 updates stale architecture/R51/R32/refactor verifiers to the neutral StateBlockTracker/StateBlockRecovery contracts and scopes the R51 active-build flag check to the active game job so the independent full-chain compile gate is allowed.",
-    "VR-REFACTOR-STATE-0004A configures StateBlockRecovery providers once during the R31 install transaction before StateBlockEvents publication instead of rewriting the same atomic callbacks on every Begin/End/Apply event; lifecycle event cache invalidation ordering and lazy resync behavior are otherwise unchanged."
+    "VR-REFACTOR-STATE-0004A configures StateBlockRecovery providers once during the R31 install transaction before StateBlockEvents publication instead of rewriting the same atomic callbacks on every Begin/End/Apply event; lifecycle event cache invalidation ordering and lazy resync behavior are otherwise unchanged.",
+    "VR-REFACTOR-STATE-0004B replaces R31 direct writes to R29 effect cache, R22 raster shadow, and R23 live-state sample cursors with explicit owner-layer invalidation APIs. The two invalidation call sites, ordering, and StateBlock lazy-resync request remain unchanged."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0004A_APPLIED_CI_PENDING"
+  "batchStatus": "VR-REFACTOR-STATE-0004B_APPLIED_CI_PENDING"
 }
