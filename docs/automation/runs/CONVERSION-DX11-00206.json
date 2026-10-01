@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00206",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "b46e2fe24e225a9c6d78aed18a4088c7a43ff0c9",
+  "result_sha": "893e02dafa31d95050eae62c8ce3b58c84c4095b",
+  "validation_bearing_result_sha": "893e02dafa31d95050eae62c8ce3b58c84c4095b",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "google_drive_canonical_hd_source_transport": {
+    "approved_by_current_git_head": true,
+    "used": false,
+    "reason": "This task acquires canonical EXE bytes through the existing GitHub Actions analyzer path; no DDS acquisition is required."
+  },
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R206_1823EF_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00204 ended at exact raw tail RVA 0x1823EF with only bytes d9 3c and explicitly named fresh canonical-EXE provenance at/after that point as the next safe bounded F13 action.",
+  "summary": "ATTEMPT=1 implementation committed. The validation-bearing tree adds a fail-closed 96-byte canonical EXE provenance collector for 0x001823EF..0x0018244F, binds the new probe prefix to the R204 raw tail d9 3c, records raw inbound/outbound rel32 candidates, and adds static disassembly-contract gating. It does not decode 0x1823EF as an instruction boundary or promote any function, call-effect, render, HUD, stereo or ownership semantics. Exact-SHA GitHub Actions validation is pending; no HMD/game test was performed.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00206.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false,
+    "hd_source_transport_changed": false
+  },
+  "evidence": [
+    "C0 recovered branch HEAD b46e2fe24e225a9c6d78aed18a4088c7a43ff0c9 directly from GitHub.",
+    "AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, durable VR state/regression documents, Set 04 and the completed CONVERSION-DX11-00204 record were reviewed before implementation.",
+    "CONVERSION-DX11-00204 exact result ee176cde9aa10a1b5a29e6a617032ff942a0f73d proved the complete 0x1823D0..0x1823EE instruction prefix but intentionally retained d9 3c at 0x1823EF as raw tail only.",
+    "The new R206 collector starts exactly at 0x1823EF, captures 96 bytes through exclusive end 0x18244F, requires the first two probe bytes to match the predecessor d9 3c tail, and records raw rel32 census without instruction-boundary inference.",
+    "Validation-bearing result 893e02dafa31d95050eae62c8ce3b58c84c4095b contains exact marker [AUTO:CONVERSION-DX11-00206] and no CI-skip directive.",
+    "Issue #14 implementation ledger comment id 5925939629 records the production-write transaction.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "proof_contract": {
+    "predecessor_status": "EXACT_1823D0_TO_1823EF_PREFIX_CONTROL_FLOW_PROVEN",
+    "start_rva": "0x001823EF",
+    "probe_len": 96,
+    "probe_end_rva": "0x0018244F",
+    "required_predecessor_tail_bytes": "d9 3c",
+    "expected_status": "EXACT_EXE_1823EF_TO_18244F_PROVENANCE_CAPTURED",
+    "start_boundary_status": "RAW_PREDECESSOR_TAIL_BOUNDARY_UNRESOLVED",
+    "function_entry_status": "UNRESOLVED_AT_1823EF_AND_DISCOVERED_TARGETS",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "ownership_effect": "NONE",
+    "continuation_scope": "RAW_BYTES_AND_REL32_CENSUS_ONLY"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier evidence only; native DX11 draw routing, provider, selector, package and renderer ownership are unchanged.",
+    "ownership": "Raw bytes and rel32 candidates are not promoted to ScreenHud/world/function ownership.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changed.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changed.",
+    "adversarial": "Collector fails unless the R204 proof remains exact, the new 96-byte range is fully mapped in .text, its exclusive end is exactly 0x18244F, and the first two bytes match the predecessor d9 3c tail."
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_1823D0_TAIL_PREFIX_PROVEN",
+    "after": "PENDING_1823EF_FRESH_PROVENANCE",
+    "runtime_claim": false
+  },
+  "blocker": "Exact-SHA GitHub Actions validation is pending. Until canonical EXE execution proves the new probe status, bytes beyond the previous two-byte tail remain unverified in this task record.",
+  "next_action": "Consume exact-SHA GitHub Actions results for 893e02dafa31d95050eae62c8ce3b58c84c4095b. If all required gates are green, finalize AUTOMATION_VALIDATION=PASS in a separate bookkeeping commit and record the observed canonical bytes/rel32 evidence. Do not decode or assign semantics until that evidence exists.",
+  "checkpoint": "C4_COMMIT_PENDING_C3_REMOTE_VALIDATION",
+  "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE",
+  "recorded_kst": "2026-10-01T15:19:00+09:00",
+  "source_commits": [
+    {
+      "sha": "fc0f15ab6488f0942a2e99528f62a2ea0aa1a7d2",
+      "message": "dx11: add 0x1823ef continuation provenance collector",
+      "role": "intermediate_source_commit",
+      "validation_bearing": false,
+      "ci_skip": false
+    },
+    {
+      "sha": "893e02dafa31d95050eae62c8ce3b58c84c4095b",
+      "message": "dx11: gate 0x1823ef provenance capture [AUTO:CONVERSION-DX11-00206]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PENDING"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5925939629,
+    "validation_comment_id": null,
+    "status": "IMPLEMENTATION_RECORDED_VALIDATION_PENDING"
+  }
+}
