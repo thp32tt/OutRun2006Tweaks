@@ -96,6 +96,11 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('ALL_TOOLS', prefix)
         self.assertNotIn('bookkeeping/checkpoint', prefix)
 
+    def test_c_qa_backlog_never_throttles_producers(self):
+        self.assertIn('C QA backlog is consumer-only state. It must never pause A/B/E producer dispatch.', SOURCE)
+        self.assertNotIn('pending_count >= LOCALIZATION_E_QA_PAUSE_THRESHOLD', SOURCE)
+        self.assertNotIn('lane_key == "D" and e_throttled', SOURCE)
+
     def test_no_work_guard_blocks_incomplete_authoritative_state(self):
         status_fn, _ = load_function('_collect_current_status_blockers')
         pending_fn, _ = load_function('_collect_pending_array_blockers')
