@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 892,
+  "cycle": 922,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -145,11 +145,20 @@
     "R84-REF-HOOKSET-0013",
     "R84-REF-LIFECYCLE-0044",
     "R84-REF-PERF-0016",
-    "R84-REF-STATE-0021"
+    "R84-REF-STATE-0021",
+    "R84-REF-LIFECYCLE-0045",
+    "R84-REF-HUD-0010",
+    "R84-REF-XYZRHW-0010",
+    "R84-REF-XYZRHW-0011",
+    "R84-REF-XYZRHW-0012",
+    "R84-REF-HUD-0011",
+    "R84-REF-HOOKSET-0014",
+    "R84-REF-LIFECYCLE-0046",
+    "R84-REF-SKYGLOW-0010"
   ],
-  "next": "Cycles 893-895: review R34 reset/lost-device guard ownership, then independent R30 HUD/XYZRHW/SkyGlow ownership without semantic changes; APPLY_GATE at 895.",
-  "updatedKst": "2026-10-02T08:13:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_892_CHECKPOINT",
+  "next": "Cycles 923-925: continue independent R29/R30 lifecycle/hook ownership and R31 StateBlock verifier-only review; preserve protected graph; APPLY_GATE at 925.",
+  "updatedKst": "2026-10-02T08:18:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_922_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -260,6 +269,16 @@
     "Cycles 881-883 R84-REF-LIFECYCLE-0044: R33 Reset chain reviewed against R32/R22 ownership; R33 only invalidates depth/stencil cache and records result. APPLY_GATE 883 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 884-886 R84-REF-PERF-0016: R33 telemetry snapshot reviewed; five-second cadence and counters remain isolated from R32 frame telemetry. APPLY_GATE 886 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 887-889 R84-REF-STATE-0021: R33 unreliable StateBlock fallback reviewed; live depth/stencil write queries remain required when tracker reliability is false. APPLY_GATE 889 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
-    "Cycles 890-892 R84-REF-GUARD-0007: R34 raster guard reviewed against R33 dispatch; pending StateBlock resync precedes raster replay snapshot. APPLY_GATE 892 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
+    "Cycles 890-892 R84-REF-GUARD-0007: R34 raster guard reviewed against R33 dispatch; pending StateBlock resync precedes raster replay snapshot. APPLY_GATE 892 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 893-895 R84-REF-LIFECYCLE-0045: R34 reset/lost-device replay ownership reviewed; safety block and raw-Present bypass ordering remains runtime-critical. APPLY_GATE 895 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 896-898 R84-REF-HUD-0010: R30 ScreenSpace guard reviewed; E_NOTIMPL fallback must remain exact lower R29 draw path. APPLY_GATE 898 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 899-901 R84-REF-XYZRHW-0010: R30 PrimitiveUP XYZRHW path reviewed: prepare/configure/transform/stereo execute fallback boundaries are behavior-sensitive. APPLY_GATE 901 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 902-904 R84-REF-XYZRHW-0011: R30 IndexedPrimitiveUP index validation/used-mask/transform path reviewed; no safe ownership move without runtime evidence. APPLY_GATE 904 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 905-907 R84-REF-XYZRHW-0012: R30 VB XYZRHW path and CPU shadow consumption reviewed; draw-time shadow fallback is tied to lock/unlock validity. APPLY_GATE 907 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 908-910 R84-REF-HUD-0011: R30 four draw destinations reviewed; XYZRHW-first then ScreenSpaceFov then lower-R29 fallback order is protected. APPLY_GATE 910 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 911-913 R84-REF-HOOKSET-0014: R30 hook transaction and buffer-shadow hook rollback reviewed; separate rollback domains are intentional. APPLY_GATE 913 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 914-916 R84-REF-LIFECYCLE-0046: R30 install success/failure/start-thread boundaries reviewed; publication ownership already isolated. APPLY_GATE 916 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 917-919 R84-REF-SKYGLOW-0010: R30 SkyGlow ownership reviewed at resource/state boundary; settings and ping-pong behavior remain runtime-sensitive. APPLY_GATE 919 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 920-922 R84-REF-GUARD-0008: Cross-checked R30 HUD/XYZRHW route against R34 final raster guard; final guard remains independent safety layer. APPLY_GATE 922 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
   ]
 }
