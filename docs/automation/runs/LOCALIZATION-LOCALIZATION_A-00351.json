@@ -1,0 +1,78 @@
+{
+  "schema_version": 20,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+  "wave_id": "P00221",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-10-01T14:34:26+09:00",
+  "base_head_sha": "88aac5dcf9b1b9c95f64aa2e23ff4094b83023d2",
+  "controller_schema_version": 20,
+  "result": "PARTIAL_BATCH_INDEX222_V20_LOCKED_SONG_TITLE_FAMILY_STATIC_SELF_QA_RUNTIME_UNTESTED",
+  "summary": "Current-HEAD v20 retrospective audit makes index222/DDF0392A the only runnable A-lane completion-tier rework. The three previously translated song titles are restored to exact source-language strings, and all seven song-title family members are natively rerendered at one locked 43px family size with no per-title size override. Generic UI rows 0/1/2 remain byte/pixel-identical to the accepted predecessor; Ferrari model rows remain exact source. DDS DXT5/header/mip/orientation are preserved; every song-title decoded bbox stays inside its source-derived 2px safe bbox; no compressed block changes outside the seven song cells and no decoded changes escape the permitted UI/song regions. Fresh A-shard rescan exposes no second runnable completion-tier candidate, so this is PARTIAL_BATCH. Runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "selected_priority": "DIRECT_REWORK_REQUIRED_V20_TITLE_POLICY",
+    "selected_indices": [
+      222
+    ],
+    "second_runnable_completion_tier_after_rescan": [],
+    "batch_disposition": "PARTIAL_BATCH_ONE_CANDIDATE_SHARD_EXHAUSTED",
+    "not_repeated_candidate_qa_pending": [
+      159,
+      198,
+      201
+    ],
+    "hold_not_promoted": [
+      51
+    ],
+    "cross_lane_rework_not_stolen": [
+      163
+    ]
+  },
+  "material_deliverable": {
+    "type": "INDEX222_DDF0392A_V20_LOCKED_SONG_TITLE_FAMILY_CANDIDATE",
+    "candidate_dds_sha256": "570cdb0884bc3495c06fd0de1d397be925e8c3506cd331f98ecbfa45053e8917",
+    "candidate_dds_modified": true,
+    "song_title_family_members": 7,
+    "song_title_fixed_font_size_px": 43,
+    "translated_song_titles_remaining": 0,
+    "localized_generic_ui_rows_inherited": 3,
+    "changed_blocks_outside_song_family": 0,
+    "one_pixel_overflow": 0,
+    "material_payload_in_result_commit": true,
+    "durable_task_record_in_result_commit": true
+  },
+  "evidence": [
+    "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/title_family_comparison.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/element_comparison.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/comparison.png",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/generation_prompt.json",
+    "localization/graphics/KOREAN_PNG_REVIEW/DDF0392A/qa_report.json",
+    "localization/graphics/role_A/20261001-A00351-P00221/A00351_P00221_INDEX222_V20_SONG_TITLE_FAMILY_NORMALIZE.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00351.json",
+    ".github/workflows/localization-a00351-ddf0392a.yml"
+  ],
+  "candidate_dds_modified": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "pinned_release_transport_used": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "schema": "outrun-a00351-p00221-producer-result-v1",
+  "commit_mode": "GITHUB_ACTIONS_ATOMIC_LANE_LOCAL_V20_CANDIDATE_REVIEW_REPORT_AND_DURABLE_TASK_RECORD",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "retry_required": false,
+  "result_commit_message": "localization(A): normalize index222 song-title family [AUTO:LOCALIZATION-LOCALIZATION_A-00351]"
+}

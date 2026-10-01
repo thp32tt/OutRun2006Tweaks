@@ -1,188 +1,25 @@
 {
   "contract": "outrun-first-pass-edit-v2",
-  "task_id": "LOCALIZATION-LOCALIZATION_A-00221",
-  "wave_id": "P00117",
+  "policy_version": 20,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+  "wave_id": "P00221",
   "queue_index": 222,
   "asset": "DDF0392A",
-  "source": {
-    "archive": "OR2-HD-GUI-v0.25.10a.zip",
-    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
-    "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
-    "sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
-    "dimensions": [
-      1024,
-      2048
-    ],
-    "format": "DXT5",
-    "mipmaps": 1,
-    "raw_to_readable": "flip_y"
-  },
-  "accepted_precandidate_lineage": {
-    "a00215_result_sha": "64e756e0cfba3b141a2e94915168f709a1a226a3",
-    "c149_q00047_result_sha": "149ce00855248574d0813d34ba34da2a1e336f17",
-    "production_readiness": "RENDER_READY"
-  },
-  "font": {
-    "identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
-    "sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb"
-  },
-  "elements": [
-    {
-      "region_index": 0,
-      "sprite": "sprite_401",
-      "source": "OutRun Mode / 15 C.",
-      "approved_korean": "아웃런 모드 / 15코스",
-      "source_effect_bbox_readable_local": [
-        6,
-        14,
-        548,
-        66
-      ],
-      "candidate_safe_bbox_readable_local": [
-        8,
-        16,
-        546,
-        64
-      ],
-      "candidate_fill_rgb": [
-        46,
-        53,
-        57
-      ],
-      "font_size_px": 45
-    },
-    {
-      "region_index": 1,
-      "sprite": "sprite_402",
-      "source": "OutRun 1986",
-      "approved_korean": "아웃런 1986",
-      "source_effect_bbox_readable_local": [
-        4,
-        17,
-        333,
-        61
-      ],
-      "candidate_safe_bbox_readable_local": [
-        6,
-        19,
-        331,
-        59
-      ],
-      "candidate_fill_rgb": [
-        57,
-        61,
-        65
-      ],
-      "font_size_px": 40
-    },
-    {
-      "region_index": 2,
-      "sprite": "sprite_403",
-      "source": "Journey Mode / Random",
-      "approved_korean": "저니 모드 / 무작위",
-      "source_effect_bbox_readable_local": [
-        2,
-        10,
-        627,
-        68
-      ],
-      "candidate_safe_bbox_readable_local": [
-        4,
-        12,
-        625,
-        66
-      ],
-      "candidate_fill_rgb": [
-        46,
-        53,
-        57
-      ],
-      "font_size_px": 50
-    },
-    {
-      "region_index": 3,
-      "sprite": "sprite_404",
-      "source": "Who Are You?",
-      "approved_korean": "당신은 누구?",
-      "source_effect_bbox_readable_local": [
-        2,
-        17,
-        342,
-        60
-      ],
-      "candidate_safe_bbox_readable_local": [
-        4,
-        19,
-        340,
-        58
-      ],
-      "candidate_fill_rgb": [
-        66,
-        65,
-        66
-      ],
-      "font_size_px": 39
-    },
-    {
-      "region_index": 6,
-      "sprite": "sprite_407",
-      "source": "Shake The Street",
-      "approved_korean": "거리를 뒤흔들어라",
-      "source_effect_bbox_readable_local": [
-        3,
-        17,
-        419,
-        60
-      ],
-      "candidate_safe_bbox_readable_local": [
-        5,
-        19,
-        417,
-        58
-      ],
-      "candidate_fill_rgb": [
-        66,
-        65,
-        66
-      ],
-      "font_size_px": 39
-    },
-    {
-      "region_index": 7,
-      "sprite": "sprite_408",
-      "source": "Rush A Difficulty",
-      "approved_korean": "난이도에 도전",
-      "source_effect_bbox_readable_local": [
-        6,
-        17,
-        421,
-        70
-      ],
-      "candidate_safe_bbox_readable_local": [
-        8,
-        19,
-        419,
-        68
-      ],
-      "candidate_fill_rgb": [
-        66,
-        65,
-        66
-      ],
-      "font_size_px": 49
-    }
+  "source_sha256": "bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72",
+  "predecessor_candidate_sha256": "c2938974e9dbde92b05eab319f85e9dd226b7f89b037d24b67b463b312a92878",
+  "typography_family_id": "DDF0392A_SONG_TITLE_SELECTOR_V20",
+  "family_target_font_size_px": 43,
+  "song_titles": [
+    "Who Are You?",
+    "Splash Wave",
+    "Shiny World",
+    "Shake The Street",
+    "Rush A Difficulty",
+    "Risky Ride",
+    "Passing Breeze"
   ],
-  "instructions": [
-    "Use only exact canonical DDF0392A source and C149/Q00047 accepted masks/clean plate/safe bboxes.",
-    "Preserve 19 protected song-title/Ferrari-model regions byte-for-byte at BC3 block level.",
-    "Build lettering in readable coordinates then flip vertically to raw DDS.",
-    "Use upright heavy condensed sans with flat source-sampled dark-gray fill; no outline/shadow/glow.",
-    "Use Noto Sans CJK KR Bold natively; no flattened-raster resize or slant transform.",
-    "Left-align inside final 2px-safe bbox with an additional internal pixel.",
-    "Encode DXT5 mip1 with exact original 128-byte header; patch only changed BC3 blocks.",
-    "Reject any decoded-final bbox escape, protected change, outside-edit change, wrong orientation, broken Hangul or source residue."
-  ],
-  "raster_resampling": "NOT_USED",
-  "source_slant_direction": "none",
-  "candidate_slant_direction": "none"
+  "rule": "PRESERVE_EXACT_SOURCE_TITLE_TEXT; RERENDER_ALL_SONG_FAMILY_MEMBERS_AT_ONE_LOCKED_NATIVE_FONT_SIZE; NO_PER_STRING_SIZE_OVERRIDE",
+  "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+  "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+  "runtime_validation": "UNTESTED"
 }
