@@ -542,6 +542,61 @@ async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, P
     return sent
 
 
+def _is_localization_producer(active: dict) -> bool:
+    lane = str(active.get("lane") or "")
+    slot = str(active.get("slot") or "")
+    return CONTROLLER_MODE == "localization" and (
+        slot in {"A", "B", "D"}
+        or lane in {"LOCALIZATION_A", "LOCALIZATION_B", "LOCALIZATION_E"}
+    )
+
+
+async def queue_send_producer_execution_continuation(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    active: dict,
+    response_hash: str,
+) -> bool:
+    """A producer status/plan response without a durable task commit is never terminal."""
+    now = datetime.now(TZ)
+    if active.get("producer_continuation_response_hash") == response_hash:
+        last = _parse_iso(active.get("producer_continuation_sent_at"))
+        if last and (now - last).total_seconds() < GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS:
+            write_runtime(
+                status="producer_execution_wait",
+                last_action=f"{active['task_id']} waiting for material execution / durable Git result",
+                queue=active,
+            )
+            return True
+
+    latest_head = github_branch_head(active["branch"])
+    if not latest_head:
+        return False
+
+    prompt = (
+        f"TASK_ID={active['task_id']} BRANCH={active['branch']} HEAD={latest_head}\n"
+        "INTERMEDIATE_STATUS_NOT_TERMINAL. 상태 재구성, HEAD 확인, 후보 스캔, 계획/다음 단계 작성은 중간 단계다. "
+        "RESULT_SHA=NOT_CREATED/미커밋 상태로 응답을 끝내지 마. 사용자 확인을 기다리지 말고 지금 이 TASK_ID에서 "
+        "실제 material 작업을 계속 실행해. 자기 shard의 runnable/fallback 작업을 수행하고 검증한 뒤 "
+        "반드시 새 [AUTO:TASK_ID] durable commit까지 만든 후에만 결과를 종료 보고해. "
+        "현재 후보가 막히면 계약의 fallback ladder로 다음 독립 미완료 작업을 계속해. "
+        "'다음 단계'를 다시 설명하지 말고 도구 호출과 실제 변경부터 수행해."
+    )
+    sent = await queue_send_same_chat_control_message(
+        context,
+        pages,
+        active,
+        prompt,
+        status="producer_execution_continuation",
+        result_label="producer_execution_continuation",
+    )
+    if sent:
+        active["producer_continuation_response_hash"] = response_hash
+        active["producer_continuation_sent_at"] = now.isoformat()
+        active["assistant_claim_verification"] = "INTERMEDIATE_STATUS_REJECTED"
+    return sent
+
+
 async def queue_handle_native_response(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -553,6 +608,18 @@ async def queue_handle_native_response(
         return False
     now = datetime.now(TZ)
     h = stable_hash(text)
+
+    # Localization producers must never stop after a plan/status-only response.
+    # This path is reached only when no authoritative TASK_ID commit was found.
+    if _is_localization_producer(active):
+        active["native_last_response_hash"] = h
+        active["assistant_claim_verification"] = "UNVERIFIED_NO_TASK_COMMIT"
+        handled = await queue_send_producer_execution_continuation(
+            context, pages, active, h
+        )
+        if handled:
+            return True
+
     last = _parse_iso(active.get("native_recovery_observed_at"))
     if active.get("native_recovery_response_hash") == h and last:
         if (now - last).total_seconds() < GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS:
