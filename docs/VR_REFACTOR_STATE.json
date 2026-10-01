@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-01T21:17:00+09:00",
+  "updatedKst": "2026-10-02T04:44:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 28,
+  "cycle": 29,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -37,9 +37,10 @@
     "VR-REFACTOR-STATE-0002B-C-FIX00",
     "VR-REFACTOR-CI-0002-FIX00",
     "VR-REFACTOR-STATE-0004A",
-    "VR-REFACTOR-STATE-0004B"
+    "VR-REFACTOR-STATE-0004B",
+    "VR-REFACTOR-STATE-0004C"
   ],
-  "next": "Continue structural review from the validated 0004B source: reduce remaining R31 lower-layer read coupling and R29 mono-safety coupling in isolated no-behavior-change steps; preserve runtime-visible invariants and require exact-SHA CI after each source batch.",
+  "next": "Validate R22 viewport owner-read boundary with policy, active R26+HUD, R34 full-chain, host and package gates. If green, continue isolating R29 mono-safety ownership from R31 without adding hot-path work.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -61,19 +62,18 @@
     "VR-REFACTOR-STATE-0002B-C-FIX00 makes event-consumer registration transactional: configure callbacks before draw-hook enable, publish EventConsumerReady only after successful enable, and clear callbacks on failed installation with Begin withdrawn first.",
     "VR-REFACTOR-CI-0002-FIX00 updates stale architecture/R51/R32/refactor verifiers to the neutral StateBlockTracker/StateBlockRecovery contracts and scopes the R51 active-build flag check to the active game job so the independent full-chain compile gate is allowed.",
     "VR-REFACTOR-STATE-0004A configures StateBlockRecovery providers once during the R31 install transaction before StateBlockEvents publication instead of rewriting the same atomic callbacks on every Begin/End/Apply event; lifecycle event cache invalidation ordering and lazy resync behavior are otherwise unchanged.",
-    "VR-REFACTOR-STATE-0004B replaces R31 direct writes to R29 effect cache, R22 raster shadow, and R23 live-state sample cursors with explicit owner-layer invalidation APIs. The two invalidation call sites, ordering, and StateBlock lazy-resync request remain unchanged."
+    "VR-REFACTOR-STATE-0004B replaces R31 direct writes to R29 effect cache, R22 raster shadow, and R23 live-state sample cursors with explicit owner-layer invalidation APIs. The two invalidation call sites, ordering, and StateBlock lazy-resync request remain unchanged.",
+    "VR-REFACTOR-STATE-0004C removes R31's last direct R22 raster-shadow read by exposing inline TryGetTrackedViewport on the R22 owner boundary. It preserves the same cached-viewport test and only falls back to IDirect3DDevice9::GetViewport when the tracked snapshot is invalid."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0004B_BUILD_VERIFIED",
-  "validatedSourceSha": "da5f68007870551e4275290b815ae765405f8830",
-  "validationRunId": 36860026580,
+  "batchStatus": "VR-REFACTOR-STATE-0004C_APPLIED_CI_PENDING",
+  "validatedSourceSha": "2c4b7dc3c6539c4430a73264eff7b601742f9149",
+  "validationRunId": 36915465759,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
     "host": "SUCCESS",
     "game": "SUCCESS",
     "fullChainCompile": "SUCCESS",
-    "package": "SUCCESS",
-    "domainIsolation": "SUCCESS",
-    "hudInspector": "SUCCESS"
+    "package": "SUCCESS"
   }
 }

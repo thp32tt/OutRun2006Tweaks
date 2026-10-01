@@ -897,6 +897,14 @@ namespace OutRunVRStereo
         return R22ShadowState;
     }
 
+    inline bool TryGetTrackedViewport(D3DVIEWPORT9& viewport) noexcept
+    {
+        if (!R22ShadowState.Valid())
+            return false;
+        viewport = R22ShadowState.viewport;
+        return true;
+    }
+
     void SetTrackedRasterShadow(
         const OutRunVR::State::D3D9RasterSnapshot& snapshot) noexcept
     {

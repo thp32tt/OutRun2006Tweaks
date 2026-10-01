@@ -158,11 +158,8 @@ namespace OutRunVRStereo
         bool R31GetSavedViewport(IDirect3DDevice9* device,
             D3DVIEWPORT9& viewport) noexcept
         {
-            if (R22ShadowState.Valid())
-            {
-                viewport = R22ShadowState.viewport;
+            if (TryGetTrackedViewport(viewport))
                 return true;
-            }
             return device && SUCCEEDED(device->GetViewport(&viewport));
         }
 

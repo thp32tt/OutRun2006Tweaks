@@ -57,7 +57,7 @@ for banned in (
     "R29Effect",
     "R23LastStateSampleDrawSerial",
     "R23LastStateSampleEpoch",
-    "R22ShadowState = {};",
+    "R22ShadowState",
 ):
     if banned in r31:
         errors.append(
@@ -67,6 +67,7 @@ for marker in (
     "InvalidateEffectStateCache()",
     "InvalidateTrackedRasterShadow()",
     "InvalidateLiveStateSample()",
+    "TryGetTrackedViewport(viewport)",
 ):
     if marker not in r31:
         errors.append(
@@ -76,6 +77,7 @@ required_r22 = (
     '#include "../state/d3d9_raster_state.hpp"',
     "using R22ScissorSnapshot = OutRunVR::State::D3D9RasterSnapshot;",
     "GetTrackedRasterShadow()",
+    "TryGetTrackedViewport(",
     "SetTrackedRasterShadow(",
     "InvalidateTrackedRasterShadow()",
     "IsTrackedStateBlockReliable()",
