@@ -1,0 +1,418 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-b00375-p00243-index220-canonical-source-geometry-prefight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00375",
+  "wave_id": "P00243",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_SELF_QA_MOD3_1",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "recorded_at_kst": "2026-10-01T18:38:08+09:00",
+  "base_head_sha": "3e92f6a5d0abd7d32ae8794235211cd24760e527",
+  "controller_schema_version": 30,
+  "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+  "input_fingerprint": {
+    "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "canonical_progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
+    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed",
+    "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df"
+  },
+  "result": "PASS_MATERIAL_B_MOD3_INDEX220_EXACT_CANONICAL_SOURCE_GEOMETRY_RECONSTRUCTION_INPUT_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "summary": "Fresh schema30 B-shard reconciliation preserves all current QA-pending candidates and sticky unchanged blockers. Shared queue/progress/resume fingerprints are unchanged from the last authoritative B scan, so no completion-tier candidate is newly runnable. This task advances B-owned index220/D657C2EB instead of repeating prior blockers: approved Drive exact-parent lookup is a typed SOURCE_TRANSPORT_MISS; pinned-tag direct binary transport is connector-unsupported but its immutable Release-path Git blob is identified; the pinned v0.25.10a Release ZIP is independently verified by exact size/SHA and yields a member whose SHA, dimensions, mode and computed Git-object SHA match both canonical inventory and the pinned-tag blob. Exact readable/raw orientation and seven physical source-effect alpha bboxes plus 2px safe bboxes are now recorded with a deterministic verifier. No Korean DDS is emitted because a source-faithful Hangul letterform/slant/font recipe has not yet been proven; candidate generation remains fail-closed PREFLIGHT_ONLY. Runtime is UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_index": 220,
+    "asset": "D657C2EB",
+    "selected_priority": "PREFLIGHT_ONLY_FALLBACK_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT",
+    "fallback_ladder_step": 4,
+    "completion_tier_scan": {
+      "direct_rework_runnable": [],
+      "render_ready": [],
+      "one_stage_to_render": [],
+      "existing_candidate_material_rework_runnable": []
+    },
+    "protected_from_repeat": [
+      {
+        "index": 61,
+        "reason": "newer B00342 candidate QA_PENDING_C"
+      },
+      {
+        "index": 94,
+        "reason": "newer B00370 producer preflight QA_PENDING_C"
+      },
+      {
+        "index": 163,
+        "reason": "newer B00347 v19 candidate QA_PENDING_C; do not rerender"
+      },
+      {
+        "indices": [
+          55,
+          154,
+          175,
+          217
+        ],
+        "reason": "SOURCE_IDENTITY_MISMATCH sticky until dependency fingerprint changes"
+      },
+      {
+        "indices": [
+          43,
+          49,
+          100,
+          103,
+          172,
+          205,
+          214,
+          241
+        ],
+        "reason": "SOURCE_ACQUISITION_EXHAUSTED sticky until dependency fingerprint changes"
+      }
+    ],
+    "predecessor_hint": {
+      "source": "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00372-rollover4-reconcile.json",
+      "index": 220,
+      "asset": "D657C2EB",
+      "status": "UNPUBLISHED_PRECOMMIT_TARGET_DUE_DUPLICATE_TASK_SUPPRESSION"
+    }
+  },
+  "target": {
+    "index": 220,
+    "asset": "D657C2EB",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+    "canonical_semantic_groups": 6,
+    "physical_occurrences": 7
+  },
+  "source_transport": {
+    "drive": {
+      "account": "ezflash557",
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "exact_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+      "exact_name": "D657C2EB_512x128.dds",
+      "exact_parent_scoped_search_results": 0,
+      "status": "SOURCE_TRANSPORT_MISS"
+    },
+    "pinned_tag": {
+      "repository": "envido32/OR2006Sprites",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "path": "Release/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+      "git_blob_sha": "0b3bdc37870e75da3290f2d5587cebd9cd73655c",
+      "size_bytes": 4194432,
+      "binary_fetch_status": "SOURCE_TRANSPORT_UNSUPPORTED_UTF8_ONLY_CONNECTOR",
+      "identity_bridge": "computed Git blob SHA of verified pinned-Release member equals immutable pinned-tag Git blob SHA"
+    },
+    "pinned_release": {
+      "archive": "OR2-HD-GUI-v0.25.10a.zip",
+      "asset_id": 306630789,
+      "expected_size_bytes": 306223257,
+      "observed_size_bytes": 306223257,
+      "expected_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "observed_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "archive_identity": "PASS_EXACT_PINNED_RELEASE_BUNDLE",
+      "member": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+      "member_size_bytes": 4194432,
+      "member_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "computed_git_blob_sha": "0b3bdc37870e75da3290f2d5587cebd9cd73655c",
+      "status": "PASS_EXACT_CANONICAL_SOURCE_IDENTITY"
+    },
+    "final_source_outcome": "PASS_EXACT_CANONICAL_SOURCE_IDENTITY"
+  },
+  "dds": {
+    "width": 2048,
+    "height": 512,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "pixel_format_flags": 65,
+    "fourcc": "",
+    "rgb_bit_count": 32,
+    "r_mask": "0x00ff0000",
+    "g_mask": "0x0000ff00",
+    "b_mask": "0x000000ff",
+    "a_mask": "0xff000000",
+    "header_128_sha256": "db8b5f3df045aa54a0a573d78a44ba811308d9cb09a700ff7abe6147c5593eb4",
+    "source_text_transform": "flip_y",
+    "readable_transform": "vertical flip of raw DDS rows; no whole-atlas resize or normalization"
+  },
+  "source_geometry": {
+    "full_visible_alpha_bbox_readable": [
+      3,
+      51,
+      1557,
+      499
+    ],
+    "total_nonzero_alpha_pixels": 176657,
+    "nonzero_alpha_pixels_outside_seven_regions": 0,
+    "all_visible_source_alpha_partitioned_by_regions": true,
+    "source_has_nontext_visible_alpha_outside_regions": false,
+    "candidate_safe_inset_px": 2,
+    "regions": [
+      {
+        "physical_occurrence": 1,
+        "source": "REMOVE FRIEND",
+        "korean": "친구 삭제",
+        "style_family": "small_gray",
+        "readable_bbox": [
+          3,
+          51,
+          394,
+          88
+        ],
+        "raw_bbox": [
+          3,
+          423,
+          394,
+          460
+        ],
+        "candidate_safe_bbox_readable": [
+          5,
+          53,
+          392,
+          86
+        ],
+        "alpha_pixels": 8195,
+        "dominant_opaque_rgba": [
+          63,
+          71,
+          74,
+          255
+        ]
+      },
+      {
+        "physical_occurrence": 2,
+        "source": "SEND GAME INVITE",
+        "korean": "게임 초대 보내기",
+        "style_family": "small_gray",
+        "readable_bbox": [
+          3,
+          115,
+          461,
+          152
+        ],
+        "raw_bbox": [
+          3,
+          359,
+          461,
+          396
+        ],
+        "candidate_safe_bbox_readable": [
+          5,
+          117,
+          459,
+          150
+        ],
+        "alpha_pixels": 9088,
+        "dominant_opaque_rgba": [
+          63,
+          71,
+          74,
+          255
+        ]
+      },
+      {
+        "physical_occurrence": 3,
+        "source": "TIME ATTACK",
+        "korean": "타임 어택",
+        "style_family": "medium_gray",
+        "readable_bbox": [
+          17,
+          180,
+          508,
+          241
+        ],
+        "raw_bbox": [
+          17,
+          270,
+          508,
+          331
+        ],
+        "candidate_safe_bbox_readable": [
+          19,
+          182,
+          506,
+          239
+        ],
+        "alpha_pixels": 15105,
+        "dominant_opaque_rgba": [
+          78,
+          96,
+          100,
+          255
+        ]
+      },
+      {
+        "physical_occurrence": 4,
+        "source": "OUTRUN",
+        "korean": "아웃런",
+        "style_family": "medium_gray",
+        "readable_bbox": [
+          808,
+          180,
+          1096,
+          241
+        ],
+        "raw_bbox": [
+          808,
+          270,
+          1096,
+          331
+        ],
+        "candidate_safe_bbox_readable": [
+          810,
+          182,
+          1094,
+          239
+        ],
+        "alpha_pixels": 10273,
+        "dominant_opaque_rgba": [
+          78,
+          96,
+          100,
+          255
+        ]
+      },
+      {
+        "physical_occurrence": 5,
+        "source": "COAST 2 COAST",
+        "korean": "코스트 2 코스트",
+        "style_family": "medium_gray",
+        "readable_bbox": [
+          20,
+          266,
+          625,
+          329
+        ],
+        "raw_bbox": [
+          20,
+          182,
+          625,
+          245
+        ],
+        "candidate_safe_bbox_readable": [
+          22,
+          268,
+          623,
+          327
+        ],
+        "alpha_pixels": 17021,
+        "dominant_opaque_rgba": [
+          78,
+          96,
+          100,
+          255
+        ]
+      },
+      {
+        "physical_occurrence": 6,
+        "source": "HEART ATTACK",
+        "korean": "하트 어택",
+        "style_family": "medium_gray",
+        "readable_bbox": [
+          1022,
+          268,
+          1557,
+          329
+        ],
+        "raw_bbox": [
+          1022,
+          182,
+          1557,
+          243
+        ],
+        "candidate_safe_bbox_readable": [
+          1024,
+          270,
+          1555,
+          327
+        ],
+        "alpha_pixels": 16968,
+        "dominant_opaque_rgba": [
+          78,
+          96,
+          100,
+          255
+        ]
+      },
+      {
+        "physical_occurrence": 7,
+        "source": "TIME ATTACK",
+        "korean": "타임 어택",
+        "style_family": "large_red",
+        "readable_bbox": [
+          14,
+          352,
+          1360,
+          499
+        ],
+        "raw_bbox": [
+          14,
+          12,
+          1360,
+          159
+        ],
+        "candidate_safe_bbox_readable": [
+          16,
+          354,
+          1358,
+          497
+        ],
+        "alpha_pixels": 100007,
+        "dominant_opaque_rgba": [
+          186,
+          0,
+          0,
+          255
+        ]
+      }
+    ]
+  },
+  "reconstruction_contract": {
+    "clean_plate_strategy": "TEXT_ONLY_TRANSPARENT_ATLAS: derive per-occurrence removal mask from exact visible source alpha inside the recorded source-effect bbox; reconstruct cleared visible glyph pixels to transparent background while preserving every unrelated/alpha-zero source byte outside the approved removal mask.",
+    "protected_artwork": "No visible non-text alpha pixels exist outside the seven recorded source-text occurrences; nevertheless all pixels outside approved removal masks remain protected bit-for-bit.",
+    "next_missing_prerequisite": "Prove source-faithful Hangul letterform family, signed slant/baseline and native render parameters for small_gray, medium_gray and large_red styles before any Korean candidate is emitted.",
+    "readiness_after": "PREFLIGHT_ONLY_ADVANCED__EXACT_SOURCE_AND_GEOMETRY_READY__LETTERFORM_STYLE_RECIPE_PENDING",
+    "candidate_generation_permitted_now": false,
+    "fail_closed_reason": "Exact source identity and geometry are now known, but source-letterform/font/slant matching has not been proven under the current orientation/style generation gate."
+  },
+  "material_deliverable": {
+    "type": "INDEX220_EXACT_CANONICAL_SOURCE_IDENTITY_PLUS_REPRODUCIBLE_SEVEN_REGION_GEOMETRY_INPUT",
+    "materially_reduces_unresolved_work": true,
+    "candidate_dds_modified": false,
+    "candidate_binary_persisted": false,
+    "new_source_identity_proof": true,
+    "new_reconstruction_geometry": true,
+    "new_deterministic_verifier": true,
+    "evidence": [
+      "localization/graphics/role_B/20261001-B00375-P00243/B00375_P00243_INDEX220_D657C2EB_CANONICAL_SOURCE_GEOMETRY.json",
+      "localization/graphics/role_B/20261001-B00375-P00243/verify_index220_source_geometry.py"
+    ]
+  },
+  "self_qa": {
+    "canonical_source_sha_match": true,
+    "canonical_dimensions_match": true,
+    "dds_mode_match": true,
+    "pinned_archive_match": true,
+    "pinned_tag_blob_equivalence": true,
+    "visible_alpha_partition_complete": true,
+    "orientation_proven_from_exact_source_pixels": true,
+    "zero_pixel_candidate_gate": "NOT_APPLICABLE_NO_CANDIDATE",
+    "english_source_comparison_gate": "NOT_APPLICABLE_NO_CANDIDATE",
+    "candidate_static_qa": "NOT_RUN_NO_CANDIDATE",
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED"
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used_as_canonical_release_transport": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}

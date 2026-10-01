@@ -1,18 +1,18 @@
 {
   "schema_version": 30,
   "controller_schema_version": 30,
-  "schema": "outrun-b00375-p00243-source-transport-narrowing-producer-result-v30",
+  "schema": "outrun-b00375-p00243-index220-canonical-source-geometry-material-v1",
   "task_id": "LOCALIZATION-LOCALIZATION_B-00375",
   "wave_id": "P00243",
   "lane": "LOCALIZATION_B",
   "role": "CONTINUOUS_PRODUCTION_SELF_QA_MOD3_1",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
-  "recorded_at_kst": "2026-10-01T18:39:00+09:00",
-  "base_head_sha": "df24c4c7fc813160b0154c9a4a617a86d6eaf797",
-  "result": "PASS_MATERIAL_B_MOD3_RELEASE_MEMBER_VERIFICATION_INDEX28_IDENTITY_MISMATCH_INDEX220_GEOMETRY_MEASURED_RUNTIME_UNTESTED",
-  "summary": "Pinned v0.25.10a archive bytes were materialized in the current tool session and verified against the exact 306223257-byte / SHA-256 76f85ed... bundle identity. Index28/A05BF610 release member fails the canonical inventory gate on both SHA-256 and decoded width, so pixel work is fail-closed as SOURCE_IDENTITY_MISMATCH. Index220/D657C2EB matches canonical SHA-256/dimensions/mode exactly; all seven accepted inspection guards now have deterministic multi-threshold alpha-support/component measurements. Semantic/protected component classification, authoritative removal masks, clean plate, candidate_safe_bbox and typography remain unresolved, so it is not render-ready and no Korean DDS is fabricated.",
-  "report": "localization/graphics/role_B/20261001-B00375-P00243/B00375_P00243_RELEASE_MEMBER_VERIFICATION_AND_GEOMETRY.json",
+  "chat_rollover": 3,
+  "recorded_at_kst": "2026-10-01T18:38:08+09:00",
+  "base_head_sha": "3e92f6a5d0abd7d32ae8794235211cd24760e527",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX220_EXACT_CANONICAL_SOURCE_GEOMETRY_RECONSTRUCTION_INPUT_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "summary": "B00375 resumes from current GitHub SSOT with no prior durable B00375 record. No completion-tier B candidate became runnable because queue/progress/resume/controller fingerprints remain unchanged; QA-pending candidates and sticky blockers are not repeated. Index220/D657C2EB is materially advanced from exact-source HOLD to a pinned canonical source + seven-region reproducible geometry input using approved transport fallthrough. No DDS candidate or shared-state write is made; source-faithful Hangul letterform/slant recipe remains the next prerequisite. Runtime remains UNTESTED.",
   "policy_resolution": {
     "dispatch_controller_schema_version": 30,
     "dispatch_controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
@@ -21,70 +21,38 @@
     "resolution": "LATEST_HEAD_SCHEMA30_POLICY_APPLIED"
   },
   "input_fingerprint": {
-    "base_head_sha": "fb23e5fe50231eb9b2a408a9424b98d366f563ab",
-    "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
-    "controller_roles_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
-    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
-    "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
     "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
     "canonical_progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
-    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed"
+    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed",
+    "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df"
   },
   "selection": {
     "shard_rule": "asset_queue.index % 3 == 1",
-    "fresh_completion_tier_scan": "ZERO_RUNNABLE_COMPLETION_TIER",
-    "direct_rework_runnable_indices": [],
-    "render_ready_indices": [],
-    "one_stage_to_render_indices": [],
-    "existing_candidate_rework_runnable_indices": [],
-    "excluded_pending_or_current_candidate_scopes": [
-      {
-        "index": 61,
-        "asset": "C4A2937B",
-        "reason": "current producer candidate remains QA_PENDING_C"
-      },
-      {
-        "index": 94,
-        "asset": "2DA43E41",
-        "reason": "newer B00370 reconstruction evidence remains QA_PENDING_C; do not build on unaccepted same-asset evidence"
-      },
-      {
-        "index": 163,
-        "asset": "59A79158",
-        "reason": "newer V19 producer candidate remains pending independent C"
-      }
-    ],
     "fallback_ladder_step": 4,
+    "selected_priority": "PREFLIGHT_ONLY_SOURCE_FAITHFUL_RECONSTRUCTION_INPUT",
     "selected_indices": [
-      28,
       220
     ],
     "selected_assets": [
-      "A05BF610",
       "D657C2EB"
     ],
-    "selection_reason": "fallback step 3 was exhausted by B00372; these are B-owned unfinished PREFLIGHT_ONLY assets whose prior source work predates the current schema30 approved-Drive transport policy and whose source ladder can be narrowed without repeating sticky SOURCE_ACQUISITION_EXHAUSTED/IDENTITY_MISMATCH probes"
+    "no_runnable_completion_tier": true,
+    "source_dependency_changed_this_task": true
   },
   "material_deliverable": {
-    "type": "PINNED_RELEASE_MEMBER_IDENTITY_RESOLUTION_PLUS_CANONICAL_SOURCE_GEOMETRY_MEASUREMENT",
-    "fallback_ladder_step": 4,
-    "reviewed_indices": [
-      28,
-      220
-    ],
-    "index28_source_identity": "FAIL_MISMATCH",
-    "index220_source_identity": "PASS_EXACT",
-    "index220_geometry_regions_measured": 7,
+    "type": "INDEX220_EXACT_CANONICAL_SOURCE_IDENTITY_AND_REPRODUCIBLE_GEOMETRY_INPUT",
     "candidate_dds_modified": false,
-    "heavy_static_qa_repeated": false,
+    "candidate_binary_persisted": false,
     "materially_reduces_unresolved_work": true,
-    "evidence": [
-      "localization/graphics/role_B/20261001-B00375-P00243/B00375_P00243_RELEASE_MEMBER_VERIFICATION_AND_GEOMETRY.json"
-    ]
+    "exact_source_acquired_and_verified": true,
+    "physical_occurrences_mapped": 7,
+    "deterministic_verifier_added": true,
+    "report": "localization/graphics/role_B/20261001-B00375-P00243/B00375_P00243_INDEX220_D657C2EB_CANONICAL_SOURCE_GEOMETRY.json",
+    "tool": "localization/graphics/role_B/20261001-B00375-P00243/verify_index220_source_geometry.py"
   },
-  "self_qa": "PASS_B_MOD3_SCHEMA30__PINNED_ARCHIVE_EXACT__INDEX28_MEMBER_FAILS_CANONICAL_SHA_AND_DIMENSIONS_FAIL_CLOSED__INDEX220_MEMBER_EXACT_CANONICAL__7_REGIONS_GEOMETRY_MEASURED__NO_EFFECT_BBOX_PROMOTION_BEFORE_SEMANTIC_CLASSIFICATION__NO_CANDIDATE__NO_SHARED_STATE_WRITE__RUNTIME_UNTESTED",
+  "production_readiness": "PREFLIGHT_ONLY_ADVANCED__LETTERFORM_STYLE_RECIPE_PENDING",
+  "self_qa": "PASS_B_MOD3_SCHEMA30__NO_RUNNABLE_COMPLETION_TIER__FALLBACK_STEP4__INDEX220_PINNED_ARCHIVE_EXACT__CANONICAL_MEMBER_SHA_DIM_MODE_EXACT__PINNED_TAG_GIT_BLOB_EQUIVALENT__7_OF_7_VISIBLE_ALPHA_REGIONS_PARTITIONED__FLIP_Y_PROVEN__2PX_SAFE_BBOX_RECORDED__NO_CANDIDATE_WRITE__RUNTIME_UNTESTED",
   "candidate_dds_modified": false,
-  "candidate_binary_persisted": false,
   "shared_state_modified": false,
   "peer_lane_files_modified": false,
   "runtime_test_performed": false,
@@ -92,23 +60,20 @@
   "build_performed": false,
   "n100_used": false,
   "local_clone_used": false,
-  "gpt_library_used_as_source_or_ssot": false,
   "google_drive_used": true,
   "google_drive_write_performed": false,
-  "uploaded_archive_used_as_state_ssot": false,
-  "work_stolen_from_lane": null,
+  "gpt_library_used_as_source_or_ssot": false,
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": "b107dca7186f77aefe810438687b1906bc77f903",
-  "authoritative_result_sha": "b107dca7186f77aefe810438687b1906bc77f903",
+  "result_sha": null,
+  "authoritative_result_sha": null,
   "validation_bearing_result_sha": null,
   "durable_task_record_in_result_commit": true,
-  "result_commit_message": "localization(B): verify pinned release members [AUTO:LOCALIZATION-LOCALIZATION_B-00375]",
-  "bookkeeping_note": "Immutable producer material result b107dca7186f77aefe810438687b1906bc77f903 contains the pinned-release member verification, index28 fail-closed canonical mismatch, index220 exact canonical identity plus seven-region geometry measurements, and the same-commit durable task record with exact AUTO marker. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; no real-game test was performed, so RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit does not replace material result identity.",
-  "chat_rollover": 5,
-  "prior_authoritative_result_sha": "e003dbbcc6fe5a85e8ed500e67f7a01bd39d9272",
-  "uploaded_archive_used_as_source_transport": true,
-  "bookkeeping_base_head_sha": "b107dca7186f77aefe810438687b1906bc77f903",
-  "bookkeeping_recorded_at_kst": "2026-10-01T18:41:00+09:00"
+  "result_commit_message": "localization(B): advance index220 canonical source geometry [AUTO:LOCALIZATION-LOCALIZATION_B-00375]",
+  "evidence": [
+    "localization/graphics/role_B/20261001-B00375-P00243/B00375_P00243_INDEX220_D657C2EB_CANONICAL_SOURCE_GEOMETRY.json",
+    "localization/graphics/role_B/20261001-B00375-P00243/verify_index220_source_geometry.py"
+  ],
+  "bookkeeping_note": "RESULT_SHA will be bound by a separate bookkeeping-only commit after the atomic material result commit. This record plus material report/tool are present in the result commit. Producer validation remains PENDING until C_BATCH_GATE; runtime remains UNTESTED."
 }
