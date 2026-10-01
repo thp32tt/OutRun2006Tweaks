@@ -1054,6 +1054,32 @@ def github_broker_clear_pending(active: dict) -> None:
         runtime["github_broker_pending_task_id"] = None
 
 
+def github_broker_initial_context(active: dict) -> str:
+    """Build controller-owned GitHub context before the first ChatGPT turn."""
+    if not GITHUB_BROKER_ENABLED:
+        return ""
+    try:
+        bootstrap = github_broker_render_read_result(
+            str(active.get("branch") or ""),
+            github_broker_bootstrap_specs(active),
+        )
+    except GitHubTransientError as e:
+        return (
+            github_broker_protocol_instructions(active)
+            + "\n\nBROKER_BOOTSTRAP_STATUS=TEMPORARY_GITHUB_RETRY\n"
+            + f"BROKER_BOOTSTRAP_ERROR={type(e).__name__}: {e}\n"
+            + "플러그인이 있으면 사용할 수 있지만, 플러그인 부재를 BLOCKED 사유로 사용하지 마."
+        )
+    except Exception as e:
+        return (
+            github_broker_protocol_instructions(active)
+            + "\n\nBROKER_BOOTSTRAP_STATUS=PARTIAL\n"
+            + f"BROKER_BOOTSTRAP_ERROR={type(e).__name__}: {e}\n"
+            + "필요한 파일은 BROKER_READ로 요청하고 작업을 계속해."
+        )
+    return github_broker_protocol_instructions(active) + "\n\n" + bootstrap
+
+
 def github_broker_apply_changeset(active: dict, changeset: dict) -> dict:
     if not GITHUB_BROKER_ENABLED:
         raise GitHubBrokerConflict("controller GitHub broker is disabled")
@@ -1433,15 +1459,15 @@ def queue_dynamic_prefix() -> str:
         f"TARGET_BRANCH={branch}",
         f"CONTROLLER_GITHUB_PREFLIGHT={'OK' if preflight_head else 'UNKNOWN'}",
         *([f"CONTROLLER_GITHUB_HEAD_SHA={preflight_head}"] if preflight_head else []),
-        "GITHUB_ACCESS_MODE=PLUGIN_PREFERRED_CONTROLLER_BROKER_FALLBACK",
+        "GITHUB_ACCESS_MODE=CONTROLLER_BROKER_PRIMARY_PLUGIN_OPTIONAL",
         f"CONTROLLER_GITHUB_BROKER={'AVAILABLE' if GITHUB_BROKER_ENABLED else 'DISABLED'}",
         f"CONTROLLER_GITHUB_BROKER_WRITE={'READY' if runtime.get('github_broker_write_capable') else 'UNCONFIRMED'}",
         "PUBLIC_GITHUB_ACCESS=DO_NOT_USE",
-        "FIRST_ACTION=CALL_GITHUB_PLUGIN_IF_AVAILABLE",
+        "FIRST_ACTION=USE_PROVIDED_BROKER_CONTEXT",
         f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
         *([f"WAVE_ID={wave_id}"] if wave_id else []),
         "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 저장소/clone/worktree로 우회하지 마. 단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용한다.",
-        "연결된 GitHub 플러그인이 보이면 사용해. 보이지 않거나 호출되지 않으면 작업을 중단/BLOCKED 처리하지 마; 컨트롤러 GitHub Broker가 같은 TASK_ID를 이어받는다.",
+        "아래 CONTROLLER_GITHUB_BROKER가 제공한 GitHub HEAD/파일 내용을 기준으로 즉시 작업해. 연결된 GitHub 플러그인이 보이면 추가 조회에 사용할 수 있지만 필수 조건이 아니다. 플러그인/tool/schema 부재를 BLOCKED 사유로 사용하지 마.",
         "파일 404는 연결 실패가 아니라 path/ref 문제다.",
         "이 작업에서 실제 변경 또는 검토 기록을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
         "필수 GitHub Actions Gate를 소유할 result commit에는 CI-skip 지시어를 넣지 마. 검증 완료 후 bookkeeping/checkpoint 커밋은 Gate 결과와 분리해 기록하고, controller가 validation-bearing result commit을 식별할 수 있게 유지해.",
@@ -1463,7 +1489,16 @@ def queue_dynamic_prefix() -> str:
             "이전 자동 검증이 실패했다. 같은 실패를 그대로 반복하지 말고 GitHub Actions 결과를 직접 확인해 원인을 수정해.",
             "FAILURE_CONTEXT=" + failure,
         ]
-    return "\n".join(lines) + "\n\n"
+    prefix = "\n".join(lines) + "\n\n"
+    if GITHUB_BROKER_ENABLED:
+        active = {
+            "task_id": task_id,
+            "lane": lane,
+            "branch": branch,
+            "attempt": attempt,
+        }
+        prefix += github_broker_initial_context(active) + "\n\n"
+    return prefix
 
 async def first_visible(page: Page, selectors: list[str], total_wait_ms: int = 10000):
     """Wait for React composer hydration instead of sampling the DOM once."""
