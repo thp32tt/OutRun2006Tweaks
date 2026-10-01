@@ -817,4 +817,10 @@ namespace OutRunVRStereo
 
         VROcclusionR26Hook VROcclusionR26Hook::instance;
     }
+
+    OutRunVR::RuntimeEligibility::InstallState
+    CorrectionOverlayInstallState() noexcept
+    {
+        return R26InstallState.load(std::memory_order_acquire);
+    }
 }

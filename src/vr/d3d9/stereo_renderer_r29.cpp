@@ -20,12 +20,12 @@
 #include "../state/depth_target_state.hpp"
 #include "../render/stereo_draw_trampoline.hpp"
 #include "../render/cached_effect_state.hpp"
+#include "../lifecycle/correction_overlay_state.hpp"
+#include "../game/renderer_recovery.hpp"
 #include "vr/game/render_semantics.hpp"\n
 namespace OutRunVRRenderer
 {
     void R29InvalidateRawWvpGeneration() noexcept;
-    void R29InvalidateRendererStateAfterExternalRestore() noexcept;
-    OutRunVR::RuntimeEligibility::InstallState R29RendererState() noexcept;
 }
 
 namespace OutRunVRStereo
@@ -497,8 +497,8 @@ namespace OutRunVRStereo
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const auto r26 = R26InstallState.load(std::memory_order_acquire);
-                const auto rendererR29 = OutRunVRRenderer::R29RendererState();
+                const auto r26 = CorrectionOverlayInstallState();
+                const auto rendererR29 = OutRunVRRenderer::RendererInstallState();
                 if (r26 == State::Failed || rendererR29 == State::Failed)
                 {
                     R29StereoInstallState.store(State::Failed,
