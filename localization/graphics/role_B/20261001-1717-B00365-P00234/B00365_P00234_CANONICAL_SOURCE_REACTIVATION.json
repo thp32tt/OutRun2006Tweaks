@@ -1,0 +1,212 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-producer-canonical-source-reactivation-v30",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00365",
+  "wave_id": "P00234",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCER_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 4,
+  "recorded_at_kst": "2026-10-01T17:17:00+09:00",
+  "base_head_sha": "f171fd4692cca31846cc7c2b482c632c252baf43",
+  "policy": {
+    "incoming_controller_schema_version": 28,
+    "incoming_controller_config_blob_sha": "4a784a4381916207af85687f53e756f7f7fd03b6",
+    "applied_head_controller_schema_version": 30,
+    "applied_head_controller_roles_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "canonical_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+    "asset_queue_blob_sha": "2c06c2b6ae303c385b62e0360dcda88a543f4a2f",
+    "canonical_progress_blob_sha": "2aaa9dc258f1527a5e8b0f51adef781c847448fc",
+    "resume_state_blob_sha": "2706b7fec8e64a3d4e2a47c6a2c8ab043da99f87",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "resolution": "LATEST_GIT_HEAD_POLICY_APPLIED; schema30 preserves schema28 producer sharding/candidate-first behavior and current contract permits successive independent PREFLIGHT_ONLY batches after fresh completion-tier exhaustion.",
+    "stale_cached_policy_used": false
+  },
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "owning_shard_rows": 46,
+    "fresh_completion_tier_scan": {
+      "direct_rework_required_runnable": [],
+      "render_ready": [],
+      "one_stage_to_render": [],
+      "existing_candidate_material_rework_runnable": []
+    },
+    "qa_pending_not_repeated": [
+      {
+        "index": 61,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+        "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6"
+      },
+      {
+        "index": 94,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+        "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f"
+      },
+      {
+        "index": 163,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+        "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f"
+      }
+    ],
+    "unconsumed_preflight_not_repeated": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00353",
+      "result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513",
+      "indices": [
+        230,
+        236
+      ]
+    },
+    "selected_indices": [
+      52,
+      220
+    ],
+    "selected_action": "PREFLIGHT_ONLY_CANONICAL_SOURCE_REACTIVATION",
+    "work_stolen_from_lane": null
+  },
+  "canonical_transport": {
+    "google_drive": {
+      "approved_account": "ezflash557",
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "read_only": true,
+      "writes": false,
+      "index_52": "SOURCE_TRANSPORT_MISS_EXACT_PARENT_spr_sprani_fight_Exst_ABSENT",
+      "index_220": "SOURCE_TRANSPORT_MISS_EXACT_D657C2EB_FILE_ABSENT_FROM_PRESENT_spr_sprani_sumo_fe_cvt_Exst"
+    },
+    "pinned_tag_direct": {
+      "repository": "envido32/OR2006Sprites",
+      "immutable_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "index_52": "SOURCE_TRANSPORT_MISS_HTTP_404",
+      "index_220": "SOURCE_TRANSPORT_MISS_HTTP_404"
+    },
+    "pinned_release": {
+      "tag": "v0.25.10a",
+      "release_asset_id": 306630789,
+      "archive_name": "OR2-HD-GUI-v0.25.10a.zip",
+      "archive_size_bytes": 306223257,
+      "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "archive_identity": "PASS_EXACT_PINNED_CONTRACT_DIGEST_AND_SIZE",
+      "source_role": "READ_ONLY_CANONICAL_FALLBACK"
+    }
+  },
+  "assets": [
+    {
+      "queue_index": 52,
+      "asset": "A8CE339F",
+      "queue_path": "textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+      "canonical_inventory_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+      "canonical_inventory_decoded_dimensions": [
+        2048,
+        1024
+      ],
+      "canonical_inventory_decoded_mode": "RGBA",
+      "pinned_release_member_sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+      "source_identity": "PASS_EXACT_SHA256_EQUALITY",
+      "dds_header": {
+        "magic": "DDS ",
+        "header_size": 124,
+        "flags": "0x81007",
+        "width": 2048,
+        "height": 1024,
+        "pitch_or_linear_size": 2097152,
+        "depth": 1,
+        "mip_count": 1,
+        "pixel_format_flags": "0x4",
+        "fourcc": "DXT5",
+        "rgb_bit_count": 0,
+        "caps": "0x1000",
+        "caps2": "0x0",
+        "file_size_bytes": 2097280
+      },
+      "storage_vs_inventory_note": "Inventory RGBA is decoded image mode; exact file SHA equality proves the canonical DDS storage is DXT5/BC3 and retires the prior assumption that Release storage mode itself was non-authoritative.",
+      "accepted_prior_evidence": [
+        "Q00007/C109 exact Release BC3 payload extraction PASS for 3 mapped regions with 4x4 block alignment",
+        "Q00010/C112 v2 payload/2px-guard work order PASS",
+        "Q00019/C121 3 canonical semantics / 5 physical occurrences retained",
+        "Q00037/C139 approved Drive exact-parent miss"
+      ],
+      "readiness_before": "PREFLIGHT_ONLY_CANONICAL_SOURCE_IDENTITY_UNRESOLVED",
+      "readiness_after": "PREFLIGHT_ONLY_SOURCE_IDENTITY_RESOLVED_EFFECT_MASK_CLEAN_PLATE_SAFE_BBOX_PENDING",
+      "candidate_dds_modified": false
+    },
+    {
+      "queue_index": 220,
+      "asset": "D657C2EB",
+      "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+      "canonical_inventory_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "canonical_inventory_decoded_dimensions": [
+        2048,
+        512
+      ],
+      "canonical_inventory_decoded_mode": "RGBA",
+      "pinned_release_member_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+      "source_identity": "PASS_EXACT_SHA256_EQUALITY",
+      "dds_header": {
+        "magic": "DDS ",
+        "header_size": 124,
+        "flags": "0x100f",
+        "width": 2048,
+        "height": 512,
+        "pitch_or_linear_size": 8192,
+        "depth": 0,
+        "mip_count": 1,
+        "pixel_format_flags": "0x41",
+        "fourcc": null,
+        "rgb_bit_count": 32,
+        "r_mask": "0x00ff0000",
+        "g_mask": "0x0000ff00",
+        "b_mask": "0x000000ff",
+        "a_mask": "0xff000000",
+        "caps": "0x1000",
+        "caps2": "0x0",
+        "file_size_bytes": 4194432
+      },
+      "accepted_prior_evidence": [
+        "Q00001/C103 exact upstream identity + 6/6 canonical headings across 7 atlas regions",
+        "Q00013/C115 v2 region/2px inspection-guard evidence PASS",
+        "Q00019/C121 canonical 2048x512 RGBA decoded identity retained but exact SHA equivalence was then unproven",
+        "B00134 exact-hash reacquisition gate explicitly required before canonical pixel geometry reuse"
+      ],
+      "readiness_before": "PREFLIGHT_ONLY_EXACT_CANONICAL_SHA_EQUIVALENCE_UNPROVEN",
+      "readiness_after": "PREFLIGHT_ONLY_SOURCE_IDENTITY_RESOLVED_BINDING_EFFECT_MASK_CLEAN_PLATE_SAFE_BBOX_PENDING",
+      "candidate_dds_modified": false
+    }
+  ],
+  "material_advance": {
+    "fallback_ladder_step": 4,
+    "type": "TWO_B_SHARD_CANONICAL_SOURCE_REACTIVATIONS",
+    "indices": [
+      52,
+      220
+    ],
+    "exact_canonical_source_identities_resolved": 2,
+    "stale_release_nonauthoritative_source_holds_retired": 2,
+    "candidate_dds_completed": 0,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true,
+    "rationale": "Both assets now have exact canonical file identity through the contract-approved fallback chain. Neither has complete source-effect/removal masks, independently verified CLEAN_PLATE, and final candidate_safe_bbox, so rendering remains fail-closed."
+  },
+  "self_qa": {
+    "shard": "PASS_B_MOD3_1_ONLY",
+    "canonical_archive_identity": "PASS",
+    "exact_member_hashes": "PASS_2_OF_2",
+    "dds_header_parse": "PASS_2_OF_2",
+    "no_qa_pending_repeat": true,
+    "no_sticky_source_reprobe": true,
+    "no_candidate_fabrication": true,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false
+  },
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
