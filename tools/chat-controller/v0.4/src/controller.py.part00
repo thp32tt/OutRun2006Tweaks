@@ -1004,6 +1004,155 @@ def localization_controller_contract_fingerprint() -> tuple[str, str]:
     return schema, blob_sha
 
 
+def github_json_file_at_ref(path: str, ref: str) -> Optional[dict]:
+    """Read one JSON file from an immutable/current Git ref. Missing file is None, not NO_WORK."""
+    qpath = urllib.parse.quote(path, safe="/")
+    qref = urllib.parse.quote(ref, safe="")
+    try:
+        payload = github_api_json(f"/repos/{GITHUB_REPO}/contents/{qpath}?ref={qref}")
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return None
+        raise
+    encoded = str(payload.get("content") or "").replace("\n", "")
+    if not encoded:
+        return None
+    decoded = base64.b64decode(encoded).decode("utf-8")
+    value = json.loads(decoded)
+    return value if isinstance(value, dict) else None
+
+
+def _collect_current_status_blockers(value, path: str, blockers: list[str]) -> None:
+    if isinstance(value, dict):
+        for key, child in value.items():
+            child_path = f"{path}.{key}" if path else key
+            if key == "status" and isinstance(child, str):
+                upper = child.upper()
+                if "REWORK_REQUIRED" in upper or "QA_PENDING" in upper:
+                    blockers.append(f"STATUS:{child_path}={child}")
+            _collect_current_status_blockers(child, child_path, blockers)
+    elif isinstance(value, list):
+        for idx, child in enumerate(value):
+            _collect_current_status_blockers(child, f"{path}[{idx}]", blockers)
+
+
+def _collect_pending_array_blockers(value, path: str, blockers: list[str]) -> None:
+    if not isinstance(value, dict):
+        return
+    for key, child in value.items():
+        child_path = f"{path}.{key}" if path else key
+        if key.startswith("pending_") and isinstance(child, list) and child:
+            blockers.append(f"PENDING_LIST:{child_path}[{len(child)}]")
+        if isinstance(child, dict):
+            _collect_pending_array_blockers(child, child_path, blockers)
+
+
+def localization_no_work_blockers_from_state(state: dict) -> list[str]:
+    """Return fail-closed blockers that make NO_WORK/NO_ACTION an invalid producer terminal."""
+    blockers: list[str] = []
+    graphics = state.get("graphics_checkpoint") if isinstance(state, dict) else {}
+    graphics = graphics if isinstance(graphics, dict) else {}
+
+    completed = graphics.get("final_artwork_completed")
+    total = graphics.get("final_artwork_total", graphics.get("artwork_targets"))
+    percent = graphics.get("final_artwork_percent")
+    try:
+        completed_num = float(completed)
+        total_num = float(total)
+        if completed_num < total_num:
+            blockers.append(f"FINAL_ARTWORK_INCOMPLETE:{completed_num:g}/{total_num:g}")
+        if percent is None and total_num > 0:
+            percent = (completed_num / total_num) * 100.0
+    except (TypeError, ValueError):
+        blockers.append("FINAL_ARTWORK_PROGRESS_UNKNOWN")
+        percent = None
+    try:
+        if percent is None or float(percent) < 100.0:
+            pct_label = "missing" if percent is None else f"{float(percent):g}"
+            blockers.append(f"FINAL_ARTWORK_PERCENT_LT_100:{pct_label}")
+    except (TypeError, ValueError):
+        blockers.append("FINAL_ARTWORK_PERCENT_UNKNOWN")
+
+    current_scopes = [
+        ("latest_qa_batch", state.get("latest_qa_batch") if isinstance(state, dict) else None),
+        ("graphics_checkpoint.strict_qa_current", graphics.get("strict_qa_current")),
+        ("graphics_checkpoint.next_hd_rework", graphics.get("next_hd_rework")),
+        ("typography_v19_reaudit", state.get("typography_v19_reaudit") if isinstance(state, dict) else None),
+    ]
+    for scope_path, scope in current_scopes:
+        _collect_current_status_blockers(scope, scope_path, blockers)
+
+    # Direct graphics pending_* arrays plus current policy/QA scopes are authoritative.
+    for key, child in graphics.items():
+        if key.startswith("pending_") and isinstance(child, list) and child:
+            blockers.append(f"PENDING_LIST:graphics_checkpoint.{key}[{len(child)}]")
+    for scope_path, scope in current_scopes:
+        _collect_pending_array_blockers(scope, scope_path, blockers)
+
+    packaging = state.get("packaging") if isinstance(state, dict) else None
+    if not isinstance(packaging, dict):
+        packaging = graphics.get("packaging")
+    packaging_status = packaging.get("status") if isinstance(packaging, dict) else None
+    if str(packaging_status or "").strip().lower() != "done":
+        blockers.append(f"PACKAGING_NOT_DONE:{packaging_status or 'missing'}")
+
+    # Preserve order but de-duplicate recursive matches.
+    return list(dict.fromkeys(blockers))
+
+
+def producer_result_claims_no_work(record: dict) -> bool:
+    """Classify review-only / zero-material producer records that must pass the global completion guard."""
+    if not isinstance(record, dict):
+        return True
+    selection = record.get("selection") if isinstance(record.get("selection"), dict) else {}
+    deliverable = record.get("material_deliverable") if isinstance(record.get("material_deliverable"), dict) else {}
+    text_fields = [
+        record.get("result"),
+        record.get("summary"),
+        selection.get("selected_action"),
+        deliverable.get("type"),
+    ]
+    text = " ".join(str(x or "") for x in text_fields).upper()
+    explicit_tokens = (
+        "NO_WORK", "NO_ACTION", "NO_NEW_PRODUCER_WORK", "ZERO_RUNNABLE",
+        "NO_RUNNABLE", "REVIEW_NO_RUNNABLE",
+    )
+    if any(token in text for token in explicit_tokens):
+        return True
+    if record.get("review_record_only") is True:
+        return True
+    reduces = record.get("materially_reduces_unresolved_work")
+    if reduces is None:
+        reduces = deliverable.get("materially_reduces_unresolved_work")
+    if (
+        record.get("material_change") is False
+        and record.get("candidate_dds_modified") is False
+        and reduces is False
+    ):
+        return True
+    return False
+
+
+def localization_validate_producer_result_commit(task_id: str, result_sha: str) -> tuple[bool, list[str], Optional[dict]]:
+    """Validate durable producer evidence before releasing A/B/E or enqueueing C QA."""
+    record_path = f"docs/automation/runs/{task_id}.json"
+    record = github_json_file_at_ref(record_path, result_sha)
+    if not record:
+        return False, ["TASK_RESULT_FILE_MISSING"], None
+    if str(record.get("task_id") or "") != task_id:
+        return False, ["TASK_RESULT_ID_MISMATCH"], record
+    if not producer_result_claims_no_work(record):
+        return True, [], record
+
+    state = github_json_file_at_ref("localization/resume_state.json", "korean-localization-clean")
+    if not state:
+        return False, ["RESUME_STATE_MISSING_FAIL_CLOSED"], record
+    blockers = localization_no_work_blockers_from_state(state)
+    if blockers:
+        return False, blockers, record
+    return True, [], record
+
+
 def native_plugin_instructions(active: dict) -> str:
     return (
         "GitHub namespace가 안 보여도 현재 환경의 도구 목록/검색(ALL_TOOLS·tool search 등)에서 "
