@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 848,
+  "cycle": 860,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -133,11 +133,15 @@
     "R84-REF-PERF-0013",
     "R84-REF-LIFECYCLE-0041",
     "R84-REF-LIFECYCLE-0042",
-    "R84-REF-LIFECYCLE-0043"
+    "R84-REF-LIFECYCLE-0043",
+    "R84-REF-VERIFY-0004",
+    "R84-REF-DIRECT-0005",
+    "R84-REF-DIRECT-0006",
+    "R84-REF-PERF-0014"
   ],
-  "next": "Cycles 849-851: cross-check R31 recording-hook helper verifier coverage and R34 protected reset/raster ordering; then continue independent R32 DirectGPU/perf boundaries if no safe change; APPLY_GATE at 851.",
-  "updatedKst": "2026-10-02T08:02:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_848_CHECKPOINT",
+  "next": "Cycles 861-862: final two-cycle verification for this requested 50-cycle batch: re-read verifier/critical source and branch checkpoint; preserve protected graph; no source edit unless concrete regression found.",
+  "updatedKst": "2026-10-02T08:05:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_860_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -233,6 +237,10 @@
     "Cycles 837-839 R84-REF-LIFECYCLE-0041: R34 Reset health synchronization reviewed. ResetReplay blocked state and RecoverySafetyBlock are deliberately updated together before fail-close invalidations. APPLY_GATE 839 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 840-842 R84-REF-LIFECYCLE-0042: R34 lost-device Present bypass reviewed. Cooperative-level reset-required path must set replay block+safety block+mono safety before raw Present; ordering is runtime-critical. APPLY_GATE 842 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 843-845 R84-REF-LIFECYCLE-0043: R34 Present pre/post fail-close reviewed. Reapplying invalidation around final Present is intentional while replay remains blocked. APPLY_GATE 845 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
-    "Cycles 846-848 R84-REF-DISPATCH-0007: R34 final raster guard reviewed against StateBlock recording bypass and pending resync flush. Existing recording guard -> resync -> RasterReplayScope order is protected. APPLY_GATE 848 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
+    "Cycles 846-848 R84-REF-DISPATCH-0007: R34 final raster guard reviewed against StateBlock recording bypass and pending resync flush. Existing recording guard -> resync -> RasterReplayScope order is protected. APPLY_GATE 848 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 849-851 R84-REF-VERIFY-0004: Verified source contract guards now pin R31 recording-hook ownership plus exact End->Begin->Create arm order; no regression found. APPLY_GATE 851 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 852-854 R84-REF-DIRECT-0005: R32 DirectGPU reset cleanup reviewed: pending producer fences are cleared before lower Reset and again in cache invalidation; duplicate-looking calls protect pre/post Reset failure paths. APPLY_GATE 854 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 855-857 R84-REF-DIRECT-0006: R32 Direct identity, producer-pending frame and copy-path rejection lifetimes reviewed; publication remains owned by post-Present transport contract and must not be collapsed. APPLY_GATE 857 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 858-860 R84-REF-PERF-0014: R32 Direct fence/copy telemetry reviewed against reset cache clearing and frame spike aggregation; counters intentionally span different windows. APPLY_GATE 860 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
   ]
 }
