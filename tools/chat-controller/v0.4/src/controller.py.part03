@@ -1127,6 +1127,39 @@ def finalize_localization_producer_commit(q: dict, active: dict, task_commit: di
     q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
 
 
+def localization_reconcile_producer_commit_without_ui(
+    q: dict,
+    active: dict,
+    task_commit: dict,
+    now: datetime,
+    source: str,
+) -> bool:
+    """Apply the producer NO_WORK guard during startup/watchdog reconciliation."""
+    valid, reasons, _record = localization_validate_producer_result_commit(
+        str(active.get("task_id") or ""), str(task_commit.get("sha") or "")
+    )
+    if valid:
+        finalize_localization_producer_commit(q, active, task_commit, now)
+        return True
+
+    active["phase"] = "WAIT_CHAT"
+    active["terminal"] = None
+    active["result_sha"] = None
+    active["automation_validation"] = "PENDING"
+    active["producer_no_work_rejected_sha"] = task_commit.get("sha")
+    active["producer_no_work_guard_reasons"] = reasons
+    active["assistant_claim_verification"] = "REJECTED_NO_WORK_COMPLETION"
+    active["failure_context"] = f"NO_WORK_GUARD_REARMED_{source}"
+    active.pop("completed_at", None)
+    active.pop("batch_validation_pending", None)
+    active.pop("wait_actions_started_at", None)
+    active.pop("startup_reconcile_pending", None)
+    invalidate_task_commit_cache(
+        str(active.get("branch") or ""), str(active.get("task_id") or "")
+    )
+    return False
+
+
 async def localization_process_lane(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -2663,8 +2696,14 @@ def startup_reconcile_queue_state() -> None:
                 invalidate_task_commit_cache(str(task.get("branch") or ""), str(task.get("task_id") or ""))
                 commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
                 if commit:
-                    finalize_localization_producer_commit(q, task, commit, now)
-                    rebounds.append(f"producer-release:{task.get('task_id')}->{commit.get('sha','')[:8]}")
+                    accepted = localization_reconcile_producer_commit_without_ui(
+                        q, task, commit, now, "STARTUP"
+                    )
+                    rebounds.append(
+                        (f"producer-release:{task.get('task_id')}->{commit.get('sha','')[:8]}")
+                        if accepted
+                        else f"producer-no-work-rearmed:{task.get('task_id')}"
+                    )
                 continue
             task["last_gate_poll_at"] = None
             task["startup_reconcile_pending"] = True
@@ -2703,8 +2742,14 @@ def watchdog_rearm_queue_state(now: datetime) -> Optional[str]:
             invalidate_task_commit_cache(str(task.get("branch") or ""), str(task.get("task_id") or ""))
             commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
             if commit:
-                finalize_localization_producer_commit(q, task, commit, now)
-                rearmed.append(f"producer-release:{task.get('task_id')}")
+                accepted = localization_reconcile_producer_commit_without_ui(
+                    q, task, commit, now, "WATCHDOG"
+                )
+                rearmed.append(
+                    f"producer-release:{task.get('task_id')}"
+                    if accepted
+                    else f"producer-no-work-rearmed:{task.get('task_id')}"
+                )
                 changed = True
             continue
         if task.get("startup_reconcile_pending"):
