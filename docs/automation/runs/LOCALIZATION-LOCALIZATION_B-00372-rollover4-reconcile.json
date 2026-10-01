@@ -1,0 +1,82 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-b00372-rollover4-existing-durable-result-reconcile-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00372",
+  "wave_id": "P00240",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 4,
+  "recorded_at_kst": "2026-10-01T18:22:56+09:00",
+  "controller_schema_version": 30,
+  "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "canonical_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+  "observed_head_before_reconcile": {
+    "sha": "e862469865c0d36394b9e051309f461445f31b92",
+    "message": "chore(localization): reconcile A00373 rollover5 duplicate [skip ci]"
+  },
+  "result": "ROLLOVER4_RECONCILED_EXISTING_DURABLE_RESULT_NO_REEXECUTION",
+  "summary": "Rollover4 refreshed the latest GitHub branch immediately before any producer commit and discovered that the same TASK_ID had already completed durably in a concurrent rollover. Authoritative producer result 22e17186664d3b693c7d1a3140d43fcfffafab6c contains the exact [AUTO:LOCALIZATION-LOCALIZATION_B-00372] marker, the same-commit durable task record, and two current-candidate DDS_ONLY isolation manifests for B-owned indices 97 and 121. Duplicate producer execution is therefore forbidden. Rollover4 does not publish the independently prepared index220 source-preflight work, does not modify DDS/shared state, and preserves RUNTIME_VALIDATION=UNTESTED.",
+  "authoritative_result": {
+    "result_sha": "22e17186664d3b693c7d1a3140d43fcfffafab6c",
+    "parent_sha": "3ff9dfd5353c20cf95e7f97cda133eb07d27df9e",
+    "result_commit_message": "localization(B): refresh current static-pass isolation inputs [AUTO:LOCALIZATION-LOCALIZATION_B-00372]",
+    "task_record_path": "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00372.json",
+    "task_record_blob_in_result_commit": "4bd0fc85b76b704b0ae49481fc017b7ae0cfe627",
+    "current_task_record_blob_sha": "02e1846af57fb22ad196df8dd7d44faf6454303d",
+    "evidence": [
+      {
+        "path": "localization/graphics/role_B/20261001-B00372-P00240/P00240_B00372_INDEX97_411827E_SINGLE_DDS_ISOLATION.json",
+        "blob_sha": "5d1360e7248f2b5fdcac5db28d7da76ddb3c9e33",
+        "index": 97,
+        "asset": "411827E",
+        "current_candidate_sha256": "85a50bb9036f1171bd14c5806cc7a2d21ae04010b9ac3692626b8b02225f9b80"
+      },
+      {
+        "path": "localization/graphics/role_B/20261001-B00372-P00240/P00240_B00372_INDEX121_FD90AA9_SINGLE_DDS_ISOLATION.json",
+        "blob_sha": "698ef01758d1766bf2b1f9744e2dfd3f7f1975cc",
+        "index": 121,
+        "asset": "FD90AA9",
+        "current_candidate_sha256": "5bb3a83b1011086f637462268490432e846bbdddbef85810f5677b77642ac1ca"
+      }
+    ],
+    "candidate_dds_modified": false,
+    "automation_validation": "PENDING",
+    "validation_mode": "C_BATCH_GATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "result_commit_verification": {
+    "exact_auto_marker_present": true,
+    "durable_task_record_in_result_commit": true,
+    "changed_file_count": 3,
+    "expected_changed_files_present": true,
+    "result_commit_has_skip_ci": false,
+    "validation_bearing_result_identity_preserved": true
+  },
+  "policy_recheck": {
+    "producer_lane_mode": "continuous_production+self_qa",
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "next_task_after": "OWN_DURABLE_COMMIT",
+    "duplicate_execution_allowed": false,
+    "candidate_completion_first": true,
+    "runtime_evidence_default": "UNTESTED"
+  },
+  "rollover4_reconciliation": {
+    "reexecuted_producer_work_after_existing_result_discovery": false,
+    "unpublished_precommit_source_preflight_discarded": true,
+    "unpublished_precommit_target": {
+      "index": 220,
+      "asset": "D657C2EB",
+      "reason": "Existing durable B00372 result was discovered at precommit refresh, so publishing additional material under the same TASK_ID would create a duplicate producer result."
+    },
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED",
+    "n100_used": false,
+    "local_clone_used": false,
+    "vr_ffb_dx_changes": false
+  },
+  "controller_resolution": "Use TASK_ID@22e17186664d3b693c7d1a3140d43fcfffafab6c as the only authoritative B00372 producer result. This rollover4 reconciliation is bookkeeping/review evidence only and must never replace the result identity."
+}
