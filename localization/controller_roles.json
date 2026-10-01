@@ -1,5 +1,5 @@
 {
-  "schema_version": 34,
+  "schema_version": 35,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -29,7 +29,9 @@
     "extra_producer_backlog_throttle": {
       "lane": "E",
       "pause_when_qa_pending_at_least": 16,
-      "resume_when_qa_pending_below": 12
+      "resume_when_qa_pending_below": 12,
+      "enabled": false,
+      "reason": "QA backlog is C-consumer state and must not pause A/B/E production"
     },
     "qa_priority_policy": {
       "primary": "CANDIDATE_BEARING_RESULTS_FIRST",
@@ -84,7 +86,7 @@
       "parallel_group": "production",
       "next_task_after": "OWN_DURABLE_COMMIT",
       "automation_validation": "PENDING_UNTIL_C_BATCH_GATE",
-      "backlog_throttle": true
+      "backlog_throttle": false
     }
   },
   "queue_source": "localization/graphics/asset_queue.csv",
@@ -824,6 +826,7 @@
     "qa_pending_is_not_production_stop": true,
     "producer_scan_full_own_shard_before_none": true,
     "producer_must_ignore_c_backlog_as_stop_signal": true,
-    "producer_stop_requires_global_no_work_guard_clear": true
+    "producer_stop_requires_global_no_work_guard_clear": true,
+    "qa_backlog_throttle_for_producers": false
   }
 }
