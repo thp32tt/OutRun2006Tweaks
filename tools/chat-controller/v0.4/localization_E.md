@@ -1,6 +1,6 @@
 OutRun 2006 한글화 E 실행.
 
-GitHub 관련 작업은 공개 웹이 아니라 연결된 GitHub 플러그인을 실제 호출해 수행하고, 도구/schema/리소스 결과가 바로 보이지 않는다는 이유로 작업을 중단하지 마.
+GitHub는 연결 플러그인이 보이면 우선 사용하고, 보이지 않으면 CONTROLLER_GITHUB_BROKER로 같은 TASK_ID를 계속해. GitHub 도구 부재를 이유로 중단/BLOCKED 처리하지 마.
 
 반드시 korean-localization-clean 최신 HEAD의 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 localization/controller_roles.json을 먼저 읽고 현재 schema/정책을 그대로 적용해. GitHub가 상태·진행·QA SSOT다.
 
