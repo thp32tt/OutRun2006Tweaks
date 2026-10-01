@@ -760,6 +760,29 @@ async def queue_handle_broker_response(
     current_hash = stable_hash(text)
     if active.get("broker_changeset_applied_hash") == current_hash:
         return False
+    if active.get("broker_pending_hash") == current_hash:
+        last_probe = _parse_iso(active.get("broker_pending_last_probe_at"))
+        now = datetime.now(TZ)
+        if last_probe and (now - last_probe).total_seconds() < 60:
+            write_runtime(
+                status="github_broker_write_permission_wait",
+                last_action=f"{active['task_id']} broker changeset preserved locally; waiting for controller GitHub write permission",
+                queue=active,
+                github_broker_pending_count=github_broker_pending_count(),
+            )
+            return True
+        active["broker_pending_last_probe_at"] = now.isoformat()
+        if not github_broker_write_capable(force=True):
+            save_queue_state(q)
+            write_runtime(
+                status="github_broker_write_permission_wait",
+                last_action=f"{active['task_id']} broker changeset preserved locally; write permission still unavailable",
+                queue=active,
+                github_broker_pending_count=github_broker_pending_count(),
+            )
+            return True
+        active.pop("broker_pending_hash", None)
+        active.pop("broker_pending_last_probe_at", None)
 
     try:
         read_specs = parse_broker_read(text)
@@ -830,6 +853,20 @@ async def queue_handle_broker_response(
                 queue=active,
             )
             return True
+        except GitHubBrokerPermissionError as e:
+            pending = github_broker_spool_pending(active, changeset, str(e))
+            active["broker_mode"] = True
+            active["broker_pending_hash"] = current_hash
+            active["broker_pending_last_probe_at"] = datetime.now(TZ).isoformat()
+            active["broker_pending_file"] = str(pending)
+            save_queue_state(q)
+            write_runtime(
+                status="github_broker_write_permission_wait",
+                last_action=f"{active['task_id']} changeset preserved at {pending}; waiting for controller GitHub write permission",
+                queue=active,
+                github_broker_pending_count=github_broker_pending_count(),
+            )
+            return True
         except (GitHubBrokerConflict, BrokerProtocolError) as e:
             head = github_branch_head(active["branch"]) or active.get("broker_head_sha") or "UNKNOWN"
             prompt = (
@@ -850,6 +887,10 @@ async def queue_handle_broker_response(
         active["broker_commit_sha"] = applied["sha"]
         active["broker_head_sha"] = applied["sha"]
         active["broker_changed_paths"] = applied["changed_paths"]
+        active.pop("broker_pending_hash", None)
+        active.pop("broker_pending_last_probe_at", None)
+        active.pop("broker_pending_file", None)
+        github_broker_clear_pending(active)
         active.pop("github_tooling_retry_until", None)
         active["github_recovery_prompts"] = 0
         save_queue_state(q)
