@@ -1,0 +1,28 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00389",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "wave_id": "Q00076",
+  "role": "C_BATCH_GATE",
+  "qa_inputs": [
+    "LOCALIZATION-LOCALIZATION_A-00001@406df86d2933eb4901e1d9a498eb700053b8bc6c",
+    "LOCALIZATION-LOCALIZATION_B-00002@8a089c241674d1217e89ed942167621bbd86df3d",
+    "LOCALIZATION-LOCALIZATION_A-00004@d10a3f1a6e49b1a4ba0303d17978b9a9246af5b7",
+    "LOCALIZATION-LOCALIZATION_A-00029@34df11681bce9662d1033f7b356f9a5706a2f88c"
+  ],
+  "automation_validation": "PASS_C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "disposition": "HOLD_STRICT_RECHECK",
+  "summary": "Independent C batch consumed immutable TASK_ID@RESULT_SHA inputs. Producer records were verified as durable GitHub records. Static candidate evidence remains subject to strict C visual/source comparison rules; no runtime test performed.",
+  "checks": {
+    "contract_read": "PASS",
+    "controller_schema": 31,
+    "input_identity": "PASS",
+    "runtime_claims": "BLOCKED_UNTIL_USER_RUNTIME_EVIDENCE"
+  },
+  "notes": [
+    "A/B/E producer self-QA does not replace independent C QA.",
+    "No runtime success claimed."
+  ]
+}
