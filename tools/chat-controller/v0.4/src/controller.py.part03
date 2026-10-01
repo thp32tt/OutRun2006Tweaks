@@ -172,6 +172,7 @@ def queue_rollover_prompt(active: dict) -> str:
         "이전 채팅이 대화 길이 한도에 도달해서 같은 프로젝트의 새 채팅으로 자동 전환했다.",
         "이 롤오버는 작업 실패나 재시도가 아니므로 ATTEMPT를 증가시키지 마.",
         "GitHub 최신 HEAD와 docs/automation/runs/ 아래 해당 TASK_ID 기록을 직접 확인해 현재 상태를 재구성해.",
+        "GitHub 사용 불가라고 추정하지 마. 실제 GitHub tool 호출로 확인하고 파일 404는 연결 실패가 아니라 path/ref 문제로 TARGET_BRANCH/ref에서 다시 조회해.",
         "한글화라면 CONTROLLER_CONFIG_BLOB_SHA의 localization/controller_roles.json과 canonical contract를 다시 읽고 현재 정책으로 프롬프트를 재해석해. 캐시된 과거 정책은 사용하지 마.",
         "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
         "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 clone/worktree로 우회하지 마. 단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용하며 GitHub-only라는 이유로 차단하지 마.",
@@ -402,6 +403,107 @@ async def queue_handle_retry_surface(context: BrowserContext, pages: dict[str, P
     write_runtime(status="retry_wait", last_action=f"Retry visible for {active['task_id']} but controlled click unavailable")
     return True
 
+
+
+def assistant_claims_github_unavailable(text: str) -> bool:
+    lowered = (text or "").lower()
+    if "github" not in lowered and "깃허브" not in lowered:
+        return False
+    phrases = (
+        "github unavailable",
+        "github is unavailable",
+        "cannot access github",
+        "can't access github",
+        "unable to access github",
+        "github connector unavailable",
+        "github connector is unavailable",
+        "github tool is unavailable",
+        "github tools are unavailable",
+        "github 연결",
+        "깃허브 연결",
+        "github 접근",
+        "깃허브 접근",
+        "github 도구",
+        "깃허브 도구",
+        "capability_blocked",
+    )
+    return any(p in lowered for p in phrases)
+
+
+async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, Page], active: dict) -> bool:
+    count = int(active.get("github_recovery_prompts", 0) or 0)
+    if count >= GITHUB_ASSISTANT_RECOVERY_MAX:
+        return False
+
+    latest_head = github_branch_head(active["branch"])
+    if not latest_head:
+        if github_transient_retry_pending():
+            write_runtime(
+                status="github_retry_wait",
+                last_action=f"{active['task_id']}: controller GitHub preflight is temporarily retrying; task/attempt preserved",
+                queue=active,
+            )
+        return False
+
+    now = datetime.now(TZ)
+    reg = load_registry(now)
+    slot = next((s for s in reg.slots if s.name == active["slot"]), None)
+    if slot is None:
+        return False
+    guard = send_guard_reason(reg, slot, now)
+    if guard:
+        write_runtime(
+            status="github_recovery_wait",
+            last_action=f"{active['task_id']} GitHub recovery waiting for {guard}",
+            queue=active,
+        )
+        return False
+
+    page = await slot_page(context, pages, slot)
+    if await detect_busy(page):
+        return False
+
+    thinking_ok = await ensure_thinking_level(page)
+    if thinking_ok:
+        track_thinking_verification(reg, slot, True, "github_recovery")
+    elif STRICT_THINKING_LEVEL:
+        track_thinking_verification(reg, slot, False, "github_recovery")
+        return False
+
+    prompt = (
+        f"[GITHUB RECOVERY] TASK_ID={active['task_id']}\n"
+        f"Controller preflight: TARGET_BRANCH={active['branch']} HEAD={latest_head} 확인됨.\n"
+        "GitHub 연결불가 판정을 철회하고 실제 GitHub tool을 호출해 같은 작업을 계속해. "
+        "파일 404는 연결 실패가 아니라 path/ref 문제로 처리해. ATTEMPT는 유지해."
+    )
+    result = await send_message(page, prompt)
+    if result != "sent":
+        write_runtime(
+            status="github_recovery_send_failed",
+            last_action=f"{active['task_id']} GitHub recovery send failed: {result}",
+            queue=active,
+        )
+        return False
+
+    sent_at = datetime.now(TZ)
+    note_successful_request(reg, sent_at, slot.name)
+    active["github_recovery_prompts"] = count + 1
+    active["last_github_recovery_at"] = sent_at.isoformat()
+    active["github_recovery_parent_head_sha"] = latest_head
+    active["sent_at"] = sent_at.isoformat()
+    active["last_hash"] = None
+    active["last_hash_changed_at"] = sent_at.isoformat()
+    slot.last_sent_at = sent_at.isoformat()
+    slot.last_assistant_hash = None
+    slot.last_assistant_change_at = sent_at.isoformat()
+    slot.last_result = "github_recovery_sent"
+    save_registry(reg)
+    write_runtime(
+        status="github_recovery_sent",
+        last_action=f"{active['task_id']} false GitHub-unavailable response recovered without consuming ATTEMPT ({count + 1}/{GITHUB_ASSISTANT_RECOVERY_MAX})",
+        queue=active,
+    )
+    return True
 
 
 async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
@@ -1096,6 +1198,10 @@ async def localization_process_lane(
             sent_at = _parse_iso(active.get("sent_at")) or now
             if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
                 return
+            if assistant_claims_github_unavailable(text):
+                if await queue_send_github_recovery(context, pages, active):
+                    save_queue_state(q)
+                    return
             reason = "Stable response finished without a durable [AUTO:TASK_ID] commit."
             if active["attempt"] < MAX_TASK_ATTEMPTS:
                 previous_attempt = active["attempt"]
@@ -2029,6 +2135,10 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             sent_at = _parse_iso(active.get("sent_at")) or now
             if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
                 return
+            if assistant_claims_github_unavailable(text):
+                if await queue_send_github_recovery(context, pages, active):
+                    save_queue_state(q)
+                    return
             reason = "Chat response stabilized but no durable commit carrying the exact [AUTO:TASK_ID] marker was found."
             if active["attempt"] < MAX_TASK_ATTEMPTS:
                 previous_attempt = active["attempt"]
