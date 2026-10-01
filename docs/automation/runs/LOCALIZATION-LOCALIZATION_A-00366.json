@@ -144,10 +144,10 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "ece3a4725d9f1a1b2e75f59171bb20085eecfa84",
+  "authoritative_result_sha": "ece3a4725d9f1a1b2e75f59171bb20085eecfa84",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_SELF_SHA_BOOKKEEPING",
+  "result_binding_state": "BOUND_TO_PRODUCER_RESULT_PENDING_C_BATCH_GATE",
   "result_commit_message": "localization(A): advance index111 RANDOM reconstruction [AUTO:LOCALIZATION-LOCALIZATION_A-00366]",
   "durable_task_record_in_result_commit": true,
   "precommit_refresh": {
@@ -156,5 +156,10 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Latest branch HEAD, current controller roles/contract, queue index111 state, resume latest C batch, A00351/A00352 pending results, and A00364 schema-current handoff were re-read immediately before blob/tree preparation. Only A00366 lane-local analyzer/evidence and durable task record are added."
   },
-  "bookkeeping_note": "Initial durable result commit leaves self SHA fields null; a separate bookkeeping commit may bind the immutable result SHA. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Initial durable result commit leaves self SHA fields null; a separate bookkeeping commit may bind the immutable result SHA. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping": {
+    "recorded_at_kst": "2026-10-01T17:15:00+09:00",
+    "producer_result_sha": "ece3a4725d9f1a1b2e75f59171bb20085eecfa84",
+    "note": "Bookkeeping-only immutable producer RESULT_SHA binding. The atomic result commit contains analyzer, machine-readable evidence, and durable task record. Producer AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; RUNTIME_VALIDATION remains UNTESTED."
+  }
 }
