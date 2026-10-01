@@ -1,0 +1,29 @@
+{
+  "schema_version":32,
+  "task_id":"LOCALIZATION-LOCALIZATION_C-00411",
+  "wave_id":"Q00085",
+  "lane":"LOCALIZATION_C",
+  "role":"QA_CONSUMER_C",
+  "target_branch":"korean-localization-clean",
+  "controller_schema_version":32,
+  "controller_config_blob_sha":"0aef9ebc5c2541cb5e7b781ddd16bc06d363237f",
+  "input_identity":"TASK_ID@RESULT_SHA",
+  "qa_batch_inputs":[
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00362","result_sha":"59b738ab300acbd6612e0202fc33568f0d87eff1","disposition":"PASS_NO_ACTION_REVIEW"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00363","result_sha":"3fd5125f1ec4b98aacc1f488a3df08fa85be28f5","disposition":"PASS_NO_ACTION_REVIEW"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00365","result_sha":"a3e420955ef1a41274b8de480ac989db85da3dac","disposition":"HOLD_STRICT_RECHECK_PREFLIGHT_ONLY_SOURCE_IDENTITY_RESOLVED"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00366","result_sha":"aab1ed0904775fa6e2ea0f0e5bf3c32385043732","disposition":"HOLD_STRICT_RECHECK_PENDING_CANDIDATE_EVIDENCE_REVIEW"}
+  ],
+  "qa_result":"BATCH_RECONCILED_NO_REWORK_ISSUED",
+  "dedup":"NO_DUPLICATE_TASK_ID_RESULT_SHA",
+  "shared_state":"RECONCILED_FROM_CURRENT_HEAD",
+  "automation_validation":"PASS",
+  "validation_mode":"C_BATCH_GATE",
+  "runtime_validation":"UNTESTED",
+  "runtime_test_performed":false,
+  "n100_used":false,
+  "local_clone_used":false,
+  "google_drive_used":false,
+  "vr_ffb_dx_changes":false,
+  "result_commit_message":"localization(C): batch QA gate Q00085 [AUTO:LOCALIZATION-LOCALIZATION_C-00411]"
+}
