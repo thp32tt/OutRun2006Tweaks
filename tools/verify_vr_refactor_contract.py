@@ -239,6 +239,29 @@ else:
         if marker in install_thread:
             errors.append(f"R30 install thread regained hook creation ownership: {marker}")
 
+reset_prep_begin = r30.find("void R30PrepareSkyGlowForReset() noexcept")
+reset_dest_begin = r30.find("HRESULT __stdcall ResetDestR30(")
+hud_scale_begin = r30.find("float R30HudScaleValue()", reset_dest_begin)
+if reset_prep_begin < 0 or reset_dest_begin <= reset_prep_begin:
+    errors.append("R30 SkyGlow reset preparation boundary missing")
+else:
+    reset_prep = r30[reset_prep_begin:reset_dest_begin]
+    release_pos = reset_prep.find("R30ReleaseSkyGlowResources()")
+    epoch_pos = reset_prep.find("R30SkyGlowSceneCaptureEpoch = 0")
+    if release_pos < 0 or epoch_pos <= release_pos:
+        errors.append("R30 SkyGlow reset preparation changed release-before-epoch order")
+if reset_dest_begin < 0 or hud_scale_begin <= reset_dest_begin:
+    errors.append("R30 Reset callback boundary missing")
+else:
+    reset_dest = r30[reset_dest_begin:hud_scale_begin]
+    prep_pos = reset_dest.find("R30PrepareSkyGlowForReset()")
+    lower_pos = reset_dest.find("R30ResetR29Hook.stdcall<HRESULT>")
+    if prep_pos < 0 or lower_pos <= prep_pos:
+        errors.append("R30 Reset callback changed SkyGlow-prep-before-lower-Reset order")
+    if "R30ReleaseSkyGlowResources()" in reset_dest or \
+            "R30SkyGlowSceneCaptureEpoch = 0" in reset_dest:
+        errors.append("R30 Reset callback regained inline SkyGlow reset ownership")
+
 startup_begin = r30.find("bool R30StartInstallThread() noexcept")
 startup_end = r30.find("class VRStereoR30HudHook", startup_begin)
 if startup_begin < 0 or startup_end <= startup_begin:

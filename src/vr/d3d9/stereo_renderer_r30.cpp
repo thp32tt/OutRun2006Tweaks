@@ -1106,12 +1106,17 @@ namespace OutRunVRStereo
                 destWindowOverride, dirtyRegion);
         }
 
+        void R30PrepareSkyGlowForReset() noexcept
+        {
+            R30ReleaseSkyGlowResources();
+            R30SkyGlowSceneCaptureEpoch = 0;
+        }
+
         HRESULT __stdcall ResetDestR30(
             IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
-            R30ReleaseSkyGlowResources();
-            R30SkyGlowSceneCaptureEpoch = 0;
+            R30PrepareSkyGlowForReset();
             return R30ResetR29Hook.stdcall<HRESULT>(device, params);
         }
 
