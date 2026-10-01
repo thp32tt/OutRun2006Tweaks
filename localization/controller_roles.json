@@ -1,5 +1,5 @@
 {
-  "schema_version": 31,
+  "schema_version": 32,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -160,8 +160,9 @@
       ],
       "applies_to_ci_failure": false,
       "retry_surface_click_limit": 2,
-      "new_task_chat_policy": "FRESH_PROJECT_CHAT",
-      "same_task_retry_policy": "REUSE_CURRENT_CHAT_UNTIL_ROLLOVER_REQUIRED"
+      "new_task_chat_policy": "BOUNDED_REUSE_COMPLETED_CHAT",
+      "same_task_retry_policy": "REUSE_CURRENT_CHAT_UNTIL_BOUNDED_ROLLOVER_REQUIRED",
+      "max_rollovers_per_task": 2
     },
     "watchdog": {
       "wait_actions_recovery": "uncached_exact_run_and_jobs_refresh",
@@ -242,7 +243,22 @@
       "qa_blocked_retry_does_not_block_other_ready_inputs": true,
       "controller_restart_requested_bypasses_lane_isolation": true,
       "thinking_verification_restart_is_immediate": true,
-      "clean_home_composer_recovery_persists_canonical_slot_clear": true
+      "clean_home_composer_recovery_persists_canonical_slot_clear": true,
+      "previous_task_ui_must_settle_before_next_send": true,
+      "previous_task_ui_settle_seconds": 180,
+      "bounded_chat_reuse": true,
+      "chat_reuse_max_tasks": 4,
+      "chat_reuse_max_age_minutes": 90,
+      "github_transient_errors_never_consume_task_attempt": true,
+      "github_transient_errors_never_trigger_chat_rollover": true,
+      "github_transient_retry_forever_across_cycles": true,
+      "github_transient_internal_retry_delays": [
+        2,
+        5,
+        10,
+        20
+      ],
+      "github_transient_cooldown_seconds": 60
     },
     "state_persistence": {
       "atomic_primary_writes": true,
@@ -277,7 +293,7 @@
     "queue_next_task_delay_seconds": 15,
     "parallel_lane_stagger_seconds": 15,
     "min_send_gap_seconds": 60,
-    "parallel_distinct_slot_send_gap_seconds": 15,
+    "parallel_distinct_slot_send_gap_seconds": 30,
     "slot_dedup_seconds": 120,
     "retry_button_cooldown_seconds": 45,
     "rate_limit_backoff_seconds": [
@@ -288,12 +304,12 @@
     ],
     "localization_qa_batch_size": 4,
     "localization_qa_coalesce_seconds": 60,
-    "localization_same_slot_send_gap_seconds": 30,
+    "localization_same_slot_send_gap_seconds": 90,
     "localization_slot_dedup_seconds": 30,
     "localization_extra_producer_qa_pause_threshold": 16,
     "localization_extra_producer_qa_resume_threshold": 12,
     "generic_retry_rollover_clicks": 2,
-    "fresh_chat_each_task": true,
+    "fresh_chat_each_task": false,
     "wait_actions_no_run_timeout_seconds": 600,
     "wait_actions_max_seconds": 1800,
     "process_heartbeat_fatal_seconds": 180,
@@ -303,7 +319,18 @@
     "github_task_commit_scan_pages": 3,
     "github_actions_discovery_per_page": 100,
     "memory_idle_restart_percent": 80,
-    "memory_fatal_restart_percent": 92
+    "memory_fatal_restart_percent": 92,
+    "chat_reuse_max_tasks": 4,
+    "chat_reuse_max_age_minutes": 90,
+    "previous_task_ui_settle_seconds": 180,
+    "max_chat_rollovers_per_task": 2,
+    "github_transient_retry_delays": [
+      2,
+      5,
+      10,
+      20
+    ],
+    "github_transient_cooldown_seconds": 60
   },
   "runtime_observability": {
     "queue_loop_heartbeat_seconds": 15,
@@ -324,7 +351,7 @@
       "WAIT_ACTIONS",
       "RETRY_PENDING"
     ],
-    "task_chat_lifecycle": "FRESH_CHAT_PER_NEW_TASK_ID",
+    "task_chat_lifecycle": "BOUNDED_REUSE_4_TASKS_OR_90_MINUTES",
     "dispatch_fairness": "FILL_READY_C_OR_MISSING_PRODUCER_BEFORE_ACTIVE_RETRY_TRAFFIC",
     "heartbeat_fatal_after_seconds": 180,
     "runtime_asset_validation": "FAIL_FAST_BEFORE_BROWSER_DISPATCH",
@@ -349,7 +376,9 @@
       "recovered_from_false_blocked",
       "recovered_from_false_blocked_at",
       "recovered_blocked_reason"
-    ]
+    ],
+    "previous_task_ui_settle_status": "previous_task_ui_settle_wait",
+    "github_transient_status": "github_retry_wait"
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
