@@ -120,8 +120,9 @@ GENERIC_RETRY_COOLDOWN_SECONDS = max(60, int(os.getenv("GENERIC_RETRY_COOLDOWN_S
 GITHUB_ASSISTANT_RECOVERY_MAX = max(1, int(os.getenv("GITHUB_ASSISTANT_RECOVERY_MAX", "2")))
 GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS = max(60, int(os.getenv("GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS", "300")))
 GITHUB_BROKER_ENABLED = os.getenv("GITHUB_BROKER_ENABLED", "true").lower() == "true"
-GITHUB_BROKER_MAX_CONTEXT_CHARS = max(8000, int(os.getenv("GITHUB_BROKER_MAX_CONTEXT_CHARS", "42000")))
-GITHUB_BROKER_MAX_FILE_CHARS = max(2000, int(os.getenv("GITHUB_BROKER_MAX_FILE_CHARS", "14000")))
+GITHUB_BROKER_MAX_CONTEXT_CHARS = max(6000, int(os.getenv("GITHUB_BROKER_MAX_CONTEXT_CHARS", "18000")))
+GITHUB_BROKER_MAX_FILE_CHARS = max(2000, int(os.getenv("GITHUB_BROKER_MAX_FILE_CHARS", "8000")))
+GITHUB_BROKER_PROTOCOL_VERSION = 2
 GITHUB_BROKER_MAX_COMMIT_BYTES = max(65536, int(os.getenv("GITHUB_BROKER_MAX_COMMIT_BYTES", "1048576")))
 PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
 STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "true"
@@ -997,18 +998,16 @@ def github_broker_bootstrap_specs(active: dict) -> list[dict]:
 
 def github_broker_protocol_instructions(active: dict) -> str:
     marker = f"[AUTO:{active['task_id']}]"
+    branch = str(active.get("branch") or "")
+    head = github_branch_head(branch) or str(active.get("base_sha") or "UNKNOWN")
     return (
-        "CONTROLLER_GITHUB_BROKER=AVAILABLE\n"
-        "중요: CONTROLLER_GITHUB_BROKER는 ChatGPT tool/schema/interface가 아니다. 노출 여부를 찾거나 기다리지 마. 컨트롤러가 아래 텍스트 태그를 읽고 GitHub 작업을 대신 실행한다.\n"
-        "GitHub 플러그인이 없거나 호출되지 않아도 작업을 중단하지 마. 제공된 BROKER_READ_RESULT를 사용하고 컨트롤러 브로커로 계속해.\n"
-        "추가 파일이 필요하면 정확히 다음 형식으로 요청해:\n"
-        '[BROKER_READ]{"files":[{"path":"path/to/file","start":1,"end":260}]}[/BROKER_READ]\n'
-        "수정 준비가 끝나면 전체 파일을 복사하지 말고 가능한 작은 exact replace/create/append/delete 편집으로 제출해:\n"
-        '[BROKER_CHANGESET]{"base_sha":"<현재 broker head>","commit_message":"요약 '
+        f"BROKER_V={GITHUB_BROKER_PROTOCOL_VERSION} HEAD={head}\n"
+        "Broker는 ChatGPT tool이 아니다. GitHub/tool 상태 설명 대신 작업을 진행해.\n"
+        "첫 응답은 반드시 아래 둘 중 태그 하나만 제출해.\n"
+        '[BROKER_READ]{"files":[{"path":"path","start":1,"end":220}]}[/BROKER_READ]\n'
+        '[BROKER_CHANGESET]{"base_sha":"<HEAD>","commit_message":"요약 '
         + marker
-        + '","edits":[{"op":"replace","path":"file","old":"정확한 기존 문자열","new":"새 문자열","count":1}]}[/BROKER_CHANGESET]\n'
-        "브로커가 HEAD CAS, 파일 SHA, 원자적 Git tree/commit/ref 갱신을 검증한다. "
-        "BROKER_READ/BROKER_CHANGESET을 출력한 뒤에는 GitHub 도구 부재를 이유로 BLOCKED 처리하지 마."
+        + '","edits":[{"op":"replace","path":"file","old":"기존문자열","new":"새문자열","count":1}]}[/BROKER_CHANGESET]'
     )
 
 
@@ -1056,29 +1055,10 @@ def github_broker_clear_pending(active: dict) -> None:
 
 
 def github_broker_initial_context(active: dict) -> str:
-    """Build controller-owned GitHub context before the first ChatGPT turn."""
+    """Keep the first ChatGPT turn compact; file bodies are supplied only on BROKER_READ."""
     if not GITHUB_BROKER_ENABLED:
         return ""
-    try:
-        bootstrap = github_broker_render_read_result(
-            str(active.get("branch") or ""),
-            github_broker_bootstrap_specs(active),
-        )
-    except GitHubTransientError as e:
-        return (
-            github_broker_protocol_instructions(active)
-            + "\n\nBROKER_BOOTSTRAP_STATUS=TEMPORARY_GITHUB_RETRY\n"
-            + f"BROKER_BOOTSTRAP_ERROR={type(e).__name__}: {e}\n"
-            + "플러그인이 있으면 사용할 수 있지만, 플러그인 부재를 BLOCKED 사유로 사용하지 마."
-        )
-    except Exception as e:
-        return (
-            github_broker_protocol_instructions(active)
-            + "\n\nBROKER_BOOTSTRAP_STATUS=PARTIAL\n"
-            + f"BROKER_BOOTSTRAP_ERROR={type(e).__name__}: {e}\n"
-            + "필요한 파일은 BROKER_READ로 요청하고 작업을 계속해."
-        )
-    return github_broker_protocol_instructions(active) + "\n\n" + bootstrap
+    return github_broker_protocol_instructions(active)
 
 
 def github_broker_apply_changeset(active: dict, changeset: dict) -> dict:
@@ -1460,16 +1440,12 @@ def queue_dynamic_prefix() -> str:
         f"TARGET_BRANCH={branch}",
         f"CONTROLLER_GITHUB_PREFLIGHT={'OK' if preflight_head else 'UNKNOWN'}",
         *([f"CONTROLLER_GITHUB_HEAD_SHA={preflight_head}"] if preflight_head else []),
-        "GITHUB_ACCESS_MODE=CONTROLLER_BROKER_PRIMARY_PLUGIN_OPTIONAL",
-        f"CONTROLLER_GITHUB_BROKER={'AVAILABLE' if GITHUB_BROKER_ENABLED else 'DISABLED'}",
-        f"CONTROLLER_GITHUB_BROKER_WRITE={'READY' if runtime.get('github_broker_write_capable') else 'UNCONFIRMED'}",
+        f"BROKER={'READY' if GITHUB_BROKER_ENABLED else 'OFF'}",
         "PUBLIC_GITHUB_ACCESS=DO_NOT_USE",
-        "FIRST_ACTION=USE_PROVIDED_BROKER_CONTEXT",
+        "FIRST_ACTION=BROKER_READ_OR_CHANGESET",
         f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
         *([f"WAVE_ID={wave_id}"] if wave_id else []),
-        "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 저장소/clone/worktree로 우회하지 마. 단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용한다.",
-        "아래 CONTROLLER_GITHUB_BROKER가 제공한 GitHub HEAD/파일 내용을 기준으로 즉시 작업해. Broker는 ChatGPT tool/schema/interface가 아니라 컨트롤러가 처리하는 텍스트 프로토콜이다. 연결 플러그인은 선택사항이며 plugin/tool/schema/interface 부재를 BLOCKED 사유로 사용하지 마.",
-        "파일 404는 연결 실패가 아니라 path/ref 문제다.",
+        "GitHub HEAD가 SSOT다. N100 clone/worktree 우회 금지. Broker 태그로 바로 작업하고 GitHub/tool 부재 설명은 하지 마.",
         "이 작업에서 실제 변경 또는 검토 기록을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
         "필수 GitHub Actions Gate를 소유할 result commit에는 CI-skip 지시어를 넣지 마. 검증 완료 후 bookkeeping/checkpoint 커밋은 Gate 결과와 분리해 기록하고, controller가 validation-bearing result commit을 식별할 수 있게 유지해.",
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
