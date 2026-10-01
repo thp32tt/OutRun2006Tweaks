@@ -1,0 +1,378 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-a00352-p00222-index51-v19-course-family-audit-v1",
+  "role": "A",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
+  "wave_id": "P00222",
+  "controller_schema_version": 22,
+  "controller_config_blob_sha": "be640c0c2806985743b8fc41b90a16025c590cf8",
+  "recorded_at_kst": "2026-10-01T14:48:26+09:00",
+  "asset_index": 51,
+  "asset": "FF2462BB",
+  "path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+  "disposition": "REWORK_REQUIRED",
+  "reason": "Current pixels are structurally valid, but immutable producer provenance does not record the v19-required family_target_font_size, actual_font_size, or per-title fit-reduction reason for the ten course-name elements. Pixel effect height alone cannot distinguish a justified native fit reduction from an unjustified per-title size choice. ORIENTATION_POLICY requires fail-closed handling when typography provenance is uncertain, so the pre-v19 static PASS must not be reused.",
+  "source_identity": {
+    "canonical_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "canonical_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "readable_transform": "FLIP_TOP_BOTTOM",
+    "transport": "exact pinned OR2-HD-GUI-v0.25.10a archive; read-only"
+  },
+  "candidate_identity": {
+    "drive_file_id": "1Rp4P_U_Aj_DOjkkIzrV3vqZ3HCFIO00f",
+    "bundle_name": "A00278_FF2462BB_Korean_candidate.zip",
+    "bundle_sha256": "4d956170dc28d166043b2083a2b8783eb318bbdadee7e74a8aa65795753d536d",
+    "candidate_dds_sha256": "907350cd8781eab887d21d89e1aa6d8bdae6b1f14159eba02dce4cac2bc5bad0",
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "transport": "approved current-pipeline Google Drive bundle; read-only"
+  },
+  "translation_policy": {
+    "song_titles": "preserve original; not part of this audit family",
+    "course_names": "localized by consistent Korean transliteration",
+    "reviewed_course_names": [
+      {
+        "source": "Ice Scape",
+        "korean": "아이스 스케이프"
+      },
+      {
+        "source": "Casino Town",
+        "korean": "카지노 타운"
+      },
+      {
+        "source": "Lost City",
+        "korean": "로스트 시티"
+      },
+      {
+        "source": "Canyon",
+        "korean": "캐니언"
+      },
+      {
+        "source": "Skyscrapers",
+        "korean": "스카이스크레이퍼"
+      },
+      {
+        "source": "Milky Way",
+        "korean": "밀키 웨이"
+      },
+      {
+        "source": "Floral Village",
+        "korean": "플로럴 빌리지"
+      },
+      {
+        "source": "Legend",
+        "korean": "레전드"
+      },
+      {
+        "source": "Giant Statues",
+        "korean": "자이언트 스태추"
+      },
+      {
+        "source": "Jungle",
+        "korean": "정글"
+      }
+    ],
+    "translation_consistency_result": "PASS"
+  },
+  "pixel_measurement": {
+    "coordinate_system": "readable FLIP_TOP_BOTTOM, half-open [x0,y0,x1,y1]",
+    "method": "Exact source/candidate DDS decode; isolate the alpha-connected source/candidate lettering components in each known course-name cell. Measurements are effect-inclusive raster evidence, not substitutes for native nominal font-size provenance.",
+    "measurements": [
+      {
+        "source": "Ice Scape",
+        "korean": "아이스 스케이프",
+        "source_effect_bbox_readable_half_open": [
+          145,
+          881,
+          491,
+          964
+        ],
+        "candidate_effect_bbox_readable_half_open": [
+          147,
+          893,
+          484,
+          951
+        ],
+        "source_effect_size": [
+          346,
+          83
+        ],
+        "candidate_effect_size": [
+          337,
+          58
+        ],
+        "height_ratio": 0.6988
+      },
+      {
+        "source": "Casino Town",
+        "korean": "카지노 타운",
+        "source_effect_bbox_readable_half_open": [
+          650,
+          853,
+          887,
+          981
+        ],
+        "candidate_effect_bbox_readable_half_open": [
+          691,
+          856,
+          837,
+          977
+        ],
+        "source_effect_size": [
+          237,
+          128
+        ],
+        "candidate_effect_size": [
+          146,
+          121
+        ],
+        "height_ratio": 0.9453
+      },
+      {
+        "source": "Lost City",
+        "korean": "로스트 시티",
+        "source_effect_bbox_readable_half_open": [
+          1154,
+          881,
+          1475,
+          964
+        ],
+        "candidate_effect_bbox_readable_half_open": [
+          1159,
+          887,
+          1464,
+          958
+        ],
+        "source_effect_size": [
+          321,
+          83
+        ],
+        "candidate_effect_size": [
+          305,
+          71
+        ],
+        "height_ratio": 0.8554
+      },
+      {
+        "source": "Canyon",
+        "korean": "캐니언",
+        "source_effect_bbox_readable_half_open": [
+          1660,
+          881,
+          1917,
+          964
+        ],
+        "candidate_effect_bbox_readable_half_open": [
+          1691,
+          884,
+          1877,
+          961
+        ],
+        "source_effect_size": [
+          257,
+          83
+        ],
+        "candidate_effect_size": [
+          186,
+          77
+        ],
+        "height_ratio": 0.9277
+      },
+      {
+        "source": "Skyscrapers",
+        "korean": "스카이스크레이퍼",
+        "source_effect_bbox_readable_half_open": [
+          983,
+          1033,
+          1268,
+          1116
+        ],
+        "candidate_effect_bbox_readable_half_open": [
+          987,
+          1051,
+          1260,
+          1098
+        ],
+        "source_effect_size": [
+          285,
+          83
+        ],
+        "candidate_effect_size": [
+          273,
+          47
+        ],
+        "height_ratio": 0.5663
+      },
+      {
+        "source": "Milky Way",
+        "korean": "밀키 웨이",
+        "source_effect_bbox_readable_half_open": [
+          1486,
+          1006,
+          1675,
+          1144
+        ],
+        "candidate_effect_bbox_readable_half_open": [
+          1521,
+          1009,
+          1634,
+          1141
+        ],
+        "source_effect_size": [
+          189,
+          138
+        ],
+        "candidate_effect_size": [
+          113,
+          132
+        ],
+        "height_ratio": 0.9565
+      },
+      {
+        "source": "Floral Village",
+        "korean": "플로럴 빌리지",
+        "source_effect_bbox_readable_half_open": [
+          1989,
+          1006,
+          2231,
+          1144
+        ],
+        "candidate_effect_bbox_readable_half_open": [
+          2028,
+          1009,
+          2189,
+          1141
+        ],
+        "source_effect_size": [
+          242,
+          138
+        ],
+        "candidate_effect_size": [
+          161,
+          132
+        ],
+        "height_ratio": 0.9565
+      },
+      {
+        "source": "Legend",
+        "korean": "레전드",
+        "source_effect_bbox_readable_half_open": [
+          2498,
+          1034,
+          2750,
+          1116
+        ],
+        "candidate_effect_bbox_readable_half_open": [
+          2531,
+          1037,
+          2717,
+          1113
+        ],
+        "source_effect_size": [
+          252,
+          82
+        ],
+        "candidate_effect_size": [
+          186,
+          76
+        ],
+        "height_ratio": 0.9268
+      },
+      {
+        "source": "Giant Statues",
+        "korean": "자이언트 스태추",
+        "source_effect_bbox_readable_half_open": [
+          3000,
+          1005,
+          3267,
+          1134
+        ],
+        "candidate_effect_bbox_readable_half_open": [
+          3035,
+          1008,
+          3231,
+          1131
+        ],
+        "source_effect_size": [
+          267,
+          129
+        ],
+        "candidate_effect_size": [
+          196,
+          123
+        ],
+        "height_ratio": 0.9535
+      },
+      {
+        "source": "Jungle",
+        "korean": "정글",
+        "source_effect_bbox_readable_half_open": [
+          3502,
+          1034,
+          3733,
+          1116
+        ],
+        "candidate_effect_bbox_readable_half_open": [
+          3554,
+          1037,
+          3682,
+          1113
+        ],
+        "source_effect_size": [
+          231,
+          82
+        ],
+        "candidate_effect_size": [
+          128,
+          76
+        ],
+        "height_ratio": 0.9268
+      }
+    ]
+  },
+  "provenance_review": {
+    "a76_report": "localization/graphics/role_A/20260927-1038-A76/A76_FF2462BB_PRODUCTION_REPORT.json",
+    "a76_finding": "Course-name translations are enumerated but native font sizes/family target/reduction reasons are not recorded.",
+    "a00278_report": "localization/graphics/role_A/20260930-A00278-P00162/A00278_P00162_INDEX51_V2_NATIVE_RERENDER.json",
+    "a00278_generation_prompt": "localization/graphics/KOREAN_PNG_REVIEW/FF2462BB/generation_prompt.json",
+    "a00278_finding": "The native-v2 rework covers 21 other elements and leaves the inherited ten course-name elements unchanged; it therefore does not supply missing v19 course-family typography metadata.",
+    "c163_report": "localization/graphics/role_C/202609302300-C163/C163_Q00061_INDEPENDENT_QA_BATCH.json",
+    "c163_finding": "Static candidate integrity remains valid for its pre-v19 scope; runtime remains UNTESTED. The later v19 audit explicitly requires title-family recheck before PASS reuse."
+  },
+  "required_next": {
+    "action": "NATIVE_RERENDER_COURSE_FAMILY_WITH_V19_METADATA",
+    "scope": "Only the ten course-name lettering elements; preserve all unrelated candidate pixels and alpha.",
+    "requirements": [
+      "derive the source-faithful course-name family target size from the exact source family/style/atlas geometry",
+      "record title_family, family_target_font_size and actual_font_size for every member",
+      "use the identical family target for every member that fits",
+      "for a title that cannot fit, use only the largest native size <= family target that passes the mandatory 1-2px safe inset and record the fit-reduction reason",
+      "preserve source alignment, line breaks when source-faithful, outline/effect hierarchy and orientation",
+      "native glyph rerender only; no flattened-raster scaling or trimming",
+      "zero changed pixels outside each permitted course-name source region; zero alpha escape; exact DDS canvas/header properties retained",
+      "independent C static QA before any promotion; real-game runtime validation remains separate"
+    ]
+  },
+  "candidate_dds_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
