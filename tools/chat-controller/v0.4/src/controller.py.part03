@@ -513,7 +513,7 @@ async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, P
     if slot is None:
         return False
     guard = send_guard_reason(reg, slot, now)
-    if guard:
+    if guard and guard.startswith("rate_limit_backoff:"):
         write_runtime(
             status="github_recovery_wait",
             last_action=f"{active['task_id']} GitHub recovery waiting for {guard}",
@@ -533,15 +533,8 @@ async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, P
         return False
 
     prompt = (
-        f"[GITHUB RECOVERY] TASK_ID={active['task_id']}\n"
-        f"Controller preflight: TARGET_BRANCH={active['branch']} HEAD={latest_head} 확인됨.\n"
-        "GITHUB_ACCESS_MODE=CONNECTED_GITHUB_PLUGIN\n"
-        "GITHUB_PLUGIN_AVAILABLE=TRUE\n"
-        "PUBLIC_GITHUB_ACCESS=DO_NOT_USE\n"
-        "FIRST_ACTION=CALL_GITHUB_PLUGIN\n"
-        "GitHub 연결불가 판정을 철회해. 공개 웹 접속을 시도하지 말고 이 프로젝트에 연결된 GitHub 플러그인을 실제 호출해 같은 작업을 계속해. "
-        "함수/schema가 바로 보이지 않으면 현재 세션의 도구/connector 목록에서 GitHub action을 탐색해. schema 미노출을 연결 실패로 처리하지 마. "
-        "파일 404는 연결 실패가 아니라 path/ref 문제로 처리하고 ATTEMPT는 유지해."
+        "GitHub 연결되어 있어. 공개 웹 말고 연결된 GitHub 플러그인 도구를 다시 탐색해서 실제 호출부터 하고, "
+        f"TASK_ID={active['task_id']} 작업을 중단하지 말고 그대로 계속해."
     )
     result = await send_message(page, prompt)
     if result != "sent":
