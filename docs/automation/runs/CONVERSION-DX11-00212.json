@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00212",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "e354cfc0530379bad5a30ce8ee1f563e372637c2",
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "google_drive_canonical_hd_source_transport": {
+    "approved_by_current_git_head": true,
+    "used": false,
+    "reason": "This bounded task exact-decodes canonical EXE bytes already captured by the R210 GitHub Actions analyzer; no DDS acquisition is required."
+  },
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R212_18244E_EXACT_DECODE",
+  "selection_reason": "CONVERSION-DX11-00210 proved immutable canonical bytes for 0x0018244E..0x001824AD and explicitly named exact forward decode from 0x0018244E as the next independent F13 action.",
+  "summary": "ATTEMPT=1 result pending validation. Exact-byte proof covers 24 complete instructions from 0x0018244E through 0x001824AA, checks seven decoded branch destinations and three raw-backed rel32 calls, and deliberately leaves 0x001824AB:e8 5e 46 as an incomplete rel32 call at the R210 capture end. Runtime renderer/native DX11 draw/transport source is unchanged.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00212.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false,
+    "hd_source_transport_changed": false
+  },
+  "evidence": [
+    "C0 recovered vr-dx11-native-r71 HEAD e354cfc0530379bad5a30ce8ee1f563e372637c2 directly from GitHub.",
+    "AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, durable VR state/regression/history material, Issue #14, and completed CONVERSION-DX11-00210 were reviewed before implementation.",
+    "CONVERSION-DX11-00210 validation-bearing result e38ebfe58fb8cafa006339995c94cc4b2d4a73b2 proved EXACT_EXE_18244E_TO_1824AE_PROVENANCE_CAPTURED on canonical EXE SHA-256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "The R210 exact 96-byte window decodes into 24 complete instructions through 0x001824AA; 0x001824AB contains only e8 5e 46 of a five-byte rel32 call and is intentionally not promoted to an instruction.",
+    "Decoded calls are 0x0018245A->0x001888EC, 0x00182494->0x00188877, and 0x0018249B->0x00185BEC; each must also appear in the R210 raw outbound rel32 census.",
+    "Decoded branch destinations are checked byte-exactly; only targets inside the R212 prefix are additionally required to land on proven instruction boundaries.",
+    "No function/callee semantic effect, render/HUD ownership, native draw activation, or runtime behavior is claimed."
+  ],
+  "proof_contract": {
+    "predecessor_status": "EXACT_EXE_18244E_TO_1824AE_PROVENANCE_CAPTURED",
+    "start_rva": "0x0018244E",
+    "prefix_end_rva": "0x001824AB",
+    "complete_instruction_count": 24,
+    "calls": [
+      "0x0018245A->0x001888EC",
+      "0x00182494->0x00188877",
+      "0x0018249B->0x00185BEC"
+    ],
+    "incomplete_tail": "0x001824AB:e8 5e 46",
+    "expected_status": "EXACT_18244E_TO_1824AB_CONTROL_FLOW_PREFIX_PROVEN",
+    "function_entry_status": "UNRESOLVED_AT_18244E_AND_EXTERNAL_TARGETS",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_ONLY",
+    "ownership_effect": "NONE",
+    "actual_status": "PENDING_CI"
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "blocker": "Automatic exact-SHA validation pending. Bytes after 0x001824AD are not present in the R210 capture, so the rel32 call beginning at 0x001824AB remains incomplete by design.",
+  "next_action": "Consume exact-SHA Backend Conversion Gate, HUD Inspector, Build and OpenXR architecture results. If PASS, preserve this result SHA as validation_bearing_result_sha and finalize the run record in a separate bookkeeping commit. Future independent F13 work may acquire fresh bytes at 0x001824AB with E8 5E 46 overlap before decoding that call.",
+  "checkpoint": "C4_COMMIT",
+  "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE",
+  "task_started_kst": "2026-10-01T16:52:00+09:00",
+  "validation_completed_kst": null,
+  "validation": {}
+}
