@@ -24,6 +24,7 @@ COPY watchdog_resume.override.md /opt/outrun/prompts/watchdog_resume.md
 COPY localization_A.md /opt/outrun/prompts/localization_A.md
 COPY localization_B.md /opt/outrun/prompts/localization_B.md
 COPY localization_C.md /opt/outrun/prompts/localization_C.md
+COPY localization_E.md /opt/outrun/prompts/localization_E.md
 COPY localization_D.md /opt/outrun/prompts/localization_D.md
 COPY localization_git_sync.md /opt/outrun/prompts/localization_git_sync.md
 COPY vr_A.md /opt/outrun/prompts/vr_A.md

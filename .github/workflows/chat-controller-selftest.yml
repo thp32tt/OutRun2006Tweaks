@@ -64,7 +64,7 @@ jobs:
           grep -Fq 'rolling the same task into a fresh project chat to break the retry loop' /tmp/controller.py
           test "$(grep -Fc 'queue_handle_retry_surface(context, pages, page, reg, slot, active, q)' /tmp/controller.py)" -eq 2
 
-      - name: Verify queue prompt files
+      - name: Verify queue prompt files and image packaging
         run: |
           test -s tools/chat-controller/v0.4/conversion_dx11.md
           test -s tools/chat-controller/v0.4/conversion_dxvk.md
@@ -72,6 +72,13 @@ jobs:
           test -s tools/chat-controller/v0.4/localization_B.md
           test -s tools/chat-controller/v0.4/localization_C.md
           test -s tools/chat-controller/v0.4/localization_E.md
+          dockerfile=tools/chat-controller/v0.4/Dockerfile.portainer
+          grep -Fq 'COPY conversion_dx11.md /opt/outrun/prompts/conversion_dx11.md' "$dockerfile"
+          grep -Fq 'COPY conversion_dxvk.md /opt/outrun/prompts/conversion_dxvk.md' "$dockerfile"
+          grep -Fq 'COPY localization_A.md /opt/outrun/prompts/localization_A.md' "$dockerfile"
+          grep -Fq 'COPY localization_B.md /opt/outrun/prompts/localization_B.md' "$dockerfile"
+          grep -Fq 'COPY localization_C.md /opt/outrun/prompts/localization_C.md' "$dockerfile"
+          grep -Fq 'COPY localization_E.md /opt/outrun/prompts/localization_E.md' "$dockerfile"
 
       - name: Verify authorized game-mod context
         run: |
