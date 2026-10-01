@@ -6,29 +6,19 @@
   "wave_id": "Q00078",
   "role": "independent_batched_cross_lane_qa+shared_state_reconcile",
   "input_identity": "TASK_ID@RESULT_SHA",
-  "qa_inputs": [
-    {
-      "task_id": "LOCALIZATION-LOCALIZATION_A-00242",
-      "result_sha": "254ac03b39a5fe21c5d9a2edc8a2449bc6e43751",
-      "disposition": "PASS_REVIEWED_SOURCE_ACQUISITION_EXHAUSTED_NO_CANDIDATE"
-    },
-    {
-      "task_id": "LOCALIZATION-LOCALIZATION_A-00245",
-      "result_sha": "9a40a39ffadcd08283b947d5abe48d9b95ed9e4c",
-      "disposition": "PASS_REVIEWED_SINGLE_DDS_ISOLATION_INPUT_NO_CANDIDATE_MODIFICATION"
-    },
-    {
-      "task_id": "LOCALIZATION-LOCALIZATION_B-00243",
-      "result_sha": "7b90bbe4ae23750ab2aad6336ad17e68ea5e9e39",
-      "disposition": "PASS_REVIEWED_SINGLE_DDS_ISOLATION_INPUT_NO_CANDIDATE_MODIFICATION"
-    },
-    {
-      "task_id": "LOCALIZATION-LOCALIZATION_A-00254",
-      "result_sha": "f73c48fcca2a17bc4bf50b2fedaa13f387635458",
-      "disposition": "PASS_REVIEWED_SOURCE_EFFECT_MASK_PREFLIGHT_NO_DDS_MODIFICATION"
-    }
+  "qa_batch_inputs": [
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00242","result_sha":"254ac03b39a5fe21c5d9a2edc8a2449bc6e43751"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00245","result_sha":"9a40a39ffadcd08283b947d5abe48d9b95ed9e4c"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00243","result_sha":"7b90bbe4ae23750ab2aad6336ad17e68ea5e9e39"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00254","result_sha":"f73c48fcca2a17bc4bf50b2fedaa13f387635458"}
   ],
-  "automation_validation": "PASS",
+  "qa_dispositions": [
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00242","result_sha":"254ac03b39a5fe21c5d9a2edc8a2449bc6e43751","status":"PASS"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00245","result_sha":"9a40a39ffadcd08283b947d5abe48d9b95ed9e4c","status":"PASS"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00243","result_sha":"7b90bbe4ae23750ab2aad6336ad17e68ea5e9e39","status":"PASS"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00254","result_sha":"f73c48fcca2a17bc4bf50b2fedaa13f387635458","status":"PASS"}
+  ],
+  "automation_validation": "PASS_PENDING_GATE_RERUN",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
@@ -38,7 +28,7 @@
     "shared_state_reconciled": true,
     "dedup_applied": true,
     "producer_barrier_applied": false,
-    "gate_result": "PASS_BATCH_RECONCILE"
+    "gate_result": "PENDING_RERUN_AFTER_SCHEMA_FIX"
   },
   "checks": {
     "exact_task_sha_identity": "PASS",
@@ -46,5 +36,5 @@
     "dds_candidate_regression": "PASS_NO_CANDIDATE_WRITES",
     "runtime_evidence": "NOT_PROVIDED"
   },
-  "note": "C batch consumed immutable TASK_ID@RESULT_SHA inputs. Producer outputs remain runtime untested unless separate runtime evidence is supplied."
+  "note": "Fixed C batch record field names to match verify_c_batch_inputs.py. Immutable TASK_ID@RESULT_SHA inputs preserved. Runtime remains UNTESTED."
 }
