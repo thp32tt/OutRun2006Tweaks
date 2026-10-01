@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 836,
+  "cycle": 848,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -130,11 +130,14 @@
     "R84-REF-LIFECYCLE-0040",
     "R84-REF-PERF-0012",
     "R84-REF-STATE-0019",
-    "R84-REF-PERF-0013"
+    "R84-REF-PERF-0013",
+    "R84-REF-LIFECYCLE-0041",
+    "R84-REF-LIFECYCLE-0042",
+    "R84-REF-LIFECYCLE-0043"
   ],
-  "next": "Cycles 837-839: review R34 reset replay state synchronization and fail-closed boundaries versus R33 reset chain; preserve lost-device raw Present bypass and recovery safety block ordering; APPLY_GATE at 839.",
-  "updatedKst": "2026-10-02T07:58:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_836_CHECKPOINT",
+  "next": "Cycles 849-851: cross-check R31 recording-hook helper verifier coverage and R34 protected reset/raster ordering; then continue independent R32 DirectGPU/perf boundaries if no safe change; APPLY_GATE at 851.",
+  "updatedKst": "2026-10-02T08:02:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_848_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -226,6 +229,10 @@
     "Cycles 825-827 R84-REF-LIFECYCLE-0040: R32 reset cache clearing order reviewed: effect/dispatch/raster invalidation, renderer external-restore invalidation, DirectGPU identity/fence cleanup, telemetry reset are intentionally ordered around R22 Reset ownership. APPLY_GATE 827 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 828-830 R84-REF-PERF-0012: R32 frame workload finalization reviewed; frame counter zeroing before spike aggregation prevents carry-over and is runtime-visible. APPLY_GATE 830 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 831-833 R84-REF-STATE-0019: R33 depth/stencil cache invalidation reviewed against StateBlock snapshot generations and Reset chaining; cache lifetime is distinct from R31 StateBlock ownership. APPLY_GATE 833 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
-    "Cycles 834-836 R84-REF-PERF-0013: R33 5-second depth/stencil telemetry baseline reviewed; cadence and reset counters remain local to R33. APPLY_GATE 836 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
+    "Cycles 834-836 R84-REF-PERF-0013: R33 5-second depth/stencil telemetry baseline reviewed; cadence and reset counters remain local to R33. APPLY_GATE 836 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 837-839 R84-REF-LIFECYCLE-0041: R34 Reset health synchronization reviewed. ResetReplay blocked state and RecoverySafetyBlock are deliberately updated together before fail-close invalidations. APPLY_GATE 839 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 840-842 R84-REF-LIFECYCLE-0042: R34 lost-device Present bypass reviewed. Cooperative-level reset-required path must set replay block+safety block+mono safety before raw Present; ordering is runtime-critical. APPLY_GATE 842 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 843-845 R84-REF-LIFECYCLE-0043: R34 Present pre/post fail-close reviewed. Reapplying invalidation around final Present is intentional while replay remains blocked. APPLY_GATE 845 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 846-848 R84-REF-DISPATCH-0007: R34 final raster guard reviewed against StateBlock recording bypass and pending resync flush. Existing recording guard -> resync -> RasterReplayScope order is protected. APPLY_GATE 848 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
   ]
 }
