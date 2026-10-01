@@ -1,5 +1,5 @@
 {
-  "schema_version": 20,
+  "schema_version": 21,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -43,6 +43,13 @@
       "normal_success_min_candidate_dds": 2,
       "partial_batch_requires_fresh_shard_exhaustion": true,
       "first_candidate_must_not_release_lane_when_second_runnable_exists": true
+    },
+    "controller_slot_count": 4,
+    "slot_map": {
+      "A": "A",
+      "B": "B",
+      "C": "C",
+      "D": "E"
     }
   },
   "lanes": {
@@ -66,7 +73,7 @@
       "consumes": "qa_pending",
       "input_identity": "TASK_ID@RESULT_SHA",
       "batch_size": 4,
-      "coalesce_seconds": 30,
+      "coalesce_seconds": 60,
       "candidate_write_policy": "RETURN_REWORK_TO_OWNING_A_B_OR_E",
       "blocks_producers": false,
       "automation_validation": "C_BATCH_GATE"
@@ -151,7 +158,10 @@
         "missing_chat",
         "missing_assistant_generation"
       ],
-      "applies_to_ci_failure": false
+      "applies_to_ci_failure": false,
+      "retry_surface_click_limit": 2,
+      "new_task_chat_policy": "FRESH_PROJECT_CHAT",
+      "same_task_retry_policy": "REUSE_CURRENT_CHAT_UNTIL_ROLLOVER_REQUIRED"
     },
     "watchdog": {
       "wait_actions_recovery": "uncached_exact_run_and_jobs_refresh",
@@ -212,7 +222,9 @@
     "localization_same_slot_send_gap_seconds": 30,
     "localization_slot_dedup_seconds": 30,
     "localization_extra_producer_qa_pause_threshold": 16,
-    "localization_extra_producer_qa_resume_threshold": 12
+    "localization_extra_producer_qa_resume_threshold": 12,
+    "generic_retry_rollover_clicks": 2,
+    "fresh_chat_each_task": true
   },
   "runtime_observability": {
     "queue_loop_heartbeat_seconds": 15,
@@ -232,7 +244,8 @@
       "WAIT_COMMIT",
       "WAIT_ACTIONS",
       "RETRY_PENDING"
-    ]
+    ],
+    "task_chat_lifecycle": "FRESH_CHAT_PER_NEW_TASK_ID"
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
