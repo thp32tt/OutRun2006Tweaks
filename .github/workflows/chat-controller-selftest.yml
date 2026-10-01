@@ -64,6 +64,8 @@ jobs:
           grep -Fq 'status="github_broker_write_permission_wait"' /tmp/controller.py
           grep -Fq 'github_broker_write_capable(strict=True)' /tmp/controller.py
           grep -Fq 'status="github_recovery_preempted_retry"' /tmp/controller.py
+          grep -Fq 'status="github_broker_legacy_handoff"' /tmp/controller.py
+          grep -Fq '"broker_context_injected": bool(GITHUB_BROKER_ENABLED)' /tmp/controller.py
           test "$(grep -Fc 'queue_handle_broker_response(context, pages, active, q' /tmp/controller.py)" -ge 3
           if grep -Fq 'GITHUB_ACCESS_MODE=CONNECTED_GITHUB_PLUGIN' /tmp/controller.py; then
             echo "legacy plugin-only access mode remains"
