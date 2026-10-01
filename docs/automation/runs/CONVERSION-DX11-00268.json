@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00268",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "5fec9408235642fc3a4fc2c9a4bd195b77a2f8e3",
+  "result_sha": "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
+  "validation_bearing_result_sha": "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
+  "source_commits": [
+    "cc73e01fd29dbd42da2f8a782d9598539bed1de3"
+  ],
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "DX11_DORMANT_ACTIVATION_SURFACE_COVERAGE",
+  "selection_reason": "Consumed CONVERSION-DX11-00266 exact-SHA automation results first. All four required 00266 gates succeeded. Remaining activation-proof review found verify_dx11_activation_boundary.py scanned only top-level src/vr/d3d11/*.cpp, leaving header-inline and future nested C/C++ surfaces outside the fail-closed Draw* boundary.",
+  "summary": "Expanded the dormant native DX11 Draw* activation guard to recursively scan C/C++ implementation, header and inline source surfaces under src/vr/d3d11 and added representative .cpp/.hpp coverage assertions. No native game draw routing or runtime rendering path was activated.",
+  "changed_paths": [
+    "tools/verify_dx11_activation_boundary.py",
+    "docs/automation/runs/CONVERSION-DX11-00268.json"
+  ],
+  "conversion_changed_paths": [
+    "tools/verify_dx11_activation_boundary.py"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "evidence": [
+    "Recovered vr-dx11-native-r71 HEAD 5fec9408235642fc3a4fc2c9a4bd195b77a2f8e3 via the connected GitHub connector.",
+    "CONVERSION-DX11-00268 run record was absent before work; the 404 was a missing path, not a connection failure.",
+    "Consumed 00266 exact-SHA 6fff554c96d7c6e58a2879173f8505455551ca7f validation: Backend Conversion Gate 36933012749 success, Build 36933017428 success, OpenXR VR architecture 36933017420 success, HUD Inspector 36933017514 success.",
+    "Pre-change guard used DX11.glob(\"*.cpp\"), so .hpp/.inl and nested future source directories were outside activation-boundary scanning.",
+    "Current seven native DX11 headers were checked and contained no Draw* dispatch before broadening the scan.",
+    "Commit cc73e01fd29dbd42da2f8a782d9598539bed1de3 recursively scans C/C++ source/header/inline suffixes and requires representative implementation/header members to remain in the scan set.",
+    "Issue #14 production change ledger appended from CHAT_DIRECT."
+  ],
+  "related_finding_or_regression_keys": [
+    "CONVERSION-DX11-00266",
+    "DX11-DRAW-ACTIVATION-SURFACE-001"
+  ],
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 36940764751,
+      "head_sha": "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
+      "conclusion": "in_progress"
+    },
+    "build": {
+      "run_id": 36940768664,
+      "head_sha": "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
+      "conclusion": "in_progress"
+    },
+    "openxr_architecture": {
+      "run_id": 36940768656,
+      "head_sha": "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
+      "conclusion": "queued"
+    },
+    "hud_inspector": {
+      "run_id": 36940768700,
+      "head_sha": "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
+      "conclusion": "in_progress"
+    }
+  },
+  "blocker": "Exact-SHA automation for cc73e01fd29dbd42da2f8a782d9598539bed1de3 is still running. Native DX11 activation remains deliberately disabled and exhaustive runtime draw coverage is not proven.",
+  "next_action": "Consume exact-SHA CI for cc73e01fd29dbd42da2f8a782d9598539bed1de3. If green, continue review of remaining exhaustive activation-proof gaps and the known menu fallback analyzer false-negative; do not permit native Draw* routing without explicit proof and runtime gate.",
+  "checkpoint": "C3_VALIDATION_PENDING",
+  "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE"
+}
