@@ -27,6 +27,8 @@ text("tools/verify_vr_hook_graph.py")
 for banned in ("R22ShadowState", "R22StateBlockTrackingReliable"):
     if banned in r23:
         errors.append(f"R23 regained direct lower-layer state dependency: {banned}")
+if "R22StateBlockTrackingReliable" in r22:
+    errors.append("R22 retained removed StateBlock reliability authority")
 
 for banned in ("R23GameDrawSerial", "R23BeforeTopLevelDraw", "GetTopLevelDrawSerial()"):
     if banned in r26:

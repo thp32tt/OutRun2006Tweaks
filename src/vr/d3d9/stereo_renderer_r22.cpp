@@ -800,8 +800,7 @@ namespace OutRunVRStereo
                         R22CreateStateBlockHook = {};
                         R22BeginStateBlockHook = {};
                         R22EndStateBlockHook = {};
-                        R22StateBlockTrackingReliable.store(
-                            false, std::memory_order_release);
+                        OutRunVR::State::StateBlockTracker::SetR22Reliable(false);
                         spdlog::warn(
                             "VR R46 STATE: StateBlock creation hooks unavailable; periodic live raster validation retained");
                     }
