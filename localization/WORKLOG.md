@@ -2230,3 +2230,9 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - B00342@`4e409a54...` is historical patch-only and **SUPERSEDED** by B00342@`89231474...` candidate `e31487c2...`; newer state remains QA_PENDING.
 - A00346@index111 deterministic replay advances accepted PREFLIGHT_ONLY reconstruction **8,221 -> 5,734 unresolved**, +2,487 proposal / +2,223 actual, 0 outside-mask/alpha/protected. RANDOM/protected fringe remains fail-closed.
 - C rewrites no candidate DDS. Pre-Gate `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+
+### 2026-10-01 15:53 KST — Q00074 authoritative Gate PASS
+- Validation-bearing result `507a781c4ac309fc7435c9f7064faa238b2278c5` passed **Localization Automation Gate** run `36827181087` attempt 1.
+- Final dispositions remain **A00344 PASS / A00345 PASS / B00342@4e409a54 SUPERSEDED / A00346 PASS**. A00344/A00345 are fail-closed source-mismatch preflight; A00346@index111 is authoritative PREFLIGHT_ONLY at 5,734 unresolved; the newer B00342@89231474 index61 candidate remains separate QA_PENDING.
+- This bookkeeping checkpoint is separate from the Gate-owning result commit. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.

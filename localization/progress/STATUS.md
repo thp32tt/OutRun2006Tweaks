@@ -1607,3 +1607,8 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Dispositions: **A00344 PASS / A00345 PASS / B00342@4e409a54 SUPERSEDED / A00346 PASS**.
 - Index111 authority advances to PREFLIGHT_ONLY 5,734 unresolved. Index147 and font15/18/21 remain fail-closed source mismatches. Current B00342@89231474 index61 candidate remains QA_PENDING.
 - `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+
+### 2026-10-01 15:53 KST — C176 / Q00074 authoritative Gate PASS
+- Result `507a781c4ac309fc7435c9f7064faa238b2278c5`; Gate `36827181087` attempt 1: **success**.
+- Dispositions unchanged: A00344 PASS, A00345 PASS, historical B00342@4e409a54 SUPERSEDED, A00346 PASS. Runtime remains UNTESTED.
