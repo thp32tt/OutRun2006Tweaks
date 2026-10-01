@@ -320,6 +320,30 @@ async def queue_handle_retry_surface(context: BrowserContext, pages: dict[str, P
     is_rate = any(re.search(p, retry_text, flags=re.I | re.S) for p in RATE_LIMIT_PATTERNS)
     generic_clicks = int(active.get("generic_retry_clicks", 0) or 0)
 
+    # A completed assistant refusal can coexist with a stale/generic Retry surface.
+    # Read the assistant result first; GitHub-tooling refusal recovery must outrank
+    # clicking Retry or opening any new chat.
+    if not is_rate:
+        assistant_text = await last_assistant_text(page)
+        if assistant_text and (
+            assistant_claims_github_tooling_absent(assistant_text)
+            or assistant_claims_github_unavailable(assistant_text)
+        ):
+            active["generic_retry_clicks"] = 0
+            active.pop("generic_retry_cooldown_until", None)
+            active["failure_context"] = (
+                "Assistant refused GitHub work while controller GitHub preflight remains healthy; "
+                "same-chat connected-plugin recovery takes precedence over generic Retry."
+            )
+            if await queue_send_github_recovery(context, pages, active):
+                save_queue_state(q)
+                write_runtime(
+                    status="github_recovery_preempted_retry",
+                    last_action=f"{active['task_id']} GitHub refusal detected before generic Retry handling",
+                    queue=active,
+                )
+                return True
+
     if is_rate:
         if rate_limit_active(reg, now):
             write_runtime(
