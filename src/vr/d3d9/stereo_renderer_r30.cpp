@@ -3217,6 +3217,21 @@ namespace OutRunVRStereo
             return 0;
         }
 
+        bool R30StartInstallThread() noexcept
+        {
+            using State = R30InstallStateValue;
+            R30SetInstallState(State::Pending);
+            HANDLE thread = CreateThread(nullptr, 0,
+                R30InstallThread, nullptr, 0, nullptr);
+            if (!thread)
+            {
+                R30SetInstallState(State::Failed);
+                return false;
+            }
+            CloseHandle(thread);
+            return true;
+        }
+
         class VRStereoR30HudHook final : public Hook
         {
         public:
@@ -3227,17 +3242,7 @@ namespace OutRunVRStereo
             bool validate() override { return true; }
             bool apply() override
             {
-                using State = R30InstallStateValue;
-                R30SetInstallState(State::Pending);
-                HANDLE thread = CreateThread(nullptr, 0,
-                    R30InstallThread, nullptr, 0, nullptr);
-                if (!thread)
-                {
-                    R30SetInstallState(State::Failed);
-                    return false;
-                }
-                CloseHandle(thread);
-                return true;
+                return R30StartInstallThread();
             }
             static VRStereoR30HudHook instance;
         };

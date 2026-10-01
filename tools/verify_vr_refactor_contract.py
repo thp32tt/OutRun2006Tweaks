@@ -239,6 +239,34 @@ else:
         if marker in install_thread:
             errors.append(f"R30 install thread regained hook creation ownership: {marker}")
 
+startup_begin = r30.find("bool R30StartInstallThread() noexcept")
+startup_end = r30.find("class VRStereoR30HudHook", startup_begin)
+if startup_begin < 0 or startup_end <= startup_begin:
+    errors.append("R30 startup thread publication boundary missing")
+else:
+    startup = r30[startup_begin:startup_end]
+    startup_order = [
+        startup.find("R30SetInstallState(State::Pending)"),
+        startup.find("CreateThread(nullptr, 0,"),
+        startup.find("if (!thread)"),
+        startup.find("R30SetInstallState(State::Failed)"),
+        startup.find("CloseHandle(thread)"),
+    ]
+    if min(startup_order) < 0 or startup_order != sorted(startup_order):
+        errors.append("R30 startup boundary changed Pending/CreateThread/Failed/CloseHandle order")
+
+apply_begin = r30.find("bool apply() override")
+apply_end = r30.find("static VRStereoR30HudHook instance", apply_begin)
+if apply_begin < 0 or apply_end <= apply_begin:
+    errors.append("R30 hook apply boundary missing")
+else:
+    apply_body = r30[apply_begin:apply_end]
+    if "return R30StartInstallThread();" not in apply_body:
+        errors.append("R30 apply no longer delegates startup ownership")
+    for escaped in ("CreateThread(", "CloseHandle(", "R30SetInstallState("):
+        if escaped in apply_body:
+            errors.append(f"R30 apply regained startup ownership: {escaped}")
+
 for legacy in (
     "R29StableStereoBase",
     "R29FragileEffectCached",
