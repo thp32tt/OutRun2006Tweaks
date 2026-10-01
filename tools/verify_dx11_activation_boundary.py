@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DX11 = ROOT / "src" / "vr" / "d3d11"
 
 DRAW_DISPATCH = re.compile(
-    r"(?:->|\.)\s*Draw(?:IndexedInstancedIndirect|InstancedIndirect|IndexedInstanced|Indexed|Instanced)?\s*\("
+    r"(?:->|\.)\s*Draw(?:Auto|IndexedInstancedIndirect|InstancedIndirect|IndexedInstanced|Indexed|Instanced)?\s*\("
 )
 
 
@@ -23,6 +23,27 @@ def require_text(path: Path, needles: list[str], label: str) -> str:
 
 
 def main() -> None:
+    # Keep every ID3D11DeviceContext Draw* entry point inside the dormant
+    # activation boundary. DrawAuto is easy to omit because it has no explicit
+    # vertex-count arguments, so fail closed if the matcher ever regresses.
+    draw_dispatch_samples = [
+        "context->Draw(1, 0)",
+        "context->DrawAuto()",
+        "context->DrawIndexed(1, 0, 0)",
+        "context->DrawInstanced(1, 1, 0, 0)",
+        "context->DrawIndexedInstanced(1, 1, 0, 0, 0)",
+        "context->DrawInstancedIndirect(args, 0)",
+        "context->DrawIndexedInstancedIndirect(args, 0)",
+    ]
+    unmatched = [
+        sample for sample in draw_dispatch_samples
+        if not DRAW_DISPATCH.search(sample)
+    ]
+    if unmatched:
+        raise SystemExit(
+            "DX11 draw activation matcher drift: " + ", ".join(unmatched)
+        )
+
     if not DX11.is_dir():
         raise SystemExit("native DX11 source directory is missing")
 
