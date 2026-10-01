@@ -566,6 +566,21 @@ namespace OutRunVRStereo
             return 0;
         }
 
+        bool R29StartInstallThread() noexcept
+        {
+            using State = OutRunVR::RuntimeEligibility::InstallState;
+            SetStereoBaseInstallState(State::Pending);
+            HANDLE thread = CreateThread(nullptr, 0,
+                R29StereoInstallThread, nullptr, 0, nullptr);
+            if (!thread)
+            {
+                SetStereoBaseInstallState(State::Failed);
+                return false;
+            }
+            CloseHandle(thread);
+            return true;
+        }
+
         class VRStereoR29Hook final : public Hook
         {
         public:
@@ -576,17 +591,7 @@ namespace OutRunVRStereo
             bool validate() override { return true; }
             bool apply() override
             {
-                using State = OutRunVR::RuntimeEligibility::InstallState;
-                SetStereoBaseInstallState(State::Pending);
-                HANDLE thread = CreateThread(nullptr, 0,
-                    R29StereoInstallThread, nullptr, 0, nullptr);
-                if (!thread)
-                {
-                    SetStereoBaseInstallState(State::Failed);
-                    return false;
-                }
-                CloseHandle(thread);
-                return true;
+                return R29StartInstallThread();
             }
             static VRStereoR29Hook instance;
         };        VRStereoR29Hook VRStereoR29Hook::instance;

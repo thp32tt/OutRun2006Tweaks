@@ -134,6 +134,33 @@ public_state_begin = r29.rfind("StereoBaseInstallState() noexcept")
 if public_state_begin < 0 or "return ReadStereoBaseInstallState();" not in r29[public_state_begin:]:
     errors.append("R29 public install-state facade bypassed read boundary")
 
+r29_startup_begin = r29.find("bool R29StartInstallThread() noexcept")
+r29_hook_begin = r29.find("class VRStereoR29Hook", r29_startup_begin)
+if r29_startup_begin < 0 or r29_hook_begin <= r29_startup_begin:
+    errors.append("R29 startup thread publication boundary missing")
+else:
+    startup = r29[r29_startup_begin:r29_hook_begin]
+    order = [
+        startup.find("SetStereoBaseInstallState(State::Pending)"),
+        startup.find("CreateThread(nullptr, 0,"),
+        startup.find("if (!thread)"),
+        startup.find("SetStereoBaseInstallState(State::Failed)"),
+        startup.find("CloseHandle(thread)"),
+    ]
+    if min(order) < 0 or order != sorted(order):
+        errors.append("R29 startup boundary changed Pending/CreateThread/Failed/CloseHandle order")
+r29_apply_begin = r29.find("bool apply() override", r29_hook_begin)
+r29_apply_end = r29.find("static VRStereoR29Hook instance", r29_apply_begin)
+if r29_apply_begin < 0 or r29_apply_end <= r29_apply_begin:
+    errors.append("R29 hook apply boundary missing")
+else:
+    apply_body = r29[r29_apply_begin:r29_apply_end]
+    if "return R29StartInstallThread();" not in apply_body:
+        errors.append("R29 apply no longer delegates startup ownership")
+    for escaped in ("CreateThread(", "CloseHandle(", "SetStereoBaseInstallState("):
+        if escaped in apply_body:
+            errors.append(f"R29 apply regained startup ownership: {escaped}")
+
 for legacy in (
     "R26InstallState",
     "R29RendererState",
