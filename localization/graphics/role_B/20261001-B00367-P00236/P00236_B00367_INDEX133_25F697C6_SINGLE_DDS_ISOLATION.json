@@ -1,0 +1,79 @@
+{
+  "schema_version": 30,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00367",
+  "wave_id": "P00236",
+  "lane": "LOCALIZATION_B",
+  "branch": "korean-localization-clean",
+  "created_at_kst": "2026-10-01T17:21:00+09:00",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "isolation_mode": "DDS_ONLY",
+  "packaging_policy": {
+    "purpose": "OPTIONAL_RUNTIME_TEST_ARTIFACT_ONLY",
+    "candidate_location": "EXTERNAL_GOOGLE_DRIVE_CURRENT_PIPELINE",
+    "repository_packaging_status": "SKIP_TYPED_EXTERNAL_CANDIDATE_NOT_IN_GIT",
+    "note": "Manifest is the deterministic exact-hash input set. No runtime PASS is asserted and no candidate bytes are rewritten."
+  },
+  "schema": "outrun-b00367-p00236-index133-single-dds-isolation-v1",
+  "case_id": "P00236_B00367_25F697C6",
+  "purpose": "Provide an exact DDS_ONLY runtime-isolation input for the unchanged C175/Q00073 STATIC_QA_PASS_RUNTIME_UNTESTED index133 candidate without rerendering or repeating heavy candidate QA.",
+  "asset": {
+    "index": 133,
+    "id": "25F697C6",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds",
+    "raw_orientation": "flip_y",
+    "localized_physical_regions": 9
+  },
+  "source": {
+    "provenance": "C173/Q00071 independently accepted exact pinned v0.25.10a member",
+    "sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "header_128_sha256": "deb793ec8a3f308311c5c31845f9bec46553f6e34f61b6112d5160e78eef8089"
+  },
+  "candidate": {
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS",
+    "drive_account": "ezflash557",
+    "drive_folder_id": "14w7A7_C2oHWUNmD4iq73sr3nWYk6f6RA",
+    "drive_file_id": "1_XTpHRuI02HsMHS1ZoALx_CuLdeEb0wu",
+    "file_name": "25F697C6_512x512.dds",
+    "sha256": "6e5ee22dd4e8c986857e49e3e0f9308d3664d172a5fecb7c38e4ffcd33aa80fb",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "drive_metadata_rechecked_this_task": {
+      "exact_name": true,
+      "exact_size": true,
+      "parent_folder_id": "14w7A7_C2oHWUNmD4iq73sr3nWYk6f6RA"
+    }
+  },
+  "unchanged_fingerprint_proof": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00339",
+    "producer_result_sha": "9d0a36f8f6e951d955f10fc3bdefedd343edbeae",
+    "independent_c_task": "LOCALIZATION-LOCALIZATION_C-00349",
+    "c_static_qa_result_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
+    "c_batch": "Q00073",
+    "c_run": "C175",
+    "c_gate_run_id": 36788089100,
+    "c_gate_conclusion": "success",
+    "static_qa": "PASS",
+    "no_existing_single_dds_manifest_at_selection": true
+  },
+  "runtime_test_requirements": [
+    "Load only the 25F697C6 replacement DDS and confirm the affected front-end UI renders without a crash.",
+    "Capture readable/game-orientation evidence for all 9 localized regions.",
+    "Confirm FLIP_Y storage is interpreted correctly in game.",
+    "Check clipping, position, alpha/transparency, scaling, neighboring-region overlap and any 1-pixel overflow.",
+    "Confirm protected source artwork/text remains visually unchanged.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ]
+}

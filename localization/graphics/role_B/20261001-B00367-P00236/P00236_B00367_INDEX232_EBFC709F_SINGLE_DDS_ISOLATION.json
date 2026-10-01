@@ -1,0 +1,81 @@
+{
+  "schema_version": 30,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00367",
+  "wave_id": "P00236",
+  "lane": "LOCALIZATION_B",
+  "branch": "korean-localization-clean",
+  "created_at_kst": "2026-10-01T17:21:00+09:00",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "isolation_mode": "DDS_ONLY",
+  "packaging_policy": {
+    "purpose": "OPTIONAL_RUNTIME_TEST_ARTIFACT_ONLY",
+    "candidate_location": "EXTERNAL_GOOGLE_DRIVE_CURRENT_PIPELINE",
+    "repository_packaging_status": "SKIP_TYPED_EXTERNAL_CANDIDATE_NOT_IN_GIT",
+    "note": "Manifest is the deterministic exact-hash input set. No runtime PASS is asserted and no candidate bytes are rewritten."
+  },
+  "schema": "outrun-b00367-p00236-index232-single-dds-isolation-v1",
+  "case_id": "P00236_B00367_EBFC709F",
+  "purpose": "Provide an exact DDS_ONLY runtime-isolation input for the unchanged C175/Q00073 STATIC_QA_PASS_RUNTIME_UNTESTED index232 candidate without rerendering or repeating heavy candidate QA.",
+  "asset": {
+    "index": 232,
+    "id": "EBFC709F",
+    "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+    "raw_orientation": "flip_y",
+    "localized_physical_regions": 6,
+    "canonical_semantic_strings": 4
+  },
+  "source": {
+    "canonical_transport": "PINNED_V0.25.10A_RELEASE",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+    "sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+    "bytes": 8388736,
+    "dds": {
+      "width": 2048,
+      "height": 1024,
+      "format": "RGBA32",
+      "mipmaps": 1
+    }
+  },
+  "candidate": {
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS",
+    "drive_account": "ezflash557",
+    "drive_folder_id": "1RU3lfr7cYLdT4Jn2ADZqN8YPY10YiKeE",
+    "drive_file_id": "1aXXwPc92KyLm-w8r8nwC8qhLfg_-HdSc",
+    "file_name": "EBFC709F_512x256.dds",
+    "sha256": "41334c7d5ae5692e232fd9dfe25b75119419187f096566a8beae22eb74dc8026",
+    "bytes": 8388736,
+    "dds": {
+      "width": 2048,
+      "height": 1024,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "drive_metadata_rechecked_this_task": {
+      "exact_name": true,
+      "exact_size": true,
+      "parent_folder_id": "1RU3lfr7cYLdT4Jn2ADZqN8YPY10YiKeE"
+    }
+  },
+  "unchanged_fingerprint_proof": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00332",
+    "producer_result_sha": "20bc1533d6150c7217dee64c1286618c7bd3992f",
+    "independent_c_task": "LOCALIZATION-LOCALIZATION_C-00349",
+    "c_static_qa_result_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
+    "c_batch": "Q00073",
+    "c_run": "C175",
+    "c_gate_run_id": 36788089100,
+    "c_gate_conclusion": "success",
+    "static_qa": "PASS",
+    "no_existing_single_dds_manifest_at_selection": true
+  },
+  "runtime_test_requirements": [
+    "Load only the EBFC709F replacement DDS and confirm the affected front-end UI renders without a crash.",
+    "Capture readable/game-orientation evidence for all 6 localized physical regions.",
+    "Confirm FLIP_Y storage is interpreted correctly in game.",
+    "Check clipping, position, alpha/transparency, scaling, neighboring-region overlap and any 1-pixel overflow.",
+    "Confirm preserved artwork and non-localized regions remain visually unchanged.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ]
+}

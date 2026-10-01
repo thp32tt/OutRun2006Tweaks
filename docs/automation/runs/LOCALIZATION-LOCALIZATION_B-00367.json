@@ -1,0 +1,132 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-producer-b00367-runtime-isolation-fallback-v30",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00367",
+  "wave_id": "P00236",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCER_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T17:21:00+09:00",
+  "incoming_controller_schema_version": 29,
+  "incoming_controller_config_blob_sha": "f77f5b666753444e4c10d70d442138101f65f115",
+  "applied_controller_schema_version": 30,
+  "applied_controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "canonical_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+  "base_head_sha": "bcdfb8eb6900e2eebf9ea765f15108d4dafff26a",
+  "input_fingerprint": {
+    "asset_queue_blob_sha": "2c06c2b6ae303c385b62e0360dcda88a543f4a2f",
+    "canonical_progress_blob_sha": "2aaa9dc258f1527a5e8b0f51adef781c847448fc",
+    "resume_state_blob_sha": "2706b7fec8e64a3d4e2a47c6a2c8ab043da99f87",
+    "controller_roles_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "latest_c_static_qa_task": "LOCALIZATION-LOCALIZATION_C-00349",
+    "latest_c_static_qa_result_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
+    "latest_c_batch_gate_run_id": 36788089100
+  },
+  "policy_resolution": {
+    "resolution": "INCOMING_SCHEMA29_STALE_AT_EXECUTION__LATEST_HEAD_SCHEMA30_APPLIED",
+    "stale_cached_policy_used": false,
+    "schema30_material_effect_on_b_selection": false,
+    "stable_shard_rule": "asset_queue.index % 3 == 1",
+    "owning_shard_rows": 46,
+    "work_steal_allowed_for_this_task": false,
+    "candidate_completion_first": true,
+    "producer_batch_target_candidate_dds": 2,
+    "fallback_required_when_no_completion_tier_runnable": true,
+    "qa_pending_alone_does_not_stop_producer": true
+  },
+  "result": "PASS_MATERIAL_B_MOD3_RUNTIME_ISOLATION_FALLBACK_TWO_STATIC_PASS_CANDIDATES_RUNTIME_UNTESTED",
+  "summary": "Fresh B-shard scan found no runnable candidate-completion tier outside current QA-pending/newer-candidate and sticky dependency states. Rather than repeat the prior review-only hold, B00367 applies the mandatory fallback ladder and creates two new lane-local exact-hash DDS_ONLY runtime-isolation inputs for current C175/Q00073 STATIC_QA_PASS candidates index133/25F697C6 and index232/EBFC709F. Both exact candidate Drive identities/name/size/parent were rechecked; candidate bytes and heavy static QA are unchanged. No shared state, peer-lane files, candidate DDS, runtime state, VR/FFB/DX content, or N100/local workspace are modified. Runtime remains UNTESTED.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "owning_shard_rows": 46,
+    "completion_tier_scan": {
+      "direct_rework_required_runnable": [],
+      "explicit_render_next": [],
+      "render_ready": [],
+      "one_stage_to_render": [],
+      "existing_candidate_material_rework_runnable": []
+    },
+    "candidate_qa_pending_not_repeated": [
+      {
+        "index": 61,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+        "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6"
+      },
+      {
+        "index": 94,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+        "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f"
+      },
+      {
+        "index": 163,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+        "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f"
+      }
+    ],
+    "fallback_ladder_step": 3,
+    "selected_indices": [
+      133,
+      232
+    ],
+    "selected_action": "CREATE_LANE_LOCAL_DDS_ONLY_RUNTIME_ISOLATION_INPUTS",
+    "candidate_dds_completed": 0,
+    "fresh_completion_tier_exhaustion_proven": true,
+    "work_stolen_from_lane": null
+  },
+  "source_transport_diagnostic": {
+    "asset_index": 220,
+    "asset": "D657C2EB",
+    "approved_drive_exact_relative_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+    "drive_outcome": "SOURCE_TRANSPORT_MISS",
+    "pinned_direct_ref": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "pinned_direct_outcome": "SOURCE_TRANSPORT_MISS_404",
+    "release_fallback_outcome": "NOT_COMPLETED_TOOL_RUNTIME_LIMIT",
+    "terminal_source_classification": "NOT_SOURCE_ACQUISITION_EXHAUSTED",
+    "note": "The pinned 306223257-byte archive is present as a Project upload but exceeds the 100 MiB materialization limit and container/python execution was unavailable. This is a tooling transport limitation, not GitHub permission denial and not a source identity mismatch."
+  },
+  "material_deliverable": {
+    "type": "B_LANE_TWO_EXACT_HASH_DDS_ONLY_RUNTIME_ISOLATION_INPUTS",
+    "isolation_inputs_created": 2,
+    "indices": [
+      133,
+      232
+    ],
+    "files": [
+      "localization/graphics/role_B/20261001-B00367-P00236/P00236_B00367_INDEX133_25F697C6_SINGLE_DDS_ISOLATION.json",
+      "localization/graphics/role_B/20261001-B00367-P00236/P00236_B00367_INDEX232_EBFC709F_SINGLE_DDS_ISOLATION.json"
+    ],
+    "candidate_dds_modified": false,
+    "candidate_binary_persisted": false,
+    "static_qa_repeated": false,
+    "materially_reduces_unresolved_work": true,
+    "next_consumer": "C_BATCH_QA_FOR_ISOLATION_INPUT_ACCEPTANCE"
+  },
+  "candidate_dds_modified": false,
+  "material_change": true,
+  "review_record_only": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used_for_bytes": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_binding_state": "PENDING_POST_COMMIT_BIND",
+  "result_commit_message": "localization(B): add exact runtime isolation inputs [AUTO:LOCALIZATION-LOCALIZATION_B-00367]",
+  "durable_task_record_in_result_commit": true,
+  "producing_role": "LOCALIZATION_B"
+}
