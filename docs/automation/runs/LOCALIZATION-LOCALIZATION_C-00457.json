@@ -5,18 +5,52 @@
   "schema_version": 32,
   "wave_id": "Q00102",
   "target_branch": "korean-localization-clean",
-  "qa_inputs": [
-    "LOCALIZATION-LOCALIZATION_B-00377@cf19c8e03d67306523c4fc0936c1c02368c4baf8",
-    "LOCALIZATION-LOCALIZATION_A-00378@318c34fe1e21522b3b2846e6fd5828b97f4ae88a",
-    "LOCALIZATION-LOCALIZATION_E-00374@3c4a59cf0f538b0ddffd1e51d14537a9ccc643d6",
-    "LOCALIZATION-LOCALIZATION_A-00383@9e3f20a35072c1c2b0824a5a2183b974e13cf745"
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00377",
+      "result_sha": "cf19c8e03d67306523c4fc0936c1c02368c4baf8"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00378",
+      "result_sha": "318c34fe1e21522b3b2846e6fd5828b97f4ae88a"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_E-00374",
+      "result_sha": "3c4a59cf0f538b0ddffd1e51d14537a9ccc643d6"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00383",
+      "result_sha": "9e3f20a35072c1c2b0824a5a2183b974e13cf745"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00377",
+      "result_sha": "cf19c8e03d67306523c4fc0936c1c02368c4baf8",
+      "status": "PASS"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00378",
+      "result_sha": "318c34fe1e21522b3b2846e6fd5828b97f4ae88a",
+      "status": "PASS"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_E-00374",
+      "result_sha": "3c4a59cf0f538b0ddffd1e51d14537a9ccc643d6",
+      "status": "PASS"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00383",
+      "result_sha": "9e3f20a35072c1c2b0824a5a2183b974e13cf745",
+      "status": "PASS"
+    }
   ],
   "disposition": "PASS_STATIC_BATCH_REVIEW",
   "qa_scope": "TASK_ID@RESULT_SHA immutable input review",
-  "automation_validation": "PASS",
+  "automation_validation": "C_BATCH_GATE",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
-  "notes": "Reviewed producer result records. No runtime execution performed. Runtime success not asserted.",
+  "notes": "Consumed immutable TASK_ID@RESULT_SHA inputs only. No runtime execution performed. Runtime success not asserted.",
   "result_sha": null
 }
