@@ -128,6 +128,44 @@ def main() -> None:
         ],
         "validated D3D9 draw bridge",
     )
+    # The census is diagnostic-only, but every D3D9 draw family that the active
+    # bridge hooks must still feed observe_source_draw. Losing one family would
+    # silently weaken readiness evidence while the analyzer continues to report
+    # non-exhaustive coverage.
+    observed_draw_functions = [
+        "DrawPrimitiveDest",
+        "DrawIndexedPrimitiveDest",
+        "DrawPrimitiveUPDest",
+        "DrawIndexedPrimitiveUPDest",
+    ]
+    missing_observers: list[str] = []
+    for function_name in observed_draw_functions:
+        marker = f"HRESULT __stdcall {function_name}("
+        start = bridge.find(marker)
+        if start < 0:
+            missing_observers.append(function_name + ":missing-function")
+            continue
+        next_start = bridge.find("HRESULT __stdcall ", start + len(marker))
+        block = bridge[start:] if next_start < 0 else bridge[start:next_start]
+        if "outrun::vr::dx11::observe_source_draw(device, type);" not in block:
+            missing_observers.append(function_name + ":missing-observer")
+    if missing_observers:
+        raise SystemExit(
+            "DX11 census source-draw coverage drift: " + ", ".join(missing_observers)
+        )
+
+    draw_hook_wiring = [
+        "DrawPrimitiveHook=safetyhook::create_inline(vtable[DrawPrimitiveVtableIndex],DrawPrimitiveDest,disabled);",
+        "DrawIndexedPrimitiveHook=safetyhook::create_inline(vtable[DrawIndexedPrimitiveVtableIndex],DrawIndexedPrimitiveDest,disabled);",
+        "DrawPrimitiveUPHook=safetyhook::create_inline(vtable[DrawPrimitiveUPVtableIndex],DrawPrimitiveUPDest,disabled);",
+        "DrawIndexedPrimitiveUPHook=safetyhook::create_inline(vtable[DrawIndexedPrimitiveUPVtableIndex],DrawIndexedPrimitiveUPDest,disabled);",
+    ]
+    missing_hook_wiring = [token for token in draw_hook_wiring if token not in bridge]
+    if missing_hook_wiring:
+        raise SystemExit(
+            "DX11 census D3D9 draw-hook wiring drift: " + ", ".join(missing_hook_wiring)
+        )
+
     forbidden_bridge_tokens = [
         "vr/d3d11/native_backend.hpp",
         "vr/d3d11/native_shared_eye_ring.hpp",
