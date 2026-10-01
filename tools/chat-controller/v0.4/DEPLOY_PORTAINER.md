@@ -206,7 +206,7 @@ The localization stack now uses these controller-runtime values directly:
 - consecutive queue exceptions: 3 cycles -> process exit / Docker restart (signature is diagnostic only)
 - consecutive watchdog exceptions: 3 cycles -> process exit / Docker restart (signature is diagnostic only)
 - explicit ChatGPT rate-limit backoff: 90/180/300/600s; Git/Actions reconciliation continues during backoff
-- generic Retry: at most 2 controlled clicks, then same TASK_ID rolls over to a fresh project chat
+- generic Retry: at most 2 controlled clicks, then the same TASK_ID/chat enters a 300s cooldown; it does not open a fresh chat. If the assistant text is a GitHub/plugin tooling refusal, same-chat GitHub-plugin recovery preempts generic Retry.
 
 On startup, required mode-specific prompt assets are validated before any browser dispatch, then persisted nonterminal queue records are reconciled against Git before UI recovery. Localization lane-local exceptions are isolated: A/B/C/E continue independently, with repeated lane-local failures bounded to 3 occurrences while browser transport failure remains a whole-container restart condition. Queue and registry JSON keep last-known-good backups and are restored from backup on primary-file corruption/missing-primary cases; the controller refuses a destructive empty reset when both copies are unreadable. Daily logical-date rollover preserves active slot URLs and send/rate state. A prompt that was already submitted is always represented by an active TASK_ID even when a rate-limit/Retry surface appears immediately after send, preventing orphan work and TASK_ID reuse.
 
