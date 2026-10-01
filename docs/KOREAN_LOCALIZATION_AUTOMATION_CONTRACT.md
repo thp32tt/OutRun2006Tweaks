@@ -249,6 +249,7 @@ A missing `docs/automation/runs/<TASK_ID>.json` is **not** evidence that no work
 
 ## No-action suppression and C batching
 - Repeated no-action producer tasks are forbidden. A/B terminal results named `NO_ACTION`, `BLOCKED_NO_ACTION`, or equivalent zero-output states are invalid while any graphics work remains.
+- `qa_pending` and `CANDIDATE_AWAITING_C` describe C-consumer backlog only. They are never producer stop signals. A/B/E must continue a fresh full scan of their own shard and select the next runnable completion-tier or mandatory-fallback material task; C backlog may suppress duplicate work on the same immutable candidate, but must not suppress unrelated producer work.
 - If a lane has no immediately runnable DDS after dependency-blocked skips, it MUST execute the mandatory fallback ladder and commit a material deliverable. A unique controller TASK_ID still requires its durable task record, but that record must accompany the material deliverable rather than replace it.
 - C is batch-oriented and independent. Default controller target is up to 4 immutable producer results per C task, with a 60-second coalesce window; this batching does not pause producers.
 - C should inspect each unique asset/candidate fingerprint once per batch, reuse unchanged PASS evidence, and update shared state once for the entire batch.
