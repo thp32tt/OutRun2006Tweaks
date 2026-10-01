@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-02T04:52:00+09:00",
+  "updatedKst": "2026-10-02T04:59:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -41,7 +41,7 @@
     "VR-REFACTOR-STATE-0004C",
     "VR-REFACTOR-STATE-0004D"
   ],
-  "next": "Validate the R29 mono-safety owner boundary with policy, active R26+HUD, R34 full-chain, host and package gates. If green, review lower-layer telemetry counters separately; do not fold telemetry ownership into this runtime-safety change.",
+  "next": "Continue from validated 0004D by reviewing lower-layer telemetry counter ownership separately from runtime-safety behavior. Preserve hot-path cost and require exact-SHA CI for each source batch.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -67,15 +67,17 @@
     "VR-REFACTOR-STATE-0004C removes R31's last direct R22 raster-shadow read by exposing inline TryGetTrackedViewport on the R22 owner boundary. It preserves the same cached-viewport test and only falls back to IDirect3DDevice9::GetViewport when the tracked snapshot is invalid.",
     "VR-REFACTOR-STATE-0004D replaces eight R31 direct calls to the private R29ArmMonoSafety helper with inline R29 owner API ArmStereoRecoverySafety. The wrapper forwards the same default two-present safety horizon and adds no extra runtime work after inlining."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0004D_APPLIED_CI_PENDING",
-  "validatedSourceSha": "e6638906d49fd12c872b0cffac5b1753d6a62ad4",
-  "validationRunId": 36916399580,
+  "batchStatus": "VR-REFACTOR-STATE-0004D_BUILD_VERIFIED",
+  "validatedSourceSha": "70566be7bb7935cdca42c7cf3ac1c4cd194073b5",
+  "validationRunId": 36917503526,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
     "host": "SUCCESS",
     "game": "SUCCESS",
     "fullChainCompile": "SUCCESS",
-    "package": "SUCCESS"
+    "package": "SUCCESS",
+    "domainIsolation": "SUCCESS",
+    "hudInspector": "SUCCESS"
   }
 }
