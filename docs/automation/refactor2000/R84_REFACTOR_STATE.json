@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 744,
+  "cycle": 756,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -113,11 +113,14 @@
     "R84-REF-LIFECYCLE-0035",
     "R84-REF-LIFECYCLE-0036",
     "R84-REF-LIFECYCLE-0037",
-    "R84-REF-HOOKSET-0005"
+    "R84-REF-HOOKSET-0005",
+    "R84-REF-HOOKSET-0006",
+    "R84-REF-HOOKSET-0007",
+    "R84-REF-HOOKSET-0008"
   ],
-  "next": "Cycles 745-747: inspect R33 disabled hook create/enable/rollback transaction ownership and failure publication; preserve exact hook order, R32 authority fallback and R26+R30 protected graph; APPLY_GATE at 747.",
-  "updatedKst": "2026-10-02T07:34:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_744_CHECKPOINT",
+  "next": "Cycles 757-759: inspect R31 draw-hook enable/rollback transaction ownership separately from StateBlock physical hook ownership; do not alter StateBlock Apply/Begin/End synchronization; APPLY_GATE at 759.",
+  "updatedKst": "2026-10-02T07:39:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_756_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -177,6 +180,10 @@
     "Cycles 733-735 R84-REF-LIFECYCLE-0036: R32 install-state publication ownership isolated behind R32PublishInstallState; release ordering and Pending/Failed/Ready paths preserved. APPLY_GATE 735 SOURCE_CHANGED=YES commit 71e0d54d75f62874957fe7f146e2d83704f4abed [skip ci]. Runtime UNTESTED.",
     "Cycles 736-738 R84-REF-LIFECYCLE-0037: R33 prerequisite 4800x25ms policy named without changing R32 readiness/failure semantics. APPLY_GATE 738 SOURCE_CHANGED=YES commit 997d888b1aa56a20409933c94766c1e9644662ff [skip ci]. Runtime UNTESTED.",
     "Cycles 739-741 R84-REF-HOOKSET-0004: R34 prerequisite 4800x25ms policy named; R33 dependency and Reset guard behavior unchanged. APPLY_GATE 741 SOURCE_CHANGED=YES commit 32dfe769b478ffb277ff65cb96ebdba3c4a7d5e8 [skip ci]. Runtime UNTESTED.",
-    "Cycles 742-744 R84-REF-HOOKSET-0005: R34 disabled-first hook creation isolated in R34CreateDisabledHooks; exact Reset/Present/DP/DIP/DPUP/DIPUP creation order and existing enable/rollback remain unchanged. APPLY_GATE 744 SOURCE_CHANGED=YES commit 8f17fc5c82a09e4709acf9e4aaed68786eb4bb7c [skip ci]. Runtime UNTESTED."
+    "Cycles 742-744 R84-REF-HOOKSET-0005: R34 disabled-first hook creation isolated in R34CreateDisabledHooks; exact Reset/Present/DP/DIP/DPUP/DIPUP creation order and existing enable/rollback remain unchanged. APPLY_GATE 744 SOURCE_CHANGED=YES commit 8f17fc5c82a09e4709acf9e4aaed68786eb4bb7c [skip ci]. Runtime UNTESTED.",
+    "Cycles 745-747 R84-REF-HOOKSET-0006: R33 create+enable+rollback grouped under R33InstallHookTransaction; exact transaction order and R32-authoritative failure fallback preserved. APPLY_GATE 747 SOURCE_CHANGED=YES commit d79170ac973304f64f2d0293592ee3baf8907890 [skip ci]. Runtime UNTESTED.",
+    "Cycles 748-750 R84-REF-HOOKSET-0007: R34 create+enable+rollback grouped under R34InstallHookTransaction; Reset guard post-install health synchronization remains after successful transaction. APPLY_GATE 750 SOURCE_CHANGED=YES commit 23ea3c26813db09b2d7f15ce44cbd7a20891ae40 [skip ci]. Runtime UNTESTED.",
+    "Cycles 751-753 R84-REF-STATE-0004: R31 install-state publication isolated behind R31PublishInstallState; release ordering and all Pending/Failed/Ready routes preserved. APPLY_GATE 753 SOURCE_CHANGED=YES commit 6e7bfe51865e0139d367a2d3c1681f757e06dfd8 [skip ci]. Runtime UNTESTED.",
+    "Cycles 754-756 R84-REF-HOOKSET-0008: R31 disabled draw-hook creation isolated in R31CreateDisabledDrawHooks; DP/DIP/DPUP/DIPUP order unchanged and StateBlock hook setup untouched. First write attempt hit transient RemoteProtocolError; HEAD re-read confirmed no commit, retry succeeded commit 5cc34048e5712b69ed170dec59fdc1408b200c3f [skip ci]. Runtime UNTESTED."
   ]
 }
