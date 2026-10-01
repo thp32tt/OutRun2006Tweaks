@@ -221,6 +221,56 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('TASK_RESULT_FILE_MISSING', SOURCE)
         self.assertIn("'커밋할 변경 없음'은 종료 사유가 아니다", SOURCE)
 
+    def test_startup_and_watchdog_recovery_use_no_work_guard(self):
+        self.assertIn('def localization_reconcile_producer_commit_without_ui(', SOURCE)
+        self.assertGreaterEqual(
+            SOURCE.count('localization_reconcile_producer_commit_without_ui('), 3
+        )
+        self.assertIn('producer-no-work-rearmed:', SOURCE)
+        self.assertIn('NO_WORK_GUARD_REARMED_STARTUP', SOURCE.replace('f"NO_WORK_GUARD_REARMED_{source}"', 'NO_WORK_GUARD_REARMED_STARTUP'))
+
+    def test_sync_reconcile_keeps_same_task_when_no_work_is_rejected(self):
+        finalize = Mock()
+        invalidate = Mock()
+        f, _ = load_function(
+            'localization_reconcile_producer_commit_without_ui',
+            localization_validate_producer_result_commit=Mock(
+                return_value=(False, ['FINAL_ARTWORK_INCOMPLETE:0/95'], {})
+            ),
+            finalize_localization_producer_commit=finalize,
+            invalidate_task_commit_cache=invalidate,
+        )
+        active = dict(
+            task_id='TASK-1',
+            branch='korean-localization-clean',
+            slot='A',
+            lane='LOCALIZATION_A',
+            phase='WAIT_ACTIONS',
+            attempt=1,
+            terminal=None,
+            result_sha='old',
+            completed_at='old',
+            batch_validation_pending=True,
+            wait_actions_started_at='old',
+        )
+        accepted = f(
+            {'completed': []},
+            active,
+            {'sha': 'b' * 40, 'message': 'review only'},
+            datetime.now(timezone.utc),
+            'STARTUP',
+        )
+        self.assertFalse(accepted)
+        self.assertEqual(active['task_id'], 'TASK-1')
+        self.assertEqual(active['attempt'], 1)
+        self.assertEqual(active['phase'], 'WAIT_CHAT')
+        self.assertIsNone(active['result_sha'])
+        self.assertIn('FINAL_ARTWORK_INCOMPLETE:0/95', active['producer_no_work_guard_reasons'])
+        self.assertEqual(active['failure_context'], 'NO_WORK_GUARD_REARMED_STARTUP')
+        self.assertNotIn('completed_at', active)
+        finalize.assert_not_called()
+        invalidate.assert_called_once()
+
     def test_no_progress_is_handled_even_when_send_deferred(self):
         self.assertTrue('queue_handle_native_response' in FUNCTIONS)
         f, ns = load_function('queue_handle_native_response', queue_send_github_recovery=AsyncMock(return_value=False))
