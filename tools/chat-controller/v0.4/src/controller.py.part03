@@ -477,6 +477,10 @@ def assistant_claims_github_tooling_absent(text: str) -> bool:
         "인터페이스가 노출",
         "호출 인터페이스",
         "실제 github 호출 인터페이스",
+        "노출된 도구 목록",
+        "도구 목록에는",
+        "함수가 로드되어 있지",
+        "함수 로드",
         "tool schema",
         "function schema",
         "not exposed",
@@ -510,6 +514,10 @@ def assistant_claims_github_tooling_absent(text: str) -> bool:
         "진행하지 않겠습니다",
         "진행하지 않겠",
         "진행하지 않음",
+        "진행할 수 없",
+        "단계까지 진행할 수 없",
+        "직접 읽는 단계까지",
+        "로드되어 있지",
         "cannot",
         "can't",
         "unable",
@@ -558,6 +566,22 @@ def assistant_claims_github_tooling_absent(text: str) -> bool:
     if tooling and no_progress_hits:
         return True
     if durable_absence and (no_progress_hits or task_block_hits >= 2):
+        return True
+
+    generic_negative = any(
+        p in lowered
+        for p in (
+            "되어 있지 않아",
+            "되어 있지 않",
+            "할 수 없습니다",
+            "할 수 없다",
+            "미완료",
+            "미수행",
+            "없음",
+            "not available",
+        )
+    )
+    if generic_negative and task_block_hits >= 2:
         return True
     return no_progress_hits >= 2 and task_block_hits >= 2
 
