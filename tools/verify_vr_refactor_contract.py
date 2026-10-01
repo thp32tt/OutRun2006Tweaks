@@ -183,6 +183,46 @@ if "attempt < R30PrerequisiteWaitAttempts" not in r30 or \
 if "R30ClassifyPrerequisite(StereoBaseInstallState())" not in r30:
     errors.append("R30 install thread bypassed prerequisite classification boundary")
 
+transaction_begin = r30.find("bool R30InstallHookTransaction() noexcept")
+transaction_end = r30.find("void R30PublishInstallResult(", transaction_begin)
+install_begin = r30.find("DWORD WINAPI R30InstallThread(")
+if transaction_begin < 0 or transaction_end <= transaction_begin:
+    errors.append("R30 disabled-first hook transaction ownership boundary missing")
+else:
+    transaction = r30[transaction_begin:transaction_end]
+    create_markers = [
+        "R30PresentR29Hook = safetyhook::create_inline(",
+        "R30ResetR29Hook = safetyhook::create_inline(",
+        "R30DrawPrimitiveR29Hook = safetyhook::create_inline(",
+        "R30DrawIndexedPrimitiveR29Hook = safetyhook::create_inline(",
+        "R30DrawPrimitiveUPR29Hook = safetyhook::create_inline(",
+        "R30DrawIndexedPrimitiveUPR29Hook = safetyhook::create_inline(",
+    ]
+    create_positions = [transaction.find(marker) for marker in create_markers]
+    if min(create_positions) < 0 or create_positions != sorted(create_positions):
+        errors.append("R30 hook transaction changed disabled-first creation order")
+    enable_pos = transaction.find("if (R30EnableHooks())")
+    rollback_pos = transaction.find("R30RollbackHooks()", enable_pos)
+    if enable_pos < 0 or rollback_pos <= enable_pos:
+        errors.append("R30 hook transaction lost enable-then-rollback behavior")
+
+if install_begin < 0:
+    errors.append("R30 install thread missing")
+else:
+    install_thread = r30[install_begin:]
+    if "if (!R30InstallHookTransaction())" not in install_thread:
+        errors.append("R30 install thread bypassed hook transaction boundary")
+    for marker in (
+        "R30PresentR29Hook = safetyhook::create_inline(",
+        "R30ResetR29Hook = safetyhook::create_inline(",
+        "R30DrawPrimitiveR29Hook = safetyhook::create_inline(",
+        "R30DrawIndexedPrimitiveR29Hook = safetyhook::create_inline(",
+        "R30DrawPrimitiveUPR29Hook = safetyhook::create_inline(",
+        "R30DrawIndexedPrimitiveUPR29Hook = safetyhook::create_inline(",
+    ):
+        if marker in install_thread:
+            errors.append(f"R30 install thread regained hook creation ownership: {marker}")
+
 for legacy in (
     "R29StableStereoBase",
     "R29FragileEffectCached",

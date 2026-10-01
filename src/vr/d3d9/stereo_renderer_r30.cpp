@@ -3108,6 +3108,35 @@ namespace OutRunVRStereo
             return true;
         }
 
+        bool R30InstallHookTransaction() noexcept
+        {
+            const auto disabled = safetyhook::InlineHook::StartDisabled;
+            R30PresentR29Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&PresentDest),
+                PresentDestR30, disabled);
+            R30ResetR29Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&ResetDest),
+                ResetDestR30, disabled);
+            R30DrawPrimitiveR29Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawPrimitiveDestR29),
+                DrawPrimitiveDestR30, disabled);
+            R30DrawIndexedPrimitiveR29Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR29),
+                DrawIndexedPrimitiveDestR30, disabled);
+            R30DrawPrimitiveUPR29Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawPrimitiveUPDestR29),
+                DrawPrimitiveUPDestR30, disabled);
+            R30DrawIndexedPrimitiveUPR29Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR29),
+                DrawIndexedPrimitiveUPDestR30, disabled);
+
+            if (R30EnableHooks())
+                return true;
+
+            R30RollbackHooks();
+            return false;
+        }
+
         void R30PublishInstallResult(
             R30InstallStateValue state, bool success) noexcept
         {
@@ -3159,29 +3188,8 @@ namespace OutRunVRStereo
 
                 if (prerequisite == R30PrerequisiteDecision::Install)
                 {
-                    const auto disabled = safetyhook::InlineHook::StartDisabled;
-                    R30PresentR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&PresentDest),
-                        PresentDestR30, disabled);
-                    R30ResetR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&ResetDest),
-                        ResetDestR30, disabled);
-                    R30DrawPrimitiveR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveDestR29),
-                        DrawPrimitiveDestR30, disabled);
-                    R30DrawIndexedPrimitiveR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR29),
-                        DrawIndexedPrimitiveDestR30, disabled);
-                    R30DrawPrimitiveUPR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveUPDestR29),
-                        DrawPrimitiveUPDestR30, disabled);
-                    R30DrawIndexedPrimitiveUPR29Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR29),
-                        DrawIndexedPrimitiveUPDestR30, disabled);
-
-                    if (!R30EnableHooks())
+                    if (!R30InstallHookTransaction())
                     {
-                        R30RollbackHooks();
                         R30RollbackBufferShadowHooks();
                         R30PublishInstallResult(State::Failed, false);
                         spdlog::error(
