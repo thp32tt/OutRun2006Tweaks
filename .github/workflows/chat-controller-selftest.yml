@@ -98,6 +98,20 @@ jobs:
           grep -Fq 'Docker restart policy can recover' /tmp/controller.py
           test "$(grep -Fc 'if is_browser_transport_failure(e):' /tmp/controller.py)" -ge 3
 
+      - name: Verify GitHub refusal preempts generic Retry
+        run: |
+          grep -Fq 'status="github_recovery_preempted_retry"' /tmp/controller.py
+          python - <<'PY2'
+          from pathlib import Path
+          src=Path('/tmp/controller.py').read_text(encoding='utf-8')
+          a=src.index('async def queue_handle_retry_surface')
+          b=src.index('def assistant_claims_github_unavailable', a)
+          body=src[a:b]
+          assert body.index('assistant_text = await last_assistant_text(page)') < body.index('if await click_retry_generation(page):')
+          assert body.index('assistant_claims_github_tooling_absent(assistant_text)') < body.index('if await click_retry_generation(page):')
+          print('GitHub refusal recovery preempts generic Retry')
+          PY2
+
       - name: Verify bounded generic Retry recovery
         run: |
           grep -Fq 'GENERIC_RETRY_ROLLOVER_CLICKS: "2"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
