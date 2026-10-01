@@ -1,0 +1,115 @@
+{
+  "schema_version": 23,
+  "schema": "outrun-b00357-rollover5-durable-result-reconcile-v23",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00357",
+  "wave_id": "P00226",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "origin_controller_schema_version": 22,
+  "origin_controller_config_blob_sha": "be640c0c2806985743b8fc41b90a16025c590cf8",
+  "current_controller_schema_version": 23,
+  "current_controller_config_blob_sha": "0c6498a84619421a9c306354561b9e5a86645c8f",
+  "current_canonical_contract_blob_sha": "874e79a51843a24e891776b6d13f1f292e06b5c7",
+  "refreshed_head_before_reconcile": "e0310a8835f2260f9b77fec500b93e305dd86260",
+  "authoritative_result_sha": "46bd3970276de8e6300d971024ec04ce2e9e9d98",
+  "result_binding_commit_sha": "2969ab4d180a454078c3f99e26933adcbfd32737",
+  "result_commit_message": "localization(B): record zero-runnable shard hold [AUTO:LOCALIZATION-LOCALIZATION_B-00357]",
+  "reconciliation_result": "TASK_ALREADY_DURABLE_NO_DUPLICATE_PRODUCER_WORK_Q00074_PASS_LATEST_HEAD_RECHECK",
+  "review_summary": "Rollover-5 reconstructed B00357 from an immutable GitHub snapshot at the current korean-localization-clean HEAD and reapplied controller schema 23/blob 0c6498a8... plus canonical automation contract. B00357's producer result 46bd3970... remains durable and must not be re-executed. Latest independent C authority C00356/Q00074 is PASS; it supersedes only the historical B00342 patch-only input while preserving the newer index61 candidate as QA_PENDING and leaves runnable production unchanged. Current shared graphics throughput state reports candidate_awaiting_c [61,159,198,201], candidate_rework_required [], runnable_production [], with no new B-owned DIRECT_REWORK_REQUIRED/RENDER_READY/ONE_STAGE_TO_RENDER completion-tier item opened since rollover-4. Therefore DDS production, source acquisition, preflight expansion, shared-state mutation, and runtime testing are intentionally not repeated. This unique review record is the only rollover-5 change.",
+  "policy_refresh": {
+    "stale_prompt_schema_rejected": true,
+    "current_schema_applied_for_reconcile": 23,
+    "durable_git_precedes_ui_recovery": true,
+    "completed_task_reexecution_forbidden": true,
+    "producer_skip_qa_pending_assets": true,
+    "candidate_completion_first_policy_preserved": true,
+    "fresh_snapshot_ref": "e0310a8835f2260f9b77fec500b93e305dd86260"
+  },
+  "current_authority": {
+    "latest_checked_c_task_id": "LOCALIZATION-LOCALIZATION_C-00356",
+    "latest_checked_c_batch": "Q00074",
+    "latest_c_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
+    "latest_c_validation_bearing_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
+    "latest_c_automation_validation": "PASS",
+    "latest_c_runtime_validation": "UNTESTED",
+    "q00074_index61": "KEEP_CURRENT_B00342_89231474_CANDIDATE_QA_PENDING",
+    "q00074_runnable_production": "UNCHANGED_BY_THIS_BATCH",
+    "shared_throughput_kpis": {
+      "production_complete": {
+        "new_this_batch": 2,
+        "retained_authoritative_static_qa_indices": [
+          51,
+          97,
+          99,
+          102,
+          112,
+          121,
+          130,
+          133,
+          152,
+          163,
+          193,
+          195,
+          222,
+          226,
+          231,
+          232,
+          237
+        ]
+      },
+      "candidate_awaiting_c": [
+        61,
+        159,
+        198,
+        201
+      ],
+      "candidate_rework_required": [],
+      "runnable_production": [],
+      "blocked_exception": [
+        54,
+        55,
+        147,
+        154
+      ],
+      "runtime_validated": []
+    },
+    "b_owned_qa_pending_not_repeated": [
+      61
+    ],
+    "b00347_candidates_not_repeated": [
+      94,
+      163
+    ]
+  },
+  "producer_work_repeated": false,
+  "candidate_dds_modified": false,
+  "candidate_binary_persisted": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "material_change": false,
+  "review_record_only": true,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "evidence": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00357.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00357-rollover4-reconcile.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00356.json",
+    "localization/controller_roles.json",
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/progress.json",
+    "localization/resume_state.json",
+    "localization/graphics/asset_queue.csv"
+  ],
+  "note": "Conversation rollover does not increment ATTEMPT. This bookkeeping/review record does not replace immutable B00357 RESULT_SHA 46bd3970.... Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE. No real-game test was performed; RUNTIME_VALIDATION=UNTESTED."
+}
