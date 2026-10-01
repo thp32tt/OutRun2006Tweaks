@@ -940,6 +940,23 @@ namespace OutRunVRStereo
             return R31PrerequisiteDecision::Wait;
         }
 
+        void R31CreateDisabledDrawHooks() noexcept
+        {
+            const auto disabled = safetyhook::InlineHook::StartDisabled;
+            R31DrawPrimitiveR30Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawPrimitiveDestR30),
+                DrawPrimitiveDestR31, disabled);
+            R31DrawIndexedPrimitiveR30Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR30),
+                DrawIndexedPrimitiveDestR31, disabled);
+            R31DrawPrimitiveUPR30Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawPrimitiveUPDestR30),
+                DrawPrimitiveUPDestR31, disabled);
+            R31DrawIndexedPrimitiveUPR30Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30),
+                DrawIndexedPrimitiveUPDestR31, disabled);
+        }
+
         void R31PublishInstallState(
             OutRunVR::RuntimeEligibility::InstallState state) noexcept
         {
@@ -968,19 +985,7 @@ namespace OutRunVRStereo
 
                 if (prerequisite == R31PrerequisiteDecision::Install)
                 {
-                    const auto disabled = safetyhook::InlineHook::StartDisabled;
-                    R31DrawPrimitiveR30Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveDestR30),
-                        DrawPrimitiveDestR31, disabled);
-                    R31DrawIndexedPrimitiveR30Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR30),
-                        DrawIndexedPrimitiveDestR31, disabled);
-                    R31DrawPrimitiveUPR30Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveUPDestR30),
-                        DrawPrimitiveUPDestR31, disabled);
-                    R31DrawIndexedPrimitiveUPR30Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30),
-                        DrawIndexedPrimitiveUPDestR31, disabled);
+                    R31CreateDisabledDrawHooks();
 
                     if (!R31EnableDrawHooks())
                     {

@@ -345,6 +345,11 @@ if r34.count("const auto disabled = safetyhook::InlineHook::StartDisabled;") != 
 if "R34CreateDisabledHooks();" not in r34:
     errors.append("R34 install thread bypassed disabled hook creation boundary")
 
+if "void R31CreateDisabledDrawHooks() noexcept" not in r31:
+    errors.append("R31 disabled draw-hook creation boundary missing")
+if "R31CreateDisabledDrawHooks();" not in r31:
+    errors.append("R31 install thread bypassed disabled draw-hook creation boundary")
+
 if "void R31PublishInstallState(" not in r31:
     errors.append("R31 install-state publication boundary missing")
 if r31.count("R31InstallState.store(") != 1:
