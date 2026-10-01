@@ -18,9 +18,12 @@ namespace OutRunVR::State
 
         static void Configure(BeginFn begin, EndFn end, ApplyFn apply) noexcept
         {
-            BeginCallback().store(begin, std::memory_order_release);
+            // Publish terminal callbacks before Begin. Once R22 becomes the
+            // single physical owner it may already be dispatching events while
+            // R31 registers; a visible Begin must never lack its matching End.
             EndCallback().store(end, std::memory_order_release);
             ApplyCallback().store(apply, std::memory_order_release);
+            BeginCallback().store(begin, std::memory_order_release);
         }
 
         static bool Configured() noexcept

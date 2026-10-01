@@ -118,6 +118,24 @@ for marker in (
     if marker not in state_block_events:
         errors.append(f"StateBlockEvents missing API marker: {marker}")
 
+configure_events = re.search(
+    r"static void Configure\(BeginFn begin, EndFn end, ApplyFn apply\) noexcept\s*\{(?P<body>.*?)\n        \}",
+    state_block_events,
+    re.DOTALL,
+)
+if not configure_events:
+    errors.append("StateBlockEvents Configure body missing")
+else:
+    configure_body = configure_events.group("body")
+    begin_publish = configure_body.find("BeginCallback().store")
+    end_publish = configure_body.find("EndCallback().store")
+    apply_publish = configure_body.find("ApplyCallback().store")
+    if min(begin_publish, end_publish, apply_publish) < 0:
+        errors.append("StateBlockEvents callback publication marker missing")
+    elif not (end_publish < begin_publish and apply_publish < begin_publish):
+        errors.append(
+            "StateBlockEvents must publish End/Apply callbacks before Begin")
+
 for marker in (
     "class StateBlockRecovery",
     "Configure(",
