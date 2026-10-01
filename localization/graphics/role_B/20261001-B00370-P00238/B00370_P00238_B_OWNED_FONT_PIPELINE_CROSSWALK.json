@@ -1,0 +1,275 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-b00370-p00238-b-owned-font-pipeline-static-source-crosswalk-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00370",
+  "wave_id": "P00238",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-10-01T17:53:40+09:00",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "selected_indices": [
+      16,
+      19,
+      22
+    ],
+    "selected_assets": [
+      "23DDB6EC",
+      "B3ED3652",
+      "E86D77E8"
+    ],
+    "selected_action": "FALLBACK_5_FONT_PIPELINE_STATIC_DESCRIPTOR_AND_PINNED_SOURCE_CROSSWALK",
+    "candidate_completion_tier_scan": {
+      "direct_rework_required_runnable": [],
+      "render_ready": [],
+      "one_stage_to_render": [],
+      "existing_candidate_material_rework_runnable": []
+    },
+    "candidate_qa_pending_not_repeated": [
+      {
+        "index": 61,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+        "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6"
+      },
+      {
+        "index": 94,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+        "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f"
+      },
+      {
+        "index": 163,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+        "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f"
+      }
+    ],
+    "other_pending_producer_inputs_not_repeated": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00365",
+        "indices": [
+          52,
+          220
+        ],
+        "state": "PREFLIGHT_PENDING_C"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00367",
+        "indices": [
+          133,
+          232
+        ],
+        "state": "RUNTIME_ISOLATION_INPUT_PENDING_C"
+      }
+    ],
+    "fresh_completion_tier_exhaustion_proven": true,
+    "work_stolen_from_lane": null
+  },
+  "dependency_fingerprints": {
+    "controller_roles_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "stock_font_map_blob_sha": "cf028d506c360fa912b178077f11aced032ebf5d",
+    "hangul_glyph_manifest_blob_sha": "102defd4139490c7b620acd3de9d3acf64318d91"
+  },
+  "source_transport": {
+    "google_drive": {
+      "account": "ezflash557",
+      "approved_font_folder_id": "1ShehW83ZpvX1N6Y65VMCRM9DWV-465_W",
+      "observed_children": [
+        "6B8ED9DA_256x128.dds"
+      ],
+      "exact_target_outcomes": {
+        "23DDB6EC_512x512.dds": "SOURCE_TRANSPORT_MISS",
+        "B3ED3652_512x256.dds": "SOURCE_TRANSPORT_MISS",
+        "E86D77E8_256x128.dds": "SOURCE_TRANSPORT_MISS"
+      },
+      "write_performed": false
+    },
+    "pinned_direct": {
+      "repository": "envido32/OR2006Sprites",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "paths": [
+        {
+          "index": 16,
+          "path": "Release/spr_font_xst/23DDB6EC_512x512.dds",
+          "git_blob_sha1": "a83c1afc529a906d437514d6bd55971888dee099"
+        },
+        {
+          "index": 19,
+          "path": "Release/spr_font_xst/B3ED3652_512x256.dds",
+          "git_blob_sha1": "3209996de4248741b513af43e4570c10e037e95d"
+        },
+        {
+          "index": 22,
+          "path": "Release/spr_font_xst/E86D77E8_256x128.dds",
+          "git_blob_sha1": "1fc96888d3089639c086cd9245944cf0abc019bf"
+        }
+      ]
+    },
+    "pinned_release": {
+      "archive": "OR2-HD-GUI-v0.25.10a.zip",
+      "size": 306223257,
+      "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "identity": "PASS_EXACT_PINNED_BUNDLE"
+    }
+  },
+  "manifest": {
+    "glyph_count": 505,
+    "page_count": 2,
+    "page_capacity": 256,
+    "grid": {
+      "columns": 16,
+      "rows": 16
+    }
+  },
+  "targets": [
+    {
+      "index": 16,
+      "asset_hash": "23DDB6EC",
+      "path": "textures/load/spr_font_xst/23DDB6EC_512x512.dds",
+      "canonical_inventory": {
+        "sha256": "87b794dea360e23aad2a0029fb349b7b4e2a8bd0167db63fbfa1f8d3bdf8dd88",
+        "width": 2048,
+        "height": 2048,
+        "decoded_mode": "RGBA"
+      },
+      "stock_runtime_descriptor": {
+        "descriptor_index": 2,
+        "resource_handle": 3,
+        "cell": [
+          30,
+          30
+        ],
+        "base_code": 32,
+        "letter_spacing": 0,
+        "stock_dds_size": [
+          512,
+          512
+        ],
+        "stock_dds_format": "DXT3"
+      },
+      "release_member": {
+        "bytes": 4194432,
+        "sha256": "87b794dea360e23aad2a0029fb349b7b4e2a8bd0167db63fbfa1f8d3bdf8dd88",
+        "git_blob_sha1": "a83c1afc529a906d437514d6bd55971888dee099",
+        "width": 2048,
+        "height": 2048,
+        "format": "DXT5",
+        "mip_count": 1,
+        "header128_sha256": "af65a2ae2c97917b2faac93347616876dbfe2010750f7c6c9bb6dc3c6a2f3c5a"
+      },
+      "source_outcome": "SOURCE_ACQUIRED_EXACT_CANONICAL",
+      "production_readiness": "PREFLIGHT_ONLY_EXACT_SOURCE_READY_RUNTIME_FONT_HANDLE_USAGE_BLOCKED"
+    },
+    {
+      "index": 19,
+      "asset_hash": "B3ED3652",
+      "path": "textures/load/spr_font_xst/B3ED3652_512x256.dds",
+      "canonical_inventory": {
+        "sha256": "a739c657091f99e8f5fd3f636cccc49beace7aac819c23d2baf33b951813b842",
+        "width": 512,
+        "height": 256,
+        "decoded_mode": "RGBA"
+      },
+      "stock_runtime_descriptor": {
+        "descriptor_index": 3,
+        "resource_handle": 4,
+        "cell": [
+          26,
+          26
+        ],
+        "base_code": 32,
+        "letter_spacing": 0,
+        "stock_dds_size": [
+          512,
+          256
+        ],
+        "stock_dds_format": "DXT3"
+      },
+      "release_member": {
+        "bytes": 2097280,
+        "sha256": "cfe5d8c43f3af0571eca51ef16eec331599ba7aa7c1ba512c6d7d5ddd8560bb2",
+        "git_blob_sha1": "3209996de4248741b513af43e4570c10e037e95d",
+        "width": 2048,
+        "height": 1024,
+        "format": "DXT5",
+        "mip_count": 1,
+        "header128_sha256": "cc9086ff5a7f0292352ff32bd46005a7a032a665036b35af7aede28fa21bb892"
+      },
+      "source_outcome": "SOURCE_IDENTITY_MISMATCH",
+      "production_readiness": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH_AND_RUNTIME_FONT_HANDLE_USAGE_BLOCKED"
+    },
+    {
+      "index": 22,
+      "asset_hash": "E86D77E8",
+      "path": "textures/load/spr_font_xst/E86D77E8_256x128.dds",
+      "canonical_inventory": {
+        "sha256": "8bbd1900dae062c82d05cda321c0f04fed7db0f1d72bb2d4366c097ed6f56bf3",
+        "width": 256,
+        "height": 128,
+        "decoded_mode": "RGBA"
+      },
+      "stock_runtime_descriptor": {
+        "descriptor_index": 8,
+        "resource_handle": 7,
+        "cell": [
+          16,
+          20
+        ],
+        "base_code": 32,
+        "letter_spacing": 0,
+        "stock_dds_size": [
+          256,
+          128
+        ],
+        "stock_dds_format": "DXT3"
+      },
+      "release_member": {
+        "bytes": 524416,
+        "sha256": "2c26a7be00c356eecdad3548f48e86f55b60ab1bffad426cf4075139c607d603",
+        "git_blob_sha1": "1fc96888d3089639c086cd9245944cf0abc019bf",
+        "width": 1024,
+        "height": 512,
+        "format": "DXT5",
+        "mip_count": 1,
+        "header128_sha256": "e17b6b3c790aa2f55e42de212fe06282762ce2b81edcc90ecb47780505cc96a8"
+      },
+      "source_outcome": "SOURCE_IDENTITY_MISMATCH",
+      "production_readiness": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH_AND_RUNTIME_FONT_HANDLE_USAGE_BLOCKED"
+    }
+  ],
+  "fail_closed": {
+    "safe_font_repurpose_inferred": false,
+    "candidate_dds_authorized": false,
+    "reason": "Static descriptor/source identity alone does not prove target-screen resource-handle usage. Real KoreanK3Trace font_state evidence is required before repurpose/page switching.",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "B_OWNED_FONT_PIPELINE_STATIC_DESCRIPTOR_SOURCE_CROSSWALK_TOOL_AND_MACHINE_OUTPUT",
+    "tool": "localization/graphics/role_B/20261001-B00370-P00238/audit_b_owned_font_pipeline.py",
+    "machine_report": "localization/graphics/role_B/20261001-B00370-P00238/B00370_P00238_B_OWNED_FONT_PIPELINE_CROSSWALK.json",
+    "new_static_runtime_crosswalk": true,
+    "source_identity_resolved_exact": 1,
+    "source_identity_mismatch_terminal": 2,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "self_qa": "PASS_B_MOD3_FONT_PIPELINE_16_19_22__STATIC_DESCRIPTOR_CROSSWALK_3_OF_3__DRIVE_EXACT_TARGET_MISS_3_OF_3__PINNED_DIRECT_TO_RELEASE_GIT_BLOB_MATCH_3_OF_3__PINNED_ZIP_SHA_SIZE_EXACT__INDEX16_CANONICAL_SHA_EXACT__INDEX19_22_FAIL_CLOSED_SOURCE_IDENTITY_MISMATCH__NO_DDS_WRITE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
