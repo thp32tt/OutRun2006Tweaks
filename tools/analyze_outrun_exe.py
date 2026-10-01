@@ -803,6 +803,14 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_5_TAIL_INSTRUCTIONS = (
     (0x001823EE, "9b", "fwait"),
 )
 
+# R206/F13: acquire fresh exact-EXE provenance beginning at the unresolved
+# two-byte tail from R204. This 96-byte window is raw evidence only: 0x1823EF
+# is not promoted to an instruction boundary, function entry, callee identity,
+# or render/HUD semantic owner until a later exact decode proves it.
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_6_RVA = 0x001823EF
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_6_PROBE_LEN = 96
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_6_PROBE_END_RVA = 0x0018244F
+
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS = (
     (0x000283DE, "b9 00 00 80 3f", "mov ecx, 0x3f800000"),
     (0x000283E3, "d9 58 1c", "fstp dword [eax+0x1c]"),
@@ -3652,6 +3660,82 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_5_tail_prefix
     }
 
 
+def collect_guarded_gf_target_c_helper_1_third_callee_continuation_6_provenance(pe: PE) -> dict:
+    """Capture fresh exact bytes from 0x1823EF through exclusive end 0x18244F.
+
+    R204 proves that the prior capture ends exactly at 0x1823F1 and that its
+    final two bytes at 0x1823EF are d9 3c, but deliberately does not decode the
+    instruction beginning there. This collector starts at that raw-tail RVA,
+    captures 96 canonical EXE bytes and a raw rel32 census, and makes no
+    instruction-boundary, function, call-effect, render or HUD ownership claim.
+    """
+
+    predecessor = collect_guarded_gf_target_c_helper_1_third_callee_continuation_5_tail_prefix_proof(pe)
+    target_rva = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_6_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    probe = pe.bytes_at_rva(
+        target_rva, GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_6_PROBE_LEN
+    )
+    inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
+    outbound = collect_raw_rel32_call_candidates(
+        pe,
+        target_rva,
+        GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_6_PROBE_LEN,
+    )
+    predecessor_exact = (
+        predecessor["status"] == "EXACT_1823D0_TO_1823EF_PREFIX_CONTROL_FLOW_PROVEN"
+        and predecessor["prefix_end_rva"] == target_rva
+        and predecessor["prefix_end_matches"]
+        and predecessor["capture_tail_rva"] == target_rva
+        and predecessor["capture_tail_bytes"] == "d9 3c"
+        and predecessor["capture_tail_matches"]
+    )
+    probe_end_matches = (
+        target_rva + len(probe)
+        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_6_PROBE_END_RVA
+    )
+    predecessor_tail_matches_probe = (
+        len(probe) >= 2
+        and probe[:2].hex(" ") == predecessor["capture_tail_bytes"]
+    )
+    captured = bool(
+        predecessor_exact
+        and target_section == ".text"
+        and len(probe) == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_6_PROBE_LEN
+        and probe_end_matches
+        and predecessor_tail_matches_probe
+    )
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "predecessor_status": predecessor["status"],
+        "predecessor_exact": predecessor_exact,
+        "probe_len": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_6_PROBE_LEN,
+        "probe_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_6_PROBE_END_RVA,
+        "probe_end_matches": probe_end_matches,
+        "predecessor_tail_bytes": predecessor["capture_tail_bytes"],
+        "predecessor_tail_matches_probe": predecessor_tail_matches_probe,
+        "first_16_bytes": probe[:16].hex(" "),
+        "last_16_bytes": probe[-16:].hex(" "),
+        "bytes": probe.hex(" "),
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "status": (
+            "EXACT_EXE_1823EF_TO_18244F_PROVENANCE_CAPTURED"
+            if captured
+            else "CALLEE_1823EF_CONTINUATION_PROVENANCE_CAPTURE_FAILED"
+        ),
+        "start_boundary_status": "RAW_PREDECESSOR_TAIL_BOUNDARY_UNRESOLVED",
+        "function_entry_status": "UNRESOLVED_AT_1823EF_AND_DISCOVERED_TARGETS",
+        "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+        "ownership_effect": "NONE",
+        "continuation_scope": "RAW_BYTES_AND_REL32_CENSUS_ONLY",
+    }
+
+
 def collect_guarded_gf_target_b_alignment_proof(pe: PE) -> dict:
     """Verify the exact 0x65860 -> 0x65874 instruction-boundary anchor.
 
@@ -5469,6 +5553,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_third_callee_continuation_5_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_5_provenance(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_5_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_5_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_5_tail_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_5_tail_prefix_proof(pe),
+        "guarded_gf_target_c_helper_1_third_callee_continuation_6_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_6_provenance(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -6526,6 +6611,38 @@ def main() -> int:
         f"call_semantics={helper_1_third_cont_5_tail['call_semantics']} "
         f"ownership_effect={helper_1_third_cont_5_tail['ownership_effect']}"
     )
+    helper_1_third_cont_6 = report[
+        "guarded_gf_target_c_helper_1_third_callee_continuation_6_provenance"
+    ]
+    helper_1_third_cont_6_outbound = ",".join(
+        f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+        f"{call['known_target'] or 'unknown'}:{call['target_section']}"
+        for call in helper_1_third_cont_6["raw_outbound_rel32_candidates"]
+    ) or "none"
+    print(
+        f"gf_target_c_helper_1_third_callee_continuation_6="
+        f"0x{helper_1_third_cont_6['target_rva']:08X} "
+        f"status={helper_1_third_cont_6['status']} "
+        f"predecessor={helper_1_third_cont_6['predecessor_status']} "
+        f"predecessor_exact={helper_1_third_cont_6['predecessor_exact']} "
+        f"section={helper_1_third_cont_6['target_section'] or 'none'} "
+        f"probe_len={helper_1_third_cont_6['probe_len']} "
+        f"probe_end=0x{helper_1_third_cont_6['probe_end_rva']:08X} "
+        f"probe_end_match={helper_1_third_cont_6['probe_end_matches']} "
+        f"tail={helper_1_third_cont_6['predecessor_tail_bytes']} "
+        f"tail_match={helper_1_third_cont_6['predecessor_tail_matches_probe']} "
+        f"first16={helper_1_third_cont_6['first_16_bytes']} "
+        f"last16={helper_1_third_cont_6['last_16_bytes']} "
+        f"inbound_raw={len(helper_1_third_cont_6['raw_inbound_rel32_candidates'])} "
+        f"outbound_raw={len(helper_1_third_cont_6['raw_outbound_rel32_candidates'])} "
+        f"outbound={helper_1_third_cont_6_outbound} "
+        f"start_boundary={helper_1_third_cont_6['start_boundary_status']} "
+        f"function_entry={helper_1_third_cont_6['function_entry_status']} "
+        f"semantic_effect={helper_1_third_cont_6['semantic_effect']} "
+        f"ownership_effect={helper_1_third_cont_6['ownership_effect']} "
+        f"scope={helper_1_third_cont_6['continuation_scope']} "
+        f"bytes={helper_1_third_cont_6['bytes']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
@@ -6633,6 +6750,9 @@ def main() -> int:
     if helper_1_third_cont_5_tail["status"] != "EXACT_1823D0_TO_1823EF_PREFIX_CONTROL_FLOW_PROVEN":
         print("guarded_gf_target_c_helper_1_third_callee_continuation_5_tail_prefix_proof=FAILED")
         return 35
+    if helper_1_third_cont_6["status"] != "EXACT_EXE_1823EF_TO_18244F_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_c_helper_1_third_callee_continuation_6_provenance=FAILED")
+        return 36
     return 0
 
 
