@@ -1,0 +1,200 @@
+{
+  "schema_version": 31,
+  "schema": "outrun-b00387-p00255-index103-source-dependency-semantics-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00387",
+  "wave_id": "P00255",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCER_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "base_head_sha": "62e42a962f347f2483159a2081fbca22264bfc3e",
+  "incoming_controller_schema_version": 31,
+  "incoming_controller_config_blob_sha": "ef7dc757bc849c898c18319a0e417e350bdda757",
+  "applied_controller_schema_version": 31,
+  "applied_controller_config_blob_sha": "ef7dc757bc849c898c18319a0e417e350bdda757",
+  "canonical_contract_blob_sha": "68c4c1d65fdb62ab33abc1ca4a93e70651f1dfd8",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX103_SCHEMA31_SOURCE_DEPENDENCY_SEMANTIC_GUARD_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "policy_resolution": {
+    "resolution": "CURRENT_HEAD_SCHEMA31_MATCHES_DISPATCH",
+    "stale_cached_policy_used": false,
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "candidate_completion_first": true,
+    "candidate_batch_target": 2,
+    "work_steal_allowed": false
+  },
+  "selection": {
+    "direct_rework_required_runnable_b": [],
+    "explicit_render_next_b": [],
+    "render_ready_runnable_b": [],
+    "one_stage_to_render_runnable_b": [],
+    "existing_candidate_material_rework_runnable_b": [],
+    "candidate_qa_pending_not_repeated": [
+      61,
+      94
+    ],
+    "accepted_static_or_production_complete_not_repeated": [
+      97,
+      121,
+      133,
+      163,
+      193,
+      226,
+      232
+    ],
+    "unconsumed_b_results_not_repeated": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00370",
+        "index": 94,
+        "result_sha": "25e854c140aedd2920878c2433895b55b6dd1c9b"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00372",
+        "indices": [
+          97,
+          121
+        ],
+        "result_sha": "22e17186664d3b693c7d1a3140d43fcfffafab6c"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00375",
+        "index": 220,
+        "result_sha": "678655ff48caeab8ac8e291bf84888b0d697d4f4"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00377",
+        "index": 139,
+        "result_sha": "cf19c8e03d67306523c4fc0936c1c02368c4baf8"
+      }
+    ],
+    "selected_index": 103,
+    "selected_asset": "590A4724",
+    "selected_action": "FALLBACK_STEP_5_UPGRADE_EXECUTABLE_SOURCE_DEPENDENCY_SEMANTIC_GUARD",
+    "source_probe_repeated": false,
+    "work_stolen_from_lane": null
+  },
+  "tooling_delta": {
+    "prior_guard_task": "LOCALIZATION-LOCALIZATION_B-00195",
+    "prior_guard_result_sha": "0601de6d80e500fa95a254e820a6aa58c83409c9",
+    "prior_guard_task_blob_sha": "13ce41c5d2a414739900e1dfb1fd73bf9c66bbbc",
+    "c_acceptance": "Q00039 C141 B00195 PASS PREFLIGHT_ONLY",
+    "deficiency_closed": [
+      "bind approved Google Drive canonical folder/subtree and acquisition order as source dependencies",
+      "bind current sticky source-exhaustion reselection policy",
+      "exclude GitHub access/recovery policy churn from source-reactivation semantics",
+      "emit deterministic semantic-dependency hashes when verifier executes"
+    ],
+    "source_reacquisition_performed": false
+  },
+  "semantic_dependencies": {
+    "queue": {
+      "index": 103,
+      "path": "textures/load/spr_sprani_selector_cvt_Exst/590A4724_512x512.dds",
+      "action": "localize_text",
+      "shard_modulo_3": 1
+    },
+    "canonical_inventory": {
+      "sha256": "b3ef4a34649ac699bd4c23d1d311b9850e0928f6cb5b98c1835f84de31561222",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA"
+    },
+    "accepted_guard": {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00195",
+      "result_commit_sha": "0601de6d80e500fa95a254e820a6aa58c83409c9",
+      "task_blob_sha": "13ce41c5d2a414739900e1dfb1fd73bf9c66bbbc",
+      "c_acceptance_marker_present": true
+    },
+    "source_transport": {
+      "provider": "google_drive",
+      "folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "allowed_subtree": "OutRun2006_Korean_Artifacts/90_ARCHIVE/LOCALIZATION_SNAPSHOT_20260927_0302/03_ORIGINAL_REFERENCE/hd_source/OR2-HD-GUI-v0.25.10a/textures/load",
+      "acquisition_order": [
+        "GOOGLE_DRIVE_EXACT_RELATIVE_PATH",
+        "PINNED_UPSTREAM_DIRECT_FILE",
+        "PINNED_V0.25.10A_RELEASE"
+      ]
+    },
+    "pinned_source": {
+      "tag": "v0.25.10a",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "zip_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "tokens_present_in_contract": true
+    },
+    "sticky_policy": {
+      "skip_unchanged_source_acquisition_exhausted": true,
+      "retry_only_on_dependency_fingerprint_change": true
+    }
+  },
+  "current_checks": {
+    "queue_identity_current_b_shard": true,
+    "canonical_inventory_identity": true,
+    "b00195_result_commit_identity": true,
+    "b00195_task_blob_identity": true,
+    "c141_acceptance_marker_current": true,
+    "current_schema_at_least_31": true,
+    "source_transport_semantics_current": true,
+    "sticky_source_reselection_policy_current": true,
+    "pinned_source_policy_tokens_current": true,
+    "shared_queue_progress_resume_fingerprints_unchanged_since_b00377": true
+  },
+  "reactivation_contract": {
+    "current_result": "BLOCKED_UNCHANGED_SOURCE_DEPENDENCY_SEMANTICS",
+    "source_reprobe_authorized": false,
+    "candidate_rebuild_authorized": false,
+    "fresh_producer_rescan_required": false,
+    "excluded_non_source_dependency_families": [
+      "github_access_validation",
+      "runtime_recovery",
+      "runtime_tuning",
+      "controller_prompt_transport_wording"
+    ],
+    "reactivation_triggers": [
+      "index103 canonical inventory identity changes",
+      "index103 queue path/action/shard ownership changes",
+      "B00195/C141 accepted source-exhaustion evidence is superseded",
+      "approved Drive canonical folder/subtree or acquisition order changes",
+      "pinned v0.25.10a tag/commit/bundle identity changes",
+      "sticky source-exhaustion reselection policy changes"
+    ]
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "INDEX103_SCHEMA31_SOURCE_DEPENDENCY_SEMANTIC_GUARD_AND_MACHINE_OUTPUT",
+    "executable": "localization/graphics/role_B/20261001-B00387-P00255/verify_index103_source_dependency_semantics.py",
+    "machine_report": "localization/graphics/role_B/20261001-B00387-P00255/B00387_P00255_INDEX103_SOURCE_DEPENDENCY_SEMANTICS.json",
+    "candidate_dds_modified": false,
+    "new_executable_selection_input": true,
+    "materially_reduces_unresolved_work": true,
+    "production_readiness": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "68c4c1d65fdb62ab33abc1ca4a93e70651f1dfd8",
+    "controller_roles_blob_sha": "ef7dc757bc849c898c18319a0e417e350bdda757",
+    "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "canonical_progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
+    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed",
+    "b00195_task_blob_sha": "13ce41c5d2a414739900e1dfb1fd73bf9c66bbbc",
+    "b00377_task_blob_sha": "9488b3dae88604d67fdb291c973a9fa505e2d19a"
+  },
+  "candidate_dds_modified": false,
+  "candidate_binary_persisted": false,
+  "material_change": true,
+  "review_record_only": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "source_reprobe_performed": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
