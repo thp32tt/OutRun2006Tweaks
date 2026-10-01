@@ -1,5 +1,5 @@
 {
-  "schema_version": 25,
+  "schema_version": 26,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -171,7 +171,11 @@
       "wait_actions_stale_seconds": 75,
       "busy_stall_seconds": 1800,
       "force_stop_active_generation": false,
-      "config_blob_refresh_on_heartbeat_stale": true
+      "config_blob_refresh_on_heartbeat_stale": true,
+      "queue_mode_role": "STATE_REARM_ONLY",
+      "queue_mode_ui_owner": "QUEUE_ENGINE",
+      "queue_mode_ui_observation": false,
+      "queue_mode_ui_actions": false
     },
     "startup_reconcile": {
       "enabled": true,
@@ -304,7 +308,8 @@
     "queue_active_legacy_field_must_not_gate_parallel_lanes": true,
     "qa_pending_retention": "UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA",
     "health_includes_memory_pressure": true,
-    "active_lane_recovery_order_field": "active_lane_recovery_order"
+    "active_lane_recovery_order_field": "active_lane_recovery_order",
+    "queue_mode_watchdog_role": "STATE_REARM_ONLY"
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
