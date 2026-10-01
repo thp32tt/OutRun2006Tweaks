@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-e00354-p00224-index119-canonical-source-acquisition-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_E-00354",
+  "producer_id": "P00224",
+  "lane": "LOCALIZATION_E",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-10-01T17:43:00+09:00",
+  "controller_schema_version": 30,
+  "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "canonical_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+  "base_head_sha": "5577083d926336e93372657c854366974c660e18",
+  "asset": {
+    "index": 119,
+    "asset_id": "F6811E94",
+    "path": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+    "action": "localize_text",
+    "shard_check": "119 % 3 == 2",
+    "source_text": "Time Attack Mode",
+    "korean_text": "타임 어택 모드",
+    "readiness_before": "PREFLIGHT_ONLY"
+  },
+  "fresh_completion_tier_scan": {
+    "source": "current GitHub shared state after C177/Q00075",
+    "direct_rework_required_runnable_e": [],
+    "render_ready_runnable_e": [],
+    "one_stage_to_render_runnable_e": [],
+    "existing_candidate_material_rework_runnable_e": [],
+    "result": "ZERO_RUNNABLE_COMPLETION_TIER__PREFLIGHT_FALLBACK_ALLOWED"
+  },
+  "canonical_inventory_expected": {
+    "sha256": "18534e553acdaf37816d193cf951ffb47f2f98223697964a724cad74fab0364a",
+    "width": 512,
+    "height": 64,
+    "mode": "RGBA"
+  },
+  "acquisition_tiers": [
+    {
+      "tier": "GOOGLE_DRIVE_EXACT_RELATIVE_PATH",
+      "account": "ezflash557",
+      "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "selector_folder_id": "1eaD_4udVHcPsa7ufbRS7gYMUlllwZU-l",
+      "requested_relative_path": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+      "observed_selector_folder_entries": [
+        "FD90AA9_1024x1024.dds",
+        "C075FB49_512x512.dds",
+        "411827E_512x512.dds",
+        "2DA43E41_1024x1024.dds"
+      ],
+      "disposition": "SOURCE_TRANSPORT_MISS"
+    },
+    {
+      "tier": "PINNED_UPSTREAM_DIRECT_FILE",
+      "repository": "envido32/OR2006Sprites",
+      "immutable_ref": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "requested_path": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+      "http_semantics": "404_NOT_FOUND",
+      "disposition": "SOURCE_TRANSPORT_MISS"
+    },
+    {
+      "tier": "PINNED_V0.25.10A_RELEASE",
+      "archive": "OR2-HD-GUI-v0.25.10a.zip",
+      "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "archive_size": 306223257,
+      "archive_identity": "PASS_PINNED_CONTRACT",
+      "member_path": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+      "member_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+      "member_size": 524416,
+      "member_dds": {
+        "width": 2048,
+        "height": 256,
+        "pixel_format": "DXT5",
+        "mip_count": 1
+      },
+      "identity_comparison": {
+        "sha256_match": false,
+        "dimensions_match": false,
+        "format_match": false
+      },
+      "disposition": "SOURCE_IDENTITY_MISMATCH"
+    }
+  ],
+  "prior_authority": {
+    "c_report": "localization/graphics/role_C/20260929-2059-C122/C122_Q00020_INDEPENDENT_QA_BATCH.json",
+    "c_disposition": "PASS_LIMITED_PREFLIGHT_ONLY",
+    "retained_rule": "OLD_2048x256_DXT5_RELEASE_MASK_CLEAN_PLATE_SAFE_BBOX_LINEAGE_REMAINS_RETIRED"
+  },
+  "result": "PASS_PREFLIGHT_TYPED_SOURCE_ACQUISITION_EXHAUSTION_WITH_RELEASE_IDENTITY_MISMATCH",
+  "source_outcome": "SOURCE_IDENTITY_MISMATCH",
+  "readiness_after": "PREFLIGHT_ONLY",
+  "candidate_dds_modified": false,
+  "clean_plate_emitted": false,
+  "source_substitution_performed": false,
+  "materially_reduces_unresolved_work": true,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified_against_contract": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false
+}
