@@ -67,10 +67,6 @@ services:
       GENERIC_RETRY_ROLLOVER_CLICKS: "2"
       GENERIC_RETRY_COOLDOWN_SECONDS: "300"
       GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS: "300"
-      GITHUB_BROKER_ENABLED: "true"
-      GITHUB_BROKER_MAX_CONTEXT_CHARS: "18000"
-      GITHUB_BROKER_MAX_FILE_CHARS: "8000"
-      GITHUB_BROKER_MAX_COMMIT_BYTES: "1048576"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
       STATUS_PORT: "8787"
       NOVNC_PUBLIC_URL: "http://192.168.0.48:6081/vnc.html"
@@ -101,3 +97,4 @@ volumes:
     name: outrun_chat_localization_data
   outrun_chat_localization_logs:
     name: outrun_chat_localization_logs
+

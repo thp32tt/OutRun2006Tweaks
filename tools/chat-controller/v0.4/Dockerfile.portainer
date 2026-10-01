@@ -15,9 +15,8 @@ RUN python -m pip install --upgrade pip --index-url https://pypi.org/simple && p
 RUN mkdir -p /opt/outrun/app /opt/outrun/prompts /tmp/controller-parts && touch /opt/outrun/app/__init__.py
 
 COPY src/controller.py.part* /tmp/controller-parts/
-COPY src/broker_protocol.py /opt/outrun/app/broker_protocol.py
 RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py \
-    && python -m py_compile /opt/outrun/app/controller.py /opt/outrun/app/broker_protocol.py \
+    && python -m py_compile /opt/outrun/app/controller.py \
     && rm -rf /tmp/controller-parts
 
 COPY entrypoint.direct.sh /opt/outrun/entrypoint.sh
@@ -39,3 +38,4 @@ COPY conversion_dxvk.md /opt/outrun/prompts/conversion_dxvk.md
 RUN chmod +x /opt/outrun/entrypoint.sh
 
 ENTRYPOINT ["/usr/bin/tini","--","/opt/outrun/entrypoint.sh"]
+

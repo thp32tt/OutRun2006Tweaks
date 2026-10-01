@@ -21,7 +21,6 @@ from typing import Optional
 from zoneinfo import ZoneInfo
 
 from playwright.async_api import async_playwright, BrowserContext, Page, TimeoutError as PlaywrightTimeoutError
-from .broker_protocol import BrokerProtocolError, apply_text_edit, parse_broker_changeset, parse_broker_read
 
 TZ = ZoneInfo(os.getenv("TZ", "Asia/Seoul"))
 CHATGPT_BASE_URL = os.getenv("CHATGPT_BASE_URL", "https://chatgpt.com/").strip()
@@ -117,13 +116,9 @@ PREVIOUS_TASK_UI_SETTLE_SECONDS = max(30, int(os.getenv("PREVIOUS_TASK_UI_SETTLE
 RETRY_BUTTON_COOLDOWN_SECONDS = max(10, int(os.getenv("RETRY_BUTTON_COOLDOWN_SECONDS", "45")))
 GENERIC_RETRY_ROLLOVER_CLICKS = max(1, int(os.getenv("GENERIC_RETRY_ROLLOVER_CLICKS", "2")))
 GENERIC_RETRY_COOLDOWN_SECONDS = max(60, int(os.getenv("GENERIC_RETRY_COOLDOWN_SECONDS", "300")))
+NATIVE_PLUGIN_PROTOCOL_VERSION = 1
 GITHUB_ASSISTANT_RECOVERY_MAX = max(1, int(os.getenv("GITHUB_ASSISTANT_RECOVERY_MAX", "2")))
 GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS = max(60, int(os.getenv("GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS", "300")))
-GITHUB_BROKER_ENABLED = os.getenv("GITHUB_BROKER_ENABLED", "true").lower() == "true"
-GITHUB_BROKER_MAX_CONTEXT_CHARS = max(6000, int(os.getenv("GITHUB_BROKER_MAX_CONTEXT_CHARS", "18000")))
-GITHUB_BROKER_MAX_FILE_CHARS = max(2000, int(os.getenv("GITHUB_BROKER_MAX_FILE_CHARS", "8000")))
-GITHUB_BROKER_PROTOCOL_VERSION = 2
-GITHUB_BROKER_MAX_COMMIT_BYTES = max(65536, int(os.getenv("GITHUB_BROKER_MAX_COMMIT_BYTES", "1048576")))
 PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
 STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "true"
 THINKING_VERIFY_FAILURE_RESTART_THRESHOLD = max(2, int(os.getenv("THINKING_VERIFY_FAILURE_RESTART_THRESHOLD", "4")))
@@ -134,7 +129,6 @@ REGISTRY_BACKUP_FILE = STATE_DIR / "chat_registry.json.bak"
 RUNTIME_FILE = STATE_DIR / "runtime_status.json"
 QUEUE_FILE = STATE_DIR / "queue_state.json"
 QUEUE_BACKUP_FILE = STATE_DIR / "queue_state.json.bak"
-BROKER_PENDING_DIR = STATE_DIR / "broker_pending"
 PROMPTS_DIR = Path("/opt/outrun/prompts")
 GAME_MOD_CONTEXT = (
     "Context: This is authorized offline game-mod/VR development for the user's local copy of OutRun 2006. "
@@ -259,16 +253,6 @@ class GitHubTransientError(RuntimeError):
     pass
 
 
-class GitHubBrokerConflict(RuntimeError):
-    """GitHub broker write could not be applied safely against the current branch HEAD."""
-    pass
-
-
-class GitHubBrokerPermissionError(GitHubBrokerConflict):
-    """Controller credential cannot publish a broker changeset."""
-    pass
-
-
 @dataclass
 class Registry:
     logical_date: str
@@ -355,11 +339,6 @@ runtime = {
     "generic_retry_cooldown_seconds": GENERIC_RETRY_COOLDOWN_SECONDS,
     "github_assistant_recovery_max": GITHUB_ASSISTANT_RECOVERY_MAX,
     "github_tooling_retry_cooldown_seconds": GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS,
-    "github_broker_enabled": GITHUB_BROKER_ENABLED,
-    "github_broker_max_context_chars": GITHUB_BROKER_MAX_CONTEXT_CHARS,
-    "github_broker_max_file_chars": GITHUB_BROKER_MAX_FILE_CHARS,
-    "github_broker_max_commit_bytes": GITHUB_BROKER_MAX_COMMIT_BYTES,
-    "github_broker_write_capable": None,
     "rate_limit_attempts": 0,
     "rate_limit_until": None,
 }
@@ -714,6 +693,7 @@ def github_api_json(path: str) -> dict:
                 _github_rest_block_until_epoch = 0.0
                 _github_transient_error_count = 0
                 write_runtime(
+                    github_observation={"method": "GET", "path": path, "http_status": resp.status, "observed_at": datetime.now(TZ).isoformat()},
                     github_rate_limit_remaining=resp.headers.get("X-RateLimit-Remaining"),
                     github_rate_limit_limit=resp.headers.get("X-RateLimit-Limit"),
                     github_rate_limit_reset=reset,
@@ -725,6 +705,7 @@ def github_api_json(path: str) -> dict:
                 )
                 return data
         except urllib.error.HTTPError as e:
+            write_runtime(github_observation={"method": "GET", "path": path, "http_status": e.code, "observed_at": datetime.now(TZ).isoformat()})
             if e.code in {403, 429}:
                 retry_after = e.headers.get("Retry-After")
                 reset = e.headers.get("X-RateLimit-Reset")
@@ -778,401 +759,6 @@ def github_api_json(path: str) -> dict:
 
     raise GitHubTransientError("GitHub transient retry loop exhausted; retry scheduled")
 
-
-
-_github_broker_capability_cache: Optional[tuple[float, bool]] = None
-
-
-def github_api_mutation_json(method: str, path: str, payload: dict) -> dict:
-    """Issue one GitHub mutation request.
-
-    Mutations are intentionally not blindly retried: a timed-out POST may already
-    have created a Git object. The next broker cycle rechecks branch HEAD/CAS and
-    safely resumes from durable Git state.
-    """
-    global _github_rest_block_until_epoch, _github_transient_error_count
-    touch_queue_heartbeat()
-    now_epoch = time.time()
-    if now_epoch < _github_rest_block_until_epoch:
-        raise GitHubTransientError(
-            f"GitHub retry cooldown active for {_github_blocked_seconds()}s"
-        )
-    if not GITHUB_TOKEN:
-        raise GitHubBrokerPermissionError("controller GitHub token is not configured")
-
-    method = method.upper()
-    if method not in {"POST", "PATCH", "PUT", "DELETE"}:
-        raise ValueError(f"unsupported GitHub mutation method: {method}")
-
-    url = "https://api.github.com" + path
-    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-    headers = {
-        "Accept": "application/vnd.github+json",
-        "Content-Type": "application/json",
-        "User-Agent": "outrun-chat-controller/0.5",
-        "X-GitHub-Api-Version": "2022-11-28",
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
-    }
-    req = urllib.request.Request(url, data=body, headers=headers, method=method)
-    try:
-        with urllib.request.urlopen(req, timeout=25) as resp:
-            raw = resp.read().decode("utf-8", errors="replace")
-            data = json.loads(raw) if raw.strip() else {}
-            _github_rest_block_until_epoch = 0.0
-            _github_transient_error_count = 0
-            write_runtime(
-                github_rate_limit_remaining=resp.headers.get("X-RateLimit-Remaining"),
-                github_rate_limit_limit=resp.headers.get("X-RateLimit-Limit"),
-                github_api_blocked_until=None,
-                github_retrying=False,
-                github_transient_error_count=0,
-                github_retry_in_seconds=0,
-                last_github_error=None,
-            )
-            return data
-    except urllib.error.HTTPError as e:
-        try:
-            error_body = e.read().decode("utf-8", errors="replace")
-        except Exception:
-            error_body = ""
-        lower = error_body.lower()
-        remaining = str(e.headers.get("X-RateLimit-Remaining") or "")
-        if e.code == 429 or (e.code == 403 and (remaining == "0" or "rate limit" in lower)):
-            retry_after = e.headers.get("Retry-After")
-            delay = GITHUB_TRANSIENT_COOLDOWN_SECONDS
-            if retry_after:
-                try:
-                    delay = max(delay, int(retry_after) + 5)
-                except ValueError:
-                    pass
-            _github_schedule_transient_retry(
-                f"GitHub mutation HTTP {e.code} rate limit; retry scheduled", delay
-            )
-            raise GitHubTransientError(f"GitHub mutation HTTP {e.code}; retry scheduled") from e
-        if 500 <= e.code <= 599:
-            _github_schedule_transient_retry(
-                f"GitHub mutation HTTP {e.code}; retry cooldown scheduled"
-            )
-            raise GitHubTransientError(f"GitHub mutation HTTP {e.code}; retry scheduled") from e
-        if e.code in {401, 403}:
-            raise GitHubBrokerPermissionError(
-                f"controller GitHub token lacks write permission (HTTP {e.code})"
-            ) from e
-        if e.code in {409, 422}:
-            raise GitHubBrokerConflict(
-                f"GitHub rejected broker CAS/mutation HTTP {e.code}: {error_body[:500]}"
-            ) from e
-        raise
-    except (urllib.error.URLError, TimeoutError, ConnectionResetError, OSError) as e:
-        _github_schedule_transient_retry(
-            f"{type(e).__name__}: {e}; mutation retry cooldown scheduled"
-        )
-        raise GitHubTransientError("GitHub mutation transport unavailable; retry scheduled") from e
-
-
-def github_broker_write_capable(force: bool = False, strict: bool = False) -> bool:
-    global _github_broker_capability_cache
-    if not GITHUB_BROKER_ENABLED or not GITHUB_TOKEN:
-        runtime["github_broker_write_capable"] = False
-        return False
-    now_mono = time.monotonic()
-    if (
-        not force
-        and _github_broker_capability_cache
-        and now_mono - _github_broker_capability_cache[0] < 300
-    ):
-        return _github_broker_capability_cache[1]
-    try:
-        repo = github_api_json(f"/repos/{GITHUB_REPO}")
-        perms = repo.get("permissions")
-        capable = (
-            bool(perms.get("push") or perms.get("admin") or perms.get("maintain"))
-            if isinstance(perms, dict) and perms
-            else True
-        )
-    except GitHubTransientError:
-        runtime["github_broker_write_capable"] = None
-        if strict:
-            raise
-        return False
-    except Exception as e:
-        log.warning("github broker permission probe failed error=%r", e)
-        capable = False
-    _github_broker_capability_cache = (now_mono, capable)
-    runtime["github_broker_write_capable"] = capable
-    return capable
-
-
-def github_broker_fetch_file(ref: str, path: str) -> Optional[dict]:
-    qpath = urllib.parse.quote(path, safe="/")
-    qref = urllib.parse.urlencode({"ref": ref})
-    try:
-        payload = github_api_json(f"/repos/{GITHUB_REPO}/contents/{qpath}?{qref}")
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
-            return None
-        raise
-    if not isinstance(payload, dict) or payload.get("type") != "file":
-        raise BrokerProtocolError(f"broker path is not a file: {path}")
-    encoded = str(payload.get("content") or "").replace("\n", "")
-    if payload.get("encoding") != "base64":
-        raise BrokerProtocolError(f"broker file content unavailable: {path}")
-    raw = base64.b64decode(encoded or "")
-    try:
-        text = raw.decode("utf-8")
-    except UnicodeDecodeError as exc:
-        raise BrokerProtocolError(f"broker supports UTF-8 text files only: {path}") from exc
-    return {
-        "path": path,
-        "sha": str(payload.get("sha") or ""),
-        "text": text,
-        "size": int(payload.get("size") or len(raw)),
-    }
-
-
-def github_broker_render_read_result(branch: str, specs: list[dict]) -> str:
-    head = github_branch_head(branch)
-    if not head:
-        raise GitHubTransientError("branch HEAD unavailable for broker read")
-    pieces = [
-        f"[BROKER_READ_RESULT] branch={branch} head={head}",
-        "Use exact file text below for analysis/replacements. Request another range if truncated.",
-    ]
-    used = sum(len(x) for x in pieces)
-    for spec in specs:
-        path = spec["path"]
-        item = github_broker_fetch_file(head, path)
-        if item is None:
-            chunk = f"\nFILE {path} status=NOT_FOUND\n"
-        else:
-            lines = item["text"].splitlines(keepends=True)
-            total_lines = len(lines)
-            if total_lines == 0:
-                start = end = 0
-                content = ""
-            else:
-                start = spec.get("start") or 1
-                end = spec.get("end") or total_lines
-                start = min(max(1, int(start)), total_lines)
-                end = min(max(start, int(end)), total_lines)
-                content = "".join(lines[start - 1:end])
-            truncated = False
-            if len(content) > GITHUB_BROKER_MAX_FILE_CHARS:
-                content = content[:GITHUB_BROKER_MAX_FILE_CHARS]
-                truncated = True
-            chunk = (
-                f"\nFILE {path} sha={item['sha']} lines={start}-{end}/{total_lines}"
-                f" truncated={'YES' if truncated else 'NO'}\n"
-                "CONTENT_BEGIN\n"
-                + content
-                + ("\n" if content and not content.endswith("\n") else "")
-                + "CONTENT_END\n"
-            )
-        if used + len(chunk) > GITHUB_BROKER_MAX_CONTEXT_CHARS:
-            pieces.append("\nBROKER_CONTEXT_LIMIT_REACHED: request remaining files/ranges in another BROKER_READ.\n")
-            break
-        pieces.append(chunk)
-        used += len(chunk)
-    pieces.append("[/BROKER_READ_RESULT]")
-    return "".join(pieces)
-
-
-def github_broker_bootstrap_specs(active: dict) -> list[dict]:
-    task_id = str(active.get("task_id") or "").strip()
-    if CONTROLLER_MODE == "localization":
-        paths = [
-            "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-            "localization/controller_roles.json",
-            f"docs/automation/runs/{task_id}.json",
-        ]
-    else:
-        paths = [
-            "AGENTS.md",
-            "docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md",
-            "docs/VR_AUTODEV_STATE.json",
-            "docs/VR_RUN_STATE.md",
-            f"docs/automation/runs/{task_id}.json",
-        ]
-    return [{"path": p, "start": 1, "end": 260} for p in paths]
-
-
-def github_broker_protocol_instructions(active: dict) -> str:
-    marker = f"[AUTO:{active['task_id']}]"
-    branch = str(active.get("branch") or "")
-    head = github_branch_head(branch) or str(active.get("base_sha") or "UNKNOWN")
-    return (
-        f"BROKER_V={GITHUB_BROKER_PROTOCOL_VERSION} HEAD={head}\n"
-        "Broker는 ChatGPT tool이 아니다. GitHub/tool 상태 설명 대신 작업을 진행해.\n"
-        "첫 응답은 반드시 아래 둘 중 태그 하나만 제출해.\n"
-        '[BROKER_READ]{"files":[{"path":"path","start":1,"end":220}]}[/BROKER_READ]\n'
-        '[BROKER_CHANGESET]{"base_sha":"<HEAD>","commit_message":"요약 '
-        + marker
-        + '","edits":[{"op":"replace","path":"file","old":"기존문자열","new":"새문자열","count":1}]}[/BROKER_CHANGESET]'
-    )
-
-
-def github_broker_spool_pending(active: dict, changeset: dict, reason: str) -> Path:
-    BROKER_PENDING_DIR.mkdir(parents=True, exist_ok=True)
-    task_id = str(active.get("task_id") or "unknown").strip()
-    safe_task = re.sub(r"[^A-Za-z0-9_.-]+", "_", task_id)
-    target = BROKER_PENDING_DIR / f"{safe_task}.json"
-    payload = {
-        "schema": 1,
-        "saved_at": datetime.now(TZ).isoformat(),
-        "task_id": task_id,
-        "lane": active.get("lane"),
-        "branch": active.get("branch"),
-        "attempt": active.get("attempt"),
-        "reason": reason,
-        "changeset": changeset,
-    }
-    tmp = target.with_suffix(".tmp")
-    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    tmp.replace(target)
-    runtime["github_broker_pending_file"] = str(target)
-    runtime["github_broker_pending_task_id"] = task_id
-    return target
-
-
-def github_broker_pending_count() -> int:
-    try:
-        return sum(1 for p in BROKER_PENDING_DIR.glob("*.json") if p.is_file())
-    except Exception:
-        return 0
-
-
-def github_broker_clear_pending(active: dict) -> None:
-    task_id = str(active.get("task_id") or "unknown").strip()
-    safe_task = re.sub(r"[^A-Za-z0-9_.-]+", "_", task_id)
-    target = BROKER_PENDING_DIR / f"{safe_task}.json"
-    try:
-        target.unlink(missing_ok=True)
-    except Exception:
-        log.exception("failed to remove broker pending spool task=%s", task_id)
-    if runtime.get("github_broker_pending_task_id") == task_id:
-        runtime["github_broker_pending_file"] = None
-        runtime["github_broker_pending_task_id"] = None
-
-
-def github_broker_initial_context(active: dict) -> str:
-    """Keep the first ChatGPT turn compact; file bodies are supplied only on BROKER_READ."""
-    if not GITHUB_BROKER_ENABLED:
-        return ""
-    return github_broker_protocol_instructions(active)
-
-
-def github_broker_apply_changeset(active: dict, changeset: dict) -> dict:
-    if not GITHUB_BROKER_ENABLED:
-        raise GitHubBrokerConflict("controller GitHub broker is disabled")
-    if not github_broker_write_capable(strict=True):
-        raise GitHubBrokerPermissionError("controller GitHub token is not write-capable")
-
-    branch = str(active.get("branch") or "").strip()
-    task_id = str(active.get("task_id") or "").strip()
-    if not branch or not task_id:
-        raise GitHubBrokerConflict("active broker task identity is incomplete")
-
-    message = str(changeset["commit_message"])
-    marker = f"[AUTO:{task_id}]"
-    if marker not in message:
-        raise BrokerProtocolError(f"broker commit message must contain exact marker {marker}")
-    if github_actions_skip_directive(message):
-        raise BrokerProtocolError("broker result commit must not contain CI-skip directives")
-
-    requested_base = str(changeset["base_sha"]).lower()
-    current_head = github_branch_head(branch)
-    if not current_head:
-        raise GitHubTransientError("branch HEAD unavailable before broker write")
-    if current_head.lower() != requested_base:
-        raise GitHubBrokerConflict(
-            f"stale broker base: requested {requested_base}, current HEAD {current_head}"
-        )
-
-    base_commit = github_api_json(f"/repos/{GITHUB_REPO}/git/commits/{current_head}")
-    base_tree = str((base_commit.get("tree") or {}).get("sha") or "")
-    if not base_tree:
-        raise GitHubBrokerConflict("base commit tree SHA unavailable")
-
-    tree_elements = []
-    total_bytes = 0
-    changed_paths = []
-    for edit in changeset["edits"]:
-        path = edit["path"]
-        existing = github_broker_fetch_file(current_head, path)
-        expected_sha = edit.get("expected_sha")
-        if expected_sha:
-            actual_sha = existing["sha"] if existing else None
-            if actual_sha != expected_sha:
-                raise GitHubBrokerConflict(
-                    f"file SHA changed for {path}: expected {expected_sha}, actual {actual_sha}"
-                )
-
-        current_text = existing["text"] if existing else None
-        new_text = apply_text_edit(current_text, edit)
-        if new_text is None:
-            tree_elements.append({
-                "path": path,
-                "mode": "100644",
-                "type": "blob",
-                "sha": None,
-            })
-        else:
-            encoded = new_text.encode("utf-8")
-            total_bytes += len(encoded)
-            if total_bytes > GITHUB_BROKER_MAX_COMMIT_BYTES:
-                raise BrokerProtocolError(
-                    f"broker changeset exceeds {GITHUB_BROKER_MAX_COMMIT_BYTES} bytes"
-                )
-            blob = github_api_mutation_json(
-                "POST",
-                f"/repos/{GITHUB_REPO}/git/blobs",
-                {"content": base64.b64encode(encoded).decode("ascii"), "encoding": "base64"},
-            )
-            blob_sha = str(blob.get("sha") or "")
-            if not blob_sha:
-                raise GitHubBrokerConflict(f"GitHub did not return blob SHA for {path}")
-            tree_elements.append({
-                "path": path,
-                "mode": "100644",
-                "type": "blob",
-                "sha": blob_sha,
-            })
-        changed_paths.append(path)
-
-    tree = github_api_mutation_json(
-        "POST",
-        f"/repos/{GITHUB_REPO}/git/trees",
-        {"base_tree": base_tree, "tree": tree_elements},
-    )
-    tree_sha = str(tree.get("sha") or "")
-    if not tree_sha:
-        raise GitHubBrokerConflict("GitHub did not return broker tree SHA")
-
-    commit = github_api_mutation_json(
-        "POST",
-        f"/repos/{GITHUB_REPO}/git/commits",
-        {"message": message, "tree": tree_sha, "parents": [current_head]},
-    )
-    commit_sha = str(commit.get("sha") or "")
-    if not commit_sha:
-        raise GitHubBrokerConflict("GitHub did not return broker commit SHA")
-
-    ref = urllib.parse.quote(branch, safe="")
-    github_api_mutation_json(
-        "PATCH",
-        f"/repos/{GITHUB_REPO}/git/refs/heads/{ref}",
-        {"sha": commit_sha, "force": False},
-    )
-    invalidate_task_commit_cache(branch, task_id)
-    runtime["github_broker_last_commit_sha"] = commit_sha
-    runtime["github_broker_last_task_id"] = task_id
-    runtime["github_broker_last_changed_paths"] = changed_paths
-    return {
-        "sha": commit_sha,
-        "message": message,
-        "changed_paths": changed_paths,
-        "base_sha": current_head,
-    }
 
 
 def github_branch_head(branch: str) -> Optional[str]:
@@ -1418,6 +1004,16 @@ def localization_controller_contract_fingerprint() -> tuple[str, str]:
     return schema, blob_sha
 
 
+def native_plugin_instructions(active: dict) -> str:
+    return (
+        "연결된 GitHub 플러그인을 탐색하고 대상 브랜치 HEAD/작업 기록을 실제 호출로 확인한 뒤 진행해. "
+        "컨트롤러 조회 성공은 채팅 플러그인 연결 증거가 아니다. "
+        "실패는 실제 호출 대상·오류 코드로 보고하고, 도구 미노출은 TOOL_NOT_EXPOSED로 구분해. "
+        "이미지·파일은 지원 도구와 승인된 Drive 경로로 직접 처리해. 채팅에 원본/base64를 붙이지 마. "
+        "완료는 실제 TASK_ID 커밋·검증 결과로만 보고해. 실기 미실행은 UNTESTED."
+    )
+
+
 def queue_dynamic_prefix() -> str:
     task_id = str(runtime.get("queue_task_id") or "").strip()
     if not task_id:
@@ -1438,14 +1034,13 @@ def queue_dynamic_prefix() -> str:
         *([f"CONTROLLER_SCHEMA_VERSION={schema_version}", f"CONTROLLER_CONFIG_BLOB_SHA={config_blob_sha}"] if CONTROLLER_MODE == "localization" else []),
         f"LANE={lane}",
         f"TARGET_BRANCH={branch}",
-        f"CONTROLLER_GITHUB_PREFLIGHT={'OK' if preflight_head else 'UNKNOWN'}",
+        f"CONTROLLER_GITHUB_READ={'OK' if preflight_head else 'UNKNOWN'}",
         *([f"CONTROLLER_GITHUB_HEAD_SHA={preflight_head}"] if preflight_head else []),
-        f"BROKER={'READY' if GITHUB_BROKER_ENABLED else 'OFF'}",
         "PUBLIC_GITHUB_ACCESS=DO_NOT_USE",
-        "FIRST_ACTION=BROKER_READ_OR_CHANGESET",
+        "FIRST_ACTION=CALL_CONNECTED_GITHUB_PLUGIN",
         f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
         *([f"WAVE_ID={wave_id}"] if wave_id else []),
-        "GitHub HEAD가 SSOT다. N100 clone/worktree 우회 금지. Broker 태그로 바로 작업하고 GitHub/tool 부재 설명은 하지 마.",
+        "GitHub HEAD가 SSOT다. N100 clone/worktree 우회 금지. 연결된 플러그인으로 직접 작업해.",
         "이 작업에서 실제 변경 또는 검토 기록을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
         "필수 GitHub Actions Gate를 소유할 result commit에는 CI-skip 지시어를 넣지 마. 검증 완료 후 bookkeeping/checkpoint 커밋은 Gate 결과와 분리해 기록하고, controller가 validation-bearing result commit을 식별할 수 있게 유지해.",
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
@@ -1467,14 +1062,7 @@ def queue_dynamic_prefix() -> str:
             "FAILURE_CONTEXT=" + failure,
         ]
     prefix = "\n".join(lines) + "\n\n"
-    if GITHUB_BROKER_ENABLED:
-        active = {
-            "task_id": task_id,
-            "lane": lane,
-            "branch": branch,
-            "attempt": attempt,
-        }
-        prefix += github_broker_initial_context(active) + "\n\n"
+    prefix += native_plugin_instructions({"task_id": task_id, "branch": branch}) + "\n\n"
     return prefix
 
 async def first_visible(page: Page, selectors: list[str], total_wait_ms: int = 10000):
@@ -1788,4 +1376,5 @@ async def ensure_logged_in(page: Page) -> bool:
         current_url=page.url,
     )
     return False
+
 

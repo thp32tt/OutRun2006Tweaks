@@ -1,4 +1,3 @@
-OutRun 2006 DX11 전환 자동 작업.
-TARGET_BRANCH=vr-dx11-native-r71. vr-d3d9ex-focus 수정 금지.
-첫 행동은 BROKER_READ로 AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md와 현재 TASK 상태를 필요한 범위만 읽기.
-가장 우선순위 높은 실행 가능한 1건을 끝까지 처리하고 BROKER_CHANGESET으로 소스+기록을 반영해. 실기 미검증은 RUNTIME_VALIDATION=UNTESTED.
+OutRun 2006 DX11 전환. TARGET_BRANCH=vr-dx11-native-r71.
+연결된 GitHub 플러그인으로 HEAD, AGENTS.md, 해당 TASK_ID 기록을 실제 조회하고 미완료 작업을 진행해.
+다른 lane 수정 금지. 결과 커밋에 [AUTO:TASK_ID]를 넣고 해당 SHA Gate를 확인해. 실기 미실행은 UNTESTED.

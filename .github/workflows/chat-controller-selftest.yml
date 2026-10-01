@@ -17,12 +17,12 @@ jobs:
       - name: Reassemble and compile controller
         run: |
           cat tools/chat-controller/v0.4/src/controller.py.part* > /tmp/controller.py
-          python -m py_compile /tmp/controller.py tools/chat-controller/v0.4/src/broker_protocol.py
+          python -m py_compile /tmp/controller.py
 
       - name: Check undefined Python names
         run: |
           python -m pip install --disable-pip-version-check --quiet pyflakes
-          pyflakes /tmp/controller.py tools/chat-controller/v0.4/src/broker_protocol.py | tee /tmp/pyflakes.txt || true
+          pyflakes /tmp/controller.py | tee /tmp/pyflakes.txt || true
           if grep -q "undefined name" /tmp/pyflakes.txt; then
             echo "Undefined Python names detected:"
             grep "undefined name" /tmp/pyflakes.txt
@@ -46,114 +46,15 @@ jobs:
           grep -Fq 'EXPECTED_PROJECT_ID: "g-p-6ab9a64fc428819198c7f39765d764bf"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'No assistant response was detected before the queue result grace period expired' tools/chat-controller/v0.4/src/controller.py.part03
 
-      - name: Verify compact GitHub broker contract
+      - name: Verify native plugins and evidence-based recovery
         run: |
-          grep -Fq 'BROKER=' /tmp/controller.py
+          python tools/chat-controller/v0.4/test_native_controller.py
+          grep -Fq 'FIRST_ACTION=CALL_CONNECTED_GITHUB_PLUGIN' /tmp/controller.py
           grep -Fq 'PUBLIC_GITHUB_ACCESS=DO_NOT_USE' /tmp/controller.py
-          grep -Fq 'FIRST_ACTION=BROKER_READ_OR_CHANGESET' /tmp/controller.py
-          grep -Fq 'GITHUB_BROKER_PROTOCOL_VERSION = 2' /tmp/controller.py
-          grep -Fq 'def github_api_mutation_json' /tmp/controller.py
-          grep -Fq 'def github_broker_apply_changeset' /tmp/controller.py
-          grep -Fq 'async def queue_handle_broker_response' /tmp/controller.py
-          grep -Fq 'def github_broker_initial_context' /tmp/controller.py
-          grep -Fq '첫 응답은 반드시 아래 둘 중 태그 하나만 제출해' /tmp/controller.py
-          grep -Fq 'BROKER_READ_RESULT' /tmp/controller.py
-          grep -Fq 'async def queue_require_broker_action' /tmp/controller.py
-          grep -Fq 'status="github_broker_action_required"' /tmp/controller.py
-          grep -Fq 'status="github_broker_commit_created"' /tmp/controller.py
-          grep -Fq 'class GitHubBrokerPermissionError' /tmp/controller.py
-          grep -Fq 'def github_broker_spool_pending' /tmp/controller.py
-          grep -Fq 'status="github_broker_write_permission_wait"' /tmp/controller.py
-          grep -Fq 'github_broker_write_capable(strict=True)' /tmp/controller.py
-          grep -Fq 'status="github_recovery_preempted_retry"' /tmp/controller.py
-          grep -Fq 'status="github_broker_legacy_handoff"' /tmp/controller.py
-          grep -Fq 'async def queue_upgrade_legacy_broker_context' /tmp/controller.py
-          grep -Fq 'if active and await queue_upgrade_legacy_broker_context(context, pages, q, active):' /tmp/controller.py
-          grep -Fq 'legacy_broker_candidates' /tmp/controller.py
-          grep -Fq '"broker_context_injected": bool(GITHUB_BROKER_ENABLED)' /tmp/controller.py
-          test "$(grep -Fc 'queue_handle_broker_response(context, pages, active, q' /tmp/controller.py)" -ge 3
-          if grep -Fq 'GITHUB_ACCESS_MODE=' /tmp/controller.py; then
-            echo "legacy verbose GitHub access mode remains"
+          if grep -Eq 'def github_api_mutation_json|def github_broker_|\[BROKER_(READ|CHANGESET)\]' /tmp/controller.py; then
+            echo "Removed broker execution path remains"
             exit 1
           fi
-          grep -Fq 'GITHUB_BROKER_ENABLED: "true"' tools/chat-controller/v0.4/docker-compose.portainer.yml
-          grep -Fq 'GITHUB_BROKER_ENABLED: "true"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'GITHUB_BROKER_ENABLED: "true"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'GITHUB_BROKER_MAX_CONTEXT_CHARS: "18000"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'GITHUB_BROKER_MAX_FILE_CHARS: "8000"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'GITHUB_BROKER_MAX_CONTEXT_CHARS: "18000"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'GITHUB_BROKER_MAX_FILE_CHARS: "8000"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'COPY src/broker_protocol.py /opt/outrun/app/broker_protocol.py' tools/chat-controller/v0.4/Dockerfile.portainer
-          python - <<'PY2'
-          import ast
-          from pathlib import Path
-          src = Path('/tmp/controller.py').read_text(encoding='utf-8')
-          tree = ast.parse(src)
-          fn = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'assistant_claims_github_tooling_absent')
-          ns = {}
-          exec(compile(ast.Module(body=[fn], type_ignores=[]), '<classifier>', 'exec'), ns)
-          detect = ns['assistant_claims_github_tooling_absent']
-          samples = [
-              'GitHub 플러그인의 실제 호출 함수(schema)가 노출되지 않아 branch 조회: 실행 불가, commit 생성 불가',
-              '연결 GitHub connector를 사용할 수 없어 HEAD 조회 불가. RESULT_SHA=NOT_CREATED AUTOMATION_VALIDATION=NOT_RUN',
-              'GitHub 도구 접근이 불가능해서 소스 수정 불가, Git commit 생성 불가, Actions Gate 확인 불가',
-              '플러그인 함수가 보이지 않아 진행하지 못했습니다. GitHub 저장소 조회 불가, 커밋 없음',
-              '현재 이 대화 환경에서는 연결된 GitHub 플러그인의 실제 리소스 호출 결과를 반환받지 못했습니다. 따라서 korean-localization-clean HEAD, docs/automation/runs, localization/controller_roles.json, canonical contract 내용을 실제 조회한 것으로 가장하여 진행하지 않겠습니다. 변경/커밋 없음. 결과 커밋 생성 없음.',
-              '현재 이 대화 실행 환경에서는 요청한 연결 GitHub 플러그인의 실제 GitHub 호출 인터페이스가 노출되어 있지 않아 vr-dxvk-r71-disasm 실제 HEAD 조회 실행 불가, AGENTS.md 조회 불가, 소스 수정 및 커밋 생성 불가, GitHub Actions Gate 확인 불가입니다. TASK_ID=CONVERSION-DXVK-00267 RESULT_SHA=NOT_CREATED AUTOMATION_VALIDATION=NOT_RUN RUNTIME_VALIDATION=UNTESTED.',
-              'GitHub 연결 리소스 탐색 호출은 수행했으나, 현재 이 세션에 노출된 도구 목록에는 실제 GitHub 저장소 조회/파일 읽기/커밋 실행 함수가 로드되어 있지 않아 korean-localization-clean branch와 docs/automation/runs/ 상태 파일을 직접 읽는 단계까지 진행할 수 없습니다. Git HEAD 검증: 미완료. 변경/커밋 없음.',
-          ]
-          assert all(detect(x) for x in samples)
-          assert not detect('GitHub 플러그인으로 HEAD를 확인했고 소스 수정과 commit을 완료했습니다. RESULT_SHA=abc123')
-          body=src[src.index('def github_broker_apply_changeset'):src.index('def github_branch_head')]
-          assert body.index('current_head = github_branch_head(branch)') < body.index('github_api_mutation_json(')
-          assert '"force": False' in body
-          assert 'broker result commit must not contain CI-skip directives' in body
-          q=src[src.index('def queue_dynamic_prefix'):src.index('async def first_visible')]
-          assert 'github_broker_initial_context(active)' in q
-          assert 'FIRST_ACTION=BROKER_READ_OR_CHANGESET' in q
-          init=src[src.index('def github_broker_initial_context'):src.index('def github_broker_apply_changeset')]
-          assert 'github_broker_render_read_result' not in init
-          r=src[src.index('def queue_rollover_prompt'):src.index('async def queue_rollover_chat')]
-          assert 'github_broker_initial_context(active)' in r
-          assert 'queue_require_broker_action(context, pages, active, text)' in src
-          print('compact broker protocol and wording-independent action enforcement verified')
-          PY2
-
-      - name: Verify broker protocol parser
-        run: |
-          python - <<'PY2'
-          import importlib.util
-          from pathlib import Path
-          path=Path('tools/chat-controller/v0.4/src/broker_protocol.py')
-          spec=importlib.util.spec_from_file_location('broker_protocol', path)
-          mod=importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
-          read=mod.parse_broker_read('[BROKER_READ]{"files":[{"path":"src/a.cpp","start":10,"end":20}]}[/BROKER_READ]')
-          assert read == [{"path":"src/a.cpp","start":10,"end":20}]
-          cs=mod.parse_broker_changeset('[BROKER_CHANGESET]{"base_sha":"0123456789abcdef0123456789abcdef01234567","commit_message":"x [AUTO:TASK-1]","edits":[{"op":"replace","path":"src/a.cpp","old":"old","new":"new","count":1}]}[/BROKER_CHANGESET]')
-          assert mod.apply_text_edit('old value', cs['edits'][0]) == 'new value'
-          try:
-              mod.safe_repo_path('../escape')
-              raise AssertionError('unsafe path accepted')
-          except mod.BrokerProtocolError:
-              pass
-          try:
-              mod.apply_text_edit('old old', cs['edits'][0])
-              raise AssertionError('ambiguous replacement accepted')
-          except mod.BrokerProtocolError:
-              pass
-          print('broker protocol parser/edit guards verified')
-          PY2
-
-      - name: Verify task prompts stay compact and action-first
-        run: |
-          for prompt in \
-            conversion_dx11.md conversion_dxvk.md \
-            localization_A.md localization_B.md localization_C.md localization_E.md; do
-            file="tools/chat-controller/v0.4/$prompt"
-            grep -Fq '첫 행동은 BROKER_READ' "$file"
-            grep -Fq 'BROKER_CHANGESET' "$file"
-            test "$(wc -c < "$file")" -le 500
-          done
 
       - name: Verify browser transport self-recovery
         run: |
@@ -163,20 +64,6 @@ jobs:
           grep -Fq 'status="browser_transport_lost"' /tmp/controller.py
           grep -Fq 'Docker restart policy can recover' /tmp/controller.py
           test "$(grep -Fc 'if is_browser_transport_failure(e):' /tmp/controller.py)" -ge 3
-
-      - name: Verify GitHub refusal preempts generic Retry
-        run: |
-          grep -Fq 'status="github_recovery_preempted_retry"' /tmp/controller.py
-          python - <<'PY2'
-          from pathlib import Path
-          src=Path('/tmp/controller.py').read_text(encoding='utf-8')
-          a=src.index('async def queue_handle_retry_surface')
-          b=src.index('def assistant_claims_github_unavailable', a)
-          body=src[a:b]
-          assert body.index('assistant_text = await last_assistant_text(page)') < body.index('if await click_retry_generation(page):')
-          assert body.index('assistant_claims_github_tooling_absent(assistant_text)') < body.index('if await click_retry_generation(page):')
-          print('GitHub refusal recovery preempts generic Retry')
-          PY2
 
       - name: Verify bounded generic Retry recovery
         run: |
@@ -652,3 +539,4 @@ jobs:
           assert 'recovery = await recover_missing_gate_run(context, pages, active, now)' in src
           print("missing Actions run recovery verified")
           PY
+

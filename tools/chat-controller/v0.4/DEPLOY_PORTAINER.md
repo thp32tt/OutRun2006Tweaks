@@ -1,3 +1,13 @@
+## 2026-10-02: 플러그인 직접 작업 구조
+
+- 브로커 실행 코드와 Docker 설정을 제거했습니다. 기존 환경변수 `GITHUB_BROKER_*`는 더 이상 사용되지 않습니다.
+- ChatGPT는 연결된 GitHub/Drive 및 이미지 도구로 직접 작업합니다. 컨트롤러는 자체 토큰으로 GitHub 결과를 읽어 검증하며, 채팅 플러그인의 연결 여부를 대신 단정하지 않습니다.
+- `chat-controller-downloads` 최신 소스로 두 Stack을 **재빌드 후 재배포**해야 Python 코드가 갱신됩니다. 컨테이너 restart 또는 base image pull만으로는 변경되지 않습니다.
+- 기존 /data 볼륨을 유지하세요. 기존 TASK_ID와 채팅을 보존하며 `native_plugin_migrated`가 한 번 기록됩니다. 예전 broker_pending 파일은 삭제·자동 실행하지 않습니다.
+- 확인: 상태 페이지에서 Native connected plugins, 동일 TASK_ID, 실제 result_sha와 해당 Gate 결과를 확인합니다. 아직 커밋이 없는 응답은 UNVERIFIED_NO_TASK_COMMIT로 기록됩니다.
+- 컨트롤러 GitHub 토큰에는 Contents/Actions 읽기 권한만 필요합니다. 실제 수정 권한은 채팅의 GitHub 연결에 별도로 필요합니다.
+- 이 변경은 플러그인 미노출 자체를 해결하거나 모델의 도구 호출을 강제하지 못합니다. 근거 없는 성공·실패 발언으로 큐가 완료/실패 전환되는 경로를 막습니다.
+
 # OutRun Chat Controller v0.4 — Portainer deployment
 
 ## Architecture
@@ -251,3 +261,4 @@ Localization A/B no longer use preflight/work-order count as the main throughput
 - QA strictness is unchanged.
 
 This policy is also enforced by the live Git localization contract, so it takes effect for newly dispatched work even before the N100 stack is redeployed. Pull/redeploy the localization Portainer stack to bake the updated controller prompts into the running image.
+
