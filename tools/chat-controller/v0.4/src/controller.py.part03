@@ -550,9 +550,14 @@ def assistant_claims_github_tooling_absent(text: str) -> bool:
     )
     task_block_markers = (
         "head 조회",
+        "head 검증",
         "branch 조회",
         "소스 수정",
         "git commit",
+        "커밋 실행",
+        "커밋 생성",
+        "파일 읽기",
+        "상태 파일",
         "github actions",
         "actions gate",
         "저장소 조회",
