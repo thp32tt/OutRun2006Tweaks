@@ -230,7 +230,7 @@ namespace OutRunVRStereo
             if (FAILED(hr) || !IsGameDevice(device) || InternalStereoPass)
                 return hr;
 
-            if (R31StateBlockRecording)
+            if (OutRunVR::State::StateBlockTracker::Recording())
             {
                 R33InvalidateDepthStencilCache();
                 return hr;
@@ -287,7 +287,7 @@ namespace OutRunVRStereo
         R31OwnedResult R33TryFastWorld(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
-            if (R31StateBlockRecording || !R29StableStereoBase(device))
+            if (OutRunVR::State::StateBlockTracker::Recording() || !R29StableStereoBase(device))
             {
                 if (R33TelemetryEnabled() && IsGameDevice(device) &&
                     !InternalStereoPass && TargetIsBackBuffer())
@@ -461,7 +461,7 @@ namespace OutRunVRStereo
         {
             const R30ScreenSpaceKind screenKind =
                 R30ClassifyScreenSpacePass(device);
-            if (R31StateBlockRecording || !R29StableStereoBase(device) ||
+            if (OutRunVR::State::StateBlockTracker::Recording() || !R29StableStereoBase(device) ||
                 screenKind == R30ScreenSpaceKind::None)
                 return {};
 
@@ -622,13 +622,13 @@ namespace OutRunVRStereo
             ActualDraw&& actualDraw, LowerR29Draw&& lowerR29Draw,
             const char* site) noexcept
         {
-            if (!R31StateBlockRecording)
+            if (!OutRunVR::State::StateBlockTracker::Recording())
                 R31FlushPendingStateBlockResync(device);
             const bool telemetry = R33TelemetryEnabled();
             if (telemetry)
                 R31ObserveDraw(device);
 
-            if (R31StateBlockRecording)
+            if (OutRunVR::State::StateBlockTracker::Recording())
             {
                 if (telemetry)
                     ++R31Frame.fallback;

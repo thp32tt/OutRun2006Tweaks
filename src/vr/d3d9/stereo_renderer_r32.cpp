@@ -413,7 +413,7 @@ namespace OutRunVRStereo
         R31OwnedResult R32TryFastWorld(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, const char* site)
         {
-            if (R31StateBlockRecording || !R29StableStereoBase(device))
+            if (OutRunVR::State::StateBlockTracker::Recording() || !R29StableStereoBase(device))
             {
                 if (IsGameDevice(device) && !InternalStereoPass && TargetIsBackBuffer())
                     ++R31Frame.unstable;
@@ -572,7 +572,7 @@ namespace OutRunVRStereo
         {
             const R30ScreenSpaceKind screenKind =
                 R30ClassifyScreenSpacePass(device);
-            if (R31StateBlockRecording || !R29StableStereoBase(device) ||
+            if (OutRunVR::State::StateBlockTracker::Recording() || !R29StableStereoBase(device) ||
                 screenKind == R30ScreenSpaceKind::None)
                 return {};
             if (!OutRunVR::State::StateBlockTracker::Reliable())
@@ -744,7 +744,7 @@ namespace OutRunVRStereo
         {
             R31ObserveDraw(device);
 
-            if (!R31StateBlockRecording)
+            if (!OutRunVR::State::StateBlockTracker::Recording())
             {
                 if (R30ClassifyScreenSpacePass(device) != R30ScreenSpaceKind::None)
                 {

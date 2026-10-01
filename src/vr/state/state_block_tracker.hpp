@@ -74,6 +74,14 @@ namespace OutRunVR::State
         {
             return ApplyGenerationCounter().load(std::memory_order_relaxed);
         }
+        static void SetRecording(bool recording) noexcept
+        {
+            RecordingFlag() = recording;
+        }
+        static bool Recording() noexcept
+        {
+            return RecordingFlag();
+        }
     private:
         static std::atomic<bool>& R22ReliableFlag() noexcept
         {
@@ -91,6 +99,11 @@ namespace OutRunVR::State
             return value;
         }
         static bool& ResyncPending() noexcept
+        {
+            static thread_local bool value = false;
+            return value;
+        }
+        static bool& RecordingFlag() noexcept
         {
             static thread_local bool value = false;
             return value;

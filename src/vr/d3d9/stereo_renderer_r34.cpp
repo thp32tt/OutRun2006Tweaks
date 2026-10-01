@@ -71,7 +71,7 @@ namespace OutRunVRStereo
                 drawSemanticValue);
 
             if (!device || !IsGameDevice(device) || InternalStereoPass ||
-                R31StateBlockRecording || !StereoWanted() ||
+                OutRunVR::State::StateBlockTracker::Recording() || !StereoWanted() ||
                 !TargetIsBackBuffer())
             {
                 return drawCall();
