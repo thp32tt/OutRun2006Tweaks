@@ -1080,13 +1080,4 @@ namespace OutRunVRStereo
         VRStereoR31PerfHook VRStereoR31PerfHook::instance;
     }
 
-    bool IsGameStateBlockRecording() noexcept
-    {
-        return OutRunVR::State::StateBlockTracker::Recording();
-    }
-
-    bool IsStateBlockTrackingReliable() noexcept
-    {
-        return OutRunVR::State::StateBlockTracker::Reliable();
-    }
 }

@@ -18,6 +18,7 @@
 #include <limits>
 
 #include "outrun_renderer_r23.cpp"
+#include "../state/state_block_tracker.hpp"
 
 namespace OutRunVRRenderer
 {
@@ -166,7 +167,7 @@ namespace OutRunVRRenderer
                     device, startRegister, constantData, vector4fCount);
             }
 
-            if (OutRunVRStereo::IsGameStateBlockRecording())
+            if (OutRunVR::State::StateBlockTracker::Recording())
             {
                 // A recorded StateBlock must contain the game's stock values,
                 // not a pose-patched matrix that could be replayed in a later
@@ -212,7 +213,7 @@ namespace OutRunVRRenderer
             // from the live device before every partial update in that mode so
             // matrix B can never be combined with cached rows from matrix A.
             if (partialWvp && (!R28RawWvpComplete() ||
-                    !OutRunVRStereo::IsStateBlockTrackingReliable()))
+                    !OutRunVR::State::StateBlockTracker::Reliable()))
                 R29SeedCurrentStockWvp(device);
             R28TrackRawWvpWrite(startRegister, constantData, vector4fCount);
 
