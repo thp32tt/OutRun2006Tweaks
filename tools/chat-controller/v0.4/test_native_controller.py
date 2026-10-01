@@ -70,6 +70,29 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('TOOL_NOT_EXPOSED', prompt)
         self.assertIn('NATIVE_PLUGIN_PROTOCOL_VERSION = 2', SOURCE)
 
+    def test_dynamic_prefix_stays_compact(self):
+        native, _ = load_function('native_plugin_instructions')
+        f, _ = load_function(
+            'queue_dynamic_prefix',
+            runtime=dict(
+                queue_task_id='CONVERSION-DX11-12345',
+                queue_lane='DX11',
+                queue_branch='vr-dx11-native-r71',
+                queue_base_sha='a' * 40,
+                queue_attempt=1,
+                queue_failure_context='',
+                queue_wave_id='',
+                queue_qa_batch=[],
+            ),
+            MAX_TASK_ATTEMPTS=3,
+            native_plugin_instructions=native,
+        )
+        prefix = f()
+        self.assertLessEqual(len(prefix.encode()), 1800)
+        self.assertIn('FIRST_ACTION=CALL_CONNECTED_GITHUB_PLUGIN', prefix)
+        self.assertIn('ALL_TOOLS', prefix)
+        self.assertNotIn('bookkeeping/checkpoint', prefix)
+
     def test_no_progress_is_handled_even_when_send_deferred(self):
         self.assertTrue('queue_handle_native_response' in FUNCTIONS)
         f, ns = load_function('queue_handle_native_response', queue_send_github_recovery=AsyncMock(return_value=False))
