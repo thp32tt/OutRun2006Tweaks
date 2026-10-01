@@ -1,5 +1,5 @@
 {
-  "schema_version": 35,
+  "schema_version": 36,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -37,7 +37,10 @@
       "primary": "CANDIDATE_BEARING_RESULTS_FIRST",
       "candidate_signal": "candidate_dds_modified=true OR materially_reworked_candidate=true",
       "secondary": "PREFLIGHT_OR_RESEARCH_RESULTS",
-      "preflight_must_not_delay_candidate_batch": true
+      "preflight_must_not_delay_candidate_batch": true,
+      "producer_must_continue_after_qa_pending": true,
+      "qa_pending_is_not_production_stop": true,
+      "producer_scan_full_own_shard_before_none": true
     },
     "producer_batch_completion": {
       "target_candidate_dds": 2,
