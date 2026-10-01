@@ -172,6 +172,18 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 
 
 
+## Final-artwork convergence mode (schema 38)
+
+While `final_artwork_completed < final_artwork_total` or `final_artwork_percent < 100`, localization production is in **final-artwork convergence mode**. The objective of A/B/E is to increase the number of current-v2 Korean DDS assets that reach C static QA production-complete state, not to maximize plans, reports, runtime manifests, source probes, or preflight records.
+
+- A/B/E selection order is: runnable `REWORK_REQUIRED` -> explicit render-next -> `RENDER_READY` -> `ONE_STAGE_TO_RENDER` completed through render in the same invocation -> existing candidate rework -> one preflight advance only when a fresh owning-shard scan proves no completion-tier item is runnable.
+- A producer normal success is a new or materially reworked DDS candidate. A runtime-only/DDS_ONLY isolation manifest, planning/status record, unchanged-candidate review, or repeated source probe is not producer completion while final artwork remains incomplete.
+- At most one preflight-only batch may be accepted consecutively for a lane. The next invocation must attempt a completion-tier path before another preflight-only batch. If that attempt is dependency-blocked, skip that asset and continue to another independent unfinished asset in the same shard.
+- `RUNTIME_VALIDATION=UNTESTED` does **not** block static production completion. Runtime approval remains a separate user integrated-game milestone.
+- C owns shared final-artwork reconciliation. On every C batch, rebuild current rework/static state from the newest candidate/result evidence rather than carrying stale snapshot labels forward. A newer current-v2 static PASS supersedes an older REWORK_REQUIRED entry for the same asset.
+- C maintains an authoritative `graphics_checkpoint.production_complete_assets` set and recomputes `final_artwork_completed` and `final_artwork_percent` from unique final-artwork targets that have current static production-complete evidence (or an explicit current-policy preserve/not-required classification). Runtime-untested status does not remove an asset from this static completion count.
+- Packaging remains after final-artwork convergence; it must not be used as a reason to defer DDS creation.
+
 ## Candidate-completion-first production policy
 
 Effective 2026-09-29. This policy overrides preflight-expansion behavior in the generic throughput/fallback rules. The purpose is to turn accepted reconstruction evidence into actual Korean DDS candidates instead of accumulating work-order backlog.
