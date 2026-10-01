@@ -123,10 +123,10 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA30__FRESH_HEAD_ZERO_COMPLETION_TIER__INDEX228_C136_SOURCE_EXHAUSTION_REUSED__NO_SOURCE_REPROBE__NONCANONICAL_RELEASE_SUBSTITUTION_FORBIDDEN__EXECUTABLE_REACTIVATION_GUARD__NO_SHARED_STATE__NO_DDS__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "ffd813d876bb83b21d02af41c4bad726bd5ea913",
+  "authoritative_result_sha": "ffd813d876bb83b21d02af41c4bad726bd5ea913",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_RESULT_COMMIT_CREATION",
+  "result_binding_state": "BOUND_TO_PRODUCER_RESULT_PENDING_C_BATCH_GATE",
   "result_commit_message": "localization(A): guard index228 source reactivation [AUTO:LOCALIZATION-LOCALIZATION_A-00371]",
   "durable_task_record_in_result_commit": true,
   "precommit_refresh": {
@@ -135,5 +135,10 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Fresh latest HEAD, schema30 roles/contract, queue/inventory, C136 source-exhaustion authority, C177/Q00075 shared state, and A00351/A00352/A00366 producer records were re-read immediately before tree creation. Only role_A A00371 verifier/report and the unique A00371 task record are added."
   },
-  "bookkeeping_note": "Initial durable result commit intentionally leaves self-SHA fields null; a separate bookkeeping-only commit may bind the immutable producer RESULT_SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Initial durable result commit intentionally leaves self-SHA fields null; a separate bookkeeping-only commit may bind the immutable producer RESULT_SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping": {
+    "recorded_at_kst": "2026-10-01T17:54:00+09:00",
+    "producer_result_sha": "ffd813d876bb83b21d02af41c4bad726bd5ea913",
+    "note": "Bookkeeping-only immutable producer RESULT_SHA binding. Atomic result ffd813d876bb83b21d02af41c4bad726bd5ea913 contains the index228 verifier, machine report, and durable A00371 task record. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; no real-game validation was performed and RUNTIME_VALIDATION remains UNTESTED."
+  }
 }
