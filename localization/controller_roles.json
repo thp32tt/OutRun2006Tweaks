@@ -1,5 +1,5 @@
 {
-  "schema_version": 29,
+  "schema_version": 30,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -235,7 +235,10 @@
       ],
       "qa_blocked_retry_rotates_to_tail": true,
       "qa_ready_selection_skips_backoff_items": true,
-      "qa_blocked_retry_does_not_block_other_ready_inputs": true
+      "qa_blocked_retry_does_not_block_other_ready_inputs": true,
+      "controller_restart_requested_bypasses_lane_isolation": true,
+      "thinking_verification_restart_is_immediate": true,
+      "clean_home_composer_recovery_persists_canonical_slot_clear": true
     },
     "state_persistence": {
       "atomic_primary_writes": true,
@@ -255,7 +258,8 @@
       "memory_idle_restart_percent": 80,
       "memory_fatal_restart_percent": 92,
       "memory_idle_restart_requires_no_active_task": true,
-      "memory_fatal_restart_preserves_queue_state": true
+      "memory_fatal_restart_preserves_queue_state": true,
+      "controller_restart_requested_immediate_exit": true
     }
   },
   "runtime_tuning": {
@@ -335,7 +339,8 @@
       "qa_retry_not_before",
       "last_qa_blocked_task_id",
       "last_qa_blocked_at"
-    ]
+    ],
+    "controller_restart_status": "controller_restart_requested"
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
