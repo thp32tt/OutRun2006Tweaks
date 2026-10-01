@@ -1,0 +1,69 @@
+{
+  "task_id": "CONVERSION-DXVK-00199",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "a0a369b48c53d833cd493463d5d10c38aa602cf3",
+  "result_sha": "PENDING",
+  "validation_bearing_result_sha": "PENDING",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R199_182391_FRESH_PROVENANCE",
+  "selection_reason": "CONVERSION-DXVK-00197 exact-decoded through exclusive end 0x182391 and explicitly named fresh exact bytes there as the next independent F13 task. A 96-byte capture includes local forward targets 0x18239F and 0x1823AC without requiring semantic interpretation.",
+  "summary": "PENDING automatic validation. Adds a fail-closed 96-byte exact-EXE provenance capture from 0x182391 through exclusive end 0x1823F1, covering the previously decoded local forward targets 0x18239F and 0x1823AC and recording raw inbound/outbound rel32 census. This task intentionally makes no instruction-boundary, function-entry, callee-semantic or render/HUD ownership claim for any included target.",
+  "evidence": [
+    "Base a0a369b48c53d833cd493463d5d10c38aa602cf3 is the completed CONVERSION-DXVK-00197 bookkeeping descendant; validation-bearing ancestor de598aaf proves the prior exact decode ends at 0x182391.",
+    "R199 requires the exact R197 predecessor status/end, .text placement, exactly 96 captured bytes, and exclusive probe end 0x1823F1.",
+    "Target byte snapshots are recorded for 0x182391, 0x18239F and 0x1823AC solely to establish that bytes are now available; no target is promoted to an instruction boundary.",
+    "No Quest 3 / VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00199.json"
+  ],
+  "proof_contract": {
+    "predecessor_status": "EXACT_182331_TO_182391_CONTROL_FLOW_PREFIX_PROVEN",
+    "target_rva": "0x00182391",
+    "probe_len": 96,
+    "probe_end_rva": "0x001823F1",
+    "referenced_target_rvas": [
+      "0x00182391",
+      "0x0018239F",
+      "0x001823AC"
+    ],
+    "expected_status": "EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED",
+    "start_boundary_status": "UNRESOLVED_RAW_BYTES_ONLY",
+    "referenced_target_status": "BYTES_CAPTURED_BOUNDARIES_UNRESOLVED",
+    "function_entry_status": "UNRESOLVED_AT_182391_18239F_1823AC",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "ownership_effect": "NONE",
+    "continuation_scope": "RAW_BYTES_TARGET_BYTES_AND_REL32_CENSUS_ONLY"
+  },
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE_UNCHANGED",
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no renderer/provider/selector/package/transport/backend activation behavior changes.",
+    "ownership": "Fresh raw continuation bytes do not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Capture fails closed unless R197 remains exact through exclusive end 0x182391, the new probe starts exactly there in .text, all 96 bytes are available, its exclusive end is exactly 0x1823F1, and all referenced target RVAs are inside the new window. No target-boundary inference is permitted."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_182331_CONTROL_FLOW_PREFIX_PROVEN",
+    "after": "PENDING_182391_TO_1823F1_PROVENANCE",
+    "runtime_claim": false
+  },
+  "blocker": "Fresh bytes at 0x182391..0x1823F0 are the current bounded target. Even after capture, 0x182391/0x18239F/0x1823AC instruction-boundary/function identities and any call/render semantics remain unresolved until a separate exact decode.",
+  "next_action": "Wait for exact-SHA automatic validation. Do not publish another ordinary same-branch commit until Backend Conversion Gate completes because cancel-in-progress is enabled.",
+  "validation": {
+    "automation_validation": "PENDING",
+    "runtime_validation": "UNTESTED"
+  }
+}
