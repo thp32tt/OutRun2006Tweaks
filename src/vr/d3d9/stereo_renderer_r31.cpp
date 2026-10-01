@@ -918,16 +918,40 @@ namespace OutRunVRStereo
             return true;
         }
 
+        enum class R31PrerequisiteDecision
+        {
+            Wait,
+            Fail,
+            Install
+        };
+
+        constexpr int R31PrerequisiteWaitAttempts = 4800;
+        constexpr DWORD R31PrerequisiteWaitMs = 25;
+
+        R31PrerequisiteDecision R31ClassifyPrerequisite(
+            OutRunVR::RuntimeEligibility::InstallState r30,
+            OutRunVR::RuntimeEligibility::InstallState renderer) noexcept
+        {
+            using State = OutRunVR::RuntimeEligibility::InstallState;
+            if (r30 == State::Failed || renderer == State::Failed)
+                return R31PrerequisiteDecision::Fail;
+            if (r30 == State::Ready && renderer == State::Ready)
+                return R31PrerequisiteDecision::Install;
+            return R31PrerequisiteDecision::Wait;
+        }
+
         DWORD WINAPI R31InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
             R31InstallState.store(State::Pending, std::memory_order_release);
 
-            for (int attempt = 0; attempt < 4800; ++attempt)
+            for (int attempt = 0; attempt < R31PrerequisiteWaitAttempts; ++attempt)
             {
                 const auto r30 = ScreenSpaceInstallState();
                 const auto renderer = OutRunVRRenderer::RendererInstallState();
-                if (r30 == State::Failed || renderer == State::Failed)
+                const auto prerequisite =
+                    R31ClassifyPrerequisite(r30, renderer);
+                if (prerequisite == R31PrerequisiteDecision::Fail)
                 {
                     R31InstallState.store(State::Failed, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR31Perf", false);
@@ -936,7 +960,7 @@ namespace OutRunVRStereo
                     return 0;
                 }
 
-                if (r30 == State::Ready && renderer == State::Ready)
+                if (prerequisite == R31PrerequisiteDecision::Install)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
                     R31DrawPrimitiveR30Hook = safetyhook::create_inline(
@@ -1011,7 +1035,7 @@ namespace OutRunVRStereo
                         "VR R31 PERF: cached world stereo + draw-route telemetry READY; R30 HUD sentinel path superseded");
                     return 0;
                 }
-                Sleep(25);
+                Sleep(R31PrerequisiteWaitMs);
             }
 
             R31InstallState.store(State::Failed, std::memory_order_release);

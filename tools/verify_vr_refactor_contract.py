@@ -473,6 +473,21 @@ else:
         if escaped in apply_body:
             errors.append(f"R30 apply regained startup ownership: {escaped}")
 
+for marker in (
+    "enum class R31PrerequisiteDecision",
+    "R31PrerequisiteWaitAttempts = 4800",
+    "R31PrerequisiteWaitMs = 25",
+    "R31ClassifyPrerequisite(",
+):
+    if marker not in r31:
+        errors.append(f"R31 prerequisite policy boundary missing marker: {marker}")
+if "attempt < 4800" in r31 or "Sleep(25)" in r31:
+    errors.append("R31 prerequisite timing literal escaped policy boundary")
+if "attempt < R31PrerequisiteWaitAttempts" not in r31 or "Sleep(R31PrerequisiteWaitMs)" not in r31:
+    errors.append("R31 install thread no longer consumes prerequisite timing policy")
+if "R31ClassifyPrerequisite(r30, renderer)" not in r31:
+    errors.append("R31 install thread bypassed prerequisite classifier")
+
 r33_read_begin = r33.find("ReadFinalDispatchInstallState() noexcept")
 r33_public_read_begin = r33.find("FinalDispatchInstallState() noexcept", r33_read_begin + 1)
 if r33_read_begin < 0 or r33_public_read_begin <= r33_read_begin:
