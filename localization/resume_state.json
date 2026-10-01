@@ -1,5 +1,5 @@
 {
-  "schema_version": 99,
+  "schema_version": 100,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1189,7 +1189,9 @@
       "flattened_raster_resize_forbidden": true,
       "report": "localization/graphics/GENERATION_V2_SAFE_FIT_20260929.json",
       "runtime_validation": "UNTESTED"
-    }
+    },
+    "final_artwork_total": 95,
+    "final_artwork_percent": 0
   },
   "runtime_packages": {
     "k1": {
@@ -2608,5 +2610,9 @@
       143
     ],
     "audit_summary": "7 affected assets; 3 prior completed/static-pass affected; 2 confirmed REWORK_REQUIRED; 1 HOLD_STRICT_RECHECK; 4 pending production under v19"
+  },
+  "packaging": {
+    "status": "pending",
+    "completion_requires": "final_artwork_percent=100 and no current REWORK_REQUIRED/QA_PENDING/pending_* blockers"
   }
 }
