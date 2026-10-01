@@ -97,10 +97,10 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "3c4a59cf0f538b0ddffd1e51d14537a9ccc643d6",
+  "authoritative_result_sha": "3c4a59cf0f538b0ddffd1e51d14537a9ccc643d6",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "UNBOUND_PRECOMMIT",
+  "result_binding_state": "BOUND_TO_PRODUCER_RESULT_PENDING_C_BATCH_GATE",
   "result_commit_message": "localization(E): guard index230 canonical source [AUTO:LOCALIZATION-LOCALIZATION_E-00374]",
   "durable_task_record_in_result_commit": true,
   "precommit_refresh": {
@@ -109,5 +109,11 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Refreshed branch immediately before result creation. Recent peer deltas are producer/reconciliation records only; E lane shared fingerprints remain unchanged. Result adds only unique role_E E00374 verifier/report and unique durable E00374 task record."
   },
-  "bookkeeping_note": "Initial durable result commit intentionally leaves self-SHA fields null. A separate bookkeeping-only commit may bind the immutable producer RESULT_SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Initial durable result commit intentionally leaves self-SHA fields null. A separate bookkeeping-only commit may bind the immutable producer RESULT_SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping": {
+    "recorded_at_kst": "2026-10-01T18:26:00+09:00",
+    "producer_result_sha": "3c4a59cf0f538b0ddffd1e51d14537a9ccc643d6",
+    "head_before_bookkeeping": "3c4a59cf0f538b0ddffd1e51d14537a9ccc643d6",
+    "note": "Bookkeeping-only immutable producer RESULT_SHA binding. The atomic result commit contains the index230 verifier, machine-readable source acquisition report, and durable E00374 task record. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; RUNTIME_VALIDATION remains UNTESTED."
+  }
 }
