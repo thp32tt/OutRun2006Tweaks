@@ -1,5 +1,5 @@
 {
-  "schema_version": 23,
+  "schema_version": 24,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -200,7 +200,9 @@
       "durable_git_precedes_ui_recovery": true,
       "post_send_task_identity_preserved": true,
       "chat_rate_limit_blocks_sends_not_git_reconcile": true,
-      "negative_task_commit_lookup_not_cached": true
+      "negative_task_commit_lookup_not_cached": true,
+      "task_commit_branch_scan_pages": 3,
+      "actions_discovery_per_page": 100
     },
     "state_persistence": {
       "atomic_primary_writes": true,
@@ -212,7 +214,7 @@
     "process_recovery": {
       "repeated_identical_queue_exception_restart_threshold": 3,
       "repeated_identical_watchdog_exception_restart_threshold": 3,
-      "queue_heartbeat_fatal_seconds": 300,
+      "queue_heartbeat_fatal_seconds": 180,
       "restart_owner": "DOCKER_UNLESS_STOPPED"
     }
   },
@@ -246,10 +248,12 @@
     "fresh_chat_each_task": true,
     "wait_actions_no_run_timeout_seconds": 600,
     "wait_actions_max_seconds": 1800,
-    "process_heartbeat_fatal_seconds": 300,
+    "process_heartbeat_fatal_seconds": 180,
     "queue_error_restart_threshold": 3,
     "watchdog_error_restart_threshold": 3,
-    "watchdog_busy_stall_seconds": 1800
+    "watchdog_busy_stall_seconds": 1800,
+    "github_task_commit_scan_pages": 3,
+    "github_actions_discovery_per_page": 100
   },
   "runtime_observability": {
     "queue_loop_heartbeat_seconds": 15,
@@ -272,7 +276,9 @@
     ],
     "task_chat_lifecycle": "FRESH_CHAT_PER_NEW_TASK_ID",
     "dispatch_fairness": "FILL_READY_C_OR_MISSING_PRODUCER_BEFORE_ACTIVE_RETRY_TRAFFIC",
-    "heartbeat_fatal_after_seconds": 300
+    "heartbeat_fatal_after_seconds": 180,
+    "runtime_asset_validation": "FAIL_FAST_BEFORE_BROWSER_DISPATCH",
+    "health_endpoint": "/healthz"
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
