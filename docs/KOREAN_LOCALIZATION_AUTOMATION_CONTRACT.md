@@ -103,6 +103,19 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - The controller must keep at most one active page per configured slot under normal operation: four localization pages total.
 - Runtime tuning authority is `localization/controller_roles.json`; Docker/controller selftests must fail when duplicated environment values drift from that SSOT.
 
+
+## Controller bounded-liveness and durable-state policy v23
+- Durable Git evidence is checked before Retry, busy, conversation-limit, or other transient ChatGPT UI recovery. A completed TASK_ID must never be re-executed merely because its old browser page still shows Retry or busy UI.
+- Every submitted prompt owns its TASK_ID immediately. A rate-limit/Retry surface detected after send must not orphan that request or allow the counter/TASK_ID to be reused.
+- Negative exact TASK_ID commit lookups are not cached; the next queue cycle must be able to observe a newly created durable commit. High-throughput branch history must fall back to the exact `docs/automation/runs/<TASK_ID>.json` commit history.
+- ChatGPT rate-limit backoff blocks new/retry sends only. Git commit discovery, producer release, C Gate reconciliation, and exact Actions polling continue during the backoff window.
+- WAIT_CHAT busy UI without durable Git progress is bounded by 1800 seconds, then the same TASK_ID rolls over to a fresh project chat subject to the existing rollover budget.
+- Missing Actions-run creation is bounded by 600 seconds. An existing exact Actions run that remains nonterminal is bounded by 1800 seconds; recovery then retries the same TASK_ID while attempt budget remains or records BLOCKED and advances.
+- Queue-loop heartbeat is fatal after 300 seconds. The controller exits so Docker `restart: unless-stopped` reconstructs Chrome, Playwright, and controller state. Three consecutive identical unexpected queue errors or watchdog errors trigger the same recovery.
+- Queue and registry JSON writes remain atomic and preserve a last-known-good backup. Missing/corrupt primary state is restored from backup. If both copies are unreadable, destructive empty reset is forbidden.
+- Logical-date rollover archives history but preserves active slot URLs, send-gap/rate-limit state, and in-flight ownership. Fresh-chat-per-TASK already provides conversation rotation; date rollover must not invalidate work.
+- Chrome startup and runtime watchdog ownership are serialized: the runtime watchdog starts only after initial DevTools readiness, and runtime Chrome restart requires two consecutive CDP failures.
+
 ## Controller liveness and GitHub Actions authority
 - A lane in `WAIT_ACTIONS` MUST be driven by the exact GitHub Actions run bound to that lane's task/result commit. Generic workflow-run list/discovery cache is never authoritative after `gate_run.id` is known.
 - Exact run-by-ID polling MUST bypass the generic Actions cache. This prevents a stale cached `queued` or `in_progress` snapshot from pinning a completed run indefinitely.
