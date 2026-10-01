@@ -523,11 +523,9 @@ async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, P
         return False
 
     prompt = (
-        f"TASK_ID={active['task_id']} BRANCH={active['branch']}\n"
-        f"컨트롤러 GET 확인 HEAD={latest_head}. 채팅 플러그인 연결 여부는 별도 확인해야 한다.\n"
-        "연결된 GitHub 플러그인을 실제 호출해 미완료 작업을 계속해. "
-        "실패는 호출 대상·오류 코드를 보고하고 도구 미노출은 TOOL_NOT_EXPOSED로 구분해. "
-        "설명이나 임의 SHA만으로 완료 처리되지 않는다. 이미지·파일은 지원 도구로 직접 처리해."
+        f"TASK_ID={active['task_id']} BRANCH={active['branch']} HEAD={latest_head}\n"
+        "컨트롤러 read 성공은 채팅 도구 연결 증거가 아니다. 같은 TASK_ID의 미완료 작업을 계속해.\n"
+        + native_plugin_instructions(active)
     )
     sent = await queue_send_same_chat_control_message(
         context,
