@@ -58,7 +58,9 @@ If HEAD moved, the changeset is rejected and ChatGPT must read the new HEAD befo
 - GitHub 404: treat as a path/ref result, not a connection failure.
 - Rate limit / 5xx / transport failure: preserve task state and retry after cooldown.
 - Broker protocol error or stale CAS: return a structured rejection in the same chat.
-- Missing controller write permission: expose `github_broker_write_capable=false`; do not create fake RESULT_SHA values.
+- Missing controller write permission: preserve the exact changeset under `/data/state/broker_pending/<TASK_ID>.json`, keep TASK_ID/ATTEMPT unchanged, and recheck permission every 60 seconds.
+- Transport/rate-limit failures are not permission failures and do not create a permission spool entry.
+- Once write permission returns, the preserved changeset is retried only if its immutable base/CAS conditions still hold.
 - Generic ChatGPT Retry never outranks a completed broker request or GitHub-tooling refusal.
 
 ## Required token permission
