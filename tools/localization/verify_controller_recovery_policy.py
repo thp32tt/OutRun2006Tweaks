@@ -80,6 +80,13 @@ required["process_recovery.consecutive_watchdog_exception_threshold"] = int(proc
 required["process_recovery.exception_signature_diagnostic_only"] = proc.get("exception_signature_is_diagnostic_only") is True
 required["process_recovery.queue_heartbeat_fatal_seconds"] = int(proc.get("queue_heartbeat_fatal_seconds", 0)) == 180
 required["process_recovery.restart_owner"] = proc.get("restart_owner") == "DOCKER_UNLESS_STOPPED"
+required["process_recovery.memory_idle_restart_percent"] = int(proc.get("memory_idle_restart_percent", 0)) == 80
+required["process_recovery.memory_fatal_restart_percent"] = int(proc.get("memory_fatal_restart_percent", 0)) == 92
+required["process_recovery.memory_idle_restart_requires_no_active_task"] = proc.get("memory_idle_restart_requires_no_active_task") is True
+required["process_recovery.memory_fatal_restart_preserves_queue_state"] = proc.get("memory_fatal_restart_preserves_queue_state") is True
+required["runtime_tuning.memory_idle_restart_percent"] = int(rt.get("memory_idle_restart_percent", 0)) == 80
+required["runtime_tuning.memory_fatal_restart_percent"] = int(rt.get("memory_fatal_restart_percent", 0)) == 92
+required["runtime_observability.health_includes_memory_pressure"] = obs.get("health_includes_memory_pressure") is True
 
 expected_failures = {"failure","cancelled","timed_out","action_required","stale"}
 required["wait_actions.retry_terminal_failure_conclusions"] = expected_failures.issubset(set(wa.get("retry_terminal_failure_conclusions") or []))
