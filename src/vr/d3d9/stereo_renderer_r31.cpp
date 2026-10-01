@@ -21,6 +21,7 @@
 
 #include "stereo_renderer_r30.cpp"
 #include "../state/state_block_tracker.hpp"
+#include "../state/state_block_recovery.hpp"
 
 namespace OutRunVRStereo
 {
@@ -777,19 +778,9 @@ namespace OutRunVRStereo
             R23LastStateSampleDrawSerial = 0;
             R23LastStateSampleEpoch = 0;
             R31EyeCache.valid = false;
+            OutRunVR::State::StateBlockRecovery::Configure(
+                &R31ResynchronizeShaderEpoch, &R22PrimeShadowState);
             OutRunVR::State::StateBlockTracker::RequireResync();
-        }
-
-        void R31FlushPendingStateBlockResync(IDirect3DDevice9* device) noexcept
-        {
-            if (!device || !OutRunVR::State::StateBlockTracker::ConsumeResync())
-                return;
-            R31ResynchronizeShaderEpoch(device);
-            if (!R22PrimeShadowState(device))
-            {
-                OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
-                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-            }
         }
 
         HRESULT __stdcall StateBlockApplyDestR31(IDirect3DStateBlock9* block)

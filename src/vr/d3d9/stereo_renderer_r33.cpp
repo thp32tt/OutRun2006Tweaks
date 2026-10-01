@@ -11,6 +11,7 @@
 // draw path pays only for correctness checks required by stereo rendering.
 
 #include "stereo_renderer_r32.cpp"
+#include "../state/state_block_recovery.hpp"
 #include "../state/state_block_tracker.hpp"
 
 namespace OutRunVRStereo
@@ -623,7 +624,7 @@ namespace OutRunVRStereo
             const char* site) noexcept
         {
             if (!OutRunVR::State::StateBlockTracker::Recording())
-                R31FlushPendingStateBlockResync(device);
+                OutRunVR::State::StateBlockRecovery::FlushPendingResync(device);
             const bool telemetry = R33TelemetryEnabled();
             if (telemetry)
                 R31ObserveDraw(device);

@@ -8,6 +8,7 @@
 // stale ResetEx state. A later clean Reset clears the block.
 
 #include "stereo_renderer_r33.cpp"
+#include "../state/state_block_recovery.hpp"
 #include "vr/game/render_semantics.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
@@ -82,7 +83,7 @@ namespace OutRunVRStereo
             // wrapper, so establish the already-validated R22 replay scope at
             // the final draw boundary. Flush a pending StateBlock resync first
             // so the scope never snapshots stale shadow state.
-            R31FlushPendingStateBlockResync(device);
+            OutRunVR::State::StateBlockRecovery::FlushPendingResync(device);
             R22ReplayScope replay(device);
             if (!replay.stateValid)
             {

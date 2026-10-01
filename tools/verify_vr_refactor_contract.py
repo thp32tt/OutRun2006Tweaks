@@ -25,6 +25,7 @@ renderer_r29 = text("src/vr/game/outrun_renderer_r29.cpp")
 draw_class = text("src/vr/render/draw_class.hpp")
 raster = text("src/vr/state/d3d9_raster_state.hpp")
 state_block_tracker = text("src/vr/state/state_block_tracker.hpp")
+state_block_recovery = text("src/vr/state/state_block_recovery.hpp")
 text("tools/verify_vr_hook_graph.py")
 
 for banned in ("R22ShadowState", "R22StateBlockTrackingReliable"):
@@ -104,6 +105,28 @@ for banned in ("R31StateBlockRecordings", "R31StateBlockApplies"):
     if banned in r31:
         errors.append(
             f"R31 retained migrated StateBlock generation owner: {banned}")
+
+for marker in (
+    "class StateBlockRecovery",
+    "Configure(",
+    "FlushPendingResync(",
+    "StateBlockTracker::ConsumeResync()",
+):
+    if marker not in state_block_recovery:
+        errors.append(f"StateBlockRecovery missing API marker: {marker}")
+
+for rel, source in (("R33", r33), ("R34", r34)):
+    if "R31FlushPendingStateBlockResync" in source:
+        errors.append(
+            f"{rel} regained R31 StateBlock resync execution dependency")
+    if "StateBlockRecovery::FlushPendingResync(device)" not in source:
+        errors.append(
+            f"{rel} missing neutral StateBlock recovery boundary")
+
+if "StateBlockRecovery::Configure(" not in r31:
+    errors.append("R31 missing neutral StateBlock recovery callback registration")
+if "R31FlushPendingStateBlockResync" in r31:
+    errors.append("R31 retained obsolete StateBlock resync execution wrapper")
 
 for rel, source in (("R31", r31), ("R32", r32), ("R33", r33), ("R34", r34)):
     if "R31StateBlockRecording" in source:
