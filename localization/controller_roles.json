@@ -1,5 +1,5 @@
 {
-  "schema_version": 36,
+  "schema_version": 37,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -831,5 +831,16 @@
     "producer_must_ignore_c_backlog_as_stop_signal": true,
     "producer_stop_requires_global_no_work_guard_clear": true,
     "qa_backlog_throttle_for_producers": false
+  },
+  "producer_execution_completion": {
+    "status_reconstruction_is_intermediate": true,
+    "planning_only_response_is_terminal": false,
+    "result_sha_not_created_means_work_required": true,
+    "user_confirmation_required_before_execution": false,
+    "same_response_execution_required": true,
+    "terminal_requires": "durable [AUTO:TASK_ID] result commit or typed external blocker after mandatory fallback exhaustion",
+    "next_steps_only_response": "INVALID_INTERMEDIATE_STATUS",
+    "controller_action_on_no_commit_response": "CONTINUE_SAME_TASK_ID_WITH_EXECUTION_PROMPT",
+    "attempt_increment": false
   }
 }
