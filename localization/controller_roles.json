@@ -219,7 +219,10 @@
       "repeated_identical_queue_exception_restart_threshold": 3,
       "repeated_identical_watchdog_exception_restart_threshold": 3,
       "queue_heartbeat_fatal_seconds": 180,
-      "restart_owner": "DOCKER_UNLESS_STOPPED"
+      "restart_owner": "DOCKER_UNLESS_STOPPED",
+      "consecutive_queue_exception_restart_threshold": 3,
+      "consecutive_watchdog_exception_restart_threshold": 3,
+      "exception_signature_is_diagnostic_only": true
     }
   },
   "runtime_tuning": {
