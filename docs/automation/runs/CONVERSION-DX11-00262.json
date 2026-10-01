@@ -5,11 +5,12 @@
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
   "base_sha": "a42d8915904a0d0ecbc1bbcbcefc69d99fa8a0fb",
-  "result_sha": "54013c7c16028896c6cd316576a376fd7bb3dbdb",
-  "validation_bearing_result_sha": "54013c7c16028896c6cd316576a376fd7bb3dbdb",
+  "result_sha": "b46c895302445b1fc2c50fad12ce9a7dcdbcb879",
+  "validation_bearing_result_sha": "b46c895302445b1fc2c50fad12ce9a7dcdbcb879",
   "source_commits": [
     "bb7395e43b565d35cf71c8777a6b0365edb69572",
-    "54013c7c16028896c6cd316576a376fd7bb3dbdb"
+    "54013c7c16028896c6cd316576a376fd7bb3dbdb",
+    "b46c895302445b1fc2c50fad12ce9a7dcdbcb879"
   ],
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
@@ -19,14 +20,16 @@
   "pc_fast_used": false,
   "selected_work": "DX11_DORMANT_ACTIVATION_BOUNDARY_GATE",
   "selection_reason": "CONVERSION-DX11-00258 selected maintenance of the DX11 activation evidence boundary. Current source already fail-closes resource introspection/behavior, input-layout and shader readiness and has generation/ACK native transport probes, but Backend Conversion Gate did not directly reject accidental native D3D11 Draw* dispatch.",
-  "summary": "ATTEMPT=1 added a CI-only fail-closed activation boundary. The new verifier scans native DX11 translation TUs for D3D11 Draw* dispatch, requires the census report to remain diagnostic/non-exhaustive with NativeDrawPathActivationAllowed=false, and requires the validated D3D9 draw bridge to depend on runtime census observation rather than native backend/shared-eye routing. The verifier is wired into Backend Conversion Gate. No game/runtime draw routing was activated and no HMD/game runtime test was performed.",
+  "summary": "ATTEMPT=1 added a CI-only fail-closed DX11 activation boundary. The new verifier rejects native D3D11 Draw* dispatch, requires census output to remain diagnostic/non-exhaustive with NativeDrawPathActivationAllowed=false, and rejects native backend/shared-eye dependencies from the validated D3D9 draw bridge. It is wired explicitly into Backend Conversion Gate and is also invoked by verify_dx11_source_graph.py so normal Build validates the same invariant. No game/runtime draw routing was activated and no HMD/game runtime test was performed.",
   "changed_paths": [
     "tools/verify_dx11_activation_boundary.py",
+    "tools/verify_dx11_source_graph.py",
     ".github/workflows/backend-conversion-gate.yml",
     "docs/automation/runs/CONVERSION-DX11-00262.json"
   ],
   "conversion_changed_paths": [
     "tools/verify_dx11_activation_boundary.py",
+    "tools/verify_dx11_source_graph.py",
     ".github/workflows/backend-conversion-gate.yml"
   ],
   "scope_guards": {
@@ -42,10 +45,10 @@
     "C0 recovered vr-dx11-native-r71 HEAD a42d8915904a0d0ecbc1bbcbcefc69d99fa8a0fb directly from GitHub and found CONVERSION-DX11-00258 as the latest task checkpoint; no 00260/00262 result record existed.",
     "Current runtime_census.cpp already starts resourcesExact from resourceIntrospectionComplete, gates exact samples on resourcesExact/inputLayoutExact/shaderTranslationExact, observes eight fixed-function stages, hashes the 1/64 draw ordinal to avoid fixed-phase alias, and keeps census evidence non-exhaustive.",
     "Current native_shared_eye_ring uses producer/consumer PID, run generation, transport generation, producer EVENT completion, immutable published snapshots and identity/slot/frame ACK retirement. Its cumulative ack.frameId >= frameId rule is intentional and is covered by the WARP probe as same-generation cumulative ACK behavior.",
-    "Exact compare a42d8915904a0d0ecbc1bbcbcefc69d99fa8a0fb...54013c7c16028896c6cd316576a376fd7bb3dbdb is ahead 2/behind 0 and changes only .github/workflows/backend-conversion-gate.yml (+4) and tools/verify_dx11_activation_boundary.py (+98).",
     "The verifier rejects any native src/vr/d3d11/*.cpp D3D11 Draw/DrawIndexed/DrawInstanced/DrawIndexedInstanced/Indirect dispatch, requires analyzer ActivationProof=false, ExhaustiveDrawCoverage=false, DiagnosticOnly=true and NativeDrawPathActivationAllowed=false, and rejects native backend/shared-eye dependencies from stereo_renderer_r7.inc.",
     "Issue #14 direct-change ledger was appended for validation-bearing result SHA 54013c7c16028896c6cd316576a376fd7bb3dbdb.",
-    "At checkpoint time Build run 36915502039, OpenXR VR architecture run 36915502084 and OutRun EXE HUD Inspector CI run 36915502052 were registered for exact result SHA and were pending. Backend Conversion Gate exact-SHA conclusion had not yet been returned by the available GitHub Actions view."
+    "The first candidate 54013c7c16028896c6cd316576a376fd7bb3dbdb is superseded for task acceptance by b46c895302445b1fc2c50fad12ce9a7dcdbcb879, which additionally chains the activation-boundary verifier through verify_dx11_source_graph.py.",
+    "At checkpoint time exact-SHA Build run 36915930514, OpenXR VR architecture run 36915930450 and OutRun EXE HUD Inspector CI run 36915930591 were registered for b46c895302445b1fc2c50fad12ce9a7dcdbcb879 and were pending/in progress. Backend Conversion Gate exact-SHA conclusion had not yet been returned by the available commit workflow view."
   ],
   "related_finding_or_regression_keys": [
     "VR_BACKEND_100_REVIEW_SET_05:F23",
@@ -54,27 +57,27 @@
   ],
   "validation": {
     "backend_conversion_gate": {
-      "head_sha": "54013c7c16028896c6cd316576a376fd7bb3dbdb",
+      "head_sha": "b46c895302445b1fc2c50fad12ce9a7dcdbcb879",
       "conclusion": "pending"
     },
     "build": {
-      "run_id": 36915502039,
-      "head_sha": "54013c7c16028896c6cd316576a376fd7bb3dbdb",
+      "run_id": 36915930514,
+      "head_sha": "b46c895302445b1fc2c50fad12ce9a7dcdbcb879",
       "conclusion": "pending"
     },
     "openxr_architecture": {
-      "run_id": 36915502084,
-      "head_sha": "54013c7c16028896c6cd316576a376fd7bb3dbdb",
+      "run_id": 36915930450,
+      "head_sha": "b46c895302445b1fc2c50fad12ce9a7dcdbcb879",
       "conclusion": "pending"
     },
     "hud_inspector": {
-      "run_id": 36915502052,
-      "head_sha": "54013c7c16028896c6cd316576a376fd7bb3dbdb",
+      "run_id": 36915930591,
+      "head_sha": "b46c895302445b1fc2c50fad12ce9a7dcdbcb879",
       "conclusion": "pending"
     }
   },
-  "blocker": "Exact-SHA GitHub Actions validation is still pending; do not claim AUTOMATION_VALIDATION=PASS until Backend Conversion Gate and required companion workflows report success.",
-  "next_action": "Consume exact-SHA GitHub Actions results for 54013c7c16028896c6cd316576a376fd7bb3dbdb. If all required gates pass, update this run record to AUTOMATION_VALIDATION=PASS while keeping RUNTIME_VALIDATION=UNTESTED.",
+  "blocker": "Exact-SHA GitHub Actions validation for b46c895302445b1fc2c50fad12ce9a7dcdbcb879 is still pending; do not claim AUTOMATION_VALIDATION=PASS until required gates report success.",
+  "next_action": "Consume exact-SHA GitHub Actions results for b46c895302445b1fc2c50fad12ce9a7dcdbcb879. If required gates pass, update this run record to AUTOMATION_VALIDATION=PASS while keeping RUNTIME_VALIDATION=UNTESTED.",
   "checkpoint": "C3_VALIDATION_PENDING",
   "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
   "runtime_claim": "NONE"
