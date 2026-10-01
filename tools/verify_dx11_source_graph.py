@@ -2427,7 +2427,9 @@ def main() -> None:
             "DX11 R108-R111 observation-only registry mirror API gained a runtime census caller"
         )
 
-    verify_dx11_activation_boundary()\n\n    print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
+    verify_dx11_activation_boundary()
+
+    print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 
 
 if __name__ == "__main__":
