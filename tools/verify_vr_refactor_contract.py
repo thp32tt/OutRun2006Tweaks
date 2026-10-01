@@ -329,6 +329,17 @@ if "attempt < R32PrerequisiteWaitAttempts" not in r32 or \
         "Sleep(R32PrerequisiteWaitMs)" not in r32:
     errors.append("R32 install thread no longer consumes prerequisite wait policy")
 for marker in (
+    "R34PrerequisiteWaitAttempts = 4800",
+    "R34PrerequisiteWaitMs = 25",
+    "attempt < R34PrerequisiteWaitAttempts",
+    "Sleep(R34PrerequisiteWaitMs)",
+):
+    if marker not in r34:
+        errors.append(f"R34 prerequisite wait-policy boundary missing: {marker}")
+if "attempt < 4800" in r34 or "Sleep(25)" in r34:
+    errors.append("R34 prerequisite timing literal escaped wait-policy boundary")
+
+for marker in (
     "R33PrerequisiteWaitAttempts = 4800",
     "R33PrerequisiteWaitMs = 25",
     "attempt < R33PrerequisiteWaitAttempts",

@@ -321,12 +321,15 @@ namespace OutRunVRStereo
             return true;
         }
 
+        constexpr int R34PrerequisiteWaitAttempts = 4800;
+        constexpr DWORD R34PrerequisiteWaitMs = 25;
+
         DWORD WINAPI R34InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
             SetResetGuardInstallState(State::Pending);
 
-            for (int attempt = 0; attempt < 4800; ++attempt)
+            for (int attempt = 0; attempt < R34PrerequisiteWaitAttempts; ++attempt)
             {
                 const auto r33 = FinalDispatchInstallState();
                 if (r33 == State::Failed)
@@ -392,7 +395,7 @@ namespace OutRunVRStereo
                         "VR R34 RESET GUARD: R15 classic-state replay health now gates post-Reset stereo eligibility; raster guard preserves viewport/scissor across final stereo draw dispatch");
                     return 0;
                 }
-                Sleep(25);
+                Sleep(R34PrerequisiteWaitMs);
             }
 
             SetResetGuardInstallState(State::Failed);
