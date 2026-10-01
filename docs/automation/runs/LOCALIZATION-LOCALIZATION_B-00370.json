@@ -49,9 +49,10 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "result_sha": "25e854c140aedd2920878c2433895b55b6dd1c9b",
+  "authoritative_result_sha": "25e854c140aedd2920878c2433895b55b6dd1c9b",
+  "validation_bearing_result_sha": "25e854c140aedd2920878c2433895b55b6dd1c9b",
   "result_commit_message": "localization(B): resolve index94 protected mask split [AUTO:LOCALIZATION-LOCALIZATION_B-00370]",
-  "bookkeeping_note": "RESULT_SHA is bound in a separate bookkeeping commit after the atomic material result commit."
+  "bookkeeping_note": "Authoritative producer material result is 25e854c140aedd2920878c2433895b55b6dd1c9b. That commit contains the B00370 lane-local index94 protected-inline split report and durable task record. This bookkeeping-only binding does not replace result identity; producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE and RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T17:54:00+09:00"
 }
