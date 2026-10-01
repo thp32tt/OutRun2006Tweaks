@@ -1,0 +1,91 @@
+{
+  "schema_version": 22,
+  "schema": "outrun-b00353-p00223-schema22-zero-candidate-exception-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00353",
+  "wave_id": "P00223",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 0,
+  "recorded_at_kst": "2026-10-01T14:39:03+09:00",
+  "base_head_sha": "ea1069a10636edf004eb253502a3a85d40a3876d",
+  "controller_schema_version": 22,
+  "controller_config_blob_sha": "be640c0c2806985743b8fc41b90a16025c590cf8",
+  "result": "PASS_MATERIAL_B_MOD3_ZERO_CANDIDATE_EXCEPTION_INDEX230_SOURCE_IDENTITY_MISMATCH_INDEX236_EXACT_SOURCE_MASK_CLEANPLATE_PREFLIGHT_RUNTIME_UNTESTED",
+  "summary": "Fresh current-HEAD B-shard scan preserves C175/Q00073 as latest independent authority: no DIRECT_REWORK, RENDER_READY, ONE_STAGE_TO_RENDER or candidate-material rework is C-accepted. B00342@index61 and newer B00347@index94/index163 candidates plus existing 159/198/201 are QA-pending and are not repeated. This invocation therefore uses exactly one allowed PREFLIGHT_ONLY batch on related indices230/236. Approved Drive exact-path lookup misses both. Pinned direct Git blobs are replayed against the contract-pinned Release archive. Index230/E95DA5 direct/Release bytes are identical but SHA-256 33077919... mismatches current canonical inventory 4da4871f..., yielding typed SOURCE_IDENTITY_MISMATCH with no pixel work. Index236/FEF70E85 direct/Release bytes are identical and exactly match canonical inventory a1c7f7d6... at 2048x2048 RGBA32 mip1. Current 15 semantic bindings, including REVERSED→역방향, cover all 511,728 visible-alpha pixels in their exact cells. A source-faithful alpha-effect removal mask and CLEAN_PLATE replay changes zero pixels/alpha outside the mask and leaves zero visible alpha. Because this CLEAN_PLATE is not yet independently C-accepted, B does not self-promote to RENDER_READY and emits no Korean DDS. Runtime remains UNTESTED.",
+  "batch_completion": {
+    "target_candidate_dds": 2,
+    "normal_success_min_candidate_dds": 2,
+    "candidate_dds_completed": 0,
+    "partial_batch": false,
+    "target_met": false,
+    "zero_candidate_exception": true,
+    "zero_candidate_exception_reason": "Fresh authoritative scan found zero runnable C-accepted completion-tier assets; one preflight-only batch is permitted.",
+    "preflight_only_batches": 1,
+    "preflight_indices": [
+      230,
+      236
+    ]
+  },
+  "candidate_results": [],
+  "material_deliverable": {
+    "type": "B_MOD3_SINGLE_PREFLIGHT_BATCH_INDEX230_TYPED_SOURCE_MISMATCH_PLUS_INDEX236_EXACT_SOURCE_15_MASK_CLEANPLATE_SAFE_BBOX_HANDOFF",
+    "reviewed_indices": [
+      230,
+      236
+    ],
+    "reviewed_assets": [
+      "E95DA5",
+      "FEF70E85"
+    ],
+    "exact_canonical_sources_acquired": 1,
+    "source_identity_mismatches": 1,
+    "semantic_bindings_revalidated": 15,
+    "source_effect_masks": 15,
+    "candidate_safe_bboxes": 15,
+    "clean_plates_produced": 1,
+    "clean_plate_changed_pixels_outside_mask": 0,
+    "clean_plate_alpha_escape": 0,
+    "source_visible_alpha_uncovered": 0,
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "evidence": [
+    "localization/graphics/role_B/20261001-B00353-P00223/B00353_P00223_INDEX230_236_CANONICAL_SOURCE_PREFLIGHT.json"
+  ],
+  "candidate_dds_modified": false,
+  "candidate_storage": "NONE_PREFLIGHT_ONLY",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "self_qa": "PASS_B_MOD3__NO_READY_TIERS__ZERO_CANDIDATE_EXCEPTION_ONE_PREFLIGHT_BATCH__DRIVE_EXACT_MISS__PINNED_ARCHIVE_IDENTITY_EXACT__INDEX230_DIRECT_RELEASE_SAME_BLOB_SOURCE_IDENTITY_MISMATCH__INDEX236_DIRECT_RELEASE_SAME_BLOB_CANONICAL_EXACT__RGBA32_2048X2048_MIP1_FLIP_Y__15_OF_15_CURRENT_SEMANTIC_BINDINGS__511728_OF_511728_VISIBLE_ALPHA_MASKED__ZERO_OUTSIDE_MASK__ZERO_ALPHA_ESCAPE__ZERO_VISIBLE_ALPHA_AFTER_CLEAN_PLATE__NO_SHARED_STATE__RUNTIME_UNTESTED",
+  "previous_result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
+  "result_sha": "PENDING_POST_COMMIT",
+  "authoritative_result_sha": "PENDING_POST_COMMIT",
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(B): advance index230/236 canonical source preflight [AUTO:LOCALIZATION-LOCALIZATION_B-00353]",
+  "durable_task_record_in_result_commit": true,
+  "producing_role": "LOCALIZATION_B",
+  "precommit_refresh": {
+    "head_sha": "ea1069a10636edf004eb253502a3a85d40a3876d",
+    "head_message": "chore(localization): bind B00347 schema22 result SHA [AUTO:LOCALIZATION-LOCALIZATION_B-00347] [skip ci]",
+    "peer_commits_preserved": true
+  },
+  "bookkeeping_note": "Result commit is the durable producer output. Producer AUTOMATION_VALIDATION remains PENDING and final authority belongs to a later C_BATCH_GATE. Record immutable RESULT_SHA in a separate bookkeeping commit without changing material evidence; do not wait for an individual producer Actions Gate.",
+  "bookkeeping_base_result_sha": null,
+  "bookkeeping_head_before_update": null
+}

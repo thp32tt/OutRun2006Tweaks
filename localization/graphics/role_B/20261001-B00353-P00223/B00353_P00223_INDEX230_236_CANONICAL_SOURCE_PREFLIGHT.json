@@ -1,0 +1,583 @@
+{
+  "schema_version": 22,
+  "schema": "outrun-b00353-p00223-index230-236-canonical-source-preflight-v1",
+  "status": "PASS_PREFLIGHT_ONLY_C_INDEPENDENT_QA_REQUIRED",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00353",
+  "wave_id": "P00223",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_LANE_B_SELF_QA",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T14:39:03+09:00",
+  "base_head_sha": "ea1069a10636edf004eb253502a3a85d40a3876d",
+  "controller_schema_version": 22,
+  "controller_config_blob_sha": "be640c0c2806985743b8fc41b90a16025c590cf8",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "authoritative_c_basis": "Q00073/C175",
+    "authoritative_ready_tiers": {
+      "direct_rework": [],
+      "render_ready": [],
+      "one_stage_to_render": [],
+      "candidate_rework": []
+    },
+    "qa_pending_not_repeated": [
+      {
+        "index": 61,
+        "reason": "B00342 fresh candidate awaiting C"
+      },
+      {
+        "index": 94,
+        "reason": "B00347 fresh candidate awaiting C"
+      },
+      {
+        "index": 163,
+        "reason": "B00347 fresh candidate awaiting C"
+      },
+      {
+        "index": 159,
+        "reason": "existing candidate awaiting C"
+      },
+      {
+        "index": 198,
+        "reason": "existing candidate awaiting C"
+      },
+      {
+        "index": 201,
+        "reason": "existing candidate awaiting C"
+      }
+    ],
+    "zero_candidate_exception": true,
+    "preflight_only_batches_this_invocation": 1,
+    "max_preflight_only_batches_when_no_ready_assets": 1,
+    "selected_indices": [
+      230,
+      236
+    ],
+    "selected_reason": "No C-accepted runnable completion-tier asset exists in B shard. Advance one related same-family preflight batch without repeating QA-pending candidates or sticky prior source probes."
+  },
+  "current_fingerprints": {
+    "automation_contract_blob_sha": "8d85dd58edb1e191e9d5b5f6d4b24e0d50d20d44",
+    "controller_roles_blob_sha": "be640c0c2806985743b8fc41b90a16025c590cf8",
+    "asset_queue_blob_sha": "ceedefb399aef8b8434cbf4fb84f455d186333cf",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "4f9a1678e6c7ae46a22011f27eb5b1eb1bb28f15",
+    "artwork_plan_blob_sha": "f26f99f36765a9225c8b718e8f73b53841e2ddef",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "latest_c_task_record_blob_sha": "92285a364dee3ad11d83c7e7f74e90e40adb54bf",
+    "previous_b_task_record_blob_sha": "a34b80e34de65a02f0b848d3de43e414b6177d62"
+  },
+  "source_transport": {
+    "approved_drive_account": "ezflash557",
+    "approved_drive_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+    "approved_drive_sumo_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+    "drive_folder_current_contents": [
+      "9F060EC1_512x512.dds"
+    ],
+    "drive_exact_outcome_for_selected": "SOURCE_TRANSPORT_MISS_BOTH",
+    "pinned_upstream_repository": "envido32/OR2006Sprites",
+    "pinned_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "pinned_release_archive": {
+      "name": "OR2-HD-GUI-v0.25.10a.zip",
+      "bytes": 306223257,
+      "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "contract_identity": "PASS_EXACT"
+    }
+  },
+  "assets": [
+    {
+      "queue_index": 230,
+      "asset": "E95DA5",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+      "canonical_inventory": {
+        "sha256": "4da4871fc494de71520e0299f4cb26eb8c9f6f7ce30ecd78f8b1d8dcd4b0f85a",
+        "width": 2048,
+        "height": 1024,
+        "mode": "RGBA"
+      },
+      "pinned_direct": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+        "git_blob_sha": "ee939d33fd363be135e681b076021c92cddcb489"
+      },
+      "pinned_release_member": {
+        "bytes": 8388736,
+        "sha256": "33077919771f580491b8ea1011401dc22df640f87b5b0e6f602b112dbdb07b81",
+        "computed_git_blob_sha": "ee939d33fd363be135e681b076021c92cddcb489",
+        "header_128_sha256": "2195f6a7c276e34259dcfa3a2af6b7424780c19478a08dc6ad597ba2753b3456",
+        "width": 2048,
+        "height": 1024,
+        "mipmaps": 1
+      },
+      "direct_release_equivalence": "PASS_SAME_GIT_BLOB",
+      "canonical_inventory_match": false,
+      "source_outcome": "SOURCE_IDENTITY_MISMATCH",
+      "sticky_until": "inventory/source transport fingerprint changes",
+      "pixel_work_performed": false,
+      "candidate_authorized": false
+    },
+    {
+      "queue_index": 236,
+      "asset": "FEF70E85",
+      "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+      "canonical_inventory": {
+        "sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+        "width": 2048,
+        "height": 2048,
+        "mode": "RGBA"
+      },
+      "pinned_direct": {
+        "path": "Release/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds",
+        "git_blob_sha": "48fd896aaa8ff2f269b659771f2618ea6a8426d5"
+      },
+      "pinned_release_member": {
+        "bytes": 16777344,
+        "sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+        "computed_git_blob_sha": "48fd896aaa8ff2f269b659771f2618ea6a8426d5",
+        "header_128_sha256": "deb793ec8a3f308311c5c31845f9bec46553f6e34f61b6112d5160e78eef8089"
+      },
+      "direct_release_equivalence": "PASS_SAME_GIT_BLOB",
+      "canonical_inventory_match": true,
+      "dds_header": {
+        "width": 2048,
+        "height": 2048,
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "pitch": 8192,
+        "channel_masks": {
+          "r": "0x00ff0000",
+          "g": "0x0000ff00",
+          "b": "0x000000ff",
+          "a": "0xff000000"
+        },
+        "raw_to_readable": "flip_y"
+      },
+      "decoded_source": {
+        "raw_rgba_sha256": "2a81855ea228775f4791ca765f0eb71aa48cf4e20cf3e8fcdb3719f509648093",
+        "readable_rgba_sha256": "148128f411c3e1e52387ddb4be7200aa2144b4484420b4df24bb35065ec906c0"
+      },
+      "semantic_binding": {
+        "canonical_segments": 15,
+        "physical_cells": 15,
+        "current_translation_binding_complete": true,
+        "placements": [
+          {
+            "source": "INDUSTRIAL COMPLEX",
+            "korean": "인더스트리얼 컴플렉스",
+            "sprite": "sprite_612",
+            "accepted_cell_readable_xywh": [
+              0,
+              1908,
+              1168,
+              140
+            ],
+            "source_effect_alpha_pixels": 50903,
+            "source_effect_bbox_readable_xyxy": [
+              54,
+              1937,
+              1161,
+              2024
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              56,
+              1939,
+              1159,
+              2022
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "WATERFALLS",
+            "korean": "워터폴스",
+            "sprite": "sprite_613",
+            "accepted_cell_readable_xywh": [
+              0,
+              1796,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 34348,
+            "source_effect_bbox_readable_xyxy": [
+              321,
+              1804,
+              1038,
+              1899
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              323,
+              1806,
+              1036,
+              1897
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "TULIP GARDEN",
+            "korean": "튤립 가든",
+            "sprite": "sprite_614",
+            "accepted_cell_readable_xywh": [
+              0,
+              1684,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 38353,
+            "source_effect_bbox_readable_xyxy": [
+              263,
+              1694,
+              1056,
+              1788
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              265,
+              1696,
+              1054,
+              1786
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "SUNNY BEACH",
+            "korean": "서니 비치",
+            "sprite": "sprite_615",
+            "accepted_cell_readable_xywh": [
+              0,
+              1572,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 37623,
+            "source_effect_bbox_readable_xyxy": [
+              283,
+              1580,
+              1063,
+              1675
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              285,
+              1582,
+              1061,
+              1673
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "SNOW MOUNTAIN",
+            "korean": "스노 마운틴",
+            "sprite": "sprite_616",
+            "accepted_cell_readable_xywh": [
+              0,
+              1460,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 46922,
+            "source_effect_bbox_readable_xyxy": [
+              106,
+              1464,
+              1034,
+              1559
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              108,
+              1466,
+              1032,
+              1557
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "SKYSCRAPERS",
+            "korean": "스카이스크레이퍼",
+            "sprite": "sprite_617",
+            "accepted_cell_readable_xywh": [
+              0,
+              1348,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 39204,
+            "source_effect_bbox_readable_xyxy": [
+              255,
+              1356,
+              1056,
+              1451
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              257,
+              1358,
+              1054,
+              1449
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "PALM BEACH",
+            "korean": "팜 비치",
+            "sprite": "sprite_618",
+            "accepted_cell_readable_xywh": [
+              0,
+              1236,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 34035,
+            "source_effect_bbox_readable_xyxy": [
+              351,
+              1241,
+              1057,
+              1335
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              353,
+              1243,
+              1055,
+              1333
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "NATIONAL PARK",
+            "korean": "내셔널 파크",
+            "sprite": "sprite_619",
+            "accepted_cell_readable_xywh": [
+              0,
+              1124,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 41589,
+            "source_effect_bbox_readable_xyxy": [
+              191,
+              1134,
+              1056,
+              1227
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              193,
+              1136,
+              1054,
+              1225
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "MILKY WAY",
+            "korean": "밀키 웨이",
+            "sprite": "sprite_620",
+            "accepted_cell_readable_xywh": [
+              0,
+              1012,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 28237,
+            "source_effect_bbox_readable_xyxy": [
+              423,
+              1023,
+              1051,
+              1112
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              425,
+              1025,
+              1049,
+              1110
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "METROPOLIS",
+            "korean": "메트로폴리스",
+            "sprite": "sprite_621",
+            "accepted_cell_readable_xywh": [
+              0,
+              900,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 35325,
+            "source_effect_bbox_readable_xyxy": [
+              347,
+              908,
+              1057,
+              1003
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              349,
+              910,
+              1055,
+              1001
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "LOST CITY",
+            "korean": "로스트 시티",
+            "sprite": "sprite_622",
+            "accepted_cell_readable_xywh": [
+              0,
+              788,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 23310,
+            "source_effect_bbox_readable_xyxy": [
+              516,
+              795,
+              1050,
+              890
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              518,
+              797,
+              1048,
+              888
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "LEGEND",
+            "korean": "레전드",
+            "sprite": "sprite_623",
+            "accepted_cell_readable_xywh": [
+              0,
+              676,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 22506,
+            "source_effect_bbox_readable_xyxy": [
+              632,
+              681,
+              1055,
+              775
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              634,
+              683,
+              1053,
+              773
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "JUNGLE",
+            "korean": "정글",
+            "sprite": "sprite_624",
+            "accepted_cell_readable_xywh": [
+              0,
+              564,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 20811,
+            "source_effect_bbox_readable_xyxy": [
+              623,
+              573,
+              1043,
+              667
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              625,
+              575,
+              1041,
+              665
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "IMPERIAL AVENUE",
+            "korean": "임페리얼 애비뉴",
+            "sprite": "sprite_625",
+            "accepted_cell_readable_xywh": [
+              0,
+              452,
+              1072,
+              112
+            ],
+            "source_effect_alpha_pixels": 49460,
+            "source_effect_bbox_readable_xyxy": [
+              36,
+              467,
+              1046,
+              559
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              38,
+              469,
+              1044,
+              557
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          },
+          {
+            "source": "REVERSED",
+            "korean": "역방향",
+            "sprite": "sprite_626",
+            "accepted_cell_readable_xywh": [
+              1072,
+              1840,
+              944,
+              68
+            ],
+            "source_effect_alpha_pixels": 9102,
+            "source_effect_bbox_readable_xyxy": [
+              1678,
+              1847,
+              1995,
+              1898
+            ],
+            "candidate_safe_bbox_inset2_readable_xyxy": [
+              1680,
+              1849,
+              1993,
+              1896
+            ],
+            "mask_rule": "alpha>0 inside exact accepted cell on readable FLIP_Y decode"
+          }
+        ]
+      },
+      "removal_mask": {
+        "rule": "union(alpha>0 inside each exact accepted target cell on readable FLIP_Y source)",
+        "readable_u8_sha256": "5ccd4cd66690c888cc7b452bae149442d9cc6fce1d16d0635cbd60eb150a85ac",
+        "raw_u8_sha256": "80f885a88697447ac408135dc3db9de065cb71bf574d6294221046027bff63f0",
+        "pixels": 511728,
+        "source_visible_alpha_pixels": 511728,
+        "visible_alpha_pixels_outside_target_union": 0
+      },
+      "clean_plate": {
+        "method": "Set RGBA=0 only where exact target removal mask is true; preserve every pixel outside mask, including transparent RGB payload.",
+        "readable_rgba_sha256": "b73bc76d4ca9353751d0876325ac8b26c9209ae4a8d4898ec633d68f088f267d",
+        "raw_rgba_sha256": "0dcf6e0cddecf626422f01f77cef56e986292919be28e010e32a39d330729da1",
+        "changed_pixels": 511728,
+        "changed_pixels_outside_removal_mask": 0,
+        "alpha_changed_pixels": 511728,
+        "alpha_changed_pixels_outside_removal_mask": 0,
+        "visible_alpha_pixels_after": 0,
+        "producer_machine_qa": "PASS",
+        "independent_c_qa_required": true
+      },
+      "candidate_safe_bbox_count": 15,
+      "candidate_rendered": false,
+      "production_readiness": "PREFLIGHT_ONLY",
+      "render_blocker": "C independent replay/acceptance of exact canonical source + 15 semantic masks + CLEAN_PLATE + safe-bbox evidence is required before producer may treat this as RENDER_READY."
+    }
+  ],
+  "heavy_qa_repeated": false,
+  "heavy_qa_note": "No existing candidate/header/containment QA was rerun. New work is exact source identity replay plus first current-canonical mask/CLEAN_PLATE derivation for index236 and typed identity blocker for index230.",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false
+}
