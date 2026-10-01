@@ -602,7 +602,7 @@
       "RATE_LIMIT",
       "LOCAL_OR_N100_WORKSPACE_UNAVAILABLE"
     ],
-    "generated_prompt_directive": "GitHub가 연결되지 않았다고 추측하거나 임의로 접근 불가 판정하지 마. 현재 세션에 설치·연결된 authenticated GitHub connector/API가 노출되어 있으면 반드시 직접 호출해서 thp32tt/OutRun2006Tweaks의 korean-localization-clean HEAD와 필요한 파일을 실제 조회해. 실제 connector/API 호출을 한 번도 하지 않은 상태에서는 GITHUB_PERMISSION_DENIED, GitHub disconnected, GitHub unavailable로 보고하거나 작업을 중단하면 안 된다. 공개 웹 검색, N100 로컬 clone/worktree, 로컬 workspace를 GitHub 직접 접근 확인의 대체 수단으로 사용하지 마. 커넥터 자체가 현재 세션에 실제로 없거나 authenticated 직접 호출이 실패한 경우에만 접근 차단을 보고하고, 호출한 기능/대상과 실제 반환 오류를 작업 기록에 남겨. fresh repository permission metadata에서 push/maintain/admin이 모두 없거나 refresh 후 실제 write가 authorization-specific 401/403일 때만 GITHUB_PERMISSION_DENIED로 중단해.",
+    "generated_prompt_directive": "GitHub 저장소 작업은 공개 웹이 아니라 설치·연결된 authenticated GitHub 플러그인/커넥터를 강제로 사용해. thp32tt/OutRun2006Tweaks의 korean-localization-clean에 대한 repository metadata, HEAD/ref, 파일 읽기/쓰기, commit/history, 권한 확인, GitHub Actions 상태 확인은 모두 GitHub 플러그인/커넥터로 직접 수행해. 공개 web/web-search를 GitHub SSOT 조회, 접근 가능 여부 판정, 권한 판정, 파일 취득의 대체 또는 fallback으로 사용하지 마. 플러그인이 노출돼 있으면 반드시 실제 호출부터 해. 실제 플러그인 호출 없이 GitHub disconnected/unavailable/permission denied라고 판정하지 마. 플러그인 호출이 실패해도 공개 웹으로 우회하지 말고 호출한 기능/대상/실제 오류를 기록해. fresh plugin repository permission metadata에서 push/maintain/admin이 모두 없거나 plugin refresh 후 실제 write가 authorization-specific 401/403일 때만 GITHUB_PERMISSION_DENIED로 중단해.",
     "mandatory_direct_probe_before_access_failure": {
       "required": true,
       "connector": "authenticated GitHub connector/API",
@@ -617,6 +617,24 @@
         "LOCAL_WORKTREE",
         "ASSUMED_CONNECTOR_UNAVAILABLE"
       ]
+    },
+    "access_transport_policy": {
+      "mandatory_transport": "INSTALLED_AUTHENTICATED_GITHUB_PLUGIN_CONNECTOR",
+      "plugin_connector_required_for": [
+        "REPOSITORY_METADATA",
+        "BRANCH_HEAD_AND_REF",
+        "FILE_READ",
+        "FILE_WRITE",
+        "COMMIT_AND_HISTORY",
+        "PERMISSION_CHECK",
+        "GITHUB_ACTIONS_STATUS"
+      ],
+      "public_web_for_repository_access": "FORBIDDEN",
+      "public_web_for_permission_or_connectivity_diagnosis": "FORBIDDEN",
+      "fallback_to_public_web_when_plugin_available": false,
+      "fallback_to_public_web_when_plugin_call_fails": false,
+      "failure_behavior": "REPORT_EXACT_PLUGIN_CONNECTOR_OPERATION_AND_ERROR; DO_NOT SUBSTITUTE_PUBLIC_WEB",
+      "rule": "For thp32tt/OutRun2006Tweaks localization SSOT operations, use the installed authenticated GitHub plugin/connector directly. Public web/web-search is not an allowed repository-access transport and must never replace, validate, or override plugin/connector results."
     }
   },
   "dispatch_freshness": {
