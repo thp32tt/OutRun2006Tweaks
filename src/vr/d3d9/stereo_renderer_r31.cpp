@@ -779,8 +779,6 @@ namespace OutRunVRStereo
             R23LastStateSampleDrawSerial = 0;
             R23LastStateSampleEpoch = 0;
             R31EyeCache.valid = false;
-            OutRunVR::State::StateBlockRecovery::Configure(
-                &R31ResynchronizeShaderEpoch, &R22PrimeShadowState);
             OutRunVR::State::StateBlockTracker::RequireResync();
         }
 
@@ -981,6 +979,8 @@ namespace OutRunVRStereo
 
                     OutRunVR::State::StateBlockTracker::SetEventConsumerReady(false);
                     OutRunVR::State::StateBlockTracker::ResetCoverageLoss();
+                    OutRunVR::State::StateBlockRecovery::Configure(
+                        &R31ResynchronizeShaderEpoch, &R22PrimeShadowState);
                     OutRunVR::State::StateBlockEvents::Configure(
                         &R31OnStateBlockBegin,
                         &R31OnStateBlockEnd,
