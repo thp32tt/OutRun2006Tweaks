@@ -148,7 +148,8 @@
   "result_commit_message": "localization(A): record schema27 zero-runnable shard hold [AUTO:LOCALIZATION-LOCALIZATION_A-00364]",
   "bookkeeping": {
     "recorded_at_kst": "2026-10-01T16:56:00+09:00",
-    "head_before_bookkeeping": "923a70de1c8673194d56e7f290b322422f080a9b",
-    "note": "Bookkeeping-only self-SHA binding. Producer AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA. RUNTIME_VALIDATION remains UNTESTED."
+    "head_before_bookkeeping": "9156510e7505e0a00b19fa7e25d04333d61cbcaf",
+    "chat_rollover": 2,
+    "note": "Bookkeeping-only immutable result-SHA binding during rollover 2. Producer AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA. No real-game test was performed; RUNTIME_VALIDATION=UNTESTED."
   }
 }
