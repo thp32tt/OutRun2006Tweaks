@@ -1,0 +1,63 @@
+{
+  "task_id": "CONVERSION-DXVK-00221",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "9dda251ec4fddb75e7bfb8d135c21a9948609da3",
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R221_1824EA_FRESH_PROVENANCE_CAPTURE",
+  "selection_reason": "CONVERSION-DXVK-00219 proves exact control flow through exclusive 0x001824EA and preserves 0x001824EA:e8 as an incomplete rel32 CALL at the R217 capture edge. The next independent bounded F13 action is fresh exact replacement-EXE provenance beginning at 0x001824EA with exact e8 overlap before any further decode.",
+  "summary": "ATTEMPT=1 implementation staged. Extend exact replacement-EXE provenance from 0x001824EA through exclusive 0x0018252A, requiring the R219-proven e8 overlap and predecessor control-flow proof. Record raw bytes plus raw rel32 census only; do not infer instruction/function/callee/render/HUD semantics or runtime behavior.",
+  "evidence": [
+    "Base branch HEAD at C0 is 9dda251ec4fddb75e7bfb8d135c21a9948609da3.",
+    "R219 predecessor static proof reports EXACT_1824AB_TO_1824EA_CONTROL_FLOW_CAPTURE_EDGE_PROVEN with incomplete_rva=0x001824EA, incomplete_bytes=e8, and capture_end_rva=0x001824EB.",
+    "New collector requires .text, an exact 64-byte probe from 0x001824EA to exclusive 0x0018252A, exact e8 overlap, and extension beyond prior capture end 0x001824EB.",
+    "Static contract verifier requires the new constants, collector/report wiring, fail-closed status, overlap status and analyzer output markers.",
+    "No Quest 3/VDXR or in-game execution is part of this task; runtime_validation remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00221.json"
+  ],
+  "proof_contract": {
+    "predecessor_control_flow_status": "EXACT_1824AB_TO_1824EA_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "start_rva": "0x001824EA",
+    "probe_len": 64,
+    "probe_end_rva": "0x0018252A",
+    "prior_capture_end_rva": "0x001824EB",
+    "overlap_bytes": "e8",
+    "expected_status": "EXACT_EXE_1824EA_TO_18252A_PROVENANCE_CAPTURED",
+    "start_boundary_status": "R219_INCOMPLETE_REL32_CALL_START_ONLY",
+    "function_entry_status": "UNRESOLVED_AT_1824EA_AND_FORWARD_BYTES",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "continuation_scope": "RAW_BYTES_OVERLAP_AND_REL32_CENSUS_ONLY"
+  },
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE_UNCHANGED",
+  "review_lenses": {
+    "architecture": "Analyzer/verifier only; no renderer/provider/selector/package/transport/backend activation behavior changes.",
+    "ownership": "Fresh raw bytes and rel32 census do not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Proof fails closed unless the R219 control-flow edge remains exact, e8 overlaps exactly, the probe is exactly 64 bytes in .text, the exclusive end is 0x0018252A, and the capture extends beyond 0x001824EB."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_1824AB_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "after": "PENDING_1824EA_FRESH_PROVENANCE_CAPTURE",
+    "runtime_claim": false
+  },
+  "blocker": "The rel32 CALL beginning at 0x001824EA is proven only by its opcode byte e8. Its displacement/target and all following instruction boundaries, function/callee identity and render/HUD semantics remain unresolved until this fresh capture is validated and a separate exact-decode task consumes only complete instructions.",
+  "next_action": "Run exact-source GitHub Actions validation. If PASS, update this record in a separate CI-skipped bookkeeping commit with validation-bearing result SHA, exact captured bytes/raw rel32 census and workflow evidence. Runtime remains UNTESTED."
+}
