@@ -2244,3 +2244,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - A00350@index225 PASS only as **PREFLIGHT_ONLY SOURCE_ACQUISITION_EXHAUSTED reactivation guard**. Canonical source identity and C142 exhaustion remain unchanged; no repeated source probes, noncanonical substitution, or candidate rebuild is authorized.
 - A00364 is **REWORK_REQUIRED** at the producer-contract level: its exact validation-bearing SHA adds only its task record and declares `material_change=false`, `review_record_only=true`, `materially_reduces_unresolved_work=false`. The current no-action contract requires a material deliverable in addition to the durable task record.
 - C rewrites no candidate DDS. Pre-Gate `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+
+### 2026-10-01 17:28 KST — Q00075 authoritative Gate PASS
+- Validation-bearing retry result `50f29f674ddbd046784a6fd6854e23c247b4d90e` passed **Localization Automation Gate** run `36836426454` attempt 1.
+- Final dispositions remain **A00348 PASS / A00350 PASS / A00364 REWORK_REQUIRED**. A00348 and A00350 are fail-closed PREFLIGHT_ONLY acceptances; A00364 is producer-contract rework for missing material payload.
+- Historical first result `6f908a5f...` failed before producer validation because the recovery verifier still required the old preflight cap. Canonical policy commit `90df2058` had already changed the cap to 999999; verifier-only alignment `5dda33d7...` corrected that stale expectation without changing Q00075 dispositions.
+- This bookkeeping checkpoint is separate from the Gate-owning result commit. `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.

@@ -1619,3 +1619,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Index24 remains PREFLIGHT_ONLY awaiting real runtime name-entry selection-index/UV plus committed Hangul evidence. Index225 remains PREFLIGHT_ONLY/SOURCE_ACQUISITION_EXHAUSTED with fail-closed reactivation triggers only.
 - A00364 is not promoted because the exact producer result has no material payload/change beyond its review record. No candidate DDS state changes were made.
 - `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.
+
+
+### 2026-10-01 17:28 KST — C177 / Q00075 authoritative Gate PASS
+- Validation-bearing retry result: `50f29f674ddbd046784a6fd6854e23c247b4d90e`; Gate: `36836426454` attempt 1 **success**.
+- Final dispositions: A00348 **PASS / PREFLIGHT_ONLY**, A00350 **PASS / PREFLIGHT_ONLY**, A00364 **REWORK_REQUIRED / no material payload**.
+- First result `6f908a5f...` is non-authoritative after a pre-producer-check failure caused by a stale recovery-policy verifier; verifier alignment commit `5dda33d7...` is separate and CI-skipped.
+- `AUTOMATION_VALIDATION=PASS`; `RUNTIME_VALIDATION=UNTESTED`.

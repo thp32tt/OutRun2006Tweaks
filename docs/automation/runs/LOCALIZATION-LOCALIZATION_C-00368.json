@@ -182,19 +182,21 @@
   "uploaded_archive_used": false,
   "heavy_qa_repeated": false,
   "vr_ffb_dx_changes": false,
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "result_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
+  "authoritative_result_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
+  "validation_bearing_result_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
   "precommit_refresh": {
     "head_sha": "5dda33d7abc733146b3b8448694572bcabfbce78",
     "stale_state_overwrite": false,
-    "concurrent_changes_reviewed": "Latest schema30 HEAD refreshed after the first Gate exposed a stale controller verifier. Q00075 dispositions are unchanged; retry commit is reissued only after the one-line verifier alignment and preserves all concurrent producer commits."
+    "concurrent_changes_reviewed": "Latest schema30 HEAD refreshed after the first Gate exposed a stale controller verifier. Q00075 dispositions are unchanged; retry commit is reissued only after the one-line verifier alignment and preserves all concurrent producer commits.",
+    "bookkeeping_head_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
+    "bookkeeping_concurrent_changes": "Fresh latest HEAD preserved after authoritative Gate success; bookkeeping binds only Q00075 validation authority and does not rewrite candidate DDS or newer producer state."
   },
   "result_commit_message": "localization(C): QA Q00075 producer batch [AUTO:LOCALIZATION-LOCALIZATION_C-00368]",
-  "bookkeeping_note": "Q00075 dispositions unchanged. The first Gate-owning result 6f908a5f... failed before producer validation because a stale verifier contradicted canonical schema30 preflight policy. Verifier fix 5dda33d7... is separate [skip ci]; this reissued result owns the next Gate. Runtime remains UNTESTED.",
+  "bookkeeping_note": "Q00075 authoritative automatic validation is owned by retry result 50f29f674ddbd046784a6fd6854e23c247b4d90e and Localization Automation Gate 36836426454 attempt 1 success. Historical first result 6f908a5f... failed before producer checks due stale verifier; verifier alignment is separate commit 5dda33d7... and does not alter dispositions. Runtime remains UNTESTED.",
   "pre_gate_retries": [
     {
       "prior_result_sha": "6f908a5f5225d1a4faf49ac3ab67096eb79896d8",
@@ -208,5 +210,15 @@
       "verifier_fix_scope": "single stale expectation aligned to canonical 999999 policy",
       "disposition_changes": false
     }
-  ]
+  ],
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 36836426454,
+    "head_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-10-01T17:27:55+09:00"
+  },
+  "bookkeeping_recorded_at_kst": "2026-10-01T17:28:12+09:00"
 }
