@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00192",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "ccf99224c817f55fc04a0865a218794b028737ad",
+  "staged_source_commits": [
+    "4320fe722562f98e4d4ccefaa1c0b8682025f288",
+    "2ab83093f3455fa0b37cc6704ffbcf8aa9f6954c"
+  ],
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R192_182300_SEQUENCE_RET_BOUNDARY",
+  "selection_reason": "CONVERSION-DX11-00190 proved 0x182300 as the exact next code boundary after the 0x1822D2 sequence and twelve-byte INT3 padding, and explicitly named decode from 0x182300 as the next bounded F13 unit. The R186 exact bytes contain a compact six-instruction sequence ending at ret 0x182313, so this is the smallest complete runnable follow-up. DXVK-00191 independently uses the same public-EXE proof shape; DX11 validation remains independent.",
+  "summary": "PENDING automatic validation. Adds a fail-closed exact-byte/manual-decode proof for the six instructions at 0x182300..0x182313, validates rel32 calls 0x182306->0x188948 and 0x18230B->0x18231D against the R186 raw census, proves ret at 0x182313, and establishes 0x182314 only as the immediate next instruction boundary. Function-entry identity and all call/render/HUD semantics remain unresolved.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00192.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "Base ccf99224c817f55fc04a0865a218794b028737ad is the completed CONVERSION-DX11-00190 bookkeeping descendant; validation-bearing ancestor 1bd287ee proves 0x182300 as the exact next code boundary after twelve CC padding bytes.",
+    "R192 decodes exact bytes 83 ec 0c; dd 14 24; e8 3d 66 00 00; e8 0d 00 00 00; 83 c4 0c; c3 from 0x182300 through 0x182313.",
+    "The two rel32 calls decode to 0x188948 and 0x18231D and must both be present in the R186 raw outbound census. The following address 0x182314 is only a contiguous instruction boundary; no function-entry or semantic claim is made.",
+    "Regression/history review found no runtime source change: protected R51 world stereo/HUD paths and Issue #13 runtime problem state are unchanged.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00191",
+    "source_result_sha": "4f7051a5b2a766bce8a5235924d12196ed54a336",
+    "source_validation_state_at_selection": "PENDING",
+    "source_proof_target": "EXACT_182300_SEQUENCE_RET_NEXT_BOUNDARY_PROVEN",
+    "reason": "Reuse only the bounded exact-byte sequence proof design on the shared canonical EXE. DX11 depends on its own R190 predecessor and independent exact-result GitHub Actions."
+  },
+  "proof_contract": {
+    "predecessor_status": "EXACT_1822D2_SEQUENCE_RET_PADDING_NEXT_BOUNDARY_PROVEN",
+    "start_rva": "0x00182300",
+    "prefix_end_rva": "0x00182314",
+    "instruction_count": 6,
+    "calls": [
+      "0x00182306->0x00188948",
+      "0x0018230B->0x0018231D"
+    ],
+    "ret_rva": "0x00182313",
+    "next_instruction_rva": "0x00182314",
+    "expected_status": "EXACT_182300_SEQUENCE_RET_NEXT_BOUNDARY_PROVEN",
+    "terminal_status": "EXACT_RET_AT_182313_PROVEN",
+    "next_boundary_status": "EXACT_182314_INSTRUCTION_BOUNDARY_PROVEN",
+    "function_entry_status": "UNRESOLVED_AT_182300_182314_AND_18231D",
+    "semantic_effect": "BOUNDED_SEQUENCE_AND_CALL_TARGETS_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no native DX11 renderer activation, game draw routing, transport, provider, selector or package behavior changes.",
+    "ownership": "Bounded exact decode does not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Proof fails closed unless the R190 predecessor remains exact, all six instruction byte sequences are contiguous/exact, both rel32 calls decode to their expected targets and appear in the R186 raw census, ret remains at 0x182313, and the exclusive sequence end is exactly 0x182314. It explicitly refuses to infer function-entry identity at 0x182300, 0x182314 or 0x18231D."
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_1822D2_SEQUENCE_RET_PADDING_NEXT_BOUNDARY_PROVEN",
+    "after": "PENDING_182300_SEQUENCE_RET_NEXT_BOUNDARY",
+    "runtime_claim": false
+  },
+  "blocker": "The exact 0x182300..0x182313 sequence and immediate 0x182314 boundary are the current bounded target. Even if proven, function-entry identity at 0x182300/0x182314/0x18231D, semantics of calls to 0x188948 and 0x18231D, remaining continuation bytes, earlier callees and all render/HUD ownership remain unresolved.",
+  "next_action": "Wait for exact-SHA automatic validation. Do not publish another ordinary same-branch commit until Backend Conversion Gate completes because cancel-in-progress is enabled."
+}
