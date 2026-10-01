@@ -155,7 +155,7 @@ required["qa_deduplication.shared_state_merge_frequency"] = qa.get("shared_state
 strategy = cfg.get("production_strategy") or {}
 required["production_strategy.mode"] = strategy.get("mode") == "candidate_completion_first"
 required["production_strategy.forbid_new_preflight_while_ready_exists"] = strategy.get("forbid_new_preflight_while_ready_exists") is True
-required["production_strategy.max_new_preflight_only_batches_when_no_ready_assets"] = int(strategy.get("max_new_preflight_only_batches_when_no_ready_assets", 99)) <= 1
+required["production_strategy.max_new_preflight_only_batches_when_no_ready_assets"] = int(strategy.get("max_new_preflight_only_batches_when_no_ready_assets", 0)) == 999999
 required["production_strategy.candidate_target_per_invocation_when_ready_exists"] = int(strategy.get("candidate_target_per_invocation_when_ready_exists", 0)) >= 2
 batch_policy = strategy.get("candidate_batch_policy") or {}
 required["production_strategy.candidate_batch_default"] = int(batch_policy.get("default_target", 0)) >= 2
