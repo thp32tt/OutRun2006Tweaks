@@ -1028,6 +1028,81 @@ async def localization_safe_send_lane_task(
         return False
 
 
+async def localization_recover_rejected_producer_commit(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    active: dict,
+    task_commit: dict,
+    reasons: list[str],
+) -> None:
+    """Keep the same producer TASK alive when a durable no-work result fails the global completion guard."""
+    result_sha = str(task_commit.get("sha") or "")
+    same_rejection = active.get("producer_no_work_rejected_sha") == result_sha
+    active["producer_no_work_rejected_sha"] = result_sha
+    active["producer_no_work_guard_reasons"] = reasons
+    active["assistant_claim_verification"] = "REJECTED_NO_WORK_COMPLETION"
+    active["phase"] = "WAIT_CHAT"
+    active["terminal"] = None
+    active["result_sha"] = None
+    active["automation_validation"] = "PENDING"
+    invalidate_task_commit_cache(active["branch"], active["task_id"])
+
+    if same_rejection and active.get("producer_no_work_recovery_sent_at"):
+        write_runtime(
+            status="producer_no_work_guard_wait",
+            last_action=f"{active['task_id']} rejected no-work result {result_sha[:12]}; waiting for material follow-up commit",
+            queue=active,
+        )
+        return
+
+    reason_text = "; ".join(reasons[:12])
+    prompt = (
+        f"TASK_ID={active['task_id']} RESULT_SHA={result_sha}\n"
+        "NO_WORK_GUARD_REJECTED: 이 커밋은 producer 완료로 인정되지 않는다. "
+        f"현재 미완료 근거={reason_text}.\n"
+        "같은 TASK_ID로 실제 미완료 작업을 계속하고 material deliverable과 새 [AUTO:TASK_ID] 커밋을 남겨. "
+        "TASK 결과 파일 없음/신규 TASK 결과 없음/'커밋할 변경 없음'은 종료 사유가 아니다. "
+        "NO_WORK/NO_ACTION/review-only는 전체 completion guard가 모두 clear일 때만 허용된다."
+    )
+    sent = await queue_send_same_chat_control_message(
+        context,
+        pages,
+        active,
+        prompt,
+        status="producer_no_work_guard_recovery",
+        result_label="producer_no_work_guard_recovery",
+    )
+    if sent:
+        active["producer_no_work_recovery_sent_at"] = datetime.now(TZ).isoformat()
+
+
+async def localization_handle_producer_commit(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    q: dict,
+    active: dict,
+    task_commit: dict,
+    now: datetime,
+) -> bool:
+    """Validate producer task evidence before release. False means same TASK remains active."""
+    valid, reasons, _record = localization_validate_producer_result_commit(
+        active["task_id"], task_commit["sha"]
+    )
+    if not valid:
+        await localization_recover_rejected_producer_commit(
+            context, pages, active, task_commit, reasons
+        )
+        return False
+    for key in (
+        "producer_no_work_rejected_sha",
+        "producer_no_work_guard_reasons",
+        "producer_no_work_recovery_sent_at",
+    ):
+        active.pop(key, None)
+    finalize_localization_producer_commit(q, active, task_commit, now)
+    return True
+
+
 def finalize_localization_producer_commit(q: dict, active: dict, task_commit: dict, now: datetime) -> None:
     """Release A/B/E on durable commit; validation is deferred to the C batch gate."""
     active["result_sha"] = task_commit["sha"]
@@ -1081,13 +1156,16 @@ async def localization_process_lane(
             )
             if task_commit:
                 if lane_key in {"A", "B", "D"}:
-                    finalize_localization_producer_commit(q, active, task_commit, now)
-                    save_queue_state(q)
-                    write_runtime(
-                        status="producer_commit_ready",
-                        last_action=f"{active['task_id']} durable commit found before UI recovery; producer released",
-                        queue=q,
+                    accepted = await localization_handle_producer_commit(
+                        context, pages, q, active, task_commit, now
                     )
+                    save_queue_state(q)
+                    if accepted:
+                        write_runtime(
+                            status="producer_commit_ready",
+                            last_action=f"{active['task_id']} durable material commit accepted; producer released",
+                            queue=q,
+                        )
                 else:
                     active["result_sha"] = task_commit["sha"]
                     active["result_message"] = task_commit["message"]
@@ -1195,7 +1273,9 @@ async def localization_process_lane(
             if not text:
                 if task_commit:
                     if lane_key in {"A", "B", "D"}:
-                        finalize_localization_producer_commit(q, active, task_commit, now)
+                        await localization_handle_producer_commit(
+                            context, pages, q, active, task_commit, now
+                        )
                     else:
                         active["result_sha"] = task_commit["sha"]
                         active["result_message"] = task_commit["message"]
@@ -1228,13 +1308,16 @@ async def localization_process_lane(
             task_commit = task_commit or github_find_task_commit(active["branch"], active["task_id"])
             if task_commit:
                 if lane_key in {"A", "B", "D"}:
-                    finalize_localization_producer_commit(q, active, task_commit, now)
-                    save_queue_state(q)
-                    write_runtime(
-                        status="producer_commit_ready",
-                        last_action=f"{active['task_id']} -> {active['result_sha']} queued for C batch validation; producer released",
-                        queue=q,
+                    accepted = await localization_handle_producer_commit(
+                        context, pages, q, active, task_commit, now
                     )
+                    save_queue_state(q)
+                    if accepted:
+                        write_runtime(
+                            status="producer_commit_ready",
+                            last_action=f"{active['task_id']} -> {active['result_sha']} queued for C batch validation; producer released",
+                            queue=q,
+                        )
                 else:
                     active["result_sha"] = task_commit["sha"]
                     active["result_message"] = task_commit["message"]
@@ -1446,7 +1529,12 @@ async def localization_process_lane_isolated(
         )
         if commit:
             if lane_key in {"A", "B", "D"}:
-                finalize_localization_producer_commit(q, active, commit, now)
+                accepted = await localization_handle_producer_commit(
+                    context, pages, q, active, commit, now
+                )
+                if not accepted:
+                    save_queue_state(q)
+                    return
             else:
                 active["result_sha"] = commit["sha"]
                 active["result_message"] = commit.get("message")
