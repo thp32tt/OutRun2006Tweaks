@@ -133,6 +133,7 @@ REGISTRY_BACKUP_FILE = STATE_DIR / "chat_registry.json.bak"
 RUNTIME_FILE = STATE_DIR / "runtime_status.json"
 QUEUE_FILE = STATE_DIR / "queue_state.json"
 QUEUE_BACKUP_FILE = STATE_DIR / "queue_state.json.bak"
+BROKER_PENDING_DIR = STATE_DIR / "broker_pending"
 PROMPTS_DIR = Path("/opt/outrun/prompts")
 GAME_MOD_CONTEXT = (
     "Context: This is authorized offline game-mod/VR development for the user's local copy of OutRun 2006. "
@@ -259,6 +260,11 @@ class GitHubTransientError(RuntimeError):
 
 class GitHubBrokerConflict(RuntimeError):
     """GitHub broker write could not be applied safely against the current branch HEAD."""
+    pass
+
+
+class GitHubBrokerPermissionError(GitHubBrokerConflict):
+    """Controller credential cannot publish a broker changeset."""
     pass
 
 
@@ -791,7 +797,7 @@ def github_api_mutation_json(method: str, path: str, payload: dict) -> dict:
             f"GitHub retry cooldown active for {_github_blocked_seconds()}s"
         )
     if not GITHUB_TOKEN:
-        raise GitHubBrokerConflict("controller GitHub token is not configured")
+        raise GitHubBrokerPermissionError("controller GitHub token is not configured")
 
     method = method.upper()
     if method not in {"POST", "PATCH", "PUT", "DELETE"}:
@@ -848,7 +854,7 @@ def github_api_mutation_json(method: str, path: str, payload: dict) -> dict:
             )
             raise GitHubTransientError(f"GitHub mutation HTTP {e.code}; retry scheduled") from e
         if e.code in {401, 403}:
-            raise GitHubBrokerConflict(
+            raise GitHubBrokerPermissionError(
                 f"controller GitHub token lacks write permission (HTTP {e.code})"
             ) from e
         if e.code in {409, 422}:
@@ -1000,11 +1006,41 @@ def github_broker_protocol_instructions(active: dict) -> str:
     )
 
 
+def github_broker_spool_pending(active: dict, changeset: dict, reason: str) -> Path:
+    BROKER_PENDING_DIR.mkdir(parents=True, exist_ok=True)
+    task_id = str(active.get("task_id") or "unknown").strip()
+    safe_task = re.sub(r"[^A-Za-z0-9_.-]+", "_", task_id)
+    target = BROKER_PENDING_DIR / f"{safe_task}.json"
+    payload = {
+        "schema": 1,
+        "saved_at": datetime.now(TZ).isoformat(),
+        "task_id": task_id,
+        "lane": active.get("lane"),
+        "branch": active.get("branch"),
+        "attempt": active.get("attempt"),
+        "reason": reason,
+        "changeset": changeset,
+    }
+    tmp = target.with_suffix(".tmp")
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(target)
+    runtime["github_broker_pending_file"] = str(target)
+    runtime["github_broker_pending_task_id"] = task_id
+    return target
+
+
+def github_broker_pending_count() -> int:
+    try:
+        return sum(1 for p in BROKER_PENDING_DIR.glob("*.json") if p.is_file())
+    except Exception:
+        return 0
+
+
 def github_broker_apply_changeset(active: dict, changeset: dict) -> dict:
     if not GITHUB_BROKER_ENABLED:
         raise GitHubBrokerConflict("controller GitHub broker is disabled")
     if not github_broker_write_capable():
-        raise GitHubBrokerConflict("controller GitHub token is not write-capable")
+        raise GitHubBrokerPermissionError("controller GitHub token is not write-capable")
 
     branch = str(active.get("branch") or "").strip()
     task_id = str(active.get("task_id") or "").strip()
