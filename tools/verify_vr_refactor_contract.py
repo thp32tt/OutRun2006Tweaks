@@ -134,6 +134,19 @@ public_state_begin = r29.rfind("StereoBaseInstallState() noexcept")
 if public_state_begin < 0 or "return ReadStereoBaseInstallState();" not in r29[public_state_begin:]:
     errors.append("R29 public install-state facade bypassed read boundary")
 
+if r29.count('HookManager::ReportAsyncResult("OpenXRVRStereoR29", success)') != 1:
+    errors.append("R29 async install-result reporting is no longer centralized")
+r29_install_begin = r29.find("DWORD WINAPI R29StereoInstallThread(")
+r29_startup_boundary = r29.find("bool R29StartInstallThread()", r29_install_begin)
+if r29_install_begin < 0 or r29_startup_boundary <= r29_install_begin:
+    errors.append("R29 install thread boundary missing")
+else:
+    install = r29[r29_install_begin:r29_startup_boundary]
+    if install.count("R29PublishInstallResult(") != 4:
+        errors.append("R29 install thread must publish exactly four terminal result routes")
+    if 'HookManager::ReportAsyncResult("OpenXRVRStereoR29"' in install:
+        errors.append("R29 install thread regained direct async publication")
+
 for marker in (
     "enum class R29PrerequisiteDecision",
     "R29PrerequisiteWaitAttempts = 4800",

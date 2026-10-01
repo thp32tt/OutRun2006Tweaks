@@ -497,6 +497,14 @@ namespace OutRunVRStereo
             return true;
         }
 
+        void R29PublishInstallResult(
+            OutRunVR::RuntimeEligibility::InstallState state,
+            bool success) noexcept
+        {
+            SetStereoBaseInstallState(state);
+            HookManager::ReportAsyncResult("OpenXRVRStereoR29", success);
+        }
+
         enum class R29PrerequisiteDecision
         {
             Wait,
@@ -532,8 +540,7 @@ namespace OutRunVRStereo
                     R29ClassifyPrerequisite(r26, rendererR29);
                 if (prerequisite == R29PrerequisiteDecision::Fail)
                 {
-                    SetStereoBaseInstallState(State::Failed);
-                    HookManager::ReportAsyncResult("OpenXRVRStereoR29", false);
+                    R29PublishInstallResult(State::Failed, false);
                     spdlog::error(
                         "VR R29 STEREO: R26 or renderer-R29 prerequisite failed; R26/R28 remains active");
                     return 0;
@@ -561,8 +568,7 @@ namespace OutRunVRStereo
                     if (!R29EnableStereoHooks())
                     {
                         R29RollbackStereoHooks();
-                        SetStereoBaseInstallState(State::Failed);
-                        HookManager::ReportAsyncResult("OpenXRVRStereoR29", false);
+                        R29PublishInstallResult(State::Failed, false);
                         spdlog::error(
                             "VR R29 STEREO: disabled-first transaction failed; R26/R28 remains active");
                         return 0;
@@ -574,8 +580,7 @@ namespace OutRunVRStereo
                     // and clears private right depth/stencil before this opens.
                     R29ArmMonoSafety(2);
                     OutRunVRRenderer::InvalidateRawWvpGeneration();
-                    SetStereoBaseInstallState(State::Ready);
-                    HookManager::ReportAsyncResult("OpenXRVRStereoR29", true);
+                    R29PublishInstallResult(State::Ready, true);
                     spdlog::info(
                         "VR R29 STEREO: conservative effect classification + cached render state + steady-state two-eye path ACTIVE");
                     return 0;
@@ -583,8 +588,7 @@ namespace OutRunVRStereo
                 Sleep(R29PrerequisiteWaitMs);
             }
 
-            SetStereoBaseInstallState(State::Failed);
-            HookManager::ReportAsyncResult("OpenXRVRStereoR29", false);
+            R29PublishInstallResult(State::Failed, false);
             spdlog::error(
                 "VR R29 STEREO: timed out waiting for R26/renderer-R29; R26/R28 remains active");
             return 0;
