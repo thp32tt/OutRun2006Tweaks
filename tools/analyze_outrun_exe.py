@@ -1096,6 +1096,16 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_10_INSTRUCTIONS = (
     (0x001825BF, "8b 74 24 14", "mov esi, [esp+0x14]"),
 )
 
+
+# R226/F13: acquire fresh exact-EXE bytes beginning at the unresolved
+# test esi,imm32 tail left at the R224 capture edge. The five-byte
+# F7 C6 03 00 00 overlap must match the prior exact prefix proof. This remains
+# raw provenance only: no instruction/function/callee/render/HUD semantics are
+# promoted here.
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_RVA = 0x001825C3
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_PROBE_LEN = 96
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_PROBE_END_RVA = 0x00182623
+
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS = (
     (0x000283DE, "b9 00 00 80 3f", "mov ecx, 0x3f800000"),
     (0x000283E3, "d9 58 1c", "fstp dword [eax+0x1c]"),
@@ -5104,6 +5114,89 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_10_prefix_pro
     }
 
 
+def collect_guarded_gf_target_c_helper_1_third_callee_continuation_11_provenance(pe: PE) -> dict:
+    """Capture fresh exact bytes from 0x1825C3 through exclusive end 0x182623.
+
+    R224 proves every complete instruction through 0x1825C2 and preserves the
+    five bytes F7 C6 03 00 00 at 0x1825C3 as an incomplete test esi,imm32.
+    This collector overlaps those bytes, extends beyond the old 0x1825C8
+    capture end, and records raw bytes/rel32 candidates only. Exact decoding
+    and semantic ownership remain separate future work.
+    """
+
+    predecessor = collect_guarded_gf_target_c_helper_1_third_callee_continuation_10_prefix_proof(pe)
+    target_rva = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    probe = pe.bytes_at_rva(
+        target_rva, GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_PROBE_LEN
+    )
+    inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
+    outbound = collect_raw_rel32_call_candidates(
+        pe,
+        target_rva,
+        GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_PROBE_LEN,
+    )
+    predecessor_exact = (
+        predecessor["status"] == "EXACT_182568_TO_1825C3_CONTROL_FLOW_PREFIX_PROVEN"
+        and predecessor["prefix_end_rva"] == target_rva
+        and predecessor["prefix_end_matches"]
+        and predecessor["incomplete_rva"] == target_rva
+        and predecessor["incomplete_bytes"] == "f7 c6 03 00 00"
+        and predecessor["incomplete_matches"]
+    )
+    probe_end_matches = (
+        target_rva + len(probe)
+        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_PROBE_END_RVA
+    )
+    predecessor_overlap_matches_probe = (
+        len(probe) >= 5
+        and probe[:5].hex(" ") == predecessor["incomplete_bytes"]
+    )
+    extends_beyond_predecessor_capture = (
+        target_rva < GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_10_PROBE_END_RVA
+        and GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_PROBE_END_RVA
+        > GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_10_PROBE_END_RVA
+    )
+    captured = bool(
+        predecessor_exact
+        and target_section == ".text"
+        and len(probe) == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_PROBE_LEN
+        and probe_end_matches
+        and predecessor_overlap_matches_probe
+        and extends_beyond_predecessor_capture
+    )
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "predecessor_status": predecessor["status"],
+        "predecessor_exact": predecessor_exact,
+        "probe_len": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_PROBE_LEN,
+        "probe_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_PROBE_END_RVA,
+        "probe_end_matches": probe_end_matches,
+        "predecessor_overlap_bytes": predecessor["incomplete_bytes"],
+        "predecessor_overlap_matches_probe": predecessor_overlap_matches_probe,
+        "extends_beyond_predecessor_capture": extends_beyond_predecessor_capture,
+        "first_16_bytes": probe[:16].hex(" "),
+        "last_16_bytes": probe[-16:].hex(" "),
+        "bytes": probe.hex(" "),
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "status": (
+            "EXACT_EXE_1825C3_TO_182623_PROVENANCE_CAPTURED"
+            if captured
+            else "CALLEE_1825C3_CONTINUATION_PROVENANCE_CAPTURE_FAILED"
+        ),
+        "start_boundary_status": "RAW_INCOMPLETE_TEST_ESI_IMM32_OVERLAP_UNRESOLVED",
+        "function_entry_status": "UNRESOLVED_AT_1825C3_AND_DISCOVERED_TARGETS",
+        "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+        "ownership_effect": "NONE",
+        "continuation_scope": "RAW_BYTES_AND_REL32_CENSUS_ONLY",
+    }
+
+
 def collect_guarded_gf_target_b_alignment_proof(pe: PE) -> dict:
     """Verify the exact 0x65860 -> 0x65874 instruction-boundary anchor.
 
@@ -6931,6 +7024,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_third_callee_continuation_9_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_9_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_10_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_10_provenance(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_10_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_10_prefix_proof(pe),
+        "guarded_gf_target_c_helper_1_third_callee_continuation_11_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_11_provenance(pe),
         "known_call_sites_expected": len(KNOWN_CALL_SITES),
         "known_call_sites_found": len(KNOWN_CALL_SITES) - len(missing_known_call_sites),
         "missing_known_call_sites": missing_known_call_sites,
@@ -8308,6 +8402,40 @@ def main() -> int:
         f"call_semantics={helper_1_third_cont_10_proof['call_semantics']} "
         f"ownership_effect={helper_1_third_cont_10_proof['ownership_effect']}"
     )
+
+    helper_1_third_cont_11 = report[
+        "guarded_gf_target_c_helper_1_third_callee_continuation_11_provenance"
+    ]
+    helper_1_third_cont_11_outbound = ",".join(
+        f"0x{call['call_rva']:08X}->0x{call['target_rva']:08X}:"
+        f"{call['known_target'] or 'unknown'}:{call['target_section']}"
+        for call in helper_1_third_cont_11["raw_outbound_rel32_candidates"]
+    ) or "none"
+    print(
+        f"gf_target_c_helper_1_third_callee_continuation_11="
+        f"0x{helper_1_third_cont_11['target_rva']:08X} "
+        f"status={helper_1_third_cont_11['status']} "
+        f"predecessor={helper_1_third_cont_11['predecessor_status']} "
+        f"predecessor_exact={helper_1_third_cont_11['predecessor_exact']} "
+        f"section={helper_1_third_cont_11['target_section'] or 'none'} "
+        f"probe_len={helper_1_third_cont_11['probe_len']} "
+        f"probe_end=0x{helper_1_third_cont_11['probe_end_rva']:08X} "
+        f"probe_end_match={helper_1_third_cont_11['probe_end_matches']} "
+        f"overlap={helper_1_third_cont_11['predecessor_overlap_bytes']} "
+        f"overlap_match={helper_1_third_cont_11['predecessor_overlap_matches_probe']} "
+        f"extends={helper_1_third_cont_11['extends_beyond_predecessor_capture']} "
+        f"first16={helper_1_third_cont_11['first_16_bytes']} "
+        f"last16={helper_1_third_cont_11['last_16_bytes']} "
+        f"inbound_raw={len(helper_1_third_cont_11['raw_inbound_rel32_candidates'])} "
+        f"outbound_raw={len(helper_1_third_cont_11['raw_outbound_rel32_candidates'])} "
+        f"outbound={helper_1_third_cont_11_outbound} "
+        f"start_boundary={helper_1_third_cont_11['start_boundary_status']} "
+        f"function_entry={helper_1_third_cont_11['function_entry_status']} "
+        f"semantic_effect={helper_1_third_cont_11['semantic_effect']} "
+        f"ownership_effect={helper_1_third_cont_11['ownership_effect']} "
+        f"scope={helper_1_third_cont_11['continuation_scope']} "
+        f"bytes={helper_1_third_cont_11['bytes']}"
+    )
     print(f"hud_strings={len(report['hud_strings'])}")
     if missing_known_call_sites:
         for item in missing_known_call_sites:
@@ -8445,6 +8573,9 @@ def main() -> int:
     if helper_1_third_cont_10_proof["status"] != "EXACT_182568_TO_1825C3_CONTROL_FLOW_PREFIX_PROVEN":
         print("guarded_gf_target_c_helper_1_third_callee_continuation_10_prefix_proof=FAILED")
         return 45
+    if helper_1_third_cont_11["status"] != "EXACT_EXE_1825C3_TO_182623_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_c_helper_1_third_callee_continuation_11_provenance=FAILED")
+        return 46
     return 0
 
 
