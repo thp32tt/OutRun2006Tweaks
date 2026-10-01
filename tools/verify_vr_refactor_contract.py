@@ -336,6 +336,16 @@ if "R34CreateDisabledHooks();" not in r34:
     errors.append("R34 install thread bypassed disabled hook creation boundary")
 
 for marker in (
+    "bool R33InstallHookTransaction() noexcept",
+    "R33CreateDisabledHooks();",
+    "if (R33EnableHooks())",
+    "R33RollbackHooks();",
+    "if (!R33InstallHookTransaction())",
+):
+    if marker not in r33:
+        errors.append(f"R33 hook transaction boundary missing: {marker}")
+
+for marker in (
     "R34PrerequisiteWaitAttempts = 4800",
     "R34PrerequisiteWaitMs = 25",
     "attempt < R34PrerequisiteWaitAttempts",

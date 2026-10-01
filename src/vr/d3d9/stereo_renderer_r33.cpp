@@ -875,6 +875,15 @@ namespace OutRunVRStereo
                 DrawIndexedPrimitiveUPDestR33, disabled);
         }
 
+        bool R33InstallHookTransaction() noexcept
+        {
+            R33CreateDisabledHooks();
+            if (R33EnableHooks())
+                return true;
+            R33RollbackHooks();
+            return false;
+        }
+
         constexpr int R33PrerequisiteWaitAttempts = 4800;
         constexpr DWORD R33PrerequisiteWaitMs = 25;
 
@@ -894,11 +903,8 @@ namespace OutRunVRStereo
                 }
                 if (r32 == State::Ready)
                 {
-                    R33CreateDisabledHooks();
-
-                    if (!R33EnableHooks())
+                    if (!R33InstallHookTransaction())
                     {
-                        R33RollbackHooks();
                         SetFinalDispatchInstallState(State::Failed);
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR33Dispatch", false);
