@@ -1,0 +1,240 @@
+{
+  "schema_version": 30,
+  "controller_schema_version": 30,
+  "schema": "outrun-b00377-p00245-index139-source-identity-terminal-v30",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00377",
+  "wave_id": "P00245",
+  "lane": "LOCALIZATION_B",
+  "role": "PRODUCER_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T18:44:35+09:00",
+  "base_head_sha": "ee920f6c316c87192a299304e6dc33c72bb15cb3",
+  "policy_resolution": {
+    "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+    "resolution": "LATEST_HEAD_SCHEMA30_POLICY_APPLIED"
+  },
+  "input_fingerprint": {
+    "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed",
+    "canonical_progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91"
+  },
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "fresh_completion_tier_scan": "ZERO_RUNNABLE_COMPLETION_TIER",
+    "direct_rework_runnable_indices": [],
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "existing_candidate_rework_runnable_indices": [],
+    "excluded_or_terminal_scopes": [
+      {
+        "index": 28,
+        "asset": "A05BF610",
+        "reason": "B00375 pinned-release verification already establishes sticky SOURCE_IDENTITY_MISMATCH; unchanged dependency fingerprint, do not repeat"
+      },
+      {
+        "index": 34,
+        "asset": "B7E25BAD",
+        "reason": "C139 accepted SOURCE_ACQUISITION_EXHAUSTED from B00188; unchanged fingerprint"
+      },
+      {
+        "index": 52,
+        "asset": "A8CE339F",
+        "reason": "C139 accepted SOURCE_ACQUISITION_EXHAUSTED from B00188; unchanged fingerprint"
+      },
+      {
+        "index": 61,
+        "asset": "C4A2937B",
+        "reason": "current candidate remains QA_PENDING_C via B00342"
+      },
+      {
+        "index": 94,
+        "asset": "2DA43E41",
+        "reason": "newer same-asset reconstruction evidence remains QA_PENDING_C; producer skip"
+      },
+      {
+        "index": 97,
+        "asset": "411827E",
+        "reason": "current STATIC_QA_PASS_RUNTIME_UNTESTED"
+      },
+      {
+        "index": 112,
+        "asset": "D41D0B1",
+        "reason": "existing current candidate/static content already under accepted QA lineage; no fresh direct rework authority"
+      },
+      {
+        "index": 121,
+        "asset": "FD90AA9",
+        "reason": "current STATIC_QA_PASS_RUNTIME_UNTESTED"
+      },
+      {
+        "index": 130,
+        "asset": "1762489B",
+        "reason": "current STATIC_QA_PASS_RUNTIME_UNTESTED"
+      },
+      {
+        "index": 133,
+        "asset": "25F697C6",
+        "reason": "current STATIC_QA_PASS_RUNTIME_UNTESTED"
+      },
+      {
+        "index": 163,
+        "asset": "59A79158",
+        "reason": "C171 marks PRODUCTION_COMPLETE; do not repeat"
+      },
+      {
+        "index": 193,
+        "asset": "97E863AD",
+        "reason": "current STATIC_QA_PASS_RUNTIME_UNTESTED"
+      },
+      {
+        "index": 220,
+        "asset": "D657C2EB",
+        "reason": "latest B00375 material result 678655ff remains pending independent C; do not build on unaccepted same-asset evidence"
+      },
+      {
+        "index": 226,
+        "asset": "E3F4BA07",
+        "reason": "current STATIC_QA_PASS_RUNTIME_UNTESTED"
+      },
+      {
+        "index": 232,
+        "asset": "EBFC709F",
+        "reason": "current STATIC_QA_PASS_RUNTIME_UNTESTED"
+      }
+    ],
+    "fallback_ladder_step": 4,
+    "selected_indices": [
+      139
+    ],
+    "selected_assets": [
+      "313DB8CB"
+    ],
+    "fewer_than_two_runnable_completion_tier_assets_proven": true,
+    "second_material_preflight_candidate": "NONE_AFTER_STICKY_QA_PENDING_AND_TERMINAL_FILTERS"
+  },
+  "asset": {
+    "queue_index": 139,
+    "asset": "313DB8CB",
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+    "canonical_inventory": {
+      "sha256": "45cd9acffa98e79079774c4af41f90471627f7531fa33c12ff16dc4ed9292209",
+      "decoded_dimensions": [
+        512,
+        256
+      ],
+      "mode": "RGBA"
+    },
+    "canonical_semantics": [
+      {
+        "source": "TUNED",
+        "korean": "튜닝"
+      },
+      {
+        "source": "NORMAL",
+        "korean": "일반"
+      }
+    ],
+    "preserve": [
+      "Ferrari/model names",
+      "flags",
+      "MT/AT legends",
+      "logos and non-text artwork"
+    ],
+    "prior_authority": {
+      "producer_task": "LOCALIZATION-LOCALIZATION_A-00128",
+      "c_disposition": "C119_Q00017_PASS_CONTRACT_FINGERPRINT_REPAIR_PREFLIGHT_ONLY",
+      "prior_state": "EXACT_CANONICAL_SOURCE_BYTES_ABSENT"
+    },
+    "acquisition": {
+      "google_drive_exact_relative_path": {
+        "account": "ezflash557",
+        "approved_root_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+        "exact_parent_folder_id": "1O6X-8bve8_SRGv07Fbd3fbwMliXFNRRr",
+        "required_name": "313DB8CB_512x256.dds",
+        "search_result_count": 0,
+        "outcome": "SOURCE_TRANSPORT_MISS"
+      },
+      "pinned_upstream_direct_file": {
+        "repository": "envido32/OR2006Sprites",
+        "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+        "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+        "outcome": "SOURCE_TRANSPORT_MISS",
+        "http_semantics": "404 exact-path miss; not identity mismatch"
+      },
+      "pinned_release_fallback": {
+        "release_tag": "v0.25.10a",
+        "release_asset_id": 306630789,
+        "archive_name": "OR2-HD-GUI-v0.25.10a.zip",
+        "archive_size": 306223257,
+        "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+        "archive_identity": "PASS_EXACT",
+        "transport": "CURRENT_SESSION_ATTACHMENT_EXACT_PINNED_RELEASE_BYTES",
+        "state_ssot": false,
+        "member": {
+          "path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
+          "bytes": 8388736,
+          "sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+          "decoded_dimensions": [
+            2048,
+            1024
+          ],
+          "format": "RGBA32",
+          "mip_count": 1
+        },
+        "canonical_comparison": {
+          "sha256_match": false,
+          "dimensions_match": false,
+          "mode_class_match": true,
+          "outcome": "SOURCE_IDENTITY_MISMATCH"
+        }
+      }
+    },
+    "terminal_source_state": "SOURCE_IDENTITY_MISMATCH_PINNED_RELEASE_MEMBER",
+    "sticky_retry_policy": "DO_NOT_REPROBE_UNCHANGED_SOURCE_OR_INVENTORY_FINGERPRINT",
+    "pixel_work_permitted": false,
+    "candidate_generation_permitted": false
+  },
+  "material_deliverable": {
+    "type": "INDEX139_SCHEMA30_FULL_SOURCE_TRANSPORT_TERMINALIZATION_PLUS_DETERMINISTIC_VERIFIER",
+    "reviewed_indices": [
+      139
+    ],
+    "drive_exact_miss": 1,
+    "pinned_direct_exact_miss": 1,
+    "pinned_release_exact_archive_pass": 1,
+    "pinned_release_member_identity_mismatch": 1,
+    "materially_reduces_unresolved_work": true,
+    "material_reduction": "closes the remaining current-contract source ladder for index139 and prevents the 2048x1024 release member from being misused as the 512x256 canonical source",
+    "verifier": "localization/graphics/role_B/20261001-B00377-P00245/verify_index139_source_identity.py",
+    "report": "localization/graphics/role_B/20261001-B00377-P00245/B00377_P00245_INDEX139_313DB8CB_SOURCE_IDENTITY_TERMINAL.json",
+    "candidate_dds_modified": false
+  },
+  "strict_hold": {
+    "exact_canonical_source_bytes": "HOLD_SOURCE_IDENTITY_MISMATCH",
+    "source_effect_masks": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "clean_plate": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "korean_candidate": "HOLD_EXACT_CANONICAL_SOURCE_REQUIRED",
+    "static_candidate_qa": "HOLD_NO_CANDIDATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "self_qa": "PASS_B_MOD3_SCHEMA30__FRESH_ZERO_RUNNABLE_COMPLETION_TIER__FALLBACK4_INDEX139__DRIVE_EXACT_MISS__PINNED_DIRECT_404__PINNED_ARCHIVE_EXACT__RELEASE_MEMBER_SHA_AND_DIMENSIONS_MISMATCH_CANONICAL__SOURCE_IDENTITY_MISMATCH_FAIL_CLOSED__NO_CANDIDATE__NO_SHARED_STATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used_as_state_ssot": false,
+  "uploaded_archive_used_as_source_transport": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}

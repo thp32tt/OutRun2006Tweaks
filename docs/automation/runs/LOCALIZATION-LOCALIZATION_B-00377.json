@@ -1,0 +1,86 @@
+{
+  "schema_version": 30,
+  "controller_schema_version": 30,
+  "schema": "outrun-b00377-p00245-index139-source-identity-terminal-material-v30",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00377",
+  "wave_id": "P00245",
+  "lane": "LOCALIZATION_B",
+  "role": "CONTINUOUS_PRODUCTION_SELF_QA_MOD3_1",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T18:44:35+09:00",
+  "base_head_sha": "ee920f6c316c87192a299304e6dc33c72bb15cb3",
+  "result": "PASS_MATERIAL_B_MOD3_INDEX139_SOURCE_IDENTITY_MISMATCH_TERMINAL_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "summary": "Fresh schema30 B-shard scan found no runnable DIRECT_REWORK/RENDER_READY/ONE_STAGE_TO_RENDER/existing-candidate completion item after excluding current C-pending scopes, accepted static-pass/production-complete candidates, and unchanged sticky source blockers. Fallback step 4 advances the remaining non-sticky index139/313DB8CB source ladder: approved Drive exact-name search misses, pinned direct exact path is 404, and the exact pinned v0.25.10a archive member is present but is 2048x1024 SHA 4c85be80..., while canonical inventory requires 512x256 SHA 45cd9acf.... The asset is therefore terminalized fail-closed as SOURCE_IDENTITY_MISMATCH, with a deterministic verifier; no Korean DDS is emitted and runtime remains UNTESTED.",
+  "policy_resolution": {
+    "dispatch_controller_schema_version": 30,
+    "dispatch_controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "latest_head_controller_roles_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "latest_head_automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+    "resolution": "LATEST_HEAD_SCHEMA30_POLICY_APPLIED"
+  },
+  "input_fingerprint": {
+    "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed",
+    "canonical_progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91"
+  },
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "fallback_ladder_step": 4,
+    "selected_priority": "PREFLIGHT_ONLY_SOURCE_TRANSPORT_TERMINALIZATION",
+    "selected_indices": [
+      139
+    ],
+    "selected_assets": [
+      "313DB8CB"
+    ],
+    "no_runnable_completion_tier": true,
+    "fewer_than_two_runnable_completion_tier_assets_proven": true,
+    "qa_pending_assets_skipped": true,
+    "sticky_blockers_not_reprobed": true
+  },
+  "material_deliverable": {
+    "type": "INDEX139_SCHEMA30_FULL_SOURCE_TRANSPORT_TERMINALIZATION_PLUS_DETERMINISTIC_VERIFIER",
+    "reviewed_indices": [
+      139
+    ],
+    "drive_exact_miss": 1,
+    "pinned_direct_exact_miss": 1,
+    "pinned_release_exact_archive_pass": 1,
+    "pinned_release_member_identity_mismatch": 1,
+    "materially_reduces_unresolved_work": true,
+    "material_reduction": "closes the remaining current-contract source ladder for index139 and prevents the 2048x1024 release member from being misused as the 512x256 canonical source",
+    "verifier": "localization/graphics/role_B/20261001-B00377-P00245/verify_index139_source_identity.py",
+    "report": "localization/graphics/role_B/20261001-B00377-P00245/B00377_P00245_INDEX139_313DB8CB_SOURCE_IDENTITY_TERMINAL.json",
+    "candidate_dds_modified": false
+  },
+  "production_readiness": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH_STICKY",
+  "self_qa": "PASS_B_MOD3_SCHEMA30__FRESH_ZERO_RUNNABLE_COMPLETION_TIER__FALLBACK4_INDEX139__DRIVE_EXACT_MISS__PINNED_DIRECT_404__PINNED_ARCHIVE_EXACT__RELEASE_MEMBER_SHA_AND_DIMENSIONS_MISMATCH_CANONICAL__SOURCE_IDENTITY_MISMATCH_FAIL_CLOSED__NO_CANDIDATE__NO_SHARED_STATE_WRITE__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used_as_source_transport": true,
+  "uploaded_archive_used_as_state_ssot": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "durable_task_record_in_result_commit": true,
+  "result_commit_message": "localization(B): terminalize index139 source identity [AUTO:LOCALIZATION-LOCALIZATION_B-00377]",
+  "evidence": [
+    "localization/graphics/role_B/20261001-B00377-P00245/B00377_P00245_INDEX139_313DB8CB_SOURCE_IDENTITY_TERMINAL.json",
+    "localization/graphics/role_B/20261001-B00377-P00245/verify_index139_source_identity.py"
+  ],
+  "bookkeeping_note": "RESULT_SHA will be bound by a separate bookkeeping-only commit after the atomic material result commit. Producer validation remains PENDING until C_BATCH_GATE; runtime remains UNTESTED."
+}
