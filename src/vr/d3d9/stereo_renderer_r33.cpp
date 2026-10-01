@@ -875,11 +875,14 @@ namespace OutRunVRStereo
                 DrawIndexedPrimitiveUPDestR33, disabled);
         }
 
+        constexpr int R33PrerequisiteWaitAttempts = 4800;
+        constexpr DWORD R33PrerequisiteWaitMs = 25;
+
         DWORD WINAPI R33InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
             SetFinalDispatchInstallState(State::Pending);
-            for (int attempt = 0; attempt < 4800; ++attempt)
+            for (int attempt = 0; attempt < R33PrerequisiteWaitAttempts; ++attempt)
             {
                 const auto r32 = ReviewInstallState();
                 if (r32 == State::Failed)
@@ -911,7 +914,7 @@ namespace OutRunVRStereo
                         "VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY; top-level telemetry counted once when enabled; corrected R32->R22 Reset lifecycle + depth/stencil cache ACTIVE");
                     return 0;
                 }
-                Sleep(25);
+                Sleep(R33PrerequisiteWaitMs);
             }
 
             SetFinalDispatchInstallState(State::Failed);
