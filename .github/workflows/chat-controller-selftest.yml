@@ -56,6 +56,10 @@ jobs:
           grep -Fq 'def github_broker_apply_changeset' /tmp/controller.py
           grep -Fq 'async def queue_handle_broker_response' /tmp/controller.py
           grep -Fq 'status="github_broker_commit_created"' /tmp/controller.py
+          grep -Fq 'class GitHubBrokerPermissionError' /tmp/controller.py
+          grep -Fq 'def github_broker_spool_pending' /tmp/controller.py
+          grep -Fq 'status="github_broker_write_permission_wait"' /tmp/controller.py
+          grep -Fq 'github_broker_write_capable(strict=True)' /tmp/controller.py
           grep -Fq 'status="github_recovery_preempted_retry"' /tmp/controller.py
           test "$(grep -Fc 'queue_handle_broker_response(context, pages, active, q' /tmp/controller.py)" -ge 3
           if grep -Fq 'GITHUB_ACCESS_MODE=CONNECTED_GITHUB_PLUGIN' /tmp/controller.py; then
