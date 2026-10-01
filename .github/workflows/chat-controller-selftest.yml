@@ -147,6 +147,8 @@ jobs:
           assert 'if FRESH_CHAT_EACH_RUN:' in send
           assert 'replace_with_fresh_slot_page(context, pages, slot)' in send
           assert 'No producer/C barrier exists.' in body
+          assert body.index('Priority lane {priority_lane} waiting for {guard}') < body.index('for lane_key in ("A", "B", "C", "D")')
+          assert 'preserving send gap before active Retry traffic' in body
           print("four-slot A/B/E producers + C QA with fresh-task chats verified")
           PY2
 
@@ -157,7 +159,7 @@ jobs:
           python - <<'PY2'
           import json, pathlib, re
           cfg=json.loads(pathlib.Path('/tmp/controller_roles.json').read_text())
-          assert cfg['schema_version'] >= 21
+          assert cfg['schema_version'] >= 22
           ex=cfg['execution']; rt=cfg['runtime_tuning']; obs=cfg['runtime_observability']
           assert ex['controller_slot_count'] == 4
           assert ex['slot_map'] == {'A':'A','B':'B','C':'C','D':'E'}
@@ -172,6 +174,10 @@ jobs:
           assert rt['generic_retry_rollover_clicks'] == 2
           assert rt['fresh_chat_each_task'] is True
           assert obs['task_chat_lifecycle'] == 'FRESH_CHAT_PER_NEW_TASK_ID'
+          cp=cfg['runtime_recovery']['continuous_progression']
+          assert cp['missing_lane_dispatch_precedes_retry_traffic'] is True
+          assert cp['preserve_send_gap_for_missing_lane'] is True
+          assert obs['dispatch_fairness'] == 'FILL_READY_C_OR_MISSING_PRODUCER_BEFORE_ACTIVE_RETRY_TRAFFIC'
           text=pathlib.Path('tools/chat-controller/v0.4/docker-compose.portainer-localization.yml').read_text()
           expected={
             'CHAT_SLOTS':4,
