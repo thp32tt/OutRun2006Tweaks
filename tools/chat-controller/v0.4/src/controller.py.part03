@@ -294,6 +294,7 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     active["last_retry_backoff_at"] = None
     active["phase"] = "WAIT_CHAT"
     active["broker_context_injected"] = bool(GITHUB_BROKER_ENABLED)
+    active["broker_protocol_version"] = GITHUB_BROKER_PROTOCOL_VERSION if GITHUB_BROKER_ENABLED else 0
     slot.last_sent_at = sent_at.isoformat()
     slot.chat_task_count = 1
     if not slot.chat_started_at:
@@ -677,6 +678,38 @@ async def queue_send_same_chat_control_message(
 
 async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, Page], active: dict) -> bool:
     now = datetime.now(TZ)
+
+    if GITHUB_BROKER_ENABLED:
+        latest_head = github_branch_head(active["branch"])
+        if not latest_head:
+            write_runtime(
+                status="github_retry_wait",
+                last_action=f"{active['task_id']} broker waiting for GitHub HEAD",
+                queue=active,
+            )
+            return False
+        prompt = github_broker_initial_context(active)
+        sent = await queue_send_same_chat_control_message(
+            context,
+            pages,
+            active,
+            prompt,
+            status="github_broker_handoff_sent",
+            result_label="github_broker_handoff_sent",
+        )
+        if sent:
+            active["broker_mode"] = True
+            active["broker_context_injected"] = True
+            active["broker_protocol_version"] = GITHUB_BROKER_PROTOCOL_VERSION
+            active["broker_head_sha"] = latest_head
+            active.pop("github_tooling_retry_until", None)
+            active["github_recovery_prompts"] = 0
+            active["last_github_recovery_at"] = datetime.now(TZ).isoformat()
+            active["github_recovery_parent_head_sha"] = latest_head
+            runtime["github_broker_active_task"] = active["task_id"]
+            runtime["github_broker_write_capable"] = github_broker_write_capable()
+        return sent
+
     wait_until = _parse_iso(active.get("github_tooling_retry_until"))
     if wait_until and now < wait_until:
         remaining = max(1, int((wait_until - now).total_seconds()))
@@ -711,39 +744,6 @@ async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, P
             )
         return False
 
-    if GITHUB_BROKER_ENABLED:
-        try:
-            bootstrap = github_broker_render_read_result(
-                active["branch"], github_broker_bootstrap_specs(active)
-            )
-        except GitHubTransientError:
-            return False
-        except Exception as e:
-            log.warning("github broker bootstrap failed task=%s error=%r", active["task_id"], e)
-            bootstrap = (
-                f"[BROKER_READ_RESULT] branch={active['branch']} head={latest_head}\n"
-                f"BOOTSTRAP_ERROR={type(e).__name__}: {e}\n"
-                "[/BROKER_READ_RESULT]"
-            )
-        prompt = github_broker_protocol_instructions(active) + "\n\n" + bootstrap
-        sent = await queue_send_same_chat_control_message(
-            context,
-            pages,
-            active,
-            prompt,
-            status="github_broker_handoff_sent",
-            result_label="github_broker_handoff_sent",
-        )
-        if sent:
-            active["broker_mode"] = True
-            active["broker_head_sha"] = latest_head
-            active["github_recovery_prompts"] = count + 1
-            active["last_github_recovery_at"] = datetime.now(TZ).isoformat()
-            active["github_recovery_parent_head_sha"] = latest_head
-            runtime["github_broker_active_task"] = active["task_id"]
-            runtime["github_broker_write_capable"] = github_broker_write_capable()
-        return sent
-
     prompt = (
         f"GitHub 연결돼 있어. 연결된 GitHub 플러그인으로 다시 시도하고 "
         f"TASK_ID={active['task_id']} 작업 계속해."
@@ -760,6 +760,39 @@ async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, P
         active["github_recovery_prompts"] = count + 1
         active["last_github_recovery_at"] = datetime.now(TZ).isoformat()
         active["github_recovery_parent_head_sha"] = latest_head
+    return sent
+
+
+async def queue_require_broker_action(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    active: dict,
+    text: str,
+) -> bool:
+    """Any stable prose-only response in broker mode is non-progress, regardless of wording."""
+    if not GITHUB_BROKER_ENABLED or not text:
+        return False
+    upper = text.upper()
+    if "[BROKER_READ]" in upper or "[BROKER_CHANGESET]" in upper:
+        return False
+    h = stable_hash(text)
+    if active.get("broker_noaction_nudged_hash") == h:
+        return False
+    prompt = (
+        "상태 설명은 그만하고 지금 BROKER_READ 또는 BROKER_CHANGESET 태그 하나만 제출해. "
+        "GitHub/tool/interface 부재는 중단 사유가 아니다."
+    )
+    sent = await queue_send_same_chat_control_message(
+        context,
+        pages,
+        active,
+        prompt,
+        status="github_broker_action_required",
+        result_label="github_broker_action_required",
+    )
+    if sent:
+        active["broker_noaction_nudged_hash"] = h
+        active["broker_protocol_version"] = GITHUB_BROKER_PROTOCOL_VERSION
     return sent
 
 
@@ -1277,6 +1310,7 @@ async def localization_send_lane_task(
         "failure_context": "",
         "qa_batch": [dict(item) for item in (qa_batch or [])],
         "broker_context_injected": bool(GITHUB_BROKER_ENABLED),
+        "broker_protocol_version": GITHUB_BROKER_PROTOCOL_VERSION if GITHUB_BROKER_ENABLED else 0,
     }
     q["counter"] = task_counter
     q.setdefault("active_by_lane", {})[slot_name] = provisional
@@ -2013,7 +2047,7 @@ async def queue_upgrade_legacy_broker_context(
         return False
     if active.get("phase") != "WAIT_CHAT":
         return False
-    if active.get("broker_context_injected"):
+    if int(active.get("broker_protocol_version", 0) or 0) >= GITHUB_BROKER_PROTOCOL_VERSION:
         return False
 
     active["failure_context"] = (
@@ -2027,6 +2061,7 @@ async def queue_upgrade_legacy_broker_context(
 
     if await queue_send_github_recovery(context, pages, active):
         active["broker_context_injected"] = True
+        active["broker_protocol_version"] = GITHUB_BROKER_PROTOCOL_VERSION
         active["broker_mode"] = True
         save_queue_state(q)
         write_runtime(
@@ -2060,7 +2095,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
         for k in ("A", "B", "C", "D")
         if k in active_by_lane
         and active_by_lane[k].get("phase") == "WAIT_CHAT"
-        and not active_by_lane[k].get("broker_context_injected")
+        and int(active_by_lane[k].get("broker_protocol_version", 0) or 0) < GITHUB_BROKER_PROTOCOL_VERSION
     ]
     legacy_broker_candidates.sort(key=lambda x: x.get("sent_at") or "")
     if legacy_broker_candidates:
@@ -2442,6 +2477,7 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             "last_gate_poll_at": None,
             "failure_context": "",
             "broker_context_injected": bool(GITHUB_BROKER_ENABLED),
+            "broker_protocol_version": GITHUB_BROKER_PROTOCOL_VERSION if GITHUB_BROKER_ENABLED else 0,
         }
         save_queue_state(q)
         write_runtime(
