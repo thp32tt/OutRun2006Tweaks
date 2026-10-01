@@ -498,7 +498,24 @@ async def localization_send_lane_task(
         write_runtime(status="thinking_level_blocked", last_action=f"Wave {wave_id} lane {slot_name}: High not verified")
         return False
 
-    prompt = prompt_for_slot(slot, "parallel")
+    try:
+        prompt = prompt_for_slot(slot, "parallel")
+    except FileNotFoundError as e:
+        q.setdefault("lane_dispatch_errors", {})[slot_name] = {
+            "at": datetime.now(TZ).isoformat(),
+            "error": repr(e),
+            "task_lane": target["lane"],
+        }
+        save_queue_state(q)
+        write_runtime(
+            status="lane_dispatch_config_error",
+            last_action=f"Lane {slot_name}/{target['lane']} prompt package missing; other lanes continue",
+            last_error=repr(e),
+            queue=q,
+        )
+        return False
+    if q.get("lane_dispatch_errors", {}).pop(slot_name, None) is not None:
+        save_queue_state(q)
     result = await send_message(page, prompt)
     if result != "sent":
         write_runtime(status="ui_changed", last_action=f"Wave {wave_id} lane {slot_name}: send failed at {result}")

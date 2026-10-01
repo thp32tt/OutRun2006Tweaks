@@ -131,6 +131,9 @@ jobs:
           grep -Fq 'qa_pending' /tmp/controller.py
           grep -Fq '"D": "localization_E.md"' tools/chat-controller/v0.4/src/controller.py.part02
           grep -Fq 'fresh_task_chat_started' tools/chat-controller/v0.4/src/controller.py.part03
+          grep -Fq 'lane_dispatch_config_error' tools/chat-controller/v0.4/src/controller.py.part03
+          grep -Fq 'lane_dispatch_errors' tools/chat-controller/v0.4/src/controller.py.part03
+          grep -Fq 'except FileNotFoundError as e:' tools/chat-controller/v0.4/src/controller.py.part03
           grep -Fq 'schema_version, config_blob_sha = localization_controller_contract_fingerprint()' tools/chat-controller/v0.4/src/controller.py.part03
           grep -Fq 'CONTROLLER_CONFIG_BLOB_SHA=' tools/chat-controller/v0.4/src/controller.py.part03
           grep -Fq 'container_memory_current_mib' /tmp/controller.py
