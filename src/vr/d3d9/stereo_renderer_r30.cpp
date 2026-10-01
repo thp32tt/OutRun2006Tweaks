@@ -1088,16 +1088,21 @@ namespace OutRunVRStereo
                 R30SkyGlow.glowHeight);
         }
 
+        bool R30ShouldApplySkyGlow() noexcept
+        {
+            return Settings::SkyGlowFactor > 0 &&
+                StereoWanted() && FrameHadWorldStereo &&
+                FrameHadDuplicatedDraw &&
+                !FrameRightDrawFailed && !FrameStereoIncomplete;
+        }
+
         HRESULT __stdcall PresentDestR30(
             IDirect3DDevice9* device, const RECT* sourceRect,
             const RECT* destRect, HWND destWindowOverride,
             const RGNDATA* dirtyRegion)
         {
             R30MaybeLogTelemetry();
-            if (Settings::SkyGlowFactor > 0 &&
-                StereoWanted() && FrameHadWorldStereo &&
-                FrameHadDuplicatedDraw &&
-                !FrameRightDrawFailed && !FrameStereoIncomplete)
+            if (R30ShouldApplySkyGlow())
             {
                 InternalPassScope guard;
                 R30ApplyStereoSkyGlow(device);

@@ -239,6 +239,36 @@ else:
         if marker in install_thread:
             errors.append(f"R30 install thread regained hook creation ownership: {marker}")
 
+skyglow_gate_begin = r30.find("bool R30ShouldApplySkyGlow() noexcept")
+present_begin = r30.find("HRESULT __stdcall PresentDestR30(")
+if skyglow_gate_begin < 0 or present_begin <= skyglow_gate_begin:
+    errors.append("R30 SkyGlow eligibility boundary missing")
+else:
+    gate = r30[skyglow_gate_begin:present_begin]
+    for marker in (
+        "Settings::SkyGlowFactor > 0",
+        "StereoWanted()",
+        "FrameHadWorldStereo",
+        "FrameHadDuplicatedDraw",
+        "!FrameRightDrawFailed",
+        "!FrameStereoIncomplete",
+    ):
+        if marker not in gate:
+            errors.append(f"R30 SkyGlow eligibility lost protected condition: {marker}")
+    present_end = r30.find("void R30PrepareSkyGlowForReset()", present_begin)
+    present = r30[present_begin:present_end]
+    if "if (R30ShouldApplySkyGlow())" not in present:
+        errors.append("R30 Present bypassed SkyGlow eligibility boundary")
+    for escaped in (
+        "Settings::SkyGlowFactor > 0",
+        "FrameHadWorldStereo",
+        "FrameHadDuplicatedDraw",
+        "FrameRightDrawFailed",
+        "FrameStereoIncomplete",
+    ):
+        if escaped in present:
+            errors.append(f"R30 Present regained inline SkyGlow eligibility: {escaped}")
+
 if "R30TelemetryIntervalMs = 5000" not in r30:
     errors.append("R30 telemetry cadence policy missing")
 if "now - R30LastTelemetryMs < R30TelemetryIntervalMs" not in r30:
