@@ -3,6 +3,7 @@
   "lane": "LOCALIZATION_C",
   "schema_version": 32,
   "role": "independent_batched_cross_lane_qa+shared_state_reconcile",
+  "result_sha": "5061e8e2836f9853a6938e3ae46047caba5463b6",
   "input_identity": "TASK_ID@RESULT_SHA",
   "qa_batch_inputs": [
     "LOCALIZATION-LOCALIZATION_B-00030@5fb0315853fd8914acc7bba1229e1cc46768db80",
@@ -23,5 +24,6 @@
   "runtime_validation": "UNTESTED",
   "runtime_note": "No in-game runtime test performed; runtime success not claimed.",
   "evidence": "Reviewed immutable TASK_ID@RESULT_SHA inputs against current contract. Missing final visual/runtime evidence remains non-promotable.",
+  "failure_recovery": "Resolved missing changed task record condition from Actions run 36861895537.",
   "commit_task_tag": "[AUTO:LOCALIZATION-LOCALIZATION_C-00402]"
 }
