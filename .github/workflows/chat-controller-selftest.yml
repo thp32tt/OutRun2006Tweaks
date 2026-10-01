@@ -162,14 +162,14 @@ jobs:
           print("four-slot A/B/E producers + C QA with fresh-task chats verified")
           PY2
 
-      - name: Verify schema 22 policy alignment
+      - name: Verify schema 23 policy alignment
         run: |
           git fetch --force origin refs/heads/korean-localization-clean:refs/remotes/origin/korean-localization-clean
           git show refs/remotes/origin/korean-localization-clean:localization/controller_roles.json > /tmp/controller_roles.json
           python - <<'PY2'
           import json, pathlib, re
           cfg=json.loads(pathlib.Path('/tmp/controller_roles.json').read_text())
-          assert cfg['schema_version'] >= 22
+          assert cfg['schema_version'] >= 23
           ex=cfg['execution']; rt=cfg['runtime_tuning']; obs=cfg['runtime_observability']
           assert ex['controller_slot_count'] == 4
           assert ex['slot_map'] == {'A':'A','B':'B','C':'C','D':'E'}
@@ -187,6 +187,19 @@ jobs:
           cp=cfg['runtime_recovery']['continuous_progression']
           assert cp['missing_lane_dispatch_precedes_retry_traffic'] is True
           assert cp['preserve_send_gap_for_missing_lane'] is True
+          assert cp['durable_git_precedes_ui_recovery'] is True
+          assert cp['post_send_task_identity_preserved'] is True
+          assert cp['chat_rate_limit_blocks_sends_not_git_reconcile'] is True
+          assert cp['negative_task_commit_lookup_not_cached'] is True
+          state=cfg['runtime_recovery']['state_persistence']
+          proc=cfg['runtime_recovery']['process_recovery']
+          assert state['last_known_good_backup'] is True and state['destructive_empty_reset_on_unreadable_state'] is False
+          assert proc['repeated_identical_queue_exception_restart_threshold'] == 3
+          assert proc['repeated_identical_watchdog_exception_restart_threshold'] == 3
+          assert proc['queue_heartbeat_fatal_seconds'] == 300
+          assert rt['wait_actions_max_seconds'] == 1800
+          assert rt['process_heartbeat_fatal_seconds'] == 300
+          assert obs['heartbeat_fatal_after_seconds'] == 300
           assert obs['dispatch_fairness'] == 'FILL_READY_C_OR_MISSING_PRODUCER_BEFORE_ACTIVE_RETRY_TRAFFIC'
           text=pathlib.Path('tools/chat-controller/v0.4/docker-compose.portainer-localization.yml').read_text()
           expected={
@@ -198,12 +211,63 @@ jobs:
             'LOCALIZATION_E_QA_PAUSE_THRESHOLD':rt['localization_extra_producer_qa_pause_threshold'],
             'LOCALIZATION_E_QA_RESUME_THRESHOLD':rt['localization_extra_producer_qa_resume_threshold'],
             'GENERIC_RETRY_ROLLOVER_CLICKS':rt['generic_retry_rollover_clicks'],
+            'WAIT_ACTIONS_MAX_SECONDS':rt['wait_actions_max_seconds'],
+            'QUEUE_ERROR_RESTART_THRESHOLD':rt['queue_error_restart_threshold'],
+            'WATCHDOG_ERROR_RESTART_THRESHOLD':rt['watchdog_error_restart_threshold'],
+            'PROCESS_HEARTBEAT_FATAL_SECONDS':rt['process_heartbeat_fatal_seconds'],
           }
           for key,val in expected.items():
             m=re.search(rf'^\s+{re.escape(key)}:\s+"?(\d+)"?\s*$',text,re.M)
             assert m and int(m.group(1))==int(val), (key,val,m.group(1) if m else None)
           assert re.search(r'^\s+FRESH_CHAT_EACH_RUN:\s+"true"\s*$',text,re.M)
-          print('schema 22 policy and deployment values aligned')
+          print('schema 23 policy and deployment values aligned')
+          PY2
+
+      - name: Verify end-to-end liveness bounds
+        run: |
+          for compose in \
+            tools/chat-controller/v0.4/docker-compose.portainer-vr.yml \
+            tools/chat-controller/v0.4/docker-compose.portainer-localization.yml; do
+            grep -Fq 'WAIT_ACTIONS_MAX_SECONDS: "1800"' "$compose"
+            grep -Fq 'QUEUE_ERROR_RESTART_THRESHOLD: "3"' "$compose"
+            grep -Fq 'WATCHDOG_ERROR_RESTART_THRESHOLD: "3"' "$compose"
+            grep -Fq 'PROCESS_HEARTBEAT_FATAL_SECONDS: "300"' "$compose"
+          done
+          grep -Fq 'REGISTRY_BACKUP_FILE' /tmp/controller.py
+          grep -Fq 'QUEUE_BACKUP_FILE' /tmp/controller.py
+          grep -Fq 'refusing destructive reset' /tmp/controller.py
+          grep -Fq 'daily registry date advanced without dropping active slot state' /tmp/controller.py
+          grep -Fq 'docs/automation/runs/{task_id}.json' /tmp/controller.py
+          grep -Fq '_github_task_commit_cache' /tmp/controller.py
+          grep -Fq 'Cache only positive path history' /tmp/controller.py
+          grep -Fq 'heartbeat_stalled_restart' /tmp/controller.py
+          grep -Fq 'def start_process_liveness_monitor' /tmp/controller.py
+          grep -Fq 'queue_error_restart' /tmp/controller.py
+          grep -Fq 'watchdog_error_restart' /tmp/controller.py
+          grep -Fq 'controller-ui-ready' tools/chat-controller/v0.4/entrypoint.direct.sh
+          grep -Fq 'Chrome DevTools unavailable twice' tools/chat-controller/v0.4/entrypoint.direct.sh
+          bash -n tools/chat-controller/v0.4/entrypoint.direct.sh
+          python - <<'PY2'
+          from pathlib import Path
+          src=Path('/tmp/controller.py').read_text(encoding='utf-8')
+          loc=src[src.index('async def localization_process_lane'):src.index('def _qa_item_key')]
+          assert loc.index('task_commit = github_find_task_commit(') < loc.index('queue_handle_retry_surface(')
+          assert 'allow_ci_skip_fallback=lane_key in {"A", "B", "D"}' in loc
+          assert src.count('remained busy without durable Git progress') >= 2
+          assert src.count('WAIT_ACTIONS_MAX_SECONDS') >= 5
+          assert 'never orphan' in src
+          assert 'Preserve the TASK_ID as active' in src
+          qcycle=src[src.index('async def queue_cycle'):src.index('def refresh_wait_actions_task_binding')]
+          assert 'Git/Actions reconciliation continues' in qcycle
+          lcycle=src[src.index('async def localization_parallel_cycle'):src.index('def reconcile_legacy_conversion_blocked')]
+          assert 'Git/Actions reconciliation continues' in lcycle
+          scheduler=src[src.index('async def scheduler_loop'):src.index('async def main_async')]
+          assert 'QUEUE_ERROR_RESTART_THRESHOLD' in scheduler
+          assert 'WATCHDOG_ERROR_RESTART_THRESHOLD' in scheduler
+          assert 'raise' in scheduler
+          assert 'registry read failed; recreating' not in src
+          assert 'queue state read failed; recreating' not in src
+          print('bounded end-to-end liveness invariants verified')
           PY2
 
       - name: Verify queue recovery ordering
@@ -231,7 +295,8 @@ jobs:
           grep -Fq '"queue_result_grace_seconds": QUEUE_RESULT_GRACE_SECONDS' /tmp/controller.py
           grep -Fq 'no-response grace {QUEUE_RESULT_GRACE_SECONDS}s' /tmp/controller.py
           grep -Fq 'def github_actions_skip_directive' /tmp/controller.py
-          grep -Fq 'if github_actions_skip_directive(message):' /tmp/controller.py
+          grep -Fq 'directive = github_actions_skip_directive(message)' /tmp/controller.py
+          grep -Fq 'allow_ci_skip_fallback' /tmp/controller.py
           grep -Fq 'async def recover_missing_gate_run' /tmp/controller.py
           grep -Fq 'contains GitHub Actions skip directive' /tmp/controller.py
           grep -Fq 'Treating the missing run as a repairable automation failure instead of waiting forever.' /tmp/controller.py

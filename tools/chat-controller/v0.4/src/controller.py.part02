@@ -218,11 +218,13 @@ async def recover_slot_composer(context: BrowserContext, pages: dict[str, Page],
 async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str, Page], slot: Slot) -> Page:
     """Start each scheduled N100 run in a brand-new tab/chat and close the previous one."""
     old = pages.get(slot.name)
-    if old is not None and not old.is_closed():
-        try:
-            await old.close()
-        except Exception:
-            log.exception("failed to close previous slot tab slot=%s", slot.name)
+    if old is not None:
+        _thinking_verified_cache.pop(id(old), None)
+        if not old.is_closed():
+            try:
+                await old.close()
+            except Exception:
+                log.exception("failed to close previous slot tab slot=%s", slot.name)
 
     page = await context.new_page()
     pages[slot.name] = page
@@ -651,12 +653,12 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
             slot.url = new_url
             save_registry(reg)
 
+    post_send_rate_limited = False
     if await detect_rate_limit(page):
-        slot.last_result = "rate_limited_after_send"
-        slot.last_sent_at = request_now.isoformat()
-        save_registry(reg)
+        # The prompt was already submitted. Preserve the TASK_ID as active and let
+        # queue retry/backoff own recovery instead of orphaning the request.
+        post_send_rate_limited = True
         mark_rate_limit(reg, request_now, f"scheduled-send:{slot.name}")
-        return
 
     note_successful_request(reg, request_now, slot.name)
     slot.runs += 1
@@ -664,7 +666,7 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
     slot.last_assistant_hash = None
     slot.last_assistant_change_at = request_now.isoformat()
     slot.last_sent_at = request_now.isoformat()
-    slot.last_result = "sent"
+    slot.last_result = "sent_rate_limited" if post_send_rate_limited else "sent"
     reg.next_slot = (reg.next_slot + 1) % len(reg.slots)
     save_registry(reg)
 

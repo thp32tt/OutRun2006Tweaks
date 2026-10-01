@@ -33,20 +33,32 @@ start_chrome() {
   google-chrome --no-sandbox --disable-dev-shm-usage --remote-debugging-address=127.0.0.1 --remote-debugging-port=9222 --user-data-dir=/data/browser-profile --no-first-run --no-default-browser-check https://chatgpt.com/ >>/logs/chrome.log 2>&1 &
 }
 
+rm -f /tmp/controller-ui-ready
 start_chrome
 
-# Keep UI dependencies alive even when x11vnc/Chrome exits while the controller remains healthy.
+# Keep UI dependencies alive after initial Chrome readiness. During startup the
+# dedicated readiness loop owns Chrome so this watchdog cannot kill a slow boot.
 (
+  chrome_failures=0
   while sleep 10; do
+    if [ ! -f /tmp/controller-ui-ready ]; then
+      continue
+    fi
     if ! pgrep -x x11vnc >/dev/null 2>&1; then
       echo "$(date -Is) x11vnc missing; restarting" >>/logs/ui-watchdog.log
       start_vnc
     fi
     if ! curl -fsS http://127.0.0.1:9222/json/version >/dev/null 2>&1; then
-      echo "$(date -Is) Chrome DevTools unavailable; restarting Chrome" >>/logs/ui-watchdog.log
-      pkill -x chrome >/dev/null 2>&1 || true
-      sleep 2
-      start_chrome
+      chrome_failures=$((chrome_failures + 1))
+      if [ "$chrome_failures" -ge 2 ]; then
+        echo "$(date -Is) Chrome DevTools unavailable twice; restarting Chrome" >>/logs/ui-watchdog.log
+        pkill -x chrome >/dev/null 2>&1 || true
+        sleep 2
+        start_chrome
+        chrome_failures=0
+      fi
+    else
+      chrome_failures=0
     fi
     if ! pgrep -f "websockify.*6080.*5900" >/dev/null 2>&1; then
       echo "$(date -Is) websockify missing; restarting" >>/logs/ui-watchdog.log
@@ -72,5 +84,6 @@ while ! curl -fsS http://127.0.0.1:9222/json/version >/dev/null 2>&1; do
   sleep 8
 done
 
+touch /tmp/controller-ui-ready
 echo "$(date -Is) starting controller" >>/logs/controller-startup.log
 exec python -m app.controller

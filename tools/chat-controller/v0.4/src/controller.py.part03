@@ -30,6 +30,7 @@ class StatusHandler(BaseHTTPRequestHandler):
 <p><b>Queue:</b> poll {QUEUE_CHECK_SECONDS}s / response stable {QUEUE_STABLE_SECONDS}s / no-response grace {QUEUE_RESULT_GRACE_SECONDS}s / GitHub discovery {GITHUB_POLL_SECONDS}s / exact run {GITHUB_BOUND_RUN_POLL_SECONDS}s / missing-run timeout {WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS}s / max attempts {MAX_TASK_ATTEMPTS}</p>
 <p><b>Conversation rollover:</b> {html.escape(str(CONVERSATION_ROLLOVER_ENABLED))} / max {MAX_CHAT_ROLLOVERS_PER_TASK} per task / rollover does not increment attempt</p>
 <p><b>Watchdog:</b> {html.escape(str(WATCHDOG_ENABLED))} / recovery-only in queue mode / idle {WATCHDOG_STALL_MINUTES}m / busy-stall {WATCHDOG_BUSY_STALL_MINUTES}m / force-stop {html.escape(str(WATCHDOG_FORCE_STOP_STALLED))}</p>
+<p><b>Liveness bounds:</b> Actions max {WAIT_ACTIONS_MAX_SECONDS}s / heartbeat fatal {PROCESS_HEARTBEAT_FATAL_SECONDS}s / queue errors {QUEUE_ERROR_RESTART_THRESHOLD} / watchdog errors {WATCHDOG_ERROR_RESTART_THRESHOLD}</p>
 <p><b>Rate limit:</b> attempts {reg.rate_limit_attempts} / until {html.escape(str(reg.rate_limit_until))} / backoff {html.escape(str(RATE_LIMIT_BACKOFF_SECONDS))}s / global-gap {MIN_SEND_GAP_SECONDS}s / slot-dedup {SLOT_DEDUP_SECONDS}s</p>
 <p><b>GitHub REST:</b> token {html.escape(str(bool(GITHUB_TOKEN)))} / task-cache {GITHUB_TASK_COMMIT_CACHE_SECONDS}s / actions-cache {GITHUB_ACTIONS_CACHE_SECONDS}s / remaining {html.escape(str(runtime.get('github_rate_limit_remaining')))} / blocked-until {html.escape(str(runtime.get('github_api_blocked_until')))}</p>
 <p><b>Thinking:</b> required {html.escape(PREFERRED_THINKING_LEVEL)} / strict {html.escape(str(STRICT_THINKING_LEVEL))} / last {html.escape(str(runtime.get('last_thinking_level_result')))}</p>
@@ -52,6 +53,39 @@ def start_status_server():
     t.start()
     log.info("status server listening on :%s", STATUS_PORT)
 
+
+def start_process_liveness_monitor():
+    """Exit a wedged controller so Docker can reconstruct Chrome/Playwright/controller."""
+    def monitor():
+        while True:
+            time.sleep(30)
+            if not AUTO_SEND or not QUEUE_MODE:
+                continue
+            now = datetime.now(TZ)
+            heartbeat = _parse_iso(runtime.get("queue_loop_heartbeat_at"))
+            started = _parse_iso(runtime.get("started_at")) or now
+            reference = heartbeat or started
+            age = max(0, int((now - reference).total_seconds()))
+            if age < PROCESS_HEARTBEAT_FATAL_SECONDS:
+                continue
+            message = (
+                f"Queue heartbeat stale for {age}s (fatal={PROCESS_HEARTBEAT_FATAL_SECONDS}s); "
+                "exiting so Docker restart policy can recover the full browser/controller stack"
+            )
+            log.critical(message)
+            try:
+                runtime["status"] = "heartbeat_stalled_restart"
+                runtime["last_action"] = message
+                runtime["last_error"] = message
+                runtime["heartbeat_stale_seconds"] = age
+                STATE_DIR.mkdir(parents=True, exist_ok=True)
+                RUNTIME_FILE.write_text(json.dumps(runtime, ensure_ascii=False, indent=2), encoding="utf-8")
+            except Exception:
+                log.exception("failed to persist heartbeat-stalled restart state")
+            os._exit(70)
+
+    threading.Thread(target=monitor, name="controller-liveness-monitor", daemon=True).start()
+    log.info("process liveness monitor armed fatal_after=%ss", PROCESS_HEARTBEAT_FATAL_SECONDS)
 
 
 def queue_rollover_prompt(active: dict) -> str:
@@ -138,7 +172,18 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         write_runtime(status="thinking_level_blocked", last_action=f"{active['task_id']}: rollover chat thinking level unverified")
         return False
 
-    result = await send_message(page, queue_rollover_prompt(active))
+    try:
+        rollover_prompt = queue_rollover_prompt(active)
+    except Exception as e:
+        if CONTROLLER_MODE == "localization":
+            write_runtime(
+                status="policy_refresh_wait",
+                last_action=f"{active['task_id']}: rollover policy refresh failed; retrying later without losing queue state",
+                last_error=repr(e),
+            )
+            return False
+        raise
+    result = await send_message(page, rollover_prompt)
     if result != "sent":
         write_runtime(status="conversation_rollover_failed", last_action=f"{active['task_id']}: rollover send failed: {result}")
         return False
@@ -291,11 +336,30 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
         return False
 
     page = await slot_page(context, pages, slot)
+    retry_fresh_chat = False
     if await detect_busy(page):
-        return False
+        busy_since = _parse_iso(active.get("last_hash_changed_at")) or _parse_iso(active.get("sent_at")) or now
+        busy_age = (now - busy_since).total_seconds()
+        if busy_age < WATCHDOG_BUSY_STALL_MINUTES * 60:
+            write_runtime(status="queue_retry_wait", last_action=f"{active['task_id']} repair send waiting for active generation ({int(busy_age)}s)")
+            return False
+        retry_fresh_chat = True
     if await first_visible(page, RETRY_SELECTORS, total_wait_ms=500) is not None:
-        write_runtime(status="queue_retry_wait", last_action=f"{active['task_id']} repair send deferred because Retry UI is active")
-        return False
+        retry_fresh_chat = True
+    if retry_fresh_chat:
+        old_url = slot.url or page.url
+        if old_url:
+            history = active.setdefault("previous_chat_urls", [])
+            if old_url not in history:
+                history.append(old_url)
+                active["previous_chat_urls"] = history[-10:]
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+        save_registry(reg)
+        write_runtime(
+            status="queue_retry_fresh_chat",
+            last_action=f"{active['task_id']} repair moved to a fresh project chat because the previous UI was stale/busy",
+            queue=active,
+        )
 
     latest_head = github_branch_head(active["branch"])
     if not latest_head:
@@ -313,7 +377,18 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
     runtime["queue_failure_context"] = reason
     runtime["queue_qa_batch"] = active.get("qa_batch") or []
 
-    prompt = prompt_for_slot(slot, "repair")
+    try:
+        prompt = prompt_for_slot(slot, "repair")
+    except Exception as e:
+        if CONTROLLER_MODE == "localization":
+            active["base_sha"] = previous_base
+            write_runtime(
+                status="policy_refresh_wait",
+                last_action=f"{active['task_id']}: retry policy refresh failed; retrying later without changing attempt state",
+                last_error=repr(e),
+            )
+            return False
+        raise
     if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
         active["base_sha"] = previous_base
         return False
@@ -324,6 +399,11 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
         return False
 
     now = datetime.now(TZ)
+    if retry_fresh_chat or not slot.url:
+        new_url = await wait_for_chat_url(page, timeout_sec=8)
+        if new_url:
+            slot.url = new_url
+            active["active_chat_url"] = new_url
     note_successful_request(reg, now, slot.name)
     active["sent_at"] = now.isoformat()
     active["last_hash"] = None
@@ -514,6 +594,21 @@ async def localization_send_lane_task(
             queue=q,
         )
         return False
+    except Exception as e:
+        q.setdefault("lane_dispatch_errors", {})[slot_name] = {
+            "at": datetime.now(TZ).isoformat(),
+            "error": repr(e),
+            "task_lane": target["lane"],
+            "kind": "policy_refresh_or_prompt_build",
+        }
+        save_queue_state(q)
+        write_runtime(
+            status="policy_refresh_wait",
+            last_action=f"Lane {slot_name}/{target['lane']} prompt policy refresh failed; deferring this lane while others continue",
+            last_error=repr(e),
+            queue=q,
+        )
+        return False
     if q.get("lane_dispatch_errors", {}).pop(slot_name, None) is not None:
         save_queue_state(q)
     result = await send_message(page, prompt)
@@ -527,15 +622,15 @@ async def localization_send_lane_task(
         if new_url:
             slot.url = new_url
 
+    post_send_rate_limited = False
     if await detect_rate_limit(page):
         if await first_visible(page, RETRY_SELECTORS, total_wait_ms=300) is not None and not await detect_busy(page):
-            slot.last_sent_at = sent_at.isoformat()
-            slot.last_result = "rate_limited_after_send"
-            save_registry(reg)
+            # send_message already submitted the TASK_ID. Keep an active queue
+            # record so the bounded Retry/backoff path owns recovery; never orphan
+            # a possibly accepted request or reuse its TASK_ID.
+            post_send_rate_limited = True
             mark_rate_limit(reg, sent_at, f"parallel-send:{slot_name}")
-            return False
-        # The request was accepted and work is active; record it normally even
-        # if a transient/stale rate-limit banner is still visible.
+        # A transient/stale banner while generation is active is still a sent task.
 
     note_successful_request(reg, sent_at, slot.name)
     slot.runs += 1
@@ -543,7 +638,7 @@ async def localization_send_lane_task(
     slot.last_assistant_hash = None
     slot.last_assistant_change_at = sent_at.isoformat()
     slot.last_sent_at = sent_at.isoformat()
-    slot.last_result = "parallel_sent"
+    slot.last_result = "parallel_sent_rate_limited" if post_send_rate_limited else "parallel_sent"
     save_registry(reg)
 
     q["counter"] = task_counter
@@ -622,6 +717,57 @@ async def localization_process_lane(
         page = await slot_page(context, pages, slot)
 
         if active["phase"] == "WAIT_CHAT":
+            # Durable Git always outranks transient UI state. A stale Retry/busy
+            # surface must never cause duplicate work after the task already committed.
+            task_commit = github_find_task_commit(
+                active["branch"],
+                active["task_id"],
+                allow_ci_skip_fallback=lane_key in {"A", "B", "D"},
+            )
+            if task_commit:
+                if lane_key in {"A", "B", "D"}:
+                    finalize_localization_producer_commit(q, active, task_commit, now)
+                    save_queue_state(q)
+                    write_runtime(
+                        status="producer_commit_ready",
+                        last_action=f"{active['task_id']} durable commit found before UI recovery; producer released",
+                        queue=q,
+                    )
+                else:
+                    active["result_sha"] = task_commit["sha"]
+                    active["result_message"] = task_commit["message"]
+                    active["phase"] = "WAIT_ACTIONS"
+                    active["wait_actions_started_at"] = now.isoformat()
+                    active["last_gate_poll_at"] = None
+                    save_queue_state(q)
+                    write_runtime(
+                        status="qa_wait_actions",
+                        last_action=f"{active['task_id']} durable C commit found before UI recovery; Gate pending",
+                        queue=q,
+                    )
+                return
+
+            if lane_key == "C":
+                skipped_commit = github_find_task_commit(
+                    active["branch"], active["task_id"], allow_ci_skip_fallback=True
+                )
+                if skipped_commit and skipped_commit.get("ci_skip_directive"):
+                    active["result_sha"] = skipped_commit["sha"]
+                    active["result_message"] = skipped_commit["message"]
+                    active["phase"] = "WAIT_ACTIONS"
+                    active["wait_actions_started_at"] = now.isoformat()
+                    active["last_gate_poll_at"] = None
+                    recovery = await recover_missing_gate_run(context, pages, active, now)
+                    save_queue_state(q)
+                    if recovery:
+                        action, reason = recovery
+                        write_runtime(
+                            status="qa_missing_gate_recovery",
+                            last_action=f"{active['task_id']} {action}: {reason}",
+                            queue=active,
+                        )
+                    return
+
             if await queue_handle_retry_surface(context, pages, page, reg, slot, active, q):
                 return
 
@@ -638,6 +784,19 @@ async def localization_process_lane(
                 return
 
             if await detect_busy(page):
+                busy_since = _parse_iso(active.get("last_hash_changed_at")) or _parse_iso(active.get("sent_at")) or now
+                busy_age = (now - busy_since).total_seconds()
+                if busy_age < WATCHDOG_BUSY_STALL_MINUTES * 60:
+                    return
+                reason = (
+                    f"ChatGPT remained busy without durable Git progress for {int(busy_age)}s; "
+                    "rolling the same task to a fresh chat instead of waiting indefinitely."
+                )
+                active["failure_context"] = reason
+                if await queue_rollover_chat(context, pages, active, reason):
+                    save_queue_state(q)
+                elif active.get("phase") == "BLOCKED":
+                    save_queue_state(q)
                 return
 
             # A task commit is authoritative even if the UI failed to expose the final assistant message.
@@ -792,6 +951,33 @@ async def localization_process_lane(
                 active["last_gate_status_changed_at"] = now.isoformat()
 
             if run["status"] != "completed":
+                wait_started = (
+                    _parse_iso(active.get("wait_actions_started_at"))
+                    or _parse_iso(active.get("task_commit_rebound_at"))
+                    or _parse_iso(active.get("sent_at"))
+                    or now
+                )
+                active.setdefault("wait_actions_started_at", wait_started.isoformat())
+                wait_age = (now - wait_started).total_seconds()
+                if wait_age >= WAIT_ACTIONS_MAX_SECONDS:
+                    reason = (
+                        f"{active['workflow']} exact run {run.get('id')} remained {run.get('status')} "
+                        f"for {int(wait_age)}s (max={WAIT_ACTIONS_MAX_SECONDS}s); bounded recovery required."
+                    )
+                    if active["attempt"] < MAX_TASK_ATTEMPTS:
+                        previous_attempt = active["attempt"]
+                        active["attempt"] = previous_attempt + 1
+                        if await queue_send_retry(context, pages, active, reason):
+                            save_queue_state(q)
+                        else:
+                            active["attempt"] = previous_attempt
+                            active["failure_context"] = reason
+                            save_queue_state(q)
+                        return
+                    active["failure_context"] = reason
+                    active["phase"] = "BLOCKED"
+                    save_queue_state(q)
+                    return
                 changed_at = _parse_iso(active.get("last_gate_status_changed_at")) or now
                 last_jobs = _parse_iso(active.get("last_jobs_refresh_at"))
                 if (
@@ -920,13 +1106,13 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
             q["active"] = None
             save_queue_state(q)
 
-    if rate_limit_active(reg, now):
+    chat_backoff = rate_limit_active(reg, now)
+    if chat_backoff:
         write_runtime(
             status="rate_limited_backoff",
-            last_action=f"Localization queue paused ({rate_limit_seconds_remaining(reg, now)}s remaining)",
+            last_action=f"ChatGPT send backoff active ({rate_limit_seconds_remaining(reg, now)}s); Git/Actions reconciliation continues",
             queue=q,
         )
-        return
 
     # Fill an actually missing worker before active Retry traffic can refresh the
     # global send timestamp again. This prevents a Retry-heavy active lane from
@@ -961,7 +1147,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
         if missing_producers:
             priority_lane = missing_producers[0]
 
-    if priority_lane is not None:
+    if priority_lane is not None and not chat_backoff:
         priority_slot = next((slot for slot in reg.slots if slot.name == priority_lane), None)
         guard = send_guard_reason(reg, priority_slot, now) if priority_slot else "slot_missing"
         if guard:
@@ -1176,14 +1362,21 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         q = load_queue_state()
     active = q.get("active")
 
-    if rate_limit_active(reg, now):
+    if rate_limit_active(reg, now) and not active:
         write_runtime(
             status="rate_limited_backoff",
-            last_action=f"Queue paused for adaptive rate-limit backoff ({rate_limit_seconds_remaining(reg, now)}s remaining)",
+            last_action=f"No active task; new ChatGPT send paused for adaptive backoff ({rate_limit_seconds_remaining(reg, now)}s remaining)",
             rate_limit_attempts=reg.rate_limit_attempts,
             rate_limit_until=reg.rate_limit_until,
         )
         return
+    if rate_limit_active(reg, now) and active:
+        write_runtime(
+            status="rate_limited_backoff",
+            last_action=f"ChatGPT send backoff active ({rate_limit_seconds_remaining(reg, now)}s); Git/Actions reconciliation continues for {active.get('task_id')}",
+            rate_limit_attempts=reg.rate_limit_attempts,
+            rate_limit_until=reg.rate_limit_until,
+        )
 
     if not active:
         not_before = _parse_iso(q.get("next_task_not_before"))
@@ -1253,6 +1446,7 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             active["result_sha"] = task_commit["sha"]
             active["result_message"] = task_commit["message"]
             active["phase"] = "WAIT_ACTIONS"
+            active["wait_actions_started_at"] = now.isoformat()
             active["last_gate_poll_at"] = None
             save_queue_state(q)
             write_runtime(
@@ -1260,6 +1454,26 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
                 last_action=f"{active['task_id']} durable task commit found -> {active['result_sha']}",
                 queue=active,
             )
+            return
+
+        skipped_commit = github_find_task_commit(
+            active["branch"], active["task_id"], allow_ci_skip_fallback=True
+        )
+        if skipped_commit and skipped_commit.get("ci_skip_directive"):
+            active["result_sha"] = skipped_commit["sha"]
+            active["result_message"] = skipped_commit["message"]
+            active["phase"] = "WAIT_ACTIONS"
+            active["wait_actions_started_at"] = now.isoformat()
+            active["last_gate_poll_at"] = None
+            recovery = await recover_missing_gate_run(context, pages, active, now)
+            save_queue_state(q)
+            if recovery:
+                action, reason = recovery
+                write_runtime(
+                    status="queue_missing_gate_recovery",
+                    last_action=f"{active['task_id']} {action}: {reason}",
+                    queue=active,
+                )
             return
 
         if await queue_handle_retry_surface(context, pages, page, reg, slot, active, q):
@@ -1281,6 +1495,19 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
                 save_queue_state(q)
             return
         if await detect_busy(page):
+            busy_since = _parse_iso(active.get("last_hash_changed_at")) or _parse_iso(active.get("sent_at")) or now
+            busy_age = (now - busy_since).total_seconds()
+            if busy_age < WATCHDOG_BUSY_STALL_MINUTES * 60:
+                return
+            reason = (
+                f"ChatGPT remained busy without durable Git progress for {int(busy_age)}s; "
+                "rolling the same task to a fresh chat instead of waiting indefinitely."
+            )
+            active["failure_context"] = reason
+            if await queue_rollover_chat(context, pages, active, reason):
+                save_queue_state(q)
+            elif active.get("phase") == "BLOCKED":
+                save_queue_state(q)
             return
         text = await last_assistant_text(page)
         if not text:
@@ -1390,6 +1617,35 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             active["last_gate_status_changed_at"] = now.isoformat()
 
         if run["status"] != "completed":
+            wait_started = (
+                _parse_iso(active.get("wait_actions_started_at"))
+                or _parse_iso(active.get("task_commit_rebound_at"))
+                or _parse_iso(active.get("sent_at"))
+                or now
+            )
+            active.setdefault("wait_actions_started_at", wait_started.isoformat())
+            wait_age = (now - wait_started).total_seconds()
+            if wait_age >= WAIT_ACTIONS_MAX_SECONDS:
+                reason = (
+                    f"{active['workflow']} exact run {run.get('id')} remained {run.get('status')} "
+                    f"for {int(wait_age)}s (max={WAIT_ACTIONS_MAX_SECONDS}s); bounded recovery required."
+                )
+                if active["attempt"] < MAX_TASK_ATTEMPTS:
+                    previous_attempt = active["attempt"]
+                    previous_base = active["base_sha"]
+                    active["attempt"] = previous_attempt + 1
+                    if await queue_send_retry(context, pages, active, reason):
+                        save_queue_state(q)
+                    else:
+                        active["attempt"] = previous_attempt
+                        active["base_sha"] = previous_base
+                        active["failure_context"] = reason
+                        save_queue_state(q)
+                    return
+                active["failure_context"] = reason
+                active["phase"] = "BLOCKED"
+                save_queue_state(q)
+                return
             changed_at = _parse_iso(active.get("last_gate_status_changed_at")) or now
             last_jobs = _parse_iso(active.get("last_jobs_refresh_at"))
             if (
@@ -1451,7 +1707,7 @@ def refresh_wait_actions_task_binding(task: dict, force_refresh: bool = False) -
     if not branch or not task_id:
         return None
     if force_refresh:
-        _github_commit_list_cache.pop(branch, None)
+        invalidate_task_commit_cache(branch, task_id)
     commit = github_find_task_commit(branch, task_id)
     if not commit or not commit.get("sha"):
         return None
@@ -1500,6 +1756,7 @@ def _queue_nonterminal_records(q: dict) -> list[dict]:
 def startup_reconcile_queue_state() -> None:
     """Invalidate stale caches and rebind persisted WAIT_ACTIONS to the latest TASK_ID commit."""
     _github_commit_list_cache.clear()
+    _github_task_commit_cache.clear()
     _github_actions_cache.clear()
     q = load_queue_state()
     now = datetime.now(TZ)
@@ -1515,7 +1772,7 @@ def startup_reconcile_queue_state() -> None:
     for task in records:
         if task.get("phase") == "WAIT_ACTIONS":
             if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B", "D"}:
-                _github_commit_list_cache.pop(str(task.get("branch") or ""), None)
+                invalidate_task_commit_cache(str(task.get("branch") or ""), str(task.get("task_id") or ""))
                 commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
                 if commit:
                     finalize_localization_producer_commit(q, task, commit, now)
@@ -1555,7 +1812,7 @@ def watchdog_rearm_queue_state(now: datetime) -> Optional[str]:
         if task.get("phase") != "WAIT_ACTIONS":
             continue
         if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B", "D"}:
-            _github_commit_list_cache.pop(str(task.get("branch") or ""), None)
+            invalidate_task_commit_cache(str(task.get("branch") or ""), str(task.get("task_id") or ""))
             commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
             if commit:
                 finalize_localization_producer_commit(q, task, commit, now)
@@ -1624,6 +1881,10 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
     last_watchdog_check = 0.0
     last_queue_check = 0.0
     last_heartbeat = 0.0
+    queue_error_signature = None
+    queue_error_count = 0
+    watchdog_error_signature = None
+    watchdog_error_count = 0
     write_runtime(status="idle", tab_mode="fresh_per_run" if FRESH_CHAT_EACH_RUN else "dedicated_per_slot", tab_count=len(pages))
     while True:
         now = datetime.now(TZ)
@@ -1642,16 +1903,32 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
                     await localization_parallel_cycle(context, pages)
                 else:
                     await queue_cycle(context, pages)
+                queue_error_signature = None
+                queue_error_count = 0
             except Exception as e:
                 if is_browser_transport_failure(e):
                     record_browser_transport_failure("queue_cycle", e)
                     raise
                 log.exception("queue cycle failed")
+                signature = f"{type(e).__name__}:{e}"
+                if signature == queue_error_signature:
+                    queue_error_count += 1
+                else:
+                    queue_error_signature = signature
+                    queue_error_count = 1
                 write_runtime(
                     status="queue_error",
-                    last_action=f"Queue cycle failed: {type(e).__name__}: {e}",
+                    last_action=f"Queue cycle failed ({queue_error_count}/{QUEUE_ERROR_RESTART_THRESHOLD}): {type(e).__name__}: {e}",
                     last_error=repr(e),
+                    queue_error_count=queue_error_count,
                 )
+                if queue_error_count >= QUEUE_ERROR_RESTART_THRESHOLD:
+                    write_runtime(
+                        status="queue_error_restart",
+                        last_action=f"Repeated queue failure reached threshold {QUEUE_ERROR_RESTART_THRESHOLD}; exiting for Docker restart",
+                        last_error=repr(e),
+                    )
+                    raise
         elif AUTO_SEND and not QUEUE_MODE:
             tick = now.strftime("%Y-%m-%dT%H:%M")
             if now.minute in SCHEDULE_MINUTES and tick != last_tick:
@@ -1674,17 +1951,38 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
             last_watchdog_check = mono
             try:
                 await watchdog_cycle(context, pages)
+                watchdog_error_signature = None
+                watchdog_error_count = 0
             except Exception as e:
                 if is_browser_transport_failure(e):
                     record_browser_transport_failure("watchdog_cycle", e)
                     raise
                 log.exception("watchdog cycle failed")
-                write_runtime(status="watchdog_error", last_error=repr(e))
+                signature = f"{type(e).__name__}:{e}"
+                if signature == watchdog_error_signature:
+                    watchdog_error_count += 1
+                else:
+                    watchdog_error_signature = signature
+                    watchdog_error_count = 1
+                write_runtime(
+                    status="watchdog_error",
+                    last_action=f"Watchdog failed ({watchdog_error_count}/{WATCHDOG_ERROR_RESTART_THRESHOLD}): {type(e).__name__}: {e}",
+                    last_error=repr(e),
+                    watchdog_error_count=watchdog_error_count,
+                )
+                if watchdog_error_count >= WATCHDOG_ERROR_RESTART_THRESHOLD:
+                    write_runtime(
+                        status="watchdog_error_restart",
+                        last_action=f"Repeated watchdog failure reached threshold {WATCHDOG_ERROR_RESTART_THRESHOLD}; exiting for Docker restart",
+                        last_error=repr(e),
+                    )
+                    raise
         await asyncio.sleep(5)
 
 
 async def main_async(once: bool):
     start_status_server()
+    start_process_liveness_monitor()
     write_runtime(status="browser_connecting", last_action="Attaching controller to Chrome DevTools")
     async with async_playwright() as p:
         browser = None

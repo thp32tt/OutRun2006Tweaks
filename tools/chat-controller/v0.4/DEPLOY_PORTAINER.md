@@ -128,19 +128,23 @@ The existing `docker-compose.portainer-vr.yml` path is retained for compatibilit
 - runtime/HMD validation remains `UNTESTED` unless separately proven
 
 ### Localization stack
-- lane A/B/C: production / exhaustive QA / final QA
+- physical A -> producer A (`asset_queue.index % 3 == 0`)
+- physical B -> producer B (`asset_queue.index % 3 == 1`)
+- physical C -> independent batched QA consumer C
+- physical D -> logical producer E (`asset_queue.index % 3 == 2`)
 - branch: `korean-localization-clean`
-- required workflow: `Localization Automation Gate`
-- automatic validation may advance while runtime validation remains `UNTESTED`
+- producer A/B/E commits release their lane on durable Git evidence and are validated later by C batch Gate
+- C uses `Localization Automation Gate`; runtime validation remains `UNTESTED` until user game testing
 
 ### Controller completion rule
-A chat response is not completion. The controller requires:
-1. target branch HEAD changed from the task base SHA;
-2. result commit message contains `[AUTO:<TASK_ID>]`;
-3. required GitHub Actions workflow exists for that exact result SHA;
-4. workflow conclusion is `success`.
+A chat response is never completion authority. The controller resolves the durable `[AUTO:<TASK_ID>]` commit first, using normal branch history plus the exact `docs/automation/runs/<TASK_ID>.json` history so high-throughput branches cannot hide an older task beyond the first 100 commits.
 
-A required workflow run is never allowed to remain validation-pending forever. Task-commit discovery ignores later CI-skipped bookkeeping/checkpoint commits so they cannot shadow the newest validation-bearing `[AUTO:<TASK_ID>]` commit. Persisted state that is already bound to a CI-skipped SHA is rebound to that validation-bearing commit on startup/watchdog reconciliation when one exists; otherwise it enters the repair path. If no authoritative run appears for any other reason, `WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS` bounds the wait (600s in the VR/localization Portainer stacks) before the same repair path is used. A failed run also triggers a repair turn in the same task chat. Maximum repair attempts: 3. After that, the task is recorded BLOCKED and the controller advances to another independent task.
+- Conversion DX11/DXVK: the validation-bearing task commit must have the exact `Backend Conversion Gate` run and that run must conclude `success`.
+- Localization C: the validation-bearing C commit must have the exact `Localization Automation Gate` run and that run must conclude `success`.
+- Localization A/B/E: a durable producer commit releases the producer immediately; automatic validation remains pending until C consumes that immutable TASK_ID@RESULT_SHA.
+- CI-skipped bookkeeping is never allowed to shadow a validation-bearing commit. If a Gate-required task has only a CI-skipped task commit, it enters bounded repair rather than pretending no commit exists.
+
+Missing Actions-run creation is bounded by `WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS=600`. An existing run that remains `queued`/`in_progress` is separately bounded by `WAIT_ACTIONS_MAX_SECONDS=1800`. Failed or timed-out validation retries the same TASK_ID while budget remains. Maximum repair attempts are 3; after that the task is recorded BLOCKED and the queue advances instead of waiting forever.
 
 ### Watchdog
 In queue mode the watchdog may recover Retry / Continue generating / browser-composer failures, but it does not select or send the next work item. Task ownership remains with the queue engine.
@@ -164,14 +168,14 @@ If Portainer does not auto-pull Git changes, use **Pull and redeploy** for each 
 
 When `LOCALIZATION_PARALLEL=true`, localization no longer serializes C behind completion of an A/B/E production set.
 
-1. Lane A continuously produces the odd-index shard. After its exact durable task commit exists, the slot becomes available for the next A task immediately; A does not wait for a per-producer Actions Gate.
-2. Lane B does the same for the even-index shard and also does not wait for a per-producer Actions Gate.
-3. Each successful A/B task result is appended to persistent `qa_pending` as an immutable `TASK_ID + RESULT_SHA` input. Production does not wait for C.
-4. Lane C is an independent QA consumer. It coalesces up to `LOCALIZATION_QA_BATCH_SIZE` producer results (default 4) for up to `LOCALIZATION_QA_COALESCE_SECONDS` (default 30s), reviews them in one task, reconciles shared state once, and its single commit is the only Actions Gate that consumes a runner for that batch.
-5. QA de-duplication key is the exact producer `TASK_ID@RESULT_SHA`. The C prompt additionally requires heavy source/DDS/visual checks to be reused for identical source SHA + candidate SHA + QA-contract fingerprints.
-6. A/B must skip candidates still awaiting C QA unless C later records `REWORK_REQUIRED` or the relevant fingerprint changed.
-7. A C failure never stops A/B/E production. Exhausted C batches move to `qa_blocked` for later diagnosis while producers continue.
-8. On restart, persisted completed A/B tasks are migrated into `qa_pending`; existing in-flight lanes are preserved.
+1. Producer A owns `asset_queue.index % 3 == 0`, B owns remainder 1, and logical E (physical slot D) owns remainder 2. Each producer releases immediately after its exact durable task commit; no per-producer Actions Gate is required.
+2. Each successful A/B/E result is appended to persistent `qa_pending` as immutable `TASK_ID@RESULT_SHA`. Production does not wait for C.
+3. C is an independent QA consumer. It coalesces up to `LOCALIZATION_QA_BATCH_SIZE=4` producer results for up to `LOCALIZATION_QA_COALESCE_SECONDS=60`, reconciles shared state once, and its single commit owns the batch Actions Gate.
+4. QA de-duplication uses exact producer `TASK_ID@RESULT_SHA`; unchanged heavy QA evidence may be reused only under the current Git policy fingerprint.
+5. A/B/E skip candidates still awaiting C unless C returns `REWORK_REQUIRED` or a relevant dependency/candidate/QA-contract fingerprint changes.
+6. E is elastic: pause new E work at `qa_pending >= 16`, resume below 12; A/B remain independent.
+7. C failure never stops A/B/E production. Exhausted C batches move to `qa_blocked` while producers continue.
+8. On restart, persisted nonterminal lanes are reconciled against Git before UI Retry/busy handling. Durable commits always outrank stale ChatGPT UI state.
 
 This model allows QA backlog to grow temporarily without reducing production throughput to zero.
 
@@ -189,16 +193,19 @@ The localization stack now uses these controller-runtime values directly:
 - next-task delay: 15s
 - A/B lane stagger: 15s
 - distinct-slot send gap: 15s
-- localization same-slot next-task send gap: 15s
+- localization same-slot next-task send gap: 30s
 - localization slot dedup: 30s
 - C QA batch size: 4 producer results
-- C QA coalesce window: 30s
-- scheduler heartbeat: 15s
-- active-generation busy-stall protection: 30m
-- explicit rate-limit backoff: 90/180/300/600s
+- C QA coalesce window: 60s
+- scheduler heartbeat: 15s; fatal event-loop heartbeat stall: 300s -> process exit / Docker restart
+- active-generation busy-stall protection: 30m -> same TASK_ID fresh-chat rollover instead of infinite WAIT_CHAT
+- existing nonterminal Actions-run maximum wait: 1800s
+- repeated identical queue exception: 3 cycles -> process exit / Docker restart
+- repeated identical watchdog exception: 3 cycles -> process exit / Docker restart
+- explicit ChatGPT rate-limit backoff: 90/180/300/600s; Git/Actions reconciliation continues during backoff
 - generic Retry: at most 2 controlled clicks, then same TASK_ID rolls over to a fresh project chat
 
-On startup, persisted nonterminal queue records are reconciled. WAIT_ACTIONS poll guards are cleared so the next queue cycle checks the stored GitHub Actions run ID directly. A failed terminal run retries the same TASK_ID while retry budget remains, after refreshing the current target-branch HEAD.
+On startup, persisted nonterminal queue records are reconciled against Git before UI recovery. Queue and registry JSON keep last-known-good backups and are restored from backup on primary-file corruption/missing-primary cases; the controller refuses a destructive empty reset when both copies are unreadable. Daily logical-date rollover preserves active slot URLs and send/rate state. A prompt that was already submitted is always represented by an active TASK_ID even when a rate-limit/Retry surface appears immediately after send, preventing orphan work and TASK_ID reuse.
 
 When redeploying in Portainer, retain the existing localization /data volume so persisted W00018 state can be reconciled instead of discarded.
 
