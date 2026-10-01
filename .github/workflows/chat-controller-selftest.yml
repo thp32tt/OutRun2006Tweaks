@@ -173,7 +173,8 @@ jobs:
           a = src.index("async def localization_parallel_cycle")
           b = src.index("def reconcile_legacy_conversion_blocked", a)
           body = src[a:b]
-          assert 'for lane_key in ("A", "B", "C", "D")' in body
+          assert 'active_lane_order = sorted(' in body
+          assert 'for lane_key in active_lane_order:' in body
           assert 'for lane_key in ("A", "B", "D")' in body
           assert 'enqueue_producer_result_for_qa' in body
           assert 'LOCALIZATION_QA_COALESCE_SECONDS' in body
@@ -183,7 +184,7 @@ jobs:
           assert 'if FRESH_CHAT_EACH_RUN:' in send
           assert 'replace_with_fresh_slot_page(context, pages, slot)' in send
           assert 'No producer/C barrier exists.' in body
-          assert body.index('Priority lane {priority_lane} waiting for {guard}') < body.index('for lane_key in ("A", "B", "C", "D")')
+          assert body.index('Priority lane {priority_lane} waiting for {guard}') < body.index('active_lane_order = sorted(')
           assert 'preserving send gap before active Retry traffic' in body
           print("four-slot A/B/E producers + C QA with fresh-task chats verified")
           PY2
