@@ -195,10 +195,10 @@
     "after": "EXACT_182569_TO_1825A6_CONTROL_FLOW_PREFIX_PROVEN",
     "runtime_claim": false
   },
-  "blocker": "Automatic validation is pending for provenance collector 0x001825A6..0x001825E6. Runtime behavior remains UNTESTED.",
-  "next_action": "Consume exact-source GitHub Actions. On PASS, read static EXE analysis output for the exact 64 bytes at 0x001825A6..0x001825E6, verify the A9 00 00 overlap and branch-target coverage, then exact-decode only complete instructions and persist the next bounded proof.",
+  "blocker": "Automatic validation is pending for exact control-flow proof commit d21d85cfdbedc762ff01b917115b3efcc4796cc5. Runtime remains UNTESTED.",
+  "next_action": "After exact-SHA proof validation, capture fresh canonical EXE bytes from 0x001825E5 with required 0x74 overlap through at least 0x0018262F so the incomplete short Jcc and forward targets 0x001825F6/0x0018261A/0x0018262E can be resolved without inference.",
   "checkpoint": "C3_VALIDATE",
-  "status": "PROVENANCE_1825A6_IMPLEMENTED_VALIDATION_PENDING_RUNTIME_UNTESTED",
+  "status": "CONTROL_FLOW_1825A6_PROOF_IMPLEMENTED_VALIDATION_PENDING_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "runtime_source_changed": false,
   "semantic_ownership_promoted": false,
@@ -214,6 +214,13 @@
       "sha": "a63af01f6b79ab98df9d747b580252810b022f29",
       "message": "vr: extend 0x1825a6 provenance window [AUTO:CONVERSION-DXVK-00267]",
       "role": "provenance-implementation",
+      "validation_bearing": true,
+      "ci_skip": false
+    },
+    {
+      "sha": "d21d85cfdbedc762ff01b917115b3efcc4796cc5",
+      "message": "vr: prove 0x1825a6 control-flow prefix [AUTO:CONVERSION-DXVK-00267]",
+      "role": "control-flow-proof",
       "validation_bearing": true,
       "ci_skip": false
     }
@@ -290,6 +297,61 @@
       "0x001825BC"
     ],
     "expected_status": "EXACT_EXE_1825A6_TO_1825E6_PROVENANCE_CAPTURED",
-    "actual_status": "PENDING"
+    "actual_status": "EXACT_EXE_1825A6_TO_1825E6_PROVENANCE_CAPTURED",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "bytes": "a9 00 00 00 ff 75 cf 83 ef 01 eb 0d 83 ef 02 eb 08 83 ef 03 eb 03 83 ef 04 8b 74 24 14 f7 c6 03 00 00 00 75 09 8b d9 c1 e9 02 75 5c eb 22 8a 16 83 c6 01 84 d2 74 3d 88 17 83 c7 01 83 e9 01 74",
+    "exact_build_artifact": {
+      "workflow_run": 36935653648,
+      "artifact_id": 11197647438,
+      "artifact_name": "outrun2006tweaks-245b28dd1ad2d6d962eb1c73c28347ec99ad842e",
+      "head_sha": "a63af01f6b79ab98df9d747b580252810b022f29"
+    }
+  },
+  "control_flow_followup": {
+    "start_rva": "0x001825A6",
+    "prefix_end_rva": "0x001825E5",
+    "instruction_count": 23,
+    "decoded_complete_byte_count": 63,
+    "incomplete_rva": "0x001825E5",
+    "incomplete_bytes": "74",
+    "incomplete_status": "SHORT_JCC_OPCODE_ONLY",
+    "status": "EXACT_1825A6_TO_1825E5_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "branches": [
+      [
+        "0x001825AB",
+        "0x0018257C"
+      ],
+      [
+        "0x001825B0",
+        "0x001825BF"
+      ],
+      [
+        "0x001825B5",
+        "0x001825BF"
+      ],
+      [
+        "0x001825BA",
+        "0x001825BF"
+      ],
+      [
+        "0x001825C9",
+        "0x001825D4"
+      ],
+      [
+        "0x001825D0",
+        "0x0018262E"
+      ],
+      [
+        "0x001825D2",
+        "0x001825F6"
+      ],
+      [
+        "0x001825DB",
+        "0x0018261A"
+      ]
+    ],
+    "next_provenance_start_rva": "0x001825E5",
+    "required_overlap": "74",
+    "minimum_required_end_rva": "0x0018262F"
   }
 }
