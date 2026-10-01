@@ -1,0 +1,34 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00406",
+  "lane": "LOCALIZATION_C",
+  "result_sha": "aaad09c1414650d2b4ad783b0566df3c3df36d11",
+  "schema_version": 32,
+  "controller_config_blob_sha": "0aef9ebc5c2541cb5e7b781ddd16bc06d363237f",
+  "validation_mode": "C_BATCH_GATE",
+  "automation_validation": "PENDING_UNTIL_C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
+      "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b",
+      "automation_validation": "PENDING"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00353",
+      "result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513",
+      "automation_validation": "PENDING"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00355",
+      "result_sha": "41bceb31bc7326ca41c491dc931ee63dfeeff126",
+      "automation_validation": "PENDING"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00357",
+      "result_sha": "46bd3970276de8e6300d971024ec04ce2e9e9d98",
+      "automation_validation": "PENDING"
+    }
+  ],
+  "qa_disposition": "RECORD_RECONCILED_AFTER_GATE_FAILURE",
+  "notes": "Created missing immutable C task run record required by C_BATCH_GATE exact producer SHA validation."
+}
