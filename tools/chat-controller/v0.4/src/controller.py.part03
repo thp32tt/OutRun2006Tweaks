@@ -1654,6 +1654,11 @@ async def localization_process_lane(
                     )
                 return
 
+            if GITHUB_BROKER_ENABLED and not task_commit:
+                if await queue_require_broker_action(context, pages, active, text):
+                    save_queue_state(q)
+                    return
+
             if assistant_claims_github_tooling_absent(text):
                 active["failure_context"] = (
                     "Assistant treated GitHub plugin function/schema visibility as a tooling block. "
@@ -2661,6 +2666,10 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
 
         task_commit = github_find_task_commit(active["branch"], active["task_id"])
         if not task_commit:
+            if GITHUB_BROKER_ENABLED:
+                if await queue_require_broker_action(context, pages, active, text):
+                    save_queue_state(q)
+                    return
             if assistant_claims_github_tooling_absent(text):
                 active["failure_context"] = (
                     "Assistant treated GitHub plugin function/schema visibility as a tooling block. "
