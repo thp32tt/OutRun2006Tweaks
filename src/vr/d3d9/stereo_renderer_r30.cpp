@@ -41,8 +41,21 @@ namespace OutRunVRStereo
         SafetyHookInline R30DrawPrimitiveUPR29Hook{};
         SafetyHookInline R30DrawIndexedPrimitiveUPR29Hook{};
 
-        std::atomic<OutRunVR::RuntimeEligibility::InstallState> R30InstallState{
-            OutRunVR::RuntimeEligibility::InstallState::Pending };
+        using R30InstallStateValue =
+            OutRunVR::RuntimeEligibility::InstallState;
+
+        std::atomic<R30InstallStateValue> R30InstallStateStorage{
+            R30InstallStateValue::Pending };
+
+        void R30SetInstallState(R30InstallStateValue state) noexcept
+        {
+            R30InstallStateStorage.store(state, std::memory_order_release);
+        }
+
+        R30InstallStateValue R30GetInstallState() noexcept
+        {
+            return R30InstallStateStorage.load(std::memory_order_acquire);
+        }
 
         std::uint64_t R30ScreenSpaceFovDraws = 0;
         std::uint64_t R30ScreenSpaceFallbacks = 0;
@@ -3095,10 +3108,18 @@ namespace OutRunVRStereo
             return true;
         }
 
+        void R30PublishInstallResult(
+            R30InstallStateValue state, bool success) noexcept
+        {
+            R30SetInstallState(state);
+            HookManager::ReportAsyncResult(
+                "OpenXRVRStereoR30HUD", success);
+        }
+
         DWORD WINAPI R30InstallThread(void*)
         {
-            using State = OutRunVR::RuntimeEligibility::InstallState;
-            R30InstallState.store(State::Pending, std::memory_order_release);
+            using State = R30InstallStateValue;
+            R30SetInstallState(State::Pending);
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
@@ -3109,9 +3130,7 @@ namespace OutRunVRStereo
                 if (r29 == State::Failed)
                 {
                     R30RollbackBufferShadowHooks();
-                    R30InstallState.store(State::Failed,
-                        std::memory_order_release);
-                    HookManager::ReportAsyncResult("OpenXRVRStereoR30HUD", false);
+                    R30PublishInstallResult(State::Failed, false);
                     spdlog::error(
                         "VR R30 HUD: R29 prerequisite failed; R29 remains active without screen-space FOV correction");
                     return 0;
@@ -3143,19 +3162,13 @@ namespace OutRunVRStereo
                     {
                         R30RollbackHooks();
                         R30RollbackBufferShadowHooks();
-                        R30InstallState.store(State::Failed,
-                            std::memory_order_release);
-                        HookManager::ReportAsyncResult(
-                            "OpenXRVRStereoR30HUD", false);
+                        R30PublishInstallResult(State::Failed, false);
                         spdlog::error(
                             "VR R30 HUD: disabled-first hook transaction failed; R29 remains active");
                         return 0;
                     }
 
-                    R30InstallState.store(State::Ready,
-                        std::memory_order_release);
-                    HookManager::ReportAsyncResult(
-                        "OpenXRVRStereoR30HUD", true);
+                    R30PublishInstallResult(State::Ready, true);
                     spdlog::info(
                         "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R36 contain-fit + depth-disabled overlay zero-disparity + head-relative XYZRHW reprojection active",
                         R30HudScaleValue());
@@ -3165,8 +3178,7 @@ namespace OutRunVRStereo
             }
 
             R30RollbackBufferShadowHooks();
-            R30InstallState.store(State::Failed, std::memory_order_release);
-            HookManager::ReportAsyncResult("OpenXRVRStereoR30HUD", false);
+            R30PublishInstallResult(State::Failed, false);
             spdlog::error(
                 "VR R30 HUD: timed out waiting for R29; R29 remains active");
             return 0;
@@ -3182,15 +3194,13 @@ namespace OutRunVRStereo
             bool validate() override { return true; }
             bool apply() override
             {
-                using State = OutRunVR::RuntimeEligibility::InstallState;
-                R30InstallState.store(State::Pending,
-                    std::memory_order_release);
+                using State = R30InstallStateValue;
+                R30SetInstallState(State::Pending);
                 HANDLE thread = CreateThread(nullptr, 0,
                     R30InstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
-                    R30InstallState.store(State::Failed,
-                        std::memory_order_release);
+                    R30SetInstallState(State::Failed);
                     return false;
                 }
                 CloseHandle(thread);
@@ -3302,6 +3312,6 @@ namespace OutRunVRStereo
     OutRunVR::RuntimeEligibility::InstallState
     ScreenSpaceInstallState() noexcept
     {
-        return R30InstallState.load(std::memory_order_acquire);
+        return R30GetInstallState();
     }
 }
