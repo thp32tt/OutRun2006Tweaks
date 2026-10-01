@@ -1123,6 +1123,17 @@ def producer_result_claims_no_work(record: dict) -> bool:
         return True
     if record.get("review_record_only") is True:
         return True
+
+    candidate_modified = record.get("candidate_dds_modified")
+    if candidate_modified is None:
+        candidate_modified = deliverable.get("candidate_dds_modified")
+    deliverable_type = str(deliverable.get("type") or "").upper()
+    runtime_only_tokens = ("RUNTIME_ISOLATION", "DDS_ONLY", "SINGLE_DDS_MANIFEST")
+    if candidate_modified is False and any(token in deliverable_type for token in runtime_only_tokens):
+        # Runtime isolation is a separate user-validation milestone and must not
+        # consume A/B/E producer completion while static final artwork remains.
+        return True
+
     reduces = record.get("materially_reduces_unresolved_work")
     if reduces is None:
         reduces = deliverable.get("materially_reduces_unresolved_work")
@@ -1155,6 +1166,31 @@ def localization_validate_producer_result_commit(task_id: str, result_sha: str) 
     return True, [], record
 
 
+def localization_final_artwork_progress_hint(branch: str) -> str:
+    """Compact authoritative convergence hint for producer/C dispatch prompts."""
+    state = github_json_file_at_ref("localization/resume_state.json", branch)
+    if not state:
+        return "FINAL_ARTWORK_PROGRESS=UNKNOWN; fail-closed and continue material work"
+    graphics = state.get("graphics_checkpoint")
+    graphics = graphics if isinstance(graphics, dict) else {}
+    completed = graphics.get("final_artwork_completed")
+    total = graphics.get("final_artwork_total", graphics.get("artwork_targets"))
+    percent = graphics.get("final_artwork_percent")
+    try:
+        completed_num = int(completed)
+        total_num = int(total)
+        if percent is None and total_num > 0:
+            percent = round((completed_num / total_num) * 100.0, 2)
+        pct = float(percent)
+        mode = "FINAL_ARTWORK_CONVERGENCE" if completed_num < total_num or pct < 100.0 else "FINAL_ARTWORK_COMPLETE"
+        return (
+            f"FINAL_ARTWORK_PROGRESS={completed_num}/{total_num} ({pct:g}%); MODE={mode}; "
+            "runtime UNTESTED는 static production_complete를 막지 않는다"
+        )
+    except (TypeError, ValueError):
+        return "FINAL_ARTWORK_PROGRESS=INVALID; fail-closed and continue material work"
+
+
 def native_plugin_instructions(active: dict) -> str:
     return (
         "GitHub namespace가 안 보여도 현재 환경의 도구 목록/검색(ALL_TOOLS·tool search 등)에서 "
@@ -1179,8 +1215,10 @@ def queue_dynamic_prefix() -> str:
     qa_batch = runtime.get("queue_qa_batch") or []
     schema_version = ""
     config_blob_sha = ""
+    final_artwork_hint = ""
     if CONTROLLER_MODE == "localization":
         schema_version, config_blob_sha = localization_controller_contract_fingerprint()
+        final_artwork_hint = localization_final_artwork_progress_hint(branch)
     lines = [
         f"[자동 큐 작업] TASK_ID={task_id}",
         *([f"CONTROLLER_SCHEMA_VERSION={schema_version}", f"CONTROLLER_CONFIG_BLOB_SHA={config_blob_sha}"] if CONTROLLER_MODE == "localization" else []),
@@ -1201,11 +1239,14 @@ def queue_dynamic_prefix() -> str:
             "현재 CONTROLLER_CONFIG_BLOB_SHA의 localization/controller_roles.json/canonical contract를 다시 읽어 producer 규칙을 적용해. 과거 캐시 금지.",
             "C qa_pending/candidate_awaiting_C는 C consumer backlog일 뿐 producer 종료 조건이 아니다. 자기 shard 전체를 계속 스캔해.",
             "NO_WORK_GUARD=FAIL_CLOSED: 미완료 guard가 하나라도 있으면 review-only/no-change로 종료 금지; 같은 TASK_ID로 material 작업 계속.",
+            final_artwork_hint,
+            "FINAL_ARTWORK_FIRST: runtime-only/DDS_ONLY manifest나 반복 preflight보다 실제 DDS 생성/재작업→self-QA→C static QA 진입을 우선해.",
         ]
     if qa_batch:
         lines += [
             "QA_BATCH_INPUTS=" + json.dumps(qa_batch, ensure_ascii=False, separators=(",", ":")),
             "C batch 규칙은 현재 CONTROLLER_CONFIG_BLOB_SHA의 Git 계약을 그대로 적용해.",
+            *([final_artwork_hint, "C는 current-v2 static PASS를 runtime과 분리해 final_artwork_completed/percent에 즉시 reconcile해."] if CONTROLLER_MODE == "localization" else []),
         ]
     if failure:
         lines += [
