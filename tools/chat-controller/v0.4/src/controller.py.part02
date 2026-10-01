@@ -508,14 +508,17 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
     slot = reg.slots[reg.next_slot]
     if FRESH_CHAT_EACH_RUN:
         previous_page = pages.get(slot.name)
-        if previous_page is not None and not previous_page.is_closed():
+        # In queue mode this function is called for a new TASK_ID only after the
+        # previous task left active queue state. Durable Git/queue state is the
+        # authority, so stale UI busy indicators must not pin an old renderer.
+        if not QUEUE_MODE and previous_page is not None and not previous_page.is_closed():
             try:
                 if await detect_busy(previous_page):
                     slot.last_result = "fresh_chat_deferred_previous_busy"
                     save_registry(reg)
                     write_runtime(
                         status="previous_run_busy",
-                        last_action=f"Slot {slot.name} is still generating; skipped this hourly fresh-chat launch instead of closing active work",
+                        last_action=f"Slot {slot.name} is still generating; skipped this scheduled fresh-chat launch instead of closing active work",
                         active_slot=slot.name,
                         active_url=slot.url or previous_page.url,
                     )

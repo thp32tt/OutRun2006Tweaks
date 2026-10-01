@@ -56,9 +56,17 @@ def start_status_server():
 
 def queue_rollover_prompt(active: dict) -> str:
     rollover = int(active.get("chat_rollovers", 0)) + 1
+    schema_lines = []
+    if CONTROLLER_MODE == "localization":
+        schema_version, config_blob_sha = localization_controller_contract_fingerprint()
+        schema_lines = [
+            f"CONTROLLER_SCHEMA_VERSION={schema_version}",
+            f"CONTROLLER_CONFIG_BLOB_SHA={config_blob_sha}",
+        ]
     lines = [
         "[대화 자동 롤오버 재개]",
         f"TASK_ID={active['task_id']}",
+        *schema_lines,
         f"LANE={active['lane']}",
         f"TARGET_BRANCH={active['branch']}",
         f"ATTEMPT={active['attempt']}/{MAX_TASK_ATTEMPTS}",
@@ -67,6 +75,7 @@ def queue_rollover_prompt(active: dict) -> str:
         "이전 채팅이 대화 길이 한도에 도달해서 같은 프로젝트의 새 채팅으로 자동 전환했다.",
         "이 롤오버는 작업 실패나 재시도가 아니므로 ATTEMPT를 증가시키지 마.",
         "GitHub 최신 HEAD와 docs/automation/runs/ 아래 해당 TASK_ID 기록을 직접 확인해 현재 상태를 재구성해.",
+        "한글화라면 CONTROLLER_CONFIG_BLOB_SHA의 localization/controller_roles.json과 canonical contract를 다시 읽고 현재 정책으로 프롬프트를 재해석해. 캐시된 과거 정책은 사용하지 마.",
         "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
         "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 clone/worktree로 우회하지 마. 단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용하며 GitHub-only라는 이유로 차단하지 마.",
         "실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED를 유지해.",
@@ -425,11 +434,21 @@ async def localization_send_lane_task(
         write_runtime(status="queue_github_unavailable", last_action=f"Could not read branch {target['branch']}")
         return False
 
-    page = await slot_page(context, pages, slot)
-    if slot.url and not is_project_scoped_chat_url(slot.url):
-        slot.url = None
-        save_registry(reg)
+    if FRESH_CHAT_EACH_RUN:
         page = await replace_with_fresh_slot_page(context, pages, slot)
+        save_registry(reg)
+        write_runtime(
+            status="fresh_task_chat_started",
+            last_action=f"Wave {wave_id} lane {slot_name}: opened fresh project chat for new TASK_ID",
+            active_slot=slot.name,
+            tab_count=len([p for p in pages.values() if not p.is_closed()]),
+        )
+    else:
+        page = await slot_page(context, pages, slot)
+        if slot.url and not is_project_scoped_chat_url(slot.url):
+            slot.url = None
+            save_registry(reg)
+            page = await replace_with_fresh_slot_page(context, pages, slot)
 
     if await detect_busy(page):
         write_runtime(status="parallel_dispatch_wait", last_action=f"Wave {wave_id} lane {slot_name} previous chat is still busy")

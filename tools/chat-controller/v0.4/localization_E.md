@@ -1,11 +1,5 @@
-OutRun 2006 한글화 E 작업을 진행해줘. 역할은 탄력적 세 번째 연속 생산 LANE E + self-QA다.
+OutRun 2006 한글화 E 실행.
 
-상태·진행·QA의 SSOT는 GitHub 저장소 thp32tt/OutRun2006Tweaks의 korean-localization-clean 최신 HEAD다. N100 로컬 clone/worktree/작업파일, GPT Library, 과거 대화 진행률은 작업 기준이나 수정 대상으로 사용하지 마. 단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용해야 하며 GitHub-only라는 이유로 차단하지 마.
+반드시 korean-localization-clean 최신 HEAD의 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 localization/controller_roles.json을 먼저 읽고 현재 schema/정책을 그대로 적용해. GitHub가 상태·진행·QA SSOT다.
 
-시작 즉시 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 localization/controller_roles.json 및 지정된 최신 기준 파일을 읽어 현재 상태를 재구성해. 현재 Git HEAD 규칙이 이 프롬프트보다 우선한다.
-
-E는 asset_queue.csv에서 index % 3 == 2인 primary shard만 생산한다. 다른 producer shard를 작업하거나 work-steal하지 마. C QA 대기 중인 candidate/task와 dependency fingerprint가 바뀌지 않은 SOURCE_ACQUISITION_EXHAUSTED 자산은 다시 선택하지 마.
-
-candidate-completion-first 순서를 지켜 직접 수정 가능한 REWORK_REQUIRED -> explicit RENDER_NEXT -> RENDER_READY -> ONE_STAGE_TO_RENDER -> 기존 candidate material rework를 먼저 처리한다. 마지막 deterministic prerequisite가 해결되면 같은 invocation에서 Korean render -> measure/refit -> exact DDS encode -> decoded-final self-QA -> ENGLISH SOURCE 비교 -> candidate persistence까지 끝내.
-
-E는 lane-local DDS/증거/role_E report와 docs/automation/runs/<TASK_ID>만 commit한다. 공용 상태는 C가 병합한다. task record는 automation_validation=PENDING, validation_mode=C_BATCH_GATE로 기록한다. commit 직전 최신 HEAD를 다시 읽고 [AUTO:TASK_ID]를 정확히 포함해. 실기 테스트가 없으면 RUNTIME_VALIDATION=UNTESTED를 유지해. VR/FFB/DX9Ex/DX11/DXVK 및 빌드는 하지 마.
+역할은 elastic producer E이며 asset_queue.index % 3 == 2 shard만 담당한다. 다른 producer shard를 work-steal하지 말고, lane-local 산출물/증거/task record만 수정한다. E dispatch throttle과 공용 상태 병합 정책은 현재 Git 계약을 따른다. 세부 생산량·candidate-completion-first·source transport·QA·예외·완료 규칙은 현재 Git 계약이 유일한 권위다.

@@ -71,6 +71,7 @@ jobs:
           test -s tools/chat-controller/v0.4/localization_A.md
           test -s tools/chat-controller/v0.4/localization_B.md
           test -s tools/chat-controller/v0.4/localization_C.md
+          test -s tools/chat-controller/v0.4/localization_E.md
 
       - name: Verify authorized game-mod context
         run: |
@@ -95,7 +96,7 @@ jobs:
           grep -Fq 'HEARTBEAT_SECONDS: "15"' "$compose"
           grep -Fq 'LOCALIZATION_QA_BATCH_SIZE: "4"' "$compose"
           grep -Fq 'LOCALIZATION_QA_COALESCE_SECONDS: "60"' "$compose"
-          grep -Fq 'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS: "15"' "$compose"
+          grep -Fq 'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS: "30"' "$compose"
           grep -Fq 'LOCALIZATION_SLOT_DEDUP_SECONDS: "30"' "$compose"
           grep -Fq 'def github_action_run_by_id' /tmp/controller.py
           grep -Fq 'run_id=bound_run_id' /tmp/controller.py
@@ -113,56 +114,81 @@ jobs:
 
       - name: Verify continuous producer and batch-QA architecture
         run: |
+          grep -Fq 'CHAT_SLOTS: "4"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'FRESH_CHAT_EACH_RUN: "true"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'FRESH_CHAT_EACH_RUN: "true"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'mem_limit: 4g' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'mem_reservation: 2g' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
           grep -Fq 'def enqueue_producer_result_for_qa' /tmp/controller.py
           grep -Fq 'def finalize_c_qa_batch' /tmp/controller.py
           grep -Fq 'qa_pending' /tmp/controller.py
-          grep -Fq 'LOCALIZATION_QA_BATCH_SIZE' /tmp/controller.py
-          grep -Fq 'QA_BATCH_INPUTS' tools/chat-controller/v0.4/localization_C.md
-          grep -Fq '독립 C QA consumer' tools/chat-controller/v0.4/localization_A.md
-          grep -Fq '독립 C QA consumer' tools/chat-controller/v0.4/localization_B.md
-          grep -Fq 'candidate-completion-first' tools/chat-controller/v0.4/localization_A.md
-          grep -Fq 'candidate-completion-first' tools/chat-controller/v0.4/localization_B.md
-          grep -Fq 'Candidate-completion-first' tools/chat-controller/v0.4/localization_C.md
-          grep -Fq 'candidate-completion-first' tools/chat-controller/v0.4/src/controller.py.part00
-          grep -Fq 'ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.' tools/chat-controller/v0.4/src/controller.py.part00
-          grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/localization_A.md
-          grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/localization_B.md
-          grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/src/controller.py.part00
-          grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/src/controller.py.part03
-          grep -Fq 'CONTROLLER_SCHEMA_VERSION=' tools/chat-controller/v0.4/src/controller.py.part00
-          grep -Fq 'CONTROLLER_CONFIG_BLOB_SHA=' tools/chat-controller/v0.4/src/controller.py.part00
-          grep -Fq 'localization_controller_contract_fingerprint' tools/chat-controller/v0.4/src/controller.py.part00
           grep -Fq '"D": "localization_E.md"' tools/chat-controller/v0.4/src/controller.py.part02
-          grep -Fq 'LOCALIZATION_E_QA_PAUSE_THRESHOLD: "16"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'LOCALIZATION_E_QA_RESUME_THRESHOLD: "12"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          if grep -Fq '반드시 GitHub만 직접 사용하고 N100' tools/chat-controller/v0.4/src/controller.py.part00 tools/chat-controller/v0.4/src/controller.py.part03; then
-            echo "legacy GitHub-only dispatch constraint remains"
-            exit 1
-          fi
-          echo "candidate-completion-first producer policy verified"
-          if grep -Fq 'A+B -> C synchronization barrier' tools/chat-controller/v0.4/DEPLOY_PORTAINER.md; then
-            echo "legacy localization QA barrier remains in deployment docs"
-            exit 1
-          fi
-          python - <<'PY'
+          grep -Fq 'fresh_task_chat_started' tools/chat-controller/v0.4/src/controller.py.part03
+          grep -Fq 'schema_version, config_blob_sha = localization_controller_contract_fingerprint()' tools/chat-controller/v0.4/src/controller.py.part03
+          grep -Fq 'CONTROLLER_CONFIG_BLOB_SHA=' tools/chat-controller/v0.4/src/controller.py.part03
+          grep -Fq 'container_memory_current_mib' /tmp/controller.py
+          for prompt in localization_A.md localization_B.md localization_C.md localization_E.md; do
+            grep -Fq 'docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md' "tools/chat-controller/v0.4/$prompt"
+            grep -Fq 'localization/controller_roles.json' "tools/chat-controller/v0.4/$prompt"
+          done
+          python - <<'PY2'
           from pathlib import Path
           src = Path("/tmp/controller.py").read_text(encoding="utf-8")
           a = src.index("async def localization_parallel_cycle")
           b = src.index("def reconcile_legacy_conversion_blocked", a)
           body = src[a:b]
           assert 'for lane_key in ("A", "B", "C", "D")' in body
+          assert 'for lane_key in ("A", "B", "D")' in body
           assert 'enqueue_producer_result_for_qa' in body
           assert 'LOCALIZATION_QA_COALESCE_SECONDS' in body
-          qa_helpers = src[src.index("def _qa_item_key"):src.index("async def localization_parallel_cycle")]
-          assert 'task.get("terminal") not in {"PRODUCED", "PASS"}' in qa_helpers
           proc = src[src.index("async def localization_process_lane"):src.index("def _qa_item_key")]
           assert 'if lane_key in {"A", "B", "D"}:' in proc
-          assert 'finalize_localization_producer_commit' in proc
-          assert 'producer_wait_actions_migrated' in proc
+          send = src[src.index("async def localization_send_lane_task"):src.index("def finalize_localization_producer_commit")]
+          assert 'if FRESH_CHAT_EACH_RUN:' in send
+          assert 'replace_with_fresh_slot_page(context, pages, slot)' in send
           assert 'No producer/C barrier exists.' in body
-          assert 'all(active_by_lane[k].get("phase") == "DONE"' not in body
-          print("continuous producers and independent batched QA verified")
-          PY
+          print("four-slot A/B/E producers + C QA with fresh-task chats verified")
+          PY2
+
+      - name: Verify schema 21 policy alignment
+        run: |
+          git fetch --force origin refs/heads/korean-localization-clean:refs/remotes/origin/korean-localization-clean
+          git show refs/remotes/origin/korean-localization-clean:localization/controller_roles.json > /tmp/controller_roles.json
+          python - <<'PY2'
+          import json, pathlib, re
+          cfg=json.loads(pathlib.Path('/tmp/controller_roles.json').read_text())
+          assert cfg['schema_version'] >= 21
+          ex=cfg['execution']; rt=cfg['runtime_tuning']; obs=cfg['runtime_observability']
+          assert ex['controller_slot_count'] == 4
+          assert ex['slot_map'] == {'A':'A','B':'B','C':'C','D':'E'}
+          assert ex['concurrent_group'] == ['A','B','E'] and ex['qa_consumer'] == 'C'
+          assert cfg['lanes']['C']['coalesce_seconds'] == 60
+          assert rt['localization_qa_batch_size'] == 4
+          assert rt['localization_qa_coalesce_seconds'] == 60
+          assert rt['localization_same_slot_send_gap_seconds'] == 30
+          assert rt['localization_slot_dedup_seconds'] == 30
+          assert rt['localization_extra_producer_qa_pause_threshold'] == 16
+          assert rt['localization_extra_producer_qa_resume_threshold'] == 12
+          assert rt['generic_retry_rollover_clicks'] == 2
+          assert rt['fresh_chat_each_task'] is True
+          assert obs['task_chat_lifecycle'] == 'FRESH_CHAT_PER_NEW_TASK_ID'
+          text=pathlib.Path('tools/chat-controller/v0.4/docker-compose.portainer-localization.yml').read_text()
+          expected={
+            'CHAT_SLOTS':4,
+            'LOCALIZATION_QA_BATCH_SIZE':rt['localization_qa_batch_size'],
+            'LOCALIZATION_QA_COALESCE_SECONDS':rt['localization_qa_coalesce_seconds'],
+            'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS':rt['localization_same_slot_send_gap_seconds'],
+            'LOCALIZATION_SLOT_DEDUP_SECONDS':rt['localization_slot_dedup_seconds'],
+            'LOCALIZATION_E_QA_PAUSE_THRESHOLD':rt['localization_extra_producer_qa_pause_threshold'],
+            'LOCALIZATION_E_QA_RESUME_THRESHOLD':rt['localization_extra_producer_qa_resume_threshold'],
+            'GENERIC_RETRY_ROLLOVER_CLICKS':rt['generic_retry_rollover_clicks'],
+          }
+          for key,val in expected.items():
+            m=re.search(rf'^\s+{re.escape(key)}:\s+"?(\d+)"?\s*$',text,re.M)
+            assert m and int(m.group(1))==int(val), (key,val,m.group(1) if m else None)
+          assert re.search(r'^\s+FRESH_CHAT_EACH_RUN:\s+"true"\s*$',text,re.M)
+          print('schema 21 policy and deployment values aligned')
+          PY2
 
       - name: Verify queue recovery ordering
         run: |

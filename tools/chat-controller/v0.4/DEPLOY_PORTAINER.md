@@ -99,10 +99,14 @@ VR conversion controller:
 
 Localization controller:
 
-- memory hard limit: 3 GiB
-- memory reservation: 1 GiB
+- memory hard limit: 4 GiB
+- memory reservation: 2 GiB
 - CPU limit: 1.5
 - shared memory: 768 MiB
+
+## Fresh-chat task lifecycle
+
+Queue tasks use one browser page per configured slot, but each **new TASK_ID** replaces that slot's previous completed ChatGPT page with a fresh project chat. Same-TASK retries reuse the current chat until retry/rollover policy requires a replacement. This bounds long-conversation DOM/renderer growth while preserving Git and `/data/state` as the durable state. Localization remains four slots: physical A/B/C/D map to logical A/B/C/E.
 
 ## Safety
 
