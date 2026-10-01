@@ -100,13 +100,16 @@ def main() -> None:
         [
             '"NativeDrawPathActivationAllowed": False',
             '"ActivationProof": False',
-            '"ExhaustiveDrawCoverage": False',
+            '"ExhaustiveDrawCoverage": exhaustive_draw_coverage',
             '"DiagnosticOnly": True',
+            '"EXHAUSTIVE_V1"',
         ],
         "DX11 census analyzer",
     )
     if '"NativeDrawPathActivationAllowed": True' in analyzer:
         raise SystemExit("DX11 census analyzer must not authorize native draws")
+    if '"ActivationProof": True' in analyzer:
+        raise SystemExit("DX11 census analyzer must not promote diagnostics to activation proof")
 
     census = require_text(
         DX11 / "runtime_census.cpp",
@@ -114,6 +117,9 @@ def main() -> None:
             "void observe_source_draw(",
             "ExactSamples.fetch_add",
             "resourcesExact && inputLayoutExact && shaderTranslationExact",
+            "OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE",
+            "census_sample_stride()",
+            "census_sampling_scheme()",
         ],
         "DX11 runtime census",
     )
