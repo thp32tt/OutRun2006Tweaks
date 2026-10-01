@@ -1,5 +1,5 @@
 {
-  "schema_version": 37,
+  "schema_version": 38,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -458,7 +458,7 @@
     },
     "one_stage_to_render_definition": "one deterministic reconstruction/style stage remains and can be completed before rendering",
     "forbid_new_preflight_while_ready_exists": true,
-    "max_new_preflight_only_batches_when_no_ready_assets": 999999,
+    "max_new_preflight_only_batches_when_no_ready_assets": 1,
     "candidate_target_per_invocation_when_ready_exists": 2,
     "continue_to_next_ready_asset_after_fail_closed": true,
     "primary_throughput_metric": "NEW_OR_MATERIALLY_REWORKED_V2_KOREAN_DDS_CANDIDATES_TO_C_QA",
@@ -578,13 +578,46 @@
         "runnable_production",
         "blocked_exception",
         "runtime_validated"
-      ]
+      ],
+      "final_artwork_completed_source": "C_RECONCILED_CURRENT_STATIC_PRODUCTION_COMPLETE_ASSET_SET",
+      "runtime_untested_does_not_decrement_final_artwork": true
     },
     "candidate_qa_priority": {
       "candidate_bearing_first": true,
       "preflight_only_secondary": true,
       "reuse_unchanged_heavy_qa_fingerprint": true,
       "c_pass_promotes_production_complete": true
+    },
+    "final_artwork_convergence": {
+      "mode": "ACTIVE_WHILE_FINAL_ARTWORK_INCOMPLETE",
+      "activation": "final_artwork_completed < final_artwork_total OR final_artwork_percent < 100",
+      "primary_goal": "INCREASE_C_STATIC_QA_PRODUCTION_COMPLETE_COUNT",
+      "producer_priority": [
+        "DIRECT_REWORK_REQUIRED_RUNNABLE_TO_NEW_DDS",
+        "EXPLICIT_RENDER_NEXT_TO_NEW_DDS",
+        "RENDER_READY_TO_NEW_DDS",
+        "ONE_STAGE_TO_RENDER_THEN_NEW_DDS_SAME_INVOCATION",
+        "EXISTING_CANDIDATE_REWORK_TO_NEW_DDS",
+        "ONE_PREFLIGHT_ADVANCE_ONLY_IF_NO_COMPLETION_TIER_RUNNABLE"
+      ],
+      "producer_normal_success": "NEW_OR_MATERIALLY_REWORKED_DDS_CANDIDATE",
+      "runtime_only_manifest_is_producer_success": false,
+      "runtime_untested_blocks_static_production_complete": false,
+      "planning_or_status_only_is_success": false,
+      "preflight_only_consecutive_limit": 1,
+      "after_preflight_required_action": "NEXT_INVOCATION_MUST_ATTEMPT_COMPLETION_TIER_BEFORE_ANOTHER_PREFLIGHT_ONLY_BATCH",
+      "blocked_asset_does_not_block_independent_shard_assets": true,
+      "c_reconciliation": {
+        "production_complete_definition": "CURRENT_V2_CANDIDATE_C_STATIC_QA_PASS",
+        "runtime_required": false,
+        "rebuild_stale_rework_snapshot_each_batch": true,
+        "remove_rework_when_superseded_by_newer_static_pass": true,
+        "maintain_authoritative_asset_list": "graphics_checkpoint.production_complete_assets",
+        "update_final_artwork_completed_each_batch": true,
+        "update_final_artwork_percent_each_batch": true,
+        "count_rule": "COUNT_UNIQUE_FINAL_ARTWORK_TARGETS_WITH_CURRENT_STATIC_PRODUCTION_COMPLETE_OR_EXPLICIT_CURRENT_POLICY_PRESERVE_NOT_REQUIRED",
+        "stale_snapshot_must_not_override_newer_asset_or_c_evidence": true
+      }
     }
   },
   "source_transport": {
