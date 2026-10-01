@@ -1,0 +1,89 @@
+{
+  "schema_version": 30,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00372",
+  "wave_id": "P00240",
+  "lane": "LOCALIZATION_B",
+  "branch": "korean-localization-clean",
+  "created_at_kst": "2026-10-01T17:58:00+09:00",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "isolation_mode": "DDS_ONLY",
+  "packaging_policy": {
+    "purpose": "OPTIONAL_RUNTIME_TEST_ARTIFACT_ONLY",
+    "candidate_location": "EXTERNAL_GOOGLE_DRIVE_CURRENT_PIPELINE_ARCHIVE",
+    "repository_packaging_status": "SKIP_TYPED_EXTERNAL_CANDIDATE_NOT_IN_GIT",
+    "note": "Manifest pins the exact independently static-QA-passed current candidate. No runtime PASS, DDS rerender, or heavy static-QA replay is asserted."
+  },
+  "schema": "outrun-b00372-p00240-index97-current-candidate-single-dds-isolation-v1",
+  "case_id": "P00240_B00372_411827E_CURRENT",
+  "purpose": "Provide a fresh DDS_ONLY runtime-isolation input for the current C164/Q00062 STATIC_QA_PASS_RUNTIME_UNTESTED index97 candidate. This supersedes the historical B00268 isolation input whose candidate SHA was replaced.",
+  "asset": {
+    "index": 97,
+    "id": "411827E",
+    "path": "textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+    "raw_orientation": "flip_y",
+    "localized_physical_regions": 7
+  },
+  "source": {
+    "canonical_transport": "PINNED_V0.25.10A_RELEASE_INDEPENDENT_C164_REPLAY",
+    "archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "archive_bytes": 306223257,
+    "sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "header_128_sha256": "5f6f54e05a1dd82f4f01f2643e4bc68077a43ced65717a99ef65be0588e0a46f"
+  },
+  "candidate": {
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_ZIP_EXACT_MEMBER",
+    "drive_account": "ezflash557",
+    "drive_folder_id": "1XL3KI6gECnlNRgt7YgT4a_mvziBQaO3W",
+    "drive_file_id": "1weJ8A0rrjB0KRHWbTprWjvzgzRV5uBJO",
+    "archive_name": "B00283_INDEX97_CANDIDATE.zip",
+    "archive_sha256": "9c305268775a002c3bfd372196b5bcfd7178c87b10f6e0ca83c3d63803265691",
+    "archive_bytes": 1142442,
+    "inner_member": "411827E_512x512.dds",
+    "sha256": "85a50bb9036f1171bd14c5806cc7a2d21ae04010b9ac3692626b8b02225f9b80",
+    "bytes": 16777344,
+    "dds": {
+      "width": 2048,
+      "height": 2048,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "header_128_sha256": "5f6f54e05a1dd82f4f01f2643e4bc68077a43ced65717a99ef65be0588e0a46f",
+    "drive_metadata_rechecked_this_task": {
+      "exact_name": true,
+      "exact_size": true,
+      "parent_folder_id": "1XL3KI6gECnlNRgt7YgT4a_mvziBQaO3W"
+    },
+    "archive_hash_reused_from_independent_c_static_qa": true
+  },
+  "unchanged_fingerprint_proof": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00283",
+    "producer_result_sha": "f231efacf0bb71f2221de947d79e25d344a53245",
+    "independent_c_task": "LOCALIZATION-LOCALIZATION_C-00293",
+    "c_static_qa_result_sha": "b47185be7eb14acfbdfb99407d8ffbeb474a8fe9",
+    "c_batch": "Q00062",
+    "c_run": "C164",
+    "c_gate_run_id": 36734942838,
+    "c_gate_conclusion": "success",
+    "static_qa": "PASS",
+    "prior_isolation_manifest": "localization/graphics/role_B/20260930-B00268-P00154/B00268_P00154_INDEX97_SINGLE_DDS_ISOLATION_INPUT.json",
+    "prior_candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
+    "prior_isolation_superseded_by_current_candidate": true,
+    "current_candidate_isolation_manifest_absent_at_selection": true,
+    "heavy_static_qa_repeated": false
+  },
+  "runtime_test_requirements": [
+    "Load only the current 411827E replacement DDS from the pinned candidate archive and confirm the affected selector UI renders without a crash.",
+    "Capture readable/game-orientation evidence for all 7 localized regions and confirm FLIP_Y interpretation.",
+    "Check clipping, position, alpha/transparency, scaling, neighboring-region overlap, style/slant and any 1-pixel overflow.",
+    "Confirm protected source artwork and recommendation badge treatment remain unchanged.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "schema_version": 30,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00372",
+  "wave_id": "P00240",
+  "lane": "LOCALIZATION_B",
+  "branch": "korean-localization-clean",
+  "created_at_kst": "2026-10-01T17:58:00+09:00",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "isolation_mode": "DDS_ONLY",
+  "packaging_policy": {
+    "purpose": "OPTIONAL_RUNTIME_TEST_ARTIFACT_ONLY",
+    "candidate_location": "EXTERNAL_GOOGLE_DRIVE_CURRENT_PIPELINE_ARCHIVE",
+    "repository_packaging_status": "SKIP_TYPED_EXTERNAL_CANDIDATE_NOT_IN_GIT",
+    "note": "Manifest pins the exact independently static-QA-passed current candidate. No runtime PASS, DDS rerender, or heavy static-QA replay is asserted."
+  },
+  "schema": "outrun-b00372-p00240-index121-current-candidate-single-dds-isolation-v1",
+  "case_id": "P00240_B00372_FD90AA9_CURRENT",
+  "purpose": "Provide a fresh DDS_ONLY runtime-isolation input for the current C170/Q00068 STATIC_QA_PASS_RUNTIME_UNTESTED index121 candidate. This supersedes the historical B00269 isolation input whose candidate SHA was replaced.",
+  "asset": {
+    "index": 121,
+    "id": "FD90AA9",
+    "path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "raw_orientation": "flip_y",
+    "localized_physical_regions": 29
+  },
+  "source": {
+    "canonical_transport": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_SOURCE_INDEPENDENT_C170_REPLAY",
+    "drive_account": "ezflash557",
+    "drive_file_id": "1J5LBV_dkJQ280Y_oDOn6JZj-n22cI4eX",
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "header_128_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f"
+  },
+  "candidate": {
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_ZIP_EXACT_MEMBER",
+    "drive_account": "ezflash557",
+    "drive_folder_id": "1J7pnOXo8Koe4zYZfJVeYuCMIvlP5O3VC",
+    "drive_file_id": "1d7iviLACITHKqIksf-IvV2SNuuVrpSoX",
+    "archive_name": "B00310_FD90AA9_candidate_bundle.zip",
+    "archive_sha256": "5a99823875512d79977cda7be02f1af5f11ee99d625cb4153172a7a2bcd990e5",
+    "archive_bytes": 3095134,
+    "expected_inner_member": "FD90AA9_1024x1024.dds",
+    "sha256": "5bb3a83b1011086f637462268490432e846bbdddbef85810f5677b77642ac1ca",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1
+    },
+    "header_128_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f",
+    "drive_metadata_rechecked_this_task": {
+      "exact_name": true,
+      "exact_size": true,
+      "parent_folder_id": "1J7pnOXo8Koe4zYZfJVeYuCMIvlP5O3VC"
+    },
+    "archive_hash_reused_from_independent_c_static_qa": true
+  },
+  "unchanged_fingerprint_proof": {
+    "producer_task": "LOCALIZATION-LOCALIZATION_B-00310",
+    "producer_result_sha": "3498a4f476e41b89c0fdd856af1c0a460c0b5e60",
+    "independent_c_task": "LOCALIZATION-LOCALIZATION_C-00321",
+    "c_static_qa_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+    "c_batch": "Q00068",
+    "c_run": "C170",
+    "c_gate_run_id": 36765645929,
+    "c_gate_conclusion": "success",
+    "static_qa": "PASS",
+    "prior_isolation_manifest": "localization/graphics/role_B/20260930-B00269-P00155/B00269_P00155_INDEX121_SINGLE_DDS_ISOLATION_INPUT.json",
+    "prior_candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+    "prior_isolation_superseded_by_current_candidate": true,
+    "current_candidate_isolation_manifest_absent_at_selection": true,
+    "heavy_static_qa_repeated": false
+  },
+  "runtime_test_requirements": [
+    "Load only the current FD90AA9 replacement DDS extracted from the pinned candidate bundle and confirm the affected selector UI renders without a crash.",
+    "Capture readable/game-orientation evidence for all 29 localized regions and confirm FLIP_Y interpretation.",
+    "Check clipping, position, alpha/transparency, scaling, neighboring-region overlap, fixed family styling/slant and any 1-pixel overflow.",
+    "Confirm all protected/non-localized artwork remains visually unchanged.",
+    "Do not promote runtime approval unless isolated real-game behavior is correct."
+  ]
+}
