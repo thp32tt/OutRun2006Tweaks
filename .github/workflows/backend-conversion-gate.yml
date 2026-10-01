@@ -53,6 +53,10 @@ jobs:
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py
 
+      - name: Verify DX11 dormant activation boundary
+        shell: pwsh
+        run: python tools/verify_dx11_activation_boundary.py
+
       - name: Test DX11 census analyzer
         shell: pwsh
         run: python tools/test_analyze_dx11_census.py
