@@ -6,8 +6,7 @@ import pathlib
 root = pathlib.Path(__file__).resolve().parents[2]
 cfg = json.loads((root / "localization" / "controller_roles.json").read_text(encoding="utf-8"))
 
-if int(cfg.get("schema_version", 0)) < 24:
-    raise SystemExit("controller_roles schema_version must be >= 24")
+if int(cfg.get("schema_version", 0)) < 31:\n    raise SystemExit("controller_roles schema_version must be >= 31")
 
 rr = cfg.get("runtime_recovery") or {}
 wa = rr.get("wait_actions") or {}
