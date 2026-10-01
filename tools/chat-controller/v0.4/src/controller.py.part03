@@ -325,6 +325,9 @@ async def queue_handle_retry_surface(context: BrowserContext, pages: dict[str, P
     # clicking Retry or opening any new chat.
     if not is_rate:
         assistant_text = await last_assistant_text(page)
+        if assistant_text and await queue_handle_broker_response(context, pages, active, q, assistant_text):
+            save_queue_state(q)
+            return True
         if assistant_text and (
             assistant_claims_github_tooling_absent(assistant_text)
             or assistant_claims_github_unavailable(assistant_text)
