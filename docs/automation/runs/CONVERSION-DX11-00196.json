@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00196",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "0b9005b8ffc116a74efe71a1eceae0b4a3639dcc",
+  "staged_source_commits": [
+    "deac57526e368ddcf70a1376f92ab371ec462b21",
+    "4c47f2acf50e1dd3beeb405878f74ecb026155eb"
+  ],
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R196_182331_FRESH_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00194 consumed exact bytes through 0x182330 and explicitly named fresh bytes beginning at 0x182331 as the next independent F13 step. A 96-byte capture reaches exclusive end 0x182391, the other previously decoded forward target, without interpreting either endpoint. DXVK-00195 independently proved the same public-EXE capture shape; DX11 validation remains independent.",
+  "summary": "PENDING automatic validation. Adds a fail-closed 96-byte exact-EXE provenance capture from 0x182331 through exclusive end 0x182391 plus raw inbound/outbound rel32 census. This task intentionally makes no instruction-boundary, function-entry, callee-semantic or render/HUD ownership claim for 0x182331 or 0x182391.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00196.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "Base 0b9005b8ffc116a74efe71a1eceae0b4a3639dcc is the completed CONVERSION-DX11-00194 bookkeeping descendant; validation-bearing ancestor 6dca08a0 proves the predecessor exact decode ends at 0x182331.",
+    "R196 requires the exact R194 predecessor status/end, .text placement, exactly 96 captured bytes, and exclusive probe end 0x182391.",
+    "First/last bytes and raw inbound/outbound rel32 candidates are surfaced as evidence only; endpoint instruction boundaries and all semantics remain unresolved.",
+    "Regression/history review found no runtime source change: protected R51 world stereo/HUD paths and Issue #13 runtime problem state are unchanged.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00195",
+    "source_result_sha": "30a3d6189075452d469fbf213d0c352e364e5257",
+    "source_validation_state_at_selection": "PASS",
+    "source_proof_target": "EXACT_EXE_182331_TO_182391_PROVENANCE_CAPTURED",
+    "reason": "Reuse only the bounded exact-byte raw provenance capture design on the shared canonical EXE. DX11 depends on its own R194 predecessor and independent exact-result GitHub Actions."
+  },
+  "proof_contract": {
+    "predecessor_status": "EXACT_182314_TO_182331_CAPTURE_END_CONTROL_FLOW_PROVEN",
+    "target_rva": "0x00182331",
+    "probe_len": 96,
+    "probe_end_rva": "0x00182391",
+    "expected_status": "EXACT_EXE_182331_TO_182391_PROVENANCE_CAPTURED",
+    "start_boundary_status": "UNRESOLVED_RAW_BYTES_ONLY",
+    "end_target_status": "REACHED_182391_TARGET_BYTES_NOT_CAPTURED",
+    "function_entry_status": "UNRESOLVED_AT_182331_AND_182391",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "ownership_effect": "NONE",
+    "continuation_scope": "RAW_BYTES_AND_REL32_CENSUS_ONLY"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no native DX11 renderer activation, game draw routing, transport, provider, selector or package behavior changes.",
+    "ownership": "Fresh raw continuation bytes do not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Capture fails closed unless R194 remains exact through exclusive end 0x182331, the new probe starts exactly there in .text, all 96 bytes are available, and its exclusive end is exactly 0x182391. Neither endpoint is interpreted as an instruction boundary."
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_182314_CAPTURE_END_CONTROL_FLOW_PROVEN",
+    "after": "PENDING_182331_TO_182391_PROVENANCE",
+    "runtime_claim": false
+  },
+  "blocker": "Fresh bytes at 0x182331..0x182390 are the current bounded target. Even after capture, 0x182331 and 0x182391 instruction boundaries/function identities and any callee/render semantics remain unresolved until a separate exact decode.",
+  "next_action": "Wait for exact-SHA automatic validation. Do not publish another ordinary same-branch commit until Backend Conversion Gate completes because cancel-in-progress is enabled."
+}
