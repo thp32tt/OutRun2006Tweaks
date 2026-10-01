@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 812,
+  "cycle": 824,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -123,11 +123,14 @@
     "R84-REF-HOOKSET-0011",
     "R84-REF-HOOKSET-0012",
     "R84-REF-LIFECYCLE-0039",
-    "R84-REF-VERIFY-0003"
+    "R84-REF-VERIFY-0003",
+    "R84-REF-STATE-0018",
+    "R84-REF-PERF-0010",
+    "R84-REF-PERF-0011"
   ],
-  "next": "Cycles 813-815: continue R31 StateBlock recording/apply ownership review while preserving existing arm order and Apply interception semantics; otherwise continue R32/R33 dispatch/perf ownership. APPLY_GATE at 815.",
-  "updatedKst": "2026-10-02T08:00:00+09:00",
-  "batchStatus": "R84_EXTENSION_TO_929_IN_PROGRESS_CYCLE_812",
+  "next": "Cycles 825-827: continue R32/R33 dispatch/perf ownership review, focusing reset-state clearing and telemetry snapshot publication without changing runtime counters; APPLY_GATE at 827.",
+  "updatedKst": "2026-10-02T07:54:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_824_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -211,6 +214,10 @@
     "Cycles 804-806: R31 fast-world cache validation versus StateBlockTracker reliability reviewed. APPLY_GATE 806 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; live validation and fail-close remain rendering-correctness sensitive.",
     "Cycles 807-809: R32/R33 dispatch ownership for fallback, state restore and final routing reviewed. APPLY_GATE 809 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; restore and semantic-consumption order remain Golden-contract-sensitive.",
     "Cycles 810-812: verifier coverage for R31/R32/R33/R34 transaction, publication, prerequisite and R33 read-facade boundaries reviewed. APPLY_GATE 812 SOURCE_CHANGED=NO/NO_SAFE_CHANGE. STATIC_VALIDATION=connector source re-read plus verifier contract inspection; executable verifier/build not started. RUNTIME_VALIDATION=UNTESTED.",
-    "Build trigger 8f4a27ecd52f40ae3991ae560230d45611e1e9fe rechecked: combined status empty and connector workflow wrapper returned no runs. BUILD_STATUS=PENDING/UNCONFIRMED; no new build started."
+    "Build trigger 8f4a27ecd52f40ae3991ae560230d45611e1e9fe rechecked: combined status empty and connector workflow wrapper returned no runs. BUILD_STATUS=PENDING/UNCONFIRMED; no new build started.",
+    "Cycles 813-815 R84-REF-STATE-0017: R31 recording-hook creation/arming isolated in R31InstallRecordingHooks while preserving exact End->Begin->Create enable order and leaving Apply interception unchanged. APPLY_GATE 815 SOURCE_CHANGED=YES commit babaca77c8b2813225ed6ce257dfac4578b29f26 [skip ci]. Runtime UNTESTED.",
+    "Cycles 816-818 R84-REF-STATE-0018: Reviewed R31 EnsureStateBlockApplyHook reliability/alternate-vtable behavior against new recording install boundary; Apply target and coverage-loss semantics remain coupled and runtime-sensitive. APPLY_GATE 818 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 819-821 R84-REF-PERF-0010: Reviewed R31 dispatch counters versus R32 frame delta telemetry ownership; counters have distinct aggregation windows and reset lifetimes. APPLY_GATE 821 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 822-824 R84-REF-PERF-0011: Reviewed R32 FinalizeFramePerf/LogPerfWindow and R33 LogPerfWindow boundaries; no safe merge without changing reporting cadence. APPLY_GATE 824 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
   ]
 }
