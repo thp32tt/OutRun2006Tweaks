@@ -2,6 +2,7 @@
 """Fail closed when checked-in CMake omits native DX11 translation/census TUs."""
 
 from pathlib import Path
+from verify_dx11_activation_boundary import main as verify_dx11_activation_boundary
 
 ROOT = Path(__file__).resolve().parents[1]
 DX11 = ROOT / "src" / "vr" / "d3d11"
@@ -2426,7 +2427,7 @@ def main() -> None:
             "DX11 R108-R111 observation-only registry mirror API gained a runtime census caller"
         )
 
-    print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
+    verify_dx11_activation_boundary()\n\n    print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
 
 
 if __name__ == "__main__":
