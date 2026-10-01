@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00208",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "2596916d06c590da807cf67b7fd0ee33898e51a0",
+  "result_sha": "PENDING_VALIDATION_BEARING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_VALIDATION_BEARING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "google_drive_canonical_hd_source_transport": {
+    "approved_by_current_git_head": true,
+    "used": false,
+    "reason": "This task uses canonical EXE bytes already captured by the GitHub Actions analyzer; no DDS acquisition is required."
+  },
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R208_1823EF_EXACT_DECODE",
+  "selection_reason": "CONVERSION-DX11-00206 explicitly left 0x001823EF..0x0018244F as exact raw provenance and named exact decoding of that window as the next safe bounded F13 action.",
+  "summary": "ATTEMPT=1 implementation committed for canonical Actions validation. Exact-byte control-flow proof covers 27 complete instructions at 0x001823EF..0x0018244D, verifies the known rel32 call and branch destinations, and deliberately leaves the final 0xDB byte at 0x0018244E raw because the capture ends before its ModRM byte. Runtime renderer source is unchanged and no semantic/render/HUD ownership is promoted.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00208.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false,
+    "hd_source_transport_changed": false
+  },
+  "evidence": [
+    "C0 recovered target branch HEAD 2596916d06c590da807cf67b7fd0ee33898e51a0 directly from GitHub.",
+    "AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, durable VR state/regression documents, Issue #14 and completed CONVERSION-DX11-00206 were reviewed before implementation.",
+    "CONVERSION-DX11-00206 proved EXACT_EXE_1823EF_TO_18244F_PROVENANCE_CAPTURED on canonical EXE SHA-256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3 and retained semantic/function ownership as unresolved.",
+    "Prior canonical HUD Inspector job 110247334985 supplied the exact 96 bytes for 0x001823EF..0x0018244F and raw outbound candidate 0x001823FC->0x001888D5.",
+    "R208 exact-byte map contains 27 complete instructions through 0x0018244D. Internal branch targets 0x00182401 and 0x00182433 are checked as instruction boundaries; external targets remain decoded destinations only.",
+    "Byte 0xDB at 0x0018244E is preserved as an incomplete x87 opcode at capture end and is not promoted to an instruction.",
+    "No N100 clone/worktree, Google Drive DDS transport, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "proof_contract": {
+    "predecessor_status": "EXACT_EXE_1823EF_TO_18244F_PROVENANCE_CAPTURED",
+    "start_rva": "0x001823EF",
+    "prefix_end_rva": "0x0018244E",
+    "probe_end_rva": "0x0018244F",
+    "complete_instruction_count": 27,
+    "known_call": "0x001823FC->0x001888D5",
+    "internal_branch_targets": [
+      "0x00182401",
+      "0x00182433"
+    ],
+    "external_decoded_targets": [
+      "0x00182461",
+      "0x0018895E",
+      "0x0018896B",
+      "0x0018246F"
+    ],
+    "incomplete_tail": "0x0018244E: db",
+    "expected_status": "EXACT_1823EF_TO_18244E_CONTROL_FLOW_PREFIX_PROVEN",
+    "function_entry_status": "UNRESOLVED_AT_1823EF_AND_EXTERNAL_TARGETS",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_ONLY",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier evidence only; backend routing, provider selection, native draw activation and runtime ownership are unchanged.",
+    "ownership": "Exact instruction boundaries do not imply ScreenHud/world/function ownership; all semantic promotion remains closed.",
+    "stereo_correctness": "No WVP/projection/eye submission/HUD/menu/recenter behavior changes.",
+    "performance": "No runtime draw/copy/wait/Flush/cadence/frame-pacing path changes.",
+    "adversarial": "Proof fails on any byte/layout/branch/call mismatch, requires the R206 exact provenance chain, and refuses to decode the trailing 0xDB without fresh bytes."
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_1823EF_FRESH_PROVENANCE_CAPTURED",
+    "after": "PENDING_1823EF_TO_18244E_EXACT_CONTROL_FLOW_VALIDATION",
+    "runtime_claim": false
+  },
+  "blocker": "The final byte 0xDB at 0x0018244E is incomplete in the R206 96-byte capture, and external decoded destinations are not newly captured. Function identity, call effects and render/HUD ownership therefore remain unresolved.",
+  "next_action": "After exact-SHA Actions validation, finalize this run record in a separate bookkeeping commit. Future independent F13 work may acquire fresh canonical bytes beginning at 0x0018244E and/or exact provenance for external targets before decoding or making any semantic claim.",
+  "checkpoint": "C4_COMMIT_PENDING_VALIDATION",
+  "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE",
+  "task_started_kst": "2026-10-01T15:44:00+09:00"
+}
