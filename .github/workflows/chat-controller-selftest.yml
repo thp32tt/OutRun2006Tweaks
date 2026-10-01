@@ -46,18 +46,20 @@ jobs:
           grep -Fq 'EXPECTED_PROJECT_ID: "g-p-6ab9a64fc428819198c7f39765d764bf"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'No assistant response was detected before the queue result grace period expired' tools/chat-controller/v0.4/src/controller.py.part03
 
-      - name: Verify hybrid GitHub broker contract
+      - name: Verify compact GitHub broker contract
         run: |
-          grep -Fq 'GITHUB_ACCESS_MODE=CONTROLLER_BROKER_PRIMARY_PLUGIN_OPTIONAL' /tmp/controller.py
-          grep -Fq 'CONTROLLER_GITHUB_BROKER=' /tmp/controller.py
+          grep -Fq 'BROKER=' /tmp/controller.py
           grep -Fq 'PUBLIC_GITHUB_ACCESS=DO_NOT_USE' /tmp/controller.py
-          grep -Fq 'FIRST_ACTION=USE_PROVIDED_BROKER_CONTEXT' /tmp/controller.py
+          grep -Fq 'FIRST_ACTION=BROKER_READ_OR_CHANGESET' /tmp/controller.py
+          grep -Fq 'GITHUB_BROKER_PROTOCOL_VERSION = 2' /tmp/controller.py
           grep -Fq 'def github_api_mutation_json' /tmp/controller.py
           grep -Fq 'def github_broker_apply_changeset' /tmp/controller.py
           grep -Fq 'async def queue_handle_broker_response' /tmp/controller.py
           grep -Fq 'def github_broker_initial_context' /tmp/controller.py
-          grep -Fq 'CONTROLLER_GITHUB_BROKER는 ChatGPT tool/schema/interface가 아니다' /tmp/controller.py
+          grep -Fq '첫 응답은 반드시 아래 둘 중 태그 하나만 제출해' /tmp/controller.py
           grep -Fq 'BROKER_READ_RESULT' /tmp/controller.py
+          grep -Fq 'async def queue_require_broker_action' /tmp/controller.py
+          grep -Fq 'status="github_broker_action_required"' /tmp/controller.py
           grep -Fq 'status="github_broker_commit_created"' /tmp/controller.py
           grep -Fq 'class GitHubBrokerPermissionError' /tmp/controller.py
           grep -Fq 'def github_broker_spool_pending' /tmp/controller.py
@@ -70,13 +72,17 @@ jobs:
           grep -Fq 'legacy_broker_candidates' /tmp/controller.py
           grep -Fq '"broker_context_injected": bool(GITHUB_BROKER_ENABLED)' /tmp/controller.py
           test "$(grep -Fc 'queue_handle_broker_response(context, pages, active, q' /tmp/controller.py)" -ge 3
-          if grep -Fq 'GITHUB_ACCESS_MODE=CONNECTED_GITHUB_PLUGIN' /tmp/controller.py; then
-            echo "legacy plugin-only access mode remains"
+          if grep -Fq 'GITHUB_ACCESS_MODE=' /tmp/controller.py; then
+            echo "legacy verbose GitHub access mode remains"
             exit 1
           fi
           grep -Fq 'GITHUB_BROKER_ENABLED: "true"' tools/chat-controller/v0.4/docker-compose.portainer.yml
           grep -Fq 'GITHUB_BROKER_ENABLED: "true"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'GITHUB_BROKER_ENABLED: "true"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'GITHUB_BROKER_MAX_CONTEXT_CHARS: "18000"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'GITHUB_BROKER_MAX_FILE_CHARS: "8000"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'GITHUB_BROKER_MAX_CONTEXT_CHARS: "18000"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'GITHUB_BROKER_MAX_FILE_CHARS: "8000"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
           grep -Fq 'COPY src/broker_protocol.py /opt/outrun/app/broker_protocol.py' tools/chat-controller/v0.4/Dockerfile.portainer
           python - <<'PY2'
           import ast
@@ -104,10 +110,13 @@ jobs:
           assert 'broker result commit must not contain CI-skip directives' in body
           q=src[src.index('def queue_dynamic_prefix'):src.index('async def first_visible')]
           assert 'github_broker_initial_context(active)' in q
-          assert 'FIRST_ACTION=USE_PROVIDED_BROKER_CONTEXT' in q
+          assert 'FIRST_ACTION=BROKER_READ_OR_CHANGESET' in q
+          init=src[src.index('def github_broker_initial_context'):src.index('def github_broker_apply_changeset')]
+          assert 'github_broker_render_read_result' not in init
           r=src[src.index('def queue_rollover_prompt'):src.index('async def queue_rollover_chat')]
           assert 'github_broker_initial_context(active)' in r
-          print('broker-primary initial context and semantic refusal classifier verified')
+          assert 'queue_require_broker_action(context, pages, active, text)' in src
+          print('compact broker protocol and wording-independent action enforcement verified')
           PY2
 
       - name: Verify broker protocol parser
@@ -135,18 +144,15 @@ jobs:
           print('broker protocol parser/edit guards verified')
           PY2
 
-      - name: Verify all task prompts support broker fallback
+      - name: Verify task prompts stay compact and action-first
         run: |
           for prompt in \
             conversion_dx11.md conversion_dxvk.md \
             localization_A.md localization_B.md localization_C.md localization_E.md; do
-            grep -Fq 'CONTROLLER_GITHUB_BROKER' "tools/chat-controller/v0.4/$prompt"
-            grep -Fq 'Broker는 ChatGPT에 노출되는 tool/schema/interface가 아니라' "tools/chat-controller/v0.4/$prompt"
-            grep -Fq 'BROKER_READ_RESULT' "tools/chat-controller/v0.4/$prompt"
-            if grep -Fq '연결된 GitHub 플러그인을 실제 호출해 수행하고' "tools/chat-controller/v0.4/$prompt"; then
-              echo "legacy plugin-only prompt remains: $prompt"
-              exit 1
-            fi
+            file="tools/chat-controller/v0.4/$prompt"
+            grep -Fq '첫 행동은 BROKER_READ' "$file"
+            grep -Fq 'BROKER_CHANGESET' "$file"
+            test "$(wc -c < "$file")" -le 500
           done
 
       - name: Verify browser transport self-recovery
