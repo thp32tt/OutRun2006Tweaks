@@ -1,0 +1,43 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00471",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "wave_id": "Q00107",
+  "controller_schema_version": 32,
+  "role": "independent_batched_cross_lane_qa+shared_state_reconcile",
+  "qa_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00340",
+      "result_sha": "4e3438375ede35e458e19303c5733710c71c608e",
+      "disposition": "PASS_RECORDED_NO_PROMOTION"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00339",
+      "result_sha": "9d0a36f8f6e951d955f10fc3bdefedd343edbeae",
+      "disposition": "PASS_RECORDED_NO_PROMOTION"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00344",
+      "result_sha": "bea28331bbdbe605dea3f6c8fb4e27892b48f56d",
+      "disposition": "PASS_RECORDED_NO_PROMOTION"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00345",
+      "result_sha": "5f72a88cbcf98873f4181a6d2e378c7f08f4f6c7",
+      "disposition": "PASS_RECORDED_NO_PROMOTION"
+    }
+  ],
+  "qa_policy": {
+    "input_identity": "TASK_ID@RESULT_SHA",
+    "producer_barrier": false,
+    "shared_state_merge": "C_ONLY",
+    "runtime_validation": "UNTESTED",
+    "candidate_promotion": "NONE"
+  },
+  "review": {
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "dds_visual_runtime_test": false,
+    "notes": "Batch C reconciliation recorded. No producer result was promoted without required runtime evidence."
+  }
+}
