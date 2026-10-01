@@ -1201,13 +1201,13 @@ async def localization_process_lane(
                     )
                 return
 
-            sent_at = _parse_iso(active.get("sent_at")) or now
-            if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
-                return
             if assistant_claims_github_unavailable(text):
                 if await queue_send_github_recovery(context, pages, active):
                     save_queue_state(q)
                     return
+            sent_at = _parse_iso(active.get("sent_at")) or now
+            if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
+                return
             reason = "Stable response finished without a durable [AUTO:TASK_ID] commit."
             if active["attempt"] < MAX_TASK_ATTEMPTS:
                 previous_attempt = active["attempt"]
@@ -2139,13 +2139,13 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
 
         task_commit = github_find_task_commit(active["branch"], active["task_id"])
         if not task_commit:
-            sent_at = _parse_iso(active.get("sent_at")) or now
-            if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
-                return
             if assistant_claims_github_unavailable(text):
                 if await queue_send_github_recovery(context, pages, active):
                     save_queue_state(q)
                     return
+            sent_at = _parse_iso(active.get("sent_at")) or now
+            if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
+                return
             reason = "Chat response stabilized but no durable commit carrying the exact [AUTO:TASK_ID] marker was found."
             if active["attempt"] < MAX_TASK_ATTEMPTS:
                 previous_attempt = active["attempt"]
