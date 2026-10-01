@@ -877,8 +877,12 @@ def github_broker_write_capable(force: bool = False) -> bool:
         return _github_broker_capability_cache[1]
     try:
         repo = github_api_json(f"/repos/{GITHUB_REPO}")
-        perms = repo.get("permissions") or {}
-        capable = bool(perms.get("push") or perms.get("admin") or perms.get("maintain"))
+        perms = repo.get("permissions")
+        capable = (
+            bool(perms.get("push") or perms.get("admin") or perms.get("maintain"))
+            if isinstance(perms, dict) and perms
+            else True
+        )
     except Exception as e:
         log.warning("github broker permission probe failed error=%r", e)
         capable = False
@@ -887,9 +891,9 @@ def github_broker_write_capable(force: bool = False) -> bool:
     return capable
 
 
-def github_broker_fetch_file(branch: str, path: str) -> Optional[dict]:
+def github_broker_fetch_file(ref: str, path: str) -> Optional[dict]:
     qpath = urllib.parse.quote(path, safe="/")
-    qref = urllib.parse.urlencode({"ref": branch})
+    qref = urllib.parse.urlencode({"ref": ref})
     try:
         payload = github_api_json(f"/repos/{GITHUB_REPO}/contents/{qpath}?{qref}")
     except urllib.error.HTTPError as e:
@@ -899,9 +903,9 @@ def github_broker_fetch_file(branch: str, path: str) -> Optional[dict]:
     if not isinstance(payload, dict) or payload.get("type") != "file":
         raise BrokerProtocolError(f"broker path is not a file: {path}")
     encoded = str(payload.get("content") or "").replace("\n", "")
-    if payload.get("encoding") != "base64" or not encoded:
+    if payload.get("encoding") != "base64":
         raise BrokerProtocolError(f"broker file content unavailable: {path}")
-    raw = base64.b64decode(encoded)
+    raw = base64.b64decode(encoded or "")
     try:
         text = raw.decode("utf-8")
     except UnicodeDecodeError as exc:
@@ -925,17 +929,21 @@ def github_broker_render_read_result(branch: str, specs: list[dict]) -> str:
     used = sum(len(x) for x in pieces)
     for spec in specs:
         path = spec["path"]
-        item = github_broker_fetch_file(branch, path)
+        item = github_broker_fetch_file(head, path)
         if item is None:
             chunk = f"\nFILE {path} status=NOT_FOUND\n"
         else:
             lines = item["text"].splitlines(keepends=True)
             total_lines = len(lines)
-            start = spec.get("start") or 1
-            end = spec.get("end") or total_lines
-            start = min(max(1, int(start)), max(1, total_lines))
-            end = min(max(start, int(end)), total_lines)
-            content = "".join(lines[start - 1:end])
+            if total_lines == 0:
+                start = end = 0
+                content = ""
+            else:
+                start = spec.get("start") or 1
+                end = spec.get("end") or total_lines
+                start = min(max(1, int(start)), total_lines)
+                end = min(max(start, int(end)), total_lines)
+                content = "".join(lines[start - 1:end])
             truncated = False
             if len(content) > GITHUB_BROKER_MAX_FILE_CHARS:
                 content = content[:GITHUB_BROKER_MAX_FILE_CHARS]
@@ -1029,7 +1037,7 @@ def github_broker_apply_changeset(active: dict, changeset: dict) -> dict:
     changed_paths = []
     for edit in changeset["edits"]:
         path = edit["path"]
-        existing = github_broker_fetch_file(branch, path)
+        existing = github_broker_fetch_file(current_head, path)
         expected_sha = edit.get("expected_sha")
         if expected_sha:
             actual_sha = existing["sha"] if existing else None
