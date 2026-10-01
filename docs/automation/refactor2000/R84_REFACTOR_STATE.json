@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 860,
+  "cycle": 862,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -137,11 +137,12 @@
     "R84-REF-VERIFY-0004",
     "R84-REF-DIRECT-0005",
     "R84-REF-DIRECT-0006",
-    "R84-REF-PERF-0014"
+    "R84-REF-PERF-0014",
+    "R84-REF-VERIFY-0005"
   ],
-  "next": "Cycles 861-862: final two-cycle verification for this requested 50-cycle batch: re-read verifier/critical source and branch checkpoint; preserve protected graph; no source edit unless concrete regression found.",
-  "updatedKst": "2026-10-02T08:05:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_860_CHECKPOINT",
+  "next": "Cycles 863-865: continue independent R32 DirectGPU/perf ownership or R33 dispatch cache review; do not alter R31 physical StateBlock Apply semantics or R34 reset/raster ordering without runtime evidence; APPLY_GATE at 865.",
+  "updatedKst": "2026-10-02T08:07:00+09:00",
+  "batchStatus": "R84_USER_BATCH_50_COMPLETE_CYCLE_862",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -241,6 +242,7 @@
     "Cycles 849-851 R84-REF-VERIFY-0004: Verified source contract guards now pin R31 recording-hook ownership plus exact End->Begin->Create arm order; no regression found. APPLY_GATE 851 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 852-854 R84-REF-DIRECT-0005: R32 DirectGPU reset cleanup reviewed: pending producer fences are cleared before lower Reset and again in cache invalidation; duplicate-looking calls protect pre/post Reset failure paths. APPLY_GATE 854 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 855-857 R84-REF-DIRECT-0006: R32 Direct identity, producer-pending frame and copy-path rejection lifetimes reviewed; publication remains owned by post-Present transport contract and must not be collapsed. APPLY_GATE 857 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
-    "Cycles 858-860 R84-REF-PERF-0014: R32 Direct fence/copy telemetry reviewed against reset cache clearing and frame spike aggregation; counters intentionally span different windows. APPLY_GATE 860 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
+    "Cycles 858-860 R84-REF-PERF-0014: R32 Direct fence/copy telemetry reviewed against reset cache clearing and frame spike aggregation; counters intentionally span different windows. APPLY_GATE 860 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 861-862 R84-REF-VERIFY-0005: final source-only verification confirmed R31 recording helper exists, exact End->Begin->Create arm order is preserved, verifier guard exists, and R34 pending-resync -> RasterReplayScope protected ordering remains present. SOURCE_CHANGED=NO. Requested batch advanced exactly 50 cycles from 812 to 862. Runtime UNTESTED."
   ]
 }
