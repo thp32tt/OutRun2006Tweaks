@@ -328,6 +328,16 @@ if "attempt < 4800" in r32 or "Sleep(25)" in r32:
 if "attempt < R32PrerequisiteWaitAttempts" not in r32 or \
         "Sleep(R32PrerequisiteWaitMs)" not in r32:
     errors.append("R32 install thread no longer consumes prerequisite wait policy")
+for marker in (
+    "bool R34InstallHookTransaction() noexcept",
+    "R34CreateDisabledHooks();",
+    "if (R34EnableHooks())",
+    "R34RollbackHooks();",
+    "if (!R34InstallHookTransaction())",
+):
+    if marker not in r34:
+        errors.append(f"R34 hook transaction boundary missing: {marker}")
+
 if "void R34CreateDisabledHooks() noexcept" not in r34:
     errors.append("R34 disabled-first hook creation boundary missing")
 if r34.count("const auto disabled = safetyhook::InlineHook::StartDisabled;") != 1:

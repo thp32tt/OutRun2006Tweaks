@@ -342,6 +342,15 @@ namespace OutRunVRStereo
                 DrawIndexedPrimitiveUPDestR34, disabled);
         }
 
+        bool R34InstallHookTransaction() noexcept
+        {
+            R34CreateDisabledHooks();
+            if (R34EnableHooks())
+                return true;
+            R34RollbackHooks();
+            return false;
+        }
+
         constexpr int R34PrerequisiteWaitAttempts = 4800;
         constexpr DWORD R34PrerequisiteWaitMs = 25;
 
@@ -363,11 +372,8 @@ namespace OutRunVRStereo
 
                 if (r33 == State::Ready)
                 {
-                    R34CreateDisabledHooks();
-
-                    if (!R34EnableHooks())
+                    if (!R34InstallHookTransaction())
                     {
-                        R34RollbackHooks();
                         SetResetGuardInstallState(State::Failed);
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR34ResetGuard", false);
