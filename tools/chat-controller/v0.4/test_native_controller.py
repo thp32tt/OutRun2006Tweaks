@@ -48,6 +48,9 @@ class NativeControllerTests(unittest.TestCase):
             prompt = (ROOT / (name + '.md')).read_text()
             self.assertNotIn('BROKER_', prompt)
             self.assertIn('플러그인', prompt)
+            if name in ('localization_A', 'localization_B', 'localization_E'):
+                self.assertIn('qa_pending/candidate_awaiting_C', prompt)
+                self.assertIn('producer 종료 조건이 아니다', prompt)
             self.assertLessEqual(len(prompt.encode()), 650)
 
     def test_preflight_does_not_claim_browser_plugin_connected(self):
@@ -92,126 +95,6 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('FIRST_ACTION=CALL_CONNECTED_GITHUB_PLUGIN', prefix)
         self.assertIn('ALL_TOOLS', prefix)
         self.assertNotIn('bookkeeping/checkpoint', prefix)
-
-    def test_no_work_guard_blocks_incomplete_authoritative_state(self):
-        status_fn, _ = load_function('_collect_current_status_blockers')
-        pending_fn, _ = load_function('_collect_pending_array_blockers')
-        f, _ = load_function(
-            'localization_no_work_blockers_from_state',
-            _collect_current_status_blockers=status_fn,
-            _collect_pending_array_blockers=pending_fn,
-        )
-        state = {
-            'graphics_checkpoint': {
-                'final_artwork_completed': 0,
-                'final_artwork_total': 95,
-                'final_artwork_percent': 0,
-                'pending_dxt5_assets': ['x.dds'],
-                'strict_qa_current': {},
-                'next_hd_rework': {'status': 'ZERO_PIXEL_BBOX_REWORK_REQUIRED'},
-            },
-            'latest_qa_batch': {
-                'qa_dispositions': [{'status': 'REWORK_REQUIRED'}],
-            },
-            'typography_v19_reaudit': {
-                'pending_not_completed_apply_on_production': [46],
-            },
-            'packaging': {'status': 'pending'},
-        }
-        blockers = f(state)
-        self.assertTrue(any(x.startswith('FINAL_ARTWORK_INCOMPLETE:') for x in blockers))
-        self.assertTrue(any(x.startswith('FINAL_ARTWORK_PERCENT_LT_100:') for x in blockers))
-        self.assertTrue(any('REWORK_REQUIRED' in x for x in blockers))
-        self.assertTrue(any('pending_dxt5_assets' in x for x in blockers))
-        self.assertTrue(any('pending_not_completed_apply_on_production' in x for x in blockers))
-        self.assertIn('PACKAGING_NOT_DONE:pending', blockers)
-
-    def test_no_work_guard_allows_only_complete_clear_state(self):
-        status_fn, _ = load_function('_collect_current_status_blockers')
-        pending_fn, _ = load_function('_collect_pending_array_blockers')
-        f, _ = load_function(
-            'localization_no_work_blockers_from_state',
-            _collect_current_status_blockers=status_fn,
-            _collect_pending_array_blockers=pending_fn,
-        )
-        state = {
-            'graphics_checkpoint': {
-                'final_artwork_completed': 95,
-                'final_artwork_total': 95,
-                'final_artwork_percent': 100,
-                'pending_dxt5_assets': [],
-                'strict_qa_current': {},
-                'next_hd_rework': {'status': 'DONE'},
-            },
-            'latest_qa_batch': {'qa_dispositions': [{'status': 'PASS'}]},
-            'typography_v19_reaudit': {'pending_not_completed_apply_on_production': []},
-            'packaging': {'status': 'done'},
-        }
-        self.assertEqual(f(state), [])
-
-    def test_review_only_zero_material_result_is_no_work_claim(self):
-        f, _ = load_function('producer_result_claims_no_work')
-        record = {
-            'result': 'PASS_REVIEW_NO_RUNNABLE',
-            'selection': {'selected_action': 'NO_NEW_PRODUCER_WORK_UNTIL_C'},
-            'material_change': False,
-            'candidate_dds_modified': False,
-            'review_record_only': True,
-            'material_deliverable': {
-                'type': 'FRESH_SHARD_NO_ACTION_REVIEW',
-                'materially_reduces_unresolved_work': False,
-            },
-        }
-        self.assertTrue(f(record))
-        self.assertFalse(f({
-            'result': 'PASS_MATERIAL_PREFLIGHT',
-            'material_change': True,
-            'candidate_dds_modified': False,
-            'review_record_only': False,
-            'material_deliverable': {
-                'type': 'NEW_RECONSTRUCTION_INPUT',
-                'materially_reduces_unresolved_work': True,
-            },
-        }))
-
-    def test_missing_task_result_is_work_required_not_no_work(self):
-        f, _ = load_function(
-            'localization_validate_producer_result_commit',
-            github_json_file_at_ref=lambda path, ref: None,
-            producer_result_claims_no_work=lambda record: True,
-            localization_no_work_blockers_from_state=lambda state: ['BLOCKED'],
-        )
-        valid, reasons, record = f('TASK-1', 'a' * 40)
-        self.assertFalse(valid)
-        self.assertEqual(reasons, ['TASK_RESULT_FILE_MISSING'])
-        self.assertIsNone(record)
-
-    def test_no_work_result_is_rejected_while_global_work_remains(self):
-        def fetch(path, ref):
-            if path.endswith('TASK-1.json'):
-                return {
-                    'task_id': 'TASK-1',
-                    'review_record_only': True,
-                    'material_change': False,
-                    'candidate_dds_modified': False,
-                    'material_deliverable': {'materially_reduces_unresolved_work': False},
-                }
-            return {'state': 'unfinished'}
-        f, _ = load_function(
-            'localization_validate_producer_result_commit',
-            github_json_file_at_ref=fetch,
-            producer_result_claims_no_work=lambda record: True,
-            localization_no_work_blockers_from_state=lambda state: ['FINAL_ARTWORK_INCOMPLETE:0/95'],
-        )
-        valid, reasons, _ = f('TASK-1', 'b' * 40)
-        self.assertFalse(valid)
-        self.assertEqual(reasons, ['FINAL_ARTWORK_INCOMPLETE:0/95'])
-
-    def test_producer_release_paths_use_no_work_guard(self):
-        self.assertGreaterEqual(SOURCE.count('await localization_handle_producer_commit('), 4)
-        self.assertIn('NO_WORK_GUARD_REJECTED', SOURCE)
-        self.assertIn('TASK_RESULT_FILE_MISSING', SOURCE)
-        self.assertIn("'커밋할 변경 없음'은 종료 사유가 아니다", SOURCE)
 
     def test_no_work_guard_blocks_incomplete_authoritative_state(self):
         status_fn, _ = load_function('_collect_current_status_blockers')
