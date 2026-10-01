@@ -92,10 +92,10 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "4c129e50612d41d13a48020357ab5eb95b290fe6",
+  "authoritative_result_sha": "4c129e50612d41d13a48020357ab5eb95b290fe6",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_RESULT_COMMIT_CREATION",
+  "result_binding_state": "BOUND_TO_PRODUCER_RESULT_PENDING_C_BATCH_GATE",
   "result_commit_message": "localization(E): guard index119 canonical source [AUTO:LOCALIZATION-LOCALIZATION_E-00354]",
   "durable_task_record_in_result_commit": true,
   "precommit_refresh": {
@@ -104,5 +104,11 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Fresh branch HEAD fetched before result tree creation. Only role_E E00354 verifier/report and the unique E00354 durable task record are added; shared state and peer-lane files are untouched."
   },
-  "bookkeeping_note": "Initial durable result commit intentionally leaves self-SHA fields null; a separate bookkeeping-only commit may bind the immutable producer RESULT_SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Initial durable result commit intentionally leaves self-SHA fields null; a separate bookkeeping-only commit may bind the immutable producer RESULT_SHA. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping": {
+    "recorded_at_kst": "2026-10-01T17:46:00+09:00",
+    "producer_result_sha": "4c129e50612d41d13a48020357ab5eb95b290fe6",
+    "head_before_bookkeeping": "4c129e50612d41d13a48020357ab5eb95b290fe6",
+    "note": "Bookkeeping-only immutable producer RESULT_SHA binding. The atomic result commit contains the index119 verifier, machine-readable source acquisition report, and durable E00354 task record. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; RUNTIME_VALIDATION remains UNTESTED."
+  }
 }
