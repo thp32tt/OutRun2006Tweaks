@@ -57,11 +57,16 @@ require(
 )
 
 workflow = read(".github/workflows/vr-dx9ex-active.yml")
+game_start = workflow.find("\n  game:")
+full_chain_start = workflow.find("\n  full-chain-compile:", game_start)
+if game_start < 0 or full_chain_start < 0 or full_chain_start <= game_start:
+    raise SystemExit("protected R51 build contract could not isolate active game job")
+active_game_job = workflow[game_start:full_chain_start]
 required_flag = "-DOUTRUN_VR_R26_HUD_COMPARE=ON"
-if required_flag not in workflow:
-    raise SystemExit(f"protected R51 build contract missing: {required_flag}")
-if "-DOUTRUN_VR_R26_HUD_COMPARE=OFF" in workflow:
-    raise SystemExit("protected R51 build contract regressed: active DX9Ex workflow contains R26_HUD_COMPARE=OFF")
+if required_flag not in active_game_job:
+    raise SystemExit(f"protected R51 build contract missing from active game job: {required_flag}")
+if "-DOUTRUN_VR_R26_HUD_COMPARE=OFF" in active_game_job:
+    raise SystemExit("protected R51 build contract regressed: active game job disables R26_HUD_COMPARE")
 
 
 

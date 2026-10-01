@@ -230,14 +230,21 @@ if "R31 fallback StateBlock hooks armed" not in r31:
 if "StateBlockTracker::SetEventConsumerReady(" not in r31 or \
         "StateBlockEvents::Configured()" not in r31:
     errors.append("R31 missing neutral event-consumer readiness publication")
-configure_pos = r31.find("StateBlockEvents::Configure(")
-enable_draw_pos = r31.find("R31EnableDrawHooks()")
-consumer_ready_pos = r31.find("StateBlockTracker::SetEventConsumerReady(true)")
-if min(configure_pos, enable_draw_pos, consumer_ready_pos) < 0 or not (
-        configure_pos < enable_draw_pos < consumer_ready_pos):
-    errors.append(
-        "R31 must configure StateBlock events before enabling draw hooks "
-        "and publish consumer readiness only after draw hooks are enabled")
+install_start = r31.find("DWORD WINAPI R31InstallThread(")
+install_end = r31.find("class VRStereoR31PerfHook", install_start)
+if install_start < 0 or install_end <= install_start:
+    errors.append("R31 install transaction body missing")
+else:
+    install_body = r31[install_start:install_end]
+    configure_pos = install_body.find("StateBlockEvents::Configure(")
+    enable_draw_pos = install_body.find("if (!R31EnableDrawHooks())")
+    consumer_ready_pos = install_body.find(
+        "StateBlockTracker::SetEventConsumerReady(true)")
+    if min(configure_pos, enable_draw_pos, consumer_ready_pos) < 0 or not (
+            configure_pos < enable_draw_pos < consumer_ready_pos):
+        errors.append(
+            "R31 must configure StateBlock events before enabling draw hooks "
+            "and publish consumer readiness only after draw hooks are enabled")
 if "StateBlockEvents::Clear()" not in r31:
     errors.append("R31 draw-hook failure path missing StateBlock event rollback")
 if "SetR31Reliable" in state_block_tracker or "R31Reliable" in state_block_tracker:

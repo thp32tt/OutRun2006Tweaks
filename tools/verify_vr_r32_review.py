@@ -363,14 +363,20 @@ if "cullNone && alphaBlendEnabled && !depthWriteEnabled;" in effect_policy:
 
 r31_lazy = require(
     "src/vr/d3d9/stereo_renderer_r31.cpp",
-    "R31StateBlockResyncPending",
     "R31MarkStateBlockCachesDirty",
-    "R31FlushPendingStateBlockResync",
+    "StateBlockRecovery::Configure(",
+    "StateBlockTracker::RequireResync()",
     "lazily re-primed at the next actual draw",
+)
+state_block_recovery = require(
+    "src/vr/state/state_block_recovery.hpp",
+    "class StateBlockRecovery",
+    "FlushPendingResync(",
+    "StateBlockTracker::ConsumeResync()",
 )
 r33_lazy = require(
     "src/vr/d3d9/stereo_renderer_r33.cpp",
-    "R31FlushPendingStateBlockResync(device);",
+    "StateBlockRecovery::FlushPendingResync(device);",
 )
 
 require(
