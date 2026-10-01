@@ -24,7 +24,7 @@
   },
   "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R200_182391_FRESH_PROVENANCE",
   "selection_reason": "CONVERSION-DX11-00198 exact-decoded through exclusive end 0x182391 and explicitly named fresh exact bytes there as the next independent F13 task. A 96-byte capture includes local forward targets 0x18239F and 0x1823AC without requiring semantic interpretation. DXVK-00199 independently proved the same public-EXE capture shape; DX11 validation remains independent.",
-  "summary": "ATTEMPT=1 complete. Validation-bearing result a09c9c09bfd02c29acd76935295e8a1cd5d04dbc captures 96 fresh canonical-EXE .text bytes from 0x182391 through exclusive end 0x1823F1, covering prior forward targets 0x18239F and 0x1823AC. The capture starts with raw byte a9, records zero raw inbound and four raw outbound rel32 candidates, and preserves all included target addresses as bytes-only evidence without boundary/function/semantic promotion. Backend Conversion Gate, Build, HUD Inspector and OpenXR all passed. No runtime source changed and no Quest 3/VDXR or in-game test was performed.",
+  "summary": "ATTEMPT=1 complete. Validation-bearing result a09c9c09bfd02c29acd76935295e8a1cd5d04dbc captures exactly 96 canonical-EXE bytes from 0x182391 through exclusive end 0x1823F1. The predecessor 0x182331..0x182390 control-flow proof remains exact; the new capture covers byte locations 0x182391, 0x18239F and 0x1823AC, records four raw outbound rel32 candidates, and deliberately keeps every included target's instruction-boundary/function identity plus call/render/HUD semantics unresolved. Backend Conversion Gate, Build, HUD Inspector and OpenXR all passed on the exact result SHA. No runtime source changed, Google Drive HD transport was not needed, and no Quest 3/VDXR or in-game test was performed.",
   "changed_paths": [
     "tools/analyze_outrun_exe.py",
     "tools/verify_vr_backend_disasm_contract.py",
@@ -46,18 +46,17 @@
     "Base 1ab165402f004b482cb75d57692d90a447931af2 is the completed CONVERSION-DX11-00198 bookkeeping descendant; validation-bearing ancestor ad80a0c743a2d248a63a979479751d3da7f350b3 proves the prior exact decode ends at 0x182391.",
     "Backend Conversion Gate 36818713185 validate job 110229414790 PASS on exact result SHA. Queue automation/HMD baseline/one-click/backend disassembly/session-regression/DX11 transport/source-graph/census contracts, Win32 build, DX11 semantic/object/linkage/constant-buffer/native-transport probes and binary verification all succeeded.",
     "Backend Gate artifact 11142772099 digest sha256:30f47f29c9320f0023eb05f7274b6e5963281d1a644a604650a95fe05e4feafb.",
-    "HUD Inspector 36818716991 PASS. static job 110229430984 emitted EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED with predecessor_exact=True, section=.text, probe_len=96, probe_end=0x001823F1, first_byte=a9, targets_in_window=True, inbound_raw=0 and outbound_raw=4.",
-    "Captured target snapshots are 0x182391=a9 ff ff 0f 00 75 f2 83; 0x18239F=dd d8 db 2d f0 60 73 00; 0x1823AC=83 3d 64 fa 85 00 00 0f. These remain bytes-only observations; no target boundary/function status is promoted.",
-    "Raw outbound rel32 candidates are 0x1823C4->0x188877, 0x1823D6->0x188948, 0x1823DB->0x1823ED and 0x1823E8->0x188905.",
-    "HUD proof preserves start_boundary=UNRESOLVED_RAW_BYTES_ONLY, target_status=BYTES_CAPTURED_BOUNDARIES_UNRESOLVED, function_entry=UNRESOLVED_AT_182391_18239F_1823AC, semantic_effect=UNRESOLVED_CONTINUATION_BYTES_ONLY and ownership_effect=NONE.",
+    "HUD Inspector 36818716991 PASS. Static job 110229430984 emitted EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED with predecessor_exact=True, section=.text, probe_len=96, probe_end=0x001823F1, probe_end_match=True, targets_in_window=True, inbound_raw=0 and outbound_raw=4.",
+    "Captured target-byte samples are 0x00182391:a9 ff ff 0f 00 75 f2 83, 0x0018239F:dd d8 db 2d f0 60 73 00, and 0x001823AC:83 3d 64 fa 85 00 00 0f. All remain BYTES_CAPTURED_BOUNDARIES_UNRESOLVED with function entry UNRESOLVED_AT_182391_18239F_1823AC.",
+    "Raw outbound rel32 candidates in the 96-byte window are 0x001823C4->0x00188877, 0x001823D6->0x00188948, 0x001823DB->0x001823ED and 0x001823E8->0x00188905. These are census-only and do not promote call semantics.",
     "Canonical replacement EXE SHA-256 remained 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
     "HUD analysis artifact 11142721877 digest sha256:42dfafba7c2f385a892f929f43c38c312a870799d79daefb42867044aba39bd0; HUD inspector game artifact 11142901074 digest sha256:0a93b61967c1c5d789c51beabaebfa3046b6136ff53f9793932e7f561a46b436.",
     "Build 36818717037 PASS on exact result SHA; binary artifact 11142353433 digest sha256:4ca8e9adaa74f678583713ff2b1cd57cf220f29538908445980150b5219c2a9a; wheel-source artifact 11142219243 digest sha256:824b28afba6bba3129baa41b437158d6f2726483b31d1ac3d936ee97a22c5bc0.",
     "OpenXR VR architecture 36818717062 PASS on exact result SHA with all 6/6 jobs successful. Host artifact 11142288359 digest sha256:25013af820a3783f96f967b23ab35f38909253cb655624d19236cebcdc308e30.",
     "VR PC Fast Test Build 36818713197 was skipped by branch policy and is not runtime validation.",
-    "Approved Google Drive canonical HD source transport was not needed for this EXE-only task and remained available/unchanged.",
-    "Regression/history review found no runtime source change: protected R51 world stereo/HUD paths and Issue #13 runtime problem state are unchanged.",
-    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+    "Runtime source, native draw routing, D3D9 render policy, OpenXR transport, native DX11 transport and HD-source transport were not changed by this task.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED.",
+    "Approved Google Drive canonical HD source transport was not needed for this EXE-only task and remains available/unmodified for future DDS acquisition."
   ],
   "reuse_evidence": {
     "source_lane": "DXVK",
@@ -69,13 +68,29 @@
   },
   "proof_contract": {
     "predecessor_status": "EXACT_182331_TO_182391_CONTROL_FLOW_PREFIX_PROVEN",
+    "predecessor_exact": true,
     "target_rva": "0x00182391",
+    "target_section": ".text",
     "probe_len": 96,
     "probe_end_rva": "0x001823F1",
+    "probe_end_matches": true,
     "referenced_target_rvas": [
       "0x00182391",
       "0x0018239F",
       "0x001823AC"
+    ],
+    "referenced_targets_in_window": true,
+    "target_byte_samples": {
+      "0x00182391": "a9 ff ff 0f 00 75 f2 83",
+      "0x0018239F": "dd d8 db 2d f0 60 73 00",
+      "0x001823AC": "83 3d 64 fa 85 00 00 0f"
+    },
+    "raw_inbound_rel32_candidate_count": 0,
+    "raw_outbound_rel32_candidates": [
+      "0x001823C4->0x00188877",
+      "0x001823D6->0x00188948",
+      "0x001823DB->0x001823ED",
+      "0x001823E8->0x00188905"
     ],
     "status": "EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED",
     "start_boundary_status": "UNRESOLVED_RAW_BYTES_ONLY",
@@ -83,23 +98,7 @@
     "function_entry_status": "UNRESOLVED_AT_182391_18239F_1823AC",
     "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
     "ownership_effect": "NONE",
-    "continuation_scope": "RAW_BYTES_TARGET_BYTES_AND_REL32_CENSUS_ONLY",
-    "first_byte": "a9",
-    "first_16_bytes": "a9 ff ff 0f 00 75 f2 83 7c 24 08 00 75 eb dd d8",
-    "last_16_bytes": "c4 0c c3 8d 54 24 04 e8 18 65 00 00 52 9b d9 3c",
-    "referenced_target_bytes": {
-      "0x00182391": "a9 ff ff 0f 00 75 f2 83",
-      "0x0018239F": "dd d8 db 2d f0 60 73 00",
-      "0x001823AC": "83 3d 64 fa 85 00 00 0f"
-    },
-    "raw_inbound_rel32_candidate_count": 0,
-    "raw_outbound_rel32_candidate_count": 4,
-    "raw_outbound_rel32_candidates": [
-      "0x001823C4->0x00188877",
-      "0x001823D6->0x00188948",
-      "0x001823DB->0x001823ED",
-      "0x001823E8->0x00188905"
-    ]
+    "continuation_scope": "RAW_BYTES_TARGET_BYTES_AND_REL32_CENSUS_ONLY"
   },
   "review_lenses": {
     "architecture": "Analyzer/verifier/run-record only; no native DX11 renderer activation, game draw routing, transport, provider, selector, package or HD-source transport behavior changes.",
@@ -119,11 +118,11 @@
     "after": "PARTIAL_PLUS_182391_TO_1823F1_PROVENANCE_CAPTURED",
     "runtime_claim": false
   },
-  "blocker": "Fresh exact bytes from 0x182391 through 0x1823F0 are now durable and include bytes at 0x18239F and 0x1823AC. However, 0x182391/0x18239F/0x1823AC instruction-boundary/function identities, the four raw rel32 candidate semantics and all ScreenHud/world/render ownership remain unresolved until a separate exact decode.",
-  "next_action": "Exact-decode the 0x182391 capture using the newly captured target bytes and raw rel32 census while keeping function-entry and ScreenHud/world/render semantics unresolved until separately proven. Runtime remains UNTESTED.",
+  "blocker": "The exact 0x182391..0x1823F0 bytes and target-byte snapshots are now durable, but 0x182391/0x18239F/0x1823AC are not yet proven instruction boundaries or function entries. The four raw rel32 candidates are census-only. Exact decode, branch-target alignment, call semantics and all ScreenHud/world/render ownership remain unresolved.",
+  "next_action": "Exact-decode the captured 0x182391..0x1823F0 window before assigning instruction boundaries/function identities or any call/render/HUD ownership. Runtime remains UNTESTED.",
   "checkpoint": "C6_STATE",
   "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
-  "recorded_kst": "2026-10-01T14:19:57+09:00",
+  "recorded_kst": "2026-10-01T14:20:16+09:00",
   "runtime_claim": "NONE",
   "validation_runs": {
     "backend_conversion_gate": {
@@ -155,33 +154,18 @@
       "proof_status": "EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED",
       "proof_predecessor_status": "EXACT_182331_TO_182391_CONTROL_FLOW_PREFIX_PROVEN",
       "proof_predecessor_exact": true,
-      "proof_target_rva": "0x00182391",
+      "proof_target_section": ".text",
       "proof_probe_len": 96,
-      "proof_probe_end_rva": "0x001823F1",
-      "proof_probe_end_matches": true,
-      "proof_first_byte": "a9",
-      "proof_first_16_bytes": "a9 ff ff 0f 00 75 f2 83 7c 24 08 00 75 eb dd d8",
-      "proof_last_16_bytes": "c4 0c c3 8d 54 24 04 e8 18 65 00 00 52 9b d9 3c",
-      "proof_referenced_targets_in_window": true,
-      "proof_referenced_target_bytes": {
-        "0x00182391": "a9 ff ff 0f 00 75 f2 83",
-        "0x0018239F": "dd d8 db 2d f0 60 73 00",
-        "0x001823AC": "83 3d 64 fa 85 00 00 0f"
-      },
+      "proof_end_rva": "0x001823F1",
+      "proof_end_matches": true,
+      "proof_targets_in_window": true,
       "proof_raw_inbound_count": 0,
       "proof_raw_outbound_count": 4,
-      "proof_raw_outbound_candidates": [
-        "0x001823C4->0x00188877",
-        "0x001823D6->0x00188948",
-        "0x001823DB->0x001823ED",
-        "0x001823E8->0x00188905"
-      ],
       "proof_start_boundary_status": "UNRESOLVED_RAW_BYTES_ONLY",
       "proof_referenced_target_status": "BYTES_CAPTURED_BOUNDARIES_UNRESOLVED",
       "proof_function_entry_status": "UNRESOLVED_AT_182391_18239F_1823AC",
       "proof_semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
-      "proof_ownership_effect": "NONE",
-      "proof_scope": "RAW_BYTES_TARGET_BYTES_AND_REL32_CENSUS_ONLY"
+      "proof_ownership_effect": "NONE"
     },
     "openxr_vr_architecture": {
       "run_id": 36818717062,
@@ -225,7 +209,7 @@
   "production_change_ledger": {
     "issue": 14,
     "implementation_comment_id": 5925194101,
-    "validation_comment_id": 5925265471,
+    "validation_comment_id": 5925264472,
     "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
   }
 }
