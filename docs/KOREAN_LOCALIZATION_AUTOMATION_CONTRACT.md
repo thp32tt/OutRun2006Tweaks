@@ -359,3 +359,12 @@ Song-title and stage/course-name typography is family-locked.
 - If a label still cannot satisfy the safe bbox at the locked family size, return `REWORK_REQUIRED` and redesign the family/layout. Never silently reduce only that label's font size or rescale a flattened raster.
 - Producer evidence must record a stable `typography_family_id` and native `font_size_px` for each affected element. C QA must compare all members available in that family and reject non-uniform font sizes.
 - This does not relax zero-pixel containment, source-faithful effects, or any DDS/alpha/orientation rule.
+
+## Bounded chat reuse and GitHub transient retry policy (schema 32)
+- New TASK_ID does not imply a new ChatGPT conversation. A completed slot chat is reused for up to 4 tasks or 90 minutes.
+- A next task MUST NOT be sent while the previous task UI is still generating. After durable Git completion, allow up to 180 seconds for the UI to settle before treating that page as stale.
+- A fresh chat is created only for bounded recycle conditions: 4-task budget, 90-minute age, conversation-length limit, stale completed Retry surface, or bounded same-TASK recovery. One task may use at most 2 chat rollovers.
+- Localization sends are paced at least 30 seconds across distinct slots and 90 seconds on the same slot.
+- GitHub 5xx/network/timeout/403/429 conditions are transient transport state, not task failure. Retry internally at 2/5/10/20 seconds, then hold a 60-second GitHub-only cooldown and continue retrying on later queue cycles.
+- GitHub transient failures MUST NOT increment TASK attempt, open a new chat, consume a rollover, or move a task to BLOCKED. Existing queue/chat state stays authoritative until GitHub recovers.
+- Localization policy metadata is checked before any chat recycle; a temporary GitHub failure must preserve the current chat.
