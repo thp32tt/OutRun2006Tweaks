@@ -3,32 +3,46 @@
   "task_id": "CONVERSION-DX11-00268",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "base_sha": "5fec9408235642fc3a4fc2c9a4bd195b77a2f8e3",
-  "result_sha": "30dd0f796f9124114a2450451bad5f12fda59f48",
-  "validation_bearing_result_sha": "30dd0f796f9124114a2450451bad5f12fda59f48",
+  "result_sha": "576c02954fd8c6bdf4989be16e1054a8869c25a4",
+  "validation_bearing_result_sha": "576c02954fd8c6bdf4989be16e1054a8869c25a4",
   "source_commits": [
     "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
-    "30dd0f796f9124114a2450451bad5f12fda59f48"
+    "30dd0f796f9124114a2450451bad5f12fda59f48",
+    "0ba3f029822801c6c24e90ca776810581c8357b0",
+    "f8a29c8041186354ed8102c19d084fb20330aa11",
+    "9e5ea845bc009f5f587bd11b0ac87ccf3a9c9b8f",
+    "573c27b0c9a22eb5d0228412906d7092fa85e497",
+    "3d7aa0fd74fdddcaa4e4d6c03f3c1e50aa128ae4",
+    "576c02954fd8c6bdf4989be16e1054a8869c25a4"
   ],
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
-  "runtime_test_required": false,
+  "runtime_test_required": true,
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_DORMANT_ACTIVATION_SURFACE_COVERAGE",
-  "selection_reason": "Consumed CONVERSION-DX11-00266 exact-SHA automation results first. All four required 00266 gates succeeded. Remaining activation-proof review found verify_dx11_activation_boundary.py scanned only top-level src/vr/d3d11/*.cpp, leaving header-inline and future nested C/C++ surfaces outside the fail-closed Draw* boundary.",
-  "summary": "Hardened the dormant native DX11 activation boundary in two steps: recursive C/C++ source/header/inline scanning under src/vr/d3d11, then per-family enforcement that all four active D3D9 draw hooks feed observe_source_draw and remain wired. No native game draw routing or runtime rendering path was activated.",
+  "selected_work": "DX11_EXHAUSTIVE_CENSUS_READINESS",
+  "selection_reason": "After 30dd0f796f9124114a2450451bad5f12fda59f48 passed exact-SHA Backend Conversion Gate and Build, the remaining activation-readiness evidence gap was explicitly non-exhaustive source-draw coverage. Added an opt-in exhaustive diagnostic census without enabling native D3D11 Draw* routing.",
+  "summary": "Added OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1 as an opt-in source-draw census mode with stride=1/scheme=2, taught the analyzer and tests to record exhaustive coverage only when every observed source draw is analyzed, and reconciled fail-closed CI contracts. Default runtime behavior remains hashed-ordinal 1/64 sampling. Exhaustive census remains diagnostic-only: ActivationProof=false and NativeDrawPathActivationAllowed=false.",
   "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
     "tools/verify_dx11_activation_boundary.py",
+    "tools/verify_dx11_source_graph.py",
     "docs/automation/runs/CONVERSION-DX11-00268.json"
   ],
   "conversion_changed_paths": [
-    "tools/verify_dx11_activation_boundary.py"
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/verify_dx11_source_graph.py"
   ],
   "scope_guards": {
-    "runtime_source_changed": false,
+    "runtime_source_changed": true,
     "native_draw_path_activation_changed": false,
     "native_game_draw_routing": false,
     "d3d9_render_policy_changed": false,
@@ -37,36 +51,50 @@
     "vr_d3d9ex_focus_modified": false
   },
   "evidence": [
-    "Recovered vr-dx11-native-r71 HEAD 5fec9408235642fc3a4fc2c9a4bd195b77a2f8e3 via the connected GitHub connector.",
-    "CONVERSION-DX11-00268 run record was absent before work; the 404 was a missing path, not a connection failure.",
-    "Consumed 00266 exact-SHA 6fff554c96d7c6e58a2879173f8505455551ca7f validation: Backend Conversion Gate 36933012749 success, Build 36933017428 success, OpenXR VR architecture 36933017420 success, HUD Inspector 36933017514 success.",
-    "Pre-change guard used DX11.glob(\"*.cpp\"), so .hpp/.inl and nested future source directories were outside activation-boundary scanning.",
-    "Current seven native DX11 headers were checked and contained no Draw* dispatch before broadening the scan.",
-    "Commit cc73e01fd29dbd42da2f8a782d9598539bed1de3 recursively scans C/C++ source/header/inline suffixes and requires representative implementation/header members to remain in the scan set.",
-    "Issue #14 production change ledger appended from CHAT_DIRECT.",
-    "Second 00268 commit 30dd0f796f9124114a2450451bad5f12fda59f48 requires DrawPrimitiveDest, DrawIndexedPrimitiveDest, DrawPrimitiveUPDest and DrawIndexedPrimitiveUPDest each to contain the diagnostic census observer, and requires all four hook-wiring expressions to remain present.",
-    "The analyzer remains fail-closed with ExhaustiveDrawCoverage=false; structural hook coverage is not promoted to runtime activation proof."
+    "Recovered target branch and AGENTS.md through the connected GitHub connector; GitHub HEAD remained the SSOT and no N100 clone/worktree was used.",
+    "Original FAILURE_CONTEXT run 36940764751 was cancelled during Build Win32; all preceding DX11 validation steps were successful, so it was not treated as a source-test failure.",
+    "30dd0f796f9124114a2450451bad5f12fda59f48 passed Backend Conversion Gate 36941031399 and Build 36941036801.",
+    "0ba3f029822801c6c24e90ca776810581c8357b0 added explicit opt-in exhaustive source-draw census mode; default remains SampleStride=64 hashed-ordinal sampling.",
+    "f8a29c8041186354ed8102c19d084fb20330aa11 taught analyze_dx11_census.py to recognize scheme=2/stride=1/samples==drawsSeen as exhaustive diagnostic evidence while leaving activation authorization false.",
+    "9e5ea845bc009f5f587bd11b0ac87ccf3a9c9b8f added regression coverage for exhaustive analyzer evidence and preserved ActivationProof=false / NativeDrawPathActivationAllowed=false.",
+    "573c27b0c9a22eb5d0228412906d7092fa85e497 failed Backend Conversion Gate 36942263240 at Verify DX11 source graph because the verifier still required the retired literal fixed SampleStride mask.",
+    "3d7aa0fd74fdddcaa4e4d6c03f3c1e50aa128ae4 fixed the first source-graph drift but Gate 36942420315 exposed a second stale analyzer assertion requiring ExhaustiveDrawCoverage=false unconditionally.",
+    "576c02954fd8c6bdf4989be16e1054a8869c25a4 reconciled that analyzer contract. Backend Conversion Gate 36942534472 completed success, including source graph, activation boundary, analyzer regression, Win32 build and all DX11 semantic/object/transport probes.",
+    "Build workflow 36942540352 for 576c02954fd8c6bdf4989be16e1054a8869c25a4 completed success.",
+    "VR PC Fast Test Build 36942534443 was skipped by policy and was not used as validation."
   ],
   "related_finding_or_regression_keys": [
     "CONVERSION-DX11-00266",
     "DX11-DRAW-ACTIVATION-SURFACE-001",
-    "DX11-CENSUS-DRAW-FAMILY-COVERAGE-001"
+    "DX11-CENSUS-DRAW-FAMILY-COVERAGE-001",
+    "DX11-EXHAUSTIVE-CENSUS-READINESS-001",
+    "DX11-CENSUS-EXHAUSTIVE-GUARD-001"
   ],
   "validation": {
     "backend_conversion_gate": {
-      "run_id": 36941031399,
-      "head_sha": "30dd0f796f9124114a2450451bad5f12fda59f48",
-      "conclusion": "pending"
+      "run_id": 36942534472,
+      "head_sha": "576c02954fd8c6bdf4989be16e1054a8869c25a4",
+      "conclusion": "success"
     },
     "build": {
-      "run_id": 36941036801,
-      "head_sha": "30dd0f796f9124114a2450451bad5f12fda59f48",
-      "conclusion": "pending"
+      "run_id": 36942540352,
+      "head_sha": "576c02954fd8c6bdf4989be16e1054a8869c25a4",
+      "conclusion": "success"
+    },
+    "openxr_architecture": {
+      "run_id": 36942540190,
+      "head_sha": "576c02954fd8c6bdf4989be16e1054a8869c25a4",
+      "conclusion": "in_progress_at_c6"
+    },
+    "hud_inspector": {
+      "run_id": 36942540197,
+      "head_sha": "576c02954fd8c6bdf4989be16e1054a8869c25a4",
+      "conclusion": "in_progress_at_c6"
     }
   },
-  "blocker": "Exact-SHA automation for 30dd0f796f9124114a2450451bad5f12fda59f48 is pending. Native DX11 activation remains deliberately disabled and runtime/exhaustive draw coverage is not proven.",
-  "next_action": "Consume exact-SHA CI for 30dd0f796f9124114a2450451bad5f12fda59f48. If green, continue bounded review of activation proof/readiness without enabling native Draw* routing. Keep RUNTIME_VALIDATION=UNTESTED.",
-  "checkpoint": "C3_VALIDATION_PENDING",
-  "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+  "blocker": "Native DX11 Draw* routing remains deliberately disabled. Exhaustive source-draw coverage has not yet been collected from an exact-build game/HMD runtime session, and exhaustive census evidence alone is not native-rendering parity proof.",
+  "next_action": "In a later exact-build diagnostic runtime session, enable OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1, collect the census report, and require zero unsupported/pending translation evidence plus Quest 3/VDXR graphics parity before any separate native Draw* activation change is considered.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
   "runtime_claim": "NONE"
 }
