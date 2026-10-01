@@ -975,6 +975,36 @@ namespace OutRunVRStereo
                         reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR30),
                         DrawIndexedPrimitiveUPDestR31, disabled);
 
+                    bool fallbackEndArmed = false;
+                    bool fallbackBeginArmed = false;
+                    bool fallbackCreateArmed = false;
+                    const auto failInstall = [&](const char* reason) noexcept
+                    {
+                        OutRunVR::State::StateBlockTracker::SetEventConsumerReady(false);
+                        if (fallbackCreateArmed)
+                        {
+                            R31CreateStateBlockHook = {};
+                            fallbackCreateArmed = false;
+                        }
+                        if (fallbackBeginArmed)
+                        {
+                            R31BeginStateBlockHook = {};
+                            fallbackBeginArmed = false;
+                        }
+                        if (fallbackEndArmed)
+                        {
+                            R31EndStateBlockHook = {};
+                            fallbackEndArmed = false;
+                        }
+                        R31RollbackDrawHooks();
+                        OutRunVR::State::StateBlockEvents::Clear();
+                        OutRunVR::State::StateBlockRecovery::Clear();
+                        OutRunVR::State::StateBlockTracker::MarkCoverageLost();
+                        R31InstallState.store(State::Failed, std::memory_order_release);
+                        HookManager::ReportAsyncResult("OpenXRVRStereoR31Perf", false);
+                        spdlog::error("VR R31 STATE: install transaction failed: {}", reason);
+                    };
+
                     OutRunVR::State::StateBlockTracker::SetEventConsumerReady(false);
                     OutRunVR::State::StateBlockTracker::ResetCoverageLoss();
                     OutRunVR::State::StateBlockRecovery::Configure(
@@ -985,27 +1015,14 @@ namespace OutRunVRStereo
                         &R31OnStateBlockApply);
                     if (!OutRunVR::State::StateBlockEvents::Configured())
                     {
-                        OutRunVR::State::StateBlockEvents::Clear();
-                        R31RollbackDrawHooks();
-                        R31InstallState.store(State::Failed,
-                            std::memory_order_release);
-                        HookManager::ReportAsyncResult(
-                            "OpenXRVRStereoR31Perf", false);
+                        failInstall("StateBlock event callbacks unavailable");
                         return 0;
                     }
-
                     if (!R31EnableDrawHooks())
                     {
-                        R31RollbackDrawHooks();
-                        OutRunVR::State::StateBlockEvents::Clear();
-                        OutRunVR::State::StateBlockTracker::SetEventConsumerReady(false);
-                        R31InstallState.store(State::Failed,
-                            std::memory_order_release);
-                        HookManager::ReportAsyncResult(
-                            "OpenXRVRStereoR31Perf", false);
+                        failInstall("draw hooks unavailable");
                         return 0;
                     }
-                    OutRunVR::State::StateBlockTracker::SetEventConsumerReady(true);
 
                     if (OutRunVR::State::StateBlockTracker::LifecycleHooksReady())
                     {
@@ -1016,46 +1033,59 @@ namespace OutRunVRStereo
                     {
                         IDirect3DDevice9* const device =
                             StereoInstalledDevice.load(std::memory_order_acquire);
-                        if (device)
+                        if (!device)
                         {
-                            void** vtable = *reinterpret_cast<void***>(device);
-                            if (vtable)
-                            {
-                                R31CreateStateBlockHook = safetyhook::create_inline(
-                                    vtable[CreateStateBlockVtableIndex],
-                                    CreateStateBlockDestR31, disabled);
-                                R31BeginStateBlockHook = safetyhook::create_inline(
-                                    vtable[BeginStateBlockVtableIndex],
-                                    BeginStateBlockDestR31, disabled);
-                                R31EndStateBlockHook = safetyhook::create_inline(
-                                    vtable[EndStateBlockVtableIndex],
-                                    EndStateBlockDestR31, disabled);
-                                const bool stateHooks = R31CreateStateBlockHook &&
-                                    R31BeginStateBlockHook &&
-                                    R31EndStateBlockHook &&
-                                    // Fallback only: arm End before Begin so a
-                                    // render-thread race cannot strand recording.
-                                    R31EndStateBlockHook.enable().has_value() &&
-                                    R31BeginStateBlockHook.enable().has_value() &&
-                                    R31CreateStateBlockHook.enable().has_value();
-                                if (!stateHooks)
-                                {
-                                    OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                                    R31CreateStateBlockHook = {};
-                                    R31BeginStateBlockHook = {};
-                                    R31EndStateBlockHook = {};
-                                    spdlog::warn(
-                                        "VR R31 STATE: R22 lifecycle coverage unavailable and fallback StateBlock hooks failed; every fast-path candidate will live-validate");
-                                }
-                                else
-                                {
-                                    spdlog::info(
-                                        "VR R31 STATE: R22 lifecycle coverage unavailable; R31 fallback StateBlock hooks armed");
-                                }
-                            }
+                            failInstall("fallback StateBlock owner has no installed device");
+                            return 0;
                         }
+                        void** vtable = *reinterpret_cast<void***>(device);
+                        if (!vtable)
+                        {
+                            failInstall("fallback StateBlock owner has no device vtable");
+                            return 0;
+                        }
+
+                        R31CreateStateBlockHook = safetyhook::create_inline(
+                            vtable[CreateStateBlockVtableIndex],
+                            CreateStateBlockDestR31, disabled);
+                        R31BeginStateBlockHook = safetyhook::create_inline(
+                            vtable[BeginStateBlockVtableIndex],
+                            BeginStateBlockDestR31, disabled);
+                        R31EndStateBlockHook = safetyhook::create_inline(
+                            vtable[EndStateBlockVtableIndex],
+                            EndStateBlockDestR31, disabled);
+                        if (!R31CreateStateBlockHook ||
+                            !R31BeginStateBlockHook ||
+                            !R31EndStateBlockHook)
+                        {
+                            failInstall("fallback StateBlock hooks could not be created");
+                            return 0;
+                        }
+
+                        fallbackEndArmed = R31EndStateBlockHook.enable().has_value();
+                        if (!fallbackEndArmed)
+                        {
+                            failInstall("fallback EndStateBlock hook failed");
+                            return 0;
+                        }
+                        fallbackBeginArmed = R31BeginStateBlockHook.enable().has_value();
+                        if (!fallbackBeginArmed)
+                        {
+                            failInstall("fallback BeginStateBlock hook failed");
+                            return 0;
+                        }
+                        fallbackCreateArmed = R31CreateStateBlockHook.enable().has_value();
+                        if (!fallbackCreateArmed)
+                        {
+                            failInstall("fallback CreateStateBlock hook failed");
+                            return 0;
+                        }
+
+                        spdlog::info(
+                            "VR R31 STATE: R22 lifecycle coverage unavailable; R31 fallback StateBlock hooks armed");
                     }
 
+                    OutRunVR::State::StateBlockTracker::SetEventConsumerReady(true);
                     R31InstallState.store(State::Ready, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR31Perf", true);
                     spdlog::info(

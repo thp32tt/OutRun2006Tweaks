@@ -195,11 +195,25 @@ else:
 for marker in (
     "class StateBlockRecovery",
     "Configure(",
+    "Clear()",
     "FlushPendingResync(",
     "StateBlockTracker::ConsumeResync()",
 ):
     if marker not in state_block_recovery:
         errors.append(f"StateBlockRecovery missing API marker: {marker}")
+
+clear_recovery = re.search(
+    r"static void Clear\(\) noexcept\s*\{(?P<body>.*?)\n        \}",
+    state_block_recovery,
+    re.DOTALL,
+)
+if not clear_recovery:
+    errors.append("StateBlockRecovery Clear body missing")
+else:
+    clear_body = clear_recovery.group("body")
+    if "ResynchronizeShaderEpoch().store(nullptr" not in clear_body or \
+            "PrimeShadowState().store(nullptr" not in clear_body:
+        errors.append("StateBlockRecovery Clear must withdraw both providers")
 
 flush_match = re.search(
     r"static void FlushPendingResync\(IDirect3DDevice9\* device\) noexcept\s*\{(?P<body>.*?)\n        \}",
@@ -263,19 +277,50 @@ if install_start < 0 or install_end <= install_start:
     errors.append("R31 install transaction body missing")
 else:
     install_body = r31[install_start:install_end]
-    recovery_configure_pos = install_body.find(
-        "StateBlockRecovery::Configure(")
+    recovery_configure_pos = install_body.find("StateBlockRecovery::Configure(")
     configure_pos = install_body.find("StateBlockEvents::Configure(")
     enable_draw_pos = install_body.find("if (!R31EnableDrawHooks())")
-    consumer_ready_pos = install_body.find(
-        "StateBlockTracker::SetEventConsumerReady(true)")
+    lifecycle_owner_pos = install_body.find("StateBlockTracker::LifecycleHooksReady()")
+    fallback_end_pos = install_body.find("fallbackEndArmed = R31EndStateBlockHook.enable().has_value()")
+    fallback_begin_pos = install_body.find("fallbackBeginArmed = R31BeginStateBlockHook.enable().has_value()")
+    fallback_create_pos = install_body.find("fallbackCreateArmed = R31CreateStateBlockHook.enable().has_value()")
+    consumer_ready_pos = install_body.find("StateBlockTracker::SetEventConsumerReady(true)")
+    ready_pos = install_body.find("R31InstallState.store(State::Ready", consumer_ready_pos)
     if min(recovery_configure_pos, configure_pos, enable_draw_pos,
-            consumer_ready_pos) < 0 or not (
+            lifecycle_owner_pos, fallback_end_pos, fallback_begin_pos,
+            fallback_create_pos, consumer_ready_pos, ready_pos) < 0 or not (
             recovery_configure_pos < configure_pos < enable_draw_pos <
-            consumer_ready_pos):
+            lifecycle_owner_pos < fallback_end_pos < fallback_begin_pos <
+            fallback_create_pos < consumer_ready_pos < ready_pos):
         errors.append(
-            "R31 must configure StateBlock recovery before event publication, "
-            "enable draw hooks next, and publish consumer readiness last")
+            "R31 must establish physical StateBlock ownership before publishing readiness")
+
+    if "R31EndStateBlockHook.enable().has_value() &&" in install_body or \
+            "R31BeginStateBlockHook.enable().has_value() &&" in install_body:
+        errors.append("R31 fallback hooks regained short-circuit partial-install enable")
+
+    fail_start = install_body.find("const auto failInstall =")
+    fail_end = install_body.find(
+        "                    };\n\n                    OutRunVR::State::StateBlockTracker::SetEventConsumerReady(false)",
+        fail_start)
+    if fail_start < 0 or fail_end <= fail_start:
+        errors.append("R31 install rollback boundary missing")
+    else:
+        fail_body = install_body[fail_start:fail_end]
+        order = [
+            fail_body.find("StateBlockTracker::SetEventConsumerReady(false)"),
+            fail_body.find("R31CreateStateBlockHook = {}"),
+            fail_body.find("R31BeginStateBlockHook = {}"),
+            fail_body.find("R31EndStateBlockHook = {}"),
+            fail_body.find("StateBlockEvents::Clear()"),
+            fail_body.find("StateBlockRecovery::Clear()"),
+            fail_body.find("StateBlockTracker::MarkCoverageLost()"),
+            fail_body.find("R31InstallState.store(State::Failed"),
+        ]
+        if min(order) < 0 or order != sorted(order):
+            errors.append(
+                "R31 rollback must withdraw readiness, fallback hooks in reverse "
+                "order, event/recovery callbacks, then fail closed")
 if "StateBlockEvents::Clear()" not in r31:
     errors.append("R31 draw-hook failure path missing StateBlock event rollback")
 

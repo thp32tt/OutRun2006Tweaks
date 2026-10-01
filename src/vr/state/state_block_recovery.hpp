@@ -25,6 +25,12 @@ namespace OutRunVR::State
                 primeShadowState, std::memory_order_release);
         }
 
+        static void Clear() noexcept
+        {
+            ResynchronizeShaderEpoch().store(nullptr, std::memory_order_release);
+            PrimeShadowState().store(nullptr, std::memory_order_release);
+        }
+
         static void FlushPendingResync(IDirect3DDevice9* device) noexcept
         {
             if (!device)
