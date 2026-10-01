@@ -70,9 +70,13 @@
   "validation_mode": "C_BATCH_GATE",
   "schema": "outrun-a00351-p00221-producer-result-v1",
   "commit_mode": "GITHUB_ACTIONS_ATOMIC_LANE_LOCAL_V20_CANDIDATE_REVIEW_REPORT_AND_DURABLE_TASK_RECORD",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
+  "authoritative_result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
   "validation_bearing_result_sha": null,
   "retry_required": false,
-  "result_commit_message": "localization(A): normalize index222 song-title family [AUTO:LOCALIZATION-LOCALIZATION_A-00351]"
+  "result_commit_message": "localization(A): normalize index222 song-title family [AUTO:LOCALIZATION-LOCALIZATION_A-00351]",
+  "bookkeeping_note": "Durable producer result 7abc6bf2ccf534d25909aff466feb7ce5c4160ac recorded after rollover recovery. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. No candidate bytes or shared state are changed by this bookkeeping commit.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T14:36:00+09:00",
+  "bookkeeping_base_head_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
+  "bookkeeping_chat_rollover_observed": 5
 }
