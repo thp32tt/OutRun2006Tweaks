@@ -1112,6 +1112,18 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_OVERLAP_BYTES = (
     GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_10_INCOMPLETE_BYTES
 )
 
+# R263/F13: extend exact-EXE provenance from the R261-proven exact capture
+# boundary at 0x182569. Unlike R225, the predecessor decode ends exactly on an
+# instruction boundary, so this fresh 64-byte .text window starts contiguously
+# at 0x182569 without overlapping an incomplete instruction. This collector is
+# raw provenance only and does not promote function/callee/render/HUD semantics.
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_RVA = 0x00182569
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PROBE_LEN = 64
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PROBE_END_RVA = 0x001825A9
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PRIOR_CAPTURE_END_RVA = (
+    GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_11_PROBE_END_RVA
+)
+
 
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS = (
     (0x000283DE, "b9 00 00 80 3f", "mov ecx, 0x3f800000"),
@@ -7030,6 +7042,92 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_11_provenance
     }
 
 
+def collect_guarded_gf_target_c_helper_1_third_callee_continuation_12_provenance(pe: PE) -> dict:
+    """Capture fresh exact bytes from 0x182569 through exclusive end 0x1825A9.
+
+    R261 proved that the predecessor decode ends exactly at 0x182569 with no
+    partial instruction bytes consumed. This collector therefore requires exact
+    predecessor provenance and contiguous start/end identity, then records only
+    raw bytes and rel32 candidate census. It does not assign function, callee,
+    render or HUD semantics.
+    """
+
+    predecessor = collect_guarded_gf_target_c_helper_1_third_callee_continuation_11_provenance(pe)
+    target_rva = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    probe = pe.bytes_at_rva(
+        target_rva, GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PROBE_LEN
+    )
+    inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
+    outbound = collect_raw_rel32_call_candidates(
+        pe,
+        target_rva,
+        GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PROBE_LEN,
+    )
+    starts_at_prior_capture_end = (
+        target_rva
+        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PRIOR_CAPTURE_END_RVA
+    )
+    predecessor_exact = (
+        predecessor["status"] == "EXACT_EXE_182529_TO_182569_PROVENANCE_CAPTURED"
+        and predecessor["probe_end_rva"]
+        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PRIOR_CAPTURE_END_RVA
+        and starts_at_prior_capture_end
+    )
+    probe_end_matches = (
+        target_rva + len(probe)
+        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PROBE_END_RVA
+    )
+    extends_prior_capture = (
+        starts_at_prior_capture_end
+        and GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PROBE_END_RVA
+        > GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PRIOR_CAPTURE_END_RVA
+    )
+    captured = bool(
+        predecessor_exact
+        and target_section == ".text"
+        and len(probe) == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PROBE_LEN
+        and probe_end_matches
+        and extends_prior_capture
+    )
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "predecessor_status": predecessor["status"],
+        "predecessor_exact": predecessor_exact,
+        "probe_len": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PROBE_LEN,
+        "probe_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PROBE_END_RVA,
+        "probe_end_matches": probe_end_matches,
+        "prior_capture_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_12_PRIOR_CAPTURE_END_RVA,
+        "starts_at_prior_capture_end": starts_at_prior_capture_end,
+        "extends_prior_capture": extends_prior_capture,
+        "first_16_bytes": probe[:16].hex(" "),
+        "last_16_bytes": probe[-16:].hex(" "),
+        "bytes": probe.hex(" "),
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "status": (
+            "EXACT_EXE_182569_TO_1825A9_PROVENANCE_CAPTURED"
+            if captured
+            else "CALLEE_182569_CONTINUATION_PROVENANCE_CAPTURE_FAILED"
+        ),
+        "continuity_status": (
+            "EXACT_182569_CONTIGUOUS_BOUNDARY_PROVEN"
+            if starts_at_prior_capture_end
+            else "182569_CONTIGUITY_MISMATCH"
+        ),
+        "start_boundary_status": "R261_EXACT_CAPTURE_END_INSTRUCTION_BOUNDARY",
+        "function_entry_status": "UNRESOLVED_AT_182569_AND_FORWARD_BYTES",
+        "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+        "call_semantics": "UNRESOLVED",
+        "ownership_effect": "NONE",
+        "continuation_scope": "RAW_BYTES_CONTIGUITY_AND_REL32_CENSUS_ONLY",
+    }
+
+
 def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
     """Record exact-EXE context around guarded GF speech/heart hook RVAs.
 
@@ -7454,6 +7552,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_third_callee_continuation_10_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_10_provenance(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_10_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_10_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_11_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_11_provenance(pe),
+        "guarded_gf_target_c_helper_1_third_callee_continuation_12_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_12_provenance(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -9001,6 +9100,42 @@ def main() -> int:
         f"bytes={helper_1_third_cont_11['bytes']}"
     )
 
+    helper_1_third_cont_12 = report[
+        "guarded_gf_target_c_helper_1_third_callee_continuation_12_provenance"
+    ]
+    helper_1_third_cont_12_outbound = ",".join(
+        f"0x{item['call_rva']:08X}->0x{item['target_rva']:08X}:"
+        f"{item['known_target'] or 'unknown'}:{item['target_section']}"
+        for item in helper_1_third_cont_12["raw_outbound_rel32_candidates"]
+    ) or "none"
+    print(
+        f"gf_target_c_helper_1_third_callee_continuation_12="
+        f"0x{helper_1_third_cont_12['target_rva']:08X} "
+        f"status={helper_1_third_cont_12['status']} "
+        f"predecessor={helper_1_third_cont_12['predecessor_status']} "
+        f"predecessor_exact={helper_1_third_cont_12['predecessor_exact']} "
+        f"section={helper_1_third_cont_12['target_section'] or 'none'} "
+        f"probe_len={helper_1_third_cont_12['probe_len']} "
+        f"probe_end=0x{helper_1_third_cont_12['probe_end_rva']:08X} "
+        f"probe_end_match={helper_1_third_cont_12['probe_end_matches']} "
+        f"prior_capture_end=0x{helper_1_third_cont_12['prior_capture_end_rva']:08X} "
+        f"starts_at_prior_capture_end={helper_1_third_cont_12['starts_at_prior_capture_end']} "
+        f"extends_prior_capture={helper_1_third_cont_12['extends_prior_capture']} "
+        f"continuity_status={helper_1_third_cont_12['continuity_status']} "
+        f"first16={helper_1_third_cont_12['first_16_bytes']} "
+        f"last16={helper_1_third_cont_12['last_16_bytes']} "
+        f"inbound_raw={len(helper_1_third_cont_12['raw_inbound_rel32_candidates'])} "
+        f"outbound_raw={len(helper_1_third_cont_12['raw_outbound_rel32_candidates'])} "
+        f"outbound={helper_1_third_cont_12_outbound} "
+        f"start_boundary={helper_1_third_cont_12['start_boundary_status']} "
+        f"function_entry={helper_1_third_cont_12['function_entry_status']} "
+        f"semantic_effect={helper_1_third_cont_12['semantic_effect']} "
+        f"call_semantics={helper_1_third_cont_12['call_semantics']} "
+        f"ownership_effect={helper_1_third_cont_12['ownership_effect']} "
+        f"scope={helper_1_third_cont_12['continuation_scope']} "
+        f"bytes={helper_1_third_cont_12['bytes']}"
+    )
+
     helper_1_third_cont_7_proof = report[
         "guarded_gf_target_c_helper_1_third_callee_continuation_7_prefix_proof"
     ]
@@ -9207,6 +9342,9 @@ def main() -> int:
     if helper_1_third_cont_11["status"] != "EXACT_EXE_182529_TO_182569_PROVENANCE_CAPTURED":
         print("guarded_gf_target_c_helper_1_third_callee_continuation_11_provenance=FAILED")
         return 48
+    if helper_1_third_cont_12["status"] != "EXACT_EXE_182569_TO_1825A9_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_c_helper_1_third_callee_continuation_12_provenance=FAILED")
+        return 49
     return 0
 
 
