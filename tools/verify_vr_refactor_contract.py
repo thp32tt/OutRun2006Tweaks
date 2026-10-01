@@ -134,6 +134,39 @@ public_state_begin = r29.rfind("StereoBaseInstallState() noexcept")
 if public_state_begin < 0 or "return ReadStereoBaseInstallState();" not in r29[public_state_begin:]:
     errors.append("R29 public install-state facade bypassed read boundary")
 
+r29_transaction_begin = r29.find("bool R29InstallHookTransaction() noexcept")
+r29_transaction_end = r29.find("void R29PublishInstallResult(", r29_transaction_begin)
+if r29_transaction_begin < 0 or r29_transaction_end <= r29_transaction_begin:
+    errors.append("R29 disabled-first hook transaction boundary missing")
+else:
+    transaction = r29[r29_transaction_begin:r29_transaction_end]
+    markers = [
+        "R29DrawPrimitiveR27Hook = safetyhook::create_inline(",
+        "R29DrawIndexedPrimitiveR27Hook = safetyhook::create_inline(",
+        "R29DrawPrimitiveUPR27Hook = safetyhook::create_inline(",
+        "R29DrawIndexedPrimitiveUPR27Hook = safetyhook::create_inline(",
+        "R29SetRenderStateR22Hook = safetyhook::create_inline(",
+    ]
+    positions = [transaction.find(marker) for marker in markers]
+    if min(positions) < 0 or positions != sorted(positions):
+        errors.append("R29 hook transaction changed disabled-first creation order")
+    enable_pos = transaction.find("if (R29EnableStereoHooks())")
+    rollback_pos = transaction.find("R29RollbackStereoHooks()", enable_pos)
+    if enable_pos < 0 or rollback_pos <= enable_pos:
+        errors.append("R29 hook transaction lost enable-then-rollback behavior")
+r29_install = r29[r29.find("DWORD WINAPI R29StereoInstallThread("):]
+if "if (!R29InstallHookTransaction())" not in r29_install:
+    errors.append("R29 install thread bypassed hook transaction boundary")
+for marker in (
+    "R29DrawPrimitiveR27Hook = safetyhook::create_inline(",
+    "R29DrawIndexedPrimitiveR27Hook = safetyhook::create_inline(",
+    "R29DrawPrimitiveUPR27Hook = safetyhook::create_inline(",
+    "R29DrawIndexedPrimitiveUPR27Hook = safetyhook::create_inline(",
+    "R29SetRenderStateR22Hook = safetyhook::create_inline(",
+):
+    if marker in r29_install:
+        errors.append(f"R29 install thread regained hook creation ownership: {marker}")
+
 if r29.count('HookManager::ReportAsyncResult("OpenXRVRStereoR29", success)') != 1:
     errors.append("R29 async install-result reporting is no longer centralized")
 r29_install_begin = r29.find("DWORD WINAPI R29StereoInstallThread(")

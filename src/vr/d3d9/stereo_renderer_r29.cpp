@@ -497,6 +497,32 @@ namespace OutRunVRStereo
             return true;
         }
 
+        bool R29InstallHookTransaction() noexcept
+        {
+            const auto disabled = safetyhook::InlineHook::StartDisabled;
+            R29DrawPrimitiveR27Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawPrimitiveDestR27Effect),
+                DrawPrimitiveDestR29, disabled);
+            R29DrawIndexedPrimitiveR27Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR27Effect),
+                DrawIndexedPrimitiveDestR29, disabled);
+            R29DrawPrimitiveUPR27Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawPrimitiveUPDestR27Effect),
+                DrawPrimitiveUPDestR29, disabled);
+            R29DrawIndexedPrimitiveUPR27Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR27Effect),
+                DrawIndexedPrimitiveUPDestR29, disabled);
+            R29SetRenderStateR22Hook = safetyhook::create_inline(
+                reinterpret_cast<void*>(&SetRenderStateDestR22),
+                SetRenderStateDestR29, disabled);
+
+            if (R29EnableStereoHooks())
+                return true;
+
+            R29RollbackStereoHooks();
+            return false;
+        }
+
         void R29PublishInstallResult(
             OutRunVR::RuntimeEligibility::InstallState state,
             bool success) noexcept
@@ -548,26 +574,8 @@ namespace OutRunVRStereo
 
                 if (prerequisite == R29PrerequisiteDecision::Install)
                 {
-                    const auto disabled = safetyhook::InlineHook::StartDisabled;
-                    R29DrawPrimitiveR27Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveDestR27Effect),
-                        DrawPrimitiveDestR29, disabled);
-                    R29DrawIndexedPrimitiveR27Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveDestR27Effect),
-                        DrawIndexedPrimitiveDestR29, disabled);
-                    R29DrawPrimitiveUPR27Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawPrimitiveUPDestR27Effect),
-                        DrawPrimitiveUPDestR29, disabled);
-                    R29DrawIndexedPrimitiveUPR27Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&DrawIndexedPrimitiveUPDestR27Effect),
-                        DrawIndexedPrimitiveUPDestR29, disabled);
-                    R29SetRenderStateR22Hook = safetyhook::create_inline(
-                        reinterpret_cast<void*>(&SetRenderStateDestR22),
-                        SetRenderStateDestR29, disabled);
-
-                    if (!R29EnableStereoHooks())
+                    if (!R29InstallHookTransaction())
                     {
-                        R29RollbackStereoHooks();
                         R29PublishInstallResult(State::Failed, false);
                         spdlog::error(
                             "VR R29 STEREO: disabled-first transaction failed; R26/R28 remains active");
