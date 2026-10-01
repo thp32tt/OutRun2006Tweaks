@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 699,
+  "cycle": 729,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -107,11 +107,13 @@
     "R84-REF-LIFECYCLE-0031",
     "R84-REF-HOOKSET-0004",
     "R84-REF-LIFECYCLE-0032",
-    "R84-REF-LIFECYCLE-0033"
+    "R84-REF-LIFECYCLE-0033",
+    "R84-REF-STATE-0017",
+    "R84-REF-LIFECYCLE-0034"
   ],
-  "next": "Cycles 700-702: inspect R30 public lower-draw/TryXyzrhw facade ownership against internal R30 hook dispatch; preserve exact lower-hook targets, XYZRHW fallback semantics and R26+R30 Golden Behavior Contract; APPLY_GATE at 702.",
-  "updatedKst": "2026-10-02T06:24:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_699_CHECKPOINT",
+  "next": "Cycles 730-732: inspect R32 prerequisite/install publication ownership and timing literals; preserve protected R26 world + R30 HUD/XYZRHW/SkyGlow graph; APPLY_GATE at 732.",
+  "updatedKst": "2026-10-02T07:11:00+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_729_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -154,6 +156,17 @@
     "Cycles 689-691: inspected R30ExecuteXyzrhwStereo, R30TryXyzrhwPrimitiveUP and R30TryXyzrhwIndexedPrimitiveUP. Execution owns left/right depth/stencil accounting and failure fallback while UP wrappers own input extraction; current separation is appropriate. APPLY_GATE 691 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
     "Cycles 692-694: inspected R30TryXyzrhwPrimitiveVB, R30TryXyzrhwIndexedPrimitiveVB and R30BuildScreenSpaceEyeConstants. VB/IB shadow transport and screen-space constants are independent; merging would cross transport/render contracts. APPLY_GATE 694 SOURCE_CHANGED=NO/NO_SAFE_CHANGE.",
     "Cycles 695-696: inspected R30TryScreenSpaceFovDraw and R30GuardScreenSpace. Guard remains a thin boundary over the behavior-heavy FOV stereo path; no source change counted before next APPLY_GATE 699. Runtime validation remains UNTESTED.",
-    "Cycles 697-699 (R84-REF-LIFECYCLE-0033): re-reviewed R30 GuardScreenSpace/lower-draw facade, install success publication and existing failure/startup ownership. Buffer-shadow/XYZRHW/SkyGlow physical paths remain NO_SAFE_CHANGE without build/HMD evidence. Isolated the behavior-neutral R30 successful terminal Ready publication behind R30CompleteSuccessfulInstall, symmetric with existing failure/startup boundaries. APPLY_GATE 699 SOURCE_CHANGED=YES; source commit 5b8f5edc16f3269ea13618e6a1e63ded5c502c02 [skip ci]. Verifier requires exactly one delegated successful terminal route and exactly one Ready=true publication in the helper. Runtime validation UNTESTED; no build/Actions started."
+    "Cycles 697-699 (R84-REF-LIFECYCLE-0033): re-reviewed R30 GuardScreenSpace/lower-draw facade, install success publication and existing failure/startup ownership. Buffer-shadow/XYZRHW/SkyGlow physical paths remain NO_SAFE_CHANGE without build/HMD evidence. Isolated the behavior-neutral R30 successful terminal Ready publication behind R30CompleteSuccessfulInstall, symmetric with existing failure/startup boundaries. APPLY_GATE 699 SOURCE_CHANGED=YES; source commit 5b8f5edc16f3269ea13618e6a1e63ded5c502c02 [skip ci]. Verifier requires exactly one delegated successful terminal route and exactly one Ready=true publication in the helper. Runtime validation UNTESTED; no build/Actions started.",
+    "Cycles 700-702 R84-REF-STATE-0017: R30 facade/R33 consumer review found recursive ReadFinalDispatchInstallState. Fixed helper to own sole acquire-load and public facade to delegate. APPLY_GATE 702 SOURCE_CHANGED=YES commit dfa4317eecdfec94e0d88448d4781a2fd7872204 [skip ci]; verifier guards recursion/direct-load regression; runtime UNTESTED.",
+    "Cycles 703-705 R84-REF-LIFECYCLE-0034: R31 prerequisite Failed/Ready/Wait classification and exact 4800-attempt/25ms policy isolated behind named boundary. APPLY_GATE 705 SOURCE_CHANGED=YES commit 2c5f236e9d56ed5eb39201247463bd38f7468792 [skip ci]; hook/stateblock/publication order unchanged; runtime UNTESTED.",
+    "Cycles 706-708: R31 Create/Begin/End/Apply StateBlock coverage and reliability reviewed. APPLY_GATE 708 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; recording balance and fail-closed cache invalidation are runtime-coupled.",
+    "Cycles 709-711: R32 dispatch/right-pass restore reviewed. APPLY_GATE 711 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; RT/depth/viewport/WVP restore order is Golden-contract-sensitive.",
+    "Cycles 712-714: R32 rollback/enable/install hook lifetime reviewed. APPLY_GATE 714 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; seven-hook transaction spans reset/transport/present/draw ownership.",
+    "Cycles 715-717: R33 dispatch fail-closed routing reviewed. APPLY_GATE 717 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; StateBlock resync, classification, cache discard and lower fallback order are behavior-visible.",
+    "Cycles 718-720: R33 hook transaction/rollback/enable/disabled creation reviewed. APPLY_GATE 720 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; ownership already centralized.",
+    "Cycles 721-723: R34 Reset/Present replay fail-close lifecycle reviewed. APPLY_GATE 723 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; device-loss/raw-Present/recovery ordering is critical.",
+    "Cycles 724-726: R34 raster guard and forced reset fail-close reviewed. APPLY_GATE 726 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; semantic consumption, resync and replay scope must stay at final draw boundary.",
+    "Cycles 727-729: R30 buffer-shadow rollback, SkyGlow Present/Reset and XYZRHW->screen-space->R29 routes rechecked. APPLY_GATE 729 SOURCE_CHANGED=NO/NO_SAFE_CHANGE; physical hook/state restore refactor still needs executable/HMD evidence.",
+    "STATIC_VALIDATION=connector source re-read/contract inspection; verifier source updated but not executed. No build/Actions started. RUNTIME_VALIDATION=UNTESTED."
   ]
 }
