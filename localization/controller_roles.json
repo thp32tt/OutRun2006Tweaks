@@ -202,7 +202,11 @@
       "chat_rate_limit_blocks_sends_not_git_reconcile": true,
       "negative_task_commit_lookup_not_cached": true,
       "task_commit_branch_scan_pages": 3,
-      "actions_discovery_per_page": 100
+      "actions_discovery_per_page": 100,
+      "lane_exception_isolation": true,
+      "lane_exception_block_threshold": 3,
+      "dispatch_exception_backoff_max_seconds": 300,
+      "browser_transport_failure_global_restart": true
     },
     "state_persistence": {
       "atomic_primary_writes": true,
@@ -266,7 +270,7 @@
     ],
     "active_state_source_of_truth": "active_by_lane",
     "queue_active_semantics": "derived_summary_with_independent_qa",
-    "queue_active_null_allowed_only_when_active_by_lane_empty": true,
+    "queue_active_null_allowed_only_when_active_by_lane_empty": false,
     "active_lane_phases": [
       "DISPATCHING",
       "WAIT_RESPONSE",
@@ -278,7 +282,9 @@
     "dispatch_fairness": "FILL_READY_C_OR_MISSING_PRODUCER_BEFORE_ACTIVE_RETRY_TRAFFIC",
     "heartbeat_fatal_after_seconds": 180,
     "runtime_asset_validation": "FAIL_FAST_BEFORE_BROWSER_DISPATCH",
-    "health_endpoint": "/healthz"
+    "health_endpoint": "/healthz",
+    "queue_active_null_allowed_in_parallel_mode": true,
+    "queue_active_legacy_field_must_not_gate_parallel_lanes": true
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
