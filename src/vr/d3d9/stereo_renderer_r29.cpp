@@ -36,6 +36,18 @@ namespace OutRunVRStereo
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R29StereoInstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
 
+        void SetStereoBaseInstallState(
+            OutRunVR::RuntimeEligibility::InstallState state) noexcept
+        {
+            R29StereoInstallState.store(state, std::memory_order_release);
+        }
+
+        OutRunVR::RuntimeEligibility::InstallState
+        ReadStereoBaseInstallState() noexcept
+        {
+            return ReadStereoBaseInstallState();
+        }
+
         struct R29EffectState
         {
             DWORD alphaBlend = FALSE;
@@ -488,7 +500,7 @@ namespace OutRunVRStereo
         DWORD WINAPI R29StereoInstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
-            R29StereoInstallState.store(State::Pending, std::memory_order_release);
+            SetStereoBaseInstallState(State::Pending);
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
@@ -496,8 +508,7 @@ namespace OutRunVRStereo
                 const auto rendererR29 = OutRunVRRenderer::RendererInstallState();
                 if (r26 == State::Failed || rendererR29 == State::Failed)
                 {
-                    R29StereoInstallState.store(State::Failed,
-                        std::memory_order_release);
+                    SetStereoBaseInstallState(State::Failed);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR29", false);
                     spdlog::error(
                         "VR R29 STEREO: R26 or renderer-R29 prerequisite failed; R26/R28 remains active");
@@ -526,8 +537,7 @@ namespace OutRunVRStereo
                     if (!R29EnableStereoHooks())
                     {
                         R29RollbackStereoHooks();
-                        R29StereoInstallState.store(State::Failed,
-                            std::memory_order_release);
+                        SetStereoBaseInstallState(State::Failed);
                         HookManager::ReportAsyncResult("OpenXRVRStereoR29", false);
                         spdlog::error(
                             "VR R29 STEREO: disabled-first transaction failed; R26/R28 remains active");
@@ -540,8 +550,7 @@ namespace OutRunVRStereo
                     // and clears private right depth/stencil before this opens.
                     R29ArmMonoSafety(2);
                     OutRunVRRenderer::InvalidateRawWvpGeneration();
-                    R29StereoInstallState.store(State::Ready,
-                        std::memory_order_release);
+                    SetStereoBaseInstallState(State::Ready);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR29", true);
                     spdlog::info(
                         "VR R29 STEREO: conservative effect classification + cached render state + steady-state two-eye path ACTIVE");
@@ -550,7 +559,7 @@ namespace OutRunVRStereo
                 Sleep(25);
             }
 
-            R29StereoInstallState.store(State::Failed, std::memory_order_release);
+            SetStereoBaseInstallState(State::Failed);
             HookManager::ReportAsyncResult("OpenXRVRStereoR29", false);
             spdlog::error(
                 "VR R29 STEREO: timed out waiting for R26/renderer-R29; R26/R28 remains active");
@@ -568,14 +577,12 @@ namespace OutRunVRStereo
             bool apply() override
             {
                 using State = OutRunVR::RuntimeEligibility::InstallState;
-                R29StereoInstallState.store(State::Pending,
-                    std::memory_order_release);
+                SetStereoBaseInstallState(State::Pending);
                 HANDLE thread = CreateThread(nullptr, 0,
                     R29StereoInstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
-                    R29StereoInstallState.store(State::Failed,
-                        std::memory_order_release);
+                    SetStereoBaseInstallState(State::Failed);
                     return false;
                 }
                 CloseHandle(thread);
