@@ -418,6 +418,11 @@ namespace OutRunVRRenderer
         R29InvalidateRendererStateAfterExternalRestore();
     }
 
+    void InvalidateRawWvpGeneration() noexcept
+    {
+        R29InvalidateRawWvpGeneration();
+    }
+
     OutRunVR::RuntimeEligibility::InstallState R29RendererState() noexcept
     {
         return R29RendererInstallState.load(std::memory_order_acquire);

@@ -23,11 +23,6 @@
 #include "../lifecycle/correction_overlay_state.hpp"
 #include "../game/renderer_recovery.hpp"
 #include "vr/game/render_semantics.hpp"\n
-namespace OutRunVRRenderer
-{
-    void R29InvalidateRawWvpGeneration() noexcept;
-}
-
 namespace OutRunVRStereo
 {
     namespace
@@ -544,7 +539,7 @@ namespace OutRunVRStereo
                     // baseline copies the current backbuffer into RightEyeSurface
                     // and clears private right depth/stencil before this opens.
                     R29ArmMonoSafety(2);
-                    OutRunVRRenderer::R29InvalidateRawWvpGeneration();
+                    OutRunVRRenderer::InvalidateRawWvpGeneration();
                     R29StereoInstallState.store(State::Ready,
                         std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR29", true);
