@@ -404,6 +404,11 @@ for marker in (
 if "attempt < 4800" in r33 or "Sleep(25)" in r33:
     errors.append("R33 prerequisite timing literal escaped wait-policy boundary")
 
+if "void R32CreateDisabledHooks() noexcept" not in r32:
+    errors.append("R32 disabled-first hook creation boundary missing")
+if "R32CreateDisabledHooks();" not in r32:
+    errors.append("R32 install thread bypassed disabled hook creation boundary")
+
 if "void R32PublishInstallState(" not in r32:
     errors.append("R32 install-state publication boundary missing")
 if r32.count("R32InstallState.store(") != 1:
