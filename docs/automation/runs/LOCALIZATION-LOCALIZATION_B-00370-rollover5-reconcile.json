@@ -1,0 +1,64 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-b00370-rollover5-existing-durable-result-reconcile-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00370",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "recorded_at_kst": "2026-10-01T17:54:05+09:00",
+  "controller_schema_version": 30,
+  "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "canonical_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+  "base_head_sha": "d320daea33e974173c8c85db924aed42a1b77498",
+  "result": "ROLLOVER_RECONCILED_EXISTING_DURABLE_RESULT_NO_REEXECUTION",
+  "summary": "Rollover5 refreshed current GitHub HEAD and authoritative schema30 policy, then verified that B00370 had already completed durably before this conversation could repeat producer work. Producer result 25e854c140aedd2920878c2433895b55b6dd1c9b contains the required exact [AUTO:LOCALIZATION-LOCALIZATION_B-00370] token and the index94 protected-inline split evidence, and bookkeeping has already bound the immutable RESULT_SHA. Contract next_task_after=OWN_DURABLE_COMMIT therefore forbids repeating the producer work. No DDS, shared state, peer-lane state, runtime claim, source probe, N100/local clone, or VR/FFB/DX work is repeated.",
+  "authoritative_result": {
+    "result_sha": "25e854c140aedd2920878c2433895b55b6dd1c9b",
+    "result_commit_message": "localization(B): resolve index94 protected mask split [AUTO:LOCALIZATION-LOCALIZATION_B-00370]",
+    "bookkeeping_commit_sha": "312c79345293f9c2bf7598be83f41fc200169543",
+    "task_record_path": "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00370.json",
+    "task_record_blob_sha": "763faa0356bb71bfd48dde8873e8b2da8be56da1",
+    "material_report": "localization/graphics/role_B/20261001-B00370-P00238/B00370_P00238_INDEX94_COURSE_SP_PROTECTED_SPLIT.json",
+    "selected_index": 94,
+    "asset": "2DA43E41",
+    "readiness_after": "PREFLIGHT_ONLY__7_OF_7_REMOVAL_MASKS_PIXEL_RESOLVED__CLEAN_PLATE_AND_SOURCE_STYLE_MEASUREMENT_REMAIN",
+    "candidate_dds_modified": false,
+    "automation_validation": "PENDING",
+    "validation_mode": "C_BATCH_GATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "policy_recheck": {
+    "producer_lane_mode": "continuous_production+self_qa",
+    "modulo_3_owner": 1,
+    "next_task_after": "OWN_DURABLE_COMMIT",
+    "automation_validation": "PENDING_UNTIL_C_BATCH_GATE",
+    "candidate_completion_first": true,
+    "duplicate_execution_allowed": false
+  },
+  "latest_c_seen": {
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00368",
+    "wave_id": "Q00075",
+    "result_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
+    "automation_validation": "PASS",
+    "consumed_b00370": false,
+    "reason": "C00368 predates B00370 producer result"
+  },
+  "reconciliation": {
+    "reexecuted_producer_work": false,
+    "candidate_dds_modified": false,
+    "shared_state_modified": false,
+    "peer_lane_files_modified": false,
+    "runtime_test_performed": false,
+    "runtime_validation": "UNTESTED",
+    "n100_used": false,
+    "local_clone_used": false,
+    "google_drive_reprobed": false,
+    "vr_ffb_dx_changes": false
+  },
+  "observed_head_before_reconcile": {
+    "sha": "d320daea33e974173c8c85db924aed42a1b77498",
+    "message": "chore(localization): bind A00371 result SHA [AUTO:LOCALIZATION-LOCALIZATION_A-00371] [skip ci]"
+  },
+  "note": "This is rollover reconciliation only, not a new producer result. Controller identity remains TASK_ID@25e854c140aedd2920878c2433895b55b6dd1c9b; the original result commit already satisfies the required AUTO marker."
+}
