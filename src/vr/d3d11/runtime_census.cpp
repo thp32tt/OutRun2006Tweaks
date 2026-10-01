@@ -34,6 +34,7 @@ namespace outrun::vr::dx11
             "DX11 census sample stride must remain a power of two");
 
         std::atomic<int> EnabledCache{-1};
+        std::atomic<int> ExhaustiveCache{-1};
         std::atomic<std::uint64_t> DrawCallsSeen{0};
         std::atomic<std::uint64_t> Samples{0};
         std::atomic<std::uint64_t> ExactSamples{0};
@@ -1358,6 +1359,33 @@ namespace outrun::vr::dx11
             }
         }
 
+        bool census_exhaustive() noexcept
+        {
+            int cached = ExhaustiveCache.load(std::memory_order_acquire);
+            if (cached >= 0)
+                return cached != 0;
+
+            char value[8]{};
+            const DWORD length = GetEnvironmentVariableA(
+                "OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE", value,
+                static_cast<DWORD>(sizeof(value)));
+            const bool exhaustive =
+                length > 0 && length < sizeof(value) && value[0] == '1';
+            ExhaustiveCache.store(
+                exhaustive ? 1 : 0, std::memory_order_release);
+            return exhaustive;
+        }
+
+        std::uint32_t census_sample_stride() noexcept
+        {
+            return census_exhaustive() ? 1u : SampleStride;
+        }
+
+        std::uint32_t census_sampling_scheme() noexcept
+        {
+            return census_exhaustive() ? 2u : 1u;
+        }
+
         bool census_enabled() noexcept
         {
             int cached = EnabledCache.load(std::memory_order_acquire);
@@ -1372,11 +1400,19 @@ namespace outrun::vr::dx11
                 length > 0 && length < sizeof(value) && value[0] == '1';
             EnabledCache.store(enabled ? 1 : 0, std::memory_order_release);
             if (enabled)
+            {
+                const auto sampleStride = census_sample_stride();
+                const auto samplingScheme = census_sampling_scheme();
                 spdlog::info(
-                    "VR DX11 R114 census ACTIVE: passive hashed-ordinal 1/{} draw sampling; signatureHashCap={} detailedSignatureLogCap={}; unique-signature-only non-routing D3DCompile probes remain diagnostic and native draw routing remains disabled",
-                    SampleStride,
+                    "VR DX11 R114 census ACTIVE: {} draw census; stride={} scheme={}; signatureHashCap={} detailedSignatureLogCap={}; unique-signature-only non-routing D3DCompile probes remain diagnostic and native draw routing remains disabled",
+                    samplingScheme == 2u
+                        ? "exhaustive"
+                        : "passive hashed-ordinal sampled",
+                    sampleStride,
+                    samplingScheme,
                     SignatureHashCap,
                     DetailedSignatureLogCap);
+            }
             return enabled;
         }
 
@@ -1397,8 +1433,10 @@ namespace outrun::vr::dx11
                     UnsupportedCounts[i].load(std::memory_order_relaxed);
 
             const auto managedLifetime = managed_lifetime_snapshot();
+            const auto sampleStride = census_sample_stride();
+            const auto samplingScheme = census_sampling_scheme();
             spdlog::info(
-                "VR DX11 R114 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} sampling[drawsSeen={},stride={},scheme=1] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R114 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -1406,7 +1444,8 @@ namespace outrun::vr::dx11
                 UnsupportedTopologySamples.load(std::memory_order_relaxed),
                 UniqueDrawSignatures.load(std::memory_order_relaxed),
                 DrawCallsSeen.load(std::memory_order_relaxed),
-                SampleStride,
+                sampleStride,
+                samplingScheme,
                 SignatureHashCap,
                 SignatureHashCapHitSamples.load(std::memory_order_relaxed),
                 DetailedSignatureLogCap,
@@ -1740,11 +1779,16 @@ namespace outrun::vr::dx11
 
         thread_local std::uint64_t drawOrdinal = 0;
         DrawCallsSeen.fetch_add(1, std::memory_order_relaxed);
-        const auto sampleKey = mix_sample_ordinal(
-            ++drawOrdinal ^
-            (static_cast<std::uint64_t>(GetCurrentThreadId()) << 32));
-        if ((sampleKey & (SampleStride - 1u)) != 0u)
-            return;
+        const auto ordinal = ++drawOrdinal;
+        const auto sampleStride = census_sample_stride();
+        if (sampleStride > 1u)
+        {
+            const auto sampleKey = mix_sample_ordinal(
+                ordinal ^
+                (static_cast<std::uint64_t>(GetCurrentThreadId()) << 32));
+            if ((sampleKey & (sampleStride - 1u)) != 0u)
+                return;
+        }
 
         OutRunVR::DrawState::RenderStateSnapshot source{};
         const bool captured =
