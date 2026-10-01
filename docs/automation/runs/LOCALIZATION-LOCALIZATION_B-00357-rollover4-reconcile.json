@@ -1,0 +1,80 @@
+{
+  "schema_version": 23,
+  "schema": "outrun-b00357-rollover4-durable-result-reconcile-v23",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00357",
+  "wave_id": "P00226",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 4,
+  "current_controller_schema_version": 23,
+  "current_controller_config_blob_sha": "0c6498a84619421a9c306354561b9e5a86645c8f",
+  "current_canonical_contract_blob_sha": "874e79a51843a24e891776b6d13f1f292e06b5c7",
+  "refreshed_head_before_reconcile": "019e5c036efc4d2d072be59c586ab850f2a050c7",
+  "authoritative_result_sha": "46bd3970276de8e6300d971024ec04ce2e9e9d98",
+  "result_binding_commit_sha": "2969ab4d180a454078c3f99e26933adcbfd32737",
+  "result_commit_message": "localization(B): record zero-runnable shard hold [AUTO:LOCALIZATION-LOCALIZATION_B-00357]",
+  "reconciliation_result": "TASK_ALREADY_DURABLE_NO_DUPLICATE_PRODUCER_WORK_Q00074_CONFIRMED",
+  "review_summary": "Rollover-4 reconstruction from authenticated latest GitHub HEAD confirms B00357 already has immutable producer review result 46bd3970... and binding commit 2969ab4d.... Current schema23/blob 0c6498a8... and canonical contract 874e79a5... are applied. Since rollover-3, C00356/Q00074 became durable and passed Localization Automation Gate. Q00074 supersedes only the historical B00342 patch-only input 4e409a54..., explicitly preserves the newer B00342@89231474 index61 candidate e31487c2... as QA_PENDING, and records runnable_production UNCHANGED. Therefore no new B-owned DIRECT_REWORK_REQUIRED/RENDER_READY/ONE_STAGE_TO_RENDER/existing-candidate material rework is opened by Q00074. Re-running DDS production, source acquisition, preflight expansion, shared-state mutation, or runtime testing would duplicate completed or QA-pending work and is intentionally forbidden.",
+  "policy_refresh": {
+    "stale_prompt_schema_rejected": true,
+    "current_schema_applied_for_reconcile": 23,
+    "durable_git_precedes_ui_recovery": true,
+    "completed_task_reexecution_forbidden": true,
+    "producer_skip_qa_pending_assets": true,
+    "candidate_first_policy_preserved": true
+  },
+  "current_authority": {
+    "latest_checked_c_task_id": "LOCALIZATION-LOCALIZATION_C-00356",
+    "latest_checked_c_batch": "Q00074",
+    "latest_c_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
+    "latest_c_validation_bearing_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
+    "latest_c_automation_validation": "PASS",
+    "latest_c_gate_run_id": 36827181087,
+    "latest_c_gate_conclusion": "success",
+    "q00074_index61": "KEEP_CURRENT_B00342_89231474_CANDIDATE_QA_PENDING",
+    "q00074_runnable_production": "UNCHANGED_BY_THIS_BATCH",
+    "prior_validated_candidate_awaiting_c": [
+      61,
+      159,
+      198,
+      201
+    ],
+    "b_owned_qa_pending_not_repeated": [
+      61
+    ],
+    "b00347_candidates_not_repeated": [
+      94,
+      163
+    ]
+  },
+  "producer_work_repeated": false,
+  "candidate_dds_modified": false,
+  "candidate_binary_persisted": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "material_change": false,
+  "review_record_only": true,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "evidence": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00357.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00357-rollover3-reconcile.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00356.json",
+    "localization/controller_roles.json",
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "localization/progress/progress.json",
+    "localization/resume_state.json",
+    "localization/graphics/asset_queue.csv"
+  ],
+  "note": "Conversation rollover does not increment ATTEMPT. This reconcile is bookkeeping/review only and does not replace immutable B00357 RESULT_SHA 46bd3970.... Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE. No real-game test was performed; RUNTIME_VALIDATION=UNTESTED."
+}
