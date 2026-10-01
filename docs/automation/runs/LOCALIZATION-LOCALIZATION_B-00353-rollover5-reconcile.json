@@ -1,0 +1,63 @@
+{
+  "schema_version": 22,
+  "schema": "outrun-b00353-rollover5-durable-result-reconcile-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00353",
+  "wave_id": "P00223",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "reconciled_at_kst": "2026-10-01T15:37:40+09:00",
+  "controller_schema_version": 22,
+  "controller_config_blob_sha": "be640c0c2806985743b8fc41b90a16025c590cf8",
+  "canonical_contract_blob_sha": "8d85dd58edb1e191e9d5b5f6d4b24e0d50d20d44",
+  "refreshed_head_before_reconcile": "29413c7855c85f196d14fe05838783ffed275ee7",
+  "authoritative_result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513",
+  "result_binding_commit_sha": "37894979a3b11064c9e99e87f5cde3793aa076c7",
+  "previous_rollover_reconcile_sha": "29413c7855c85f196d14fe05838783ffed275ee7",
+  "result_commit_message": "localization(B): advance index230/236 canonical source preflight [AUTO:LOCALIZATION-LOCALIZATION_B-00353]",
+  "reconciliation_result": "TASK_ALREADY_DURABLE_NO_DUPLICATE_PRODUCER_WORK",
+  "review_summary": "Rollover-5 reconstruction from authenticated current GitHub HEAD reconfirms the immutable B00353 producer result and binding. The result already used the one allowed zero-candidate PREFLIGHT_ONLY batch after a fresh B-mod3 scan found no C-accepted DIRECT_REWORK, RENDER_READY, ONE_STAGE_TO_RENDER, or candidate-material rework item. Index230/E95DA5 remains fail-closed on SOURCE_IDENTITY_MISMATCH until its inventory/source-transport fingerprint changes. Index236/FEF70E85 remains PREFLIGHT_ONLY with exact canonical source plus 15 producer-derived semantic masks, CLEAN_PLATE and safe bboxes, and cannot be rendered by B until independent C acceptance. Current C00349/Q00073 is an earlier completed batch and does not consume B00353. Repeating producer pixel work in this rollover would violate no-repeat and C-acceptance rules.",
+  "producer_work_repeated": false,
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "material_change": false,
+  "review_record_only": true,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "c_batch_consumption_check": {
+    "latest_checked_c_task_id": "LOCALIZATION-LOCALIZATION_C-00349",
+    "latest_checked_c_batch": "Q00073",
+    "b00353_consumed": false,
+    "note": "C00349/Q00073 predates B00353 and its qa_batch_inputs do not contain LOCALIZATION-LOCALIZATION_B-00353."
+  },
+  "remaining_dependencies": [
+    {
+      "queue_index": 230,
+      "asset": "E95DA5",
+      "state": "SOURCE_IDENTITY_MISMATCH",
+      "owner_next_action": "Wait for canonical inventory/source-transport fingerprint change before any pixel work."
+    },
+    {
+      "queue_index": 236,
+      "asset": "FEF70E85",
+      "state": "PREFLIGHT_COMPLETE_AWAITING_INDEPENDENT_C_ACCEPTANCE",
+      "owner_next_action": "C must independently replay/accept exact source, 15 masks, CLEAN_PLATE and safe-bbox evidence before a future producer task may render."
+    }
+  ],
+  "evidence": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00353.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00353-rollover4-reconcile.json",
+    "localization/graphics/role_B/20261001-B00353-P00223/B00353_P00223_INDEX230_236_CANONICAL_SOURCE_PREFLIGHT.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00349.json"
+  ],
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "note": "Conversation rollover does not increment ATTEMPT. This rollover-5 record is bookkeeping/review only and does not replace or alter immutable producer RESULT_SHA; producer Actions validation remains pending under C_BATCH_GATE."
+}
