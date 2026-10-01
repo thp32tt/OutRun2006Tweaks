@@ -8,7 +8,7 @@ The durable control path is:
 
 `GitHub <-> Controller Broker <-> ChatGPT`
 
-The connected ChatGPT GitHub plugin remains a preferred fast path when it is available, but it is not a liveness dependency.
+The controller broker is the primary path and is present from the first task turn. A connected ChatGPT GitHub plugin is optional and may be used only as an additional direct-read/write path when available.
 
 ## Authority
 
@@ -54,7 +54,7 @@ If HEAD moved, the changeset is rejected and ChatGPT must read the new HEAD befo
 
 ## Failure policy
 
-- Plugin/schema/tool absence: switch to the controller broker in the same chat and preserve TASK_ID/ATTEMPT.
+- Every task starts with controller-provided `BROKER_READ_RESULT` context. Plugin/schema/tool absence therefore requires no mode switch and must never block the task.
 - GitHub 404: treat as a path/ref result, not a connection failure.
 - Rate limit / 5xx / transport failure: preserve task state and retry after cooldown.
 - Broker protocol error or stale CAS: return a structured rejection in the same chat.
