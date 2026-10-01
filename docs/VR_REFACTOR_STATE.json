@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-01T19:23:00+09:00",
+  "updatedKst": "2026-10-01T19:27:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 19,
+  "cycle": 20,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -28,9 +28,10 @@
     "VR-REFACTOR-STATE-0003C",
     "VR-REFACTOR-STATE-0003D",
     "VR-REFACTOR-STATE-0003E-FIX00",
-    "VR-REFACTOR-CI-0002"
+    "VR-REFACTOR-CI-0002",
+    "VR-REFACTOR-STATE-0002B-A"
   ],
-  "next": "Use the new R34 full-chain compile gate to expose any remaining legacy-chain compile regressions; then extract a neutral StateBlock physical-hook event boundary before removing duplicated R22/R31 physical hooks.",
+  "next": "Validate 0002B-A plus the R34 full-chain compile gate; then in 0002B-B make R22 the single physical StateBlock hook owner and dispatch R31 cache/recording semantics through StateBlockEvents.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -43,7 +44,8 @@
     "VR-REFACTOR-STATE-0003A-FIX00 removed the final stale R22StateBlockTrackingReliable compile reference and added a deterministic verifier guard.",
     "200-cycle review loop checkpoint 100/200: R32 was the remaining full-chain consumer of removed R31 StateBlock reliability and generation globals; migrated those reads to StateBlockTracker and guarded recurrence.",
     "Post-100/200 continuation completed StateBlock recording authority migration, removed renderer->stereo StateBlock status exports, extracted neutral lazy-resync execution, and preserved pending resync until recovery callbacks are ready.",
-    "200/200 structural review completed. VR-REFACTOR-CI-0002 adds a non-packaging R34 full-chain compile job so active R26+HUD validation can no longer hide compile failures in R31-R34."
+    "200/200 structural review completed. VR-REFACTOR-CI-0002 adds a non-packaging R34 full-chain compile job so active R26+HUD validation can no longer hide compile failures in R31-R34.",
+    "VR-REFACTOR-STATE-0002B-A extracts R31 Begin/End/Apply post-processing behind neutral StateBlockEvents while intentionally preserving the existing R31 physical hooks and exact event conditions/order."
   ],
-  "batchStatus": "VR-REFACTOR-CI-0002_APPLIED_CI_PENDING"
+  "batchStatus": "VR-REFACTOR-STATE-0002B_A_APPLIED_CI_PENDING"
 }

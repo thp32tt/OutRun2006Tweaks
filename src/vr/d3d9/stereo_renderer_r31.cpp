@@ -22,6 +22,7 @@
 #include "stereo_renderer_r30.cpp"
 #include "../state/state_block_tracker.hpp"
 #include "../state/state_block_recovery.hpp"
+#include "../state/state_block_events.hpp"
 
 namespace OutRunVRStereo
 {
@@ -783,6 +784,40 @@ namespace OutRunVRStereo
             OutRunVR::State::StateBlockTracker::RequireResync();
         }
 
+        void R31OnStateBlockBegin(IDirect3DDevice9*) noexcept
+        {
+            OutRunVR::State::StateBlockTracker::SetRecording(true);
+            OutRunVR::State::StateBlockTracker::NoteRecording();
+            R31MarkStateBlockCachesDirty();
+        }
+
+        void R31OnStateBlockEnd(IDirect3DDevice9*, HRESULT hr) noexcept
+        {
+            if (SUCCEEDED(hr))
+            {
+                OutRunVR::State::StateBlockTracker::SetRecording(false);
+            }
+            else if (OutRunVR::State::StateBlockTracker::Recording())
+            {
+                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
+                OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
+            }
+            R31MarkStateBlockCachesDirty();
+        }
+
+        void R31OnStateBlockApply(IDirect3DDevice9*, HRESULT hr) noexcept
+        {
+            OutRunVR::State::StateBlockTracker::NoteApply();
+            R31MarkStateBlockCachesDirty();
+            if (!R31FirstStateBlockLogged)
+            {
+                R31FirstStateBlockLogged = true;
+                spdlog::info(
+                    "VR R31 STATE: StateBlock::Apply observed hr=0x{:08x}; caches invalidate immediately and live D3D state is lazily re-primed at the next actual draw",
+                    static_cast<unsigned>(hr));
+            }
+        }
+
         HRESULT __stdcall StateBlockApplyDestR31(IDirect3DStateBlock9* block)
         {
             const HRESULT hr = R31StateBlockApplyHook.stdcall<HRESULT>(block);
@@ -791,19 +826,8 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device = nullptr;
             if (SUCCEEDED(block->GetDevice(&device)) && device)
             {
-                const bool game = IsGameDevice(device);
-                if (game)
-                {
-                    OutRunVR::State::StateBlockTracker::NoteApply();
-                    R31MarkStateBlockCachesDirty();
-                    if (!R31FirstStateBlockLogged)
-                    {
-                        R31FirstStateBlockLogged = true;
-                        spdlog::info(
-                            "VR R31 STATE: StateBlock::Apply observed hr=0x{:08x}; caches invalidate immediately and live D3D state is lazily re-primed at the next actual draw",
-                            static_cast<unsigned>(hr));
-                    }
-                }
+                if (IsGameDevice(device))
+                    OutRunVR::State::StateBlockEvents::NotifyApply(device, hr);
                 device->Release();
             }
             else
@@ -888,11 +912,7 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R31BeginStateBlockHook.stdcall<HRESULT>(device);
             if (SUCCEEDED(hr) && IsGameDevice(device) && !InternalStereoPass)
-            {
-                OutRunVR::State::StateBlockTracker::SetRecording(true);
-                OutRunVR::State::StateBlockTracker::NoteRecording();
-                R31MarkStateBlockCachesDirty();
-            }
+                OutRunVR::State::StateBlockEvents::NotifyBegin(device);
             return hr;
         }
 
@@ -903,16 +923,7 @@ namespace OutRunVRStereo
             if (IsGameDevice(device) &&
                 (!InternalStereoPass || OutRunVR::State::StateBlockTracker::Recording()))
             {
-                if (SUCCEEDED(hr))
-                {
-                    OutRunVR::State::StateBlockTracker::SetRecording(false);
-                }
-                else if (OutRunVR::State::StateBlockTracker::Recording())
-                {
-                    OutRunVR::State::StateBlockTracker::MarkCoverageLost();
-                    OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
-                }
-                R31MarkStateBlockCachesDirty();
+                OutRunVR::State::StateBlockEvents::NotifyEnd(device, hr);
                 if (SUCCEEDED(hr) && block && *block)
                     R31EnsureStateBlockApplyHook(*block);
             }
@@ -984,6 +995,11 @@ namespace OutRunVRStereo
                             "OpenXRVRStereoR31Perf", false);
                         return 0;
                     }
+
+                    OutRunVR::State::StateBlockEvents::Configure(
+                        &R31OnStateBlockBegin,
+                        &R31OnStateBlockEnd,
+                        &R31OnStateBlockApply);
 
                     IDirect3DDevice9* const device =
                         StereoInstalledDevice.load(std::memory_order_acquire);

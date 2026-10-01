@@ -26,6 +26,7 @@ draw_class = text("src/vr/render/draw_class.hpp")
 raster = text("src/vr/state/d3d9_raster_state.hpp")
 state_block_tracker = text("src/vr/state/state_block_tracker.hpp")
 state_block_recovery = text("src/vr/state/state_block_recovery.hpp")
+state_block_events = text("src/vr/state/state_block_events.hpp")
 text("tools/verify_vr_hook_graph.py")
 
 for banned in ("R22ShadowState", "R22StateBlockTrackingReliable"):
@@ -107,6 +108,17 @@ for banned in ("R31StateBlockRecordings", "R31StateBlockApplies"):
             f"R31 retained migrated StateBlock generation owner: {banned}")
 
 for marker in (
+    "class StateBlockEvents",
+    "Configure(",
+    "Configured()",
+    "NotifyBegin(",
+    "NotifyEnd(",
+    "NotifyApply(",
+):
+    if marker not in state_block_events:
+        errors.append(f"StateBlockEvents missing API marker: {marker}")
+
+for marker in (
     "class StateBlockRecovery",
     "Configure(",
     "FlushPendingResync(",
@@ -145,6 +157,15 @@ for rel, source in (("R33", r33), ("R34", r34)):
 
 if "StateBlockRecovery::Configure(" not in r31:
     errors.append("R31 missing neutral StateBlock recovery callback registration")
+if "StateBlockEvents::Configure(" not in r31:
+    errors.append("R31 missing neutral StateBlock event callback registration")
+for marker in (
+    "StateBlockEvents::NotifyBegin(device)",
+    "StateBlockEvents::NotifyEnd(device, hr)",
+    "StateBlockEvents::NotifyApply(device, hr)",
+):
+    if marker not in r31:
+        errors.append(f"R31 physical StateBlock hook missing neutral event dispatch: {marker}")
 if "R31FlushPendingStateBlockResync" in r31:
     errors.append("R31 retained obsolete StateBlock resync execution wrapper")
 
