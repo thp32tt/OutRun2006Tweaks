@@ -1,0 +1,12 @@
+{
+  "schema_version": 20,
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+  "wave_id": "P00221",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "action": "RUN_INDEX222_V20_SONG_TITLE_SOURCE_RESTORE",
+  "runner_setup_commit": "4c46eb29009218e59008483293ca9cabbfb78349",
+  "runtime_validation": "UNTESTED"
+}
