@@ -8,7 +8,7 @@
   "base_sha": "d67ded2e23dd45ee26ddebb186e75b1558ca6715",
   "result_sha": "f4bd99b4672148fb3622aceb7219ec9c7312c5a5",
   "validation_bearing_result_sha": "f4bd99b4672148fb3622aceb7219ec9c7312c5a5",
-  "automation_validation": "PASS_CORE_GATES_INSPECTOR_PENDING",
+  "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
   "runtime_test_required": false,
   "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R267_182569_EXACT_DECODE_REVIEW",
@@ -24,6 +24,8 @@
     "RUNTIME_VALIDATION remains UNTESTED; this task changes durable review evidence only."
   ],
   "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
     "docs/automation/runs/CONVERSION-DXVK-00267.json"
   ],
   "predecessor_reconciliation": {
@@ -193,10 +195,10 @@
     "after": "EXACT_182569_TO_1825A6_CONTROL_FLOW_PREFIX_PROVEN",
     "runtime_claim": false
   },
-  "blocker": "No implementation blocker. The next provenance step still requires bytes beyond the validated 0x001825A9 capture because the instruction beginning at 0x001825A6 is incomplete and four branch targets lie outside the window. Runtime behavior remains UNTESTED.",
-  "next_action": "Capture a fresh canonical replacement-EXE provenance window beginning at 0x001825A6, require the known a9 00 00 three-byte overlap, obtain enough bytes to complete TEST EAX, imm32 and cover the nearby external branch targets, then exact-decode only after that provenance passes.",
-  "checkpoint": "C6_STATE",
-  "status": "CORE_VALIDATED_RUNTIME_UNTESTED",
+  "blocker": "Automatic validation is pending for provenance collector 0x001825A6..0x001825E6. Runtime behavior remains UNTESTED.",
+  "next_action": "Consume exact-source GitHub Actions. On PASS, read static EXE analysis output for the exact 64 bytes at 0x001825A6..0x001825E6, verify the A9 00 00 overlap and branch-target coverage, then exact-decode only complete instructions and persist the next bounded proof.",
+  "checkpoint": "C3_VALIDATE",
+  "status": "PROVENANCE_1825A6_IMPLEMENTED_VALIDATION_PENDING_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "runtime_source_changed": false,
   "semantic_ownership_promoted": false,
@@ -205,6 +207,13 @@
       "sha": "f4bd99b4672148fb3622aceb7219ec9c7312c5a5",
       "message": "vr: exact-decode 0x182569 continuation [AUTO:CONVERSION-DXVK-00267]",
       "role": "validation-bearing-result",
+      "validation_bearing": true,
+      "ci_skip": false
+    },
+    {
+      "sha": "a63af01f6b79ab98df9d747b580252810b022f29",
+      "message": "vr: extend 0x1825a6 provenance window [AUTO:CONVERSION-DXVK-00267]",
+      "role": "provenance-implementation",
       "validation_bearing": true,
       "ci_skip": false
     }
@@ -268,5 +277,19 @@
       "required_for_completion": false,
       "reason": "No explicitly authorized evening PC-fast test session."
     }
-  ]
+  ],
+  "provenance_followup": {
+    "start_rva": "0x001825A6",
+    "probe_len": 64,
+    "probe_end_rva": "0x001825E6",
+    "required_overlap": "a9 00 00",
+    "required_branch_targets": [
+      "0x001825AD",
+      "0x001825B2",
+      "0x001825B7",
+      "0x001825BC"
+    ],
+    "expected_status": "EXACT_EXE_1825A6_TO_1825E6_PROVENANCE_CAPTURED",
+    "actual_status": "PENDING"
+  }
 }
