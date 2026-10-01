@@ -25,5 +25,7 @@
   "local_clone_used":false,
   "google_drive_used":false,
   "vr_ffb_dx_changes":false,
-  "result_commit_message":"localization(C): batch QA gate Q00085 [AUTO:LOCALIZATION-LOCALIZATION_C-00411]"
+  "gate_repair_for_run":"36867500001",
+  "gate_failure_root_cause":"C_BATCH_INPUT_RECORD_PRESENT_IN_WORKTREE_BUT_NOT_AS_CHANGED_TASK_RECORD",
+  "result_commit_message":"localization(C): repair batch QA gate record [AUTO:LOCALIZATION-LOCALIZATION_C-00411]"
 }
