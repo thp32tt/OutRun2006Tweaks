@@ -150,9 +150,14 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "material_evidence_commit_sha": "d8f733d9da5cdd66ff0165337bf18bba8eea9f47",
-  "result_sha": null,
-  "authoritative_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_BOOKKEEPING_SELF_SHA_BIND",
-  "result_commit_message": "localization(B): reactivate canonical sources 52 and 220 [AUTO:LOCALIZATION-LOCALIZATION_B-00365]"
+  "result_sha": "a3e420955ef1a41274b8de480ac989db85da3dac",
+  "authoritative_result_sha": "a3e420955ef1a41274b8de480ac989db85da3dac",
+  "validation_bearing_result_sha": "a3e420955ef1a41274b8de480ac989db85da3dac",
+  "result_binding_state": "BOUND_TO_VALIDATION_BEARING_RESULT",
+  "result_commit_message": "localization(B): reactivate canonical sources 52 and 220 [AUTO:LOCALIZATION-LOCALIZATION_B-00365]",
+  "bookkeeping": {
+    "recorded_at_kst": "2026-10-01T17:19:00+09:00",
+    "head_before_bookkeeping": "893b046f9a827dd7e94a9ee0c3afa0c8bbb22b50",
+    "note": "Bookkeeping-only result-SHA binding. Producer AUTOMATION_VALIDATION remains PENDING until independent C batch consumes TASK_ID@RESULT_SHA. No real-game test was performed; RUNTIME_VALIDATION remains UNTESTED."
+  }
 }
