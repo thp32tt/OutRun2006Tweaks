@@ -1,5 +1,5 @@
 {
-  "schema_version": 33,
+  "schema_version": 34,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -816,5 +816,14 @@
     "review_only_or_zero_material_result": "REJECT_AS_PRODUCER_COMPLETION_WHILE_BLOCKED",
     "same_task_recovery": true,
     "attempt_increment_on_guard_rejection": false
+  },
+  "producer_qa_separation": {
+    "qa_pending_is_c_consumer_only": true,
+    "candidate_awaiting_c_is_c_consumer_only": true,
+    "producer_must_continue_after_qa_pending": true,
+    "qa_pending_is_not_production_stop": true,
+    "producer_scan_full_own_shard_before_none": true,
+    "producer_must_ignore_c_backlog_as_stop_signal": true,
+    "producer_stop_requires_global_no_work_guard_clear": true
   }
 }
