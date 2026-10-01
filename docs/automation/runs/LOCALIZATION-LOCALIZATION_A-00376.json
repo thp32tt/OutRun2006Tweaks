@@ -145,10 +145,10 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA30__FRESH_HEAD_ZERO_COMPLETION_TIER__REVIEW_ONLY_RESULT_SUPERSEDED__INDEX147_C176_SOURCE_IDENTITY_MISMATCH_REUSED__NO_SOURCE_REPROBE__EXECUTABLE_FAIL_CLOSED_REACTIVATION_GUARD_ADDED__NONCANONICAL_SUBSTITUTION_FORBIDDEN__NO_SHARED_STATE__NO_DDS__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "45b0ea6683450da03bd4f44d8ab9ae79dcbd5293",
+  "authoritative_result_sha": "45b0ea6683450da03bd4f44d8ab9ae79dcbd5293",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "UNBOUND_MATERIAL_REPAIR_PENDING_BOOKKEEPING",
+  "result_binding_state": "BOUND_TO_MATERIAL_REPAIR_PENDING_C_BATCH_GATE",
   "result_commit_message": "localization(A): repair A00376 with index147 executable guard [AUTO:LOCALIZATION-LOCALIZATION_A-00376]",
   "durable_task_record_in_result_commit": true,
   "precommit_refresh": {
@@ -156,5 +156,15 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Fast-forward rebase after branch race; preserved disjoint B00375 lane-local task/tool/report commits. Queue/progress/resume/controller/contract/A-shard fingerprints remain unchanged. A00376 repair modifies only its task record and adds lane-A index147 material payload."
   },
-  "bookkeeping_note": "A separate bookkeeping-only commit will bind this material-repair RESULT_SHA. AUTOMATION_VALIDATION remains PENDING until independent C consumes this repair TASK_ID@RESULT_SHA; RUNTIME_VALIDATION=UNTESTED."
+  "bookkeeping_note": "Material repair result 45b0ea6683450da03bd4f44d8ab9ae79dcbd5293 supersedes review-only d5c57976a2007aa19d308ccbe28cc93edab6911f. The repair commit carries the required AUTO marker and atomically contains the index147 executable verifier, machine report, and updated durable task record. AUTOMATION_VALIDATION remains PENDING until independent C consumes A00376@45b0ea66; RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping": {
+    "recorded_at_kst": "2026-10-01T18:35:00+09:00",
+    "producer_result_sha": "45b0ea6683450da03bd4f44d8ab9ae79dcbd5293",
+    "result_parent_sha": "195898203b1ce30b9e92be97573b5fe1953726c6",
+    "result_parent_concurrency": "Only disjoint B00375 lane-local files changed between the recorded precommit refresh and final parent; shared/A fingerprints were unchanged.",
+    "superseded_review_result_sha": "d5c57976a2007aa19d308ccbe28cc93edab6911f",
+    "automation_validation": "PENDING",
+    "validation_mode": "C_BATCH_GATE",
+    "runtime_validation": "UNTESTED"
+  }
 }
