@@ -1,0 +1,118 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00394-index111-random-source-only-background-reconstruction-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00394",
+  "wave_id": "P00260",
+  "lane": "LOCALIZATION_A",
+  "queue_index": 111,
+  "asset": "C075FB49",
+  "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+  "coordinate_space": "readable/display after raw mirror_y -> flip_y",
+  "source_identity": {
+    "target_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "donor411_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+    "decoded_canvas": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "mip_count": 1
+  },
+  "accepted_prior_evidence": {
+    "a00309_random_scope_pixels": 9606,
+    "a00309_donor411_clean_coverage_pixels": 4414,
+    "a00309_donor53_incremental_clean_coverage_pixels": 0,
+    "a00309_random_unresolved_pixels": 5192,
+    "a00346_current_total_unresolved_pixels": 5734,
+    "a00346_tuned_remaining_pixels": 463,
+    "a00346_normal_remaining_pixels": 79,
+    "a00346_random_remaining_pixels": 5192,
+    "c176_disposition": "PASS_PREFLIGHT_ONLY"
+  },
+  "method": {
+    "scope": "RANDOM_REMAINDER_ONLY__TUNED_NORMAL_UNCHANGED",
+    "source_only": true,
+    "candidate_pixels_used": false,
+    "stage3a": "Intersect A00309 RANDOM unresolved mask with filled RETR_EXTERNAL contour of largest exact BLUE_PANEL source component inside conservative panel ROI.",
+    "stage3b": "For unresolved y<1451 only, accept nearest non-text-neighborhood source samples left/right within 96px when both RGBA samples are exactly equal; write that exact source RGBA value.",
+    "candidate_or_clean_plate_status": "NOT_EMITTED_PREFLIGHT_ONLY"
+  },
+  "random": {
+    "prior_unresolved_pixels": 5192,
+    "prior_unresolved_bbox": [
+      1761,
+      1448,
+      1943,
+      1481
+    ],
+    "stage3a_panel_interior_proposal_pixels": 4831,
+    "stage3a_bbox": [
+      1761,
+      1451,
+      1943,
+      1481
+    ],
+    "stage3a_actual_changed_pixels": 3490,
+    "stage3b_border_proposal_pixels": 360,
+    "stage3b_bbox": [
+      1779,
+      1448,
+      1941,
+      1451
+    ],
+    "stage3b_source_rgba_values": [
+      [
+        76,
+        131,
+        188,
+        255
+      ],
+      [
+        129,
+        168,
+        208,
+        255
+      ],
+      [
+        136,
+        173,
+        211,
+        255
+      ]
+    ],
+    "stage3b_actual_changed_pixels": 0,
+    "new_proposal_pixels": 5191,
+    "new_actual_changed_pixels": 3490,
+    "remaining_unresolved_pixels": 1,
+    "remaining_coordinates_xy": [
+      [
+        1774,
+        1450
+      ]
+    ]
+  },
+  "aggregate_after": {
+    "tuned_setting_remaining_pixels": 463,
+    "normal_setting_remaining_pixels": 79,
+    "random_remaining_pixels": 1,
+    "total_remaining_unresolved_pixels": 543,
+    "new_unresolved_reduction_pixels": 5191,
+    "outside_prior_unresolved_changed_pixels": 0,
+    "alpha_changed_pixels": 0
+  },
+  "self_qa": {
+    "exact_target_identity": "PASS",
+    "exact_donor_identity": "PASS",
+    "a00309_random_fingerprint_reproduced": "PASS",
+    "proposal_subset_of_prior_unresolved": "PASS",
+    "source_only_background_rule": "PASS",
+    "outside_prior_unresolved_changes": 0,
+    "alpha_changes": 0,
+    "candidate_dds_modified": false,
+    "clean_plate_emitted": false
+  },
+  "readiness_after": "PREFLIGHT_ONLY__RANDOM_SOURCE_ONLY_RECONSTRUCTION_ADVANCED__543_TOTAL_UNRESOLVED__NO_CLEAN_PLATE_OR_DDS",
+  "candidate_dds_authorized": false,
+  "candidate_dds_modified": false,
+  "runtime_validation": "UNTESTED"
+}
