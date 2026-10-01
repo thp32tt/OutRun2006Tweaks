@@ -15,6 +15,7 @@ def read(rel: str) -> str:
 tracker = read("src/vr/state/state_block_tracker.hpp")
 r22 = read("src/vr/d3d9/stereo_renderer_r22.cpp")
 r29 = read("src/vr/d3d9/stereo_renderer_r29.cpp")
+r30 = read("src/vr/d3d9/stereo_renderer_r30.cpp")
 r31 = read("src/vr/d3d9/stereo_renderer_r31.cpp")
 r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = read("src/vr/d3d9/stereo_renderer_r33.cpp")
@@ -141,8 +142,26 @@ for legacy in (
     "R29",
 ):
     import re
-    if re.search(rf"\\b{legacy}[A-Za-z0-9_]+", read("src/vr/d3d9/stereo_renderer_r30.cpp")):
+    if re.search(rf"\\b{legacy}[A-Za-z0-9_]+", r30):
         errors.append(f"R30 regained lower-layer implementation dependency: {legacy}*")
+
+for marker in (
+    "R30InstallStateStorage",
+    "R30SetInstallState",
+    "R30GetInstallState",
+    "R30PublishInstallResult",
+):
+    if marker not in r30:
+        errors.append(f"R30 install lifecycle boundary missing marker: {marker}")
+
+if r30.count("R30InstallStateStorage.store(") != 1:
+    errors.append("R30 install-state storage must have one write boundary")
+if r30.count("R30InstallStateStorage.load(") != 1:
+    errors.append("R30 install-state storage must have one read boundary")
+if r30.count('HookManager::ReportAsyncResult(\n                "OpenXRVRStereoR30HUD", success)') != 1:
+    errors.append("R30 async install-result reporting is no longer centralized")
+if "R30InstallState.store(" in r30 or "R30InstallState.load(" in r30:
+    errors.append("R30 legacy direct install-state access reintroduced")
 
 for legacy in (
     "R29StableStereoBase",
