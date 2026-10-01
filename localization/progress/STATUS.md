@@ -1601,3 +1601,9 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Validation-bearing result: `0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa`; Gate run: `36788089100` **success**.
 - Final dispositions: B00332 **PASS/STATIC_QA**, A00338 **PASS**, A00340 **PASS**, B00339 **PASS/STATIC_QA**.
 - Production-complete static-QA adds **133/232**; current-schema isolation-ready adds **102/231**. Candidate QA backlog is **61/159/198/201** after Q00073 reconciliation. Post-Gate B00347@index94 remains separate out-of-batch QA_PENDING. Runtime remains **UNTESTED**.
+
+
+### 2026-10-01 15:46 KST — C176 / Q00074 pre-Gate
+- Dispositions: **A00344 PASS / A00345 PASS / B00342@4e409a54 SUPERSEDED / A00346 PASS**.
+- Index111 authority advances to PREFLIGHT_ONLY 5,734 unresolved. Index147 and font15/18/21 remain fail-closed source mismatches. Current B00342@89231474 index61 candidate remains QA_PENDING.
+- `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

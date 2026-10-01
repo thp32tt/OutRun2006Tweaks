@@ -2222,3 +2222,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - **index51 / FF2462BB: HOLD_STRICT_RECHECK.** It has prior static PASS plus a stage/course-name family, but no v19-equivalent family ID/uniform native font-size evidence. Measure every family member before reusing PASS; any mismatch promotes it to REWORK_REQUIRED.
 - Indices **46, 86, 128, 143** are not prior completed candidates; enforce v18/v19 naming/typography during their future production rather than fabricating a retrospective failure.
 - Runtime remains UNTESTED for all of the above.
+
+
+## 2026-10-01 15:46 KST - C176 Q00074 independent batch QA
+- Immutable inputs A00344 `bea28331...`, A00345 `5f72a88c...`, B00342 `4e409a54...`, A00346 `4fd5c5ae...`: **PASS / PASS / SUPERSEDED / PASS**.
+- A00344@index147 and A00345@15/18/21 PASS only as fail-closed **PREFLIGHT_ONLY SOURCE_IDENTITY_MISMATCH**; no candidate authorization. Font runtime blocker remains.
+- B00342@`4e409a54...` is historical patch-only and **SUPERSEDED** by B00342@`89231474...` candidate `e31487c2...`; newer state remains QA_PENDING.
+- A00346@index111 deterministic replay advances accepted PREFLIGHT_ONLY reconstruction **8,221 -> 5,734 unresolved**, +2,487 proposal / +2,223 actual, 0 outside-mask/alpha/protected. RANDOM/protected fringe remains fail-closed.
+- C rewrites no candidate DDS. Pre-Gate `AUTOMATION_VALIDATION=PENDING`; `RUNTIME_VALIDATION=UNTESTED`.

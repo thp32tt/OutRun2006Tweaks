@@ -1,0 +1,238 @@
+{
+  "schema_version": 23,
+  "controller_schema_version": 23,
+  "schema": "outrun-c176-q00074-four-input-independent-batch-qa-v23",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00356",
+  "wave_id": "Q00074",
+  "qa_batch_id": "Q00074",
+  "run": "C176",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T15:46:38+09:00",
+  "base_head_sha": "cc16fb4b320308e72b078cfd3d1e221c910bb794",
+  "base_sha": "cc16fb4b320308e72b078cfd3d1e221c910bb794",
+  "commit_mode": "VALIDATION_BEARING_RESULT",
+  "result": "PASS_Q00074_THREE_PREFLIGHT_SCOPES_ONE_SUPERSEDED_HISTORICAL_INDEX61_RUNTIME_UNTESTED",
+  "summary": "Q00074 consumes immutable A00344/A00345/B00342(old patch-only)/A00346 once. A00344 index147 and A00345 font15/18/21 PASS only as fail-closed SOURCE_IDENTITY_MISMATCH preflight. A00346 index111 PASS advances independently replayed reconstruction from 8,221 to 5,734 unresolved with zero outside-mask/alpha/protected changes, still PREFLIGHT_ONLY. Supplied B00342@4e409a54 is SUPERSEDED by current B00342@89231474 candidate e31487c2; newer state remains QA_PENDING. No C DDS rewrite; runtime UNTESTED.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00344",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "bea28331bbdbe605dea3f6c8fb4e27892b48f56d",
+      "result_message": "localization(A): close index147 canonical source mismatch [AUTO:LOCALIZATION-LOCALIZATION_A-00344]",
+      "completed_at": "2026-10-01T06:51:55.063929+09:00",
+      "producer_id": "P00215",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00345",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "5f72a88cbcf98873f4181a6d2e378c7f08f4f6c7",
+      "result_message": "localization(A): close font-family source mismatches [AUTO:LOCALIZATION-LOCALIZATION_A-00345]",
+      "completed_at": "2026-10-01T06:58:49.710255+09:00",
+      "producer_id": "P00216",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "4e409a5498d1a07e0701223943b16df89bf4c337",
+      "result_message": "localization(B): stage index61 semantic rework patch [AUTO:LOCALIZATION-LOCALIZATION_B-00342]",
+      "completed_at": "2026-10-01T07:30:12.567332+09:00",
+      "producer_id": "P00214",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00346",
+      "lane": "LOCALIZATION_A",
+      "result_sha": "4fd5c5ae6b505bffb13809db29f54e49eaf21800",
+      "result_message": "localization(A): advance index111 panel reconstruction [AUTO:LOCALIZATION-LOCALIZATION_A-00346]",
+      "completed_at": "2026-10-01T07:31:46.950867+09:00",
+      "producer_id": "P00217",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00344",
+      "result_sha": "bea28331bbdbe605dea3f6c8fb4e27892b48f56d",
+      "status": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH",
+      "reason": "Index147/39BCA907 source guard is valid and not superseded. Canonical c52f48b1... != exact pinned Release b913c967... despite matching 2048x1024 RGBA32 mip1 geometry. PASS is fail-closed preflight only; no substitution/CLEAN_PLATE/render/candidate/runtime approval."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00345",
+      "result_sha": "5f72a88cbcf98873f4181a6d2e378c7f08f4f6c7",
+      "status": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH_RUNTIME_FONT_BLOCKED",
+      "reason": "Font indices15/18/21 current inventory identities differ from all three exact pinned Release members. Prior approved Drive misses remain fingerprint-unchanged. No candidate/mask/CLEAN_PLATE; runtime font-handle evidence remains required."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+      "result_sha": "4e409a5498d1a07e0701223943b16df89bf4c337",
+      "status": "SUPERSEDED",
+      "production_readiness": "SUPERSEDED_BY_NEWER_SAME_TASK_CANDIDATE",
+      "reason": "Supplied B00342@4e409a54 is historical patch-only with no final DDS. Current HEAD carries newer authoritative B00342@89231474 and index61 candidate e31487c2.... Old input must not overwrite or promote shared state; newer exact result remains QA_PENDING."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00346",
+      "result_sha": "4fd5c5ae6b505bffb13809db29f54e49eaf21800",
+      "status": "PASS",
+      "production_readiness": "PREFLIGHT_ONLY_PARTIAL_RECONSTRUCTION_5734_UNRESOLVED",
+      "reason": "Index111 A00346 deterministic source-only replay reproduces +2,487 proposal-resolved / +2,223 actual changed pixels and 5,734 unresolved, with zero outside-mask, alpha, or protected-guard change. PASS advances preflight only; RANDOM/protected fringe still blocks CLEAN_PLATE/render/candidate."
+    }
+  ],
+  "policy_resolution": {
+    "dispatch_controller_schema_version": 22,
+    "dispatch_controller_config_blob_sha": "be640c0c2806985743b8fc41b90a16025c590cf8",
+    "latest_head_controller_schema_version": 23,
+    "latest_head_controller_roles_blob_sha": "0c6498a84619421a9c306354561b9e5a86645c8f",
+    "latest_head_automation_contract_blob_sha": "874e79a51843a24e891776b6d13f1f292e06b5c7",
+    "resolution": "LATEST_HEAD_POLICY_APPLIED_PER_CONTRACT; C disposition/dedup/shared-state/Gate semantics remain compatible"
+  },
+  "input_fingerprint": {
+    "automation_contract_blob_sha": "874e79a51843a24e891776b6d13f1f292e06b5c7",
+    "controller_roles_blob_sha": "0c6498a84619421a9c306354561b9e5a86645c8f",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "transcriptions_blob_sha": "16a18cd038fe274f8a6b72906af0201c5197e1ac",
+    "asset_queue_blob_sha": "ceedefb399aef8b8434cbf4fb84f455d186333cf",
+    "canonical_progress_blob_sha": "860eb0f5ee50809321aca5d169b9ad1d30e4a1b2",
+    "resume_state_blob_sha": "5c345857da18fba8e94c6c161c7f2a19bff44d73",
+    "merge_head_sha": "cc16fb4b320308e72b078cfd3d1e221c910bb794",
+    "current_b00342_authoritative_result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
+    "current_b00342_candidate_sha256": "e31487c2d8023ce79a07999bec3fa673517dcc1332f69074c05bea3f4b4417d7",
+    "unlisted_newer_producers_preserved_by_head_refresh": true
+  },
+  "de_duplication": {
+    "identity": "TASK_ID@RESULT_SHA",
+    "heavy_check_fingerprint": [
+      "canonical_source_sha",
+      "candidate_sha",
+      "orientation_contract",
+      "translation_or_layout_input",
+      "qa_contract_version"
+    ],
+    "source_archive_identity_checked_once": true,
+    "a00344_release_member_identity_replayed_once": true,
+    "a00345_three_release_member_identities_replayed_once": true,
+    "a00346_reconstruction_algorithm_replayed_once": true,
+    "b00342_old_patch_heavy_candidate_qa_skipped_due_superseded": true,
+    "repeated_identical_heavy_checks": false,
+    "shared_state_merge_frequency": "once_per_c_batch"
+  },
+  "independent_replay": {
+    "pinned_release_archive": {
+      "bytes": 306223257,
+      "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "identity": "PASS_CONTRACT_EXACT"
+    },
+    "index147": {
+      "canonical_sha256": "c52f48b1d08781c70e9637b9c95103dc3ae8cc637ca0ed951f74cf1d69e40b72",
+      "release_sha256": "b913c9670288f7b67be514ddb4bc7eaba97fe70e0e640ba744429bbb4e5625a5",
+      "structure": "2048x1024 RGBA32 mip1",
+      "outcome": "SOURCE_IDENTITY_MISMATCH"
+    },
+    "font_family": [
+      {
+        "index": 15,
+        "canonical_sha256": "0b687a1d416f579bc71521ad4ec8278b84a3362b1c687ead3d80aaec7de31d25",
+        "release_sha256": "25ee2fd3cca7ac65acc5629ef96270d78706179bc0e723838ed7a992821735aa"
+      },
+      {
+        "index": 18,
+        "canonical_sha256": "c1f47db9ab463fcc46bc23fa1154046b5c0eb6fd126559351e2e80042334e100",
+        "release_sha256": "09f27e1c4e3997aa49fa120838626271855c504463be2383f7e9330509801484"
+      },
+      {
+        "index": 21,
+        "canonical_sha256": "2a8f9e8c906a6ae5583550c735d999fc3f5650c4f21a4e9d0c7a915ec063f4b7",
+        "release_sha256": "3185f71400fa697aa6104a5cceac49bbad458d5f02667526efa21fc98f47e8fe"
+      }
+    ],
+    "index111": {
+      "target_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "donor411_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "prior_unresolved_pixels": 8221,
+      "new_proposal_resolved_pixels": 2487,
+      "new_actual_changed_pixels": 2223,
+      "remaining_unresolved_pixels": 5734,
+      "outside_accepted_mask_changed_pixels": 0,
+      "alpha_changed_pixels": 0,
+      "protected_guard_overlap_pixels": 0,
+      "random_state": "UNCHANGED_FAIL_CLOSED"
+    },
+    "index61_supersession": {
+      "supplied_result_sha": "4e409a5498d1a07e0701223943b16df89bf4c337",
+      "supplied_scope": "PATCH_READY_NO_FINAL_DDS",
+      "current_authoritative_result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
+      "current_candidate_sha256": "e31487c2d8023ce79a07999bec3fa673517dcc1332f69074c05bea3f4b4417d7",
+      "disposition": "SUPERSEDED"
+    }
+  },
+  "readiness_reconciliation": {
+    "accepted_this_batch": {
+      "index147": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH",
+      "font_indices_15_18_21": "PREFLIGHT_ONLY_SOURCE_IDENTITY_MISMATCH_RUNTIME_FONT_BLOCKED",
+      "index111": "PREFLIGHT_ONLY_5734_UNRESOLVED"
+    },
+    "index61": "KEEP_CURRENT_B00342_89231474_CANDIDATE_QA_PENDING",
+    "newer_out_of_batch_results": "PRESERVED",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_FOUR_INPUT_BATCH_QA_THREE_PREFLIGHT_ACCEPTANCES_ONE_SUPERSEDED",
+    "reviewed_inputs": 4,
+    "producer_inputs_pass": 3,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_hold": 0,
+    "producer_inputs_superseded": 1,
+    "new_static_artwork_passes": 0,
+    "new_runtime_approvals": 0,
+    "candidate_dds_modified_by_c": false,
+    "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00356.json",
+    "role_c_report": "localization/graphics/role_C/20261001-1546-C176/C176_Q00074_INDEPENDENT_QA_BATCH.json"
+  },
+  "throughput_kpis": {
+    "production_complete": {
+      "new_this_batch": 0
+    },
+    "candidate_awaiting_c": "PRESERVE_CURRENT_HEAD_INCLUDING_NEWER_INDEX61_RESULT",
+    "runnable_production": "UNCHANGED_BY_THIS_BATCH",
+    "blocked_exception": "INDEX147_AND_FONT_SOURCE_IDENTITY_MISMATCH_SCOPES_RECORDED",
+    "runtime_validated": []
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": true,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "gpt_library_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "heavy_qa_repeated": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "precommit_refresh": {
+    "head_sha": "cc16fb4b320308e72b078cfd3d1e221c910bb794",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "Schema23 HEAD re-read before merge; newer commits preserved and only fixed Q00074 inputs dispositioned."
+  },
+  "result_commit_message": "localization(C): QA Q00074 producer batch [AUTO:LOCALIZATION-LOCALIZATION_C-00356]",
+  "bookkeeping_note": "Bind RESULT_SHA/Gate metadata only after this exact C result commit passes Localization Automation Gate. Runtime UNTESTED.",
+  "report_kind": "ROLE_C_INDEPENDENT_QA_BATCH_EVIDENCE"
+}

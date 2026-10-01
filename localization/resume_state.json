@@ -1,5 +1,5 @@
 {
-  "schema_version": 96,
+  "schema_version": 97,
   "branch": "korean-localization-clean",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -13,12 +13,12 @@
     "RENDER_READY: none authoritative after Q00073 consumed the index133 and index232 Korean candidates.",
     "ONE_STAGE_TO_RENDER: none authoritative.",
     "CANDIDATE_AWAITING_C: index61/C4A2937B fresh B00342 semantic-rework candidate (SHA-256 e31487c2...) is the highest completion-tier pending C input; then indices159/198/201. Do not expand unrelated preflight ahead of candidate completion.",
-    "PREFLIGHT_ONLY ACCEPTED/BLOCKED: preserve Q00072 authority for index111 at 8,221 unresolved until A00346 is separately C-consumed; index54/55/147/154 remain blocked/accepted fail-closed as previously recorded. A00344@index147, A00345@index15/18/21 and A00348@index24 are newer out-of-batch QA_PENDING and are not implicitly promoted here.",
     "RUNTIME ISOLATION READY: Q00073 accepts current-schema DDS_ONLY manifests for indices102 and231 on unchanged prior-static-QA candidates. Existing ready set is 12/51/63/99/102/195/222/231/237. No real-game validation is implied.",
     "STATIC_QA PASS: index133/25F697C6 candidate 6e5ee22d... and index232/EBFC709F candidate 41334c7d... are newly accepted; runtime remains UNTESTED.",
-    "OUT-OF-BATCH C QA: B00342@index61, A00344@index147, A00345@index15/18/21, A00346@index111 and A00348@index24 remain QA_PENDING by exact TASK_ID@RESULT_SHA.",
     "THROUGHPUT v16: production_complete new=2 (133/232); candidate_awaiting_c=61/159/198/201; candidate_rework_required=none; runnable_production=none; blocked_exception=54/55/147/154; runtime_validated=none.",
-    "Q00073 validation-bearing result commit owns the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
+    "Q00073 validation-bearing result commit owns the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
+    "Q00074: index111 PREFLIGHT_ONLY authority = 5,734 unresolved; index147 and font15/18/21 accepted fail-closed SOURCE_IDENTITY_MISMATCH; current B00342@89231474 index61 candidate remains QA_PENDING because supplied B00342@4e409a54 was SUPERSEDED.",
+    "Q00074 C00356 is pre-Gate: AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -106,9 +106,9 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-01T01:52:33+09:00",
+      "updated_at_kst": "2026-10-01T15:46:38+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20261001-0148-C166/C166_Q00064_INDEPENDENT_QA_BATCH.json",
+      "report": "localization/graphics/role_C/20261001-1546-C176/C176_Q00074_INDEPENDENT_QA_BATCH.json",
       "direct_queue_scope": 126,
       "current_candidates_scanned": 18,
       "elements_scanned": 203,
@@ -483,7 +483,33 @@
       ],
       "q00064_automation_validation": "PASS",
       "q00064_validation_bearing_result_sha": "624b504f9ddfeea77fe72f0fb7f155b3fce3832d",
-      "q00064_automation_gate_run_id": 36747306315
+      "q00064_automation_gate_run_id": 36747306315,
+      "q00074_reviewed_indices": [
+        15,
+        18,
+        21,
+        61,
+        111,
+        147
+      ],
+      "q00074_input_dispositions": {
+        "LOCALIZATION-LOCALIZATION_A-00344@bea28331bbdbe605dea3f6c8fb4e27892b48f56d": "PASS",
+        "LOCALIZATION-LOCALIZATION_A-00345@5f72a88cbcf98873f4181a6d2e378c7f08f4f6c7": "PASS",
+        "LOCALIZATION-LOCALIZATION_B-00342@4e409a5498d1a07e0701223943b16df89bf4c337": "SUPERSEDED",
+        "LOCALIZATION-LOCALIZATION_A-00346@4fd5c5ae6b505bffb13809db29f54e49eaf21800": "PASS"
+      },
+      "q00074_candidate_dds_modified": false,
+      "q00074_index111_remaining_unresolved": 5734,
+      "q00074_source_identity_mismatch_indices": [
+        15,
+        18,
+        21,
+        147
+      ],
+      "q00074_superseded_inputs": [
+        "LOCALIZATION-LOCALIZATION_B-00342@4e409a5498d1a07e0701223943b16df89bf4c337"
+      ],
+      "q00074_automation_validation": "PENDING"
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {
@@ -2468,87 +2494,48 @@
     "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json"
   },
   "latest_qa_batch": {
-    "schema_version": 16,
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00349",
-    "wave_id": "Q00073",
-    "run": "C175",
-    "recorded_at_kst": "2026-10-01T07:50:21+09:00",
-    "result": "PASS_Q00073_INDEX232_133_STATIC_QA_INDEX102_231_SCHEMA16_ISOLATION_RUNTIME_UNTESTED",
+    "schema_version": 23,
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00356",
+    "wave_id": "Q00074",
+    "run": "C176",
+    "recorded_at_kst": "2026-10-01T15:46:38+09:00",
+    "result": "PASS_Q00074_THREE_PREFLIGHT_SCOPES_ONE_SUPERSEDED_HISTORICAL_INDEX61_RUNTIME_UNTESTED",
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00332",
-        "result_sha": "20bc1533d6150c7217dee64c1286618c7bd3992f",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00344",
+        "result_sha": "bea28331bbdbe605dea3f6c8fb4e27892b48f56d",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00338",
-        "result_sha": "9640f989e50fa8ee3f661206ee8679f26371b05c",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00345",
+        "result_sha": "5f72a88cbcf98873f4181a6d2e378c7f08f4f6c7",
         "status": "PASS"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00340",
-        "result_sha": "4e3438375ede35e458e19303c5733710c71c608e",
-        "status": "PASS"
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+        "result_sha": "4e409a5498d1a07e0701223943b16df89bf4c337",
+        "status": "SUPERSEDED"
       },
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_B-00339",
-        "result_sha": "9d0a36f8f6e951d955f10fc3bdefedd343edbeae",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00346",
+        "result_sha": "4fd5c5ae6b505bffb13809db29f54e49eaf21800",
         "status": "PASS"
       }
     ],
     "throughput_kpis": {
       "production_complete": {
-        "new_this_batch": 2,
-        "retained_authoritative_static_qa_indices": [
-          51,
-          97,
-          99,
-          102,
-          112,
-          121,
-          130,
-          133,
-          152,
-          163,
-          193,
-          195,
-          222,
-          226,
-          231,
-          232,
-          237
-        ]
+        "new_this_batch": 0
       },
-      "candidate_awaiting_c": [
-        61,
-        159,
-        198,
-        201
-      ],
-      "candidate_rework_required": [],
-      "runnable_production": [],
-      "blocked_exception": [
-        54,
-        55,
-        147,
-        154
-      ],
+      "candidate_awaiting_c": "PRESERVE_CURRENT_HEAD_INCLUDING_NEWER_INDEX61_RESULT",
+      "runnable_production": "UNCHANGED_BY_THIS_BATCH",
+      "blocked_exception": "INDEX147_AND_FONT_SOURCE_IDENTITY_MISMATCH_SCOPES_RECORDED",
       "runtime_validated": []
     },
-    "automation_validation": "PASS",
+    "automation_validation": "PENDING",
     "runtime_validation": "UNTESTED",
-    "result_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
-    "authoritative_result_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
-    "validation_bearing_result_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
-    "automation_gate": {
-      "workflow": "Localization Automation Gate",
-      "run_id": 36788089100,
-      "head_sha": "0f6dd9a39ee6f6c3750325eb0b89df42f44b83fa",
-      "run_attempt": 1,
-      "status": "completed",
-      "conclusion": "success",
-      "validated_at_kst": "2026-10-01T07:53:28+09:00"
-    }
+    "result_sha": null,
+    "authoritative_result_sha": null,
+    "validation_bearing_result_sha": null
   },
   "typography_v19_reaudit": {
     "policy_version": 19,
