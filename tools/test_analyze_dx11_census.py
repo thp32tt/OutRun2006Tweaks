@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for R72-R85 compatibility plus R106/R107/R113/R114 evidence."""
+"""Regression tests for R72-R85 compatibility plus R106/R107/R113/R114 exhaustive evidence."""
 
 from __future__ import annotations
 
@@ -657,6 +657,39 @@ def main() -> int:
     assert r114_coverage["ActivationProof"] is False
     assert r114_saturated["NativeDrawPathActivationAllowed"] is False
 
+    exhaustive = run_case(
+        "VR DX11 R114 census: samples=4 exact=4 fixedFn=4 programmable=0 "
+        "topologyUnsupported=0 signatures=4 "
+        "sampling[drawsSeen=4,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert (
+        exhaustive["Status"]
+        == "OBSERVED_EXHAUSTIVE_TRANSLATION_EXACT_DIAGNOSTIC_ONLY"
+    )
+    exhaustive_exactness = exhaustive["ActivationEvidence"]["CensusExactness"]
+    exhaustive_coverage = exhaustive["ActivationEvidence"]["SamplingCoverage"]
+    assert exhaustive_exactness["AllSampledExact"] is True
+    assert exhaustive_exactness["ExhaustiveDrawCoverage"] is True
+    assert exhaustive_exactness["ActivationProof"] is False
+    assert exhaustive_coverage["DrawsSeen"] == 4
+    assert exhaustive_coverage["Samples"] == 4
+    assert exhaustive_coverage["Stride"] == 1
+    assert exhaustive_coverage["SchemeId"] == 2
+    assert exhaustive_coverage["Scheme"] == "EXHAUSTIVE_V1"
+    assert exhaustive_coverage["NonExhaustive"] is False
+    assert exhaustive_coverage["ExhaustiveDrawCoverage"] is True
+    assert exhaustive_coverage["ActivationProof"] is False
+    assert exhaustive["NativeDrawPathActivationAllowed"] is False
+
     r72 = run_case(
         "VR DX11 R72 signature#1: primitive=4 fixedFn=1\n"
         "VR DX11 R72 census: samples=64 exact=64 fixedFn=64 programmable=0 "
@@ -678,7 +711,7 @@ def main() -> int:
     assert r72["LatestSummary"]["mutationTelemetryRequired"] == 0
     assert r72["LatestSummary"]["managedShadowRequired"] == 0
 
-    print("DX11 census analyzer regression R114: PASS")
+    print("DX11 census analyzer regression R114 exhaustive-mode: PASS")
     return 0
 
 
