@@ -116,6 +116,24 @@ for legacy in (
     if re.search(rf"\\b{legacy}[A-Za-z0-9_]+", r31):
         errors.append(f"R31 regained lower-layer implementation dependency: {legacy}*")
 
+if r29.count("R29StereoInstallState.store(") != 1:
+    errors.append("R29 install-state storage must have one write boundary")
+if r29.count("R29StereoInstallState.load(") != 1:
+    errors.append("R29 install-state storage must have one read boundary")
+read_state_begin = r29.find("ReadStereoBaseInstallState() noexcept")
+effect_state_begin = r29.find("struct R29EffectState", read_state_begin)
+if read_state_begin < 0 or effect_state_begin <= read_state_begin:
+    errors.append("R29 install-state read boundary missing")
+else:
+    read_state = r29[read_state_begin:effect_state_begin]
+    if "R29StereoInstallState.load(std::memory_order_acquire)" not in read_state:
+        errors.append("R29 install-state read boundary no longer owns atomic load")
+    if "return ReadStereoBaseInstallState();" in read_state:
+        errors.append("R29 install-state read boundary became recursive")
+public_state_begin = r29.rfind("StereoBaseInstallState() noexcept")
+if public_state_begin < 0 or "return ReadStereoBaseInstallState();" not in r29[public_state_begin:]:
+    errors.append("R29 public install-state facade bypassed read boundary")
+
 for legacy in (
     "R26InstallState",
     "R29RendererState",

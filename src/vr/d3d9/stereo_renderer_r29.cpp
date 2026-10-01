@@ -45,7 +45,7 @@ namespace OutRunVRStereo
         OutRunVR::RuntimeEligibility::InstallState
         ReadStereoBaseInstallState() noexcept
         {
-            return ReadStereoBaseInstallState();
+            return R29StereoInstallState.load(std::memory_order_acquire);
         }
 
         struct R29EffectState
@@ -638,6 +638,6 @@ namespace OutRunVRStereo
     OutRunVR::RuntimeEligibility::InstallState
     StereoBaseInstallState() noexcept
     {
-        return R29StereoInstallState.load(std::memory_order_acquire);
+        return ReadStereoBaseInstallState();
     }
 }
