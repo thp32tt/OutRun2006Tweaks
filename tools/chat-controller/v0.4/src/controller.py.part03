@@ -434,8 +434,42 @@ def assistant_claims_github_unavailable(text: str) -> bool:
         "github 도구",
         "깃허브 도구",
         "capability_blocked",
+        "blocked_tooling",
     )
     return any(p in lowered for p in phrases)
+
+
+def assistant_claims_github_tooling_absent(text: str) -> bool:
+    lowered = (text or "").lower()
+    if "github" not in lowered and "깃허브" not in lowered:
+        return False
+    tooling_phrases = (
+        "schema",
+        "함수(schema)",
+        "실제 호출 함수",
+        "호출 함수",
+        "함수가 노출되지",
+        "도구가 노출되지",
+        "tool schema",
+        "function schema",
+        "functions are not exposed",
+        "tool functions are not exposed",
+        "not exposed",
+        "blocked_tooling",
+    )
+    blocked_phrases = (
+        "진행되지 못",
+        "실행할 수",
+        "호출할 수",
+        "사용할 수 없",
+        "unavailable",
+        "cannot",
+        "can't",
+        "unable",
+        "blocked",
+        "not exposed",
+    )
+    return any(p in lowered for p in tooling_phrases) and any(p in lowered for p in blocked_phrases)
 
 
 async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, Page], active: dict) -> bool:
@@ -1209,6 +1243,18 @@ async def localization_process_lane(
                     )
                 return
 
+            if assistant_claims_github_tooling_absent(text):
+                reason = (
+                    "Assistant incorrectly treated GitHub plugin function/schema visibility as a tooling block. "
+                    "The connected GitHub plugin is required; roll the same TASK_ID to a fresh project chat and retry plugin discovery without consuming ATTEMPT."
+                )
+                active["failure_context"] = reason
+                if await queue_rollover_chat(context, pages, active, reason):
+                    save_queue_state(q)
+                    return
+                if active.get("phase") == "BLOCKED":
+                    save_queue_state(q)
+                    return
             if assistant_claims_github_unavailable(text):
                 if await queue_send_github_recovery(context, pages, active):
                     save_queue_state(q)
@@ -2147,6 +2193,18 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
 
         task_commit = github_find_task_commit(active["branch"], active["task_id"])
         if not task_commit:
+            if assistant_claims_github_tooling_absent(text):
+                reason = (
+                    "Assistant incorrectly treated GitHub plugin function/schema visibility as a tooling block. "
+                    "The connected GitHub plugin is required; roll the same TASK_ID to a fresh project chat and retry plugin discovery without consuming ATTEMPT."
+                )
+                active["failure_context"] = reason
+                if await queue_rollover_chat(context, pages, active, reason):
+                    save_queue_state(q)
+                    return
+                if active.get("phase") == "BLOCKED":
+                    save_queue_state(q)
+                    return
             if assistant_claims_github_unavailable(text):
                 if await queue_send_github_recovery(context, pages, active):
                     save_queue_state(q)
