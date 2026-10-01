@@ -11,6 +11,12 @@ services:
     environment:
       TZ: Asia/Seoul
       AUTO_SEND: "${AUTO_SEND:-true}"
+      GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
+      GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
+      GITHUB_BROKER_ENABLED: "true"
+      GITHUB_BROKER_MAX_CONTEXT_CHARS: "42000"
+      GITHUB_BROKER_MAX_FILE_CHARS: "14000"
+      GITHUB_BROKER_MAX_COMMIT_BYTES: "1048576"
       SCHEDULE_MINUTES: "0,20,40"
       CHAT_SLOTS: "3"
       CHAT_DAY_ROLLOVER_HOUR: "2"
