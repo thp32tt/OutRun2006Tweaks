@@ -1,0 +1,150 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-a00378-p00246-index135-material-source-reactivation-guard-producer-result-v30",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00378",
+  "wave_id": "P00246",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCER_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T18:44:00+09:00",
+  "incoming_controller_schema_version": 30,
+  "incoming_controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "applied_controller_schema_version": 30,
+  "applied_controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "canonical_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+  "base_head_sha": "92e9c59a7b0b90d1b06b4e67f450a4632823e486",
+  "policy_resolution": {
+    "resolution": "CURRENT_HEAD_SCHEMA30_APPLIED",
+    "stale_cached_policy_used": false,
+    "stable_shard_rule": "asset_queue.index % 3 == 0",
+    "owning_shard_rows": 42,
+    "candidate_completion_first": true,
+    "producer_skip_qa_pending_assets": true,
+    "candidate_batch_target": 2,
+    "normal_success_min_candidate_dds": 2,
+    "zero_candidate_exception_requires_fresh_completion_tier_scan": true,
+    "preflight_fallback_requires_no_runnable_completion_tier": true,
+    "work_steal_allowed": false
+  },
+  "result": "PASS_MATERIAL_A_MOD3_INDEX135_SOURCE_REACTIVATION_GUARD_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "summary": "Fresh schema30 A-shard reconciliation reuses A00376's zero completion-tier scan because queue/inventory/progress/resume/controller/contract fingerprints are unchanged; intervening commits are disjoint producer-B lane-local work. Candidate-bearing indices159/198/201 and unconsumed A results are not repeated. Fallback step 5 closes a tooling gap on index135/2B0863D6: C152/Q00050 accepted A00225 SOURCE_ACQUISITION_EXHAUSTED, but no executable dependency-reactivation verifier existed. This task adds a deterministic fail-closed guard and machine report without repeating Drive/direct/Release acquisition. Noncanonical Release substitution and candidate rebuild remain forbidden until a declared dependency fingerprint changes. No DDS/shared-state/runtime/N100/local-clone/Drive-write/VR/FFB/DX work.",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00368",
+    "latest_authoritative_c_wave": "Q00075",
+    "direct_rework_required_runnable_a": [],
+    "explicit_render_next_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "unconsumed_a_results_not_repeated": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+        "index": 222,
+        "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
+        "index": 51,
+        "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00366",
+        "index": 111,
+        "result_sha": "ece3a4725d9f1a1b2e75f59171bb20085eecfa84"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00371",
+        "index": 228,
+        "result_sha": "ffd813d876bb83b21d02af41c4bad726bd5ea913"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00373",
+        "index": 54,
+        "result_sha": "c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00376",
+        "index": 147,
+        "result_sha": "45b0ea6683450da03bd4f44d8ab9ae79dcbd5293"
+      }
+    ],
+    "selected_indices": [
+      135
+    ],
+    "selected_asset": "2B0863D6",
+    "selected_action": "FALLBACK_STEP_5_ADD_EXECUTABLE_SOURCE_DEPENDENCY_REACTIVATION_GUARD",
+    "source_probe_repeated": false,
+    "work_stolen_from_lane": null
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "INDEX135_SOURCE_DEPENDENCY_REACTIVATION_GUARD_AND_MACHINE_OUTPUT",
+    "executable": "localization/graphics/role_A/20261001-A00378-P00246/verify_index135_source_reactivation.py",
+    "machine_report": "localization/graphics/role_A/20261001-A00378-P00246/A00378_P00246_INDEX135_SOURCE_REACTIVATION_GUARD.json",
+    "candidate_dds_modified": false,
+    "new_executable_selection_input": true,
+    "materially_reduces_unresolved_work": true,
+    "production_readiness": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED"
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261001-A00378-P00246/verify_index135_source_reactivation.py",
+    "localization/graphics/role_A/20261001-A00378-P00246/A00378_P00246_INDEX135_SOURCE_REACTIVATION_GUARD.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00225.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00228.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00376.json"
+  ],
+  "fingerprints": {
+    "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+    "controller_roles_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed",
+    "canonical_progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
+    "a00225_task_blob_sha": "658dd9414e4b1a5c371586e96159707b09bf38be",
+    "c152_task_blob_sha": "166cee891bf8fb636d664c46c6eb7ec7fc39a19e",
+    "canonical_source_sha256": "7cb768c657869981b0e548293f68975a84d4e2fb179f29a7568dbf096c365521",
+    "pinned_release_member_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06"
+  },
+  "candidate_dds_modified": false,
+  "candidate_binary_persisted": false,
+  "material_change": true,
+  "review_record_only": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "source_reprobe_performed": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "self_qa": "PASS_A_MOD3_SCHEMA30__FRESH_HEAD_ZERO_COMPLETION_TIER_BY_UNCHANGED_SHARED_FINGERPRINT__QA_PENDING_AND_UNCONSUMED_A_RESULTS_NOT_REPEATED__INDEX135_C152_SOURCE_EXHAUSTION_REUSED__NO_SOURCE_REPROBE__NONCANONICAL_RELEASE_SUBSTITUTION_FORBIDDEN__EXECUTABLE_FAIL_CLOSED_REACTIVATION_GUARD_ADDED__NO_SHARED_STATE__NO_DDS__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_binding_state": "PENDING_RESULT_COMMIT_CREATION",
+  "result_commit_message": "localization(A): add index135 source reactivation guard [AUTO:LOCALIZATION-LOCALIZATION_A-00378]",
+  "durable_task_record_in_result_commit": true,
+  "precommit_refresh": {
+    "head_sha": "92e9c59a7b0b90d1b06b4e67f450a4632823e486",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "Latest shared fingerprints equal A00376 scan. Intervening B00375 changes are lane-B task/tool/report only; no queue/progress/resume/controller/contract/A-shard fingerprint changed. A00378 adds only lane-A index135 verifier/report and unique task record."
+  },
+  "bookkeeping_note": "Initial durable result commit intentionally leaves self-SHA fields null. A separate bookkeeping-only commit will bind immutable RESULT_SHA. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; no real-game validation was performed and RUNTIME_VALIDATION remains UNTESTED."
+}
