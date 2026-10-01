@@ -107,6 +107,8 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 - Runtime tuning authority is `localization/controller_roles.json`; Docker/controller selftests must fail when duplicated environment values drift from that SSOT.
 
 
+- Startup blocked-producer recovery (schema31): if an A/B/E task is present in `blocked[]` only because ChatGPT UI recovery exhausted but the exact TASK_ID has a durable Git commit, startup must restore it as `PRODUCED`, remove it from `blocked[]`, and enqueue its immutable TASK_ID@RESULT_SHA for C QA. A blocked producer with no durable task commit remains blocked.
+
 ## Controller bounded-liveness and durable-state policy v23
 - Durable Git evidence is checked before Retry, busy, conversation-limit, or other transient ChatGPT UI recovery. A completed TASK_ID must never be re-executed merely because its old browser page still shows Retry or busy UI.
 - Every submitted prompt owns its TASK_ID immediately. A rate-limit/Retry surface detected after send must not orphan that request or allow the counter/TASK_ID to be reused.
