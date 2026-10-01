@@ -3145,6 +3145,13 @@ namespace OutRunVRStereo
                 "OpenXRVRStereoR30HUD", success);
         }
 
+        void R30FailInstall() noexcept
+        {
+            R30RollbackBufferShadowHooks();
+            R30PublishInstallResult(
+                R30InstallStateValue::Failed, false);
+        }
+
         enum class R30PrerequisiteDecision
         {
             Wait,
@@ -3179,8 +3186,7 @@ namespace OutRunVRStereo
                     R30ClassifyPrerequisite(StereoBaseInstallState());
                 if (prerequisite == R30PrerequisiteDecision::Fail)
                 {
-                    R30RollbackBufferShadowHooks();
-                    R30PublishInstallResult(State::Failed, false);
+                    R30FailInstall();
                     spdlog::error(
                         "VR R30 HUD: R29 prerequisite failed; R29 remains active without screen-space FOV correction");
                     return 0;
@@ -3190,8 +3196,7 @@ namespace OutRunVRStereo
                 {
                     if (!R30InstallHookTransaction())
                     {
-                        R30RollbackBufferShadowHooks();
-                        R30PublishInstallResult(State::Failed, false);
+                        R30FailInstall();
                         spdlog::error(
                             "VR R30 HUD: disabled-first hook transaction failed; R29 remains active");
                         return 0;
@@ -3206,8 +3211,7 @@ namespace OutRunVRStereo
                 Sleep(R30PrerequisiteWaitMs);
             }
 
-            R30RollbackBufferShadowHooks();
-            R30PublishInstallResult(State::Failed, false);
+            R30FailInstall();
             spdlog::error(
                 "VR R30 HUD: timed out waiting for R29; R29 remains active");
             return 0;

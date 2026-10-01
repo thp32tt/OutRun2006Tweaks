@@ -183,6 +183,17 @@ if "attempt < R30PrerequisiteWaitAttempts" not in r30 or \
 if "R30ClassifyPrerequisite(StereoBaseInstallState())" not in r30:
     errors.append("R30 install thread bypassed prerequisite classification boundary")
 
+if "void R30FailInstall() noexcept" not in r30:
+    errors.append("R30 install failure boundary missing")
+else:
+    fail_begin = r30.find("void R30FailInstall() noexcept")
+    fail_end = r30.find("enum class R30PrerequisiteDecision", fail_begin)
+    fail_body = r30[fail_begin:fail_end]
+    rollback_pos = fail_body.find("R30RollbackBufferShadowHooks()")
+    publish_pos = fail_body.find("R30PublishInstallResult(")
+    if rollback_pos < 0 or publish_pos <= rollback_pos:
+        errors.append("R30 failure boundary changed buffer-rollback-before-publication order")
+
 transaction_begin = r30.find("bool R30InstallHookTransaction() noexcept")
 transaction_end = r30.find("void R30PublishInstallResult(", transaction_begin)
 install_begin = r30.find("DWORD WINAPI R30InstallThread(")
@@ -210,6 +221,11 @@ if install_begin < 0:
     errors.append("R30 install thread missing")
 else:
     install_thread = r30[install_begin:]
+    if install_thread.count("R30FailInstall();") != 3:
+        errors.append("R30 install thread must route all three failure exits through one boundary")
+    if "R30RollbackBufferShadowHooks();" in install_thread or \
+            "R30PublishInstallResult(State::Failed, false);" in install_thread:
+        errors.append("R30 install thread regained inline failure cleanup/publication ownership")
     if "if (!R30InstallHookTransaction())" not in install_thread:
         errors.append("R30 install thread bypassed hook transaction boundary")
     for marker in (
