@@ -440,36 +440,83 @@ def assistant_claims_github_unavailable(text: str) -> bool:
 
 
 def assistant_claims_github_tooling_absent(text: str) -> bool:
+    """Detect semantic GitHub-tooling refusal even when wording changes."""
     lowered = (text or "").lower()
-    if "github" not in lowered and "깃허브" not in lowered:
+    if not any(x in lowered for x in ("github", "깃허브", "플러그인", "plugin", "connector")):
         return False
-    tooling_phrases = (
+
+    tooling_markers = (
         "schema",
-        "함수(schema)",
-        "실제 호출 함수",
         "호출 함수",
-        "함수가 노출되지",
-        "도구가 노출되지",
+        "도구가 노출",
+        "함수가 노출",
         "tool schema",
         "function schema",
-        "functions are not exposed",
-        "tool functions are not exposed",
         "not exposed",
+        "plugin",
+        "플러그인",
+        "connector",
+        "capability_blocked",
         "blocked_tooling",
     )
-    blocked_phrases = (
+    no_progress_markers = (
+        "실행 불가",
+        "조회 불가",
+        "생성 불가",
+        "수행 불가",
+        "진입하지 못",
         "진행되지 못",
-        "실행할 수",
-        "호출할 수",
+        "실행할 수 없",
+        "호출할 수 없",
         "사용할 수 없",
-        "unavailable",
+        "접근할 수 없",
         "cannot",
         "can't",
         "unable",
+        "unavailable",
+        "not run",
+        "not_run",
+        "not created",
+        "not_created",
         "blocked",
-        "not exposed",
     )
-    return any(p in lowered for p in tooling_phrases) and any(p in lowered for p in blocked_phrases)
+    durable_absence_markers = (
+        "result_sha=not_created",
+        "result_sha: not_created",
+        "result_sha=none",
+        "result_sha: none",
+        "result_sha: 없음",
+        "commit: 없음",
+        "commit=none",
+        "커밋: 없음",
+        "커밋 없음",
+        "source_change: 미수행",
+        "source change: not",
+        "automation_validation=not_run",
+        "automation_validation: not_run",
+        "automation_validation=blocked_tooling",
+        "automation_validation: blocked_tooling",
+    )
+    task_block_markers = (
+        "head 조회",
+        "branch 조회",
+        "소스 수정",
+        "git commit",
+        "github actions",
+        "actions gate",
+        "저장소 조회",
+    )
+
+    tooling = any(p in lowered for p in tooling_markers)
+    no_progress_hits = sum(1 for p in no_progress_markers if p in lowered)
+    durable_absence = any(p in lowered for p in durable_absence_markers)
+    task_block_hits = sum(1 for p in task_block_markers if p in lowered)
+
+    if tooling and no_progress_hits:
+        return True
+    if durable_absence and (no_progress_hits or task_block_hits >= 2):
+        return True
+    return no_progress_hits >= 2 and task_block_hits >= 2
 
 
 async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, Page], active: dict) -> bool:
@@ -533,8 +580,7 @@ async def queue_send_github_recovery(context: BrowserContext, pages: dict[str, P
         return False
 
     prompt = (
-        "GitHub 연결되어 있어. 공개 웹 말고 연결된 GitHub 플러그인 도구를 다시 탐색해서 실제 호출부터 하고, "
-        f"TASK_ID={active['task_id']} 작업을 중단하지 말고 그대로 계속해."
+        f"GitHub 연결돼 있어. 연결된 GitHub 플러그인으로 다시 시도하고 TASK_ID={active['task_id']} 작업 계속해."
     )
     result = await send_message(page, prompt)
     if result != "sent":
