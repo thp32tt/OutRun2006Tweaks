@@ -86,8 +86,8 @@
   "retry_required": false,
   "self_qa": "PASS_B_MOD3_BATCH_2_OF_2__INDEX94_EXISTING_IMMUTABLE__INDEX163_V19_TRANSLITERATION_ONLY_FIXED46__ZERO_OUTSIDE__ZERO_ALPHA_OUTSIDE__ZERO_PROTECTED__ZERO_1PX_OVERFLOW__HEADER_EXACT__ROUNDTRIP_EXACT__ENGLISH_SOURCE_VISUAL_PASS__DRIVE_READBACK_BYTE_IDENTICAL__RUNTIME_UNTESTED",
   "previous_result_sha": "7ca5adbc51941aff245f1f5e1646528c6003e32d",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
+  "authoritative_result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
   "validation_bearing_result_sha": null,
   "result_commit_message": "localization(B): complete schema22 two-candidate batch [AUTO:LOCALIZATION-LOCALIZATION_B-00347]",
   "durable_task_record_in_result_commit": true,
@@ -98,5 +98,8 @@
     "controller_config_blob_sha": "be640c0c2806985743b8fc41b90a16025c590cf8",
     "stale_state_overwrite": false,
     "shared_state_modified": false
-  }
+  },
+  "bookkeeping_note": "Durable producer result fa9c8bf687b17318d00bee52e615f134b6ee7b3f contains the completed schema22 B00347 2/2 candidate batch: immutable index94 plus materially reworked index163. Index163 package/review bytes are persisted in approved current-pipeline Drive and GitHub review evidence. AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; RUNTIME_VALIDATION remains UNTESTED. Shared progress/queue state was not modified by producer B.",
+  "bookkeeping_base_result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
+  "bookkeeping_head_before_update": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f"
 }
