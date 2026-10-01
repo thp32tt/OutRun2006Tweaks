@@ -1,0 +1,49 @@
+{
+  "task_id": "CONVERSION-DXVK-00215",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "7eb0c8c47c971bada69df05357078f9bad454a79",
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R215_18246D_CONTROL_FLOW_CAPTURE_EDGE",
+  "selection_reason": "CONVERSION-DXVK-00213 captured exact replacement-EXE bytes for 0x0018246D..0x001824AD and explicitly named bounded exact-decode of complete instructions from 0x0018246D as the next independent F13 action.",
+  "summary": "ATTEMPT=1 implementation staged. Exact-decode complete instructions from the R213-proven 64-byte window only; preserve the trailing e8 5e at 0x001824AB as an incomplete rel32 CALL capture edge. No runtime/provider/selector/renderer behavior is modified.",
+  "evidence": [
+    "R213 exact provenance bytes are immutable input for this task: 75 eb dd d8 db 2d f0 60 73 00 b8 01 00 00 00 83 3d 64 fa 85 00 00 0f 85 d5 64 00 00 ba 0e 00 00 00 8d 0d e0 59 73 00 e8 de 63 00 00 5a c3 e8 4c 37 00 00 8b 40 64 3b 05 5c 5e 73 00 74 05 e8 5e.",
+    "Decoder proves only complete instructions through exclusive 0x001824AB; bytes e8 5e at 0x001824AB remain incomplete and no target is inferred.",
+    "Expected exact branches are 0x0018246D->0x0018245A, 0x00182483->0x0018895E and 0x001824A9->0x001824B0.",
+    "Expected exact calls are 0x00182494->0x00188877 and 0x0018249B->0x00185BEC; both must also exist in R213 raw rel32 provenance.",
+    "R211 predecessor branches 0x00182433/0x00182444->0x0018246F and 0x0018245F->0x0018247C are used only to prove current instruction boundaries. Function/callee/render/HUD semantics remain unresolved.",
+    "No Quest 3/VDXR or in-game test is part of this static proof; runtime_validation remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00215.json"
+  ],
+  "proof_contract": {
+    "predecessor_provenance_status": "EXACT_EXE_18246D_TO_1824AD_PROVENANCE_CAPTURED",
+    "predecessor_control_flow_status": "EXACT_18242E_TO_18246D_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "start_rva": "0x0018246D",
+    "prefix_end_rva": "0x001824AB",
+    "capture_end_rva": "0x001824AD",
+    "incomplete_rva": "0x001824AB",
+    "incomplete_bytes": "e8 5e",
+    "expected_status": "EXACT_18246D_TO_1824AB_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "semantic_effect": "BOUNDED_CONTROL_FLOW_AND_CAPTURE_EDGE_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE_UNCHANGED",
+  "blocker": "The capture ends two bytes into the rel32 CALL at 0x001824AB. Its displacement/target and all bytes/instruction boundaries beyond 0x001824AD remain unresolved pending a future fresh provenance capture.",
+  "next_action": "Run exact-source GitHub Actions validation. If PASS, update this record in a separate CI-skipped bookkeeping commit with the validation-bearing result SHA and run evidence. Runtime remains UNTESTED."
+}
