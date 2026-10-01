@@ -1,0 +1,201 @@
+{
+  "schema_version": 31,
+  "schema": "outrun-a00383-p00251-index30-source-dependency-semantics-v2",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00383",
+  "wave_id": "P00251",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCER_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "base_head_sha": "bbc8ebefda2d03ef37b59100c0094b2397dc2125",
+  "incoming_controller_schema_version": 30,
+  "incoming_controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "applied_controller_schema_version": 31,
+  "applied_controller_config_blob_sha": "ef7dc757bc849c898c18319a0e417e350bdda757",
+  "canonical_contract_blob_sha": "68c4c1d65fdb62ab33abc1ca4a93e70651f1dfd8",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX30_SCHEMA31_SOURCE_DEPENDENCY_SEMANTIC_GUARD_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "policy_resolution": {
+    "resolution": "CURRENT_HEAD_SCHEMA31_APPLIED_TO_STALE_SCHEMA30_DISPATCH",
+    "stale_cached_policy_used": false,
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "candidate_completion_first": true,
+    "candidate_batch_target": 2,
+    "work_steal_allowed": false
+  },
+  "selection": {
+    "direct_rework_required_runnable_a": [],
+    "explicit_render_next_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "unconsumed_a_results_not_repeated": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+        "index": 222,
+        "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
+        "index": 51,
+        "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00366",
+        "index": 111,
+        "result_sha": "ece3a4725d9f1a1b2e75f59171bb20085eecfa84"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00371",
+        "index": 228,
+        "result_sha": "ffd813d876bb83b21d02af41c4bad726bd5ea913"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00373",
+        "index": 54,
+        "result_sha": "c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00376",
+        "index": 147,
+        "result_sha": "45b0ea6683450da03bd4f44d8ab9ae79dcbd5293"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00378",
+        "index": 135,
+        "result_sha": "318c34fe1e21522b3b2846e6fd5828b97f4ae88a"
+      }
+    ],
+    "selected_index": 30,
+    "selected_asset": "8215FD25",
+    "selected_action": "FALLBACK_STEP_5_UPGRADE_EXECUTABLE_SOURCE_DEPENDENCY_SEMANTIC_GUARD",
+    "source_probe_repeated": false,
+    "work_stolen_from_lane": null
+  },
+  "tooling_delta": {
+    "prior_guard_task": "LOCALIZATION-LOCALIZATION_A-00286",
+    "prior_guard_result_sha": "1eabccbc904731c6b18f34e2fa0f213ca4401e27",
+    "deficiency_closed": [
+      "bind approved Google Drive canonical folder/subtree and acquisition order as source dependencies",
+      "bind current sticky source-exhaustion reselection policy",
+      "exclude GitHub access/recovery policy churn from source-reactivation semantics",
+      "emit deterministic semantic-dependency hashes when verifier executes"
+    ],
+    "source_reacquisition_performed": false
+  },
+  "semantic_dependencies": {
+    "queue": {
+      "index": 30,
+      "path": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+      "action": "localize_text",
+      "shard_modulo_3": 0
+    },
+    "canonical_inventory": {
+      "sha256": "0cd71138fd6811f5466a9c6674a243324d88ecc8dd82ad36df05234d759abc56",
+      "width": 1024,
+      "height": 512,
+      "mode": "RGBA"
+    },
+    "accepted_guard": {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00286",
+      "result_sha": "1eabccbc904731c6b18f34e2fa0f213ca4401e27",
+      "c_acceptance_marker_present": true
+    },
+    "source_transport": {
+      "provider": "google_drive",
+      "folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "allowed_subtree": "OutRun2006_Korean_Artifacts/90_ARCHIVE/LOCALIZATION_SNAPSHOT_20260927_0302/03_ORIGINAL_REFERENCE/hd_source/OR2-HD-GUI-v0.25.10a/textures/load",
+      "acquisition_order": [
+        "GOOGLE_DRIVE_EXACT_RELATIVE_PATH",
+        "PINNED_UPSTREAM_DIRECT_FILE",
+        "PINNED_V0.25.10A_RELEASE"
+      ]
+    },
+    "pinned_source": {
+      "tag": "v0.25.10a",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "zip_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "tokens_present_in_contract": true
+    },
+    "sticky_policy": {
+      "skip_unchanged_source_acquisition_exhausted": true,
+      "retry_only_on_dependency_fingerprint_change": true
+    }
+  },
+  "current_checks": {
+    "queue_identity_current_a_shard": true,
+    "canonical_inventory_identity": true,
+    "a00286_result_identity": true,
+    "c165_acceptance_marker_current": true,
+    "current_schema_at_least_31": true,
+    "source_transport_semantics_current": true,
+    "sticky_source_reselection_policy_current": true,
+    "pinned_source_policy_tokens_current": true,
+    "shared_queue_progress_resume_fingerprints_unchanged_since_a00378": true
+  },
+  "reactivation_contract": {
+    "current_result": "BLOCKED_UNCHANGED_SOURCE_DEPENDENCY_SEMANTICS",
+    "source_reprobe_authorized": false,
+    "candidate_rebuild_authorized": false,
+    "fresh_producer_rescan_required": false,
+    "excluded_non_source_dependency_families": [
+      "github_access_validation",
+      "runtime_recovery",
+      "runtime_tuning",
+      "controller_prompt_transport_wording"
+    ],
+    "reactivation_triggers": [
+      "index30 canonical inventory identity changes",
+      "index30 queue path/action/shard ownership changes",
+      "A00286/C165 accepted guard is superseded",
+      "approved Drive canonical folder/subtree or acquisition order changes",
+      "pinned v0.25.10a tag/commit/bundle identity changes",
+      "sticky source-exhaustion reselection policy changes"
+    ]
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "INDEX30_SCHEMA31_SOURCE_DEPENDENCY_SEMANTIC_GUARD_AND_MACHINE_OUTPUT",
+    "executable": "localization/graphics/role_A/20261001-A00383-P00251/verify_index30_source_dependency_semantics.py",
+    "machine_report": "localization/graphics/role_A/20261001-A00383-P00251/A00383_P00251_INDEX30_SOURCE_DEPENDENCY_SEMANTICS.json",
+    "candidate_dds_modified": false,
+    "new_executable_selection_input": true,
+    "materially_reduces_unresolved_work": true,
+    "production_readiness": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "68c4c1d65fdb62ab33abc1ca4a93e70651f1dfd8",
+    "controller_roles_blob_sha": "ef7dc757bc849c898c18319a0e417e350bdda757",
+    "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "canonical_progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
+    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed",
+    "a00286_task_blob_sha": "e114f57dbc5fa0f7abbfd4855084ecd789b21b57",
+    "a00378_task_blob_sha": "8e5d1649e17591debccf1a1c2e0a8f019bbd90d1"
+  },
+  "candidate_dds_modified": false,
+  "candidate_binary_persisted": false,
+  "material_change": true,
+  "review_record_only": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "source_reprobe_performed": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "self_qa": "PASS_A_MOD3_SCHEMA31__ZERO_COMPLETION_TIER_SHARED_FINGERPRINT_UNCHANGED__QA_PENDING_AND_UNCONSUMED_A_RESULTS_NOT_REPEATED__INDEX30_CURRENT_C165_GUARD__SOURCE_TRANSPORT_SEMANTICS_BOUND__GITHUB_ACCESS_POLICY_CHURN_EXCLUDED__NO_SOURCE_REPROBE__NO_SHARED_STATE__NO_DDS__RUNTIME_UNTESTED"
+}
