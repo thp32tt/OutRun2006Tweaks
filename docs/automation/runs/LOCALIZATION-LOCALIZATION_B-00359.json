@@ -46,7 +46,10 @@
     "unconsumed_b_preflight_not_repeated": {
       "task_id": "LOCALIZATION-LOCALIZATION_B-00353",
       "result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513",
-      "indices": [230, 236],
+      "indices": [
+        230,
+        236
+      ],
       "state": "PREFLIGHT_RESULT_AWAITING_C_CONSUMPTION_OR_DEPENDENCY_CHANGE"
     },
     "prior_no_action_review_not_used_as_material_authority": {
@@ -103,9 +106,12 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "bf1b6c87fc2a0f999d894e78c2b60a75d546f047",
+  "authoritative_result_sha": "bf1b6c87fc2a0f999d894e78c2b60a75d546f047",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_SEPARATE_BOOKKEEPING_BIND",
-  "result_commit_message": "localization(B): record schema23 zero-runnable shard review [AUTO:LOCALIZATION-LOCALIZATION_B-00359]"
+  "result_binding_state": "BOUND_BY_SEPARATE_BOOKKEEPING_COMMIT",
+  "result_commit_message": "localization(B): record schema23 zero-runnable shard review [AUTO:LOCALIZATION-LOCALIZATION_B-00359]",
+  "bookkeeping_note": "Immutable producer review result bf1b6c87fc2a0f999d894e78c2b60a75d546f047 is authoritative for B00359. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE and RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_at_kst": "2026-10-01T16:06:47+09:00",
+  "bookkeeping_base_result_sha": "bf1b6c87fc2a0f999d894e78c2b60a75d546f047"
 }
