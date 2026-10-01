@@ -1,0 +1,17 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00416",
+  "lane": "LOCALIZATION_C",
+  "attempt": "2/3",
+  "wave_id": "Q00087",
+  "result_message": "localization(C): batch gate reconcile exact producer SHAs [AUTO:LOCALIZATION-LOCALIZATION_C-00416]",
+  "qa_inputs": [
+    {"task_id":"LOCALIZATION-LOCALIZATION_E-00354","result_sha":"4c129e50612d41d13a48020357ab5eb95b290fe6","automation_validation":"PENDING"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00372","result_sha":"73c1cc95fd64c0d45f486eba434bab25ddfc1b6f","automation_validation":"PENDING"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00373","result_sha":"c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463","automation_validation":"PENDING"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00375","result_sha":"678655ff48caeab8ac8e291bf84888b0d697d4f4","automation_validation":"PENDING"}
+  ],
+  "automation_validation": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "failure_recovery": "added missing changed task record required by verify_c_batch_inputs.py from run 36870665454",
+  "created_at": "2026-10-01T22:45:00+09:00"
+}
