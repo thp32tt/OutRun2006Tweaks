@@ -1197,6 +1197,7 @@ def queue_dynamic_prefix() -> str:
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B", "LOCALIZATION_E"}:
         lines += [
             "현재 CONTROLLER_CONFIG_BLOB_SHA의 localization/controller_roles.json/canonical contract를 다시 읽어 producer 규칙을 적용해. 과거 캐시 금지.",
+            "NO_WORK_GUARD=FAIL_CLOSED: 미완료 guard가 하나라도 있으면 review-only/no-change로 종료 금지; 같은 TASK_ID로 material 작업 계속.",
         ]
     if qa_batch:
         lines += [
