@@ -206,7 +206,8 @@
       "lane_exception_isolation": true,
       "lane_exception_block_threshold": 3,
       "dispatch_exception_backoff_max_seconds": 300,
-      "browser_transport_failure_global_restart": true
+      "browser_transport_failure_global_restart": true,
+      "qa_pending_unconsumed_never_truncated": true
     },
     "state_persistence": {
       "atomic_primary_writes": true,
@@ -287,7 +288,8 @@
     "runtime_asset_validation": "FAIL_FAST_BEFORE_BROWSER_DISPATCH",
     "health_endpoint": "/healthz",
     "queue_active_null_allowed_in_parallel_mode": true,
-    "queue_active_legacy_field_must_not_gate_parallel_lanes": true
+    "queue_active_legacy_field_must_not_gate_parallel_lanes": true,
+    "qa_pending_retention": "UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA"
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
