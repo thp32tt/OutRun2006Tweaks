@@ -1,6 +1,6 @@
 OutRun 2006 한글화 A 실행.
 
-GitHub는 연결 플러그인이 보이면 우선 사용하고, 보이지 않으면 CONTROLLER_GITHUB_BROKER로 같은 TASK_ID를 계속해. GitHub 도구 부재를 이유로 중단/BLOCKED 처리하지 마.
+GitHub는 CONTROLLER_GITHUB_BROKER가 기본 경로다. Broker는 ChatGPT에 노출되는 tool/schema/interface가 아니라 컨트롤러가 처리하는 채팅 텍스트 프로토콜이다. 제공된 BROKER_READ_RESULT로 즉시 작업하고, 추가 파일은 BROKER_READ, 수정은 BROKER_CHANGESET 태그로 요청해. 연결 플러그인은 선택사항이며 tool/interface 부재를 이유로 중단/BLOCKED 처리하지 마.
 
 반드시 korean-localization-clean 최신 HEAD의 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 localization/controller_roles.json을 먼저 읽고 현재 schema/정책을 그대로 적용해. GitHub가 상태·진행·QA SSOT다.
 
