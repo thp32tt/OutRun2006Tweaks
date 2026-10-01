@@ -1,89 +1,149 @@
 {
   "schema_version": 30,
-  "schema": "outrun-producer-b00372-source-transport-material-prefight-v30",
+  "controller_schema_version": 30,
+  "schema": "outrun-b00372-p00240-current-static-pass-runtime-isolation-fallback-v30",
   "task_id": "LOCALIZATION-LOCALIZATION_B-00372",
   "wave_id": "P00240",
   "lane": "LOCALIZATION_B",
-  "role": "PRODUCER_B",
+  "role": "CONTINUOUS_PRODUCTION_SELF_QA_MOD3_1",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
-  "controller_schema_version": 30,
-  "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
-  "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
-  "base_head_sha": "b42129b90ae7f3d579de28f2fd83386aaf349ec7",
-  "result": "PASS_MATERIAL_B_MOD3_TWO_SOURCE_TRANSPORT_TIERS_CLOSED_RELEASE_VERIFIER_ADDED_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
-  "summary": "Fresh B-shard scan at schema30 found no runnable completion-tier work after preserving unconsumed/QA-pending producer results. B00372 materially advances indices 28 and 139 by closing the approved-Drive and immutable pinned-direct acquisition tiers with typed SOURCE_TRANSPORT_MISS evidence, while deliberately leaving the pinned-Release tier open because both available local binary runtimes fail before execution. A deterministic pinned-Release bundle/member SHA + DDS verifier is committed alongside the evidence so the remaining tier can be completed without repeating lower tiers. No source exhaustion, Korean DDS, static QA, runtime PASS, shared-state update, work-steal, N100/local clone, or VR/FFB/DX work is claimed.",
-  "report": "localization/graphics/role_B/20261001-B00372-P00240/B00372_P00240_INDICES28_139_SOURCE_TRANSPORT_PREFLIGHT.json",
-  "verifier": "localization/graphics/role_B/20261001-B00372-P00240/verify_release_sources_28_139.py",
-  "selected_indices": [
-    28,
-    139
-  ],
-  "selected_assets": [
-    "A05BF610",
-    "313DB8CB"
-  ],
-  "readiness_after": {
-    "28": "PREFLIGHT_ONLY__DRIVE_AND_PINNED_DIRECT_MISS_CONFIRMED__PINNED_RELEASE_MEMBER_IDENTITY_PENDING",
-    "139": "PREFLIGHT_ONLY__DRIVE_AND_PINNED_DIRECT_MISS_CONFIRMED__PINNED_RELEASE_MEMBER_IDENTITY_PENDING"
-  },
-  "material_deliverable": {
-    "fallback_ladder_step": 4,
-    "type": "TWO_B_SHARD_SOURCE_TRANSPORT_TIER_CLOSURES_PLUS_DETERMINISTIC_RELEASE_VERIFIER",
-    "material_payload_in_result_commit": true,
-    "materially_reduces_unresolved_work": true,
-    "candidate_dds_modified": false,
-    "release_verifier_added": true,
-    "unresolved_reason": "Pinned Release member identity cannot be executed in the current binary runtime; fail closed without terminal source classification."
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-10-01T17:58:00+09:00",
+  "base_head_sha": "3ff9dfd5353c20cf95e7f97cda133eb07d27df9e",
+  "result": "PASS_MATERIAL_B_MOD3_CURRENT_STATIC_PASS_RUNTIME_ISOLATION_INDEX97_INDEX121_RUNTIME_UNTESTED",
+  "summary": "Fresh schema30 B-shard scan found no authoritative B-owned DIRECT_REWORK/RENDER_READY/ONE_STAGE_TO_RENDER/current candidate completion item that was not already pending independent C or sticky-blocked. Fallback step 3 therefore advances two existing current STATIC_QA_PASS_RUNTIME_UNTESTED candidates: index97/411827E and index121/FD90AA9. Their old DDS_ONLY manifests pin superseded candidate SHAs; this task emits fresh exact-hash isolation manifests for the independently C-approved current candidates, rechecks current Drive archive name/size/parent metadata, does not rerender DDS or repeat heavy static QA, and keeps runtime UNTESTED.",
+  "policy_resolution": {
+    "dispatch_controller_schema_version": 30,
+    "dispatch_controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "latest_head_controller_roles_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "latest_head_automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+    "resolution": "LATEST_HEAD_SCHEMA30_POLICY_APPLIED"
   },
   "input_fingerprint": {
+    "base_head_sha": "3ff9dfd5353c20cf95e7f97cda133eb07d27df9e",
+    "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+    "controller_roles_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "canonical_inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
     "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
     "canonical_progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
-    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed",
-    "controller_roles_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
-    "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
-    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
-    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df"
+    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed"
   },
   "selection": {
     "shard_rule": "asset_queue.index % 3 == 1",
-    "selected_indices": [
-      28,
-      139
+    "fallback_ladder_step": 3,
+    "selected_priority": "EXISTING_STATIC_QA_PASS_CURRENT_CANDIDATE_DDS_ONLY_RUNTIME_ISOLATION",
+    "render_ready_indices": [],
+    "one_stage_to_render_indices": [],
+    "direct_rework_runnable_indices": [],
+    "current_candidate_completion_runnable_indices": [],
+    "excluded_pending_or_newer_producer_scopes": [
+      {
+        "index": 61,
+        "asset": "C4A2937B",
+        "reason": "current B00342 candidate already QA_PENDING_C"
+      },
+      {
+        "index": 94,
+        "asset": "2DA43E41",
+        "reason": "B00370 seven-of-seven source removal-mask preflight already QA_PENDING_C; do not repeat"
+      },
+      {
+        "index": 163,
+        "asset": "59A79158",
+        "reason": "newer V19 producer candidate already pending independent C; do not rerender"
+      }
     ],
-    "work_steal_allowed_for_this_task": false,
-    "completion_tier_scan": {
-      "direct_rework_required_runnable": [],
-      "explicit_render_next": [],
-      "render_ready": [],
-      "one_stage_to_render": [],
-      "existing_candidate_material_rework_runnable": []
-    },
-    "candidate_dds_completed": 0,
-    "fresh_completion_tier_exhaustion_proven": true,
-    "selected_action": "PREFLIGHT_ONLY_SOURCE_TRANSPORT_ESCALATION",
-    "work_stolen_from_lane": null
+    "existing_current_isolation_not_repeated": [
+      51,
+      63,
+      99,
+      102,
+      112,
+      130,
+      133,
+      193,
+      195,
+      222,
+      226,
+      231,
+      232,
+      237
+    ],
+    "selected_indices": [
+      97,
+      121
+    ],
+    "selected_assets": [
+      "411827E",
+      "FD90AA9"
+    ],
+    "superseded_old_isolation_inputs": [
+      {
+        "index": 97,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00268",
+        "old_candidate_sha256": "5e7692270b4e5f0683d1671ef67779aa682a005067a88178f0eedbc939df4948",
+        "current_candidate_sha256": "85a50bb9036f1171bd14c5806cc7a2d21ae04010b9ac3692626b8b02225f9b80"
+      },
+      {
+        "index": 121,
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00269",
+        "old_candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+        "current_candidate_sha256": "5bb3a83b1011086f637462268490432e846bbdddbef85810f5677b77642ac1ca"
+      }
+    ]
   },
-  "source_transport": {
-    "approved_drive_root_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
-    "pinned_direct_ref": "55f67a813dd3603d201d0be0da47c071965f53a4",
-    "pinned_release_name": "OR2-HD-GUI-v0.25.10a.zip",
-    "pinned_release_expected_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
-    "lower_tier_outcomes": {
-      "28": [
-        "SOURCE_TRANSPORT_MISS_DRIVE_PARENT_ABSENT",
-        "SOURCE_TRANSPORT_MISS_PINNED_DIRECT_404"
-      ],
-      "139": [
-        "SOURCE_TRANSPORT_MISS_DRIVE_EXACT_NAME_ABSENT",
-        "SOURCE_TRANSPORT_MISS_PINNED_DIRECT_404"
-      ]
+  "current_static_qa_authority": [
+    {
+      "index": 97,
+      "asset": "411827E",
+      "producer_task": "LOCALIZATION-LOCALIZATION_B-00283",
+      "producer_result_sha": "f231efacf0bb71f2221de947d79e25d344a53245",
+      "c_task": "LOCALIZATION-LOCALIZATION_C-00293",
+      "c_batch": "Q00062",
+      "c_result_sha": "b47185be7eb14acfbdfb99407d8ffbeb474a8fe9",
+      "gate_run_id": 36734942838,
+      "candidate_sha256": "85a50bb9036f1171bd14c5806cc7a2d21ae04010b9ac3692626b8b02225f9b80",
+      "status": "STATIC_QA_PASS_RUNTIME_UNTESTED"
     },
-    "pinned_release_outcome": "PENDING_BINARY_RUNTIME_UNAVAILABLE",
-    "terminal_source_classification": "NOT_SOURCE_ACQUISITION_EXHAUSTED"
+    {
+      "index": 121,
+      "asset": "FD90AA9",
+      "producer_task": "LOCALIZATION-LOCALIZATION_B-00310",
+      "producer_result_sha": "3498a4f476e41b89c0fdd856af1c0a460c0b5e60",
+      "c_task": "LOCALIZATION-LOCALIZATION_C-00321",
+      "c_batch": "Q00068",
+      "c_result_sha": "09f720371ac36e02098b6cf10b5c6c545cd75b7e",
+      "gate_run_id": 36765645929,
+      "candidate_sha256": "5bb3a83b1011086f637462268490432e846bbdddbef85810f5677b77642ac1ca",
+      "status": "STATIC_QA_PASS_RUNTIME_UNTESTED"
+    }
+  ],
+  "material_deliverable": {
+    "type": "TWO_CURRENT_STATIC_PASS_DDS_ONLY_RUNTIME_ISOLATION_MANIFESTS_SUPERSEDING_STALE_CANDIDATE_INPUTS",
+    "fallback_ladder_step": 3,
+    "reviewed_indices": [
+      97,
+      121
+    ],
+    "reviewed_assets": [
+      "411827E",
+      "FD90AA9"
+    ],
+    "new_current_candidate_isolation_inputs": 2,
+    "candidate_dds_modified": false,
+    "candidate_binary_rewritten": false,
+    "heavy_static_qa_repeated": false,
+    "drive_metadata_rechecked": true,
+    "materially_reduces_unresolved_work": true,
+    "evidence": [
+      "localization/graphics/role_B/20261001-B00372-P00240/P00240_B00372_INDEX97_411827E_SINGLE_DDS_ISOLATION.json",
+      "localization/graphics/role_B/20261001-B00372-P00240/P00240_B00372_INDEX121_FD90AA9_SINGLE_DDS_ISOLATION.json"
+    ]
   },
+  "self_qa": "PASS_B_MOD3_SCHEMA30__ZERO_RUNNABLE_COMPLETION_TIER_AFTER_FRESH_SHARD_SCAN__FALLBACK_STEP3__INDEX97_CURRENT_C164_STATIC_PASS_HASH_PINNED__INDEX121_CURRENT_C170_STATIC_PASS_HASH_PINNED__OLD_ISOLATION_CANDIDATES_PROVEN_SUPERSEDED__DRIVE_ARCHIVE_METADATA_RECHECKED__NO_DDS_WRITE__NO_HEAVY_QA_REPEAT__NO_SHARED_STATE_WRITE__RUNTIME_UNTESTED",
   "candidate_dds_modified": false,
-  "candidate_binary_persisted": false,
   "shared_state_modified": false,
   "peer_lane_files_modified": false,
   "runtime_test_performed": false,
@@ -91,30 +151,20 @@
   "build_performed": false,
   "n100_used": false,
   "local_clone_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
   "google_drive_used": true,
   "google_drive_write_performed": false,
-  "uploaded_archive_used_for_bytes": false,
-  "gpt_library_used_as_source_or_ssot": false,
+  "uploaded_archive_used_as_state_ssot": false,
+  "work_stolen_from_lane": null,
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "22e17186664d3b693c7d1a3140d43fcfffafab6c",
+  "authoritative_result_sha": "22e17186664d3b693c7d1a3140d43fcfffafab6c",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_BOOKKEEPING_BIND",
-  "result_commit_message": "localization(B): advance source transport preflight 28 139 [AUTO:LOCALIZATION-LOCALIZATION_B-00372]",
   "durable_task_record_in_result_commit": true,
-  "producing_role": "LOCALIZATION_B",
-  "bookkeeping_note": "RESULT_SHA will be bound in a separate bookkeeping-only commit after the atomic material result commit; producer AUTOMATION_VALIDATION remains PENDING until C consumes TASK_ID@RESULT_SHA. RUNTIME_VALIDATION remains UNTESTED.",
-  "precommit_refresh": {
-    "safe_anchor": "5df01ba2d6a96683042b0b6be21f5e98565b7216",
-    "head": "b42129b90ae7f3d579de28f2fd83386aaf349ec7",
-    "delta_files": [
-      "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00372.json",
-      "localization/graphics/role_B/20261001-B00372-P00240/B00372_P00240_INDICES28_139_SOURCE_TRANSPORT_PREFLIGHT.json",
-      "localization/graphics/role_B/20261001-B00372-P00240/verify_release_sources_28_139.py"
-    ],
-    "shared_state_change": false
-  }
+  "result_commit_message": "localization(B): refresh current static-pass isolation inputs [AUTO:LOCALIZATION-LOCALIZATION_B-00372]",
+  "bookkeeping_note": "Immutable producer material result 22e17186664d3b693c7d1a3140d43fcfffafab6c contains both current-candidate DDS_ONLY isolation manifests plus the same-commit durable task record and exact AUTO marker. Producer validation remains PENDING under C_BATCH_GATE; no real-game test was performed, so runtime remains UNTESTED. This bookkeeping commit does not replace the material result SHA.",
+  "bookkeeping_base_head_sha": "1e41a1aba49370a29a897e5a0317ac6942a00e22",
+  "bookkeeping_recorded_at_kst": "2026-10-01T18:11:00+09:00"
 }
