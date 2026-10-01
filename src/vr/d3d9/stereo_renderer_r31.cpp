@@ -1024,8 +1024,7 @@ namespace OutRunVRStereo
                                 R31CreateStateBlockHook.enable().has_value();
                             if (!stateHooks)
                             {
-                                R31StateBlockCoverageLost.store(true,
-                                    std::memory_order_release);
+                                OutRunVR::State::StateBlockTracker::MarkCoverageLost();
                                 R31CreateStateBlockHook = {};
                                 R31BeginStateBlockHook = {};
                                 R31EndStateBlockHook = {};
