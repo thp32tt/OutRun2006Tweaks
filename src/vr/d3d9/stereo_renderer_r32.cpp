@@ -1399,6 +1399,15 @@ namespace OutRunVRStereo
                 DrawIndexedPrimitiveUPDestR32, disabled);
         }
 
+        bool R32InstallHookTransaction() noexcept
+        {
+            R32CreateDisabledHooks();
+            if (R32EnableHooks())
+                return true;
+            R32RollbackHooks();
+            return false;
+        }
+
         enum class R32PrerequisiteDecision
         {
             Wait,
@@ -1448,11 +1457,8 @@ namespace OutRunVRStereo
                 }
                 if (prerequisite == R32PrerequisiteDecision::Install)
                 {
-                    R32CreateDisabledHooks();
-
-                    if (!R32EnableHooks())
+                    if (!R32InstallHookTransaction())
                     {
-                        R32RollbackHooks();
                         R32PublishInstallState(State::Failed);
                         HookManager::ReportAsyncResult(
                             "OpenXRVRStereoR32Review", false);

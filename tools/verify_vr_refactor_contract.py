@@ -404,6 +404,16 @@ for marker in (
 if "attempt < 4800" in r33 or "Sleep(25)" in r33:
     errors.append("R33 prerequisite timing literal escaped wait-policy boundary")
 
+for marker in (
+    "bool R32InstallHookTransaction() noexcept",
+    "R32CreateDisabledHooks();",
+    "if (R32EnableHooks())",
+    "R32RollbackHooks();",
+    "if (!R32InstallHookTransaction())",
+):
+    if marker not in r32:
+        errors.append(f"R32 hook transaction boundary missing: {marker}")
+
 if "void R32CreateDisabledHooks() noexcept" not in r32:
     errors.append("R32 disabled-first hook creation boundary missing")
 if "R32CreateDisabledHooks();" not in r32:
