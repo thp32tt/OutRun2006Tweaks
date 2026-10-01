@@ -89,7 +89,15 @@ Never share `/data` between the two stacks. It contains the Chrome profile, logi
 
 ## Current resource limits
 
-Each controller:
+VR conversion controller:
+
+- memory hard limit: 5 GiB
+- memory reservation: 2 GiB
+- CPU limit: 1.5
+- shared memory: 768 MiB
+- fatal Playwright/CDP transport loss exits the controller so `restart: unless-stopped` can recover the container
+
+Localization controller:
 
 - memory hard limit: 3 GiB
 - memory reservation: 1 GiB
