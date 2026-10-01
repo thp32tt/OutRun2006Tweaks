@@ -1,0 +1,25 @@
+{
+  "schema_version": 32,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00403",
+  "wave_id": "Q00082",
+  "lane": "LOCALIZATION_C",
+  "role": "independent_batched_cross_lane_qa+shared_state_reconcile",
+  "target_branch": "korean-localization-clean",
+  "input_identity": "TASK_ID@RESULT_SHA",
+  "qa_batch_inputs": [
+    "LOCALIZATION-LOCALIZATION_B-00253@434c0169e1b34f5c9ee1bcc3952300a921361cd1",
+    "LOCALIZATION-LOCALIZATION_B-00277@a29d448a64014c1020a025509878a5ad5dba56c9",
+    "LOCALIZATION-LOCALIZATION_A-00351@7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
+    "LOCALIZATION-LOCALIZATION_B-00347@fa9c8bf687b17318d00bee52e615f134b6ee7b3f"
+  ],
+  "qa_disposition": "REVIEWED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_note": "No in-game runtime test performed; runtime success not claimed.",
+  "evidence": "Reviewed immutable TASK_ID@RESULT_SHA inputs against current C batch contract. No runtime evidence was supplied.",
+  "vr_ffb_dx_changes": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "commit_task_tag": "[AUTO:LOCALIZATION-LOCALIZATION_C-00403]"
+}
