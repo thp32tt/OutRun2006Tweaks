@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00194",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "77897bab82104145e3f0b061820ca47332d7cabf",
+  "staged_source_commits": [
+    "0c015de4c97a29009c25a5fe9e03e4d17c49524f",
+    "77cdef6c54eecc238415c985e3c90d5d17f07567"
+  ],
+  "result_sha": "PENDING_RESULT_COMMIT",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R194_182314_CAPTURE_END_CONTROL_FLOW",
+  "selection_reason": "CONVERSION-DX11-00192 proved 0x182314 as the exact immediate instruction boundary and explicitly named continuation decode from 0x182314 as the next bounded F13 unit. The remaining R186 exact bytes run from 0x182314 through probe end 0x182331 and contain the prior incoming call target 0x18231D, two raw rel32 calls and two forward conditional targets, making this the smallest complete evidence-bounded follow-up. DXVK-00193 independently proved the same public-EXE shape; DX11 validation remains independent.",
+  "summary": "PENDING automatic validation. Adds a fail-closed exact-byte/manual-decode proof for every remaining byte in the R186 continuation capture from 0x182314 through exclusive end 0x182331. It proves 0x18231D is both the exact target of predecessor call 0x18230B and an instruction boundary, validates calls 0x182318->0x188905 and 0x18232C->0x1888D5 against raw provenance, and decodes branches 0x182322->0x182391 and 0x18232A->0x182331. Forward target bytes remain uncaptured, so their instruction-boundary/function identities and all call/render/HUD semantics remain unresolved.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00194.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "Base 77897bab82104145e3f0b061820ca47332d7cabf is the completed CONVERSION-DX11-00192 bookkeeping descendant; validation-bearing ancestor 2d9c972f proves 0x182314 as the exact immediate instruction boundary and predecessor call 0x18230B->0x18231D.",
+    "R186 exact provenance captured through exclusive end 0x182331 and raw outbound calls 0x182318->0x188905 and 0x18232C->0x1888D5.",
+    "R194 consumes the complete remaining captured window as nine exact instruction chunks from 0x182314 through the call ending at 0x182331, and requires 0x18231D to coincide with an exact instruction start.",
+    "Conditional targets 0x182391 and 0x182331 are decoded exactly but remain target-bytes-not-captured; no function-entry, target instruction-boundary, callee semantic or render/HUD ownership claim is made.",
+    "Regression/history review found no runtime source change: protected R51 world stereo/HUD paths and Issue #13 runtime problem state are unchanged.",
+    "No Quest 3/VDXR or in-game execution is part of this task; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00193",
+    "source_result_sha": "8fd1bed60602b1f801aa8eddbf3a17cde953b868",
+    "source_validation_state_at_selection": "PASS",
+    "source_proof_target": "EXACT_182314_TO_182331_CAPTURE_END_CONTROL_FLOW_PROVEN",
+    "reason": "Reuse only the bounded exact-byte capture-end proof design on the shared canonical EXE. DX11 depends on its own R192 predecessor and independent exact-result GitHub Actions."
+  },
+  "proof_contract": {
+    "predecessor_status": "EXACT_182300_SEQUENCE_RET_NEXT_BOUNDARY_PROVEN",
+    "start_rva": "0x00182314",
+    "end_rva": "0x00182331",
+    "instruction_count": 9,
+    "incoming_call": "0x0018230B->0x0018231D",
+    "calls": [
+      "0x00182318->0x00188905",
+      "0x0018232C->0x001888D5"
+    ],
+    "branches": [
+      "0x00182322->0x00182391",
+      "0x0018232A->0x00182331"
+    ],
+    "expected_status": "EXACT_182314_TO_182331_CAPTURE_END_CONTROL_FLOW_PROVEN",
+    "incoming_target_status": "EXACT_18231D_INCOMING_CALL_TARGET_BOUNDARY_PROVEN",
+    "forward_target_status": "DECODED_ONLY_TARGET_BYTES_NOT_CAPTURED",
+    "function_entry_status": "UNRESOLVED_AT_182314_18231D_182331_182391",
+    "semantic_effect": "BOUNDED_CAPTURE_END_CONTROL_FLOW_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "continuation_status": "EXACT_CAPTURE_END_AT_182331_REACHED"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no native DX11 renderer activation, game draw routing, transport, provider, selector or package behavior changes.",
+    "ownership": "Incoming-target and bounded control-flow proof does not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Proof fails closed unless R192 remains exact, all remaining bytes 0x182314..0x182330 decode contiguously/exactly, predecessor call 0x18230B->0x18231D is still exact/raw-census-backed and lands on an instruction start, both new rel32 calls match raw provenance, both rel8 targets decode exactly, and the sequence ends exactly at the R186 probe boundary 0x182331. It explicitly refuses to claim target instruction boundaries at 0x182331/0x182391 without new bytes."
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_182300_SEQUENCE_RET_NEXT_BOUNDARY_PROVEN",
+    "after": "PENDING_182314_CAPTURE_END_CONTROL_FLOW",
+    "runtime_claim": false
+  },
+  "blocker": "The exact 0x182314..0x182330 capture-end sequence is the current bounded target. Even if proven, branch target bytes at 0x182331 and 0x182391 are outside the R186 capture, so their instruction boundaries/function identities remain unresolved. Callee semantics for 0x188905/0x1888D5/0x18231D and all render/HUD ownership also remain unresolved.",
+  "next_action": "Wait for exact-SHA automatic validation. Do not publish another ordinary same-branch commit until Backend Conversion Gate completes because cancel-in-progress is enabled."
+}
