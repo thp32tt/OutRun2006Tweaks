@@ -4807,6 +4807,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_9_prefix_proo
     )
     return {
         "start_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_9_RVA,
+        "target_section": provenance["target_section"],
         "provenance_status": provenance["status"],
         "provenance_exact": provenance_exact,
         "layout_contiguous": contiguous,
@@ -4814,6 +4815,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_9_prefix_proo
         "instructions": rows,
         "instruction_count": len(rows),
         "prefix_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_9_PREFIX_END_RVA,
+        "probe_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_9_PROBE_END_RVA,
         "prefix_end_matches": prefix_end_matches,
         "probe_consumed_exactly": probe_consumed_exactly,
         "branches": branch_rows,
