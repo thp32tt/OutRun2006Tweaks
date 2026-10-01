@@ -8,8 +8,8 @@
   "role": "PRODUCER_B",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
-  "recorded_at_kst": null,
-  "recorded_at_source": "RESULT_COMMIT_METADATA_PENDING_BOOKKEEPING_BIND",
+  "recorded_at_kst": "2026-10-01T19:59:37.000+09:00",
+  "recorded_at_source": "GITHUB_RESULT_COMMIT_COMMITTER_DATE",
   "base_head_sha": "62e42a962f347f2483159a2081fbca22264bfc3e",
   "incoming_controller_schema_version": 31,
   "incoming_controller_config_blob_sha": "ef7dc757bc849c898c18319a0e417e350bdda757",
@@ -116,10 +116,10 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "159777fff73950c2840dd7f30352b5a880ea8add",
+  "authoritative_result_sha": "159777fff73950c2840dd7f30352b5a880ea8add",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_RESULT_COMMIT_CREATION",
+  "result_binding_state": "BOUND_TO_PRODUCER_RESULT_PENDING_C_BATCH_GATE",
   "result_commit_message": "localization(B): add index103 source dependency guard [AUTO:LOCALIZATION-LOCALIZATION_B-00387]",
   "durable_task_record_in_result_commit": true,
   "precommit_refresh": {
@@ -127,5 +127,6 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Current branch HEAD refreshed immediately before claim. Shared queue/inventory/progress/resume fingerprints are unchanged from B00377; current schema31 source-transport/candidate policies are applied."
   },
-  "bookkeeping_note": "Initial durable result commit intentionally leaves self-SHA/timestamp fields null. A separate bookkeeping-only commit will bind the immutable producer RESULT_SHA and result commit time. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Immutable producer result 159777fff73950c2840dd7f30352b5a880ea8add atomically contains the schema31 index103 source-dependency semantic guard, machine report, and durable B00387 task record with the exact AUTO marker. This bookkeeping-only commit binds RESULT_SHA/timestamp. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes LOCALIZATION-LOCALIZATION_B-00387@159777fff73950c2840dd7f30352b5a880ea8add; no real-game validation was performed, so RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping_recorded_from_head": "159777fff73950c2840dd7f30352b5a880ea8add"
 }
