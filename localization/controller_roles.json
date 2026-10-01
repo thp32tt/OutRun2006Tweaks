@@ -602,7 +602,22 @@
       "RATE_LIMIT",
       "LOCAL_OR_N100_WORKSPACE_UNAVAILABLE"
     ],
-    "generated_prompt_directive": "GitHub 접근/권한 판정에는 공개 웹 검색을 사용하지 마. authenticated GitHub connector/API로 thp32tt/OutRun2006Tweaks repository metadata와 korean-localization-clean HEAD를 먼저 직접 확인해. 공개 검색 miss 또는 upstream만 노출되는 결과는 권한 부족의 근거가 아니다. push/maintain/admin 중 하나가 true이면 즉시 현재 HEAD에서 작업을 계속해. fresh permission denial 또는 refresh 후 실제 write 401/403일 때만 GITHUB_PERMISSION_DENIED로 중단해."
+    "generated_prompt_directive": "GitHub가 연결되지 않았다고 추측하거나 임의로 접근 불가 판정하지 마. 현재 세션에 설치·연결된 authenticated GitHub connector/API가 노출되어 있으면 반드시 직접 호출해서 thp32tt/OutRun2006Tweaks의 korean-localization-clean HEAD와 필요한 파일을 실제 조회해. 실제 connector/API 호출을 한 번도 하지 않은 상태에서는 GITHUB_PERMISSION_DENIED, GitHub disconnected, GitHub unavailable로 보고하거나 작업을 중단하면 안 된다. 공개 웹 검색, N100 로컬 clone/worktree, 로컬 workspace를 GitHub 직접 접근 확인의 대체 수단으로 사용하지 마. 커넥터 자체가 현재 세션에 실제로 없거나 authenticated 직접 호출이 실패한 경우에만 접근 차단을 보고하고, 호출한 기능/대상과 실제 반환 오류를 작업 기록에 남겨. fresh repository permission metadata에서 push/maintain/admin이 모두 없거나 refresh 후 실제 write가 authorization-specific 401/403일 때만 GITHUB_PERMISSION_DENIED로 중단해.",
+    "mandatory_direct_probe_before_access_failure": {
+      "required": true,
+      "connector": "authenticated GitHub connector/API",
+      "target_repository": "thp32tt/OutRun2006Tweaks",
+      "target_ref": "korean-localization-clean",
+      "minimum_probe": "fetch a known repository file or current branch/ref through the authenticated GitHub connector/API",
+      "no_probe_no_denial": true,
+      "rule": "Never report GitHub disconnected, unavailable, or permission denied without first making a real authenticated GitHub connector/API call in the current task. If the connector is exposed, call it directly. Only an actual connector absence or an actual authenticated call failure may support an access-blocked report; record the exact operation and returned error.",
+      "forbidden_substitutes": [
+        "PUBLIC_WEB_SEARCH",
+        "N100_LOCAL_CLONE",
+        "LOCAL_WORKTREE",
+        "ASSUMED_CONNECTOR_UNAVAILABLE"
+      ]
+    }
   },
   "dispatch_freshness": {
     "refresh_config_before": [
