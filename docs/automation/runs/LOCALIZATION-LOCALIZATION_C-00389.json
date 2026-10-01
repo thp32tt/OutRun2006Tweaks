@@ -2,15 +2,22 @@
   "task_id": "LOCALIZATION-LOCALIZATION_C-00389",
   "lane": "LOCALIZATION_C",
   "target_branch": "korean-localization-clean",
-  "attempt": "1/3",
+  "attempt": "3/3",
   "wave_id": "Q00076",
   "role": "C_BATCH_GATE",
+  "qa_batch_inputs": [
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00001","lane":"LOCALIZATION_A","result_sha":"406df86d2933eb4901e1d9a498eb700053b8bc6c"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_B-00002","lane":"LOCALIZATION_B","result_sha":"8a089c241674d1217e89ed942167621bbd86df3d"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00004","lane":"LOCALIZATION_A","result_sha":"d10a3f1a6e49b1a4ba0303d17978b9a9246af5b7"},
+    {"task_id":"LOCALIZATION-LOCALIZATION_A-00029","lane":"LOCALIZATION_A","result_sha":"34df11681bce9662d1033f7b356f9a5706a2f88c"}
+  ],
   "qa_inputs": [
     "LOCALIZATION-LOCALIZATION_A-00001@406df86d2933eb4901e1d9a498eb700053b8bc6c",
-    "LOCALIZATION-LOCALIZATION_B-00002@8a089c241674d1217e89ed942167621bbd86df3d",
+    "LOCALIZATION-LOCALIZATION_B-00002@8a089c241674d121e89ed942167621bbd86df3d",
     "LOCALIZATION-LOCALIZATION_A-00004@d10a3f1a6e49b1a4ba0303d17978b9a9246af5b7",
     "LOCALIZATION-LOCALIZATION_A-00029@34df11681bce9662d1033f7b356f9a5706a2f88c"
   ],
+  "previous_failure": "Localization Automation Gate run 36852646541 failed because C_BATCH_GATE found qa_batch_inputs empty.",
   "automation_validation": "PASS_C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
   "disposition": "HOLD_STRICT_RECHECK",
