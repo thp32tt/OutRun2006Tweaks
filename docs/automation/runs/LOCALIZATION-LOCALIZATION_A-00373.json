@@ -128,10 +128,10 @@
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
   "self_qa": "PASS_A_MOD3_SCHEMA30__FRESH_HEAD_ZERO_COMPLETION_TIER_PRESERVED__QA_PENDING_AND_UNCONSUMED_A_RESULTS_NOT_REPEATED__INDEX54_C172_SOURCE_IDENTITY_MISMATCH_REUSED__NO_SOURCE_REPROBE__NEW_EXECUTABLE_FAIL_CLOSED_REACTIVATION_GUARD__NONCANONICAL_SOURCE_AND_HISTORICAL_B95_CANDIDATE_REUSE_FORBIDDEN__NO_SHARED_STATE__NO_DDS__RUNTIME_UNTESTED",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463",
+  "authoritative_result_sha": "c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_RESULT_SHA_BINDING",
+  "result_binding_state": "BOUND_TO_PRODUCER_RESULT_PENDING_C_BATCH_GATE",
   "result_commit_message": "localization(A): add index54 source identity guard [AUTO:LOCALIZATION-LOCALIZATION_A-00373]",
   "durable_task_record_in_result_commit": true,
   "precommit_refresh": {
@@ -140,5 +140,10 @@
     "stale_state_overwrite": false,
     "concurrent_changes_reviewed": "Compared prior 1e9fd11 HEAD with latest 41190653; only E00354 rollover5 reconciliation JSON was added. No queue/progress/resume/controller/contract/A-lane production fingerprint changed. Only A00373 lane-local verifier/report and the unique A00373 task record will be added."
   },
-  "bookkeeping_note": "Initial durable producer result intentionally leaves self-SHA fields null. A separate bookkeeping-only commit will bind immutable RESULT_SHA. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; no real-game validation was performed and RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Initial durable producer result intentionally leaves self-SHA fields null. A separate bookkeeping-only commit will bind immutable RESULT_SHA. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; no real-game validation was performed and RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping": {
+    "recorded_at_kst": "2026-10-01T18:09:00+09:00",
+    "producer_result_sha": "c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463",
+    "note": "Bookkeeping-only immutable producer RESULT_SHA binding. Atomic result c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463 contains the index54 verifier, machine report, and durable A00373 task record. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; no real-game validation was performed and RUNTIME_VALIDATION remains UNTESTED."
+  }
 }
