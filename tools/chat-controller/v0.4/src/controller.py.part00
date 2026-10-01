@@ -999,7 +999,8 @@ def github_broker_protocol_instructions(active: dict) -> str:
     marker = f"[AUTO:{active['task_id']}]"
     return (
         "CONTROLLER_GITHUB_BROKER=AVAILABLE\n"
-        "GitHub 플러그인이 없거나 호출되지 않아도 작업을 중단하지 마. 컨트롤러 브로커를 사용해.\n"
+        "중요: CONTROLLER_GITHUB_BROKER는 ChatGPT tool/schema/interface가 아니다. 노출 여부를 찾거나 기다리지 마. 컨트롤러가 아래 텍스트 태그를 읽고 GitHub 작업을 대신 실행한다.\n"
+        "GitHub 플러그인이 없거나 호출되지 않아도 작업을 중단하지 마. 제공된 BROKER_READ_RESULT를 사용하고 컨트롤러 브로커로 계속해.\n"
         "추가 파일이 필요하면 정확히 다음 형식으로 요청해:\n"
         '[BROKER_READ]{"files":[{"path":"path/to/file","start":1,"end":260}]}[/BROKER_READ]\n'
         "수정 준비가 끝나면 전체 파일을 복사하지 말고 가능한 작은 exact replace/create/append/delete 편집으로 제출해:\n"
@@ -1467,7 +1468,7 @@ def queue_dynamic_prefix() -> str:
         f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
         *([f"WAVE_ID={wave_id}"] if wave_id else []),
         "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 저장소/clone/worktree로 우회하지 마. 단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용한다.",
-        "아래 CONTROLLER_GITHUB_BROKER가 제공한 GitHub HEAD/파일 내용을 기준으로 즉시 작업해. 연결된 GitHub 플러그인이 보이면 추가 조회에 사용할 수 있지만 필수 조건이 아니다. 플러그인/tool/schema 부재를 BLOCKED 사유로 사용하지 마.",
+        "아래 CONTROLLER_GITHUB_BROKER가 제공한 GitHub HEAD/파일 내용을 기준으로 즉시 작업해. Broker는 ChatGPT tool/schema/interface가 아니라 컨트롤러가 처리하는 텍스트 프로토콜이다. 연결 플러그인은 선택사항이며 plugin/tool/schema/interface 부재를 BLOCKED 사유로 사용하지 마.",
         "파일 404는 연결 실패가 아니라 path/ref 문제다.",
         "이 작업에서 실제 변경 또는 검토 기록을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
         "필수 GitHub Actions Gate를 소유할 result commit에는 CI-skip 지시어를 넣지 마. 검증 완료 후 bookkeeping/checkpoint 커밋은 Gate 결과와 분리해 기록하고, controller가 validation-bearing result commit을 식별할 수 있게 유지해.",
