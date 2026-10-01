@@ -7,7 +7,7 @@ N100 runs only the browser/controller containers. Project work must be performed
 - VR SSOT: `thp32tt/OutRun2006Tweaks` / `vr-d3d9ex-focus`
 - Korean localization SSOT: `thp32tt/OutRun2006Tweaks` / `korean-localization-clean`
 - Do not use N100 local clones/worktrees as project workspaces.
-- Each ChatGPT account must have working GitHub read/write access before AUTO_SEND is enabled.
+- The controller `GITHUB_TOKEN` is the durable GitHub read/write path. ChatGPT GitHub plugin access is preferred when present but is no longer required for queue liveness.
 
 ## Portainer Git source
 
@@ -67,9 +67,10 @@ For each account:
 
 1. Verify the correct ChatGPT account is logged in.
 2. Verify the configured ChatGPT project opens from noVNC.
-3. Verify GitHub read/write access is available to ChatGPT.
-4. Run one manual task and confirm GitHub is used directly.
-5. Confirm no N100 local clone/worktree is used for project changes.
+3. Verify the controller `GITHUB_TOKEN` has repository Contents read/write and Actions read access.
+4. Confirm the status page reports the GitHub Broker enabled; plugin availability may be tested but is optional.
+5. Run one manual task and confirm either the connected plugin or `BROKER_READ`/`BROKER_CHANGESET` path reaches GitHub directly.
+6. Confirm no N100 local clone/worktree is used for project changes.
 
 Then change `AUTO_SEND=true` in that Portainer stack and redeploy.
 
@@ -109,6 +110,14 @@ Localization controller:
 Queue tasks keep one browser page per configured slot and **reuse the completed slot chat** instead of opening a new conversation for every TASK_ID. A slot is recycled only after 4 tasks, 90 minutes, a conversation-length limit, a stale completed Retry surface, or bounded same-TASK recovery. If Git already completed but the previous ChatGPT turn is still visibly generating, the next task waits up to 180 seconds for the UI to settle before a stale-page recycle is allowed. Same-TASK rollover is capped at 2. Localization remains four slots: physical A/B/C/D map to logical A/B/C/E, with 30s cross-slot and 90s same-slot send spacing. This reduces renderer churn and `Too many requests` pressure while preserving Git and `/data/state` as durable state.
 
 GitHub 5xx/network/timeout/403/429 conditions are treated as transient transport state. The controller retries 2/5/10/20 seconds internally, then waits 60 seconds and keeps retrying on future queue cycles. These GitHub errors never consume a TASK attempt, trigger a new ChatGPT chat, consume a rollover, or move work to BLOCKED.
+
+## GitHub broker
+
+See [GITHUB_BROKER_ARCHITECTURE.md](GITHUB_BROKER_ARCHITECTURE.md).
+
+The controller owns the durable GitHub control plane. Connected ChatGPT GitHub tools are a preferred path, not a prerequisite. If a session reports that GitHub plugin/tool/schema functions are absent, the same TASK_ID stays in the same chat and switches to the structured controller broker instead of declaring the task blocked.
+
+`BROKER_READ` requests immutable-SHA file context. `BROKER_CHANGESET` requests an atomic Git Data API commit with HEAD CAS and `force=false`. The controller token is never sent to ChatGPT.
 
 ## Safety
 
