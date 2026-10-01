@@ -1465,11 +1465,44 @@ def collect_raw_rel32_call_candidates(
     return out
 
 
+def _raw_inbound_rel32_offset_index(pe: PE) -> dict[int, list[int]]:
+    """Index raw .text E8 rel32 candidates once per PE instance.
+
+    The analyzer asks for inbound candidates at many nearby targets. Re-scanning
+    the complete .text section for every target is quadratic in review breadth,
+    so cache only byte offsets keyed by decoded target. Semantic classification
+    and function-start guesses remain query-local to preserve existing output.
+    """
+
+    cached = getattr(pe, "_raw_inbound_rel32_offsets_by_target", None)
+    if cached is not None:
+        return cached
+
+    text_section = pe.section(".text")
+    offsets_by_target: dict[int, list[int]] = {}
+    if text_section:
+        text = pe.data[
+            text_section.raw_pointer :
+            text_section.raw_pointer + text_section.raw_size
+        ]
+        for i in range(0, max(0, len(text) - 5)):
+            if text[i] != 0xE8:
+                continue
+            rel = struct.unpack_from("<i", text, i + 1)[0]
+            call_rva = text_section.virtual_address + i
+            decoded_target_rva = (call_rva + 5 + rel) & 0xFFFFFFFF
+            offsets_by_target.setdefault(decoded_target_rva, []).append(i)
+
+    setattr(pe, "_raw_inbound_rel32_offsets_by_target", offsets_by_target)
+    return offsets_by_target
+
+
 def collect_raw_inbound_rel32_candidates(pe: PE, target_rva: int) -> list[dict]:
     """Find raw .text E8 rel32 byte candidates that decode to target_rva.
 
-    This scans bytes, not decoded instructions. Results are provenance leads,
-    not proof that an E8 byte is an instruction-aligned CALL.
+    This uses a cached byte-level offset index, not decoded instructions.
+    Results are provenance leads, not proof that an E8 byte is an
+    instruction-aligned CALL.
     """
 
     text_section = pe.section(".text")
@@ -1481,14 +1514,8 @@ def collect_raw_inbound_rel32_candidates(pe: PE, target_rva: int) -> list[dict]:
         text_section.raw_pointer + text_section.raw_size
     ]
     out: list[dict] = []
-    for i in range(0, max(0, len(text) - 5)):
-        if text[i] != 0xE8:
-            continue
-        rel = struct.unpack_from("<i", text, i + 1)[0]
+    for i in _raw_inbound_rel32_offset_index(pe).get(target_rva, ()):
         call_rva = text_section.virtual_address + i
-        decoded_target_rva = (call_rva + 5 + rel) & 0xFFFFFFFF
-        if decoded_target_rva != target_rva:
-            continue
         area, semantic, space_policy = classify_semantic(call_rva)
         out.append(
             {
