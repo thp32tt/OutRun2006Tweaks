@@ -1063,6 +1063,7 @@ namespace OutRunVRStereo
             return false;
         }
 
+        constexpr ULONGLONG R30TelemetryIntervalMs = 5000;
         ULONGLONG R30LastTelemetryMs = 0;
 
         void R30MaybeLogTelemetry()
@@ -1070,7 +1071,7 @@ namespace OutRunVRStereo
             if (!Settings::VRTelemetry)
                 return;
             const ULONGLONG now = GetTickCount64();
-            if (now - R30LastTelemetryMs < 5000)
+            if (now - R30LastTelemetryMs < R30TelemetryIntervalMs)
                 return;
             R30LastTelemetryMs = now;
             spdlog::info(

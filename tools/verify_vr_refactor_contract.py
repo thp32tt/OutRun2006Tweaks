@@ -239,6 +239,13 @@ else:
         if marker in install_thread:
             errors.append(f"R30 install thread regained hook creation ownership: {marker}")
 
+if "R30TelemetryIntervalMs = 5000" not in r30:
+    errors.append("R30 telemetry cadence policy missing")
+if "now - R30LastTelemetryMs < R30TelemetryIntervalMs" not in r30:
+    errors.append("R30 telemetry logger bypassed cadence policy")
+if "now - R30LastTelemetryMs < 5000" in r30:
+    errors.append("R30 telemetry cadence literal escaped policy boundary")
+
 reset_prep_begin = r30.find("void R30PrepareSkyGlowForReset() noexcept")
 reset_dest_begin = r30.find("HRESULT __stdcall ResetDestR30(")
 hud_scale_begin = r30.find("float R30HudScaleValue()", reset_dest_begin)
