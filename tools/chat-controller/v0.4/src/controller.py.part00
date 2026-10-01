@@ -1381,6 +1381,7 @@ def queue_dynamic_prefix() -> str:
         *([f"CONTROLLER_GITHUB_HEAD_SHA={preflight_head}"] if preflight_head else []),
         "GITHUB_ACCESS_MODE=PLUGIN_PREFERRED_CONTROLLER_BROKER_FALLBACK",
         f"CONTROLLER_GITHUB_BROKER={'AVAILABLE' if GITHUB_BROKER_ENABLED else 'DISABLED'}",
+        f"CONTROLLER_GITHUB_BROKER_WRITE={'READY' if runtime.get('github_broker_write_capable') else 'UNCONFIRMED'}",
         "PUBLIC_GITHUB_ACCESS=DO_NOT_USE",
         "FIRST_ACTION=CALL_GITHUB_PLUGIN_IF_AVAILABLE",
         f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
