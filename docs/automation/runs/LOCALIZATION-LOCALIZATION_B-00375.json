@@ -102,10 +102,12 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "e003dbbcc6fe5a85e8ed500e67f7a01bd39d9272",
+  "authoritative_result_sha": "e003dbbcc6fe5a85e8ed500e67f7a01bd39d9272",
   "validation_bearing_result_sha": null,
   "durable_task_record_in_result_commit": true,
   "result_commit_message": "localization(B): narrow canonical source transport [AUTO:LOCALIZATION-LOCALIZATION_B-00375]",
-  "bookkeeping_note": "Producer result SHA is bound after immutable material commit. Producer automatic validation remains PENDING for independent C batch Gate; no real-game test was performed, so runtime remains UNTESTED."
+  "bookkeeping_note": "Immutable producer material result e003dbbcc6fe5a85e8ed500e67f7a01bd39d9272 contains the schema30 source-transport narrowing report plus the same-commit durable task record and exact AUTO marker. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; no real-game test was performed, so RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit does not replace material result identity.",
+  "bookkeeping_base_head_sha": "e003dbbcc6fe5a85e8ed500e67f7a01bd39d9272",
+  "bookkeeping_recorded_at_kst": "2026-10-01T18:32:00+09:00"
 }
