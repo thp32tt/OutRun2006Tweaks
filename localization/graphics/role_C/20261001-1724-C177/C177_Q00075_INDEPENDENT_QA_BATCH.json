@@ -10,9 +10,9 @@
   "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_MERGE",
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
-  "recorded_at_kst": "2026-10-01T17:24:07+09:00",
-  "base_head_sha": "b3818a4fafc41746d1f29df2822d6fcec0365a9e",
-  "base_sha": "b3818a4fafc41746d1f29df2822d6fcec0365a9e",
+  "recorded_at_kst": "2026-10-01T17:27:10+09:00",
+  "base_head_sha": "5dda33d7abc733146b3b8448694572bcabfbce78",
+  "base_sha": "5dda33d7abc733146b3b8448694572bcabfbce78",
   "commit_mode": "VALIDATION_BEARING_RESULT",
   "result": "PASS_Q00075_TWO_PREFLIGHT_PASSES_ONE_PRODUCER_CONTRACT_REWORK_RUNTIME_UNTESTED",
   "summary": "Q00075 consumes immutable A00348/A00350/A00364 once. A00348 index24 PASS is limited to fail-closed runtime-binder regression preflight; synthetic fixtures are not runtime evidence. A00350 index225 PASS is limited to fail-closed source-reactivation preflight with source acquisition still exhausted. A00364 is REWORK_REQUIRED because its exact result contains only the review record and explicitly no material change or unresolved-work reduction. No C candidate DDS rewrite; runtime UNTESTED.",
@@ -189,10 +189,24 @@
   "authoritative_result_sha": null,
   "validation_bearing_result_sha": null,
   "precommit_refresh": {
-    "head_sha": "b3818a4fafc41746d1f29df2822d6fcec0365a9e",
+    "head_sha": "5dda33d7abc733146b3b8448694572bcabfbce78",
     "stale_state_overwrite": false,
-    "concurrent_changes_reviewed": "Schema30 HEAD refreshed before preparing immutable Q00075 merge; any later producer-only commits are preserved by attaching this tree delta to the final latest HEAD."
+    "concurrent_changes_reviewed": "Latest schema30 HEAD refreshed after the first Gate exposed a stale controller verifier. Q00075 dispositions are unchanged; retry commit is reissued only after the one-line verifier alignment and preserves all concurrent producer commits."
   },
   "result_commit_message": "localization(C): QA Q00075 producer batch [AUTO:LOCALIZATION-LOCALIZATION_C-00368]",
-  "bookkeeping_note": "Pre-Gate validation-bearing C result. RESULT_SHA and Gate identity are bound only in a separate post-validation bookkeeping checkpoint. Runtime remains UNTESTED."
+  "bookkeeping_note": "Q00075 dispositions unchanged. The first Gate-owning result 6f908a5f... failed before producer validation because a stale verifier contradicted canonical schema30 preflight policy. Verifier fix 5dda33d7... is separate [skip ci]; this reissued result owns the next Gate. Runtime remains UNTESTED.",
+  "pre_gate_retries": [
+    {
+      "prior_result_sha": "6f908a5f5225d1a4faf49ac3ab67096eb79896d8",
+      "gate_run_id": 36836172971,
+      "run_attempt": 1,
+      "conclusion": "failure",
+      "failed_step": "Verify controller runtime recovery and throughput policy",
+      "failure": "controller recovery policy invalid: production_strategy.max_new_preflight_only_batches_when_no_ready_assets",
+      "root_cause": "Schema28 policy commit 90df2058 intentionally changed max_new_preflight_only_batches_when_no_ready_assets from 1 to 999999, while verify_controller_recovery_policy.py still required <=1.",
+      "verifier_fix_commit_sha": "5dda33d7abc733146b3b8448694572bcabfbce78",
+      "verifier_fix_scope": "single stale expectation aligned to canonical 999999 policy",
+      "disposition_changes": false
+    }
+  ]
 }
