@@ -1,0 +1,142 @@
+{
+  "schema_version": 31,
+  "schema": "outrun-a00388-p00256-index36-material-source-dependency-semantics-producer-result-v31",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00388",
+  "wave_id": "P00256",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCER_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": null,
+  "recorded_at_source": "RESULT_COMMIT_METADATA_PENDING_BOOKKEEPING_BIND",
+  "incoming_controller_schema_version": 31,
+  "incoming_controller_config_blob_sha": "ef7dc757bc849c898c18319a0e417e350bdda757",
+  "applied_controller_schema_version": 31,
+  "applied_controller_config_blob_sha": "ef7dc757bc849c898c18319a0e417e350bdda757",
+  "canonical_contract_blob_sha": "68c4c1d65fdb62ab33abc1ca4a93e70651f1dfd8",
+  "base_head_sha": "d673197949fbc17d3ba446fd11182796ea9cf174",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX36_SCHEMA31_SOURCE_DEPENDENCY_SEMANTIC_GUARD_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "summary": "Fresh latest-HEAD A-shard reconciliation under schema31 confirms the shared queue/inventory/progress/resume fingerprints are unchanged from A00383 despite a disjoint C00389 gate commit. Candidate-QA and unconsumed A results are not repeated. With no runnable DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER, or existing-candidate material rework in A, fallback step 5 upgrades index36/06AB5CEE from its C165-accepted schema15 exact-name guard to a schema31 source-dependency semantic guard binding approved Drive transport, pinned source identity, sticky exhaustion policy and exact-name alias safety while excluding unrelated GitHub access/recovery churn. No source reacquisition, DDS, shared-state, runtime, N100/local clone, Drive write, or VR/FFB/DX work.",
+  "selection": {
+    "direct_rework_required_runnable_a": [],
+    "explicit_render_next_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "unconsumed_a_results_not_repeated": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+        "index": 222,
+        "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
+        "index": 51,
+        "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00366",
+        "index": 111,
+        "result_sha": "ece3a4725d9f1a1b2e75f59171bb20085eecfa84"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00371",
+        "index": 228,
+        "result_sha": "ffd813d876bb83b21d02af41c4bad726bd5ea913"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00373",
+        "index": 54,
+        "result_sha": "c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00376",
+        "index": 147,
+        "result_sha": "45b0ea6683450da03bd4f44d8ab9ae79dcbd5293"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00378",
+        "index": 135,
+        "result_sha": "318c34fe1e21522b3b2846e6fd5828b97f4ae88a"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00383",
+        "index": 30,
+        "result_sha": "9e3f20a35072c1c2b0824a5a2183b974e13cf745"
+      }
+    ],
+    "selected_index": 36,
+    "selected_asset": "06AB5CEE",
+    "selected_action": "FALLBACK_STEP_5_UPGRADE_EXECUTABLE_SOURCE_DEPENDENCY_SEMANTIC_GUARD",
+    "source_probe_repeated": false,
+    "work_stolen_from_lane": null
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "INDEX36_SCHEMA31_SOURCE_DEPENDENCY_SEMANTIC_GUARD_AND_MACHINE_OUTPUT",
+    "executable": "localization/graphics/role_A/20261001-A00388-P00256/verify_index36_source_dependency_semantics.py",
+    "machine_report": "localization/graphics/role_A/20261001-A00388-P00256/A00388_P00256_INDEX36_SOURCE_DEPENDENCY_SEMANTICS.json",
+    "candidate_dds_modified": false,
+    "new_executable_selection_input": true,
+    "materially_reduces_unresolved_work": true,
+    "production_readiness": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED"
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261001-A00388-P00256/verify_index36_source_dependency_semantics.py",
+    "localization/graphics/role_A/20261001-A00388-P00256/A00388_P00256_INDEX36_SOURCE_DEPENDENCY_SEMANTICS.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00290.json",
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00383.json"
+  ],
+  "fingerprints": {
+    "automation_contract_blob_sha": "68c4c1d65fdb62ab33abc1ca4a93e70651f1dfd8",
+    "controller_roles_blob_sha": "ef7dc757bc849c898c18319a0e417e350bdda757",
+    "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "canonical_progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
+    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed",
+    "a00290_task_blob_sha": "c5e3b44724a0ac40486db17760c25ce522e77d33",
+    "a00290_guard_report_blob_sha": "729a057e3ecb8bd72209a591c06152b213f44d8f"
+  },
+  "candidate_dds_modified": false,
+  "candidate_binary_persisted": false,
+  "materially_reworked_candidate": false,
+  "material_change": true,
+  "review_record_only": false,
+  "materially_reduces_unresolved_work": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used_for_current_material": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used_for_current_material": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "source_reprobe_performed": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "self_qa": "PASS_A_MOD3_SCHEMA31__ZERO_COMPLETION_TIER_SHARED_FINGERPRINT_UNCHANGED__QA_PENDING_AND_UNCONSUMED_A_RESULTS_NOT_REPEATED__INDEX36_CURRENT_C165_GUARD__SOURCE_TRANSPORT_SEMANTICS_BOUND__EXACT_NAME_ALIAS_GUARD_RETAINED__GITHUB_ACCESS_POLICY_CHURN_EXCLUDED__NO_SOURCE_REPROBE__NO_SHARED_STATE__NO_DDS__RUNTIME_UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_binding_state": "PENDING_RESULT_COMMIT_CREATION",
+  "result_commit_message": "localization(A): upgrade index36 source dependency guard [AUTO:LOCALIZATION-LOCALIZATION_A-00388]",
+  "durable_task_record_in_result_commit": true,
+  "precommit_refresh": {
+    "head_sha": "d673197949fbc17d3ba446fd11182796ea9cf174",
+    "stale_state_overwrite": false,
+    "concurrent_changes_reviewed": "Latest branch HEAD refreshed after C00389. Shared queue/inventory/progress/resume/controller/contract fingerprints are unchanged from A00383; C00389 QA inputs are disjoint from A00383/index36. Current schema31 source-transport/candidate policies are applied."
+  },
+  "bookkeeping_note": "Initial durable result commit intentionally leaves self-SHA/timestamp fields null. A separate bookkeeping-only commit will bind the immutable producer RESULT_SHA and result commit time. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; RUNTIME_VALIDATION remains UNTESTED."
+}
