@@ -1,0 +1,166 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-a00371-p00239-index228-source-reactivation-guard-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00371",
+  "wave_id": "P00239",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCER_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "recorded_at_kst": "2026-10-01T17:53:00+09:00",
+  "base_head_sha": "25e854c140aedd2920878c2433895b55b6dd1c9b",
+  "controller_schema_version": 30,
+  "controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "result": "PASS_MATERIAL_A_MOD3_INDEX228_SOURCE_REACTIVATION_GUARD_PREFLIGHT_ONLY_RUNTIME_UNTESTED",
+  "selection": {
+    "shard_rule": "asset_queue.index % 3 == 0",
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00368",
+    "latest_authoritative_c_wave": "Q00075",
+    "latest_authoritative_c_result_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
+    "latest_authoritative_c_gate_run_id": 36836426454,
+    "direct_rework_required_runnable_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "unconsumed_a_results_not_repeated": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+        "index": 222,
+        "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
+        "index": 51,
+        "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00366",
+        "index": 111,
+        "result_sha": "ece3a4725d9f1a1b2e75f59171bb20085eecfa84",
+        "state": "PREFLIGHT_MATERIAL_NOT_REPEATED"
+      }
+    ],
+    "selected_indices": [
+      228
+    ],
+    "selected_asset": "E7F6E9B7",
+    "selected_action": "FALLBACK_STEP_5_INDEX228_SOURCE_REACTIVATION_GUARD",
+    "source_probe_repeated": false,
+    "work_stolen_from_lane": null
+  },
+  "locked_dependency": {
+    "queue_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds",
+    "canonical_inventory": {
+      "sha256": "bbbc44543042527a1c4f80156ddbf4f0f26b9130d8eca0a78012fb79ee3f38b2",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA"
+    },
+    "accepted_source_exhaustion": {
+      "producer_task": "LOCALIZATION-LOCALIZATION_B-00180",
+      "producer_result_sha": "2af61fc8fd41e5ee6d8e4524914107682c591149",
+      "c_task": "LOCALIZATION-LOCALIZATION_C-00184",
+      "c_run": "C136/Q00034",
+      "c_validation_bearing_result_sha": "5417599fe8ce1951be9b36edf63b058f6f68c19d",
+      "c_gate_run_id": 36603079461,
+      "disposition": "PASS_SOURCE_ACQUISITION_EXHAUSTION_ONLY",
+      "production_readiness": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED",
+      "drive": "SOURCE_TRANSPORT_MISS_EXACT_FILENAME",
+      "pinned_direct": "SOURCE_IDENTITY_MISMATCH",
+      "pinned_release": "SOURCE_IDENTITY_MISMATCH",
+      "pinned_direct_git_blob_sha": "87ff6635b287982d1dd2089f9bf9183df8a1e3ea",
+      "pinned_release_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+      "pinned_release_dimensions": [
+        2048,
+        2048
+      ],
+      "canonical_substitution_allowed": false
+    },
+    "pinned_source": {
+      "tag": "v0.25.10a",
+      "commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "bundle_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+      "approved_drive_folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr"
+    }
+  },
+  "current_checks": {
+    "latest_c177": "PASS",
+    "zero_ready": "PASS",
+    "queue_identity": "PASS",
+    "queue_exhaustion": "PASS",
+    "canonical": "PASS",
+    "b_asset": "PASS",
+    "drive_miss": "PASS",
+    "direct": "PASS",
+    "release": "PASS",
+    "c136": "PASS",
+    "c177": "PASS",
+    "config": "PASS",
+    "source_policy": "PASS",
+    "contract": "PASS"
+  },
+  "reactivation_contract": {
+    "current_result": "BLOCKED_UNCHANGED_SOURCE_ACQUISITION_EXHAUSTED_FINGERPRINT",
+    "source_reprobe_authorized": false,
+    "release_member_substitution_authorized": false,
+    "candidate_rebuild_authorized": false,
+    "fresh_rescan_required": false,
+    "triggers": [
+      "index228 canonical inventory identity changes",
+      "asset_queue no longer retains C136/B00180 source-acquisition exhaustion",
+      "C136/B00180 source-exhaustion evidence is superseded by authoritative C evidence",
+      "pinned source tag/commit/bundle or approved Drive transport policy changes",
+      "an exact canonical E7F6E9B7 source transport is newly recorded by authoritative evidence"
+    ],
+    "purpose": "Prevent duplicate source probes while providing deterministic fail-closed reactivation for index228."
+  },
+  "material_deliverable": {
+    "fallback_ladder_step": 5,
+    "type": "INDEX228_SOURCE_DEPENDENCY_REACTIVATION_GUARD_AND_MACHINE_OUTPUT",
+    "executable": "localization/graphics/role_A/20261001-A00371-P00239/verify_index228_source_reactivation.py",
+    "machine_report": "localization/graphics/role_A/20261001-A00371-P00239/A00371_P00239_INDEX228_SOURCE_REACTIVATION_GUARD.json",
+    "candidate_dds_modified": false,
+    "new_executable_selection_input": true,
+    "materially_reduces_unresolved_work": true,
+    "production_readiness": "PREFLIGHT_ONLY_SOURCE_ACQUISITION_EXHAUSTED"
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+    "controller_roles_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed",
+    "b00180_source_manifest_blob_sha": "2d646ff4bd144c1e301ebfe512a2df617d90f71d",
+    "c136_task_blob_sha": "010c327a3e55091d8bda3b075401227870b58d6b",
+    "c177_task_blob_sha": "67b37947b864b3da59fe22651ccaaf8a60fb17fb",
+    "a00366_task_blob_sha": "fbb50ea01ed3238f5d61de0a0af166e9fbedd104",
+    "canonical_source_sha256": "bbbc44543042527a1c4f80156ddbf4f0f26b9130d8eca0a78012fb79ee3f38b2",
+    "pinned_release_member_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+    "verifier_blob_sha": "6ee12d5cd2146b6249392e281a925295e97eb873"
+  },
+  "candidate_dds_modified": false,
+  "candidate_binary_persisted": false,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "source_reprobe_performed": false,
+  "work_stolen_from_lane": null,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "self_qa": "PASS_A_MOD3_SCHEMA30__FRESH_HEAD_ZERO_COMPLETION_TIER__INDEX228_C136_SOURCE_EXHAUSTION_REUSED__NO_SOURCE_REPROBE__NONCANONICAL_RELEASE_SUBSTITUTION_FORBIDDEN__EXECUTABLE_REACTIVATION_GUARD__NO_SHARED_STATE__NO_DDS__RUNTIME_UNTESTED"
+}
