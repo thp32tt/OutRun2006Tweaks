@@ -58,6 +58,12 @@ GITHUB_TASK_COMMIT_CACHE_SECONDS = max(15, int(os.getenv("GITHUB_TASK_COMMIT_CAC
 GITHUB_TASK_COMMIT_SCAN_PAGES = max(1, min(5, int(os.getenv("GITHUB_TASK_COMMIT_SCAN_PAGES", "3"))))
 GITHUB_ACTIONS_DISCOVERY_PER_PAGE = max(30, min(100, int(os.getenv("GITHUB_ACTIONS_DISCOVERY_PER_PAGE", "100"))))
 GITHUB_ACTIONS_CACHE_SECONDS = max(10, int(os.getenv("GITHUB_ACTIONS_CACHE_SECONDS", "60")))
+GITHUB_TRANSIENT_RETRY_DELAYS = [
+    max(1, int(x.strip())) for x in os.getenv("GITHUB_TRANSIENT_RETRY_DELAYS", "2,5,10,20").split(",") if x.strip()
+]
+if not GITHUB_TRANSIENT_RETRY_DELAYS:
+    GITHUB_TRANSIENT_RETRY_DELAYS = [2, 5, 10, 20]
+GITHUB_TRANSIENT_COOLDOWN_SECONDS = max(15, int(os.getenv("GITHUB_TRANSIENT_COOLDOWN_SECONDS", "60")))
 WAIT_ACTIONS_STALE_SECONDS = max(GITHUB_BOUND_RUN_POLL_SECONDS, int(os.getenv("WAIT_ACTIONS_STALE_SECONDS", "75")))
 WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS = max(GITHUB_POLL_SECONDS, int(os.getenv("WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS", "600")))
 WAIT_ACTIONS_MAX_SECONDS = max(WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS, int(os.getenv("WAIT_ACTIONS_MAX_SECONDS", "1800")))
@@ -67,7 +73,7 @@ QUEUE_NEXT_TASK_DELAY_SECONDS = max(0, int(os.getenv("QUEUE_NEXT_TASK_DELAY_SECO
 QUEUE_IDLE_REARM_SECONDS = max(30, int(os.getenv("QUEUE_IDLE_REARM_SECONDS", "90")))
 LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "true"
 PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "15")))
-PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS", "15")))
+PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS", "30")))
 HEARTBEAT_SECONDS = max(5, int(os.getenv("HEARTBEAT_SECONDS", "15")))
 PROCESS_HEARTBEAT_FATAL_SECONDS = max(120, int(os.getenv("PROCESS_HEARTBEAT_FATAL_SECONDS", "300")))
 MEMORY_IDLE_RESTART_PERCENT = max(50.0, min(95.0, float(os.getenv("MEMORY_IDLE_RESTART_PERCENT", "80"))))
@@ -76,11 +82,11 @@ LOCALIZATION_QA_BATCH_SIZE = max(1, int(os.getenv("LOCALIZATION_QA_BATCH_SIZE", 
 LOCALIZATION_QA_COALESCE_SECONDS = max(0, int(os.getenv("LOCALIZATION_QA_COALESCE_SECONDS", "60")))
 LOCALIZATION_E_QA_PAUSE_THRESHOLD = max(1, int(os.getenv("LOCALIZATION_E_QA_PAUSE_THRESHOLD", "16")))
 LOCALIZATION_E_QA_RESUME_THRESHOLD = max(0, min(LOCALIZATION_E_QA_PAUSE_THRESHOLD - 1, int(os.getenv("LOCALIZATION_E_QA_RESUME_THRESHOLD", "12"))))
-LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS", "30")))
+LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS", "90")))
 LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_SECONDS", "30")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
 CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
-MAX_CHAT_ROLLOVERS_PER_TASK = max(1, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "5")))
+MAX_CHAT_ROLLOVERS_PER_TASK = max(1, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "2")))
 GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
@@ -103,7 +109,10 @@ if not RATE_LIMIT_BACKOFF_SECONDS:
     RATE_LIMIT_BACKOFF_SECONDS = [30, 60, 120]
 MIN_SEND_GAP_SECONDS = max(0, int(os.getenv("MIN_SEND_GAP_SECONDS", "45")))
 SLOT_DEDUP_SECONDS = max(0, int(os.getenv("SLOT_DEDUP_SECONDS", "120")))
-FRESH_CHAT_EACH_RUN = os.getenv("FRESH_CHAT_EACH_RUN", "true").lower() == "true"
+FRESH_CHAT_EACH_RUN = os.getenv("FRESH_CHAT_EACH_RUN", "false").lower() == "true"
+CHAT_REUSE_MAX_TASKS = max(1, int(os.getenv("CHAT_REUSE_MAX_TASKS", "4")))
+CHAT_REUSE_MAX_AGE_MINUTES = max(15, int(os.getenv("CHAT_REUSE_MAX_AGE_MINUTES", "90")))
+PREVIOUS_TASK_UI_SETTLE_SECONDS = max(30, int(os.getenv("PREVIOUS_TASK_UI_SETTLE_SECONDS", "180")))
 RETRY_BUTTON_COOLDOWN_SECONDS = max(10, int(os.getenv("RETRY_BUTTON_COOLDOWN_SECONDS", "45")))
 GENERIC_RETRY_ROLLOVER_CLICKS = max(1, int(os.getenv("GENERIC_RETRY_ROLLOVER_CLICKS", "2")))
 PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
@@ -227,8 +236,16 @@ class Slot:
     last_watchdog_at: Optional[str] = None
     thinking_verify_failures: int = 0
     last_thinking_failure_at: Optional[str] = None
+    chat_task_count: int = 0
+    chat_started_at: Optional[str] = None
+    last_task_completed_at: Optional[str] = None
 
 class ControllerRestartRequested(RuntimeError):
+    pass
+
+
+class GitHubTransientError(RuntimeError):
+    """Temporary GitHub transport/API failure; queue state must be preserved and retried."""
     pass
 
 
@@ -257,6 +274,8 @@ runtime = {
     "github_task_commit_scan_pages": GITHUB_TASK_COMMIT_SCAN_PAGES,
     "github_actions_discovery_per_page": GITHUB_ACTIONS_DISCOVERY_PER_PAGE,
     "github_actions_cache_seconds": GITHUB_ACTIONS_CACHE_SECONDS,
+    "github_transient_retry_delays": GITHUB_TRANSIENT_RETRY_DELAYS,
+    "github_transient_cooldown_seconds": GITHUB_TRANSIENT_COOLDOWN_SECONDS,
     "wait_actions_stale_seconds": WAIT_ACTIONS_STALE_SECONDS,
     "wait_actions_no_run_timeout_seconds": WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS,
     "wait_actions_max_seconds": WAIT_ACTIONS_MAX_SECONDS,
@@ -308,6 +327,9 @@ runtime = {
     "min_send_gap_seconds": MIN_SEND_GAP_SECONDS,
     "slot_dedup_seconds": SLOT_DEDUP_SECONDS,
     "fresh_chat_each_run": FRESH_CHAT_EACH_RUN,
+    "chat_reuse_max_tasks": CHAT_REUSE_MAX_TASKS,
+    "chat_reuse_max_age_minutes": CHAT_REUSE_MAX_AGE_MINUTES,
+    "previous_task_ui_settle_seconds": PREVIOUS_TASK_UI_SETTLE_SECONDS,
     "retry_button_cooldown_seconds": RETRY_BUTTON_COOLDOWN_SECONDS,
     "generic_retry_rollover_clicks": GENERIC_RETRY_ROLLOVER_CLICKS,
     "rate_limit_attempts": 0,
@@ -596,21 +618,54 @@ def save_queue_state(state: dict):
 
 
 _github_rest_block_until_epoch = 0.0
+_github_transient_error_count = 0
 _github_commit_list_cache: dict[str, tuple[float, list]] = {}
 _github_task_commit_cache: dict[tuple[str, str], tuple[float, list]] = {}
 _github_actions_cache: dict[str, tuple[float, dict]] = {}
+_localization_contract_cache: Optional[tuple[float, str, str]] = None
 
 
 def _github_blocked_seconds() -> int:
     return max(0, int(_github_rest_block_until_epoch - time.time()))
 
 
+def github_transient_retry_pending() -> bool:
+    return time.time() < _github_rest_block_until_epoch and bool(runtime.get("github_retrying"))
+
+
+def _github_retry_sleep(seconds: int) -> None:
+    deadline = time.monotonic() + max(0, seconds)
+    while True:
+        remain = deadline - time.monotonic()
+        if remain <= 0:
+            return
+        touch_queue_heartbeat()
+        time.sleep(min(5.0, remain))
+
+
+def _github_schedule_transient_retry(message: str, seconds: Optional[int] = None) -> None:
+    global _github_rest_block_until_epoch, _github_transient_error_count
+    _github_transient_error_count += 1
+    delay = max(1, int(seconds or GITHUB_TRANSIENT_COOLDOWN_SECONDS))
+    until = max(_github_rest_block_until_epoch, time.time() + delay)
+    _github_rest_block_until_epoch = until
+    write_runtime(
+        github_retrying=True,
+        github_transient_error_count=_github_transient_error_count,
+        github_retry_in_seconds=max(1, int(until - time.time())),
+        github_api_blocked_until=datetime.fromtimestamp(until, TZ).isoformat(),
+        last_github_error=message,
+    )
+
+
 def github_api_json(path: str) -> dict:
-    global _github_rest_block_until_epoch
+    global _github_rest_block_until_epoch, _github_transient_error_count
     touch_queue_heartbeat()
     now_epoch = time.time()
     if now_epoch < _github_rest_block_until_epoch:
-        raise RuntimeError(f"github REST temporarily paused for {_github_blocked_seconds()}s after rate limit")
+        raise GitHubTransientError(
+            f"GitHub retry cooldown active for {_github_blocked_seconds()}s"
+        )
 
     url = "https://api.github.com" + path
     headers = {
@@ -620,43 +675,80 @@ def github_api_json(path: str) -> dict:
     }
     if GITHUB_TOKEN:
         headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
-    req = urllib.request.Request(url, headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=20) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            reset = resp.headers.get("X-RateLimit-Reset")
-            write_runtime(
-                github_rate_limit_remaining=resp.headers.get("X-RateLimit-Remaining"),
-                github_rate_limit_limit=resp.headers.get("X-RateLimit-Limit"),
-                github_rate_limit_reset=reset,
-                github_api_blocked_until=None,
-                last_github_error=None,
+
+    attempts = len(GITHUB_TRANSIENT_RETRY_DELAYS) + 1
+    for attempt in range(attempts):
+        req = urllib.request.Request(url, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                reset = resp.headers.get("X-RateLimit-Reset")
+                _github_rest_block_until_epoch = 0.0
+                _github_transient_error_count = 0
+                write_runtime(
+                    github_rate_limit_remaining=resp.headers.get("X-RateLimit-Remaining"),
+                    github_rate_limit_limit=resp.headers.get("X-RateLimit-Limit"),
+                    github_rate_limit_reset=reset,
+                    github_api_blocked_until=None,
+                    github_retrying=False,
+                    github_transient_error_count=0,
+                    github_retry_in_seconds=0,
+                    last_github_error=None,
+                )
+                return data
+        except urllib.error.HTTPError as e:
+            if e.code in {403, 429}:
+                retry_after = e.headers.get("Retry-After")
+                reset = e.headers.get("X-RateLimit-Reset")
+                until = time.time() + GITHUB_TRANSIENT_COOLDOWN_SECONDS
+                if retry_after:
+                    try:
+                        until = max(until, time.time() + int(retry_after) + 5)
+                    except ValueError:
+                        pass
+                if reset:
+                    try:
+                        until = max(until, float(reset) + 5)
+                    except ValueError:
+                        pass
+                _github_schedule_transient_retry(
+                    f"HTTP {e.code} rate limit; automatic retry scheduled",
+                    max(1, int(until - time.time())),
+                )
+                raise GitHubTransientError(f"GitHub HTTP {e.code}; retry scheduled") from e
+            if 500 <= e.code <= 599:
+                if attempt < len(GITHUB_TRANSIENT_RETRY_DELAYS):
+                    delay = GITHUB_TRANSIENT_RETRY_DELAYS[attempt]
+                    write_runtime(
+                        github_retrying=True,
+                        github_retry_attempt=attempt + 1,
+                        github_retry_in_seconds=delay,
+                        last_github_error=f"HTTP {e.code}; retrying GitHub automatically",
+                    )
+                    _github_retry_sleep(delay)
+                    continue
+                _github_schedule_transient_retry(
+                    f"HTTP {e.code}; automatic retry cooldown scheduled"
+                )
+                raise GitHubTransientError(f"GitHub HTTP {e.code}; retry scheduled") from e
+            raise
+        except (urllib.error.URLError, TimeoutError, ConnectionResetError, OSError) as e:
+            if attempt < len(GITHUB_TRANSIENT_RETRY_DELAYS):
+                delay = GITHUB_TRANSIENT_RETRY_DELAYS[attempt]
+                write_runtime(
+                    github_retrying=True,
+                    github_retry_attempt=attempt + 1,
+                    github_retry_in_seconds=delay,
+                    last_github_error=f"{type(e).__name__}: {e}; retrying GitHub automatically",
+                )
+                _github_retry_sleep(delay)
+                continue
+            _github_schedule_transient_retry(
+                f"{type(e).__name__}: {e}; automatic retry cooldown scheduled"
             )
-            return data
-    except urllib.error.HTTPError as e:
-        if e.code in {403, 429}:
-            retry_after = e.headers.get("Retry-After")
-            reset = e.headers.get("X-RateLimit-Reset")
-            until = time.time() + 300
-            if retry_after:
-                try:
-                    until = max(until, time.time() + int(retry_after) + 5)
-                except ValueError:
-                    pass
-            if reset:
-                try:
-                    until = max(until, float(reset) + 5)
-                except ValueError:
-                    pass
-            _github_rest_block_until_epoch = until
-            write_runtime(
-                github_rate_limit_remaining=e.headers.get("X-RateLimit-Remaining"),
-                github_rate_limit_limit=e.headers.get("X-RateLimit-Limit"),
-                github_rate_limit_reset=reset,
-                github_api_blocked_until=datetime.fromtimestamp(until, TZ).isoformat(),
-                last_github_error=f"HTTP {e.code} rate limit; REST paused until {datetime.fromtimestamp(until, TZ).isoformat()}",
-            )
-        raise
+            raise GitHubTransientError("GitHub transport unavailable; retry scheduled") from e
+
+    raise GitHubTransientError("GitHub transient retry loop exhausted; retry scheduled")
 
 
 def github_branch_head(branch: str) -> Optional[str]:
@@ -664,6 +756,9 @@ def github_branch_head(branch: str) -> Optional[str]:
         q = urllib.parse.quote(branch, safe="")
         data = github_api_json(f"/repos/{GITHUB_REPO}/git/ref/heads/{q}")
         return data.get("object", {}).get("sha")
+    except GitHubTransientError as e:
+        log.info("github branch lookup deferred branch=%s error=%r", branch, e)
+        return None
     except Exception as e:
         log.warning("github branch lookup failed branch=%s error=%r", branch, e)
         write_runtime(last_github_error=f"branch:{branch}:{e!r}")
@@ -674,6 +769,9 @@ def github_commit_message(sha: str) -> Optional[str]:
     try:
         data = github_api_json(f"/repos/{GITHUB_REPO}/commits/{sha}")
         return data.get("commit", {}).get("message", "")
+    except GitHubTransientError as e:
+        log.info("github commit lookup deferred sha=%s error=%r", sha, e)
+        return None
     except Exception as e:
         log.warning("github commit lookup failed sha=%s error=%r", sha, e)
         return None
@@ -763,6 +861,9 @@ def github_find_task_commit(branch: str, task_id: str, per_page: int = 100, allo
                 # next queue cycle so a just-created durable TASK_ID commit is seen fast.
                 _github_task_commit_cache[key] = (now_mono, task_data)
         return _select_task_commit(task_data if isinstance(task_data, list) else [], task_id, allow_ci_skip_fallback=allow_ci_skip_fallback)
+    except GitHubTransientError as e:
+        log.info("github task commit lookup deferred branch=%s task=%s error=%r", branch, task_id, e)
+        return None
     except Exception as e:
         log.warning("github task commit lookup failed branch=%s task=%s error=%r", branch, task_id, e)
         write_runtime(last_github_error=f"task-commit:{branch}:{task_id}:{e!r}")
@@ -793,6 +894,9 @@ def github_action_run_by_id(run_id: int, sha: str, workflow_name: str) -> Option
             log.warning("bound actions run mismatch id=%s expected_sha=%s actual_sha=%s", run_id, sha, r.get("head_sha"))
             return None
         return _normalize_github_run(r)
+    except GitHubTransientError as e:
+        log.info("github exact actions lookup deferred run=%s sha=%s error=%r", run_id, sha, e)
+        return None
     except Exception as e:
         log.warning("github exact actions lookup failed run=%s sha=%s error=%r", run_id, sha, e)
         write_runtime(last_github_error=f"actions-run:{run_id}:{sha}:{e!r}")
@@ -811,6 +915,9 @@ def github_action_jobs_summary(run_id: int) -> list[dict]:
             "started_at": j.get("started_at"),
             "completed_at": j.get("completed_at"),
         } for j in jobs]
+    except GitHubTransientError as e:
+        log.info("github actions jobs lookup deferred run=%s error=%r", run_id, e)
+        return []
     except Exception as e:
         log.warning("github actions jobs lookup failed run=%s error=%r", run_id, e)
         write_runtime(last_github_error=f"actions-jobs:{run_id}:{e!r}")
@@ -838,6 +945,9 @@ def github_gate_run(branch: str, sha: str, workflow_name: str, run_id: Optional[
             return None
         matches.sort(key=lambda r: r.get("created_at", ""), reverse=True)
         return _normalize_github_run(matches[0])
+    except GitHubTransientError as e:
+        log.info("github actions discovery deferred branch=%s sha=%s error=%r", branch, sha, e)
+        return None
     except Exception as e:
         log.warning("github actions discovery failed branch=%s sha=%s error=%r", branch, sha, e)
         write_runtime(last_github_error=f"actions-discovery:{branch}:{sha}:{e!r}")
@@ -865,7 +975,11 @@ def queue_target_for_slot(slot_name: str) -> dict:
 
 
 def localization_controller_contract_fingerprint() -> tuple[str, str]:
-    """Return the live localization controller schema and config blob SHA used for dispatch."""
+    """Return the live localization schema/blob, with a short cache to avoid needless API pressure."""
+    global _localization_contract_cache
+    now_mono = time.monotonic()
+    if _localization_contract_cache and now_mono - _localization_contract_cache[0] < 60:
+        return _localization_contract_cache[1], _localization_contract_cache[2]
     path = "/repos/" + GITHUB_REPO + "/contents/localization/controller_roles.json?ref=korean-localization-clean"
     payload = github_api_json(path)
     blob_sha = str(payload.get("sha") or "").strip()
@@ -876,6 +990,7 @@ def localization_controller_contract_fingerprint() -> tuple[str, str]:
     schema = str(config.get("schema_version") or "").strip()
     if not schema:
         raise RuntimeError("localization controller schema_version unavailable")
+    _localization_contract_cache = (now_mono, schema, blob_sha)
     return schema, blob_sha
 
 

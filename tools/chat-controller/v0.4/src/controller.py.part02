@@ -243,8 +243,90 @@ async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str,
     slot.last_assistant_change_at = None
     slot.last_watchdog_at = None
     slot.watchdog_resumes_since_schedule = 0
+    slot.chat_task_count = 0
+    slot.chat_started_at = datetime.now(TZ).isoformat()
+    slot.last_task_completed_at = None
     await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
     await page.wait_for_timeout(700)
+    return page
+
+
+def slot_chat_recycle_reason(slot: Slot, now: datetime) -> Optional[str]:
+    if not slot.url:
+        return None
+    if slot.chat_task_count >= CHAT_REUSE_MAX_TASKS:
+        return f"task_budget:{slot.chat_task_count}/{CHAT_REUSE_MAX_TASKS}"
+    started = _parse_iso(slot.chat_started_at)
+    if started and (now - started).total_seconds() >= CHAT_REUSE_MAX_AGE_MINUTES * 60:
+        return f"chat_age:{int((now - started).total_seconds() // 60)}m"
+    return None
+
+
+async def prepare_reusable_slot_chat(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    reg: Registry,
+    slot: Slot,
+    purpose: str,
+) -> Optional[Page]:
+    """Reuse a completed slot chat when safe; recycle only on bounded conditions."""
+    page = await slot_page(context, pages, slot)
+    now = datetime.now(TZ)
+
+    if await detect_busy(page):
+        completed_at = (
+            _parse_iso(slot.last_task_completed_at)
+            or _parse_iso(slot.last_assistant_change_at)
+            or _parse_iso(slot.last_sent_at)
+        )
+        if completed_at is None or (now - completed_at).total_seconds() < PREVIOUS_TASK_UI_SETTLE_SECONDS:
+            write_runtime(
+                status="previous_task_ui_settle_wait",
+                last_action=f"Slot {slot.name}: previous task UI still generating; holding {purpose} instead of opening another chat",
+                active_slot=slot.name,
+                chat_task_count=slot.chat_task_count,
+            )
+            return None
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+        save_registry(reg)
+        write_runtime(
+            status="stale_completed_chat_recycled",
+            last_action=f"Slot {slot.name}: previous task stayed busy beyond {PREVIOUS_TASK_UI_SETTLE_SECONDS}s; recycled one stale chat",
+            active_slot=slot.name,
+        )
+        return page
+
+    recycle_reason = slot_chat_recycle_reason(slot, now)
+    if recycle_reason:
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+        save_registry(reg)
+        write_runtime(
+            status="bounded_chat_recycle",
+            last_action=f"Slot {slot.name}: recycled chat for {recycle_reason} before {purpose}",
+            active_slot=slot.name,
+        )
+        return page
+
+    if slot.url and await detect_conversation_limit(page):
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+        save_registry(reg)
+        write_runtime(
+            status="conversation_limit_recycle",
+            last_action=f"Slot {slot.name}: conversation limit reached; opened one fresh chat",
+            active_slot=slot.name,
+        )
+        return page
+
+    if await first_visible(page, RETRY_SELECTORS, total_wait_ms=500) is not None:
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+        save_registry(reg)
+        write_runtime(
+            status="stale_retry_chat_recycled",
+            last_action=f"Slot {slot.name}: stale Retry surface on completed chat; opened one fresh chat",
+            active_slot=slot.name,
+        )
+        return page
+
     return page
 
 
@@ -576,7 +658,9 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
             slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
         )
     else:
-        page = await slot_page(context, pages, slot)
+        page = await prepare_reusable_slot_chat(context, pages, reg, slot, "next task")
+        if page is None:
+            return
         is_new = not slot.url
 
     if is_new:
@@ -697,6 +781,10 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
 
     note_successful_request(reg, request_now, slot.name)
     slot.runs += 1
+    slot.chat_task_count += 1
+    if not slot.chat_started_at:
+        slot.chat_started_at = request_now.isoformat()
+    slot.last_task_completed_at = None
     slot.watchdog_resumes_since_schedule = 0
     slot.last_assistant_hash = None
     slot.last_assistant_change_at = request_now.isoformat()

@@ -125,11 +125,11 @@ jobs:
           grep -Fq 'QUEUE_NEXT_TASK_DELAY_SECONDS: "15"' "$compose"
           grep -Fq 'QUEUE_IDLE_REARM_SECONDS: "90"' "$compose"
           grep -Fq 'PARALLEL_LANE_STAGGER_SECONDS: "15"' "$compose"
-          grep -Fq 'PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS: "15"' "$compose"
+          grep -Fq 'PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS: "30"' "$compose"
           grep -Fq 'HEARTBEAT_SECONDS: "15"' "$compose"
           grep -Fq 'LOCALIZATION_QA_BATCH_SIZE: "4"' "$compose"
           grep -Fq 'LOCALIZATION_QA_COALESCE_SECONDS: "60"' "$compose"
-          grep -Fq 'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS: "30"' "$compose"
+          grep -Fq 'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS: "90"' "$compose"
           grep -Fq 'LOCALIZATION_SLOT_DEDUP_SECONDS: "30"' "$compose"
           grep -Fq 'def github_action_run_by_id' /tmp/controller.py
           grep -Fq 'run_id=bound_run_id' /tmp/controller.py
@@ -148,15 +148,21 @@ jobs:
       - name: Verify continuous producer and batch-QA architecture
         run: |
           grep -Fq 'CHAT_SLOTS: "4"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'FRESH_CHAT_EACH_RUN: "true"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'FRESH_CHAT_EACH_RUN: "true"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'FRESH_CHAT_EACH_RUN: "false"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'FRESH_CHAT_EACH_RUN: "false"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'CHAT_REUSE_MAX_TASKS: "4"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'CHAT_REUSE_MAX_TASKS: "4"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'PREVIOUS_TASK_UI_SETTLE_SECONDS: "180"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          grep -Fq 'PREVIOUS_TASK_UI_SETTLE_SECONDS: "180"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'mem_limit: 4g' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
           grep -Fq 'mem_reservation: 2g' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
           grep -Fq 'def enqueue_producer_result_for_qa' /tmp/controller.py
           grep -Fq 'def finalize_c_qa_batch' /tmp/controller.py
           grep -Fq 'qa_pending' /tmp/controller.py
           grep -Fq '"D": "localization_E.md"' tools/chat-controller/v0.4/src/controller.py.part02
-          grep -Fq 'fresh_task_chat_started' tools/chat-controller/v0.4/src/controller.py.part03
+          grep -Fq 'def prepare_reusable_slot_chat' tools/chat-controller/v0.4/src/controller.py.part02
+          grep -Fq 'previous_task_ui_settle_wait' tools/chat-controller/v0.4/src/controller.py.part02
+          grep -Fq 'bounded_chat_recycle' tools/chat-controller/v0.4/src/controller.py.part02
           grep -Fq 'lane_dispatch_config_error' tools/chat-controller/v0.4/src/controller.py.part03
           grep -Fq 'lane_dispatch_errors' tools/chat-controller/v0.4/src/controller.py.part03
           grep -Fq 'except FileNotFoundError as e:' tools/chat-controller/v0.4/src/controller.py.part03
@@ -182,21 +188,22 @@ jobs:
           assert 'if lane_key in {"A", "B", "D"}:' in proc
           send = src[src.index("async def localization_send_lane_task"):src.index("def finalize_localization_producer_commit")]
           assert 'if FRESH_CHAT_EACH_RUN:' in send
-          assert 'replace_with_fresh_slot_page(context, pages, slot)' in send
+          assert 'prepare_reusable_slot_chat(context, pages, reg, slot' in send
+          assert 'previous task still generating; not opening a new chat yet' in send
           assert 'No producer/C barrier exists.' in body
           assert body.index('Priority lane {priority_lane} waiting for {guard}') < body.index('active_lane_order = sorted(')
           assert 'preserving send gap before active Retry traffic' in body
-          print("four-slot A/B/E producers + C QA with fresh-task chats verified")
+          print("four-slot A/B/E producers + C QA with bounded chat reuse verified")
           PY2
 
-      - name: Verify schema 30 policy alignment
+      - name: Verify schema 32 policy alignment
         run: |
           git fetch --force origin refs/heads/korean-localization-clean:refs/remotes/origin/korean-localization-clean
           git show refs/remotes/origin/korean-localization-clean:localization/controller_roles.json > /tmp/controller_roles.json
           python - <<'PY2'
           import json, pathlib, re
           cfg=json.loads(pathlib.Path('/tmp/controller_roles.json').read_text())
-          assert cfg['schema_version'] >= 30
+          assert cfg['schema_version'] >= 32
           ex=cfg['execution']; rt=cfg['runtime_tuning']; obs=cfg['runtime_observability']
           assert ex['controller_slot_count'] == 4
           assert ex['slot_map'] == {'A':'A','B':'B','C':'C','D':'E'}
@@ -204,13 +211,22 @@ jobs:
           assert cfg['lanes']['C']['coalesce_seconds'] == 60
           assert rt['localization_qa_batch_size'] == 4
           assert rt['localization_qa_coalesce_seconds'] == 60
-          assert rt['localization_same_slot_send_gap_seconds'] == 30
+          assert rt['parallel_distinct_slot_send_gap_seconds'] == 30
+          assert rt['localization_same_slot_send_gap_seconds'] == 90
           assert rt['localization_slot_dedup_seconds'] == 30
           assert rt['localization_extra_producer_qa_pause_threshold'] == 16
           assert rt['localization_extra_producer_qa_resume_threshold'] == 12
           assert rt['generic_retry_rollover_clicks'] == 2
-          assert rt['fresh_chat_each_task'] is True
-          assert obs['task_chat_lifecycle'] == 'FRESH_CHAT_PER_NEW_TASK_ID'
+          assert rt['fresh_chat_each_task'] is False
+          assert rt['chat_reuse_max_tasks'] == 4
+          assert rt['chat_reuse_max_age_minutes'] == 90
+          assert rt['previous_task_ui_settle_seconds'] == 180
+          assert rt['max_chat_rollovers_per_task'] == 2
+          assert rt['github_transient_retry_delays'] == [2,5,10,20]
+          assert rt['github_transient_cooldown_seconds'] == 60
+          assert obs['task_chat_lifecycle'] == 'BOUNDED_REUSE_4_TASKS_OR_90_MINUTES'
+          assert obs['previous_task_ui_settle_status'] == 'previous_task_ui_settle_wait'
+          assert obs['github_transient_status'] == 'github_retry_wait'
           cp=cfg['runtime_recovery']['continuous_progression']
           assert cp['missing_lane_dispatch_precedes_retry_traffic'] is True
           assert cp['preserve_send_gap_for_missing_lane'] is True
@@ -222,6 +238,16 @@ jobs:
           assert cp['lane_exception_block_threshold'] == 3
           assert cp['dispatch_exception_backoff_max_seconds'] == 300
           assert cp['browser_transport_failure_global_restart'] is True
+          assert cp['previous_task_ui_must_settle_before_next_send'] is True
+          assert cp['previous_task_ui_settle_seconds'] == 180
+          assert cp['bounded_chat_reuse'] is True
+          assert cp['chat_reuse_max_tasks'] == 4
+          assert cp['chat_reuse_max_age_minutes'] == 90
+          assert cp['github_transient_errors_never_consume_task_attempt'] is True
+          assert cp['github_transient_errors_never_trigger_chat_rollover'] is True
+          assert cp['github_transient_retry_forever_across_cycles'] is True
+          assert cp['github_transient_internal_retry_delays'] == [2,5,10,20]
+          assert cp['github_transient_cooldown_seconds'] == 60
           assert cp['active_lane_retry_fairness'] is True
           assert cp['active_lane_recovery_order'] == 'OLDEST_EFFECTIVE_SEND_FIRST'
           assert cp['active_lane_effective_send_fields'] == ['last_retry_click_at','last_rollover_at','sent_at']
@@ -287,6 +313,7 @@ jobs:
           text=pathlib.Path('tools/chat-controller/v0.4/docker-compose.portainer-localization.yml').read_text()
           expected={
             'CHAT_SLOTS':4,
+            'PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS':rt['parallel_distinct_slot_send_gap_seconds'],
             'LOCALIZATION_QA_BATCH_SIZE':rt['localization_qa_batch_size'],
             'LOCALIZATION_QA_COALESCE_SECONDS':rt['localization_qa_coalesce_seconds'],
             'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS':rt['localization_same_slot_send_gap_seconds'],
@@ -306,8 +333,12 @@ jobs:
           for key,val in expected.items():
             m=re.search(rf'^\s+{re.escape(key)}:\s+"?(\d+)"?\s*$',text,re.M)
             assert m and int(m.group(1))==int(val), (key,val,m.group(1) if m else None)
-          assert re.search(r'^\s+FRESH_CHAT_EACH_RUN:\s+"true"\s*$',text,re.M)
-          print('schema 30 policy and deployment values aligned')
+          assert re.search(r'^\s+FRESH_CHAT_EACH_RUN:\s+"false"\s*$',text,re.M)
+          assert re.search(r'^\s+CHAT_REUSE_MAX_TASKS:\s+"4"\s*$',text,re.M)
+          assert re.search(r'^\s+CHAT_REUSE_MAX_AGE_MINUTES:\s+"90"\s*$',text,re.M)
+          assert re.search(r'^\s+PREVIOUS_TASK_UI_SETTLE_SECONDS:\s+"180"\s*$',text,re.M)
+          assert re.search(r'^\s+MAX_CHAT_ROLLOVERS_PER_TASK:\s+"2"\s*$',text,re.M)
+          print('schema 32 policy and deployment values aligned')
           PY2
 
       - name: Verify end-to-end liveness bounds
@@ -319,6 +350,13 @@ jobs:
             grep -Fq 'QUEUE_ERROR_RESTART_THRESHOLD: "3"' "$compose"
             grep -Fq 'WATCHDOG_ERROR_RESTART_THRESHOLD: "3"' "$compose"
             grep -Fq 'PROCESS_HEARTBEAT_FATAL_SECONDS: "180"' "$compose"
+            grep -Fq 'MAX_CHAT_ROLLOVERS_PER_TASK: "2"' "$compose"
+            grep -Fq 'FRESH_CHAT_EACH_RUN: "false"' "$compose"
+            grep -Fq 'CHAT_REUSE_MAX_TASKS: "4"' "$compose"
+            grep -Fq 'CHAT_REUSE_MAX_AGE_MINUTES: "90"' "$compose"
+            grep -Fq 'PREVIOUS_TASK_UI_SETTLE_SECONDS: "180"' "$compose"
+            grep -Fq 'GITHUB_TRANSIENT_RETRY_DELAYS: "2,5,10,20"' "$compose"
+            grep -Fq 'GITHUB_TRANSIENT_COOLDOWN_SECONDS: "60"' "$compose"
           done
           grep -Fq 'REGISTRY_BACKUP_FILE' /tmp/controller.py
           grep -Fq 'QUEUE_BACKUP_FILE' /tmp/controller.py
@@ -331,6 +369,11 @@ jobs:
           grep -Fq 'def start_process_liveness_monitor' /tmp/controller.py
           grep -Fq 'queue_error_restart' /tmp/controller.py
           grep -Fq 'watchdog_error_restart' /tmp/controller.py
+          grep -Fq 'class GitHubTransientError' /tmp/controller.py
+          grep -Fq 'github_transient_retry_pending' /tmp/controller.py
+          grep -Fq 'GITHUB_TRANSIENT_RETRY_DELAYS' /tmp/controller.py
+          grep -Fq 'GitHub temporary error; holding current chat/task' /tmp/controller.py
+          grep -Fq 'def prepare_reusable_slot_chat' /tmp/controller.py
           grep -Fq 'def reconcile_localization_blocked_producer_commits' /tmp/controller.py
           grep -Fq 'startup_blocked_producer_recovered' /tmp/controller.py
           grep -Fq 'recovered_from_false_blocked' /tmp/controller.py

@@ -209,6 +209,27 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         )
         return False
 
+    # Build/refresh the task prompt before closing the current page. A temporary
+    # GitHub policy lookup failure must never create an unnecessary blank chat.
+    try:
+        rollover_prompt = queue_rollover_prompt(active)
+    except GitHubTransientError as e:
+        write_runtime(
+            status="github_retry_wait",
+            last_action=f"{active['task_id']}: GitHub temporary error before rollover; keeping current chat and retrying GitHub",
+            last_error=repr(e),
+        )
+        return False
+    except Exception as e:
+        if CONTROLLER_MODE == "localization":
+            write_runtime(
+                status="policy_refresh_wait",
+                last_action=f"{active['task_id']}: rollover policy refresh failed; current chat preserved for later retry",
+                last_error=repr(e),
+            )
+            return False
+        raise
+
     old_page = pages.get(slot.name)
     old_url = slot.url or (old_page.url if old_page and not old_page.is_closed() else None)
     previous = list(active.get("previous_chat_urls", []))
@@ -238,17 +259,6 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         track_thinking_verification(reg, slot, False, "conversation_rollover")
         return False
 
-    try:
-        rollover_prompt = queue_rollover_prompt(active)
-    except Exception as e:
-        if CONTROLLER_MODE == "localization":
-            write_runtime(
-                status="policy_refresh_wait",
-                last_action=f"{active['task_id']}: rollover policy refresh failed; retrying later without losing queue state",
-                last_error=repr(e),
-            )
-            return False
-        raise
     result = await send_message(page, rollover_prompt)
     if result != "sent":
         write_runtime(status="conversation_rollover_failed", last_action=f"{active['task_id']}: rollover send failed: {result}")
@@ -272,6 +282,10 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     active["last_retry_backoff_at"] = None
     active["phase"] = "WAIT_CHAT"
     slot.last_sent_at = sent_at.isoformat()
+    slot.chat_task_count = 1
+    if not slot.chat_started_at:
+        slot.chat_started_at = sent_at.isoformat()
+    slot.last_task_completed_at = None
     slot.last_assistant_hash = None
     slot.last_assistant_change_at = sent_at.isoformat()
     slot.last_result = "conversation_rollover_sent"
@@ -583,35 +597,59 @@ async def localization_send_lane_task(
     target = queue_target_for_slot(slot_name)
     base_sha = github_branch_head(target["branch"])
     if not base_sha:
-        write_runtime(status="queue_github_unavailable", last_action=f"Could not read branch {target['branch']}")
+        if github_transient_retry_pending():
+            write_runtime(
+                status="github_retry_wait",
+                last_action=f"GitHub temporary error for {target['branch']}; queue state preserved and automatic retry continues",
+            )
+        else:
+            write_runtime(status="queue_github_unavailable", last_action=f"Could not read branch {target['branch']}")
+        return False
+
+    # Verify/cache the live localization policy before any tab is recycled. A
+    # GitHub transport failure should never cause a new blank chat by itself.
+    try:
+        localization_controller_contract_fingerprint()
+    except GitHubTransientError as e:
+        write_runtime(
+            status="github_retry_wait",
+            last_action=f"Wave {wave_id} lane {slot_name}: GitHub policy lookup retrying automatically; current chat preserved",
+            last_error=repr(e),
+        )
+        return False
+    except Exception as e:
+        write_runtime(
+            status="policy_refresh_wait",
+            last_action=f"Wave {wave_id} lane {slot_name}: policy refresh unavailable; current chat preserved",
+            last_error=repr(e),
+        )
         return False
 
     if FRESH_CHAT_EACH_RUN:
+        # Legacy compatibility only. Normal queue policy now reuses a bounded chat.
+        previous_page = await slot_page(context, pages, slot)
+        if await detect_busy(previous_page):
+            write_runtime(
+                status="previous_task_ui_settle_wait",
+                last_action=f"Wave {wave_id} lane {slot_name}: previous task still generating; not opening a new chat yet",
+            )
+            return False
         page = await replace_with_fresh_slot_page(context, pages, slot)
         save_registry(reg)
         write_runtime(
             status="fresh_task_chat_started",
-            last_action=f"Wave {wave_id} lane {slot_name}: opened fresh project chat for new TASK_ID",
+            last_action=f"Wave {wave_id} lane {slot_name}: legacy fresh-per-task policy opened one project chat",
             active_slot=slot.name,
             tab_count=len([p for p in pages.values() if not p.is_closed()]),
         )
     else:
-        page = await slot_page(context, pages, slot)
+        page = await prepare_reusable_slot_chat(context, pages, reg, slot, f"wave {wave_id}")
+        if page is None:
+            return False
         if slot.url and not is_project_scoped_chat_url(slot.url):
             slot.url = None
             save_registry(reg)
             page = await replace_with_fresh_slot_page(context, pages, slot)
-
-    if await detect_busy(page):
-        write_runtime(status="parallel_dispatch_wait", last_action=f"Wave {wave_id} lane {slot_name} previous chat is still busy")
-        return False
-
-    if slot.url and await detect_conversation_limit(page):
-        page = await replace_with_fresh_slot_page(context, pages, slot)
-
-    if await first_visible(page, RETRY_SELECTORS, total_wait_ms=500) is not None:
-        # A finished lane that still shows Retry is not a safe surface for a new task.
-        page = await replace_with_fresh_slot_page(context, pages, slot)
 
     if not await ensure_logged_in(page):
         write_runtime(status="login_required", last_action=f"Wave {wave_id} lane {slot_name}: login required")
@@ -749,6 +787,10 @@ async def localization_send_lane_task(
 
     note_successful_request(reg, sent_at, slot.name)
     slot.runs += 1
+    slot.chat_task_count += 1
+    if not slot.chat_started_at:
+        slot.chat_started_at = sent_at.isoformat()
+    slot.last_task_completed_at = None
     slot.watchdog_resumes_since_schedule = 0
     slot.last_assistant_hash = None
     slot.last_assistant_change_at = sent_at.isoformat()
@@ -913,6 +955,14 @@ async def localization_process_lane(
                             queue=active,
                         )
                     return
+
+            if github_transient_retry_pending():
+                write_runtime(
+                    status="github_retry_wait",
+                    last_action=f"{active['task_id']}: GitHub temporary error; holding current chat/task and retrying GitHub automatically",
+                    queue=active,
+                )
+                return
 
             if active.get("dispatch_confirmed") is False:
                 dispatch_started = _parse_iso(active.get("dispatch_started_at")) or _parse_iso(active.get("sent_at")) or now
@@ -1099,6 +1149,13 @@ async def localization_process_lane(
             )
             save_queue_state(q)
             if run is None:
+                if github_transient_retry_pending():
+                    write_runtime(
+                        status="github_retry_wait",
+                        last_action=f"{active['task_id']}: GitHub temporary error; C Gate lookup will retry automatically without changing this task",
+                        queue=active,
+                    )
+                    return
                 recovery = await recover_missing_gate_run(context, pages, active, now)
                 if recovery:
                     action, reason = recovery
@@ -1531,20 +1588,32 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
     active_by_lane = q.setdefault("active_by_lane", {})
 
     # Retire completed producers immediately and enqueue immutable task/result SHAs for C.
+    # Mark the slot completion timestamp before another task may reuse the same chat.
     producer_retired = []
+    registry_changed = False
     for lane_key in ("A", "B", "D"):
         task = active_by_lane.get(lane_key)
         if task and task.get("phase") == "DONE":
             if enqueue_producer_result_for_qa(q, task):
                 producer_retired.append(f"{task.get('task_id')}->{task.get('result_sha')}")
+            completed_slot = next((s for s in reg.slots if s.name == lane_key), None)
+            if completed_slot is not None:
+                completed_slot.last_task_completed_at = now.isoformat()
+                registry_changed = True
             active_by_lane.pop(lane_key, None)
 
     # Retire one finished C batch without touching producer slots.
     ctask = active_by_lane.get("C")
     if ctask and ctask.get("phase") == "DONE":
         finalize_c_qa_batch(q, ctask)
+        completed_slot = next((s for s in reg.slots if s.name == "C"), None)
+        if completed_slot is not None:
+            completed_slot.last_task_completed_at = now.isoformat()
+            registry_changed = True
         active_by_lane.pop("C", None)
 
+    if registry_changed:
+        save_registry(reg)
     if producer_retired or (ctask and ctask.get("phase") == "DONE"):
         save_queue_state(q)
 
@@ -1740,7 +1809,13 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         target = queue_target_for_slot(slot.name)
         base_sha = github_branch_head(target["branch"])
         if not base_sha:
-            write_runtime(status="queue_github_unavailable", last_action=f"Could not read branch {target['branch']}")
+            if github_transient_retry_pending():
+                write_runtime(
+                    status="github_retry_wait",
+                    last_action=f"GitHub temporary error for {target['branch']}; no TASK attempt consumed, automatic retry continues",
+                )
+            else:
+                write_runtime(status="queue_github_unavailable", last_action=f"Could not read branch {target['branch']}")
             return
         previous_counter = int(q.get("counter", 0))
         q["counter"] = previous_counter + 1
@@ -1850,6 +1925,14 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
                     last_action=f"{active['task_id']} {action}: {reason}",
                     queue=active,
                 )
+            return
+
+        if github_transient_retry_pending():
+            write_runtime(
+                status="github_retry_wait",
+                last_action=f"{active['task_id']}: GitHub temporary error; holding current chat/task and retrying GitHub automatically",
+                queue=active,
+            )
             return
 
         if active.get("dispatch_confirmed") is False:
@@ -1999,6 +2082,13 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         )
         save_queue_state(q)
         if run is None:
+            if github_transient_retry_pending():
+                write_runtime(
+                    status="github_retry_wait",
+                    last_action=f"{active['task_id']}: GitHub temporary error; Gate lookup will retry automatically without attempt/rollover changes",
+                    queue=active,
+                )
+                return
             recovery = await recover_missing_gate_run(context, pages, active, now)
             if recovery:
                 action, reason = recovery
@@ -2068,6 +2158,10 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             record["completed_at"] = now.isoformat()
             q["completed"] = (q.get("completed", []) + [record])[-100:]
             q["active"] = None
+            completed_slot = next((s for s in reg.slots if s.name == record.get("slot")), None)
+            if completed_slot is not None:
+                completed_slot.last_task_completed_at = now.isoformat()
+                save_registry(reg)
             q["next_task_not_before"] = (now + timedelta(seconds=QUEUE_NEXT_TASK_DELAY_SECONDS)).isoformat()
             save_queue_state(q)
             write_runtime(status="queue_pass", last_action=f"{record['task_id']} automation PASS; runtime UNTESTED", last_completed=record)
@@ -2096,6 +2190,10 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         record["blocked_at"] = now.isoformat()
         q["blocked"] = (q.get("blocked", []) + [record])[-100:]
         q["active"] = None
+        blocked_slot = next((s for s in reg.slots if s.name == record.get("slot")), None)
+        if blocked_slot is not None:
+            blocked_slot.last_task_completed_at = now.isoformat()
+            save_registry(reg)
         q["next_task_not_before"] = (now + timedelta(seconds=QUEUE_NEXT_TASK_DELAY_SECONDS)).isoformat()
         save_queue_state(q)
         write_runtime(status="queue_blocked", last_action=f"{record['task_id']} blocked after {record['attempt']} attempts; advancing to next independent task", last_blocked=record)

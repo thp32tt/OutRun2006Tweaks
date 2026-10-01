@@ -104,13 +104,15 @@ Localization controller:
 - CPU limit: 1.5
 - shared memory: 768 MiB
 
-## Fresh-chat task lifecycle
+## Bounded chat-reuse lifecycle
 
-Queue tasks use one browser page per configured slot, but each **new TASK_ID** replaces that slot's previous completed ChatGPT page with a fresh project chat. Same-TASK retries reuse the current chat until retry/rollover policy requires a replacement. This bounds long-conversation DOM/renderer growth while preserving Git and `/data/state` as the durable state. Localization remains four slots: physical A/B/C/D map to logical A/B/C/E. The scheduler uses missing-worker dispatch fairness so a ready C batch or unthrottled missing producer is filled before active Retry traffic can refresh the global send gap.
+Queue tasks keep one browser page per configured slot and **reuse the completed slot chat** instead of opening a new conversation for every TASK_ID. A slot is recycled only after 4 tasks, 90 minutes, a conversation-length limit, a stale completed Retry surface, or bounded same-TASK recovery. If Git already completed but the previous ChatGPT turn is still visibly generating, the next task waits up to 180 seconds for the UI to settle before a stale-page recycle is allowed. Same-TASK rollover is capped at 2. Localization remains four slots: physical A/B/C/D map to logical A/B/C/E, with 30s cross-slot and 90s same-slot send spacing. This reduces renderer churn and `Too many requests` pressure while preserving Git and `/data/state` as durable state.
+
+GitHub 5xx/network/timeout/403/429 conditions are treated as transient transport state. The controller retries 2/5/10/20 seconds internally, then waits 60 seconds and keeps retrying on future queue cycles. These GitHub errors never consume a TASK attempt, trigger a new ChatGPT chat, consume a rollover, or move work to BLOCKED.
 
 ## Safety
 
-If GitHub access is unavailable, the controller prompt instructs ChatGPT to report the failure. It must not fall back to the N100 local repository.
+If GitHub access is temporarily unavailable, the controller preserves the current TASK/chat state and keeps retrying GitHub automatically. It must not treat a transient GitHub error as task failure and must not fall back to the N100 local repository.
 
 
 ## Queue mode (v0.5 behavior in v0.4 deployment path)
