@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 616,
+  "cycle": 646,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -96,11 +96,20 @@
     "R84-REF-LIFECYCLE-0024",
     "R84-REF-LIFECYCLE-0025",
     "R84-REF-HOOKSET-0003",
-    "R84-REF-LIFECYCLE-0026"
+    "R84-REF-LIFECYCLE-0026",
+    "R84-REF-LIFECYCLE-0027",
+    "R84-REF-LIFECYCLE-0028",
+    "R84-REF-PERF-0009",
+    "R84-REF-SKYGLOW-0001",
+    "R84-REF-STATE-0016",
+    "R84-REF-LIFECYCLE-0029",
+    "R84-REF-LIFECYCLE-0030",
+    "R84-REF-LIFECYCLE-0031",
+    "R84-REF-HOOKSET-0004"
   ],
-  "next": "Cycles 617-619: inspect and isolate the R30 CreateThread/startup failure publication boundary, preserving existing apply() return semantics and all protected R26+R30 runtime behavior; APPLY_GATE at 619.",
-  "updatedKst": "2026-10-02T05:08:00+09:00",
-  "batchStatus": "R84_FLATTEN_CYCLE_616_CHECKPOINT",
+  "next": "Cycles 647-649: inspect R29 terminal failure cleanup/publication ownership after hook-transaction isolation; preserve mono-safety/WVP invalidation ordering and protected R26+R30 runtime graph; APPLY_GATE at 649.",
+  "updatedKst": "2026-10-02T06:05:48+09:00",
+  "batchStatus": "R84_FLATTEN_CYCLE_646_CHECKPOINT",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -115,6 +124,16 @@
     "APPLY_GATE 610: SOURCE_CHANGED=YES. Source commit c4af42ea6ebe217e716b5dbe7e4c8c0bcaf40503 [skip ci]. Files: src/vr/d3d9/stereo_renderer_r30.cpp and tools/verify_vr_refactor_contract.py. Static connector re-read confirms decision boundary present, 4800/25 timing preserved through named policy constants, install thread consumes the classifier, old inline timing literals are absent, and the source-only verifier guards the boundary. Runtime validation remains UNTESTED; no build was started.",
     "Campaign cadence updated per current instruction: applyEvery=3 from cycle 611 onward; prior completed checkpoints remain unchanged.",
     "Cycles 611-613 (R84-REF-HOOKSET-0003): isolated the R30 disabled-first Present/Reset/DP/DIP/DPUP/DIPUP hook create+enable+rollback ownership behind R30InstallHookTransaction without changing create order, enable order, existing R30RollbackHooks order, prerequisite timing, buffer-shadow cleanup, or result publication. APPLY_GATE 613 SOURCE_CHANGED=YES; source commit 6780df43f1ce51fa09c86d5bbd2e6a81952630d7 [skip ci]. Source-only verifier guards the ownership boundary and exact creation ordering. Runtime validation UNTESTED; no build started.",
-    "Cycles 614-616 (R84-REF-LIFECYCLE-0026): confirmed all three R30 install-thread failure exits perform buffer-shadow rollback before Failed publication, then centralized that exact pair behind R30FailInstall while preserving each distinct log/return site. APPLY_GATE 616 SOURCE_CHANGED=YES; source commit ac0ad52271678e429c15dc2d945a43f34b7bb47b [skip ci]. Verifier guards three failure routes and rollback-before-publication order. Runtime validation UNTESTED; no build started."
+    "Cycles 614-616 (R84-REF-LIFECYCLE-0026): confirmed all three R30 install-thread failure exits perform buffer-shadow rollback before Failed publication, then centralized that exact pair behind R30FailInstall while preserving each distinct log/return site. APPLY_GATE 616 SOURCE_CHANGED=YES; source commit ac0ad52271678e429c15dc2d945a43f34b7bb47b [skip ci]. Verifier guards three failure routes and rollback-before-publication order. Runtime validation UNTESTED; no build started.",
+    "Cycles 617-619 (R84-REF-LIFECYCLE-0027): isolated R30 CreateThread startup publication behind R30StartInstallThread while preserving Pending/CreateThread/Failed-or-CloseHandle and apply() false/true semantics. APPLY_GATE 619 SOURCE_CHANGED=YES; commit 39519f338912c405b928151bc92ddc2ac503667b [skip ci].",
+    "Cycles 620-622: reviewed R30 buffer-shadow creation plus VB/IB Lock/Unlock/Release physical vtable-hook and registry lifetime from three paths. APPLY_GATE 622 SOURCE_CHANGED=NO/NO_SAFE_CHANGE because further ownership merge would combine physical hook lifetime with shadow registry semantics without build/HMD evidence.",
+    "Cycles 623-625 (R84-REF-LIFECYCLE-0028): isolated R30 SkyGlow reset preparation while preserving resource-release -> capture-epoch reset -> lower Reset order. APPLY_GATE 625 SOURCE_CHANGED=YES; commit 98f11fcd3f593ecd5b84ecd92359a0ada73feb19 [skip ci].",
+    "Cycles 626-628 (R84-REF-PERF-0009): moved the existing R30 5000 ms telemetry cadence literal behind R30TelemetryIntervalMs with no cadence change. APPLY_GATE 628 SOURCE_CHANGED=YES; commit 2df88b146a9fc4116db68472a835b8d640557bb4 [skip ci].",
+    "Cycles 629-631 (R84-REF-SKYGLOW-0001): isolated exact existing SkyGlow Present eligibility conditions behind R30ShouldApplySkyGlow; InternalPassScope, apply call and lower Present order unchanged. APPLY_GATE 631 SOURCE_CHANGED=YES; commit 7ca3a6c7c4a9c980280279b237aea7c61f550fe7 [skip ci].",
+    "Cycles 632-634 (R84-REF-STATE-0016): found dormant recursive R29 ReadStereoBaseInstallState helper and repaired it to own the sole atomic acquire-load; public StereoBaseInstallState now delegates to it. APPLY_GATE 634 SOURCE_CHANGED=YES; commit 91afc5f2ddc28e66c551cce36f547c7059600805 [skip ci]. Initial ref-update safety-filter retries succeeded; no local fallback remains pending.",
+    "Cycles 635-637 (R84-REF-LIFECYCLE-0029): isolated R29 CreateThread startup publication behind R29StartInstallThread, preserving Pending/CreateThread/Failed-or-CloseHandle and apply() return semantics. APPLY_GATE 637 SOURCE_CHANGED=YES; commit 74baea356005f6bda048435e35ca87de7d35233a [skip ci].",
+    "Cycles 638-640 (R84-REF-LIFECYCLE-0030): isolated R29 prerequisite Wait/Fail/Install classification and exact 4800-attempt/25 ms timing policy; hook, mono-safety and WVP invalidation order unchanged. APPLY_GATE 640 SOURCE_CHANGED=YES; commit 4b5be21d26bd04d8fdc61bc6128a968eeb623cda [skip ci].",
+    "Cycles 641-643 (R84-REF-LIFECYCLE-0031): centralized four existing R29 install-thread terminal state+async-result publication pairs behind R29PublishInstallResult; CreateThread failure intentionally retains its previous no-async-report behavior. APPLY_GATE 643 SOURCE_CHANGED=YES; commit c9616b57d4b2fd10490cee25dbd8dad14635b5d2 [skip ci].",
+    "Cycles 644-646 (R84-REF-HOOKSET-0004): isolated R29 disabled-first DP/DIP/DPUP/DIPUP/SetRenderState create+enable+rollback ownership behind R29InstallHookTransaction, preserving exact creation order and existing rollback helper. APPLY_GATE 646 SOURCE_CHANGED=YES; commit 8ba2b7bfd5627fd1a848fae799ad34724e5f680e [skip ci]. Static connector inspection passed all newly added source-only contract markers; executable verifier/build capability was not invoked per DO_NOT_BUILD policy. Runtime validation remains UNTESTED."
   ]
 }
