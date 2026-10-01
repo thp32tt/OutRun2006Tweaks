@@ -3163,6 +3163,12 @@ namespace OutRunVRStereo
                 R30InstallStateValue::Failed, false);
         }
 
+        void R30CompleteSuccessfulInstall() noexcept
+        {
+            R30PublishInstallResult(
+                R30InstallStateValue::Ready, true);
+        }
+
         enum class R30PrerequisiteDecision
         {
             Wait,
@@ -3213,7 +3219,7 @@ namespace OutRunVRStereo
                         return 0;
                     }
 
-                    R30PublishInstallResult(State::Ready, true);
+                    R30CompleteSuccessfulInstall();
                     spdlog::info(
                         "VR R30 HUD: ScreenSpace2D correction READY with configurable common-center HUD scale current={:.2f}; R36 contain-fit + depth-disabled overlay zero-disparity + head-relative XYZRHW reprojection active",
                         R30HudScaleValue());

@@ -326,6 +326,16 @@ else:
     if rollback_pos < 0 or publish_pos <= rollback_pos:
         errors.append("R30 failure boundary changed buffer-rollback-before-publication order")
 
+success_begin = r30.find("void R30CompleteSuccessfulInstall() noexcept")
+success_end = r30.find("enum class R30PrerequisiteDecision", success_begin)
+if success_begin < 0 or success_end <= success_begin:
+    errors.append("R30 successful-install publication boundary missing")
+else:
+    success_body = r30[success_begin:success_end]
+    if success_body.count("R30PublishInstallResult(") != 1 or \
+            "R30InstallStateValue::Ready, true" not in success_body:
+        errors.append("R30 successful-install boundary must publish Ready=true exactly once")
+
 transaction_begin = r30.find("bool R30InstallHookTransaction() noexcept")
 transaction_end = r30.find("void R30PublishInstallResult(", transaction_begin)
 install_begin = r30.find("DWORD WINAPI R30InstallThread(")
@@ -360,6 +370,10 @@ else:
         errors.append("R30 install thread regained inline failure cleanup/publication ownership")
     if "if (!R30InstallHookTransaction())" not in install_thread:
         errors.append("R30 install thread bypassed hook transaction boundary")
+    if install_thread.count("R30CompleteSuccessfulInstall();") != 1:
+        errors.append("R30 install thread must delegate exactly one successful terminal route")
+    if "R30PublishInstallResult(State::Ready, true);" in install_thread:
+        errors.append("R30 install thread regained inline successful publication ownership")
     for marker in (
         "R30PresentR29Hook = safetyhook::create_inline(",
         "R30ResetR29Hook = safetyhook::create_inline(",
