@@ -1,5 +1,5 @@
 {
-  "schema_version": 22,
+  "schema_version": 23,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -196,7 +196,24 @@
       "qa_failure_gates_producers": false,
       "terminal_transition_target_seconds": 30,
       "missing_lane_dispatch_precedes_retry_traffic": true,
-      "preserve_send_gap_for_missing_lane": true
+      "preserve_send_gap_for_missing_lane": true,
+      "durable_git_precedes_ui_recovery": true,
+      "post_send_task_identity_preserved": true,
+      "chat_rate_limit_blocks_sends_not_git_reconcile": true,
+      "negative_task_commit_lookup_not_cached": true
+    },
+    "state_persistence": {
+      "atomic_primary_writes": true,
+      "last_known_good_backup": true,
+      "restore_missing_or_corrupt_primary_from_backup": true,
+      "destructive_empty_reset_on_unreadable_state": false,
+      "daily_logical_date_rollover_preserves_active_slots": true
+    },
+    "process_recovery": {
+      "repeated_identical_queue_exception_restart_threshold": 3,
+      "repeated_identical_watchdog_exception_restart_threshold": 3,
+      "queue_heartbeat_fatal_seconds": 300,
+      "restart_owner": "DOCKER_UNLESS_STOPPED"
     }
   },
   "runtime_tuning": {
@@ -226,7 +243,13 @@
     "localization_extra_producer_qa_pause_threshold": 16,
     "localization_extra_producer_qa_resume_threshold": 12,
     "generic_retry_rollover_clicks": 2,
-    "fresh_chat_each_task": true
+    "fresh_chat_each_task": true,
+    "wait_actions_no_run_timeout_seconds": 600,
+    "wait_actions_max_seconds": 1800,
+    "process_heartbeat_fatal_seconds": 300,
+    "queue_error_restart_threshold": 3,
+    "watchdog_error_restart_threshold": 3,
+    "watchdog_busy_stall_seconds": 1800
   },
   "runtime_observability": {
     "queue_loop_heartbeat_seconds": 15,
@@ -248,7 +271,8 @@
       "RETRY_PENDING"
     ],
     "task_chat_lifecycle": "FRESH_CHAT_PER_NEW_TASK_ID",
-    "dispatch_fairness": "FILL_READY_C_OR_MISSING_PRODUCER_BEFORE_ACTIVE_RETRY_TRAFFIC"
+    "dispatch_fairness": "FILL_READY_C_OR_MISSING_PRODUCER_BEFORE_ACTIVE_RETRY_TRAFFIC",
+    "heartbeat_fatal_after_seconds": 300
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
