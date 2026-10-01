@@ -100,13 +100,15 @@
   "vr_ffb_dx_changes": false,
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "b107dca7186f77aefe810438687b1906bc77f903",
+  "authoritative_result_sha": "b107dca7186f77aefe810438687b1906bc77f903",
   "validation_bearing_result_sha": null,
   "durable_task_record_in_result_commit": true,
   "result_commit_message": "localization(B): verify pinned release members [AUTO:LOCALIZATION-LOCALIZATION_B-00375]",
-  "bookkeeping_note": "This material repair result resolves the previously pending pinned-release member bytes. Bind the immutable result SHA in a separate bookkeeping commit; C_BATCH_GATE remains pending and runtime remains UNTESTED.",
+  "bookkeeping_note": "Immutable producer material result b107dca7186f77aefe810438687b1906bc77f903 contains the pinned-release member verification, index28 fail-closed canonical mismatch, index220 exact canonical identity plus seven-region geometry measurements, and the same-commit durable task record with exact AUTO marker. Producer AUTOMATION_VALIDATION remains PENDING under C_BATCH_GATE; no real-game test was performed, so RUNTIME_VALIDATION remains UNTESTED. This bookkeeping commit does not replace material result identity.",
   "chat_rollover": 5,
   "prior_authoritative_result_sha": "e003dbbcc6fe5a85e8ed500e67f7a01bd39d9272",
-  "uploaded_archive_used_as_source_transport": true
+  "uploaded_archive_used_as_source_transport": true,
+  "bookkeeping_base_head_sha": "b107dca7186f77aefe810438687b1906bc77f903",
+  "bookkeeping_recorded_at_kst": "2026-10-01T18:41:00+09:00"
 }
