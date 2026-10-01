@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <cstdint>
 
 namespace OutRunVR::State
 {
@@ -57,6 +58,22 @@ namespace OutRunVR::State
             pending = false;
             return true;
         }
+        static void NoteRecording() noexcept
+        {
+            RecordingGenerationCounter().fetch_add(1, std::memory_order_relaxed);
+        }
+        static void NoteApply() noexcept
+        {
+            ApplyGenerationCounter().fetch_add(1, std::memory_order_relaxed);
+        }
+        static std::uint64_t RecordingGeneration() noexcept
+        {
+            return RecordingGenerationCounter().load(std::memory_order_relaxed);
+        }
+        static std::uint64_t ApplyGeneration() noexcept
+        {
+            return ApplyGenerationCounter().load(std::memory_order_relaxed);
+        }
     private:
         static std::atomic<bool>& R22ReliableFlag() noexcept
         {
@@ -76,6 +93,16 @@ namespace OutRunVR::State
         static bool& ResyncPending() noexcept
         {
             static thread_local bool value = false;
+            return value;
+        }
+        static std::atomic<std::uint64_t>& RecordingGenerationCounter() noexcept
+        {
+            static std::atomic<std::uint64_t> value{0};
+            return value;
+        }
+        static std::atomic<std::uint64_t>& ApplyGenerationCounter() noexcept
+        {
+            static std::atomic<std::uint64_t> value{0};
             return value;
         }
     };

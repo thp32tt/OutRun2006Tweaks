@@ -97,8 +97,8 @@ namespace OutRunVRStereo
             {
                 next.valid = true;
                 next.depthGeneration = R9MainDepthGeneration;
-                next.stateBlockRecordings = R31StateBlockRecordings;
-                next.stateBlockApplies = R31StateBlockApplies;
+                next.stateBlockRecordings = OutRunVR::State::StateBlockTracker::RecordingGeneration();
+                next.stateBlockApplies = OutRunVR::State::StateBlockTracker::ApplyGeneration();
                 R33DepthStencilState = next;
                 if (R33TelemetryEnabled())
                     ++R33DepthStencilSyncs;
@@ -144,8 +144,8 @@ namespace OutRunVRStereo
 
             next.valid = true;
             next.depthGeneration = R9MainDepthGeneration;
-            next.stateBlockRecordings = R31StateBlockRecordings;
-            next.stateBlockApplies = R31StateBlockApplies;
+            next.stateBlockRecordings = OutRunVR::State::StateBlockTracker::RecordingGeneration();
+            next.stateBlockApplies = OutRunVR::State::StateBlockTracker::ApplyGeneration();
             R33DepthStencilState = next;
             if (R33TelemetryEnabled())
                 ++R33DepthStencilSyncs;
@@ -163,8 +163,8 @@ namespace OutRunVRStereo
             return R33DepthStencilState.valid &&
                 R33DepthStencilState.depthGeneration == R9MainDepthGeneration &&
                 R33DepthStencilState.stateBlockRecordings ==
-                    R31StateBlockRecordings &&
-                R33DepthStencilState.stateBlockApplies == R31StateBlockApplies;
+                    OutRunVR::State::StateBlockTracker::RecordingGeneration() &&
+                R33DepthStencilState.stateBlockApplies == OutRunVR::State::StateBlockTracker::ApplyGeneration();
         }
 
         bool R33GetWriteFlags(IDirect3DDevice9* device,

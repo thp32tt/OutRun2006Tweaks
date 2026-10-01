@@ -68,6 +68,10 @@ for marker in (
     "CoverageLost()",
     "RequireResync()",
     "ConsumeResync()",
+    "NoteRecording()",
+    "NoteApply()",
+    "RecordingGeneration()",
+    "ApplyGeneration()",
 ):
     if marker not in state_block_tracker:
         errors.append(f"StateBlockTracker missing API marker: {marker}")
@@ -83,6 +87,14 @@ for rel, source in (
 if "R31StateBlockTrackingReliable" in r33:
     errors.append(
         "R33 regained removed R31 StateBlock reliability dependency")
+
+for banned in ("R31StateBlockRecordings", "R31StateBlockApplies"):
+    if banned in r33:
+        errors.append(
+            f"R33 regained R31 StateBlock generation dependency: {banned}")
+    if banned in r31:
+        errors.append(
+            f"R31 retained migrated StateBlock generation owner: {banned}")
 
 misplaced_tracker = ROOT / "src/vr/d3d9/state/state_block_tracker.hpp"
 if misplaced_tracker.exists():

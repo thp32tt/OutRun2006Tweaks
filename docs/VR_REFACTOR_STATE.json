@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-01T07:59:00+09:00",
+  "updatedKst": "2026-10-01T11:26:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
-  "mode": "MANUAL_APPLY",
+  "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 11,
+  "cycle": 12,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -20,9 +20,10 @@
     "VR-REFACTOR-CI-0001",
     "VR-REFACTOR-STATE-0002A",
     "VR-REFACTOR-STATE-0002A-FIX00",
-    "VR-REFACTOR-STATE-0002A-FIX01"
+    "VR-REFACTOR-STATE-0002A-FIX01",
+    "VR-REFACTOR-STATE-0003A"
   ],
-  "next": "Run refactor verifier plus SAFE_DRAW and FULL R34 compile gates for FIX00/FIX01; then migrate R33 StateBlock recording/apply/recording-state dependencies as VR-REFACTOR-STATE-0003 before STATE-0002B physical hook consolidation.",
+  "next": "Validate VR-REFACTOR-STATE-0003A with refactor verifier plus DX9Ex SAFE_DRAW/FULL R34 compile gates; then migrate R31StateBlockRecording boolean authority to StateBlockTracker as VR-REFACTOR-STATE-0003B before STATE-0002B physical hook consolidation.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -30,7 +31,8 @@
     "VR-REFACTOR-STATE-0002A centralizes R22/R31 StateBlock reliability, coverage-loss and lazy-resync authority while preserving physical hooks, cache invalidation and final-draw ordering.",
     "Aggregate StateBlock reliability requires both R22 and R31 producers plus intact coverage, preventing premature R31 fast-path trust.",
     "FIX00 restored StateBlockTracker to src/vr/state, added explicit R31Reliable(), and added verifier required-file/API/misplaced-copy guards.",
-    "FIX01 replaced the three removed R31StateBlockTrackingReliable references in R33 with StateBlockTracker::Reliable(). R31StateBlockRecordings/Applies/Recording remain for VR-REFACTOR-STATE-0003."
+    "FIX01 replaced the removed R31 StateBlock reliability references in R33 with StateBlockTracker::Reliable().",
+    "VR-REFACTOR-STATE-0003A moved StateBlock recording/apply monotonic generations from R31 globals into neutral StateBlockTracker; R33 now depends only on the neutral generation API. R31StateBlockRecording remains intentionally deferred to 0003B."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0002A_FIX00_FIX01_APPLIED_STATIC_PENDING"
+  "batchStatus": "VR-REFACTOR-STATE-0003A_APPLIED_STATIC_PENDING"
 }

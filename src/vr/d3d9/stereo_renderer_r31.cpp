@@ -50,8 +50,6 @@ namespace OutRunVRStereo
         std::uint64_t R31FastWorldDraws = 0;
         std::uint64_t R31FastWorldLiveValidations = 0;
         std::uint64_t R31FastWorldValidationRejects = 0;
-        std::uint64_t R31StateBlockApplies = 0;
-        std::uint64_t R31StateBlockRecordings = 0;
         std::uint64_t R31HudDraws = 0;
         thread_local bool R31StateBlockRecording = false;
         bool R31FirstFastWorldLogged = false;
@@ -133,7 +131,8 @@ namespace OutRunVRStereo
                     R31Window.fastWorld, R31Window.hud, R31Window.fragile,
                     R31Window.unstable, R31Window.fallback,
                     R31FastWorldLiveValidations, R31FastWorldValidationRejects,
-                    R31StateBlockRecordings, R31StateBlockApplies);
+                    OutRunVR::State::StateBlockTracker::RecordingGeneration(),
+                    OutRunVR::State::StateBlockTracker::ApplyGeneration());
                 R31Window = {};
                 R31Window.lastLogMs = now;
             }
@@ -805,7 +804,7 @@ namespace OutRunVRStereo
                 const bool game = IsGameDevice(device);
                 if (game)
                 {
-                    ++R31StateBlockApplies;
+                    OutRunVR::State::StateBlockTracker::NoteApply();
                     R31MarkStateBlockCachesDirty();
                     if (!R31FirstStateBlockLogged)
                     {
@@ -901,7 +900,7 @@ namespace OutRunVRStereo
             if (SUCCEEDED(hr) && IsGameDevice(device) && !InternalStereoPass)
             {
                 R31StateBlockRecording = true;
-                ++R31StateBlockRecordings;
+                OutRunVR::State::StateBlockTracker::NoteRecording();
                 R31MarkStateBlockCachesDirty();
             }
             return hr;
