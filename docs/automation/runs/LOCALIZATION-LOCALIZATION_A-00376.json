@@ -1,0 +1,186 @@
+{
+  "schema_version": 30,
+  "schema": "outrun-a00376-p00244-schema30-fresh-shard-executability-review-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00376",
+  "wave_id": "P00244",
+  "lane": "LOCALIZATION_A",
+  "role": "PRODUCER_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 1,
+  "recorded_at_kst": "2026-10-01T18:27:59+09:00",
+  "incoming_controller_schema_version": 30,
+  "incoming_controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "applied_controller_schema_version": 30,
+  "applied_controller_config_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+  "canonical_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+  "base_head_sha": "2cf66345f58b93a2f7295531dff8a5e7da4fcdfd",
+  "policy_resolution": {
+    "resolution": "CURRENT_HEAD_SCHEMA30_APPLIED",
+    "stale_cached_policy_used": false,
+    "stable_shard_rule": "asset_queue.index % 3 == 0",
+    "owning_shard_rows": 42,
+    "candidate_completion_first": true,
+    "producer_skip_qa_pending_assets": true,
+    "candidate_batch_target": 2,
+    "normal_success_min_candidate_dds": 2,
+    "partial_batch_requires_fresh_shard_exhaustion": true,
+    "zero_candidate_exception_requires_fresh_completion_tier_scan": true,
+    "preflight_fallback_requires_no_runnable_completion_tier": true,
+    "work_steal_allowed": false
+  },
+  "selection": {
+    "latest_authoritative_c_task": "LOCALIZATION-LOCALIZATION_C-00368",
+    "latest_authoritative_c_wave": "Q00075",
+    "latest_authoritative_c_result_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
+    "latest_c_gate_run_id": 36836426454,
+    "latest_c_gate_conclusion": "success",
+    "latest_a_material_task": "LOCALIZATION-LOCALIZATION_A-00373",
+    "latest_a_material_result_sha": "c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463",
+    "branch_delta_since_a00373_result": {
+      "compare_base": "c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463",
+      "compare_head": "2cf66345f58b93a2f7295531dff8a5e7da4fcdfd",
+      "commits": 12,
+      "shared_queue_or_policy_changed": false,
+      "classification": "A00373_ROLLOVER_BOOKKEEPING_PLUS_B_E_LANE_LOCAL_ONLY"
+    },
+    "direct_rework_required_runnable_a": [],
+    "explicit_render_next_a": [],
+    "render_ready_runnable_a": [],
+    "one_stage_to_render_runnable_a": [],
+    "existing_candidate_material_rework_runnable_a": [],
+    "candidate_qa_pending_not_repeated": [
+      159,
+      198,
+      201
+    ],
+    "conservative_legacy_pending_c_not_repeated": [
+      57,
+      60
+    ],
+    "unconsumed_a_results_not_repeated": [
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+        "index": 222,
+        "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
+        "state": "V20_SONG_TITLE_FAMILY_CANDIDATE_AWAITING_C"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
+        "index": 51,
+        "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b",
+        "state": "V19_COURSE_FAMILY_REWORK_AUDIT_AWAITING_C"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00366",
+        "index": 111,
+        "result_sha": "ece3a4725d9f1a1b2e75f59171bb20085eecfa84",
+        "state": "PREFLIGHT_RECONSTRUCTION_ADVANCE_AWAITING_C"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00371",
+        "index": 228,
+        "result_sha": "ffd813d876bb83b21d02af41c4bad726bd5ea913",
+        "state": "SOURCE_REACTIVATION_GUARD_AWAITING_C"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00373",
+        "index": 54,
+        "result_sha": "c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463",
+        "state": "SOURCE_IDENTITY_GUARD_AWAITING_C"
+      }
+    ],
+    "covered_source_guard_or_exhaustion_rows": [
+      30,
+      36,
+      48,
+      54,
+      132,
+      135,
+      147,
+      219,
+      225,
+      228
+    ],
+    "runtime_observation_blocked_rows_not_repeated": [
+      15,
+      18,
+      21,
+      24
+    ],
+    "current_static_or_isolation_complete_rows_not_repeated": [
+      12,
+      63,
+      99,
+      102,
+      195,
+      231,
+      237
+    ],
+    "selected_indices": [],
+    "selected_action": "FRESH_A_SHARD_EXECUTABILITY_REVIEW_ONLY__NO_SAFE_NONREPEATING_FALLBACK",
+    "fresh_shard_exhaustion_proven": true,
+    "candidate_dds_completed": 0,
+    "production_source_reprobe_performed": false,
+    "work_stolen_from_lane": null
+  },
+  "fallback_ladder_evaluation": {
+    "step1_next_runnable_localize_text_candidate": "NONE_AFTER_FRESH_SCHEMA30_A_SHARD_SCAN",
+    "step2_unfinished_zoom_review": "NONE_RUNNABLE_IN_A_SHARD; RESOLVED/PRESERVE-ORIGINAL ROWS ARE NOT REOPENED",
+    "step3_runtime_isolation_deliverable": "NO_NEW_A_STATIC_PASS_CANDIDATE REQUIRES ANOTHER A ISOLATION INPUT; EXISTING ACCEPTED ISOLATION INPUTS ARE NOT DUPLICATED",
+    "step4_new_reconstruction_input": "BLOCKED_OR_QA_PENDING: INDEX111 ADVANCE IS UNCONSUMED; INDEX159/198/201 CANDIDATE MATERIAL IS QA-PENDING; IMMUTABLE SOURCE/RUNTIME DEPENDENCIES ARE UNCHANGED",
+    "step5_lane_local_tooling": "NO NEW SAFE TOOLING GAP AFTER A00371 INDEX228 AND A00373 INDEX54 SCHEMA30 GUARDS; OTHER A SOURCE-BOUND ROWS ALREADY HAVE ACCEPTED/EXECUTABLE GUARDS OR IMMUTABLE SOURCE EXHAUSTION EVIDENCE",
+    "outcome": "ZERO_CANDIDATE_EXCEPTION_WITH_TYPED_FRESH_SHARD_EXHAUSTION_REVIEW",
+    "normal_batch_success_claimed": false
+  },
+  "result": "HOLD_SCHEMA30_A_SHARD_FRESH_EXHAUSTION_REVIEW_ONLY_RUNTIME_UNTESTED",
+  "summary": "Schema30 producer-A refreshed korean-localization-clean at HEAD 2cf66345 and revalidated the A modulo-3 shard after A00373. The 12-commit delta from A00373's material result contains only A00373 rollover/bookkeeping and B/E lane-local records; asset_queue, progress/resume, controller roles, automation contract and A production fingerprints are unchanged. No safe A-owned DIRECT_REWORK_REQUIRED, RENDER_READY, ONE_STAGE_TO_RENDER or existing-candidate material rework is runnable outside QA-pending/unconsumed state. Candidate-bearing 159/198/201 are not repeated; A00351@index222, A00352@index51, A00366@index111, A00371@index228 and A00373@index54 remain unconsumed and are not rerun. Remaining source/runtime-bound rows have unchanged accepted guards/exhaustion fingerprints. This task therefore records a fresh typed shard-exhaustion review only; it does not claim normal producer batch success or runtime validation.",
+  "material_deliverable": {
+    "type": "SCHEMA30_A_SHARD_EXECUTABILITY_MATRIX_REVIEW",
+    "review_record": "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00376.json",
+    "reviewed_shard_rows": 42,
+    "candidate_dds_modified": false,
+    "candidate_binary_persisted": false,
+    "production_source_reprobe_performed": false,
+    "peer_shard_work_performed": false,
+    "shared_state_modified": false,
+    "normal_candidate_batch_satisfied": false,
+    "purpose": "Durable current-HEAD evidence for the zero-candidate exception and duplicate/QA-pending/sticky-dependency suppression."
+  },
+  "fingerprints": {
+    "automation_contract_blob_sha": "d9e9d04e0e85430b85b563e79b86d8ab2dff246d",
+    "controller_roles_blob_sha": "f3d0ec79032fe0c290f66210ed730f262dcc3bf4",
+    "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "canonical_progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
+    "progress_compatibility_mirror_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
+    "resume_state_blob_sha": "5b684a6fa26da5e5c10a50e76625f4c160e129ed",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "a00373_task_result_sha": "c28f3ccbdde0bbda0d57ad56e8ce4cda8c882463",
+    "current_head_sha_before_result": "2cf66345f58b93a2f7295531dff8a5e7da4fcdfd"
+  },
+  "self_qa": "PASS_A_MOD3_SCHEMA30__FRESH_HEAD_SCAN__ZERO_RUNNABLE_COMPLETION_TIER__QA_PENDING_AND_UNCONSUMED_RESULTS_NOT_REPEATED__STICKY_SOURCE_RUNTIME_FINGERPRINTS_NOT_REPROBED__NO_WORK_STEAL__NO_SHARED_STATE__REVIEW_ONLY__RUNTIME_UNTESTED",
+  "candidate_dds_modified": false,
+  "candidate_binary_persisted": false,
+  "material_change": false,
+  "review_record_only": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_write_performed": false,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_binding_state": "UNBOUND_RESULT_COMMIT_PENDING_BOOKKEEPING",
+  "result_commit_message": "localization(A): record schema30 fresh shard hold [AUTO:LOCALIZATION-LOCALIZATION_A-00376]",
+  "durable_task_record_in_result_commit": true,
+  "bookkeeping_note": "Initial durable producer result leaves self-SHA fields null. A separate bookkeeping-only commit will bind the immutable producer RESULT_SHA. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; RUNTIME_VALIDATION remains UNTESTED."
+}
