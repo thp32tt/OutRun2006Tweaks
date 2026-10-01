@@ -17,7 +17,7 @@ FUNCTIONS = {n.name: n for n in TREE.body if isinstance(n, (ast.FunctionDef, ast
 
 def load_function(name, **overrides):
     ns = dict(re=re, datetime=datetime, timedelta=timedelta, TZ=timezone.utc,
-              GITHUB_BROKER_ENABLED=False, NATIVE_PLUGIN_PROTOCOL_VERSION=1,
+              GITHUB_BROKER_ENABLED=False, NATIVE_PLUGIN_PROTOCOL_VERSION=2,
               GITHUB_ASSISTANT_RECOVERY_MAX=2, GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS=300,
               QUEUE_STABLE_SECONDS=30, QUEUE_RESULT_GRACE_SECONDS=180,
               _parse_iso=lambda x: datetime.fromisoformat(x) if x else None,
@@ -26,6 +26,7 @@ def load_function(name, **overrides):
               github_branch_head=Mock(return_value='a'*40),
               github_find_task_commit=Mock(return_value=None), CONTROLLER_MODE='conversion',
               github_transient_retry_pending=lambda: False,
+              native_plugin_instructions=lambda active: 'ALL_TOOLS tool search TOOL_NOT_EXPOSED 404 TARGET_BRANCH',
               queue_send_same_chat_control_message=AsyncMock(return_value=True))
     ns.update(overrides)
     node = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), FUNCTIONS[name]], type_ignores=[])
@@ -54,7 +55,20 @@ class NativeControllerTests(unittest.TestCase):
         asyncio.run(f(None, {}, self.active()))
         prompt = ns['queue_send_same_chat_control_message'].call_args.args[3]
         self.assertNotIn('GitHub 연결돼 있어', prompt)
+        self.assertIn('ALL_TOOLS', prompt)
+        self.assertIn('tool search', prompt)
         self.assertIn('TOOL_NOT_EXPOSED', prompt)
+
+    def test_native_instructions_search_tools_before_blocking(self):
+        f, _ = load_function('native_plugin_instructions')
+        prompt = f(self.active())
+        self.assertIn('ALL_TOOLS', prompt)
+        self.assertIn('tool search', prompt)
+        self.assertIn('탐색 후', prompt)
+        self.assertIn('404', prompt)
+        self.assertIn('TARGET_BRANCH/ref', prompt)
+        self.assertIn('TOOL_NOT_EXPOSED', prompt)
+        self.assertIn('NATIVE_PLUGIN_PROTOCOL_VERSION = 2', SOURCE)
 
     def test_no_progress_is_handled_even_when_send_deferred(self):
         self.assertTrue('queue_handle_native_response' in FUNCTIONS)
@@ -97,7 +111,7 @@ class NativeControllerTests(unittest.TestCase):
         self.assertEqual(active['attempt'],1)
         self.assertEqual(active['chat_rollovers'],2)
         self.assertEqual(active['legacy_broker_pending_file'],'/data/state/broker_pending/TASK-1.json')
-        self.assertEqual(active['native_plugin_protocol_version'],1)
+        self.assertEqual(active['native_plugin_protocol_version'],2)
         self.assertFalse(asyncio.run(f(None, {}, {'active':active}, active)))
         self.assertEqual(ns['queue_send_same_chat_control_message'].call_count,1)
 
