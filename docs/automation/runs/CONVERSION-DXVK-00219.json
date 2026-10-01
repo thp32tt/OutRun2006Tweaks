@@ -4,7 +4,7 @@
   "target_branch": "vr-dxvk-r71-disasm",
   "attempt": 1,
   "controller_attempt": "1/3",
-  "chat_rollover": 1,
+  "chat_rollover": 2,
   "base_sha": "07f9924385145164bb39cf5c4baab4d8a344cf54",
   "result_sha": "25977d008fa0a329d743d608693ca66f20fb1512",
   "validation_bearing_result_sha": "25977d008fa0a329d743d608693ca66f20fb1512",
@@ -127,5 +127,11 @@
     "pc_fast_run_id": 36843081283,
     "pc_fast_result": "SKIPPED",
     "runtime_validation": "UNTESTED"
+  },
+  "tooling_performance_observation": {
+    "status": "FOLLOW_UP_TOOLING_OPTIMIZATION",
+    "scope": "STATIC_ANALYZER_ONLY",
+    "evidence": "HUD static analysis Analyze EXE HUD/render anchors ran from 2026-10-01T09:29:52Z to approximately 2026-10-01T09:52:25Z (~22m33s). Review found continuation proof/provenance chains repeatedly recompute collect_raw_inbound_rel32_candidates(), which scans the full .text section. This does not affect runtime behavior or the validated proof result.",
+    "suggested_follow_up": "Memoize/cache raw inbound rel32 target scans per parsed PE, and avoid recomputing identical predecessor proof chains when assembling one analysis report. Validate output equivalence before adopting."
   }
 }
