@@ -223,7 +223,11 @@
       "restart_owner": "DOCKER_UNLESS_STOPPED",
       "consecutive_queue_exception_restart_threshold": 3,
       "consecutive_watchdog_exception_restart_threshold": 3,
-      "exception_signature_is_diagnostic_only": true
+      "exception_signature_is_diagnostic_only": true,
+      "memory_idle_restart_percent": 80,
+      "memory_fatal_restart_percent": 92,
+      "memory_idle_restart_requires_no_active_task": true,
+      "memory_fatal_restart_preserves_queue_state": true
     }
   },
   "runtime_tuning": {
@@ -261,7 +265,9 @@
     "watchdog_error_restart_threshold": 3,
     "watchdog_busy_stall_seconds": 1800,
     "github_task_commit_scan_pages": 3,
-    "github_actions_discovery_per_page": 100
+    "github_actions_discovery_per_page": 100,
+    "memory_idle_restart_percent": 80,
+    "memory_fatal_restart_percent": 92
   },
   "runtime_observability": {
     "queue_loop_heartbeat_seconds": 15,
@@ -289,7 +295,8 @@
     "health_endpoint": "/healthz",
     "queue_active_null_allowed_in_parallel_mode": true,
     "queue_active_legacy_field_must_not_gate_parallel_lanes": true,
-    "qa_pending_retention": "UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA"
+    "qa_pending_retention": "UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA",
+    "health_includes_memory_pressure": true
   },
   "qa_deduplication": {
     "identity": "TASK_ID@RESULT_SHA",
