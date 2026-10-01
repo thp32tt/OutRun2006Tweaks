@@ -21,6 +21,7 @@ from typing import Optional
 from zoneinfo import ZoneInfo
 
 from playwright.async_api import async_playwright, BrowserContext, Page, TimeoutError as PlaywrightTimeoutError
+from .broker_protocol import BrokerProtocolError, apply_text_edit, parse_broker_changeset, parse_broker_read
 
 TZ = ZoneInfo(os.getenv("TZ", "Asia/Seoul"))
 CHATGPT_BASE_URL = os.getenv("CHATGPT_BASE_URL", "https://chatgpt.com/").strip()
@@ -118,6 +119,10 @@ GENERIC_RETRY_ROLLOVER_CLICKS = max(1, int(os.getenv("GENERIC_RETRY_ROLLOVER_CLI
 GENERIC_RETRY_COOLDOWN_SECONDS = max(60, int(os.getenv("GENERIC_RETRY_COOLDOWN_SECONDS", "300")))
 GITHUB_ASSISTANT_RECOVERY_MAX = max(1, int(os.getenv("GITHUB_ASSISTANT_RECOVERY_MAX", "2")))
 GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS = max(60, int(os.getenv("GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS", "300")))
+GITHUB_BROKER_ENABLED = os.getenv("GITHUB_BROKER_ENABLED", "true").lower() == "true"
+GITHUB_BROKER_MAX_CONTEXT_CHARS = max(8000, int(os.getenv("GITHUB_BROKER_MAX_CONTEXT_CHARS", "42000")))
+GITHUB_BROKER_MAX_FILE_CHARS = max(2000, int(os.getenv("GITHUB_BROKER_MAX_FILE_CHARS", "14000")))
+GITHUB_BROKER_MAX_COMMIT_BYTES = max(65536, int(os.getenv("GITHUB_BROKER_MAX_COMMIT_BYTES", "1048576")))
 PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
 STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "true"
 THINKING_VERIFY_FAILURE_RESTART_THRESHOLD = max(2, int(os.getenv("THINKING_VERIFY_FAILURE_RESTART_THRESHOLD", "4")))
@@ -252,6 +257,11 @@ class GitHubTransientError(RuntimeError):
     pass
 
 
+class GitHubBrokerConflict(RuntimeError):
+    """GitHub broker write could not be applied safely against the current branch HEAD."""
+    pass
+
+
 @dataclass
 class Registry:
     logical_date: str
@@ -338,6 +348,11 @@ runtime = {
     "generic_retry_cooldown_seconds": GENERIC_RETRY_COOLDOWN_SECONDS,
     "github_assistant_recovery_max": GITHUB_ASSISTANT_RECOVERY_MAX,
     "github_tooling_retry_cooldown_seconds": GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS,
+    "github_broker_enabled": GITHUB_BROKER_ENABLED,
+    "github_broker_max_context_chars": GITHUB_BROKER_MAX_CONTEXT_CHARS,
+    "github_broker_max_file_chars": GITHUB_BROKER_MAX_FILE_CHARS,
+    "github_broker_max_commit_bytes": GITHUB_BROKER_MAX_COMMIT_BYTES,
+    "github_broker_write_capable": None,
     "rate_limit_attempts": 0,
     "rate_limit_until": None,
 }
