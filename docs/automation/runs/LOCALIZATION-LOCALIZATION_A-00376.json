@@ -176,11 +176,16 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "d5c57976a2007aa19d308ccbe28cc93edab6911f",
+  "authoritative_result_sha": "d5c57976a2007aa19d308ccbe28cc93edab6911f",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "UNBOUND_RESULT_COMMIT_PENDING_BOOKKEEPING",
+  "result_binding_state": "BOUND_TO_PRODUCER_RESULT_PENDING_C_BATCH_GATE",
   "result_commit_message": "localization(A): record schema30 fresh shard hold [AUTO:LOCALIZATION-LOCALIZATION_A-00376]",
   "durable_task_record_in_result_commit": true,
-  "bookkeeping_note": "Initial durable producer result leaves self-SHA fields null. A separate bookkeeping-only commit will bind the immutable producer RESULT_SHA. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; RUNTIME_VALIDATION remains UNTESTED."
+  "bookkeeping_note": "Initial durable producer result leaves self-SHA fields null. A separate bookkeeping-only commit will bind the immutable producer RESULT_SHA. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; RUNTIME_VALIDATION remains UNTESTED.",
+  "bookkeeping": {
+    "recorded_at_kst": "2026-10-01T18:28:57+09:00",
+    "producer_result_sha": "d5c57976a2007aa19d308ccbe28cc93edab6911f",
+    "note": "Bookkeeping-only immutable producer RESULT_SHA binding. Atomic result d5c57976a2007aa19d308ccbe28cc93edab6911f contains the fresh schema30 A-shard executability review and durable A00376 task record. AUTOMATION_VALIDATION remains PENDING until independent C batch Gate consumes TASK_ID@RESULT_SHA; no real-game validation was performed and RUNTIME_VALIDATION remains UNTESTED."
+  }
 }
