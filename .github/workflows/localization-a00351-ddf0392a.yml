@@ -1,0 +1,75 @@
+name: Localization A00351 DDF0392A Song Title Restore
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - 'docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00351.dispatch.json'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-a00351-ddf0392a
+  cancel-in-progress: false
+
+jobs:
+  produce:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 0
+
+      - name: Refresh branch before production
+        shell: bash
+        run: |
+          set -euo pipefail
+          git pull --ff-only origin korean-localization-clean
+
+      - name: Install deterministic image dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fontconfig fonts-noto-cjk unzip
+          python -m pip install --disable-pip-version-check 'pillow==12.3.0' 'numpy==2.3.5'
+
+      - name: Reconstruct durable generator
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p localization/graphics/role_A/20261001-A00351-P00221
+          printf '%s' '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' | base64 -d | gzip -d > localization/graphics/role_A/20261001-A00351-P00221/generate_a00351_index222.py
+          chmod +x localization/graphics/role_A/20261001-A00351-P00221/generate_a00351_index222.py
+
+      - name: Acquire exact pinned v0.25.10a source member
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 3 --retry-delay 5 -o /tmp/OR2-HD-GUI-v0.25.10a.zip https://github.com/envido32/OR2006Sprites/releases/download/v0.25.10a/OR2-HD-GUI-v0.25.10a.zip
+          echo '76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958  /tmp/OR2-HD-GUI-v0.25.10a.zip' | sha256sum -c -
+          unzip -p /tmp/OR2-HD-GUI-v0.25.10a.zip textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds > /tmp/DDF0392A_256x512.dds
+          echo 'bcfad5a1a71ab66c841134b0f3f3aa8fa5571b806bd3945dabeca3722d18fb72  /tmp/DDF0392A_256x512.dds' | sha256sum -c -
+
+      - name: Generate v20 index222 candidate and QA evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPO_ROOT="$GITHUB_WORKSPACE" SOURCE_DDS=/tmp/DDF0392A_256x512.dds python localization/graphics/role_A/20261001-A00351-P00221/generate_a00351_index222.py
+          echo 'e8dadfb5a976a9addafa08fe7a9dd1d94d4979ac387c496c98983e2d01e68b83  localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds' | sha256sum -c -
+
+      - name: Commit atomic lane-local A00351 result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00351.json localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds localization/graphics/role_A/20261001-A00351-P00221 localization/graphics/KOREAN_PNG_REVIEW/DDF0392A
+          git commit -m "localization(A): restore index222 source song titles [AUTO:LOCALIZATION-LOCALIZATION_A-00351]"
+          git pull --rebase origin korean-localization-clean
+          git push origin HEAD:korean-localization-clean
