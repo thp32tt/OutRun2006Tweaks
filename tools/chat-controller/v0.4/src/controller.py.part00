@@ -116,7 +116,7 @@ PREVIOUS_TASK_UI_SETTLE_SECONDS = max(30, int(os.getenv("PREVIOUS_TASK_UI_SETTLE
 RETRY_BUTTON_COOLDOWN_SECONDS = max(10, int(os.getenv("RETRY_BUTTON_COOLDOWN_SECONDS", "45")))
 GENERIC_RETRY_ROLLOVER_CLICKS = max(1, int(os.getenv("GENERIC_RETRY_ROLLOVER_CLICKS", "2")))
 GENERIC_RETRY_COOLDOWN_SECONDS = max(60, int(os.getenv("GENERIC_RETRY_COOLDOWN_SECONDS", "300")))
-NATIVE_PLUGIN_PROTOCOL_VERSION = 1
+NATIVE_PLUGIN_PROTOCOL_VERSION = 2
 GITHUB_ASSISTANT_RECOVERY_MAX = max(1, int(os.getenv("GITHUB_ASSISTANT_RECOVERY_MAX", "2")))
 GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS = max(60, int(os.getenv("GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS", "300")))
 PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
@@ -1006,11 +1006,12 @@ def localization_controller_contract_fingerprint() -> tuple[str, str]:
 
 def native_plugin_instructions(active: dict) -> str:
     return (
-        "연결된 GitHub 플러그인을 탐색하고 대상 브랜치 HEAD/작업 기록을 실제 호출로 확인한 뒤 진행해. "
-        "컨트롤러 조회 성공은 채팅 플러그인 연결 증거가 아니다. "
-        "실패는 실제 호출 대상·오류 코드로 보고하고, 도구 미노출은 TOOL_NOT_EXPOSED로 구분해. "
-        "이미지·파일은 지원 도구와 승인된 Drive 경로로 직접 처리해. 채팅에 원본/base64를 붙이지 마. "
-        "완료는 실제 TASK_ID 커밋·검증 결과로만 보고해. 실기 미실행은 UNTESTED."
+        "GitHub namespace가 안 보여도 현재 환경의 도구 목록/검색(ALL_TOOLS·tool search 등)에서 "
+        "GitHub connector 함수를 찾아 실제 호출해. 이름 미노출만으로 중단 금지; "
+        "탐색 후 호출 가능한 함수가 없을 때만 TOOL_NOT_EXPOSED. "
+        "404는 연결 실패가 아니라 path/ref 문제이므로 TARGET_BRANCH/ref로 재조회해. "
+        "파일·이미지는 연결 Drive/지원 도구로 직접 처리하고 원본/base64는 채팅에 붙이지 마. "
+        "완료는 실제 TASK_ID 커밋·검증으로만 판정하며 실기 미실행=UNTESTED."
     )
 
 
@@ -1040,20 +1041,18 @@ def queue_dynamic_prefix() -> str:
         "FIRST_ACTION=CALL_CONNECTED_GITHUB_PLUGIN",
         f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
         *([f"WAVE_ID={wave_id}"] if wave_id else []),
-        "GitHub HEAD가 SSOT다. N100 clone/worktree 우회 금지. 연결된 플러그인으로 직접 작업해.",
-        "이 작업에서 실제 변경 또는 검토 기록을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
-        "필수 GitHub Actions Gate를 소유할 result commit에는 CI-skip 지시어를 넣지 마. 검증 완료 후 bookkeeping/checkpoint 커밋은 Gate 결과와 분리해 기록하고, controller가 validation-bearing result commit을 식별할 수 있게 유지해.",
-        "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
-        "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
+        "GitHub HEAD=SSOT; N100 clone/worktree 금지. 실제 변경/검토를 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 포함.",
+        "Gate 대상 result commit에는 CI-skip 금지. 자동/실기 검증을 분리하고 미실기=RUNTIME_VALIDATION=UNTESTED.",
+        "종료 출력: TASK_ID/RESULT_SHA/AUTOMATION_VALIDATION/RUNTIME_VALIDATION 각 1줄.",
     ]
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B", "LOCALIZATION_E"}:
         lines += [
-            "이 producer의 shard/생산량/우선순위/QA/예외/완료 규칙은 위 CONTROLLER_CONFIG_BLOB_SHA가 가리키는 localization/controller_roles.json과 canonical contract에서 지금 다시 읽어 적용해. Docker 프롬프트의 과거 규칙을 추정해 사용하지 마.",
+            "현재 CONTROLLER_CONFIG_BLOB_SHA의 localization/controller_roles.json/canonical contract를 다시 읽어 producer 규칙을 적용해. 과거 캐시 금지.",
         ]
     if qa_batch:
         lines += [
             "QA_BATCH_INPUTS=" + json.dumps(qa_batch, ensure_ascii=False, separators=(",", ":")),
-            "C batch의 disposition/dedup/shared-state/Gate 규칙은 위 CONTROLLER_CONFIG_BLOB_SHA가 가리키는 현재 Git 계약을 그대로 적용해.",
+            "C batch 규칙은 현재 CONTROLLER_CONFIG_BLOB_SHA의 Git 계약을 그대로 적용해.",
         ]
     if failure:
         lines += [
