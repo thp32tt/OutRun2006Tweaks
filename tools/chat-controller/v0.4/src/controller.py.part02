@@ -285,6 +285,15 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
                 status="watchdog_queue_rearm",
                 last_action=f"Queue watchdog {recovery}; queue engine remains the only task sender",
             )
+        else:
+            write_runtime(
+                watchdog_queue_observed_at=now.isoformat(),
+                watchdog_queue_role="STATE_REARM_ONLY",
+            )
+        # Queue mode has a single UI owner: queue_cycle/localization_parallel_cycle.
+        # Do not inspect or click Retry/Continue/busy UI here and do not overwrite
+        # the queue engine status with stale page state from another slot.
+        return
     reg = load_registry(now)
     guard = send_guard_reason(reg, None, now)
     if guard and guard.startswith("rate_limit_backoff:"):

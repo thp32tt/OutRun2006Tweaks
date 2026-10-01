@@ -188,14 +188,14 @@ jobs:
           print("four-slot A/B/E producers + C QA with fresh-task chats verified")
           PY2
 
-      - name: Verify schema 24 policy alignment
+      - name: Verify schema 26 policy alignment
         run: |
           git fetch --force origin refs/heads/korean-localization-clean:refs/remotes/origin/korean-localization-clean
           git show refs/remotes/origin/korean-localization-clean:localization/controller_roles.json > /tmp/controller_roles.json
           python - <<'PY2'
           import json, pathlib, re
           cfg=json.loads(pathlib.Path('/tmp/controller_roles.json').read_text())
-          assert cfg['schema_version'] >= 24
+          assert cfg['schema_version'] >= 26
           ex=cfg['execution']; rt=cfg['runtime_tuning']; obs=cfg['runtime_observability']
           assert ex['controller_slot_count'] == 4
           assert ex['slot_map'] == {'A':'A','B':'B','C':'C','D':'E'}
@@ -221,6 +221,16 @@ jobs:
           assert cp['lane_exception_block_threshold'] == 3
           assert cp['dispatch_exception_backoff_max_seconds'] == 300
           assert cp['browser_transport_failure_global_restart'] is True
+          assert cp['active_lane_retry_fairness'] is True
+          assert cp['active_lane_recovery_order'] == 'OLDEST_EFFECTIVE_SEND_FIRST'
+          assert cp['active_lane_effective_send_fields'] == ['last_retry_click_at','last_rollover_at','sent_at']
+          assert obs['active_lane_recovery_order_field'] == 'active_lane_recovery_order'
+          wd=cfg['runtime_recovery']['watchdog']
+          assert wd['queue_mode_role'] == 'STATE_REARM_ONLY'
+          assert wd['queue_mode_ui_owner'] == 'QUEUE_ENGINE'
+          assert wd['queue_mode_ui_observation'] is False
+          assert wd['queue_mode_ui_actions'] is False
+          assert obs['queue_mode_watchdog_role'] == 'STATE_REARM_ONLY'
           assert cp['qa_pending_unconsumed_never_truncated'] is True
           assert obs['qa_pending_retention'] == 'UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA'
           assert obs['queue_active_null_allowed_only_when_active_by_lane_empty'] is False
@@ -275,7 +285,7 @@ jobs:
             m=re.search(rf'^\s+{re.escape(key)}:\s+"?(\d+)"?\s*$',text,re.M)
             assert m and int(m.group(1))==int(val), (key,val,m.group(1) if m else None)
           assert re.search(r'^\s+FRESH_CHAT_EACH_RUN:\s+"true"\s*$',text,re.M)
-          print('schema 24 policy and deployment values aligned')
+          print('schema 26 policy and deployment values aligned')
           PY2
 
       - name: Verify end-to-end liveness bounds
@@ -343,6 +353,14 @@ jobs:
           assert 'Git/Actions reconciliation continues' in qcycle
           lcycle=src[src.index('async def localization_parallel_cycle'):src.index('def reconcile_legacy_conversion_blocked')]
           assert 'Git/Actions reconciliation continues' in lcycle
+          assert 'active_lane_order = sorted(' in lcycle
+          assert 'key=_active_lane_send_epoch' in lcycle
+          assert 'for lane_key in active_lane_order:' in lcycle
+          assert 'last_retry_click_at' in lcycle and 'last_rollover_at' in lcycle and 'sent_at' in lcycle
+          watchdog=src[src.index('async def watchdog_cycle'):src.index('async def run_cycle')]
+          qpos=watchdog.index('if QUEUE_MODE:')
+          assert watchdog.index('return', qpos) < watchdog.index('reg = load_registry(now)')
+          assert 'watchdog_queue_role="STATE_REARM_ONLY"' in watchdog
           scheduler=src[src.index('async def scheduler_loop'):src.index('async def main_async')]
           assert 'QUEUE_ERROR_RESTART_THRESHOLD' in scheduler
           assert 'WATCHDOG_ERROR_RESTART_THRESHOLD' in scheduler

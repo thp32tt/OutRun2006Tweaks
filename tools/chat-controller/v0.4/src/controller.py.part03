@@ -1374,10 +1374,26 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
             )
             return
 
-    # Advance A/B/E producers plus C independently after missing-worker fairness.
-    for lane_key in ("A", "B", "C", "D"):
-        if lane_key in active_by_lane:
-            await localization_process_lane_isolated(context, pages, q, lane_key)
+    # Advance active lanes oldest-send first. Retry/rollover actions consume the
+    # shared ChatGPT send gap, so fixed A->B->C->D ordering can starve D/E forever
+    # when earlier lanes keep presenting Retry. The oldest effective send wins the
+    # next recovery opportunity, which naturally rotates fairness after a click.
+    def _active_lane_send_epoch(lane_key: str) -> float:
+        task = active_by_lane.get(lane_key) or {}
+        stamp = (
+            _parse_iso(task.get("last_retry_click_at"))
+            or _parse_iso(task.get("last_rollover_at"))
+            or _parse_iso(task.get("sent_at"))
+        )
+        return stamp.timestamp() if stamp else 0.0
+
+    active_lane_order = sorted(
+        [lane for lane in ("A", "B", "C", "D") if lane in active_by_lane],
+        key=_active_lane_send_epoch,
+    )
+    q["active_lane_recovery_order"] = active_lane_order
+    for lane_key in active_lane_order:
+        await localization_process_lane_isolated(context, pages, q, lane_key)
 
     active_by_lane = q.setdefault("active_by_lane", {})
 
