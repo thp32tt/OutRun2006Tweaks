@@ -318,6 +318,34 @@ int main()
         samplerOwner.initialize(d3d.device, linearClampStage),
         "R98 sampler owner reinitialize with linear clamp");
 
+    auto borderStage = linearClampStage;
+    borderStage.addressU = D3DTADDRESS_BORDER;
+    borderStage.addressV = D3DTADDRESS_BORDER;
+    borderStage.borderColor = 0x80402010u;
+    const auto borderSampler = translate_fixed_function_sampler(borderStage);
+    require(
+        borderSampler.exact &&
+        borderSampler.desc.AddressU == D3D11_TEXTURE_ADDRESS_BORDER &&
+        borderSampler.desc.AddressV == D3D11_TEXTURE_ADDRESS_BORDER &&
+        borderSampler.desc.BorderColor[0] == 64.0f / 255.0f &&
+        borderSampler.desc.BorderColor[1] == 32.0f / 255.0f &&
+        borderSampler.desc.BorderColor[2] == 16.0f / 255.0f &&
+        borderSampler.desc.BorderColor[3] == 128.0f / 255.0f,
+        "R160 BORDER sampler translation preserves D3D9 ARGB color");
+    require(
+        samplerOwner.initialize(d3d.device, borderStage),
+        "R160 sampler owner accepts exact BORDER state");
+    D3D11_SAMPLER_DESC observedBorderSampler{};
+    samplerOwner.sampler()->GetDesc(&observedBorderSampler);
+    require(
+        observedBorderSampler.AddressU == D3D11_TEXTURE_ADDRESS_BORDER &&
+        observedBorderSampler.AddressV == D3D11_TEXTURE_ADDRESS_BORDER &&
+        observedBorderSampler.BorderColor[0] == 64.0f / 255.0f &&
+        observedBorderSampler.BorderColor[1] == 32.0f / 255.0f &&
+        observedBorderSampler.BorderColor[2] == 16.0f / 255.0f &&
+        observedBorderSampler.BorderColor[3] == 128.0f / 255.0f,
+        "R160 created BORDER sampler descriptor preserves ARGB color");
+
     auto translatedLodStage = linearClampStage;
     translatedLodStage.mipLodBiasBits = 0x3F000000u;
     translatedLodStage.maxMipLevel = 1u;

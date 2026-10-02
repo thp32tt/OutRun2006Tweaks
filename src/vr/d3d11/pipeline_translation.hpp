@@ -92,10 +92,11 @@ namespace outrun::vr::dx11
         DWORD mipLodBiasBits = 0;
         DWORD maxMipLevel = 0;
         // R159 maps the address modes with identical D3D9/D3D11 coordinate
-        // semantics directly. BORDER remains fail-closed until D3D9 border
-        // color provenance is captured alongside the sampler state.
+        // semantics directly. R160 captures D3DSAMP_BORDERCOLOR so BORDER can
+        // preserve the exact D3D9 ARGB sampler color in D3D11 RGBA form.
         DWORD addressU = D3DTADDRESS_WRAP;
         DWORD addressV = D3DTADDRESS_WRAP;
+        DWORD borderColor = 0;
     };
 
     // R98 translates the conservative R82 sampler subset into a concrete

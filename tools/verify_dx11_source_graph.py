@@ -3390,8 +3390,6 @@ def main() -> None:
          SEMANTIC_SMOKE, "R159 mirror readiness positive smoke"),
         ("R159 mirror sampler address translation drift",
          SEMANTIC_SMOKE, "R159 mirror descriptor positive smoke"),
-        ("R159 border sampler remains fail closed without captured border color",
-         SEMANTIC_SMOKE, "R159 uncaptured BORDER negative smoke"),
     ]
     missing_r159_sampler_mirror_address = [
         meaning
@@ -3402,6 +3400,41 @@ def main() -> None:
         raise SystemExit(
             "DX11 R159 sampler mirror-address contract drift: "
             + ", ".join(missing_r159_sampler_mirror_address)
+        )
+
+    r160_sampler_border_contract = [
+        ("DWORD borderColor = 0;", PIPELINE_TRANSLATION_HPP,
+         "R160 fixed-function sampler border-color provenance"),
+        ("D3DSAMP_BORDERCOLOR", RUNTIME_CENSUS,
+         "R160 runtime census captures D3D9 border color"),
+        ("hash = hash_mix(hash, stage.borderColor);", RUNTIME_CENSUS,
+         "R160 signature identity includes border color"),
+        ("value == D3DTADDRESS_BORDER ||", PIPELINE_TRANSLATION_CPP,
+         "R160 BORDER support classification"),
+        ("case D3DTADDRESS_BORDER:", PIPELINE_TRANSLATION_CPP,
+         "R160 BORDER translation branch"),
+        ("D3D11_TEXTURE_ADDRESS_BORDER", PIPELINE_TRANSLATION_CPP,
+         "R160 D3D11 BORDER mapping"),
+        ("source.borderColor >> 16", PIPELINE_TRANSLATION_CPP,
+         "R160 ARGB red-channel conversion"),
+        ("source.borderColor >> 24", PIPELINE_TRANSLATION_CPP,
+         "R160 ARGB alpha-channel conversion"),
+        ("R160 border sampler addressing readiness was not exact",
+         SEMANTIC_SMOKE, "R160 BORDER readiness positive smoke"),
+        ("R160 border sampler ARGB to RGBA translation drift",
+         SEMANTIC_SMOKE, "R160 BORDER color translation smoke"),
+        ("R160 created BORDER sampler descriptor preserves ARGB color",
+         CONSTANT_BUFFER_PROBE, "R160 WARP sampler descriptor proof"),
+    ]
+    missing_r160_sampler_border = [
+        meaning
+        for token, source, meaning in r160_sampler_border_contract
+        if token not in source
+    ]
+    if missing_r160_sampler_border:
+        raise SystemExit(
+            "DX11 R160 sampler BORDER contract drift: "
+            + ", ".join(missing_r160_sampler_border)
         )
 
     for graph_name, graph in (

@@ -347,6 +347,7 @@ namespace outrun::vr::dx11
                 hash = hash_mix(hash, stage.maxMipLevel);
                 hash = hash_mix(hash, stage.addressU);
                 hash = hash_mix(hash, stage.addressV);
+                hash = hash_mix(hash, stage.borderColor);
             }
             hash = hash_mix(
                 hash, sig.alphaTestObservationComplete ? 1u : 0u);
@@ -1044,6 +1045,7 @@ namespace outrun::vr::dx11
                         D3DSAMP_MAXMIPLEVEL, out.maxMipLevel);
                     observeSamplerState(D3DSAMP_ADDRESSU, out.addressU);
                     observeSamplerState(D3DSAMP_ADDRESSV, out.addressV);
+                    observeSamplerState(D3DSAMP_BORDERCOLOR, out.borderColor);
                 }
                 sig.colorOp0 = sig.fixedFunctionStages[0].colorOp;
                 sig.alphaOp0 = sig.fixedFunctionStages[0].alphaOp;
@@ -1421,7 +1423,7 @@ namespace outrun::vr::dx11
                             continue;
 
                         spdlog::info(
-                            "VR DX11 R85 ffp signature#{} stage#{}: color[op={},arg1=0x{:08X},arg2=0x{:08X}] alpha[op={},arg1=0x{:08X},arg2=0x{:08X}] texCoord=0x{:08X} texTransform=0x{:08X} sampler[min={},mag={},mip={},u={},v={}]",
+                            "VR DX11 R160 ffp signature#{} stage#{}: color[op={},arg1=0x{:08X},arg2=0x{:08X}] alpha[op={},arg1=0x{:08X},arg2=0x{:08X}] texCoord=0x{:08X} texTransform=0x{:08X} sampler[min={},mag={},mip={},u={},v={},border=0x{:08X}]",
                             unique,
                             stageIndex,
                             stage.colorOp,
@@ -1436,7 +1438,8 @@ namespace outrun::vr::dx11
                             stage.magFilter,
                             stage.mipFilter,
                             stage.addressU,
-                            stage.addressV);
+                            stage.addressV,
+                            stage.borderColor);
                     }
                 }
 

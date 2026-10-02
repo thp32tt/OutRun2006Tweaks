@@ -847,17 +847,24 @@ int main()
             "R159 mirror sampler address translation drift");
 
         stages[0].addressU = D3DTADDRESS_BORDER;
+        stages[0].borderColor = 0x80402010u;
         const auto borderReadiness =
             translate_fixed_function_readiness(
                 stages, true, 0x01, 0x01);
         const auto borderSampler =
             translate_fixed_function_sampler(stages[0]);
         require(
-            !borderReadiness.exact() &&
-            (borderReadiness.unsupported &
-             FixedFunctionUnsupportedSamplerAddress) != 0 &&
-            !borderSampler.exact,
-            "R159 border sampler remains fail closed without captured border color");
+            borderReadiness.exact(),
+            "R160 border sampler addressing readiness was not exact");
+        require(
+            borderSampler.exact &&
+            borderSampler.desc.AddressU == D3D11_TEXTURE_ADDRESS_BORDER &&
+            borderSampler.desc.AddressV == D3D11_TEXTURE_ADDRESS_MIRROR_ONCE &&
+            borderSampler.desc.BorderColor[0] == 64.0f / 255.0f &&
+            borderSampler.desc.BorderColor[1] == 32.0f / 255.0f &&
+            borderSampler.desc.BorderColor[2] == 16.0f / 255.0f &&
+            borderSampler.desc.BorderColor[3] == 128.0f / 255.0f,
+            "R160 border sampler ARGB to RGBA translation drift");
     }
 
     {

@@ -278,12 +278,13 @@ namespace outrun::vr::dx11
 
         bool fixed_function_address_supported(DWORD value) noexcept
         {
-            // R159: these four modes have direct D3D9/D3D11 coordinate
-            // semantics. BORDER is intentionally excluded because the current
-            // fixed-function stage snapshot does not carry D3DSAMP_BORDERCOLOR.
+            // R159/R160: these D3D9 modes have direct D3D11 coordinate
+            // semantics. BORDER is exact only because R160 now captures the
+            // corresponding D3DSAMP_BORDERCOLOR in FixedFunctionStageState.
             return value == D3DTADDRESS_WRAP ||
                    value == D3DTADDRESS_MIRROR ||
                    value == D3DTADDRESS_CLAMP ||
+                   value == D3DTADDRESS_BORDER ||
                    value == D3DTADDRESS_MIRRORONCE;
         }
 
@@ -359,6 +360,8 @@ namespace outrun::vr::dx11
                 return D3D11_TEXTURE_ADDRESS_MIRROR;
             case D3DTADDRESS_CLAMP:
                 return D3D11_TEXTURE_ADDRESS_CLAMP;
+            case D3DTADDRESS_BORDER:
+                return D3D11_TEXTURE_ADDRESS_BORDER;
             case D3DTADDRESS_MIRRORONCE:
                 return D3D11_TEXTURE_ADDRESS_MIRROR_ONCE;
             case D3DTADDRESS_WRAP:
@@ -689,10 +692,16 @@ namespace outrun::vr::dx11
         out.desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
         out.desc.MaxAnisotropy = 1;
         out.desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-        out.desc.BorderColor[0] = 0.0f;
-        out.desc.BorderColor[1] = 0.0f;
-        out.desc.BorderColor[2] = 0.0f;
-        out.desc.BorderColor[3] = 0.0f;
+        // D3D9 D3DCOLOR is AARRGGBB; D3D11 expects RGBA float channels.
+        constexpr float kInv255 = 1.0f / 255.0f;
+        out.desc.BorderColor[0] =
+            static_cast<float>((source.borderColor >> 16) & 0xFFu) * kInv255;
+        out.desc.BorderColor[1] =
+            static_cast<float>((source.borderColor >> 8) & 0xFFu) * kInv255;
+        out.desc.BorderColor[2] =
+            static_cast<float>(source.borderColor & 0xFFu) * kInv255;
+        out.desc.BorderColor[3] =
+            static_cast<float>((source.borderColor >> 24) & 0xFFu) * kInv255;
         out.exact = true;
         return out;
     }
