@@ -1110,24 +1110,26 @@ async def localization_send_lane_task(
             write_runtime(status="queue_github_unavailable", last_action=f"Could not read branch {target['branch']}")
         return False
 
-    # Verify/cache the live localization policy before any tab is recycled. A
-    # GitHub transport failure should never cause a new blank chat by itself.
-    try:
-        localization_controller_contract_fingerprint()
-    except GitHubTransientError as e:
-        write_runtime(
-            status="github_retry_wait",
-            last_action=f"Wave {wave_id} lane {slot_name}: GitHub policy lookup retrying automatically; current chat preserved",
-            last_error=repr(e),
-        )
-        return False
-    except Exception as e:
-        write_runtime(
-            status="policy_refresh_wait",
-            last_action=f"Wave {wave_id} lane {slot_name}: policy refresh unavailable; current chat preserved",
-            last_error=repr(e),
-        )
-        return False
+    # Localization refreshes its canonical controller policy before dispatch.
+    # Conversion lanes use branch-local AGENTS/CONVERSION_LANE_STATE in the prompt,
+    # so no localization policy lookup is applicable there.
+    if CONTROLLER_MODE == "localization":
+        try:
+            localization_controller_contract_fingerprint()
+        except GitHubTransientError as e:
+            write_runtime(
+                status="github_retry_wait",
+                last_action=f"Wave {wave_id} lane {slot_name}: GitHub policy lookup retrying automatically; current chat preserved",
+                last_error=repr(e),
+            )
+            return False
+        except Exception as e:
+            write_runtime(
+                status="policy_refresh_wait",
+                last_action=f"Wave {wave_id} lane {slot_name}: policy refresh unavailable; current chat preserved",
+                last_error=repr(e),
+            )
+            return False
 
     if FRESH_CHAT_EACH_RUN:
         # Legacy compatibility only. Normal queue policy now reuses a bounded chat.
@@ -1179,7 +1181,8 @@ async def localization_send_lane_task(
         return False
 
     task_counter = int(q.get("counter", 0)) + 1
-    task_id = f"LOCALIZATION-{target['lane']}-{task_counter:05d}"
+    task_prefix = "CONVERSION" if CONTROLLER_MODE == "conversion" else "LOCALIZATION"
+    task_id = f"{task_prefix}-{target['lane']}-{task_counter:05d}"
     runtime["queue_task_id"] = task_id
     runtime["queue_lane"] = target["lane"]
     runtime["queue_branch"] = target["branch"]
@@ -1260,8 +1263,11 @@ async def localization_send_lane_task(
         "failure_context": "",
         "qa_batch": [dict(item) for item in (qa_batch or [])],
         "native_plugin_protocol_version": NATIVE_PLUGIN_PROTOCOL_VERSION,
-        "task_latched": slot_name in {"A", "B", "D"},
-        "controller_stage": "WAIT_MATERIAL_COMMIT" if slot_name in {"A", "B", "D"} else "WAIT_QA_RESULT",
+        "task_latched": True if CONTROLLER_MODE == "conversion" else slot_name in {"A", "B", "D"},
+        "controller_stage": (
+            "WAIT_DURABLE_RESULT" if CONTROLLER_MODE == "conversion"
+            else ("WAIT_MATERIAL_COMMIT" if slot_name in {"A", "B", "D"} else "WAIT_QA_RESULT")
+        ),
         "premature_stop_count": 0,
         "premature_stop_total": 0,
         "premature_stop_counted_for_send_at": None,
@@ -1540,10 +1546,10 @@ async def localization_process_lane(
             task_commit = github_find_task_commit(
                 active["branch"],
                 active["task_id"],
-                allow_ci_skip_fallback=lane_key in {"A", "B", "D"},
+                allow_ci_skip_fallback=CONTROLLER_MODE == "localization" and lane_key in {"A", "B", "D"},
             )
             if task_commit:
-                if lane_key in {"A", "B", "D"}:
+                if CONTROLLER_MODE == "localization" and lane_key in {"A", "B", "D"}:
                     accepted = await localization_handle_producer_commit(
                         context, pages, q, active, task_commit, now
                     )
@@ -1568,7 +1574,7 @@ async def localization_process_lane(
                     )
                 return
 
-            if lane_key == "C":
+            if CONTROLLER_MODE == "conversion" or lane_key == "C":
                 skipped_commit = github_find_task_commit(
                     active["branch"], active["task_id"], allow_ci_skip_fallback=True
                 )
@@ -1660,7 +1666,7 @@ async def localization_process_lane(
             text = await current_assistant_text(page)
             if not text:
                 if task_commit:
-                    if lane_key in {"A", "B", "D"}:
+                    if CONTROLLER_MODE == "localization" and lane_key in {"A", "B", "D"}:
                         await localization_handle_producer_commit(
                             context, pages, q, active, task_commit, now
                         )
@@ -1695,7 +1701,7 @@ async def localization_process_lane(
 
             task_commit = task_commit or github_find_task_commit(active["branch"], active["task_id"])
             if task_commit:
-                if lane_key in {"A", "B", "D"}:
+                if CONTROLLER_MODE == "localization" and lane_key in {"A", "B", "D"}:
                     accepted = await localization_handle_producer_commit(
                         context, pages, q, active, task_commit, now
                     )
@@ -1736,7 +1742,7 @@ async def localization_process_lane(
             return
 
         if active["phase"] == "WAIT_ACTIONS":
-            if lane_key in {"A", "B", "D"}:
+            if CONTROLLER_MODE == "localization" and lane_key in {"A", "B", "D"}:
                 task_commit = github_find_task_commit(active["branch"], active["task_id"])
                 if task_commit:
                     active["phase"] = "WAIT_CHAT"
@@ -1860,6 +1866,8 @@ async def localization_process_lane(
                 active["completed_at"] = now.isoformat()
                 active["terminal"] = "PASS"
                 active["phase"] = "DONE"
+                active["task_latched"] = False
+                active["controller_stage"] = "DONE"
                 q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
                 save_queue_state(q)
                 return
@@ -1884,6 +1892,8 @@ async def localization_process_lane(
         active["blocked_at"] = now.isoformat()
         active["terminal"] = "BLOCKED"
         active["phase"] = "DONE"
+        active["task_latched"] = False
+        active["controller_stage"] = "BLOCKED"
         q["blocked"] = (q.get("blocked", []) + [dict(active)])[-100:]
         save_queue_state(q)
 
@@ -1917,10 +1927,10 @@ async def localization_process_lane_isolated(
         commit = github_find_task_commit(
             str(active.get("branch") or ""),
             str(active.get("task_id") or ""),
-            allow_ci_skip_fallback=lane_key in {"A", "B", "D"},
+            allow_ci_skip_fallback=CONTROLLER_MODE == "localization" and lane_key in {"A", "B", "D"},
         )
         if commit:
-            if lane_key in {"A", "B", "D"}:
+            if CONTROLLER_MODE == "localization" and lane_key in {"A", "B", "D"}:
                 accepted = await localization_handle_producer_commit(
                     context, pages, q, active, commit, now
                 )
@@ -1950,7 +1960,7 @@ async def localization_process_lane_isolated(
         active["lane_exception_at"] = now.isoformat()
         if count >= QUEUE_ERROR_RESTART_THRESHOLD:
             reason = f"Lane-local controller failure repeated {count} times: {signature}"
-            if _is_localization_producer(active) and active.get("task_latched", True):
+            if _is_latched_execution_task(active) and active.get("task_latched", True):
                 # Preserve the producer TASK_ID/checkpoint and restart the controller
                 # process instead of converting a recoverable orchestration failure
                 # into a terminal task result. Docker restart policy resumes from /data.
@@ -1960,7 +1970,10 @@ async def localization_process_lane_isolated(
                 active["terminal"] = None
                 active["phase"] = "WAIT_CHAT"
                 active["task_latched"] = True
-                active["controller_stage"] = "WAIT_MATERIAL_COMMIT"
+                active["controller_stage"] = (
+                    "WAIT_MATERIAL_COMMIT" if CONTROLLER_MODE == "localization"
+                    else "WAIT_DURABLE_RESULT"
+                )
                 active["controller_restart_recovery_count"] = int(active.get("controller_restart_recovery_count", 0) or 0) + 1
                 active["last_checkpoint_at"] = now.isoformat()
                 save_queue_state(q)
@@ -2468,6 +2481,116 @@ def reconcile_legacy_conversion_blocked(q: dict) -> bool:
             recovered_tasks=[r["task_id"] for r in recovered],
         )
     return bool(recovered)
+
+
+async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
+    """Run DX11/A and DXVK/B independently so one lane cannot starve the other."""
+    now = datetime.now(TZ)
+    q = load_queue_state()
+    reconcile_legacy_conversion_blocked(q)
+    q = load_queue_state()
+    reg = load_registry(now)
+    active_by_lane = q.setdefault("active_by_lane", {})
+
+    # One-time migration from the old single-active conversion queue. Preserve
+    # the exact TASK_ID/attempt/chat/checkpoint rather than redispatching it.
+    legacy = q.get("active")
+    if legacy:
+        legacy_slot = str(legacy.get("slot") or "")
+        if legacy_slot in {"A", "B"} and legacy_slot not in active_by_lane:
+            legacy["task_latched"] = True
+            legacy.setdefault("premature_stop_count", 0)
+            legacy.setdefault("premature_stop_total", 0)
+            legacy["controller_stage"] = (
+                "WAIT_ACTIONS" if legacy.get("phase") == "WAIT_ACTIONS"
+                else legacy.get("controller_stage") or "WAIT_DURABLE_RESULT"
+            )
+            active_by_lane[legacy_slot] = legacy
+            q["active"] = None
+            q["conversion_parallel_migrated_at"] = now.isoformat()
+            save_queue_state(q)
+
+    # Upgrade older prompt protocol without letting one lane starve the other.
+    for task in sorted(active_by_lane.values(), key=lambda x: x.get("sent_at") or ""):
+        if await queue_upgrade_native_context(context, pages, q, task):
+            return
+
+    chat_backoff = rate_limit_active(reg, now)
+    if chat_backoff:
+        write_runtime(
+            status="rate_limited_backoff",
+            last_action=(
+                f"ChatGPT send backoff active ({rate_limit_seconds_remaining(reg, now)}s); "
+                "DX11/DXVK Git/Actions reconciliation continues independently"
+            ),
+            queue=q,
+        )
+
+    # Advance both active lanes oldest-send first. WAIT_ACTIONS polling does not
+    # consume the ChatGPT send gap, while Retry/rollover remains serialized.
+    def _send_epoch(lane_key: str) -> float:
+        task = active_by_lane.get(lane_key) or {}
+        stamp = (
+            _parse_iso(task.get("last_retry_click_at"))
+            or _parse_iso(task.get("last_rollover_at"))
+            or _parse_iso(task.get("sent_at"))
+        )
+        return stamp.timestamp() if stamp else 0.0
+
+    for lane_key in sorted([x for x in ("A", "B") if x in active_by_lane], key=_send_epoch):
+        await localization_process_lane_isolated(context, pages, q, lane_key)
+
+    active_by_lane = q.setdefault("active_by_lane", {})
+    registry_changed = False
+    retired = []
+    for lane_key in ("A", "B"):
+        task = active_by_lane.get(lane_key)
+        if task and task.get("phase") == "DONE":
+            slot = next((s for s in reg.slots if s.name == lane_key), None)
+            if slot is not None:
+                slot.last_task_completed_at = now.isoformat()
+                registry_changed = True
+            retired.append(f"{task.get('task_id')}:{task.get('terminal')}")
+            active_by_lane.pop(lane_key, None)
+    if registry_changed:
+        save_registry(reg)
+    if retired:
+        save_queue_state(q)
+
+    # Fill missing backends independently. The normal global send gap means at
+    # most one fresh ChatGPT dispatch usually occurs per cycle; the other lane
+    # is picked up automatically on a later cycle instead of waiting for the
+    # first lane's task/Gate to finish.
+    if not chat_backoff:
+        slot_by_name = {s.name: s for s in reg.slots}
+        missing = [lane for lane in ("A", "B") if lane not in active_by_lane]
+        missing.sort(key=lambda lane: (slot_by_name.get(lane).last_sent_at if slot_by_name.get(lane) else "") or "")
+        for lane_key in missing:
+            dispatch_id = f"V{int(q.get('conversion_parallel_counter', 0)) + 1:05d}"
+            if await localization_safe_send_lane_task(
+                context, pages, q, lane_key, dispatch_id, qa_batch=None
+            ):
+                q["conversion_parallel_counter"] = int(q.get("conversion_parallel_counter", 0)) + 1
+                q["conversion_parallel_last_lane"] = lane_key
+                q["conversion_parallel_last_at"] = datetime.now(TZ).isoformat()
+                save_queue_state(q)
+                break
+
+    active_by_lane = q.setdefault("active_by_lane", {})
+    lane_summary = []
+    for lane_key in ("A", "B"):
+        task = active_by_lane.get(lane_key)
+        if task:
+            lane_summary.append(
+                f"{lane_key}:{task.get('lane')}:{task.get('phase')}:{task.get('task_id')}"
+            )
+        else:
+            lane_summary.append(f"{lane_key}:idle")
+    write_runtime(
+        status="conversion_parallel_running",
+        last_action="DX11/DXVK independent lanes; " + " | ".join(lane_summary),
+        queue=q,
+    )
 
 
 async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
@@ -3216,6 +3339,8 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
         if QUEUE_MODE:
             if CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL:
                 await localization_parallel_cycle(context, pages)
+            elif CONTROLLER_MODE == "conversion":
+                await conversion_parallel_cycle(context, pages)
             else:
                 await queue_cycle(context, pages)
         else:
@@ -3245,6 +3370,8 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
             try:
                 if CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL:
                     await localization_parallel_cycle(context, pages)
+                elif CONTROLLER_MODE == "conversion":
+                    await conversion_parallel_cycle(context, pages)
                 else:
                     await queue_cycle(context, pages)
                 queue_error_signature = None
