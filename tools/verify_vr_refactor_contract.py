@@ -1094,7 +1094,9 @@ for forbidden_call in (
             f"R32 retained direct transport/base call after Gate C phase 2: {forbidden_call}")
 
 
-# R13 Gate C hook destination linkage guard.
+# R13 Gate C hook destination linkage guard. Match the local namespace
+# close immediately before each external hook body and the namespace reopen
+# immediately after that body; indentation inside the body is intentionally ignored.
 for marker in (
     "bool ResolveDirectTransportR13(",
     "HRESULT __stdcall PresentDestR13(",
@@ -1103,9 +1105,9 @@ for marker in (
     if pos < 0:
         errors.append(f"R13 Gate C hook destination missing: {marker}")
         continue
-    before = r13[:pos]
-    after = r13[pos:]
-    if not before.endswith("    }\n\n") or "\n\n    namespace\n    {" not in after:
+    close_pos = r13.rfind("\n    }\n\n", 0, pos)
+    reopen_pos = r13.find("\n\n    namespace\n    {", pos)
+    if close_pos < 0 or pos - close_pos > 16 or reopen_pos < 0:
         errors.append(f"R13 Gate C hook destination is not outside anonymous namespace: {marker}")
 
 
