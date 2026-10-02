@@ -240,6 +240,29 @@ else:
             "StateBlockRecovery must validate callbacks before consuming resync "
             "and preserve shader-resync before shadow-prime ordering")
 
+for rel, source in (("R32", r32), ("R33", r33), ("R34", r34)):
+    for banned in (
+        "R31FastWorldCandidates",
+        "R31FastWorldDraws",
+        "R31FastWorldLiveValidations",
+        "R31FastWorldValidationRejects",
+        "R31HudDraws",
+        "R31Frame.",
+    ):
+        if banned in source:
+            errors.append(
+                f"{rel} retained direct R31 telemetry state dependency: {banned}")
+
+for marker in (
+    "R31TelemetryNoteFastWorld()",
+    "R31TelemetryNoteHud()",
+    "R31TelemetryNoteFallback()",
+    "R31TelemetryLiveWvpChecks()",
+    "R31TelemetryLiveWvpRejects()",
+):
+    if marker not in r31:
+        errors.append(f"R31 missing owner telemetry API: {marker}")
+
 for rel, source in (("R33", r33), ("R34", r34)):
     if "R31FlushPendingStateBlockResync" in source:
         errors.append(
