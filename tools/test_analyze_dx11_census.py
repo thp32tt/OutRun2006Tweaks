@@ -697,7 +697,7 @@ def main() -> int:
     assert exhaustive["NativeDrawPathActivationAllowed"] is False
 
     src1_demand = run_case(
-        "VR DX11 R120 census: samples=4 exact=3 fixedFn=4 programmable=0 "
+        "VR DX11 R120 census: samples=4 exact=2 fixedFn=4 programmable=0 "
         "topologyUnsupported=0 signatures=4 "
         "sampling[drawsSeen=4,stride=1,scheme=2] "
         "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
