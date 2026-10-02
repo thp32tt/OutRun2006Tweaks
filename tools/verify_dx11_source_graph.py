@@ -1768,7 +1768,7 @@ def main() -> None:
         "textureStageManagedShadowPending": "R106 managed texture stage pending evidence",
         "ManagedTextureShadow": "R106 activation evidence object",
         "ObservedReady": "R106 all-observed managed texture readiness evidence",
-        "R(?:7[23456789]|8[012345]|114) census": "R72 through R85 plus R114 summary compatibility",
+        "R(?:7[23456789]|8[012345]|114|120) census": "R72 through R85 plus R114/R120 summary compatibility",
         "mutationWriteUnlocks": "R74 write Lock/Unlock evidence",
         "mutationReadOnlyUnlocks": "R74 read-only Lock/Unlock evidence",
         "mutationDiscardWriteUnlocks": "R74 DISCARD evidence",
