@@ -756,7 +756,7 @@ compose_fixed_function_output_state_readiness(
     const NativeSurfacePairReadiness& surfacePair,
     std::uint64_t snapshotToken) noexcept;
 
-// R135 observes the effective live RS/OM state after the dormant R126 owner
+// R136 observes the effective live RS/OM state after the dormant R126 owner
 // has been applied. A token is issued only when every sealed object and
 // dynamic value is still exact on the same D3D11 context device.
 struct NativeFixedFunctionOutputBindingReadiness {
