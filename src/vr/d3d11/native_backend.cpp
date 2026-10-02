@@ -3359,6 +3359,99 @@ bool validate_fixed_function_same_context_bound_draw_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+
+NativeFixedFunctionCompleteBoundDrawReadiness
+compose_fixed_function_complete_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset) noexcept {
+    NativeFixedFunctionCompleteBoundDrawReadiness out{};
+    const auto boundDraw =
+        compose_fixed_function_same_context_bound_draw_readiness(
+            draw, context, outputStateBinding, pipelineBundle,
+            layout, vertexPrototype, pixelPrototype, samplers, textures);
+    const auto geometryBinding = observe_fixed_function_geometry_binding(
+        context, geometry, vertexBuffer, vertexStride, vertexOffset,
+        indexBuffer, indexFormat, indexOffset);
+
+    out.sameContextBoundDrawSnapshotToken = boundDraw.snapshotToken;
+    out.geometryBindingSnapshotToken = geometryBinding.snapshotToken;
+    out.inputValid =
+        boundDraw.inputValid &&
+        geometryBinding.inputValid &&
+        validate_fixed_function_draw_readiness_integrity(draw);
+    out.sameContextBoundDrawReady =
+        boundDraw.ready && boundDraw.snapshotToken != 0;
+    out.geometryBindingReady =
+        geometryBinding.ready && geometryBinding.snapshotToken != 0;
+    out.geometryBindingMatchesDraw =
+        draw.geometrySnapshotToken != 0 &&
+        geometry.snapshotToken == draw.geometrySnapshotToken &&
+        geometryBinding.geometrySnapshotToken == draw.geometrySnapshotToken;
+    out.componentSnapshotsPresent =
+        boundDraw.snapshotToken != 0 &&
+        geometryBinding.snapshotToken != 0 &&
+        draw.geometrySnapshotToken != 0;
+    out.ready =
+        out.inputValid &&
+        out.sameContextBoundDrawReady &&
+        out.geometryBindingReady &&
+        out.geometryBindingMatchesDraw &&
+        out.componentSnapshotsPresent;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.sameContextBoundDrawSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.geometryBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, draw.geometrySnapshotToken);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_complete_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = compose_fixed_function_complete_bound_draw_readiness(
+        draw, context, outputStateBinding, pipelineBundle,
+        layout, vertexPrototype, pixelPrototype, samplers, textures,
+        geometry, vertexBuffer, vertexStride, vertexOffset,
+        indexBuffer, indexFormat, indexOffset);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 void NativeFixedFunctionPipelineBundle::shutdown() noexcept {
     transform_buffer_.shutdown();
     input_layout_.Reset();
