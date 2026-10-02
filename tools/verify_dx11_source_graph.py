@@ -50,6 +50,9 @@ RESOURCE_TRANSLATION_HPP = (
 RESOURCE_TRANSLATION_CPP = (
     ROOT / "src" / "vr" / "d3d11" / "resource_translation.cpp"
 ).read_text(encoding="utf-8")
+STATE_TRANSLATION_CPP = (
+    ROOT / "src" / "vr" / "d3d11" / "state_translation.cpp"
+).read_text(encoding="utf-8")
 CONSTANT_BUFFER_CONTRACT_TEXT = (
     CONSTANT_BUFFER_PROBE + "\n" + NATIVE_BACKEND_CPP
 )
@@ -249,6 +252,23 @@ def main() -> None:
         raise SystemExit(
             "DX11 R73 resource behavior contract drift: "
             + ", ".join(missing_resource_contract)
+        )
+
+    dual_source_blend_contract = {
+        "case D3DBLEND_SRCCOLOR2: return {D3D11_BLEND_SRC1_COLOR, false};":
+            "dual-source source-color blend stays fail-closed without SV_Target1 proof",
+        "case D3DBLEND_INVSRCCOLOR2: return {D3D11_BLEND_INV_SRC1_COLOR, false};":
+            "inverse dual-source source-color blend stays fail-closed without SV_Target1 proof",
+    }
+    missing_dual_source_blend_contract = [
+        meaning
+        for token, meaning in dual_source_blend_contract.items()
+        if token not in STATE_TRANSLATION_CPP
+    ]
+    if missing_dual_source_blend_contract:
+        raise SystemExit(
+            "DX11 dual-source blend readiness drift: "
+            + ", ".join(missing_dual_source_blend_contract)
         )
 
     census_r73_contract = {
