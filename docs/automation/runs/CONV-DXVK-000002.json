@@ -2343,8 +2343,7 @@
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Capture the next bounded canonical continuation starting at 0x00182DCF with mandatory overlap bytes 83 3d 60 bc. Keep that fresh window raw-only until canonical provenance succeeds; then exact-decode only complete instructions and resolve forward target 0x00182E34 only with exact instruction-boundary evidence. Keep function/render/HUD/runtime semantics unresolved.",
       "issue14_validation_comment_id": 5947562196
-    }
-  ,
+    },
     {
       "unit_id": "DXVK_MODERN_OVERLAP_PREDECESSOR_CROSS_PROOF_GUARD",
       "job_id": "CONV-DXVK-000002",
@@ -2404,6 +2403,67 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authoritative canonical-disassembly frontier. For every continuation-43+ overlap transition, retain predecessor expected/actual incomplete-byte cross-proof; continue raw/proof work only from the newest validated edge without function/render/HUD/runtime semantic promotion."
+    },
+    {
+      "unit_id": "DXVK_CONTINUATION_PROOF_FINAL_GATE_BINDING",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "1f3015155d0c624414964091442a643d4f0473ef",
+      "validation_bearing_descendant_sha": "fbdec361e708da352e7eb6171e8eed3d65832019",
+      "commit_message": "test: bind DXVK proof status to integrity gates [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "AST-seal each auto-discovered continuation proof's final proven=bool(...) so mandatory byte/layout/prefix gates and every recognized computed branch/call/raw-call/predecessor/cut-edge/capture-boundary integrity gate must participate in final proof status.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch authority, current AGENTS conversion override, lane/run state, regression/problem history and Issue #14 while tracking concurrent F36/F37 frontier advancement."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected an independent verifier-integrity gap instead of racing already-claimed canonical frontier work: proof collectors could retain integrity marker strings while accidentally dropping computed gates from final proven status."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 1f3015155d0c624414964091442a643d4f0473ef adds AST extraction of the exact final proven assignment and mandatory/conditional fail-closed gate binding across auto-discovered continuation proofs."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Material-SHA DXVK evidence run 36979778830 exposed an inherited one-line raw-call predicate parser failure before canonical analysis. Descendant 8bdf8d9d0e8ad5dae4347f453fe9b915c81ed8bc repaired that inherited parser via AST. Validation-bearing descendant fbdec361e708da352e7eb6171e8eed3d65832019, which retains this material change, passed DXVK Canonical Disassembly Evidence run 36979825482/job 110751579685 including static disassembly contract and canonical EXE analysis."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit 1f3015155d0c624414964091442a643d4f0473ef contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947595043 records the transaction."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static Python verifier hardening only; no runtime payload, selector, packaged backend binary, deployment content or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally without replacing the concurrently newer primary canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "material_sha": "1f3015155d0c624414964091442a643d4f0473ef",
+        "material_run_id": 36979778830,
+        "material_run_result": "FAIL_PREEXISTING_RAW_CALL_PREDICATE_PARSER",
+        "validation_bearing_descendant_sha": "fbdec361e708da352e7eb6171e8eed3d65832019",
+        "descendant_is_material_ancestor": true,
+        "dxvk_disassembly_evidence_run_id": 36979825482,
+        "dxvk_disassembly_evidence_job_id": 110751579685,
+        "static_disassembly_contract": "PASS",
+        "canonical_exe_analysis": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947595043,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest primary canonical-disassembly frontier. Future proof collectors must keep all recognized computed integrity gates bound into final proven status; continue frontier work independently without semantic promotion."
     }
   ]
 }
