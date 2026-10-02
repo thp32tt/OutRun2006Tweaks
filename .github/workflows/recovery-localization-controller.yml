@@ -1,0 +1,55 @@
+name: Recovery Localization Controller
+
+on:
+  push:
+    branches:
+      - recovery/localization-no-e
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble and compile controller
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat tools/chat-controller/v0.4/src/controller.py.part* > /tmp/controller.py
+          python -m py_compile /tmp/controller.py
+
+      - name: Validate recovered contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          src = ''.join(p.read_text(encoding='utf-8') for p in sorted(Path('tools/chat-controller/v0.4/src').glob('controller.py.part*')))
+          a = Path('tools/chat-controller/v0.4/localization_A.md').read_text(encoding='utf-8')
+          b = Path('tools/chat-controller/v0.4/localization_B.md').read_text(encoding='utf-8')
+          c = Path('tools/chat-controller/v0.4/localization_C.md').read_text(encoding='utf-8')
+          compose = Path('tools/chat-controller/v0.4/docker-compose.portainer-localization.yml').read_text(encoding='utf-8')
+          assert 'Keep both producers fed independently. No A+B/C barrier exists.' not in src
+          assert 'next A/B wave unlocked' in src
+          assert 'task_material_commit_ok' in src
+          assert 'asset_queue_v2.csv' in a and 'index % 2 == 0' in a
+          assert 'asset_queue_v2.csv' in b and 'index % 2 == 1' in b
+          assert 'QA barrier' in c
+          assert 'LOCALIZATION_PIPELINE: "A_B_THEN_C_BARRIER"' in compose
+          assert 'CHAT_SLOTS: "3"' in compose
+          assert 'outrun_localization_network' in compose
+          assert 'localization_E.md' not in compose
+          PY
+
+      - name: Validate compose
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker compose -f tools/chat-controller/v0.4/docker-compose.portainer-localization.yml config >/tmp/compose.yml
+
+      - name: Build localization controller
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -f tools/chat-controller/v0.4/Dockerfile.portainer tools/chat-controller/v0.4
