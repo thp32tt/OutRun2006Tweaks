@@ -9,7 +9,7 @@ on:
 
 jobs:
   r34-r33-split:
-    if: github.head_ref == 'vr-refactor-r84-2000c-20261001' || github.event_name == 'workflow_dispatch'
+    if: github.ref == 'refs/heads/vr-refactor-r84-2000c-20261001' || github.head_ref == 'vr-refactor-r84-2000c-20261001' || github.event_name == 'workflow_dispatch'
     runs-on: windows-2022
     steps:
       - name: Checkout
