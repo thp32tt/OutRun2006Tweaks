@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
+  "branch": "vr-dxvk-r71-disasm",
+  "lane": "DXVK",
+  "state_parent_head": "41027e1b5d38293aa9f420998736156672165841",
+  "precedence": {
+    "over_inherited_vr_autodev_state": true,
+    "order": [
+      "current GitHub HEAD",
+      "docs/CONVERSION_LANE_STATE.json",
+      "current TASK_ID durable record",
+      "AGENTS.md",
+      "inherited/historical docs/VR_AUTODEV_STATE.json"
+    ],
+    "reason": "The inherited VR_AUTODEV_STATE.json contains historical DX9Ex/global policy and must not overwrite current conversion-lane status."
+  },
+  "environment": {
+    "github_only_development": true,
+    "local_development_pc_required": false,
+    "renderdoc_required": false,
+    "local_openxr_runtime_required": false,
+    "missing_optional_skill_is_blocker": false
+  },
+  "skill_routing": {
+    "mode": "OPTIONAL_HELPFUL_ONLY",
+    "preferred": [
+      "outrun-vr-execution-router",
+      "outrun-github-only-build-gate",
+      "outrun-durable-task-recorder",
+      "outrun-openxr-lifecycle-validator",
+      "outrun-stereo-rendering-auditor",
+      "outrun-directgpu-sync-auditor",
+      "reverse-engineering-github-only"
+    ],
+    "runtime_log_skill": "outrun-vr-runtime-log-analyzer",
+    "fallback": "CONTINUE_EXISTING_GITHUB_SOURCE_DISASSEMBLY_ACTIONS_WORKFLOW_WITHOUT_SKILL",
+    "skills_are_completion_authority": false
+  },
+  "task_liveness": {
+    "assistant_turn_end_is_task_end": false,
+    "recovery_status_review_plan_only": "CONTINUE_SAME_TASK_ID",
+    "local_tool_absence_is_terminal": false,
+    "runtime_evidence_absence_blocks_only_runtime_claims": true
+  },
+  "latest_durable_task": {
+    "task_id": "CONVERSION-DXVK-00267",
+    "result_sha": "75d91a42fa8fd6d08ab2d0e9048cd42cfd9a9b0b",
+    "automation_validation": "PASS_CORE_GATES_INSPECTOR_PENDING",
+    "runtime_validation": "UNTESTED",
+    "checkpoint": "C6_STATE"
+  },
+  "runtime_blocker": "No runtime acceptance claim exists; exact disassembly/control-flow evidence remains review/static evidence only.",
+  "runtime_next_action": "Quest 3/VDXR runtime validation remains a later user-hardware gate after a runtime candidate exists.",
+  "independent_static_next_action": "Continue from exact instruction boundary 0x00182635 with a fresh bounded canonical-EXE provenance window; preserve DXVK isolation and do not promote semantics beyond evidence.",
+  "policy": [
+    "Do not modify another backend lane.",
+    "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
+    "Do not activate or promote semantics without the branch-specific evidence gate.",
+    "When runtime-only evidence is unavailable, continue independent GitHub-only source/static/CI work instead of stopping.",
+    "Installed Skills are optional helpers; if unavailable or unsuitable, continue without them."
+  ]
+}
