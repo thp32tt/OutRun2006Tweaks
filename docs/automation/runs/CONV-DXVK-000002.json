@@ -146,7 +146,8 @@
     5947371527,
     5947373054,
     5947388153,
-    5947402349
+    5947402349,
+    5947440962
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -2023,6 +2024,82 @@
       "runtime_validation": "UNTESTED",
       "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
       "exact_next_action": "Preserve descendant f9c6a2c4932a7b8a41e91390f84794bc69b837cc F35 raw overlap capture 0x00182D53..0x00182D93; validate canonical provenance before exact decode, and resolve 0x00182D59 only with exact instruction-boundary proof."
+    },
+    {
+      "unit_id": "DXVK_F35_CANONICAL_CONTROL_FLOW_0x182D53_TO_0x182D93",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "64bd1e523fbd316f5f7d949cbd92b48a7655ad3d",
+      "validation_bearing_result_sha": "64bd1e523fbd316f5f7d949cbd92b48a7655ad3d",
+      "commit_message": "dxvk: prove canonical 0x182D53 control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact-decoded canonical 0x00182D53..0x00182D93 into 25 contiguous complete instructions, proved five short branches, resolved predecessor forward target 0x00182D59 onto an instruction boundary, and proved an exact capture boundary at 0x00182D93 without semantic or ownership promotion.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local lane/run state, regression/problem history and Issue #14; detected concurrent F35 raw/F36 work and avoided duplicate writes."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the highest-value unfinished runnable static unit after canonical F35 raw provenance passed: exact control-flow proof for 0x00182D53..0x00182D93."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 64bd1e523fbd316f5f7d949cbd92b48a7655ad3d adds 25 exact instruction rows, five branch proofs, predecessor-target boundary proof, capture-boundary/raw-call census contracts, report binding and fail-closed telemetry."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA 64bd1e523fbd316f5f7d949cbd92b48a7655ad3d passed DXVK Canonical Disassembly Evidence run 36978987005/job 110748976582 against canonical EXE SHA256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3; backend disassembly contract OK and proof status EXACT_182D53_TO_182D93_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commit 64bd1e523fbd316f5f7d949cbd92b48a7655ad3d contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947440962 records implementation and exact-SHA validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly analyzer proof only; no runtime payload, selector, packaged binary, deployment content or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded as a supplemental completed unit so the newer concurrent F36 raw source frontier is not overwritten."
+        }
+      },
+      "validation": {
+        "exact_sha": "64bd1e523fbd316f5f7d949cbd92b48a7655ad3d",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36978987005,
+        "dxvk_disassembly_evidence_job_id": 110748976582,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "evidence_artifact_id": 11214916344,
+        "evidence_artifact_digest": "sha256:2aa0997644e8188ae1728d7270abc07f50d7264d4db1b6f67baf89689e01c71d",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "proof_status": "EXACT_182D53_TO_182D93_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "instruction_count": 25,
+        "branch_targets_match": true,
+        "internal_branch_targets_on_boundaries": true,
+        "external_targets": [
+          "0x00182D95",
+          "0x00182D96",
+          "0x00182D9A"
+        ],
+        "raw_call_census_empty": true,
+        "resolved_predecessor_target_rva": "0x00182D59",
+        "resolved_predecessor_target_boundary": true,
+        "predecessor_target_contract": true,
+        "capture_boundary_matches": true,
+        "backend_conversion_gate_run_id": 36978987044,
+        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_REQUIRED_FOR_STATIC_PROOF",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947440962,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_F36_RAW_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newer F36 raw frontier beginning at exact boundary 0x00182D93. Exact-decode only complete canonical instructions and resolve 0x00182D95/0x00182D96/0x00182D9A only with exact instruction-boundary evidence; keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
