@@ -196,30 +196,26 @@ namespace OutRunVRStereo
             else
                 frame.pointLinePrimitives += primitiveCount;
 
-            const bool effectKnown =
-                R29Effect.valid &&
-                R29Effect.presentEpoch == PresentEpoch &&
-                R23GameDrawSerial >= R29Effect.drawSerial &&
-                R23GameDrawSerial - R29Effect.drawSerial < 64;
-            if (!effectKnown)
+            R29EffectTelemetrySnapshot effect{};
+            if (!TryGetEffectTelemetrySnapshot(effect))
             {
                 ++frame.effectUnknownDraws;
                 return;
             }
 
-            if (R29Effect.alphaBlend != FALSE)
+            if (effect.alphaBlend != FALSE)
             {
                 ++frame.alphaBlendDraws;
                 frame.alphaBlendPrimitives += primitiveCount;
             }
-            if (R29Effect.alphaTest != FALSE)
+            if (effect.alphaTest != FALSE)
                 ++frame.alphaTestDraws;
 
             // Heuristic only: alpha-blended, non-Z-writing point/triangle work
             // is a useful proxy for sand/smoke/spray/flare-style effects, but is
             // deliberately not labelled as a proven game particle draw.
-            if (R29Effect.alphaBlend != FALSE &&
-                R29Effect.zWrite == FALSE &&
+            if (effect.alphaBlend != FALSE &&
+                effect.zWrite == FALSE &&
                 (triangleTopology || type == D3DPT_POINTLIST))
             {
                 ++frame.particleLikeDraws;
