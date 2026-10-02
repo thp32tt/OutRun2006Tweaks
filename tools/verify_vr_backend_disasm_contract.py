@@ -109,6 +109,20 @@ def verify_dxvk_continuation_chain() -> None:
                 f"DXVK continuation {continuation_id} raw provenance lost capture-integrity gate: "
                 f"{missing_capture_integrity_markers}"
             )
+        raw_status_fail_closed_markers = (
+            '"status": (',
+            "if captured",
+            "else",
+        )
+        missing_raw_status_markers = [
+            marker for marker in raw_status_fail_closed_markers
+            if marker not in provenance_source
+        ]
+        if missing_raw_status_markers:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} raw provenance status is not fail-closed: "
+                f"{missing_raw_status_markers}"
+            )
         if continuation_id > raw_ids[0]:
             expected_predecessor_call = (
                 "collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
@@ -198,6 +212,21 @@ def verify_dxvk_continuation_chain() -> None:
         if '"ownership_effect": "NONE"' not in proof_source:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} proof unexpectedly promotes ownership"
+            )
+        proof_status_fail_closed_markers = (
+            "proven = bool(",
+            '"status": (',
+            "if proven",
+            "else",
+        )
+        missing_proof_status_markers = [
+            marker for marker in proof_status_fail_closed_markers
+            if marker not in proof_source
+        ]
+        if missing_proof_status_markers:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} prefix proof status is not fail-closed: "
+                f"{missing_proof_status_markers}"
             )
         expected_provenance_call = (
             "collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
