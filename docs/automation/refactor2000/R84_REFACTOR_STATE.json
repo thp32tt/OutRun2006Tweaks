@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1082,
+  "cycle": 1112,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -207,11 +207,21 @@
     "R84-REF-LIFECYCLE-0056",
     "R84-REF-GUARD-0013",
     "R84-REF-SKYGLOW-0012",
-    "R84-REF-HUD-0013"
+    "R84-REF-HUD-0013",
+    "R84-REF-XYZRHW-0017",
+    "R84-REF-XYZRHW-0018",
+    "R84-REF-XYZRHW-0019",
+    "R84-REF-STATE-0028",
+    "R84-REF-STATE-0029",
+    "R84-REF-DIRECT-0012",
+    "R84-REF-DISPATCH-0016",
+    "R84-REF-STATE-0030",
+    "R84-REF-GUARD-0014",
+    "R84-REF-LIFECYCLE-0057"
   ],
-  "next": "Cycles 1083-1085: inspect R30 buffer-shadow validity ranges and XYZRHW indexed paths, then R31/R32 state cache invalidation; APPLY_GATE at 1085.",
-  "updatedKst": "2026-10-02T10:01:00+09:00",
-  "batchStatus": "R84_200C_EXT_CYCLE_1082",
+  "next": "Cycles 1113-1115: final 50-cycle portion: verifier-backed cross-layer invariants, legacy dependency opportunities, and remaining telemetry/guard seams; APPLY_GATE at 1115.",
+  "updatedKst": "2026-10-02T10:06:00+09:00",
+  "batchStatus": "R84_200C_EXT_CYCLE_1112",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -386,6 +396,16 @@
     "Cycles 1071-1073 R84-REF-LIFECYCLE-0056: R34 fail-closed reset helper reviewed; eligibility/baseline/raster/depth invalidations intentionally occur together. APPLY_GATE 1073 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 1074-1076 R84-REF-GUARD-0013: R34 Present lost-device bypass reviewed against reset replay state; raw Present bypass is required while device recovery is pending. APPLY_GATE 1076 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 1077-1079 R84-REF-SKYGLOW-0012: R30 SkyGlow capture-before-HUD and stereo apply sequence reviewed; source timing is visually observable and protected. APPLY_GATE 1079 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
-    "Cycles 1080-1082 R84-REF-HUD-0013: R30 HUD contain-scale/scissor transform reviewed; viewport/scissor geometry belongs to HUD projection and cannot merge with R34 raster restore. APPLY_GATE 1082 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
+    "Cycles 1080-1082 R84-REF-HUD-0013: R30 HUD contain-scale/scissor transform reviewed; viewport/scissor geometry belongs to HUD projection and cannot merge with R34 raster restore. APPLY_GATE 1082 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1083-1085 R84-REF-XYZRHW-0017: R30 valid-range merge/query invariants reviewed; sorted merged ranges are required by early-break lookup. APPLY_GATE 1085 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1086-1088 R84-REF-XYZRHW-0018: R30 VB/IB shadow copy paths reviewed; commonization would obscure first-miss logging and typed registry ownership. APPLY_GATE 1088 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1089-1091 R84-REF-XYZRHW-0019: R30 observed Lock/Unlock validity lifecycle reviewed; snapshot-before-real-Unlock and failure invalidation are required. APPLY_GATE 1091 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1092-1094 R84-REF-STATE-0028: R31 cache invalidation around StateBlock recording reviewed; cache loss is tied to recording generation. APPLY_GATE 1094 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1095-1097 R84-REF-STATE-0029: R32 effect/raster/renderer cache reset reviewed; each cache has distinct producer and generation semantics. APPLY_GATE 1097 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1098-1100 R84-REF-DIRECT-0012: R32 Direct resource ensure/wait/drain lifecycle reviewed; fence wait budget and publication identity cannot be merged safely. APPLY_GATE 1100 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1101-1103 R84-REF-DISPATCH-0016: R32 dispatch support state reviewed against R31/R33 layers; R32 owns corrected intermediate route, not final classification. APPLY_GATE 1103 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1104-1106 R84-REF-STATE-0030: R33 SetRenderState shadow invalidation reviewed; only depth/stencil-relevant state changes invalidate its cache. APPLY_GATE 1106 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1107-1109 R84-REF-GUARD-0014: R34 final semantic scope and raster replay reviewed after R33 fallback; no redundant guard found. APPLY_GATE 1109 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1110-1112 R84-REF-LIFECYCLE-0057: Cross-layer Reset success/failure invalidation reviewed; R22 baseline, R32 cache, R33 depth and R34 replay health remain distinct. APPLY_GATE 1112 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
   ]
 }
