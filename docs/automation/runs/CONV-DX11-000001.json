@@ -5,7 +5,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "8204de3c411b327cb857e6348160968a49b37273",
-  "state_parent_head": "132a3b21d4a57d993ed49844010b207f1b761a3a",
+  "state_parent_head": "063959b1712d7206c67fdcf58916ee5682d489de",
   "material_result_sha": "162073d1f36ab2f4634cb50d6ca6957764bf1eb2",
   "validation_bearing_sha": "d874b7cf337bc75c66594d389c68267554ee173a",
   "runtime_validation": "UNTESTED",
