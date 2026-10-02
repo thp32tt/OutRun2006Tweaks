@@ -2357,6 +2357,56 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Exact-decode only complete canonical instructions in 0x00182F45..0x00182F85. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F42_CANONICAL_CONTROL_FLOW_0x182F09_TO_0x182F45",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "b70002b00db463e06172a5f632831f9168d8bddf",
+      "validation_bearing_result_sha": "b70002b00db463e06172a5f632831f9168d8bddf",
+      "run_record_commit_sha": "77c4ee8e256f61f557fb822afba7c742bbc4c132",
+      "commit_message": "dxvk: prove canonical 0x182F09 control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact canonical F42 proof through 0x00182F45: 16 complete instructions, direct CALL 0x00182F25->0x00189F10, predecessor targets 0x00182F2D/0x00182F32 resolved on instruction boundaries, and cut bytes 3d ff 0b 00 preserved for mandatory overlap.",
+      "pipeline_status": "C0_C6_COMPLETE",
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "b70002b00db463e06172a5f632831f9168d8bddf",
+        "dxvk_disassembly_evidence_run_id": 36982763869,
+        "dxvk_disassembly_evidence_job_id": 110760806362,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "artifact_id": 11216466795,
+        "artifact_digest": "sha256:9572e0d0466054ddb4e99bd11826a62496cad78ccc07e33083ba2a5763efcdf5",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "proof_status": "EXACT_182F09_TO_182F45_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "instruction_count": 16,
+        "call": "0x00182F25->0x00189F10",
+        "calls_match": true,
+        "raw_call_census_matches": true,
+        "predecessor_target_contract": true,
+        "resolved_predecessor_targets": [
+          "0x00182F2D",
+          "0x00182F32"
+        ],
+        "resolved_predecessor_targets_on_boundaries": true,
+        "incomplete_rva": "0x00182F45",
+        "incomplete_bytes": "3d ff 0b 00",
+        "incomplete_matches": true,
+        "capture_edge_matches": true,
+        "build_run_id": 36982768146,
+        "build_job_id": 110761005711,
+        "backend_disassembly_contract": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947981600,
+      "issue14_exact_validation_comment_id": 5947982893,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_F43_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newer F43 raw frontier at 0x00182F45..0x00182F85 and exact-decode only complete instructions from its validated bytes; keep any new cut edge overlapped and semantics unresolved."
     }
   ]
 }
