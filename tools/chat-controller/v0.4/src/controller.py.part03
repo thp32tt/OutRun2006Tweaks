@@ -167,6 +167,7 @@ def localization_material_target_hints(branch: str, lane: str, limit: int = 2) -
         return []
 
     key = (str(branch or ""), str(lane or ""))
+    cache_limit = max(24, int(limit or 0))
     now_mono = time.monotonic()
     cached = _localization_material_target_cache.get(key)
     if cached and now_mono - cached[0] < 60:
@@ -235,22 +236,30 @@ def localization_material_target_hints(branch: str, lane: str, limit: int = 2) -
             "status": str(row.get("artwork_status") or "").strip(),
             "priority": score,
         })
-        if len(chosen) >= max(1, limit):
+        if len(chosen) >= cache_limit:
             break
 
     _localization_material_target_cache[key] = (now_mono, [dict(x) for x in chosen])
-    return [dict(x) for x in chosen]
+    return [dict(x) for x in chosen[:limit]]
 
 
 def localization_material_target_prompt(active: dict) -> str:
-    if active.get("pipeline_candidate_indices"):
-        targets = localization_remaining_material_targets(active, limit=2)
-    else:
-        targets = localization_material_target_hints(
-            str(active.get("branch") or "korean-localization-clean"),
-            str(active.get("lane") or ""),
-            limit=2,
+    excluded = {
+        int(x) for x in (
+            list(active.get("pipeline_candidate_indices") or [])
+            + list(active.get("controller_exclude_indices") or [])
         )
+        if str(x).lstrip("-").isdigit()
+    }
+    raw_targets = localization_material_target_hints(
+        str(active.get("branch") or "korean-localization-clean"),
+        str(active.get("lane") or ""),
+        limit=24,
+    )
+    targets = [
+        item for item in raw_targets
+        if int(item.get("index", -1)) not in excluded
+    ][:2]
     if not targets:
         return (
             "CONTROLLER_SELECTED_TARGET=NONE; fresh Git scan only as much as needed to choose "
