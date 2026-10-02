@@ -2852,6 +2852,35 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer branch-authoritative continuation_56 raw frontier at 0x0018303B..0x0018307B with mandatory overlap byte 66. Validate its canonical provenance if needed, then exact-decode only complete instructions, preserve any subsequent cut edge, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_DISASM_INT3_CALL_PADDING_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "78bea62471774ab92ec23e561d7d9e361ba931bb",
+      "validation_bearing_result_sha": "78bea62471774ab92ec23e561d7d9e361ba931bb",
+      "run_record_commit_sha": "4bcc1e53795c25a2d893a6636cfaa49e617b3997",
+      "commit_message": "test: reject DXVK calls into INT3 padding [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Branch-wide DXVK disassembly verifier now rejects declared direct rel32 CALL targets that enter long internal INT3 alignment spans, complementing the existing direct-BRANCH padding control-flow guard.",
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "78bea62471774ab92ec23e561d7d9e361ba931bb",
+        "dxvk_disassembly_evidence_run_id": 36985567724,
+        "dxvk_disassembly_evidence_job_id": 110769695750,
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "static_disassembly_contract": "PASS",
+        "canonical_exe_analysis": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948409944,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the current branch-authoritative continuation frontier and continue its canonical raw/proof sequence only if unclaimed; otherwise keep hardening independent static verifier contracts."
     }
   ]
 }
