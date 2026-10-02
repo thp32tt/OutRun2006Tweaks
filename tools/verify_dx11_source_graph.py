@@ -3309,6 +3309,33 @@ def main() -> None:
             "DX11 R87 semantic smoke drift: " + ", ".join(missing_r87_smoke)
         )
 
+    r159_sampler_mirror_address_contract = [
+        ("D3DTADDRESS_MIRROR ||", PIPELINE_TRANSLATION_CPP,
+         "R159 MIRROR support classification"),
+        ("D3DTADDRESS_MIRRORONCE;", PIPELINE_TRANSLATION_CPP,
+         "R159 MIRRORONCE support classification"),
+        ("D3D11_TEXTURE_ADDRESS_MIRROR;", PIPELINE_TRANSLATION_CPP,
+         "R159 MIRROR direct mapping"),
+        ("D3D11_TEXTURE_ADDRESS_MIRROR_ONCE;", PIPELINE_TRANSLATION_CPP,
+         "R159 MIRRORONCE direct mapping"),
+        ("R159 mirror sampler addressing readiness was not exact",
+         SEMANTIC_SMOKE, "R159 mirror readiness positive smoke"),
+        ("R159 mirror sampler address translation drift",
+         SEMANTIC_SMOKE, "R159 mirror descriptor positive smoke"),
+        ("R159 border sampler remains fail closed without captured border color",
+         SEMANTIC_SMOKE, "R159 uncaptured BORDER negative smoke"),
+    ]
+    missing_r159_sampler_mirror_address = [
+        meaning
+        for token, source, meaning in r159_sampler_mirror_address_contract
+        if token not in source
+    ]
+    if missing_r159_sampler_mirror_address:
+        raise SystemExit(
+            "DX11 R159 sampler mirror-address contract drift: "
+            + ", ".join(missing_r159_sampler_mirror_address)
+        )
+
     for graph_name, graph in (
         ("checked-in CMake", CMAKE),
         ("cmake.toml", CMAKE_TOML),

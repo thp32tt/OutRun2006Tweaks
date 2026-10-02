@@ -87,6 +87,9 @@ namespace outrun::vr::dx11
         // bias/most-detailed-mip state remains fail-closed.
         DWORD mipLodBiasBits = 0;
         DWORD maxMipLevel = 0;
+        // R159 maps the address modes with identical D3D9/D3D11 coordinate
+        // semantics directly. BORDER remains fail-closed until D3D9 border
+        // color provenance is captured alongside the sampler state.
         DWORD addressU = D3DTADDRESS_WRAP;
         DWORD addressV = D3DTADDRESS_WRAP;
     };

@@ -16,6 +16,7 @@ namespace
     using outrun::vr::dx11::FixedFunctionShaderPrototypeUnsupportedResourceType;
     using outrun::vr::dx11::FixedFunctionStageState;
     using outrun::vr::dx11::FixedFunctionUnsupportedArgument;
+    using outrun::vr::dx11::FixedFunctionUnsupportedSamplerAddress;
     using outrun::vr::dx11::FixedFunctionUnsupportedSamplerFilter;
     using outrun::vr::dx11::FixedFunctionUnsupportedSamplerLod;
     using outrun::vr::dx11::FixedFunctionUnsupportedStageChain;
@@ -33,6 +34,7 @@ namespace
     using outrun::vr::dx11::materialize_indexed_triangle_fan_indices;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::translate_fixed_function_readiness;
+    using outrun::vr::dx11::translate_fixed_function_sampler;
 
     void require(bool condition, const char* message)
     {
@@ -815,6 +817,47 @@ int main()
                 "float nextAlpha = sampled2.a;") != std::string::npos,
             "stage2 SELECTARG2 alpha semantic drift");
         require_compiles(prototype, "stage2 SELECTARG2 chain compile");
+    }
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        stages[0] = active_stage(
+            D3DTOP_SELECTARG1,
+            D3DTA_TEXTURE,
+            D3DTA_CURRENT,
+            D3DTOP_SELECTARG1,
+            D3DTA_TEXTURE,
+            D3DTA_CURRENT,
+            0);
+        stages[0].addressU = D3DTADDRESS_MIRROR;
+        stages[0].addressV = D3DTADDRESS_MIRRORONCE;
+
+        const auto mirrorReadiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x01, 0x01);
+        const auto mirrorSampler =
+            translate_fixed_function_sampler(stages[0]);
+        require(
+            mirrorReadiness.exact(),
+            "R159 mirror sampler addressing readiness was not exact");
+        require(
+            mirrorSampler.exact &&
+            mirrorSampler.desc.AddressU == D3D11_TEXTURE_ADDRESS_MIRROR &&
+            mirrorSampler.desc.AddressV == D3D11_TEXTURE_ADDRESS_MIRROR_ONCE,
+            "R159 mirror sampler address translation drift");
+
+        stages[0].addressU = D3DTADDRESS_BORDER;
+        const auto borderReadiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x01, 0x01);
+        const auto borderSampler =
+            translate_fixed_function_sampler(stages[0]);
+        require(
+            !borderReadiness.exact() &&
+            (borderReadiness.unsupported &
+             FixedFunctionUnsupportedSamplerAddress) != 0 &&
+            !borderSampler.exact,
+            "R159 border sampler remains fail closed without captured border color");
     }
 
     {

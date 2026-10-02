@@ -278,8 +278,13 @@ namespace outrun::vr::dx11
 
         bool fixed_function_address_supported(DWORD value) noexcept
         {
+            // R159: these four modes have direct D3D9/D3D11 coordinate
+            // semantics. BORDER is intentionally excluded because the current
+            // fixed-function stage snapshot does not carry D3DSAMP_BORDERCOLOR.
             return value == D3DTADDRESS_WRAP ||
-                   value == D3DTADDRESS_CLAMP;
+                   value == D3DTADDRESS_MIRROR ||
+                   value == D3DTADDRESS_CLAMP ||
+                   value == D3DTADDRESS_MIRRORONCE;
         }
 
         bool translate_fixed_function_sampler_lod(
@@ -348,9 +353,18 @@ namespace outrun::vr::dx11
         D3D11_TEXTURE_ADDRESS_MODE translate_fixed_function_address(
             DWORD value) noexcept
         {
-            return value == D3DTADDRESS_CLAMP
-                ? D3D11_TEXTURE_ADDRESS_CLAMP
-                : D3D11_TEXTURE_ADDRESS_WRAP;
+            switch (value)
+            {
+            case D3DTADDRESS_MIRROR:
+                return D3D11_TEXTURE_ADDRESS_MIRROR;
+            case D3DTADDRESS_CLAMP:
+                return D3D11_TEXTURE_ADDRESS_CLAMP;
+            case D3DTADDRESS_MIRRORONCE:
+                return D3D11_TEXTURE_ADDRESS_MIRROR_ONCE;
+            case D3DTADDRESS_WRAP:
+            default:
+                return D3D11_TEXTURE_ADDRESS_WRAP;
+            }
         }
 
         void validate_fixed_function_op(
