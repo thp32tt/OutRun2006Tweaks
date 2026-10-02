@@ -862,6 +862,25 @@ def main() -> int:
     assert r194_stage["resultArg"] == 0x00000001
     assert r194_arg0["NativeDrawPathActivationAllowed"] is False
 
+    r197_stage_constant = run_case(
+        "VR DX11 R72 signature#10: primitive=4 fixedFn=1\n"
+        "VR DX11 R197 ffp signature#10 stage#3: "
+        "color[op=2,arg0=0x00000001,arg1=0x00000006,arg2=0x00000001] "
+        "alpha[op=2,arg0=0x00000001,arg1=0x00000006,arg2=0x00000001] "
+        "constant=0x80402010 resultArg=0x00000001 "
+        "texCoord=0x00000003 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+    )
+    assert r197_stage_constant["SourceLogs"] == ["OutRun2006Tweaks.log"]
+    assert r197_stage_constant["UniqueSignaturesCaptured"] == 1
+    r197_stage = r197_stage_constant["Signatures"][0]["fixed_function_stages"][0]
+    assert r197_stage["stage"] == 3
+    assert r197_stage["stageConstant"] == 0x80402010
+    assert r197_stage["stageConstant_hex"] == "0x80402010"
+    assert r197_stage["colorArg1"] == 0x00000006
+    assert r197_stage["alphaArg1"] == 0x00000006
+    assert r197_stage_constant["NativeDrawPathActivationAllowed"] is False
+
     r191_texture_factor = run_case(
         "VR DX11 R72 signature#7: primitive=4 fixedFn=1\n"
         "VR DX11 R191 ffp texture-factor state#7: observed=1 argb=0x80402010\n"
@@ -876,7 +895,7 @@ def main() -> int:
     }
     assert r191_texture_factor["NativeDrawPathActivationAllowed"] is False
 
-    print("DX11 census analyzer regression R120/SRC1/R191/R194 exhaustive-mode: PASS")
+    print("DX11 census analyzer regression R120/SRC1/R191/R194/R197 exhaustive-mode: PASS")
     return 0
 
 
