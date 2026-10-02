@@ -77,6 +77,13 @@ int main()
         depth.render_target_view() || !depth.descriptor_exact(device.Get()))
         return fail("depth surface mirror readiness/descriptor drift");
 
+    if (color.descriptor_exact(nullptr) || depth.descriptor_exact(nullptr))
+        return fail("surface descriptor validation accepted null device");
+    color.shutdown();
+    if (color.ready() || color.texture() || color.render_target_view() ||
+        color.depth_stencil_view() || color.mirror_generation() != 0)
+        return fail("surface mirror shutdown retained GPU ownership");
+
     NativeSurfaceMirror invalidPool;
     if (invalidPool.initialize(
             device.Get(),

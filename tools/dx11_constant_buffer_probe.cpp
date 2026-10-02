@@ -18,7 +18,6 @@ namespace
     using outrun::vr::dx11::NativeFixedFunctionSamplerState;
     using outrun::vr::dx11::NativeFixedFunctionTextureView;
     using outrun::vr::dx11::NativeFixedFunctionTransformBuffer;
-    using outrun::vr::dx11::NativeDeviceSurfaceMirror;
     using outrun::vr::dx11::NativeManagedBufferShadow;
     using outrun::vr::dx11::NativeManagedTextureRegistry;
     using outrun::vr::dx11::NativeManagedTextureShadow;
@@ -524,105 +523,6 @@ int main()
     require(
         dynamicTextureView.upload_generation() == 2,
         "R101 upload generation must advance monotonically");
-
-    NativeDeviceSurfaceMirror colorSurface;
-    require(
-        colorSurface.initialize(
-            ResourceRole::Color,
-            D3DFMT_A8R8G8B8,
-            64,
-            32,
-            D3DUSAGE_RENDERTARGET),
-        "R114 color render-target metadata initialize");
-    require(
-        colorSurface.ready() &&
-        !colorSurface.mirror_ready() &&
-        colorSurface.device_generation() == 1 &&
-        colorSurface.mirror_generation() == 0,
-        "R114 color surface starts generation-valid without GPU mirror");
-    require(
-        colorSurface.recreate(d3d.device) &&
-        colorSurface.mirror_ready() &&
-        colorSurface.descriptor_exact(d3d.device) &&
-        colorSurface.mirror_rtv() != nullptr &&
-        colorSurface.mirror_dsv() == nullptr &&
-        colorSurface.mirror_generation() == colorSurface.device_generation(),
-        "R114 color render-target mirror recreation");
-
-    D3D11_TEXTURE2D_DESC colorSurfaceDesc{};
-    colorSurface.mirror_texture()->GetDesc(&colorSurfaceDesc);
-    require(
-        colorSurfaceDesc.Width == 64 &&
-        colorSurfaceDesc.Height == 32 &&
-        colorSurfaceDesc.MipLevels == 1 &&
-        colorSurfaceDesc.ArraySize == 1 &&
-        colorSurfaceDesc.Format == DXGI_FORMAT_B8G8R8A8_UNORM &&
-        colorSurfaceDesc.SampleDesc.Count == 1 &&
-        colorSurfaceDesc.BindFlags == D3D11_BIND_RENDER_TARGET,
-        "R114 color render-target descriptor contract");
-
-    colorSurface.observe_device_reset();
-    require(
-        colorSurface.device_generation() == 2 &&
-        !colorSurface.mirror_ready() &&
-        colorSurface.mirror_texture() == nullptr &&
-        colorSurface.mirror_rtv() == nullptr,
-        "R114 Reset invalidates generation-bound color surface");
-    require(
-        colorSurface.recreate(d3d.device) &&
-        colorSurface.mirror_ready() &&
-        colorSurface.mirror_generation() == 2 &&
-        colorSurface.descriptor_exact(d3d.device),
-        "R114 post-Reset color surface uses current generation");
-
-    NativeDeviceSurfaceMirror depthSurface;
-    require(
-        depthSurface.initialize(
-            ResourceRole::DepthStencil,
-            D3DFMT_D24S8,
-            64,
-            32,
-            D3DUSAGE_DEPTHSTENCIL) &&
-        depthSurface.recreate(d3d.device) &&
-        depthSurface.mirror_ready() &&
-        depthSurface.descriptor_exact(d3d.device) &&
-        depthSurface.mirror_rtv() == nullptr &&
-        depthSurface.mirror_dsv() != nullptr,
-        "R114 depth-stencil mirror recreation");
-
-    D3D11_TEXTURE2D_DESC depthSurfaceDesc{};
-    depthSurface.mirror_texture()->GetDesc(&depthSurfaceDesc);
-    require(
-        depthSurfaceDesc.Format == DXGI_FORMAT_D24_UNORM_S8_UINT &&
-        depthSurfaceDesc.BindFlags == D3D11_BIND_DEPTH_STENCIL &&
-        depthSurfaceDesc.SampleDesc.Count == 1,
-        "R114 depth-stencil descriptor contract");
-
-    NativeDeviceSurfaceMirror invalidSurface;
-    require(
-        !invalidSurface.initialize(
-            ResourceRole::Texture,
-            D3DFMT_A8R8G8B8,
-            64,
-            32,
-            0),
-        "R114 non-surface role must fail closed");
-    require(
-        !invalidSurface.initialize(
-            ResourceRole::Color,
-            D3DFMT_A8R8G8B8,
-            64,
-            32,
-            0),
-        "R114 color surface without RENDERTARGET usage must fail closed");
-    require(
-        !invalidSurface.initialize(
-            ResourceRole::DepthStencil,
-            D3DFMT_A8R8G8B8,
-            64,
-            32,
-            D3DUSAGE_DEPTHSTENCIL),
-        "R114 color format on depth role must fail closed");
 
     NativeManagedBufferShadow managedVertexBuffer;
     require(

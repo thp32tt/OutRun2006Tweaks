@@ -9,7 +9,7 @@
 
 namespace outrun::vr::dx11
 {
-    // Dormant R115 owner for DEFAULT-pool D3D9 render-target/depth-stencil
+    // Dormant R118 owner for DEFAULT-pool D3D9 render-target/depth-stencil
     // surfaces. The mirror is generation-bound: a successful D3D9 Reset
     // invalidates the D3D11 Texture2D/view and requires explicit recreation.
     // This class does not bind a native draw path.

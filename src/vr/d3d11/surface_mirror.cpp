@@ -125,7 +125,12 @@ namespace outrun::vr::dx11
         rtv_ = std::move(rtv);
         dsv_ = std::move(dsv);
         mirror_generation_ = device_generation_;
-        return descriptor_exact(device);
+        if (!descriptor_exact(device))
+        {
+            release_mirror();
+            return false;
+        }
+        return true;
     }
 
     bool NativeSurfaceMirror::ready() const noexcept
@@ -162,9 +167,9 @@ namespace outrun::vr::dx11
             textureDesc.Format != format.format ||
             textureDesc.SampleDesc.Count != 1 ||
             textureDesc.SampleDesc.Quality != 0 ||
-            textureDesc.Usage != D3D11_USAGE_DEFAULT ||
+            textureDesc.Usage != behavior.usage ||
             textureDesc.BindFlags != behavior.bindFlags ||
-            textureDesc.CPUAccessFlags != 0 ||
+            textureDesc.CPUAccessFlags != behavior.cpuAccessFlags ||
             textureDesc.MiscFlags != 0)
             return false;
 
@@ -173,18 +178,25 @@ namespace outrun::vr::dx11
         if (!textureDevice || textureDevice.Get() != expectedDevice)
             return false;
 
+        Microsoft::WRL::ComPtr<ID3D11Resource> viewResource;
         if (role_ == ResourceRole::Color)
         {
             D3D11_RENDER_TARGET_VIEW_DESC viewDesc{};
             rtv_->GetDesc(&viewDesc);
-            return viewDesc.Format == format.format &&
+            rtv_->GetResource(viewResource.ReleaseAndGetAddressOf());
+            return viewResource &&
+                viewResource.Get() == texture_.Get() &&
+                viewDesc.Format == format.format &&
                 viewDesc.ViewDimension == D3D11_RTV_DIMENSION_TEXTURE2D &&
                 viewDesc.Texture2D.MipSlice == 0;
         }
 
         D3D11_DEPTH_STENCIL_VIEW_DESC viewDesc{};
         dsv_->GetDesc(&viewDesc);
-        return viewDesc.Format == format.format &&
+        dsv_->GetResource(viewResource.ReleaseAndGetAddressOf());
+        return viewResource &&
+            viewResource.Get() == texture_.Get() &&
+            viewDesc.Format == format.format &&
             viewDesc.ViewDimension == D3D11_DSV_DIMENSION_TEXTURE2D &&
             viewDesc.Flags == 0 &&
             viewDesc.Texture2D.MipSlice == 0;
