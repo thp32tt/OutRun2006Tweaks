@@ -28,8 +28,10 @@ from .core import (
     prepare_outgoing_message,
     GITHUB_TOOL_RECOVERY_MESSAGE,
     LOCALIZATION_QUEUE_RECOVERY_MESSAGE,
+    LOCALIZATION_BINARY_RECOVERY_MESSAGE,
     github_tool_unavailable_response,
     github_read_limit_response,
+    localization_binary_blocker_response,
     retry_surface_has_platform_error,
     reconcile_state,
     record_completed,
@@ -789,7 +791,9 @@ class Controller:
             return
 
         baseline = stable_hash(await last_assistant_text(page))
-        if job.get("github_read_limit_retry_same_chat"):
+        if job.get("localization_binary_retry_same_chat"):
+            prompt = LOCALIZATION_BINARY_RECOVERY_MESSAGE
+        elif job.get("github_read_limit_retry_same_chat"):
             prompt = LOCALIZATION_QUEUE_RECOVERY_MESSAGE
         elif job.get("github_tool_retry_same_chat"):
             prompt = GITHUB_TOOL_RECOVERY_MESSAGE
@@ -832,6 +836,7 @@ class Controller:
         job["force_full_prompt"] = False
         job["github_tool_retry_same_chat"] = False
         job["github_read_limit_retry_same_chat"] = False
+        job["localization_binary_retry_same_chat"] = False
 
         chat_url = await wait_for_chat_url(page)
         if chat_url:
@@ -912,6 +917,30 @@ class Controller:
 
         github_unavailable = github_tool_unavailable_response(text)
         github_read_limited = github_read_limit_response(text)
+        localization_binary_blocked = localization_binary_blocker_response(text)
+
+        if localization_binary_blocked and lane["role"] == "localization_producer":
+            attempts = int(job.get("localization_binary_recovery_attempts", 0) or 0) + 1
+            job["localization_binary_recovery_attempts"] = attempts
+            job["localization_binary_retry_same_chat"] = True
+            job["status"] = "READY"
+            job["next_send_at"] = (
+                datetime.now(TZ) + timedelta(seconds=SAME_CHAT_CONTINUATION_GAP_SECONDS)
+            ).isoformat()
+            job["baseline_assistant_hash"] = None
+            job["response_hash"] = None
+            job["response_last_changed_at"] = None
+            job["verify_started_at"] = None
+            lane["last_result"] = f"binary_source_server_side_retry:{attempts}"
+            save_state(self.state)
+            write_runtime(
+                status="localization_binary_recovery",
+                last_action=(
+                    f"{lane['name']} {job['job_id']} binary-source attempt {attempts}; "
+                    "retry same chat with server-side GitHub Actions instruction"
+                ),
+            )
+            return
 
         if github_read_limited and lane["role"] == "localization_producer":
             attempts = int(job.get("github_read_limit_recovery_attempts", 0) or 0) + 1

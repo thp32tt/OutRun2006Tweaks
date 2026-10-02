@@ -17,6 +17,19 @@ LOCALIZATION_QUEUE_RECOVERY_MESSAGE = (
     "shard(index % 3)를 판정하고 필요한 다음 범위를 계속 조회한 뒤, 같은 JOB_ID로 runnable "
     "asset을 확정해서 DDS 생성, 검증, material commit까지 끝내."
 )
+LOCALIZATION_BINARY_RECOVERY_MESSAGE = (
+    "계속 진행해. GitHub 연결은 정상이며 지금 문제는 DDS 바이너리를 UTF-8/text API로 직접 "
+    "읽으려 한 접근 방식이다. 바이너리 payload를 채팅으로 읽지 못하는 것은 파일 부재나 작업 "
+    "불가가 아니다. 같은 바이너리 조회를 반복하지 말고 현재 branch에서 선택 asset 이름/경로를 "
+    "기준으로 기존 GitHub Actions workflow, 생성 스크립트, QA/rework artifact를 먼저 찾는다. "
+    "GitHub Actions가 checkout 또는 pinned release/archive에서 canonical source DDS를 서버측으로 "
+    "읽고 기존 deterministic renderer/rework script를 실행하게 하라. 필요한 경우 같은 JOB_ID용 "
+    "작은 text dispatch/request와 lane-safe workflow를 만들고 Actions 결과를 확인해서 최종 "
+    "localization/graphics/hd_candidates/...dds material commit [AUTO:<JOB_ID>]까지 끝낸다. "
+    "특히 index222/DDF0392A는 current branch의 .github/workflows/localization-a00221-ddf0392a.yml "
+    "및 연결된 generate_index222 parts를 기존 증거로 확인하고, 현재 canonical translation과 "
+    "현재 JOB_ID에 맞게 재사용/적응한다. 'binary payload를 확보할 수 없음'으로 응답을 끝내지 마."
+)
 
 
 def prepare_outgoing_message(message: str) -> str:
@@ -48,6 +61,21 @@ GITHUB_READ_LIMIT_PATTERNS = [
 def github_read_limit_response(text: str) -> bool:
     sample = (text or "").lower()
     return any(re.search(pattern, sample, flags=re.I | re.S) for pattern in GITHUB_READ_LIMIT_PATTERNS)
+
+
+LOCALIZATION_BINARY_BLOCKER_PATTERNS = [
+    r"(?:github|git허브|깃허브).{0,160}(?:text api|텍스트 api|utf-?8).{0,220}(?:binary|바이너리|dds).{0,220}(?:읽|read|access|접근|payload|bytes|바이트|확보).{0,120}(?:못|불가|없|cannot|unavailable|failed)",
+    r"(?:binary|바이너리|dds).{0,180}(?:payload|bytes|바이트|원본).{0,220}(?:직접 읽|읽을 수 없|확보되지|접근할 수 없|cannot read|cannot access|unavailable|not available)",
+    r"(?:원본|source).{0,80}dds.{0,180}(?:payload|bytes|바이트|입력).{0,180}(?:확보되지|없|불가|cannot|unavailable)",
+]
+
+
+def localization_binary_blocker_response(text: str) -> bool:
+    sample = (text or "").lower()
+    return any(
+        re.search(pattern, sample, flags=re.I | re.S)
+        for pattern in LOCALIZATION_BINARY_BLOCKER_PATTERNS
+    )
 
 
 RETRY_ERROR_PATTERNS = [

@@ -18,6 +18,15 @@ GitHub read-size/truncation is not a blocker and must never end the job. If asse
 
 Producer jobs do not edit shared progress/resume/WORKLOG reconciliation. C owns shared QA reconciliation.
 
+Binary source access rule:
+- GitHub connector text fetches may reject a valid DDS as non-UTF-8, return an empty text payload, or expose only blob/path metadata. That is expected for binary data and is not proof that the DDS is missing.
+- Never end a producer job with "binary DDS payload cannot be read", "text API cannot access the DDS", or equivalent. Do not repeatedly call the same text/blob fetch expecting raw DDS bytes.
+- Search the current branch for existing asset-specific workflows, deterministic generation/rework scripts, and prior QA artifacts using the asset hash/path. Reuse proven server-side production paths before inventing a new one.
+- Run binary-dependent work server-side in GitHub Actions: checkout the branch or fetch the pinned canonical archive/release, verify the source checksum, run the deterministic renderer/rework script, validate the resulting DDS, and create the material AUTO commit.
+- A small UTF-8 dispatch/request file may be committed to trigger an existing or lane-safe new workflow. The request/status commit itself is not job completion; only the resulting candidate DDS material commit is completion.
+- For index222 / DDF0392A specifically, inspect and reuse/adapt current-branch .github/workflows/localization-a00221-ddf0392a.yml and its generate_index222 parts. Update behavior to current canonical translation rules and the current JOB_ID; do not fall back to the obsolete translated song-title candidate.
+- If no asset-specific workflow exists, create a minimal lane-safe GitHub Action that performs the binary read/render/validation on the runner, then continue the SAME JOB_ID through the resulting material commit.
+
 Binary DDS transport rule:
 - Do not end the job because a DDS/base64 payload is too large for one GitHub connector call.
 - The target branch contains \`.github/workflows/localization-binary-import-v05.yml\` specifically for this case.

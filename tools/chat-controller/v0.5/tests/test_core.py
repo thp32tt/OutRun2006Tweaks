@@ -15,9 +15,11 @@ from app.core import (
     GITHUB_CONNECTION_FIRST_LINE,
     GITHUB_TOOL_RECOVERY_MESSAGE,
     LOCALIZATION_QUEUE_RECOVERY_MESSAGE,
+    LOCALIZATION_BINARY_RECOVERY_MESSAGE,
     prepare_outgoing_message,
     github_tool_unavailable_response,
     github_read_limit_response,
+    localization_binary_blocker_response,
     retry_surface_has_platform_error,
     reconcile_state,
     select_qa_batch,
@@ -143,6 +145,31 @@ class CoreTests(unittest.TestCase):
                 "asset_queue.csv 전체를 확인했고 runnable asset 222를 선택했습니다."
             )
         )
+
+
+    def test_detects_localization_binary_source_blocker(self):
+        sample = (
+            "GitHub 연결: OK. 현재 GitHub 텍스트 API 범위에서는 해당 바이너리 DDS payload를 "
+            "직접 읽어 생성·검증할 수 있는 입력이 확보되지 않았습니다."
+        )
+        self.assertTrue(localization_binary_blocker_response(sample))
+        self.assertTrue(
+            localization_binary_blocker_response(
+                "원본 DDS binary payload를 읽을 수 없어 작업을 진행할 수 없습니다."
+            )
+        )
+        self.assertFalse(
+            localization_binary_blocker_response(
+                "GitHub Actions에서 DDS를 생성했고 material commit까지 완료했습니다."
+            )
+        )
+
+    def test_binary_recovery_message_forces_server_side_action(self):
+        rendered = prepare_outgoing_message(LOCALIZATION_BINARY_RECOVERY_MESSAGE)
+        self.assertEqual(rendered.splitlines()[0], GITHUB_CONNECTION_FIRST_LINE)
+        self.assertIn("GitHub Actions", rendered)
+        self.assertIn("DDF0392A", rendered)
+        self.assertIn("같은 JOB", rendered)
 
     def test_retry_button_requires_real_platform_error(self):
         self.assertFalse(retry_surface_has_platform_error("Retry this task when GitHub is ready"))
