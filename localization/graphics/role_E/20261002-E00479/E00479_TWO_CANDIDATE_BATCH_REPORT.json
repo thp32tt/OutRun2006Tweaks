@@ -1,0 +1,110 @@
+{
+  "schema_version": 43,
+  "schema": "outrun-e00479-two-candidate-material-report-v43",
+  "task_id": "LOCALIZATION-LOCALIZATION_E-00479",
+  "lane": "LOCALIZATION_E",
+  "role": "PRODUCER_E",
+  "target_branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-10-02T12:35:34+09:00",
+  "base_head_sha": "f8e788b213dadd83a79c0b440155d52f1702284f",
+  "controller_schema_version": 43,
+  "controller_config_blob_sha": "e6cc40a12511f7d9a0cd09b1da49acc1b7c2c648",
+  "fingerprints": {
+    "canonical_contract_blob_sha": "fa805264375e45ebd99731b88f532ff953bd02f7",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+    "resume_state_blob_sha": "13c468ebf5c9cf5d72e451fe86bc16a1f62cfdc0"
+  },
+  "shard_rule": "asset_queue.index % 3 == 2",
+  "source_bundle": {
+    "name": "OR2-HD-GUI-v0.25.10a.zip",
+    "bytes": 306223257,
+    "sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "identity": "PASS_EXACT_PINNED_CONTRACT_BUNDLE",
+    "use": "READ_ONLY_CANONICAL_SOURCE"
+  },
+  "material_deliverable": {
+    "type": "TWO_NEW_V2_KOREAN_DDS_CANDIDATES",
+    "candidate_count": 2,
+    "assets": [
+      {
+        "queue_index": 128,
+        "asset_id": "12519155",
+        "source_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
+        "source_sha256": "ad88efc25b705be8960f373f8a06ea88ce39f086857e68c851595f7c867c14c3",
+        "source_canvas": [
+          1024,
+          1024
+        ],
+        "candidate_sha256": "bf65dc0c89a727961a15155d9b17d15df73e56f6f2e11bd069f6131439c5befa",
+        "candidate_bytes": 4194432,
+        "raw_orientation": "flip_y",
+        "typography_family": "course_name_compact_125",
+        "family_font_size_px": 48,
+        "qa": {
+          "prompt_contract": "outrun-first-pass-edit-v2",
+          "signed_slant_gate": "PASS",
+          "changed_pixels_outside_safe_bboxes": 0,
+          "changed_pixels_in_protected_mask": 0,
+          "alpha_changed_outside_exact_source_bboxes": 0,
+          "one_pixel_overflow_count": 0,
+          "dds_header_128_identical": true,
+          "dds_roundtrip_pixel_exact": true
+        }
+      },
+      {
+        "queue_index": 143,
+        "asset_id": "34923C8A",
+        "source_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/34923C8A_512x128.dds",
+        "source_sha256": "e1461c131037d9cd347fb59af5208b55eaf621dce2edc42e752f66a040676c7c",
+        "source_canvas": [
+          2048,
+          512
+        ],
+        "candidate_sha256": "1a9cb44b224a5d6cd3b4beea7a3278312fe831ed167e5c90a86d18a6dc5e9181",
+        "candidate_bytes": 4194432,
+        "raw_orientation": "flip_y",
+        "typography_family": "front_end_heading_34923",
+        "family_font_size_px": 116,
+        "qa": {
+          "prompt_contract": "outrun-first-pass-edit-v2",
+          "signed_slant_gate": "PASS",
+          "changed_pixels_outside_safe_bboxes": 0,
+          "changed_pixels_in_protected_mask": 0,
+          "alpha_changed_outside_exact_source_bboxes": 0,
+          "one_pixel_overflow_count": 0,
+          "dds_header_128_identical": true,
+          "dds_roundtrip_pixel_exact": true
+        }
+      }
+    ],
+    "storage": {
+      "policy": "GOOGLE_DRIVE_LARGE_BINARY_CURRENT_PIPELINE_WITH_GITHUB_METADATA",
+      "folder_id": "1j1it5m50jNACRbwxEDAvcH0pTI3sFsNZ",
+      "bundle_file_id": "16jgEBv7EAq-1zrp4mHqJFa3Zk_v0_e0k",
+      "bundle_name": "E00479_candidate_bundle_v2.zip",
+      "bundle_sha256": "ac65ac451e31b46f59285e5b40037d6ab6639c1b471f6cb80dbf78ccae9bbe9c",
+      "bundle_bytes": 353629,
+      "prior_upload_file_id": "18d5RP-KCTMIksJVKKE64QLB2RCpWjR_F",
+      "prior_upload_state": "SUPERSEDED_BY_V2"
+    },
+    "review_set_per_asset": [
+      "source_display.png",
+      "clean_plate_display.png",
+      "candidate_display.png",
+      "comparison.png",
+      "generation_prompt.json",
+      "clean_plate_qa.json",
+      "qa_report.json",
+      "removal_mask_display.png"
+    ]
+  },
+  "producer_pre_gate": "PASS",
+  "self_qa": "PASS_E_MOD3_TWO_NEW_V2_CANDIDATES__EXACT_PINNED_SOURCE__FLIP_Y_PRESERVED__2PX_SAFE_BBOX__ZERO_OUTSIDE__ZERO_PROTECTED__ZERO_ALPHA_OUTSIDE__ZERO_1PX_OVERFLOW__HEADER_EXACT__ROUNDTRIP_EXACT__RUNTIME_UNTESTED",
+  "c_static_qa": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "vr_ffb_dx_changes": false
+}

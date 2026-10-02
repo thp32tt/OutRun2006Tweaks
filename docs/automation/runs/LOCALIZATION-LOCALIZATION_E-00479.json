@@ -1,0 +1,92 @@
+{
+  "schema_version": 43,
+  "schema": "outrun-producer-e00479-continuous-two-candidate-result-v43",
+  "task_id": "LOCALIZATION-LOCALIZATION_E-00479",
+  "lane": "LOCALIZATION_E",
+  "role": "PRODUCER_E",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 8,
+  "recorded_at_kst": "2026-10-02T12:35:34+09:00",
+  "incoming_controller_schema_version": 43,
+  "incoming_controller_config_blob_sha": "e6cc40a12511f7d9a0cd09b1da49acc1b7c2c648",
+  "applied_controller_schema_version": 43,
+  "applied_controller_config_blob_sha": "e6cc40a12511f7d9a0cd09b1da49acc1b7c2c648",
+  "canonical_contract_blob_sha": "fa805264375e45ebd99731b88f532ff953bd02f7",
+  "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+  "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+  "inventory_blob_sha": "5a3d3b09d97063c65e2b2e356a20878e4c0a83df",
+  "resume_state_blob_sha": "13c468ebf5c9cf5d72e451fe86bc16a1f62cfdc0",
+  "base_head_sha": "f8e788b213dadd83a79c0b440155d52f1702284f",
+  "policy_resolution": {
+    "resolution": "CURRENT_HEAD_SCHEMA43_APPLIED",
+    "stable_shard_rule": "asset_queue.index % 3 == 2",
+    "active_task_latch": true,
+    "controller_stage": "WAIT_MATERIAL_COMMIT",
+    "candidate_batch_target": 2,
+    "final_artwork_convergence": true,
+    "work_steal_allowed": false
+  },
+  "selection": {
+    "selected_indices": [
+      128,
+      143
+    ],
+    "selected_assets": [
+      "12519155",
+      "34923C8A"
+    ],
+    "selection_basis": "Fresh E-shard execution used the exact pinned HD archive supplied in-session; both selected E-owned unfinished RGBA assets matched canonical inventory SHA/canvas exactly and supported exact-header deterministic v2 candidate production without reusing historical Korean candidate pixels.",
+    "candidate_dds_completed": 2,
+    "candidate_batch_target": 2,
+    "source_probe_repeated": false,
+    "work_stolen_from_lane": null
+  },
+  "result": "PASS_MATERIAL_E_MOD3_TWO_NEW_V2_CANDIDATES_PENDING_C_RUNTIME_UNTESTED",
+  "summary": "Produced two new E-owned Korean DDS candidates from exact pinned English HD source bytes: index128/12519155 and index143/34923C8A. Both preserve raw flip_y orientation and exact 128-byte DDS headers, pass local v2 2px safe-bbox containment with zero outside/protected/alpha violations and exact DDS round-trip, and include source/clean/candidate/comparison/prompt/clean-plate-QA/self-QA evidence in the current-pipeline Drive bundle. No real-game test was performed.",
+  "material_deliverable": {
+    "type": "TWO_NEW_V2_KOREAN_DDS_CANDIDATES",
+    "candidate_dds_modified": true,
+    "candidate_binary_persisted": true,
+    "candidate_storage": "GOOGLE_DRIVE_CURRENT_PIPELINE",
+    "drive_folder_id": "1j1it5m50jNACRbwxEDAvcH0pTI3sFsNZ",
+    "drive_bundle_file_id": "16jgEBv7EAq-1zrp4mHqJFa3Zk_v0_e0k",
+    "drive_bundle_sha256": "ac65ac451e31b46f59285e5b40037d6ab6639c1b471f6cb80dbf78ccae9bbe9c",
+    "report_path": "localization/graphics/role_E/20261002-E00479/E00479_TWO_CANDIDATE_BATCH_REPORT.json",
+    "candidate_sha256": {
+      "128/12519155": "bf65dc0c89a727961a15155d9b17d15df73e56f6f2e11bd069f6131439c5befa",
+      "143/34923C8A": "1a9cb44b224a5d6cd3b4beea7a3278312fe831ed167e5c90a86d18a6dc5e9181"
+    },
+    "materially_reduces_unresolved_work": true
+  },
+  "evidence": [
+    "localization/graphics/role_E/20261002-E00479/E00479_TWO_CANDIDATE_BATCH_REPORT.json",
+    "Drive file 16jgEBv7EAq-1zrp4mHqJFa3Zk_v0_e0k / E00479_candidate_bundle_v2.zip"
+  ],
+  "producer_pre_gate": "PASS",
+  "self_qa": "PASS_MOD3_E_128_143__EXACT_PINNED_BUNDLE_AND_INVENTORY_SOURCE__NO_HISTORICAL_KOREAN_PIXEL_LINEAGE__V2_SAFE_FIT__TYPOGRAPHY_FAMILY_LOCK__ZERO_1PX_OVERFLOW__EXACT_HEADER__ROUNDTRIP_EXACT__RUNTIME_UNTESTED",
+  "candidate_dds_modified": true,
+  "candidate_binary_persisted": true,
+  "shared_state_modified": false,
+  "peer_lane_files_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": true,
+  "uploaded_archive_used": true,
+  "uploaded_archive_identity_verified_against_contract": true,
+  "gpt_library_used_as_source_or_ssot": false,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "retry_required": false,
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_binding_state": "PENDING_IMMUTABLE_RESULT_SHA_BOOKKEEPING",
+  "result_commit_message": "localization(E): produce indices128/143 v2 candidates [AUTO:LOCALIZATION-LOCALIZATION_E-00479]",
+  "durable_task_record_in_result_commit": true
+}
