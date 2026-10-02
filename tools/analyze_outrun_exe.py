@@ -2341,6 +2341,12 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_37_BRANCHES = (
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_37_CALLS = (
     (0x00182B96, 0x00189D5D),
 )
+# The raw byte scanner also sees the 0xE8 displacement byte inside
+# "mov esp, [ebp-0x18]" at 0x182BA3. Keep that candidate visible, but prove
+# it is not an instruction boundary instead of promoting it to a CALL.
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_37_RAW_NONCALL_CANDIDATES = (
+    (0x00182BA5, 0x0014792D),
+)
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_37_INSTRUCTIONS = (
     (0x00182B96, "e8 c2 71 00 00", "call 0x189d5d"),
     (0x00182B9B, "59", "pop ecx"),
@@ -12499,6 +12505,8 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_31_prefix_pro
         "calls_match": calls_match,
         "raw_call_census_matches": raw_call_census_matches,
         "raw_call_candidates": provenance["raw_outbound_rel32_candidates"],
+        "raw_noncall_candidates": sorted(observed_raw_noncalls),
+        "raw_noncall_candidates_match": raw_noncall_candidates_match,
         "predecessor_target_contract": predecessor_target_contract,
         "resolved_predecessor_targets": resolved_predecessor_targets,
         "resolved_predecessor_targets_on_boundaries": resolved_predecessor_targets_on_boundaries,
@@ -13753,11 +13761,25 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_37_prefix_pro
         calls_match = calls_match and matches
 
     expected_raw_calls = set(GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_37_CALLS)
+    expected_raw_noncalls = set(
+        GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_37_RAW_NONCALL_CANDIDATES
+    )
     observed_raw_calls = {
         (item["call_rva"], item["target_rva"])
         for item in provenance["raw_outbound_rel32_candidates"]
     }
-    raw_call_census_matches = observed_raw_calls == expected_raw_calls
+    observed_instruction_calls = {
+        item for item in observed_raw_calls if item[0] in instruction_starts
+    }
+    observed_raw_noncalls = observed_raw_calls - observed_instruction_calls
+    raw_noncall_candidates_match = (
+        observed_raw_noncalls == expected_raw_noncalls
+        and all(rva not in instruction_starts for rva, _ in observed_raw_noncalls)
+    )
+    raw_call_census_matches = (
+        observed_instruction_calls == expected_raw_calls
+        and raw_noncall_candidates_match
+    )
 
     predecessor_boundaries = {
         row["rva"]
@@ -17488,6 +17510,8 @@ def main() -> int:
         f"calls={helper_1_third_cont_37_calls} "
         f"calls_match={helper_1_third_cont_37_proof['calls_match']} "
         f"raw_call_census={helper_1_third_cont_37_proof['raw_call_census_matches']} "
+        f"raw_noncall_census={helper_1_third_cont_37_proof['raw_noncall_candidates_match']} "
+        f"raw_noncalls={helper_1_third_cont_37_proof['raw_noncall_candidates']} "
         f"predecessor_target_contract={helper_1_third_cont_37_proof['predecessor_target_contract']} "
         f"backward_target=0x{helper_1_third_cont_37_proof['backward_target_rva']:08X}:"
         f"boundary={helper_1_third_cont_37_proof['backward_target_is_predecessor_boundary']} "
