@@ -4867,7 +4867,7 @@ def main() -> None:
             "R141 positive WARP live-binding proof",
         ),
         (
-            "R141 live generated fan IA topology drift fails closed",
+            "R141 live generated fan IA binding fails closed after topology drift",
             TRIANGLE_FAN_INDEX_BUFFER_PROBE,
             "R141 topology-drift fail-closed proof",
         ),
@@ -4875,6 +4875,16 @@ def main() -> None:
             "R141 generated fan IA binding restores deterministic snapshot",
             TRIANGLE_FAN_INDEX_BUFFER_PROBE,
             "R141 deterministic live-binding restore proof",
+        ),
+        (
+            "R141 live generated fan IA binding rejects index offset drift",
+            TRIANGLE_FAN_INDEX_BUFFER_PROBE,
+            "R141 index-offset drift fail-closed proof",
+        ),
+        (
+            "R141 live generated fan IA binding rejects index format drift",
+            TRIANGLE_FAN_INDEX_BUFFER_PROBE,
+            "R141 index-format drift fail-closed proof",
         ),
     ]
     missing_r141_triangle_fan_live_binding = [

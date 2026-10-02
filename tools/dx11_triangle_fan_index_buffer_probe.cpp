@@ -187,6 +187,51 @@ int main() {
                 context.Get(), liveFanBinding.snapshotToken),
         "R141 generated fan IA binding restores deterministic snapshot");
 
+    context->IASetIndexBuffer(
+        owner.buffer(), DXGI_FORMAT_R32_UINT, sizeof(UINT));
+    const auto offsetDriftFanBinding =
+        owner.binding_readiness(context.Get());
+    require(
+        offsetDriftFanBinding.inputValid &&
+            offsetDriftFanBinding.ownerReady &&
+            offsetDriftFanBinding.contextMatches &&
+            offsetDriftFanBinding.bufferBoundExact &&
+            offsetDriftFanBinding.formatExact &&
+            !offsetDriftFanBinding.offsetExact &&
+            offsetDriftFanBinding.topologyExact &&
+            !offsetDriftFanBinding.ready &&
+            offsetDriftFanBinding.snapshotToken == 0 &&
+            !owner.validate_binding_snapshot(
+                context.Get(), liveFanBinding.snapshotToken),
+        "R141 live generated fan IA binding rejects index offset drift");
+
+    require(
+        owner.bind(context.Get()),
+        "R141 restore generated fan IA after index offset drift");
+    context->IASetIndexBuffer(
+        owner.buffer(), DXGI_FORMAT_R16_UINT, 0u);
+    const auto formatDriftFanBinding =
+        owner.binding_readiness(context.Get());
+    require(
+        formatDriftFanBinding.inputValid &&
+            formatDriftFanBinding.ownerReady &&
+            formatDriftFanBinding.contextMatches &&
+            formatDriftFanBinding.bufferBoundExact &&
+            !formatDriftFanBinding.formatExact &&
+            formatDriftFanBinding.offsetExact &&
+            formatDriftFanBinding.topologyExact &&
+            !formatDriftFanBinding.ready &&
+            formatDriftFanBinding.snapshotToken == 0 &&
+            !owner.validate_binding_snapshot(
+                context.Get(), liveFanBinding.snapshotToken),
+        "R141 live generated fan IA binding rejects index format drift");
+
+    require(
+        owner.bind(context.Get()) &&
+            owner.validate_binding_snapshot(
+                context.Get(), liveFanBinding.snapshotToken),
+        "R141 generated fan IA format offset restore reproduces snapshot");
+
     const std::array<std::uint16_t, 7> source16{
         99u, 4u, 8u, 15u, 16u, 23u, 77u};
     const auto staleToken = nonIndexedReady.snapshotToken;
