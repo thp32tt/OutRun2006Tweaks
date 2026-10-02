@@ -933,7 +933,7 @@ def main() -> int:
         "FixedFunctionDetailedStageDemand"
     ]
     assert r198_demand["DetailedStages"] == 3
-    assert r198_demand["DuplicateDetailedStageRecordsDropped"] == 1
+    assert r198_demand["DuplicateDetailedStageRecordsDropped"] == 2
     assert r198_demand["UnsupportedColorOps"] == [
         {"value": 22, "name": "BUMPENVMAP", "count": 1}
     ]

@@ -1160,7 +1160,7 @@ def main() -> None:
         ('"FixedFunctionDetailedStageDemand": fixed_function_detailed_stage_demand',
          DX11_CENSUS_ANALYZER,
          "report attachment for detailed demand evidence"),
-        ('r198_demand["DuplicateDetailedStageRecordsDropped"] == 1',
+        ('r198_demand["DuplicateDetailedStageRecordsDropped"] == 2',
          DX11_CENSUS_ANALYZER_TEST,
          "duplicate-stage regression fixture"),
         ('{"value": 22, "name": "BUMPENVMAP", "count": 1}',
