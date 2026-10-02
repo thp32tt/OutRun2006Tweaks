@@ -34,6 +34,10 @@ namespace outrun::vr::dx11
         // interpolation. D3D9 FLAT/PHONG shade modes require separate
         // semantics and therefore remain fail-closed.
         PipelineUnsupportedShadeMode = 1u << 13,
+        // R161: native fixed-function readiness currently models the normal
+        // D3D9 clipping path only. Disabled clipping or enabled user clip
+        // planes require shader/raster semantics that are not implemented.
+        PipelineUnsupportedClipping = 1u << 14,
     };
 
     struct PipelineTranslation
