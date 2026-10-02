@@ -89,6 +89,12 @@ D3D9_RENDER_STATE_CAPTURE = (
 RUNTIME_CENSUS = (
     ROOT / "src" / "vr" / "d3d11" / "runtime_census.cpp"
 ).read_text(encoding="utf-8")
+DX11_CENSUS_ANALYZER = (
+    ROOT / "tools" / "analyze_dx11_census.py"
+).read_text(encoding="utf-8")
+DX11_CENSUS_ANALYZER_TEST = (
+    ROOT / "tools" / "test_analyze_dx11_census.py"
+).read_text(encoding="utf-8")
 CONSTANT_BUFFER_CONTRACT_TEXT = (
     CONSTANT_BUFFER_PROBE + "\n" + NATIVE_BACKEND_CPP
 )
@@ -1132,6 +1138,47 @@ def main() -> None:
         raise SystemExit(
             "DX11 R198 D3DTA_SPECULAR/COLOR1 contract drift: "
             + ", ".join(missing_r198_d3dta_specular)
+        )
+
+
+    # Detailed fixed-function demand evidence must stay coupled to the current
+    # dormant translator support set. This prevents a later semantic addition
+    # from leaving the census stale and falsely reporting a now-supported op or
+    # argument as outstanding conversion demand.
+    detailed_ffp_demand_census_contract = [
+        ("summarize_fixed_function_detailed_stage_demand(",
+         DX11_CENSUS_ANALYZER,
+         "detailed fixed-function demand summarizer"),
+        ("FFP_SUPPORTED_ARGUMENT_SELECTORS = frozenset({0, 1, 2, 3, 4, 6})",
+         DX11_CENSUS_ANALYZER,
+         "current DIFFUSE/CURRENT/TEXTURE/TFACTOR/SPECULAR/CONSTANT selector set"),
+        ("duplicate_stage_records += 1", DX11_CENSUS_ANALYZER,
+         "duplicate detailed-stage de-weighting"),
+        ('"FixedFunctionDetailedStageDemand": fixed_function_detailed_stage_demand',
+         DX11_CENSUS_ANALYZER,
+         "report attachment for detailed demand evidence"),
+        ('r198_demand["DuplicateDetailedStageRecordsDropped"] == 1',
+         DX11_CENSUS_ANALYZER_TEST,
+         "duplicate-stage regression fixture"),
+        ('{"value": 22, "name": "BUMPENVMAP", "count": 1}',
+         DX11_CENSUS_ANALYZER_TEST,
+         "unsupported color-op demand fixture"),
+        ('{"value": 5, "name": "TEMP", "count": 1}',
+         DX11_CENSUS_ANALYZER_TEST,
+         "unsupported TEMP selector/result fixture"),
+        ('r198_demand["ActivationProof"] is False',
+         DX11_CENSUS_ANALYZER_TEST,
+         "diagnostic-only activation boundary"),
+    ]
+    missing_detailed_ffp_demand_census = [
+        meaning
+        for token, source, meaning in detailed_ffp_demand_census_contract
+        if token not in source
+    ]
+    if missing_detailed_ffp_demand_census:
+        raise SystemExit(
+            "DX11 detailed fixed-function demand census contract drift: "
+            + ", ".join(missing_detailed_ffp_demand_census)
         )
 
     r200_temp_register_contract = [
