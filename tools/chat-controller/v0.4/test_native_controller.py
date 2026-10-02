@@ -511,6 +511,44 @@ class NativeControllerTests(unittest.TestCase):
         self.assertEqual(active['pipeline_candidate_count'],2)
         self.assertEqual(enqueue.call_count,2)
 
+    def test_partial_candidate_does_not_release_when_target_scan_failed(self):
+        checkpoint, _ = load_function(
+            'localization_record_producer_checkpoint',
+            localization_producer_seen_result=lambda active, sha: False,
+            producer_result_candidate_count=lambda record:1,
+            producer_result_candidate_indices=lambda record:[94],
+            producer_result_candidate_paths=lambda record:['candidate.dds'],
+            enqueue_producer_result_for_qa=Mock(return_value=True),
+            localization_qa_inflight_candidate_indices=lambda q:[94],
+            _localization_material_target_cache={},
+            localization_remaining_material_targets=lambda active:[],
+            localization_material_target_scan_succeeded=lambda active:False,
+            producer_result_claims_no_work=lambda record:False,
+            LOCALIZATION_PRODUCER_TARGET_CANDIDATES=2,
+            LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS=8,
+        )
+        active=dict(
+            task_id='LOCALIZATION-LOCALIZATION_B-00477',
+            lane='LOCALIZATION_B',
+            branch='korean-localization-clean',
+        )
+        release,reason=checkpoint(
+            {'qa_pending':[]},active,{'sha':'e'*40,'message':'candidate'},
+            {'candidate_dds_modified':True},datetime.now(timezone.utc)
+        )
+        self.assertFalse(release)
+        self.assertIn('CONTINUE_PIPELINE',reason)
+        self.assertEqual(active['pipeline_candidate_count'],1)
+
+    def test_target_routing_excludes_inflight_candidate_indices(self):
+        source=ast.get_source_segment(SOURCE, FUNCTIONS['localization_send_lane_task']) or ''
+        checkpoint_source=ast.get_source_segment(SOURCE, FUNCTIONS['localization_record_producer_checkpoint']) or ''
+        qa_source=ast.get_source_segment(SOURCE, FUNCTIONS['enqueue_producer_result_for_qa']) or ''
+        self.assertIn('controller_exclude_indices',source)
+        self.assertIn('localization_qa_inflight_candidate_indices(q)',source)
+        self.assertIn('checkpoint_candidate_indices',checkpoint_source)
+        self.assertIn('"candidate_indices"',qa_source)
+
     def test_intermediate_producer_commit_keeps_same_task_latched(self):
         finalize=Mock()
         continuation=AsyncMock(return_value=True)
