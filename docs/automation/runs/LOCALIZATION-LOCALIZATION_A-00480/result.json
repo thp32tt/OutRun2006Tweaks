@@ -1,0 +1,16 @@
+{
+  "TASK_ID": "LOCALIZATION-LOCALIZATION_A-00480",
+  "LANE": "LOCALIZATION_A",
+  "role": "A",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result": "BLOCKER_RECORDED",
+  "notes": [
+    "Read current contract and state from korean-localization-clean HEAD.",
+    "No authoritative RENDER_READY or ONE_STAGE_TO_RENDER asset was available in current inspected state.",
+    "No DDS candidate was rendered to avoid creating non-authoritative output without required source/candidate evidence."
+  ],
+  "source_policy": "canonical HD source transport remains read-only input only",
+  "lane_scope": "role_A lane-local record only"
+}
