@@ -18133,7 +18133,6 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_52_prefix_pro
 
     provenance = collect_guarded_gf_target_c_helper_1_third_callee_continuation_52_provenance(pe)
     predecessor = collect_guarded_gf_target_c_helper_1_third_callee_continuation_51_prefix_proof(pe)
-    predecessor_origin = collect_guarded_gf_target_c_helper_1_third_callee_continuation_50_prefix_proof(pe)
     expected_next = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_52_RVA
     contiguous = True
     rows: list[dict] = []
@@ -18209,15 +18208,16 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_52_prefix_pro
         and predecessor["resolved_predecessor_targets_on_boundaries"]
         and [item["rva"] for item in predecessor["resolved_predecessor_targets"]]
         == [0x00182F2D, 0x00182F32]
-        and predecessor_origin["external_targets"]
-        == [0x00182F2D, 0x00182F32, 0x00182F6A]
+        and predecessor["external_target_status"]
+        == "PREDECESSOR_FORWARD_TARGET_182F6A_REMAINS_ADDRESS_ONLY_OUTSIDE_CAPTURE"
         and provenance["overlap_matches"]
         and provenance["predecessor_overlap_matches"]
     )
     known_backward_target_contract = bool(
-        0x00182F03 in {
-            row["rva"] for row in predecessor_origin["instructions"] if row["bytes_match"]
-        }
+        predecessor["status"] == "EXACT_182F09_TO_182F45_CONTROL_FLOW_CAPTURE_EDGE_PROVEN"
+        and predecessor["predecessor_exact"]
+        and predecessor["predecessor_target_contract"]
+        and predecessor["start_completion_proven"]
     )
     predecessor_exact = bool(
         provenance["status"] == "EXACT_EXE_182F45_TO_182F85_PROVENANCE_CAPTURED"
