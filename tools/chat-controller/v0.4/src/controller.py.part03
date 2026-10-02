@@ -279,8 +279,35 @@ def localization_material_target_prompt(active: dict) -> str:
         "CONTROLLER_SELECTED_MATERIAL_TARGETS=" + " | ".join(parts)
         + "\nDO_NOT_RESCAN_WHOLE_QUEUE. Execute T1 now. If a fresh Git read proves T1 "
           "superseded/QA-pending/dependency-blocked, record that exact reason and immediately execute T2 "
-          "or the next runnable own-shard target in the same response."
+          "or the next runnable own-shard target in the same response.\n"
+          "CANONICAL_SOURCE_ACQUISITION=Git source-path absence/404 is SOURCE_TRANSPORT_MISS, not a blocker. "
+          "Acquire the exact canonical HD source per the current contract: approved Drive exact path -> "
+          "pinned v0.25.10a direct file -> verified pinned Release ZIP; verify canonical inventory identity "
+          "before pixel work. Only after all approved tiers miss may this asset become SOURCE_ACQUISITION_EXHAUSTED, "
+          "and that outcome must immediately switch to the next runnable own-shard asset.\n"
+          "CANDIDATE_DESTINATION=Do not require the original queue-path DDS to already be tracked in Git. "
+          "Persist the localized output using the current branch's canonical candidate location/metadata convention; "
+          "external large-binary storage is authoritative only when Git records its identity, SHA-256, TASK_ID/RESULT_SHA and validation state."
     )
+
+
+def localization_policy_refresh_reason(active: dict) -> Optional[str]:
+    """Return a typed reason when an in-flight localization task is using stale policy."""
+    current_schema, current_blob = localization_controller_contract_fingerprint()
+    recorded_schema = str(active.get("localization_policy_schema_version") or "").strip()
+    recorded_blob = str(active.get("localization_policy_config_blob_sha") or "").strip()
+    if not recorded_schema or not recorded_blob:
+        return (
+            "CONTROLLER_POLICY_FINGERPRINT_MISSING:"
+            f"current_schema={current_schema};current_blob={current_blob}"
+        )
+    if recorded_schema != current_schema or recorded_blob != current_blob:
+        return (
+            "CONTROLLER_POLICY_DRIFT:"
+            f"task_schema={recorded_schema};current_schema={current_schema};"
+            f"task_blob={recorded_blob};current_blob={current_blob}"
+        )
+    return None
 
 
 def queue_rollover_prompt(active: dict) -> str:
@@ -449,6 +476,16 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     active["last_retry_backoff_at"] = None
     active["phase"] = "WAIT_CHAT"
     active["native_plugin_protocol_version"] = NATIVE_PLUGIN_PROTOCOL_VERSION
+    if CONTROLLER_MODE == "localization":
+        try:
+            schema_version, config_blob_sha = localization_controller_contract_fingerprint()
+        except Exception as exc:
+            active["localization_policy_refresh_record_error"] = repr(exc)
+        else:
+            active["localization_policy_schema_version"] = schema_version
+            active["localization_policy_config_blob_sha"] = config_blob_sha
+            active["localization_policy_refreshed_at"] = sent_at.isoformat()
+            active.pop("localization_policy_refresh_record_error", None)
     slot.last_sent_at = sent_at.isoformat()
     slot.chat_task_count = 1
     if not slot.chat_started_at:
@@ -1527,9 +1564,11 @@ async def localization_send_lane_task(
     # Localization refreshes its canonical controller policy before dispatch.
     # Conversion lanes use branch-local AGENTS/CONVERSION_LANE_STATE in the prompt,
     # so no localization policy lookup is applicable there.
+    localization_schema_version = None
+    localization_config_blob_sha = None
     if CONTROLLER_MODE == "localization":
         try:
-            localization_controller_contract_fingerprint()
+            localization_schema_version, localization_config_blob_sha = localization_controller_contract_fingerprint()
         except GitHubTransientError as e:
             write_runtime(
                 status="github_retry_wait",
@@ -1683,6 +1722,8 @@ async def localization_send_lane_task(
         "failure_context": "",
         "qa_batch": [dict(item) for item in (qa_batch or [])],
         "native_plugin_protocol_version": NATIVE_PLUGIN_PROTOCOL_VERSION,
+        "localization_policy_schema_version": localization_schema_version if CONTROLLER_MODE == "localization" else None,
+        "localization_policy_config_blob_sha": localization_config_blob_sha if CONTROLLER_MODE == "localization" else None,
         "task_latched": True if CONTROLLER_MODE in {"conversion", "localization"} else slot_name in {"A", "B", "C", "D"},
         "controller_stage": (
             "C0_RECOVER" if CONTROLLER_MODE == "conversion"
@@ -2410,6 +2451,42 @@ async def localization_process_lane(
                     active["wait_actions_started_at"] = now.isoformat()
                     active["last_gate_poll_at"] = None
                     save_queue_state(q)
+                    return
+
+            if CONTROLLER_MODE == "localization":
+                try:
+                    policy_refresh_reason = localization_policy_refresh_reason(active)
+                except GitHubTransientError as e:
+                    write_runtime(
+                        status="github_retry_wait",
+                        last_action=f"{active['task_id']}: live localization policy refresh is retrying; active TASK preserved",
+                        last_error=repr(e),
+                        queue=active,
+                    )
+                    save_queue_state(q)
+                    return
+                except Exception as e:
+                    write_runtime(
+                        status="policy_refresh_wait",
+                        last_action=f"{active['task_id']}: live localization policy fingerprint unavailable; active TASK preserved",
+                        last_error=repr(e),
+                        queue=active,
+                    )
+                    save_queue_state(q)
+                    return
+                if policy_refresh_reason:
+                    active["failure_context"] = policy_refresh_reason
+                    active["assistant_claim_verification"] = "CONTROLLER_POLICY_REFRESH_REQUIRED"
+                    active["task_latched"] = True
+                    active["terminal"] = None
+                    rolled = await queue_rollover_chat(context, pages, active, policy_refresh_reason)
+                    save_queue_state(q)
+                    if rolled:
+                        write_runtime(
+                            status="policy_refresh_rollover",
+                            last_action=f"{active['task_id']} moved to a fresh chat with the live localization schema/config; TASK_ID preserved",
+                            queue=active,
+                        )
                     return
 
             if CONTROLLER_MODE == "conversion" or lane_key == "C":
