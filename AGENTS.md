@@ -196,6 +196,21 @@ The repository has an interactive Windows self-hosted fast-build path in .github
 
 
 
+## Controller conversion TASK completion override — 2026-10-02
+
+For controller-dispatched DX11/DXVK conversion tasks, the normal task boundary is **one selected work item through the complete C0→C6 pipeline**, not one review/checkpoint.
+
+- C0 RECOVER, C1 REVIEW, C2 IMPLEMENT, C3 VALIDATE, C4 COMMIT, C5 PACKAGE (or explicit reasoned NOT_REQUIRED), and C6 STATE must all be represented in the current TASK run record before normal release.
+- C0-only recovery, C1-only review, plan/status text, state-only commits, and single checkpoint commits are nonterminal. Continue the same TASK_ID.
+- C2 requires substantive repository work outside task/state bookkeeping: source, tool, test, workflow, or disassembly-evidence implementation. If runtime hardware is unavailable, continue independent GitHub-only static/source/disassembly/CI work.
+- C3 must record validation evidence for the C2 work. Build/CI evidence is not Quest 3/VDXR runtime proof; runtime may remain UNTESTED.
+- C5 may be NOT_REQUIRED only with an explicit reason.
+- C6 must persist durable continuation state and an exact next action.
+- docs/automation/runs/<TASK_ID>.json uses conversion pipeline schema 2 and is controller completion evidence.
+- Partial C0→C6 checkpoints exist for interruption/recovery only and do not satisfy normal TASK completion.
+- After the full-pipeline result passes its exact-SHA Backend Conversion Gate, the controller should release that TASK and immediately continue with the next independent work item in the same backend lane.
+
+This branch-local override narrows the general bounded-run rule: boundedness still applies inside each stage, but it must not be used to stop normally after C0/C1 or after a bookkeeping checkpoint while independent implementation work remains.
 ## DX11 conversion-branch state override
 
 This branch is a dedicated conversion lane. Before substantial work, read `docs/CONVERSION_LANE_STATE.json` after fetching the current GitHub HEAD.
