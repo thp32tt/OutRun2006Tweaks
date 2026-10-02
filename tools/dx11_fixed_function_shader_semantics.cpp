@@ -5,6 +5,7 @@
 #include <string>
 
 #include "vr/d3d11/pipeline_translation.hpp"
+#include "vr/d3d11/state_translation.hpp"
 
 namespace
 {
@@ -325,7 +326,7 @@ int main()
              expandedIndex < static_cast<UINT>(expected.size());
              ++expandedIndex)
         {
-            UINT sourceElement = std::numeric_limits<UINT>::max();
+            UINT sourceElement = (std::numeric_limits<UINT>::max)();
             require(
                 triangle_fan_source_element(
                     3u, expandedIndex, sourceElement),
@@ -365,13 +366,13 @@ int main()
             "triangle fan short destination did not fail before writes");
         require(
             !materialize_triangle_fan_vertex_indices(
-                3u, std::numeric_limits<UINT>::max() - 3u,
+                3u, (std::numeric_limits<UINT>::max)() - 3u,
                 untouched.data(), static_cast<UINT>(untouched.size())) &&
             untouched == untouchedBefore,
             "triangle fan base-vertex overflow did not fail before writes");
         require(
             materialize_triangle_fan_vertex_indices(
-                0u, std::numeric_limits<UINT>::max(), nullptr, 0u),
+                0u, (std::numeric_limits<UINT>::max)(), nullptr, 0u),
             "zero-primitive triangle fan materialization must be empty-exact");
 
         constexpr std::array<WORD, 6> source16{
@@ -444,13 +445,13 @@ int main()
             "indexed triangle fan accepted unsupported index format");
         require(
             materialize_indexed_triangle_fan_indices(
-                0u, D3DFMT_INDEX16, std::numeric_limits<UINT>::max(),
+                0u, D3DFMT_INDEX16, (std::numeric_limits<UINT>::max)(),
                 nullptr, 0u, nullptr, 0u),
             "zero-primitive indexed triangle fan must be empty-exact");
 
         require(
             !translate_triangle_fan_expansion(
-                std::numeric_limits<UINT>::max()).exact,
+                (std::numeric_limits<UINT>::max)()).exact,
             "triangle fan expansion overflow did not fail closed");
     }
 
