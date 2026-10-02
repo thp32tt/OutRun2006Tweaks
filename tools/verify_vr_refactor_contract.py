@@ -327,6 +327,18 @@ else:
 if "R31ResetFastPathState();" not in r32:
     errors.append("R32 reset path missing R31 fast-path owner reset API")
 
+for banned, owner_api in (
+    ("R29Effect = {};", "InvalidateEffectStateCache();"),
+    ("R23LastStateSampleDrawSerial = 0;", "InvalidateLiveStateSample();"),
+    ("R23LastStateSampleEpoch = 0;", "InvalidateLiveStateSample();"),
+):
+    if banned in r32:
+        errors.append(
+            f"R32 retained lower-layer reset-state ownership: {banned}")
+    if owner_api not in r32:
+        errors.append(
+            f"R32 reset path missing lower-layer owner API: {owner_api}")
+
 for rel, source in (("R33", r33), ("R34", r34)):
     if "R31FlushPendingStateBlockResync" in source:
         errors.append(
