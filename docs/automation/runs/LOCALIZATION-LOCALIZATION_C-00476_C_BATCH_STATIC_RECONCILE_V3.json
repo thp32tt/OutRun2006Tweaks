@@ -1,0 +1,35 @@
+{
+  "schema_version": 3,
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00476",
+  "lane": "LOCALIZATION_C",
+  "target_branch": "korean-localization-clean",
+  "mode": "C_BATCH_GATE",
+  "inputs_verified": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00062",
+      "result_sha": "2579efe87a6f20d7a9c12c930dec122d125d04d8",
+      "static_result": "PASS_RECONCILE_INPUT_ACCEPTED"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
+      "result_sha": "1d0c05d29118192c5c10f40ee857fb26ae366622",
+      "static_result": "PASS_REWORK_INPUT_ACCEPTED"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00253",
+      "result_sha": "434c0169e1b34f5c9ee1bcc3952300a921361cd1",
+      "static_result": "PASS_RESULT_SHA_INPUT_ACCEPTED"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00277",
+      "result_sha": "a29d448a64014c1020a025509878a5ad5dba56c9",
+      "static_result": "PASS_REBUILD_SPEC_INPUT_ACCEPTED"
+    }
+  ],
+  "current_v2_static_reconcile": "PASS_INPUT_SET_COMPLETE",
+  "rework_required": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "ci_skip_directive": false,
+  "result": "PASS_C_BATCH_INPUTS_RECONCILED_STATIC_V2"
+}
