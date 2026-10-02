@@ -1520,6 +1520,11 @@ def main() -> None:
             "R136 copied aggregate identity drift fails closed",
         ),
         (
+            "R136 aggregate binding snapshot rejects unrequired stage-token injection",
+            CONSTANT_BUFFER_PROBE,
+            "R136 unused stage-token injection fails exact aggregate integrity",
+        ),
+        (
             "R136 aggregate binding fails closed after one required PS stage drifts",
             CONSTANT_BUFFER_PROBE,
             "R136 one-stage live drift invalidates aggregate identity",
