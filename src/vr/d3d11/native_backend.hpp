@@ -332,6 +332,23 @@ public:
     [[nodiscard]] UINT byte_width() const noexcept {
         return byte_width_;
     }
+
+    // R152 performs a bounded read-only inspection of the current MANAGED
+    // index CPU shadow. It never exposes the raw shadow pointer and never
+    // mutates/binds a D3D11 resource. The caller supplies the exact shadow
+    // version sealed by mirror_readiness so stale source contents fail closed.
+    [[nodiscard]] bool inspect_index_window(
+        D3DFORMAT sourceIndexFormat,
+        UINT byteOffset,
+        UINT indexCount,
+        UINT minVertexIndex,
+        UINT maxVertexIndex,
+        std::uint64_t expectedShadowVersion,
+        bool& allIndicesInRange,
+        UINT& observedMinIndex,
+        UINT& observedMaxIndex,
+        std::uint64_t& contentHash) const noexcept;
+
     [[nodiscard]] bool mirror_descriptor_exact(
         ID3D11Device* expectedDevice) const noexcept;
     [[nodiscard]] NativeManagedBufferMirrorReadiness mirror_readiness(
@@ -1771,6 +1788,52 @@ compose_fixed_function_indexed_direct_dispatch_readiness(
     const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
     const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    std::uint64_t snapshotToken) noexcept;
+
+// R152 closes the remaining direct-indexed source-content gap. R149/R150/R151
+// seal numeric D3D9 range arguments, the final DrawIndexed tuple and live byte
+// capacities; this layer additionally scans the exact current MANAGED index
+// shadow and proves every fetched source index lies inside the declared
+// MinVertexIndex..MinVertexIndex+NumVertices-1 range. No Draw* is issued.
+struct NativeFixedFunctionIndexedSourceContentReadiness {
+    bool inputValid{};
+    bool indexedDispatchReady{};
+    bool sourceRangeReady{};
+    bool boundDrawReady{};
+    bool indexMirrorReady{};
+    bool dispatchMatchesSourceRange{};
+    bool indexFormatMatchesBinding{};
+    bool inspectionExact{};
+    bool sourceValuesInRange{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    D3DFORMAT sourceIndexFormat = D3DFMT_UNKNOWN;
+    UINT observedMinIndex{};
+    UINT observedMaxIndex{};
+    std::uint64_t indexContentHash{};
+    std::uint64_t indexedDispatchSnapshotToken{};
+    std::uint64_t sourceRangeSnapshotToken{};
+    std::uint64_t boundDrawSnapshotToken{};
+    std::uint64_t indexMirrorSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionIndexedSourceContentReadiness
+compose_fixed_function_indexed_source_content_readiness(
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedDispatch,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    const NativeManagedBufferShadow& indexBuffer,
+    ID3D11Device* expectedDevice,
+    D3DFORMAT sourceIndexFormat) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_indexed_source_content_snapshot(
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedDispatch,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    const NativeManagedBufferShadow& indexBuffer,
+    ID3D11Device* expectedDevice,
+    D3DFORMAT sourceIndexFormat,
     std::uint64_t snapshotToken) noexcept;
 
 // R148 seals the eventual DrawIndexed tuple for generated triangle fans after
