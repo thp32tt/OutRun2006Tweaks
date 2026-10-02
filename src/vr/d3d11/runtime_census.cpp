@@ -257,6 +257,18 @@ namespace outrun::vr::dx11
             // dithering cannot alias the exact disabled-default signature.
             bool ditherObservationComplete{};
             DWORD ditherEnable = FALSE;
+            // R169: D3D9 POINTLIST size/sprite/scale state affects raster and
+            // texture-coordinate semantics. Preserve the complete family in
+            // census identity while native direct points remain fail-closed.
+            bool pointRasterObservationComplete{};
+            DWORD pointSizeBits = 0x3F800000u;
+            DWORD pointSizeMinBits = 0x3F800000u;
+            DWORD pointSizeMaxBits = 0x42800000u;
+            DWORD pointSpriteEnable = FALSE;
+            DWORD pointScaleEnable = FALSE;
+            DWORD pointScaleABits = 0x3F800000u;
+            DWORD pointScaleBBits = 0u;
+            DWORD pointScaleCBits = 0u;
             bool alphaTestObservationComplete{};
             DWORD alphaTestEnable = FALSE;
             DWORD alphaTestRef{};
@@ -441,6 +453,16 @@ namespace outrun::vr::dx11
             hash = hash_mix(
                 hash, sig.ditherObservationComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.ditherEnable);
+            hash = hash_mix(
+                hash, sig.pointRasterObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.pointSizeBits);
+            hash = hash_mix(hash, sig.pointSizeMinBits);
+            hash = hash_mix(hash, sig.pointSizeMaxBits);
+            hash = hash_mix(hash, sig.pointSpriteEnable);
+            hash = hash_mix(hash, sig.pointScaleEnable);
+            hash = hash_mix(hash, sig.pointScaleABits);
+            hash = hash_mix(hash, sig.pointScaleBBits);
+            hash = hash_mix(hash, sig.pointScaleCBits);
             hash = hash_mix(
                 hash, sig.fixedFunctionTranslationReady ? 1u : 0u);
             hash = hash_mix(
@@ -1459,6 +1481,19 @@ namespace outrun::vr::dx11
                         sig.depthBiasBits,
                         sig.slopeScaleDepthBiasBits);
 
+                    spdlog::info(
+                        "VR DX11 R169 point-raster state#{}: observed={} sizeBits=0x{:08X} minBits=0x{:08X} maxBits=0x{:08X} sprite={} scale={} scaleBits[A=0x{:08X},B=0x{:08X},C=0x{:08X}]",
+                        unique,
+                        sig.pointRasterObservationComplete ? 1 : 0,
+                        sig.pointSizeBits,
+                        sig.pointSizeMinBits,
+                        sig.pointSizeMaxBits,
+                        sig.pointSpriteEnable != FALSE ? 1 : 0,
+                        sig.pointScaleEnable != FALSE ? 1 : 0,
+                        sig.pointScaleABits,
+                        sig.pointScaleBBits,
+                        sig.pointScaleCBits);
+
                     if (sig.fixedFunctionShaderPrototypeGenerated)
                     {
                         spdlog::info(
@@ -2057,6 +2092,16 @@ namespace outrun::vr::dx11
         signature.ditherObservationComplete =
             captured && source.complete;
         signature.ditherEnable = source.ditherEnable;
+        signature.pointRasterObservationComplete =
+            captured && source.complete;
+        signature.pointSizeBits = source.pointSizeBits;
+        signature.pointSizeMinBits = source.pointSizeMinBits;
+        signature.pointSizeMaxBits = source.pointSizeMaxBits;
+        signature.pointSpriteEnable = source.pointSpriteEnable;
+        signature.pointScaleEnable = source.pointScaleEnable;
+        signature.pointScaleABits = source.pointScaleABits;
+        signature.pointScaleBBits = source.pointScaleBBits;
+        signature.pointScaleCBits = source.pointScaleCBits;
         signature.alphaTestObservationComplete =
             captured && source.complete;
         signature.alphaTestEnable = source.alphaTestEnable;
