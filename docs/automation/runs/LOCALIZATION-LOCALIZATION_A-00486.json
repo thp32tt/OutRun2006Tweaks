@@ -1,15 +1,27 @@
 {
+  "schema_version": 100,
   "TASK_ID": "LOCALIZATION-LOCALIZATION_A-00486",
   "LANE": "LOCALIZATION_A",
   "WAVE_ID": "P00319",
+  "TARGET_BRANCH": "korean-localization-clean",
+  "ATTEMPT": "1/3",
+  "CHAT_ROLLOVER": 5,
   "role": "producer_A_self_QA",
-  "branch": "korean-localization-clean",
-  "source_of_truth": "GitHub korean-localization-clean HEAD",
+  "candidate_completion_first": true,
+  "repair_of_prior_result": "BLOCKER_RECORDED",
+  "result": "PASS_MATERIAL_FRESH_SOURCE_KOREAN_DDS_SELF_QA_PENDING_C",
+  "queue_index": 53,
+  "asset": "568D3696",
+  "candidate_sha256": "9a7d968c6663c752020f7a018fccae085c58a74b3af4bce7d509aff3012b9c6a",
+  "candidate_dds_modified": true,
+  "drive_package_file_id": "1Z8mS847gsjDIUdQYLQmEMophLE9HnWiM",
+  "drive_package_sha256": "42bbf2670de9e62b4b01f340c11c8550d3f69784942b8fee5577efb4d4436c1c",
+  "self_qa": "PASS",
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "candidate_completion_first": true,
-  "result": "BLOCKER_RECORDED",
-  "details": "Checked current queue contract. No existing A-lane RENDER_READY or ONE_STAGE_TO_RENDER evidence was available from current GitHub state for this task. No unrelated preflight-only expansion performed. No DDS candidate was created without canonical source/evidence chain.",
-  "changed_files": ["docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00486.json"]
+  "changed_files": [
+    "docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00486.json",
+    "localization/graphics/role_A/20261002-A00486-R5/A00486_INDEX53_568D3696_FRESH_SOURCE_DDS_QA.json"
+  ]
 }

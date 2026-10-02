@@ -1,0 +1,97 @@
+{
+  "schema_version": 100,
+  "schema": "outrun-a00486-index53-fresh-source-korean-dds-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00486",
+  "wave_id": "P00319",
+  "lane": "LOCALIZATION_A",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "queue_index": 53,
+  "asset": "568D3696",
+  "path": "textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+  "selection_reason": "Current authoritative C state keeps index53/568D3696 REWORK_REQUIRED specifically for pre-reset Korean raster/lower-mip lineage reuse. Rebuilt from exact canonical English HD source with no historical Korean construction input.",
+  "result": "PASS_MATERIAL_FRESH_SOURCE_KOREAN_DDS_SELF_QA_PENDING_C",
+  "source": {
+    "transport": "GOOGLE_DRIVE_CANONICAL_HD_SOURCE",
+    "drive_file_id": "1-R_eZ1YIYLFEIappgQFUV5gBh_d2QRhU",
+    "sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+    "bytes": 22369776,
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "DXT5",
+    "mipmaps": 13,
+    "raw_orientation": "mirror_y"
+  },
+  "candidate": {
+    "sha256": "9a7d968c6663c752020f7a018fccae085c58a74b3af4bce7d509aff3012b9c6a",
+    "bytes": 22369776,
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "DXT5",
+    "mipmaps": 13,
+    "header_128_exact_source": true,
+    "historical_korean_candidate_pixels_reused": false,
+    "historical_localized_mip_bytes_reused": false,
+    "candidate_dds_modified": true
+  },
+  "generation": {
+    "translations": {
+      "Hit the zippers!": "지퍼를 맞히세요!",
+      "Hit the cars!": "차를 맞히세요!",
+      "Dodge the bombs!": "폭탄을 피하세요!",
+      "Feed the girl!": "여자친구에게 먹여 주세요!",
+      "Avoid abduction!": "납치를 피하세요!",
+      "Avoid the meteors!": "운석을 피하세요!",
+      "Dribble the beach ball!": "비치볼을 드리블하세요!",
+      "Photograph the sights!": "명소를 촬영하세요!",
+      "Hit the ducks!": "오리를 맞히세요!",
+      "See the sights!": "명소를 구경하세요!",
+      "END": "종료",
+      "ANSWER": "정답",
+      "QUESTION": "문제",
+      "START": "시작"
+    },
+    "font_families": {
+      "instruction_family": "NanumSquare Bold",
+      "state_label_family": "UnGraphic Bold"
+    },
+    "clean_plate": "Fresh source-only text-footprint removal; no rejected-candidate pixels used.",
+    "mip_strategy": "All 13 canonical English source mips decoded independently. Korean glyphs were freshly rasterized per mip. Only BC3 blocks intersecting localization footprints were replaced; untouched source BC3 blocks remain byte-identical."
+  },
+  "self_qa": {
+    "status": "PASS",
+    "english_source_vs_korean_candidate_visual_review": "PASS",
+    "comparison_png_sha256": "c91328ee7e2f73c637288bf533af749a45b7f9043fcdcf2907705f555d90bf9a",
+    "changed_pixels_outside_declared_bc3_block_envelope": 0,
+    "alpha_changed_pixels_outside_declared_bc3_block_envelope": 0,
+    "decoded_final_alpha_escape_pixels_from_candidate_safe_bboxes": 0,
+    "header_128_exact": true,
+    "output_size_exact_source": true,
+    "all_13_mips_present": true
+  },
+  "package_drive": {
+    "account": "ezflash557",
+    "task_folder_id": "1SUA54Hz5LRg8FuqHue0tXLTV4MIBz3Y5",
+    "package_file_id": "1Z8mS847gsjDIUdQYLQmEMophLE9HnWiM",
+    "package_name": "LOCALIZATION-LOCALIZATION_A-00486_INDEX53_568D3696_KO.zip",
+    "package_sha256": "42bbf2670de9e62b4b01f340c11c8550d3f69784942b8fee5577efb4d4436c1c",
+    "package_bytes": 4222910,
+    "package_contains": [
+      "568D3696_1024x1024.dds",
+      "568D3696_EN_KO_compare.png",
+      "A00486_INDEX53_568D3696_FRESH_SOURCE_DDS_QA.json"
+    ],
+    "upload_readback_byte_identical": true
+  },
+  "shared_state_modified": false,
+  "candidate_git_pointer_modified": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
