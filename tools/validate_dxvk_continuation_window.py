@@ -19,8 +19,12 @@ def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def parse_hex_window(value: str) -> bytes:
+    return bytes.fromhex(" ".join(value.split()))
+
+
 def validate_window(data: bytes, start: int, end: int, expected_hex: str) -> dict:
-    expected = bytes.fromhex(expected_hex)
+    expected = parse_hex_window(expected_hex)
     actual = data[start : start + len(expected)]
     return {
         "offset": hex(start),
@@ -29,6 +33,7 @@ def validate_window(data: bytes, start: int, end: int, expected_hex: str) -> dic
         "actual_bytes": actual.hex(" "),
         "matches": actual == expected,
         "available_length": len(actual),
+        "expected_length": len(expected),
         "window_contains_overlap": start < end and start + len(expected) <= end,
         "window_within_binary": 0 <= start <= end <= len(data),
     }
@@ -42,7 +47,7 @@ def validate_runtime_claim(record: dict) -> list[str]:
 
 def validate_expected_frontier(window: dict) -> list[str]:
     errors = []
-    if window["available_length"] != len(bytes.fromhex(DEFAULT_OVERLAP)):
+    if window["available_length"] != window["expected_length"]:
         errors.append("truncated_frontier_overlap")
     if window["offset"] == window["end_offset"]:
         errors.append("zero_length_frontier_window")
@@ -59,7 +64,7 @@ def main() -> int:
     args = parser.parse_args()
 
     data = args.binary.read_bytes()
-    expected = bytes.fromhex(args.overlap)
+    expected = parse_hex_window(args.overlap)
     end = args.end if args.end is not None else args.offset + len(expected)
     window = validate_window(data, args.offset, end, args.overlap)
     result = {
@@ -67,6 +72,7 @@ def main() -> int:
         "binary_sha256": sha256_file(args.binary),
         "runtime_validation": "UNTESTED",
         "provenance_only": True,
+        "semantic_promotion": False,
         "window": window,
     }
 
