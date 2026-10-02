@@ -6609,7 +6609,7 @@ def main() -> None:
             "R129 generated fan source-element reconstruction",
         ),
         (
-            "baseVertex >\n                    std::numeric_limits<UINT>::max() - sourceElement",
+            "baseVertex >\n                    (std::numeric_limits<UINT>::max)() - sourceElement",
             NATIVE_BACKEND_CPP,
             "R129 base-vertex overflow fail-closed gate",
         ),
