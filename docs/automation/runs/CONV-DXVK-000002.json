@@ -194,7 +194,8 @@
     5948240512,
     5948449828,
     5948947099,
-    5949032426
+    5949032426,
+    5949488558
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -5875,6 +5876,71 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authenticated DXVK canonical frontier (F64 raw provenance at 0x001832AF..0x001832EF was already exact-SHA validated concurrently). Exact-decode only complete canonical instructions from that raw window, resolve inherited 0x001832AF/0x001832B9 targets only on exact boundaries, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_CURRENT_EXTERNAL_TARGET_SET_FAIL_CLOSED_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "ba4e4bdde631f6beab7789635454e70f27746c6a",
+      "validation_bearing_result_sha": "ba4e4bdde631f6beab7789635454e70f27746c6a",
+      "commit_message": "test: fail-close DXVK external target sets [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Validates every assigned expected_external_targets set immediately against the exact decoded direct-BRANCH targets outside the current proof interval and makes that assignment mandatory in the final proven predicate, closing the newest-frontier gap before a successor continuation exists.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local lane/run state, regression/problem history and Issue #14 while repeatedly refreshing the concurrently advancing same-JOB branch."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "After F63-F65 frontier work raced ahead, fresh verifier review found current expected_external_targets declarations were mainly consumed by successor handoff checks and lacked an immediate declaration-vs-decoded-external-set invariant."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit ba4e4bdde631f6beab7789635454e70f27746c6a adds current-proof AST validation for expected_external_targets and requires the assigned gate in final proven."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA Build run 36991332370 job 110788167268 passed HMD baseline, one-click structure, backend disassembly contract, consolidated wheel FFB source and wheel FFB math. Exact-SHA HUD Inspector run 36991332209 static-exe-analysis job 110788057513 passed. Full Win32 build was still in progress when state was persisted and is not claimed."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit ba4e4bdde631f6beab7789635454e70f27746c6a contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5949488558 records the production change and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only hardening; no runtime DXVK payload, backend selector/deployment content, packaged binary, or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally in run/lane state without replacing or rewinding the newer concurrently advancing canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_STATIC",
+        "exact_sha": "ba4e4bdde631f6beab7789635454e70f27746c6a",
+        "backend_conversion_gate_run_id": 36991332370,
+        "backend_disassembly_contract_job_id": 110788167268,
+        "hmd_baseline_step": "SUCCESS",
+        "one_click_structure_step": "SUCCESS",
+        "backend_disassembly_contract_step": "SUCCESS",
+        "wheel_ffb_source_step": "SUCCESS",
+        "wheel_ffb_math_step": "SUCCESS",
+        "full_build_conclusion": "NOT_CLAIMED_IN_PROGRESS_AT_C6",
+        "hud_inspector_run_id": 36991332209,
+        "static_exe_analysis_job_id": 110788057513,
+        "static_exe_analysis": "SUCCESS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5949488558,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authenticated DXVK canonical frontier and continue the next runnable raw/proof/static unit from current HEAD; every proof assigning expected_external_targets must now match decoded out-of-prefix BRANCH targets and gate final proven."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
