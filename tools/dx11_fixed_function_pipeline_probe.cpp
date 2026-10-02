@@ -182,7 +182,43 @@ int main()
             "R158 phong shade mode remains fail closed");
     }
 
+    {
+        auto defaultClipping = base_state();
+        const auto defaultPipeline = translate_pipeline(defaultClipping);
+        require(
+            defaultPipeline.exact() &&
+            defaultPipeline.rasterizer.DepthClipEnable == TRUE &&
+            (defaultPipeline.unsupported & PipelineUnsupportedClipping) == 0,
+            "R161 default D3D9 clipping must remain exact");
+
+        auto clippingDisabled = defaultClipping;
+        clippingDisabled.clipping = FALSE;
+        const auto disabledPipeline = translate_pipeline(clippingDisabled);
+        require(
+            !disabledPipeline.exact() &&
+            (disabledPipeline.unsupported & PipelineUnsupportedClipping) != 0,
+            "R161 disabled D3D9 clipping must fail closed");
+
+        auto userClipPlane = defaultClipping;
+        userClipPlane.clipPlaneEnable = 1u << 2;
+        const auto userClipPipeline = translate_pipeline(userClipPlane);
+        require(
+            !userClipPipeline.exact() &&
+            (userClipPipeline.unsupported & PipelineUnsupportedClipping) != 0,
+            "R161 enabled D3D9 user clip plane must fail closed");
+
+        const auto fixedUserClip =
+            translate_fixed_function_pipeline_with_shader_semantics(
+                userClipPlane, true, stages, true, 0x00, 0x00, textureTypes);
+        require(
+            !fixedUserClip.exact() &&
+            (fixedUserClip.renderStates.unsupported &
+             PipelineUnsupportedClipping) != 0,
+            "R161 fixed-function shader handoff must retain clipping blocker");
+    }
+
     std::cout
+        << "DX11 fixed-function clipping fail-closed R161: PASS\n"
         << "DX11 fixed-function alpha-test pipeline handoff R118: PASS\n"
         << "DX11 fixed-function shade-mode fail-closed R158: PASS\n";
     return 0;
