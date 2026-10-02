@@ -251,6 +251,11 @@ def summarize_fixed_function_detailed_stage_demand(
     argument_values: Counter[int] = Counter()
     result_args: Counter[int] = Counter()
     detailed_stages = 0
+    duplicate_stage_records = 0
+    # R199: detail lines may be repeated across collected logs. A signature
+    # hashes its stage state, so identical signature/stage payloads are one
+    # semantic observation and must not inflate conversion-demand counts.
+    seen_stage_records: set[tuple[int, tuple[tuple[str, int], ...]]] = set()
 
     def inspect_arguments(stage: dict, op: int, prefix: str) -> None:
         for key in fixed_function_used_argument_fields(op, prefix):
@@ -263,8 +268,14 @@ def summarize_fixed_function_detailed_stage_demand(
                 argument_values[value] += 1
                 argument_selectors[selector] += 1
 
-    for stages in fixed_function.values():
+    for signature_id, stages in fixed_function.items():
         for stage in stages:
+            stage_record = (signature_id, tuple(sorted(stage.items())))
+            if stage_record in seen_stage_records:
+                duplicate_stage_records += 1
+                continue
+            seen_stage_records.add(stage_record)
+
             color_op = stage.get("colorOp")
             if color_op is None or color_op == 1:
                 continue
@@ -309,6 +320,7 @@ def summarize_fixed_function_detailed_stage_demand(
     )
     return {
         "DetailedStages": detailed_stages,
+        "DuplicateDetailedStageRecordsDropped": duplicate_stage_records,
         "UnsupportedColorOps": enum_counts(color_ops, FFP_OP_NAMES),
         "UnsupportedAlphaOps": enum_counts(alpha_ops, FFP_OP_NAMES),
         "UnsupportedArgumentSelectors": enum_counts(

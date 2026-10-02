@@ -904,6 +904,12 @@ def main() -> int:
         "constant=0xFFFFFFFF resultArg=0x00000005 "
         "texCoord=0x00000000 texTransform=0x00000000 "
         "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+        "VR DX11 R197 ffp signature#11 stage#0: "
+        "color[op=22,arg0=0x00000001,arg1=0x00000002,arg2=0x00000001] "
+        "alpha[op=18,arg0=0x00000001,arg1=0x00000002,arg2=0x00000001] "
+        "constant=0xFFFFFFFF resultArg=0x00000005 "
+        "texCoord=0x00000000 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
         "VR DX11 R197 ffp signature#11 stage#1: "
         "color[op=25,arg0=0x00000004,arg1=0x00000001,arg2=0x00000002] "
         "alpha[op=2,arg0=0x00000001,arg1=0x00000005,arg2=0x00000001] "
@@ -915,6 +921,7 @@ def main() -> int:
         "FixedFunctionDetailedStageDemand"
     ]
     assert r198_demand["DetailedStages"] == 2
+    assert r198_demand["DuplicateDetailedStageRecordsDropped"] == 1
     assert r198_demand["UnsupportedColorOps"] == [
         {"value": 22, "name": "BUMPENVMAP", "count": 1}
     ]
@@ -942,7 +949,7 @@ def main() -> int:
     assert r198_demand["ActivationProof"] is False
     assert r198_unsupported_demand["NativeDrawPathActivationAllowed"] is False
 
-    print("DX11 census analyzer regression R120/SRC1/R191/R194/R197/R198 exhaustive-mode: PASS")
+    print("DX11 census analyzer regression R120/SRC1/R191/R194/R197/R198/R199 dedupe: PASS")
     return 0
 
 
