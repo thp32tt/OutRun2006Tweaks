@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-02T04:59:00+09:00",
+  "updatedKst": "2026-10-03T03:19:32+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 30,
+  "cycle": 330,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -39,9 +39,11 @@
     "VR-REFACTOR-STATE-0004A",
     "VR-REFACTOR-STATE-0004B",
     "VR-REFACTOR-STATE-0004C",
-    "VR-REFACTOR-STATE-0004D"
+    "VR-REFACTOR-STATE-0004D",
+    "VR-REFACTOR-STATE-0004E",
+    "VR-REFACTOR-STATE-0004F"
   ],
-  "next": "Continue from validated 0004D by reviewing lower-layer telemetry counter ownership separately from runtime-safety behavior. Preserve hot-path cost and require exact-SHA CI for each source batch.",
+  "next": "Continue from validated 0004F by reviewing the remaining cross-layer reset/cache ownership one owner at a time (R29 effect cache and R23 live-state sample reset are next candidates). Preserve reset ordering, hot-path cost, and exact-SHA CI for every source batch.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -65,11 +67,14 @@
     "VR-REFACTOR-STATE-0004A configures StateBlockRecovery providers once during the R31 install transaction before StateBlockEvents publication instead of rewriting the same atomic callbacks on every Begin/End/Apply event; lifecycle event cache invalidation ordering and lazy resync behavior are otherwise unchanged.",
     "VR-REFACTOR-STATE-0004B replaces R31 direct writes to R29 effect cache, R22 raster shadow, and R23 live-state sample cursors with explicit owner-layer invalidation APIs. The two invalidation call sites, ordering, and StateBlock lazy-resync request remain unchanged.",
     "VR-REFACTOR-STATE-0004C removes R31's last direct R22 raster-shadow read by exposing inline TryGetTrackedViewport on the R22 owner boundary. It preserves the same cached-viewport test and only falls back to IDirect3DDevice9::GetViewport when the tracked snapshot is invalid.",
-    "VR-REFACTOR-STATE-0004D replaces eight R31 direct calls to the private R29ArmMonoSafety helper with inline R29 owner API ArmStereoRecoverySafety. The wrapper forwards the same default two-present safety horizon and adds no extra runtime work after inlining."
+    "VR-REFACTOR-STATE-0004D replaces eight R31 direct calls to the private R29ArmMonoSafety helper with inline R29 owner API ArmStereoRecoverySafety. The wrapper forwards the same default two-present safety horizon and adds no extra runtime work after inlining.",
+    "300-cycle continuation completed as 60 persistent review batches x 5 lenses (architecture/integration, ownership/lifetime, stereo correctness, performance, adversarial/failure), for 300 static review checks. Source-edit gates were evaluated every 3 cycles and build gates every 6 cycles; unchanged/no-op gates were skipped per repository policy instead of manufacturing edits or duplicate builds.",
+    "VR-REFACTOR-STATE-0004E encapsulates R31 telemetry ownership: R32/R33/R34 no longer read or write R31 frame/window/live-WVP counters directly. R31 exposes inline note/snapshot/getter/reset APIs; verifier guards direct upper-layer access, recursive wrappers, and declaration order. The corrected source batch was exact-SHA validated before continuing.",
+    "VR-REFACTOR-STATE-0004F moves R31 fast-path reset ownership behind R31ResetFastPathState. R32 preserves the previous reset sequence (blocked generation -> validation cadence -> eye cache -> telemetry frame/window) without directly mutating R31 internals. R29 effect-cache and R23 live-state reset ownership remain intentionally separate for the next atomic review."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0004D_BUILD_VERIFIED",
-  "validatedSourceSha": "70566be7bb7935cdca42c7cf3ac1c4cd194073b5",
-  "validationRunId": 36917503526,
+  "batchStatus": "VR-REFACTOR-STATE-0004F_BUILD_VERIFIED",
+  "validatedSourceSha": "5204aa57dd7a3b362792de28447c685a9cdf852f",
+  "validationRunId": 37045990391,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -77,7 +82,6 @@
     "game": "SUCCESS",
     "fullChainCompile": "SUCCESS",
     "package": "SUCCESS",
-    "domainIsolation": "SUCCESS",
-    "hudInspector": "SUCCESS"
+    "domainIsolation": "SUCCESS"
   }
 }
