@@ -1,0 +1,147 @@
+{
+  "schema_version": 22,
+  "schema": "outrun-b00481-p00315-b00347-current-head-reconciliation-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00481",
+  "wave_id": "P00315",
+  "lane": "LOCALIZATION_B",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 3,
+  "selection_head_sha": "819155b83040421cf5755c5abe8d96ed3d85ef7f",
+  "selection_head_message": "[AUTO:LOCALIZATION-LOCALIZATION_A-00483] record lane-local producer blocker",
+  "source_qa_hold": {
+    "c_task_id": "LOCALIZATION-LOCALIZATION_C-00482",
+    "c_wave_id": "Q00110",
+    "producer_task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+    "producer_result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
+    "c_status": "HOLD_STRICT_RECHECK",
+    "c_reason": "Awaiting full lane-local evidence reconciliation against current HEAD before approval."
+  },
+  "reconciliation_scope": {
+    "shard_rule": "asset_queue.index % 3 == 1",
+    "candidate_count": 2,
+    "candidates": [
+      94,
+      163
+    ],
+    "duplicate_candidate_generation": false,
+    "rationale": "B00347 immutable candidate bytes already exist and are active C-batch inputs. Current contract forbids duplicate review/production of the same TASK_ID@RESULT_SHA and permits reuse of unchanged machine-readable PASS evidence."
+  },
+  "current_contract": {
+    "path": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "current_git_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+    "b00347_recorded_git_blob_sha": "8d85dd58edb1e191e9d5b5f6d4b24e0d50d20d44",
+    "blob_changed_since_b00347": true,
+    "compatibility_review": "PASS",
+    "findings": [
+      "Current contract retains mandatory zero-pixel containment, DDS/alpha/orientation, protected-artwork, and canonical English-source comparison gates.",
+      "Current contract explicitly permits reuse of existing machine-readable PASS evidence when the relevant fingerprint is unchanged.",
+      "Current contract forbids duplicate review/enqueue of a producer result already present in qa_pending, qa_completed, or an active C batch under the same TASK_ID@RESULT_SHA.",
+      "No current contract rule requires regeneration of either immutable B00347 candidate solely because the contract file blob changed."
+    ]
+  },
+  "producer_record": {
+    "path": "docs/automation/runs/LOCALIZATION-LOCALIZATION_B-00347.json",
+    "current_git_blob_sha": "fb167f3292c14eead8295e133f631608de756368",
+    "authoritative_result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
+    "candidate_count": 2,
+    "target_met": true,
+    "automation_validation": "PENDING",
+    "runtime_validation": "UNTESTED"
+  },
+  "candidates": [
+    {
+      "index": 94,
+      "asset": "2DA43E41",
+      "evidence_path": "localization/graphics/role_B/20261001-B00347-P00218/B00347_P00218_INDEX94_2DA43E41_V2_CANDIDATE_QA.json",
+      "evidence_git_blob_sha": "4ff525c83532e9cdda22f2903ffc7a47a9867187",
+      "evidence_blob_unchanged_from_b00347_to_selection_head": true,
+      "generation_prompt_path": "localization/graphics/role_B/20261001-B00347-P00218/generation_prompt.json",
+      "generation_prompt_git_blob_sha": "fa3fb721b867db4271f2130db1886a209c40a1aa",
+      "generation_prompt_blob_unchanged": true,
+      "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "candidate_sha256": "93b4256599dcb131978f3685f80d25e99ce3eac3dfd12d8e4f4a923c3fafc054",
+      "drive_package_file_id": "19UmVXn59iBoxwYwZTmZG9Ep7DuoETWDi",
+      "drive_package_name": "LOCALIZATION-LOCALIZATION_B-00347_INDEX94_2DA43E41_V2.zip",
+      "drive_package_bytes": 2973872,
+      "recorded_package_sha256": "148f4f781c8da24489debd2977ae7a1ec83be9dcc7c7ebcc59f03f6530ad9208",
+      "fresh_drive_package_sha256": "148f4f781c8da24489debd2977ae7a1ec83be9dcc7c7ebcc59f03f6530ad9208",
+      "fresh_drive_package_hash_match": true,
+      "fresh_inner_dds_sha256": "93b4256599dcb131978f3685f80d25e99ce3eac3dfd12d8e4f4a923c3fafc054",
+      "fresh_inner_dds_hash_match": true,
+      "prior_static_self_qa": {
+        "dds_header_128_identical": true,
+        "decoded_roundtrip_pixel_exact": true,
+        "changed_pixels_outside_allowed": 0,
+        "alpha_changed_pixels_outside_allowed": 0,
+        "protected_art_overlap_pixels": 0,
+        "one_pixel_overflow_count": 0,
+        "visual_review": "PASS"
+      },
+      "disposition": "PASS_CURRENT_HEAD_IDENTITY_RECONCILIATION_PENDING_INDEPENDENT_C"
+    },
+    {
+      "index": 163,
+      "asset": "59A79158",
+      "evidence_path": "localization/graphics/role_B/20261001-B00347-P00218/B00347_P00218_INDEX163_SCHEMA22_TITLE_FAMILY_REWORK_QA.json",
+      "evidence_git_blob_sha": "37817bb9659f70d2579ffcbcd2ed60dfac6f1827",
+      "evidence_blob_unchanged_from_b00347_to_selection_head": true,
+      "generation_prompt_path": "localization/graphics/role_B/20261001-B00347-P00218/generation_prompt_index163.json",
+      "generation_prompt_git_blob_sha": "7be8603551d1a566d5f302605f46054ac7e984c0",
+      "generation_prompt_blob_unchanged": true,
+      "source_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "candidate_sha256": "fa93090c5fe818b2006040dde1515c4027b7292504d5d4f785521fd3991e10ab",
+      "drive_package_file_id": "1UZUIXrTAzTsEBWwgUN7a7XK-7ZtxFiPa",
+      "drive_package_name": "LOCALIZATION-LOCALIZATION_B-00347_INDEX163_59A79158_SCHEMA22.zip",
+      "drive_package_bytes": 78524,
+      "recorded_package_sha256": "ce7180196a311ffdecbb118b779ee1acb7b9f78e63c4acb1a3d49c6e01dee265",
+      "fresh_drive_package_sha256": "ce7180196a311ffdecbb118b779ee1acb7b9f78e63c4acb1a3d49c6e01dee265",
+      "fresh_drive_package_hash_match": true,
+      "fresh_inner_dds_sha256": "fa93090c5fe818b2006040dde1515c4027b7292504d5d4f785521fd3991e10ab",
+      "fresh_inner_dds_hash_match": true,
+      "current_github_review_set": {
+        "source_display": "6dca01e7f5c90dd2f82e8c12a59e1bf365e2fddd",
+        "clean_plate_display": "5d6a53406ab0f027a8855343e9c175026efff441",
+        "candidate_display": "2ea89f345f2354ec83e0207f106aecc8d10b6c10",
+        "comparison": "e6aa50008ba436ba7d209a2d38c7c31fe34af4b7",
+        "element_comparison": "faeedf31afac057cfe650329b0f6bf16f5166e24",
+        "source_text_mask_display": "c259fa545fdad2df137445714c0aa839a7ad5446",
+        "protected_mask_display": "80c8a12e61f17093777f2e27e93ce4d16d51bc09",
+        "qa_report": "d7a109762f6e438486e520ee6f9a5a5ed93a6811",
+        "all_blobs_unchanged_from_b00347_to_selection_head": true
+      },
+      "prior_static_self_qa": {
+        "canonical_semantics": "24/24",
+        "fixed_font_size_px": 46,
+        "unique_font_sizes": [
+          46
+        ],
+        "per_string_font_size_reduction": false,
+        "changed_pixels_outside_source_effect_union": 0,
+        "alpha_changed_pixels_outside_source_effect_union": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "one_pixel_overflow_total": 0,
+        "high_zoom_review": "PASS",
+        "english_source_visual_review": "PASS_24_OF_24__NO_RESIDUE_CLIPPING_WRONG_ART_OR_BOX"
+      },
+      "disposition": "PASS_CURRENT_HEAD_IDENTITY_AND_REVIEW_SET_RECONCILIATION_PENDING_INDEPENDENT_C"
+    }
+  ],
+  "source_rehash": {
+    "performed": false,
+    "reason": "Canonical source fingerprints and the producer evidence that binds them are unchanged; current contract permits reuse of unchanged PASS evidence. Fresh rehash was performed on both current-pipeline candidate ZIPs and their inner DDS payloads instead."
+  },
+  "result": "PASS_CURRENT_HEAD_RECONCILIATION_TWO_IMMUTABLE_B00347_CANDIDATES_PENDING_INDEPENDENT_C",
+  "c_recheck_ready": true,
+  "candidate_dds_modified": false,
+  "candidate_binary_regenerated": false,
+  "shared_progress_or_queue_modified": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": false,
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE"
+}
