@@ -5178,7 +5178,7 @@ compose_fixed_function_direct_draw_dispatch_readiness(
     // R151 validates direct fetches against the byte capacity sealed by R145.
     // The widened arithmetic keeps this proof safe from UINT wraparound.
     out.bufferRangeExact = false;
-    if (countExact && boundDraw.geometryRangeMetadataExact) {
+    if (countExact && rangeExact && boundDraw.geometryRangeMetadataExact) {
         if (indexed) {
             const std::uint64_t indexElementBytes =
                 boundDraw.indexFormat == DXGI_FORMAT_R16_UINT ? 2ull :

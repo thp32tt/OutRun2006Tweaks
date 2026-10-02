@@ -2407,6 +2407,8 @@ def main() -> None:
          NATIVE_BACKEND_CPP, "R151 live index-buffer capacity capture"),
         ("R151 validates direct fetches", NATIVE_BACKEND_CPP,
          "R151 widened direct fetch capacity proof"),
+        ("countExact && rangeExact && boundDraw.geometryRangeMetadataExact",
+         NATIVE_BACKEND_CPP, "R151 byte arithmetic executes only after UINT range proof"),
         ("out.vertexBufferRangeExact =", NATIVE_BACKEND_CPP,
          "R151 indexed declared vertex range capacity proof"),
         ("dispatch, sourceRange, boundDraw", NATIVE_BACKEND_CPP,
