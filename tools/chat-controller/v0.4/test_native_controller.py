@@ -763,6 +763,188 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('if not ctask.get("qa_batch_finalized")',source)
         self.assertIn('finalize_c_qa_batch(q, ctask)',source)
 
+    def test_conversion_pipeline_validator_rejects_review_only_checkpoint(self):
+        status_ok, _ = load_function('conversion_pipeline_status_ok')
+        changed_paths, _ = load_function('conversion_pipeline_changed_paths')
+        has_work, _ = load_function(
+            'conversion_pipeline_has_substantive_work',
+            conversion_pipeline_changed_paths=changed_paths,
+        )
+        record={
+            'schema_version':1,
+            'task_id':'CONVERSION-DX11-00277',
+            'lane':'DX11',
+            'changed_paths':['docs/automation/runs/CONVERSION-DX11-00277.json'],
+            'validation':{'static':'PASS'},
+            'runtime_validation':'UNTESTED',
+            'next_action':'continue',
+        }
+        def fetch(path, ref):
+            if path.endswith('CONVERSION-DX11-00277.json'):
+                return record
+            return {'development_complete':False}
+        validator, _ = load_function(
+            'conversion_validate_pipeline_result_commit',
+            github_json_file_at_ref=fetch,
+            conversion_pipeline_status_ok=status_ok,
+            conversion_pipeline_has_substantive_work=has_work,
+            CONVERSION_PIPELINE_SCHEMA_VERSION=2,
+            CONVERSION_PIPELINE_STAGES=("C0_RECOVER","C1_REVIEW","C2_IMPLEMENT","C3_VALIDATE","C4_COMMIT","C5_PACKAGE","C6_STATE"),
+        )
+        valid,reasons,_=validator(
+            'CONVERSION-DX11-00277','a'*40,'DX11','vr-dx11-native-r71'
+        )
+        self.assertFalse(valid)
+        self.assertTrue(any(x.startswith('PIPELINE_SCHEMA_LT_2') for x in reasons))
+        self.assertIn('SUBSTANTIVE_WORK_MISSING:REVIEW_OR_STATE_ONLY',reasons)
+        self.assertTrue(any(x.startswith('PIPELINE_STAGE_C2_IMPLEMENT') for x in reasons))
+
+    def test_conversion_pipeline_validator_accepts_full_c0_c6_transaction(self):
+        status_ok, _ = load_function('conversion_pipeline_status_ok')
+        changed_paths, _ = load_function('conversion_pipeline_changed_paths')
+        has_work, _ = load_function(
+            'conversion_pipeline_has_substantive_work',
+            conversion_pipeline_changed_paths=changed_paths,
+        )
+        record={
+            'pipeline_schema_version':2,
+            'task_id':'CONVERSION-DXVK-00999',
+            'lane':'DXVK',
+            'pipeline':{
+                'C0_RECOVER':'COMPLETE',
+                'C1_REVIEW':'COMPLETE',
+                'C2_IMPLEMENT':'IMPLEMENTED',
+                'C3_VALIDATE':'PASS',
+                'C4_COMMIT':'COMPLETE',
+                'C5_PACKAGE':{'status':'NOT_REQUIRED','reason':'No runtime candidate produced'},
+                'C6_STATE':{'status':'COMPLETE','state_persisted':True},
+            },
+            'changed_paths':['tools/analyze_outrun_exe.py','docs/automation/runs/CONVERSION-DXVK-00999.json'],
+            'validation':{'backend_contract':'PASS'},
+            'state_persisted':True,
+            'next_action':'continue next bounded implementation target',
+            'runtime_validation':'UNTESTED',
+        }
+        def fetch(path, ref):
+            if path.endswith('CONVERSION-DXVK-00999.json'):
+                return record
+            return {'development_complete':False}
+        validator, _ = load_function(
+            'conversion_validate_pipeline_result_commit',
+            github_json_file_at_ref=fetch,
+            conversion_pipeline_status_ok=status_ok,
+            conversion_pipeline_has_substantive_work=has_work,
+            CONVERSION_PIPELINE_SCHEMA_VERSION=2,
+            CONVERSION_PIPELINE_STAGES=("C0_RECOVER","C1_REVIEW","C2_IMPLEMENT","C3_VALIDATE","C4_COMMIT","C5_PACKAGE","C6_STATE"),
+        )
+        valid,reasons,_=validator(
+            'CONVERSION-DXVK-00999','b'*40,'DXVK','vr-dxvk-r71-disasm'
+        )
+        self.assertTrue(valid)
+        self.assertEqual(reasons,[])
+
+    def test_conversion_partial_commit_keeps_same_task_active(self):
+        continuation=AsyncMock(return_value=True)
+        invalidate=Mock()
+        handler, _ = load_function(
+            'conversion_handle_discovered_commit',
+            conversion_validate_pipeline_result_commit=Mock(
+                return_value=(False,['PIPELINE_STAGE_C2_IMPLEMENT:INCOMPLETE'],{})
+            ),
+            github_actions_skip_directive=lambda message:None,
+            conversion_pipeline_next_stage=lambda reasons:'C2_IMPLEMENT',
+            invalidate_task_commit_cache=invalidate,
+            queue_send_conversion_pipeline_continuation=continuation,
+        )
+        active=self.active()
+        active.update(
+            task_id='CONVERSION-DX11-00277',
+            lane='DX11',
+            branch='vr-dx11-native-r71',
+            task_latched=True,
+        )
+        handled=asyncio.run(handler(
+            None,{}, {}, active,
+            {'sha':'c'*40,'message':'docs: checkpoint [AUTO:CONVERSION-DX11-00277]'},
+            datetime.now(timezone.utc),
+        ))
+        self.assertTrue(handled)
+        self.assertEqual(active['phase'],'WAIT_CHAT')
+        self.assertTrue(active['task_latched'])
+        self.assertEqual(active['controller_stage'],'C2_IMPLEMENT')
+        self.assertIsNone(active['result_sha'])
+        continuation.assert_awaited_once()
+        invalidate.assert_called_once()
+
+    def test_conversion_full_pipeline_commit_binds_to_actions(self):
+        continuation=AsyncMock(return_value=True)
+        handler, _ = load_function(
+            'conversion_handle_discovered_commit',
+            conversion_validate_pipeline_result_commit=Mock(return_value=(True,[],{})),
+            github_actions_skip_directive=lambda message:None,
+            conversion_pipeline_next_stage=lambda reasons:'C0_RECOVER',
+            invalidate_task_commit_cache=Mock(),
+            queue_send_conversion_pipeline_continuation=continuation,
+        )
+        active=self.active()
+        active.update(
+            task_id='CONVERSION-DXVK-00999',
+            lane='DXVK',
+            branch='vr-dxvk-r71-disasm',
+        )
+        handled=asyncio.run(handler(
+            None,{}, {}, active,
+            {'sha':'d'*40,'message':'[AUTO:CONVERSION-DXVK-00999] full pipeline'},
+            datetime.now(timezone.utc),
+        ))
+        self.assertTrue(handled)
+        self.assertEqual(active['phase'],'WAIT_ACTIONS')
+        self.assertEqual(active['result_sha'],'d'*40)
+        self.assertEqual(active['conversion_pipeline_validation'],'PASS_C0_C6')
+        continuation.assert_not_awaited()
+
+    def test_conversion_final_ci_skip_commit_is_not_gate_eligible(self):
+        continuation=AsyncMock(return_value=True)
+        handler, _ = load_function(
+            'conversion_handle_discovered_commit',
+            conversion_validate_pipeline_result_commit=Mock(return_value=(True,[],{})),
+            github_actions_skip_directive=lambda message:'[skip ci]',
+            conversion_pipeline_next_stage=lambda reasons:'C0_RECOVER',
+            invalidate_task_commit_cache=Mock(),
+            queue_send_conversion_pipeline_continuation=continuation,
+        )
+        active=self.active()
+        active.update(
+            task_id='CONVERSION-DX11-00998',
+            lane='DX11',
+            branch='vr-dx11-native-r71',
+        )
+        handled=asyncio.run(handler(
+            None,{}, {}, active,
+            {'sha':'e'*40,'message':'[AUTO:CONVERSION-DX11-00998] [skip ci]'},
+            datetime.now(timezone.utc),
+        ))
+        self.assertTrue(handled)
+        self.assertEqual(active['phase'],'WAIT_CHAT')
+        self.assertIn('FINAL_COMMIT_CI_SKIP_DIRECTIVE', ';'.join(active['conversion_pipeline_reject_reasons']))
+        continuation.assert_awaited_once()
+
+    def test_conversion_startup_rearm_cannot_bypass_pipeline_gate(self):
+        source=ast.get_source_segment(SOURCE, FUNCTIONS['startup_reconcile_queue_state']) or ''
+        watchdog=ast.get_source_segment(SOURCE, FUNCTIONS['watchdog_rearm_queue_state']) or ''
+        self.assertIn('conversion_reconcile_wait_actions_without_ui',source)
+        self.assertIn('vr-pipeline-rearmed:',source)
+        self.assertIn('conversion_reconcile_wait_actions_without_ui',watchdog)
+
+    def test_vr_compose_tunes_continuous_pipeline(self):
+        compose=(ROOT/'docker-compose.portainer-vr.yml').read_text()
+        self.assertIn('CONVERSION_PIPELINE_SCHEMA_VERSION: "2"',compose)
+        self.assertIn('CONVERSION_PREMATURE_STOP_ROLLOVER_THRESHOLD: "2"',compose)
+        self.assertIn('GITHUB_TASK_COMMIT_CACHE_SECONDS: "15"',compose)
+        self.assertIn('GITHUB_POLL_SECONDS: "60"',compose)
+        self.assertIn('PREVIOUS_TASK_UI_SETTLE_SECONDS: "45"',compose)
+        self.assertIn('SLOT_DEDUP_SECONDS: "45"',compose)
+
     def test_conversion_no_commit_response_forces_execution_continuation(self):
         continuation = AsyncMock(return_value=True)
         recovery = AsyncMock(return_value=True)
