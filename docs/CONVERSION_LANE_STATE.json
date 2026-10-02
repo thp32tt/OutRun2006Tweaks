@@ -2549,6 +2549,41 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve any newer F45 frontier beginning at 0x00182FBE; do not regress primary state to F44. Continue validation/exact decode only from the newest authoritative edge."
+    },
+    {
+      "unit_id": "DXVK_INHERITED_PREFIX_PROOF_DEPENDENCY_CHAIN_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "05a088a3f7dc743573e15367a3e292410f75cbf7",
+      "validation_bearing_result_sha": "05a088a3f7dc743573e15367a3e292410f75cbf7",
+      "run_record_commit_sha": "77c1a464b7bf230388ab3266627c4f18e4a6052e",
+      "commit_message": "test: harden inherited DXVK proof dependency chain [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Static verifier dependency-chain guard: dependency-free prefix proofs remain valid; declared proof dependencies require the immediate predecessor exactly once, all inherited references must be unique existing older proof stages, and unknown/duplicate/self/future references fail closed.",
+      "pipeline_status": "C0_C6_COMPLETE",
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_STATIC_CONTRACT",
+        "exact_sha": "05a088a3f7dc743573e15367a3e292410f75cbf7",
+        "proof_stage_count": 31,
+        "proof_stage_range": "continuation_23..continuation_53",
+        "existing_dependency_violations": 0,
+        "dependency_probe_failures": 0,
+        "build_run_id": 36984181304,
+        "build_job_id": 110765420366,
+        "backend_disassembly_contract": "PASS",
+        "hud_inspector_run_id": 36984181269,
+        "hud_inspector_static_job_id": 110765382745,
+        "canonical_analyzer": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948240512,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_F45_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the verifier guard and newest authoritative canonical frontier; current source contains raw continuation_54 0x00182FBE..0x00182FFE. Validate its canonical provenance if needed, then exact-decode only complete instructions and preserve any cut edge."
     }
   ]
 }
