@@ -1950,8 +1950,9 @@ struct NativeFixedFunctionFanDrawDispatchReadiness {
     bool generatedIndexReady{};
     bool generatedIndexMatchesDispatch{};
     // R154 seals the deterministic nonindexed fan source-vertex span against
-    // the exact managed vertex-buffer byte capacity. Indexed fan source-value
-    // capacity remains a separate gate and does not claim this field yet.
+    // the exact managed vertex-buffer byte capacity. R156 applies the same
+    // fail-closed capacity proof to indexed fans using exact R155 source
+    // content plus an R152 MANAGED source-index window snapshot.
     bool vertexBufferRangeExact{};
     bool dispatchArgumentsExact{};
     bool componentSnapshotsPresent{};
@@ -1965,6 +1966,11 @@ struct NativeFixedFunctionFanDrawDispatchReadiness {
     std::uint64_t generatedIndexSnapshotToken{};
     std::uint64_t sourceIndexSnapshotToken{};
     std::uint64_t sourceContentSnapshotToken{};
+    // R156 seals the exact source-index values used to derive indexed fan
+    // vertex capacity. Zero for nonindexed fans.
+    UINT sourceObservedMinIndex{};
+    UINT sourceObservedMaxIndex{};
+    std::uint64_t sourceValueSnapshotToken{};
     std::uint64_t snapshotToken{};
 };
 
