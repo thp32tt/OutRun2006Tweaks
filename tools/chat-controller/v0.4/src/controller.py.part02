@@ -236,446 +236,203 @@ async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str,
     return page
 
 
-def prompt_for_slot(slot: Slot, phase: str) -> str:
-    """Select a queue-isolated prompt and prepend the current task contract."""
-    if CONTROLLER_MODE == "conversion":
-        role_prompts = {
-            "A": "conversion_dx11.md",
-            "B": "conversion_dxvk.md",
-        }
-        default_prompt = "conversion_dx11.md"
+def github_file(path: str, ref: str) -> Optional[dict]:
+    query = urllib.parse.urlencode({"ref": ref})
+    try:
+        return github_api_json(f"/repos/{GITHUB_REPO}/contents/{urllib.parse.quote(path, safe='/')}?{query}")
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return None
+        raise
+
+
+def github_text(path: str, ref: str) -> Optional[str]:
+    payload = github_file(path, ref)
+    if payload is None:
+        return None
+    if not isinstance(payload, dict) or payload.get("encoding") != "base64":
+        raise ValueError(f"Expected base64 text at {path}@{ref}")
+    return base64.b64decode(payload["content"]).decode("utf-8")
+
+
+def github_json_file(path: str, ref: str) -> Optional[dict]:
+    text = github_text(path, ref)
+    return json.loads(text) if text is not None else None
+
+
+def latest_path_commit(path: str, head: str) -> Optional[str]:
+    query = urllib.parse.urlencode({"sha": head, "path": path, "per_page": 1})
+    commits = github_api_json(f"/repos/{GITHUB_REPO}/commits?{query}")
+    return commits[0]["sha"] if commits else None
+
+
+def verify_candidate(path: str, sha: str, lane: str) -> dict:
+    """Accept material bytes and committed self-QA, never a prose success claim."""
+    manifest = github_json_file(artifact_record_path(path), sha)
+    if not manifest or manifest.get("asset_path") != path or manifest.get("lane") != lane:
+        raise ValueError("Candidate manifest asset/lane mismatch")
+    if manifest.get("state") != "PRODUCED":
+        raise ValueError("Manifest does not represent a produced DDS")
+    if manifest.get("runtime_validation") != "UNTESTED":
+        raise ValueError("Controller does not certify runtime validation")
+    commit = github_api_json(f"/repos/{GITHUB_REPO}/commits/{sha}")
+    parent = commit["parents"][0]["sha"]
+    evidence = manifest.get("self_qa_path", "")
+    asset_key(evidence)
+    proof = github_file(evidence, sha)
+    old_proof = github_file(evidence, parent)
+    if not proof or (old_proof and proof["sha"] == old_proof["sha"]):
+        raise ValueError("Missing changed, committed decoded self-QA evidence")
+    candidate_path = manifest.get("artifact_path", "")
+    asset_key(candidate_path)
+    if not candidate_path.lower().endswith('.dds'):
+        raise ValueError("Candidate must be a DDS")
+    transport = manifest.get("transport", "github")
+    if transport == "github":
+        new = github_file(candidate_path, sha)
+        old = github_file(candidate_path, parent)
+        if not new or new.get("sha") != manifest.get("artifact_sha"):
+            raise ValueError("Candidate blob SHA mismatch")
+        if old and old["sha"] == new["sha"]:
+            raise ValueError("Unchanged DDS is not production")
+    elif transport == "drive":
+        if not manifest.get("drive_file_id") or not re.fullmatch(r"[0-9a-f]{64}", manifest.get("artifact_sha", "")):
+            raise ValueError("Drive candidate needs file identity and SHA-256")
+        old = github_json_file(artifact_record_path(path), parent)
+        if old and old.get("artifact_sha") == manifest["artifact_sha"]:
+            raise ValueError("Unchanged external DDS is not production")
     else:
-        if slot.name not in {"A", "B", "C"}:
-            raise ValueError(f"Retired or unsupported localization lane: {slot.name}")
-        role_prompts = {
-            "A": "localization_A.md",
-            "B": "localization_B.md",
-            "C": "localization_C.md",
-        }
-        default_prompt = "localization_A.md"
-    context_prefix = (GAME_MOD_CONTEXT + "\n\n") if CONTROLLER_MODE == "conversion" else ""
-    return context_prefix + queue_dynamic_prefix() + read_prompt(role_prompts.get(slot.name, default_prompt))
+        raise ValueError("Unsupported candidate transport")
+    return {"lane": lane, "asset_path": path, "artifact_path": candidate_path,
+            "artifact_sha": manifest["artifact_sha"], "candidate_sha": sha,
+            "result_sha": sha, "state": "QA_PENDING", "self_qa_path": evidence}
 
 
-async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
-    if not WATCHDOG_ENABLED or not AUTO_SEND:
+def read_qa_result(item: dict, head: str) -> Optional[dict]:
+    path = qa_record_path(item["asset_path"], item["candidate_sha"])
+    payload = github_json_file(path, head)
+    if payload is None:
+        return None
+    if (payload.get("asset_path") != item["asset_path"] or
+            payload.get("candidate_sha") != item["candidate_sha"] or
+            payload.get("artifact_sha") != item["artifact_sha"] or
+            payload.get("status") not in {"PASS", "REWORK_REQUIRED"}):
+        raise ValueError("QA disposition identity/status mismatch")
+    evidence = payload.get("evidence_path", "")
+    asset_key(evidence)
+    sha = latest_path_commit(path, head)
+    if not sha or sha == item["candidate_sha"]:
+        raise ValueError("QA needs its own independent commit")
+    if not github_file(evidence, sha):
+        raise ValueError("Missing committed independent QA evidence")
+    return {"status": payload["status"], "result_sha": sha, "evidence_path": evidence}
+
+
+def reconcile_assets(reg: Registry, head: str):
+    """Rebuild lost checkpoints from asset manifests at one immutable Git HEAD."""
+    if reg.reconciled_head == head:
         return
-    now = datetime.now(TZ)
-    if QUEUE_MODE:
-        recovery = watchdog_rearm_queue_state(now)
-        if recovery:
-            write_runtime(
-                status="watchdog_queue_rearm",
-                last_action=f"Queue watchdog {recovery}; queue engine remains the only task sender",
-            )
-    reg = load_registry(now)
-    guard = send_guard_reason(reg, None, now)
-    if guard and guard.startswith("rate_limit_backoff:"):
-        write_runtime(
-            status="rate_limited_backoff",
-            last_action=f"Watchdog paused by {guard}",
-            rate_limit_attempts=reg.rate_limit_attempts,
-            rate_limit_until=reg.rate_limit_until,
-        )
-        return
-    candidates = [(i, s) for i, s in enumerate(reg.slots) if s.url and s.last_sent_at]
-    if not candidates:
-        return
-
-    def watch_key(item):
-        _, slot = item
-        return slot.last_watchdog_at or slot.last_sent_at or ""
-
-    for idx, slot in sorted(candidates, key=watch_key):
-        if slot.watchdog_resumes_since_schedule >= WATCHDOG_MAX_RESUMES_PER_RUN:
+    directory = github_file(ARTIFACT_ROOT, head)
+    if directory is not None and not isinstance(directory, list):
+        raise ValueError("Artifact registry must be a repository directory")
+    rows = {r["path"]: r for r in load_asset_rows(head)}
+    for entry in directory or []:
+        if entry.get("type") != "file" or not entry["path"].endswith('.json'):
             continue
-
-        page = await slot_page(context, pages, slot)
+        manifest = github_json_file(entry["path"], head)
+        path = manifest.get("asset_path", "")
+        row = rows.get(path)
+        if row is None or entry["path"] != artifact_record_path(path):
+            continue
+        lane = "A" if int(row["index"]) % 2 == 0 else "B"
+        sha = latest_path_commit(entry["path"], head)
+        old = reg.artifact_records.get(path, {})
+        if old.get("candidate_sha") == sha:
+            if manifest.get("transport", "github") == "github":
+                current_blob = github_file(manifest["artifact_path"], head)
+                if not current_blob or current_blob.get("sha") != manifest["artifact_sha"]:
+                    old.update(state="BLOCKED", reason="Candidate bytes changed without a new manifest")
+            continue
         try:
-            if page.url.rstrip("/") != slot.url.rstrip("/"):
-                await page.goto(slot.url, wait_until="domcontentloaded", timeout=60000)
-                await page.wait_for_timeout(700)
-        except Exception:
-            log.exception("watchdog slot-tab navigation failed slot=%s", slot.name)
+            record = verify_candidate(path, sha, lane)
+        except ValueError as exc:
+            log.warning("asset evidence rejected ASSET=%s reason=%s", path, exc)
             continue
-
-        guard = send_guard_reason(reg, slot, datetime.now(TZ))
-        retry_visible = await first_visible(page, RETRY_SELECTORS)
-        if retry_visible:
-            if QUEUE_MODE:
-                # In queue mode Retry is owned exclusively by the queue engine.
-                # Ignore stale Retry UI from inactive tabs so it cannot overwrite
-                # the status of the actually active task.
-                qstate = load_queue_state()
-                active_slots = set()
-                if qstate.get("active") and qstate["active"].get("slot"):
-                    active_slots.add(qstate["active"]["slot"])
-                for lane_task in qstate.get("active_by_lane", {}).values():
-                    if lane_task and lane_task.get("phase") != "DONE" and lane_task.get("slot"):
-                        active_slots.add(lane_task["slot"])
-                slot.last_result = "watchdog_retry_deferred_to_queue"
-                slot.last_watchdog_at = now.isoformat()
-                save_registry(reg)
-                if slot.name not in active_slots:
-                    continue
-                if rate_limit_active(reg, datetime.now(TZ)):
-                    write_runtime(
-                        status="rate_limited_backoff",
-                        last_action=f"Retry visible on active slot {slot.name}; queue engine waiting for adaptive backoff",
-                        rate_limit_attempts=reg.rate_limit_attempts,
-                        rate_limit_until=reg.rate_limit_until,
-                    )
-                else:
-                    write_runtime(
-                        status="retry_deferred_to_queue",
-                        last_action=f"Retry visible on active slot {slot.name}; queue engine owns retry/backoff",
-                    )
-                continue
-
-            last_request = _parse_iso(slot.last_sent_at)
-            retry_age = (datetime.now(TZ) - last_request).total_seconds() if last_request else RETRY_BUTTON_COOLDOWN_SECONDS
-            if retry_age < RETRY_BUTTON_COOLDOWN_SECONDS:
-                wait_sec = max(1, int(RETRY_BUTTON_COOLDOWN_SECONDS - retry_age))
-                slot.last_result = f"retry_wait:cooldown:{wait_sec}s"
-                slot.last_watchdog_at = now.isoformat()
-                save_registry(reg)
-                write_runtime(status="retry_wait", last_action=f"Retry visible on slot {slot.name}; cooldown {wait_sec}s")
-                continue
-            retry_guard = send_guard_reason(reg, slot, datetime.now(TZ))
-            if retry_guard and retry_guard.startswith("slot_dedup:"):
-                retry_guard = None
-            if retry_guard:
-                slot.last_result = f"retry_wait:{retry_guard}"
-                slot.last_watchdog_at = now.isoformat()
-                save_registry(reg)
-                write_runtime(status="retry_wait", last_action=f"Retry visible on slot {slot.name}; waiting only for {retry_guard}")
-                continue
-            if await click_retry_generation(page):
-                request_now = datetime.now(TZ)
-                note_successful_request(reg, request_now, slot.name)
-                slot.watchdog_resumes_since_schedule += 1
-                slot.last_watchdog_at = request_now.isoformat()
-                slot.last_sent_at = request_now.isoformat()
-                slot.last_assistant_change_at = request_now.isoformat()
-                slot.last_result = "watchdog_retry_clicked"
-                save_registry(reg)
-                write_runtime(status="watchdog_retry", last_action=f"Clicked Retry on slot {slot.name}")
-                continue
-
-        if await detect_rate_limit(page):
-            mark_rate_limit(reg, datetime.now(TZ), f"watchdog-precheck:{slot.name}")
-            return
-        if QUEUE_MODE and await detect_conversation_limit(page):
-            slot.last_result = "watchdog_conversation_limit_deferred_to_queue"
-            slot.last_watchdog_at = now.isoformat()
-            save_registry(reg)
-            write_runtime(
-                status="conversation_limit_detected",
-                last_action=f"Slot {slot.name} conversation limit detected; queue engine will roll over the active task",
-            )
-            continue
-        if await detect_limit(page):
-            write_runtime(status="limit_detected", last_action=f"Watchdog stopped: limit detected while checking slot {slot.name}")
-            return
-
-        guard = send_guard_reason(reg, slot, datetime.now(TZ))
-        if not guard and await click_continue_generating(page):
-            request_now = datetime.now(TZ)
-            if await detect_rate_limit(page):
-                mark_rate_limit(reg, request_now, f"watchdog-continue:{slot.name}")
-                return
-            note_successful_request(reg, request_now, slot.name)
-            slot.last_watchdog_at = request_now.isoformat()
-            slot.last_result = "watchdog_continue_clicked"
-            save_registry(reg)
-            write_runtime(status="watchdog_continue", last_action=f"Clicked Continue generating on slot {slot.name}")
-            continue
-
-        text = await last_assistant_text(page)
-        h = stable_hash(text) if text else None
-        if h and h != slot.last_assistant_hash:
-            slot.last_assistant_hash = h
-            slot.last_assistant_change_at = now.isoformat()
-            slot.last_watchdog_at = now.isoformat()
-            save_registry(reg)
-            continue
-        if not slot.last_assistant_change_at:
-            slot.last_assistant_change_at = slot.last_sent_at or now.isoformat()
-            slot.last_watchdog_at = now.isoformat()
-            save_registry(reg)
-            continue
-
-        stale_min = minutes_since(slot.last_assistant_change_at, now) or 0
-        busy = await detect_busy(page)
-
-        if busy:
-            if stale_min < WATCHDOG_BUSY_STALL_MINUTES:
-                slot.last_watchdog_at = now.isoformat()
-                save_registry(reg)
-                continue
-            if not WATCHDOG_FORCE_STOP_STALLED:
-                slot.last_result = "watchdog_busy_stalled"
-                slot.last_watchdog_at = now.isoformat()
-                save_registry(reg)
-                write_runtime(
-                    status="watchdog_busy_stalled",
-                    last_action=f"Slot {slot.name} unchanged {stale_min:.1f}m but still generating; other tabs continue",
-                )
-                continue
-            if not await click_stop_generating(page):
-                continue
-            if await detect_busy(page):
-                continue
-        elif stale_min < WATCHDOG_STALL_MINUTES:
-            slot.last_watchdog_at = now.isoformat()
-            save_registry(reg)
-            continue
-
-        if QUEUE_MODE:
-            slot.last_result = "watchdog_queue_observe"
-            slot.last_watchdog_at = now.isoformat()
-            save_registry(reg)
-            write_runtime(
-                status="watchdog_queue_observe",
-                last_action=f"Queue watchdog checked slot {slot.name}; queue-state recovery is handled independently of UI stall timing",
-            )
-            continue
-
-        guard = send_guard_reason(reg, slot, datetime.now(TZ))
-        if guard:
-            slot.last_result = f"send_guard:{guard}"
-            slot.last_watchdog_at = now.isoformat()
-            save_registry(reg)
-            write_runtime(status="send_throttled", last_action=f"Watchdog slot {slot.name} skipped by {guard}")
-            continue
-
-        prompt = prompt_for_slot(slot, "watchdog")
-        thinking_ok = await ensure_thinking_level(page)
-        if not thinking_ok and STRICT_THINKING_LEVEL:
-            slot.last_result = "thinking_level_unverified"
-            slot.last_watchdog_at = now.isoformat()
-            save_registry(reg)
-            write_runtime(status="thinking_level_blocked", last_action=f"Watchdog did not send slot {slot.name}: {PREFERRED_THINKING_LEVEL} could not be verified")
-            continue
-
-        send_result = await send_message(page, prompt)
-        if send_result != "sent":
-            slot.last_result = f"watchdog_{send_result}"
-            slot.last_watchdog_at = now.isoformat()
-            save_registry(reg)
-            write_runtime(status="ui_changed", last_action=f"Watchdog slot {slot.name} send failed: {send_result}")
-            continue
-
-        request_now = datetime.now(TZ)
-        if await detect_rate_limit(page):
-            slot.last_result = "watchdog_rate_limited"
-            slot.last_watchdog_at = request_now.isoformat()
-            slot.last_sent_at = request_now.isoformat()
-            save_registry(reg)
-            mark_rate_limit(reg, request_now, f"watchdog-send:{slot.name}")
-            return
-
-        note_successful_request(reg, request_now, slot.name)
-        slot.watchdog_resumes_since_schedule += 1
-        slot.last_watchdog_at = request_now.isoformat()
-        slot.last_sent_at = request_now.isoformat()
-        slot.last_assistant_change_at = request_now.isoformat()
-        slot.last_result = "watchdog_resume_sent"
-        save_registry(reg)
-        write_runtime(
-            status="watchdog_resume_sent",
-            last_action=f"Sent continuation prompt to stalled/idle slot {slot.name}",
-            active_slot=slot.name,
-            active_url=slot.url,
-            slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
-        )
-        log.info("watchdog resumed slot=%s stale_min=%.1f busy=%s", slot.name, stale_min, busy)
+        reg.artifact_records[path] = record
+        # A newer candidate supersedes pending inputs without approving old bytes.
+        reg.qa_queue = [q for q in reg.qa_queue if q["asset_path"] != path]
+        enqueue_candidate(reg, record)
+    reg.reconciled_head = head
 
 
-async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
-    now = datetime.now(TZ)
-    reg = load_registry(now)
+def load_asset_rows(head: str) -> list[dict]:
+    text = github_text(ASSET_QUEUE_PATH, head)
+    if text is None:
+        raise ValueError("Canonical asset queue is absent")
+    rows = list(csv.DictReader(io.StringIO(text)))
+    paths, indices = set(), set()
+    for row in rows:
+        index, path = int(row["index"]), row["path"]
+        asset_key(path)
+        if path in paths or index in indices:
+            raise ValueError("Duplicate path/index in canonical queue")
+        paths.add(path)
+        indices.add(index)
+    return rows
 
-    guard = send_guard_reason(reg, None, now)
-    if guard and guard.startswith("rate_limit_backoff:"):
-        write_runtime(
-            status="rate_limited_backoff",
-            last_action=f"Scheduled send paused by {guard}",
-            rate_limit_attempts=reg.rate_limit_attempts,
-            rate_limit_until=reg.rate_limit_until,
-        )
-        return
 
-    slot = reg.slots[reg.next_slot]
-    if FRESH_CHAT_EACH_RUN:
-        previous_page = pages.get(slot.name)
-        if previous_page is not None and not previous_page.is_closed():
-            try:
-                if await detect_busy(previous_page):
-                    slot.last_result = "fresh_chat_deferred_previous_busy"
-                    save_registry(reg)
-                    write_runtime(
-                        status="previous_run_busy",
-                        last_action=f"Slot {slot.name} is still generating; skipped this hourly fresh-chat launch instead of closing active work",
-                        active_slot=slot.name,
-                        active_url=slot.url or previous_page.url,
-                    )
-                    return
-            except Exception:
-                log.exception("failed to check previous slot before fresh-chat rotation slot=%s", slot.name)
-                slot.last_result = "fresh_chat_deferred_busy_check_failed"
-                save_registry(reg)
-                return
-        page = await replace_with_fresh_slot_page(context, pages, slot)
-        is_new = True
-        save_registry(reg)
-        write_runtime(
-            status="fresh_chat_started",
-            last_action=f"Opened a fresh ChatGPT tab for slot {slot.name}",
-            tab_mode="fresh_per_run",
-            tab_count=len([p for p in pages.values() if not p.is_closed()]),
-            slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
-        )
-    else:
-        page = await slot_page(context, pages, slot)
-        is_new = not slot.url
+def producer_prompt(active: dict) -> str:
+    path = active["asset_path"]
+    manifest = {"lane": active["lane"], "asset_path": path, "state": "PRODUCED",
+                "artifact_path": "<실제 DDS 경로>", "artifact_sha": "<Git blob SHA 또는 Drive SHA-256>",
+                "transport": "github", "self_qa_path": "<같은 커밋의 decoded self-QA JSON 경로>",
+                "runtime_validation": "UNTESTED"}
+    lines = [f"LANE={active['lane']}", f"ASSET={path}", "STATE=PRODUCING",
+             f"RESULT_SHA={active.get('result_sha', '')}", f"BASE_SHA={active['base_sha']}",
+             f"TARGET_BRANCH={LOCALIZATION_BRANCH}",
+             "GitHub 연결 플러그인으로 최신 HEAD와 이 자산의 기존 증거를 읽고 미완료 부분만 진행해.",
+             "현재 지시는 자산 경로 + 후보 SHA 실행 계약이다. 과거 번호 기반 실행 계약을 재생성하지 마.",
+             "candidate-completion-first: ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.",
+             "Git HEAD가 승인한 Google Drive canonical HD source transport를 사용할 수 있다.",
+             f"실제 DDS와 self-QA를 같은 커밋에 넣고 {artifact_record_path(path)}에 아래 JSON을 기록해.",
+             json.dumps(manifest, ensure_ascii=False),
+             "Drive 출력은 transport=drive와 drive_file_id를 추가하고 실제 bytes SHA-256을 artifact_sha로 기록해.",
+             "Git 출력의 artifact_sha는 DDS Git blob SHA다. self-QA와 원본 영어 비교 증거를 실제 파일로 커밋해.",
+             "준비 작업·설명만으로 PRODUCED를 기록하지 마. 공용 진행 상태는 독립 C QA consumer가 병합한다.",
+             "commit 메시지는 [AUTO:LOCALIZATION-A] 또는 [AUTO:LOCALIZATION-B]와 자산 경로를 사용해.",
+             "RUNTIME_VALIDATION=UNTESTED. CI-skip 지시어를 넣지 마.",
+             "최종 출력: LANE, ASSET, STATE, RESULT_SHA를 각각 한 줄로 출력해."]
+    return "\n".join(lines) + "\n\n" + read_prompt(f"localization_{active['lane']}.md")
 
-    if is_new:
-        if not await ensure_logged_in(page):
-            write_runtime(status="login_required", last_action=f"Slot {slot.name}: open noVNC and log in to ChatGPT")
-            return
-        prompt = prompt_for_slot(slot, "bootstrap")
-    else:
-        try:
-            if page.url.rstrip("/") != slot.url.rstrip("/"):
-                await page.goto(slot.url, wait_until="domcontentloaded", timeout=60000)
-                await page.wait_for_timeout(600)
-        except Exception:
-            log.exception("slot-tab navigation failed slot=%s", slot.name)
-            return
 
-        if CONVERSATION_ROLLOVER_ENABLED and await detect_conversation_limit(page):
-            old_url = slot.url
-            page = await replace_with_fresh_slot_page(context, pages, slot)
-            is_new = True
-            save_registry(reg)
-            if not await ensure_logged_in(page):
-                write_runtime(status="login_required", last_action=f"Slot {slot.name}: login required after completed-chat rollover")
-                return
-            prompt = prompt_for_slot(slot, "bootstrap")
-            write_runtime(
-                status="conversation_rollover_new_task",
-                last_action=f"Slot {slot.name} old chat reached length limit; opened a fresh project chat for the next task",
-                previous_chat_url=old_url,
-            )
-        else:
-            if await detect_busy(page):
-                slot.last_result = "busy_skipped"
-                reg.next_slot = (reg.next_slot + 1) % len(reg.slots)
-                save_registry(reg)
-                write_runtime(
-                    status="slot_busy",
-                    last_action=f"Slot {slot.name} still generating in its own tab; advanced to next slot",
-                    slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
-                )
-                return
-            prompt = prompt_for_slot(slot, "continue")
+def qa_prompt(active: dict) -> str:
+    item = active
+    payload = {"asset_path": item["asset_path"], "candidate_sha": item["candidate_sha"],
+               "artifact_sha": item["artifact_sha"], "status": "PASS 또는 REWORK_REQUIRED",
+               "evidence_path": "<독립 검증 증거 JSON 경로>", "runtime_validation": "UNTESTED"}
+    return "\n".join([
+        "LANE=C", f"ASSET={item['asset_path']}", "STATE=VERIFYING",
+        f"CANDIDATE_SHA={item['candidate_sha']}", f"ARTIFACT_SHA={item['artifact_sha']}",
+        f"TARGET_BRANCH={LOCALIZATION_BRANCH}",
+        "GitHub 연결 플러그인을 사용해 이 정확한 후보 커밋의 DDS와 self-QA를 독립 검증해.",
+        "현재 지시는 자산 경로 + 후보 SHA 실행 계약이다. 과거 번호 기반 실행 계약을 재생성하지 마.",
+        f"후보 manifest: {artifact_record_path(item['asset_path'])}",
+        f"독립 증거와 아래 JSON을 {qa_record_path(item['asset_path'], item['candidate_sha'])}에 같은 커밋으로 기록해.",
+        json.dumps(payload, ensure_ascii=False),
+        "판정은 PASS 또는 REWORK_REQUIRED. 최신 후보가 달라졌다면 오래된 후보로 공용 상태를 덮어쓰지 마.",
+        "새 DDS를 만들거나 producer를 대신하지 마. 공용 상태 병합은 최신 HEAD 위에서 수행해.",
+        "commit 메시지는 [AUTO:LOCALIZATION-C]와 자산 경로를 사용해. CI-skip 지시어를 넣지 마.",
+        "최종 출력: LANE=C, ASSET, STATE, RESULT_SHA. 실기 테스트는 UNTESTED.",
+    ]) + "\n\n" + read_prompt("localization_C.md")
 
-    # Scheduled self-healing: Retry/error pages can lose the composer entirely.
-    # Refresh once, then replace only this slot tab; do not consume an extra prompt send.
-    if await first_visible(page, INPUT_SELECTORS, total_wait_ms=1200) is None:
-        page = await recover_slot_composer(context, pages, slot, page)
-        is_new = not slot.url
-        if await first_visible(page, INPUT_SELECTORS, total_wait_ms=3000) is None:
-            slot.last_result = "composer_recovery_failed"
-            save_registry(reg)
-            write_runtime(status="ui_changed", last_action=f"Slot {slot.name}: composer recovery failed", current_url=page.url)
-            return
-        prompt = prompt_for_slot(slot, "bootstrap" if is_new else "continue")
 
-    if await detect_rate_limit(page):
-        slot.last_result = "rate_limited_pre_send"
-        save_registry(reg)
-        mark_rate_limit(reg, datetime.now(TZ), f"scheduled-slot-precheck:{slot.name}")
-        return
-
-    if await detect_limit(page):
-        slot.last_result = "limit_detected"
-        save_registry(reg)
-        write_runtime(status="limit_detected", last_action=f"Slot {slot.name} not sent")
-        return
-
-    guard = send_guard_reason(reg, slot, datetime.now(TZ))
-    if guard:
-        slot.last_result = f"send_guard:{guard}"
-        save_registry(reg)
-        write_runtime(status="send_throttled", last_action=f"Slot {slot.name} not sent because {guard}")
-        return
-
-    thinking_ok = await ensure_thinking_level(page)
-    if not thinking_ok and STRICT_THINKING_LEVEL:
-        slot.last_result = "thinking_level_unverified"
-        save_registry(reg)
-        write_runtime(
-            status="thinking_level_blocked",
-            last_action=f"Slot {slot.name} not sent: {PREFERRED_THINKING_LEVEL} could not be positively verified",
-            active_slot=slot.name,
-            active_url=page.url,
-            slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
-        )
-        return
-
-    send_result = await send_message(page, prompt)
-    if send_result != "sent":
-        slot.last_result = send_result
-        save_registry(reg)
-        diag = await composer_diagnostics(page)
-        write_runtime(
-            status="ui_changed",
-            last_action=f"Slot {slot.name}: send failed at {send_result}",
-            composer_diagnostics=diag,
-            current_url=page.url,
-        )
-        log.warning("composer not found slot=%s url=%s diagnostics=%s", slot.name, page.url, diag)
-        return
-
-    request_now = datetime.now(TZ)
-
-    # Persist the newly created chat URL before inspecting transient errors so the
-    # watchdog can retry the exact failed turn instead of losing the new chat.
-    if is_new:
-        new_url = await wait_for_chat_url(page, timeout_sec=8)
-        if new_url:
-            slot.url = new_url
-            save_registry(reg)
-
-    if await detect_rate_limit(page):
-        slot.last_result = "rate_limited_after_send"
-        slot.last_sent_at = request_now.isoformat()
-        save_registry(reg)
-        mark_rate_limit(reg, request_now, f"scheduled-send:{slot.name}")
-        return
-
-    note_successful_request(reg, request_now, slot.name)
-    slot.runs += 1
-    slot.watchdog_resumes_since_schedule = 0
-    slot.last_assistant_hash = None
-    slot.last_assistant_change_at = request_now.isoformat()
-    slot.last_sent_at = request_now.isoformat()
-    slot.last_result = "sent"
-    reg.next_slot = (reg.next_slot + 1) % len(reg.slots)
-    save_registry(reg)
-
-    write_runtime(
-        status="sent",
-        last_action=f"Sent review cycle to dedicated tab {slot.name}",
-        active_slot=slot.name,
-        active_url=slot.url,
-        tab_mode="dedicated_per_slot",
-        tab_count=len(pages),
-        slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
-    )
-    log.info("sent slot=%s fresh=%s runs=%s url=%s", slot.name, FRESH_CHAT_EACH_RUN, slot.runs, slot.url)
-
+def conversion_prompt(active: dict) -> str:
+    context_prefix = (GAME_MOD_CONTEXT + "\n\n")
+    return context_prefix + "\n".join([
+        f"LANE={active['lane']}", f"ASSET={active['asset_path']}", "STATE=PRODUCING",
+        f"TARGET_BRANCH={active['branch']}", f"BASE_SHA={active['base_sha']}",
+        "대상 브랜치의 실제 변경을 commit하고 RESULT_SHA=<40자리 커밋 SHA>를 마지막에 출력해.",
+        "실기 검증하지 않았다면 UNTESTED로 기록해. CI-skip 지시어를 넣지 마.",
+    ]) + "\n\n" + read_prompt("conversion_dx11.md" if active["lane"] == "A" else "conversion_dxvk.md")
 
 

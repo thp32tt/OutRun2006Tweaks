@@ -3,1680 +3,299 @@ class StatusHandler(BaseHTTPRequestHandler):
         return
 
     def do_GET(self):
-        if self.path not in ("/", "/status"):
-            self.send_response(404); self.end_headers(); return
-        now = datetime.now(TZ)
-        reg = load_registry(now)
-        q = load_queue_state()
-        execution = (
-            (
-                f"QUEUE / localization A+B producers -> C QA barrier (check every {QUEUE_CHECK_SECONDS}s)"
-                if CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL
-                else f"QUEUE / event-driven (check every {QUEUE_CHECK_SECONDS}s; legacy schedule ignored)"
-            )
-            if QUEUE_MODE else
-            f"SCHEDULE / minute {SCHEDULE_MINUTES} KST"
-        )
-        legacy_schedule = "ignored while QUEUE_MODE=true" if QUEUE_MODE else f"active: minute {SCHEDULE_MINUTES} KST"
-        body = f"""<!doctype html><html><head><meta charset='utf-8'><title>OutRun Chat Controller</title>
-<style>body{{font-family:sans-serif;max-width:1000px;margin:40px auto;padding:0 20px}}pre{{background:#f5f5f5;padding:16px;overflow:auto}}.ok{{font-weight:700}}</style></head><body>
-<h1>OutRun Chat Controller</h1>
-<p><b>Controller mode:</b> {html.escape(str(CONTROLLER_MODE))}</p>
-<p><b>AUTO_SEND:</b> {html.escape(str(AUTO_SEND))}</p>
-<p><b>Execution:</b> <span class='ok'>{html.escape(execution)}</span></p>
-<p><b>Legacy schedule:</b> {html.escape(legacy_schedule)}</p>
-<p><b>Status:</b> {html.escape(str(runtime.get('status')))}</p>
-<p><b>Last action:</b> {html.escape(str(runtime.get('last_action')))}</p>
-<p><b>Queue:</b> poll {QUEUE_CHECK_SECONDS}s / response stable {QUEUE_STABLE_SECONDS}s / no-response grace {QUEUE_RESULT_GRACE_SECONDS}s / GitHub discovery {GITHUB_POLL_SECONDS}s / exact run {GITHUB_BOUND_RUN_POLL_SECONDS}s / missing-run timeout {WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS}s / max attempts {MAX_TASK_ATTEMPTS}</p>
-<p><b>Conversation rollover:</b> {html.escape(str(CONVERSATION_ROLLOVER_ENABLED))} / max {MAX_CHAT_ROLLOVERS_PER_TASK} per task / rollover does not increment attempt</p>
-<p><b>Watchdog:</b> {html.escape(str(WATCHDOG_ENABLED))} / recovery-only in queue mode / idle {WATCHDOG_STALL_MINUTES}m / busy-stall {WATCHDOG_BUSY_STALL_MINUTES}m / force-stop {html.escape(str(WATCHDOG_FORCE_STOP_STALLED))}</p>
-<p><b>Rate limit:</b> attempts {reg.rate_limit_attempts} / until {html.escape(str(reg.rate_limit_until))} / backoff {html.escape(str(RATE_LIMIT_BACKOFF_SECONDS))}s / global-gap {MIN_SEND_GAP_SECONDS}s / slot-dedup {SLOT_DEDUP_SECONDS}s</p>
-<p><b>GitHub REST:</b> token {html.escape(str(bool(GITHUB_TOKEN)))} / task-cache {GITHUB_TASK_COMMIT_CACHE_SECONDS}s / actions-cache {GITHUB_ACTIONS_CACHE_SECONDS}s / remaining {html.escape(str(runtime.get('github_rate_limit_remaining')))} / blocked-until {html.escape(str(runtime.get('github_api_blocked_until')))}</p>
-<p><b>Thinking:</b> required {html.escape(PREFERRED_THINKING_LEVEL)} / strict {html.escape(str(STRICT_THINKING_LEVEL))} / last {html.escape(str(runtime.get('last_thinking_level_result')))}</p>
-<p><b>Logical date:</b> {html.escape(reg.logical_date)}</p>
-<p><b>Next slot:</b> {html.escape(reg.slots[reg.next_slot].name)}</p>
-<p><b>noVNC:</b> {f"<a href='{html.escape(NOVNC_PUBLIC_URL, quote=True)}' target='_blank' rel='noopener noreferrer'>{html.escape(NOVNC_PUBLIC_URL)}</a>" if NOVNC_PUBLIC_URL else "not configured"}</p>
-<h2>Queue State</h2><pre>{html.escape(json.dumps(q, ensure_ascii=False, indent=2))}</pre>
-<h2>Registry</h2><pre>{html.escape(json.dumps({"next_slot": reg.next_slot, "rate_limit_attempts": reg.rate_limit_attempts, "rate_limit_until": reg.rate_limit_until, "last_global_send_at": reg.last_global_send_at, "last_global_send_slot": reg.last_global_send_slot, "slots": [asdict(s) for s in reg.slots]}, ensure_ascii=False, indent=2))}</pre>
-<h2>Runtime</h2><pre>{html.escape(json.dumps(runtime, ensure_ascii=False, indent=2))}</pre>
-</body></html>""".encode("utf-8")
+        if self.path not in {"/", "/status"}:
+            self.send_response(404)
+            self.end_headers()
+            return
+        # Read-only status requests cannot migrate or overwrite scheduler state.
+        with registry_lock:
+            snapshot = dict(runtime)
+            registry = json.loads(REGISTRY_FILE.read_text()) if REGISTRY_FILE.exists() else {}
+        body = ("<!doctype html><html><head><meta charset='utf-8'><title>OutRun Controller</title>"
+                "</head><body><h1>OutRun lane / asset controller</h1><pre>" +
+                html.escape(json.dumps({"runtime": snapshot, "registry": registry},
+                                       ensure_ascii=False, indent=2)) + "</pre></body></html>").encode()
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
-        self.end_headers(); self.wfile.write(body)
+        self.end_headers()
+        self.wfile.write(body)
 
 
 def start_status_server():
     server = ThreadingHTTPServer(("0.0.0.0", STATUS_PORT), StatusHandler)
-    t = threading.Thread(target=server.serve_forever, daemon=True)
-    t.start()
-    log.info("status server listening on :%s", STATUS_PORT)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
 
 
-
-def queue_rollover_prompt(active: dict) -> str:
-    rollover = int(active.get("chat_rollovers", 0)) + 1
-    lane = str(active.get("lane", ""))
-    source_policy = (
-        "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 clone/worktree로 우회하지 마. "
-        "단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용하며 GitHub-only라는 이유로 차단하지 마."
-        if lane.startswith("LOCALIZATION_")
-        else
-        "GitHub 최신 HEAD를 최종 상태·결과 SSOT로 유지하되 N100 로컬 저장소/clone/worktree와 Google Drive는 "
-        "보조 입력, 분석, 빌드, 검증, 전송 수단으로 필요할 때 사용해도 된다. 최종 결과와 완료 판정은 대상 Git 브랜치의 실제 material commit으로 남겨."
-    )
-    lines = [
-        "[대화 자동 롤오버 재개]",
-        f"TASK_ID={active['task_id']}",
-        f"PRODUCTION_ID={active.get('production_id', active['task_id'])}",
-        f"EVENT_ID={active.get('event_id', '')}",
-        f"EVENT_TYPE={active.get('event_type', 'rollover')}",
-        f"LANE={active['lane']}",
-        f"TARGET_BRANCH={active['branch']}",
-        f"ATTEMPT={active['attempt']}/{MAX_TASK_ATTEMPTS}",
-        f"CHAT_ROLLOVER={rollover}",
-        "",
-        "이전 대화를 계속 사용할 수 없어 같은 프로젝트의 새 채팅으로 전환했다. 아래 실제 사유를 확인해.",
-        "이 롤오버는 작업 실패나 재시도가 아니므로 ATTEMPT를 증가시키지 마.",
-        "GitHub 최신 HEAD와 docs/automation/runs/ 아래 해당 TASK_ID 기록을 직접 확인해 현재 상태를 재구성해.",
-        "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
-        source_policy,
-        "실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED를 유지해.",
-        "실제 변경 또는 검토 기록을 Git에 남기고 결과 커밋 메시지에 정확히 [AUTO:" + active["task_id"] + "] 를 포함해.",
-    ]
-    if CONTROLLER_MODE == "conversion":
-        lines = [GAME_MOD_CONTEXT, ""] + lines
-    if str(active.get("lane", "")).startswith("LOCALIZATION_"):
-        lines.append(LOCALIZATION_EXECUTION_POLICY)
-    lines.append("RESUME_REASON=" + str(active.get("last_rollover_reason") or active.get("failure_context") or "conversation recovery"))
-    if active.get("qa_batch"):
-        lines.append("QA_BATCH_INPUTS=" + json.dumps(active["qa_batch"], ensure_ascii=False))
-    return "\n".join(lines)
+def block_lane(reg: Registry, active: dict, reason: str):
+    active["state"] = "BLOCKED"
+    active["reason"] = reason
+    record = dict(active)
+    reg.artifact_records[active["asset_path"]] = record
+    reg.active_lanes.pop(active["lane"], None)
+    publish_lane(active)
+    save_registry(reg)
 
 
-async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
-    """Move one active task to a fresh chat without consuming a repair attempt."""
-    if not CONVERSATION_ROLLOVER_ENABLED:
-        return False
-    count = int(active.get("chat_rollovers", 0))
-    if MAX_CHAT_ROLLOVERS_PER_TASK and count >= MAX_CHAT_ROLLOVERS_PER_TASK:
-        active["failure_context"] = (
-            f"conversation rollover limit reached ({MAX_CHAT_ROLLOVERS_PER_TASK}) after: {reason}"
-        )
-        active["phase"] = "BLOCKED"
-        return False
+def finish_qa(reg: Registry, active: dict):
+    path = active["asset_path"]
+    current = reg.artifact_records.get(path, {})
+    if (current.get("candidate_sha") != active["candidate_sha"] or
+            current.get("reason") == "Candidate bytes changed without a new manifest"):
+        reg.active_lanes.pop("C", None)
+        return
+    current.update(state=active["disposition"], qa_sha=active["result_sha"],
+                   automation_validation="PASS", runtime_validation="UNTESTED")
+    reg.qa_queue = [q for q in reg.qa_queue if qa_key(q) != qa_key(active)]
+    reg.active_lanes.pop("C", None)
+    publish_lane({**current, "lane": "C"})
+    save_registry(reg)
 
+
+async def poll_gate(reg: Registry, active: dict):
     now = datetime.now(TZ)
-    reg = load_registry(now)
-    slot = next((s for s in reg.slots if s.name == active["slot"]), None)
-    if slot is None:
+    run = await asyncio.to_thread(github_gate_run, active["branch"], active["result_sha"],
+                                 active["workflow"], active.get("run_id"), True)
+    if run is None:
+        elapsed = (now - datetime.fromisoformat(active["gate_started_at"])).total_seconds()
+        if elapsed > WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS:
+            block_lane(reg, active, "Exact-SHA Actions run missing; preserve evidence for gate repair")
+        return
+    active["run_id"] = run["id"]
+    if run["status"] != "completed":
+        return
+    if run["conclusion"] != "success":
+        block_lane(reg, active, f"Actions run {run['id']}: {run['conclusion']}")
+        return
+    if active["lane"] == "C" and CONTROLLER_MODE == "localization":
+        finish_qa(reg, active)
+    else:
+        active["state"] = "PASS"
+        reg.artifact_records[active["asset_path"]] = dict(active)
+        reg.active_lanes.pop(active["lane"], None)
+        publish_lane(active)
+
+
+async def dispatch_lane(context, pages, reg: Registry, active: dict) -> bool:
+    slot = next(s for s in reg.slots if s.name == active["lane"])
+    now = datetime.now(TZ)
+    if send_guard_reason(reg, slot, now):
         return False
-
-    guard = send_guard_reason(reg, slot, now)
-    if guard:
-        write_runtime(
-            status="conversation_rollover_wait",
-            last_action=f"{active['task_id']} rollover waiting for {guard}",
-        )
+    running_tabs = 0
+    for existing in pages.values():
+        if not existing.is_closed() and await detect_busy(existing):
+            running_tabs += 1
+    if running_tabs >= MAX_ACTIVE_LANES:
         return False
-
-    old_page = pages.get(slot.name)
-    old_url = slot.url or (old_page.url if old_page and not old_page.is_closed() else None)
-    previous = list(active.get("previous_chat_urls", []))
-    if old_url and old_url not in previous:
-        previous.append(old_url)
-    active["previous_chat_urls"] = previous[-20:]
-
+    page = await slot_page(context, pages, slot)
+    # Preserve a live old conversation during migration; do not discard work.
+    if await detect_busy(page):
+        return False
+    if not await ensure_logged_in(page):
+        write_runtime(status="login_required")
+        return False
+    if await detect_rate_limit(page):
+        mark_rate_limit(reg, now, "lane-dispatch")
+        return False
     page = await replace_with_fresh_slot_page(context, pages, slot)
-    if not await ensure_logged_in(page):
-        write_runtime(status="login_required", last_action=f"{active['task_id']}: login required after conversation rollover")
+    if not await ensure_thinking_level(page):
         return False
-    if await first_visible(page, INPUT_SELECTORS, total_wait_ms=5000) is None:
-        write_runtime(status="conversation_rollover_failed", last_action=f"{active['task_id']}: fresh project composer unavailable")
-        return False
-
-    runtime["queue_task_id"] = active["task_id"]
-    runtime["queue_lane"] = active["lane"]
-    runtime["queue_branch"] = active["branch"]
-    runtime["queue_attempt"] = active["attempt"]
-    runtime["queue_wave_id"] = active.get("wave_id")
-    runtime["queue_failure_context"] = active.get("failure_context", "")
-
-    if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
-        write_runtime(status="thinking_level_blocked", last_action=f"{active['task_id']}: rollover chat thinking level unverified")
-        return False
-
-    active["last_rollover_reason"] = reason
-    previous_event_id = active.get("event_id")
-    previous_event_type = active.get("event_type")
-    previous_rollover_count = int(active.get("rollover_count", active.get("chat_rollovers", 0)))
-    active["chat_rollovers"] = count + 1
-    active["rollover_count"] = count + 1
-    event = append_task_event(reg, active, "rollover")
-    runtime["queue_production_id"] = event.production_id
-    runtime["queue_event_id"] = event.event_id
-    runtime["queue_event_type"] = event.event_type
-    result = await send_message(page, queue_rollover_prompt(active))
-    if result != "sent":
-        if reg.task_events and reg.task_events[-1].event_id == event.event_id:
-            reg.task_events.pop()
-        active["chat_rollovers"] = count
-        active["rollover_count"] = previous_rollover_count
-        if previous_event_id is None:
-            active.pop("event_id", None)
-        else:
-            active["event_id"] = previous_event_id
-        if previous_event_type is None:
-            active.pop("event_type", None)
-        else:
-            active["event_type"] = previous_event_type
-        write_runtime(status="conversation_rollover_failed", last_action=f"{active['task_id']}: rollover send failed: {result}")
-        return False
-
-    sent_at = datetime.now(TZ)
-    new_url = await wait_for_chat_url(page, timeout_sec=8)
-    if new_url:
-        slot.url = new_url
-        active["active_chat_url"] = new_url
-
-    active["retry_recovery_attempted"] = False
-    active["retry_rollover_pending"] = False
-    active["last_rollover_reason"] = reason
-    active["last_rollover_at"] = sent_at.isoformat()
-    active["sent_at"] = sent_at.isoformat()
-    active["last_hash"] = None
-    active["last_hash_changed_at"] = sent_at.isoformat()
-    active["phase"] = "WAIT_CHAT"
-    slot.last_sent_at = sent_at.isoformat()
-    slot.last_assistant_hash = None
-    slot.last_assistant_change_at = sent_at.isoformat()
-    slot.last_result = "conversation_rollover_sent"
-    note_successful_request(reg, sent_at, slot.name)
+    prompt = (conversion_prompt(active) if CONTROLLER_MODE == "conversion" else
+              qa_prompt(active) if active["lane"] == "C" else producer_prompt(active))
+    # Persist intent BEFORE Enter. An interrupted send must never be silently
+    # replayed into another chat after a crash.
+    active.update(state="SENDING", sent_at=now.isoformat(), assistant_hash="",
+                  response_changed_at=now.isoformat())
+    reg.active_lanes[active["lane"]] = active
     save_registry(reg)
-    write_runtime(
-        status="conversation_rollover_sent",
-        last_action=f"{active['task_id']} moved to fresh chat rollover={active['chat_rollovers']} without incrementing attempt",
-        queue=active,
-    )
-    return True
-
-
-async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, active: dict, q: dict, context=None, pages=None) -> bool:
-    """Serialize Retry handling while distinguishing real rate pressure from generic transient Retry."""
-    retry = await first_visible(page, RETRY_SELECTORS, total_wait_ms=500)
-    if retry is None and not active.get("retry_rollover_pending"):
-        return False
-
-    now = datetime.now(TZ)
-    retry_text = await retry_surface_text(page)
-    is_rate = any(re.search(p, retry_text, flags=re.I | re.S) for p in RATE_LIMIT_PATTERNS)
-
-    if is_rate:
-        if rate_limit_active(reg, now):
-            write_runtime(
-                status="rate_limited_backoff",
-                last_action=f"Too many requests on {active['task_id']}; waiting {rate_limit_seconds_remaining(reg, now)}s",
-                rate_limit_attempts=reg.rate_limit_attempts,
-                rate_limit_until=reg.rate_limit_until,
-            )
-            return True
-
-        last_backoff = _parse_iso(active.get("last_retry_backoff_at"))
-        last_click = _parse_iso(active.get("last_retry_click_at"))
-        if last_backoff is None or (last_click is not None and last_click > last_backoff):
-            mark_rate_limit(reg, now, f"queue-retry:{active['task_id']}:too-many-requests")
-            active["last_retry_backoff_at"] = now.isoformat()
-            active["last_retry_context"] = retry_text[:500]
-            slot.last_result = "queue_rate_limit_backoff"
-            save_registry(reg)
-            save_queue_state(q)
-            return True
-
-        guard = send_guard_reason(reg, slot, now)
-        if guard:
-            write_runtime(status="retry_wait", last_action=f"Rate-limit Retry for {active['task_id']} waiting for {guard}")
-            return True
-    else:
-        # Generic Retry is usually a transient generation/UI failure. Keep it fast.
-        last_click = _parse_iso(active.get("last_retry_click_at"))
-        if last_click:
-            age = (now - last_click).total_seconds()
-            if age < RETRY_BUTTON_COOLDOWN_SECONDS:
-                write_runtime(
-                    status="retry_wait",
-                    last_action=f"Generic Retry for {active['task_id']} cooling down {max(1, int(RETRY_BUTTON_COOLDOWN_SECONDS-age))}s",
-                )
-                return True
-        guard = send_guard_reason(reg, slot, now)
-        if guard and not guard.startswith("slot_dedup:"):
-            write_runtime(status="retry_wait", last_action=f"Generic Retry for {active['task_id']} waiting for {guard}")
-            return True
-
-    if active.get("retry_recovery_attempted") or active.get("retry_rollover_pending"):
-        active["retry_rollover_pending"] = True
-        if context is not None and pages is not None:
-            await queue_rollover_chat(context, pages, active, "Retry persisted after one recovery attempt")
-        save_queue_state(q)
-        return True
-
-    active["retry_recovery_attempted"] = True
-    save_queue_state(q)
-    if await click_retry_generation(page):
-        request_now = datetime.now(TZ)
-        note_successful_request(reg, request_now, slot.name)
-        active["retry_count"] = int(active.get("retry_count", 0)) + 1
-        event = append_task_event(reg, active, "retry")
-        runtime["queue_production_id"] = event.production_id
-        runtime["queue_event_id"] = event.event_id
-        runtime["queue_event_type"] = event.event_type
-        active["last_retry_click_at"] = request_now.isoformat()
-        active["sent_at"] = request_now.isoformat()
-        active["last_hash"] = None
-        active["last_hash_changed_at"] = request_now.isoformat()
-        slot.last_sent_at = request_now.isoformat()
-        slot.last_assistant_hash = None
-        slot.last_assistant_change_at = request_now.isoformat()
-        slot.last_result = "queue_retry_clicked"
-        save_registry(reg)
-        save_queue_state(q)
-        write_runtime(
-            status="queue_retry_clicked",
-            last_action=f"Clicked one controlled {'rate-limit' if is_rate else 'generic'} Retry for {active['task_id']}",
-            queue=active,
-        )
-        return True
-
-    write_runtime(status="retry_wait", last_action=f"Retry visible for {active['task_id']} but controlled click unavailable")
-    return True
-
-
-
-async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
-    now = datetime.now(TZ)
-    reg = load_registry(now)
-    slot = next((s for s in reg.slots if s.name == active["slot"]), None)
-    if slot is None:
-        return False
-
-    guard = send_guard_reason(reg, slot, now)
-    if guard:
-        write_runtime(status="queue_retry_wait", last_action=f"{active['task_id']} repair send waiting for {guard}")
-        return False
-
-    page = await slot_page(context, pages, slot)
-    if await detect_busy(page):
-        return False
-    if await first_visible(page, RETRY_SELECTORS, total_wait_ms=500) is not None:
-        write_runtime(status="queue_retry_wait", last_action=f"{active['task_id']} repair send deferred because Retry UI is active")
-        return False
-
-    latest_head = github_branch_head(active["branch"])
-    if not latest_head:
-        write_runtime(status="queue_github_unavailable", last_action=f"{active['task_id']} retry could not refresh latest branch HEAD")
-        return False
-    previous_base = active.get("base_sha")
-    active["base_sha"] = latest_head
-    active["retry_parent_head_sha"] = latest_head
-
-    runtime["queue_task_id"] = active["task_id"]
-    runtime["queue_lane"] = active["lane"]
-    runtime["queue_branch"] = active["branch"]
-    runtime["queue_attempt"] = active["attempt"]
-    runtime["queue_wave_id"] = active.get("wave_id")
-    runtime["queue_failure_context"] = reason
-    runtime["queue_qa_batch"] = active.get("qa_batch") or []
-
-    previous_event_id = active.get("event_id")
-    previous_event_type = active.get("event_type")
-    previous_retry_count = int(active.get("retry_count", 0))
-    active["retry_count"] = previous_retry_count + 1
-    event = append_task_event(reg, active, "retry")
-    runtime["queue_production_id"] = event.production_id
-    runtime["queue_event_id"] = event.event_id
-    runtime["queue_event_type"] = event.event_type
-
-    prompt = prompt_for_slot(slot, "repair")
-    if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
-        if reg.task_events and reg.task_events[-1].event_id == event.event_id:
-            reg.task_events.pop()
-        active["retry_count"] = previous_retry_count
-        active["base_sha"] = previous_base
-        return False
     result = await send_message(page, prompt)
+    slot.url = await wait_for_chat_url(page)
+    active["chat_url"] = slot.url
     if result != "sent":
-        if reg.task_events and reg.task_events[-1].event_id == event.event_id:
-            reg.task_events.pop()
-        active["retry_count"] = previous_retry_count
-        if previous_event_id is None:
-            active.pop("event_id", None)
-        else:
-            active["event_id"] = previous_event_id
-        if previous_event_type is None:
-            active.pop("event_type", None)
-        else:
-            active["event_type"] = previous_event_type
-        active["base_sha"] = previous_base
-        write_runtime(status="queue_retry_send_failed", last_action=f"{active['task_id']} retry send failed: {result}")
+        block_lane(reg, active, "Send outcome uncertain: " + result)
         return False
-
-    now = datetime.now(TZ)
-    note_successful_request(reg, now, slot.name)
-    active["sent_at"] = now.isoformat()
-    active["last_hash"] = None
-    active["last_hash_changed_at"] = now.isoformat()
-    active["result_sha"] = None
-    active["phase"] = "WAIT_CHAT"
-    active["last_gate_poll_at"] = None
-    active.pop("wait_actions_started_at", None)
-    active.pop("missing_gate_run_detected_at", None)
-    active.pop("missing_gate_run_reason", None)
-    active["last_gate_status"] = None
-    active["last_gate_status_changed_at"] = None
-    active["last_jobs_refresh_at"] = None
-    active.pop("gate_run", None)
-    active.pop("gate_jobs", None)
-    active["failure_context"] = reason
-    slot.last_sent_at = now.isoformat()
-    slot.last_assistant_hash = None
-    slot.last_assistant_change_at = now.isoformat()
-    slot.last_result = "queue_retry_sent"
-    save_registry(reg)
-    return True
-
-
-async def recover_missing_gate_run(
-    context: BrowserContext,
-    pages: dict[str, Page],
-    active: dict,
-    now: datetime,
-) -> Optional[tuple[str, str]]:
-    """Turn a missing required Actions run into a bounded repair instead of an infinite wait."""
-    result_sha = str(active.get("result_sha") or "").strip()
-    message = str(active.get("result_message") or "")
-    if not message and result_sha:
-        message = github_commit_message(result_sha) or ""
-        if message:
-            active["result_message"] = message
-
-    directive = github_actions_skip_directive(message)
-    wait_started = (
-        _parse_iso(active.get("wait_actions_started_at"))
-        or _parse_iso(active.get("task_commit_rebound_at"))
-        or _parse_iso(active.get("last_hash_changed_at"))
-        or _parse_iso(active.get("sent_at"))
-        or now
-    )
-    active.setdefault("wait_actions_started_at", wait_started.isoformat())
-    age_seconds = max(0, int((now - wait_started).total_seconds()))
-
-    if not directive and age_seconds < WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS:
-        return None
-
-    if directive:
-        reason = (
-            f"Result commit {result_sha} contains GitHub Actions skip directive {directive!r}; "
-            f"required workflow {active['workflow']} cannot validate that exact SHA. "
-            "Create a follow-up task commit without any CI-skip directive."
-        )
-    else:
-        reason = (
-            f"No authoritative {active['workflow']} run was created for result SHA {result_sha} "
-            f"after {age_seconds}s (timeout={WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS}s). "
-            "Treating the missing run as a repairable automation failure instead of waiting forever."
-        )
-
-    active["missing_gate_run_detected_at"] = now.isoformat()
-    active["missing_gate_run_reason"] = reason
-    if active["attempt"] < MAX_TASK_ATTEMPTS:
-        previous_attempt = active["attempt"]
-        active["attempt"] = previous_attempt + 1
-        if await queue_send_retry(context, pages, active, reason):
-            return ("retry_sent", reason)
-        active["attempt"] = previous_attempt
-        active["failure_context"] = reason
-        return ("retry_deferred", reason)
-
-    active["failure_context"] = reason
-    active["phase"] = "BLOCKED"
-    return ("blocked", reason)
-
-
-async def localization_send_lane_task(
-    context: BrowserContext,
-    pages: dict[str, Page],
-    q: dict,
-    slot_name: str,
-    wave_id: str,
-    qa_batch: Optional[list[dict]] = None,
-) -> bool:
-    """Send one lane task without changing the other parallel lane."""
-    now = datetime.now(TZ)
-    reg = load_registry(now)
-    slot = next((s for s in reg.slots if s.name == slot_name), None)
-    if slot is None:
-        return False
-
-    guard = send_guard_reason(reg, slot, now)
-    if guard:
-        write_runtime(
-            status="parallel_dispatch_wait",
-            last_action=f"Wave {wave_id} lane {slot_name} waiting for {guard}",
-        )
-        return False
-
-    target = queue_target_for_slot(slot_name)
-    base_sha = github_branch_head(target["branch"])
-    if not base_sha:
-        write_runtime(status="queue_github_unavailable", last_action=f"Could not read branch {target['branch']}")
-        return False
-
-    page = await slot_page(context, pages, slot)
-    if slot.url and not is_project_scoped_chat_url(slot.url):
-        slot.url = None
-        save_registry(reg)
-        page = await replace_with_fresh_slot_page(context, pages, slot)
-
-    if await detect_busy(page):
-        write_runtime(status="parallel_dispatch_wait", last_action=f"Wave {wave_id} lane {slot_name} previous chat is still busy")
-        return False
-
-    if slot.url and await detect_conversation_limit(page):
-        page = await replace_with_fresh_slot_page(context, pages, slot)
-
-    if await first_visible(page, RETRY_SELECTORS, total_wait_ms=500) is not None:
-        # A finished lane that still shows Retry is not a safe surface for a new task.
-        page = await replace_with_fresh_slot_page(context, pages, slot)
-
-    if not await ensure_logged_in(page):
-        write_runtime(status="login_required", last_action=f"Wave {wave_id} lane {slot_name}: login required")
-        return False
-
-    if await first_visible(page, INPUT_SELECTORS, total_wait_ms=1500) is None:
-        page = await recover_slot_composer(context, pages, slot, page)
-        if await first_visible(page, INPUT_SELECTORS, total_wait_ms=3000) is None:
-            write_runtime(status="ui_changed", last_action=f"Wave {wave_id} lane {slot_name}: composer unavailable")
-            return False
-
-    if await detect_rate_limit(page):
-        mark_rate_limit(reg, datetime.now(TZ), f"parallel-dispatch:{slot_name}")
-        return False
-    if await detect_limit(page):
-        write_runtime(status="limit_detected", last_action=f"Wave {wave_id} lane {slot_name}: usage limit detected")
-        return False
-
-    minimum_next = queue_lane_minimum_next(q, target["lane"])
-    production_id = allocate_lane_production_id(reg, target["lane"], "LOCALIZATION", minimum_next)
-    draft = {
-        "task_id": production_id,
-        "production_id": production_id,
-        "attempt": 1,
-        "retry_count": 0,
-        "rollover_count": 0,
-        "chat_rollovers": 0,
-    }
-    event = append_task_event(reg, draft, "dispatch")
-    runtime["queue_task_id"] = production_id
-    runtime["queue_production_id"] = production_id
-    runtime["queue_event_id"] = event.event_id
-    runtime["queue_event_type"] = event.event_type
-    runtime["queue_lane"] = target["lane"]
-    runtime["queue_branch"] = target["branch"]
-    runtime["queue_attempt"] = 1
-    runtime["queue_wave_id"] = wave_id
-    runtime["queue_failure_context"] = ""
-    runtime["queue_qa_batch"] = qa_batch or []
-
-    if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
-        write_runtime(status="thinking_level_blocked", last_action=f"Wave {wave_id} lane {slot_name}: High not verified")
-        return False
-
-    prompt = prompt_for_slot(slot, "parallel")
-    result = await send_message(page, prompt)
-    if result != "sent":
-        write_runtime(status="ui_changed", last_action=f"Wave {wave_id} lane {slot_name}: send failed at {result}")
-        return False
-
-    sent_at = datetime.now(TZ)
-    if not slot.url:
-        new_url = await wait_for_chat_url(page, timeout_sec=8)
-        if new_url:
-            slot.url = new_url
-
-    if await detect_rate_limit(page):
-        slot.last_sent_at = sent_at.isoformat()
-        slot.last_result = "rate_limited_after_send"
-        save_registry(reg)
-        mark_rate_limit(reg, sent_at, f"parallel-send:{slot_name}")
-        return False
-
-    note_successful_request(reg, sent_at, slot.name)
+    active["state"] = "VERIFYING" if active["lane"] == "C" else "PRODUCING"
     slot.runs += 1
-    slot.watchdog_resumes_since_schedule = 0
-    slot.last_assistant_hash = None
-    slot.last_assistant_change_at = sent_at.isoformat()
-    slot.last_sent_at = sent_at.isoformat()
-    slot.last_result = "parallel_sent"
+    slot.last_sent_at = now.isoformat()
+    note_successful_request(reg, now, slot.name)
+    publish_lane(active)
+    save_registry(reg)
+    return True
+
+
+async def reconcile_active(reg: Registry, active: dict, head: str) -> bool:
+    path = active["asset_path"]
+    if active["lane"] in {"A", "B"}:
+        record = reg.artifact_records.get(path, {})
+        if record.get("candidate_sha") and record.get("candidate_sha") != active.get("previous_candidate_sha"):
+            if record.get("state") == "QA_PENDING":
+                enqueue_candidate(reg, record)
+                reg.active_lanes.pop(active["lane"], None)
+                publish_lane(record)
+                return True
+        return False
+    current = reg.artifact_records.get(path, {})
+    if (current.get("candidate_sha") != active["candidate_sha"] or
+            current.get("reason") == "Candidate bytes changed without a new manifest"):
+        reg.active_lanes.pop("C", None)
+        return True
+    result = await asyncio.to_thread(read_qa_result, active, head)
+    if result is None:
+        return False
+    active.update(state="WAIT_GATE", disposition=result["status"], result_sha=result["result_sha"],
+                  gate_started_at=datetime.now(TZ).isoformat())
+    message = await asyncio.to_thread(github_commit_message, active["result_sha"])
+    if message is None:
+        raise RuntimeError("Cannot read QA commit")
+    if github_actions_skip_directive(message):
+        block_lane(reg, active, "QA commit contains GitHub Actions skip directive")
+    publish_lane(active)
+    return True
+
+
+async def observe_lane(context, pages, reg: Registry, active: dict, head: str):
+    if active["state"] == "WAIT_GATE":
+        await poll_gate(reg, active)
+        return
+    if CONTROLLER_MODE == "localization" and await reconcile_active(reg, active, head):
+        return
+    slot = next(s for s in reg.slots if s.name == active["lane"])
+    if not active.get("chat_url"):
+        # Check Git evidence first (above), then fail closed on an ambiguous send.
+        block_lane(reg, active, "No persisted chat URL; send not repeated")
+        return
+    slot.url = active["chat_url"]
+    page = await slot_page(context, pages, slot)
+    now = datetime.now(TZ)
+    if await detect_rate_limit(page):
+        if not rate_limit_active(reg, now):
+            mark_rate_limit(reg, now, "lane-observation")
+        return
+    if await detect_conversation_limit(page):
+        block_lane(reg, active, "Conversation unavailable; asset and SHA checkpoint preserved")
+        return
+    busy = await detect_busy(page)
+    response = await last_assistant_text(page)
+    digest = stable_hash(response) if response else ""
+    if digest != active.get("assistant_hash"):
+        active.update(assistant_hash=digest, response_changed_at=now.isoformat())
+        if response:
+            clear_rate_limit_after_response(reg)
+    if busy:
+        return
+    # Only the existing generation may be continued; no prompt re-dispatch loop.
+    if await click_continue_generating(page):
+        return
+    changed = datetime.fromisoformat(active["response_changed_at"])
+    if (now - changed).total_seconds() < QUEUE_STABLE_SECONDS:
+        return
+    if CONTROLLER_MODE == "conversion" and response:
+        match = re.search(r"(?m)^RESULT_SHA\s*=\s*([0-9a-f]{40})\s*$", response)
+        if match:
+            sha = match.group(1)
+            compare = await asyncio.to_thread(github_api_json,
+                f"/repos/{GITHUB_REPO}/compare/{active['base_sha']}...{sha}")
+            reach = await asyncio.to_thread(github_api_json,
+                f"/repos/{GITHUB_REPO}/compare/{sha}...{head}")
+            if compare.get("status") == "ahead" and compare.get("files") and reach.get("status") in {"ahead", "identical"}:
+                active.update(state="WAIT_GATE", result_sha=sha, gate_started_at=now.isoformat())
+                publish_lane(active)
+                return
+    if (now - datetime.fromisoformat(active["sent_at"])).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
+        return
+    reason = ("Assistant finished without verified material evidence" if response else
+              "No assistant response was detected before the queue result grace period expired")
+    block_lane(reg, active, reason)
+
+
+def new_producer(row: dict, lane: str, head: str, reg: Registry) -> dict:
+    previous = reg.artifact_records.get(row["path"], {})
+    return {"lane": lane, "asset_path": row["path"], "artifact_sha": previous.get("artifact_sha", ""),
+            "state": "READY", "base_sha": head, "result_sha": previous.get("candidate_sha", ""),
+            "previous_candidate_sha": previous.get("candidate_sha"),
+            "branch": LOCALIZATION_BRANCH, "workflow": "Localization Automation Gate"}
+
+
+async def localization_cycle(context, pages, reg: Registry):
+    head = await asyncio.to_thread(github_branch_head, LOCALIZATION_BRANCH)
+    if not head:
+        raise RuntimeError("Cannot resolve authoritative localization HEAD")
+    await asyncio.to_thread(reconcile_assets, reg, head)
+    # Resume from asset/SHA evidence before considering new sends.
+    for lane in ("C", "A", "B"):
+        active = reg.active_lanes.get(lane)
+        if active:
+            await observe_lane(context, pages, reg, active, head)
+            save_registry(reg)
+    if not AUTO_SEND:
+        return
+    # C gets the next available slot; it never waits for both producers.
+    if "C" not in reg.active_lanes and len(reg.active_lanes) < MAX_ACTIVE_LANES:
+        for item in reg.qa_queue:
+            current = reg.artifact_records.get(item["asset_path"], {})
+            if current.get("state") == "BLOCKED" and not current.get("reason", "").startswith(("Actions run ", "Exact-SHA Actions")):
+                continue
+            active = {**item, "lane": "C", "state": "READY", "base_sha": head,
+                      "result_sha": "", "branch": LOCALIZATION_BRANCH,
+                      "workflow": "Localization Automation Gate"}
+            # Existing QA commit is adopted on restart without a second C chat.
+            if await reconcile_active(reg, active, head):
+                if active["state"] == "WAIT_GATE":
+                    reg.active_lanes["C"] = active
+                break
+            await dispatch_lane(context, pages, reg, active)
+            break
+    rows = await asyncio.to_thread(load_asset_rows, head)
+    for lane in ("A", "B"):
+        if lane in reg.active_lanes or len(reg.active_lanes) >= MAX_ACTIVE_LANES:
+            continue
+        row = choose_asset(rows, lane, reg)
+        if row:
+            await dispatch_lane(context, pages, reg, new_producer(row, lane, head, reg))
     save_registry(reg)
 
-    production_number = int(production_id.rsplit("-", 1)[-1])
-    q["counter"] = max(int(q.get("counter", 0)), production_number)
-    q.setdefault("active_by_lane", {})[slot_name] = {
-        "task_id": production_id,
-        "production_id": production_id,
-        "event_id": event.event_id,
-        "event_type": event.event_type,
-        "slot": slot_name,
-        "lane": target["lane"],
-        "branch": target["branch"],
-        "workflow": target["workflow"],
-        "base_sha": base_sha,
-        "result_sha": None,
-        "attempt": 1,
-        "retry_count": 0,
-        "rollover_count": 0,
-        "wave_id": wave_id,
-        "chat_rollovers": 0,
-        "previous_chat_urls": [],
-        "active_chat_url": slot.url,
-        "phase": "WAIT_CHAT",
-        "status": "WAIT_CHAT",
-        "terminal": None,
-        "sent_at": sent_at.isoformat(),
-        "last_hash": None,
-        "last_hash_changed_at": sent_at.isoformat(),
-        "last_gate_poll_at": None,
-        "failure_context": "",
-        "qa_batch": [dict(item) for item in (qa_batch or [])],
-    }
-    save_queue_state(q)
-    write_runtime(
-        status="parallel_wave_running",
-        last_action=f"Wave {wave_id}: sent lane {slot_name} as {production_id} event={event.event_id}",
-        queue=q,
-    )
-    return True
 
-
-def finalize_localization_producer_commit(q: dict, active: dict, task_commit: dict, now: datetime) -> None:
-    """Release only material results; keep blocked/report-only tasks resumable."""
-    kind, reason = github_localization_result_evidence(task_commit, active["task_id"])
-    active["result_classification"] = kind
-    active["result_evidence_reason"] = reason
-    if kind in {"REJECTED", "RETRY"}:
-        active["rejected_result_sha"] = task_commit["sha"]
-        active["result_sha"] = None
-        active["phase"] = "WAIT_CHAT"
-        if kind == "REJECTED":
-            active["execution_resume_reason"] = reason + "; rejected SHA=" + task_commit["sha"] + "; perform missing asset work, not another blocker-only commit."
-        return
-    active["result_sha"] = task_commit["sha"]
-    active["result_message"] = task_commit.get("message")
-    active["automation_validation"] = "PENDING"
-    active["validation_mode"] = "C_BATCH_GATE"
-    active["batch_validation_pending"] = kind == "PRODUCED"
-    active["runtime_validation"] = "UNTESTED"
-    active["completed_at"] = now.isoformat()
-    active["terminal"] = kind
-    active["phase"] = "DONE"
-    for key in (
-        "gate_run",
-        "last_gate_poll_at",
-        "last_gate_status",
-        "last_gate_status_changed_at",
-        "gate_jobs",
-        "last_jobs_refresh_at",
-        "startup_reconcile_pending",
-    ):
-        active.pop(key, None)
-    q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
-
-
-async def resume_incomplete_localization(context, pages, q: dict, active: dict, reason: str) -> None:
-    """Continue the same task with backoff; do not consume CI attempts or chat rollovers."""
-    now = datetime.now(TZ)
-    last = _parse_iso(active.get("last_execution_resume_at"))
-    count = int(active.get("execution_resumes", 0))
-    delay = min(900, 60 * (2 ** min(count, 4)))
-    if last and (now - last).total_seconds() < delay:
-        return
-    active["failure_context"] = reason
-    if await queue_send_retry(context, pages, active, reason):
-        active["execution_resumes"] = count + 1
-        active["last_execution_resume_at"] = now.isoformat()
-        active["phase"] = "WAIT_CHAT"
-        active.pop("execution_resume_reason", None)
-    save_queue_state(q)
-
-
-async def localization_process_lane(
-    context: BrowserContext,
-    pages: dict[str, Page],
-    q: dict,
-    lane_key: str,
-) -> None:
-    active = q.get("active_by_lane", {}).get(lane_key)
-    if not active or active.get("phase") == "DONE":
-        return
-
-    if active.get("execution_resume_reason"):
-        await resume_incomplete_localization(context, pages, q, active, active["execution_resume_reason"])
-        return
-
-    now = datetime.now(TZ)
-    reg = load_registry(now)
-    slot = next((s for s in reg.slots if s.name == active["slot"]), None)
-    if slot is None:
-        active["failure_context"] = "slot_missing"
-        active["phase"] = "BLOCKED"
-    else:
-        page = await slot_page(context, pages, slot)
-
-        if active["phase"] == "WAIT_CHAT":
-            if await queue_handle_retry_surface(page, reg, slot, active, q, context, pages):
-                return
-
-            if not slot.url or not is_project_scoped_chat_url(slot.url):
-                reason = "Active lane chat URL is missing or outside the configured project."
-                if await queue_rollover_chat(context, pages, active, reason):
-                    save_queue_state(q)
-                return
-
-            if await detect_conversation_limit(page):
-                reason = "ChatGPT reported that the current conversation reached its length limit."
-                if await queue_rollover_chat(context, pages, active, reason):
-                    save_queue_state(q)
-                return
-
-            if await detect_busy(page):
-                return
-
-            # A task commit is authoritative even if the UI failed to expose the final assistant message.
-            task_commit = github_find_task_commit(active["branch"], active["task_id"])
-            text = await last_assistant_text(page)
-            if not text:
-                if task_commit:
-                    if lane_key in {"A", "B"}:
-                        finalize_localization_producer_commit(q, active, task_commit, now)
-                    else:
-                        active["result_sha"] = task_commit["sha"]
-                        active["result_message"] = task_commit["message"]
-                        active["phase"] = "WAIT_ACTIONS"
-                        active["last_gate_poll_at"] = None
-                    save_queue_state(q)
-                    return
-                sent_at = _parse_iso(active.get("sent_at")) or now
-                if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
-                    return
-                reason = "No assistant response or durable task commit was detected before the queue result grace period expired."
-                if await queue_rollover_chat(context, pages, active, reason):
-                    save_queue_state(q)
-                return
-
-            clear_rate_limit_after_response(reg)
-            active["last_retry_backoff_at"] = None
-            active["last_retry_click_at"] = None
-            h = stable_hash(text)
-            changed_at = _parse_iso(active.get("last_hash_changed_at")) or now
-            if h != active.get("last_hash"):
-                active["last_hash"] = h
-                active["last_hash_changed_at"] = now.isoformat()
-                save_queue_state(q)
-                return
-            if (now - changed_at).total_seconds() < QUEUE_STABLE_SECONDS:
-                return
-
-            task_commit = task_commit or github_find_task_commit(active["branch"], active["task_id"])
-            if task_commit:
-                if lane_key in {"A", "B"}:
-                    finalize_localization_producer_commit(q, active, task_commit, now)
-                    save_queue_state(q)
-                    if active.get("phase") != "DONE":
-                        return
-                    write_runtime(
-                        status="producer_commit_ready",
-                        last_action=f"{active['task_id']} -> {active['result_sha']} material result recorded; candidate results queued for C",
-                        queue=q,
-                    )
-                else:
-                    active["result_sha"] = task_commit["sha"]
-                    active["result_message"] = task_commit["message"]
-                    active["phase"] = "WAIT_ACTIONS"
-                    active["wait_actions_started_at"] = now.isoformat()
-                    active["last_gate_poll_at"] = None
-                    if github_actions_skip_directive(active["result_message"]):
-                        recovery = await recover_missing_gate_run(context, pages, active, now)
-                        save_queue_state(q)
-                        if recovery:
-                            action, reason = recovery
-                            write_runtime(
-                                status="qa_missing_gate_recovery",
-                                last_action=f"{active['task_id']} {action}: {reason}",
-                                queue=active,
-                            )
-                        return
-                    save_queue_state(q)
-                    write_runtime(
-                        status="qa_wait_actions",
-                        last_action=f"{active['task_id']} -> {active['result_sha']} C batch Gate pending",
-                        queue=q,
-                    )
-                return
-
-            sent_at = _parse_iso(active.get("sent_at")) or now
-            if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
-                return
-            reason = "NO_DURABLE_RESULT: stable answer ended without a task commit. Discover connected GitHub tools, read HEAD/task record, and execute missing work. An unverified tool/permission claim is not a blocker."
-            active["execution_resume_reason"] = reason
-            await resume_incomplete_localization(context, pages, q, active, reason)
-            return
-
-        if active["phase"] == "WAIT_ACTIONS":
-            if lane_key in {"A", "B"}:
-                task_commit = github_find_task_commit(active["branch"], active["task_id"])
-                if task_commit:
-                    finalize_localization_producer_commit(q, active, task_commit, now)
-                    save_queue_state(q)
-                    if active.get("phase") != "DONE":
-                        return
-                    write_runtime(
-                        status="producer_wait_actions_migrated",
-                        last_action=f"{active['task_id']} migrated from legacy WAIT_ACTIONS to C batch validation",
-                        queue=q,
-                    )
-                return
-            # C alone waits for the batched GitHub Actions Gate. Persisted C state
-            # may still point at an older failed attempt, so rebind by TASK_ID.
-            rebound = refresh_wait_actions_task_binding(
-                active,
-                force_refresh=bool(active.get("startup_reconcile_pending")),
-            )
-            if rebound:
-                save_queue_state(q)
-                write_runtime(
-                    status="task_commit_rebound",
-                    last_action=f"Rebound stale WAIT_ACTIONS task commit {rebound}",
-                    queue=q,
-                )
-            bound_run_id = (active.get("gate_run") or {}).get("id")
-            poll_seconds = GITHUB_BOUND_RUN_POLL_SECONDS if bound_run_id else GITHUB_POLL_SECONDS
-            last_poll = _parse_iso(active.get("last_gate_poll_at"))
-            if last_poll and (now - last_poll).total_seconds() < poll_seconds:
-                return
-            active["last_gate_poll_at"] = now.isoformat()
-            run = github_gate_run(
-                active["branch"],
-                active["result_sha"],
-                active["workflow"],
-                run_id=bound_run_id,
-                force_discovery=not bool(bound_run_id),
-            )
-            save_queue_state(q)
-            if run is None:
-                recovery = await recover_missing_gate_run(context, pages, active, now)
-                if recovery:
-                    action, reason = recovery
-                    save_queue_state(q)
-                    write_runtime(
-                        status="parallel_missing_gate_recovery",
-                        last_action=f"{active['task_id']} {action}: {reason}",
-                        queue=active,
-                    )
-                    return
-                save_queue_state(q)
-                write_runtime(
-                    status="parallel_validation_pending",
-                    last_action=f"No authoritative {active['workflow']} run yet for {active['task_id']} SHA {active['result_sha']}",
-                    queue=q,
-                )
-                return
-
-            active["gate_run"] = run
-            status_key = f"{run.get('status')}:{run.get('conclusion')}"
-            if status_key != active.get("last_gate_status"):
-                active["last_gate_status"] = status_key
-                active["last_gate_status_changed_at"] = now.isoformat()
-
-            if run["status"] != "completed":
-                changed_at = _parse_iso(active.get("last_gate_status_changed_at")) or now
-                last_jobs = _parse_iso(active.get("last_jobs_refresh_at"))
-                if (
-                    (now - changed_at).total_seconds() >= WAIT_ACTIONS_STALE_SECONDS
-                    and (not last_jobs or (now - last_jobs).total_seconds() >= WAIT_ACTIONS_STALE_SECONDS)
-                ):
-                    active["gate_jobs"] = github_action_jobs_summary(run["id"])
-                    active["last_jobs_refresh_at"] = now.isoformat()
-                save_queue_state(q)
-                write_runtime(
-                    status="parallel_validation_running",
-                    last_action=f"{active['workflow']} exact run {run['id']} is {run['status']}",
-                    queue=q,
-                )
-                return
-
-            if run.get("conclusion") == "success":
-                active["automation_validation"] = "PASS"
-                active["runtime_validation"] = "UNTESTED"
-                active["completed_at"] = now.isoformat()
-                active["terminal"] = "PASS"
-                active["phase"] = "DONE"
-                q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
-                save_queue_state(q)
-                return
-
-            active["gate_jobs"] = github_action_jobs_summary(run["id"])
-            reason = f"{active['workflow']} exact run {run.get('id')} concluded {run.get('conclusion')}; inspect {run.get('html_url')}"
-            if active["attempt"] < MAX_TASK_ATTEMPTS:
-                previous_attempt = active["attempt"]
-                active["attempt"] = previous_attempt + 1
-                if await queue_send_retry(context, pages, active, reason):
-                    save_queue_state(q)
-                else:
-                    active["attempt"] = previous_attempt
-                    save_queue_state(q)
-                return
-            active["failure_context"] = reason
-            active["phase"] = "BLOCKED"
-
-    if active.get("phase") == "BLOCKED":
-        active["automation_validation"] = "FAIL"
-        active["runtime_validation"] = "UNTESTED"
-        active["blocked_at"] = now.isoformat()
-        active["terminal"] = "BLOCKED"
-        active["phase"] = "DONE"
-        q["blocked"] = (q.get("blocked", []) + [dict(active)])[-100:]
-        save_queue_state(q)
-
-
-def _qa_item_key(item: dict) -> str:
-    return f"{item.get('task_id','')}@{item.get('result_sha','')}"
-
-
-def _qa_completed_input_keys(q: dict) -> set[str]:
-    keys: set[str] = set()
-    for record in q.get("qa_completed", []):
-        keys.update(record.get("input_keys", []))
-    for record in q.get("qa_blocked", []):
-        keys.update(record.get("input_keys", []))
-    return keys
-
-
-def enqueue_producer_result_for_qa(q: dict, task: dict) -> bool:
-    if task.get("terminal") not in {"PRODUCED", "PASS"} or not task.get("result_sha"):
-        return False
-    item = {
-        "task_id": task.get("task_id"),
-        "lane": task.get("lane"),
-        "result_sha": task.get("result_sha"),
-        "result_message": task.get("result_message"),
-        "completed_at": task.get("completed_at"),
-        "producer_id": task.get("wave_id"),
-        "automation_validation": task.get("automation_validation", "PENDING"),
-        "validation_mode": task.get("validation_mode", "C_BATCH_GATE"),
-    }
-    key = _qa_item_key(item)
-    pending_keys = {_qa_item_key(x) for x in q.get("qa_pending", [])}
-    if key in pending_keys or key in _qa_completed_input_keys(q):
-        return False
-    q.setdefault("qa_pending", []).append(item)
-    q["qa_pending"] = q["qa_pending"][-200:]
-    return True
-
-
-def finalize_c_qa_batch(q: dict, task: dict) -> None:
-    batch = task.get("qa_batch") or []
-    input_keys = [_qa_item_key(x) for x in batch]
-    record = {
-        "qa_task_id": task.get("task_id"),
-        "qa_result_sha": task.get("result_sha"),
-        "terminal": task.get("terminal"),
-        "completed_at": task.get("completed_at") or task.get("blocked_at"),
-        "input_keys": input_keys,
-        "inputs": batch,
-    }
-    if task.get("terminal") == "PASS":
-        try:
-            evidence = github_task_record(task["result_sha"], task["task_id"]) or {}
-            dispositions = evidence.get("qa_dispositions", [])
-            expected = set(input_keys)
-            actual = {_qa_item_key(x) for x in dispositions if isinstance(x, dict)}
-            allowed = {"PASS", "REWORK_REQUIRED", "HOLD_STRICT_RECHECK", "SUPERSEDED"}
-            if actual != expected or len(dispositions) != len(expected) or any(x.get("status") not in allowed for x in dispositions):
-                raise ValueError("INCOMPLETE_C_DISPOSITIONS")
-            record["qa_dispositions"] = dispositions
-            if any(x["status"] == "HOLD_STRICT_RECHECK" for x in dispositions):
-                q["qa_hold"] = "C requested HOLD_STRICT_RECHECK; preserve inputs until resolved"
-        except Exception as exc:
-            q["qa_hold"] = f"C evidence unresolved: {exc}"
-            q.setdefault("qa_blocked", []).append(record)
-            return
-        q["qa_completed"] = (q.get("qa_completed", []) + [record])[-100:]
-        input_key_set = set(input_keys)
-        for producer in q.get("completed", []):
-            if _qa_item_key(producer) in input_key_set:
-                producer["automation_validation"] = "PASS"
-                producer["qa_disposition"] = next(x["status"] for x in dispositions if _qa_item_key(x) == _qa_item_key(producer))
-                producer["batch_validation_pending"] = False
-                producer["validated_by_qa_task_id"] = task.get("task_id")
-                producer["validated_by_qa_result_sha"] = task.get("result_sha")
-    else:
-        q["qa_hold"] = "C QA did not pass its validation gate; inspect qa_blocked before resuming"
-        q["qa_blocked"] = (q.get("qa_blocked", []) + [record])[-100:]
-    consumed = set(input_keys)
-    q["qa_pending"] = [x for x in q.get("qa_pending", []) if _qa_item_key(x) not in consumed]
-
-
-def select_verified_qa_batch(q: dict) -> list[dict]:
-    """Recheck legacy pending entries; retain rejected evidence outside the C queue."""
-    batch = []
-    for item in list(q.get("qa_pending", []))[:LOCALIZATION_QA_BATCH_SIZE]:
-        kind, reason = github_localization_result_evidence(
-            {"sha": item.get("result_sha", "")}, item.get("task_id", ""))
-        if kind == "PRODUCED":
-            batch.append(item)
-        elif kind != "RETRY":
-            q.setdefault("qa_ineligible", []).append({**item, "result_classification": kind,
-                                                       "result_evidence_reason": reason})
-            q["qa_pending"].remove(item)
-            save_queue_state(q)
-    return batch
-
-
-async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
-    """Run two producers, then independent C QA, before the next wave."""
-    now = datetime.now(TZ)
-    q = load_queue_state()
-    reg = load_registry(now)
-    active_by_lane = q.setdefault("active_by_lane", {})
-    # Preserve old ownership/history, but never dispatch or route the retired E lane.
-    for key in list(active_by_lane):
-        if key not in {"A", "B", "C"}:
-            q.setdefault("retired_lane_tasks", []).append(active_by_lane.pop(key))
-            save_queue_state(q)
-    q.setdefault("production_wave", {"dispatched": [k for k in ("A", "B") if k in active_by_lane]})
-
-    # One-time migration from the old single-active localization queue.
-    legacy = q.get("active")
-    if legacy and not active_by_lane:
-        legacy_slot = legacy.get("slot")
-        if legacy_slot in {"A", "B", "C"}:
-            legacy.setdefault("terminal", None)
-            active_by_lane[legacy_slot] = legacy
-            if legacy_slot in {"A", "B"} and legacy_slot not in q["production_wave"]["dispatched"]:
-                q["production_wave"]["dispatched"].append(legacy_slot)
-            q["active"] = None
-            save_queue_state(q)
-
-    if rate_limit_active(reg, now):
-        write_runtime(
-            status="rate_limited_backoff",
-            last_action=f"Localization queue paused ({rate_limit_seconds_remaining(reg, now)}s remaining)",
-            queue=q,
-        )
-        return
-
-    # Advance existing tasks; dispatch is controlled by the A/B -> C barrier.
-    for lane_key in ("A", "B", "C"):
-        if lane_key in active_by_lane:
-            await localization_process_lane(context, pages, q, lane_key)
-
-    active_by_lane = q.setdefault("active_by_lane", {})
-
-    # Retire completed producers immediately and enqueue immutable task/result SHAs for C.
-    producer_retired = []
-    for lane_key in ("A", "B"):
-        task = active_by_lane.get(lane_key)
-        if task and task.get("phase") == "DONE":
-            if enqueue_producer_result_for_qa(q, task):
-                producer_retired.append(f"{task.get('task_id')}->{task.get('result_sha')}")
-            active_by_lane.pop(lane_key, None)
-
-    # Retire one finished C batch without touching producer slots.
-    ctask = active_by_lane.get("C")
-    if ctask and ctask.get("phase") == "DONE":
-        finalize_c_qa_batch(q, ctask)
-        active_by_lane.pop("C", None)
-
-    if producer_retired or (ctask and ctask.get("phase") == "DONE"):
-        save_queue_state(q)
-
-    # A/B -> C barrier: partial dispatch resumes only the missing lane.
-    if q.get("qa_hold") and not active_by_lane:
-        write_runtime(status="parallel_c_barrier", last_action=q["qa_hold"], queue=q)
-        return
-    wave = q.setdefault("production_wave", {"dispatched": []})
-    if not active_by_lane and not q.get("qa_pending") and wave.get("dispatched"):
-        if q.get("qa_hold"):
-            write_runtime(status="parallel_c_barrier", last_action=q["qa_hold"], queue=q)
-            return
-        wave = q["production_wave"] = {"dispatched": []}
-    for lane_key in ("A", "B"):
-        if "C" in active_by_lane or lane_key in active_by_lane or lane_key in wave["dispatched"]:
+async def conversion_cycle(context, pages, reg: Registry):
+    # Separate branch-level conversion work retains its own mode and volume.
+    for lane, branch in (("A", "vr-dx11-native-r71"), ("B", "vr-dxvk-r71-disasm")):
+        head = await asyncio.to_thread(github_branch_head, branch)
+        if not head:
             continue
-        # Drain migrated QA backlog before starting a new wave.
-        if q.get("qa_pending") and not wave["dispatched"]:
-            break
-        producer_id = f"P{int(q.get('producer_counter', 0)) + 1:05d}"
-        if await localization_send_lane_task(context, pages, q, lane_key, producer_id):
-            wave["dispatched"].append(lane_key)
-            q["producer_counter"] = int(q.get("producer_counter", 0)) + 1
-            save_queue_state(q)
-
-    # C consumes immutable producer results only after both producer slots finish.
-    active_by_lane = q.setdefault("active_by_lane", {})
-    pending = q.get("qa_pending", [])
-    if not any(k in active_by_lane for k in ("A", "B", "C")) and pending:
-        batch = select_verified_qa_batch(q)
-        if not batch:
-            return
-        oldest = _parse_iso(batch[0].get("completed_at")) or now
-        age = (now - oldest).total_seconds()
-        if len(batch) < LOCALIZATION_QA_BATCH_SIZE and age < LOCALIZATION_QA_COALESCE_SECONDS:
-            write_runtime(
-                status="qa_batch_coalescing",
-                last_action=f"C QA collecting batch: {len(batch)}/{LOCALIZATION_QA_BATCH_SIZE}, oldest {int(age)}s",
-                queue=q,
-            )
-            return
-        qa_id = f"Q{int(q.get('qa_batch_counter', 0)) + 1:05d}"
-        if await localization_send_lane_task(context, pages, q, "C", qa_id, qa_batch=batch):
-            q["qa_batch_counter"] = int(q.get("qa_batch_counter", 0)) + 1
-            save_queue_state(q)
-            write_runtime(
-                status="qa_batch_running",
-                last_action=f"{qa_id}: C reviewing {len(batch)} producer results after A/B complete",
-                queue=q,
-            )
-            return
-
-    active_by_lane = q.setdefault("active_by_lane", {})
-    write_runtime(
-        status="continuous_production_qa_running",
-        last_action=(
-            f"A/B -> C barrier; C QA pending={len(q.get('qa_pending', []))} "
-            f"active={','.join(sorted(active_by_lane.keys())) or 'none'}"
-        ),
-        queue=q,
-    )
-
-def reconcile_legacy_conversion_blocked(q: dict) -> bool:
-    """Move historical UI-detection false failures to completed when exact task SHA gate already passed."""
-    if CONTROLLER_MODE != "conversion":
-        return False
-    # v2 retries the earlier reconciliation because v1 could mark itself complete
-    # even after GitHub REST rate limiting interrupted the scan.
-    if int(q.get("conversion_blocked_reconcile_version", 0)) >= 2:
-        return False
-
-    original = list(q.get("blocked", []))
-    kept = []
-    recovered = []
-    lookup_failed = False
-
-    for idx, record in enumerate(original):
-        task_id = record.get("task_id")
-        branch = record.get("branch")
-        workflow = record.get("workflow") or "Backend Conversion Gate"
-        if not task_id or not branch:
-            kept.append(record)
+        active = reg.active_lanes.get(lane)
+        if active:
+            await observe_lane(context, pages, reg, active, head)
             continue
-
-        commit = github_find_task_commit(branch, task_id)
-        if commit is None:
-            kept.append(record)
-            if _github_blocked_seconds() > 0:
-                lookup_failed = True
-                kept.extend(original[idx + 1:])
-                break
+        if not AUTO_SEND:
             continue
-
-        run = github_gate_run(branch, commit["sha"], workflow)
-        if run is None:
-            kept.append(record)
-            if _github_blocked_seconds() > 0:
-                lookup_failed = True
-                kept.extend(original[idx + 1:])
-                break
+        asset = "branches/" + branch
+        previous = reg.artifact_records.get(asset, {})
+        if previous.get("state") == "BLOCKED":
             continue
-
-        if run.get("status") == "completed" and run.get("conclusion") == "success":
-            fixed = dict(record)
-            fixed["result_sha"] = commit["sha"]
-            fixed["result_message"] = commit["message"]
-            fixed["gate_run"] = run
-            fixed["automation_validation"] = "PASS"
-            fixed["runtime_validation"] = record.get("runtime_validation") or "UNTESTED"
-            fixed["recovered_from_false_blocked"] = True
-            fixed["recovered_at"] = datetime.now(TZ).isoformat()
-            fixed["original_failure_context"] = record.get("failure_context")
-            fixed["failure_context"] = ""
-            recovered.append(fixed)
-        else:
-            kept.append(record)
-
-    q["blocked"] = kept
-    if recovered:
-        existing_ids = {r.get("task_id") for r in q.get("completed", [])}
-        q["completed"] = (
-            q.get("completed", []) + [r for r in recovered if r.get("task_id") not in existing_ids]
-        )[-100:]
-
-    q["last_blocked_reconcile_at"] = datetime.now(TZ).isoformat()
-    q["last_blocked_recovered_count"] = len(recovered)
-
-    if lookup_failed:
-        # Do not seal reconciliation while REST is rate-limited; retry automatically later.
-        q["conversion_blocked_reconcile_version"] = 1
-        save_queue_state(q)
-        write_runtime(
-            status="queue_history_reconcile_paused",
-            last_action=f"Recovered {len(recovered)} historical tasks; reconciliation paused by GitHub REST rate limit",
-            recovered_tasks=[r["task_id"] for r in recovered],
-        )
-        return bool(recovered)
-
-    q["conversion_blocked_reconcile_version"] = 2
-    save_queue_state(q)
-    if recovered:
-        write_runtime(
-            status="queue_history_reconciled",
-            last_action=f"Recovered {len(recovered)} historical conversion tasks that had durable PASS commits/gates",
-            recovered_tasks=[r["task_id"] for r in recovered],
-        )
-    return bool(recovered)
-
-
-async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
-    now = datetime.now(TZ)
-    q = load_queue_state()
-    reg = load_registry(now)
-    if CONTROLLER_MODE == "conversion":
-        reconcile_legacy_conversion_blocked(q)
-        q = load_queue_state()
-    active = q.get("active")
-
-    if rate_limit_active(reg, now):
-        write_runtime(
-            status="rate_limited_backoff",
-            last_action=f"Queue paused for adaptive rate-limit backoff ({rate_limit_seconds_remaining(reg, now)}s remaining)",
-            rate_limit_attempts=reg.rate_limit_attempts,
-            rate_limit_until=reg.rate_limit_until,
-        )
-        return
-
-    if not active:
-        not_before = _parse_iso(q.get("next_task_not_before"))
-        if not_before and now < not_before:
-            remaining = max(1, int((not_before - now).total_seconds()))
-            write_runtime(
-                status="queue_next_task_cooldown",
-                last_action=f"Previous task finished; waiting {remaining}s before starting the next ChatGPT request",
-            )
-            return
-        slot = reg.slots[reg.next_slot]
-        target = queue_target_for_slot(slot.name)
-        base_sha = github_branch_head(target["branch"])
-        if not base_sha:
-            write_runtime(status="queue_github_unavailable", last_action=f"Could not read branch {target['branch']}")
-            return
-        q["counter"] = int(q.get("counter", 0)) + 1
-        task_id = f"{CONTROLLER_MODE.upper()}-{target['lane']}-{q['counter']:05d}"
-        runtime["queue_task_id"] = task_id
-        runtime["queue_lane"] = target["lane"]
-        runtime["queue_branch"] = target["branch"]
-        runtime["queue_attempt"] = 1
-        runtime["queue_failure_context"] = ""
-        slot_name = slot.name
-        await run_cycle(context, pages)
-        if runtime.get("status") != "sent":
-            q["counter"] -= 1
-            save_queue_state(q)
-            return
-        q["active"] = {
-            "task_id": task_id,
-            "slot": slot_name,
-            "lane": target["lane"],
-            "branch": target["branch"],
-            "workflow": target["workflow"],
-            "base_sha": base_sha,
-            "result_sha": None,
-            "attempt": 1,
-            "chat_rollovers": 0,
-            "previous_chat_urls": [],
-            "active_chat_url": slot.url,
-            "phase": "WAIT_CHAT",
-            "sent_at": datetime.now(TZ).isoformat(),
-            "last_hash": None,
-            "last_hash_changed_at": datetime.now(TZ).isoformat(),
-            "last_gate_poll_at": None,
-            "failure_context": "",
-        }
-        save_queue_state(q)
-        write_runtime(status="queue_wait_chat", last_action=f"Sent {task_id}", queue=q["active"])
-        return
-
-    slot = next((s for s in reg.slots if s.name == active["slot"]), None)
-    if slot is None:
-        active["failure_context"] = "slot_missing"
-        q["blocked"].append(active)
-        q["active"] = None
-        save_queue_state(q)
-        return
-    page = await slot_page(context, pages, slot)
-
-    if active["phase"] == "WAIT_CHAT":
-        # Durable Git is authoritative. ChatGPT UI response detection can fail even
-        # after the task already committed its result, so check the exact task marker first.
-        task_commit = github_find_task_commit(active["branch"], active["task_id"])
-        if task_commit:
-            active["result_sha"] = task_commit["sha"]
-            active["result_message"] = task_commit["message"]
-            active["phase"] = "WAIT_ACTIONS"
-            active["last_gate_poll_at"] = None
-            save_queue_state(q)
-            write_runtime(
-                status="queue_wait_actions",
-                last_action=f"{active['task_id']} durable task commit found -> {active['result_sha']}",
-                queue=active,
-            )
-            return
-
-        if await queue_handle_retry_surface(page, reg, slot, active, q, context, pages):
-            return
-        if not slot.url or not is_project_scoped_chat_url(slot.url):
-            reason = "Active task chat URL is missing or outside the configured project after restart/project-scope reconciliation."
-            if await queue_rollover_chat(context, pages, active, reason):
-                save_queue_state(q)
-                return
-            if active.get("phase") == "BLOCKED":
-                save_queue_state(q)
-            return
-        if await detect_conversation_limit(page):
-            reason = "ChatGPT reported that the current conversation reached its length limit."
-            if await queue_rollover_chat(context, pages, active, reason):
-                save_queue_state(q)
-                return
-            if active.get("phase") == "BLOCKED":
-                save_queue_state(q)
-            return
-        if await detect_busy(page):
-            return
-        text = await last_assistant_text(page)
-        if not text:
-            sent_at = _parse_iso(active.get("sent_at")) or now
-            if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
-                return
-            reason = (
-                "No assistant response was detected before the queue result grace period expired; "
-                "the active chat may be stale, hidden, or failed before generation started."
-            )
-            if await queue_rollover_chat(context, pages, active, reason):
-                save_queue_state(q)
-                return
-            if active.get("phase") == "BLOCKED":
-                save_queue_state(q)
-            return
-        clear_rate_limit_after_response(reg)
-        active["last_retry_backoff_at"] = None
-        active["last_retry_click_at"] = None
-        h = stable_hash(text)
-        changed_at = _parse_iso(active.get("last_hash_changed_at")) or now
-        if h != active.get("last_hash"):
-            active["last_hash"] = h
-            active["last_hash_changed_at"] = now.isoformat()
-            save_queue_state(q)
-            return
-        if (now - changed_at).total_seconds() < QUEUE_STABLE_SECONDS:
-            return
-
-        task_commit = github_find_task_commit(active["branch"], active["task_id"])
-        if not task_commit:
-            sent_at = _parse_iso(active.get("sent_at")) or now
-            if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
-                return
-            reason = "Chat response stabilized but no durable commit carrying the exact [AUTO:TASK_ID] marker was found."
-            if active["attempt"] < MAX_TASK_ATTEMPTS:
-                previous_attempt = active["attempt"]
-                active["attempt"] = previous_attempt + 1
-                if await queue_send_retry(context, pages, active, reason):
-                    save_queue_state(q)
-                else:
-                    active["attempt"] = previous_attempt
-                    save_queue_state(q)
-                return
-            active["failure_context"] = reason
-            active["phase"] = "BLOCKED"
-        else:
-            active["result_sha"] = task_commit["sha"]
-            active["result_message"] = task_commit["message"]
-            active["phase"] = "WAIT_ACTIONS"
-            active["wait_actions_started_at"] = now.isoformat()
-            active["last_gate_poll_at"] = None
-            if github_actions_skip_directive(active["result_message"]):
-                recovery = await recover_missing_gate_run(context, pages, active, now)
-                save_queue_state(q)
-                if recovery:
-                    action, reason = recovery
-                    write_runtime(
-                        status="queue_missing_gate_recovery",
-                        last_action=f"{active['task_id']} {action}: {reason}",
-                        queue=active,
-                    )
-                return
-            save_queue_state(q)
-            write_runtime(
-                status="queue_wait_actions",
-                last_action=f"{active['task_id']} -> {active['result_sha']} (exact task commit)",
-                queue=active,
-            )
-            return
-
-    if active["phase"] == "WAIT_ACTIONS":
-        bound_run_id = (active.get("gate_run") or {}).get("id")
-        poll_seconds = GITHUB_BOUND_RUN_POLL_SECONDS if bound_run_id else GITHUB_POLL_SECONDS
-        last_poll = _parse_iso(active.get("last_gate_poll_at"))
-        if last_poll and (now - last_poll).total_seconds() < poll_seconds:
-            return
-        active["last_gate_poll_at"] = now.isoformat()
-        run = github_gate_run(
-            active["branch"],
-            active["result_sha"],
-            active["workflow"],
-            run_id=bound_run_id,
-            force_discovery=not bool(bound_run_id),
-        )
-        save_queue_state(q)
-        if run is None:
-            recovery = await recover_missing_gate_run(context, pages, active, now)
-            if recovery:
-                action, reason = recovery
-                save_queue_state(q)
-                write_runtime(
-                    status="queue_missing_gate_recovery",
-                    last_action=f"{active['task_id']} {action}: {reason}",
-                    queue=active,
-                )
-                return
-            save_queue_state(q)
-            write_runtime(status="queue_validation_pending", last_action=f"No authoritative {active['workflow']} run yet for {active['result_sha']}", queue=active)
-            return
-
-        active["gate_run"] = run
-        status_key = f"{run.get('status')}:{run.get('conclusion')}"
-        if status_key != active.get("last_gate_status"):
-            active["last_gate_status"] = status_key
-            active["last_gate_status_changed_at"] = now.isoformat()
-
-        if run["status"] != "completed":
-            changed_at = _parse_iso(active.get("last_gate_status_changed_at")) or now
-            last_jobs = _parse_iso(active.get("last_jobs_refresh_at"))
-            if (
-                (now - changed_at).total_seconds() >= WAIT_ACTIONS_STALE_SECONDS
-                and (not last_jobs or (now - last_jobs).total_seconds() >= WAIT_ACTIONS_STALE_SECONDS)
-            ):
-                active["gate_jobs"] = github_action_jobs_summary(run["id"])
-                active["last_jobs_refresh_at"] = now.isoformat()
-            save_queue_state(q)
-            write_runtime(status="queue_validation_running", last_action=f"{active['workflow']} exact run {run['id']} is {run['status']}", queue=active)
-            return
-
-        if run.get("conclusion") == "success":
-            record = dict(active)
-            record["automation_validation"] = "PASS"
-            record["runtime_validation"] = "UNTESTED"
-            record["completed_at"] = now.isoformat()
-            q["completed"] = (q.get("completed", []) + [record])[-100:]
-            q["active"] = None
-            q["next_task_not_before"] = (now + timedelta(seconds=QUEUE_NEXT_TASK_DELAY_SECONDS)).isoformat()
-            save_queue_state(q)
-            write_runtime(status="queue_pass", last_action=f"{record['task_id']} automation PASS; runtime UNTESTED", last_completed=record)
-            return
-
-        active["gate_jobs"] = github_action_jobs_summary(run["id"])
-        reason = f"{active['workflow']} exact run {run.get('id')} concluded {run.get('conclusion')}; inspect {run.get('html_url')}"
-        if active["attempt"] < MAX_TASK_ATTEMPTS:
-            previous_attempt = active["attempt"]
-            previous_base = active["base_sha"]
-            active["attempt"] = previous_attempt + 1
-            if await queue_send_retry(context, pages, active, reason):
-                save_queue_state(q)
-            else:
-                active["attempt"] = previous_attempt
-                active["base_sha"] = previous_base
-                save_queue_state(q)
-            return
-        active["failure_context"] = reason
-        active["phase"] = "BLOCKED"
-
-    if active["phase"] == "BLOCKED":
-        record = dict(active)
-        record["automation_validation"] = "FAIL"
-        record["runtime_validation"] = "UNTESTED"
-        record["blocked_at"] = now.isoformat()
-        q["blocked"] = (q.get("blocked", []) + [record])[-100:]
-        q["active"] = None
-        q["next_task_not_before"] = (now + timedelta(seconds=QUEUE_NEXT_TASK_DELAY_SECONDS)).isoformat()
-        save_queue_state(q)
-        write_runtime(status="queue_blocked", last_action=f"{record['task_id']} blocked after {record['attempt']} attempts; advancing to next independent task", last_blocked=record)
-
-
-def refresh_wait_actions_task_binding(task: dict, force_refresh: bool = False) -> Optional[str]:
-    """Rebind persisted WAIT_ACTIONS to the newest durable commit for the same TASK_ID."""
-    if task.get("phase") != "WAIT_ACTIONS":
-        return None
-    branch = str(task.get("branch") or "").strip()
-    task_id = str(task.get("task_id") or "").strip()
-    if not branch or not task_id:
-        return None
-    if force_refresh:
-        _github_commit_list_cache.pop(branch, None)
-    commit = github_find_task_commit(branch, task_id)
-    if not commit or not commit.get("sha"):
-        return None
-
-    old_sha = task.get("result_sha")
-    new_sha = commit["sha"]
-    task["startup_reconcile_pending"] = False
-    if new_sha == old_sha:
-        return None
-
-    if old_sha:
-        task["rebound_from_result_sha"] = old_sha
-    old_failure = str(task.get("failure_context") or "").strip()
-    if old_failure:
-        task["previous_failure_context"] = old_failure
-    task["result_sha"] = new_sha
-    task["result_message"] = commit.get("message")
-    task["failure_context"] = ""
-    task["last_gate_poll_at"] = None
-    task["task_commit_rebound_at"] = datetime.now(TZ).isoformat()
-    task["wait_actions_started_at"] = task["task_commit_rebound_at"]
-    task.pop("missing_gate_run_detected_at", None)
-    task.pop("missing_gate_run_reason", None)
-    for key in (
-        "gate_run",
-        "last_gate_status",
-        "last_gate_status_changed_at",
-        "gate_jobs",
-        "last_jobs_refresh_at",
-    ):
-        task.pop(key, None)
-    return f"{task_id}:{str(old_sha or 'none')[:8]}->{new_sha[:8]}"
-
-
-def _queue_nonterminal_records(q: dict) -> list[dict]:
-    records = []
-    active = q.get("active")
-    if isinstance(active, dict) and active.get("phase") not in {None, "DONE"}:
-        records.append(active)
-    for task in (q.get("active_by_lane") or {}).values():
-        if isinstance(task, dict) and task.get("phase") not in {None, "DONE"}:
-            records.append(task)
-    return records
-
-
-def startup_reconcile_queue_state() -> None:
-    """Invalidate stale caches and rebind persisted WAIT_ACTIONS to the latest TASK_ID commit."""
-    _github_commit_list_cache.clear()
-    _github_actions_cache.clear()
-    q = load_queue_state()
-    now = datetime.now(TZ)
-    records = _queue_nonterminal_records(q)
-    branches = sorted({r.get("branch") for r in records if r.get("branch")})
-    heads = {}
-    for branch_name in branches:
-        head = github_branch_head(branch_name)
-        if head:
-            heads[branch_name] = head
-
-    rebounds = []
-    for task in records:
-        head = heads.get(task.get("branch"))
-        if head and CONTROLLER_MODE == "localization":
-            try:
-                record = github_task_record(head, task["task_id"])
-                if record:
-                    restore_task_counters(task, record)
-            except Exception as exc:
-                task["checkpoint_lookup_error"] = str(exc)
-                write_runtime(last_github_error=f"checkpoint:{task['task_id']}:{exc}")
-        if task.get("phase") == "WAIT_ACTIONS":
-            if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B"}:
-                _github_commit_list_cache.pop(str(task.get("branch") or ""), None)
-                commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
-                if commit:
-                    finalize_localization_producer_commit(q, task, commit, now)
-                    if task.get("phase") == "DONE":
-                        rebounds.append(f"producer-release:{task.get('task_id')}->{commit.get('sha','')[:8]}")
-                continue
-            task["last_gate_poll_at"] = None
-            task["startup_reconcile_pending"] = True
-            rebound = refresh_wait_actions_task_binding(task, force_refresh=True)
-            if rebound:
-                rebounds.append(rebound)
-
-    if not records:
-        not_before = _parse_iso(q.get("next_task_not_before"))
-        if not_before and (not_before - now).total_seconds() > QUEUE_IDLE_REARM_SECONDS:
-            q["next_task_not_before"] = (now + timedelta(seconds=QUEUE_NEXT_TASK_DELAY_SECONDS)).isoformat()
-    q["last_startup_reconcile_at"] = now.isoformat()
-    q["startup_branch_heads"] = heads
-    q["startup_task_rebounds"] = rebounds[-20:]
-    save_queue_state(q)
-    write_runtime(
-        status="startup_reconcile",
-        last_action=(
-            f"Startup reconciled {len(records)} nonterminal queue record(s); "
-            f"task-commit rebounds={len(rebounds)}"
-        ),
-        queue=q,
-    )
-
-
-def watchdog_rearm_queue_state(now: datetime) -> Optional[str]:
-    """Re-arm stale queue state; the queue engine remains the only task sender."""
-    q = load_queue_state()
-    records = _queue_nonterminal_records(q)
-    changed = False
-    rearmed = []
-    for task in records:
-        if task.get("phase") != "WAIT_ACTIONS":
-            continue
-        if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B"}:
-            _github_commit_list_cache.pop(str(task.get("branch") or ""), None)
-            commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
-            if commit:
-                finalize_localization_producer_commit(q, task, commit, now)
-                rearmed.append(f"producer-release:{task.get('task_id')}")
-                changed = True
-            continue
-        if task.get("startup_reconcile_pending"):
-            rebound = refresh_wait_actions_task_binding(task, force_refresh=True)
-            if rebound:
-                rearmed.append("commit-rebound:" + rebound)
-                changed = True
-        last_poll = _parse_iso(task.get("last_gate_poll_at"))
-        if last_poll and (now - last_poll).total_seconds() >= WAIT_ACTIONS_STALE_SECONDS:
-            rebound = refresh_wait_actions_task_binding(task, force_refresh=True)
-            task["last_gate_poll_at"] = None
-            task["watchdog_rearmed_at"] = now.isoformat()
-            rearmed.append(("commit-rebound:" + rebound) if rebound else str(task.get("task_id")))
-            changed = True
-    if not records:
-        not_before = _parse_iso(q.get("next_task_not_before"))
-        if not_before and (not_before - now).total_seconds() > QUEUE_IDLE_REARM_SECONDS:
-            q["next_task_not_before"] = (now + timedelta(seconds=QUEUE_NEXT_TASK_DELAY_SECONDS)).isoformat()
-            rearmed.append("idle-queue")
-            changed = True
-    if changed:
-        save_queue_state(q)
-        return "rearmed " + ", ".join(x for x in rearmed if x)
-    return None
+        active = {"lane": lane, "asset_path": asset, "artifact_sha": "", "state": "READY",
+                  "base_sha": head, "result_sha": "", "branch": branch,
+                  "workflow": "Backend Conversion Gate"}
+        await dispatch_lane(context, pages, reg, active)
+    save_registry(reg)
 
 
 async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: bool):
-    if QUEUE_MODE:
-        startup_reconcile_queue_state()
-    if once:
-        if QUEUE_MODE:
-            if CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL:
-                await localization_parallel_cycle(context, pages)
-            else:
-                await queue_cycle(context, pages)
-        else:
-            await run_cycle(context, pages)
-        return
-    last_tick = None
-    last_watchdog_check = 0.0
-    last_queue_check = 0.0
-    last_heartbeat = 0.0
-    write_runtime(status="idle", tab_mode="fresh_per_run" if FRESH_CHAT_EACH_RUN else "dedicated_per_slot", tab_count=len(pages))
+    reg = load_registry(datetime.now(TZ))
     while True:
         now = datetime.now(TZ)
-        mono = time.monotonic()
-        did_work = False
+        write_runtime(queue_loop_heartbeat_at=now.isoformat(), status="running" if AUTO_SEND else "manual_mode")
+        try:
+            if CONTROLLER_MODE == "localization":
+                await localization_cycle(context, pages, reg)
+            else:
+                await conversion_cycle(context, pages, reg)
+        except Exception as exc:
+            log.exception("asset cycle failed; checkpoint retained")
+            write_runtime(status="blocked", last_error=str(exc))
+            # Keep prior durable state on partial network failure. No false PASS.
+        if once:
+            return
+        await asyncio.sleep(QUEUE_CHECK_SECONDS)
 
-        if mono - last_heartbeat >= HEARTBEAT_SECONDS:
-            last_heartbeat = mono
-            write_runtime(queue_loop_heartbeat_at=now.isoformat(), last_tick=now.isoformat())
-
-        if AUTO_SEND and QUEUE_MODE and mono - last_queue_check >= QUEUE_CHECK_SECONDS:
-            last_queue_check = mono
-            did_work = True
-            try:
-                if CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL:
-                    await localization_parallel_cycle(context, pages)
-                else:
-                    await queue_cycle(context, pages)
-            except Exception as e:
-                log.exception("queue cycle failed")
-                write_runtime(
-                    status="queue_error",
-                    last_action=f"Queue cycle failed: {type(e).__name__}: {e}",
-                    last_error=repr(e),
-                )
-        elif AUTO_SEND and not QUEUE_MODE:
-            tick = now.strftime("%Y-%m-%dT%H:%M")
-            if now.minute in SCHEDULE_MINUTES and tick != last_tick:
-                last_tick = tick
-                did_work = True
-                write_runtime(last_tick=tick, status="running")
-                try:
-                    await run_cycle(context, pages)
-                except Exception as e:
-                    log.exception("scheduled cycle failed")
-                    write_runtime(status="error", last_error=repr(e))
-        elif not AUTO_SEND:
-            if runtime.get("status") not in ("login_required", "manual_mode"):
-                write_runtime(status="manual_mode", last_action="AUTO_SEND=false; waiting for manual login/setup")
-
-        if AUTO_SEND and WATCHDOG_ENABLED and not did_work and mono - last_watchdog_check >= WATCHDOG_CHECK_SECONDS:
-            last_watchdog_check = mono
-            try:
-                await watchdog_cycle(context, pages)
-            except Exception as e:
-                log.exception("watchdog cycle failed")
-                write_runtime(status="watchdog_error", last_error=repr(e))
-        await asyncio.sleep(5)
 
 
 async def main_async(once: bool):
@@ -1717,5 +336,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 

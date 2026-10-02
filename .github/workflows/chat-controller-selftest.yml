@@ -16,173 +16,53 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Reassemble and compile controller
+      - name: Reassemble and compile deployed controller
         run: |
           cat tools/chat-controller/v0.4/src/controller.py.part* > /tmp/controller.py
-          python -m py_compile /tmp/controller.py
-
-      - name: Localization result and resume regression tests
-        run: python tests/test_localization_execution.py
-
-      - name: Check undefined Python names
-        run: |
-          python -m pip install --disable-pip-version-check --quiet pyflakes
-          pyflakes /tmp/controller.py | tee /tmp/pyflakes.txt || true
-          if grep -q "undefined name" /tmp/pyflakes.txt; then
-            echo "Undefined Python names detected:"
-            grep "undefined name" /tmp/pyflakes.txt
+          python3 -m py_compile /tmp/controller.py
+          if grep -En 'TASK_ID|TaskEvent|task_id|production_id|event_id|rollover|retry_count|chat_rollovers' tools/chat-controller/v0.4/src/*; then
+            echo 'Removed execution engine found in deployed source'
             exit 1
           fi
 
-      - name: Validate Portainer compose files
+      - name: Lane asset identity, restart, material evidence and QA regression tests
+        run: python3 tools/chat-controller/v0.4/tests/test_event_model_v2.py -v
+
+      - name: Separate legacy localization implementation regression tests
+        run: python3 tests/test_localization_execution.py
+
+      - name: Check undefined Python names
+        run: |
+          python3 -m pip install --disable-pip-version-check --quiet pyflakes
+          pyflakes /tmp/controller.py | tee /tmp/pyflakes.txt || true
+          if grep -q 'undefined name' /tmp/pyflakes.txt; then exit 1; fi
+
+      - name: Validate unchanged Portainer compose interfaces
         run: |
           docker compose -f tools/chat-controller/v0.4/docker-compose.portainer-vr.yml config >/tmp/vr-compose.txt
           docker compose -f tools/chat-controller/v0.4/docker-compose.portainer-localization.yml config >/tmp/loc-compose.txt
-
-      - name: Verify High-only automation policy
-        run: |
-          for compose in \
-            tools/chat-controller/v0.4/docker-compose.portainer-vr.yml \
-            tools/chat-controller/v0.4/docker-compose.portainer-localization.yml \
-            tools/chat-controller/v0.4/docker-compose.portainer.yml; do
+          for compose in tools/chat-controller/v0.4/docker-compose.portainer{,-vr,-localization}.yml; do
             grep -Fq 'PREFERRED_THINKING_LEVEL: "High"' "$compose"
             grep -Fq 'STRICT_THINKING_LEVEL: "true"' "$compose"
           done
           grep -Fq 'EXPECTED_PROJECT_ID: "g-p-6ab9a64fc428819198c7f39765d764bf"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'No assistant response was detected before the queue result grace period expired' tools/chat-controller/v0.4/src/controller.py.part03
+          grep -Fq 'COPY src/controller.py.part*' tools/chat-controller/v0.4/Dockerfile.portainer
 
-      - name: Verify queue prompt files
+      - name: Verify prompt isolation and project guards
         run: |
-          test -s tools/chat-controller/v0.4/conversion_dx11.md
-          test -s tools/chat-controller/v0.4/conversion_dxvk.md
-          test -s tools/chat-controller/v0.4/localization_A.md
-          test -s tools/chat-controller/v0.4/localization_B.md
-          test -s tools/chat-controller/v0.4/localization_C.md
-
-      - name: Verify authorized game-mod context
-        run: |
-          grep -Fq 'GAME_MOD_CONTEXT = (' tools/chat-controller/v0.4/src/controller.py.part00
-          grep -Fq 'authorized offline game-mod/VR development' tools/chat-controller/v0.4/src/controller.py.part00
-          grep -Fq 'context_prefix = (GAME_MOD_CONTEXT' tools/chat-controller/v0.4/src/controller.py.part02
-          grep -Fq 'lines = [GAME_MOD_CONTEXT, ""] + lines' tools/chat-controller/v0.4/src/controller.py.part03
-
-
-      - name: Verify localization liveness runtime policy
-        run: |
-          compose=tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'QUEUE_RESULT_GRACE_SECONDS: "180"' "$compose"
-          grep -Fq 'GITHUB_POLL_SECONDS: "60"' "$compose"
-          grep -Fq 'GITHUB_BOUND_RUN_POLL_SECONDS: "30"' "$compose"
-          grep -Fq 'WAIT_ACTIONS_STALE_SECONDS: "75"' "$compose"
-          grep -Fq 'WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS: "600"' "$compose"
-          grep -Fq 'QUEUE_NEXT_TASK_DELAY_SECONDS: "15"' "$compose"
-          grep -Fq 'QUEUE_IDLE_REARM_SECONDS: "90"' "$compose"
-          grep -Fq 'PARALLEL_LANE_STAGGER_SECONDS: "15"' "$compose"
-          grep -Fq 'PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS: "15"' "$compose"
-          grep -Fq 'HEARTBEAT_SECONDS: "15"' "$compose"
-          grep -Fq 'LOCALIZATION_QA_BATCH_SIZE: "4"' "$compose"
-          grep -Fq 'LOCALIZATION_QA_COALESCE_SECONDS: "30"' "$compose"
-          grep -Fq 'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS: "15"' "$compose"
-          grep -Fq 'LOCALIZATION_SLOT_DEDUP_SECONDS: "30"' "$compose"
-          grep -Fq 'def github_action_run_by_id' /tmp/controller.py
-          grep -Fq 'run_id=bound_run_id' /tmp/controller.py
-          grep -Fq 'def startup_reconcile_queue_state' /tmp/controller.py
-          grep -Fq 'def refresh_wait_actions_task_binding' /tmp/controller.py
-          grep -Fq 'rebound_from_result_sha' /tmp/controller.py
-          grep -Fq 'startup_task_rebounds' /tmp/controller.py
-          grep -Fq 'def watchdog_rearm_queue_state' /tmp/controller.py
-          grep -Fq 'queue_loop_heartbeat_at=now.isoformat()' /tmp/controller.py
-          if grep -Fq 'watchdog_queue_observe_only' /tmp/controller.py; then
-            echo "legacy observe-only queue watchdog remains"
-            exit 1
-          fi
-
-
-      - name: Verify continuous producer and batch-QA architecture
-        run: |
-          grep -Fq 'def enqueue_producer_result_for_qa' /tmp/controller.py
-          grep -Fq 'def finalize_c_qa_batch' /tmp/controller.py
-          grep -Fq 'qa_pending' /tmp/controller.py
-          grep -Fq 'LOCALIZATION_QA_BATCH_SIZE' /tmp/controller.py
-          grep -Fq 'QA_BATCH_INPUTS' tools/chat-controller/v0.4/localization_C.md
-          grep -Fq '독립 C QA consumer' tools/chat-controller/v0.4/localization_A.md
-          grep -Fq '독립 C QA consumer' tools/chat-controller/v0.4/localization_B.md
-          grep -Fq 'candidate-completion-first' tools/chat-controller/v0.4/localization_A.md
-          grep -Fq 'candidate-completion-first' tools/chat-controller/v0.4/localization_B.md
-          grep -Fq 'Candidate-completion-first' tools/chat-controller/v0.4/localization_C.md
-          grep -Fq 'candidate-completion-first' tools/chat-controller/v0.4/src/controller.py.part00
-          grep -Fq 'ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.' tools/chat-controller/v0.4/src/controller.py.part00
-          grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/localization_A.md
-          grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/localization_B.md
-          grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/src/controller.py.part00
-          grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/src/controller.py.part03
-          if grep -Fq '반드시 GitHub만 직접 사용하고 N100' tools/chat-controller/v0.4/src/controller.py.part00 tools/chat-controller/v0.4/src/controller.py.part03; then
-            echo "legacy GitHub-only dispatch constraint remains"
-            exit 1
-          fi
-          echo "candidate-completion-first producer policy verified"
-          if grep -Fq 'A+B -> C synchronization barrier' tools/chat-controller/v0.4/DEPLOY_PORTAINER.md; then
-            echo "legacy localization QA barrier remains in deployment docs"
-            exit 1
-          fi
-          python - <<'PY'
+          python3 - <<'PY'
           from pathlib import Path
-          src = Path("/tmp/controller.py").read_text(encoding="utf-8")
-          a = src.index("async def localization_parallel_cycle")
-          b = src.index("def reconcile_legacy_conversion_blocked", a)
-          body = src[a:b]
-          assert 'for lane_key in ("A", "B", "C")' in body
-          assert 'enqueue_producer_result_for_qa' in body
-          assert 'LOCALIZATION_QA_COALESCE_SECONDS' in body
-          qa_helpers = src[src.index("def _qa_item_key"):src.index("async def localization_parallel_cycle")]
-          assert 'task.get("terminal") not in {"PRODUCED", "PASS"}' in qa_helpers
-          proc = src[src.index("async def localization_process_lane"):src.index("def _qa_item_key")]
-          assert 'if lane_key in {"A", "B"}:' in proc
-          assert 'finalize_localization_producer_commit' in proc
-          assert 'producer_wait_actions_migrated' in proc
-          assert 'A/B -> C barrier' in body
-          assert 'all(active_by_lane[k].get("phase") == "DONE"' not in body
-          print("continuous producers and independent batched QA verified")
+          import re
+          root = Path('tools/chat-controller/v0.4')
+          src = Path('/tmp/controller.py').read_text()
+          for role in 'ABC':
+              prompt = (root / f'localization_{role}.md').read_text()
+              assert not re.search(r'TASK_ID|PRODUCTION_ID|EVENT_ID|ATTEMPT=|CHAT_ROLLOVER', prompt)
+              assert 'UNTESTED' in prompt
+          assert 'authorized offline game-mod/VR development' in src
+          assert 'is_configured_project_url(page.url)' in src
+          assert 'ensure_thinking_level(page)' in src
+          assert 'Google Drive canonical HD source transport' in src
+          for name in ('conversion_dx11.md', 'conversion_dxvk.md'):
+              assert (root / name).stat().st_size
           PY
-
-      - name: Verify queue recovery ordering
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          src = Path("/tmp/controller.py").read_text(encoding="utf-8")
-          a = src.index("async def watchdog_cycle")
-          b = src.index("async def run_cycle", a)
-          body = src[a:b]
-          assert body.index("watchdog_rearm_queue_state(now)") < body.index("candidates =")
-          assert body.index("watchdog_rearm_queue_state(now)") < body.index("stale_min =")
-          assert "refresh_wait_actions_task_binding(task, force_refresh=True)" in src
-          assert "producer-release:" in src
-          assert "refresh_wait_actions_task_binding(" in src[src.index("async def localization_process_lane"):src.index("async def localization_parallel_cycle")]
-          print("queue recovery runs before UI stall timing")
-          PY
-
-      - name: Verify missing Actions run recovery
-        run: |
-          grep -Fq 'QUEUE_RESULT_GRACE_SECONDS: "180"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS: "600"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'GITHUB_BOUND_RUN_POLL_SECONDS: "30"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'WAIT_ACTIONS_STALE_SECONDS: "75"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq '"queue_result_grace_seconds": QUEUE_RESULT_GRACE_SECONDS' /tmp/controller.py
-          grep -Fq 'no-response grace {QUEUE_RESULT_GRACE_SECONDS}s' /tmp/controller.py
-          grep -Fq 'def github_actions_skip_directive' /tmp/controller.py
-          grep -Fq 'if github_actions_skip_directive(message):' /tmp/controller.py
-          grep -Fq 'async def recover_missing_gate_run' /tmp/controller.py
-          grep -Fq 'contains GitHub Actions skip directive' /tmp/controller.py
-          grep -Fq 'Treating the missing run as a repairable automation failure instead of waiting forever.' /tmp/controller.py
-          grep -Fq 'CI-skip 지시어를 넣지 마.' /tmp/controller.py
-          python - <<'PY'
-          from pathlib import Path
-          src = Path("/tmp/controller.py").read_text(encoding="utf-8")
-          assert 'r"\\[(?:skip ci|ci skip|no ci|skip actions|actions skip)\\]"' in src
-          assert 'r"(?im)^skip-checks:\\s*true\\s*$"' in src
-          assert 'active["wait_actions_started_at"] = now.isoformat()' in src
-          assert 'recovery = await recover_missing_gate_run(context, pages, active, now)' in src
-          print("missing Actions run recovery verified")
-          PY
-
-

@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import argparse
 import base64
+import csv
+import io
+import hashlib
 import asyncio
 import html
 import json
@@ -13,7 +16,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, asdict, field, fields
 from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -54,11 +57,9 @@ QUEUE_STABLE_SECONDS = max(10, int(os.getenv("QUEUE_STABLE_SECONDS", "30")))
 QUEUE_RESULT_GRACE_SECONDS = max(30, int(os.getenv("QUEUE_RESULT_GRACE_SECONDS", "180")))
 GITHUB_POLL_SECONDS = max(15, int(os.getenv("GITHUB_POLL_SECONDS", "60")))
 GITHUB_BOUND_RUN_POLL_SECONDS = max(10, int(os.getenv("GITHUB_BOUND_RUN_POLL_SECONDS", "30")))
-GITHUB_TASK_COMMIT_CACHE_SECONDS = max(15, int(os.getenv("GITHUB_TASK_COMMIT_CACHE_SECONDS", "60")))
 GITHUB_ACTIONS_CACHE_SECONDS = max(10, int(os.getenv("GITHUB_ACTIONS_CACHE_SECONDS", "60")))
 WAIT_ACTIONS_STALE_SECONDS = max(GITHUB_BOUND_RUN_POLL_SECONDS, int(os.getenv("WAIT_ACTIONS_STALE_SECONDS", "75")))
 WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS = max(GITHUB_POLL_SECONDS, int(os.getenv("WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS", "600")))
-QUEUE_NEXT_TASK_DELAY_SECONDS = max(0, int(os.getenv("QUEUE_NEXT_TASK_DELAY_SECONDS", "15")))
 QUEUE_IDLE_REARM_SECONDS = max(30, int(os.getenv("QUEUE_IDLE_REARM_SECONDS", "90")))
 LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "true"
 PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "15")))
@@ -68,16 +69,10 @@ LOCALIZATION_QA_BATCH_SIZE = max(1, int(os.getenv("LOCALIZATION_QA_BATCH_SIZE", 
 LOCALIZATION_QA_COALESCE_SECONDS = max(0, int(os.getenv("LOCALIZATION_QA_COALESCE_SECONDS", "30")))
 LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS", "15")))
 LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_SECONDS", "30")))
-MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
-CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
-MAX_CHAT_ROLLOVERS_PER_TASK = max(0, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "5")))
-TASK_EVENT_MODEL = os.getenv("TASK_EVENT_MODEL", "v2").strip().lower()
-PRODUCTION_COUNTER_MODE = os.getenv("PRODUCTION_COUNTER_MODE", "lane").strip().lower()
 GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
-CHAT_SLOTS = 3 if CONTROLLER_MODE == "localization" else max(1, int(os.getenv("CHAT_SLOTS", "6")))
-ROLLOVER_HOUR = int(os.getenv("CHAT_DAY_ROLLOVER_HOUR", "2"))
+CHAT_SLOTS = 3 if CONTROLLER_MODE == "localization" else 2
 STATUS_PORT = int(os.getenv("STATUS_PORT", "8787"))
 NOVNC_PUBLIC_URL = os.getenv("NOVNC_PUBLIC_URL", "").strip()
 WATCHDOG_ENABLED = os.getenv("WATCHDOG_ENABLED", "true").lower() == "true"
@@ -103,7 +98,6 @@ PROFILE_DIR = Path("/data/browser-profile")
 STATE_DIR = Path("/data/state")
 REGISTRY_FILE = STATE_DIR / "chat_registry.json"
 RUNTIME_FILE = STATE_DIR / "runtime_status.json"
-QUEUE_FILE = STATE_DIR / "queue_state.json"
 PROMPTS_DIR = Path("/opt/outrun/prompts")
 GAME_MOD_CONTEXT = (
     "Context: This is authorized offline game-mod/VR development for the user's local copy of OutRun 2006. "
@@ -214,340 +208,162 @@ class Slot:
     watchdog_resumes_since_schedule: int = 0
     last_watchdog_at: Optional[str] = None
 
-@dataclass
-class TaskEvent:
-    event_id: str
-    production_id: str
-    event_type: str
-    attempt: int
-    retry_count: int
-    rollover_count: int
-    created_at: str
-
 
 @dataclass
 class Registry:
     logical_date: str
     next_slot: int
     slots: list[Slot]
-    next_production_id: dict[str, int] = field(default_factory=dict)
-    task_events: list[TaskEvent] = field(default_factory=list)
+    active_lanes: dict = field(default_factory=dict)
+    artifact_records: dict = field(default_factory=dict)
+    qa_queue: list = field(default_factory=list)
+    schema: str = "lane-asset-v1"
+    reconciled_head: Optional[str] = None
     rate_limit_attempts: int = 0
     rate_limit_until: Optional[str] = None
     last_global_send_at: Optional[str] = None
     last_global_send_slot: Optional[str] = None
 
+
+LOCALIZATION_BRANCH = "korean-localization-clean"
+ASSET_QUEUE_PATH = "localization/graphics/asset_queue.csv"
+ARTIFACT_ROOT = "localization/graphics/controller_assets"
+QA_ROOT = "localization/graphics/controller_qa"
+MAX_ACTIVE_LANES = 2
+registry_lock = threading.RLock()
 runtime = {
     "started_at": datetime.now(TZ).isoformat(),
-    "auto_send": AUTO_SEND,
-    "auto_send_requested": AUTO_SEND_REQUESTED,
     "controller_mode": CONTROLLER_MODE,
-    "queue_mode": QUEUE_MODE,
-    "queue_check_seconds": QUEUE_CHECK_SECONDS,
-    "queue_stable_seconds": QUEUE_STABLE_SECONDS,
-    "queue_result_grace_seconds": QUEUE_RESULT_GRACE_SECONDS,
-    "github_poll_seconds": GITHUB_POLL_SECONDS,
-    "github_bound_run_poll_seconds": GITHUB_BOUND_RUN_POLL_SECONDS,
-    "github_task_commit_cache_seconds": GITHUB_TASK_COMMIT_CACHE_SECONDS,
-    "github_actions_cache_seconds": GITHUB_ACTIONS_CACHE_SECONDS,
-    "wait_actions_stale_seconds": WAIT_ACTIONS_STALE_SECONDS,
-    "wait_actions_no_run_timeout_seconds": WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS,
-    "github_token_configured": bool(GITHUB_TOKEN),
-    "queue_next_task_delay_seconds": QUEUE_NEXT_TASK_DELAY_SECONDS,
-    "queue_idle_rearm_seconds": QUEUE_IDLE_REARM_SECONDS,
-    "localization_parallel": LOCALIZATION_PARALLEL,
-    "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
-    "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
-    "heartbeat_seconds": HEARTBEAT_SECONDS,
-    "localization_qa_batch_size": LOCALIZATION_QA_BATCH_SIZE,
-    "localization_qa_coalesce_seconds": LOCALIZATION_QA_COALESCE_SECONDS,
-    "localization_same_slot_send_gap_seconds": LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS,
-    "localization_slot_dedup_seconds": LOCALIZATION_SLOT_DEDUP_SECONDS,
-    "max_task_attempts": MAX_TASK_ATTEMPTS,
-    "conversation_rollover_enabled": CONVERSATION_ROLLOVER_ENABLED,
-    "max_chat_rollovers_per_task": MAX_CHAT_ROLLOVERS_PER_TASK,
-    "project_url_configured": bool(CHATGPT_PROJECT_URL),
-    "require_project_url": REQUIRE_PROJECT_URL,
-    "configured_project_id": CONFIGURED_PROJECT_ID,
-    "expected_project_id": EXPECTED_PROJECT_ID or None,
-    "project_id_match": PROJECT_ID_MATCH,
-    "start_url": BASE_URL,
-    "novnc_public_url": NOVNC_PUBLIC_URL or None,
-    "schedule_minutes": SCHEDULE_MINUTES,
+    "auto_send": AUTO_SEND,
     "status": "starting",
-    "last_tick": None,
-    "queue_loop_heartbeat_at": None,
-    "last_scheduler_decision_at": None,
-    "last_scheduler_decision": None,
-    "blocked_reason": None,
-    "last_action": None,
-    "last_error": None,
-    "watchdog_enabled": WATCHDOG_ENABLED,
-    "watchdog_stall_minutes": WATCHDOG_STALL_MINUTES,
-    "watchdog_busy_stall_minutes": WATCHDOG_BUSY_STALL_MINUTES,
-    "watchdog_force_stop_stalled": WATCHDOG_FORCE_STOP_STALLED,
-    "preferred_thinking_level": PREFERRED_THINKING_LEVEL,
-    "strict_thinking_level": STRICT_THINKING_LEVEL,
-    "last_thinking_level_result": None,
-    "rate_limit_backoff_seconds": RATE_LIMIT_BACKOFF_SECONDS,
-    "min_send_gap_seconds": MIN_SEND_GAP_SECONDS,
-    "slot_dedup_seconds": SLOT_DEDUP_SECONDS,
-    "fresh_chat_each_run": FRESH_CHAT_EACH_RUN,
-    "retry_button_cooldown_seconds": RETRY_BUTTON_COOLDOWN_SECONDS,
-    "rate_limit_attempts": 0,
-    "rate_limit_until": None,
+    "lane": "",
+    "asset_path": "",
+    "artifact_sha": "",
+    "state": "IDLE",
+    "runtime_validation": "UNTESTED",
 }
 
 
-def write_runtime(**updates):
-    now = datetime.now(TZ)
-    if updates.get("last_action") is not None:
-        runtime["last_scheduler_decision_at"] = now.isoformat()
-        runtime["last_scheduler_decision"] = updates.get("last_action")
-    status = str(updates.get("status", ""))
-    if "blocked" in status or status in {"queue_error", "watchdog_error", "login_required", "limit_detected"}:
-        runtime["blocked_reason"] = updates.get("last_action") or updates.get("last_error") or status
-    elif status in {"idle", "sent", "queue_wait_chat", "queue_wait_actions", "parallel_wave_running",
-                    "parallel_wait_actions", "parallel_wave_complete", "queue_pass",
-                    "parallel_c_barrier", "startup_reconcile"}:
-        runtime["blocked_reason"] = None
-    runtime.update(updates)
-    STATE_DIR.mkdir(parents=True, exist_ok=True)
-    RUNTIME_FILE.write_text(json.dumps(runtime, ensure_ascii=False, indent=2), encoding="utf-8")
+def atomic_json(path: Path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(".tmp")
+    with temporary.open("w", encoding="utf-8") as stream:
+        json.dump(value, stream, ensure_ascii=False, indent=2)
+        stream.flush()
+        os.fsync(stream.fileno())
+    temporary.replace(path)
 
-def logical_date(now: datetime) -> str:
-    shifted = now - timedelta(days=1) if now.hour < ROLLOVER_HOUR else now
-    return shifted.date().isoformat()
+
+def write_runtime(**updates):
+    with registry_lock:
+        runtime.update(updates)
+        atomic_json(RUNTIME_FILE, runtime)
+
+
+def publish_lane(active: dict):
+    write_runtime(lane=active["lane"], asset_path=active["asset_path"],
+                  artifact_sha=active.get("artifact_sha", ""), state=active["state"],
+                  result_sha=active.get("result_sha", ""))
+    log.info("LANE=%s ASSET=%s STATE=%s RESULT_SHA=%s", active["lane"],
+             active["asset_path"], active["state"], active.get("result_sha", ""))
 
 
 def new_registry(now: datetime) -> Registry:
-    return Registry(
-        logical_date=logical_date(now),
-        next_slot=0,
-        slots=[Slot(name=chr(ord('A') + i)) for i in range(CHAT_SLOTS)],
-        next_production_id={},
-        task_events=[],
-        rate_limit_attempts=0,
-        rate_limit_until=None,
-        last_global_send_at=None,
-        last_global_send_slot=None,
-    )
+    return Registry(now.date().isoformat(), 0,
+                    [Slot(name=chr(ord('A') + i)) for i in range(CHAT_SLOTS)])
 
 
 def load_registry(now: datetime) -> Registry:
-    STATE_DIR.mkdir(parents=True, exist_ok=True)
-    if not REGISTRY_FILE.exists():
-        reg = new_registry(now)
-        save_registry(reg)
-        return reg
-    try:
+    with registry_lock:
+        if not REGISTRY_FILE.exists():
+            return new_registry(now)
+        # Invalid JSON is a blocker, never a reason to silently discard progress.
         raw = json.loads(REGISTRY_FILE.read_text(encoding="utf-8"))
-        reg = Registry(
-            logical_date=raw["logical_date"],
-            next_slot=int(raw.get("next_slot", 0)),
-            slots=[Slot(**s) for s in raw["slots"]],
-            next_production_id={str(k): int(v) for k, v in dict(raw.get("next_production_id", {})).items()},
-            task_events=[TaskEvent(**e) for e in raw.get("task_events", []) if isinstance(e, dict)],
-            rate_limit_attempts=int(raw.get("rate_limit_attempts", 0)),
-            rate_limit_until=raw.get("rate_limit_until"),
-            last_global_send_at=raw.get("last_global_send_at"),
-            last_global_send_slot=raw.get("last_global_send_slot"),
-        )
-    except Exception:
-        log.exception("registry read failed; recreating")
-        reg = new_registry(now)
-    if reg.logical_date != logical_date(now):
-        archive = STATE_DIR / f"chat_registry_{reg.logical_date}.json"
-        try:
-            if REGISTRY_FILE.exists():
-                archive.write_text(REGISTRY_FILE.read_text(encoding="utf-8"), encoding="utf-8")
-        except Exception:
-            log.exception("registry archive failed")
-        reg = new_registry(now)
-        save_registry(reg)
-        log.info("daily chat generation rolled over: %s", reg.logical_date)
-    elif len(reg.slots) != CHAT_SLOTS:
-        # Resize without discarding progress: preserve A..N existing slot state.
-        old_len = len(reg.slots)
-        if CHAT_SLOTS < old_len:
-            reg.slots = reg.slots[:CHAT_SLOTS]
-        else:
-            for i in range(old_len, CHAT_SLOTS):
-                reg.slots.append(Slot(name=chr(ord('A') + i)))
-        reg.next_slot = reg.next_slot % CHAT_SLOTS
-        save_registry(reg)
-        log.info("resized chat slots from %s to %s while preserving state", old_len, CHAT_SLOTS)
-    return reg
+        if raw.get("schema") != "lane-asset-v1":
+            archive = REGISTRY_FILE.with_suffix(".before-lane-asset.json")
+            if not archive.exists():
+                archive.write_bytes(REGISTRY_FILE.read_bytes())
+            reg = new_registry(now)
+            # Retain browser sessions and all previous files, but do not execute
+            # old queue entries. Reconstruct work from GitHub assets and SHAs.
+            by_name = {s.get("name"): s for s in raw.get("slots", [])}
+            allowed = {f.name for f in fields(Slot)}
+            reg.slots = [Slot(**{k: v for k, v in by_name.get(s.name, asdict(s)).items()
+                                 if k in allowed}) for s in reg.slots]
+            return reg
+        allowed = {f.name for f in fields(Registry)}
+        values = {k: v for k, v in raw.items() if k in allowed}
+        values["slots"] = [Slot(**s) for s in raw["slots"]]
+        reg = Registry(**values)
+        # Asset ownership survives midnight, process restart and container rebuild.
+        if {s.name for s in reg.slots} != {chr(ord('A') + i) for i in range(CHAT_SLOTS)}:
+            raise ValueError("Registry belongs to another controller mode; use its isolated volume")
+        return reg
 
 
 def save_registry(reg: Registry):
-    payload = {
-        "logical_date": reg.logical_date,
-        "next_slot": reg.next_slot,
-        "slots": [asdict(s) for s in reg.slots],
-        "next_production_id": dict(reg.next_production_id),
-        "task_events": [asdict(e) for e in reg.task_events[-5000:]],
-        "rate_limit_attempts": reg.rate_limit_attempts,
-        "rate_limit_until": reg.rate_limit_until,
-        "last_global_send_at": reg.last_global_send_at,
-        "last_global_send_slot": reg.last_global_send_slot,
-    }
-    tmp = REGISTRY_FILE.with_suffix(".tmp")
-    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    tmp.replace(REGISTRY_FILE)
-
-
-def allocate_lane_production_id(reg: Registry, lane: str, prefix: str, minimum_next: int = 1) -> str:
-    """Allocate exactly one production number for a new dispatch.
-
-    Retry, rollover, continue and reconcile must never call this function.
-    Counters are lane-scoped when PRODUCTION_COUNTER_MODE=lane. minimum_next
-    safely migrates an existing v1 queue without reusing historical numbers.
-    """
-    key = lane if PRODUCTION_COUNTER_MODE == "lane" else "__global__"
-    next_id = max(int(reg.next_production_id.get(key, 1)), int(minimum_next or 1))
-    reg.next_production_id[key] = next_id + 1
-    return f"{prefix}-{lane}-{next_id:05d}"
-
-
-def production_id_from_identifier(identifier: str) -> str:
-    value = str(identifier or "").strip()
-    return re.sub(r"-E\d{3}$", "", value)
-
-
-def queue_lane_minimum_next(q: dict, lane: str) -> int:
-    """Return a collision-safe migration floor from v1 queue history.
-
-    Once lane history exists, do not let the legacy global counter couple lane
-    numbering again. The global counter is only a first-migration fallback.
-    """
-    seen = []
-    records = []
-    if isinstance(q.get("active"), dict):
-        records.append(q["active"])
-    records.extend(v for v in q.get("active_by_lane", {}).values() if isinstance(v, dict))
-    records.extend(v for key in ("completed", "blocked") for v in q.get(key, []) if isinstance(v, dict))
-    for record in records:
-        if str(record.get("lane") or "") != lane:
-            continue
-        identifier = production_id_from_identifier(record.get("production_id") or record.get("task_id") or "")
-        match = re.search(r"-(\d{5,})$", identifier)
-        if match:
-            seen.append(int(match.group(1)))
-    if seen:
-        return max(seen) + 1
-    return int(q.get("counter", 0)) + 1
-
-
-def next_task_event_id(reg: Registry, production_id: str) -> str:
-    count = sum(1 for e in reg.task_events if e.production_id == production_id)
-    return f"{production_id}-E{count + 1:03d}"
-
-
-def append_task_event(reg: Registry, active: dict, event_type: str) -> TaskEvent:
-    production_id = str(active.get("production_id") or active.get("task_id") or "").strip()
-    if not production_id:
-        raise ValueError("PRODUCTION_ID_REQUIRED")
-    existing = [e for e in reg.task_events if e.production_id == production_id]
-    event_id = next_task_event_id(reg, production_id)
-    event = TaskEvent(
-        event_id=event_id,
-        production_id=production_id,
-        event_type=event_type,
-        attempt=int(active.get("attempt", 1)),
-        retry_count=int(active.get("retry_count", 0)),
-        rollover_count=int(active.get("rollover_count", active.get("chat_rollovers", 0))),
-        created_at=datetime.now(TZ).isoformat(),
-    )
-    reg.task_events.append(event)
-    active["production_id"] = production_id
-    active["task_id"] = production_id  # compatibility alias for existing Git markers
-    active["event_id"] = event_id
-    active["event_type"] = event_type
-    active["retry_count"] = event.retry_count
-    active["rollover_count"] = event.rollover_count
-    return event
+    with registry_lock:
+        atomic_json(REGISTRY_FILE, asdict(reg))
 
 
 def read_prompt(filename: str) -> str:
-    path = PROMPTS_DIR / filename
-    return path.read_text(encoding="utf-8").strip()
+    return (PROMPTS_DIR / filename).read_text(encoding="utf-8").strip()
 
 
-def load_queue_state() -> dict:
-    STATE_DIR.mkdir(parents=True, exist_ok=True)
-    if not QUEUE_FILE.exists():
-        state = {
-            "counter": 0,
-            "active": None,
-            "task_event_model": TASK_EVENT_MODEL,
-            "production_counter_mode": PRODUCTION_COUNTER_MODE,
-            "active_by_lane": {},
-            "wave_counter": 0,
-            "wave_id": None,
-            "wave_started_at": None,
-            "producer_counter": 0,
-            "qa_batch_counter": 0,
-            "qa_pending": [],
-            "qa_completed": [],
-            "qa_blocked": [],
-            "completed": [],
-            "blocked": [],
-            "last_github_poll_at": None,
-            "conversion_blocked_reconcile_version": 0,
-        }
-        save_queue_state(state)
-        return state
-    try:
-        raw = json.loads(QUEUE_FILE.read_text(encoding="utf-8"))
-        raw.setdefault("counter", 0)
-        raw.setdefault("active", None)
-        raw.setdefault("task_event_model", TASK_EVENT_MODEL)
-        raw.setdefault("production_counter_mode", PRODUCTION_COUNTER_MODE)
-        raw.setdefault("active_by_lane", {})
-        raw.setdefault("wave_counter", 0)
-        raw.setdefault("wave_id", None)
-        raw.setdefault("wave_started_at", None)
-        raw.setdefault("producer_counter", 0)
-        raw.setdefault("qa_batch_counter", 0)
-        raw.setdefault("qa_pending", [])
-        raw.setdefault("qa_completed", [])
-        raw.setdefault("qa_blocked", [])
-        raw.setdefault("completed", [])
-        raw.setdefault("blocked", [])
-        raw.setdefault("last_github_poll_at", None)
-        raw.setdefault("conversion_blocked_reconcile_version", 0)
-        return raw
-    except Exception:
-        # Never overwrite a damaged checkpoint with an empty queue and duplicate work.
-        log.exception("queue state read failed; preserved for recovery")
-        raise
+def asset_key(path: str) -> str:
+    if not isinstance(path, str) or not path or path.startswith('/') or '..' in path.split('/'):
+        raise ValueError("Invalid repository-relative asset path")
+    return hashlib.sha256(path.encode("utf-8")).hexdigest()
 
 
+def artifact_record_path(path: str) -> str:
+    return f"{ARTIFACT_ROOT}/{asset_key(path)}.json"
 
-def save_queue_state(state: dict):
-    """Persist v2 identity fields while retaining task_id as a compatibility alias."""
-    state["task_event_model"] = TASK_EVENT_MODEL
-    state["production_counter_mode"] = PRODUCTION_COUNTER_MODE
-    records = []
-    if isinstance(state.get("active"), dict):
-        records.append(state["active"])
-    records.extend(v for v in state.get("active_by_lane", {}).values() if isinstance(v, dict))
-    for record in records:
-        production_id = str(record.get("production_id") or record.get("task_id") or "").strip()
-        if production_id:
-            record["production_id"] = production_id
-            record["task_id"] = production_id
-        record.setdefault("event_id", "")
-        record.setdefault("event_type", "dispatch")
-        record.setdefault("attempt", 1)
-        record.setdefault("retry_count", 0)
-        record.setdefault("rollover_count", int(record.get("chat_rollovers", 0)))
-        record["status"] = str(record.get("phase") or record.get("status") or "PENDING")
-    STATE_DIR.mkdir(parents=True, exist_ok=True)
-    tmp = QUEUE_FILE.with_suffix(".tmp")
-    tmp.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
-    tmp.replace(QUEUE_FILE)
+
+def qa_record_path(path: str, sha: str) -> str:
+    if not re.fullmatch(r"[0-9a-f]{40}", sha):
+        raise ValueError("QA requires an exact candidate commit SHA")
+    return f"{QA_ROOT}/{asset_key(path)}/{sha}.json"
+
+
+def qa_key(item: dict) -> str:
+    return item["asset_path"] + "@" + item["candidate_sha"]
+
+
+def enqueue_candidate(reg: Registry, record: dict):
+    if record["state"] != "QA_PENDING":
+        return
+    item = {k: record[k] for k in ("asset_path", "candidate_sha", "artifact_sha", "lane")}
+    if not any(qa_key(old) == qa_key(item) for old in reg.qa_queue):
+        reg.qa_queue.append(item)
+
+
+def choose_asset(rows: list[dict], lane: str, reg: Registry) -> Optional[dict]:
+    if lane not in {"A", "B"}:
+        raise ValueError("Only A/B produce DDS assets")
+    occupied = {a["asset_path"] for a in reg.active_lanes.values()}
+    waiting = {a["asset_path"] for a in reg.qa_queue}
+    candidates = []
+    for row in rows:
+        path = row.get("path", "")
+        if not path.lower().endswith('.dds') or int(row["index"]) % 2 != (lane == "B"):
+            continue
+        status = row.get("artwork_status", "").lower()
+        current = reg.artifact_records.get(path, {})
+        if path in occupied or path in waiting:
+            continue
+        if current.get("state") in {"PASS", "QA_PENDING", "WAIT_GATE", "BLOCKED"}:
+            continue
+        if row.get("action") != "localize_text" or any(s in status for s in
+                ("preserve", "blocked", "pending_ingame", "runtime", "qa_pending")):
+            continue
+        if current.get("state") != "REWORK_REQUIRED" and any(s in status for s in ("pass", "complete", "approved")):
+            continue
+        priority = (0 if current.get("state") == "REWORK_REQUIRED" or "rework" in status else
+                    1 if "render_ready" in status else 2 if "one_stage" in status else 3)
+        candidates.append((priority, int(row["index"]), row))
+    return min(candidates, default=(0, 0, None), key=lambda item: item[:2])[2]
+
 
 
 _github_rest_block_until_epoch = 0.0
@@ -651,199 +467,6 @@ def github_actions_skip_directive(message: str) -> Optional[str]:
     return None
 
 
-def github_find_task_commit(branch: str, task_id: str, per_page: int = 100) -> Optional[dict]:
-    """Find a task commit using a short shared branch-history cache to protect REST rate limits."""
-    try:
-        now_mono = time.monotonic()
-        cached = _github_commit_list_cache.get(branch)
-        if cached and now_mono - cached[0] < GITHUB_TASK_COMMIT_CACHE_SECONDS:
-            data = cached[1]
-        else:
-            q = urllib.parse.urlencode({"sha": branch, "per_page": max(1, min(per_page, 100))})
-            data = github_api_json(f"/repos/{GITHUB_REPO}/commits?{q}")
-            if isinstance(data, list):
-                _github_commit_list_cache[branch] = (now_mono, data)
-        expected = f"[AUTO:{task_id}]"
-        for item in data if isinstance(data, list) else []:
-            message = item.get("commit", {}).get("message", "")
-            if expected not in message:
-                continue
-            if github_actions_skip_directive(message):
-                continue
-            return {
-                "sha": item.get("sha"),
-                "message": message,
-                "html_url": item.get("html_url"),
-            }
-        return None
-    except Exception as e:
-        log.warning("github task commit lookup failed branch=%s task=%s error=%r", branch, task_id, e)
-        write_runtime(last_github_error=f"task-commit:{branch}:{task_id}:{e!r}")
-        return None
-
-
-
-_producer_result_evidence_cache: dict = {}
-
-
-def classify_localization_result(record: dict, files: list[dict], task_id: str) -> tuple[str, str]:
-    """Check immutable content, never accept the assistant's summary as production."""
-    if record.get("TASK_ID", record.get("task_id")) != task_id:
-        return "REJECTED", "TASK_RECORD_ID_MISMATCH"
-    outcome = str(record.get("result", record.get("status", ""))).upper()
-    if outcome in {"BLOCKED", "FAILED", "FAIL", "NO_WORK", "NO_CHANGE", "PENDING"} or record.get("blocker"):
-        return "REJECTED", "BLOCKER_IS_NOT_PRODUCTION"
-    changed = [f.get("filename", "") for f in files if f.get("status") != "removed"]
-    substantive = [p for p in changed if p.startswith("localization/")
-                   and not p.startswith(("localization/progress", "localization/resume_state"))
-                   and p.rsplit("/", 1)[-1].lower() not in {"worklog.md", "readme.md", "status.md", "asset_queue.csv"}]
-    if any(p.lower().endswith(".dds") for p in substantive):
-        return "PRODUCED", "DDS_CHANGED"
-    artifacts = record.get("candidate_artifacts", [])
-    if isinstance(artifacts, list):
-        for artifact in artifacts:
-            if not isinstance(artifact, dict):
-                continue
-            if (artifact.get("role") == "korean_candidate"
-                    and str(artifact.get("path", "")).lower().endswith(".dds")
-                    and re.fullmatch(r"[0-9a-fA-F]{64}", str(artifact.get("sha256", "")))
-                    and artifact.get("drive_file_id")
-                    and any(p.lower().endswith(".json") and "qa" in p.lower() for p in substantive)):
-                return "PRODUCED", "EXTERNAL_DDS_DECLARED_REQUIRES_C_VERIFICATION"
-    if substantive:
-        return "ADVANCED", "PREREQUISITE_CHANGE_ONLY"
-    return "REJECTED", "BOOKKEEPING_ONLY_NO_ARTIFACT"
-
-
-def _task_records(payload, task_id):
-    """Match either production identity or one of its event identities."""
-    requested = str(task_id or "").strip()
-    production_id = production_id_from_identifier(requested)
-    if isinstance(payload, dict):
-        record_task = str(payload.get("TASK_ID", payload.get("task_id", "")) or "")
-        record_production = str(payload.get("production_id", "") or "")
-        record_event = str(payload.get("event_id", "") or "")
-        if requested in {record_task, record_production, record_event} or production_id in {record_task, record_production}:
-            yield payload
-        for value in payload.values():
-            if isinstance(value, (dict, list)):
-                yield from _task_records(value, task_id)
-    elif isinstance(payload, list):
-        for value in payload:
-            yield from _task_records(value, task_id)
-
-
-def github_task_record(ref: str, task_id: str) -> Optional[dict]:
-    """Resolve exact, variants, dispatch, reconcile, rollover, lane/number, number.
-
-    Reads remain pinned to the caller's immutable HEAD/result SHA. Only 404 is
-    a candidate miss; authorization, throttling and incomplete trees propagate.
-    """
-    def read(path):
-        try:
-            encoded = urllib.parse.quote(path, safe="/")
-            data = github_api_json(f"/repos/{GITHUB_REPO}/contents/{encoded}?ref={urllib.parse.quote(ref, safe='')}")
-        except urllib.error.HTTPError as exc:
-            if exc.code == 404:
-                return []
-            raise
-        try:
-            payload = json.loads(base64.b64decode(data["content"]).decode("utf-8"))
-        except (ValueError, KeyError, TypeError):
-            return []
-        return list(_task_records(payload, task_id))
-
-    def newest(records):
-        return max(records, key=lambda r: (int(r.get("ATTEMPT", r.get("attempt", 1))),
-                    int(r.get("CHAT_ROLLOVER", r.get("chat_rollovers", 0))),
-                    str(r.get("updated_at", r.get("timestamp", "")))))
-
-    requested_id = str(task_id or "").strip()
-    production_id = production_id_from_identifier(requested_id)
-    exact_candidates = [
-        f"docs/automation/runs/{requested_id}.json",
-        f"docs/automation/runs/{production_id}.json",
-    ]
-    records = []
-    for exact in dict.fromkeys(exact_candidates):
-        records.extend(read(exact))
-        if records:
-            break
-    if records:
-        return newest(records)
-    tree = github_api_json(f"/repos/{GITHUB_REPO}/git/trees/{ref}?recursive=1")
-    if tree.get("truncated"):
-        raise RuntimeError("TASK_LOOKUP_TREE_TRUNCATED")
-    paths = sorted(x["path"] for x in tree.get("tree", [])
-                   if x.get("type") == "blob" and x["path"].startswith("docs/automation/")
-                   and x["path"].endswith(".json"))
-    number = production_id.rsplit("-", 1)[-1]
-    lane = production_id.rsplit("-", 1)[0].split("-")[-1]
-    predicates = [
-        lambda p: p.startswith(f"docs/automation/runs/{requested_id}.") or p.startswith(f"docs/automation/runs/{production_id}."),
-        lambda p: "dispatch" in p.lower(),
-        lambda p: "reconcile" in p.lower(),
-        lambda p: "rollover" in p.lower(),
-        lambda p: lane.lower() in p.lower() and number in p,
-        lambda p: number in p,
-    ]
-    visited = set(exact_candidates)
-    for predicate in predicates:
-        records = []
-        for path in paths:
-            if path not in visited and predicate(path):
-                visited.add(path)
-                records.extend(read(path))
-        if records:
-            return newest(records)
-    return None
-
-
-def restore_task_counters(active: dict, record: dict) -> None:
-    if record.get("TASK_ID", record.get("task_id")) != active["task_id"]:
-        raise ValueError("TASK_RECORD_ID_MISMATCH")
-    # Never roll durable local progress backwards or count a rollover as retry.
-    active["attempt"] = max(int(active.get("attempt", 1)), int(record.get("ATTEMPT", record.get("attempt", 1))))
-    active["chat_rollovers"] = max(int(active.get("chat_rollovers", 0)), int(record.get("CHAT_ROLLOVER", record.get("chat_rollovers", 0))))
-
-
-def github_localization_result_evidence(task_commit: dict, task_id: str) -> tuple[str, str]:
-    """Read task record and complete changed-file list at exactly the producer SHA."""
-    sha = task_commit["sha"]
-    key = (sha, task_id)
-    if key in _producer_result_evidence_cache:
-        return _producer_result_evidence_cache[key]
-    try:
-        record = github_task_record(sha, task_id)
-        if record is None:
-            return "REJECTED", "TASK_RECORD_MISSING_AFTER_FALLBACK"
-        files = []
-        for page in range(1, 31):
-            commit = github_api_json(f"/repos/{GITHUB_REPO}/commits/{sha}?per_page=100&page={page}")
-            batch = commit.get("files", [])
-            files.extend(batch)
-            if len(batch) < 100:
-                break
-        else:
-            return "REJECTED", "COMMIT_FILE_LIST_TRUNCATED"
-        result = classify_localization_result(record, files, task_id)
-        if len(_producer_result_evidence_cache) >= 256:
-            _producer_result_evidence_cache.clear()
-        _producer_result_evidence_cache[key] = result
-        return result
-    except urllib.error.HTTPError as exc:
-        if exc.code == 404:
-            return "REJECTED", "TASK_RECORD_OR_COMMIT_MISSING_AT_RESULT_SHA"
-        log.warning("producer evidence HTTP failure sha=%s code=%s", sha, exc.code)
-        return "RETRY", f"RESULT_EVIDENCE_HTTP_{exc.code}"
-    except (ValueError, KeyError, TypeError) as exc:
-        return "REJECTED", "INVALID_TASK_RECORD_OR_COMMIT_RESPONSE"
-    except Exception as exc:
-        # Transient read errors must be retried, never cached as an authorization verdict.
-        log.warning("producer evidence read failed sha=%s error=%r", sha, exc)
-        return "RETRY", "RESULT_EVIDENCE_READ_FAILED"
-
-
 def _normalize_github_run(r: dict) -> dict:
     return {
         "id": r.get("id"),
@@ -894,132 +517,15 @@ def github_action_jobs_summary(run_id: int) -> list[dict]:
 def github_gate_run(branch: str, sha: str, workflow_name: str, run_id: Optional[int] = None, force_discovery: bool = False) -> Optional[dict]:
     if run_id:
         return github_action_run_by_id(int(run_id), sha, workflow_name)
-    try:
-        now_mono = time.monotonic()
-        cached = _github_actions_cache.get(branch)
-        if cached and not force_discovery and now_mono - cached[0] < GITHUB_ACTIONS_CACHE_SECONDS:
-            payload = cached[1]
-        else:
-            q = urllib.parse.urlencode({"branch": branch, "per_page": 30})
-            payload = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs?{q}")
-            if isinstance(payload, dict):
-                _github_actions_cache[branch] = (now_mono, payload)
-        matches = [
-            r for r in payload.get("workflow_runs", [])
-            if r.get("head_sha") == sha and r.get("name") == workflow_name
-        ]
-        if not matches:
-            return None
-        matches.sort(key=lambda r: r.get("created_at", ""), reverse=True)
-        return _normalize_github_run(matches[0])
-    except Exception as e:
-        log.warning("github actions discovery failed branch=%s sha=%s error=%r", branch, sha, e)
-        write_runtime(last_github_error=f"actions-discovery:{branch}:{sha}:{e!r}")
-        return None
+    # Filter server-side by immutable SHA; unrelated producer pushes must not
+    # push the required run outside a short branch-level result window.
+    query = urllib.parse.urlencode({"branch": branch, "head_sha": sha, "per_page": 100})
+    payload = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs?{query}")
+    matches = [r for r in payload.get("workflow_runs", [])
+               if r.get("head_sha") == sha and r.get("name") == workflow_name]
+    matches.sort(key=lambda r: (r.get("created_at", ""), r.get("run_attempt", 1)), reverse=True)
+    return _normalize_github_run(matches[0]) if matches else None
 
-def queue_target_for_slot(slot_name: str) -> dict:
-    if CONTROLLER_MODE == "conversion":
-        if slot_name == "B":
-            return {
-                "lane": "DXVK",
-                "branch": "vr-dxvk-r71-disasm",
-                "workflow": "Backend Conversion Gate",
-            }
-        return {
-            "lane": "DX11",
-            "branch": "vr-dx11-native-r71",
-            "workflow": "Backend Conversion Gate",
-        }
-    if slot_name not in {"A", "B", "C"}:
-        raise ValueError(f"Retired or unsupported localization lane: {slot_name}")
-    role = slot_name
-    return {
-        "lane": f"LOCALIZATION_{role}",
-        "branch": "korean-localization-clean",
-        "workflow": "Localization Automation Gate",
-    }
-
-
-LOCALIZATION_EXECUTION_POLICY = (
-    "GitHub은 연결된 플러그인으로 사용한다. 초기 도구 목록에 없다는 이유로 연결/권한 없음을 단정하지 마. "
-    "ALL_TOOLS 또는 제공된 도구 검색에서 GitHub read/write 기능과 호출 스키마를 탐색한 뒤 실제 호출해. "
-    "읽기 성공, 쓰기 기능 발견, 실제 쓰기 성공은 구분해 기록한다. "
-    "쓰기 경로는 update_file 또는 create_blob -> create_tree -> create_commit -> update_ref(force=false)다. "
-    "실제 오류는 호출 기능/대상/ref/HTTP 코드/비밀정보를 제거한 응답으로 입증한다. "
-    "404는 경로/ref/transport miss, 429는 backoff, 401/403은 응답으로 인증/권한/한도 원인을 구분한다. "
-    "도구 탐색 실패는 TOOL_DISCOVERY_INCOMPLETE이며 권한 거부 증거가 아니다. "
-    "읽기가 가능하면 HEAD와 TASK 기록 확인부터 실행하고 실패한 기능만 복구해. "
-    "RENDER_READY가 없으면 pending_artwork의 원본 취득/영역/마스크 등 미완료 단계를 실제 수행한다. "
-    "자산 하나가 차단되면 근거를 보존하고 다른 실행 가능한 자산을 진행한다. "
-    "보고만 하는 커밋은 제작 성과가 아니다. 실제 DDS 변경 또는 외부 candidate_artifacts 증빙이 있어야 PRODUCED다. "
-    "Drive DDS는 task JSON의 candidate_artifacts에 role=korean_candidate, path(.dds), "
-    "sha256(64자리), drive_file_id를 기록하고 같은 커밋에 self-QA 증빙을 포함한다. "
-    "준비 단계의 실제 변경은 ADVANCED이며 DDS 제작 건수/완료로 세지 않는다. "
-    "상태 안내로 끝내지 말고 실제 작업을 계속하며 RUNTIME_VALIDATION=UNTESTED를 유지한다."
-)
-
-
-def queue_dynamic_prefix() -> str:
-    task_id = str(runtime.get("queue_task_id") or "").strip()
-    if not task_id:
-        return ""
-    lane = str(runtime.get("queue_lane") or "")
-    source_policy = (
-        "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 저장소/clone/worktree로 우회하지 마. "
-        "단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용하며 GitHub-only라는 이유로 차단하지 마."
-        if lane.startswith("LOCALIZATION_")
-        else
-        "GitHub 최신 HEAD를 최종 상태·결과 SSOT로 유지하되 N100 로컬 저장소/clone/worktree와 Google Drive는 "
-        "보조 입력, 분석, 빌드, 검증, 전송 수단으로 필요할 때 사용해도 된다. 최종 결과와 완료 판정은 대상 Git 브랜치의 실제 material commit으로 남겨."
-    )
-    branch = str(runtime.get("queue_branch") or "")
-    attempt = int(runtime.get("queue_attempt") or 1)
-    failure = str(runtime.get("queue_failure_context") or "").strip()
-    wave_id = str(runtime.get("queue_wave_id") or "").strip()
-    qa_batch = runtime.get("queue_qa_batch") or []
-    production_id = str(runtime.get("queue_production_id") or task_id).strip()
-    event_id = str(runtime.get("queue_event_id") or "").strip()
-    event_type = str(runtime.get("queue_event_type") or "").strip()
-    lines = [
-        f"[자동 큐 작업] TASK_ID={task_id}",
-        f"PRODUCTION_ID={production_id}",
-        *([f"EVENT_ID={event_id}"] if event_id else []),
-        *([f"EVENT_TYPE={event_type}"] if event_type else []),
-        f"LANE={lane}",
-        f"TARGET_BRANCH={branch}",
-        f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
-        *([f"WAVE_ID={wave_id}"] if wave_id else []),
-        source_policy,
-        "이 작업에서 실제 변경 또는 검토 기록을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
-        "필수 GitHub Actions Gate를 소유할 result commit에는 CI-skip 지시어를 넣지 마. 검증 완료 후 bookkeeping/checkpoint 커밋은 Gate 결과와 분리해 기록하고, controller가 validation-bearing result commit을 식별할 수 있게 유지해.",
-        "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
-        "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
-    ]
-    if lane.startswith("LOCALIZATION_"):
-        lines.append(LOCALIZATION_EXECUTION_POLICY)
-    if lane in {"LOCALIZATION_A", "LOCALIZATION_B"}:
-        lines += [
-            "A/B producer는 개별 GitHub Actions Gate를 기다리지 않는다. A/B material commit 후 C QA와 C Gate를 완료해야 다음 생산 wave를 시작한다. A는 짝수 index, B는 홀수 index를 소유한다. E lane/shard는 사용하지 않는다.",
-            "이 producer task record의 AUTOMATION_VALIDATION은 PENDING으로 남기고 validation_mode=C_BATCH_GATE로 기록해. 최종 자동 검증 권한은 후속 C batch Gate에 있다.",
-            "생산 우선순위는 candidate-completion-first다. C가 받아들인 RENDER_READY 또는 ONE_STAGE_TO_RENDER 자산이 shard에 있으면 새 unrelated preflight/work-order를 시작하지 말고 그 자산을 실제 Korean DDS candidate까지 완료해.",
-            "baseline/slant/style 측정만 남았다면 같은 invocation에서 측정하고 render -> measure/refit -> DDS encode -> decoded-final self-QA까지 이어가. ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.",
-            "ready 자산이 모두 fail-closed일 때만 정확한 blocker를 기록하고 다음 ready 자산을 시도해. ready 자산이 전혀 없을 때만 새 preflight-only batch를 최대 1개 확장해.",
-        ]
-    if qa_batch:
-        lines += [
-            "이 C 작업은 독립 QA 소비자다. 아래 생산 결과들을 하나의 배치로 중복 없이 검수하고 공용 상태를 한 번만 병합해.",
-            "QA_BATCH_INPUTS=" + json.dumps(qa_batch, ensure_ascii=False, separators=(",", ":")),
-            "각 입력의 TASK_ID + RESULT_SHA를 고정 기준으로 사용하고, 동일 candidate/source/contract fingerprint의 무거운 검증은 한 번만 수행해.",
-            "각 input에 대해 qa_dispositions를 기록해: PASS, REWORK_REQUIRED, HOLD_STRICT_RECHECK, SUPERSEDED 중 하나. C commit 하나의 Localization Automation Gate가 이 batch 전체의 자동 검증이다.",
-            "C가 pre-generation evidence를 PASS할 때 가능한 경우 production_readiness를 RENDER_READY, ONE_STAGE_TO_RENDER, PREFLIGHT_ONLY 중 하나로 분류하고 shared next_actions는 candidate 완성을 unrelated preflight보다 앞에 둬.",
-        ]
-    if failure:
-        lines += [
-            "",
-            "이전 실행의 미완료 사유를 확인하고 해당 단계부터 실제 작업을 재개해. Actions 실패가 명시된 경우에만 해당 run을 확인해.",
-            "FAILURE_CONTEXT=" + failure,
-        ]
-    return "\n".join(lines) + "\n\n"
 
 async def first_visible(page: Page, selectors: list[str], total_wait_ms: int = 10000):
     """Wait for React composer hydration instead of sampling the DOM once."""
@@ -1332,6 +838,7 @@ async def ensure_logged_in(page: Page) -> bool:
         current_url=page.url,
     )
     return False
+
 
 
 

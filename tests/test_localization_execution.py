@@ -37,7 +37,7 @@ def load_functions(variant):
 
 class ExecutionTests(unittest.TestCase):
     def test_variants(self):
-        for variant in ('v0.4', 'localization'):
+        for variant in ('localization',):
             with self.subTest(variant=variant):
                 e = load_functions(variant)
                 classify = e['classify_localization_result']
@@ -114,4 +114,5 @@ class ExecutionTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
 
