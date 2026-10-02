@@ -596,8 +596,9 @@ def verify_dxvk_continuation_chain() -> None:
         # Keep declared direct relative BRANCH metadata tied to the exact
         # decoded instruction rows. This catches off-by-one/stale branch RVAs,
         # omitted direct branches, and target-displacement drift before the
-        # canonical-EXE execution stage. Recognize the branch encodings used by
-        # continuation proofs: rel8 Jcc/JMP and rel32 Jcc/JMP.
+        # canonical-EXE execution stage. Recognize all direct relative branch
+        # encodings that can appear in these 32-bit windows: rel8 Jcc/JMP,
+        # LOOPNE/LOOPE/LOOP/JECXZ (E0-E3), and rel32 Jcc/JMP.
         instruction_rows = value(f"{prefix}_INSTRUCTIONS")
 
         # Validate the declared instruction tuple geometry before canonical-EXE
@@ -744,7 +745,9 @@ def verify_dxvk_continuation_chain() -> None:
             encoded = bytes.fromhex(instruction_hex)
             decoded_target_rva = None
             if len(encoded) == 2 and (
-                encoded[0] == 0xEB or 0x70 <= encoded[0] <= 0x7F
+                encoded[0] == 0xEB
+                or 0x70 <= encoded[0] <= 0x7F
+                or 0xE0 <= encoded[0] <= 0xE3
             ):
                 rel8 = int.from_bytes(encoded[1:2], byteorder="little", signed=True)
                 decoded_target_rva = (instruction_rva + 2 + rel8) & 0xFFFFFFFF
