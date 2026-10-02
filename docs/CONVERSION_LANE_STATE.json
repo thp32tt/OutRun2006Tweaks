@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "3b4ffb7c9b32749a547edff0ea91b9a420ad0bb2",
+  "state_parent_head": "602b7c0cd72a1bbf8b7a71ab3cafd08f25b8c2ec",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -530,6 +530,19 @@
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5947553790,
       "validation_issue14_comment_id": 5947592536
+    },
+    {
+      "unit_id": "DX11_DRAW_SIDE_EFFECT_ISOLATION_R148",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "2537bd8927f1bf6527f1b44b26fd3b4763819442",
+      "validation_bearing_sha": "b0d0eee45bfaf843a634b255f6cf25902776df24",
+      "retaining_descendant_sha": "b0d0eee45bfaf843a634b255f6cf25902776df24",
+      "automation_validation": "PASS_DESCENDANT_DX11_SOURCE_GRAPH_CENSUS_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5947682688,
+      "validation_issue14_comment_id": 5947717774
     },
     {
       "unit_id": "DX11_DIRECT_INDEXED_SOURCE_RANGE_IDENTITY_R149",
