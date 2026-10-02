@@ -54,7 +54,7 @@ hooks or alter DX9Ex Reset/StateBlock, transport, HUD semantics or host behavior
 - D3DBLEND_BOTHSRCALPHA/BOTHINVSRCALPHA need pair-aware conversion.
 - Fixed-function texture stages need generated/cached shaders.
 - FVF/vertex declarations need D3D11 input-layout generation.
-- Render-target/depth-surface lifetime needs explicit mirrors.
+- Render-target/depth-surface mirrors now have one dormant generation-bound owner for exact non-MSAA DEFAULT surfaces; live D3D9 surface registration/binding and proven D3D9-to-DXGI MSAA quality mapping remain pending.
 - Lock/Unlock and dynamic-resource update behavior must match D3D9 expectations.
 
 ## 2026-09-28 branch decision

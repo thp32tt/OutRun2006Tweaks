@@ -116,6 +116,17 @@
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false
+    },
+    {
+      "unit_id": "DX11_DEVICE_SURFACE_MIRROR_R118",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "8f0f3d6b8bf6a3d80c67934e0d979b59cf163674",
+      "successor_consolidation_sha": "703f126ea46f65b2abbaba58182da7dd6595132a",
+      "validation_bearing_sha": "703f126ea46f65b2abbaba58182da7dd6595132a",
+      "automation_validation": "PASS_STATIC_CONTRACT_BUILD_SUPERSEDED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "STATE_PERSISTED",
+      "native_draw_path_activation_changed": false
     }
   ]
 }

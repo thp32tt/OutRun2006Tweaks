@@ -94,5 +94,73 @@
     "automation_validation": "PASS_REMOTE_STATIC",
     "runtime_validation": "UNTESTED",
     "summary": "Separated the mandatory Backend Conversion Gate core validation from dormant-DX11 readiness smoke/probe builds. The core validate job keeps static contracts, Win32 build, binary verification and artifact upload; a DX11-only job depending on validate retains all eight prior smoke/probe executions."
-  }
+  },
+  "continuation_units": [
+    {
+      "unit_id": "DX11_DEVICE_SURFACE_MIRROR_R118",
+      "job_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_RENDER_TARGET_DEPTH_SURFACE_MIRROR_LIFETIME",
+      "base_sha": "4647f909cad0edc80306d590f98a33bc14cc6003",
+      "material_result_sha": "8f0f3d6b8bf6a3d80c67934e0d979b59cf163674",
+      "successor_consolidation_sha": "703f126ea46f65b2abbaba58182da7dd6595132a",
+      "validation_bearing_sha": "703f126ea46f65b2abbaba58182da7dd6595132a",
+      "implementation_commits": [
+        "8f0f3d6b8bf6a3d80c67934e0d979b59cf163674",
+        "703f126ea46f65b2abbaba58182da7dd6595132a"
+      ],
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "The current DX11 plan retained explicit render-target/depth-surface mirror lifetime as unfinished R73 readiness work. Existing resource translation had exact Color/DepthStencil descriptor rules but no single dedicated dormant Texture2D+RTV/DSV owner when this unit was selected.",
+      "summary": "Added a dormant generation-bound NativeSurfaceMirror for exact non-MSAA DEFAULT-pool D3D9 render-target/depth-stencil surfaces, WARP probe coverage, checked-in build graph wiring and source-graph guards. A later same-JOB successor consolidated duplicate concurrent ownership into this class and strengthened view-to-texture identity/failure cleanup. Native Draw* routing remains disabled.",
+      "changed_paths": [
+        "src/vr/d3d11/surface_mirror.hpp",
+        "src/vr/d3d11/surface_mirror.cpp",
+        "tools/dx11_surface_mirror_probe.cpp",
+        "CMakeLists.txt",
+        "cmake.toml",
+        ".github/workflows/backend-conversion-gate.yml",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "validation": {
+        "status": "PASS_STATIC_CONTRACT_BUILD_SUPERSEDED",
+        "evidence": [
+          "Backend Conversion Gate 36970150014 on exact material SHA 8f0f3d6b8bf6a3d80c67934e0d979b59cf163674 passed Verify DX11 source graph, dormant activation boundary, dual-source contract, census analyzer and all preceding static regression/contract checks before concurrency cancelled Configure Win32.",
+          "Backend Conversion Gate 36970352387 on successor SHA 703f126ea46f65b2abbaba58182da7dd6595132a again passed Verify DX11 source graph, dormant activation boundary, dual-source contract, census analyzer and all preceding static checks before a newer same-branch push cancelled Configure Win32.",
+          "No Win32 build or WARP surface probe success is claimed because both runs were superseded before those stages."
+        ],
+        "full_win32_build": "UNCONFIRMED_SUPERSEDED",
+        "warp_probe": "UNCONFIRMED_SUPERSEDED"
+      },
+      "commit": {
+        "required_marker": "[AUTO:CONV-DX11-000001]",
+        "material_commit": "8f0f3d6b8bf6a3d80c67934e0d979b59cf163674",
+        "successor_consolidation_commit": "703f126ea46f65b2abbaba58182da7dd6595132a",
+        "issue14_comment_id": 5946308608
+      },
+      "package": {
+        "status": "NOT_REQUIRED",
+        "reason": "Dormant source/readiness/test work only; no native game Draw* activation, runtime candidate payload, backend promotion or package behavior change."
+      },
+      "state": {
+        "status": "PERSISTED",
+        "exact_next_action": "Keep native Draw* disabled. Continue only an independent DX11 readiness gap; surface activation still requires live D3D9 surface ownership/binding evidence, proven MSAA mapping where needed, exhaustive census and Quest 3/VDXR visual parity."
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "automation_validation": "PASS_STATIC_CONTRACT_BUILD_SUPERSEDED",
+      "blocker": "Full Win32/WARP probe execution for this unit was superseded by newer same-branch pushes; runtime Quest 3/VDXR validation remains unperformed and native Draw* remains disabled.",
+      "next_action": "Continue independent GitHub-only DX11 readiness without native Draw* activation; require a non-superseded Win32/WARP gate before claiming compiled surface-probe validation.",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE"
+    }
+  ],
+  "state_persisted_for_continuation": true
 }
