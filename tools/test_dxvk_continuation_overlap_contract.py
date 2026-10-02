@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Static contract guard for DXVK disassembly continuation overlap handling.
 
-This intentionally does not decode runtime semantics.  It only protects the
+This intentionally does not decode runtime semantics. It only protects the
 canonical byte-overlap contract used when a previous proof window ends on a
 partial x86 instruction and the next window must inherit those bytes.
 """
@@ -51,6 +51,16 @@ def test_known_dxvk_frontier_overlap() -> None:
     assert EXPECTED.overlap_bytes.hex(" ") == "66 0f 54 1d 20 91 61"
 
 
+def test_changed_tail_is_rejected() -> None:
+    mutated = OverlapContract(
+        start_rva=EXPECTED.start_rva,
+        end_rva=EXPECTED.end_rva,
+        overlap_bytes=bytes.fromhex("66 0f 54 1d 20 91 60"),
+    )
+    assert mutated.overlap_bytes != EXPECTED.overlap_bytes
+
+
 if __name__ == "__main__":
     test_known_dxvk_frontier_overlap()
+    test_changed_tail_is_rejected()
     print("DXVK continuation overlap contract: PASS")
