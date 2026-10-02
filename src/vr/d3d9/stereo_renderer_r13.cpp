@@ -168,7 +168,7 @@ namespace OutRunVRStereo
             return false;
         }
 
-        bool ResolveDirectTransportR13(IDirect3DDevice9* device, std::uint32_t frameId)
+    bool ResolveDirectTransportR13(IDirect3DDevice9* device, std::uint32_t frameId)
         {
             if (!R13OverlayReady.load(std::memory_order_acquire))
                 return R13ResolveDirectHook.call<bool>(device, frameId);
@@ -594,7 +594,7 @@ namespace OutRunVRStereo
                 device, actual, legacy, "R13/DrawIndexedPrimitiveUP");
         }
 
-        HRESULT __stdcall PresentDestR13(IDirect3DDevice9* device,
+    HRESULT __stdcall PresentDestR13(IDirect3DDevice9* device,
             const RECT* sourceRect, const RECT* destRect,
             HWND destWindowOverride, const RGNDATA* dirtyRegion)
         {
