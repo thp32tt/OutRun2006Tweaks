@@ -231,6 +231,43 @@ def verify_dxvk_continuation_chain() -> None:
                 f"DXVK continuation {continuation_id} proof escaped bounded control-flow semantic quarantine: "
                 f"{semantic_effect}"
             )
+        raw_call_census_guards = [
+            marker
+            for marker in ("raw_call_census_matches", "raw_call_census_empty")
+            if marker in proof_source
+        ]
+        if len(raw_call_census_guards) != 1:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof lost exhaustive raw-call census gate: "
+                f"{raw_call_census_guards}"
+            )
+        raw_call_census_guard = raw_call_census_guards[0]
+        proven_predicate_start = proof_source.find("proven = bool(")
+        proven_predicate_end = proof_source.find(
+            "\n    )\n    return {", proven_predicate_start
+        )
+        if proven_predicate_end < 0:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof predicate could not be isolated "
+                f"for raw-call census validation"
+            )
+        proven_predicate = proof_source[
+            proven_predicate_start:proven_predicate_end
+        ]
+        if raw_call_census_guard not in proven_predicate:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof does not gate proven status on "
+                f"{raw_call_census_guard}"
+            )
+        raw_call_census_result_binding = (
+            f'"{raw_call_census_guard}": {raw_call_census_guard}'
+        )
+        if raw_call_census_result_binding not in proof_source:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof does not report "
+                f"{raw_call_census_guard}"
+            )
+
         proof_status_fail_closed_markers = (
             "proven = bool(",
             '"status"',
