@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "a0b7453122b84934a39d0db177465e1caaa68b4e",
+  "state_parent_head": "052295e01e8b0c6dd0addfcd014290415312c09e",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,16 +52,16 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "82fb2e36bedda85c87f8f1bd8e27edc179a6fb90",
-    "validation_bearing_sha": "82fb2e36bedda85c87f8f1bd8e27edc179a6fb90",
-    "retaining_descendant_sha": "a0b7453122b84934a39d0db177465e1caaa68b4e",
-    "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; READINESS_SMOKE_CANCELLED; BUILD_NOT_CLAIMED",
+    "result_sha": "f611eaab243bc11756e1d953e50b1e335064d7c1",
+    "validation_bearing_sha": "f611eaab243bc11756e1d953e50b1e335064d7c1",
+    "retaining_descendant_sha": "052295e01e8b0c6dd0addfcd014290415312c09e",
+    "automation_validation": "PASS_GITHUB_AUTHORITATIVE_SOURCE_AND_RETENTION_INSPECTION; EXACT_SHA_ACTIONS_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; COMPILE_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
-  "runtime_blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI. The exact R171 material SHA passed the DX11 source-graph, dormant-activation and census-analyzer static steps; same-branch descendant churn cancelled Win32 configure and the DX11 readiness-smoke job, so compile/probe/runtime success is not claimed.",
-  "runtime_next_action": "Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before NativeDrawPathActive may be enabled; R171 changes dormant render-state provenance only.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve the newer R172 multisample census identity already present after R171 and fresh-audit the latest GitHub HEAD for the next independent dormant D3D9 render-state semantic gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "runtime_blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI. R172 is retained in branch ancestry, but exact-result Actions were cancelled by same-branch descendant churn; compile/runtime success is not claimed.",
+  "runtime_next_action": "Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before NativeDrawPathActive may be enabled; R172 changes census identity only and does not activate native routing.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit latest GitHub HEAD for the next independent dormant D3D9 render-state semantic gap, excluding R168 line raster, R169 point raster, R170 WRAP0..7, R171 multisample translation and R172 multisample census identity. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -849,6 +849,21 @@
       "issue14_comment_id": 5948631492,
       "validation_run_id": 36986777523,
       "validation_job_id": 110773801055
+    },
+    {
+      "unit_id": "DX11_MULTISAMPLE_RASTER_CENSUS_IDENTITY_R172",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "82fb2e36bedda85c87f8f1bd8e27edc179a6fb90",
+      "source_implementation_sha": "3834db7301b67531920a377e96f0f21b97d4fb69",
+      "material_result_sha": "f611eaab243bc11756e1d953e50b1e335064d7c1",
+      "validation_bearing_sha": "f611eaab243bc11756e1d953e50b1e335064d7c1",
+      "retaining_descendant_sha": "052295e01e8b0c6dd0addfcd014290415312c09e",
+      "automation_validation": "PASS_GITHUB_AUTHORITATIVE_SOURCE_AND_RETENTION_INSPECTION; EXACT_SHA_ACTIONS_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5948655749,
+      "run_state_commit": "052295e01e8b0c6dd0addfcd014290415312c09e"
     }
   ]
 }
