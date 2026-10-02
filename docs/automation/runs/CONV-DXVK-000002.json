@@ -5831,7 +5831,7 @@
         },
         "C3_VALIDATE": {
           "status": "COMPLETE",
-          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36990773809 job 110786214911 completed SUCCESS on 1790192abd39e73dc3ea7a77b5012c237317a62e. Verify static disassembly contract, canonical EXE identity, canonical analyzer, exact evidence identity and artifact upload all passed."
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36990773809 job 110786214911 completed SUCCESS. Exact-SHA Backend Conversion Gate run 36990773792 job 110786214632 also completed SUCCESS: backend disassembly contract, Configure Win32, Build Win32, binary existence and artifact upload all passed."
         },
         "C4_COMMIT": {
           "status": "COMPLETE",
@@ -5848,7 +5848,7 @@
         }
       },
       "validation": {
-        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_GATE",
         "exact_sha": "1790192abd39e73dc3ea7a77b5012c237317a62e",
         "dxvk_canonical_evidence_run_id": 36990773809,
         "dxvk_canonical_evidence_job_id": 110786214911,
@@ -5858,8 +5858,15 @@
         "evidence_artifact_id": 11218843240,
         "evidence_artifact_digest": "sha256:da34a59af501f56e343f2e1797ffcbcd33d52d1c8d430a03960a0ebc8822cd4d",
         "backend_conversion_gate_run_id": 36990773792,
-        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_REQUIRED_FOR_STATIC_VERIFIER_UNIT",
-        "runtime_validation": "UNTESTED"
+        "runtime_validation": "UNTESTED",
+        "backend_conversion_gate_job_id": 110786214632,
+        "backend_conversion_gate_conclusion": "success",
+        "backend_disassembly_contract_step": "SUCCESS",
+        "configure_win32": "SUCCESS",
+        "build_win32": "SUCCESS",
+        "verify_binary_exists": "SUCCESS",
+        "backend_artifact_id": 11219399198,
+        "backend_artifact_digest": "sha256:cae24a96babfe495dbeae40c354df58fc6605a9d15147272f2172480753c48c6"
       },
       "issue14_implementation_comment_id": 5949349397,
       "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
