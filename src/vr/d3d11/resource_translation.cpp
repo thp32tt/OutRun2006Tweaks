@@ -94,6 +94,11 @@ namespace outrun::vr::dx11
             return { DXGI_FORMAT_B8G8R8X8_UNORM, true };
         case D3DFMT_A8B8G8R8:
             return { DXGI_FORMAT_R8G8B8A8_UNORM, true };
+        case D3DFMT_A2B10G10R10:
+            // D3D9 A2B10G10R10 and DXGI R10G10B10A2_UNORM share the
+            // same R-low/G/B/A-high packed channel layout. The opposite
+            // D3D9 A2R10G10B10 ordering intentionally remains fail-closed.
+            return { DXGI_FORMAT_R10G10B10A2_UNORM, true };
         case D3DFMT_R5G6B5:
             return { DXGI_FORMAT_B5G6R5_UNORM, true };
         case D3DFMT_A1R5G5B5:

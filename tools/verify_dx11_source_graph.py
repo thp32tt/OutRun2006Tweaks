@@ -1008,6 +1008,32 @@ def main() -> None:
             + ", ".join(missing_resource_contract)
         )
 
+    a2b10g10r10_resource_contract = [
+        ("case D3DFMT_A2B10G10R10:", resource_translation,
+         "A2B10G10R10 exact source-format case"),
+        ("DXGI_FORMAT_R10G10B10A2_UNORM", resource_translation,
+         "A2B10G10R10 exact DXGI packed-format mapping"),
+        ("translate_resource_format(\n        D3DFMT_A2B10G10R10",
+         CONSTANT_BUFFER_PROBE, "A2B10G10R10 hosted positive probe"),
+        ("D3DFMT_A2R10G10B10, ResourceRole::Texture",
+         CONSTANT_BUFFER_PROBE, "A2R10G10B10 fail-closed contrast probe"),
+        ("DX11 resource A2B10G10R10 exact mapping: PASS",
+         CONSTANT_BUFFER_PROBE, "resource-format hosted probe completion"),
+    ]
+    missing_a2b10g10r10_resource_contract = [
+        meaning
+        for token, source, meaning in a2b10g10r10_resource_contract
+        if token not in source
+    ]
+    if "case D3DFMT_A2R10G10B10:" in resource_translation:
+        missing_a2b10g10r10_resource_contract.append(
+            "A2R10G10B10 must remain fail-closed without an exact DXGI mapping")
+    if missing_a2b10g10r10_resource_contract:
+        raise SystemExit(
+            "DX11 A2B10G10R10 resource-format contract drift: "
+            + ", ".join(missing_a2b10g10r10_resource_contract)
+        )
+
     r121_managed_buffer_mutation_plan_contract = {
         "R121: the CPU-shadow/reset-generation implementation now makes":
             "R121 managed-buffer plan exactness rationale",

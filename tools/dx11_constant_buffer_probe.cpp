@@ -42,6 +42,7 @@ namespace
     using outrun::vr::dx11::generate_fixed_function_vertex_shader_prototype;
     using outrun::vr::dx11::translate_fixed_function_sampler;
     using outrun::vr::dx11::translate_pipeline;
+    using outrun::vr::dx11::translate_resource_format;
     using outrun::vr::dx11::translate_texture_mutation;
     using outrun::vr::dx11::translate_vertex_input_layout;
     using outrun::vr::dx11::bind_fixed_function_texture_stage_for_observation;
@@ -178,6 +179,20 @@ void main(point GSIn input[1], inout PointStream<GSOut> outputStream)
 
 int main()
 {
+    const auto a2b10g10r10 = translate_resource_format(
+        D3DFMT_A2B10G10R10, ResourceRole::Texture);
+    require(
+        a2b10g10r10.exact &&
+        a2b10g10r10.format == DXGI_FORMAT_R10G10B10A2_UNORM,
+        "A2B10G10R10 must map exactly to R10G10B10A2_UNORM");
+
+    const auto a2r10g10b10 = translate_resource_format(
+        D3DFMT_A2R10G10B10, ResourceRole::Texture);
+    require(
+        !a2r10g10b10.exact &&
+        a2r10g10b10.format == DXGI_FORMAT_UNKNOWN,
+        "A2R10G10B10 must remain fail-closed without a direct DXGI equivalent");
+
     D3DMATRIX identity{};
     identity._11 = 1.0f;
     identity._22 = 1.0f;
@@ -5847,6 +5862,7 @@ int main()
     std::cout << "DX11 indexed fan vertex capacity R156: PASS\n";
     std::cout << "DX11 indexed fan declared vertex range: PASS\n";
     std::cout << "DX11 indexed fan declared VB capacity R160: PASS\n";
+    std::cout << "DX11 resource A2B10G10R10 exact mapping: PASS\n";
     std::cout << "DX11 direct line raster semantics R157: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
