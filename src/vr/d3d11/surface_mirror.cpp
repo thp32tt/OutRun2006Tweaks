@@ -130,6 +130,9 @@ namespace outrun::vr::dx11
             release_mirror();
             return false;
         }
+        mirror_serial_ = mirror_serial_ == ~std::uint64_t{0}
+            ? 1
+            : mirror_serial_ + 1;
         return true;
     }
 
@@ -233,5 +236,73 @@ namespace outrun::vr::dx11
         source_multisample_quality_ = 0;
         metadata_valid_ = false;
         device_generation_ = 1;
+    }
+
+    NativeSurfacePairReadiness compose_surface_pair_readiness(
+        ID3D11Device* expectedDevice,
+        const NativeSurfaceMirror& color,
+        const NativeSurfaceMirror& depth) noexcept
+    {
+        NativeSurfacePairReadiness out{};
+        out.inputValid = expectedDevice != nullptr &&
+            color.role() == ResourceRole::Color &&
+            depth.role() == ResourceRole::DepthStencil;
+        if (!out.inputValid)
+            return out;
+
+        out.colorReady = color.descriptor_exact(expectedDevice);
+        out.depthReady = depth.descriptor_exact(expectedDevice);
+        out.deviceMatches = out.colorReady && out.depthReady;
+        out.dimensionsMatch = color.width() != 0 && color.height() != 0 &&
+            color.width() == depth.width() && color.height() == depth.height();
+        out.generationsCurrent =
+            color.mirror_generation() != 0 &&
+            color.mirror_generation() == color.device_generation() &&
+            depth.mirror_generation() != 0 &&
+            depth.mirror_generation() == depth.device_generation();
+        out.colorMirrorSerial = color.mirror_serial();
+        out.depthMirrorSerial = depth.mirror_serial();
+        out.componentSerialsPresent =
+            out.colorMirrorSerial != 0 && out.depthMirrorSerial != 0;
+        out.width = color.width();
+        out.height = color.height();
+        out.ready = out.colorReady && out.depthReady && out.deviceMatches &&
+            out.dimensionsMatch && out.generationsCurrent &&
+            out.componentSerialsPresent;
+        if (!out.ready)
+            return out;
+
+        std::uint64_t hash = 1469598103934665603ull;
+        const auto mix = [&hash](std::uint64_t value) noexcept {
+            hash ^= value;
+            hash *= 1099511628211ull;
+        };
+        mix(static_cast<std::uint64_t>(color.role()));
+        mix(static_cast<std::uint64_t>(depth.role()));
+        mix(static_cast<std::uint64_t>(out.width));
+        mix(static_cast<std::uint64_t>(out.height));
+        mix(static_cast<std::uint64_t>(color.source_format()));
+        mix(static_cast<std::uint64_t>(depth.source_format()));
+        mix(color.device_generation());
+        mix(color.mirror_generation());
+        mix(depth.device_generation());
+        mix(depth.mirror_generation());
+        mix(out.colorMirrorSerial);
+        mix(out.depthMirrorSerial);
+        out.snapshotToken = hash == 0 ? 1 : hash;
+        return out;
+    }
+
+    bool validate_surface_pair_snapshot(
+        ID3D11Device* expectedDevice,
+        const NativeSurfaceMirror& color,
+        const NativeSurfaceMirror& depth,
+        std::uint64_t snapshotToken) noexcept
+    {
+        if (snapshotToken == 0)
+            return false;
+        const auto current = compose_surface_pair_readiness(
+            expectedDevice, color, depth);
+        return current.ready && current.snapshotToken == snapshotToken;
     }
 }
