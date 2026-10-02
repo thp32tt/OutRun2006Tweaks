@@ -4539,6 +4539,85 @@ static bool direct_draw_element_count(
     }
 }
 
+NativeFixedFunctionIndexedSourceRangeReadiness
+compose_fixed_function_indexed_source_range_readiness(
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    INT baseVertexIndex,
+    UINT minVertexIndex,
+    UINT numVertices,
+    UINT startIndex) noexcept {
+    NativeFixedFunctionIndexedSourceRangeReadiness out{};
+    out.primitiveCount = primitiveCount;
+    out.baseVertexIndex = baseVertexIndex;
+    out.minVertexIndex = minVertexIndex;
+    out.numVertices = numVertices;
+    out.startIndex = startIndex;
+
+    const auto topology = translate_primitive(primitive);
+    out.topology = topology.value;
+
+    UINT elementCount = 0;
+    const bool countExact =
+        direct_draw_element_count(primitive, primitiveCount, elementCount);
+    out.elementCount = countExact ? elementCount : 0u;
+    out.primitiveExact =
+        topology.exact &&
+        topology.value != D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED &&
+        primitive != D3DPT_TRIANGLEFAN;
+
+    const UINT maxValue = std::numeric_limits<UINT>::max();
+    const bool vertexCountCompatible =
+        primitiveCount == 0u || numVertices != 0u;
+    bool vertexRangeFits = primitiveCount == 0u;
+    if (numVertices != 0u) {
+        const UINT spanMinusOne = numVertices - 1u;
+        vertexRangeFits = minVertexIndex <= maxValue - spanMinusOne;
+        if (vertexRangeFits)
+            out.maxVertexIndex = minVertexIndex + spanMinusOne;
+    }
+    out.vertexRangeExact = vertexCountCompatible && vertexRangeFits;
+    out.indexRangeExact =
+        countExact && startIndex <= maxValue - elementCount;
+    out.inputValid = out.primitiveExact && countExact;
+    out.ready =
+        out.inputValid &&
+        out.vertexRangeExact &&
+        out.indexRangeExact;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(primitive));
+        token = mix_readiness_snapshot_token(token, primitiveCount);
+        token = mix_readiness_snapshot_token(token, elementCount);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(baseVertexIndex));
+        token = mix_readiness_snapshot_token(token, minVertexIndex);
+        token = mix_readiness_snapshot_token(token, numVertices);
+        token = mix_readiness_snapshot_token(token, out.maxVertexIndex);
+        token = mix_readiness_snapshot_token(token, startIndex);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_indexed_source_range_snapshot(
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    INT baseVertexIndex,
+    UINT minVertexIndex,
+    UINT numVertices,
+    UINT startIndex,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = compose_fixed_function_indexed_source_range_readiness(
+        primitive, primitiveCount, baseVertexIndex, minVertexIndex,
+        numVertices, startIndex);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 bool validate_fixed_function_render_target_bound_draw_readiness_integrity(
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept {
     if (!boundDraw.inputValid ||
