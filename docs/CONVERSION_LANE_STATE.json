@@ -778,6 +778,19 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5948363000
+    },
+    {
+      "unit_id": "DX11_DITHER_FAIL_CLOSED_R165",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "d64773db8bc7385f6779b9bff272851c6b04b177",
+      "material_result_sha": "eef351b2cc0194e700f769e72c38c0f94e2eb895",
+      "validation_bearing_sha": "3aefbdcf0344ae70cabc925c3293a0f4c42505c4",
+      "retaining_descendant_sha": "3aefbdcf0344ae70cabc925c3293a0f4c42505c4",
+      "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_SOURCE_GRAPH_ACTIVATION_CENSUS; WIN32_CONFIGURE_CANCELLED_BY_BRANCH_CHURN_BUILD_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5948376267
     }
   ]
 }
