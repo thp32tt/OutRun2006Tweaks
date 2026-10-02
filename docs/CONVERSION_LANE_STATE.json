@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "3b6db224c3e4e27ff4c0f6bf8669ad12cdc6b23c",
+  "state_parent_head": "51b4657fc6027e6fa4679748274edd682b2e2f5c",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,15 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "603a906e35e606be4a3fd48b97cd8b42ddb87127",
-    "validation_bearing_sha": "3b6db224c3e4e27ff4c0f6bf8669ad12cdc6b23c",
-    "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_CI_PENDING",
+    "result_sha": "a6b13f1cf996cd5cd4aab18431def091843d0540",
+    "validation_bearing_sha": "a6b13f1cf996cd5cd4aab18431def091843d0540",
+    "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_DURING_CHECKOUT",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. R125 non-default sampler LOD state and SRC1 dual-source blend remain fail-closed until their separate evidence/implementation gates pass.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until parity proof.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Consume a non-superseded hosted Build/WARP result that contains 603a906e35e606be4a3fd48b97cd8b42ddb87127. Then continue the next independent static unit by composing the proven PS texture-stage sampler/SRV identity together with proven RS/OM binding identity into dormant draw-candidate readiness, without routing game Draw*. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. The current descendant source already composes the proven PS texture-stage binding into draw readiness; do not duplicate it. Next independent static work should compose exact R97 pipeline-object binding evidence with the existing dormant output/surface/PS/geometry binding evidence without issuing game Draw*. Consume a future non-superseded hosted source-graph/Win32/WARP result containing a6b13f1c; exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -285,6 +285,17 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5946792002
+    },
+    {
+      "unit_id": "DX11_DORMANT_PIPELINE_OBJECT_BINDING",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "a6b13f1cf996cd5cd4aab18431def091843d0540",
+      "validation_bearing_sha": "a6b13f1cf996cd5cd4aab18431def091843d0540",
+      "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_DURING_CHECKOUT",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5946844951
     }
   ]
 }
