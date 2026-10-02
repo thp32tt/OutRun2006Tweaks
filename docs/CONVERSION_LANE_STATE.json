@@ -2993,6 +2993,71 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve this verifier guard and the newest authoritative canonical continuation frontier; do not weaken overlap evidence binding or infer runtime/render semantics."
+    },
+    {
+      "unit_id": "DXVK_DIRECT_PREDECESSOR_TARGET_RESOLUTION_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "95686fa78abdbbd20a6853958976786dd5023394",
+      "validation_bearing_result_sha": "95686fa78abdbbd20a6853958976786dd5023394",
+      "run_record_commit_sha": "f62c589e6080df07e6728bc04cf3cdcf7605b9d2",
+      "commit_message": "test: require DXVK predecessor target resolution [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Cross-stage verifier now fails closed when an immediate predecessor proof's direct external branch target enters the successor exact prefix but is omitted from RESOLVED_PREDECESSOR_TARGET_RVAS.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Authenticated GitHub authority and branch-local state/history recovered; current HEAD refreshed during same-JOB concurrency."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Found a branch-wide omission gap in predecessor target resolution metadata."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 95686fa78abdbbd20a6853958976786dd5023394 hardens tools/verify_vr_backend_disasm_contract.py."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA canonical evidence run 36985840252/job 110770542762 SUCCESS; static disassembly contract and canonical EXE analysis PASS."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit contains [AUTO:CONV-DXVK-000002]; Issue #14 comments 5948443294/5948466975 persisted implementation and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only change; no deployable runtime/backend/localization payload."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Durable run record f62c589e6080df07e6728bc04cf3cdcf7605b9d2 plus this supplemental lane entry preserve the unit without regressing the newer primary frontier."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "95686fa78abdbbd20a6853958976786dd5023394",
+        "dxvk_disassembly_evidence_run_id": 36985840252,
+        "dxvk_disassembly_evidence_job_id": 110770542762,
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "artifact_id": 11217706091,
+        "artifact_digest": "sha256:5dd2464c42125dcc0e5b72642c662e02655348c871251d75e570bf5ddc14a521",
+        "static_disassembly_contract": "PASS",
+        "canonical_exe_analysis": "PASS",
+        "backend_conversion_gate_run_id": 36985840229,
+        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_CLAIMED_COMPLETE",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948443294,
+      "issue14_validation_comment_id": 5948466975,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the guard and current branch-authoritative continuation frontier; continue only the first unfinished canonical raw/exact/static unit from current HEAD."
     }
   ]
 }
