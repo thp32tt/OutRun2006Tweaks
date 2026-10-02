@@ -1078,11 +1078,14 @@ async def queue_send_conversion_execution_continuation(
     prompt = (
         f"TASK_ID={active['task_id']} BRANCH={active['branch']} HEAD={latest_head}\n"
         f"GITHUB_ONLY_DEVELOPMENT=true ACTIVE_TASK_LATCH=ON PREMATURE_STOP={strikes}/{PREMATURE_STOP_ROLLOVER_THRESHOLD} "
-        "CONTROLLER_STAGE=WAIT_DURABLE_RESULT. "
-        "HEAD/AGENTS/상태복구/리뷰/계획은 중간 단계다. 로컬 개발 PC, RenderDoc, OpenXR runtime 부재는 "
-        "source/static/disassembly/GitHub Actions 작업의 blocker가 아니다. 설치 Skill은 직접 도움이 될 때만 사용하고 "
-        "없거나 부적합하면 기존 GitHub-only 방식으로 계속해. 지금 실제 지정 작업(소스 수정 또는 bounded evidence 갱신), "
-        "검증, 새 [AUTO:TASK_ID] durable commit까지 진행해. RESULT_SHA=NOT_CREATED/다음 단계 설명만으로 종료하지 마."
+        f"CONTROLLER_STAGE={active.get('controller_stage') or 'C0_RECOVER'} VR_PIPELINE_SCHEMA={CONVERSION_PIPELINE_SCHEMA_VERSION}. "
+        "HEAD/AGENTS/상태복구/리뷰/계획은 중간 단계다. 첫 출력부터 연결된 GitHub 도구를 호출해. "
+        "PIPELINE_REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(필요 없으면 이유+NOT_REQUIRED)→C6_STATE. "
+        "C1에서 발견한 실제 independent work를 C2에서 source/tool/test/workflow/disassembly evidence로 구현하고, C3 검증 후 C4/C6까지 같은 TASK_ID에서 끝내. "
+        "review-only/state-only commit 하나로 종료하지 마. 로컬 개발 PC, RenderDoc, OpenXR runtime 부재는 "
+        "source/static/disassembly/GitHub Actions 작업의 blocker가 아니다. runtime claim만 UNTESTED로 남겨. "
+        "docs/automation/runs/<TASK_ID>.json에 pipeline C0-C6, changed_paths/work_product, validation, state_persisted=true, next_action을 기록한 "
+        "새 [AUTO:TASK_ID] durable commit까지 진행해. RESULT_SHA=NOT_CREATED/다음 단계 설명만으로 종료하지 마."
     )
     sent = await queue_send_same_chat_control_message(
         context,
