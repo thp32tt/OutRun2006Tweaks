@@ -4,72 +4,89 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "942ad6befeb0b8d1eec8dcdaa7b5346a292a0981",
-  "state_parent_head": "6d800ec01584ae76c88caf76d16e30fbddcb69ce",
-  "material_result_sha": "94cf2e7fb072ef58541c7c112e51a0707e638afa",
-  "validation_bearing_sha": "94cf2e7fb072ef58541c7c112e51a0707e638afa",
+  "base_sha": "fa18cde47f0edd6b3da32813ecd6d30307bea8ff",
+  "state_parent_head": "82fb2e36bedda85c87f8f1bd8e27edc179a6fb90",
+  "material_result_sha": "0347abcd313a08d469d2508bf8a34785003d854d",
+  "validation_bearing_sha": "0347abcd313a08d469d2508bf8a34785003d854d",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_CENSUS_ANALYZER_EXTENDED_UNSUPPORTED_R168",
-  "selection_reason": "The live runtime census summary already emits PipelineUnsupported reasons through dualSource/shadeMode/clipping/depthBias/vertexBlend/dither, while tools/analyze_dx11_census.py still terminated the unsupported parser at cull. Current R120 summaries could therefore fail parsing and newer blockers were excluded from UnsupportedTotalLatest.",
-  "summary": "Extended the DX11 census analyzer to parse and count all current unsupported reasons while keeping older cull-terminated summary logs backward compatible; added a regression fixture that proves all six newer reasons contribute to the unsupported total and keep activation disallowed.",
+  "selected_work": "DX11_TEXTURE_COORDINATE_WRAP_FAIL_CLOSED_R170",
+  "selection_reason": "The durable lane state explicitly selected D3DRS_WRAP0..7 for the next independent audit. Fresh GitHub-authoritative inspection confirmed the tracked snapshot, native readiness, census identity, analyzer and probes contained no WRAP0..7 provenance, so nonzero fixed-function coordinate-wrap semantics could be erased.",
+  "summary": "Captured all eight D3DRS_WRAP render states, failed dormant native DX11 readiness closed on any nonzero wrap mask, sealed the values into runtime census identity/telemetry, extended census parsing/accounting, and added positive/negative probes plus source-graph retention guards.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read AGENTS.md, docs/CONVERSION_LANE_STATE.json, the current CONV-DX11-000001 run record, docs/VR_REGRESSION_KNOWLEDGE.json, docs/VR_PROBLEM_HISTORY.md, Issue #14, and the live DX11 checkpoint through authenticated GitHub authority.",
-        "Repeated live HEAD checks during same-branch churn and rejected already-claimed clipping, shade-mode, depth-bias, sampler-sRGB, vertex-blend, dithering and unsupported-bit accounting scopes."
+        "Read AGENTS.md, branch-local conversion state/run files, regression/problem history and Issue #14 through authenticated GitHub authority.",
+        "Repeated fresh HEAD checks during concurrent R168/R169/R171 work and selected the durable-state WRAP0..7 gap only after confirming it remained absent."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "src/vr/d3d11/runtime_census.cpp emits unsupported[incomplete..cull,dualSource,shadeMode,clipping,depthBias,vertexBlend,dither].",
-        "tools/analyze_dx11_census.py accepted only unsupported[incomplete..cull], so current summary lines were incompatible and the six newer blocker counters were absent from UnsupportedTotalLatest.",
-        "Legacy R72-R120 fixtures still use cull-terminated summaries, so the repair must preserve backward parsing compatibility."
+        "D3DRS_WRAP0..7 were absent from RenderStateSnapshot and tracked-state capture.",
+        "translate_pipeline had no WRAP semantic gate; sampler address modes cannot substitute for D3D9 fixed-function coordinate wrapping.",
+        "Runtime census identity, unsupported summary/analyzer and hosted probes had no WRAP coverage."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
+        "src/vr/core/d3d9_draw_state.hpp",
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "src/vr/d3d11/pipeline_translation.hpp",
+        "src/vr/d3d11/pipeline_translation.cpp",
+        "src/vr/d3d11/runtime_census.cpp",
+        "tools/dx11_fixed_function_pipeline_probe.cpp",
         "tools/analyze_dx11_census.py",
-        "tools/test_analyze_dx11_census.py"
+        "tools/test_analyze_dx11_census.py",
+        "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "94cf2e7fb072ef58541c7c112e51a0707e638afa"
+        "b6466cfe78f0ea9c99851c72076bd90e89b2dadb",
+        "c0b5149447322ea0797b1aa5992e27024ab74dd7",
+        "8aef53ffc07eb1e6c13bd96367b72a4eba49084c",
+        "178ec0b4f94c19007fb509fe0fc5d901ffa9f80d",
+        "a1d03aaec9aaac2b25535501c6b3231b2426e17d",
+        "24b3eaf27509c2c55d9c9f1a4ff9eddf6cbb12e7",
+        "ae6edff607d3dafac4347ed1e8b13d5003c342ff",
+        "f9de7e55507a4f293c2aa32f765739ed8f9b6ada",
+        "0347abcd313a08d469d2508bf8a34785003d854d"
       ],
       "details": [
-        "Made the six-field extended unsupported suffix optional after cull, preserving historical census logs while accepting the current runtime format.",
-        "Added dualSource, shadeMode, clipping, depthBias, vertexBlend and dither to unsupported_total accounting.",
-        "Added an R120 regression case with non-zero values for all six fields and asserted UnsupportedTotalLatest=27 plus activation remaining disabled."
+        "Added an eight-stage textureCoordinateWrap snapshot and prime/capture of D3DRS_WRAP0..7.",
+        "Added PipelineUnsupportedTextureCoordinateWrap and fail-closed any nonzero wrap mask.",
+        "Added census observation/value identity, hashing, propagation, detail telemetry, unsupported counter parsing/accounting and regression tests.",
+        "Added zero-wrap exact, WRAP0/WRAP7 negative, fixed-function handoff probes and source-graph retention guards."
       ]
     },
     "C3_VALIDATE": {
       "status": "COMPLETE_STATIC_COMPILE_NOT_CLAIMED",
-      "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_NOT_CLAIMED",
       "evidence": [
-        "Backend Conversion Gate run 36985310958 on exact material SHA 94cf2e7fb072ef58541c7c112e51a0707e638afa: Verify DX11 source graph=success.",
+        "Backend Conversion Gate run 36986701264 on exact material SHA 0347abcd313a08d469d2508bf8a34785003d854d: Verify DX11 source graph=success.",
         "Same exact-SHA run: Verify DX11 dormant activation boundary=success.",
-        "Same exact-SHA run: Test DX11 census analyzer=success, directly exercising the updated parser and regression fixture.",
-        "Win32 Configure was cancelled by descendant branch churn; Build Win32 was skipped. No compile/WARP success is claimed."
+        "Same exact-SHA run: Test DX11 census analyzer=success.",
+        "Configure Win32 was cancelled after descendant branch churn and Build Win32 was skipped; compile success is not claimed.",
+        "Retaining descendant 82fb2e36bedda85c87f8f1bd8e27edc179a6fb90 is ahead_by=1/behind_by=0 and retains PipelineUnsupportedTextureCoordinateWrap plus the R170 source-graph guard."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "94cf2e7fb072ef58541c7c112e51a0707e638afa",
-      "issue14_comment_id": 5948378050
+      "material_commit": "0347abcd313a08d469d2508bf8a34785003d854d",
+      "issue14_comment_id": 5948607857
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Tool/parser regression repair only; no native draw routing, D3D11 runtime implementation, OpenXR transport, localization, DXVK lane, package contents or release payload changed."
+      "reason": "Dormant source/readiness/census/probe/analyzer work only; NativeDrawPathActive stayed disabled and no runtime package or localization changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit D3DRS_WRAP0..7 texture-coordinate wrap provenance on the latest GitHub HEAD; if still absent, implement a fail-closed capture/readiness/census/probe guard as the next independent DX11 unit. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. R171 multisample raster provenance has already landed as a retaining descendant; fresh-audit the latest GitHub HEAD for the next independent dormant D3D9 render-state semantic gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -80,20 +97,27 @@
     "localization_modified": false,
     "other_backend_modified": false
   },
-  "issue14_comment_id": 5948378050,
-  "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; COMPILE_NOT_CLAIMED",
-  "blocker": "Full Win32 configure/build for the exact material SHA was cancelled/skipped because same-branch descendants arrived after the static validation steps. Runtime validation was not performed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit D3DRS_WRAP0..7 texture-coordinate wrap provenance on the latest GitHub HEAD; if still absent, implement a fail-closed capture/readiness/census/probe guard as the next independent DX11 unit. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5948607857,
+  "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_NOT_CLAIMED",
+  "blocker": "Exact-SHA static DX11 contracts passed. Win32 Configure was cancelled after a same-branch R171 descendant arrived, so compile/build success is not claimed. Runtime validation was not performed.",
+  "next_action": "Keep NativeDrawPathActive disabled. R171 multisample raster provenance has already landed as a retaining descendant; fresh-audit the latest GitHub HEAD for the next independent dormant D3D9 render-state semantic gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "prior_completed_unit": "DX11_DITHER_CENSUS_IDENTITY_R167",
-  "source_head": "6d800ec01584ae76c88caf76d16e30fbddcb69ce",
-  "result_sha": "94cf2e7fb072ef58541c7c112e51a0707e638afa",
-  "selected_work_item": "DX11_CENSUS_ANALYZER_EXTENDED_UNSUPPORTED_R168",
+  "prior_completed_unit": "DX11_CENSUS_ANALYZER_EXTENDED_UNSUPPORTED_R168",
+  "source_head": "82fb2e36bedda85c87f8f1bd8e27edc179a6fb90",
+  "result_sha": "0347abcd313a08d469d2508bf8a34785003d854d",
+  "selected_work_item": "DX11_TEXTURE_COORDINATE_WRAP_FAIL_CLOSED_R170",
   "changed_paths": [
+    "src/vr/core/d3d9_draw_state.hpp",
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "src/vr/d3d11/pipeline_translation.hpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/dx11_fixed_function_pipeline_probe.cpp",
     "tools/analyze_dx11_census.py",
-    "tools/test_analyze_dx11_census.py"
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py"
   ],
-  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit D3DRS_WRAP0..7 texture-coordinate wrap provenance on the latest GitHub HEAD; if still absent, implement a fail-closed capture/readiness/census/probe guard as the next independent DX11 unit. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+  "exact_next_action": "Keep NativeDrawPathActive disabled. R171 multisample raster provenance has already landed as a retaining descendant; fresh-audit the latest GitHub HEAD for the next independent dormant D3D9 render-state semantic gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
 }
