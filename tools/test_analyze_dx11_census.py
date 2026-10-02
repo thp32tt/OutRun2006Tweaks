@@ -725,6 +725,32 @@ def main() -> int:
     assert src1_evidence["ActivationProof"] is False
     assert src1_demand["NativeDrawPathActivationAllowed"] is False
 
+    extended_unsupported = run_case(
+        "VR DX11 R120 census: samples=4 exact=0 fixedFn=4 programmable=0 "
+        "topologyUnsupported=0 signatures=4 "
+        "sampling[drawsSeen=4,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0,dualSource=2,shadeMode=3,clipping=4,"
+        "depthBias=5,vertexBlend=6,dither=7]\n"
+    )
+    assert extended_unsupported["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert extended_unsupported["UnsupportedTotalLatest"] == 27
+    assert extended_unsupported["LatestSummary"]["dualSource"] == 2
+    assert extended_unsupported["LatestSummary"]["shadeMode"] == 3
+    assert extended_unsupported["LatestSummary"]["clipping"] == 4
+    assert extended_unsupported["LatestSummary"]["depthBias"] == 5
+    assert extended_unsupported["LatestSummary"]["vertexBlend"] == 6
+    assert extended_unsupported["LatestSummary"]["dither"] == 7
+    assert extended_unsupported["NativeDrawPathActivationAllowed"] is False
+
     r72 = run_case(
         "VR DX11 R72 signature#1: primitive=4 fixedFn=1\n"
         "VR DX11 R72 census: samples=64 exact=64 fixedFn=64 programmable=0 "

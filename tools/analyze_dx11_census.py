@@ -96,7 +96,10 @@ SUMMARY_RE = re.compile(
     r"fog=(?P<fog>\d+),lighting=(?P<lighting>\d+),"
     r"srgb=(?P<srgb>\d+),fill=(?P<fill>\d+),"
     r"blend=(?P<blend>\d+),depthCmp=(?P<depthCmp>\d+),"
-    r"cull=(?P<cull>\d+)\]"
+    r"cull=(?P<cull>\d+)"
+    r"(?:,dualSource=(?P<dualSource>\d+),shadeMode=(?P<shadeMode>\d+),"
+    r"clipping=(?P<clipping>\d+),depthBias=(?P<depthBias>\d+),"
+    r"vertexBlend=(?P<vertexBlend>\d+),dither=(?P<dither>\d+))?\]"
 )
 
 BOOTSTRAP_RE = re.compile(
@@ -371,6 +374,12 @@ def main() -> int:
             "blend",
             "depthCmp",
             "cull",
+            "dualSource",
+            "shadeMode",
+            "clipping",
+            "depthBias",
+            "vertexBlend",
+            "dither",
         ]
         unsupported_total = sum(latest[key] for key in unsupported_keys)
 
