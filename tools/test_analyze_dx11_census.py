@@ -922,6 +922,12 @@ def main() -> int:
         "constant=0xFFFFFFFF resultArg=0x00000000 "
         "texCoord=0x00000002 texTransform=0x00000000 "
         "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+        "VR DX11 R197 ffp signature#11 stage#2: "
+        "color[op=2,arg0=0x00000001,arg1=0x00000007,arg2=0x00000001] "
+        "alpha[op=2,arg0=0x00000001,arg1=0x00000001,arg2=0x00000001] "
+        "constant=0xFFFFFFFF resultArg=0x00000000 "
+        "texCoord=0x00000002 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
     )
     r198_demand = r198_unsupported_demand["ActivationEvidence"][
         "FixedFunctionDetailedStageDemand"
