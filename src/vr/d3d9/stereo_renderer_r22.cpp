@@ -916,6 +916,13 @@ namespace OutRunVRStereo
         R22ShadowState = {};
     }
 
+    inline void FailClosedResetBaselineState() noexcept
+    {
+        R22FailClosedEligibility();
+        R22ResetBaselineTracking();
+        InvalidateTrackedRasterShadow();
+    }
+
     bool IsTrackedStateBlockReliable() noexcept
     {
         return OutRunVR::State::StateBlockTracker::R22Reliable();
