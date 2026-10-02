@@ -24,12 +24,16 @@ namespace outrun::vr::dx11
         bool fixedFunctionObserved = false;
         bool alphaTestOwnedByPixelShader = false;
 
+        [[nodiscard]] bool alpha_test_transfered() const noexcept
+        {
+            return alphaTestOwnedByPixelShader && pixelShader.generated();
+        }
+
         [[nodiscard]] bool exact() const noexcept
         {
             return fixedFunctionObserved &&
                 renderStates.exact() &&
-                pixelShader.generated() &&
-                (!alphaTestOwnedByPixelShader || pixelShader.generated());
+                pixelShader.generated();
         }
     };
 
