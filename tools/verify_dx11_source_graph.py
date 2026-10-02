@@ -938,6 +938,66 @@ def main() -> None:
             + ", ".join(missing_r194_d3dtop_multiplyadd_arg0)
         )
 
+    r195_d3dtop_premodulate_contract = [
+        ("case D3DTOP_PREMODULATE:", PIPELINE_TRANSLATION_CPP,
+         "R195 PREMODULATE dependency/HLSL/readiness case"),
+        ("fixed_function_op_uses_current_argument(",
+         PIPELINE_TRANSLATION_CPP,
+         "R195 next-stage CURRENT dependency classifier"),
+        ("fixed_function_stage_uses_texture(",
+         PIPELINE_TRANSLATION_CPP,
+         "R195 implicit next-stage texture dependency classifier"),
+        ("premodulateCurrent",
+         PIPELINE_TRANSLATION_CPP,
+         "R195 CURRENT rewrite flag"),
+        ('? "(current * sampled" + std::to_string(stageIndex) + ")"',
+         PIPELINE_TRANSLATION_CPP,
+         "R195 CURRENT times next-stage texture expression"),
+        ("premodulateColor = stage.colorOp == D3DTOP_PREMODULATE;",
+         PIPELINE_TRANSLATION_CPP,
+         "R195 color-chain PREMODULATE propagation"),
+        ("premodulateAlpha = stage.alphaOp == D3DTOP_PREMODULATE;",
+         PIPELINE_TRANSLATION_CPP,
+         "R195 alpha-chain PREMODULATE propagation"),
+        ("premodulateStages[0].colorOp = D3DTOP_PREMODULATE;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R195 hosted color PREMODULATE fixture"),
+        ("premodulateStages[0].alphaOp = D3DTOP_PREMODULATE;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R195 hosted alpha PREMODULATE fixture"),
+        ("float3 nextColor = (current * sampled1).rgb;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R195 generated color CURRENT premultiplication assertion"),
+        ("float nextAlpha = (current * sampled1).a;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R195 generated alpha CURRENT premultiplication assertion"),
+        ("R195 PREMODULATE implicit next-stage texture dependency must fail closed when inexact",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R195 implicit texture exactness guard"),
+        ("R195 PREMODULATE must leave next-stage CURRENT unchanged when no texture is bound",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R195 no-texture semantic guard"),
+        ("R195 D3DTOP_PREMODULATE fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R195 offline compile assertion"),
+        ("DX11 fixed-function PREMODULATE stage-chain support R195: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R195 hosted probe completion"),
+    ]
+    missing_r195_d3dtop_premodulate = [
+        meaning
+        for token, source, meaning in r195_d3dtop_premodulate_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_PREMODULATE:") < 3:
+        missing_r195_d3dtop_premodulate.append(
+            "R195 PREMODULATE must participate in dependency, HLSL and readiness switches")
+    if missing_r195_d3dtop_premodulate:
+        raise SystemExit(
+            "DX11 R195 fixed-function D3DTOP_PREMODULATE contract drift: "
+            + ", ".join(missing_r195_d3dtop_premodulate)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
