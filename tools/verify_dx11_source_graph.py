@@ -3,6 +3,7 @@
 
 from pathlib import Path
 from verify_dx11_activation_boundary import main as verify_dx11_activation_boundary
+from verify_dx11_dual_source_contract import main as verify_dx11_dual_source_contract
 
 ROOT = Path(__file__).resolve().parents[1]
 DX11 = ROOT / "src" / "vr" / "d3d11"
@@ -59,6 +60,7 @@ CONSTANT_BUFFER_CONTRACT_TEXT = (
 
 
 def main() -> None:
+    verify_dx11_dual_source_contract()
     cpp_files = sorted(path.relative_to(ROOT).as_posix() for path in DX11.glob("*.cpp"))
     missing = [path for path in cpp_files if f'"{path}"' not in CMAKE]
     if missing:
