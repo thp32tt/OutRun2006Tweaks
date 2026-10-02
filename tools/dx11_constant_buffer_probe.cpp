@@ -2176,6 +2176,8 @@ int main()
         outputStateBinding.ready() &&
         outputStateBinding.render_state_snapshot_token() ==
             outputBindingRenderReady.snapshotToken &&
+        outputStateBinding.surface_pair_snapshot_token() ==
+            surfacePairReady.snapshotToken &&
         outputStateBinding.output_state_snapshot_token() ==
             outputStateReady.snapshotToken &&
         outputStateBinding.snapshot_token() != 0,
@@ -2346,38 +2348,42 @@ int main()
 
     const auto drawReady =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairReady, outputStateReady,
-            indexedGeometryReady);
+            texturedActivation, outputBindingRenderReady, surfacePairReady,
+            outputStateReady, outputStateBinding, indexedGeometryReady);
     require(
         drawReady.inputValid &&
         drawReady.activationReady &&
         drawReady.renderStateReady &&
         drawReady.surfacePairReady &&
         drawReady.outputStateReady &&
+        drawReady.outputBindingReady &&
         drawReady.geometryReady &&
         drawReady.componentSnapshotsPresent &&
         drawReady.ready &&
         drawReady.activationSnapshotToken ==
             texturedActivation.snapshotToken &&
         drawReady.renderStateSnapshotToken ==
-            renderStateRecreated.snapshotToken &&
+            outputBindingRenderReady.snapshotToken &&
         drawReady.surfacePairSnapshotToken ==
             surfacePairReady.snapshotToken &&
         drawReady.outputStateSnapshotToken ==
             outputStateReady.snapshotToken &&
+        drawReady.outputBindingSnapshotToken ==
+            outputStateBinding.snapshot_token() &&
         drawReady.geometrySnapshotToken ==
             indexedGeometryReady.snapshotToken &&
         drawReady.snapshotToken != 0 &&
         validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated, surfacePairReady, outputStateReady,
-            indexedGeometryReady, drawReady.snapshotToken),
-        "R124 draw readiness composes activation, render-state, surface, output-state, and geometry snapshots");
+            texturedActivation, outputBindingRenderReady, surfacePairReady,
+            outputStateReady, outputStateBinding, indexedGeometryReady,
+            drawReady.snapshotToken),
+        "R131 draw readiness composes sealed output binding identity");
 
     auto activationMissingSnapshot = texturedActivation;
     activationMissingSnapshot.snapshotToken = 0;
-    auto renderStateMissingSnapshot = renderStateRecreated;
+    auto renderStateMissingSnapshot = outputBindingRenderReady;
     renderStateMissingSnapshot.snapshotToken = 0;
-    auto renderStateNotReady = renderStateRecreated;
+    auto renderStateNotReady = outputBindingRenderReady;
     renderStateNotReady.ready = false;
     auto surfacePairMissingSnapshot = surfacePairReady;
     surfacePairMissingSnapshot.snapshotToken = 0;
@@ -2386,37 +2392,48 @@ int main()
     auto outputStateNotReady = outputStateReady;
     outputStateNotReady.ready = false;
     outputStateNotReady.snapshotToken = 0;
+    NativeFixedFunctionOutputStateBinding missingDrawOutputBinding;
+
     const auto missingActivationDraw =
         compose_fixed_function_draw_readiness(
-            activationMissingSnapshot, renderStateRecreated, surfacePairReady, outputStateReady,
+            activationMissingSnapshot, outputBindingRenderReady,
+            surfacePairReady, outputStateReady, outputStateBinding,
             indexedGeometryReady);
     const auto missingRenderStateDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateMissingSnapshot, surfacePairReady, outputStateReady,
+            texturedActivation, renderStateMissingSnapshot,
+            surfacePairReady, outputStateReady, outputStateBinding,
             indexedGeometryReady);
     const auto pendingRenderStateDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateNotReady, surfacePairReady, outputStateReady,
+            texturedActivation, renderStateNotReady,
+            surfacePairReady, outputStateReady, outputStateBinding,
             indexedGeometryReady);
     const auto missingSurfacePairDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairMissingSnapshot, outputStateReady,
+            texturedActivation, outputBindingRenderReady,
+            surfacePairMissingSnapshot, outputStateReady, outputStateBinding,
             indexedGeometryReady);
     const auto pendingSurfacePairDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairNotReady, outputStateReady,
+            texturedActivation, outputBindingRenderReady,
+            surfacePairNotReady, outputStateReady, outputStateBinding,
             indexedGeometryReady);
     const auto pendingOutputStateDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairReady,
-            outputStateNotReady, indexedGeometryReady);
+            texturedActivation, outputBindingRenderReady, surfacePairReady,
+            outputStateNotReady, outputStateBinding, indexedGeometryReady);
+    const auto missingOutputBindingDraw =
+        compose_fixed_function_draw_readiness(
+            texturedActivation, outputBindingRenderReady, surfacePairReady,
+            outputStateReady, missingDrawOutputBinding, indexedGeometryReady);
     auto geometryNotReady = indexedGeometryReady;
     geometryNotReady.ready = false;
     geometryNotReady.snapshotToken = 0;
     const auto pendingGeometryDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairReady, outputStateReady,
-            geometryNotReady);
+            texturedActivation, outputBindingRenderReady, surfacePairReady,
+            outputStateReady, outputStateBinding, geometryNotReady);
     require(
         !missingActivationDraw.ready &&
         missingActivationDraw.snapshotToken == 0 &&
@@ -2430,81 +2447,80 @@ int main()
         pendingSurfacePairDraw.snapshotToken == 0 &&
         !pendingOutputStateDraw.ready &&
         pendingOutputStateDraw.snapshotToken == 0 &&
+        !missingOutputBindingDraw.outputBindingReady &&
+        !missingOutputBindingDraw.ready &&
+        missingOutputBindingDraw.snapshotToken == 0 &&
         !pendingGeometryDraw.ready &&
         pendingGeometryDraw.snapshotToken == 0,
-        "R120 draw readiness fails closed on missing component evidence");
+        "R131 draw readiness fails closed on missing binding evidence");
 
-    auto changedRenderStateIdentity = renderStateRecreated;
+    auto changedRenderStateIdentity = outputBindingRenderReady;
     changedRenderStateIdentity.snapshotToken ^= 0x9e3779b97f4a7c15ull;
     const auto changedDrawReady =
         compose_fixed_function_draw_readiness(
-            texturedActivation, changedRenderStateIdentity, surfacePairReady, outputStateReady,
-            indexedGeometryReady);
+            texturedActivation, changedRenderStateIdentity, surfacePairReady,
+            outputStateReady, outputStateBinding, indexedGeometryReady);
     require(
-        changedDrawReady.ready &&
-        changedDrawReady.snapshotToken != 0 &&
-        changedDrawReady.snapshotToken != drawReady.snapshotToken &&
+        !changedDrawReady.outputBindingReady &&
+        !changedDrawReady.ready &&
+        changedDrawReady.snapshotToken == 0 &&
         !validate_fixed_function_draw_snapshot(
-            texturedActivation, changedRenderStateIdentity, surfacePairReady, outputStateReady,
-            indexedGeometryReady, drawReady.snapshotToken) &&
-        validate_fixed_function_draw_snapshot(
-            texturedActivation, changedRenderStateIdentity, surfacePairReady, outputStateReady,
-            indexedGeometryReady, changedDrawReady.snapshotToken),
-        "R120 draw snapshot changes with render-state identity");
+            texturedActivation, changedRenderStateIdentity, surfacePairReady,
+            outputStateReady, outputStateBinding, indexedGeometryReady,
+            drawReady.snapshotToken),
+        "R131 draw binding rejects render-state identity drift");
 
     auto changedSurfacePairIdentity = surfacePairReady;
     changedSurfacePairIdentity.snapshotToken ^= 0x100000001b3ull;
     const auto changedSurfacePairDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, changedSurfacePairIdentity, outputStateReady,
+            texturedActivation, outputBindingRenderReady,
+            changedSurfacePairIdentity, outputStateReady, outputStateBinding,
             indexedGeometryReady);
     require(
-        changedSurfacePairDraw.ready &&
-        changedSurfacePairDraw.snapshotToken != 0 &&
-        changedSurfacePairDraw.snapshotToken != drawReady.snapshotToken &&
+        !changedSurfacePairDraw.outputBindingReady &&
+        !changedSurfacePairDraw.ready &&
+        changedSurfacePairDraw.snapshotToken == 0 &&
         !validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated, changedSurfacePairIdentity, outputStateReady,
-            indexedGeometryReady, drawReady.snapshotToken) &&
-        validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated, changedSurfacePairIdentity, outputStateReady,
-            indexedGeometryReady, changedSurfacePairDraw.snapshotToken),
-        "R120 draw snapshot changes with output-surface identity");
+            texturedActivation, outputBindingRenderReady,
+            changedSurfacePairIdentity, outputStateReady, outputStateBinding,
+            indexedGeometryReady, drawReady.snapshotToken),
+        "R131 draw binding rejects surface-pair identity drift");
 
     const auto changedOutputStateDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairReady,
-            changedOutputStateReady, indexedGeometryReady);
+            texturedActivation, outputBindingRenderReady, surfacePairReady,
+            changedOutputStateReady, outputStateBinding, indexedGeometryReady);
     require(
-        changedOutputStateDraw.ready &&
-        changedOutputStateDraw.snapshotToken != 0 &&
-        changedOutputStateDraw.snapshotToken != drawReady.snapshotToken &&
+        !changedOutputStateDraw.outputBindingReady &&
+        !changedOutputStateDraw.ready &&
+        changedOutputStateDraw.snapshotToken == 0 &&
         !validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated, surfacePairReady,
-            changedOutputStateReady, indexedGeometryReady,
-            drawReady.snapshotToken) &&
-        validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated, surfacePairReady,
-            changedOutputStateReady, indexedGeometryReady,
-            changedOutputStateDraw.snapshotToken),
-        "R124 draw snapshot changes with output-state identity");
+            texturedActivation, outputBindingRenderReady, surfacePairReady,
+            changedOutputStateReady, outputStateBinding, indexedGeometryReady,
+            drawReady.snapshotToken),
+        "R131 draw binding rejects output-state identity drift");
 
     auto changedGeometryIdentity = indexedGeometryReady;
     changedGeometryIdentity.snapshotToken ^= 0x9e3779b97f4a7c15ull;
     const auto changedGeometryDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairReady, outputStateReady,
-            changedGeometryIdentity);
+            texturedActivation, outputBindingRenderReady, surfacePairReady,
+            outputStateReady, outputStateBinding, changedGeometryIdentity);
     require(
+        changedGeometryDraw.outputBindingReady &&
         changedGeometryDraw.ready &&
         changedGeometryDraw.snapshotToken != 0 &&
         changedGeometryDraw.snapshotToken != drawReady.snapshotToken &&
         !validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated, surfacePairReady, outputStateReady,
-            changedGeometryIdentity, drawReady.snapshotToken) &&
+            texturedActivation, outputBindingRenderReady, surfacePairReady,
+            outputStateReady, outputStateBinding, changedGeometryIdentity,
+            drawReady.snapshotToken) &&
         validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated, surfacePairReady, outputStateReady,
-            changedGeometryIdentity, changedGeometryDraw.snapshotToken),
-        "R122 draw snapshot changes with geometry identity");
+            texturedActivation, outputBindingRenderReady, surfacePairReady,
+            outputStateReady, outputStateBinding, changedGeometryIdentity,
+            changedGeometryDraw.snapshotToken),
+        "R131 draw snapshot still changes with independent geometry identity");
 
     DevicePair pipelineOtherDevice = create_warp_device();
     auto changedLayout = inputLayout;
@@ -2758,6 +2774,7 @@ int main()
     std::cout << "DX11 fixed-function activation evidence composition R115: PASS\n";
     std::cout << "DX11 fixed-function render-state bundle R116: PASS\n";
     std::cout << "DX11 fixed-function draw readiness composition R120: PASS\n";
+    std::cout << "DX11 draw output-binding readiness R131: PASS\n";
     std::cout << "DX11 geometry-gated draw readiness R122: PASS\n";
     std::cout << "DX11 dynamic output-state readiness R124: PASS\n";
     return 0;
