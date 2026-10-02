@@ -625,8 +625,12 @@ if "attempt < R31PrerequisiteWaitAttempts" not in r31 or "Sleep(R31PrerequisiteW
 if "R31ClassifyPrerequisite(r30, renderer)" not in r31:
     errors.append("R31 install thread bypassed prerequisite classifier")
 
-r33_read_begin = r33.find("ReadFinalDispatchInstallState() noexcept")
-r33_public_read_begin = r33.find("FinalDispatchInstallState() noexcept", r33_read_begin + 1)
+r33_read_marker = "ReadFinalDispatchInstallState() noexcept"
+r33_public_marker = "FinalDispatchInstallState() noexcept"
+r33_read_begin = r33.find(r33_read_marker)
+r33_public_read_begin = r33.find(
+    r33_public_marker,
+    r33_read_begin + len(r33_read_marker))
 if r33_read_begin < 0 or r33_public_read_begin <= r33_read_begin:
     errors.append("R33 final-dispatch install-state read boundary missing")
 else:
