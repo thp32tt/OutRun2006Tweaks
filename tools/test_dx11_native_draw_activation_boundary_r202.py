@@ -25,10 +25,10 @@ def main() -> None:
         raise SystemExit("DX11 native draw activation boundary drift: " + ", ".join(missing))
 
     forbidden = [
+        '"native_draw_path_active_changed": true',
         "NativeDrawPathActive = true",
-        "native_draw_path_active_changed": "true",
     ]
-    if any(item in state for item in forbidden if isinstance(item, str)):
+    if any(item in state for item in forbidden):
         raise SystemExit("DX11 native draw activation must remain disabled")
 
     print("DX11 native draw activation boundary R202: PASS")
