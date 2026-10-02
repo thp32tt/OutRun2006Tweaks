@@ -5,7 +5,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "2ef8e67a0cc5662b4a561a17bf937856378d2ef3",
-  "state_parent_head": "232c5b3429ee498a66f491276f2a566e84f56cf1",
+  "state_parent_head": "13f7b04d2fa7a6881301105ec64badc4cd306869",
   "material_result_sha": "55ca31b8ff3ba961f7d342ef8e80543ef8202e24",
   "validation_bearing_sha": "55ca31b8ff3ba961f7d342ef8e80543ef8202e24",
   "runtime_validation": "UNTESTED",
@@ -83,13 +83,13 @@
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "prior_completed_unit": {
-    "selected_work": "DX11_FINAL_VS_B0_TRANSFORM_BINDING",
-    "material_result_sha": "5646574723603ed9c85c34b0561e4feea6ae3cef",
-    "validation_bearing_sha": "ddc5ddc6b826d629b16161bb2f2baac7e68fce87",
-    "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+    "selected_work": "DX11_GENERATED_FAN_DORMANCY_GUARD_FIX",
+    "material_result_sha": "55ca31b8ff3ba961f7d342ef8e80543ef8202e24",
+    "validation_bearing_sha": "55ca31b8ff3ba961f7d342ef8e80543ef8202e24",
+    "automation_validation": "PASS_EXACT_DX11_SOURCE_GRAPH_BUILD_RUN_CANCELLED_AFTER_STATIC_STEP",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
-    "issue14_comment_id": 5947277201
+    "issue14_comment_id": 5947354326
   }
 }

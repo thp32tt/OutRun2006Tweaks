@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "232c5b3429ee498a66f491276f2a566e84f56cf1",
+  "state_parent_head": "13f7b04d2fa7a6881301105ec64badc4cd306869",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
