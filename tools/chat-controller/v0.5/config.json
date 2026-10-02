@@ -1,16 +1,21 @@
 {
-  "schema": 1,
+  "schema": 2,
   "repository": "thp32tt/OutRun2006Tweaks",
   "modes": {
     "localization": {
+      "pipeline": "A_B_THEN_C_BARRIER",
+      "queue": "localization/graphics/asset_queue_v2.csv",
+      "config": "localization/controller_roles.json",
       "lanes": [
-        {"name": "A", "role": "localization_producer", "branch": "korean-localization-clean", "shard": 0},
-        {"name": "B", "role": "localization_producer", "branch": "korean-localization-clean", "shard": 1},
-        {"name": "E", "role": "localization_producer", "branch": "korean-localization-clean", "shard": 2},
-        {"name": "C", "role": "localization_qa", "branch": "korean-localization-clean", "qa_batch_size": 4}
-      ]
+        {"name": "A", "role": "localization_producer", "branch": "korean-localization-clean", "shard_rule": "index % 2 == 0"},
+        {"name": "B", "role": "localization_producer", "branch": "korean-localization-clean", "shard_rule": "index % 2 == 1"},
+        {"name": "C", "role": "localization_qa", "branch": "korean-localization-clean", "barrier": true, "qa_batch_size": 4}
+      ],
+      "retired_lanes": ["E"],
+      "requires_material_commit": true
     },
     "conversion": {
+      "isolated": true,
       "lanes": [
         {"name": "DX11", "role": "conversion", "branch": "vr-dx11-native-r71", "backend": "DX11"},
         {"name": "DXVK", "role": "conversion", "branch": "vr-dxvk-r71-disasm", "backend": "DXVK"}
