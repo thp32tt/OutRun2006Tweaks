@@ -6,7 +6,7 @@ N100 연결 환경은 승인된 실행 환경으로 사용할 수 있다. Docker
 
 승인된 Google Drive canonical HD source transport는 원본 DDS 검증과 취득에 사용할 수 있다. DDS 규격과 checksum 조건을 유지한다.
 
-이전 TASK_ID, 이전 rollover 기록, 이전 chat registry는 실행 재개 조건으로 사용하지 않는다. TASK_ID는 기록 식별자이며 실행 상태를 결정하는 키가 아니다.
+작업 식별은 lane + asset path + result artifact 기준으로 관리한다. 이전 TASK_ID, 이전 rollover 기록, 이전 chat registry는 실행 재개 조건으로 사용하지 않는다. 기록용 식별자가 필요한 경우에도 실행 상태를 결정하는 키로 사용하지 않는다.
 
 C는 A/B 생산 완료를 기다리는 barrier가 아니다. A/B 생산은 계속 진행되고 C는 완료된 candidate를 독립적으로 검증한다.
 
@@ -19,4 +19,4 @@ C는 A/B 생산 완료를 기다리는 barrier가 아니다. A/B 생산은 계�
 
 실패는 해당 asset만 REWORK_REQUIRED로 반환한다. 전체 생산을 중단하지 않는다.
 
-공용 QA 상태 병합은 C가 담당한다. commit 메시지는 [AUTO:TASK_ID] 형식을 따른다. 실기 테스트 전 RUNTIME_VALIDATION=UNTESTED를 유지한다. VR/FFB 및 빌드는 수행하지 않는다.
+공용 QA 상태 병합은 C가 담당한다. commit 메시지와 증빙은 현재 QA batch와 검증 결과를 기준으로 기록한다. 실기 테스트 전 RUNTIME_VALIDATION=UNTESTED를 유지한다. VR/FFB 및 빌드는 수행하지 않는다.
