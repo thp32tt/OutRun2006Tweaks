@@ -152,7 +152,8 @@
     5947751800,
     5947788675,
     5947846126,
-    5947892877
+    5947892877,
+    5947895623
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -2843,6 +2844,74 @@
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Capture canonical continuation 50 from 0x00182ECB with mandatory 66 0F 7E overlap; keep fresh bytes and raw rel32 census only until exact decode proves the cut instruction, and keep function/render/HUD/runtime semantics unresolved.",
       "issue14_validation_comment_id": 5947892877
+    },
+    {
+      "unit_id": "DXVK_INSTRUCTION_GEOMETRY_STATIC_CROSSCHECK",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "b5a108b16c1eaf7bd511b486aa12f92c409d12b7",
+      "material_commits": [
+        "d14d3120a932770c4d69437267e3f45e8b9ac703",
+        "b5a108b16c1eaf7bd511b486aa12f92c409d12b7"
+      ],
+      "commit_message": "test: honor DXVK padding geometry [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Added fail-closed static geometry validation for auto-discovered exact continuation instruction tuples. The first exact-SHA run surfaced continuation_26's intentional six-byte INT3 padding contract; the final implementation validates contiguous instruction rows through INSTRUCTION_END_RVA and, when present, requires a complete PADDING_RVA/PADDING_LEN span through PREFIX_END_RVA.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch authority, AGENTS.md, current lane/run state, regression/problem history and Issue #14. Concurrent canonical frontier work was detected and not duplicated."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "After concurrent workers claimed the raw/proof frontier and branch-declaration verifier, selected the remaining static integrity gap: *_INSTRUCTIONS tuple geometry was only evaluated during canonical proof execution."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commits d14d3120a932770c4d69437267e3f45e8b9ac703 and b5a108b16c1eaf7bd511b486aa12f92c409d12b7 add instruction layout validation and explicit padding-geometry support."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Initial exact-SHA run 36981940144/job 110758195896 failed on continuation_26's explicit padding contract, proving the checker active. Final exact-SHA run 36982107380/job 110758714684 completed SUCCESS with VR backend disassembly contract OK and canonical analyzer execution."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Both substantive commits contain [AUTO:CONV-DXVK-000002]; Issue #14 comment 5947895623 records implementation and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only hardening; no runtime payload, selector, backend binary, localization or deployable package content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally so the newer canonical-disassembly primary frontier is not overwritten."
+        }
+      },
+      "validation": {
+        "initial_exact_sha": "d14d3120a932770c4d69437267e3f45e8b9ac703",
+        "initial_dxvk_disassembly_evidence_run_id": 36981940144,
+        "initial_dxvk_disassembly_evidence_job_id": 110758195896,
+        "initial_conclusion": "failure",
+        "initial_failure": "DXVK continuation 26 instruction geometry end drift: decoded_end=0x0018291A prefix_end=0x00182920",
+        "exact_sha": "b5a108b16c1eaf7bd511b486aa12f92c409d12b7",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36982107380,
+        "dxvk_disassembly_evidence_job_id": 110758714684,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "artifact_id": 11215334781,
+        "artifact_digest": "sha256:dfd3e82c483e870186746166aa0ec2fe99f376132767dd573063906de168dbb8",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5947895623,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest canonical-disassembly frontier and keep instruction/call/branch static cross-checks active on future exact continuation proofs; do not promote function/render/HUD/runtime semantics without separate evidence."
     }
   ],
   "issue14_implementation_comment_id": 5947846126,
