@@ -3294,9 +3294,9 @@
       "job_id": "CONV-DXVK-000002",
       "result_sha": "faf83ac4769449bfffa9b2b8130c61f00defa2c3",
       "validation_bearing_result_sha": "faf83ac4769449bfffa9b2b8130c61f00defa2c3",
-      "run_record_commit_sha": "014a0854cc311b22419ed84f55d68a83e79ebede",
+      "run_record_commit_sha": "517e953f3389965a42bb7b8c31d7d4abdbef2c0b",
       "commit_message": "dxvk: capture canonical 0x1830F3 continuation [AUTO:CONV-DXVK-000002]",
-      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BUILD",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "changed_paths": [
@@ -3318,15 +3318,23 @@
         "artifact_id": 11217519326,
         "artifact_digest": "sha256:a2b6619c22569e3a4a910d95c8d79720e4212913bc2b7472ce27578a245dae83",
         "backend_conversion_gate_run_id": 36986923560,
-        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_CLAIMED_COMPLETE",
-        "runtime_validation": "UNTESTED"
+        "runtime_validation": "UNTESTED",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BUILD",
+        "backend_conversion_gate_job_id": 110773950945,
+        "backend_conversion_gate_status": "SUCCESS",
+        "backend_conversion_gate_conclusion": "success",
+        "backend_disassembly_contract": "PASS",
+        "configure_win32": "PASS",
+        "build_win32": "PASS",
+        "binary_exists": "PASS"
       },
       "issue14_implementation_comment_id": 5948651605,
       "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
       "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
       "semantic_promotion": "NONE",
       "ownership_effect": "NONE",
-      "exact_next_action": "Exact-decode only complete canonical instructions in validated continuation_59 raw window 0x001830F3..0x00183133. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
+      "exact_next_action": "Exact-decode only complete canonical instructions in validated continuation_59 raw window 0x001830F3..0x00183133. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved.",
+      "issue14_validation_comment_id": 5948687685
     }
   ]
 }
