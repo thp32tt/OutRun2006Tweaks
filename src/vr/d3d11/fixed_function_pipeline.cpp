@@ -44,6 +44,7 @@ namespace outrun::vr::dx11
         // state blocker set into shader ownership.
         if (source.complete &&
             source.alphaTestEnable != FALSE &&
+            out.alpha_test_transfer_allowed() &&
             (out.renderStates.unsupported & PipelineUnsupportedAlphaTest) != 0)
         {
             out.renderStates.unsupported &= ~PipelineUnsupportedAlphaTest;
