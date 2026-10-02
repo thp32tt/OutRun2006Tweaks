@@ -377,31 +377,39 @@ async def queue_handle_retry_surface(context: BrowserContext, pages: dict[str, P
             write_runtime(status="retry_wait", last_action=f"Rate-limit Retry for {active['task_id']} waiting for {guard}")
             return True
     else:
-        # Generic Retry is usually transient. Repeated Retry must not create
-        # endless fresh chats. Keep the same TASK_ID/chat and open a cooldown circuit.
+        # A persistent generic Retry means the current conversation surface is not a
+        # usable input surface. After the bounded controlled clicks, preserve TASK_ID
+        # but move to a fresh project chat instead of cooling down in the broken chat.
         if generic_clicks >= GENERIC_RETRY_ROLLOVER_CLICKS:
-            retry_until = _parse_iso(active.get("generic_retry_cooldown_until"))
-            if retry_until and now >= retry_until:
-                active["generic_retry_clicks"] = 0
-                active.pop("generic_retry_cooldown_until", None)
-                generic_clicks = 0
-                save_queue_state(q)
-            else:
-                if retry_until is None:
-                    retry_until = now + timedelta(seconds=GENERIC_RETRY_COOLDOWN_SECONDS)
-                    active["generic_retry_cooldown_until"] = retry_until.isoformat()
-                    active["failure_context"] = (
-                        f"Generic Retry remained visible after {generic_clicks} controlled clicks; "
-                        "preserving the same TASK_ID/chat and cooling down instead of opening another chat."
-                    )
-                    save_queue_state(q)
-                remaining = max(1, int((retry_until - now).total_seconds()))
-                write_runtime(
-                    status="generic_retry_circuit_wait",
-                    last_action=f"{active['task_id']} persistent Retry; same chat preserved, retry resumes in {remaining}s",
-                    queue=active,
+            reason = (
+                f"Generic Retry remained visible after {generic_clicks} controlled clicks; "
+                "current chat input is unusable, so resume the same TASK_ID in a fresh project chat."
+            )
+            active["failure_context"] = reason
+            active["task_latched"] = True
+            if CONTROLLER_MODE == "localization":
+                active["controller_stage"] = (
+                    "WAIT_QA_RESULT" if str(active.get("lane") or "") == "LOCALIZATION_C"
+                    else active.get("controller_stage") or "WAIT_MATERIAL_COMMIT"
                 )
+            else:
+                active["controller_stage"] = active.get("controller_stage") or "WAIT_DURABLE_RESULT"
+            active.pop("generic_retry_cooldown_until", None)
+            if await queue_rollover_chat(context, pages, active, reason):
+                active["generic_retry_clicks"] = 0
+                save_queue_state(q)
                 return True
+            # Rollover may be temporarily deferred by normal send spacing. Stay
+            # nonterminal and retry the rollover on the next queue cycle.
+            active["phase"] = "WAIT_CHAT"
+            active["terminal"] = None
+            save_queue_state(q)
+            write_runtime(
+                status="generic_retry_rollover_wait",
+                last_action=f"{active['task_id']} input unavailable; waiting to roll the same TASK_ID to a fresh chat",
+                queue=active,
+            )
+            return True
 
         last_click = _parse_iso(active.get("last_retry_click_at"))
         if last_click:
@@ -577,8 +585,14 @@ def _is_localization_producer(active: dict) -> bool:
 
 
 def _is_latched_execution_task(active: dict) -> bool:
-    """Tasks whose assistant turn must not be treated as task completion."""
-    return _is_localization_producer(active) or CONTROLLER_MODE == "conversion"
+    """Queue tasks whose assistant/UI turn must not be treated as task completion."""
+    if CONTROLLER_MODE == "conversion":
+        return True
+    if CONTROLLER_MODE == "localization":
+        lane = str(active.get("lane") or "")
+        slot = str(active.get("slot") or "")
+        return slot in {"A", "B", "C", "D"} or lane.startswith("LOCALIZATION_")
+    return False
 
 
 async def queue_send_producer_execution_continuation(
@@ -2982,6 +2996,27 @@ def startup_reconcile_queue_state() -> None:
 
     rebounds = []
     for task in records:
+        if _is_latched_execution_task(task):
+            task["task_latched"] = True
+            task.setdefault("premature_stop_count", 0)
+            task.setdefault("premature_stop_total", 0)
+            task.setdefault("premature_stop_counted_for_send_at", None)
+            branch_head = heads.get(task.get("branch"))
+            if branch_head:
+                task.setdefault("last_checkpoint_head", branch_head)
+            task.setdefault("last_checkpoint_at", now.isoformat())
+            if task.get("phase") == "WAIT_ACTIONS":
+                task["controller_stage"] = "WAIT_ACTIONS"
+            elif CONTROLLER_MODE == "localization":
+                task["controller_stage"] = (
+                    "WAIT_QA_RESULT" if str(task.get("lane") or "") == "LOCALIZATION_C"
+                    else task.get("controller_stage") or "WAIT_MATERIAL_COMMIT"
+                )
+            else:
+                task["controller_stage"] = task.get("controller_stage") or "WAIT_DURABLE_RESULT"
+            # Old releases could persist a five-minute generic-Retry circuit. The
+            # new policy rolls a broken input surface to a fresh chat instead.
+            task.pop("generic_retry_cooldown_until", None)
         if task.get("phase") == "WAIT_ACTIONS":
             if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B", "D"}:
                 invalidate_task_commit_cache(str(task.get("branch") or ""), str(task.get("task_id") or ""))
