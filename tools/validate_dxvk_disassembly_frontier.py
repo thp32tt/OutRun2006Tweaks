@@ -21,23 +21,28 @@ def _hex_bytes(value: object) -> bytes:
         return b""
 
 
+def _valid_rva(value: object) -> bool:
+    return isinstance(value, str) and value.startswith("0x") and int(value, 16) >= 0
+
+
 def validate(record: dict) -> list[str]:
     errors: list[str] = []
 
     start = record.get("provenance_start_rva")
     end = record.get("probe_end_rva")
-    if not isinstance(start, str) or not isinstance(end, str):
-        errors.append("missing_rva_range")
-    else:
-        try:
-            if int(end, 16) <= int(start, 16):
-                errors.append("invalid_rva_range")
-        except ValueError:
-            errors.append("invalid_rva_encoding")
+    if not _valid_rva(start) or not _valid_rva(end):
+        errors.append("invalid_rva_encoding")
+    elif int(end, 16) <= int(start, 16):
+        errors.append("invalid_rva_range")
 
     overlap = _hex_bytes(record.get("overlap_bytes"))
     if not overlap:
         errors.append("missing_overlap_bytes")
+
+    branches = record.get("branch_targets")
+    if branches is not None:
+        if not isinstance(branches, list) or any(not isinstance(item, str) or "->" not in item for item in branches):
+            errors.append("invalid_branch_targets")
 
     if record.get("capture_edge_matches") is False:
         errors.append("capture_edge_mismatch")
