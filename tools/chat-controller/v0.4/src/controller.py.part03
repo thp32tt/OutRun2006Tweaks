@@ -1099,7 +1099,7 @@ async def queue_send_conversion_execution_continuation(
     active["last_checkpoint_stage"] = "WAIT_DURABLE_RESULT"
 
     strikes = int(active.get("premature_stop_count", 0) or 0)
-    if strikes >= PREMATURE_STOP_ROLLOVER_THRESHOLD:
+    if strikes >= CONVERSION_PREMATURE_STOP_ROLLOVER_THRESHOLD:
         reason = (
             f"PREMATURE_STOP:{strikes} consecutive conversion turns ended without a durable TASK commit; "
             "same TASK_ID must continue from checkpoint in a fresh chat."
@@ -1135,7 +1135,7 @@ async def queue_send_conversion_execution_continuation(
 
     prompt = (
         f"TASK_ID={active['task_id']} BRANCH={active['branch']} HEAD={latest_head}\n"
-        f"GITHUB_ONLY_DEVELOPMENT=true ACTIVE_TASK_LATCH=ON PREMATURE_STOP={strikes}/{PREMATURE_STOP_ROLLOVER_THRESHOLD} "
+        f"GITHUB_ONLY_DEVELOPMENT=true ACTIVE_TASK_LATCH=ON PREMATURE_STOP={strikes}/{CONVERSION_PREMATURE_STOP_ROLLOVER_THRESHOLD} "
         f"CONTROLLER_STAGE={active.get('controller_stage') or 'C0_RECOVER'} VR_PIPELINE_SCHEMA={CONVERSION_PIPELINE_SCHEMA_VERSION}. "
         "HEAD/AGENTS/상태복구/리뷰/계획은 중간 단계다. 첫 출력부터 연결된 GitHub 도구를 호출해. "
         "PIPELINE_REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(필요 없으면 이유+NOT_REQUIRED)→C6_STATE. "
