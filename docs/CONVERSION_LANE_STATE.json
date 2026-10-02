@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "f50aafbb8bf1d5c8ac3617398f62df3361aa9408",
+  "state_parent_head": "6bd4824eb1e5f8b29f55e507464fa1914797a577",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -65,7 +65,7 @@
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA Build run 36993754160 passed DX11 source-graph/census and preceding static checks; Configure was cancelled by newer same-branch descendant churn and Build/binary steps were skipped, so compile/binary success is not claimed.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation; R195 PREMODULATE is dormant translation/probe logic only.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R195 D3DTOP_PREMODULATE stage-chain semantics and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the latest authenticated GitHub HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R196 D3DTOP_LERP ARG0 support and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1314,6 +1314,27 @@
       "issue14_comment_id": 5950023207,
       "validation_run_id": 36993754160,
       "validation_job_id": 110795726211
+    },
+    {
+      "unit_id": "DX11_FFP_D3DTOP_LERP_ARG0_SUPPORT_R196",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "8d86a47b1f9ba9a7ee76d2d6223b20ab3411c236",
+      "implementation_commits": [
+        "d83df6bd048842b2e61245d8a7ad5e9b4fa5e217",
+        "5bb6d15ae76b0e1c9151fe61f7cce118a6bbc8f0",
+        "faa27274d45f1da5b9989965e161f79a0b04d555",
+        "23d5bc02df5bad35e1e9fbeb128a0842faaf682e"
+      ],
+      "source_implementation_sha": "d83df6bd048842b2e61245d8a7ad5e9b4fa5e217",
+      "material_result_sha": "faa27274d45f1da5b9989965e161f79a0b04d555",
+      "validation_bearing_sha": "23d5bc02df5bad35e1e9fbeb128a0842faaf682e",
+      "retaining_descendant_sha": "6bd4824eb1e5f8b29f55e507464fa1914797a577",
+      "automation_validation": "PASS_EXACT_SHA_STATIC_CONTRACT; exact result Build run 36993877716 cancelled by descendant branch churn; subsequent stale census-log revision guards identified and repaired/retained on descendants; compile/binary success not claimed",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_SOURCE_TEST_ONLY",
+      "issue14_comment_id": 5950119060
     }
   ]
 }
