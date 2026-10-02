@@ -96,6 +96,16 @@ PREMATURE_STOP_ROLLOVER_THRESHOLD = max(2, int(os.getenv("PREMATURE_STOP_ROLLOVE
 PRODUCER_CONTINUATION_COOLDOWN_SECONDS = max(5, int(os.getenv("PRODUCER_CONTINUATION_COOLDOWN_SECONDS", "15")))
 PRODUCER_PREMATURE_STOP_ROLLOVER_THRESHOLD = max(1, int(os.getenv("PRODUCER_PREMATURE_STOP_ROLLOVER_THRESHOLD", "2")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
+CONVERSION_PIPELINE_SCHEMA_VERSION = max(2, int(os.getenv("CONVERSION_PIPELINE_SCHEMA_VERSION", "2")))
+CONVERSION_PIPELINE_STAGES = (
+    "C0_RECOVER",
+    "C1_REVIEW",
+    "C2_IMPLEMENT",
+    "C3_VALIDATE",
+    "C4_COMMIT",
+    "C5_PACKAGE",
+    "C6_STATE",
+)
 CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
 MAX_CHAT_ROLLOVERS_PER_TASK = max(1, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "2")))
 GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
@@ -311,6 +321,8 @@ runtime = {
     "localization_qa_coalesce_seconds": LOCALIZATION_QA_COALESCE_SECONDS,
     "localization_producer_target_candidates": LOCALIZATION_PRODUCER_TARGET_CANDIDATES,
     "localization_producer_max_material_commits": LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS,
+    "conversion_pipeline_schema_version": CONVERSION_PIPELINE_SCHEMA_VERSION,
+    "conversion_pipeline_stages": list(CONVERSION_PIPELINE_STAGES),
     "localization_same_slot_send_gap_seconds": LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS,
     "localization_slot_dedup_seconds": LOCALIZATION_SLOT_DEDUP_SECONDS,
     "same_task_control_gap_seconds": SAME_TASK_CONTROL_GAP_SECONDS,
@@ -1316,6 +1328,151 @@ def localization_validate_producer_result_commit(task_id: str, result_sha: str) 
     if blockers:
         return False, blockers, record
     return True, [], record
+
+
+def conversion_pipeline_status_ok(stage: str, value) -> bool:
+    """Accept explicit terminal stage statuses; C5 may be NOT_REQUIRED with a reason."""
+    if isinstance(value, dict):
+        status = str(value.get("status") or value.get("result") or "").strip().upper()
+    else:
+        status = str(value or "").strip().upper()
+    allowed = {
+        "C0_RECOVER": {"COMPLETE", "PASS", "DONE"},
+        "C1_REVIEW": {"COMPLETE", "PASS", "DONE"},
+        "C2_IMPLEMENT": {"COMPLETE", "PASS", "DONE", "IMPLEMENTED"},
+        "C3_VALIDATE": {"COMPLETE", "PASS", "DONE"},
+        "C4_COMMIT": {"COMPLETE", "PASS", "DONE"},
+        "C5_PACKAGE": {"COMPLETE", "PASS", "DONE", "NOT_REQUIRED"},
+        "C6_STATE": {"COMPLETE", "PASS", "DONE"},
+    }
+    return status in allowed.get(stage, set())
+
+
+def conversion_pipeline_changed_paths(record: dict) -> list[str]:
+    paths = []
+    for key in ("conversion_changed_paths", "changed_paths"):
+        value = record.get(key)
+        if isinstance(value, list):
+            paths.extend(str(x).strip() for x in value if str(x).strip())
+    work_product = record.get("work_product") if isinstance(record.get("work_product"), dict) else {}
+    value = work_product.get("changed_paths")
+    if isinstance(value, list):
+        paths.extend(str(x).strip() for x in value if str(x).strip())
+    return list(dict.fromkeys(paths))
+
+
+def conversion_pipeline_has_substantive_work(record: dict) -> bool:
+    """Task completion requires an implementation/evidence artifact, not state/review prose only."""
+    metadata_prefixes = (
+        "docs/automation/runs/",
+        "docs/CONVERSION_LANE_STATE.json",
+        "docs/VR_RUN_STATE.md",
+        "docs/VR_AUTODEV_STATE.json",
+        "docs/VR_AUTODEV_STATE.md",
+    )
+    for path in conversion_pipeline_changed_paths(record):
+        norm = path.replace("\\", "/")
+        if not any(norm.startswith(prefix) for prefix in metadata_prefixes):
+            return True
+    return False
+
+
+def conversion_pipeline_next_stage(reasons: list[str]) -> str:
+    for reason in reasons:
+        if reason.startswith("PIPELINE_STAGE_"):
+            rest = reason[len("PIPELINE_STAGE_"):]
+            return rest.split(":", 1)[0]
+        if reason.startswith("SUBSTANTIVE_WORK"):
+            return "C2_IMPLEMENT"
+        if reason.startswith("VALIDATION_"):
+            return "C3_VALIDATE"
+        if reason.startswith("STATE_"):
+            return "C6_STATE"
+    return "C0_RECOVER"
+
+
+def conversion_validate_pipeline_result_commit(
+    task_id: str,
+    result_sha: str,
+    expected_lane: str,
+    branch: str,
+) -> tuple[bool, list[str], Optional[dict]]:
+    """Fail closed unless one conversion TASK completed the full C0-C6 transaction."""
+    record_path = f"docs/automation/runs/{task_id}.json"
+    record = github_json_file_at_ref(record_path, result_sha)
+    if not record:
+        return False, ["PIPELINE_RECORD_MISSING"], None
+    reasons: list[str] = []
+    if str(record.get("task_id") or "") != str(task_id):
+        reasons.append("PIPELINE_TASK_ID_MISMATCH")
+    lane = str(record.get("lane") or "").upper()
+    if lane != str(expected_lane or "").upper():
+        reasons.append(f"PIPELINE_LANE_MISMATCH:{lane or 'missing'}")
+
+    try:
+        schema = int(record.get("pipeline_schema_version", record.get("schema_version", 0)) or 0)
+    except (TypeError, ValueError):
+        schema = 0
+    if schema < CONVERSION_PIPELINE_SCHEMA_VERSION:
+        reasons.append(f"PIPELINE_SCHEMA_LT_{CONVERSION_PIPELINE_SCHEMA_VERSION}:{schema}")
+
+    pipeline = record.get("pipeline") if isinstance(record.get("pipeline"), dict) else {}
+    for stage in CONVERSION_PIPELINE_STAGES:
+        value = pipeline.get(stage)
+        if not conversion_pipeline_status_ok(stage, value):
+            reasons.append(f"PIPELINE_STAGE_{stage}:INCOMPLETE")
+
+    c5 = pipeline.get("C5_PACKAGE")
+    c5_status = str(
+        (c5.get("status") if isinstance(c5, dict) else c5) or ""
+    ).strip().upper()
+    if c5_status == "NOT_REQUIRED":
+        reason = ""
+        if isinstance(c5, dict):
+            reason = str(c5.get("reason") or c5.get("not_required_reason") or "").strip()
+        reason = reason or str(record.get("package_not_required_reason") or "").strip()
+        if not reason:
+            reasons.append("PIPELINE_STAGE_C5_PACKAGE:NOT_REQUIRED_REASON_MISSING")
+
+    if not conversion_pipeline_has_substantive_work(record):
+        lane_state = github_json_file_at_ref("docs/CONVERSION_LANE_STATE.json", branch)
+        development_complete = bool(
+            isinstance(lane_state, dict)
+            and (
+                lane_state.get("development_complete") is True
+                or lane_state.get("static_pipeline_complete") is True
+            )
+        )
+        if not development_complete:
+            reasons.append("SUBSTANTIVE_WORK_MISSING:REVIEW_OR_STATE_ONLY")
+
+    validation = record.get("validation")
+    observed = record.get("validation_observed")
+    if not (
+        isinstance(validation, dict) and validation
+        or isinstance(observed, dict) and observed
+    ):
+        reasons.append("VALIDATION_EVIDENCE_MISSING")
+
+    state_persisted = record.get("state_persisted")
+    c6 = pipeline.get("C6_STATE")
+    if state_persisted is not True and not (
+        isinstance(c6, dict) and c6.get("state_persisted") is True
+    ):
+        reasons.append("STATE_PERSISTENCE_NOT_CONFIRMED")
+
+    if not str(record.get("next_action") or "").strip():
+        reasons.append("STATE_NEXT_ACTION_MISSING")
+
+    runtime = str(
+        record.get("runtime_validation")
+        or (record.get("validation") or {}).get("runtime_validation")
+        or ""
+    ).strip().upper()
+    if runtime not in {"UNTESTED", "PASS", "FAIL", "BLOCKED"}:
+        reasons.append("RUNTIME_VALIDATION_MISSING")
+
+    return len(reasons) == 0, reasons, record
 
 
 def localization_final_artwork_progress_hint(branch: str) -> str:
