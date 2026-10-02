@@ -61,6 +61,7 @@ namespace outrun::vr::dx11
         FixedFunctionUnsupportedTextureTransform = 1u << 7,
         FixedFunctionUnsupportedSamplerFilter = 1u << 8,
         FixedFunctionUnsupportedSamplerAddress = 1u << 9,
+        FixedFunctionUnsupportedSamplerLod = 1u << 10,
     };
 
     struct FixedFunctionStageState
@@ -76,6 +77,11 @@ namespace outrun::vr::dx11
         DWORD minFilter = D3DTEXF_NONE;
         DWORD magFilter = D3DTEXF_NONE;
         DWORD mipFilter = D3DTEXF_NONE;
+        // R125 preserves raw D3D9 sampler LOD provenance. The current native
+        // sampler contract proves only the legacy defaults, so non-default
+        // bias/most-detailed-mip state remains fail-closed.
+        DWORD mipLodBiasBits = 0;
+        DWORD maxMipLevel = 0;
         DWORD addressU = D3DTADDRESS_WRAP;
         DWORD addressV = D3DTADDRESS_WRAP;
     };
