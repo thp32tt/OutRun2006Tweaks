@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "15d9d6817e4aa22606425e2f42878a606e70d673",
+  "state_parent_head": "ecccde1dc4c14061ee116474f808ab090661db1c",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -58,7 +58,7 @@
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
-  "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. Aggregate exact PS sampler/SRV binding evidence for all required texture stages is still pending; R135 now seals requiredTextureMask against stale downstream readiness.",
+  "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. Static dormant evidence now includes R136 aggregate live PS sampler/SRV binding identity and R137 live RS/OM binding readback; composing those live identities into the final dormant bound-draw evidence remains an independent static pre-activation step.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until parity proof.",
   "independent_static_next_action": "Keep NativeDrawPathActive disabled. The source descendant now contains aggregate multi-stage PS binding evidence; next independent static work should compose the exact R137 live RS/OM binding snapshot with the final dormant bound-draw evidence so pipeline, aggregate PS, output/surface state and geometry are all proven on the same context without issuing game Draw*. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
