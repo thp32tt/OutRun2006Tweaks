@@ -431,6 +431,79 @@ def main() -> None:
         for token, meaning in probe_contract.items()
         if token not in SURFACE_MIRROR_PROBE
     ]
+
+    r130_surface_binding_contract = [
+        (
+            "class NativeSurfacePairBinding final",
+            SURFACE_MIRROR_HPP,
+            "R130 dormant surface-pair binding owner",
+        ),
+        (
+            "surface_pair_snapshot_token_ != 0",
+            SURFACE_MIRROR_HPP,
+            "R130 sealed surface-pair identity",
+        ),
+        (
+            "validate_surface_pair_snapshot(",
+            SURFACE_MIRROR_CPP,
+            "R130 live surface-pair snapshot revalidation",
+        ),
+        (
+            "color.render_target_view() != rtv_.Get()",
+            SURFACE_MIRROR_CPP,
+            "R130 stale color-view identity rejection",
+        ),
+        (
+            "depth.depth_stencil_view() != dsv_.Get()",
+            SURFACE_MIRROR_CPP,
+            "R130 stale depth-view identity rejection",
+        ),
+        (
+            "contextDevice.Get() != device_.Get()",
+            SURFACE_MIRROR_CPP,
+            "R130 foreign-context rejection",
+        ),
+        (
+            "context->OMSetRenderTargets(1, &rtv, dsv_.Get());",
+            SURFACE_MIRROR_CPP,
+            "R130 dormant OM render-target binding",
+        ),
+        (
+            "R130 exact surface-pair binding failed",
+            SURFACE_MIRROR_PROBE,
+            "R130 positive WARP binding probe",
+        ),
+        (
+            "R130 OM render-target binding identity drifted",
+            SURFACE_MIRROR_PROBE,
+            "R130 bound RTV/DSV identity proof",
+        ),
+        (
+            "R130 foreign context did not fail closed",
+            SURFACE_MIRROR_PROBE,
+            "R130 foreign-context negative probe",
+        ),
+        (
+            "R130 stale binding survived depth Reset",
+            SURFACE_MIRROR_PROBE,
+            "R130 Reset invalidation negative probe",
+        ),
+        (
+            "R130 stale binding survived mirror recreation",
+            SURFACE_MIRROR_PROBE,
+            "R130 recreation invalidation negative probe",
+        ),
+        (
+            "DX11 dormant surface-pair binding R130: PASS",
+            SURFACE_MIRROR_PROBE,
+            "R130 hosted probe completion marker",
+        ),
+    ]
+    missing_surface_mirror_contract += [
+        meaning
+        for token, source, meaning in r130_surface_binding_contract
+        if token not in source
+    ]
     if missing_surface_mirror_contract:
         raise SystemExit(
             "DX11 dormant surface-mirror contract drift: "
