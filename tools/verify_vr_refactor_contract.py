@@ -339,6 +339,21 @@ for banned, owner_api in (
         errors.append(
             f"R32 reset path missing lower-layer owner API: {owner_api}")
 
+for banned in ("R29Effect.", "R23GameDrawSerial"):
+    if banned in r32:
+        errors.append(
+            f"R32 retained direct R29 effect telemetry dependency: {banned}")
+
+for marker in (
+    "struct R29EffectTelemetrySnapshot",
+    "TryGetEffectTelemetrySnapshot(",
+):
+    if marker not in r29:
+        errors.append(f"R29 missing effect telemetry owner API: {marker}")
+
+if "TryGetEffectTelemetrySnapshot(effect)" not in r32:
+    errors.append("R32 workload telemetry missing R29 owner snapshot API")
+
 for rel, source in (("R33", r33), ("R34", r34)):
     if "R31FlushPendingStateBlockResync" in source:
         errors.append(
