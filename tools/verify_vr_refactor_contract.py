@@ -21,6 +21,9 @@ r31 = read("src/vr/d3d9/stereo_renderer_r31.cpp")
 r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = read("src/vr/d3d9/stereo_renderer_r33.cpp")
 r34 = read("src/vr/d3d9/stereo_renderer_r34.cpp")
+runtime_context = read("src/vr/render/runtime_context.hpp")
+raw_draw_api = read("src/vr/render/raw_draw_api.hpp")
+depth_runtime = read("src/vr/state/depth_stencil_runtime.hpp")
 final_dispatch_hooks = read("src/vr/core/final_dispatch_hooks.hpp")
 runtime_context = read("src/vr/render/runtime_context.hpp")
 raster_replay_scope = read("src/vr/state/raster_replay_scope.hpp")
@@ -902,6 +905,48 @@ for legacy in (
         errors.append(f"R34 retained implicit lower-TU runtime dependency: {legacy}")
 if re.search(r"\\bInternalStereoPass\\b", r34):
     errors.append("R34 retained implicit lower-TU runtime dependency: InternalStereoPass")
+
+
+
+# Gate B independent-TU facades: R33 must not regain direct R7 implementation
+# state or raw hook-object access after R32 is split out.
+for marker in (
+    "IsVRTelemetryEnabled",
+    "IsCurrentGameDevice",
+    "IsInternalStereoPassActive",
+):
+    if marker not in runtime_context:
+        errors.append(f"runtime context API missing Gate B marker: {marker}")
+for marker in (
+    "CallRawDrawPrimitive(",
+    "CallRawDrawIndexedPrimitive(",
+    "CallRawDrawPrimitiveUP(",
+    "CallRawDrawIndexedPrimitiveUP(",
+):
+    if marker not in raw_draw_api:
+        errors.append(f"raw draw API missing Gate B marker: {marker}")
+for marker in (
+    "TrackedDepthStencilSnapshot(",
+    "TrackedDepthStencilHasStencil(",
+    "LeftDrawMayWriteDepthLive(",
+    "LeftDrawMayWriteStencilLive(",
+):
+    if marker not in depth_runtime:
+        errors.append(f"depth runtime API missing Gate B marker: {marker}")
+for forbidden in (
+    "Settings::VRTelemetry",
+    "TrackedDepthStencil",
+    "DrawPrimitiveHook.stdcall",
+    "DrawIndexedPrimitiveHook.stdcall",
+    "DrawPrimitiveUPHook.stdcall",
+    "DrawIndexedPrimitiveUPHook.stdcall",
+):
+    if forbidden in r33 and forbidden != "TrackedDepthStencil":
+        errors.append(f"R33 regained direct Gate B implementation dependency: {forbidden}")
+if "TrackedDepthStencil" in r33 and "TrackedDepthStencilSnapshot" not in r33:
+    errors.append("R33 regained direct tracked-depth pointer dependency")
+if "#ifndef NOMINMAX" not in r32:
+    errors.append("R32 independent TU lost NOMINMAX pre-include guard")
 
 
 if errors:

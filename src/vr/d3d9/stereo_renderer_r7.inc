@@ -1634,6 +1634,56 @@ namespace OutRunVRStereo
 	{
 		return StereoInstalledDevice.load(std::memory_order_acquire);
 	}
+	bool IsVRTelemetryEnabled() noexcept { return Settings::VRTelemetry; }
+	IDirect3DSurface9* TrackedDepthStencilSnapshot() noexcept
+	{
+		return TrackedDepthStencil;
+	}
+	bool TrackedDepthStencilHasStencil() noexcept
+	{
+		return SurfaceHasStencil(TrackedDepthStencil);
+	}
+	bool LeftDrawMayWriteDepthLive(IDirect3DDevice9* device) noexcept
+	{
+		return LeftDrawMayWriteDepth(device);
+	}
+	bool LeftDrawMayWriteStencilLive(IDirect3DDevice9* device) noexcept
+	{
+		return LeftDrawMayWriteStencil(device);
+	}
+	HRESULT CallRawDrawPrimitive(
+		IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+		UINT startVertex, UINT primitiveCount) noexcept
+	{
+		return DrawPrimitiveHook.stdcall<HRESULT>(
+			device, type, startVertex, primitiveCount);
+	}
+	HRESULT CallRawDrawIndexedPrimitive(
+		IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+		INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+		UINT startIndex, UINT primitiveCount) noexcept
+	{
+		return DrawIndexedPrimitiveHook.stdcall<HRESULT>(
+			device, type, baseVertexIndex, minVertexIndex, numVertices,
+			startIndex, primitiveCount);
+	}
+	HRESULT CallRawDrawPrimitiveUP(
+		IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+		UINT primitiveCount, const void* data, UINT stride) noexcept
+	{
+		return DrawPrimitiveUPHook.stdcall<HRESULT>(
+			device, type, primitiveCount, data, stride);
+	}
+	HRESULT CallRawDrawIndexedPrimitiveUP(
+		IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+		UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
+		const void* indexData, D3DFORMAT indexFormat,
+		const void* vertexData, UINT stride) noexcept
+	{
+		return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
+			device, type, minVertexIndex, numVertices, primitiveCount,
+			indexData, indexFormat, vertexData, stride);
+	}
 	bool GetCurrentShaderEpoch(std::uintptr_t&shaderIdentity,std::uint64_t&serial){for(int attempt=0;attempt<3;++attempt){const std::uint64_t before=VertexShaderSerial.load(std::memory_order_acquire);const std::uintptr_t identity=CurrentVertexShaderIdentity.load(std::memory_order_acquire);const std::uint64_t after=VertexShaderSerial.load(std::memory_order_acquire);if(before==after){shaderIdentity=identity;serial=after;return identity!=0&&after!=0;}}shaderIdentity=0;serial=0;return false;}
 	class VRStereoHook:public Hook
 	{

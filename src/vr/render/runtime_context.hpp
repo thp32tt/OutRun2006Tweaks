@@ -9,4 +9,5 @@ namespace OutRunVRStereo
     bool StereoWantedForCurrentFrame() noexcept;
     bool TargetIsCurrentBackBuffer() noexcept;
     IDirect3DDevice9* StereoInstalledDeviceSnapshot() noexcept;
+    bool IsVRTelemetryEnabled() noexcept;
 }

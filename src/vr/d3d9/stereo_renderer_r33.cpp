@@ -36,6 +36,10 @@
 #include "../lifecycle/mono_safety.hpp"
 #include "../state/depth_stencil_write_state.hpp"
 #include "../telemetry/depth_stencil_metrics.hpp"
+#include "../render/runtime_context.hpp"
+#include "../render/raw_draw_api.hpp"
+#include "../state/depth_stencil_runtime.hpp"
+#include "../core/dispatch_result.hpp"
 
 namespace OutRunVRStereo
 {
@@ -91,7 +95,7 @@ namespace OutRunVRStereo
 
         inline bool R33TelemetryEnabled() noexcept
         {
-            return Settings::VRTelemetry;
+            return IsVRTelemetryEnabled();
         }
 
         HRESULT CallLowerSetRenderState(
@@ -124,11 +128,11 @@ namespace OutRunVRStereo
             R33DepthStencilState.valid = false;
         }
 
-        bool R33TrackedDepthHasStencil() noexcept
+        bool TrackedDepthStencilHasStencil() noexcept
         {
             const auto depthTarget = MainDepthTargetSnapshot();
-            if (!TrackedDepthStencil || !depthTarget.known ||
-                TrackedDepthStencil != depthTarget.identity)
+            if (!TrackedDepthStencilSnapshot() || !depthTarget.known ||
+                TrackedDepthStencilSnapshot() != depthTarget.identity)
                 return false;
             return FormatHasStencil(depthTarget.desc.Format);
         }
@@ -142,7 +146,7 @@ namespace OutRunVRStereo
             const auto depthTarget = MainDepthTargetSnapshot();
             const auto stateBlock =
                 OutRunVR::State::StateBlockTracker::Snapshot();
-            if (!TrackedDepthStencil)
+            if (!TrackedDepthStencilSnapshot())
             {
                 next.valid = true;
                 next.depthGeneration = depthTarget.generation;
@@ -163,7 +167,7 @@ namespace OutRunVRStereo
                 return false;
             }
 
-            if (R33TrackedDepthHasStencil())
+            if (TrackedDepthStencilHasStencil())
             {
                 if (FAILED(device->GetRenderState(
                         D3DRS_STENCILENABLE, &next.stencilEnable)) ||
@@ -224,15 +228,15 @@ namespace OutRunVRStereo
         {
             mayWriteDepth = false;
             mayWriteStencil = false;
-            if (!TrackedDepthStencil)
+            if (!TrackedDepthStencilSnapshot())
                 return true;
 
             if (!OutRunVR::State::StateBlockTracker::Reliable())
             {
                 if (R33TelemetryEnabled())
                     ++R33DepthStencilLiveFallbacks;
-                mayWriteDepth = LeftDrawMayWriteDepth(device);
-                mayWriteStencil = LeftDrawMayWriteStencil(device);
+                mayWriteDepth = LeftDrawMayWriteDepthLive(device);
+                mayWriteStencil = LeftDrawMayWriteStencilLive(device);
                 return true;
             }
 
@@ -249,7 +253,7 @@ namespace OutRunVRStereo
             const auto& s = R33DepthStencilState;
             mayWriteDepth = s.zEnable != D3DZB_FALSE && s.zWrite != FALSE;
 
-            if (!R33TrackedDepthHasStencil() || s.stencilEnable == FALSE ||
+            if (!TrackedDepthStencilHasStencil() || s.stencilEnable == FALSE ||
                 s.stencilWriteMask == 0)
                 return true;
 
@@ -279,7 +283,7 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = CallLowerSetRenderState(
                 device, state, value);
-            if (FAILED(hr) || !IsGameDevice(device) || InternalStereoPass)
+            if (FAILED(hr) || !IsCurrentGameDevice(device) || IsInternalStereoPassActive())
                 return hr;
 
             if (OutRunVR::State::StateBlockTracker::IsRecording())
@@ -341,8 +345,8 @@ namespace OutRunVRStereo
         {
             if (OutRunVR::State::StateBlockTracker::IsRecording() || !StableStereoBase(device))
             {
-                if (R33TelemetryEnabled() && IsGameDevice(device) &&
-                    !InternalStereoPass && TargetIsBackBuffer())
+                if (R33TelemetryEnabled() && IsCurrentGameDevice(device) &&
+                    !IsInternalStereoPassActive() && TargetIsBackBuffer())
                     NoteDispatchUnstable();
                 return {};
             }
@@ -868,8 +872,7 @@ HRESULT __stdcall DrawPrimitiveDestR33(IDirect3DDevice9* device,
         D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
     {
         auto actual = [&]() {
-            return DrawPrimitiveHook.stdcall<HRESULT>(
-                device, type, startVertex, primitiveCount);
+            return CallRawDrawPrimitive(device, type, startVertex, primitiveCount);
         };
         auto lower = [&]() {
             return LowerDrawPrimitive(
@@ -886,9 +889,7 @@ HRESULT __stdcall DrawIndexedPrimitiveDestR33(
         UINT startIndex, UINT primitiveCount)
     {
         auto actual = [&]() {
-            return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
-                baseVertexIndex, minVertexIndex, numVertices, startIndex,
-                primitiveCount);
+            return CallRawDrawIndexedPrimitive(device, type, baseVertexIndex, minVertexIndex, numVertices, startIndex, primitiveCount);
         };
         auto lower = [&]() {
             return LowerDrawIndexedPrimitive(device,
@@ -906,8 +907,7 @@ HRESULT __stdcall DrawPrimitiveUPDestR33(IDirect3DDevice9* device,
         UINT stride)
     {
         auto actual = [&]() {
-            return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                device, type, primitiveCount, data, stride);
+            return CallRawDrawPrimitiveUP(device, type, primitiveCount, data, stride);
         };
         auto lower = [&]() {
             return LowerDrawPrimitiveUP(
@@ -925,9 +925,7 @@ HRESULT __stdcall DrawIndexedPrimitiveUPDestR33(
         const void* vertexData, UINT stride)
     {
         auto actual = [&]() {
-            return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
-                minVertexIndex, numVertices, primitiveCount, indexData,
-                indexFormat, vertexData, stride);
+            return CallRawDrawIndexedPrimitiveUP(device, type, minVertexIndex, numVertices, primitiveCount, indexData, indexFormat, vertexData, stride);
         };
         auto lower = [&]() {
             return LowerDrawIndexedPrimitiveUP(device,
@@ -943,7 +941,7 @@ HRESULT __stdcall DrawIndexedPrimitiveUPDestR33(
 HRESULT __stdcall ResetDestR33(IDirect3DDevice9* device,
         D3DPRESENT_PARAMETERS* params)
     {
-        const bool gameDevice = IsGameDevice(device);
+        const bool gameDevice = IsCurrentGameDevice(device);
         const HRESULT hr = CallLowerReset(device, params);
 
         if (gameDevice)
@@ -972,7 +970,7 @@ HRESULT __stdcall PresentDestR33(IDirect3DDevice9* device,
     {
         const HRESULT hr = CallLowerPresent(device,
             sourceRect, destRect, destWindowOverride, dirtyRegion);
-        if (IsGameDevice(device))
+        if (IsCurrentGameDevice(device))
             R33LogPerfWindow();
         return hr;
     }

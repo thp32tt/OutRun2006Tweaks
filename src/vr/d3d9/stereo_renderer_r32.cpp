@@ -1,4 +1,11 @@
 // R32 review-consolidation overlay.
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 //
 // Keeps R31/R29/R14 correctness policy while consolidating the reviewed hot
 // paths. Review-2 additionally makes R22 the reset owner and prevents reuse of a
