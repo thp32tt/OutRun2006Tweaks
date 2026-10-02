@@ -14,6 +14,12 @@ Portainer:
 - branch: `chat-controller-downloads`
 - compose: `tools/chat-controller/localization/docker-compose.portainer.yml`
 
+Execution environment:
+- N100 connected execution environment is supported for controller operation, Docker/Portainer management, and validation.
+- GitHub remains the source of truth for code and state records.
+- Approved Google Drive canonical HD source transport may be used for original DDS acquisition when required by localization tasks.
+- Original assets, DDS outputs, QA records, and Git history must be preserved.
+
 Set `LOCALIZATION_PROJECT_URL`, `VNC_PASSWORD`, and optionally `GITHUB_TOKEN`. This stack defaults `AUTO_SEND=true`.
 # Execution evidence and recovery (2026-10-02)
 
