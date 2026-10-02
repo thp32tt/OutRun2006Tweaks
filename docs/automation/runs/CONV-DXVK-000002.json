@@ -4168,6 +4168,66 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the overlap evidence result-binding invariant and continue from the newest branch-authoritative canonical continuation frontier; do not infer runtime/render semantics from raw/static disassembly evidence."
+    },
+    {
+      "unit_id": "DXVK_PREDECESSOR_TARGET_INT3_PADDING_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "2caac7df15dcf77b19f9000a828bd1779f9eb9b4",
+      "validation_bearing_result_sha": "2caac7df15dcf77b19f9000a828bd1779f9eb9b4",
+      "commit_message": "test: reject DXVK predecessor targets in INT3 padding [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Fail closed when RESOLVED_PREDECESSOR_TARGET_RVAS lands inside a detected long internal INT3 alignment span. This closes a structural hole where one-byte CC padding rows could otherwise satisfy the generic exact-instruction-boundary check even though direct branch/CALL entry into the same padding is prohibited.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local conversion/run state, current VR work queue, regression/problem-history context and Issue #14; refreshed the rapidly advancing same-job branch before selecting an independent verifier gap."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Fresh verifier review found long internal INT3 spans were protected against direct branch and rel32 CALL targets, while resolved predecessor targets were only checked against instruction-start RVAs. Because CC padding is represented as one-byte instruction rows, padding could falsely satisfy that boundary check."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 2caac7df15dcf77b19f9000a828bd1779f9eb9b4 adds an explicit padding_predecessor_target_hits fail-closed guard to tools/verify_vr_backend_disasm_contract.py without changing runtime or analyzer semantics."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36985879689 completed SUCCESS and uploaded artifact 11217661995. Backend Conversion Gate run 36985879626 also completed the exact-SHA Verify backend disassembly contract step successfully; full gate was still running at state write and is not required for this verifier-only static unit."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit 2caac7df15dcf77b19f9000a828bd1779f9eb9b4 contains required [AUTO:CONV-DXVK-000002]. Issue #14 comment 5948459613 records the production change and validation scope."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only hardening; no deployable/runtime DXVK payload, selector, backend binary or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally in the durable task run without replacing any concurrently newer canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "2caac7df15dcf77b19f9000a828bd1779f9eb9b4",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36985879689,
+        "dxvk_disassembly_evidence_artifact_id": 11217661995,
+        "dxvk_disassembly_evidence_artifact_digest": "sha256:397a4cb058f1656948fe3f91a886e72d1f7d881b5927032ba67e3f29f1f6d119",
+        "backend_conversion_gate_run_id": 36985879626,
+        "backend_disassembly_contract_step": "PASS",
+        "full_backend_gate_status_at_state_write": "IN_PROGRESS_NOT_REQUIRED_FOR_VERIFIER_ONLY_UNIT",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948459613,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authoritative canonical continuation frontier. Continue the next independent DXVK static/disassembly item from that frontier; any future RESOLVED_PREDECESSOR_TARGET_RVAS entry inside a detected long INT3 span must fail CI."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
