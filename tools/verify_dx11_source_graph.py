@@ -2696,7 +2696,9 @@ def main() -> None:
             or "validate_fixed_function_indexed_source_value_snapshot(" in runtime_source
             or "compose_fixed_function_indexed_source_binding_readiness(" in runtime_source
             or "validate_fixed_function_indexed_source_binding_snapshot(" in runtime_source
-            or "compose_fixed_function_indexed_source_live_binding_readiness(" in runtime_source\n            or "validate_fixed_function_indexed_source_live_binding_snapshot(" in runtime_source\n            or ".index_range_readiness(" in runtime_source
+            or "compose_fixed_function_indexed_source_live_binding_readiness(" in runtime_source
+            or "validate_fixed_function_indexed_source_live_binding_snapshot(" in runtime_source
+            or ".index_range_readiness(" in runtime_source
             or ".validate_index_range_readiness_snapshot(" in runtime_source
             or "compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(" in runtime_source
             or "validate_fixed_function_nonindexed_triangle_fan_draw_dispatch_snapshot(" in runtime_source
