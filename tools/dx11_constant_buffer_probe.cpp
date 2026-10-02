@@ -2443,20 +2443,48 @@ int main()
             changedActivation.snapshotToken),
         "R115 composite activation snapshot changes with component identity");
 
-    NativeSurfacePairReadiness surfacePairReady{};
-    surfacePairReady.inputValid = true;
-    surfacePairReady.colorReady = true;
-    surfacePairReady.depthReady = true;
-    surfacePairReady.deviceMatches = true;
-    surfacePairReady.dimensionsMatch = true;
-    surfacePairReady.generationsCurrent = true;
-    surfacePairReady.componentSerialsPresent = true;
-    surfacePairReady.ready = true;
-    surfacePairReady.width = 64;
-    surfacePairReady.height = 32;
-    surfacePairReady.colorMirrorSerial = 11;
-    surfacePairReady.depthMirrorSerial = 13;
-    surfacePairReady.snapshotToken = 0x120001ull;
+    outrun::vr::dx11::NativeSurfaceMirror outputColorSurface;
+    require(
+        outputColorSurface.initialize(
+            d3d.device, ResourceRole::Color, 64u, 32u,
+            D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, D3DUSAGE_RENDERTARGET,
+            D3DMULTISAMPLE_NONE, 0u),
+        "R145 live OM color mirror prerequisite");
+    outrun::vr::dx11::NativeSurfaceMirror outputDepthSurface;
+    require(
+        outputDepthSurface.initialize(
+            d3d.device, ResourceRole::DepthStencil, 64u, 32u,
+            D3DFMT_D24S8, D3DPOOL_DEFAULT, D3DUSAGE_DEPTHSTENCIL,
+            D3DMULTISAMPLE_NONE, 0u),
+        "R145 live OM depth mirror prerequisite");
+    const auto surfacePairReady =
+        outrun::vr::dx11::compose_surface_pair_readiness(
+            d3d.device, outputColorSurface, outputDepthSurface);
+    require(
+        surfacePairReady.ready &&
+        surfacePairReady.snapshotToken != 0,
+        "R145 live OM surface pair prerequisite");
+
+    outrun::vr::dx11::NativeSurfacePairBinding surfaceTargetBinding;
+    require(
+        surfaceTargetBinding.initialize(
+            d3d.device, outputColorSurface, outputDepthSurface,
+            surfacePairReady) &&
+        surfaceTargetBinding.apply(
+            d3d.context, outputColorSurface, outputDepthSurface),
+        "R145 live OM target owner prerequisite");
+    const auto surfaceTargetBindingReady =
+        surfaceTargetBinding.binding_readiness(
+            d3d.context, outputColorSurface, outputDepthSurface);
+    require(
+        surfaceTargetBindingReady.ready &&
+        surfaceTargetBindingReady.surfacePairSnapshotToken ==
+            surfacePairReady.snapshotToken &&
+        surfaceTargetBindingReady.snapshotToken != 0 &&
+        surfaceTargetBinding.validate_binding_snapshot(
+            d3d.context, outputColorSurface, outputDepthSurface,
+            surfaceTargetBindingReady.snapshotToken),
+        "R145 live OM target prerequisite seals current RTV DSV");
 
     auto outputStateSource = renderStateSource;
     outputStateSource.outputStateComplete = true;
@@ -3422,6 +3450,89 @@ int main()
             !copiedPayloadDrift.ready &&
             copiedPayloadDrift.snapshotToken == 0,
             "final VS b0 copied WVP payload drift fails closed");
+
+        const auto renderTargetBoundDraw =
+            outrun::vr::dx11::
+                compose_fixed_function_render_target_bound_draw_readiness(
+                    multiStageDrawReady, d3d.context, outputStateBinding,
+                    pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                    multiStageSamplers, multiStageTextures,
+                    indexedGeometryReady, managedVertexBuffer,
+                    geometryVertexStride, geometryVertexOffset,
+                    &managedIndexBuffer, DXGI_FORMAT_R16_UINT,
+                    geometryIndexOffset, transform, surfaceTargetBinding,
+                    outputColorSurface, outputDepthSurface);
+        require(
+            renderTargetBoundDraw.inputValid &&
+            renderTargetBoundDraw.fullyBoundDrawReady &&
+            renderTargetBoundDraw.surfaceTargetBindingReady &&
+            renderTargetBoundDraw.surfacePairMatchesDraw &&
+            renderTargetBoundDraw.componentSnapshotsPresent &&
+            renderTargetBoundDraw.ready &&
+            renderTargetBoundDraw.surfaceTargetBindingSnapshotToken ==
+                surfaceTargetBindingReady.snapshotToken &&
+            renderTargetBoundDraw.surfacePairSnapshotToken ==
+                surfacePairReady.snapshotToken &&
+            renderTargetBoundDraw.snapshotToken != 0 &&
+            outrun::vr::dx11::
+                validate_fixed_function_render_target_bound_draw_snapshot(
+                    multiStageDrawReady, d3d.context, outputStateBinding,
+                    pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                    multiStageSamplers, multiStageTextures,
+                    indexedGeometryReady, managedVertexBuffer,
+                    geometryVertexStride, geometryVertexOffset,
+                    &managedIndexBuffer, DXGI_FORMAT_R16_UINT,
+                    geometryIndexOffset, transform, surfaceTargetBinding,
+                    outputColorSurface, outputDepthSurface,
+                    renderTargetBoundDraw.snapshotToken),
+            "R145 final draw seals exact live OM RTV DSV identity");
+
+        d3d.context->OMSetRenderTargets(0, nullptr, nullptr);
+        const auto missingRenderTargets =
+            outrun::vr::dx11::
+                compose_fixed_function_render_target_bound_draw_readiness(
+                    multiStageDrawReady, d3d.context, outputStateBinding,
+                    pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                    multiStageSamplers, multiStageTextures,
+                    indexedGeometryReady, managedVertexBuffer,
+                    geometryVertexStride, geometryVertexOffset,
+                    &managedIndexBuffer, DXGI_FORMAT_R16_UINT,
+                    geometryIndexOffset, transform, surfaceTargetBinding,
+                    outputColorSurface, outputDepthSurface);
+        require(
+            missingRenderTargets.fullyBoundDrawReady &&
+            !missingRenderTargets.surfaceTargetBindingReady &&
+            missingRenderTargets.surfacePairMatchesDraw &&
+            !missingRenderTargets.ready &&
+            missingRenderTargets.snapshotToken == 0 &&
+            !outrun::vr::dx11::
+                validate_fixed_function_render_target_bound_draw_snapshot(
+                    multiStageDrawReady, d3d.context, outputStateBinding,
+                    pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                    multiStageSamplers, multiStageTextures,
+                    indexedGeometryReady, managedVertexBuffer,
+                    geometryVertexStride, geometryVertexOffset,
+                    &managedIndexBuffer, DXGI_FORMAT_R16_UINT,
+                    geometryIndexOffset, transform, surfaceTargetBinding,
+                    outputColorSurface, outputDepthSurface,
+                    renderTargetBoundDraw.snapshotToken),
+            "R145 final draw fails closed after live OM target unbind");
+
+        require(
+            surfaceTargetBinding.apply(
+                d3d.context, outputColorSurface, outputDepthSurface) &&
+            outrun::vr::dx11::
+                validate_fixed_function_render_target_bound_draw_snapshot(
+                    multiStageDrawReady, d3d.context, outputStateBinding,
+                    pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                    multiStageSamplers, multiStageTextures,
+                    indexedGeometryReady, managedVertexBuffer,
+                    geometryVertexStride, geometryVertexOffset,
+                    &managedIndexBuffer, DXGI_FORMAT_R16_UINT,
+                    geometryIndexOffset, transform, surfaceTargetBinding,
+                    outputColorSurface, outputDepthSurface,
+                    renderTargetBoundDraw.snapshotToken),
+            "R145 live OM target restore reproduces final draw snapshot");
     }
 
     NativeTriangleFanIndexBuffer liveFanOwner;
