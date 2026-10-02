@@ -25,6 +25,11 @@ namespace outrun::vr::dx11
         PipelineUnsupportedBlend = 1u << 9,
         PipelineUnsupportedDepthCompare = 1u << 10,
         PipelineUnsupportedCull = 1u << 11,
+        // D3D9Ex SRC*COLOR2 needs a second pixel-shader color output. Keep
+        // this distinct from generic blend translation failures so fixed-
+        // function readiness cannot accidentally treat a D3D11 SRC1 enum
+        // mapping as proof that SV_Target1 semantics exist.
+        PipelineUnsupportedDualSourceBlend = 1u << 12,
     };
 
     struct PipelineTranslation
