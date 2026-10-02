@@ -1832,6 +1832,48 @@ bool NativeFixedFunctionPipelineBundle::validate_translation_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+bool NativeFixedFunctionPipelineBundle::bind_for_observation(
+    ID3D11DeviceContext* context,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    std::uint64_t snapshotToken) const noexcept {
+
+    if (!context || !ready() || snapshotToken == 0 ||
+        !validate_translation_snapshot(
+            device_.Get(), layout, vertexPrototype, pixelPrototype,
+            snapshotToken))
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    if (!contextDevice || contextDevice.Get() != device_.Get())
+        return false;
+
+    context->IASetInputLayout(input_layout_.Get());
+    context->VSSetShader(vertex_shader_.Get(), nullptr, 0);
+    context->PSSetShader(pixel_shader_.Get(), nullptr, 0);
+
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> boundInputLayout;
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> boundVertexShader;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> boundPixelShader;
+    context->IAGetInputLayout(boundInputLayout.ReleaseAndGetAddressOf());
+    context->VSGetShader(
+        boundVertexShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    context->PSGetShader(
+        boundPixelShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+
+    if (boundInputLayout.Get() != input_layout_.Get() ||
+        boundVertexShader.Get() != vertex_shader_.Get() ||
+        boundPixelShader.Get() != pixel_shader_.Get()) {
+        context->IASetInputLayout(nullptr);
+        context->VSSetShader(nullptr, nullptr, 0);
+        context->PSSetShader(nullptr, nullptr, 0);
+        return false;
+    }
+    return true;
+}
+
 NativeFixedFunctionActivationReadiness
 compose_fixed_function_activation_readiness(
     const NativeFixedFunctionPipelineReadiness& pipeline,
