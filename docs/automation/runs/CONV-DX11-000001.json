@@ -4,77 +4,60 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "4579bde180ff3e59d36269abaf71ea741a91fa39",
-  "state_parent_head": "0dce0101afab2958767323ddcbf12a521a01fb3f",
-  "material_result_sha": "38b4ec4c9fc11fc1976482de80b66a45f875f37a",
-  "validation_bearing_sha": "0dce0101afab2958767323ddcbf12a521a01fb3f",
+  "base_sha": "3aefbdcf0344ae70cabc925c3293a0f4c42505c4",
+  "state_parent_head": "7e4e3991aae5a2564a4155894fed889240990d45",
+  "material_result_sha": "942ad6befeb0b8d1eec8dcdaa7b5346a292a0981",
+  "validation_bearing_sha": "942ad6befeb0b8d1eec8dcdaa7b5346a292a0981",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_PIPELINE_UNSUPPORTED_CENSUS_SENTINEL_R166",
-  "selection_reason": "Exhaustive DX11 census is an activation prerequisite, but the runtime unsupported-reason array had historically lagged new PipelineUnsupported bits. Concurrent R163/R165 additions during this transaction demonstrated that hard-coded numeric counts are race-prone. Bind census sizing to an enum-owned one-past-last sentinel and gate max(bit)+1 statically.",
-  "summary": "Adds enum-owned PipelineUnsupportedBitCount, derives runtime census UnsupportedBitCount from that sentinel, and adds a source-graph guard requiring contiguous concrete unsupported bits plus exact sentinel/runtime binding. This prevents future fail-closed render-state blockers from being silently omitted. Native Draw* remains disabled.",
+  "selected_work": "DX11_DITHER_CENSUS_IDENTITY_R167",
+  "selection_reason": "R165 failed closed enabled D3D9 dithering but sampled DX11 census SourceSignature omitted dithering provenance, allowing enabled and disabled dither states to alias one source signature.",
+  "summary": "R167 adds DITHERENABLE observation/value to runtime-census identity, hashing, captured propagation, detailed telemetry, and the DX11 source-graph contract guard.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read AGENTS.md, current GitHub branch HEAD, docs/CONVERSION_LANE_STATE.json, current run record, regression knowledge/problem history, and Issue #14 through the authenticated GitHub connector.",
-        "Tracked same-branch concurrent DX11 churn and used current GitHub HEAD rather than stale lane-state priority text."
+        "Recovered latest GitHub-authoritative DX11 branch state and deduplicated concurrent R163-R166 work before selecting the missing dithering census identity."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Fresh source audit showed PipelineUnsupported had outgrown the historical generic UnsupportedCounts census width, so newer fail-closed blocker bits could be omitted from unsupported-reason evidence.",
-        "Concurrent vertex-blend and dither additions extended the enum while the transaction was active, demonstrating that patching the census to another hard-coded number would remain fragile.",
-        "Existing durable identities already used R164 for depth-bias census and R165 for dithering; the future-proof sentinel unit was disambiguated to R166."
+        "R165 native readiness captured and rejected enabled dithering, while runtime_census SourceSignature/hash/propagation contained no dithering field."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "changed_paths": [
-        "src/vr/d3d11/pipeline_translation.hpp",
-        "src/vr/d3d11/runtime_census.cpp",
-        "tools/verify_dx11_source_graph.py"
-      ],
       "implementation_commits": [
-        "8699d6327c30dc360d318f9f86e65359e59837ae",
-        "7e0f85982461c5f6d2fd3858188419a08da70200",
-        "a677df92bbf44546db61d6da1dbca772dbadb7a3",
-        "38b4ec4c9fc11fc1976482de80b66a45f875f37a"
+        "942ad6befeb0b8d1eec8dcdaa7b5346a292a0981"
       ],
       "details": [
-        "Added PipelineUnsupportedBitCount as the enum-owned one-past-last unsupported bit sentinel.",
-        "Changed runtime census UnsupportedBitCount to derive from PipelineUnsupportedBitCount instead of a numeric literal.",
-        "Preserved the established R165 dither bit contract and bounded the sentinel to the 32-bit unsupported mask width.",
-        "Added source-graph checks requiring concrete unsupported bits to be contiguous from zero, sentinel=max(bit)+1, and runtime census sizing to consume the sentinel."
+        "Added dither observation/value to census identity/hash/propagation/telemetry plus a source-graph retention guard; native Draw* routing remains disabled."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_STATIC",
-      "automation_validation": "PASS_GITHUB_AUTHORITATIVE_EXACT_AND_RETAINING_DESCENDANT_STATIC_CONTRACT; COMBINED_STATUS_EMPTY_COMPILE_NOT_CLAIMED",
+      "status": "COMPLETE_STATIC_COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_EXACT_MATERIAL_SHA_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; CONFIGURE_CANCELLED_BY_CONCURRENT_BRANCH_CHURN; WIN32_BUILD_NOT_CLAIMED",
       "evidence": [
-        "Exact material SHA 38b4ec4c9fc11fc1976482de80b66a45f875f37a: concrete PipelineUnsupported bits 0..17 contiguous; PipelineUnsupportedBitCount=18; runtime census uses the sentinel; bounded mask loop and R166 source-graph guard all passed authenticated static inspection.",
-        "Fresh retaining descendant 0dce0101afab2958767323ddcbf12a521a01fb3f was 6 commits ahead/0 behind and independently retained and passed the same R166 contract.",
-        "get_commit_combined_status on the material SHA returned no statuses; hosted compile/build success is not claimed."
+        "Backend Conversion Gate run 36985270187 job 110768849652 on exact material SHA passed DX11 source graph and DX11 census analyzer plus preceding static gates; Configure was cancelled by branch churn and Build/WARP/runtime are not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "38b4ec4c9fc11fc1976482de80b66a45f875f37a",
-      "source_commit": "a677df92bbf44546db61d6da1dbca772dbadb7a3",
-      "issue14_comment_id": 5948363000
+      "material_commit": "942ad6befeb0b8d1eec8dcdaa7b5346a292a0981",
+      "issue14_comment_id": 5948381953
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant DX11 census/source/static-guard work only; no Native Draw* activation, OpenXR transport, localization, DXVK lane, packaging input, binary or release payload changed."
+      "reason": "Dormant census/readiness evidence and static-guard unit only; no production Draw* routing, backend activation, OpenXR transport, localization, DXVK, or release payload changed."
     },
     "C6_STATE": {
-      "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve the R166 enum-owned unsupported census sentinel and fresh-audit the latest GitHub HEAD for the next independent dormant DX11 semantics gap without duplicating R159-R166 work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
+      "exact_next_action": "Preserve R167 from the latest GitHub descendant and continue independent DX11 static/readiness work; keep NativeDrawPathActive disabled pending exact-build exhaustive census and Quest 3/VDXR parity."
     }
   },
   "scope_guards": {
@@ -85,13 +68,13 @@
     "localization_modified": false,
     "other_backend_modified": false
   },
-  "issue14_comment_id": 5948363000,
-  "automation_validation": "PASS_GITHUB_AUTHORITATIVE_EXACT_AND_RETAINING_DESCENDANT_STATIC_CONTRACT; COMBINED_STATUS_EMPTY_COMPILE_NOT_CLAIMED",
-  "blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI. The material commit had no reported combined CI statuses, so hosted compile/build success is not claimed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Preserve the R166 enum-owned unsupported census sentinel and fresh-audit the latest GitHub HEAD for the next independent dormant DX11 semantics gap without duplicating R159-R166 work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5948381953,
+  "automation_validation": "PASS_EXACT_MATERIAL_SHA_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; CONFIGURE_CANCELLED_BY_CONCURRENT_BRANCH_CHURN; WIN32_BUILD_NOT_CLAIMED",
+  "blocker": "Win32 compile/build, hosted WARP smoke execution and Quest 3/VDXR runtime are not claimed; exact-material static source-graph and census analyzer gates passed before branch-churn cancellation.",
+  "next_action": "Preserve R167 and continue from latest GitHub HEAD after deduplicating concurrent work; native Draw* remains disabled.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
-  "runtime_claim": "RUNTIME_VALIDATION=UNTESTED",
+  "runtime_claim": "UNTESTED",
   "prior_completed_unit": "DX11_SHADEMODE_CAPTURE_FAILCLOSED_R162",
   "initial_material_sha": "34e1b84224928e607449d34391b8e9278a21ea52",
   "prior_material_result_sha": "67ec86f4406c3c1734c7f4a741829fcac5f433e1",
@@ -111,5 +94,7 @@
   "completed_supporting_repairs": [
     "Initial numeric census-width patches were superseded as concurrent R163/R165 work added new unsupported bits.",
     "R166 replaces fixed numeric coupling with the enum-owned sentinel; the earlier material commits remain ancestry but are not the authoritative final unit identity."
-  ]
+  ],
+  "validation_run_id": 36985270187,
+  "validation_job_id": 110768849652
 }
