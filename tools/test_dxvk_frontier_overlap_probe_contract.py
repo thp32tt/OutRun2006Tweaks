@@ -6,6 +6,11 @@ semantic interpretation of the recovered instructions.
 
 from dataclasses import dataclass
 
+from dxvk_disasm_frontier_validator import (
+    DisasmWindow,
+    validate_contiguous_window,
+)
+
 
 @dataclass(frozen=True)
 class FrontierWindow:
@@ -30,6 +35,11 @@ def test_continuation_window_preserves_partial_instruction_overlap() -> None:
     )
 
     validate_frontier_window(window, 0x00182F7E, previous_tail)
+    validate_contiguous_window(
+        DisasmWindow(0x00182F7E, 0x00182FBE, previous_tail),
+        0x00182F7E,
+        previous_tail,
+    )
 
 
 def test_frontier_window_rejects_different_overlap() -> None:
