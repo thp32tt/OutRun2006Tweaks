@@ -3,70 +3,72 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "dd52e5b6b8e5e779987fca2bd2d501b7741e9916",
-  "state_parent_head": "1b743cb73adaa851b4121e34f48be97cd233bbfd",
-  "material_result_sha": "22b3eb20828ff7c9d95a98f9f60385e1b8711855",
-  "validation_bearing_sha": "22b3eb20828ff7c9d95a98f9f60385e1b8711855",
+  "base_sha": "0a01d1850735b3b3e60f3a4ab5dfd76b30845f6a",
+  "state_parent_head": "717a284cee1f35b6074ca388d3d39dca9d56b9e3",
+  "material_result_sha": "1b743cb73adaa851b4121e34f48be97cd233bbfd",
+  "validation_bearing_sha": "1b743cb73adaa851b4121e34f48be97cd233bbfd",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_R145_LIVE_OM_EXTRA_RTV_EXACTNESS",
-  "selection_reason": "Fresh current-HEAD review found the new R145 NativeSurfacePairBinding live OM check used OMGetRenderTargets(1,...), so it could report exact target identity while RTV slots 1..7 remained bound. This was the highest-value deterministic static correctness gap at the current DX11 dormant pre-draw frontier.",
-  "summary": "Hardened R145 live OM surface-target identity by observing every D3D11 RTV slot, requiring only the sealed slot-0 RTV plus sealed DSV, rejecting extra RTV slots, releasing all readback references, adding a WARP negative probe, and strengthening the source-graph contract. Native Draw* remains disabled.",
+  "selected_work": "DX11_LIVE_OM_UAV_EXACTNESS",
+  "selection_reason": "Fresh current-HEAD review found the sealed R145 OM target identity rejected extra RTVs but did not observe output-merger UAV slots. Because D3D9 fixed-function output has no UAV equivalent, an unexpected live OM UAV made the exact target-binding claim incomplete.",
+  "summary": "Hardened dormant DX11 OM target identity so apply clears unsupported pixel/output-merger UAV slots, live readiness observes UAV slots that can coexist with the sealed slot-0 RTV and fails closed on any non-null UAV, with WARP negative/restore coverage and source-graph guards. Native Draw* remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
         "Read current GitHub HEAD, AGENTS.md, branch-local conversion state/run record, regression knowledge/history and Issue #14 through the authenticated GitHub connector.",
-        "Recovered concurrent descendant frontier through dd52e5b6b8e5e779987fca2bd2d501b7741e9916 and selected an independent static gap without modifying DXVK or localization."
+        "Tracked rapid same-branch descendants and used fast-forward-only publication; the R146 material commit remains an ancestor of the current branch."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Confirmed R145 live surface binding and final direct-geometry target readiness were already present on current descendants.",
-        "Found OMGetRenderTargets(1,...) only observed slot 0 and DSV, leaving extra RTV slots invisible to the exactness claim; source-graph guard also lacked this negative contract."
+        "Confirmed R145 live OM target identity already rejected extra RTV slots and the final direct/fan readiness frontier was progressing on descendants.",
+        "Found NativeSurfacePairBinding did not observe OM UAV bindings, so it could report an exact D3D9-compatible RTV/DSV identity while an unsupported pixel/output-merger UAV remained live."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
+        "src/vr/d3d11/surface_mirror.hpp",
         "src/vr/d3d11/surface_mirror.cpp",
         "tools/dx11_surface_mirror_probe.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "22b3eb20828ff7c9d95a98f9f60385e1b8711855"
+        "1b743cb73adaa851b4121e34f48be97cd233bbfd"
       ],
       "details": [
-        "Read all D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT RTV slots and fail closed unless slot 0 is the sealed RTV and slots 1..7 are null.",
-        "Release every OMGetRenderTargets RTV reference after observation while retaining the sealed DSV identity check.",
-        "Added a two-RTV WARP negative probe and static source-graph tokens requiring all-slot observation and extra-slot rejection."
+        "Added unorderedAccessClear to live surface-target readiness and inspect OM UAV slots 1..7 with OMGetRenderTargetsAndUnorderedAccessViews.",
+        "Changed dormant surface-pair apply to OMSetRenderTargetsAndUnorderedAccessViews so unsupported UAV state is explicitly cleared before readiness is issued.",
+        "Added a feature-level-11 WARP negative probe for an unexpected OM UAV plus deterministic restore proof and static source-graph contract tokens."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_EXACT_STATIC_BUILD_NOT_CLAIMED",
-      "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_ACTIVATION_CENSUS_BUILD_NOT_CLAIMED",
+      "status": "COMPLETE_EXACT_STATIC_CONFIGURE_CANCELLED_BY_DESCENDANT_CHURN",
+      "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_CENSUS_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
       "evidence": [
-        "Backend Conversion Gate 36979098434 job 110749370171 on exact material SHA passed checkout, queue/baseline/structure/backend-disassembly/session-analysis, DX11 transport, dual-source, DX11 source graph, dormant activation boundary and DX11 census analyzer.",
-        "Build run 36979103530 on exact material SHA passed DX11 source graph, census analyzer and wheel static/math prerequisites, then was cancelled by descendant branch churn during Configure; no Win32 build or WARP executable PASS is claimed."
+        "Exact material SHA 1b743cb73adaa851b4121e34f48be97cd233bbfd Build run 36979361739 passed checkout, HMD/structure/backend-disassembly contracts, Verify DX11 source graph, DX11 census analyzer, wheel-source and wheel-math checks.",
+        "That exact-SHA Build run was cancelled by descendant branch churn during Configure; Build and dx11_surface_mirror_probe execution are not claimed.",
+        "Retained descendant f8e8da8e26176753e55a2cd3f93238cfb69d3710 Backend Conversion Gate run 36979487993 passed queue/baseline/structure/disassembly, session-analysis, DX11 transport, dual-source, DX11 source graph, dormant activation boundary and census checks while retaining the material commit."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "22b3eb20828ff7c9d95a98f9f60385e1b8711855",
-      "issue14_comment_id": 5947444226
+      "material_commit": "1b743cb73adaa851b4121e34f48be97cd233bbfd",
+      "issue14_comment_id": 5947533657
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant DX11 readiness/probe/static-guard hardening only; no native Draw* routing, backend activation, OpenXR transport, localization or release packaging changed."
+      "reason": "Dormant DX11 readiness/probe/static-guard hardening only; no native Draw* routing, backend activation, OpenXR transport, localization or release payload changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve the R145 all-RTV-slot fail-closed OM target contract. Next inspect the current non-indexed and indexed generated-fan final-readiness paths and, only if they still do not consume NativeSurfacePairBinding live target identity, add that same-context surface-target gate before any future DrawIndexed activation. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. First consume a non-superseded descendant Backend Conversion Gate/Build result that retains 1b743cb73adaa851b4121e34f48be97cd233bbfd and the current direct/generated-fan readiness frontier, including successful dx11_surface_mirror_probe and dx11_constant_buffer_probe execution. If that passes, perform a fresh source-wide review for the next dormant DX11 conversion gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -75,21 +77,21 @@
     "dxvk_lane_modified": false,
     "localization_modified": false
   },
-  "issue14_comment_id": 5947444226,
-  "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_ACTIVATION_CENSUS_BUILD_NOT_CLAIMED",
-  "blocker": "Exact material-SHA static gates passed. Hosted Win32 compile/WARP execution was not completed before descendant branch churn, and Quest 3/VDXR runtime validation was not performed. Neither blocks further independent GitHub-only static conversion work.",
-  "next_action": "Keep NativeDrawPathActive disabled. Preserve the R145 all-RTV-slot fail-closed OM target contract. Next inspect the current non-indexed and indexed generated-fan final-readiness paths and, only if they still do not consume NativeSurfacePairBinding live target identity, add that same-context surface-target gate before any future DrawIndexed activation. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5947533657,
+  "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_CENSUS_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+  "blocker": "Exact material-SHA static gates passed. Hosted Win32 compile and WARP surface-mirror probe execution were cancelled/not reached because the branch advanced; Quest 3/VDXR runtime validation was not performed. These do not block further independent GitHub-only static conversion work.",
+  "next_action": "Keep NativeDrawPathActive disabled. First consume a non-superseded descendant Backend Conversion Gate/Build result that retains 1b743cb73adaa851b4121e34f48be97cd233bbfd and the current direct/generated-fan readiness frontier, including successful dx11_surface_mirror_probe and dx11_constant_buffer_probe execution. If that passes, perform a fresh source-wide review for the next dormant DX11 conversion gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "prior_completed_unit": {
-    "selected_work": "DX11_INDEXED_FAN_FINAL_BOUND_READINESS_R144",
-    "material_result_sha": "2bb39f31d45177d73993d6a042a387ad2dd88ee8",
-    "validation_bearing_sha": "dd52e5b6b8e5e779987fca2bd2d501b7741e9916",
-    "automation_validation": "PASS_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+    "selected_work": "DX11_R145_LIVE_OM_EXTRA_RTV_EXACTNESS",
+    "material_result_sha": "22b3eb20828ff7c9d95a98f9f60385e1b8711855",
+    "validation_bearing_sha": "22b3eb20828ff7c9d95a98f9f60385e1b8711855",
+    "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_ACTIVATION_CENSUS_BUILD_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
-    "issue14_comment_id": 5947373343
+    "issue14_comment_id": 5947444226
   }
 }
