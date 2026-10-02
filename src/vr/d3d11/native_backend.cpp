@@ -3498,7 +3498,7 @@ compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(
     out.generatedIndexBindingSnapshotToken = fanBinding.snapshotToken;
     out.inputValid =
         context != nullptr &&
-        contextDevice != nullptr &&
+        contextDevice.Get() != nullptr &&
         vertexStride != 0 &&
         boundDraw.inputValid &&
         currentGeometry.inputValid &&
@@ -3520,7 +3520,7 @@ compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(
             &observedStride, &observedVertexOffset);
     }
     out.vertexBufferBoundExact =
-        contextDevice &&
+        contextDevice.Get() != nullptr &&
         vertexBuffer.mirror_device() == contextDevice.Get() &&
         currentVertex.ready &&
         currentVertex.snapshotToken ==
