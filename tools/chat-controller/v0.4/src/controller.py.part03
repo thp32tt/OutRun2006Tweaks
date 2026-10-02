@@ -1822,6 +1822,122 @@ def localization_reconcile_producer_commit_without_ui(
     return False
 
 
+def localization_c_result_seen(active: dict, sha: Optional[str]) -> bool:
+    if not sha:
+        return False
+    seen = {
+        str(x) for x in (active.get("c_consumed_result_shas") or []) if x
+    }
+    rejected = {
+        str(x) for x in (active.get("c_rejected_result_shas") or []) if x
+    }
+    return str(sha) in seen or str(sha) in rejected
+
+
+async def queue_send_c_execution_continuation(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    active: dict,
+    reason: str = "CONTINUE_C_QA",
+) -> bool:
+    batch = active.get("qa_batch") or []
+    prompt = (
+        f"C_CONTINUOUS_QA TASK_ID={active['task_id']} REASON={reason}\n"
+        "QA_BATCH_INPUTS=" + json.dumps(batch, ensure_ascii=False, separators=(",", ":")) + "\n"
+        "이 C TASK는 batch 하나 설명하고 종료하는 작업이 아니다. 첫 출력은 연결된 GitHub/파일 도구 호출이어야 한다. "
+        "위 immutable TASK_ID@RESULT_SHA 입력을 전부 검증하고 current-v2 static PASS/REWORK를 reconcile한 뒤 "
+        "새 [AUTO:TASK_ID] commit을 남겨. 일부 입력만 검토한 커밋은 완료로 인정되지 않는다. "
+        "runtime UNTESTED는 static production_complete를 막지 않는다."
+    )
+    sent = await queue_send_same_chat_control_message(
+        context,
+        pages,
+        active,
+        prompt,
+        status="c_continuous_qa",
+        result_label="c_continuous_qa",
+    )
+    if sent:
+        active["c_drain_continuation_pending"] = False
+        active["c_continuation_sent_at"] = datetime.now(TZ).isoformat()
+        active["assistant_claim_verification"] = "C_CONTINUOUS_QA_SENT"
+        active["last_hash"] = None
+        active["last_hash_changed_at"] = datetime.now(TZ).isoformat()
+    return sent
+
+
+async def localization_bind_c_commit(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    active: dict,
+    task_commit: dict,
+    now: datetime,
+) -> bool:
+    """Validate full C batch coverage before binding the result SHA to Actions."""
+    sha = str(task_commit.get("sha") or "")
+    if localization_c_result_seen(active, sha):
+        return False
+    valid, reasons, _record = localization_validate_c_result_commit(
+        str(active.get("task_id") or ""),
+        sha,
+        list(active.get("qa_batch") or []),
+    )
+    if not valid:
+        rejected = list(active.get("c_rejected_result_shas") or [])
+        if sha and sha not in rejected:
+            rejected.append(sha)
+        active["c_rejected_result_shas"] = rejected[-16:]
+        active["c_rejected_reasons"] = reasons
+        active["result_sha"] = None
+        active["phase"] = "WAIT_CHAT"
+        active["task_latched"] = True
+        active["controller_stage"] = "WAIT_QA_RESULT"
+        invalidate_task_commit_cache(active["branch"], active["task_id"])
+        await queue_send_c_execution_continuation(
+            context, pages, active, "REJECTED_INCOMPLETE_C_BATCH:" + ";".join(reasons[:6])
+        )
+        return True
+
+    active["result_sha"] = sha
+    active["result_message"] = task_commit.get("message")
+    active["phase"] = "WAIT_ACTIONS"
+    active["wait_actions_started_at"] = now.isoformat()
+    active["last_gate_poll_at"] = None
+    active["controller_stage"] = "WAIT_ACTIONS"
+    active.pop("c_rejected_reasons", None)
+    return True
+
+
+def localization_prepare_c_next_batch(active: dict, batch: list[dict], now: datetime) -> None:
+    active["qa_batch"] = [dict(x) for x in batch]
+    active["phase"] = "WAIT_CHAT"
+    active["terminal"] = None
+    active["task_latched"] = True
+    active["controller_stage"] = "WAIT_QA_RESULT"
+    active["result_sha"] = None
+    active["result_message"] = None
+    active["automation_validation"] = "PENDING"
+    active["runtime_validation"] = "UNTESTED"
+    active["c_drain_continuation_pending"] = True
+    active["c_drain_waiting"] = False
+    active["last_checkpoint_at"] = now.isoformat()
+    active["last_checkpoint_stage"] = "C_NEXT_BATCH"
+    for key in (
+        "gate_run",
+        "last_gate_poll_at",
+        "last_gate_status",
+        "last_gate_status_changed_at",
+        "gate_jobs",
+        "last_jobs_refresh_at",
+        "wait_actions_started_at",
+        "startup_reconcile_pending",
+        "completed_at",
+        "blocked_at",
+    ):
+        active.pop(key, None)
+    invalidate_task_commit_cache(active["branch"], active["task_id"])
+
+
 async def localization_process_lane(
     context: BrowserContext,
     pages: dict[str, Page],
