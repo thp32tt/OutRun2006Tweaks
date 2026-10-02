@@ -1681,6 +1681,10 @@ def main() -> None:
             or "validate_fixed_function_texture_binding_set_snapshot(" in runtime_source
             or "compose_fixed_function_bound_draw_readiness(" in runtime_source
             or "compose_fixed_function_same_context_bound_draw_readiness(" in runtime_source
+            or "validate_fixed_function_same_context_bound_draw_snapshot(" in runtime_source
+            or "bind_fixed_function_geometry_for_observation(" in runtime_source
+            or "observe_fixed_function_geometry_binding(" in runtime_source
+            or "validate_fixed_function_geometry_binding_snapshot(" in runtime_source
             or ".binding_readiness(" in runtime_source
         ):
             runtime_textured_draw_users.append(
