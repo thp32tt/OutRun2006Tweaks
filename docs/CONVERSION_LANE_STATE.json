@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "2764563902d53acb910e27aa0dd5bcf873abe2cd",
+  "state_parent_head": "9ec6284663dfbad4fb89e5f2b937b3b6b582fb83",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -362,6 +362,64 @@
       "semantic_promotion": "NONE",
       "ownership_effect": "NONE",
       "next_action": "Exact-decode only complete instructions in the validated canonical 0x00182B57..0x00182B97 window. Preserve the trailing cut rel32 CALL opcode at 0x00182B96 (e8) raw-only; after proving that cut edge, use a fresh bounded overlap capture before decoding beyond it. Keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_PREFLIGHT_PROVIDER_SHA256_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "64779b56668366fcc5b6d383925cf0bd4b6bf4e2",
+      "commit_message": "dxvk: fail closed on preflight provider hash [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_dxvk_session.py",
+        "tools/test_analyze_dxvk_session.py"
+      ],
+      "summary": "Fail closed before STOCK_DXVK_PROVIDER_VERIFIED unless both VR_ONE_CLICK_PREFLIGHT Dxvk.Provider.Sha256 and Dxvk.ExpectedSha256 are present, valid 64-hex SHA-256 values, and equal; regression tests cover missing, malformed, and mismatched identity evidence.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local conversion state/run record, current DXVK plan/work queue, one-click identity contract, and Issue #14. Concurrent same-JOB canonical-disassembly work was advancing, so duplicate frontier edits were avoided."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected an independent DXVK evidence-integrity gap: analyze_dxvk_session.py read the provider SHA-256 but did not require presence, valid SHA-256 syntax, or equality to preflight ExpectedSha256 before emitting STOCK_DXVK_PROVIDER_VERIFIED."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 64779b56668366fcc5b6d383925cf0bd4b6bf4e2 adds fail-closed provider-hash validation/report fields and missing/invalid/mismatch regression cases."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA Backend Conversion Gate run 36975213984 job 110737448934 completed Test DXVK session analyzer successfully; package-SHA256, one-click, disassembly, transport, pinned-acquisition, SAFE-reactivation, and recenter static checks through step 16 also succeeded. Win32 configure/build was still running at state capture and is not required for this Python evidence-integrity unit."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commit 64779b56668366fcc5b6d383925cf0bd4b6bf4e2 contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5946937286 records the production change and validation scope."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Python session-analysis evidence tooling and tests only; no runtime payload, selector behavior, packaged backend binary, or deployment content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit while preserving the newer concurrent canonical-disassembly primary frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "64779b56668366fcc5b6d383925cf0bd4b6bf4e2",
+        "backend_conversion_gate_run_id": 36975213984,
+        "backend_conversion_gate_job_id": 110737448934,
+        "targeted_test": "Test DXVK session analyzer",
+        "targeted_test_conclusion": "success",
+        "static_steps_through_recenter": "success",
+        "win32_build": "IN_PROGRESS_AT_STATE_CAPTURE_NOT_REQUIRED_FOR_UNIT",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5946937286,
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Treat missing, malformed, or mismatched DXVK preflight provider SHA-256 as untrusted identity evidence. Preserve the newest canonical-disassembly frontier from current branch state; runtime provider/visual claims still require matching Quest 3/VDXR evidence."
     }
   ]
 }
