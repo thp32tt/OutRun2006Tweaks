@@ -882,7 +882,47 @@ int main()
             "R186 D3DTOP_BLENDTEXTUREALPHA fixed-function shader prototype did not compile");
     }
 
+
+    {
+        std::array<FixedFunctionStageState, 8> blendTextureAlphaPmStages{};
+        blendTextureAlphaPmStages[0].colorOp = D3DTOP_BLENDTEXTUREALPHAPM;
+        blendTextureAlphaPmStages[0].colorArg1 = D3DTA_DIFFUSE;
+        blendTextureAlphaPmStages[0].colorArg2 = D3DTA_CURRENT;
+        blendTextureAlphaPmStages[0].alphaOp = D3DTOP_BLENDTEXTUREALPHAPM;
+        blendTextureAlphaPmStages[0].alphaArg1 = D3DTA_DIFFUSE;
+        blendTextureAlphaPmStages[0].alphaArg2 = D3DTA_CURRENT;
+        blendTextureAlphaPmStages[0].minFilter = D3DTEXF_POINT;
+        blendTextureAlphaPmStages[0].magFilter = D3DTEXF_POINT;
+        blendTextureAlphaPmStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto blendTextureAlphaPmShader =
+            generate_fixed_function_pixel_shader_prototype(
+                blendTextureAlphaPmStages, true, 0x01u, 0x01u, textureTypes);
+        require(
+            blendTextureAlphaPmShader.generated() &&
+                blendTextureAlphaPmShader.activeStages == 1,
+            "R187 D3DTOP_BLENDTEXTUREALPHAPM fixed-function stage must become shader-exact");
+        require(
+            blendTextureAlphaPmShader.source.find(
+                "float3 nextColor = input.diffuse.rgb + current.rgb * (1.0 - sampled0.a);") !=
+                std::string::npos &&
+            blendTextureAlphaPmShader.source.find(
+                "float nextAlpha = input.diffuse.a + current.a * (1.0 - sampled0.a);") !=
+                std::string::npos,
+            "R187 D3DTOP_BLENDTEXTUREALPHAPM shader expression or intrinsic texture dependency drift");
+        const auto blendTextureAlphaPmCompile =
+            compile_fixed_function_pixel_shader_prototype(
+                blendTextureAlphaPmShader);
+        require(
+            blendTextureAlphaPmCompile.attempted &&
+            blendTextureAlphaPmCompile.succeeded &&
+            blendTextureAlphaPmCompile.result == S_OK &&
+            blendTextureAlphaPmCompile.bytecodeBytes != 0,
+            "R187 D3DTOP_BLENDTEXTUREALPHAPM fixed-function shader prototype did not compile");
+    }
+
     std::cout
+        << "DX11 fixed-function D3DTOP_BLENDTEXTUREALPHAPM support R187: PASS\n"
         << "DX11 fixed-function D3DTOP_BLENDTEXTUREALPHA support R186: PASS\n"
         << "DX11 fixed-function D3DTOP_BLENDDIFFUSEALPHA support R185: PASS\n"
         << "DX11 fixed-function D3DTOP_ADDSMOOTH support R184: PASS\n"

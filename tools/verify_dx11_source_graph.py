@@ -550,6 +550,41 @@ def main() -> None:
             + ", ".join(missing_r186_d3dtop_blendtexturealpha)
         )
 
+    r187_d3dtop_blendtexturealphapm_contract = [
+        ("case D3DTOP_BLENDTEXTUREALPHAPM:", PIPELINE_TRANSLATION_CPP,
+         "R187 D3DTOP_BLENDTEXTUREALPHAPM readiness/translation case"),
+        ("premultiplied texture-alpha blending still depends on",
+         PIPELINE_TRANSLATION_CPP, "R187 intrinsic texture dependency"),
+        ('return first + " + " + second +',
+         PIPELINE_TRANSLATION_CPP,
+         "R187 premultiplied texture-alpha shader expression"),
+        ("blendTextureAlphaPmStages[0].colorOp = D3DTOP_BLENDTEXTUREALPHAPM;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R187 hosted color fixture"),
+        ("blendTextureAlphaPmStages[0].alphaOp = D3DTOP_BLENDTEXTUREALPHAPM;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R187 hosted alpha fixture"),
+        ("float3 nextColor = input.diffuse.rgb + current.rgb * (1.0 - sampled0.a);",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R187 RGB HLSL assertion"),
+        ("float nextAlpha = input.diffuse.a + current.a * (1.0 - sampled0.a);",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R187 alpha HLSL assertion"),
+        ("R187 D3DTOP_BLENDTEXTUREALPHAPM fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R187 offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_BLENDTEXTUREALPHAPM support R187: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R187 hosted probe completion"),
+    ]
+    missing_r187_d3dtop_blendtexturealphapm = [
+        meaning
+        for token, source, meaning in r187_d3dtop_blendtexturealphapm_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_BLENDTEXTUREALPHAPM:") < 3:
+        missing_r187_d3dtop_blendtexturealphapm.append(
+            "R187 BLENDTEXTUREALPHAPM must participate in texture-use, HLSL and readiness switches")
+    if missing_r187_d3dtop_blendtexturealphapm:
+        raise SystemExit(
+            "DX11 R187 fixed-function D3DTOP_BLENDTEXTUREALPHAPM contract drift: "
+            + ", ".join(missing_r187_d3dtop_blendtexturealphapm)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.

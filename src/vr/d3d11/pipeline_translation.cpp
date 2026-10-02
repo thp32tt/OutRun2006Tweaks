@@ -173,6 +173,10 @@ namespace outrun::vr::dx11
                 // R186: the blend factor itself is this stage's sampled
                 // texture alpha, even when neither argument selects texture.
                 return true;
+            case D3DTOP_BLENDTEXTUREALPHAPM:
+                // R187: premultiplied texture-alpha blending still depends on
+                // this stage's sampled alpha even when neither argument does.
+                return true;
             case D3DTOP_MODULATE:
             case D3DTOP_MODULATE2X:
             case D3DTOP_MODULATE4X:
@@ -284,6 +288,15 @@ namespace outrun::vr::dx11
                 const auto textureAlpha =
                     "sampled" + std::to_string(stageIndex) + ".a";
                 return first + " * " + textureAlpha + " + " + second +
+                       " * (1.0 - " + textureAlpha + ")";
+            }
+            case D3DTOP_BLENDTEXTUREALPHAPM:
+            {
+                // R187: D3D9 BLENDTEXTUREALPHAPM assumes Arg1 is already
+                // premultiplied by this stage's texture alpha.
+                const auto textureAlpha =
+                    "sampled" + std::to_string(stageIndex) + ".a";
+                return first + " + " + second +
                        " * (1.0 - " + textureAlpha + ")";
             }
             case D3DTOP_SUBTRACT:
@@ -475,6 +488,7 @@ namespace outrun::vr::dx11
             case D3DTOP_BLENDDIFFUSEALPHA:
             case D3DTOP_BLENDCURRENTALPHA:
             case D3DTOP_BLENDTEXTUREALPHA:
+            case D3DTOP_BLENDTEXTUREALPHAPM:
             case D3DTOP_SUBTRACT:
                 useArg1 = true;
                 useArg2 = true;
