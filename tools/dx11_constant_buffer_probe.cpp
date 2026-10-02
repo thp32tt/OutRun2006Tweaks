@@ -922,6 +922,21 @@ int main()
             expandedNonIndexedFan.snapshotToken),
         "R128 fan geometry rejects mismatched or stale generated IB identity");
 
+    auto overflowGeneratedFan = generatedFanReady;
+    overflowGeneratedFan.indexCount = 3;
+    const auto overflowFanGeometry =
+        compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
+            managedVertexPostResetReady, overflowGeneratedFan, 1u, ~0u);
+    require(
+        !overflowFanGeometry.inputValid &&
+        overflowFanGeometry.vertexBufferReady &&
+        overflowFanGeometry.generatedIndexBufferReady &&
+        !overflowFanGeometry.generatedIndexBufferMatchesDraw &&
+        overflowFanGeometry.topologyReady &&
+        !overflowFanGeometry.ready &&
+        overflowFanGeometry.snapshotToken == 0,
+        "R129 non-indexed fan base-vertex overflow fails closed");
+
     NativeManagedBufferShadow invalidManagedBuffer;
     require(
         !invalidManagedBuffer.initialize(
