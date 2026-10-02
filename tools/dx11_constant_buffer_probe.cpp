@@ -2825,6 +2825,103 @@ int main()
             boundDrawReady.snapshotToken,
         "R138 restored output binding reproduces final bound draw snapshot");
 
+
+    const auto sameContextBoundDraw =
+        outrun::vr::dx11::compose_fixed_function_same_context_bound_draw_readiness(
+            multiStageDrawReady, d3d.context, outputStateBinding,
+            pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+            multiStageSamplers, multiStageTextures);
+    require(
+        sameContextBoundDraw.inputValid &&
+        sameContextBoundDraw.texturedDrawReady &&
+        sameContextBoundDraw.pipelineBindingReady &&
+        sameContextBoundDraw.pipelineBindingMatchesDraw &&
+        sameContextBoundDraw.outputBindingReady &&
+        sameContextBoundDraw.outputBindingMatchesDraw &&
+        sameContextBoundDraw.componentSnapshotsPresent &&
+        sameContextBoundDraw.ready &&
+        sameContextBoundDraw.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_fixed_function_same_context_bound_draw_snapshot(
+            multiStageDrawReady, d3d.context, outputStateBinding,
+            pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+            multiStageSamplers, multiStageTextures,
+            sameContextBoundDraw.snapshotToken),
+        "R139 same-context final bound draw reobserves every live binding");
+
+    d3d.context->PSSetShader(nullptr, nullptr, 0);
+    const auto sameContextPipelineDrift =
+        outrun::vr::dx11::compose_fixed_function_same_context_bound_draw_readiness(
+            multiStageDrawReady, d3d.context, outputStateBinding,
+            pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+            multiStageSamplers, multiStageTextures);
+    require(
+        sameContextPipelineDrift.texturedDrawReady &&
+        !sameContextPipelineDrift.pipelineBindingReady &&
+        sameContextPipelineDrift.outputBindingReady &&
+        !sameContextPipelineDrift.ready &&
+        sameContextPipelineDrift.snapshotToken == 0 &&
+        !outrun::vr::dx11::validate_fixed_function_same_context_bound_draw_snapshot(
+            multiStageDrawReady, d3d.context, outputStateBinding,
+            pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+            multiStageSamplers, multiStageTextures,
+            sameContextBoundDraw.snapshotToken),
+        "R139 same-context final bound draw rejects live PS pipeline drift");
+    require(
+        pipelineBundle.bind_for_observation(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken),
+        "R139 restore pipeline after same-context drift probe");
+
+    ID3D11SamplerState* clearSameContextSampler = nullptr;
+    ID3D11ShaderResourceView* clearSameContextSrv = nullptr;
+    d3d.context->PSSetSamplers(
+        secondDrawTextureStageSlot, 1, &clearSameContextSampler);
+    d3d.context->PSSetShaderResources(
+        secondDrawTextureStageSlot, 1, &clearSameContextSrv);
+    const auto sameContextTextureDrift =
+        outrun::vr::dx11::compose_fixed_function_same_context_bound_draw_readiness(
+            multiStageDrawReady, d3d.context, outputStateBinding,
+            pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+            multiStageSamplers, multiStageTextures);
+    require(
+        !sameContextTextureDrift.texturedDrawReady &&
+        sameContextTextureDrift.pipelineBindingReady &&
+        sameContextTextureDrift.outputBindingReady &&
+        !sameContextTextureDrift.ready &&
+        sameContextTextureDrift.snapshotToken == 0,
+        "R139 same-context final bound draw rejects live aggregate PS drift");
+    require(
+        bind_fixed_function_texture_stage_for_observation(
+            d3d.context, secondDrawTextureStageSlot, samplerOwner, textureView),
+        "R139 restore aggregate PS stage after same-context drift probe");
+
+    d3d.context->RSSetState(nullptr);
+    const auto sameContextOutputDrift =
+        outrun::vr::dx11::compose_fixed_function_same_context_bound_draw_readiness(
+            multiStageDrawReady, d3d.context, outputStateBinding,
+            pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+            multiStageSamplers, multiStageTextures);
+    require(
+        sameContextOutputDrift.texturedDrawReady &&
+        sameContextOutputDrift.pipelineBindingReady &&
+        !sameContextOutputDrift.outputBindingReady &&
+        !sameContextOutputDrift.ready &&
+        sameContextOutputDrift.snapshotToken == 0,
+        "R139 same-context final bound draw rejects live RS OM drift");
+    require(
+        outputStateBinding.apply(d3d.context),
+        "R139 restore RS OM after same-context drift probe");
+
+    const auto sameContextRestored =
+        outrun::vr::dx11::compose_fixed_function_same_context_bound_draw_readiness(
+            multiStageDrawReady, d3d.context, outputStateBinding,
+            pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+            multiStageSamplers, multiStageTextures);
+    require(
+        sameContextRestored.ready &&
+        sameContextRestored.snapshotToken == sameContextBoundDraw.snapshotToken,
+        "R139 same-context final bound draw restores deterministic snapshot");
+
     auto mismatchedPipelineBinding = drawPipelineBindingReady;
     mismatchedPipelineBinding.pipelineSnapshotToken ^= 0x100000001b3ull;
     const auto mismatchedPipelineBoundDraw =
