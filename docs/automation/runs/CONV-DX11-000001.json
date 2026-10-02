@@ -1207,8 +1207,110 @@
       "checkpoint": "C6_STATE",
       "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
       "runtime_claim": "NONE"
+    },
+    {
+      "unit_id": "DX11_NONINDEXED_FAN_GEOMETRY_STATIC_GUARD_R129",
+      "job_id": "CONV-DX11-000001",
+      "task_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_NONINDEXED_FAN_GEOMETRY_STATIC_GUARD_R129",
+      "base_sha": "d6399127f35092ab9a780ae6b8c56b0ef1039fdb",
+      "material_result_sha": "205fe1aa5e2148cfce8919161137f2d6f413bedd",
+      "validation_bearing_sha": "205fe1aa5e2148cfce8919161137f2d6f413bedd",
+      "implementation_commits": [
+        "34777edf95bb38d7218fc76d982a5782b4f8295c",
+        "205fe1aa5e2148cfce8919161137f2d6f413bedd"
+      ],
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "The immediately preceding generated non-indexed D3DPT_TRIANGLEFAN geometry readiness path had positive and stale/mismatched generated-index identity coverage, but no explicit UINT base-vertex overflow regression and no source-graph contract protecting the new path from silent drift.",
+      "summary": "Added a hosted negative probe proving baseVertex+sourceElement overflow fails closed for generated non-indexed fan geometry, plus source-graph guards for the readiness API, generated-index identity, expansion reconstruction, overflow gate and positive/stale/mismatch/overflow probes. Native Draw* remains disabled.",
+      "changed_paths": [
+        "tools/dx11_constant_buffer_probe.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Read current GitHub HEAD, AGENTS.md, branch-local conversion state/run record, DX11 plan/work queue, regression knowledge/history and Issue #14 through the authenticated GitHub connector.",
+            "Tracked concurrent same-JOB branch churn and used current branch contents/CAS-style file updates without force-moving refs."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Confirmed the generated non-indexed fan geometry path reconstructs the exact generated index content hash from primitiveCount/baseVertex and fails closed on arithmetic overflow.",
+            "Confirmed the existing hosted probe covered positive, stale and mismatched generated-index identity but did not pin the overflow boundary, and verify_dx11_source_graph.py had no contract for the new fan geometry path."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "changed_paths": [
+            "tools/dx11_constant_buffer_probe.cpp",
+            "tools/verify_dx11_source_graph.py"
+          ],
+          "implementation_commits": [
+            "34777edf95bb38d7218fc76d982a5782b4f8295c",
+            "205fe1aa5e2148cfce8919161137f2d6f413bedd"
+          ],
+          "details": [
+            "Added an explicit ~0u baseVertex / one-primitive fan case that requires inputValid=false, ready=false and snapshotToken=0.",
+            "Added source-graph contract markers for generated fan readiness declaration, source-element reconstruction, UINT overflow gate, generated content-hash identity and hosted positive/negative probes."
+          ]
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_REMOTE_STATIC_CI_CANCELLED_DURING_CONFIGURE",
+          "automation_validation": "PASS_REMOTE_STATIC_EXACT_SHA_BUILD_NOT_CLAIMED",
+          "evidence": [
+            "Exact result SHA 205fe1aa5e2148cfce8919161137f2d6f413bedd was re-fetched through authenticated GitHub and contains only the intended source-graph guard change on top of the overflow probe commit.",
+            "Backend Conversion Gate run 36973343816 passed queue/baseline/one-click/backend-disassembly/session-analysis/native-transport/dual-source/source-graph/dormant-activation/census static steps, including Verify DX11 source graph.",
+            "The exact-SHA run was cancelled during Win32 Configure by a descendant same-branch push. No exact-SHA compile, WARP probe or runtime success is claimed.",
+            "Later descendants retain both the R129 overflow probe marker and the R129 source-graph guard."
+          ],
+          "exact_gate_run_id": 36973343816,
+          "full_win32_build": "UNCONFIRMED_SUPERSEDED",
+          "hosted_warp_probe": "UNCONFIRMED_SUPERSEDED",
+          "runtime_validation": "UNTESTED"
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "205fe1aa5e2148cfce8919161137f2d6f413bedd",
+          "issue14_comment_id": 5946711098
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Test/static-contract hardening only; no native game Draw* routing, backend activation, OpenXR transport, runtime candidate payload or release package behavior changed."
+        },
+        "C6_STATE": {
+          "status": "PERSISTING_WITH_THIS_STATE_COMMIT",
+          "state_parent_head": "44b02708fd9f77b9cdb61e53dc36ecc03d431b10",
+          "exact_next_action": "Keep NativeDrawPathActive disabled. Continue from the latest GitHub HEAD with the next independent DX11 readiness gap; retain the R129 generated-fan overflow/content-identity static gate, and require exhaustive exact-build census plus Quest 3/VDXR parity before any activation claim."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "related_finding_or_regression_keys": [
+        "DX11_NONINDEXED_FAN_GEOMETRY_STATIC_GUARD_R129"
+      ],
+      "issue14_comment_id": 5946711098,
+      "automation_validation": "PASS_REMOTE_STATIC_EXACT_SHA_BUILD_NOT_CLAIMED",
+      "blocker": "Exact-SHA Win32 configure/build and hosted WARP execution were superseded by descendant branch churn. Runtime graphics validation remains UNTESTED; this does not block further independent GitHub-only static/source work.",
+      "next_action": "Keep NativeDrawPathActive disabled and continue the next independent DX11 source/static readiness unit from the latest GitHub HEAD while preserving the generated-fan overflow/content-identity gates.",
+      "checkpoint": "C6_STATE",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE",
+      "state_persisted": true
     }
   ],
-  "latest_continuation_unit": "DX11_DYNAMIC_OUTPUT_STATE_PROVENANCE_R124",
+  "latest_continuation_unit": "DX11_NONINDEXED_FAN_GEOMETRY_STATIC_GUARD_R129",
   "state_persisted_for_continuation": true
 }
