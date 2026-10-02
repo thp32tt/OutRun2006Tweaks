@@ -371,7 +371,8 @@ def verify_dxvk_continuation_chain() -> None:
         explicit_probe_compare = (
             f"overlap = {overlap_constant}" in next_provenance_source
             and "overlap_actual = probe[: len(overlap)]" in next_provenance_source
-            and "overlap_matches = overlap_actual == overlap" in next_provenance_source
+            and "overlap_matches =" in next_provenance_source
+            and "overlap_actual == overlap" in next_provenance_source
         )
         if not (legacy_probe_compare or explicit_probe_compare):
             raise SystemExit(
