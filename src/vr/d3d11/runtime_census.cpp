@@ -221,6 +221,15 @@ namespace outrun::vr::dx11
             DWORD alphaTestEnable = FALSE;
             DWORD alphaTestRef{};
             DWORD alphaTestFunc = D3DCMP_ALWAYS;
+            bool fogObservationComplete{};
+            DWORD fogEnable = FALSE;
+            DWORD fogColor{};
+            DWORD fogTableMode = D3DFOG_NONE;
+            DWORD fogStartBits{};
+            DWORD fogEndBits = 0x3F800000u;
+            DWORD fogDensityBits = 0x3F800000u;
+            DWORD rangeFogEnable = FALSE;
+            DWORD fogVertexMode = D3DFOG_NONE;
             bool fixedFunctionTranslationReady{};
             std::uint32_t fixedFunctionTranslationUnsupported{};
             UINT fixedFunctionActiveStages{};
@@ -327,6 +336,21 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.alphaTestEnable);
             hash = hash_mix(hash, sig.alphaTestRef & 0xFFu);
             hash = hash_mix(hash, sig.alphaTestFunc);
+            hash = hash_mix(
+                hash, sig.fogObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.fogEnable);
+            if (sig.fogEnable != FALSE)
+            {
+                // D3D9 ignores fog-color alpha. Hash only RGB plus every
+                // remaining mode/parameter state that can affect fog output.
+                hash = hash_mix(hash, sig.fogColor & 0x00FFFFFFu);
+                hash = hash_mix(hash, sig.fogTableMode);
+                hash = hash_mix(hash, sig.fogStartBits);
+                hash = hash_mix(hash, sig.fogEndBits);
+                hash = hash_mix(hash, sig.fogDensityBits);
+                hash = hash_mix(hash, sig.rangeFogEnable);
+                hash = hash_mix(hash, sig.fogVertexMode);
+            }
             hash = hash_mix(hash, sig.minFilter);
             hash = hash_mix(hash, sig.magFilter);
             hash = hash_mix(hash, sig.mipFilter);
@@ -1311,6 +1335,19 @@ namespace outrun::vr::dx11
                 if (sig.fixedFunction)
                 {
                     spdlog::info(
+                        "VR DX11 R119 ffp fog state#{}: observed={} enable={} colorRgb=0x{:06X} tableMode={} vertexMode={} startBits=0x{:08X} endBits=0x{:08X} densityBits=0x{:08X} range={}",
+                        unique,
+                        sig.fogObservationComplete ? 1 : 0,
+                        sig.fogEnable != FALSE ? 1 : 0,
+                        sig.fogColor & 0x00FFFFFFu,
+                        sig.fogTableMode,
+                        sig.fogVertexMode,
+                        sig.fogStartBits,
+                        sig.fogEndBits,
+                        sig.fogDensityBits,
+                        sig.rangeFogEnable != FALSE ? 1 : 0);
+
+                    spdlog::info(
                         "VR DX11 R94 ffp vertex readiness#{}: generated={} mask=0x{:08X} sourceHash=0x{:016X} sourceBytes={} transform[exact={},mask=0x{:08X},payloadHash=0x{:016X}]",
                         unique,
                         sig.fixedFunctionVertexShaderPrototypeGenerated ? 1 : 0,
@@ -1878,6 +1915,16 @@ namespace outrun::vr::dx11
         signature.alphaTestEnable = source.alphaTestEnable;
         signature.alphaTestRef = source.alphaRef;
         signature.alphaTestFunc = source.alphaFunc;
+        signature.fogObservationComplete =
+            captured && source.complete;
+        signature.fogEnable = source.fogEnable;
+        signature.fogColor = source.fogColor;
+        signature.fogTableMode = source.fogTableMode;
+        signature.fogStartBits = source.fogStartBits;
+        signature.fogEndBits = source.fogEndBits;
+        signature.fogDensityBits = source.fogDensityBits;
+        signature.rangeFogEnable = source.rangeFogEnable;
+        signature.fogVertexMode = source.fogVertexMode;
 
         const bool inputLayoutExact = signature.inputLayoutExact;
         const bool shaderTranslationExact =

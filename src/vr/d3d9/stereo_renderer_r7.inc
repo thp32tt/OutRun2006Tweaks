@@ -1725,6 +1725,13 @@ namespace OutRunVRStereo
 		read(D3DRS_CCW_STENCILPASS, out.ccwStencilPass);
 		read(D3DRS_CCW_STENCILFUNC, out.ccwStencilFunc);
 		read(D3DRS_FOGENABLE, out.fogEnable);
+		read(D3DRS_FOGCOLOR, out.fogColor);
+		read(D3DRS_FOGTABLEMODE, out.fogTableMode);
+		read(D3DRS_FOGSTART, out.fogStartBits);
+		read(D3DRS_FOGEND, out.fogEndBits);
+		read(D3DRS_FOGDENSITY, out.fogDensityBits);
+		read(D3DRS_RANGEFOGENABLE, out.rangeFogEnable);
+		read(D3DRS_FOGVERTEXMODE, out.fogVertexMode);
 		read(D3DRS_LIGHTING, out.lighting);
 
 		out.complete = ok;

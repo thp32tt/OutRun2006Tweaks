@@ -580,6 +580,74 @@ def main() -> None:
             + ", ".join(missing_alpha_test_shader_contract)
         )
 
+
+    fog_observation_snapshot_contract = {
+        "DWORD fogColor = 0;": "fog color snapshot",
+        "DWORD fogTableMode = D3DFOG_NONE;": "pixel/table fog mode snapshot",
+        "DWORD fogStartBits = 0x00000000u;": "raw fog-start bit snapshot",
+        "DWORD fogEndBits = 0x3F800000u;": "raw fog-end bit snapshot",
+        "DWORD fogDensityBits = 0x3F800000u;": "raw fog-density bit snapshot",
+        "DWORD rangeFogEnable = FALSE;": "range-fog enable snapshot",
+        "DWORD fogVertexMode = D3DFOG_NONE;": "vertex fog mode snapshot",
+    }
+    missing_fog_observation_contract = [
+        meaning
+        for token, meaning in fog_observation_snapshot_contract.items()
+        if token not in D3D9_DRAW_STATE_HPP
+    ]
+    fog_observation_capture_contract = {
+        "read(D3DRS_FOGCOLOR, out.fogColor);": "capture fog color",
+        "read(D3DRS_FOGTABLEMODE, out.fogTableMode);":
+            "capture pixel/table fog mode",
+        "read(D3DRS_FOGSTART, out.fogStartBits);":
+            "capture raw fog-start bits",
+        "read(D3DRS_FOGEND, out.fogEndBits);":
+            "capture raw fog-end bits",
+        "read(D3DRS_FOGDENSITY, out.fogDensityBits);":
+            "capture raw fog-density bits",
+        "read(D3DRS_RANGEFOGENABLE, out.rangeFogEnable);":
+            "capture range-fog enable",
+        "read(D3DRS_FOGVERTEXMODE, out.fogVertexMode);":
+            "capture vertex fog mode",
+    }
+    missing_fog_observation_contract += [
+        meaning
+        for token, meaning in fog_observation_capture_contract.items()
+        if token not in D3D9_RENDER_STATE_CAPTURE
+    ]
+    fog_observation_census_contract = {
+        "bool fogObservationComplete{};":
+            "fog census completeness identity",
+        "signature.fogColor = source.fogColor;":
+            "fog color census propagation",
+        "signature.fogTableMode = source.fogTableMode;":
+            "fog table-mode census propagation",
+        "signature.fogVertexMode = source.fogVertexMode;":
+            "fog vertex-mode census propagation",
+        "sig.fogColor & 0x00FFFFFFu":
+            "fog RGB semantic signature hashing",
+        "hash = hash_mix(hash, sig.fogStartBits);":
+            "fog-start signature hashing",
+        "hash = hash_mix(hash, sig.fogEndBits);":
+            "fog-end signature hashing",
+        "hash = hash_mix(hash, sig.fogDensityBits);":
+            "fog-density signature hashing",
+        "hash = hash_mix(hash, sig.rangeFogEnable);":
+            "range-fog signature hashing",
+        "VR DX11 R119 ffp fog state#{}:":
+            "per-signature fog evidence logging",
+    }
+    missing_fog_observation_contract += [
+        meaning
+        for token, meaning in fog_observation_census_contract.items()
+        if token not in census
+    ]
+    if missing_fog_observation_contract:
+        raise SystemExit(
+            "DX11 fog observation/census contract drift: "
+            + ", ".join(missing_fog_observation_contract)
+        )
+
     stencil_snapshot_contract = {
         "DWORD stencilReadMask = 0xFFFFFFFFu;": "stencil read mask snapshot",
         "DWORD stencilRef = 0;": "dynamic stencil reference snapshot",

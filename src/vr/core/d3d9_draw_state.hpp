@@ -47,7 +47,17 @@ namespace OutRunVR::DrawState
         DWORD ccwStencilPass = D3DSTENCILOP_KEEP;
         DWORD ccwStencilFunc = D3DCMP_ALWAYS;
 
+        // D3D9 fog parameters are render-state DWORDs. Float-valued states
+        // retain their raw IEEE-754 bit patterns so the DX11 census can prove
+        // exact semantic identity before any native fog implementation.
         DWORD fogEnable = FALSE;
+        DWORD fogColor = 0;
+        DWORD fogTableMode = D3DFOG_NONE;
+        DWORD fogStartBits = 0x00000000u;
+        DWORD fogEndBits = 0x3F800000u;
+        DWORD fogDensityBits = 0x3F800000u;
+        DWORD rangeFogEnable = FALSE;
+        DWORD fogVertexMode = D3DFOG_NONE;
         DWORD lighting = FALSE;
 
         bool complete = false;
