@@ -3,60 +3,73 @@
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
   "attempt": "2/3",
-  "initial_controller_head": "83e00209698d06d0c1430b38883df037322986e7",
-  "reconciled_head_before_state_commit": "653088a0a16d7abd66549dbbbcc414eb763c42e0",
-  "validation_bearing_source_sha": "85cfe3c20df78aa50e4c19ca94f59bb840f02bf8",
-  "result_sha": "PENDING_STATE_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA_GATE",
-  "runtime_validation": "UNTESTED",
   "checkpoint": "C6_STATE",
-  "status": "SOURCE_IMPLEMENTED_EXACT_SHA_VALIDATION_PENDING",
-  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R278_1827AC_PROVENANCE",
-  "summary": "Implemented DXVK disassembly-lane progress instead of review-only recovery: optimized the analyzer prologue hot path, added a fail-closed canonical-EXE provenance collector for 0x001827AC..0x001827EC, and extended the backend disassembly contract. Concurrent same-lane work advanced HEAD and cancelled the first exact-SHA PR runs, so the task is reconciled onto the latest branch state before re-gating.",
+  "status": "COMPLETE_AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "initial_controller_head": "83e00209698d06d0c1430b38883df037322986e7",
+  "validation_bearing_result_sha": "d19b66beba76a9d06a7be5f4a59995cf5a41a54f",
+  "result_sha": "d19b66beba76a9d06a7be5f4a59995cf5a41a54f",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R278_1827AC_PROVENANCE_AND_ANALYZER_HOT_PATH",
+  "summary": "Implemented DXVK conversion-lane progress: replaced the analyzer's Python byte-by-byte backward prologue scan with bounded bytes.rfind while preserving nearest-known-prologue semantics; added fail-closed canonical-EXE provenance from 0x001827AC; extended the disassembly contract; and validated the reconciled result at exact SHA d19b66beba76a9d06a7be5f4a59995cf5a41a54f.",
   "source_commits": [
     {
       "sha": "e8405ba3c0910c361a0bc161bb92031367ecc3f3",
-      "message": "[AUTO:CONVERSION-DXVK-00278] optimize disassembly prologue scan",
-      "paths": ["tools/analyze_outrun_exe.py"]
+      "message": "[AUTO:CONVERSION-DXVK-00278] optimize disassembly prologue scan"
     },
     {
       "sha": "0a23b2d7530599470eff936e0b44f5bd01629a2c",
-      "message": "[AUTO:CONVERSION-DXVK-00278] capture 0x1827AC continuation provenance",
-      "paths": ["tools/analyze_outrun_exe.py"]
+      "message": "[AUTO:CONVERSION-DXVK-00278] capture 0x1827AC continuation provenance"
     },
     {
       "sha": "85cfe3c20df78aa50e4c19ca94f59bb840f02bf8",
-      "message": "[AUTO:CONVERSION-DXVK-00278] gate continuation provenance and analyzer hot path",
-      "paths": ["tools/verify_vr_backend_disasm_contract.py"]
+      "message": "[AUTO:CONVERSION-DXVK-00278] gate continuation provenance and analyzer hot path"
+    },
+    {
+      "sha": "d19b66beba76a9d06a7be5f4a59995cf5a41a54f",
+      "message": "[AUTO:CONVERSION-DXVK-00278] persist developed DXVK continuation checkpoint",
+      "validation_bearing": true
     }
   ],
-  "implementation": {
-    "analyzer_hot_path": "guess_function_start uses bounded bytes.rfind instead of a Python per-byte reverse loop while preserving nearest known-prologue selection.",
-    "continuation_start_rva": "0x001827AC",
-    "continuation_probe_end_rva": "0x001827EC",
-    "probe_len": 64,
-    "required_overlap": "0f",
-    "expected_status": "EXACT_EXE_1827AC_TO_1827EC_PROVENANCE_CAPTURED",
-    "semantic_scope": "RAW_BYTES_OVERLAP_AND_REL32_CENSUS_ONLY",
-    "function_entry_status": "UNRESOLVED",
-    "render_ownership_status": "UNRESOLVED",
-    "hud_ownership_status": "UNRESOLVED"
-  },
   "changed_paths": [
     "tools/analyze_outrun_exe.py",
     "tools/verify_vr_backend_disasm_contract.py",
     "docs/automation/runs/CONVERSION-DXVK-00278.json"
   ],
-  "validation_observed": {
-    "source_sha": "85cfe3c20df78aa50e4c19ca94f59bb840f02bf8",
-    "backend_disassembly_contract_step": "PASS_BEFORE_SUPERSEDE",
-    "pr_build": "CANCELLED_BY_NEWER_BRANCH_HEAD",
-    "pr_hud_inspector": "CANCELLED_BY_NEWER_BRANCH_HEAD",
-    "pr_openxr": "CANCELLED_BY_NEWER_BRANCH_HEAD",
-    "note": "Cancellation was caused by concurrent same-lane HEAD advancement, not by a confirmed source failure."
+  "implementation": {
+    "analyzer_hot_path": "guess_function_start uses bounded bytes.rfind instead of a Python per-byte reverse loop.",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "continuation_start_rva": "0x001827AC",
+    "continuation_probe_end_rva": "0x001827EC",
+    "probe_len": 64,
+    "required_overlap": "0f",
+    "provenance_status": "EXACT_EXE_1827AC_TO_1827EC_PROVENANCE_CAPTURED",
+    "exact_decode_status": "EXACT_1827AC_TO_1827E9_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "decoded_complete_instruction_count": 18,
+    "next_incomplete_rva": "0x001827E9",
+    "next_incomplete_bytes": "b8 07 00",
+    "ownership_effect": "NONE"
   },
-  "issue14_comments": [5944961256, 5944961557],
-  "runtime_test_performed": false,
-  "runtime_claim": "NONE",
-  "next_action": "Run exact-SHA automation on this reconciled checkpoint. If provenance passes, exact-decode only complete instructions beginning at 0x001827AC in the next bounded checkpoint; keep runtime validation UNTESTED until Quest 3/VDXR evidence exists."
+  "validation": {
+    "exact_sha": "d19b66beba76a9d06a7be5f4a59995cf5a41a54f",
+    "backend_conversion_gate_run_id": 36959494795,
+    "backend_conversion_gate_conclusion": "success",
+    "backend_disassembly_contract": "PASS",
+    "configure_win32": "PASS",
+    "build_win32": "PASS",
+    "binary_exists": "PASS",
+    "artifact_upload": "PASS",
+    "hud_inspector_run_id": 36959497900,
+    "static_exe_analysis_job_id": 110689826636,
+    "static_exe_analysis": "PASS",
+    "canonical_provenance": "PASS",
+    "notes": "PC-fast remained skipped because no authorized evening PC-fast session was active. Runtime/HMD validation was not performed."
+  },
+  "issue14_comments": [
+    5944961256,
+    5944961557
+  ],
+  "next_action": "Continue with a fresh bounded canonical-EXE window overlapping the incomplete MOV EAX,imm32 bytes at 0x001827E9. Do not promote function/render/HUD/runtime semantics until separately proven; Quest 3/VDXR remains the runtime gate."
 }
