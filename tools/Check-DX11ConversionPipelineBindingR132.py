@@ -38,11 +38,20 @@ def validate(path: Path) -> int:
     if not isinstance(data["bindings"], list):
         raise SystemExit("bindings must be a list")
 
+    seen = set()
     for item in data["bindings"]:
         if not isinstance(item, dict):
             raise SystemExit("binding entries must be objects")
         if "resource" not in item or "stage" not in item:
             raise SystemExit("binding entries require resource and stage")
+
+        key = (item["resource"], item["stage"])
+        if key in seen:
+            raise SystemExit("duplicate resource/stage binding evidence")
+        seen.add(key)
+
+        if "slot" in item and not isinstance(item["slot"], int):
+            raise SystemExit("binding slot must be an integer when present")
 
     return 0
 
