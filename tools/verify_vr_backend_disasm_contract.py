@@ -62,6 +62,37 @@ def _final_proven_gate_names(source: str) -> set[str]:
     }
 
 
+def _final_captured_gate_names(source: str) -> set[str]:
+    """Return names consumed by the collector's exact final captured bool expression."""
+
+    tree = ast.parse(source)
+    captured_values = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign):
+            continue
+        if any(isinstance(target, ast.Name) and target.id == "captured" for target in node.targets):
+            captured_values.append(node.value)
+    if len(captured_values) != 1:
+        raise SystemExit(
+            "DXVK continuation provenance must contain exactly one final captured assignment: "
+            f"found={len(captured_values)}"
+        )
+    value = captured_values[0]
+    if not (
+        isinstance(value, ast.Call)
+        and isinstance(value.func, ast.Name)
+        and value.func.id == "bool"
+        and len(value.args) == 1
+        and not value.keywords
+    ):
+        raise SystemExit("DXVK continuation provenance final captured assignment must be bool(<gates>)")
+    return {
+        node.id
+        for node in ast.walk(value.args[0])
+        if isinstance(node, ast.Name)
+    }
+
+
 def verify_dxvk_continuation_chain() -> None:
     """Auto-discover and fail closed if canonical continuation capture/proof edges drift apart."""
 
@@ -156,6 +187,28 @@ def verify_dxvk_continuation_chain() -> None:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} raw provenance lost capture-integrity gate: "
                 f"{missing_capture_integrity_markers}"
+            )
+        captured_gate_names = _final_captured_gate_names(provenance_source)
+        assigned_names = _function_assignment_names(provenance_source)
+        mandatory_captured_gates = {
+            "predecessor_exact",
+            "target_section",
+            "probe",
+            "probe_end_matches",
+        }
+        conditional_captured_gates = {
+            "overlap_matches",
+            "predecessor_overlap_matches",
+        }
+        required_captured_gates = (
+            mandatory_captured_gates
+            | (assigned_names & conditional_captured_gates)
+        )
+        missing_captured_gates = sorted(required_captured_gates - captured_gate_names)
+        if missing_captured_gates:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} raw provenance captured status dropped "
+                f"required fail-closed gates: {missing_captured_gates}"
             )
         raw_status_fail_closed_markers = (
             '"status"',
