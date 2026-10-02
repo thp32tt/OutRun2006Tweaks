@@ -389,6 +389,10 @@ def verify_dxvk_continuation_chain() -> None:
         # contract immediately instead of waiting for the evidence workflow.
         declared_start_rva = value(f"{prefix}_RVA")
         declared_prefix_end_rva = value(f"{prefix}_PREFIX_END_RVA")
+        declared_instruction_end_rva = analyzer.get(
+            f"{prefix}_INSTRUCTION_END_RVA",
+            declared_prefix_end_rva,
+        )
         if not instruction_rows:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} has no exact instruction rows"
@@ -420,11 +424,46 @@ def verify_dxvk_continuation_chain() -> None:
                     f"expected=0x{static_next_rva:08X} actual=0x{instruction_rva:08X}"
                 )
             static_next_rva = instruction_rva + len(encoded)
-        if static_next_rva != declared_prefix_end_rva:
+        if static_next_rva != declared_instruction_end_rva:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} instruction geometry end drift: "
                 f"decoded_end=0x{static_next_rva:08X} "
-                f"prefix_end=0x{declared_prefix_end_rva:08X}"
+                f"instruction_end=0x{declared_instruction_end_rva:08X}"
+            )
+
+        padding_names = (
+            f"{prefix}_PADDING_RVA",
+            f"{prefix}_PADDING_LEN",
+        )
+        padding_presence = [name in analyzer for name in padding_names]
+        if any(padding_presence) and not all(padding_presence):
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} has a half-defined padding contract"
+            )
+        if all(padding_presence):
+            padding_rva = value(padding_names[0])
+            padding_len = value(padding_names[1])
+            if padding_len <= 0:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} has non-positive padding length "
+                    f"{padding_len}"
+                )
+            if declared_instruction_end_rva != padding_rva:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} padding does not start at the "
+                    f"instruction end: instruction_end=0x{declared_instruction_end_rva:08X} "
+                    f"padding_rva=0x{padding_rva:08X}"
+                )
+            if padding_rva + padding_len != declared_prefix_end_rva:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} padding geometry end drift: "
+                    f"padding_end=0x{padding_rva + padding_len:08X} "
+                    f"prefix_end=0x{declared_prefix_end_rva:08X}"
+                )
+        elif declared_instruction_end_rva != declared_prefix_end_rva:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} instruction end differs from prefix "
+                "end without an explicit padding contract"
             )
 
         declared_branches = analyzer.get(f"{prefix}_BRANCHES", ())
