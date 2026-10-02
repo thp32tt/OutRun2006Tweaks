@@ -20,6 +20,7 @@ r31 = read("src/vr/d3d9/stereo_renderer_r31.cpp")
 r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = read("src/vr/d3d9/stereo_renderer_r33.cpp")
 r34 = read("src/vr/d3d9/stereo_renderer_r34.cpp")
+final_dispatch_hooks = read("src/vr/core/final_dispatch_hooks.hpp")
 
 for marker in (
     "class StateBlockTracker final",
@@ -692,6 +693,41 @@ if reset_begin >= 0 and rollback_begin > reset_begin:
     for legacy in ("R34ResetR33Hook.stdcall", "R34PresentR33Hook.stdcall"):
         if legacy in callback_region:
             errors.append(f"R34 callback bypassed lifecycle facade: {legacy}")
+
+
+# R84 staged interface extraction: R33 -> R34 seam.
+# Stage 1 exposes stable hook-destination declarations but deliberately keeps
+# the legacy textual include until an explicit build/link gate is allowed.
+for marker in (
+    "DrawPrimitiveDestR33(",
+    "DrawIndexedPrimitiveDestR33(",
+    "DrawPrimitiveUPDestR33(",
+    "DrawIndexedPrimitiveUPDestR33(",
+    "ResetDestR33(",
+    "PresentDestR33(",
+):
+    if marker not in final_dispatch_hooks:
+        errors.append(f"R33 final-dispatch hook API missing declaration: {marker}")
+if '#include "../core/final_dispatch_hooks.hpp"' not in r33:
+    errors.append("R33 final-dispatch hook API include missing")
+if '#include "../core/final_dispatch_hooks.hpp"' not in r34:
+    errors.append("R34 final-dispatch hook API include missing")
+if '#include "stereo_renderer_r33.cpp"' not in r34:
+    errors.append("R33->R34 textual include removed before build/link gate")
+r33_instance = r33.find("VRStereoR33DispatchHook VRStereoR33DispatchHook::instance;")
+for marker in (
+    "HRESULT __stdcall DrawPrimitiveDestR33(",
+    "HRESULT __stdcall DrawIndexedPrimitiveDestR33(",
+    "HRESULT __stdcall DrawPrimitiveUPDestR33(",
+    "HRESULT __stdcall DrawIndexedPrimitiveUPDestR33(",
+    "HRESULT __stdcall ResetDestR33(",
+    "HRESULT __stdcall PresentDestR33(",
+):
+    pos = r33.find(marker)
+    if r33_instance < 0 or pos <= r33_instance:
+        errors.append(
+            f"R33 hook destination has not crossed the anonymous implementation boundary: {marker}")
+
 
 if errors:
     print("R84 refactor contract FAILED")

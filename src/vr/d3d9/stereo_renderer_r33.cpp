@@ -13,6 +13,7 @@
 #include "stereo_renderer_r32.cpp"
 #include "../state/state_block_tracker.hpp"
 #include "../core/dispatch_support.hpp"
+#include "../core/final_dispatch_hooks.hpp"
 #include "../render/stereo_base_policy.hpp"
 #include "../render/screen_space_api.hpp"
 #include "../render/fast_path_support.hpp"
@@ -695,99 +696,7 @@ namespace OutRunVRStereo
                 std::forward<LowerR29Draw>(lowerR29Draw));
         }
 
-        HRESULT __stdcall DrawPrimitiveDestR33(IDirect3DDevice9* device,
-            D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
-        {
-            auto actual = [&]() {
-                return DrawPrimitiveHook.stdcall<HRESULT>(
-                    device, type, startVertex, primitiveCount);
-            };
-            auto lower = [&]() {
-                return LowerDrawPrimitive(
-                    device, type, startVertex, primitiveCount);
-            };
-            return R33Dispatch(device, actual, lower, "R33/DrawPrimitive");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveDestR33(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
-            UINT startIndex, UINT primitiveCount)
-        {
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
-                    baseVertexIndex, minVertexIndex, numVertices, startIndex,
-                    primitiveCount);
-            };
-            auto lower = [&]() {
-                return LowerDrawIndexedPrimitive(device,
-                    type, baseVertexIndex, minVertexIndex, numVertices,
-                    startIndex, primitiveCount);
-            };
-            return R33Dispatch(device, actual, lower,
-                "R33/DrawIndexedPrimitive");
-        }
-
-        HRESULT __stdcall DrawPrimitiveUPDestR33(IDirect3DDevice9* device,
-            D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
-            UINT stride)
-        {
-            auto actual = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, primitiveCount, data, stride);
-            };
-            auto lower = [&]() {
-                return LowerDrawPrimitiveUP(
-                    device, type, primitiveCount, data, stride);
-            };
-            return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveUPDestR33(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
-            const void* indexData, D3DFORMAT indexFormat,
-            const void* vertexData, UINT stride)
-        {
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
-                    minVertexIndex, numVertices, primitiveCount, indexData,
-                    indexFormat, vertexData, stride);
-            };
-            auto lower = [&]() {
-                return LowerDrawIndexedPrimitiveUP(device,
-                    type, minVertexIndex, numVertices, primitiveCount,
-                    indexData, indexFormat, vertexData, stride);
-            };
-            return R33Dispatch(device, actual, lower,
-                "R33/DrawIndexedPrimitiveUP");
-        }
-
-        HRESULT __stdcall ResetDestR33(IDirect3DDevice9* device,
-            D3DPRESENT_PARAMETERS* params)
-        {
-            const bool gameDevice = IsGameDevice(device);
-            const HRESULT hr = CallLowerReset(device, params);
-
-            if (gameDevice)
-            {
-                R33InvalidateDepthStencilCache();
-                if (SUCCEEDED(hr))
-                    ++R33ResetSuccesses;
-                else
-                    ++R33ResetFailures;
-
-                if (!R33FirstResetLifecycleLogged)
-                {
-                    R33FirstResetLifecycleLogged = true;
-                    spdlog::info(
-                        "VR R33 RESET: chained R33 -> R32 -> R22; R22 owns fail-close/baseline and R32 rearms caches only after successful Reset");
-                }
-            }
-            return hr;
-        }
-
-        void R33LogPerfWindow() noexcept
+                                                void R33LogPerfWindow() noexcept
         {
             if (!R33TelemetryEnabled())
                 return;
@@ -824,18 +733,7 @@ namespace OutRunVRStereo
             R33Perf.resetFail = R33ResetFailures;
         }
 
-        HRESULT __stdcall PresentDestR33(IDirect3DDevice9* device,
-            const RECT* sourceRect, const RECT* destRect,
-            HWND destWindowOverride, const RGNDATA* dirtyRegion)
-        {
-            const HRESULT hr = CallLowerPresent(device,
-                sourceRect, destRect, destWindowOverride, dirtyRegion);
-            if (IsGameDevice(device))
-                R33LogPerfWindow();
-            return hr;
-        }
-
-        void R33RollbackHooks() noexcept
+                void R33RollbackHooks() noexcept
         {
             for (auto* hook : R33HookTransaction)
                 *hook = {};
@@ -953,6 +851,121 @@ namespace OutRunVRStereo
 
         VRStereoR33DispatchHook VRStereoR33DispatchHook::instance;
     }
+
+HRESULT __stdcall DrawPrimitiveDestR33(IDirect3DDevice9* device,
+        D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
+    {
+        auto actual = [&]() {
+            return DrawPrimitiveHook.stdcall<HRESULT>(
+                device, type, startVertex, primitiveCount);
+        };
+        auto lower = [&]() {
+            return LowerDrawPrimitive(
+                device, type, startVertex, primitiveCount);
+        };
+        return R33Dispatch(device, actual, lower, "R33/DrawPrimitive");
+    }
+
+
+
+HRESULT __stdcall DrawIndexedPrimitiveDestR33(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+        UINT startIndex, UINT primitiveCount)
+    {
+        auto actual = [&]() {
+            return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
+                baseVertexIndex, minVertexIndex, numVertices, startIndex,
+                primitiveCount);
+        };
+        auto lower = [&]() {
+            return LowerDrawIndexedPrimitive(device,
+                type, baseVertexIndex, minVertexIndex, numVertices,
+                startIndex, primitiveCount);
+        };
+        return R33Dispatch(device, actual, lower,
+            "R33/DrawIndexedPrimitive");
+    }
+
+
+
+HRESULT __stdcall DrawPrimitiveUPDestR33(IDirect3DDevice9* device,
+        D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
+        UINT stride)
+    {
+        auto actual = [&]() {
+            return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                device, type, primitiveCount, data, stride);
+        };
+        auto lower = [&]() {
+            return LowerDrawPrimitiveUP(
+                device, type, primitiveCount, data, stride);
+        };
+        return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP");
+    }
+
+
+
+HRESULT __stdcall DrawIndexedPrimitiveUPDestR33(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
+        const void* indexData, D3DFORMAT indexFormat,
+        const void* vertexData, UINT stride)
+    {
+        auto actual = [&]() {
+            return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
+                minVertexIndex, numVertices, primitiveCount, indexData,
+                indexFormat, vertexData, stride);
+        };
+        auto lower = [&]() {
+            return LowerDrawIndexedPrimitiveUP(device,
+                type, minVertexIndex, numVertices, primitiveCount,
+                indexData, indexFormat, vertexData, stride);
+        };
+        return R33Dispatch(device, actual, lower,
+            "R33/DrawIndexedPrimitiveUP");
+    }
+
+
+
+HRESULT __stdcall ResetDestR33(IDirect3DDevice9* device,
+        D3DPRESENT_PARAMETERS* params)
+    {
+        const bool gameDevice = IsGameDevice(device);
+        const HRESULT hr = CallLowerReset(device, params);
+
+        if (gameDevice)
+        {
+            R33InvalidateDepthStencilCache();
+            if (SUCCEEDED(hr))
+                ++R33ResetSuccesses;
+            else
+                ++R33ResetFailures;
+
+            if (!R33FirstResetLifecycleLogged)
+            {
+                R33FirstResetLifecycleLogged = true;
+                spdlog::info(
+                    "VR R33 RESET: chained R33 -> R32 -> R22; R22 owns fail-close/baseline and R32 rearms caches only after successful Reset");
+            }
+        }
+        return hr;
+    }
+
+
+
+HRESULT __stdcall PresentDestR33(IDirect3DDevice9* device,
+        const RECT* sourceRect, const RECT* destRect,
+        HWND destWindowOverride, const RGNDATA* dirtyRegion)
+    {
+        const HRESULT hr = CallLowerPresent(device,
+            sourceRect, destRect, destWindowOverride, dirtyRegion);
+        if (IsGameDevice(device))
+            R33LogPerfWindow();
+        return hr;
+    }
+
+
 
     void InvalidateDepthStencilStateCache() noexcept
     {

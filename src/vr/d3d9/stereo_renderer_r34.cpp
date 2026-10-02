@@ -18,6 +18,7 @@
 #include "../state/depth_stencil_sync.hpp"
 #include "../state/stateblock_tracking.hpp"
 #include "../core/final_dispatch_state.hpp"
+#include "../core/final_dispatch_hooks.hpp"
 #include "../lifecycle/raw_present.hpp"
 #include "../lifecycle/reset_replay_health.hpp"
 #include "../telemetry/raster_guard_metrics.hpp"
