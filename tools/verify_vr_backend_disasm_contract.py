@@ -2,6 +2,7 @@
 """Verify the DX11/DXVK backend contract still matches recovered OutRun EXE facts."""
 
 from pathlib import Path
+import re
 import runpy
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -212,6 +213,23 @@ def verify_dxvk_continuation_chain() -> None:
         if '"ownership_effect": "NONE"' not in proof_source:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} proof unexpectedly promotes ownership"
+            )
+        semantic_effect_match = re.search(
+            r'"semantic_effect"\s*:\s*"([^"]+)"',
+            proof_source,
+        )
+        if semantic_effect_match is None:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof lost semantic-effect quarantine"
+            )
+        semantic_effect = semantic_effect_match.group(1)
+        if not (
+            semantic_effect.startswith("BOUNDED_CONTROL_FLOW")
+            and semantic_effect.endswith("_ONLY")
+        ):
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof escaped bounded control-flow semantic quarantine: "
+                f"{semantic_effect}"
             )
         proof_status_fail_closed_markers = (
             "proven = bool(",
