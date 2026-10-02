@@ -91,5 +91,108 @@
     "automation_validation": "PASS_SELECTED_UNIT",
     "runtime_validation": "UNTESTED",
     "summary": "Implemented D3D9 legacy BOTHSRCALPHA/BOTHINVSRCALPHA SRCBLEND override semantics in the dormant DX11 pipeline translation, while keeping destination-state misuse and SRC1 dual-source blending fail-closed. Added semantic smoke coverage and source-graph/CI guards. Native Draw* routing remains disabled."
-  }
+  },
+  "continuation_units": [
+    {
+      "unit_id": "DX11_MANAGED_BUFFER_MIRROR_SHADOW_R113",
+      "job_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_MANAGED_BUFFER_MIRROR_SHADOW",
+      "base_sha": "7dd2d2e4277f16a5cbf3444e0f4593e410a9d6b4",
+      "material_result_sha": "5560d5b3c7ffdf8ae2420c4cbf1618ed20eb79fe",
+      "validation_bearing_sha": "bbf291b9aba2130aaf548fe5e3fd60f05975794d",
+      "implementation_commits": [
+        "5560d5b3c7ffdf8ae2420c4cbf1618ed20eb79fe",
+        "bbf291b9aba2130aaf548fe5e3fd60f05975794d"
+      ],
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "D3DPOOL_MANAGED vertex/index buffers already had translation-level CPU-shadow requirements, but unlike managed Texture2D they had no concrete dormant CPU-shadow/generation-bound D3D11 mirror owner. This is independent source/static readiness work and does not require HMD hardware.",
+      "summary": "Added dormant MANAGED VB/IB CPU shadows, exact D3D11 DEFAULT vertex/index buffer mirror creation, device/descriptor verification, Reset-generation invalidation/recreation, WARP byte/lifetime tests, explicit shutdown checks, and a fail-closed R113 source-graph contract. Native Draw* routing remains disabled.",
+      "changed_paths": [
+        "src/vr/d3d11/native_backend.hpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_constant_buffer_probe.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Read branch AGENTS.md, docs/CONVERSION_LANE_STATE.json, current docs/automation/runs/CONV-DX11-000001.json and DX11 plan/work-queue state through the authenticated GitHub connector.",
+            "Read Issue #14 production ledger contract and branch runtime evidence; runtime remains separate from source/static progress."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "translate_resource_behavior/translate_buffer_mutation classified MANAGED Vertex/Index as CPU-shadow-backed but native_backend had no corresponding concrete buffer shadow/mirror owner.",
+            "Managed Texture2D R102-R111 already provided the lifetime model, making a bounded dormant VB/IB counterpart an independent readiness unit."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "changed_paths": [
+            "src/vr/d3d11/native_backend.hpp",
+            "src/vr/d3d11/native_backend.cpp",
+            "tools/dx11_constant_buffer_probe.cpp",
+            "tools/verify_dx11_source_graph.py"
+          ],
+          "material_commit": "5560d5b3c7ffdf8ae2420c4cbf1618ed20eb79fe",
+          "guard_commit": "bbf291b9aba2130aaf548fe5e3fd60f05975794d"
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_STATIC_CONTRACT_BUILD_SUPERSEDED",
+          "automation_validation": "PASS_STATIC_CONTRACT",
+          "evidence": [
+            "Backend Conversion Gate 36969415667 on material SHA 5560d5b3c7ffdf8ae2420c4cbf1618ed20eb79fe passed queue/baseline/one-click/disassembly/session regressions, native-transport contract, dual-source contract, DX11 source graph, dormant activation boundary and census analyzer before concurrency cancelled Configure Win32.",
+            "Backend Conversion Gate 36969850088 on guard SHA bbf291b9aba2130aaf548fe5e3fd60f05975794d passed the new R113-aware Verify DX11 source graph plus dormant activation/census checks before a newer same-branch commit cancelled Configure Win32.",
+            "A retry was also superseded by newer branch work. No Win32 compile or WARP probe success is claimed for this unit.",
+            "A later descendant 4647f909cad0edc80306d590f98a33bc14cc6003 was checked through GitHub and retained the R113 class, implementation, source-graph guard, hosted probe marker and shutdown proof."
+          ],
+          "full_win32_build": "UNCONFIRMED_SUPERSEDED",
+          "warp_probe": "UNCONFIRMED_SUPERSEDED"
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "5560d5b3c7ffdf8ae2420c4cbf1618ed20eb79fe",
+          "guard_commit": "bbf291b9aba2130aaf548fe5e3fd60f05975794d",
+          "issue14_comment_ids": [
+            5946187468,
+            5946237976
+          ]
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Dormant resource-readiness/test work only; no native game Draw* activation, runtime candidate payload, backend promotion or package behavior change."
+        },
+        "C6_STATE": {
+          "status": "PERSISTING_WITH_THIS_STATE_COMMIT",
+          "exact_next_action": "Keep native Draw* disabled. Continue an independent DX11 readiness item; for managed VB/IB specifically, only wire observation-only Lock/Unlock ownership/registry paths after exact source contracts are defined, and require a non-superseded Win32/WARP gate before claiming compiled probe validation."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "related_finding_or_regression_keys": [
+        "DX11-MANAGED-BUFFER-MIRROR-READINESS-001",
+        "DX11-DRAW-ACTIVATION-SURFACE-001"
+      ],
+      "automation_validation": "PASS_STATIC_CONTRACT",
+      "blocker": "Full Win32/WARP probe execution for this unit was repeatedly superseded by newer same-branch pushes; this is not a source-test failure. Runtime Quest 3/VDXR validation remains unavailable and native Draw* remains disabled.",
+      "next_action": "Continue independent GitHub-only DX11 readiness without native Draw* activation; obtain a non-superseded Win32/WARP gate for R113 when branch concurrency permits.",
+      "checkpoint": "C6_STATE",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE"
+    }
+  ],
+  "latest_continuation_unit": "DX11_MANAGED_BUFFER_MIRROR_SHADOW_R113",
+  "state_persisted_for_continuation": true
 }

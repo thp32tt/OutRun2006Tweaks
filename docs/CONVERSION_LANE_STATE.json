@@ -105,5 +105,17 @@
     "runtime_rule": "UNTESTED_DOES_NOT_BLOCK_SOURCE_STATIC_DISASSEMBLY_CI_PROGRESS",
     "interruption_rule": "PARTIAL_C0_C6_CHECKPOINT_IS_FOR_RESUME_ONLY_NOT_NORMAL_TASK_SUCCESS",
     "next_task_rule": "AFTER_FULL_PIPELINE_GATE_PASS_DISPATCH_NEXT_INDEPENDENT_WORK_IMMEDIATELY"
-  }
+  },
+  "completed_static_units": [
+    {
+      "unit_id": "DX11_MANAGED_BUFFER_MIRROR_SHADOW_R113",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "5560d5b3c7ffdf8ae2420c4cbf1618ed20eb79fe",
+      "validation_bearing_sha": "bbf291b9aba2130aaf548fe5e3fd60f05975794d",
+      "automation_validation": "PASS_STATIC_CONTRACT",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false
+    }
+  ]
 }
