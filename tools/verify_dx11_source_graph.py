@@ -4980,13 +4980,15 @@ def main() -> None:
             + ", ".join(missing_sampler_srgb_provenance)
         )
 
-    result_arg_fail_closed_contract = [
+    result_arg_routing_contract = [
         ("FixedFunctionUnsupportedResultArg = 1u << 12",
          PIPELINE_TRANSLATION_HPP, "RESULTARG dedicated unsupported bit"),
         ("DWORD resultArg = D3DTA_CURRENT;", PIPELINE_TRANSLATION_HPP,
          "RESULTARG provenance with D3D9 default"),
-        ("stage.resultArg != D3DTA_CURRENT", PIPELINE_TRANSLATION_CPP,
-         "RESULTARG TEMP fail-closed predicate"),
+        ("stage.resultArg == D3DTA_TEMP", PIPELINE_TRANSLATION_CPP,
+         "RESULTARG TEMP destination support"),
+        ("readsTemp && !tempAvailable", PIPELINE_TRANSLATION_CPP,
+         "uninitialized TEMP fail-closed predicate"),
         ("out.unsupported |= FixedFunctionUnsupportedResultArg;",
          PIPELINE_TRANSLATION_CPP, "RESULTARG readiness blocker propagation"),
         ("D3DTSS_RESULTARG, out.resultArg", RUNTIME_CENSUS,
@@ -4997,10 +4999,10 @@ def main() -> None:
          "detailed RESULTARG telemetry"),
         ("RESULTARG-001 default CURRENT result routing must remain exact",
          SEMANTIC_SMOKE, "CURRENT positive semantic probe"),
-        ("RESULTARG-001 TEMP result routing must fail closed",
-         SEMANTIC_SMOKE, "TEMP negative semantic probe"),
-        ("RESULTARG-001 TEMP result routing must block shader generation",
-         SEMANTIC_SMOKE, "shader-generation fail-closed probe"),
+        ("RESULTARG-001 initialized TEMP routing must remain exact",
+         SEMANTIC_SMOKE, "initialized TEMP positive semantic probe"),
+        ("RESULTARG-001 uninitialized TEMP read must fail closed",
+         SEMANTIC_SMOKE, "uninitialized TEMP negative semantic probe"),
         ("resultArg", analyzer, "census analyzer exposes RESULTARG"),
         ("R(?:72|8[12345]|160|173|194|197) ffp signature", analyzer,
          "RESULTARG census parser retains legacy and current signature versions"),
@@ -5009,7 +5011,7 @@ def main() -> None:
          "R173 RESULTARG census fixture version"),
     ]
     missing_result_arg = [
-        meaning for token, source, meaning in result_arg_fail_closed_contract
+        meaning for token, source, meaning in result_arg_routing_contract
         if token not in source
     ]
     if missing_result_arg:
@@ -7972,7 +7974,7 @@ def main() -> None:
         (
             "FixedFunctionUnsupportedResultArg = 1u << 12",
             PIPELINE_TRANSLATION_HPP,
-            "R173 RESULTARG unsupported readiness bit",
+            "R173/R200 RESULTARG unsupported readiness bit",
         ),
         (
             "DWORD resultArg = D3DTA_CURRENT;",
@@ -7980,14 +7982,19 @@ def main() -> None:
             "R173 RESULTARG default provenance",
         ),
         (
-            "if (stage.resultArg != D3DTA_CURRENT)",
+            "stage.resultArg == D3DTA_TEMP",
             PIPELINE_TRANSLATION_CPP,
-            "R173 non-CURRENT readiness fail-closed gate",
+            "R200 TEMP result destination support",
+        ),
+        (
+            "readsTemp && !tempAvailable",
+            PIPELINE_TRANSLATION_CPP,
+            "R200 uninitialized TEMP readiness gate",
         ),
         (
             "FixedFunctionUnsupportedResultArg;",
             PIPELINE_TRANSLATION_CPP,
-            "R173 RESULTARG readiness blocker",
+            "R173/R200 RESULTARG readiness blocker",
         ),
         (
             "D3DTSS_RESULTARG, out.resultArg",
@@ -8005,14 +8012,19 @@ def main() -> None:
             "R173 RESULTARG detailed evidence",
         ),
         (
-            "R173 D3DTSS_RESULTARG TEMP must fail closed",
+            "R200 D3DTSS_RESULTARG TEMP write/read chain must become exact",
             FIXED_FUNCTION_PIPELINE_PROBE,
-            "R173 TEMP negative probe",
+            "R200 TEMP positive probe",
         ),
         (
-            "DX11 fixed-function RESULTARG fail-closed R173: PASS",
+            "R200 uninitialized D3DTA_TEMP read must fail closed",
             FIXED_FUNCTION_PIPELINE_PROBE,
-            "R173 hosted probe completion marker",
+            "R200 uninitialized TEMP negative probe",
+        ),
+        (
+            "DX11 fixed-function RESULTARG TEMP register support R200: PASS",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R200 hosted probe completion marker",
         ),
     ]
     missing_r173_resultarg = [

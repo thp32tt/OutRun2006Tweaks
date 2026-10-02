@@ -902,17 +902,43 @@ int main()
                 "RESULTARG-001 default CURRENT result routing must remain exact");
 
         stages[0].resultArg = D3DTA_TEMP;
+        stages[1] = active_stage(
+            D3DTOP_ADD,
+            D3DTA_TEMP,
+            D3DTA_CURRENT,
+            D3DTOP_ADD,
+            D3DTA_TEMP,
+            D3DTA_CURRENT,
+            1);
         const auto tempResult =
             translate_fixed_function_readiness(stages, true, 0x00, 0x00);
-        require(!tempResult.exact(),
-                "RESULTARG-001 TEMP result routing must fail closed");
-        require((tempResult.unsupported & FixedFunctionUnsupportedResultArg) != 0,
-                "RESULTARG-001 TEMP result routing blocker missing");
+        require(tempResult.exact(),
+                "RESULTARG-001 initialized TEMP routing must remain exact");
         const auto tempPrototype =
             generate_fixed_function_pixel_shader_prototype(
                 stages, true, 0x00, 0x00, textureTypes);
-        require(!tempPrototype.generated(),
-                "RESULTARG-001 TEMP result routing must block shader generation");
+        require(
+            tempPrototype.generated() &&
+            tempPrototype.source.find(
+                "temp = float4(nextColor, nextAlpha);") != std::string::npos &&
+            tempPrototype.source.find(
+                "float3 nextColor = temp.rgb + current.rgb;") != std::string::npos,
+            "RESULTARG-001 initialized TEMP routing shader dataflow drift");
+
+        auto uninitializedTemp = stages;
+        uninitializedTemp[0].resultArg = D3DTA_CURRENT;
+        uninitializedTemp[0].colorArg1 = D3DTA_TEMP;
+        uninitializedTemp[0].alphaArg1 = D3DTA_TEMP;
+        uninitializedTemp[1].colorOp = D3DTOP_DISABLE;
+        uninitializedTemp[1].alphaOp = D3DTOP_DISABLE;
+        const auto uninitializedResult =
+            translate_fixed_function_readiness(
+                uninitializedTemp, true, 0x00, 0x00);
+        require(
+            !uninitializedResult.exact() &&
+            (uninitializedResult.unsupported &
+             FixedFunctionUnsupportedResultArg) != 0,
+            "RESULTARG-001 uninitialized TEMP read must fail closed");
     }
 
     {
