@@ -507,6 +507,7 @@ namespace OutRunVRStereo
         {
             return R20StereoEligibilityGate.load(std::memory_order_acquire);
         }
+    }
 
     HRESULT __stdcall ResetDestR22(IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
@@ -526,6 +527,8 @@ namespace OutRunVRStereo
             return hr;
         }
 
+    namespace
+    {
         HRESULT __stdcall ClearDestR22(IDirect3DDevice9* device, DWORD count,
             const D3DRECT* rects, DWORD flags, D3DCOLOR color, float z,
             DWORD stencil)
