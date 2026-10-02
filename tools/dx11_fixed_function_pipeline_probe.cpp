@@ -217,6 +217,42 @@ int main()
             "R161 fixed-function shader handoff must retain clipping blocker");
     }
 
+    {
+        auto unbiased = base_state();
+        const auto unbiasedPipeline = translate_pipeline(unbiased);
+        require(
+            unbiasedPipeline.exact() &&
+            (unbiasedPipeline.unsupported & PipelineUnsupportedDepthBias) == 0,
+            "DX11 zero depth bias must remain exact");
+
+        auto constantBias = unbiased;
+        constantBias.depthBiasBits = 0x3F000000u; // +0.5f as raw D3D9 bits
+        const auto constantBiasPipeline = translate_pipeline(constantBias);
+        require(
+            !constantBiasPipeline.exact() &&
+            (constantBiasPipeline.unsupported &
+             PipelineUnsupportedDepthBias) != 0,
+            "DX11 nonzero D3D9 constant depth bias must fail closed");
+
+        auto slopeBias = unbiased;
+        slopeBias.slopeScaleDepthBiasBits = 0xBF800000u; // -1.0f
+        const auto slopeBiasPipeline = translate_pipeline(slopeBias);
+        require(
+            !slopeBiasPipeline.exact() &&
+            (slopeBiasPipeline.unsupported &
+             PipelineUnsupportedDepthBias) != 0,
+            "DX11 nonzero D3D9 slope depth bias must fail closed");
+
+        const auto fixedSlopeBias =
+            translate_fixed_function_pipeline_with_shader_semantics(
+                slopeBias, true, stages, true, 0x00, 0x00, textureTypes);
+        require(
+            !fixedSlopeBias.exact() &&
+            (fixedSlopeBias.renderStates.unsupported &
+             PipelineUnsupportedDepthBias) != 0,
+            "DX11 fixed-function handoff must retain depth-bias blocker");
+    }
+
     std::cout
         << "DX11 fixed-function clipping fail-closed R161: PASS\n"
         << "DX11 fixed-function alpha-test pipeline handoff R118: PASS\n"
