@@ -1,0 +1,42 @@
+services:
+  outrun-chat-controller:
+    build:
+      context: .
+      dockerfile: Dockerfile.portainer
+    container_name: outrun-chat-controller
+    restart: unless-stopped
+    init: true
+    ipc: host
+    shm_size: "2gb"
+    environment:
+      TZ: Asia/Seoul
+      AUTO_SEND: "${AUTO_SEND:-true}"
+      SCHEDULE_MINUTES: "0,20,40"
+      CHAT_SLOTS: "3"
+      CHAT_DAY_ROLLOVER_HOUR: "2"
+      CHATGPT_BASE_URL: "https://chatgpt.com/"
+      PREFERRED_THINKING_LEVEL: "High"
+      STRICT_THINKING_LEVEL: "true"
+      FRESH_CHAT_EACH_RUN: "false"
+      RETRY_BUTTON_COOLDOWN_SECONDS: "45"
+      VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
+      STATUS_PORT: "8787"
+      WATCHDOG_ENABLED: "false"
+      WATCHDOG_STALL_MINUTES: "5"
+      WATCHDOG_BUSY_STALL_MINUTES: "10"
+      WATCHDOG_CHECK_SECONDS: "30"
+      WATCHDOG_MAX_RESUMES_PER_RUN: "1"
+      WATCHDOG_FORCE_STOP_STALLED: "false"
+      RATE_LIMIT_BACKOFF_SECONDS: "30,60,120"
+      MIN_SEND_GAP_SECONDS: "45"
+      SLOT_DEDUP_SECONDS: "120"
+    ports:
+      - "6080:6080"
+      - "8787:8787"
+    volumes:
+      - outrun_chat_data:/data
+      - outrun_chat_logs:/logs
+
+volumes:
+  outrun_chat_data:
+  outrun_chat_logs:

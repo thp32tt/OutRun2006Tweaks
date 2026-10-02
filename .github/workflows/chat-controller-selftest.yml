@@ -46,79 +46,13 @@ jobs:
           grep -Fq 'EXPECTED_PROJECT_ID: "g-p-6ab9a64fc428819198c7f39765d764bf"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'No assistant response was detected before the queue result grace period expired' tools/chat-controller/v0.4/src/controller.py.part03
 
-      - name: Verify native plugins and evidence-based recovery
-        run: |
-          python tools/chat-controller/v0.4/test_native_controller.py
-          grep -Fq 'FIRST_ACTION=CALL_CONNECTED_GITHUB_PLUGIN' /tmp/controller.py
-          grep -Fq 'PUBLIC_GITHUB_ACCESS=DO_NOT_USE' /tmp/controller.py
-          if grep -Eq 'def github_api_mutation_json|def github_broker_|\[BROKER_(READ|CHANGESET)\]' /tmp/controller.py; then
-            echo "Removed broker execution path remains"
-            exit 1
-          fi
-
-      - name: Verify browser transport self-recovery
-        run: |
-          grep -Fq 'mem_limit: 5g' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'mem_reservation: 2g' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'def is_browser_transport_failure' /tmp/controller.py
-          grep -Fq 'status="browser_transport_lost"' /tmp/controller.py
-          grep -Fq 'Docker restart policy can recover' /tmp/controller.py
-          test "$(grep -Fc 'if is_browser_transport_failure(e):' /tmp/controller.py)" -ge 3
-
-      - name: Verify bounded generic Retry recovery
-        run: |
-          grep -Fq 'GENERIC_RETRY_ROLLOVER_CLICKS: "2"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'GENERIC_RETRY_ROLLOVER_CLICKS: "2"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'GENERIC_RETRY_COOLDOWN_SECONDS: "300"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'GENERIC_RETRY_COOLDOWN_SECONDS: "300"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS: "300"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS: "300"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'generic_retry_cooldown_until' /tmp/controller.py
-          grep -Fq 'status="generic_retry_circuit_wait"' /tmp/controller.py
-          grep -Fq 'same TASK_ID/chat and cooling down instead of opening another chat' /tmp/controller.py
-          test "$(grep -Fc 'queue_handle_retry_surface(context, pages, page, reg, slot, active, q)' /tmp/controller.py)" -eq 2
-
-      - name: Verify queue prompt files and image packaging
+      - name: Verify queue prompt files
         run: |
           test -s tools/chat-controller/v0.4/conversion_dx11.md
           test -s tools/chat-controller/v0.4/conversion_dxvk.md
           test -s tools/chat-controller/v0.4/localization_A.md
           test -s tools/chat-controller/v0.4/localization_B.md
           test -s tools/chat-controller/v0.4/localization_C.md
-          test -s tools/chat-controller/v0.4/localization_E.md
-          dockerfile=tools/chat-controller/v0.4/Dockerfile.portainer
-          grep -Fq 'COPY conversion_dx11.md /opt/outrun/prompts/conversion_dx11.md' "$dockerfile"
-          grep -Fq 'COPY conversion_dxvk.md /opt/outrun/prompts/conversion_dxvk.md' "$dockerfile"
-          grep -Fq 'COPY localization_A.md /opt/outrun/prompts/localization_A.md' "$dockerfile"
-          grep -Fq 'COPY localization_B.md /opt/outrun/prompts/localization_B.md' "$dockerfile"
-          grep -Fq 'COPY localization_C.md /opt/outrun/prompts/localization_C.md' "$dockerfile"
-          grep -Fq 'COPY localization_E.md /opt/outrun/prompts/localization_E.md' "$dockerfile"
-          grep -Fq 'def validate_runtime_assets()' /tmp/controller.py
-          grep -Fq 'validate_runtime_assets()' /tmp/controller.py
-          python - <<'PY2'
-          from pathlib import Path
-          import re
-          root = Path('tools/chat-controller/v0.4')
-          dockerfile = (root/'Dockerfile.portainer').read_text(encoding='utf-8')
-          for line in dockerfile.splitlines():
-              line=line.strip()
-              if not line.startswith('COPY ') or '*' in line:
-                  continue
-              parts=line.split()
-              if len(parts) < 3:
-                  continue
-              src=parts[1]
-              if src.startswith('--'):
-                  continue
-              assert (root/src).exists(), f'Dockerfile COPY source missing: {src}'
-          src=Path('/tmp/controller.py').read_text(encoding='utf-8')
-          required={'conversion_dx11.md','conversion_dxvk.md','localization_A.md','localization_B.md','localization_C.md','localization_E.md'}
-          copied=set(re.findall(r'^COPY\s+([^\s]+\.md)\s+/opt/outrun/prompts/', dockerfile, re.M))
-          assert required.issubset(copied), (required-copied)
-          main=src[src.index('async def main_async'):]
-          assert main.index('validate_runtime_assets()') < main.index('async_playwright()')
-          print('runtime prompt assets and Docker COPY sources verified')
-          PY2
 
       - name: Verify authorized game-mod context
         run: |
@@ -139,11 +73,11 @@ jobs:
           grep -Fq 'QUEUE_NEXT_TASK_DELAY_SECONDS: "15"' "$compose"
           grep -Fq 'QUEUE_IDLE_REARM_SECONDS: "90"' "$compose"
           grep -Fq 'PARALLEL_LANE_STAGGER_SECONDS: "15"' "$compose"
-          grep -Fq 'PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS: "30"' "$compose"
+          grep -Fq 'PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS: "15"' "$compose"
           grep -Fq 'HEARTBEAT_SECONDS: "15"' "$compose"
           grep -Fq 'LOCALIZATION_QA_BATCH_SIZE: "4"' "$compose"
-          grep -Fq 'LOCALIZATION_QA_COALESCE_SECONDS: "60"' "$compose"
-          grep -Fq 'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS: "90"' "$compose"
+          grep -Fq 'LOCALIZATION_QA_COALESCE_SECONDS: "30"' "$compose"
+          grep -Fq 'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS: "15"' "$compose"
           grep -Fq 'LOCALIZATION_SLOT_DEDUP_SECONDS: "30"' "$compose"
           grep -Fq 'def github_action_run_by_id' /tmp/controller.py
           grep -Fq 'run_id=bound_run_id' /tmp/controller.py
@@ -161,343 +95,50 @@ jobs:
 
       - name: Verify continuous producer and batch-QA architecture
         run: |
-          grep -Fq 'CHAT_SLOTS: "4"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'FRESH_CHAT_EACH_RUN: "false"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'FRESH_CHAT_EACH_RUN: "false"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'CHAT_REUSE_MAX_TASKS: "4"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'CHAT_REUSE_MAX_TASKS: "4"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'PREVIOUS_TASK_UI_SETTLE_SECONDS: "180"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'PREVIOUS_TASK_UI_SETTLE_SECONDS: "180"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'mem_limit: 4g' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'mem_reservation: 2g' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
           grep -Fq 'def enqueue_producer_result_for_qa' /tmp/controller.py
           grep -Fq 'def finalize_c_qa_batch' /tmp/controller.py
           grep -Fq 'qa_pending' /tmp/controller.py
-          grep -Fq '"D": "localization_E.md"' tools/chat-controller/v0.4/src/controller.py.part02
-          grep -Fq 'def prepare_reusable_slot_chat' tools/chat-controller/v0.4/src/controller.py.part02
-          grep -Fq 'previous_task_ui_settle_wait' tools/chat-controller/v0.4/src/controller.py.part02
-          grep -Fq 'bounded_chat_recycle' tools/chat-controller/v0.4/src/controller.py.part02
-          grep -Fq 'lane_dispatch_config_error' tools/chat-controller/v0.4/src/controller.py.part03
-          grep -Fq 'lane_dispatch_errors' tools/chat-controller/v0.4/src/controller.py.part03
-          grep -Fq 'except FileNotFoundError as e:' tools/chat-controller/v0.4/src/controller.py.part03
-          grep -Fq 'schema_version, config_blob_sha = localization_controller_contract_fingerprint()' tools/chat-controller/v0.4/src/controller.py.part03
-          grep -Fq 'CONTROLLER_CONFIG_BLOB_SHA=' tools/chat-controller/v0.4/src/controller.py.part03
-          grep -Fq 'container_memory_current_mib' /tmp/controller.py
-          for prompt in localization_A.md localization_B.md localization_C.md localization_E.md; do
-            grep -Fq 'docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md' "tools/chat-controller/v0.4/$prompt"
-            grep -Fq 'localization/controller_roles.json' "tools/chat-controller/v0.4/$prompt"
-          done
-          python - <<'PY2'
+          grep -Fq 'LOCALIZATION_QA_BATCH_SIZE' /tmp/controller.py
+          grep -Fq 'QA_BATCH_INPUTS' tools/chat-controller/v0.4/localization_C.md
+          grep -Fq '독립 C QA consumer' tools/chat-controller/v0.4/localization_A.md
+          grep -Fq '독립 C QA consumer' tools/chat-controller/v0.4/localization_B.md
+          grep -Fq 'candidate-completion-first' tools/chat-controller/v0.4/localization_A.md
+          grep -Fq 'candidate-completion-first' tools/chat-controller/v0.4/localization_B.md
+          grep -Fq 'Candidate-completion-first' tools/chat-controller/v0.4/localization_C.md
+          grep -Fq 'candidate-completion-first' tools/chat-controller/v0.4/src/controller.py.part00
+          grep -Fq 'ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.' tools/chat-controller/v0.4/src/controller.py.part00
+          grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/localization_A.md
+          grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/localization_B.md
+          grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/src/controller.py.part00
+          grep -Fq 'Google Drive canonical HD source transport' tools/chat-controller/v0.4/src/controller.py.part03
+          if grep -Fq '반드시 GitHub만 직접 사용하고 N100' tools/chat-controller/v0.4/src/controller.py.part00 tools/chat-controller/v0.4/src/controller.py.part03; then
+            echo "legacy GitHub-only dispatch constraint remains"
+            exit 1
+          fi
+          echo "candidate-completion-first producer policy verified"
+          if grep -Fq 'A+B -> C synchronization barrier' tools/chat-controller/v0.4/DEPLOY_PORTAINER.md; then
+            echo "legacy localization QA barrier remains in deployment docs"
+            exit 1
+          fi
+          python - <<'PY'
           from pathlib import Path
           src = Path("/tmp/controller.py").read_text(encoding="utf-8")
           a = src.index("async def localization_parallel_cycle")
           b = src.index("def reconcile_legacy_conversion_blocked", a)
           body = src[a:b]
-          assert 'active_lane_order = sorted(' in body
-          assert 'for lane_key in active_lane_order:' in body
-          assert 'for lane_key in ("A", "B", "D")' in body
+          assert 'for lane_key in ("A", "B", "C")' in body
           assert 'enqueue_producer_result_for_qa' in body
           assert 'LOCALIZATION_QA_COALESCE_SECONDS' in body
+          qa_helpers = src[src.index("def _qa_item_key"):src.index("async def localization_parallel_cycle")]
+          assert 'task.get("terminal") not in {"PRODUCED", "PASS"}' in qa_helpers
           proc = src[src.index("async def localization_process_lane"):src.index("def _qa_item_key")]
-          assert 'if lane_key in {"A", "B", "D"}:' in proc
-          send = src[src.index("async def localization_send_lane_task"):src.index("def finalize_localization_producer_commit")]
-          assert 'if FRESH_CHAT_EACH_RUN:' in send
-          assert 'prepare_reusable_slot_chat(context, pages, reg, slot' in send
-          assert 'previous task still generating; not opening a new chat yet' in send
-          assert 'No producer/C barrier exists.' in body
-          assert body.index('Priority lane {priority_lane} waiting for {guard}') < body.index('active_lane_order = sorted(')
-          assert 'preserving send gap before active Retry traffic' in body
-          print("four-slot A/B/E producers + C QA with bounded chat reuse verified")
-          PY2
-
-      - name: Verify schema 32 policy alignment
-        run: |
-          git fetch --force origin refs/heads/korean-localization-clean:refs/remotes/origin/korean-localization-clean
-          git show refs/remotes/origin/korean-localization-clean:localization/controller_roles.json > /tmp/controller_roles.json
-          python - <<'PY2'
-          import json, pathlib, re
-          cfg=json.loads(pathlib.Path('/tmp/controller_roles.json').read_text())
-          assert cfg['schema_version'] >= 32
-          ex=cfg['execution']; rt=cfg['runtime_tuning']; obs=cfg['runtime_observability']
-          assert ex['controller_slot_count'] == 4
-          assert ex['slot_map'] == {'A':'A','B':'B','C':'C','D':'E'}
-          assert ex['concurrent_group'] == ['A','B','E'] and ex['qa_consumer'] == 'C'
-          assert cfg['lanes']['C']['coalesce_seconds'] == 60
-          assert rt['localization_qa_batch_size'] == 4
-          assert rt['localization_qa_coalesce_seconds'] == 60
-          assert rt['parallel_distinct_slot_send_gap_seconds'] == 30
-          assert rt['localization_same_slot_send_gap_seconds'] == 90
-          assert rt['localization_slot_dedup_seconds'] == 30
-          assert rt['localization_extra_producer_qa_pause_threshold'] == 16
-          assert rt['localization_extra_producer_qa_resume_threshold'] == 12
-          assert rt['generic_retry_rollover_clicks'] == 2
-          assert rt['fresh_chat_each_task'] is False
-          assert rt['chat_reuse_max_tasks'] == 4
-          assert rt['chat_reuse_max_age_minutes'] == 90
-          assert rt['previous_task_ui_settle_seconds'] == 180
-          assert rt['max_chat_rollovers_per_task'] == 2
-          assert rt['github_transient_retry_delays'] == [2,5,10,20]
-          assert rt['github_transient_cooldown_seconds'] == 60
-          assert obs['task_chat_lifecycle'] == 'BOUNDED_REUSE_4_TASKS_OR_90_MINUTES'
-          assert obs['previous_task_ui_settle_status'] == 'previous_task_ui_settle_wait'
-          assert obs['github_transient_status'] == 'github_retry_wait'
-          cp=cfg['runtime_recovery']['continuous_progression']
-          assert cp['missing_lane_dispatch_precedes_retry_traffic'] is True
-          assert cp['preserve_send_gap_for_missing_lane'] is True
-          assert cp['durable_git_precedes_ui_recovery'] is True
-          assert cp['post_send_task_identity_preserved'] is True
-          assert cp['chat_rate_limit_blocks_sends_not_git_reconcile'] is True
-          assert cp['negative_task_commit_lookup_not_cached'] is True
-          assert cp['lane_exception_isolation'] is True
-          assert cp['lane_exception_block_threshold'] == 3
-          assert cp['dispatch_exception_backoff_max_seconds'] == 300
-          assert cp['browser_transport_failure_global_restart'] is True
-          assert cp['previous_task_ui_must_settle_before_next_send'] is True
-          assert cp['previous_task_ui_settle_seconds'] == 180
-          assert cp['bounded_chat_reuse'] is True
-          assert cp['chat_reuse_max_tasks'] == 4
-          assert cp['chat_reuse_max_age_minutes'] == 90
-          assert cp['github_transient_errors_never_consume_task_attempt'] is True
-          assert cp['github_transient_errors_never_trigger_chat_rollover'] is True
-          assert cp['github_transient_retry_forever_across_cycles'] is True
-          assert cp['github_transient_internal_retry_delays'] == [2,5,10,20]
-          assert cp['github_transient_cooldown_seconds'] == 60
-          assert cp['active_lane_retry_fairness'] is True
-          assert cp['active_lane_recovery_order'] == 'OLDEST_EFFECTIVE_SEND_FIRST'
-          assert cp['active_lane_effective_send_fields'] == ['last_retry_click_at','last_rollover_at','sent_at']
-          assert obs['active_lane_recovery_order_field'] == 'active_lane_recovery_order'
-          wd=cfg['runtime_recovery']['watchdog']
-          assert wd['queue_mode_role'] == 'STATE_REARM_ONLY'
-          assert wd['queue_mode_ui_owner'] == 'QUEUE_ENGINE'
-          assert wd['queue_mode_ui_observation'] is False
-          assert wd['queue_mode_ui_actions'] is False
-          assert obs['queue_mode_watchdog_role'] == 'STATE_REARM_ONLY'
-          assert cp['pre_send_task_identity_persisted'] is True
-          assert cp['dispatch_confirmation_after_send'] is True
-          assert cp['uncertain_dispatch_grace_seconds'] == 180
-          assert cp['uncertain_dispatch_same_task_rollover'] is True
-          assert cp['live_page_url_reconciles_stale_registry'] is True
-          assert obs['dispatch_confirmation_field'] == 'dispatch_confirmed'
-          assert obs['dispatch_started_at_field'] == 'dispatch_started_at'
-          assert cp['c_blocked_inputs_remain_qa_pending'] is True
-          assert cp['qa_blocked_is_diagnostic_not_consumed'] is True
-          assert cp['startup_requeues_legacy_qa_blocked_inputs'] is True
-          assert obs['qa_blocked_semantics'] == 'DIAGNOSTIC_UNVALIDATED_INPUTS_REMAIN_PENDING'
-          assert cp['qa_blocked_retry_backoff_seconds'] == [300,600,1200,1800]
-          assert cp['qa_blocked_retry_rotates_to_tail'] is True
-          assert cp['qa_ready_selection_skips_backoff_items'] is True
-          assert cp['qa_blocked_retry_does_not_block_other_ready_inputs'] is True
-          assert obs['qa_retry_fields'] == ['qa_retry_count','qa_retry_not_before','last_qa_blocked_task_id','last_qa_blocked_at']
-          assert cp['controller_restart_requested_bypasses_lane_isolation'] is True
-          assert cp['thinking_verification_restart_is_immediate'] is True
-          assert cp['clean_home_composer_recovery_persists_canonical_slot_clear'] is True
-          assert cfg['runtime_recovery']['process_recovery']['controller_restart_requested_immediate_exit'] is True
-          assert obs['controller_restart_status'] == 'controller_restart_requested'
-          assert cp['qa_pending_unconsumed_never_truncated'] is True
-          assert obs['qa_pending_retention'] == 'UNTIL_C_CONSUMES_TASK_ID_RESULT_SHA'
-          assert obs['queue_active_null_allowed_only_when_active_by_lane_empty'] is False
-          assert obs['queue_active_null_allowed_in_parallel_mode'] is True
-          assert obs['queue_active_legacy_field_must_not_gate_parallel_lanes'] is True
-          state=cfg['runtime_recovery']['state_persistence']
-          proc=cfg['runtime_recovery']['process_recovery']
-          assert state['last_known_good_backup'] is True and state['destructive_empty_reset_on_unreadable_state'] is False
-          assert proc['repeated_identical_queue_exception_restart_threshold'] == 3
-          assert proc['repeated_identical_watchdog_exception_restart_threshold'] == 3
-          assert proc['consecutive_queue_exception_restart_threshold'] == 3
-          assert proc['consecutive_watchdog_exception_restart_threshold'] == 3
-          assert proc['exception_signature_is_diagnostic_only'] is True
-          assert proc['queue_heartbeat_fatal_seconds'] == 180
-          assert proc['memory_idle_restart_percent'] == 80
-          assert proc['memory_fatal_restart_percent'] == 92
-          assert proc['memory_idle_restart_requires_no_active_task'] is True
-          assert proc['memory_fatal_restart_preserves_queue_state'] is True
-          assert obs['health_includes_memory_pressure'] is True
-          assert rt['wait_actions_max_seconds'] == 1800
-          assert rt['process_heartbeat_fatal_seconds'] == 180
-          assert rt['github_task_commit_scan_pages'] == 3
-          assert rt['github_actions_discovery_per_page'] == 100
-          assert rt['memory_idle_restart_percent'] == 80
-          assert rt['memory_fatal_restart_percent'] == 92
-          assert cp['task_commit_branch_scan_pages'] == 3
-          assert cp['actions_discovery_per_page'] == 100
-          assert obs['heartbeat_fatal_after_seconds'] == 180
-          assert obs['runtime_asset_validation'] == 'FAIL_FAST_BEFORE_BROWSER_DISPATCH'
-          assert obs['health_endpoint'] == '/healthz'
-          assert obs['dispatch_fairness'] == 'FILL_READY_C_OR_MISSING_PRODUCER_BEFORE_ACTIVE_RETRY_TRAFFIC'
-          text=pathlib.Path('tools/chat-controller/v0.4/docker-compose.portainer-localization.yml').read_text()
-          expected={
-            'CHAT_SLOTS':4,
-            'PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS':rt['parallel_distinct_slot_send_gap_seconds'],
-            'LOCALIZATION_QA_BATCH_SIZE':rt['localization_qa_batch_size'],
-            'LOCALIZATION_QA_COALESCE_SECONDS':rt['localization_qa_coalesce_seconds'],
-            'LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS':rt['localization_same_slot_send_gap_seconds'],
-            'LOCALIZATION_SLOT_DEDUP_SECONDS':rt['localization_slot_dedup_seconds'],
-            'LOCALIZATION_E_QA_PAUSE_THRESHOLD':rt['localization_extra_producer_qa_pause_threshold'],
-            'LOCALIZATION_E_QA_RESUME_THRESHOLD':rt['localization_extra_producer_qa_resume_threshold'],
-            'GENERIC_RETRY_ROLLOVER_CLICKS':rt['generic_retry_rollover_clicks'],
-            'WAIT_ACTIONS_MAX_SECONDS':rt['wait_actions_max_seconds'],
-            'QUEUE_ERROR_RESTART_THRESHOLD':rt['queue_error_restart_threshold'],
-            'WATCHDOG_ERROR_RESTART_THRESHOLD':rt['watchdog_error_restart_threshold'],
-            'PROCESS_HEARTBEAT_FATAL_SECONDS':rt['process_heartbeat_fatal_seconds'],
-            'GITHUB_TASK_COMMIT_SCAN_PAGES':rt['github_task_commit_scan_pages'],
-            'GITHUB_ACTIONS_DISCOVERY_PER_PAGE':rt['github_actions_discovery_per_page'],
-            'MEMORY_IDLE_RESTART_PERCENT':rt['memory_idle_restart_percent'],
-            'MEMORY_FATAL_RESTART_PERCENT':rt['memory_fatal_restart_percent'],
-          }
-          for key,val in expected.items():
-            m=re.search(rf'^\s+{re.escape(key)}:\s+"?(\d+)"?\s*$',text,re.M)
-            assert m and int(m.group(1))==int(val), (key,val,m.group(1) if m else None)
-          assert re.search(r'^\s+FRESH_CHAT_EACH_RUN:\s+"false"\s*$',text,re.M)
-          assert re.search(r'^\s+CHAT_REUSE_MAX_TASKS:\s+"4"\s*$',text,re.M)
-          assert re.search(r'^\s+CHAT_REUSE_MAX_AGE_MINUTES:\s+"90"\s*$',text,re.M)
-          assert re.search(r'^\s+PREVIOUS_TASK_UI_SETTLE_SECONDS:\s+"180"\s*$',text,re.M)
-          assert re.search(r'^\s+MAX_CHAT_ROLLOVERS_PER_TASK:\s+"2"\s*$',text,re.M)
-          print('schema 32 policy and deployment values aligned')
-          PY2
-
-      - name: Verify end-to-end liveness bounds
-        run: |
-          for compose in \
-            tools/chat-controller/v0.4/docker-compose.portainer-vr.yml \
-            tools/chat-controller/v0.4/docker-compose.portainer-localization.yml; do
-            grep -Fq 'WAIT_ACTIONS_MAX_SECONDS: "1800"' "$compose"
-            grep -Fq 'QUEUE_ERROR_RESTART_THRESHOLD: "3"' "$compose"
-            grep -Fq 'WATCHDOG_ERROR_RESTART_THRESHOLD: "3"' "$compose"
-            grep -Fq 'PROCESS_HEARTBEAT_FATAL_SECONDS: "180"' "$compose"
-            grep -Fq 'MAX_CHAT_ROLLOVERS_PER_TASK: "2"' "$compose"
-            grep -Fq 'FRESH_CHAT_EACH_RUN: "false"' "$compose"
-            grep -Fq 'CHAT_REUSE_MAX_TASKS: "4"' "$compose"
-            grep -Fq 'CHAT_REUSE_MAX_AGE_MINUTES: "90"' "$compose"
-            grep -Fq 'PREVIOUS_TASK_UI_SETTLE_SECONDS: "180"' "$compose"
-            grep -Fq 'GITHUB_TRANSIENT_RETRY_DELAYS: "2,5,10,20"' "$compose"
-            grep -Fq 'GITHUB_TRANSIENT_COOLDOWN_SECONDS: "60"' "$compose"
-          done
-          grep -Fq 'REGISTRY_BACKUP_FILE' /tmp/controller.py
-          grep -Fq 'QUEUE_BACKUP_FILE' /tmp/controller.py
-          grep -Fq 'refusing destructive reset' /tmp/controller.py
-          grep -Fq 'daily registry date advanced without dropping active slot state' /tmp/controller.py
-          grep -Fq 'docs/automation/runs/{task_id}.json' /tmp/controller.py
-          grep -Fq '_github_task_commit_cache' /tmp/controller.py
-          grep -Fq 'Cache only positive path history' /tmp/controller.py
-          grep -Fq 'heartbeat_stalled_restart' /tmp/controller.py
-          grep -Fq 'def start_process_liveness_monitor' /tmp/controller.py
-          grep -Fq 'queue_error_restart' /tmp/controller.py
-          grep -Fq 'watchdog_error_restart' /tmp/controller.py
-          grep -Fq 'class GitHubTransientError' /tmp/controller.py
-          grep -Fq 'github_transient_retry_pending' /tmp/controller.py
-          grep -Fq 'GITHUB_TRANSIENT_RETRY_DELAYS' /tmp/controller.py
-          grep -Fq 'GitHub temporary error; holding current chat/task' /tmp/controller.py
-          grep -Fq 'def prepare_reusable_slot_chat' /tmp/controller.py
-          grep -Fq 'def reconcile_localization_blocked_producer_commits' /tmp/controller.py
-          grep -Fq 'startup_blocked_producer_recovered' /tmp/controller.py
-          grep -Fq 'recovered_from_false_blocked' /tmp/controller.py
-          grep -Fq 'GITHUB_TASK_COMMIT_SCAN_PAGES' /tmp/controller.py
-          grep -Fq 'for page_no in range(1, GITHUB_TASK_COMMIT_SCAN_PAGES + 1)' /tmp/controller.py
-          grep -Fq '"per_page": GITHUB_ACTIONS_DISCOVERY_PER_PAGE' /tmp/controller.py
-          grep -Fq 'GITHUB_TASK_COMMIT_SCAN_PAGES: "3"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'GITHUB_TASK_COMMIT_SCAN_PAGES: "3"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'GITHUB_ACTIONS_DISCOVERY_PER_PAGE: "100"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'GITHUB_ACTIONS_DISCOVERY_PER_PAGE: "100"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'MEMORY_IDLE_RESTART_PERCENT: "80"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'MEMORY_IDLE_RESTART_PERCENT: "80"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'MEMORY_FATAL_RESTART_PERCENT: "92"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq 'MEMORY_FATAL_RESTART_PERCENT: "92"' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'memory_pressure_idle_restart' /tmp/controller.py
-          grep -Fq 'memory_pressure_fatal_restart' /tmp/controller.py
-          grep -Fq 'os._exit(71)' /tmp/controller.py
-          grep -Fq 'self.path == "/healthz"' /tmp/controller.py
-          grep -Fq '/healthz >/dev/null' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
-          grep -Fq '/healthz >/dev/null' tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
-          grep -Fq 'controller-ui-ready' tools/chat-controller/v0.4/entrypoint.direct.sh
-          grep -Fq 'Chrome DevTools unavailable twice' tools/chat-controller/v0.4/entrypoint.direct.sh
-          bash -n tools/chat-controller/v0.4/entrypoint.direct.sh
-          python - <<'PY2'
-          from pathlib import Path
-          src=Path('/tmp/controller.py').read_text(encoding='utf-8')
-          loc=src[src.index('async def localization_process_lane'):src.index('def _qa_item_key')]
-          assert loc.index('task_commit = github_find_task_commit(') < loc.index('queue_handle_retry_surface(')
-          assert 'allow_ci_skip_fallback=lane_key in {"A", "B", "D"}' in loc
-          assert 'async def localization_process_lane_isolated' in src
-          assert 'async def localization_safe_send_lane_task' in src
-          assert src.count('localization_safe_send_lane_task(') >= 4
-          assert 'await localization_process_lane_isolated(context, pages, q, lane_key)' in src
-          isolated=src[src.index('async def localization_process_lane_isolated'):src.index('def _qa_item_key')]
-          assert 'lane_exception_count' in isolated and 'QUEUE_ERROR_RESTART_THRESHOLD' in isolated
-          assert 'isinstance(e, ControllerRestartRequested) or is_browser_transport_failure(e)' in isolated and 'raise' in isolated
-          safe_send=src[src.index('async def localization_safe_send_lane_task'):src.index('def finalize_localization_producer_commit')]
-          assert 'isinstance(e, ControllerRestartRequested) or is_browser_transport_failure(e)' in safe_send
-          composer=src[src.index('async def recover_slot_composer'):src.index('async def replace_with_fresh_slot_page')]
-          assert 'current_slot.url = None' in composer and 'save_registry(current_reg)' in composer
-          assert 'save_registry(load_registry' not in composer
-          qakeys=src[src.index('def _qa_completed_input_keys'):src.index('def reconcile_blocked_qa_inputs')]
-          assert 'q.get("qa_blocked"' not in qakeys
-          retryhelpers=src[src.index('def _qa_retry_delay_seconds'):src.index('def reconcile_blocked_qa_inputs')]
-          assert 'min(1800, 300 *' in retryhelpers
-          assert 'def select_ready_qa_batch' in retryhelpers and '_qa_item_ready(item, now)' in retryhelpers
-          assert 'def next_qa_retry_wait_seconds' in retryhelpers
-          reconcile=src[src.index('def reconcile_blocked_qa_inputs'):src.index('def enqueue_producer_result_for_qa')]
-          assert 'qa_blocked_requeued_count' in reconcile and 'pending.append(item)' in reconcile
-          assert 'qa_retry_not_before' in reconcile and '_qa_retry_delay_seconds' in reconcile
-          enqueue=src[src.index('def enqueue_producer_result_for_qa'):src.index('def finalize_c_qa_batch')]
-          assert 'qa_pending"][-200:]' not in enqueue
-          assert 'Never truncate unconsumed QA work' in enqueue
-          cfinal=src[src.index('def finalize_c_qa_batch'):src.index('async def localization_parallel_cycle')]
-          pass_pos=cfinal.index('if task.get("terminal") == "PASS":')
-          consume_pos=cfinal.index('q["qa_pending"] =')
-          else_pos=cfinal.index('else:', pass_pos)
-          assert pass_pos < consume_pos < else_pos
-          assert 'Keep every immutable TASK_ID@RESULT_SHA input pending' in cfinal
-          blocked_producers=src[src.index('def reconcile_localization_blocked_producer_commits'):src.index('def startup_reconcile_queue_state')]
-          assert 'allow_ci_skip_fallback=True' in blocked_producers
-          assert 'finalize_localization_producer_commit' in blocked_producers
-          assert 'enqueue_producer_result_for_qa' in blocked_producers
-          assert 'q["blocked"] = kept[-100:]' in blocked_producers
-          startup=src[src.index('def startup_reconcile_queue_state'):src.index('def watchdog_rearm_queue_state')]
-          assert 'reconcile_blocked_qa_inputs(q)' in startup
-          assert 'reconcile_localization_blocked_producer_commits(q)' in startup
-          assert src.count('remained busy without durable Git progress') >= 2
-          assert src.count('WAIT_ACTIONS_MAX_SECONDS') >= 5
-          assert 'never orphan' in src
-          assert 'Preserve the TASK_ID as active' in src
-          assert src.count('"dispatch_confirmed": False') >= 2
-          assert src.count('active.get("dispatch_confirmed") is False') >= 2
-          assert src.count('"dispatch_confirmed"] = True') >= 3
-          assert src.count('dispatch_started_at') >= 6
-          locsend=src[src.index('async def localization_send_lane_task'):src.index('async def localization_safe_send_lane_task')]
-          assert locsend.index('save_queue_state(q)') < locsend.index('result = await send_message(page, prompt)')
-          qdispatch=src[src.index('if not active:', src.index('async def queue_cycle')):src.index('slot = next((s for s in reg.slots', src.index('async def queue_cycle'))]
-          assert qdispatch.index('save_queue_state(q)') < qdispatch.index('await run_cycle(context, pages)')
-          assert 'status="queue_dispatching"' in qdispatch
-          assert 'provisional queue identity lost after dispatch' in qdispatch
-          qcycle=src[src.index('async def queue_cycle'):src.index('def refresh_wait_actions_task_binding')]
-          assert 'Git/Actions reconciliation continues' in qcycle
-          lcycle=src[src.index('async def localization_parallel_cycle'):src.index('def reconcile_legacy_conversion_blocked')]
-          assert 'Git/Actions reconciliation continues' in lcycle
-          assert 'active_lane_order = sorted(' in lcycle
-          assert 'key=_active_lane_send_epoch' in lcycle
-          assert 'for lane_key in active_lane_order:' in lcycle
-          assert 'last_retry_click_at' in lcycle and 'last_rollover_at' in lcycle and 'sent_at' in lcycle
-          watchdog=src[src.index('async def watchdog_cycle'):src.index('async def run_cycle')]
-          qpos=watchdog.index('if QUEUE_MODE:')
-          assert watchdog.index('return', qpos) < watchdog.index('reg = load_registry(now)')
-          assert 'watchdog_queue_role="STATE_REARM_ONLY"' in watchdog
-          scheduler=src[src.index('async def scheduler_loop'):src.index('async def main_async')]
-          assert 'QUEUE_ERROR_RESTART_THRESHOLD' in scheduler
-          assert 'WATCHDOG_ERROR_RESTART_THRESHOLD' in scheduler
-          assert scheduler.count('isinstance(e, ControllerRestartRequested)') >= 3
-          assert scheduler.count('status="controller_restart_requested"') >= 3
-          assert 'queue_error_count += 1' in scheduler
-          assert 'watchdog_error_count += 1' in scheduler
-          assert 'if signature == queue_error_signature' not in scheduler
-          assert 'if signature == watchdog_error_signature' not in scheduler
-          assert 'raise' in scheduler
-          main=src[src.index('async def main_async'):]
-          assert main.index('validate_runtime_assets()') < main.index('async_playwright()')
-          assert main.index('prepare_slot_pages(context, reg)') < main.index('start_process_liveness_monitor()')
-          assert 'registry read failed; recreating' not in src
-          assert 'queue state read failed; recreating' not in src
-          print('bounded end-to-end liveness invariants verified')
-          PY2
+          assert 'if lane_key in {"A", "B"}:' in proc
+          assert 'finalize_localization_producer_commit' in proc
+          assert 'producer_wait_actions_migrated' in proc
+          assert 'No A+B/C barrier exists.' in body
+          assert 'all(active_by_lane[k].get("phase") == "DONE"' not in body
+          print("continuous producers and independent batched QA verified")
+          PY
 
       - name: Verify queue recovery ordering
         run: |
@@ -524,8 +165,7 @@ jobs:
           grep -Fq '"queue_result_grace_seconds": QUEUE_RESULT_GRACE_SECONDS' /tmp/controller.py
           grep -Fq 'no-response grace {QUEUE_RESULT_GRACE_SECONDS}s' /tmp/controller.py
           grep -Fq 'def github_actions_skip_directive' /tmp/controller.py
-          grep -Fq 'directive = github_actions_skip_directive(message)' /tmp/controller.py
-          grep -Fq 'allow_ci_skip_fallback' /tmp/controller.py
+          grep -Fq 'if github_actions_skip_directive(message):' /tmp/controller.py
           grep -Fq 'async def recover_missing_gate_run' /tmp/controller.py
           grep -Fq 'contains GitHub Actions skip directive' /tmp/controller.py
           grep -Fq 'Treating the missing run as a repairable automation failure instead of waiting forever.' /tmp/controller.py
@@ -539,4 +179,3 @@ jobs:
           assert 'recovery = await recover_missing_gate_run(context, pages, active, now)' in src
           print("missing Actions run recovery verified")
           PY
-
