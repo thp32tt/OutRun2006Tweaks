@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Fail-closed checks for DXVK disassembly continuation byte windows.
 
-This helper intentionally validates evidence shape only. It does not promote
-static disassembly into runtime semantic claims.
+This helper validates evidence shape only. It does not promote static
+instruction evidence into runtime semantic claims.
 """
 
 from __future__ import annotations
@@ -20,30 +20,39 @@ REQUIRED_FIELDS = (
 )
 
 
+def _hex_rva(value: object) -> int | None:
+    if not isinstance(value, str) or not value.startswith("0x"):
+        return None
+    try:
+        return int(value, 16)
+    except ValueError:
+        return None
+
+
 def validate(record: dict) -> list[str]:
     errors: list[str] = []
     for field in REQUIRED_FIELDS:
         if field not in record:
             errors.append(f"missing:{field}")
 
-    if not isinstance(record.get("instruction_count"), int):
+    instruction_count = record.get("instruction_count")
+    if not isinstance(instruction_count, int) or instruction_count <= 0:
         errors.append("invalid:instruction_count")
 
-    start = record.get("start_rva")
-    end = record.get("end_rva")
-    if isinstance(start, str) and isinstance(end, str):
-        try:
-            if int(end, 16) <= int(start, 16):
-                errors.append("invalid:rva-order")
-        except ValueError:
-            errors.append("invalid:rva-format")
+    start = _hex_rva(record.get("start_rva"))
+    end = _hex_rva(record.get("end_rva"))
+    if start is None or end is None:
+        errors.append("invalid:rva-format")
+    elif end <= start:
+        errors.append("invalid:rva-order")
 
     overlap = record.get("overlap_bytes")
-    if isinstance(overlap, str):
-        if len(overlap.split()) == 0:
-            errors.append("invalid:empty-overlap")
-    else:
-        errors.append("invalid:overlap-type")
+    if not isinstance(overlap, str) or len(overlap.split()) == 0:
+        errors.append("invalid:empty-overlap")
+
+    targets = record.get("branch_targets")
+    if targets is not None and not isinstance(targets, list):
+        errors.append("invalid:branch-targets-type")
 
     return errors
 
