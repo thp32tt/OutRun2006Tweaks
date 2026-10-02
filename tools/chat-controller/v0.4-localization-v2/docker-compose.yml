@@ -14,7 +14,7 @@ services:
     environment:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
-      AUTO_SEND: "${AUTO_SEND:-false}"
+      AUTO_SEND: "${AUTO_SEND:-true}"
       QUEUE_MODE: "true"
       LOCALIZATION_PARALLEL: "true"
       PARALLEL_LANE_STAGGER_SECONDS: "15"
@@ -52,7 +52,7 @@ services:
       RETRY_BUTTON_COOLDOWN_SECONDS: "45"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
       STATUS_PORT: "8787"
-      NOVNC_PUBLIC_URL: "${NOVNC_PUBLIC_URL:-http://localhost:6082/vnc.html}"
+      NOVNC_PUBLIC_URL: "${NOVNC_PUBLIC_URL:-http://localhost:6081/vnc.html}"
       WATCHDOG_ENABLED: "${WATCHDOG_ENABLED:-true}"
       WATCHDOG_STALL_MINUTES: "25"
       WATCHDOG_BUSY_STALL_MINUTES: "30"
@@ -69,8 +69,8 @@ services:
       retries: 3
       start_period: 90s
     ports:
-      - "${LOCALIZATION_VNC_PORT:-6082}:6080"
-      - "${LOCALIZATION_STATUS_PORT:-8789}:8787"
+      - "${LOCALIZATION_VNC_PORT:-6081}:6080"
+      - "${LOCALIZATION_STATUS_PORT:-8788}:8787"
     volumes:
       - outrun_localization_v2_data:/data
       - outrun_localization_v2_logs:/logs
@@ -80,7 +80,6 @@ volumes:
     name: outrun_localization_v2_data
   outrun_localization_v2_logs:
     name: outrun_localization_v2_logs
-
 
 networks:
   localization_v2:
