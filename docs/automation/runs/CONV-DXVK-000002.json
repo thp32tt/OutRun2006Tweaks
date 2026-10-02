@@ -4368,6 +4368,79 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve any newer branch-authoritative frontier. If this remains the newest proof edge, capture canonical bytes from 0x001830B3 with mandatory 66 0f 54 05 50 91 61 overlap, validate provenance, then exact-decode only complete instructions; keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F49_CANONICAL_EXE_PROVENANCE_0x1830B3_TO_0x1830F3",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "c55d069d0a97a8a8352b395ec779b4601a89a8c0",
+      "validation_bearing_result_sha": "c55d069d0a97a8a8352b395ec779b4601a89a8c0",
+      "commit_message": "dxvk: capture canonical 0x1830B3 continuation [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Canonical F49 raw provenance captures 0x001830B3..0x001830F3 with mandatory seven-byte ANDPD overlap from the exact F48 capture edge, exact predecessor identity, .text/probe geometry and overlap equality; fresh bytes and rel32 candidates remain raw-only.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub AGENTS.md, branch-local conversion/run state, regression/problem history and Issue #14; refreshed the rapidly advancing same-JOB branch repeatedly and skipped concurrently completed F47/F48 units."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the first unfinished runnable canonical frontier after F48 proof: continuation_58 raw provenance beginning at 0x001830B3 with mandatory overlap bytes 66 0f 54 05 50 91 61."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material analyzer commit c55d069d0a97a8a8352b395ec779b4601a89a8c0 adds F49 bounded raw provenance collector, report binding and CLI fail-closed guard."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact material-SHA OutRun EXE HUD Inspector CI run 36986228192 static-exe-analysis job 110772082908 completed SUCCESS against canonical EXE; exact material-SHA Build run 36986228202 also passed Verify backend disassembly contract. Later compile stages are not required or claimed for this static provenance unit."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commit c55d069d0a97a8a8352b395ec779b4601a89a8c0 contains required [AUTO:CONV-DXVK-000002]; Issue #14 comment 5948526894 records implementation and exact validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly provenance only; no deployable DXVK runtime payload, backend binary, selector or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally in the durable task run so concurrent/newer branch state is not overwritten."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "c55d069d0a97a8a8352b395ec779b4601a89a8c0",
+        "out_run_exe_hud_inspector_run_id": 36986228192,
+        "static_exe_analysis_job_id": 110772082908,
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "provenance_status": "EXACT_EXE_1830B3_TO_1830F3_PROVENANCE_CAPTURED",
+        "predecessor_proof_status": "EXACT_18307A_TO_1830B3_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "predecessor_exact": true,
+        "target_section": ".text",
+        "probe_start_rva": "0x001830B3",
+        "probe_end_rva": "0x001830F3",
+        "probe_len": 64,
+        "overlap_bytes": "66 0f 54 05 50 91 61",
+        "overlap_matches": true,
+        "predecessor_overlap_matches": true,
+        "probe_end_matches": true,
+        "artifact_id": 11217631874,
+        "artifact_digest": "sha256:95148cd3fd30a442535bbc024a6bcb40abcb5abdc02c09c90423c0db9c3e34c9",
+        "backend_conversion_gate_run_id": 36986228202,
+        "backend_disassembly_contract_step": "PASS",
+        "full_build_status_at_state_write": "IN_PROGRESS_NOT_REQUIRED_NOT_CLAIMED",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5948526894,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_CONCURRENT_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Exact-decode only complete canonical instructions in validated continuation_58 bytes 0x001830B3..0x001830F3. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
