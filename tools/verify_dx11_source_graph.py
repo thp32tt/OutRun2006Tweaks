@@ -692,6 +692,44 @@ def main() -> None:
             + ", ".join(missing_r188_d3dtop_modulatecolor_addalpha)
         )
 
+
+    r189_d3dtop_modulateinvalpha_addcolor_contract = [
+        ("case D3DTOP_MODULATEINVALPHA_ADDCOLOR:", PIPELINE_TRANSLATION_CPP,
+         "R189 D3DTOP_MODULATEINVALPHA_ADDCOLOR dependency/readiness/translation case"),
+        ('return first + " + (1.0 - " + firstAlpha + ") * " + second;',
+         PIPELINE_TRANSLATION_CPP,
+         "R189 MODULATEINVALPHA_ADDCOLOR RGB expression"),
+        ("modulateInvAlphaAddColorStages[0].colorOp =",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R189 hosted MODULATEINVALPHA_ADDCOLOR color fixture"),
+        ("sampled0.rgb + (1.0 - sampled0.a) * input.diffuse.rgb",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R189 generated RGB MODULATEINVALPHA_ADDCOLOR assertion"),
+        ("R189 D3DTOP_MODULATEINVALPHA_ADDCOLOR must remain fail-closed as ALPHAOP",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R189 color-only ALPHAOP rejection assertion"),
+        ("R189 D3DTOP_MODULATEINVALPHA_ADDCOLOR fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R189 offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_MODULATEINVALPHA_ADDCOLOR COLOROP support R189: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R189 hosted probe completion"),
+    ]
+    missing_r189_d3dtop_modulateinvalpha_addcolor = [
+        meaning
+        for token, source, meaning in r189_d3dtop_modulateinvalpha_addcolor_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count(
+            "case D3DTOP_MODULATEINVALPHA_ADDCOLOR:") < 3:
+        missing_r189_d3dtop_modulateinvalpha_addcolor.append(
+            "R189 MODULATEINVALPHA_ADDCOLOR must participate in dependency, HLSL and readiness switches")
+    if missing_r189_d3dtop_modulateinvalpha_addcolor:
+        raise SystemExit(
+            "DX11 R189 fixed-function D3DTOP_MODULATEINVALPHA_ADDCOLOR contract drift: "
+            + ", ".join(missing_r189_d3dtop_modulateinvalpha_addcolor)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
