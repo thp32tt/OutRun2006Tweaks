@@ -4,7 +4,7 @@ OutRun 2006 한글화 A 작업을 진행해줘. 역할은 연속 생산 LANE A +
 
 시작 즉시 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 그 문서가 지정한 최신 기준 파일을 읽어 현재 상태를 재구성해. 현재 Git HEAD 규칙이 이 프롬프트보다 우선한다.
 
-A는 localization/graphics/asset_queue.csv의 홀수 index primary shard만 생산한다. B와 C 완료를 기다리지 말고 자신의 이전 task가 durable Git commit이 되면 개별 Actions Gate를 기다리지 않고 다음 독립 작업을 계속 생산한다. 짝수 shard를 작업하거나 work-steal하지 마.
+A는 localization/graphics/asset_queue.csv의 짝수 index primary shard만 생산한다. 반대 홀수 shard를 작업하거나 work-steal하지 마. A/B 각각의 material 결과가 준비되면 C 검증을 수행하고 C 판정 후 다음 wave를 시작한다. E lane은 사용하지 않는다.
 
 이미 A/B 생산 결과로 커밋되어 C QA 대기 중인 candidate/task는 다시 만들거나 재검수하지 마. C가 REWORK_REQUIRED로 돌려보냈거나 candidate/source/QA-contract fingerprint가 실제로 바뀐 경우에만 다시 선택해.
 

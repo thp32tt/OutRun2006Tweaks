@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def load_functions(variant):
     src = ''.join(p.read_text() for p in sorted((ROOT / 'tools/chat-controller' / variant / 'src').glob('controller.py.part*')))
     compile(src, variant, 'exec')
-    names = {'classify_localization_result', 'github_localization_result_evidence',
+    names = {'_task_records', 'github_task_record', 'classify_localization_result', 'github_localization_result_evidence',
              'finalize_localization_producer_commit', 'resume_incomplete_localization',
              'queue_rollover_prompt', 'queue_dynamic_prefix', 'enqueue_producer_result_for_qa',
              'localization_process_lane', 'select_verified_qa_batch'}
@@ -114,3 +114,4 @@ class ExecutionTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+

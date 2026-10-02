@@ -1,0 +1,48 @@
+name: Localization Controller v2
+on:
+  push:
+    branches: [chat-controller-downloads]
+    paths:
+      - 'tools/chat-controller/v0.4/src/**'
+      - 'tools/chat-controller/v0.4/localization_*.md'
+      - 'tools/chat-controller/v0.4/entrypoint.direct.sh'
+      - 'tools/chat-controller/v0.4-localization-v2/**'
+      - 'tests/test_controller_v2.py'
+      - '.github/workflows/localization-controller-v2.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-and-start:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and regression tests
+        run: |
+          cat tools/chat-controller/v0.4/src/controller.py.part* >/tmp/controller.py
+          python -m py_compile /tmp/controller.py
+          python tests/test_controller_v2.py
+          python tests/test_localization_execution.py
+      - name: Compose configuration
+        run: docker compose -f tools/chat-controller/v0.4-localization-v2/docker-compose.yml config --quiet
+      - name: Build dedicated image
+        run: docker build -t localization-v2:test -f tools/chat-controller/v0.4-localization-v2/Dockerfile tools/chat-controller/v0.4
+      - name: Container startup and isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --entrypoint sh localization-v2:test -c 'test -f /opt/outrun/prompts/localization_A.md && test -f /opt/outrun/prompts/localization_B.md && test -f /opt/outrun/prompts/localization_C.md && test ! -e /opt/outrun/prompts/vr_A.md'
+          if docker run --rm -e CONTROLLER_MODE=conversion localization-v2:test; then
+            echo 'ERROR: conversion mode must be rejected'; exit 1
+          fi
+          docker run -d --name loc-v2-smoke -e AUTO_SEND=false -e REQUIRE_PROJECT_URL=false localization-v2:test
+          trap 'docker logs loc-v2-smoke; docker rm -f loc-v2-smoke >/dev/null 2>&1 || true' EXIT
+          ok=0
+          for i in $(seq 1 40); do
+            if docker exec loc-v2-smoke curl -fsS http://127.0.0.1:8787/status >/tmp/status.html; then ok=1; break; fi
+            sleep 3
+          done
+          test "$ok" = 1
+          grep -q 'Controller mode:</b> localization' /tmp/status.html
+          docker exec loc-v2-smoke curl -fsS http://127.0.0.1:9222/json/version

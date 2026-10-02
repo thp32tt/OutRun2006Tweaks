@@ -140,7 +140,7 @@ jobs:
           assert 'if lane_key in {"A", "B"}:' in proc
           assert 'finalize_localization_producer_commit' in proc
           assert 'producer_wait_actions_migrated' in proc
-          assert 'No A+B/C barrier exists.' in body
+          assert 'A/B -> C barrier' in body
           assert 'all(active_by_lane[k].get("phase") == "DONE"' not in body
           print("continuous producers and independent batched QA verified")
           PY
@@ -184,4 +184,5 @@ jobs:
           assert 'recovery = await recover_missing_gate_run(context, pages, active, now)' in src
           print("missing Actions run recovery verified")
           PY
+
 

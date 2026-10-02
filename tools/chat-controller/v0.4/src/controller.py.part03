@@ -87,7 +87,7 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     if not CONVERSATION_ROLLOVER_ENABLED:
         return False
     count = int(active.get("chat_rollovers", 0))
-    if count >= MAX_CHAT_ROLLOVERS_PER_TASK:
+    if MAX_CHAT_ROLLOVERS_PER_TASK and count >= MAX_CHAT_ROLLOVERS_PER_TASK:
         active["failure_context"] = (
             f"conversation rollover limit reached ({MAX_CHAT_ROLLOVERS_PER_TASK}) after: {reason}"
         )
@@ -146,6 +146,8 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         slot.url = new_url
         active["active_chat_url"] = new_url
 
+    active["retry_recovery_attempted"] = False
+    active["retry_rollover_pending"] = False
     active["chat_rollovers"] = count + 1
     active["last_rollover_reason"] = reason
     active["last_rollover_at"] = sent_at.isoformat()
@@ -167,10 +169,10 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     return True
 
 
-async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, active: dict, q: dict) -> bool:
+async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, active: dict, q: dict, context=None, pages=None) -> bool:
     """Serialize Retry handling while distinguishing real rate pressure from generic transient Retry."""
     retry = await first_visible(page, RETRY_SELECTORS, total_wait_ms=500)
-    if retry is None:
+    if retry is None and not active.get("retry_rollover_pending"):
         return False
 
     now = datetime.now(TZ)
@@ -218,6 +220,15 @@ async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, acti
             write_runtime(status="retry_wait", last_action=f"Generic Retry for {active['task_id']} waiting for {guard}")
             return True
 
+    if active.get("retry_recovery_attempted") or active.get("retry_rollover_pending"):
+        active["retry_rollover_pending"] = True
+        if context is not None and pages is not None:
+            await queue_rollover_chat(context, pages, active, "Retry persisted after one recovery attempt")
+        save_queue_state(q)
+        return True
+
+    active["retry_recovery_attempted"] = True
+    save_queue_state(q)
     if await click_retry_generation(page):
         request_now = datetime.now(TZ)
         note_successful_request(reg, request_now, slot.name)
@@ -582,7 +593,7 @@ async def localization_process_lane(
         page = await slot_page(context, pages, slot)
 
         if active["phase"] == "WAIT_CHAT":
-            if await queue_handle_retry_surface(page, reg, slot, active, q):
+            if await queue_handle_retry_surface(page, reg, slot, active, q, context, pages):
                 return
 
             if not slot.url or not is_project_scoped_chat_url(slot.url):
@@ -844,15 +855,32 @@ def finalize_c_qa_batch(q: dict, task: dict) -> None:
         "inputs": batch,
     }
     if task.get("terminal") == "PASS":
+        try:
+            evidence = github_task_record(task["result_sha"], task["task_id"]) or {}
+            dispositions = evidence.get("qa_dispositions", [])
+            expected = set(input_keys)
+            actual = {_qa_item_key(x) for x in dispositions if isinstance(x, dict)}
+            allowed = {"PASS", "REWORK_REQUIRED", "HOLD_STRICT_RECHECK", "SUPERSEDED"}
+            if actual != expected or len(dispositions) != len(expected) or any(x.get("status") not in allowed for x in dispositions):
+                raise ValueError("INCOMPLETE_C_DISPOSITIONS")
+            record["qa_dispositions"] = dispositions
+            if any(x["status"] == "HOLD_STRICT_RECHECK" for x in dispositions):
+                q["qa_hold"] = "C requested HOLD_STRICT_RECHECK; preserve inputs until resolved"
+        except Exception as exc:
+            q["qa_hold"] = f"C evidence unresolved: {exc}"
+            q.setdefault("qa_blocked", []).append(record)
+            return
         q["qa_completed"] = (q.get("qa_completed", []) + [record])[-100:]
         input_key_set = set(input_keys)
         for producer in q.get("completed", []):
             if _qa_item_key(producer) in input_key_set:
                 producer["automation_validation"] = "PASS"
+                producer["qa_disposition"] = next(x["status"] for x in dispositions if _qa_item_key(x) == _qa_item_key(producer))
                 producer["batch_validation_pending"] = False
                 producer["validated_by_qa_task_id"] = task.get("task_id")
                 producer["validated_by_qa_result_sha"] = task.get("result_sha")
     else:
+        q["qa_hold"] = "C QA did not pass its validation gate; inspect qa_blocked before resuming"
         q["qa_blocked"] = (q.get("qa_blocked", []) + [record])[-100:]
     consumed = set(input_keys)
     q["qa_pending"] = [x for x in q.get("qa_pending", []) if _qa_item_key(x) not in consumed]
@@ -875,11 +903,17 @@ def select_verified_qa_batch(q: dict) -> list[dict]:
 
 
 async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
-    """Run A/B as continuous producers and C as an independent batched QA consumer."""
+    """Run two producers, then independent C QA, before the next wave."""
     now = datetime.now(TZ)
     q = load_queue_state()
     reg = load_registry(now)
     active_by_lane = q.setdefault("active_by_lane", {})
+    # Preserve old ownership/history, but never dispatch or route the retired E lane.
+    for key in list(active_by_lane):
+        if key not in {"A", "B", "C"}:
+            q.setdefault("retired_lane_tasks", []).append(active_by_lane.pop(key))
+            save_queue_state(q)
+    q.setdefault("production_wave", {"dispatched": [k for k in ("A", "B") if k in active_by_lane]})
 
     # One-time migration from the old single-active localization queue.
     legacy = q.get("active")
@@ -888,6 +922,8 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
         if legacy_slot in {"A", "B", "C"}:
             legacy.setdefault("terminal", None)
             active_by_lane[legacy_slot] = legacy
+            if legacy_slot in {"A", "B"} and legacy_slot not in q["production_wave"]["dispatched"]:
+                q["production_wave"]["dispatched"].append(legacy_slot)
             q["active"] = None
             save_queue_state(q)
 
@@ -899,7 +935,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
         )
         return
 
-    # Advance all three lanes independently. C never blocks A/B production.
+    # Advance existing tasks; dispatch is controlled by the A/B -> C barrier.
     for lane_key in ("A", "B", "C"):
         if lane_key in active_by_lane:
             await localization_process_lane(context, pages, q, lane_key)
@@ -924,21 +960,32 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
     if producer_retired or (ctask and ctask.get("phase") == "DONE"):
         save_queue_state(q)
 
-    # Keep both producers fed independently. No A+B/C barrier exists.
+    # A/B -> C barrier: partial dispatch resumes only the missing lane.
+    if q.get("qa_hold") and not active_by_lane:
+        write_runtime(status="parallel_c_barrier", last_action=q["qa_hold"], queue=q)
+        return
+    wave = q.setdefault("production_wave", {"dispatched": []})
+    if not active_by_lane and not q.get("qa_pending") and wave.get("dispatched"):
+        if q.get("qa_hold"):
+            write_runtime(status="parallel_c_barrier", last_action=q["qa_hold"], queue=q)
+            return
+        wave = q["production_wave"] = {"dispatched": []}
     for lane_key in ("A", "B"):
-        active_by_lane = q.setdefault("active_by_lane", {})
-        if lane_key in active_by_lane:
+        if "C" in active_by_lane or lane_key in active_by_lane or lane_key in wave["dispatched"]:
             continue
+        # Drain migrated QA backlog before starting a new wave.
+        if q.get("qa_pending") and not wave["dispatched"]:
+            break
         producer_id = f"P{int(q.get('producer_counter', 0)) + 1:05d}"
         if await localization_send_lane_task(context, pages, q, lane_key, producer_id):
+            wave["dispatched"].append(lane_key)
             q["producer_counter"] = int(q.get("producer_counter", 0)) + 1
             save_queue_state(q)
 
-    # C consumes immutable producer results in batches. Waiting briefly for coalescing
-    # reduces repeated source/header/atlas/shared-state work without pausing production.
+    # C consumes immutable producer results only after both producer slots finish.
     active_by_lane = q.setdefault("active_by_lane", {})
     pending = q.get("qa_pending", [])
-    if "C" not in active_by_lane and pending:
+    if not any(k in active_by_lane for k in ("A", "B", "C")) and pending:
         batch = select_verified_qa_batch(q)
         if not batch:
             return
@@ -957,7 +1004,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
             save_queue_state(q)
             write_runtime(
                 status="qa_batch_running",
-                last_action=f"{qa_id}: C reviewing {len(batch)} producer results while A/B continue",
+                last_action=f"{qa_id}: C reviewing {len(batch)} producer results after A/B complete",
                 queue=q,
             )
             return
@@ -966,7 +1013,7 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
     write_runtime(
         status="continuous_production_qa_running",
         last_action=(
-            f"A/B continuous producers; C QA pending={len(q.get('qa_pending', []))} "
+            f"A/B -> C barrier; C QA pending={len(q.get('qa_pending', []))} "
             f"active={','.join(sorted(active_by_lane.keys())) or 'none'}"
         ),
         queue=q,
@@ -1154,7 +1201,7 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             )
             return
 
-        if await queue_handle_retry_surface(page, reg, slot, active, q):
+        if await queue_handle_retry_surface(page, reg, slot, active, q, context, pages):
             return
         if not slot.url or not is_project_scoped_chat_url(slot.url):
             reason = "Active task chat URL is missing or outside the configured project after restart/project-scope reconciliation."
@@ -1404,6 +1451,15 @@ def startup_reconcile_queue_state() -> None:
 
     rebounds = []
     for task in records:
+        head = heads.get(task.get("branch"))
+        if head and CONTROLLER_MODE == "localization":
+            try:
+                record = github_task_record(head, task["task_id"])
+                if record:
+                    restore_task_counters(task, record)
+            except Exception as exc:
+                task["checkpoint_lookup_error"] = str(exc)
+                write_runtime(last_github_error=f"checkpoint:{task['task_id']}:{exc}")
         if task.get("phase") == "WAIT_ACTIONS":
             if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B"}:
                 _github_commit_list_cache.pop(str(task.get("branch") or ""), None)
@@ -1582,4 +1638,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 

@@ -70,11 +70,11 @@ LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SAM
 LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_SECONDS", "30")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
 CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
-MAX_CHAT_ROLLOVERS_PER_TASK = max(1, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "5")))
+MAX_CHAT_ROLLOVERS_PER_TASK = max(0, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "5")))
 GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
-CHAT_SLOTS = max(1, int(os.getenv("CHAT_SLOTS", "6")))
+CHAT_SLOTS = 3 if CONTROLLER_MODE == "localization" else max(1, int(os.getenv("CHAT_SLOTS", "6")))
 ROLLOVER_HOUR = int(os.getenv("CHAT_DAY_ROLLOVER_HOUR", "2"))
 STATUS_PORT = int(os.getenv("STATUS_PORT", "8787"))
 NOVNC_PUBLIC_URL = os.getenv("NOVNC_PUBLIC_URL", "").strip()
@@ -422,10 +422,10 @@ def load_queue_state() -> dict:
         raw.setdefault("conversion_blocked_reconcile_version", 0)
         return raw
     except Exception:
-        log.exception("queue state read failed; recreating")
-        state = {"counter": 0, "active": None, "active_by_lane": {}, "wave_counter": 0, "wave_id": None, "wave_started_at": None, "producer_counter": 0, "qa_batch_counter": 0, "qa_pending": [], "qa_completed": [], "qa_blocked": [], "completed": [], "blocked": [], "last_github_poll_at": None, "conversion_blocked_reconcile_version": 0}
-        save_queue_state(state)
-        return state
+        # Never overwrite a damaged checkpoint with an empty queue and duplicate work.
+        log.exception("queue state read failed; preserved for recovery")
+        raise
+
 
 
 def save_queue_state(state: dict):
@@ -472,7 +472,7 @@ def github_api_json(path: str) -> dict:
             )
             return data
     except urllib.error.HTTPError as e:
-        if e.code in {403, 429}:
+        if e.code == 429 or (e.code == 403 and (e.headers.get("Retry-After") or e.headers.get("X-RateLimit-Remaining") == "0")):
             retry_after = e.headers.get("Retry-After")
             reset = e.headers.get("X-RateLimit-Reset")
             until = time.time() + 300
@@ -494,6 +494,10 @@ def github_api_json(path: str) -> dict:
                 github_api_blocked_until=datetime.fromtimestamp(until, TZ).isoformat(),
                 last_github_error=f"HTTP {e.code} rate limit; REST paused until {datetime.fromtimestamp(until, TZ).isoformat()}",
             )
+        elif e.code in {401, 403}:
+            write_runtime(github_blocker="GITHUB_AUTHORIZATION_REQUIRED", last_github_error=f"HTTP {e.code}: authorization denied")
+        elif e.code == 404:
+            write_runtime(github_lookup_miss=path)
         raise
 
 
@@ -596,6 +600,84 @@ def classify_localization_result(record: dict, files: list[dict], task_id: str) 
     return "REJECTED", "BOOKKEEPING_ONLY_NO_ARTIFACT"
 
 
+def _task_records(payload, task_id):
+    """Filename fallback never substitutes another task's identity."""
+    if isinstance(payload, dict):
+        if payload.get("TASK_ID", payload.get("task_id")) == task_id:
+            yield payload
+        for value in payload.values():
+            if isinstance(value, (dict, list)):
+                yield from _task_records(value, task_id)
+    elif isinstance(payload, list):
+        for value in payload:
+            yield from _task_records(value, task_id)
+
+
+def github_task_record(ref: str, task_id: str) -> Optional[dict]:
+    """Resolve exact, variants, dispatch, reconcile, rollover, lane/number, number.
+
+    Reads remain pinned to the caller's immutable HEAD/result SHA. Only 404 is
+    a candidate miss; authorization, throttling and incomplete trees propagate.
+    """
+    def read(path):
+        try:
+            encoded = urllib.parse.quote(path, safe="/")
+            data = github_api_json(f"/repos/{GITHUB_REPO}/contents/{encoded}?ref={urllib.parse.quote(ref, safe='')}")
+        except urllib.error.HTTPError as exc:
+            if exc.code == 404:
+                return []
+            raise
+        try:
+            payload = json.loads(base64.b64decode(data["content"]).decode("utf-8"))
+        except (ValueError, KeyError, TypeError):
+            return []
+        return list(_task_records(payload, task_id))
+
+    def newest(records):
+        return max(records, key=lambda r: (int(r.get("ATTEMPT", r.get("attempt", 1))),
+                    int(r.get("CHAT_ROLLOVER", r.get("chat_rollovers", 0))),
+                    str(r.get("updated_at", r.get("timestamp", "")))))
+
+    exact = f"docs/automation/runs/{task_id}.json"
+    records = read(exact)
+    if records:
+        return newest(records)
+    tree = github_api_json(f"/repos/{GITHUB_REPO}/git/trees/{ref}?recursive=1")
+    if tree.get("truncated"):
+        raise RuntimeError("TASK_LOOKUP_TREE_TRUNCATED")
+    paths = sorted(x["path"] for x in tree.get("tree", [])
+                   if x.get("type") == "blob" and x["path"].startswith("docs/automation/")
+                   and x["path"].endswith(".json"))
+    number = task_id.rsplit("-", 1)[-1]
+    lane = task_id.rsplit("-", 1)[0].split("-")[-1]
+    predicates = [
+        lambda p: p.startswith(f"docs/automation/runs/{task_id}."),
+        lambda p: "dispatch" in p.lower(),
+        lambda p: "reconcile" in p.lower(),
+        lambda p: "rollover" in p.lower(),
+        lambda p: lane.lower() in p.lower() and number in p,
+        lambda p: number in p,
+    ]
+    visited = {exact}
+    for predicate in predicates:
+        records = []
+        for path in paths:
+            if path not in visited and predicate(path):
+                visited.add(path)
+                records.extend(read(path))
+        if records:
+            return newest(records)
+    return None
+
+
+def restore_task_counters(active: dict, record: dict) -> None:
+    if record.get("TASK_ID", record.get("task_id")) != active["task_id"]:
+        raise ValueError("TASK_RECORD_ID_MISMATCH")
+    # Never roll durable local progress backwards or count a rollover as retry.
+    active["attempt"] = max(int(active.get("attempt", 1)), int(record.get("ATTEMPT", record.get("attempt", 1))))
+    active["chat_rollovers"] = max(int(active.get("chat_rollovers", 0)), int(record.get("CHAT_ROLLOVER", record.get("chat_rollovers", 0))))
+
+
 def github_localization_result_evidence(task_commit: dict, task_id: str) -> tuple[str, str]:
     """Read task record and complete changed-file list at exactly the producer SHA."""
     sha = task_commit["sha"]
@@ -603,11 +685,9 @@ def github_localization_result_evidence(task_commit: dict, task_id: str) -> tupl
     if key in _producer_result_evidence_cache:
         return _producer_result_evidence_cache[key]
     try:
-        path = urllib.parse.quote(f"docs/automation/runs/{task_id}.json", safe="/")
-        data = github_api_json(f"/repos/{GITHUB_REPO}/contents/{path}?ref={sha}")
-        record = json.loads(base64.b64decode(data["content"]).decode("utf-8"))
-        if not isinstance(record, dict):
-            return "REJECTED", "TASK_RECORD_NOT_OBJECT"
+        record = github_task_record(sha, task_id)
+        if record is None:
+            return "REJECTED", "TASK_RECORD_MISSING_AFTER_FALLBACK"
         files = []
         for page in range(1, 31):
             commit = github_api_json(f"/repos/{GITHUB_REPO}/commits/{sha}?per_page=100&page={page}")
@@ -1107,5 +1187,6 @@ async def ensure_logged_in(page: Page) -> bool:
         current_url=page.url,
     )
     return False
+
 
 
