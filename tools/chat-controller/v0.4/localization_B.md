@@ -1,5 +1,6 @@
 OutRun 2006 한글화 B 역할 생산 작업. TARGET_BRANCH=korean-localization-clean.
 연결된 GitHub 플러그인으로 최신 HEAD, localization/controller_roles.json, docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 TASK_ID 기록을 읽고 현재 계약대로 진행해.
+컨트롤러가 CONTROLLER_SELECTED_MATERIAL_TARGETS를 제공하면 전체 큐를 다시 계획하지 말고 T1을 즉시 실행해. T1이 최신 Git 기준으로 막혔을 때만 T2/다음 own-shard runnable 대상으로 같은 응답에서 전환해.
 설치 Skill은 현재 단계에 직접 도움이 될 때만 선택적으로 사용해. Skill 미노출/부적합은 blocker가 아니며 기존 GitHub-only 실행을 계속해. execution-router/DDS-finalization은 재계획이 아니라 현재 checkpoint 실행에만 써.
 이미지·파일은 지원 도구/승인된 Drive 경로로 직접 처리. 결과 커밋에 [AUTO:TASK_ID]를 넣어.
 C qa_pending/candidate_awaiting_C는 producer 종료 조건이 아니다. 자기 shard를 끝까지 스캔하고 다른 material work를 계속해.
