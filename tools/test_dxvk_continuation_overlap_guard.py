@@ -42,6 +42,12 @@ def validate_frontier_transition(previous_end_rva: str, next_start_rva: str) -> 
     assert previous_end_rva == next_start_rva
 
 
+def validate_partial_instruction_requires_overlap(decode_complete: bool, overlap_bytes: str) -> None:
+    """Fail closed if partial instruction evidence is promoted without bytes."""
+    if not decode_complete:
+        assert len(bytes.fromhex(overlap_bytes)) > 0
+
+
 def test_dxvk_continuation_overlap_guard() -> None:
     validate_overlap_record(
         OverlapRecord(
@@ -62,7 +68,12 @@ def test_dxvk_continuation_frontier_edge_alignment() -> None:
     )
 
 
+def test_dxvk_partial_decode_stays_unresolved() -> None:
+    validate_partial_instruction_requires_overlap(False, EXPECTED_OVERLAP)
+
+
 if __name__ == "__main__":
     test_dxvk_continuation_overlap_guard()
     test_dxvk_continuation_frontier_edge_alignment()
+    test_dxvk_partial_decode_stays_unresolved()
     print("DXVK_CONTINUATION_OVERLAP_GUARD=PASS")
