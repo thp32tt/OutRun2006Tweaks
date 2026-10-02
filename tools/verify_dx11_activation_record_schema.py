@@ -31,7 +31,15 @@ def validate_activation_record(record: dict) -> None:
             raise AssertionError("diagnostic records cannot activate")
 
 
-if __name__ == "__main__":
+def _expect_rejection(record: dict) -> None:
+    try:
+        validate_activation_record(record)
+    except AssertionError:
+        return
+    raise AssertionError("invalid activation record was accepted")
+
+
+def run_contract_smoke_tests() -> None:
     validate_activation_record(
         {
             "NativeDrawPathActivationAllowed": False,
@@ -40,4 +48,35 @@ if __name__ == "__main__":
             "BackendLane": "DX11",
         }
     )
+
+    _expect_rejection(
+        {
+            "NativeDrawPathActivationAllowed": True,
+            "ActivationProof": False,
+            "DiagnosticOnly": False,
+            "BackendLane": "DX11",
+        }
+    )
+
+    _expect_rejection(
+        {
+            "NativeDrawPathActivationAllowed": True,
+            "ActivationProof": True,
+            "DiagnosticOnly": True,
+            "BackendLane": "DX11",
+        }
+    )
+
+    _expect_rejection(
+        {
+            "NativeDrawPathActivationAllowed": False,
+            "ActivationProof": False,
+            "DiagnosticOnly": True,
+            "BackendLane": "DXVK",
+        }
+    )
+
+
+if __name__ == "__main__":
+    run_contract_smoke_tests()
     print("DX11 activation record schema OK")
