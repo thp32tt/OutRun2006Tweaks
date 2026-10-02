@@ -5,22 +5,22 @@
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
   "checkpoint": "C6_STATE",
-  "status": "COMPLETE_F33_CONTROL_FLOW_STATIC_PASS_RUNTIME_UNTESTED",
+  "status": "COMPLETE_F35_PROVENANCE_STATIC_PASS_RUNTIME_UNTESTED",
   "initial_recovered_head": "936ba3538bd3bc54ccb4da1f582a2d2be7ca9007",
-  "validation_bearing_result_sha": "187d084e0f4490f76819be94110173103caba655",
-  "result_sha": "187d084e0f4490f76819be94110173103caba655",
-  "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+  "validation_bearing_result_sha": "703cce74ebb5dc0240bcd2dc9e2b4b1457c5880d",
+  "result_sha": "f9c6a2c4932a7b8a41e91390f84794bc69b837cc",
+  "automation_validation": "PASS_DESCENDANT_CANONICAL_STATIC",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "UNTESTED",
-  "selected_work_item": "DXVK_F33_CANONICAL_CONTROL_FLOW_0x182CD5_TO_0x182D14",
-  "summary": "Exact-decoded canonical 0x00182CD5..0x00182D15 into 27 contiguous complete instructions through 0x00182D14, proved two short branches and two rel32 calls, resolved predecessor forward target 0x00182CEB onto an instruction boundary, and preserved trailing incomplete F7 at 0x00182D14 for mandatory overlap with no semantic/ownership promotion.",
+  "selected_work_item": "DXVK_F35_CANONICAL_EXE_PROVENANCE_0x182D53_TO_0x182D93",
+  "summary": "Captured the canonical 64-byte continuation from 0x00182D53 through 0x00182D93 by overlapping the proven F34 cut-edge F7 byte, with exact predecessor proof, overlap, .text and probe-geometry gates. Fresh bytes remain raw-only; no function/render/HUD/runtime semantics or ownership were promoted.",
   "source_commits": [
     {
-      "sha": "187d084e0f4490f76819be94110173103caba655",
-      "message": "dxvk: prove canonical 0x182CD5 control flow [AUTO:CONV-DXVK-000002]",
-      "role": "validated-canonical-control-flow-proof",
-      "validation_bearing": true
+      "sha": "f9c6a2c4932a7b8a41e91390f84794bc69b837cc",
+      "message": "dxvk: capture canonical 0x182D53 continuation [AUTO:CONV-DXVK-000002]",
+      "role": "material-canonical-provenance-capture",
+      "validation_bearing": false
     }
   ],
   "changed_paths": [
@@ -28,97 +28,88 @@
   ],
   "implementation": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
-    "predecessor_provenance_sha": "3b9110369a622b15dafeb75fc297216aeea2f0d5",
-    "proof_status": "EXACT_182CD5_TO_182D14_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
-    "proof_start_rva": "0x00182CD5",
-    "prefix_end_rva": "0x00182D14",
-    "instruction_count": 27,
-    "branches": [
-      "0x00182CDB->0x00182CEB",
-      "0x00182D0B->0x00182D21"
-    ],
-    "calls": [
-      "0x00182CDD->0x00185BEC",
-      "0x00182CEB->0x00185BEC"
-    ],
-    "resolved_predecessor_target_rva": "0x00182CEB",
-    "resolved_predecessor_target_status": "INSTRUCTION_BOUNDARY_PROVEN",
-    "trailing_partial_rva": "0x00182D14",
-    "trailing_partial_bytes": "f7",
+    "predecessor_proof_sha": "1427dac55e8e1900849377cc8ec67377f0bf8ac5",
+    "predecessor_control_flow_status": "EXACT_182D14_TO_182D53_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "provenance_status": "EXACT_EXE_182D53_TO_182D93_PROVENANCE_CAPTURED",
+    "provenance_start_rva": "0x00182D53",
+    "provenance_probe_end_rva": "0x00182D93",
+    "probe_len": 64,
+    "overlap_bytes": "f7",
+    "overlap_matches": true,
+    "target_section": ".text",
+    "probe_end_matches": true,
+    "predecessor_forward_target_rva": "0x00182D59",
+    "predecessor_forward_target_status": "ADDRESS_ONLY_WITHIN_RAW_CAPTURE_NOT_YET_BOUNDARY_PROVEN",
     "semantic_promotion": "NONE",
     "ownership_effect": "NONE"
   },
   "pipeline": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered current authenticated GitHub HEAD, AGENTS.md, lane/run state, regression/problem records and Issue #14; skipped already-completed F32/F33 raw work and tracked concurrent same-JOB descendants."
+      "evidence": "Recovered current authenticated GitHub branch, AGENTS.md, durable lane/run state, regression/problem history and Issue #14. Concurrent F34 raw/proof work was detected from live HEAD and duplicate writes were skipped."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
-      "evidence": "Selected the highest-value unfinished validated canonical static frontier: exact-decode complete instructions from F33 raw capture 0x00182CD5..0x00182D15."
+      "evidence": "After F34 exact proof reached cut edge 0x00182D53, selected the highest-value unfinished runnable static frontier: a bounded canonical overlap capture starting at that incomplete F7 opcode."
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "evidence": "Material commit 187d084e0f4490f76819be94110173103caba655 adds continuation 42 exact instruction/branch/call tables, predecessor-target boundary proof, raw-call census equality, incomplete-edge contract, report wiring and fail-closed CLI status."
+      "evidence": "Material commit f9c6a2c4932a7b8a41e91390f84794bc69b837cc adds continuation 44 constants, exact predecessor/cut-edge overlap gating, .text/probe checks, raw rel32 census, report binding and fail-closed CLI status."
     },
     "C3_VALIDATE": {
       "status": "COMPLETE",
-      "evidence": "Exact SHA 187d084e0f4490f76819be94110173103caba655 passed OutRun EXE HUD Inspector CI static-exe-analysis run 36977997238/job 110746013333 against canonical EXE SHA256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3. Proof status EXACT_182CD5_TO_182D14_CONTROL_FLOW_CAPTURE_EDGE_PROVEN; Build run 36977997247 also passed Verify backend disassembly contract."
+      "evidence": "OutRun EXE HUD Inspector CI run 36978688539 static-exe-analysis job 110748130672 succeeded on merge SHA 703cce74ebb5dc0240bcd2dc9e2b4b1457c5880d containing material SHA f9c6a2c4932a7b8a41e91390f84794bc69b837cc. Canonical EXE SHA256 matched and continuation_44 reported EXACT_EXE_182D53_TO_182D93_PROVENANCE_CAPTURED with predecessor_exact=true, overlap f7 match=true, .text, probe_len=64 and probe_end match=true."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
-      "evidence": "Substantive commit 187d084e0f4490f76819be94110173103caba655 contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947306139 records implementation and validation."
+      "evidence": "Substantive material commit f9c6a2c4932a7b8a41e91390f84794bc69b837cc contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947402349 records implementation and validation."
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Static canonical-disassembly analyzer proof only; no runtime payload, selector, packaged backend binary, deployment content or localization changed."
+      "reason": "Static canonical-disassembly provenance tooling only; no runtime payload, selector, packaged binary, deployment content or localization changed."
     },
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "evidence": "Persisted exact validated F33 proof while preserving concurrent descendant F34 raw candidate and its separate validation status."
+      "evidence": "Durable run/lane state records the validated F35 raw provenance frontier and exact next action while keeping runtime validation UNTESTED."
     }
   },
   "validation": {
-    "exact_sha": "187d084e0f4490f76819be94110173103caba655",
-    "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
-    "hud_inspector_run_id": 36977997238,
-    "static_exe_analysis_job_id": 110746013333,
+    "material_sha": "f9c6a2c4932a7b8a41e91390f84794bc69b837cc",
+    "validation_bearing_merge_sha": "703cce74ebb5dc0240bcd2dc9e2b4b1457c5880d",
+    "material_is_ancestor_of_validation_merge": true,
+    "automation_validation": "PASS_DESCENDANT_CANONICAL_STATIC",
+    "hud_inspector_run_id": 36978688539,
+    "static_exe_analysis_job_id": 110748130672,
     "static_exe_analysis_conclusion": "success",
-    "evidence_artifact_id": 11214207072,
-    "evidence_artifact_digest": "sha256:1b8d2b2200e1dc2ab3883eb8b4150c1714eb87d1ad7fc5820c6665ef8015cf46",
+    "evidence_artifact_id": 11214243096,
+    "evidence_artifact_digest": "sha256:dc3e65c0499fb53c0cd9b32bbabf4680cc544c5da37b5f11895894ac9841c2b2",
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
-    "proof_status": "EXACT_182CD5_TO_182D14_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
-    "instruction_count": 27,
-    "branch_targets_match": true,
-    "internal_branch_targets_on_boundaries": true,
-    "calls_match": true,
-    "raw_call_census_matches": true,
-    "resolved_predecessor_target_rva": "0x00182CEB",
-    "resolved_predecessor_target_boundary": true,
-    "incomplete_rva": "0x00182D14",
-    "incomplete_bytes": "f7",
-    "incomplete_matches": true,
-    "capture_edge_matches": true,
-    "backend_build_run_id": 36977997247,
-    "backend_disassembly_contract": "PASS",
-    "full_win32_build": "NOT_REQUIRED_NOT_CLAIMED",
+    "provenance_status": "EXACT_EXE_182D53_TO_182D93_PROVENANCE_CAPTURED",
+    "predecessor_status": "EXACT_182D14_TO_182D53_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "predecessor_exact": true,
+    "overlap_bytes": "f7",
+    "overlap_matches": true,
+    "target_section": ".text",
+    "probe_len": 64,
+    "probe_end_rva": "0x00182D93",
+    "probe_end_matches": true,
+    "backend_build_run_id": 36978688469,
+    "full_win32_build": "CANCELLED_BY_BRANCH_CHURN_NOT_REQUIRED_NOT_CLAIMED",
     "runtime_validation": "UNTESTED"
   },
   "follow_on_frontier": {
-    "predecessor_proof_sha": "187d084e0f4490f76819be94110173103caba655",
-    "predecessor_control_flow_status": "EXACT_182CD5_TO_182D14_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
-    "proof_start_rva": "0x00182CD5",
-    "prefix_end_rva": "0x00182D14",
-    "trailing_partial_rva": "0x00182D14",
-    "trailing_partial_bytes": "f7",
-    "predecessor_forward_target_rva": "0x00182D21",
-    "predecessor_forward_target_status": "ADDRESS_ONLY_OUTSIDE_CAPTURE_NOT_YET_BOUNDARY_PROVEN",
-    "concurrent_f34_raw_candidate_sha": "27be49b786e02dfe61bca4262475bdfb1b34f91b",
-    "concurrent_f34_raw_candidate_range": "0x00182D14..0x00182D54",
-    "concurrent_f34_backend_contract_run_id": 36978162725,
-    "concurrent_f34_backend_contract_status": "FAIL_OVERLAP_TRANSITION_42_TO_43_COMPARE_FORM",
-    "validation_bearing_result_sha": "187d084e0f4490f76819be94110173103caba655",
+    "predecessor_proof_sha": "1427dac55e8e1900849377cc8ec67377f0bf8ac5",
+    "predecessor_control_flow_status": "EXACT_182D14_TO_182D53_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "provenance_sha": "f9c6a2c4932a7b8a41e91390f84794bc69b837cc",
+    "provenance_status": "EXACT_EXE_182D53_TO_182D93_PROVENANCE_CAPTURED",
+    "provenance_start_rva": "0x00182D53",
+    "probe_end_rva": "0x00182D93",
+    "transition": "INCOMPLETE_F7_OVERLAP_PROVEN",
+    "overlap_bytes": "f7",
+    "predecessor_forward_target_rva": "0x00182D59",
+    "predecessor_forward_target_status": "ADDRESS_ONLY_WITHIN_RAW_CAPTURE_NOT_YET_BOUNDARY_PROVEN",
+    "validation_bearing_merge_sha": "703cce74ebb5dc0240bcd2dc9e2b4b1457c5880d",
     "runtime_validation": "UNTESTED"
   },
   "issue14_comments": [
@@ -154,7 +145,8 @@
     5947334794,
     5947371527,
     5947373054,
-    5947388153
+    5947388153,
+    5947402349
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -163,7 +155,7 @@
     "No localization files modified",
     "RUNTIME_VALIDATION remains UNTESTED without matching Quest 3/VDXR evidence"
   ],
-  "next_action": "Current descendant 27be49b786e02dfe61bca4262475bdfb1b34f91b already contains F34 raw overlap capture at 0x00182D14..0x00182D54, but its Build run 36978162725 fails the backend disassembly contract at overlap transition 42->43. Repair/validate that F34 raw collector before any exact decode; then resolve forward target 0x00182D21 only with exact instruction-boundary evidence.",
+  "next_action": "Exact-decode only complete canonical instructions in 0x00182D53..0x00182D93. Resolve predecessor forward target 0x00182D59 only if exact instruction-boundary evidence proves it; preserve any trailing partial instruction raw-only and keep function/render/HUD/runtime semantics unresolved.",
   "supplemental_completed_static_units": [
     {
       "unit_id": "DXVK_CONTINUATION_ANALYZER_WIRING_FAIL_CLOSED",
