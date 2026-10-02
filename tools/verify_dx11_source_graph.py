@@ -1219,13 +1219,13 @@ def main() -> None:
          SEMANTIC_SMOKE,
          "R201 semantic smoke default-zero TEMP shader dataflow"),
         ("FFP_SUPPORTED_ARGUMENT_SELECTORS = frozenset({0, 1, 2, 3, 4, 5, 6})",
-         analyzer,
+         DX11_CENSUS_ANALYZER,
          "R200 census TEMP selector support"),
         ("FFP_SUPPORTED_RESULT_ARGS = frozenset({1, 5})",
          analyzer,
          "R200 census CURRENT/TEMP destination support"),
         ('r198_demand["UnsupportedResultArgs"] == [',
-         analyzer_test,
+         DX11_CENSUS_ANALYZER_TEST,
          "R200 census invalid RESULTARG separation"),
     ]
     missing_r201_temp_default = [
