@@ -442,13 +442,20 @@ class NativeControllerTests(unittest.TestCase):
             'producer_result_candidate_indices',
             producer_result_candidate_count=count_fn,
         )
+        paths_fn, _ = load_function(
+            'producer_result_candidate_paths',
+            producer_result_candidate_count=count_fn,
+        )
         enqueue = Mock(return_value=True)
         checkpoint, _ = load_function(
             'localization_record_producer_checkpoint',
             localization_producer_seen_result=lambda active, sha: False,
             producer_result_candidate_count=count_fn,
             producer_result_candidate_indices=indices_fn,
+            producer_result_candidate_paths=paths_fn,
             enqueue_producer_result_for_qa=enqueue,
+            localization_qa_inflight_candidate_indices=lambda q: [],
+            _localization_material_target_cache={},
             localization_remaining_material_targets=lambda active: [{'index':163}],
             producer_result_claims_no_work=lambda record: False,
             LOCALIZATION_PRODUCER_TARGET_CANDIDATES=2,
@@ -480,7 +487,10 @@ class NativeControllerTests(unittest.TestCase):
             localization_producer_seen_result=lambda active, sha: sha in active.get('pipeline_result_shas',[]),
             producer_result_candidate_count=count_fn,
             producer_result_candidate_indices=indices_fn,
+            producer_result_candidate_paths=paths_fn,
             enqueue_producer_result_for_qa=enqueue,
+            localization_qa_inflight_candidate_indices=lambda q: [],
+            _localization_material_target_cache={},
             localization_remaining_material_targets=lambda active: [{'index':205}],
             producer_result_claims_no_work=lambda record: False,
             LOCALIZATION_PRODUCER_TARGET_CANDIDATES=2,
