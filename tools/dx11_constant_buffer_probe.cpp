@@ -2681,7 +2681,7 @@ int main()
     const auto multiStageBoundDraw =
         outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
             multiStageDrawReady, multiStageTexturedDraw,
-            drawPipelineBindingReady);
+            drawPipelineBindingReady, d3d.context, outputStateBinding);
     require(
         multiStageBoundDraw.ready &&
         multiStageBoundDraw.pipelineBindingMatchesDraw &&
@@ -2767,29 +2767,70 @@ int main()
 
     const auto boundDrawReady =
         outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
-            drawReady, texturedDrawReady, drawPipelineBindingReady);
+            drawReady, texturedDrawReady, drawPipelineBindingReady,
+            d3d.context, outputStateBinding);
     require(
         boundDrawReady.inputValid &&
         boundDrawReady.texturedDrawReady &&
         boundDrawReady.pipelineBindingReady &&
         boundDrawReady.pipelineBindingMatchesDraw &&
+        boundDrawReady.outputBindingReady &&
+        boundDrawReady.outputBindingMatchesDraw &&
         boundDrawReady.componentSnapshotsPresent &&
         boundDrawReady.ready &&
         boundDrawReady.texturedDrawSnapshotToken ==
             texturedDrawReady.snapshotToken &&
         boundDrawReady.pipelineBindingSnapshotToken ==
             drawPipelineBindingReady.snapshotToken &&
+        boundDrawReady.outputBindingSnapshotToken ==
+            liveOutputBindingReady.snapshotToken &&
         boundDrawReady.snapshotToken != 0 &&
         outrun::vr::dx11::validate_fixed_function_bound_draw_snapshot(
             drawReady, texturedDrawReady, drawPipelineBindingReady,
-            boundDrawReady.snapshotToken),
-        "R134 bound draw readiness composes exact pipeline binding identity");
+            d3d.context, outputStateBinding, boundDrawReady.snapshotToken),
+        "R138 bound draw reobserves exact live RS OM binding");
+
+    d3d.context->RSSetState(nullptr);
+    const auto staleOutputBoundDraw =
+        outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
+            drawReady, texturedDrawReady, drawPipelineBindingReady,
+            d3d.context, outputStateBinding);
+    require(
+        staleOutputBoundDraw.pipelineBindingReady &&
+        staleOutputBoundDraw.pipelineBindingMatchesDraw &&
+        !staleOutputBoundDraw.outputBindingReady &&
+        staleOutputBoundDraw.outputBindingMatchesDraw &&
+        !staleOutputBoundDraw.componentSnapshotsPresent &&
+        !staleOutputBoundDraw.ready &&
+        staleOutputBoundDraw.outputBindingSnapshotToken == 0 &&
+        staleOutputBoundDraw.snapshotToken == 0 &&
+        !outrun::vr::dx11::validate_fixed_function_bound_draw_snapshot(
+            drawReady, texturedDrawReady, drawPipelineBindingReady,
+            d3d.context, outputStateBinding, boundDrawReady.snapshotToken),
+        "R138 bound draw fails closed after live RS drift");
+    require(
+        outputStateBinding.apply(d3d.context),
+        "R138 restore output binding after final draw drift probe");
+    const auto restoredOutputBoundDraw =
+        outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
+            drawReady, texturedDrawReady, drawPipelineBindingReady,
+            d3d.context, outputStateBinding);
+    require(
+        restoredOutputBoundDraw.ready &&
+        restoredOutputBoundDraw.outputBindingReady &&
+        restoredOutputBoundDraw.outputBindingMatchesDraw &&
+        restoredOutputBoundDraw.outputBindingSnapshotToken ==
+            liveOutputBindingReady.snapshotToken &&
+        restoredOutputBoundDraw.snapshotToken ==
+            boundDrawReady.snapshotToken,
+        "R138 restored output binding reproduces final bound draw snapshot");
 
     auto mismatchedPipelineBinding = drawPipelineBindingReady;
     mismatchedPipelineBinding.pipelineSnapshotToken ^= 0x100000001b3ull;
     const auto mismatchedPipelineBoundDraw =
         outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
-            drawReady, texturedDrawReady, mismatchedPipelineBinding);
+            drawReady, texturedDrawReady, mismatchedPipelineBinding,
+            d3d.context, outputStateBinding);
     require(
         mismatchedPipelineBoundDraw.pipelineBindingReady &&
         !mismatchedPipelineBoundDraw.pipelineBindingMatchesDraw &&
@@ -2801,7 +2842,8 @@ int main()
     mismatchedTexturedDraw.drawSnapshotToken ^= 0x9e3779b97f4a7c15ull;
     const auto mismatchedTexturedBoundDraw =
         outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
-            drawReady, mismatchedTexturedDraw, drawPipelineBindingReady);
+            drawReady, mismatchedTexturedDraw, drawPipelineBindingReady,
+            d3d.context, outputStateBinding);
     require(
         !mismatchedTexturedBoundDraw.texturedDrawReady &&
         mismatchedTexturedBoundDraw.pipelineBindingReady &&
@@ -2810,7 +2852,7 @@ int main()
         mismatchedTexturedBoundDraw.snapshotToken == 0 &&
         !outrun::vr::dx11::validate_fixed_function_bound_draw_snapshot(
             drawReady, mismatchedTexturedDraw, drawPipelineBindingReady,
-            boundDrawReady.snapshotToken),
+            d3d.context, outputStateBinding, boundDrawReady.snapshotToken),
         "R134 bound draw rejects textured R133-to-R131 identity drift");
 
     d3d.context->PSSetShader(nullptr, nullptr, 0);

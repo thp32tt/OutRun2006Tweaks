@@ -939,18 +939,21 @@ compose_fixed_function_multistage_textured_draw_readiness(
     const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
     std::uint64_t snapshotToken) noexcept;
 
-// R134 composes the existing output/surface/PS/geometry evidence with a live
-// exact R97 IA/VS/PS binding snapshot. The pipeline token must match the one
-// sealed by the activation carried inside the draw candidate.
+// R138 composes the existing output/surface/PS/geometry evidence with live
+// exact R97 IA/VS/PS and R137 RS/OM binding observations on the same context.
+// Both live binding identities must still match the snapshots sealed by draw.
 struct NativeFixedFunctionBoundDrawReadiness {
     bool inputValid{};
     bool texturedDrawReady{};
     bool pipelineBindingReady{};
     bool pipelineBindingMatchesDraw{};
+    bool outputBindingReady{};
+    bool outputBindingMatchesDraw{};
     bool componentSnapshotsPresent{};
     bool ready{};
     std::uint64_t texturedDrawSnapshotToken{};
     std::uint64_t pipelineBindingSnapshotToken{};
+    std::uint64_t outputBindingSnapshotToken{};
     std::uint64_t snapshotToken{};
 };
 
@@ -958,12 +961,16 @@ struct NativeFixedFunctionBoundDrawReadiness {
 compose_fixed_function_bound_draw_readiness(
     const NativeFixedFunctionDrawReadiness& draw,
     const NativeFixedFunctionTexturedDrawReadiness& texturedDraw,
-    const NativeFixedFunctionPipelineBindingReadiness& pipelineBinding) noexcept;
+    const NativeFixedFunctionPipelineBindingReadiness& pipelineBinding,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding) noexcept;
 
 [[nodiscard]] bool validate_fixed_function_bound_draw_snapshot(
     const NativeFixedFunctionDrawReadiness& draw,
     const NativeFixedFunctionTexturedDrawReadiness& texturedDraw,
     const NativeFixedFunctionPipelineBindingReadiness& pipelineBinding,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
     std::uint64_t snapshotToken) noexcept;
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88

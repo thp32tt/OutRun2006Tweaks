@@ -1551,6 +1551,59 @@ def main() -> None:
             + ", ".join(missing_r136_multi_stage_texture_binding)
         )
 
+    r138_final_live_output_binding_contract = [
+        (
+            "bool outputBindingMatchesDraw{}",
+            NATIVE_BACKEND_HPP,
+            "R138 final bound draw records live RS/OM lineage match",
+        ),
+        (
+            "const NativeFixedFunctionOutputStateBinding& outputStateBinding",
+            NATIVE_BACKEND_HPP,
+            "R138 bound draw accepts the sealed R126 output owner",
+        ),
+        (
+            "outputStateBinding.binding_readiness(context)",
+            NATIVE_BACKEND_CPP,
+            "R138 final composition reobserves current live RS/OM state",
+        ),
+        (
+            "outputBinding.outputBindingSnapshotToken ==",
+            NATIVE_BACKEND_CPP,
+            "R138 live RS/OM owner token must match sealed draw identity",
+        ),
+        (
+            "draw.outputBindingSnapshotToken",
+            NATIVE_BACKEND_CPP,
+            "R138 sealed draw output-owner identity participates in final token",
+        ),
+        (
+            "R138 bound draw reobserves exact live RS OM binding",
+            CONSTANT_BUFFER_PROBE,
+            "R138 positive final live output binding proof",
+        ),
+        (
+            "R138 bound draw fails closed after live RS drift",
+            CONSTANT_BUFFER_PROBE,
+            "R138 live RS drift invalidates final bound draw",
+        ),
+        (
+            "R138 restored output binding reproduces final bound draw snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R138 deterministic RS/OM restore proof",
+        ),
+    ]
+    missing_r138_final_live_output_binding = [
+        meaning
+        for token, source, meaning in r138_final_live_output_binding_contract
+        if token not in source
+    ]
+    if missing_r138_final_live_output_binding:
+        raise SystemExit(
+            "DX11 R138 final live output binding contract drift: "
+            + ", ".join(missing_r138_final_live_output_binding)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
@@ -1570,7 +1623,7 @@ def main() -> None:
             )
     if runtime_textured_draw_users:
         raise SystemExit(
-            "DX11 R132/R133/R134/R136 dormant binding readiness gained a production "
+            "DX11 R132/R133/R134/R136/R137/R138 dormant binding readiness gained a production "
             "caller before activation gate: " + ", ".join(runtime_textured_draw_users)
         )
 

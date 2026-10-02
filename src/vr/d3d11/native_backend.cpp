@@ -2966,16 +2966,22 @@ NativeFixedFunctionBoundDrawReadiness
 compose_fixed_function_bound_draw_readiness(
     const NativeFixedFunctionDrawReadiness& draw,
     const NativeFixedFunctionTexturedDrawReadiness& texturedDraw,
-    const NativeFixedFunctionPipelineBindingReadiness& pipelineBinding) noexcept {
+    const NativeFixedFunctionPipelineBindingReadiness& pipelineBinding,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding) noexcept {
     NativeFixedFunctionBoundDrawReadiness out{};
     out.texturedDrawSnapshotToken = texturedDraw.snapshotToken;
     out.pipelineBindingSnapshotToken = pipelineBinding.snapshotToken;
+    const auto outputBinding =
+        outputStateBinding.binding_readiness(context);
+    out.outputBindingSnapshotToken = outputBinding.snapshotToken;
     const bool drawSnapshotValid =
         validate_fixed_function_draw_readiness_integrity(draw);
     out.inputValid =
         drawSnapshotValid &&
         texturedDraw.inputValid &&
-        pipelineBinding.inputValid;
+        pipelineBinding.inputValid &&
+        outputBinding.inputValid;
     out.texturedDrawReady =
         texturedDraw.ready && texturedDraw.snapshotToken != 0 &&
         texturedDraw.drawSnapshotToken == draw.snapshotToken;
@@ -2984,16 +2990,25 @@ compose_fixed_function_bound_draw_readiness(
     out.pipelineBindingMatchesDraw =
         draw.pipelineSnapshotToken != 0 &&
         pipelineBinding.pipelineSnapshotToken == draw.pipelineSnapshotToken;
+    out.outputBindingReady =
+        outputBinding.ready && outputBinding.snapshotToken != 0;
+    out.outputBindingMatchesDraw =
+        draw.outputBindingSnapshotToken != 0 &&
+        outputBinding.outputBindingSnapshotToken ==
+            draw.outputBindingSnapshotToken;
     out.componentSnapshotsPresent =
         draw.snapshotToken != 0 &&
         texturedDraw.snapshotToken != 0 &&
-        pipelineBinding.snapshotToken != 0;
+        pipelineBinding.snapshotToken != 0 &&
+        outputBinding.snapshotToken != 0;
     out.ready =
         draw.ready &&
         out.inputValid &&
         out.texturedDrawReady &&
         out.pipelineBindingReady &&
         out.pipelineBindingMatchesDraw &&
+        out.outputBindingReady &&
+        out.outputBindingMatchesDraw &&
         out.componentSnapshotsPresent;
     if (out.ready) {
         std::uint64_t token = 0xcbf29ce484222325ull;
@@ -3002,7 +3017,11 @@ compose_fixed_function_bound_draw_readiness(
         token = mix_readiness_snapshot_token(
             token, out.pipelineBindingSnapshotToken);
         token = mix_readiness_snapshot_token(
+            token, out.outputBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
             token, draw.pipelineSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, draw.outputBindingSnapshotToken);
         out.snapshotToken = token == 0 ? 1 : token;
     }
     return out;
@@ -3012,11 +3031,13 @@ bool validate_fixed_function_bound_draw_snapshot(
     const NativeFixedFunctionDrawReadiness& draw,
     const NativeFixedFunctionTexturedDrawReadiness& texturedDraw,
     const NativeFixedFunctionPipelineBindingReadiness& pipelineBinding,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
     std::uint64_t snapshotToken) noexcept {
     if (snapshotToken == 0)
         return false;
     const auto current = compose_fixed_function_bound_draw_readiness(
-        draw, texturedDraw, pipelineBinding);
+        draw, texturedDraw, pipelineBinding, context, outputStateBinding);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
