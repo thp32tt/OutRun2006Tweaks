@@ -1,5 +1,5 @@
 {
-  "schema_version": 41,
+  "schema_version": 42,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -167,7 +167,9 @@
       "retry_surface_click_limit": 2,
       "new_task_chat_policy": "BOUNDED_REUSE_COMPLETED_CHAT",
       "same_task_retry_policy": "REUSE_CURRENT_CHAT_UNTIL_BOUNDED_ROLLOVER_REQUIRED",
-      "max_rollovers_per_task": 2
+      "max_rollovers_per_task": 2,
+      "latched_producer_limit_behavior": "SOFT_RECOVERY_BUDGET_NOT_TERMINAL",
+      "latched_producer_same_task_id": true
     },
     "watchdog": {
       "wait_actions_recovery": "uncached_exact_run_and_jobs_refresh",
@@ -263,7 +265,9 @@
         10,
         20
       ],
-      "github_transient_cooldown_seconds": 60
+      "github_transient_cooldown_seconds": 60,
+      "producer_lane_exception_threshold_action": "PERSIST_STATE_AND_RESTART_CONTROLLER_PRESERVE_TASK",
+      "c_or_nonproducer_lane_exception_threshold_action": "BLOCK_ONLY_WHEN_EXISTING_POLICY_REQUIRES"
     },
     "state_persistence": {
       "atomic_primary_writes": true,
