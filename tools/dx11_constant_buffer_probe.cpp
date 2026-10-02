@@ -272,6 +272,18 @@ int main()
         samplerOwner.initialize(d3d.device, linearClampStage),
         "R98 sampler owner reinitialize with linear clamp");
 
+    auto unsupportedLodBiasStage = stages[0];
+    unsupportedLodBiasStage.mipLodBiasBits = 0x3F000000u;
+    require(
+        !translate_fixed_function_sampler(unsupportedLodBiasStage).exact,
+        "R125 non-default sampler MIP LOD bias must fail closed");
+
+    auto unsupportedMaxMipStage = stages[0];
+    unsupportedMaxMipStage.maxMipLevel = 1u;
+    require(
+        !translate_fixed_function_sampler(unsupportedMaxMipStage).exact,
+        "R125 non-default sampler MAXMIPLEVEL must fail closed");
+
     auto unsupportedSamplerStage = stages[0];
     unsupportedSamplerStage.minFilter = D3DTEXF_ANISOTROPIC;
     require(
