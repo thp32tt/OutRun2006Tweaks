@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <d3d9.h>
 
 namespace OutRunVR::DrawState
@@ -62,6 +63,10 @@ namespace OutRunVR::DrawState
         DWORD pointScaleABits = 0x3F800000u;
         DWORD pointScaleBBits = 0u;
         DWORD pointScaleCBits = 0u;
+        // R170: D3DRS_WRAP0..7 modifies fixed-function texture coordinates
+        // before interpolation. The dormant native DX11 vertex path does not
+        // reproduce this render-state transform, so preserve all eight stages.
+        std::array<DWORD, 8> textureCoordinateWrap{};
         // R161: D3D9 user clipping is not reproduced by the native DX11
         // fixed-function path. Preserve both gates so non-default semantics
         // fail closed instead of being erased by DepthClipEnable=TRUE.
