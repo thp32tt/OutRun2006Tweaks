@@ -10,6 +10,21 @@ namespace outrun::vr::dx11 {
 // R126 dormant ownership/readiness identity for one generated triangle-fan
 // D3D11 R32_UINT index stream. The owner may bind only an explicitly supplied
 // D3D11 context; no D3D9 Draw* hook routes through this class.
+// R141 observes the exact live IA state for the generated fan owner after bind.
+// This is dormant evidence only; it never issues a Draw* call.
+struct NativeTriangleFanIndexBufferBindingReadiness {
+    bool inputValid{};
+    bool ownerReady{};
+    bool contextMatches{};
+    bool bufferBoundExact{};
+    bool formatExact{};
+    bool offsetExact{};
+    bool topologyExact{};
+    bool ready{};
+    std::uint64_t ownerSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
 struct NativeTriangleFanIndexBufferReadiness {
     bool resourcesOwned{};
     bool deviceMatches{};
@@ -68,6 +83,12 @@ public:
         ID3D11Device* expectedDevice) const noexcept;
     [[nodiscard]] bool validate_readiness_snapshot(
         ID3D11Device* expectedDevice,
+        std::uint64_t snapshotToken) const noexcept;
+
+    [[nodiscard]] NativeTriangleFanIndexBufferBindingReadiness
+    binding_readiness(ID3D11DeviceContext* context) const noexcept;
+    [[nodiscard]] bool validate_binding_snapshot(
+        ID3D11DeviceContext* context,
         std::uint64_t snapshotToken) const noexcept;
 
     void shutdown() noexcept;
