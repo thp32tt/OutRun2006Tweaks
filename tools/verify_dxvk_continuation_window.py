@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Fail-closed checks for DXVK disassembly continuation byte windows.
 
-This helper validates evidence shape only. It does not promote static
-instruction evidence into runtime semantic claims.
+This helper validates static evidence shape only. It does not promote
+instruction bytes into runtime semantic claims.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ REQUIRED_FIELDS = (
 
 
 def _hex_rva(value: object) -> int | None:
-    if not isinstance(value, str) or not value.startswith("0x"):
+    if not isinstance(value, str) or not value.lower().startswith("0x"):
         return None
     try:
         return int(value, 16)
@@ -29,8 +29,18 @@ def _hex_rva(value: object) -> int | None:
         return None
 
 
+def _parse_bytes(value: object) -> bytes | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        return bytes.fromhex(value)
+    except ValueError:
+        return None
+
+
 def validate(record: dict) -> list[str]:
     errors: list[str] = []
+
     for field in REQUIRED_FIELDS:
         if field not in record:
             errors.append(f"missing:{field}")
@@ -46,9 +56,17 @@ def validate(record: dict) -> list[str]:
     elif end <= start:
         errors.append("invalid:rva-order")
 
-    overlap = record.get("overlap_bytes")
-    if not isinstance(overlap, str) or len(overlap.split()) == 0:
-        errors.append("invalid:empty-overlap")
+    overlap = _parse_bytes(record.get("overlap_bytes"))
+    if overlap is None:
+        errors.append("invalid:overlap-bytes")
+
+    window = record.get("window_bytes")
+    if window is not None:
+        parsed_window = _parse_bytes(window)
+        if parsed_window is None:
+            errors.append("invalid:window-bytes")
+        elif overlap is not None and not parsed_window.startswith(overlap):
+            errors.append("invalid:overlap-mismatch")
 
     targets = record.get("branch_targets")
     if targets is not None and not isinstance(targets, list):
