@@ -800,16 +800,24 @@ def verify_dxvk_continuation_chain() -> None:
             invalid_proof_dependencies = [
                 proof_id
                 for proof_id in predecessor_proof_ids
-                if proof_id >= continuation_id
+                if proof_id >= continuation_id or proof_id not in proof_ids
             ]
+            duplicate_proof_dependencies = sorted({
+                proof_id
+                for proof_id in predecessor_proof_ids
+                if predecessor_proof_ids.count(proof_id) > 1
+            })
             if predecessor_proof_ids and (
-                immediate_predecessor_calls != 1 or invalid_proof_dependencies
+                immediate_predecessor_calls != 1
+                or invalid_proof_dependencies
+                or duplicate_proof_dependencies
             ):
                 raise SystemExit(
                     f"DXVK continuation {continuation_id} prefix proof consumes invalid predecessor proof chain: "
                     f"expected={expected_predecessor_call} proof_ids={predecessor_proof_ids} "
                     f"immediate_calls={immediate_predecessor_calls} "
-                    f"invalid={invalid_proof_dependencies}"
+                    f"invalid={invalid_proof_dependencies} "
+                    f"duplicates={duplicate_proof_dependencies}"
                 )
         proof_name = (
             f"guarded_gf_target_c_helper_1_third_callee_continuation_"
