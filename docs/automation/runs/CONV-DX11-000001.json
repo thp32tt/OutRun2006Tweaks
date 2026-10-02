@@ -5,7 +5,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "5cf025e20382f6db5d6cf3297dd738bcfafb911c",
-  "state_parent_head": "395a9fbdac2d6b4eec951cbd09ed7ba9eef14557",
+  "state_parent_head": "0ee584aae99aa5c32e122bfcd7db8f9a3c623617",
   "material_result_sha": "ecccde1dc4c14061ee116474f808ab090661db1c",
   "validation_bearing_sha": "8dcec97abd7b1bfb05c9ccd57ed73c3d334af582",
   "runtime_validation": "UNTESTED",
@@ -71,7 +71,7 @@
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. R138 live RS/OM final-bound composition is complete and current descendants already add R139 same-context live reobservation plus direct live IA geometry evidence. The current R140 API declared at 931d4b8448e9a734b0816d9693b1b151e69d009e still needs its implementation/probes/guard completed so exact live VB/optional-IB/stride/offset/index-format/topology identity is composed with the same-context final dormant pre-draw proof. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Do not duplicate completed R138 or the current descendant R139/R140 same-context/live-IA work. First consume a non-superseded CI result for the R140 complete-bound-draw contract now present through 395a9fbdac2d6b4eec951cbd09ed7ba9eef14557; it must retain exact live pipeline, aggregate PS, RS/OM and VB/optional-IB/stride/offset/index-format/topology evidence without a production Draw* caller. If that static/build gate passes, perform a fresh source-wide review for the next dormant conversion gap. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -84,7 +84,7 @@
   "issue14_comment_id": 5947157876,
   "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
   "blocker": "Hosted Win32 configure/build was superseded by rapid descendant branch pushes after all relevant static gates passed. Runtime hardware validation was not performed.",
-  "next_action": "Keep NativeDrawPathActive disabled. R138 live RS/OM final-bound composition is complete and current descendants already add R139 same-context live reobservation plus direct live IA geometry evidence. The current R140 API declared at 931d4b8448e9a734b0816d9693b1b151e69d009e still needs its implementation/probes/guard completed so exact live VB/optional-IB/stride/offset/index-format/topology identity is composed with the same-context final dormant pre-draw proof. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
+  "next_action": "Keep NativeDrawPathActive disabled. Do not duplicate completed R138 or the current descendant R139/R140 same-context/live-IA work. First consume a non-superseded CI result for the R140 complete-bound-draw contract now present through 395a9fbdac2d6b4eec951cbd09ed7ba9eef14557; it must retain exact live pipeline, aggregate PS, RS/OM and VB/optional-IB/stride/offset/index-format/topology evidence without a production Draw* caller. If that static/build gate passes, perform a fresh source-wide review for the next dormant conversion gap. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",

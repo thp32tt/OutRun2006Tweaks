@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "395a9fbdac2d6b4eec951cbd09ed7ba9eef14557",
+  "state_parent_head": "0ee584aae99aa5c32e122bfcd7db8f9a3c623617",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -60,7 +60,7 @@
   },
   "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. R138 now composes live RS/OM readback into final dormant bound-draw readiness; later descendants strengthen same-context and IA geometry evidence, but none activate Draw*.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until Quest 3/VDXR parity proof.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. R138 live RS/OM final-bound composition is complete and current descendants already add R139 same-context live reobservation plus direct live IA geometry evidence. The current R140 API declared at 931d4b8448e9a734b0816d9693b1b151e69d009e still needs its implementation/probes/guard completed so exact live VB/optional-IB/stride/offset/index-format/topology identity is composed with the same-context final dormant pre-draw proof. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Do not duplicate completed R138 or the current descendant R139/R140 same-context/live-IA work. First consume a non-superseded CI result for the R140 complete-bound-draw contract now present through 395a9fbdac2d6b4eec951cbd09ed7ba9eef14557; it must retain exact live pipeline, aggregate PS, RS/OM and VB/optional-IB/stride/offset/index-format/topology evidence without a production Draw* caller. If that static/build gate passes, perform a fresh source-wide review for the next dormant conversion gap. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
