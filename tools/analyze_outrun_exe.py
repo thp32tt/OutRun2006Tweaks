@@ -2120,6 +2120,42 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_OVERLAP_BYTES = (
 )
 
 
+# CONV-DXVK-000002/F23: exact-decode all complete instructions exposed by
+# the canonical 0x182A5B overlap window. The capture ends two bytes into
+# a rel32 CALL at 0x182A99, so that cut edge remains raw-only.
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_PREFIX_END_RVA = 0x00182A99
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_INCOMPLETE_RVA = 0x00182A99
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_INCOMPLETE_BYTES = bytes.fromhex("e8 01")
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_BRANCHES = (
+    (0x00182A66, 0x00182A9F),
+    (0x00182A6E, 0x00182A8F),
+    (0x00182A83, 0x00182A8F),
+    (0x00182A89, 0x00182A70),
+    (0x00182A8D, 0x00182A70),
+)
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_CALLS = ()
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_INSTRUCTIONS = (
+    (0x00182A5B, "8a 45 10", "mov al, [ebp+0x10]"),
+    (0x00182A5E, "a2 a8 fa 85 00", "mov [0x85faa8], al"),
+    (0x00182A63, "39 7d 0c", "cmp [ebp+0x0c], edi"),
+    (0x00182A66, "75 37", "jne 0x182a9f"),
+    (0x00182A68, "39 3d 6c bc 98 00", "cmp [0x98bc6c], edi"),
+    (0x00182A6E, "74 1f", "je 0x182a8f"),
+    (0x00182A70, "a1 68 bc 98 00", "mov eax, [0x98bc68]"),
+    (0x00182A75, "83 e8 04", "sub eax, 4"),
+    (0x00182A78, "a3 68 bc 98 00", "mov [0x98bc68], eax"),
+    (0x00182A7D, "3b 05 6c bc 98 00", "cmp eax, [0x98bc6c]"),
+    (0x00182A83, "72 0a", "jb 0x182a8f"),
+    (0x00182A85, "8b 00", "mov eax, [eax]"),
+    (0x00182A87, "3b c7", "cmp eax, edi"),
+    (0x00182A89, "74 e5", "je 0x182a70"),
+    (0x00182A8B, "ff d0", "call eax"),
+    (0x00182A8D, "eb e1", "jmp 0x182a70"),
+    (0x00182A8F, "68 08 f1 62 00", "push 0x62f108"),
+    (0x00182A94, "b8 00 f1 62 00", "mov eax, 0x62f100"),
+)
+
+
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS = (
     (0x000283DE, "b9 00 00 80 3f", "mov ecx, 0x3f800000"),
     (0x000283E3, "d9 58 1c", "fstp dword [eax+0x1c]"),
@@ -12293,6 +12329,147 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_32_provenance
     }
 
 
+def collect_guarded_gf_target_c_helper_1_third_callee_continuation_32_prefix_proof(pe: PE) -> dict:
+    """Prove the complete canonical 0x182A5B prefix without semantic promotion."""
+
+    provenance = collect_guarded_gf_target_c_helper_1_third_callee_continuation_32_provenance(pe)
+    expected_next = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_RVA
+    rows = []
+    instruction_starts = set()
+    contiguous = True
+    for rva, expected_hex, asm in GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_INSTRUCTIONS:
+        expected = bytes.fromhex(expected_hex)
+        actual = pe.bytes_at_rva(rva, len(expected))
+        bytes_match = actual == expected
+        if rva != expected_next:
+            contiguous = False
+        rows.append({
+            "rva": rva,
+            "expected_bytes": expected.hex(" "),
+            "actual_bytes": actual.hex(" "),
+            "asm": asm,
+            "bytes_match": bytes_match,
+        })
+        instruction_starts.add(rva)
+        expected_next = rva + len(expected)
+
+    branch_rows = []
+    branch_targets_match = True
+    internal_branch_targets_on_boundaries = True
+    external_targets = []
+    for branch_rva, expected_target_rva in GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_BRANCHES:
+        decoded_target_rva = rel_target(branch_rva)
+        matches = decoded_target_rva == expected_target_rva
+        target_within_prefix = (
+            GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_RVA
+            <= expected_target_rva
+            < GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_PREFIX_END_RVA
+        )
+        target_is_boundary = expected_target_rva in instruction_starts
+        branch_rows.append({
+            "branch_rva": branch_rva,
+            "expected_target_rva": expected_target_rva,
+            "decoded_target_rva": decoded_target_rva,
+            "matches": matches,
+            "target_within_prefix": target_within_prefix,
+            "target_is_instruction_boundary": target_is_boundary,
+        })
+        branch_targets_match = branch_targets_match and matches
+        if target_within_prefix:
+            internal_branch_targets_on_boundaries = (
+                internal_branch_targets_on_boundaries and target_is_boundary
+            )
+        else:
+            external_targets.append(expected_target_rva)
+
+    expected_raw_calls = set(GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_CALLS)
+    observed_raw_calls = {
+        (item["call_rva"], item["target_rva"])
+        for item in provenance["raw_outbound_rel32_candidates"]
+    }
+    raw_call_census_matches = observed_raw_calls == expected_raw_calls
+
+    incomplete = pe.bytes_at_rva(
+        GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_INCOMPLETE_RVA,
+        len(GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_INCOMPLETE_BYTES),
+    )
+    incomplete_matches = (
+        incomplete == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_INCOMPLETE_BYTES
+    )
+    capture_edge_matches = (
+        GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_INCOMPLETE_RVA
+        + len(incomplete)
+        == provenance["probe_end_rva"]
+    )
+    predecessor_exact = (
+        provenance["status"] == "EXACT_EXE_182A5B_TO_182A9B_PROVENANCE_CAPTURED"
+        and provenance["predecessor_exact"]
+        and provenance["predecessor_end_rva"] == provenance["target_rva"]
+        and provenance["predecessor_incomplete_rva"] == provenance["target_rva"]
+        and provenance["overlap_matches"]
+        and provenance["probe_end_matches"]
+    )
+    start_completion_proven = bool(
+        rows
+        and rows[0]["rva"] == provenance["target_rva"]
+        and rows[0]["bytes_match"]
+        and rows[0]["actual_bytes"].startswith(provenance["overlap_actual_bytes"])
+    )
+    all_bytes_match = all(row["bytes_match"] for row in rows)
+    prefix_end_matches = (
+        expected_next == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_PREFIX_END_RVA
+    )
+    proven = bool(
+        predecessor_exact
+        and start_completion_proven
+        and contiguous
+        and all_bytes_match
+        and prefix_end_matches
+        and branch_targets_match
+        and internal_branch_targets_on_boundaries
+        and set(external_targets) == {0x00182A9F}
+        and raw_call_census_matches
+        and incomplete_matches
+        and capture_edge_matches
+    )
+    return {
+        "start_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_RVA,
+        "prefix_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_PREFIX_END_RVA,
+        "predecessor_status": provenance["status"],
+        "predecessor_exact": predecessor_exact,
+        "start_completion_proven": start_completion_proven,
+        "layout_contiguous": contiguous,
+        "all_instruction_bytes_match": all_bytes_match,
+        "instructions": rows,
+        "instruction_count": len(rows),
+        "prefix_end_matches": prefix_end_matches,
+        "branches": branch_rows,
+        "branch_targets_match": branch_targets_match,
+        "internal_branch_targets_on_boundaries": internal_branch_targets_on_boundaries,
+        "external_targets": sorted(set(external_targets)),
+        "raw_call_census_matches": raw_call_census_matches,
+        "raw_call_candidates": provenance["raw_outbound_rel32_candidates"],
+        "incomplete_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_32_INCOMPLETE_RVA,
+        "incomplete_bytes": incomplete.hex(" "),
+        "incomplete_matches": incomplete_matches,
+        "capture_edge_matches": capture_edge_matches,
+        "capture_end_rva": provenance["probe_end_rva"],
+        "status": (
+            "EXACT_182A5B_TO_182A99_CONTROL_FLOW_CAPTURE_EDGE_PROVEN"
+            if proven
+            else "CALLEE_182A5B_CONTROL_FLOW_CAPTURE_EDGE_PROOF_FAILED"
+        ),
+        "start_boundary_status": "EXACT_182A5B_MOV_AL_COMPLETION_PROVEN",
+        "internal_branch_status": "EXACT_182A70_182A8F_INTERNAL_TARGET_BOUNDARIES_PROVEN",
+        "forward_target_status": "FORWARD_TARGET_182A9F_ADDRESS_ONLY_OUTSIDE_CAPTURE",
+        "continuation_status": "INCOMPLETE_REL32_CALL_AT_182A99_CAPTURE_END",
+        "function_entry_status": "UNRESOLVED_AT_182A5B_182A99_AND_EXTERNAL_TARGETS",
+        "semantic_effect": "BOUNDED_CONTROL_FLOW_AND_CAPTURE_EDGE_ONLY",
+        "call_semantics": "INDIRECT_CALL_ONLY_COMPLETE_REL32_CENSUS_EMPTY",
+        "ownership_effect": "NONE",
+    }
+
+
 def _memoize_pe_only_collector(func):
     """Cache pure PE-only collector results on the PE instance.
 
@@ -12801,6 +12978,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_third_callee_continuation_31_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_31_provenance(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_31_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_31_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_32_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_32_provenance(pe),
+        "guarded_gf_target_c_helper_1_third_callee_continuation_32_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_32_prefix_proof(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -15615,6 +15793,41 @@ def main() -> int:
     if helper_1_third_cont_32["status"] != "EXACT_EXE_182A5B_TO_182A9B_PROVENANCE_CAPTURED":
         print("guarded_gf_target_c_helper_1_third_callee_continuation_32_provenance=FAILED")
         return 88
+
+    helper_1_third_cont_32_proof = report[
+        "guarded_gf_target_c_helper_1_third_callee_continuation_32_prefix_proof"
+    ]
+    helper_1_third_cont_32_branches = ",".join(
+        f"0x{row['branch_rva']:08X}->0x{row['decoded_target_rva']:08X}:"
+        f"match={row['matches']}:within={row['target_within_prefix']}:"
+        f"boundary={row['target_is_instruction_boundary']}"
+        for row in helper_1_third_cont_32_proof["branches"]
+    )
+    print(
+        f"gf_target_c_helper_1_third_callee_continuation_32_proof="
+        f"0x{helper_1_third_cont_32_proof['start_rva']:08X} "
+        f"status={helper_1_third_cont_32_proof['status']} "
+        f"predecessor_exact={helper_1_third_cont_32_proof['predecessor_exact']} "
+        f"start_completion={helper_1_third_cont_32_proof['start_completion_proven']} "
+        f"layout_contiguous={helper_1_third_cont_32_proof['layout_contiguous']} "
+        f"bytes_match={helper_1_third_cont_32_proof['all_instruction_bytes_match']} "
+        f"instruction_count={helper_1_third_cont_32_proof['instruction_count']} "
+        f"prefix_end=0x{helper_1_third_cont_32_proof['prefix_end_rva']:08X}:"
+        f"match={helper_1_third_cont_32_proof['prefix_end_matches']} "
+        f"branches={helper_1_third_cont_32_branches} "
+        f"branch_targets_match={helper_1_third_cont_32_proof['branch_targets_match']} "
+        f"internal_boundaries={helper_1_third_cont_32_proof['internal_branch_targets_on_boundaries']} "
+        f"raw_call_census={helper_1_third_cont_32_proof['raw_call_census_matches']} "
+        f"incomplete=0x{helper_1_third_cont_32_proof['incomplete_rva']:08X}:"
+        f"{helper_1_third_cont_32_proof['incomplete_bytes']}:"
+        f"match={helper_1_third_cont_32_proof['incomplete_matches']} "
+        f"capture_edge={helper_1_third_cont_32_proof['capture_edge_matches']} "
+        f"continuation={helper_1_third_cont_32_proof['continuation_status']} "
+        f"ownership_effect={helper_1_third_cont_32_proof['ownership_effect']}"
+    )
+    if helper_1_third_cont_32_proof["status"] != "EXACT_182A5B_TO_182A99_CONTROL_FLOW_CAPTURE_EDGE_PROVEN":
+        print("guarded_gf_target_c_helper_1_third_callee_continuation_32_prefix_proof=FAILED")
+        return 89
     return 0
 
 
