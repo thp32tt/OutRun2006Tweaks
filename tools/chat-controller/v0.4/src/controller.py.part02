@@ -245,6 +245,8 @@ def prompt_for_slot(slot: Slot, phase: str) -> str:
         }
         default_prompt = "conversion_dx11.md"
     else:
+        if slot.name not in {"A", "B", "C"}:
+            raise ValueError(f"Retired or unsupported localization lane: {slot.name}")
         role_prompts = {
             "A": "localization_A.md",
             "B": "localization_B.md",
@@ -674,5 +676,6 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
         slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
     )
     log.info("sent slot=%s fresh=%s runs=%s url=%s", slot.name, FRESH_CHAT_EACH_RUN, slot.runs, slot.url)
+
 
 

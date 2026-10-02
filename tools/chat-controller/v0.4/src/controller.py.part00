@@ -801,7 +801,9 @@ def queue_target_for_slot(slot_name: str) -> dict:
             "branch": "vr-dx11-native-r71",
             "workflow": "Backend Conversion Gate",
         }
-    role = slot_name if slot_name in {"A", "B", "C"} else "A"
+    if slot_name not in {"A", "B", "C"}:
+        raise ValueError(f"Retired or unsupported localization lane: {slot_name}")
+    role = slot_name
     return {
         "lane": f"LOCALIZATION_{role}",
         "branch": "korean-localization-clean",
@@ -854,7 +856,7 @@ def queue_dynamic_prefix() -> str:
         lines.append(LOCALIZATION_EXECUTION_POLICY)
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B"}:
         lines += [
-            "A/B producer는 개별 GitHub Actions Gate를 기다리지 않는다. durable task commit이 생성되면 controller가 즉시 다음 생산으로 진행한다.",
+            "A/B producer는 개별 GitHub Actions Gate를 기다리지 않는다. A/B material commit 후 C QA와 C Gate를 완료해야 다음 생산 wave를 시작한다. A는 짝수 index, B는 홀수 index를 소유한다. E lane/shard는 사용하지 않는다.",
             "이 producer task record의 AUTOMATION_VALIDATION은 PENDING으로 남기고 validation_mode=C_BATCH_GATE로 기록해. 최종 자동 검증 권한은 후속 C batch Gate에 있다.",
             "생산 우선순위는 candidate-completion-first다. C가 받아들인 RENDER_READY 또는 ONE_STAGE_TO_RENDER 자산이 shard에 있으면 새 unrelated preflight/work-order를 시작하지 말고 그 자산을 실제 Korean DDS candidate까지 완료해.",
             "baseline/slant/style 측정만 남았다면 같은 invocation에서 측정하고 render -> measure/refit -> DDS encode -> decoded-final self-QA까지 이어가. ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.",

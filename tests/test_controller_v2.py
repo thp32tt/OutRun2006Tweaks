@@ -110,6 +110,13 @@ class ControllerV2(unittest.TestCase):
         q['active_by_lane']['C'].update(phase='DONE',terminal='PASS')
         cycle();self.assertEqual(set(q['active_by_lane']),{'A','B'})
 
+    def test_retired_lane_rejected(self):
+        e=env();e['CONTROLLER_MODE']='localization'
+        for lane in ('D','E'):
+            with self.assertRaises(ValueError): e['queue_target_for_slot'](lane)
+            with self.assertRaises(ValueError): e['prompt_for_slot'](SimpleNamespace(name=lane),'parallel')
+        self.assertEqual(e['queue_target_for_slot']('C')['lane'],'LOCALIZATION_C')
+
     def test_incomplete_c_evidence_holds(self):
         e=env();item={'task_id':'A','result_sha':'sha'};q={'qa_pending':[item]}
         e['github_task_record']=Mock(return_value={'qa_dispositions':[]})

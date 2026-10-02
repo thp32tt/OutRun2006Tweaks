@@ -33,6 +33,7 @@ jobs:
           python tests/test_localization_execution.py
 
       - name: Validate exact pre-E prompt contract
+        if: github.ref == 'refs/heads/recovery/localization-no-e'
         shell: bash
         run: |
           set -euo pipefail
@@ -49,6 +50,24 @@ jobs:
           assert 'C가 검수하는 동안 A/B 생산은 계속된다' in c
           assert 'asset_queue_v2.csv' not in a+b+c
           assert 'LOCALIZATION_E' not in a+b+c
+          PY
+
+      - name: Validate v2 ABC prompt and dispatch contract
+        if: github.ref != 'refs/heads/recovery/localization-no-e'
+        shell: bash
+        run: |
+          python tests/test_controller_v2.py
+          python - <<'PY'
+          from pathlib import Path
+          root = Path('tools/chat-controller/v0.4')
+          a = (root/'localization_A.md').read_text()
+          b = (root/'localization_B.md').read_text()
+          c = (root/'localization_C.md').read_text()
+          assert '짝수 index primary shard' in a
+          assert '홀수 index primary shard' in b
+          assert '다음 A/B wave를 시작하지 않는다' in c
+          assert 'asset_queue_v2.csv' not in a+b+c
+          assert not (root/'localization_E.md').exists()
           PY
 
       - name: Assemble and compile controller
@@ -142,3 +161,4 @@ jobs:
           test "$ok" = "1"
           grep -q 'Controller mode:</b> localization' /tmp/localization-only-status.html
           grep -q '&quot;localization_only&quot;: true' /tmp/localization-only-status.html
+
