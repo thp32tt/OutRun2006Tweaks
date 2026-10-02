@@ -4,75 +4,72 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "0347abcd313a08d469d2508bf8a34785003d854d",
-  "state_parent_head": "a0b7453122b84934a39d0db177465e1caaa68b4e",
-  "material_result_sha": "82fb2e36bedda85c87f8f1bd8e27edc179a6fb90",
-  "validation_bearing_sha": "82fb2e36bedda85c87f8f1bd8e27edc179a6fb90",
+  "base_sha": "82fb2e36bedda85c87f8f1bd8e27edc179a6fb90",
+  "state_parent_head": "be0d3e87b8e23867f4d02350db198e89ede4f88d",
+  "material_result_sha": "f611eaab243bc11756e1d953e50b1e335064d7c1",
+  "validation_bearing_sha": "f611eaab243bc11756e1d953e50b1e335064d7c1",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_MULTISAMPLE_RASTER_PROVENANCE_R171",
-  "selection_reason": "Fresh latest-HEAD audit found D3DRS_MULTISAMPLEANTIALIAS absent from the tracked D3D9 snapshot while translate_pipeline hard-coded D3D11 RasterizerState.MultisampleEnable=FALSE, erasing game-authored per-draw multisample raster intent.",
-  "summary": "Preserved D3DRS_MULTISAMPLEANTIALIAS through the D3D9 tracked snapshot and native DX11 rasterizer translation, with enabled/disabled regression probes and a source-graph retention contract. Native draw activation remains disabled.",
+  "selected_work": "DX11_MULTISAMPLE_RASTER_CENSUS_IDENTITY_R172",
+  "selection_reason": "Fresh GitHub-authoritative inspection of the retaining R171 implementation showed D3DRS_MULTISAMPLEANTIALIAS was captured and translated into D3D11 rasterizer state, but runtime_census.cpp contained no multiSampleAntialias provenance. Distinct per-draw raster states could therefore alias one census signature.",
+  "summary": "Added multisample-raster observation/value provenance to DX11 runtime census identity, hashing, capture propagation and detailed telemetry; extended the DX11 source-graph contract so this semantic identity cannot silently regress.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read branch-authoritative AGENTS.md, conversion lane state, current job run record, regression/history evidence, and current GitHub HEAD; rejected concurrently completed R169/R170 work rather than duplicating it."
+        "Read AGENTS.md, docs/CONVERSION_LANE_STATE.json and the live CONV-DX11-000001 run record through authenticated GitHub authority.",
+        "Confirmed R171 was retained on current branch and isolated the remaining census-identity gap; no local/N100 clone was used."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "RenderStateSnapshot lacked D3DRS_MULTISAMPLEANTIALIAS provenance.",
-        "PrimeTrackedRenderStates/CaptureTrackedRenderStateSnapshot did not capture it.",
-        "translate_pipeline hard-coded D3D11_RASTERIZER_DESC.MultisampleEnable=FALSE."
+        "R171 already captured D3DRS_MULTISAMPLEANTIALIAS and translated it to D3D11_RASTERIZER_DESC::MultisampleEnable.",
+        "runtime_census.cpp had zero multiSampleAntialias/R171 references before this unit, allowing distinct raster states to share a census signature."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
-        "src/vr/core/d3d9_draw_state.hpp",
-        "src/vr/d3d9/stereo_renderer_r7.inc",
-        "src/vr/d3d11/pipeline_translation.cpp",
-        "tools/dx11_fixed_function_pipeline_probe.cpp",
+        "src/vr/d3d11/runtime_census.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "82fb2e36bedda85c87f8f1bd8e27edc179a6fb90"
+        "3834db7301b67531920a377e96f0f21b97d4fb69",
+        "f611eaab243bc11756e1d953e50b1e335064d7c1"
       ],
       "details": [
-        "Added multiSampleAntialias default TRUE to D3D9 render-state snapshot.",
-        "Tracked and captured D3DRS_MULTISAMPLEANTIALIAS through the existing render-state shadow.",
-        "Mapped the captured value to D3D11 rasterizer MultisampleEnable.",
-        "Added enabled/disabled translation probes and source-graph retention guard."
+        "Added multisampleRasterObservationComplete and multiSampleAntialias to runtime census signature identity.",
+        "Hashed both observation completeness and the captured raster value, propagated the live snapshot, and emitted bounded R172 detail telemetry.",
+        "Extended verify_dx11_source_graph.py to require all R172 census identity/capture/logging tokens."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_STATIC_COMPILE_NOT_CLAIMED",
-      "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; READINESS_SMOKE_CANCELLED; BUILD_NOT_CLAIMED",
+      "status": "COMPLETE_STATIC_CI_CANCELLED_COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_GITHUB_AUTHORITATIVE_SOURCE_AND_RETENTION_INSPECTION; EXACT_SHA_ACTIONS_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; COMPILE_NOT_CLAIMED",
       "evidence": [
-        "Backend Conversion Gate run 36986777523 on exact material SHA: Verify DX11 source graph=success.",
-        "Same exact-SHA run: Verify DX11 dormant activation boundary=success.",
-        "Same exact-SHA run: Test DX11 census analyzer=success.",
-        "Same-branch churn cancelled Configure Win32 and DX11 readiness smoke probes; Build Win32 was skipped, so compile/probe success is not claimed."
+        "Authenticated GitHub commit inspection confirmed both R172 material commits and the expected source/test diffs.",
+        "Current branch remains a descendant of f611eaab243bc11756e1d953e50b1e335064d7c1; the material result is retained.",
+        "Exact-result Build/OpenXR/HUD workflow runs were cancelled by same-branch descendant churn; no compile success is claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "82fb2e36bedda85c87f8f1bd8e27edc179a6fb90",
-      "issue14_comment_id": 5948631492
+      "material_commit": "f611eaab243bc11756e1d953e50b1e335064d7c1",
+      "implementation_commit": "3834db7301b67531920a377e96f0f21b97d4fb69",
+      "issue14_comment_id": 5948655749
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant D3D9-to-DX11 render-state provenance/translation unit only; no runtime package or activation change."
+      "reason": "Dormant DX11 census identity/static guard only; no native draw activation, transport, release package, localization or other backend changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve the newer R172 multisample census identity already present after R171 and fresh-audit the latest GitHub HEAD for the next independent dormant D3D9 render-state semantic gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit latest GitHub HEAD for the next independent dormant D3D9 render-state semantic gap, excluding already covered R168 line raster, R169 point raster, R170 WRAP0..7, R171 multisample translation and R172 multisample census identity. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -83,23 +80,20 @@
     "localization_modified": false,
     "other_backend_modified": false
   },
-  "issue14_comment_id": 5948631492,
-  "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; READINESS_SMOKE_CANCELLED; BUILD_NOT_CLAIMED",
-  "blocker": "Full Win32 configure/build and the hosted DX11 readiness smoke probes for the exact R171 SHA were cancelled/skipped by same-branch descendant churn. Runtime validation was not performed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Preserve the newer R172 multisample census identity already present after R171 and fresh-audit the latest GitHub HEAD for the next independent dormant D3D9 render-state semantic gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5948655749,
+  "automation_validation": "PASS_GITHUB_AUTHORITATIVE_SOURCE_AND_RETENTION_INSPECTION; EXACT_SHA_ACTIONS_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; COMPILE_NOT_CLAIMED",
+  "blocker": "Exact-result GitHub Actions were cancelled by same-branch descendant churn, so compile/build success is not claimed. Runtime validation was not performed.",
+  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit latest GitHub HEAD for the next independent dormant D3D9 render-state semantic gap, excluding already covered R168 line raster, R169 point raster, R170 WRAP0..7, R171 multisample translation and R172 multisample census identity. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
   "prior_completed_unit": "DX11_TEXTURE_COORDINATE_WRAP_FAIL_CLOSED_R170",
-  "source_head": "a0b7453122b84934a39d0db177465e1caaa68b4e",
-  "result_sha": "82fb2e36bedda85c87f8f1bd8e27edc179a6fb90",
-  "selected_work_item": "DX11_MULTISAMPLE_RASTER_PROVENANCE_R171",
+  "source_head": "be0d3e87b8e23867f4d02350db198e89ede4f88d",
+  "result_sha": "f611eaab243bc11756e1d953e50b1e335064d7c1",
+  "selected_work_item": "DX11_MULTISAMPLE_RASTER_CENSUS_IDENTITY_R172",
   "changed_paths": [
-    "src/vr/core/d3d9_draw_state.hpp",
-    "src/vr/d3d9/stereo_renderer_r7.inc",
-    "src/vr/d3d11/pipeline_translation.cpp",
-    "tools/dx11_fixed_function_pipeline_probe.cpp",
+    "src/vr/d3d11/runtime_census.cpp",
     "tools/verify_dx11_source_graph.py"
   ],
-  "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve the newer R172 multisample census identity already present after R171 and fresh-audit the latest GitHub HEAD for the next independent dormant D3D9 render-state semantic gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit latest GitHub HEAD for the next independent dormant D3D9 render-state semantic gap, excluding already covered R168 line raster, R169 point raster, R170 WRAP0..7, R171 multisample translation and R172 multisample census identity. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
 }
