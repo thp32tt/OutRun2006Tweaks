@@ -586,6 +586,29 @@ namespace OutRunVRStereo
         VRStereoR29Hook VRStereoR29Hook::instance;
     }
 
+    struct R29EffectTelemetrySnapshot
+    {
+        DWORD alphaBlend = FALSE;
+        DWORD alphaTest = FALSE;
+        DWORD zWrite = TRUE;
+    };
+
+    inline bool TryGetEffectTelemetrySnapshot(
+        R29EffectTelemetrySnapshot& out) noexcept
+    {
+        out = {};
+        if (!R29Effect.valid ||
+            R29Effect.presentEpoch != PresentEpoch ||
+            R23GameDrawSerial < R29Effect.drawSerial ||
+            R23GameDrawSerial - R29Effect.drawSerial >= 64)
+            return false;
+
+        out.alphaBlend = R29Effect.alphaBlend;
+        out.alphaTest = R29Effect.alphaTest;
+        out.zWrite = R29Effect.zWrite;
+        return true;
+    }
+
     inline void InvalidateEffectStateCache() noexcept
     {
         R29Effect = {};
