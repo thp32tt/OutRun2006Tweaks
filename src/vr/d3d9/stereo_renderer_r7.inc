@@ -1641,6 +1641,13 @@ namespace OutRunVRStereo
 	bool IsVRTelemetryEnabled() noexcept { return Settings::VRTelemetry; }
 	bool AnyAuxRenderTargetActiveSnapshot() noexcept { return AnyAuxRenderTargetActive(); }
 	float StereoWorldScaleSnapshot() noexcept { return Settings::VRWorldScale; }
+	bool StereoMatrixFinite(const D3DMATRIX& m) noexcept { return MatrixFinite(m); }
+	D3DMATRIX StereoMatrixFromPose(const float q[4],const float p[3],float s) noexcept { return MatrixFromQuaternionTranslation(q,p,s); }
+	D3DMATRIX StereoInverseRigid(const D3DMATRIX& m) noexcept { return InverseRigid(m); }
+	D3DMATRIX StereoMultiplyMatrix(const D3DMATRIX& a,const D3DMATRIX& b) noexcept { return MultiplyMatrix(a,b); }
+	D3DMATRIX StereoTransposeMatrix(const D3DMATRIX& m) noexcept { return TransposeMatrix(m); }
+	D3DMATRIX StereoProjectionFromFov(const D3DMATRIX& b,float l,float r,float u,float d) noexcept { OutRunVR::SharedFov f{}; f.angleLeft=l;f.angleRight=r;f.angleUp=u;f.angleDown=d; return ProjectionFromFov(b,f); }
+	bool StereoGetInverseProjection(const D3DMATRIX& p,D3DMATRIX& i) noexcept { return GetInverseProjection(p,i); }
 	InternalStereoPassScope::InternalStereoPassScope() noexcept
 		: previous_(InternalStereoPass)
 	{

@@ -32,6 +32,7 @@
 #include "../render/stereo_base_policy.hpp"
 #include "../render/runtime_context.hpp"
 #include "../render/stereo_runtime_facade.hpp"
+#include "../render/stereo_math_api.hpp"
 #include "../state/depth_stencil_runtime.hpp"
 #include "../render/fast_path_support.hpp"
 #include "../render/screen_space_api.hpp"
@@ -208,13 +209,14 @@ namespace OutRunVRStereo
             next.inverseProjection = inverseProjection;
             for (int eye = 0; eye < 2; ++eye)
             {
-                const D3DMATRIX eyePose = MatrixFromQuaternionTranslation(
+                const D3DMATRIX eyePose = StereoMatrixFromPose(
                     stereo.eyeOrientation[eye], stereo.eyeOffset[eye], worldScale);
-                const D3DMATRIX eyeInverse = InverseRigid(eyePose);
-                const D3DMATRIX eyeProjection = ProjectionFromFov(
-                    projection, stereo.eyeFov[eye]);
-                next.eyeTail[eye] = MultiplyMatrix(eyeInverse, eyeProjection);
-                if (!MatrixFinite(next.eyeTail[eye]))
+                const D3DMATRIX eyeInverse = StereoInverseRigid(eyePose);
+                const D3DMATRIX eyeProjection = StereoProjectionFromFov(
+                    projection, stereo.eyeFov[eye].angleLeft, stereo.eyeFov[eye].angleRight,
+                    stereo.eyeFov[eye].angleUp, stereo.eyeFov[eye].angleDown);
+                next.eyeTail[eye] = StereoMultiplyMatrix(eyeInverse, eyeProjection);
+                if (!StereoMatrixFinite(next.eyeTail[eye]))
                     return false;
             }
             next.valid = true;
@@ -224,7 +226,7 @@ namespace OutRunVRStereo
 
         bool R31BuildFastWorldConstants(IDirect3DDevice9* device,
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
-            DrawStereoState& draw) noexcept
+            OutRunVR::Render::FastWorldDispatchConstants& draw) noexcept
         {
             float verified[16]{};
             std::uint32_t generation = 0;
@@ -279,8 +281,8 @@ namespace OutRunVRStereo
                 projectionPoseSequence != poseSequence)
                 return false;
             std::memcpy(&projection, verifiedProjection, sizeof(projection));
-            if (!MatrixFinite(projection) ||
-                !GetInverseProjection(projection, inverseProjection) ||
+            if (!StereoMatrixFinite(projection) ||
+                !StereoGetInverseProjection(projection, inverseProjection) ||
                 !R31PrepareEyeTailCache(stereo, projection, inverseProjection))
                 return false;
 
@@ -288,25 +290,23 @@ namespace OutRunVRStereo
                 liveValidated ? live : verified, sizeof(verified));
             D3DMATRIX uploadedT{};
             std::memcpy(&uploadedT, verified, sizeof(uploadedT));
-            const D3DMATRIX currentWvp = TransposeMatrix(uploadedT);
-            const D3DMATRIX correctedWorldView = MultiplyMatrix(
+            const D3DMATRIX currentWvp = StereoTransposeMatrix(uploadedT);
+            const D3DMATRIX correctedWorldView = StereoMultiplyMatrix(
                 currentWvp, R31EyeCache.inverseProjection);
-            if (!MatrixFinite(correctedWorldView))
+            if (!StereoMatrixFinite(correctedWorldView))
                 return false;
 
             for (int eye = 0; eye < 2; ++eye)
             {
-                const D3DMATRIX eyeWvp = MultiplyMatrix(
+                const D3DMATRIX eyeWvp = StereoMultiplyMatrix(
                     correctedWorldView, R31EyeCache.eyeTail[eye]);
-                if (!MatrixFinite(eyeWvp))
+                if (!StereoMatrixFinite(eyeWvp))
                     return false;
-                const D3DMATRIX eyeWvpT = TransposeMatrix(eyeWvp);
+                const D3DMATRIX eyeWvpT = StereoTransposeMatrix(eyeWvp);
                 std::memcpy(draw.eyeConstants[eye], &eyeWvpT,
                     sizeof(eyeWvpT));
             }
-            draw.worldStereo = true;
             draw.poseSequence = stereo.poseSequence;
-            draw.stereoFrame = stereo;
             return true;
         }
 
@@ -350,7 +350,7 @@ namespace OutRunVRStereo
                 CurrentFrameStereoPoseSequence() != stereo.poseSequence)
                 return {};
 
-            DrawStereoState draw{};
+            OutRunVR::Render::FastWorldDispatchConstants draw{};
             if (!R31BuildFastWorldConstants(device, stereo, draw))
                 return {};
 
@@ -1163,7 +1163,7 @@ HRESULT __stdcall DrawIndexedPrimitiveUPDestR31(
         const OutRunVRRenderer::LatchedStereoFrame& stereo,
         FastWorldDispatchConstants& out) noexcept
     {
-        DrawStereoState draw{};
+        OutRunVR::Render::FastWorldDispatchConstants draw{};
         if (!R31BuildFastWorldConstants(device, stereo, draw))
             return false;
         std::memcpy(out.originalConstants,
