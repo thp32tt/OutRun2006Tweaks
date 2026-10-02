@@ -1631,6 +1631,26 @@ def localization_remaining_material_targets(active: dict, limit: int = 12) -> li
     return [item for item in targets if int(item.get("index", -1)) not in completed][:limit]
 
 
+def localization_qa_inflight_candidate_indices(q: dict) -> list[int]:
+    """Candidate asset indices already produced and awaiting/under C validation."""
+    values = []
+    for item in q.get("qa_pending", []) or []:
+        values.extend(item.get("candidate_indices") or [])
+    for lane_task in (q.get("active_by_lane") or {}).values():
+        if not isinstance(lane_task, dict):
+            continue
+        values.extend(lane_task.get("pipeline_candidate_indices") or [])
+    result = []
+    for value in values:
+        try:
+            idx = int(value)
+        except (TypeError, ValueError):
+            continue
+        if idx not in result:
+            result.append(idx)
+    return result
+
+
 def localization_record_producer_checkpoint(
     q: dict,
     active: dict,
@@ -1652,8 +1672,10 @@ def localization_record_producer_checkpoint(
     active["pipeline_material_commit_count"] = int(active.get("pipeline_material_commit_count", 0) or 0) + 1
     active["pipeline_last_candidate_delta"] = candidate_delta
 
+    checkpoint_indices = producer_result_candidate_indices(record)
+    checkpoint_paths = producer_result_candidate_paths(record)
     indices = list(active.get("pipeline_candidate_indices") or [])
-    for idx in producer_result_candidate_indices(record):
+    for idx in checkpoint_indices:
         if idx not in indices:
             indices.append(idx)
     active["pipeline_candidate_indices"] = indices[-64:]
@@ -1675,7 +1697,11 @@ def localization_record_producer_checkpoint(
     snapshot["terminal"] = "PRODUCED"
     snapshot["phase"] = "DONE"
     snapshot["completed_at"] = now.isoformat()
+    snapshot["checkpoint_candidate_indices"] = checkpoint_indices
+    snapshot["checkpoint_candidate_paths"] = checkpoint_paths
     enqueue_producer_result_for_qa(q, snapshot)
+    active["controller_exclude_indices"] = localization_qa_inflight_candidate_indices(q)
+    _localization_material_target_cache.clear()
 
     remaining = localization_remaining_material_targets(active)
     candidates = int(active.get("pipeline_candidate_count", 0) or 0)
@@ -2730,6 +2756,8 @@ def enqueue_producer_result_for_qa(q: dict, task: dict) -> bool:
         "producer_id": task.get("wave_id"),
         "automation_validation": task.get("automation_validation", "PENDING"),
         "validation_mode": task.get("validation_mode", "C_BATCH_GATE"),
+        "candidate_indices": list(task.get("checkpoint_candidate_indices") or []),
+        "candidate_paths": list(task.get("checkpoint_candidate_paths") or []),
     }
     key = _qa_item_key(item)
     pending_keys = {_qa_item_key(x) for x in q.get("qa_pending", [])}
