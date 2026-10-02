@@ -134,7 +134,8 @@
     5946905253,
     5947028855,
     5947079394,
-    5947106311
+    5947106311,
+    5947150461
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -1320,6 +1321,28 @@
       "runtime_validation": "UNTESTED",
       "state_strategy": "LATEST_PRIMARY_FRONTIER",
       "exact_next_action": "Exact-decode only complete instructions in canonical 0x00182C56..0x00182C96. Resolve predecessor forward target 0x00182C59 only if exact instruction-boundary evidence proves it; preserve any trailing partial instruction raw-only and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_CONTINUATION_EXACT_CALL_CONTRACT_VERIFIER_FIX",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "ceaed63b0876ccf6bd48efa6d31f0bfc9e4bbde4",
+      "commit_message": "dxvk: fix exact continuation call contract [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Replaced generic continuation collector call-count heuristics with exact expected predecessor/provenance call counting, removing a false continuation-24 failure while preserving fail-closed call identity.",
+      "validation": {
+        "exact_sha": "ceaed63b0876ccf6bd48efa6d31f0bfc9e4bbde4",
+        "dxvk_disassembly_evidence_run_id": 36976961600,
+        "dxvk_disassembly_evidence_job_id": 110742757788,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947150461,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "runtime_validation": "UNTESTED",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER"
     }
   ]
 }
