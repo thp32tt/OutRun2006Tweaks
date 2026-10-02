@@ -442,6 +442,55 @@ int main()
     d3d.context->PSSetShaderResources(
         textureStageSlot, 1, &nullSrv);
 
+    D3D11_TEXTURE2D_DESC hazardTextureDesc = textureDesc;
+    hazardTextureDesc.BindFlags =
+        D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+    ID3D11Texture2D* hazardTexture = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateTexture2D(
+            &hazardTextureDesc, nullptr, &hazardTexture)) &&
+        hazardTexture != nullptr,
+        "DX11 dormant texture-stage output hazard texture prerequisite");
+
+    NativeFixedFunctionTextureView hazardTextureView;
+    require(
+        hazardTextureView.initialize(
+            d3d.device, hazardTexture,
+            D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, 0),
+        "DX11 dormant texture-stage output hazard view prerequisite");
+
+    ID3D11RenderTargetView* hazardRtv = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateRenderTargetView(
+            hazardTexture, nullptr, &hazardRtv)) &&
+        hazardRtv != nullptr,
+        "DX11 dormant texture-stage output hazard RTV prerequisite");
+    d3d.context->OMSetRenderTargets(1, &hazardRtv, nullptr);
+
+    require(
+        !bind_fixed_function_texture_stage_for_observation(
+            d3d.context, textureStageSlot, samplerOwner, hazardTextureView),
+        "DX11 dormant texture-stage output hazard fails closed");
+
+    ID3D11SamplerState* hazardBoundSampler = nullptr;
+    ID3D11ShaderResourceView* hazardBoundSrv = nullptr;
+    d3d.context->PSGetSamplers(
+        textureStageSlot, 1, &hazardBoundSampler);
+    d3d.context->PSGetShaderResources(
+        textureStageSlot, 1, &hazardBoundSrv);
+    require(
+        hazardBoundSampler == nullptr && hazardBoundSrv == nullptr,
+        "DX11 dormant texture-stage failed bind clears partial state");
+    if (hazardBoundSampler)
+        hazardBoundSampler->Release();
+    if (hazardBoundSrv)
+        hazardBoundSrv->Release();
+
+    d3d.context->OMSetRenderTargets(0, nullptr, nullptr);
+    hazardRtv->Release();
+    hazardTextureView.shutdown();
+    hazardTexture->Release();
+
     const auto managedVertexWritePlan = translate_buffer_mutation(
         ResourceRole::Vertex, D3DPOOL_MANAGED, D3DUSAGE_WRITEONLY, 0);
     require(
