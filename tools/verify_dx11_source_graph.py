@@ -128,45 +128,49 @@ def main() -> None:
             + ", ".join(missing_r165_dither)
         )
 
-    # R165 keeps the runtime unsupported-reason census structurally aligned
-    # with every concrete PipelineUnsupported bit. This is activation evidence:
-    # silently dropping a newer blocker would make exhaustive census misleading.
+    # R166 makes the enum-owned one-past-last sentinel the census authority.
+    # The concrete unsupported bits must stay contiguous, the sentinel must be
+    # max(bit)+1, and runtime_census must size its array from that sentinel.
     pipeline_unsupported_bits = sorted({
         int(bit)
         for bit in re.findall(
             r"PipelineUnsupported[A-Za-z0-9_]+\s*=\s*1u\s*<<\s*(\d+)",
             PIPELINE_TRANSLATION_HPP)
     })
-    census_bit_count_match = re.search(
-        r"UnsupportedBitCount\s*=\s*(\d+)\s*;", RUNTIME_CENSUS)
+    pipeline_bit_count_match = re.search(
+        r"PipelineUnsupportedBitCount\s*=\s*(\d+)u?\s*,",
+        PIPELINE_TRANSLATION_HPP)
     expected_pipeline_bits = (
         list(range(pipeline_unsupported_bits[-1] + 1))
         if pipeline_unsupported_bits else []
     )
-    r165_unsupported_census_errors = []
+    r166_unsupported_census_errors = []
     if pipeline_unsupported_bits != expected_pipeline_bits:
-        r165_unsupported_census_errors.append(
+        r166_unsupported_census_errors.append(
             "PipelineUnsupported bits must remain contiguous from bit 0")
-    if (not census_bit_count_match or
-            int(census_bit_count_match.group(1)) != len(pipeline_unsupported_bits)):
-        r165_unsupported_census_errors.append(
-            "UnsupportedBitCount must cover every concrete PipelineUnsupported bit")
+    if (not pipeline_bit_count_match or
+            int(pipeline_bit_count_match.group(1)) != len(pipeline_unsupported_bits)):
+        r166_unsupported_census_errors.append(
+            "PipelineUnsupportedBitCount must equal max concrete bit + 1")
+    if "static_cast<std::size_t>(PipelineUnsupportedBitCount)" not in RUNTIME_CENSUS:
+        r166_unsupported_census_errors.append(
+            "runtime census must size UnsupportedBitCount from the enum sentinel")
     for token, meaning in [
-        ("DX11 R165 unsupported census bit coverage drift",
-         "compile-time highest-bit coverage assertion"),
+        ("DX11 R166 unsupported census sentinel out of range",
+         "compile-time sentinel bounds assertion"),
         ("dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={}",
-         "R165 log labels for bits 12..17"),
+         "R165/R166 log labels for bits 12..17"),
         ("unsupported[12], unsupported[13], unsupported[14], unsupported[15],",
-         "R165 log arguments for bits 12..15"),
+         "R165/R166 log arguments for bits 12..15"),
         ("unsupported[16], unsupported[17]);",
-         "R165 log arguments for bits 16..17"),
+         "R165/R166 log arguments for bits 16..17"),
     ]:
         if token not in RUNTIME_CENSUS:
-            r165_unsupported_census_errors.append(meaning)
-    if r165_unsupported_census_errors:
+            r166_unsupported_census_errors.append(meaning)
+    if r166_unsupported_census_errors:
         raise SystemExit(
-            "DX11 R165 unsupported census coverage drift: "
-            + ", ".join(r165_unsupported_census_errors)
+            "DX11 R166 unsupported census sentinel drift: "
+            + ", ".join(r166_unsupported_census_errors)
         )
 
     r162_shade_mode_contract = [
