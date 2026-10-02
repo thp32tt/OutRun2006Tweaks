@@ -176,6 +176,7 @@ namespace outrun::vr::dx11
             case D3DTOP_ADDSIGNED:
             case D3DTOP_ADDSIGNED2X:
             case D3DTOP_ADDSMOOTH:
+            case D3DTOP_BLENDDIFFUSEALPHA:
             case D3DTOP_SUBTRACT:
                 return fixed_function_argument_uses_texture(arg1) ||
                        fixed_function_argument_uses_texture(arg2);
@@ -260,6 +261,12 @@ namespace outrun::vr::dx11
                 // R184: D3D9 ADDSMOOTH computes Arg1 + Arg2 * (1 - Arg1)
                 // component-wise.
                 return first + " + " + second + " * (1.0 - " + first + ")";
+            case D3DTOP_BLENDDIFFUSEALPHA:
+                // R185: D3D9 BLENDDIFFUSEALPHA linearly blends Arg1/Arg2
+                // using the interpolated vertex diffuse alpha for both RGB
+                // and alpha outputs.
+                return first + " * input.diffuse.a + " + second +
+                       " * (1.0 - input.diffuse.a)";
             case D3DTOP_SUBTRACT:
                 // R177: D3D9 defines SUBTRACT as component-wise Arg1 - Arg2.
                 return first + " - " + second;
@@ -446,6 +453,7 @@ namespace outrun::vr::dx11
             case D3DTOP_ADDSIGNED:
             case D3DTOP_ADDSIGNED2X:
             case D3DTOP_ADDSMOOTH:
+            case D3DTOP_BLENDDIFFUSEALPHA:
             case D3DTOP_SUBTRACT:
                 useArg1 = true;
                 useArg2 = true;
