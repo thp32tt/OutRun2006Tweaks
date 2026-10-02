@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1484,
+  "cycle": 1493,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -337,11 +337,14 @@
     "R84-REF-GATED-GAP-PROJECTION-0049",
     "R84-REF-GATED-GAP-BOUNDARY-0050",
     "R84-REF-GATED-TELEMETRYFIX-0051",
-    "R84-REF-GATED-BUILD-0052"
+    "R84-REF-GATED-BUILD-0052",
+    "R84-REF-GATED-DEPTHSYNC-0053",
+    "R84-REF-GATED-RIGHTPASS-0054",
+    "R84-REF-GATED-FRAMEACCOUNT-0055"
   ],
-  "next": "Consume exact Gate D BUILD_GATE 1484 run. If compile fails, repair first concrete missing dependency only.",
-  "updatedKst": "2026-10-02T21:24:00+09:00",
-  "batchStatus": "R84_GATE_D_BUILD_GATE_1484_TRIGGERED",
+  "next": "Consume exact hosted Gate D run 37004875399 for source SHA e393493a689f716de1a3b120aa94f32742df2eaa. If runner starts and compile fails, repair first remaining concrete dependency (expected aux-target/world-scale/math/DrawStereoState boundary) only. Continue evidence-bearing cycles toward requested +300; do not fabricate cycles while hosted build is pending.",
+  "updatedKst": "2026-10-02T21:10:00+09:00",
+  "batchStatus": "R84_GATE_D_APPLY_1493_BUILD_PENDING",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -660,7 +663,8 @@
     "Cycles 1476-1478 R84-REF-GATED-GAP-BOUNDARY-0050: Combined owner map confirms remaining R31-only gaps can be solved with read-only/pure facades; no mutable R7 array/atomic/surface global needs external linkage. APPLY_GATE 1478 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime NEED_HMD_TEST.",
     "BUILD_GATE 1460/1466/1472/1478: REUSED_BUILD_EVIDENCE=IN_PROGRESS exact Gate D run 37002438567/job 110822978221; build input unchanged since cycle 1394.",
     "Cycles 1479-1481 R84-REF-GATED-TELEMETRYFIX-0051: consumed Gate D run 37002438567/job 110822978221. First concrete error after macro repair was Settings::VRTelemetry undeclared. Added explicit runtime_context.hpp and replaced only that read with build-green IsVRTelemetryEnabled(); verifier forbids direct telemetry-setting regression. APPLY_GATE 1481 SOURCE_CHANGED=YES. Runtime NEED_HMD_TEST.",
-    "Cycles 1482-1484 R84-REF-GATED-BUILD-0052: static re-read confirmed R31 no longer references Settings::VRTelemetry and runtime_context.hpp is explicit. APPLY_GATE 1484 NO_SAFE_CHANGE. BUILD_GATE 1484 intentionally triggered on exact telemetry-repair SHA. Runtime NEED_HMD_TEST."
+    "Cycles 1482-1484 R84-REF-GATED-BUILD-0052: static re-read confirmed R31 no longer references Settings::VRTelemetry and runtime_context.hpp is explicit. APPLY_GATE 1484 NO_SAFE_CHANGE. BUILD_GATE 1484 intentionally triggered on exact telemetry-repair SHA. Runtime NEED_HMD_TEST.",
+    "Cycles 1485-1493: three Gate D APPLY_GATE batches. 1485-1487 routed RightDepth/Stencil synchronization through right_depth_stencil_sync.hpp; 1488-1490 routed InternalPassScope/right-eye RT/depth through stereo_runtime_facade.hpp; 1491-1493 routed duplicated/right-failure accounting and installed-device lookup through existing neutral facades. Source commits f9e25aed, 5391ca31, e393493a. Exact hosted run 37004875399 for e393493a is pending; no filler cycles counted while runner is pending. Runtime NEED_HMD_TEST."
   ],
   "campaign": {
     "startCycle": 1202,
