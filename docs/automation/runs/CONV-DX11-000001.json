@@ -4,75 +4,76 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "871c0ee11322c9325325efee5813d90a7cab7a0c",
-  "state_parent_head": "b3ad54cb14c1ddb84d492722fd16c4d615964319",
-  "material_result_sha": "93d73bfef228fe03cc741a40c7523ad5114a5311",
-  "source_implementation_sha": "93d73bfef228fe03cc741a40c7523ad5114a5311",
-  "validation_bearing_sha": "93d73bfef228fe03cc741a40c7523ad5114a5311",
-  "retaining_descendant_sha": "b3ad54cb14c1ddb84d492722fd16c4d615964319",
+  "base_sha": "108a0455cc8b4fe060fa58695ac01a9f4cc35484",
+  "state_parent_head": "ee0d41992589bfb0ac76d7baad044471c5b85b61",
+  "material_result_sha": "a73942e981fce7c54888ccbf304ced6c577993d4",
+  "source_implementation_sha": "b3ad54cb14c1ddb84d492722fd16c4d615964319",
+  "validation_bearing_sha": "a73942e981fce7c54888ccbf304ced6c577993d4",
+  "retaining_descendant_sha": "ee0d41992589bfb0ac76d7baad044471c5b85b61",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_IMPLICIT_TEXTURE_ALPHA_RESOURCE_COVERAGE_GUARD",
-  "selection_reason": "Fresh authenticated HEAD audit found R186/R187 implicit texture-alpha shader paths had positive generation/compile coverage but no explicit negative readiness fixture proving a missing current-stage texture resource fails closed before generated HLSL can reference sampledN.a.",
-  "summary": "Added hosted fail-closed readiness coverage for R186 D3DTOP_BLENDTEXTUREALPHA and R187 D3DTOP_BLENDTEXTUREALPHAPM when their implicit current-stage texture-alpha dependency lacks present/exact resource coverage, plus source-graph retention guards. NativeDrawPathActive remains disabled.",
+  "selected_work": "DX11_FFP_D3DTOP_MODULATECOLOR_ADDALPHA_SUPPORT_R188",
+  "selection_reason": "Fresh authenticated GitHub HEAD audit found D3DTOP_MODULATECOLOR_ADDALPHA absent after R187. Microsoft D3D9 defines it as Arg1.rgb * Arg2.rgb + Arg1.a and restricts it to COLOROP; existing captured arguments are sufficient, so this is an exact dormant semantic gap with no new runtime state requirement.",
+  "summary": "Implemented dormant native DX11 D3DTOP_MODULATECOLOR_ADDALPHA texture-use/readiness/HLSL translation, kept ALPHAOP fail-closed, added hosted generated-HLSL/offline-compile coverage, and added a source-graph retention guard. NativeDrawPathActive remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read AGENTS.md, branch-local conversion state/run record, regression/problem history and Issue #14 from authenticated GitHub authority.",
-        "Repeated concurrent branch advances were handled only by non-force fast-forward publication; no N100/local clone was used as product-development truth."
+        "Read AGENTS.md, docs/CONVERSION_LANE_STATE.json, the live task record, docs/VR_WORK_QUEUE.json, regression/problem history and Issue #14 through authenticated GitHub authority.",
+        "Recovered the newest branch frontier before each write and preserved concurrent descendants; no N100/local clone was used as product-development truth. Retaining descendant at C6=ee0d41992589bfb0ac76d7baad044471c5b85b61."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "R186/R187 generated-HLSL paths both consume sampled stage alpha even when explicit Arg1/Arg2 selectors are non-texture.",
-        "Existing positive fixtures supplied exact texture masks, but no negative fixture pinned FixedFunctionUnsupportedResourceStageCoverage for the implicit dependency."
+        "Fresh exact-branch source audit found zero D3DTOP_MODULATECOLOR_ADDALPHA implementation/probe occurrences while adjacent R187 support was present.",
+        "Microsoft D3D9 D3DTEXTUREOP semantics define MODULATECOLOR_ADDALPHA as Arg1.rgb * Arg2.rgb + Arg1.a and COLOROP-only, requiring no new D3D9 state capture."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
+        "src/vr/d3d11/pipeline_translation.cpp",
         "tools/dx11_fixed_function_pipeline_probe.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "93d73bfef228fe03cc741a40c7523ad5114a5311"
+        "b3ad54cb14c1ddb84d492722fd16c4d615964319",
+        "8897737da96bfe841237f9ce8ba21c998996b04e",
+        "a73942e981fce7c54888ccbf304ced6c577993d4"
       ],
       "details": [
-        "Added zero-resource-mask readiness fixtures for both R186 and R187 using non-texture arguments.",
-        "Required FixedFunctionUnsupportedResourceStageCoverage and non-exact readiness for each implicit texture-alpha dependency.",
-        "Added source-graph retention checks for both negative fixtures and the exact blocker."
+        "Added texture-use classification, exact generated-HLSL expression and COLOROP-only readiness acceptance for D3DTOP_MODULATECOLOR_ADDALPHA.",
+        "Added positive generated-HLSL/offline-compile probe coverage plus explicit ALPHAOP fail-closed coverage.",
+        "Added R188 source-graph contract requiring all three switch participations, probe assertions and compile assertion."
       ]
     },
     "C3_VALIDATE": {
       "status": "COMPLETE_STATIC_EXACT_SHA_PASS_COMPILE_NOT_CLAIMED",
-      "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36991719434 job 110789312352; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_STATIC_STEPS_DX11_SOURCE_GRAPH_AND_CENSUS; CONFIGURE_IN_PROGRESS_AT_C6; COMPILE_NOT_CLAIMED",
       "evidence": [
-        "Exact material SHA 93d73bfef228fe03cc741a40c7523ad5114a5311 retained both negative fixtures and source-graph contract.",
-        "Backend Conversion Gate run 36991719434 job 110789312352: Verify DX11 source graph=SUCCESS.",
-        "The same exact-SHA job completed Verify DX11 dormant activation boundary=SUCCESS and Test DX11 census analyzer=SUCCESS.",
-        "Newer same-branch descendant churn cancelled Configure Win32; Build and binary verification were skipped, so compile/binary success is not claimed.",
-        "Authenticated compare proved the material SHA is retained by state-parent HEAD b3ad54cb14c1ddb84d492722fd16c4d615964319."
+        "Authenticated GitHub source-contract check on exact result SHA a73942e981fce7c54888ccbf304ced6c577993d4 passed: three switch sites, exact RGB HLSL expression, positive fixture, ALPHAOP rejection, offline-compile assertion and source-graph guard are present.",
+        "GitHub Build run 36992160627 job 110790748419 on exact result SHA completed Checkout, HMD baseline, one-click structure, backend disassembly, Verify DX11 source graph, Test DX11 census analyzer, wheel source and FFB math with SUCCESS; Configure was in progress at C6.",
+        "Compile/binary/hosted-probe execution is not claimed from the in-progress workflow."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "93d73bfef228fe03cc741a40c7523ad5114a5311",
-      "result_commit": "93d73bfef228fe03cc741a40c7523ad5114a5311",
-      "issue14_comment_id": 5949570905
+      "source_implementation_commit": "b3ad54cb14c1ddb84d492722fd16c4d615964319",
+      "result_commit": "a73942e981fce7c54888ccbf304ced6c577993d4",
+      "issue14_comment_id": 5949643379
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant hosted-test/source-graph guard only; NativeDrawPathActive, release payload, localization, OpenXR transport and other backend lanes are unchanged."
+      "reason": "Dormant fixed-function source/test/guard unit only; NativeDrawPathActive, release payload, localization, OpenXR transport and other backend lanes are unchanged."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve newer authenticated vr-dx11-native-r71 descendants, including concurrent source work already retained at HEAD. Fresh-audit the newest HEAD for the next independent runnable DX11 semantic/source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R188 D3DTOP_MODULATECOLOR_ADDALPHA and newer concurrent work already retained at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -85,21 +86,22 @@
     "native_draw_path_active_changed": false,
     "runtime_validation_claimed": false
   },
-  "issue14_comment_id": 5949570905,
-  "validation_run_id": 36991719434,
-  "validation_job_id": 110789312352,
-  "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36991719434 job 110789312352; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
-  "blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA static DX11 source-graph/activation/census validation passed; descendant churn cancelled Win32 Configure and skipped Build, so compile/binary success is not claimed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Preserve newer authenticated vr-dx11-native-r71 descendants, including concurrent source work already retained at HEAD. Fresh-audit the newest HEAD for the next independent runnable DX11 semantic/source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5949643379,
+  "validation_run_id": 36992160627,
+  "validation_job_id": 110790748419,
+  "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_STATIC_STEPS_DX11_SOURCE_GRAPH_AND_CENSUS; CONFIGURE_IN_PROGRESS_AT_C6; COMPILE_NOT_CLAIMED",
+  "blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA GitHub workflow static DX11 source-graph/census checks passed; configure/build were not complete at C6, so compile/binary success is not claimed.",
+  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R188 D3DTOP_MODULATECOLOR_ADDALPHA and newer concurrent work already retained at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "source_head": "b3ad54cb14c1ddb84d492722fd16c4d615964319",
-  "result_sha": "93d73bfef228fe03cc741a40c7523ad5114a5311",
-  "selected_work_item": "DX11_IMPLICIT_TEXTURE_ALPHA_RESOURCE_COVERAGE_GUARD",
+  "source_head": "ee0d41992589bfb0ac76d7baad044471c5b85b61",
+  "result_sha": "a73942e981fce7c54888ccbf304ced6c577993d4",
+  "selected_work_item": "DX11_FFP_D3DTOP_MODULATECOLOR_ADDALPHA_SUPPORT_R188",
   "changed_paths": [
+    "src/vr/d3d11/pipeline_translation.cpp",
     "tools/dx11_fixed_function_pipeline_probe.cpp",
     "tools/verify_dx11_source_graph.py"
   ],
-  "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve newer authenticated vr-dx11-native-r71 descendants, including concurrent source work already retained at HEAD. Fresh-audit the newest HEAD for the next independent runnable DX11 semantic/source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R188 D3DTOP_MODULATECOLOR_ADDALPHA and newer concurrent work already retained at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
 }
