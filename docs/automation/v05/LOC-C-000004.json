@@ -1,0 +1,16 @@
+{
+  "job_id": "LOC-C-000004",
+  "role": "independent QA/reconciler C",
+  "branch": "korean-localization-clean",
+  "controller_queue": "empty",
+  "controller_idle": "NO_RUNNABLE_WORK",
+  "dispositions": [],
+  "qa_pending_scan": {
+    "progress_checked": true,
+    "resume_state_checked": true,
+    "asset_queue_checked": true,
+    "qa_pending_items_found": 0
+  },
+  "runtime_validation": "UNTESTED",
+  "note": "No current QA_PENDING/current-candidate items available for reconciliation. No producer candidate bytes modified."
+}
