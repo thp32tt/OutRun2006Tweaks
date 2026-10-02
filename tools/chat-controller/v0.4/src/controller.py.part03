@@ -327,11 +327,12 @@ def queue_rollover_prompt(active: dict) -> str:
             f"CONTROLLER_STAGE={active.get('controller_stage') or 'C0_RECOVER'}",
             f"LAST_CHECKPOINT_HEAD={active.get('last_checkpoint_head') or active.get('base_sha') or ''}",
             f"PREMATURE_STOP_RECOVERY_TOTAL={int(active.get('premature_stop_total', 0) or 0)}",
+            f"PIPELINE_CYCLES_COMPLETED={int(active.get('conversion_cycle_count', 0) or 0)}",
             *([f"PIPELINE_REJECT_REASONS={';'.join(str(x) for x in reject_reasons[:12])}"] if reject_reasons else []),
             "FIRST_EXECUTION_ACTION=CALL_CONNECTED_TOOL; do not emit a review/status/plan paragraph before the first tool call.",
             "PIPELINE_REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(or reasoned NOT_REQUIRED)→C6_STATE.",
             conversion_lane_work_hint(active["branch"]),
-            "A partial/review-only/state-only commit is a checkpoint, not task completion. Continue the same TASK_ID through substantive implementation/evidence work, validation and durable state.",
+            "A partial/review-only/state-only commit is a checkpoint, not task completion. A full C0-C6 + Gate PASS is also only a development checkpoint while CONVERSION_LANE_STATE says static/development work remains. Continue the same TASK_ID through subsequent full cycles.",
             "No local PC/RenderDoc/OpenXR runtime is required for source/static/disassembly/CI progress; only runtime claims remain UNTESTED.",
         ]
     lines += [
@@ -1690,6 +1691,9 @@ async def localization_send_lane_task(
         "conversion_pipeline_schema_version": CONVERSION_PIPELINE_SCHEMA_VERSION if CONTROLLER_MODE == "conversion" else None,
         "conversion_pipeline_required_stages": list(CONVERSION_PIPELINE_STAGES) if CONTROLLER_MODE == "conversion" else None,
         "conversion_pipeline_validation": "PENDING" if CONTROLLER_MODE == "conversion" else None,
+        "conversion_cycle_count": 0 if CONTROLLER_MODE == "conversion" else None,
+        "conversion_consumed_result_shas": [] if CONTROLLER_MODE == "conversion" else None,
+        "conversion_cycle_continuation_pending": False if CONTROLLER_MODE == "conversion" else None,
         "pipeline_candidate_count": 0 if CONTROLLER_MODE == "localization" and slot_name in {"A", "B", "D"} else None,
         "pipeline_material_commit_count": 0 if CONTROLLER_MODE == "localization" and slot_name in {"A", "B", "D"} else None,
         "pipeline_result_shas": [] if CONTROLLER_MODE == "localization" and slot_name in {"A", "B", "D"} else None,
@@ -2452,6 +2456,16 @@ async def localization_process_lane(
                 )
                 if sent:
                     active["conversion_pipeline_continuation_pending"] = False
+                save_queue_state(q)
+                if sent:
+                    return
+
+            if CONTROLLER_MODE == "conversion" and active.get("conversion_cycle_continuation_pending"):
+                sent = await queue_send_conversion_cycle_continuation(
+                    context, pages, active
+                )
+                if sent:
+                    active["conversion_cycle_continuation_pending"] = False
                 save_queue_state(q)
                 if sent:
                     return
