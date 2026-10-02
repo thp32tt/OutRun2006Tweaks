@@ -5689,6 +5689,9 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
             currentSource, sourceIndexFormat, startIndex,
             expansion.sourceElementCount, 0u, maxValue);
     }
+    out.sourceObservedMinIndex = sourceVertexWindow.observedMinIndex;
+    out.sourceObservedMaxIndex = sourceVertexWindow.observedMaxIndex;
+    out.sourceValueSnapshotToken = sourceVertexWindow.snapshotToken;
     if (out.generatedIndexMatchesDispatch &&
         sourceVertexWindow.ready &&
         sourceVertexWindow.snapshotToken != 0 &&
@@ -5738,7 +5741,11 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
         token = mix_readiness_snapshot_token(
             token, out.sourceContentSnapshotToken);
         token = mix_readiness_snapshot_token(
-            token, sourceVertexWindow.snapshotToken);
+            token, out.sourceValueSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceObservedMinIndex);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceObservedMaxIndex);
         token = mix_readiness_snapshot_token(
             token, out.vertexBufferRangeExact ? 0x156u : 0u);
         token = mix_readiness_snapshot_token(token, primitiveCount);
