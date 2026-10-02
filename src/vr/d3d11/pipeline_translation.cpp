@@ -1479,7 +1479,7 @@ namespace outrun::vr::dx11
         if (source.clipping == FALSE || source.clipPlaneEnable != 0u)
             out.unsupported |= PipelineUnsupportedClipping;
 
-        // R158: the current native fixed-function HLSL follows D3D9's
+        // R162: the current native fixed-function HLSL follows D3D9's
         // default Gouraud interpolation only. Do not let FLAT/PHONG state be
         // erased by an otherwise exact D3D11 pipeline descriptor.
         if (source.shadeMode != D3DSHADE_GOURAUD)

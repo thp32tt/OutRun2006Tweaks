@@ -23,7 +23,7 @@ namespace OutRunVR::DrawState
         DWORD alphaRef = 0;
         DWORD alphaFunc = D3DCMP_ALWAYS;
 
-        // R158: D3D9 fixed-function color interpolation defaults to
+        // R162: D3D9 fixed-function color interpolation defaults to
         // Gouraud shading. Native DX11 readiness may treat only this mode as
         // exact until flat/provoking-vertex semantics are explicitly modeled.
         DWORD shadeMode = D3DSHADE_GOURAUD;

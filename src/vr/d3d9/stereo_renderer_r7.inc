@@ -1707,7 +1707,7 @@ namespace OutRunVRStereo
 		read(D3DRS_ALPHAREF, out.alphaRef);
 		read(D3DRS_ALPHAFUNC, out.alphaFunc);
 
-		// R158 captures SHADEMODE as part of the same tracked render-state
+		// R162 captures SHADEMODE as part of the same tracked render-state
 		// snapshot so DX11 readiness cannot silently assume Gouraud shading.
 		read(D3DRS_SHADEMODE, out.shadeMode);
 		read(D3DRS_CULLMODE, out.cullMode);

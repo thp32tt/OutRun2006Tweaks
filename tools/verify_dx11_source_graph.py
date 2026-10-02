@@ -83,6 +83,9 @@ D3D9_DRAW_STATE_HPP = (
 D3D9_RENDER_STATE_CAPTURE = (
     ROOT / "src" / "vr" / "d3d9" / "stereo_renderer_r7.inc"
 ).read_text(encoding="utf-8")
+RUNTIME_CENSUS = (
+    ROOT / "src" / "vr" / "d3d11" / "runtime_census.cpp"
+).read_text(encoding="utf-8")
 CONSTANT_BUFFER_CONTRACT_TEXT = (
     CONSTANT_BUFFER_PROBE + "\n" + NATIVE_BACKEND_CPP
 )
@@ -91,40 +94,50 @@ CONSTANT_BUFFER_CONTRACT_TEXT = (
 def main() -> None:
     verify_dx11_dual_source_contract()
 
-    r158_shade_mode_contract = [
+    r162_shade_mode_contract = [
         ("DWORD shadeMode = D3DSHADE_GOURAUD;", D3D9_DRAW_STATE_HPP,
-         "R158 tracked shade-mode field and Gouraud default"),
+         "R162 tracked shade-mode field and Gouraud default"),
         ("read(D3DRS_SHADEMODE, out.shadeMode);", D3D9_RENDER_STATE_CAPTURE,
-         "R158 live shade-mode capture"),
+         "R162 live shade-mode capture"),
         ("PipelineUnsupportedShadeMode = 1u << 13", PIPELINE_TRANSLATION_HPP,
-         "R158 dedicated unsupported shade-mode bit"),
+         "R162 dedicated unsupported shade-mode bit"),
         ("source.shadeMode != D3DSHADE_GOURAUD", PIPELINE_TRANSLATION_CPP,
-         "R158 non-Gouraud fail-closed predicate"),
+         "R162 non-Gouraud fail-closed predicate"),
         ("out.unsupported |= PipelineUnsupportedShadeMode;",
-         PIPELINE_TRANSLATION_CPP, "R158 pipeline readiness blocker"),
-        ("R158 Gouraud shade mode remains exact", FIXED_FUNCTION_PIPELINE_PROBE,
-         "R158 Gouraud positive fixture"),
-        ("R158 flat shade mode remains fail closed", FIXED_FUNCTION_PIPELINE_PROBE,
-         "R158 FLAT negative fixture"),
-        ("R158 shader handoff retains flat shade blocker",
-         FIXED_FUNCTION_PIPELINE_PROBE, "R158 ownership handoff negative fixture"),
-        ("R158 phong shade mode remains fail closed", FIXED_FUNCTION_PIPELINE_PROBE,
-         "R158 PHONG negative fixture"),
-        ("DX11 fixed-function shade-mode fail-closed R158: PASS",
-         FIXED_FUNCTION_PIPELINE_PROBE, "R158 hosted probe completion marker"),
+         PIPELINE_TRANSLATION_CPP, "R162 pipeline readiness blocker"),
+        ("R162 Gouraud shade mode remains exact", FIXED_FUNCTION_PIPELINE_PROBE,
+         "R162 Gouraud positive fixture"),
+        ("R162 flat shade mode remains fail closed", FIXED_FUNCTION_PIPELINE_PROBE,
+         "R162 FLAT negative fixture"),
+        ("R162 shader handoff retains flat shade blocker",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R162 ownership handoff negative fixture"),
+        ("R162 phong shade mode remains fail closed", FIXED_FUNCTION_PIPELINE_PROBE,
+         "R162 PHONG negative fixture"),
+        ("DX11 fixed-function shade-mode fail-closed R162: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R162 hosted probe completion marker"),
+        ("bool shadeModeObservationComplete{};", RUNTIME_CENSUS,
+         "R162 census shade observation-completeness identity"),
+        ("DWORD shadeMode = D3DSHADE_GOURAUD;", RUNTIME_CENSUS,
+         "R162 census shade-mode identity"),
+        ("hash, sig.shadeModeObservationComplete ? 1u : 0u", RUNTIME_CENSUS,
+         "R162 census shade completeness hash"),
+        ("hash = hash_mix(hash, sig.shadeMode);", RUNTIME_CENSUS,
+         "R162 census shade-mode hash"),
+        ("signature.shadeMode = source.shadeMode;", RUNTIME_CENSUS,
+         "R162 captured shade-mode propagation"),
     ]
-    missing_r158_shade_mode = [
+    missing_r162_shade_mode = [
         meaning
-        for token, source, meaning in r158_shade_mode_contract
+        for token, source, meaning in r162_shade_mode_contract
         if token not in source
     ]
     if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_SHADEMODE") < 2:
-        missing_r158_shade_mode.append(
-            "R158 SHADEMODE must be both primed and captured")
-    if missing_r158_shade_mode:
+        missing_r162_shade_mode.append(
+            "R162 SHADEMODE must be both primed and captured")
+    if missing_r162_shade_mode:
         raise SystemExit(
-            "DX11 R158 shade-mode contract drift: "
-            + ", ".join(missing_r158_shade_mode)
+            "DX11 R162 shade-mode contract drift: "
+            + ", ".join(missing_r162_shade_mode)
         )
 
     r161_clipping_contract = [

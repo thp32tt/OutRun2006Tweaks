@@ -225,6 +225,10 @@ namespace outrun::vr::dx11
             bool shaderMixedPair{};
             bool shaderTranslationExact{};
             bool fixedFunctionStateCoverageExact{};
+            // R162: preserve interpolation provenance in the sampled draw
+            // identity so non-Gouraud state cannot alias an exact signature.
+            bool shadeModeObservationComplete{};
+            DWORD shadeMode = D3DSHADE_GOURAUD;
             bool alphaTestObservationComplete{};
             DWORD alphaTestEnable = FALSE;
             DWORD alphaTestRef{};
@@ -394,6 +398,9 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
             hash = hash_mix(
                 hash, sig.fixedFunctionStateCoverageExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.shadeModeObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.shadeMode);
             hash = hash_mix(
                 hash, sig.fixedFunctionTranslationReady ? 1u : 0u);
             hash = hash_mix(
@@ -1979,6 +1986,9 @@ namespace outrun::vr::dx11
         if (vs) vs->Release();
         if (ps) ps->Release();
 
+        signature.shadeModeObservationComplete =
+            captured && source.complete;
+        signature.shadeMode = source.shadeMode;
         signature.alphaTestObservationComplete =
             captured && source.complete;
         signature.alphaTestEnable = source.alphaTestEnable;

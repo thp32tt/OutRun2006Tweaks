@@ -30,7 +30,7 @@ namespace outrun::vr::dx11
         // function readiness cannot accidentally treat a D3D11 SRC1 enum
         // mapping as proof that SV_Target1 semantics exist.
         PipelineUnsupportedDualSourceBlend = 1u << 12,
-        // R158: the generated fixed-function shaders use ordinary smooth
+        // R162: the generated fixed-function shaders use ordinary smooth
         // interpolation. D3D9 FLAT/PHONG shade modes require separate
         // semantics and therefore remain fail-closed.
         PipelineUnsupportedShadeMode = 1u << 13,
