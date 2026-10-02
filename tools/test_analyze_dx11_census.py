@@ -895,7 +895,62 @@ def main() -> int:
     }
     assert r191_texture_factor["NativeDrawPathActivationAllowed"] is False
 
-    print("DX11 census analyzer regression R120/SRC1/R191/R194/R197 exhaustive-mode: PASS")
+
+    r198_unsupported_demand = run_case(
+        "VR DX11 R72 signature#11: primitive=4 fixedFn=1\n"
+        "VR DX11 R197 ffp signature#11 stage#0: "
+        "color[op=22,arg0=0x00000001,arg1=0x00000002,arg2=0x00000001] "
+        "alpha[op=18,arg0=0x00000001,arg1=0x00000002,arg2=0x00000001] "
+        "constant=0xFFFFFFFF resultArg=0x00000005 "
+        "texCoord=0x00000000 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+        "VR DX11 R197 ffp signature#11 stage#1: "
+        "color[op=25,arg0=0x00000004,arg1=0x00000001,arg2=0x00000002] "
+        "alpha[op=2,arg0=0x00000001,arg1=0x00000005,arg2=0x00000001] "
+        "constant=0xFFFFFFFF resultArg=0x00000001 "
+        "texCoord=0x00000001 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+    )
+    r198_demand = r198_unsupported_demand["ActivationEvidence"][
+        "FixedFunctionDetailedStageDemand"
+    ]
+    assert r198_demand["DetailedStages"] == 2
+    assert r198_demand["UnsupportedColorOps"] == [
+        {"value": 22, "name": "BUMPENVMAP", "count": 1}
+    ]
+    assert r198_demand["UnsupportedAlphaOps"] == [
+        {"value": 18, "name": "MODULATEALPHA_ADDCOLOR", "count": 1}
+    ]
+    assert r198_demand["UnsupportedArgumentSelectors"] == [
+        {"value": 4, "name": "SPECULAR", "count": 1},
+        {"value": 5, "name": "TEMP", "count": 1},
+    ]
+    assert r198_demand["UnsupportedArgumentValues"] == [
+        {
+            "value": 4,
+            "value_hex": "0x00000004",
+            "selector": 4,
+            "selector_name": "SPECULAR",
+            "count": 1,
+        },
+        {
+            "value": 5,
+            "value_hex": "0x00000005",
+            "selector": 5,
+            "selector_name": "TEMP",
+            "count": 1,
+        },
+    ]
+    assert r198_demand["NonCurrentResultArgs"] == [
+        {"value": 5, "name": "TEMP", "count": 1}
+    ]
+    assert r198_demand["HasUnsupportedObservedSemantics"] is True
+    assert r198_demand["CoverageLimitedByDetailCap"] is False
+    assert r198_demand["DiagnosticOnly"] is True
+    assert r198_demand["ActivationProof"] is False
+    assert r198_unsupported_demand["NativeDrawPathActivationAllowed"] is False
+
+    print("DX11 census analyzer regression R120/SRC1/R191/R194/R197/R198 exhaustive-mode: PASS")
     return 0
 
 
