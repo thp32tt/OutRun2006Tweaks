@@ -614,14 +614,13 @@ def verify_dxvk_continuation_chain() -> None:
                 and not isinstance(element.value, bool)
             ]
             if (
-                not expected_inherited_forward_targets
-                or len(expected_inherited_forward_targets) != len(expected_targets_node.elts)
+                len(expected_inherited_forward_targets) != len(expected_targets_node.elts)
                 or len(expected_inherited_forward_targets)
                 != len(set(expected_inherited_forward_targets))
             ):
                 raise SystemExit(
                     f"DXVK continuation {continuation_id} raw provenance inherited "
-                    "forward-target gate must use a non-empty unique int literal sequence"
+                    "forward-target gate must use a unique int literal sequence"
                 )
 
         has_overlap_contract = f"{prefix}_OVERLAP_BYTES" in analyzer

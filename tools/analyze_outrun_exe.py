@@ -22705,6 +22705,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_67_provenance
         and predecessor["incomplete_rva"] == target_rva
         and predecessor["incomplete_matches"]
         and predecessor["capture_edge_matches"]
+        and predecessor["unresolved_forward_targets"] == []
     )
     probe_end_matches = (
         target_rva + len(probe)
@@ -22725,6 +22726,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_67_provenance
         "predecessor_exact": predecessor_exact,
         "predecessor_end_rva": predecessor["prefix_end_rva"],
         "predecessor_incomplete_rva": predecessor["incomplete_rva"],
+        "inherited_predecessor_forward_targets": predecessor["unresolved_forward_targets"],
         "probe_len": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_67_PROBE_LEN,
         "probe_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_67_PROBE_END_RVA,
         "probe_end_matches": probe_end_matches,
