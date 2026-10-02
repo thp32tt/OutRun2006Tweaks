@@ -27,7 +27,7 @@ def verify_dxvk_continuation_chain() -> None:
             raise SystemExit(f"DXVK continuation chain missing analyzer symbol: {name}")
         return analyzer[name]
 
-    raw_ids = (23, 24, 25, 26, 27, 28, 29)
+    raw_ids = (23, 24, 25, 26, 27, 28, 29, 30)
     for continuation_id in raw_ids:
         prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
         start = value(f"{prefix}_RVA")
@@ -76,6 +76,7 @@ def verify_dxvk_continuation_chain() -> None:
         (26, 27, "overlap"),
         (27, 28, "overlap"),
         (28, 29, "boundary"),
+        (29, 30, "boundary"),
     )
     for previous_id, next_id, mode in transitions:
         previous = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{previous_id}"
@@ -1630,6 +1631,17 @@ def main() -> None:
             'INDIRECT_CALLS_ONLY_NO_REL32_CALLS_IN_CAPTURE',
             'gf_target_c_helper_1_third_callee_continuation_29_proof=',
             'guarded_gf_target_c_helper_1_third_callee_continuation_29_prefix_proof=FAILED',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_30_RVA = 0x001829DD',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_30_PROBE_LEN = 64',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_30_PROBE_END_RVA = 0x00182A1D',
+            'def collect_guarded_gf_target_c_helper_1_third_callee_continuation_30_provenance(pe: PE) -> dict:',
+            '"guarded_gf_target_c_helper_1_third_callee_continuation_30_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_30_provenance(pe)',
+            'EXACT_EXE_1829DD_TO_182A1D_PROVENANCE_CAPTURED',
+            'EXACT_PREDECESSOR_INSTRUCTION_BOUNDARY_1829DD',
+            'UNRESOLVED_AT_1829DD_AND_FORWARD_BYTES',
+            'RAW_BYTES_AND_REL32_CENSUS_ONLY',
+            'gf_target_c_helper_1_third_callee_continuation_30=',
+            'guarded_gf_target_c_helper_1_third_callee_continuation_30_provenance=FAILED',
             'text.rfind(prologue, lo, hi)',
             'def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:',
             '"guarded_gf_hook_provenance": collect_guarded_gf_hook_provenance(pe, calls)',
