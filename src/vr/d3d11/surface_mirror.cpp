@@ -367,6 +367,85 @@ namespace outrun::vr::dx11
 
         ID3D11RenderTargetView* rtv = rtv_.Get();
         context->OMSetRenderTargets(1, &rtv, dsv_.Get());
-        return true;
+        return binding_readiness(context, color, depth).ready;
+    }
+
+    NativeSurfacePairBindingReadiness
+    NativeSurfacePairBinding::binding_readiness(
+        ID3D11DeviceContext* context,
+        const NativeSurfaceMirror& color,
+        const NativeSurfaceMirror& depth) const noexcept
+    {
+        NativeSurfacePairBindingReadiness out{};
+        out.surfacePairSnapshotToken = surface_pair_snapshot_token_;
+        out.inputValid =
+            context != nullptr && surface_pair_snapshot_token_ != 0;
+        out.ownerReady = ready();
+        if (!out.inputValid || !out.ownerReady)
+            return out;
+
+        out.pairCurrent = validate_surface_pair_snapshot(
+            device_.Get(), color, depth, surface_pair_snapshot_token_);
+        out.colorViewCurrent =
+            color.render_target_view() == rtv_.Get();
+        out.depthViewCurrent =
+            depth.depth_stencil_view() == dsv_.Get();
+        if (!out.pairCurrent ||
+            !out.colorViewCurrent ||
+            !out.depthViewCurrent)
+            return out;
+
+        Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+        context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+        out.contextMatches =
+            contextDevice && contextDevice.Get() == device_.Get();
+        if (!out.contextMatches)
+            return out;
+
+        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> observedRtv;
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilView> observedDsv;
+        context->OMGetRenderTargets(
+            1,
+            observedRtv.ReleaseAndGetAddressOf(),
+            observedDsv.ReleaseAndGetAddressOf());
+        out.rtvBoundExact = observedRtv.Get() == rtv_.Get();
+        out.dsvBoundExact = observedDsv.Get() == dsv_.Get();
+        out.ready =
+            out.pairCurrent &&
+            out.contextMatches &&
+            out.colorViewCurrent &&
+            out.depthViewCurrent &&
+            out.rtvBoundExact &&
+            out.dsvBoundExact;
+        if (out.ready) {
+            std::uint64_t hash = 1469598103934665603ull;
+            const auto mix = [&hash](std::uint64_t value) noexcept {
+                hash ^= value;
+                hash *= 1099511628211ull;
+            };
+            mix(out.surfacePairSnapshotToken);
+            mix(static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(context)));
+            mix(static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(observedRtv.Get())));
+            mix(static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(observedDsv.Get())));
+            mix(color.mirror_serial());
+            mix(depth.mirror_serial());
+            out.snapshotToken = hash == 0 ? 1 : hash;
+        }
+        return out;
+    }
+
+    bool NativeSurfacePairBinding::validate_binding_snapshot(
+        ID3D11DeviceContext* context,
+        const NativeSurfaceMirror& color,
+        const NativeSurfaceMirror& depth,
+        std::uint64_t snapshotToken) const noexcept
+    {
+        if (snapshotToken == 0)
+            return false;
+        const auto current = binding_readiness(context, color, depth);
+        return current.ready && current.snapshotToken == snapshotToken;
     }
 }
