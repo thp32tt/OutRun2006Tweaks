@@ -1749,6 +1749,79 @@ def main() -> None:
             + ", ".join(missing_r140_complete_ia_parameter_drift)
         )
 
+    r142_complete_fan_bound_draw_contract = [
+        (
+            "struct NativeFixedFunctionCompleteFanBoundDrawReadiness",
+            NATIVE_BACKEND_HPP,
+            "R142 complete generated-fan final readiness identity",
+        ),
+        (
+            "compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(",
+            NATIVE_BACKEND_HPP,
+            "R142 complete generated-fan final composition API",
+        ),
+        (
+            "compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(\n            currentVertex, currentFan, primitiveCount, baseVertex)",
+            NATIVE_BACKEND_CPP,
+            "R142 reconstructs fan geometry from current owners",
+        ),
+        (
+            "generatedIndexBuffer.binding_readiness(context)",
+            NATIVE_BACKEND_CPP,
+            "R142 reobserves generated fan IB/topology on final context",
+        ),
+        (
+            "currentGeometry.snapshotToken == draw.geometrySnapshotToken",
+            NATIVE_BACKEND_CPP,
+            "R142 reconstructed geometry matches sealed draw identity",
+        ),
+        (
+            "observedVertexBuffer.Get() == vertexBuffer.mirror_buffer()",
+            NATIVE_BACKEND_CPP,
+            "R142 live slot-0 VB identity is exact",
+        ),
+        (
+            "!generatedIndexBuffer.indexedSource",
+            NATIVE_BACKEND_CPP,
+            "R142 non-indexed fan owner provenance fails closed",
+        ),
+        (
+            "R142 non-indexed fan geometry rejects owner provenance drift",
+            CONSTANT_BUFFER_PROBE,
+            "R142 fan owner provenance negative proof",
+        ),
+        (
+            "R142 complete fan bound draw seals live VB and generated IB",
+            CONSTANT_BUFFER_PROBE,
+            "R142 positive complete fan pre-draw proof",
+        ),
+        (
+            "R142 complete fan bound draw rejects generated IB topology drift",
+            CONSTANT_BUFFER_PROBE,
+            "R142 generated IB topology drift fail-closed proof",
+        ),
+        (
+            "R142 complete fan bound draw rejects live VB stride drift",
+            CONSTANT_BUFFER_PROBE,
+            "R142 live VB parameter drift fail-closed proof",
+        ),
+        (
+            "R142 complete fan bound draw restores deterministic live IA snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R142 deterministic complete fan restore proof",
+        ),
+    ]
+    missing_r142_complete_fan_bound_draw = [
+        meaning
+        for token, source, meaning in r142_complete_fan_bound_draw_contract
+        if token not in source
+    ]
+    if missing_r142_complete_fan_bound_draw:
+        raise SystemExit(
+            "DX11 R142 complete generated-fan bound draw contract drift: "
+            + ", ".join(missing_r142_complete_fan_bound_draw)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
@@ -1764,6 +1837,8 @@ def main() -> None:
             or "compose_fixed_function_same_context_bound_draw_readiness(" in runtime_source
             or "compose_fixed_function_complete_bound_draw_readiness(" in runtime_source
             or "validate_fixed_function_complete_bound_draw_snapshot(" in runtime_source
+            or "compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(" in runtime_source
+            or "validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(" in runtime_source
             or "validate_fixed_function_same_context_bound_draw_snapshot(" in runtime_source
             or "bind_fixed_function_geometry_for_observation(" in runtime_source
             or "observe_fixed_function_geometry_binding(" in runtime_source
@@ -1775,7 +1850,7 @@ def main() -> None:
             )
     if runtime_textured_draw_users:
         raise SystemExit(
-            "DX11 R132/R133/R134/R136/R137/R138/R139/R140/R141 dormant binding readiness gained a production "
+            "DX11 R132/R133/R134/R136/R137/R138/R139/R140/R141/R142 dormant binding readiness gained a production "
             "caller before activation gate: " + ", ".join(runtime_textured_draw_users)
         )
 
