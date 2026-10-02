@@ -95,5 +95,75 @@
   "runtime_claim": "UNTESTED",
   "prior_completed_unit": "DX11_INDEXED_FAN_VERTEX_CAPACITY_R156",
   "validation_issue14_comment_id": 5948053649,
-  "followup_disambiguation_sha": "69f5ef459e47da85999e506ff54bc6d7a4d8fbba"
+  "followup_disambiguation_sha": "69f5ef459e47da85999e506ff54bc6d7a4d8fbba",
+  "completed_supporting_repairs": [
+    {
+      "id": "DX11_R156_INDEXED_FAN_CAPACITY_FIXTURE_REPAIR",
+      "material_result_sha": "72abb66e109f4409ac41ce1f3c0c45ea28684bad",
+      "base_sha": "cd823563f92fef892190ce294184dac89892748f",
+      "summary": "Repaired the R156 hosted indexed-fan capacity fixture: observed max 9 makes BaseVertexLocation -3 end at byte 168 within the 256-byte managed VB, while the +1 overrun case ends at byte 264 and fails closed. The source-graph verifier now guards this exact boundary.",
+      "changed_paths": [
+        "tools/dx11_constant_buffer_probe.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Recovered current GitHub branch/state and tracked same-branch concurrent work.",
+            "Read regression knowledge/history and production ledger before write."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Prior positive fixture implied (16 - 3 + 1) * 24 = 336 bytes against a 256-byte managed VB, contradicting its expected vertexBufferRangeExact=true."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "implementation_commits": [
+            "72abb66e109f4409ac41ce1f3c0c45ea28684bad"
+          ],
+          "details": [
+            "Bounded source fixture to observed max 9, kept forged R155 source content distinct, added explicit boundary precondition and source-graph guards."
+          ]
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_STATIC_COMPILE_NOT_CLAIMED",
+          "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_GATES_EXACT_RUN_CANCELLED_BY_BRANCH_CHURN",
+          "evidence": [
+            "Material commit remains in current branch ancestry.",
+            "Retaining descendant Backend Conversion Gate run 36983528196 passed Verify DX11 source graph, dormant activation boundary, native transport, dual-source and census static gates.",
+            "Exact material run 36983455435 was cancelled by branch churn before job details; compile/WARP/probe execution not claimed."
+          ],
+          "runtime_validation": "UNTESTED"
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "72abb66e109f4409ac41ce1f3c0c45ea28684bad",
+          "issue14_comment_id": 5948106384
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Test-fixture/source-graph repair only; no runtime draw routing, backend activation, transport, localization, DXVK or release payload changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
+          "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R158 input-layout/live-IA stride lineage and fresh-audit current HEAD for the next independent dormant DX11 semantics gap without duplicating R152-R158 work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false,
+        "other_backend_modified": false
+      },
+      "issue14_comment_id": 5948106384,
+      "runtime_validation": "UNTESTED"
+    }
+  ]
 }
