@@ -2628,35 +2628,57 @@ def main() -> None:
             + ", ".join(missing_r155_indexed_fan_source_content)
         )
 
+    r156_dispatch_start = NATIVE_BACKEND_CPP.find(
+        "compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness("
+    )
+    r156_dispatch_end = NATIVE_BACKEND_CPP.find(
+        "validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(",
+        r156_dispatch_start,
+    )
+    if (
+        r156_dispatch_start < 0
+        or r156_dispatch_end < 0
+        or r156_dispatch_end <= r156_dispatch_start
+    ):
+        raise SystemExit(
+            "DX11 R156 indexed fan dispatch compositor boundary is missing or reordered"
+        )
+    r156_indexed_fan_dispatch_body = NATIVE_BACKEND_CPP[
+        r156_dispatch_start:r156_dispatch_end
+    ]
+
+    # Scope R156 source tokens to the indexed-fan compositor. Several
+    # expressions intentionally mirror R154, so whole-file matching could let
+    # a partial indexed-fan regression borrow the nonindexed implementation.
     r156_indexed_fan_vertex_capacity_contract = [
         ("R156: indexed fan capacity follows the exact source indices",
-         NATIVE_BACKEND_CPP, "R156 indexed-fan effective vertex capacity proof"),
+         r156_indexed_fan_dispatch_body, "R156 indexed-fan effective vertex capacity proof"),
         ("sourceIndexBuffer.index_range_readiness(",
-         NATIVE_BACKEND_CPP, "R156 exact MANAGED source-index window scan"),
+         r156_indexed_fan_dispatch_body, "R156 exact MANAGED source-index window scan"),
         ("out.sourceValueSnapshotToken = sourceVertexWindow.snapshotToken;",
-         NATIVE_BACKEND_CPP, "R156 source-value snapshot lineage"),
+         r156_indexed_fan_dispatch_body, "R156 source-value snapshot lineage"),
         ("sourceObservedMinIndex", NATIVE_BACKEND_HPP,
          "R156 observed source minimum field"),
         ("sourceObservedMaxIndex", NATIVE_BACKEND_HPP,
          "R156 observed source maximum field"),
         ("out.sourceObservedMinIndex = sourceVertexWindow.observedMinIndex;",
-         NATIVE_BACKEND_CPP, "R156 observed source minimum retained in dispatch"),
+         r156_indexed_fan_dispatch_body, "R156 observed source minimum retained in dispatch"),
         ("out.sourceObservedMaxIndex = sourceVertexWindow.observedMaxIndex;",
-         NATIVE_BACKEND_CPP, "R156 observed source maximum retained in dispatch"),
+         r156_indexed_fan_dispatch_body, "R156 observed source maximum retained in dispatch"),
         ("token, out.sourceObservedMinIndex",
-         NATIVE_BACKEND_CPP, "R156 source minimum participates in snapshot"),
+         r156_indexed_fan_dispatch_body, "R156 source minimum participates in snapshot"),
         ("token, out.sourceObservedMaxIndex",
-         NATIVE_BACKEND_CPP, "R156 source maximum participates in snapshot"),
+         r156_indexed_fan_dispatch_body, "R156 source maximum participates in snapshot"),
         ("indexedFanDispatch.sourceValueSnapshotToken != 0",
          CONSTANT_BUFFER_PROBE, "R156 positive source-window token proof"),
         ("indexedFanVertexOverrun.sourceValueSnapshotToken != 0",
          CONSTANT_BUFFER_PROBE, "R156 overrun retains source-window evidence"),
         ("effectiveMinVertex >= 0",
-         NATIVE_BACKEND_CPP, "R156 negative effective vertex rejection"),
+         r156_indexed_fan_dispatch_body, "R156 negative effective vertex rejection"),
         ("endByte <= static_cast<std::uint64_t>(vertexBuffer.byte_width())",
-         NATIVE_BACKEND_CPP, "R156 indexed-fan VB byte capacity bound"),
+         r156_indexed_fan_dispatch_body, "R156 indexed-fan VB byte capacity bound"),
         ("out.vertexBufferRangeExact ? 0x156u : 0u",
-         NATIVE_BACKEND_CPP, "R156 capacity identity in dispatch token"),
+         r156_indexed_fan_dispatch_body, "R156 capacity identity in dispatch token"),
         ("R156 indexed fan dispatch rejects effective vertex buffer overrun",
          CONSTANT_BUFFER_PROBE, "R156 effective VB overrun fail-closed proof"),
         ("DX11 indexed fan vertex capacity R156: PASS",
