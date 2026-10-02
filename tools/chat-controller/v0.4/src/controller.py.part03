@@ -1554,6 +1554,130 @@ async def localization_recover_rejected_producer_commit(
         active["producer_no_work_recovery_sent_at"] = datetime.now(TZ).isoformat()
 
 
+def localization_producer_seen_result(active: dict, sha: Optional[str]) -> bool:
+    return bool(sha) and str(sha) in {
+        str(x) for x in (active.get("pipeline_result_shas") or []) if x
+    }
+
+
+def localization_remaining_material_targets(active: dict, limit: int = 12) -> list[dict]:
+    """Return runnable controller targets not already candidate-completed in this task."""
+    completed = {
+        int(x) for x in (active.get("pipeline_candidate_indices") or [])
+        if str(x).lstrip("-").isdigit()
+    }
+    targets = localization_material_target_hints(
+        str(active.get("branch") or "korean-localization-clean"),
+        str(active.get("lane") or ""),
+        limit=max(limit, 4),
+    )
+    return [item for item in targets if int(item.get("index", -1)) not in completed][:limit]
+
+
+def localization_record_producer_checkpoint(
+    q: dict,
+    active: dict,
+    task_commit: dict,
+    record: dict,
+    now: datetime,
+) -> tuple[bool, str]:
+    """Record one immutable material checkpoint and decide whether the producer batch may release."""
+    sha = str(task_commit.get("sha") or "")
+    if localization_producer_seen_result(active, sha):
+        return False, "DUPLICATE_CHECKPOINT"
+
+    result_shas = list(active.get("pipeline_result_shas") or [])
+    result_shas.append(sha)
+    active["pipeline_result_shas"] = result_shas[-32:]
+
+    candidate_delta = producer_result_candidate_count(record)
+    active["pipeline_candidate_count"] = int(active.get("pipeline_candidate_count", 0) or 0) + candidate_delta
+    active["pipeline_material_commit_count"] = int(active.get("pipeline_material_commit_count", 0) or 0) + 1
+    active["pipeline_last_candidate_delta"] = candidate_delta
+
+    indices = list(active.get("pipeline_candidate_indices") or [])
+    for idx in producer_result_candidate_indices(record):
+        if idx not in indices:
+            indices.append(idx)
+    active["pipeline_candidate_indices"] = indices[-64:]
+
+    active["result_sha"] = sha
+    active["result_message"] = task_commit.get("message")
+    active["automation_validation"] = "PENDING"
+    active["validation_mode"] = "C_BATCH_GATE"
+    active["batch_validation_pending"] = True
+    active["runtime_validation"] = "UNTESTED"
+    active["last_material_progress_at"] = now.isoformat()
+    active["last_checkpoint_head"] = sha
+    active["last_checkpoint_at"] = now.isoformat()
+    active["last_checkpoint_stage"] = "PIPELINE_CHECKPOINT"
+
+    # Every immutable material checkpoint can be consumed by C independently even
+    # while the producer keeps the same TASK_ID alive for the rest of its batch.
+    snapshot = dict(active)
+    snapshot["terminal"] = "PRODUCED"
+    snapshot["phase"] = "DONE"
+    snapshot["completed_at"] = now.isoformat()
+    enqueue_producer_result_for_qa(q, snapshot)
+
+    remaining = localization_remaining_material_targets(active)
+    candidates = int(active.get("pipeline_candidate_count", 0) or 0)
+    material_commits = int(active.get("pipeline_material_commit_count", 0) or 0)
+    no_work_record = producer_result_claims_no_work(record)
+
+    if candidates >= LOCALIZATION_PRODUCER_TARGET_CANDIDATES:
+        return True, f"TARGET_REACHED:{candidates}/{LOCALIZATION_PRODUCER_TARGET_CANDIDATES}"
+    if candidates >= 1 and not remaining:
+        return True, f"PARTIAL_BATCH_SHARD_EXHAUSTED:{candidates}"
+    if no_work_record and not remaining:
+        return True, "NO_RUNNABLE_SHARD_WORK"
+    if material_commits >= LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS and not remaining:
+        return True, f"MATERIAL_COMMIT_BUDGET_WITH_SHARD_EXHAUSTED:{material_commits}"
+    return False, (
+        f"CONTINUE_PIPELINE:candidates={candidates}/{LOCALIZATION_PRODUCER_TARGET_CANDIDATES};"
+        f"material_commits={material_commits};remaining_targets={len(remaining)}"
+    )
+
+
+async def queue_send_producer_pipeline_continuation(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    active: dict,
+) -> bool:
+    """Continue the same producer TASK after an accepted intermediate material commit."""
+    latest_head = github_branch_head(active["branch"])
+    if not latest_head:
+        return False
+    candidates = int(active.get("pipeline_candidate_count", 0) or 0)
+    material_commits = int(active.get("pipeline_material_commit_count", 0) or 0)
+    prompt = (
+        f"PIPELINE_CHECKPOINT_ACCEPTED TASK_ID={active['task_id']} HEAD={latest_head}\n"
+        f"CANDIDATES={candidates}/{LOCALIZATION_PRODUCER_TARGET_CANDIDATES} "
+        f"MATERIAL_COMMITS={material_commits}/{LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS}. "
+        "이 커밋은 중간 checkpoint이며 TASK 완료가 아니다. 첫 출력은 연결된 도구 호출이어야 한다.\n"
+        + localization_material_target_prompt(active) + "\n"
+        "현재 asset이 이 checkpoint로 render-ready가 됐다면 같은 asset의 KOREAN_RENDER→MEASURE_REFIT→"
+        "EXACT_DDS_ENCODE→DECODED_FINAL_SELF_QA→PERSIST_CANDIDATE를 먼저 끝내. "
+        "그 다음 두 번째 runnable candidate까지 같은 TASK_ID에서 계속하고 각 material checkpoint마다 "
+        "새 [AUTO:TASK_ID] 커밋을 남겨. 계획/상태보고만 하고 멈추지 마."
+    )
+    sent = await queue_send_same_chat_control_message(
+        context,
+        pages,
+        active,
+        prompt,
+        status="producer_pipeline_continuation",
+        result_label="producer_pipeline_continuation",
+    )
+    if sent:
+        active["pipeline_continuation_pending"] = False
+        active["pipeline_continuation_sent_at"] = datetime.now(TZ).isoformat()
+        active["assistant_claim_verification"] = "PIPELINE_CONTINUATION_SENT"
+        active["last_hash"] = None
+        active["last_hash_changed_at"] = datetime.now(TZ).isoformat()
+    return sent
+
+
 async def localization_handle_producer_commit(
     context: BrowserContext,
     pages: dict[str, Page],
