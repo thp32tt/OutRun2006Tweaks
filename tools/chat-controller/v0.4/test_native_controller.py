@@ -570,6 +570,14 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('task_latched', node_source)
         self.assertIn('_is_localization_producer', node_source)
 
+    def test_latched_producer_controller_failure_restarts_instead_of_done(self):
+        node_source = ast.get_source_segment(SOURCE, FUNCTIONS['localization_process_lane_isolated']) or ''
+        self.assertIn('lane_exception_restart', node_source)
+        self.assertIn('raise ControllerRestartRequested', node_source)
+        self.assertIn('active["phase"] = "WAIT_CHAT"', node_source)
+        self.assertIn('active["terminal"] = None', node_source)
+        self.assertIn('active["task_latched"] = True', node_source)
+
     def test_valid_producer_commit_releases_active_task_latch(self):
         node_source = ast.get_source_segment(SOURCE, FUNCTIONS['finalize_localization_producer_commit']) or ''
         self.assertIn('active["task_latched"] = False', node_source)
