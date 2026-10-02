@@ -849,7 +849,7 @@ int main()
         << "DX11 fixed-function D3DTOP_ADDSMOOTH support R184: PASS\n"
         << "DX11 fixed-function D3DTOP_ADDSIGNED2X support R183: PASS\n"
         << "DX11 MRT color-write fail-closed: PASS\n"
-        << "DX11 fixed-function D3DTOP_BLENDCURRENTALPHA support: PASS\\n"
+        << "DX11 fixed-function D3DTOP_BLENDCURRENTALPHA support: PASS\n"
         << "DX11 fixed-function D3DTOP_ADDSIGNED support R182: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATE4X support R181: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATE2X support R180: PASS\n"
