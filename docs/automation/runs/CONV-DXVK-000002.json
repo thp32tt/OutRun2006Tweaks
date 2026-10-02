@@ -2100,6 +2100,65 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer F36 raw frontier beginning at exact boundary 0x00182D93. Exact-decode only complete canonical instructions and resolve 0x00182D95/0x00182D96/0x00182D9A only with exact instruction-boundary evidence; keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_CONTINUATION_PROOF_SEMANTIC_QUARANTINE",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "932a583ccf87ec678f739178df6ea08eafb64ebf",
+      "commit_message": "test: quarantine DXVK continuation proof semantics [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Hardened the auto-discovered DXVK continuation contract so every exact prefix proof must keep semantic_effect inside BOUNDED_CONTROL_FLOW..._ONLY. This prevents bounded byte/control-flow evidence from silently promoting function, HUD, render or runtime semantics while preserving the separate ownership NONE quarantine.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch authority, AGENTS.md, lane/run state, regression/problem context and Issue #14; detected rapid same-JOB canonical frontier advancement and avoided duplicate F34/F35 source work."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected an independent static integrity gap in the auto-discovered proof-chain verifier after concurrent workers had already claimed the sequential canonical-disassembly frontier."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 932a583ccf87ec678f739178df6ea08eafb64ebf adds a generic semantic-effect quarantine for every discovered prefix proof without changing analyzer/runtime/backend behavior."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Remote GitHub-source audit on a descendant retaining the material commit checked 22 implemented prefix proofs through continuation_44; all semantic_effect values start with BOUNDED_CONTROL_FLOW and end with _ONLY, violations=0. No CI PASS is claimed because same-branch frontier churn kept descendant Actions queued/superseded during this unit."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit 932a583ccf87ec678f739178df6ea08eafb64ebf contains the required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947455752 records the production event."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static Python verifier hardening only; no runtime payload, selector, backend binary, deployment artifact or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted supplementally without replacing the newer authoritative canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "932a583ccf87ec678f739178df6ea08eafb64ebf",
+        "base_sha": "4215fc9a85633ee5dc4a5711ebd1cb62f504bd55",
+        "automation_validation": "PASS_REMOTE_STATIC_SOURCE_AUDIT",
+        "proofs_checked": 22,
+        "latest_proof_id_at_audit": 44,
+        "semantic_quarantine_violations": 0,
+        "descendant_contains_material_commit": true,
+        "github_actions_status_at_state_write": "QUEUED_OR_SUPERSEDED_BY_SAME_BRANCH_CHURN_NO_PASS_CLAIMED",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947455752,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authoritative canonical-disassembly frontier. Continue exact decode/capture only from its latest validated edge; keep bounded control-flow proofs semantically quarantined and let the next non-superseded descendant static gate exercise this verifier."
     }
   ]
 }
