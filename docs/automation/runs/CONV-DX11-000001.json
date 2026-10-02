@@ -5,7 +5,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "8b760190868471eb2b02273de53a7d07025847a1",
-  "state_parent_head": "ccd34f6caff1b9c181531e05f94f3471fd93b1b2",
+  "state_parent_head": "9edc5f6952825824d23f6c476e097b85aa6dc530",
   "material_result_sha": "d879b6042908389444b45b0f040326855821d69b",
   "validation_bearing_sha": "d879b6042908389444b45b0f040326855821d69b",
   "runtime_validation": "UNTESTED",
@@ -590,8 +590,115 @@
       "checkpoint": "C6_STATE",
       "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
       "exact_next_action": "Consume a descendant Backend Conversion Gate result containing the material SHA and verify the semantic/source-graph probes; keep native Draw* disabled until fan geometry readiness and Quest 3/VDXR parity are proven."
+    },
+    {
+      "unit_id": "DX11_MANAGED_BUFFER_MUTATION_PLAN_R121",
+      "job_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_MANAGED_BUFFER_MUTATION_PLAN_EXACTNESS",
+      "base_sha": "7a3e86c25cb0ced8738afad5a961945888625a65",
+      "material_result_sha": "0cff71d25101f47cb2fd0fbfe2da539551d1325f",
+      "guard_result_sha": "c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e",
+      "validation_bearing_sha": "c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e",
+      "implementation_commits": [
+        "0cff71d25101f47cb2fd0fbfe2da539551d1325f",
+        "c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e"
+      ],
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "R113/R119 already provide a concrete MANAGED VB/IB CPU-shadow, Reset-generation and mirror-readiness model, but translate_buffer_mutation() still returned concrete ManagedCpuShadowRead/Write operations with planExact=false. The independent static gap was to make the mutation-plan contract internally consistent without weakening live mirror/draw gates.",
+      "summary": "R121 marks ordinary D3DPOOL_MANAGED VB/IB read/write CPU-shadow mutation plans exact while preserving requiresCpuShadow=true. MANAGED DISCARD and NOOVERWRITE remain unsupported. Added hosted probe assertions and a source-graph drift guard. Native Draw* routing remains disabled.",
+      "changed_paths": [
+        "src/vr/d3d11/resource_translation.hpp",
+        "src/vr/d3d11/resource_translation.cpp",
+        "tools/dx11_constant_buffer_probe.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Read current GitHub HEAD, AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/automation/runs/CONV-DX11-000001.json, docs/VR_DX11_NATIVE_PLAN.md, docs/VR_WORK_QUEUE.json, docs/VR_REGRESSION_KNOWLEDGE.json and docs/VR_PROBLEM_HISTORY.md through the authenticated GitHub connector.",
+            "Tracked rapid same-branch descendant pushes and used compare/re-fetch rather than force-updating or overwriting concurrent DX11 work."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Confirmed translate_buffer_mutation() selected ManagedCpuShadowRead/Write and requiresCpuShadow for ordinary MANAGED locks but left planExact=false.",
+            "Confirmed R113/R119 already implement CPU-shadow contents, Reset generation, D3D11 mirror recreation and stale-readiness rejection.",
+            "Scoped the change to plan-level exactness only; live Lock/Unlock routing, NativeDrawPathActive, mirror readiness and runtime promotion remain independent gates."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "changed_paths": [
+            "src/vr/d3d11/resource_translation.hpp",
+            "src/vr/d3d11/resource_translation.cpp",
+            "tools/dx11_constant_buffer_probe.cpp",
+            "tools/verify_dx11_source_graph.py"
+          ],
+          "material_commit": "0cff71d25101f47cb2fd0fbfe2da539551d1325f",
+          "guard_commit": "c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e",
+          "details": [
+            "Set planExact=true for ordinary MANAGED VB/IB CPU-shadow read/write plans while keeping requiresCpuShadow=true.",
+            "Kept MANAGED DISCARD and NOOVERWRITE fail-closed.",
+            "Added positive VB-write/IB-read probe assertions and negative DISCARD/NOOVERWRITE assertions.",
+            "Added R121 source-graph drift guards covering implementation and probe contract."
+          ]
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_REMOTE_STATIC",
+          "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_DESCENDANT_GATE",
+          "evidence": [
+            "Re-fetched exact guard SHA c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e from GitHub and verified the MANAGED branch contains planExact=true plus requiresCpuShadow=true, both positive probe cases, both fail-closed negative cases, and the R121 source-graph guard.",
+            "Re-fetched material SHA 0cff71d25101f47cb2fd0fbfe2da539551d1325f; it changes only resource_translation.hpp/.cpp and dx11_constant_buffer_probe.cpp and contains no NativeDrawPathActive token.",
+            "Descendant badcb1f7bacb5f555eb3d355f71f7dd3f268d6dd contains the material commit; Backend Conversion Gate run 36971449402 passed queue/baseline/disassembly/session checks plus DX11 transport, dual-source, source-graph, dormant-activation and census-analyzer steps before Win32 configure.",
+            "The R121-specific guard push queued Backend Conversion Gate run 36971688398; no hosted compile/probe completion is claimed at this checkpoint because same-branch churn may supersede it."
+          ],
+          "hosted_probe": "QUEUED_NOT_CLAIMED",
+          "runtime_validation": "UNTESTED"
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "0cff71d25101f47cb2fd0fbfe2da539551d1325f",
+          "guard_commit": "c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e",
+          "issue14_comment_id": 5946421532
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Translation-plan/source-test readiness only. No native game Draw* routing, runtime candidate payload, backend promotion or package contents were activated."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE_WITH_THIS_STATE_COMMIT",
+          "state_parent_head": "9edc5f6952825824d23f6c476e097b85aa6dc530",
+          "exact_next_action": "Keep NativeDrawPathActive disabled. Consume a non-superseded hosted dx11_constant_buffer_probe result when available, then use R121 plan exactness only in dormant per-resource managed-buffer census/readiness accounting while still requiring R119 mirror snapshots; exhaustive exact-build census and Quest 3/VDXR parity remain required before activation."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "live_lock_unlock_routing_changed": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "related_finding_or_regression_keys": [
+        "DX11_MANAGED_BUFFER_MUTATION_PLAN_R121"
+      ],
+      "issue14_comment_id": 5946421532,
+      "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_DESCENDANT_GATE",
+      "blocker": "Hosted WARP probe completion for the R121-specific guard has not been observed under current branch churn. Runtime graphics validation remains UNTESTED; native Draw* still requires exhaustive exact-build census plus Quest 3/VDXR parity.",
+      "next_action": "Keep NativeDrawPathActive disabled. Consume a non-superseded hosted dx11_constant_buffer_probe result when available, then feed R121 plan exactness into dormant per-resource MANAGED buffer census/readiness only while retaining R119 stale-mirror rejection.",
+      "checkpoint": "C6_STATE",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE",
+      "state_persisted": true
     }
   ],
-  "latest_continuation_unit": "DX11_INDEXED_TRIANGLE_FAN_EXPANSION_R123",
+  "latest_continuation_unit": "DX11_MANAGED_BUFFER_MUTATION_PLAN_R121",
   "state_persisted_for_continuation": true
 }

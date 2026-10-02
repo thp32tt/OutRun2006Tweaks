@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "ccd34f6caff1b9c181531e05f94f3471fd93b1b2",
+  "state_parent_head": "9edc5f6952825824d23f6c476e097b85aa6dc530",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,15 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "7716fa911645fffa0e95ec8787922392bc1b0d11",
-    "validation_bearing_sha": "7716fa911645fffa0e95ec8787922392bc1b0d11",
-    "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
+    "result_sha": "c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e",
+    "validation_bearing_sha": "c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e",
+    "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_DESCENDANT_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. SRC1 dual-source blend remains fail-closed until a proven second pixel-shader output/linkage path exists.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until parity proof.",
-  "independent_static_next_action": "Consume a descendant Backend Conversion Gate result containing the material SHA and verify the semantic/source-graph probes; keep native Draw* disabled until fan geometry readiness and Quest 3/VDXR parity are proven.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Consume a non-superseded hosted dx11_constant_buffer_probe result when available, then feed R121 MANAGED buffer plan exactness into dormant per-resource census/readiness while retaining R119 stale-mirror rejection and all exhaustive-census/Quest 3 activation gates.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -185,6 +185,17 @@
       "material_result_sha": "7716fa911645fffa0e95ec8787922392bc1b0d11",
       "validation_bearing_sha": "7716fa911645fffa0e95ec8787922392bc1b0d11",
       "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false
+    },
+    {
+      "unit_id": "DX11_MANAGED_BUFFER_MUTATION_PLAN_R121",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "0cff71d25101f47cb2fd0fbfe2da539551d1325f",
+      "guard_result_sha": "c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e",
+      "validation_bearing_sha": "c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e",
+      "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_DESCENDANT_GATE",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false
