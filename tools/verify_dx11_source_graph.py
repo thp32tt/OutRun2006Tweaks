@@ -1041,6 +1041,49 @@ def main() -> None:
             + ", ".join(missing_r196_d3dtop_lerp_arg0)
         )
 
+    r197_d3dta_constant_contract = [
+        ("DWORD stageConstant = 0xFFFFFFFFu;", PIPELINE_TRANSLATION_HPP,
+         "R197 per-stage D3DTSS_CONSTANT identity and D3D9 default"),
+        ("case D3DTA_CONSTANT:", PIPELINE_TRANSLATION_CPP,
+         "R197 D3DTA_CONSTANT HLSL argument translation"),
+        ("stage.stageConstant", PIPELINE_TRANSLATION_CPP,
+         "R197 stage constant handoff into generated color/alpha expressions"),
+        ("observeTextureStageState(D3DTSS_CONSTANT, out.stageConstant);",
+         RUNTIME_CENSUS, "R197 live D3DTSS_CONSTANT observation"),
+        ("hash = hash_mix(hash, stage.stageConstant);",
+         RUNTIME_CENSUS, "R197 per-stage constant census identity"),
+        ("VR DX11 R197 ffp signature#{}", RUNTIME_CENSUS,
+         "R197 detailed per-stage constant census evidence"),
+        ("stageConstantStages[0].stageConstant = 0x80402010u;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R197 first hosted stage constant fixture"),
+        ("stageConstantStages[1].stageConstant = 0xFF102030u;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R197 second hosted stage constant fixture"),
+        ("R197 D3DTSS_CONSTANT must preserve independent per-stage ARGB values",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R197 per-stage constant isolation assertion"),
+        ("R197 D3DTA_CONSTANT fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R197 offline compile assertion"),
+        ("DX11 fixed-function D3DTA_CONSTANT per-stage support R197: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R197 hosted probe completion"),
+    ]
+    missing_r197_d3dta_constant = [
+        meaning
+        for token, source, meaning in r197_d3dta_constant_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("stage.stageConstant") < 2:
+        missing_r197_d3dta_constant.append(
+            "R197 stage constant must feed both generated color and alpha expressions")
+    if missing_r197_d3dta_constant:
+        raise SystemExit(
+            "DX11 R197 D3DTA_CONSTANT contract drift: "
+            + ", ".join(missing_r197_d3dta_constant)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
