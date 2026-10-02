@@ -2881,6 +2881,83 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the current branch-authoritative continuation frontier and continue its canonical raw/proof sequence only if unclaimed; otherwise keep hardening independent static verifier contracts."
+    },
+    {
+      "unit_id": "DXVK_F47_CANONICAL_CONTROL_FLOW_0x18303B_TO_0x18307A",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "9fa4de2ce90020751541a63798df06eb336391c4",
+      "validation_bearing_result_sha": "9fa4de2ce90020751541a63798df06eb336391c4",
+      "run_record_commit_sha": "b0fea5e72e0bc8ba04c518fb55b3671b5fc7f4a9",
+      "commit_message": "dxvk: prove canonical 0x18303B control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact canonical F47 proof covers 0x0018303B..0x0018307A with 18 complete instructions, four exact branches, internal boundary 0x00183063, empty direct rel32 CALL census, and trailing incomplete 89 at 0x0018307A preserved for mandatory overlap.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "GitHub-authoritative AGENTS/state/regression/history/Issue #14 recovered; concurrent same-JOB frontier refreshed repeatedly."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected exact decode of validated continuation_56 raw provenance after duplicate F46/F47 units were skipped."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material analyzer proof commit 9fa4de2ce90020751541a63798df06eb336391c4."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact canonical run 36985565386 job 110769688424 SUCCESS; Backend Conversion Gate 36985565454 passed static/test stages through recenter and was in Win32 configure at state write."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Required marker is on substantive material commit; Issue #14 comment 5948424468 appended."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static disassembly proof only; no deployable payload/package/localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Run record b0fea5e72e0bc8ba04c518fb55b3671b5fc7f4a9 plus this lane mirror preserve the completed unit supplementally without regressing the newer raw frontier."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "dxvk_disassembly_evidence_run_id": 36985565386,
+        "dxvk_disassembly_evidence_job_id": 110769688424,
+        "artifact_id": 11217520872,
+        "artifact_digest": "sha256:ca76e1aac96340b18b94702da3e0ede282b4c4c4f1614f7b48b4e92ea0abec61",
+        "proof_status": "EXACT_18303B_TO_18307A_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "instruction_count": 18,
+        "branch_targets_match": true,
+        "internal_branch_targets_on_boundaries": true,
+        "external_targets": [
+          "0x0018308D",
+          "0x00183092",
+          "0x001830CA"
+        ],
+        "raw_call_census_empty": true,
+        "predecessor_target_contract": true,
+        "incomplete_rva": "0x0018307A",
+        "incomplete_bytes": "89",
+        "incomplete_matches": true,
+        "capture_edge_matches": true,
+        "backend_conversion_gate_run_id": 36985565454,
+        "backend_conversion_gate_job_id": 110769693334,
+        "backend_conversion_gate_status_at_state_write": "STATIC_TESTS_THROUGH_RECENTER_PASS_WIN32_CONFIGURE_IN_PROGRESS_NOT_CLAIMED_COMPLETE",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5948424468,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_0x18307A_RAW_FRONTIER",
+      "semantic_promotion": "BOUNDED_CONTROL_FLOW_ONLY",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newer raw continuation beginning at 0x0018307A with mandatory 89 overlap; canonical-validate provenance before exact decode and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
