@@ -46,3 +46,44 @@ Goal: remove the textual R29 -> R30 -> R31 -> R32 -> R33 -> R34 implementation i
 - Stage 5 / R29 -> R30/R33 seam: R29 draw destinations plus `SetRenderStateDestR29` exposed through `stereo_base_hooks.hpp`.
 - Remaining deep targets before translation-unit split: R30 still consumes lower `PresentDest`/`ResetDest`; R32 consumes `ResetDestR22`, `ResolveDirectTransportR13`, and `PresentDestR13`.
 - No textual implementation include is removed until an explicit build/link gate is allowed.
+
+
+## Deep hook inventory
+
+The remaining cross-layer targets are not owned by R29-R34:
+
+- R30 directly hooks `PresentDest` and `ResetDest`, both implemented in `stereo_renderer_r7.inc`.
+- R32 directly hooks `ResetDestR22` from `stereo_renderer_r22.cpp`.
+- R32 directly hooks `ResolveDirectTransportR13` and `PresentDestR13` from `stereo_renderer_r13.cpp`.
+
+These lower targets sit on active Reset/DirectGPU/Present safety paths. They are inventory-only for now and must not be moved merely to make the source graph prettier.
+
+## Build-gated split order
+
+1. **Gate A: R34 / R33**
+   - Remove only `#include "stereo_renderer_r33.cpp"` from R34.
+   - Compile R33 and R34 as separate translation units.
+   - R34 consumes `final_dispatch_hooks.hpp` and `final_dispatch_state.hpp`.
+   - Require compile + link validation before continuing.
+
+2. **Gate B: R33 / R32**
+   - Remove only the R32 textual include from R33.
+   - Compile R32 normally.
+   - R33 consumes `review_dispatch_hooks.hpp`, `fast_path_support.hpp`, neutral render/state APIs, and `stereo_base_hooks.hpp`.
+   - Require compile + link validation.
+
+3. **Gate C: R32 / R31**
+   - Before include removal, expose or facade the R22/R13 deep targets used by R32.
+   - Keep Reset and DirectGPU/Present order unchanged.
+   - Then compile R31/R32 separately and validate.
+
+4. **Gate D: R31 / R30**
+   - Use `screen_space_hooks.hpp` plus existing screen-space/lower-draw APIs.
+   - Compile/link gate required.
+
+5. **Gate E: R30 / R29**
+   - Before include removal, expose/facade the R7 `PresentDest`/`ResetDest` targets.
+   - Use `stereo_base_hooks.hpp` for R29 draw/state hooks.
+   - Compile/link gate required.
+
+No CMake owner change or textual include removal is performed until the corresponding build gate is explicitly enabled.
