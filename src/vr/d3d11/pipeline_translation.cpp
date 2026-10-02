@@ -373,9 +373,9 @@ namespace outrun::vr::dx11
                 // signed values (2*x-1), computes their three-component dot
                 // product, and replicates the scalar through the destination.
                 const auto dotFirst = fixed_function_argument_expression(
-                    arg1, stageIndex, ".rgb");
+                    arg1, stageIndex, ".rgb", textureFactor);
                 const auto dotSecond = fixed_function_argument_expression(
-                    arg2, stageIndex, ".rgb");
+                    arg2, stageIndex, ".rgb", textureFactor);
                 return "dot((" + dotFirst + " * 2.0 - 1.0), (" +
                        dotSecond + " * 2.0 - 1.0))";
             }
