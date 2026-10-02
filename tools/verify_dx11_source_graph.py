@@ -2565,6 +2565,31 @@ def main() -> None:
             + ", ".join(missing_r155_indexed_fan_source_content)
         )
 
+    r155_direct_pointlist_raster_contract = [
+        ("bool pointRasterSemanticsExact{};", NATIVE_BACKEND_HPP,
+         "R155 direct point-list raster semantic gate"),
+        ("out.pointRasterSemanticsExact = primitive != D3DPT_POINTLIST;",
+         NATIVE_BACKEND_CPP, "R155 POINTLIST fail-closed assignment"),
+        ("out.pointRasterSemanticsExact &&", NATIVE_BACKEND_CPP,
+         "R155 readiness requires proven point raster semantics"),
+        ("out.pointRasterSemanticsExact ? 0x155u : 0u", NATIVE_BACKEND_CPP,
+         "R155 direct-dispatch snapshot contract version"),
+        ("R155 point-list fixture reaches exact dormant IA topology",
+         CONSTANT_BUFFER_PROBE, "R155 positive topology fixture"),
+        ("R155 direct point-list raster semantics remain fail closed", CONSTANT_BUFFER_PROBE,
+         "R155 point raster fail-closed proof"),
+    ]
+    missing_r155_direct_pointlist_raster = [
+        meaning
+        for token, source, meaning in r155_direct_pointlist_raster_contract
+        if token not in source
+    ]
+    if missing_r155_direct_pointlist_raster:
+        raise SystemExit(
+            "DX11 R155 direct POINTLIST raster contract drift: "
+            + ", ".join(missing_r155_direct_pointlist_raster)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":

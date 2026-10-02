@@ -4250,6 +4250,53 @@ int main()
             nonIndexedVertexBufferOverrun.snapshotToken == 0,
             "R151 direct nonindexed dispatch rejects vertex buffer overrun");
 
+        const auto pointListGeometryReady =
+            outrun::vr::dx11::compose_fixed_function_geometry_readiness(
+                managedVertexPostResetReady, false, managedIndexReady,
+                D3DPT_POINTLIST);
+        require(
+            pointListGeometryReady.ready &&
+            pointListGeometryReady.topology ==
+                D3D11_PRIMITIVE_TOPOLOGY_POINTLIST &&
+            outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+                d3d.context, pointListGeometryReady, managedVertexBuffer,
+                geometryVertexStride, geometryVertexOffset,
+                nullptr, DXGI_FORMAT_UNKNOWN, 0u),
+            "R155 point-list fixture reaches exact dormant IA topology");
+
+        const auto pointListDrawReady =
+            compose_fixed_function_draw_readiness(
+                multiStageActivation, outputBindingRenderReady, surfacePairReady,
+                outputStateReady, outputStateBinding, pointListGeometryReady);
+        const auto pointListRenderTargetBoundDraw =
+            outrun::vr::dx11::
+                compose_fixed_function_render_target_bound_draw_readiness(
+                    pointListDrawReady, d3d.context, outputStateBinding,
+                    pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                    multiStageSamplers, multiStageTextures,
+                    pointListGeometryReady, managedVertexBuffer,
+                    geometryVertexStride, geometryVertexOffset,
+                    nullptr, DXGI_FORMAT_UNKNOWN, 0u, transform,
+                    surfaceTargetBinding, outputColorSurface, outputDepthSurface);
+        const auto pointListDirectDispatch =
+            outrun::vr::dx11::compose_fixed_function_direct_draw_dispatch_readiness(
+                pointListRenderTargetBoundDraw, pointListDrawReady,
+                pointListGeometryReady, D3DPT_POINTLIST, 1u, false,
+                0u, 0u, 0);
+        require(
+            pointListRenderTargetBoundDraw.ready &&
+            pointListDirectDispatch.inputValid &&
+            pointListDirectDispatch.renderTargetBoundDrawReady &&
+            pointListDirectDispatch.geometryReady &&
+            pointListDirectDispatch.geometryMatchesDraw &&
+            pointListDirectDispatch.topologyMatchesGeometry &&
+            pointListDirectDispatch.bufferRangeExact &&
+            pointListDirectDispatch.dispatchArgumentsExact &&
+            !pointListDirectDispatch.pointRasterSemanticsExact &&
+            !pointListDirectDispatch.ready &&
+            pointListDirectDispatch.snapshotToken == 0,
+            "R155 direct point-list raster semantics remain fail closed");
+
         require(
             outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
                 d3d.context, indexedGeometryReady, managedVertexBuffer,

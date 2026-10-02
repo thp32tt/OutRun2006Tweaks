@@ -5303,6 +5303,10 @@ compose_fixed_function_direct_draw_dispatch_readiness(
         topology.exact &&
         topology.value != D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED &&
         topology.value == geometry.topology;
+    // R155 keeps direct POINTLIST fail-closed until D3D9 point-size and
+    // point-sprite raster state is captured and translated. Topology alone
+    // is not sufficient evidence of fixed-function raster equivalence.
+    out.pointRasterSemanticsExact = primitive != D3DPT_POINTLIST;
     out.dispatchArgumentsExact =
         argumentsCanonical && rangeExact && out.bufferRangeExact;
     out.componentSnapshotsPresent =
@@ -5317,6 +5321,7 @@ compose_fixed_function_direct_draw_dispatch_readiness(
         out.geometryMatchesDraw &&
         out.surfacePairMatchesDraw &&
         out.topologyMatchesGeometry &&
+        out.pointRasterSemanticsExact &&
         out.dispatchArgumentsExact &&
         out.componentSnapshotsPresent;
 
@@ -5337,6 +5342,8 @@ compose_fixed_function_direct_draw_dispatch_readiness(
             token, static_cast<std::uint32_t>(baseVertexLocation));
         token = mix_readiness_snapshot_token(
             token, out.bufferRangeExact ? 0x151u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.pointRasterSemanticsExact ? 0x155u : 0u);
         out.snapshotToken = token == 0 ? 1 : token;
     }
     return out;

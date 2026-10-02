@@ -1704,6 +1704,9 @@ struct NativeFixedFunctionDirectDrawDispatchReadiness {
     bool geometryMatchesDraw{};
     bool surfacePairMatchesDraw{};
     bool topologyMatchesGeometry{};
+    // R155: D3D9 POINTLIST raster behavior depends on point-size/point-sprite
+    // state that is not yet sealed by the dormant DX11 draw snapshot.
+    bool pointRasterSemanticsExact{};
     bool bufferRangeExact{};
     bool dispatchArgumentsExact{};
     bool componentSnapshotsPresent{};
