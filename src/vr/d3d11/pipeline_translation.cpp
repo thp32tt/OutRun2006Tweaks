@@ -679,6 +679,7 @@ namespace outrun::vr::dx11
             !fixed_function_filter_supported(source.magFilter, false) ||
             !fixed_function_filter_supported(source.mipFilter, true) ||
             !translate_fixed_function_sampler_lod(source, out.desc) ||
+            source.srgbTexture != FALSE ||
             !fixed_function_address_supported(source.addressU) ||
             !fixed_function_address_supported(source.addressV))
             return out;
@@ -777,6 +778,9 @@ namespace outrun::vr::dx11
             D3D11_SAMPLER_DESC lodDesc{};
             if (!translate_fixed_function_sampler_lod(stage, lodDesc))
                 out.unsupported |= FixedFunctionUnsupportedSamplerLod;
+
+            if (stage.srgbTexture != FALSE)
+                out.unsupported |= FixedFunctionUnsupportedSamplerSrgb;
         }
 
         return out;
