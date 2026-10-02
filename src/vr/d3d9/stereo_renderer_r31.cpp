@@ -86,12 +86,14 @@ namespace OutRunVRStereo
 
         inline void R31TelemetryNoteFastWorld() noexcept
         {
-            R31TelemetryNoteFastWorld();
+            ++R31FastWorldDraws;
+            ++R31Frame.fastWorld;
         }
 
         inline void R31TelemetryNoteHud() noexcept
         {
-            R31TelemetryNoteHud();
+            ++R31HudDraws;
+            ++R31Frame.hud;
         }
 
         inline void R31TelemetryNoteFallback() noexcept
@@ -107,12 +109,6 @@ namespace OutRunVRStereo
         inline void R31TelemetryNoteFragile() noexcept
         {
             ++R31Frame.fragile;
-        }
-
-        inline void R31TelemetryResetFrameWindow() noexcept
-        {
-            R31Frame = {};
-            R31Window = {};
         }
 
         inline R31FramePerf R31TelemetryFrameSnapshot() noexcept
@@ -146,6 +142,12 @@ namespace OutRunVRStereo
             ULONGLONG lastLogMs = 0;
         };
         R31WindowPerf R31Window{};
+
+        inline void R31TelemetryResetFrameWindow() noexcept
+        {
+            R31Frame = {};
+            R31Window = {};
+        }
 
         void R31FinalizePerfFrame() noexcept
         {
