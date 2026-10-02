@@ -1324,6 +1324,74 @@ validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(
     UINT baseVertex,
     std::uint64_t snapshotToken) noexcept;
 
+// R144 closes the indexed triangle-fan final dormant pre-draw gap. It
+// reconstructs R143 geometry from the current VB/source-IB mirrors, reobserves
+// the generated R32_UINT triangle-list binding on the same context, and seals
+// the future DrawIndexed BaseVertexLocation without issuing Draw*.
+struct NativeFixedFunctionCompleteIndexedFanBoundDrawReadiness {
+    bool inputValid{};
+    bool sameContextBoundDrawReady{};
+    bool geometryReady{};
+    bool geometryMatchesDraw{};
+    bool sourceIndexBufferCurrent{};
+    bool vertexBufferBoundExact{};
+    bool generatedIndexBindingReady{};
+    bool generatedIndexMatchesGeometry{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t sameContextBoundDrawSnapshotToken{};
+    std::uint64_t geometrySnapshotToken{};
+    std::uint64_t vertexBufferSnapshotToken{};
+    std::uint64_t sourceIndexBufferSnapshotToken{};
+    std::uint64_t generatedIndexBindingSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionCompleteIndexedFanBoundDrawReadiness
+compose_fixed_function_complete_indexed_triangle_fan_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount,
+    INT baseVertexLocation) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_complete_indexed_triangle_fan_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount,
+    INT baseVertexLocation,
+    std::uint64_t snapshotToken) noexcept;
+
 // Final transform-aware dormant pre-draw proof. R140 already reobserves live
 // pipeline/PS/RS/OM/direct-IA state; this layer additionally requires the
 // exact R96 WVP payload to remain bound at VS b0 on that same context.
