@@ -4634,6 +4634,62 @@ bool validate_fixed_function_indexed_source_range_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+NativeFixedFunctionIndexedDirectDispatchReadiness
+compose_fixed_function_indexed_direct_dispatch_readiness(
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange) noexcept {
+    NativeFixedFunctionIndexedDirectDispatchReadiness out{};
+    out.directDispatchSnapshotToken = dispatch.snapshotToken;
+    out.sourceRangeSnapshotToken = sourceRange.snapshotToken;
+    out.inputValid =
+        dispatch.ready &&
+        sourceRange.ready &&
+        dispatch.indexed &&
+        dispatch.snapshotToken != 0 &&
+        sourceRange.snapshotToken != 0;
+    out.directDispatchReady = dispatch.ready && dispatch.indexed;
+    out.sourceRangeReady = sourceRange.ready;
+    out.dispatchMatchesSourceRange =
+        out.inputValid &&
+        dispatch.topology == sourceRange.topology &&
+        dispatch.primitiveCount == sourceRange.primitiveCount &&
+        dispatch.elementCount == sourceRange.elementCount &&
+        dispatch.startIndexLocation == sourceRange.startIndex &&
+        dispatch.baseVertexLocation == sourceRange.baseVertexIndex;
+    out.componentSnapshotsPresent =
+        dispatch.snapshotToken != 0 &&
+        sourceRange.snapshotToken != 0;
+    out.ready =
+        out.inputValid &&
+        out.directDispatchReady &&
+        out.sourceRangeReady &&
+        out.dispatchMatchesSourceRange &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.directDispatchSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceRangeSnapshotToken);
+        token = mix_readiness_snapshot_token(token, 0x150u);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_indexed_direct_dispatch_snapshot(
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        compose_fixed_function_indexed_direct_dispatch_readiness(
+            dispatch, sourceRange);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 bool validate_fixed_function_render_target_bound_draw_readiness_integrity(
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept {
     if (!boundDraw.inputValid ||
