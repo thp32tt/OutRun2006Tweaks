@@ -64,7 +64,7 @@ def queue_rollover_prompt(active: dict) -> str:
         f"ATTEMPT={active['attempt']}/{MAX_TASK_ATTEMPTS}",
         f"CHAT_ROLLOVER={rollover}",
         "",
-        "이전 채팅이 대화 길이 한도에 도달해서 같은 프로젝트의 새 채팅으로 자동 전환했다.",
+        "이전 대화를 계속 사용할 수 없어 같은 프로젝트의 새 채팅으로 전환했다. 아래 실제 사유를 확인해.",
         "이 롤오버는 작업 실패나 재시도가 아니므로 ATTEMPT를 증가시키지 마.",
         "GitHub 최신 HEAD와 docs/automation/runs/ 아래 해당 TASK_ID 기록을 직접 확인해 현재 상태를 재구성해.",
         "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
@@ -72,6 +72,11 @@ def queue_rollover_prompt(active: dict) -> str:
         "실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED를 유지해.",
         "실제 변경 또는 검토 기록을 Git에 남기고 결과 커밋 메시지에 정확히 [AUTO:" + active["task_id"] + "] 를 포함해.",
     ]
+    if str(active.get("lane", "")).startswith("LOCALIZATION_"):
+        lines.append(LOCALIZATION_EXECUTION_POLICY)
+    lines.append("RESUME_REASON=" + str(active.get("last_rollover_reason") or active.get("failure_context") or "conversation recovery"))
+    if active.get("qa_batch"):
+        lines.append("QA_BATCH_INPUTS=" + json.dumps(active["qa_batch"], ensure_ascii=False))
     return "\n".join(lines)
 
 
@@ -127,6 +132,7 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         write_runtime(status="thinking_level_blocked", last_action=f"{active['task_id']}: rollover chat thinking level unverified")
         return False
 
+    active["last_rollover_reason"] = reason
     result = await send_message(page, queue_rollover_prompt(active))
     if result != "sent":
         write_runtime(status="conversation_rollover_failed", last_action=f"{active['task_id']}: rollover send failed: {result}")
@@ -522,15 +528,25 @@ async def localization_send_lane_task(
 
 
 def finalize_localization_producer_commit(q: dict, active: dict, task_commit: dict, now: datetime) -> None:
-    """Release A/B on durable commit; validation is deferred to the C batch gate."""
+    """Release only material results; keep blocked/report-only tasks resumable."""
+    kind, reason = github_localization_result_evidence(task_commit, active["task_id"])
+    active["result_classification"] = kind
+    active["result_evidence_reason"] = reason
+    if kind in {"REJECTED", "RETRY"}:
+        active["rejected_result_sha"] = task_commit["sha"]
+        active["result_sha"] = None
+        active["phase"] = "WAIT_CHAT"
+        if kind == "REJECTED":
+            active["execution_resume_reason"] = reason + "; rejected SHA=" + task_commit["sha"] + "; perform missing asset work, not another blocker-only commit."
+        return
     active["result_sha"] = task_commit["sha"]
     active["result_message"] = task_commit.get("message")
     active["automation_validation"] = "PENDING"
     active["validation_mode"] = "C_BATCH_GATE"
-    active["batch_validation_pending"] = True
+    active["batch_validation_pending"] = kind == "PRODUCED"
     active["runtime_validation"] = "UNTESTED"
     active["completed_at"] = now.isoformat()
-    active["terminal"] = "PRODUCED"
+    active["terminal"] = kind
     active["phase"] = "DONE"
     for key in (
         "gate_run",
@@ -545,6 +561,23 @@ def finalize_localization_producer_commit(q: dict, active: dict, task_commit: di
     q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
 
 
+async def resume_incomplete_localization(context, pages, q: dict, active: dict, reason: str) -> None:
+    """Continue the same task with backoff; do not consume CI attempts or chat rollovers."""
+    now = datetime.now(TZ)
+    last = _parse_iso(active.get("last_execution_resume_at"))
+    count = int(active.get("execution_resumes", 0))
+    delay = min(900, 60 * (2 ** min(count, 4)))
+    if last and (now - last).total_seconds() < delay:
+        return
+    active["failure_context"] = reason
+    if await queue_send_retry(context, pages, active, reason):
+        active["execution_resumes"] = count + 1
+        active["last_execution_resume_at"] = now.isoformat()
+        active["phase"] = "WAIT_CHAT"
+        active.pop("execution_resume_reason", None)
+    save_queue_state(q)
+
+
 async def localization_process_lane(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -553,6 +586,10 @@ async def localization_process_lane(
 ) -> None:
     active = q.get("active_by_lane", {}).get(lane_key)
     if not active or active.get("phase") == "DONE":
+        return
+
+    if active.get("execution_resume_reason"):
+        await resume_incomplete_localization(context, pages, q, active, active["execution_resume_reason"])
         return
 
     now = datetime.now(TZ)
@@ -640,9 +677,11 @@ async def localization_process_lane(
                 if lane_key in {"A", "B"}:
                     finalize_localization_producer_commit(q, active, task_commit, now)
                     save_queue_state(q)
+                    if active.get("phase") != "DONE":
+                        return
                     write_runtime(
                         status="producer_commit_ready",
-                        last_action=f"{active['task_id']} -> {active['result_sha']} queued for C batch validation; producer released",
+                        last_action=f"{active['task_id']} -> {active['result_sha']} material result recorded; candidate results queued for C",
                         queue=q,
                     )
                 else:
@@ -673,18 +712,10 @@ async def localization_process_lane(
             sent_at = _parse_iso(active.get("sent_at")) or now
             if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
                 return
-            reason = "Stable response finished without a durable [AUTO:TASK_ID] commit."
-            if active["attempt"] < MAX_TASK_ATTEMPTS:
-                previous_attempt = active["attempt"]
-                active["attempt"] = previous_attempt + 1
-                if await queue_send_retry(context, pages, active, reason):
-                    save_queue_state(q)
-                else:
-                    active["attempt"] = previous_attempt
-                    save_queue_state(q)
-                return
-            active["failure_context"] = reason
-            active["phase"] = "BLOCKED"
+            reason = "NO_DURABLE_RESULT: stable answer ended without a task commit. Discover connected GitHub tools, read HEAD/task record, and execute missing work. An unverified tool/permission claim is not a blocker."
+            active["execution_resume_reason"] = reason
+            await resume_incomplete_localization(context, pages, q, active, reason)
+            return
 
         if active["phase"] == "WAIT_ACTIONS":
             if lane_key in {"A", "B"}:
@@ -692,6 +723,8 @@ async def localization_process_lane(
                 if task_commit:
                     finalize_localization_producer_commit(q, active, task_commit, now)
                     save_queue_state(q)
+                    if active.get("phase") != "DONE":
+                        return
                     write_runtime(
                         status="producer_wait_actions_migrated",
                         last_action=f"{active['task_id']} migrated from legacy WAIT_ACTIONS to C batch validation",
@@ -862,6 +895,22 @@ def finalize_c_qa_batch(q: dict, task: dict) -> None:
     q["qa_pending"] = [x for x in q.get("qa_pending", []) if _qa_item_key(x) not in consumed]
 
 
+def select_verified_qa_batch(q: dict) -> list[dict]:
+    """Recheck legacy pending entries; retain rejected evidence outside the C queue."""
+    batch = []
+    for item in list(q.get("qa_pending", []))[:LOCALIZATION_QA_BATCH_SIZE]:
+        kind, reason = github_localization_result_evidence(
+            {"sha": item.get("result_sha", "")}, item.get("task_id", ""))
+        if kind == "PRODUCED":
+            batch.append(item)
+        elif kind != "RETRY":
+            q.setdefault("qa_ineligible", []).append({**item, "result_classification": kind,
+                                                       "result_evidence_reason": reason})
+            q["qa_pending"].remove(item)
+            save_queue_state(q)
+    return batch
+
+
 async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
     """Run A/B as continuous producers and C as an independent batched QA consumer."""
     now = datetime.now(TZ)
@@ -929,7 +978,9 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
     active_by_lane = q.setdefault("active_by_lane", {})
     pending = q.get("qa_pending", [])
     if "C" not in active_by_lane and pending:
-        batch = pending[:LOCALIZATION_QA_BATCH_SIZE]
+        batch = select_verified_qa_batch(q)
+        if not batch:
+            return
         oldest = _parse_iso(batch[0].get("completed_at")) or now
         age = (now - oldest).total_seconds()
         if len(batch) < LOCALIZATION_QA_BATCH_SIZE and age < LOCALIZATION_QA_COALESCE_SECONDS:
@@ -1400,7 +1451,8 @@ def startup_reconcile_queue_state() -> None:
                 commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
                 if commit:
                     finalize_localization_producer_commit(q, task, commit, now)
-                    rebounds.append(f"producer-release:{task.get('task_id')}->{commit.get('sha','')[:8]}")
+                    if task.get("phase") == "DONE":
+                        rebounds.append(f"producer-release:{task.get('task_id')}->{commit.get('sha','')[:8]}")
                 continue
             task["last_gate_poll_at"] = None
             task["startup_reconcile_pending"] = True
@@ -1571,3 +1623,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

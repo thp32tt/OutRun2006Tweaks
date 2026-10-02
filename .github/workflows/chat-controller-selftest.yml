@@ -5,6 +5,8 @@ on:
     branches: [chat-controller-downloads]
     paths:
       - 'tools/chat-controller/v0.4/**'
+      - 'tools/chat-controller/localization/**'
+      - 'tests/test_localization_execution.py'
       - '.github/workflows/chat-controller-selftest.yml'
   workflow_dispatch:
 
@@ -18,6 +20,9 @@ jobs:
         run: |
           cat tools/chat-controller/v0.4/src/controller.py.part* > /tmp/controller.py
           python -m py_compile /tmp/controller.py
+
+      - name: Localization result and resume regression tests
+        run: python tests/test_localization_execution.py
 
       - name: Check undefined Python names
         run: |
@@ -179,3 +184,4 @@ jobs:
           assert 'recovery = await recover_missing_gate_run(context, pages, active, now)' in src
           print("missing Actions run recovery verified")
           PY
+

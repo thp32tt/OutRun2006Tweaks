@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import asyncio
 import html
 import json
@@ -563,6 +564,77 @@ def github_find_task_commit(branch: str, task_id: str, per_page: int = 100) -> O
 
 
 
+_producer_result_evidence_cache: dict = {}
+
+
+def classify_localization_result(record: dict, files: list[dict], task_id: str) -> tuple[str, str]:
+    """Check immutable content, never accept the assistant's summary as production."""
+    if record.get("TASK_ID", record.get("task_id")) != task_id:
+        return "REJECTED", "TASK_RECORD_ID_MISMATCH"
+    outcome = str(record.get("result", record.get("status", ""))).upper()
+    if outcome in {"BLOCKED", "FAILED", "FAIL", "NO_WORK", "NO_CHANGE", "PENDING"} or record.get("blocker"):
+        return "REJECTED", "BLOCKER_IS_NOT_PRODUCTION"
+    changed = [f.get("filename", "") for f in files if f.get("status") != "removed"]
+    substantive = [p for p in changed if p.startswith("localization/")
+                   and not p.startswith(("localization/progress", "localization/resume_state"))
+                   and p.rsplit("/", 1)[-1].lower() not in {"worklog.md", "readme.md", "status.md", "asset_queue.csv"}]
+    if any(p.lower().endswith(".dds") for p in substantive):
+        return "PRODUCED", "DDS_CHANGED"
+    artifacts = record.get("candidate_artifacts", [])
+    if isinstance(artifacts, list):
+        for artifact in artifacts:
+            if not isinstance(artifact, dict):
+                continue
+            if (artifact.get("role") == "korean_candidate"
+                    and str(artifact.get("path", "")).lower().endswith(".dds")
+                    and re.fullmatch(r"[0-9a-fA-F]{64}", str(artifact.get("sha256", "")))
+                    and artifact.get("drive_file_id")
+                    and any(p.lower().endswith(".json") and "qa" in p.lower() for p in substantive)):
+                return "PRODUCED", "EXTERNAL_DDS_DECLARED_REQUIRES_C_VERIFICATION"
+    if substantive:
+        return "ADVANCED", "PREREQUISITE_CHANGE_ONLY"
+    return "REJECTED", "BOOKKEEPING_ONLY_NO_ARTIFACT"
+
+
+def github_localization_result_evidence(task_commit: dict, task_id: str) -> tuple[str, str]:
+    """Read task record and complete changed-file list at exactly the producer SHA."""
+    sha = task_commit["sha"]
+    key = (sha, task_id)
+    if key in _producer_result_evidence_cache:
+        return _producer_result_evidence_cache[key]
+    try:
+        path = urllib.parse.quote(f"docs/automation/runs/{task_id}.json", safe="/")
+        data = github_api_json(f"/repos/{GITHUB_REPO}/contents/{path}?ref={sha}")
+        record = json.loads(base64.b64decode(data["content"]).decode("utf-8"))
+        if not isinstance(record, dict):
+            return "REJECTED", "TASK_RECORD_NOT_OBJECT"
+        files = []
+        for page in range(1, 31):
+            commit = github_api_json(f"/repos/{GITHUB_REPO}/commits/{sha}?per_page=100&page={page}")
+            batch = commit.get("files", [])
+            files.extend(batch)
+            if len(batch) < 100:
+                break
+        else:
+            return "REJECTED", "COMMIT_FILE_LIST_TRUNCATED"
+        result = classify_localization_result(record, files, task_id)
+        if len(_producer_result_evidence_cache) >= 256:
+            _producer_result_evidence_cache.clear()
+        _producer_result_evidence_cache[key] = result
+        return result
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return "REJECTED", "TASK_RECORD_OR_COMMIT_MISSING_AT_RESULT_SHA"
+        log.warning("producer evidence HTTP failure sha=%s code=%s", sha, exc.code)
+        return "RETRY", f"RESULT_EVIDENCE_HTTP_{exc.code}"
+    except (ValueError, KeyError, TypeError) as exc:
+        return "REJECTED", "INVALID_TASK_RECORD_OR_COMMIT_RESPONSE"
+    except Exception as exc:
+        # Transient read errors must be retried, never cached as an authorization verdict.
+        log.warning("producer evidence read failed sha=%s error=%r", sha, exc)
+        return "RETRY", "RESULT_EVIDENCE_READ_FAILED"
+
+
 def _normalize_github_run(r: dict) -> dict:
     return {
         "id": r.get("id"),
@@ -657,6 +729,25 @@ def queue_target_for_slot(slot_name: str) -> dict:
     }
 
 
+LOCALIZATION_EXECUTION_POLICY = (
+    "GitHub은 연결된 플러그인으로 사용한다. 초기 도구 목록에 없다는 이유로 연결/권한 없음을 단정하지 마. "
+    "ALL_TOOLS 또는 제공된 도구 검색에서 GitHub read/write 기능과 호출 스키마를 탐색한 뒤 실제 호출해. "
+    "읽기 성공, 쓰기 기능 발견, 실제 쓰기 성공은 구분해 기록한다. "
+    "쓰기 경로는 update_file 또는 create_blob -> create_tree -> create_commit -> update_ref(force=false)다. "
+    "실제 오류는 호출 기능/대상/ref/HTTP 코드/비밀정보를 제거한 응답으로 입증한다. "
+    "404는 경로/ref/transport miss, 429는 backoff, 401/403은 응답으로 인증/권한/한도 원인을 구분한다. "
+    "도구 탐색 실패는 TOOL_DISCOVERY_INCOMPLETE이며 권한 거부 증거가 아니다. "
+    "읽기가 가능하면 HEAD와 TASK 기록 확인부터 실행하고 실패한 기능만 복구해. "
+    "RENDER_READY가 없으면 pending_artwork의 원본 취득/영역/마스크 등 미완료 단계를 실제 수행한다. "
+    "자산 하나가 차단되면 근거를 보존하고 다른 실행 가능한 자산을 진행한다. "
+    "보고만 하는 커밋은 제작 성과가 아니다. 실제 DDS 변경 또는 외부 candidate_artifacts 증빙이 있어야 PRODUCED다. "
+    "Drive DDS는 task JSON의 candidate_artifacts에 role=korean_candidate, path(.dds), "
+    "sha256(64자리), drive_file_id를 기록하고 같은 커밋에 self-QA 증빙을 포함한다. "
+    "준비 단계의 실제 변경은 ADVANCED이며 DDS 제작 건수/완료로 세지 않는다. "
+    "상태 안내로 끝내지 말고 실제 작업을 계속하며 RUNTIME_VALIDATION=UNTESTED를 유지한다."
+)
+
+
 def queue_dynamic_prefix() -> str:
     task_id = str(runtime.get("queue_task_id") or "").strip()
     if not task_id:
@@ -679,6 +770,8 @@ def queue_dynamic_prefix() -> str:
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
         "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
     ]
+    if lane.startswith("LOCALIZATION_"):
+        lines.append(LOCALIZATION_EXECUTION_POLICY)
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B"}:
         lines += [
             "A/B producer는 개별 GitHub Actions Gate를 기다리지 않는다. durable task commit이 생성되면 controller가 즉시 다음 생산으로 진행한다.",
@@ -698,7 +791,7 @@ def queue_dynamic_prefix() -> str:
     if failure:
         lines += [
             "",
-            "이전 자동 검증이 실패했다. 같은 실패를 그대로 반복하지 말고 GitHub Actions 결과를 직접 확인해 원인을 수정해.",
+            "이전 실행의 미완료 사유를 확인하고 해당 단계부터 실제 작업을 재개해. Actions 실패가 명시된 경우에만 해당 run을 확인해.",
             "FAILURE_CONTEXT=" + failure,
         ]
     return "\n".join(lines) + "\n\n"
@@ -1014,4 +1107,5 @@ async def ensure_logged_in(page: Page) -> bool:
         current_url=page.url,
     )
     return False
+
 
