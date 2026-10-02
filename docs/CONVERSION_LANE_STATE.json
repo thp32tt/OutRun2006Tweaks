@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "6f7e9c5a511ef5d40d6ba3b7999d50624b461672",
+  "state_parent_head": "b7a9e8eb17cf37a03731fb28267301ec012071eb",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,15 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "0c2d584a46dbfb6808434ddeaa3f94a1d54d9ad7",
-    "validation_bearing_sha": "5f390182dedff22c8be47b9b519f619c4f794e57",
-    "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_CI_BUILD_SUPERSEDED",
+    "result_sha": "4ca2588aed2eb54efdfe19ba45c0740c9a4e8a51",
+    "validation_bearing_sha": "4ca2588aed2eb54efdfe19ba45c0740c9a4e8a51",
+    "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. SRC1 dual-source blend remains fail-closed until a proven second pixel-shader output/linkage path exists.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until parity proof.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Consume the sealed R124 dynamic output-state readiness only in a dormant D3D11 RS/OM binding owner/probe, then obtain a non-superseded hosted Win32/WARP result; exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Obtain a non-superseded hosted Build/WARP result containing R126, then compose the concrete R126 RS/OM binding identity into dormant draw-candidate readiness without routing game Draw*. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -237,6 +237,16 @@
       "material_result_sha": "d2535bae3db9e272c1279a2c9d2e1bc0e9fb1737",
       "validation_bearing_sha": "d3492c12c001bc4bdcdece27852ef09bd6dbc219",
       "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_GATE_BUILD_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false
+    },
+    {
+      "unit_id": "DX11_OUTPUT_STATE_BINDING_R126",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "4ca2588aed2eb54efdfe19ba45c0740c9a4e8a51",
+      "validation_bearing_sha": "4ca2588aed2eb54efdfe19ba45c0740c9a4e8a51",
+      "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false
