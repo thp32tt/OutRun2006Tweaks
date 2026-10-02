@@ -183,6 +183,7 @@ A/B/E producer TASK_IDs are controller-latched until the controller accepts a du
 - The persistent controller stage during this recovery is `WAIT_MATERIAL_COMMIT`. The rollover prompt must carry the latest checkpoint HEAD and instruct the worker to execute rather than re-plan.
 - A dependency-blocked asset does not release the TASK. Continue with another independent runnable asset in the producer's own shard.
 - The latch is released only when the controller validates the durable producer result against current completion/material rules. Runtime remains separately `UNTESTED` unless the user supplies integrated-game evidence.
+- Repeated lane-local controller exceptions are recoverable for a latched A/B/E producer: persist queue/checkpoint state, keep `WAIT_CHAT`, and restart the controller process. Do not convert the TASK to `BLOCKED/DONE` solely because the controller itself faulted repeatedly.
 
 ## Final-artwork convergence mode (schema 38)
 
