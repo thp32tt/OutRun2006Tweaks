@@ -20,6 +20,7 @@ struct FixedFunctionTransformConstants;
 struct FixedFunctionVertexShaderPrototype;
 struct FixedFunctionPixelShaderPrototype;
 struct NativeSurfacePairReadiness;
+struct NativeTriangleFanIndexBufferReadiness;
 struct VertexInputLayoutTranslation;
 struct FixedFunctionStageState;
 struct PipelineTranslation;
@@ -589,6 +590,9 @@ struct NativeFixedFunctionGeometryReadiness {
     bool vertexBufferReady{};
     bool indexBufferRequired{};
     bool indexBufferReady{};
+    bool generatedIndexBufferRequired{};
+    bool generatedIndexBufferReady{};
+    bool generatedIndexBufferMatchesDraw{};
     bool topologyReady{};
     bool componentSnapshotsPresent{};
     bool ready{};
@@ -596,6 +600,7 @@ struct NativeFixedFunctionGeometryReadiness {
         D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
     std::uint64_t vertexBufferSnapshotToken{};
     std::uint64_t indexBufferSnapshotToken{};
+    std::uint64_t generatedIndexBufferSnapshotToken{};
     std::uint64_t snapshotToken{};
 };
 
@@ -611,6 +616,24 @@ compose_fixed_function_geometry_readiness(
     bool indexed,
     const NativeManagedBufferMirrorReadiness& indexBuffer,
     D3DPRIMITIVETYPE primitive,
+    std::uint64_t snapshotToken) noexcept;
+
+// R128 consumes an R126 generated IB only for non-indexed D3D9 triangle fans.
+// Indexed fans deliberately remain on the direct R122 fail-closed path until
+// source-index provenance is sealed separately.
+[[nodiscard]] NativeFixedFunctionGeometryReadiness
+compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    const NativeTriangleFanIndexBufferReadiness& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_nonindexed_triangle_fan_geometry_snapshot(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    const NativeTriangleFanIndexBufferReadiness& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex,
     std::uint64_t snapshotToken) noexcept;
 
 // R124 seals D3D9 dynamic output state into a dormant D3D11-ready snapshot.

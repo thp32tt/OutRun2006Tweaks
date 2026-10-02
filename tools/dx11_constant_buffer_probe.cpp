@@ -10,6 +10,7 @@
 #include "vr/d3d11/pipeline_translation.hpp"
 #include "vr/d3d11/resource_translation.hpp"
 #include "vr/d3d11/surface_mirror.hpp"
+#include "vr/d3d11/triangle_fan_index_buffer.hpp"
 
 namespace
 {
@@ -25,9 +26,12 @@ namespace
     using outrun::vr::dx11::NativeManagedTextureShadow;
     using outrun::vr::dx11::NativeManagedTextureStageReadiness;
     using outrun::vr::dx11::NativeSurfacePairReadiness;
+    using outrun::vr::dx11::NativeTriangleFanIndexBufferReadiness;
     using outrun::vr::dx11::PipelineUnsupportedBlend;
     using outrun::vr::dx11::compose_fixed_function_activation_readiness;
+    using outrun::vr::dx11::compose_fixed_function_nonindexed_triangle_fan_geometry_readiness;
     using outrun::vr::dx11::validate_fixed_function_activation_snapshot;
+    using outrun::vr::dx11::validate_fixed_function_nonindexed_triangle_fan_geometry_snapshot;
     using outrun::vr::dx11::ResourceRole;
     using outrun::vr::dx11::TextureMutationUpdateKind;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
@@ -859,6 +863,64 @@ int main()
         !fanGeometry.ready &&
         fanGeometry.snapshotToken == 0,
         "R122 geometry fails closed on role IB or unowned fan expansion");
+
+    NativeTriangleFanIndexBufferReadiness generatedFanReady{};
+    generatedFanReady.resourcesOwned = true;
+    generatedFanReady.deviceMatches = true;
+    generatedFanReady.descriptorExact = true;
+    generatedFanReady.ready = true;
+    generatedFanReady.indexCount = 9;
+    generatedFanReady.generation = 1;
+    generatedFanReady.contentHash = 0xd8928727f6a47b73ull;
+    generatedFanReady.snapshotToken = 0x1280F11ull;
+
+    const auto expandedNonIndexedFan =
+        compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
+            managedVertexPostResetReady, generatedFanReady, 3u, 7u);
+    require(
+        expandedNonIndexedFan.inputValid &&
+        expandedNonIndexedFan.vertexBufferReady &&
+        !expandedNonIndexedFan.indexBufferRequired &&
+        expandedNonIndexedFan.indexBufferReady &&
+        expandedNonIndexedFan.generatedIndexBufferRequired &&
+        expandedNonIndexedFan.generatedIndexBufferReady &&
+        expandedNonIndexedFan.generatedIndexBufferMatchesDraw &&
+        expandedNonIndexedFan.topologyReady &&
+        expandedNonIndexedFan.componentSnapshotsPresent &&
+        expandedNonIndexedFan.ready &&
+        expandedNonIndexedFan.topology ==
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST &&
+        expandedNonIndexedFan.indexBufferSnapshotToken == 0 &&
+        expandedNonIndexedFan.generatedIndexBufferSnapshotToken ==
+            generatedFanReady.snapshotToken &&
+        expandedNonIndexedFan.snapshotToken != 0 &&
+        validate_fixed_function_nonindexed_triangle_fan_geometry_snapshot(
+            managedVertexPostResetReady, generatedFanReady, 3u, 7u,
+            expandedNonIndexedFan.snapshotToken),
+        "R128 generated IB makes exact non-indexed fan geometry ready");
+
+    auto mismatchedGeneratedFan = generatedFanReady;
+    mismatchedGeneratedFan.contentHash ^= 0x1u;
+    const auto mismatchedFanGeometry =
+        compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
+            managedVertexPostResetReady, mismatchedGeneratedFan, 3u, 7u);
+    auto staleGeneratedFan = generatedFanReady;
+    staleGeneratedFan.snapshotToken ^= 0x100000001b3ull;
+    const auto staleFanGeometry =
+        compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
+            managedVertexPostResetReady, staleGeneratedFan, 3u, 7u);
+    require(
+        mismatchedFanGeometry.generatedIndexBufferReady &&
+        !mismatchedFanGeometry.generatedIndexBufferMatchesDraw &&
+        !mismatchedFanGeometry.ready &&
+        mismatchedFanGeometry.snapshotToken == 0 &&
+        staleFanGeometry.ready &&
+        staleFanGeometry.snapshotToken !=
+            expandedNonIndexedFan.snapshotToken &&
+        !validate_fixed_function_nonindexed_triangle_fan_geometry_snapshot(
+            managedVertexPostResetReady, staleGeneratedFan, 3u, 7u,
+            expandedNonIndexedFan.snapshotToken),
+        "R128 fan geometry rejects mismatched or stale generated IB identity");
 
     NativeManagedBufferShadow invalidManagedBuffer;
     require(

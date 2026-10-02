@@ -1,6 +1,7 @@
 #include "native_backend.hpp"
 
 #include "pipeline_translation.hpp"
+#include "triangle_fan_index_buffer.hpp"
 #include "resource_translation.hpp"
 #include "state_translation.hpp"
 #include "surface_mirror.hpp"
@@ -1866,6 +1867,105 @@ bool validate_fixed_function_geometry_snapshot(
         return false;
     const auto current = compose_fixed_function_geometry_readiness(
         vertexBuffer, indexed, indexBuffer, primitive);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
+NativeFixedFunctionGeometryReadiness
+compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    const NativeTriangleFanIndexBufferReadiness& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex) noexcept {
+    NativeFixedFunctionGeometryReadiness out{};
+    const auto expansion = translate_triangle_fan_expansion(primitiveCount);
+    out.indexBufferRequired = false;
+    out.indexBufferReady = true;
+    out.generatedIndexBufferRequired = true;
+    out.topology = expansion.topology;
+    out.vertexBufferSnapshotToken = vertexBuffer.snapshotToken;
+    out.generatedIndexBufferSnapshotToken =
+        generatedIndexBuffer.snapshotToken;
+
+    std::uint64_t expectedContentHash = 0;
+    if (expansion.exact &&
+        expansion.expandedIndexCount != 0 &&
+        expansion.topology == D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) {
+        std::uint64_t hash = 0xcbf29ce484222325ull;
+        bool exactIndices = true;
+        for (UINT expandedIndex = 0;
+             expandedIndex < expansion.expandedIndexCount;
+             ++expandedIndex) {
+            UINT sourceElement = 0;
+            if (!triangle_fan_source_element(
+                    primitiveCount, expandedIndex, sourceElement) ||
+                baseVertex >
+                    std::numeric_limits<UINT>::max() - sourceElement) {
+                exactIndices = false;
+                break;
+            }
+            hash = mix_readiness_snapshot_token(
+                hash, baseVertex + sourceElement);
+        }
+        if (exactIndices)
+            expectedContentHash = hash == 0 ? 1 : hash;
+    }
+
+    out.inputValid =
+        vertexBuffer.inputValid &&
+        vertexBuffer.role == ResourceRole::Vertex &&
+        expansion.exact &&
+        expectedContentHash != 0;
+    out.vertexBufferReady =
+        vertexBuffer.ready && vertexBuffer.snapshotToken != 0;
+    out.generatedIndexBufferReady =
+        generatedIndexBuffer.ready &&
+        generatedIndexBuffer.snapshotToken != 0;
+    out.generatedIndexBufferMatchesDraw =
+        out.generatedIndexBufferReady &&
+        generatedIndexBuffer.indexCount == expansion.expandedIndexCount &&
+        generatedIndexBuffer.contentHash == expectedContentHash;
+    out.topologyReady =
+        expansion.exact &&
+        expansion.topology == D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    out.componentSnapshotsPresent =
+        vertexBuffer.snapshotToken != 0 &&
+        generatedIndexBuffer.snapshotToken != 0;
+    out.ready =
+        out.inputValid &&
+        out.vertexBufferReady &&
+        out.indexBufferReady &&
+        out.generatedIndexBufferReady &&
+        out.generatedIndexBufferMatchesDraw &&
+        out.topologyReady &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.vertexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.generatedIndexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(token, primitiveCount);
+        token = mix_readiness_snapshot_token(token, baseVertex);
+        token = mix_readiness_snapshot_token(token, expectedContentHash);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.topology));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_nonindexed_triangle_fan_geometry_snapshot(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    const NativeTriangleFanIndexBufferReadiness& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
+            vertexBuffer, generatedIndexBuffer, primitiveCount, baseVertex);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
