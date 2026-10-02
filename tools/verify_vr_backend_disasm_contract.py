@@ -119,6 +119,11 @@ def verify_dxvk_continuation_chain() -> None:
         start = value(f"{prefix}_RVA")
         probe_len = value(f"{prefix}_PROBE_LEN")
         probe_end = value(f"{prefix}_PROBE_END_RVA")
+        if probe_len != 64:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} must retain the canonical 64-byte bounded probe: "
+                f"got {probe_len}"
+            )
         if start + probe_len != probe_end:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} probe geometry drift: "
