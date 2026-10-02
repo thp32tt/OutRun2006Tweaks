@@ -4988,6 +4988,106 @@ bool validate_fixed_function_indexed_source_value_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+NativeFixedFunctionIndexedSourceBindingReadiness
+compose_fixed_function_indexed_source_binding_readiness(
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept {
+
+    NativeFixedFunctionIndexedSourceBindingReadiness out{};
+    out.sourceIndexFormat = sourceValues.sourceIndexFormat;
+    out.boundIndexFormat = boundDraw.indexFormat;
+    out.boundIndexOffset = boundDraw.indexOffset;
+    out.sourceValueLineageSnapshotToken = sourceValueLineage.snapshotToken;
+    out.indexedLineageSnapshotToken = indexedLineage.snapshotToken;
+    out.boundDrawSnapshotToken = boundDraw.snapshotToken;
+
+    out.sourceValueLineageReady =
+        validate_fixed_function_indexed_source_value_snapshot(
+            dispatch, indexedLineage, sourceRange, geometry, sourceValues,
+            sourceValueLineage.snapshotToken);
+    out.boundDrawReady =
+        validate_fixed_function_render_target_bound_draw_readiness_integrity(
+            boundDraw);
+    out.boundDrawMatchesLineage =
+        indexedLineage.boundDrawSnapshotToken != 0 &&
+        indexedLineage.boundDrawSnapshotToken == boundDraw.snapshotToken &&
+        dispatch.renderTargetBoundDrawSnapshotToken != 0 &&
+        dispatch.renderTargetBoundDrawSnapshotToken == boundDraw.snapshotToken;
+
+    const DXGI_FORMAT expectedIndexFormat =
+        sourceValues.sourceIndexFormat == D3DFMT_INDEX16
+            ? DXGI_FORMAT_R16_UINT
+            : sourceValues.sourceIndexFormat == D3DFMT_INDEX32
+                ? DXGI_FORMAT_R32_UINT
+                : DXGI_FORMAT_UNKNOWN;
+    out.indexFormatMatchesSourceValues =
+        expectedIndexFormat != DXGI_FORMAT_UNKNOWN &&
+        boundDraw.indexFormat == expectedIndexFormat;
+    out.indexOffsetExact = boundDraw.indexOffset == 0u;
+    out.componentSnapshotsPresent =
+        sourceValueLineage.snapshotToken != 0 &&
+        indexedLineage.snapshotToken != 0 &&
+        boundDraw.snapshotToken != 0;
+    out.inputValid =
+        sourceValueLineage.ready &&
+        indexedLineage.ready &&
+        dispatch.ready &&
+        dispatch.indexed &&
+        sourceRange.ready &&
+        geometry.ready &&
+        sourceValues.ready;
+    out.ready =
+        out.inputValid &&
+        out.sourceValueLineageReady &&
+        out.boundDrawReady &&
+        out.boundDrawMatchesLineage &&
+        out.indexFormatMatchesSourceValues &&
+        out.indexOffsetExact &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.sourceValueLineageSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.indexedLineageSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.boundDrawSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.sourceIndexFormat));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.boundIndexFormat));
+        token = mix_readiness_snapshot_token(token, out.boundIndexOffset);
+        token = mix_readiness_snapshot_token(token, 0x153u);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_indexed_source_binding_snapshot(
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    std::uint64_t snapshotToken) noexcept {
+
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        compose_fixed_function_indexed_source_binding_readiness(
+            sourceValueLineage, dispatch, indexedLineage, sourceRange,
+            geometry, sourceValues, boundDraw);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 bool validate_fixed_function_render_target_bound_draw_readiness_integrity(
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept {
     if (!boundDraw.inputValid ||
