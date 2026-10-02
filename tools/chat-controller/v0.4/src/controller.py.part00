@@ -1397,17 +1397,50 @@ def conversion_pipeline_has_substantive_work(record: dict) -> bool:
 
 
 def conversion_pipeline_next_stage(reasons: list[str]) -> str:
-    for reason in reasons:
-        if reason.startswith("PIPELINE_STAGE_"):
-            rest = reason[len("PIPELINE_STAGE_"):]
-            return rest.split(":", 1)[0]
-        if reason.startswith("SUBSTANTIVE_WORK"):
-            return "C2_IMPLEMENT"
-        if reason.startswith("VALIDATION_"):
-            return "C3_VALIDATE"
-        if reason.startswith("STATE_"):
-            return "C6_STATE"
+    """Choose the earliest *meaningful* unfinished stage without repeating completed recovery/review."""
+    values = [str(x) for x in reasons]
+    has = lambda prefix: any(x.startswith(prefix) for x in values)
+    if has("PIPELINE_STAGE_C0_RECOVER"):
+        return "C0_RECOVER"
+    if has("PIPELINE_STAGE_C1_REVIEW"):
+        return "C1_REVIEW"
+    if has("SUBSTANTIVE_WORK") or has("PIPELINE_STAGE_C2_IMPLEMENT"):
+        return "C2_IMPLEMENT"
+    if has("VALIDATION_") or has("PIPELINE_STAGE_C3_VALIDATE"):
+        return "C3_VALIDATE"
+    if has("PIPELINE_STAGE_C4_COMMIT"):
+        return "C4_COMMIT"
+    if has("PIPELINE_STAGE_C5_PACKAGE"):
+        return "C5_PACKAGE"
+    if has("STATE_") or has("PIPELINE_STAGE_C6_STATE") or has("PIPELINE_SCHEMA_LT_"):
+        return "C6_STATE"
     return "C0_RECOVER"
+
+
+def conversion_legacy_checkpoint_completed_stages(record: dict) -> set[str]:
+    """Interpret old Cx checkpoint labels only for resume position; never as schema-2 completion proof."""
+    cp = str(record.get("checkpoint") or "").upper()
+    done: set[str] = set()
+    if "C0" in cp:
+        done.add("C0_RECOVER")
+    if "C1" in cp:
+        done.update(("C0_RECOVER", "C1_REVIEW"))
+    if "C2" in cp:
+        done.update(("C0_RECOVER", "C1_REVIEW", "C2_IMPLEMENT"))
+    if "C3" in cp:
+        done.update(("C0_RECOVER", "C1_REVIEW", "C2_IMPLEMENT", "C3_VALIDATE"))
+    if "C4" in cp:
+        done.add("C4_COMMIT")
+    if "C5" in cp:
+        done.add("C5_PACKAGE")
+    if "C6" in cp:
+        done.add("C6_STATE")
+        # Historical C6_STATE records normally represent a completed bounded run.
+        # Preserve that progress, but leave C5 explicit so schema-2 migration must
+        # state PACKAGE or reasoned NOT_REQUIRED.
+        if cp.strip() == "C6_STATE":
+            done.update(("C0_RECOVER", "C1_REVIEW", "C2_IMPLEMENT", "C3_VALIDATE", "C4_COMMIT"))
+    return done
 
 
 def conversion_validate_pipeline_result_commit(
@@ -1445,11 +1478,14 @@ def conversion_validate_pipeline_result_commit(
         "C5_PACKAGE": "c5",
         "C6_STATE": "c6",
     }
+    legacy_checkpoint_done = conversion_legacy_checkpoint_completed_stages(record)
     stage_values = {}
     for stage in CONVERSION_PIPELINE_STAGES:
         value = pipeline.get(stage)
         if value is None:
             value = record.get(legacy_stage_keys.get(stage, ""))
+        if value is None and stage in legacy_checkpoint_done:
+            value = "COMPLETE"
         stage_values[stage] = value
         if not conversion_pipeline_status_ok(stage, value):
             reasons.append(f"PIPELINE_STAGE_{stage}:INCOMPLETE")
