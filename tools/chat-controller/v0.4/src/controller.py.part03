@@ -2814,6 +2814,30 @@ async def localization_process_lane(
                             queue=q,
                         )
                         return
+
+                    passed_sha = str(active.get("result_sha") or "")
+                    static_complete, static_reason = conversion_lane_static_complete(
+                        str(active.get("branch") or "")
+                    )
+                    if not static_complete:
+                        conversion_prepare_next_cycle(active, passed_sha, now, static_reason)
+                        sent = await queue_send_conversion_cycle_continuation(
+                            context, pages, active
+                        )
+                        if not sent:
+                            active["conversion_cycle_continuation_pending"] = True
+                        save_queue_state(q)
+                        write_runtime(
+                            status="conversion_cycle_continue",
+                            last_action=(
+                                f"{active['task_id']} full C0-C6 + Gate cycle PASS; "
+                                f"same TASK continues cycle={active.get('conversion_cycle_count', 0) + 1} "
+                                f"because {static_reason}"
+                            ),
+                            queue=q,
+                        )
+                        return
+                    active["conversion_static_completion_reason"] = static_reason
                 if CONTROLLER_MODE == "localization" and lane_key == "C":
                     # One successful C batch is a checkpoint. Consume it, then drain
                     # the next ready batch in the same TASK/chat instead of stopping.
