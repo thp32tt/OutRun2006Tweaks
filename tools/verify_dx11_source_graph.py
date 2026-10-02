@@ -2288,6 +2288,59 @@ def main() -> None:
             + ", ".join(missing_r148_draw_side_effect_isolation)
         )
 
+    r150_indexed_direct_dispatch_lineage_contract = [
+        (
+            "struct NativeFixedFunctionIndexedDirectDispatchReadiness",
+            NATIVE_BACKEND_HPP,
+            "R150 indexed direct dispatch/source-range lineage identity",
+        ),
+        (
+            "compose_fixed_function_indexed_direct_dispatch_readiness(",
+            NATIVE_BACKEND_CPP,
+            "R150 indexed direct dispatch lineage compositor",
+        ),
+        (
+            "dispatch.startIndexLocation == sourceRange.startIndex",
+            NATIVE_BACKEND_CPP,
+            "R150 StartIndex lineage equality",
+        ),
+        (
+            "dispatch.baseVertexLocation == sourceRange.baseVertexIndex",
+            NATIVE_BACKEND_CPP,
+            "R150 BaseVertex lineage equality",
+        ),
+        (
+            "dispatch.elementCount == sourceRange.elementCount",
+            NATIVE_BACKEND_CPP,
+            "R150 primitive-derived element-count lineage equality",
+        ),
+        (
+            "validate_fixed_function_indexed_direct_dispatch_snapshot(",
+            NATIVE_BACKEND_CPP,
+            "R150 stale indexed lineage validator",
+        ),
+        (
+            "R150 indexed direct dispatch binds R147 tuple to R149 source range",
+            CONSTANT_BUFFER_PROBE,
+            "R150 positive lineage proof",
+        ),
+        (
+            "R150 indexed direct dispatch rejects R149 StartIndex lineage drift",
+            CONSTANT_BUFFER_PROBE,
+            "R150 source-range drift rejection",
+        ),
+    ]
+    missing_r150_indexed_direct_dispatch_lineage = [
+        meaning
+        for token, source, meaning in r150_indexed_direct_dispatch_lineage_contract
+        if token not in source
+    ]
+    if missing_r150_indexed_direct_dispatch_lineage:
+        raise SystemExit(
+            "DX11 R150 indexed direct dispatch lineage contract drift: "
+            + ", ".join(missing_r150_indexed_direct_dispatch_lineage)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
@@ -2311,6 +2364,8 @@ def main() -> None:
             or "validate_fixed_function_direct_draw_dispatch_snapshot(" in runtime_source
             or "compose_fixed_function_indexed_source_range_readiness(" in runtime_source
             or "validate_fixed_function_indexed_source_range_snapshot(" in runtime_source
+            or "compose_fixed_function_indexed_direct_dispatch_readiness(" in runtime_source
+            or "validate_fixed_function_indexed_direct_dispatch_snapshot(" in runtime_source
             or "compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(" in runtime_source
             or "validate_fixed_function_nonindexed_triangle_fan_draw_dispatch_snapshot(" in runtime_source
             or "compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(" in runtime_source
