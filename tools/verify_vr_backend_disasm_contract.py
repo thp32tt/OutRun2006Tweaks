@@ -299,6 +299,35 @@ def verify_dxvk_continuation_chain() -> None:
                 "address-coupled to target_rva and its exact PROBE_LEN symbol"
             )
 
+        # The captured predicate already requires probe_end_matches, but that
+        # intermediate value must itself prove the exact capture geometry.
+        # Otherwise a collector could assign probe_end_matches = True and still
+        # satisfy every downstream gate while silently severing PROBE_END_RVA
+        # from target_rva + len(probe).
+        probe_end_expr = single_assignment_value("probe_end_matches")
+        expected_probe_end_name = f"{prefix}_PROBE_END_RVA"
+        probe_end_geometry_ok = bool(
+            isinstance(probe_end_expr, ast.Compare)
+            and len(probe_end_expr.ops) == 1
+            and isinstance(probe_end_expr.ops[0], ast.Eq)
+            and len(probe_end_expr.comparators) == 1
+            and isinstance(probe_end_expr.left, ast.BinOp)
+            and isinstance(probe_end_expr.left.op, ast.Add)
+            and is_name(probe_end_expr.left.left, "target_rva")
+            and isinstance(probe_end_expr.left.right, ast.Call)
+            and isinstance(probe_end_expr.left.right.func, ast.Name)
+            and probe_end_expr.left.right.func.id == "len"
+            and len(probe_end_expr.left.right.args) == 1
+            and not probe_end_expr.left.right.keywords
+            and is_name(probe_end_expr.left.right.args[0], "probe")
+            and is_name(probe_end_expr.comparators[0], expected_probe_end_name)
+        )
+        if not probe_end_geometry_ok:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} raw provenance probe_end_matches is not exact capture geometry: "
+                f"expected=target_rva+len(probe)=={expected_probe_end_name}"
+            )
+
         inbound_expr = single_assignment_value("inbound")
         inbound_args_ok = bool(
             isinstance(inbound_expr, ast.Call)
