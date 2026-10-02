@@ -1364,17 +1364,34 @@ def conversion_pipeline_changed_paths(record: dict) -> list[str]:
 
 
 def conversion_pipeline_has_substantive_work(record: dict) -> bool:
-    """Task completion requires an implementation/evidence artifact, not state/review prose only."""
-    metadata_prefixes = (
-        "docs/automation/runs/",
-        "docs/CONVERSION_LANE_STATE.json",
-        "docs/VR_RUN_STATE.md",
-        "docs/VR_AUTODEV_STATE.json",
-        "docs/VR_AUTODEV_STATE.md",
+    """Task completion requires implementation/evidence outside review/state bookkeeping."""
+    allowed_prefixes = (
+        "src/",
+        "tools/",
+        "tests/",
+        "cmake/",
+        "include/",
+        ".github/workflows/",
+        "scripts/",
+    )
+    allowed_root_files = {
+        "CMakeLists.txt",
+        "CMakePresets.json",
+        "vcpkg.json",
+    }
+    allowed_suffixes = (
+        ".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp",
+        ".py", ".ps1", ".cmake", ".yml", ".yaml", ".toml", ".ini",
     )
     for path in conversion_pipeline_changed_paths(record):
-        norm = path.replace("\\", "/")
-        if not any(norm.startswith(prefix) for prefix in metadata_prefixes):
+        norm = path.replace("\\", "/").lstrip("./")
+        if not norm or norm == "AGENTS.md" or norm.startswith("docs/"):
+            continue
+        if (
+            norm in allowed_root_files
+            or norm.startswith(allowed_prefixes)
+            or norm.lower().endswith(allowed_suffixes)
+        ):
             return True
     return False
 
