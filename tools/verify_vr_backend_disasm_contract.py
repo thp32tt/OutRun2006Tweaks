@@ -802,7 +802,9 @@ def verify_dxvk_continuation_chain() -> None:
                 for proof_id in predecessor_proof_ids
                 if proof_id >= continuation_id
             ]
-            if immediate_predecessor_calls != 1 or invalid_proof_dependencies:
+            if predecessor_proof_ids and (
+                immediate_predecessor_calls != 1 or invalid_proof_dependencies
+            ):
                 raise SystemExit(
                     f"DXVK continuation {continuation_id} prefix proof consumes invalid predecessor proof chain: "
                     f"expected={expected_predecessor_call} proof_ids={predecessor_proof_ids} "
