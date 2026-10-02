@@ -724,6 +724,43 @@ def main() -> None:
             + ", ".join(missing_fog_observation_contract)
         )
 
+    r124_output_snapshot_contract = {
+        "DWORD blendFactor = 0xFFFFFFFFu;":
+            "R124 D3D9 blend-factor snapshot",
+        "DWORD multiSampleMask = 0xFFFFFFFFu;":
+            "R124 D3D9 multisample-mask snapshot",
+        "D3DVIEWPORT9 viewport{};":
+            "R124 viewport snapshot",
+        "RECT scissorRect{};":
+            "R124 scissor rectangle snapshot",
+        "bool outputStateComplete = false;":
+            "R124 output-state completeness bit",
+    }
+    missing_r124_output = [
+        meaning
+        for token, meaning in r124_output_snapshot_contract.items()
+        if token not in D3D9_DRAW_STATE_HPP
+    ]
+    for token, meaning in {
+        "readOutput(D3DRS_BLENDFACTOR, out.blendFactor);":
+            "R124 tracked blend-factor capture",
+        "readOutput(D3DRS_MULTISAMPLEMASK, out.multiSampleMask);":
+            "R124 tracked sample-mask capture",
+        "device->GetViewport(&out.viewport)":
+            "R124 viewport capture",
+        "device->GetScissorRect(&out.scissorRect)":
+            "R124 scissor capture",
+        "out.outputStateComplete = outputOk;":
+            "R124 independent output completeness",
+    }.items():
+        if token not in D3D9_RENDER_STATE_CAPTURE:
+            missing_r124_output.append(meaning)
+    if missing_r124_output:
+        raise SystemExit(
+            "DX11 R124 output-state capture drift: "
+            + ", ".join(missing_r124_output)
+        )
+
     stencil_snapshot_contract = {
         "DWORD stencilReadMask = 0xFFFFFFFFu;": "stencil read mask snapshot",
         "DWORD stencilRef = 0;": "dynamic stencil reference snapshot",
@@ -3246,6 +3283,83 @@ def main() -> None:
                 "DX11 R122 geometry probe drift: " + meaning
             )
 
+    r124_output_state_header = {
+        "struct NativeFixedFunctionOutputStateReadiness":
+            "R124 output-state readiness snapshot",
+        "bool viewportExact{}":
+            "R124 viewport exactness gate",
+        "bool scissorExact{}":
+            "R124 scissor exactness gate",
+        "bool omDynamicExact{}":
+            "R124 OM dynamic exactness gate",
+        "std::array<float, 4> blendFactor":
+            "R124 D3D11 blend-factor payload",
+        "UINT sampleMask = 0xFFFFFFFFu;":
+            "R124 D3D11 sample-mask payload",
+        "compose_fixed_function_output_state_readiness(":
+            "R124 output-state composition API",
+        "validate_fixed_function_output_state_snapshot(":
+            "R124 stale output-state validator",
+        "bool outputStateReady{}":
+            "R124 final draw output-state prerequisite",
+        "std::uint64_t outputStateSnapshotToken{}":
+            "R124 final draw output-state identity",
+    }
+    missing_r124_output_header = [
+        meaning
+        for token, meaning in r124_output_state_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r124_output_header:
+        raise SystemExit(
+            "DX11 R124 output-state header drift: "
+            + ", ".join(missing_r124_output_header)
+        )
+    for token, meaning in {
+        "source.outputStateComplete":
+            "R124 completeness prerequisite",
+        "viewportRight <= surfacePair.width":
+            "R124 viewport/output extent gate",
+        "source.scissorTestEnable == FALSE || scissorBoundsExact":
+            "R124 enabled-scissor bounds gate",
+        "(source.blendFactor >> 16) & 0xffu":
+            "R124 ARGB-to-R blend factor conversion",
+        "out.sampleMask = source.multiSampleMask":
+            "R124 sample-mask propagation",
+        "token, source.blendFactor":
+            "R124 blend-factor snapshot identity",
+        "token, source.multiSampleMask":
+            "R124 sample-mask snapshot identity",
+        "outputState.ready && outputState.snapshotToken != 0":
+            "R124 final-draw output-state prerequisite",
+        "drawToken, out.outputStateSnapshotToken":
+            "R124 final-draw output-state identity",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R124 output-state source drift: " + meaning
+            )
+    for token, meaning in {
+        "R124 exact dynamic output state issues a valid snapshot":
+            "R124 positive output-state proof",
+        "R124 incomplete output-state observation fails closed":
+            "R124 incomplete-observation proof",
+        "R124 out-of-bounds viewport fails closed":
+            "R124 viewport bounds proof",
+        "R124 enabled out-of-bounds scissor fails closed":
+            "R124 scissor bounds proof",
+        "R124 OM dynamic state changes invalidate output snapshot":
+            "R124 OM identity invalidation proof",
+        "R124 draw snapshot changes with output-state identity":
+            "R124 final-draw output identity invalidation",
+        "DX11 dynamic output-state readiness R124: PASS":
+            "R124 hosted probe marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R124 output-state probe drift: " + meaning
+            )
+
     r120_draw_readiness_header = {
         "struct NativeFixedFunctionDrawReadiness":
             "R120 composite draw readiness",
@@ -3303,8 +3417,8 @@ def main() -> None:
             )
 
     for token, meaning in {
-        "R120 draw readiness composes activation, render-state, and surface-pair snapshots":
-            "R120 positive composition proof",
+        "R124 draw readiness composes activation, render-state, surface, output-state, and geometry snapshots":
+            "R124 positive composition proof",
         "R120 draw readiness fails closed on missing component evidence":
             "R120 missing-evidence fail-closed proof",
         "R120 draw snapshot changes with render-state identity":
