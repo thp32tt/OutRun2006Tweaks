@@ -6504,6 +6504,67 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authenticated frontier. Exact-decode only complete canonical instructions from validated continuation_70 bytes at 0x001833AB..0x001833EB, resolve inherited 0x001833AD only on an exact instruction boundary, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_RAW_PROBE_END_GEOMETRY_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "3089edf6efa6572ecc5164dea92e2a2543bc9f33",
+      "validation_bearing_result_sha": "3089edf6efa6572ecc5164dea92e2a2543bc9f33",
+      "commit_message": "test: fail-close DXVK raw probe-end geometry [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Auto-discovered DXVK raw-continuation verification now structurally requires probe_end_matches to be the exact target_rva + len(probe) == <continuation>_PROBE_END_RVA equation, closing a fail-open path where the named gate could remain in captured while its assignment was weakened.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local run/lane state, Issue #14 and the concurrently advancing F69-F72 canonical frontier."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Fresh verifier review found probe and probe-length address coupling plus final captured-gate consumption were enforced, but the intermediate probe_end_matches geometry expression itself was not AST-validated."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 3089edf6efa6572ecc5164dea92e2a2543bc9f33 adds exact AST validation for target_rva + len(probe) == <continuation>_PROBE_END_RVA across auto-discovered DXVK raw provenance collectors."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA Build run 36993491586 job 110794849418 passed HMD baseline, one-click structure, Verify backend disassembly contract, and consolidated wheel FFB source; full Win32 build completion is not claimed for this verifier-only unit."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5949949389 records implementation and exact-SHA validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only hardening; no runtime DXVK payload, selector/deployment content, packaged binary, other backend branch or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally so the newer concurrently advancing canonical-disassembly frontier remains authoritative and is not rewound."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_STATIC_BACKEND_CONTRACT",
+        "exact_sha": "3089edf6efa6572ecc5164dea92e2a2543bc9f33",
+        "build_run_id": 36993491586,
+        "build_job_id": 110794849418,
+        "hmd_baseline_step": "SUCCESS",
+        "one_click_structure_step": "SUCCESS",
+        "backend_disassembly_contract_step": "SUCCESS",
+        "wheel_ffb_source_step": "SUCCESS",
+        "full_build_conclusion": "NOT_CLAIMED_AFTER_VALIDATION_BEARING_STEP",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5949949389,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authenticated canonical frontier and continue its next runnable raw/proof unit; raw continuation probe-end geometry is now fail-closed automatically."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
