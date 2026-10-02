@@ -100,6 +100,62 @@ int main()
             device.Get(), color, depth, recreatedPair.snapshotToken))
         return fail("surface pair snapshot did not refresh after recreation");
 
+    NativeSurfacePairBinding binding;
+    if (!binding.initialize(device.Get(), color, depth, recreatedPair) ||
+        !binding.ready() ||
+        binding.surface_pair_snapshot_token() != recreatedPair.snapshotToken)
+        return fail("R129 surface-pair binding owner initialization failed");
+    if (!binding.apply(context.Get(), color, depth))
+        return fail("R129 exact surface-pair binding failed");
+
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> boundRtv;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> boundDsv;
+    context->OMGetRenderTargets(
+        1, boundRtv.ReleaseAndGetAddressOf(), boundDsv.ReleaseAndGetAddressOf());
+    if (boundRtv.Get() != color.render_target_view() ||
+        boundDsv.Get() != depth.depth_stencil_view())
+        return fail("R129 OM render-target binding identity drifted");
+
+    Microsoft::WRL::ComPtr<ID3D11Device> foreignDevice;
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext> foreignContext;
+    D3D_FEATURE_LEVEL foreignFeatureLevel = D3D_FEATURE_LEVEL_9_1;
+    if (FAILED(D3D11CreateDevice(
+            nullptr,
+            D3D_DRIVER_TYPE_WARP,
+            nullptr,
+            D3D11_CREATE_DEVICE_BGRA_SUPPORT,
+            nullptr,
+            0,
+            D3D11_SDK_VERSION,
+            foreignDevice.ReleaseAndGetAddressOf(),
+            &foreignFeatureLevel,
+            foreignContext.ReleaseAndGetAddressOf())) ||
+        !foreignDevice || !foreignContext)
+        return fail("R129 foreign WARP device setup failed");
+    if (binding.apply(foreignContext.Get(), color, depth))
+        return fail("R129 foreign context did not fail closed");
+
+    const auto boundPairToken = binding.surface_pair_snapshot_token();
+    depth.observe_device_reset();
+    if (binding.apply(context.Get(), color, depth))
+        return fail("R129 stale binding survived depth Reset");
+    if (!depth.recreate(device.Get()))
+        return fail("R129 depth recreation after stale binding failed");
+    const auto reboundPair = compose_surface_pair_readiness(
+        device.Get(), color, depth);
+    if (!reboundPair.ready || reboundPair.snapshotToken == boundPairToken)
+        return fail("R129 recreated pair did not invalidate binding identity");
+    if (binding.apply(context.Get(), color, depth))
+        return fail("R129 stale binding survived mirror recreation");
+    if (!binding.initialize(device.Get(), color, depth, reboundPair) ||
+        !binding.apply(context.Get(), color, depth))
+        return fail("R129 binding did not recover on refreshed pair");
+
+    binding.shutdown();
+    if (binding.ready() || binding.surface_pair_snapshot_token() != 0 ||
+        binding.apply(context.Get(), color, depth))
+        return fail("R129 binding shutdown retained bindable state");
+
     NativeSurfaceMirror mismatchedDepth;
     if (!mismatchedDepth.initialize(
             device.Get(), ResourceRole::DepthStencil, 63, 32, D3DFMT_D24S8,
@@ -157,5 +213,6 @@ int main()
         return fail("unproven D3D9-to-DXGI MSAA mapping must fail closed");
 
     std::cout << "DX11 dormant surface mirror probe passed\n";
+    std::cout << "DX11 dormant surface-pair binding R129: PASS\n";
     return 0;
 }
