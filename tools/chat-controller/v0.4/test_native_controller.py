@@ -844,6 +844,48 @@ class NativeControllerTests(unittest.TestCase):
         self.assertFalse(any(x.startswith('PIPELINE_STAGE_C0_RECOVER') for x in reasons))
         self.assertFalse(any(x.startswith('PIPELINE_STAGE_C1_REVIEW') for x in reasons))
 
+    def test_live_style_dx11_c2_checkpoint_resumes_at_c3(self):
+        status_ok, _ = load_function('conversion_pipeline_status_ok')
+        changed_paths, _ = load_function('conversion_pipeline_changed_paths')
+        has_work, _ = load_function(
+            'conversion_pipeline_has_substantive_work',
+            conversion_pipeline_changed_paths=changed_paths,
+        )
+        legacy_done, _ = load_function('conversion_legacy_checkpoint_completed_stages')
+        next_stage, _ = load_function('conversion_pipeline_next_stage')
+        record={
+            'schema_version':2,
+            'task_id':'CONVERSION-DX11-00282',
+            'lane':'DX11',
+            'checkpoint':'C2_IMPLEMENT_C4_COMMIT',
+            'changed_paths':['tools/verify_dx11_dual_source_contract.py','docs/automation/runs/CONVERSION-DX11-00282.json'],
+            'validation':{'static_validation':'NOT_RUN_IN_CONNECTOR_ENV'},
+            'next_action':'Run validator and continue DX11 readiness work',
+            'runtime_validation':'UNTESTED',
+        }
+        def fetch(path, ref):
+            if path.endswith('CONVERSION-DX11-00282.json'):
+                return record
+            return {'development_complete':False}
+        validator, _ = load_function(
+            'conversion_validate_pipeline_result_commit',
+            github_json_file_at_ref=fetch,
+            conversion_pipeline_status_ok=status_ok,
+            conversion_pipeline_has_substantive_work=has_work,
+            conversion_legacy_checkpoint_completed_stages=legacy_done,
+            CONVERSION_PIPELINE_SCHEMA_VERSION=2,
+            CONVERSION_PIPELINE_STAGES=("C0_RECOVER","C1_REVIEW","C2_IMPLEMENT","C3_VALIDATE","C4_COMMIT","C5_PACKAGE","C6_STATE"),
+        )
+        valid,reasons,_=validator(
+            'CONVERSION-DX11-00282','f'*40,'DX11','vr-dx11-native-r71'
+        )
+        self.assertFalse(valid)
+        self.assertEqual(next_stage(reasons),'C3_VALIDATE')
+        self.assertFalse(any(x.startswith('PIPELINE_STAGE_C0_RECOVER') for x in reasons))
+        self.assertFalse(any(x.startswith('PIPELINE_STAGE_C1_REVIEW') for x in reasons))
+        self.assertFalse(any(x.startswith('PIPELINE_STAGE_C2_IMPLEMENT') for x in reasons))
+        self.assertTrue(any(x.startswith('PIPELINE_STAGE_C3_VALIDATE') for x in reasons))
+
     def test_conversion_pipeline_validator_accepts_full_c0_c6_transaction(self):
         status_ok, _ = load_function('conversion_pipeline_status_ok')
         changed_paths, _ = load_function('conversion_pipeline_changed_paths')
