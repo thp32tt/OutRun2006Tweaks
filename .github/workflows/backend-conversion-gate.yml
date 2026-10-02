@@ -53,6 +53,16 @@ jobs:
         shell: pwsh
         run: python tools/verify_dx11_dual_source_contract.py
 
+      - name: Test DX11 static surface contract analyzer
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_static_surface_contract.py
+
+      - name: Verify DX11 static surface contract
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/dx11_native_static_surface_contract_check.py src/vr/d3d11/resource_translation.cpp src/vr/d3d11/surface_mirror.cpp
+
       - name: Verify DX11 source graph
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py
