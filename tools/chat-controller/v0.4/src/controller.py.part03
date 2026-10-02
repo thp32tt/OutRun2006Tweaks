@@ -963,6 +963,86 @@ async def queue_send_conversion_pipeline_continuation(
     return sent
 
 
+def conversion_result_seen(active: dict, sha: Optional[str]) -> bool:
+    return bool(sha) and str(sha) in {
+        str(x) for x in (active.get("conversion_consumed_result_shas") or []) if x
+    }
+
+
+def conversion_prepare_next_cycle(active: dict, passed_sha: str, now: datetime, reason: str) -> None:
+    """Keep one VR lane alive after a complete C0-C6 + Gate cycle while static work remains."""
+    consumed = list(active.get("conversion_consumed_result_shas") or [])
+    if passed_sha and passed_sha not in consumed:
+        consumed.append(passed_sha)
+    active["conversion_consumed_result_shas"] = consumed[-32:]
+    active["conversion_cycle_count"] = int(active.get("conversion_cycle_count", 0) or 0) + 1
+    active["conversion_last_cycle_sha"] = passed_sha
+    active["conversion_last_cycle_completed_at"] = now.isoformat()
+    active["conversion_last_cycle_reason"] = reason
+    active["conversion_pipeline_validation"] = "CYCLE_PASS_CONTINUE"
+    active["phase"] = "WAIT_CHAT"
+    active["terminal"] = None
+    active["result_sha"] = None
+    active["result_message"] = None
+    active["task_latched"] = True
+    active["controller_stage"] = "C0_RECOVER"
+    active["last_checkpoint_head"] = passed_sha or active.get("last_checkpoint_head")
+    active["last_checkpoint_at"] = now.isoformat()
+    active["last_checkpoint_stage"] = "C6_STATE"
+    active["conversion_cycle_continuation_pending"] = True
+    active["failure_context"] = ""
+    active["premature_stop_count"] = 0
+    active["premature_stop_counted_for_send_at"] = None
+    for key in (
+        "gate_run", "last_gate_poll_at", "last_gate_status",
+        "last_gate_status_changed_at", "gate_jobs", "last_jobs_refresh_at",
+        "wait_actions_started_at", "startup_reconcile_pending", "completed_at",
+        "blocked_at", "conversion_pipeline_rejected_sha",
+        "conversion_pipeline_reject_reasons", "conversion_pipeline_recovery_sent_sha",
+        "conversion_pipeline_continuation_sent_at",
+    ):
+        active.pop(key, None)
+    invalidate_task_commit_cache(str(active.get("branch") or ""), str(active.get("task_id") or ""))
+
+
+async def queue_send_conversion_cycle_continuation(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    active: dict,
+) -> bool:
+    """Start the next bounded C0-C6 cycle in the same TASK_ID when static work remains."""
+    latest_head = github_branch_head(active["branch"]) or active.get("last_checkpoint_head") or ""
+    complete, completion_reason = conversion_lane_static_complete(active["branch"])
+    if complete:
+        return False
+    cycle = int(active.get("conversion_cycle_count", 0) or 0) + 1
+    prompt = (
+        f"VR_CONTINUOUS_PIPELINE TASK_ID={active['task_id']} BRANCH={active['branch']} HEAD={latest_head}\n"
+        f"NEXT_CYCLE={cycle} ACTIVE_TASK_LATCH=ON CONTROLLER_STAGE=C0_RECOVER. "
+        f"PREVIOUS_CYCLE_GATE=PASS; RELEASE_BLOCKED={completion_reason}.\n"
+        "이전 C0-C6/Gate PASS는 중간 development checkpoint다. 이 TASK를 종료하지 말고 첫 출력부터 연결된 GitHub 도구를 호출해.\n"
+        "다음 independent static work를 현재 HEAD에서 즉시 잡고 "
+        "C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→"
+        "C5_PACKAGE(필요 없으면 이유+NOT_REQUIRED)→C6_STATE 전체를 다시 수행해.\n"
+        + conversion_lane_work_hint(active["branch"]) + "\n"
+        "review/plan/state-only로 멈추지 마. source/tool/test/workflow/disassembly 중 실제 work product를 만들고 "
+        "docs/automation/runs/<TASK_ID>.json을 현재 cycle 결과로 갱신한 새 [AUTO:TASK_ID] Gate 대상 commit까지 진행해. "
+        "로컬 runtime 부재는 static GitHub 작업 blocker가 아니며 RUNTIME_VALIDATION=UNTESTED로 분리해."
+    )
+    sent = await queue_send_same_chat_control_message(
+        context, pages, active, prompt,
+        status="conversion_cycle_continuation",
+        result_label="conversion_cycle_continuation",
+    )
+    if sent:
+        active["conversion_cycle_continuation_pending"] = False
+        active["conversion_cycle_continuation_sent_at"] = datetime.now(TZ).isoformat()
+        active["assistant_claim_verification"] = "NEXT_VR_PIPELINE_CYCLE_SENT"
+        active["last_hash"] = None
+        active["last_hash_changed_at"] = datetime.now(TZ).isoformat()
+    return sent
+
+
 async def conversion_handle_discovered_commit(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -973,6 +1053,8 @@ async def conversion_handle_discovered_commit(
 ) -> bool:
     """Bind only a full C0-C6 conversion result to Actions. Partial commits keep the same TASK alive."""
     sha = str(task_commit.get("sha") or "")
+    if conversion_result_seen(active, sha):
+        return False
     valid, reasons, _record = conversion_validate_pipeline_result_commit(
         str(active.get("task_id") or ""),
         sha,
