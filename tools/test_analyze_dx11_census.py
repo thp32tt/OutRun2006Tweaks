@@ -332,7 +332,7 @@ def main() -> int:
         "VR DX11 R160 ffp signature#1 stage#2: "
         "color[op=4,arg1=0x00000002,arg2=0x00000001] "
         "alpha[op=4,arg1=0x00000002,arg2=0x00000001] "
-        "texCoord=0x00000002 texTransform=0x00000000 "
+        "resultArg=0x00000005 texCoord=0x00000002 texTransform=0x00000000 "
         "sampler[min=2,mag=2,mip=2,u=1,v=3,border=0x80402010,srgb=1]\n"
         "VR DX11 R82 census: samples=1 exact=0 fixedFn=1 programmable=0 "
         "topologyUnsupported=0 signatures=1 declSamples=0 indexedSamples=0 "
@@ -369,6 +369,7 @@ def main() -> int:
     assert r82["Signatures"][0]["fixed_function_stages"][0]["samplerAddressV"] == 3
     assert r82["Signatures"][0]["fixed_function_stages"][0]["samplerBorderColor"] == 0x80402010
     assert r82["Signatures"][0]["fixed_function_stages"][0]["samplerSrgb"] == 1
+    assert r82["Signatures"][0]["fixed_function_stages"][0]["resultArg"] == 5
 
     r83 = run_case(
         "VR DX11 R83 signature#1: primitive=4 fixedFn=1 fvf=0x000001C4 "
