@@ -516,6 +516,69 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the latest authoritative canonical frontier. At state write raw continuation 36 is present while exact proof reaches continuation 35; validate/decode only from the newest current canonical edge and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F26_CONTROL_FLOW_182B17_182B57",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "05cb6f09de3c7fb58a1740a544a1c3b603b24029",
+      "commit_message": "dxvk: prove canonical 0x182B17 control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact-decoded canonical 0x00182B17..0x00182B57 into 22 contiguous complete instructions, proved five direct rel32 CALL targets and exact raw-call census, and proved the capture ends on an instruction boundary at 0x00182B57 without semantic promotion.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered current authenticated GitHub branch/state and followed concurrent same-JOB descendants instead of duplicating F25/F26 provenance work."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the unproved canonical control-flow unit for validated F26 raw provenance 0x00182B17..0x00182B57."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Commit 05cb6f09 exact-decodes 22 complete instructions, five direct rel32 CALL targets and exact capture-boundary semantics without runtime/function/HUD promotion."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA 05cb6f09 passed DXVK Canonical Disassembly Evidence run 36974919382/job 110736548291 against the pinned canonical EXE and dynamic backend disassembly contract."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive analyzer commit 05cb6f09de3c7fb58a1740a544a1c3b603b24029 contains required [AUTO:CONV-DXVK-000002] marker."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static/disassembly proof only; no runtime payload or deployable backend content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as supplemental completed static evidence so newer concurrent raw-frontier work remains authoritative."
+        }
+      },
+      "validation": {
+        "exact_sha": "05cb6f09de3c7fb58a1740a544a1c3b603b24029",
+        "dxvk_disassembly_evidence_run_id": 36974919382,
+        "dxvk_disassembly_evidence_job_id": 110736548291,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "dxvk_disassembly_evidence_artifact_id": 11213540991,
+        "dxvk_disassembly_evidence_artifact_digest": "sha256:7f5cc05b94df74990d07e3afcde452ec4efe9c427eae909981c61a6fc20fb008",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "backend_disassembly_contract": "PASS",
+        "control_flow_status": "EXACT_182B17_TO_182B57_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "instruction_count": 22,
+        "direct_rel32_call_count": 5,
+        "raw_call_census_matches": true,
+        "capture_boundary_matches": true,
+        "generic_win32_build": "CANCELLED_BY_BRANCH_CONCURRENCY_NO_PASS_CLAIM",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5946891513,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER"
     }
   ]
 }
