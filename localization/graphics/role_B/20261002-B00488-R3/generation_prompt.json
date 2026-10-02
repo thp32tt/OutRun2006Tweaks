@@ -1,0 +1,21 @@
+{
+  "contract": "outrun-first-pass-edit-v2",
+  "contract_version": 2,
+  "task_id": "LOCALIZATION-LOCALIZATION_B-00488",
+  "wave_id": "ROLLOVER3",
+  "index": 94,
+  "asset": "2DA43E41",
+  "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+  "candidate_sha256": "627489d616b3636d048fe6b1cfc5e302392c5bc382743bb025550dab798e7721",
+  "semantics": {
+    "course_sp": ["OutRun2: SP","· 15코스 연속","선택되었습니다."],
+    "wait_now": ["현재 다른 플레이어를 기다리는 중입니다.","잠시 기다려 주세요."],
+    "acceleration": "가속도:",
+    "max_speed": "최고 속도:",
+    "view_change": "시점 변경 버튼:",
+    "expert": "상급자용",
+    "special_course": "스페셜 코스"
+  },
+  "protected_original": ["OutRun2: SP","other non-localized artwork outside removal masks"],
+  "rules": ["exact canonical source","deterministic alpha-support clean plate","2px safe containment","vector-outline rerender only","no flattened raster scaling","zero protected overlap","zero outside/alpha escape","runtime UNTESTED"]
+}
