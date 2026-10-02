@@ -1059,6 +1059,35 @@ private:
     std::uint64_t bundle_generation_ = 0;
 };
 
+
+// R139 is the stronger final dormant proof: it reobserves aggregate PS,
+// IA/VS/PS and RS/OM bindings from one caller-supplied D3D11 context before
+// composing R138. Precomputed readiness from another context cannot be
+// injected because this entrypoint owns all live observations. It never Draw*s.
+[[nodiscard]] NativeFixedFunctionBoundDrawReadiness
+compose_fixed_function_same_context_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_same_context_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    std::uint64_t snapshotToken) noexcept;
+
 class NativeBackend final {
 public:
     NativeBackend() = default;
