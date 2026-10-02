@@ -1,0 +1,28 @@
+name: outrun-localization
+
+services:
+  controller:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: outrun-localization-controller
+    restart: unless-stopped
+    environment:
+      CONTROLLER_DOMAIN: localization
+      GITHUB_REPOSITORY: thp32tt/OutRun2006Tweaks
+      GITHUB_BRANCH: korean-localization-clean
+      CONTROLLER_CONFIG: localization/controller_roles.json
+      CONTROLLER_QUEUE: localization/graphics/asset_queue_v2.csv
+      CONTROLLER_CONTRACT: docs/automation/LOCALIZATION_CONTROLLER_V2.md
+    volumes:
+      - localization-state:/var/lib/outrun-controller
+    networks:
+      - localization-net
+
+volumes:
+  localization-state:
+    name: outrun-localization-state
+
+networks:
+  localization-net:
+    name: outrun-localization-net
