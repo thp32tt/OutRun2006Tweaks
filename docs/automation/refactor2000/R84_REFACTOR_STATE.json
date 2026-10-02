@@ -344,9 +344,9 @@
     "R84-REF-GATED-AUXSCALE-0056",
     "R84-REF-GATED-MATHAPI-0057"
   ],
-  "next": "Gate D: consume hosted Win32 Release result for cycle 1499 exact checkpoint; fix first concrete remaining R31/R30 split compile/link error only. Keep runtime NEED_HMD_TEST.",
+  "next": "Gate D BUILD_GATE 1499: trigger .github/workflows/vr-refactor-build.yml on current exact branch HEAD using a GitHub action that emits workflow_dispatch/push, then consume exact run/job. Current connector git-data create_commit/update_ref writes do not create an Actions push run, and direct create_file/update_file trigger attempts were blocked by connector safety. Do not advance cycles until exact hosted build is obtained.",
   "updatedKst": "2026-10-02T22:55:39+09:00",
-  "batchStatus": "GATE_D_BUILD_TRIGGERED",
+  "batchStatus": "GATE_D_BUILD_BLOCKED_CONNECTOR_TRIGGER",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -668,7 +668,7 @@
     "Cycles 1482-1484 R84-REF-GATED-BUILD-0052: static re-read confirmed R31 no longer references Settings::VRTelemetry and runtime_context.hpp is explicit. APPLY_GATE 1484 NO_SAFE_CHANGE. BUILD_GATE 1484 intentionally triggered on exact telemetry-repair SHA. Runtime NEED_HMD_TEST.",
     "Cycles 1485-1493: three Gate D APPLY_GATE batches. 1485-1487 routed RightDepth/Stencil synchronization through right_depth_stencil_sync.hpp; 1488-1490 routed InternalPassScope/right-eye RT/depth through stereo_runtime_facade.hpp; 1491-1493 routed duplicated/right-failure accounting and installed-device lookup through existing neutral facades. Source commits f9e25aed, 5391ca31, e393493a. Exact hosted run 37004875399 for e393493a is pending; no filler cycles counted while runner is pending. Runtime NEED_HMD_TEST.",
     "Cycles 1494-1496 R84-REF-GATED-AUXSCALE-0056: consumed Gate D run 37010503811/job 110848822960 (FAIL, PRODUCT_DEFECT). First concrete error AnyAuxRenderTargetActive; next Settings::VRWorldScale. Added owner-side read-only aux-active/world-scale snapshots and routed R31 through runtime_context.hpp. APPLY_GATE 1496 SOURCE_CHANGED=YES result c292aec4. Runtime NEED_HMD_TEST.",
-    "Cycles 1497-1499 R84-REF-GATED-MATHAPI-0057: isolated R31 fast-world D3D9 matrix operations behind stereo_math_api.hpp wrappers owned by R7 and replaced private DrawStereoState with FastWorldDispatchConstants. Protected Present/Reset/StateBlock/DirectGPU/HUD semantics unchanged. APPLY_GATE 1499 SOURCE_CHANGED=YES result 4dc5cc39. BUILD_GATE 1499 requested by this checkpoint push. Runtime NEED_HMD_TEST."
+    "Cycles 1497-1499 R84-REF-GATED-MATHAPI-0057: isolated R31 fast-world D3D9 matrix operations behind stereo_math_api.hpp wrappers owned by R7 and replaced private DrawStereoState with FastWorldDispatchConstants. Protected Present/Reset/StateBlock/DirectGPU/HUD semantics unchanged. APPLY_GATE 1499 SOURCE_CHANGED=YES result 4dc5cc39. BUILD_GATE 1499 BLOCKED_CONNECTOR_TRIGGER: git-data create_commit/update_ref advanced branch but emitted no Actions push run; connector create_file/update_file trigger attempts were blocked. No build result claimed. Runtime NEED_HMD_TEST."
   ],
   "campaign": {
     "startCycle": 1202,
