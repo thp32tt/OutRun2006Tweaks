@@ -723,19 +723,41 @@ def verify_dxvk_continuation_chain() -> None:
             # resolution in a later exact proof.
             if continuation_id >= 65:
                 predecessor_return_keys: set[str] = set()
+                predecessor_unresolved_forward_values: list[ast.AST] = []
                 for return_node in (
                     node
                     for node in ast.walk(predecessor_proof_ast)
                     if isinstance(node, ast.Return) and isinstance(node.value, ast.Dict)
                 ):
-                    for key_node in return_node.value.keys:
+                    for key_node, value_node in zip(
+                        return_node.value.keys, return_node.value.values
+                    ):
                         if (
                             isinstance(key_node, ast.Constant)
                             and isinstance(key_node.value, str)
                         ):
                             predecessor_return_keys.add(key_node.value)
+                            if key_node.value == "unresolved_forward_targets":
+                                predecessor_unresolved_forward_values.append(value_node)
 
-                if "unresolved_forward_targets" in predecessor_return_keys:
+                if len(predecessor_unresolved_forward_values) > 1:
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} predecessor proof has ambiguous "
+                        "unresolved_forward_targets return bindings: "
+                        f"{len(predecessor_unresolved_forward_values)}"
+                    )
+
+                predecessor_has_unresolved_forward_debt = False
+                if predecessor_unresolved_forward_values:
+                    unresolved_value = predecessor_unresolved_forward_values[0]
+                    if isinstance(unresolved_value, (ast.List, ast.Tuple, ast.Set)):
+                        predecessor_has_unresolved_forward_debt = bool(unresolved_value.elts)
+                    else:
+                        # A computed value cannot be proven empty statically, so
+                        # conservatively require the successor to carry it.
+                        predecessor_has_unresolved_forward_debt = True
+
+                if predecessor_has_unresolved_forward_debt:
                     unresolved_forward_target_compared = any(
                         isinstance(node, ast.Compare)
                         and len(node.ops) == 1
