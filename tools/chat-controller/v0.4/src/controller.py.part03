@@ -1370,6 +1370,7 @@ async def localization_send_lane_task(
             prompt += "\n\n" + localization_material_target_prompt({
                 "branch": target["branch"],
                 "lane": target["lane"],
+                "controller_exclude_indices": localization_qa_inflight_candidate_indices(q),
             })
     except FileNotFoundError as e:
         q.setdefault("lane_dispatch_errors", {})[slot_name] = {
@@ -1442,6 +1443,7 @@ async def localization_send_lane_task(
         "pipeline_material_commit_count": 0 if CONTROLLER_MODE == "localization" and slot_name in {"A", "B", "D"} else None,
         "pipeline_result_shas": [] if CONTROLLER_MODE == "localization" and slot_name in {"A", "B", "D"} else None,
         "pipeline_candidate_indices": [] if CONTROLLER_MODE == "localization" and slot_name in {"A", "B", "D"} else None,
+        "controller_exclude_indices": localization_qa_inflight_candidate_indices(q) if CONTROLLER_MODE == "localization" and slot_name in {"A", "B", "D"} else None,
         "qa_batches_completed_in_task": 0 if CONTROLLER_MODE == "localization" and slot_name == "C" else None,
         "qa_inputs_validated_in_task": 0 if CONTROLLER_MODE == "localization" and slot_name == "C" else None,
         "c_consumed_result_shas": [] if CONTROLLER_MODE == "localization" and slot_name == "C" else None,
