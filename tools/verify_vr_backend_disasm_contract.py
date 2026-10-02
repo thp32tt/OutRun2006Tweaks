@@ -866,6 +866,7 @@ def verify_dxvk_continuation_chain() -> None:
         # exact: declarations are unique, are consumed by this proof, and land
         # on exact instruction boundaries in the successor decode.
         resolved_predecessor_name = f"{prefix}_RESOLVED_PREDECESSOR_TARGET_RVAS"
+        resolved_predecessor_targets: tuple[int, ...] = ()
         if resolved_predecessor_name in analyzer:
             resolved_predecessor_targets = tuple(value(resolved_predecessor_name))
             if len(resolved_predecessor_targets) != len(set(resolved_predecessor_targets)):
@@ -893,6 +894,82 @@ def verify_dxvk_continuation_chain() -> None:
                         f"DXVK continuation {continuation_id} resolved predecessor targets "
                         "are not guarded by an exact-boundary proof"
                     )
+        # A predecessor proof may leave a direct branch target address-only
+        # because it lies beyond that capture. Once the immediately following
+        # exact capture contains that target, the successor must explicitly
+        # promote it through RESOLVED_PREDECESSOR_TARGET_RVAS. Without this
+        # cross-stage check an empty/omitted declaration can vacuously pass the
+        # local boundary guard even though a proven target is now resolvable.
+        if continuation_id > proof_ids[0]:
+            predecessor_id = continuation_id - 1
+            predecessor_proof_name = (
+                "collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
+                f"{predecessor_id}_prefix_proof"
+            )
+            predecessor_proof_source = function_source(predecessor_proof_name)
+            predecessor_proof_ast = ast.parse(predecessor_proof_source)
+            predecessor_external_assignments = [
+                node.value
+                for node in ast.walk(predecessor_proof_ast)
+                if isinstance(node, ast.Assign)
+                and any(
+                    isinstance(target, ast.Name)
+                    and target.id == "expected_external_targets"
+                    for target in node.targets
+                )
+            ]
+            if len(predecessor_external_assignments) > 1:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} predecessor proof "
+                    f"{predecessor_id} has ambiguous expected_external_targets assignments: "
+                    f"{len(predecessor_external_assignments)}"
+                )
+            if predecessor_external_assignments:
+                external_node = predecessor_external_assignments[0]
+                if isinstance(external_node, ast.Set):
+                    predecessor_external_targets = {
+                        element.value
+                        for element in external_node.elts
+                        if isinstance(element, ast.Constant)
+                        and isinstance(element.value, int)
+                    }
+                    if len(predecessor_external_targets) != len(external_node.elts):
+                        raise SystemExit(
+                            f"DXVK continuation {continuation_id} predecessor proof "
+                            f"{predecessor_id} expected_external_targets is not an int literal set"
+                        )
+                elif (
+                    isinstance(external_node, ast.Call)
+                    and isinstance(external_node.func, ast.Name)
+                    and external_node.func.id == "set"
+                    and not external_node.args
+                    and not external_node.keywords
+                ):
+                    predecessor_external_targets = set()
+                else:
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} predecessor proof "
+                        f"{predecessor_id} expected_external_targets must be a literal int set"
+                    )
+
+                successor_start = value(f"{prefix}_RVA")
+                successor_end = value(f"{prefix}_PREFIX_END_RVA")
+                required_direct_predecessor_resolutions = {
+                    target_rva
+                    for target_rva in predecessor_external_targets
+                    if successor_start <= target_rva < successor_end
+                }
+                missing_direct_predecessor_resolutions = sorted(
+                    required_direct_predecessor_resolutions
+                    - set(resolved_predecessor_targets)
+                )
+                if missing_direct_predecessor_resolutions:
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} direct predecessor external target entered successor capture without resolution: "
+                        f"predecessor={predecessor_id} "
+                        f"missing={[f'0x{rva:08X}' for rva in missing_direct_predecessor_resolutions]}"
+                    )
+
         proof_status_fail_closed_markers = (
             "proven = bool(",
             '"status"',
