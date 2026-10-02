@@ -200,18 +200,23 @@ function Get-R23PipelinePhaseSummary([string]$text){
         $cadenceXrFrames=0L
         $cadenceFresh=0L
         $cadenceCached=0L
+        $cadenceCounterCount=0
         $cadenceMatch=[regex]::Match($line,'cadence=\{([^}]*)\}',[Text.RegularExpressions.RegexOptions]::IgnoreCase)
         if($cadenceMatch.Success){
-            $cadenceEvidence=$true
             $cadenceBody=$cadenceMatch.Groups[1].Value
             foreach($counterName in @('xr','fresh','cached')){
-                $counterMatch=[regex]::Match($cadenceBody,('(?:^|,)'+[regex]::Escape($counterName)+':(\d+)'),[Text.RegularExpressions.RegexOptions]::IgnoreCase)
+                $counterMatch=[regex]::Match($cadenceBody,('(?:^|,)\s*'+[regex]::Escape($counterName)+':(\d+)'),[Text.RegularExpressions.RegexOptions]::IgnoreCase)
                 if(-not $counterMatch.Success){continue}
+                $cadenceCounterCount++
                 $counterValue=[int64]$counterMatch.Groups[1].Value
                 if($counterName -eq 'xr'){$cadenceXrFrames=$counterValue}
                 elseif($counterName -eq 'fresh'){$cadenceFresh=$counterValue}
                 elseif($counterName -eq 'cached'){$cadenceCached=$counterValue}
             }
+            # Fresh/cached attribution is decision evidence only when all three
+            # co-timed counters are present. A partial cadence block must not
+            # silently contribute zeroes to phase freshness rates.
+            $cadenceEvidence=($cadenceCounterCount -eq 3)
         }
 
         $phase='MIXED_OR_UNKNOWN'
