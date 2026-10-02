@@ -152,6 +152,121 @@ def start_process_liveness_monitor():
     log.info("process liveness monitor armed fatal_after=%ss", PROCESS_HEARTBEAT_FATAL_SECONDS)
 
 
+_localization_material_target_cache: dict[tuple[str, str], tuple[float, list[dict]]] = {}
+
+
+def localization_material_target_hints(branch: str, lane: str, limit: int = 2) -> list[dict]:
+    """Select concrete producer-owned asset targets from the live Git asset queue.
+
+    This is a routing hint, not completion authority. A worker may skip a hinted
+    asset only when a fresh Git read proves it is superseded, QA-pending, or
+    dependency-blocked, then it must immediately use the next hinted/runnable asset.
+    """
+    lane_mod = {"LOCALIZATION_A": 0, "LOCALIZATION_B": 1, "LOCALIZATION_E": 2}.get(str(lane or ""))
+    if CONTROLLER_MODE != "localization" or lane_mod is None:
+        return []
+
+    key = (str(branch or ""), str(lane or ""))
+    now_mono = time.monotonic()
+    cached = _localization_material_target_cache.get(key)
+    if cached and now_mono - cached[0] < 60:
+        return [dict(x) for x in cached[1][:limit]]
+
+    try:
+        path = (
+            "/repos/" + GITHUB_REPO
+            + "/contents/localization/graphics/asset_queue.csv?ref="
+            + urllib.parse.quote(str(branch or "korean-localization-clean"), safe="")
+        )
+        payload = github_api_json(path)
+        encoded = str(payload.get("content") or "").replace("\\n", "")
+        if not encoded:
+            return []
+        text_data = base64.b64decode(encoded).decode("utf-8-sig")
+        rows = list(csv.DictReader(io.StringIO(text_data)))
+    except Exception as exc:
+        log.info("material target hint unavailable lane=%s branch=%s error=%r", lane, branch, exc)
+        return []
+
+    def rank_row(row: dict) -> tuple[int, int]:
+        try:
+            idx = int(str(row.get("index") or "-1"))
+        except Exception:
+            return (999, 999999)
+        if idx < 0 or idx % 3 != lane_mod:
+            return (999, idx)
+        if str(row.get("action") or "").strip().lower() != "localize_text":
+            return (999, idx)
+        status = str(row.get("artwork_status") or "").strip().lower()
+        # Never dispatch already-static-complete, C-pending, runtime-only, or
+        # sticky source-identity blockers as the primary material target.
+        blocked_tokens = (
+            "static_qa_pass",
+            "candidate_qa_pending",
+            "source_identity_mismatch",
+            "blocked_runtime",
+            "preserve_original",
+        )
+        if any(tok in status for tok in blocked_tokens):
+            return (999, idx)
+        if "rework_required" in status:
+            return (0, idx)
+        if "render_ready" in status:
+            return (1, idx)
+        if "one_stage" in status:
+            return (2, idx)
+        if "candidate" in status and "rework" in status:
+            return (3, idx)
+        if "pending_artwork" in status:
+            return (8, idx)
+        return (999, idx)
+
+    chosen = []
+    for row in sorted(rows, key=rank_row):
+        score, idx = rank_row(row)
+        if score >= 999:
+            continue
+        asset_path = str(row.get("path") or "").strip()
+        asset_name = Path(asset_path).stem.split("_")[0] if asset_path else ""
+        chosen.append({
+            "index": idx,
+            "asset": asset_name,
+            "path": asset_path,
+            "status": str(row.get("artwork_status") or "").strip(),
+            "priority": score,
+        })
+        if len(chosen) >= max(1, limit):
+            break
+
+    _localization_material_target_cache[key] = (now_mono, [dict(x) for x in chosen])
+    return [dict(x) for x in chosen]
+
+
+def localization_material_target_prompt(active: dict) -> str:
+    targets = localization_material_target_hints(
+        str(active.get("branch") or "korean-localization-clean"),
+        str(active.get("lane") or ""),
+        limit=2,
+    )
+    if not targets:
+        return (
+            "CONTROLLER_SELECTED_TARGET=NONE; fresh Git scan only as much as needed to choose "
+            "the highest-priority runnable asset in your own modulo-3 shard, then execute it immediately."
+        )
+    parts = []
+    for n, item in enumerate(targets, 1):
+        parts.append(
+            f"T{n}:index={item['index']};asset={item['asset']};"
+            f"status={item['status']};path={item['path']}"
+        )
+    return (
+        "CONTROLLER_SELECTED_MATERIAL_TARGETS=" + " | ".join(parts)
+        + "\nDO_NOT_RESCAN_WHOLE_QUEUE. Execute T1 now. If a fresh Git read proves T1 "
+          "superseded/QA-pending/dependency-blocked, record that exact reason and immediately execute T2 "
+          "or the next runnable own-shard target in the same response."
+    )
+
+
 def queue_rollover_prompt(active: dict) -> str:
     rollover = int(active.get("chat_rollovers", 0)) + 1
     lines = [
@@ -175,7 +290,8 @@ def queue_rollover_prompt(active: dict) -> str:
                 f"CONTROLLER_STAGE={active.get('controller_stage') or 'WAIT_MATERIAL_COMMIT'}",
                 f"LAST_CHECKPOINT_HEAD={active.get('last_checkpoint_head') or active.get('base_sha') or ''}",
                 f"PREMATURE_STOP_RECOVERY_TOTAL={int(active.get('premature_stop_total', 0) or 0)}",
-                "FIRST_EXECUTION_ACTION=DO_NOT_PLAN; resume material/tool execution immediately.",
+                "FIRST_EXECUTION_ACTION=CALL_CONNECTED_TOOL. Do not emit a status/plan paragraph before the first tool call.",
+                localization_material_target_prompt(active),
             ]
     elif CONTROLLER_MODE == "conversion" and active.get("task_latched", True):
         lines += [
@@ -711,7 +827,8 @@ async def queue_send_producer_execution_continuation(
     active["last_checkpoint_stage"] = "WAIT_MATERIAL_COMMIT"
 
     strikes = int(active.get("premature_stop_count", 0) or 0)
-    if strikes >= PREMATURE_STOP_ROLLOVER_THRESHOLD:
+    effective_threshold = PRODUCER_PREMATURE_STOP_ROLLOVER_THRESHOLD
+    if strikes >= effective_threshold:
         reason = (
             f"PREMATURE_STOP:{strikes} consecutive assistant turns ended without a durable material result; "
             "same TASK_ID must continue from the persistent controller checkpoint in a fresh chat."
@@ -749,12 +866,14 @@ async def queue_send_producer_execution_continuation(
 
     prompt = (
         f"TASK_ID={active['task_id']} BRANCH={active['branch']} HEAD={latest_head}\n"
-        f"ACTIVE_TASK_LATCH=ON PREMATURE_STOP={strikes}/{PREMATURE_STOP_ROLLOVER_THRESHOLD} "
+        f"ACTIVE_TASK_LATCH=ON PREMATURE_STOP={strikes}/{effective_threshold} "
         "CONTROLLER_STAGE=WAIT_MATERIAL_COMMIT. "
-        "INTERMEDIATE_STATUS_NOT_TERMINAL. 상태 재구성/HEAD 확인/후보 스캔/계획은 이미 끝난 중간 단계로 취급해. "
-        "RESULT_SHA=NOT_CREATED/미커밋 상태로 응답을 끝내지 마. 사용자 확인을 기다리지 말고 지금 도구 호출부터 시작해서 "
-        "실제 material 작업(DDS 생성/재작업)→검증→새 [AUTO:TASK_ID] durable commit까지 같은 TASK_ID에서 계속해. "
-        "현재 asset이 dependency-blocked면 같은 shard의 다음 독립 runnable asset으로 즉시 전환해. "
+        "INTERMEDIATE_STATUS_NOT_TERMINAL. 첫 출력은 설명이 아니라 연결된 GitHub/파일 도구 호출이어야 한다. "
+        "상태 재구성/HEAD 확인/후보 스캔/계획은 이미 끝난 중간 단계로 취급해. "
+        + localization_material_target_prompt(active) + "\n"
+        "RESULT_SHA=NOT_CREATED/미커밋 상태로 응답을 끝내지 마. 사용자 확인을 기다리지 말고 실제 material 작업"
+        "(DDS 생성/재작업)→검증→새 [AUTO:TASK_ID] durable commit까지 같은 TASK_ID에서 계속해. "
+        "현재 asset이 dependency-blocked면 정확한 blocker를 기록하고 같은 shard의 다음 독립 runnable asset으로 즉시 전환해. "
         "'다음 단계'를 설명하지 말고 도구 호출과 실제 변경부터 수행해."
     )
     sent = await queue_send_same_chat_control_message(
@@ -1201,6 +1320,11 @@ async def localization_send_lane_task(
 
     try:
         prompt = prompt_for_slot(slot, "parallel")
+        if CONTROLLER_MODE == "localization" and slot_name in {"A", "B", "D"}:
+            prompt += "\n\n" + localization_material_target_prompt({
+                "branch": target["branch"],
+                "lane": target["lane"],
+            })
     except FileNotFoundError as e:
         q.setdefault("lane_dispatch_errors", {})[slot_name] = {
             "at": datetime.now(TZ).isoformat(),
