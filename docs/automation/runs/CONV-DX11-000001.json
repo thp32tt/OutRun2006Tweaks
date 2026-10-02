@@ -5,7 +5,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "0dd353c4147ba412ca9376404c826a0187f49a61",
-  "state_parent_head": "e1b507248de7891211a8c26775b5c501a97828c9",
+  "state_parent_head": "dff8c48005d2f0ca117c369c968a9cacd45e5083",
   "material_result_sha": "b0d0eee45bfaf843a634b255f6cf25902776df24",
   "validation_bearing_sha": "df28e8ac4a4244239129dad6b4c2aca5b29bff70",
   "runtime_validation": "UNTESTED",
@@ -51,12 +51,12 @@
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_EXACT_STATIC_CONFIGURE_IN_PROGRESS",
-      "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_CENSUS_CONFIGURE_IN_PROGRESS",
+      "status": "COMPLETE_EXACT_STATIC_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+      "automation_validation": "PASS_EXACT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
       "evidence": [
-        "Exact validation-bearing SHA df28e8ac4a4244239129dad6b4c2aca5b29bff70 retained one R149 declaration/implementation plus all expected probe/verifier markers and production-caller quarantine.",
+        "Exact validation-bearing SHA df28e8ac4a4244239129dad6b4c2aca5b29bff70 retained the R149 source, probe/verifier markers and production-caller quarantine.",
         "Build run 36980813692 job 110754710280 on that exact SHA passed Checkout, HMD baseline, one-click structure, backend disassembly contract, Verify DX11 source graph, Test DX11 census analyzer, consolidated wheel source and production wheel FFB math.",
-        "Configure was still in progress at validation capture; Win32 compile, probe executable/WARP execution and runtime behavior are not claimed."
+        "Later same-branch pushes cancelled Configure; Build and downstream binary/WARP steps were skipped, so Win32 compile, WARP executable execution and runtime behavior are not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
@@ -68,7 +68,8 @@
         "b0d0eee45bfaf843a634b255f6cf25902776df24",
         "df28e8ac4a4244239129dad6b4c2aca5b29bff70"
       ],
-      "issue14_comment_id": 5947732266
+      "issue14_comment_id": 5947732266,
+      "validation_issue14_comment_id": 5947758609
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
@@ -89,8 +90,8 @@
     "other_backend_modified": false
   },
   "issue14_comment_id": 5947732266,
-  "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_CENSUS_CONFIGURE_IN_PROGRESS",
-  "blocker": "Win32 Configure/build and WARP probe execution were not complete at validation capture; runtime remains UNTESTED. This does not block the completed R149 static readiness unit.",
+  "automation_validation": "PASS_EXACT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+  "blocker": "Exact validation-bearing CI passed all static gates through DX11 source graph/census and wheel math, then same-branch churn cancelled Configure. Win32 Build/WARP execution was skipped; runtime remains UNTESTED.",
   "next_action": "Keep NativeDrawPathActive disabled. Preserve R149. Current descendants already add R150 binding between R147 direct dispatch and R149 source range; validate/persist that existing descendant rather than duplicate it, then continue a fresh source-wide DX11 dormant-conversion audit. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
@@ -104,5 +105,6 @@
     "checkpoint": "C6_STATE",
     "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
     "issue14_comment_id": 5947553790
-  }
+  },
+  "validation_issue14_comment_id": 5947758609
 }
