@@ -923,6 +923,7 @@ namespace OutRunVRStereo
 				D3DRS_SRCBLENDALPHA, D3DRS_DESTBLENDALPHA,
 				D3DRS_BLENDOPALPHA, D3DRS_ALPHATESTENABLE,
 				D3DRS_SHADEMODE, D3DRS_CULLMODE, D3DRS_COLORWRITEENABLE,
+				D3DRS_CLIPPING, D3DRS_CLIPPLANEENABLE,
 				D3DRS_STENCILENABLE, D3DRS_STENCILMASK,
 				D3DRS_STENCILWRITEMASK, D3DRS_STENCILREF,
 				D3DRS_STENCILFAIL, D3DRS_STENCILZFAIL,
@@ -1711,6 +1712,10 @@ namespace OutRunVRStereo
 		read(D3DRS_SHADEMODE, out.shadeMode);
 		read(D3DRS_CULLMODE, out.cullMode);
 		read(D3DRS_FILLMODE, out.fillMode);
+		// R161 keeps D3D9 clipping/user-plane semantics explicit for DX11
+		// readiness instead of silently assuming the D3D11 default.
+		read(D3DRS_CLIPPING, out.clipping);
+		read(D3DRS_CLIPPLANEENABLE, out.clipPlaneEnable);
 		read(D3DRS_SCISSORTESTENABLE, out.scissorTestEnable);
 		read(D3DRS_SRGBWRITEENABLE, out.sRGBWriteEnable);
 		read(D3DRS_COLORWRITEENABLE, out.colorWriteEnable);
