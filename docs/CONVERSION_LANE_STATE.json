@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
+  "state_parent_head": "ab891f9b31c2fafda275d852b25ce75aaa46e853",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -144,6 +144,17 @@
       "material_result_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
       "validation_bearing_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
       "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_AFTER_STATIC_PHASE",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false
+    },
+    {
+      "unit_id": "DX11_FIXED_FUNCTION_PIPELINE_CENSUS_ACCOUNTING_R120",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "d6b23a98c793c74341ce320a25225944051b1b3f",
+      "guard_result_sha": "12690c3de37f724e062da046ed3097b64fd931fe",
+      "validation_bearing_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
+      "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_CI",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false
