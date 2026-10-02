@@ -12,7 +12,9 @@ class StatusHandler(BaseHTTPRequestHandler):
             snapshot = dict(runtime)
             registry = json.loads(REGISTRY_FILE.read_text()) if REGISTRY_FILE.exists() else {}
         body = ("<!doctype html><html><head><meta charset='utf-8'><title>OutRun Controller</title>"
-                "</head><body><h1>OutRun lane / asset controller</h1><pre>" +
+                "</head><body><h1>OutRun lane / asset controller</h1>"
+                "<p><b>Controller mode:</b> " + html.escape(CONTROLLER_MODE) + "</p>"
+                "<h2>Runtime</h2><pre>" +
                 html.escape(json.dumps({"runtime": snapshot, "registry": registry},
                                        ensure_ascii=False, indent=2)) + "</pre></body></html>").encode()
         self.send_response(200)

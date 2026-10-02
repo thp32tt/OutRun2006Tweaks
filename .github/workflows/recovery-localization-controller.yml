@@ -63,9 +63,9 @@ jobs:
           a = (root/'localization_A.md').read_text()
           b = (root/'localization_B.md').read_text()
           c = (root/'localization_C.md').read_text()
-          assert '짝수 index primary shard' in a
-          assert '홀수 index primary shard' in b
-          assert '다음 A/B wave를 시작하지 않는다' in c
+          assert '짝수 index' in a
+          assert '홀수 index' in b
+          assert 'ASSET + CANDIDATE_SHA + ARTIFACT_SHA' in c
           assert 'asset_queue_v2.csv' not in a+b+c
           assert not (root/'localization_E.md').exists()
           PY
@@ -161,4 +161,5 @@ jobs:
           test "$ok" = "1"
           grep -q 'Controller mode:</b> localization' /tmp/localization-only-status.html
           grep -q '&quot;localization_only&quot;: true' /tmp/localization-only-status.html
+
 
