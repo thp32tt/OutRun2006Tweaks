@@ -3794,6 +3794,39 @@ def main() -> None:
             + ", ".join(missing_sampler_srgb_provenance)
         )
 
+    result_arg_fail_closed_contract = [
+        ("FixedFunctionUnsupportedResultArg = 1u << 12",
+         PIPELINE_TRANSLATION_HPP, "RESULTARG dedicated unsupported bit"),
+        ("DWORD resultArg = D3DTA_CURRENT;", PIPELINE_TRANSLATION_HPP,
+         "RESULTARG provenance with D3D9 default"),
+        ("stage.resultArg != D3DTA_CURRENT", PIPELINE_TRANSLATION_CPP,
+         "RESULTARG TEMP fail-closed predicate"),
+        ("out.unsupported |= FixedFunctionUnsupportedResultArg;",
+         PIPELINE_TRANSLATION_CPP, "RESULTARG readiness blocker propagation"),
+        ("D3DTSS_RESULTARG, out.resultArg", RUNTIME_CENSUS,
+         "runtime census RESULTARG capture"),
+        ("hash = hash_mix(hash, stage.resultArg);", RUNTIME_CENSUS,
+         "signature identity includes RESULTARG"),
+        ("resultArg=0x{:08X}", RUNTIME_CENSUS,
+         "detailed RESULTARG telemetry"),
+        ("RESULTARG-001 default CURRENT result routing must remain exact",
+         SEMANTIC_SMOKE, "CURRENT positive semantic probe"),
+        ("RESULTARG-001 TEMP result routing must fail closed",
+         SEMANTIC_SMOKE, "TEMP negative semantic probe"),
+        ("RESULTARG-001 TEMP result routing must block shader generation",
+         SEMANTIC_SMOKE, "shader-generation fail-closed probe"),
+        ("resultArg", analyzer, "census analyzer exposes RESULTARG"),
+        ("resultArg", analyzer_test, "census analyzer regression covers RESULTARG"),
+    ]
+    missing_result_arg = [
+        meaning for token, source, meaning in result_arg_fail_closed_contract
+        if token not in source
+    ]
+    if missing_result_arg:
+        raise SystemExit(
+            "DX11 RESULTARG contract drift: " + ", ".join(missing_result_arg)
+        )
+
     depth_bias_fail_closed_contract = [
         ("DWORD depthBiasBits = 0;", D3D9_DRAW_STATE_HPP,
          "depth-bias raw constant provenance"),
