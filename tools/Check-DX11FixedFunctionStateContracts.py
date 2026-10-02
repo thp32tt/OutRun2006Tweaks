@@ -24,6 +24,27 @@ REQUIRED_SAFE_MARKERS = (
     "NativeDrawPath",
 )
 
+SUPPORTED_TEXT_SUFFIXES = {
+    ".cpp",
+    ".hpp",
+    ".h",
+    ".ini",
+    ".json",
+    ".md",
+    ".py",
+}
+
+
+def iter_scan_paths(path: Path):
+    if path.is_file():
+        yield path
+        return
+
+    if path.is_dir():
+        for child in sorted(path.rglob("*")):
+            if child.is_file() and child.suffix.lower() in SUPPORTED_TEXT_SUFFIXES:
+                yield child
+
 
 def scan(path: Path) -> tuple[bool, list[str]]:
     text = path.read_text(encoding="utf-8", errors="replace")
@@ -46,13 +67,20 @@ def main() -> int:
     args = parser.parse_args()
 
     failed = False
-    for path in args.paths:
-        ok, findings = scan(path)
-        status = "PASS" if ok else "FAIL"
-        print(f"{status}: {path}")
-        for finding in findings:
-            print(f"  - {finding}")
-        failed |= not ok
+    scanned = False
+    for root in args.paths:
+        for path in iter_scan_paths(root):
+            scanned = True
+            ok, findings = scan(path)
+            status = "PASS" if ok else "FAIL"
+            print(f"{status}: {path}")
+            for finding in findings:
+                print(f"  - {finding}")
+            failed |= not ok
+
+    if not scanned:
+        print("FAIL: no supported evidence files found")
+        return 1
 
     return 1 if failed else 0
 
