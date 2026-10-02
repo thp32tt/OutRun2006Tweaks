@@ -2569,6 +2569,79 @@ def main() -> None:
                 "DX11 R112 pipeline-identity probe drift: " + meaning
             )
 
+    r114_surface_header = {
+        "class NativeDeviceSurfaceMirror final":
+            "R114 generation-bound surface owner",
+        "bool recreate(ID3D11Device* device) noexcept":
+            "R114 concrete surface recreation entrypoint",
+        "ID3D11RenderTargetView* mirror_rtv() const noexcept":
+            "R114 render-target view ownership",
+        "ID3D11DepthStencilView* mirror_dsv() const noexcept":
+            "R114 depth-stencil view ownership",
+        "std::uint64_t device_generation_ = 1":
+            "R114 current device generation",
+        "std::uint64_t mirror_generation_ = 0":
+            "R114 mirror generation identity",
+    }
+    missing_r114_header = [
+        meaning
+        for token, meaning in r114_surface_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r114_header:
+        raise SystemExit(
+            "DX11 R114 surface-mirror header drift: "
+            + ", ".join(missing_r114_header)
+        )
+
+    for token, meaning in {
+        "behavior.lifetime != ResourceMirrorLifetime::DeviceGeneration":
+            "R114 device-generation lifetime gate",
+        "desc.SampleDesc.Count = 1":
+            "R114 bounded single-sample surface contract",
+        "device->CreateRenderTargetView(":
+            "R114 concrete RTV creation",
+        "device->CreateDepthStencilView(":
+            "R114 concrete DSV creation",
+        "mirror_generation_ = device_generation_":
+            "R114 mirror generation acknowledgment",
+        "viewResource.Get() == mirror_texture_.Get()":
+            "R114 view-to-texture identity proof",
+        "void NativeDeviceSurfaceMirror::observe_device_reset() noexcept":
+            "R114 Reset lifetime transition",
+        "mirror_generation_ = 0":
+            "R114 released mirror generation invalidation",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R114 surface-mirror source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R114 color render-target mirror recreation":
+            "R114 positive color surface creation",
+        "R114 color render-target descriptor contract":
+            "R114 color descriptor proof",
+        "R114 Reset invalidates generation-bound color surface":
+            "R114 Reset invalidation proof",
+        "R114 post-Reset color surface uses current generation":
+            "R114 post-Reset generation proof",
+        "R114 depth-stencil mirror recreation":
+            "R114 positive depth surface creation",
+        "R114 depth-stencil descriptor contract":
+            "R114 depth descriptor proof",
+        "R114 non-surface role must fail closed":
+            "R114 role rejection",
+        "R114 color surface without RENDERTARGET usage must fail closed":
+            "R114 usage rejection",
+        "R114 color format on depth role must fail closed":
+            "R114 role/format rejection",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R114 surface-mirror probe drift: " + meaning
+            )
+
     r115_activation_header = {
         "struct NativeFixedFunctionActivationReadiness":
             "R115 composite activation readiness",

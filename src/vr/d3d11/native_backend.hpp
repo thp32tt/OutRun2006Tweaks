@@ -152,6 +152,78 @@ private:
     std::uint64_t upload_generation_ = 0;
 };
 
+// R114 dormant generation-bound mirror for D3D9 DEFAULT-pool render-target
+// and depth-stencil surfaces. This owns exact D3D11 Texture2D + RTV/DSV
+// resources for static readiness testing only; no game SetRenderTarget,
+// SetDepthStencilSurface, Clear or Draw path routes through it yet.
+class NativeDeviceSurfaceMirror final {
+public:
+    NativeDeviceSurfaceMirror() = default;
+    ~NativeDeviceSurfaceMirror() = default;
+    NativeDeviceSurfaceMirror(const NativeDeviceSurfaceMirror&) = delete;
+    NativeDeviceSurfaceMirror& operator=(const NativeDeviceSurfaceMirror&) = delete;
+
+    bool initialize(
+        ResourceRole role,
+        D3DFORMAT sourceFormat,
+        UINT width,
+        UINT height,
+        DWORD sourceUsage) noexcept;
+    bool recreate(ID3D11Device* device) noexcept;
+    void observe_device_reset() noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return metadata_valid_ &&
+            (role_ == ResourceRole::Color ||
+             role_ == ResourceRole::DepthStencil) &&
+            width_ != 0 && height_ != 0;
+    }
+    [[nodiscard]] bool mirror_ready() const noexcept {
+        const bool viewReady =
+            role_ == ResourceRole::Color
+                ? static_cast<bool>(mirror_rtv_) && !mirror_dsv_
+                : role_ == ResourceRole::DepthStencil
+                    ? static_cast<bool>(mirror_dsv_) && !mirror_rtv_
+                    : false;
+        return ready() && mirror_device_ && mirror_texture_ && viewReady &&
+            mirror_generation_ == device_generation_;
+    }
+    [[nodiscard]] std::uint64_t device_generation() const noexcept {
+        return device_generation_;
+    }
+    [[nodiscard]] std::uint64_t mirror_generation() const noexcept {
+        return mirror_generation_;
+    }
+    [[nodiscard]] ID3D11Texture2D* mirror_texture() const noexcept {
+        return mirror_texture_.Get();
+    }
+    [[nodiscard]] ID3D11RenderTargetView* mirror_rtv() const noexcept {
+        return mirror_rtv_.Get();
+    }
+    [[nodiscard]] ID3D11DepthStencilView* mirror_dsv() const noexcept {
+        return mirror_dsv_.Get();
+    }
+    [[nodiscard]] bool descriptor_exact(
+        ID3D11Device* expectedDevice) const noexcept;
+
+private:
+    void release_mirror() noexcept;
+
+    ResourceRole role_ = ResourceRole::Color;
+    D3DFORMAT source_format_ = D3DFMT_UNKNOWN;
+    DWORD source_usage_ = 0;
+    UINT width_ = 0;
+    UINT height_ = 0;
+    bool metadata_valid_ = false;
+    std::uint64_t device_generation_ = 1;
+    std::uint64_t mirror_generation_ = 0;
+    Microsoft::WRL::ComPtr<ID3D11Device> mirror_device_;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> mirror_texture_;
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mirror_rtv_;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mirror_dsv_;
+};
+
 // R113 dormant CPU shadow plus generation-bound D3D11 mirror for D3D9
 // MANAGED vertex/index buffers. This is readiness infrastructure only: no
 // game Lock/Unlock hook or native draw path routes through it yet.

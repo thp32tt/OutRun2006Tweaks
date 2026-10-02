@@ -482,6 +482,198 @@ void NativeFixedFunctionTextureView::shutdown() noexcept {
     upload_generation_ = 0;
 }
 
+bool NativeDeviceSurfaceMirror::initialize(
+    ResourceRole role,
+    D3DFORMAT sourceFormat,
+    UINT width,
+    UINT height,
+    DWORD sourceUsage) noexcept {
+
+    shutdown();
+    if ((role != ResourceRole::Color &&
+         role != ResourceRole::DepthStencil) ||
+        width == 0 || height == 0)
+        return false;
+
+    const auto format = translate_resource_format(sourceFormat, role);
+    const auto behavior = translate_resource_behavior(
+        role, D3DPOOL_DEFAULT, sourceUsage);
+    const UINT expectedBind =
+        role == ResourceRole::Color
+            ? D3D11_BIND_RENDER_TARGET
+            : D3D11_BIND_DEPTH_STENCIL;
+    if (!format.exact || format.format == DXGI_FORMAT_UNKNOWN ||
+        !behavior.descriptorExact ||
+        behavior.lifetime != ResourceMirrorLifetime::DeviceGeneration ||
+        behavior.usage != D3D11_USAGE_DEFAULT ||
+        behavior.bindFlags != expectedBind ||
+        behavior.cpuAccessFlags != 0 ||
+        behavior.requiresMutationTelemetry ||
+        behavior.requiresCpuShadow)
+        return false;
+
+    role_ = role;
+    source_format_ = sourceFormat;
+    source_usage_ = sourceUsage;
+    width_ = width;
+    height_ = height;
+    metadata_valid_ = true;
+    device_generation_ = 1;
+    mirror_generation_ = 0;
+    return true;
+}
+
+bool NativeDeviceSurfaceMirror::recreate(ID3D11Device* device) noexcept {
+    if (!ready() || !device)
+        return false;
+
+    const auto format = translate_resource_format(source_format_, role_);
+    const auto behavior = translate_resource_behavior(
+        role_, D3DPOOL_DEFAULT, source_usage_);
+    const UINT expectedBind =
+        role_ == ResourceRole::Color
+            ? D3D11_BIND_RENDER_TARGET
+            : D3D11_BIND_DEPTH_STENCIL;
+    if (!format.exact || format.format == DXGI_FORMAT_UNKNOWN ||
+        !behavior.descriptorExact ||
+        behavior.lifetime != ResourceMirrorLifetime::DeviceGeneration ||
+        behavior.usage != D3D11_USAGE_DEFAULT ||
+        behavior.bindFlags != expectedBind ||
+        behavior.cpuAccessFlags != 0 ||
+        behavior.requiresMutationTelemetry ||
+        behavior.requiresCpuShadow)
+        return false;
+
+    release_mirror();
+
+    D3D11_TEXTURE2D_DESC desc{};
+    desc.Width = width_;
+    desc.Height = height_;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = format.format;
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = expectedBind;
+
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+    if (FAILED(device->CreateTexture2D(
+            &desc, nullptr, texture.ReleaseAndGetAddressOf())) ||
+        !texture)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> dsv;
+    if (role_ == ResourceRole::Color) {
+        if (FAILED(device->CreateRenderTargetView(
+                texture.Get(), nullptr, rtv.ReleaseAndGetAddressOf())) ||
+            !rtv)
+            return false;
+    } else {
+        if (FAILED(device->CreateDepthStencilView(
+                texture.Get(), nullptr, dsv.ReleaseAndGetAddressOf())) ||
+            !dsv)
+            return false;
+    }
+
+    mirror_device_ = device;
+    mirror_texture_ = std::move(texture);
+    mirror_rtv_ = std::move(rtv);
+    mirror_dsv_ = std::move(dsv);
+    mirror_generation_ = device_generation_;
+    if (!mirror_ready() || !descriptor_exact(device)) {
+        release_mirror();
+        return false;
+    }
+    return true;
+}
+
+bool NativeDeviceSurfaceMirror::descriptor_exact(
+    ID3D11Device* expectedDevice) const noexcept {
+
+    if (!mirror_ready() || !expectedDevice ||
+        mirror_device_.Get() != expectedDevice)
+        return false;
+
+    const auto format = translate_resource_format(source_format_, role_);
+    const auto behavior = translate_resource_behavior(
+        role_, D3DPOOL_DEFAULT, source_usage_);
+    if (!format.exact || !behavior.descriptorExact)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> textureDevice;
+    mirror_texture_->GetDevice(textureDevice.ReleaseAndGetAddressOf());
+    if (!textureDevice || textureDevice.Get() != expectedDevice)
+        return false;
+
+    D3D11_TEXTURE2D_DESC desc{};
+    mirror_texture_->GetDesc(&desc);
+    if (desc.Width != width_ ||
+        desc.Height != height_ ||
+        desc.MipLevels != 1 ||
+        desc.ArraySize != 1 ||
+        desc.Format != format.format ||
+        desc.SampleDesc.Count != 1 ||
+        desc.SampleDesc.Quality != 0 ||
+        desc.Usage != behavior.usage ||
+        desc.BindFlags != behavior.bindFlags ||
+        desc.CPUAccessFlags != behavior.cpuAccessFlags ||
+        desc.MiscFlags != 0)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Resource> viewResource;
+    if (role_ == ResourceRole::Color) {
+        if (!mirror_rtv_ || mirror_dsv_)
+            return false;
+        D3D11_RENDER_TARGET_VIEW_DESC viewDesc{};
+        mirror_rtv_->GetDesc(&viewDesc);
+        mirror_rtv_->GetResource(viewResource.ReleaseAndGetAddressOf());
+        return viewDesc.Format == format.format &&
+            viewDesc.ViewDimension == D3D11_RTV_DIMENSION_TEXTURE2D &&
+            viewDesc.Texture2D.MipSlice == 0 &&
+            viewResource.Get() == mirror_texture_.Get();
+    }
+
+    if (!mirror_dsv_ || mirror_rtv_)
+        return false;
+    D3D11_DEPTH_STENCIL_VIEW_DESC viewDesc{};
+    mirror_dsv_->GetDesc(&viewDesc);
+    mirror_dsv_->GetResource(viewResource.ReleaseAndGetAddressOf());
+    return viewDesc.Format == format.format &&
+        viewDesc.ViewDimension == D3D11_DSV_DIMENSION_TEXTURE2D &&
+        viewDesc.Flags == 0 &&
+        viewDesc.Texture2D.MipSlice == 0 &&
+        viewResource.Get() == mirror_texture_.Get();
+}
+
+void NativeDeviceSurfaceMirror::observe_device_reset() noexcept {
+    release_mirror();
+    device_generation_ =
+        device_generation_ == ~std::uint64_t{0}
+            ? 1
+            : device_generation_ + 1;
+}
+
+void NativeDeviceSurfaceMirror::release_mirror() noexcept {
+    mirror_dsv_.Reset();
+    mirror_rtv_.Reset();
+    mirror_texture_.Reset();
+    mirror_device_.Reset();
+    mirror_generation_ = 0;
+}
+
+void NativeDeviceSurfaceMirror::shutdown() noexcept {
+    release_mirror();
+    role_ = ResourceRole::Color;
+    source_format_ = D3DFMT_UNKNOWN;
+    source_usage_ = 0;
+    width_ = 0;
+    height_ = 0;
+    metadata_valid_ = false;
+    device_generation_ = 1;
+}
+
 bool NativeManagedBufferShadow::initialize(
     ResourceRole role,
     UINT byteWidth,
