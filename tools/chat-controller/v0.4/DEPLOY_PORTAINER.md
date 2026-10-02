@@ -2,11 +2,11 @@
 
 ## Architecture
 
-N100 runs only the browser/controller containers. Project work must be performed directly against GitHub by ChatGPT.
+N100 runs the browser/controller containers. VR jobs may also use N100 local workspaces and Google Drive as auxiliary input, analysis, build, validation, or transport sources; the assigned GitHub branch remains the durable source/output authority.
 
 - VR SSOT: `thp32tt/OutRun2006Tweaks` / `vr-d3d9ex-focus`
 - Korean localization SSOT: `thp32tt/OutRun2006Tweaks` / `korean-localization-clean`
-- Do not use N100 local clones/worktrees as project workspaces.
+- For VR jobs, N100 local clones/worktrees and Google Drive are permitted as auxiliary work/transport sources; durable completion still requires the assigned GitHub branch result.
 - Each ChatGPT account must have working GitHub read/write access before AUTO_SEND is enabled.
 
 ## Portainer Git source
@@ -69,7 +69,7 @@ For each account:
 2. Verify the configured ChatGPT project opens from noVNC.
 3. Verify GitHub read/write access is available to ChatGPT.
 4. Run one manual task and confirm GitHub is used directly.
-5. Confirm no N100 local clone/worktree is used for project changes.
+5. For VR, confirm N100/Google Drive auxiliary use is allowed while final completion is still recorded on the assigned GitHub branch.
 
 Then change `AUTO_SEND=true` in that Portainer stack and redeploy.
 
@@ -98,7 +98,7 @@ Each controller:
 
 ## Safety
 
-If GitHub access is unavailable, the controller prompt instructs ChatGPT to report the failure. It must not fall back to the N100 local repository.
+For VR, temporary GitHub unavailability does not forbid N100 local workspaces or Google Drive for auxiliary work. Do not claim job completion until the required material result is committed to the assigned GitHub branch.
 
 
 ## Queue mode (v0.5 behavior in v0.4 deployment path)
