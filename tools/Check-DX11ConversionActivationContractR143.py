@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Static guard for DX11 conversion activation contracts.
 
-This check intentionally validates source policy boundaries only. It does not
-prove runtime behavior on Quest 3/VDXR hardware.
+This check validates source policy boundaries only. It does not prove runtime
+behavior on Quest 3/VDXR hardware.
 """
 
 from __future__ import annotations
@@ -14,6 +14,8 @@ from pathlib import Path
 FORBIDDEN = (
     "NativeDrawPathActive=true",
     "ENABLE_NATIVE_DRAW_PATH=1",
+    "native_draw_path_activation=true",
+    "activate_native_draw_path: true",
 )
 REQUIRED = (
     "runtime_validation",
@@ -21,14 +23,18 @@ REQUIRED = (
 )
 
 
+def check_contract(text: str) -> tuple[list[str], list[str]]:
+    failures = [token for token in FORBIDDEN if token in text]
+    missing = [token for token in REQUIRED if token not in text]
+    return failures, missing
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("state", type=Path, help="conversion state or evidence file")
     args = parser.parse_args()
 
-    text = args.state.read_text(encoding="utf-8")
-    failures = [token for token in FORBIDDEN if token in text]
-    missing = [token for token in REQUIRED if token not in text]
+    failures, missing = check_contract(args.state.read_text(encoding="utf-8"))
 
     if failures:
         print("activation boundary violation:", ", ".join(failures))
