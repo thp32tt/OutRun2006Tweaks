@@ -1313,6 +1313,11 @@ def main() -> None:
             "R134 pipeline-token mismatch fail-closed proof",
         ),
         (
+            "R134 bound draw rejects textured R133-to-R131 identity drift",
+            CONSTANT_BUFFER_PROBE,
+            "R134 textured-draw lineage mismatch fail-closed proof",
+        ),
+        (
             "R134 live PS binding drift invalidates pipeline binding snapshot",
             CONSTANT_BUFFER_PROBE,
             "R134 live pipeline binding drift fail-closed proof",
