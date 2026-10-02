@@ -443,6 +443,43 @@ def main() -> None:
             + ", ".join(missing_r184_d3dtop_addsmooth)
         )
 
+    r185_d3dtop_blenddiffusealpha_contract = [
+        ("case D3DTOP_BLENDDIFFUSEALPHA:", PIPELINE_TRANSLATION_CPP,
+         "R185 D3DTOP_BLENDDIFFUSEALPHA readiness/translation case"),
+        ('return first + " * input.diffuse.a + " + second +',
+         PIPELINE_TRANSLATION_CPP,
+         "R185 D3DTOP_BLENDDIFFUSEALPHA diffuse-alpha shader expression"),
+        ("blendDiffuseAlphaStages[0].colorOp = D3DTOP_BLENDDIFFUSEALPHA;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R185 hosted BLENDDIFFUSEALPHA color fixture"),
+        ("blendDiffuseAlphaStages[0].alphaOp = D3DTOP_BLENDDIFFUSEALPHA;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R185 hosted BLENDDIFFUSEALPHA alpha fixture"),
+        ("float3 nextColor = sampled0.rgb * input.diffuse.a + input.diffuse.rgb * (1.0 - input.diffuse.a);",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R185 generated RGB HLSL assertion"),
+        ("float nextAlpha = sampled0.a * input.diffuse.a + input.diffuse.a * (1.0 - input.diffuse.a);",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R185 generated alpha HLSL assertion"),
+        ("R185 D3DTOP_BLENDDIFFUSEALPHA fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R185 offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_BLENDDIFFUSEALPHA support R185: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R185 hosted probe completion"),
+    ]
+    missing_r185_d3dtop_blenddiffusealpha = [
+        meaning
+        for token, source, meaning in r185_d3dtop_blenddiffusealpha_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_BLENDDIFFUSEALPHA:") < 3:
+        missing_r185_d3dtop_blenddiffusealpha.append(
+            "R185 BLENDDIFFUSEALPHA must participate in texture-use, HLSL and readiness switches")
+    if missing_r185_d3dtop_blenddiffusealpha:
+        raise SystemExit(
+            "DX11 R185 fixed-function D3DTOP_BLENDDIFFUSEALPHA contract drift: "
+            + ", ".join(missing_r185_d3dtop_blenddiffusealpha)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
