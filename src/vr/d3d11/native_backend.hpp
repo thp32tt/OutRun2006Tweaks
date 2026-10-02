@@ -358,22 +358,6 @@ public:
         return byte_width_;
     }
 
-    // R152 performs a bounded read-only inspection of the current MANAGED
-    // index CPU shadow. It never exposes the raw shadow pointer and never
-    // mutates/binds a D3D11 resource. The caller supplies the exact shadow
-    // version sealed by mirror_readiness so stale source contents fail closed.
-    [[nodiscard]] bool inspect_index_window(
-        D3DFORMAT sourceIndexFormat,
-        UINT byteOffset,
-        UINT indexCount,
-        UINT minVertexIndex,
-        UINT maxVertexIndex,
-        std::uint64_t expectedShadowVersion,
-        bool& allIndicesInRange,
-        UINT& observedMinIndex,
-        UINT& observedMaxIndex,
-        std::uint64_t& contentHash) const noexcept;
-
     [[nodiscard]] bool mirror_descriptor_exact(
         ID3D11Device* expectedDevice) const noexcept;
     [[nodiscard]] NativeManagedBufferMirrorReadiness mirror_readiness(
@@ -1830,60 +1814,6 @@ compose_fixed_function_indexed_direct_dispatch_readiness(
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
     std::uint64_t snapshotToken) noexcept;
 
-// R152 closes the remaining direct-indexed source-content gap. R149/R150/R151
-// seal numeric D3D9 range arguments, the final DrawIndexed tuple and live byte
-// capacities; this layer additionally scans the exact current MANAGED index
-// shadow and proves every fetched source index lies inside the declared
-// MinVertexIndex..MinVertexIndex+NumVertices-1 range. No Draw* is issued.
-struct NativeFixedFunctionIndexedSourceContentReadiness {
-    bool inputValid{};
-    bool indexedDispatchReady{};
-    bool sourceRangeReady{};
-    bool boundDrawReady{};
-    bool indexMirrorReady{};
-    bool directDispatchMatchesIndexedSeal{};
-    bool dispatchMatchesSourceRange{};
-    bool indexMirrorMatchesGeometry{};
-    bool indexFormatMatchesBinding{};
-    bool inspectionExact{};
-    bool sourceValuesInRange{};
-    bool componentSnapshotsPresent{};
-    bool ready{};
-    D3DFORMAT sourceIndexFormat = D3DFMT_UNKNOWN;
-    UINT observedMinIndex{};
-    UINT observedMaxIndex{};
-    std::uint64_t indexContentHash{};
-    std::uint64_t indexedDispatchSnapshotToken{};
-    std::uint64_t directDispatchSnapshotToken{};
-    std::uint64_t sourceRangeSnapshotToken{};
-    std::uint64_t geometrySnapshotToken{};
-    std::uint64_t boundDrawSnapshotToken{};
-    std::uint64_t indexMirrorSnapshotToken{};
-    std::uint64_t snapshotToken{};
-};
-
-[[nodiscard]] NativeFixedFunctionIndexedSourceContentReadiness
-compose_fixed_function_indexed_source_content_readiness(
-    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedDispatch,
-    const NativeFixedFunctionDirectDrawDispatchReadiness& directDispatch,
-    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
-    const NativeFixedFunctionGeometryReadiness& geometry,
-    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
-    const NativeManagedBufferShadow& indexBuffer,
-    ID3D11Device* expectedDevice,
-    D3DFORMAT sourceIndexFormat) noexcept;
-
-[[nodiscard]] bool validate_fixed_function_indexed_source_content_snapshot(
-    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedDispatch,
-    const NativeFixedFunctionDirectDrawDispatchReadiness& directDispatch,
-    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
-    const NativeFixedFunctionGeometryReadiness& geometry,
-    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
-    const NativeManagedBufferShadow& indexBuffer,
-    ID3D11Device* expectedDevice,
-    D3DFORMAT sourceIndexFormat,
-    std::uint64_t snapshotToken) noexcept;
-
 // R152 closes the remaining direct indexed source-range gap by joining the
 // R150 dispatch/source-range lineage to the exact managed IB CPU-shadow values
 // and the R122 geometry snapshot that owns that same IB mirror. This remains
@@ -1922,6 +1852,49 @@ compose_fixed_function_indexed_source_value_readiness(
     const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
     const NativeFixedFunctionGeometryReadiness& geometry,
     const NativeManagedIndexRangeReadiness& sourceValues,
+    std::uint64_t snapshotToken) noexcept;
+
+// R153 seals R152's exact source-index values to the live IA index binding.
+// The managed shadow mirrors the complete D3D9 index buffer, so an exact
+// direct-DIP path must bind that mirror from byte offset zero and use the
+// DXGI index format corresponding to the scanned D3D9 format. This remains
+// dormant evidence only and never issues DrawIndexed.
+struct NativeFixedFunctionIndexedSourceBindingReadiness {
+    bool inputValid{};
+    bool sourceValueLineageReady{};
+    bool boundDrawReady{};
+    bool boundDrawMatchesLineage{};
+    bool indexFormatMatchesSourceValues{};
+    bool indexOffsetExact{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    D3DFORMAT sourceIndexFormat = D3DFMT_UNKNOWN;
+    DXGI_FORMAT boundIndexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT boundIndexOffset{};
+    std::uint64_t sourceValueLineageSnapshotToken{};
+    std::uint64_t indexedLineageSnapshotToken{};
+    std::uint64_t boundDrawSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionIndexedSourceBindingReadiness
+compose_fixed_function_indexed_source_binding_readiness(
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_indexed_source_binding_snapshot(
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
     std::uint64_t snapshotToken) noexcept;
 
 // R148 seals the eventual DrawIndexed tuple for generated triangle fans after
