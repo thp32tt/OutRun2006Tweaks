@@ -130,5 +130,71 @@
     "No localization files modified",
     "RUNTIME_VALIDATION remains UNTESTED without matching Quest 3/VDXR evidence"
   ],
-  "next_action": "Exact-decode only complete instructions in the validated 0x00182A99..0x00182AD9 window, completing the cut rel32 CALL at 0x00182A99; preserve the trailing incomplete e8 bb bytes at the new capture edge raw-only and keep function/render/HUD/runtime semantics unresolved."
+  "next_action": "Exact-decode only complete instructions in the validated 0x00182A99..0x00182AD9 window, completing the cut rel32 CALL at 0x00182A99; preserve the trailing incomplete e8 bb bytes at the new capture edge raw-only and keep function/render/HUD/runtime semantics unresolved.",
+  "supplemental_completed_static_units": [
+    {
+      "unit_id": "DXVK_CONTINUATION_ANALYZER_WIRING_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "c2e2fe67a9fdcaabc34768b85c376585cc1e82a6",
+      "commit_message": "test: require DXVK continuation analyzer wiring [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Auto-discovered DXVK continuation provenance/proof stages must be wired into analyze_outrun_exe.py report generation and expose their nonzero CLI failure guards; constants/collectors alone can no longer satisfy the structural chain contract without canonical analyzer execution.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered current GitHub branch, AGENTS.md, durable lane/run state, work queue and Issue #14 while preserving concurrent same-JOB descendants."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Found a fail-open verifier gap: auto-discovery required collector symbols and geometry but did not require analyzer report/main wiring for each discovered provenance/proof stage."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Commit c2e2fe67a9fdcaabc34768b85c376585cc1e82a6 adds fail-closed report-binding and CLI failure-guard checks for every auto-discovered raw/proof continuation stage."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA c2e2fe67a9fdcaabc34768b85c376585cc1e82a6 passed DXVK Canonical Disassembly Evidence run 36973860583/job 110733359718 and Backend Conversion Gate run 36973860767/job 110733359909, including Win32 configure/build/binary verification/artifact upload."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit c2e2fe67a9fdcaabc34768b85c376585cc1e82a6 contains required [AUTO:CONV-DXVK-000002] marker."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier hardening only; no runtime payload or deployable backend content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit without replacing the newer F24 primary frontier/state."
+        }
+      },
+      "validation": {
+        "exact_sha": "c2e2fe67a9fdcaabc34768b85c376585cc1e82a6",
+        "dxvk_disassembly_evidence_run_id": 36973860583,
+        "dxvk_disassembly_evidence_job_id": 110733359718,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "dxvk_disassembly_evidence_artifact_id": 11213115241,
+        "dxvk_disassembly_evidence_artifact_digest": "sha256:3f6041016527705e04555903700194db860c454b3f0123b461540fb0340dd914",
+        "backend_conversion_gate_run_id": 36973860767,
+        "backend_conversion_gate_job_id": 110733359909,
+        "backend_conversion_gate_conclusion": "success",
+        "backend_conversion_gate_artifact_id": 11212562572,
+        "backend_conversion_gate_artifact_digest": "sha256:3adad4baed23c03e3671c9346dc20487c47c0d8ebec306e6b44fa1c1516c244d",
+        "backend_disassembly_contract": "PASS",
+        "configure_win32": "PASS",
+        "build_win32": "PASS",
+        "binary_exists": "PASS",
+        "artifact_upload": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5946754878,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED"
+    }
+  ]
 }
