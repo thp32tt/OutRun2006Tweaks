@@ -29,6 +29,11 @@ namespace OutRunVR::DrawState
         DWORD shadeMode = D3DSHADE_GOURAUD;
         DWORD cullMode = D3DCULL_CCW;
         DWORD fillMode = D3DFILL_SOLID;
+        // Preserve raw D3D9 float-bit provenance for raster depth bias.
+        // Native DX11 readiness currently keeps any non-zero bias fail-closed
+        // rather than assuming D3D9 constant-bias units equal D3D11 DepthBias.
+        DWORD depthBiasBits = 0;
+        DWORD slopeScaleDepthBiasBits = 0;
         // R161: D3D9 user clipping is not reproduced by the native DX11
         // fixed-function path. Preserve both gates so non-default semantics
         // fail closed instead of being erased by DepthClipEnable=TRUE.
