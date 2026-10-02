@@ -14,6 +14,9 @@ import sys
 from pathlib import Path
 
 
+CANONICAL_OVERLAP_BYTES = bytes.fromhex("66 0f 54 1d 20 91 61")
+
+
 def parse_hex_bytes(value: str) -> bytes:
     return bytes.fromhex(value.replace("0x", "").replace(" ", ""))
 
@@ -38,8 +41,11 @@ def validate(record: dict) -> list[str]:
         errors.append("missing byte window")
     else:
         try:
-            if len(parse_hex_bytes(blob)) == 0:
+            decoded = parse_hex_bytes(blob)
+            if len(decoded) == 0:
                 errors.append("byte window is empty")
+            if start == "0x182F7E" and not decoded.startswith(CANONICAL_OVERLAP_BYTES):
+                errors.append("byte window must preserve canonical overlap bytes")
         except ValueError:
             errors.append("byte window is not valid hex")
 
