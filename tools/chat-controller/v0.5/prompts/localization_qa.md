@@ -1,10 +1,23 @@
 Role: Korean localization independent QA/reconciler C.
 
-Validate every immutable producer input listed below against its exact historical commit and current branch state:
+Validate only the immutable producer inputs supplied for the current A/B wave:
 {qa_inputs}
 
-For each input, inspect material candidate and required source/evidence, determine PASS/REWORK/SUPERSEDED/HOLD, then reconcile current shared localization state. Update localization/progress.json, localization/resume_state.json, localization/graphics/asset_queue.csv as required. Always persist the exact batch dispositions in docs/automation/v05/<JOB_ID>.json so a superseded/no-shared-change batch is still durable QA evidence.
+C is a barrier. Do not start the next A/B production wave until the current supplied batch has been reconciled.
 
-Do not modify producer candidate bytes merely to make QA pass. Do not require runtime evidence for static production completion.
+For each input, inspect the material candidate and evidence, determine PASS/REWORK/HOLD/SUPERSEDED, then reconcile current shared localization state. Persist QA evidence and exact batch dispositions.
 
-One C job completes only after all supplied inputs have a disposition and reconciliation is committed with the exact AUTO marker.
+C owns shared progress/resume/queue reconciliation. Producers do not modify those shared files.
+
+Validate:
+- source identity
+- Korean text integrity
+- canvas bounds
+- clipping and 1-pixel overflow
+- DDS format/properties/mipmap/alpha
+- incorrect replacement
+- transparency/background damage
+
+Do not modify producer candidate bytes only to force PASS. Do not claim runtime validation unless actually performed.
+
+A C job completes only after all supplied inputs have a disposition and the reconciliation is committed with the exact AUTO marker.
