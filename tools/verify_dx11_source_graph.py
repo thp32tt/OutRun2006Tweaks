@@ -286,6 +286,40 @@ def main() -> None:
             + ", ".join(missing_resource_contract)
         )
 
+    r121_managed_buffer_mutation_plan_contract = {
+        "R121: the CPU-shadow/reset-generation implementation now makes":
+            "R121 managed-buffer plan exactness rationale",
+        "out.planExact = true;":
+            "R121 exact managed-buffer mutation plan",
+        "out.requiresCpuShadow = true;":
+            "R121 CPU-shadow requirement remains explicit",
+    }
+    missing_r121_managed_buffer_plan = [
+        meaning
+        for token, meaning in r121_managed_buffer_mutation_plan_contract.items()
+        if token not in resource_translation
+    ]
+    r121_managed_buffer_probe_contract = {
+        "R121 managed VB write is an exact CPU-shadow mutation plan":
+            "R121 managed write positive probe",
+        "R121 managed IB read is an exact CPU-shadow mutation plan":
+            "R121 managed read positive probe",
+        "R121 managed DISCARD remains fail-closed":
+            "R121 managed DISCARD negative probe",
+        "R121 managed NOOVERWRITE remains fail-closed":
+            "R121 managed NOOVERWRITE negative probe",
+    }
+    missing_r121_managed_buffer_plan += [
+        meaning
+        for token, meaning in r121_managed_buffer_probe_contract.items()
+        if token not in CONSTANT_BUFFER_PROBE
+    ]
+    if missing_r121_managed_buffer_plan:
+        raise SystemExit(
+            "DX11 R121 managed-buffer mutation-plan contract drift: "
+            + ", ".join(missing_r121_managed_buffer_plan)
+        )
+
     surface_mirror_contract_text = SURFACE_MIRROR_HPP + "\n" + SURFACE_MIRROR_CPP
     surface_mirror_contract = {
         "class NativeSurfaceMirror": "dedicated dormant RT/depth mirror owner",
