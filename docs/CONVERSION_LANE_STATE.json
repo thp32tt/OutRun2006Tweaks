@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "fd687017b365b04916399dceec44d8003be182d4",
+  "state_parent_head": "2eaac924ba8d2f971131f21ab9fad4d89bac77c1",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,10 +52,10 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
-    "validation_bearing_sha": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
-    "retaining_descendant_sha": "fd687017b365b04916399dceec44d8003be182d4",
-    "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_DX11_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+    "result_sha": "6057609f31c3ddca6171e94f92907f57b38b42ee",
+    "validation_bearing_sha": "c3b987ba03a2cc3535c40123b8fff8e15ecc7456",
+    "retaining_descendant_sha": "2eaac924ba8d2f971131f21ab9fad4d89bac77c1",
+    "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36991406339 job 110788249400; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
@@ -1082,6 +1082,26 @@
       "issue14_comment_id": 5949485235,
       "validation_run_id": 36991274241,
       "validation_job_id": 110787830179
+    },
+    {
+      "unit_id": "DX11_RESOURCE_A2B10G10R10_EXACT_MAPPING",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
+      "implementation_commits": [
+        "6057609f31c3ddca6171e94f92907f57b38b42ee"
+      ],
+      "source_implementation_sha": "6057609f31c3ddca6171e94f92907f57b38b42ee",
+      "material_result_sha": "6057609f31c3ddca6171e94f92907f57b38b42ee",
+      "validation_bearing_sha": "c3b987ba03a2cc3535c40123b8fff8e15ecc7456",
+      "retaining_descendant_sha": "2eaac924ba8d2f971131f21ab9fad4d89bac77c1",
+      "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36991406339 job 110788249400; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_RESOURCE_TRANSLATION_STATIC",
+      "issue14_comment_id": 5949513441,
+      "validation_run_id": 36991406339,
+      "validation_job_id": 110788249400
     }
   ]
 }
