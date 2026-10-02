@@ -241,6 +241,12 @@ namespace outrun::vr::dx11
             bool vertexBlendObservationComplete{};
             DWORD vertexBlend = D3DVBF_DISABLE;
             DWORD indexedVertexBlendEnable = FALSE;
+            // R164: preserve the raw D3D9 raster depth-bias states in the
+            // census identity. Native readiness remains fail-closed for any
+            // non-zero value, but distinct bias patterns must not alias.
+            bool depthBiasObservationComplete{};
+            DWORD depthBiasBits{};
+            DWORD slopeScaleDepthBiasBits{};
             bool alphaTestObservationComplete{};
             DWORD alphaTestEnable = FALSE;
             DWORD alphaTestRef{};
@@ -418,6 +424,10 @@ namespace outrun::vr::dx11
                 hash, sig.vertexBlendObservationComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.vertexBlend);
             hash = hash_mix(hash, sig.indexedVertexBlendEnable);
+            hash = hash_mix(
+                hash, sig.depthBiasObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.depthBiasBits);
+            hash = hash_mix(hash, sig.slopeScaleDepthBiasBits);
             hash = hash_mix(
                 hash, sig.fixedFunctionTranslationReady ? 1u : 0u);
             hash = hash_mix(
@@ -1423,6 +1433,13 @@ namespace outrun::vr::dx11
                         sig.fixedFunctionPipelineShaderUnsupported,
                         sig.fixedFunctionAlphaTestOwnedByPixelShader ? 1 : 0);
 
+                    spdlog::info(
+                        "VR DX11 R164 depth-bias state#{}: observed={} constantBits=0x{:08X} slopeBits=0x{:08X}",
+                        unique,
+                        sig.depthBiasObservationComplete ? 1 : 0,
+                        sig.depthBiasBits,
+                        sig.slopeScaleDepthBiasBits);
+
                     if (sig.fixedFunctionShaderPrototypeGenerated)
                     {
                         spdlog::info(
@@ -2013,6 +2030,10 @@ namespace outrun::vr::dx11
             captured && source.complete;
         signature.vertexBlend = source.vertexBlend;
         signature.indexedVertexBlendEnable = source.indexedVertexBlendEnable;
+        signature.depthBiasObservationComplete =
+            captured && source.complete;
+        signature.depthBiasBits = source.depthBiasBits;
+        signature.slopeScaleDepthBiasBits = source.slopeScaleDepthBiasBits;
         signature.alphaTestObservationComplete =
             captured && source.complete;
         signature.alphaTestEnable = source.alphaTestEnable;
