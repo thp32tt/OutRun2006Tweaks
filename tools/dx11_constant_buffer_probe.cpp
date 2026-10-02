@@ -1779,6 +1779,66 @@ int main()
             changedActivation.snapshotToken),
         "R115 composite activation snapshot changes with component identity");
 
+    const auto drawReady =
+        compose_fixed_function_draw_readiness(
+            texturedActivation, renderStateRecreated);
+    require(
+        drawReady.inputValid &&
+        drawReady.activationReady &&
+        drawReady.renderStateReady &&
+        drawReady.componentSnapshotsPresent &&
+        drawReady.ready &&
+        drawReady.activationSnapshotToken ==
+            texturedActivation.snapshotToken &&
+        drawReady.renderStateSnapshotToken ==
+            renderStateRecreated.snapshotToken &&
+        drawReady.snapshotToken != 0 &&
+        validate_fixed_function_draw_snapshot(
+            texturedActivation, renderStateRecreated,
+            drawReady.snapshotToken),
+        "R117 draw readiness composes activation and render-state snapshots");
+
+    auto activationMissingSnapshot = texturedActivation;
+    activationMissingSnapshot.snapshotToken = 0;
+    auto renderStateMissingSnapshot = renderStateRecreated;
+    renderStateMissingSnapshot.snapshotToken = 0;
+    auto renderStateNotReady = renderStateRecreated;
+    renderStateNotReady.ready = false;
+    const auto missingActivationDraw =
+        compose_fixed_function_draw_readiness(
+            activationMissingSnapshot, renderStateRecreated);
+    const auto missingRenderStateDraw =
+        compose_fixed_function_draw_readiness(
+            texturedActivation, renderStateMissingSnapshot);
+    const auto pendingRenderStateDraw =
+        compose_fixed_function_draw_readiness(
+            texturedActivation, renderStateNotReady);
+    require(
+        !missingActivationDraw.ready &&
+        missingActivationDraw.snapshotToken == 0 &&
+        !missingRenderStateDraw.ready &&
+        missingRenderStateDraw.snapshotToken == 0 &&
+        !pendingRenderStateDraw.ready &&
+        pendingRenderStateDraw.snapshotToken == 0,
+        "R117 draw readiness fails closed on missing component evidence");
+
+    auto changedRenderStateIdentity = renderStateRecreated;
+    changedRenderStateIdentity.snapshotToken ^= 0x9e3779b97f4a7c15ull;
+    const auto changedDrawReady =
+        compose_fixed_function_draw_readiness(
+            texturedActivation, changedRenderStateIdentity);
+    require(
+        changedDrawReady.ready &&
+        changedDrawReady.snapshotToken != 0 &&
+        changedDrawReady.snapshotToken != drawReady.snapshotToken &&
+        !validate_fixed_function_draw_snapshot(
+            texturedActivation, changedRenderStateIdentity,
+            drawReady.snapshotToken) &&
+        validate_fixed_function_draw_snapshot(
+            texturedActivation, changedRenderStateIdentity,
+            changedDrawReady.snapshotToken),
+        "R117 draw snapshot changes with render-state identity");
+
     DevicePair pipelineOtherDevice = create_warp_device();
     auto changedLayout = inputLayout;
     changedLayout.elements[0].SemanticIndex ^= 1u;
@@ -2029,5 +2089,6 @@ int main()
     std::cout << "DX11 managed vertex/index buffer mirror R113: PASS\n";
     std::cout << "DX11 fixed-function activation evidence composition R115: PASS\n";
     std::cout << "DX11 fixed-function render-state bundle R116: PASS\n";
+    std::cout << "DX11 fixed-function draw readiness composition R117: PASS\n";
     return 0;
 }

@@ -2857,6 +2857,61 @@ def main() -> None:
                 "DX11 R116 render-state probe drift: " + meaning
             )
 
+    r117_draw_readiness_header = {
+        "struct NativeFixedFunctionDrawReadiness":
+            "R117 composite draw readiness",
+        "bool renderStateReady{}":
+            "R117 explicit render-state readiness",
+        "std::uint64_t renderStateSnapshotToken{}":
+            "R117 render-state snapshot identity",
+        "compose_fixed_function_draw_readiness(":
+            "R117 fail-closed draw readiness composition API",
+        "validate_fixed_function_draw_snapshot(":
+            "R117 composite draw snapshot validator",
+    }
+    missing_r117_header = [
+        meaning
+        for token, meaning in r117_draw_readiness_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r117_header:
+        raise SystemExit(
+            "DX11 R117 draw-readiness header drift: "
+            + ", ".join(missing_r117_header)
+        )
+
+    for token, meaning in {
+        "activation.ready && activation.snapshotToken != 0":
+            "R117 activation snapshot prerequisite",
+        "renderState.ready && renderState.snapshotToken != 0":
+            "R117 render-state snapshot prerequisite",
+        "out.componentSnapshotsPresent =":
+            "R117 explicit component-token aggregation",
+        "drawToken, out.activationSnapshotToken":
+            "R117 activation identity in draw token",
+        "drawToken, out.renderStateSnapshotToken":
+            "R117 render-state identity in draw token",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R117 draw-readiness source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R117 draw readiness composes activation and render-state snapshots":
+            "R117 positive composition proof",
+        "R117 draw readiness fails closed on missing component evidence":
+            "R117 missing-evidence fail-closed proof",
+        "R117 draw snapshot changes with render-state identity":
+            "R117 render-state identity invalidation proof",
+        "DX11 fixed-function draw readiness composition R117: PASS":
+            "R117 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R117 draw-readiness probe drift: " + meaning
+            )
+
     if (
         "recreate_and_upload_mirror_for_observation(" in census
         or "mirror_readiness(" in census

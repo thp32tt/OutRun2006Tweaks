@@ -619,6 +619,31 @@ compose_fixed_function_activation_readiness(
     const NativeManagedTextureStageReadiness& textureStages,
     std::uint64_t snapshotToken) noexcept;
 
+// R117 composes the R115 activation snapshot with the independently proven
+// R116 render-state snapshot. A native draw candidate is not ready unless both
+// component identities are current and nonzero. This remains dormant evidence:
+// it does not bind state or route any D3D9 Draw* call to D3D11.
+struct NativeFixedFunctionDrawReadiness {
+    bool inputValid{};
+    bool activationReady{};
+    bool renderStateReady{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t activationSnapshotToken{};
+    std::uint64_t renderStateSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionDrawReadiness
+compose_fixed_function_draw_readiness(
+    const NativeFixedFunctionActivationReadiness& activation,
+    const NativeFixedFunctionRenderStateReadiness& renderState) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_draw_snapshot(
+    const NativeFixedFunctionActivationReadiness& activation,
+    const NativeFixedFunctionRenderStateReadiness& renderState,
+    std::uint64_t snapshotToken) noexcept;
+
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
 // input layout, and R96 transform buffer. No game draw path constructs or
 // binds this bundle yet.
