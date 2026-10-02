@@ -611,6 +611,34 @@
       "ownership_effect": "NONE",
       "state_strategy": "LATEST_PRIMARY_FRONTIER",
       "exact_next_action": "Capture the next bounded canonical 64-byte raw window from exact instruction boundary 0x00182C56 without overlap. Preserve forward target 0x00182C59 as address/control-flow evidence only until captured and exact-decoded; keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_RAW_CONTINUATION_CAPTURE_INTEGRITY_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "e9a3a10a4335984b3a093c6f74ab3b00bf18b530",
+      "run_record_commit_sha": "9a6316dd8ae04ec917275cce112a9cb3d5ae20e3",
+      "commit_message": "test: fail closed on DXVK raw capture gates [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "static_contract": "PASS",
+      "dxvk_disassembly_evidence_run_id": 36976297225,
+      "dxvk_disassembly_evidence_job_id": 110740762874,
+      "dxvk_disassembly_evidence_artifact_id": 11213473945,
+      "dxvk_disassembly_evidence_artifact_digest": "sha256:4905b3ca0b52169b21eb31be4b3ca9d3f38fc30d09727a782ae626ccc1043996",
+      "backend_conversion_gate_run_id": 36976297231,
+      "backend_disassembly_contract": "PASS",
+      "issue14_implementation_comment_id": 5947099166,
+      "scope": "Auto-discovered DXVK raw continuation provenance collectors must retain predecessor-exact, .text, exact bounded probe-length, probe-end geometry, and captured fail-closed gates.",
+      "reason": "Close a chain-wide static-verifier integrity gap without colliding with concurrently advancing canonical disassembly frontier work.",
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "exact_next_action": "Capture the next bounded canonical 64-byte raw window from exact instruction boundary 0x00182C56 with no overlap. Preserve forward target 0x00182C59 as address/control-flow evidence only until captured and exact-decoded; keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
