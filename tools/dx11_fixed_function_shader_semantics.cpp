@@ -990,14 +990,23 @@ int main()
         const auto readiness =
             translate_fixed_function_readiness(
                 stages, true, 0x01, 0x01);
-        require(!readiness.exact(), "argument modifier did not fail closed");
         require(
-            (readiness.unsupported & FixedFunctionUnsupportedArgument) != 0,
-            "argument modifier did not set argument blocker");
+            readiness.exact(),
+            "R178 complement argument modifier must remain exact");
+        require(
+            (readiness.unsupported & FixedFunctionUnsupportedArgument) == 0,
+            "R178 complement argument modifier retained argument blocker");
         const auto prototype =
             generate_fixed_function_pixel_shader_prototype(
                 stages, true, 0x01, 0x01, textureTypes);
-        require(!prototype.generated(), "argument modifier generated HLSL");
+        require(
+            prototype.generated() &&
+            prototype.source.find("(1.0 - sampled0.rgb)") !=
+                std::string::npos,
+            "R178 complement argument modifier shader semantics drift");
+        require_compiles(
+            prototype,
+            "R178 complement argument modifier HLSL did not compile");
     }
 
     {
