@@ -2107,6 +2107,21 @@ def main() -> None:
             "R149 MinVertexIndex/NumVertices overflow guard",
         ),
         (
+            "const std::int64_t effectiveMinVertex =",
+            NATIVE_BACKEND_CPP,
+            "R149 BaseVertexIndex effective minimum computation",
+        ),
+        (
+            "effectiveMinVertex >= 0",
+            NATIVE_BACKEND_CPP,
+            "R149 negative effective vertex rejection",
+        ),
+        (
+            "effectiveMaxVertex <=",
+            NATIVE_BACKEND_CPP,
+            "R149 effective vertex maximum overflow guard",
+        ),
+        (
             "startIndex <= maxValue - elementCount",
             NATIVE_BACKEND_CPP,
             "R149 StartIndex plus fetched-index-count overflow guard",
@@ -2135,6 +2150,21 @@ def main() -> None:
             "R149 indexed source range rejects StartIndex element-count overflow",
             CONSTANT_BUFFER_PROBE,
             "R149 index-range overflow rejection",
+        ),
+        (
+            "R149 indexed source range rejects negative effective BaseVertexIndex range",
+            CONSTANT_BUFFER_PROBE,
+            "R149 negative effective BaseVertexIndex rejection",
+        ),
+        (
+            "R149 indexed source range rejects effective BaseVertexIndex maximum overflow",
+            CONSTANT_BUFFER_PROBE,
+            "R149 effective BaseVertexIndex upper overflow rejection",
+        ),
+        (
+            "R149 indexed source range accepts bounded negative BaseVertexIndex",
+            CONSTANT_BUFFER_PROBE,
+            "R149 legal negative BaseVertexIndex preservation",
         ),
         (
             "R149 indexed source range keeps triangle fan on generated-index path",

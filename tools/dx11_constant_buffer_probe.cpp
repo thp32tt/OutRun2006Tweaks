@@ -3805,6 +3805,41 @@ int main()
             indexedSourceRangeVertexOverflow.snapshotToken == 0,
             "R149 indexed source range rejects MinVertexIndex NumVertices overflow");
 
+        const auto indexedSourceRangeNegativeEffectiveVertex =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_range_readiness(
+                    D3DPT_TRIANGLELIST, 1u, -2, 1u, 3u, 0u);
+        require(
+            indexedSourceRangeNegativeEffectiveVertex.inputValid &&
+            !indexedSourceRangeNegativeEffectiveVertex.vertexRangeExact &&
+            indexedSourceRangeNegativeEffectiveVertex.indexRangeExact &&
+            !indexedSourceRangeNegativeEffectiveVertex.ready &&
+            indexedSourceRangeNegativeEffectiveVertex.snapshotToken == 0,
+            "R149 indexed source range rejects negative effective BaseVertexIndex range");
+
+        const auto indexedSourceRangeEffectiveVertexOverflow =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_range_readiness(
+                    D3DPT_TRIANGLELIST, 1u, 1,
+                    std::numeric_limits<UINT>::max(), 1u, 0u);
+        require(
+            indexedSourceRangeEffectiveVertexOverflow.inputValid &&
+            !indexedSourceRangeEffectiveVertexOverflow.vertexRangeExact &&
+            indexedSourceRangeEffectiveVertexOverflow.indexRangeExact &&
+            !indexedSourceRangeEffectiveVertexOverflow.ready &&
+            indexedSourceRangeEffectiveVertexOverflow.snapshotToken == 0,
+            "R149 indexed source range rejects effective BaseVertexIndex maximum overflow");
+
+        const auto indexedSourceRangeNegativeBaseValid =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_range_readiness(
+                    D3DPT_TRIANGLELIST, 1u, -2, 2u, 3u, 0u);
+        require(
+            indexedSourceRangeNegativeBaseValid.vertexRangeExact &&
+            indexedSourceRangeNegativeBaseValid.ready &&
+            indexedSourceRangeNegativeBaseValid.snapshotToken != 0,
+            "R149 indexed source range accepts bounded negative BaseVertexIndex");
+
         const auto indexedSourceRangeIndexOverflow =
             outrun::vr::dx11::
                 compose_fixed_function_indexed_source_range_readiness(

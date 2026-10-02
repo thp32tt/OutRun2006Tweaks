@@ -4570,13 +4570,29 @@ compose_fixed_function_indexed_source_range_readiness(
     const bool vertexCountCompatible =
         primitiveCount == 0u || numVertices != 0u;
     bool vertexRangeFits = primitiveCount == 0u;
+    bool effectiveVertexRangeFits = primitiveCount == 0u;
     if (numVertices != 0u) {
         const UINT spanMinusOne = numVertices - 1u;
         vertexRangeFits = minVertexIndex <= maxValue - spanMinusOne;
-        if (vertexRangeFits)
+        if (vertexRangeFits) {
             out.maxVertexIndex = minVertexIndex + spanMinusOne;
+            const std::int64_t effectiveMinVertex =
+                static_cast<std::int64_t>(baseVertexIndex) +
+                static_cast<std::int64_t>(minVertexIndex);
+            const std::int64_t effectiveMaxVertex =
+                static_cast<std::int64_t>(baseVertexIndex) +
+                static_cast<std::int64_t>(out.maxVertexIndex);
+            effectiveVertexRangeFits =
+                effectiveMinVertex >= 0 &&
+                effectiveMaxVertex >= effectiveMinVertex &&
+                effectiveMaxVertex <=
+                    static_cast<std::int64_t>(maxValue);
+        } else {
+            effectiveVertexRangeFits = false;
+        }
     }
-    out.vertexRangeExact = vertexCountCompatible && vertexRangeFits;
+    out.vertexRangeExact =
+        vertexCountCompatible && vertexRangeFits && effectiveVertexRangeFits;
     out.indexRangeExact =
         countExact && startIndex <= maxValue - elementCount;
     out.inputValid = out.primitiveExact && countExact;
