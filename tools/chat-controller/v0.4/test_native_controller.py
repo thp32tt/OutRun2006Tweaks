@@ -653,7 +653,7 @@ class NativeControllerTests(unittest.TestCase):
         node_source = ast.get_source_segment(SOURCE, FUNCTIONS['queue_rollover_chat']) or ''
         self.assertIn('rollover_soft_limit_exceeded', node_source)
         self.assertIn('task_latched', node_source)
-        self.assertIn('_is_localization_producer', node_source)
+        self.assertIn('_is_latched_execution_task', node_source)
 
     def test_latched_producer_controller_failure_restarts_instead_of_done(self):
         node_source = ast.get_source_segment(SOURCE, FUNCTIONS['localization_process_lane_isolated']) or ''
