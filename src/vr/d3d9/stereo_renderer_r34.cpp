@@ -44,10 +44,8 @@ namespace OutRunVRStereo
 
             OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
             FailClosedResetBaselineState();
-            R33InvalidateDepthStencilCache();
+            FailClosedDepthStencilState();
             ArmStereoRecoverySafety();
-            RightDepthSynchronized = false;
-            RightStencilSynchronized = false;
 
             if (!R34FirstReplayBlockLogged)
             {
