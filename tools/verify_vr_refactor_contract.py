@@ -360,6 +360,14 @@ if "InvalidateTrackedRasterShadow();" not in r34:
     errors.append("R34 reset replay fail-close missing R22 raster owner invalidation API")
 
 for rel, source in (("R33", r33), ("R34", r34)):
+    if "R29ArmMonoSafety(" in source:
+        errors.append(
+            f"{rel} retained private R29 mono-safety helper dependency")
+    if "ArmStereoRecoverySafety(" not in source:
+        errors.append(
+            f"{rel} missing R29 owner stereo-recovery safety API")
+
+for rel, source in (("R33", r33), ("R34", r34)):
     if "R31FlushPendingStateBlockResync" in source:
         errors.append(
             f"{rel} regained R31 StateBlock resync execution dependency")
