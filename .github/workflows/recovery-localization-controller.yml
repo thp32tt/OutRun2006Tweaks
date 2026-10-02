@@ -11,6 +11,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify exact pre-E controller files
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASELINE=42e3410d9582b85d74a51435188905c5bbd27feb
+          git cat-file -e "$BASELINE^{commit}"
+          git diff --exit-code "$BASELINE" --             tools/chat-controller/v0.4/src/controller.py.part00             tools/chat-controller/v0.4/src/controller.py.part01             tools/chat-controller/v0.4/src/controller.py.part02             tools/chat-controller/v0.4/src/controller.py.part03             tools/chat-controller/v0.4/localization_A.md             tools/chat-controller/v0.4/localization_B.md             tools/chat-controller/v0.4/localization_C.md             tools/chat-controller/v0.4/Dockerfile.portainer             tools/chat-controller/v0.4/entrypoint.direct.sh             tools/chat-controller/v0.4/requirements.direct.txt             tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
+          test ! -e tools/chat-controller/v0.4/localization_E.md
+
+      - name: Validate exact pre-E prompt contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          a=Path('tools/chat-controller/v0.4/localization_A.md').read_text(encoding='utf-8')
+          b=Path('tools/chat-controller/v0.4/localization_B.md').read_text(encoding='utf-8')
+          c=Path('tools/chat-controller/v0.4/localization_C.md').read_text(encoding='utf-8')
+          assert '홀수 index primary shard' in a
+          assert '짝수 shard를 작업하거나 work-steal하지 마' in a
+          assert '짝수 index primary shard' in b
+          assert '홀수 shard를 작업하거나 work-steal하지 마' in b
+          assert '독립적으로 계속 동작하는 배치 QA consumer' in c
+          assert 'C가 검수하는 동안 A/B 생산은 계속된다' in c
+          assert 'asset_queue_v2.csv' not in a+b+c
+          assert 'LOCALIZATION_E' not in a+b+c
+          PY
 
       - name: Assemble and compile controller
         shell: bash
@@ -18,29 +48,6 @@ jobs:
           set -euo pipefail
           cat tools/chat-controller/v0.4/src/controller.py.part* > /tmp/controller.py
           python -m py_compile /tmp/controller.py
-
-      - name: Validate recovered contract
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          src = ''.join(p.read_text(encoding='utf-8') for p in sorted(Path('tools/chat-controller/v0.4/src').glob('controller.py.part*')))
-          a = Path('tools/chat-controller/v0.4/localization_A.md').read_text(encoding='utf-8')
-          b = Path('tools/chat-controller/v0.4/localization_B.md').read_text(encoding='utf-8')
-          c = Path('tools/chat-controller/v0.4/localization_C.md').read_text(encoding='utf-8')
-          compose = Path('tools/chat-controller/v0.4/docker-compose.portainer-localization.yml').read_text(encoding='utf-8')
-          assert 'Keep both producers fed independently. No A+B/C barrier exists.' not in src
-          assert 'next A/B wave unlocked' in src
-          assert 'task_material_commit_ok' in src
-          assert 'asset_queue_v2.csv' in a and 'index % 2 == 0' in a
-          assert 'asset_queue_v2.csv' in b and 'index % 2 == 1' in b
-          assert 'QA barrier' in c
-          assert 'LOCALIZATION_PIPELINE: "A_B_THEN_C_BARRIER"' in compose
-          assert 'CHAT_SLOTS: "3"' in compose
-          assert 'outrun_localization_network' in compose
-          assert 'localization_E.md' not in compose
-          PY
 
       - name: Validate compose
         shell: bash
@@ -52,22 +59,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          docker build -t outrun-localization-recovery:test -f tools/chat-controller/v0.4/Dockerfile.portainer tools/chat-controller/v0.4
+          docker build -t outrun-localization-pre-e:test             -f tools/chat-controller/v0.4/Dockerfile.portainer             tools/chat-controller/v0.4
 
       - name: Runtime smoke test
         shell: bash
         run: |
           set -euo pipefail
-          docker run -d --name outrun-localization-recovery-smoke             -e CONTROLLER_MODE=localization             -e AUTO_SEND=false             -e QUEUE_MODE=true             -e LOCALIZATION_PARALLEL=true             -e CHAT_SLOTS=3             -e REQUIRE_PROJECT_URL=false             -e GITHUB_REPO=thp32tt/OutRun2006Tweaks             -e GITHUB_TOKEN=             -e CHATGPT_PROJECT_URL=             outrun-localization-recovery:test
+          docker run -d --name outrun-localization-pre-e-smoke             -e CONTROLLER_MODE=localization             -e AUTO_SEND=false             -e QUEUE_MODE=true             -e LOCALIZATION_PARALLEL=true             -e CHAT_SLOTS=3             -e REQUIRE_PROJECT_URL=false             -e GITHUB_REPO=thp32tt/OutRun2006Tweaks             -e GITHUB_TOKEN=             -e CHATGPT_PROJECT_URL=             outrun-localization-pre-e:test
+          cleanup() { docker rm -f outrun-localization-pre-e-smoke >/dev/null 2>&1 || true; }
+          trap cleanup EXIT
           ok=0
           for i in $(seq 1 30); do
-            if docker exec outrun-localization-recovery-smoke curl -fsS http://127.0.0.1:8787/status >/tmp/status.html 2>/dev/null; then
+            if docker exec outrun-localization-pre-e-smoke curl -fsS http://127.0.0.1:8787/status >/tmp/status.html 2>/dev/null; then
               ok=1
               break
             fi
             sleep 3
           done
-          docker logs outrun-localization-recovery-smoke || true
+          docker logs outrun-localization-pre-e-smoke || true
           test "$ok" = "1"
+          grep -q "Controller mode:</b> localization" /tmp/status.html
           grep -q "Runtime" /tmp/status.html
-          docker rm -f outrun-localization-recovery-smoke
