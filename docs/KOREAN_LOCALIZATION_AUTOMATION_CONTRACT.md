@@ -172,6 +172,15 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 
 
 
+## Recovery-policy reconciliation (schema 42)
+
+The legacy numeric chat-rollover and lane-exception thresholds remain bounded recovery triggers, not automatic terminal conditions for a latched A/B/E producer.
+
+- Reaching the chat rollover budget while the producer TASK is still latched keeps the same TASK_ID and uses a fresh chat when needed.
+- Repeated producer lane-local controller exceptions persist queue/checkpoint state and restart the controller process instead of converting the TASK to BLOCKED/DONE.
+- C and non-producer failure handling continue to follow their existing bounded-failure policy.
+- Real deterministic validation/Gate failures may still become BLOCKED after the configured repair budget; task-liveness protection does not hide genuine test failures.
+
 ## Optional installed-skill routing (schema 41)
 
 Installed Skills are optional execution aids, not dependencies and not completion authorities.
