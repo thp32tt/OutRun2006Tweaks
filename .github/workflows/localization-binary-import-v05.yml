@@ -1,0 +1,131 @@
+name: Localization Binary Import v0.5
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - 'localization/graphics/binary_staging/v05/**/manifest.json'
+      - '.github/workflows/localization-binary-import-v05.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import-staged-dds:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 0
+
+      - name: Publish staged DDS jobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="korean-localization-clean"
+          root="localization/graphics/binary_staging/v05"
+
+          for cycle in $(seq 1 64); do
+            git fetch origin "$branch"
+            git reset --hard "origin/$branch"
+
+            manifest="$(find "$root" -mindepth 2 -maxdepth 2 -type f -name manifest.json 2>/dev/null | sort | head -n 1 || true)"
+            if [ -z "$manifest" ]; then
+              echo "No staged manifests remain."
+              exit 0
+            fi
+
+            python3 - "$manifest" <<'PY'
+          import base64
+          import hashlib
+          import json
+          import lzma
+          import re
+          import sys
+          from pathlib import Path
+
+          manifest_path = Path(sys.argv[1])
+          data = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+          job_id = str(data.get("job_id", ""))
+          output_path = str(data.get("output_path", ""))
+          sha256 = str(data.get("sha256", "")).lower()
+          encoding = str(data.get("encoding", "xz+base64"))
+          parts = data.get("parts")
+          expected_size = data.get("size")
+
+          if not re.fullmatch(r"LOC-[ABE]-[0-9]{6}", job_id):
+              raise SystemExit(f"invalid job_id: {job_id!r}")
+          if not re.fullmatch(r"localization/graphics/hd_candidates/[A-Za-z0-9_./-]+[.]dds", output_path):
+              raise SystemExit(f"invalid output_path: {output_path!r}")
+          if ".." in Path(output_path).parts:
+              raise SystemExit("output_path traversal rejected")
+          if not re.fullmatch(r"[0-9a-f]{64}", sha256):
+              raise SystemExit("invalid sha256")
+          if encoding not in {"xz+base64", "base64"}:
+              raise SystemExit(f"unsupported encoding: {encoding}")
+          if not isinstance(parts, list) or not parts:
+              raise SystemExit("parts must be a non-empty list")
+
+          job_dir = manifest_path.parent
+          chunks = []
+          for name in parts:
+              if not isinstance(name, str) or not re.fullmatch(r"payload[.]part[0-9]{3,4}", name):
+                  raise SystemExit(f"invalid part name: {name!r}")
+              p = job_dir / name
+              if not p.is_file():
+                  raise SystemExit(f"missing part: {p}")
+              chunks.append("".join(p.read_text(encoding="ascii").split()))
+
+          packed = base64.b64decode("".join(chunks), validate=True)
+          raw = lzma.decompress(packed) if encoding == "xz+base64" else packed
+
+          digest = hashlib.sha256(raw).hexdigest()
+          if digest != sha256:
+              raise SystemExit(f"sha256 mismatch: expected {sha256}, got {digest}")
+          if expected_size is not None and len(raw) != int(expected_size):
+              raise SystemExit(f"size mismatch: expected {expected_size}, got {len(raw)}")
+          if raw[:4] != b"DDS ":
+              raise SystemExit("payload is not a DDS file")
+
+          out = Path(output_path)
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_bytes(raw)
+
+          Path("/tmp/localization-binary-import-meta.json").write_text(
+              json.dumps(
+                  {
+                      "job_id": job_id,
+                      "stage_dir": job_dir.as_posix(),
+                      "output_path": output_path,
+                  }
+              ),
+              encoding="utf-8",
+          )
+          print(f"Reconstructed {output_path} ({len(raw)} bytes, sha256={digest})")
+          PY
+
+            job_id="$(python3 -c 'import json; print(json.load(open("/tmp/localization-binary-import-meta.json"))["job_id"])')"
+            stage_dir="$(python3 -c 'import json; print(json.load(open("/tmp/localization-binary-import-meta.json"))["stage_dir"])')"
+            output_path="$(python3 -c 'import json; print(json.load(open("/tmp/localization-binary-import-meta.json"))["output_path"])')"
+
+            git rm -r "$stage_dir"
+            git add "$output_path"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "localization: publish $(basename "$output_path") [AUTO:$job_id]"
+
+            if git push origin "HEAD:$branch"; then
+              echo "Published $job_id -> $output_path"
+              continue
+            fi
+
+            echo "Push raced with another writer; retrying from fresh branch state."
+            sleep 2
+          done
+
+          echo "Importer exceeded safety cycle limit." >&2
+          exit 1
