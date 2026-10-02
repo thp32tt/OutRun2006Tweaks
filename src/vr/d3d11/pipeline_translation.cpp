@@ -149,6 +149,7 @@ namespace outrun::vr::dx11
             case D3DTA_DIFFUSE:
             case D3DTA_CURRENT:
             case D3DTA_TEXTURE:
+            case D3DTA_TFACTOR:
                 return true;
             default:
                 return false;
@@ -186,6 +187,7 @@ namespace outrun::vr::dx11
             case D3DTOP_ADDSMOOTH:
             case D3DTOP_BLENDDIFFUSEALPHA:
             case D3DTOP_BLENDCURRENTALPHA:
+            case D3DTOP_BLENDFACTORALPHA:
             case D3DTOP_MODULATEALPHA_ADDCOLOR:
             case D3DTOP_MODULATECOLOR_ADDALPHA:
             case D3DTOP_MODULATEINVALPHA_ADDCOLOR:
@@ -202,8 +204,14 @@ namespace outrun::vr::dx11
         std::string fixed_function_argument_expression(
             DWORD value,
             std::size_t stageIndex,
-            const char* swizzle)
+            const char* swizzle,
+            DWORD textureFactor)
         {
+            const auto normalizedByte = [textureFactor](unsigned shift)
+            {
+                return std::to_string((textureFactor >> shift) & 0xFFu) +
+                       ".0f / 255.0f";
+            };
             std::string base;
             switch (value & D3DTA_SELECTMASK)
             {
@@ -215,6 +223,14 @@ namespace outrun::vr::dx11
                 break;
             case D3DTA_TEXTURE:
                 base = "sampled" + std::to_string(stageIndex);
+                break;
+            case D3DTA_TFACTOR:
+                // D3DCOLOR is 0xAARRGGBB; materialize a normalized RGBA
+                // constant so existing COMPLEMENT/ALPHAREPLICATE handling
+                // remains identical to other fixed-function arguments.
+                base = "float4(" + normalizedByte(16) + ", " +
+                       normalizedByte(8) + ", " + normalizedByte(0) + ", " +
+                       normalizedByte(24) + ")";
                 break;
             default:
                 return {};
@@ -238,12 +254,13 @@ namespace outrun::vr::dx11
             DWORD arg1,
             DWORD arg2,
             std::size_t stageIndex,
-            const char* swizzle)
+            const char* swizzle,
+            DWORD textureFactor)
         {
             const auto first = fixed_function_argument_expression(
-                arg1, stageIndex, swizzle);
+                arg1, stageIndex, swizzle, textureFactor);
             const auto second = fixed_function_argument_expression(
-                arg2, stageIndex, swizzle);
+                arg2, stageIndex, swizzle, textureFactor);
             switch (op)
             {
             case D3DTOP_SELECTARG1:
@@ -295,6 +312,15 @@ namespace outrun::vr::dx11
                 return first + " * " + textureAlpha + " + " + second +
                        " * (1.0 - " + textureAlpha + ")";
             }
+            case D3DTOP_BLENDFACTORALPHA:
+            {
+                // D3D9 BLENDFACTORALPHA linearly blends Arg1/Arg2 using
+                // D3DRS_TEXTUREFACTOR's alpha byte as one global scalar.
+                const auto factorAlpha = std::to_string(
+                    (textureFactor >> 24) & 0xFFu) + ".0f / 255.0f";
+                return first + " * (" + factorAlpha + ") + " + second +
+                       " * (1.0 - (" + factorAlpha + "))";
+            }
             case D3DTOP_BLENDTEXTUREALPHAPM:
             {
                 // R187: D3D9 BLENDTEXTUREALPHAPM assumes Arg1 is already
@@ -309,7 +335,7 @@ namespace outrun::vr::dx11
                 // Direct3D 9 defines this COLOROP-only operation as
                 // Arg1.rgb + Arg1.a * Arg2.rgb.
                 const auto firstAlpha = fixed_function_argument_expression(
-                    arg1, stageIndex, ".a");
+                    arg1, stageIndex, ".a", textureFactor);
                 return first + " + " + firstAlpha + " * " + second;
             }
             case D3DTOP_MODULATECOLOR_ADDALPHA:
@@ -318,7 +344,7 @@ namespace outrun::vr::dx11
                 // Arg1.rgb * Arg2.rgb + Arg1.a, with Arg1.a replicated
                 // across the RGB result.
                 const auto firstAlpha = fixed_function_argument_expression(
-                    arg1, stageIndex, ".a");
+                    arg1, stageIndex, ".a", textureFactor);
                 return first + " * " + second + " + " + firstAlpha;
             }
             case D3DTOP_MODULATEINVALPHA_ADDCOLOR:
@@ -326,7 +352,7 @@ namespace outrun::vr::dx11
                 // R189: D3D9 defines this COLOROP-only operation as
                 // Arg1.rgb + (1 - Arg1.a) * Arg2.rgb.
                 const auto firstAlpha = fixed_function_argument_expression(
-                    arg1, stageIndex, ".a");
+                    arg1, stageIndex, ".a", textureFactor);
                 return first + " + (1.0 - " + firstAlpha + ") * " + second;
             }
             case D3DTOP_MODULATEINVCOLOR_ADDALPHA:
@@ -334,7 +360,7 @@ namespace outrun::vr::dx11
                 // R190: D3D9 defines this COLOROP-only operation as
                 // (1 - Arg1.rgb) * Arg2.rgb + Arg1.a.
                 const auto firstAlpha = fixed_function_argument_expression(
-                    arg1, stageIndex, ".a");
+                    arg1, stageIndex, ".a", textureFactor);
                 return "(1.0 - " + first + ") * " + second + " + " +
                        firstAlpha;
             }
@@ -539,6 +565,7 @@ namespace outrun::vr::dx11
             case D3DTOP_ADDSMOOTH:
             case D3DTOP_BLENDDIFFUSEALPHA:
             case D3DTOP_BLENDCURRENTALPHA:
+            case D3DTOP_BLENDFACTORALPHA:
             case D3DTOP_BLENDTEXTUREALPHA:
             case D3DTOP_BLENDTEXTUREALPHAPM:
             case D3DTOP_DOTPRODUCT3:
@@ -967,7 +994,8 @@ namespace outrun::vr::dx11
         std::uint8_t textureResourcePresentMask,
         std::uint8_t textureResourceExactMask,
         const std::array<D3DRESOURCETYPE, 8>& textureResourceTypes,
-        FixedFunctionAlphaTestState alphaTest)
+        FixedFunctionAlphaTestState alphaTest,
+        DWORD textureFactor)
     {
         FixedFunctionPixelShaderPrototype out{};
         const auto readiness = translate_fixed_function_readiness(
@@ -1094,11 +1122,11 @@ namespace outrun::vr::dx11
             shader += "        float3 nextColor = ";
             shader += fixed_function_op_expression(
                 stage.colorOp, stage.colorArg1, stage.colorArg2,
-                stageIndex, ".rgb");
+                stageIndex, ".rgb", textureFactor);
             shader += ";\n        float nextAlpha = ";
             shader += fixed_function_op_expression(
                 stage.alphaOp, stage.alphaArg1, stage.alphaArg2,
-                stageIndex, ".a");
+                stageIndex, ".a", textureFactor);
             shader +=
                 ";\n        current = float4(nextColor, nextAlpha);\n"
                 "    }\n";

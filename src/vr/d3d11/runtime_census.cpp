@@ -1379,7 +1379,8 @@ namespace outrun::vr::dx11
                                 sig.alphaTestEnable,
                                 sig.alphaTestRef,
                                 sig.alphaTestFunc
-                            });
+                            },
+                            sig.textureFactor);
                     compileProbe =
                         compile_fixed_function_pixel_shader_prototype(
                             prototype);

@@ -1207,7 +1207,75 @@ int main()
             "R193 D3DTOP_DOTPRODUCT3 texture dependency must fail closed without exact resource coverage");
     }
 
+
+    {
+        std::array<FixedFunctionStageState, 8> textureFactorStages{};
+        textureFactorStages[0].colorOp = D3DTOP_SELECTARG1;
+        textureFactorStages[0].colorArg1 = D3DTA_TFACTOR;
+        textureFactorStages[0].alphaOp = D3DTOP_SELECTARG1;
+        textureFactorStages[0].alphaArg1 = D3DTA_TFACTOR;
+        textureFactorStages[0].minFilter = D3DTEXF_POINT;
+        textureFactorStages[0].magFilter = D3DTEXF_POINT;
+        textureFactorStages[0].mipFilter = D3DTEXF_NONE;
+
+        constexpr DWORD textureFactor = 0x80654321u;
+        const auto textureFactorShader =
+            generate_fixed_function_pixel_shader_prototype(
+                textureFactorStages, true, 0x00u, 0x00u,
+                textureTypes, FixedFunctionAlphaTestState{}, textureFactor);
+        require(
+            textureFactorShader.generated() &&
+                textureFactorShader.activeStages == 1,
+            "R191 D3DTA_TFACTOR argument must become shader-exact without a bound texture");
+        require(
+            textureFactorShader.source.find(
+                "float3 nextColor = float4(101.0f / 255.0f, 67.0f / 255.0f, 33.0f / 255.0f, 128.0f / 255.0f).rgb;") !=
+                std::string::npos &&
+            textureFactorShader.source.find(
+                "float nextAlpha = float4(101.0f / 255.0f, 67.0f / 255.0f, 33.0f / 255.0f, 128.0f / 255.0f).a;") !=
+                std::string::npos,
+            "R191 D3DTA_TFACTOR ARGB-to-RGBA normalization drift");
+
+        std::array<FixedFunctionStageState, 8> blendFactorAlphaStages{};
+        blendFactorAlphaStages[0].colorOp = D3DTOP_BLENDFACTORALPHA;
+        blendFactorAlphaStages[0].colorArg1 = D3DTA_TEXTURE;
+        blendFactorAlphaStages[0].colorArg2 = D3DTA_DIFFUSE;
+        blendFactorAlphaStages[0].alphaOp = D3DTOP_BLENDFACTORALPHA;
+        blendFactorAlphaStages[0].alphaArg1 = D3DTA_TEXTURE;
+        blendFactorAlphaStages[0].alphaArg2 = D3DTA_DIFFUSE;
+        blendFactorAlphaStages[0].minFilter = D3DTEXF_POINT;
+        blendFactorAlphaStages[0].magFilter = D3DTEXF_POINT;
+        blendFactorAlphaStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto blendFactorAlphaShader =
+            generate_fixed_function_pixel_shader_prototype(
+                blendFactorAlphaStages, true, 0x01u, 0x01u,
+                textureTypes, FixedFunctionAlphaTestState{}, textureFactor);
+        require(
+            blendFactorAlphaShader.generated() &&
+                blendFactorAlphaShader.activeStages == 1,
+            "R191 D3DTOP_BLENDFACTORALPHA operation must become shader-exact");
+        require(
+            blendFactorAlphaShader.source.find(
+                "float3 nextColor = sampled0.rgb * (128.0f / 255.0f) + input.diffuse.rgb * (1.0 - (128.0f / 255.0f));") !=
+                std::string::npos &&
+            blendFactorAlphaShader.source.find(
+                "float nextAlpha = sampled0.a * (128.0f / 255.0f) + input.diffuse.a * (1.0 - (128.0f / 255.0f));") !=
+                std::string::npos,
+            "R191 D3DTOP_BLENDFACTORALPHA interpolation drift");
+        const auto blendFactorAlphaCompile =
+            compile_fixed_function_pixel_shader_prototype(
+                blendFactorAlphaShader);
+        require(
+            blendFactorAlphaCompile.attempted &&
+            blendFactorAlphaCompile.succeeded &&
+            blendFactorAlphaCompile.result == S_OK &&
+            blendFactorAlphaCompile.bytecodeBytes != 0,
+            "R191 texture-factor fixed-function shader prototype did not compile");
+    }
+
     std::cout
+        << "DX11 fixed-function texture-factor consumption R191: PASS\n"
         << "DX11 fixed-function D3DTOP_DOTPRODUCT3 support R193: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATEINVCOLOR_ADDALPHA COLOROP support R190: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATEINVALPHA_ADDCOLOR COLOROP support R189: PASS\n"

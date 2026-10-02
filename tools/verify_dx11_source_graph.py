@@ -38,6 +38,9 @@ CONSTANT_BUFFER_PROBE = (
 FIXED_FUNCTION_PIPELINE_PROBE = (
     ROOT / "tools" / "dx11_fixed_function_pipeline_probe.cpp"
 ).read_text(encoding="utf-8")
+FIXED_FUNCTION_PIPELINE_CPP = (
+    ROOT / "src" / "vr" / "d3d11" / "fixed_function_pipeline.cpp"
+).read_text(encoding="utf-8")
 SURFACE_MIRROR_HPP = (
     ROOT / "src" / "vr" / "d3d11" / "surface_mirror.hpp"
 ).read_text(encoding="utf-8")
@@ -789,6 +792,32 @@ def main() -> None:
          "R191 texture-factor propagation"),
         ("VR DX11 R191 ffp texture-factor state#{}", RUNTIME_CENSUS,
          "R191 texture-factor detailed evidence"),
+        ("case D3DTA_TFACTOR:", PIPELINE_TRANSLATION_CPP,
+         "R191 TFACTOR argument translation"),
+        ("case D3DTOP_BLENDFACTORALPHA:", PIPELINE_TRANSLATION_CPP,
+         "R191 BLENDFACTORALPHA operation translation"),
+        ("D3DRS_TEXTUREFACTOR's alpha byte as one global scalar",
+         PIPELINE_TRANSLATION_CPP,
+         "R191 BLENDFACTORALPHA semantic ownership"),
+        ("source.textureFactor);", FIXED_FUNCTION_PIPELINE_CPP,
+         "R191 live pipeline texture-factor handoff"),
+        ("sig.textureFactor);", RUNTIME_CENSUS,
+         "R191 diagnostic shader texture-factor handoff"),
+        ("textureFactorStages[0].colorArg1 = D3DTA_TFACTOR;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R191 TFACTOR hosted fixture"),
+        ("blendFactorAlphaStages[0].colorOp = D3DTOP_BLENDFACTORALPHA;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R191 BLENDFACTORALPHA hosted fixture"),
+        ("101.0f / 255.0f, 67.0f / 255.0f, 33.0f / 255.0f, 128.0f / 255.0f",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R191 D3DCOLOR ARGB-to-RGBA normalization assertion"),
+        ("R191 texture-factor fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R191 offline compile assertion"),
+        ("DX11 fixed-function texture-factor consumption R191: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R191 hosted probe completion"),
     ]
     missing_r191_texture_factor_census = [
         meaning
@@ -798,6 +827,9 @@ def main() -> None:
     if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_TEXTUREFACTOR") < 2:
         missing_r191_texture_factor_census.append(
             "R191 TEXTUREFACTOR must be both primed and captured")
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_BLENDFACTORALPHA:") < 3:
+        missing_r191_texture_factor_census.append(
+            "R191 BLENDFACTORALPHA must participate in dependency, HLSL and readiness switches")
     if missing_r191_texture_factor_census:
         raise SystemExit(
             "DX11 R191 fixed-function texture-factor census contract drift: "

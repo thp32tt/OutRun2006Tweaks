@@ -216,7 +216,8 @@ namespace outrun::vr::dx11
         std::uint8_t textureResourcePresentMask,
         std::uint8_t textureResourceExactMask,
         const std::array<D3DRESOURCETYPE, 8>& textureResourceTypes,
-        FixedFunctionAlphaTestState alphaTest = {});
+        FixedFunctionAlphaTestState alphaTest = {},
+        DWORD textureFactor = 0xFFFFFFFFu);
 
     // R85 compiles the generated R84 source only as an offline diagnostic
     // probe. The bytecode is immediately discarded and never bound to a

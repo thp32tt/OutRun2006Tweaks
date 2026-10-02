@@ -32,7 +32,8 @@ namespace outrun::vr::dx11
                 source.alphaTestEnable,
                 source.alphaRef,
                 source.alphaFunc
-            });
+            },
+            source.textureFactor);
 
         if (!out.pixelShader.generated())
             return out;
