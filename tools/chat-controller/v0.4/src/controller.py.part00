@@ -857,12 +857,19 @@ def github_actions_skip_directive(message: str) -> Optional[str]:
     return None
 
 
-def _select_task_commit(items: list, task_id: str, allow_ci_skip_fallback: bool = False) -> Optional[dict]:
+def _select_task_commit(
+    items: list,
+    task_id: str,
+    allow_ci_skip_fallback: bool = False,
+    exclude_shas: Optional[set[str]] = None,
+) -> Optional[dict]:
     expected = f"[AUTO:{task_id}]"
+    excluded = {str(x) for x in (exclude_shas or set()) if x}
     skipped = None
     for item in items if isinstance(items, list) else []:
         message = item.get("commit", {}).get("message", "")
-        if expected not in message:
+        sha = str(item.get("sha") or "")
+        if expected not in message or sha in excluded:
             continue
         result = {
             "sha": item.get("sha"),
@@ -887,7 +894,13 @@ def invalidate_task_commit_cache(branch: str, task_id: Optional[str] = None):
             _github_task_commit_cache.pop(key, None)
 
 
-def github_find_task_commit(branch: str, task_id: str, per_page: int = 100, allow_ci_skip_fallback: bool = False) -> Optional[dict]:
+def github_find_task_commit(
+    branch: str,
+    task_id: str,
+    per_page: int = 100,
+    allow_ci_skip_fallback: bool = False,
+    exclude_shas: Optional[set[str]] = None,
+) -> Optional[dict]:
     """Find the exact task commit; fall back to commits touching its durable task-record path."""
     try:
         now_mono = time.monotonic()
@@ -905,11 +918,16 @@ def github_find_task_commit(branch: str, task_id: str, per_page: int = 100, allo
                 data.extend(page_data)
                 if len(page_data) < page_size:
                     break
-                if _select_task_commit(page_data, task_id, allow_ci_skip_fallback=True):
+                if _select_task_commit(page_data, task_id, allow_ci_skip_fallback=True, exclude_shas=exclude_shas):
                     break
             if isinstance(data, list):
                 _github_commit_list_cache[branch] = (now_mono, data)
-        result = _select_task_commit(data if isinstance(data, list) else [], task_id, allow_ci_skip_fallback=False)
+        result = _select_task_commit(
+            data if isinstance(data, list) else [],
+            task_id,
+            allow_ci_skip_fallback=False,
+            exclude_shas=exclude_shas,
+        )
         if result:
             return result
 
@@ -925,7 +943,12 @@ def github_find_task_commit(branch: str, task_id: str, per_page: int = 100, allo
                 # Cache only positive path history. A negative lookup must be retried
                 # next queue cycle so a just-created durable TASK_ID commit is seen fast.
                 _github_task_commit_cache[key] = (now_mono, task_data)
-        return _select_task_commit(task_data if isinstance(task_data, list) else [], task_id, allow_ci_skip_fallback=allow_ci_skip_fallback)
+        return _select_task_commit(
+            task_data if isinstance(task_data, list) else [],
+            task_id,
+            allow_ci_skip_fallback=allow_ci_skip_fallback,
+            exclude_shas=exclude_shas,
+        )
     except GitHubTransientError as e:
         log.info("github task commit lookup deferred branch=%s task=%s error=%r", branch, task_id, e)
         return None
@@ -1541,6 +1564,26 @@ def conversion_validate_pipeline_result_commit(
         reasons.append("RUNTIME_VALIDATION_MISSING")
 
     return len(reasons) == 0, reasons, record
+
+
+def conversion_lane_static_complete(branch: str) -> tuple[bool, str]:
+    """Static GitHub-only completion gate; runtime UNTESTED remains separate."""
+    state = github_json_file_at_ref("docs/CONVERSION_LANE_STATE.json", branch)
+    if not isinstance(state, dict):
+        return False, "LANE_STATE_MISSING"
+    if state.get("static_pipeline_complete") is True:
+        return True, "STATIC_PIPELINE_COMPLETE"
+    if state.get("development_complete") is True:
+        return True, "DEVELOPMENT_COMPLETE"
+    target = str(
+        state.get("independent_static_next_action")
+        or state.get("static_next_action")
+        or state.get("next_action")
+        or ""
+    ).strip()
+    if target:
+        return False, "NEXT_STATIC_ACTION:" + " ".join(target.split())[:420]
+    return False, "STATIC_COMPLETION_NOT_DECLARED"
 
 
 def conversion_lane_work_hint(branch: str) -> str:
