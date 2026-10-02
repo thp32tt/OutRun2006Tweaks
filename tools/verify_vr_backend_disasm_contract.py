@@ -767,6 +767,95 @@ def verify_dxvk_continuation_chain() -> None:
                 )
 
                 if predecessor_declares_forward_lineage:
+                    # Bind the raw collector's inherited-target predicate to the predecessor proof.
+                    # Both sides were already checked for shape independently; this equality
+                    # prevents a stale explicit target list from remaining statically green.
+                    predecessor_forward_node = predecessor_unresolved_forward_values[0]
+                    if isinstance(predecessor_forward_node, ast.Name):
+                        predecessor_forward_assignments = [
+                            node.value
+                            for node in ast.walk(predecessor_proof_ast)
+                            if isinstance(node, ast.Assign)
+                            and any(
+                                isinstance(target, ast.Name)
+                                and target.id == predecessor_forward_node.id
+                                for target in node.targets
+                            )
+                        ]
+                        if len(predecessor_forward_assignments) != 1:
+                            raise SystemExit(
+                                f"DXVK continuation {continuation_id} predecessor proof "
+                                "forward-target lineage assignment is ambiguous: "
+                                f"{predecessor_forward_node.id}="
+                                f"{len(predecessor_forward_assignments)}"
+                            )
+                        predecessor_forward_node = predecessor_forward_assignments[0]
+                    if not isinstance(
+                        predecessor_forward_node, (ast.List, ast.Tuple, ast.Set)
+                    ):
+                        raise SystemExit(
+                            f"DXVK continuation {continuation_id} predecessor proof "
+                            "forward-target lineage must resolve to an explicit int sequence"
+                        )
+                    predecessor_forward_targets = [
+                        element.value
+                        for element in predecessor_forward_node.elts
+                        if isinstance(element, ast.Constant)
+                        and isinstance(element.value, int)
+                        and not isinstance(element.value, bool)
+                    ]
+                    if (
+                        len(predecessor_forward_targets)
+                        != len(predecessor_forward_node.elts)
+                        or len(predecessor_forward_targets)
+                        != len(set(predecessor_forward_targets))
+                    ):
+                        raise SystemExit(
+                            f"DXVK continuation {continuation_id} predecessor proof "
+                            "forward-target lineage must use a unique int literal sequence"
+                        )
+
+                    raw_forward_gate_nodes: list[ast.AST] = []
+                    for node in ast.walk(predecessor_exact_value):
+                        if not (
+                            isinstance(node, ast.Compare)
+                            and len(node.ops) == 1
+                            and isinstance(node.ops[0], ast.Eq)
+                            and len(node.comparators) == 1
+                        ):
+                            continue
+                        left, right = node.left, node.comparators[0]
+                        if predecessor_field(left) == "unresolved_forward_targets":
+                            raw_forward_gate_nodes.append(right)
+                        elif predecessor_field(right) == "unresolved_forward_targets":
+                            raw_forward_gate_nodes.append(left)
+                    if len(raw_forward_gate_nodes) != 1:
+                        raise SystemExit(
+                            f"DXVK continuation {continuation_id} raw provenance "
+                            "forward-target lineage gate is ambiguous: "
+                            f"{len(raw_forward_gate_nodes)}"
+                        )
+                    raw_forward_node = raw_forward_gate_nodes[0]
+                    if not isinstance(raw_forward_node, (ast.List, ast.Tuple, ast.Set)):
+                        raise SystemExit(
+                            f"DXVK continuation {continuation_id} raw provenance "
+                            "forward-target lineage gate must be an explicit int sequence"
+                        )
+                    raw_forward_targets = [
+                        element.value
+                        for element in raw_forward_node.elts
+                        if isinstance(element, ast.Constant)
+                        and isinstance(element.value, int)
+                        and not isinstance(element.value, bool)
+                    ]
+                    if raw_forward_targets != predecessor_forward_targets:
+                        raise SystemExit(
+                            f"DXVK continuation {continuation_id} predecessor proof "
+                            "forward-target lineage drift: "
+                            f"proof={predecessor_forward_targets} "
+                            f"raw_gate={raw_forward_targets}"
+                        )
+
                     unresolved_forward_target_compared = any(
                         isinstance(node, ast.Compare)
                         and len(node.ops) == 1
