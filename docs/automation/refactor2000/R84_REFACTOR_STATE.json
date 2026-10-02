@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1391,
+  "cycle": 1394,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -306,11 +306,12 @@
     "R84-REF-GATED-FRAMEWRITE-0018",
     "R84-REF-GATED-COUNTMAP-0019",
     "R84-REF-GATED-BUILDWAIT-0020",
-    "R84-REF-GATED-NOMINMAX-0021"
+    "R84-REF-GATED-NOMINMAX-0021",
+    "R84-REF-GATED-BUILD-0022"
   ],
-  "next": "Cycles 1392-1394: static re-read then BUILD_GATE. Prior Gate D run 37001614851/job 110820361574 first concrete error was std::max broken by Win32 max macro in R31 independent TU.",
-  "updatedKst": "2026-10-02T21:00:00+09:00",
-  "batchStatus": "R84_GATE_D_NOMINMAX_REPAIR_CYCLE_1391",
+  "next": "Consume exact Gate D BUILD_GATE 1394 run. If compile fails, repair only the first concrete missing dependency.",
+  "updatedKst": "2026-10-02T21:02:00+09:00",
+  "batchStatus": "R84_GATE_D_BUILD_GATE_1394_TRIGGERED",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -595,7 +596,8 @@
     "BUILD_GATE 1358/1364/1370/1376/1382: REUSED_BUILD_EVIDENCE=IN_PROGRESS exact Gate D run 37001614851/job 110820361574; build input unchanged since cycle 1352.",
     "Cycles 1383-1385 R84-REF-GATED-COUNTMAP-0019: counted remaining R31 lower-runtime accesses for repair sizing: IsGameDevice=6, InternalPassScope=8, PresentEpoch=2, aux=1, VRWorldScale=1, DrawStereoState=3, TrackedDepthStencil=10, FrameStereoPoseSequence=6, raw RT/depth hooks=2 each, restore=2, direct frame/counter writes present. Most have existing neutral APIs. APPLY_GATE 1385 NO_SAFE_CHANGE while exact build active.",
     "Cycles 1386-1388 R84-REF-GATED-BUILDWAIT-0020: no build input change; BUILD_GATE 1388 REUSED_BUILD_EVIDENCE=IN_PROGRESS run 37001614851/job 110820361574. No duplicate CI triggered. Runtime NEED_HMD_TEST.",
-    "Cycles 1389-1391 R84-REF-GATED-NOMINMAX-0021: consumed Gate D run 37001614851/job 110820361574. FAILURE_CLASS=PRODUCT_DEFECT. First concrete compile error at R31 std::max: Win32 max macro active after removing textual R30 include. Added WIN32_LEAN_AND_MEAN/NOMINMAX before all includes and verifier guard only. APPLY_GATE 1391 SOURCE_CHANGED=YES. Runtime NEED_HMD_TEST."
+    "Cycles 1389-1391 R84-REF-GATED-NOMINMAX-0021: consumed Gate D run 37001614851/job 110820361574. FAILURE_CLASS=PRODUCT_DEFECT. First concrete compile error at R31 std::max: Win32 max macro active after removing textual R30 include. Added WIN32_LEAN_AND_MEAN/NOMINMAX before all includes and verifier guard only. APPLY_GATE 1391 SOURCE_CHANGED=YES. Runtime NEED_HMD_TEST.",
+    "Cycles 1392-1394 R84-REF-GATED-BUILD-0022: static re-read confirmed R31 WIN32_LEAN_AND_MEAN/NOMINMAX is before all includes. APPLY_GATE 1394 NO_SAFE_CHANGE. BUILD_GATE 1394 intentionally triggered on exact macro-boundary repair SHA. Runtime NEED_HMD_TEST."
   ],
   "campaign": {
     "startCycle": 1202,
