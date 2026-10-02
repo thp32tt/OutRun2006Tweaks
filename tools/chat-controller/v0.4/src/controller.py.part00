@@ -71,6 +71,8 @@ LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
 CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
 MAX_CHAT_ROLLOVERS_PER_TASK = max(0, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "5")))
+TASK_EVENT_MODEL = os.getenv("TASK_EVENT_MODEL", "v2").strip().lower()
+PRODUCTION_COUNTER_MODE = os.getenv("PRODUCTION_COUNTER_MODE", "lane").strip().lower()
 GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
@@ -213,10 +215,23 @@ class Slot:
     last_watchdog_at: Optional[str] = None
 
 @dataclass
+class TaskEvent:
+    event_id: str
+    production_id: str
+    event_type: str
+    attempt: int
+    retry_count: int
+    rollover_count: int
+    created_at: str
+
+
+@dataclass
 class Registry:
     logical_date: str
     next_slot: int
     slots: list[Slot]
+    next_production_id: dict[str, int] = field(default_factory=dict)
+    task_events: list[TaskEvent] = field(default_factory=list)
     rate_limit_attempts: int = 0
     rate_limit_until: Optional[str] = None
     last_global_send_at: Optional[str] = None
@@ -310,6 +325,8 @@ def new_registry(now: datetime) -> Registry:
         logical_date=logical_date(now),
         next_slot=0,
         slots=[Slot(name=chr(ord('A') + i)) for i in range(CHAT_SLOTS)],
+        next_production_id={},
+        task_events=[],
         rate_limit_attempts=0,
         rate_limit_until=None,
         last_global_send_at=None,
@@ -329,6 +346,8 @@ def load_registry(now: datetime) -> Registry:
             logical_date=raw["logical_date"],
             next_slot=int(raw.get("next_slot", 0)),
             slots=[Slot(**s) for s in raw["slots"]],
+            next_production_id={str(k): int(v) for k, v in dict(raw.get("next_production_id", {})).items()},
+            task_events=[TaskEvent(**e) for e in raw.get("task_events", []) if isinstance(e, dict)],
             rate_limit_attempts=int(raw.get("rate_limit_attempts", 0)),
             rate_limit_until=raw.get("rate_limit_until"),
             last_global_send_at=raw.get("last_global_send_at"),
@@ -366,6 +385,8 @@ def save_registry(reg: Registry):
         "logical_date": reg.logical_date,
         "next_slot": reg.next_slot,
         "slots": [asdict(s) for s in reg.slots],
+        "next_production_id": dict(reg.next_production_id),
+        "task_events": [asdict(e) for e in reg.task_events[-5000:]],
         "rate_limit_attempts": reg.rate_limit_attempts,
         "rate_limit_until": reg.rate_limit_until,
         "last_global_send_at": reg.last_global_send_at,
@@ -374,6 +395,48 @@ def save_registry(reg: Registry):
     tmp = REGISTRY_FILE.with_suffix(".tmp")
     tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     tmp.replace(REGISTRY_FILE)
+
+
+def allocate_lane_production_id(reg: Registry, lane: str, prefix: str) -> str:
+    """Allocate exactly one production number for a new dispatch.
+
+    Retry, rollover, continue and reconcile must never call this function.
+    Counters are lane-scoped when PRODUCTION_COUNTER_MODE=lane.
+    """
+    key = lane if PRODUCTION_COUNTER_MODE == "lane" else "__global__"
+    next_id = int(reg.next_production_id.get(key, 1))
+    reg.next_production_id[key] = next_id + 1
+    return f"{prefix}-{lane}-{next_id:05d}"
+
+
+def production_id_from_identifier(identifier: str) -> str:
+    value = str(identifier or "").strip()
+    return re.sub(r"-E\d{3}$", "", value)
+
+
+def append_task_event(reg: Registry, active: dict, event_type: str) -> TaskEvent:
+    production_id = str(active.get("production_id") or active.get("task_id") or "").strip()
+    if not production_id:
+        raise ValueError("PRODUCTION_ID_REQUIRED")
+    existing = [e for e in reg.task_events if e.production_id == production_id]
+    event_id = f"{production_id}-E{len(existing) + 1:03d}"
+    event = TaskEvent(
+        event_id=event_id,
+        production_id=production_id,
+        event_type=event_type,
+        attempt=int(active.get("attempt", 1)),
+        retry_count=int(active.get("retry_count", 0)),
+        rollover_count=int(active.get("rollover_count", active.get("chat_rollovers", 0))),
+        created_at=datetime.now(TZ).isoformat(),
+    )
+    reg.task_events.append(event)
+    active["production_id"] = production_id
+    active["task_id"] = production_id  # compatibility alias for existing Git markers
+    active["event_id"] = event_id
+    active["event_type"] = event_type
+    active["retry_count"] = event.retry_count
+    active["rollover_count"] = event.rollover_count
+    return event
 
 
 def read_prompt(filename: str) -> str:
@@ -387,6 +450,8 @@ def load_queue_state() -> dict:
         state = {
             "counter": 0,
             "active": None,
+            "task_event_model": TASK_EVENT_MODEL,
+            "production_counter_mode": PRODUCTION_COUNTER_MODE,
             "active_by_lane": {},
             "wave_counter": 0,
             "wave_id": None,
@@ -407,6 +472,8 @@ def load_queue_state() -> dict:
         raw = json.loads(QUEUE_FILE.read_text(encoding="utf-8"))
         raw.setdefault("counter", 0)
         raw.setdefault("active", None)
+        raw.setdefault("task_event_model", TASK_EVENT_MODEL)
+        raw.setdefault("production_counter_mode", PRODUCTION_COUNTER_MODE)
         raw.setdefault("active_by_lane", {})
         raw.setdefault("wave_counter", 0)
         raw.setdefault("wave_id", None)
@@ -601,9 +668,14 @@ def classify_localization_result(record: dict, files: list[dict], task_id: str) 
 
 
 def _task_records(payload, task_id):
-    """Filename fallback never substitutes another task's identity."""
+    """Match either production identity or one of its event identities."""
+    requested = str(task_id or "").strip()
+    production_id = production_id_from_identifier(requested)
     if isinstance(payload, dict):
-        if payload.get("TASK_ID", payload.get("task_id")) == task_id:
+        record_task = str(payload.get("TASK_ID", payload.get("task_id", "")) or "")
+        record_production = str(payload.get("production_id", "") or "")
+        record_event = str(payload.get("event_id", "") or "")
+        if requested in {record_task, record_production, record_event} or production_id in {record_task, record_production}:
             yield payload
         for value in payload.values():
             if isinstance(value, (dict, list)):
@@ -638,8 +710,17 @@ def github_task_record(ref: str, task_id: str) -> Optional[dict]:
                     int(r.get("CHAT_ROLLOVER", r.get("chat_rollovers", 0))),
                     str(r.get("updated_at", r.get("timestamp", "")))))
 
-    exact = f"docs/automation/runs/{task_id}.json"
-    records = read(exact)
+    requested_id = str(task_id or "").strip()
+    production_id = production_id_from_identifier(requested_id)
+    exact_candidates = [
+        f"docs/automation/runs/{requested_id}.json",
+        f"docs/automation/runs/{production_id}.json",
+    ]
+    records = []
+    for exact in dict.fromkeys(exact_candidates):
+        records.extend(read(exact))
+        if records:
+            break
     if records:
         return newest(records)
     tree = github_api_json(f"/repos/{GITHUB_REPO}/git/trees/{ref}?recursive=1")
@@ -648,17 +729,17 @@ def github_task_record(ref: str, task_id: str) -> Optional[dict]:
     paths = sorted(x["path"] for x in tree.get("tree", [])
                    if x.get("type") == "blob" and x["path"].startswith("docs/automation/")
                    and x["path"].endswith(".json"))
-    number = task_id.rsplit("-", 1)[-1]
-    lane = task_id.rsplit("-", 1)[0].split("-")[-1]
+    number = production_id.rsplit("-", 1)[-1]
+    lane = production_id.rsplit("-", 1)[0].split("-")[-1]
     predicates = [
-        lambda p: p.startswith(f"docs/automation/runs/{task_id}."),
+        lambda p: p.startswith(f"docs/automation/runs/{requested_id}.") or p.startswith(f"docs/automation/runs/{production_id}."),
         lambda p: "dispatch" in p.lower(),
         lambda p: "reconcile" in p.lower(),
         lambda p: "rollover" in p.lower(),
         lambda p: lane.lower() in p.lower() and number in p,
         lambda p: number in p,
     ]
-    visited = {exact}
+    visited = set(exact_candidates)
     for predicate in predicates:
         records = []
         for path in paths:
