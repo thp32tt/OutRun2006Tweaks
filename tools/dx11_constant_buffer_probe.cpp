@@ -2586,6 +2586,154 @@ int main()
             texturedDrawReady.snapshotToken),
         "R133 textured draw readiness composes the exact required PS stage");
 
+    auto multiStageTextureReady = texturedStageReady;
+    multiStageTextureReady.requiredMask = 0x3u;
+    multiStageTextureReady.readyMask = 0x3u;
+    multiStageTextureReady.pendingMask = 0;
+    multiStageTextureReady.snapshotToken = 0x136003ull;
+    const auto multiStageActivation =
+        compose_fixed_function_activation_readiness(
+            pipelineIdentityReady, multiStageTextureReady);
+    require(
+        multiStageActivation.ready &&
+        multiStageActivation.requiredTextureMask == 0x3u &&
+        multiStageActivation.snapshotToken != 0,
+        "R136 two-stage activation prerequisite");
+
+    const auto multiStageDrawReady =
+        compose_fixed_function_draw_readiness(
+            multiStageActivation, outputBindingRenderReady, surfacePairReady,
+            outputStateReady, outputStateBinding, indexedGeometryReady);
+    require(
+        multiStageDrawReady.ready &&
+        multiStageDrawReady.requiredTextureMask == 0x3u &&
+        validate_fixed_function_draw_readiness_integrity(
+            multiStageDrawReady),
+        "R136 two-stage sealed draw prerequisite");
+
+    constexpr UINT secondDrawTextureStageSlot = 1;
+    require(
+        bind_fixed_function_texture_stage_for_observation(
+            d3d.context, secondDrawTextureStageSlot, samplerOwner, textureView),
+        "R136 second texture-stage live binding prerequisite");
+
+    std::array<
+        const outrun::vr::dx11::NativeFixedFunctionSamplerState*, 8>
+        multiStageSamplers{};
+    std::array<
+        const outrun::vr::dx11::NativeFixedFunctionTextureView*, 8>
+        multiStageTextures{};
+    multiStageSamplers[0] = &samplerOwner;
+    multiStageSamplers[1] = &samplerOwner;
+    multiStageTextures[0] = &textureView;
+    multiStageTextures[1] = &textureView;
+
+    const auto multiStageBindingSet =
+        outrun::vr::dx11::observe_fixed_function_texture_binding_set(
+            d3d.context, multiStageDrawReady.requiredTextureMask,
+            multiStageSamplers, multiStageTextures);
+    require(
+        multiStageBindingSet.inputValid &&
+        multiStageBindingSet.requiredMaskValid &&
+        multiStageBindingSet.allRequiredBoundExact &&
+        multiStageBindingSet.ready &&
+        multiStageBindingSet.requiredTextureMask == 0x3u &&
+        multiStageBindingSet.observedTextureMask == 0x3u &&
+        multiStageBindingSet.stageSnapshotTokens[0] != 0 &&
+        multiStageBindingSet.stageSnapshotTokens[1] != 0 &&
+        multiStageBindingSet.snapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_fixed_function_texture_binding_set_readiness_integrity(
+                multiStageBindingSet) &&
+        outrun::vr::dx11::validate_fixed_function_texture_binding_set_snapshot(
+            d3d.context, multiStageDrawReady.requiredTextureMask,
+            multiStageSamplers, multiStageTextures,
+            multiStageBindingSet.snapshotToken),
+        "R136 aggregate two-stage PS binding captures exact live identity");
+
+    const auto multiStageTexturedDraw =
+        outrun::vr::dx11::
+            compose_fixed_function_multistage_textured_draw_readiness(
+                multiStageDrawReady, multiStageBindingSet);
+    require(
+        multiStageTexturedDraw.inputValid &&
+        multiStageTexturedDraw.drawReady &&
+        multiStageTexturedDraw.textureStageReady &&
+        multiStageTexturedDraw.textureMaskMatches &&
+        multiStageTexturedDraw.componentSnapshotsPresent &&
+        multiStageTexturedDraw.ready &&
+        multiStageTexturedDraw.requiredTextureMask == 0x3u &&
+        multiStageTexturedDraw.observedTextureMask == 0x3u &&
+        multiStageTexturedDraw.drawSnapshotToken ==
+            multiStageDrawReady.snapshotToken &&
+        multiStageTexturedDraw.textureStageSnapshotToken ==
+            multiStageBindingSet.snapshotToken &&
+        multiStageTexturedDraw.snapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_fixed_function_multistage_textured_draw_snapshot(
+                multiStageDrawReady, multiStageBindingSet,
+                multiStageTexturedDraw.snapshotToken),
+        "R136 aggregate two-stage PS binding composes exact draw readiness");
+
+    const auto multiStageBoundDraw =
+        outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
+            multiStageDrawReady, multiStageTexturedDraw,
+            drawPipelineBindingReady);
+    require(
+        multiStageBoundDraw.ready &&
+        multiStageBoundDraw.pipelineBindingMatchesDraw &&
+        multiStageBoundDraw.snapshotToken != 0,
+        "R136 aggregate textured draw remains compatible with R134 pipeline identity");
+
+    auto forgedMultiStageBindingSet = multiStageBindingSet;
+    forgedMultiStageBindingSet.stageSnapshotTokens[1] ^=
+        0x9e3779b97f4a7c15ull;
+    const auto forgedMultiStageTexturedDraw =
+        outrun::vr::dx11::
+            compose_fixed_function_multistage_textured_draw_readiness(
+                multiStageDrawReady, forgedMultiStageBindingSet);
+    require(
+        !outrun::vr::dx11::
+            validate_fixed_function_texture_binding_set_readiness_integrity(
+                forgedMultiStageBindingSet) &&
+        !forgedMultiStageTexturedDraw.inputValid &&
+        !forgedMultiStageTexturedDraw.textureStageReady &&
+        !forgedMultiStageTexturedDraw.ready &&
+        forgedMultiStageTexturedDraw.snapshotToken == 0,
+        "R136 aggregate binding snapshot rejects copied stage-token drift");
+
+    ID3D11SamplerState* clearSecondStageSampler = nullptr;
+    ID3D11ShaderResourceView* clearSecondStageSrv = nullptr;
+    d3d.context->PSSetSamplers(
+        secondDrawTextureStageSlot, 1, &clearSecondStageSampler);
+    d3d.context->PSSetShaderResources(
+        secondDrawTextureStageSlot, 1, &clearSecondStageSrv);
+    const auto missingSecondStageBindingSet =
+        outrun::vr::dx11::observe_fixed_function_texture_binding_set(
+            d3d.context, multiStageDrawReady.requiredTextureMask,
+            multiStageSamplers, multiStageTextures);
+    require(
+        missingSecondStageBindingSet.inputValid &&
+        missingSecondStageBindingSet.requiredMaskValid &&
+        !missingSecondStageBindingSet.allRequiredBoundExact &&
+        !missingSecondStageBindingSet.ready &&
+        missingSecondStageBindingSet.observedTextureMask == 0x1u &&
+        missingSecondStageBindingSet.snapshotToken == 0 &&
+        !outrun::vr::dx11::validate_fixed_function_texture_binding_set_snapshot(
+            d3d.context, multiStageDrawReady.requiredTextureMask,
+            multiStageSamplers, multiStageTextures,
+            multiStageBindingSet.snapshotToken),
+        "R136 aggregate binding fails closed after one required PS stage drifts");
+
+    require(
+        bind_fixed_function_texture_stage_for_observation(
+            d3d.context, secondDrawTextureStageSlot, samplerOwner, textureView) &&
+        outrun::vr::dx11::validate_fixed_function_texture_binding_set_snapshot(
+            d3d.context, multiStageDrawReady.requiredTextureMask,
+            multiStageSamplers, multiStageTextures,
+            multiStageBindingSet.snapshotToken),
+        "R136 aggregate live binding restores deterministic snapshot identity");
+
     const auto boundDrawReady =
         outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
             drawReady, texturedDrawReady, drawPipelineBindingReady);
@@ -3253,6 +3401,7 @@ int main()
     std::cout << "DX11 draw output-binding readiness R131: PASS\n";
     std::cout << "DX11 final dormant bound-draw readiness R134: PASS\n";
     std::cout << "DX11 draw texture-mask snapshot integrity R135: PASS\n";
+    std::cout << "DX11 aggregate texture binding readiness R136: PASS\n";
     std::cout << "DX11 geometry-gated draw readiness R122: PASS\n";
     std::cout << "DX11 dynamic output-state readiness R124: PASS\n";
     return 0;
