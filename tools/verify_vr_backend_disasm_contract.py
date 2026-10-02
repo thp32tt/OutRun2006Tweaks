@@ -27,7 +27,7 @@ def verify_dxvk_continuation_chain() -> None:
             raise SystemExit(f"DXVK continuation chain missing analyzer symbol: {name}")
         return analyzer[name]
 
-    raw_ids = (23, 24, 25, 26, 27, 28)
+    raw_ids = (23, 24, 25, 26, 27, 28, 29)
     for continuation_id in raw_ids:
         prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
         start = value(f"{prefix}_RVA")
@@ -39,7 +39,7 @@ def verify_dxvk_continuation_chain() -> None:
                 f"0x{start:08X}+{probe_len} != 0x{probe_end:08X}"
             )
 
-    proof_ids = (23, 24, 25, 26, 27)
+    proof_ids = (23, 24, 25, 26, 27, 28)
     for continuation_id in proof_ids:
         prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
         start = value(f"{prefix}_RVA")
@@ -75,6 +75,7 @@ def verify_dxvk_continuation_chain() -> None:
         (25, 26, "overlap"),
         (26, 27, "overlap"),
         (27, 28, "overlap"),
+        (28, 29, "boundary"),
     )
     for previous_id, next_id, mode in transitions:
         previous = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{previous_id}"
@@ -1600,6 +1601,17 @@ def main() -> None:
             'EXACT_INSTRUCTION_BOUNDARY_AT_18299D',
             'gf_target_c_helper_1_third_callee_continuation_28_proof=',
             'guarded_gf_target_c_helper_1_third_callee_continuation_28_prefix_proof=FAILED',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_29_RVA = 0x0018299D',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_29_PROBE_LEN = 64',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_29_PROBE_END_RVA = 0x001829DD',
+            'def collect_guarded_gf_target_c_helper_1_third_callee_continuation_29_provenance(pe: PE) -> dict:',
+            '"guarded_gf_target_c_helper_1_third_callee_continuation_29_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_29_provenance(pe)',
+            'EXACT_EXE_18299D_TO_1829DD_PROVENANCE_CAPTURED',
+            'EXACT_PREDECESSOR_INSTRUCTION_BOUNDARY_18299D',
+            'UNRESOLVED_AT_18299D_AND_FORWARD_BYTES',
+            'RAW_BYTES_AND_REL32_CENSUS_ONLY',
+            'gf_target_c_helper_1_third_callee_continuation_29=',
+            'guarded_gf_target_c_helper_1_third_callee_continuation_29_provenance=FAILED',
             'text.rfind(prologue, lo, hi)',
             'def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:',
             '"guarded_gf_hook_provenance": collect_guarded_gf_hook_provenance(pe, calls)',
