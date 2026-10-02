@@ -6,18 +6,46 @@
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
   "chat_rollover": 5,
-  "result": "PASS_Q00110_3_INPUT_PASS_1_SUPERSEDED_3_STATIC_ASSET_PASS_INDEX236_RENDER_READY_INDEX230_SOURCE_IDENTITY_MISMATCH_RUNTIME_UNTESTED",
+  "result": "PASS_Q00110_2_INPUT_PASS_1_REWORK_1_SUPERSEDED_2_STATIC_ASSET_PASS_INDEX236_RENDER_READY_INDEX230_SOURCE_IDENTITY_MISMATCH_RUNTIME_UNTESTED",
   "qa_batch_inputs": [
-    {"task_id":"LOCALIZATION-LOCALIZATION_A-00351","result_sha":"7abc6bf2ccf534d25909aff466feb7ce5c4160ac"},
-    {"task_id":"LOCALIZATION-LOCALIZATION_B-00347","result_sha":"fa9c8bf687b17318d00bee52e615f134b6ee7b3f"},
-    {"task_id":"LOCALIZATION-LOCALIZATION_A-00352","result_sha":"b5d39094ce2f9941e7807349b563e31f4d19654b"},
-    {"task_id":"LOCALIZATION-LOCALIZATION_B-00353","result_sha":"ff18b8aa855da74e0f1070661ff0462a53f58513"}
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+      "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+      "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
+      "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00353",
+      "result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513"
+    }
   ],
   "qa_dispositions": [
-    {"task_id":"LOCALIZATION-LOCALIZATION_A-00351","result_sha":"7abc6bf2ccf534d25909aff466feb7ce5c4160ac","status":"PASS"},
-    {"task_id":"LOCALIZATION-LOCALIZATION_B-00347","result_sha":"fa9c8bf687b17318d00bee52e615f134b6ee7b3f","status":"PASS"},
-    {"task_id":"LOCALIZATION-LOCALIZATION_A-00352","result_sha":"b5d39094ce2f9941e7807349b563e31f4d19654b","status":"SUPERSEDED"},
-    {"task_id":"LOCALIZATION-LOCALIZATION_B-00353","result_sha":"ff18b8aa855da74e0f1070661ff0462a53f58513","status":"PASS"}
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+      "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
+      "status": "REWORK_REQUIRED"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+      "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
+      "status": "PASS"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
+      "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b",
+      "status": "SUPERSEDED"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00353",
+      "result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513",
+      "status": "PASS"
+    }
   ],
   "report": "localization/graphics/role_C/20261002-2056-C178/C178_Q00110_INDEPENDENT_QA_BATCH.json",
   "candidate_dds_modified": false,
