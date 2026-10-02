@@ -4302,6 +4302,35 @@ def main() -> None:
     analyzer_test = (
         ROOT / "tools" / "test_analyze_dx11_census.py"
     ).read_text(encoding="utf-8")
+    r194_arg0_analyzer_contract = [
+        ("|160|173|194)", analyzer,
+         "R194 fixed-function log revision parser"),
+        ("?P<colorArg0>", analyzer,
+         "R194 COLORARG0 parser group"),
+        ("?P<alphaArg0>", analyzer,
+         "R194 ALPHAARG0 parser group"),
+        ('"colorArg0", "colorArg1", "colorArg2"', analyzer,
+         "R194 color ARG0 hexadecimal conversion"),
+        ('"alphaArg0", "alphaArg1", "alphaArg2"', analyzer,
+         "R194 alpha ARG0 hexadecimal conversion"),
+        ("r194_arg0 = run_case(", analyzer_test,
+         "R194 ARG0 analyzer regression fixture"),
+        ('r194_stage["colorArg0"] == 0x00000002', analyzer_test,
+         "R194 COLORARG0 analyzer assertion"),
+        ('r194_stage["alphaArg0"] == 0x00000001', analyzer_test,
+         "R194 ALPHAARG0 analyzer assertion"),
+    ]
+    missing_r194_arg0_analyzer = [
+        meaning
+        for token, source, meaning in r194_arg0_analyzer_contract
+        if token not in source
+    ]
+    if missing_r194_arg0_analyzer:
+        raise SystemExit(
+            "DX11 R194 ARG0 census analyzer contract drift: "
+            + ", ".join(missing_r194_arg0_analyzer)
+        )
+
     # Keep the enum-owned unsupported bitset, runtime summary, parser schema
     # and aggregate accounting structurally synchronized. Earlier R166/R170
     # guards pinned specific tails; this parity check makes a future new bit

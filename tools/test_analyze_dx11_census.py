@@ -839,6 +839,29 @@ def main() -> int:
     assert r72["LatestSummary"]["mutationTelemetryRequired"] == 0
     assert r72["LatestSummary"]["managedShadowRequired"] == 0
 
+    r194_arg0 = run_case(
+        "VR DX11 R72 signature#9: primitive=4 fixedFn=1\n"
+        "VR DX11 R194 ffp signature#9 stage#0: "
+        "color[op=25,arg0=0x00000002,arg1=0x00000000,arg2=0x00000003] "
+        "alpha[op=25,arg0=0x00000001,arg1=0x00000002,arg2=0x00000000] "
+        "resultArg=0x00000001 texCoord=0x00000000 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+    )
+    assert r194_arg0["SourceLogs"] == ["OutRun2006Tweaks.log"]
+    assert r194_arg0["UniqueSignaturesCaptured"] == 1
+    r194_stage = r194_arg0["Signatures"][0]["fixed_function_stages"][0]
+    assert r194_stage["colorOp"] == 25
+    assert r194_stage["colorArg0"] == 0x00000002
+    assert r194_stage["colorArg0_hex"] == "0x00000002"
+    assert r194_stage["colorArg1"] == 0x00000000
+    assert r194_stage["colorArg2"] == 0x00000003
+    assert r194_stage["alphaArg0"] == 0x00000001
+    assert r194_stage["alphaArg0_hex"] == "0x00000001"
+    assert r194_stage["alphaArg1"] == 0x00000002
+    assert r194_stage["alphaArg2"] == 0x00000000
+    assert r194_stage["resultArg"] == 0x00000001
+    assert r194_arg0["NativeDrawPathActivationAllowed"] is False
+
     r191_texture_factor = run_case(
         "VR DX11 R72 signature#7: primitive=4 fixedFn=1\n"
         "VR DX11 R191 ffp texture-factor state#7: observed=1 argb=0x80402010\n"
@@ -853,7 +876,7 @@ def main() -> int:
     }
     assert r191_texture_factor["NativeDrawPathActivationAllowed"] is False
 
-    print("DX11 census analyzer regression R120/SRC1/R191 exhaustive-mode: PASS")
+    print("DX11 census analyzer regression R120/SRC1/R191/R194 exhaustive-mode: PASS")
     return 0
 
 
