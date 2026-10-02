@@ -39,6 +39,7 @@
 #include "../telemetry/stereo_dispatch_counters.hpp"
 #include "../core/dispatch_result.hpp"
 #include "../core/dispatch_support_hooks.hpp"
+#include "../../hook_mgr.hpp"
 
 namespace OutRunVRStereo
 {

@@ -1137,6 +1137,10 @@ if "-DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=ON" not in refactor_workflow:
     errors.append("Gate D refactor workflow flag missing")
 
 
+if '#include "../../hook_mgr.hpp"' not in r31:
+    errors.append("R31 independent TU missing explicit hook framework dependency")
+
+
 if errors:
     print("R84 refactor contract FAILED")
     for error in errors:
