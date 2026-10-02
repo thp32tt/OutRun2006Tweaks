@@ -16,17 +16,37 @@ REQUIRED = (
     "native_draw_path_activation_changed",
 )
 
+# Keep activation disabled even when an alias/config spelling is introduced.
+# This is a source contract check, not a runtime validator.
 FORBIDDEN_ACTIVATION_MARKERS = (
     "force_native_draw_path=true",
     "AUTO_ENABLE_NATIVE_DRAW_PATH",
     "enable_native_draw_path=true",
     "NativeDrawPathActive=true",
+    "NATIVE_DRAW_PATH_ACTIVE=1",
+    "native_draw_path_active = true",
+    "nativeDrawPathActive(true)",
 )
 
 SCAN_ROOTS = (
     "src/vr/d3d11",
     "vrhost/src",
+    "tools",
 )
+
+
+def read_sources(root: Path) -> str:
+    sources = []
+    for relative in SCAN_ROOTS:
+        scan_root = root / relative
+        if scan_root.exists():
+            sources.extend(
+                path.read_text(encoding="utf-8", errors="ignore")
+                for path in scan_root.rglob("*")
+                if path.is_file()
+                and path.suffix.lower() in {".cpp", ".hpp", ".h", ".py", ".json", ".md"}
+            )
+    return "\n".join(sources)
 
 
 def main() -> int:
@@ -42,17 +62,7 @@ def main() -> int:
         print("missing required evidence markers:", ", ".join(missing))
         return 1
 
-    sources = []
-    for relative in SCAN_ROOTS:
-        scan_root = root / relative
-        if scan_root.exists():
-            sources.extend(
-                path.read_text(encoding="utf-8", errors="ignore")
-                for path in scan_root.rglob("*")
-                if path.is_file()
-            )
-
-    source = "\n".join(sources)
+    source = read_sources(root)
     for marker in FORBIDDEN_ACTIVATION_MARKERS:
         if marker in source:
             print("unexpected activation marker:", marker)
