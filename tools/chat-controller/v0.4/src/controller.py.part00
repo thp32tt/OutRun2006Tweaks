@@ -139,6 +139,7 @@ GAME_MOD_CONTEXT = (
     "not for cybersecurity exploitation, malware, cheating, or unauthorized access."
 )
 LOG_FILE = Path("/logs/controller.log")
+RETRY_DIAGNOSTICS_FILE = Path("/logs/retry_diagnostics.jsonl")
 
 LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 logging.basicConfig(
@@ -382,6 +383,29 @@ def write_runtime(**updates):
     runtime.update(updates)
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     RUNTIME_FILE.write_text(json.dumps(runtime, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def persist_retry_diagnostic(record: dict) -> None:
+    """Append bounded structured Retry diagnostics and surface the latest record in runtime."""
+    try:
+        RETRY_DIAGNOSTICS_FILE.parent.mkdir(parents=True, exist_ok=True)
+        if RETRY_DIAGNOSTICS_FILE.exists() and RETRY_DIAGNOSTICS_FILE.stat().st_size > 2_000_000:
+            backup = RETRY_DIAGNOSTICS_FILE.with_suffix(".jsonl.1")
+            try:
+                if backup.exists():
+                    backup.unlink()
+                RETRY_DIAGNOSTICS_FILE.replace(backup)
+            except Exception:
+                RETRY_DIAGNOSTICS_FILE.write_text("", encoding="utf-8")
+        with RETRY_DIAGNOSTICS_FILE.open("a", encoding="utf-8") as fp:
+            fp.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
+        write_runtime(
+            last_retry_diagnostic=record,
+            retry_diagnostics_file=str(RETRY_DIAGNOSTICS_FILE),
+        )
+        log.warning("retry-diagnostic %s", json.dumps(record, ensure_ascii=False))
+    except Exception as exc:
+        log.warning("retry diagnostic persistence failed: %r", exc)
 
 
 def touch_queue_heartbeat() -> None:
