@@ -8012,9 +8012,9 @@ def main() -> None:
             "R200 TEMP result destination support",
         ),
         (
-            "readsTemp && !tempAvailable",
+            "stage.resultArg != D3DTA_TEMP",
             PIPELINE_TRANSLATION_CPP,
-            "R200 uninitialized TEMP readiness gate",
+            "R201 CURRENT/TEMP destination allow-list",
         ),
         (
             "FixedFunctionUnsupportedResultArg;",
@@ -8042,14 +8042,14 @@ def main() -> None:
             "R200 TEMP positive probe",
         ),
         (
-            "R200 uninitialized D3DTA_TEMP read must fail closed",
+            "R201 default-zero D3DTA_TEMP read must remain exact",
             FIXED_FUNCTION_PIPELINE_PROBE,
-            "R200 uninitialized TEMP negative probe",
+            "R201 default-zero TEMP positive probe",
         ),
         (
-            "DX11 fixed-function RESULTARG TEMP register support R200: PASS",
+            "DX11 fixed-function TEMP default-zero semantics R201: PASS",
             FIXED_FUNCTION_PIPELINE_PROBE,
-            "R200 hosted probe completion marker",
+            "R201 hosted probe completion marker",
         ),
     ]
     missing_r173_resultarg = [
