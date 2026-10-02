@@ -189,6 +189,7 @@ namespace outrun::vr::dx11
             case D3DTOP_MODULATEALPHA_ADDCOLOR:
             case D3DTOP_MODULATECOLOR_ADDALPHA:
             case D3DTOP_MODULATEINVALPHA_ADDCOLOR:
+            case D3DTOP_MODULATEINVCOLOR_ADDALPHA:
             case D3DTOP_SUBTRACT:
                 return fixed_function_argument_uses_texture(arg1) ||
                        fixed_function_argument_uses_texture(arg2);
@@ -326,6 +327,15 @@ namespace outrun::vr::dx11
                 const auto firstAlpha = fixed_function_argument_expression(
                     arg1, stageIndex, ".a");
                 return first + " + (1.0 - " + firstAlpha + ") * " + second;
+            }
+            case D3DTOP_MODULATEINVCOLOR_ADDALPHA:
+            {
+                // R190: D3D9 defines this COLOROP-only operation as
+                // (1 - Arg1.rgb) * Arg2.rgb + Arg1.a.
+                const auto firstAlpha = fixed_function_argument_expression(
+                    arg1, stageIndex, ".a");
+                return "(1.0 - " + first + ") * " + second + " + " +
+                       firstAlpha;
             }
             case D3DTOP_SUBTRACT:
                 // R177: D3D9 defines SUBTRACT as component-wise Arg1 - Arg2.
@@ -525,6 +535,7 @@ namespace outrun::vr::dx11
             case D3DTOP_MODULATEALPHA_ADDCOLOR:
             case D3DTOP_MODULATECOLOR_ADDALPHA:
             case D3DTOP_MODULATEINVALPHA_ADDCOLOR:
+            case D3DTOP_MODULATEINVCOLOR_ADDALPHA:
                 // These Direct3D 9 operations are valid only for COLOROP.
                 if (alphaOperation)
                 {
