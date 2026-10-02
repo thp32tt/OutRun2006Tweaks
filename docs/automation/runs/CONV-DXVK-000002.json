@@ -6647,6 +6647,72 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authenticated frontier. Capture the mandatory 64-byte overlap at 0x001833EA..0x0018342A to complete the trailing 0x83 instruction, carry the currently empty unresolved-forward-target debt fail-closed, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_RAW_CALL_CENSUS_PREDICATE_SOURCE_COUPLING",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "dd0ccaa7f243e2b779d8b033ec77ef21f272f906",
+      "validation_bearing_result_sha": "dd0ccaa7f243e2b779d8b033ec77ef21f272f906",
+      "commit_message": "test: bind DXVK raw-call census predicates [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Hardened the dynamically discovered DXVK continuation proof contract so exhaustive raw-call census predicates remain source-coupled to each continuation's declared CALLS metadata and raw provenance candidate list instead of being replaceable by constants or unrelated predicates.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub AGENTS.md, branch-local run/lane state, regression/problem history and Issue #14; refreshed the moving same-JOB branch and avoided duplicate F70/F72/F73 frontier work completed concurrently."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Fresh verifier review found raw-call census gate names were required in proven and telemetry, but the predicate assignments themselves were not source-coupled; a constant or unrelated comparison could retain the gate name and fail open."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit dd0ccaa7f243e2b779d8b033ec77ef21f272f906 adds AST validation for empty and non-empty raw-call census predicates across dynamically discovered DXVK continuation proofs."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36993915976 job 110796157118 completed SUCCESS including Verify static disassembly contract and canonical EXE analysis. Backend Conversion Gate run 36993915950 job 110796157165 passed Verify backend disassembly contract and subsequent observed static/test steps; full job completion is not claimed."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit dd0ccaa7f243e2b779d8b033ec77ef21f272f906 contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5950029027 records implementation and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only hardening; no runtime DXVK payload, backend selector/deployment content, packaged binary, other backend branch or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted supplementally without replacing or rewinding the newer concurrently advancing canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_DISASM_CONTRACT",
+        "exact_sha": "dd0ccaa7f243e2b779d8b033ec77ef21f272f906",
+        "dxvk_canonical_evidence_run_id": 36993915976,
+        "dxvk_canonical_evidence_job_id": 110796157118,
+        "dxvk_canonical_evidence_conclusion": "success",
+        "static_disassembly_contract": "SUCCESS",
+        "canonical_exe_analysis": "SUCCESS",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "evidence_artifact_id": 11220972209,
+        "evidence_artifact_digest": "sha256:9457818bdc2a91d483c4ef0253890e14a5bfa4a7d1b01e899206ee5f65cce334",
+        "backend_conversion_gate_run_id": 36993915950,
+        "backend_conversion_gate_job_id": 110796157165,
+        "backend_disassembly_contract_step": "SUCCESS",
+        "backend_full_job_status_at_state_write": "IN_PROGRESS_NOT_CLAIMED_COMPLETE",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5950029027,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authenticated DXVK canonical frontier and continue its next runnable raw/proof/static unit; exhaustive raw-call census predicates are now source-coupled to declared CALLS metadata and raw provenance."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
