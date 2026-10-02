@@ -413,6 +413,7 @@ def main() -> None:
         "D3DSAMP_MAXMIPLEVEL": "R125 per-stage sampler most-detailed-mip observation",
         "D3DSAMP_ADDRESSU": "R81 per-stage sampler U addressing observation",
         "D3DSAMP_ADDRESSV": "R81 per-stage sampler V addressing observation",
+        "D3DSAMP_SRGBTEXTURE": "sampler sRGB decode provenance observation",
         "fixedFunctionStateCoverageExact": "R81 fixed-function coverage readiness evidence",
         "FixedFunctionStateCoverageExactSamples": "R81 complete FFP observation counter",
         "FixedFunctionStateCoverageFailureSamples": "R81 failed FFP observation counter",
@@ -3422,6 +3423,8 @@ def main() -> None:
         "fixed_function_shader_compile": "R85 per-signature compiler evidence",
         "samplerMin": "R81 per-stage sampler parser evidence",
         "samplerAddressV": "R81 per-stage sampler parser evidence",
+        "samplerBorderColor": "current per-stage sampler border-color parser evidence",
+        "samplerSrgb": "sampler sRGB decode parser evidence",
     }
     missing_analyzer = [
         meaning for token, meaning in analyzer_contract.items() if token not in analyzer
@@ -3552,6 +3555,40 @@ def main() -> None:
         raise SystemExit(
             "DX11 R160 sampler BORDER contract drift: "
             + ", ".join(missing_r160_sampler_border)
+        )
+
+    sampler_srgb_provenance_contract = [
+        ("FixedFunctionUnsupportedSamplerSrgb = 1u << 11",
+         PIPELINE_TRANSLATION_HPP, "sampler sRGB unsupported reason bit"),
+        ("DWORD srgbTexture = FALSE;", PIPELINE_TRANSLATION_HPP,
+         "sampler sRGB state provenance field"),
+        ("source.srgbTexture != FALSE", PIPELINE_TRANSLATION_CPP,
+         "sampler descriptor fail-closed sRGB gate"),
+        ("stage.srgbTexture != FALSE", PIPELINE_TRANSLATION_CPP,
+         "fixed-function readiness sRGB gate"),
+        ("FixedFunctionUnsupportedSamplerSrgb", PIPELINE_TRANSLATION_CPP,
+         "fixed-function readiness sRGB blocker"),
+        ("D3DSAMP_SRGBTEXTURE", RUNTIME_CENSUS,
+         "runtime census captures D3D9 sampler sRGB state"),
+        ("hash = hash_mix(hash, stage.srgbTexture);", RUNTIME_CENSUS,
+         "signature identity includes sampler sRGB state"),
+        ("sampler sRGB decode did not fail closed", SEMANTIC_SMOKE,
+         "semantic readiness negative sRGB probe"),
+        ("sampler owner rejects sRGB decode without sRGB SRV",
+         CONSTANT_BUFFER_PROBE, "hosted sampler-owner sRGB rejection"),
+        ("samplerSrgb", ANALYZER, "census analyzer exposes sampler sRGB state"),
+        ("samplerSrgb", ANALYZER_TEST,
+         "census analyzer regression covers sampler sRGB state"),
+    ]
+    missing_sampler_srgb_provenance = [
+        meaning
+        for token, source, meaning in sampler_srgb_provenance_contract
+        if token not in source
+    ]
+    if missing_sampler_srgb_provenance:
+        raise SystemExit(
+            "DX11 sampler sRGB provenance contract drift: "
+            + ", ".join(missing_sampler_srgb_provenance)
         )
 
     depth_bias_fail_closed_contract = [
