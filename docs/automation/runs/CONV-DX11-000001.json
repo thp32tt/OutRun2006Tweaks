@@ -5,7 +5,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "8b760190868471eb2b02273de53a7d07025847a1",
-  "state_parent_head": "d348f707d1ebea4d727f3e9e7488b97c69525bb2",
+  "state_parent_head": "1b64c8f751d0c07fc17594f5c20c03f3bb8736c2",
   "material_result_sha": "d879b6042908389444b45b0f040326855821d69b",
   "validation_bearing_sha": "d879b6042908389444b45b0f040326855821d69b",
   "runtime_validation": "UNTESTED",
@@ -273,8 +273,12 @@
           "reason": "Census/readiness telemetry and static guard only; no native Draw* routing, backend promotion, runtime test candidate or release package was requested or activated."
         },
         "C6_STATE": {
-          "status": "PERSISTING_WITH_STATE_COMMITS",
-          "exact_next_action": "Keep native Draw* disabled. Treat R120 as dormant census/readiness evidence only and continue from the latest branch HEAD with the next independent DX11 readiness gap; exhaustive exact-build census and Quest 3/VDXR parity remain required before activation."
+          "status": "COMPLETE_WITH_STATE_COMMITS",
+          "exact_next_action": "Keep native Draw* disabled. Treat R120 as dormant census/readiness evidence only and continue from the latest branch HEAD with the next independent DX11 readiness gap; exhaustive exact-build census and Quest 3/VDXR parity remain required before activation.",
+          "state_commits": [
+            "c8909f6af02d19b44b050a45098602faa6968955",
+            "0d2591802c33bc9c89078552426a50325a82e9a5"
+          ]
         }
       },
       "scope_guards": {
@@ -291,7 +295,8 @@
       "next_action": "Continue independent GitHub-only DX11 readiness work from the current branch HEAD without changing native activation gates.",
       "checkpoint": "C6_STATE",
       "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
-      "runtime_claim": "NONE"
+      "runtime_claim": "NONE",
+      "state_persisted": true
     }
   ],
   "latest_continuation_unit": "DX11_FIXED_FUNCTION_PIPELINE_CENSUS_ACCOUNTING_R120",
