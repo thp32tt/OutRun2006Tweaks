@@ -2958,6 +2958,41 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer raw continuation beginning at 0x0018307A with mandatory 89 overlap; canonical-validate provenance before exact decode and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_OVERLAP_EVIDENCE_RESULT_BINDING_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "4b7c2d0c6530e02a9f8754f5d1e1b5cd3204f813",
+      "validation_bearing_result_sha": "4b7c2d0c6530e02a9f8754f5d1e1b5cd3204f813",
+      "run_record_commit_sha": "c1c2a4239557cc774bb7ab3983525169428dfac0",
+      "commit_message": "test: bind DXVK overlap evidence bytes [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Static verifier now requires modern continuation overlap evidence to emit expected/actual overlap bytes and overlap booleans from the same local values used by fail-closed capture validation.",
+      "pipeline_status": "C0_C6_COMPLETE",
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "4b7c2d0c6530e02a9f8754f5d1e1b5cd3204f813",
+        "modern_overlap_stage_count": 11,
+        "source_audit_binding_failures": 0,
+        "dxvk_disassembly_evidence_run_id": 36985779879,
+        "dxvk_disassembly_evidence_job_id": 110770361061,
+        "backend_disassembly_contract": "PASS",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "artifact_id": 11217705987,
+        "artifact_digest": "sha256:51e43360420cb60ccc83d8ca1da5bf07c4ed3e5b6ccb08565219c31e1b75a75d",
+        "backend_conversion_gate_run_id": 36985779774,
+        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_CLAIMED_COMPLETE",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5948449828,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve this verifier guard and the newest authoritative canonical continuation frontier; do not weaken overlap evidence binding or infer runtime/render semantics."
     }
   ]
 }
