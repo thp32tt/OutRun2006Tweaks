@@ -603,6 +603,7 @@ int main()
         managedVertexReady.deviceMatches &&
         managedVertexReady.descriptorExact &&
         managedVertexReady.ready &&
+        managedVertexReady.role == ResourceRole::Vertex &&
         managedVertexReady.deviceGeneration == 1 &&
         managedVertexReady.shadowVersion == 1 &&
         managedVertexReady.mirrorGeneration == 1 &&
@@ -771,11 +772,77 @@ int main()
         managedIndexBuffer.mirror_readiness(d3d.device);
     require(
         managedIndexReady.ready &&
+        managedIndexReady.role == ResourceRole::Index &&
         managedIndexReady.snapshotToken != 0 &&
         managedIndexReady.mirrorInstanceGeneration == 1 &&
         managedIndexBuffer.validate_mirror_readiness_snapshot(
             d3d.device, managedIndexReady.snapshotToken),
         "R119 managed index-buffer mirror issues exact readiness snapshot");
+
+    const auto indexedGeometryReady =
+        compose_fixed_function_geometry_readiness(
+            managedVertexPostResetReady, true, managedIndexReady,
+            D3DPT_TRIANGLELIST);
+    require(
+        indexedGeometryReady.inputValid &&
+        indexedGeometryReady.vertexBufferReady &&
+        indexedGeometryReady.indexBufferRequired &&
+        indexedGeometryReady.indexBufferReady &&
+        indexedGeometryReady.topologyReady &&
+        indexedGeometryReady.componentSnapshotsPresent &&
+        indexedGeometryReady.ready &&
+        indexedGeometryReady.topology ==
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST &&
+        indexedGeometryReady.vertexBufferSnapshotToken ==
+            managedVertexPostResetReady.snapshotToken &&
+        indexedGeometryReady.indexBufferSnapshotToken ==
+            managedIndexReady.snapshotToken &&
+        indexedGeometryReady.snapshotToken != 0 &&
+        validate_fixed_function_geometry_snapshot(
+            managedVertexPostResetReady, true, managedIndexReady,
+            D3DPT_TRIANGLELIST, indexedGeometryReady.snapshotToken),
+        "R122 indexed geometry seals VB IB and topology snapshots");
+
+    const auto nonIndexedGeometryReady =
+        compose_fixed_function_geometry_readiness(
+            managedVertexPostResetReady, false, managedIndexReady,
+            D3DPT_TRIANGLESTRIP);
+    require(
+        nonIndexedGeometryReady.ready &&
+        !nonIndexedGeometryReady.indexBufferRequired &&
+        nonIndexedGeometryReady.indexBufferReady &&
+        nonIndexedGeometryReady.indexBufferSnapshotToken == 0 &&
+        nonIndexedGeometryReady.topology ==
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
+        "R122 non-indexed geometry ignores unrelated IB identity");
+
+    auto wrongVertexRole = managedVertexPostResetReady;
+    wrongVertexRole.role = ResourceRole::Index;
+    auto missingIndexReady = managedIndexReady;
+    missingIndexReady.ready = false;
+    missingIndexReady.snapshotToken = 0;
+    const auto wrongRoleGeometry =
+        compose_fixed_function_geometry_readiness(
+            wrongVertexRole, true, managedIndexReady, D3DPT_TRIANGLELIST);
+    const auto missingIndexGeometry =
+        compose_fixed_function_geometry_readiness(
+            managedVertexPostResetReady, true, missingIndexReady,
+            D3DPT_TRIANGLELIST);
+    const auto fanGeometry =
+        compose_fixed_function_geometry_readiness(
+            managedVertexPostResetReady, false, managedIndexReady,
+            D3DPT_TRIANGLEFAN);
+    require(
+        !wrongRoleGeometry.inputValid &&
+        !wrongRoleGeometry.ready &&
+        wrongRoleGeometry.snapshotToken == 0 &&
+        !missingIndexGeometry.ready &&
+        missingIndexGeometry.snapshotToken == 0 &&
+        !fanGeometry.topologyReady &&
+        !fanGeometry.ready &&
+        fanGeometry.snapshotToken == 0,
+        "R122 geometry fails closed on role IB or unowned fan expansion");
+
     NativeManagedBufferShadow invalidManagedBuffer;
     require(
         !invalidManagedBuffer.initialize(
@@ -1833,12 +1900,14 @@ int main()
 
     const auto drawReady =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairReady);
+            texturedActivation, renderStateRecreated, surfacePairReady,
+            indexedGeometryReady);
     require(
         drawReady.inputValid &&
         drawReady.activationReady &&
         drawReady.renderStateReady &&
         drawReady.surfacePairReady &&
+        drawReady.geometryReady &&
         drawReady.componentSnapshotsPresent &&
         drawReady.ready &&
         drawReady.activationSnapshotToken ==
@@ -1847,10 +1916,12 @@ int main()
             renderStateRecreated.snapshotToken &&
         drawReady.surfacePairSnapshotToken ==
             surfacePairReady.snapshotToken &&
+        drawReady.geometrySnapshotToken ==
+            indexedGeometryReady.snapshotToken &&
         drawReady.snapshotToken != 0 &&
         validate_fixed_function_draw_snapshot(
             texturedActivation, renderStateRecreated, surfacePairReady,
-            drawReady.snapshotToken),
+            indexedGeometryReady, drawReady.snapshotToken),
         "R120 draw readiness composes activation, render-state, and surface-pair snapshots");
 
     auto activationMissingSnapshot = texturedActivation;
@@ -1865,19 +1936,31 @@ int main()
     surfacePairNotReady.ready = false;
     const auto missingActivationDraw =
         compose_fixed_function_draw_readiness(
-            activationMissingSnapshot, renderStateRecreated, surfacePairReady);
+            activationMissingSnapshot, renderStateRecreated, surfacePairReady,
+            indexedGeometryReady);
     const auto missingRenderStateDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateMissingSnapshot, surfacePairReady);
+            texturedActivation, renderStateMissingSnapshot, surfacePairReady,
+            indexedGeometryReady);
     const auto pendingRenderStateDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateNotReady, surfacePairReady);
+            texturedActivation, renderStateNotReady, surfacePairReady,
+            indexedGeometryReady);
     const auto missingSurfacePairDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairMissingSnapshot);
+            texturedActivation, renderStateRecreated, surfacePairMissingSnapshot,
+            indexedGeometryReady);
     const auto pendingSurfacePairDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairNotReady);
+            texturedActivation, renderStateRecreated, surfacePairNotReady,
+            indexedGeometryReady);
+    auto geometryNotReady = indexedGeometryReady;
+    geometryNotReady.ready = false;
+    geometryNotReady.snapshotToken = 0;
+    const auto pendingGeometryDraw =
+        compose_fixed_function_draw_readiness(
+            texturedActivation, renderStateRecreated, surfacePairReady,
+            geometryNotReady);
     require(
         !missingActivationDraw.ready &&
         missingActivationDraw.snapshotToken == 0 &&
@@ -1888,42 +1971,64 @@ int main()
         !missingSurfacePairDraw.ready &&
         missingSurfacePairDraw.snapshotToken == 0 &&
         !pendingSurfacePairDraw.ready &&
-        pendingSurfacePairDraw.snapshotToken == 0,
+        pendingSurfacePairDraw.snapshotToken == 0 &&
+        !pendingGeometryDraw.ready &&
+        pendingGeometryDraw.snapshotToken == 0,
         "R120 draw readiness fails closed on missing component evidence");
 
     auto changedRenderStateIdentity = renderStateRecreated;
     changedRenderStateIdentity.snapshotToken ^= 0x9e3779b97f4a7c15ull;
     const auto changedDrawReady =
         compose_fixed_function_draw_readiness(
-            texturedActivation, changedRenderStateIdentity, surfacePairReady);
+            texturedActivation, changedRenderStateIdentity, surfacePairReady,
+            indexedGeometryReady);
     require(
         changedDrawReady.ready &&
         changedDrawReady.snapshotToken != 0 &&
         changedDrawReady.snapshotToken != drawReady.snapshotToken &&
         !validate_fixed_function_draw_snapshot(
             texturedActivation, changedRenderStateIdentity, surfacePairReady,
-            drawReady.snapshotToken) &&
+            indexedGeometryReady, drawReady.snapshotToken) &&
         validate_fixed_function_draw_snapshot(
             texturedActivation, changedRenderStateIdentity, surfacePairReady,
-            changedDrawReady.snapshotToken),
+            indexedGeometryReady, changedDrawReady.snapshotToken),
         "R120 draw snapshot changes with render-state identity");
 
     auto changedSurfacePairIdentity = surfacePairReady;
     changedSurfacePairIdentity.snapshotToken ^= 0x100000001b3ull;
     const auto changedSurfacePairDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, changedSurfacePairIdentity);
+            texturedActivation, renderStateRecreated, changedSurfacePairIdentity,
+            indexedGeometryReady);
     require(
         changedSurfacePairDraw.ready &&
         changedSurfacePairDraw.snapshotToken != 0 &&
         changedSurfacePairDraw.snapshotToken != drawReady.snapshotToken &&
         !validate_fixed_function_draw_snapshot(
             texturedActivation, renderStateRecreated, changedSurfacePairIdentity,
-            drawReady.snapshotToken) &&
+            indexedGeometryReady, drawReady.snapshotToken) &&
         validate_fixed_function_draw_snapshot(
             texturedActivation, renderStateRecreated, changedSurfacePairIdentity,
-            changedSurfacePairDraw.snapshotToken),
+            indexedGeometryReady, changedSurfacePairDraw.snapshotToken),
         "R120 draw snapshot changes with output-surface identity");
+
+    auto changedGeometryIdentity = indexedGeometryReady;
+    changedGeometryIdentity.snapshotToken ^= 0x9e3779b97f4a7c15ull;
+    const auto changedGeometryDraw =
+        compose_fixed_function_draw_readiness(
+            texturedActivation, renderStateRecreated, surfacePairReady,
+            changedGeometryIdentity);
+    require(
+        changedGeometryDraw.ready &&
+        changedGeometryDraw.snapshotToken != 0 &&
+        changedGeometryDraw.snapshotToken != drawReady.snapshotToken &&
+        !validate_fixed_function_draw_snapshot(
+            texturedActivation, renderStateRecreated, surfacePairReady,
+            changedGeometryIdentity, drawReady.snapshotToken) &&
+        validate_fixed_function_draw_snapshot(
+            texturedActivation, renderStateRecreated, surfacePairReady,
+            changedGeometryIdentity, changedGeometryDraw.snapshotToken),
+        "R122 draw snapshot changes with geometry identity");
 
     DevicePair pipelineOtherDevice = create_warp_device();
     auto changedLayout = inputLayout;
@@ -2177,5 +2282,6 @@ int main()
     std::cout << "DX11 fixed-function activation evidence composition R115: PASS\n";
     std::cout << "DX11 fixed-function render-state bundle R116: PASS\n";
     std::cout << "DX11 fixed-function draw readiness composition R120: PASS\n";
+    std::cout << "DX11 geometry-gated draw readiness R122: PASS\n";
     return 0;
 }

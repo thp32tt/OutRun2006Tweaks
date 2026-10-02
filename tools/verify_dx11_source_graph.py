@@ -3111,6 +3111,73 @@ def main() -> None:
                 "DX11 R116 render-state probe drift: " + meaning
             )
 
+    r122_geometry_header = {
+        "struct NativeFixedFunctionGeometryReadiness":
+            "R122 geometry readiness snapshot",
+        "ResourceRole role = ResourceRole::Vertex":
+            "R122 managed-buffer role identity",
+        "compose_fixed_function_geometry_readiness(":
+            "R122 geometry composition API",
+        "validate_fixed_function_geometry_snapshot(":
+            "R122 stale geometry validator",
+        "bool geometryReady{}":
+            "R122 final draw geometry prerequisite",
+        "std::uint64_t geometrySnapshotToken{}":
+            "R122 final draw geometry identity",
+    }
+    missing_r122_header = [
+        meaning
+        for token, meaning in r122_geometry_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r122_header:
+        raise SystemExit(
+            "DX11 R122 geometry header drift: "
+            + ", ".join(missing_r122_header)
+        )
+    for token, meaning in {
+        '#include "state_translation.hpp"':
+            "R122 primitive translator dependency",
+        "out.role = role_":
+            "R122 managed-buffer role propagation",
+        "const auto topology = translate_primitive(primitive)":
+            "R122 exact topology translation",
+        "vertexBuffer.role == ResourceRole::Vertex":
+            "R122 vertex-role gate",
+        "indexBuffer.role == ResourceRole::Index":
+            "R122 index-role gate",
+        "token, out.vertexBufferSnapshotToken":
+            "R122 vertex snapshot identity",
+        "token, out.indexBufferSnapshotToken":
+            "R122 index snapshot identity",
+        "geometry.ready && geometry.snapshotToken != 0":
+            "R122 geometry final-draw prerequisite",
+        "token, out.geometrySnapshotToken":
+            "R122 geometry final-draw token identity",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R122 geometry source drift: " + meaning
+            )
+    for token, meaning in {
+        "R122 indexed geometry seals VB IB and topology snapshots":
+            "R122 indexed geometry positive proof",
+        "R122 non-indexed geometry ignores unrelated IB identity":
+            "R122 optional-index proof",
+        "R122 geometry fails closed on role IB or unowned fan expansion":
+            "R122 geometry fail-closed proof",
+        "!pendingGeometryDraw.ready":
+            "R122 final draw missing-geometry rejection",
+        "R122 draw snapshot changes with geometry identity":
+            "R122 final draw geometry identity invalidation",
+        "DX11 geometry-gated draw readiness R122: PASS":
+            "R122 hosted probe marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R122 geometry probe drift: " + meaning
+            )
+
     r120_draw_readiness_header = {
         "struct NativeFixedFunctionDrawReadiness":
             "R120 composite draw readiness",
@@ -3120,6 +3187,8 @@ def main() -> None:
             "R120 explicit render-state readiness",
         "bool surfacePairReady{}":
             "R120 explicit output-surface readiness",
+        "bool geometryReady{}":
+            "R122 explicit geometry readiness",
         "std::uint64_t renderStateSnapshotToken{}":
             "R120 render-state snapshot identity",
         "std::uint64_t surfacePairSnapshotToken{}":
@@ -3157,6 +3226,8 @@ def main() -> None:
             "R120 render-state identity in draw token",
         "drawToken, out.surfacePairSnapshotToken":
             "R120 output-surface identity in draw token",
+        "token, out.geometrySnapshotToken":
+            "R122 geometry identity in draw token",
     }.items():
         if token not in NATIVE_BACKEND_CPP:
             raise SystemExit(

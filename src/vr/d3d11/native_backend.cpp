@@ -2,6 +2,7 @@
 
 #include "pipeline_translation.hpp"
 #include "resource_translation.hpp"
+#include "state_translation.hpp"
 #include "surface_mirror.hpp"
 
 #include <array>
@@ -643,6 +644,7 @@ NativeManagedBufferShadow::mirror_readiness(
     ID3D11Device* expectedDevice) const noexcept {
 
     NativeManagedBufferMirrorReadiness out{};
+    out.role = role_;
     out.deviceGeneration = lifetime_.deviceGeneration;
     out.shadowVersion = lifetime_.cpuShadowVersion;
     out.mirrorGeneration = lifetime_.mirrorGeneration;
@@ -1794,46 +1796,114 @@ bool validate_fixed_function_activation_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+NativeFixedFunctionGeometryReadiness
+compose_fixed_function_geometry_readiness(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    bool indexed,
+    const NativeManagedBufferMirrorReadiness& indexBuffer,
+    D3DPRIMITIVETYPE primitive) noexcept {
+    NativeFixedFunctionGeometryReadiness out{};
+    const auto topology = translate_primitive(primitive);
+    out.indexBufferRequired = indexed;
+    out.topology = topology.value;
+    out.vertexBufferSnapshotToken = vertexBuffer.snapshotToken;
+    out.indexBufferSnapshotToken = indexed ? indexBuffer.snapshotToken : 0;
+    out.inputValid =
+        vertexBuffer.inputValid &&
+        vertexBuffer.role == ResourceRole::Vertex &&
+        (!indexed ||
+         (indexBuffer.inputValid &&
+          indexBuffer.role == ResourceRole::Index));
+    out.vertexBufferReady =
+        vertexBuffer.ready && vertexBuffer.snapshotToken != 0;
+    out.indexBufferReady =
+        !indexed || (indexBuffer.ready && indexBuffer.snapshotToken != 0);
+    out.topologyReady =
+        topology.exact &&
+        topology.value != D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    out.componentSnapshotsPresent =
+        vertexBuffer.snapshotToken != 0 &&
+        (!indexed || indexBuffer.snapshotToken != 0);
+    out.ready =
+        out.inputValid &&
+        out.vertexBufferReady &&
+        out.indexBufferReady &&
+        out.topologyReady &&
+        out.componentSnapshotsPresent;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.vertexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(token, indexed ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.indexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.topology));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_geometry_snapshot(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    bool indexed,
+    const NativeManagedBufferMirrorReadiness& indexBuffer,
+    D3DPRIMITIVETYPE primitive,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = compose_fixed_function_geometry_readiness(
+        vertexBuffer, indexed, indexBuffer, primitive);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 NativeFixedFunctionDrawReadiness
 compose_fixed_function_draw_readiness(
     const NativeFixedFunctionActivationReadiness& activation,
     const NativeFixedFunctionRenderStateReadiness& renderState,
-    const NativeSurfacePairReadiness& surfacePair) noexcept {
+    const NativeSurfacePairReadiness& surfacePair,
+    const NativeFixedFunctionGeometryReadiness& geometry) noexcept {
     NativeFixedFunctionDrawReadiness out{};
     out.activationSnapshotToken = activation.snapshotToken;
     out.renderStateSnapshotToken = renderState.snapshotToken;
     out.surfacePairSnapshotToken = surfacePair.snapshotToken;
-
+    out.geometrySnapshotToken = geometry.snapshotToken;
     out.inputValid =
         activation.inputValid &&
         renderState.inputValid &&
-        surfacePair.inputValid;
+        surfacePair.inputValid &&
+        geometry.inputValid;
     out.activationReady =
         activation.ready && activation.snapshotToken != 0;
     out.renderStateReady =
         renderState.ready && renderState.snapshotToken != 0;
     out.surfacePairReady =
         surfacePair.ready && surfacePair.snapshotToken != 0;
+    out.geometryReady =
+        geometry.ready && geometry.snapshotToken != 0;
     out.componentSnapshotsPresent =
         activation.snapshotToken != 0 &&
         renderState.snapshotToken != 0 &&
-        surfacePair.snapshotToken != 0;
+        surfacePair.snapshotToken != 0 &&
+        geometry.snapshotToken != 0;
     out.ready =
         out.inputValid &&
         out.activationReady &&
         out.renderStateReady &&
         out.surfacePairReady &&
+        out.geometryReady &&
         out.componentSnapshotsPresent;
-
     if (out.ready) {
-        std::uint64_t drawToken = 0xcbf29ce484222325ull;
-        drawToken = mix_readiness_snapshot_token(
-            drawToken, out.activationSnapshotToken);
-        drawToken = mix_readiness_snapshot_token(
-            drawToken, out.renderStateSnapshotToken);
-        drawToken = mix_readiness_snapshot_token(
-            drawToken, out.surfacePairSnapshotToken);
-        out.snapshotToken = drawToken == 0 ? 1 : drawToken;
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.activationSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.renderStateSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.surfacePairSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.geometrySnapshotToken);
+        out.snapshotToken = token == 0 ? 1 : token;
     }
     return out;
 }
@@ -1842,12 +1912,12 @@ bool validate_fixed_function_draw_snapshot(
     const NativeFixedFunctionActivationReadiness& activation,
     const NativeFixedFunctionRenderStateReadiness& renderState,
     const NativeSurfacePairReadiness& surfacePair,
+    const NativeFixedFunctionGeometryReadiness& geometry,
     std::uint64_t snapshotToken) noexcept {
     if (snapshotToken == 0)
         return false;
-    const auto current =
-        compose_fixed_function_draw_readiness(
-            activation, renderState, surfacePair);
+    const auto current = compose_fixed_function_draw_readiness(
+        activation, renderState, surfacePair, geometry);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 

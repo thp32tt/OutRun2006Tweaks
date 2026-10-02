@@ -166,6 +166,7 @@ struct NativeManagedBufferMirrorReadiness
     bool deviceMatches{};
     bool descriptorExact{};
     bool ready{};
+    ResourceRole role = ResourceRole::Vertex;
     std::uint64_t deviceGeneration{};
     std::uint64_t shadowVersion{};
     std::uint64_t mirrorGeneration{};
@@ -578,6 +579,38 @@ compose_fixed_function_activation_readiness(
     const NativeManagedTextureStageReadiness& textureStages,
     std::uint64_t snapshotToken) noexcept;
 
+// R122 composes exact R119 managed VB/optional IB snapshots with exact
+// primitive topology. The R121 fan materializer still needs an owned/uploaded
+// generated IB, so triangle fans remain fail-closed at this readiness layer.
+struct NativeFixedFunctionGeometryReadiness {
+    bool inputValid{};
+    bool vertexBufferReady{};
+    bool indexBufferRequired{};
+    bool indexBufferReady{};
+    bool topologyReady{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    D3D11_PRIMITIVE_TOPOLOGY topology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    std::uint64_t vertexBufferSnapshotToken{};
+    std::uint64_t indexBufferSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionGeometryReadiness
+compose_fixed_function_geometry_readiness(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    bool indexed,
+    const NativeManagedBufferMirrorReadiness& indexBuffer,
+    D3DPRIMITIVETYPE primitive) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_geometry_snapshot(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    bool indexed,
+    const NativeManagedBufferMirrorReadiness& indexBuffer,
+    D3DPRIMITIVETYPE primitive,
+    std::uint64_t snapshotToken) noexcept;
+
 // R120 extends the R117 draw-readiness snapshot with the independently proven
 // R119 color/depth surface-pair identity. A native draw candidate is not ready
 // unless activation, render state, and the exact output-surface pair are all
@@ -587,11 +620,13 @@ struct NativeFixedFunctionDrawReadiness {
     bool activationReady{};
     bool renderStateReady{};
     bool surfacePairReady{};
+    bool geometryReady{};
     bool componentSnapshotsPresent{};
     bool ready{};
     std::uint64_t activationSnapshotToken{};
     std::uint64_t renderStateSnapshotToken{};
     std::uint64_t surfacePairSnapshotToken{};
+    std::uint64_t geometrySnapshotToken{};
     std::uint64_t snapshotToken{};
 };
 
@@ -599,12 +634,14 @@ struct NativeFixedFunctionDrawReadiness {
 compose_fixed_function_draw_readiness(
     const NativeFixedFunctionActivationReadiness& activation,
     const NativeFixedFunctionRenderStateReadiness& renderState,
-    const NativeSurfacePairReadiness& surfacePair) noexcept;
+    const NativeSurfacePairReadiness& surfacePair,
+    const NativeFixedFunctionGeometryReadiness& geometry) noexcept;
 
 [[nodiscard]] bool validate_fixed_function_draw_snapshot(
     const NativeFixedFunctionActivationReadiness& activation,
     const NativeFixedFunctionRenderStateReadiness& renderState,
     const NativeSurfacePairReadiness& surfacePair,
+    const NativeFixedFunctionGeometryReadiness& geometry,
     std::uint64_t snapshotToken) noexcept;
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
