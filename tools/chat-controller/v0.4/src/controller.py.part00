@@ -1494,6 +1494,25 @@ def conversion_validate_pipeline_result_commit(
     return len(reasons) == 0, reasons, record
 
 
+def conversion_lane_work_hint(branch: str) -> str:
+    """Inject the branch-local independent static target so C0 does not become a planning loop."""
+    state = github_json_file_at_ref("docs/CONVERSION_LANE_STATE.json", branch)
+    if not isinstance(state, dict):
+        return "CONTROLLER_SELECTED_WORK_TARGET=READ_LANE_STATE_AND_EXECUTE_INDEPENDENT_STATIC_NEXT_ACTION"
+    target = str(
+        state.get("independent_static_next_action")
+        or state.get("static_next_action")
+        or state.get("next_action")
+        or ""
+    ).strip()
+    if not target:
+        return "CONTROLLER_SELECTED_WORK_TARGET=SELECT_HIGHEST_PRIORITY_INDEPENDENT_STATIC_WORK_FROM_CURRENT_HEAD"
+    target = " ".join(target.split())
+    if len(target) > 420:
+        target = target[:417] + "..."
+    return "CONTROLLER_SELECTED_WORK_TARGET=" + target
+
+
 def localization_final_artwork_progress_hint(branch: str) -> str:
     """Compact authoritative convergence hint for producer/C dispatch prompts."""
     state = github_json_file_at_ref("localization/resume_state.json", branch)
@@ -1567,6 +1586,7 @@ def queue_dynamic_prefix() -> str:
             f"VR_PIPELINE_SCHEMA={CONVERSION_PIPELINE_SCHEMA_VERSION}; REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(or reasoned NOT_REQUIRED)→C6_STATE.",
             "RELEASE=full pipeline only; review/plan/state-only or one checkpoint is nonterminal. C2 needs substantive source/tool/test/workflow/disassembly evidence; runtime absence only keeps runtime=UNTESTED.",
             "RUN_RECORD=docs/automation/runs/<TASK_ID>.json with pipeline_schema_version, pipeline C0-C6, changed_paths/work_product, validation, state_persisted=true, next_action, runtime_validation.",
+            conversion_lane_work_hint(branch),
         ]
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B", "LOCALIZATION_E"}:
         lines += [
