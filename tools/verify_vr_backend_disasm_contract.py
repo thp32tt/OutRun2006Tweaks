@@ -157,6 +157,83 @@ def verify_dxvk_continuation_chain() -> None:
                 f"DXVK continuation {continuation_id} is missing its provenance collector"
             )
         provenance_source = function_source(provenance_collector_name)
+        provenance_ast = ast.parse(provenance_source)
+
+        # Keep raw evidence collection pinned to the exact continuation window.
+        # A collector can otherwise preserve a fail-closed captured predicate while
+        # accidentally reading probe/call-census bytes from a stale RVA or length.
+        # This is the raw provenance collector address coupling contract.
+        def single_assignment_value(local_name: str) -> ast.AST:
+            values = [
+                node.value
+                for node in ast.walk(provenance_ast)
+                if isinstance(node, ast.Assign)
+                and any(
+                    isinstance(target, ast.Name) and target.id == local_name
+                    for target in node.targets
+                )
+            ]
+            if len(values) != 1:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} raw provenance has ambiguous "
+                    f"{local_name} assignment: assignments={len(values)}"
+                )
+            return values[0]
+
+        def is_name(node: ast.AST, expected: str) -> bool:
+            return isinstance(node, ast.Name) and node.id == expected
+
+        probe_expr = single_assignment_value("probe")
+        expected_probe_len_name = f"{prefix}_PROBE_LEN"
+        probe_args_ok = bool(
+            isinstance(probe_expr, ast.Call)
+            and isinstance(probe_expr.func, ast.Attribute)
+            and isinstance(probe_expr.func.value, ast.Name)
+            and probe_expr.func.value.id == "pe"
+            and probe_expr.func.attr == "bytes_at_rva"
+            and len(probe_expr.args) == 2
+            and not probe_expr.keywords
+            and is_name(probe_expr.args[0], "target_rva")
+            and is_name(probe_expr.args[1], expected_probe_len_name)
+        )
+        if not probe_args_ok:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} raw provenance probe is not "
+                "address-coupled to target_rva and its exact PROBE_LEN symbol"
+            )
+
+        inbound_expr = single_assignment_value("inbound")
+        inbound_args_ok = bool(
+            isinstance(inbound_expr, ast.Call)
+            and isinstance(inbound_expr.func, ast.Name)
+            and inbound_expr.func.id == "collect_raw_inbound_rel32_candidates"
+            and len(inbound_expr.args) == 2
+            and not inbound_expr.keywords
+            and is_name(inbound_expr.args[0], "pe")
+            and is_name(inbound_expr.args[1], "target_rva")
+        )
+        if not inbound_args_ok:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} raw inbound census is not "
+                "address-coupled to target_rva"
+            )
+
+        outbound_expr = single_assignment_value("outbound")
+        outbound_args_ok = bool(
+            isinstance(outbound_expr, ast.Call)
+            and isinstance(outbound_expr.func, ast.Name)
+            and outbound_expr.func.id == "collect_raw_rel32_call_candidates"
+            and len(outbound_expr.args) == 3
+            and not outbound_expr.keywords
+            and is_name(outbound_expr.args[0], "pe")
+            and is_name(outbound_expr.args[1], "target_rva")
+            and is_name(outbound_expr.args[2], expected_probe_len_name)
+        )
+        if not outbound_args_ok:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} raw outbound census is not "
+                "address-coupled to target_rva and its exact PROBE_LEN symbol"
+            )
         conservative_raw_markers = (
             '"semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY"',
             '"call_semantics": "UNRESOLVED"',
@@ -255,7 +332,6 @@ def verify_dxvk_continuation_chain() -> None:
         # calling the right proof while accidentally replacing predecessor_exact
         # with a weaker predicate (or True) and silently break fail-closed chain
         # continuity.
-        provenance_ast = ast.parse(provenance_source)
         predecessor_exact_values = [
             node.value
             for node in ast.walk(provenance_ast)
