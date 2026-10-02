@@ -129,15 +129,6 @@ namespace OutRunVRStereo
             R33DepthStencilState.valid = false;
         }
 
-        bool TrackedDepthStencilHasStencil() noexcept
-        {
-            const auto depthTarget = MainDepthTargetSnapshot();
-            if (!TrackedDepthStencilSnapshot() || !depthTarget.known ||
-                TrackedDepthStencilSnapshot() != depthTarget.identity)
-                return false;
-            return FormatHasStencil(depthTarget.desc.Format);
-        }
-
         bool R33ReadDepthStencilWriteState(IDirect3DDevice9* device) noexcept
         {
             if (!device)

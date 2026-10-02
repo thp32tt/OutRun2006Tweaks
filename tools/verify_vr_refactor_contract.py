@@ -997,6 +997,9 @@ for forbidden in (
         errors.append(f"R33 retained direct lower-runtime dependency after Gate B facade extraction: {forbidden}")
 
 
+if "FormatHasStencil(" in r33:
+    errors.append("R33 regained direct base depth-format helper dependency")
+
 if errors:
     print("R84 refactor contract FAILED")
     for error in errors:
