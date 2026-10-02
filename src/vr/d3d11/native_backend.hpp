@@ -166,6 +166,7 @@ struct NativeManagedBufferMirrorReadiness
     bool lifetimeCurrent{};
     bool deviceMatches{};
     bool descriptorExact{};
+    bool mutationPlanExact{};
     bool ready{};
     ResourceRole role = ResourceRole::Vertex;
     std::uint64_t deviceGeneration{};

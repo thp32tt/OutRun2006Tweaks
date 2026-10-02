@@ -602,6 +602,7 @@ int main()
         managedVertexReady.lifetimeCurrent &&
         managedVertexReady.deviceMatches &&
         managedVertexReady.descriptorExact &&
+        managedVertexReady.mutationPlanExact &&
         managedVertexReady.ready &&
         managedVertexReady.role == ResourceRole::Vertex &&
         managedVertexReady.deviceGeneration == 1 &&
@@ -613,6 +614,9 @@ int main()
         managedVertexBuffer.validate_mirror_readiness_snapshot(
             d3d.device, managedVertexReady.snapshotToken),
         "R119 managed vertex-buffer mirror issues exact readiness snapshot");
+    require(
+        managedVertexReady.mutationPlanExact,
+        "R127 managed-buffer readiness consumes exact mutation plan");
     const auto managedVertexInitialToken = managedVertexReady.snapshotToken;
 
     DevicePair managedBufferOtherDevice = create_warp_device();

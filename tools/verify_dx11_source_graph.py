@@ -336,9 +336,24 @@ def main() -> None:
         for token, meaning in r125_managed_buffer_exact_consumer_contract.items()
         if token not in NATIVE_BACKEND_CPP
     ]
+    r127_managed_buffer_readiness_contract = {
+        "bool mutationPlanExact{};":
+            "R127 per-resource mutation-plan readiness bit",
+        "out.mutationPlanExact =":
+            "R127 managed-buffer readiness computes mutation-plan exactness",
+        "out.descriptorExact &&\n        out.mutationPlanExact &&":
+            "R127 readiness requires descriptor and mutation-plan exactness",
+        "R127 managed-buffer readiness consumes exact mutation plan":
+            "R127 hosted readiness probe assertion",
+    }
+    missing_r121_managed_buffer_plan += [
+        meaning
+        for token, meaning in r127_managed_buffer_readiness_contract.items()
+        if token not in (NATIVE_BACKEND_HPP + "\n" + NATIVE_BACKEND_CPP + "\n" + CONSTANT_BUFFER_PROBE)
+    ]
     if missing_r121_managed_buffer_plan:
         raise SystemExit(
-            "DX11 R121 managed-buffer mutation-plan contract drift: "
+            "DX11 R121/R127 managed-buffer mutation-plan contract drift: "
             + ", ".join(missing_r121_managed_buffer_plan)
         )
 

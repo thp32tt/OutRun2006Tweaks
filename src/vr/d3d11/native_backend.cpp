@@ -671,12 +671,19 @@ NativeManagedBufferShadow::mirror_readiness(
     }
     out.descriptorExact =
         out.deviceMatches && mirror_descriptor_exact(expectedDevice);
+    const auto mutationPlan = translate_buffer_mutation(
+        role_, D3DPOOL_MANAGED, source_usage_, 0);
+    out.mutationPlanExact =
+        mutationPlan.planExact &&
+        mutationPlan.requiresCpuShadow &&
+        mutationPlan.kind == BufferMutationUpdateKind::ManagedCpuShadowWrite;
     out.ready =
         out.shadowValid &&
         out.resourcesOwned &&
         out.lifetimeCurrent &&
         out.deviceMatches &&
         out.descriptorExact &&
+        out.mutationPlanExact &&
         out.mirrorInstanceGeneration != 0;
 
     if (out.ready) {
@@ -699,6 +706,8 @@ NativeManagedBufferShadow::mirror_readiness(
             snapshotToken, source_usage_);
         snapshotToken = mix_readiness_snapshot_token(
             snapshotToken, byte_width_);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, out.mutationPlanExact ? 1u : 0u);
         snapshotToken = mix_readiness_snapshot_token(
             snapshotToken, out.deviceGeneration);
         snapshotToken = mix_readiness_snapshot_token(
