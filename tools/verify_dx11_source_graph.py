@@ -3950,7 +3950,11 @@ def main() -> None:
         ("RESULTARG-001 TEMP result routing must block shader generation",
          SEMANTIC_SMOKE, "shader-generation fail-closed probe"),
         ("resultArg", analyzer, "census analyzer exposes RESULTARG"),
+        ("R(?:72|8[12345]|160|173) ffp signature", analyzer,
+         "R173 RESULTARG census parser version"),
         ("resultArg", analyzer_test, "census analyzer regression covers RESULTARG"),
+        ("VR DX11 R173 ffp signature#1 stage#2:", analyzer_test,
+         "R173 RESULTARG census fixture version"),
     ]
     missing_result_arg = [
         meaning for token, source, meaning in result_arg_fail_closed_contract
