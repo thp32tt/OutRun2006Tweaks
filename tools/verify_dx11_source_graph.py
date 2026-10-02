@@ -504,9 +504,35 @@ def main() -> None:
         for token, source, meaning in r130_surface_binding_contract
         if token not in source
     ]
+    r145_surface_live_binding_contract = [
+        ("struct NativeSurfacePairBindingReadiness", SURFACE_MIRROR_HPP,
+         "R145 live OM target readiness identity"),
+        ("NativeSurfacePairBinding::binding_readiness(", SURFACE_MIRROR_CPP,
+         "R145 live OM target observer"),
+        ("context->OMGetRenderTargets(", SURFACE_MIRROR_CPP,
+         "R145 live RTV/DSV readback"),
+        ("return binding_readiness(context, color, depth).ready;", SURFACE_MIRROR_CPP,
+         "R145 apply verifies effective OM target state"),
+        ("R145 live OM target binding seals exact RTV DSV identity", SURFACE_MIRROR_PROBE,
+         "R145 positive live target proof"),
+        ("R145 live OM target binding fails closed after RTV DSV unbind", SURFACE_MIRROR_PROBE,
+         "R145 live target unbind negative proof"),
+        ("R145 live OM target binding restores deterministic snapshot", SURFACE_MIRROR_PROBE,
+         "R145 deterministic target restore proof"),
+    ]
+    missing_surface_mirror_contract += [
+        meaning
+        for token, source, meaning in r145_surface_live_binding_contract
+        if token not in source
+    ]
+
     runtime_surface_binding_users = []
+    surface_binding_internal_sources = {
+        DX11 / "surface_mirror.cpp",
+        DX11 / "native_backend.cpp",
+    }
     for source_path in (ROOT / "src").rglob("*.cpp"):
-        if source_path == DX11 / "surface_mirror.cpp":
+        if source_path in surface_binding_internal_sources:
             continue
         if "NativeSurfacePairBinding" in source_path.read_text(
             encoding="utf-8", errors="ignore"
@@ -1856,6 +1882,34 @@ def main() -> None:
             + ", ".join(missing_final_vs_b0_transform)
         )
 
+    r145_final_live_om_target_contract = [
+        ("struct NativeFixedFunctionRenderTargetBoundDrawReadiness", NATIVE_BACKEND_HPP,
+         "R145 final live OM target readiness identity"),
+        ("compose_fixed_function_render_target_bound_draw_readiness(", NATIVE_BACKEND_CPP,
+         "R145 final live OM target composition"),
+        ("surfaceBinding.binding_readiness(", NATIVE_BACKEND_CPP,
+         "R145 final gate reobserves surface target owner"),
+        ("targetBinding.surfacePairSnapshotToken ==\n            draw.surfacePairSnapshotToken",
+         NATIVE_BACKEND_CPP,
+         "R145 target identity matches sealed draw surface pair"),
+        ("R145 final draw seals exact live OM RTV DSV identity", CONSTANT_BUFFER_PROBE,
+         "R145 positive final target-bound draw proof"),
+        ("R145 final draw fails closed after live OM target unbind", CONSTANT_BUFFER_PROBE,
+         "R145 final target drift negative proof"),
+        ("R145 live OM target restore reproduces final draw snapshot", CONSTANT_BUFFER_PROBE,
+         "R145 deterministic final target restore proof"),
+    ]
+    missing_r145_final_live_om_target = [
+        meaning
+        for token, source, meaning in r145_final_live_om_target_contract
+        if token not in source
+    ]
+    if missing_r145_final_live_om_target:
+        raise SystemExit(
+            "DX11 R145 final live OM target contract drift: "
+            + ", ".join(missing_r145_final_live_om_target)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
@@ -1873,6 +1927,8 @@ def main() -> None:
             or "validate_fixed_function_complete_bound_draw_snapshot(" in runtime_source
             or "compose_fixed_function_fully_bound_draw_readiness(" in runtime_source
             or "validate_fixed_function_fully_bound_draw_snapshot(" in runtime_source
+            or "compose_fixed_function_render_target_bound_draw_readiness(" in runtime_source
+            or "validate_fixed_function_render_target_bound_draw_snapshot(" in runtime_source
             or "upload_transform_for_observation(" in runtime_source
             or "compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(" in runtime_source
             or "validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(" in runtime_source
@@ -1891,7 +1947,7 @@ def main() -> None:
             )
     if runtime_textured_draw_users:
         raise SystemExit(
-            "DX11 R132/R133/R134/R136/R137/R138/R139/R140/R141/R142/R143/R144 dormant binding readiness gained a production "
+            "DX11 R132/R133/R134/R136/R137/R138/R139/R140/R141/R142/R143/R144/R145 dormant binding readiness gained a production "
             "caller before activation gate: " + ", ".join(runtime_textured_draw_users)
         )
 
