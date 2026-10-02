@@ -3509,7 +3509,7 @@
         },
         "C3_VALIDATE": {
           "status": "COMPLETE",
-          "evidence": "Exact-SHA HUD Inspector run 36987677912 / static-exe-analysis job 110776366478 SUCCESS."
+          "evidence": "Exact result-SHA validation complete: DXVK Canonical Disassembly Evidence 36987670992/110776308928 SUCCESS, OutRun EXE HUD Inspector 36987677912/110776366478 SUCCESS, and Backend Conversion Gate 36987671001/110776299445 SUCCESS including Win32 configure/build, binary existence and artifact upload."
         },
         "C4_COMMIT": {
           "status": "COMPLETE",
@@ -3522,11 +3522,11 @@
         "C6_STATE": {
           "status": "COMPLETE",
           "state_persisted": true,
-          "evidence": "Durable task record d48123266d3d040294ef5d611448d143fbab2c79 plus this lane mirror."
+          "evidence": "Durable task record d48123266d3d040294ef5d611448d143fbab2c79 plus lane mirror, with exact-SHA full-validation finalization in dbf945c6323a0838ef617e0ee382ecf7ad09026f."
         }
       },
       "validation": {
-        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BUILD",
         "exact_sha": "3234252f267a5a3a057f24b6900aa1878231f1ce",
         "hud_inspector_run_id": 36987677912,
         "static_exe_analysis_job_id": 110776366478,
@@ -3546,7 +3546,19 @@
         "raw_call_census_matches": true,
         "artifact_id": 11218192408,
         "artifact_digest": "sha256:2e78b8888670e1e150c9ad649c676312f66b6560b520138bb5c4b77617cc2b87",
-        "runtime_validation": "UNTESTED"
+        "runtime_validation": "UNTESTED",
+        "dxvk_disassembly_evidence_run_id": 36987670992,
+        "dxvk_disassembly_evidence_job_id": 110776308928,
+        "backend_conversion_gate_run_id": 36987671001,
+        "backend_conversion_gate_job_id": 110776299445,
+        "backend_conversion_gate_conclusion": "success",
+        "backend_disassembly_contract": "PASS",
+        "configure_win32": "PASS",
+        "build_win32": "PASS",
+        "binary_exists": "PASS",
+        "artifact_upload": "PASS",
+        "backend_artifact_id": 11218282768,
+        "backend_artifact_digest": "sha256:b56fa46a0b9854abd626afc44563d7a2679bceb3d40c706a3c0f7d2dcb2e90f1"
       },
       "issue14_comment_id": 5948761716,
       "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
@@ -3554,7 +3566,10 @@
       "semantic_promotion": "BOUNDED_CONTROL_FLOW_ONLY",
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
-      "exact_next_action": "Preserve any newer branch-authoritative frontier. If no newer continuation supersedes 0x00183173, capture the next bounded canonical window there and keep higher-level semantics unresolved."
+      "exact_next_action": "Preserve any newer branch-authoritative frontier. If no newer continuation supersedes 0x00183173, capture the next bounded canonical window there and keep higher-level semantics unresolved.",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BUILD",
+      "run_record_validation_finalization_sha": "dbf945c6323a0838ef617e0ee382ecf7ad09026f",
+      "issue14_validation_comment_id": 5948859039
     },
     {
       "unit_id": "DXVK_LOOP_FAMILY_BRANCH_DECLARATION_GUARD",
