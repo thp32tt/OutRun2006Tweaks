@@ -1,0 +1,10 @@
+{
+  "job_id": "LOC-B-000002",
+  "output_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/59A79158_256x512.dds",
+  "sha256": "fa93090c5fe818b2006040dde1515c4027b7292504d5d4f785521fd3991e10ab",
+  "size": 8388736,
+  "encoding": "xz+base64",
+  "parts": [
+    "payload.part000"
+  ]
+}
