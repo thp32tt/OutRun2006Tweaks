@@ -1682,6 +1682,48 @@ compose_fixed_function_direct_draw_dispatch_readiness(
     INT baseVertexLocation,
     std::uint64_t snapshotToken) noexcept;
 
+// R149 preserves the D3D9 DrawIndexedPrimitive source-range arguments before
+// any native DrawIndexed activation. D3D11 drops MinVertexIndex/NumVertices
+// from the dispatch API, so this dormant token keeps BaseVertexIndex,
+// MinVertexIndex, NumVertices, StartIndex and PrimitiveCount stale-resistant.
+// It proves only numeric/range identity; it does not claim source index values
+// have been scanned against the declared vertex range.
+struct NativeFixedFunctionIndexedSourceRangeReadiness {
+    bool inputValid{};
+    bool primitiveExact{};
+    bool vertexRangeExact{};
+    bool indexRangeExact{};
+    bool ready{};
+    D3D11_PRIMITIVE_TOPOLOGY topology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    UINT primitiveCount{};
+    UINT elementCount{};
+    INT baseVertexIndex{};
+    UINT minVertexIndex{};
+    UINT numVertices{};
+    UINT maxVertexIndex{};
+    UINT startIndex{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionIndexedSourceRangeReadiness
+compose_fixed_function_indexed_source_range_readiness(
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    INT baseVertexIndex,
+    UINT minVertexIndex,
+    UINT numVertices,
+    UINT startIndex) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_indexed_source_range_snapshot(
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    INT baseVertexIndex,
+    UINT minVertexIndex,
+    UINT numVertices,
+    UINT startIndex,
+    std::uint64_t snapshotToken) noexcept;
+
 // R148 seals the eventual DrawIndexed tuple for generated triangle fans after
 // the R146 live IA/VS-b0/OM proof. This remains dormant evidence only and does
 // not issue DrawIndexed or enable NativeDrawPathActive.
