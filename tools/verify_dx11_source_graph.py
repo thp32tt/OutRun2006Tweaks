@@ -4316,6 +4316,84 @@ def main() -> None:
                 "DX11 R122 geometry probe drift: " + meaning
             )
 
+    r139_live_geometry_binding_contract = [
+        (
+            "struct NativeFixedFunctionGeometryBindingReadiness",
+            NATIVE_BACKEND_HPP,
+            "R139 live IA geometry binding readiness",
+        ),
+        (
+            "validate_fixed_function_direct_geometry_readiness_integrity(",
+            NATIVE_BACKEND_CPP,
+            "R139 direct geometry self-integrity validator",
+        ),
+        (
+            "context->IASetVertexBuffers(",
+            NATIVE_BACKEND_CPP,
+            "R139 exact IA vertex-buffer bind",
+        ),
+        (
+            "context->IASetIndexBuffer(",
+            NATIVE_BACKEND_CPP,
+            "R139 exact IA index-buffer bind",
+        ),
+        (
+            "context->IASetPrimitiveTopology(geometry.topology);",
+            NATIVE_BACKEND_CPP,
+            "R139 exact IA topology bind",
+        ),
+        (
+            "context->IAGetVertexBuffers(",
+            NATIVE_BACKEND_CPP,
+            "R139 live IA vertex-buffer readback",
+        ),
+        (
+            "context->IAGetIndexBuffer(",
+            NATIVE_BACKEND_CPP,
+            "R139 live IA index-buffer readback",
+        ),
+        (
+            "context->IAGetPrimitiveTopology(",
+            NATIVE_BACKEND_CPP,
+            "R139 live IA topology readback",
+        ),
+        (
+            "R139 live IA observer seals VB IB stride offsets and topology",
+            CONSTANT_BUFFER_PROBE,
+            "R139 positive indexed IA proof",
+        ),
+        (
+            "R139 live IA topology drift invalidates geometry binding snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R139 live topology drift fail-closed proof",
+        ),
+        (
+            "R139 non-indexed live IA binding is exact and index-free",
+            CONSTANT_BUFFER_PROBE,
+            "R139 non-indexed IA proof",
+        ),
+        (
+            "R139 copied geometry topology drift fails closed before IA mutation",
+            CONSTANT_BUFFER_PROBE,
+            "R139 copied-geometry integrity proof",
+        ),
+        (
+            "R139 unsupported IA index format fails closed",
+            CONSTANT_BUFFER_PROBE,
+            "R139 unsupported index format proof",
+        ),
+    ]
+    missing_r139_live_geometry_binding = [
+        meaning
+        for token, source, meaning in r139_live_geometry_binding_contract
+        if token not in source
+    ]
+    if missing_r139_live_geometry_binding:
+        raise SystemExit(
+            "DX11 R139 live IA geometry binding contract drift: "
+            + ", ".join(missing_r139_live_geometry_binding)
+        )
+
     r124_output_state_header = {
         "struct NativeFixedFunctionOutputStateReadiness":
             "R124 output-state readiness snapshot",

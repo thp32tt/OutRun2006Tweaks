@@ -992,6 +992,131 @@ int main()
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
         "R122 non-indexed geometry ignores unrelated IB identity");
 
+    constexpr UINT geometryVertexStride = 16u;
+    constexpr UINT geometryVertexOffset = 0u;
+    constexpr UINT geometryIndexOffset = 0u;
+    require(
+        outrun::vr::dx11::
+            validate_fixed_function_direct_geometry_readiness_integrity(
+                indexedGeometryReady) &&
+        outrun::vr::dx11::
+            validate_fixed_function_direct_geometry_readiness_integrity(
+                nonIndexedGeometryReady),
+        "R139 direct geometry readiness seals copied struct identity");
+
+    require(
+        outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+            d3d.context, indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset),
+        "R139 direct indexed geometry binds exact IA state");
+    const auto indexedGeometryBinding =
+        outrun::vr::dx11::observe_fixed_function_geometry_binding(
+            d3d.context, indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+    require(
+        indexedGeometryBinding.inputValid &&
+        indexedGeometryBinding.geometryReady &&
+        indexedGeometryBinding.contextMatches &&
+        indexedGeometryBinding.vertexBufferCurrent &&
+        indexedGeometryBinding.indexBufferCurrent &&
+        indexedGeometryBinding.vertexBufferBoundExact &&
+        indexedGeometryBinding.indexBufferBoundExact &&
+        indexedGeometryBinding.topologyBoundExact &&
+        indexedGeometryBinding.ready &&
+        indexedGeometryBinding.indexed &&
+        indexedGeometryBinding.geometrySnapshotToken ==
+            indexedGeometryReady.snapshotToken &&
+        indexedGeometryBinding.vertexBufferSnapshotToken ==
+            managedVertexPostResetReady.snapshotToken &&
+        indexedGeometryBinding.indexBufferSnapshotToken ==
+            managedIndexReady.snapshotToken &&
+        indexedGeometryBinding.vertexStride == geometryVertexStride &&
+        indexedGeometryBinding.indexFormat == DXGI_FORMAT_R16_UINT &&
+        indexedGeometryBinding.topology ==
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST &&
+        indexedGeometryBinding.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_fixed_function_geometry_binding_snapshot(
+            d3d.context, indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            indexedGeometryBinding.snapshotToken),
+        "R139 live IA observer seals VB IB stride offsets and topology");
+
+    d3d.context->IASetPrimitiveTopology(
+        D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    const auto driftedGeometryBinding =
+        outrun::vr::dx11::observe_fixed_function_geometry_binding(
+            d3d.context, indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+    require(
+        driftedGeometryBinding.inputValid &&
+        driftedGeometryBinding.geometryReady &&
+        driftedGeometryBinding.vertexBufferBoundExact &&
+        driftedGeometryBinding.indexBufferBoundExact &&
+        !driftedGeometryBinding.topologyBoundExact &&
+        !driftedGeometryBinding.ready &&
+        driftedGeometryBinding.snapshotToken == 0 &&
+        !outrun::vr::dx11::validate_fixed_function_geometry_binding_snapshot(
+            d3d.context, indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            indexedGeometryBinding.snapshotToken),
+        "R139 live IA topology drift invalidates geometry binding snapshot");
+
+    require(
+        outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+            d3d.context, nonIndexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            nullptr, DXGI_FORMAT_UNKNOWN, 0),
+        "R139 non-indexed geometry clears unrelated IA index binding");
+    const auto nonIndexedGeometryBinding =
+        outrun::vr::dx11::observe_fixed_function_geometry_binding(
+            d3d.context, nonIndexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            nullptr, DXGI_FORMAT_UNKNOWN, 0);
+    require(
+        nonIndexedGeometryBinding.ready &&
+        !nonIndexedGeometryBinding.indexed &&
+        nonIndexedGeometryBinding.indexBufferCurrent &&
+        nonIndexedGeometryBinding.indexBufferBoundExact &&
+        nonIndexedGeometryBinding.topology ==
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP &&
+        nonIndexedGeometryBinding.snapshotToken != 0,
+        "R139 non-indexed live IA binding is exact and index-free");
+
+    auto forgedDirectGeometry = indexedGeometryReady;
+    forgedDirectGeometry.topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+    require(
+        !outrun::vr::dx11::
+            validate_fixed_function_direct_geometry_readiness_integrity(
+                forgedDirectGeometry) &&
+        !outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+            d3d.context, forgedDirectGeometry, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset),
+        "R139 copied geometry topology drift fails closed before IA mutation");
+    require(
+        !outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+            d3d.context, indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R8_UINT, geometryIndexOffset),
+        "R139 unsupported IA index format fails closed");
+
+    require(
+        outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+            d3d.context, indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset) &&
+        outrun::vr::dx11::validate_fixed_function_geometry_binding_snapshot(
+            d3d.context, indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            indexedGeometryBinding.snapshotToken),
+        "R139 exact indexed IA binding restores deterministic snapshot");
+
     auto wrongVertexRole = managedVertexPostResetReady;
     wrongVertexRole.role = ResourceRole::Index;
     auto missingIndexReady = managedIndexReady;

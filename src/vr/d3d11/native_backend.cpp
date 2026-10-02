@@ -2254,6 +2254,278 @@ bool validate_fixed_function_geometry_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+bool validate_fixed_function_direct_geometry_readiness_integrity(
+    const NativeFixedFunctionGeometryReadiness& geometry) noexcept {
+    if (!geometry.inputValid ||
+        !geometry.vertexBufferReady ||
+        !geometry.indexBufferReady ||
+        !geometry.topologyReady ||
+        !geometry.componentSnapshotsPresent ||
+        !geometry.ready ||
+        geometry.generatedIndexBufferRequired ||
+        geometry.generatedIndexBufferReady ||
+        geometry.generatedIndexBufferMatchesDraw ||
+        geometry.generatedIndexBufferSnapshotToken != 0 ||
+        geometry.vertexBufferSnapshotToken == 0 ||
+        geometry.topology == D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED ||
+        geometry.snapshotToken == 0)
+        return false;
+
+    if (geometry.indexBufferRequired) {
+        if (geometry.indexBufferSnapshotToken == 0)
+            return false;
+    } else if (geometry.indexBufferSnapshotToken != 0) {
+        return false;
+    }
+
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(
+        token, geometry.vertexBufferSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, geometry.indexBufferRequired ? 1u : 0u);
+    token = mix_readiness_snapshot_token(
+        token, geometry.indexBufferSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, static_cast<std::uint32_t>(geometry.topology));
+    token = token == 0 ? 1 : token;
+    return token == geometry.snapshotToken;
+}
+
+NativeFixedFunctionGeometryBindingReadiness
+observe_fixed_function_geometry_binding(
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset) noexcept {
+    NativeFixedFunctionGeometryBindingReadiness out{};
+    out.indexed = geometry.indexBufferRequired;
+    out.vertexStride = vertexStride;
+    out.vertexOffset = vertexOffset;
+    out.indexFormat = indexFormat;
+    out.indexOffset = indexOffset;
+    out.topology = geometry.topology;
+    out.geometrySnapshotToken = geometry.snapshotToken;
+    out.vertexBufferSnapshotToken = geometry.vertexBufferSnapshotToken;
+    out.indexBufferSnapshotToken = geometry.indexBufferSnapshotToken;
+
+    const bool indexFormatExact =
+        indexFormat == DXGI_FORMAT_R16_UINT ||
+        indexFormat == DXGI_FORMAT_R32_UINT;
+    const UINT indexElementBytes =
+        indexFormat == DXGI_FORMAT_R16_UINT ? 2u :
+        indexFormat == DXGI_FORMAT_R32_UINT ? 4u : 0u;
+    const bool indexShapeValid =
+        out.indexed
+            ? indexBuffer != nullptr &&
+              indexFormatExact &&
+              indexElementBytes != 0 &&
+              (indexOffset % indexElementBytes) == 0
+            : indexBuffer == nullptr &&
+              indexFormat == DXGI_FORMAT_UNKNOWN &&
+              indexOffset == 0;
+
+    out.inputValid =
+        context != nullptr &&
+        vertexStride != 0 &&
+        indexShapeValid &&
+        validate_fixed_function_direct_geometry_readiness_integrity(geometry);
+    if (!out.inputValid)
+        return out;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    out.contextMatches =
+        contextDevice &&
+        vertexBuffer.mirror_device() == contextDevice.Get() &&
+        (!out.indexed ||
+         (indexBuffer &&
+          indexBuffer->mirror_device() == contextDevice.Get()));
+    if (!out.contextMatches)
+        return out;
+
+    const auto currentVertex =
+        vertexBuffer.mirror_readiness(contextDevice.Get());
+    out.vertexBufferCurrent =
+        currentVertex.ready &&
+        currentVertex.role == ResourceRole::Vertex &&
+        currentVertex.snapshotToken == geometry.vertexBufferSnapshotToken;
+
+    out.indexBufferCurrent = !out.indexed;
+    if (out.indexed && indexBuffer) {
+        const auto currentIndex =
+            indexBuffer->mirror_readiness(contextDevice.Get());
+        out.indexBufferCurrent =
+            currentIndex.ready &&
+            currentIndex.role == ResourceRole::Index &&
+            currentIndex.snapshotToken == geometry.indexBufferSnapshotToken;
+    }
+
+    out.geometryReady =
+        out.vertexBufferCurrent &&
+        out.indexBufferCurrent;
+    if (!out.geometryReady)
+        return out;
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer> observedVertexBuffer;
+    UINT observedStride = 0;
+    UINT observedVertexOffset = 0;
+    context->IAGetVertexBuffers(
+        0, 1, observedVertexBuffer.ReleaseAndGetAddressOf(),
+        &observedStride, &observedVertexOffset);
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer> observedIndexBuffer;
+    DXGI_FORMAT observedIndexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT observedIndexOffset = 0;
+    context->IAGetIndexBuffer(
+        observedIndexBuffer.ReleaseAndGetAddressOf(),
+        &observedIndexFormat, &observedIndexOffset);
+
+    D3D11_PRIMITIVE_TOPOLOGY observedTopology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    context->IAGetPrimitiveTopology(&observedTopology);
+
+    out.vertexBufferBoundExact =
+        observedVertexBuffer.Get() == vertexBuffer.mirror_buffer() &&
+        observedStride == vertexStride &&
+        observedVertexOffset == vertexOffset;
+    out.indexBufferBoundExact =
+        out.indexed
+            ? observedIndexBuffer.Get() == indexBuffer->mirror_buffer() &&
+              observedIndexFormat == indexFormat &&
+              observedIndexOffset == indexOffset
+            : observedIndexBuffer.Get() == nullptr &&
+              observedIndexFormat == DXGI_FORMAT_UNKNOWN &&
+              observedIndexOffset == 0;
+    out.topologyBoundExact = observedTopology == geometry.topology;
+    out.ready =
+        out.geometryReady &&
+        out.contextMatches &&
+        out.vertexBufferBoundExact &&
+        out.indexBufferBoundExact &&
+        out.topologyBoundExact;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.geometrySnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.vertexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.indexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(context)));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(
+                    observedVertexBuffer.Get())));
+        token = mix_readiness_snapshot_token(token, observedStride);
+        token = mix_readiness_snapshot_token(token, observedVertexOffset);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(
+                    observedIndexBuffer.Get())));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(observedIndexFormat));
+        token = mix_readiness_snapshot_token(token, observedIndexOffset);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(observedTopology));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool bind_fixed_function_geometry_for_observation(
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset) noexcept {
+    if (!context ||
+        vertexStride == 0 ||
+        !validate_fixed_function_direct_geometry_readiness_integrity(geometry))
+        return false;
+
+    const bool indexed = geometry.indexBufferRequired;
+    const UINT indexElementBytes =
+        indexFormat == DXGI_FORMAT_R16_UINT ? 2u :
+        indexFormat == DXGI_FORMAT_R32_UINT ? 4u : 0u;
+    if (indexed) {
+        if (!indexBuffer ||
+            indexElementBytes == 0 ||
+            (indexOffset % indexElementBytes) != 0)
+            return false;
+    } else if (indexBuffer ||
+               indexFormat != DXGI_FORMAT_UNKNOWN ||
+               indexOffset != 0) {
+        return false;
+    }
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    if (!contextDevice ||
+        vertexBuffer.mirror_device() != contextDevice.Get())
+        return false;
+
+    const auto currentVertex =
+        vertexBuffer.mirror_readiness(contextDevice.Get());
+    if (!currentVertex.ready ||
+        currentVertex.role != ResourceRole::Vertex ||
+        currentVertex.snapshotToken != geometry.vertexBufferSnapshotToken)
+        return false;
+
+    if (indexed) {
+        if (indexBuffer->mirror_device() != contextDevice.Get())
+            return false;
+        const auto currentIndex =
+            indexBuffer->mirror_readiness(contextDevice.Get());
+        if (!currentIndex.ready ||
+            currentIndex.role != ResourceRole::Index ||
+            currentIndex.snapshotToken != geometry.indexBufferSnapshotToken)
+            return false;
+    }
+
+    ID3D11Buffer* vertex = vertexBuffer.mirror_buffer();
+    context->IASetVertexBuffers(
+        0, 1, &vertex, &vertexStride, &vertexOffset);
+    if (indexed) {
+        context->IASetIndexBuffer(
+            indexBuffer->mirror_buffer(), indexFormat, indexOffset);
+    } else {
+        context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+    }
+    context->IASetPrimitiveTopology(geometry.topology);
+
+    return observe_fixed_function_geometry_binding(
+        context, geometry, vertexBuffer, vertexStride, vertexOffset,
+        indexBuffer, indexFormat, indexOffset).ready;
+}
+
+bool validate_fixed_function_geometry_binding_snapshot(
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = observe_fixed_function_geometry_binding(
+        context, geometry, vertexBuffer, vertexStride, vertexOffset,
+        indexBuffer, indexFormat, indexOffset);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 NativeFixedFunctionGeometryReadiness
 compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
     const NativeManagedBufferMirrorReadiness& vertexBuffer,

@@ -712,6 +712,68 @@ compose_fixed_function_geometry_readiness(
     D3DPRIMITIVETYPE primitive,
     std::uint64_t snapshotToken) noexcept;
 
+// R139 seals the direct R122 managed-buffer geometry snapshot against copied
+// struct drift, then observes the effective live IA slot-0 VB/optional IB and
+// primitive topology. Generated triangle-fan IBs remain fail-closed here until
+// their owning buffer is wired through the same live-binding contract.
+[[nodiscard]] bool validate_fixed_function_direct_geometry_readiness_integrity(
+    const NativeFixedFunctionGeometryReadiness& geometry) noexcept;
+
+struct NativeFixedFunctionGeometryBindingReadiness {
+    bool inputValid{};
+    bool geometryReady{};
+    bool contextMatches{};
+    bool vertexBufferCurrent{};
+    bool indexBufferCurrent{};
+    bool vertexBufferBoundExact{};
+    bool indexBufferBoundExact{};
+    bool topologyBoundExact{};
+    bool ready{};
+    bool indexed{};
+    UINT vertexStride{};
+    UINT vertexOffset{};
+    DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT indexOffset{};
+    D3D11_PRIMITIVE_TOPOLOGY topology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    std::uint64_t geometrySnapshotToken{};
+    std::uint64_t vertexBufferSnapshotToken{};
+    std::uint64_t indexBufferSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] bool bind_fixed_function_geometry_for_observation(
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset) noexcept;
+
+[[nodiscard]] NativeFixedFunctionGeometryBindingReadiness
+observe_fixed_function_geometry_binding(
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_geometry_binding_snapshot(
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset,
+    std::uint64_t snapshotToken) noexcept;
+
 // R128 consumes an R126 generated IB only for non-indexed D3D9 triangle fans.
 // Indexed fans deliberately remain on the direct R122 fail-closed path until
 // source-index provenance is sealed separately.
