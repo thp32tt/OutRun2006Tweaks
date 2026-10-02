@@ -3879,6 +3879,80 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authenticated DXVK canonical frontier and this prefixed-direct-branch census invariant; continue the next independent static/raw/proof unit without promoting function/render/HUD/runtime semantics."
+    },
+    {
+      "unit_id": "DXVK_F55_CANONICAL_CONTROL_FLOW_0x183173_TO_0x1831B2",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "2ab1dcbe85c207434790d572df19b8ba44af96d7",
+      "validation_bearing_result_sha": "df20df24e62766c2a7b1b893c23de8c8322dffdc",
+      "run_record_commit_sha": "497cb7fa76266d7547ab980f392068f330641284",
+      "commit_message": "dxvk: prove canonical 0x183173 control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Canonical F55 exact proof decodes 24 contiguous complete instructions in 0x00183173..0x001831B2, resolves inherited predecessor targets 0x00183186/0x00183198 on exact boundaries, proves two external JMPs, one internal JP and one direct rel32 CALL, and preserves the lone DD at 0x001831B2 as an incomplete mandatory-overlap edge.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Authenticated GitHub authority/current state refreshed repeatedly under same-branch concurrency."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Validated F54 continuation_61 raw window selected as first unfinished canonical exact-proof frontier."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 2ab1dcbe85c207434790d572df19b8ba44af96d7."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Retaining descendant df20df24e62766c2a7b1b893c23de8c8322dffdc canonical evidence run 36988321609 / job 110778363059 SUCCESS; result-SHA auto runs were cancelled before jobs due descendant churn."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Required [AUTO:CONV-DXVK-000002] marker present; Issue #14 comment 5948967891."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static disassembly proof only."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Task run record 497cb7fa76266d7547ab980f392068f330641284 plus this supplemental lane mirror."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_RETAINING_DESCENDANT_CANONICAL_STATIC",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "dxvk_disassembly_evidence_run_id": 36988321609,
+        "dxvk_disassembly_evidence_job_id": 110778363059,
+        "proof_status": "EXACT_183173_TO_1831B2_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "instruction_count": 24,
+        "prefix_end_rva": "0x001831B2",
+        "resolved_predecessor_targets": [
+          "0x00183186",
+          "0x00183198"
+        ],
+        "branches": [
+          "0x00183181->0x001832AF",
+          "0x00183196->0x001831A9",
+          "0x001831A4->0x001832D4"
+        ],
+        "call_target": "0x0018319A->0x0018688C",
+        "incomplete_bytes": "dd",
+        "capture_edge_matches": true,
+        "artifact_id": 11217404705,
+        "artifact_digest": "sha256:710d54a8937baadefc7f40b370236fb05c14608f386bb40ad6ccab89b66e3fa1",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5948967891,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "BOUNDED_CONTROL_FLOW_ONLY",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve any newer branch-authoritative frontier. continuation_62 raw provenance already starts at mandatory overlap 0x001831B2; validate/decode that frontier next without promoting function/render/HUD/runtime semantics."
     }
   ]
 }
