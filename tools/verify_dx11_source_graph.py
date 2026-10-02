@@ -6618,6 +6618,75 @@ def main() -> None:
             "DX11 R108-R111 observation-only registry mirror API gained a runtime census caller"
         )
 
+    r169_point_raster_provenance_contract = [
+        ("DWORD pointSizeBits = 0x3F800000u;", D3D9_DRAW_STATE_HPP,
+         "R169 point-size snapshot provenance"),
+        ("DWORD pointSizeMinBits = 0x3F800000u;", D3D9_DRAW_STATE_HPP,
+         "R169 point-size minimum snapshot provenance"),
+        ("DWORD pointSizeMaxBits = 0x42800000u;", D3D9_DRAW_STATE_HPP,
+         "R169 point-size maximum snapshot provenance"),
+        ("DWORD pointSpriteEnable = FALSE;", D3D9_DRAW_STATE_HPP,
+         "R169 point-sprite snapshot provenance"),
+        ("DWORD pointScaleEnable = FALSE;", D3D9_DRAW_STATE_HPP,
+         "R169 point-scale enable snapshot provenance"),
+        ("DWORD pointScaleABits = 0x3F800000u;", D3D9_DRAW_STATE_HPP,
+         "R169 point-scale A snapshot provenance"),
+        ("DWORD pointScaleBBits = 0u;", D3D9_DRAW_STATE_HPP,
+         "R169 point-scale B snapshot provenance"),
+        ("DWORD pointScaleCBits = 0u;", D3D9_DRAW_STATE_HPP,
+         "R169 point-scale C snapshot provenance"),
+        ("D3DRS_POINTSIZE, D3DRS_POINTSIZE_MIN",
+         D3D9_RENDER_STATE_CAPTURE, "R169 point-size tracked-state priming"),
+        ("D3DRS_POINTSIZE_MAX, D3DRS_POINTSPRITEENABLE",
+         D3D9_RENDER_STATE_CAPTURE, "R169 point-sprite tracked-state priming"),
+        ("D3DRS_POINTSCALEENABLE, D3DRS_POINTSCALE_A",
+         D3D9_RENDER_STATE_CAPTURE, "R169 point-scale tracked-state priming"),
+        ("D3DRS_POINTSCALE_B, D3DRS_POINTSCALE_C",
+         D3D9_RENDER_STATE_CAPTURE, "R169 point-scale tail tracked-state priming"),
+        ("read(D3DRS_POINTSIZE, out.pointSizeBits);",
+         D3D9_RENDER_STATE_CAPTURE, "R169 point-size capture"),
+        ("read(D3DRS_POINTSIZE_MIN, out.pointSizeMinBits);",
+         D3D9_RENDER_STATE_CAPTURE, "R169 point-size minimum capture"),
+        ("read(D3DRS_POINTSIZE_MAX, out.pointSizeMaxBits);",
+         D3D9_RENDER_STATE_CAPTURE, "R169 point-size maximum capture"),
+        ("read(D3DRS_POINTSPRITEENABLE, out.pointSpriteEnable);",
+         D3D9_RENDER_STATE_CAPTURE, "R169 point-sprite capture"),
+        ("read(D3DRS_POINTSCALEENABLE, out.pointScaleEnable);",
+         D3D9_RENDER_STATE_CAPTURE, "R169 point-scale enable capture"),
+        ("read(D3DRS_POINTSCALE_A, out.pointScaleABits);",
+         D3D9_RENDER_STATE_CAPTURE, "R169 point-scale A capture"),
+        ("read(D3DRS_POINTSCALE_B, out.pointScaleBBits);",
+         D3D9_RENDER_STATE_CAPTURE, "R169 point-scale B capture"),
+        ("read(D3DRS_POINTSCALE_C, out.pointScaleCBits);",
+         D3D9_RENDER_STATE_CAPTURE, "R169 point-scale C capture"),
+        ("bool pointRasterObservationComplete{};", RUNTIME_CENSUS,
+         "R169 census observation completeness"),
+        ("hash = hash_mix(hash, sig.pointSizeBits);", RUNTIME_CENSUS,
+         "R169 point-size census identity"),
+        ("hash = hash_mix(hash, sig.pointScaleCBits);", RUNTIME_CENSUS,
+         "R169 point-scale census identity"),
+        ("signature.pointSizeBits = source.pointSizeBits;", RUNTIME_CENSUS,
+         "R169 point-size census capture"),
+        ("signature.pointScaleCBits = source.pointScaleCBits;", RUNTIME_CENSUS,
+         "R169 point-scale census capture"),
+        ("VR DX11 R169 point-raster state#{}", RUNTIME_CENSUS,
+         "R169 detailed census evidence"),
+        ("out.pointRasterSemanticsExact = primitive != D3DPT_POINTLIST;",
+         NATIVE_BACKEND_CPP, "R169 POINTLIST remains fail closed"),
+        ("R155 direct point-list raster semantics remain fail closed",
+         CONSTANT_BUFFER_PROBE, "R169 retains hosted POINTLIST blocker proof"),
+    ]
+    missing_r169_point_raster_provenance = [
+        meaning
+        for token, source, meaning in r169_point_raster_provenance_contract
+        if token not in source
+    ]
+    if missing_r169_point_raster_provenance:
+        raise SystemExit(
+            "DX11 R169 point-raster provenance drift: "
+            + ", ".join(missing_r169_point_raster_provenance)
+        )
+
     r168_line_raster_contract = [
         (
             "DWORD lastPixel = TRUE;",
