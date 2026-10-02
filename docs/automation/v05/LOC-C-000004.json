@@ -1,16 +1,118 @@
 {
+  "schema_version": 2,
   "job_id": "LOC-C-000004",
-  "role": "independent QA/reconciler C",
+  "role": "Korean localization independent QA/reconciler C",
+  "repository": "thp32tt/OutRun2006Tweaks",
   "branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-10-02T15:26:06+09:00",
+  "base_head_sha": "c4e7f8439f0d61737fb472b2ed90d592f0fddbfd",
   "controller_queue": "empty",
-  "controller_idle": "NO_RUNNABLE_WORK",
-  "dispositions": [],
-  "qa_pending_scan": {
-    "progress_checked": true,
-    "resume_state_checked": true,
-    "asset_queue_checked": true,
-    "qa_pending_items_found": 0
-  },
+  "controller_idle": "RUNNABLE_CURRENT_CANDIDATES_FOUND_AND_RECONCILED",
   "runtime_validation": "UNTESTED",
-  "note": "No current QA_PENDING/current-candidate items available for reconciliation. No producer candidate bytes modified."
+  "candidate_bytes_modified_by_c": false,
+  "batch_scope": {
+    "fresh_material_inputs": 4,
+    "dispositions_complete": 4,
+    "stale_shared_state_reconciled_without_repeat_qa": [
+      61
+    ]
+  },
+  "dispositions": [
+    {
+      "queue_index": 53,
+      "asset": "568D3696",
+      "producer": "LOC-E-000003",
+      "producer_result_commit": "c2b5e244d47ec468cad87d243c82e3f72154ee2d",
+      "source_git_blob_sha": "3d6bedf9c66d6c43c4ca16483a0f447137b39c3a",
+      "source_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+      "candidate_git_blob_sha": "3bd46228619d09d5129b48a95fd188a1f7b60000",
+      "candidate_sha256": "fe0d710bade6eafc6a24278e78d57bd3ab1c35826d5eac6eb1df079c6fc03b26",
+      "evidence_report": "localization/graphics/role_E/LOC-E-000003/LOC-E-000003_568D3696_SELF_QA.json",
+      "disposition": "REWORK_REQUIRED",
+      "reason": "Producer method explicitly rescaled/repositioned six existing Korean glyph rasters and preserved prior localized mip1-12 bytes. Current post-reset policy forbids using pixels or composites from an older Korean candidate and requires reconstruction from the exact English HD source. Header/containment metrics do not override the lineage failure.",
+      "candidate_bytes_modified_by_c": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "queue_index": 159,
+      "asset": "4EDA9DE3",
+      "producer": "LOCALIZATION-LOCALIZATION_A-00196",
+      "producer_result_sha": "1efd8de0f240b7a6170b29a4e86d9f8f6aa366fb",
+      "candidate_sha256": "7724fb92807ff18c0f4d2bc01797e42cd4be1f0bae07ee851140c00c901085d5",
+      "drive_candidate_transport_id": "1z5V0zyf7UJaa58wPVJzmuedTTH2TG5fd",
+      "drive_candidate_transport_sha256": "c608b5c6a99827e4d96eda7a96002063bdebd75b7eaf4d5dc16b120f125da7c9",
+      "drive_comparison_id": "1wXgK25d8m7v2TLJiVuk6N5bKuHRk9sRW",
+      "drive_comparison_sha256": "0e97533331c41bea830435769601352109db8c4f6b658edea051b03dd8cdbedc",
+      "identity_verification": "PASS_EXACT_DRIVE_BYTES_MATCH_GITHUB_RECORDED_SHA256",
+      "semantic_and_visual_verification": "PASS_15_OF_15_CANONICAL_COURSE_TRANSLATIONS_NO_OBVIOUS_CLIPPING_OR_WRONG_ARTWORK",
+      "disposition": "HOLD",
+      "reason": "Current course-title normalization policy requires machine-readable title_family, family_target_font_size, actual_font_size and fit-reduction evidence. Those fields are absent from the immutable A00196 result, so static promotion is blocked even though transport identity, canonical semantics and visual comparison pass.",
+      "candidate_bytes_modified_by_c": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "queue_index": 198,
+      "asset": "9FC88069",
+      "producer": "LOCALIZATION-LOCALIZATION_A-00208",
+      "producer_result_commit": "b874d64204539123c7c3e13d35a26a5ff3511a77",
+      "source_repository": "envido32/OR2006Sprites",
+      "source_commit": "55f67a813dd3603d201d0be0da47c071965f53a4",
+      "source_git_blob_sha": "e97d852a905aa8a219b786b843089e0998037f52",
+      "source_sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+      "candidate_git_blob_sha": "5377656bf2f3ba07e84867a3595e411a5dfd4007",
+      "candidate_sha256": "851ba4d5b3b0ea5c3d7a07471bf991640d517870cca24e41fcaf8202d00cf60d",
+      "evidence_report": "localization/graphics/KOREAN_PNG_REVIEW/9FC88069/qa_report.json",
+      "verification": {
+        "source_identity": "PASS_EXACT_PINNED_SOURCE_BLOB_AND_SIZE",
+        "canonical_semantics": "PASS_7_OF_7",
+        "clean_plate_lineage": "PASS_REUSED_ACCEPTED_C146_EXACT_SOURCE_FINGERPRINT",
+        "header_and_roundtrip": "PASS",
+        "changed_pixels_outside_allowed_edit_mask": 0,
+        "alpha_changed_pixels_outside_allowed_edit_mask": 0,
+        "changed_pixels_in_protected_regions": 0,
+        "one_pixel_overflow": 0,
+        "safe_bbox": "PASS_2PX_INSET_ALL_7",
+        "independent_visual_review": "PASS_SOURCE_VS_CANDIDATE_NO_OBVIOUS_RESIDUE_CLIPPING_BOX_OR_WRONG_ARTWORK"
+      },
+      "disposition": "PASS",
+      "production_readiness": "PRODUCTION_COMPLETE_STATIC_QA",
+      "candidate_bytes_modified_by_c": false,
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "queue_index": 201,
+      "asset": "A9ABD877",
+      "producer": "LOCALIZATION-LOCALIZATION_A-00196",
+      "producer_result_sha": "1efd8de0f240b7a6170b29a4e86d9f8f6aa366fb",
+      "candidate_sha256": "cf0799464af91a7b195f69053e538e5c4e210870d15a1540c9d23e39eb81f4d0",
+      "drive_candidate_transport_id": "1VGIpxShmZfZ3KvlB8WC1O-gDWl0Nr7IK",
+      "drive_candidate_transport_sha256": "56998a5fc720bdf14878dbf6afd76a20bc395e9893125437576bc219f2f22513",
+      "drive_comparison_id": "1qscKI5zYXvsitSK8vItkJFBIBgSLDp_c",
+      "drive_comparison_sha256": "64ef450d6623764c584638ab170779def9cb433304100de470d9d2466d0a9cc4",
+      "identity_verification": "PASS_EXACT_DRIVE_BYTES_MATCH_GITHUB_RECORDED_SHA256",
+      "semantic_and_visual_verification": "PASS_17_OF_17_CANONICAL_TRANSLATIONS_AND_NIGHT_BIRD_RADIATION_PRESERVE_NO_OBVIOUS_CLIPPING_OR_WRONG_ARTWORK",
+      "disposition": "HOLD",
+      "reason": "Current course-title normalization policy requires machine-readable title_family, family_target_font_size, actual_font_size and fit-reduction evidence. Those fields are absent from the immutable A00196 result, so static promotion is blocked even though transport identity, canonical semantics, preserve-original song titles and visual comparison pass.",
+      "candidate_bytes_modified_by_c": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "stale_state_reconciliation": [
+    {
+      "queue_index": 61,
+      "asset": "C4A2937B",
+      "prior_authoritative_c_commit": "9ebdd6ae0a27d940730de23c56c1679157bfd052",
+      "prior_disposition": "REWORK_REQUIRED",
+      "action": "RECONCILE_STALE_QA_PENDING_MARKER_ONLY",
+      "duplicate_qa_performed": false,
+      "candidate_bytes_modified_by_c": false,
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "shared_state_updates": [
+    "localization/progress.json",
+    "localization/resume_state.json",
+    "localization/graphics/asset_queue.csv"
+  ],
+  "summary": "Four fresh material inputs were dispositioned: PASS index198; REWORK_REQUIRED index53; HOLD indices159 and201. Stale index61 QA_PENDING was reconciled to its prior C00476 REWORK_REQUIRED decision without re-review. No producer candidate bytes were changed by C."
 }
