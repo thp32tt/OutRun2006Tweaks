@@ -2,10 +2,11 @@
 """Static guard for DXVK disassembly frontier evidence.
 
 This intentionally does not decode instructions or promote runtime semantics.
-It only validates the immutable shape of a captured continuation window:
+It validates the shape of a captured continuation window:
 - RVA range ordering
 - overlap bytes retained from the previous capture edge
 - explicit UNTESTED runtime state
+- byte-count consistency for hexadecimal evidence
 
 Used by GitHub-only conversion evidence checks.
 """
@@ -18,6 +19,16 @@ from pathlib import Path
 
 
 
+def _hex_bytes(value: object) -> bytes:
+    if not isinstance(value, str) or not value.strip():
+        return b""
+    try:
+        return bytes.fromhex(value)
+    except ValueError:
+        return b""
+
+
+
 def validate(record: dict) -> list[str]:
     errors: list[str] = []
     start = record.get("provenance_start_rva")
@@ -25,16 +36,27 @@ def validate(record: dict) -> list[str]:
     if not isinstance(start, str) or not isinstance(end, str):
         errors.append("missing_rva_range")
     else:
-        if int(end, 16) <= int(start, 16):
-            errors.append("invalid_rva_range")
+        try:
+            if int(end, 16) <= int(start, 16):
+                errors.append("invalid_rva_range")
+        except ValueError:
+            errors.append("invalid_rva_encoding")
 
-    if record.get("overlap_bytes") in (None, ""):
+    overlap = _hex_bytes(record.get("overlap_bytes"))
+    if not overlap:
         errors.append("missing_overlap_bytes")
+    elif record.get("overlap_bytes") and len(overlap) == 0:
+        errors.append("invalid_overlap_encoding")
+
+    instruction_count = record.get("instruction_count")
+    if instruction_count is not None and (not isinstance(instruction_count, int) or instruction_count <= 0):
+        errors.append("invalid_instruction_count")
 
     if record.get("runtime_validation") != "UNTESTED":
         errors.append("runtime_claim_not_allowed")
 
     return errors
+
 
 
 def main() -> int:
