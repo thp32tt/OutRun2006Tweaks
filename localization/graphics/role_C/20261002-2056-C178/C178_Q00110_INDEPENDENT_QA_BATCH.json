@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "schema": "outrun-c178-q00110-four-input-independent-batch-qa-v1",
+  "schema_version": 2,
+  "schema": "outrun-c178-q00110-four-input-independent-batch-qa-v2",
   "task_id": "LOCALIZATION-LOCALIZATION_C-00482",
   "wave_id": "Q00110",
   "run": "C178",
@@ -10,7 +10,7 @@
   "chat_rollover": 5,
   "recorded_at_kst": "2026-10-02T20:56:00+09:00",
   "commit_mode": "VALIDATION_BEARING_RESULT",
-  "result": "PASS_Q00110_3_INPUT_PASS_1_SUPERSEDED__3_STATIC_ASSET_PASS__INDEX236_RENDER_READY__INDEX230_SOURCE_IDENTITY_MISMATCH__RUNTIME_UNTESTED",
+  "result": "PASS_Q00110_2_INPUT_PASS_1_REWORK_1_SUPERSEDED__2_STATIC_ASSET_PASS__INDEX236_RENDER_READY__INDEX230_SOURCE_IDENTITY_MISMATCH__RUNTIME_UNTESTED",
   "qa_batch_inputs": [
     "LOCALIZATION-LOCALIZATION_A-00351@7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
     "LOCALIZATION-LOCALIZATION_B-00347@fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
@@ -21,13 +21,13 @@
     {
       "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
       "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
-      "status": "PASS",
-      "production_readiness": "PRODUCTION_COMPLETE_STATIC_QA",
+      "status": "REWORK_REQUIRED",
+      "production_readiness": "REWORK_REQUIRED_CURRENT_CONTROLLER_SHARD_PROVENANCE",
       "queue_index": 222,
       "asset": "DDF0392A",
       "candidate_sha256": "570cdb0884bc3495c06fd0de1d397be925e8c3506cd331f98ecbfa45053e8917",
       "current_head_candidate_git_blob_sha": "f3d36ae52ca89f5e42382eb5a89d51df5775a68c",
-      "verification": "Current HEAD candidate blob is identical to the immutable A00351 result. Exact-source song titles are preserved, all seven title-family members use locked 43px native size, DXT5/header/mip/orientation and zero-outside/alpha/1px-overflow gates pass, and independent source-vs-candidate visual review passes.",
+      "verification": "Pixel/static evidence remains reusable and current HEAD candidate bytes are unchanged, but the immutable A00351 result changes index222 DDS from lane A. The current controller's producer verifier assigns lane A odd indices and lane B even indices; index222 is therefore outside current A shard. Exact-SHA C Gate cannot PASS this producer result. Re-emit/rebind the same validated candidate under the current owning lane before promotion; runtime remains UNTESTED.",
       "runtime_validation": "UNTESTED"
     },
     {
@@ -95,12 +95,11 @@
   ],
   "material_deliverable": {
     "reviewed_inputs": 4,
-    "producer_inputs_pass": 3,
+    "producer_inputs_pass": 2,
     "producer_inputs_superseded": 1,
     "static_qa_pass_assets": [
       94,
-      163,
-      222
+      163
     ],
     "render_ready_indices": [
       236
@@ -108,7 +107,8 @@
     "source_identity_mismatch_indices": [
       230
     ],
-    "candidate_dds_modified_by_c": false
+    "candidate_dds_modified_by_c": false,
+    "producer_inputs_rework_required": 1
   },
   "contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
   "google_drive_readback_performed": true,
@@ -124,5 +124,17 @@
   "result_sha": null,
   "authoritative_result_sha": null,
   "validation_bearing_result_sha": null,
-  "result_commit_message": "localization(C): QA Q00110 four-input batch [AUTO:LOCALIZATION-LOCALIZATION_C-00482]"
+  "result_commit_message": "localization(C): QA Q00110 four-input batch [AUTO:LOCALIZATION-LOCALIZATION_C-00482]",
+  "gate_diagnostics": [
+    {
+      "result_sha": "ae5a68b75f78028ca7331033c771aeb3db30ca3d",
+      "run_id": 37005519700,
+      "failure": "qa_batch_inputs encoding corrected in retry"
+    },
+    {
+      "result_sha": "fc6c8e433292bc70368b2c34ea9c4d5dbf604eff",
+      "run_id": 37005676323,
+      "failure": "current exact-SHA producer verification rejects A00351 lane-A DDS change at even queue index222; disposition corrected to REWORK_REQUIRED"
+    }
+  ]
 }
