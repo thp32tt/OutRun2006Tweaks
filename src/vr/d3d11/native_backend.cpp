@@ -5431,6 +5431,11 @@ compose_fixed_function_direct_draw_dispatch_readiness(
     // point-sprite raster state is captured and translated. Topology alone
     // is not sufficient evidence of fixed-function raster equivalence.
     out.pointRasterSemanticsExact = primitive != D3DPT_POINTLIST;
+    // R157 keeps LINELIST/LINESTRIP fail-closed until D3D9 line-raster
+    // semantics such as LASTPIXEL and ANTIALIASEDLINEENABLE are captured and
+    // translated. Exact topology/arguments alone cannot prove raster parity.
+    out.lineRasterSemanticsExact =
+        primitive != D3DPT_LINELIST && primitive != D3DPT_LINESTRIP;
     out.dispatchArgumentsExact =
         argumentsCanonical && rangeExact && out.bufferRangeExact;
     out.componentSnapshotsPresent =
@@ -5446,6 +5451,7 @@ compose_fixed_function_direct_draw_dispatch_readiness(
         out.surfacePairMatchesDraw &&
         out.topologyMatchesGeometry &&
         out.pointRasterSemanticsExact &&
+        out.lineRasterSemanticsExact &&
         out.dispatchArgumentsExact &&
         out.componentSnapshotsPresent;
 
@@ -5468,6 +5474,8 @@ compose_fixed_function_direct_draw_dispatch_readiness(
             token, out.bufferRangeExact ? 0x151u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.pointRasterSemanticsExact ? 0x155u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.lineRasterSemanticsExact ? 0x157u : 0u);
         out.snapshotToken = token == 0 ? 1 : token;
     }
     return out;
