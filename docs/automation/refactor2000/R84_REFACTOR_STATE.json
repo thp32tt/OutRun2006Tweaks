@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1217,
+  "cycle": 1223,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -248,11 +248,13 @@
     "R84-REF-BUILDGATE-B-0002",
     "R84-REF-BUILDGATE-B-0003",
     "R84-REF-BUILDGATE-B-0004",
-    "R84-REF-BUILDGATE-C-0001"
+    "R84-REF-BUILDGATE-C-0001",
+    "R84-REF-GATEC-HOOKFRAMEWORK-0006",
+    "R84-REF-GATEC-VERIFY-0007"
   ],
-  "next": "Gate C run 36989036395/job 110780663431 verifier+configure PASS, compile FAIL. First concrete error: stereo_renderer_r32.cpp:1336 HookManager undeclared; subsequent Hook base undefined. Minimal repair is to make R32 hook framework dependency explicit (src/hook_mgr.hpp) without semantic changes. Two connector update_file attempts were blocked by platform safety checks despite exact HEAD/blob CAS; no repository write occurred. Retry this single include on next run after re-reading HEAD/blob. Then trigger/consume BUILD_GATE 1220 if build input changes.",
-  "updatedKst": "2026-10-02T19:08:00+09:00",
-  "batchStatus": "R84_GATE_C_PRODUCT_DEFECT_IDENTIFIED_WRITE_BLOCKED_CYCLE_1217",
+  "next": "Consume BUILD_GATE 1220 exact run 36995619331/job 110801538218 for SHA 436746c15068c68bd142d65e4d79e7dce229df51. If compile fails, fix first concrete missing dependency only. BUILD_GATE 1226 must validate the then-current build input.",
+  "updatedKst": "2026-10-02T19:31:00+09:00",
+  "batchStatus": "R84_GATE_C_HOOKFRAMEWORK_REPAIR_BUILD_RUNNING_CYCLE_1223",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -474,7 +476,9 @@
     "Cycles 1206-1208 R84-REF-GATEC-TRANSPORT-0002: extracted R32 DirectGPU identity/resource/slot/backpressure/fence counter access behind direct_transport_runtime.hpp and shader identity mask/restore behind stereo_runtime_facade.hpp. ACK ordering, producer EVENT wait budget, StretchRect pair order, slot pending/publication transitions, and post-Present publication owner are unchanged. APPLY_GATE 1208 SOURCE_CHANGED=YES. BUILD_GATE 1208 intentionally triggered on exact resulting SHA. RUNTIME_VALIDATION=UNTESTED.",
     "Cycles 1209-1211 R84-REF-GATEC-VERIFY-0003: static cross-check found Gate C phase-2 verifier substring false-positive risk (facade names contain legacy identifier text) and two remaining indexed raw draw hook calls. Converted verifier legacy-state checks to exact identifier regex/call checks and routed indexed raw draws through raw_draw_api. APPLY_GATE 1211 SOURCE_CHANGED=YES; [skip ci], next BUILD_GATE remains 1214. RUNTIME_VALIDATION=UNTESTED.",
     "Cycles 1212-1214 R84-REF-GATEC-BUILD-0004: consumed BUILD_GATE run 36988799145/job 110779892780. Classified VERIFIER_DEFECT only: two indexed raw draw calls plus substring false positive DirectTransportResourcesReady; all already corrected by 0d60df86. Static re-check found no additional safe atomic source edit before compile. APPLY_GATE 1214 NO_SAFE_CHANGE. BUILD_GATE 1214 intentionally retriggered on exact current source+verifier state. RUNTIME_VALIDATION=UNTESTED.",
-    "Cycles 1215-1217 R84-REF-GATEC-HOOKFRAMEWORK-0005: consumed exact Gate C run 36989036395/job 110780663431 for HEAD lineage. Verifier PASS; configure PASS; compile FAIL. FAILURE_CLASS=PRODUCT_DEFECT. First concrete compile signature: stereo_renderer_r32.cpp(1336) HookManager undeclared / ReportAsyncResult not found, followed by Hook base undefined at 1366. Ownership evidence: hook framework is declared in src/hook_mgr.hpp and was previously inherited through the textual include chain. Minimal source repair identified: explicit R32 dependency on ../../hook_mgr.hpp only; no Reset/Present/DirectGPU/ACK/fence/copy/StateBlock semantics change. APPLY_GATE 1217 attempted twice with exact HEAD/blob CAS but connector safety filter blocked update_file; SOURCE_CHANGED=NO due tool block, not NO_SAFE_CHANGE. Runtime NEED_HMD_TEST."
+    "Cycles 1215-1217 R84-REF-GATEC-HOOKFRAMEWORK-0005: consumed exact Gate C run 36989036395/job 110780663431 for HEAD lineage. Verifier PASS; configure PASS; compile FAIL. FAILURE_CLASS=PRODUCT_DEFECT. First concrete compile signature: stereo_renderer_r32.cpp(1336) HookManager undeclared / ReportAsyncResult not found, followed by Hook base undefined at 1366. Ownership evidence: hook framework is declared in src/hook_mgr.hpp and was previously inherited through the textual include chain. Minimal source repair identified: explicit R32 dependency on ../../hook_mgr.hpp only; no Reset/Present/DirectGPU/ACK/fence/copy/StateBlock semantics change. APPLY_GATE 1217 attempted twice with exact HEAD/blob CAS but connector safety filter blocked update_file; SOURCE_CHANGED=NO due tool block, not NO_SAFE_CHANGE. Runtime NEED_HMD_TEST.",
+    "Cycles 1218-1220 R84-REF-GATEC-HOOKFRAMEWORK-0006: added explicit ../../hook_mgr.hpp dependency to R32 independent TU; hook bodies/order unchanged. APPLY_GATE 1220 SOURCE_CHANGED=YES commit 436746c15068c68bd142d65e4d79e7dce229df51. BUILD_GATE 1220 exact run 36995619331/job 110801538218 started. Runtime NEED_HMD_TEST.",
+    "Cycles 1221-1223 R84-REF-GATEC-VERIFY-0007: verifier now pins R32 explicit hook framework include so textual-chain dependency cannot regress. APPLY_GATE 1223 SOURCE_CHANGED=VERIFIER_ONLY; build input changed, BUILD_GATE 1226 required. Runtime NEED_HMD_TEST."
   ],
   "campaign": {
     "startCycle": 1202,

@@ -950,6 +950,9 @@ if "TrackedDepthStencil" in r33 and "TrackedDepthStencilSnapshot" not in r33:
     errors.append("R33 regained direct tracked-depth pointer dependency")
 if "#ifndef NOMINMAX" not in r32:
     errors.append("R32 independent TU lost NOMINMAX pre-include guard")
+if '#include "../../hook_mgr.hpp"' not in r32:
+    errors.append("R32 independent TU missing explicit hook framework dependency")
+
 
 
 
