@@ -780,6 +780,7 @@ struct NativeFixedFunctionDrawReadiness {
     bool geometryReady{};
     bool componentSnapshotsPresent{};
     bool ready{};
+    std::uint32_t requiredTextureMask{};
     std::uint64_t activationSnapshotToken{};
     std::uint64_t renderStateSnapshotToken{};
     std::uint64_t surfacePairSnapshotToken{};
@@ -814,8 +815,11 @@ struct NativeFixedFunctionTexturedDrawReadiness {
     bool inputValid{};
     bool drawReady{};
     bool textureStageReady{};
+    bool textureMaskMatches{};
     bool componentSnapshotsPresent{};
     bool ready{};
+    std::uint32_t requiredTextureMask{};
+    std::uint32_t observedTextureMask{};
     std::uint64_t drawSnapshotToken{};
     std::uint64_t textureStageSnapshotToken{};
     std::uint64_t snapshotToken{};
