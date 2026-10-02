@@ -2,12 +2,27 @@
 
 #include <d3d9.h>
 #include <cstdint>
+#include <type_traits>
 #include "../runtime_eligibility.hpp"
 
 namespace OutRunVRRenderer { struct LatchedStereoFrame; }
 
 namespace OutRunVRStereo
 {
+    using FailClosedDrawCallback = HRESULT(*)(void*) noexcept;
+    HRESULT RunLowerFailClosed(IDirect3DDevice9* device,
+        FailClosedDrawCallback callback, void* context) noexcept;
+
+    template <typename LowerDraw>
+    HRESULT LowerFailClosed(IDirect3DDevice9* device, LowerDraw&& lowerDraw) noexcept
+    {
+        using DrawType = std::remove_reference_t<LowerDraw>;
+        auto callback = [](void* context) noexcept -> HRESULT {
+            return (*static_cast<DrawType*>(context))();
+        };
+        return RunLowerFailClosed(device, callback, &lowerDraw);
+    }
+
     struct FastWorldDispatchConstants
     {
         float originalConstants[16]{};
