@@ -205,6 +205,31 @@ def main() -> None:
             + ", ".join(missing_r167_dither_identity)
         )
 
+    d3dtop_add_contract = [
+        ("case D3DTOP_ADD:", PIPELINE_TRANSLATION_CPP,
+         "D3DTOP_ADD readiness/translation case"),
+        ('return first + " + " + second;', PIPELINE_TRANSLATION_CPP,
+         "D3DTOP_ADD component-wise shader expression"),
+        ("addStages[0].colorOp = D3DTOP_ADD;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "D3DTOP_ADD hosted probe fixture"),
+        ("float3 nextColor = sampled0.rgb + input.diffuse.rgb;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "D3DTOP_ADD generated HLSL assertion"),
+        ("D3DTOP_ADD fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE, "D3DTOP_ADD offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_ADD support: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "D3DTOP_ADD hosted probe completion"),
+    ]
+    missing_d3dtop_add = [
+        meaning
+        for token, source, meaning in d3dtop_add_contract
+        if token not in source
+    ]
+    if missing_d3dtop_add:
+        raise SystemExit(
+            "DX11 fixed-function D3DTOP_ADD contract drift: "
+            + ", ".join(missing_d3dtop_add)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
