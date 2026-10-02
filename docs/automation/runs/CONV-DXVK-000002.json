@@ -4228,6 +4228,70 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authoritative canonical continuation frontier. Continue the next independent DXVK static/disassembly item from that frontier; any future RESOLVED_PREDECESSOR_TARGET_RVAS entry inside a detected long INT3 span must fail CI."
+    },
+    {
+      "unit_id": "DXVK_DIRECT_PREDECESSOR_TARGET_RESOLUTION_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "95686fa78abdbbd20a6853958976786dd5023394",
+      "validation_bearing_result_sha": "95686fa78abdbbd20a6853958976786dd5023394",
+      "commit_message": "test: require DXVK predecessor target resolution [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Cross-stage DXVK verifier guard: a direct external branch target from the immediate predecessor proof that now falls inside the successor exact prefix must be explicitly declared in RESOLVED_PREDECESSOR_TARGET_RVAS; omitted resolutions fail closed.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Authenticated GitHub branch authority and current lane/run/history/Issue #14 recovered; moving same-JOB frontier refreshed repeatedly."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Found omission gap: declared predecessor resolutions were validated, but a newly resolvable direct predecessor external target could be omitted."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material verifier commit 95686fa78abdbbd20a6853958976786dd5023394."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36985840252 job 110770542762 SUCCESS; backend disassembly contract OK and canonical EXE analysis passed."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit contains required [AUTO:CONV-DXVK-000002]; Issue #14 comments 5948443294 and 5948466975 record implementation/validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier only; no deployable DXVK/runtime/backend/localization payload changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally without replacing the newer canonical frontier."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "95686fa78abdbbd20a6853958976786dd5023394",
+        "dxvk_disassembly_evidence_run_id": 36985840252,
+        "dxvk_disassembly_evidence_job_id": 110770542762,
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "artifact_id": 11217706091,
+        "artifact_digest": "sha256:5dd2464c42125dcc0e5b72642c662e02655348c871251d75e570bf5ddc14a521",
+        "static_disassembly_contract": "PASS",
+        "canonical_exe_analysis": "PASS",
+        "backend_conversion_gate_run_id": 36985840229,
+        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_CLAIMED_COMPLETE",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948443294,
+      "issue14_validation_comment_id": 5948466975,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve this guard and newest authoritative continuation frontier; continue only the first unfinished canonical raw/exact/static unit from current HEAD."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
