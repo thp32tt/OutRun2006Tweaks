@@ -5805,6 +5805,69 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest branch-authoritative canonical frontier. Continue raw/proof work only from that edge; inherited unresolved forward-target lineage is now fail-closed automatically, with no function/render/HUD/runtime semantic promotion."
+    },
+    {
+      "unit_id": "DXVK_INHERITED_CUT_TARGET_PROVEN_GATE_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "1790192abd39e73dc3ea7a77b5012c237317a62e",
+      "validation_bearing_result_sha": "1790192abd39e73dc3ea7a77b5012c237317a62e",
+      "commit_message": "test: require DXVK inherited cut target gate [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Auto-discovered DXVK continuation proof verification now treats every assigned *_cut_target_matches predicate as mandatory in the final proven expression, protecting continuation_65 inherited cut-target lineage at its incomplete E8 capture edge from telemetry-only drift.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local lane/run state, regression/problem history and Issue #14 while same-JOB canonical frontier work advanced concurrently; stale F43 primary next_action was not reused."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Fresh verifier review after F63 exact proof found inherited_cut_target_matches was assigned and currently consumed by proven, but was absent from the verifier-required dynamic gate set; selected this independent static integrity gap to avoid duplicating the moving canonical frontier."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 1790192abd39e73dc3ea7a77b5012c237317a62e adds dynamic *_cut_target_matches discovery to tools/verify_vr_backend_disasm_contract.py and requires those gates in required_proven_gates."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36990773809 job 110786214911 completed SUCCESS on 1790192abd39e73dc3ea7a77b5012c237317a62e. Verify static disassembly contract, canonical EXE identity, canonical analyzer, exact evidence identity and artifact upload all passed."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit 1790192abd39e73dc3ea7a77b5012c237317a62e contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5949349397 records implementation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only hardening; no runtime DXVK payload, backend selector, deployment content, packaged binary, or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted supplementally without replacing or rewinding the newer concurrently advancing canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "1790192abd39e73dc3ea7a77b5012c237317a62e",
+        "dxvk_canonical_evidence_run_id": 36990773809,
+        "dxvk_canonical_evidence_job_id": 110786214911,
+        "static_disassembly_contract": "SUCCESS",
+        "canonical_exe_identity": "SUCCESS",
+        "canonical_exe_analysis": "SUCCESS",
+        "evidence_artifact_id": 11218843240,
+        "evidence_artifact_digest": "sha256:da34a59af501f56e343f2e1797ffcbcd33d52d1c8d430a03960a0ebc8822cd4d",
+        "backend_conversion_gate_run_id": 36990773792,
+        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_REQUIRED_FOR_STATIC_VERIFIER_UNIT",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5949349397,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authenticated DXVK canonical frontier (F64 raw provenance at 0x001832AF..0x001832EF was already exact-SHA validated concurrently). Exact-decode only complete canonical instructions from that raw window, resolve inherited 0x001832AF/0x001832B9 targets only on exact boundaries, and keep function/render/HUD/runtime semantics unresolved."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
