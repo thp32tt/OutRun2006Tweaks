@@ -531,39 +531,6 @@ def github_actions_skip_directive(message: str) -> Optional[str]:
     return None
 
 
-def github_commit_changed_paths(sha: str) -> list[str]:
-    try:
-        data = github_api_json(f"/repos/{GITHUB_REPO}/commits/{sha}")
-        return [
-            str(item.get("filename"))
-            for item in (data.get("files") or [])
-            if isinstance(item, dict) and item.get("filename")
-        ]
-    except Exception as e:
-        log.warning("github commit path lookup failed sha=%s error=%r", sha, e)
-        return []
-
-
-def task_material_commit_ok(task_id: str, sha: str) -> bool:
-    paths = github_commit_changed_paths(sha)
-    if task_id.startswith("LOCALIZATION-LOCALIZATION_A-") or task_id.startswith("LOCALIZATION-LOCALIZATION_B-"):
-        return any(
-            p.startswith("localization/graphics/hd_candidates/") and p.lower().endswith(".dds")
-            for p in paths
-        )
-    if task_id.startswith("LOCALIZATION-LOCALIZATION_C-"):
-        allowed = (
-            "localization/graphics/asset_queue_v2.csv",
-            "localization/progress",
-            "localization/resume_state.json",
-            "localization/validation/",
-            "localization/WORKLOG.md",
-            "docs/automation/runs/",
-        )
-        return any(p == allowed[0] or p.startswith(allowed[1:]) for p in paths)
-    return True
-
-
 def github_find_task_commit(branch: str, task_id: str, per_page: int = 100) -> Optional[dict]:
     """Find a task commit using a short shared branch-history cache to protect REST rate limits."""
     try:
@@ -583,11 +550,8 @@ def github_find_task_commit(branch: str, task_id: str, per_page: int = 100) -> O
                 continue
             if github_actions_skip_directive(message):
                 continue
-            sha = str(item.get("sha") or "")
-            if not sha or not task_material_commit_ok(task_id, sha):
-                continue
             return {
-                "sha": sha,
+                "sha": item.get("sha"),
                 "message": message,
                 "html_url": item.get("html_url"),
             }
@@ -717,16 +681,15 @@ def queue_dynamic_prefix() -> str:
     ]
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B"}:
         lines += [
-            "A/B producer는 현재 wave에서 실제 candidate DDS material commit 하나를 완성해야 한다. bookkeeping/status-only commit은 완료로 인정되지 않는다.",
-            "A/B 둘 다 terminal이 된 뒤 C barrier가 현재 wave를 검수한다. C terminal commit 전에는 다음 A/B wave를 시작하지 않는다.",
-            "이 producer task record의 AUTOMATION_VALIDATION은 PENDING으로 남기고 validation_mode=C_BATCH_GATE로 기록해. 최종 자동 검증 권한은 현재 wave의 C Gate에 있다.",
+            "A/B producer는 개별 GitHub Actions Gate를 기다리지 않는다. durable task commit이 생성되면 controller가 즉시 다음 생산으로 진행한다.",
+            "이 producer task record의 AUTOMATION_VALIDATION은 PENDING으로 남기고 validation_mode=C_BATCH_GATE로 기록해. 최종 자동 검증 권한은 후속 C batch Gate에 있다.",
             "생산 우선순위는 candidate-completion-first다. C가 받아들인 RENDER_READY 또는 ONE_STAGE_TO_RENDER 자산이 shard에 있으면 새 unrelated preflight/work-order를 시작하지 말고 그 자산을 실제 Korean DDS candidate까지 완료해.",
             "baseline/slant/style 측정만 남았다면 같은 invocation에서 측정하고 render -> measure/refit -> DDS encode -> decoded-final self-QA까지 이어가. ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.",
             "ready 자산이 모두 fail-closed일 때만 정확한 blocker를 기록하고 다음 ready 자산을 시도해. ready 자산이 전혀 없을 때만 새 preflight-only batch를 최대 1개 확장해.",
         ]
     if qa_batch:
         lines += [
-            "이 C 작업은 현재 A/B wave를 닫는 필수 QA barrier다. 아래 생산 결과들을 하나의 배치로 중복 없이 검수하고 공용 상태를 한 번만 병합해.",
+            "이 C 작업은 독립 QA 소비자다. 아래 생산 결과들을 하나의 배치로 중복 없이 검수하고 공용 상태를 한 번만 병합해.",
             "QA_BATCH_INPUTS=" + json.dumps(qa_batch, ensure_ascii=False, separators=(",", ":")),
             "각 입력의 TASK_ID + RESULT_SHA를 고정 기준으로 사용하고, 동일 candidate/source/contract fingerprint의 무거운 검증은 한 번만 수행해.",
             "각 input에 대해 qa_dispositions를 기록해: PASS, REWORK_REQUIRED, HOLD_STRICT_RECHECK, SUPERSEDED 중 하나. C commit 하나의 Localization Automation Gate가 이 batch 전체의 자동 검증이다.",
