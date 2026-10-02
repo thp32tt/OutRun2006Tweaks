@@ -4437,6 +4437,7 @@ int main()
         fanDispatch.finalFanBoundDrawReady &&
         fanDispatch.generatedIndexReady &&
         fanDispatch.generatedIndexMatchesDispatch &&
+        fanDispatch.vertexBufferRangeExact &&
         fanDispatch.dispatchArgumentsExact &&
         fanDispatch.componentSnapshotsPresent &&
         fanDispatch.ready &&
@@ -4467,6 +4468,45 @@ int main()
                 outputColorSurface, outputDepthSurface,
                 fanDispatch.snapshotToken),
         "R148 generated fan dispatch rejects nonindexed base-vertex drift");
+
+    const UINT fanCapacityOverrunStride =
+        managedVertexBuffer.byte_width();
+    d3d.context->IASetVertexBuffers(
+        0, 1, &liveFanVertexBuffer,
+        &fanCapacityOverrunStride, &geometryVertexOffset);
+    const auto fanCapacityOverrun =
+        outrun::vr::dx11::
+            compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(
+                liveFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, fanCapacityOverrunStride,
+                geometryVertexOffset, liveFanOwner, 3u, 7u, transform,
+                surfaceTargetBinding, outputColorSurface, outputDepthSurface);
+    require(
+        fanCapacityOverrun.inputValid &&
+        fanCapacityOverrun.finalFanBoundDrawReady &&
+        fanCapacityOverrun.generatedIndexReady &&
+        fanCapacityOverrun.generatedIndexMatchesDispatch &&
+        !fanCapacityOverrun.vertexBufferRangeExact &&
+        !fanCapacityOverrun.dispatchArgumentsExact &&
+        !fanCapacityOverrun.ready &&
+        fanCapacityOverrun.snapshotToken == 0,
+        "R154 nonindexed fan dispatch rejects vertex buffer overrun");
+    d3d.context->IASetVertexBuffers(
+        0, 1, &liveFanVertexBuffer,
+        &geometryVertexStride, &geometryVertexOffset);
+    require(
+        outrun::vr::dx11::
+            validate_fixed_function_nonindexed_triangle_fan_draw_dispatch_snapshot(
+                liveFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                liveFanOwner, 3u, 7u, transform, surfaceTargetBinding,
+                outputColorSurface, outputDepthSurface,
+                fanDispatch.snapshotToken),
+        "R154 nonindexed fan dispatch restores bounded vertex span");
 
     d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
     const auto fanTopologyDrift =

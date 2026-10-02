@@ -2432,6 +2432,33 @@ def main() -> None:
             + ", ".join(missing_r151_direct_bound_buffer_capacity)
         )
 
+    r154_nonindexed_fan_vertex_capacity_contract = [
+        ("bool vertexBufferRangeExact{};", NATIVE_BACKEND_HPP,
+         "R154 generated-fan vertex capacity readiness"),
+        ("R154: a generated nonindexed fan encodes source vertices",
+         NATIVE_BACKEND_CPP, "R154 deterministic fan source span proof"),
+        ("expansion.sourceElementCount - 1u", NATIVE_BACKEND_CPP,
+         "R154 fan maximum source vertex identity"),
+        ("endByte <= static_cast<std::uint64_t>(vertexBuffer.byte_width())",
+         NATIVE_BACKEND_CPP, "R154 managed VB byte-capacity bound"),
+        ("out.vertexBufferRangeExact ? 0x154u : 0u", NATIVE_BACKEND_CPP,
+         "R154 capacity identity in dispatch token"),
+        ("R154 nonindexed fan dispatch rejects vertex buffer overrun",
+         CONSTANT_BUFFER_PROBE, "R154 fan VB overrun fail-closed proof"),
+        ("R154 nonindexed fan dispatch restores bounded vertex span",
+         CONSTANT_BUFFER_PROBE, "R154 deterministic restore proof"),
+    ]
+    missing_r154_nonindexed_fan_vertex_capacity = [
+        meaning
+        for token, source, meaning in r154_nonindexed_fan_vertex_capacity_contract
+        if token not in source
+    ]
+    if missing_r154_nonindexed_fan_vertex_capacity:
+        raise SystemExit(
+            "DX11 R154 nonindexed fan vertex-capacity contract drift: "
+            + ", ".join(missing_r154_nonindexed_fan_vertex_capacity)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":

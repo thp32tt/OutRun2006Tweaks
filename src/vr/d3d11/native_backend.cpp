@@ -5346,8 +5346,34 @@ compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(
         generated.baseVertex == baseVertex &&
         generated.sourceIndexSnapshotToken == 0 &&
         countExact;
+
+    // R154: a generated nonindexed fan encodes source vertices
+    // [baseVertex, baseVertex + primitiveCount + 1] directly into its immutable
+    // R32 index stream. Seal that deterministic span against the same managed
+    // VB owner/stride/offset used by the final live IA proof before allowing
+    // the eventual DrawIndexed tuple to become ready.
+    out.vertexBufferRangeExact = false;
+    const auto expansion = translate_triangle_fan_expansion(primitiveCount);
+    if (out.generatedIndexMatchesDispatch &&
+        expansion.exact &&
+        expansion.sourceElementCount != 0u &&
+        vertexStride != 0u &&
+        vertexBuffer.byte_width() != 0u &&
+        vertexOffset <= vertexBuffer.byte_width()) {
+        const std::uint64_t maxVertex =
+            static_cast<std::uint64_t>(baseVertex) +
+            static_cast<std::uint64_t>(expansion.sourceElementCount - 1u);
+        const std::uint64_t endByte =
+            static_cast<std::uint64_t>(vertexOffset) +
+            (maxVertex + 1ull) * static_cast<std::uint64_t>(vertexStride);
+        out.vertexBufferRangeExact =
+            maxVertex <= std::numeric_limits<UINT>::max() &&
+            endByte <= static_cast<std::uint64_t>(vertexBuffer.byte_width());
+    }
+
     out.dispatchArgumentsExact =
         out.generatedIndexMatchesDispatch &&
+        out.vertexBufferRangeExact &&
         out.startIndexLocation == 0u &&
         out.baseVertexLocation == 0;
     out.componentSnapshotsPresent =
@@ -5368,6 +5394,8 @@ compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(
         token = mix_readiness_snapshot_token(token, out.startIndexLocation);
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint32_t>(out.baseVertexLocation));
+        token = mix_readiness_snapshot_token(
+            token, out.vertexBufferRangeExact ? 0x154u : 0u);
         out.snapshotToken = token == 0 ? 1 : token;
     }
     return out;

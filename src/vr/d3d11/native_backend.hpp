@@ -1905,6 +1905,10 @@ struct NativeFixedFunctionFanDrawDispatchReadiness {
     bool finalFanBoundDrawReady{};
     bool generatedIndexReady{};
     bool generatedIndexMatchesDispatch{};
+    // R154 seals the deterministic nonindexed fan source-vertex span against
+    // the exact managed vertex-buffer byte capacity. Indexed fan source-value
+    // capacity remains a separate gate and does not claim this field yet.
+    bool vertexBufferRangeExact{};
     bool dispatchArgumentsExact{};
     bool componentSnapshotsPresent{};
     bool ready{};
