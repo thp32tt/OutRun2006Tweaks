@@ -441,6 +441,58 @@ int main()
     }
 
     {
+        std::array<FixedFunctionStageState, 8> modifierStages{};
+        modifierStages[0].colorOp = D3DTOP_SELECTARG1;
+        modifierStages[0].colorArg1 =
+            D3DTA_TEXTURE | D3DTA_ALPHAREPLICATE | D3DTA_COMPLEMENT;
+        modifierStages[0].alphaOp = D3DTOP_SELECTARG1;
+        modifierStages[0].alphaArg1 = D3DTA_DIFFUSE | D3DTA_COMPLEMENT;
+        modifierStages[0].minFilter = D3DTEXF_POINT;
+        modifierStages[0].magFilter = D3DTEXF_POINT;
+        modifierStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto modifierReadiness = translate_fixed_function_readiness(
+            modifierStages, true, 0x01u, 0x01u);
+        require(
+            modifierReadiness.exact() &&
+            (modifierReadiness.unsupported &
+             FixedFunctionUnsupportedArgument) == 0,
+            "R175 supported D3DTA modifiers must remain shader-exact");
+
+        const auto modifierShader =
+            generate_fixed_function_pixel_shader_prototype(
+                modifierStages, true, 0x01u, 0x01u, textureTypes);
+        require(
+            modifierShader.generated() &&
+            modifierShader.source.find(
+                "float3 nextColor = (1.0 - sampled0.aaa);") !=
+                std::string::npos &&
+            modifierShader.source.find(
+                "float nextAlpha = (1.0 - input.diffuse.a);") !=
+                std::string::npos,
+            "R175 complement/alpha-replicate shader expression drift");
+
+        const auto modifierCompile =
+            compile_fixed_function_pixel_shader_prototype(modifierShader);
+        require(
+            modifierCompile.attempted && modifierCompile.succeeded &&
+            modifierCompile.result == S_OK &&
+            modifierCompile.bytecodeBytes != 0,
+            "R175 D3DTA modifier shader prototype did not compile");
+
+        auto unknownModifierStages = modifierStages;
+        unknownModifierStages[0].colorArg1 = D3DTA_TEXTURE | 0x40u;
+        const auto unknownModifierReadiness =
+            translate_fixed_function_readiness(
+                unknownModifierStages, true, 0x01u, 0x01u);
+        require(
+            !unknownModifierReadiness.exact() &&
+            (unknownModifierReadiness.unsupported &
+             FixedFunctionUnsupportedArgument) != 0,
+            "R175 unknown D3DTA modifier bits must fail closed");
+    }
+
+    {
         std::array<FixedFunctionStageState, 8> addStages{};
         addStages[0].colorOp = D3DTOP_ADD;
         addStages[0].colorArg1 = D3DTA_TEXTURE;
@@ -470,6 +522,7 @@ int main()
     }
 
     std::cout
+        << "DX11 fixed-function argument modifiers R175: PASS\n"
         << "DX11 fixed-function D3DTOP_ADD support: PASS\n"
         << "DX11 fixed-function RESULTARG fail-closed R173: PASS\n"
         << "DX11 multisample raster provenance R171: PASS\n"
