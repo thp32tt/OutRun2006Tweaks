@@ -760,7 +760,46 @@ int main()
             "R184 D3DTOP_ADDSMOOTH fixed-function shader prototype did not compile");
     }
 
+    {
+        std::array<FixedFunctionStageState, 8> blendDiffuseAlphaStages{};
+        blendDiffuseAlphaStages[0].colorOp = D3DTOP_BLENDDIFFUSEALPHA;
+        blendDiffuseAlphaStages[0].colorArg1 = D3DTA_TEXTURE;
+        blendDiffuseAlphaStages[0].colorArg2 = D3DTA_DIFFUSE;
+        blendDiffuseAlphaStages[0].alphaOp = D3DTOP_BLENDDIFFUSEALPHA;
+        blendDiffuseAlphaStages[0].alphaArg1 = D3DTA_TEXTURE;
+        blendDiffuseAlphaStages[0].alphaArg2 = D3DTA_DIFFUSE;
+        blendDiffuseAlphaStages[0].minFilter = D3DTEXF_POINT;
+        blendDiffuseAlphaStages[0].magFilter = D3DTEXF_POINT;
+        blendDiffuseAlphaStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto blendDiffuseAlphaShader =
+            generate_fixed_function_pixel_shader_prototype(
+                blendDiffuseAlphaStages, true, 0x01u, 0x01u, textureTypes);
+        require(
+            blendDiffuseAlphaShader.generated() &&
+                blendDiffuseAlphaShader.activeStages == 1,
+            "R185 D3DTOP_BLENDDIFFUSEALPHA fixed-function stage must become shader-exact");
+        require(
+            blendDiffuseAlphaShader.source.find(
+                "float3 nextColor = sampled0.rgb * input.diffuse.a + input.diffuse.rgb * (1.0 - input.diffuse.a);") !=
+                std::string::npos &&
+            blendDiffuseAlphaShader.source.find(
+                "float nextAlpha = sampled0.a * input.diffuse.a + input.diffuse.a * (1.0 - input.diffuse.a);") !=
+                std::string::npos,
+            "R185 D3DTOP_BLENDDIFFUSEALPHA shader expression drift");
+        const auto blendDiffuseAlphaCompile =
+            compile_fixed_function_pixel_shader_prototype(
+                blendDiffuseAlphaShader);
+        require(
+            blendDiffuseAlphaCompile.attempted &&
+            blendDiffuseAlphaCompile.succeeded &&
+            blendDiffuseAlphaCompile.result == S_OK &&
+            blendDiffuseAlphaCompile.bytecodeBytes != 0,
+            "R185 D3DTOP_BLENDDIFFUSEALPHA fixed-function shader prototype did not compile");
+    }
+
     std::cout
+        << "DX11 fixed-function D3DTOP_BLENDDIFFUSEALPHA support R185: PASS\n"
         << "DX11 fixed-function D3DTOP_ADDSMOOTH support R184: PASS\n"
         << "DX11 fixed-function D3DTOP_ADDSIGNED2X support R183: PASS\n"
         << "DX11 MRT color-write fail-closed: PASS\n"
