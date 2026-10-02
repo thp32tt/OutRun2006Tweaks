@@ -36,7 +36,17 @@ if ($state.task_liveness.normal_success_requires -notcontains 'SUBSTANTIVE_C2_RE
     Write-Error 'DX11 task contract does not require substantive implementation.'
 }
 
+if ($state.latest_durable_task.runtime_validation -ne 'UNTESTED') {
+    Write-Error 'Unexpected runtime validation state. Hardware validation must be recorded separately.'
+}
+
+$stateText = Get-Content (Join-Path $Root 'docs/CONVERSION_LANE_STATE.json') -Raw
+if ($stateText -notmatch 'NativeDrawPath') {
+    Write-Error 'DX11 conversion state does not expose native draw path gate evidence.'
+}
+
 Write-Output 'DX11_STATIC_CONVERSION_GUARD=PASS'
+Write-Output 'NATIVE_DRAW_PATH_GATE=STATIC_EVIDENCE_PRESENT'
 Write-Output ('BRANCH=' + $state.branch)
 Write-Output ('TASK=' + $state.latest_durable_task.task_id)
 Write-Output ('RUNTIME_VALIDATION=' + $state.latest_durable_task.runtime_validation)
