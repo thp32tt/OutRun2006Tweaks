@@ -1,0 +1,8 @@
+{
+  "mode": "localization",
+  "schema": "v2/v50",
+  "pipeline": ["A", "B", "C"],
+  "queue": "localization/graphics/asset_queue_v2.csv",
+  "roles": "localization/controller_roles.json",
+  "shard": "index%2"
+}
