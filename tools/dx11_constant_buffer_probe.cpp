@@ -3697,7 +3697,7 @@ int main()
                 d3d.context, indexedGeometryReady, managedVertexBuffer,
                 mismatchedLayoutStride, geometryVertexOffset,
                 &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset),
-            "R157 mismatched IA stride binding prerequisite");
+            "R158 mismatched IA stride binding prerequisite");
         const auto layoutStrideMismatch =
             outrun::vr::dx11::
                 compose_fixed_function_render_target_bound_draw_readiness(
@@ -3720,7 +3720,7 @@ int main()
                 inputLayout.stream0Stride &&
             !layoutStrideMismatch.ready &&
             layoutStrideMismatch.snapshotToken == 0,
-            "R157 final draw rejects live IA stride drift from translated layout");
+            "R158 final draw rejects live IA stride drift from translated layout");
         require(
             outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
                 d3d.context, indexedGeometryReady, managedVertexBuffer,
@@ -3737,7 +3737,7 @@ int main()
                     geometryIndexOffset, transform, surfaceTargetBinding,
                     outputColorSurface, outputDepthSurface,
                     renderTargetBoundDraw.snapshotToken),
-            "R157 exact IA stride restore keeps final draw snapshot deterministic");
+            "R158 exact IA stride restore keeps final draw snapshot deterministic");
 
         d3d.context->OMSetRenderTargets(0, nullptr, nullptr);
         const auto missingRenderTargets =

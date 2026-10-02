@@ -1519,7 +1519,7 @@ struct NativeFixedFunctionRenderTargetBoundDrawReadiness {
     bool surfacePairMatchesDraw{};
     // R151 seals the exact byte-range metadata behind the live IA binding.
     bool geometryRangeMetadataExact{};
-    // R157 binds live IA stride to the stride used to validate the translated
+    // R158 binds live IA stride to the stride used to validate the translated
     // D3D9 input layout.
     bool vertexStrideMatchesInputLayout{};
     bool componentSnapshotsPresent{};
