@@ -3864,6 +3864,19 @@ int main()
             indexedSourceRangeFan.snapshotToken == 0,
             "R149 indexed source range keeps triangle fan on generated-index path");
 
+        const auto indexedSourceRangePointList =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_range_readiness(
+                    D3DPT_POINTLIST, 1u, 0, 0u, 1u, 0u);
+        require(
+            !indexedSourceRangePointList.inputValid &&
+            !indexedSourceRangePointList.primitiveExact &&
+            indexedSourceRangePointList.vertexRangeExact &&
+            indexedSourceRangePointList.indexRangeExact &&
+            !indexedSourceRangePointList.ready &&
+            indexedSourceRangePointList.snapshotToken == 0,
+            "R149 indexed source range rejects D3D9 DIP point list");
+
         require(
             !outrun::vr::dx11::
                 validate_fixed_function_indexed_source_range_snapshot(

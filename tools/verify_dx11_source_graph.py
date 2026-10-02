@@ -2167,6 +2167,16 @@ def main() -> None:
             "R149 legal negative BaseVertexIndex preservation",
         ),
         (
+            "primitive != D3DPT_POINTLIST",
+            NATIVE_BACKEND_CPP,
+            "R149 D3D9 DrawIndexedPrimitive point-list rejection",
+        ),
+        (
+            "R149 indexed source range rejects D3D9 DIP point list",
+            CONSTANT_BUFFER_PROBE,
+            "R149 unsupported indexed point-list rejection",
+        ),
+        (
             "R149 indexed source range keeps triangle fan on generated-index path",
             CONSTANT_BUFFER_PROBE,
             "R149 direct-path fan quarantine",

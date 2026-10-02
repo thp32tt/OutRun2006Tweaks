@@ -4564,6 +4564,7 @@ compose_fixed_function_indexed_source_range_readiness(
     out.primitiveExact =
         topology.exact &&
         topology.value != D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED &&
+        primitive != D3DPT_POINTLIST &&
         primitive != D3DPT_TRIANGLEFAN;
 
     const UINT maxValue = std::numeric_limits<UINT>::max();
