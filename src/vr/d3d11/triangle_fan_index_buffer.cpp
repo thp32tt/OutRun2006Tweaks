@@ -1,0 +1,206 @@
+#include "triangle_fan_index_buffer.hpp"
+
+#include "state_translation.hpp"
+
+#include <limits>
+#include <vector>
+
+namespace outrun::vr::dx11 {
+namespace {
+
+std::uint64_t mix_index_token(
+    std::uint64_t token,
+    std::uint64_t value) noexcept {
+    token ^= value + 0x9e3779b97f4a7c15ull + (token << 6) + (token >> 2);
+    return token;
+}
+
+std::uint64_t hash_indices(const UINT* indices, UINT count) noexcept {
+    if (!indices || count == 0)
+        return 0;
+
+    std::uint64_t hash = 0xcbf29ce484222325ull;
+    for (UINT i = 0; i < count; ++i)
+        hash = mix_index_token(hash, indices[i]);
+    return hash == 0 ? 1 : hash;
+}
+
+} // namespace
+
+bool NativeTriangleFanIndexBuffer::initialize_nonindexed(
+    ID3D11Device* device,
+    UINT primitiveCount,
+    UINT baseVertex) noexcept {
+    const auto plan = translate_triangle_fan_expansion(primitiveCount);
+    if (!device || !plan.exact || plan.expandedIndexCount == 0)
+        return false;
+
+    std::vector<UINT> indices(plan.expandedIndexCount);
+    if (!materialize_triangle_fan_vertex_indices(
+            primitiveCount,
+            baseVertex,
+            indices.data(),
+            static_cast<UINT>(indices.size())))
+        return false;
+
+    return initialize_materialized(
+        device,
+        indices.data(),
+        static_cast<UINT>(indices.size()));
+}
+
+bool NativeTriangleFanIndexBuffer::initialize_indexed(
+    ID3D11Device* device,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    const void* sourceIndices,
+    UINT sourceIndexCount) noexcept {
+    const auto plan = translate_triangle_fan_expansion(primitiveCount);
+    if (!device || !plan.exact || plan.expandedIndexCount == 0)
+        return false;
+
+    std::vector<UINT> indices(plan.expandedIndexCount);
+    if (!materialize_indexed_triangle_fan_indices(
+            primitiveCount,
+            sourceIndexFormat,
+            startIndex,
+            sourceIndices,
+            sourceIndexCount,
+            indices.data(),
+            static_cast<UINT>(indices.size())))
+        return false;
+
+    return initialize_materialized(
+        device,
+        indices.data(),
+        static_cast<UINT>(indices.size()));
+}
+
+bool NativeTriangleFanIndexBuffer::initialize_materialized(
+    ID3D11Device* device,
+    const UINT* indices,
+    UINT indexCount) noexcept {
+    shutdown();
+
+    if (!device || !indices || indexCount == 0 ||
+        indexCount >
+            std::numeric_limits<UINT>::max() /
+                static_cast<UINT>(sizeof(UINT)) ||
+        generation_ == std::numeric_limits<std::uint64_t>::max())
+        return false;
+
+    const std::uint64_t contentHash = hash_indices(indices, indexCount);
+    if (contentHash == 0)
+        return false;
+
+    D3D11_BUFFER_DESC desc{};
+    desc.ByteWidth = indexCount * static_cast<UINT>(sizeof(UINT));
+    desc.Usage = D3D11_USAGE_IMMUTABLE;
+    desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+    D3D11_SUBRESOURCE_DATA initialData{};
+    initialData.pSysMem = indices;
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer> buffer;
+    if (FAILED(device->CreateBuffer(&desc, &initialData, buffer.GetAddressOf())) ||
+        !buffer)
+        return false;
+
+    device_ = device;
+    buffer_ = std::move(buffer);
+    index_count_ = indexCount;
+    content_hash_ = contentHash;
+    ++generation_;
+    return true;
+}
+
+bool NativeTriangleFanIndexBuffer::descriptor_exact(
+    ID3D11Device* expectedDevice) const noexcept {
+    if (!ready() || !expectedDevice || expectedDevice != device_.Get())
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> bufferDevice;
+    buffer_->GetDevice(bufferDevice.GetAddressOf());
+    if (bufferDevice.Get() != expectedDevice)
+        return false;
+
+    if (index_count_ >
+        std::numeric_limits<UINT>::max() /
+            static_cast<UINT>(sizeof(UINT)))
+        return false;
+
+    D3D11_BUFFER_DESC desc{};
+    buffer_->GetDesc(&desc);
+    return
+        desc.ByteWidth ==
+            index_count_ * static_cast<UINT>(sizeof(UINT)) &&
+        desc.Usage == D3D11_USAGE_IMMUTABLE &&
+        desc.BindFlags == D3D11_BIND_INDEX_BUFFER &&
+        desc.CPUAccessFlags == 0 &&
+        desc.MiscFlags == 0 &&
+        desc.StructureByteStride == 0;
+}
+
+NativeTriangleFanIndexBufferReadiness
+NativeTriangleFanIndexBuffer::readiness(
+    ID3D11Device* expectedDevice) const noexcept {
+    NativeTriangleFanIndexBufferReadiness out{};
+    out.resourcesOwned = device_ && buffer_;
+    out.deviceMatches =
+        expectedDevice != nullptr &&
+        device_.Get() == expectedDevice;
+    out.descriptorExact = descriptor_exact(expectedDevice);
+    out.indexCount = index_count_;
+    out.generation = generation_;
+    out.contentHash = content_hash_;
+    out.ready =
+        out.resourcesOwned &&
+        out.deviceMatches &&
+        out.descriptorExact &&
+        out.indexCount != 0 &&
+        out.generation != 0 &&
+        out.contentHash != 0;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_index_token(token, out.generation);
+        token = mix_index_token(token, out.indexCount);
+        token = mix_index_token(token, out.contentHash);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeTriangleFanIndexBuffer::validate_readiness_snapshot(
+    ID3D11Device* expectedDevice,
+    std::uint64_t snapshotToken) const noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = readiness(expectedDevice);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
+bool NativeTriangleFanIndexBuffer::bind(
+    ID3D11DeviceContext* context) const noexcept {
+    if (!ready() || !context)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    context->GetDevice(contextDevice.GetAddressOf());
+    if (contextDevice.Get() != device_.Get())
+        return false;
+
+    context->IASetIndexBuffer(buffer_.Get(), DXGI_FORMAT_R32_UINT, 0);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    return true;
+}
+
+void NativeTriangleFanIndexBuffer::shutdown() noexcept {
+    buffer_.Reset();
+    device_.Reset();
+    index_count_ = 0;
+    content_hash_ = 0;
+}
+
+} // namespace outrun::vr::dx11
