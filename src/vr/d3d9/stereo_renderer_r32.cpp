@@ -8,6 +8,7 @@
 #include "../telemetry/performance_types.hpp"
 #include "../telemetry/performance_clock.hpp"
 #include "../render/effect_state_snapshot.hpp"
+#include "../core/review_dispatch_hooks.hpp"
 #include "stereo_renderer_r31.cpp"
 #include "../render/stereo_base_policy.hpp"
 #include "../render/screen_space_api.hpp"
@@ -719,79 +720,7 @@ namespace OutRunVRStereo
                 std::forward<LowerDraw>(lowerDraw));
         }
 
-        HRESULT __stdcall DrawPrimitiveDestR32(IDirect3DDevice9* device,
-            D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
-        {
-            R32ObserveFrameWorkload(device, type, primitiveCount, false, false);
-            auto actual = [&]() {
-                return DrawPrimitiveHook.stdcall<HRESULT>(
-                    device, type, startVertex, primitiveCount);
-            };
-            auto lower = [&]() {
-                return R32DrawPrimitiveR31Hook.stdcall<HRESULT>(
-                    device, type, startVertex, primitiveCount);
-            };
-            return R32Dispatch(device, actual, lower, "R32/DrawPrimitive");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveDestR32(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
-            UINT startIndex, UINT primitiveCount)
-        {
-            R32ObserveFrameWorkload(device, type, primitiveCount, true, false);
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
-                    baseVertexIndex, minVertexIndex, numVertices, startIndex,
-                    primitiveCount);
-            };
-            auto lower = [&]() {
-                return R32DrawIndexedPrimitiveR31Hook.stdcall<HRESULT>(device,
-                    type, baseVertexIndex, minVertexIndex, numVertices,
-                    startIndex, primitiveCount);
-            };
-            return R32Dispatch(device, actual, lower,
-                "R32/DrawIndexedPrimitive");
-        }
-
-        HRESULT __stdcall DrawPrimitiveUPDestR32(IDirect3DDevice9* device,
-            D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
-            UINT stride)
-        {
-            R32ObserveFrameWorkload(device, type, primitiveCount, false, true);
-            auto actual = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, primitiveCount, data, stride);
-            };
-            auto lower = [&]() {
-                return R32DrawPrimitiveUPR31Hook.stdcall<HRESULT>(
-                    device, type, primitiveCount, data, stride);
-            };
-            return R32Dispatch(device, actual, lower, "R32/DrawPrimitiveUP");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveUPDestR32(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
-            const void* indexData, D3DFORMAT indexFormat,
-            const void* vertexData, UINT stride)
-        {
-            R32ObserveFrameWorkload(device, type, primitiveCount, true, true);
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
-                    minVertexIndex, numVertices, primitiveCount, indexData,
-                    indexFormat, vertexData, stride);
-            };
-            auto lower = [&]() {
-                return R32DrawIndexedPrimitiveUPR31Hook.stdcall<HRESULT>(device,
-                    type, minVertexIndex, numVertices, primitiveCount,
-                    indexData, indexFormat, vertexData, stride);
-            };
-            return R32Dispatch(device, actual, lower,
-                "R32/DrawIndexedPrimitiveUP");
-        }
-
-        void R32ForgetDirectIdentity() noexcept
+                                        void R32ForgetDirectIdentity() noexcept
         {
             R32DirectHostPid = 0;
             R32DirectHostLuidLow = 0;
@@ -1159,28 +1088,7 @@ namespace OutRunVRStereo
             }
         }
 
-        HRESULT __stdcall ResetDestR32(IDirect3DDevice9* device,
-            D3DPRESENT_PARAMETERS* params)
-        {
-            const bool gameDevice = IsGameDevice(device);
-            if (gameDevice)
-                R32ClearPendingProducerFences();
-
-            const HRESULT hr = R32ResetR22Hook.stdcall<HRESULT>(device, params);
-            if (gameDevice)
-            {
-                if (SUCCEEDED(hr))
-                    R32ResetAfterGameReset();
-                else
-                {
-                    R32InvalidateResetCaches();
-                    ++R32ResetFailures;
-                }
-            }
-            return hr;
-        }
-
-        void R32LogPerfWindow() noexcept
+                void R32LogPerfWindow() noexcept
         {
             if (!Settings::VRTelemetry)
                 return;
@@ -1320,34 +1228,7 @@ namespace OutRunVRStereo
             R32PerfWindowCounters = {};
         }
 
-        HRESULT __stdcall PresentDestR32(IDirect3DDevice9* device,
-            const RECT* sourceRect, const RECT* destRect,
-            HWND destWindowOverride, const RGNDATA* dirtyRegion)
-        {
-            const bool gameDevice = IsGameDevice(device);
-            const R32StereoWorkloadSnapshot stereo =
-                gameDevice ? R32CaptureStereoWorkload()
-                           : R32StereoWorkloadSnapshot{};
-            LARGE_INTEGER presentStart{};
-            if (gameDevice && Settings::VRTelemetry)
-                QueryPerformanceCounter(&presentStart);
-
-            const HRESULT hr = R32PresentR13Hook.stdcall<HRESULT>(device,
-                sourceRect, destRect, destWindowOverride, dirtyRegion);
-
-            if (gameDevice)
-            {
-                LARGE_INTEGER presentEnd{};
-                if (Settings::VRTelemetry)
-                    QueryPerformanceCounter(&presentEnd);
-                R32FinalizeFramePerf(
-                    presentStart.QuadPart, presentEnd.QuadPart, stereo);
-                R32LogPerfWindow();
-            }
-            return hr;
-        }
-
-        void R32RollbackHooks() noexcept
+                void R32RollbackHooks() noexcept
         {
             R32DrawIndexedPrimitiveUPR31Hook = {};
             R32DrawPrimitiveUPR31Hook = {};
@@ -1508,6 +1389,138 @@ namespace OutRunVRStereo
 
         VRStereoR32ReviewHook VRStereoR32ReviewHook::instance;
     }
+
+HRESULT __stdcall DrawPrimitiveDestR32(IDirect3DDevice9* device,
+        D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
+    {
+        R32ObserveFrameWorkload(device, type, primitiveCount, false, false);
+        auto actual = [&]() {
+            return DrawPrimitiveHook.stdcall<HRESULT>(
+                device, type, startVertex, primitiveCount);
+        };
+        auto lower = [&]() {
+            return R32DrawPrimitiveR31Hook.stdcall<HRESULT>(
+                device, type, startVertex, primitiveCount);
+        };
+        return R32Dispatch(device, actual, lower, "R32/DrawPrimitive");
+    }
+
+
+
+HRESULT __stdcall DrawIndexedPrimitiveDestR32(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+        UINT startIndex, UINT primitiveCount)
+    {
+        R32ObserveFrameWorkload(device, type, primitiveCount, true, false);
+        auto actual = [&]() {
+            return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
+                baseVertexIndex, minVertexIndex, numVertices, startIndex,
+                primitiveCount);
+        };
+        auto lower = [&]() {
+            return R32DrawIndexedPrimitiveR31Hook.stdcall<HRESULT>(device,
+                type, baseVertexIndex, minVertexIndex, numVertices,
+                startIndex, primitiveCount);
+        };
+        return R32Dispatch(device, actual, lower,
+            "R32/DrawIndexedPrimitive");
+    }
+
+
+
+HRESULT __stdcall DrawPrimitiveUPDestR32(IDirect3DDevice9* device,
+        D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
+        UINT stride)
+    {
+        R32ObserveFrameWorkload(device, type, primitiveCount, false, true);
+        auto actual = [&]() {
+            return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                device, type, primitiveCount, data, stride);
+        };
+        auto lower = [&]() {
+            return R32DrawPrimitiveUPR31Hook.stdcall<HRESULT>(
+                device, type, primitiveCount, data, stride);
+        };
+        return R32Dispatch(device, actual, lower, "R32/DrawPrimitiveUP");
+    }
+
+
+
+HRESULT __stdcall DrawIndexedPrimitiveUPDestR32(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
+        const void* indexData, D3DFORMAT indexFormat,
+        const void* vertexData, UINT stride)
+    {
+        R32ObserveFrameWorkload(device, type, primitiveCount, true, true);
+        auto actual = [&]() {
+            return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
+                minVertexIndex, numVertices, primitiveCount, indexData,
+                indexFormat, vertexData, stride);
+        };
+        auto lower = [&]() {
+            return R32DrawIndexedPrimitiveUPR31Hook.stdcall<HRESULT>(device,
+                type, minVertexIndex, numVertices, primitiveCount,
+                indexData, indexFormat, vertexData, stride);
+        };
+        return R32Dispatch(device, actual, lower,
+            "R32/DrawIndexedPrimitiveUP");
+    }
+
+
+
+HRESULT __stdcall ResetDestR32(IDirect3DDevice9* device,
+        D3DPRESENT_PARAMETERS* params)
+    {
+        const bool gameDevice = IsGameDevice(device);
+        if (gameDevice)
+            R32ClearPendingProducerFences();
+
+        const HRESULT hr = R32ResetR22Hook.stdcall<HRESULT>(device, params);
+        if (gameDevice)
+        {
+            if (SUCCEEDED(hr))
+                R32ResetAfterGameReset();
+            else
+            {
+                R32InvalidateResetCaches();
+                ++R32ResetFailures;
+            }
+        }
+        return hr;
+    }
+
+
+
+HRESULT __stdcall PresentDestR32(IDirect3DDevice9* device,
+        const RECT* sourceRect, const RECT* destRect,
+        HWND destWindowOverride, const RGNDATA* dirtyRegion)
+    {
+        const bool gameDevice = IsGameDevice(device);
+        const R32StereoWorkloadSnapshot stereo =
+            gameDevice ? R32CaptureStereoWorkload()
+                       : R32StereoWorkloadSnapshot{};
+        LARGE_INTEGER presentStart{};
+        if (gameDevice && Settings::VRTelemetry)
+            QueryPerformanceCounter(&presentStart);
+
+        const HRESULT hr = R32PresentR13Hook.stdcall<HRESULT>(device,
+            sourceRect, destRect, destWindowOverride, dirtyRegion);
+
+        if (gameDevice)
+        {
+            LARGE_INTEGER presentEnd{};
+            if (Settings::VRTelemetry)
+                QueryPerformanceCounter(&presentEnd);
+            R32FinalizeFramePerf(
+                presentStart.QuadPart, presentEnd.QuadPart, stereo);
+            R32LogPerfWindow();
+        }
+        return hr;
+    }
+
+
 
     bool EffectIsFragileLive(
         IDirect3DDevice9* device, bool& fragile) noexcept

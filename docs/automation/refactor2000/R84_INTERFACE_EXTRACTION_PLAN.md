@@ -36,6 +36,8 @@ Goal: remove the textual R29 -> R30 -> R31 -> R32 -> R33 -> R34 implementation i
    - Keep exactly one active stereo owner for each configured graph.
    - Extend verifier/CMake guards so textual .cpp includes cannot reappear.
 
-## Current step
+## Current progress
 
-Stage 1 / R33 -> R34 seam. This step changes linkage visibility only; the R34 textual include remains in place and runtime ordering is unchanged.
+- Stage 1 / R33 -> R34 seam: hook destinations exposed through `final_dispatch_hooks.hpp`; textual include intentionally preserved.
+- Stage 2 / R32 -> R33 seam: hook destinations exposed through `review_dispatch_hooks.hpp`; textual include intentionally preserved.
+- Next: repeat the same boundary extraction for R31 -> R32. No textual implementation include is removed until an explicit build/link gate is allowed.

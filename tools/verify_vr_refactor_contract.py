@@ -21,6 +21,7 @@ r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = read("src/vr/d3d9/stereo_renderer_r33.cpp")
 r34 = read("src/vr/d3d9/stereo_renderer_r34.cpp")
 final_dispatch_hooks = read("src/vr/core/final_dispatch_hooks.hpp")
+review_dispatch_hooks = read("src/vr/core/review_dispatch_hooks.hpp")
 
 for marker in (
     "class StateBlockTracker final",
@@ -694,6 +695,37 @@ if reset_begin >= 0 and rollback_begin > reset_begin:
         if legacy in callback_region:
             errors.append(f"R34 callback bypassed lifecycle facade: {legacy}")
 
+
+# R84 staged interface extraction: R32 -> R33 seam.
+for marker in (
+    "DrawPrimitiveDestR32(",
+    "DrawIndexedPrimitiveDestR32(",
+    "DrawPrimitiveUPDestR32(",
+    "DrawIndexedPrimitiveUPDestR32(",
+    "ResetDestR32(",
+    "PresentDestR32(",
+):
+    if marker not in review_dispatch_hooks:
+        errors.append(f"R32 review-dispatch hook API missing declaration: {marker}")
+if '#include "../core/review_dispatch_hooks.hpp"' not in r32:
+    errors.append("R32 review-dispatch hook API include missing")
+if '#include "../core/review_dispatch_hooks.hpp"' not in r33:
+    errors.append("R33 review-dispatch hook API include missing")
+if '#include "stereo_renderer_r32.cpp"' not in r33:
+    errors.append("R32->R33 textual include removed before build/link gate")
+r32_instance = r32.find("VRStereoR32ReviewHook VRStereoR32ReviewHook::instance;")
+for marker in (
+    "HRESULT __stdcall DrawPrimitiveDestR32(",
+    "HRESULT __stdcall DrawIndexedPrimitiveDestR32(",
+    "HRESULT __stdcall DrawPrimitiveUPDestR32(",
+    "HRESULT __stdcall DrawIndexedPrimitiveUPDestR32(",
+    "HRESULT __stdcall ResetDestR32(",
+    "HRESULT __stdcall PresentDestR32(",
+):
+    pos = r32.find(marker)
+    if r32_instance < 0 or pos <= r32_instance:
+        errors.append(
+            f"R32 hook destination has not crossed the anonymous implementation boundary: {marker}")
 
 # R84 staged interface extraction: R33 -> R34 seam.
 # Stage 1 exposes stable hook-destination declarations but deliberately keeps

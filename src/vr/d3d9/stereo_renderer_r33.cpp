@@ -13,6 +13,7 @@
 #include "stereo_renderer_r32.cpp"
 #include "../state/state_block_tracker.hpp"
 #include "../core/dispatch_support.hpp"
+#include "../core/review_dispatch_hooks.hpp"
 #include "../core/final_dispatch_hooks.hpp"
 #include "../render/stereo_base_policy.hpp"
 #include "../render/screen_space_api.hpp"
