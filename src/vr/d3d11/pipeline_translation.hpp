@@ -79,6 +79,10 @@ namespace outrun::vr::dx11
         FixedFunctionUnsupportedSamplerFilter = 1u << 8,
         FixedFunctionUnsupportedSamplerAddress = 1u << 9,
         FixedFunctionUnsupportedSamplerLod = 1u << 10,
+        // D3D9 D3DSAMP_SRGBTEXTURE changes texture decode semantics. The
+        // current native Texture2D SRV path is not yet format-promoted to an
+        // sRGB view, so nonzero state must remain fail-closed.
+        FixedFunctionUnsupportedSamplerSrgb = 1u << 11,
     };
 
     struct FixedFunctionStageState
@@ -105,6 +109,10 @@ namespace outrun::vr::dx11
         DWORD addressU = D3DTADDRESS_WRAP;
         DWORD addressV = D3DTADDRESS_WRAP;
         DWORD borderColor = 0;
+        // Preserve raw D3D9 sampler sRGB-decode intent. FALSE is exact with
+        // the current linear SRV path; enabled sRGB decode is gated until an
+        // exact sRGB SRV/format translation is implemented.
+        DWORD srgbTexture = FALSE;
     };
 
     // R98 translates the conservative R82 sampler subset into a concrete
