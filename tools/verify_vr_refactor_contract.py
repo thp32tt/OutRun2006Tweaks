@@ -293,6 +293,40 @@ if min(window_decl, reset_window) < 0 or not window_decl < reset_window:
     errors.append(
         "R31 telemetry reset API must be declared after the R31 window owner")
 
+for banned in (
+    "R31BlockedVerifiedGeneration =",
+    "R31FastWorldCandidates =",
+    "R31EyeCache =",
+):
+    if banned in r32:
+        errors.append(
+            f"R32 retained direct R31 reset-state ownership: {banned}")
+    if banned in r33 or banned in r34:
+        errors.append(
+            f"upper renderer retained direct R31 reset-state ownership: {banned}")
+
+reset_fast = re.search(
+    r"inline void R31ResetFastPathState\(\) noexcept\s*\{(?P<body>.*?)\n        \}",
+    r31,
+    re.DOTALL,
+)
+if not reset_fast:
+    errors.append("R31 fast-path reset owner API missing")
+else:
+    reset_body = reset_fast.group("body")
+    reset_order = [
+        reset_body.find("R31BlockedVerifiedGeneration = 0;"),
+        reset_body.find("R31FastWorldCandidates = 0;"),
+        reset_body.find("R31EyeCache = {};"),
+        reset_body.find("R31TelemetryResetFrameWindow();"),
+    ]
+    if min(reset_order) < 0 or reset_order != sorted(reset_order):
+        errors.append(
+            "R31 fast-path reset API must preserve blocked/candidate/eye/telemetry order")
+
+if "R31ResetFastPathState();" not in r32:
+    errors.append("R32 reset path missing R31 fast-path owner reset API")
+
 for rel, source in (("R33", r33), ("R34", r34)):
     if "R31FlushPendingStateBlockResync" in source:
         errors.append(
