@@ -125,7 +125,7 @@ DECL_RE = re.compile(
     r"method=(?P<method>\d+) usage=(?P<usage>\d+) usageIndex=(?P<usageIndex>\d+)"
 )
 FFP_RE = re.compile(
-    r"VR DX11 R(?:72|8[12345]|160) ffp signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
+    r"VR DX11 R(?:72|8[12345]|160|173) ffp signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
     r"color\[op=(?P<colorOp>\d+),arg1=0x(?P<colorArg1>[0-9A-Fa-f]+),"
     r"arg2=0x(?P<colorArg2>[0-9A-Fa-f]+)\] "
     r"alpha\[op=(?P<alphaOp>\d+),arg1=0x(?P<alphaArg1>[0-9A-Fa-f]+),"
