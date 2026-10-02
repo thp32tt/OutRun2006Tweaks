@@ -3047,6 +3047,83 @@ int main()
         sameContextRestored.snapshotToken == sameContextBoundDraw.snapshotToken,
         "R139 same-context final bound draw restores deterministic snapshot");
 
+    const auto completeBoundDraw =
+        outrun::vr::dx11::compose_fixed_function_complete_bound_draw_readiness(
+            multiStageDrawReady, d3d.context, outputStateBinding,
+            pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+            multiStageSamplers, multiStageTextures,
+            indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+    require(
+        completeBoundDraw.inputValid &&
+        completeBoundDraw.sameContextBoundDrawReady &&
+        completeBoundDraw.geometryBindingReady &&
+        completeBoundDraw.geometryBindingMatchesDraw &&
+        completeBoundDraw.componentSnapshotsPresent &&
+        completeBoundDraw.ready &&
+        completeBoundDraw.sameContextBoundDrawSnapshotToken ==
+            sameContextBoundDraw.snapshotToken &&
+        completeBoundDraw.geometryBindingSnapshotToken ==
+            indexedGeometryBinding.snapshotToken &&
+        completeBoundDraw.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_fixed_function_complete_bound_draw_snapshot(
+            multiStageDrawReady, d3d.context, outputStateBinding,
+            pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+            multiStageSamplers, multiStageTextures,
+            indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            completeBoundDraw.snapshotToken),
+        "R140 complete bound draw includes exact live IA geometry");
+
+    d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    const auto completeGeometryDrift =
+        outrun::vr::dx11::compose_fixed_function_complete_bound_draw_readiness(
+            multiStageDrawReady, d3d.context, outputStateBinding,
+            pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+            multiStageSamplers, multiStageTextures,
+            indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+    require(
+        completeGeometryDrift.sameContextBoundDrawReady &&
+        !completeGeometryDrift.geometryBindingReady &&
+        completeGeometryDrift.geometryBindingMatchesDraw &&
+        !completeGeometryDrift.componentSnapshotsPresent &&
+        !completeGeometryDrift.ready &&
+        completeGeometryDrift.snapshotToken == 0 &&
+        !outrun::vr::dx11::validate_fixed_function_complete_bound_draw_snapshot(
+            multiStageDrawReady, d3d.context, outputStateBinding,
+            pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+            multiStageSamplers, multiStageTextures,
+            indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            completeBoundDraw.snapshotToken),
+        "R140 final gate fails closed after live IA topology drift");
+
+    require(
+        outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+            d3d.context, indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset),
+        "R140 restore IA geometry after final gate drift probe");
+    const auto completeBoundDrawRestored =
+        outrun::vr::dx11::compose_fixed_function_complete_bound_draw_readiness(
+            multiStageDrawReady, d3d.context, outputStateBinding,
+            pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+            multiStageSamplers, multiStageTextures,
+            indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+    require(
+        completeBoundDrawRestored.ready &&
+        completeBoundDrawRestored.geometryBindingReady &&
+        completeBoundDrawRestored.geometryBindingMatchesDraw &&
+        completeBoundDrawRestored.snapshotToken == completeBoundDraw.snapshotToken,
+        "R140 restored IA geometry reproduces complete bound draw snapshot");
+
     auto mismatchedPipelineBinding = drawPipelineBindingReady;
     mismatchedPipelineBinding.pipelineSnapshotToken ^= 0x100000001b3ull;
     const auto mismatchedPipelineBoundDraw =
