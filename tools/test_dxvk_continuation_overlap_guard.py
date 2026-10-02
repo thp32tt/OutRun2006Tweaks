@@ -72,8 +72,17 @@ def test_dxvk_partial_decode_stays_unresolved() -> None:
     validate_partial_instruction_requires_overlap(False, EXPECTED_OVERLAP)
 
 
+def test_dxvk_partial_decode_rejects_missing_overlap_bytes() -> None:
+    try:
+        validate_partial_instruction_requires_overlap(False, "")
+    except AssertionError:
+        return
+    raise AssertionError("missing overlap evidence was accepted")
+
+
 if __name__ == "__main__":
     test_dxvk_continuation_overlap_guard()
     test_dxvk_continuation_frontier_edge_alignment()
     test_dxvk_partial_decode_stays_unresolved()
+    test_dxvk_partial_decode_rejects_missing_overlap_bytes()
     print("DXVK_CONTINUATION_OVERLAP_GUARD=PASS")
