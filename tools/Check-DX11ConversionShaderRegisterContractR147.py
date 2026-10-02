@@ -10,7 +10,8 @@ from pathlib import Path
 import sys
 
 
-SCAN_SUFFIXES = ("*.cpp", "*.hpp", "*.h", "*.c")
+SCAN_SUFFIXES = ("*.cpp", "*.hpp", "*.h", "*.c", "*.inl", "*.inc")
+IGNORED_DIRS = {".git", "out", "build", "bin"}
 TRACKED_MARKERS = (
     "D3DTA_TEMP",
     "D3DTSS_RESULTARG",
@@ -26,9 +27,12 @@ def iter_sources(root: Path):
     seen = set()
     for pattern in SCAN_SUFFIXES:
         for path in root.rglob(pattern):
-            if path not in seen:
-                seen.add(path)
-                yield path
+            if path in seen:
+                continue
+            if any(part in IGNORED_DIRS for part in path.parts):
+                continue
+            seen.add(path)
+            yield path
 
 
 def scan(root: Path) -> int:
@@ -56,7 +60,7 @@ def scan(root: Path) -> int:
         print("FAIL")
         print("\n".join(failures))
         return 1
-    print("PASS_STATIC_DX11_SHADER_REGISTER_CONTRACT_R147")
+    print(f"PASS_STATIC_DX11_SHADER_REGISTER_CONTRACT_R147 scanned={scanned}")
     return 0
 
 
