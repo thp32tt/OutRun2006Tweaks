@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1349,
+  "cycle": 1352,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -292,11 +292,12 @@
     "R84-REF-GATEE-RESTORE-0021",
     "R84-REF-GATEE-DEPTHAPI-0022",
     "R84-REF-GATEE-INCLUDEPLAN-0023",
-    "R84-REF-GATED-HOOKFRAMEWORK-0007"
+    "R84-REF-GATED-HOOKFRAMEWORK-0007",
+    "R84-REF-GATED-BUILD-0008"
   ],
-  "next": "Cycles 1350-1352: static re-read then BUILD_GATE. Prior Gate D run 37000911855/job 110818147921 first concrete compile error was SafetyHookInline undefined in R31.",
-  "updatedKst": "2026-10-02T20:45:00+09:00",
-  "batchStatus": "R84_GATE_D_HOOKFRAMEWORK_REPAIR_CYCLE_1349",
+  "next": "Consume exact Gate D BUILD_GATE 1352 run for this SHA. If compile still fails, repair first concrete missing dependency only.",
+  "updatedKst": "2026-10-02T20:47:00+09:00",
+  "batchStatus": "R84_GATE_D_BUILD_GATE_1352_TRIGGERED",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -566,7 +567,8 @@
     "Cycles 1341-1343 R84-REF-GATEE-DEPTHAPI-0022: R30 depth writes can use TrackedDepthStencilSnapshot/RightEyeDepthSnapshot/LeftDrawMayWrite*Live/InvalidateRightDepthStencilForLeftWrite; direct depth globals are unnecessary. APPLY_GATE 1343 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime NEED_HMD_TEST.",
     "Cycles 1344-1346 R84-REF-GATEE-INCLUDEPLAN-0023: R30 independent TU will need explicit hook_mgr, raw_draw_api, stereo_runtime_facade, depth_stencil_runtime, mono/frame/depth APIs and stereo_base hooks/policy. Buffer-shadow ownership remains local. No split until Gate D green. APPLY_GATE 1346 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime NEED_HMD_TEST.",
     "BUILD_GATE 1322/1328/1334/1340/1346: REUSED_BUILD_EVIDENCE=IN_PROGRESS exact Gate D run 37000911855/job 110818147921; build input unchanged since cycle 1286, so no duplicate hosted builds were started.",
-    "Cycles 1347-1349 R84-REF-GATED-HOOKFRAMEWORK-0007: consumed Gate D run 37000911855/job 110818147921. FAILURE_CLASS=PRODUCT_DEFECT. First concrete error at R31 lines 53-60: SafetyHookInline undefined because R31 inherited hook framework only through textual R30/R29 chain. Added explicit ../../hook_mgr.hpp and verifier guard only; no hook bodies/order changed. APPLY_GATE 1349 SOURCE_CHANGED=YES. Runtime NEED_HMD_TEST."
+    "Cycles 1347-1349 R84-REF-GATED-HOOKFRAMEWORK-0007: consumed Gate D run 37000911855/job 110818147921. FAILURE_CLASS=PRODUCT_DEFECT. First concrete error at R31 lines 53-60: SafetyHookInline undefined because R31 inherited hook framework only through textual R30/R29 chain. Added explicit ../../hook_mgr.hpp and verifier guard only; no hook bodies/order changed. APPLY_GATE 1349 SOURCE_CHANGED=YES. Runtime NEED_HMD_TEST.",
+    "Cycles 1350-1352 R84-REF-GATED-BUILD-0008: static re-read confirmed explicit ../../hook_mgr.hpp and verifier guard in R31. APPLY_GATE 1352 NO_SAFE_CHANGE. BUILD_GATE 1352 intentionally triggered on hook-framework repair SHA. Runtime NEED_HMD_TEST."
   ],
   "campaign": {
     "startCycle": 1202,
