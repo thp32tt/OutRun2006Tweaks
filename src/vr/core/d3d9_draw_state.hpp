@@ -39,6 +39,10 @@ namespace OutRunVR::DrawState
         // rather than assuming D3D9 constant-bias units equal D3D11 DepthBias.
         DWORD depthBiasBits = 0;
         DWORD slopeScaleDepthBiasBits = 0;
+        // R165: D3D9 dithering has no explicit D3D11 raster/OM state
+        // equivalent. Preserve it so enabled legacy dithering cannot be
+        // silently accepted as the native default.
+        DWORD ditherEnable = FALSE;
         // R161: D3D9 user clipping is not reproduced by the native DX11
         // fixed-function path. Preserve both gates so non-default semantics
         // fail closed instead of being erased by DepthClipEnable=TRUE.

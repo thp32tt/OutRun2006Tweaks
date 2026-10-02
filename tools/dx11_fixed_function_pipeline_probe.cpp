@@ -294,7 +294,35 @@ int main()
             "R163 fixed-function handoff must retain vertex-blend blocker");
     }
 
+    {
+        auto ditherOff = base_state();
+        ditherOff.ditherEnable = FALSE;
+        const auto ditherOffPipeline = translate_pipeline(ditherOff);
+        require(
+            ditherOffPipeline.exact() &&
+            (ditherOffPipeline.unsupported & PipelineUnsupportedDither) == 0,
+            "R165 disabled D3D9 dithering must remain exact");
+
+        auto ditherOn = ditherOff;
+        ditherOn.ditherEnable = TRUE;
+        const auto ditherOnPipeline = translate_pipeline(ditherOn);
+        require(
+            !ditherOnPipeline.exact() &&
+            (ditherOnPipeline.unsupported & PipelineUnsupportedDither) != 0,
+            "R165 enabled D3D9 dithering must fail closed");
+
+        const auto fixedDitherOn =
+            translate_fixed_function_pipeline_with_shader_semantics(
+                ditherOn, true, stages, true, 0x00, 0x00, textureTypes);
+        require(
+            !fixedDitherOn.exact() &&
+            (fixedDitherOn.renderStates.unsupported &
+             PipelineUnsupportedDither) != 0,
+            "R165 fixed-function shader handoff must retain dithering blocker");
+    }
+
     std::cout
+        << "DX11 fixed-function dithering fail-closed R165: PASS\n"
         << "DX11 fixed-function vertex-blend fail-closed R163: PASS\n"
         << "DX11 fixed-function clipping fail-closed R161: PASS\n"
         << "DX11 fixed-function alpha-test pipeline handoff R118: PASS\n"

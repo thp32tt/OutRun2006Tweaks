@@ -46,6 +46,10 @@ namespace outrun::vr::dx11
         // transforms and optional packed matrix indices that the dormant
         // native vertex shader does not model.
         PipelineUnsupportedVertexBlend = 1u << 16,
+        // R165: D3D9 can explicitly enable output dithering, while D3D11
+        // exposes no equivalent raster/OM toggle. Keep enabled dithering
+        // fail-closed until exact output-format behavior is proven.
+        PipelineUnsupportedDither = 1u << 17,
     };
 
     struct PipelineTranslation

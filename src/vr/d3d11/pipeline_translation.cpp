@@ -1503,6 +1503,11 @@ namespace outrun::vr::dx11
             source.indexedVertexBlendEnable != FALSE)
             out.unsupported |= PipelineUnsupportedVertexBlend;
 
+        // R165: D3D11 has no D3D9 DITHERENABLE state. Do not erase an
+        // explicitly enabled legacy output-dithering request.
+        if (source.ditherEnable != FALSE)
+            out.unsupported |= PipelineUnsupportedDither;
+
         if (source.alphaTestEnable != FALSE)
             out.unsupported |= PipelineUnsupportedAlphaTest;
         if (source.fogEnable != FALSE)

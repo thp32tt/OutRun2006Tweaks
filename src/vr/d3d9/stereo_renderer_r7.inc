@@ -926,6 +926,7 @@ namespace OutRunVRStereo
 				D3DRS_INDEXEDVERTEXBLENDENABLE,
 				D3DRS_CULLMODE, D3DRS_COLORWRITEENABLE,
 				D3DRS_DEPTHBIAS, D3DRS_SLOPESCALEDEPTHBIAS,
+				D3DRS_DITHERENABLE,
 				D3DRS_CLIPPING, D3DRS_CLIPPLANEENABLE,
 				D3DRS_STENCILENABLE, D3DRS_STENCILMASK,
 				D3DRS_STENCILWRITEMASK, D3DRS_STENCILREF,
@@ -1721,6 +1722,9 @@ namespace OutRunVRStereo
 		read(D3DRS_FILLMODE, out.fillMode);
 		read(D3DRS_DEPTHBIAS, out.depthBiasBits);
 		read(D3DRS_SLOPESCALEDEPTHBIAS, out.slopeScaleDepthBiasBits);
+		// R165 preserves legacy dithering provenance. Native DX11 has no
+		// matching switch, so readiness must see and reject the enabled case.
+		read(D3DRS_DITHERENABLE, out.ditherEnable);
 		// R161 keeps D3D9 clipping/user-plane semantics explicit for DX11
 		// readiness instead of silently assuming the D3D11 default.
 		read(D3DRS_CLIPPING, out.clipping);

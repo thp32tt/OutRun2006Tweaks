@@ -94,6 +94,40 @@ CONSTANT_BUFFER_CONTRACT_TEXT = (
 def main() -> None:
     verify_dx11_dual_source_contract()
 
+    r165_dither_contract = [
+        ("DWORD ditherEnable = FALSE;", D3D9_DRAW_STATE_HPP,
+         "R165 tracked dither field and disabled default"),
+        ("read(D3DRS_DITHERENABLE, out.ditherEnable);",
+         D3D9_RENDER_STATE_CAPTURE, "R165 live dither capture"),
+        ("PipelineUnsupportedDither = 1u << 17", PIPELINE_TRANSLATION_HPP,
+         "R165 dedicated unsupported dither bit"),
+        ("source.ditherEnable != FALSE", PIPELINE_TRANSLATION_CPP,
+         "R165 enabled-dither fail-closed predicate"),
+        ("out.unsupported |= PipelineUnsupportedDither;",
+         PIPELINE_TRANSLATION_CPP, "R165 pipeline readiness blocker"),
+        ("R165 disabled D3D9 dithering must remain exact",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R165 disabled positive fixture"),
+        ("R165 enabled D3D9 dithering must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R165 enabled negative fixture"),
+        ("R165 fixed-function shader handoff must retain dithering blocker",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R165 handoff negative fixture"),
+        ("DX11 fixed-function dithering fail-closed R165: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R165 hosted probe completion marker"),
+    ]
+    missing_r165_dither = [
+        meaning
+        for token, source, meaning in r165_dither_contract
+        if token not in source
+    ]
+    if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_DITHERENABLE") < 2:
+        missing_r165_dither.append(
+            "R165 DITHERENABLE must be both primed and captured")
+    if missing_r165_dither:
+        raise SystemExit(
+            "DX11 R165 dithering contract drift: "
+            + ", ".join(missing_r165_dither)
+        )
+
     # R163 keeps the runtime unsupported-reason census structurally aligned
     # with every concrete PipelineUnsupported bit. This is activation evidence:
     # silently dropping a newer blocker would make exhaustive census misleading.
