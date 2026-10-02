@@ -1413,7 +1413,7 @@ HRESULT __stdcall DrawIndexedPrimitiveDestR32(
     {
         R32ObserveFrameWorkload(device, type, primitiveCount, true, false);
         auto actual = [&]() {
-            return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
+            return CallRawDrawIndexedPrimitive(device, type,
                 baseVertexIndex, minVertexIndex, numVertices, startIndex,
                 primitiveCount);
         };
@@ -1453,7 +1453,7 @@ HRESULT __stdcall DrawIndexedPrimitiveUPDestR32(
     {
         R32ObserveFrameWorkload(device, type, primitiveCount, true, true);
         auto actual = [&]() {
-            return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
+            return CallRawDrawIndexedPrimitiveUP(device, type,
                 minVertexIndex, numVertices, primitiveCount, indexData,
                 indexFormat, vertexData, stride);
         };

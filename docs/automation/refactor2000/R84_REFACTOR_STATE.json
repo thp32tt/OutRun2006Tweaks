@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1208,
+  "cycle": 1211,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -250,9 +250,9 @@
     "R84-REF-BUILDGATE-B-0004",
     "R84-REF-BUILDGATE-C-0001"
   ],
-  "next": "Consume exact hosted BUILD_GATE for this cycle-1208 source SHA. If compile/link fails, fix only the first concrete remaining R32 independent-TU dependency. If green, mark Gate C BUILD_VERIFIED and proceed to Gate D R31/R30 split.",
-  "updatedKst": "2026-10-02T18:31:00+09:00",
-  "batchStatus": "R84_BUILD_GATE_C_TRANSPORT_FACADE_APPLIED_BUILD_TRIGGERED_CYCLE_1208",
+  "next": "Cycles 1212-1214: consume cycle-1208 BUILD_GATE result, then repair only the first concrete remaining R32 independent-TU compile/link dependency. APPLY_GATE and BUILD_GATE at 1214 on exact resulting SHA.",
+  "updatedKst": "2026-10-02T18:36:00+09:00",
+  "batchStatus": "R84_BUILD_GATE_C_VERIFIER_BOUNDARY_REPAIRED_CYCLE_1211",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -471,7 +471,8 @@
     "Gate B exact hosted run 36967884507 job 110715482893 completed SUCCESS for SHA 60bfea8251685207cddf3ffa6482027083d0034f. Gate C prep exposed R13 ResolveDirectTransportR13/PresentDestR13 and R22 ResetDestR22 with linkage-only changes; bodies/order unchanged. R32 now guards R31 textual include under OUTRUN_VR_REFACTOR_SPLIT_R32_R31; cmake.toml/CMakeLists.txt kept aligned; workflow now validates cumulative R34-R31 split. Exact Gate C run 36972915737 job 110730517261 for SHA d992b38a1087fc70f18f53ce933c03a7fb9caa6e: verifier PASS, configure IN_PROGRESS at checkpoint. Runtime NEED_HMD_TEST.",
     "Gate C run 36972915737 job 110730517261 failed in compile after verifier/configure PASS. FAILURE_CLASS=PRODUCT_DEFECT: removing R31 textual include exposed R32 implicit base dependencies; first error SafetyHookInline missing, followed by STL/spdlog/backend declarations. Repair attempt 1 commit 6101cbc58d4a648ff15f1dc4273550157114c6bd adds explicit stereo_backend/safetyhook/STL/spdlog dependencies only; no hook bodies/order or runtime semantics changed. Exact repair run 36978856386 job 110748583667 is IN_PROGRESS. Runtime NEED_HMD_TEST.",
     "Cycles 1203-1205 R84-REF-GATEC-RUNTIME-0001: consumed Gate C repair run 36978856386/job 110748583667 (verifier/configure PASS, compile FAIL). Extracted R32 general runtime dependencies onto existing neutral facades: telemetry/device/internal-pass/present-epoch/WVP upload, RT/depth binding, depth sync/write invalidation, stereo resource/frame metadata, raw draw hooks, and explicit DispatchResult/fast-path dependencies. DirectGPU transport internals intentionally remain for next 3-cycle batch. APPLY_GATE 1205 SOURCE_CHANGED=YES. Build deferred to BUILD_GATE 1208 per 6-cycle cadence. RUNTIME_VALIDATION=UNTESTED.",
-    "Cycles 1206-1208 R84-REF-GATEC-TRANSPORT-0002: extracted R32 DirectGPU identity/resource/slot/backpressure/fence counter access behind direct_transport_runtime.hpp and shader identity mask/restore behind stereo_runtime_facade.hpp. ACK ordering, producer EVENT wait budget, StretchRect pair order, slot pending/publication transitions, and post-Present publication owner are unchanged. APPLY_GATE 1208 SOURCE_CHANGED=YES. BUILD_GATE 1208 intentionally triggered on exact resulting SHA. RUNTIME_VALIDATION=UNTESTED."
+    "Cycles 1206-1208 R84-REF-GATEC-TRANSPORT-0002: extracted R32 DirectGPU identity/resource/slot/backpressure/fence counter access behind direct_transport_runtime.hpp and shader identity mask/restore behind stereo_runtime_facade.hpp. ACK ordering, producer EVENT wait budget, StretchRect pair order, slot pending/publication transitions, and post-Present publication owner are unchanged. APPLY_GATE 1208 SOURCE_CHANGED=YES. BUILD_GATE 1208 intentionally triggered on exact resulting SHA. RUNTIME_VALIDATION=UNTESTED.",
+    "Cycles 1209-1211 R84-REF-GATEC-VERIFY-0003: static cross-check found Gate C phase-2 verifier substring false-positive risk (facade names contain legacy identifier text) and two remaining indexed raw draw hook calls. Converted verifier legacy-state checks to exact identifier regex/call checks and routed indexed raw draws through raw_draw_api. APPLY_GATE 1211 SOURCE_CHANGED=YES; [skip ci], next BUILD_GATE remains 1214. RUNTIME_VALIDATION=UNTESTED."
   ],
   "campaign": {
     "startCycle": 1202,

@@ -1064,7 +1064,7 @@ for marker in (
 ):
     if marker not in stereo_runtime_facade:
         errors.append(f"stereo runtime facade missing Gate C shader-mask marker: {marker}")
-for forbidden in (
+for forbidden_ident in (
     "SharedState",
     "DirectInteropVerified",
     "DirectInteropProbeFence",
@@ -1074,14 +1074,20 @@ for forbidden in (
     "DirectInteropProbeToken",
     "DirectTransportSlots",
     "DirectTransportResourcesReady",
+    "ActiveDirectTransportSlot",
+):
+    if re.search(rf"\\b{forbidden_ident}\\b", r32):
+        errors.append(
+            f"R32 retained direct transport/base state after Gate C phase 2: {forbidden_ident}")
+for forbidden_call in (
     "EnsureDirectTransportResources(",
     "ReleaseDirectTransportSlots(",
-    "ActiveDirectTransportSlot",
     "CurrentVertexShaderIdentity.exchange",
     "CurrentVertexShaderIdentity.compare_exchange",
 ):
-    if forbidden in r32:
-        errors.append(f"R32 retained direct transport/base state after Gate C phase 2: {forbidden}")
+    if forbidden_call in r32:
+        errors.append(
+            f"R32 retained direct transport/base call after Gate C phase 2: {forbidden_call}")
 
 if errors:
     print("R84 refactor contract FAILED")
