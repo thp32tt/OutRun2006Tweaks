@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "e6839c3323918fa22b368ff860716c20aca040e0",
+  "state_parent_head": "4c0b52ab5080f39ba5bcb804fc49a560afc4a181",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,20 +52,20 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "7275187140877c54ebc4901eec07ba0218fdbfad",
-    "source_implementation_sha": "1ce005dd16323d31d1970adc195ef33a9aad20c7",
-    "validation_bearing_sha": "cf2340a3813fa2556f5c47c0c48bf328f893800f",
-    "retaining_descendant_sha": "e6839c3323918fa22b368ff860716c20aca040e0",
-    "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; CONFIGURE_IN_PROGRESS_AT_OBSERVATION; BUILD_BINARY_NOT_CLAIMED",
+    "result_sha": "d9c3ca4a6c8e0ad0c6db7a4f52148a3b20cf8576",
+    "source_implementation_sha": "4376679dc1fb47a354c530b6e2a010a0b4fb2789",
+    "validation_bearing_sha": "278452f5be570920954bbfe1c52c74cf4f170e3e",
+    "retaining_descendant_sha": "4c0b52ab5080f39ba5bcb804fc49a560afc4a181",
+    "automation_validation": "PASS_RETAINING_DESCENDANT_BACKEND_GATE_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; COMPILE_NOT_REQUIRED_FOR_ANALYZER_STATIC_UNIT_AND_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "issue14_comment_id": 5950133752,
-    "validation_run_id": 36994292016,
-    "validation_job_id": 110797368451
+    "issue14_comment_id": 5950356781,
+    "validation_run_id": 36995444588,
+    "validation_job_id": 110800992720
   },
-  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA descendant static validation passed through DX11 source graph, dormant activation boundary and census analyzer; compile/binary success is not claimed.",
-  "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation; R197 D3DTA_CONSTANT is dormant translation/census/probe logic only.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve completed R197 D3DTA_CONSTANT per-stage semantics and all newer retained work; fresh-audit only the newest authenticated GitHub HEAD for the next independent dormant DX11 source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed. The selected analyzer/test/source-graph unit passed its required static checks on retaining descendant 278452f5be570920954bbfe1c52c74cf4f170e3e; Win32 binary/runtime success is not claimed.",
+  "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation; FixedFunctionDetailedStageDemand remains diagnostic-only.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve R198 SPECULAR, R199 detailed-stage dedupe, R200 TEMP/RESULTARG semantics and the R200-aligned FixedFunctionDetailedStageDemand contract; fresh-audit only the newest authenticated GitHub HEAD for the next independent dormant DX11 source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1386,6 +1386,34 @@
       "issue14_comment_id": 5950133752,
       "validation_run_id": 36994292016,
       "validation_job_id": 110797368451
+    },
+    {
+      "unit_id": "DX11_FFP_DETAILED_DEMAND_CENSUS_R200_ALIGNMENT",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "7275187140877c54ebc4901eec07ba0218fdbfad",
+      "implementation_commits": [
+        "4376679dc1fb47a354c530b6e2a010a0b4fb2789",
+        "c91ac0fbd74f7bdeb63a898f17ae35f3d237ac60",
+        "09335d2a1ac9f376f86c5d4637dca0f73b18a36f",
+        "450700c3ee8504b48d2008573ec6a873cbf580cd",
+        "e785a0ae16281594d6059b6b3b753bc150c30e9c",
+        "c28cec04cd374f72d30ad99b9697f5316ff71df0",
+        "8cb24e26614924f13875c510b62d2d1e2a39b340",
+        "ba09eae18565ae418d18f2bc352f2a1570bb71d6",
+        "d9c3ca4a6c8e0ad0c6db7a4f52148a3b20cf8576"
+      ],
+      "source_implementation_sha": "4376679dc1fb47a354c530b6e2a010a0b4fb2789",
+      "material_result_sha": "d9c3ca4a6c8e0ad0c6db7a4f52148a3b20cf8576",
+      "validation_bearing_sha": "278452f5be570920954bbfe1c52c74cf4f170e3e",
+      "retaining_descendant_sha": "4c0b52ab5080f39ba5bcb804fc49a560afc4a181",
+      "automation_validation": "PASS_RETAINING_DESCENDANT_BACKEND_GATE_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; COMPILE_NOT_REQUIRED_FOR_ANALYZER_STATIC_UNIT_AND_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_ANALYZER_TEST_STATIC",
+      "issue14_comment_id": 5950356781,
+      "validation_run_id": 36995444588,
+      "validation_job_id": 110800992720
     }
   ]
 }
