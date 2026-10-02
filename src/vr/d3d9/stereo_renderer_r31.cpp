@@ -31,6 +31,8 @@
 #endif
 #include "../render/stereo_base_policy.hpp"
 #include "../render/runtime_context.hpp"
+#include "../render/stereo_runtime_facade.hpp"
+#include "../state/depth_stencil_runtime.hpp"
 #include "../render/fast_path_support.hpp"
 #include "../render/screen_space_api.hpp"
 #include "../core/screen_space_hooks.hpp"
@@ -131,16 +133,16 @@ namespace OutRunVRStereo
 
         void R31ObserveDraw(IDirect3DDevice9* device) noexcept
         {
-            if (!IsGameDevice(device) || InternalStereoPass)
+            if (!IsCurrentGameDevice(device) || IsInternalStereoPassActive())
                 return;
-            if (R31Frame.epoch != PresentEpoch)
+            if (R31Frame.epoch != CurrentPresentEpochSnapshot())
             {
                 R31FinalizePerfFrame();
                 R31Frame = {};
-                R31Frame.epoch = PresentEpoch;
+                R31Frame.epoch = CurrentPresentEpochSnapshot();
             }
             ++R31Frame.draws;
-            if (TargetIsBackBuffer()) ++R31Frame.main;
+            if (TargetIsCurrentBackBuffer()) ++R31Frame.main;
             else ++R31Frame.offscreen;
             if (AnyAuxRenderTargetActive()) ++R31Frame.aux;
         }
@@ -313,7 +315,7 @@ namespace OutRunVRStereo
         {
             if (OutRunVR::State::StateBlockTracker::IsRecording() || !StableStereoBase(device))
             {
-                if (IsGameDevice(device) && !InternalStereoPass && TargetIsBackBuffer())
+                if (IsCurrentGameDevice(device) && !IsInternalStereoPassActive() && TargetIsCurrentBackBuffer())
                     ++R31Frame.unstable;
                 return {};
             }
@@ -329,13 +331,13 @@ namespace OutRunVRStereo
 
             if (!EnsureStereoResources(device))
                 return {};
-            if (TrackedDepthStencil &&
+            if (TrackedDepthStencilSnapshot() &&
                 (!RightDepthSynchronized || !RightStencilSynchronized))
                 TryBootstrapRightDepthFromRecentClear(device);
-            if (TrackedDepthStencil && !RightDepthSynchronized &&
+            if (TrackedDepthStencilSnapshot() && !RightDepthSynchronized &&
                 DepthTestActive(device))
                 return {};
-            if (TrackedDepthStencil && !RightStencilSynchronized &&
+            if (TrackedDepthStencilSnapshot() && !RightStencilSynchronized &&
                 StencilTestActive(device))
                 return {};
 
@@ -343,8 +345,8 @@ namespace OutRunVRStereo
             if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
                 stereo.poseSequence == 0)
                 return {};
-            if (FrameStereoPoseSequence != 0 &&
-                FrameStereoPoseSequence != stereo.poseSequence)
+            if (CurrentFrameStereoPoseSequence() != 0 &&
+                CurrentFrameStereoPoseSequence() != stereo.poseSequence)
                 return {};
 
             DrawStereoState draw{};
@@ -402,7 +404,7 @@ namespace OutRunVRStereo
             }
 
             IDirect3DSurface9* savedRt = TrackedRenderTarget;
-            IDirect3DSurface9* savedDepth = TrackedDepthStencil;
+            IDirect3DSurface9* savedDepth = TrackedDepthStencilSnapshot();
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
@@ -413,7 +415,7 @@ namespace OutRunVRStereo
                     device, 0u, RightEyeSurface);
                 if (SUCCEEDED(rightHr))
                     rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
-                        device, TrackedDepthStencil ? RightEyeDepth : nullptr);
+                        device, TrackedDepthStencilSnapshot() ? RightEyeDepth : nullptr);
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) && !SetWvpOneRegisterAtATime(
@@ -439,9 +441,9 @@ namespace OutRunVRStereo
             ++R31FastWorldDraws;
             ++R31Frame.fastWorld;
 
-            if (FrameStereoPoseSequence == 0)
+            if (CurrentFrameStereoPoseSequence() == 0)
             {
-                FrameStereoPoseSequence = draw.poseSequence;
+                CurrentFrameStereoPoseSequence() = draw.poseSequence;
                 FrameStereoMetadata = draw.stereoFrame;
             }
 
@@ -481,19 +483,19 @@ namespace OutRunVRStereo
             if (!OutRunVR::State::StateBlockTracker::Reliable())
             {
                 const std::uintptr_t cachedShader =
-                    CurrentVertexShaderIdentity.load(std::memory_order_acquire);
+                    CurrentVertexShaderIdentitySnapshot().load(std::memory_order_acquire);
                 if (!R31LiveShaderMatches(device, cachedShader))
                     return {};
             }
             if (!EnsureStereoResources(device))
                 return {};
-            if (TrackedDepthStencil &&
+            if (TrackedDepthStencilSnapshot() &&
                 (!RightDepthSynchronized || !RightStencilSynchronized))
                 TryBootstrapRightDepthFromRecentClear(device);
-            if (TrackedDepthStencil && !RightDepthSynchronized &&
+            if (TrackedDepthStencilSnapshot() && !RightDepthSynchronized &&
                 DepthTestActive(device))
                 return {};
-            if (TrackedDepthStencil && !RightStencilSynchronized &&
+            if (TrackedDepthStencilSnapshot() && !RightStencilSynchronized &&
                 StencilTestActive(device))
                 return {};
 
@@ -501,8 +503,8 @@ namespace OutRunVRStereo
             if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
                 stereo.poseSequence == 0)
                 return {};
-            if (FrameStereoPoseSequence != 0 &&
-                FrameStereoPoseSequence != stereo.poseSequence)
+            if (CurrentFrameStereoPoseSequence() != 0 &&
+                CurrentFrameStereoPoseSequence() != stereo.poseSequence)
                 return {};
 
             float original[16]{};
@@ -559,7 +561,7 @@ namespace OutRunVRStereo
             }
 
             IDirect3DSurface9* savedRt = TrackedRenderTarget;
-            IDirect3DSurface9* savedDepth = TrackedDepthStencil;
+            IDirect3DSurface9* savedDepth = TrackedDepthStencilSnapshot();
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
@@ -570,7 +572,7 @@ namespace OutRunVRStereo
                     device, 0u, RightEyeSurface);
                 if (SUCCEEDED(rightHr))
                     rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
-                        device, TrackedDepthStencil ? RightEyeDepth : nullptr);
+                        device, TrackedDepthStencilSnapshot() ? RightEyeDepth : nullptr);
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) &&
@@ -673,7 +675,7 @@ namespace OutRunVRStereo
             if (shader) shader->Release();
 
             const std::uintptr_t previous =
-                CurrentVertexShaderIdentity.exchange(identity,
+                CurrentVertexShaderIdentitySnapshot().exchange(identity,
                     std::memory_order_acq_rel);
             if (previous != identity)
             {
@@ -715,7 +717,7 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device = nullptr;
             if (SUCCEEDED(block->GetDevice(&device)) && device)
             {
-                const bool game = IsGameDevice(device);
+                const bool game = IsCurrentGameDevice(device);
                 if (game)
                 {
                     OutRunVR::State::StateBlockTracker::NoteApply();
@@ -803,7 +805,7 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R31CreateStateBlockHook.stdcall<HRESULT>(
                 device, type, block);
-            if (SUCCEEDED(hr) && IsGameDevice(device) && block && *block)
+            if (SUCCEEDED(hr) && IsCurrentGameDevice(device) && block && *block)
                 R31EnsureStateBlockApplyHook(*block);
             return hr;
         }
@@ -811,7 +813,7 @@ namespace OutRunVRStereo
         HRESULT __stdcall BeginStateBlockDestR31(IDirect3DDevice9* device)
         {
             const HRESULT hr = R31BeginStateBlockHook.stdcall<HRESULT>(device);
-            if (SUCCEEDED(hr) && IsGameDevice(device) && !InternalStereoPass)
+            if (SUCCEEDED(hr) && IsCurrentGameDevice(device) && !IsInternalStereoPassActive())
             {
                 OutRunVR::State::StateBlockTracker::BeginRecording();
                 R31MarkStateBlockCachesDirty();
@@ -823,8 +825,8 @@ namespace OutRunVRStereo
             IDirect3DStateBlock9** block)
         {
             const HRESULT hr = R31EndStateBlockHook.stdcall<HRESULT>(device, block);
-            if (IsGameDevice(device) &&
-                (!InternalStereoPass || OutRunVR::State::StateBlockTracker::IsRecording()))
+            if (IsCurrentGameDevice(device) &&
+                (!IsInternalStereoPassActive() || OutRunVR::State::StateBlockTracker::IsRecording()))
             {
                 if (SUCCEEDED(hr))
                 {
