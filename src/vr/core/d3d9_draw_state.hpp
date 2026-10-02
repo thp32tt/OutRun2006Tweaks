@@ -29,6 +29,11 @@ namespace OutRunVR::DrawState
         DWORD shadeMode = D3DSHADE_GOURAUD;
         DWORD cullMode = D3DCULL_CCW;
         DWORD fillMode = D3DFILL_SOLID;
+        // R161: D3D9 user clipping is not reproduced by the native DX11
+        // fixed-function path. Preserve both gates so non-default semantics
+        // fail closed instead of being erased by DepthClipEnable=TRUE.
+        DWORD clipping = TRUE;
+        DWORD clipPlaneEnable = 0;
         DWORD scissorTestEnable = FALSE;
         DWORD sRGBWriteEnable = FALSE;
         DWORD colorWriteEnable =
