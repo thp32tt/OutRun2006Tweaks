@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "61c62cacfad503160a9049f8b585a0ad95ce9d1f",
+  "state_parent_head": "17bf4b9c9bea18142eaed9a570e160b3555416db",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,7 +54,7 @@
     "task_id": "CONV-DXVK-000002",
     "result_sha": "b6482cd27acd035783d021b65b1748534c3618f6",
     "validation_bearing_result_sha": "b6482cd27acd035783d021b65b1748534c3618f6",
-    "run_record_commit_sha": "1400f938253beff5656e5a52d6ac807b2b87bd7b",
+    "run_record_commit_sha": "17bf4b9c9bea18142eaed9a570e160b3555416db",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
@@ -79,7 +79,7 @@
   },
   "runtime_blocker": "No runtime acceptance claim exists; canonical provenance/static CI evidence only.",
   "runtime_next_action": "Quest 3/VDXR runtime validation remains a later user-hardware gate after a runtime candidate exists.",
-  "independent_static_next_action": "A descendant already implements the F24 exact proof at 666ba2c5f1c0ba377ee304d51f5a8a3c7925e334 and moves the cut edge to 0x00182AD7 with raw bytes e8 bb, but its exact-SHA workflows were cancelled by branch concurrency. Require a non-superseded canonical static validation containing that proof before treating EXACT_182A99_TO_182AD7_CONTROL_FLOW_CAPTURE_EDGE_PROVEN as durable; after that, capture a fresh bounded overlap at 0x00182AD7 and keep function/render/HUD/runtime semantics unresolved.",
+  "independent_static_next_action": "Current descendants already contain F24 exact proof 666ba2c5f1c0ba377ee304d51f5a8a3c7925e334 and F25 raw provenance capture 61c62cacfad503160a9049f8b585a0ad95ce9d1f at 0x00182AD7..0x00182B17. Their immediate workflow attempts were cancelled by branch concurrency. Require a non-superseded canonical static validation containing both stages before exact-decoding continuation 34; keep function/render/HUD/runtime semantics unresolved.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -126,18 +126,13 @@
     "next_task_rule": "AFTER_FULL_PIPELINE_GATE_PASS_DISPATCH_NEXT_INDEPENDENT_WORK_IMMEDIATELY"
   },
   "follow_on_frontier": {
-    "descendant_sha": "666ba2c5f1c0ba377ee304d51f5a8a3c7925e334",
-    "descendant_status": "IMPLEMENTED_EXACT_SHA_WORKFLOWS_CANCELLED_BY_BRANCH_CONCURRENCY",
-    "predecessor_provenance_status": "EXACT_EXE_182A99_TO_182AD9_PROVENANCE_CAPTURED",
+    "descendant_proof_sha": "666ba2c5f1c0ba377ee304d51f5a8a3c7925e334",
     "candidate_control_flow_status": "EXACT_182A99_TO_182AD7_CONTROL_FLOW_CAPTURE_EDGE_PROVEN_REQUIRES_NON_SUPERSEDED_VALIDATION",
-    "incomplete_rva": "0x00182AD7",
-    "incomplete_bytes": "e8 bb",
-    "exact_sha_workflow_runs": [
-      36974227063,
-      36974226940,
-      36974226956,
-      36974226953
-    ],
+    "descendant_provenance_sha": "61c62cacfad503160a9049f8b585a0ad95ce9d1f",
+    "provenance_target_status": "EXACT_EXE_182AD7_TO_182B17_PROVENANCE_CAPTURED_REQUIRES_NON_SUPERSEDED_VALIDATION",
+    "overlap_rva": "0x00182AD7",
+    "overlap_bytes": "e8 bb",
+    "probe_end_rva": "0x00182B17",
     "runtime_validation": "UNTESTED"
   },
   "supplemental_completed_static_units": [
