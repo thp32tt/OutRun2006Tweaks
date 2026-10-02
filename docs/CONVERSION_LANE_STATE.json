@@ -4537,7 +4537,7 @@
         },
         "C3_VALIDATE": {
           "status": "COMPLETE",
-          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence 36990773809 / 110786214911 SUCCESS. Exact-sha Backend Conversion Gate 36990773792 job 110786214632 also passed Verify backend disassembly contract and Configure Win32 before state write; Build Win32 remained in progress and is not required for this verifier-only unit."
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence 36990773809 / 110786214911 SUCCESS. Exact-SHA Backend Conversion Gate 36990773792 / 110786214632 completed SUCCESS: backend disassembly contract, Configure Win32, Build Win32, binary existence and artifact upload all passed."
         },
         "C4_COMMIT": {
           "status": "COMPLETE",
@@ -4554,7 +4554,7 @@
         }
       },
       "validation": {
-        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_DISASM_CONTRACT",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_GATE",
         "exact_sha": "1790192abd39e73dc3ea7a77b5012c237317a62e",
         "dxvk_canonical_evidence_run_id": 36990773809,
         "dxvk_canonical_evidence_job_id": 110786214911,
@@ -4568,8 +4568,12 @@
         "backend_conversion_gate_job_id": 110786214632,
         "backend_disassembly_contract_step": "SUCCESS",
         "configure_win32": "SUCCESS",
-        "build_win32": "IN_PROGRESS_AT_STATE_WRITE_NOT_REQUIRED_FOR_UNIT",
-        "runtime_validation": "UNTESTED"
+        "runtime_validation": "UNTESTED",
+        "backend_conversion_gate_conclusion": "success",
+        "verify_binary_exists": "SUCCESS",
+        "backend_artifact_id": 11219399198,
+        "backend_artifact_digest": "sha256:cae24a96babfe495dbeae40c354df58fc6605a9d15147272f2172480753c48c6",
+        "build_win32": "SUCCESS"
       },
       "issue14_implementation_comment_id": 5949349397,
       "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
