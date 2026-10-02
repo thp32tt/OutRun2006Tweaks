@@ -12353,6 +12353,18 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_32_prefix_pro
         instruction_starts.add(rva)
         expected_next = rva + len(expected)
 
+
+    def rel_target(rva: int) -> int | None:
+        raw2 = pe.bytes_at_rva(rva, 2)
+        if len(raw2) >= 2 and (raw2[0] == 0xEB or 0x70 <= raw2[0] <= 0x7F):
+            rel = struct.unpack_from("<b", raw2, 1)[0]
+            return (rva + 2 + rel) & 0xFFFFFFFF
+        raw5 = pe.bytes_at_rva(rva, 5)
+        if len(raw5) >= 5 and raw5[0] in (0xE8, 0xE9):
+            rel = struct.unpack_from("<i", raw5, 1)[0]
+            return (rva + 5 + rel) & 0xFFFFFFFF
+        return None
+
     branch_rows = []
     branch_targets_match = True
     internal_branch_targets_on_boundaries = True
