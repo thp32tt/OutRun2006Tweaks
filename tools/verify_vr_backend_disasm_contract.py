@@ -114,11 +114,8 @@ def verify_dxvk_continuation_chain() -> None:
                 "collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
                 f"{continuation_id - 1}_prefix_proof(pe)"
             )
-            predecessor_proof_calls = provenance_source.count("_prefix_proof(pe)")
-            if (
-                expected_predecessor_call not in provenance_source
-                or predecessor_proof_calls != 1
-            ):
+            predecessor_proof_calls = provenance_source.count(expected_predecessor_call)
+            if predecessor_proof_calls != 1:
                 raise SystemExit(
                     f"DXVK continuation {continuation_id} raw provenance consumes wrong predecessor proof: "
                     f"expected={expected_predecessor_call} proof_calls={predecessor_proof_calls}"
@@ -206,13 +203,11 @@ def verify_dxvk_continuation_chain() -> None:
             "collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
             f"{continuation_id}_provenance(pe)"
         )
-        if (
-            expected_provenance_call not in proof_source
-            or proof_source.count("_provenance(pe)") != 1
-        ):
+        provenance_calls = proof_source.count(expected_provenance_call)
+        if provenance_calls != 1:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} prefix proof consumes wrong provenance: "
-                f"expected={expected_provenance_call}"
+                f"expected={expected_provenance_call} provenance_calls={provenance_calls}"
             )
         if continuation_id > proof_ids[0]:
             expected_predecessor_call = (
