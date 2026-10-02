@@ -41,6 +41,7 @@
 #include "../lifecycle/mono_safety.hpp"
 #include "../lifecycle/frame_accounting.hpp"
 #include "../state/depth_target_state.hpp"
+#include "../state/right_depth_stencil_sync.hpp"
 #include "../state/raster_shadow_api.hpp"
 #include "../lifecycle/frame_lifecycle.hpp"
 #include "../game/renderer_recovery.hpp"
@@ -332,12 +333,12 @@ namespace OutRunVRStereo
             if (!EnsureStereoResources(device))
                 return {};
             if (TrackedDepthStencilSnapshot() &&
-                (!RightDepthSynchronized || !RightStencilSynchronized))
+                (!IsRightDepthSynchronized() || !IsRightStencilSynchronized()))
                 TryBootstrapRightDepthFromRecentClear(device);
-            if (TrackedDepthStencilSnapshot() && !RightDepthSynchronized &&
+            if (TrackedDepthStencilSnapshot() && !IsRightDepthSynchronized() &&
                 DepthTestActive(device))
                 return {};
-            if (TrackedDepthStencilSnapshot() && !RightStencilSynchronized &&
+            if (TrackedDepthStencilSnapshot() && !IsRightStencilSynchronized() &&
                 StencilTestActive(device))
                 return {};
 
@@ -490,12 +491,12 @@ namespace OutRunVRStereo
             if (!EnsureStereoResources(device))
                 return {};
             if (TrackedDepthStencilSnapshot() &&
-                (!RightDepthSynchronized || !RightStencilSynchronized))
+                (!IsRightDepthSynchronized() || !IsRightStencilSynchronized()))
                 TryBootstrapRightDepthFromRecentClear(device);
-            if (TrackedDepthStencilSnapshot() && !RightDepthSynchronized &&
+            if (TrackedDepthStencilSnapshot() && !IsRightDepthSynchronized() &&
                 DepthTestActive(device))
                 return {};
-            if (TrackedDepthStencilSnapshot() && !RightStencilSynchronized &&
+            if (TrackedDepthStencilSnapshot() && !IsRightStencilSynchronized() &&
                 StencilTestActive(device))
                 return {};
 
