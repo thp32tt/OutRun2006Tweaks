@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1256,
+  "cycle": 1262,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -261,11 +261,13 @@
     "R84-REF-GATED-DEPS-0002",
     "R84-REF-GATEE-DEPS-0002",
     "R84-REF-GATEC-VERIFIER-0012",
-    "R84-REF-GATEC-BUILD-0013"
+    "R84-REF-GATEC-BUILD-0013",
+    "R84-REF-GATED-CMAKE-0003",
+    "R84-REF-GATEE-BASEAPI-0003"
   ],
-  "next": "Consume exact BUILD_GATE 1256 run for this checkpoint SHA. Verifier close/reopen offsets were statically confirmed delta=12 for both R13 external hook destinations. If green, Gate C BUILD_VERIFIED then Gate D.",
-  "updatedKst": "2026-10-02T20:15:00+09:00",
-  "batchStatus": "R84_GATE_C_BUILD_GATE_1256_TRIGGERED",
+  "next": "Consume exact Gate C BUILD_GATE 1256 run 36999194285/job when complete. Gate D split design: add guarded R31 include + R30 TU enable + matching cmake.toml/workflow flag. Gate E base API design: owner-correct declarations for R7 PresentDest/ResetDest before removing R29 textual include.",
+  "updatedKst": "2026-10-02T20:18:00+09:00",
+  "batchStatus": "R84_GATE_C_BUILD_RUNNING_NEXT_GATES_DESIGNED_CYCLE_1262",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -500,7 +502,9 @@
     "Cycles 1245-1247 R84-REF-GATED-DEPS-0002: mapped R31->R30 seam precisely. R31 consumes four R30 draw hook destinations plus ScreenSpaceInstallState/ClassifyScreenSpacePass/BuildScreenSpaceEyeConstants; existing screen_space_hooks.hpp and screen-space APIs cover the seam. APPLY_GATE 1247 NO_SAFE_CHANGE while Gate C build pending.",
     "Cycles 1248-1250 R84-REF-GATEE-DEPS-0002: mapped R30->R29/base seam. R30 hook transaction targets legacy PresentDest/ResetDest plus four R29 draw destinations; PresentDest/ResetDest are owned by base R7 implementation while R29 draw targets already have stereo_base_hooks.hpp. APPLY_GATE 1250 NO_SAFE_CHANGE. BUILD_GATE 1250 REUSED_BUILD_EVIDENCE=PENDING run 36998885260 because build input unchanged from 1244. Runtime NEED_HMD_TEST.",
     "Cycles 1251-1253 R84-REF-GATEC-VERIFIER-0012: consumed run 36998885260/job 110812036093. FAILURE_CLASS=VERIFIER_DEFECT: source shows explicit anonymous-namespace close before both R13 hook destinations, but verifier required an exact suffix that included the function indentation incorrectly. Replaced with bounded close/reopen search; product source unchanged. APPLY_GATE 1253 SOURCE_CHANGED=VERIFIER_ONLY. Runtime NEED_HMD_TEST.",
-    "Cycles 1254-1256 R84-REF-GATEC-BUILD-0013: static verifier math confirmed each external R13 destination is 12 bytes after the anonymous namespace close and followed by a namespace reopen. APPLY_GATE 1256 NO_SAFE_CHANGE. BUILD_GATE 1256 intentionally triggered on verifier-repair SHA. Runtime NEED_HMD_TEST."
+    "Cycles 1254-1256 R84-REF-GATEC-BUILD-0013: static verifier math confirmed each external R13 destination is 12 bytes after the anonymous namespace close and followed by a namespace reopen. APPLY_GATE 1256 NO_SAFE_CHANGE. BUILD_GATE 1256 intentionally triggered on verifier-repair SHA. Runtime NEED_HMD_TEST.",
+    "Cycles 1257-1259 R84-REF-GATED-CMAKE-0003: designed Gate D cumulative split from existing Gate C pattern. Required changes are limited to guarding R31's stereo_renderer_r30.cpp include, enabling stereo_renderer_r30.cpp as non-HEADER_FILE_ONLY only when D follows C, and adding the same option to cmake.toml/workflow. Existing screen_space_hooks.hpp/screen-space APIs cover runtime calls. APPLY_GATE 1259 NO_SAFE_CHANGE until Gate C green.",
+    "Cycles 1260-1262 R84-REF-GATEE-BASEAPI-0003: designed Gate E lower base API. R30 hook transaction targets base R7 PresentDest/ResetDest plus R29 draw hooks. PresentDest/ResetDest signatures and ownership were verified in stereo_renderer_r7.inc; linkage-only API exposure is required before R29 include removal. APPLY_GATE 1262 NO_SAFE_CHANGE. BUILD_GATE 1262 REUSED_BUILD_EVIDENCE=PENDING run 36999194285 because build input unchanged since 1256. Runtime NEED_HMD_TEST."
   ],
   "campaign": {
     "startCycle": 1202,
