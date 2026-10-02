@@ -1995,6 +1995,56 @@ int main()
             pipelineIdentityReady.snapshotToken),
         "R112 exact fixed-function pipeline translation identity issues a valid snapshot");
 
+    require(
+        pipelineBundle.bind_for_observation(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken),
+        "dormant pipeline binding accepts exact same-device R97 snapshot");
+
+    ID3D11InputLayout* boundPipelineLayout = nullptr;
+    ID3D11VertexShader* boundPipelineVertexShader = nullptr;
+    ID3D11PixelShader* boundPipelinePixelShader = nullptr;
+    d3d.context->IAGetInputLayout(&boundPipelineLayout);
+    d3d.context->VSGetShader(
+        &boundPipelineVertexShader, nullptr, nullptr);
+    d3d.context->PSGetShader(
+        &boundPipelinePixelShader, nullptr, nullptr);
+    require(
+        boundPipelineLayout == pipelineBundle.input_layout() &&
+        boundPipelineVertexShader == pipelineBundle.vertex_shader() &&
+        boundPipelinePixelShader == pipelineBundle.pixel_shader(),
+        "dormant pipeline binding preserves exact IA VS PS identity");
+    if (boundPipelineLayout)
+        boundPipelineLayout->Release();
+    if (boundPipelineVertexShader)
+        boundPipelineVertexShader->Release();
+    if (boundPipelinePixelShader)
+        boundPipelinePixelShader->Release();
+
+    require(
+        !pipelineBundle.bind_for_observation(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype, 0),
+        "dormant pipeline binding rejects missing R97 snapshot");
+    require(
+        !pipelineBundle.bind_for_observation(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken ^ 0x100000001b3ull),
+        "dormant pipeline binding rejects stale R97 snapshot");
+
+    DevicePair pipelineBindingForeignDevice = create_warp_device();
+    require(
+        !pipelineBundle.bind_for_observation(
+            pipelineBindingForeignDevice.context,
+            inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken),
+        "dormant pipeline binding rejects foreign D3D11 context");
+    pipelineBindingForeignDevice.context->Release();
+    pipelineBindingForeignDevice.device->Release();
+
+    d3d.context->IASetInputLayout(nullptr);
+    d3d.context->VSSetShader(vertexShader, nullptr, 0);
+    d3d.context->PSSetShader(nullptr, nullptr, 0);
+
     NativeManagedTextureStageReadiness untexturedStageReady{};
     untexturedStageReady.inputValid = true;
     untexturedStageReady.allRequiredReady = true;
@@ -2755,6 +2805,7 @@ int main()
     std::cout << "DX11 constant buffer probe R95: PASS\n";
     std::cout << "DX11 constant buffer lifetime R96: PASS\n";
     std::cout << "DX11 fixed-function pipeline bundle R97: PASS\n";
+    std::cout << "DX11 dormant fixed-function pipeline object binding: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
     std::cout << "DX11 texture mutation readiness R100: PASS\n";
