@@ -1500,17 +1500,17 @@ def main() -> None:
             "R136 aggregate mask must match sealed R135 draw mask",
         ),
         (
-            "R136 multi-stage PS binding set seals every required stage",
+            "R136 aggregate two-stage PS binding captures exact live identity",
             CONSTANT_BUFFER_PROBE,
             "R136 positive two-stage live binding proof",
         ),
         (
-            "R136 multi-stage textured draw accepts exact aggregate PS identity",
+            "R136 aggregate two-stage PS binding composes exact draw readiness",
             CONSTANT_BUFFER_PROBE,
             "R136 positive aggregate draw proof",
         ),
         (
-            "R136 aggregate PS identity composes with R134 bound draw evidence",
+            "R136 aggregate textured draw remains compatible with R134 pipeline identity",
             CONSTANT_BUFFER_PROBE,
             "R136 aggregate identity reaches final dormant bound-draw evidence",
         ),
