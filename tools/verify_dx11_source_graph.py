@@ -3541,6 +3541,64 @@ def main() -> None:
             + ", ".join(missing_r128_output_binding)
         )
 
+    r129_generated_fan_geometry_contract = [
+        (
+            "compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(",
+            NATIVE_BACKEND_HPP,
+            "R129 generated non-indexed fan geometry readiness API",
+        ),
+        (
+            "generatedIndexBufferMatchesDraw",
+            NATIVE_BACKEND_HPP,
+            "R129 generated index identity result",
+        ),
+        (
+            "translate_triangle_fan_expansion(primitiveCount)",
+            NATIVE_BACKEND_CPP,
+            "R129 fan expansion contract",
+        ),
+        (
+            "triangle_fan_source_element(",
+            NATIVE_BACKEND_CPP,
+            "R129 generated fan source-element reconstruction",
+        ),
+        (
+            "baseVertex >\n                    std::numeric_limits<UINT>::max() - sourceElement",
+            NATIVE_BACKEND_CPP,
+            "R129 base-vertex overflow fail-closed gate",
+        ),
+        (
+            "generatedIndexBuffer.contentHash == expectedContentHash",
+            NATIVE_BACKEND_CPP,
+            "R129 generated index content identity gate",
+        ),
+        (
+            "R128 generated IB makes exact non-indexed fan geometry ready",
+            CONSTANT_BUFFER_PROBE,
+            "R129 positive generated fan geometry probe",
+        ),
+        (
+            "R128 fan geometry rejects mismatched or stale generated IB identity",
+            CONSTANT_BUFFER_PROBE,
+            "R129 stale/mismatched generated fan negative probe",
+        ),
+        (
+            "R129 non-indexed fan base-vertex overflow fails closed",
+            CONSTANT_BUFFER_PROBE,
+            "R129 base-vertex overflow negative probe",
+        ),
+    ]
+    missing_r129_generated_fan_geometry = [
+        meaning
+        for token, source, meaning in r129_generated_fan_geometry_contract
+        if token not in source
+    ]
+    if missing_r129_generated_fan_geometry:
+        raise SystemExit(
+            "DX11 R129 generated fan geometry contract drift: "
+            + ", ".join(missing_r129_generated_fan_geometry)
+        )
+
     r120_draw_readiness_header = {
         "struct NativeFixedFunctionDrawReadiness":
             "R120 composite draw readiness",
