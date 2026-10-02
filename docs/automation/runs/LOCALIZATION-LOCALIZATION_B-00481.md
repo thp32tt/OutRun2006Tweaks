@@ -62,3 +62,38 @@ result=PASS_CURRENT_HEAD_RECONCILIATION_TWO_IMMUTABLE_B00347_CANDIDATES_PENDING_
 automation_validation=PENDING
 validation_mode=C_BATCH_GATE
 RUNTIME_VALIDATION=UNTESTED
+
+## Rollover 5 material continuation
+
+CHAT_ROLLOVER=5
+ATTEMPT=1/3
+
+Current HEAD candidate-completion reconciliation avoided duplicate production:
+- index 94 / 2DA43E41: B00347 candidate work already complete; pending independent C QA.
+- index 163 / 59A79158: B00347 schema22 fixed-title-family 24/24 rerender already complete; pending independent C QA.
+
+Material work completed on the next genuinely unfinished B-shard item:
+- queue index: 61
+- asset: C4A2937B
+- prior C disposition: REWORK_REQUIRED_POST_RESET_SOURCE_LINEAGE_VIOLATION
+- rebuild scope: full 21 physical localized regions from exact canonical English HD source only
+- pre-reset Korean candidate pixels reused: false
+- pre-reset clean plate/masks/patches/crops/composites reused: false
+- canonical source SHA-256: 821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0
+- new candidate SHA-256: 16d8c2b0bf0969ac75bda648e38978825106c76303a82ee512169f13e63f0bab
+- dimensions/format: 4096x4096 RGBA32 mip1, mirror_y
+- semantic coverage: 20/20; physical occurrences: 21/21
+- changed pixels outside fresh source-derived regions: 0
+- alpha changes outside fresh source-derived regions: 0
+- one-pixel overflow: 0
+- exact DDS header preserved: true
+- decoded roundtrip pixel exact: true
+- source-vs-candidate visual review: PASS
+- Drive package file ID: 1kMvEMtK2Acih53YS9ZLja3X4070i5h4h
+- Drive package SHA-256: f2bbb7cc12826e59a8a41f0853a13a4f5876daf12b183d2eef4e47ae6d504a63
+- Drive upload readback byte-identical: true
+- detailed Git evidence: localization/graphics/role_B/20261002-B00481-R5/B00481_INDEX61_C4A2937B_FULL_SOURCE_RESET_QA.json
+
+automation_validation=PENDING
+validation_mode=C_BATCH_GATE
+RUNTIME_VALIDATION=UNTESTED
