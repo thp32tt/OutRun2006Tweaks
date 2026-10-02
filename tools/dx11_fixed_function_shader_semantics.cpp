@@ -20,6 +20,7 @@ namespace
     using outrun::vr::dx11::FixedFunctionUnsupportedSamplerFilter;
     using outrun::vr::dx11::FixedFunctionUnsupportedSamplerLod;
     using outrun::vr::dx11::FixedFunctionUnsupportedSamplerSrgb;
+    using outrun::vr::dx11::FixedFunctionUnsupportedResultArg;
     using outrun::vr::dx11::FixedFunctionUnsupportedStageChain;
     using outrun::vr::dx11::FixedFunctionUnsupportedTextureTransform;
     using outrun::vr::dx11::PipelineUnsupportedBlend;
@@ -883,6 +884,35 @@ int main()
         require(
             !srgbSampler.exact,
             "sampler sRGB decode unexpectedly translated without sRGB SRV");
+    }
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        stages[0] = active_stage(
+            D3DTOP_SELECTARG1,
+            D3DTA_DIFFUSE,
+            D3DTA_CURRENT,
+            D3DTOP_SELECTARG1,
+            D3DTA_DIFFUSE,
+            D3DTA_CURRENT,
+            0);
+        const auto currentResult =
+            translate_fixed_function_readiness(stages, true, 0x00, 0x00);
+        require(currentResult.exact(),
+                "RESULTARG-001 default CURRENT result routing must remain exact");
+
+        stages[0].resultArg = D3DTA_TEMP;
+        const auto tempResult =
+            translate_fixed_function_readiness(stages, true, 0x00, 0x00);
+        require(!tempResult.exact(),
+                "RESULTARG-001 TEMP result routing must fail closed");
+        require((tempResult.unsupported & FixedFunctionUnsupportedResultArg) != 0,
+                "RESULTARG-001 TEMP result routing blocker missing");
+        const auto tempPrototype =
+            generate_fixed_function_pixel_shader_prototype(
+                stages, true, 0x00, 0x00, textureTypes);
+        require(!tempPrototype.generated(),
+                "RESULTARG-001 TEMP result routing must block shader generation");
     }
 
     {
