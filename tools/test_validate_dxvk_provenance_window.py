@@ -42,3 +42,24 @@ def test_reversed_window_is_rejected() -> None:
             "end_rva": "0x100",
         }
     )
+
+
+def test_branch_target_format_is_checked() -> None:
+    assert "invalid branch target format" in module.validate(
+        {
+            "start_rva": "0x100",
+            "end_rva": "0x120",
+            "branch_targets": ["bad-target"],
+        }
+    )
+
+
+def test_required_overlap_is_checked() -> None:
+    assert "required overlap bytes mismatch" in module.validate(
+        {
+            "start_rva": "0x100",
+            "end_rva": "0x120",
+            "overlap_bytes": "90",
+            "required_overlap_bytes": "66 0f 54",
+        }
+    )

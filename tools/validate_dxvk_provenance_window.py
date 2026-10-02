@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Validate bounded DXVK raw provenance windows without semantic promotion.
 
-This helper intentionally checks only evidence shape:
+This helper checks evidence shape only:
 - RVA range continuity
-- required overlap bytes
+- overlap byte encoding
 - branch target formatting
+- optional exact overlap expectations
 
 It does not infer renderer, HUD, or runtime behavior.
 """
@@ -30,12 +31,23 @@ def validate(record: dict) -> list[str]:
         errors.append("invalid RVA encoding")
 
     overlap = record.get("overlap_bytes")
-    if overlap is not None and not isinstance(overlap, str):
-        errors.append("overlap_bytes must be text")
+    if overlap is not None:
+        if not isinstance(overlap, str):
+            errors.append("overlap_bytes must be text")
+        else:
+            tokens = overlap.split()
+            if any(len(token) != 2 for token in tokens):
+                errors.append("invalid overlap byte width")
 
     targets = record.get("branch_targets", [])
     if not isinstance(targets, list):
         errors.append("branch_targets must be a list")
+    elif any(not isinstance(target, str) or "->" not in target for target in targets):
+        errors.append("invalid branch target format")
+
+    expected = record.get("required_overlap_bytes")
+    if expected is not None and overlap != expected:
+        errors.append("required overlap bytes mismatch")
 
     if record.get("semantic_promotion", False) is True:
         errors.append("semantic promotion is forbidden for provenance-only evidence")
