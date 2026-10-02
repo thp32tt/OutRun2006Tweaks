@@ -1,6 +1,8 @@
 name: VR Refactor Build Gate
 
 on:
+  push:
+    branches: [ vr-refactor-r84-2000c-20261001 ]
   pull_request:
     branches: [ vr-d3d9ex-focus ]
   workflow_dispatch:
