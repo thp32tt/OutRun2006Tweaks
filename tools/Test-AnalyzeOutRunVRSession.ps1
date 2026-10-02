@@ -491,6 +491,33 @@ D3D9: Failed to write shared resource info for a texture
         -ExpectedGameplayCachedProjectionSubmitCount 0 `
         -ExpectedGameplayDirectSubmitFraction 1.0
 
+    # A syntactically present but incomplete cadence block must not be treated
+    # as fresh/cached decision evidence. Keep the gameplay window for phase
+    # timing, but exclude its partial counters from cadence-derived rates.
+    Invoke-AnalyzerCase -Name 'dxvk-incomplete-cadence-fail-closed' `
+        -GameLog "direct[frames=200,fallbacks=0,fenceTimeout=0]" `
+        -DxvkLog "DXVK: v3.1.1" `
+        -HostLog @"
+[R23 pipeline] requestedLayer=projection-cached actualFinal=projection-direct-r32-fast captureMs=0.0 commitCopyMs=0.001 renderMs=0.01 xrWaitFrameMs=9.0 xrFrameIntervalMs=20.0 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=18.0 xrEndFrameMs=10.0 displayPeriodMs=11.1 intervalFrames=100 actualSubmits={projection-direct-r32-fast:100} rejectCounts={none} captureAvgMaxP95=0.0/0.1/0.1 commitAvgMaxP95=0.001/0.002/0.002 renderAvgMaxP95=0.01/0.02/0.02 endAvgMaxP95=10.0/12.0/11.0 cadence={mode:auto, xr:100, req:0, fresh:60, cached:40, other:0, noLayer:0}
+[R23 pipeline] requestedLayer=projection-cached actualFinal=projection-direct-r32-fast captureMs=0.0 commitCopyMs=0.001 renderMs=0.01 xrWaitFrameMs=9.0 xrFrameIntervalMs=20.0 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=18.0 xrEndFrameMs=10.0 displayPeriodMs=11.1 intervalFrames=100 actualSubmits={projection-direct-r32-fast:100} rejectCounts={none} captureAvgMaxP95=0.0/0.1/0.1 commitAvgMaxP95=0.001/0.002/0.002 renderAvgMaxP95=0.01/0.02/0.02 endAvgMaxP95=10.0/12.0/11.0 cadence={mode:auto,xr:100,req:0,fresh:100,other:0,noLayer:0}
+"@ `
+        -ExpectedSharedFailure $false -ExpectedReasons @() `
+        -ExpectedDirectFrames 200 -ExpectedFallbacks 0 `
+        -ExpectedHostPipelineWindows 2 `
+        -ExpectedGameplayCadenceWindows 2 `
+        -ExpectedGameplayCadenceHz 50.0 `
+        -ExpectedGameplayCadenceDegraded $true `
+        -ExpectedGameplayFreshProjectionCount 60 `
+        -ExpectedGameplayCachedProjectionCount 40 `
+        -ExpectedGameplayFreshProjectionFraction 0.6 `
+        -ExpectedGameplayCadenceEvidenceWindows 1 `
+        -ExpectedGameplayXrFrameCount 100 `
+        -ExpectedGameplayFreshProjectionHzEstimate 30.0 `
+        -ExpectedGameplayCachedProjectionHzEstimate 20.0 `
+        -ExpectedGameplayDirectSubmitCount 200 `
+        -ExpectedGameplayCachedProjectionSubmitCount 0 `
+        -ExpectedGameplayDirectSubmitFraction 1.0
+
     $queuePath = Join-Path $PSScriptRoot '..\docs\VR_WORK_QUEUE.json'
     $workQueue = Get-Content $queuePath -Raw | ConvertFrom-Json
     $perfItems = @($workQueue.items | Where-Object { $_.id -eq 'VR-PERF-COMMON-001' })
