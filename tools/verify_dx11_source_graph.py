@@ -4806,6 +4806,64 @@ def main() -> None:
             + ", ".join(missing_r126_fan_index)
         )
 
+    r141_triangle_fan_live_binding_contract = [
+        (
+            "struct NativeTriangleFanIndexBufferBindingReadiness",
+            TRIANGLE_FAN_INDEX_BUFFER_HPP,
+            "R141 generated fan live IA binding readiness",
+        ),
+        (
+            "binding_readiness(ID3D11DeviceContext* context) const noexcept",
+            TRIANGLE_FAN_INDEX_BUFFER_HPP,
+            "R141 live IA binding observer API",
+        ),
+        (
+            "validate_binding_snapshot(",
+            TRIANGLE_FAN_INDEX_BUFFER_HPP,
+            "R141 live IA binding snapshot validator",
+        ),
+        (
+            "context->IAGetIndexBuffer(",
+            TRIANGLE_FAN_INDEX_BUFFER_CPP,
+            "R141 live generated-IB readback",
+        ),
+        (
+            "context->IAGetPrimitiveTopology(&observedTopology);",
+            TRIANGLE_FAN_INDEX_BUFFER_CPP,
+            "R141 live triangle-list topology readback",
+        ),
+        (
+            "out.ownerSnapshotToken = owner.snapshotToken;",
+            TRIANGLE_FAN_INDEX_BUFFER_CPP,
+            "R141 generated-owner identity propagation",
+        ),
+        (
+            "R141 live generated fan IA binding seals exact owner identity",
+            TRIANGLE_FAN_INDEX_BUFFER_PROBE,
+            "R141 positive WARP live-binding proof",
+        ),
+        (
+            "R141 live generated fan IA topology drift fails closed",
+            TRIANGLE_FAN_INDEX_BUFFER_PROBE,
+            "R141 topology-drift fail-closed proof",
+        ),
+        (
+            "R141 restored generated fan IA binding reproduces snapshot",
+            TRIANGLE_FAN_INDEX_BUFFER_PROBE,
+            "R141 deterministic live-binding restore proof",
+        ),
+    ]
+    missing_r141_triangle_fan_live_binding = [
+        meaning
+        for token, source, meaning in r141_triangle_fan_live_binding_contract
+        if token not in source
+    ]
+    if missing_r141_triangle_fan_live_binding:
+        raise SystemExit(
+            "DX11 R141 generated triangle-fan live binding contract drift: "
+            + ", ".join(missing_r141_triangle_fan_live_binding)
+        )
+
     if (
         "recreate_and_upload_mirror_for_observation(" in census
         or "mirror_readiness(" in census
