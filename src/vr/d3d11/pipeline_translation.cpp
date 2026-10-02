@@ -167,6 +167,7 @@ namespace outrun::vr::dx11
             switch (op)
             {
             case D3DTOP_SELECTARG1:
+            case D3DTOP_PREMODULATE:
                 return fixed_function_argument_uses_texture(arg1);
             case D3DTOP_SELECTARG2:
                 return fixed_function_argument_uses_texture(arg2);
@@ -206,11 +207,86 @@ namespace outrun::vr::dx11
             }
         }
 
+        bool fixed_function_argument_uses_current(DWORD value) noexcept
+        {
+            return (value & D3DTA_SELECTMASK) == D3DTA_CURRENT;
+        }
+
+        bool fixed_function_op_uses_current_argument(
+            DWORD op, DWORD arg0, DWORD arg1, DWORD arg2) noexcept
+        {
+            switch (op)
+            {
+            case D3DTOP_SELECTARG1:
+            case D3DTOP_PREMODULATE:
+                return fixed_function_argument_uses_current(arg1);
+            case D3DTOP_SELECTARG2:
+                return fixed_function_argument_uses_current(arg2);
+            case D3DTOP_MODULATE:
+            case D3DTOP_MODULATE2X:
+            case D3DTOP_MODULATE4X:
+            case D3DTOP_ADD:
+            case D3DTOP_ADDSIGNED:
+            case D3DTOP_ADDSIGNED2X:
+            case D3DTOP_ADDSMOOTH:
+            case D3DTOP_BLENDDIFFUSEALPHA:
+            case D3DTOP_BLENDCURRENTALPHA:
+            case D3DTOP_BLENDFACTORALPHA:
+            case D3DTOP_BLENDTEXTUREALPHA:
+            case D3DTOP_BLENDTEXTUREALPHAPM:
+            case D3DTOP_MODULATEALPHA_ADDCOLOR:
+            case D3DTOP_MODULATECOLOR_ADDALPHA:
+            case D3DTOP_MODULATEINVALPHA_ADDCOLOR:
+            case D3DTOP_MODULATEINVCOLOR_ADDALPHA:
+            case D3DTOP_DOTPRODUCT3:
+            case D3DTOP_SUBTRACT:
+                return fixed_function_argument_uses_current(arg1) ||
+                       fixed_function_argument_uses_current(arg2);
+            case D3DTOP_MULTIPLYADD:
+                return fixed_function_argument_uses_current(arg0) ||
+                       fixed_function_argument_uses_current(arg1) ||
+                       fixed_function_argument_uses_current(arg2);
+            default:
+                return false;
+            }
+        }
+
+        bool fixed_function_stage_uses_texture(
+            const FixedFunctionStageState& stage,
+            bool premodulateColor,
+            bool premodulateAlpha,
+            bool texturePresent) noexcept
+        {
+            if (fixed_function_op_uses_texture(
+                    stage.colorOp, stage.colorArg0,
+                    stage.colorArg1, stage.colorArg2) ||
+                fixed_function_op_uses_texture(
+                    stage.alphaOp, stage.alphaArg0,
+                    stage.alphaArg1, stage.alphaArg2))
+                return true;
+
+            // R195: PREMODULATE only changes CURRENT in the following stage
+            // when that following stage actually has a texture bound.
+            if (!texturePresent)
+                return false;
+
+            return
+                (premodulateColor &&
+                 fixed_function_op_uses_current_argument(
+                     stage.colorOp, stage.colorArg0,
+                     stage.colorArg1, stage.colorArg2)) ||
+                (premodulateAlpha &&
+                 fixed_function_op_uses_current_argument(
+                     stage.alphaOp, stage.alphaArg0,
+                     stage.alphaArg1, stage.alphaArg2));
+        }
+
         std::string fixed_function_argument_expression(
             DWORD value,
             std::size_t stageIndex,
             const char* swizzle,
-            DWORD textureFactor)
+            DWORD textureFactor,
+            bool premodulateCurrent = false)
         {
             const auto normalizedByte = [textureFactor](unsigned shift)
             {
@@ -224,7 +300,9 @@ namespace outrun::vr::dx11
                 base = "input.diffuse";
                 break;
             case D3DTA_CURRENT:
-                base = "current";
+                base = premodulateCurrent
+                    ? "(current * sampled" + std::to_string(stageIndex) + ")"
+                    : "current";
                 break;
             case D3DTA_TEXTURE:
                 base = "sampled" + std::to_string(stageIndex);
@@ -261,15 +339,19 @@ namespace outrun::vr::dx11
             DWORD arg2,
             std::size_t stageIndex,
             const char* swizzle,
-            DWORD textureFactor)
+            DWORD textureFactor,
+            bool premodulateCurrent = false)
         {
             const auto first = fixed_function_argument_expression(
-                arg1, stageIndex, swizzle, textureFactor);
+                arg1, stageIndex, swizzle, textureFactor,
+                premodulateCurrent);
             const auto second = fixed_function_argument_expression(
-                arg2, stageIndex, swizzle, textureFactor);
+                arg2, stageIndex, swizzle, textureFactor,
+                premodulateCurrent);
             switch (op)
             {
             case D3DTOP_SELECTARG1:
+            case D3DTOP_PREMODULATE:
                 return first;
             case D3DTOP_SELECTARG2:
                 return second;
@@ -341,7 +423,8 @@ namespace outrun::vr::dx11
                 // Direct3D 9 defines this COLOROP-only operation as
                 // Arg1.rgb + Arg1.a * Arg2.rgb.
                 const auto firstAlpha = fixed_function_argument_expression(
-                    arg1, stageIndex, ".a", textureFactor);
+                    arg1, stageIndex, ".a", textureFactor,
+                    premodulateCurrent);
                 return first + " + " + firstAlpha + " * " + second;
             }
             case D3DTOP_MODULATECOLOR_ADDALPHA:
@@ -350,7 +433,8 @@ namespace outrun::vr::dx11
                 // Arg1.rgb * Arg2.rgb + Arg1.a, with Arg1.a replicated
                 // across the RGB result.
                 const auto firstAlpha = fixed_function_argument_expression(
-                    arg1, stageIndex, ".a", textureFactor);
+                    arg1, stageIndex, ".a", textureFactor,
+                    premodulateCurrent);
                 return first + " * " + second + " + " + firstAlpha;
             }
             case D3DTOP_MODULATEINVALPHA_ADDCOLOR:
@@ -358,7 +442,8 @@ namespace outrun::vr::dx11
                 // R189: D3D9 defines this COLOROP-only operation as
                 // Arg1.rgb + (1 - Arg1.a) * Arg2.rgb.
                 const auto firstAlpha = fixed_function_argument_expression(
-                    arg1, stageIndex, ".a", textureFactor);
+                    arg1, stageIndex, ".a", textureFactor,
+                    premodulateCurrent);
                 return first + " + (1.0 - " + firstAlpha + ") * " + second;
             }
             case D3DTOP_MODULATEINVCOLOR_ADDALPHA:
@@ -366,7 +451,8 @@ namespace outrun::vr::dx11
                 // R190: D3D9 defines this COLOROP-only operation as
                 // (1 - Arg1.rgb) * Arg2.rgb + Arg1.a.
                 const auto firstAlpha = fixed_function_argument_expression(
-                    arg1, stageIndex, ".a", textureFactor);
+                    arg1, stageIndex, ".a", textureFactor,
+                    premodulateCurrent);
                 return "(1.0 - " + first + ") * " + second + " + " +
                        firstAlpha;
             }
@@ -379,9 +465,11 @@ namespace outrun::vr::dx11
                 // signed values (2*x-1), computes their three-component dot
                 // product, and replicates the scalar through the destination.
                 const auto dotFirst = fixed_function_argument_expression(
-                    arg1, stageIndex, ".rgb", textureFactor);
+                    arg1, stageIndex, ".rgb", textureFactor,
+                    premodulateCurrent);
                 const auto dotSecond = fixed_function_argument_expression(
-                    arg2, stageIndex, ".rgb", textureFactor);
+                    arg2, stageIndex, ".rgb", textureFactor,
+                    premodulateCurrent);
                 return "dot((" + dotFirst + " * 2.0 - 1.0), (" +
                        dotSecond + " * 2.0 - 1.0))";
             }
@@ -390,7 +478,8 @@ namespace outrun::vr::dx11
                 // R194: Direct3D 9 defines MULTIPLYADD as
                 // Arg1 + Arg2 * Arg0, where ARG0 is the third stage source.
                 const auto third = fixed_function_argument_expression(
-                    arg0, stageIndex, swizzle, textureFactor);
+                    arg0, stageIndex, swizzle, textureFactor,
+                    premodulateCurrent);
                 return first + " + " + second + " * " + third;
             }
             default:
@@ -567,6 +656,7 @@ namespace outrun::vr::dx11
             switch (op)
             {
             case D3DTOP_SELECTARG1:
+            case D3DTOP_PREMODULATE:
                 useArg1 = true;
                 break;
             case D3DTOP_SELECTARG2:
@@ -936,6 +1026,8 @@ namespace outrun::vr::dx11
                 FixedFunctionUnsupportedIncompleteObservation;
 
         bool colorChainDisabled = false;
+        bool premodulateColor = false;
+        bool premodulateAlpha = false;
         for (std::size_t stageIndex = 0;
              stageIndex < source.size(); ++stageIndex)
         {
@@ -944,6 +1036,8 @@ namespace outrun::vr::dx11
             if (stage.colorOp == D3DTOP_DISABLE)
             {
                 colorChainDisabled = true;
+                premodulateColor = false;
+                premodulateAlpha = false;
                 if (stage.alphaOp != D3DTOP_DISABLE)
                     out.unsupported |= FixedFunctionUnsupportedStageChain;
                 continue;
@@ -967,15 +1061,12 @@ namespace outrun::vr::dx11
             if (stage.resultArg != D3DTA_CURRENT)
                 out.unsupported |= FixedFunctionUnsupportedResultArg;
 
-            const bool usesTexture =
-                fixed_function_op_uses_texture(
-                    stage.colorOp, stage.colorArg0,
-                    stage.colorArg1, stage.colorArg2) ||
-                fixed_function_op_uses_texture(
-                    stage.alphaOp, stage.alphaArg0,
-                    stage.alphaArg1, stage.alphaArg2);
             const auto stageBit = static_cast<std::uint8_t>(
                 1u << static_cast<unsigned>(stageIndex));
+            const bool texturePresent =
+                (textureResourcePresentMask & stageBit) != 0;
+            const bool usesTexture = fixed_function_stage_uses_texture(
+                stage, premodulateColor, premodulateAlpha, texturePresent);
             if (usesTexture &&
                 (((textureResourcePresentMask & stageBit) == 0) ||
                  ((textureResourceExactMask & stageBit) == 0)))
@@ -1006,6 +1097,9 @@ namespace outrun::vr::dx11
 
             if (stage.srgbTexture != FALSE)
                 out.unsupported |= FixedFunctionUnsupportedSamplerSrgb;
+
+            premodulateColor = stage.colorOp == D3DTOP_PREMODULATE;
+            premodulateAlpha = stage.alphaOp == D3DTOP_PREMODULATE;
         }
 
         return out;
@@ -1044,6 +1138,8 @@ namespace outrun::vr::dx11
             return out;
         }
 
+        bool premodulateColor = false;
+        bool premodulateAlpha = false;
         for (std::size_t stageIndex = 0;
              stageIndex < source.size(); ++stageIndex)
         {
@@ -1051,13 +1147,12 @@ namespace outrun::vr::dx11
             if (stage.colorOp == D3DTOP_DISABLE)
                 break;
 
-            const bool usesTexture =
-                fixed_function_op_uses_texture(
-                    stage.colorOp, stage.colorArg0,
-                    stage.colorArg1, stage.colorArg2) ||
-                fixed_function_op_uses_texture(
-                    stage.alphaOp, stage.alphaArg0,
-                    stage.alphaArg1, stage.alphaArg2);
+            const auto stageBit = static_cast<std::uint8_t>(
+                1u << static_cast<unsigned>(stageIndex));
+            const bool texturePresent =
+                (textureResourcePresentMask & stageBit) != 0;
+            const bool usesTexture = fixed_function_stage_uses_texture(
+                stage, premodulateColor, premodulateAlpha, texturePresent);
             if (usesTexture &&
                 textureResourceTypes[stageIndex] != D3DRTYPE_TEXTURE)
             {
@@ -1065,6 +1160,9 @@ namespace outrun::vr::dx11
                     FixedFunctionShaderPrototypeUnsupportedResourceType;
                 return out;
             }
+
+            premodulateColor = stage.colorOp == D3DTOP_PREMODULATE;
+            premodulateAlpha = stage.alphaOp == D3DTOP_PREMODULATE;
         }
 
         auto& shader = out.source;
@@ -1084,19 +1182,23 @@ namespace outrun::vr::dx11
         }
         shader += "};\n";
 
+        premodulateColor = false;
+        premodulateAlpha = false;
         for (std::size_t stageIndex = 0;
              stageIndex < source.size(); ++stageIndex)
         {
             const auto& stage = source[stageIndex];
             if (stage.colorOp == D3DTOP_DISABLE)
                 break;
-            const bool usesTexture =
-                fixed_function_op_uses_texture(
-                    stage.colorOp, stage.colorArg0,
-                    stage.colorArg1, stage.colorArg2) ||
-                fixed_function_op_uses_texture(
-                    stage.alphaOp, stage.alphaArg0,
-                    stage.alphaArg1, stage.alphaArg2);
+            const auto stageBit = static_cast<std::uint8_t>(
+                1u << static_cast<unsigned>(stageIndex));
+            const bool texturePresent =
+                (textureResourcePresentMask & stageBit) != 0;
+            const bool usesTexture = fixed_function_stage_uses_texture(
+                stage, premodulateColor, premodulateAlpha, texturePresent);
+
+            premodulateColor = stage.colorOp == D3DTOP_PREMODULATE;
+            premodulateAlpha = stage.alphaOp == D3DTOP_PREMODULATE;
             if (!usesTexture)
                 continue;
 
@@ -1116,6 +1218,8 @@ namespace outrun::vr::dx11
             "{\n"
             "    float4 current = input.diffuse;\n";
 
+        premodulateColor = false;
+        premodulateAlpha = false;
         for (std::size_t stageIndex = 0;
              stageIndex < source.size(); ++stageIndex)
         {
@@ -1127,13 +1231,16 @@ namespace outrun::vr::dx11
             shader += std::to_string(stageIndex);
             shader += "\n";
 
-            const bool usesTexture =
-                fixed_function_op_uses_texture(
-                    stage.colorOp, stage.colorArg0,
-                    stage.colorArg1, stage.colorArg2) ||
-                fixed_function_op_uses_texture(
-                    stage.alphaOp, stage.alphaArg0,
-                    stage.alphaArg1, stage.alphaArg2);
+            const auto stageBit = static_cast<std::uint8_t>(
+                1u << static_cast<unsigned>(stageIndex));
+            const bool texturePresent =
+                (textureResourcePresentMask & stageBit) != 0;
+            const bool usesTexture = fixed_function_stage_uses_texture(
+                stage, premodulateColor, premodulateAlpha, texturePresent);
+            const bool premodulateCurrentColor =
+                premodulateColor && texturePresent;
+            const bool premodulateCurrentAlpha =
+                premodulateAlpha && texturePresent;
             if (usesTexture)
             {
                 const auto coord = static_cast<unsigned>(
@@ -1152,14 +1259,19 @@ namespace outrun::vr::dx11
             shader += "        float3 nextColor = ";
             shader += fixed_function_op_expression(
                 stage.colorOp, stage.colorArg0, stage.colorArg1, stage.colorArg2,
-                stageIndex, ".rgb", textureFactor);
+                stageIndex, ".rgb", textureFactor,
+                premodulateCurrentColor);
             shader += ";\n        float nextAlpha = ";
             shader += fixed_function_op_expression(
                 stage.alphaOp, stage.alphaArg0, stage.alphaArg1, stage.alphaArg2,
-                stageIndex, ".a", textureFactor);
+                stageIndex, ".a", textureFactor,
+                premodulateCurrentAlpha);
             shader +=
                 ";\n        current = float4(nextColor, nextAlpha);\n"
                 "    }\n";
+
+            premodulateColor = stage.colorOp == D3DTOP_PREMODULATE;
+            premodulateAlpha = stage.alphaOp == D3DTOP_PREMODULATE;
         }
 
         if (alphaTest.enabled != FALSE)
