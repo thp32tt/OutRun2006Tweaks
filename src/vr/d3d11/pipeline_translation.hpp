@@ -119,6 +119,9 @@ namespace outrun::vr::dx11
         DWORD alphaArg1 = D3DTA_TEXTURE;
         DWORD alphaArg2 = D3DTA_CURRENT;
         DWORD alphaArg0 = D3DTA_CURRENT;
+        // R197: D3DTSS_CONSTANT is an ARGB per-stage color selected by
+        // D3DTA_CONSTANT. Direct3D 9 defines an opaque-white default.
+        DWORD stageConstant = 0xFFFFFFFFu;
         // D3D9 defaults stage output to CURRENT. TEMP changes the dependency
         // graph across later stages and is not modeled by the current HLSL.
         DWORD resultArg = D3DTA_CURRENT;
