@@ -928,11 +928,15 @@ compose_fixed_function_textured_draw_readiness(
 [[nodiscard]] NativeFixedFunctionTexturedDrawReadiness
 compose_fixed_function_multistage_textured_draw_readiness(
     const NativeFixedFunctionDrawReadiness& draw,
-    const NativeFixedFunctionTextureBindingSetReadiness& textureBindings) noexcept;
+    ID3D11DeviceContext* context,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures) noexcept;
 
 [[nodiscard]] bool validate_fixed_function_multistage_textured_draw_snapshot(
     const NativeFixedFunctionDrawReadiness& draw,
-    const NativeFixedFunctionTextureBindingSetReadiness& textureBindings,
+    ID3D11DeviceContext* context,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
     std::uint64_t snapshotToken) noexcept;
 
 // R134 composes the existing output/surface/PS/geometry evidence with a live
