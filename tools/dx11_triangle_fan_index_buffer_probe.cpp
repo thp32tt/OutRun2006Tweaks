@@ -150,6 +150,43 @@ int main() {
             topology == D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
         "R126 IA binding did not seal R32_UINT triangle-list state");
 
+    const auto liveFanBinding = owner.binding_readiness(context.Get());
+    require(
+        liveFanBinding.inputValid &&
+            liveFanBinding.ownerReady &&
+            liveFanBinding.contextMatches &&
+            liveFanBinding.bufferBoundExact &&
+            liveFanBinding.formatExact &&
+            liveFanBinding.offsetExact &&
+            liveFanBinding.topologyExact &&
+            liveFanBinding.ready &&
+            liveFanBinding.ownerSnapshotToken == nonIndexedReady.snapshotToken &&
+            liveFanBinding.snapshotToken != 0 &&
+            owner.validate_binding_snapshot(
+                context.Get(), liveFanBinding.snapshotToken),
+        "R141 live generated fan IA binding seals exact owner identity");
+
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    const auto driftedFanBinding = owner.binding_readiness(context.Get());
+    require(
+        driftedFanBinding.inputValid &&
+            driftedFanBinding.ownerReady &&
+            driftedFanBinding.contextMatches &&
+            driftedFanBinding.bufferBoundExact &&
+            driftedFanBinding.formatExact &&
+            driftedFanBinding.offsetExact &&
+            !driftedFanBinding.topologyExact &&
+            !driftedFanBinding.ready &&
+            driftedFanBinding.snapshotToken == 0 &&
+            !owner.validate_binding_snapshot(
+                context.Get(), liveFanBinding.snapshotToken),
+        "R141 live generated fan IA binding fails closed after topology drift");
+    require(
+        owner.bind(context.Get()) &&
+            owner.validate_binding_snapshot(
+                context.Get(), liveFanBinding.snapshotToken),
+        "R141 generated fan IA binding restores deterministic snapshot");
+
     const std::array<std::uint16_t, 7> source16{
         99u, 4u, 8u, 15u, 16u, 23u, 77u};
     const auto staleToken = nonIndexedReady.snapshotToken;
@@ -178,8 +215,10 @@ int main() {
             indexed16Ready.sourceIndexSnapshotToken == 0x126160001ull &&
             indexed16Ready.generation > nonIndexedReady.generation &&
             indexed16Ready.snapshotToken != staleToken &&
-            !owner.validate_readiness_snapshot(device.Get(), staleToken),
-        "R126 reupload did not invalidate stale readiness");
+            !owner.validate_readiness_snapshot(device.Get(), staleToken) &&
+            !owner.validate_binding_snapshot(
+                context.Get(), liveFanBinding.snapshotToken),
+        "R141 reupload invalidates stale live generated fan binding identity");
 
     require_indices(
         read_back_indices(device.Get(), context.Get(), owner.buffer(), 9u),
@@ -223,8 +262,11 @@ int main() {
         !foreignReady.ready &&
             !foreignReady.deviceMatches &&
             !foreignReady.descriptorExact &&
-            !owner.bind(foreignContext.Get()),
-        "R126 foreign-device owner/context did not fail closed");
+            !owner.bind(foreignContext.Get()) &&
+            !owner.binding_readiness(foreignContext.Get()).ready &&
+            !owner.validate_binding_snapshot(
+                foreignContext.Get(), liveFanBinding.snapshotToken),
+        "R141 foreign-device live generated fan binding fails closed");
 
     const std::array<std::uint16_t, 3> invalidSource{1u, 2u, 3u};
     require(
@@ -260,5 +302,6 @@ int main() {
 
     std::cout << "DX11 triangle-fan generated index buffer R126: PASS\n";
     std::cout << "DX11 indexed triangle-fan source provenance R129: PASS\n";
+    std::cout << "DX11 triangle-fan live IA binding R141: PASS\n";
     return 0;
 }
