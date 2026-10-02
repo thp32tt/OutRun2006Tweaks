@@ -2264,6 +2264,14 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_34_INSTRUCTIONS = (
 )
 
 
+# CONV-DXVK-000002/F26: continuation 34 ends at an exact instruction
+# boundary, so capture the next canonical window without overlap metadata.
+# Fresh bytes remain raw-only until a later exact canonical decode proves them.
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_35_RVA = 0x00182B17
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_35_PROBE_LEN = 64
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_35_PROBE_END_RVA = 0x00182B57
+
+
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS = (
     (0x000283DE, "b9 00 00 80 3f", "mov ecx, 0x3f800000"),
     (0x000283E3, "d9 58 1c", "fstp dword [eax+0x1c]"),
@@ -13057,6 +13065,69 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_34_prefix_pro
     }
 
 
+def collect_guarded_gf_target_c_helper_1_third_callee_continuation_35_provenance(pe: PE) -> dict:
+    """Capture canonical bytes after the exact 0x182B17 instruction boundary."""
+
+    predecessor = collect_guarded_gf_target_c_helper_1_third_callee_continuation_34_prefix_proof(pe)
+    target_rva = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_35_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    probe = pe.bytes_at_rva(
+        target_rva, GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_35_PROBE_LEN
+    )
+    inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
+    outbound = collect_raw_rel32_call_candidates(
+        pe, target_rva, GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_35_PROBE_LEN
+    )
+    predecessor_exact = (
+        predecessor["status"] == "EXACT_182AD7_TO_182B17_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN"
+        and predecessor["prefix_end_rva"] == target_rva
+        and predecessor["prefix_end_matches"]
+        and predecessor["capture_boundary_matches"]
+    )
+    probe_end_matches = (
+        target_rva + len(probe)
+        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_35_PROBE_END_RVA
+    )
+    captured = bool(
+        predecessor_exact
+        and target_section == ".text"
+        and len(probe) == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_35_PROBE_LEN
+        and probe_end_matches
+    )
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "predecessor_status": predecessor["status"],
+        "predecessor_exact": predecessor_exact,
+        "predecessor_end_rva": predecessor["prefix_end_rva"],
+        "predecessor_end_is_instruction_boundary": bool(
+            predecessor["prefix_end_matches"] and predecessor["capture_boundary_matches"]
+        ),
+        "probe_len": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_35_PROBE_LEN,
+        "probe_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_35_PROBE_END_RVA,
+        "probe_end_matches": probe_end_matches,
+        "first_16_bytes": probe[:16].hex(" "),
+        "last_16_bytes": probe[-16:].hex(" "),
+        "bytes": probe.hex(" "),
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "status": (
+            "EXACT_EXE_182B17_TO_182B57_PROVENANCE_CAPTURED"
+            if captured
+            else "CALLEE_182B17_CONTINUATION_PROVENANCE_CAPTURE_FAILED"
+        ),
+        "start_boundary_status": "EXACT_PREDECESSOR_INSTRUCTION_BOUNDARY_182B17",
+        "function_entry_status": "UNRESOLVED_AT_182B17_AND_FORWARD_BYTES",
+        "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+        "call_semantics": "UNRESOLVED",
+        "ownership_effect": "NONE",
+        "continuation_scope": "RAW_BYTES_AND_REL32_CENSUS_ONLY",
+    }
+
+
 def _memoize_pe_only_collector(func):
     """Cache pure PE-only collector results on the PE instance.
 
@@ -13570,6 +13641,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_third_callee_continuation_33_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_33_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_34_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_34_provenance(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_34_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_34_prefix_proof(pe),
+        "guarded_gf_target_c_helper_1_third_callee_continuation_35_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_35_provenance(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -16534,6 +16606,27 @@ def main() -> int:
     if helper_1_third_cont_34_proof["status"] != "EXACT_182AD7_TO_182B17_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN":
         print("guarded_gf_target_c_helper_1_third_callee_continuation_34_prefix_proof=FAILED")
         return 93
+
+    helper_1_third_cont_35 = report[
+        "guarded_gf_target_c_helper_1_third_callee_continuation_35_provenance"
+    ]
+    print(
+        f"gf_target_c_helper_1_third_callee_continuation_35="
+        f"0x{helper_1_third_cont_35['target_rva']:08X} "
+        f"status={helper_1_third_cont_35['status']} "
+        f"predecessor={helper_1_third_cont_35['predecessor_status']} "
+        f"predecessor_exact={helper_1_third_cont_35['predecessor_exact']} "
+        f"predecessor_end=0x{helper_1_third_cont_35['predecessor_end_rva']:08X}:"
+        f"boundary={helper_1_third_cont_35['predecessor_end_is_instruction_boundary']} "
+        f"section={helper_1_third_cont_35['target_section']} "
+        f"probe_len={helper_1_third_cont_35['probe_len']} "
+        f"probe_end=0x{helper_1_third_cont_35['probe_end_rva']:08X}:"
+        f"match={helper_1_third_cont_35['probe_end_matches']} "
+        f"bytes={helper_1_third_cont_35['bytes']}"
+    )
+    if helper_1_third_cont_35["status"] != "EXACT_EXE_182B17_TO_182B57_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_c_helper_1_third_callee_continuation_35_provenance=FAILED")
+        return 94
 
     return 0
 
