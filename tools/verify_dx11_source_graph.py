@@ -800,6 +800,84 @@ def main() -> None:
             + ", ".join(missing_r124_output)
         )
 
+    r126_output_binding_contract = [
+        (
+            "class NativeFixedFunctionOutputStateBinding final",
+            NATIVE_BACKEND_HPP,
+            "R126 dormant output-state binding owner",
+        ),
+        (
+            "render_state_snapshot_token_ != 0",
+            NATIVE_BACKEND_HPP,
+            "R126 sealed R116 component identity",
+        ),
+        (
+            "output_state_snapshot_token_ != 0",
+            NATIVE_BACKEND_HPP,
+            "R126 sealed R124 component identity",
+        ),
+        (
+            "NativeFixedFunctionOutputStateBinding::initialize(",
+            NATIVE_BACKEND_CPP,
+            "R126 binding initialization",
+        ),
+        (
+            "renderStateBundle.device() != device",
+            NATIVE_BACKEND_CPP,
+            "R126 exact-device ownership gate",
+        ),
+        (
+            "context->RSSetViewports(1, &viewport_);",
+            NATIVE_BACKEND_CPP,
+            "R126 viewport binding",
+        ),
+        (
+            "context->RSSetScissorRects(1, &scissor_rect_);",
+            NATIVE_BACKEND_CPP,
+            "R126 scissor binding",
+        ),
+        (
+            "context->OMSetBlendState(",
+            NATIVE_BACKEND_CPP,
+            "R126 blend-factor/sample-mask binding",
+        ),
+        (
+            "context->OMSetDepthStencilState(",
+            NATIVE_BACKEND_CPP,
+            "R126 depth-stencil reference binding",
+        ),
+        (
+            "R126 WARP context exposes the exact sealed RS/OM binding",
+            CONSTANT_BUFFER_PROBE,
+            "R126 WARP positive binding probe",
+        ),
+        (
+            "R126 foreign D3D11 context cannot consume binding owner",
+            CONSTANT_BUFFER_PROBE,
+            "R126 foreign-device fail-closed probe",
+        ),
+        (
+            "R126 missing R124 snapshot token fails closed",
+            CONSTANT_BUFFER_PROBE,
+            "R126 missing dynamic-state identity probe",
+        ),
+        (
+            "R126 missing R116 snapshot token fails closed",
+            CONSTANT_BUFFER_PROBE,
+            "R126 missing immutable-state identity probe",
+        ),
+    ]
+    missing_r126_output_binding = [
+        meaning
+        for token, source, meaning in r126_output_binding_contract
+        if token not in source
+    ]
+    if missing_r126_output_binding:
+        raise SystemExit(
+            "DX11 R126 output-state binding contract drift: "
+            + ", ".join(missing_r126_output_binding)
+        )
+
     stencil_snapshot_contract = {
         "DWORD stencilReadMask = 0xFFFFFFFFu;": "stencil read mask snapshot",
         "DWORD stencilRef = 0;": "dynamic stencil reference snapshot",
