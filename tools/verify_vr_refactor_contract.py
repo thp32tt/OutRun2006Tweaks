@@ -21,6 +21,9 @@ r31 = read("src/vr/d3d9/stereo_renderer_r31.cpp")
 r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = read("src/vr/d3d9/stereo_renderer_r33.cpp")
 r34 = read("src/vr/d3d9/stereo_renderer_r34.cpp")
+cmake_text = read("CMakeLists.txt")
+cmake_toml_text = read("cmake.toml")
+refactor_workflow = read(".github/workflows/vr-refactor-build.yml")
 r13 = read("src/vr/d3d9/stereo_renderer_r13.cpp")
 runtime_context = read("src/vr/render/runtime_context.hpp")
 raw_draw_api = read("src/vr/render/raw_draw_api.hpp")
@@ -1109,6 +1112,29 @@ for marker in (
     reopen_pos = r13.find("\n\n    namespace\n    {", pos)
     if close_pos < 0 or pos - close_pos > 16 or reopen_pos < 0:
         errors.append(f"R13 Gate C hook destination is not outside anonymous namespace: {marker}")
+
+
+
+# Gate D R31/R30 translation-unit split contract.
+if "OUTRUN_VR_REFACTOR_SPLIT_R31_R30" not in r31:
+    errors.append("R31/R30 split macro guard missing from R31")
+if '#include "stereo_renderer_r30.cpp"' not in r31:
+    errors.append("R31/R30 guarded compatibility include missing before final cleanup")
+for required in (
+    '../core/screen_space_hooks.hpp',
+    '../render/screen_space_api.hpp',
+    '../render/lower_draw_api.hpp',
+):
+    if required not in r31:
+        errors.append(f"R31 independent TU missing explicit Gate D dependency: {required}")
+for marker in (
+    "OUTRUN_VR_REFACTOR_SPLIT_R31_R30",
+    "stereo_renderer_r30.cpp",
+):
+    if marker not in cmake_text or marker not in cmake_toml_text:
+        errors.append(f"Gate D CMake parity missing marker: {marker}")
+if "-DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=ON" not in refactor_workflow:
+    errors.append("Gate D refactor workflow flag missing")
 
 
 if errors:

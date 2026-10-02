@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1280,
+  "cycle": 1283,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -269,11 +269,12 @@
     "R84-REF-CMAKE-PARITY-0001",
     "R84-REF-WORKFLOW-ISOLATION-0001",
     "R84-REF-GATED-PATCHPLAN-0004",
-    "R84-REF-BATCH42-0001"
+    "R84-REF-BATCH42-0001",
+    "R84-REF-GATED-SPLIT-0005"
   ],
-  "next": "Gate D: apply prepared R31/R30 split. Guard R31 textual stereo_renderer_r30.cpp include with OUTRUN_VR_REFACTOR_SPLIT_R31_R30, enable R30 as a separate TU in CMakeLists.txt/cmake.toml, add workflow flag, then run hosted Win32 Release compile/link validation. Continue 3-cycle APPLY / 6-cycle BUILD cadence.",
-  "updatedKst": "2026-10-02T20:11:54+09:00",
-  "batchStatus": "R84_USER_BATCH_42_COMPLETE_GATE_C_BUILD_VERIFIED_CYCLE_1280",
+  "next": "Cycles 1284-1286: static parity review then BUILD_GATE 1286 for Gate D cumulative R30-R34 split.",
+  "updatedKst": "2026-10-02T20:27:00+09:00",
+  "batchStatus": "R84_GATE_D_SPLIT_APPLIED_CYCLE_1283",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -518,7 +519,8 @@
     "Cycles 1275-1277 R84-REF-GATED-PATCHPLAN-0004: located exact Gate D edit boundaries. R31 textual R30 include is line 22 and required screen_space_hooks/screen_space_api/lower_draw_api are already explicit. CMakeLists/cmake.toml Gate C blocks and workflow flag insertion points were mapped. Planned Gate D macro OUTRUN_VR_REFACTOR_SPLIT_R31_R30 will guard only the textual include and enable R30 as a real TU. APPLY_GATE 1277 NO_SAFE_CHANGE until Gate C green. Runtime NEED_HMD_TEST.",
     "Cycles 1278-1280 R84-REF-BATCH42-0001: final requested-batch verification. Gate C exact run 36999194285/job 110812730420 remains in Build cumulative split graph with verifier/configure PASS; no new build input was introduced after 1256. APPLY_GATE 1280 NO_SAFE_CHANGE while exact build is active. BUILD_GATE 1280 REUSED_BUILD_EVIDENCE=IN_PROGRESS same run. Requested batch advanced exactly 42 cycles from 1238 to 1280. Gate D patch is ready but intentionally not applied before Gate C green. Runtime NEED_HMD_TEST.",
     "Post-cycle-1280 evidence update (no cycle increment): exact Gate C BUILD_GATE run 36999194285 job 110812730420 completed SUCCESS. Verify refactor contracts PASS, configure PASS, Build cumulative split graph PASS. Gate C R32/R31 is BUILD_VERIFIED. Next gate is D R31/R30. Runtime NEED_HMD_TEST.",
-    "Timestamp correction only (no cycle increment): updatedKst aligned to authoritative KST clock after Gate C success was recorded."
+    "Timestamp correction only (no cycle increment): updatedKst aligned to authoritative KST clock after Gate C success was recorded.",
+    "Cycles 1281-1283 R84-REF-GATED-SPLIT-0005: Gate D applied after Gate C BUILD_VERIFIED. Guarded R31 textual R30 include with OUTRUN_VR_REFACTOR_SPLIT_R31_R30; enabled R30 as a real TU only when Gate C is active; synchronized CMakeLists.txt/cmake.toml; added hosted workflow Gate D flag and verifier contract. No hook bodies/order or production R26+HUD graph changed. APPLY_GATE 1283 SOURCE_CHANGED=YES. Runtime NEED_HMD_TEST."
   ],
   "campaign": {
     "startCycle": 1202,

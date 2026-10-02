@@ -19,7 +19,9 @@
 //  * a five-second route summary separates main/offscreen/aux/world/HUD/fallback
 //    work so stage-specific 300 -> 3000+ draw explosions can be diagnosed.
 
+#ifndef OUTRUN_VR_REFACTOR_SPLIT_R31_R30
 #include "stereo_renderer_r30.cpp"
+#endif
 #include "../render/stereo_base_policy.hpp"
 #include "../render/fast_path_support.hpp"
 #include "../render/screen_space_api.hpp"
