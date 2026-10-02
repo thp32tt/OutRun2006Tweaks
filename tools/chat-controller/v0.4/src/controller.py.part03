@@ -916,6 +916,99 @@ async def queue_send_producer_execution_continuation(
     return sent
 
 
+async def queue_send_conversion_pipeline_continuation(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    active: dict,
+    reasons: list[str],
+    result_sha: str,
+) -> bool:
+    """Continue a conversion TASK when a durable commit is only a partial C0-C6 checkpoint."""
+    next_stage = conversion_pipeline_next_stage(reasons)
+    latest_head = github_branch_head(active["branch"]) or result_sha
+    prompt = (
+        f"VR_PIPELINE_CHECKPOINT_REJECTED TASK_ID={active['task_id']} RESULT_SHA={result_sha} "
+        f"BRANCH={active['branch']} HEAD={latest_head}\n"
+        f"CONTROLLER_STAGE={next_stage} ACTIVE_TASK_LATCH=ON PIPELINE_SCHEMA={CONVERSION_PIPELINE_SCHEMA_VERSION}.\n"
+        "이 커밋은 TASK 완료가 아니라 중간 checkpoint다. 다음 설명/계획을 출력하고 멈추지 말고 첫 출력부터 연결된 GitHub 도구를 호출해.\n"
+        "PIPELINE_REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(필요 없으면 이유와 NOT_REQUIRED)→C6_STATE.\n"
+        "C2는 review/state 문서만이 아니라 실제 source/tool/test/workflow/disassembly evidence 변경을 포함해야 한다. "
+        "C3에는 해당 변경 검증 근거가 있어야 하고 C6에는 durable state와 exact next action을 남겨야 한다.\n"
+        "현재 미충족=" + "; ".join(reasons[:12]) + "\n"
+        "같은 TASK_ID로 미완료 stage를 즉시 계속하고 docs/automation/runs/<TASK_ID>.json에 pipeline_schema_version, "
+        "pipeline C0-C6, changed_paths/work_product, validation, state_persisted=true, runtime_validation을 기록한 새 [AUTO:TASK_ID] commit까지 진행해. "
+        "로컬 PC/RenderDoc/OpenXR runtime 부재는 source/static/disassembly/GitHub Actions 진행 blocker가 아니다."
+    )
+    sent = await queue_send_same_chat_control_message(
+        context,
+        pages,
+        active,
+        prompt,
+        status="conversion_pipeline_continuation",
+        result_label="conversion_pipeline_continuation",
+    )
+    if sent:
+        active["conversion_pipeline_continuation_sent_at"] = datetime.now(TZ).isoformat()
+        active["conversion_pipeline_recovery_sent_sha"] = result_sha
+        active["assistant_claim_verification"] = "PARTIAL_PIPELINE_COMMIT_REJECTED"
+        active["last_hash"] = None
+        active["last_hash_changed_at"] = datetime.now(TZ).isoformat()
+    return sent
+
+
+async def conversion_handle_discovered_commit(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    q: dict,
+    active: dict,
+    task_commit: dict,
+    now: datetime,
+) -> bool:
+    """Bind only a full C0-C6 conversion result to Actions. Partial commits keep the same TASK alive."""
+    sha = str(task_commit.get("sha") or "")
+    valid, reasons, _record = conversion_validate_pipeline_result_commit(
+        str(active.get("task_id") or ""),
+        sha,
+        str(active.get("lane") or ""),
+        str(active.get("branch") or ""),
+    )
+    if valid:
+        active["result_sha"] = sha
+        active["result_message"] = task_commit.get("message")
+        active["phase"] = "WAIT_ACTIONS"
+        active["wait_actions_started_at"] = now.isoformat()
+        active["last_gate_poll_at"] = None
+        active["controller_stage"] = "WAIT_ACTIONS"
+        active["conversion_pipeline_validation"] = "PASS_C0_C6"
+        active.pop("conversion_pipeline_rejected_sha", None)
+        active.pop("conversion_pipeline_reject_reasons", None)
+        active.pop("conversion_pipeline_recovery_sent_sha", None)
+        active.pop("conversion_pipeline_continuation_sent_at", None)
+        return True
+
+    same_rejected = active.get("conversion_pipeline_rejected_sha") == sha
+    active["conversion_pipeline_rejected_sha"] = sha
+    active["conversion_pipeline_reject_reasons"] = reasons
+    active["conversion_pipeline_validation"] = "INCOMPLETE"
+    active["phase"] = "WAIT_CHAT"
+    active["terminal"] = None
+    active["result_sha"] = None
+    active["task_latched"] = True
+    active["controller_stage"] = conversion_pipeline_next_stage(reasons)
+    active["last_checkpoint_head"] = sha or active.get("last_checkpoint_head")
+    active["last_checkpoint_at"] = now.isoformat()
+    active["last_checkpoint_stage"] = active["controller_stage"]
+    invalidate_task_commit_cache(str(active.get("branch") or ""), str(active.get("task_id") or ""))
+
+    # Send one explicit execution continuation for this rejected SHA. Subsequent
+    # cycles must inspect the live assistant turn so plan-only recovery still works.
+    if not same_rejected or active.get("conversion_pipeline_recovery_sent_sha") != sha:
+        return await queue_send_conversion_pipeline_continuation(
+            context, pages, active, reasons, sha
+        )
+    return False
+
+
 async def queue_send_conversion_execution_continuation(
     context: BrowserContext,
     pages: dict[str, Page],
