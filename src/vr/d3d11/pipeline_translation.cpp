@@ -198,7 +198,9 @@ namespace outrun::vr::dx11
                 return fixed_function_argument_uses_texture(arg1) ||
                        fixed_function_argument_uses_texture(arg2);
             case D3DTOP_MULTIPLYADD:
-                // R194: COLORARG0/ALPHAARG0 is the third source operand.
+            case D3DTOP_LERP:
+                // R194/R196: ternary operations consume COLORARG0/ALPHAARG0
+                // as the third source operand.
                 return fixed_function_argument_uses_texture(arg0) ||
                        fixed_function_argument_uses_texture(arg1) ||
                        fixed_function_argument_uses_texture(arg2);
@@ -243,6 +245,7 @@ namespace outrun::vr::dx11
                 return fixed_function_argument_uses_current(arg1) ||
                        fixed_function_argument_uses_current(arg2);
             case D3DTOP_MULTIPLYADD:
+            case D3DTOP_LERP:
                 return fixed_function_argument_uses_current(arg0) ||
                        fixed_function_argument_uses_current(arg1) ||
                        fixed_function_argument_uses_current(arg2);
@@ -482,6 +485,16 @@ namespace outrun::vr::dx11
                     premodulateCurrent);
                 return first + " + " + second + " * " + third;
             }
+            case D3DTOP_LERP:
+            {
+                // R196: Direct3D 9 linearly interpolates Arg1 toward Arg2
+                // using ARG0 as the per-component proportion.
+                const auto proportion = fixed_function_argument_expression(
+                    arg0, stageIndex, swizzle, textureFactor,
+                    premodulateCurrent);
+                return first + " * " + proportion + " + " + second +
+                       " * (1.0 - " + proportion + ")";
+            }
             default:
                 return {};
             }
@@ -680,6 +693,7 @@ namespace outrun::vr::dx11
                 useArg2 = true;
                 break;
             case D3DTOP_MULTIPLYADD:
+            case D3DTOP_LERP:
                 useArg0 = true;
                 useArg1 = true;
                 useArg2 = true;
