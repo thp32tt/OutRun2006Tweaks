@@ -1472,6 +1472,13 @@ namespace outrun::vr::dx11
         out.rasterizer.MultisampleEnable = FALSE;
         out.rasterizer.AntialiasedLineEnable = FALSE;
 
+        // R161: the native path currently assumes normal D3D9 frustum
+        // clipping and does not emit SV_ClipDistance for user clip planes.
+        // Keep those unmodeled semantics fail-closed instead of silently
+        // accepting the unconditional D3D11 DepthClipEnable descriptor.
+        if (source.clipping == FALSE || source.clipPlaneEnable != 0u)
+            out.unsupported |= PipelineUnsupportedClipping;
+
         // R158: the current native fixed-function HLSL follows D3D9's
         // default Gouraud interpolation only. Do not let FLAT/PHONG state be
         // erased by an otherwise exact D3D11 pipeline descriptor.
