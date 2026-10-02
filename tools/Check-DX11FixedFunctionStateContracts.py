@@ -10,13 +10,13 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import re
 import sys
 
 
-FORBIDDEN_RUNTIME_ENABLE_MARKERS = (
-    "NativeDrawPathActive = true",
-    "NativeDrawPathActive=true",
-    "ENABLE_NATIVE_DRAW_PATH=1",
+FORBIDDEN_RUNTIME_ENABLE_PATTERNS = (
+    r"NativeDrawPathActive\s*=\s*true",
+    r"ENABLE_NATIVE_DRAW_PATH\s*=\s*1",
 )
 
 REQUIRED_SAFE_MARKERS = (
@@ -29,9 +29,9 @@ def scan(path: Path) -> tuple[bool, list[str]]:
     text = path.read_text(encoding="utf-8", errors="replace")
     findings: list[str] = []
 
-    for marker in FORBIDDEN_RUNTIME_ENABLE_MARKERS:
-        if marker in text:
-            findings.append(f"runtime activation marker present: {marker}")
+    for pattern in FORBIDDEN_RUNTIME_ENABLE_PATTERNS:
+        if re.search(pattern, text, flags=re.IGNORECASE):
+            findings.append(f"runtime activation marker present: {pattern}")
 
     for marker in REQUIRED_SAFE_MARKERS:
         if marker not in text:
