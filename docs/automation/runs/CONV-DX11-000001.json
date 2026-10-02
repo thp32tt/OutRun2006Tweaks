@@ -195,8 +195,105 @@
       "checkpoint": "C6_STATE",
       "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
       "runtime_claim": "NONE"
+    },
+    {
+      "unit_id": "DX11_FIXED_FUNCTION_PIPELINE_CENSUS_ACCOUNTING_R120",
+      "job_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_FIXED_FUNCTION_ALPHA_TEST_CENSUS_READINESS_ACCOUNTING",
+      "base_sha": "5c56835ed4c80940b8ad27d66f3326e0e66f567d",
+      "material_result_sha": "d6b23a98c793c74341ce320a25225944051b1b3f",
+      "guard_result_sha": "12690c3de37f724e062da046ed3097b64fd931fe",
+      "validation_bearing_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
+      "implementation_commits": [
+        "d6b23a98c793c74341ce320a25225944051b1b3f",
+        "12690c3de37f724e062da046ed3097b64fd931fe"
+      ],
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "The durable R118 next action explicitly left its fixed-function alpha-test pipeline/shader handoff unconsumed by dormant runtime census/readiness accounting. This was independent GitHub-only source/static work and did not require native Draw* activation or Quest 3/VDXR hardware.",
+      "summary": "R120 consumes the R118 fixed-function-only alpha-test handoff as census/readiness telemetry. It records exact/pending pipeline+pixel-shader readiness, reconciled render-state blockers and shader-owned alpha-test evidence per signature and cumulatively, while leaving the generic pipeline unsupported mask and shaderTranslationExact=false gate unchanged. Added source-graph drift guards.",
+      "changed_paths": [
+        "src/vr/d3d11/runtime_census.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Read current branch AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/automation/runs/CONV-DX11-000001.json and docs/VR_DX11_NATIVE_PLAN.md through the authenticated GitHub connector.",
+            "Read Issue #14 production ledger; the latest durable R118 event required fixed-function census/readiness integration while preserving native activation gates.",
+            "Tracked branch churn and rebased evidence against descendants rather than overwriting concurrent same-branch work."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Confirmed runtime_census still generated the fixed-function pixel-shader prototype directly and left R118 translate_fixed_function_pipeline_with_shader_semantics unused.",
+            "Confirmed generic translate_pipeline alpha-test unsupported accounting and shaderTranslationExact=false are deliberate fail-closed gates.",
+            "Selected telemetry/readiness-only integration: do not clear the generic unsupported mask, do not mark native shader translation exact and do not route Draw*."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "changed_paths": [
+            "src/vr/d3d11/runtime_census.cpp",
+            "tools/verify_dx11_source_graph.py"
+          ],
+          "material_commit": "d6b23a98c793c74341ce320a25225944051b1b3f",
+          "guard_commit": "12690c3de37f724e062da046ed3097b64fd931fe",
+          "details": [
+            "Runtime census now calls the R118 fixed-function pipeline/shader handoff only for fixed-function signatures and uses its pixel-shader prototype.",
+            "Added exact/pending handoff counters, alpha-test shader-ownership counter, reconciled blocker identity, signature hashing and R120 detail/summary telemetry.",
+            "Added source-graph guards requiring the R120 accounting contract and the existing shaderTranslationExact=false fail-closed token."
+          ]
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_REMOTE_STATIC",
+          "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_CI",
+          "evidence": [
+            "GitHub-source assertions on descendant a564becad3d390c84034e3bd666b2714f5781d81 confirmed R118 invocation remains inside the fixed-function block, generic unsupported remains sourced from translate_pipeline(), shaderTranslationExact remains false, and reconciled ownership is telemetry only.",
+            "Build run 36970893793 job 110724437916 on descendant a564becad3d390c84034e3bd666b2714f5781d81 passed Verify DX11 source graph and Test DX11 census analyzer plus preceding static checks before entering Configure.",
+            "Exact source/guard commit workflows were cancelled by later same-branch pushes; no source/test failure was observed.",
+            "No Win32 build completion, native graphics activation, visual parity or Quest 3/VDXR success is claimed."
+          ],
+          "full_win32_build": "UNCONFIRMED_AT_OBSERVATION"
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "d6b23a98c793c74341ce320a25225944051b1b3f",
+          "guard_commit": "12690c3de37f724e062da046ed3097b64fd931fe",
+          "issue14_comment_id": 5946383122
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Census/readiness telemetry and static guard only; no native Draw* routing, backend promotion, runtime test candidate or release package was requested or activated."
+        },
+        "C6_STATE": {
+          "status": "PERSISTING_WITH_STATE_COMMITS",
+          "exact_next_action": "Keep native Draw* disabled. Treat R120 as dormant census/readiness evidence only and continue from the latest branch HEAD with the next independent DX11 readiness gap; exhaustive exact-build census and Quest 3/VDXR parity remain required before activation."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "programmable_alpha_test_relaxed": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "issue14_comment_id": 5946383122,
+      "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_CI",
+      "blocker": "Native DX11 Draw* remains disabled. Exact-build exhaustive census plus Quest 3/VDXR graphics parity are still required before runtime activation; SRC1 dual-source remains separately fail-closed.",
+      "next_action": "Continue independent GitHub-only DX11 readiness work from the current branch HEAD without changing native activation gates.",
+      "checkpoint": "C6_STATE",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE"
     }
   ],
-  "latest_continuation_unit": "DX11_FOG_STATE_CENSUS_IDENTITY_R119",
+  "latest_continuation_unit": "DX11_FIXED_FUNCTION_PIPELINE_CENSUS_ACCOUNTING_R120",
   "state_persisted_for_continuation": true
 }
