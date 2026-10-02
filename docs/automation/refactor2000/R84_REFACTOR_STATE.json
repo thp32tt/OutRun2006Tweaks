@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1201,
+  "cycle": 1202,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -250,9 +250,9 @@
     "R84-REF-BUILDGATE-B-0004",
     "R84-REF-BUILDGATE-C-0001"
   ],
-  "next": "Consume exact hosted Gate C run 36972915737 job 110730517261 for source SHA d992b38a1087fc70f18f53ce933c03a7fb9caa6e. Verifier PASS; configure currently IN_PROGRESS. If green, mark Gate C BUILD_VERIFIED and immediately implement Gate D R31/R30 split using screen_space_hooks.hpp. If failed, classify first concrete compile/link error and minimally repair.",
-  "updatedKst": "2026-10-02T15:20:00+09:00",
-  "batchStatus": "R84_BUILD_GATE_C_VALIDATION_IN_PROGRESS_CYCLE_1201",
+  "next": "Consume exact hosted Gate C repair run 36978856386 job 110748583667 for source SHA 6101cbc58d4a648ff15f1dc4273550157114c6bd. Verifier PASS; configure IN_PROGRESS. If failure, inspect first concrete compile/link dependency; this is repair attempt 1 for the R32 direct-dependency seam. If green, mark Gate C BUILD_VERIFIED and proceed immediately to Gate D R31/R30 split.",
+  "updatedKst": "2026-10-02T16:32:00+09:00",
+  "batchStatus": "R84_BUILD_GATE_C_REPAIR1_VALIDATION_IN_PROGRESS_CYCLE_1202",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -468,6 +468,7 @@
     "Cycles 1190-1192 R84-REF-BUILDGATE-B-0001: Gate B cumulative R34/R33 + R33/R32 split run 36958531456 job 110686824910 exposed PRODUCT_DEFECT/implicit include dependencies plus Win32 min/max pollution. Added NOMINMAX at R32 TU start and owner-neutral runtime/raw-draw/depth facades at 8300ec814f241366d3bb27481ff0597cf8880bb1. Follow-up static dependency review found further R33 access to R7 stereo resources/frame accounting.",
     "Cycles 1193-1195 R84-REF-BUILDGATE-B-0002: extracted R33 stereo runtime facade and neutral FastWorldDispatchConstants at 84f5f245932f30e6a16e0c4e86a8bc5097db8db6, then removed the remaining local FormatHasStencil dependency at build-input SHA 792480b46fa8790cbdfc19551fdde2fae8b3e87f. Exact GitHub-hosted Gate B run 36961186184 job 110695037585: verifier PASS; configure currently in progress, build pending at checkpoint time. RUNTIME_VALIDATION=UNTESTED. Do not start Gate C until this exact Gate B lineage is BUILD_VERIFIED.",
     "Cycles 1196-1198 R84-REF-BUILDGATE-B-0003: reapplied previously pending Gate B repair after connector HEAD exactly matched BASE_HEAD_SHA 89a08602a3d2819195d1ea25444dc0e3bac1ffdc. Added owner-neutral LowerFailClosed callback facade, switched R32 fast-world path to FastWorldDispatchConstants/BuildFastWorldDispatchConstants, and made stereo_runtime_facade.hpp explicit in R7. Sequential CAS commits dbdd0f0d5455fb2cd0d2ad28b7fbf79947088412, e7db6860e56b54675d190ae90c0cde125d41769b, 63a2bacf9bd4e7790546a525c5624bd1786f54cc. Exact hosted Gate B run 36967088342 job 110713079748 is IN_PROGRESS. Reset/Present/DirectGPU/ACK/fence/copy/StateBlock semantics unchanged. Runtime NEED_HMD_TEST.",
-    "Gate B exact hosted run 36967884507 job 110715482893 completed SUCCESS for SHA 60bfea8251685207cddf3ffa6482027083d0034f. Gate C prep exposed R13 ResolveDirectTransportR13/PresentDestR13 and R22 ResetDestR22 with linkage-only changes; bodies/order unchanged. R32 now guards R31 textual include under OUTRUN_VR_REFACTOR_SPLIT_R32_R31; cmake.toml/CMakeLists.txt kept aligned; workflow now validates cumulative R34-R31 split. Exact Gate C run 36972915737 job 110730517261 for SHA d992b38a1087fc70f18f53ce933c03a7fb9caa6e: verifier PASS, configure IN_PROGRESS at checkpoint. Runtime NEED_HMD_TEST."
+    "Gate B exact hosted run 36967884507 job 110715482893 completed SUCCESS for SHA 60bfea8251685207cddf3ffa6482027083d0034f. Gate C prep exposed R13 ResolveDirectTransportR13/PresentDestR13 and R22 ResetDestR22 with linkage-only changes; bodies/order unchanged. R32 now guards R31 textual include under OUTRUN_VR_REFACTOR_SPLIT_R32_R31; cmake.toml/CMakeLists.txt kept aligned; workflow now validates cumulative R34-R31 split. Exact Gate C run 36972915737 job 110730517261 for SHA d992b38a1087fc70f18f53ce933c03a7fb9caa6e: verifier PASS, configure IN_PROGRESS at checkpoint. Runtime NEED_HMD_TEST.",
+    "Gate C run 36972915737 job 110730517261 failed in compile after verifier/configure PASS. FAILURE_CLASS=PRODUCT_DEFECT: removing R31 textual include exposed R32 implicit base dependencies; first error SafetyHookInline missing, followed by STL/spdlog/backend declarations. Repair attempt 1 commit 6101cbc58d4a648ff15f1dc4273550157114c6bd adds explicit stereo_backend/safetyhook/STL/spdlog dependencies only; no hook bodies/order or runtime semantics changed. Exact repair run 36978856386 job 110748583667 is IN_PROGRESS. Runtime NEED_HMD_TEST."
   ]
 }
