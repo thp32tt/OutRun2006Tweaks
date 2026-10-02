@@ -1141,6 +1141,10 @@ if '#include "../../hook_mgr.hpp"' not in r31:
     errors.append("R31 independent TU missing explicit hook framework dependency")
 
 
+if "#ifndef NOMINMAX" not in r31:
+    errors.append("R31 independent TU lost NOMINMAX pre-include guard")
+
+
 if errors:
     print("R84 refactor contract FAILED")
     for error in errors:

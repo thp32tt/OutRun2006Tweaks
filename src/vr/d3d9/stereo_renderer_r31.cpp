@@ -1,4 +1,11 @@
 // R31 high-draw-count performance overlay.
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 //
 // R29 removed the steady-state mono replay, but the validated R7 world path
 // still read c64..c67 and rebuilt all eye transforms for every draw. Complex
