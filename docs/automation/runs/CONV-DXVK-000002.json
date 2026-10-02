@@ -1562,6 +1562,83 @@
       "semantic_promotion": "NONE",
       "ownership_effect": "NONE",
       "exact_next_action": "Historical handoff at repair time was to exact-decode canonical 0x00182C95..0x00182CD5; newer branch frontier/state takes precedence because concurrent work has since completed that decode."
+    },
+    {
+      "unit_id": "DXVK_OVERLAP_PROVENANCE_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "f429752ae28ae1027c5f5f5fd02ead8c3ff4c3ed",
+      "source_commits": [
+        {
+          "sha": "7e75f690e52a75faa1529212aa3e652f64068912",
+          "role": "initial-guard-attempt",
+          "validation": "FAILED_STATIC_CONTRACT"
+        },
+        {
+          "sha": "f429752ae28ae1027c5f5f5fd02ead8c3ff4c3ed",
+          "role": "repaired-material-result",
+          "validation": "PASS_ON_DESCENDANT"
+        }
+      ],
+      "validation_bearing_descendant_sha": "936ba3538bd3bc54ccb4da1f582a2d2be7ca9007",
+      "commit_message": "test: accept proven DXVK overlap collector forms [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Fail closed on every DXVK cut-edge overlap transition unless the following raw provenance collector compares canonical probe bytes against the declared overlap, includes overlap_matches in its captured gate and telemetry, and binds predecessor incomplete-edge evidence; accept both validated historical and current collector spellings.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD/AGENTS/conversion lane/task state/regression history and Issue #14; preserved concurrent same-JOB canonical-disassembly descendants."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Found a chain-verifier fail-open gap: overlap constants/geometry were checked, but collector source was not required to validate actual canonical overlap probe bytes before reporting captured."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Initial 7e75f690 added overlap collector source guards; CI exposed a valid historical collector spelling. Repair f429752a recognizes both proven forms while preserving fail-closed captured/telemetry/predecessor-edge requirements."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Initial Build run 36977213502/job 110743562479 failed the new verifier on continuation 23->24, then repaired f429752a was carried by direct descendant 936ba353. Build run 36977418801/job 110744186707 passed Verify backend disassembly contract; OutRun EXE HUD Inspector run 36977418796/static-exe-analysis job 110744181787 passed canonical analysis."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive repaired commit f429752ae28ae1027c5f5f5fd02ead8c3ff4c3ed contains required [AUTO:CONV-DXVK-000002] marker. Issue #14 implementation comment 5947174310 and validation comment 5947225385 record the change."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier hardening only; no runtime payload, selector, packaged backend binary, deployment content or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit without replacing the newer canonical-disassembly primary frontier."
+        }
+      },
+      "validation": {
+        "initial_failed_sha": "7e75f690e52a75faa1529212aa3e652f64068912",
+        "initial_failed_build_run_id": 36977213502,
+        "initial_failed_build_job_id": 110743562479,
+        "exact_repair_sha": "f429752ae28ae1027c5f5f5fd02ead8c3ff4c3ed",
+        "exact_repair_build_run_id": 36977366637,
+        "exact_repair_build_conclusion": "CANCELLED_DUE_BRANCH_CONCURRENCY_NO_PASS_CLAIM",
+        "validation_bearing_descendant_sha": "936ba3538bd3bc54ccb4da1f582a2d2be7ca9007",
+        "descendant_build_run_id": 36977418801,
+        "descendant_build_job_id": 110744186707,
+        "backend_disassembly_contract": "PASS",
+        "descendant_hud_inspector_run_id": 36977418796,
+        "descendant_static_exe_analysis_job_id": 110744181787,
+        "canonical_static_analysis": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947174310,
+      "issue14_validation_comment_id": 5947225385,
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve current primary frontier at canonical raw capture 0x00182CD5..0x00182D15. Exact-decode only complete instructions, resolve predecessor forward target 0x00182CEB only if exact instruction-boundary evidence proves it, preserve any trailing partial instruction raw-only, and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
