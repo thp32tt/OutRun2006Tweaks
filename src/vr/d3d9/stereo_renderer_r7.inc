@@ -1619,7 +1619,17 @@ namespace OutRunVRStereo
 		return installed;
 	}
 
-	bool IsInternalStereoPassActive(){return InternalStereoPass;}
+	bool IsCurrentGameDevice(IDirect3DDevice9* device) noexcept
+	{
+		return IsGameDevice(device);
+	}
+	bool IsInternalStereoPassActive() noexcept { return InternalStereoPass; }
+	bool StereoWantedForCurrentFrame() noexcept { return StereoWanted(); }
+	bool TargetIsCurrentBackBuffer() noexcept { return TargetIsBackBuffer(); }
+	IDirect3DDevice9* StereoInstalledDeviceSnapshot() noexcept
+	{
+		return StereoInstalledDevice.load(std::memory_order_acquire);
+	}
 	bool GetCurrentShaderEpoch(std::uintptr_t&shaderIdentity,std::uint64_t&serial){for(int attempt=0;attempt<3;++attempt){const std::uint64_t before=VertexShaderSerial.load(std::memory_order_acquire);const std::uintptr_t identity=CurrentVertexShaderIdentity.load(std::memory_order_acquire);const std::uint64_t after=VertexShaderSerial.load(std::memory_order_acquire);if(before==after){shaderIdentity=identity;serial=after;return identity!=0&&after!=0;}}shaderIdentity=0;serial=0;return false;}
 	class VRStereoHook:public Hook
 	{

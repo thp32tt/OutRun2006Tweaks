@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Windows.h>
-#include "../stereo_failure.hpp"
+#include "../ipc/protocol.hpp"
 
 namespace OutRunVRStereo
 {

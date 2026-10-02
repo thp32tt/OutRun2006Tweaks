@@ -7,6 +7,17 @@
 // state fail-closed so a later baseline cannot accidentally re-enable stereo on
 // stale ResetEx state. A later clean Reset clears the block.
 
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+#include "hook_mgr.hpp"
+#include "../render/runtime_context.hpp"
+#include "../state/raster_replay_scope.hpp"
+
 #ifndef OUTRUN_VR_REFACTOR_SPLIT_R34_R33
 #include "stereo_renderer_r33.cpp"
 #endif
@@ -113,7 +124,7 @@ namespace OutRunVRStereo
         void R34ForceResetReplayFailClosed(IDirect3DDevice9* device,
             const char* site) noexcept
         {
-            if (!device || !IsGameDevice(device))
+            if (!device || !IsCurrentGameDevice(device))
                 return;
 
             OutRunVR::Lifecycle::SetRecoverySafetyBlock(true);
@@ -137,15 +148,15 @@ namespace OutRunVRStereo
             DrawCall&& drawCall, const char* site) noexcept
         {
             const auto drawSemanticValue =
-                (device && IsGameDevice(device) && !InternalStereoPass)
+                (device && IsCurrentGameDevice(device) && !IsInternalStereoPassActive())
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
                 : OutRunVR::GameSemantic::CurrentScope;
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
 
-            if (!device || !IsGameDevice(device) || InternalStereoPass ||
-                IsGameStateBlockRecording() || !StereoWanted() ||
-                !TargetIsBackBuffer())
+            if (!device || !IsCurrentGameDevice(device) || IsInternalStereoPassActive() ||
+                IsGameStateBlockRecording() || !StereoWantedForCurrentFrame() ||
+                !TargetIsCurrentBackBuffer())
             {
                 return drawCall();
             }
@@ -245,7 +256,7 @@ namespace OutRunVRStereo
         HRESULT __stdcall ResetDestR34(IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
-            const bool gameDevice = IsGameDevice(device);
+            const bool gameDevice = IsCurrentGameDevice(device);
             const HRESULT hr = CallFinalReset(device, params);
 
             if (!gameDevice)
@@ -274,7 +285,7 @@ namespace OutRunVRStereo
             const RECT* sourceRect, const RECT* destRect,
             HWND destWindowOverride, const RGNDATA* dirtyRegion)
         {
-            if (device && IsGameDevice(device))
+            if (device && IsCurrentGameDevice(device))
             {
                 const HRESULT cooperative = device->TestCooperativeLevel();
                 if (OutRunVR::Lifecycle::DeviceNeedsResetBypass(cooperative))
@@ -295,7 +306,7 @@ namespace OutRunVRStereo
                 }
             }
 
-            const bool blocked = IsGameDevice(device) &&
+            const bool blocked = IsCurrentGameDevice(device) &&
                 R34ResetReplay.IsBlocked();
             if (blocked)
                 R34ForceResetReplayFailClosed(device, "Present/pre");
@@ -386,7 +397,7 @@ namespace OutRunVRStereo
                     }
 
                     IDirect3DDevice9* const installedDevice =
-                        StereoInstalledDevice.load(std::memory_order_acquire);
+                        StereoInstalledDeviceSnapshot();
                     if (installedDevice &&
                         OutRunVR::Lifecycle::IsCompatResetDevice(installedDevice))
                     {

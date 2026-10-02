@@ -14,6 +14,7 @@
 #include "../state/d3d9_raster_state.hpp"
 #include "../state/state_block_tracker.hpp"
 #include "../state/d3d9_raster_tracking.hpp"
+#include "../state/raster_replay_scope.hpp"
 
 namespace OutRunVRStereo
 {
@@ -872,22 +873,54 @@ namespace OutRunVRStereo
         R22ShadowState = {};
     }
 
-    class RasterReplayScope final
+    void BeginRasterReplay(
+        RasterReplayToken& token, IDirect3DDevice9* device) noexcept
     {
-    public:
-        explicit RasterReplayScope(IDirect3DDevice9* device) noexcept
-            : scope_(device)
+        token = {};
+        token.device = device;
+        token.outer = R22InternalReplayDepth++ == 0;
+        if (token.outer)
         {
+            R22InternalViewportTouched = false;
+            token.stateValid =
+                R22SnapshotShadowedGameState(device, R22GameScissor);
         }
-
-        bool Valid() const noexcept
+        else
         {
-            return scope_.stateValid;
+            token.stateValid = R22GameScissor.Valid();
         }
+    }
 
-    private:
-        R22ReplayScope scope_;
-    };
+    void EndRasterReplay(RasterReplayToken& token) noexcept
+    {
+        if (R22InternalReplayDepth)
+            --R22InternalReplayDepth;
+        if (token.outer)
+        {
+            bool restored = true;
+            if (R22GameScissor.Valid())
+            {
+                if (R22InternalViewportTouched &&
+                    (!R22SetViewportHook ||
+                     FAILED(R22SetViewportHook.stdcall<HRESULT>(
+                         token.device, &R22GameScissor.viewport))))
+                {
+                    restored = false;
+                }
+                if (!R22ApplyGameScissor(token.device, R22GameScissor))
+                    restored = false;
+            }
+            if (!restored)
+            {
+                R20CancelInitialSeed(token.device);
+                R9MonoBackupGap = true;
+                NoteRestoreFailure("R22 final viewport/scissor restore");
+            }
+            R22InternalViewportTouched = false;
+            R22GameScissor = {};
+        }
+        token = {};
+    }
 
     bool IsTrackedStateBlockReliable() noexcept
     {

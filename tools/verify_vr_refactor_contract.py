@@ -21,6 +21,8 @@ r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = read("src/vr/d3d9/stereo_renderer_r33.cpp")
 r34 = read("src/vr/d3d9/stereo_renderer_r34.cpp")
 final_dispatch_hooks = read("src/vr/core/final_dispatch_hooks.hpp")
+runtime_context = read("src/vr/render/runtime_context.hpp")
+raster_replay_scope = read("src/vr/state/raster_replay_scope.hpp")
 review_dispatch_hooks = read("src/vr/core/review_dispatch_hooks.hpp")
 dispatch_support_hooks = read("src/vr/core/dispatch_support_hooks.hpp")
 screen_space_hooks = read("src/vr/core/screen_space_hooks.hpp")
@@ -860,6 +862,37 @@ for marker in (
     if r33_instance < 0 or pos <= r33_instance:
         errors.append(
             f"R33 hook destination has not crossed the anonymous implementation boundary: {marker}")
+
+
+# Gate A explicit dependency contract.
+for marker in (
+    "IsCurrentGameDevice(",
+    "IsInternalStereoPassActive()",
+    "StereoWantedForCurrentFrame()",
+    "TargetIsCurrentBackBuffer()",
+    "StereoInstalledDeviceSnapshot()",
+):
+    if marker not in runtime_context:
+        errors.append(f"runtime context facade missing: {marker}")
+for marker in (
+    "struct RasterReplayToken",
+    "class RasterReplayScope final",
+    "BeginRasterReplay(",
+    "EndRasterReplay(",
+):
+    if marker not in raster_replay_scope:
+        errors.append(f"raster replay facade missing: {marker}")
+if '#include "../ipc/protocol.hpp"' not in read("src/vr/lifecycle/frame_accounting.hpp"):
+    errors.append("frame accounting does not include canonical IPC failure contract")
+for legacy in (
+    "IsGameDevice(",
+    "InternalStereoPass",
+    "StereoWanted()",
+    "TargetIsBackBuffer()",
+    "StereoInstalledDevice.load(",
+):
+    if legacy in r34:
+        errors.append(f"R34 retained implicit lower-TU runtime dependency: {legacy}")
 
 
 if errors:
