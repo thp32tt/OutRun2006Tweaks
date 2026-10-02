@@ -60,6 +60,20 @@ TranslationResult<D3D11_COMPARISON_FUNC> translate_compare(D3DCMPFUNC value) noe
     }
 }
 
+TranslationResult<D3D11_STENCIL_OP> translate_stencil_op(D3DSTENCILOP value) noexcept {
+    switch (value) {
+    case D3DSTENCILOP_KEEP: return {D3D11_STENCIL_OP_KEEP, true};
+    case D3DSTENCILOP_ZERO: return {D3D11_STENCIL_OP_ZERO, true};
+    case D3DSTENCILOP_REPLACE: return {D3D11_STENCIL_OP_REPLACE, true};
+    case D3DSTENCILOP_INCRSAT: return {D3D11_STENCIL_OP_INCR_SAT, true};
+    case D3DSTENCILOP_DECRSAT: return {D3D11_STENCIL_OP_DECR_SAT, true};
+    case D3DSTENCILOP_INVERT: return {D3D11_STENCIL_OP_INVERT, true};
+    case D3DSTENCILOP_INCR: return {D3D11_STENCIL_OP_INCR, true};
+    case D3DSTENCILOP_DECR: return {D3D11_STENCIL_OP_DECR, true};
+    default: return {D3D11_STENCIL_OP_KEEP, false};
+    }
+}
+
 TranslationResult<D3D11_CULL_MODE> translate_cull(D3DCULL value) noexcept {
     switch (value) {
     case D3DCULL_NONE: return {D3D11_CULL_NONE, true};

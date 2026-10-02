@@ -31,7 +31,18 @@ namespace OutRunVR::DrawState
             D3DCOLORWRITEENABLE_ALPHA;
 
         DWORD stencilEnable = FALSE;
+        DWORD stencilReadMask = 0xFFFFFFFFu;
         DWORD stencilWriteMask = 0xFFFFFFFFu;
+        DWORD stencilRef = 0;
+        DWORD stencilFail = D3DSTENCILOP_KEEP;
+        DWORD stencilZFail = D3DSTENCILOP_KEEP;
+        DWORD stencilPass = D3DSTENCILOP_KEEP;
+        DWORD stencilFunc = D3DCMP_ALWAYS;
+        DWORD twoSidedStencilMode = FALSE;
+        DWORD ccwStencilFail = D3DSTENCILOP_KEEP;
+        DWORD ccwStencilZFail = D3DSTENCILOP_KEEP;
+        DWORD ccwStencilPass = D3DSTENCILOP_KEEP;
+        DWORD ccwStencilFunc = D3DCMP_ALWAYS;
 
         DWORD fogEnable = FALSE;
         DWORD lighting = FALSE;

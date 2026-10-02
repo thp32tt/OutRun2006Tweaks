@@ -54,6 +54,12 @@ RESOURCE_TRANSLATION_CPP = (
 STATE_TRANSLATION_CPP = (
     ROOT / "src" / "vr" / "d3d11" / "state_translation.cpp"
 ).read_text(encoding="utf-8")
+D3D9_DRAW_STATE_HPP = (
+    ROOT / "src" / "vr" / "core" / "d3d9_draw_state.hpp"
+).read_text(encoding="utf-8")
+D3D9_RENDER_STATE_CAPTURE = (
+    ROOT / "src" / "vr" / "d3d9" / "stereo_renderer_r7.inc"
+).read_text(encoding="utf-8")
 CONSTANT_BUFFER_CONTRACT_TEXT = (
     CONSTANT_BUFFER_PROBE + "\n" + NATIVE_BACKEND_CPP
 )
@@ -348,6 +354,64 @@ def main() -> None:
         raise SystemExit(
             "DX11 triangle-fan expansion contract drift: "
             + ", ".join(missing_triangle_fan_expansion_contract)
+        )
+
+    stencil_snapshot_contract = {
+        "DWORD stencilReadMask = 0xFFFFFFFFu;": "stencil read mask snapshot",
+        "DWORD stencilRef = 0;": "dynamic stencil reference snapshot",
+        "DWORD stencilFunc = D3DCMP_ALWAYS;": "clockwise/front stencil function snapshot",
+        "DWORD twoSidedStencilMode = FALSE;": "two-sided stencil mode snapshot",
+        "DWORD ccwStencilFunc = D3DCMP_ALWAYS;": "counterclockwise/back stencil function snapshot",
+    }
+    missing_stencil_contract = [
+        meaning
+        for token, meaning in stencil_snapshot_contract.items()
+        if token not in D3D9_DRAW_STATE_HPP
+    ]
+    stencil_capture_contract = {
+        "read(D3DRS_STENCILMASK, out.stencilReadMask);": "capture stencil read mask",
+        "read(D3DRS_STENCILREF, out.stencilRef);": "capture stencil reference",
+        "read(D3DRS_STENCILFUNC, out.stencilFunc);": "capture clockwise/front stencil function",
+        "read(D3DRS_CCW_STENCILFUNC, out.ccwStencilFunc);": "capture counterclockwise/back stencil function",
+    }
+    missing_stencil_contract += [
+        meaning
+        for token, meaning in stencil_capture_contract.items()
+        if token not in D3D9_RENDER_STATE_CAPTURE
+    ]
+    stencil_translation_contract = {
+        "translate_stencil_op(": "D3D9 stencil-op translation helper",
+        "case D3DSTENCILOP_INCRSAT: return {D3D11_STENCIL_OP_INCR_SAT, true};":
+            "saturating increment stencil mapping",
+        "out.stencil_ref = source.stencilRef & 0xFFu;":
+            "dynamic stencil reference propagation",
+        "source.twoSidedStencilMode != FALSE": "two-sided stencil branch",
+        "source.cullMode != D3DCULL_NONE": "two-sided stencil cull fail-closed guard",
+        "out.depth_stencil.BackFace = out.depth_stencil.FrontFace;":
+            "one-sided stencil front/back equivalence",
+    }
+    stencil_translation_text = STATE_TRANSLATION_CPP + "\n" + PIPELINE_TRANSLATION_CPP
+    missing_stencil_contract += [
+        meaning
+        for token, meaning in stencil_translation_contract.items()
+        if token not in stencil_translation_text
+    ]
+    stencil_semantic_contract = {
+        "one-sided stencil did not translate exactly": "one-sided positive semantic smoke",
+        "two-sided stencil did not translate exactly": "two-sided positive semantic smoke",
+        "invalid stencil op must fail closed": "invalid stencil-op negative semantic smoke",
+        "two-sided stencil with culling must fail closed":
+            "two-sided/culling combination stays fail-closed",
+    }
+    missing_stencil_contract += [
+        meaning
+        for token, meaning in stencil_semantic_contract.items()
+        if token not in SEMANTIC_SMOKE
+    ]
+    if missing_stencil_contract:
+        raise SystemExit(
+            "DX11 stencil translation contract drift: "
+            + ", ".join(missing_stencil_contract)
         )
 
     census_r73_contract = {

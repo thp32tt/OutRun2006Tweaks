@@ -1163,14 +1163,84 @@ namespace outrun::vr::dx11
         if (out.depth_stencil.DepthEnable && !depthFunc.exact)
             out.unsupported |= PipelineUnsupportedDepthCompare;
 
-        // D3D9 stencil state is intentionally fail-closed until all front/back
-        // op/function semantics are captured in the shared snapshot.
         out.depth_stencil.StencilEnable = source.stencilEnable != FALSE;
-        out.depth_stencil.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+        out.depth_stencil.StencilReadMask =
+            static_cast<UINT8>(source.stencilReadMask & 0xFFu);
         out.depth_stencil.StencilWriteMask =
             static_cast<UINT8>(source.stencilWriteMask & 0xFFu);
+        out.stencil_ref = source.stencilRef & 0xFFu;
+
+        const auto set_default_stencil_face =
+            [](D3D11_DEPTH_STENCILOP_DESC& face) noexcept
+        {
+            face.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+            face.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+            face.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+            face.StencilFunc = D3D11_COMPARISON_ALWAYS;
+        };
+        set_default_stencil_face(out.depth_stencil.FrontFace);
+        set_default_stencil_face(out.depth_stencil.BackFace);
+
+        const auto translate_stencil_face =
+            [](D3D11_DEPTH_STENCILOP_DESC& face,
+               DWORD failValue,
+               DWORD depthFailValue,
+               DWORD passValue,
+               DWORD funcValue) noexcept
+        {
+            const auto fail =
+                translate_stencil_op(static_cast<D3DSTENCILOP>(failValue));
+            const auto depthFail =
+                translate_stencil_op(static_cast<D3DSTENCILOP>(depthFailValue));
+            const auto pass =
+                translate_stencil_op(static_cast<D3DSTENCILOP>(passValue));
+            const auto func =
+                translate_compare(static_cast<D3DCMPFUNC>(funcValue));
+
+            face.StencilFailOp = fail.value;
+            face.StencilDepthFailOp = depthFail.value;
+            face.StencilPassOp = pass.value;
+            face.StencilFunc = func.value;
+            return fail.exact && depthFail.exact && pass.exact && func.exact;
+        };
+
         if (out.depth_stencil.StencilEnable)
-            out.unsupported |= PipelineUnsupportedStencil;
+        {
+            // R71 keeps FrontCounterClockwise=FALSE, matching D3D9's clockwise
+            // front-face convention. D3DRS_STENCIL* therefore maps to
+            // D3D11 FrontFace; CCW_STENCIL* maps to BackFace in two-sided mode.
+            const bool frontExact = translate_stencil_face(
+                out.depth_stencil.FrontFace,
+                source.stencilFail,
+                source.stencilZFail,
+                source.stencilPass,
+                source.stencilFunc);
+            if (!frontExact)
+                out.unsupported |= PipelineUnsupportedStencil;
+
+            if (source.twoSidedStencilMode != FALSE)
+            {
+                // D3D9 requires two-sided stencil with culling disabled.
+                // Keep invalid/driver-dependent combinations fail-closed.
+                if (source.cullMode != D3DCULL_NONE)
+                {
+                    out.unsupported |= PipelineUnsupportedStencil;
+                }
+                else if (!translate_stencil_face(
+                             out.depth_stencil.BackFace,
+                             source.ccwStencilFail,
+                             source.ccwStencilZFail,
+                             source.ccwStencilPass,
+                             source.ccwStencilFunc))
+                {
+                    out.unsupported |= PipelineUnsupportedStencil;
+                }
+            }
+            else
+            {
+                out.depth_stencil.BackFace = out.depth_stencil.FrontFace;
+            }
+        }
 
         out.rasterizer.FillMode = D3D11_FILL_SOLID;
         switch (static_cast<D3DFILLMODE>(source.fillMode))

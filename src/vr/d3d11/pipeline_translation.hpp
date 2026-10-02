@@ -31,6 +31,7 @@ namespace outrun::vr::dx11
     {
         D3D11_BLEND_DESC blend{};
         D3D11_DEPTH_STENCIL_DESC depth_stencil{};
+        UINT stencil_ref = 0;
         D3D11_RASTERIZER_DESC rasterizer{};
         std::uint32_t unsupported = PipelineUnsupportedNone;
 

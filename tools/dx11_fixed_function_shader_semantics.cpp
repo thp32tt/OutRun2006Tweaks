@@ -18,6 +18,7 @@ namespace
     using outrun::vr::dx11::FixedFunctionUnsupportedStageChain;
     using outrun::vr::dx11::FixedFunctionUnsupportedTextureTransform;
     using outrun::vr::dx11::PipelineUnsupportedBlend;
+    using outrun::vr::dx11::PipelineUnsupportedStencil;
     using outrun::vr::dx11::compile_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::translate_pipeline;
     using outrun::vr::dx11::translate_primitive;
@@ -243,6 +244,100 @@ int main()
             !translate_triangle_fan_expansion(
                 std::numeric_limits<UINT>::max()).exact,
             "triangle fan expansion overflow did not fail closed");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.stencilEnable = TRUE;
+        state.stencilReadMask = 0x3Cu;
+        state.stencilWriteMask = 0xA5u;
+        state.stencilRef = 0x123u;
+        state.stencilFail = D3DSTENCILOP_ZERO;
+        state.stencilZFail = D3DSTENCILOP_INCRSAT;
+        state.stencilPass = D3DSTENCILOP_REPLACE;
+        state.stencilFunc = D3DCMP_GREATEREQUAL;
+
+        const auto translated = translate_pipeline(state);
+        const auto& ds = translated.depth_stencil;
+        require(
+            (translated.unsupported & PipelineUnsupportedStencil) == 0,
+            "one-sided stencil did not translate exactly");
+        require(
+            ds.StencilReadMask == 0x3Cu &&
+            ds.StencilWriteMask == 0xA5u &&
+            translated.stencil_ref == 0x23u,
+            "one-sided stencil masks/reference drifted");
+        require(
+            ds.FrontFace.StencilFailOp == D3D11_STENCIL_OP_ZERO &&
+            ds.FrontFace.StencilDepthFailOp == D3D11_STENCIL_OP_INCR_SAT &&
+            ds.FrontFace.StencilPassOp == D3D11_STENCIL_OP_REPLACE &&
+            ds.FrontFace.StencilFunc == D3D11_COMPARISON_GREATER_EQUAL,
+            "one-sided front-face stencil mapping drifted");
+        require(
+            ds.BackFace.StencilFailOp == ds.FrontFace.StencilFailOp &&
+            ds.BackFace.StencilDepthFailOp == ds.FrontFace.StencilDepthFailOp &&
+            ds.BackFace.StencilPassOp == ds.FrontFace.StencilPassOp &&
+            ds.BackFace.StencilFunc == ds.FrontFace.StencilFunc,
+            "one-sided stencil did not mirror front state to back face");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.cullMode = D3DCULL_NONE;
+        state.stencilEnable = TRUE;
+        state.twoSidedStencilMode = TRUE;
+        state.stencilFail = D3DSTENCILOP_KEEP;
+        state.stencilZFail = D3DSTENCILOP_INCR;
+        state.stencilPass = D3DSTENCILOP_DECRSAT;
+        state.stencilFunc = D3DCMP_LESS;
+        state.ccwStencilFail = D3DSTENCILOP_REPLACE;
+        state.ccwStencilZFail = D3DSTENCILOP_INVERT;
+        state.ccwStencilPass = D3DSTENCILOP_DECR;
+        state.ccwStencilFunc = D3DCMP_NOTEQUAL;
+
+        const auto translated = translate_pipeline(state);
+        const auto& ds = translated.depth_stencil;
+        require(
+            (translated.unsupported & PipelineUnsupportedStencil) == 0,
+            "two-sided stencil did not translate exactly");
+        require(
+            ds.FrontFace.StencilDepthFailOp == D3D11_STENCIL_OP_INCR &&
+            ds.FrontFace.StencilPassOp == D3D11_STENCIL_OP_DECR_SAT &&
+            ds.FrontFace.StencilFunc == D3D11_COMPARISON_LESS,
+            "clockwise/front stencil mapping drifted");
+        require(
+            ds.BackFace.StencilFailOp == D3D11_STENCIL_OP_REPLACE &&
+            ds.BackFace.StencilDepthFailOp == D3D11_STENCIL_OP_INVERT &&
+            ds.BackFace.StencilPassOp == D3D11_STENCIL_OP_DECR &&
+            ds.BackFace.StencilFunc == D3D11_COMPARISON_NOT_EQUAL,
+            "counterclockwise/back stencil mapping drifted");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.stencilEnable = TRUE;
+        state.stencilFail = 0xFFFFFFFFu;
+
+        const auto translated = translate_pipeline(state);
+        require(
+            (translated.unsupported & PipelineUnsupportedStencil) != 0,
+            "invalid stencil op must fail closed");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.cullMode = D3DCULL_CCW;
+        state.stencilEnable = TRUE;
+        state.twoSidedStencilMode = TRUE;
+
+        const auto translated = translate_pipeline(state);
+        require(
+            (translated.unsupported & PipelineUnsupportedStencil) != 0,
+            "two-sided stencil with culling must fail closed");
     }
 
     std::array<D3DRESOURCETYPE, 8> textureTypes{};
