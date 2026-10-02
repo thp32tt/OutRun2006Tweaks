@@ -1,0 +1,17 @@
+{
+  "task_id": "CONVERSION-DXVK-00269",
+  "lane": "DXVK",
+  "branch": "vr-dxvk-r71-disasm",
+  "base_head": "79d515f25dc43e7b493f2da3dea55bcd71c19809",
+  "phase": "STATIC_DISASSEMBLY_CONTINUATION",
+  "status": "IN_PROGRESS",
+  "checkpoint": "0x00182635 bounded provenance window pending",
+  "changes": [],
+  "automation_validation": "NOT_RUN",
+  "runtime_validation": "UNTESTED",
+  "notes": [
+    "Resumed from current GitHub HEAD.",
+    "No local runtime, RenderDoc, or Quest 3 validation performed.",
+    "No semantic promotion without branch-specific evidence gate."
+  ]
+}
