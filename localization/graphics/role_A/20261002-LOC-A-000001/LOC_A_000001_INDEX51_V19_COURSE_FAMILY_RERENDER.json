@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-loc-a-000001-index51-v19-course-family-production-v1",
+  "job_id": "LOC-A-000001",
+  "role": "A",
+  "branch": "korean-localization-clean",
+  "recorded_at_kst": "2026-10-02T15:27:02+09:00",
+  "selection_head_sha": "00548db6bafd6e0bf119e8e0ab76b3edad30dd0d",
+  "shard_rule": "asset_queue.index % 3 == 0",
+  "selection": {
+    "selected_index": 51,
+    "selected_asset": "FF2462BB",
+    "priority": "REWORK_REQUIRED_RUNNABLE_COMPLETION_TIER",
+    "authoritative_rework_record": "localization/graphics/role_A/20261001-A00352-P00222/A00352_P00222_INDEX51_V19_COURSE_FAMILY_AUDIT.json",
+    "authoritative_rework_record_git_blob_sha": "a9569f7da8a8133bf56c29250106ecaf01d27d5f",
+    "reason": "A00352 requires a native rerender of only the ten course-name elements with v19 family_target_font_size, actual_font_size and per-title fit-reduction provenance. Index222 already has a later v20 material candidate, while index111 remains preflight-only."
+  },
+  "production": {
+    "action": "NATIVE_RERENDER_COURSE_FAMILY_WITH_V19_METADATA",
+    "scope": "Only ten course-name lettering elements; preserve all unrelated A00278 candidate pixels and alpha.",
+    "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+    "family_target_font_size_px": 62,
+    "course_members": 10,
+    "family_target_members_at_62px": [
+      "Lost City",
+      "Canyon",
+      "Legend",
+      "Jungle"
+    ],
+    "fit_reduced_members": [
+      "Ice Scape",
+      "Casino Town",
+      "Skyscrapers",
+      "Milky Way",
+      "Floral Village",
+      "Giant Statues"
+    ],
+    "native_glyph_render_only": true,
+    "flattened_raster_resize": false,
+    "candidate_sha256": "a1f2c28d9461d8c8bcbf4dfd3df96c8e8b52f3e2265699ff2590941d9c8fa6ea"
+  },
+  "storage": {
+    "mode": "GOOGLE_DRIVE_LARGE_BINARY_BUNDLE",
+    "account": "ezflash557",
+    "current_pipeline_folder_id": "1mbdyLRgd8b1lEzoBxdwSAgOds-tEXdkW",
+    "drive_file_id": "1eV4bLuSf-nazNWz8dl5y510LXCuQHJXq",
+    "bundle_name": "LOC-A-000001_FF2462BB_v19_course_family_candidate.zip",
+    "bundle_sha256": "cbaf797abb6b281f28c8764f1337252e29aaec7cf90c1472b1a6a996d6cb0dab",
+    "bundle_bytes": 1446205,
+    "upload_readback_verified": true,
+    "inner_candidate_path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+    "inner_candidate_sha256": "a1f2c28d9461d8c8bcbf4dfd3df96c8e8b52f3e2265699ff2590941d9c8fa6ea"
+  },
+  "qa": {
+    "report": "localization/graphics/role_A/20261002-LOC-A-000001/LOC_A_000001_INDEX51_V19_COURSE_FAMILY_QA.json",
+    "static_self_qa": "PASS",
+    "changed_pixels_outside_course_source_regions": 0,
+    "alpha_changed_pixels_outside_course_source_regions": 0,
+    "one_pixel_overflow": 0,
+    "visual_review": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_deliverable": {
+    "type": "INDEX51_FF2462BB_V19_COURSE_FAMILY_NATIVE_RERENDER_CANDIDATE",
+    "candidate_dds_modified": true,
+    "candidate_binary_persisted": true,
+    "materially_reduces_unresolved_work": true,
+    "readiness_before": "REWORK_REQUIRED_V19_TYPOGRAPHY_FAMILY_PROVENANCE",
+    "readiness_after": "A_SELF_QA_PASS_PENDING_INDEPENDENT_C",
+    "shared_state_modified": false
+  },
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED",
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": true,
+  "google_drive_write_performed": true,
+  "vr_ffb_dx_changes": false
+}

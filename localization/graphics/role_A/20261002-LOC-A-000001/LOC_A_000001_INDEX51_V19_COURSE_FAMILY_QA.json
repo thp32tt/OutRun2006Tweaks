@@ -1,0 +1,521 @@
+{
+  "schema_version": 1,
+  "schema": "outrun-loc-a-000001-index51-v19-course-family-selfqa-v1",
+  "job_id": "LOC-A-000001",
+  "role": "A",
+  "recorded_at_kst": "2026-10-02T15:27:02+09:00",
+  "queue_index": 51,
+  "asset": "FF2462BB",
+  "path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "source": {
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+    "git_blob_sha": "ed9aab60ed352409459bfbb5612eded1ec89e7a9",
+    "sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+    "canonical_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958"
+  },
+  "input_candidate": {
+    "provenance_report": "localization/graphics/role_A/20260930-A00278-P00162/A00278_P00162_INDEX51_V2_NATIVE_RERENDER.json",
+    "provenance_report_git_blob_sha": "2b71f51e11cfb740d6bcd639e45c6efc9d824a5a",
+    "drive_file_id": "1Rp4P_U_Aj_DOjkkIzrV3vqZ3HCFIO00f",
+    "bundle_sha256": "4d956170dc28d166043b2083a2b8783eb318bbdadee7e74a8aa65795753d536d",
+    "sha256": "907350cd8781eab887d21d89e1aa6d8bdae6b1f14159eba02dce4cac2bc5bad0"
+  },
+  "output_candidate": {
+    "sha256": "a1f2c28d9461d8c8bcbf4dfd3df96c8e8b52f3e2265699ff2590941d9c8fa6ea",
+    "bytes": 33554560,
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact_source": true,
+    "raw_orientation": "flip_y"
+  },
+  "typography": {
+    "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+    "family_target_font_size_px": 62,
+    "font_identifier": "NotoSansCJK-Bold.ttc#1 Noto Sans CJK KR Bold",
+    "font_sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "stroke_width_px": 8,
+    "fill_rgb": [
+      255,
+      255,
+      255
+    ],
+    "stroke_rgb": [
+      0,
+      8,
+      57
+    ],
+    "native_glyph_render_only": true
+  },
+  "metrics": [
+    {
+      "source": "Ice Scape",
+      "korean": "아이스 스케이프",
+      "line_breaks": [
+        "아이스 스케이프"
+      ],
+      "source_effect_bbox_readable_half_open": [
+        145,
+        881,
+        491,
+        964
+      ],
+      "safe_bbox_readable_half_open": [
+        147,
+        883,
+        489,
+        962
+      ],
+      "actual_font_size_px": 48,
+      "rendered_effect_bbox_readable_half_open": [
+        152,
+        891,
+        485,
+        954
+      ],
+      "rendered_effect_size": [
+        333,
+        63
+      ],
+      "fit_reduction_reason": "FIT_REDUCTION_WIDTH",
+      "next_size_rejection_evidence": {
+        "font_size_px": 49,
+        "theoretical_effect_size": [
+          343,
+          63
+        ],
+        "safe_size": [
+          342,
+          79
+        ],
+        "fails_width": true,
+        "fails_height": false
+      },
+      "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+      "family_target_font_size_px": 62,
+      "stroke_width_px": 8,
+      "raster_resampling": "NOT_USED_NATIVE_GLYPH_RENDER"
+    },
+    {
+      "source": "Casino Town",
+      "korean": "카지노 타운",
+      "line_breaks": [
+        "카지노",
+        "타운"
+      ],
+      "source_effect_bbox_readable_half_open": [
+        650,
+        853,
+        887,
+        981
+      ],
+      "safe_bbox_readable_half_open": [
+        652,
+        855,
+        885,
+        979
+      ],
+      "actual_font_size_px": 43,
+      "rendered_effect_bbox_readable_half_open": [
+        702,
+        855,
+        834,
+        979
+      ],
+      "rendered_effect_size": [
+        132,
+        124
+      ],
+      "fit_reduction_reason": "FIT_REDUCTION_HEIGHT",
+      "next_size_rejection_evidence": {
+        "font_size_px": 44,
+        "theoretical_effect_size": [
+          137,
+          127
+        ],
+        "safe_size": [
+          233,
+          124
+        ],
+        "fails_width": false,
+        "fails_height": true
+      },
+      "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+      "family_target_font_size_px": 62,
+      "stroke_width_px": 8,
+      "raster_resampling": "NOT_USED_NATIVE_GLYPH_RENDER"
+    },
+    {
+      "source": "Lost City",
+      "korean": "로스트 시티",
+      "line_breaks": [
+        "로스트 시티"
+      ],
+      "source_effect_bbox_readable_half_open": [
+        1154,
+        881,
+        1475,
+        964
+      ],
+      "safe_bbox_readable_half_open": [
+        1156,
+        883,
+        1473,
+        962
+      ],
+      "actual_font_size_px": 62,
+      "rendered_effect_bbox_readable_half_open": [
+        1159,
+        885,
+        1466,
+        960
+      ],
+      "rendered_effect_size": [
+        307,
+        75
+      ],
+      "fit_reduction_reason": "NONE_FAMILY_TARGET_FITS",
+      "next_size_rejection_evidence": null,
+      "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+      "family_target_font_size_px": 62,
+      "stroke_width_px": 8,
+      "raster_resampling": "NOT_USED_NATIVE_GLYPH_RENDER"
+    },
+    {
+      "source": "Canyon",
+      "korean": "캐니언",
+      "line_breaks": [
+        "캐니언"
+      ],
+      "source_effect_bbox_readable_half_open": [
+        1660,
+        881,
+        1917,
+        964
+      ],
+      "safe_bbox_readable_half_open": [
+        1662,
+        883,
+        1915,
+        962
+      ],
+      "actual_font_size_px": 62,
+      "rendered_effect_bbox_readable_half_open": [
+        1697,
+        885,
+        1877,
+        960
+      ],
+      "rendered_effect_size": [
+        180,
+        75
+      ],
+      "fit_reduction_reason": "NONE_FAMILY_TARGET_FITS",
+      "next_size_rejection_evidence": null,
+      "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+      "family_target_font_size_px": 62,
+      "stroke_width_px": 8,
+      "raster_resampling": "NOT_USED_NATIVE_GLYPH_RENDER"
+    },
+    {
+      "source": "Skyscrapers",
+      "korean": "스카이스크레이퍼",
+      "line_breaks": [
+        "스카이스크레이퍼"
+      ],
+      "source_effect_bbox_readable_half_open": [
+        983,
+        1033,
+        1268,
+        1116
+      ],
+      "safe_bbox_readable_half_open": [
+        985,
+        1035,
+        1266,
+        1114
+      ],
+      "actual_font_size_px": 36,
+      "rendered_effect_bbox_readable_half_open": [
+        986,
+        1048,
+        1263,
+        1100
+      ],
+      "rendered_effect_size": [
+        277,
+        52
+      ],
+      "fit_reduction_reason": "FIT_REDUCTION_WIDTH",
+      "next_size_rejection_evidence": {
+        "font_size_px": 37,
+        "theoretical_effect_size": [
+          288,
+          53
+        ],
+        "safe_size": [
+          281,
+          79
+        ],
+        "fails_width": true,
+        "fails_height": false
+      },
+      "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+      "family_target_font_size_px": 62,
+      "stroke_width_px": 8,
+      "raster_resampling": "NOT_USED_NATIVE_GLYPH_RENDER"
+    },
+    {
+      "source": "Milky Way",
+      "korean": "밀키 웨이",
+      "line_breaks": [
+        "밀키",
+        "웨이"
+      ],
+      "source_effect_bbox_readable_half_open": [
+        1486,
+        1006,
+        1675,
+        1144
+      ],
+      "safe_bbox_readable_half_open": [
+        1488,
+        1008,
+        1673,
+        1142
+      ],
+      "actual_font_size_px": 47,
+      "rendered_effect_bbox_readable_half_open": [
+        1530,
+        1008,
+        1627,
+        1141
+      ],
+      "rendered_effect_size": [
+        97,
+        133
+      ],
+      "fit_reduction_reason": "FIT_REDUCTION_HEIGHT",
+      "next_size_rejection_evidence": {
+        "font_size_px": 48,
+        "theoretical_effect_size": [
+          104,
+          135
+        ],
+        "safe_size": [
+          185,
+          134
+        ],
+        "fails_width": false,
+        "fails_height": true
+      },
+      "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+      "family_target_font_size_px": 62,
+      "stroke_width_px": 8,
+      "raster_resampling": "NOT_USED_NATIVE_GLYPH_RENDER"
+    },
+    {
+      "source": "Floral Village",
+      "korean": "플로럴 빌리지",
+      "line_breaks": [
+        "플로럴",
+        "빌리지"
+      ],
+      "source_effect_bbox_readable_half_open": [
+        1989,
+        1006,
+        2231,
+        1144
+      ],
+      "safe_bbox_readable_half_open": [
+        1991,
+        1008,
+        2229,
+        1142
+      ],
+      "actual_font_size_px": 48,
+      "rendered_effect_bbox_readable_half_open": [
+        2037,
+        1008,
+        2181,
+        1142
+      ],
+      "rendered_effect_size": [
+        144,
+        134
+      ],
+      "fit_reduction_reason": "FIT_REDUCTION_HEIGHT",
+      "next_size_rejection_evidence": {
+        "font_size_px": 49,
+        "theoretical_effect_size": [
+          151,
+          137
+        ],
+        "safe_size": [
+          238,
+          134
+        ],
+        "fails_width": false,
+        "fails_height": true
+      },
+      "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+      "family_target_font_size_px": 62,
+      "stroke_width_px": 8,
+      "raster_resampling": "NOT_USED_NATIVE_GLYPH_RENDER"
+    },
+    {
+      "source": "Legend",
+      "korean": "레전드",
+      "line_breaks": [
+        "레전드"
+      ],
+      "source_effect_bbox_readable_half_open": [
+        2498,
+        1034,
+        2750,
+        1116
+      ],
+      "safe_bbox_readable_half_open": [
+        2500,
+        1036,
+        2748,
+        1114
+      ],
+      "actual_font_size_px": 62,
+      "rendered_effect_bbox_readable_half_open": [
+        2533,
+        1037,
+        2715,
+        1112
+      ],
+      "rendered_effect_size": [
+        182,
+        75
+      ],
+      "fit_reduction_reason": "NONE_FAMILY_TARGET_FITS",
+      "next_size_rejection_evidence": null,
+      "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+      "family_target_font_size_px": 62,
+      "stroke_width_px": 8,
+      "raster_resampling": "NOT_USED_NATIVE_GLYPH_RENDER"
+    },
+    {
+      "source": "Giant Statues",
+      "korean": "자이언트 스태추",
+      "line_breaks": [
+        "자이언트",
+        "스태추"
+      ],
+      "source_effect_bbox_readable_half_open": [
+        3000,
+        1005,
+        3267,
+        1134
+      ],
+      "safe_bbox_readable_half_open": [
+        3002,
+        1007,
+        3265,
+        1132
+      ],
+      "actual_font_size_px": 43,
+      "rendered_effect_bbox_readable_half_open": [
+        3046,
+        1007,
+        3219,
+        1131
+      ],
+      "rendered_effect_size": [
+        173,
+        124
+      ],
+      "fit_reduction_reason": "FIT_REDUCTION_HEIGHT",
+      "next_size_rejection_evidence": {
+        "font_size_px": 44,
+        "theoretical_effect_size": [
+          178,
+          127
+        ],
+        "safe_size": [
+          263,
+          125
+        ],
+        "fails_width": false,
+        "fails_height": true
+      },
+      "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+      "family_target_font_size_px": 62,
+      "stroke_width_px": 8,
+      "raster_resampling": "NOT_USED_NATIVE_GLYPH_RENDER"
+    },
+    {
+      "source": "Jungle",
+      "korean": "정글",
+      "line_breaks": [
+        "정글"
+      ],
+      "source_effect_bbox_readable_half_open": [
+        3502,
+        1034,
+        3733,
+        1116
+      ],
+      "safe_bbox_readable_half_open": [
+        3504,
+        1036,
+        3731,
+        1114
+      ],
+      "actual_font_size_px": 62,
+      "rendered_effect_bbox_readable_half_open": [
+        3554,
+        1037,
+        3680,
+        1112
+      ],
+      "rendered_effect_size": [
+        126,
+        75
+      ],
+      "fit_reduction_reason": "NONE_FAMILY_TARGET_FITS",
+      "next_size_rejection_evidence": null,
+      "title_family": "course_name__FF2462BB__white_navy_outline__course_cards",
+      "family_target_font_size_px": 62,
+      "stroke_width_px": 8,
+      "raster_resampling": "NOT_USED_NATIVE_GLYPH_RENDER"
+    }
+  ],
+  "strict_scope_qa": {
+    "changed_pixels": 263408,
+    "changed_pixels_outside_course_source_regions": 0,
+    "alpha_changed_pixels_outside_course_source_regions": 0,
+    "one_pixel_overflow": 0,
+    "header_128_exact_source": true,
+    "dimensions_exact": true,
+    "raster_resampling": "NOT_USED_NATIVE_GLYPH_RENDER",
+    "unrelated_candidate_pixels_preserved": true
+  },
+  "visual_qa": {
+    "result": "PASS_MANUAL_SOURCE_A00278_V19_THREE_WAY_COMPARISON",
+    "proof_in_bundle": "qa/FF2462BB_v19_course_family_comparison.png",
+    "proof_sha256": "c8ebd575386aa1c9865267da757394164180ebd910a2971ae56583647f56387a",
+    "checked": [
+      "source alignment and line breaks",
+      "no clipping",
+      "no 1px overflow",
+      "source-faithful white/navy outline hierarchy",
+      "no visible cover box or background damage"
+    ]
+  },
+  "reproducibility": {
+    "generator_in_bundle": "qa/generate_ff2462bb_v19_course_family.py",
+    "generator_sha256": "0d98ef60a6c9f2af9c57f808137d3edc852cc3e8d064bfe684ffdd0f9e0326f3",
+    "qa_json_in_bundle": "qa/FF2462BB_v19_course_family_qa.json",
+    "qa_json_sha256": "4a95833a98c76c12cdb5852c5256f48c01f95dda3f910db2f5437ecce25fb1e1"
+  },
+  "runtime_validation": "UNTESTED",
+  "independent_c_gate": "PENDING"
+}

@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "job_id": "LOC-A-000001",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-clean",
+  "role": "KOREAN_LOCALIZATION_PRODUCER_A",
+  "shard_rule": "asset_queue index % 3 == 0",
+  "recorded_at_kst": "2026-10-02T15:27:02+09:00",
+  "selection_head_sha": "00548db6bafd6e0bf119e8e0ab76b3edad30dd0d",
+  "status": "COMPLETE_MATERIAL_PRODUCTION_PENDING_INDEPENDENT_C",
+  "selected": {
+    "index": 51,
+    "asset": "FF2462BB"
+  },
+  "result": {
+    "candidate_sha256": "a1f2c28d9461d8c8bcbf4dfd3df96c8e8b52f3e2265699ff2590941d9c8fa6ea",
+    "drive_file_id": "1eV4bLuSf-nazNWz8dl5y510LXCuQHJXq",
+    "bundle_sha256": "cbaf797abb6b281f28c8764f1337252e29aaec7cf90c1472b1a6a996d6cb0dab",
+    "producer_static_qa": "PASS",
+    "independent_c_gate": "PENDING",
+    "runtime_validation": "UNTESTED"
+  },
+  "evidence": [
+    "localization/graphics/role_A/20261002-LOC-A-000001/LOC_A_000001_INDEX51_V19_COURSE_FAMILY_RERENDER.json",
+    "localization/graphics/role_A/20261002-LOC-A-000001/LOC_A_000001_INDEX51_V19_COURSE_FAMILY_QA.json"
+  ],
+  "completion_marker": "[AUTO:LOC-A-000001]"
+}
