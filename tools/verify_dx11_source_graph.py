@@ -4872,7 +4872,7 @@ def main() -> None:
             "R141 topology-drift fail-closed proof",
         ),
         (
-            "R141 restored generated fan IA binding reproduces snapshot",
+            "R141 generated fan IA binding restores deterministic snapshot",
             TRIANGLE_FAN_INDEX_BUFFER_PROBE,
             "R141 deterministic live-binding restore proof",
         ),
