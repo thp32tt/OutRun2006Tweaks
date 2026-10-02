@@ -25,40 +25,29 @@ Portainer (Docker Standalone, amd64): configure:
 
 Start with `AUTO_SEND=false`, verify ChatGPT project and GitHub connection, then enable `AUTO_SEND=true` and redeploy.
 
-## Parallel localization flow
+## Localization worker model
 
-A/B/C are independent pipeline roles.
+The production controller uses independent parallel lanes:
 
+```text
+Producer A  ─────┐
+                 ├── Artifact Queue ─── QA Validator C
+Producer B  ─────┘
 ```
-A producer  ----\
-                +---- artifact queue ---- C QA validator
-B producer  ----/
-```
 
-### A/B production lanes
+### Producer lanes
 
-A and B continuously produce DDS candidates.
+- A and B continuously produce DDS localization candidates.
+- A and B are independent production workers.
+- A/B production must not stop because unrelated assets are waiting for QA.
+- Every candidate must include the required artifact evidence before entering QA.
 
-Rules:
+### QA lane
 
-- Claim independent assets.
-- Produce Korean DDS candidates.
-- Preserve dimensions, format, alpha, mip and artwork requirements.
-- Store commit/artifact evidence.
-- A/B production does not stop because unrelated assets are waiting for QA.
-
-### C validation lane
-
-C continuously consumes completed A/B artifacts.
-
-Rules:
-
-- Validate exact artifact SHA.
-- Perform source/output comparison.
-- Record PASS or REWORK.
-- Block only the affected asset.
-
-A/B production and C validation run concurrently.
+- C continuously consumes completed A/B artifacts.
+- C validates producer output using the required QA rules.
+- C PASS/REWORK decisions apply to the affected asset only.
+- A QA failure must not block unrelated production assets.
 
 ## State and source rules
 
@@ -66,7 +55,26 @@ A/B production and C validation run concurrently.
 - N100 remote execution is supported for controller operation, Docker management, and Portainer deployment.
 - Approved Google Drive canonical HD source transport may be used for original DDS acquisition.
 - Drive DDS sources must preserve checksum, dimensions, format, alpha, mip requirements, and localization quality gates.
-- VR controller deployment remains independent.
+- Existing localization artifacts and VR deployment remain separate.
+
+## Slot model
+
+Localization execution uses three logical workers:
+
+```text
+slot-1 = Producer A
+slot-2 = Producer B
+slot-3 = QA C
+```
+
+Restarting the controller must preserve this role separation.
+
+## Queue rules
+
+- Production queue continues while QA is processing other assets.
+- Blocking is asset-scoped, not global.
+- Rework only returns the affected asset to production.
+- Completed assets are not reprocessed unless explicitly reopened by QA.
 
 ## Build
 
@@ -76,4 +84,4 @@ docker compose -f tools/chat-controller/v0.4-localization-v2/docker-compose.yml 
 docker compose -f tools/chat-controller/v0.4-localization-v2/docker-compose.yml up -d
 ```
 
-The image builds from `v0.4/src` and uses A/B/C localization prompts. Do not delete existing localization artifacts or volumes. Runtime game validation remains `UNTESTED` until performed.
+The image builds from `v0.4/src` and uses A/B/C localization prompts. VR controller deployment is independent. Do not delete existing volumes. Runtime game validation remains `UNTESTED` until performed.
