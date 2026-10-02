@@ -725,7 +725,43 @@ int main()
             "R183 D3DTOP_ADDSIGNED2X fixed-function shader prototype did not compile");
     }
 
+    {
+        std::array<FixedFunctionStageState, 8> addSmoothStages{};
+        addSmoothStages[0].colorOp = D3DTOP_ADDSMOOTH;
+        addSmoothStages[0].colorArg1 = D3DTA_TEXTURE;
+        addSmoothStages[0].colorArg2 = D3DTA_DIFFUSE;
+        addSmoothStages[0].alphaOp = D3DTOP_ADDSMOOTH;
+        addSmoothStages[0].alphaArg1 = D3DTA_TEXTURE;
+        addSmoothStages[0].alphaArg2 = D3DTA_DIFFUSE;
+        addSmoothStages[0].minFilter = D3DTEXF_POINT;
+        addSmoothStages[0].magFilter = D3DTEXF_POINT;
+        addSmoothStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto addSmoothShader =
+            generate_fixed_function_pixel_shader_prototype(
+                addSmoothStages, true, 0x01u, 0x01u, textureTypes);
+        require(
+            addSmoothShader.generated() && addSmoothShader.activeStages == 1,
+            "R184 D3DTOP_ADDSMOOTH fixed-function stage must become shader-exact");
+        require(
+            addSmoothShader.source.find(
+                "float3 nextColor = sampled0.rgb + input.diffuse.rgb * (1.0 - sampled0.rgb);") !=
+                std::string::npos &&
+            addSmoothShader.source.find(
+                "float nextAlpha = sampled0.a + input.diffuse.a * (1.0 - sampled0.a);") !=
+                std::string::npos,
+            "R184 D3DTOP_ADDSMOOTH shader expression drift");
+        const auto addSmoothCompile =
+            compile_fixed_function_pixel_shader_prototype(addSmoothShader);
+        require(
+            addSmoothCompile.attempted && addSmoothCompile.succeeded &&
+            addSmoothCompile.result == S_OK &&
+            addSmoothCompile.bytecodeBytes != 0,
+            "R184 D3DTOP_ADDSMOOTH fixed-function shader prototype did not compile");
+    }
+
     std::cout
+        << "DX11 fixed-function D3DTOP_ADDSMOOTH support R184: PASS\n"
         << "DX11 fixed-function D3DTOP_ADDSIGNED2X support R183: PASS\n"
         << "DX11 MRT color-write fail-closed: PASS\n"
         << "DX11 fixed-function D3DTOP_ADDSIGNED support R182: PASS\n"
