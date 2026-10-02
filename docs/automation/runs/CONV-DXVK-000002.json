@@ -79,7 +79,7 @@
     },
     "C3_VALIDATE": {
       "status": "COMPLETE",
-      "evidence": "Exact SHA 283a0b7f5f3ef051cb0b0f5584bd8e4989565492 passed DXVK Canonical Disassembly Evidence run 36972495984/job 110729229831 with canonical SHA256 pin, analyzer proof and disassembly contract all PASS. Backend Conversion Gate run 36972496055 also passed all static/DXVK contract checks and Win32 configure before continuing its non-required build stage."
+      "evidence": "Exact SHA 283a0b7f5f3ef051cb0b0f5584bd8e4989565492 passed DXVK Canonical Disassembly Evidence run 36972495984/job 110729229831 and Backend Conversion Gate run 36972496055/job 110729229912; canonical proof, static/backend/DXVK contracts, Win32 configure/build, binary verification and artifact upload all PASS."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
@@ -87,12 +87,12 @@
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Static/disassembly tooling proof only; no runtime payload or packaging content changed. Backend Conversion Gate build was still in progress at C6 write and is not required to establish this exact canonical proof."
+      "reason": "Static/disassembly tooling proof only; no runtime payload or packaging content changed. Backend Conversion Gate nevertheless configured/built Win32, verified the binary and uploaded its artifact successfully."
     },
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "exact_next_action": "Use validated descendant F21 provenance at commit 732870d551b9957815a7d711fcf75a46fb091b94 (canonical run 36972693928 SUCCESS) to exact-decode only complete instructions in 0x001829DD..0x00182A1D, preserve any new cut edge raw-only, and keep function/render/HUD/runtime semantics unresolved."
+      "exact_next_action": "F22 provenance commit 6c2e73b4c9629699a767bf56e24e26b9e94be6e5 now overlaps the incomplete XOR opcode at 0x00182A1C and captures through 0x00182A5C. Require its exact-SHA canonical provenance success, then exact-decode only complete instructions from that window, preserving any new cut edge raw-only and keeping function/render/HUD/runtime semantics unresolved."
     }
   },
   "validation": {
@@ -104,11 +104,11 @@
     "dxvk_disassembly_evidence_artifact_digest": "sha256:6c7f2426287fd4914a7cd66814f1a71c3b036ad336c34eca3f91332fda2d5f41",
     "backend_conversion_gate_run_id": 36972496055,
     "backend_conversion_gate_job_id": 110729229912,
-    "backend_conversion_gate_conclusion": "in_progress_at_c6_write",
+    "backend_conversion_gate_conclusion": "success",
     "backend_disassembly_contract": "PASS",
     "dxvk_session_transport_safe_recenter_checks": "PASS",
     "configure_win32": "PASS",
-    "build_win32": "IN_PROGRESS_AT_C6_WRITE_NOT_REQUIRED_FOR_SELECTED_STATIC_UNIT",
+    "build_win32": "PASS",
     "canonical_control_flow": "EXACT_18299D_TO_1829DD_CONTROL_FLOW_BOUNDARY_PROVEN",
     "predecessor_exact": true,
     "layout_contiguous": true,
@@ -122,13 +122,20 @@
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
     "pc_fast": "SKIPPED_NOT_AUTHORIZED",
     "runtime_validation": "UNTESTED",
-    "notes": "No Quest 3/VDXR or in-game runtime test was performed; canonical disassembly/CI evidence is not runtime acceptance evidence."
+    "notes": "No Quest 3/VDXR or in-game runtime test was performed; canonical disassembly/CI evidence is not runtime acceptance evidence.",
+    "backend_conversion_gate_artifact_id": 11212357096,
+    "backend_conversion_gate_artifact_digest": "sha256:fb1becf1fc79ffe45dff8e0e7dd11e09a319361e05e1248cc08899ccf16afa4a",
+    "binary_exists": "PASS",
+    "artifact_upload": "PASS"
   },
   "follow_on_frontier": {
-    "descendant_sha": "732870d551b9957815a7d711fcf75a46fb091b94",
-    "provenance_status": "EXACT_EXE_1829DD_TO_182A1D_PROVENANCE_CAPTURED",
-    "dxvk_disassembly_evidence_run_id": 36972693928,
-    "dxvk_disassembly_evidence_conclusion": "success"
+    "descendant_sha": "6c2e73b4c9629699a767bf56e24e26b9e94be6e5",
+    "predecessor_control_flow_status": "EXACT_1829DD_TO_182A1C_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "provenance_target_status": "EXACT_EXE_182A1C_TO_182A5C_PROVENANCE_CAPTURED",
+    "overlap_rva": "0x00182A1C",
+    "overlap_bytes": "33",
+    "dxvk_disassembly_evidence_run_id": 36973034794,
+    "dxvk_disassembly_evidence_status": "IN_PROGRESS_AT_C6_WRITE"
   },
   "issue14_comments": [
     5946039322,
@@ -140,7 +147,8 @@
     5946309730,
     5946320540,
     5946359507,
-    5946600016
+    5946600016,
+    5946641593
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -149,5 +157,5 @@
     "No localization files modified",
     "RUNTIME_VALIDATION remains UNTESTED without matching Quest 3/VDXR evidence"
   ],
-  "next_action": "Use validated descendant F21 provenance at commit 732870d551b9957815a7d711fcf75a46fb091b94 (canonical run 36972693928 SUCCESS) to exact-decode only complete instructions in 0x001829DD..0x00182A1D, preserve any new cut edge raw-only, and keep function/render/HUD/runtime semantics unresolved."
+  "next_action": "F22 provenance commit 6c2e73b4c9629699a767bf56e24e26b9e94be6e5 now overlaps the incomplete XOR opcode at 0x00182A1C and captures through 0x00182A5C. Require its exact-SHA canonical provenance success, then exact-decode only complete instructions from that window, preserving any new cut edge raw-only and keeping function/render/HUD/runtime semantics unresolved."
 }
