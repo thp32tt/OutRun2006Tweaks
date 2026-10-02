@@ -39,6 +39,7 @@ def load_function(name, **overrides):
               github_transient_retry_pending=lambda: False,
               native_plugin_instructions=lambda active: 'ALL_TOOLS tool search TOOL_NOT_EXPOSED 404 TARGET_BRANCH',
               conversion_lane_work_hint=lambda branch: 'CONTROLLER_SELECTED_WORK_TARGET=continue independent static work',
+              conversion_legacy_checkpoint_completed_stages=lambda record:set(),
               _is_localization_producer=lambda active: False,
               _is_latched_execution_task=lambda active: False,
               queue_send_producer_execution_continuation=AsyncMock(return_value=False),
@@ -808,6 +809,7 @@ class NativeControllerTests(unittest.TestCase):
             conversion_pipeline_changed_paths=changed_paths,
         )
         next_stage, _ = load_function('conversion_pipeline_next_stage')
+        legacy_done, _ = load_function('conversion_legacy_checkpoint_completed_stages')
         record={
             'task_id':'CONVERSION-DX11-00279',
             'lane':'DX11',
@@ -830,6 +832,7 @@ class NativeControllerTests(unittest.TestCase):
             github_json_file_at_ref=fetch,
             conversion_pipeline_status_ok=status_ok,
             conversion_pipeline_has_substantive_work=has_work,
+            conversion_legacy_checkpoint_completed_stages=legacy_done,
             CONVERSION_PIPELINE_SCHEMA_VERSION=2,
             CONVERSION_PIPELINE_STAGES=("C0_RECOVER","C1_REVIEW","C2_IMPLEMENT","C3_VALIDATE","C4_COMMIT","C5_PACKAGE","C6_STATE"),
         )
