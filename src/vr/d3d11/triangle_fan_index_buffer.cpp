@@ -48,10 +48,17 @@ bool NativeTriangleFanIndexBuffer::initialize_nonindexed(
             static_cast<UINT>(indices.size())))
         return false;
 
-    return initialize_materialized(
-        device,
-        indices.data(),
-        static_cast<UINT>(indices.size()));
+    if (!initialize_materialized(
+            device,
+            indices.data(),
+            static_cast<UINT>(indices.size())))
+        return false;
+
+    source_provenance_exact_ = true;
+    indexed_source_ = false;
+    primitive_count_ = primitiveCount;
+    base_vertex_ = baseVertex;
+    return true;
 }
 
 bool NativeTriangleFanIndexBuffer::initialize_indexed(
@@ -60,12 +67,14 @@ bool NativeTriangleFanIndexBuffer::initialize_indexed(
     D3DFORMAT sourceIndexFormat,
     UINT startIndex,
     const void* sourceIndices,
-    UINT sourceIndexCount) noexcept {
+    UINT sourceIndexCount,
+    std::uint64_t sourceIndexSnapshotToken) noexcept {
     // Preserve the same fail-closed replacement rule for indexed fans.
     shutdown();
 
     const auto plan = translate_triangle_fan_expansion(primitiveCount);
-    if (!device || !plan.exact || plan.expandedIndexCount == 0)
+    if (!device || !plan.exact || plan.expandedIndexCount == 0 ||
+        sourceIndexSnapshotToken == 0)
         return false;
 
     std::vector<UINT> indices(plan.expandedIndexCount);
@@ -79,10 +88,20 @@ bool NativeTriangleFanIndexBuffer::initialize_indexed(
             static_cast<UINT>(indices.size())))
         return false;
 
-    return initialize_materialized(
-        device,
-        indices.data(),
-        static_cast<UINT>(indices.size()));
+    if (!initialize_materialized(
+            device,
+            indices.data(),
+            static_cast<UINT>(indices.size())))
+        return false;
+
+    source_provenance_exact_ = true;
+    indexed_source_ = true;
+    primitive_count_ = primitiveCount;
+    source_index_format_ = sourceIndexFormat;
+    source_start_index_ = startIndex;
+    source_index_count_ = sourceIndexCount;
+    source_index_snapshot_token_ = sourceIndexSnapshotToken;
+    return true;
 }
 
 bool NativeTriangleFanIndexBuffer::initialize_materialized(
@@ -159,14 +178,28 @@ NativeTriangleFanIndexBuffer::readiness(
         expectedDevice != nullptr &&
         device_.Get() == expectedDevice;
     out.descriptorExact = descriptor_exact(expectedDevice);
+    out.sourceProvenanceExact = source_provenance_exact_;
+    out.indexedSource = indexed_source_;
     out.indexCount = index_count_;
+    out.primitiveCount = primitive_count_;
+    out.baseVertex = base_vertex_;
+    out.sourceIndexFormat = source_index_format_;
+    out.sourceStartIndex = source_start_index_;
+    out.sourceIndexCount = source_index_count_;
+    out.sourceIndexSnapshotToken = source_index_snapshot_token_;
     out.generation = generation_;
     out.contentHash = content_hash_;
     out.ready =
         out.resourcesOwned &&
         out.deviceMatches &&
         out.descriptorExact &&
+        out.sourceProvenanceExact &&
         out.indexCount != 0 &&
+        out.primitiveCount != 0 &&
+        (!out.indexedSource ||
+            (out.sourceIndexSnapshotToken != 0 &&
+             (out.sourceIndexFormat == D3DFMT_INDEX16 ||
+              out.sourceIndexFormat == D3DFMT_INDEX32))) &&
         out.generation != 0 &&
         out.contentHash != 0;
 
@@ -174,6 +207,14 @@ NativeTriangleFanIndexBuffer::readiness(
         std::uint64_t token = 0xcbf29ce484222325ull;
         token = mix_index_token(token, out.generation);
         token = mix_index_token(token, out.indexCount);
+        token = mix_index_token(token, out.primitiveCount);
+        token = mix_index_token(token, out.baseVertex);
+        token = mix_index_token(token, out.indexedSource ? 1u : 0u);
+        token = mix_index_token(
+            token, static_cast<std::uint32_t>(out.sourceIndexFormat));
+        token = mix_index_token(token, out.sourceStartIndex);
+        token = mix_index_token(token, out.sourceIndexCount);
+        token = mix_index_token(token, out.sourceIndexSnapshotToken);
         token = mix_index_token(token, out.contentHash);
         out.snapshotToken = token == 0 ? 1 : token;
     }
@@ -208,6 +249,14 @@ void NativeTriangleFanIndexBuffer::shutdown() noexcept {
     buffer_.Reset();
     device_.Reset();
     index_count_ = 0;
+    source_provenance_exact_ = false;
+    indexed_source_ = false;
+    primitive_count_ = 0;
+    base_vertex_ = 0;
+    source_index_format_ = D3DFMT_UNKNOWN;
+    source_start_index_ = 0;
+    source_index_count_ = 0;
+    source_index_snapshot_token_ = 0;
     content_hash_ = 0;
 }
 

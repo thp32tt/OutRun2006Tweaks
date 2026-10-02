@@ -3681,6 +3681,10 @@ def main() -> None:
             "R126 indexed fan upload API",
         "NativeTriangleFanIndexBufferReadiness readiness(":
             "R126 readiness snapshot API",
+        "bool sourceProvenanceExact{}":
+            "R129 source provenance readiness gate",
+        "std::uint64_t sourceIndexSnapshotToken{}":
+            "R129 source index snapshot identity",
         "bool bind(ID3D11DeviceContext* context) const noexcept":
             "R126 explicit dormant bind primitive",
     }
@@ -3706,6 +3710,12 @@ def main() -> None:
             "R126 foreign-context fail-closed gate",
         "shutdown();":
             "R126 replacement invalidates prior ownership",
+        "sourceIndexSnapshotToken == 0":
+            "R129 missing indexed-source snapshot rejection",
+        "source_index_snapshot_token_ = sourceIndexSnapshotToken;":
+            "R129 persisted indexed-source snapshot provenance",
+        "token, out.sourceIndexSnapshotToken":
+            "R129 indexed-source snapshot in readiness identity",
     }.items():
         if token not in TRIANGLE_FAN_INDEX_BUFFER_CPP:
             missing_r126_fan_index.append(meaning)
@@ -3720,6 +3730,12 @@ def main() -> None:
             "R126 foreign-device negative proof",
         "R126 rejected replacement retained stale generated IB":
             "R126 stale replacement negative proof",
+        "R129 INDEX32 source snapshot provenance was not sealed":
+            "R129 indexed source-provenance positive proof",
+        "R129 indexed fan without source snapshot provenance did not fail closed":
+            "R129 missing source-provenance negative proof",
+        "DX11 indexed triangle-fan source provenance R129: PASS":
+            "R129 hosted probe completion marker",
         "DX11 triangle-fan generated index buffer R126: PASS":
             "R126 hosted probe completion marker",
     }.items():

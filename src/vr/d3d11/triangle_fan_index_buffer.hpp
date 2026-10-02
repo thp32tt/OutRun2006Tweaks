@@ -14,8 +14,16 @@ struct NativeTriangleFanIndexBufferReadiness {
     bool resourcesOwned{};
     bool deviceMatches{};
     bool descriptorExact{};
+    bool sourceProvenanceExact{};
+    bool indexedSource{};
     bool ready{};
     UINT indexCount{};
+    UINT primitiveCount{};
+    UINT baseVertex{};
+    D3DFORMAT sourceIndexFormat = D3DFMT_UNKNOWN;
+    UINT sourceStartIndex{};
+    UINT sourceIndexCount{};
+    std::uint64_t sourceIndexSnapshotToken{};
     std::uint64_t generation{};
     std::uint64_t contentHash{};
     std::uint64_t snapshotToken{};
@@ -39,13 +47,17 @@ public:
     // an immutable R32_UINT triangle-list index buffer. BaseVertexIndex is
     // deliberately not folded into the generated values; a future DrawIndexed
     // caller must preserve it as D3D11 BaseVertexLocation.
+    // R129 additionally seals the exact source-index mirror snapshot used to
+    // materialize the fan. Indexed geometry may consume this owner only while
+    // that source snapshot is still current.
     bool initialize_indexed(
         ID3D11Device* device,
         UINT primitiveCount,
         D3DFORMAT sourceIndexFormat,
         UINT startIndex,
         const void* sourceIndices,
-        UINT sourceIndexCount) noexcept;
+        UINT sourceIndexCount,
+        std::uint64_t sourceIndexSnapshotToken) noexcept;
 
     // Dormant binding primitive for hosted validation/future native callers.
     // It rejects foreign-device contexts and always binds R32_UINT offset 0
@@ -61,7 +73,8 @@ public:
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
-        return device_ && buffer_ && index_count_ != 0 && content_hash_ != 0;
+        return device_ && buffer_ && index_count_ != 0 && content_hash_ != 0 &&
+            source_provenance_exact_;
     }
     [[nodiscard]] ID3D11Buffer* buffer() const noexcept {
         return buffer_.Get();
@@ -84,6 +97,14 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
     Microsoft::WRL::ComPtr<ID3D11Buffer> buffer_;
     UINT index_count_ = 0;
+    bool source_provenance_exact_ = false;
+    bool indexed_source_ = false;
+    UINT primitive_count_ = 0;
+    UINT base_vertex_ = 0;
+    D3DFORMAT source_index_format_ = D3DFMT_UNKNOWN;
+    UINT source_start_index_ = 0;
+    UINT source_index_count_ = 0;
+    std::uint64_t source_index_snapshot_token_ = 0;
     std::uint64_t generation_ = 0;
     std::uint64_t content_hash_ = 0;
 };
