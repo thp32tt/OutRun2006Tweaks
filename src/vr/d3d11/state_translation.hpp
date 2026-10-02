@@ -36,4 +36,13 @@ struct TriangleFanExpansionPlan {
     UINT expandedIndex,
     UINT& sourceElement) noexcept;
 
+// R121 materializes the exact non-indexed D3D9 triangle-fan vertex order as a
+// D3D11 triangle-list index stream. This is a dormant translation primitive:
+// callers still must own/upload an index buffer before native Draw* can use it.
+[[nodiscard]] bool materialize_triangle_fan_vertex_indices(
+    UINT primitiveCount,
+    UINT baseVertex,
+    UINT* expandedIndices,
+    UINT expandedIndexCapacity) noexcept;
+
 } // namespace outrun::vr::dx11

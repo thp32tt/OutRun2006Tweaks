@@ -425,6 +425,12 @@ def main() -> None:
             "triangle-fan emits three indices per source primitive",
         "triangle_fan_source_element":
             "triangle-fan expanded-index to source-element mapping",
+        "materialize_triangle_fan_vertex_indices":
+            "triangle-fan concrete triangle-list index materializer",
+        "expandedIndexCapacity < expansion.expandedIndexCount":
+            "triangle-fan destination-capacity fail-closed gate",
+        "maxValue - (expansion.sourceElementCount - 1u)":
+            "triangle-fan base-vertex overflow fail-closed gate",
         "case D3DPT_TRIANGLEFAN: return {D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED, false};":
             "direct triangle-fan topology remains fail-closed",
     }
@@ -440,8 +446,16 @@ def main() -> None:
             "triangle-list expansion semantic smoke",
         "triangle fan expansion source mapping drifted":
             "fan source-index mapping semantic smoke",
+        "triangle fan materialized index stream drifted":
+            "fan concrete index-stream semantic smoke",
+        "triangle fan short destination did not fail before writes":
+            "fan destination-capacity fail-closed smoke",
+        "triangle fan base-vertex overflow did not fail before writes":
+            "fan base-vertex overflow fail-closed smoke",
+        "zero-primitive triangle fan materialization must be empty-exact":
+            "fan empty-stream semantic smoke",
         "triangle fan expansion overflow did not fail closed":
-            "fan overflow negative semantic smoke",
+            "fan expansion-count overflow negative semantic smoke",
     }
     missing_triangle_fan_expansion_contract += [
         meaning

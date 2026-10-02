@@ -135,4 +135,37 @@ bool triangle_fan_source_element(
     return true;
 }
 
+bool materialize_triangle_fan_vertex_indices(
+    UINT primitiveCount,
+    UINT baseVertex,
+    UINT* expandedIndices,
+    UINT expandedIndexCapacity) noexcept
+{
+    const auto expansion = translate_triangle_fan_expansion(primitiveCount);
+    if (!expansion.exact)
+        return false;
+    if (expansion.expandedIndexCount == 0u)
+        return true;
+    if (!expandedIndices ||
+        expandedIndexCapacity < expansion.expandedIndexCount)
+        return false;
+
+    const UINT maxValue = std::numeric_limits<UINT>::max();
+    if (baseVertex >
+        maxValue - (expansion.sourceElementCount - 1u))
+        return false;
+
+    for (UINT expandedIndex = 0u;
+         expandedIndex < expansion.expandedIndexCount;
+         ++expandedIndex)
+    {
+        UINT sourceElement = 0u;
+        if (!triangle_fan_source_element(
+                primitiveCount, expandedIndex, sourceElement))
+            return false;
+        expandedIndices[expandedIndex] = baseVertex + sourceElement;
+    }
+    return true;
+}
+
 } // namespace outrun::vr::dx11

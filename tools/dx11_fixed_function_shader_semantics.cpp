@@ -305,6 +305,41 @@ int main()
         require(
             !triangle_fan_source_element(3u, 9u, sourceElement),
             "triangle fan expansion accepted out-of-range index");
+
+        std::array<UINT, 9> materialized{};
+        require(
+            materialize_triangle_fan_vertex_indices(
+                3u, 7u, materialized.data(),
+                static_cast<UINT>(materialized.size())),
+            "triangle fan index stream materialization failed");
+        constexpr std::array<UINT, 9> expectedMaterialized{
+            7u, 8u, 9u,
+            7u, 9u, 10u,
+            7u, 10u, 11u,
+        };
+        require(
+            materialized == expectedMaterialized,
+            "triangle fan materialized index stream drifted");
+
+        std::array<UINT, 9> untouched{};
+        untouched.fill(0xA5A5A5A5u);
+        const auto untouchedBefore = untouched;
+        require(
+            !materialize_triangle_fan_vertex_indices(
+                3u, 7u, untouched.data(), 8u) &&
+            untouched == untouchedBefore,
+            "triangle fan short destination did not fail before writes");
+        require(
+            !materialize_triangle_fan_vertex_indices(
+                3u, std::numeric_limits<UINT>::max() - 3u,
+                untouched.data(), static_cast<UINT>(untouched.size())) &&
+            untouched == untouchedBefore,
+            "triangle fan base-vertex overflow did not fail before writes");
+        require(
+            materialize_triangle_fan_vertex_indices(
+                0u, std::numeric_limits<UINT>::max(), nullptr, 0u),
+            "zero-primitive triangle fan materialization must be empty-exact");
+
         require(
             !translate_triangle_fan_expansion(
                 std::numeric_limits<UINT>::max()).exact,
