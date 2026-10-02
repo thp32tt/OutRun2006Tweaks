@@ -143,7 +143,8 @@
     5947562196,
     5947626731,
     5947639095,
-    5947708894
+    5947708894,
+    5947726417
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -2620,6 +2621,66 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve descendant 6f5d748bde8a0f3b374db40791ef03aa3d863127 and its 0x00182E4F raw continuation. After canonical provenance succeeds, exact-decode only complete instructions and retain unresolved function/render/HUD/runtime semantics."
+    },
+    {
+      "unit_id": "DXVK_REL32_CALL_DECLARATION_STATIC_CROSSCHECK",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "ec2edac95638b6a37d06847ddd6f31dd9868a1cf",
+      "commit_message": "test: verify DXVK rel32 call declarations [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Auto-discovered exact continuation proofs now statically cross-check declared direct E8 rel32 CALL RVAs against decoded instruction rows, reject duplicate/missing/stale RVAs, require 5-byte E8 encoding, and recompute each declared target from the rel32 displacement. This prevents the F38 0x182E40/0x182E41 off-by-one class from escaping preflight.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS conversion override, lane/run state, regression/problem history and Issue #14. Concurrent F38 proof repair and F39 raw-capture work were detected and not duplicated."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA F38 canonical run 36980415016 failed after static contract PASS because a declared CALL RVA was one byte before the E8 opcode, exposing a generic static verifier gap."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit ec2edac95638b6a37d06847ddd6f31dd9868a1cf adds generic rel32 call declaration/instruction/target cross-checking to tools/verify_vr_backend_disasm_contract.py."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "DXVK Canonical Disassembly Evidence run 36980811199 job 110754673582 completed SUCCESS on exact material SHA, including static disassembly contract, canonical EXE identity, analyzer execution, evidence identity and artifact upload."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commit ec2edac95638b6a37d06847ddd6f31dd9868a1cf contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947726417 records the change."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only hardening; no runtime payload, selector, backend binary, localization or deployable package content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally in branch-local durable run/lane state without replacing the newer canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "ec2edac95638b6a37d06847ddd6f31dd9868a1cf",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36980811199,
+        "dxvk_disassembly_evidence_job_id": 110754673582,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "artifact_id": 11215501370,
+        "artifact_digest": "sha256:34a760c483835ea0c8216935628cce44e135cbb38d6114e7e8444ac6880d0bf8",
+        "backend_conversion_gate_run_id": 36980811176,
+        "backend_conversion_gate_status": "IN_PROGRESS_AT_STATE_WRITE_NOT_CLAIMED",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5947726417,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest validated canonical-disassembly frontier; keep rel32 declaration cross-checking active on all exact continuation proofs and advance only from the latest raw/proof edge without function/render/HUD/runtime semantic promotion."
     }
   ],
   "issue14_implementation_comment_id": 5947620605,
