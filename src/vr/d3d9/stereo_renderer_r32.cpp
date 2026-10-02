@@ -12,6 +12,7 @@
 // DirectGPU producer slot while a timed-out D3D9 EVENT query is still pending.
 
 #include "r32_policy.hpp"
+#include "../../hook_mgr.hpp"
 #include "../telemetry/performance_types.hpp"
 #include "../telemetry/performance_clock.hpp"
 #include "../render/effect_state_snapshot.hpp"
