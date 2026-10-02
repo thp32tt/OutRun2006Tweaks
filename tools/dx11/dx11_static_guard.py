@@ -12,24 +12,38 @@ import argparse
 from pathlib import Path
 
 
+# Keep this list conservative: these are explicit opt-in/runtime forcing
+# patterns, not ordinary implementation references.
 FORBIDDEN_RUNTIME_ENABLE_MARKERS = (
     "NativeDrawPathActive = true",
     "ENABLE_NATIVE_DRAW_PATH=1",
     "ForceNativeDrawPath",
+    "EnableNativeDrawPath(true)",
+    "native_draw_activation_override = true",
 )
+
+SCANNED_SUFFIXES = {
+    ".cpp",
+    ".hpp",
+    ".h",
+    ".c",
+    ".ini",
+    ".cmake",
+    ".py",
+    ".ps1",
+}
 
 
 def scan(root: Path) -> int:
     failures = []
     for path in root.rglob("*"):
-        if not path.is_file():
-            continue
-        if path.suffix.lower() not in {".cpp", ".hpp", ".h", ".c", ".ini", ".cmake"}:
+        if not path.is_file() or path.suffix.lower() not in SCANNED_SUFFIXES:
             continue
         try:
             text = path.read_text(encoding="utf-8", errors="ignore")
         except OSError:
             continue
+
         for marker in FORBIDDEN_RUNTIME_ENABLE_MARKERS:
             if marker in text:
                 failures.append((path, marker))
