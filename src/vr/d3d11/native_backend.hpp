@@ -2009,6 +2009,11 @@ struct NativeFixedFunctionFanDrawDispatchReadiness {
     // fail-closed capacity proof to indexed fans using exact R155 source
     // content plus an R152 MANAGED source-index window snapshot.
     bool vertexBufferRangeExact{};
+    // R158 preserves D3D9 DrawIndexedPrimitive MinVertexIndex/NumVertices for
+    // indexed triangle fans and proves the exact MANAGED source values stay
+    // inside that declared source-vertex interval before D3D11 DrawIndexed.
+    bool sourceDeclaredVertexRangeExact{};
+    bool sourceValuesWithinDeclaredRange{};
     bool dispatchArgumentsExact{};
     bool componentSnapshotsPresent{};
     bool ready{};
@@ -2025,6 +2030,9 @@ struct NativeFixedFunctionFanDrawDispatchReadiness {
     // vertex capacity. Zero for nonindexed fans.
     UINT sourceObservedMinIndex{};
     UINT sourceObservedMaxIndex{};
+    UINT sourceMinVertexIndex{};
+    UINT sourceNumVertices{};
+    UINT sourceMaxVertexIndex{};
     std::uint64_t sourceValueSnapshotToken{};
     std::uint64_t snapshotToken{};
 };
@@ -2087,6 +2095,7 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
     const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
     UINT primitiveCount, D3DFORMAT sourceIndexFormat,
     UINT startIndex, UINT sourceIndexCount, INT baseVertexLocation,
+    UINT minVertexIndex, UINT numVertices,
     const FixedFunctionTransformConstants& transform,
     const NativeSurfacePairBinding& surfaceBinding,
     const NativeSurfaceMirror& colorSurface,
@@ -2109,6 +2118,7 @@ validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(
     const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
     UINT primitiveCount, D3DFORMAT sourceIndexFormat,
     UINT startIndex, UINT sourceIndexCount, INT baseVertexLocation,
+    UINT minVertexIndex, UINT numVertices,
     const FixedFunctionTransformConstants& transform,
     const NativeSurfacePairBinding& surfaceBinding,
     const NativeSurfaceMirror& colorSurface,

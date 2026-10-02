@@ -5746,6 +5746,7 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
     const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
     UINT primitiveCount, D3DFORMAT sourceIndexFormat,
     UINT startIndex, UINT sourceIndexCount, INT baseVertexLocation,
+    UINT minVertexIndex, UINT numVertices,
     const FixedFunctionTransformConstants& transform,
     const NativeSurfacePairBinding& surfaceBinding,
     const NativeSurfaceMirror& colorSurface,
@@ -5775,6 +5776,8 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
     out.indexCount = generated.indexCount;
     out.startIndexLocation = 0u;
     out.baseVertexLocation = baseVertexLocation;
+    out.sourceMinVertexIndex = minVertexIndex;
+    out.sourceNumVertices = numVertices;
     out.finalFanBoundDrawSnapshotToken = finalBound.snapshotToken;
     out.generatedIndexSnapshotToken = generated.snapshotToken;
     out.sourceIndexSnapshotToken = currentSource.snapshotToken;
@@ -5794,6 +5797,24 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
     const bool countExact =
         primitiveCount <= maxValue / 3u &&
         generated.indexCount == primitiveCount * 3u;
+
+    // R158: preserve D3D9 indexed-fan declared vertex range. D3D11
+    // DrawIndexed has no MinVertexIndex/NumVertices arguments, so the dormant
+    // readiness chain must retain them and prove the exact source index values
+    // stay within that caller-declared interval before activation.
+    const bool sourceVertexCountCompatible =
+        primitiveCount == 0u || numVertices != 0u;
+    bool sourceDeclaredRangeFits = primitiveCount == 0u;
+    if (numVertices != 0u) {
+        const UINT spanMinusOne = numVertices - 1u;
+        sourceDeclaredRangeFits =
+            minVertexIndex <= maxValue - spanMinusOne;
+        if (sourceDeclaredRangeFits)
+            out.sourceMaxVertexIndex = minVertexIndex + spanMinusOne;
+    }
+    out.sourceDeclaredVertexRangeExact =
+        sourceVertexCountCompatible && sourceDeclaredRangeFits;
+
     out.generatedIndexMatchesDispatch =
         generated.ready && generated.indexedSource &&
         generated.baseVertex == 0u &&
@@ -5816,13 +5837,18 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
     const auto expansion = translate_triangle_fan_expansion(primitiveCount);
     NativeManagedIndexRangeReadiness sourceVertexWindow{};
     if (currentSource.ready && expansion.exact &&
-        expansion.sourceElementCount != 0u) {
+        expansion.sourceElementCount != 0u &&
+        out.sourceDeclaredVertexRangeExact) {
         sourceVertexWindow = sourceIndexBuffer.index_range_readiness(
             currentSource, sourceIndexFormat, startIndex,
-            expansion.sourceElementCount, 0u, maxValue);
+            expansion.sourceElementCount, out.sourceMinVertexIndex,
+            out.sourceMaxVertexIndex);
     }
     out.sourceObservedMinIndex = sourceVertexWindow.observedMinIndex;
     out.sourceObservedMaxIndex = sourceVertexWindow.observedMaxIndex;
+    out.sourceValuesWithinDeclaredRange =
+        sourceVertexWindow.ready &&
+        sourceVertexWindow.valuesWithinDeclaredRange;
     out.sourceValueSnapshotToken = sourceVertexWindow.snapshotToken;
     if (out.generatedIndexMatchesDispatch &&
         sourceVertexWindow.ready &&
@@ -5850,6 +5876,8 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
     }
     out.dispatchArgumentsExact =
         out.generatedIndexMatchesDispatch &&
+        out.sourceDeclaredVertexRangeExact &&
+        out.sourceValuesWithinDeclaredRange &&
         out.vertexBufferRangeExact &&
         out.startIndexLocation == 0u;
     out.componentSnapshotsPresent =
@@ -5878,6 +5906,16 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
             token, out.sourceObservedMinIndex);
         token = mix_readiness_snapshot_token(
             token, out.sourceObservedMaxIndex);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceMinVertexIndex);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceNumVertices);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceMaxVertexIndex);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceDeclaredVertexRangeExact ? 0x158u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceValuesWithinDeclaredRange ? 0x1581u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.vertexBufferRangeExact ? 0x156u : 0u);
         token = mix_readiness_snapshot_token(token, primitiveCount);
@@ -5911,6 +5949,7 @@ validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(
     const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
     UINT primitiveCount, D3DFORMAT sourceIndexFormat,
     UINT startIndex, UINT sourceIndexCount, INT baseVertexLocation,
+    UINT minVertexIndex, UINT numVertices,
     const FixedFunctionTransformConstants& transform,
     const NativeSurfacePairBinding& surfaceBinding,
     const NativeSurfaceMirror& colorSurface,
@@ -5924,7 +5963,8 @@ validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(
             layout, vertexPrototype, pixelPrototype, samplers, textures,
             vertexBuffer, vertexStride, vertexOffset, sourceIndexBuffer,
             generatedIndexBuffer, primitiveCount, sourceIndexFormat,
-            startIndex, sourceIndexCount, baseVertexLocation, transform,
+            startIndex, sourceIndexCount, baseVertexLocation,
+            minVertexIndex, numVertices, transform,
             surfaceBinding, colorSurface, depthSurface);
     return current.ready && current.snapshotToken == snapshotToken;
 }
