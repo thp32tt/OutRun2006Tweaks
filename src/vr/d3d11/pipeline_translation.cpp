@@ -132,7 +132,16 @@ namespace outrun::vr::dx11
 
         bool fixed_function_argument_supported(DWORD value) noexcept
         {
-            if ((value & ~static_cast<DWORD>(D3DTA_SELECTMASK)) != 0)
+            // R175: D3DTA_COMPLEMENT and D3DTA_ALPHAREPLICATE are modifiers
+            // on an otherwise supported argument selector. Preserve those
+            // fixed-function semantics in generated HLSL while keeping every
+            // unknown modifier bit fail-closed.
+            constexpr DWORD supportedModifiers =
+                static_cast<DWORD>(D3DTA_COMPLEMENT) |
+                static_cast<DWORD>(D3DTA_ALPHAREPLICATE);
+            const DWORD supportedBits =
+                static_cast<DWORD>(D3DTA_SELECTMASK) | supportedModifiers;
+            if ((value & ~supportedBits) != 0)
                 return false;
 
             switch (value & D3DTA_SELECTMASK)
@@ -189,7 +198,17 @@ namespace outrun::vr::dx11
             default:
                 return {};
             }
-            base += swizzle;
+            // R175: ALPHAREPLICATE substitutes the source alpha for the
+            // RGB argument. It is a no-op for the scalar alpha path. Apply
+            // COMPLEMENT after selecting/replicating the source argument.
+            if ((value & static_cast<DWORD>(D3DTA_ALPHAREPLICATE)) != 0 &&
+                std::string(swizzle) == ".rgb")
+                base += ".aaa";
+            else
+                base += swizzle;
+
+            if ((value & static_cast<DWORD>(D3DTA_COMPLEMENT)) != 0)
+                return "(1.0 - " + base + ")";
             return base;
         }
 
