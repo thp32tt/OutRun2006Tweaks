@@ -8,6 +8,14 @@ A owns even queue indexes; B owns odd indexes. A/B produce material DDS results,
 
 TASK lookup uses exact record, TASK_ID.*, dispatch, reconcile, rollover, lane+number, number. Embedded TASK_ID must match even for broad fallbacks. Only missing paths fall through; auth errors and rate limits stay distinct. Generic Retry gets one recovery attempt per chat, then rollover with the same TASK_ID and ATTEMPT. Rate limits still respect backoff. MAX_CHAT_ROLLOVERS_PER_TASK=0 means unlimited rollovers.
 
+Execution environment:
+
+- N100 remote execution is supported for controller operation, Docker management, Portainer deployment, and maintenance workflows.
+- GitHub remains the source of truth for code, state definitions, and tracked changes.
+- Approved Google Drive canonical HD source transport may be used for original DDS acquisition when required by localization tasks.
+- Drive-sourced DDS files must preserve checksum, dimensions, format, alpha, mip requirements, and localization quality gates.
+- VR controller and localization controller remain separate deployments.
+
 Build locally from repository root:
 
 ```sh
