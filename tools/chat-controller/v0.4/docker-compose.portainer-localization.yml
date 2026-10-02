@@ -1,4 +1,5 @@
-# v0.4 compatibility wrapper: builds the v0.5 controller.
+# v0.4 compatibility wrapper: builds the v0.5 localization controller.
+# Localization only. VR controller uses a separate compose stack/state volume.
 services:
   outrun-chat-controller-localization:
     build:
@@ -14,8 +15,15 @@ services:
     environment:
       TZ: Asia/Seoul
       CONTROLLER_MODE: localization
+      CONTROLLER_SCHEMA_VERSION: "50"
+      LOCALIZATION_PIPELINE: "A_B_THEN_C_BARRIER"
+      LOCALIZATION_QUEUE: "localization/graphics/asset_queue_v2.csv"
+      LOCALIZATION_CONFIG: "localization/controller_roles.json"
+      LOCALIZATION_CONTRACT: "docs/automation/LOCALIZATION_CONTROLLER_V2.md"
+      LEGACY_QUEUE_READONLY: "localization/graphics/asset_queue.csv"
       AUTO_SEND: "${AUTO_SEND:-true}"
       GITHUB_REPO: thp32tt/OutRun2006Tweaks
+      GITHUB_BRANCH: korean-localization-clean
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
       CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
       REQUIRE_PROJECT_URL: "true"
@@ -25,9 +33,10 @@ services:
       SAME_CHAT_CONTINUATION_GAP_SECONDS: "20"
       TURN_IDLE_GRACE_SECONDS: "8"
       QA_BATCH_SIZE: "4"
+      QA_BARRIER_REQUIRED: "true"
       NO_WORK_RETRY_SECONDS: "600"
-      CHAT_REUSE_MAX_JOBS: "12"
-      CHAT_REUSE_MAX_AGE_MINUTES: "240"
+      CHAT_REUSE_MAX_JOBS: "4"
+      CHAT_REUSE_MAX_AGE_MINUTES: "90"
       RATE_LIMIT_BACKOFF_SECONDS: "90,180,300,600"
       STATUS_PORT: "8787"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
@@ -35,11 +44,11 @@ services:
       - "6081:6080"
       - "8788:8787"
     volumes:
-      - outrun_chat_localization_data:/data
-      - outrun_chat_localization_logs:/logs
+      - outrun_chat_localization_v2_data:/data
+      - outrun_chat_localization_v2_logs:/logs
 
 volumes:
-  outrun_chat_localization_data:
-    name: outrun_chat_localization_data
-  outrun_chat_localization_logs:
-    name: outrun_chat_localization_logs
+  outrun_chat_localization_v2_data:
+    name: outrun_chat_localization_v2_data
+  outrun_chat_localization_v2_logs:
+    name: outrun_chat_localization_v2_logs
