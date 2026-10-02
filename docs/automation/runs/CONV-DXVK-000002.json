@@ -3857,6 +3857,90 @@
         }
       },
       "exact_next_action": "Preserve any newer authoritative frontier. If continuation_55 remains the newest raw-only edge, exact-decode only complete canonical instructions in 0x00182FFC..0x0018303C, resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F46_CANONICAL_CONTROL_FLOW_0x182FFC_TO_0x18303B",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "123d4b8248427813e53df091faba3abd84529961",
+      "validation_bearing_result_sha": "123d4b8248427813e53df091faba3abd84529961",
+      "commit_message": "dxvk: prove canonical 0x182FFC control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact-decoded continuation_55 canonical bytes from 0x00182FFC through exclusive 0x0018303B as 13 contiguous complete instructions, resolved F45 forward target 0x00183004 onto an exact instruction boundary, proved external/internal branch targets, verified an empty direct rel32 CALL census, and preserved trailing 0x66 at 0x0018303B for mandatory overlap.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered AGENTS.md, branch-local lane/run state, current work queue, regression/problem history and Issue #14 from authenticated GitHub; refreshed same-job HEAD repeatedly to avoid duplicate F44/F45/F46 work."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Fresh branch-wide source check showed F45 exact proof and F46 raw provenance already present while continuation_55 had no prefix proof, making F46 exact decode the highest-value unfinished runnable static item."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 123d4b8248427813e53df091faba3abd84529961 adds F46 instruction, branch, predecessor-target, cut-edge proof metadata, report binding and fail-closed CLI guard."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36985162932 job 110768418111 completed SUCCESS, including VR backend disassembly contract OK, canonical EXE identity and analyzer proof EXACT_182FFC_TO_18303B_CONTROL_FLOW_CAPTURE_EDGE_PROVEN."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commit 123d4b8248427813e53df091faba3abd84529961 contains required [AUTO:CONV-DXVK-000002]; Issue #14 comment 5948352683 records the implementation and exact-SHA validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly control-flow proof only; no deployable/runtime DXVK payload, selector, backend binary or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally in this durable task run without overwriting any concurrently newer primary frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "123d4b8248427813e53df091faba3abd84529961",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "dxvk_disassembly_evidence_run_id": 36985162932,
+        "dxvk_disassembly_evidence_job_id": 110768418111,
+        "artifact_id": 11216234970,
+        "artifact_digest": "sha256:f455baae727cb1ba4886063b3219cb4b363afa87a2fb1d9143dff56eace29e03",
+        "proof_status": "EXACT_182FFC_TO_18303B_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "predecessor_exact": true,
+        "start_completion_proven": true,
+        "layout_contiguous": true,
+        "all_instruction_bytes_match": true,
+        "instruction_count": 13,
+        "prefix_end_rva": "0x0018303B",
+        "prefix_end_matches": true,
+        "branches": [
+          "0x00183008->0x0018A5EB",
+          "0x0018300E->0x00183010"
+        ],
+        "branch_targets_match": true,
+        "internal_branch_targets_on_boundaries": true,
+        "external_targets": [
+          "0x0018A5EB"
+        ],
+        "raw_call_census_empty": true,
+        "predecessor_target_contract": true,
+        "resolved_predecessor_target_rva": "0x00183004",
+        "resolved_predecessor_target_is_boundary": true,
+        "incomplete_rva": "0x0018303B",
+        "incomplete_bytes": "66",
+        "incomplete_matches": true,
+        "capture_edge_matches": true,
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948352683,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Capture the next bounded canonical continuation from 0x0018303B with mandatory overlap byte 66, validate exact raw provenance first, then decode only complete instructions and keep function/render/HUD/runtime semantics unresolved."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
