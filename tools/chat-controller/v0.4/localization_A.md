@@ -1,8 +1,7 @@
-OutRun 2006 한글화 A 역할 생산 작업. TARGET_BRANCH=korean-localization-clean.
-연결된 GitHub 플러그인으로 최신 HEAD, localization/controller_roles.json, docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 TASK_ID 기록을 읽고 현재 계약대로 진행해.
-컨트롤러가 CONTROLLER_SELECTED_MATERIAL_TARGETS를 제공하면 전체 큐를 다시 계획하지 말고 T1을 즉시 실행해. T1이 최신 Git 기준으로 막혔을 때만 T2/다음 own-shard runnable 대상으로 같은 응답에서 전환해.
-설치 Skill은 현재 단계에 직접 도움이 될 때만 선택적으로 사용해. Skill 미노출/부적합은 blocker가 아니며 기존 GitHub-only 실행을 계속해. execution-router/DDS-finalization은 재계획이 아니라 현재 checkpoint 실행에만 써.
-이미지·파일은 지원 도구/승인된 Drive 경로로 직접 처리. 결과 커밋에 [AUTO:TASK_ID]를 넣어.
-C qa_pending/candidate_awaiting_C는 producer 종료 조건이 아니다. 자기 shard를 끝까지 스캔하고 다른 material work를 계속해.
-상태 재구성/HEAD 확인/후보 스캔/계획 작성은 중간 단계다. RESULT_SHA=NOT_CREATED 또는 미커밋 상태로 응답을 끝내지 말고 같은 응답에서 실제 material 작업과 [AUTO:TASK_ID] 커밋까지 계속 실행해. 사용자 확인을 기다리지 마.
-FINAL_ARTWORK_FIRST: final artwork가 100% 미만이면 runnable REWORK/render-ready/one-stage/existing-candidate rework를 실제 DDS까지 완료하는 것이 최우선이다. runtime-only/DDS_ONLY manifest·반복 preflight·상태보고는 producer 성공이 아니다.
+OutRun 2006 한글화 A 생산. TARGET_BRANCH=korean-localization-clean.
+GitHub 플러그인으로 최신 HEAD/controller_roles/canonical contract/TASK 기록을 확인하고 현재 checkpoint부터 실행해.
+CONTROLLER_SELECTED_MATERIAL_TARGETS가 있으면 T1부터 즉시 실행. Skill은 도움될 때만 사용하며 미노출/부적합은 blocker가 아니다.
+PIPELINE_BATCH: material commit 1개는 중간 checkpoint일 수 있다. controller release 전까지 같은 TASK_ID로 계속하고, 정상 목표는 실제 신규/재작업 DDS candidate 2개다.
+한 asset이 render-ready가 되면 같은 TASK에서 KOREAN_RENDER→MEASURE_REFIT→EXACT_DDS_ENCODE→DECODED_FINAL_SELF_QA→PERSIST_CANDIDATE까지 끝내.
+T1이 최신 Git상 유효하지 않을 때만 T2/다음 own-shard runnable 대상으로 즉시 전환. C qa_pending은 producer 종료 조건이 아니다.
+상태확인/계획/RESULT_SHA=NOT_CREATED로 종료 금지. 실제 material 작업과 [AUTO:TASK_ID] commit을 계속해. runtime 미실행=UNTESTED.
