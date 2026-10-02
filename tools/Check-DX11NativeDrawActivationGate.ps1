@@ -20,11 +20,18 @@ $forbiddenActivationClaims = @(
     'NativeDrawPathActivation=ENABLED'
 )
 
+$disabledActivationEvidence = @(
+    'NativeDrawPathActive=false',
+    'NativeDrawPathActivation=DISABLED',
+    'native_draw_path_activation_changed=false'
+)
+
 $extensions = @('*.cpp','*.hpp','*.h','*.json','*.md','*.ps1')
 $files = Get-ChildItem -Path $Root -Recurse -File -Include $extensions -ErrorAction SilentlyContinue
 
 $matches = @()
 $forbiddenMatches = @()
+$disabledMatches = @()
 foreach ($file in $files) {
     $text = Get-Content -Path $file.FullName -Raw -ErrorAction SilentlyContinue
     foreach ($signal in $requiredSignals) {
@@ -43,14 +50,24 @@ foreach ($file in $files) {
             }
         }
     }
+    foreach ($evidence in $disabledActivationEvidence) {
+        if ($text -match [regex]::Escape($evidence)) {
+            $disabledMatches += [pscustomobject]@{
+                Evidence = $evidence
+                File = $file.FullName.Substring($Root.Length).TrimStart('\','/')
+            }
+        }
+    }
 }
 
 Write-Host "DX11_NATIVE_DRAW_GATE_STATIC_SCAN"
 Write-Host "FilesScanned=$($files.Count)"
 Write-Host "SignalsFound=$($matches.Count)"
+Write-Host "DisabledEvidence=$($disabledMatches.Count)"
 Write-Host "ForbiddenActivationClaims=$($forbiddenMatches.Count)"
 
 $matches | Sort-Object Signal, File | Format-Table -AutoSize
+$disabledMatches | Sort-Object Evidence, File | Format-Table -AutoSize
 $forbiddenMatches | Sort-Object Claim, File | Format-Table -AutoSize
 
 if ($matches.Count -eq 0) {
@@ -61,5 +78,9 @@ if ($forbiddenMatches.Count -ne 0) {
     throw 'DX11 native draw activation claim detected without runtime evidence gate.'
 }
 
-Write-Host 'RESULT=PASS_STATIC_EVIDENCE_PRESENT'
+if ($disabledMatches.Count -eq 0) {
+    throw 'No dormant DX11 activation preservation evidence found.'
+}
+
+Write-Host 'RESULT=PASS_STATIC_EVIDENCE_PRESENT_DORMANT_GATE_PRESERVED'
 Write-Host 'RUNTIME_VALIDATION=UNTESTED'
