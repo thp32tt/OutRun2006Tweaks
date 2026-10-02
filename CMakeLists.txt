@@ -600,6 +600,8 @@ set(outrun2006tweaks_SOURCES
 	"src/vr/d3d11/resource_translation.hpp"
 	"src/vr/d3d11/surface_mirror.cpp"
 	"src/vr/d3d11/surface_mirror.hpp"
+	"src/vr/d3d11/triangle_fan_index_buffer.cpp"
+	"src/vr/d3d11/triangle_fan_index_buffer.hpp"
 	"src/vr/d3d11/runtime_census.cpp"
 	"src/vr/d3d11/runtime_census.hpp"
 	"src/vr/d3d11/startup_census.cpp"
@@ -1020,6 +1022,36 @@ target_link_libraries(dx11_surface_mirror_probe PUBLIC
     d3d11.lib
 )
 
+
+# Target: dx11_triangle_fan_index_buffer_probe
+set(dx11_triangle_fan_index_buffer_probe_SOURCES
+    "tools/dx11_triangle_fan_index_buffer_probe.cpp"
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_triangle_fan_index_buffer_probe)
+
+target_sources(dx11_triangle_fan_index_buffer_probe PRIVATE ${dx11_triangle_fan_index_buffer_probe_SOURCES})
+
+target_compile_features(dx11_triangle_fan_index_buffer_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_triangle_fan_index_buffer_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_triangle_fan_index_buffer_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_triangle_fan_index_buffer_probe PUBLIC
+    d3d11.lib
+)
 
 # Target: dx11_fixed_function_pipeline_probe
 set(dx11_fixed_function_pipeline_probe_SOURCES
