@@ -54,6 +54,17 @@ def validate_expected_frontier(window: dict) -> list[str]:
     return errors
 
 
+def validate_cli_range(start: int, end: int) -> list[str]:
+    errors = []
+    if start < 0:
+        errors.append("negative_window_start")
+    if end < 0:
+        errors.append("negative_window_end")
+    if end < start:
+        errors.append("window_end_before_start")
+    return errors
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("binary", type=Path)
@@ -77,6 +88,7 @@ def main() -> int:
     }
 
     errors = validate_runtime_claim(result)
+    errors.extend(validate_cli_range(args.offset, end))
     errors.extend(validate_expected_frontier(window))
     if not window["window_within_binary"]:
         errors.append("window_outside_binary")
