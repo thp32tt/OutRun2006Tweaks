@@ -1000,6 +1000,31 @@ async def queue_handle_native_response(
         if handled:
             return True
 
+    # C QA is also a latched pipeline. A prose-only turn must continue the
+    # current immutable QA batch instead of falling into generic GitHub recovery.
+    if CONTROLLER_MODE == "localization" and str(active.get("lane") or "") == "LOCALIZATION_C":
+        turn_key = str(active.get("sent_at") or active.get("dispatch_started_at") or "")
+        if active.get("c_premature_stop_counted_for_send_at") != turn_key:
+            active["c_premature_stop_count"] = int(active.get("c_premature_stop_count", 0) or 0) + 1
+            active["c_premature_stop_total"] = int(active.get("c_premature_stop_total", 0) or 0) + 1
+            active["c_premature_stop_counted_for_send_at"] = turn_key
+        strikes = int(active.get("c_premature_stop_count", 0) or 0)
+        active["native_last_response_hash"] = h
+        active["assistant_claim_verification"] = "C_UNVERIFIED_NO_TASK_COMMIT"
+        if strikes >= PRODUCER_PREMATURE_STOP_ROLLOVER_THRESHOLD:
+            reason = (
+                f"C_PREMATURE_STOP:{strikes} turns ended without a full-batch durable result; "
+                "continue the same C TASK_ID in a fresh chat."
+            )
+            if await queue_rollover_chat(context, pages, active, reason):
+                active["c_premature_stop_count"] = 0
+                return True
+        handled = await queue_send_c_execution_continuation(
+            context, pages, active, "PLAN_OR_STATUS_ONLY_RESPONSE"
+        )
+        if handled:
+            return True
+
     # Conversion workers use the same task-liveness rule. Review/status text is
     # not a terminal result when the requested durable TASK commit does not exist.
     if CONTROLLER_MODE == "conversion":
