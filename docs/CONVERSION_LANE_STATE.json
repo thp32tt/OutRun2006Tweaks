@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "9f6b7dfd8d19e69b9f659e9f03acda8845330ecc",
+  "state_parent_head": "4facce44282285976b3224a69ce752fac8a7b0a4",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -5068,6 +5068,72 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authenticated canonical frontier. Continue exact-decode work from validated continuation_69 raw bytes at 0x0018336B..0x001833AB while keeping the forward-target debt-transition verifier invariant active."
+    },
+    {
+      "unit_id": "DXVK_FORWARD_TARGET_LINEAGE_STATIC_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "431d16a26a328a5d00a1d1870bb0ce5e65328273",
+      "validation_bearing_result_sha": "431d16a26a328a5d00a1d1870bb0ce5e65328273",
+      "commit_message": "test: bind DXVK forward-target lineage [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "The DXVK disassembly contract now resolves the predecessor proof's emitted unresolved_forward_targets (direct literal or single local assignment) and requires exact value identity with the successor raw provenance predecessor_exact target list, closing a static fail-open where both sides could be individually well-formed but mutually stale.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch authority, AGENTS.md, branch-local state/run record, current work queue/plan, regression/problem history and Issue #14 while same-JOB canonical disassembly commits advanced concurrently."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Repeated HEAD refreshes showed the canonical frontier advancing through F68/F69/F70 under another same-JOB writer, so duplicate frontier work was avoided. Review of tools/verify_vr_backend_disasm_contract.py found inherited forward-target shape checks did not compare the successor raw literal to the predecessor proof's emitted lineage value."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 431d16a26a328a5d00a1d1870bb0ce5e65328273 adds fail-closed value binding for predecessor unresolved-forward-target lineage, including proof-local variable resolution and unique integer-sequence validation."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36992939272 job 110793106902 completed SUCCESS. Backend Conversion Gate run 36992939323 job 110793106673 passed Verify backend disassembly contract and all preceding static contract steps through application-space recenter; Configure Win32 was still running and is not required for this verifier-only unit."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit 431d16a26a328a5d00a1d1870bb0ce5e65328273 contains the required [AUTO:CONV-DXVK-000002] marker. Issue #14 comment 5949823179 records the direct-chat production change and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier hardening only; no runtime DXVK payload, selector/deployment content, binary, or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit without replacing or rewinding the newer concurrently advancing canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "431d16a26a328a5d00a1d1870bb0ce5e65328273",
+        "dxvk_canonical_evidence_run_id": 36992939272,
+        "dxvk_canonical_evidence_job_id": 110793106902,
+        "dxvk_canonical_evidence_conclusion": "success",
+        "static_disassembly_contract": "SUCCESS",
+        "canonical_exe_identity": "SUCCESS",
+        "canonical_exe_analysis": "SUCCESS",
+        "evidence_artifact_id": 11220825579,
+        "evidence_artifact_digest": "sha256:39c3f6e0402b8bfe900998bba8ef96ce6d2192b2e592736749d6c6fd409078e1",
+        "backend_conversion_gate_run_id": 36992939323,
+        "backend_conversion_gate_job_id": 110793106673,
+        "backend_disassembly_contract_step": "SUCCESS",
+        "full_backend_gate_conclusion": "NOT_CLAIMED_IN_PROGRESS_AT_C6",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5949823179,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authenticated DXVK canonical frontier and continue the next non-duplicated raw/proof/static unit from current HEAD; every inherited unresolved-forward-target handoff must remain value-identical to the predecessor proof lineage."
     }
   ]
 }
