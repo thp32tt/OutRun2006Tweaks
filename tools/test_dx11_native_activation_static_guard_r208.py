@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Static guard for DX11 native conversion activation boundaries.
 
-This check intentionally does not enable the native draw path.  It verifies that
+This check intentionally does not enable the native draw path. It verifies that
 source policy markers continue to require an explicit evidence gate before any
 activation change.
 """
@@ -13,12 +13,14 @@ REQUIRED = (
     "NativeDrawPathActive",
     "UNTESTED",
     "runtime_validation",
+    "native_draw_path_activation_changed",
 )
 
 FORBIDDEN_ACTIVATION_MARKERS = (
     "force_native_draw_path=true",
     "AUTO_ENABLE_NATIVE_DRAW_PATH",
     "enable_native_draw_path=true",
+    "NativeDrawPathActive=true",
 )
 
 SCAN_ROOTS = (
@@ -58,6 +60,10 @@ def main() -> int:
 
     if '"runtime_validation": "PASS"' in text:
         print("unexpected runtime validation promotion")
+        return 1
+
+    if '"native_draw_path_activation_changed": true' in text:
+        print("unexpected native activation change")
         return 1
 
     print("DX11 native activation static guard r208 PASS")
