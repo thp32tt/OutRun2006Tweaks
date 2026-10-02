@@ -68,8 +68,9 @@ private:
     std::uint64_t upload_generation_ = 0;
 };
 
-// R98 dormant owner for one translated fixed-function sampler state. It
-// creates a D3D11 sampler object but never binds it to a game context.
+// R98 dormant owner for one translated fixed-function sampler state.
+// The CONV-DX11 texture-stage binding primitive may bind this immutable object
+// only to an explicitly supplied same-device context; no game Draw* path calls it.
 class NativeFixedFunctionSamplerState final {
 public:
     NativeFixedFunctionSamplerState() = default;
@@ -101,8 +102,9 @@ private:
 
 // R99 dormant owner for a translated D3D11 Texture2D mirror and its SRV.
 // R101 adds a bounded full-subresource WRITE_DISCARD upload for exact
-// DEFAULT+DYNAMIC source semantics. The object still never binds its SRV to a
-// game context and has no production caller.
+// DEFAULT+DYNAMIC source semantics. The CONV-DX11 texture-stage binding
+// primitive may bind the SRV only with a same-device R98 sampler; no production
+// caller or native game Draw* routing is introduced here.
 class NativeFixedFunctionTextureView final {
 public:
     NativeFixedFunctionTextureView() = default;
@@ -154,6 +156,16 @@ private:
     bool source_metadata_valid_ = false;
     std::uint64_t upload_generation_ = 0;
 };
+
+// Dormant fixed-function texture-stage binding primitive. Both immutable
+// owners and the supplied context must belong to the same D3D11 device, and
+// the slot must be legal for both PS sampler and SRV namespaces. This helper
+// never dispatches a D3D11 Draw* call and has no production caller.
+[[nodiscard]] bool bind_fixed_function_texture_stage_for_observation(
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture) noexcept;
 
 // R119 seals one R113 MANAGED vertex/index buffer mirror into a fail-closed
 // readiness snapshot. The token binds CPU-shadow version, device generation,
