@@ -1676,8 +1676,9 @@ def queue_dynamic_prefix() -> str:
     if CONTROLLER_MODE == "conversion":
         lines += [
             f"VR_PIPELINE_SCHEMA={CONVERSION_PIPELINE_SCHEMA_VERSION}; REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(or reasoned NOT_REQUIRED)→C6_STATE.",
-            "RELEASE=full pipeline only; review/plan/state/checkpoint is nonterminal. C2 needs source/tool/test/workflow/disassembly work; runtime absence only keeps runtime=UNTESTED.",
-            "RUN_RECORD=docs/automation/runs/<TASK_ID>.json with pipeline_schema_version, pipeline C0-C6, changed_paths/work_product, validation, state_persisted=true, next_action, runtime_validation.",
+            "CONTINUOUS_PIPELINE=ON: full C0-C6 + Gate PASS is a development checkpoint, not TASK release, while docs/CONVERSION_LANE_STATE.json does not declare static_pipeline_complete=true or development_complete=true.",
+            "RELEASE=static/development completion declaration only; review/plan/state/checkpoint and a single successful cycle are nonterminal. C2 needs source/tool/test/workflow/disassembly work; runtime absence only keeps runtime=UNTESTED.",
+            "RUN_RECORD=docs/automation/runs/<TASK_ID>.json with pipeline_schema_version, pipeline C0-C6, changed_paths/work_product, validation, state_persisted=true, next_action, runtime_validation. Reuse the same TASK_ID for the next full cycle.",
             conversion_lane_work_hint(branch),
         ]
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B", "LOCALIZATION_E"}:
