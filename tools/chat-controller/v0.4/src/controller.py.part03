@@ -2358,6 +2358,18 @@ async def localization_process_lane(
                             )
                         return
 
+            if CONTROLLER_MODE == "conversion" and active.get("conversion_pipeline_continuation_pending"):
+                reasons = list(active.get("conversion_pipeline_reject_reasons") or ["PIPELINE_INCOMPLETE"])
+                result_sha = str(active.get("conversion_pipeline_rejected_sha") or active.get("last_checkpoint_head") or "")
+                sent = await queue_send_conversion_pipeline_continuation(
+                    context, pages, active, reasons, result_sha
+                )
+                if sent:
+                    active["conversion_pipeline_continuation_pending"] = False
+                save_queue_state(q)
+                if sent:
+                    return
+
             if CONTROLLER_MODE == "localization" and lane_key in {"A", "B", "D"} and active.get("pipeline_continuation_pending"):
                 sent = await queue_send_producer_pipeline_continuation(context, pages, active)
                 save_queue_state(q)
