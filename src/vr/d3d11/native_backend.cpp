@@ -3041,6 +3041,52 @@ bool validate_fixed_function_bound_draw_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+
+NativeFixedFunctionBoundDrawReadiness
+compose_fixed_function_same_context_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures) noexcept {
+    if (!context || !validate_fixed_function_draw_readiness_integrity(draw))
+        return {};
+
+    // All three live observations are derived here from the same context.
+    // Callers cannot splice a textured/pipeline snapshot captured elsewhere.
+    const auto texturedDraw =
+        compose_fixed_function_multistage_textured_draw_readiness(
+            draw, context, samplers, textures);
+    const auto pipelineBinding = pipelineBundle.binding_readiness(
+        context, layout, vertexPrototype, pixelPrototype,
+        draw.pipelineSnapshotToken);
+    return compose_fixed_function_bound_draw_readiness(
+        draw, texturedDraw, pipelineBinding, context, outputStateBinding);
+}
+
+bool validate_fixed_function_same_context_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = compose_fixed_function_same_context_bound_draw_readiness(
+        draw, context, outputStateBinding, pipelineBundle,
+        layout, vertexPrototype, pixelPrototype, samplers, textures);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 void NativeFixedFunctionPipelineBundle::shutdown() noexcept {
     transform_buffer_.shutdown();
     input_layout_.Reset();
