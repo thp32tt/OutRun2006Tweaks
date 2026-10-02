@@ -4798,8 +4798,11 @@ int main()
                 liveFanOwner, 3u, 7u, completeFanBoundDraw.snapshotToken),
         "R142 complete fan bound draw restores deterministic live IA snapshot");
 
+    // R156 capacity fixture is intentionally bounded by the 256-byte managed
+    // VB at stride 24. The positive BaseVertexLocation (-3) must fit while the
+    // negative probe (+1) must cross the same byte-capacity boundary.
     const std::array<std::uint16_t, 5> liveIndexedFanSource{
-        99u, 4u, 8u, 15u, 16u};
+        99u, 4u, 6u, 8u, 9u};
     NativeManagedBufferShadow liveIndexedFanSourceBuffer;
     require(
         liveIndexedFanSourceBuffer.initialize(
@@ -4845,7 +4848,7 @@ int main()
         "R155 indexed fan source content matches exact managed IB shadow");
 
     const std::array<std::uint16_t, 5> forgedIndexedFanSource{
-        99u, 4u, 8u, 15u, 17u};
+        99u, 4u, 6u, 8u, 10u};
     NativeTriangleFanIndexBuffer forgedIndexedFanOwner;
     require(
         forgedIndexedFanOwner.initialize_indexed(
@@ -4899,6 +4902,22 @@ int main()
         "R144 bind indexed generated fan IA prerequisite");
 
     constexpr INT indexedFanBaseVertexLocation = -3;
+    constexpr UINT indexedFanObservedMaxIndex = 9u;
+    const std::int64_t indexedFanPositiveEffectiveMax =
+        static_cast<std::int64_t>(indexedFanBaseVertexLocation) +
+        static_cast<std::int64_t>(indexedFanObservedMaxIndex);
+    const std::int64_t indexedFanOverrunEffectiveMax =
+        1ll + static_cast<std::int64_t>(indexedFanObservedMaxIndex);
+    require(
+        indexedFanPositiveEffectiveMax >= 0 &&
+        (static_cast<std::uint64_t>(indexedFanPositiveEffectiveMax) + 1ull) *
+                static_cast<std::uint64_t>(geometryVertexStride) <=
+            static_cast<std::uint64_t>(managedVertexBuffer.byte_width()) &&
+        indexedFanOverrunEffectiveMax >= 0 &&
+        (static_cast<std::uint64_t>(indexedFanOverrunEffectiveMax) + 1ull) *
+                static_cast<std::uint64_t>(geometryVertexStride) >
+            static_cast<std::uint64_t>(managedVertexBuffer.byte_width()),
+        "R156 indexed fan capacity fixture straddles managed VB boundary");
     const auto completeIndexedFanBoundDraw =
         outrun::vr::dx11::
             compose_fixed_function_complete_indexed_triangle_fan_bound_draw_readiness(
@@ -5136,7 +5155,7 @@ int main()
         indexedFanDispatch.sourceContentSnapshotToken ==
             liveIndexedFanSourceContent.snapshotToken &&
         indexedFanDispatch.sourceObservedMinIndex == 4u &&
-        indexedFanDispatch.sourceObservedMaxIndex == 16u &&
+        indexedFanDispatch.sourceObservedMaxIndex == indexedFanObservedMaxIndex &&
         indexedFanDispatch.sourceValueSnapshotToken != 0 &&
         indexedFanDispatch.snapshotToken != 0 &&
         outrun::vr::dx11::
@@ -5171,7 +5190,7 @@ int main()
         indexedFanVertexOverrun.generatedIndexReady &&
         indexedFanVertexOverrun.generatedIndexMatchesDispatch &&
         indexedFanVertexOverrun.sourceObservedMinIndex == 4u &&
-        indexedFanVertexOverrun.sourceObservedMaxIndex == 16u &&
+        indexedFanVertexOverrun.sourceObservedMaxIndex == indexedFanObservedMaxIndex &&
         indexedFanVertexOverrun.sourceValueSnapshotToken != 0 &&
         !indexedFanVertexOverrun.vertexBufferRangeExact &&
         !indexedFanVertexOverrun.dispatchArgumentsExact &&
