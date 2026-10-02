@@ -235,34 +235,12 @@ function Invoke-AnalyzerCase {
        [bool]$summary.DxvkGameplayCadenceDegraded -ne [bool]$ExpectedGameplayCadenceDegraded){
         throw "${Name}: DxvkGameplayCadenceDegraded=$($summary.DxvkGameplayCadenceDegraded), expected $ExpectedGameplayCadenceDegraded"
     }
-    if($null -ne $ExpectedGameplayFreshProjectionCount -and
-       [int64]$summary.PresentationCadence.Gameplay.FreshProjectionCount -ne [int64]$ExpectedGameplayFreshProjectionCount){
-        throw "${Name}: Gameplay FreshProjectionCount=$($summary.PresentationCadence.Gameplay.FreshProjectionCount), expected $ExpectedGameplayFreshProjectionCount"
-    }
-    if($null -ne $ExpectedGameplayCachedProjectionCount -and
-       [int64]$summary.PresentationCadence.Gameplay.CachedProjectionCount -ne [int64]$ExpectedGameplayCachedProjectionCount){
-        throw "${Name}: Gameplay CachedProjectionCount=$($summary.PresentationCadence.Gameplay.CachedProjectionCount), expected $ExpectedGameplayCachedProjectionCount"
-    }
-    if($null -ne $ExpectedGameplayFreshProjectionFraction){
-        if($null -eq $summary.PresentationCadence.Gameplay.FreshProjectionFraction -or
-           [math]::Abs([double]$summary.PresentationCadence.Gameplay.FreshProjectionFraction-[double]$ExpectedGameplayFreshProjectionFraction) -gt 0.0001){
-            throw "${Name}: Gameplay FreshProjectionFraction=$($summary.PresentationCadence.Gameplay.FreshProjectionFraction), expected $ExpectedGameplayFreshProjectionFraction"
-        }
-    }
-    if($null -ne $ExpectedGameplayDirectSubmitCount -and
-       [int64]$summary.PresentationCadence.Gameplay.DirectSubmitCount -ne [int64]$ExpectedGameplayDirectSubmitCount){
-        throw "${Name}: Gameplay DirectSubmitCount=$($summary.PresentationCadence.Gameplay.DirectSubmitCount), expected $ExpectedGameplayDirectSubmitCount"
-    }
-    if($null -ne $ExpectedGameplayCachedProjectionSubmitCount -and
-       [int64]$summary.PresentationCadence.Gameplay.CachedProjectionSubmitCount -ne [int64]$ExpectedGameplayCachedProjectionSubmitCount){
-        throw "${Name}: Gameplay CachedProjectionSubmitCount=$($summary.PresentationCadence.Gameplay.CachedProjectionSubmitCount), expected $ExpectedGameplayCachedProjectionSubmitCount"
-    }
-    if($null -ne $ExpectedGameplayDirectSubmitFraction){
-        if($null -eq $summary.PresentationCadence.Gameplay.DirectSubmitFraction -or
-           [math]::Abs([double]$summary.PresentationCadence.Gameplay.DirectSubmitFraction-[double]$ExpectedGameplayDirectSubmitFraction) -gt 0.0001){
-            throw "${Name}: Gameplay DirectSubmitFraction=$($summary.PresentationCadence.Gameplay.DirectSubmitFraction), expected $ExpectedGameplayDirectSubmitFraction"
-        }
-    }
+    if($null -ne $ExpectedGameplayFreshProjectionCount -and [int64]$summary.PresentationCadence.Gameplay.FreshProjectionCount -ne [int64]$ExpectedGameplayFreshProjectionCount){throw "${Name}: Gameplay FreshProjectionCount mismatch"}
+    if($null -ne $ExpectedGameplayCachedProjectionCount -and [int64]$summary.PresentationCadence.Gameplay.CachedProjectionCount -ne [int64]$ExpectedGameplayCachedProjectionCount){throw "${Name}: Gameplay CachedProjectionCount mismatch"}
+    if($null -ne $ExpectedGameplayFreshProjectionFraction -and ($null -eq $summary.PresentationCadence.Gameplay.FreshProjectionFraction -or [math]::Abs([double]$summary.PresentationCadence.Gameplay.FreshProjectionFraction-[double]$ExpectedGameplayFreshProjectionFraction) -gt 0.0001)){throw "${Name}: Gameplay FreshProjectionFraction mismatch"}
+    if($null -ne $ExpectedGameplayDirectSubmitCount -and [int64]$summary.PresentationCadence.Gameplay.DirectSubmitCount -ne [int64]$ExpectedGameplayDirectSubmitCount){throw "${Name}: Gameplay DirectSubmitCount mismatch"}
+    if($null -ne $ExpectedGameplayCachedProjectionSubmitCount -and [int64]$summary.PresentationCadence.Gameplay.CachedProjectionSubmitCount -ne [int64]$ExpectedGameplayCachedProjectionSubmitCount){throw "${Name}: Gameplay CachedProjectionSubmitCount mismatch"}
+    if($null -ne $ExpectedGameplayDirectSubmitFraction -and ($null -eq $summary.PresentationCadence.Gameplay.DirectSubmitFraction -or [math]::Abs([double]$summary.PresentationCadence.Gameplay.DirectSubmitFraction-[double]$ExpectedGameplayDirectSubmitFraction) -gt 0.0001)){throw "${Name}: Gameplay DirectSubmitFraction mismatch"}
     $actualDirectBlockers=@($summary.DxvkDirectEvidenceBlockers)
     foreach($blocker in $ExpectedDirectEvidenceBlockers){
         if($actualDirectBlockers -notcontains $blocker){
