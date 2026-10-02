@@ -293,6 +293,20 @@ def main() -> None:
             "view-to-texture COM identity verifier",
         "if (!descriptor_exact(device))":
             "post-create descriptor validation fail-closed gate",
+        "mirror_serial() const noexcept":
+            "monotonic concrete mirror recreation identity",
+        "struct NativeSurfacePairReadiness":
+            "R119 color/depth pair readiness identity",
+        "compose_surface_pair_readiness":
+            "R119 fail-closed pair composition API",
+        "validate_surface_pair_snapshot":
+            "R119 stale pair snapshot validator",
+        "out.dimensionsMatch =":
+            "R119 render-target dimension compatibility gate",
+        "out.generationsCurrent =":
+            "R119 per-mirror Reset generation gate",
+        "out.componentSerialsPresent =":
+            "R119 concrete recreation serial gate",
     }
     missing_surface_mirror_contract = [
         meaning
@@ -320,6 +334,14 @@ def main() -> None:
         "D3DMULTISAMPLE_2_SAMPLES": "MSAA fail-closed negative smoke",
         "color.shutdown();": "explicit surface ownership shutdown smoke",
         "descriptor_exact(nullptr)": "null-device descriptor rejection smoke",
+        "surface pair readiness did not compose exact mirrors":
+            "R119 positive render-target pair proof",
+        "stale surface pair snapshot survived depth Reset":
+            "R119 stale snapshot rejection proof",
+        "surface pair snapshot did not refresh after recreation":
+            "R119 recreation identity refresh proof",
+        "surface pair accepted mismatched dimensions":
+            "R119 dimension mismatch rejection proof",
     }
     missing_surface_mirror_contract += [
         meaning
