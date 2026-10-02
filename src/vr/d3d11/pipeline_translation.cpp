@@ -1496,6 +1496,13 @@ namespace outrun::vr::dx11
         if (source.shadeMode != D3DSHADE_GOURAUD)
             out.unsupported |= PipelineUnsupportedShadeMode;
 
+        // R163: exact native fixed-function translation currently assumes one
+        // world matrix and no packed matrix-index stream. Keep every D3D9
+        // geometry-blend mode fail-closed until that VS path is implemented.
+        if (source.vertexBlend != D3DVBF_DISABLE ||
+            source.indexedVertexBlendEnable != FALSE)
+            out.unsupported |= PipelineUnsupportedVertexBlend;
+
         if (source.alphaTestEnable != FALSE)
             out.unsupported |= PipelineUnsupportedAlphaTest;
         if (source.fogEnable != FALSE)

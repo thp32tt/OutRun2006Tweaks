@@ -253,7 +253,49 @@ int main()
             "DX11 fixed-function handoff must retain depth-bias blocker");
     }
 
+    {
+        auto noVertexBlend = base_state();
+        const auto defaultPipeline = translate_pipeline(noVertexBlend);
+        require(
+            defaultPipeline.exact() &&
+            (defaultPipeline.unsupported &
+             PipelineUnsupportedVertexBlend) == 0,
+            "R163 disabled vertex blending must remain exact");
+
+        auto weightedVertexBlend = noVertexBlend;
+        weightedVertexBlend.vertexBlend = D3DVBF_1WEIGHTS;
+        const auto weightedPipeline =
+            translate_pipeline(weightedVertexBlend);
+        require(
+            !weightedPipeline.exact() &&
+            (weightedPipeline.unsupported &
+             PipelineUnsupportedVertexBlend) != 0,
+            "R163 weighted vertex blending must fail closed");
+
+        auto indexedVertexBlend = noVertexBlend;
+        indexedVertexBlend.vertexBlend = D3DVBF_1WEIGHTS;
+        indexedVertexBlend.indexedVertexBlendEnable = TRUE;
+        const auto indexedPipeline =
+            translate_pipeline(indexedVertexBlend);
+        require(
+            !indexedPipeline.exact() &&
+            (indexedPipeline.unsupported &
+             PipelineUnsupportedVertexBlend) != 0,
+            "R163 indexed vertex blending must fail closed");
+
+        const auto fixedIndexed =
+            translate_fixed_function_pipeline_with_shader_semantics(
+                indexedVertexBlend, true, stages, true,
+                0x00, 0x00, textureTypes);
+        require(
+            !fixedIndexed.exact() &&
+            (fixedIndexed.renderStates.unsupported &
+             PipelineUnsupportedVertexBlend) != 0,
+            "R163 fixed-function handoff must retain vertex-blend blocker");
+    }
+
     std::cout
+        << "DX11 fixed-function vertex-blend fail-closed R163: PASS\n"
         << "DX11 fixed-function clipping fail-closed R161: PASS\n"
         << "DX11 fixed-function alpha-test pipeline handoff R118: PASS\n"
         << "DX11 fixed-function shade-mode fail-closed R162: PASS\n";

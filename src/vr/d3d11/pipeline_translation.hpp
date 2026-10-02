@@ -42,6 +42,10 @@ namespace outrun::vr::dx11
         // Until an exact cross-API mapping is proven, any non-zero constant
         // or slope-scale bias must block dormant native readiness.
         PipelineUnsupportedDepthBias = 1u << 15,
+        // R163: D3D9 fixed-function matrix blending requires multiple world
+        // transforms and optional packed matrix indices that the dormant
+        // native vertex shader does not model.
+        PipelineUnsupportedVertexBlend = 1u << 16,
     };
 
     struct PipelineTranslation

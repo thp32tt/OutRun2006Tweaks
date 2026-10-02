@@ -27,6 +27,11 @@ namespace OutRunVR::DrawState
         // Gouraud shading. Native DX11 readiness may treat only this mode as
         // exact until flat/provoking-vertex semantics are explicitly modeled.
         DWORD shadeMode = D3DSHADE_GOURAUD;
+        // R163: the dormant native fixed-function VS currently consumes a
+        // single world transform. Preserve D3D9 matrix-blend provenance so
+        // weighted/indexed geometry cannot alias the single-matrix path.
+        DWORD vertexBlend = D3DVBF_DISABLE;
+        DWORD indexedVertexBlendEnable = FALSE;
         DWORD cullMode = D3DCULL_CCW;
         DWORD fillMode = D3DFILL_SOLID;
         // Preserve raw D3D9 float-bit provenance for raster depth bias.

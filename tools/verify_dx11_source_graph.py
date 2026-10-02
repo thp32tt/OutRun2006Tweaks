@@ -140,6 +140,67 @@ def main() -> None:
             + ", ".join(missing_r162_shade_mode)
         )
 
+    r163_vertex_blend_contract = [
+        ("DWORD vertexBlend = D3DVBF_DISABLE;", D3D9_DRAW_STATE_HPP,
+         "R163 tracked vertex-blend mode and disabled default"),
+        ("DWORD indexedVertexBlendEnable = FALSE;", D3D9_DRAW_STATE_HPP,
+         "R163 tracked indexed vertex-blend default"),
+        ("read(D3DRS_VERTEXBLEND, out.vertexBlend);",
+         D3D9_RENDER_STATE_CAPTURE, "R163 live vertex-blend capture"),
+        ("read(D3DRS_INDEXEDVERTEXBLENDENABLE, out.indexedVertexBlendEnable);",
+         D3D9_RENDER_STATE_CAPTURE, "R163 live indexed-blend capture"),
+        ("PipelineUnsupportedVertexBlend = 1u << 16",
+         PIPELINE_TRANSLATION_HPP, "R163 dedicated vertex-blend blocker"),
+        ("source.vertexBlend != D3DVBF_DISABLE ||", PIPELINE_TRANSLATION_CPP,
+         "R163 non-default vertex-blend predicate"),
+        ("source.indexedVertexBlendEnable != FALSE", PIPELINE_TRANSLATION_CPP,
+         "R163 indexed vertex-blend predicate"),
+        ("out.unsupported |= PipelineUnsupportedVertexBlend;",
+         PIPELINE_TRANSLATION_CPP, "R163 pipeline readiness blocker"),
+        ("R163 disabled vertex blending must remain exact",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R163 default positive fixture"),
+        ("R163 weighted vertex blending must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R163 weighted-blend negative fixture"),
+        ("R163 indexed vertex blending must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R163 indexed-blend negative fixture"),
+        ("R163 fixed-function handoff must retain vertex-blend blocker",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R163 ownership handoff fixture"),
+        ("DX11 fixed-function vertex-blend fail-closed R163: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R163 hosted probe completion marker"),
+        ("bool vertexBlendObservationComplete{};", RUNTIME_CENSUS,
+         "R163 census vertex-blend observation identity"),
+        ("DWORD vertexBlend = D3DVBF_DISABLE;", RUNTIME_CENSUS,
+         "R163 census vertex-blend mode identity"),
+        ("DWORD indexedVertexBlendEnable = FALSE;", RUNTIME_CENSUS,
+         "R163 census indexed-blend identity"),
+        ("hash, sig.vertexBlendObservationComplete ? 1u : 0u",
+         RUNTIME_CENSUS, "R163 census observation hash"),
+        ("hash = hash_mix(hash, sig.vertexBlend);", RUNTIME_CENSUS,
+         "R163 census vertex-blend hash"),
+        ("hash = hash_mix(hash, sig.indexedVertexBlendEnable);",
+         RUNTIME_CENSUS, "R163 census indexed-blend hash"),
+        ("signature.vertexBlend = source.vertexBlend;", RUNTIME_CENSUS,
+         "R163 captured vertex-blend propagation"),
+        ("signature.indexedVertexBlendEnable = source.indexedVertexBlendEnable;",
+         RUNTIME_CENSUS, "R163 captured indexed-blend propagation"),
+    ]
+    missing_r163_vertex_blend = [
+        meaning
+        for token, source, meaning in r163_vertex_blend_contract
+        if token not in source
+    ]
+    if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_VERTEXBLEND") < 2:
+        missing_r163_vertex_blend.append(
+            "R163 VERTEXBLEND must be both primed and captured")
+    if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_INDEXEDVERTEXBLENDENABLE") < 2:
+        missing_r163_vertex_blend.append(
+            "R163 INDEXEDVERTEXBLENDENABLE must be both primed and captured")
+    if missing_r163_vertex_blend:
+        raise SystemExit(
+            "DX11 R163 vertex-blend contract drift: "
+            + ", ".join(missing_r163_vertex_blend)
+        )
+
     r161_clipping_contract = [
         ("DWORD clipping = TRUE;", D3D9_DRAW_STATE_HPP,
          "R161 tracked D3D9 clipping field and default"),

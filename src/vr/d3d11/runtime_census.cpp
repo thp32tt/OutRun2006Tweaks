@@ -229,6 +229,11 @@ namespace outrun::vr::dx11
             // identity so non-Gouraud state cannot alias an exact signature.
             bool shadeModeObservationComplete{};
             DWORD shadeMode = D3DSHADE_GOURAUD;
+            // R163 seals matrix-blend provenance into draw identity so an
+            // unsupported weighted/indexed draw cannot alias the default.
+            bool vertexBlendObservationComplete{};
+            DWORD vertexBlend = D3DVBF_DISABLE;
+            DWORD indexedVertexBlendEnable = FALSE;
             bool alphaTestObservationComplete{};
             DWORD alphaTestEnable = FALSE;
             DWORD alphaTestRef{};
@@ -402,6 +407,10 @@ namespace outrun::vr::dx11
             hash = hash_mix(
                 hash, sig.shadeModeObservationComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.shadeMode);
+            hash = hash_mix(
+                hash, sig.vertexBlendObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.vertexBlend);
+            hash = hash_mix(hash, sig.indexedVertexBlendEnable);
             hash = hash_mix(
                 hash, sig.fixedFunctionTranslationReady ? 1u : 0u);
             hash = hash_mix(
@@ -1992,6 +2001,10 @@ namespace outrun::vr::dx11
         signature.shadeModeObservationComplete =
             captured && source.complete;
         signature.shadeMode = source.shadeMode;
+        signature.vertexBlendObservationComplete =
+            captured && source.complete;
+        signature.vertexBlend = source.vertexBlend;
+        signature.indexedVertexBlendEnable = source.indexedVertexBlendEnable;
         signature.alphaTestObservationComplete =
             captured && source.complete;
         signature.alphaTestEnable = source.alphaTestEnable;

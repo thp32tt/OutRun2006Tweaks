@@ -922,7 +922,9 @@ namespace OutRunVRStereo
 				D3DRS_SEPARATEALPHABLENDENABLE,
 				D3DRS_SRCBLENDALPHA, D3DRS_DESTBLENDALPHA,
 				D3DRS_BLENDOPALPHA, D3DRS_ALPHATESTENABLE,
-				D3DRS_SHADEMODE, D3DRS_CULLMODE, D3DRS_COLORWRITEENABLE,
+				D3DRS_SHADEMODE, D3DRS_VERTEXBLEND,
+				D3DRS_INDEXEDVERTEXBLENDENABLE,
+				D3DRS_CULLMODE, D3DRS_COLORWRITEENABLE,
 				D3DRS_DEPTHBIAS, D3DRS_SLOPESCALEDEPTHBIAS,
 				D3DRS_CLIPPING, D3DRS_CLIPPLANEENABLE,
 				D3DRS_STENCILENABLE, D3DRS_STENCILMASK,
@@ -1711,6 +1713,10 @@ namespace OutRunVRStereo
 		// R162 captures SHADEMODE as part of the same tracked render-state
 		// snapshot so DX11 readiness cannot silently assume Gouraud shading.
 		read(D3DRS_SHADEMODE, out.shadeMode);
+		// R163 keeps geometry-blend state explicit for the DX11 readiness
+		// gate; the current native VS does not implement matrix palettes.
+		read(D3DRS_VERTEXBLEND, out.vertexBlend);
+		read(D3DRS_INDEXEDVERTEXBLENDENABLE, out.indexedVertexBlendEnable);
 		read(D3DRS_CULLMODE, out.cullMode);
 		read(D3DRS_FILLMODE, out.fillMode);
 		read(D3DRS_DEPTHBIAS, out.depthBiasBits);
