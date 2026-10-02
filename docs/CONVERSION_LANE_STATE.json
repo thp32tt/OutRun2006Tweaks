@@ -788,6 +788,24 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Capture the next bounded canonical 64-byte raw window from exact instruction boundary 0x00182C56 with no overlap. Preserve forward target 0x00182C59 as address/control-flow evidence only until captured and exact-decoded; keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_CONTINUATION_EXACT_CALL_CONTRACT_VERIFIER_FIX",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "ceaed63b0876ccf6bd48efa6d31f0bfc9e4bbde4",
+      "validation_bearing_result_sha": "ceaed63b0876ccf6bd48efa6d31f0bfc9e4bbde4",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Exact expected predecessor/provenance collector call counting replaces generic suffix counting, preserving fail-closed identity without rejecting valid historical prefix-proof structure.",
+      "dxvk_disassembly_evidence_run_id": 36976961600,
+      "dxvk_disassembly_evidence_job_id": 110742757788,
+      "issue14_implementation_comment_id": 5947150461,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER"
     }
   ]
 }
