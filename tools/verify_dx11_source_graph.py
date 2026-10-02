@@ -1668,6 +1668,59 @@ def main() -> None:
             + ", ".join(missing_r139_same_context_final_bound_draw)
         )
 
+    r140_complete_bound_draw_contract = [
+        (
+            "struct NativeFixedFunctionCompleteBoundDrawReadiness",
+            NATIVE_BACKEND_HPP,
+            "R140 complete final bound-draw readiness identity",
+        ),
+        (
+            "compose_fixed_function_complete_bound_draw_readiness(",
+            NATIVE_BACKEND_HPP,
+            "R140 complete final bound-draw composition API",
+        ),
+        (
+            "observe_fixed_function_geometry_binding(\n        context, geometry, vertexBuffer",
+            NATIVE_BACKEND_CPP,
+            "R140 reobserves live IA geometry on the final caller context",
+        ),
+        (
+            "geometryBinding.geometrySnapshotToken == draw.geometrySnapshotToken",
+            NATIVE_BACKEND_CPP,
+            "R140 live IA geometry must match the draw-sealed geometry identity",
+        ),
+        (
+            "token, out.geometryBindingSnapshotToken",
+            NATIVE_BACKEND_CPP,
+            "R140 final token includes the live IA binding snapshot",
+        ),
+        (
+            "R140 complete bound draw includes exact live IA geometry",
+            CONSTANT_BUFFER_PROBE,
+            "R140 positive complete pre-draw proof",
+        ),
+        (
+            "R140 final gate fails closed after live IA topology drift",
+            CONSTANT_BUFFER_PROBE,
+            "R140 live IA drift fail-closed proof",
+        ),
+        (
+            "R140 restored IA geometry reproduces complete bound draw snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R140 deterministic live IA restore proof",
+        ),
+    ]
+    missing_r140_complete_bound_draw = [
+        meaning
+        for token, source, meaning in r140_complete_bound_draw_contract
+        if token not in source
+    ]
+    if missing_r140_complete_bound_draw:
+        raise SystemExit(
+            "DX11 R140 complete bound draw contract drift: "
+            + ", ".join(missing_r140_complete_bound_draw)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
@@ -1692,7 +1745,7 @@ def main() -> None:
             )
     if runtime_textured_draw_users:
         raise SystemExit(
-            "DX11 R132/R133/R134/R136/R137/R138/R139 dormant binding readiness gained a production "
+            "DX11 R132/R133/R134/R136/R137/R138/R139/R140 dormant binding readiness gained a production "
             "caller before activation gate: " + ", ".join(runtime_textured_draw_users)
         )
 
