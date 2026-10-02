@@ -1,49 +1,52 @@
 #!/usr/bin/env python3
-"""Static checks for DX11 conversion lane source boundaries.
+"""
+DX11 conversion lane static guard.
 
-This helper intentionally avoids runtime GPU requirements. It catches common
-conversion hygiene issues before CI/build review: accidental DXVK/localization
-scope leakage and missing DX11 marker references.
+Repository-only validation helper. It does not activate the native draw path and
+never substitutes runtime Quest 3/VDXR validation.
 """
 
-from __future__ import annotations
-
-import argparse
 from pathlib import Path
+import argparse
+import sys
 
 
-FORBIDDEN_SCOPE_PATHS = (
-    "dxvk",
-    "localization",
-    "korean",
+FORBIDDEN_ACTIVATION_MARKERS = (
+    "NativeDrawPathActive = true",
+    "native_draw_path_active = true",
+    "ENABLE_NATIVE_DRAW_PATH=1",
 )
 
 
-def scan(root: Path) -> list[str]:
-    failures: list[str] = []
+def scan(root: Path) -> int:
+    failures = []
+    checked = 0
     for path in root.rglob("*"):
         if not path.is_file():
             continue
-        rel = str(path).replace("\\", "/").lower()
-        if any(token in rel for token in FORBIDDEN_SCOPE_PATHS):
-            failures.append(f"DX11 lane touched out-of-scope path: {rel}")
-    return failures
+        if path.suffix.lower() not in {".cpp", ".h", ".hpp", ".cmake", ".md", ".json", ".yml", ".yaml"}:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        checked += 1
+        for marker in FORBIDDEN_ACTIVATION_MARKERS:
+            if marker in text:
+                failures.append(f"activation marker found: {path}: {marker}")
 
-
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("root", nargs="?", default=".")
-    args = parser.parse_args()
-
-    failures = scan(Path(args.root))
+    print(f"DX11_STATIC_GUARD_FILES_CHECKED={checked}")
     if failures:
-        for item in failures:
-            print(item)
+        for failure in failures:
+            print(failure)
         return 1
 
-    print("DX11_STATIC_SCOPE_GUARD=PASS")
+    print("DX11_STATIC_GUARD_RESULT=PASS_DORMANT_ACTIVATION_SCAN")
+    print("RUNTIME_VALIDATION=UNTESTED")
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    parser = argparse.ArgumentParser()
+    parser.add_argument("root", nargs="?", default=".")
+    sys.exit(scan(Path(parser.parse_args().root)))
