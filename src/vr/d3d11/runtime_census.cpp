@@ -257,6 +257,11 @@ namespace outrun::vr::dx11
             // dithering cannot alias the exact disabled-default signature.
             bool ditherObservationComplete{};
             DWORD ditherEnable = FALSE;
+            // R172: R171 translates D3DRS_MULTISAMPLEANTIALIAS into the
+            // D3D11 rasterizer descriptor. Preserve the observed value in
+            // census identity so per-draw raster variants cannot alias.
+            bool multisampleRasterObservationComplete{};
+            DWORD multiSampleAntialias = TRUE;
             // R169: D3D9 POINTLIST size/sprite/scale state affects raster and
             // texture-coordinate semantics. Preserve the complete family in
             // census identity while native direct points remain fail-closed.
@@ -456,6 +461,9 @@ namespace outrun::vr::dx11
             hash = hash_mix(
                 hash, sig.ditherObservationComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.ditherEnable);
+            hash = hash_mix(
+                hash, sig.multisampleRasterObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.multiSampleAntialias);
             hash = hash_mix(
                 hash, sig.pointRasterObservationComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.pointSizeBits);
@@ -1416,6 +1424,11 @@ namespace outrun::vr::dx11
                     sig.ditherObservationComplete ? 1 : 0,
                     sig.ditherEnable != FALSE ? 1 : 0);
                 spdlog::info(
+                    "VR DX11 R172 multisample-raster state#{}: observed={} enable={}",
+                    unique,
+                    sig.multisampleRasterObservationComplete ? 1 : 0,
+                    sig.multiSampleAntialias != FALSE ? 1 : 0);
+                spdlog::info(
                     "VR DX11 R170 texture-coordinate wrap state#{}: observed={} wrap=[{},{},{},{},{},{},{},{}]",
                     unique,
                     sig.textureCoordinateWrapObservationComplete ? 1 : 0,
@@ -2107,6 +2120,9 @@ namespace outrun::vr::dx11
         signature.ditherObservationComplete =
             captured && source.complete;
         signature.ditherEnable = source.ditherEnable;
+        signature.multisampleRasterObservationComplete =
+            captured && source.complete;
+        signature.multiSampleAntialias = source.multiSampleAntialias;
         signature.pointRasterObservationComplete =
             captured && source.complete;
         signature.pointSizeBits = source.pointSizeBits;
