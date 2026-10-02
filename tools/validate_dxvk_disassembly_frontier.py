@@ -7,6 +7,7 @@ It validates the shape of a captured continuation window:
 - overlap bytes retained from the previous capture edge
 - explicit UNTESTED runtime state
 - byte-count consistency for hexadecimal evidence
+- optional edge capture declarations
 
 Used by GitHub-only conversion evidence checks.
 """
@@ -42,11 +43,22 @@ def validate(record: dict) -> list[str]:
         except ValueError:
             errors.append("invalid_rva_encoding")
 
-    overlap = _hex_bytes(record.get("overlap_bytes"))
+    overlap_text = record.get("overlap_bytes")
+    overlap = _hex_bytes(overlap_text)
     if not overlap:
         errors.append("missing_overlap_bytes")
-    elif record.get("overlap_bytes") and len(overlap) == 0:
+    elif isinstance(overlap_text, str) and len(overlap_text.split()) * 2 != len(overlap) * 2:
         errors.append("invalid_overlap_encoding")
+
+    overlap_length = record.get("overlap_length_bytes")
+    if overlap_length is not None:
+        if not isinstance(overlap_length, int) or overlap_length <= 0:
+            errors.append("invalid_overlap_length")
+        elif len(overlap) != overlap_length:
+            errors.append("overlap_length_mismatch")
+
+    if record.get("capture_edge_matches") is False:
+        errors.append("capture_edge_mismatch")
 
     instruction_count = record.get("instruction_count")
     if instruction_count is not None and (not isinstance(instruction_count, int) or instruction_count <= 0):
