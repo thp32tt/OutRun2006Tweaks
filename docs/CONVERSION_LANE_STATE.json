@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "77b8abc3a6dea4e94c62ad2744f4ea0e93ddd2db",
+  "state_parent_head": "8e008f0c4cb135d5c6a74730716686eb5e00cdb3",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -51,15 +51,16 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DX11-00274",
-    "result_sha": "07ff1005982b16f03e5060ca3677b1d22fbd7c3a",
-    "automation_validation": "PASS",
+    "task_id": "CONV-DX11-000001",
+    "result_sha": "acf2075c71664b12586c2215214538d1f7f352a7",
+    "validation_bearing_sha": "388cf8a44421491cfee985ce4425debf6d50d3c1",
+    "automation_validation": "PASS_SELECTED_UNIT",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
-  "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before any separate native Draw* activation. Dual-source blend also remains fail-closed until a proven second pixel-shader output/linkage path exists.",
+  "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. SRC1 dual-source blend remains fail-closed until a proven second pixel-shader output/linkage path exists.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until parity proof.",
-  "independent_static_next_action": "Continue bounded GitHub-only DX11 source/transport/activation-readiness work that does not require HMD evidence. Keep dual-source blend inexact until SV_Target1/linkage proof exists; do not idle merely because runtime evidence is unavailable.",
+  "independent_static_next_action": "Continue GitHub-only DX11 readiness work without activating native Draw*. Pair-aware legacy BOTH* SRCBLEND translation is complete; preserve SRC1 dual-source fail-closed semantics and advance only independently provable pipeline/resource/shader readiness gaps.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",

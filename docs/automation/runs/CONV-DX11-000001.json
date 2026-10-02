@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "job_id": "CONV-DX11-000001",
+  "task_id": "CONV-DX11-000001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "d1f216f3ad0e54ac344a2cf946da605133a46590",
+  "state_parent_head": "8e008f0c4cb135d5c6a74730716686eb5e00cdb3",
+  "material_result_sha": "acf2075c71664b12586c2215214538d1f7f352a7",
+  "validation_bearing_sha": "388cf8a44421491cfee985ce4425debf6d50d3c1",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "DX11_LEGACY_BOTH_SOURCE_BLEND_PAIR_TRANSLATION",
+  "selection_reason": "The branch plan still listed D3DBLEND_BOTHSRCALPHA/BOTHINVSRCALPHA pair-aware conversion as an unfinished static readiness gap. It is source/static work and does not require Quest 3/VDXR runtime hardware.",
+  "summary": "Implemented D3D9 legacy BOTHSRCALPHA/BOTHINVSRCALPHA SRCBLEND override semantics in the dormant DX11 pipeline translation, while keeping destination-state misuse and SRC1 dual-source blending fail-closed. Added semantic smoke coverage and source-graph/CI guards. Native Draw* routing remains disabled.",
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": [
+        "GitHub HEAD and AGENTS.md read through authenticated connector",
+        "docs/CONVERSION_LANE_STATE.json and branch DX11 plan read",
+        "VR regression knowledge/problem history and Issue #14 production ledger contract read"
+      ]
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": [
+        "Confirmed state_translation role-agnostic BOTH* mappings were intentionally inexact",
+        "Confirmed translate_pipeline lacked D3D9 SRCBLEND pair override semantics",
+        "Selected branch-plan known gap without requiring runtime hardware"
+      ]
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "changed_paths": [
+        "src/vr/d3d11/pipeline_translation.cpp",
+        "tools/dx11_fixed_function_shader_semantics.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "commit": "acf2075c71664b12586c2215214538d1f7f352a7"
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE_SELECTED_UNIT",
+      "evidence": [
+        "Backend Conversion Gate 36968000578 on 388cf8a44421491cfee985ce4425debf6d50d3c1: Verify DX11 dual-source blend contract PASS",
+        "Backend Conversion Gate 36968000578: Verify DX11 source graph PASS",
+        "Backend Conversion Gate 36968000578: Verify DX11 dormant activation boundary PASS",
+        "Backend Conversion Gate 36968000578: Test DX11 census analyzer PASS",
+        "Backend Conversion Gate 36968000578: Configure Win32 PASS and Build Win32 PASS",
+        "Backend Conversion Gate 36968000578: Build and Run DX11 fixed-function shader semantic smoke PASS",
+        "The workflow was later cancelled only because the branch advanced to newer same-JOB commits; the selected-unit checks above completed successfully before cancellation.",
+        "At current state parent, newer gates continue to pass dual-source/source-graph/dormant-activation static checks."
+      ],
+      "full_gate_conclusion": "SUPERSEDED_BY_NEWER_BRANCH_HEAD",
+      "selected_unit_validation": "PASS"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "required_marker": "[AUTO:CONV-DX11-000001]",
+      "material_commit": "acf2075c71664b12586c2215214538d1f7f352a7",
+      "followup_same_job_commits": [
+        "388cf8a44421491cfee985ce4425debf6d50d3c1",
+        "609e0e803d7d63e3c1eaa5b81510b47314486254",
+        "7299c29cddf4709ab29a9ca30bf5078e166811e6",
+        "7db646d1d54e4714df54e1609274028c20177cbe"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant translation/readiness work only. No native game Draw* activation, backend promotion, runtime candidate, or package payload change was requested or justified."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE_WITH_THIS_STATE_COMMIT",
+      "exact_next_action": "Continue independent DX11 readiness work without activating native Draw*. Preserve SRC1 dual-source blend fail-closed until proven SV_Target1/linkage evidence; runtime activation still requires exhaustive exact-build census plus Quest 3/VDXR parity."
+    }
+  },
+  "scope_guards": {
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "openxr_transport_changed": false,
+    "dxvk_lane_modified": false,
+    "localization_modified": false
+  },
+  "issue14_comment_id": 5945991937,
+  "automation_validation": "PASS_SELECTED_UNIT",
+  "blocker": "Native DX11 Draw* routing remains deliberately disabled. Exact-build exhaustive census and Quest 3/VDXR graphics parity are still required for runtime activation; SRC1 dual-source factors remain fail-closed pending proven second pixel-shader output/linkage.",
+  "next_action": "Continue independent GitHub-only DX11 readiness work. Do not activate native Draw* until exhaustive census and Quest 3/VDXR parity evidence exist.",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE"
+}
