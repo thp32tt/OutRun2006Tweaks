@@ -1,0 +1,15 @@
+{
+  "TASK_ID": "LOCALIZATION-LOCALIZATION_A-00486",
+  "LANE": "LOCALIZATION_A",
+  "WAVE_ID": "P00319",
+  "role": "producer_A_self_QA",
+  "branch": "korean-localization-clean",
+  "source_of_truth": "GitHub korean-localization-clean HEAD",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "candidate_completion_first": true,
+  "result": "BLOCKER_RECORDED",
+  "details": "Checked current queue contract. No existing A-lane RENDER_READY or ONE_STAGE_TO_RENDER evidence was available from current GitHub state for this task. No unrelated preflight-only expansion performed. No DDS candidate was created without canonical source/evidence chain.",
+  "changed_files": ["docs/automation/runs/LOCALIZATION-LOCALIZATION_A-00486.json"]
+}
