@@ -2897,8 +2897,15 @@ bool validate_fixed_function_textured_draw_snapshot(
 NativeFixedFunctionTexturedDrawReadiness
 compose_fixed_function_multistage_textured_draw_readiness(
     const NativeFixedFunctionDrawReadiness& draw,
-    const NativeFixedFunctionTextureBindingSetReadiness& textureBindings) noexcept {
+    ID3D11DeviceContext* context,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures) noexcept {
     NativeFixedFunctionTexturedDrawReadiness out{};
+    // Reobserve every required PS stage at composition time. A previously
+    // captured aggregate is useful diagnostic evidence, but cannot authorize a
+    // later draw candidate after the live context has changed.
+    const auto textureBindings = observe_fixed_function_texture_binding_set(
+        context, draw.requiredTextureMask, samplers, textures);
     out.drawSnapshotToken = draw.snapshotToken;
     out.textureStageSnapshotToken = textureBindings.snapshotToken;
     out.requiredTextureMask = draw.requiredTextureMask;
@@ -2943,13 +2950,15 @@ compose_fixed_function_multistage_textured_draw_readiness(
 
 bool validate_fixed_function_multistage_textured_draw_snapshot(
     const NativeFixedFunctionDrawReadiness& draw,
-    const NativeFixedFunctionTextureBindingSetReadiness& textureBindings,
+    ID3D11DeviceContext* context,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
     std::uint64_t snapshotToken) noexcept {
     if (snapshotToken == 0)
         return false;
     const auto current =
         compose_fixed_function_multistage_textured_draw_readiness(
-            draw, textureBindings);
+            draw, context, samplers, textures);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
