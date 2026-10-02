@@ -8,6 +8,7 @@ behavior on Quest 3/VDXR hardware.
 from __future__ import annotations
 
 import argparse
+import re
 from pathlib import Path
 
 
@@ -23,8 +24,14 @@ REQUIRED = (
 )
 
 
+_TRUE_ASSIGNMENT = re.compile(r"(?:native[_-]?draw[_-]?path|NativeDrawPathActive)\s*[:=]\s*true", re.IGNORECASE)
+
+
 def check_contract(text: str) -> tuple[list[str], list[str]]:
-    failures = [token for token in FORBIDDEN if token in text]
+    normalized = text.replace(" ", "").replace("\t", "")
+    failures = [token for token in FORBIDDEN if token in normalized]
+    if _TRUE_ASSIGNMENT.search(text):
+        failures.append("normalized_native_draw_path_true_assignment")
     missing = [token for token in REQUIRED if token not in text]
     return failures, missing
 
