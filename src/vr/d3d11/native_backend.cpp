@@ -1988,6 +1988,104 @@ bool validate_fixed_function_output_state_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+bool NativeFixedFunctionOutputStateBinding::initialize(
+    ID3D11Device* device,
+    const NativeFixedFunctionRenderStateBundle& renderStateBundle,
+    const NativeFixedFunctionRenderStateReadiness& renderState,
+    const NativeFixedFunctionOutputStateReadiness& outputState) noexcept {
+
+    shutdown();
+    if (!device ||
+        !renderState.inputValid ||
+        !renderState.bundleReady ||
+        !renderState.deviceMatches ||
+        !renderState.translationMatches ||
+        !renderState.ready ||
+        renderState.bundleGeneration == 0 ||
+        renderState.translationIdentity == 0 ||
+        renderState.snapshotToken == 0 ||
+        !outputState.inputValid ||
+        !outputState.viewportExact ||
+        !outputState.scissorExact ||
+        !outputState.omDynamicExact ||
+        !outputState.ready ||
+        outputState.snapshotToken == 0 ||
+        !renderStateBundle.ready() ||
+        renderStateBundle.device() != device ||
+        !renderStateBundle.blend_state() ||
+        !renderStateBundle.depth_stencil_state() ||
+        !renderStateBundle.rasterizer_state())
+        return false;
+
+    device_ = device;
+    blend_state_ = renderStateBundle.blend_state();
+    depth_stencil_state_ = renderStateBundle.depth_stencil_state();
+    rasterizer_state_ = renderStateBundle.rasterizer_state();
+    viewport_ = outputState.viewport;
+    scissor_rect_ = outputState.scissorRect;
+    blend_factor_ = outputState.blendFactor;
+    sample_mask_ = outputState.sampleMask;
+    stencil_ref_ = renderStateBundle.stencil_ref();
+    render_state_snapshot_token_ = renderState.snapshotToken;
+    output_state_snapshot_token_ = outputState.snapshotToken;
+
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(
+        token, render_state_snapshot_token_);
+    token = mix_readiness_snapshot_token(
+        token, output_state_snapshot_token_);
+    token = mix_readiness_snapshot_token(
+        token, static_cast<std::uint64_t>(
+            reinterpret_cast<std::uintptr_t>(device_.Get())));
+    token = mix_readiness_snapshot_token(
+        token, static_cast<std::uint64_t>(
+            reinterpret_cast<std::uintptr_t>(blend_state_.Get())));
+    token = mix_readiness_snapshot_token(
+        token, static_cast<std::uint64_t>(
+            reinterpret_cast<std::uintptr_t>(depth_stencil_state_.Get())));
+    token = mix_readiness_snapshot_token(
+        token, static_cast<std::uint64_t>(
+            reinterpret_cast<std::uintptr_t>(rasterizer_state_.Get())));
+    snapshot_token_ = token == 0 ? 1 : token;
+    return ready();
+}
+
+void NativeFixedFunctionOutputStateBinding::shutdown() noexcept {
+    rasterizer_state_.Reset();
+    depth_stencil_state_.Reset();
+    blend_state_.Reset();
+    device_.Reset();
+    viewport_ = {};
+    scissor_rect_ = {};
+    blend_factor_ = {1.0f, 1.0f, 1.0f, 1.0f};
+    sample_mask_ = 0xFFFFFFFFu;
+    stencil_ref_ = 0;
+    render_state_snapshot_token_ = 0;
+    output_state_snapshot_token_ = 0;
+    snapshot_token_ = 0;
+}
+
+bool NativeFixedFunctionOutputStateBinding::apply(
+    ID3D11DeviceContext* context) const noexcept {
+
+    if (!ready() || !context)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    if (!contextDevice || contextDevice.Get() != device_.Get())
+        return false;
+
+    context->RSSetState(rasterizer_state_.Get());
+    context->RSSetViewports(1, &viewport_);
+    context->RSSetScissorRects(1, &scissor_rect_);
+    context->OMSetBlendState(
+        blend_state_.Get(), blend_factor_.data(), sample_mask_);
+    context->OMSetDepthStencilState(
+        depth_stencil_state_.Get(), stencil_ref_);
+    return true;
+}
+
 NativeFixedFunctionDrawReadiness
 compose_fixed_function_draw_readiness(
     const NativeFixedFunctionActivationReadiness& activation,
