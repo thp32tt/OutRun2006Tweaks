@@ -1589,6 +1589,58 @@ bool NativeFixedFunctionRenderStateBundle::validate_translation_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+bool NativeFixedFunctionRenderStateBundle::bind_output_state_if_ready(
+    ID3D11DeviceContext* context,
+    const PipelineTranslation& translation,
+    std::uint64_t translationSnapshotToken,
+    const OutRunVR::DrawState::RenderStateSnapshot& source,
+    const NativeSurfacePairReadiness& surfacePair,
+    std::uint64_t outputStateSnapshotToken) const noexcept {
+
+    if (!context || !device_ ||
+        !validate_translation_snapshot(
+            device_.Get(), translation, translationSnapshotToken) ||
+        !validate_fixed_function_output_state_snapshot(
+            source, surfacePair, outputStateSnapshotToken))
+        return false;
+
+    const bool sourceScissorEnabled = source.scissorTestEnable != FALSE;
+    if (translation.rasterizer.ScissorEnable != sourceScissorEnabled)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    if (!contextDevice || contextDevice.Get() != device_.Get())
+        return false;
+
+    const auto output =
+        compose_fixed_function_output_state_readiness(source, surfacePair);
+    if (!output.ready || output.snapshotToken != outputStateSnapshotToken)
+        return false;
+
+    D3D11_RECT scissor = output.scissorRect;
+    if (!sourceScissorEnabled) {
+        if (surfacePair.width >
+                static_cast<UINT>(std::numeric_limits<LONG>::max()) ||
+            surfacePair.height >
+                static_cast<UINT>(std::numeric_limits<LONG>::max()))
+            return false;
+        scissor.left = 0;
+        scissor.top = 0;
+        scissor.right = static_cast<LONG>(surfacePair.width);
+        scissor.bottom = static_cast<LONG>(surfacePair.height);
+    }
+
+    context->RSSetState(rasterizer_state_.Get());
+    context->RSSetViewports(1, &output.viewport);
+    context->RSSetScissorRects(1, &scissor);
+    context->OMSetBlendState(
+        blend_state_.Get(), output.blendFactor.data(), output.sampleMask);
+    context->OMSetDepthStencilState(
+        depth_stencil_state_.Get(), stencil_ref_);
+    return true;
+}
+
 void NativeFixedFunctionRenderStateBundle::shutdown() noexcept {
     rasterizer_state_.Reset();
     depth_stencil_state_.Reset();
