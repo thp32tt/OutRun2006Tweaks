@@ -28,3 +28,13 @@ validation_mode=C_BATCH_GATE
 RUNTIME_VALIDATION=UNTESTED
 
 This record is lane-local evidence only. Shared progress, queue, and QA state remain owned by C batch processing.
+
+## Rollover Continuation
+
+CHAT_ROLLOVER=2
+Revalidated against current branch state after automatic chat rollover. Prior lane evidence was preserved; no duplicate DDS generation was performed.
+
+Current state remains:
+- no RENDER_READY B-shard candidate available for safe completion
+- RUNTIME_VALIDATION=UNTESTED
+- waiting on producer prerequisites or C batch gate input
