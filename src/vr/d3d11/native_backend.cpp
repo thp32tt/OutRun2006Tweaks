@@ -4631,6 +4631,261 @@ bool validate_fixed_function_direct_draw_dispatch_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+NativeFixedFunctionFanDrawDispatchReadiness
+compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount, UINT baseVertex,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface) noexcept {
+    NativeFixedFunctionFanDrawDispatchReadiness out{};
+    const auto finalBound =
+        compose_fixed_function_final_nonindexed_triangle_fan_bound_draw_readiness(
+            draw, context, outputStateBinding, pipelineBundle,
+            layout, vertexPrototype, pixelPrototype, samplers, textures,
+            vertexBuffer, vertexStride, vertexOffset, generatedIndexBuffer,
+            primitiveCount, baseVertex, transform, surfaceBinding,
+            colorSurface, depthSurface);
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    if (context)
+        context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    const auto generated = generatedIndexBuffer.readiness(contextDevice.Get());
+
+    out.primitiveCount = primitiveCount;
+    out.indexCount = generated.indexCount;
+    out.startIndexLocation = 0u;
+    out.baseVertexLocation = 0;
+    out.finalFanBoundDrawSnapshotToken = finalBound.snapshotToken;
+    out.generatedIndexSnapshotToken = generated.snapshotToken;
+    out.inputValid =
+        context != nullptr && contextDevice.Get() != nullptr &&
+        finalBound.inputValid && generated.deviceMatches;
+    out.finalFanBoundDrawReady =
+        finalBound.ready && finalBound.snapshotToken != 0;
+    out.generatedIndexReady =
+        generated.ready && generated.snapshotToken != 0;
+
+    const UINT maxValue = std::numeric_limits<UINT>::max();
+    const bool countExact =
+        primitiveCount <= maxValue / 3u &&
+        generated.indexCount == primitiveCount * 3u;
+    out.generatedIndexMatchesDispatch =
+        generated.ready &&
+        !generated.indexedSource &&
+        generated.primitiveCount == primitiveCount &&
+        generated.baseVertex == baseVertex &&
+        generated.sourceIndexSnapshotToken == 0 &&
+        countExact;
+    out.dispatchArgumentsExact =
+        out.generatedIndexMatchesDispatch &&
+        out.startIndexLocation == 0u &&
+        out.baseVertexLocation == 0;
+    out.componentSnapshotsPresent =
+        finalBound.snapshotToken != 0 && generated.snapshotToken != 0;
+    out.ready =
+        out.inputValid && out.finalFanBoundDrawReady &&
+        out.generatedIndexReady && out.generatedIndexMatchesDispatch &&
+        out.dispatchArgumentsExact && out.componentSnapshotsPresent;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.finalFanBoundDrawSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.generatedIndexSnapshotToken);
+        token = mix_readiness_snapshot_token(token, primitiveCount);
+        token = mix_readiness_snapshot_token(token, baseVertex);
+        token = mix_readiness_snapshot_token(token, out.indexCount);
+        token = mix_readiness_snapshot_token(token, out.startIndexLocation);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.baseVertexLocation));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool
+validate_fixed_function_nonindexed_triangle_fan_draw_dispatch_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount, UINT baseVertex,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(
+            draw, context, outputStateBinding, pipelineBundle,
+            layout, vertexPrototype, pixelPrototype, samplers, textures,
+            vertexBuffer, vertexStride, vertexOffset, generatedIndexBuffer,
+            primitiveCount, baseVertex, transform, surfaceBinding,
+            colorSurface, depthSurface);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
+NativeFixedFunctionFanDrawDispatchReadiness
+compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount, D3DFORMAT sourceIndexFormat,
+    UINT startIndex, UINT sourceIndexCount, INT baseVertexLocation,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface) noexcept {
+    NativeFixedFunctionFanDrawDispatchReadiness out{};
+    out.indexedSource = true;
+    const auto finalBound =
+        compose_fixed_function_final_indexed_triangle_fan_bound_draw_readiness(
+            draw, context, outputStateBinding, pipelineBundle,
+            layout, vertexPrototype, pixelPrototype, samplers, textures,
+            vertexBuffer, vertexStride, vertexOffset, sourceIndexBuffer,
+            generatedIndexBuffer, primitiveCount, sourceIndexFormat,
+            startIndex, sourceIndexCount, baseVertexLocation, transform,
+            surfaceBinding, colorSurface, depthSurface);
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    if (context)
+        context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    const auto generated = generatedIndexBuffer.readiness(contextDevice.Get());
+    const auto currentSource =
+        sourceIndexBuffer.mirror_readiness(contextDevice.Get());
+
+    out.primitiveCount = primitiveCount;
+    out.indexCount = generated.indexCount;
+    out.startIndexLocation = 0u;
+    out.baseVertexLocation = baseVertexLocation;
+    out.finalFanBoundDrawSnapshotToken = finalBound.snapshotToken;
+    out.generatedIndexSnapshotToken = generated.snapshotToken;
+    out.sourceIndexSnapshotToken = currentSource.snapshotToken;
+    out.inputValid =
+        context != nullptr && contextDevice.Get() != nullptr &&
+        finalBound.inputValid && generated.deviceMatches &&
+        currentSource.inputValid;
+    out.finalFanBoundDrawReady =
+        finalBound.ready && finalBound.snapshotToken != 0;
+    out.generatedIndexReady =
+        generated.ready && generated.snapshotToken != 0 &&
+        currentSource.ready && currentSource.snapshotToken != 0;
+
+    const UINT maxValue = std::numeric_limits<UINT>::max();
+    const bool countExact =
+        primitiveCount <= maxValue / 3u &&
+        generated.indexCount == primitiveCount * 3u;
+    out.generatedIndexMatchesDispatch =
+        generated.ready && generated.indexedSource &&
+        generated.baseVertex == 0u &&
+        generated.primitiveCount == primitiveCount &&
+        generated.sourceIndexFormat == sourceIndexFormat &&
+        generated.sourceStartIndex == startIndex &&
+        generated.sourceIndexCount == sourceIndexCount &&
+        generated.sourceIndexSnapshotToken != 0 &&
+        generated.sourceIndexSnapshotToken == currentSource.snapshotToken &&
+        countExact;
+    out.dispatchArgumentsExact =
+        out.generatedIndexMatchesDispatch && out.startIndexLocation == 0u;
+    out.componentSnapshotsPresent =
+        finalBound.snapshotToken != 0 &&
+        generated.snapshotToken != 0 &&
+        currentSource.snapshotToken != 0;
+    out.ready =
+        out.inputValid && out.finalFanBoundDrawReady &&
+        out.generatedIndexReady && out.generatedIndexMatchesDispatch &&
+        out.dispatchArgumentsExact && out.componentSnapshotsPresent;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.finalFanBoundDrawSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.generatedIndexSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceIndexSnapshotToken);
+        token = mix_readiness_snapshot_token(token, primitiveCount);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(sourceIndexFormat));
+        token = mix_readiness_snapshot_token(token, startIndex);
+        token = mix_readiness_snapshot_token(token, sourceIndexCount);
+        token = mix_readiness_snapshot_token(token, out.indexCount);
+        token = mix_readiness_snapshot_token(token, out.startIndexLocation);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(baseVertexLocation));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool
+validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount, D3DFORMAT sourceIndexFormat,
+    UINT startIndex, UINT sourceIndexCount, INT baseVertexLocation,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
+            draw, context, outputStateBinding, pipelineBundle,
+            layout, vertexPrototype, pixelPrototype, samplers, textures,
+            vertexBuffer, vertexStride, vertexOffset, sourceIndexBuffer,
+            generatedIndexBuffer, primitiveCount, sourceIndexFormat,
+            startIndex, sourceIndexCount, baseVertexLocation, transform,
+            surfaceBinding, colorSurface, depthSurface);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
+
 void NativeFixedFunctionPipelineBundle::shutdown() noexcept {
     transform_buffer_.shutdown();
     input_layout_.Reset();
