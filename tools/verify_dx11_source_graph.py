@@ -1222,7 +1222,7 @@ def main() -> None:
          DX11_CENSUS_ANALYZER,
          "R200 census TEMP selector support"),
         ("FFP_SUPPORTED_RESULT_ARGS = frozenset({1, 5})",
-         analyzer,
+         DX11_CENSUS_ANALYZER,
          "R200 census CURRENT/TEMP destination support"),
         ('r198_demand["UnsupportedResultArgs"] == [',
          DX11_CENSUS_ANALYZER_TEST,
