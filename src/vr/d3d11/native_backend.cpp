@@ -2,6 +2,7 @@
 
 #include "pipeline_translation.hpp"
 #include "resource_translation.hpp"
+#include "surface_mirror.hpp"
 
 #include <array>
 #include <cstddef>
@@ -1796,23 +1797,32 @@ bool validate_fixed_function_activation_snapshot(
 NativeFixedFunctionDrawReadiness
 compose_fixed_function_draw_readiness(
     const NativeFixedFunctionActivationReadiness& activation,
-    const NativeFixedFunctionRenderStateReadiness& renderState) noexcept {
+    const NativeFixedFunctionRenderStateReadiness& renderState,
+    const NativeSurfacePairReadiness& surfacePair) noexcept {
     NativeFixedFunctionDrawReadiness out{};
     out.activationSnapshotToken = activation.snapshotToken;
     out.renderStateSnapshotToken = renderState.snapshotToken;
+    out.surfacePairSnapshotToken = surfacePair.snapshotToken;
 
-    out.inputValid = activation.inputValid && renderState.inputValid;
+    out.inputValid =
+        activation.inputValid &&
+        renderState.inputValid &&
+        surfacePair.inputValid;
     out.activationReady =
         activation.ready && activation.snapshotToken != 0;
     out.renderStateReady =
         renderState.ready && renderState.snapshotToken != 0;
+    out.surfacePairReady =
+        surfacePair.ready && surfacePair.snapshotToken != 0;
     out.componentSnapshotsPresent =
         activation.snapshotToken != 0 &&
-        renderState.snapshotToken != 0;
+        renderState.snapshotToken != 0 &&
+        surfacePair.snapshotToken != 0;
     out.ready =
         out.inputValid &&
         out.activationReady &&
         out.renderStateReady &&
+        out.surfacePairReady &&
         out.componentSnapshotsPresent;
 
     if (out.ready) {
@@ -1821,6 +1831,8 @@ compose_fixed_function_draw_readiness(
             drawToken, out.activationSnapshotToken);
         drawToken = mix_readiness_snapshot_token(
             drawToken, out.renderStateSnapshotToken);
+        drawToken = mix_readiness_snapshot_token(
+            drawToken, out.surfacePairSnapshotToken);
         out.snapshotToken = drawToken == 0 ? 1 : drawToken;
     }
     return out;
@@ -1829,11 +1841,13 @@ compose_fixed_function_draw_readiness(
 bool validate_fixed_function_draw_snapshot(
     const NativeFixedFunctionActivationReadiness& activation,
     const NativeFixedFunctionRenderStateReadiness& renderState,
+    const NativeSurfacePairReadiness& surfacePair,
     std::uint64_t snapshotToken) noexcept {
     if (snapshotToken == 0)
         return false;
     const auto current =
-        compose_fixed_function_draw_readiness(activation, renderState);
+        compose_fixed_function_draw_readiness(
+            activation, renderState, surfacePair);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 

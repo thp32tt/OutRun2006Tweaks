@@ -3097,59 +3097,73 @@ def main() -> None:
                 "DX11 R116 render-state probe drift: " + meaning
             )
 
-    r117_draw_readiness_header = {
+    r120_draw_readiness_header = {
         "struct NativeFixedFunctionDrawReadiness":
-            "R117 composite draw readiness",
+            "R120 composite draw readiness",
+        "struct NativeSurfacePairReadiness;":
+            "R120 surface-pair readiness dependency",
         "bool renderStateReady{}":
-            "R117 explicit render-state readiness",
+            "R120 explicit render-state readiness",
+        "bool surfacePairReady{}":
+            "R120 explicit output-surface readiness",
         "std::uint64_t renderStateSnapshotToken{}":
-            "R117 render-state snapshot identity",
+            "R120 render-state snapshot identity",
+        "std::uint64_t surfacePairSnapshotToken{}":
+            "R120 output-surface snapshot identity",
+        "const NativeSurfacePairReadiness& surfacePair":
+            "R120 surface-pair composition input",
         "compose_fixed_function_draw_readiness(":
-            "R117 fail-closed draw readiness composition API",
+            "R120 fail-closed draw readiness composition API",
         "validate_fixed_function_draw_snapshot(":
-            "R117 composite draw snapshot validator",
+            "R120 composite draw snapshot validator",
     }
-    missing_r117_header = [
+    missing_r120_header = [
         meaning
-        for token, meaning in r117_draw_readiness_header.items()
+        for token, meaning in r120_draw_readiness_header.items()
         if token not in NATIVE_BACKEND_HPP
     ]
-    if missing_r117_header:
+    if missing_r120_header:
         raise SystemExit(
-            "DX11 R117 draw-readiness header drift: "
-            + ", ".join(missing_r117_header)
+            "DX11 R120 draw-readiness header drift: "
+            + ", ".join(missing_r120_header)
         )
 
     for token, meaning in {
-        "activation.ready && activation.snapshotToken != 0":
-            "R117 activation snapshot prerequisite",
-        "renderState.ready && renderState.snapshotToken != 0":
-            "R117 render-state snapshot prerequisite",
+        '#include "surface_mirror.hpp"':
+            "R120 native backend surface-pair definition dependency",
+        "surfacePair.inputValid":
+            "R120 surface-pair input validity prerequisite",
+        "surfacePair.ready && surfacePair.snapshotToken != 0":
+            "R120 surface-pair readiness prerequisite",
         "out.componentSnapshotsPresent =":
-            "R117 explicit component-token aggregation",
+            "R120 explicit component-token aggregation",
         "drawToken, out.activationSnapshotToken":
-            "R117 activation identity in draw token",
+            "R120 activation identity in draw token",
         "drawToken, out.renderStateSnapshotToken":
-            "R117 render-state identity in draw token",
+            "R120 render-state identity in draw token",
+        "drawToken, out.surfacePairSnapshotToken":
+            "R120 output-surface identity in draw token",
     }.items():
         if token not in NATIVE_BACKEND_CPP:
             raise SystemExit(
-                "DX11 R117 draw-readiness source drift: " + meaning
+                "DX11 R120 draw-readiness source drift: " + meaning
             )
 
     for token, meaning in {
-        "R117 draw readiness composes activation and render-state snapshots":
-            "R117 positive composition proof",
-        "R117 draw readiness fails closed on missing component evidence":
-            "R117 missing-evidence fail-closed proof",
-        "R117 draw snapshot changes with render-state identity":
-            "R117 render-state identity invalidation proof",
-        "DX11 fixed-function draw readiness composition R117: PASS":
-            "R117 hosted probe completion marker",
+        "R120 draw readiness composes activation, render-state, and surface-pair snapshots":
+            "R120 positive composition proof",
+        "R120 draw readiness fails closed on missing component evidence":
+            "R120 missing-evidence fail-closed proof",
+        "R120 draw snapshot changes with render-state identity":
+            "R120 render-state identity invalidation proof",
+        "R120 draw snapshot changes with output-surface identity":
+            "R120 output-surface identity invalidation proof",
+        "DX11 fixed-function draw readiness composition R120: PASS":
+            "R120 hosted probe completion marker",
     }.items():
         if token not in CONSTANT_BUFFER_PROBE:
             raise SystemExit(
-                "DX11 R117 draw-readiness probe drift: " + meaning
+                "DX11 R120 draw-readiness probe drift: " + meaning
             )
 
     if (

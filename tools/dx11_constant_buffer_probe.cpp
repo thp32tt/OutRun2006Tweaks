@@ -9,6 +9,7 @@
 #include "vr/d3d11/native_backend.hpp"
 #include "vr/d3d11/pipeline_translation.hpp"
 #include "vr/d3d11/resource_translation.hpp"
+#include "vr/d3d11/surface_mirror.hpp"
 
 namespace
 {
@@ -22,6 +23,7 @@ namespace
     using outrun::vr::dx11::NativeManagedTextureRegistry;
     using outrun::vr::dx11::NativeManagedTextureShadow;
     using outrun::vr::dx11::NativeManagedTextureStageReadiness;
+    using outrun::vr::dx11::NativeSurfacePairReadiness;
     using outrun::vr::dx11::PipelineUnsupportedBlend;
     using outrun::vr::dx11::compose_fixed_function_activation_readiness;
     using outrun::vr::dx11::validate_fixed_function_activation_snapshot;
@@ -1780,24 +1782,42 @@ int main()
             changedActivation.snapshotToken),
         "R115 composite activation snapshot changes with component identity");
 
+    NativeSurfacePairReadiness surfacePairReady{};
+    surfacePairReady.inputValid = true;
+    surfacePairReady.colorReady = true;
+    surfacePairReady.depthReady = true;
+    surfacePairReady.deviceMatches = true;
+    surfacePairReady.dimensionsMatch = true;
+    surfacePairReady.generationsCurrent = true;
+    surfacePairReady.componentSerialsPresent = true;
+    surfacePairReady.ready = true;
+    surfacePairReady.width = 64;
+    surfacePairReady.height = 32;
+    surfacePairReady.colorMirrorSerial = 11;
+    surfacePairReady.depthMirrorSerial = 13;
+    surfacePairReady.snapshotToken = 0x120001ull;
+
     const auto drawReady =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated);
+            texturedActivation, renderStateRecreated, surfacePairReady);
     require(
         drawReady.inputValid &&
         drawReady.activationReady &&
         drawReady.renderStateReady &&
+        drawReady.surfacePairReady &&
         drawReady.componentSnapshotsPresent &&
         drawReady.ready &&
         drawReady.activationSnapshotToken ==
             texturedActivation.snapshotToken &&
         drawReady.renderStateSnapshotToken ==
             renderStateRecreated.snapshotToken &&
+        drawReady.surfacePairSnapshotToken ==
+            surfacePairReady.snapshotToken &&
         drawReady.snapshotToken != 0 &&
         validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated,
+            texturedActivation, renderStateRecreated, surfacePairReady,
             drawReady.snapshotToken),
-        "R117 draw readiness composes activation and render-state snapshots");
+        "R120 draw readiness composes activation, render-state, and surface-pair snapshots");
 
     auto activationMissingSnapshot = texturedActivation;
     activationMissingSnapshot.snapshotToken = 0;
@@ -1805,40 +1825,71 @@ int main()
     renderStateMissingSnapshot.snapshotToken = 0;
     auto renderStateNotReady = renderStateRecreated;
     renderStateNotReady.ready = false;
+    auto surfacePairMissingSnapshot = surfacePairReady;
+    surfacePairMissingSnapshot.snapshotToken = 0;
+    auto surfacePairNotReady = surfacePairReady;
+    surfacePairNotReady.ready = false;
     const auto missingActivationDraw =
         compose_fixed_function_draw_readiness(
-            activationMissingSnapshot, renderStateRecreated);
+            activationMissingSnapshot, renderStateRecreated, surfacePairReady);
     const auto missingRenderStateDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateMissingSnapshot);
+            texturedActivation, renderStateMissingSnapshot, surfacePairReady);
     const auto pendingRenderStateDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateNotReady);
+            texturedActivation, renderStateNotReady, surfacePairReady);
+    const auto missingSurfacePairDraw =
+        compose_fixed_function_draw_readiness(
+            texturedActivation, renderStateRecreated, surfacePairMissingSnapshot);
+    const auto pendingSurfacePairDraw =
+        compose_fixed_function_draw_readiness(
+            texturedActivation, renderStateRecreated, surfacePairNotReady);
     require(
         !missingActivationDraw.ready &&
         missingActivationDraw.snapshotToken == 0 &&
         !missingRenderStateDraw.ready &&
         missingRenderStateDraw.snapshotToken == 0 &&
         !pendingRenderStateDraw.ready &&
-        pendingRenderStateDraw.snapshotToken == 0,
-        "R117 draw readiness fails closed on missing component evidence");
+        pendingRenderStateDraw.snapshotToken == 0 &&
+        !missingSurfacePairDraw.ready &&
+        missingSurfacePairDraw.snapshotToken == 0 &&
+        !pendingSurfacePairDraw.ready &&
+        pendingSurfacePairDraw.snapshotToken == 0,
+        "R120 draw readiness fails closed on missing component evidence");
 
     auto changedRenderStateIdentity = renderStateRecreated;
     changedRenderStateIdentity.snapshotToken ^= 0x9e3779b97f4a7c15ull;
     const auto changedDrawReady =
         compose_fixed_function_draw_readiness(
-            texturedActivation, changedRenderStateIdentity);
+            texturedActivation, changedRenderStateIdentity, surfacePairReady);
     require(
         changedDrawReady.ready &&
         changedDrawReady.snapshotToken != 0 &&
         changedDrawReady.snapshotToken != drawReady.snapshotToken &&
         !validate_fixed_function_draw_snapshot(
-            texturedActivation, changedRenderStateIdentity,
+            texturedActivation, changedRenderStateIdentity, surfacePairReady,
             drawReady.snapshotToken) &&
         validate_fixed_function_draw_snapshot(
-            texturedActivation, changedRenderStateIdentity,
+            texturedActivation, changedRenderStateIdentity, surfacePairReady,
             changedDrawReady.snapshotToken),
-        "R117 draw snapshot changes with render-state identity");
+        "R120 draw snapshot changes with render-state identity");
+
+    auto changedSurfacePairIdentity = surfacePairReady;
+    changedSurfacePairIdentity.snapshotToken ^= 0x100000001b3ull;
+    const auto changedSurfacePairDraw =
+        compose_fixed_function_draw_readiness(
+            texturedActivation, renderStateRecreated, changedSurfacePairIdentity);
+    require(
+        changedSurfacePairDraw.ready &&
+        changedSurfacePairDraw.snapshotToken != 0 &&
+        changedSurfacePairDraw.snapshotToken != drawReady.snapshotToken &&
+        !validate_fixed_function_draw_snapshot(
+            texturedActivation, renderStateRecreated, changedSurfacePairIdentity,
+            drawReady.snapshotToken) &&
+        validate_fixed_function_draw_snapshot(
+            texturedActivation, renderStateRecreated, changedSurfacePairIdentity,
+            changedSurfacePairDraw.snapshotToken),
+        "R120 draw snapshot changes with output-surface identity");
 
     DevicePair pipelineOtherDevice = create_warp_device();
     auto changedLayout = inputLayout;
@@ -2091,6 +2142,6 @@ int main()
     std::cout << "DX11 managed buffer mirror readiness snapshot R119: PASS\n";
     std::cout << "DX11 fixed-function activation evidence composition R115: PASS\n";
     std::cout << "DX11 fixed-function render-state bundle R116: PASS\n";
-    std::cout << "DX11 fixed-function draw readiness composition R117: PASS\n";
+    std::cout << "DX11 fixed-function draw readiness composition R120: PASS\n";
     return 0;
 }
