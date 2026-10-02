@@ -301,12 +301,13 @@
       "unit_id": "DX11_TEXTURE_STAGE_DRAW_READINESS_R132",
       "task_id": "CONV-DX11-000001",
       "material_result_sha": "c0a5a55f86b807b46476a852af21ae2f222e8761",
-      "validation_bearing_sha": "5eb6fed696d3053fb4b2351dfaf6f0217bf8504d",
-      "automation_validation": "EXACT_GATE_REACHED_SOURCE_GRAPH_INHERITED_R124_DRIFT_DESCENDANT_FIX_PENDING_NON_SUPERSEDED_CI",
+      "validation_bearing_sha": "1ff9f680ae205eef042271885ee4f84f3b35bc0a",
+      "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_GATE_CONFIGURE_CANCELLED",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
-      "issue14_comment_id": 5946871149
+      "issue14_comment_id": 5946871149,
+      "validation_issue14_comment_id": 5946893347
     }
   ]
 }
