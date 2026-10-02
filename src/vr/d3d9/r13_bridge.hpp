@@ -75,4 +75,13 @@ namespace OutRunVRStereo
     // Compatibility helper used by the validated base renderer. New R13 code
     // that compares both classifications should prefer CurrentPoseInjectionSnapshot().
     bool IsMainBackbufferPoseInjectionPass() noexcept;
+
+    // Stable R13 hook-destination surface for later overlay translation units.
+    // Definitions remain owned by R13; exposing linkage does not alter callback
+    // bodies, fallback order, DirectGPU publication/ACK, or Present semantics.
+    bool ResolveDirectTransportR13(IDirect3DDevice9* device,
+        std::uint32_t frameId);
+    HRESULT __stdcall PresentDestR13(IDirect3DDevice9* device,
+        const RECT* sourceRect, const RECT* destRect,
+        HWND destWindowOverride, const RGNDATA* dirtyRegion);
 }
