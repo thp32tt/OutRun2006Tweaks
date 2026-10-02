@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "job_id": "CONV-DXVK-000002",
+  "task_id": "CONV-DXVK-000002",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "initial_recovered_head": "15d61f8a26cb3ba7f6c802b8fe24f6eb4081cddb",
+  "validation_bearing_result_sha": "5574618845b1dab0f05ac5a3d9b7a15150fd5b45",
+  "result_sha": "5574618845b1dab0f05ac5a3d9b7a15150fd5b45",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "selected_work_item": "DXVK_F13_F14_CANONICAL_EXE_CONTINUATION_0x1827E9_TO_0x182868",
+  "summary": "Advanced the DXVK disassembly-first lane with exact canonical-EXE control-flow proof from 0x001827E9 through exclusive 0x00182828, then a fail-closed 64-byte provenance continuation from the incomplete TEST opcode at 0x00182828 through 0x00182868. No function, render, HUD, ownership or runtime semantics were promoted beyond the evidence.",
+  "source_commits": [
+    {
+      "sha": "618729b2e4297e77910c1254e72acb350634582d",
+      "message": "dxvk: prove canonical 0x1827E9 control-flow prefix [AUTO:CONV-DXVK-000002]"
+    },
+    {
+      "sha": "5574618845b1dab0f05ac5a3d9b7a15150fd5b45",
+      "message": "dxvk: capture canonical 0x182828 continuation [AUTO:CONV-DXVK-000002]",
+      "validation_bearing": true
+    }
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONV-DXVK-000002.json"
+  ],
+  "implementation": {
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "control_flow_start_rva": "0x001827E9",
+    "control_flow_prefix_end_rva": "0x00182828",
+    "control_flow_status": "EXACT_1827E9_TO_182828_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "decoded_complete_instruction_count": 18,
+    "control_flow_next_incomplete_rva": "0x00182828",
+    "control_flow_next_incomplete_bytes": "85",
+    "raw_continuation_start_rva": "0x00182828",
+    "raw_continuation_probe_end_rva": "0x00182868",
+    "raw_probe_len": 64,
+    "raw_required_overlap": "85",
+    "raw_provenance_status": "EXACT_EXE_182828_TO_182868_PROVENANCE_CAPTURED",
+    "raw_first_bytes": "85 c9 75 bb 83 ec 74 8b cc 51 83 ec 10 dd 1c 24",
+    "raw_last_bytes": "b8 01 00 00 00 e9 42 ff ff ff 8b 44 24 0c 25",
+    "semantic_promotion": "NONE",
+    "ownership_effect": "NONE"
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read AGENTS.md and docs/CONVERSION_LANE_STATE.json from current GitHub branch; branch-local conversion state and current GitHub HEAD treated as authority."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected the highest-value unfinished branch-local canonical-EXE continuation chain and preserved fail-closed semantics at capture edges."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Material analyzer and disassembly-contract changes are in source commits 618729b2e4297e77910c1254e72acb350634582d and 5574618845b1dab0f05ac5a3d9b7a15150fd5b45."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA canonical EXE analysis and Backend Conversion Gate both passed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Two substantive commits contain the required [AUTO:CONV-DXVK-000002] marker."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "This work item changes disassembly/static-evidence tooling only and does not create or alter a runtime candidate payload. The exact-SHA Backend Conversion Gate still built and verified the Win32 binary."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "exact_next_action": "Exact-decode only the complete instructions exposed by the validated 0x00182828..0x00182868 canonical window. Preserve the trailing cut instruction beginning with byte 0x25 near the capture end as raw-only until a fresh overlapping window proves the remaining bytes; do not infer render/HUD/runtime semantics from control-flow shape."
+    }
+  },
+  "validation": {
+    "exact_sha": "5574618845b1dab0f05ac5a3d9b7a15150fd5b45",
+    "hud_inspector_run_id": 36968266438,
+    "static_exe_analysis_job_id": 110716752069,
+    "static_exe_analysis": "PASS",
+    "canonical_provenance": "EXACT_EXE_182828_TO_182868_PROVENANCE_CAPTURED",
+    "previous_control_flow_exact_sha": "618729b2e4297e77910c1254e72acb350634582d",
+    "previous_control_flow_ci_run_id": 36967930823,
+    "previous_control_flow_status": "EXACT_1827E9_TO_182828_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "backend_conversion_gate_run_id": 36968261606,
+    "backend_conversion_gate_conclusion": "success",
+    "backend_disassembly_contract": "PASS",
+    "configure_win32": "PASS",
+    "build_win32": "PASS",
+    "binary_exists": "PASS",
+    "artifact_upload": "PASS",
+    "pc_fast": "SKIPPED_NOT_AUTHORIZED",
+    "notes": "No Quest 3/VDXR runtime test was performed. CI/build evidence is not runtime acceptance evidence."
+  },
+  "issue14_comments": [
+    5946039322,
+    5946042892
+  ],
+  "constraints": [
+    "GitHub-only repository authority",
+    "No N100/local clone used as product-development truth",
+    "No other backend branch modified",
+    "No localization files modified",
+    "RUNTIME_VALIDATION remains UNTESTED without matching Quest 3/VDXR evidence"
+  ],
+  "next_action": "Exact-decode only complete instructions from canonical RVA 0x00182828 using the validated 64-byte window through 0x00182868; preserve the cut trailing opcode beginning with 0x25 as raw capture-edge evidence and extend it only with a fresh overlap window."
+}
