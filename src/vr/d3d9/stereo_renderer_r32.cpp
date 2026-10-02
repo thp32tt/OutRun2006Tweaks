@@ -18,6 +18,13 @@
 #include "../core/dispatch_support.hpp"
 #include "../core/dispatch_support_hooks.hpp"
 #include "../core/review_dispatch_hooks.hpp"
+#include "stereo_backend.hpp"
+#include <algorithm>
+#include <array>
+#include <atomic>
+#include <cstring>
+#include <spdlog/spdlog.h>
+#include <safetyhook.hpp>
 #include "r13_bridge.hpp"
 #include "../lifecycle/recovery_api.hpp"
 #ifndef OUTRUN_VR_REFACTOR_SPLIT_R32_R31
