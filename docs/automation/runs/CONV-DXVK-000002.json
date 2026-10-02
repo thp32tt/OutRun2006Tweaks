@@ -3406,6 +3406,84 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Exact-decode only complete canonical instructions in 0x00182F7E..0x00182FBE. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F44_CANONICAL_CONTROL_FLOW_0x182F7E_TO_0x182FBE",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "b1366bb99e21a2b18c788f616c7d4896a00bb22e",
+      "validation_bearing_result_sha": "1f286a7ecc23f8219dc02a808a46a2232215c868",
+      "verifier_validation_descendant_sha": "6af5f0f6d2b346d2efa61bd9a7046396d4e2db86",
+      "commit_message": "dxvk: prove canonical 0x182F7E control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact-decoded validated F44 canonical bytes 0x00182F7E..0x00182FBE as 32 contiguous complete instructions, proved internal short-branch targets 0x00182FBB/0x00182FB0, empty direct rel32 CALL census, and an exact instruction boundary at the 64-byte capture end with no trailing partial instruction.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authoritative GitHub branch/run/lane state and continuously refreshed HEAD during same-job concurrent work to avoid duplicate or stale-parent writes."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected exact control-flow proof of already validated F44 raw canonical provenance as the highest-value unfinished static unit."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit b1366bb99e21a2b18c788f616c7d4896a00bb22e adds the complete instruction table, branch/boundary proof, immediate predecessor contract, report binding and fail-closed CLI guard."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Retaining descendant 1f286a7ecc23f8219dc02a808a46a2232215c868 passed canonical EXE static analysis with EXACT_182F7E_TO_182FBE_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN; later retaining descendant 6af5f0f6d2b346d2efa61bd9a7046396d4e2db86 passed Verify backend disassembly contract after an unrelated inherited dependency-ID verifier repair."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive material commit b1366bb99e21a2b18c788f616c7d4896a00bb22e contains required [AUTO:CONV-DXVK-000002]; Issue #14 comment 5948208838 records implementation and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly proof only; no deployable/runtime DXVK payload, selector, backend binary or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally so concurrent F45 primary source/frontier is not regressed."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_RETAINING_DESCENDANT_CANONICAL_STATIC",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "hud_inspector_run_id": 36983887152,
+        "hud_inspector_static_job_id": 110764386792,
+        "proof_status": "EXACT_182F7E_TO_182FBE_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "predecessor_exact": true,
+        "start_completion_proven": true,
+        "layout_contiguous": true,
+        "all_instruction_bytes_match": true,
+        "instruction_count": 32,
+        "prefix_end_rva": "0x00182FBE",
+        "prefix_end_matches": true,
+        "capture_boundary_matches": true,
+        "branches": [
+          "0x00182FA3->0x00182FBB",
+          "0x00182FA8->0x00182FB0"
+        ],
+        "branch_targets_match": true,
+        "internal_branch_targets_on_boundaries": true,
+        "external_targets": [],
+        "raw_call_census_empty": true,
+        "predecessor_target_contract": true,
+        "verifier_run_id": 36984084736,
+        "verifier_job_id": 110765006050,
+        "backend_disassembly_contract": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948208838,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_F45_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newer F45 source frontier beginning at 0x00182FBE. Validate/canonical-capture that frontier if not already validated, then exact-decode only complete instructions; do not regress the primary frontier to F44."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
