@@ -50,6 +50,30 @@
   "report": "localization/graphics/role_C/20261002-2056-C178/C178_Q00110_INDEPENDENT_QA_BATCH.json",
   "candidate_dds_modified": false,
   "runtime_validation": "UNTESTED",
-  "automation_validation": "PENDING",
-  "validation_mode": "C_BATCH_GATE"
+  "automation_validation": "PASS",
+  "validation_mode": "C_BATCH_GATE",
+  "result_sha": "e83decfe340db6045a0fea09a1d173372ec53019",
+  "authoritative_result_sha": "e83decfe340db6045a0fea09a1d173372ec53019",
+  "validation_bearing_result_sha": "e83decfe340db6045a0fea09a1d173372ec53019",
+  "automation_gate": {
+    "workflow": "Localization Automation Gate",
+    "run_id": 37005930610,
+    "head_sha": "e83decfe340db6045a0fea09a1d173372ec53019",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "validated_at_kst": "2026-10-02T21:19:00+09:00"
+  },
+  "prior_failed_gates": [
+    {
+      "result_sha": "ae5a68b75f78028ca7331033c771aeb3db30ca3d",
+      "run_id": 37005519700,
+      "reason": "qa_batch_inputs task/SHA objects were encoded incorrectly in rollover record; QA dispositions unchanged"
+    },
+    {
+      "result_sha": "fc6c8e433292bc70368b2c34ea9c4d5dbf604eff",
+      "run_id": 37005676323,
+      "reason": "A00351 exact producer result fails current lane shard verifier for even index222; disposition corrected from PASS to REWORK_REQUIRED"
+    }
+  ]
 }
