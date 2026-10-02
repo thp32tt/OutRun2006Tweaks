@@ -330,6 +330,7 @@ def queue_rollover_prompt(active: dict) -> str:
             *([f"PIPELINE_REJECT_REASONS={';'.join(str(x) for x in reject_reasons[:12])}"] if reject_reasons else []),
             "FIRST_EXECUTION_ACTION=CALL_CONNECTED_TOOL; do not emit a review/status/plan paragraph before the first tool call.",
             "PIPELINE_REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(or reasoned NOT_REQUIRED)→C6_STATE.",
+            conversion_lane_work_hint(active["branch"]),
             "A partial/review-only/state-only commit is a checkpoint, not task completion. Continue the same TASK_ID through substantive implementation/evidence work, validation and durable state.",
             "No local PC/RenderDoc/OpenXR runtime is required for source/static/disassembly/CI progress; only runtime claims remain UNTESTED.",
         ]
@@ -940,6 +941,7 @@ async def queue_send_conversion_pipeline_continuation(
         "C2는 review/state 문서만이 아니라 실제 source/tool/test/workflow/disassembly evidence 변경을 포함해야 한다. "
         "C3에는 해당 변경 검증 근거가 있어야 하고 C6에는 durable state와 exact next action을 남겨야 한다.\n"
         "현재 미충족=" + "; ".join(reasons[:12]) + "\n"
+        + conversion_lane_work_hint(active["branch"]) + "\n"
         "같은 TASK_ID로 미완료 stage를 즉시 계속하고 docs/automation/runs/<TASK_ID>.json에 pipeline_schema_version, "
         "pipeline C0-C6, changed_paths/work_product, validation, state_persisted=true, runtime_validation을 기록한 새 [AUTO:TASK_ID] commit까지 진행해. "
         "로컬 PC/RenderDoc/OpenXR runtime 부재는 source/static/disassembly/GitHub Actions 진행 blocker가 아니다."
@@ -1140,6 +1142,7 @@ async def queue_send_conversion_execution_continuation(
         f"CONTROLLER_STAGE={active.get('controller_stage') or 'C0_RECOVER'} VR_PIPELINE_SCHEMA={CONVERSION_PIPELINE_SCHEMA_VERSION}. "
         "HEAD/AGENTS/상태복구/리뷰/계획은 중간 단계다. 첫 출력부터 연결된 GitHub 도구를 호출해. "
         "PIPELINE_REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(필요 없으면 이유+NOT_REQUIRED)→C6_STATE. "
+        + conversion_lane_work_hint(active["branch"]) + " "
         "C1에서 발견한 실제 independent work를 C2에서 source/tool/test/workflow/disassembly evidence로 구현하고, C3 검증 후 C4/C6까지 같은 TASK_ID에서 끝내. "
         "Skill은 직접 도움이 될 때만 사용하고 미노출/부적합은 blocker가 아니다. review-only/state-only commit 하나로 종료하지 마. 로컬 개발 PC, RenderDoc, OpenXR runtime 부재는 "
         "source/static/disassembly/GitHub Actions 작업의 blocker가 아니다. runtime claim만 UNTESTED로 남겨. "
