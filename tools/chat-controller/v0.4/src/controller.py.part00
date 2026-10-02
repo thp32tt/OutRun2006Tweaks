@@ -520,6 +520,24 @@ def load_queue_state() -> dict:
 
 
 def save_queue_state(state: dict):
+    """Persist v2 identity fields while retaining task_id as a compatibility alias."""
+    state["task_event_model"] = TASK_EVENT_MODEL
+    state["production_counter_mode"] = PRODUCTION_COUNTER_MODE
+    records = []
+    if isinstance(state.get("active"), dict):
+        records.append(state["active"])
+    records.extend(v for v in state.get("active_by_lane", {}).values() if isinstance(v, dict))
+    for record in records:
+        production_id = str(record.get("production_id") or record.get("task_id") or "").strip()
+        if production_id:
+            record["production_id"] = production_id
+            record["task_id"] = production_id
+        record.setdefault("event_id", "")
+        record.setdefault("event_type", "dispatch")
+        record.setdefault("attempt", 1)
+        record.setdefault("retry_count", 0)
+        record.setdefault("rollover_count", int(record.get("chat_rollovers", 0)))
+        record["status"] = str(record.get("phase") or record.get("status") or "PENDING")
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     tmp = QUEUE_FILE.with_suffix(".tmp")
     tmp.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
