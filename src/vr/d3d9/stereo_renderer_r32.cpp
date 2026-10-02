@@ -157,15 +157,16 @@ namespace OutRunVRStereo
 
         R32StereoWorkloadSnapshot R32CaptureStereoWorkload() noexcept
         {
+            const auto route = R31TelemetryFrameSnapshot();
             return {
-                R31Frame.main,
-                R31Frame.offscreen,
-                R31Frame.aux,
-                R31Frame.fastWorld,
-                R31Frame.hud,
-                R31Frame.fallback,
-                R31Frame.fragile,
-                R31Frame.unstable
+                route.main,
+                route.offscreen,
+                route.aux,
+                route.fastWorld,
+                route.hud,
+                route.fallback,
+                route.fragile,
+                route.unstable
             };
         }
 
@@ -416,7 +417,7 @@ namespace OutRunVRStereo
             if (OutRunVR::State::StateBlockTracker::Recording() || !R29StableStereoBase(device))
             {
                 if (IsGameDevice(device) && !InternalStereoPass && TargetIsBackBuffer())
-                    ++R31Frame.unstable;
+                    R31TelemetryNoteUnstable();
                 return {};
             }
 
@@ -430,7 +431,7 @@ namespace OutRunVRStereo
                 return {};
             if (fragile)
             {
-                ++R31Frame.fragile;
+                R31TelemetryNoteFragile();
                 return {};
             }
 
@@ -541,8 +542,7 @@ namespace OutRunVRStereo
             ++DuplicatedDraws;
             ++WorldStereoDraws;
             ++R29StableTwoEyeDraws;
-            ++R31FastWorldDraws;
-            ++R31Frame.fastWorld;
+            R31TelemetryNoteFastWorld();
 
             if (FrameStereoPoseSequence == 0)
             {
@@ -692,8 +692,7 @@ namespace OutRunVRStereo
             ++NonWorldDuplicatedDraws;
             ++R29StableTwoEyeDraws;
             ++R30ScreenSpaceFovDraws;
-            ++R31HudDraws;
-            ++R31Frame.hud;
+            R31TelemetryNoteHud();
 
             if (FAILED(rightHr))
             {
@@ -762,7 +761,7 @@ namespace OutRunVRStereo
                 }
             }
 
-            ++R31Frame.fallback;
+            R31TelemetryNoteFallback();
             return R32LowerFailClosed(device,
                 std::forward<LowerDraw>(lowerDraw));
         }
@@ -1157,8 +1156,7 @@ namespace OutRunVRStereo
             R31BlockedVerifiedGeneration = 0;
             R31FastWorldCandidates = 0;
             R31EyeCache = {};
-            R31Frame = {};
-            R31Window = {};
+            R31TelemetryResetFrameWindow();
             R23LastStateSampleDrawSerial = 0;
             R23LastStateSampleEpoch = 0;
             OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
