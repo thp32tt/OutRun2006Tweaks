@@ -2007,15 +2007,37 @@ def main() -> None:
                 "DX11 R97 pipeline-bundle source drift: " + meaning
             )
 
-    for forbidden, meaning in {
-        "IASetInputLayout": "input-layout binding",
-        "VSSetShader(": "vertex-shader binding",
-        "PSSetShader(": "pixel-shader binding",
-    }.items():
-        if forbidden in NATIVE_BACKEND_CPP:
-            raise SystemExit(
-                "DX11 R97 bundle must remain non-routing; found " + meaning
-            )
+    dormant_pipeline_binding_contract = {
+        "bind_for_observation(": "explicit dormant pipeline binding entrypoint",
+        "validate_translation_snapshot(": "live R97 snapshot revalidation",
+        "contextDevice.Get() != device_.Get()": "foreign-context rejection",
+        "context->IASetInputLayout(input_layout_.Get());":
+            "exact input-layout binding",
+        "context->VSSetShader(vertex_shader_.Get(), nullptr, 0);":
+            "exact vertex-shader binding",
+        "context->PSSetShader(pixel_shader_.Get(), nullptr, 0);":
+            "exact pixel-shader binding",
+        "boundInputLayout.Get() != input_layout_.Get()":
+            "input-layout readback identity gate",
+        "boundVertexShader.Get() != vertex_shader_.Get()":
+            "vertex-shader readback identity gate",
+        "boundPixelShader.Get() != pixel_shader_.Get()":
+            "pixel-shader readback identity gate",
+    }
+    missing_dormant_pipeline_binding = [
+        meaning
+        for token, meaning in dormant_pipeline_binding_contract.items()
+        if token not in NATIVE_BACKEND_CPP
+    ]
+    if "bind_for_observation(" not in NATIVE_BACKEND_HPP:
+        missing_dormant_pipeline_binding.append(
+            "dormant pipeline binding declaration"
+        )
+    if missing_dormant_pipeline_binding:
+        raise SystemExit(
+            "DX11 dormant pipeline-object binding source drift: "
+            + ", ".join(missing_dormant_pipeline_binding)
+        )
 
     runtime_bundle_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
@@ -2034,6 +2056,18 @@ def main() -> None:
     for token, meaning in {
         "R97 bundle must start dormant": "R97 dormant initial state",
         "R97 bundle owned-object readiness": "R97 owned object readiness",
+        "dormant pipeline binding accepts exact same-device R97 snapshot":
+            "same-device exact-snapshot pipeline bind",
+        "dormant pipeline binding preserves exact IA VS PS identity":
+            "pipeline binding readback identity",
+        "dormant pipeline binding rejects missing R97 snapshot":
+            "missing snapshot rejection",
+        "dormant pipeline binding rejects stale R97 snapshot":
+            "stale snapshot rejection",
+        "dormant pipeline binding rejects foreign D3D11 context":
+            "foreign context rejection",
+        "DX11 dormant fixed-function pipeline object binding: PASS":
+            "dormant pipeline binding probe completion marker",
         "R97 inexact input layout must fail closed": "R97 fail-closed input-layout gate",
         "R97 failed reinitialize must leave bundle dormant": "R97 failure cleanup",
         "R97 bundle reinitialize after fail-closed reset": "R97 recreate lifecycle",
