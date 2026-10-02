@@ -1105,67 +1105,67 @@ def main() -> None:
             + ", ".join(missing_r126_output_binding)
         )
 
-    r136_live_output_binding_contract = [
+    r137_live_output_binding_contract = [
         (
             "struct NativeFixedFunctionOutputBindingReadiness",
             NATIVE_BACKEND_HPP,
-            "R136 live RS/OM binding readiness identity",
+            "R137 live RS/OM binding readiness identity",
         ),
         (
             "NativeFixedFunctionOutputStateBinding::binding_readiness(",
             NATIVE_BACKEND_CPP,
-            "R136 live RS/OM observation implementation",
+            "R137 live RS/OM observation implementation",
         ),
         (
             "context->RSGetState(",
             NATIVE_BACKEND_CPP,
-            "R136 rasterizer readback",
+            "R137 rasterizer readback",
         ),
         (
             "context->RSGetViewports(",
             NATIVE_BACKEND_CPP,
-            "R136 viewport readback",
+            "R137 viewport readback",
         ),
         (
             "context->RSGetScissorRects(",
             NATIVE_BACKEND_CPP,
-            "R136 scissor readback",
+            "R137 scissor readback",
         ),
         (
             "context->OMGetBlendState(",
             NATIVE_BACKEND_CPP,
-            "R136 blend state/factor/sample-mask readback",
+            "R137 blend state/factor/sample-mask readback",
         ),
         (
             "context->OMGetDepthStencilState(",
             NATIVE_BACKEND_CPP,
-            "R136 depth-stencil/stencil-ref readback",
+            "R137 depth-stencil/stencil-ref readback",
         ),
         (
-            "R136 live output binding issues exact RS OM snapshot",
+            "R137 live output binding issues exact RS OM snapshot",
             CONSTANT_BUFFER_PROBE,
-            "R136 positive live output binding proof",
+            "R137 positive live output binding proof",
         ),
         (
-            "R136 live output binding fails closed after RS drift",
+            "R137 live output binding fails closed after RS drift",
             CONSTANT_BUFFER_PROBE,
-            "R136 post-apply rasterizer drift negative proof",
+            "R137 post-apply rasterizer drift negative proof",
         ),
         (
-            "R136 restored output binding reproduces exact snapshot",
+            "R137 restored output binding reproduces exact snapshot",
             CONSTANT_BUFFER_PROBE,
-            "R136 deterministic restore proof",
+            "R137 deterministic restore proof",
         ),
     ]
-    missing_r136_live_output_binding = [
+    missing_r137_live_output_binding = [
         meaning
-        for token, source, meaning in r136_live_output_binding_contract
+        for token, source, meaning in r137_live_output_binding_contract
         if token not in source
     ]
-    if missing_r136_live_output_binding:
+    if missing_r137_live_output_binding:
         raise SystemExit(
-            "DX11 R136 live output-binding contract drift: "
-            + ", ".join(missing_r136_live_output_binding)
+            "DX11 R137 live output-binding contract drift: "
+            + ", ".join(missing_r137_live_output_binding)
         )
 
     r126_output_binding_provenance_contract = [

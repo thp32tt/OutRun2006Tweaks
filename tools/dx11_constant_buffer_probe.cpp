@@ -2351,7 +2351,7 @@ int main()
         liveOutputBindingReady.snapshotToken != 0 &&
         outputStateBinding.validate_binding_snapshot(
             d3d.context, liveOutputBindingReady.snapshotToken),
-        "R136 live output binding issues exact RS OM snapshot");
+        "R137 live output binding issues exact RS OM snapshot");
 
     d3d.context->RSSetState(nullptr);
     const auto driftedOutputBinding =
@@ -2365,10 +2365,10 @@ int main()
         driftedOutputBinding.snapshotToken == 0 &&
         !outputStateBinding.validate_binding_snapshot(
             d3d.context, liveOutputBindingReady.snapshotToken),
-        "R136 live output binding fails closed after RS drift");
+        "R137 live output binding fails closed after RS drift");
     require(
         outputStateBinding.apply(d3d.context),
-        "R136 live output binding restores sealed RS OM state");
+        "R137 live output binding restores sealed RS OM state");
     const auto restoredOutputBinding =
         outputStateBinding.binding_readiness(d3d.context);
     require(
@@ -2377,7 +2377,7 @@ int main()
             liveOutputBindingReady.snapshotToken &&
         outputStateBinding.validate_binding_snapshot(
             d3d.context, liveOutputBindingReady.snapshotToken),
-        "R136 restored output binding reproduces exact snapshot");
+        "R137 restored output binding reproduces exact snapshot");
 
     DevicePair outputBindingOtherDevice = create_warp_device();
     require(
