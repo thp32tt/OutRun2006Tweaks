@@ -21,6 +21,7 @@ namespace
     using outrun::vr::dx11::FixedFunctionUnsupportedStageChain;
     using outrun::vr::dx11::FixedFunctionUnsupportedTextureTransform;
     using outrun::vr::dx11::PipelineUnsupportedBlend;
+    using outrun::vr::dx11::PipelineUnsupportedDualSourceBlend;
     using outrun::vr::dx11::PipelineUnsupportedSeparateAlphaBlend;
     using outrun::vr::dx11::PipelineUnsupportedStencil;
     using outrun::vr::dx11::compile_fixed_function_pixel_shader_prototype;
@@ -151,6 +152,9 @@ int main()
             (translated.unsupported & PipelineUnsupportedBlend) != 0,
             "SRCCOLOR2 source blend must remain fail-closed without SV_Target1");
         require(
+            (translated.unsupported & PipelineUnsupportedDualSourceBlend) != 0,
+            "SRCCOLOR2 source blend must report dedicated dual-source blocker");
+        require(
             rt.SrcBlend == D3D11_BLEND_SRC1_COLOR,
             "SRCCOLOR2 source blend mapping drifted");
     }
@@ -167,6 +171,9 @@ int main()
         require(
             (translated.unsupported & PipelineUnsupportedBlend) != 0,
             "INVSRCCOLOR2 source blend must remain fail-closed without SV_Target1");
+        require(
+            (translated.unsupported & PipelineUnsupportedDualSourceBlend) != 0,
+            "INVSRCCOLOR2 source blend must report dedicated dual-source blocker");
         require(
             rt.SrcBlend == D3D11_BLEND_INV_SRC1_COLOR,
             "INVSRCCOLOR2 source blend mapping drifted");
@@ -185,6 +192,9 @@ int main()
             (translated.unsupported & PipelineUnsupportedBlend) != 0,
             "SRCCOLOR2 destination blend must remain fail-closed without SV_Target1");
         require(
+            (translated.unsupported & PipelineUnsupportedDualSourceBlend) != 0,
+            "SRCCOLOR2 destination blend must report dedicated dual-source blocker");
+        require(
             rt.DestBlend == D3D11_BLEND_SRC1_COLOR,
             "SRCCOLOR2 destination blend mapping drifted");
     }
@@ -202,8 +212,25 @@ int main()
             (translated.unsupported & PipelineUnsupportedBlend) != 0,
             "INVSRCCOLOR2 destination blend must remain fail-closed without SV_Target1");
         require(
+            (translated.unsupported & PipelineUnsupportedDualSourceBlend) != 0,
+            "INVSRCCOLOR2 destination blend must report dedicated dual-source blocker");
+        require(
             rt.DestBlend == D3D11_BLEND_INV_SRC1_COLOR,
             "INVSRCCOLOR2 destination blend mapping drifted");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.alphaBlendEnable = FALSE;
+        state.srcBlend = D3DBLEND_SRCCOLOR2;
+        state.destBlend = D3DBLEND_INVSRCCOLOR2;
+
+        const auto translated = translate_pipeline(state);
+        require(
+            (translated.unsupported & PipelineUnsupportedDualSourceBlend) == 0 &&
+            (translated.unsupported & PipelineUnsupportedBlend) == 0,
+            "disabled alpha blending must ignore dormant dual-source factors");
     }
 
     {
