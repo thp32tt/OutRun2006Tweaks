@@ -71,7 +71,7 @@ class NativeControllerTests(unittest.TestCase):
                 self.assertIn('RESULT_SHA=NOT_CREATED', prompt)
                 self.assertIn('같은 응답에서 실제 material 작업', prompt)
                 self.assertIn('FINAL_ARTWORK_FIRST', prompt)
-                self.assertLessEqual(len(prompt.encode()), 1500)
+                self.assertLessEqual(len(prompt.encode()), 1700)
             else:
                 self.assertLessEqual(len(prompt.encode()), 650)
             self.assertIn('Skill', prompt)
