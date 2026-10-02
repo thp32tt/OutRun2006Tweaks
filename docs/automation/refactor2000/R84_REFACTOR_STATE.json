@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1022,
+  "cycle": 1052,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -187,11 +187,21 @@
     "R84-REF-GUARD-0011",
     "R84-REF-XYZRHW-0014",
     "R84-REF-LIFECYCLE-0053",
-    "R84-REF-HOOKSET-0017"
+    "R84-REF-HOOKSET-0017",
+    "R84-REF-VERIFY-0009",
+    "R84-REF-PERF-0019",
+    "R84-REF-PERF-0020",
+    "R84-REF-PERF-0021",
+    "R84-REF-PERF-0022",
+    "R84-REF-LIFECYCLE-0054",
+    "R84-REF-HOOKSET-0018",
+    "R84-REF-STATE-0027",
+    "R84-REF-DISPATCH-0015",
+    "R84-REF-GUARD-0012"
   ],
-  "next": "Cycles 1023-1025: cross-layer verifier/guard review, then revisit helper extraction opportunities in telemetry and lifecycle only; APPLY_GATE at 1025.",
-  "updatedKst": "2026-10-02T09:51:00+09:00",
-  "batchStatus": "R84_200C_EXT_CYCLE_1022",
+  "next": "Cycles 1053-1055: revisit R30 buffer shadow registry and scratch ownership, then R32 DirectGPU cleanup and R34 reset replay; APPLY_GATE at 1055.",
+  "updatedKst": "2026-10-02T09:56:00+09:00",
+  "batchStatus": "R84_200C_EXT_CYCLE_1052",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -346,6 +356,16 @@
     "Cycles 1011-1013 R84-REF-GUARD-0011: R34 pending-resync then RasterReplayScope sequence reviewed; failure path deliberately fail-closes before draw. APPLY_GATE 1013 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 1014-1016 R84-REF-XYZRHW-0014: R34 XYZRHW-first final draw wrappers reviewed; they preserve R30 transformed path before final lower draw. APPLY_GATE 1016 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 1017-1019 R84-REF-LIFECYCLE-0053: R34 Reset replay fail-close state reviewed against mono-safety and depth/stencil invalidation. APPLY_GATE 1019 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
-    "Cycles 1020-1022 R84-REF-HOOKSET-0017: R34 hook transaction ownership reviewed; final Reset/Present/draw hooks remain a coherent top-level set. APPLY_GATE 1022 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
+    "Cycles 1020-1022 R84-REF-HOOKSET-0017: R34 hook transaction ownership reviewed; final Reset/Present/draw hooks remain a coherent top-level set. APPLY_GATE 1022 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1023-1025 R84-REF-VERIFY-0009: Verifier markers cross-checked for R29/R30 completion, R31 recording/draw transaction, R32-R34 hook transactions and wait-policy boundaries; all present. APPLY_GATE 1025 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1026-1028 R84-REF-PERF-0019: R30 telemetry counters reviewed against SkyGlow/XYZRHW/HUD domains; counters are diagnostic and coupled to domain-specific fallback sites. APPLY_GATE 1028 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1029-1031 R84-REF-PERF-0020: R31 dispatch telemetry reviewed against reliability counters; merging with R32 frame telemetry would mix draw and frame lifetimes. APPLY_GATE 1031 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1032-1034 R84-REF-PERF-0021: R32 perf-window and spike-log cooldown reviewed; separate baseline/window/cooldown state is intentional. APPLY_GATE 1034 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1035-1037 R84-REF-PERF-0022: R33 depth/stencil cache telemetry reviewed; read failures, live fallbacks, syncs and hits map to distinct safety decisions. APPLY_GATE 1037 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1038-1040 R84-REF-LIFECYCLE-0054: R29-R34 install-state publication symmetry reviewed; layer-specific prerequisites prevent a shared generic installer without obscuring contracts. APPLY_GATE 1040 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1041-1043 R84-REF-HOOKSET-0018: Hook rollback direction reviewed across layers; reverse/array reset semantics are intentionally tailored to hook ownership. APPLY_GATE 1043 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1044-1046 R84-REF-STATE-0027: StateBlock tracker consumers reviewed across R31/R33/R34; physical interception remains R31 while consumers use neutral state. APPLY_GATE 1046 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1047-1049 R84-REF-DISPATCH-0015: ScreenSpace semantic route ownership reviewed R30->R33; classifier reuse does not justify collapsing execution layers. APPLY_GATE 1049 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 1050-1052 R84-REF-GUARD-0012: Final raster guard and lower dispatch failure handling reviewed; independent guards remain defense-in-depth. APPLY_GATE 1052 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
   ]
 }
