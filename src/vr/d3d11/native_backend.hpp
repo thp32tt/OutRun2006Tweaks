@@ -20,6 +20,7 @@ struct FixedFunctionVertexShaderPrototype;
 struct FixedFunctionPixelShaderPrototype;
 struct VertexInputLayoutTranslation;
 struct FixedFunctionStageState;
+struct PipelineTranslation;
 
 struct NativeBackendConfig {
     std::uint32_t width = 0;
@@ -436,6 +437,73 @@ private:
         const void*,
         std::unique_ptr<NativeManagedTextureShadow>> shadows_;
     std::uint64_t membership_generation_ = 1;
+};
+
+// R116 owns concrete D3D11 blend/depth-stencil/rasterizer objects for one
+// exact PipelineTranslation and seals their immutable translation identity.
+// This remains dormant activation-readiness evidence: it does not bind state
+// or route a game draw.
+struct NativeFixedFunctionRenderStateReadiness {
+    bool inputValid{};
+    bool bundleReady{};
+    bool deviceMatches{};
+    bool translationMatches{};
+    bool ready{};
+    std::uint64_t bundleGeneration{};
+    std::uint64_t translationIdentity{};
+    std::uint64_t snapshotToken{};
+};
+
+class NativeFixedFunctionRenderStateBundle final {
+public:
+    NativeFixedFunctionRenderStateBundle() = default;
+    ~NativeFixedFunctionRenderStateBundle() = default;
+    NativeFixedFunctionRenderStateBundle(
+        const NativeFixedFunctionRenderStateBundle&) = delete;
+    NativeFixedFunctionRenderStateBundle& operator=(
+        const NativeFixedFunctionRenderStateBundle&) = delete;
+
+    bool initialize(
+        ID3D11Device* device,
+        const PipelineTranslation& translation) noexcept;
+    void shutdown() noexcept;
+    [[nodiscard]] NativeFixedFunctionRenderStateReadiness
+    translation_readiness(
+        ID3D11Device* expectedDevice,
+        const PipelineTranslation& translation) const noexcept;
+    [[nodiscard]] bool validate_translation_snapshot(
+        ID3D11Device* expectedDevice,
+        const PipelineTranslation& translation,
+        std::uint64_t snapshotToken) const noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && blend_state_ && depth_stencil_state_ &&
+            rasterizer_state_;
+    }
+    [[nodiscard]] ID3D11Device* device() const noexcept {
+        return device_.Get();
+    }
+    [[nodiscard]] ID3D11BlendState* blend_state() const noexcept {
+        return blend_state_.Get();
+    }
+    [[nodiscard]] ID3D11DepthStencilState* depth_stencil_state() const noexcept {
+        return depth_stencil_state_.Get();
+    }
+    [[nodiscard]] ID3D11RasterizerState* rasterizer_state() const noexcept {
+        return rasterizer_state_.Get();
+    }
+    [[nodiscard]] UINT stencil_ref() const noexcept {
+        return stencil_ref_;
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11BlendState> blend_state_;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depth_stencil_state_;
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizer_state_;
+    UINT stencil_ref_ = 0;
+    std::uint64_t translation_identity_ = 0;
+    std::uint64_t bundle_generation_ = 0;
 };
 
 // R112 seals the exact translation identity of an R97 bundle without routing
