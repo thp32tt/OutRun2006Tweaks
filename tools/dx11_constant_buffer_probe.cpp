@@ -2520,7 +2520,7 @@ int main()
             texturedActivation, outputBindingRenderReady, surfacePairReady,
             outputStateReady, outputStateBinding, changedGeometryIdentity,
             changedGeometryDraw.snapshotToken),
-        "R131 draw snapshot still changes with independent geometry identity");
+        "R122 draw snapshot changes with geometry identity; R131 draw snapshot still changes with independent geometry identity");
 
     DevicePair pipelineOtherDevice = create_warp_device();
     auto changedLayout = inputLayout;
