@@ -1080,7 +1080,8 @@ async def queue_send_conversion_execution_continuation(
     """Keep conversion TASK active when a stable assistant turn ends without a task commit."""
     now = datetime.now(TZ)
     active["task_latched"] = True
-    active["controller_stage"] = "WAIT_DURABLE_RESULT"
+    if active.get("controller_stage") in {None, "", "WAIT_DURABLE_RESULT", "WAIT_ACTIONS"}:
+        active["controller_stage"] = "C0_RECOVER"
 
     turn_key = str(active.get("sent_at") or active.get("dispatch_started_at") or "")
     if active.get("premature_stop_counted_for_send_at") != turn_key:
@@ -1096,7 +1097,7 @@ async def queue_send_conversion_execution_continuation(
 
     active["last_checkpoint_head"] = latest_head
     active["last_checkpoint_at"] = now.isoformat()
-    active["last_checkpoint_stage"] = "WAIT_DURABLE_RESULT"
+    active["last_checkpoint_stage"] = active.get("controller_stage") or "C0_RECOVER"
 
     strikes = int(active.get("premature_stop_count", 0) or 0)
     if strikes >= CONVERSION_PREMATURE_STOP_ROLLOVER_THRESHOLD:
@@ -1111,7 +1112,7 @@ async def queue_send_conversion_execution_continuation(
             active["premature_stop_count"] = 0
             active["conversion_continuation_response_hash"] = None
             active["conversion_continuation_sent_at"] = None
-            active["controller_stage"] = "WAIT_DURABLE_RESULT"
+            active["controller_stage"] = active.get("last_checkpoint_stage") or active.get("controller_stage") or "C0_RECOVER"
             active["assistant_claim_verification"] = "PREMATURE_STOP_ROLLOVER_SENT"
             return True
         active["phase"] = "WAIT_CHAT"
