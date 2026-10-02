@@ -416,8 +416,12 @@ def production_id_from_identifier(identifier: str) -> str:
 
 
 def queue_lane_minimum_next(q: dict, lane: str) -> int:
-    """Return a collision-safe migration floor from v1 queue history."""
-    seen = [int(q.get("counter", 0))]
+    """Return a collision-safe migration floor from v1 queue history.
+
+    Once lane history exists, do not let the legacy global counter couple lane
+    numbering again. The global counter is only a first-migration fallback.
+    """
+    seen = []
     records = []
     if isinstance(q.get("active"), dict):
         records.append(q["active"])
@@ -430,7 +434,9 @@ def queue_lane_minimum_next(q: dict, lane: str) -> int:
         match = re.search(r"-(\d{5,})$", identifier)
         if match:
             seen.append(int(match.group(1)))
-    return max(seen, default=0) + 1
+    if seen:
+        return max(seen) + 1
+    return int(q.get("counter", 0)) + 1
 
 
 def next_task_event_id(reg: Registry, production_id: str) -> str:
