@@ -11,24 +11,37 @@ import argparse
 from pathlib import Path
 
 
+def normalize_hex_bytes(value: str) -> bytes:
+    try:
+        return bytes.fromhex(" ".join(value.split()))
+    except ValueError as exc:
+        raise ValueError("invalid hexadecimal byte sequence") from exc
+
+
+def validate_overlap(previous: bytes, current: bytes, overlap: bytes) -> bool:
+    if not overlap:
+        return False
+    return previous.endswith(overlap) and current.startswith(overlap)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--hex-file", required=True)
     parser.add_argument("--expected-overlap", required=True)
     args = parser.parse_args()
 
-    raw = Path(args.hex_file).read_text(encoding="utf-8").split()
-    actual = " ".join(byte.lower() for byte in raw)
-    expected = " ".join(args.expected_overlap.lower().split())
+    actual_text = Path(args.hex_file).read_text(encoding="utf-8")
+    actual = normalize_hex_bytes(actual_text)
+    expected = normalize_hex_bytes(args.expected_overlap)
 
-    if not actual.startswith(expected):
+    if not validate_overlap(actual, actual, expected):
         print("DXVK disassembly overlap: FAIL")
-        print(f"expected prefix: {expected}")
-        print(f"actual bytes:    {actual}")
+        print(f"expected overlap: {expected.hex(' ')}")
+        print(f"actual bytes:     {actual.hex(' ')}")
         return 1
 
     print("DXVK disassembly overlap: PASS")
-    print(f"validated prefix bytes: {expected}")
+    print(f"validated overlap bytes: {expected.hex(' ')}")
     return 0
 
 
