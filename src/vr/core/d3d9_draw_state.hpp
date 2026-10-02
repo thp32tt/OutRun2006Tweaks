@@ -33,6 +33,16 @@ namespace OutRunVR::DrawState
             D3DCOLORWRITEENABLE_BLUE |
             D3DCOLORWRITEENABLE_ALPHA;
 
+        // R124 dynamic output-state provenance used by dormant DX11 draw
+        // readiness. D3D9 BLENDFACTOR maps to D3D11 OMSetBlendState's
+        // float[4] factor; MULTISAMPLEMASK maps to its sample mask. Viewport
+        // and scissor rectangle remain draw-time dynamic state.
+        DWORD blendFactor = 0xFFFFFFFFu;
+        DWORD multiSampleMask = 0xFFFFFFFFu;
+        D3DVIEWPORT9 viewport{};
+        RECT scissorRect{};
+        bool outputStateComplete = false;
+
         DWORD stencilEnable = FALSE;
         DWORD stencilReadMask = 0xFFFFFFFFu;
         DWORD stencilWriteMask = 0xFFFFFFFFu;
