@@ -49,6 +49,19 @@ namespace OutRunVR::DrawState
         // until endpoint coverage is explicitly emulated.
         DWORD lastPixel = TRUE;
         DWORD antialiasedLineEnable = FALSE;
+        // R169: D3D9 POINTLIST rasterization can expand each source point to
+        // a screen-space quad and can replace/scale point texture coordinates.
+        // Preserve the complete point-size/sprite/scale render-state family;
+        // native D3D11 POINTLIST remains fail-closed until those semantics are
+        // explicitly emulated rather than inferred from topology alone.
+        DWORD pointSizeBits = 0x3F800000u;
+        DWORD pointSizeMinBits = 0x3F800000u;
+        DWORD pointSizeMaxBits = 0x42800000u;
+        DWORD pointSpriteEnable = FALSE;
+        DWORD pointScaleEnable = FALSE;
+        DWORD pointScaleABits = 0x3F800000u;
+        DWORD pointScaleBBits = 0u;
+        DWORD pointScaleCBits = 0u;
         // R161: D3D9 user clipping is not reproduced by the native DX11
         // fixed-function path. Preserve both gates so non-default semantics
         // fail closed instead of being erased by DepthClipEnable=TRUE.
