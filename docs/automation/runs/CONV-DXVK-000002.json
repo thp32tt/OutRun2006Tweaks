@@ -191,7 +191,8 @@
     5947982893,
     5948007671,
     5948133867,
-    5948240512
+    5948240512,
+    5948449828
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -4089,6 +4090,84 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer branch-authoritative raw continuation beginning at 0x0018307A with mandatory overlap byte 89. Require canonical provenance success, then exact-decode only complete instructions, preserve any subsequent cut edge, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_OVERLAP_EVIDENCE_RESULT_BINDING_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "4b7c2d0c6530e02a9f8754f5d1e1b5cd3204f813",
+      "validation_bearing_result_sha": "4b7c2d0c6530e02a9f8754f5d1e1b5cd3204f813",
+      "commit_message": "test: bind DXVK overlap evidence bytes [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Modern DXVK overlap provenance (continuation 43+) must bind emitted expected/actual overlap bytes and both overlap booleans directly to the same local values used by fail-closed capture validation, preventing stale or misleading CI evidence while captured status still passes.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub AGENTS.md, current branch state/work queue, regression/history context and Issue #14; repeatedly refreshed the fast-moving same-JOB branch to avoid stale-parent or duplicate frontier writes."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "After concurrent workers consumed F46/F47 canonical frontiers, selected an independent verifier gap: modern overlap collectors gated capture validity but expected/actual overlap result fields were not statically bound to their validated local values."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 4b7c2d0c6530e02a9f8754f5d1e1b5cd3204f813 adds overlap_expected_bytes, overlap_actual_bytes, overlap_matches and predecessor_overlap_matches result-binding requirements to the continuation 43+ cross-proof contract."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "GitHub-source audit covered 11 modern overlap collectors with zero binding failures. Exact-SHA DXVK Canonical Disassembly Evidence run 36985779879/job 110770361061 succeeded through static verifier, canonical EXE identity, analyzer and artifact upload. Backend Conversion Gate 36985779774 remained in progress and is not claimed complete."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit 4b7c2d0c6530e02a9f8754f5d1e1b5cd3204f813 contains required [AUTO:CONV-DXVK-000002]. Issue #14 comment 5948449828 records implementation and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier/test-contract hardening only; no deployable DXVK payload, selector, backend binary or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally without overwriting the newer branch-authoritative canonical continuation frontier."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "4b7c2d0c6530e02a9f8754f5d1e1b5cd3204f813",
+        "modern_overlap_stage_count": 11,
+        "modern_overlap_stage_ids": [
+          43,
+          44,
+          46,
+          49,
+          50,
+          51,
+          52,
+          53,
+          55,
+          56,
+          57
+        ],
+        "source_audit_binding_failures": 0,
+        "dxvk_disassembly_evidence_run_id": 36985779879,
+        "dxvk_disassembly_evidence_job_id": 110770361061,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "backend_disassembly_contract": "PASS",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "artifact_id": 11217705987,
+        "artifact_digest": "sha256:51e43360420cb60ccc83d8ca1da5bf07c4ed3e5b6ccb08565219c31e1b75a75d",
+        "backend_conversion_gate_run_id": 36985779774,
+        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_CLAIMED_COMPLETE",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5948449828,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the overlap evidence result-binding invariant and continue from the newest branch-authoritative canonical continuation frontier; do not infer runtime/render semantics from raw/static disassembly evidence."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
