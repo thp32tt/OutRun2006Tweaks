@@ -58,6 +58,67 @@ std::uint64_t hash_pipeline_input_layout_identity(
     return hash == 0 ? 1 : hash;
 }
 
+std::uint64_t hash_pipeline_render_state_identity(
+    const PipelineTranslation& pipeline) noexcept {
+    if (!pipeline.exact())
+        return 0;
+
+    std::uint64_t hash = 0xcbf29ce484222325ull;
+    const auto mix = [&hash](std::uint64_t value) noexcept {
+        hash = mix_readiness_snapshot_token(hash, value);
+    };
+    const auto mix_float = [&mix](float value) noexcept {
+        std::uint32_t bits = 0;
+        std::memcpy(&bits, &value, sizeof(bits));
+        mix(bits);
+    };
+    const auto mix_stencil_face =
+        [&mix](const D3D11_DEPTH_STENCILOP_DESC& face) noexcept {
+            mix(static_cast<std::uint32_t>(face.StencilFailOp));
+            mix(static_cast<std::uint32_t>(face.StencilDepthFailOp));
+            mix(static_cast<std::uint32_t>(face.StencilPassOp));
+            mix(static_cast<std::uint32_t>(face.StencilFunc));
+        };
+
+    mix(pipeline.blend.AlphaToCoverageEnable != FALSE ? 1u : 0u);
+    mix(pipeline.blend.IndependentBlendEnable != FALSE ? 1u : 0u);
+    for (const auto& rt : pipeline.blend.RenderTarget) {
+        mix(rt.BlendEnable != FALSE ? 1u : 0u);
+        mix(static_cast<std::uint32_t>(rt.SrcBlend));
+        mix(static_cast<std::uint32_t>(rt.DestBlend));
+        mix(static_cast<std::uint32_t>(rt.BlendOp));
+        mix(static_cast<std::uint32_t>(rt.SrcBlendAlpha));
+        mix(static_cast<std::uint32_t>(rt.DestBlendAlpha));
+        mix(static_cast<std::uint32_t>(rt.BlendOpAlpha));
+        mix(rt.RenderTargetWriteMask);
+    }
+
+    const auto& depth = pipeline.depth_stencil;
+    mix(depth.DepthEnable != FALSE ? 1u : 0u);
+    mix(static_cast<std::uint32_t>(depth.DepthWriteMask));
+    mix(static_cast<std::uint32_t>(depth.DepthFunc));
+    mix(depth.StencilEnable != FALSE ? 1u : 0u);
+    mix(depth.StencilReadMask);
+    mix(depth.StencilWriteMask);
+    mix_stencil_face(depth.FrontFace);
+    mix_stencil_face(depth.BackFace);
+
+    const auto& raster = pipeline.rasterizer;
+    mix(static_cast<std::uint32_t>(raster.FillMode));
+    mix(static_cast<std::uint32_t>(raster.CullMode));
+    mix(raster.FrontCounterClockwise != FALSE ? 1u : 0u);
+    mix(static_cast<std::uint32_t>(raster.DepthBias));
+    mix_float(raster.DepthBiasClamp);
+    mix_float(raster.SlopeScaledDepthBias);
+    mix(raster.DepthClipEnable != FALSE ? 1u : 0u);
+    mix(raster.ScissorEnable != FALSE ? 1u : 0u);
+    mix(raster.MultisampleEnable != FALSE ? 1u : 0u);
+    mix(raster.AntialiasedLineEnable != FALSE ? 1u : 0u);
+    mix(pipeline.stencil_ref);
+
+    return hash == 0 ? 1 : hash;
+}
+
 bool texture_uncompressed_row_bytes(
     D3DFORMAT format,
     UINT width,
@@ -1324,6 +1385,116 @@ bool NativeManagedTextureRegistry::read_shadow(
     const auto* shadow = find_locked(textureKey);
     return shadow && shadow->read_full(
         destination, destinationRowPitch, destinationRows);
+}
+
+bool NativeFixedFunctionRenderStateBundle::initialize(
+    ID3D11Device* device,
+    const PipelineTranslation& translation) noexcept {
+
+    shutdown();
+    const auto translationIdentity =
+        hash_pipeline_render_state_identity(translation);
+    if (!device || translationIdentity == 0)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
+    if (FAILED(device->CreateBlendState(
+            &translation.blend,
+            blendState.ReleaseAndGetAddressOf())) ||
+        !blendState ||
+        FAILED(device->CreateDepthStencilState(
+            &translation.depth_stencil,
+            depthStencilState.ReleaseAndGetAddressOf())) ||
+        !depthStencilState ||
+        FAILED(device->CreateRasterizerState(
+            &translation.rasterizer,
+            rasterizerState.ReleaseAndGetAddressOf())) ||
+        !rasterizerState)
+        return false;
+
+    device_ = device;
+    blend_state_ = std::move(blendState);
+    depth_stencil_state_ = std::move(depthStencilState);
+    rasterizer_state_ = std::move(rasterizerState);
+    stencil_ref_ = translation.stencil_ref;
+    translation_identity_ = translationIdentity;
+    ++bundle_generation_;
+    if (bundle_generation_ == 0)
+        ++bundle_generation_;
+    return true;
+}
+
+NativeFixedFunctionRenderStateReadiness
+NativeFixedFunctionRenderStateBundle::translation_readiness(
+    ID3D11Device* expectedDevice,
+    const PipelineTranslation& translation) const noexcept {
+    NativeFixedFunctionRenderStateReadiness out{};
+    const auto translationIdentity =
+        hash_pipeline_render_state_identity(translation);
+    if (!expectedDevice || translationIdentity == 0)
+        return out;
+
+    out.inputValid = true;
+    out.bundleReady = ready();
+    out.bundleGeneration = bundle_generation_;
+    out.translationIdentity = translationIdentity;
+    out.translationMatches =
+        translation_identity_ != 0 &&
+        translation_identity_ == translationIdentity &&
+        stencil_ref_ == translation.stencil_ref;
+
+    if (out.bundleReady) {
+        Microsoft::WRL::ComPtr<ID3D11Device> blendDevice;
+        Microsoft::WRL::ComPtr<ID3D11Device> depthDevice;
+        Microsoft::WRL::ComPtr<ID3D11Device> rasterDevice;
+        blend_state_->GetDevice(blendDevice.ReleaseAndGetAddressOf());
+        depth_stencil_state_->GetDevice(depthDevice.ReleaseAndGetAddressOf());
+        rasterizer_state_->GetDevice(rasterDevice.ReleaseAndGetAddressOf());
+        out.deviceMatches =
+            device_.Get() == expectedDevice &&
+            blendDevice.Get() == expectedDevice &&
+            depthDevice.Get() == expectedDevice &&
+            rasterDevice.Get() == expectedDevice;
+    }
+
+    out.ready =
+        out.bundleReady &&
+        out.deviceMatches &&
+        out.translationMatches;
+    if (out.ready) {
+        std::uint64_t snapshotToken = 0xcbf29ce484222325ull;
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken,
+            reinterpret_cast<std::uintptr_t>(expectedDevice));
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, translationIdentity);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, bundle_generation_);
+        out.snapshotToken = snapshotToken == 0 ? 1 : snapshotToken;
+    }
+    return out;
+}
+
+bool NativeFixedFunctionRenderStateBundle::validate_translation_snapshot(
+    ID3D11Device* expectedDevice,
+    const PipelineTranslation& translation,
+    std::uint64_t snapshotToken) const noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        translation_readiness(expectedDevice, translation);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
+void NativeFixedFunctionRenderStateBundle::shutdown() noexcept {
+    rasterizer_state_.Reset();
+    depth_stencil_state_.Reset();
+    blend_state_.Reset();
+    device_.Reset();
+    stencil_ref_ = 0;
+    translation_identity_ = 0;
 }
 
 bool NativeFixedFunctionPipelineBundle::initialize(
