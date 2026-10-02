@@ -1604,6 +1604,70 @@ def main() -> None:
             + ", ".join(missing_r138_final_live_output_binding)
         )
 
+
+    r139_same_context_final_bound_draw_contract = [
+        (
+            "compose_fixed_function_same_context_bound_draw_readiness(",
+            NATIVE_BACKEND_HPP,
+            "R139 public same-context final readiness entrypoint",
+        ),
+        (
+            "validate_fixed_function_same_context_bound_draw_snapshot(",
+            NATIVE_BACKEND_HPP,
+            "R139 same-context final snapshot validator",
+        ),
+        (
+            "compose_fixed_function_multistage_textured_draw_readiness(\n            draw, context, samplers, textures)",
+            NATIVE_BACKEND_CPP,
+            "R139 aggregate PS bindings are reobserved on caller context",
+        ),
+        (
+            "pipelineBundle.binding_readiness(\n        context, layout, vertexPrototype, pixelPrototype",
+            NATIVE_BACKEND_CPP,
+            "R139 IA VS PS bindings are reobserved on caller context",
+        ),
+        (
+            "compose_fixed_function_bound_draw_readiness(\n        draw, texturedDraw, pipelineBinding, context, outputStateBinding)",
+            NATIVE_BACKEND_CPP,
+            "R139 R138 live RS OM composition consumes same-context observations",
+        ),
+        (
+            "R139 same-context final bound draw reobserves every live binding",
+            CONSTANT_BUFFER_PROBE,
+            "R139 positive same-context pre-draw proof",
+        ),
+        (
+            "R139 same-context final bound draw rejects live PS pipeline drift",
+            CONSTANT_BUFFER_PROBE,
+            "R139 live pipeline drift fails closed",
+        ),
+        (
+            "R139 same-context final bound draw rejects live aggregate PS drift",
+            CONSTANT_BUFFER_PROBE,
+            "R139 aggregate texture drift fails closed",
+        ),
+        (
+            "R139 same-context final bound draw rejects live RS OM drift",
+            CONSTANT_BUFFER_PROBE,
+            "R139 live output drift fails closed",
+        ),
+        (
+            "R139 same-context final bound draw restores deterministic snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R139 deterministic same-context restore proof",
+        ),
+    ]
+    missing_r139_same_context_final_bound_draw = [
+        meaning
+        for token, source, meaning in r139_same_context_final_bound_draw_contract
+        if token not in source
+    ]
+    if missing_r139_same_context_final_bound_draw:
+        raise SystemExit(
+            "DX11 R139 same-context final bound draw contract drift: "
+            + ", ".join(missing_r139_same_context_final_bound_draw)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
@@ -1616,6 +1680,7 @@ def main() -> None:
             or "observe_fixed_function_texture_binding_set(" in runtime_source
             or "validate_fixed_function_texture_binding_set_snapshot(" in runtime_source
             or "compose_fixed_function_bound_draw_readiness(" in runtime_source
+            or "compose_fixed_function_same_context_bound_draw_readiness(" in runtime_source
             or ".binding_readiness(" in runtime_source
         ):
             runtime_textured_draw_users.append(
@@ -1623,7 +1688,7 @@ def main() -> None:
             )
     if runtime_textured_draw_users:
         raise SystemExit(
-            "DX11 R132/R133/R134/R136/R137/R138 dormant binding readiness gained a production "
+            "DX11 R132/R133/R134/R136/R137/R138/R139 dormant binding readiness gained a production "
             "caller before activation gate: " + ", ".join(runtime_textured_draw_users)
         )
 
