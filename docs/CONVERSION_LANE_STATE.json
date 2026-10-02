@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "8402d8765246546ed06f36506f479309d55a80ab",
+  "state_parent_head": "4e794ae980bfbbe496c491d67070d8162693d245",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -1406,6 +1406,77 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authoritative canonical-disassembly frontier; continue only from its latest validated edge, keep bounded control-flow proofs semantically quarantined, and consume the next non-superseded descendant static gate result."
+    },
+    {
+      "unit_id": "DXVK_F36_CANONICAL_EXE_PROVENANCE_0x182D93_TO_0x182DD3",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "c573149dbd27e62be36b23ae3a6c4d279c77dbae",
+      "validation_bearing_result_sha": "c573149dbd27e62be36b23ae3a6c4d279c77dbae",
+      "commit_message": "dxvk: capture canonical 0x182D93 continuation [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Added F36 bounded raw canonical provenance at exact predecessor boundary 0x00182D93, capturing 64 bytes through 0x00182DD3 with fail-closed predecessor, .text, probe-length and probe-end gates while preserving semantic/ownership quarantine.",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch, AGENTS.md, branch-local conversion/run state, regression/problem history and Issue #14 while tracking concurrent F35/F36 advancement."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Avoided duplicating concurrently landed F35 proof and selected the next unfinished static frontier: raw canonical provenance immediately after exact instruction boundary 0x00182D93."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material source commit c573149dbd27e62be36b23ae3a6c4d279c77dbae adds continuation_45 64-byte raw provenance collector and report/CLI fail-closed wiring."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA Build run 36979155651 job 110749495131 passed Verify backend disassembly contract. Exact SHA OutRun EXE HUD Inspector CI run 36979155705 static-exe-analysis job 110749655511 succeeded on canonical EXE SHA256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3 and reported EXACT_EXE_182D93_TO_182DD3_PROVENANCE_CAPTURED."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive source commit c573149dbd27e62be36b23ae3a6c4d279c77dbae contains [AUTO:CONV-DXVK-000002]; Issue #14 comment 5947473749 records implementation and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly provenance tooling only; no runtime payload, selector, backend binary, localization, or deployable package content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit because descendants already advanced to an F36 exact proof; newer primary frontier is preserved."
+        }
+      },
+      "validation": {
+        "exact_sha": "c573149dbd27e62be36b23ae3a6c4d279c77dbae",
+        "backend_conversion_gate_run_id": 36979155651,
+        "backend_conversion_gate_job_id": 110749495131,
+        "backend_disassembly_contract": "PASS",
+        "hud_inspector_run_id": 36979155705,
+        "static_exe_analysis_job_id": 110749655511,
+        "static_exe_analysis_conclusion": "success",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "provenance_status": "EXACT_EXE_182D93_TO_182DD3_PROVENANCE_CAPTURED",
+        "probe_start_rva": "0x00182D93",
+        "probe_end_rva": "0x00182DD3",
+        "probe_len": 64,
+        "probe_end_matches": true,
+        "artifact_id": 11214094750,
+        "artifact_digest": "sha256:ed1b1a13a97a46843761796ceb528676667473337184d0569f072451e567d596",
+        "descendant_head_at_state_write": "d2c4a45fbfea9c1eda63a6c22d6314e230b487ad",
+        "descendant_ahead_by": 7,
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947473749,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_DESCENDANT_F36_PROOF",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "exact_next_action": "Preserve descendant F36 exact proof b2e0f73a64aa00b4290f54db7196e39c88f9cd74. The next raw frontier should overlap incomplete bytes 83 3d 60 bc at 0x00182DCF and capture forward from that edge; keep forward target 0x00182E34 address-only until exact boundary proof and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
