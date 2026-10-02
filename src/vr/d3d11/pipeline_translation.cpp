@@ -1479,6 +1479,13 @@ namespace outrun::vr::dx11
         if (source.clipping == FALSE || source.clipPlaneEnable != 0u)
             out.unsupported |= PipelineUnsupportedClipping;
 
+        // D3D9 constant depth-bias units are not assumed equivalent to
+        // D3D11's integer DepthBias. Preserve both raw float-bit states and
+        // reject any non-default bias until an exact mapping is proven.
+        if (source.depthBiasBits != 0u ||
+            source.slopeScaleDepthBiasBits != 0u)
+            out.unsupported |= PipelineUnsupportedDepthBias;
+
         // R162: the current native fixed-function HLSL follows D3D9's
         // default Gouraud interpolation only. Do not let FLAT/PHONG state be
         // erased by an otherwise exact D3D11 pipeline descriptor.
