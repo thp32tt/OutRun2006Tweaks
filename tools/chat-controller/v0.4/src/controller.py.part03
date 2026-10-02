@@ -319,18 +319,101 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
     return True
 
 
+async def collect_retry_diagnostic(
+    page: Page,
+    slot: Slot,
+    active: dict,
+    retry_text: str,
+    *,
+    busy: bool,
+) -> dict:
+    """Capture bounded UI/queue evidence for persistent Retry without dumping chat history."""
+    now = datetime.now(TZ)
+    composer = await first_visible(page, INPUT_SELECTORS, total_wait_ms=250)
+    composer_rows = []
+    if composer is None:
+        composer_rows = (await composer_diagnostics(page))[:8]
+    assistant_text = await current_assistant_text(page)
+    rate_matches = [p for p in RATE_LIMIT_PATTERNS if re.search(p, retry_text, flags=re.I | re.S)]
+    conversation_matches = [p for p in CONVERSATION_LIMIT_PATTERNS if re.search(p, retry_text, flags=re.I | re.S)]
+    usage_matches = [p for p in LIMIT_PATTERNS if re.search(p, retry_text, flags=re.I | re.S)]
+    if rate_matches:
+        classification = "RATE_LIMIT"
+    elif conversation_matches:
+        classification = "CONVERSATION_LIMIT"
+    elif usage_matches:
+        classification = "USAGE_LIMIT"
+    elif busy:
+        classification = "BUSY_WITH_RETRY"
+    elif composer is None:
+        classification = "GENERIC_RETRY_COMPOSER_MISSING"
+    else:
+        classification = "GENERIC_RETRY_COMPOSER_PRESENT"
+    try:
+        page_title = (await page.title())[:160]
+    except Exception:
+        page_title = ""
+    sent_at = _parse_iso(active.get("sent_at"))
+    return {
+        "at": now.isoformat(),
+        "classification": classification,
+        "controller_mode": CONTROLLER_MODE,
+        "task_id": active.get("task_id"),
+        "slot": getattr(slot, "name", None),
+        "lane": active.get("lane"),
+        "branch": active.get("branch"),
+        "phase": active.get("phase"),
+        "attempt": active.get("attempt"),
+        "task_latched": active.get("task_latched"),
+        "controller_stage": active.get("controller_stage"),
+        "page_url": str(getattr(page, "url", "") or "")[:500],
+        "page_title": page_title,
+        "retry_surface": (retry_text or "")[:800],
+        "busy": bool(busy),
+        "composer_visible": composer is not None,
+        "composer_diagnostics": composer_rows,
+        "assistant_response_present": bool(assistant_text),
+        "assistant_response_chars": len(assistant_text or ""),
+        "assistant_response_hash": stable_hash(assistant_text) if assistant_text else None,
+        "rate_limit_match": rate_matches[0] if rate_matches else None,
+        "conversation_limit_match": conversation_matches[0] if conversation_matches else None,
+        "usage_limit_match": usage_matches[0] if usage_matches else None,
+        "generic_retry_clicks": int(active.get("generic_retry_clicks", 0) or 0),
+        "chat_rollovers": int(active.get("chat_rollovers", 0) or 0),
+        "seconds_since_send": (
+            max(0, int((now - sent_at).total_seconds())) if sent_at else None
+        ),
+    }
+
+
 async def queue_handle_retry_surface(context: BrowserContext, pages: dict[str, Page], page: Page, reg: Registry, slot: Slot, active: dict, q: dict) -> bool:
     """Serialize Retry handling while distinguishing real rate pressure from generic transient Retry."""
     retry = await first_visible(page, RETRY_SELECTORS, total_wait_ms=500)
     if retry is None:
         return False
 
-    if await detect_busy(page):
-        return True
-
     now = datetime.now(TZ)
     retry_text = await retry_surface_text(page)
-    is_rate = any(re.search(p, retry_text, flags=re.I | re.S) for p in RATE_LIMIT_PATTERNS)
+    busy = await detect_busy(page)
+    diagnostic = await collect_retry_diagnostic(
+        page, slot, active, retry_text, busy=busy
+    )
+    persist_retry_diagnostic(diagnostic)
+    active["last_retry_diagnostic_at"] = diagnostic["at"]
+    active["last_retry_classification"] = diagnostic["classification"]
+    active["last_retry_composer_visible"] = diagnostic["composer_visible"]
+    active["last_retry_surface"] = diagnostic["retry_surface"]
+    save_queue_state(q)
+
+    if busy:
+        write_runtime(
+            status="retry_busy_observed",
+            last_action=f"{active['task_id']} Retry visible while generation is still busy",
+            queue=active,
+        )
+        return True
+
+    is_rate = diagnostic["classification"] == "RATE_LIMIT"
     generic_clicks = int(active.get("generic_retry_clicks", 0) or 0)
 
     # An idle, stable response is handled before stale generic Retry UI.
@@ -397,6 +480,7 @@ async def queue_handle_retry_surface(context: BrowserContext, pages: dict[str, P
             active.pop("generic_retry_cooldown_until", None)
             if await queue_rollover_chat(context, pages, active, reason):
                 active["generic_retry_clicks"] = 0
+                active["last_retry_recovery_action"] = "FRESH_CHAT_ROLLOVER"
                 save_queue_state(q)
                 return True
             # Rollover may be temporarily deferred by normal send spacing. Stay
@@ -429,6 +513,7 @@ async def queue_handle_retry_surface(context: BrowserContext, pages: dict[str, P
         request_now = datetime.now(TZ)
         note_successful_request(reg, request_now, slot.name)
         active["last_retry_click_at"] = request_now.isoformat()
+        active["last_retry_recovery_action"] = "CONTROLLED_RETRY_CLICK"
         if not is_rate:
             active["generic_retry_clicks"] = generic_clicks + 1
         active["sent_at"] = request_now.isoformat()
