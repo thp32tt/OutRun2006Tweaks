@@ -1,0 +1,20 @@
+{
+  "task_id": "CONVERSION-DXVK-00271",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "base_sha": "cb4f001be16f27ed1a060ba3aa27c940ca8c9df0",
+  "stage": "WAIT_DURABLE_RESULT",
+  "scope": "DXVK static conversion continuation",
+  "runtime_validation": "UNTESTED",
+  "first_action": "continue_source_static_review",
+  "current_checkpoint": {
+    "topic": "HDR FP16 design contract consumed",
+    "next": "bounded provenance review around render resource classification"
+  },
+  "constraints": [
+    "GitHub-only development",
+    "no local runtime claim",
+    "do not modify vr-d3d9ex-focus",
+    "no CI skip marker in result commit"
+  ]
+}
