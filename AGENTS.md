@@ -138,6 +138,13 @@ This section is the current backend-allocation policy and overrides older backen
 - Build/CI success is not runtime or low-end performance proof. Quest 3/VDXR exact-build evidence remains required for visual, pacing and performance claims.
 - Stale queue/history text that still describes active DX9Ex performance or DX12 development must not create new autonomous work; preserve it as history until explicitly reconciled.
 
+
+## HDR / floating-point render pipeline design
+
+For DXVK/DX11 work that touches render-target formats, exposure/SkyGlow preservation, post-processing, tone mapping, color spaces, reflection surfaces, or final OpenXR color output, read `docs/VR_HDR_RENDER_PIPELINE_DESIGN.md` before implementation.
+
+Key constraints: preserve restored Xbox exposure/SkyGlow semantics; use selective provenance-driven FP16 promotion rather than blanket render-target upgrades; keep reflection/UI/depth/transport surfaces deny-by-default; tone-map the Quest 3/VDXR path exactly once; and keep runtime claims `UNTESTED` until matching HMD evidence exists. The design document does not authorize native draw-path activation or relax any branch-local conversion gate.
+
 ## Interactive chat default
 
 When a user asks to review, fix, build, package, or continue this OutRun2 VR project in chat, follow this contract automatically.
