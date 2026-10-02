@@ -1448,6 +1448,79 @@ def main() -> None:
             + ", ".join(missing_r134_bound_pipeline_draw)
         )
 
+    r136_multi_stage_texture_binding_contract = [
+        (
+            "struct NativeFixedFunctionTextureBindingSetReadiness",
+            NATIVE_BACKEND_HPP,
+            "R136 aggregate PS sampler/SRV binding identity",
+        ),
+        (
+            "observe_fixed_function_texture_binding_set(",
+            NATIVE_BACKEND_CPP,
+            "R136 aggregate live PS binding observer",
+        ),
+        (
+            "std::array<std::uint64_t, 8> stageSnapshotTokens{}",
+            NATIVE_BACKEND_HPP,
+            "R136 per-required-stage snapshot identity",
+        ),
+        (
+            "out.observedTextureMask |= stageBit;",
+            NATIVE_BACKEND_CPP,
+            "R136 exact bound-stage coverage mask",
+        ),
+        (
+            "out.observedTextureMask == out.requiredTextureMask",
+            NATIVE_BACKEND_CPP,
+            "R136 every required stage must be exact",
+        ),
+        (
+            "compose_fixed_function_multistage_textured_draw_readiness(",
+            NATIVE_BACKEND_CPP,
+            "R136 aggregate binding-to-draw composition",
+        ),
+        (
+            "textureBindings.requiredTextureMask == out.requiredTextureMask",
+            NATIVE_BACKEND_CPP,
+            "R136 aggregate mask must match sealed draw mask",
+        ),
+        (
+            "R136 multi-stage PS binding set seals every required stage",
+            CONSTANT_BUFFER_PROBE,
+            "R136 positive aggregate live binding proof",
+        ),
+        (
+            "R136 multi-stage textured draw accepts exact aggregate PS identity",
+            CONSTANT_BUFFER_PROBE,
+            "R136 positive aggregate draw proof",
+        ),
+        (
+            "R136 aggregate PS identity composes with R134 bound draw evidence",
+            CONSTANT_BUFFER_PROBE,
+            "R136 aggregate identity reaches final dormant bound-draw evidence",
+        ),
+        (
+            "R136 aggregate PS binding drift fails closed",
+            CONSTANT_BUFFER_PROBE,
+            "R136 one-stage live drift invalidates the aggregate snapshot",
+        ),
+        (
+            "R136 multi-stage textured draw rejects one stale required binding",
+            CONSTANT_BUFFER_PROBE,
+            "R136 stale aggregate cannot produce textured draw readiness",
+        ),
+    ]
+    missing_r136_multi_stage_texture_binding = [
+        meaning
+        for token, source, meaning in r136_multi_stage_texture_binding_contract
+        if token not in source
+    ]
+    if missing_r136_multi_stage_texture_binding:
+        raise SystemExit(
+            "DX11 R136 multi-stage texture binding contract drift: "
+            + ", ".join(missing_r136_multi_stage_texture_binding)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
@@ -1455,6 +1528,8 @@ def main() -> None:
         runtime_source = source_path.read_text(encoding="utf-8")
         if (
             "compose_fixed_function_textured_draw_readiness(" in runtime_source
+            or "compose_fixed_function_multistage_textured_draw_readiness(" in runtime_source
+            or "observe_fixed_function_texture_binding_set(" in runtime_source
             or "compose_fixed_function_bound_draw_readiness(" in runtime_source
             or ".binding_readiness(" in runtime_source
         ):
@@ -1463,7 +1538,7 @@ def main() -> None:
             )
     if runtime_textured_draw_users:
         raise SystemExit(
-            "DX11 R132/R133/R134 dormant binding readiness gained a production "
+            "DX11 R132/R133/R134/R136 dormant binding readiness gained a production "
             "caller before activation gate: " + ", ".join(runtime_textured_draw_users)
         )
 

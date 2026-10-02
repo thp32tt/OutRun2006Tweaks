@@ -2723,6 +2723,137 @@ int main()
         partialMultiStageDraw.snapshotToken == 0,
         "R133 single-stage observer rejects multi-stage activation mask");
 
+    NativeManagedTextureStageReadiness multiTextureStageReady{};
+    multiTextureStageReady.inputValid = true;
+    multiTextureStageReady.allRequiredReady = true;
+    multiTextureStageReady.requiredMask = 0x3u;
+    multiTextureStageReady.readyMask = 0x3u;
+    multiTextureStageReady.snapshotToken = 0x136003ull;
+    const auto multiTextureActivation =
+        compose_fixed_function_activation_readiness(
+            pipelineIdentityReady, multiTextureStageReady);
+    require(
+        multiTextureActivation.ready &&
+        multiTextureActivation.requiredTextureMask == 0x3u &&
+        multiTextureActivation.snapshotToken != 0 &&
+        validate_fixed_function_activation_snapshot(
+            pipelineIdentityReady, multiTextureStageReady,
+            multiTextureActivation.snapshotToken),
+        "R136 multi-stage activation prerequisite seals exact required mask");
+
+    const auto multiTextureDraw =
+        compose_fixed_function_draw_readiness(
+            multiTextureActivation, outputBindingRenderReady,
+            surfacePairReady, outputStateReady, outputStateBinding,
+            indexedGeometryReady);
+    require(
+        multiTextureDraw.ready &&
+        multiTextureDraw.requiredTextureMask == 0x3u &&
+        multiTextureDraw.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_fixed_function_draw_readiness_integrity(
+            multiTextureDraw),
+        "R136 multi-stage draw prerequisite preserves sealed mask identity");
+
+    require(
+        bind_fixed_function_texture_stage_for_observation(
+            d3d.context, 0, samplerOwner, textureView) &&
+        bind_fixed_function_texture_stage_for_observation(
+            d3d.context, 1, samplerOwner, textureView),
+        "R136 multi-stage PS binding prerequisites");
+    std::array<const NativeFixedFunctionSamplerState*, 8> multiSamplers{};
+    std::array<const NativeFixedFunctionTextureView*, 8> multiTextures{};
+    multiSamplers[0] = &samplerOwner;
+    multiSamplers[1] = &samplerOwner;
+    multiTextures[0] = &textureView;
+    multiTextures[1] = &textureView;
+
+    const auto multiBindingSet =
+        outrun::vr::dx11::observe_fixed_function_texture_binding_set(
+            d3d.context, multiTextureDraw.requiredTextureMask,
+            multiSamplers, multiTextures);
+    require(
+        multiBindingSet.inputValid &&
+        multiBindingSet.requiredMaskValid &&
+        multiBindingSet.allRequiredBoundExact &&
+        multiBindingSet.ready &&
+        multiBindingSet.requiredTextureMask == 0x3u &&
+        multiBindingSet.observedTextureMask == 0x3u &&
+        multiBindingSet.stageSnapshotTokens[0] != 0 &&
+        multiBindingSet.stageSnapshotTokens[1] != 0 &&
+        multiBindingSet.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_fixed_function_texture_binding_set_snapshot(
+            d3d.context, 0x3u, multiSamplers, multiTextures,
+            multiBindingSet.snapshotToken),
+        "R136 multi-stage PS binding set seals every required stage");
+
+    const auto multiTexturedDraw =
+        outrun::vr::dx11::compose_fixed_function_multistage_textured_draw_readiness(
+            multiTextureDraw, multiBindingSet);
+    require(
+        multiTexturedDraw.inputValid &&
+        multiTexturedDraw.drawReady &&
+        multiTexturedDraw.textureStageReady &&
+        multiTexturedDraw.textureMaskMatches &&
+        multiTexturedDraw.componentSnapshotsPresent &&
+        multiTexturedDraw.ready &&
+        multiTexturedDraw.requiredTextureMask == 0x3u &&
+        multiTexturedDraw.observedTextureMask == 0x3u &&
+        multiTexturedDraw.textureStageSnapshotToken ==
+            multiBindingSet.snapshotToken &&
+        multiTexturedDraw.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_fixed_function_multistage_textured_draw_snapshot(
+            multiTextureDraw, multiBindingSet,
+            multiTexturedDraw.snapshotToken),
+        "R136 multi-stage textured draw accepts exact aggregate PS identity");
+
+    const auto multiBoundDraw =
+        outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
+            multiTextureDraw, multiTexturedDraw, drawPipelineBindingReady);
+    require(
+        multiBoundDraw.ready &&
+        multiBoundDraw.texturedDrawSnapshotToken ==
+            multiTexturedDraw.snapshotToken &&
+        multiBoundDraw.pipelineBindingSnapshotToken ==
+            drawPipelineBindingReady.snapshotToken,
+        "R136 aggregate PS identity composes with R134 bound draw evidence");
+
+    ID3D11ShaderResourceView* clearMultiStageSrv = nullptr;
+    d3d.context->PSSetShaderResources(1, 1, &clearMultiStageSrv);
+    const auto staleMultiBindingSet =
+        outrun::vr::dx11::observe_fixed_function_texture_binding_set(
+            d3d.context, 0x3u, multiSamplers, multiTextures);
+    require(
+        staleMultiBindingSet.inputValid &&
+        staleMultiBindingSet.requiredMaskValid &&
+        !staleMultiBindingSet.allRequiredBoundExact &&
+        !staleMultiBindingSet.ready &&
+        staleMultiBindingSet.observedTextureMask == 0x1u &&
+        staleMultiBindingSet.stageSnapshotTokens[0] != 0 &&
+        staleMultiBindingSet.stageSnapshotTokens[1] == 0 &&
+        staleMultiBindingSet.snapshotToken == 0 &&
+        !outrun::vr::dx11::validate_fixed_function_texture_binding_set_snapshot(
+            d3d.context, 0x3u, multiSamplers, multiTextures,
+            multiBindingSet.snapshotToken),
+        "R136 aggregate PS binding drift fails closed");
+
+    const auto staleMultiTexturedDraw =
+        outrun::vr::dx11::compose_fixed_function_multistage_textured_draw_readiness(
+            multiTextureDraw, staleMultiBindingSet);
+    require(
+        !staleMultiTexturedDraw.inputValid &&
+        staleMultiTexturedDraw.drawReady &&
+        !staleMultiTexturedDraw.textureStageReady &&
+        !staleMultiTexturedDraw.textureMaskMatches &&
+        !staleMultiTexturedDraw.componentSnapshotsPresent &&
+        !staleMultiTexturedDraw.ready &&
+        staleMultiTexturedDraw.snapshotToken == 0,
+        "R136 multi-stage textured draw rejects one stale required binding");
+
+    require(
+        bind_fixed_function_texture_stage_for_observation(
+            d3d.context, 1, samplerOwner, textureView),
+        "R136 restore aggregate PS binding after drift probe");
+
     auto activationMissingSnapshot = texturedActivation;
     activationMissingSnapshot.snapshotToken = 0;
     auto renderStateMissingSnapshot = outputBindingRenderReady;
