@@ -40,6 +40,15 @@ def validate_runtime_claim(record: dict) -> list[str]:
     return []
 
 
+def validate_expected_frontier(window: dict) -> list[str]:
+    errors = []
+    if window["available_length"] != len(bytes.fromhex(DEFAULT_OVERLAP)):
+        errors.append("truncated_frontier_overlap")
+    if window["offset"] == window["end_offset"]:
+        errors.append("zero_length_frontier_window")
+    return errors
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("binary", type=Path)
@@ -54,7 +63,7 @@ def main() -> int:
     end = args.end if args.end is not None else args.offset + len(expected)
     window = validate_window(data, args.offset, end, args.overlap)
     result = {
-        "schema_version": 1,
+        "schema_version": 2,
         "binary_sha256": sha256_file(args.binary),
         "runtime_validation": "UNTESTED",
         "provenance_only": True,
@@ -62,6 +71,7 @@ def main() -> int:
     }
 
     errors = validate_runtime_claim(result)
+    errors.extend(validate_expected_frontier(window))
     if not window["window_within_binary"]:
         errors.append("window_outside_binary")
     if not window["window_contains_overlap"]:
