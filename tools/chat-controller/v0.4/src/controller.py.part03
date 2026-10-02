@@ -2965,7 +2965,9 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
     # Retire one finished C batch without touching producer slots.
     ctask = active_by_lane.get("C")
     if ctask and ctask.get("phase") == "DONE":
-        finalize_c_qa_batch(q, ctask)
+        if not ctask.get("qa_batch_finalized"):
+            finalize_c_qa_batch(q, ctask)
+            ctask["qa_batch_finalized"] = True
         completed_slot = next((s for s in reg.slots if s.name == "C"), None)
         if completed_slot is not None:
             completed_slot.last_task_completed_at = now.isoformat()
