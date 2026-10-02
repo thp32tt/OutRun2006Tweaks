@@ -44,3 +44,9 @@ This applies to new jobs and same-JOB continuation/recovery turns. Individual pr
 ## Large localization binary transport
 
 Localization producers must not treat connector payload-size limits as material blockers. Large DDS candidates are transported as connector-safe ASCII chunks under \`localization/graphics/binary_staging/v05/<JOB_ID>/\`; \`manifest.json\` is written last. The branch workflow \`.github/workflows/localization-binary-import-v05.yml\` reconstructs, validates SHA256/size/DDS signature, removes staging, and publishes the final \`hd_candidates\` DDS in a material commit containing the same \`[AUTO:<JOB_ID>]\` marker.
+
+## Connector-unavailable recovery
+
+If an assistant response explicitly reports that the authenticated GitHub connector/tool is unavailable or not exposed, that response is never accepted as progress or completion. The controller preserves the exact JOB_ID, opens a fresh chat in the configured project, and retries without a finite attempt cap.
+
+Visible Retry/Try again controls alone are not failure evidence. They are actionable only when the current visible surface also contains an actual ChatGPT generation/network error, preventing stale history controls from causing chat churn.

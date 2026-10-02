@@ -26,6 +26,8 @@ from .core import (
     material_commit_ok,
     now_iso,
     prepare_outgoing_message,
+    github_tool_unavailable_response,
+    retry_surface_has_platform_error,
     reconcile_state,
     record_completed,
     select_qa_batch,
@@ -836,22 +838,28 @@ class Controller:
             lane["retry_clicked_at"] = None
             return False
 
-        clicked_at = parse_iso(lane.get("retry_clicked_at"))
-        if clicked_at is None:
-            try:
-                await retry.click(force=True, timeout=1500)
-                lane["retry_clicked_at"] = now_iso()
-                save_state(self.state)
-                write_runtime(status="retry_clicked", last_action=f"{lane['name']} retry once")
-                return True
-            except Exception:
-                await self.recycle_chat(lane, "retry_click_failed")
-                return True
+        # Old Retry/Try again controls can remain visible in message history.
+        # Only act when the current page also shows a real generation/network error.
+        surface = await visible_surface_text(page)
+        if not retry_surface_has_platform_error(surface):
+            lane["retry_clicked_at"] = None
+            return False
 
-        if datetime.now(TZ) - clicked_at >= timedelta(seconds=45):
-            await self.recycle_chat(lane, "retry_surface_persisted")
+        clicked_at = parse_iso(lane.get("retry_clicked_at"))
+        if clicked_at is not None and datetime.now(TZ) - clicked_at < timedelta(seconds=45):
             return True
-        return True
+
+        try:
+            await retry.click(force=True, timeout=1500)
+            lane["retry_clicked_at"] = now_iso()
+            save_state(self.state)
+            write_runtime(status="retry_clicked", last_action=f"{lane['name']} platform retry")
+            return True
+        except Exception:
+            # A stale control must never cause chat churn.
+            lane["retry_clicked_at"] = now_iso()
+            save_state(self.state)
+            return True
 
     async def observe_response(self, lane: dict[str, Any], page: Page) -> None:
         job = lane["job"]
@@ -893,6 +901,19 @@ class Controller:
         if datetime.now(TZ) - changed_at < timedelta(seconds=TURN_IDLE_GRACE_SECONDS):
             return
 
+        if github_tool_unavailable_response(text):
+            attempts = int(job.get("github_tool_recovery_attempts", 0) or 0) + 1
+            job["github_tool_recovery_attempts"] = attempts
+            lane["last_result"] = f"github_tool_unavailable:{attempts}"
+            save_state(self.state)
+            write_runtime(
+                status="github_tool_recovery",
+                last_action=f"{lane['name']} {job['job_id']} connector unavailable attempt {attempts}; recycle same JOB",
+            )
+            await self.recycle_chat(lane, "github_tool_unavailable")
+            return
+
+        job["github_tool_recovery_attempts"] = 0
         job["status"] = "VERIFY_GIT"
         job["verify_started_at"] = now_iso()
         job["last_response_excerpt"] = text[-1200:]

@@ -14,6 +14,8 @@ from app.core import (
     material_commit_ok,
     GITHUB_CONNECTION_FIRST_LINE,
     prepare_outgoing_message,
+    github_tool_unavailable_response,
+    retry_surface_has_platform_error,
     reconcile_state,
     select_qa_batch,
 )
@@ -104,6 +106,28 @@ class CoreTests(unittest.TestCase):
             prepare_outgoing_message(rendered),
             rendered,
         )
+
+    def test_detects_github_tool_unavailable_response(self):
+        self.assertTrue(
+            github_tool_unavailable_response(
+                "현재 이 실행에서는 인증된 GitHub 커넥터 작업 도구 호출까지 연결하지 못해 최신 HEAD를 확인할 수 없습니다."
+            )
+        )
+        self.assertTrue(
+            github_tool_unavailable_response(
+                "The GitHub connector tool is not available in this chat."
+            )
+        )
+        self.assertFalse(
+            github_tool_unavailable_response(
+                "GitHub HEAD 확인 완료. 파일 수정과 커밋을 계속 진행합니다."
+            )
+        )
+
+    def test_retry_button_requires_real_platform_error(self):
+        self.assertFalse(retry_surface_has_platform_error("Retry this task when GitHub is ready"))
+        self.assertTrue(retry_surface_has_platform_error("Something went wrong. Try again."))
+        self.assertTrue(retry_surface_has_platform_error("응답 생성 중 오류가 발생했습니다. 다시 시도"))
 
     def test_localization_prompt_has_chunked_binary_fallback(self):
         prompt = (ROOT / "prompts" / "localization_producer.md").read_text(encoding="utf-8")

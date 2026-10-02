@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import datetime, timezone
 from typing import Any, Iterable
+import re
 
 
 STATE_VERSION = 1
@@ -16,6 +17,33 @@ def prepare_outgoing_message(message: str) -> str:
     if body == GITHUB_CONNECTION_FIRST_LINE or body.startswith(GITHUB_CONNECTION_FIRST_LINE + "\n"):
         return body
     return GITHUB_CONNECTION_FIRST_LINE + "\n" + body
+
+
+GITHUB_TOOL_UNAVAILABLE_PATTERNS = [
+    r"(?:github|git허브|깃허브).{0,180}(?:connector|커넥터|plugin|플러그인|tool|도구|namespace|네임스페이스|호출 인터페이스).{0,180}(?:not\s+available|unavailable|not\s+exposed|cannot\s+access|can(?:not|'t)\s+use|노출되지|연결하지 못|사용할 수 없|접근할 수 없|호출할 수 없)",
+    r"(?:connector|커넥터|plugin|플러그인).{0,120}(?:github|git허브|깃허브).{0,180}(?:not\s+available|unavailable|not\s+exposed|노출되지|연결하지 못|사용할 수 없)",
+]
+
+
+def github_tool_unavailable_response(text: str) -> bool:
+    sample = (text or "").lower()
+    return any(re.search(pattern, sample, flags=re.I | re.S) for pattern in GITHUB_TOOL_UNAVAILABLE_PATTERNS)
+
+
+RETRY_ERROR_PATTERNS = [
+    r"something went wrong",
+    r"there was an error (?:generating|producing) (?:a )?response",
+    r"network error",
+    r"failed to generate",
+    r"문제가 발생했습니다",
+    r"응답.{0,30}오류",
+    r"네트워크.{0,20}오류",
+]
+
+
+def retry_surface_has_platform_error(text: str) -> bool:
+    sample = (text or "").lower()
+    return any(re.search(pattern, sample, flags=re.I | re.S) for pattern in RETRY_ERROR_PATTERNS)
 
 
 def now_iso() -> str:
