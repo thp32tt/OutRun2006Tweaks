@@ -2034,17 +2034,14 @@ async def localization_process_lane(
                 allow_ci_skip_fallback=CONTROLLER_MODE == "localization" and lane_key in {"A", "B", "D"},
             )
             if task_commit:
-                if CONTROLLER_MODE == "localization" and lane_key in {"A", "B", "D"}:
-                    accepted = await localization_handle_producer_commit(
-                        context, pages, q, active, task_commit, now
+                if CONTROLLER_MODE == "localization":
+                    handled = await localization_handle_discovered_commit(
+                        context, pages, q, active, lane_key, task_commit, now
                     )
                     save_queue_state(q)
-                    if accepted:
-                        write_runtime(
-                            status="producer_commit_ready",
-                            last_action=f"{active['task_id']} durable material commit accepted; producer released",
-                            queue=q,
-                        )
+                    if handled:
+                        return
+                    task_commit = None
                 else:
                     active["result_sha"] = task_commit["sha"]
                     active["result_message"] = task_commit["message"]
@@ -2052,33 +2049,77 @@ async def localization_process_lane(
                     active["wait_actions_started_at"] = now.isoformat()
                     active["last_gate_poll_at"] = None
                     save_queue_state(q)
-                    write_runtime(
-                        status="qa_wait_actions",
-                        last_action=f"{active['task_id']} durable C commit found before UI recovery; Gate pending",
-                        queue=q,
-                    )
-                return
+                    return
 
             if CONTROLLER_MODE == "conversion" or lane_key == "C":
                 skipped_commit = github_find_task_commit(
                     active["branch"], active["task_id"], allow_ci_skip_fallback=True
                 )
                 if skipped_commit and skipped_commit.get("ci_skip_directive"):
-                    active["result_sha"] = skipped_commit["sha"]
-                    active["result_message"] = skipped_commit["message"]
-                    active["phase"] = "WAIT_ACTIONS"
-                    active["wait_actions_started_at"] = now.isoformat()
-                    active["last_gate_poll_at"] = None
-                    recovery = await recover_missing_gate_run(context, pages, active, now)
-                    save_queue_state(q)
-                    if recovery:
-                        action, reason = recovery
-                        write_runtime(
-                            status="qa_missing_gate_recovery",
-                            last_action=f"{active['task_id']} {action}: {reason}",
-                            queue=active,
+                    if CONTROLLER_MODE == "localization" and lane_key == "C":
+                        handled = await localization_handle_discovered_commit(
+                            context, pages, q, active, lane_key, skipped_commit, now
                         )
+                        save_queue_state(q)
+                        if handled:
+                            return
+                    else:
+                        active["result_sha"] = skipped_commit["sha"]
+                        active["result_message"] = skipped_commit["message"]
+                        active["phase"] = "WAIT_ACTIONS"
+                        active["wait_actions_started_at"] = now.isoformat()
+                        active["last_gate_poll_at"] = None
+                        recovery = await recover_missing_gate_run(context, pages, active, now)
+                        save_queue_state(q)
+                        if recovery:
+                            action, reason = recovery
+                            write_runtime(
+                                status="qa_missing_gate_recovery",
+                                last_action=f"{active['task_id']} {action}: {reason}",
+                                queue=active,
+                            )
+                        return
+
+            if CONTROLLER_MODE == "localization" and lane_key in {"A", "B", "D"} and active.get("pipeline_continuation_pending"):
+                sent = await queue_send_producer_pipeline_continuation(context, pages, active)
+                save_queue_state(q)
+                if sent:
                     return
+
+            if CONTROLLER_MODE == "localization" and lane_key == "C":
+                if active.get("c_drain_waiting"):
+                    next_batch = select_ready_qa_batch(q, now)
+                    if next_batch:
+                        localization_prepare_c_next_batch(active, next_batch, now)
+                        sent = await queue_send_c_execution_continuation(
+                            context, pages, active, "DRAIN_NEXT_READY_BATCH"
+                        )
+                        save_queue_state(q)
+                        if sent:
+                            return
+                    elif q.get("qa_pending"):
+                        write_runtime(
+                            status="c_drain_wait",
+                            last_action=f"{active['task_id']} C drain waiting for retry-ready QA inputs; pending={len(q.get('qa_pending', []))}",
+                            queue=q,
+                        )
+                        return
+                    else:
+                        active["completed_at"] = now.isoformat()
+                        active["terminal"] = "PASS"
+                        active["phase"] = "DONE"
+                        active["task_latched"] = False
+                        active["controller_stage"] = "DONE"
+                        q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
+                        save_queue_state(q)
+                        return
+                if active.get("c_drain_continuation_pending"):
+                    sent = await queue_send_c_execution_continuation(
+                        context, pages, active, "CONTINUE_NEXT_C_BATCH"
+                    )
+                    save_queue_state(q)
+                    if sent:
+                        return
 
             if github_transient_retry_pending():
                 write_runtime(
