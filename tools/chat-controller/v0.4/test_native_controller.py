@@ -496,7 +496,7 @@ class NativeControllerTests(unittest.TestCase):
             _is_localization_producer=loc,
         )
         self.assertTrue(f2({'lane':'LOCALIZATION_A'}))
-        self.assertFalse(f2({'lane':'LOCALIZATION_C'}))
+        self.assertTrue(f2({'lane':'LOCALIZATION_C', 'slot':'C'}))
 
     def test_no_progress_is_handled_even_when_send_deferred(self):
         self.assertTrue('queue_handle_native_response' in FUNCTIONS)
@@ -668,6 +668,50 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('active["task_latched"] = False', node_source)
         self.assertIn('active["controller_stage"] = "DONE"', node_source)
         self.assertIn('last_material_progress_at', node_source)
+
+    def test_persistent_generic_retry_rolls_same_task_to_fresh_chat(self):
+        rollover = AsyncMock(return_value=True)
+        f, ns = load_function(
+            'queue_handle_retry_surface',
+            CONTROLLER_MODE='conversion',
+            first_visible=AsyncMock(return_value=object()),
+            RETRY_SELECTORS=[],
+            detect_busy=AsyncMock(return_value=False),
+            retry_surface_text=AsyncMock(return_value='Something went wrong. Retry'),
+            RATE_LIMIT_PATTERNS=[],
+            current_assistant_text=AsyncMock(return_value=''),
+            GENERIC_RETRY_ROLLOVER_CLICKS=2,
+            RETRY_BUTTON_COOLDOWN_SECONDS=45,
+            rate_limit_active=lambda *args: False,
+            send_guard_reason=lambda *args: None,
+            click_retry_generation=AsyncMock(return_value=False),
+            queue_rollover_chat=rollover,
+            save_registry=Mock(),
+        )
+        active = self.active()
+        active.update(
+            lane='DXVK',
+            branch='vr-dxvk-r71-disasm',
+            generic_retry_clicks=2,
+            generic_retry_cooldown_until=(datetime.now(timezone.utc)+timedelta(seconds=300)).isoformat(),
+        )
+        slot=SimpleNamespace(name='B')
+        q={'active':active}
+        self.assertTrue(asyncio.run(f(None,{},None,None,slot,active,q)))
+        rollover.assert_awaited_once()
+        self.assertEqual(active['task_id'], 'TASK-1')
+        self.assertTrue(active['task_latched'])
+        self.assertEqual(active['controller_stage'], 'WAIT_DURABLE_RESULT')
+        self.assertEqual(active['generic_retry_clicks'], 0)
+        self.assertNotIn('generic_retry_cooldown_until', active)
+
+    def test_startup_migrates_persisted_active_task_latch_fields(self):
+        node_source = ast.get_source_segment(SOURCE, FUNCTIONS['startup_reconcile_queue_state']) or ''
+        self.assertIn('task["task_latched"] = True', node_source)
+        self.assertIn('WAIT_DURABLE_RESULT', node_source)
+        self.assertIn('WAIT_MATERIAL_COMMIT', node_source)
+        self.assertIn('WAIT_QA_RESULT', node_source)
+        self.assertIn('generic_retry_cooldown_until', node_source)
 
     def test_retry_surface_stable_response_preempts_generic_retry_cooldown(self):
         native = AsyncMock(return_value=True)
