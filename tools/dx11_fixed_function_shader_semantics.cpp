@@ -1,6 +1,7 @@
 #include <array>
 #include <cstdlib>
 #include <iostream>
+#include <limits>
 #include <string>
 
 #include "vr/d3d11/pipeline_translation.hpp"
@@ -19,6 +20,9 @@ namespace
     using outrun::vr::dx11::PipelineUnsupportedBlend;
     using outrun::vr::dx11::compile_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::translate_pipeline;
+    using outrun::vr::dx11::translate_primitive;
+    using outrun::vr::dx11::translate_triangle_fan_expansion;
+    using outrun::vr::dx11::triangle_fan_source_element;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::translate_fixed_function_readiness;
 
@@ -193,6 +197,52 @@ int main()
         require(
             rt.DestBlend == D3D11_BLEND_INV_SRC1_COLOR,
             "INVSRCCOLOR2 destination blend mapping drifted");
+    }
+
+    {
+        const auto direct = translate_primitive(D3DPT_TRIANGLEFAN);
+        require(
+            !direct.exact &&
+            direct.value == D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED,
+            "triangle fan direct topology must remain fail-closed");
+
+        const auto expansion = translate_triangle_fan_expansion(3u);
+        require(expansion.exact, "triangle fan expansion was not exact");
+        require(
+            expansion.topology == D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+            "triangle fan expansion did not target triangle list");
+        require(
+            expansion.sourceElementCount == 5u &&
+            expansion.expandedIndexCount == 9u,
+            "triangle fan expansion counts drifted");
+
+        constexpr std::array<UINT, 9> expected{
+            0u, 1u, 2u,
+            0u, 2u, 3u,
+            0u, 3u, 4u,
+        };
+        for (UINT expandedIndex = 0;
+             expandedIndex < static_cast<UINT>(expected.size());
+             ++expandedIndex)
+        {
+            UINT sourceElement = std::numeric_limits<UINT>::max();
+            require(
+                triangle_fan_source_element(
+                    3u, expandedIndex, sourceElement),
+                "triangle fan expansion source mapping rejected valid index");
+            require(
+                sourceElement == expected[expandedIndex],
+                "triangle fan expansion source mapping drifted");
+        }
+
+        UINT sourceElement = 0u;
+        require(
+            !triangle_fan_source_element(3u, 9u, sourceElement),
+            "triangle fan expansion accepted out-of-range index");
+        require(
+            !translate_triangle_fan_expansion(
+                std::numeric_limits<UINT>::max()).exact,
+            "triangle fan expansion overflow did not fail closed");
     }
 
     std::array<D3DRESOURCETYPE, 8> textureTypes{};

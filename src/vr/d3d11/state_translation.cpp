@@ -1,4 +1,6 @@
 #include "state_translation.hpp"
+
+#include <limits>
 #include "vr/game/disasm_render_contract.hpp"
 
 static_assert(OutRunVR::DisasmContract::WvpVsRegister == 64u);
@@ -74,9 +76,49 @@ TranslationResult<D3D11_PRIMITIVE_TOPOLOGY> translate_primitive(D3DPRIMITIVETYPE
     case D3DPT_LINESTRIP: return {D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP, true};
     case D3DPT_TRIANGLELIST: return {D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, true};
     case D3DPT_TRIANGLESTRIP: return {D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, true};
+    // A fan is exact only after its source elements are expanded into an
+    // explicit triangle-list index stream. Direct topology translation stays
+    // fail-closed so census/activation gates cannot treat the fan as ready.
     case D3DPT_TRIANGLEFAN: return {D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED, false};
     default: return {D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED, false};
     }
+}
+
+TriangleFanExpansionPlan translate_triangle_fan_expansion(
+    UINT primitiveCount) noexcept
+{
+    TriangleFanExpansionPlan out{};
+    out.topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+    if (primitiveCount == 0u)
+    {
+        out.exact = true;
+        return out;
+    }
+
+    const UINT maxValue = std::numeric_limits<UINT>::max();
+    if (primitiveCount > maxValue / 3u)
+        return out;
+
+    out.sourceElementCount = primitiveCount + 2u;
+    out.expandedIndexCount = primitiveCount * 3u;
+    out.exact = true;
+    return out;
+}
+
+bool triangle_fan_source_element(
+    UINT primitiveCount,
+    UINT expandedIndex,
+    UINT& sourceElement) noexcept
+{
+    const auto expansion = translate_triangle_fan_expansion(primitiveCount);
+    if (!expansion.exact || expandedIndex >= expansion.expandedIndexCount)
+        return false;
+
+    const UINT triangle = expandedIndex / 3u;
+    const UINT corner = expandedIndex % 3u;
+    sourceElement = corner == 0u ? 0u : triangle + corner;
+    return true;
 }
 
 } // namespace outrun::vr::dx11

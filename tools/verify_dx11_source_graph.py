@@ -310,6 +310,44 @@ def main() -> None:
             + ", ".join(missing_legacy_both_source_blend_contract)
         )
 
+    triangle_fan_expansion_contract = {
+        "translate_triangle_fan_expansion":
+            "triangle-fan expansion planning API",
+        "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST":
+            "triangle-fan expansion targets D3D11 triangle-list topology",
+        "out.expandedIndexCount = primitiveCount * 3u":
+            "triangle-fan emits three indices per source primitive",
+        "triangle_fan_source_element":
+            "triangle-fan expanded-index to source-element mapping",
+        "case D3DPT_TRIANGLEFAN: return {D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED, false};":
+            "direct triangle-fan topology remains fail-closed",
+    }
+    missing_triangle_fan_expansion_contract = [
+        meaning
+        for token, meaning in triangle_fan_expansion_contract.items()
+        if token not in STATE_TRANSLATION_CPP
+    ]
+    semantic_triangle_fan_contract = {
+        "triangle fan direct topology must remain fail-closed":
+            "direct fan negative semantic smoke",
+        "triangle fan expansion did not target triangle list":
+            "triangle-list expansion semantic smoke",
+        "triangle fan expansion source mapping drifted":
+            "fan source-index mapping semantic smoke",
+        "triangle fan expansion overflow did not fail closed":
+            "fan overflow negative semantic smoke",
+    }
+    missing_triangle_fan_expansion_contract += [
+        meaning
+        for token, meaning in semantic_triangle_fan_contract.items()
+        if token not in SEMANTIC_SMOKE
+    ]
+    if missing_triangle_fan_expansion_contract:
+        raise SystemExit(
+            "DX11 triangle-fan expansion contract drift: "
+            + ", ".join(missing_triangle_fan_expansion_contract)
+        )
+
     census_r73_contract = {
         "ResourceBehaviorUnsupportedSamples": "unmodelled descriptor counter",
         "ResourceMutationTelemetryRequiredSamples": "lock/update blocker counter",

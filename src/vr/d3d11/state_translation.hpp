@@ -17,4 +17,22 @@ struct TranslationResult {
 [[nodiscard]] TranslationResult<D3D11_CULL_MODE> translate_cull(D3DCULL value) noexcept;
 [[nodiscard]] TranslationResult<D3D11_PRIMITIVE_TOPOLOGY> translate_primitive(D3DPRIMITIVETYPE value) noexcept;
 
+// D3D11 has no triangle-fan topology. This plan describes the exact
+// triangle-list index stream a future native draw caller must materialize.
+// Keeping this separate from translate_primitive() prevents readiness work
+// from silently promoting TRIANGLEFAN before a caller consumes the expansion.
+struct TriangleFanExpansionPlan {
+    D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    UINT sourceElementCount = 0;
+    UINT expandedIndexCount = 0;
+    bool exact = false;
+};
+
+[[nodiscard]] TriangleFanExpansionPlan translate_triangle_fan_expansion(
+    UINT primitiveCount) noexcept;
+[[nodiscard]] bool triangle_fan_source_element(
+    UINT primitiveCount,
+    UINT expandedIndex,
+    UINT& sourceElement) noexcept;
+
 } // namespace outrun::vr::dx11
