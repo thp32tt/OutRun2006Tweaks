@@ -197,6 +197,35 @@ observe_fixed_function_texture_stage_binding(
     const NativeFixedFunctionTextureView& texture,
     std::uint64_t snapshotToken) noexcept;
 
+// R136 aggregates the exact live PS sampler/SRV identity for every fixed-
+// function texture stage required by the sealed draw mask. D3D9 fixed-function
+// texture stages are limited to 0..7. Missing owners, unsupported mask bits, or
+// any stale live binding keep the aggregate fail-closed.
+struct NativeFixedFunctionTextureBindingSetReadiness {
+    bool inputValid{};
+    bool requiredMaskValid{};
+    bool allRequiredBoundExact{};
+    bool ready{};
+    std::uint32_t requiredTextureMask{};
+    std::uint32_t observedTextureMask{};
+    std::array<std::uint64_t, 8> stageSnapshotTokens{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionTextureBindingSetReadiness
+observe_fixed_function_texture_binding_set(
+    ID3D11DeviceContext* context,
+    std::uint32_t requiredTextureMask,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_texture_binding_set_snapshot(
+    ID3D11DeviceContext* context,
+    std::uint32_t requiredTextureMask,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    std::uint64_t snapshotToken) noexcept;
+
 // R119 seals one R113 MANAGED vertex/index buffer mirror into a fail-closed
 // readiness snapshot. The token binds CPU-shadow version, device generation,
 // mirror instance, descriptor and expected-device identity. This is dormant
@@ -885,6 +914,19 @@ compose_fixed_function_textured_draw_readiness(
     UINT slot,
     const NativeFixedFunctionSamplerState& sampler,
     const NativeFixedFunctionTextureView& texture,
+    std::uint64_t snapshotToken) noexcept;
+
+// R136 composes a sealed draw with an aggregate of all required live PS
+// sampler/SRV stage identities. The legacy single-stage R133 entrypoint remains
+// fail-closed for multi-stage masks.
+[[nodiscard]] NativeFixedFunctionTexturedDrawReadiness
+compose_fixed_function_multistage_textured_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionTextureBindingSetReadiness& textureBindings) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_multistage_textured_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionTextureBindingSetReadiness& textureBindings,
     std::uint64_t snapshotToken) noexcept;
 
 // R134 composes the existing output/surface/PS/geometry evidence with a live
