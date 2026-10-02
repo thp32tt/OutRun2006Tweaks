@@ -39,6 +39,8 @@ def run_case(
     probe_lines: list[str] | None = None,
     expected_create_count: int = 1,
     expected_reattest_passed: bool = True,
+    expected_attestation_ids_valid: bool = True,
+    expected_provider_attestation: int | None = 1,
     expected_native_transport: bool | None = True,
 ) -> None:
     with tempfile.TemporaryDirectory(prefix=f"dxvk-analyzer-{name}-") as temp:
@@ -75,6 +77,13 @@ def run_case(
         actual_match = report.get("RuntimeVersionMatchesPreflight")
         actual_count = report.get("DeviceCreationReattestationCount")
         actual_passed = report.get("DeviceCreationReattestationPassed")
+        actual_ids_valid = report.get("DeviceCreationAttestationIdsValid")
+        provider_probe = report.get("ProviderProbe")
+        actual_provider_attestation = (
+            provider_probe.get("attestation")
+            if isinstance(provider_probe, dict)
+            else None
+        )
         actual_native_transport = report.get(
             "NativeTransportPrerequisitesObserved"
         )
@@ -83,15 +92,21 @@ def run_case(
             or actual_match is not expected_match
             or actual_count != expected_create_count
             or actual_passed is not expected_reattest_passed
+            or actual_ids_valid is not expected_attestation_ids_valid
+            or actual_provider_attestation != expected_provider_attestation
             or actual_native_transport is not expected_native_transport
         ):
             raise AssertionError(
                 f"{name}: status={actual_status!r} match={actual_match!r} "
                 f"create_count={actual_count!r} reattest={actual_passed!r} "
+                f"ids_valid={actual_ids_valid!r} "
+                f"provider_attestation={actual_provider_attestation!r} "
                 f"native_transport={actual_native_transport!r}; "
                 f"expected status={expected_status!r} match={expected_match!r} "
                 f"create_count={expected_create_count!r} "
                 f"reattest={expected_reattest_passed!r} "
+                f"ids_valid={expected_attestation_ids_valid!r} "
+                f"provider_attestation={expected_provider_attestation!r} "
                 f"native_transport={expected_native_transport!r}"
             )
 
@@ -141,6 +156,8 @@ def main() -> int:
         probe_lines=[PROBE_STARTUP],
         expected_create_count=0,
         expected_reattest_passed=False,
+        expected_attestation_ids_valid=False,
+        expected_provider_attestation=2,
     )
     failed_recreation = (
         "VR DXVK R71 census: providerLoaded=1 nonSystem=1 gameLocal=1 "
@@ -156,7 +173,36 @@ def main() -> int:
         probe_lines=[PROBE_CREATE_EX, PROBE_STARTUP, failed_recreation],
         expected_create_count=2,
         expected_reattest_passed=False,
+        expected_provider_attestation=3,
         expected_native_transport=None,
+    )
+    duplicate_creation = PROBE_CREATE_EX
+    run_case(
+        "duplicate-creation-attestation-id",
+        expected_version="3.1.1",
+        runtime_versions=["3.1.1"],
+        expected_status="DXVK_DEVICE_CREATION_ATTESTATION_IDS_INVALID",
+        expected_match=True,
+        probe_lines=[PROBE_CREATE_EX, duplicate_creation],
+        expected_create_count=2,
+        expected_reattest_passed=False,
+        expected_attestation_ids_valid=False,
+        expected_provider_attestation=1,
+    )
+    create_attestation_3 = PROBE_CREATE_EX.replace(
+        "attestation=1", "attestation=3"
+    )
+    run_case(
+        "creation-attestation-file-order-independent",
+        expected_version="3.1.1",
+        runtime_versions=["3.1.1"],
+        expected_status="STOCK_DXVK_PROVIDER_VERIFIED",
+        expected_match=True,
+        probe_lines=[create_attestation_3, PROBE_CREATE_EX],
+        expected_create_count=2,
+        expected_reattest_passed=True,
+        expected_attestation_ids_valid=True,
+        expected_provider_attestation=3,
     )
     run_case(
         "legacy-log-without-native-transport-gate",

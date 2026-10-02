@@ -127,8 +127,23 @@ def main() -> int:
         for probe in probes
         if probe.get("source", "").startswith("create-device-")
     ]
-    latest = creation_probes[-1] if creation_probes else (probes[-1] if probes else None)
-    creation_re_attestation_passed = bool(creation_probes) and all(
+    creation_attestation_ids = [
+        probe.get("attestation") for probe in creation_probes
+    ]
+    creation_attestation_ids_valid = bool(creation_probes) and all(
+        isinstance(attestation, int) and attestation > 0
+        for attestation in creation_attestation_ids
+    ) and len(set(creation_attestation_ids)) == len(creation_attestation_ids)
+    # ProviderAttestationSequence is process-global and strictly increasing.
+    # Log-file enumeration is not a trustworthy chronology, so select the
+    # newest creation evidence by producer sequence instead of file order.
+    latest_creation = (
+        max(creation_probes, key=lambda probe: probe["attestation"])
+        if creation_attestation_ids_valid
+        else (creation_probes[-1] if creation_probes else None)
+    )
+    latest = latest_creation if latest_creation is not None else (probes[-1] if probes else None)
+    creation_re_attestation_passed = creation_attestation_ids_valid and all(
         probe["provider_loaded"]
         and probe["non_system"]
         and probe["game_local"]
@@ -157,6 +172,8 @@ def main() -> int:
         status = "NO_DXVK_PROVIDER_CENSUS"
     elif not creation_probes:
         status = "DXVK_DEVICE_CREATION_REATTESTATION_MISSING"
+    elif not creation_attestation_ids_valid:
+        status = "DXVK_DEVICE_CREATION_ATTESTATION_IDS_INVALID"
     elif not creation_re_attestation_passed:
         status = "DXVK_DEVICE_CREATION_REATTESTATION_FAILED"
     elif not latest["provider_loaded"]:
@@ -190,6 +207,8 @@ def main() -> int:
         "DeviceCreationReattestations": creation_probes,
         "DeviceCreationReattestationCount": len(creation_probes),
         "DeviceCreationReattestationPassed": creation_re_attestation_passed,
+        "DeviceCreationAttestationIds": creation_attestation_ids,
+        "DeviceCreationAttestationIdsValid": creation_attestation_ids_valid,
         "PreflightDxvkVersion": expected_version,
         "PreflightProviderSha256": expected_hash,
         "DetectedDxvkVersions": unique_versions,
