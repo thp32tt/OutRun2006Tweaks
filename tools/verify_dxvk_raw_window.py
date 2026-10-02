@@ -1,60 +1,38 @@
 #!/usr/bin/env python3
-"""Fail-closed verifier for DXVK raw disassembly continuation windows.
+"""Validate exact DXVK continuation raw-window evidence.
 
-This tool intentionally does not assign runtime semantics.  It only validates
-that a captured byte window contains the expected overlap bytes and that the
-window boundaries are internally consistent before a later decoder step.
+This guard checks provenance metadata only. It intentionally does not infer
+renderer semantics or runtime behaviour.
 """
 
 from __future__ import annotations
 
-import argparse
-import hashlib
-from pathlib import Path
+EXPECTED_START = "0x00182F7E"
+EXPECTED_END = "0x00182FBE"
+EXPECTED_OVERLAP = "66 0f 54 1d 20 91 61"
 
 
-class WindowVerificationError(RuntimeError):
-    pass
+def normalize_bytes(value: str) -> str:
+    return " ".join(value.split()).lower()
 
 
-def verify_window(data: bytes, *, start_rva: int, expected_overlap: bytes, expected_sha256: str | None = None) -> dict[str, object]:
-    if start_rva < 0:
-        raise WindowVerificationError("start RVA must be non-negative")
-    if not expected_overlap:
-        raise WindowVerificationError("overlap bytes must not be empty")
-    if not data.startswith(expected_overlap):
-        raise WindowVerificationError("continuation overlap bytes do not match capture edge")
-
-    digest = hashlib.sha256(data).hexdigest()
-    if expected_sha256 and digest != expected_sha256:
-        raise WindowVerificationError("capture digest mismatch")
-
-    return {
-        "start_rva": hex(start_rva),
-        "length": len(data),
-        "sha256": digest,
-        "overlap_match": True,
-    }
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("window", type=Path)
-    parser.add_argument("--start-rva", required=True, type=lambda value: int(value, 0))
-    parser.add_argument("--overlap", required=True, help="hex bytes, e.g. '66 0f 54 1d'")
-    parser.add_argument("--sha256")
-    args = parser.parse_args()
-
-    result = verify_window(
-        args.window.read_bytes(),
-        start_rva=args.start_rva,
-        expected_overlap=bytes.fromhex(args.overlap),
-        expected_sha256=args.sha256,
-    )
-    for key, value in result.items():
-        print(f"{key}={value}")
-    return 0
+def validate_raw_window(report: dict) -> list[str]:
+    errors: list[str] = []
+    if report.get("runtime_validation") != "UNTESTED":
+        errors.append("runtime_validation_must_remain_untested")
+    if report.get("provenance_start_rva") != EXPECTED_START:
+        errors.append("raw_window_start_mismatch")
+    if report.get("probe_end_rva") != EXPECTED_END:
+        errors.append("raw_window_end_mismatch")
+    if normalize_bytes(report.get("overlap_bytes", "")) != EXPECTED_OVERLAP:
+        errors.append("overlap_anchor_mismatch")
+    return errors
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    import json
+    import sys
+
+    with open(sys.argv[1], encoding="utf-8") as handle:
+        failures = validate_raw_window(json.load(handle))
+    raise SystemExit(1 if failures else 0)
