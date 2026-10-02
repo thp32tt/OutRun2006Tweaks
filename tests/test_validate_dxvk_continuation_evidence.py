@@ -30,3 +30,14 @@ def test_rejects_invalid_range_and_hex():
     errors = validator.validate(record)
     assert "end_rva must be greater than start_rva" in errors
     assert "byte window is not valid hex" in errors
+
+
+def test_rejects_missing_overlap_provenance_bytes():
+    record = {
+        "start_rva": "0x182F7E",
+        "end_rva": "0x182FBE",
+        "bytes": "90 90 90 90",
+        "branch_targets": [],
+    }
+    errors = validator.validate(record)
+    assert "byte window must preserve canonical overlap bytes" in errors
