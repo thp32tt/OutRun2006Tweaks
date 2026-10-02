@@ -305,4 +305,68 @@ namespace outrun::vr::dx11
             expectedDevice, color, depth);
         return current.ready && current.snapshotToken == snapshotToken;
     }
+
+    bool NativeSurfacePairBinding::initialize(
+        ID3D11Device* device,
+        const NativeSurfaceMirror& color,
+        const NativeSurfaceMirror& depth,
+        const NativeSurfacePairReadiness& readiness) noexcept
+    {
+        shutdown();
+        if (!device || !readiness.ready || readiness.snapshotToken == 0 ||
+            !validate_surface_pair_snapshot(
+                device, color, depth, readiness.snapshotToken))
+            return false;
+
+        ID3D11RenderTargetView* rtv = color.render_target_view();
+        ID3D11DepthStencilView* dsv = depth.depth_stencil_view();
+        if (!rtv || !dsv ||
+            readiness.colorMirrorSerial != color.mirror_serial() ||
+            readiness.depthMirrorSerial != depth.mirror_serial())
+            return false;
+
+        Microsoft::WRL::ComPtr<ID3D11Device> rtvDevice;
+        Microsoft::WRL::ComPtr<ID3D11Device> dsvDevice;
+        rtv->GetDevice(rtvDevice.ReleaseAndGetAddressOf());
+        dsv->GetDevice(dsvDevice.ReleaseAndGetAddressOf());
+        if (!rtvDevice || !dsvDevice ||
+            rtvDevice.Get() != device || dsvDevice.Get() != device)
+            return false;
+
+        device_ = device;
+        rtv_ = rtv;
+        dsv_ = dsv;
+        surface_pair_snapshot_token_ = readiness.snapshotToken;
+        return true;
+    }
+
+    void NativeSurfacePairBinding::shutdown() noexcept
+    {
+        dsv_.Reset();
+        rtv_.Reset();
+        device_.Reset();
+        surface_pair_snapshot_token_ = 0;
+    }
+
+    bool NativeSurfacePairBinding::apply(
+        ID3D11DeviceContext* context,
+        const NativeSurfaceMirror& color,
+        const NativeSurfaceMirror& depth) const noexcept
+    {
+        if (!ready() || !context ||
+            !validate_surface_pair_snapshot(
+                device_.Get(), color, depth, surface_pair_snapshot_token_) ||
+            color.render_target_view() != rtv_.Get() ||
+            depth.depth_stencil_view() != dsv_.Get())
+            return false;
+
+        Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+        context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+        if (!contextDevice || contextDevice.Get() != device_.Get())
+            return false;
+
+        ID3D11RenderTargetView* rtv = rtv_.Get();
+        context->OMSetRenderTargets(1, &rtv, dsv_.Get());
+        return true;
+    }
 }
