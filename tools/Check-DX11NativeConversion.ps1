@@ -9,6 +9,19 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+function Require-TextMarker {
+    param(
+        [string]$File,
+        [string]$Marker,
+        [string]$Message
+    )
+
+    $content = Get-Content (Join-Path $Root $File) -Raw
+    if ($content -notmatch [regex]::Escape($Marker)) {
+        Write-Error $Message
+    }
+}
+
 $requiredPaths = @(
     'AGENTS.md',
     'docs/CONVERSION_LANE_STATE.json',
@@ -62,10 +75,20 @@ if ($state.latest_durable_task.checkpoint -ne 'C6_STATE') {
     Write-Error 'DX11 state is not persisted at a resumable checkpoint.'
 }
 
+# Guard the DX11 build lane from silently losing its dedicated semantic probes.
+$cmake = Join-Path $Root 'CMakeLists.txt'
+if (-not (Test-Path $cmake)) {
+    Write-Error 'CMakeLists.txt missing for DX11 target verification.'
+}
+Require-TextMarker 'CMakeLists.txt' 'dx11_fixed_function_shader_semantics' 'DX11 fixed-function semantic target is missing.'
+Require-TextMarker 'CMakeLists.txt' 'dx11_input_layout_semantics' 'DX11 input-layout semantic target is missing.'
+Require-TextMarker 'CMakeLists.txt' 'dx11_shader_linkage_probe' 'DX11 shader linkage probe target is missing.'
+
 Write-Output 'DX11_STATIC_CONVERSION_GUARD=PASS'
 Write-Output 'NATIVE_DRAW_PATH_GATE=STATIC_EVIDENCE_PRESENT'
 Write-Output 'DORMANT_ACTIVATION_GUARD=PASS'
 Write-Output 'STATE_CHECKPOINT_GUARD=PASS'
+Write-Output 'SEMANTIC_PROBE_TARGET_GUARD=PASS'
 Write-Output ('BRANCH=' + $state.branch)
 Write-Output ('TASK=' + $state.latest_durable_task.task_id)
 Write-Output ('RUNTIME_VALIDATION=' + $state.latest_durable_task.runtime_validation)
