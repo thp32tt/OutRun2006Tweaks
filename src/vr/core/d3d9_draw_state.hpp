@@ -23,6 +23,11 @@ namespace OutRunVR::DrawState
         DWORD alphaTestEnable = FALSE;
         DWORD alphaRef = 0;
         DWORD alphaFunc = D3DCMP_ALWAYS;
+        // R191: D3DRS_TEXTUREFACTOR feeds D3DTA_TFACTOR and
+        // D3DTOP_BLENDFACTORALPHA fixed-function semantics. Preserve the
+        // exact ARGB value now so passive DX11 census can distinguish draws
+        // that will need texture-factor shader plumbing later.
+        DWORD textureFactor = 0xFFFFFFFFu;
 
         // R162: D3D9 fixed-function color interpolation defaults to
         // Gouraud shading. Native DX11 readiness may treat only this mode as
