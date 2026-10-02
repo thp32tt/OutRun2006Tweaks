@@ -928,6 +928,10 @@ namespace OutRunVRStereo
 				D3DRS_DEPTHBIAS, D3DRS_SLOPESCALEDEPTHBIAS,
 				D3DRS_DITHERENABLE,
 				D3DRS_LASTPIXEL, D3DRS_ANTIALIASEDLINEENABLE,
+				D3DRS_POINTSIZE, D3DRS_POINTSIZE_MIN,
+				D3DRS_POINTSIZE_MAX, D3DRS_POINTSPRITEENABLE,
+				D3DRS_POINTSCALEENABLE, D3DRS_POINTSCALE_A,
+				D3DRS_POINTSCALE_B, D3DRS_POINTSCALE_C,
 				D3DRS_CLIPPING, D3DRS_CLIPPLANEENABLE,
 				D3DRS_STENCILENABLE, D3DRS_STENCILMASK,
 				D3DRS_STENCILWRITEMASK, D3DRS_STENCILREF,
@@ -1731,6 +1735,17 @@ namespace OutRunVRStereo
 		// blocker; ANTIALIASEDLINEENABLE maps to rasterizer state below.
 		read(D3DRS_LASTPIXEL, out.lastPixel);
 		read(D3DRS_ANTIALIASEDLINEENABLE, out.antialiasedLineEnable);
+		// R169 captures the full D3D9 point-raster state family. D3D11 has no
+		// fixed-function equivalent for variable-size/scaled point sprites, so
+		// the existing direct POINTLIST readiness gate remains fail-closed.
+		read(D3DRS_POINTSIZE, out.pointSizeBits);
+		read(D3DRS_POINTSIZE_MIN, out.pointSizeMinBits);
+		read(D3DRS_POINTSIZE_MAX, out.pointSizeMaxBits);
+		read(D3DRS_POINTSPRITEENABLE, out.pointSpriteEnable);
+		read(D3DRS_POINTSCALEENABLE, out.pointScaleEnable);
+		read(D3DRS_POINTSCALE_A, out.pointScaleABits);
+		read(D3DRS_POINTSCALE_B, out.pointScaleBBits);
+		read(D3DRS_POINTSCALE_C, out.pointScaleCBits);
 		// R161 keeps D3D9 clipping/user-plane semantics explicit for DX11
 		// readiness instead of silently assuming the D3D11 default.
 		read(D3DRS_CLIPPING, out.clipping);
