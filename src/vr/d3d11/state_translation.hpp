@@ -45,4 +45,16 @@ struct TriangleFanExpansionPlan {
     UINT* expandedIndices,
     UINT expandedIndexCapacity) noexcept;
 
+// R123 expands an indexed D3D9 triangle fan while preserving the source index
+// values exactly. The caller retains D3D9 BaseVertexIndex separately as the
+// future D3D11 DrawIndexed BaseVertexLocation; this helper only rewrites fan
+// ordering into a triangle-list stream and never activates native Draw*.
+[[nodiscard]] bool materialize_indexed_triangle_fan_indices(
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    const void* sourceIndices,
+    UINT sourceIndexCount,
+    UINT* expandedIndices,
+    UINT expandedIndexCapacity) noexcept;
+
 } // namespace outrun::vr::dx11

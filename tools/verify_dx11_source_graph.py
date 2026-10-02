@@ -427,6 +427,14 @@ def main() -> None:
             "triangle-fan expanded-index to source-element mapping",
         "materialize_triangle_fan_vertex_indices":
             "triangle-fan concrete triangle-list index materializer",
+        "materialize_indexed_triangle_fan_indices":
+            "R123 indexed triangle-fan source-stream materializer",
+        "sourceIndexFormat != D3DFMT_INDEX16":
+            "R123 exact D3D9 index-format gate",
+        "sourceIndexCount < expansion.sourceElementCount":
+            "R123 source-index-count fail-closed gate",
+        "std::memcpy(":
+            "R123 alignment-safe source-index decoding",
         "expandedIndexCapacity < expansion.expandedIndexCount":
             "triangle-fan destination-capacity fail-closed gate",
         "maxValue - (expansion.sourceElementCount - 1u)":
@@ -454,6 +462,18 @@ def main() -> None:
             "fan base-vertex overflow fail-closed smoke",
         "zero-primitive triangle fan materialization must be empty-exact":
             "fan empty-stream semantic smoke",
+        "INDEX16 triangle fan did not preserve source indices":
+            "R123 INDEX16 source-value preservation proof",
+        "INDEX32 triangle fan did not preserve 32-bit source indices":
+            "R123 INDEX32 source-value preservation proof",
+        "indexed triangle fan short source did not fail before writes":
+            "R123 short-source fail-closed proof",
+        "indexed triangle fan short destination did not fail before writes":
+            "R123 short-destination fail-closed proof",
+        "indexed triangle fan accepted unsupported index format":
+            "R123 unsupported-format fail-closed proof",
+        "zero-primitive indexed triangle fan must be empty-exact":
+            "R123 empty indexed-fan proof",
         "triangle fan expansion overflow did not fail closed":
             "fan expansion-count overflow negative semantic smoke",
     }

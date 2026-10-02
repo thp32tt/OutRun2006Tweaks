@@ -27,6 +27,7 @@ namespace
     using outrun::vr::dx11::translate_primitive;
     using outrun::vr::dx11::translate_triangle_fan_expansion;
     using outrun::vr::dx11::triangle_fan_source_element;
+    using outrun::vr::dx11::materialize_indexed_triangle_fan_indices;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::translate_fixed_function_readiness;
 
@@ -339,6 +340,71 @@ int main()
             materialize_triangle_fan_vertex_indices(
                 0u, std::numeric_limits<UINT>::max(), nullptr, 0u),
             "zero-primitive triangle fan materialization must be empty-exact");
+
+        constexpr std::array<WORD, 5> source16{
+            4u, 8u, 15u, 16u, 23u,
+        };
+        constexpr std::array<UINT, 9> expected16{
+            4u, 8u, 15u,
+            4u, 15u, 16u,
+            4u, 16u, 23u,
+        };
+        std::array<UINT, 9> expanded16{};
+        require(
+            materialize_indexed_triangle_fan_indices(
+                3u, D3DFMT_INDEX16,
+                source16.data(), static_cast<UINT>(source16.size()),
+                expanded16.data(), static_cast<UINT>(expanded16.size())) &&
+            expanded16 == expected16,
+            "INDEX16 triangle fan did not preserve source indices");
+
+        constexpr std::array<DWORD, 5> source32{
+            70000u, 71000u, 72000u, 73000u, 74000u,
+        };
+        constexpr std::array<UINT, 9> expected32{
+            70000u, 71000u, 72000u,
+            70000u, 72000u, 73000u,
+            70000u, 73000u, 74000u,
+        };
+        std::array<UINT, 9> expanded32{};
+        require(
+            materialize_indexed_triangle_fan_indices(
+                3u, D3DFMT_INDEX32,
+                source32.data(), static_cast<UINT>(source32.size()),
+                expanded32.data(), static_cast<UINT>(expanded32.size())) &&
+            expanded32 == expected32,
+            "INDEX32 triangle fan did not preserve 32-bit source indices");
+
+        std::array<UINT, 9> indexedUntouched{};
+        indexedUntouched.fill(0xCDCDCDCDu);
+        const auto indexedUntouchedBefore = indexedUntouched;
+        require(
+            !materialize_indexed_triangle_fan_indices(
+                3u, D3DFMT_INDEX16,
+                source16.data(), 4u,
+                indexedUntouched.data(),
+                static_cast<UINT>(indexedUntouched.size())) &&
+            indexedUntouched == indexedUntouchedBefore,
+            "indexed triangle fan short source did not fail before writes");
+        require(
+            !materialize_indexed_triangle_fan_indices(
+                3u, D3DFMT_INDEX16,
+                source16.data(), static_cast<UINT>(source16.size()),
+                indexedUntouched.data(), 8u) &&
+            indexedUntouched == indexedUntouchedBefore,
+            "indexed triangle fan short destination did not fail before writes");
+        require(
+            !materialize_indexed_triangle_fan_indices(
+                3u, D3DFMT_UNKNOWN,
+                source16.data(), static_cast<UINT>(source16.size()),
+                indexedUntouched.data(),
+                static_cast<UINT>(indexedUntouched.size())) &&
+            indexedUntouched == indexedUntouchedBefore,
+            "indexed triangle fan accepted unsupported index format");
+        require(
+            materialize_indexed_triangle_fan_indices(
+                0u, D3DFMT_INDEX16, nullptr, 0u, nullptr, 0u),
+            "zero-primitive indexed triangle fan must be empty-exact");
 
         require(
             !translate_triangle_fan_expansion(

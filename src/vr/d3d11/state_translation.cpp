@@ -1,5 +1,6 @@
 #include "state_translation.hpp"
 
+#include <cstring>
 #include <limits>
 #include "vr/game/disasm_render_contract.hpp"
 
@@ -164,6 +165,67 @@ bool materialize_triangle_fan_vertex_indices(
                 primitiveCount, expandedIndex, sourceElement))
             return false;
         expandedIndices[expandedIndex] = baseVertex + sourceElement;
+    }
+    return true;
+}
+
+bool materialize_indexed_triangle_fan_indices(
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    const void* sourceIndices,
+    UINT sourceIndexCount,
+    UINT* expandedIndices,
+    UINT expandedIndexCapacity) noexcept
+{
+    const auto expansion = translate_triangle_fan_expansion(primitiveCount);
+    if (!expansion.exact)
+        return false;
+    if (sourceIndexFormat != D3DFMT_INDEX16 &&
+        sourceIndexFormat != D3DFMT_INDEX32)
+        return false;
+    if (expansion.expandedIndexCount == 0u)
+        return true;
+    if (!sourceIndices || !expandedIndices ||
+        sourceIndexCount < expansion.sourceElementCount ||
+        expandedIndexCapacity < expansion.expandedIndexCount)
+        return false;
+
+    const auto* sourceBytes =
+        static_cast<const unsigned char*>(sourceIndices);
+    const UINT sourceStride =
+        sourceIndexFormat == D3DFMT_INDEX16
+            ? static_cast<UINT>(sizeof(WORD))
+            : static_cast<UINT>(sizeof(DWORD));
+
+    for (UINT expandedIndex = 0u;
+         expandedIndex < expansion.expandedIndexCount;
+         ++expandedIndex)
+    {
+        UINT sourceElement = 0u;
+        if (!triangle_fan_source_element(
+                primitiveCount, expandedIndex, sourceElement))
+            return false;
+
+        UINT sourceIndex = 0u;
+        if (sourceIndexFormat == D3DFMT_INDEX16)
+        {
+            WORD value = 0;
+            std::memcpy(
+                &value,
+                sourceBytes + sourceElement * sourceStride,
+                sizeof(value));
+            sourceIndex = value;
+        }
+        else
+        {
+            DWORD value = 0;
+            std::memcpy(
+                &value,
+                sourceBytes + sourceElement * sourceStride,
+                sizeof(value));
+            sourceIndex = value;
+        }
+        expandedIndices[expandedIndex] = sourceIndex;
     }
     return true;
 }
