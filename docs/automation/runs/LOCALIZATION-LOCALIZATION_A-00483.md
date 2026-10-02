@@ -3,20 +3,26 @@
 TASK_ID=LOCALIZATION-LOCALIZATION_A-00483
 LANE=LOCALIZATION_A
 WAVE_ID=P00316
+TARGET_BRANCH=korean-localization-clean
 
-## Producer record
-- role: A
-- shard: asset_queue.csv index % 3 == 0
-- automation_validation: PENDING
-- validation_mode: C_BATCH_GATE
-- runtime_validation: UNTESTED
+## Corrected current-contract execution
+- A shard: ODD numeric asset_queue index.
+- Current authoritative RENDER_READY: none.
+- Current authoritative ONE_STAGE_TO_RENDER: none.
+- Index 163 / 59A79158 is skipped because B00347 already produced the fixed-family candidate and it remains C_BATCH_GATE pending.
+- Direct C rework index 53 / 568D3696 was inspected against current HEAD.
 
-## Execution result
-- Current branch contract and state files were read from korean-localization-clean.
-- Existing authoritative ready/rework evidence was checked before selecting new production.
-- No eligible RENDER_READY or ONE_STAGE_TO_RENDER asset with complete canonical source, CLEAN_PLATE, safe bbox and semantic binding evidence was available for this lane invocation.
-- No new DDS candidate was emitted because required deterministic render inputs were not present. This is fail-closed; no placeholder or substitute DDS was created.
+## Material work completed
+- Bound the exact canonical English source already present on GitHub: blob 3d6bedf9c66d6c43c4ca16483a0f447137b39c3a, SHA-256 65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813, 4096x4096 DXT5, 13 mips.
+- Separated reusable exact-source semantics/source-bbox measurements from the rejected LOC-E-000003 Korean candidate lineage.
+- Explicitly forbade reuse of six historical Korean rasters and localized mip1-12 bytes that caused the C REWORK_REQUIRED disposition.
+- Added a current generation-reset fresh-rebuild specification for all 14 Korean elements.
+- No shared progress/resume/queue files were modified.
 
-## Blocker
-- Candidate completion requires a valid canonical HD source/evidence chain for the selected A shard asset before render -> measure/refit -> DDS encode -> decoded-final self-QA.
-- Continue with the next A shard runnable asset when a complete input chain is available.
+## Remaining fail-closed stage
+Fresh exact-source removal/protected masks, CLEAN_PLATE, source-style/orientation measurement and a newly encoded full 13-mip DXT5 candidate are still required. The existing Korean candidate cannot be used as construction input.
+
+RESULT=PREFLIGHT_ONLY_MATERIAL_ADVANCE
+AUTOMATION_VALIDATION=PENDING
+VALIDATION_MODE=C_BATCH_GATE
+RUNTIME_VALIDATION=UNTESTED

@@ -1,0 +1,316 @@
+{
+  "schema_version": 100,
+  "schema": "outrun-a00483-index53-generation-reset-preflight-v1",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00483",
+  "wave_id": "P00316",
+  "lane": "LOCALIZATION_A",
+  "shard_rule": "ODD_NUMERIC_INDEX",
+  "queue_index": 53,
+  "asset": "568D3696",
+  "branch": "korean-localization-clean",
+  "base_head_sha": "8da0ab2a1bb6b13ea91028ced7c8dbde4a3e4f71",
+  "automation_contract_blob_sha": "8b7a840fcd756185761bbc39aafff255a7b3aefc",
+  "orientation_policy_blob_sha": "cf9c4cdc6e4e06ad32b047607c675a56bfc486e3",
+  "resume_state_blob_sha": "74c6323e806eb72025267d51f53baa97d7b663cc",
+  "selection_reason": "DIRECT_REWORK_REQUIRED is highest-priority runnable class in A odd shard; RENDER_READY and ONE_STAGE_TO_RENDER are authoritative-none. Index163 is skipped because B00347@fa9c8bf687b17318d00bee52e615f134b6ee7b3f already produced the fixed-46px candidate and is C_BATCH_GATE pending.",
+  "source": {
+    "repository_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+    "git_blob_sha": "3d6bedf9c66d6c43c4ca16483a0f447137b39c3a",
+    "sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "compression": "DXT5",
+    "mipmaps": 13,
+    "bytes": 22369776,
+    "identity": "PASS_CURRENT_GITHUB_CANONICAL_SOURCE_PRESENT"
+  },
+  "rejected_candidate_lineage": {
+    "repository_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+    "git_blob_sha": "3bd46228619d09d5129b48a95fd188a1f7b60000",
+    "sha256": "fe0d710bade6eafc6a24278e78d57bd3ab1c35826d5eac6eb1df079c6fc03b26",
+    "producer": "LOC-E-000003@c2b5e244d47ec468cad87d243c82e3f72154ee2d",
+    "c_disposition": "REWORK_REQUIRED",
+    "defects": [
+      "six Korean glyph rasters were rescaled/repositioned from a pre-reset localized candidate instead of freshly rendered from exact English source lineage",
+      "mip1-12 were preserved byte-identical from the prior localized candidate",
+      "therefore the current candidate cannot satisfy the post-reset immutable-source/candidate-lineage rule"
+    ],
+    "reuse_for_new_candidate": "FORBIDDEN"
+  },
+  "reusable_candidate_independent_inputs": {
+    "semantics_count": 14,
+    "semantics": [
+      {
+        "key": "r1",
+        "source": "Hit the zippers!",
+        "korean": "지퍼를 맞히세요!",
+        "sprite_cell": [
+          3100,
+          8,
+          3628,
+          112
+        ],
+        "source_bbox": [
+          3117,
+          16,
+          3613,
+          109
+        ]
+      },
+      {
+        "key": "r2",
+        "source": "Hit the cars!",
+        "korean": "차를 맞히세요!",
+        "sprite_cell": [
+          545,
+          2056,
+          974,
+          2160
+        ],
+        "source_bbox": [
+          545,
+          2068,
+          974,
+          2160
+        ]
+      },
+      {
+        "key": "r3",
+        "source": "Dodge the bombs!",
+        "korean": "폭탄을 피하세요!",
+        "sprite_cell": [
+          1140,
+          2054,
+          1775,
+          2165
+        ],
+        "source_bbox": [
+          1140,
+          2061,
+          1775,
+          2165
+        ]
+      },
+      {
+        "key": "r4",
+        "source": "Feed the girl!",
+        "korean": "여자친구에게 먹여 주세요!",
+        "sprite_cell": [
+          1988,
+          2053,
+          2445,
+          2164
+        ],
+        "source_bbox": [
+          1988,
+          2061,
+          2445,
+          2164
+        ]
+      },
+      {
+        "key": "r5",
+        "source": "Avoid abduction!",
+        "korean": "납치를 피하세요!",
+        "sprite_cell": [
+          2826,
+          2064,
+          3410,
+          2165
+        ],
+        "source_bbox": [
+          2826,
+          2073,
+          3410,
+          2165
+        ]
+      },
+      {
+        "key": "r6",
+        "source": "Avoid the meteors!",
+        "korean": "운석을 피하세요!",
+        "sprite_cell": [
+          1695,
+          2298,
+          2330,
+          2398
+        ],
+        "source_bbox": [
+          1695,
+          2298,
+          2327,
+          2398
+        ]
+      },
+      {
+        "key": "r7",
+        "source": "Dribble the beach ball!",
+        "korean": "비치볼을 드리블하세요!",
+        "sprite_cell": [
+          2328,
+          2298,
+          3080,
+          2400
+        ],
+        "source_bbox": [
+          2334,
+          2312,
+          3067,
+          2388
+        ]
+      },
+      {
+        "key": "r8",
+        "source": "Photograph the sights!",
+        "korean": "명소를 촬영하세요!",
+        "sprite_cell": [
+          3160,
+          2298,
+          3700,
+          2490
+        ],
+        "source_bbox": [
+          3172,
+          2313,
+          3685,
+          2474
+        ]
+      },
+      {
+        "key": "r9",
+        "source": "Hit the ducks!",
+        "korean": "오리를 맞히세요!",
+        "sprite_cell": [
+          3090,
+          3200,
+          3570,
+          3294
+        ],
+        "source_bbox": [
+          3101,
+          3212,
+          3558,
+          3288
+        ]
+      },
+      {
+        "key": "r10",
+        "source": "See the sights!",
+        "korean": "명소를 구경하세요!",
+        "sprite_cell": [
+          2968,
+          3296,
+          3510,
+          3395
+        ],
+        "source_bbox": [
+          2975,
+          3299,
+          3494,
+          3395
+        ]
+      },
+      {
+        "key": "r11",
+        "source": "END",
+        "korean": "종료",
+        "sprite_cell": [
+          920,
+          2548,
+          1510,
+          2818
+        ],
+        "source_bbox": [
+          942,
+          2565,
+          1489,
+          2799
+        ]
+      },
+      {
+        "key": "r12",
+        "source": "ANSWER",
+        "korean": "정답",
+        "sprite_cell": [
+          2120,
+          2548,
+          3255,
+          2820
+        ],
+        "source_bbox": [
+          2157,
+          2559,
+          3217,
+          2800
+        ]
+      },
+      {
+        "key": "r13",
+        "source": "QUESTION",
+        "korean": "문제",
+        "sprite_cell": [
+          748,
+          2880,
+          2070,
+          3180
+        ],
+        "source_bbox": [
+          777,
+          2905,
+          2040,
+          3161
+        ]
+      },
+      {
+        "key": "r14",
+        "source": "START",
+        "korean": "시작",
+        "sprite_cell": [
+          2570,
+          2880,
+          3490,
+          3180
+        ],
+        "source_bbox": [
+          2605,
+          2911,
+          3457,
+          3145
+        ]
+      }
+    ],
+    "note": "These source/cell measurements are retained only as exact-source measurement inputs. Fresh generation must re-decode and verify them against the canonical English DDS before editing; no Korean candidate pixels or localized mip bytes are reusable."
+  },
+  "generation_reset_requirements": [
+    "decode the exact canonical English DXT5 source and verify source SHA/header/dimensions/mip count",
+    "derive fresh per-element source glyph/effect removal masks from English source pixels only; do not derive masks from any Korean candidate",
+    "derive protected masks and CLEAN_PLATE from exact English source only; validate zero changes outside permitted masks",
+    "measure source typography, orientation and signed slant in readable coordinates for all 14 elements before Korean rendering",
+    "render all 14 approved Korean strings as new glyphs; no prior Korean raster reuse and no flattened-raster rescale",
+    "measure/refit each effect-inclusive candidate bbox to the 1px/2px-safe containment policy without source-region escape",
+    "encode a fresh DXT5 candidate while preserving source header/dimensions/format and rebuild the full 13-level localized mip chain from exact-source lineage; copying prior localized mip bytes is forbidden",
+    "decode the produced DDS and run header/alpha/orientation/protected-mask/zero-pixel containment and English-source comparison on decoded final pixels",
+    "persist current-generation KOREAN_PNG_REVIEW source/clean/candidate/comparison/generation_prompt/qa_report lineage before C batch submission"
+  ],
+  "readiness_before": "DIRECT_REWORK_REQUIRED_GENERATION_RESET_LINEAGE",
+  "readiness_after": "PREFLIGHT_ONLY_FRESH_SOURCE_REBUILD_SPEC_BOUND",
+  "blocker_remaining": {
+    "type": "FRESH_SOURCE_EFFECT_MASK_CLEAN_PLATE_AND_FULL_MIP_REGENERATION_NOT_YET_MATERIALIZED",
+    "fail_closed": true,
+    "why_not_rendered": "The current HEAD contains the exact English source and semantic/source-bbox inputs, but no current-generation source-derived removal/protected masks and CLEAN_PLATE for this asset. The only current Korean candidate and lower mips are explicitly rejected lineage and may not be used as construction input.",
+    "next_candidate_condition": "Fresh source-only masks/CLEAN_PLATE plus source-style measurements must be materialized and independently self-checked; once that deterministic stage is complete, the same producer invocation must continue through render, full-mip encode and decoded-final QA."
+  },
+  "peer_and_shared_state": {
+    "shared_files_modified": false,
+    "peer_lane_files_modified": false,
+    "newer_A00484_preserved": true
+  },
+  "candidate_dds_modified": false,
+  "material_deliverable": "GENERATION_RESET_SOURCE_LINEAGE_SPLIT_AND_FRESH_REBUILD_SPEC",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_test_performed": false,
+  "runtime_validation": "UNTESTED"
+}
