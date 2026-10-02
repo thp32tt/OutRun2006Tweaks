@@ -1775,8 +1775,35 @@ def main() -> None:
             )
     if runtime_textured_draw_users:
         raise SystemExit(
-            "DX11 R132/R133/R134/R136/R137/R138/R139/R140 dormant binding readiness gained a production "
+            "DX11 R132/R133/R134/R136/R137/R138/R139/R140/R141 dormant binding readiness gained a production "
             "caller before activation gate: " + ", ".join(runtime_textured_draw_users)
+        )
+
+    # R141 adds a generated triangle-fan owner whose bind() mutates IA state and
+    # whose live-binding observer/validator are still dormant activation
+    # evidence. Keep all three APIs out of production source until the native
+    # Draw activation gate is explicitly opened.
+    runtime_generated_fan_users = []
+    for source_path in (ROOT / "src").rglob("*.cpp"):
+        if source_path == DX11 / "triangle_fan_index_buffer.cpp":
+            continue
+        runtime_source = source_path.read_text(encoding="utf-8")
+        if (
+            "NativeTriangleFanIndexBuffer" in runtime_source
+            and (
+                ".bind(" in runtime_source
+                or ".binding_readiness(" in runtime_source
+                or ".validate_binding_snapshot(" in runtime_source
+            )
+        ):
+            runtime_generated_fan_users.append(
+                source_path.relative_to(ROOT).as_posix()
+            )
+    if runtime_generated_fan_users:
+        raise SystemExit(
+            "DX11 R141 generated triangle-fan live IA APIs gained a production "
+            "caller before activation gate: "
+            + ", ".join(runtime_generated_fan_users)
         )
 
     stencil_snapshot_contract = {
