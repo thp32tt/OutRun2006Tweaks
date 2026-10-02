@@ -13,6 +13,9 @@ import json
 from pathlib import Path
 
 
+DEFAULT_OVERLAP = "66 0f 54 1d 20 91 61"
+
+
 def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -32,7 +35,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("binary", type=Path)
     parser.add_argument("--offset", type=lambda x: int(x, 0), required=True)
-    parser.add_argument("--overlap", required=True)
+    parser.add_argument("--overlap", default=DEFAULT_OVERLAP)
     args = parser.parse_args()
 
     result = {
