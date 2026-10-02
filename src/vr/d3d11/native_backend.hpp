@@ -611,6 +611,32 @@ compose_fixed_function_geometry_readiness(
     D3DPRIMITIVETYPE primitive,
     std::uint64_t snapshotToken) noexcept;
 
+// R124 seals D3D9 dynamic output state into a dormant D3D11-ready snapshot.
+// It proves viewport/scissor geometry plus the OM blend factor/sample mask
+// against the current output-surface extent. Nothing here binds RS/OM state.
+struct NativeFixedFunctionOutputStateReadiness {
+    bool inputValid{};
+    bool viewportExact{};
+    bool scissorExact{};
+    bool omDynamicExact{};
+    bool ready{};
+    D3D11_VIEWPORT viewport{};
+    D3D11_RECT scissorRect{};
+    std::array<float, 4> blendFactor{1.0f, 1.0f, 1.0f, 1.0f};
+    UINT sampleMask = 0xFFFFFFFFu;
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionOutputStateReadiness
+compose_fixed_function_output_state_readiness(
+    const OutRunVR::DrawState::RenderStateSnapshot& source,
+    const NativeSurfacePairReadiness& surfacePair) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_output_state_snapshot(
+    const OutRunVR::DrawState::RenderStateSnapshot& source,
+    const NativeSurfacePairReadiness& surfacePair,
+    std::uint64_t snapshotToken) noexcept;
+
 // R120 extends the R117 draw-readiness snapshot with the independently proven
 // R119 color/depth surface-pair identity. A native draw candidate is not ready
 // unless activation, render state, and the exact output-surface pair are all
@@ -620,12 +646,14 @@ struct NativeFixedFunctionDrawReadiness {
     bool activationReady{};
     bool renderStateReady{};
     bool surfacePairReady{};
+    bool outputStateReady{};
     bool geometryReady{};
     bool componentSnapshotsPresent{};
     bool ready{};
     std::uint64_t activationSnapshotToken{};
     std::uint64_t renderStateSnapshotToken{};
     std::uint64_t surfacePairSnapshotToken{};
+    std::uint64_t outputStateSnapshotToken{};
     std::uint64_t geometrySnapshotToken{};
     std::uint64_t snapshotToken{};
 };
@@ -635,12 +663,14 @@ compose_fixed_function_draw_readiness(
     const NativeFixedFunctionActivationReadiness& activation,
     const NativeFixedFunctionRenderStateReadiness& renderState,
     const NativeSurfacePairReadiness& surfacePair,
+    const NativeFixedFunctionOutputStateReadiness& outputState,
     const NativeFixedFunctionGeometryReadiness& geometry) noexcept;
 
 [[nodiscard]] bool validate_fixed_function_draw_snapshot(
     const NativeFixedFunctionActivationReadiness& activation,
     const NativeFixedFunctionRenderStateReadiness& renderState,
     const NativeSurfacePairReadiness& surfacePair,
+    const NativeFixedFunctionOutputStateReadiness& outputState,
     const NativeFixedFunctionGeometryReadiness& geometry,
     std::uint64_t snapshotToken) noexcept;
 
