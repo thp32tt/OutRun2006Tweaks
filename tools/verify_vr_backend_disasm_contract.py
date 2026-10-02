@@ -987,6 +987,69 @@ def verify_dxvk_continuation_chain() -> None:
                         f"missing={[f'0x{rva:08X}' for rva in missing_direct_predecessor_resolutions]}"
                     )
 
+            # A target can also be carried one stage beyond the proof that
+            # originally discovered it. continuation_57, for example, records
+            # 0x1830CA as remaining outside its capture even though that target
+            # originated in continuation_56. Once such an inherited forward
+            # target enters the immediate successor capture it must be promoted
+            # through RESOLVED_PREDECESSOR_TARGET_RVAS just like a direct
+            # predecessor external target; otherwise exact boundary evidence
+            # could be silently dropped across a two-window handoff.
+            inherited_target_assignments = [
+                node.value
+                for node in ast.walk(predecessor_proof_ast)
+                if isinstance(node, ast.Assign)
+                and any(
+                    isinstance(target, ast.Name)
+                    and target.id == "remaining_predecessor_target_outside_capture"
+                    for target in node.targets
+                )
+            ]
+            if len(inherited_target_assignments) > 1:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} predecessor proof "
+                    f"{predecessor_id} has ambiguous inherited target carry assignments: "
+                    f"{len(inherited_target_assignments)}"
+                )
+            if inherited_target_assignments:
+                inherited_expr = inherited_target_assignments[0]
+                if not (
+                    isinstance(inherited_expr, ast.Compare)
+                    and len(inherited_expr.ops) == 1
+                    and isinstance(inherited_expr.ops[0], (ast.Gt, ast.GtE))
+                    and len(inherited_expr.comparators) == 1
+                    and isinstance(inherited_expr.left, ast.Constant)
+                    and isinstance(inherited_expr.left.value, int)
+                    and isinstance(inherited_expr.comparators[0], ast.Name)
+                    and inherited_expr.comparators[0].id.endswith("_PREFIX_END_RVA")
+                ):
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} predecessor proof "
+                        f"{predecessor_id} inherited target carry is not an exact "
+                        "literal-target versus PREFIX_END_RVA comparison"
+                    )
+                inherited_target_rva = inherited_expr.left.value
+                inherited_result_binding = (
+                    '"remaining_predecessor_target_outside_capture": '
+                    "remaining_predecessor_target_outside_capture"
+                )
+                if inherited_result_binding not in predecessor_proof_source:
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} predecessor proof "
+                        f"{predecessor_id} inherited target carry is not reported"
+                    )
+                successor_start = value(f"{prefix}_RVA")
+                successor_end = value(f"{prefix}_PREFIX_END_RVA")
+                if (
+                    successor_start <= inherited_target_rva < successor_end
+                    and inherited_target_rva not in set(resolved_predecessor_targets)
+                ):
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} inherited predecessor forward target entered successor capture without resolution: "
+                        f"predecessor={predecessor_id} "
+                        f"target=0x{inherited_target_rva:08X}"
+                    )
+
         proof_status_fail_closed_markers = (
             "proven = bool(",
             '"status"',
