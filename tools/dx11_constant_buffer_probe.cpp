@@ -400,6 +400,24 @@ int main()
         observedStageSampler == samplerOwner.sampler() &&
         observedStageSrv == textureView.srv(),
         "DX11 dormant texture-stage binding preserves sampler/SRV identity");
+
+    const auto textureStageBindingReady =
+        outrun::vr::dx11::observe_fixed_function_texture_stage_binding(
+            d3d.context, textureStageSlot, samplerOwner, textureView);
+    require(
+        textureStageBindingReady.inputValid &&
+        textureStageBindingReady.slotValid &&
+        textureStageBindingReady.ownersReady &&
+        textureStageBindingReady.devicesMatch &&
+        textureStageBindingReady.contextMatches &&
+        textureStageBindingReady.boundExact &&
+        textureStageBindingReady.ready &&
+        textureStageBindingReady.slot == textureStageSlot &&
+        textureStageBindingReady.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_fixed_function_texture_stage_binding_snapshot(
+            d3d.context, textureStageSlot, samplerOwner, textureView,
+            textureStageBindingReady.snapshotToken),
+        "R132 texture-stage binding issues exact sampler/SRV snapshot");
     if (observedStageSampler)
         observedStageSampler->Release();
     if (observedStageSrv)
@@ -2396,6 +2414,18 @@ int main()
             changedOutputStateReady.snapshotToken),
         "R124 OM dynamic state changes invalidate output snapshot");
 
+    require(
+        bind_fixed_function_texture_stage_for_observation(
+            d3d.context, textureStageSlot, samplerOwner, textureView),
+        "R132 textured draw texture-stage rebind prerequisite");
+    const auto drawTextureStageReady =
+        outrun::vr::dx11::observe_fixed_function_texture_stage_binding(
+            d3d.context, textureStageSlot, samplerOwner, textureView);
+    require(
+        drawTextureStageReady.ready &&
+        drawTextureStageReady.snapshotToken != 0,
+        "R132 textured draw texture-stage snapshot prerequisite");
+
     const auto drawReady =
         compose_fixed_function_draw_readiness(
             texturedActivation, outputBindingRenderReady, surfacePairReady,
@@ -2428,6 +2458,45 @@ int main()
             outputStateReady, outputStateBinding, indexedGeometryReady,
             drawReady.snapshotToken),
         "R131 draw readiness composes sealed output binding identity");
+
+    const auto texturedDrawReady =
+        outrun::vr::dx11::compose_fixed_function_textured_draw_readiness(
+            drawReady, d3d.context, textureStageSlot, samplerOwner, textureView);
+    require(
+        texturedDrawReady.inputValid &&
+        texturedDrawReady.drawReady &&
+        texturedDrawReady.textureStageReady &&
+        texturedDrawReady.componentSnapshotsPresent &&
+        texturedDrawReady.ready &&
+        texturedDrawReady.drawSnapshotToken == drawReady.snapshotToken &&
+        texturedDrawReady.textureStageSnapshotToken ==
+            drawTextureStageReady.snapshotToken &&
+        texturedDrawReady.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_fixed_function_textured_draw_snapshot(
+            drawReady, d3d.context, textureStageSlot, samplerOwner, textureView,
+            texturedDrawReady.snapshotToken),
+        "R132 textured draw readiness composes PS binding with R131 draw identity");
+
+    ID3D11SamplerState* clearDrawSampler = nullptr;
+    ID3D11ShaderResourceView* clearDrawSrv = nullptr;
+    d3d.context->PSSetSamplers(
+        textureStageSlot, 1, &clearDrawSampler);
+    d3d.context->PSSetShaderResources(
+        textureStageSlot, 1, &clearDrawSrv);
+    const auto missingTextureStageDraw =
+        outrun::vr::dx11::compose_fixed_function_textured_draw_readiness(
+            drawReady, d3d.context, textureStageSlot, samplerOwner, textureView);
+    require(
+        !missingTextureStageDraw.textureStageReady &&
+        !missingTextureStageDraw.ready &&
+        missingTextureStageDraw.snapshotToken == 0 &&
+        !outrun::vr::dx11::validate_fixed_function_texture_stage_binding_snapshot(
+            d3d.context, textureStageSlot, samplerOwner, textureView,
+            drawTextureStageReady.snapshotToken) &&
+        !outrun::vr::dx11::validate_fixed_function_textured_draw_snapshot(
+            drawReady, d3d.context, textureStageSlot, samplerOwner, textureView,
+            texturedDrawReady.snapshotToken),
+        "R132 textured draw readiness fails closed after PS binding drift");
 
     auto activationMissingSnapshot = texturedActivation;
     activationMissingSnapshot.snapshotToken = 0;

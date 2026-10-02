@@ -1135,6 +1135,59 @@ def main() -> None:
             + ", ".join(missing_r131_output_binding_draw)
         )
 
+    r132_textured_draw_contract = [
+        (
+            "struct NativeFixedFunctionTextureStageBindingReadiness",
+            NATIVE_BACKEND_HPP,
+            "R132 observed PS texture-stage binding readiness",
+        ),
+        (
+            "struct NativeFixedFunctionTexturedDrawReadiness",
+            NATIVE_BACKEND_HPP,
+            "R132 textured draw readiness",
+        ),
+        (
+            "PSGetSamplers(",
+            NATIVE_BACKEND_CPP,
+            "R132 live sampler binding readback",
+        ),
+        (
+            "PSGetShaderResources(",
+            NATIVE_BACKEND_CPP,
+            "R132 live SRV binding readback",
+        ),
+        (
+            "out.textureStageSnapshotToken = textureStage.snapshotToken",
+            NATIVE_BACKEND_CPP,
+            "R132 textured draw consumes exact PS binding identity",
+        ),
+        (
+            "R132 texture-stage binding issues exact sampler/SRV snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R132 positive PS binding snapshot proof",
+        ),
+        (
+            "R132 textured draw readiness composes PS binding with R131 draw identity",
+            CONSTANT_BUFFER_PROBE,
+            "R132 positive textured draw composition proof",
+        ),
+        (
+            "R132 textured draw readiness fails closed after PS binding drift",
+            CONSTANT_BUFFER_PROBE,
+            "R132 stale PS binding negative proof",
+        ),
+    ]
+    missing_r132_textured_draw = [
+        meaning
+        for token, source, meaning in r132_textured_draw_contract
+        if token not in source
+    ]
+    if missing_r132_textured_draw:
+        raise SystemExit(
+            "DX11 R132 textured-draw readiness contract drift: "
+            + ", ".join(missing_r132_textured_draw)
+        )
+
     stencil_snapshot_contract = {
         "DWORD stencilReadMask = 0xFFFFFFFFu;": "stencil read mask snapshot",
         "DWORD stencilRef = 0;": "dynamic stencil reference snapshot",

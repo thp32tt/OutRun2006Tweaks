@@ -524,6 +524,89 @@ bool bind_fixed_function_texture_stage_for_observation(
     return true;
 }
 
+NativeFixedFunctionTextureStageBindingReadiness
+observe_fixed_function_texture_stage_binding(
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture) noexcept {
+    NativeFixedFunctionTextureStageBindingReadiness out{};
+    out.slot = slot;
+    out.textureUploadGeneration = texture.upload_generation();
+    out.inputValid = context != nullptr;
+    out.slotValid =
+        slot < D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT &&
+        slot < D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT;
+    out.ownersReady = sampler.ready() && texture.ready();
+
+    ID3D11Device* samplerDevice = sampler.device();
+    ID3D11Device* textureDevice = texture.device();
+    out.devicesMatch =
+        samplerDevice != nullptr &&
+        textureDevice != nullptr &&
+        samplerDevice == textureDevice;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    if (context)
+        context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    out.contextMatches =
+        out.devicesMatch &&
+        contextDevice &&
+        contextDevice.Get() == samplerDevice;
+
+    if (out.inputValid && out.slotValid && out.ownersReady &&
+        out.devicesMatch && out.contextMatches) {
+        Microsoft::WRL::ComPtr<ID3D11SamplerState> boundSampler;
+        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> boundResource;
+        context->PSGetSamplers(
+            slot, 1, boundSampler.ReleaseAndGetAddressOf());
+        context->PSGetShaderResources(
+            slot, 1, boundResource.ReleaseAndGetAddressOf());
+        out.boundExact =
+            boundSampler.Get() == sampler.sampler() &&
+            boundResource.Get() == texture.srv();
+    }
+
+    out.ready =
+        out.inputValid &&
+        out.slotValid &&
+        out.ownersReady &&
+        out.devicesMatch &&
+        out.contextMatches &&
+        out.boundExact;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(token, out.slot);
+        token = mix_readiness_snapshot_token(
+            token, out.textureUploadGeneration);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(samplerDevice)));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(sampler.sampler())));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(texture.srv())));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_texture_stage_binding_snapshot(
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = observe_fixed_function_texture_stage_binding(
+        context, slot, sampler, texture);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 void NativeFixedFunctionTextureView::shutdown() noexcept {
     srv_.Reset();
     texture_.Reset();
@@ -2415,6 +2498,53 @@ bool validate_fixed_function_draw_snapshot(
         return false;
     const auto current = compose_fixed_function_draw_readiness(
         activation, renderState, surfacePair, outputState, outputBinding, geometry);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
+NativeFixedFunctionTexturedDrawReadiness
+compose_fixed_function_textured_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture) noexcept {
+    NativeFixedFunctionTexturedDrawReadiness out{};
+    const auto textureStage = observe_fixed_function_texture_stage_binding(
+        context, slot, sampler, texture);
+    out.drawSnapshotToken = draw.snapshotToken;
+    out.textureStageSnapshotToken = textureStage.snapshotToken;
+    out.inputValid = draw.inputValid && textureStage.inputValid;
+    out.drawReady = draw.ready && draw.snapshotToken != 0;
+    out.textureStageReady =
+        textureStage.ready && textureStage.snapshotToken != 0;
+    out.componentSnapshotsPresent =
+        draw.snapshotToken != 0 && textureStage.snapshotToken != 0;
+    out.ready =
+        out.inputValid &&
+        out.drawReady &&
+        out.textureStageReady &&
+        out.componentSnapshotsPresent;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(token, out.drawSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.textureStageSnapshotToken);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_textured_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = compose_fixed_function_textured_draw_readiness(
+        draw, context, slot, sampler, texture);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 

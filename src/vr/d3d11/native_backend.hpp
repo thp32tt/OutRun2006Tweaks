@@ -167,6 +167,36 @@ private:
     const NativeFixedFunctionSamplerState& sampler,
     const NativeFixedFunctionTextureView& texture) noexcept;
 
+// R132 observes the exact PS sampler/SRV identity after a dormant binding.
+// The snapshot includes the slot, owner COM identities and texture upload
+// generation so a later mutation/rebind cannot reuse stale readiness.
+struct NativeFixedFunctionTextureStageBindingReadiness {
+    bool inputValid{};
+    bool slotValid{};
+    bool ownersReady{};
+    bool devicesMatch{};
+    bool contextMatches{};
+    bool boundExact{};
+    bool ready{};
+    UINT slot{};
+    std::uint64_t textureUploadGeneration{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionTextureStageBindingReadiness
+observe_fixed_function_texture_stage_binding(
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_texture_stage_binding_snapshot(
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture,
+    std::uint64_t snapshotToken) noexcept;
+
 // R119 seals one R113 MANAGED vertex/index buffer mirror into a fail-closed
 // readiness snapshot. The token binds CPU-shadow version, device generation,
 // mirror instance, descriptor and expected-device identity. This is dormant
@@ -775,6 +805,36 @@ compose_fixed_function_draw_readiness(
     const NativeFixedFunctionOutputStateReadiness& outputState,
     const NativeFixedFunctionOutputStateBinding& outputBinding,
     const NativeFixedFunctionGeometryReadiness& geometry,
+    std::uint64_t snapshotToken) noexcept;
+
+// R132 composes the R131 RS/OM-gated draw candidate with the currently
+// observed PS sampler/SRV binding identity. This is readiness evidence only;
+// it does not issue a D3D11 Draw* call.
+struct NativeFixedFunctionTexturedDrawReadiness {
+    bool inputValid{};
+    bool drawReady{};
+    bool textureStageReady{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t drawSnapshotToken{};
+    std::uint64_t textureStageSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionTexturedDrawReadiness
+compose_fixed_function_textured_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_textured_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture,
     std::uint64_t snapshotToken) noexcept;
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
