@@ -4,77 +4,78 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "3be47cfab3d2863961cff7c0dfb21f26123b1cfb",
-  "state_parent_head": "346c18011f4f35a970a2c1fc5be2b76f273cc5b4",
-  "material_result_sha": "e176d66f92fd6916a544dc2bbcdb91283792fb0c",
-  "validation_bearing_sha": "e176d66f92fd6916a544dc2bbcdb91283792fb0c",
+  "base_sha": "e176d66f92fd6916a544dc2bbcdb91283792fb0c",
+  "state_parent_head": "b12603f32eceb456ec67b7ff119cafa636d5294c",
+  "material_result_sha": "d82e348ddea8a25e5bd5ab4405632d10940ba71e",
+  "validation_bearing_sha": "bb1b262832510bae5c52ca0a47af4a2c81f976a3",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_SRC1_BLEND_CENSUS_EVIDENCE",
-  "selection_reason": "Fresh branch review found the primary dormant binding frontier was being advanced concurrently, while SRC1 dual-source blend remained an explicit fail-closed DX11 blocker with no role-specific runtime demand evidence. Review also found a concrete tooling drift: runtime_census.cpp emits current R120 summaries but analyze_dx11_census.py did not recognize R120, so current census output could be silently omitted. This independent unit closes that evidence/tooling gap without competing with R134/R135 binding work.",
-  "summary": "Added passive exact-demand census for active D3D9 SRCCOLOR2/INVSRCCOLOR2 requests across RGB/alpha source/destination roles, restored analyzer support for the current R120 census summary, exposed exhaustive-only no-usage evidence, and extended analyzer regressions plus the dual-source fail-closed guard. SRC1 translation remains inexact and NativeDrawPathActive remains disabled.",
+  "selected_work": "DX11_LIVE_OUTPUT_BINDING_READBACK_R137",
+  "selection_reason": "R126 apply() installed sealed RS/OM state but no reusable readiness object proved that the effective same-device D3D11 context still retained the exact rasterizer, viewport/scissor, blend state/factor/sample mask, depth-stencil state and stencil ref. This remained an independent dormant pre-draw evidence gap after pipeline and texture binding work.",
+  "summary": "Implemented fail-closed live RS/OM binding observation for NativeFixedFunctionOutputStateBinding, with exact same-context state readback, snapshot validation, drift rejection and deterministic restore probes. Corrected the pre-existing analyzer/verifier R120-summary guard that blocked hosted source-graph validation. Finalized the unit as R137 to avoid R135 texture-mask and R136 aggregate-PS numbering collisions.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read current GitHub HEAD, AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/automation/runs/CONV-DX11-000001.json, docs/VR_WORK_QUEUE.json, regression knowledge/history and Issue #14 through the authenticated GitHub connector.",
-        "Observed concurrent R134/R135 progression and avoided duplicating the hot native_backend binding frontier."
+        "Read current GitHub HEAD, AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/automation/runs/CONV-DX11-000001.json, regression knowledge/history and Issue #14 through the authenticated GitHub connector.",
+        "Tracked rapid concurrent descendants and rebased only when target-file blob identities were unchanged, avoiding overwrite of aggregate-PS and census work."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Confirmed D3DBLEND_SRCCOLOR2 and D3DBLEND_INVSRCCOLOR2 remain intentionally fail-closed because the fixed-function shader generator has no proven SV_Target1 linkage.",
-        "Confirmed runtime census only aggregated PipelineUnsupportedBlend and did not identify whether SRC1 factors caused it.",
-        "Found current runtime emits VR DX11 R120 census summaries while the analyzer accepted only R72-R85/R114 and its source-log filter also omitted R120."
+        "Confirmed R126 NativeFixedFunctionOutputStateBinding::apply() sets RS/OM state after a same-device check but exposes no reusable live-binding readiness snapshot.",
+        "Confirmed existing R133/R134-era evidence covers texture/pipeline object identity while final dormant draw evidence did not prove effective live RS/OM identity."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
-        "src/vr/d3d11/runtime_census.cpp",
-        "tools/analyze_dx11_census.py",
-        "tools/test_analyze_dx11_census.py",
-        "tools/verify_dx11_dual_source_contract.py"
+        "src/vr/d3d11/native_backend.hpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_constant_buffer_probe.cpp",
+        "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "d33e677712552a3017dbfa28ce689465f39df950",
-        "e176d66f92fd6916a544dc2bbcdb91283792fb0c"
+        "d82e348ddea8a25e5bd5ab4405632d10940ba71e",
+        "346c18011f4f35a970a2c1fc5be2b76f273cc5b4",
+        "132b862871f0f8b03e0ac9cad4e946a7cf495f4d",
+        "bb1b262832510bae5c52ca0a47af4a2c81f976a3"
       ],
       "details": [
-        "Counted active SRC1 requests separately for RGB source, RGB destination, separate-alpha source and separate-alpha destination, plus any-draw demand.",
-        "Extended R120 periodic census output without changing pipeline translation or draw routing.",
-        "Restored analyzer recognition/filtering for R120 and added a DualSourceBlend evidence block where zero demand is considered absence evidence only with exhaustive stride=1 source-draw coverage.",
-        "Added exhaustive zero-demand and positive-demand analyzer regressions and guarded the complete evidence path from the existing fail-closed dual-source validator."
+        "Added NativeFixedFunctionOutputBindingReadiness and same-device RS/OM readback validation covering rasterizer, viewport, scissor, blend state/factor/sample mask, depth-stencil state and stencil ref.",
+        "Issued a nonzero readiness token only when every live output binding remains exact; stale live state fails closed.",
+        "Added positive, rasterizer-drift and deterministic-restore hosted probe contracts.",
+        "Aligned the analyzer source-graph guard with already-supported R120 census summaries and finalized this independent unit as R137."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_EXACT_STATIC_CI_CANCELLED_DURING_CHECKOUT",
-      "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_DURING_CHECKOUT",
+      "status": "COMPLETE_EXACT_STATIC_CI_CANCELLED_DURING_CHECKOUT_AFTER_GUARD_FIX",
+      "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_DURING_CHECKOUT_AFTER_GUARD_FIX",
       "evidence": [
-        "Re-fetched exact material/result SHA e176d66f92fd6916a544dc2bbcdb91283792fb0c and verified R120 parser recognition, SRC1 counters, exhaustive-only absence rule, positive/zero analyzer regression markers and the extended dual-source guard.",
-        "Verified the existing dual-source contract still requires D3DBLEND_SRCCOLOR2/D3DBLEND_INVSRCCOLOR2 mappings to remain inexact and the single-target shader generator to contain no SV_Target1 promotion.",
-        "Backend Conversion Gate run 36975539235 for exact result SHA e176d66f was cancelled during Checkout by descendant branch churn; verifier/analyzer/Win32/WARP steps were skipped, so no hosted execution success is claimed.",
-        "GitHub comparison proved e176d66f is a descendant of d33e6777 with zero behind, retaining the primary implementation while preserving concurrent state work."
+        "GitHub exact material diff d82e348ddea8a25e5bd5ab4405632d10940ba71e changed only the four intended DX11 source/probe/guard paths and contains positive, drift and restore R137 live-output binding evidence (subsequently relabeled without changing implementation semantics).",
+        "Build run 36975573494 reached Verify DX11 source graph and failed on a pre-existing analyzer/verifier R120-summary compatibility drift before the new live-output contract; 346c18011f4f35a970a2c1fc5be2b76f273cc5b4 aligned that guard with analyze_dx11_census.py.",
+        "Validation-bearing bb1b262832510bae5c52ca0a47af4a2c81f976a3 retains the R137 header/probe/verifier markers. Build run 36976142670 was cancelled during Checkout by descendant branch churn, so no hosted source-graph, compiler or WARP execution success is claimed after the guard fix.",
+        "Current descendants retained the R137 live-output markers while continuing independent aggregate-PS work."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "e176d66f92fd6916a544dc2bbcdb91283792fb0c",
-      "primary_implementation_commit": "d33e677712552a3017dbfa28ce689465f39df950",
-      "issue14_comment_id": 5946974703
+      "material_commit": "d82e348ddea8a25e5bd5ab4405632d10940ba71e",
+      "validation_bearing_commit": "bb1b262832510bae5c52ca0a47af4a2c81f976a3",
+      "issue14_comment_id": 5947015143
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Passive diagnostic census, analyzer and regression/guard changes only; no native game Draw* routing, backend promotion, OpenXR transport or release-package selection changed."
+      "reason": "Dormant readiness/readback, probe and source-graph validation only; no native game Draw* routing, backend activation, OpenXR transport, localization or release package selection changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Do not duplicate R135. Keep NativeDrawPathActive disabled. Next independent static work should aggregate exact PS sampler/SRV binding identity across every texture stage required by activation, replacing R133's intentional single-stage fail-closed limit while preserving R135 requiredTextureMask snapshot integrity. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. The source descendant now contains aggregate multi-stage PS binding evidence; next independent static work should compose the exact R137 live RS/OM binding snapshot with the final dormant bound-draw evidence so pipeline, aggregate PS, output/surface state and geometry are all proven on the same context without issuing game Draw*. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -84,22 +85,21 @@
     "dxvk_lane_modified": false,
     "localization_modified": false
   },
-  "issue14_comment_id": 5946974703,
-  "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_DURING_CHECKOUT",
-  "blocker": "Exact-SHA hosted Backend Conversion Gate was cancelled during Checkout because the branch advanced concurrently. Runtime graphics validation remains UNTESTED; this does not block further independent GitHub-only static/source work.",
-  "next_action": "Do not duplicate R135. Keep NativeDrawPathActive disabled. Next independent static work should aggregate exact PS sampler/SRV binding identity across every texture stage required by activation, replacing R133's intentional single-stage fail-closed limit while preserving R135 requiredTextureMask snapshot integrity. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5947015143,
+  "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_DURING_CHECKOUT_AFTER_GUARD_FIX",
+  "blocker": "Hosted validation after the R120 guard fix was cancelled during Checkout by descendant branch churn. Runtime hardware validation was not performed.",
+  "next_action": "Keep NativeDrawPathActive disabled. The source descendant now contains aggregate multi-stage PS binding evidence; next independent static work should compose the exact R137 live RS/OM binding snapshot with the final dormant bound-draw evidence so pipeline, aggregate PS, output/surface state and geometry are all proven on the same context without issuing game Draw*. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "prior_completed_unit": {
-    "selected_work": "DX11_DRAW_TEXTURE_MASK_SNAPSHOT_INTEGRITY_R135",
-    "material_result_sha": "00f52fccc3a0f27e7e29aee6e60a8f969204e391",
-    "validation_bearing_sha": "00f52fccc3a0f27e7e29aee6e60a8f969204e391",
-    "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_BEFORE_STEPS",
+    "selected_work": "DX11_SRC1_BLEND_CENSUS_EVIDENCE",
+    "material_result_sha": "e176d66f92fd6916a544dc2bbcdb91283792fb0c",
+    "validation_bearing_sha": "e176d66f92fd6916a544dc2bbcdb91283792fb0c",
+    "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_DURING_CHECKOUT",
     "runtime_validation": "UNTESTED",
-    "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
     "checkpoint": "C6_STATE",
-    "summary": "Sealed requiredTextureMask into the dormant draw snapshot token, added a self-contained draw-readiness integrity validator, and required downstream textured/bound readiness to reject copied draw snapshots whose required texture mask drifted. Added an exact WARP-oriented regression case where a forged mask matches a live PS stage but must still fail closed. Native game Draw* routing remains disabled.",
-    "issue14_comment_id": 5946939969
+    "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+    "issue14_comment_id": 5946974703
   }
 }
