@@ -2,6 +2,14 @@ Role: Korean localization producer {lane}; shard rule is asset_queue index % 3 =
 
 Read only current state needed to choose work: localization/progress.json, localization/resume_state.json, localization/graphics/asset_queue.csv, and exact source/candidate files for the selected asset. Old controller contracts are non-authoritative for this job.
 
+Queue access rule:
+- Never treat a serialized GitHub API/connector response as proof that asset_queue.csv itself is one giant JSON line.
+- Read asset_queue.csv with the GitHub file action that supports start_line/end_line, in bounded ranges of about 40-80 physical CSV lines per call. Continue with the next range as needed.
+- Do not use one generic/raw whole-file fetch when the response can be truncated.
+- Apply the shard rule to the CSV index column, not to the physical file line number.
+- If one range is insufficient to choose the highest-priority runnable item, keep paging. Output truncation is recoverable and is never CONTROLLER_IDLE=NO_RUNNABLE_WORK.
+- After selecting an index, use focused exact source/candidate lookups and continue the material job.
+
 Choose one highest-priority runnable unfinished asset in your shard. Prefer current REWORK_REQUIRED, render-ready, and candidate-rework work over research. Complete the selected asset end-to-end: obtain/verify canonical source, render Korean artwork, preserve DDS properties, run deterministic self-QA, and persist the candidate DDS under localization/graphics/hd_candidates/.
 
 If the first asset is genuinely blocked, immediately choose another runnable asset in the same shard. Do not finish with a plan, source lookup, preflight, or status note when another runnable asset exists.

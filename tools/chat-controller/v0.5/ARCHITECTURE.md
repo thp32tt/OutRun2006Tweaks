@@ -54,3 +54,6 @@ Localization producers must not treat connector payload-size limits as material 
 If an assistant response explicitly reports that the authenticated GitHub connector/tool is unavailable or not exposed, that response is never accepted as progress or completion. The controller preserves the exact JOB_ID, opens a fresh chat in the configured project, and retries without a finite attempt cap.
 
 Visible Retry/Try again controls alone are not failure evidence. They are actionable only when the current visible surface also contains an actual ChatGPT generation/network error, preventing stale history controls from causing chat churn.
+
+
+Queue-read recovery is same-chat first. If a localization producer claims asset_queue.csv is unreadable because a generic GitHub response is large or truncated, the controller keeps the same JOB_ID and sends a bounded start_line/end_line paging instruction instead of accepting the turn as blocked.

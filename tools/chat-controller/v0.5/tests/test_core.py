@@ -14,6 +14,7 @@ from app.core import (
     material_commit_ok,
     GITHUB_CONNECTION_FIRST_LINE,
     GITHUB_TOOL_RECOVERY_MESSAGE,
+    LOCALIZATION_QUEUE_RECOVERY_MESSAGE,
     prepare_outgoing_message,
     github_tool_unavailable_response,
     github_read_limit_response,
@@ -151,6 +152,15 @@ class CoreTests(unittest.TestCase):
     def test_same_chat_github_recovery_message_is_minimal(self):
         rendered = prepare_outgoing_message(GITHUB_TOOL_RECOVERY_MESSAGE)
         self.assertEqual(rendered.splitlines(), [GITHUB_CONNECTION_FIRST_LINE, "진행해"])
+
+    def test_localization_queue_recovery_message_uses_ranged_reads(self):
+        rendered = prepare_outgoing_message(LOCALIZATION_QUEUE_RECOVERY_MESSAGE)
+        self.assertEqual(rendered.splitlines()[0], GITHUB_CONNECTION_FIRST_LINE)
+        self.assertIn("start_line/end_line", rendered)
+        self.assertIn("같은 JOB_ID", rendered)
+        prompt = (ROOT / "prompts" / "localization_producer.md").read_text(encoding="utf-8")
+        self.assertIn("40-80 physical CSV lines", prompt)
+        self.assertIn("CSV index column", prompt)
 
     def test_localization_prompt_has_chunked_binary_fallback(self):
         prompt = (ROOT / "prompts" / "localization_producer.md").read_text(encoding="utf-8")

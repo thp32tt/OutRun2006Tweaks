@@ -10,6 +10,13 @@ STATE_VERSION = 1
 
 GITHUB_CONNECTION_FIRST_LINE = "깃허브 연결은되어 있다 오류가 난다면 정상연결될때까지 무제한 다시 연결 상태를 확인한다"
 GITHUB_TOOL_RECOVERY_MESSAGE = "진행해"
+LOCALIZATION_QUEUE_RECOVERY_MESSAGE = (
+    "계속 진행해. asset_queue.csv를 한 번에 전체 조회하지 말고 GitHub 파일 조회의 "
+    "start_line/end_line 범위로 40~80줄씩 나눠 읽어. API 응답의 JSON wrapper나 출력 "
+    "truncation을 실제 CSV가 단일 JSON 라인인 것으로 오인하지 마. CSV의 실제 index 값으로 "
+    "shard(index % 3)를 판정하고 필요한 다음 범위를 계속 조회한 뒤, 같은 JOB_ID로 runnable "
+    "asset을 확정해서 DDS 생성, 검증, material commit까지 끝내."
+)
 
 
 def prepare_outgoing_message(message: str) -> str:
