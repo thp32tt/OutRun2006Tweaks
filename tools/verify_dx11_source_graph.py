@@ -262,17 +262,17 @@ def main() -> None:
          PIPELINE_TRANSLATION_CPP,
          "R180 D3DTOP_MODULATE2X component-wise shader expression"),
         ("modulate2xStages[0].colorOp = D3DTOP_MODULATE2X;",
-         FIXED_FUNCTION_PIPELINE_PROBE, "R179 hosted MODULATE2X color fixture"),
+         FIXED_FUNCTION_PIPELINE_PROBE, "R180 hosted MODULATE2X color fixture"),
         ("modulate2xStages[0].alphaOp = D3DTOP_MODULATE2X;",
-         FIXED_FUNCTION_PIPELINE_PROBE, "R179 hosted MODULATE2X alpha fixture"),
+         FIXED_FUNCTION_PIPELINE_PROBE, "R180 hosted MODULATE2X alpha fixture"),
         ("float3 nextColor = (sampled0.rgb * input.diffuse.rgb) * 2.0;",
-         FIXED_FUNCTION_PIPELINE_PROBE, "R179 generated RGB HLSL assertion"),
+         FIXED_FUNCTION_PIPELINE_PROBE, "R180 generated RGB HLSL assertion"),
         ("float nextAlpha = (sampled0.a * input.diffuse.a) * 2.0;",
-         FIXED_FUNCTION_PIPELINE_PROBE, "R179 generated alpha HLSL assertion"),
+         FIXED_FUNCTION_PIPELINE_PROBE, "R180 generated alpha HLSL assertion"),
         ("R180 D3DTOP_MODULATE2X fixed-function shader prototype did not compile",
-         FIXED_FUNCTION_PIPELINE_PROBE, "R179 offline compile assertion"),
+         FIXED_FUNCTION_PIPELINE_PROBE, "R180 offline compile assertion"),
         ("DX11 fixed-function D3DTOP_MODULATE2X support R180: PASS",
-         FIXED_FUNCTION_PIPELINE_PROBE, "R179 hosted probe completion"),
+         FIXED_FUNCTION_PIPELINE_PROBE, "R180 hosted probe completion"),
     ]
     missing_r180_d3dtop_modulate2x = [
         meaning
