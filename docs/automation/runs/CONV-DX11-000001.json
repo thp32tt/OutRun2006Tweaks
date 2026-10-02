@@ -5,11 +5,11 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "ba57be935167347396e90f71c4a655226cb51e46",
-  "state_parent_head": "a93dc60f70415b519fb9fcbb85a472d0b1673280",
+  "state_parent_head": "2c2306d8c8096f9b23f8fecc3aa99a1ccf4c1c36",
   "material_result_sha": "fa96af8dc7b918783a24b17f3ccc1ce5826c835b",
   "source_implementation_sha": "ee0d41992589bfb0ac76d7baad044471c5b85b61",
   "validation_bearing_sha": "fa96af8dc7b918783a24b17f3ccc1ce5826c835b",
-  "retaining_descendant_sha": "a93dc60f70415b519fb9fcbb85a472d0b1673280",
+  "retaining_descendant_sha": "2c2306d8c8096f9b23f8fecc3aa99a1ccf4c1c36",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
@@ -52,11 +52,11 @@
     },
     "C3_VALIDATE": {
       "status": "COMPLETE_STATIC_EXACT_SHA_PASS_COMPILE_NOT_CLAIMED",
-      "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; WIN32_CONFIGURE_IN_PROGRESS_AT_C6; BUILD_NOT_CLAIMED",
+      "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
       "evidence": [
         "Authenticated exact-SHA static contract check passed: three dependency/HLSL/readiness switch sites, exact RGB expression, positive fixture, ALPHAOP rejection, compile assertion and R190 source-graph guard are present.",
         "GitHub Build run 36992449743 job 110791600400 on exact result SHA completed HMD baseline, one-click structure, backend disassembly, Verify DX11 source graph, Test DX11 census analyzer, wheel source and FFB math with SUCCESS.",
-        "Win32 Configure remained in progress at the C6 checkpoint; Build/binary verification had not completed, so compile/binary success is not claimed."
+        "Win32 Configure was cancelled by newer same-branch descendant state churn; Build and binary verification were skipped, so compile/binary success is not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
@@ -73,7 +73,7 @@
       "reason": "Dormant fixed-function source/test/guard unit only; NativeDrawPathActive, release payload, localization, OpenXR transport and other backend lanes are unchanged."
     },
     "C6_STATE": {
-      "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
+      "status": "COMPLETE_WITH_FINAL_VALIDATION_STATE",
       "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R190 D3DTOP_MODULATEINVCOLOR_ADDALPHA and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
@@ -90,13 +90,13 @@
   "issue14_comment_id": 5949694784,
   "validation_run_id": 36992449743,
   "validation_job_id": 110791600400,
-  "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; WIN32_CONFIGURE_IN_PROGRESS_AT_C6; BUILD_NOT_CLAIMED",
-  "blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA GitHub Build run passed DX11 source-graph/census and preceding static checks; Configure was still in progress at C6 and Build/binary verification had not completed, so compile/binary success is not claimed.",
+  "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+  "blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA GitHub Build run 36992449743 passed DX11 source-graph/census and preceding static checks; Win32 Configure was cancelled by descendant branch churn and Build/binary steps were skipped, so compile/binary success is not claimed.",
   "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R190 D3DTOP_MODULATEINVCOLOR_ADDALPHA and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "source_head": "a93dc60f70415b519fb9fcbb85a472d0b1673280",
+  "source_head": "2c2306d8c8096f9b23f8fecc3aa99a1ccf4c1c36",
   "result_sha": "fa96af8dc7b918783a24b17f3ccc1ce5826c835b",
   "selected_work_item": "DX11_FFP_D3DTOP_MODULATEINVCOLOR_ADDALPHA_SUPPORT_R190",
   "changed_paths": [
