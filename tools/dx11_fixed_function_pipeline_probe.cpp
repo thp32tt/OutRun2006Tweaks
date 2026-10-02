@@ -322,6 +322,24 @@ int main()
     }
 
     {
+        auto multisampleOn = base_state();
+        multisampleOn.multiSampleAntialias = TRUE;
+        const auto multisampleOnPipeline = translate_pipeline(multisampleOn);
+        require(
+            multisampleOnPipeline.exact() &&
+            multisampleOnPipeline.rasterizer.MultisampleEnable == TRUE,
+            "R171 enabled D3D9 multisample raster intent reaches D3D11 rasterizer state");
+
+        auto multisampleOff = multisampleOn;
+        multisampleOff.multiSampleAntialias = FALSE;
+        const auto multisampleOffPipeline = translate_pipeline(multisampleOff);
+        require(
+            multisampleOffPipeline.exact() &&
+            multisampleOffPipeline.rasterizer.MultisampleEnable == FALSE,
+            "R171 disabled D3D9 multisample raster intent reaches D3D11 rasterizer state");
+    }
+
+    {
         auto lineRaster = base_state();
         lineRaster.lastPixel = TRUE;
         lineRaster.antialiasedLineEnable = FALSE;
@@ -385,6 +403,7 @@ int main()
     }
 
     std::cout
+        << "DX11 multisample raster provenance R171: PASS\n"
         << "DX11 texture-coordinate wrap fail-closed R170: PASS\n"
         << "DX11 line-raster provenance R168: PASS\n"
         << "DX11 fixed-function dithering fail-closed R165: PASS\n"

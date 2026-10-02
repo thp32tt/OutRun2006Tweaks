@@ -6745,6 +6745,54 @@ def main() -> None:
             + ", ".join(missing_r169_point_raster_provenance)
         )
 
+    r171_multisample_raster_contract = [
+        (
+            "DWORD multiSampleAntialias = TRUE;",
+            D3D9_DRAW_STATE_HPP,
+            "R171 multisample raster snapshot provenance",
+        ),
+        (
+            "D3DRS_MULTISAMPLEANTIALIAS,",
+            D3D9_RENDER_STATE_CAPTURE,
+            "R171 tracked multisample-raster priming",
+        ),
+        (
+            "read(D3DRS_MULTISAMPLEANTIALIAS, out.multiSampleAntialias);",
+            D3D9_RENDER_STATE_CAPTURE,
+            "R171 multisample-raster capture",
+        ),
+        (
+            "out.rasterizer.MultisampleEnable =\n            source.multiSampleAntialias != FALSE;",
+            PIPELINE_TRANSLATION_CPP,
+            "R171 D3D11 multisample-raster translation",
+        ),
+        (
+            "R171 enabled D3D9 multisample raster intent reaches D3D11 rasterizer state",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R171 enabled-state translation probe",
+        ),
+        (
+            "R171 disabled D3D9 multisample raster intent reaches D3D11 rasterizer state",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R171 disabled-state translation probe",
+        ),
+        (
+            "DX11 multisample raster provenance R171: PASS",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R171 hosted probe completion marker",
+        ),
+    ]
+    missing_r171_multisample_raster = [
+        meaning
+        for token, source, meaning in r171_multisample_raster_contract
+        if token not in source
+    ]
+    if missing_r171_multisample_raster:
+        raise SystemExit(
+            "DX11 R171 multisample-raster provenance drift: "
+            + ", ".join(missing_r171_multisample_raster)
+        )
+
     r168_line_raster_contract = [
         (
             "DWORD lastPixel = TRUE;",

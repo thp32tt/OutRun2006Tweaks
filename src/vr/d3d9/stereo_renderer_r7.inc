@@ -928,6 +928,7 @@ namespace OutRunVRStereo
 				D3DRS_DEPTHBIAS, D3DRS_SLOPESCALEDEPTHBIAS,
 				D3DRS_DITHERENABLE,
 				D3DRS_LASTPIXEL, D3DRS_ANTIALIASEDLINEENABLE,
+				D3DRS_MULTISAMPLEANTIALIAS,
 				D3DRS_WRAP0, D3DRS_WRAP1, D3DRS_WRAP2, D3DRS_WRAP3,
 				D3DRS_WRAP4, D3DRS_WRAP5, D3DRS_WRAP6, D3DRS_WRAP7,
 				D3DRS_POINTSIZE, D3DRS_POINTSIZE_MIN,
@@ -1737,6 +1738,8 @@ namespace OutRunVRStereo
 		// blocker; ANTIALIASEDLINEENABLE maps to rasterizer state below.
 		read(D3DRS_LASTPIXEL, out.lastPixel);
 		read(D3DRS_ANTIALIASEDLINEENABLE, out.antialiasedLineEnable);
+		// R171 carries D3D9 multisample-raster intent into native translation.
+		read(D3DRS_MULTISAMPLEANTIALIAS, out.multiSampleAntialias);
 		// R169 captures the full D3D9 point-raster state family. D3D11 has no
 		// fixed-function equivalent for variable-size/scaled point sprites, so
 		// the existing direct POINTLIST readiness gate remains fail-closed.

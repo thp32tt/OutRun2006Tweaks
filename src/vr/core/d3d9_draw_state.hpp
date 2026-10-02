@@ -50,6 +50,10 @@ namespace OutRunVR::DrawState
         // until endpoint coverage is explicitly emulated.
         DWORD lastPixel = TRUE;
         DWORD antialiasedLineEnable = FALSE;
+        // R171: preserve the D3D9 multisample rasterization switch instead of
+        // hard-coding the dormant D3D11 rasterizer state. The D3D9 default is
+        // enabled; the native descriptor carries the same per-draw intent.
+        DWORD multiSampleAntialias = TRUE;
         // R169: D3D9 POINTLIST rasterization can expand each source point to
         // a screen-space quad and can replace/scale point texture coordinates.
         // Preserve the complete point-size/sprite/scale render-state family;

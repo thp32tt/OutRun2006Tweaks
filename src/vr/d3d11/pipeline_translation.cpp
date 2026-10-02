@@ -1473,7 +1473,11 @@ namespace outrun::vr::dx11
         out.rasterizer.DepthClipEnable = TRUE;
         out.rasterizer.ScissorEnable =
             source.scissorTestEnable != FALSE;
-        out.rasterizer.MultisampleEnable = FALSE;
+        // R171: D3DRS_MULTISAMPLEANTIALIAS is the D3D9 per-draw
+        // multisample-raster switch. Preserve it in the D3D11 rasterizer
+        // descriptor rather than silently forcing the native path off.
+        out.rasterizer.MultisampleEnable =
+            source.multiSampleAntialias != FALSE;
         // R168: D3D11 retains an explicit antialiased-line switch, so carry
         // the captured D3D9 intent instead of silently forcing it off.
         // LASTPIXEL has no D3D11 rasterizer equivalent and remains guarded at
