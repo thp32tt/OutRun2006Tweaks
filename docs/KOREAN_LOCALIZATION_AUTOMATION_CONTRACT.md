@@ -172,6 +172,19 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 
 
 
+## Optional installed-skill routing (schema 41)
+
+Installed Skills are optional execution aids, not dependencies and not completion authorities.
+
+- A/B/E may use `outrun-localization-execution-router`, `outrun-dds-finalization-executor`, the durable-task recorder, or the GitHub-only build gate when they directly help the current checkpoint.
+- OCR/text-region recovery is allowed only when source text/region evidence is genuinely missing or disputed.
+- Korean translation consistency work is allowed only when canonical Korean text is missing/conflicting or C rejected the semantics.
+- DirectXTex guidance is allowed only when DDS inspection/conversion is directly useful; absence of texconv or a local PC is not a blocker for unrelated GitHub-only work.
+- C may use the static-QA reconciler, but its PASS/REWORK disposition and shared-state reconciliation remain governed by this contract.
+- Missing, unavailable, or unsuitable Skills must fall back immediately to the existing GitHub-only workflow.
+- A Skill must resume the current checkpoint. It must not restart completed OCR/translation/preflight stages merely because a chat rolled over or a Skill was invoked.
+- Natural-language Skill output never releases a TASK. Durable Git evidence and controller validation remain authoritative.
+
 ## Active-task latch and premature-stop recovery (schema 39)
 
 A/B/E producer TASK_IDs are controller-latched until the controller accepts a durable producer result. An assistant turn ending is never task completion by itself.
