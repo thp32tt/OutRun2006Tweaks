@@ -3493,6 +3493,41 @@ def main() -> None:
             + ", ".join(missing_r160_sampler_border)
         )
 
+    depth_bias_fail_closed_contract = [
+        ("DWORD depthBiasBits = 0;", D3D9_DRAW_STATE_HPP,
+         "depth-bias raw constant provenance"),
+        ("DWORD slopeScaleDepthBiasBits = 0;", D3D9_DRAW_STATE_HPP,
+         "depth-bias raw slope provenance"),
+        ("D3DRS_DEPTHBIAS, out.depthBiasBits", D3D9_RENDER_STATE_CAPTURE,
+         "live D3D9 constant depth-bias capture"),
+        ("D3DRS_SLOPESCALEDEPTHBIAS, out.slopeScaleDepthBiasBits",
+         D3D9_RENDER_STATE_CAPTURE, "live D3D9 slope depth-bias capture"),
+        ("PipelineUnsupportedDepthBias = 1u << 15", PIPELINE_TRANSLATION_HPP,
+         "dedicated depth-bias readiness blocker"),
+        ("source.depthBiasBits != 0u", PIPELINE_TRANSLATION_CPP,
+         "nonzero D3D9 constant depth-bias rejection"),
+        ("source.slopeScaleDepthBiasBits != 0u", PIPELINE_TRANSLATION_CPP,
+         "nonzero D3D9 slope depth-bias rejection"),
+        ("DX11 zero depth bias must remain exact", FIXED_FUNCTION_PIPELINE_PROBE,
+         "zero-bias positive fixture"),
+        ("DX11 nonzero D3D9 constant depth bias must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE, "constant-bias negative fixture"),
+        ("DX11 nonzero D3D9 slope depth bias must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE, "slope-bias negative fixture"),
+        ("DX11 fixed-function handoff must retain depth-bias blocker",
+         FIXED_FUNCTION_PIPELINE_PROBE, "handoff blocker retention fixture"),
+    ]
+    missing_depth_bias_fail_closed = [
+        meaning
+        for token, source, meaning in depth_bias_fail_closed_contract
+        if token not in source
+    ]
+    if missing_depth_bias_fail_closed:
+        raise SystemExit(
+            "DX11 depth-bias fail-closed contract drift: "
+            + ", ".join(missing_depth_bias_fail_closed)
+        )
+
     for graph_name, graph in (
         ("checked-in CMake", CMAKE),
         ("cmake.toml", CMAKE_TOML),
