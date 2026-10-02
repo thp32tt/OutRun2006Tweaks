@@ -329,6 +329,9 @@ public:
     [[nodiscard]] ID3D11Buffer* mirror_buffer() const noexcept {
         return mirror_buffer_.Get();
     }
+    [[nodiscard]] UINT byte_width() const noexcept {
+        return byte_width_;
+    }
     [[nodiscard]] bool mirror_descriptor_exact(
         ID3D11Device* expectedDevice) const noexcept;
     [[nodiscard]] NativeManagedBufferMirrorReadiness mirror_readiness(
@@ -1463,8 +1466,16 @@ struct NativeFixedFunctionRenderTargetBoundDrawReadiness {
     bool fullyBoundDrawReady{};
     bool surfaceTargetBindingReady{};
     bool surfacePairMatchesDraw{};
+    // R151 seals the exact byte-range metadata behind the live IA binding.
+    bool geometryRangeMetadataExact{};
     bool componentSnapshotsPresent{};
     bool ready{};
+    UINT vertexStride{};
+    UINT vertexOffset{};
+    UINT vertexBufferByteWidth{};
+    DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT indexOffset{};
+    UINT indexBufferByteWidth{};
     std::uint64_t fullyBoundDrawSnapshotToken{};
     std::uint64_t surfaceTargetBindingSnapshotToken{};
     std::uint64_t surfacePairSnapshotToken{};
@@ -1642,6 +1653,7 @@ struct NativeFixedFunctionDirectDrawDispatchReadiness {
     bool geometryMatchesDraw{};
     bool surfacePairMatchesDraw{};
     bool topologyMatchesGeometry{};
+    bool bufferRangeExact{};
     bool dispatchArgumentsExact{};
     bool componentSnapshotsPresent{};
     bool ready{};
@@ -1737,22 +1749,28 @@ struct NativeFixedFunctionIndexedDirectDispatchReadiness {
     bool inputValid{};
     bool directDispatchReady{};
     bool sourceRangeReady{};
+    bool boundDrawReady{};
     bool dispatchMatchesSourceRange{};
+    bool boundDrawMatchesDispatch{};
+    bool vertexBufferRangeExact{};
     bool componentSnapshotsPresent{};
     bool ready{};
     std::uint64_t directDispatchSnapshotToken{};
     std::uint64_t sourceRangeSnapshotToken{};
+    std::uint64_t boundDrawSnapshotToken{};
     std::uint64_t snapshotToken{};
 };
 
 [[nodiscard]] NativeFixedFunctionIndexedDirectDispatchReadiness
 compose_fixed_function_indexed_direct_dispatch_readiness(
     const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
-    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange) noexcept;
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept;
 
 [[nodiscard]] bool validate_fixed_function_indexed_direct_dispatch_snapshot(
     const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
     const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
     std::uint64_t snapshotToken) noexcept;
 
 // R148 seals the eventual DrawIndexed tuple for generated triangle fans after

@@ -4177,6 +4177,30 @@ compose_fixed_function_render_target_bound_draw_readiness(
     const NativeSurfaceMirror& colorSurface,
     const NativeSurfaceMirror& depthSurface) noexcept {
     NativeFixedFunctionRenderTargetBoundDrawReadiness out{};
+    out.vertexStride = vertexStride;
+    out.vertexOffset = vertexOffset;
+    out.vertexBufferByteWidth = vertexBuffer.byte_width();
+    out.indexFormat = indexFormat;
+    out.indexOffset = indexOffset;
+    out.indexBufferByteWidth = indexBuffer ? indexBuffer->byte_width() : 0u;
+    const UINT indexElementBytes =
+        indexFormat == DXGI_FORMAT_R16_UINT ? 2u :
+        indexFormat == DXGI_FORMAT_R32_UINT ? 4u : 0u;
+    out.geometryRangeMetadataExact =
+        vertexStride != 0 &&
+        out.vertexBufferByteWidth != 0 &&
+        vertexOffset <= out.vertexBufferByteWidth &&
+        (geometry.indexBufferRequired
+            ? indexBuffer != nullptr &&
+              indexElementBytes != 0 &&
+              (indexOffset % indexElementBytes) == 0 &&
+              out.indexBufferByteWidth != 0 &&
+              indexOffset <= out.indexBufferByteWidth
+            : indexBuffer == nullptr &&
+              indexFormat == DXGI_FORMAT_UNKNOWN &&
+              indexOffset == 0 &&
+              out.indexBufferByteWidth == 0);
+
     const auto fullyBound =
         compose_fixed_function_fully_bound_draw_readiness(
             draw, context, outputStateBinding, pipelineBundle,
@@ -4210,6 +4234,7 @@ compose_fixed_function_render_target_bound_draw_readiness(
         out.fullyBoundDrawReady &&
         out.surfaceTargetBindingReady &&
         out.surfacePairMatchesDraw &&
+        out.geometryRangeMetadataExact &&
         out.componentSnapshotsPresent;
     if (out.ready) {
         std::uint64_t token = 0xcbf29ce484222325ull;
@@ -4219,6 +4244,13 @@ compose_fixed_function_render_target_bound_draw_readiness(
             token, out.surfaceTargetBindingSnapshotToken);
         token = mix_readiness_snapshot_token(
             token, out.surfacePairSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.vertexStride);
+        token = mix_readiness_snapshot_token(token, out.vertexOffset);
+        token = mix_readiness_snapshot_token(token, out.vertexBufferByteWidth);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.indexFormat));
+        token = mix_readiness_snapshot_token(token, out.indexOffset);
+        token = mix_readiness_snapshot_token(token, out.indexBufferByteWidth);
         out.snapshotToken = token == 0 ? 1 : token;
     }
     return out;
@@ -4638,18 +4670,26 @@ bool validate_fixed_function_indexed_source_range_snapshot(
 NativeFixedFunctionIndexedDirectDispatchReadiness
 compose_fixed_function_indexed_direct_dispatch_readiness(
     const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
-    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange) noexcept {
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept {
     NativeFixedFunctionIndexedDirectDispatchReadiness out{};
     out.directDispatchSnapshotToken = dispatch.snapshotToken;
     out.sourceRangeSnapshotToken = sourceRange.snapshotToken;
+    out.boundDrawSnapshotToken = boundDraw.snapshotToken;
+
+    const bool boundDrawIntegrity =
+        validate_fixed_function_render_target_bound_draw_readiness_integrity(
+            boundDraw);
     out.inputValid =
         dispatch.ready &&
         sourceRange.ready &&
         dispatch.indexed &&
         dispatch.snapshotToken != 0 &&
-        sourceRange.snapshotToken != 0;
+        sourceRange.snapshotToken != 0 &&
+        boundDrawIntegrity;
     out.directDispatchReady = dispatch.ready && dispatch.indexed;
     out.sourceRangeReady = sourceRange.ready;
+    out.boundDrawReady = boundDrawIntegrity;
     out.dispatchMatchesSourceRange =
         out.inputValid &&
         dispatch.topology == sourceRange.topology &&
@@ -4657,37 +4697,68 @@ compose_fixed_function_indexed_direct_dispatch_readiness(
         dispatch.elementCount == sourceRange.elementCount &&
         dispatch.startIndexLocation == sourceRange.startIndex &&
         dispatch.baseVertexLocation == sourceRange.baseVertexIndex;
+    out.boundDrawMatchesDispatch =
+        boundDraw.snapshotToken != 0 &&
+        boundDraw.snapshotToken == dispatch.renderTargetBoundDrawSnapshotToken;
+
+    out.vertexBufferRangeExact = false;
+    if (out.inputValid &&
+        boundDraw.geometryRangeMetadataExact &&
+        boundDraw.vertexStride != 0 &&
+        boundDraw.vertexBufferByteWidth != 0) {
+        if (sourceRange.elementCount == 0) {
+            out.vertexBufferRangeExact = true;
+        } else {
+            const std::int64_t effectiveMaxVertex =
+                static_cast<std::int64_t>(sourceRange.baseVertexIndex) +
+                static_cast<std::int64_t>(sourceRange.maxVertexIndex);
+            if (effectiveMaxVertex >= 0) {
+                const std::uint64_t endByte =
+                    static_cast<std::uint64_t>(boundDraw.vertexOffset) +
+                    (static_cast<std::uint64_t>(effectiveMaxVertex) + 1ull) *
+                        boundDraw.vertexStride;
+                out.vertexBufferRangeExact =
+                    endByte <= boundDraw.vertexBufferByteWidth;
+            }
+        }
+    }
+
     out.componentSnapshotsPresent =
         dispatch.snapshotToken != 0 &&
-        sourceRange.snapshotToken != 0;
+        sourceRange.snapshotToken != 0 &&
+        boundDraw.snapshotToken != 0;
     out.ready =
         out.inputValid &&
         out.directDispatchReady &&
         out.sourceRangeReady &&
+        out.boundDrawReady &&
         out.dispatchMatchesSourceRange &&
+        out.boundDrawMatchesDispatch &&
+        out.vertexBufferRangeExact &&
         out.componentSnapshotsPresent;
 
     if (out.ready) {
         std::uint64_t token = 0xcbf29ce484222325ull;
-        token = mix_readiness_snapshot_token(
-            token, out.directDispatchSnapshotToken);
-        token = mix_readiness_snapshot_token(
-            token, out.sourceRangeSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.directDispatchSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.sourceRangeSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.boundDrawSnapshotToken);
         token = mix_readiness_snapshot_token(token, 0x150u);
+        token = mix_readiness_snapshot_token(
+            token, out.vertexBufferRangeExact ? 0x151u : 0u);
         out.snapshotToken = token == 0 ? 1 : token;
     }
     return out;
 }
-
 bool validate_fixed_function_indexed_direct_dispatch_snapshot(
     const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
     const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
     std::uint64_t snapshotToken) noexcept {
     if (snapshotToken == 0)
         return false;
     const auto current =
         compose_fixed_function_indexed_direct_dispatch_readiness(
-            dispatch, sourceRange);
+            dispatch, sourceRange, boundDraw);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
@@ -4697,21 +4768,42 @@ bool validate_fixed_function_render_target_bound_draw_readiness_integrity(
         !boundDraw.fullyBoundDrawReady ||
         !boundDraw.surfaceTargetBindingReady ||
         !boundDraw.surfacePairMatchesDraw ||
+        !boundDraw.geometryRangeMetadataExact ||
         !boundDraw.componentSnapshotsPresent ||
         !boundDraw.ready ||
+        boundDraw.vertexStride == 0 ||
+        boundDraw.vertexBufferByteWidth == 0 ||
+        boundDraw.vertexOffset > boundDraw.vertexBufferByteWidth ||
         boundDraw.fullyBoundDrawSnapshotToken == 0 ||
         boundDraw.surfaceTargetBindingSnapshotToken == 0 ||
         boundDraw.surfacePairSnapshotToken == 0 ||
         boundDraw.snapshotToken == 0)
         return false;
 
+    const UINT indexElementBytes =
+        boundDraw.indexFormat == DXGI_FORMAT_R16_UINT ? 2u :
+        boundDraw.indexFormat == DXGI_FORMAT_R32_UINT ? 4u : 0u;
+    if (boundDraw.indexFormat == DXGI_FORMAT_UNKNOWN) {
+        if (boundDraw.indexOffset != 0 || boundDraw.indexBufferByteWidth != 0)
+            return false;
+    } else if (indexElementBytes == 0 ||
+               boundDraw.indexBufferByteWidth == 0 ||
+               (boundDraw.indexOffset % indexElementBytes) != 0 ||
+               boundDraw.indexOffset > boundDraw.indexBufferByteWidth) {
+        return false;
+    }
+
     std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(token, boundDraw.fullyBoundDrawSnapshotToken);
+    token = mix_readiness_snapshot_token(token, boundDraw.surfaceTargetBindingSnapshotToken);
+    token = mix_readiness_snapshot_token(token, boundDraw.surfacePairSnapshotToken);
+    token = mix_readiness_snapshot_token(token, boundDraw.vertexStride);
+    token = mix_readiness_snapshot_token(token, boundDraw.vertexOffset);
+    token = mix_readiness_snapshot_token(token, boundDraw.vertexBufferByteWidth);
     token = mix_readiness_snapshot_token(
-        token, boundDraw.fullyBoundDrawSnapshotToken);
-    token = mix_readiness_snapshot_token(
-        token, boundDraw.surfaceTargetBindingSnapshotToken);
-    token = mix_readiness_snapshot_token(
-        token, boundDraw.surfacePairSnapshotToken);
+        token, static_cast<std::uint32_t>(boundDraw.indexFormat));
+    token = mix_readiness_snapshot_token(token, boundDraw.indexOffset);
+    token = mix_readiness_snapshot_token(token, boundDraw.indexBufferByteWidth);
     if (token == 0)
         token = 1;
     return token == boundDraw.snapshotToken;
@@ -4757,6 +4849,39 @@ compose_fixed_function_direct_draw_dispatch_readiness(
             ? startIndexLocation <= maxValue - elementCount
             : startVertexLocation <= maxValue - elementCount);
 
+    // R151 validates direct fetches against the byte capacity sealed by R145.
+    // The widened arithmetic keeps this proof safe from UINT wraparound.
+    out.bufferRangeExact = false;
+    if (countExact && boundDraw.geometryRangeMetadataExact) {
+        if (indexed) {
+            const std::uint64_t indexElementBytes =
+                boundDraw.indexFormat == DXGI_FORMAT_R16_UINT ? 2ull :
+                boundDraw.indexFormat == DXGI_FORMAT_R32_UINT ? 4ull : 0ull;
+            if (indexElementBytes != 0) {
+                const std::uint64_t firstByte =
+                    static_cast<std::uint64_t>(boundDraw.indexOffset) +
+                    static_cast<std::uint64_t>(startIndexLocation) * indexElementBytes;
+                const std::uint64_t endByte =
+                    firstByte +
+                    static_cast<std::uint64_t>(elementCount) * indexElementBytes;
+                out.bufferRangeExact =
+                    firstByte <= boundDraw.indexBufferByteWidth &&
+                    endByte <= boundDraw.indexBufferByteWidth;
+            }
+        } else {
+            const std::uint64_t firstByte =
+                static_cast<std::uint64_t>(boundDraw.vertexOffset) +
+                static_cast<std::uint64_t>(startVertexLocation) *
+                    boundDraw.vertexStride;
+            const std::uint64_t endByte =
+                firstByte +
+                static_cast<std::uint64_t>(elementCount) * boundDraw.vertexStride;
+            out.bufferRangeExact =
+                firstByte <= boundDraw.vertexBufferByteWidth &&
+                endByte <= boundDraw.vertexBufferByteWidth;
+        }
+    }
+
     const bool drawIntegrity =
         validate_fixed_function_draw_readiness_integrity(draw);
     out.inputValid =
@@ -4780,7 +4905,7 @@ compose_fixed_function_direct_draw_dispatch_readiness(
         topology.value != D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED &&
         topology.value == geometry.topology;
     out.dispatchArgumentsExact =
-        argumentsCanonical && rangeExact;
+        argumentsCanonical && rangeExact && out.bufferRangeExact;
     out.componentSnapshotsPresent =
         boundDraw.snapshotToken != 0 &&
         draw.snapshotToken != 0 &&
@@ -4811,6 +4936,8 @@ compose_fixed_function_direct_draw_dispatch_readiness(
         token = mix_readiness_snapshot_token(token, startIndexLocation);
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint32_t>(baseVertexLocation));
+        token = mix_readiness_snapshot_token(
+            token, out.bufferRangeExact ? 0x151u : 0u);
         out.snapshotToken = token == 0 ? 1 : token;
     }
     return out;

@@ -2351,6 +2351,44 @@ def main() -> None:
             + ", ".join(missing_r150_indexed_direct_dispatch_lineage)
         )
 
+    r151_direct_bound_buffer_capacity_contract = [
+        ("UINT byte_width() const noexcept", NATIVE_BACKEND_HPP,
+         "R151 managed-buffer byte capacity accessor"),
+        ("bool geometryRangeMetadataExact{};", NATIVE_BACKEND_HPP,
+         "R151 sealed live IA byte metadata"),
+        ("bool bufferRangeExact{};", NATIVE_BACKEND_HPP,
+         "R151 direct fetch byte-range gate"),
+        ("bool vertexBufferRangeExact{};", NATIVE_BACKEND_HPP,
+         "R151 indexed declared vertex-range byte gate"),
+        ("out.vertexBufferByteWidth = vertexBuffer.byte_width();", NATIVE_BACKEND_CPP,
+         "R151 live vertex-buffer capacity capture"),
+        ("out.indexBufferByteWidth = indexBuffer ? indexBuffer->byte_width() : 0u;",
+         NATIVE_BACKEND_CPP, "R151 live index-buffer capacity capture"),
+        ("R151 validates direct fetches", NATIVE_BACKEND_CPP,
+         "R151 widened direct fetch capacity proof"),
+        ("out.vertexBufferRangeExact =", NATIVE_BACKEND_CPP,
+         "R151 indexed declared vertex range capacity proof"),
+        ("dispatch, sourceRange, boundDraw", NATIVE_BACKEND_CPP,
+         "R151 indexed lineage consumes sealed bound-draw capacity"),
+        ("R151 direct indexed dispatch rejects index buffer overrun",
+         CONSTANT_BUFFER_PROBE, "R151 indexed IB overrun WARP proof"),
+        ("R151 indexed direct lineage rejects declared vertex buffer overrun",
+         CONSTANT_BUFFER_PROBE, "R151 indexed VB overrun WARP proof"),
+        ("R151 direct nonindexed dispatch rejects vertex buffer overrun",
+         CONSTANT_BUFFER_PROBE, "R151 nonindexed VB overrun WARP proof"),
+        ("DX11 direct bound-buffer capacity R151: PASS",
+         CONSTANT_BUFFER_PROBE, "R151 hosted probe completion marker"),
+    ]
+    missing_r151_direct_bound_buffer_capacity = [
+        meaning for token, source, meaning in r151_direct_bound_buffer_capacity_contract
+        if token not in source
+    ]
+    if missing_r151_direct_bound_buffer_capacity:
+        raise SystemExit(
+            "DX11 R151 direct bound-buffer capacity contract drift: "
+            + ", ".join(missing_r151_direct_bound_buffer_capacity)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":

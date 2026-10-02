@@ -774,7 +774,7 @@ int main()
     NativeManagedBufferShadow managedVertexBuffer;
     require(
         managedVertexBuffer.initialize(
-            ResourceRole::Vertex, 32, D3DUSAGE_WRITEONLY),
+            ResourceRole::Vertex, 256, D3DUSAGE_WRITEONLY),
         "R113 managed vertex-buffer shadow initialize");
     require(
         managedVertexBuffer.ready() &&
@@ -782,7 +782,7 @@ int main()
         !managedVertexBuffer.mirror_ready(),
         "R113 managed vertex-buffer shadow starts content-invalid");
 
-    std::array<unsigned char, 32> managedVertexBytes{};
+    std::array<unsigned char, 256> managedVertexBytes{};
     for (std::size_t index = 0; index < managedVertexBytes.size(); ++index)
         managedVertexBytes[index] =
             static_cast<unsigned char>(0x20u + index);
@@ -905,7 +905,8 @@ int main()
         "R119 shadow mutation invalidates managed-buffer snapshot");
     require(
         !managedVertexBuffer.write_range(
-            31, managedVertexPatch,
+            static_cast<UINT>(managedVertexBytes.size() - 1u),
+            managedVertexPatch,
             static_cast<UINT>(sizeof(managedVertexPatch))),
         "R113 out-of-range managed buffer write must fail closed");
     require(
@@ -3660,6 +3661,13 @@ int main()
             renderTargetBoundDraw.fullyBoundDrawReady &&
             renderTargetBoundDraw.surfaceTargetBindingReady &&
             renderTargetBoundDraw.surfacePairMatchesDraw &&
+            renderTargetBoundDraw.geometryRangeMetadataExact &&
+            renderTargetBoundDraw.vertexStride == geometryVertexStride &&
+            renderTargetBoundDraw.vertexOffset == geometryVertexOffset &&
+            renderTargetBoundDraw.vertexBufferByteWidth == managedVertexBytes.size() &&
+            renderTargetBoundDraw.indexFormat == DXGI_FORMAT_R16_UINT &&
+            renderTargetBoundDraw.indexOffset == geometryIndexOffset &&
+            renderTargetBoundDraw.indexBufferByteWidth == sizeof(managedIndexBytes) &&
             renderTargetBoundDraw.componentSnapshotsPresent &&
             renderTargetBoundDraw.ready &&
             renderTargetBoundDraw.surfaceTargetBindingSnapshotToken ==
@@ -3740,6 +3748,7 @@ int main()
             indexedDirectDispatch.geometryMatchesDraw &&
             indexedDirectDispatch.surfacePairMatchesDraw &&
             indexedDirectDispatch.topologyMatchesGeometry &&
+            indexedDirectDispatch.bufferRangeExact &&
             indexedDirectDispatch.dispatchArgumentsExact &&
             indexedDirectDispatch.componentSnapshotsPresent &&
             indexedDirectDispatch.ready &&
@@ -3887,23 +3896,29 @@ int main()
         const auto indexedDirectLineage =
             outrun::vr::dx11::
                 compose_fixed_function_indexed_direct_dispatch_readiness(
-                    indexedDirectDispatch, indexedSourceRange);
+                    indexedDirectDispatch, indexedSourceRange,
+                    renderTargetBoundDraw);
         require(
             indexedDirectLineage.inputValid &&
             indexedDirectLineage.directDispatchReady &&
             indexedDirectLineage.sourceRangeReady &&
+            indexedDirectLineage.boundDrawReady &&
             indexedDirectLineage.dispatchMatchesSourceRange &&
+            indexedDirectLineage.boundDrawMatchesDispatch &&
+            indexedDirectLineage.vertexBufferRangeExact &&
             indexedDirectLineage.componentSnapshotsPresent &&
             indexedDirectLineage.ready &&
             indexedDirectLineage.directDispatchSnapshotToken ==
                 indexedDirectDispatch.snapshotToken &&
             indexedDirectLineage.sourceRangeSnapshotToken ==
                 indexedSourceRange.snapshotToken &&
+            indexedDirectLineage.boundDrawSnapshotToken ==
+                renderTargetBoundDraw.snapshotToken &&
             indexedDirectLineage.snapshotToken != 0 &&
             outrun::vr::dx11::
                 validate_fixed_function_indexed_direct_dispatch_snapshot(
                     indexedDirectDispatch, indexedSourceRange,
-                    indexedDirectLineage.snapshotToken),
+                    renderTargetBoundDraw, indexedDirectLineage.snapshotToken),
             "R150 indexed direct dispatch binds R147 tuple to R149 source range");
 
         const auto indexedSourceRangeStartDrift =
@@ -3913,7 +3928,8 @@ int main()
         const auto indexedDirectLineageDrift =
             outrun::vr::dx11::
                 compose_fixed_function_indexed_direct_dispatch_readiness(
-                    indexedDirectDispatch, indexedSourceRangeStartDrift);
+                    indexedDirectDispatch, indexedSourceRangeStartDrift,
+                    renderTargetBoundDraw);
         require(
             indexedSourceRangeStartDrift.ready &&
             indexedDirectLineageDrift.inputValid &&
@@ -3925,8 +3941,38 @@ int main()
             !outrun::vr::dx11::
                 validate_fixed_function_indexed_direct_dispatch_snapshot(
                     indexedDirectDispatch, indexedSourceRangeStartDrift,
-                    indexedDirectLineage.snapshotToken),
+                    renderTargetBoundDraw, indexedDirectLineage.snapshotToken),
             "R150 indexed direct dispatch rejects R149 StartIndex lineage drift");
+
+        const auto indexedSourceRangeBufferOverrun =
+            outrun::vr::dx11::compose_fixed_function_indexed_source_range_readiness(
+                D3DPT_TRIANGLELIST, 2u, 0, 14u, 3u, 0u);
+        const auto indexedVertexBufferOverrun =
+            outrun::vr::dx11::compose_fixed_function_indexed_direct_dispatch_readiness(
+                indexedDirectDispatch, indexedSourceRangeBufferOverrun,
+                renderTargetBoundDraw);
+        require(
+            indexedSourceRangeBufferOverrun.ready &&
+            indexedVertexBufferOverrun.inputValid &&
+            indexedVertexBufferOverrun.dispatchMatchesSourceRange &&
+            indexedVertexBufferOverrun.boundDrawMatchesDispatch &&
+            !indexedVertexBufferOverrun.vertexBufferRangeExact &&
+            !indexedVertexBufferOverrun.ready &&
+            indexedVertexBufferOverrun.snapshotToken == 0,
+            "R151 indexed direct lineage rejects declared vertex buffer overrun");
+
+        const auto indexedIndexBufferOverrun =
+            outrun::vr::dx11::compose_fixed_function_direct_draw_dispatch_readiness(
+                renderTargetBoundDraw, multiStageDrawReady,
+                indexedGeometryReady, D3DPT_TRIANGLELIST, 2u, true,
+                0u, 1u, 0);
+        require(
+            indexedIndexBufferOverrun.inputValid &&
+            !indexedIndexBufferOverrun.bufferRangeExact &&
+            !indexedIndexBufferOverrun.dispatchArgumentsExact &&
+            !indexedIndexBufferOverrun.ready &&
+            indexedIndexBufferOverrun.snapshotToken == 0,
+            "R151 direct indexed dispatch rejects index buffer overrun");
 
         require(
             !outrun::vr::dx11::
@@ -3997,6 +4043,7 @@ int main()
         require(
             nonIndexedDirectDispatch.ready &&
             !nonIndexedDirectDispatch.indexed &&
+            nonIndexedDirectDispatch.bufferRangeExact &&
             nonIndexedDirectDispatch.elementCount == 4u &&
             nonIndexedDirectDispatch.startVertexLocation == 1u &&
             nonIndexedDirectDispatch.startIndexLocation == 0u &&
@@ -4015,6 +4062,19 @@ int main()
                     nonIndexedGeometryReady, D3DPT_TRIANGLESTRIP, 2u, false,
                     2u, 0u, 0, nonIndexedDirectDispatch.snapshotToken),
             "R147 direct nonindexed dispatch snapshot rejects StartVertexLocation drift");
+
+        const auto nonIndexedVertexBufferOverrun =
+            outrun::vr::dx11::compose_fixed_function_direct_draw_dispatch_readiness(
+                nonIndexedRenderTargetBoundDraw, nonIndexedDirectDrawReady,
+                nonIndexedGeometryReady, D3DPT_TRIANGLESTRIP, 2u, false,
+                14u, 0u, 0);
+        require(
+            nonIndexedVertexBufferOverrun.inputValid &&
+            !nonIndexedVertexBufferOverrun.bufferRangeExact &&
+            !nonIndexedVertexBufferOverrun.dispatchArgumentsExact &&
+            !nonIndexedVertexBufferOverrun.ready &&
+            nonIndexedVertexBufferOverrun.snapshotToken == 0,
+            "R151 direct nonindexed dispatch rejects vertex buffer overrun");
 
         require(
             outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
@@ -5119,6 +5179,7 @@ int main()
     std::cout << "DX11 dormant fixed-function pipeline object binding: PASS\n";
     std::cout << "DX11 fixed-function GS/HS/DS isolation R147: PASS\n";
     std::cout << "DX11 fixed-function SO/predication isolation R148: PASS\n";
+    std::cout << "DX11 direct bound-buffer capacity R151: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
     std::cout << "DX11 texture mutation readiness R100: PASS\n";
