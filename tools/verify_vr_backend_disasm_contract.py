@@ -289,19 +289,27 @@ def verify_dxvk_continuation_chain() -> None:
                 f"{raw_call_census_guards}"
             )
         raw_call_census_guard = raw_call_census_guards[0]
-        proven_predicate_start = proof_source.find("proven = bool(")
-        proven_predicate_end = proof_source.find(
-            "\n    )\n    return {", proven_predicate_start
-        )
-        if proven_predicate_end < 0:
-            raise SystemExit(
-                f"DXVK continuation {continuation_id} proof predicate could not be isolated "
-                f"for raw-call census validation"
+        proof_ast = ast.parse(proof_source)
+        proven_assignments = [
+            node
+            for node in ast.walk(proof_ast)
+            if isinstance(node, ast.Assign)
+            and any(
+                isinstance(target, ast.Name) and target.id == "proven"
+                for target in node.targets
             )
-        proven_predicate = proof_source[
-            proven_predicate_start:proven_predicate_end
         ]
-        if raw_call_census_guard not in proven_predicate:
+        if len(proven_assignments) != 1:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof has ambiguous proven predicate: "
+                f"assignments={len(proven_assignments)}"
+            )
+        proven_names = {
+            node.id
+            for node in ast.walk(proven_assignments[0].value)
+            if isinstance(node, ast.Name)
+        }
+        if raw_call_census_guard not in proven_names:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} proof does not gate proven status on "
                 f"{raw_call_census_guard}"
