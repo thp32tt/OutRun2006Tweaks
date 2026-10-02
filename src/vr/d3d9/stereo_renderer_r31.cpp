@@ -30,6 +30,7 @@
 #include "stereo_renderer_r30.cpp"
 #endif
 #include "../render/stereo_base_policy.hpp"
+#include "../render/runtime_context.hpp"
 #include "../render/fast_path_support.hpp"
 #include "../render/screen_space_api.hpp"
 #include "../core/screen_space_hooks.hpp"
@@ -110,7 +111,7 @@ namespace OutRunVRStereo
             const ULONGLONG now = GetTickCount64();
             if (R31Window.lastLogMs == 0)
                 R31Window.lastLogMs = now;
-            if (Settings::VRTelemetry && now - R31Window.lastLogMs >= 5000 &&
+            if (IsVRTelemetryEnabled() && now - R31Window.lastLogMs >= 5000 &&
                 R31Window.presents != 0)
             {
                 const double avg = static_cast<double>(R31Window.draws) /

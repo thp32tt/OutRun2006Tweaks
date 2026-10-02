@@ -1145,6 +1145,12 @@ if "#ifndef NOMINMAX" not in r31:
     errors.append("R31 independent TU lost NOMINMAX pre-include guard")
 
 
+if "Settings::VRTelemetry" in r31:
+    errors.append("R31 retained direct telemetry setting dependency")
+if '#include "../render/runtime_context.hpp"' not in r31:
+    errors.append("R31 independent TU missing runtime_context dependency")
+
+
 if errors:
     print("R84 refactor contract FAILED")
     for error in errors:
