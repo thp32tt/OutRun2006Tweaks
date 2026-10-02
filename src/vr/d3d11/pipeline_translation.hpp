@@ -112,9 +112,13 @@ namespace outrun::vr::dx11
         DWORD colorOp = D3DTOP_DISABLE;
         DWORD colorArg1 = D3DTA_TEXTURE;
         DWORD colorArg2 = D3DTA_CURRENT;
+        // R194: D3D9 ternary operations use COLORARG0/ALPHAARG0 as their
+        // third source operand. Both states default to CURRENT.
+        DWORD colorArg0 = D3DTA_CURRENT;
         DWORD alphaOp = D3DTOP_DISABLE;
         DWORD alphaArg1 = D3DTA_TEXTURE;
         DWORD alphaArg2 = D3DTA_CURRENT;
+        DWORD alphaArg0 = D3DTA_CURRENT;
         // D3D9 defaults stage output to CURRENT. TEMP changes the dependency
         // graph across later stages and is not modeled by the current HLSL.
         DWORD resultArg = D3DTA_CURRENT;

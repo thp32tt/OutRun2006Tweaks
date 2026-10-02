@@ -1209,6 +1209,67 @@ int main()
 
 
     {
+        std::array<FixedFunctionStageState, 8> multiplyAddStages{};
+        multiplyAddStages[0].colorOp = D3DTOP_MULTIPLYADD;
+        multiplyAddStages[0].colorArg0 = D3DTA_TEXTURE;
+        multiplyAddStages[0].colorArg1 = D3DTA_DIFFUSE;
+        multiplyAddStages[0].colorArg2 = D3DTA_TFACTOR;
+        multiplyAddStages[0].alphaOp = D3DTOP_MULTIPLYADD;
+        multiplyAddStages[0].alphaArg0 = D3DTA_TEXTURE;
+        multiplyAddStages[0].alphaArg1 = D3DTA_DIFFUSE;
+        multiplyAddStages[0].alphaArg2 = D3DTA_TFACTOR;
+        multiplyAddStages[0].minFilter = D3DTEXF_POINT;
+        multiplyAddStages[0].magFilter = D3DTEXF_POINT;
+        multiplyAddStages[0].mipFilter = D3DTEXF_NONE;
+
+        constexpr DWORD multiplyAddFactor = 0x80402010u;
+        const auto multiplyAddShader =
+            generate_fixed_function_pixel_shader_prototype(
+                multiplyAddStages, true, 0x01u, 0x01u, textureTypes,
+                FixedFunctionAlphaTestState{}, multiplyAddFactor);
+        require(
+            multiplyAddShader.generated() &&
+                multiplyAddShader.activeStages == 1,
+            "R194 D3DTOP_MULTIPLYADD ARG0 fixture must become shader-exact");
+        require(
+            multiplyAddShader.source.find(
+                "float3 nextColor = input.diffuse.rgb + float4(64.0f / 255.0f, 32.0f / 255.0f, 16.0f / 255.0f, 128.0f / 255.0f).rgb * sampled0.rgb;") !=
+                std::string::npos &&
+            multiplyAddShader.source.find(
+                "float nextAlpha = input.diffuse.a + float4(64.0f / 255.0f, 32.0f / 255.0f, 16.0f / 255.0f, 128.0f / 255.0f).a * sampled0.a;") !=
+                std::string::npos,
+            "R194 D3DTOP_MULTIPLYADD Arg1 + Arg2 * Arg0 expression drift");
+
+        const auto multiplyAddCompile =
+            compile_fixed_function_pixel_shader_prototype(multiplyAddShader);
+        require(
+            multiplyAddCompile.attempted &&
+            multiplyAddCompile.succeeded &&
+            multiplyAddCompile.result == S_OK &&
+            multiplyAddCompile.bytecodeBytes != 0,
+            "R194 D3DTOP_MULTIPLYADD fixed-function shader prototype did not compile");
+
+        const auto missingArg0Texture =
+            translate_fixed_function_readiness(
+                multiplyAddStages, true, 0x00u, 0x00u);
+        require(
+            (missingArg0Texture.unsupported &
+             FixedFunctionUnsupportedResourceStageCoverage) != 0,
+            "R194 D3DTOP_MULTIPLYADD ARG0 texture dependency must fail closed");
+
+        auto unsupportedArg0Stages = multiplyAddStages;
+        unsupportedArg0Stages[0].colorArg0 = D3DTA_SPECULAR;
+        const auto unsupportedArg0 =
+            translate_fixed_function_readiness(
+                unsupportedArg0Stages, true, 0x01u, 0x01u);
+        require(
+            (unsupportedArg0.unsupported &
+             FixedFunctionUnsupportedArgument) != 0,
+            "R194 D3DTOP_MULTIPLYADD unsupported ARG0 selector must fail closed");
+    }
+
+
+    {
         std::array<FixedFunctionStageState, 8> textureFactorStages{};
         textureFactorStages[0].colorOp = D3DTOP_SELECTARG1;
         textureFactorStages[0].colorArg1 = D3DTA_TFACTOR;
@@ -1275,6 +1336,7 @@ int main()
     }
 
     std::cout
+        << "DX11 fixed-function D3DTOP_MULTIPLYADD ARG0 support R194: PASS\n"
         << "DX11 fixed-function texture-factor consumption R191: PASS\n"
         << "DX11 fixed-function D3DTOP_DOTPRODUCT3 support R193: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATEINVCOLOR_ADDALPHA COLOROP support R190: PASS\n"

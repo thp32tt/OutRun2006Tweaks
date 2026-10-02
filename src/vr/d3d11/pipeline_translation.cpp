@@ -162,7 +162,7 @@ namespace outrun::vr::dx11
         }
 
         bool fixed_function_op_uses_texture(
-            DWORD op, DWORD arg1, DWORD arg2) noexcept
+            DWORD op, DWORD arg0, DWORD arg1, DWORD arg2) noexcept
         {
             switch (op)
             {
@@ -195,6 +195,11 @@ namespace outrun::vr::dx11
             case D3DTOP_DOTPRODUCT3:
             case D3DTOP_SUBTRACT:
                 return fixed_function_argument_uses_texture(arg1) ||
+                       fixed_function_argument_uses_texture(arg2);
+            case D3DTOP_MULTIPLYADD:
+                // R194: COLORARG0/ALPHAARG0 is the third source operand.
+                return fixed_function_argument_uses_texture(arg0) ||
+                       fixed_function_argument_uses_texture(arg1) ||
                        fixed_function_argument_uses_texture(arg2);
             default:
                 return false;
@@ -251,6 +256,7 @@ namespace outrun::vr::dx11
 
         std::string fixed_function_op_expression(
             DWORD op,
+            DWORD arg0,
             DWORD arg1,
             DWORD arg2,
             std::size_t stageIndex,
@@ -378,6 +384,14 @@ namespace outrun::vr::dx11
                     arg2, stageIndex, ".rgb", textureFactor);
                 return "dot((" + dotFirst + " * 2.0 - 1.0), (" +
                        dotSecond + " * 2.0 - 1.0))";
+            }
+            case D3DTOP_MULTIPLYADD:
+            {
+                // R194: Direct3D 9 defines MULTIPLYADD as
+                // Arg1 + Arg2 * Arg0, where ARG0 is the third stage source.
+                const auto third = fixed_function_argument_expression(
+                    arg0, stageIndex, swizzle, textureFactor);
+                return first + " + " + second + " * " + third;
             }
             default:
                 return {};
@@ -540,12 +554,14 @@ namespace outrun::vr::dx11
 
         void validate_fixed_function_op(
             DWORD op,
+            DWORD arg0,
             DWORD arg1,
             DWORD arg2,
             std::uint32_t opBit,
             bool alphaOperation,
             FixedFunctionTranslationReadiness& out) noexcept
         {
+            bool useArg0 = false;
             bool useArg1 = false;
             bool useArg2 = false;
             switch (op)
@@ -573,6 +589,11 @@ namespace outrun::vr::dx11
                 useArg1 = true;
                 useArg2 = true;
                 break;
+            case D3DTOP_MULTIPLYADD:
+                useArg0 = true;
+                useArg1 = true;
+                useArg2 = true;
+                break;
             case D3DTOP_MODULATEALPHA_ADDCOLOR:
             case D3DTOP_MODULATECOLOR_ADDALPHA:
             case D3DTOP_MODULATEINVALPHA_ADDCOLOR:
@@ -591,7 +612,8 @@ namespace outrun::vr::dx11
                 return;
             }
 
-            if ((useArg1 && !fixed_function_argument_supported(arg1)) ||
+            if ((useArg0 && !fixed_function_argument_supported(arg0)) ||
+                (useArg1 && !fixed_function_argument_supported(arg1)) ||
                 (useArg2 && !fixed_function_argument_supported(arg2)))
                 out.unsupported |= FixedFunctionUnsupportedArgument;
         }
@@ -933,10 +955,10 @@ namespace outrun::vr::dx11
             ++out.activeStages;
 
             validate_fixed_function_op(
-                stage.colorOp, stage.colorArg1, stage.colorArg2,
+                stage.colorOp, stage.colorArg0, stage.colorArg1, stage.colorArg2,
                 FixedFunctionUnsupportedColorOp, false, out);
             validate_fixed_function_op(
-                stage.alphaOp, stage.alphaArg1, stage.alphaArg2,
+                stage.alphaOp, stage.alphaArg0, stage.alphaArg1, stage.alphaArg2,
                 FixedFunctionUnsupportedAlphaOp, true, out);
 
             // R173: generated fixed-function HLSL always writes CURRENT after
@@ -947,9 +969,11 @@ namespace outrun::vr::dx11
 
             const bool usesTexture =
                 fixed_function_op_uses_texture(
-                    stage.colorOp, stage.colorArg1, stage.colorArg2) ||
+                    stage.colorOp, stage.colorArg0,
+                    stage.colorArg1, stage.colorArg2) ||
                 fixed_function_op_uses_texture(
-                    stage.alphaOp, stage.alphaArg1, stage.alphaArg2);
+                    stage.alphaOp, stage.alphaArg0,
+                    stage.alphaArg1, stage.alphaArg2);
             const auto stageBit = static_cast<std::uint8_t>(
                 1u << static_cast<unsigned>(stageIndex));
             if (usesTexture &&
@@ -1029,9 +1053,11 @@ namespace outrun::vr::dx11
 
             const bool usesTexture =
                 fixed_function_op_uses_texture(
-                    stage.colorOp, stage.colorArg1, stage.colorArg2) ||
+                    stage.colorOp, stage.colorArg0,
+                    stage.colorArg1, stage.colorArg2) ||
                 fixed_function_op_uses_texture(
-                    stage.alphaOp, stage.alphaArg1, stage.alphaArg2);
+                    stage.alphaOp, stage.alphaArg0,
+                    stage.alphaArg1, stage.alphaArg2);
             if (usesTexture &&
                 textureResourceTypes[stageIndex] != D3DRTYPE_TEXTURE)
             {
@@ -1066,9 +1092,11 @@ namespace outrun::vr::dx11
                 break;
             const bool usesTexture =
                 fixed_function_op_uses_texture(
-                    stage.colorOp, stage.colorArg1, stage.colorArg2) ||
+                    stage.colorOp, stage.colorArg0,
+                    stage.colorArg1, stage.colorArg2) ||
                 fixed_function_op_uses_texture(
-                    stage.alphaOp, stage.alphaArg1, stage.alphaArg2);
+                    stage.alphaOp, stage.alphaArg0,
+                    stage.alphaArg1, stage.alphaArg2);
             if (!usesTexture)
                 continue;
 
@@ -1101,9 +1129,11 @@ namespace outrun::vr::dx11
 
             const bool usesTexture =
                 fixed_function_op_uses_texture(
-                    stage.colorOp, stage.colorArg1, stage.colorArg2) ||
+                    stage.colorOp, stage.colorArg0,
+                    stage.colorArg1, stage.colorArg2) ||
                 fixed_function_op_uses_texture(
-                    stage.alphaOp, stage.alphaArg1, stage.alphaArg2);
+                    stage.alphaOp, stage.alphaArg0,
+                    stage.alphaArg1, stage.alphaArg2);
             if (usesTexture)
             {
                 const auto coord = static_cast<unsigned>(
@@ -1121,11 +1151,11 @@ namespace outrun::vr::dx11
 
             shader += "        float3 nextColor = ";
             shader += fixed_function_op_expression(
-                stage.colorOp, stage.colorArg1, stage.colorArg2,
+                stage.colorOp, stage.colorArg0, stage.colorArg1, stage.colorArg2,
                 stageIndex, ".rgb", textureFactor);
             shader += ";\n        float nextAlpha = ";
             shader += fixed_function_op_expression(
-                stage.alphaOp, stage.alphaArg1, stage.alphaArg2,
+                stage.alphaOp, stage.alphaArg0, stage.alphaArg1, stage.alphaArg2,
                 stageIndex, ".a", textureFactor);
             shader +=
                 ";\n        current = float4(nextColor, nextAlpha);\n"

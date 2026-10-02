@@ -890,6 +890,52 @@ def main() -> None:
             + ", ".join(missing_r193_d3dtop_dotproduct3)
         )
 
+    r194_d3dtop_multiplyadd_arg0_contract = [
+        ("DWORD colorArg0 = D3DTA_CURRENT;", PIPELINE_TRANSLATION_HPP,
+         "R194 COLORARG0 stage identity and D3D9 default"),
+        ("DWORD alphaArg0 = D3DTA_CURRENT;", PIPELINE_TRANSLATION_HPP,
+         "R194 ALPHAARG0 stage identity and D3D9 default"),
+        ("observeTextureStageState(D3DTSS_COLORARG0, out.colorArg0);",
+         RUNTIME_CENSUS, "R194 live COLORARG0 observation"),
+        ("observeTextureStageState(D3DTSS_ALPHAARG0, out.alphaArg0);",
+         RUNTIME_CENSUS, "R194 live ALPHAARG0 observation"),
+        ("hash = hash_mix(hash, stage.colorArg0);", RUNTIME_CENSUS,
+         "R194 COLORARG0 census identity"),
+        ("hash = hash_mix(hash, stage.alphaArg0);", RUNTIME_CENSUS,
+         "R194 ALPHAARG0 census identity"),
+        ("VR DX11 R194 ffp signature#{}", RUNTIME_CENSUS,
+         "R194 ARG0 detailed census evidence"),
+        ("case D3DTOP_MULTIPLYADD:", PIPELINE_TRANSLATION_CPP,
+         "R194 MULTIPLYADD dependency/HLSL/readiness case"),
+        ('return first + " + " + second + " * " + third;',
+         PIPELINE_TRANSLATION_CPP, "R194 Arg1 + Arg2 * Arg0 HLSL expression"),
+        ("multiplyAddStages[0].colorArg0 = D3DTA_TEXTURE;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R194 COLORARG0 texture fixture"),
+        ("multiplyAddStages[0].alphaArg0 = D3DTA_TEXTURE;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R194 ALPHAARG0 texture fixture"),
+        ("R194 D3DTOP_MULTIPLYADD ARG0 texture dependency must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R194 ARG0 resource coverage guard"),
+        ("R194 D3DTOP_MULTIPLYADD unsupported ARG0 selector must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R194 ARG0 selector guard"),
+        ("R194 D3DTOP_MULTIPLYADD fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R194 offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_MULTIPLYADD ARG0 support R194: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R194 hosted probe completion"),
+    ]
+    missing_r194_d3dtop_multiplyadd_arg0 = [
+        meaning
+        for token, source, meaning in r194_d3dtop_multiplyadd_arg0_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_MULTIPLYADD:") < 3:
+        missing_r194_d3dtop_multiplyadd_arg0.append(
+            "R194 MULTIPLYADD must participate in dependency, HLSL and readiness switches")
+    if missing_r194_d3dtop_multiplyadd_arg0:
+        raise SystemExit(
+            "DX11 R194 fixed-function D3DTOP_MULTIPLYADD ARG0 contract drift: "
+            + ", ".join(missing_r194_d3dtop_multiplyadd_arg0)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.

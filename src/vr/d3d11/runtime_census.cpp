@@ -444,9 +444,11 @@ namespace outrun::vr::dx11
                 hash = hash_mix(hash, stage.colorOp);
                 hash = hash_mix(hash, stage.colorArg1);
                 hash = hash_mix(hash, stage.colorArg2);
+                hash = hash_mix(hash, stage.colorArg0);
                 hash = hash_mix(hash, stage.alphaOp);
                 hash = hash_mix(hash, stage.alphaArg1);
                 hash = hash_mix(hash, stage.alphaArg2);
+                hash = hash_mix(hash, stage.alphaArg0);
                 hash = hash_mix(hash, stage.resultArg);
                 hash = hash_mix(hash, stage.texCoordIndex);
                 hash = hash_mix(hash, stage.textureTransformFlags);
@@ -1239,9 +1241,11 @@ namespace outrun::vr::dx11
                     observeTextureStageState(D3DTSS_COLOROP, out.colorOp);
                     observeTextureStageState(D3DTSS_COLORARG1, out.colorArg1);
                     observeTextureStageState(D3DTSS_COLORARG2, out.colorArg2);
+                    observeTextureStageState(D3DTSS_COLORARG0, out.colorArg0);
                     observeTextureStageState(D3DTSS_ALPHAOP, out.alphaOp);
                     observeTextureStageState(D3DTSS_ALPHAARG1, out.alphaArg1);
                     observeTextureStageState(D3DTSS_ALPHAARG2, out.alphaArg2);
+                    observeTextureStageState(D3DTSS_ALPHAARG0, out.alphaArg0);
                     // R173: RESULTARG affects supported SELECTARG/MODULATE
                     // chains even when all argument/op enums are otherwise exact.
                     observeTextureStageState(D3DTSS_RESULTARG, out.resultArg);
@@ -1735,13 +1739,15 @@ namespace outrun::vr::dx11
                             continue;
 
                         spdlog::info(
-                            "VR DX11 R173 ffp signature#{} stage#{}: color[op={},arg1=0x{:08X},arg2=0x{:08X}] alpha[op={},arg1=0x{:08X},arg2=0x{:08X}] resultArg=0x{:08X} texCoord=0x{:08X} texTransform=0x{:08X} sampler[min={},mag={},mip={},u={},v={},border=0x{:08X},srgb={}]",
+                            "VR DX11 R194 ffp signature#{} stage#{}: color[op={},arg0=0x{:08X},arg1=0x{:08X},arg2=0x{:08X}] alpha[op={},arg0=0x{:08X},arg1=0x{:08X},arg2=0x{:08X}] resultArg=0x{:08X} texCoord=0x{:08X} texTransform=0x{:08X} sampler[min={},mag={},mip={},u={},v={},border=0x{:08X},srgb={}]",
                             unique,
                             stageIndex,
                             stage.colorOp,
+                            stage.colorArg0,
                             stage.colorArg1,
                             stage.colorArg2,
                             stage.alphaOp,
+                            stage.alphaArg0,
                             stage.alphaArg1,
                             stage.alphaArg2,
                             stage.resultArg,
