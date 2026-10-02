@@ -128,6 +128,33 @@ def main() -> None:
             + ", ".join(missing_r165_dither)
         )
 
+    r167_dither_identity_contract = [
+        ("bool ditherObservationComplete{};", RUNTIME_CENSUS,
+         "R167 census dither observation identity"),
+        ("DWORD ditherEnable = FALSE;", RUNTIME_CENSUS,
+         "R167 census dither value identity"),
+        ("hash, sig.ditherObservationComplete ? 1u : 0u", RUNTIME_CENSUS,
+         "R167 census dither observation hash"),
+        ("hash = hash_mix(hash, sig.ditherEnable);", RUNTIME_CENSUS,
+         "R167 census dither value hash"),
+        ("signature.ditherObservationComplete =", RUNTIME_CENSUS,
+         "R167 captured dither observation propagation"),
+        ("signature.ditherEnable = source.ditherEnable;", RUNTIME_CENSUS,
+         "R167 captured dither value propagation"),
+        ("VR DX11 R167 dither state#{}", RUNTIME_CENSUS,
+         "R167 detailed dither telemetry marker"),
+    ]
+    missing_r167_dither_identity = [
+        meaning
+        for token, source, meaning in r167_dither_identity_contract
+        if token not in source
+    ]
+    if missing_r167_dither_identity:
+        raise SystemExit(
+            "DX11 R167 dither census identity drift: "
+            + ", ".join(missing_r167_dither_identity)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.

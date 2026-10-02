@@ -252,6 +252,11 @@ namespace outrun::vr::dx11
             bool depthBiasObservationComplete{};
             DWORD depthBiasBits{};
             DWORD slopeScaleDepthBiasBits{};
+            // R167: D3D9 dithering is fail-closed in the native pipeline, but
+            // it must also participate in sampled draw identity so enabled
+            // dithering cannot alias the exact disabled-default signature.
+            bool ditherObservationComplete{};
+            DWORD ditherEnable = FALSE;
             bool alphaTestObservationComplete{};
             DWORD alphaTestEnable = FALSE;
             DWORD alphaTestRef{};
@@ -433,6 +438,9 @@ namespace outrun::vr::dx11
                 hash, sig.depthBiasObservationComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.depthBiasBits);
             hash = hash_mix(hash, sig.slopeScaleDepthBiasBits);
+            hash = hash_mix(
+                hash, sig.ditherObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.ditherEnable);
             hash = hash_mix(
                 hash, sig.fixedFunctionTranslationReady ? 1u : 0u);
             hash = hash_mix(
@@ -1373,6 +1381,12 @@ namespace outrun::vr::dx11
                     sig.addressU,
                     sig.addressV);
 
+                spdlog::info(
+                    "VR DX11 R167 dither state#{}: observed={} enable={}",
+                    unique,
+                    sig.ditherObservationComplete ? 1 : 0,
+                    sig.ditherEnable != FALSE ? 1 : 0);
+
                 for (std::size_t stageIndex = 0;
                      stageIndex < sig.textureStages.size();
                      ++stageIndex)
@@ -2040,6 +2054,9 @@ namespace outrun::vr::dx11
             captured && source.complete;
         signature.depthBiasBits = source.depthBiasBits;
         signature.slopeScaleDepthBiasBits = source.slopeScaleDepthBiasBits;
+        signature.ditherObservationComplete =
+            captured && source.complete;
+        signature.ditherEnable = source.ditherEnable;
         signature.alphaTestObservationComplete =
             captured && source.complete;
         signature.alphaTestEnable = source.alphaTestEnable;
