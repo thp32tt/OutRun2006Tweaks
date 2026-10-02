@@ -93,8 +93,105 @@ def _final_captured_gate_names(source: str) -> set[str]:
     }
 
 
+_DIRECT_BRANCH_LEGACY_PREFIXES = frozenset({
+    0x26,  # ES segment override
+    0x2E,  # CS override / historical branch hint
+    0x36,  # SS segment override
+    0x3E,  # DS override / historical branch hint
+    0x64,  # FS segment override
+    0x65,  # GS segment override
+    0x66,  # operand-size override
+    0x67,  # address-size override
+    0xF2,  # REPNE (ignored/legacy prefix on control flow)
+    0xF3,  # REP (ignored/legacy prefix on control flow)
+})
+
+
+def _decode_direct_relative_branch_target(
+    instruction_rva: int, encoded: bytes
+) -> int | None:
+    """Decode direct relative branch targets, including legacy-prefixed forms."""
+
+    prefix_end = 0
+    while (
+        prefix_end < len(encoded)
+        and encoded[prefix_end] in _DIRECT_BRANCH_LEGACY_PREFIXES
+    ):
+        prefix_end += 1
+    if prefix_end >= len(encoded):
+        return None
+
+    opcode = encoded[prefix_end]
+    operand16 = 0x66 in encoded[:prefix_end]
+    body = encoded[prefix_end:]
+
+    # rel8 Jcc/JMP and LOOPNE/LOOPE/LOOP/JCXZ/JECXZ. Legacy prefixes extend
+    # instruction length but do not change the signed rel8 displacement.
+    if (
+        len(body) == 2
+        and (
+            opcode == 0xEB
+            or 0x70 <= opcode <= 0x7F
+            or 0xE0 <= opcode <= 0xE3
+        )
+    ):
+        rel8 = int.from_bytes(body[1:2], byteorder="little", signed=True)
+        return (instruction_rva + len(encoded) + rel8) & 0xFFFFFFFF
+
+    # Near JMP uses rel16 under 0x66 in 32-bit mode; the resulting EIP is
+    # truncated to 16 bits. Without 0x66, the displacement is rel32.
+    if opcode == 0xE9:
+        if operand16 and len(body) == 3:
+            rel16 = int.from_bytes(body[1:3], byteorder="little", signed=True)
+            return (instruction_rva + len(encoded) + rel16) & 0xFFFF
+        if not operand16 and len(body) == 5:
+            rel32 = int.from_bytes(body[1:5], byteorder="little", signed=True)
+            return (instruction_rva + len(encoded) + rel32) & 0xFFFFFFFF
+        return None
+
+    # Near Jcc follows the same rel16/rel32 operand-size rule.
+    if len(body) >= 2 and opcode == 0x0F and 0x80 <= body[1] <= 0x8F:
+        if operand16 and len(body) == 4:
+            rel16 = int.from_bytes(body[2:4], byteorder="little", signed=True)
+            return (instruction_rva + len(encoded) + rel16) & 0xFFFF
+        if not operand16 and len(body) == 6:
+            rel32 = int.from_bytes(body[2:6], byteorder="little", signed=True)
+            return (instruction_rva + len(encoded) + rel32) & 0xFFFFFFFF
+    return None
+
+
+def _verify_direct_relative_branch_decoder() -> None:
+    """Exercise branch forms that must not evade exact metadata census."""
+
+    cases = (
+        (0x00183000, "75 05", 0x00183007),
+        (0x00183000, "67 e3 fc", 0x00182FFF),
+        (0x00183000, "66 e9 10 00", 0x00003014),
+        (0x00183004, "66 0f 85 10 00", 0x00003019),
+        (0x0018300C, "67 e9 10 00 00 00", 0x00183022),
+        (0x00183020, "2e 75 05", 0x00183028),
+    )
+    for instruction_rva, hex_bytes, expected_target_rva in cases:
+        actual_target_rva = _decode_direct_relative_branch_target(
+            instruction_rva, bytes.fromhex(hex_bytes)
+        )
+        if actual_target_rva != expected_target_rva:
+            raise SystemExit(
+                "DXVK direct relative branch decoder self-test failed: "
+                f"rva=0x{instruction_rva:08X} bytes={hex_bytes} "
+                f"expected=0x{expected_target_rva:08X} "
+                f"actual={actual_target_rva!r}"
+            )
+    if _decode_direct_relative_branch_target(0x00183000, b"\x90") is not None:
+        raise SystemExit(
+            "DXVK direct relative branch decoder misclassified non-branch opcode"
+        )
+
+
 def verify_dxvk_continuation_chain() -> None:
     """Auto-discover and fail closed if canonical continuation capture/proof edges drift apart."""
+
+    _verify_direct_relative_branch_decoder()
 
     analyzer_path = ROOT / "tools/analyze_outrun_exe.py"
     analyzer_source = analyzer_path.read_text(encoding="utf-8")
@@ -672,9 +769,9 @@ def verify_dxvk_continuation_chain() -> None:
         # Keep declared direct relative BRANCH metadata tied to the exact
         # decoded instruction rows. This catches off-by-one/stale branch RVAs,
         # omitted direct branches, and target-displacement drift before the
-        # canonical-EXE execution stage. Recognize all direct relative branch
-        # encodings that can appear in these 32-bit windows: rel8 Jcc/JMP,
-        # LOOPNE/LOOPE/LOOP/JECXZ (E0-E3), and rel32 Jcc/JMP.
+        # canonical-EXE execution stage. Decode direct relative branch forms
+        # including legacy-prefixed rel8 Jcc/JMP/LOOP-family instructions and
+        # operand/address-size-prefixed near Jcc/JMP encodings.
         instruction_rows = value(f"{prefix}_INSTRUCTIONS")
 
         # Validate the declared instruction tuple geometry before canonical-EXE
@@ -819,24 +916,9 @@ def verify_dxvk_continuation_chain() -> None:
         direct_branch_rows: dict[int, tuple[bytes, int]] = {}
         for instruction_rva, instruction_hex, _instruction_asm in instruction_rows:
             encoded = bytes.fromhex(instruction_hex)
-            decoded_target_rva = None
-            if len(encoded) == 2 and (
-                encoded[0] == 0xEB
-                or 0x70 <= encoded[0] <= 0x7F
-                or 0xE0 <= encoded[0] <= 0xE3
-            ):
-                rel8 = int.from_bytes(encoded[1:2], byteorder="little", signed=True)
-                decoded_target_rva = (instruction_rva + 2 + rel8) & 0xFFFFFFFF
-            elif len(encoded) == 5 and encoded[0] == 0xE9:
-                rel32 = int.from_bytes(encoded[1:5], byteorder="little", signed=True)
-                decoded_target_rva = (instruction_rva + 5 + rel32) & 0xFFFFFFFF
-            elif (
-                len(encoded) == 6
-                and encoded[0] == 0x0F
-                and 0x80 <= encoded[1] <= 0x8F
-            ):
-                rel32 = int.from_bytes(encoded[2:6], byteorder="little", signed=True)
-                decoded_target_rva = (instruction_rva + 6 + rel32) & 0xFFFFFFFF
+            decoded_target_rva = _decode_direct_relative_branch_target(
+                instruction_rva, encoded
+            )
             if decoded_target_rva is not None:
                 direct_branch_rows[instruction_rva] = (encoded, decoded_target_rva)
 
