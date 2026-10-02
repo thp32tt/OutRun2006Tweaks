@@ -15269,9 +15269,9 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_43_provenance
     )
     overlap = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_43_OVERLAP_BYTES
     overlap_actual = probe[: len(overlap)]
-    overlap_matches = (
-        overlap_actual == overlap
-        and predecessor["incomplete_expected_bytes"] == overlap.hex(" ")
+    overlap_matches = overlap_actual == overlap
+    predecessor_overlap_matches = (
+        predecessor["incomplete_expected_bytes"] == overlap.hex(" ")
         and predecessor["incomplete_actual_bytes"] == overlap.hex(" ")
     )
     inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
@@ -15294,6 +15294,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_43_provenance
         and target_section == ".text"
         and len(probe) == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_43_PROBE_LEN
         and overlap_matches
+        and predecessor_overlap_matches
         and probe_end_matches
     )
     return {
@@ -15309,6 +15310,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_43_provenance
         "overlap_expected_bytes": overlap.hex(" "),
         "overlap_actual_bytes": overlap_actual.hex(" "),
         "overlap_matches": overlap_matches,
+        "predecessor_overlap_matches": predecessor_overlap_matches,
         "first_16_bytes": probe[:16].hex(" "),
         "last_16_bytes": probe[-16:].hex(" "),
         "bytes": probe.hex(" "),
