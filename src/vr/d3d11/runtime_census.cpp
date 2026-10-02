@@ -328,6 +328,8 @@ namespace outrun::vr::dx11
                 hash = hash_mix(hash, stage.minFilter);
                 hash = hash_mix(hash, stage.magFilter);
                 hash = hash_mix(hash, stage.mipFilter);
+                hash = hash_mix(hash, stage.mipLodBiasBits);
+                hash = hash_mix(hash, stage.maxMipLevel);
                 hash = hash_mix(hash, stage.addressU);
                 hash = hash_mix(hash, stage.addressV);
             }
@@ -1021,6 +1023,10 @@ namespace outrun::vr::dx11
                     observeSamplerState(D3DSAMP_MINFILTER, out.minFilter);
                     observeSamplerState(D3DSAMP_MAGFILTER, out.magFilter);
                     observeSamplerState(D3DSAMP_MIPFILTER, out.mipFilter);
+                    observeSamplerState(
+                        D3DSAMP_MIPMAPLODBIAS, out.mipLodBiasBits);
+                    observeSamplerState(
+                        D3DSAMP_MAXMIPLEVEL, out.maxMipLevel);
                     observeSamplerState(D3DSAMP_ADDRESSU, out.addressU);
                     observeSamplerState(D3DSAMP_ADDRESSV, out.addressV);
                 }
