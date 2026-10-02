@@ -38,6 +38,10 @@ namespace outrun::vr::dx11
         // D3D9 clipping path only. Disabled clipping or enabled user clip
         // planes require shader/raster semantics that are not implemented.
         PipelineUnsupportedClipping = 1u << 14,
+        // D3D9 DEPTHBIAS uses API/format-specific constant-bias semantics.
+        // Until an exact cross-API mapping is proven, any non-zero constant
+        // or slope-scale bias must block dormant native readiness.
+        PipelineUnsupportedDepthBias = 1u << 15,
     };
 
     struct PipelineTranslation
