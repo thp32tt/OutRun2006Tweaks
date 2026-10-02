@@ -440,6 +440,38 @@
       "issue14_implementation_comment_id": 5946947114,
       "scope": "Continuation 37 raw canonical overlap provenance at the F27 cut rel32 CALL edge 0x00182B96 through 0x00182BD6; no function/render/HUD/runtime semantic promotion.",
       "exact_next_action": "Exact-decode only complete instructions in canonical 0x00182B96..0x00182BD6; preserve any trailing partial instruction raw-only and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F28_CANONICAL_CONTROL_FLOW_0x182B96_TO_0x182BD6",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "1ed91e677a0bf951c9f59067b3bf10ec31a663d7",
+      "run_record_commit_sha": "708791f675bc66fa2bd77aaaa8d7e86daac7d557",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "control_flow_status": "EXACT_182B96_TO_182BD6_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+      "instruction_count": 34,
+      "direct_rel32_call_count": 1,
+      "branch_count": 3,
+      "backward_target_rva": "0x00182B82",
+      "backward_target_is_predecessor_boundary": true,
+      "raw_noncall_candidate": "0x00182BA5->0x0014792D",
+      "raw_noncall_census": true,
+      "dxvk_disassembly_evidence_run_id": 36975741491,
+      "dxvk_disassembly_evidence_job_id": 110739088251,
+      "dxvk_disassembly_evidence_artifact_id": 11213656490,
+      "dxvk_disassembly_evidence_artifact_digest": "sha256:d2b896eecd13974665549720c559fdd004c2a477d4d81e12354758c3b9b730eb",
+      "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+      "issue14_implementation_comment_id": 5947011588,
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "scope": "Exact canonical continuation_37 control-flow proof for 0x00182B96..0x00182BD6, including the completed predecessor rel32 CALL, direct/branch targets, predecessor-boundary back edge and explicit misaligned raw E8 non-CALL evidence; no semantic/runtime promotion.",
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_ONLY",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "exact_next_action": "Preserve the newer F29 0x00182BD6..0x00182C16 exact-proof frontier. Continue only from the latest GitHub HEAD with the next bounded canonical capture starting at exact boundary 0x00182C16; keep the 0x00182C33 forward target and all function/render/HUD/runtime semantics unresolved until separately proven."
     }
   ]
 }
