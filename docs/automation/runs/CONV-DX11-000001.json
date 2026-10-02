@@ -4,7 +4,7 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "8204de3c411b327cb857e6348160968a49b37273",
+  "base_sha": "c7110fcde412e7bcefdcfb099c4a6e67382985ea",
   "state_parent_head": "60f544cca35a1b3f0801306f3f29e90054d301fc",
   "material_result_sha": "162073d1f36ab2f4634cb50d6ca6957764bf1eb2",
   "validation_bearing_sha": "d874b7cf337bc75c66594d389c68267554ee173a",
@@ -19,16 +19,15 @@
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read AGENTS.md, current GitHub branch HEAD, docs/CONVERSION_LANE_STATE.json, current run state/work queue, and regression history through the authenticated GitHub connector.",
-        "Deduplicated against concurrent R159-R165 DX11 work and selected an independent unimplemented depth-bias semantic gap."
+        "Read AGENTS.md, branch-local conversion state/run record, regression/problem history and Issue #14 through authenticated GitHub authority.",
+        "Re-read live branch during rapid same-branch churn and selected a non-duplicated dormant DX11 semantics gap."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "RenderStateSnapshot did not preserve D3DRS_DEPTHBIAS or D3DRS_SLOPESCALEDEPTHBIAS.",
-        "translate_pipeline() emitted zero D3D11 rasterizer bias without a corresponding unsupported blocker, permitting erased non-default D3D9 bias semantics to appear exact.",
-        "Loaded regression risk paths did not identify a matching runtime-regression key for these DX11 conversion files."
+        "D3DRS_VERTEXBLEND and D3DRS_INDEXEDVERTEXBLENDENABLE were absent from the tracked render-state/readiness identity while the dormant native fixed-function vertex path assumes a single world transform.",
+        "D3D9 defaults remain disabled, so preserving those states and rejecting non-default weighted/indexed matrix blending keeps the existing exact default path unchanged."
       ]
     },
     "C2_IMPLEMENT": {
@@ -38,48 +37,46 @@
         "src/vr/d3d9/stereo_renderer_r7.inc",
         "src/vr/d3d11/pipeline_translation.hpp",
         "src/vr/d3d11/pipeline_translation.cpp",
+        "src/vr/d3d11/runtime_census.cpp",
         "tools/dx11_fixed_function_pipeline_probe.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "dfc7879731f40be0407c6d3047eb4eca5990d858",
-        "1bdb7f50ca3ae2c9653b3301983a772890e4e393",
-        "ebbeb449f9728d43d33678b0745753e459b41595",
-        "ebdc483e704f9c4520b6b0188bbe29eabf6aafee",
-        "b19e5dac6160abaeb776900f7e933e191d3a366f",
-        "162073d1f36ab2f4634cb50d6ca6957764bf1eb2"
+        "90bc7ec5eb52b44e357316466bfe5825d113618b"
+      ],
+      "integration_followup_commits": [
+        "d64773db8bc7385f6779b9bff272851c6b04b177"
       ],
       "details": [
-        "Added raw DWORD fields for constant and slope-scale D3D9 depth bias.",
-        "Primed/captured D3DRS_DEPTHBIAS and D3DRS_SLOPESCALEDEPTHBIAS in the existing tracked render-state snapshot.",
-        "Added PipelineUnsupportedDepthBias and fail-closed classification for any non-zero bias until an exact cross-API mapping is proven.",
-        "Added zero-bias exact, constant-bias reject, slope-bias reject, fixed-function handoff-retention probes and source-graph guards."
+        "Captured and tracked D3D9 vertex-blend and indexed-vertex-blend render states.",
+        "Added PipelineUnsupportedVertexBlend and fail-closed translation for any non-default matrix blending.",
+        "Added runtime census identity/hash propagation plus positive/negative fixed-function pipeline probes and source-graph guards.",
+        "A retaining descendant extended unsupported census accounting to include the new vertex-blend blocker without relaxing the guard."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_STATIC",
-      "automation_validation": "PASS_GITHUB_AUTHORITATIVE_STATIC_CONTRACT_RETENTION_ACTIONS_CANCELLED_BY_BRANCH_CHURN_COMPILE_NOT_CLAIMED",
+      "status": "COMPLETE_STATIC_COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_GITHUB_AUTHORITATIVE_R163_STATIC_CONTRACT_RETENTION_CENSUS_INTEGRATION_GUARD; BACKEND_GATE_FULL_GRAPH_NOT_CLAIMED_DUE_CONCURRENT_BRANCH_CHURN",
       "evidence": [
-        "GitHub compare proved material result 162073d1f36ab2f4634cb50d6ca6957764bf1eb2 remained an ancestor of retaining descendants with behind_by=0.",
-        "Fresh GitHub connector reads at d874b7cf337bc75c66594d389c68267554ee173a confirmed all six depth-bias source/capture/blocker/probe/guard contracts were retained.",
-        "Later R163 census work explicitly expanded unsupported-bit accounting through bit 15, including PipelineUnsupportedDepthBias.",
-        "Build workflow attempts 36984315879, 36984378775 and 36984614956 were cancelled by same-branch descendant churn/concurrency before a compile result; compile/WARP success is not claimed."
+        "Authenticated GitHub compare proves material 90bc7ec5eb52b44e357316466bfe5825d113618b is retained by descendant 640b25579222d51daeedf559a241adcc700e1d2a (same branch lineage).",
+        "Direct GitHub-authoritative R163 contract check on descendant 640b25579222d51daeedf559a241adcc700e1d2a passed capture/default, blocker predicate, census hash/propagation, probe and source-graph guard tokens; both D3D9 states are present in prime+capture paths.",
+        "Backend Conversion Gate runs were repeatedly cancelled or blocked by unrelated concurrent sampler-sRGB/unsupported-census guard churn; those blockers were repaired on descendants, but no full Win32 compile is claimed for this unit."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "162073d1f36ab2f4634cb50d6ca6957764bf1eb2",
-      "issue14_comment_id": 5948284234
+      "material_commit": "90bc7ec5eb52b44e357316466bfe5825d113618b",
+      "issue14_comment_id": 5948291172
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant DX11 render-state readiness/source/probe/guard work only; no Native Draw* activation, OpenXR transport, localization, DXVK lane, packaging inputs or release payload changed."
+      "reason": "Dormant DX11 render-state/readiness/census/probe/static-guard work only; no NativeDrawPathActive change, production Draw* routing, OpenXR transport, localization, DXVK lane or release payload changed."
     },
     "C6_STATE": {
-      "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve the depth-bias fail-closed gate and fresh-audit the latest GitHub HEAD for the next independent dormant DX11 semantic gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R163 D3D9 VERTEXBLEND/INDEXEDVERTEXBLENDENABLE capture, fail-closed pipeline blocker, census identity and probe/static-guard lineage; continue only from latest GitHub HEAD with the next independent dormant DX11 semantics gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -93,11 +90,24 @@
   "issue14_comment_id": 5948284234,
   "automation_validation": "PASS_GITHUB_AUTHORITATIVE_STATIC_CONTRACT_RETENTION_ACTIONS_CANCELLED_BY_BRANCH_CHURN_COMPILE_NOT_CLAIMED",
   "blocker": "GitHub Actions compile runs were repeatedly cancelled by same-branch descendant churn; no compile/WARP or Quest 3/VDXR runtime success is claimed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Preserve the depth-bias fail-closed gate and fresh-audit the latest GitHub HEAD for the next independent dormant DX11 semantic gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "next_action": "Keep NativeDrawPathActive disabled. Preserve R163 D3D9 VERTEXBLEND/INDEXEDVERTEXBLENDENABLE capture, fail-closed pipeline blocker, census identity and probe/static-guard lineage; continue only from latest GitHub HEAD with the next independent dormant DX11 semantics gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
   "prior_completed_unit": "DX11_SHADEMODE_CAPTURE_FAILCLOSED_R162",
   "initial_material_sha": "34e1b84224928e607449d34391b8e9278a21ea52",
-  "prior_material_result_sha": "67ec86f4406c3c1734c7f4a741829fcac5f433e1"
+  "prior_material_result_sha": "67ec86f4406c3c1734c7f4a741829fcac5f433e1",
+  "source_head": "640b25579222d51daeedf559a241adcc700e1d2a",
+  "result_sha": "90bc7ec5eb52b44e357316466bfe5825d113618b",
+  "selected_work_item": "DX11_VERTEX_BLEND_PROVENANCE_FAILCLOSED_R163",
+  "changed_paths": [
+    "src/vr/core/d3d9_draw_state.hpp",
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "src/vr/d3d11/pipeline_translation.hpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/dx11_fixed_function_pipeline_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R163 D3D9 VERTEXBLEND/INDEXEDVERTEXBLENDENABLE capture, fail-closed pipeline blocker, census identity and probe/static-guard lineage; continue only from latest GitHub HEAD with the next independent dormant DX11 semantics gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
 }
