@@ -2697,6 +2697,15 @@ int main()
                 forgedMultiStageBindingSet),
         "R136 aggregate binding snapshot rejects copied stage-token drift");
 
+    auto injectedUnusedStageBindingSet = multiStageBindingSet;
+    injectedUnusedStageBindingSet.stageSnapshotTokens[2] =
+        multiStageBindingSet.stageSnapshotTokens[0];
+    require(
+        !outrun::vr::dx11::
+            validate_fixed_function_texture_binding_set_readiness_integrity(
+                injectedUnusedStageBindingSet),
+        "R136 aggregate binding snapshot rejects unrequired stage-token injection");
+
     ID3D11SamplerState* clearSecondStageSampler = nullptr;
     ID3D11ShaderResourceView* clearSecondStageSrv = nullptr;
     d3d.context->PSSetSamplers(
