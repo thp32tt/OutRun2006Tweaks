@@ -7,6 +7,8 @@ on:
     paths:
       - 'tools/analyze_outrun_exe.py'
       - 'tools/verify_vr_backend_disasm_contract.py'
+      - 'tools/extract_dxvk_canonical_window.py'
+      - 'tools/test_extract_dxvk_canonical_window.py'
       - '.github/workflows/dxvk-disasm-evidence.yml'
   workflow_dispatch:
 
@@ -34,6 +36,10 @@ jobs:
         shell: pwsh
         run: python tools/verify_vr_backend_disasm_contract.py
 
+      - name: Verify canonical window extractor
+        shell: pwsh
+        run: python -m unittest discover -s tools -p 'test_extract_dxvk_canonical_window.py' -v
+
       - name: Download canonical OutRun executable
         shell: pwsh
         run: |
@@ -51,6 +57,19 @@ jobs:
             throw "Canonical OutRun executable SHA256 mismatch: expected=$expectedHash actual=$actualHash"
           }
           Write-Host "CANONICAL_EXE_SHA256=$actualHash"
+
+      - name: Capture next canonical DXVK frontier window
+        shell: pwsh
+        run: |
+          python tools/extract_dxvk_canonical_window.py `
+            --exe analysis-input/OR2006C2C.EXE `
+            --frontier-source tools/analyze_outrun_exe.py `
+            --length 64 `
+            --expected-sha256 $env:CANONICAL_EXE_SHA256 `
+            --source-sha "${{ github.sha }}" `
+            --out analysis-output/DXVK_CANONICAL_FRONTIER_NEXT.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-Content analysis-output/DXVK_CANONICAL_FRONTIER_NEXT.json
 
       - name: Analyze canonical executable
         shell: pwsh
