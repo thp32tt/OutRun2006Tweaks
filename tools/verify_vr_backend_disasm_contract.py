@@ -1460,6 +1460,166 @@ def verify_dxvk_continuation_chain() -> None:
                         f"target=0x{inherited_target_rva:08X}"
                     )
 
+        # DXVK proof forward-target debt transition: once the newer continuation
+        # chain exposes unresolved_forward_targets, each exact proof must account
+        # for that debt deterministically. A predecessor target may be resolved
+        # only by an exact boundary in this capture; otherwise it must remain
+        # carried. New direct branches at/after the capture edge are added to
+        # the carried set. This prevents a proof from dropping a still-forward
+        # target even when its raw successor lineage is otherwise well-formed.
+        if continuation_id > proof_ids[0]:
+            predecessor_id = continuation_id - 1
+            predecessor_proof_name = (
+                "collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
+                f"{predecessor_id}_prefix_proof"
+            )
+            predecessor_proof_ast = ast.parse(
+                function_source(predecessor_proof_name)
+            )
+
+            def proof_unresolved_forward_targets(
+                tree: ast.AST, owner_id: int
+            ) -> set[int] | None:
+                return_values: list[ast.AST] = []
+                for return_node in (
+                    node
+                    for node in ast.walk(tree)
+                    if isinstance(node, ast.Return)
+                    and isinstance(node.value, ast.Dict)
+                ):
+                    for key_node, value_node in zip(
+                        return_node.value.keys, return_node.value.values
+                    ):
+                        if (
+                            isinstance(key_node, ast.Constant)
+                            and key_node.value == "unresolved_forward_targets"
+                        ):
+                            return_values.append(value_node)
+                if not return_values:
+                    return None
+                if len(return_values) != 1:
+                    raise SystemExit(
+                        f"DXVK continuation {owner_id} proof has ambiguous "
+                        "unresolved_forward_targets return bindings: "
+                        f"{len(return_values)}"
+                    )
+
+                value_node = return_values[0]
+                if isinstance(value_node, ast.Name):
+                    assignments = [
+                        node.value
+                        for node in ast.walk(tree)
+                        if isinstance(node, ast.Assign)
+                        and any(
+                            isinstance(target, ast.Name)
+                            and target.id == value_node.id
+                            for target in node.targets
+                        )
+                    ]
+                    if len(assignments) != 1:
+                        raise SystemExit(
+                            f"DXVK continuation {owner_id} proof unresolved-forward "
+                            f"variable {value_node.id!r} has ambiguous assignments: "
+                            f"{len(assignments)}"
+                        )
+                    value_node = assignments[0]
+
+                if isinstance(value_node, (ast.List, ast.Tuple, ast.Set)):
+                    values = [
+                        element.value
+                        for element in value_node.elts
+                        if (
+                            isinstance(element, ast.Constant)
+                            and isinstance(element.value, int)
+                            and not isinstance(element.value, bool)
+                        )
+                    ]
+                    if len(values) != len(value_node.elts):
+                        raise SystemExit(
+                            f"DXVK continuation {owner_id} proof "
+                            "unresolved_forward_targets must be an int literal sequence"
+                        )
+                elif (
+                    isinstance(value_node, ast.Call)
+                    and isinstance(value_node.func, ast.Name)
+                    and value_node.func.id == "set"
+                    and not value_node.args
+                    and not value_node.keywords
+                ):
+                    values = []
+                else:
+                    raise SystemExit(
+                        f"DXVK continuation {owner_id} proof "
+                        "unresolved_forward_targets must resolve to an explicit int literal sequence"
+                    )
+                if len(values) != len(set(values)):
+                    raise SystemExit(
+                        f"DXVK continuation {owner_id} proof "
+                        "unresolved_forward_targets contains duplicate targets"
+                    )
+                return set(values)
+
+            predecessor_forward_targets = proof_unresolved_forward_targets(
+                predecessor_proof_ast, predecessor_id
+            )
+            if predecessor_forward_targets is not None:
+                current_forward_targets = proof_unresolved_forward_targets(
+                    proof_ast, continuation_id
+                )
+                if current_forward_targets is None:
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} dropped predecessor "
+                        "unresolved_forward_targets lineage from its exact proof"
+                    )
+
+                current_start = value(f"{prefix}_RVA")
+                current_end = value(f"{prefix}_PREFIX_END_RVA")
+                resolved_target_set = set(resolved_predecessor_targets)
+                unexpected_resolutions = sorted(
+                    resolved_target_set - predecessor_forward_targets
+                )
+                if unexpected_resolutions:
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} resolves targets not present "
+                        f"in predecessor {predecessor_id} forward debt: "
+                        f"{[f'0x{rva:08X}' for rva in unexpected_resolutions]}"
+                    )
+
+                inherited_remaining = (
+                    predecessor_forward_targets - resolved_target_set
+                )
+                skipped_inherited_targets = sorted(
+                    target_rva
+                    for target_rva in inherited_remaining
+                    if target_rva < current_end
+                )
+                if skipped_inherited_targets:
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} carried predecessor targets "
+                        "past the capture that should have resolved them: "
+                        f"{[f'0x{rva:08X}' for rva in skipped_inherited_targets]} "
+                        f"capture=0x{current_start:08X}..0x{current_end:08X}"
+                    )
+
+                new_direct_forward_targets = {
+                    target_rva
+                    for _branch_rva, target_rva in declared_branches
+                    if target_rva >= current_end
+                }
+                expected_current_forward_targets = (
+                    inherited_remaining | new_direct_forward_targets
+                )
+                if current_forward_targets != expected_current_forward_targets:
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} unresolved forward-target "
+                        "debt transition drift: "
+                        f"predecessor={sorted(predecessor_forward_targets)} "
+                        f"resolved={sorted(resolved_target_set)} "
+                        f"new={sorted(new_direct_forward_targets)} "
+                        f"expected={sorted(expected_current_forward_targets)} "
+                        f"actual={sorted(current_forward_targets)}"
+                    )
+
         proof_status_fail_closed_markers = (
             "proven = bool(",
             '"status"',
