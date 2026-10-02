@@ -1216,8 +1216,8 @@ namespace OutRunVRStereo
             if (R32Counters.lastLogMs == 0)
             {
                 R32Counters.lastLogMs = now;
-                R32Counters.liveWvp = R31FastWorldLiveValidations;
-                R32Counters.liveReject = R31FastWorldValidationRejects;
+                R32Counters.liveWvp = R31TelemetryLiveWvpChecks();
+                R32Counters.liveReject = R31TelemetryLiveWvpRejects();
                 R32Counters.stateRecord = OutRunVR::State::StateBlockTracker::RecordingGeneration();
                 R32Counters.stateApply = OutRunVR::State::StateBlockTracker::ApplyGeneration();
                 R32Counters.batch = R32BatchWvpUploads;
@@ -1279,8 +1279,8 @@ namespace OutRunVRStereo
                 R32PerfWindowCounters.maxAlphaBlendDraws,
                 R32PerfWindowCounters.maxParticleLikeDraws,
                 R32PerfWindowCounters.maxParticleLikePrimitives,
-                R31FastWorldLiveValidations - R32Counters.liveWvp,
-                R31FastWorldValidationRejects - R32Counters.liveReject,
+                R31TelemetryLiveWvpChecks() - R32Counters.liveWvp,
+                R31TelemetryLiveWvpRejects() - R32Counters.liveReject,
                 OutRunVR::State::StateBlockTracker::RecordingGeneration() - R32Counters.stateRecord,
                 OutRunVR::State::StateBlockTracker::ApplyGeneration() - R32Counters.stateApply,
                 R32BatchWvpUploads - R32Counters.batch,
@@ -1302,8 +1302,8 @@ namespace OutRunVRStereo
                 R32ResetFailures - R32Counters.resetFail);
 
             R32Counters.lastLogMs = now;
-            R32Counters.liveWvp = R31FastWorldLiveValidations;
-            R32Counters.liveReject = R31FastWorldValidationRejects;
+            R32Counters.liveWvp = R31TelemetryLiveWvpChecks();
+            R32Counters.liveReject = R31TelemetryLiveWvpRejects();
             R32Counters.stateRecord = OutRunVR::State::StateBlockTracker::RecordingGeneration();
             R32Counters.stateApply = OutRunVR::State::StateBlockTracker::ApplyGeneration();
             R32Counters.batch = R32BatchWvpUploads;
