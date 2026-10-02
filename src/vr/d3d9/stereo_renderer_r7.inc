@@ -1734,7 +1734,24 @@ namespace OutRunVRStereo
 		read(D3DRS_FOGVERTEXMODE, out.fogVertexMode);
 		read(D3DRS_LIGHTING, out.lighting);
 
+		// R124 keeps output-state completeness separate from the historical
+		// render-state completeness bit so passive census behavior does not
+		// regress when one dynamic-output query is unavailable.
+		bool outputOk = true;
+		auto readOutput = [&](D3DRENDERSTATETYPE state, DWORD& value)
+		{
+			if (!ReadTrackedRenderState(device, state, value))
+				outputOk = false;
+		};
+		readOutput(D3DRS_BLENDFACTOR, out.blendFactor);
+		readOutput(D3DRS_MULTISAMPLEMASK, out.multiSampleMask);
+		if (FAILED(device->GetViewport(&out.viewport)))
+			outputOk = false;
+		if (FAILED(device->GetScissorRect(&out.scissorRect)))
+			outputOk = false;
+
 		out.complete = ok;
+		out.outputStateComplete = outputOk;
 		return ok;
 	}
 
