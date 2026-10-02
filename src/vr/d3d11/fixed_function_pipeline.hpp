@@ -24,6 +24,11 @@ namespace outrun::vr::dx11
         bool fixedFunctionObserved = false;
         bool alphaTestOwnedByPixelShader = false;
 
+        [[nodiscard]] bool alpha_test_transfer_allowed() const noexcept
+        {
+            return fixedFunctionObserved && pixelShader.generated();
+        }
+
         [[nodiscard]] bool alpha_test_transferred() const noexcept
         {
             return alphaTestOwnedByPixelShader && pixelShader.generated();
