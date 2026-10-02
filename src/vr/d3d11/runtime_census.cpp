@@ -812,7 +812,8 @@ namespace outrun::vr::dx11
             bool fixedFunction,
             IDirect3DVertexShader9* vertexShader,
             IDirect3DPixelShader9* pixelShader,
-            bool shaderQueryComplete) noexcept
+            bool shaderQueryComplete,
+            FixedFunctionLightingState fixedFunctionLighting) noexcept
         {
             SourceSignature sig{};
             sig.fixedFunction = fixedFunction;
@@ -1038,7 +1039,7 @@ namespace outrun::vr::dx11
 
                 const auto vertexPrototype =
                     generate_fixed_function_vertex_shader_prototype(
-                        sig.fvf, sig.stride);
+                        sig.fvf, sig.stride, fixedFunctionLighting);
                 sig.fixedFunctionVertexShaderPrototypeGenerated =
                     vertexPrototype.generated();
                 sig.fixedFunctionVertexShaderPrototypeUnsupported =
@@ -1905,8 +1906,17 @@ namespace outrun::vr::dx11
         else if (programmablePair)
             ProgrammableSamples.fetch_add(1, std::memory_order_relaxed);
 
+        const FixedFunctionLightingState fixedFunctionLighting{
+            captured && source.complete,
+            source.lighting,
+        };
         auto signature = inspect_source_signature(
-            device, fixedFunction, vs, ps, shaderQueryComplete);
+            device,
+            fixedFunction,
+            vs,
+            ps,
+            shaderQueryComplete,
+            fixedFunctionLighting);
         if (vs) vs->Release();
         if (ps) ps->Release();
 

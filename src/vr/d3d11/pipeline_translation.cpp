@@ -1011,7 +1011,8 @@ namespace outrun::vr::dx11
     FixedFunctionVertexShaderPrototype
     generate_fixed_function_vertex_shader_prototype(
         DWORD fvf,
-        UINT stream0Stride)
+        UINT stream0Stride,
+        FixedFunctionLightingState lighting)
     {
         FixedFunctionVertexShaderPrototype out{};
 
@@ -1048,9 +1049,14 @@ namespace outrun::vr::dx11
                     D3DFVF_LASTBETA_D3DCOLOR)) != 0)
             out.unsupported |=
                 FixedFunctionVertexShaderPrototypeUnsupportedBlend;
-        if ((fvf & D3DFVF_NORMAL) != 0)
+
+        out.hasNormal = (fvf & D3DFVF_NORMAL) != 0;
+        if (out.hasNormal &&
+            (!lighting.observationComplete || lighting.enabled != FALSE))
+        {
             out.unsupported |=
                 FixedFunctionVertexShaderPrototypeUnsupportedNormal;
+        }
         if ((fvf & D3DFVF_PSIZE) != 0)
             out.unsupported |=
                 FixedFunctionVertexShaderPrototypeUnsupportedPointSize;
@@ -1095,6 +1101,8 @@ namespace outrun::vr::dx11
             "struct VSInput\n"
             "{\n"
             "    float3 position : POSITION0;\n";
+        if (out.hasNormal)
+            shader += "    float3 normal : NORMAL0;\n";
         if (out.hasDiffuse)
             shader += "    float4 diffuse : COLOR0;\n";
 
@@ -1122,8 +1130,10 @@ namespace outrun::vr::dx11
             "};\n"
             "struct VSOutput\n"
             "{\n"
-            "    float4 position : SV_Position;\n"
-            "    float4 diffuse : COLOR0;\n";
+            "    float4 position : SV_Position;\n";
+        if (out.hasNormal)
+            shader += "    float3 normal : NORMAL0;\n";
+        shader += "    float4 diffuse : COLOR0;\n";
         for (UINT index = 0; index < 8; ++index)
         {
             shader += "    float4 tex";
@@ -1139,6 +1149,8 @@ namespace outrun::vr::dx11
             "    VSOutput output;\n"
             "    output.position = mul(float4(input.position, 1.0f), "
             "worldViewProjection);\n";
+        if (out.hasNormal)
+            shader += "    output.normal = input.normal;\n";
         shader += out.hasDiffuse
             ? "    output.diffuse = input.diffuse;\n"
             : "    output.diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);\n";

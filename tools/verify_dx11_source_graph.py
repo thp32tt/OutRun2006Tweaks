@@ -1428,6 +1428,7 @@ def main() -> None:
 
     r93_vertex_prototype_contract = {
         "FixedFunctionVertexShaderPrototype": "R93 reusable diagnostic vertex-shader prototype type",
+        "FixedFunctionLightingState": "R123 observed fixed-function lighting state",
         "generate_fixed_function_vertex_shader_prototype": "R93 vertex-shader generator declaration",
         "FixedFunctionVertexShaderPrototypeUnsupportedBlend": "R93 blend-weight fail-closed contract",
         "FixedFunctionVertexShaderPrototypeUnsupportedNormal": "R93 normal/lighting fail-closed contract",
@@ -1449,6 +1450,9 @@ def main() -> None:
         "register(b0)": "R93 D3D11 constant-buffer slot",
         "mul(float4(input.position, 1.0f)": "R93 position transform",
         "output.diffuse = input.diffuse": "R93 diffuse propagation",
+        "out.hasNormal": "R123 normal-presence gate",
+        "!lighting.observationComplete || lighting.enabled != FALSE": "R123 lighting fail-closed gate",
+        "output.normal = input.normal": "R123 unlit normal pass-through contract",
         "D3DFVF_TEXCOORDSIZE4": "R93 1D-4D texture-coordinate handling",
         "hash_shader_source(shader)": "R93 deterministic source identity",
     }.items():
@@ -1462,7 +1466,9 @@ def main() -> None:
         "R93 fixed-function vertex shader prototype generation": "R93 positive generation case",
         "R93 XYZRHW must fail closed": "R93 transformed-position negative case",
         "R93 blend-weight FVF must fail closed": "R93 blend negative case",
-        "R93 normal/lighting path must fail closed": "R93 normal/lighting negative case",
+        "R123 unlit normal FVF must generate": "R123 unlit-normal positive case",
+        "R123 unknown lighting normal FVF must fail closed": "R123 unknown-lighting negative case",
+        "R123 lit normal FVF must fail closed": "R123 active-lighting negative case",
     }.items():
         if token not in SHADER_LINKAGE_PROBE:
             raise SystemExit(

@@ -231,18 +231,24 @@ VSOutput main(float3 position : POSITION0)
         "R94 non-finite transform must fail closed");
 
     const DWORD fixedFunctionFvf =
-        D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
+        D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1;
     const auto vertexPrototype =
         generate_fixed_function_vertex_shader_prototype(
-            fixedFunctionFvf, 24);
+            fixedFunctionFvf,
+            36,
+            { true, FALSE });
     require(vertexPrototype.generated(),
             "R93 fixed-function vertex shader prototype generation");
-    require(vertexPrototype.inputElements == 3,
+    require(vertexPrototype.inputElements == 4,
             "R93 input element count");
     require(vertexPrototype.texCoordCount == 1,
             "R93 texture-coordinate count");
     require(vertexPrototype.hasDiffuse,
             "R93 diffuse semantic");
+    require(vertexPrototype.hasNormal,
+            "R123 unlit normal FVF must generate");
+    require(vertexPrototype.source.find("NORMAL0") != std::string::npos,
+            "R123 unlit normal semantic");
     require(vertexPrototype.source.find("worldViewProjection") !=
                 std::string::npos,
             "R93 WVP constant-buffer contract");
@@ -267,14 +273,25 @@ VSOutput main(float3 position : POSITION0)
          FixedFunctionVertexShaderPrototypeUnsupportedBlend) != 0,
         "R93 blend-weight FVF must fail closed");
 
-    const auto normalPrototype =
+    const auto unknownLightingNormalPrototype =
         generate_fixed_function_vertex_shader_prototype(
             D3DFVF_XYZ | D3DFVF_NORMAL, 24);
     require(
-        !normalPrototype.generated() &&
-        (normalPrototype.unsupported &
+        !unknownLightingNormalPrototype.generated() &&
+        (unknownLightingNormalPrototype.unsupported &
          FixedFunctionVertexShaderPrototypeUnsupportedNormal) != 0,
-        "R93 normal/lighting path must fail closed");
+        "R123 unknown lighting normal FVF must fail closed");
+
+    const auto litNormalPrototype =
+        generate_fixed_function_vertex_shader_prototype(
+            D3DFVF_XYZ | D3DFVF_NORMAL,
+            24,
+            { true, TRUE });
+    require(
+        !litNormalPrototype.generated() &&
+        (litNormalPrototype.unsupported &
+         FixedFunctionVertexShaderPrototypeUnsupportedNormal) != 0,
+        "R123 lit normal FVF must fail closed");
 
     std::array<FixedFunctionStageState, 8> stages{};
     stages[0] = active_stage();

@@ -192,6 +192,16 @@ namespace outrun::vr::dx11
         FixedFunctionVertexShaderPrototypeUnsupportedTexCoord = 1u << 6,
     };
 
+    struct FixedFunctionLightingState
+    {
+        // A normal-bearing FVF is exact for this diagnostic prototype only
+        // when the D3D9 lighting render state is known disabled. If lighting
+        // is enabled, material/light semantics remain a separate fail-closed
+        // conversion item.
+        bool observationComplete = false;
+        DWORD enabled = FALSE;
+    };
+
     struct FixedFunctionVertexShaderPrototype
     {
         std::uint32_t unsupported =
@@ -199,6 +209,7 @@ namespace outrun::vr::dx11
         UINT inputElements = 0;
         UINT texCoordCount = 0;
         bool hasDiffuse = false;
+        bool hasNormal = false;
         std::uint64_t sourceHash = 0;
         std::string source;
 
@@ -213,7 +224,8 @@ namespace outrun::vr::dx11
     [[nodiscard]] FixedFunctionVertexShaderPrototype
     generate_fixed_function_vertex_shader_prototype(
         DWORD fvf,
-        UINT stream0Stride);
+        UINT stream0Stride,
+        FixedFunctionLightingState lighting = {});
 
     // R94 translates passively observed D3D9 WORLD/VIEW/PROJECTION state
     // into the row-major b0 payload consumed by the R93 diagnostic vertex
