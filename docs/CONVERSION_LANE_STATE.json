@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "06558bf73ae02fe1db5178b50ae5f8091c91e29f",
+  "state_parent_head": "1427dac55e8e1900849377cc8ec67377f0bf8ac5",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -1048,6 +1048,77 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Current descendant 27be49b786e02dfe61bca4262475bdfb1b34f91b contains F34 raw overlap capture 0x00182D14..0x00182D54 but Build run 36978162725 fails the backend disassembly contract because transition 42->43 is not recognized as comparing canonical probe bytes against the declared overlap. Repair and validate that raw collector before exact-decoding it."
+    },
+    {
+      "unit_id": "DXVK_OVERLAP_COMPOUND_COMPARE_VERIFIER_FIX",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "d0952c9a97481c8f0ca0fe8d5576f3b2497d7a58",
+      "validation_bearing_result_sha": "d0952c9a97481c8f0ca0fe8d5576f3b2497d7a58",
+      "commit_message": "test: accept guarded DXVK overlap comparisons [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Repaired a fail-open-syntax false negative in the auto-discovered DXVK overlap verifier: guarded multi-line overlap_matches predicates are accepted only when the collector still binds the declared overlap constant, canonical probe slice, overlap_matches assignment, and the actual overlap_actual == overlap comparison.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local lane/run state, regression/problem history and Issue #14; tracked concurrent F33/F34 frontier commits and did not duplicate them."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the exact F34 canonical-disassembly blocker after run 36978158616 failed the overlap verifier on a stronger multi-line overlap predicate."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit d0952c9a97481c8f0ca0fe8d5576f3b2497d7a58 relaxes only syntax recognition while retaining explicit overlap variable assignment and canonical byte equality requirements."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA d0952c9a97481c8f0ca0fe8d5576f3b2497d7a58 passed DXVK Canonical Disassembly Evidence run 36978281835/job 110746825032: backend disassembly contract OK, canonical EXE identity matched, and continuation_43 raw provenance captured 0x00182D14..0x00182D54 with f7 overlap match."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit d0952c9a97481c8f0ca0fe8d5576f3b2497d7a58 contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947334794 records implementation and exact-SHA validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static Python verifier repair only; no runtime payload, selector, backend binary, localization, or deployable package content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit without replacing the newer authoritative primary disassembly frontier."
+        }
+      },
+      "validation": {
+        "fail_before_sha": "27be49b786e02dfe61bca4262475bdfb1b34f91b",
+        "fail_before_dxvk_disassembly_run_id": 36978158616,
+        "fail_before_job_id": 110746440511,
+        "fail_before_reason": "DXVK overlap transition 42->43 raw provenance no longer compares canonical probe bytes against the declared overlap",
+        "exact_sha": "d0952c9a97481c8f0ca0fe8d5576f3b2497d7a58",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36978281835,
+        "dxvk_disassembly_evidence_job_id": 110746825032,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "dxvk_disassembly_evidence_artifact_id": 11214222490,
+        "dxvk_disassembly_evidence_artifact_digest": "sha256:a699e36b33f78c677ddf35346768f533023bacccf4ab4acf72f208e526464215",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "continuation_43_status": "EXACT_EXE_182D14_TO_182D54_PROVENANCE_CAPTURED",
+        "overlap_bytes": "f7",
+        "overlap_matches": true,
+        "probe_end_rva": "0x00182D54",
+        "probe_end_matches": true,
+        "backend_conversion_gate_run_id": 36978281881,
+        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_REQUIRED_FOR_STATIC_VERIFIER_UNIT",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947334794,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the validated F34 raw frontier 0x00182D14..0x00182D54. Exact-decode only complete canonical instructions, resolve predecessor forward target 0x00182D21 only if exact instruction-boundary evidence proves it, preserve any trailing partial instruction raw-only, and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
