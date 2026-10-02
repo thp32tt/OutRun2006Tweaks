@@ -21,6 +21,7 @@ r31 = read("src/vr/d3d9/stereo_renderer_r31.cpp")
 r32 = read("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = read("src/vr/d3d9/stereo_renderer_r33.cpp")
 r34 = read("src/vr/d3d9/stereo_renderer_r34.cpp")
+r13 = read("src/vr/d3d9/stereo_renderer_r13.cpp")
 runtime_context = read("src/vr/render/runtime_context.hpp")
 raw_draw_api = read("src/vr/render/raw_draw_api.hpp")
 depth_runtime = read("src/vr/state/depth_stencil_runtime.hpp")
@@ -1091,6 +1092,22 @@ for forbidden_call in (
     if forbidden_call in r32:
         errors.append(
             f"R32 retained direct transport/base call after Gate C phase 2: {forbidden_call}")
+
+
+# R13 Gate C hook destination linkage guard.
+for marker in (
+    "bool ResolveDirectTransportR13(",
+    "HRESULT __stdcall PresentDestR13(",
+):
+    pos = r13.find(marker)
+    if pos < 0:
+        errors.append(f"R13 Gate C hook destination missing: {marker}")
+        continue
+    before = r13[:pos]
+    after = r13[pos:]
+    if not before.endswith("    }\n\n") or "\n\n    namespace\n    {" not in after:
+        errors.append(f"R13 Gate C hook destination is not outside anonymous namespace: {marker}")
+
 
 if errors:
     print("R84 refactor contract FAILED")

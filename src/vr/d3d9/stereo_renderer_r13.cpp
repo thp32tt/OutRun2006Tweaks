@@ -168,6 +168,8 @@ namespace OutRunVRStereo
             return false;
         }
 
+    }
+
     bool ResolveDirectTransportR13(IDirect3DDevice9* device, std::uint32_t frameId)
         {
             if (!R13OverlayReady.load(std::memory_order_acquire))
@@ -270,6 +272,9 @@ namespace OutRunVRStereo
             ActiveDirectTransportSlot = selected;
             return true;
         }
+
+    namespace
+    {
 
         void R13ResetCommonPre(IDirect3DDevice9*)
         {
@@ -594,6 +599,8 @@ namespace OutRunVRStereo
                 device, actual, legacy, "R13/DrawIndexedPrimitiveUP");
         }
 
+    }
+
     HRESULT __stdcall PresentDestR13(IDirect3DDevice9* device,
             const RECT* sourceRect, const RECT* destRect,
             HWND destWindowOverride, const RGNDATA* dirtyRegion)
@@ -610,6 +617,9 @@ namespace OutRunVRStereo
                 R13ForceMonoShadow = false;
             return hr;
         }
+
+    namespace
+    {
 
         void R13RollbackOverlayHooks() noexcept
         {
