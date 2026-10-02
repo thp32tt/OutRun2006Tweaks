@@ -972,6 +972,10 @@ async def conversion_handle_discovered_commit(
         str(active.get("lane") or ""),
         str(active.get("branch") or ""),
     )
+    skip_directive = github_actions_skip_directive(str(task_commit.get("message") or ""))
+    if valid and skip_directive:
+        valid = False
+        reasons = list(reasons) + [f"FINAL_COMMIT_CI_SKIP_DIRECTIVE:{skip_directive}"]
     if valid:
         active["result_sha"] = sha
         active["result_message"] = task_commit.get("message")
@@ -2237,6 +2241,14 @@ async def localization_process_lane(
                     if handled:
                         return
                     task_commit = None
+                elif CONTROLLER_MODE == "conversion":
+                    handled = await conversion_handle_discovered_commit(
+                        context, pages, q, active, task_commit, now
+                    )
+                    save_queue_state(q)
+                    if handled:
+                        return
+                    task_commit = None
                 else:
                     active["result_sha"] = task_commit["sha"]
                     active["result_message"] = task_commit["message"]
@@ -2254,6 +2266,13 @@ async def localization_process_lane(
                     if CONTROLLER_MODE == "localization" and lane_key == "C":
                         handled = await localization_handle_discovered_commit(
                             context, pages, q, active, lane_key, skipped_commit, now
+                        )
+                        save_queue_state(q)
+                        if handled:
+                            return
+                    elif CONTROLLER_MODE == "conversion":
+                        handled = await conversion_handle_discovered_commit(
+                            context, pages, q, active, skipped_commit, now
                         )
                         save_queue_state(q)
                         if handled:
