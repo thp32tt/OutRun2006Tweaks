@@ -1,58 +1,57 @@
 #!/usr/bin/env python3
-"""Validate DXVK disassembly continuation evidence overlap.
+"""Validate DXVK raw disassembly continuation overlap windows.
 
-Static evidence helper only. It does not infer runtime semantics.
-It verifies that a continuation window preserves the mandatory overlap bytes
-captured at a predecessor boundary before following bytes are decoded.
+This is a byte-provenance helper only. It does not decode x86 instructions or
+promote runtime/render semantics. It rejects gaps or mismatched overlap bytes
+when a later evidence window continues a previously captured window.
 """
 
 from __future__ import annotations
 
 import argparse
-import sys
+import json
+from pathlib import Path
 
 
-DEFAULT_OVERLAP = "66 0f 54 1d 20 91 61"
+def compact_hex(value: str) -> str:
+    return "".join(value.split()).lower()
 
 
-def normalize_bytes(value: str) -> bytes:
-    """Convert a human byte sequence into bytes with strict validation."""
-    compact = value.lower().replace("0x", "").replace(",", " ")
-    parts = [p for p in compact.split() if p]
-    if not parts:
-        raise ValueError("byte sequence is empty")
-    if any(len(p) != 2 for p in parts):
-        raise ValueError("byte sequence contains non-byte token")
-    try:
-        return bytes(int(p, 16) for p in parts)
-    except ValueError as exc:
-        raise ValueError("byte sequence contains invalid hex") from exc
+def validate(record: dict) -> list[str]:
+    errors: list[str] = []
+    previous = record.get("previous_bytes")
+    overlap = record.get("overlap_bytes")
+    current = record.get("current_bytes")
 
+    if not all(isinstance(v, str) for v in (previous, overlap, current)):
+        return ["byte fields must be hex strings"]
 
-def validate_window(overlap: str, window: str) -> tuple[bool, str]:
-    try:
-        expected = normalize_bytes(overlap)
-        actual = normalize_bytes(window)
-    except ValueError as exc:
-        return False, str(exc)
+    previous_hex = compact_hex(previous)
+    overlap_hex = compact_hex(overlap)
+    current_hex = compact_hex(current)
 
-    if len(actual) < len(expected):
-        return False, "continuation window shorter than required overlap"
-    if actual[: len(expected)] != expected:
-        return False, "continuation overlap mismatch"
-    return True, "overlap preserved"
+    if not overlap_hex:
+        errors.append("overlap bytes cannot be empty")
+    if not previous_hex.endswith(overlap_hex):
+        errors.append("previous window does not end with overlap")
+    if not current_hex.startswith(overlap_hex):
+        errors.append("current window does not start with overlap")
+
+    return errors
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--overlap", default=DEFAULT_OVERLAP)
-    parser.add_argument("--window", required=True)
+    parser.add_argument("record")
     args = parser.parse_args()
-
-    ok, message = validate_window(args.overlap, args.window)
-    print(message)
-    return 0 if ok else 1
+    errors = validate(json.loads(Path(args.record).read_text(encoding="utf-8")))
+    if errors:
+        for error in errors:
+            print(error)
+        return 1
+    print("DXVK continuation overlap: PASS")
+    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

@@ -1,31 +1,28 @@
-#!/usr/bin/env python3
-"""Regression checks for DXVK continuation overlap validation."""
+import json
+import tempfile
+from pathlib import Path
 
-from validate_dxvk_continuation_overlap import validate_window
-
-
-def test_accepts_exact_overlap_prefix():
-    ok, message = validate_window(
-        "66 0f 54 1d 20 91 61",
-        "66 0f 54 1d 20 91 61 90 90",
-    )
-    assert ok
-    assert message == "overlap preserved"
+from validate_dxvk_continuation_overlap import validate
 
 
-def test_rejects_short_window():
-    ok, message = validate_window(
-        "66 0f 54 1d 20 91 61",
-        "66 0f 54",
-    )
-    assert not ok
-    assert message == "continuation window shorter than required overlap"
+def test_matching_overlap():
+    assert validate({
+        "previous_bytes": "aa bb 66 0f 54 1d 20 91 61",
+        "overlap_bytes": "66 0f 54 1d 20 91 61",
+        "current_bytes": "66 0f 54 1d 20 91 61 cc",
+    }) == []
 
 
-def test_rejects_changed_prefix_byte():
-    ok, message = validate_window(
-        "66 0f 54 1d 20 91 61",
-        "66 0f 54 1d 20 91 62",
-    )
-    assert not ok
-    assert message == "continuation overlap mismatch"
+def test_rejects_missing_overlap():
+    errors = validate({
+        "previous_bytes": "aa bb cc",
+        "overlap_bytes": "66 0f",
+        "current_bytes": "66 0f cc",
+    })
+    assert errors
+
+
+if __name__ == "__main__":
+    test_matching_overlap()
+    test_rejects_missing_overlap()
+    print("DXVK continuation overlap tests: PASS")
