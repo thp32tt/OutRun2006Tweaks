@@ -773,18 +773,30 @@ def verify_dxvk_continuation_chain() -> None:
                 f"expected={expected_provenance_call} provenance_calls={provenance_calls}"
             )
         if continuation_id > proof_ids[0]:
+            expected_predecessor_id = continuation_id - 1
             expected_predecessor_call = (
                 "collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
-                f"{continuation_id - 1}_prefix_proof(pe)"
+                f"{expected_predecessor_id}_prefix_proof(pe)"
             )
-            predecessor_proof_calls = proof_source.count("_prefix_proof(pe)")
-            if predecessor_proof_calls and (
-                expected_predecessor_call not in proof_source
-                or predecessor_proof_calls != 1
-            ):
+            predecessor_proof_ids = [
+                int(match.group(1))
+                for match in re.finditer(
+                    r"collect_guarded_gf_target_c_helper_1_third_callee_continuation_(\\d+)_prefix_proof\\(pe\\)",
+                    proof_source,
+                )
+            ]
+            immediate_predecessor_calls = predecessor_proof_ids.count(expected_predecessor_id)
+            invalid_proof_dependencies = [
+                proof_id
+                for proof_id in predecessor_proof_ids
+                if proof_id >= continuation_id
+            ]
+            if immediate_predecessor_calls != 1 or invalid_proof_dependencies:
                 raise SystemExit(
-                    f"DXVK continuation {continuation_id} prefix proof consumes wrong predecessor proof: "
-                    f"expected={expected_predecessor_call} proof_calls={predecessor_proof_calls}"
+                    f"DXVK continuation {continuation_id} prefix proof consumes invalid predecessor proof chain: "
+                    f"expected={expected_predecessor_call} proof_ids={predecessor_proof_ids} "
+                    f"immediate_calls={immediate_predecessor_calls} "
+                    f"invalid={invalid_proof_dependencies}"
                 )
         proof_name = (
             f"guarded_gf_target_c_helper_1_third_callee_continuation_"
