@@ -54,7 +54,7 @@
     "task_id": "CONV-DX11-000001",
     "result_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
     "validation_bearing_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
-    "automation_validation": "PASS_REMOTE_STATIC",
+    "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_AFTER_STATIC_PHASE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
@@ -143,7 +143,7 @@
       "task_id": "CONV-DX11-000001",
       "material_result_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
       "validation_bearing_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
-      "automation_validation": "PASS_REMOTE_STATIC",
+      "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_AFTER_STATIC_PHASE",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false

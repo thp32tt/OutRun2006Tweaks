@@ -150,15 +150,15 @@
           ]
         },
         "C3_VALIDATE": {
-          "status": "COMPLETE_REMOTE_STATIC",
-          "automation_validation": "PASS_REMOTE_STATIC",
+          "status": "COMPLETE_REMOTE_STATIC_CI_CANCELLED_AFTER_STATIC_PHASE",
+          "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_AFTER_STATIC_PHASE",
           "evidence": [
             "Re-fetched exact material SHA and all four changed blobs; snapshot/capture/census/guard assertions all passed and the commit diff does not touch NativeDrawPathActive.",
             "Backend Conversion Gate run 36970889503 on exact SHA passed queue automation, HMD-baseline structure, one-click structure, backend disassembly, session regressions, DX11 transport, DX11 dual-source, Verify DX11 source graph, dormant activation boundary and DX11 census analyzer.",
-            "Win32 configure/build was still in progress at C6 persistence time; no Win32 build success or WARP/runtime success is claimed."
+            "The exact-SHA validate job later concluded CANCELLED after all required static DX11 contract/analyzer steps had succeeded; Win32 configure/build did not yield a success claim."
           ],
           "gate_run_id": 36970889503,
-          "full_win32_build": "IN_PROGRESS_AT_C6",
+          "full_win32_build": "CANCELLED_AFTER_STATIC_PASS",
           "runtime_validation": "UNTESTED"
         },
         "C4_COMMIT": {
@@ -189,7 +189,7 @@
         "DX11-DRAW-ACTIVATION-SURFACE-001"
       ],
       "issue14_comment_id": 5946373640,
-      "automation_validation": "PASS_REMOTE_STATIC",
+      "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_AFTER_STATIC_PHASE",
       "blocker": "Native fog shader behavior is intentionally not implemented or activated. Exact-build exhaustive census and Quest 3/VDXR parity remain required before native Draw* activation.",
       "next_action": "Consume the exact-SHA Backend Conversion Gate result for a564becad3d390c84034e3bd666b2714f5781d81 when complete. Then use exhaustive R119 fog evidence to determine which D3D9 fog modes actually occur before implementing shader semantics. Keep native Draw* disabled and fog translation fail-closed until exact semantics and Quest 3/VDXR parity are proven.",
       "checkpoint": "C6_STATE",
