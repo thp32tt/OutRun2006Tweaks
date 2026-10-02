@@ -7,15 +7,17 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "Q00110 AUTHORITATIVE GATE PASS: corrected validation-bearing result 291775a4b2a7b26726b87ee6d555fa8436725cb1 / Localization Automation Gate 37006267428 succeeded; runtime remains UNTESTED.",
+    "Q00110 RENDER_READY: index236/FEF70E85 exact canonical source + 15 semantic masks + accepted CLEAN_PLATE + final safe bboxes; render candidate next.",
+    "Q00110 ONE_STAGE_TO_RENDER: index94/2DA43E41 B00347 candidate has a canonical acceleration-label semantic mismatch; preserve reusable DDS/containment evidence, rerender the label, then fresh C QA.",
+    "Q00110 CANDIDATE_QA_PENDING: index51/FF2462BB A00352 input is SUPERSEDED by LOC-A-000001@d49e9cb3 candidate a1f2c28d; do not roll back or promote out of batch.",
+    "Q00110 PRODUCER_CONTRACT_REWORK: index222/DDF0392A A00351 candidate pixel/static evidence is reusable, but the immutable producer result cannot pass the current exact-SHA producer gate; re-emit/rebind under the current owning lane before promotion.",
+    "Q00110 STATIC_QA PASS: index163/59A79158 candidate fa93090c remains accepted; runtime UNTESTED.",
+    "Q00110 PREFLIGHT_ONLY: index230/E95DA5 remains SOURCE_IDENTITY_MISMATCH.",
     "LOC-C-000004 PASS: index198/9FC88069 A00208 current v2 candidate passed independent static QA and is PRODUCTION_COMPLETE; runtime UNTESTED.",
     "LOC-C-000004 REWORK_REQUIRED: index53/568D3696 LOC-E-000003 exact-bbox rework reused older Korean glyph rasters and prior localized lower mips; rebuild from exact English HD source under current generation-reset contract; runtime UNTESTED.",
     "LOC-C-000004 HOLD: indices159/4EDA9DE3 and201/A9ABD877 A00196 candidate transport/comparison identities and visual/canonical checks passed, but mandatory course-title family font-size evidence is absent; no promotion until title_family/family_target_font_size/actual_font_size/fit-reduction evidence is supplied; runtime UNTESTED.",
     "LOC-C-000004 RECONCILED: index61/C4A2937B exact B00342 candidate was already REWORK_REQUIRED in C00476@9ebdd6ae for pre-reset lineage reuse; stale QA_PENDING marker removed without duplicate QA.",
-    "V19 RETROSPECTIVE REWORK: index163/59A79158 prior PRODUCTION_COMPLETE/static PASS withdrawn; 24 stage/course rows historically used nine font sizes 36-57px. Rerender one locked stage/course typography-family size, then fresh C QA.",
-    "V19 RETROSPECTIVE REWORK: index222/DDF0392A prior PRODUCTION_COMPLETE withdrawn; restore exact-source song titles and rerender one locked song-title family font size, then fresh C QA.",
-    "V19 RETROSPECTIVE HOLD: index51/FF2462BB old static PASS cannot be reused until all stage/course rows are measured and prove one family font size; mismatch => REWORK_REQUIRED.",
-    "RENDER_READY: none authoritative after Q00073 consumed the index133 and index232 Korean candidates.",
-    "ONE_STAGE_TO_RENDER: none authoritative.",
     "RUNTIME ISOLATION READY: Q00073 accepts current-schema DDS_ONLY manifests for indices102 and231 on unchanged prior-static-QA candidates. Existing ready set is 12/51/63/99/102/195/222/231/237. No real-game validation is implied.",
     "STATIC_QA PASS: index133/25F697C6 candidate 6e5ee22d... and index232/EBFC709F candidate 41334c7d... are newly accepted; runtime remains UNTESTED.",
     "Q00073 validation-bearing result commit owns the sole Localization Automation Gate for this batch. Pre-Gate AUTOMATION_VALIDATION=PENDING; RUNTIME_VALIDATION=UNTESTED.",
@@ -111,9 +113,9 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-01T15:46:38+09:00",
+      "updated_at_kst": "2026-10-02T21:23:00+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20261001-1546-C176/C176_Q00074_INDEPENDENT_QA_BATCH.json",
+      "report": "localization/graphics/role_C/20261002-2121-C178/C178_Q00110_SEMANTIC_CORRECTION.json",
       "direct_queue_scope": 126,
       "current_candidates_scanned": 18,
       "elements_scanned": 203,
@@ -122,7 +124,9 @@
         "9F060EC1",
         "D6DC1380",
         "48DEBE77",
-        "9CE4E175"
+        "9CE4E175",
+        "59A79158",
+        "DDF0392A"
       ],
       "rework_required_assets": [
         "FF2462BB",
@@ -136,7 +140,8 @@
         "62BEBF33",
         "E3FD08BE",
         "C075FB49",
-        "FD90AA9"
+        "FD90AA9",
+        "DDF0392A"
       ],
       "failed_elements": 93,
       "pending_production_localize_text": 65,
@@ -516,7 +521,40 @@
       ],
       "q00074_automation_validation": "PASS",
       "q00074_validation_bearing_result_sha": "507a781c4ac309fc7435c9f7064faa238b2278c5",
-      "q00074_automation_gate_run_id": 36827181087
+      "q00074_automation_gate_run_id": 36827181087,
+      "q00110_reviewed_indices": [
+        51,
+        94,
+        163,
+        222,
+        230,
+        236
+      ],
+      "q00110_input_dispositions": {
+        "LOCALIZATION-LOCALIZATION_A-00351@7abc6bf2ccf534d25909aff466feb7ce5c4160ac": "REWORK_REQUIRED",
+        "LOCALIZATION-LOCALIZATION_B-00347@fa9c8bf687b17318d00bee52e615f134b6ee7b3f": "REWORK_REQUIRED",
+        "LOCALIZATION-LOCALIZATION_A-00352@b5d39094ce2f9941e7807349b563e31f4d19654b": "SUPERSEDED",
+        "LOCALIZATION-LOCALIZATION_B-00353@ff18b8aa855da74e0f1070661ff0462a53f58513": "PASS"
+      },
+      "q00110_static_pass_indices": [
+        163
+      ],
+      "q00110_rework_required_indices": [
+        94,
+        222
+      ],
+      "q00110_candidate_qa_pending_indices": [
+        51
+      ],
+      "q00110_render_ready_indices": [
+        236
+      ],
+      "q00110_preflight_only_indices": [
+        230
+      ],
+      "q00110_automation_validation": "PASS",
+      "q00110_validation_bearing_result_sha": "291775a4b2a7b26726b87ee6d555fa8436725cb1",
+      "q00110_gate_run_id": 37006267428
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {
@@ -2503,54 +2541,67 @@
     "report": "localization/graphics/role_C/20260929-0445-C95/C95_W00010_SYNC_FINAL_QA.json"
   },
   "latest_qa_batch": {
-    "schema_version": 30,
-    "task_id": "LOCALIZATION-LOCALIZATION_C-00368",
-    "wave_id": "Q00075",
-    "run": "C177",
-    "recorded_at_kst": "2026-10-01T17:27:10+09:00",
-    "result": "PASS_Q00075_TWO_PREFLIGHT_PASSES_ONE_PRODUCER_CONTRACT_REWORK_RUNTIME_UNTESTED",
+    "schema_version": 102,
+    "task_id": "LOCALIZATION-LOCALIZATION_C-00482",
+    "wave_id": "Q00110",
+    "run": "C178-CORRECTED",
+    "recorded_at_kst": "2026-10-02T21:23:00+09:00",
+    "result": "Q00110_A351_REWORK_B347_REWORK_A352_SUPERSEDED_B353_PASS",
     "qa_dispositions": [
       {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00348",
-        "result_sha": "206f8c434e75ed0b8dbed72c6aabd95e4209d933",
-        "status": "PASS"
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00350",
-        "result_sha": "033ef6c483983bd60b72bb089431a9c3ae25eddf",
-        "status": "PASS"
-      },
-      {
-        "task_id": "LOCALIZATION-LOCALIZATION_A-00364",
-        "result_sha": "923a70de1c8673194d56e7f290b322422f080a9b",
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
+        "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
         "status": "REWORK_REQUIRED"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
+        "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
+        "status": "REWORK_REQUIRED"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
+        "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b",
+        "status": "SUPERSEDED"
+      },
+      {
+        "task_id": "LOCALIZATION-LOCALIZATION_B-00353",
+        "result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513",
+        "status": "PASS"
       }
     ],
-    "throughput_kpis": {
-      "production_complete": {
-        "new_this_batch": 0
-      },
-      "candidate_awaiting_c": "PRESERVE_CURRENT_HEAD",
-      "runnable_production": "UNCHANGED_BY_THIS_BATCH",
-      "blocked_exception": "INDEX225_SOURCE_ACQUISITION_EXHAUSTED_REACTIVATION_GUARD_ACCEPTED",
-      "producer_contract_rework": [
-        "LOCALIZATION-LOCALIZATION_A-00364"
+    "readiness_reconciliation": {
+      "render_ready": [
+        236
       ],
-      "runtime_validated": []
+      "one_stage_to_render": [
+        94
+      ],
+      "candidate_qa_pending": [
+        51
+      ],
+      "preflight_only": [
+        230
+      ],
+      "static_qa_pass": [
+        163
+      ],
+      "producer_contract_rework": [
+        222
+      ]
     },
     "automation_validation": "PASS",
     "runtime_validation": "UNTESTED",
-    "result_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
-    "authoritative_result_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
-    "validation_bearing_result_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
+    "result_sha": "291775a4b2a7b26726b87ee6d555fa8436725cb1",
+    "authoritative_result_sha": "291775a4b2a7b26726b87ee6d555fa8436725cb1",
+    "validation_bearing_result_sha": "291775a4b2a7b26726b87ee6d555fa8436725cb1",
     "automation_gate": {
       "workflow": "Localization Automation Gate",
-      "run_id": 36836426454,
-      "head_sha": "50f29f674ddbd046784a6fd6854e23c247b4d90e",
+      "run_id": 37006267428,
+      "head_sha": "291775a4b2a7b26726b87ee6d555fa8436725cb1",
       "run_attempt": 1,
       "status": "completed",
       "conclusion": "success",
-      "validated_at_kst": "2026-10-01T17:27:55+09:00"
+      "validated_at_kst": "2026-10-02T21:23:00+09:00"
     }
   },
   "typography_v19_reaudit": {
@@ -2563,24 +2614,7 @@
       "SAME_VISUAL_FAMILY_FIXED_FONT_SIZE",
       "NO_PER_STRING_FONT_SIZE_REDUCTION"
     ],
-    "confirmed_rework_required": [
-      {
-        "index": 163,
-        "asset": "59A79158",
-        "reason": "EXPLICIT_HISTORICAL_NONUNIFORM_STAGE_COURSE_FONT_SIZES_36_TO_57PX_NINE_SIZES",
-        "required_fix": "RERENDER_24_STAGE_COURSE_ROWS_WITH_ONE_LOCKED_TYPOGRAPHY_FAMILY_SIZE_THEN_FRESH_C_QA",
-        "prior_completion_must_not_be_reused": true,
-        "runtime_validation": "UNTESTED"
-      },
-      {
-        "index": 222,
-        "asset": "DDF0392A",
-        "reason": "PRIOR_PRODUCTION_COMPLETE_CONTAINS_TRANSLATED_SONG_TITLES_AND_PRE_V19_FAMILY_EVIDENCE",
-        "required_fix": "RESTORE_EXACT_SOURCE_SONG_TITLES_AND_RERENDER_WITH_ONE_LOCKED_SONG_TITLE_FAMILY_SIZE_THEN_FRESH_C_QA",
-        "prior_completion_must_not_be_reused": true,
-        "runtime_validation": "UNTESTED"
-      }
-    ],
+    "confirmed_rework_required": [],
     "existing_completion_policy": "NO_PRE_V19_COMPLETION_WITH_AFFECTED_TITLE_FAMILY_MAY_REUSE_STATIC_PASS_UNLESS_V19_NAMING_AND_TYPOGRAPHY_FAMILY_EVIDENCE_IS_PRESENT",
     "c_action": "AUDIT_AFFECTED_EXISTING_COMPLETIONS_BEFORE_REUSE_OR_RUNTIME_ISOLATION",
     "affected_inventory_indices": [
@@ -2597,21 +2631,39 @@
       163,
       222
     ],
-    "hold_strict_recheck": [
-      {
-        "index": 51,
-        "asset": "FF2462BB",
-        "reason": "PRE_V19_STATIC_PASS_HAS_STAGE_COURSE_FAMILY_WITHOUT_UNIFORM_FONT_SIZE_EVIDENCE",
-        "required_check": "MEASURE_ALL_STAGE_COURSE_ROWS_NATIVE_FONT_SIZE_AND_ASSIGN_TYPOGRAPHY_FAMILY_ID_BEFORE_PASS_REUSE"
-      }
-    ],
+    "hold_strict_recheck": [],
     "pending_not_completed_apply_on_production": [
       46,
       86,
       128,
       143
     ],
-    "audit_summary": "7 affected assets; 3 prior completed/static-pass affected; 2 confirmed REWORK_REQUIRED; 1 HOLD_STRICT_RECHECK; 4 pending production under v19"
+    "audit_summary": "Q00110 corrected: index163 v19 candidate passes static QA; index51 old audit is superseded by newer candidate pending separate C QA; index222 pixel evidence is reusable but producer result requires current-lane re-emission before promotion.",
+    "resolved_static_qa": [
+      {
+        "index": 163,
+        "asset": "59A79158",
+        "candidate_sha256": "fa93090c5fe818b2006040dde1515c4027b7292504d5d4f785521fd3991e10ab",
+        "qa_task": "LOCALIZATION-LOCALIZATION_C-00482",
+        "status": "PASS_STATIC_QA_RUNTIME_UNTESTED"
+      }
+    ],
+    "newer_candidate_qa_pending": [
+      {
+        "index": 51,
+        "asset": "FF2462BB",
+        "result_sha": "d49e9cb300914d057d81417c9cebcbacf3a35b33",
+        "candidate_sha256": "a1f2c28d9461d8c8bcbf4dfd3df96c8e8b52f3e2265699ff2590941d9c8fa6ea"
+      }
+    ],
+    "producer_contract_rework": [
+      {
+        "index": 222,
+        "asset": "DDF0392A",
+        "source_result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
+        "reason": "CURRENT_EXACT_SHA_PRODUCER_GATE_REQUIRES_REEMIT_OR_REBIND_UNDER_CURRENT_OWNING_LANE"
+      }
+    ]
   },
   "packaging": {
     "status": "pending",
