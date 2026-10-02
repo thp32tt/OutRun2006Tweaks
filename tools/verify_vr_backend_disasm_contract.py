@@ -63,6 +63,24 @@ def verify_dxvk_continuation_chain() -> None:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} is missing its provenance collector"
             )
+        analyzer_source = (ROOT / "tools/analyze_outrun_exe.py").read_text(encoding="utf-8")
+        provenance_name = (
+            f"guarded_gf_target_c_helper_1_third_callee_continuation_"
+            f"{continuation_id}_provenance"
+        )
+        provenance_report_binding = (
+            f'"{provenance_name}": '
+            f"collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
+            f"{continuation_id}_provenance(pe)"
+        )
+        if provenance_report_binding not in analyzer_source:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} missing analyzer report binding"
+            )
+        if f"{provenance_name}=FAILED" not in analyzer_source:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} missing analyzer failure guard"
+            )
         start = value(f"{prefix}_RVA")
         probe_len = value(f"{prefix}_PROBE_LEN")
         probe_end = value(f"{prefix}_PROBE_END_RVA")
@@ -105,6 +123,23 @@ def verify_dxvk_continuation_chain() -> None:
         if not callable(proof_collector):
             raise SystemExit(
                 f"DXVK continuation {continuation_id} is missing its prefix-proof collector"
+            )
+        proof_name = (
+            f"guarded_gf_target_c_helper_1_third_callee_continuation_"
+            f"{continuation_id}_prefix_proof"
+        )
+        proof_report_binding = (
+            f'"{proof_name}": '
+            f"collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
+            f"{continuation_id}_prefix_proof(pe)"
+        )
+        if proof_report_binding not in analyzer_source:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof missing analyzer report binding"
+            )
+        if f"{proof_name}=FAILED" not in analyzer_source:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof missing analyzer failure guard"
             )
         start = value(f"{prefix}_RVA")
         probe_end = value(f"{prefix}_PROBE_END_RVA")
