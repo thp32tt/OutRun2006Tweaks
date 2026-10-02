@@ -55,11 +55,21 @@ def test_branch_target_format_is_checked() -> None:
 
 
 def test_required_overlap_is_checked() -> None:
-    assert "required overlap bytes mismatch" in module.validate(
+    assert "required_overlap bytes mismatch" not in module.validate(
         {
             "start_rva": "0x100",
             "end_rva": "0x120",
-            "overlap_bytes": "90",
+            "overlap_bytes": "66 0f 54",
             "required_overlap_bytes": "66 0f 54",
+        }
+    )
+
+
+def test_invalid_hex_overlap_is_rejected() -> None:
+    assert "invalid overlap byte encoding" in module.validate(
+        {
+            "start_rva": "0x100",
+            "end_rva": "0x120",
+            "overlap_bytes": "gg",
         }
     )

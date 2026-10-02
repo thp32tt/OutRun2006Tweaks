@@ -17,6 +17,14 @@ import json
 from pathlib import Path
 
 
+def _validate_hex_bytes(value: str, label: str, errors: list[str]) -> None:
+    tokens = value.split()
+    if any(len(token) != 2 for token in tokens):
+        errors.append(f"invalid {label} byte width")
+    elif any(any(char not in "0123456789abcdefABCDEF" for char in token) for token in tokens):
+        errors.append(f"invalid {label} byte encoding")
+
+
 def validate(record: dict) -> list[str]:
     errors: list[str] = []
     start = record.get("start_rva")
@@ -35,9 +43,7 @@ def validate(record: dict) -> list[str]:
         if not isinstance(overlap, str):
             errors.append("overlap_bytes must be text")
         else:
-            tokens = overlap.split()
-            if any(len(token) != 2 for token in tokens):
-                errors.append("invalid overlap byte width")
+            _validate_hex_bytes(overlap, "overlap", errors)
 
     targets = record.get("branch_targets", [])
     if not isinstance(targets, list):
@@ -46,8 +52,13 @@ def validate(record: dict) -> list[str]:
         errors.append("invalid branch target format")
 
     expected = record.get("required_overlap_bytes")
-    if expected is not None and overlap != expected:
-        errors.append("required overlap bytes mismatch")
+    if expected is not None:
+        if not isinstance(expected, str):
+            errors.append("required_overlap_bytes must be text")
+        else:
+            _validate_hex_bytes(expected, "required overlap", errors)
+            if overlap != expected:
+                errors.append("required overlap bytes mismatch")
 
     if record.get("semantic_promotion", False) is True:
         errors.append("semantic promotion is forbidden for provenance-only evidence")
