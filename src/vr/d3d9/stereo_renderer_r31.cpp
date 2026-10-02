@@ -330,16 +330,16 @@ namespace OutRunVRStereo
                 return {};
             }
 
-            if (!EnsureStereoResources(device))
+            if (!EnsureStereoResourcesForDispatch(device))
                 return {};
             if (TrackedDepthStencilSnapshot() &&
                 (!IsRightDepthSynchronized() || !IsRightStencilSynchronized()))
-                TryBootstrapRightDepthFromRecentClear(device);
+                TryBootstrapRightDepthForDispatch(device);
             if (TrackedDepthStencilSnapshot() && !IsRightDepthSynchronized() &&
-                DepthTestActive(device))
+                DepthTestActiveForDispatch(device))
                 return {};
             if (TrackedDepthStencilSnapshot() && !IsRightStencilSynchronized() &&
-                StencilTestActive(device))
+                StencilTestActiveForDispatch(device))
                 return {};
 
             OutRunVRRenderer::LatchedStereoFrame stereo{};
@@ -486,16 +486,16 @@ namespace OutRunVRStereo
                 if (!R31LiveShaderMatches(device, cachedShader))
                     return {};
             }
-            if (!EnsureStereoResources(device))
+            if (!EnsureStereoResourcesForDispatch(device))
                 return {};
             if (TrackedDepthStencilSnapshot() &&
                 (!IsRightDepthSynchronized() || !IsRightStencilSynchronized()))
-                TryBootstrapRightDepthFromRecentClear(device);
+                TryBootstrapRightDepthForDispatch(device);
             if (TrackedDepthStencilSnapshot() && !IsRightDepthSynchronized() &&
-                DepthTestActive(device))
+                DepthTestActiveForDispatch(device))
                 return {};
             if (TrackedDepthStencilSnapshot() && !IsRightStencilSynchronized() &&
-                StencilTestActive(device))
+                StencilTestActiveForDispatch(device))
                 return {};
 
             OutRunVRRenderer::LatchedStereoFrame stereo{};
