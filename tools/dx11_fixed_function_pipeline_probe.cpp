@@ -1106,7 +1106,63 @@ int main()
             "R189 D3DTOP_MODULATEINVALPHA_ADDCOLOR must remain fail-closed as ALPHAOP");
     }
 
+    {
+        std::array<FixedFunctionStageState, 8> modulateInvColorAddAlphaStages{};
+        modulateInvColorAddAlphaStages[0].colorOp =
+            D3DTOP_MODULATEINVCOLOR_ADDALPHA;
+        modulateInvColorAddAlphaStages[0].colorArg1 = D3DTA_TEXTURE;
+        modulateInvColorAddAlphaStages[0].colorArg2 = D3DTA_DIFFUSE;
+        modulateInvColorAddAlphaStages[0].alphaOp = D3DTOP_SELECTARG1;
+        modulateInvColorAddAlphaStages[0].alphaArg1 = D3DTA_DIFFUSE;
+        modulateInvColorAddAlphaStages[0].alphaArg2 = D3DTA_CURRENT;
+        modulateInvColorAddAlphaStages[0].minFilter = D3DTEXF_POINT;
+        modulateInvColorAddAlphaStages[0].magFilter = D3DTEXF_POINT;
+        modulateInvColorAddAlphaStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto modulateInvColorAddAlphaShader =
+            generate_fixed_function_pixel_shader_prototype(
+                modulateInvColorAddAlphaStages, true, 0x01u, 0x01u,
+                textureTypes);
+        require(
+            modulateInvColorAddAlphaShader.generated() &&
+                modulateInvColorAddAlphaShader.activeStages == 1,
+            "R190 D3DTOP_MODULATEINVCOLOR_ADDALPHA COLOROP must become shader-exact");
+        require(
+            modulateInvColorAddAlphaShader.source.find(
+                "float3 nextColor = (1.0 - sampled0.rgb) * input.diffuse.rgb + sampled0.a;") !=
+                std::string::npos &&
+            modulateInvColorAddAlphaShader.source.find(
+                "float nextAlpha = input.diffuse.a;") !=
+                std::string::npos,
+            "R190 D3DTOP_MODULATEINVCOLOR_ADDALPHA shader expression drift");
+        const auto modulateInvColorAddAlphaCompile =
+            compile_fixed_function_pixel_shader_prototype(
+                modulateInvColorAddAlphaShader);
+        require(
+            modulateInvColorAddAlphaCompile.attempted &&
+            modulateInvColorAddAlphaCompile.succeeded &&
+            modulateInvColorAddAlphaCompile.result == S_OK &&
+            modulateInvColorAddAlphaCompile.bytecodeBytes != 0,
+            "R190 D3DTOP_MODULATEINVCOLOR_ADDALPHA fixed-function shader prototype did not compile");
+
+        auto invalidAlphaStages = modulateInvColorAddAlphaStages;
+        invalidAlphaStages[0].colorOp = D3DTOP_SELECTARG1;
+        invalidAlphaStages[0].colorArg1 = D3DTA_DIFFUSE;
+        invalidAlphaStages[0].alphaOp =
+            D3DTOP_MODULATEINVCOLOR_ADDALPHA;
+        invalidAlphaStages[0].alphaArg1 = D3DTA_TEXTURE;
+        invalidAlphaStages[0].alphaArg2 = D3DTA_DIFFUSE;
+        const auto invalidAlphaReadiness =
+            translate_fixed_function_readiness(
+                invalidAlphaStages, true, 0x01u, 0x01u);
+        require(
+            (invalidAlphaReadiness.unsupported &
+             FixedFunctionUnsupportedAlphaOp) != 0,
+            "R190 D3DTOP_MODULATEINVCOLOR_ADDALPHA must remain fail-closed as ALPHAOP");
+    }
+
     std::cout
+        << "DX11 fixed-function D3DTOP_MODULATEINVCOLOR_ADDALPHA COLOROP support R190: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATEINVALPHA_ADDCOLOR COLOROP support R189: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATECOLOR_ADDALPHA COLOROP support R188: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATEALPHA_ADDCOLOR COLOROP support: PASS\n"
