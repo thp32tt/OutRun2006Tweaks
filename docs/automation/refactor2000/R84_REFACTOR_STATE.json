@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1268,
+  "cycle": 1274,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -265,11 +265,13 @@
     "R84-REF-GATED-CMAKE-0003",
     "R84-REF-GATEE-BASEAPI-0003",
     "R84-REF-PRODGRAPH-0001",
-    "R84-REF-FINALVERIFY-0001"
+    "R84-REF-FINALVERIFY-0001",
+    "R84-REF-CMAKE-PARITY-0001",
+    "R84-REF-WORKFLOW-ISOLATION-0001"
   ],
-  "next": "Consume Gate C run 36999194285/job 110812730420. Production R26+HUD graph remains isolated: R34 hidden, R30_r26_safe active, renderer_r23 active. Final verifier cleanup must only forbid textual R29-R34 includes after all A-E split gates are green.",
-  "updatedKst": "2026-10-02T20:20:00+09:00",
-  "batchStatus": "R84_GATE_C_BUILD_RUNNING_PRODUCTION_GUARD_REVIEW_CYCLE_1268",
+  "next": "Consume exact Gate C BUILD_GATE 1256 run 36999194285/job 110812730420, now in actual Build cumulative split graph step. If green, immediately apply Gate D R31/R30 split; otherwise repair first concrete compile/link issue.",
+  "updatedKst": "2026-10-02T20:23:00+09:00",
+  "batchStatus": "R84_GATE_C_BUILD_RUNNING_CONFIG_PARITY_CYCLE_1274",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -508,7 +510,9 @@
     "Cycles 1257-1259 R84-REF-GATED-CMAKE-0003: designed Gate D cumulative split from existing Gate C pattern. Required changes are limited to guarding R31's stereo_renderer_r30.cpp include, enabling stereo_renderer_r30.cpp as non-HEADER_FILE_ONLY only when D follows C, and adding the same option to cmake.toml/workflow. Existing screen_space_hooks.hpp/screen-space APIs cover runtime calls. APPLY_GATE 1259 NO_SAFE_CHANGE until Gate C green.",
     "Cycles 1260-1262 R84-REF-GATEE-BASEAPI-0003: designed Gate E lower base API. R30 hook transaction targets base R7 PresentDest/ResetDest plus R29 draw hooks. PresentDest/ResetDest signatures and ownership were verified in stereo_renderer_r7.inc; linkage-only API exposure is required before R29 include removal. APPLY_GATE 1262 NO_SAFE_CHANGE. BUILD_GATE 1262 REUSED_BUILD_EVIDENCE=PENDING run 36999194285 because build input unchanged since 1256. Runtime NEED_HMD_TEST.",
     "Cycles 1263-1265 R84-REF-PRODGRAPH-0001: reviewed production OUTRUN_VR_R26_HUD_COMPARE ownership. Split-gate work does not alter the production comparison block: R34 stays HEADER_FILE_ONLY, stereo_renderer_r30_r26_safe is the sole stereo owner, and outrun_renderer_r23 remains renderer owner. APPLY_GATE 1265 NO_SAFE_CHANGE while Gate C validates.",
-    "Cycles 1266-1268 R84-REF-FINALVERIFY-0001: reviewed final verifier strategy. Existing verifier still references all five textual includes because staged gates intentionally preserve lower seams; final cleanup must invert these guards only after A-E are build-green, then reject any stereo_renderer_r29..r33.cpp textual include reintroduction. APPLY_GATE 1268 NO_SAFE_CHANGE. BUILD_GATE 1268 REUSED_BUILD_EVIDENCE=PENDING run 36999194285/job 110812730420. Runtime NEED_HMD_TEST."
+    "Cycles 1266-1268 R84-REF-FINALVERIFY-0001: reviewed final verifier strategy. Existing verifier still references all five textual includes because staged gates intentionally preserve lower seams; final cleanup must invert these guards only after A-E are build-green, then reject any stereo_renderer_r29..r33.cpp textual include reintroduction. APPLY_GATE 1268 NO_SAFE_CHANGE. BUILD_GATE 1268 REUSED_BUILD_EVIDENCE=PENDING run 36999194285/job 110812730420. Runtime NEED_HMD_TEST.",
+    "Cycles 1269-1271 R84-REF-CMAKE-PARITY-0001: verified CMakeLists.txt and cmake.toml split-option parity for Gate A/B/C: R34_R33 refs 4/4, R33_R32 refs 4/4, R32_R31 refs 3/3. No canonical-source drift detected. APPLY_GATE 1271 NO_SAFE_CHANGE.",
+    "Cycles 1272-1274 R84-REF-WORKFLOW-ISOLATION-0001: verified vr-refactor-build.yml enables exactly Gate A/B/C cumulative split flags while forcing SAFE_DRAW/R26_HUD/C1/C2 comparison options OFF, keeping refactor validation isolated from production comparison graph. APPLY_GATE 1274 NO_SAFE_CHANGE. BUILD_GATE 1274 REUSED_BUILD_EVIDENCE=IN_PROGRESS run 36999194285/job 110812730420, currently Build cumulative split graph. Runtime NEED_HMD_TEST."
   ],
   "campaign": {
     "startCycle": 1202,
