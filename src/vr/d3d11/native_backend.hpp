@@ -602,6 +602,20 @@ struct NativeFixedFunctionPipelineReadiness {
     std::uint64_t snapshotToken{};
 };
 
+// R134 observes the concrete IA/VS/PS objects after the dormant R132 binder.
+// Its token is tied to the exact R112 translation snapshot and same-device COM
+// identities. This is observation evidence only and never issues Draw*.
+struct NativeFixedFunctionPipelineBindingReadiness {
+    bool inputValid{};
+    bool bundleReady{};
+    bool contextMatches{};
+    bool translationSnapshotValid{};
+    bool boundExact{};
+    bool ready{};
+    std::uint64_t pipelineSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
 // R115 composes the independently proven R112 pipeline snapshot and R110/R111
 // managed-texture stage snapshot into one fail-closed activation-candidate
 // identity. This is evidence only: it does not bind state or route a game draw.
@@ -782,6 +796,7 @@ struct NativeFixedFunctionDrawReadiness {
     bool ready{};
     std::uint32_t requiredTextureMask{};
     std::uint64_t activationSnapshotToken{};
+    std::uint64_t pipelineSnapshotToken{};
     std::uint64_t renderStateSnapshotToken{};
     std::uint64_t surfacePairSnapshotToken{};
     std::uint64_t outputStateSnapshotToken{};
@@ -841,6 +856,33 @@ compose_fixed_function_textured_draw_readiness(
     const NativeFixedFunctionTextureView& texture,
     std::uint64_t snapshotToken) noexcept;
 
+// R134 composes the existing output/surface/PS/geometry evidence with a live
+// exact R97 IA/VS/PS binding snapshot. The pipeline token must match the one
+// sealed by the activation carried inside the draw candidate.
+struct NativeFixedFunctionBoundDrawReadiness {
+    bool inputValid{};
+    bool texturedDrawReady{};
+    bool pipelineBindingReady{};
+    bool pipelineBindingMatchesDraw{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t texturedDrawSnapshotToken{};
+    std::uint64_t pipelineBindingSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionBoundDrawReadiness
+compose_fixed_function_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionTexturedDrawReadiness& texturedDraw,
+    const NativeFixedFunctionPipelineBindingReadiness& pipelineBinding) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionTexturedDrawReadiness& texturedDraw,
+    const NativeFixedFunctionPipelineBindingReadiness& pipelineBinding,
+    std::uint64_t snapshotToken) noexcept;
+
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
 // input layout, and R96 transform buffer. No game draw path constructs or
 // binds this bundle yet.
@@ -880,6 +922,19 @@ public:
         const FixedFunctionVertexShaderPrototype& vertexPrototype,
         const FixedFunctionPixelShaderPrototype& pixelPrototype,
         std::uint64_t snapshotToken) const noexcept;
+    [[nodiscard]] NativeFixedFunctionPipelineBindingReadiness binding_readiness(
+        ID3D11DeviceContext* context,
+        const VertexInputLayoutTranslation& layout,
+        const FixedFunctionVertexShaderPrototype& vertexPrototype,
+        const FixedFunctionPixelShaderPrototype& pixelPrototype,
+        std::uint64_t pipelineSnapshotToken) const noexcept;
+    [[nodiscard]] bool validate_binding_snapshot(
+        ID3D11DeviceContext* context,
+        const VertexInputLayoutTranslation& layout,
+        const FixedFunctionVertexShaderPrototype& vertexPrototype,
+        const FixedFunctionPixelShaderPrototype& pixelPrototype,
+        std::uint64_t pipelineSnapshotToken,
+        std::uint64_t bindingSnapshotToken) const noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
         return device_ && vertex_shader_ && pixel_shader_ && input_layout_ &&
