@@ -83,6 +83,48 @@ jobs:
       - name: Build Win32
         run: cmake --build build-auto --config Release --target outrun2006tweaks
 
+      - name: Verify binary exists
+        shell: pwsh
+        run: |
+          $dll = Get-ChildItem build-auto -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw "dinput8.dll missing" }
+          if ($dll.Length -lt 1000000) { throw "dinput8.dll unexpectedly small" }
+          Write-Host "AUTOMATION_VALIDATION candidate built from $env:GITHUB_SHA"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-autovalidated-${{ github.ref_name }}-${{ github.sha }}
+          path: |
+            build-auto/bin/dinput8.dll
+          if-no-files-found: error
+
+  dx11-smoke:
+    name: DX11 readiness smoke probes
+    if: github.ref_name == 'vr-dx11-native-r71'
+    needs: validate
+    runs-on: windows-2022
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 2
+
+      - name: Configure Win32
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-auto -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-auto/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-auto/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-auto/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-auto/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
+          (Get-Content build-auto/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-auto/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+
       - name: Build DX11 fixed-function shader semantic smoke
         run: cmake --build build-auto --config Release --target dx11_fixed_function_shader_semantics
 
@@ -170,18 +212,3 @@ jobs:
           if (-not $probe) { throw "DX11 native transport probe executable missing" }
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 native transport probe failed with exit code $LASTEXITCODE" }
-
-      - name: Verify binary exists
-        shell: pwsh
-        run: |
-          $dll = Get-ChildItem build-auto -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
-          if (-not $dll) { throw "dinput8.dll missing" }
-          if ($dll.Length -lt 1000000) { throw "dinput8.dll unexpectedly small" }
-          Write-Host "AUTOMATION_VALIDATION candidate built from $env:GITHUB_SHA"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: backend-autovalidated-${{ github.ref_name }}-${{ github.sha }}
-          path: |
-            build-auto/bin/dinput8.dll
-          if-no-files-found: error
