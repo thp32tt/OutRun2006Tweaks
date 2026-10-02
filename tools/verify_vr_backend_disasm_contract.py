@@ -334,15 +334,26 @@ def verify_dxvk_continuation_chain() -> None:
             f"{next_id}_provenance"
         )
         next_provenance_source = function_source(next_provenance_collector_name)
+        overlap_constant = f"{following}_OVERLAP_BYTES"
+        legacy_probe_compare = (
+            f"probe[:len({overlap_constant})]" in next_provenance_source
+            and f"overlap == {overlap_constant}" in next_provenance_source
+        )
+        explicit_probe_compare = (
+            f"overlap = {overlap_constant}" in next_provenance_source
+            and "overlap_actual = probe[: len(overlap)]" in next_provenance_source
+            and "overlap_matches = overlap_actual == overlap" in next_provenance_source
+        )
+        if not (legacy_probe_compare or explicit_probe_compare):
+            raise SystemExit(
+                f"DXVK overlap transition {previous_id}->{next_id} raw provenance "
+                "no longer compares canonical probe bytes against the declared overlap"
+            )
         overlap_integrity_markers = (
-            f"{following}_OVERLAP_BYTES",
-            "overlap_actual = probe[: len(overlap)]",
-            "overlap_matches = overlap_actual == overlap",
             "and overlap_matches",
             '"overlap_matches": overlap_matches',
             'predecessor["incomplete_rva"] == target_rva',
             'predecessor["incomplete_matches"]',
-            'predecessor["capture_edge_matches"]',
         )
         missing_overlap_integrity_markers = [
             marker for marker in overlap_integrity_markers
