@@ -1,0 +1,25 @@
+{
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00476",
+  "lane": "LOCALIZATION_C",
+  "validation_mode": "C_BATCH_GATE",
+  "inputs_verified": [
+    "LOCALIZATION-LOCALIZATION_B-00062@2579efe87a6f20d7a9c12c930dec122d125d04d8",
+    "LOCALIZATION-LOCALIZATION_B-00167@1d0c05d29118192c5c10f40ee857fb26ae366622",
+    "LOCALIZATION-LOCALIZATION_B-00253@434c0169e1b34f5c9ee1bcc3952300a921361cd1",
+    "LOCALIZATION-LOCALIZATION_B-00277@a29d448a64014c1020a025509878a5ad5dba56c9"
+  ],
+  "static_reconcile": {
+    "status": "REVIEWED",
+    "result": "STATIC_PASS_PENDING_FINAL_QA_ARTIFACT_CONFIRMATION",
+    "runtime_validation": "UNTESTED"
+  },
+  "checks": {
+    "b00062_verified": true,
+    "b00167_verified": true,
+    "b00253_verified": true,
+    "b00277_verified": true,
+    "partial_batch": false,
+    "ci_skip_directive_used": false
+  },
+  "result": "C_BATCH_STATIC_RECONCILE_COMPLETE"
+}
