@@ -457,7 +457,7 @@ int main()
             modifierReadiness.exact() &&
             (modifierReadiness.unsupported &
              FixedFunctionUnsupportedArgument) == 0,
-            "R175 supported D3DTA modifiers must remain shader-exact");
+            "R178 supported D3DTA modifiers must remain shader-exact");
 
         const auto modifierShader =
             generate_fixed_function_pixel_shader_prototype(
@@ -470,7 +470,7 @@ int main()
             modifierShader.source.find(
                 "float nextAlpha = (1.0 - input.diffuse.a);") !=
                 std::string::npos,
-            "R175 complement/alpha-replicate shader expression drift");
+            "R178 complement/alpha-replicate shader expression drift");
 
         const auto modifierCompile =
             compile_fixed_function_pixel_shader_prototype(modifierShader);
@@ -478,7 +478,7 @@ int main()
             modifierCompile.attempted && modifierCompile.succeeded &&
             modifierCompile.result == S_OK &&
             modifierCompile.bytecodeBytes != 0,
-            "R175 D3DTA modifier shader prototype did not compile");
+            "R178 D3DTA modifier shader prototype did not compile");
 
         auto unknownModifierStages = modifierStages;
         unknownModifierStages[0].colorArg1 = D3DTA_TEXTURE | 0x40u;
@@ -489,7 +489,7 @@ int main()
             !unknownModifierReadiness.exact() &&
             (unknownModifierReadiness.unsupported &
              FixedFunctionUnsupportedArgument) != 0,
-            "R175 unknown D3DTA modifier bits must fail closed");
+            "R178 unknown D3DTA modifier bits must fail closed");
     }
 
     {
@@ -550,7 +550,7 @@ int main()
 
     std::cout
         << "DX11 fixed-function D3DTOP_SUBTRACT support R177: PASS\n"
-        << "DX11 fixed-function argument modifiers R175: PASS\n"
+        << "DX11 fixed-function argument modifiers R178: PASS\n"
         << "DX11 fixed-function D3DTOP_ADD support: PASS\n"
         << "DX11 fixed-function RESULTARG fail-closed R173: PASS\n"
         << "DX11 multisample raster provenance R171: PASS\n"
