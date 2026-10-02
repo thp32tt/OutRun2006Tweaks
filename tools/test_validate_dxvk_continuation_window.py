@@ -1,20 +1,30 @@
 #!/usr/bin/env python3
-"""Minimal regression test for DXVK continuation window validation."""
+"""Regression tests for DXVK continuation-window evidence validation."""
 
-import tempfile
-from pathlib import Path
-
-from validate_dxvk_continuation_window import validate_window
+from Validate-DXVK-ContinuationWindow import validate_window
 
 
-def test_overlap_bytes_match():
-    with tempfile.TemporaryDirectory() as tmp:
-        path = Path(tmp) / "sample.bin"
-        path.write_bytes(bytes.fromhex("90 66 0f 54 1d 20 91 61 90"))
-        result = validate_window(path.read_bytes(), 1, "66 0f 54 1d 20 91 61")
-        assert result["matches"] is True
+def test_exact_frontier_accepts_canonical_window():
+    record = {
+        "lane": "DXVK",
+        "follow_on_frontier": {
+            "provenance_status": "EXACT_EXE_182F7E_TO_182FBE_PROVENANCE_CAPTURED",
+            "overlap_bytes": "66 0f 54 1d 20 91 61",
+            "provenance_start_rva": "0x00182F7E",
+            "probe_end_rva": "0x00182FBE",
+        },
+    }
+    assert validate_window(record) == []
 
 
-if __name__ == "__main__":
-    test_overlap_bytes_match()
-    print("ok")
+def test_frontier_rejects_changed_overlap():
+    record = {
+        "lane": "DXVK",
+        "follow_on_frontier": {
+            "provenance_status": "EXACT_EXE_182F7E_TO_182FBE_PROVENANCE_CAPTURED",
+            "overlap_bytes": "90 90",
+            "provenance_start_rva": "0x00182F7E",
+            "probe_end_rva": "0x00182FBE",
+        },
+    }
+    assert "mandatory overlap bytes do not match" in validate_window(record)
