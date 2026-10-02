@@ -45,7 +45,7 @@ namespace OutRunVRStereo
             OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
             R22FailClosedEligibility();
             R22ResetBaselineTracking();
-            R22ShadowState = {};
+            InvalidateTrackedRasterShadow();
             R33InvalidateDepthStencilCache();
             R29ArmMonoSafety();
             RightDepthSynchronized = false;
