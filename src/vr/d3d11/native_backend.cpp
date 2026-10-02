@@ -1894,16 +1894,16 @@ compose_fixed_function_draw_readiness(
         out.geometryReady &&
         out.componentSnapshotsPresent;
     if (out.ready) {
-        std::uint64_t token = 0xcbf29ce484222325ull;
-        token = mix_readiness_snapshot_token(
-            token, out.activationSnapshotToken);
-        token = mix_readiness_snapshot_token(
-            token, out.renderStateSnapshotToken);
-        token = mix_readiness_snapshot_token(
-            token, out.surfacePairSnapshotToken);
-        token = mix_readiness_snapshot_token(
-            token, out.geometrySnapshotToken);
-        out.snapshotToken = token == 0 ? 1 : token;
+        std::uint64_t drawToken = 0xcbf29ce484222325ull;
+        drawToken = mix_readiness_snapshot_token(
+            drawToken, out.activationSnapshotToken);
+        drawToken = mix_readiness_snapshot_token(
+            drawToken, out.renderStateSnapshotToken);
+        drawToken = mix_readiness_snapshot_token(
+            drawToken, out.surfacePairSnapshotToken);
+        drawToken = mix_readiness_snapshot_token(
+            drawToken, out.geometrySnapshotToken);
+        out.snapshotToken = drawToken == 0 ? 1 : drawToken;
     }
     return out;
 }

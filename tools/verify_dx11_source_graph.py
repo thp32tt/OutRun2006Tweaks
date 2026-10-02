@@ -3152,7 +3152,7 @@ def main() -> None:
             "R122 index snapshot identity",
         "geometry.ready && geometry.snapshotToken != 0":
             "R122 geometry final-draw prerequisite",
-        "token, out.geometrySnapshotToken":
+        "drawToken, out.geometrySnapshotToken":
             "R122 geometry final-draw token identity",
     }.items():
         if token not in NATIVE_BACKEND_CPP:
@@ -3226,7 +3226,7 @@ def main() -> None:
             "R120 render-state identity in draw token",
         "drawToken, out.surfacePairSnapshotToken":
             "R120 output-surface identity in draw token",
-        "token, out.geometrySnapshotToken":
+        "drawToken, out.geometrySnapshotToken":
             "R122 geometry identity in draw token",
     }.items():
         if token not in NATIVE_BACKEND_CPP:
