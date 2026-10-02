@@ -70,7 +70,7 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "exact_next_action": "Exact-decode only complete instructions in the validated 0x00182A99..0x00182AD9 window, completing the cut rel32 CALL at 0x00182A99; preserve the trailing incomplete e8 bb bytes at the new capture edge raw-only and keep function/render/HUD/runtime semantics unresolved."
+      "exact_next_action": "Current descendant 61c62cacfad503160a9049f8b585a0ad95ce9d1f already captures the next raw overlap at 0x00182AD7..0x00182B17 (continuation 34), after descendant 666ba2c5f1c0ba377ee304d51f5a8a3c7925e334 implements the 0x00182A99..0x00182AD7 exact proof. Their immediate workflow attempts were cancelled by branch concurrency. Require a non-superseded canonical static validation containing both descendant stages before exact-decoding continuation 34; keep function/render/HUD/runtime semantics unresolved."
     }
   },
   "validation": {
@@ -94,16 +94,14 @@
     "notes": "No Quest 3/VDXR or in-game runtime test was performed. Canonical disassembly/static CI evidence is not runtime acceptance evidence."
   },
   "follow_on_frontier": {
-    "descendant_sha": "b6482cd27acd035783d021b65b1748534c3618f6",
-    "predecessor_control_flow_status": "EXACT_182A5B_TO_182A99_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
-    "provenance_target_status": "EXACT_EXE_182A99_TO_182AD9_PROVENANCE_CAPTURED",
-    "overlap_rva": "0x00182A99",
-    "overlap_bytes": "e8 01",
-    "probe_end_rva": "0x00182AD9",
-    "trailing_capture_bytes": "e8 bb",
-    "dxvk_disassembly_evidence_run_id": 36973896506,
-    "dxvk_disassembly_evidence_job_id": 110733504620,
-    "dxvk_disassembly_evidence_status": "SUCCESS"
+    "descendant_proof_sha": "666ba2c5f1c0ba377ee304d51f5a8a3c7925e334",
+    "candidate_control_flow_status": "EXACT_182A99_TO_182AD7_CONTROL_FLOW_CAPTURE_EDGE_PROVEN_REQUIRES_NON_SUPERSEDED_VALIDATION",
+    "descendant_provenance_sha": "61c62cacfad503160a9049f8b585a0ad95ce9d1f",
+    "provenance_target_status": "EXACT_EXE_182AD7_TO_182B17_PROVENANCE_CAPTURED_REQUIRES_NON_SUPERSEDED_VALIDATION",
+    "overlap_rva": "0x00182AD7",
+    "overlap_bytes": "e8 bb",
+    "probe_end_rva": "0x00182B17",
+    "runtime_validation": "UNTESTED"
   },
   "issue14_comments": [
     5946039322,
@@ -130,7 +128,7 @@
     "No localization files modified",
     "RUNTIME_VALIDATION remains UNTESTED without matching Quest 3/VDXR evidence"
   ],
-  "next_action": "Exact-decode only complete instructions in the validated 0x00182A99..0x00182AD9 window, completing the cut rel32 CALL at 0x00182A99; preserve the trailing incomplete e8 bb bytes at the new capture edge raw-only and keep function/render/HUD/runtime semantics unresolved.",
+  "next_action": "Current descendant 61c62cacfad503160a9049f8b585a0ad95ce9d1f already captures the next raw overlap at 0x00182AD7..0x00182B17 (continuation 34), after descendant 666ba2c5f1c0ba377ee304d51f5a8a3c7925e334 implements the 0x00182A99..0x00182AD7 exact proof. Their immediate workflow attempts were cancelled by branch concurrency. Require a non-superseded canonical static validation containing both descendant stages before exact-decoding continuation 34; keep function/render/HUD/runtime semantics unresolved.",
   "supplemental_completed_static_units": [
     {
       "unit_id": "DXVK_CONTINUATION_ANALYZER_WIRING_FAIL_CLOSED",
