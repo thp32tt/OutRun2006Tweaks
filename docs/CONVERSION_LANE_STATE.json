@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "b88f8970bba0a03c4bf2af09499a4a933124da67",
+  "state_parent_head": "e7d2e00aa091ba4eaf2a1515cd179e52a6763767",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -61,7 +61,7 @@
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA GitHub Build run 36992889181 passed DX11 source-graph/census and preceding static checks; Win32 Configure was cancelled by newer same-branch descendant churn and Build/binary steps were skipped, so compile/binary success is not claimed.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation; R191 now consumes captured D3DRS_TEXTUREFACTOR only in dormant fixed-function translation.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R191 texture-factor census analyzer evidence and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the latest authenticated GitHub HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R191 texture-factor consumption and R193 D3DTOP_DOTPRODUCT3 support plus all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1248,6 +1248,26 @@
       "issue14_comment_id": 5949803893,
       "validation_run_id": 36992927041,
       "validation_job_id": 110793277038
+    },
+    {
+      "unit_id": "DX11_FFP_D3DTOP_DOTPRODUCT3_SUPPORT_R193",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "5b91a2200230f1807ba4e36d3468b0e1e67ae095",
+      "implementation_commits": [
+        "71fcebb7ec6d4de166b931d934ebb15ebc02ad4c"
+      ],
+      "source_implementation_sha": "71fcebb7ec6d4de166b931d934ebb15ebc02ad4c",
+      "material_result_sha": "71fcebb7ec6d4de166b931d934ebb15ebc02ad4c",
+      "validation_bearing_sha": "71fcebb7ec6d4de166b931d934ebb15ebc02ad4c",
+      "retaining_descendant_sha": "e7d2e00aa091ba4eaf2a1515cd179e52a6763767",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36992813680 job 110792798079; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_SOURCE_TEST_ONLY",
+      "issue14_comment_id": 5949835357,
+      "validation_run_id": 36992813680,
+      "validation_job_id": 110792798079
     }
   ]
 }
