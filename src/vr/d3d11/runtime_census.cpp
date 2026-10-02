@@ -281,6 +281,16 @@ namespace outrun::vr::dx11
             // census identity so per-draw raster variants cannot alias.
             bool multisampleRasterObservationComplete{};
             DWORD multiSampleAntialias = TRUE;
+            // R176: R124 already carries the dynamic output state consumed by
+            // native DX11 binding. Seal it into census identity so draws that
+            // differ only by blend factor, sample mask, viewport or scissor
+            // cannot alias the same sampled signature.
+            bool outputStateObservationComplete{};
+            DWORD outputBlendFactor = 0xFFFFFFFFu;
+            DWORD outputMultiSampleMask = 0xFFFFFFFFu;
+            D3DVIEWPORT9 outputViewport{};
+            RECT outputScissorRect{};
+            DWORD outputScissorTestEnable = FALSE;
             // R169: D3D9 POINTLIST size/sprite/scale state affects raster and
             // texture-coordinate semantics. Preserve the complete family in
             // census identity while native direct points remain fail-closed.
@@ -346,6 +356,14 @@ namespace outrun::vr::dx11
         {
             hash ^= value + 0x9e3779b97f4a7c15ull + (hash << 6) + (hash >> 2);
             return hash;
+        }
+
+        std::uint32_t float_bits(float value) noexcept
+        {
+            static_assert(sizeof(std::uint32_t) == sizeof(float));
+            std::uint32_t bits = 0;
+            std::memcpy(&bits, &value, sizeof(bits));
+            return bits;
         }
 
         // R114/F22: hash the per-thread draw ordinal before applying the 1/64
@@ -494,6 +512,25 @@ namespace outrun::vr::dx11
             hash = hash_mix(
                 hash, sig.multisampleRasterObservationComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.multiSampleAntialias);
+            hash = hash_mix(
+                hash, sig.outputStateObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.outputBlendFactor);
+            hash = hash_mix(hash, sig.outputMultiSampleMask);
+            hash = hash_mix(hash, sig.outputViewport.X);
+            hash = hash_mix(hash, sig.outputViewport.Y);
+            hash = hash_mix(hash, sig.outputViewport.Width);
+            hash = hash_mix(hash, sig.outputViewport.Height);
+            hash = hash_mix(hash, float_bits(sig.outputViewport.MinZ));
+            hash = hash_mix(hash, float_bits(sig.outputViewport.MaxZ));
+            hash = hash_mix(
+                hash, static_cast<std::uint32_t>(sig.outputScissorRect.left));
+            hash = hash_mix(
+                hash, static_cast<std::uint32_t>(sig.outputScissorRect.top));
+            hash = hash_mix(
+                hash, static_cast<std::uint32_t>(sig.outputScissorRect.right));
+            hash = hash_mix(
+                hash, static_cast<std::uint32_t>(sig.outputScissorRect.bottom));
+            hash = hash_mix(hash, sig.outputScissorTestEnable);
             hash = hash_mix(
                 hash, sig.pointRasterObservationComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.pointSizeBits);
@@ -1506,6 +1543,23 @@ namespace outrun::vr::dx11
                     sig.multisampleRasterObservationComplete ? 1 : 0,
                     sig.multiSampleAntialias != FALSE ? 1 : 0);
                 spdlog::info(
+                    "VR DX11 R176 output state#{}: observed={} scissorEnable={} blendFactor=0x{:08X} sampleMask=0x{:08X} viewport=[{},{},{},{},minZBits=0x{:08X},maxZBits=0x{:08X}] scissor=[{},{},{},{}]",
+                    unique,
+                    sig.outputStateObservationComplete ? 1 : 0,
+                    sig.outputScissorTestEnable != FALSE ? 1 : 0,
+                    sig.outputBlendFactor,
+                    sig.outputMultiSampleMask,
+                    sig.outputViewport.X,
+                    sig.outputViewport.Y,
+                    sig.outputViewport.Width,
+                    sig.outputViewport.Height,
+                    float_bits(sig.outputViewport.MinZ),
+                    float_bits(sig.outputViewport.MaxZ),
+                    sig.outputScissorRect.left,
+                    sig.outputScissorRect.top,
+                    sig.outputScissorRect.right,
+                    sig.outputScissorRect.bottom);
+                spdlog::info(
                     "VR DX11 R170 texture-coordinate wrap state#{}: observed={} wrap=[{},{},{},{},{},{},{},{}]",
                     unique,
                     sig.textureCoordinateWrapObservationComplete ? 1 : 0,
@@ -2223,6 +2277,13 @@ namespace outrun::vr::dx11
         signature.multisampleRasterObservationComplete =
             captured && source.complete;
         signature.multiSampleAntialias = source.multiSampleAntialias;
+        signature.outputStateObservationComplete =
+            captured && source.complete && source.outputStateComplete;
+        signature.outputBlendFactor = source.blendFactor;
+        signature.outputMultiSampleMask = source.multiSampleMask;
+        signature.outputViewport = source.viewport;
+        signature.outputScissorRect = source.scissorRect;
+        signature.outputScissorTestEnable = source.scissorTestEnable;
         signature.pointRasterObservationComplete =
             captured && source.complete;
         signature.pointSizeBits = source.pointSizeBits;
