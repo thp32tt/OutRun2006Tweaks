@@ -1346,6 +1346,66 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer F36 raw frontier beginning at exact boundary 0x00182D93. Exact-decode only complete canonical instructions and resolve 0x00182D95/0x00182D96/0x00182D9A only with exact instruction-boundary evidence; keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_CONTINUATION_PROOF_SEMANTIC_QUARANTINE",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "932a583ccf87ec678f739178df6ea08eafb64ebf",
+      "validation_bearing_result_sha": "932a583ccf87ec678f739178df6ea08eafb64ebf",
+      "commit_message": "test: quarantine DXVK continuation proof semantics [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Hardened the auto-discovered DXVK continuation contract so every exact prefix proof must keep semantic_effect inside BOUNDED_CONTROL_FLOW..._ONLY, preventing bounded control-flow evidence from silently promoting function/HUD/render/runtime semantics.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch/AGENTS/lane/run/regression state and tracked concurrent same-JOB frontier advancement without using an N100/local clone."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected an independent verifier integrity gap after concurrent workers had already advanced the sequential F34/F35 canonical frontier."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 932a583ccf87ec678f739178df6ea08eafb64ebf adds generic prefix-proof semantic quarantine; no analyzer/runtime/backend behavior changed."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Remote GitHub-source audit on a descendant retaining the commit checked 22 prefix proofs through continuation_44; all matched BOUNDED_CONTROL_FLOW..._ONLY and violations=0. Same-branch churn kept Actions queued/superseded, so no CI PASS is claimed."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947455752 records the event."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static Python verifier hardening only; no runtime payload, backend binary, selector, localization or deployment content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as supplemental history without replacing the newer authoritative canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "932a583ccf87ec678f739178df6ea08eafb64ebf",
+        "base_sha": "4215fc9a85633ee5dc4a5711ebd1cb62f504bd55",
+        "automation_validation": "PASS_REMOTE_STATIC_SOURCE_AUDIT",
+        "proofs_checked": 22,
+        "latest_proof_id_at_audit": 44,
+        "semantic_quarantine_violations": 0,
+        "descendant_contains_material_commit": true,
+        "github_actions_status_at_state_write": "QUEUED_OR_SUPERSEDED_BY_SAME_BRANCH_CHURN_NO_PASS_CLAIMED",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947455752,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authoritative canonical-disassembly frontier; continue only from its latest validated edge, keep bounded control-flow proofs semantically quarantined, and consume the next non-superseded descendant static gate result."
     }
   ]
 }
