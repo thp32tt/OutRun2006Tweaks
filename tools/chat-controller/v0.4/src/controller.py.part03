@@ -1768,13 +1768,39 @@ def localization_reconcile_producer_commit_without_ui(
     now: datetime,
     source: str,
 ) -> bool:
-    """Apply the producer NO_WORK guard during startup/watchdog reconciliation."""
-    valid, reasons, _record = localization_validate_producer_result_commit(
-        str(active.get("task_id") or ""), str(task_commit.get("sha") or "")
+    """Reconcile a durable producer checkpoint on startup/watchdog without falsely ending the batch."""
+    sha = str(task_commit.get("sha") or "")
+    if localization_producer_seen_result(active, sha):
+        active["phase"] = "WAIT_CHAT"
+        active["task_latched"] = True
+        active["controller_stage"] = active.get("controller_stage") or "CONTINUE_PIPELINE"
+        return False
+
+    valid, reasons, record = localization_validate_producer_result_commit(
+        str(active.get("task_id") or ""), sha
     )
-    if valid:
-        finalize_localization_producer_commit(q, active, task_commit, now)
-        return True
+    if valid and isinstance(record, dict):
+        release, reason = localization_record_producer_checkpoint(
+            q, active, task_commit, record, now
+        )
+        active["pipeline_release_decision"] = reason
+        invalidate_task_commit_cache(
+            str(active.get("branch") or ""), str(active.get("task_id") or "")
+        )
+        if release:
+            finalize_localization_producer_commit(q, active, task_commit, now)
+            active["pipeline_release_decision"] = reason
+            return True
+        active["phase"] = "WAIT_CHAT"
+        active["terminal"] = None
+        active["task_latched"] = True
+        active["controller_stage"] = "CONTINUE_PIPELINE"
+        active["pipeline_continuation_pending"] = True
+        active["failure_context"] = f"PIPELINE_CHECKPOINT_REARMED_{source}"
+        active.pop("completed_at", None)
+        active.pop("wait_actions_started_at", None)
+        active.pop("startup_reconcile_pending", None)
+        return False
 
     active["phase"] = "WAIT_CHAT"
     active["terminal"] = None
