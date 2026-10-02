@@ -2407,6 +2407,53 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer F43 raw frontier at 0x00182F45..0x00182F85 and exact-decode only complete instructions from its validated bytes; keep any new cut edge overlapped and semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F44_CANONICAL_EXE_PROVENANCE_0x182F7E_TO_0x182FBE",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "c6af263262513aabfb3dca617fb0b907b3310b54",
+      "validation_bearing_result_sha": "a62e1cf9ab54a660aae4dda84905a9b7a9f896b6",
+      "run_record_commit_sha": "81d8c2ec0ab2099fa5323832735ae91f1f7e4886",
+      "commit_message": "dxvk: capture canonical 0x182F7E continuation [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Captured and descendant-validated 64 canonical bytes at 0x00182F7E..0x00182FBE with mandatory seven-byte overlap from the F43 cut ANDPD; predecessor identity, overlap, .text placement and probe geometry are fail-closed while fresh bytes remain raw-only.",
+      "pipeline_status": "C0_C6_COMPLETE",
+      "validation": {
+        "exact_material_sha": "c6af263262513aabfb3dca617fb0b907b3310b54",
+        "initial_dxvk_disassembly_evidence_run_id": 36983488953,
+        "initial_dxvk_disassembly_evidence_job_id": 110763138840,
+        "initial_failure": "Inherited F43 proof-chain static contract rejected proof_calls=2 before canonical EXE analysis.",
+        "validation_bearing_descendant_sha": "a62e1cf9ab54a660aae4dda84905a9b7a9f896b6",
+        "automation_validation": "PASS_DESCENDANT_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36983655888,
+        "dxvk_disassembly_evidence_job_id": 110763664199,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "artifact_id": 11215793656,
+        "artifact_digest": "sha256:6dbe4947c62abc710eefb5591bc304e9f3ad89294c51c389df5a1a436732537b",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "provenance_status": "EXACT_EXE_182F7E_TO_182FBE_PROVENANCE_CAPTURED",
+        "predecessor_status": "EXACT_182F45_TO_182F7E_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "predecessor_exact": true,
+        "probe_start_rva": "0x00182F7E",
+        "probe_end_rva": "0x00182FBE",
+        "probe_len": 64,
+        "overlap_bytes": "66 0f 54 1d 20 91 61",
+        "overlap_matches": true,
+        "predecessor_overlap_matches": true,
+        "target_section": ".text",
+        "probe_end_matches": true,
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948079715,
+      "issue14_validation_comment_id": 5948116292,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newer primary canonical frontier. F44 raw provenance at 0x00182F7E..0x00182FBE is validated; exact-decode only complete instructions if that proof is not already present, preserve any subsequent cut edge, and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
