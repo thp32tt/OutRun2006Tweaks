@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "b12603f32eceb456ec67b7ff119cafa636d5294c",
+  "state_parent_head": "15d9d6817e4aa22606425e2f42878a606e70d673",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -354,6 +354,19 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5946974703
+    },
+    {
+      "unit_id": "DX11_MULTI_STAGE_PS_BINDING_READINESS_R136",
+      "task_id": "CONV-DX11-000001",
+      "source_implementation_sha": "d2ce600b505ae770ae68549f268f3bdd055b8292",
+      "material_result_sha": "654c659552cc52adbb19f7ed6bfde3c64b7dfffc",
+      "validation_bearing_sha": "b12603f32eceb456ec67b7ff119cafa636d5294c",
+      "lineage_guard_sha": "beda8f281b61e6660cadc6f95bd2691bf4e0629e",
+      "automation_validation": "PASS_DESCENDANT_STATIC_GATE_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5947071734
     },
     {
       "unit_id": "DX11_LIVE_OUTPUT_BINDING_READBACK_R137",
