@@ -7110,6 +7110,38 @@ def main() -> None:
             + ", ".join(missing_r168_line_raster)
         )
 
+
+    r175_stream_source_frequency_contract = [
+        ("DWORD stream0Frequency = 1u;", RUNTIME_CENSUS,
+         "R175 stream0 frequency identity and D3D9 default"),
+        ("device->GetStreamSourceFreq(", RUNTIME_CENSUS,
+         "R175 live stream-frequency observation"),
+        ("0, &sig.stream0Frequency", RUNTIME_CENSUS,
+         "R175 stream0 frequency capture"),
+        ("hash = hash_mix(hash, sig.stream0Frequency);", RUNTIME_CENSUS,
+         "R175 stream-frequency signature hash"),
+        ("streamSourceFrequencyUnsupported =", RUNTIME_CENSUS,
+         "R175 non-default stream-frequency readiness predicate"),
+        ("signature.stream0Frequency != 1u", RUNTIME_CENSUS,
+         "R175 default-only exactness contract"),
+        ("!behaviorDescriptorExact || streamSourceFrequencyUnsupported",
+         RUNTIME_CENSUS, "R175 resource behavior unsupported accounting"),
+        ("managedShadowRequired || streamSourceFrequencyUnsupported",
+         RUNTIME_CENSUS, "R175 resourcesExact fail-closed gate"),
+        ("VR DX11 R175 stream0-frequency state#{}", RUNTIME_CENSUS,
+         "R175 detailed stream-frequency telemetry"),
+    ]
+    missing_r175_stream_source_frequency = [
+        meaning
+        for token, source, meaning in r175_stream_source_frequency_contract
+        if token not in source
+    ]
+    if missing_r175_stream_source_frequency:
+        raise SystemExit(
+            "DX11 R175 stream-source-frequency contract drift: "
+            + ", ".join(missing_r175_stream_source_frequency)
+        )
+
     r174_source_mrt_contract = [
         ("bool auxiliaryRenderTargetObservationComplete = true;", RUNTIME_CENSUS,
          "R174 auxiliary MRT observation identity"),

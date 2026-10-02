@@ -198,6 +198,10 @@ namespace outrun::vr::dx11
             std::array<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1> vertexDeclElementsData{};
             UINT streamOffset{};
             UINT stride{};
+            // R175: D3D9 stream frequency controls indexed/instanced vertex
+            // reuse. The dormant DX11 input layout is strictly per-vertex, so
+            // only the D3D9 default frequency of one is currently exact.
+            DWORD stream0Frequency = 1u;
             DWORD vertexUsage{};
             D3DPOOL vertexPool = D3DPOOL_FORCE_DWORD;
             DWORD indexUsage{};
@@ -358,6 +362,7 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.vertexDeclElements);
             hash = hash_mix(hash, sig.streamOffset);
             hash = hash_mix(hash, sig.stride);
+            hash = hash_mix(hash, sig.stream0Frequency);
             hash = hash_mix(hash, sig.vertexUsage);
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.vertexPool));
             hash = hash_mix(hash, sig.indexUsage);
@@ -1003,6 +1008,13 @@ namespace outrun::vr::dx11
                 vb->Release();
             }
 
+            // R175: GetStreamSource does not expose D3D9 instancing
+            // frequency. Observe it independently so INDEXEDDATA/
+            // INSTANCEDATA semantics cannot alias an ordinary vertex stream.
+            if (FAILED(device->GetStreamSourceFreq(
+                    0, &sig.stream0Frequency)))
+                sig.resourceIntrospectionComplete = false;
+
             IDirect3DSurface9* rt0 = nullptr;
             const HRESULT rtHr = device->GetRenderTarget(0, &rt0);
             if (FAILED(rtHr) || !rt0)
@@ -1482,6 +1494,10 @@ namespace outrun::vr::dx11
                     sig.textureCoordinateWrap[4], sig.textureCoordinateWrap[5],
                     sig.textureCoordinateWrap[6], sig.textureCoordinateWrap[7]);
 
+                spdlog::info(
+                    "VR DX11 R175 stream0-frequency state#{}: frequency=0x{:08X}",
+                    unique,
+                    sig.stream0Frequency);
                 spdlog::info(
                     "VR DX11 R174 source MRT state#{}: observed={} mask=0x{:02X}",
                     unique,
@@ -2222,6 +2238,9 @@ namespace outrun::vr::dx11
             resourcesExact = false;
         }
 
+        const bool streamSourceFrequencyUnsupported =
+            signature.stream0Frequency != 1u;
+
         bool behaviorDescriptorExact = true;
         bool mutationTelemetryRequired = false;
         bool managedShadowRequired = false;
@@ -2265,7 +2284,7 @@ namespace outrun::vr::dx11
             signature.depthPresent, ResourceRole::DepthStencil,
             signature.depthPool, signature.depthUsage);
 
-        if (!behaviorDescriptorExact)
+        if (!behaviorDescriptorExact || streamSourceFrequencyUnsupported)
             ResourceBehaviorUnsupportedSamples.fetch_add(
                 1, std::memory_order_relaxed);
         if (mutationTelemetryRequired)
@@ -2296,7 +2315,7 @@ namespace outrun::vr::dx11
         // activation prerequisite. It deliberately does not clear the older
         // mutation-telemetry/resource-lifetime blocker or activate native draw.
         if (!behaviorDescriptorExact || mutationTelemetryRequired ||
-            managedShadowRequired)
+            managedShadowRequired || streamSourceFrequencyUnsupported)
             resourcesExact = false;
 
         if (signature.indexed &&
