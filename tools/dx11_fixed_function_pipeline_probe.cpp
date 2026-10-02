@@ -602,7 +602,7 @@ int main()
                 modulate2xStages, true, 0x01u, 0x01u, textureTypes);
         require(
             modulate2xShader.generated() && modulate2xShader.activeStages == 1,
-            "R179 D3DTOP_MODULATE2X fixed-function stage must become shader-exact");
+            "R180 D3DTOP_MODULATE2X fixed-function stage must become shader-exact");
         require(
             modulate2xShader.source.find(
                 "float3 nextColor = (sampled0.rgb * input.diffuse.rgb) * 2.0;") !=
@@ -610,19 +610,19 @@ int main()
             modulate2xShader.source.find(
                 "float nextAlpha = (sampled0.a * input.diffuse.a) * 2.0;") !=
                 std::string::npos,
-            "R179 D3DTOP_MODULATE2X shader expression drift");
+            "R180 D3DTOP_MODULATE2X shader expression drift");
         const auto modulate2xCompile =
             compile_fixed_function_pixel_shader_prototype(modulate2xShader);
         require(
             modulate2xCompile.attempted && modulate2xCompile.succeeded &&
             modulate2xCompile.result == S_OK &&
             modulate2xCompile.bytecodeBytes != 0,
-            "R179 D3DTOP_MODULATE2X fixed-function shader prototype did not compile");
+            "R180 D3DTOP_MODULATE2X fixed-function shader prototype did not compile");
     }
 
     std::cout
         << "DX11 MRT color-write fail-closed: PASS\n"
-        << "DX11 fixed-function D3DTOP_MODULATE2X support R179: PASS\n"
+        << "DX11 fixed-function D3DTOP_MODULATE2X support R180: PASS\n"
         << "DX11 fixed-function D3DTOP_SUBTRACT support R177: PASS\n"
         << "DX11 fixed-function argument modifiers R178: PASS\n"
         << "DX11 fixed-function D3DTOP_ADD support: PASS\n"
