@@ -2777,6 +2777,38 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer branch-authoritative continuation_55 raw frontier beginning at 0x00182FFC with mandatory overlap bytes 66 83. Continue only from its validated canonical evidence; keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F46_CANONICAL_EXE_PROVENANCE_0x182FFC_TO_0x18303C",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "2d83d701949d2de3fa9480540ee81db697248f4d",
+      "run_record_commit_sha": "f523d36b2c7ef34f4839c63c5afbeddcfc59b700",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+      "dxvk_disassembly_evidence_run_id": 36984846807,
+      "dxvk_disassembly_evidence_job_id": 110767408796,
+      "evidence_artifact_id": 11216996799,
+      "evidence_artifact_digest": "sha256:9bb02fd5f0b71c2a07b13227b0356d7e97e415b3c193d187785df6fb92b67ac7",
+      "provenance_status": "EXACT_EXE_182FFC_TO_18303C_PROVENANCE_CAPTURED",
+      "provenance_start_rva": "0x00182FFC",
+      "probe_end_rva": "0x0018303C",
+      "probe_len": 64,
+      "overlap_bytes": "66 83",
+      "overlap_matches": true,
+      "predecessor_overlap_matches": true,
+      "predecessor_proof_status": "EXACT_182FBE_TO_182FFC_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+      "predecessor_exact": true,
+      "target_section": ".text",
+      "probe_end_matches": true,
+      "issue14_implementation_comment_id": 5948296105,
+      "issue14_validation_comment_id": 5948306847,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "scope": "Bounded canonical raw provenance only; no function/render/HUD/runtime semantic promotion.",
+      "exact_next_action": "Preserve any newer authoritative frontier. If continuation_55 remains the newest raw-only edge, exact-decode only complete canonical instructions in 0x00182FFC..0x0018303C, resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved.",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER"
     }
   ]
 }
