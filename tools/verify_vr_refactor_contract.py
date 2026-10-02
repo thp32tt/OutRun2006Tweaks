@@ -371,6 +371,35 @@ for banned in ("R22FailClosedEligibility();", "R22ResetBaselineTracking();"):
 if "FailClosedResetBaselineState();" not in r34:
     errors.append("R34 missing consolidated R22 reset fail-close owner API")
 
+for banned in (
+    "R33InvalidateDepthStencilCache();",
+    "RightDepthSynchronized = false;",
+    "RightStencilSynchronized = false;",
+):
+    if banned in r34:
+        errors.append(
+            f"R34 retained direct R33 depth/stencil fail-close state: {banned}")
+if "FailClosedDepthStencilState();" not in r34:
+    errors.append("R34 missing consolidated R33 depth/stencil owner API")
+
+fail_closed_depth = re.search(
+    r"inline void FailClosedDepthStencilState\(\) noexcept\s*\{(?P<body>.*?)\n    \}",
+    r33,
+    re.DOTALL,
+)
+if not fail_closed_depth:
+    errors.append("R33 consolidated depth/stencil fail-close owner API missing")
+else:
+    depth_body = fail_closed_depth.group("body")
+    depth_order = [
+        depth_body.find("R33InvalidateDepthStencilCache();"),
+        depth_body.find("RightDepthSynchronized = false;"),
+        depth_body.find("RightStencilSynchronized = false;"),
+    ]
+    if min(depth_order) < 0 or depth_order != sorted(depth_order):
+        errors.append(
+            "R33 depth/stencil fail-close API must preserve cache/depth/stencil order")
+
 fail_closed_reset = re.search(
     r"inline void FailClosedResetBaselineState\(\) noexcept\s*\{(?P<body>.*?)\n    \}",
     r22,
