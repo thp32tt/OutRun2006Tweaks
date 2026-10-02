@@ -42,6 +42,8 @@ This applies to new jobs and same-JOB continuation/recovery turns. Individual pr
 
 GitHub tool-unavailable replies are retried in the SAME chat and SAME JOB_ID by sending only '진행해' after the mandatory first line. This repeats without an attempt limit. A new chat is reserved for actual platform/conversation failure.
 
+GitHub read/output truncation replies (for example an oversized asset_queue response) use the same retry path; truncation is never accepted as a terminal no-work result.
+
 
 ## Large localization binary transport
 

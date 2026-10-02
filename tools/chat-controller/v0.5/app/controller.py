@@ -28,6 +28,7 @@ from .core import (
     prepare_outgoing_message,
     GITHUB_TOOL_RECOVERY_MESSAGE,
     github_tool_unavailable_response,
+    github_read_limit_response,
     retry_surface_has_platform_error,
     reconcile_state,
     record_completed,
@@ -905,7 +906,9 @@ class Controller:
         if datetime.now(TZ) - changed_at < timedelta(seconds=TURN_IDLE_GRACE_SECONDS):
             return
 
-        if github_tool_unavailable_response(text):
+        github_unavailable = github_tool_unavailable_response(text)
+        github_read_limited = github_read_limit_response(text)
+        if github_unavailable or github_read_limited:
             attempts = int(job.get("github_tool_recovery_attempts", 0) or 0) + 1
             job["github_tool_recovery_attempts"] = attempts
             job["github_tool_retry_same_chat"] = True
@@ -917,12 +920,13 @@ class Controller:
             job["response_hash"] = None
             job["response_last_changed_at"] = None
             job["verify_started_at"] = None
-            lane["last_result"] = f"github_tool_unavailable_same_chat_retry:{attempts}"
+            reason = "connector_unavailable" if github_unavailable else "github_read_limit"
+            lane["last_result"] = f"{reason}_same_chat_retry:{attempts}"
             save_state(self.state)
             write_runtime(
                 status="github_tool_recovery",
                 last_action=(
-                    f"{lane['name']} {job['job_id']} connector unavailable attempt {attempts}; "
+                    f"{lane['name']} {job['job_id']} {reason} attempt {attempts}; "
                     "retry same chat with 진행해"
                 ),
             )

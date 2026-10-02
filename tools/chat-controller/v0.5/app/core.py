@@ -31,6 +31,18 @@ def github_tool_unavailable_response(text: str) -> bool:
     return any(re.search(pattern, sample, flags=re.I | re.S) for pattern in GITHUB_TOOL_UNAVAILABLE_PATTERNS)
 
 
+GITHUB_READ_LIMIT_PATTERNS = [
+    r"(?:github|git허브|깃허브).{0,220}(?:api|응답|response|output|출력|파일|file).{0,220}(?:too large|truncat|잘리|대형|너무 크|끝까지 확인할 수 없|후반부.{0,40}확인할 수 없)",
+    r"(?:asset_queue[.]csv|progress[.]json|resume_state[.]json).{0,220}(?:단일 대형|single large|truncat|잘리|끝까지 확인할 수 없|후반부.{0,40}확인할 수 없)",
+    r"(?:runnable|unfinished|후보|asset).{0,180}(?:확정|판별|선택).{0,120}(?:불가|할 수 없).{0,180}(?:queue|candidate|원본|정보|응답)",
+]
+
+
+def github_read_limit_response(text: str) -> bool:
+    sample = (text or "").lower()
+    return any(re.search(pattern, sample, flags=re.I | re.S) for pattern in GITHUB_READ_LIMIT_PATTERNS)
+
+
 RETRY_ERROR_PATTERNS = [
     r"something went wrong",
     r"there was an error (?:generating|producing) (?:a )?response",

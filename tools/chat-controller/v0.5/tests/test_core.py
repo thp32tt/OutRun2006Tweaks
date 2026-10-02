@@ -16,6 +16,7 @@ from app.core import (
     GITHUB_TOOL_RECOVERY_MESSAGE,
     prepare_outgoing_message,
     github_tool_unavailable_response,
+    github_read_limit_response,
     retry_surface_has_platform_error,
     reconcile_state,
     select_qa_batch,
@@ -122,6 +123,23 @@ class CoreTests(unittest.TestCase):
         self.assertFalse(
             github_tool_unavailable_response(
                 "GitHub HEAD 확인 완료. 파일 수정과 커밋을 계속 진행합니다."
+            )
+        )
+
+    def test_detects_github_read_limit_response(self):
+        self.assertTrue(
+            github_read_limit_response(
+                "asset_queue.csv가 GitHub API 응답에서 단일 대형 JSON 라인으로 반환되어 필요한 후반부 queue 항목과 후보 DDS 경로를 끝까지 확인할 수 없는 상태입니다."
+            )
+        )
+        self.assertTrue(
+            github_read_limit_response(
+                "GitHub API output was truncated because the file is too large, so I cannot inspect the remaining candidates."
+            )
+        )
+        self.assertFalse(
+            github_read_limit_response(
+                "asset_queue.csv 전체를 확인했고 runnable asset 222를 선택했습니다."
             )
         )
 
