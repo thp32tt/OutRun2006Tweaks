@@ -1580,5 +1580,34 @@
       "exact_next_action": "Capture the next bounded canonical continuation starting at 0x00182DCF with mandatory overlap bytes 83 3d 60 bc. Keep that fresh window raw-only until canonical provenance succeeds; then exact-decode only complete instructions and resolve forward target 0x00182E34 only with exact instruction-boundary evidence. Keep function/render/HUD/runtime semantics unresolved.",
       "issue14_validation_comment_id": 5947562196
     }
+  ,
+    {
+      "unit_id": "DXVK_MODERN_OVERLAP_PREDECESSOR_CROSS_PROOF_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "fbdec361e708da352e7eb6171e8eed3d65832019",
+      "run_record_commit_sha": "91a29153d0f5b5c6c1cdfba09430c494f4f4365c",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_DISASM_CONTRACT_STEP",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Modern F34+/continuation-43+ overlap provenance now fails the static contract unless the declared overlap matches both predecessor expected and observed incomplete bytes, participates in capture success, and is retained in the report. Legacy collectors remain readable.",
+      "validation": {
+        "exact_sha": "fbdec361e708da352e7eb6171e8eed3d65832019",
+        "build_run_id": 36979830082,
+        "build_job_id": 110751602672,
+        "backend_disassembly_contract_step": "PASS",
+        "current_modern_overlap_preflight": "PASS",
+        "full_win32_build": "IN_PROGRESS_AT_STATE_WRITE_NOT_REQUIRED_FOR_VERIFIER_ONLY_UNIT",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947570664,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "exact_next_action": "Preserve the newest authoritative canonical-disassembly frontier and retain the predecessor expected/actual incomplete-byte cross-proof on every modern overlap transition."
+    }
   ]
 }
