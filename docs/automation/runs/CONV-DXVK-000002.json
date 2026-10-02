@@ -4894,6 +4894,81 @@
       "ownership_effect": "NONE",
       "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
       "exact_next_action": "Preserve this E0-E3 direct-branch declaration guard while continuing from the newest branch-authoritative canonical continuation frontier; any future LOOPNE/LOOPE/LOOP/JECXZ exact row must be declared in BRANCHES and its signed-rel8 target must match."
+    },
+    {
+      "unit_id": "DXVK_F52_CANONICAL_EXE_PROVENANCE_0x183133_TO_0x183173",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "872dfb4e53fe6fbe83dc9cc639035d7ea52e6c28",
+      "validation_bearing_result_sha": "4431b909343ad2a1e50c4c176b781bb4a48c3920",
+      "commit_message": "dxvk: capture canonical 0x183133 continuation [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Bounded canonical raw continuation 0x00183133..0x00183173 captured from the exact 0x00183133 predecessor instruction boundary; fresh bytes and rel32 candidates remain raw-only with no render/HUD/runtime semantic promotion.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Authenticated GitHub AGENTS/current lane/run/history/Issue #14 recovered; moving same-JOB frontier refreshed repeatedly."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Concurrent workers completed the preceding exact proof; fresh HEAD audit found no continuation_60 raw capture, making 0x00183133 the first runnable canonical static frontier."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material analyzer commit 872dfb4e53fe6fbe83dc9cc639035d7ea52e6c28 adds fail-closed continuation_60 raw provenance capture."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact material-SHA Build 36987414677 job 110775495070 passed Verify backend disassembly contract. Retaining descendant 4431b909343ad2a1e50c4c176b781bb4a48c3920 is ahead_by=4/behind_by=0 and leaves tools/analyze_outrun_exe.py unchanged after the material SHA; its HUD Inspector 36987501303 job 110775771763 completed canonical analyzer/upload steps and reported EXACT_EXE_183133_TO_183173_PROVENANCE_CAPTURED before cancellation during post-checkout branch churn."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commit 872dfb4e53fe6fbe83dc9cc639035d7ea52e6c28 contains [AUTO:CONV-DXVK-000002]; Issue #14 comment 5948756993 records implementation and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static disassembly provenance only; no deployable DXVK/runtime/backend/localization payload changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally in run/lane state without replacing the newer exact-proof primary frontier."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_DISASM_CONTRACT_PLUS_RETAINING_DESCENDANT_CANONICAL_ANALYZER_STEPS",
+        "exact_material_sha": "872dfb4e53fe6fbe83dc9cc639035d7ea52e6c28",
+        "exact_sha_build_run_id": 36987414677,
+        "exact_sha_build_job_id": 110775495070,
+        "backend_disassembly_contract": "SUCCESS",
+        "exact_sha_hud_inspector_run_id": 36987414688,
+        "exact_sha_hud_inspector_status": "CANCELLED_BY_DESCENDANT_CHURN_NOT_CLAIMED",
+        "retaining_descendant_sha": "4431b909343ad2a1e50c4c176b781bb4a48c3920",
+        "descendant_ahead_by": 4,
+        "descendant_behind_by": 0,
+        "descendant_analyzer_run_id": 36987501303,
+        "descendant_analyzer_job_id": 110775771763,
+        "descendant_analyzer_substantive_steps": "SUCCESS_BEFORE_POST_CHECKOUT_CANCEL",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "provenance_status": "EXACT_EXE_183133_TO_183173_PROVENANCE_CAPTURED",
+        "predecessor_status": "EXACT_1830F3_TO_183133_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "predecessor_exact": true,
+        "predecessor_end_is_instruction_boundary": true,
+        "probe_start_rva": "0x00183133",
+        "probe_end_rva": "0x00183173",
+        "probe_len": 64,
+        "artifact_id": 11217483806,
+        "artifact_digest": "sha256:0da75fe158b603beaad01b6e1c660aa389cdf93e7d27138fa655bce1f6b5c6fb",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5948756993,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve any newer branch-authoritative exact proof; if 0x00183173 remains the exact edge, capture the next bounded canonical continuation there and keep function/render/HUD/runtime semantics unresolved."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
