@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 962,
+  "cycle": 992,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -167,11 +167,21 @@
     "R84-REF-VERIFY-0007",
     "R84-REF-DISPATCH-0011",
     "R84-REF-LIFECYCLE-0050",
-    "R84-REF-VERIFY-0008"
+    "R84-REF-VERIFY-0008",
+    "R84-REF-LIFECYCLE-0051",
+    "R84-REF-DISPATCH-0012",
+    "R84-REF-DIRECT-0008",
+    "R84-REF-HUD-0012",
+    "R84-REF-XYZRHW-0013",
+    "R84-REF-SKYGLOW-0011",
+    "R84-REF-HOOKSET-0016",
+    "R84-REF-STATE-0024",
+    "R84-REF-DISPATCH-0013",
+    "R84-REF-DIRECT-0009"
   ],
-  "next": "Cycles 963-965: resume normal campaign from remaining independent ownership seams; prioritize verifier-backed behavior-neutral extraction only, otherwise continue review. APPLY_GATE at 965.",
-  "updatedKst": "2026-10-02T08:25:00+09:00",
-  "batchStatus": "R84_USER_BATCH_100_COMPLETE_CYCLE_962",
+  "next": "Cycles 993-995: review R32 Reset/cache/perf boundaries then R33 depth-stencil/final dispatch; APPLY_GATE at 995.",
+  "updatedKst": "2026-10-02T09:46:00+09:00",
+  "batchStatus": "R84_200C_EXT_CYCLE_992",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -306,6 +316,16 @@
     "Cycles 953-955 R84-REF-VERIFY-0007: Protected graph source cross-check passed by inspection: R30 ScreenSpace boundary, R31 Apply interception, R33 fail-closed fallback and R34 resync->raster replay ordering remain present. APPLY_GATE 955 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 956-958 R84-REF-DISPATCH-0011: Final dispatch ownership pass found no duplicate route owner suitable for behavior-neutral removal; R30/R31/R33/R34 layers retain distinct contracts. APPLY_GATE 958 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 959-961 R84-REF-LIFECYCLE-0050: Final lifecycle pass found no safe Reset/StateBlock/DirectGPU ownership move without runtime validation. APPLY_GATE 961 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
-    "Cycle 962 R84-REF-VERIFY-0008: durable final verification for requested 100-cycle batch. Re-read critical R30/R31/R33/R34 source and verifier at current branch; protected boundaries present. SOURCE_CHANGED=NO. Batch advanced exactly 100 cycles from 862 to 962. Runtime UNTESTED."
+    "Cycle 962 R84-REF-VERIFY-0008: durable final verification for requested 100-cycle batch. Re-read critical R30/R31/R33/R34 source and verifier at current branch; protected boundaries present. SOURCE_CHANGED=NO. Batch advanced exactly 100 cycles from 862 to 962. Runtime UNTESTED.",
+    "Cycles 963-965 R84-REF-LIFECYCLE-0051: R29 prerequisite/install publication boundaries reviewed; existing classifier, transaction, success publication and start-thread ownership are already atomic. APPLY_GATE 965 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 966-968 R84-REF-DISPATCH-0012: R29 stable-world guard reviewed against R31 cached-world and R33 final dispatcher ownership; lower-layer fallback contract remains distinct. APPLY_GATE 968 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 969-971 R84-REF-DIRECT-0008: R29 DirectTwoEye boundary reviewed; DirectGPU submission behavior must remain coupled to lower stereo renderer semantics. APPLY_GATE 971 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 972-974 R84-REF-HUD-0012: R30 HUD ScreenSpace classifier/build/guard boundaries reviewed; semantic classification and eye-affine construction remain distinct responsibilities. APPLY_GATE 974 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 975-977 R84-REF-XYZRHW-0013: R30 XYZRHW preparation/configuration/transform/execution pipeline reviewed; stages already have behavior-specific fallback boundaries. APPLY_GATE 977 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 978-980 R84-REF-SKYGLOW-0011: R30 SkyGlow resource/capture/apply/reset lifecycle reviewed; ping-pong source and reset release ordering remain runtime-sensitive. APPLY_GATE 980 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 981-983 R84-REF-HOOKSET-0016: R30 buffer-shadow hook ownership reviewed separately from top-level draw hooks; rollback domains intentionally differ. APPLY_GATE 983 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 984-986 R84-REF-STATE-0024: R31 recording hooks and Apply interception reviewed as separate reliability boundaries; no physical hook consolidation without runtime evidence. APPLY_GATE 986 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 987-989 R84-REF-DISPATCH-0013: R31 cached-world dispatch reviewed against R33 final dispatch; no duplicate route suitable for removal. APPLY_GATE 989 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
+    "Cycles 990-992 R84-REF-DIRECT-0009: R32 DirectGPU resource/identity/fence lifecycle reviewed; identity and fence invalidation have different safety scopes. APPLY_GATE 992 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED."
   ]
 }
