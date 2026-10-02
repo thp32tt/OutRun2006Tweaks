@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "602b7c0cd72a1bbf8b7a71ab3cafd08f25b8c2ec",
+  "state_parent_head": "4529806ae37170ab6c6b12218c78b5375e7ce2fb",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,7 +54,7 @@
     "task_id": "CONV-DX11-000001",
     "result_sha": "b0d0eee45bfaf843a634b255f6cf25902776df24",
     "validation_bearing_sha": "df28e8ac4a4244239129dad6b4c2aca5b29bff70",
-    "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_CENSUS_CONFIGURE_IN_PROGRESS",
+    "automation_validation": "PASS_EXACT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
@@ -549,12 +549,13 @@
       "task_id": "CONV-DX11-000001",
       "material_result_sha": "b0d0eee45bfaf843a634b255f6cf25902776df24",
       "validation_bearing_sha": "df28e8ac4a4244239129dad6b4c2aca5b29bff70",
-      "retaining_descendant_sha": "3b4ffb7c9b32749a547edff0ea91b9a420ad0bb2",
-      "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_CENSUS_CONFIGURE_IN_PROGRESS",
+      "retaining_descendant_sha": "4529806ae37170ab6c6b12218c78b5375e7ce2fb",
+      "automation_validation": "PASS_EXACT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
-      "issue14_comment_id": 5947732266
+      "issue14_comment_id": 5947732266,
+      "validation_issue14_comment_id": 5947758609
     }
   ]
 }
