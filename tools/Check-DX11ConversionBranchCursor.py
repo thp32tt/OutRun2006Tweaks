@@ -2,8 +2,8 @@
 """Validate DX11 conversion lane cursor evidence without making runtime claims.
 
 This is a GitHub-only static guard. It verifies that a conversion lane state file
-points at the current branch identity and that recorded SHAs are non-empty.
-It intentionally does not infer Quest 3/VDXR runtime success.
+points at the current branch identity, keeps runtime evidence explicit, and does
+not accidentally advance a dormant native draw path into activation.
 """
 
 from __future__ import annotations
@@ -20,7 +20,6 @@ REQUIRED_KEYS = (
     "latest_durable_task",
     "runtime_validation",
 )
-
 
 
 def main() -> int:
@@ -51,6 +50,10 @@ def main() -> int:
 
     if state.get("runtime_validation") != "UNTESTED":
         print("FAIL runtime evidence must remain explicit")
+        return 1
+
+    if state.get("native_draw_path_activation_changed", False):
+        print("FAIL native draw path activation changed")
         return 1
 
     print("PASS DX11 conversion cursor consistency")
