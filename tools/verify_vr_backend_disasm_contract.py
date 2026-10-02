@@ -376,6 +376,44 @@ def verify_dxvk_continuation_chain() -> None:
                 f"{raw_call_census_guard}"
             )
 
+        # Keep declared direct rel32 CALL metadata tied to the exact decoded
+        # instruction rows. This catches off-by-one CALL RVAs or stale targets
+        # before canonical-EXE execution reaches telemetry formatting/census.
+        instruction_rows = value(f"{prefix}_INSTRUCTIONS")
+        declared_calls = analyzer.get(f"{prefix}_CALLS", ())
+        direct_rel32_rows: dict[int, bytes] = {}
+        for instruction_rva, instruction_hex, _instruction_asm in instruction_rows:
+            encoded = bytes.fromhex(instruction_hex)
+            if encoded[:1] == b"\xE8":
+                direct_rel32_rows[instruction_rva] = encoded
+        declared_call_rvas = [call_rva for call_rva, _target_rva in declared_calls]
+        if len(declared_call_rvas) != len(set(declared_call_rvas)):
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} declares duplicate rel32 CALL RVAs: "
+                f"{declared_call_rvas}"
+            )
+        if set(direct_rel32_rows) != set(declared_call_rvas):
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} rel32 CALL declaration drift: "
+                f"instruction_rvas={sorted(direct_rel32_rows)} "
+                f"declared_rvas={sorted(declared_call_rvas)}"
+            )
+        for call_rva, expected_target_rva in declared_calls:
+            encoded = direct_rel32_rows[call_rva]
+            if len(encoded) != 5:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} rel32 CALL at "
+                    f"0x{call_rva:08X} has invalid encoded length {len(encoded)}"
+                )
+            rel32 = int.from_bytes(encoded[1:5], byteorder="little", signed=True)
+            decoded_target_rva = (call_rva + 5 + rel32) & 0xFFFFFFFF
+            if decoded_target_rva != expected_target_rva:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} rel32 CALL target drift at "
+                    f"0x{call_rva:08X}: declared=0x{expected_target_rva:08X} "
+                    f"decoded=0x{decoded_target_rva:08X}"
+                )
+
         proof_status_fail_closed_markers = (
             "proven = bool(",
             '"status"',
