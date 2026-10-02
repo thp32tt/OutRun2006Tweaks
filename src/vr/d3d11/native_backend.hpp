@@ -226,6 +226,12 @@ observe_fixed_function_texture_binding_set(
     const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
     std::uint64_t snapshotToken) noexcept;
 
+// R136 also makes the aggregate value self-authenticating against accidental
+// copied-struct drift before it can be composed with an R135 sealed draw.
+[[nodiscard]] bool
+validate_fixed_function_texture_binding_set_readiness_integrity(
+    const NativeFixedFunctionTextureBindingSetReadiness& textureBindings) noexcept;
+
 // R119 seals one R113 MANAGED vertex/index buffer mirror into a fail-closed
 // readiness snapshot. The token binds CPU-shadow version, device generation,
 // mirror instance, descriptor and expected-device identity. This is dormant
