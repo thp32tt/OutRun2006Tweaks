@@ -151,6 +151,7 @@ namespace outrun::vr::dx11
             case D3DTA_TEXTURE:
             case D3DTA_TFACTOR:
             case D3DTA_CONSTANT:
+            case D3DTA_SPECULAR:
                 return true;
             default:
                 return false;
@@ -329,6 +330,12 @@ namespace outrun::vr::dx11
                        normalizedByte(stageConstant, 8) + ", " +
                        normalizedByte(stageConstant, 0) + ", " +
                        normalizedByte(stageConstant, 24) + ")";
+                break;
+            case D3DTA_SPECULAR:
+                // R198: D3DTA_SPECULAR consumes interpolated vertex COLOR1.
+                // The fixed-function VS prototype emits opaque white when the
+                // FVF omits SPECULAR, matching the documented D3D9 default.
+                base = "input.specular";
                 break;
             default:
                 return {};
@@ -1198,7 +1205,8 @@ namespace outrun::vr::dx11
             "// R84 diagnostic-only fixed-function pixel-shader prototype\n"
             "struct PSInput\n"
             "{\n"
-            "    float4 diffuse : COLOR0;\n";
+            "    float4 diffuse : COLOR0;\n"
+            "    float4 specular : COLOR1;\n";
         for (std::size_t index = 0; index < source.size(); ++index)
         {
             shader += "    float4 tex";
@@ -1505,11 +1513,9 @@ namespace outrun::vr::dx11
         if ((fvf & D3DFVF_PSIZE) != 0)
             out.unsupported |=
                 FixedFunctionVertexShaderPrototypeUnsupportedPointSize;
-        if ((fvf & D3DFVF_SPECULAR) != 0)
-            out.unsupported |=
-                FixedFunctionVertexShaderPrototypeUnsupportedSpecular;
 
         out.hasDiffuse = (fvf & D3DFVF_DIFFUSE) != 0;
+        out.hasSpecular = (fvf & D3DFVF_SPECULAR) != 0;
         out.texCoordCount = static_cast<UINT>(
             (fvf & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT);
         if (out.texCoordCount > 8)
@@ -1550,6 +1556,8 @@ namespace outrun::vr::dx11
             shader += "    float3 normal : NORMAL0;\n";
         if (out.hasDiffuse)
             shader += "    float4 diffuse : COLOR0;\n";
+        if (out.hasSpecular)
+            shader += "    float4 specular : COLOR1;\n";
 
         for (UINT index = 0; index < out.texCoordCount; ++index)
         {
@@ -1578,7 +1586,9 @@ namespace outrun::vr::dx11
             "    float4 position : SV_Position;\n";
         if (out.hasNormal)
             shader += "    float3 normal : NORMAL0;\n";
-        shader += "    float4 diffuse : COLOR0;\n";
+        shader +=
+            "    float4 diffuse : COLOR0;\n"
+            "    float4 specular : COLOR1;\n";
         for (UINT index = 0; index < 8; ++index)
         {
             shader += "    float4 tex";
@@ -1599,6 +1609,9 @@ namespace outrun::vr::dx11
         shader += out.hasDiffuse
             ? "    output.diffuse = input.diffuse;\n"
             : "    output.diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);\n";
+        shader += out.hasSpecular
+            ? "    output.specular = input.specular;\n"
+            : "    output.specular = float4(1.0f, 1.0f, 1.0f, 1.0f);\n";
 
         for (UINT index = 0; index < 8; ++index)
         {

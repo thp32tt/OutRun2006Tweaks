@@ -277,6 +277,7 @@ namespace outrun::vr::dx11
         UINT inputElements = 0;
         UINT texCoordCount = 0;
         bool hasDiffuse = false;
+        bool hasSpecular = false;
         bool hasNormal = false;
         std::uint64_t sourceHash = 0;
         std::string source;
