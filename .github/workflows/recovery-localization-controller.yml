@@ -112,7 +112,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          docker build -t outrun-localization-only:test tools/chat-controller/localization
+          docker build -t outrun-localization-only:test -f tools/chat-controller/localization/Dockerfile.portainer tools/chat-controller/localization
           docker run --rm --entrypoint sh outrun-localization-only:test -c 'test -f /opt/outrun/prompts/localization_A.md && test -f /opt/outrun/prompts/localization_B.md && test -f /opt/outrun/prompts/localization_C.md && test ! -e /opt/outrun/prompts/vr_A.md && test ! -e /opt/outrun/prompts/conversion_dx11.md'
 
       - name: Smoke standalone localization runtime
