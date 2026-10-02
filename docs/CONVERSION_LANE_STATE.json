@@ -52,9 +52,9 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "ecccde1dc4c14061ee116474f808ab090661db1c",
-    "validation_bearing_sha": "8dcec97abd7b1bfb05c9ccd57ed73c3d334af582",
-    "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+    "result_sha": "5194dd02a1feb05bef67d74dc2f90e038dd080c0",
+    "validation_bearing_sha": "5194dd02a1feb05bef67d74dc2f90e038dd080c0",
+    "automation_validation": "PASS_EXACT_STATIC_GATES_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
@@ -390,6 +390,17 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5947157876
+    },
+    {
+      "unit_id": "DX11_LIVE_IA_GEOMETRY_BINDING_R139",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "5194dd02a1feb05bef67d74dc2f90e038dd080c0",
+      "validation_bearing_sha": "5194dd02a1feb05bef67d74dc2f90e038dd080c0",
+      "automation_validation": "PASS_EXACT_STATIC_GATES_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5947169671
     }
   ]
 }
