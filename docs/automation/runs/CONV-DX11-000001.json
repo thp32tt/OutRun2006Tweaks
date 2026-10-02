@@ -4,30 +4,30 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "5c30125eaf843435906e1fafc805887f50a1bc49",
-  "state_parent_head": "b26574148b794eb049815612f0ab4ddcb0e875a7",
-  "material_result_sha": "84b33e9ca13249e1dbc60e6bf74cd2184d027da0",
-  "validation_bearing_sha": "f8e8da8e26176753e55a2cd3f93238cfb69d3710",
+  "base_sha": "f8e8da8e26176753e55a2cd3f93238cfb69d3710",
+  "state_parent_head": "7b8373317b893fa1c7fd9433214c4db2efa16438",
+  "material_result_sha": "284ba6509becdfb3cd2363050d71282060aac447",
+  "validation_bearing_sha": "9fb8b92ecb1af016de6b9f48a6b101ecad07ea29",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_R146_FAN_FINAL_TRANSFORM_OM_BINDING",
-  "selection_reason": "Fresh current-branch review found direct geometry had final live VS-b0/WVP plus live OM target proof, while R142/R144 generated-fan final readiness stopped at live generated IA/source provenance. The highest-value deterministic static gap was to require those same final transform and target identities for both fan paths without activating Draw*.",
-  "summary": "Added dormant R146 final fan readiness for both non-indexed and indexed triangle fans. It recomposes R142/R144 live generated-IA/source-provenance readiness with exact live VS-b0/WVP transform binding and exact live OM RTV/DSV surface-pair binding, adds fail-closed VS-b0/OM drift probes and deterministic restore evidence, and extends the source-graph production-caller quarantine. Native Draw* remains disabled.",
+  "selected_work": "DX11_DIRECT_DRAW_DISPATCH_ARGUMENT_READINESS_R147",
+  "selection_reason": "Fresh current-branch review after R145/R146 found the direct non-fan path sealed live IA/VS/PS/RS/OM/RTV/DSV and transform state but not the exact Draw/DrawIndexed dispatch tuple. Start vertex/index/base-vertex and primitive-derived element count therefore remained outside the stale-resistant final readiness identity.",
+  "summary": "Added dormant direct non-fan Draw/DrawIndexed dispatch readiness. The new gate derives exact element counts for supported direct topologies, rejects overflow and triangle-fan use on this path, requires geometry/surface/draw identity continuity, seals StartVertexLocation/StartIndexLocation/BaseVertexLocation, and adds indexed/non-indexed drift probes plus source-graph quarantine. Native Draw* remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read current GitHub HEAD, AGENTS.md, branch-local conversion state/run record, VR_WORK_QUEUE, regression knowledge/history, VR_RUN_STATE, VR_REVIEW_FINDINGS, build log context and Issue #14 using authenticated GitHub authority.",
-        "Tracked concurrent same-branch descendants and used fast-forward-only publication; no N100/local clone was used as product-development truth."
+        "Read current GitHub HEAD, AGENTS.md, branch-local conversion state/run record, regression knowledge/history and current DX11 source/probe/verifier artifacts through authenticated GitHub authority.",
+        "Tracked same-branch descendants and published the material commit by fast-forward-only ref update; no N100/local clone was used as product-development truth."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Confirmed R145 direct-geometry final readiness already combines exact live VS-b0/WVP transform binding with exact live OM RTV/DSV target identity.",
-        "Confirmed R142 non-indexed and R144 indexed generated-fan final readiness still terminated at generated live-IA/source-provenance evidence and did not consume final transform or surface-target identity."
+        "R145 final direct-geometry readiness already sealed live pipeline, direct IA, VS-b0/WVP and OM RTV/DSV identities.",
+        "Direct non-fan readiness did not preserve primitive-derived D3D11 element count or StartVertexLocation/StartIndexLocation/BaseVertexLocation; fan paths had separate generated-index argument provenance."
       ]
     },
     "C2_IMPLEMENT": {
@@ -39,63 +39,63 @@
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "84b33e9ca13249e1dbc60e6bf74cd2184d027da0"
+        "284ba6509becdfb3cd2363050d71282060aac447"
       ],
       "details": [
-        "Added NativeFixedFunctionFinalFanBoundDrawReadiness plus non-indexed/indexed compose and snapshot-validation APIs.",
-        "Required current live VS-b0 WVP payload identity and current exact OM RTV/DSV surface-pair identity on top of existing R142/R144 generated-fan readiness.",
-        "Added positive, VS-b0 drift, OM target drift and deterministic restore probes and extended dormant production-caller quarantine through R146."
+        "Added NativeFixedFunctionDirectDrawDispatchReadiness and stale-snapshot validation for direct non-fan geometry.",
+        "Added exact POINT/LIST/STRIP element-count conversion with UINT overflow rejection; triangle fans remain fail-closed on the direct path.",
+        "Sealed indexed/non-indexed dispatch-mode identity and StartVertexLocation/StartIndexLocation/BaseVertexLocation into the readiness token.",
+        "Added positive indexed/non-indexed WARP probe cases, start-argument drift rejection, fan rejection, overflow rejection and source-graph production-caller quarantine."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_DESCENDANT_STATIC_CONFIGURE_BUILD_CANCELLED_BY_CHURN",
-      "automation_validation": "PASS_DESCENDANT_STATIC_GATES_AND_CONFIGURE_BUILD_CANCELLED_BY_BRANCH_CHURN",
+      "status": "COMPLETE_DESCENDANT_STATIC_CONFIGURE_CANCELLED_BY_CHURN",
+      "automation_validation": "PASS_DESCENDANT_STATIC_SOURCE_GRAPH_ACTIVATION_CENSUS_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
       "evidence": [
-        "Exact material Backend Conversion Gate 36979447555 was cancelled before jobs started by same-branch descendant churn; no result is inferred from that cancelled run.",
-        "Validation descendant f8e8da8e26176753e55a2cd3f93238cfb69d3710 is exactly one state-only commit ahead of material SHA 84b33e9ca13249e1dbc60e6bf74cd2184d027da0, so R146 source/tool content is unchanged.",
-        "Backend Conversion Gate 36979487993 job 110750535264 passed queue/baseline/structure/backend-disassembly/session-analysis, DX11 transport lifetime, dual-source, DX11 source graph, dormant activation boundary, DX11 census analyzer, and Configure Win32.",
-        "Build Win32 was cancelled by later descendant churn; successful compile, binary/WARP execution, and runtime behavior are not claimed."
+        "Exact material Backend Conversion Gate 36979666682 was cancelled before jobs started by same-branch descendant churn; no result is inferred from that cancelled run.",
+        "Validation descendant 9fb8b92ecb1af016de6b9f48a6b101ecad07ea29 retained the exact R147 native_backend.hpp/native_backend.cpp blobs and preserved all R147 probe/verifier contract markers.",
+        "Backend Conversion Gate 36979693421 job 110751258838 passed queue automation, HMD baseline, structure, backend disassembly, session-analysis regressions, DX11 transport lifetime, dual-source blend, DX11 source graph, dormant activation boundary and DX11 census analyzer.",
+        "Configure Win32 was cancelled by later same-branch churn; successful compilation, binary/WARP executable execution and runtime behavior are not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "84b33e9ca13249e1dbc60e6bf74cd2184d027da0",
-      "issue14_comment_id": 5947549727
+      "material_commit": "284ba6509becdfb3cd2363050d71282060aac447",
+      "issue14_comment_id": 5947540331
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant DX11 source/probe/static-guard hardening only; no Draw* routing, backend activation, OpenXR transport, localization, release payload or user-test package changed."
+      "reason": "Dormant DX11 readiness source/probe/static-guard work only; no Draw* routing, backend activation, OpenXR transport, localization, release payload or user-test package changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R146. Consume validation for current descendants already adding direct-dispatch/stage-isolation work, then perform a fresh current-HEAD source-wide audit before selecting another independent static conversion gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve the direct-dispatch argument readiness contract. Consume validation/state for current fixed-function GS/HS/DS isolation descendants, then perform a fresh current-HEAD source-wide audit for the next independent dormant conversion gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
-    "target_branch_only": true,
     "native_draw_path_activation_changed": false,
     "native_game_draw_routing": false,
     "openxr_transport_changed": false,
     "dxvk_lane_modified": false,
     "localization_modified": false
   },
-  "issue14_comment_id": 5947549727,
-  "automation_validation": "PASS_DESCENDANT_STATIC_GATES_AND_CONFIGURE_BUILD_CANCELLED_BY_BRANCH_CHURN",
-  "blocker": "Hosted Build Win32 was cancelled by rapid same-branch descendant churn after all static gates and Configure Win32 passed. Quest 3/VDXR runtime validation was not performed; neither fact is represented as a runtime or full-build pass.",
-  "next_action": "Keep NativeDrawPathActive disabled. Preserve R146. Consume validation for current descendants already adding direct-dispatch/stage-isolation work, then perform a fresh current-HEAD source-wide audit before selecting another independent static conversion gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5947540331,
+  "automation_validation": "PASS_DESCENDANT_STATIC_SOURCE_GRAPH_ACTIVATION_CENSUS_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+  "blocker": "Exact material CI was superseded by branch churn. A retained descendant passed all applicable static gates through the DX11 census analyzer, but Configure Win32 was cancelled; no compile or WARP executable PASS is claimed.",
+  "next_action": "Keep NativeDrawPathActive disabled. Preserve the direct-dispatch argument readiness contract. Consume validation/state for current fixed-function GS/HS/DS isolation descendants, then perform a fresh current-HEAD source-wide audit for the next independent dormant conversion gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "prior_completed_unit": {
-    "selected_work": "DX11_LIVE_OM_UAV_EXACTNESS",
-    "material_result_sha": "1b743cb73adaa851b4121e34f48be97cd233bbfd",
-    "validation_bearing_sha": "1b743cb73adaa851b4121e34f48be97cd233bbfd",
-    "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_CENSUS_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+    "selected_work": "DX11_R146_FAN_FINAL_TRANSFORM_OM_BINDING",
+    "material_result_sha": "84b33e9ca13249e1dbc60e6bf74cd2184d027da0",
+    "validation_bearing_sha": "f8e8da8e26176753e55a2cd3f93238cfb69d3710",
+    "automation_validation": "PASS_DESCENDANT_STATIC_GATES_AND_CONFIGURE_BUILD_CANCELLED_BY_BRANCH_CHURN",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
-    "issue14_comment_id": 5947533657
+    "issue14_comment_id": 5947549727
   }
 }
