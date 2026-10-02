@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "22a9010516ecfb729b7b68ecf177b5f3dc295d5f",
+  "state_parent_head": "3b4ffb7c9b32749a547edff0ea91b9a420ad0bb2",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,15 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "6977c6a22ff6aa9eef2dec45dada3164f9b8c120",
-    "validation_bearing_sha": "717a284cee1f35b6074ca388d3d39dca9d56b9e3",
-    "automation_validation": "PASS_DESCENDANT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+    "result_sha": "b0d0eee45bfaf843a634b255f6cf25902776df24",
+    "validation_bearing_sha": "df28e8ac4a4244239129dad6b4c2aca5b29bff70",
+    "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_CENSUS_CONFIGURE_IN_PROGRESS",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
-  "runtime_blocker": "Native Draw* activation remains disabled. R147 now proves the dormant fixed-function IA/VS/PS path also clears and reobserves GS/HS/DS, but exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before activation.",
+  "runtime_blocker": "Native Draw* activation remains disabled. R149 preserves the D3D9 indexed source-range argument identity, but exact-build exhaustive census and Quest 3/VDXR graphics parity evidence remain mandatory before activation.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until Quest 3/VDXR parity proof.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve completed R147 GS/HS/DS graphics-stage isolation. Consume the already-present direct-dispatch descendant work (284ba6509becdfb3cd2363050d71282060aac447) only if it is still non-superseded and not yet durably recorded, then perform a fresh current-HEAD source-wide audit for the next unsealed dormant DX11 draw-semantics gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve R149 indexed source-range identity. Current descendants already add R150 binding between the R147 direct dispatch tuple and R149 source range; validate/persist that work rather than duplicate it, then continue a fresh current-HEAD audit for the next independent dormant DX11 gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -530,6 +530,18 @@
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5947553790,
       "validation_issue14_comment_id": 5947592536
+    },
+    {
+      "unit_id": "DX11_DIRECT_INDEXED_SOURCE_RANGE_IDENTITY_R149",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "b0d0eee45bfaf843a634b255f6cf25902776df24",
+      "validation_bearing_sha": "df28e8ac4a4244239129dad6b4c2aca5b29bff70",
+      "retaining_descendant_sha": "3b4ffb7c9b32749a547edff0ea91b9a420ad0bb2",
+      "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_CENSUS_CONFIGURE_IN_PROGRESS",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5947732266
     }
   ]
 }
