@@ -31,6 +31,8 @@ RULES = (
     ),
 )
 
+SOURCE_EXTENSIONS = {".cpp", ".cc", ".c", ".h", ".hpp"}
+
 
 def scan_file(path: Path) -> int:
     try:
@@ -60,7 +62,7 @@ def main() -> int:
             findings += scan_file(root)
         elif root.is_dir():
             for path in root.rglob("*"):
-                if path.suffix.lower() in {".cpp", ".cc", " .c", ".h", ".hpp"}:
+                if path.suffix.lower() in SOURCE_EXTENSIONS:
                     checked += 1
                     findings += scan_file(path)
 
