@@ -354,6 +354,11 @@ for marker in (
 if "TryGetEffectTelemetrySnapshot(effect)" not in r32:
     errors.append("R32 workload telemetry missing R29 owner snapshot API")
 
+if "R22ShadowState =" in r34:
+    errors.append("R34 retained direct R22 raster-shadow mutation")
+if "InvalidateTrackedRasterShadow();" not in r34:
+    errors.append("R34 reset replay fail-close missing R22 raster owner invalidation API")
+
 for rel, source in (("R33", r33), ("R34", r34)):
     if "R31FlushPendingStateBlockResync" in source:
         errors.append(
