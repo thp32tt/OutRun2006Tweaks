@@ -534,8 +534,11 @@ bool NativeManagedBufferShadow::write_range(
 
     const auto mutation = translate_buffer_mutation(
         role_, D3DPOOL_MANAGED, source_usage_, 0);
+    // R125: R121 made ordinary MANAGED buffer mutation plans exact. The
+    // dormant R113 CPU shadow must consume that exact plan rather than reject
+    // it; R119 mirror readiness still independently rejects stale snapshots.
     if (mutation.kind != BufferMutationUpdateKind::ManagedCpuShadowWrite ||
-        !mutation.requiresCpuShadow || mutation.planExact)
+        !mutation.requiresCpuShadow || !mutation.planExact)
         return false;
 
     // Until a complete initial image exists, a partial Lock cannot establish
