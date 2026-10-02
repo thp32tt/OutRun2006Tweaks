@@ -1258,7 +1258,7 @@ int main()
             "R194 D3DTOP_MULTIPLYADD ARG0 texture dependency must fail closed");
 
         auto unsupportedArg0Stages = multiplyAddStages;
-        unsupportedArg0Stages[0].colorArg0 = D3DTA_SPECULAR;
+        unsupportedArg0Stages[0].colorArg0 = D3DTA_TEMP;
         const auto unsupportedArg0 =
             translate_fixed_function_readiness(
                 unsupportedArg0Stages, true, 0x01u, 0x01u);
@@ -1319,7 +1319,7 @@ int main()
             "R196 D3DTOP_LERP ARG0 texture dependency must fail closed");
 
         auto unsupportedLerpArg0 = lerpStages;
-        unsupportedLerpArg0[0].colorArg0 = D3DTA_SPECULAR;
+        unsupportedLerpArg0[0].colorArg0 = D3DTA_TEMP;
         const auto invalidLerpArg0 =
             translate_fixed_function_readiness(
                 unsupportedLerpArg0, true, 0x01u, 0x01u);
