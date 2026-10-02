@@ -5390,6 +5390,71 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer branch-authoritative canonical frontier. F56 raw provenance is complete/validated; continue only from the newest exact/raw edge without promoting function/render/HUD/runtime semantics."
+    },
+    {
+      "unit_id": "DXVK_F59_CANONICAL_CONTROL_FLOW_0x1831F0_TO_0x183230",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "163b6e3de46ff6c8c9d9d6afc3646f1eab7be2c3",
+      "validation_bearing_result_sha": "4ccb6fb1a45b30ea0b8fef9b639800b97b955fb8",
+      "commit_message": "dxvk: prove canonical 0x1831f0 control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact-decoded validated continuation_63 0x001831F0..0x00183230 as 22 contiguous complete instructions; completed mandatory DD 1C overlap, resolved predecessor target 0x00183219 on an exact boundary, proved branches 0x00183214->0x001832AF and 0x0018321E->0x00183250, proved direct rel32 CALLs 0x001831F3->0x0018118E and 0x0018322B->0x00185F45 with raw-call census equality, and proved exact capture boundary 0x00183230.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Read branch AGENTS/current conversion state, run record, regression/history and Issue #14 from authenticated GitHub; refreshed moving same-JOB HEAD and skipped already-landed F55/F57 concurrent work."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected F59 because F58 exact-SHA canonical raw provenance at 0x001831F0..0x00183230 was the newest unfinished runnable DXVK static frontier."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 163b6e3de46ff6c8c9d9d6afc3646f1eab7be2c3 adds the continuation_63 exact byte/control-flow/call/boundary proof."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA runs were cancelled by same-branch concurrency. Direct retaining descendant 4ccb6fb1a45b30ea0b8fef9b639800b97b955fb8 adds only F60 continuation code after F59; OutRun EXE HUD Inspector CI run 36989644712 static-exe-analysis job 110782639361 SUCCESS on canonical EXE SHA256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3 and reported EXACT_1831F0_TO_183230_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN. Build run 36989644650 job 110782604984 passed Verify backend disassembly contract."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive material commit contains [AUTO:CONV-DXVK-000002]; Issue #14 implementation ledger comment 5949123524."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static disassembly proof only; no runtime DXVK payload, selector, deployment content, or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Supplemental run-state entry preserves newer concurrently advancing canonical frontier rather than replacing stale primary state."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_RETAINING_DESCENDANT_CANONICAL_STATIC_AND_BACKEND_DISASM_CONTRACT",
+        "material_sha": "163b6e3de46ff6c8c9d9d6afc3646f1eab7be2c3",
+        "validation_bearing_descendant_sha": "4ccb6fb1a45b30ea0b8fef9b639800b97b955fb8",
+        "material_exact_sha_workflows": "CANCELLED_BY_SAME_BRANCH_CONCURRENCY_NOT_CLAIMED",
+        "dxvk_canonical_evidence_run_id": 36989644712,
+        "dxvk_canonical_evidence_job_id": 110782639361,
+        "dxvk_canonical_evidence_conclusion": "success",
+        "backend_conversion_gate_run_id": 36989644650,
+        "backend_disassembly_contract_job_id": 110782604984,
+        "backend_disassembly_contract_step": "success",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "proof_status": "EXACT_1831F0_TO_183230_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "instruction_count": 22,
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5949123524,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "BOUNDED_CONTROL_FLOW_ONLY",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve newer branch-authoritative F60 raw provenance at 0x00183230..0x00183270. After canonical provenance validation, exact-decode only complete instructions there, resolve inherited predecessor targets only on exact boundaries, and keep function/render/HUD/runtime semantics unresolved."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
