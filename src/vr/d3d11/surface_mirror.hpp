@@ -52,6 +52,9 @@ namespace outrun::vr::dx11
         [[nodiscard]] std::uint64_t mirror_generation() const noexcept {
             return mirror_generation_;
         }
+        [[nodiscard]] std::uint64_t mirror_serial() const noexcept {
+            return mirror_serial_;
+        }
         [[nodiscard]] ID3D11Texture2D* texture() const noexcept {
             return texture_.Get();
         }
@@ -77,10 +80,44 @@ namespace outrun::vr::dx11
         bool metadata_valid_ = false;
         std::uint64_t device_generation_ = 1;
         std::uint64_t mirror_generation_ = 0;
+        // Monotonic per-owner recreation identity. Deliberately survives
+        // shutdown()/reinitialize so stale pair snapshots cannot become current.
+        std::uint64_t mirror_serial_ = 0;
 
         Microsoft::WRL::ComPtr<ID3D11Device> device_;
         Microsoft::WRL::ComPtr<ID3D11Texture2D> texture_;
         Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv_;
         Microsoft::WRL::ComPtr<ID3D11DepthStencilView> dsv_;
     };
+
+    // R119 composes one exact color/depth mirror pair into a fail-closed
+    // render-target readiness identity. Dormant evidence only: no OM binding
+    // or game Draw* routing is activated here.
+    struct NativeSurfacePairReadiness
+    {
+        bool inputValid{};
+        bool colorReady{};
+        bool depthReady{};
+        bool deviceMatches{};
+        bool dimensionsMatch{};
+        bool generationsCurrent{};
+        bool componentSerialsPresent{};
+        bool ready{};
+        UINT width{};
+        UINT height{};
+        std::uint64_t colorMirrorSerial{};
+        std::uint64_t depthMirrorSerial{};
+        std::uint64_t snapshotToken{};
+    };
+
+    [[nodiscard]] NativeSurfacePairReadiness compose_surface_pair_readiness(
+        ID3D11Device* expectedDevice,
+        const NativeSurfaceMirror& color,
+        const NativeSurfaceMirror& depth) noexcept;
+
+    [[nodiscard]] bool validate_surface_pair_snapshot(
+        ID3D11Device* expectedDevice,
+        const NativeSurfaceMirror& color,
+        const NativeSurfaceMirror& depth,
+        std::uint64_t snapshotToken) noexcept;
 }
