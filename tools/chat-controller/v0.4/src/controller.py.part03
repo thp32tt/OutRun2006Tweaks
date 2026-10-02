@@ -1739,6 +1739,27 @@ async def localization_process_lane_isolated(
         active["lane_exception_at"] = now.isoformat()
         if count >= QUEUE_ERROR_RESTART_THRESHOLD:
             reason = f"Lane-local controller failure repeated {count} times: {signature}"
+            if _is_localization_producer(active) and active.get("task_latched", True):
+                # Preserve the producer TASK_ID/checkpoint and restart the controller
+                # process instead of converting a recoverable orchestration failure
+                # into a terminal task result. Docker restart policy resumes from /data.
+                active["failure_context"] = reason
+                active["automation_validation"] = "PENDING"
+                active["runtime_validation"] = "UNTESTED"
+                active["terminal"] = None
+                active["phase"] = "WAIT_CHAT"
+                active["task_latched"] = True
+                active["controller_stage"] = "WAIT_MATERIAL_COMMIT"
+                active["controller_restart_recovery_count"] = int(active.get("controller_restart_recovery_count", 0) or 0) + 1
+                active["last_checkpoint_at"] = now.isoformat()
+                save_queue_state(q)
+                write_runtime(
+                    status="lane_exception_restart",
+                    last_action=f"{active.get('task_id')} remains ACTIVE; restarting controller after {count} repeated lane-local failures",
+                    last_error=repr(e),
+                    queue=q,
+                )
+                raise ControllerRestartRequested(reason)
             active["failure_context"] = reason
             active["automation_validation"] = "FAIL"
             active["runtime_validation"] = "UNTESTED"
