@@ -1150,6 +1150,9 @@ def verify_dxvk_continuation_chain() -> None:
                 'predecessor["incomplete_expected_bytes"] == overlap.hex(" ")',
                 'predecessor["incomplete_actual_bytes"] == overlap.hex(" ")',
                 "and predecessor_overlap_matches",
+                '"overlap_expected_bytes": overlap.hex(" ")',
+                '"overlap_actual_bytes": overlap_actual.hex(" ")',
+                '"overlap_matches": overlap_matches',
                 '"predecessor_overlap_matches": predecessor_overlap_matches',
             )
             missing_predecessor_cross_proof_markers = [
