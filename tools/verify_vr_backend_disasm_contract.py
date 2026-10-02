@@ -39,7 +39,7 @@ def verify_dxvk_continuation_chain() -> None:
                 f"0x{start:08X}+{probe_len} != 0x{probe_end:08X}"
             )
 
-    proof_ids = (23, 24, 25, 26, 27, 28, 29)
+    proof_ids = (23, 24, 25, 26, 27, 28, 29, 30)
     for continuation_id in proof_ids:
         prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
         start = value(f"{prefix}_RVA")
@@ -51,7 +51,7 @@ def verify_dxvk_continuation_chain() -> None:
                 f"0x{proof_end:08X} not in 0x{start:08X}..0x{probe_end:08X}"
             )
 
-    cut_edge_ids = (23, 25, 26, 27)
+    cut_edge_ids = (23, 25, 26, 27, 30)
     for continuation_id in cut_edge_ids:
         prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
         proof_end = value(f"{prefix}_PREFIX_END_RVA")
@@ -1642,6 +1642,28 @@ def main() -> None:
             'RAW_BYTES_AND_REL32_CENSUS_ONLY',
             'gf_target_c_helper_1_third_callee_continuation_30=',
             'guarded_gf_target_c_helper_1_third_callee_continuation_30_provenance=FAILED',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_30_PREFIX_END_RVA = 0x00182A1C',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_30_INCOMPLETE_RVA = 0x00182A1C',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_30_INCOMPLETE_BYTES = bytes.fromhex("33")',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_30_BRANCHES = (',
+            '(0x001829DD, 0x00182A1E)',
+            '(0x00182A0B, 0x00182A1C)',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_30_CALLS = (',
+            '(0x001829F7, 0x00180195)',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_30_PREDECESSOR_TARGET_BYTES = (',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_30_RESOLVED_PRIOR_FORWARD_TARGET_RVA = 0x001829F2',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_30_INSTRUCTIONS = (',
+            '(0x001829DD, "75 3f", "jne 0x182a1e")',
+            '(0x00182A1A, "72 f1", "jb 0x182a0d")',
+            'def collect_guarded_gf_target_c_helper_1_third_callee_continuation_30_prefix_proof(pe: PE) -> dict:',
+            '"guarded_gf_target_c_helper_1_third_callee_continuation_30_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_30_prefix_proof(pe)',
+            'EXACT_1829DD_TO_182A1C_CONTROL_FLOW_CAPTURE_EDGE_PROVEN',
+            'EXACT_1829F2_PRIOR_FORWARD_TARGET_BOUNDARY_PROVEN',
+            'EXACT_1829DB_PREDECESSOR_TARGET_BYTES_PROVEN',
+            'EXACT_182A1E_BRANCH_TARGET_ADDRESS_DECODED_OUTSIDE_CAPTURE',
+            'INCOMPLETE_XOR_R32_RM32_OPCODE_AT_182A1C_CAPTURE_END',
+            'gf_target_c_helper_1_third_callee_continuation_30_proof=',
+            'guarded_gf_target_c_helper_1_third_callee_continuation_30_prefix_proof=FAILED',
             'text.rfind(prologue, lo, hi)',
             'def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:',
             '"guarded_gf_hook_provenance": collect_guarded_gf_hook_provenance(pe, calls)',
