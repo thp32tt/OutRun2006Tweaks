@@ -36,6 +36,23 @@ struct NativeBackendConfig {
     LUID adapter_luid{};
 };
 
+// Live binding proof for the R96 transform owner. A snapshot is valid only
+// when the exact translated WVP payload previously uploaded by this owner is
+// still bound at VS b0 on the caller-supplied same-device context. This is
+// dormant observation evidence only and never issues Draw*.
+struct NativeFixedFunctionTransformBindingReadiness {
+    bool inputValid{};
+    bool ownerReady{};
+    bool contextMatches{};
+    bool payloadMatches{};
+    bool boundExact{};
+    bool uploadPresent{};
+    bool ready{};
+    std::uint64_t uploadGeneration{};
+    std::uint64_t payloadHash{};
+    std::uint64_t snapshotToken{};
+};
+
 // R96 dormant owner for the R94/R95 fixed-function transform constant
 // payload. No game draw path constructs this owner yet.
 class NativeFixedFunctionTransformBuffer final {
@@ -51,6 +68,14 @@ public:
     bool upload_and_bind(
         ID3D11DeviceContext* context,
         const FixedFunctionTransformConstants& constants) noexcept;
+    [[nodiscard]] NativeFixedFunctionTransformBindingReadiness
+    binding_readiness(
+        ID3D11DeviceContext* context,
+        const FixedFunctionTransformConstants& constants) const noexcept;
+    [[nodiscard]] bool validate_binding_snapshot(
+        ID3D11DeviceContext* context,
+        const FixedFunctionTransformConstants& constants,
+        std::uint64_t snapshotToken) const noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
@@ -67,6 +92,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
     Microsoft::WRL::ComPtr<ID3D11Buffer> buffer_;
     std::uint64_t upload_generation_ = 0;
+    std::uint64_t payload_hash_ = 0;
 };
 
 // R98 dormant owner for one translated fixed-function sampler state.
@@ -1093,6 +1119,12 @@ public:
         const FixedFunctionPixelShaderPrototype& pixelPrototype,
         std::uint64_t snapshotToken) const noexcept;
 
+    // Upload and bind the exact translated WVP through the R96 owner without
+    // routing a game draw. The final VS-b0 gate reobserves this binding.
+    bool upload_transform_for_observation(
+        ID3D11DeviceContext* context,
+        const FixedFunctionTransformConstants& constants) noexcept;
+
     // Dormant exact-device binding primitive for the already-sealed R97
     // pipeline identity. This binds only IA/VS/PS objects for observation;
     // it does not upload per-draw constants or issue a Draw* call.
@@ -1290,6 +1322,57 @@ validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(
     const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
     UINT primitiveCount,
     UINT baseVertex,
+    std::uint64_t snapshotToken) noexcept;
+
+// Final transform-aware dormant pre-draw proof. R140 already reobserves live
+// pipeline/PS/RS/OM/direct-IA state; this layer additionally requires the
+// exact R96 WVP payload to remain bound at VS b0 on that same context.
+struct NativeFixedFunctionFullyBoundDrawReadiness {
+    bool inputValid{};
+    bool completeBoundDrawReady{};
+    bool transformBindingReady{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t completeBoundDrawSnapshotToken{};
+    std::uint64_t transformBindingSnapshotToken{};
+    std::uint64_t transformPayloadHash{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionFullyBoundDrawReadiness
+compose_fixed_function_fully_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat, UINT indexOffset,
+    const FixedFunctionTransformConstants& transform) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_fully_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat, UINT indexOffset,
+    const FixedFunctionTransformConstants& transform,
     std::uint64_t snapshotToken) noexcept;
 
 class NativeBackend final {

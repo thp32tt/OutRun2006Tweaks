@@ -28,6 +28,21 @@ std::uint64_t mix_readiness_snapshot_token(
     return token;
 }
 
+std::uint64_t hash_transform_payload_bytes(
+    const FixedFunctionTransformConstants& constants) noexcept {
+    if (!constants.exact() || constants.payloadHash == 0)
+        return 0;
+    std::uint64_t hash = 1469598103934665603ull;
+    const auto* bytes = reinterpret_cast<const unsigned char*>(
+        constants.worldViewProjection.data());
+    constexpr std::size_t kPayloadBytes = 16u * sizeof(float);
+    for (std::size_t index = 0; index < kPayloadBytes; ++index) {
+        hash ^= static_cast<std::uint64_t>(bytes[index]);
+        hash *= 1099511628211ull;
+    }
+    return hash == constants.payloadHash ? hash : 0;
+}
+
 std::uint64_t hash_pipeline_input_layout_identity(
     const VertexInputLayoutTranslation& layout) noexcept {
     if (!layout.exact || layout.elementCount == 0 ||
@@ -297,6 +312,10 @@ bool NativeFixedFunctionTransformBuffer::upload_and_bind(
     if (!ready() || !context || !constants.exact())
         return false;
 
+    const auto payloadHash = hash_transform_payload_bytes(constants);
+    if (payloadHash == 0)
+        return false;
+
     Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
     context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
     if (!contextDevice || contextDevice.Get() != device_.Get())
@@ -318,14 +337,76 @@ bool NativeFixedFunctionTransformBuffer::upload_and_bind(
 
     ID3D11Buffer* buffer = buffer_.Get();
     context->VSSetConstantBuffers(0, 1, &buffer);
+    Microsoft::WRL::ComPtr<ID3D11Buffer> observedBuffer;
+    context->VSGetConstantBuffers(0, 1, observedBuffer.ReleaseAndGetAddressOf());
+    if (observedBuffer.Get() != buffer_.Get())
+        return false;
+    payload_hash_ = payloadHash;
     ++upload_generation_;
+    if (upload_generation_ == 0)
+        ++upload_generation_;
     return true;
+}
+
+NativeFixedFunctionTransformBindingReadiness
+NativeFixedFunctionTransformBuffer::binding_readiness(
+    ID3D11DeviceContext* context,
+    const FixedFunctionTransformConstants& constants) const noexcept {
+    NativeFixedFunctionTransformBindingReadiness out{};
+    const auto payloadHash = hash_transform_payload_bytes(constants);
+    out.payloadHash = payloadHash;
+    out.uploadGeneration = upload_generation_;
+    out.inputValid = context != nullptr && payloadHash != 0;
+    out.ownerReady = ready();
+    out.payloadMatches = payloadHash != 0 && payload_hash_ == payloadHash;
+    out.uploadPresent = upload_generation_ != 0 && payload_hash_ != 0;
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    if (context)
+        context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    out.contextMatches =
+        contextDevice && device_ && contextDevice.Get() == device_.Get();
+    if (out.inputValid && out.ownerReady && out.contextMatches) {
+        Microsoft::WRL::ComPtr<ID3D11Buffer> observedBuffer;
+        context->VSGetConstantBuffers(
+            0, 1, observedBuffer.ReleaseAndGetAddressOf());
+        out.boundExact = observedBuffer.Get() == buffer_.Get();
+    }
+    out.ready =
+        out.inputValid && out.ownerReady && out.contextMatches &&
+        out.payloadMatches && out.boundExact && out.uploadPresent;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(this)));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(device_.Get())));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(buffer_.Get())));
+        token = mix_readiness_snapshot_token(token, out.uploadGeneration);
+        token = mix_readiness_snapshot_token(token, out.payloadHash);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeFixedFunctionTransformBuffer::validate_binding_snapshot(
+    ID3D11DeviceContext* context,
+    const FixedFunctionTransformConstants& constants,
+    std::uint64_t snapshotToken) const noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = binding_readiness(context, constants);
+    return current.ready && current.snapshotToken == snapshotToken;
 }
 
 void NativeFixedFunctionTransformBuffer::shutdown() noexcept {
     buffer_.Reset();
     device_.Reset();
     upload_generation_ = 0;
+    payload_hash_ = 0;
 }
 
 bool NativeFixedFunctionSamplerState::initialize(
@@ -2021,6 +2102,14 @@ bool NativeFixedFunctionPipelineBundle::validate_translation_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+bool NativeFixedFunctionPipelineBundle::upload_transform_for_observation(
+    ID3D11DeviceContext* context,
+    const FixedFunctionTransformConstants& constants) noexcept {
+    if (!ready() || !context)
+        return false;
+    return transform_buffer_.upload_and_bind(context, constants);
+}
+
 bool NativeFixedFunctionPipelineBundle::bind_for_observation(
     ID3D11DeviceContext* context,
     const VertexInputLayoutTranslation& layout,
@@ -3712,6 +3801,84 @@ validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(
             layout, vertexPrototype, pixelPrototype, samplers, textures,
             vertexBuffer, vertexStride, vertexOffset,
             generatedIndexBuffer, primitiveCount, baseVertex);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
+NativeFixedFunctionFullyBoundDrawReadiness
+compose_fixed_function_fully_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat, UINT indexOffset,
+    const FixedFunctionTransformConstants& transform) noexcept {
+    NativeFixedFunctionFullyBoundDrawReadiness out{};
+    const auto complete = compose_fixed_function_complete_bound_draw_readiness(
+        draw, context, outputStateBinding, pipelineBundle,
+        layout, vertexPrototype, pixelPrototype, samplers, textures,
+        geometry, vertexBuffer, vertexStride, vertexOffset,
+        indexBuffer, indexFormat, indexOffset);
+    const auto transformBinding =
+        pipelineBundle.transform_buffer().binding_readiness(context, transform);
+    out.completeBoundDrawSnapshotToken = complete.snapshotToken;
+    out.transformBindingSnapshotToken = transformBinding.snapshotToken;
+    out.transformPayloadHash = transformBinding.payloadHash;
+    out.inputValid = complete.inputValid && transformBinding.inputValid;
+    out.completeBoundDrawReady = complete.ready && complete.snapshotToken != 0;
+    out.transformBindingReady =
+        transformBinding.ready && transformBinding.snapshotToken != 0;
+    out.componentSnapshotsPresent =
+        complete.snapshotToken != 0 &&
+        transformBinding.snapshotToken != 0 &&
+        transformBinding.payloadHash != 0;
+    out.ready =
+        out.inputValid && out.completeBoundDrawReady &&
+        out.transformBindingReady && out.componentSnapshotsPresent;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.completeBoundDrawSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.transformBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.transformPayloadHash);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_fully_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat, UINT indexOffset,
+    const FixedFunctionTransformConstants& transform,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = compose_fixed_function_fully_bound_draw_readiness(
+        draw, context, outputStateBinding, pipelineBundle,
+        layout, vertexPrototype, pixelPrototype, samplers, textures,
+        geometry, vertexBuffer, vertexStride, vertexOffset,
+        indexBuffer, indexFormat, indexOffset, transform);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 

@@ -2284,6 +2284,26 @@ int main()
         "R112 exact fixed-function pipeline translation identity issues a valid snapshot");
 
     require(
+        pipelineBundle.upload_transform_for_observation(d3d.context, transform),
+        "final VS b0 transform upload prerequisite");
+    const auto pipelineTransformBindingReady =
+        pipelineBundle.transform_buffer().binding_readiness(
+            d3d.context, transform);
+    require(
+        pipelineTransformBindingReady.inputValid &&
+        pipelineTransformBindingReady.ownerReady &&
+        pipelineTransformBindingReady.contextMatches &&
+        pipelineTransformBindingReady.payloadMatches &&
+        pipelineTransformBindingReady.boundExact &&
+        pipelineTransformBindingReady.uploadPresent &&
+        pipelineTransformBindingReady.ready &&
+        pipelineTransformBindingReady.payloadHash == transform.payloadHash &&
+        pipelineTransformBindingReady.snapshotToken != 0 &&
+        pipelineBundle.transform_buffer().validate_binding_snapshot(
+            d3d.context, transform, pipelineTransformBindingReady.snapshotToken),
+        "final VS b0 transform binding seals exact WVP payload");
+
+    require(
         pipelineBundle.bind_for_observation(
             d3d.context, inputLayout, vertexPrototype, pixelPrototype,
             pipelineIdentityReady.snapshotToken),
@@ -3317,6 +3337,92 @@ int main()
             completeBoundDraw.snapshotToken),
         "R140 complete bound draw restores exact IA binding parameters");
 
+
+    {
+        const auto fullyBoundDraw =
+            outrun::vr::dx11::compose_fixed_function_fully_bound_draw_readiness(
+                multiStageDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                indexedGeometryReady, managedVertexBuffer,
+                geometryVertexStride, geometryVertexOffset,
+                &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+                transform);
+        require(
+            fullyBoundDraw.inputValid &&
+            fullyBoundDraw.completeBoundDrawReady &&
+            fullyBoundDraw.transformBindingReady &&
+            fullyBoundDraw.componentSnapshotsPresent &&
+            fullyBoundDraw.ready &&
+            fullyBoundDraw.transformBindingSnapshotToken ==
+                pipelineTransformBindingReady.snapshotToken &&
+            fullyBoundDraw.transformPayloadHash == transform.payloadHash &&
+            fullyBoundDraw.snapshotToken != 0 &&
+            outrun::vr::dx11::validate_fixed_function_fully_bound_draw_snapshot(
+                multiStageDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                indexedGeometryReady, managedVertexBuffer,
+                geometryVertexStride, geometryVertexOffset,
+                &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+                transform, fullyBoundDraw.snapshotToken),
+            "final fully bound draw includes exact live VS b0 transform");
+
+        ID3D11Buffer* nullFinalTransformBuffer = nullptr;
+        d3d.context->VSSetConstantBuffers(0, 1, &nullFinalTransformBuffer);
+        const auto missingTransformBinding =
+            outrun::vr::dx11::compose_fixed_function_fully_bound_draw_readiness(
+                multiStageDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                indexedGeometryReady, managedVertexBuffer,
+                geometryVertexStride, geometryVertexOffset,
+                &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+                transform);
+        require(
+            missingTransformBinding.completeBoundDrawReady &&
+            !missingTransformBinding.transformBindingReady &&
+            !missingTransformBinding.ready &&
+            missingTransformBinding.snapshotToken == 0 &&
+            !outrun::vr::dx11::validate_fixed_function_fully_bound_draw_snapshot(
+                multiStageDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                indexedGeometryReady, managedVertexBuffer,
+                geometryVertexStride, geometryVertexOffset,
+                &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+                transform, fullyBoundDraw.snapshotToken),
+            "final fully bound draw fails closed after VS b0 drift");
+
+        ID3D11Buffer* restoredFinalTransformBuffer =
+            pipelineBundle.transform_buffer().buffer();
+        d3d.context->VSSetConstantBuffers(0, 1, &restoredFinalTransformBuffer);
+        const auto fullyBoundDrawRestored =
+            outrun::vr::dx11::compose_fixed_function_fully_bound_draw_readiness(
+                multiStageDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                indexedGeometryReady, managedVertexBuffer,
+                geometryVertexStride, geometryVertexOffset,
+                &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+                transform);
+        require(
+            fullyBoundDrawRestored.ready &&
+            fullyBoundDrawRestored.snapshotToken == fullyBoundDraw.snapshotToken,
+            "final VS b0 restore reproduces fully bound draw snapshot");
+
+        auto transformPayloadDrift = transform;
+        transformPayloadDrift.worldViewProjection[0] += 1.0f;
+        const auto copiedPayloadDrift =
+            pipelineBundle.transform_buffer().binding_readiness(
+                d3d.context, transformPayloadDrift);
+        require(
+            !copiedPayloadDrift.inputValid &&
+            !copiedPayloadDrift.payloadMatches &&
+            !copiedPayloadDrift.ready &&
+            copiedPayloadDrift.snapshotToken == 0,
+            "final VS b0 copied WVP payload drift fails closed");
+    }
 
     NativeTriangleFanIndexBuffer liveFanOwner;
     require(
