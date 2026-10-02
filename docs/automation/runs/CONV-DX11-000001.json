@@ -96,5 +96,107 @@
     "automation_validation": "PASS_REMOTE_STATIC",
     "runtime_validation": "UNTESTED",
     "summary": "Added R117 dormant fixed-function draw-readiness composition. A nonzero draw candidate token now requires both the R115 activation snapshot and the R116 render-state snapshot; missing/not-ready/stale component evidence fails closed. Added hosted probe coverage and source-graph drift guards. Native Draw* routing remains disabled."
-  }
+  },
+  "continuation_units": [
+    {
+      "unit_id": "DX11_FOG_STATE_CENSUS_IDENTITY_R119",
+      "job_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_FOG_STATE_CENSUS_IDENTITY",
+      "base_sha": "12690c3de37f724e062da046ed3097b64fd931fe",
+      "material_result_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
+      "validation_bearing_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "FOGENABLE-only capture could not identify D3D9 fog semantics. Exact DX11 readiness needs passive evidence for fog color, table/vertex mode, start/end/density and range-fog state before any shader implementation or Draw* activation.",
+      "summary": "Expanded the passive D3D9 render-state snapshot to the complete fog identity, preserved float-valued states as raw DWORD bits, propagated semantic fog identity into the DX11 census signature, logged R119 per-signature evidence, and added a fail-closed source-graph guard. Native Draw* remains disabled.",
+      "changed_paths": [
+        "src/vr/core/d3d9_draw_state.hpp",
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "src/vr/d3d11/runtime_census.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Read AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/automation/runs/CONV-DX11-000001.json, current DX11 plan/source graph and Issue #14 through the authenticated GitHub connector.",
+            "Observed same-JOB concurrent alpha-test/surface-mirror work and selected a non-overlapping fog census/readiness gap on the current vr-dx11-native-r71 HEAD."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "RenderStateSnapshot and CaptureTrackedRenderStateSnapshot carried only fogEnable while D3D9 fog semantics depend on color, table/vertex modes, start/end/density and range-fog state.",
+            "translate_pipeline still correctly keeps fog unsupported; this unit adds evidence identity only and does not promote native fog behavior."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "changed_paths": [
+            "src/vr/core/d3d9_draw_state.hpp",
+            "src/vr/d3d9/stereo_renderer_r7.inc",
+            "src/vr/d3d11/runtime_census.cpp",
+            "tools/verify_dx11_source_graph.py"
+          ],
+          "material_commit": "a564becad3d390c84034e3bd666b2714f5781d81",
+          "details": [
+            "Captured FOGCOLOR, FOGTABLEMODE, FOGSTART, FOGEND, FOGDENSITY, RANGEFOGENABLE and FOGVERTEXMODE in addition to FOGENABLE.",
+            "Preserved float-valued fog render states as raw IEEE-754 DWORD bit patterns and hashed fog-color RGB only because D3D9 ignores fog alpha.",
+            "Added semantic fog identity to census signature hashing and an R119 per-signature fog evidence log.",
+            "Added fail-closed source-graph checks for snapshot, capture, propagation, hashing and logging."
+          ]
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_REMOTE_STATIC",
+          "automation_validation": "PASS_REMOTE_STATIC",
+          "evidence": [
+            "Re-fetched exact material SHA and all four changed blobs; snapshot/capture/census/guard assertions all passed and the commit diff does not touch NativeDrawPathActive.",
+            "Backend Conversion Gate run 36970889503 on exact SHA passed queue automation, HMD-baseline structure, one-click structure, backend disassembly, session regressions, DX11 transport, DX11 dual-source, Verify DX11 source graph, dormant activation boundary and DX11 census analyzer.",
+            "Win32 configure/build was still in progress at C6 persistence time; no Win32 build success or WARP/runtime success is claimed."
+          ],
+          "gate_run_id": 36970889503,
+          "full_win32_build": "IN_PROGRESS_AT_C6",
+          "runtime_validation": "UNTESTED"
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "a564becad3d390c84034e3bd666b2714f5781d81",
+          "issue14_comment_id": 5946373640
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Observation-only render-state/census readiness work. No native game draw routing, runtime candidate payload, backend promotion or package behavior was activated."
+        },
+        "C6_STATE": {
+          "status": "PERSISTING_WITH_THIS_STATE_COMMIT",
+          "state_parent_head": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
+          "exact_next_action": "Consume the exact-SHA Backend Conversion Gate result for a564becad3d390c84034e3bd666b2714f5781d81 when complete. Then use exhaustive R119 fog evidence to determine which D3D9 fog modes actually occur before implementing shader semantics. Keep native Draw* disabled and fog translation fail-closed until exact semantics and Quest 3/VDXR parity are proven."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "related_finding_or_regression_keys": [
+        "DX11-FOG-STATE-CENSUS-IDENTITY-001",
+        "DX11-DRAW-ACTIVATION-SURFACE-001"
+      ],
+      "issue14_comment_id": 5946373640,
+      "automation_validation": "PASS_REMOTE_STATIC",
+      "blocker": "Native fog shader behavior is intentionally not implemented or activated. Exact-build exhaustive census and Quest 3/VDXR parity remain required before native Draw* activation.",
+      "next_action": "Consume the exact-SHA Backend Conversion Gate result for a564becad3d390c84034e3bd666b2714f5781d81 when complete. Then use exhaustive R119 fog evidence to determine which D3D9 fog modes actually occur before implementing shader semantics. Keep native Draw* disabled and fog translation fail-closed until exact semantics and Quest 3/VDXR parity are proven.",
+      "checkpoint": "C6_STATE",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE"
+    }
+  ],
+  "latest_continuation_unit": "DX11_FOG_STATE_CENSUS_IDENTITY_R119",
+  "state_persisted_for_continuation": true
 }
