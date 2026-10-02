@@ -52,4 +52,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          docker build -f tools/chat-controller/v0.4/Dockerfile.portainer tools/chat-controller/v0.4
+          docker build -t outrun-localization-recovery:test -f tools/chat-controller/v0.4/Dockerfile.portainer tools/chat-controller/v0.4
+
+      - name: Runtime smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run -d --name outrun-localization-recovery-smoke             -e CONTROLLER_MODE=localization             -e AUTO_SEND=false             -e QUEUE_MODE=true             -e LOCALIZATION_PARALLEL=true             -e CHAT_SLOTS=3             -e REQUIRE_PROJECT_URL=false             -e GITHUB_REPO=thp32tt/OutRun2006Tweaks             -e GITHUB_TOKEN=             -e CHATGPT_PROJECT_URL=             outrun-localization-recovery:test
+          ok=0
+          for i in $(seq 1 30); do
+            if docker exec outrun-localization-recovery-smoke curl -fsS http://127.0.0.1:8787/status >/tmp/status.html 2>/dev/null; then
+              ok=1
+              break
+            fi
+            sleep 3
+          done
+          docker logs outrun-localization-recovery-smoke || true
+          test "$ok" = "1"
+          grep -q "Runtime" /tmp/status.html
+          docker rm -f outrun-localization-recovery-smoke
