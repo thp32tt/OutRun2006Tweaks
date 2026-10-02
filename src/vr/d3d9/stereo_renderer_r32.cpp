@@ -420,8 +420,8 @@ namespace OutRunVRStereo
                 FrameStereoPoseSequence != stereo.poseSequence)
                 return {};
 
-            DrawStereoState draw{};
-            if (!BuildFastWorldConstants(device, stereo, draw))
+            FastWorldDispatchConstants draw{};
+            if (!BuildFastWorldDispatchConstants(device, stereo, draw))
                 return {};
 
             D3DVIEWPORT9 savedViewport{};
@@ -511,7 +511,7 @@ namespace OutRunVRStereo
             if (FrameStereoPoseSequence == 0)
             {
                 FrameStereoPoseSequence = draw.poseSequence;
-                FrameStereoMetadata = draw.stereoFrame;
+                FrameStereoMetadata = stereo;
             }
 
             if (FAILED(rightHr))
@@ -1562,12 +1562,14 @@ HRESULT __stdcall PresentDestR32(IDirect3DDevice9* device,
             originalConstants, restoreWvp);
     }
 
-    template <typename LowerDraw>
-    HRESULT LowerFailClosed(
-        IDirect3DDevice9* device, LowerDraw&& lowerDraw) noexcept
+    HRESULT RunLowerFailClosed(
+        IDirect3DDevice9* device,
+        FailClosedDrawCallback callback,
+        void* context) noexcept
     {
-        return R32LowerFailClosed(
-            device, std::forward<LowerDraw>(lowerDraw));
+        return R32LowerFailClosed(device, [callback, context]() noexcept {
+            return callback(context);
+        });
     }
 
     OutRunVR::RuntimeEligibility::InstallState
