@@ -1947,8 +1947,8 @@ async def queue_send_c_execution_continuation(
         "QA_BATCH_INPUTS=" + json.dumps(batch, ensure_ascii=False, separators=(",", ":")) + "\n"
         "이 C TASK는 batch 하나 설명하고 종료하는 작업이 아니다. 첫 출력은 연결된 GitHub/파일 도구 호출이어야 한다. "
         "위 immutable TASK_ID@RESULT_SHA 입력을 전부 검증하고 current-v2 static PASS/REWORK를 reconcile한 뒤 "
-        "새 [AUTO:TASK_ID] commit을 남겨. 일부 입력만 검토한 커밋은 완료로 인정되지 않는다. "
-        "runtime UNTESTED는 static production_complete를 막지 않는다."
+        "새 [AUTO:TASK_ID] commit을 남겨. 이 commit은 Localization Automation Gate 대상이므로 CI-skip 지시어를 넣지 마. "
+        "일부 입력만 검토한 커밋은 완료로 인정되지 않는다. runtime UNTESTED는 static production_complete를 막지 않는다."
     )
     sent = await queue_send_same_chat_control_message(
         context,
