@@ -4,31 +4,31 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "9fb8b92ecb1af016de6b9f48a6b101ecad07ea29",
-  "state_parent_head": "22a9010516ecfb729b7b68ecf177b5f3dc295d5f",
-  "material_result_sha": "6977c6a22ff6aa9eef2dec45dada3164f9b8c120",
-  "validation_bearing_sha": "717a284cee1f35b6074ca388d3d39dca9d56b9e3",
+  "base_sha": "0dd353c4147ba412ca9376404c826a0187f49a61",
+  "state_parent_head": "e1b507248de7891211a8c26775b5c501a97828c9",
+  "material_result_sha": "b0d0eee45bfaf843a634b255f6cf25902776df24",
+  "validation_bearing_sha": "df28e8ac4a4244239129dad6b4c2aca5b29bff70",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_FIXED_FUNCTION_GRAPHICS_STAGE_ISOLATION_R147",
-  "selection_reason": "Fresh current-branch review found that final dormant pipeline readiness reobserved exact IA input layout plus VS/PS identity but did not prove D3D11 GS/HS/DS were absent. Any inherited programmable stage could change future Draw* semantics, so fixed-function graphics-stage isolation was the highest-value independent static fail-closed gap.",
-  "summary": "R147 clears GS/HS/DS when binding the dormant fixed-function pipeline, reobserves those live stages in readiness, rejects a real injected WARP geometry shader, and guards the contract in the DX11 source-graph verifier. NativeDrawPathActive remains disabled.",
+  "selected_work": "DX11_DIRECT_INDEXED_SOURCE_RANGE_IDENTITY_R149",
+  "selection_reason": "Fresh current-HEAD audit found the R147 direct non-fan dispatch gate sealed the eventual D3D11 Draw/DrawIndexed tuple but did not preserve D3D9 DrawIndexedPrimitive MinVertexIndex/NumVertices source-range semantics. Those arguments disappear from the D3D11 DrawIndexed API, so preserving their exact stale-resistant identity before activation was the highest-value independent static conversion gap.",
+  "summary": "Added dormant R149 indexed source-range readiness preserving BaseVertexIndex, MinVertexIndex, NumVertices, StartIndex and PrimitiveCount with primitive-derived element count. The gate rejects empty live vertex ranges, vertex/index arithmetic overflow, direct triangle-fan use and stale argument drift; probe coverage and source-graph production-caller quarantine retain the contract. Native Draw* remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read current GitHub branch HEAD, AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/automation/runs/CONV-DX11-000001.json, VR work queue, regression knowledge/history, and Issue #14 through authenticated GitHub authority.",
-        "Tracked concurrent same-branch R145/R146/direct-dispatch descendants and used fast-forward-only publication; no N100/local clone was used as product-development truth."
+        "Read branch AGENTS.md, current conversion state/run record, regression knowledge/history, Issue #14 and current DX11 source/probe/verifier artifacts through authenticated GitHub authority.",
+        "Tracked concurrent same-branch descendants and retried one GitHub 409 source conflict against the newest blob; no N100/local clone was used as product-development truth."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Confirmed final dormant pipeline binding readiness reobserved exact IA input layout, VS and PS objects but had no GSGetShader/HSGetShader/DSGetShader isolation check.",
-        "Confirmed no existing GS/HS/DS clear/readback contract existed in native_backend, the WARP probe, or verify_dx11_source_graph.py at selection time.",
-        "Bounded the unit to fixed-function graphics stages only; native Draw* activation and runtime behavior remain outside this static unit."
+        "Confirmed R147 direct dispatch seals PrimitiveCount-derived element count, StartVertexLocation/StartIndexLocation/BaseVertexLocation and final live bound-state identity.",
+        "Confirmed D3D9-only MinVertexIndex/NumVertices were not represented in that dispatch identity and would otherwise be lost at the D3D11 DrawIndexed API boundary.",
+        "Bounded R149 to numeric/source-range identity only; it does not claim actual source-index values were scanned against the declared range."
       ]
     },
     "C2_IMPLEMENT": {
@@ -40,41 +40,44 @@
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "6977c6a22ff6aa9eef2dec45dada3164f9b8c120"
+        "32e921c1e63697c88fdf9809a0118be9121dc324",
+        "b0d0eee45bfaf843a634b255f6cf25902776df24",
+        "df28e8ac4a4244239129dad6b4c2aca5b29bff70"
       ],
       "details": [
-        "Added GS/HS/DS clear-state fields and aggregate graphicsStageIsolationReady to NativeFixedFunctionPipelineBindingReadiness.",
-        "Dormant pipeline binding now explicitly clears GS/HS/DS and verifies their live readback is null before accepting the exact IA/VS/PS binding.",
-        "Live binding readiness now fails closed when any GS/HS/DS stage is populated and versions the snapshot identity with the R147 isolation contract.",
-        "WARP probe compiles/creates a real geometry shader, injects it to prove fail-closed rejection, then restores deterministic isolation; source-graph guard enforces the contract."
+        "Added NativeFixedFunctionIndexedSourceRangeReadiness with exact D3D9 indexed source-range argument identity and stale-snapshot validation.",
+        "Derived direct non-fan element count and fail-closed MinVertexIndex+NumVertices and StartIndex+element-count overflow checks; nonzero primitive draws reject an empty declared vertex range and triangle fans remain on the generated-index path.",
+        "Added positive/drift/overflow/fan probe coverage and quarantined both R149 APIs from production source before activation."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_DESCENDANT_STATIC_CONFIGURE_CANCELLED_BY_CHURN",
-      "automation_validation": "PASS_DESCENDANT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+      "status": "COMPLETE_EXACT_STATIC_CONFIGURE_IN_PROGRESS",
+      "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_CENSUS_CONFIGURE_IN_PROGRESS",
       "evidence": [
-        "Exact material Build run 36979763472 and Backend Conversion Gate run 36979759369 were cancelled by same-branch descendant churn before useful steps completed; no result is inferred from those cancellations.",
-        "Validation descendant 717a284cee1f35b6074ca388d3d39dca9d56b9e3 retains the R147 native source, probe and source-graph guard.",
-        "Build run 36979840162 job 110751629759 passed HMD baseline, one-click structure, backend disassembly, Verify DX11 source graph, DX11 census analyzer and wheel static/math checks before Configure was cancelled by a later push.",
-        "Backend Conversion Gate run 36979836237 job 110751646448 passed queue/baseline/structure/disassembly/session-analysis, DX11 native transport, dual-source, DX11 source graph, dormant activation-boundary and census static steps before Configure cancellation.",
-        "Win32 compile and R147 WARP executable execution are not claimed because cancellation occurred at Configure."
+        "Exact validation-bearing SHA df28e8ac4a4244239129dad6b4c2aca5b29bff70 retained one R149 declaration/implementation plus all expected probe/verifier markers and production-caller quarantine.",
+        "Build run 36980813692 job 110754710280 on that exact SHA passed Checkout, HMD baseline, one-click structure, backend disassembly contract, Verify DX11 source graph, Test DX11 census analyzer, consolidated wheel source and production wheel FFB math.",
+        "Configure was still in progress at validation capture; Win32 compile, probe executable/WARP execution and runtime behavior are not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "6977c6a22ff6aa9eef2dec45dada3164f9b8c120",
-      "issue14_comment_id": 5947553790,
-      "validation_issue14_comment_id": 5947592536
+      "material_commits": [
+        "32e921c1e63697c88fdf9809a0118be9121dc324",
+        "b0d0eee45bfaf843a634b255f6cf25902776df24",
+        "df28e8ac4a4244239129dad6b4c2aca5b29bff70"
+      ],
+      "issue14_comment_id": 5947732266
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant DX11 readiness/probe/static-guard work only. No production Draw* route, backend activation/promotion, OpenXR transport, localization or release payload changed."
+      "reason": "Dormant DX11 readiness/probe/static-guard work only; no production Draw* routing, backend activation, OpenXR transport, localization, other backend lane or release payload changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R147. Consume the already-present direct-dispatch descendant work only if still non-superseded/not durably recorded, then run a fresh current-HEAD source-wide audit for the next independent dormant conversion gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "lane_state_commit": "802fe62657d041f7f8eeda488bfb307e4e474ead",
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R149. Current descendants already add R150 binding between R147 direct dispatch and R149 source range; validate/persist that existing descendant rather than duplicate it, then continue fresh current-HEAD static review. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -85,13 +88,21 @@
     "localization_modified": false,
     "other_backend_modified": false
   },
-  "issue14_comment_id": 5947553790,
-  "automation_validation": "PASS_DESCENDANT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
-  "blocker": "Win32 compile/WARP probe execution was superseded by branch churn; static source-graph and activation-boundary gates passed on retaining descendant. Runtime remains UNTESTED.",
-  "next_action": "Keep NativeDrawPathActive disabled. Preserve completed R147 GS/HS/DS graphics-stage isolation. Consume the already-present direct-dispatch descendant work (284ba6509becdfb3cd2363050d71282060aac447) only if it is still non-superseded and not yet durably recorded, then perform a fresh current-HEAD source-wide audit for the next unsealed dormant DX11 draw-semantics gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5947732266,
+  "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_CENSUS_CONFIGURE_IN_PROGRESS",
+  "blocker": "Win32 Configure/build and WARP probe execution were not complete at validation capture; runtime remains UNTESTED. This does not block the completed R149 static readiness unit.",
+  "next_action": "Keep NativeDrawPathActive disabled. Preserve R149. Current descendants already add R150 binding between R147 direct dispatch and R149 source range; validate/persist that existing descendant rather than duplicate it, then continue a fresh source-wide DX11 dormant-conversion audit. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "prior_completed_unit": "DX11_DIRECT_DRAW_DISPATCH_ARGUMENT_READINESS_R147",
-  "validation_issue14_comment_id": 5947592536
+  "prior_completed_unit": {
+    "selected_work": "DX11_FIXED_FUNCTION_GRAPHICS_STAGE_ISOLATION_R147",
+    "material_result_sha": "6977c6a22ff6aa9eef2dec45dada3164f9b8c120",
+    "validation_bearing_sha": "717a284cee1f35b6074ca388d3d39dca9d56b9e3",
+    "automation_validation": "PASS_DESCENDANT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+    "runtime_validation": "UNTESTED",
+    "checkpoint": "C6_STATE",
+    "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+    "issue14_comment_id": 5947553790
+  }
 }
