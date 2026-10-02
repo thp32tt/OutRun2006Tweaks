@@ -1268,7 +1268,7 @@ def verify_dxvk_continuation_chain() -> None:
         predecessor_boundary_gates = {
             name
             for name in assigned_names
-            if name.endsWith("_is_predecessor_boundary")
+            if name.endswith("_is_predecessor_boundary")
         }
         required_proven_gates = (
             mandatory_proven_gates
