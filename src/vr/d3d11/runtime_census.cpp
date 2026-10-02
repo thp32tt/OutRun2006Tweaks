@@ -291,6 +291,12 @@ namespace outrun::vr::dx11
             D3DVIEWPORT9 outputViewport{};
             RECT outputScissorRect{};
             DWORD outputScissorTestEnable = FALSE;
+            // R191: D3DRS_TEXTUREFACTOR participates in fixed-function
+            // D3DTA_TFACTOR/BLENDFACTORALPHA semantics. Keep observation
+            // completeness and raw ARGB value in draw identity before those
+            // shader operations are promoted.
+            bool textureFactorObservationComplete{};
+            DWORD textureFactor = 0xFFFFFFFFu;
             // R169: D3D9 POINTLIST size/sprite/scale state affects raster and
             // texture-coordinate semantics. Preserve the complete family in
             // census identity while native direct points remain fail-closed.
@@ -520,6 +526,9 @@ namespace outrun::vr::dx11
                 hash, sig.outputStateObservationComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.outputBlendFactor);
             hash = hash_mix(hash, sig.outputMultiSampleMask);
+            hash = hash_mix(
+                hash, sig.textureFactorObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.textureFactor);
             hash = hash_mix(hash, sig.outputViewport.X);
             hash = hash_mix(hash, sig.outputViewport.Y);
             hash = hash_mix(hash, sig.outputViewport.Width);
@@ -1648,6 +1657,12 @@ namespace outrun::vr::dx11
                         sig.rangeFogEnable != FALSE ? 1 : 0);
 
                     spdlog::info(
+                        "VR DX11 R191 ffp texture-factor state#{}: observed={} argb=0x{:08X}",
+                        unique,
+                        sig.textureFactorObservationComplete ? 1 : 0,
+                        sig.textureFactor);
+
+                    spdlog::info(
                         "VR DX11 R94 ffp vertex readiness#{}: generated={} mask=0x{:08X} sourceHash=0x{:016X} sourceBytes={} transform[exact={},mask=0x{:08X},payloadHash=0x{:016X}]",
                         unique,
                         sig.fixedFunctionVertexShaderPrototypeGenerated ? 1 : 0,
@@ -2306,6 +2321,9 @@ namespace outrun::vr::dx11
         signature.outputViewport = source.viewport;
         signature.outputScissorRect = source.scissorRect;
         signature.outputScissorTestEnable = source.scissorTestEnable;
+        signature.textureFactorObservationComplete =
+            captured && source.complete;
+        signature.textureFactor = source.textureFactor;
         signature.pointRasterObservationComplete =
             captured && source.complete;
         signature.pointSizeBits = source.pointSizeBits;
