@@ -157,6 +157,7 @@ class CoreTests(unittest.TestCase):
         self.assertIn("localization-binary-import-v05.yml", prompt)
         self.assertIn("binary_staging/v05/<JOB_ID>/", prompt)
         self.assertIn("manifest.json", prompt)
+        self.assertIn("GitHub read-size/truncation is not a blocker", prompt)
 
     def test_config_has_expected_current_branches(self):
         config = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))

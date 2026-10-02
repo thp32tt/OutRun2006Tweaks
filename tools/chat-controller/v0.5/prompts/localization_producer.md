@@ -6,6 +6,8 @@ Choose one highest-priority runnable unfinished asset in your shard. Prefer curr
 
 If the first asset is genuinely blocked, immediately choose another runnable asset in the same shard. Do not finish with a plan, source lookup, preflight, or status note when another runnable asset exists.
 
+GitHub read-size/truncation is not a blocker and must never end the job. If asset_queue.csv or another state file is too large or a connector response is truncated, change retrieval strategy: use targeted GitHub search, fetch the exact file/path, request narrower content where supported, or inspect only the shard/candidate records needed for this JOB. Continue until a concrete runnable asset is selected or a fresh targeted check proves none exists.
+
 Producer jobs do not edit shared progress/resume/WORKLOG reconciliation. C owns shared QA reconciliation.
 
 Binary DDS transport rule:
