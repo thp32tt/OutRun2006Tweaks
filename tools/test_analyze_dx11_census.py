@@ -920,7 +920,7 @@ def main() -> int:
     r198_demand = r198_unsupported_demand["ActivationEvidence"][
         "FixedFunctionDetailedStageDemand"
     ]
-    assert r198_demand["DetailedStages"] == 2
+    assert r198_demand["DetailedStages"] == 3
     assert r198_demand["DuplicateDetailedStageRecordsDropped"] == 1
     assert r198_demand["UnsupportedColorOps"] == [
         {"value": 22, "name": "BUMPENVMAP", "count": 1}
@@ -929,19 +929,23 @@ def main() -> int:
         {"value": 18, "name": "MODULATEALPHA_ADDCOLOR", "count": 1}
     ]
     assert r198_demand["UnsupportedArgumentSelectors"] == [
-        {"value": 5, "name": "TEMP", "count": 1},
+        {"value": 7, "name": "UNKNOWN", "count": 1},
     ]
     assert r198_demand["UnsupportedArgumentValues"] == [
         {
-            "value": 5,
-            "value_hex": "0x00000005",
-            "selector": 5,
-            "selector_name": "TEMP",
+            "value": 7,
+            "value_hex": "0x00000007",
+            "selector": 7,
+            "selector_name": "UNKNOWN",
             "count": 1,
         },
     ]
     assert r198_demand["NonCurrentResultArgs"] == [
-        {"value": 5, "name": "TEMP", "count": 1}
+        {"value": 0, "name": "DIFFUSE", "count": 1},
+        {"value": 5, "name": "TEMP", "count": 1},
+    ]
+    assert r198_demand["UnsupportedResultArgs"] == [
+        {"value": 0, "name": "DIFFUSE", "count": 1}
     ]
     assert r198_demand["HasUnsupportedObservedSemantics"] is True
     assert r198_demand["CoverageLimitedByDetailCap"] is False
@@ -949,7 +953,7 @@ def main() -> int:
     assert r198_demand["ActivationProof"] is False
     assert r198_unsupported_demand["NativeDrawPathActivationAllowed"] is False
 
-    print("DX11 census analyzer regression R120/SRC1/R191/R194/R197/R198/R199 dedupe: PASS")
+    print("DX11 census analyzer regression R120/SRC1/R191/R194/R197/R198/R199/R200 demand: PASS")
     return 0
 
 
