@@ -129,6 +129,7 @@ FFP_RE = re.compile(
     r"arg2=0x(?P<colorArg2>[0-9A-Fa-f]+)\] "
     r"alpha\[op=(?P<alphaOp>\d+),arg1=0x(?P<alphaArg1>[0-9A-Fa-f]+),"
     r"arg2=0x(?P<alphaArg2>[0-9A-Fa-f]+)\] "
+    r"(?:resultArg=0x(?P<resultArg>[0-9A-Fa-f]+) )?"
     r"texCoord=0x(?P<texCoord>[0-9A-Fa-f]+) "
     r"texTransform=0x(?P<texTransform>[0-9A-Fa-f]+)"
     r"(?: sampler\[min=(?P<samplerMin>\d+),mag=(?P<samplerMag>\d+),"
