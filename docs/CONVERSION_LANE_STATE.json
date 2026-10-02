@@ -295,6 +295,22 @@
       "scope": "Auto-discovered continuation raw/proof stages must retain canonical analyzer success telemetry as well as report/failure wiring; analyzer source is loaded once for chain verification.",
       "exact_next_action": "Preserve the newest authoritative primary disassembly frontier; continue only from its current validated/candidate edge without semantic promotion.",
       "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER"
+    },
+    {
+      "unit_id": "DXVK_F26_CONTROL_FLOW_182B17_182B57",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "05cb6f09de3c7fb58a1740a544a1c3b603b24029",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "static_contract": "PASS",
+      "dxvk_disassembly_evidence_run_id": 36974919382,
+      "dxvk_disassembly_evidence_job_id": 110736548291,
+      "dxvk_disassembly_evidence_artifact_id": 11213540991,
+      "dxvk_disassembly_evidence_artifact_digest": "sha256:7f5cc05b94df74990d07e3afcde452ec4efe9c427eae909981c61a6fc20fb008",
+      "issue14_implementation_comment_id": 5946891513,
+      "scope": "Exact canonical 0x00182B17..0x00182B57 control-flow/call proof; 22 complete instructions, five direct rel32 CALLs, exact boundary at 0x00182B57.",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER"
     }
   ]
 }
