@@ -7,7 +7,9 @@
 // state fail-closed so a later baseline cannot accidentally re-enable stereo on
 // stale ResetEx state. A later clean Reset clears the block.
 
+#ifndef OUTRUN_VR_REFACTOR_SPLIT_R34_R33
 #include "stereo_renderer_r33.cpp"
+#endif
 #include "vr/game/render_semantics.hpp"
 #include "../render/xyzrhw_api.hpp"
 #include "../lifecycle/reset_replay_state.hpp"

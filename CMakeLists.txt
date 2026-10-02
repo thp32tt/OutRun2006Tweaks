@@ -128,6 +128,18 @@ endif()
 # C2 = C1 + R30 asymmetric-FOV HUD correction. R31-R34 stay excluded in both.
 option(OUTRUN_VR_C1_COMPARE "Build C1: R29 fast L+R with R27/R28 classification" OFF)
 option(OUTRUN_VR_C2_COMPARE "Build C2: C1 plus R30 HUD correction" OFF)
+option(OUTRUN_VR_REFACTOR_SPLIT_R34_R33 "Refactor gate: compile R33 and R34 as separate translation units" OFF)
+if(OUTRUN_VR_REFACTOR_SPLIT_R34_R33)
+    if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
+       OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+        message(FATAL_ERROR "R34/R33 refactor split requires all comparison builds OFF")
+    endif()
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r33.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R34_R33=1)
+    message(STATUS "OutRun VR refactor gate: R33 + R34 separate translation units")
+endif()
 set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp
     src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp

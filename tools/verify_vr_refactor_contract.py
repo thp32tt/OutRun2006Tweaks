@@ -840,8 +840,9 @@ if '#include "../core/final_dispatch_hooks.hpp"' not in r33:
     errors.append("R33 final-dispatch hook API include missing")
 if '#include "../core/final_dispatch_hooks.hpp"' not in r34:
     errors.append("R34 final-dispatch hook API include missing")
-if '#include "stereo_renderer_r33.cpp"' not in r34:
-    errors.append("R33->R34 textual include removed before build/link gate")
+if '#ifndef OUTRUN_VR_REFACTOR_SPLIT_R34_R33' not in r34 or \
+        '#include "stereo_renderer_r33.cpp"' not in r34:
+    errors.append("R33->R34 split gate lost guarded legacy include")
 r33_instance = r33.find("VRStereoR33DispatchHook VRStereoR33DispatchHook::instance;")
 for marker in (
     "HRESULT __stdcall DrawPrimitiveDestR33(",
