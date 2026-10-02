@@ -153,6 +153,7 @@ def start_process_liveness_monitor():
 
 
 _localization_material_target_cache: dict[tuple[str, str], tuple[float, list[dict]]] = {}
+_localization_material_target_scan_ok: dict[tuple[str, str], bool] = {}
 
 
 def localization_material_target_hints(branch: str, lane: str, limit: int = 2) -> list[dict]:
@@ -182,10 +183,12 @@ def localization_material_target_hints(branch: str, lane: str, limit: int = 2) -
         payload = github_api_json(path)
         encoded = str(payload.get("content") or "").replace("\\n", "")
         if not encoded:
+            _localization_material_target_scan_ok[key] = False
             return []
         text_data = base64.b64decode(encoded).decode("utf-8-sig")
         rows = list(csv.DictReader(io.StringIO(text_data)))
     except Exception as exc:
+        _localization_material_target_scan_ok[key] = False
         log.info("material target hint unavailable lane=%s branch=%s error=%r", lane, branch, exc)
         return []
 
@@ -240,6 +243,7 @@ def localization_material_target_hints(branch: str, lane: str, limit: int = 2) -
             break
 
     _localization_material_target_cache[key] = (now_mono, [dict(x) for x in chosen])
+    _localization_material_target_scan_ok[key] = True
     return [dict(x) for x in chosen[:limit]]
 
 
@@ -1653,6 +1657,14 @@ def localization_qa_inflight_candidate_indices(q: dict) -> list[int]:
     return result
 
 
+def localization_material_target_scan_succeeded(active: dict) -> bool:
+    key = (
+        str(active.get("branch") or "korean-localization-clean"),
+        str(active.get("lane") or ""),
+    )
+    return _localization_material_target_scan_ok.get(key) is True
+
+
 def localization_record_producer_checkpoint(
     q: dict,
     active: dict,
@@ -1712,11 +1724,15 @@ def localization_record_producer_checkpoint(
 
     if candidates >= LOCALIZATION_PRODUCER_TARGET_CANDIDATES:
         return True, f"TARGET_REACHED:{candidates}/{LOCALIZATION_PRODUCER_TARGET_CANDIDATES}"
-    if candidates >= 1 and not remaining:
+    if candidates >= 1 and not remaining and localization_material_target_scan_succeeded(active):
         return True, f"PARTIAL_BATCH_SHARD_EXHAUSTED:{candidates}"
     if no_work_record and not remaining:
         return True, "NO_RUNNABLE_SHARD_WORK"
-    if material_commits >= LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS and not remaining:
+    if (
+        material_commits >= LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS
+        and not remaining
+        and localization_material_target_scan_succeeded(active)
+    ):
         return True, f"MATERIAL_COMMIT_BUDGET_WITH_SHARD_EXHAUSTED:{material_commits}"
     return False, (
         f"CONTINUE_PIPELINE:candidates={candidates}/{LOCALIZATION_PRODUCER_TARGET_CANDIDATES};"
