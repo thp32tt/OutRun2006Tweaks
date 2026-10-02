@@ -3763,7 +3763,7 @@ def reconcile_localization_blocked_producer_commits(q: dict) -> int:
             kept.append(task)
             continue
 
-        valid, guard_reasons, _record = localization_validate_producer_result_commit(
+        valid, guard_reasons, record = localization_validate_producer_result_commit(
             task_id, str(commit.get("sha") or "")
         )
         if not valid:
@@ -3799,21 +3799,42 @@ def reconcile_localization_blocked_producer_commits(q: dict) -> int:
         fixed.pop("blocked_at", None)
         fixed["failure_context"] = ""
         key = (task_id, str(commit.get("sha") or ""))
-        if key not in completed_keys:
+        if key in completed_keys:
+            # Older controller already released this exact immutable result.
+            recovered += 1
+            continue
+
+        release, decision = localization_record_producer_checkpoint(
+            q, fixed, commit, record if isinstance(record, dict) else {}, now
+        )
+        fixed["pipeline_release_decision"] = decision
+        if release:
             finalize_localization_producer_commit(q, fixed, commit, now)
             completed_keys.add(key)
-        else:
-            fixed["result_sha"] = commit["sha"]
-            fixed["result_message"] = commit.get("message")
-            fixed["automation_validation"] = "PENDING"
-            fixed["validation_mode"] = "C_BATCH_GATE"
-            fixed["batch_validation_pending"] = True
-            fixed["runtime_validation"] = "UNTESTED"
-            fixed["completed_at"] = fixed.get("completed_at") or now.isoformat()
-            fixed["terminal"] = "PRODUCED"
-            fixed["phase"] = "DONE"
-        enqueue_producer_result_for_qa(q, fixed)
-        recovered += 1
+            recovered += 1
+            continue
+
+        slot_key = slot if slot in {"A", "B", "D"} else {
+            "LOCALIZATION_A": "A",
+            "LOCALIZATION_B": "B",
+            "LOCALIZATION_E": "D",
+        }.get(lane)
+        active_by_lane = q.setdefault("active_by_lane", {})
+        if slot_key and slot_key not in active_by_lane:
+            fixed["slot"] = slot_key
+            fixed["phase"] = "WAIT_CHAT"
+            fixed["terminal"] = None
+            fixed["task_latched"] = True
+            fixed["controller_stage"] = "CONTINUE_PIPELINE"
+            fixed["pipeline_continuation_pending"] = True
+            fixed.pop("completed_at", None)
+            active_by_lane[slot_key] = fixed
+            recovered += 1
+            continue
+
+        # Do not overwrite a newer active task in the same slot. Keep this record
+        # recoverable until the lane is free.
+        kept.append(task)
 
     if recovered:
         q["blocked"] = kept[-100:]
