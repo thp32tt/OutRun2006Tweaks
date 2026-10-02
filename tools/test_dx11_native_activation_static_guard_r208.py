@@ -12,11 +12,13 @@ import sys
 REQUIRED = (
     "NativeDrawPathActive",
     "UNTESTED",
+    "runtime_validation",
 )
 
 FORBIDDEN_ACTIVATION_MARKERS = (
     "force_native_draw_path=true",
     "AUTO_ENABLE_NATIVE_DRAW_PATH",
+    "enable_native_draw_path=true",
 )
 
 SCAN_ROOTS = (
@@ -53,6 +55,10 @@ def main() -> int:
         if marker in source:
             print("unexpected activation marker:", marker)
             return 1
+
+    if '"runtime_validation": "PASS"' in text:
+        print("unexpected runtime validation promotion")
+        return 1
 
     print("DX11 native activation static guard r208 PASS")
     return 0
