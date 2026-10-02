@@ -17,14 +17,25 @@ DEFAULT_OVERLAP = "66 0f 54 1d 20 91 61"
 
 
 def normalize_bytes(value: str) -> bytes:
-    compact = value.replace("0x", "").replace(",", " ")
+    """Convert a human byte sequence into bytes with clear input validation."""
+    compact = value.lower().replace("0x", "").replace(",", " ")
     parts = [p for p in compact.split() if p]
-    return bytes(int(p, 16) for p in parts)
+    if not parts:
+        raise ValueError("byte sequence is empty")
+    if any(len(p) != 2 for p in parts):
+        raise ValueError("byte sequence contains non-byte token")
+    try:
+        return bytes(int(p, 16) for p in parts)
+    except ValueError as exc:
+        raise ValueError("byte sequence contains invalid hex") from exc
 
 
 def validate_window(overlap: str, window: str) -> tuple[bool, str]:
-    expected = normalize_bytes(overlap)
-    actual = normalize_bytes(window)
+    try:
+        expected = normalize_bytes(overlap)
+        actual = normalize_bytes(window)
+    except ValueError as exc:
+        return False, str(exc)
     if len(actual) < len(expected):
         return False, "continuation window shorter than required overlap"
     if actual[: len(expected)] != expected:
