@@ -998,6 +998,49 @@ def main() -> None:
             + ", ".join(missing_r195_d3dtop_premodulate)
         )
 
+
+    r196_d3dtop_lerp_arg0_contract = [
+        ("case D3DTOP_LERP:", PIPELINE_TRANSLATION_CPP,
+         "R196 LERP dependency/current/HLSL/readiness cases"),
+        ('return first + " * " + proportion + " + " + second +',
+         PIPELINE_TRANSLATION_CPP,
+         "R196 Arg1*Arg0 + Arg2*(1-Arg0) HLSL expression"),
+        ("lerpStages[0].colorOp = D3DTOP_LERP;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R196 hosted LERP color fixture"),
+        ("lerpStages[0].alphaOp = D3DTOP_LERP;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R196 hosted LERP alpha fixture"),
+        ("lerpStages[0].colorArg0 = D3DTA_TEXTURE;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R196 COLORARG0 interpolation-proportion fixture"),
+        ("R196 D3DTOP_LERP ARG0 texture dependency must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R196 ARG0 resource coverage guard"),
+        ("R196 D3DTOP_LERP unsupported ARG0 selector must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R196 ARG0 selector guard"),
+        ("R196 D3DTOP_LERP fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R196 offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_LERP ARG0 support R196: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R196 hosted probe completion"),
+    ]
+    missing_r196_d3dtop_lerp_arg0 = [
+        meaning
+        for token, source, meaning in r196_d3dtop_lerp_arg0_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_LERP:") < 4:
+        missing_r196_d3dtop_lerp_arg0.append(
+            "R196 LERP must participate in texture dependency, CURRENT dependency, HLSL and readiness switches")
+    if missing_r196_d3dtop_lerp_arg0:
+        raise SystemExit(
+            "DX11 R196 fixed-function D3DTOP_LERP ARG0 contract drift: "
+            + ", ".join(missing_r196_d3dtop_lerp_arg0)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
