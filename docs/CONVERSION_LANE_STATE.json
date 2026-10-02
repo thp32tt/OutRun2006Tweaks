@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "6057609f31c3ddca6171e94f92907f57b38b42ee",
+  "state_parent_head": "fd687017b365b04916399dceec44d8003be182d4",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,16 +52,16 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "13b9c3930b9da967c5e98c875fb137aeb81e23e2",
-    "validation_bearing_sha": "13b9c3930b9da967c5e98c875fb137aeb81e23e2",
-    "retaining_descendant_sha": "6057609f31c3ddca6171e94f92907f57b38b42ee",
+    "result_sha": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
+    "validation_bearing_sha": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
+    "retaining_descendant_sha": "fd687017b365b04916399dceec44d8003be182d4",
     "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_DX11_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
-  "runtime_blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI. D3DTOP_BLENDCURRENTALPHA exact-SHA source-graph/activation/census validation passed; Win32 Configure was cancelled by same-branch descendant churn, so compile/runtime success is not claimed.",
-  "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation; BLENDCURRENTALPHA only extends dormant fixed-function texture-op semantics.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed retained work including D3DTOP_BLENDCURRENTALPHA and any newer concurrent texture-op units already present at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "runtime_blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI. R186 D3DTOP_BLENDTEXTUREALPHA exact-SHA source-graph/activation/census validation passed; Win32 Configure was cancelled by same-branch descendant churn, so compile/binary/runtime success is not claimed.",
+  "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation; R186 only extends dormant fixed-function texture-op semantics.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R186 D3DTOP_BLENDTEXTUREALPHA and newer concurrent work already retained at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1066,6 +1066,22 @@
       "issue14_comment_id": 5949452261,
       "validation_run_id": 36991107870,
       "validation_job_id": 110787318562
+    },
+    {
+      "unit_id": "DX11_FFP_D3DTOP_BLENDTEXTUREALPHA_SUPPORT_R186",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "dfafc889b12f225880c788aa5cb396ab36333813",
+      "material_result_sha": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
+      "validation_bearing_sha": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
+      "retaining_descendant_sha": "fd687017b365b04916399dceec44d8003be182d4",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_DX11_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_SOURCE_TEST_ONLY",
+      "issue14_comment_id": 5949485235,
+      "validation_run_id": 36991274241,
+      "validation_job_id": 110787830179
     }
   ]
 }

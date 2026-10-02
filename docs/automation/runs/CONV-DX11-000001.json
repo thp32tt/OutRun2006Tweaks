@@ -4,33 +4,32 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "bbb244f5e149ad7f5586452d56733a265a1c09bb",
-  "state_parent_head": "6057609f31c3ddca6171e94f92907f57b38b42ee",
-  "material_result_sha": "13b9c3930b9da967c5e98c875fb137aeb81e23e2",
-  "source_implementation_sha": "13b9c3930b9da967c5e98c875fb137aeb81e23e2",
-  "followup_test_fix_sha": "56f4463f88ae957fa0906ce7d2a65da081a1053e",
-  "validation_bearing_sha": "13b9c3930b9da967c5e98c875fb137aeb81e23e2",
-  "retaining_descendant_sha": "6057609f31c3ddca6171e94f92907f57b38b42ee",
+  "base_sha": "dfafc889b12f225880c788aa5cb396ab36333813",
+  "state_parent_head": "fd687017b365b04916399dceec44d8003be182d4",
+  "material_result_sha": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
+  "source_implementation_sha": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
+  "validation_bearing_sha": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
+  "retaining_descendant_sha": "fd687017b365b04916399dceec44d8003be182d4",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_FFP_D3DTOP_BLENDCURRENTALPHA_SUPPORT",
-  "selection_reason": "Fresh authenticated GitHub audit found D3DTOP_BLENDCURRENTALPHA remained unsupported after retained BLENDDIFFUSEALPHA work. Microsoft Direct3D 9 documents it as Arg1/Arg2 linear blending using alpha from the previous texture stage; the dormant shader generator already preserves that previous result as current, so the semantic is implementable without new runtime state capture.",
-  "summary": "Implemented dormant native DX11 D3DTOP_BLENDCURRENTALPHA translation for RGB and alpha paths using previous-stage current.a, added a two-stage generated-HLSL/offline-compile probe and source-graph guard, then normalized the probe PASS newline. NativeDrawPathActive remains disabled.",
+  "selected_work": "DX11_FFP_D3DTOP_BLENDTEXTUREALPHA_SUPPORT_R186",
+  "selection_reason": "Fresh authenticated GitHub audit found D3DTOP_BLENDTEXTUREALPHA still unsupported after adjacent fixed-function blend operations. Direct3D 9 defines it as Arg1/Arg2 interpolation using this texture stage's alpha; existing stage sampling can express it exactly without new D3D9 state capture.",
+  "summary": "Implemented dormant native DX11 D3DTOP_BLENDTEXTUREALPHA RGB/alpha translation, including the operation's intrinsic current-stage texture dependency even when neither argument selects D3DTA_TEXTURE, plus generated-HLSL/offline-compile coverage and a source-graph guard. NativeDrawPathActive remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read branch-local AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/automation/runs/CONV-DX11-000001.json, regression/problem history and Issue #14 through authenticated GitHub authority.",
-        "Recovered repeated concurrent branch advances and rejected duplicate/orphan publish attempts without updating the branch; no N100/local clone was used as product-development truth."
+        "Read AGENTS.md, branch-local conversion state, live task record, current work queue, regression/problem history and Issue #14 through authenticated GitHub authority.",
+        "Recovered repeated concurrent branch advances and used non-force compare/CAS publication; no N100/local clone was used as product-development truth."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Current fixed-function translation already maintained a per-stage current result but did not accept D3DTOP_BLENDCURRENTALPHA.",
-        "Microsoft Direct3D 9 semantics define BLENDCURRENTALPHA as Arg1*previous-stage-alpha + Arg2*(1-previous-stage-alpha); generated HLSL evaluates nextColor/nextAlpha before assigning current, so current.a is the required previous-stage factor."
+        "Current fixed-function translator retained adjacent blend operations but did not accept D3DTOP_BLENDTEXTUREALPHA.",
+        "The blend factor is the current stage texture alpha itself, so texture sampling is required even when Arg1/Arg2 are D3DTA_DIFFUSE/D3DTA_CURRENT; this exposed an intrinsic dependency not covered by argument-only texture detection."
       ]
     },
     "C2_IMPLEMENT": {
@@ -41,42 +40,39 @@
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "13b9c3930b9da967c5e98c875fb137aeb81e23e2",
-        "56f4463f88ae957fa0906ce7d2a65da081a1053e"
+        "d10b3b684805df03d5e3ef021ceb0a6e7f926cae"
       ],
       "details": [
-        "Added D3DTOP_BLENDCURRENTALPHA to texture-use and readiness validation switches.",
-        "Generated Arg1*current.a + Arg2*(1-current.a) for RGB and alpha paths.",
-        "Added a two-stage probe proving stage-1 HLSL uses the stage-0 current alpha, offline HLSL compilation coverage, and a source-graph drift guard.",
-        "Normalized the probe PASS output newline in follow-up commit 56f4463f88ae957fa0906ce7d2a65da081a1053e."
+        "Added D3DTOP_BLENDTEXTUREALPHA to readiness and generated-HLSL translation.",
+        "Made fixed_function_op_uses_texture return true for BLENDTEXTUREALPHA independent of Arg1/Arg2 selectors.",
+        "Added a hosted probe with non-texture arguments that requires sampled0.a in RGB/alpha HLSL, offline compilation, and source-graph retention checks."
       ]
     },
     "C3_VALIDATE": {
       "status": "COMPLETE_STATIC_EXACT_SHA_PASS_COMPILE_NOT_CLAIMED",
       "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_DX11_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
       "evidence": [
-        "Backend Conversion Gate run 36991107870 job 110787318562 on exact material SHA 13b9c3930b9da967c5e98c875fb137aeb81e23e2 completed Verify DX11 source graph=SUCCESS.",
+        "Backend Conversion Gate run 36991274241 job 110787830179 on exact material SHA d10b3b684805df03d5e3ef021ceb0a6e7f926cae: Verify DX11 source graph=SUCCESS.",
         "The same exact-SHA job completed Verify DX11 dormant activation boundary=SUCCESS, Test DX11 census analyzer=SUCCESS, and all preceding static baseline/disassembly checks=SUCCESS.",
-        "Win32 Configure was cancelled by newer same-branch descendant churn; Build and binary verification were skipped, so compile/binary success is not claimed.",
-        "Authenticated compare proved material SHA and follow-up test fix are retained as ancestors of branch head 6057609f31c3ddca6171e94f92907f57b38b42ee."
+        "Win32 Configure was cancelled by newer same-branch descendant churn; Build/binary verification and DX11 readiness smoke were skipped/cancelled, so compile/binary success is not claimed.",
+        "Authenticated compare proved material SHA d10b3b684805df03d5e3ef021ceb0a6e7f926cae is retained as an ancestor of state-parent HEAD fd687017b365b04916399dceec44d8003be182d4."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "source_implementation_commit": "13b9c3930b9da967c5e98c875fb137aeb81e23e2",
-      "followup_test_fix_commit": "56f4463f88ae957fa0906ce7d2a65da081a1053e",
-      "result_commit": "13b9c3930b9da967c5e98c875fb137aeb81e23e2",
-      "issue14_comment_id": 5949452261
+      "source_implementation_commit": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
+      "result_commit": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
+      "issue14_comment_id": 5949485235
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant fixed-function source/test/guard change only; NativeDrawPathActive, release payload, localization, OpenXR transport and other backend lanes are unchanged."
+      "reason": "Dormant fixed-function source/test/guard unit only; NativeDrawPathActive, release payload, localization, OpenXR transport and other backend lanes are unchanged."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed retained work including D3DTOP_BLENDCURRENTALPHA and any newer concurrent texture-op units already present at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R186 D3DTOP_BLENDTEXTUREALPHA and newer concurrent work already retained at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -89,22 +85,22 @@
     "native_draw_path_active_changed": false,
     "runtime_validation_claimed": false
   },
-  "issue14_comment_id": 5949452261,
-  "validation_run_id": 36991107870,
-  "validation_job_id": 110787318562,
+  "issue14_comment_id": 5949485235,
+  "validation_run_id": 36991274241,
+  "validation_job_id": 110787830179,
   "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_DX11_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
-  "blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA static DX11 source-graph/activation/census validation passed; same-branch descendant churn cancelled Win32 Configure and skipped Build, so compile/binary success is not claimed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed retained work including D3DTOP_BLENDCURRENTALPHA and any newer concurrent texture-op units already present at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA static DX11 source-graph/activation/census validation passed; descendant churn cancelled Win32 Configure and skipped Build, so compile/binary success is not claimed.",
+  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R186 D3DTOP_BLENDTEXTUREALPHA and newer concurrent work already retained at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "source_head": "6057609f31c3ddca6171e94f92907f57b38b42ee",
-  "result_sha": "13b9c3930b9da967c5e98c875fb137aeb81e23e2",
-  "selected_work_item": "DX11_FFP_D3DTOP_BLENDCURRENTALPHA_SUPPORT",
+  "source_head": "fd687017b365b04916399dceec44d8003be182d4",
+  "result_sha": "d10b3b684805df03d5e3ef021ceb0a6e7f926cae",
+  "selected_work_item": "DX11_FFP_D3DTOP_BLENDTEXTUREALPHA_SUPPORT_R186",
   "changed_paths": [
     "src/vr/d3d11/pipeline_translation.cpp",
     "tools/dx11_fixed_function_pipeline_probe.cpp",
     "tools/verify_dx11_source_graph.py"
   ],
-  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed retained work including D3DTOP_BLENDCURRENTALPHA and any newer concurrent texture-op units already present at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R186 D3DTOP_BLENDTEXTUREALPHA and newer concurrent work already retained at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
 }
