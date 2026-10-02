@@ -21,6 +21,7 @@
 
 #include "stereo_renderer_r30.cpp"
 #include "../render/stereo_base_policy.hpp"
+#include "../render/fast_path_support.hpp"
 #include "../render/screen_space_api.hpp"
 #include "../core/screen_space_hooks.hpp"
 #include "../render/lower_draw_api.hpp"
@@ -1148,12 +1149,20 @@ HRESULT __stdcall DrawIndexedPrimitiveUPDestR31(
 
     void NoteDispatchFallback() noexcept { ++R31Frame.fallback; }
 
-    bool BuildFastWorldConstants(
+    bool BuildFastWorldDispatchConstants(
         IDirect3DDevice9* device,
         const OutRunVRRenderer::LatchedStereoFrame& stereo,
-        DrawStereoState& draw) noexcept
+        FastWorldDispatchConstants& out) noexcept
     {
-        return R31BuildFastWorldConstants(device, stereo, draw);
+        DrawStereoState draw{};
+        if (!R31BuildFastWorldConstants(device, stereo, draw))
+            return false;
+        std::memcpy(out.originalConstants,
+            draw.originalConstants, sizeof(out.originalConstants));
+        std::memcpy(out.eyeConstants,
+            draw.eyeConstants, sizeof(out.eyeConstants));
+        out.poseSequence = draw.poseSequence;
+        return true;
     }
 
     bool GetTrackedViewport(

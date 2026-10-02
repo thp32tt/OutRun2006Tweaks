@@ -1635,6 +1635,94 @@ namespace OutRunVRStereo
 		return StereoInstalledDevice.load(std::memory_order_acquire);
 	}
 	bool IsVRTelemetryEnabled() noexcept { return Settings::VRTelemetry; }
+	InternalStereoPassScope::InternalStereoPassScope() noexcept
+		: previous_(InternalStereoPass)
+	{
+		InternalStereoPass = true;
+	}
+	InternalStereoPassScope::~InternalStereoPassScope()
+	{
+		InternalStereoPass = previous_;
+	}
+	bool EnsureStereoResourcesForDispatch(IDirect3DDevice9* device) noexcept
+	{
+		return EnsureStereoResources(device);
+	}
+	bool TryBootstrapRightDepthForDispatch(IDirect3DDevice9* device) noexcept
+	{
+		return TryBootstrapRightDepthFromRecentClear(device);
+	}
+	bool DepthTestActiveForDispatch(IDirect3DDevice9* device) noexcept
+	{
+		return DepthTestActive(device);
+	}
+	bool StencilTestActiveForDispatch(IDirect3DDevice9* device) noexcept
+	{
+		return StencilTestActive(device);
+	}
+	IDirect3DSurface9* TrackedRenderTargetSnapshot() noexcept
+	{
+		return TrackedRenderTarget;
+	}
+	IDirect3DSurface9* RightEyeSurfaceSnapshot() noexcept
+	{
+		return RightEyeSurface;
+	}
+	IDirect3DSurface9* RightEyeDepthSnapshot() noexcept
+	{
+		return RightEyeDepth;
+	}
+	HRESULT SetRawRenderTarget0(
+		IDirect3DDevice9* device, IDirect3DSurface9* surface) noexcept
+	{
+		return SetRenderTargetHook.stdcall<HRESULT>(device, 0u, surface);
+	}
+	HRESULT SetRawDepthStencil(
+		IDirect3DDevice9* device, IDirect3DSurface9* surface) noexcept
+	{
+		return SetDepthStencilSurfaceHook
+			? SetDepthStencilSurfaceHook.stdcall<HRESULT>(device, surface)
+			: device->SetDepthStencilSurface(surface);
+	}
+	std::uintptr_t CurrentVertexShaderIdentitySnapshot() noexcept
+	{
+		return CurrentVertexShaderIdentity.load(std::memory_order_acquire);
+	}
+	std::uint32_t CurrentFrameStereoPoseSequence() noexcept
+	{
+		return FrameStereoPoseSequence;
+	}
+	void LatchFrameStereoMetadataIfUnset(
+		std::uint32_t poseSequence,
+		const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+	{
+		if (FrameStereoPoseSequence == 0)
+		{
+			FrameStereoPoseSequence = poseSequence;
+			FrameStereoMetadata = stereo;
+		}
+	}
+	void RecordWorldStereoDuplicate() noexcept
+	{
+		FrameHadDuplicatedDraw = true;
+		FrameHadWorldStereo = true;
+		++DuplicatedDraws;
+		++WorldStereoDraws;
+	}
+	void RecordHudStereoDuplicate() noexcept
+	{
+		FrameHadDuplicatedDraw = true;
+		++DuplicatedDraws;
+		++NonWorldDuplicatedDraws;
+	}
+	void MarkFrameRightDrawFailed() noexcept
+	{
+		FrameRightDrawFailed = true;
+	}
+	void RecordRestoreFailure(const char* what) noexcept
+	{
+		NoteRestoreFailure(what);
+	}
 	IDirect3DSurface9* TrackedDepthStencilSnapshot() noexcept
 	{
 		return TrackedDepthStencil;

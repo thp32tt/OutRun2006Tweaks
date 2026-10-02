@@ -1,10 +1,25 @@
 #pragma once
 
 #include <d3d9.h>
+#include <cstdint>
 #include "../runtime_eligibility.hpp"
+
+namespace OutRunVRRenderer { struct LatchedStereoFrame; }
 
 namespace OutRunVRStereo
 {
+    struct FastWorldDispatchConstants
+    {
+        float originalConstants[16]{};
+        float eyeConstants[2][16]{};
+        std::uint32_t poseSequence = 0;
+    };
+
+    bool BuildFastWorldDispatchConstants(
+        IDirect3DDevice9* device,
+        const OutRunVRRenderer::LatchedStereoFrame& stereo,
+        FastWorldDispatchConstants& out) noexcept;
+
     bool EffectIsFragileLive(
         IDirect3DDevice9* device, bool& fragile) noexcept;
 

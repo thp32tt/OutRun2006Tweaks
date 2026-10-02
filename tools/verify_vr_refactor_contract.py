@@ -24,6 +24,8 @@ r34 = read("src/vr/d3d9/stereo_renderer_r34.cpp")
 runtime_context = read("src/vr/render/runtime_context.hpp")
 raw_draw_api = read("src/vr/render/raw_draw_api.hpp")
 depth_runtime = read("src/vr/state/depth_stencil_runtime.hpp")
+stereo_runtime_facade = read("src/vr/render/stereo_runtime_facade.hpp")
+fast_path_support = read("src/vr/render/fast_path_support.hpp")
 final_dispatch_hooks = read("src/vr/core/final_dispatch_hooks.hpp")
 runtime_context = read("src/vr/render/runtime_context.hpp")
 raster_replay_scope = read("src/vr/state/raster_replay_scope.hpp")
@@ -947,6 +949,52 @@ if "TrackedDepthStencil" in r33 and "TrackedDepthStencilSnapshot" not in r33:
     errors.append("R33 regained direct tracked-depth pointer dependency")
 if "#ifndef NOMINMAX" not in r32:
     errors.append("R32 independent TU lost NOMINMAX pre-include guard")
+
+
+
+for marker in (
+    "InternalStereoPassScope",
+    "EnsureStereoResourcesForDispatch",
+    "TryBootstrapRightDepthForDispatch",
+    "DepthTestActiveForDispatch",
+    "StencilTestActiveForDispatch",
+    "TrackedRenderTargetSnapshot",
+    "RightEyeSurfaceSnapshot",
+    "RightEyeDepthSnapshot",
+    "SetRawRenderTarget0",
+    "SetRawDepthStencil",
+    "CurrentVertexShaderIdentitySnapshot",
+    "CurrentFrameStereoPoseSequence",
+    "LatchFrameStereoMetadataIfUnset",
+    "RecordWorldStereoDuplicate",
+    "RecordHudStereoDuplicate",
+    "MarkFrameRightDrawFailed",
+    "RecordRestoreFailure",
+):
+    if marker not in stereo_runtime_facade:
+        errors.append(f"stereo runtime facade missing Gate B marker: {marker}")
+for marker in (
+    "FastWorldDispatchConstants",
+    "BuildFastWorldDispatchConstants",
+):
+    if marker not in fast_path_support:
+        errors.append(f"fast-path support missing Gate B marker: {marker}")
+for forbidden in (
+    "InternalPassScope",
+    "EnsureStereoResources(device)",
+    "TryBootstrapRightDepthFromRecentClear(device)",
+    "CurrentVertexShaderIdentity.load",
+    "SetRenderTargetHook.stdcall",
+    "SetDepthStencilSurfaceHook.stdcall",
+    "FrameHadDuplicatedDraw",
+    "FrameHadWorldStereo",
+    "FrameRightDrawFailed = true",
+    "DuplicatedDraws",
+    "WorldStereoDraws",
+    "NonWorldDuplicatedDraws",
+):
+    if forbidden in r33:
+        errors.append(f"R33 retained direct lower-runtime dependency after Gate B facade extraction: {forbidden}")
 
 
 if errors:
