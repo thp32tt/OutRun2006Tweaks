@@ -1,0 +1,56 @@
+name: Localization E LOC-E-000003 568D3696 Rework
+
+on:
+  push:
+    branches:
+      - korean-localization-clean
+    paths:
+      - '.github/workflows/localization-e000003-568d.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-e000003-568d
+  cancel-in-progress: false
+
+jobs:
+  rework:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: korean-localization-clean
+          fetch-depth: 0
+
+      - name: Install deterministic image dependency
+        run: python -m pip install --disable-pip-version-check pillow==12.0.0
+
+      - name: Rework 568D3696 and run deterministic self-QA
+        run: python tools/localization/loc_e_000003_568d_rework.py
+
+      - name: Commit material result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git rm .github/workflows/localization-e000003-568d.yml
+          git rm tools/localization/loc_e_000003_568d_rework.py
+          git add localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds
+          git add localization/graphics/role_E/LOC-E-000003
+
+          git commit -m "localization: rework 568D3696 exact-bbox [AUTO:LOC-E-000003]"
+
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:korean-localization-clean; then
+              exit 0
+            fi
+            git fetch origin korean-localization-clean
+            git rebase origin/korean-localization-clean
+            sleep 2
+          done
+          echo "Failed to publish material result after retries." >&2
+          exit 1
