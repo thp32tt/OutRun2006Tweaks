@@ -110,6 +110,32 @@ def verify_dxvk_continuation_chain() -> None:
             )
 
 
+    memoize = analyzer.get("_memoize_pe_only_collector")
+    memoized_count = analyzer.get("_DXVK_CONTINUATION_COLLECTORS_MEMOIZED", 0)
+    pe_type = analyzer.get("PE")
+    if memoize is None or pe_type is None or memoized_count < 10:
+        raise SystemExit(
+            "DXVK continuation collector memoization was not installed for the proof chain"
+        )
+
+    calls = {"count": 0}
+
+    def probe(pe):
+        calls["count"] += 1
+        return {"pe": pe, "ordinal": calls["count"]}
+
+    cached_probe = memoize(probe)
+    pe_a = pe_type(data=b"", image_base=0, entry_rva=0, timestamp=0, size_of_image=0, sections=[])
+    pe_b = pe_type(data=b"", image_base=0, entry_rva=0, timestamp=0, size_of_image=0, sections=[])
+    first = cached_probe(pe_a)
+    second = cached_probe(pe_a)
+    third = cached_probe(pe_b)
+    if calls["count"] != 2 or first is not second or third is first:
+        raise SystemExit(
+            "DXVK continuation collector memoization failed single-PE reuse or PE isolation"
+        )
+
+
 def main() -> None:
     require(
         "src/vr/game/disasm_render_contract.hpp",

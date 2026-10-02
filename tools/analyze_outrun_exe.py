@@ -11406,6 +11406,50 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_28_prefix_pro
     }
 
 
+def _memoize_pe_only_collector(func):
+    """Cache pure PE-only collector results on the PE instance.
+
+    The continuation proof chain repeatedly asks for the same predecessor
+    provenance/proof objects. Those collectors are deterministic for one
+    immutable PE image, so reusing the result avoids re-walking the full chain
+    for every report field while preserving exact byte/control-flow checks.
+    """
+
+    def cached(pe: PE):
+        cache = getattr(pe, "_analysis_result_cache", None)
+        if cache is None:
+            cache = {}
+            setattr(pe, "_analysis_result_cache", cache)
+        key = func.__name__
+        if key not in cache:
+            cache[key] = func(pe)
+        return cache[key]
+
+    cached.__name__ = func.__name__
+    cached.__doc__ = func.__doc__
+    return cached
+
+
+def _install_dxvk_continuation_collector_cache() -> int:
+    """Memoize all PE-only guarded-GF continuation provenance/proof collectors."""
+
+    prefix = "collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
+    wrapped = 0
+    for name, value in list(globals().items()):
+        if not name.startswith(prefix):
+            continue
+        if not (name.endswith("_provenance") or name.endswith("_prefix_proof")):
+            continue
+        if not callable(value):
+            continue
+        globals()[name] = _memoize_pe_only_collector(value)
+        wrapped += 1
+    return wrapped
+
+
+_DXVK_CONTINUATION_COLLECTORS_MEMOIZED = _install_dxvk_continuation_collector_cache()
+
+
 def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
     """Record exact-EXE context around guarded GF speech/heart hook RVAs.
 
