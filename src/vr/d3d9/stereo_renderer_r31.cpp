@@ -99,6 +99,22 @@ namespace OutRunVRStereo
             ++R31Frame.fallback;
         }
 
+        inline void R31TelemetryNoteUnstable() noexcept
+        {
+            ++R31Frame.unstable;
+        }
+
+        inline void R31TelemetryNoteFragile() noexcept
+        {
+            ++R31Frame.fragile;
+        }
+
+        inline void R31TelemetryResetFrameWindow() noexcept
+        {
+            R31Frame = {};
+            R31Window = {};
+        }
+
         inline std::uint64_t R31TelemetryLiveWvpChecks() noexcept
         {
             return R31FastWorldLiveValidations;
