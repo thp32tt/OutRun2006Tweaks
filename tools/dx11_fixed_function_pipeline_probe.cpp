@@ -1330,6 +1330,43 @@ int main()
     }
 
     {
+        std::array<FixedFunctionStageState, 8> stageConstantStages{};
+        stageConstantStages[0].colorOp = D3DTOP_SELECTARG1;
+        stageConstantStages[0].colorArg1 = D3DTA_CONSTANT;
+        stageConstantStages[0].alphaOp = D3DTOP_SELECTARG1;
+        stageConstantStages[0].alphaArg1 = D3DTA_CONSTANT;
+        stageConstantStages[0].stageConstant = 0x80402010u;
+        stageConstantStages[0].minFilter = D3DTEXF_POINT;
+        stageConstantStages[0].magFilter = D3DTEXF_POINT;
+        stageConstantStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto stageConstantShader =
+            generate_fixed_function_pixel_shader_prototype(
+                stageConstantStages, true, 0x00u, 0x00u, textureTypes);
+        require(
+            stageConstantShader.generated() &&
+                stageConstantShader.activeStages == 1,
+            "R197 D3DTA_CONSTANT must become shader-exact without a bound texture");
+        require(
+            stageConstantShader.source.find(
+                "float3 nextColor = float4(64.0f / 255.0f, 32.0f / 255.0f, 16.0f / 255.0f, 128.0f / 255.0f).rgb;") !=
+                std::string::npos &&
+            stageConstantShader.source.find(
+                "float nextAlpha = float4(64.0f / 255.0f, 32.0f / 255.0f, 16.0f / 255.0f, 128.0f / 255.0f).a;") !=
+                std::string::npos,
+            "R197 D3DTA_CONSTANT ARGB-to-RGBA normalization drift");
+
+        const auto stageConstantCompile =
+            compile_fixed_function_pixel_shader_prototype(stageConstantShader);
+        require(
+            stageConstantCompile.attempted &&
+            stageConstantCompile.succeeded &&
+            stageConstantCompile.result == S_OK &&
+            stageConstantCompile.bytecodeBytes != 0,
+            "R197 D3DTA_CONSTANT fixed-function shader prototype did not compile");
+    }
+
+    {
         std::array<FixedFunctionStageState, 8> textureFactorStages{};
         textureFactorStages[0].colorOp = D3DTOP_SELECTARG1;
         textureFactorStages[0].colorArg1 = D3DTA_TFACTOR;
@@ -1463,6 +1500,7 @@ int main()
     }
 
     std::cout
+        << "DX11 fixed-function D3DTA_CONSTANT per-stage color R197: PASS\n"
         << "DX11 fixed-function D3DTOP_LERP ARG0 support R196: PASS\n"
         << "DX11 fixed-function PREMODULATE stage-chain support R195: PASS\n"
         << "DX11 fixed-function D3DTOP_MULTIPLYADD ARG0 support R194: PASS\n"
