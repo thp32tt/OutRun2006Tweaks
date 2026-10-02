@@ -126,7 +126,7 @@ DECL_RE = re.compile(
     r"method=(?P<method>\d+) usage=(?P<usage>\d+) usageIndex=(?P<usageIndex>\d+)"
 )
 FFP_RE = re.compile(
-    r"VR DX11 R(?:72|8[12345]|160|173|194) ffp signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
+    r"VR DX11 R(?:72|8[12345]|160|173|194|197) ffp signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
     r"color\[op=(?P<colorOp>\d+),"
     r"(?:arg0=0x(?P<colorArg0>[0-9A-Fa-f]+),)?"
     r"arg1=0x(?P<colorArg1>[0-9A-Fa-f]+),"
@@ -135,6 +135,7 @@ FFP_RE = re.compile(
     r"(?:arg0=0x(?P<alphaArg0>[0-9A-Fa-f]+),)?"
     r"arg1=0x(?P<alphaArg1>[0-9A-Fa-f]+),"
     r"arg2=0x(?P<alphaArg2>[0-9A-Fa-f]+)\] "
+    r"(?:constant=0x(?P<stageConstant>[0-9A-Fa-f]+) )?"
     r"(?:resultArg=0x(?P<resultArg>[0-9A-Fa-f]+) )?"
     r"texCoord=0x(?P<texCoord>[0-9A-Fa-f]+) "
     r"texTransform=0x(?P<texTransform>[0-9A-Fa-f]+)"
@@ -221,6 +222,7 @@ def main() -> int:
             and "VR DX11 R120" not in text
             and "VR DX11 R191" not in text
             and "VR DX11 R194" not in text
+            and "VR DX11 R197" not in text
         ):
             continue
         source_logs.append(log_path.name)
@@ -340,7 +342,8 @@ def main() -> int:
                         continue
                     if key in {"colorArg0", "colorArg1", "colorArg2",
                                "alphaArg0", "alphaArg1", "alphaArg2",
-                               "texCoord", "texTransform", "samplerBorderColor"}:
+                               "stageConstant", "texCoord", "texTransform",
+                               "samplerBorderColor"}:
                         parsed[key] = int(value, 16)
                         parsed[key + "_hex"] = "0x" + value.upper()
                     else:
