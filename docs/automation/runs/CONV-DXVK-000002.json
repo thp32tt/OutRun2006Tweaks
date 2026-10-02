@@ -1644,6 +1644,78 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve current primary frontier at canonical raw capture 0x00182CD5..0x00182D15. Exact-decode only complete instructions, resolve predecessor forward target 0x00182CEB only if exact instruction-boundary evidence proves it, preserve any trailing partial instruction raw-only, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_CONTINUATION_STATUS_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "material_result_sha": "6a5905462a943054f30786e81a346410d9a0fe7c",
+      "result_sha": "8f9687d4ee599df77c6c0cecd7fa22f79ce570a9",
+      "validation_bearing_result_sha": "8f9687d4ee599df77c6c0cecd7fa22f79ce570a9",
+      "commit_message": "test: tolerate inline DXVK status conditionals [AUTO:CONV-DXVK-000002]",
+      "source_commits": [
+        "6a5905462a943054f30786e81a346410d9a0fe7c",
+        "8f9687d4ee599df77c6c0cecd7fa22f79ce570a9"
+      ],
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Fail closed when an auto-discovered DXVK raw provenance or control-flow proof no longer conditions its reported success status on the captured/proven predicate. Accept both parenthesized and inline Python conditional-expression formatting.",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch, AGENTS.md, conversion lane/run state and Issue #14 while the primary canonical frontier was advancing concurrently through F31-F33."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Avoided duplicating concurrently landed canonical frontier work and selected an independent verifier-integrity gap: supporting capture/proof gates were checked, but the emitted success status was not required to remain conditional on captured/proven."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Commit 6a5905462a943054f30786e81a346410d9a0fe7c added raw/proof status fail-closed source guards. Commit 8f9687d4ee599df77c6c0cecd7fa22f79ce570a9 removed a formatting-only false failure while preserving the predicate-binding requirement."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Fail-before DXVK Canonical Disassembly Evidence run 36977665326/job 110744909549 rejected continuation 29 only because the first guard required parenthesized status syntax. Exact repair SHA 8f9687d4ee599df77c6c0cecd7fa22f79ce570a9 passed run 36977726336/job 110745096544 with VR backend disassembly contract OK, canonical EXE SHA256 match, analyzer success through continuation 42, exact SOURCE_SHA identity and artifact upload. Backend Conversion Gate 36977726332 passed all static/contract steps through application-space recenter; full Win32 build was not required for this verifier-only unit and was still running at record time."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Both substantive verifier commits contain the required [AUTO:CONV-DXVK-000002] marker. Issue #14 comment 5947255554 records implementation and validation evidence."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static Python verifier hardening only; no runtime payload, selector, backend binary or deployable package content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "exact_next_action": "Preserve the current F33 raw canonical frontier at 0x00182CD5..0x00182D15. Exact-decode only complete instructions from that validated window, preserve any trailing partial instruction raw-only, and keep function/render/HUD/runtime semantics unresolved."
+        }
+      },
+      "validation": {
+        "fail_before_sha": "6a5905462a943054f30786e81a346410d9a0fe7c",
+        "fail_before_dxvk_disassembly_evidence_run_id": 36977665326,
+        "fail_before_dxvk_disassembly_evidence_job_id": 110744909549,
+        "fail_before_reason": "continuation_29 inline status conditional rejected by over-specific parenthesized syntax marker",
+        "exact_sha": "8f9687d4ee599df77c6c0cecd7fa22f79ce570a9",
+        "dxvk_disassembly_evidence_run_id": 36977726336,
+        "dxvk_disassembly_evidence_job_id": 110745096544,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "dxvk_disassembly_evidence_artifact_id": 11214690125,
+        "dxvk_disassembly_evidence_artifact_digest": "sha256:d77b9e4b526f0cda328696bb1436ce3d7f9defd59f70896b9326547b7d596891",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "backend_conversion_gate_run_id": 36977726332,
+        "backend_static_steps_through_recenter": "PASS",
+        "full_win32_build": "IN_PROGRESS_AT_STATE_CAPTURE_NOT_REQUIRED_FOR_UNIT",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947255554,
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "exact_next_action": "Preserve the current F33 raw canonical frontier at 0x00182CD5..0x00182D15. Exact-decode only complete instructions from that validated window, preserve any trailing partial instruction raw-only, and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
