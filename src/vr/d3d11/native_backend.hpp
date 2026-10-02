@@ -721,6 +721,26 @@ compose_fixed_function_output_state_readiness(
     const NativeSurfacePairReadiness& surfacePair,
     std::uint64_t snapshotToken) noexcept;
 
+// R135 observes the effective live RS/OM state after the dormant R126 owner
+// has been applied. A token is issued only when every sealed object and
+// dynamic value is still exact on the same D3D11 context device.
+struct NativeFixedFunctionOutputBindingReadiness {
+    bool inputValid{};
+    bool ownerReady{};
+    bool contextMatches{};
+    bool rasterizerMatches{};
+    bool viewportMatches{};
+    bool scissorMatches{};
+    bool blendStateMatches{};
+    bool blendFactorMatches{};
+    bool sampleMaskMatches{};
+    bool depthStencilMatches{};
+    bool stencilRefMatches{};
+    bool ready{};
+    std::uint64_t outputBindingSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
 // R126 consumes an exact live R116 translation snapshot plus a freshly
 // recomputed R124 source/surface snapshot into one dormant binding owner.
 // initialize() cross-checks immutable rasterizer scissor enable against the
@@ -744,6 +764,11 @@ public:
         std::uint64_t outputStateSnapshotToken) noexcept;
     void shutdown() noexcept;
     [[nodiscard]] bool apply(ID3D11DeviceContext* context) const noexcept;
+    [[nodiscard]] NativeFixedFunctionOutputBindingReadiness binding_readiness(
+        ID3D11DeviceContext* context) const noexcept;
+    [[nodiscard]] bool validate_binding_snapshot(
+        ID3D11DeviceContext* context,
+        std::uint64_t bindingSnapshotToken) const noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
         return device_ && blend_state_ && depth_stencil_state_ &&

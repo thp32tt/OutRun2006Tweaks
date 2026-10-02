@@ -2490,6 +2490,113 @@ bool NativeFixedFunctionOutputStateBinding::apply(
     return true;
 }
 
+NativeFixedFunctionOutputBindingReadiness
+NativeFixedFunctionOutputStateBinding::binding_readiness(
+    ID3D11DeviceContext* context) const noexcept {
+    NativeFixedFunctionOutputBindingReadiness out{};
+    out.outputBindingSnapshotToken = snapshot_token_;
+    out.inputValid = context != nullptr && snapshot_token_ != 0;
+    out.ownerReady = ready();
+    if (!out.inputValid || !out.ownerReady)
+        return out;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    out.contextMatches =
+        contextDevice && contextDevice.Get() == device_.Get();
+    if (!out.contextMatches)
+        return out;
+
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> observedRasterizer;
+    Microsoft::WRL::ComPtr<ID3D11BlendState> observedBlend;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> observedDepthStencil;
+    D3D11_VIEWPORT observedViewport{};
+    D3D11_RECT observedScissor{};
+    FLOAT observedBlendFactor[4]{};
+    UINT observedSampleMask = 0;
+    UINT observedStencilRef = 0;
+    UINT viewportCount = 1;
+    UINT scissorCount = 1;
+
+    context->RSGetState(observedRasterizer.ReleaseAndGetAddressOf());
+    context->RSGetViewports(&viewportCount, &observedViewport);
+    context->RSGetScissorRects(&scissorCount, &observedScissor);
+    context->OMGetBlendState(
+        observedBlend.ReleaseAndGetAddressOf(),
+        observedBlendFactor, &observedSampleMask);
+    context->OMGetDepthStencilState(
+        observedDepthStencil.ReleaseAndGetAddressOf(),
+        &observedStencilRef);
+
+    out.rasterizerMatches =
+        observedRasterizer.Get() == rasterizer_state_.Get();
+    out.viewportMatches =
+        viewportCount == 1 &&
+        observedViewport.TopLeftX == viewport_.TopLeftX &&
+        observedViewport.TopLeftY == viewport_.TopLeftY &&
+        observedViewport.Width == viewport_.Width &&
+        observedViewport.Height == viewport_.Height &&
+        observedViewport.MinDepth == viewport_.MinDepth &&
+        observedViewport.MaxDepth == viewport_.MaxDepth;
+    out.scissorMatches =
+        scissorCount == 1 &&
+        observedScissor.left == scissor_rect_.left &&
+        observedScissor.top == scissor_rect_.top &&
+        observedScissor.right == scissor_rect_.right &&
+        observedScissor.bottom == scissor_rect_.bottom;
+    out.blendStateMatches =
+        observedBlend.Get() == blend_state_.Get();
+    out.blendFactorMatches =
+        observedBlendFactor[0] == blend_factor_[0] &&
+        observedBlendFactor[1] == blend_factor_[1] &&
+        observedBlendFactor[2] == blend_factor_[2] &&
+        observedBlendFactor[3] == blend_factor_[3];
+    out.sampleMaskMatches = observedSampleMask == sample_mask_;
+    out.depthStencilMatches =
+        observedDepthStencil.Get() == depth_stencil_state_.Get();
+    out.stencilRefMatches = observedStencilRef == stencil_ref_;
+    out.ready =
+        out.rasterizerMatches &&
+        out.viewportMatches &&
+        out.scissorMatches &&
+        out.blendStateMatches &&
+        out.blendFactorMatches &&
+        out.sampleMaskMatches &&
+        out.depthStencilMatches &&
+        out.stencilRefMatches;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.outputBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(context)));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(observedRasterizer.Get())));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(observedBlend.Get())));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(observedDepthStencil.Get())));
+        token = mix_readiness_snapshot_token(token, observedSampleMask);
+        token = mix_readiness_snapshot_token(token, observedStencilRef);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeFixedFunctionOutputStateBinding::validate_binding_snapshot(
+    ID3D11DeviceContext* context,
+    std::uint64_t bindingSnapshotToken) const noexcept {
+    if (bindingSnapshotToken == 0)
+        return false;
+    const auto current = binding_readiness(context);
+    return current.ready && current.snapshotToken == bindingSnapshotToken;
+}
+
 NativeFixedFunctionDrawReadiness
 compose_fixed_function_draw_readiness(
     const NativeFixedFunctionActivationReadiness& activation,

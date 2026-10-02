@@ -2330,6 +2330,54 @@ int main()
     if (boundDepthStencil)
         boundDepthStencil->Release();
 
+    const auto liveOutputBindingReady =
+        outputStateBinding.binding_readiness(d3d.context);
+    require(
+        liveOutputBindingReady.inputValid &&
+        liveOutputBindingReady.ownerReady &&
+        liveOutputBindingReady.contextMatches &&
+        liveOutputBindingReady.rasterizerMatches &&
+        liveOutputBindingReady.viewportMatches &&
+        liveOutputBindingReady.scissorMatches &&
+        liveOutputBindingReady.blendStateMatches &&
+        liveOutputBindingReady.blendFactorMatches &&
+        liveOutputBindingReady.sampleMaskMatches &&
+        liveOutputBindingReady.depthStencilMatches &&
+        liveOutputBindingReady.stencilRefMatches &&
+        liveOutputBindingReady.ready &&
+        liveOutputBindingReady.outputBindingSnapshotToken ==
+            outputStateBinding.snapshot_token() &&
+        liveOutputBindingReady.snapshotToken != 0 &&
+        outputStateBinding.validate_binding_snapshot(
+            d3d.context, liveOutputBindingReady.snapshotToken),
+        "R135 live output binding issues exact RS OM snapshot");
+
+    d3d.context->RSSetState(nullptr);
+    const auto driftedOutputBinding =
+        outputStateBinding.binding_readiness(d3d.context);
+    require(
+        driftedOutputBinding.inputValid &&
+        driftedOutputBinding.ownerReady &&
+        driftedOutputBinding.contextMatches &&
+        !driftedOutputBinding.rasterizerMatches &&
+        !driftedOutputBinding.ready &&
+        driftedOutputBinding.snapshotToken == 0 &&
+        !outputStateBinding.validate_binding_snapshot(
+            d3d.context, liveOutputBindingReady.snapshotToken),
+        "R135 live output binding fails closed after RS drift");
+    require(
+        outputStateBinding.apply(d3d.context),
+        "R135 live output binding restores sealed RS OM state");
+    const auto restoredOutputBinding =
+        outputStateBinding.binding_readiness(d3d.context);
+    require(
+        restoredOutputBinding.ready &&
+        restoredOutputBinding.snapshotToken ==
+            liveOutputBindingReady.snapshotToken &&
+        outputStateBinding.validate_binding_snapshot(
+            d3d.context, liveOutputBindingReady.snapshotToken),
+        "R135 restored output binding reproduces exact snapshot");
+
     DevicePair outputBindingOtherDevice = create_warp_device();
     require(
         !outputStateBinding.apply(outputBindingOtherDevice.context),
