@@ -87,3 +87,13 @@ These lower targets sit on active Reset/DirectGPU/Present safety paths. They are
    - Compile/link gate required.
 
 No CMake owner change or textual include removal is performed until the corresponding build gate is explicitly enabled.
+
+
+## Long campaign cadence (2026-10-02)
+
+- Campaign start checkpoint: cycle 1202.
+- Approximate upper target: cycle 11202 (10,000 additional evidence-bearing cycles), but BUILD_VERIFIED_COMPLETE ends the campaign early.
+- APPLY_GATE every 3 cycles. Apply only safe atomic source/refactor/verifier/CMake changes; otherwise record NO_SAFE_CHANGE.
+- BUILD_GATE every 6 cycles when build inputs changed or a split gate requires exact validation. Reuse identical successful SHA evidence instead of rebuilding unchanged inputs.
+- Current sequence remains Gate C -> Gate D -> Gate E -> final graph cleanup.
+- Runtime/HMD validation remains separate from compile/link completion.
