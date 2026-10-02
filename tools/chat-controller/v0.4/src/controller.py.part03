@@ -280,14 +280,11 @@ def localization_material_target_prompt(active: dict) -> str:
         + "\nDO_NOT_RESCAN_WHOLE_QUEUE. Execute T1 now. If a fresh Git read proves T1 "
           "superseded/QA-pending/dependency-blocked, record that exact reason and immediately execute T2 "
           "or the next runnable own-shard target in the same response.\n"
-          "CANONICAL_SOURCE_ACQUISITION=Git source-path absence/404 is SOURCE_TRANSPORT_MISS, not a blocker. "
-          "Acquire the exact canonical HD source per the current contract: approved Drive exact path -> "
-          "pinned v0.25.10a direct file -> verified pinned Release ZIP; verify canonical inventory identity "
-          "before pixel work. Only after all approved tiers miss may this asset become SOURCE_ACQUISITION_EXHAUSTED, "
-          "and that outcome must immediately switch to the next runnable own-shard asset.\n"
-          "CANDIDATE_DESTINATION=Do not require the original queue-path DDS to already be tracked in Git. "
-          "Persist the localized output using the current branch's canonical candidate location/metadata convention; "
-          "external large-binary storage is authoritative only when Git records its identity, SHA-256, TASK_ID/RESULT_SHA and validation state."
+          "SOURCE_404_POLICY=Git source 404/missing is SOURCE_TRANSPORT_MISS, not blocker. "
+          "Use current contract: approved Drive exact path -> pinned v0.25.10a direct file -> verified pinned Release ZIP; "
+          "inventory-verify. All tiers miss => SOURCE_ACQUISITION_EXHAUSTED, then immediately run the next own-shard asset.\n"
+          "CANDIDATE_DESTINATION=Source need not exist at the Git queue path. Persist via the current candidate/metadata convention; "
+          "external binary is authoritative only with Git identity/hash/TASK_ID/RESULT_SHA/validation metadata."
     )
 
 
