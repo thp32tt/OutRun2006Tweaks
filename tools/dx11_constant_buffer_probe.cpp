@@ -4957,6 +4957,9 @@ int main()
             liveIndexedSourceReady.snapshotToken &&
         indexedFanDispatch.sourceContentSnapshotToken ==
             liveIndexedFanSourceContent.snapshotToken &&
+        indexedFanDispatch.sourceObservedMinIndex == 4u &&
+        indexedFanDispatch.sourceObservedMaxIndex == 16u &&
+        indexedFanDispatch.sourceValueSnapshotToken != 0 &&
         indexedFanDispatch.snapshotToken != 0 &&
         outrun::vr::dx11::
             validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(
@@ -4989,6 +4992,9 @@ int main()
         indexedFanVertexOverrun.finalFanBoundDrawReady &&
         indexedFanVertexOverrun.generatedIndexReady &&
         indexedFanVertexOverrun.generatedIndexMatchesDispatch &&
+        indexedFanVertexOverrun.sourceObservedMinIndex == 4u &&
+        indexedFanVertexOverrun.sourceObservedMaxIndex == 16u &&
+        indexedFanVertexOverrun.sourceValueSnapshotToken != 0 &&
         !indexedFanVertexOverrun.vertexBufferRangeExact &&
         !indexedFanVertexOverrun.dispatchArgumentsExact &&
         !indexedFanVertexOverrun.ready &&
