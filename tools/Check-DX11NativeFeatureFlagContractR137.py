@@ -39,25 +39,46 @@ REQUIRED_BOUNDARY_MARKERS = (
 )
 
 
-def collect_text(root: Path) -> str:
-    chunks: list[str] = []
+def collect_files(root: Path) -> list[Path]:
+    files: list[Path] = []
     for directory_name in SCAN_DIRS:
         directory = root / directory_name
         if not directory.exists():
             continue
         for path in directory.rglob("*"):
             if path.is_file() and path.suffix.lower() in TEXT_EXTENSIONS:
-                chunks.append(path.read_text(encoding="utf-8", errors="ignore"))
-    return "\n".join(chunks)
+                files.append(path)
+    return files
+
+
+def collect_text(root: Path) -> str:
+    return "\n".join(
+        path.read_text(encoding="utf-8", errors="ignore")
+        for path in collect_files(root)
+    )
+
+
+def find_markers(root: Path, markers: tuple[str, ...]) -> list[str]:
+    findings: list[str] = []
+    for path in collect_files(root):
+        try:
+            lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()
+        except OSError:
+            continue
+        for index, line in enumerate(lines, start=1):
+            for marker in markers:
+                if marker in line:
+                    findings.append(f"{path}:{index}: {marker}")
+    return findings
 
 
 def check(root: Path) -> int:
     text = collect_text(root)
     failures: list[str] = []
 
-    for marker in FORBIDDEN_MARKERS:
-        if marker in text:
-            failures.append(f"active native DX11 marker found: {marker}")
+    forbidden = find_markers(root, FORBIDDEN_MARKERS)
+    for marker in forbidden:
+        failures.append(f"active native DX11 marker found: {marker}")
 
     missing = [marker for marker in REQUIRED_BOUNDARY_MARKERS if marker not in text]
     if missing:
