@@ -1,46 +1,351 @@
 {
-  "schema_version": 50,
+  "schema_version": 12,
   "branch": "korean-localization-clean",
-  "contract": "docs/automation/LOCALIZATION_CONTROLLER_V2.md",
+  "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+  "command_map": {
+    "A": "OutRun 한글화 A 실행",
+    "B": "OutRun 한글화 B 실행",
+    "C": "OutRun 한글화 C 실행"
+  },
   "execution": {
-    "mode": "two_producers_then_c_barrier",
-    "wave_order": ["A_B_PRODUCTION", "C_QA", "NEXT_WAVE"],
-    "producer_lanes": ["A", "B"],
-    "qa_lane": "C",
+    "mode": "continuous_production_with_c_batch_gate",
     "max_parallel_production": 2,
-    "c_gates_next_wave": true,
-    "producer_result_required": "MATERIAL_COMMIT",
-    "runtime_validation_default": "UNTESTED"
+    "concurrent_group": [
+      "A",
+      "B"
+    ],
+    "qa_consumer": "C",
+    "qa_queue": "qa_pending",
+    "qa_batch_size": 4,
+    "qa_coalesce_seconds": 30,
+    "producer_next_after": "OWN_LANE_DURABLE_COMMIT",
+    "c_gates_production": false,
+    "compatibility_fallback": "sequential_producers_with_independent_qa",
+    "producer_individual_actions_gate": false,
+    "batch_gate_role": "C",
+    "batch_gate_is_only_runner_validation": true
   },
   "lanes": {
-    "A": {"role":"producer","shard":"asset_queue_v2.index % 2 == 0"},
-    "B": {"role":"producer","shard":"asset_queue_v2.index % 2 == 1"},
-    "C": {"role":"independent_qa","consumes":"current_wave immutable TASK_ID@RESULT_SHA","writes_shared_state":true}
+    "A": {
+      "mode": "continuous_production+self_qa",
+      "primary_index_parity": "odd",
+      "parallel_group": "production",
+      "next_task_after": "OWN_DURABLE_COMMIT",
+      "automation_validation": "PENDING_UNTIL_C_BATCH_GATE"
+    },
+    "B": {
+      "mode": "continuous_production+self_qa",
+      "primary_index_parity": "even",
+      "parallel_group": "production",
+      "next_task_after": "OWN_DURABLE_COMMIT",
+      "automation_validation": "PENDING_UNTIL_C_BATCH_GATE"
+    },
+    "C": {
+      "mode": "independent_batched_cross_lane_qa+shared_state_reconcile",
+      "primary_index_parity": "all",
+      "consumes": "qa_pending",
+      "input_identity": "TASK_ID@RESULT_SHA",
+      "batch_size": 4,
+      "coalesce_seconds": 30,
+      "candidate_write_policy": "RETURN_REWORK_TO_A_OR_B",
+      "blocks_producers": false,
+      "automation_validation": "C_BATCH_GATE"
+    }
   },
-  "queue_source": "localization/graphics/asset_queue_v2.csv",
-  "legacy_queue": "localization/graphics/asset_queue.csv",
-  "state_machine": {
-    "states":["READY","CLAIMED_A","CLAIMED_B","QA_PENDING","REWORK_REQUIRED","PRODUCTION_COMPLETE","HOLD","PRESERVE"],
-    "producer_terminal_requires":["real material change","durable commit containing [AUTO:TASK_ID]"],
-    "assistant_text_never_completes_task":true,
-    "next_wave_requires_c_terminal":true,
-    "rework_returns_to_owner":true
+  "queue_source": "localization/graphics/asset_queue.csv",
+  "priorities": [
+    "DIRECT_REWORK_REQUIRED",
+    "RENDER_READY",
+    "ONE_STAGE_TO_RENDER",
+    "EXISTING_CANDIDATE_REWORK",
+    "unfinished_localize_text_preflight",
+    "zoom_review_localizable_text",
+    "other_pending"
+  ],
+  "zero_pixel_overflow": true,
+  "missing_evidence_status": "HOLD_STRICT_RECHECK",
+  "controller_prompt_policy": "Keep prompts minimal; workflow rules live in Git. Do not duplicate contract logic in Docker.",
+  "concurrency_safety": {
+    "refresh_head_before_claim": true,
+    "refresh_head_before_commit": true,
+    "disjoint_primary_shards": true,
+    "stale_state_overwrite_forbidden": true,
+    "shared_state_reconcile_from_latest_head": true,
+    "c_reads_only_durable_ab_results": true,
+    "c_uses_exact_result_sha": true,
+    "c_must_not_overwrite_newer_candidate": true,
+    "producers_skip_qa_pending_assets": true
   },
-  "isolation": {
-    "domain":"LOCALIZATION_ONLY",
-    "forbidden_domains":["VR","FFB","DX9Ex","DX11","DXVK","OpenXR"],
-    "share_runtime_state_with_vr":false,
-    "share_queue_with_vr":false,
-    "share_task_ids_with_vr":false,
-    "share_browser_slots_with_vr":false
+  "work_steal": {
+    "enabled": true,
+    "disabled_while_peer_lane_active": true,
+    "condition": "peer production lane is confirmed idle/completed, latest Git refresh confirms target is unclaimed, and target has no newer current-cycle production/state change",
+    "report_field": "work_stolen_from_lane"
   },
-  "recovery": {
-    "refresh_github_head_before_dispatch":true,
-    "refresh_github_head_before_commit":true,
-    "same_task_retry_when_no_material_commit":true,
-    "restart_resumes_from_durable_git_state":true,
-    "github_transient_errors_retry":true,
-    "max_same_chat_retries":2,
-    "then_new_chat_same_task":true
+  "runtime_recovery": {
+    "wait_actions": {
+      "authoritative_lookup": "github_actions_run_by_id",
+      "bypass_generic_actions_cache": true,
+      "generic_actions_cache_scope": "discovery_only_before_run_id_binding",
+      "bound_run_nonterminal_cache_ttl_seconds": 0,
+      "force_uncached_refresh_after_poll_intervals": 2,
+      "refresh_jobs_with_forced_run_refresh": true,
+      "rediscover_missing_bound_run_by": [
+        "result_sha",
+        "workflow_name"
+      ],
+      "retry_terminal_failure_conclusions": [
+        "failure",
+        "cancelled",
+        "timed_out",
+        "action_required",
+        "stale"
+      ],
+      "retry_same_task_id": true,
+      "retry_increments_attempt": true,
+      "ci_failure_consumes_chat_rollover": false,
+      "force_uncached_refresh_after_seconds": 60,
+      "localization_applies_to": [
+        "C"
+      ]
+    },
+    "conversation_rollover": {
+      "enabled": true,
+      "applies_to": [
+        "stale_chat",
+        "expired_chat",
+        "missing_chat",
+        "missing_assistant_generation"
+      ],
+      "applies_to_ci_failure": false
+    },
+    "watchdog": {
+      "wait_actions_recovery": "uncached_exact_run_and_jobs_refresh",
+      "observe_only_allowed_for_wait_actions": false,
+      "queue_idle_rearm_seconds": 90,
+      "queue_idle_requires_unfinished_work": true,
+      "wait_actions_stale_seconds": 75,
+      "busy_stall_seconds": 1800,
+      "force_stop_active_generation": false
+    },
+    "startup_reconcile": {
+      "enabled": true,
+      "refresh_branch_head_first": true,
+      "clear_discovery_cache_first": true,
+      "reconcile_all_nonterminal_lanes": true,
+      "exact_run_lookup_for_wait_actions": true,
+      "refresh_jobs_for_stale_wait_actions": true,
+      "refresh_branch_head_before_retry": true,
+      "terminal_failure_with_attempts": "retry_same_task_id",
+      "terminal_failure_without_attempts": "BLOCKED",
+      "never_wait_for_chat_expiry_after_terminal_action": true
+    },
+    "continuous_progression": {
+      "producer_commit_releases_same_lane": true,
+      "producer_commit_enqueues_qa": true,
+      "producer_waits_for_actions": false,
+      "c_batch_waits_for_actions": true,
+      "c_completion_gates_producers": false,
+      "qa_failure_gates_producers": false,
+      "terminal_transition_target_seconds": 30
+    }
+  },
+  "runtime_tuning": {
+    "queue_check_seconds": 15,
+    "queue_stable_seconds": 30,
+    "github_discovery_poll_seconds": 60,
+    "github_bound_run_poll_seconds": 30,
+    "github_task_commit_cache_seconds": 60,
+    "github_actions_discovery_cache_seconds": 60,
+    "bound_run_nonterminal_cache_ttl_seconds": 0,
+    "queue_next_task_delay_seconds": 15,
+    "parallel_lane_stagger_seconds": 15,
+    "min_send_gap_seconds": 60,
+    "parallel_distinct_slot_send_gap_seconds": 15,
+    "slot_dedup_seconds": 120,
+    "retry_button_cooldown_seconds": 45,
+    "rate_limit_backoff_seconds": [
+      90,
+      180,
+      300,
+      600
+    ],
+    "localization_qa_batch_size": 4,
+    "localization_qa_coalesce_seconds": 30,
+    "localization_same_slot_send_gap_seconds": 15,
+    "localization_slot_dedup_seconds": 30
+  },
+  "runtime_observability": {
+    "queue_loop_heartbeat_seconds": 15,
+    "heartbeat_stale_after_seconds": 45,
+    "required_runtime_fields": [
+      "queue_loop_heartbeat_at",
+      "last_scheduler_decision_at",
+      "last_scheduler_decision",
+      "blocked_reason"
+    ],
+    "active_state_source_of_truth": "active_by_lane",
+    "queue_active_semantics": "derived_summary_with_independent_qa",
+    "queue_active_null_allowed_only_when_active_by_lane_empty": true,
+    "active_lane_phases": [
+      "DISPATCHING",
+      "WAIT_RESPONSE",
+      "WAIT_COMMIT",
+      "WAIT_ACTIONS",
+      "RETRY_PENDING"
+    ]
+  },
+  "qa_deduplication": {
+    "identity": "TASK_ID@RESULT_SHA",
+    "heavy_check_fingerprint": [
+      "canonical_source_sha",
+      "candidate_sha",
+      "orientation_contract",
+      "translation_or_layout_input",
+      "qa_contract_version"
+    ],
+    "reuse_unchanged_pass_evidence": true,
+    "rerun_on": [
+      "fingerprint_change",
+      "prior_hold",
+      "prior_fail",
+      "rework_required",
+      "new_user_runtime_or_visual_evidence"
+    ],
+    "shared_state_merge_frequency": "once_per_c_batch"
+  },
+  "actions_batching": {
+    "producer_push_workflow_job": "SKIPPED_NO_RUNNER",
+    "producer_task_record_validation": "PENDING",
+    "producer_validation_mode": "C_BATCH_GATE",
+    "batch_gate_role": "C",
+    "max_producer_inputs_per_gate": 4,
+    "exact_input_identity": "TASK_ID@RESULT_SHA",
+    "strict_checks_for_pass_disposition": [
+      "domain_isolation",
+      "changed_localization_payload",
+      "lane_isolation"
+    ],
+    "nonpass_dispositions": [
+      "REWORK_REQUIRED",
+      "HOLD_STRICT_RECHECK",
+      "SUPERSEDED"
+    ],
+    "runtime_validation_separate": true
+  },
+  "production_strategy": {
+    "mode": "candidate_completion_first",
+    "readiness_tiers": [
+      "RENDER_READY",
+      "ONE_STAGE_TO_RENDER",
+      "PREFLIGHT_ONLY"
+    ],
+    "selection_order": [
+      "DIRECT_REWORK_REQUIRED_RUNNABLE",
+      "EXPLICIT_RENDER_NEXT_FROM_LATEST_PRODUCER_OR_C",
+      "RENDER_READY",
+      "ONE_STAGE_TO_RENDER",
+      "EXISTING_CANDIDATE_REWORK",
+      "PREFLIGHT_ONLY"
+    ],
+    "render_ready_definition": {
+      "exact_canonical_source": true,
+      "source_effect_or_removal_mask": true,
+      "clean_plate_independent_pass": true,
+      "final_candidate_safe_bbox": true,
+      "semantic_binding_resolved": true,
+      "baseline_slant_style_may_be_measured_in_same_task": true
+    },
+    "one_stage_to_render_definition": "one deterministic reconstruction/style stage remains and can be completed before rendering",
+    "forbid_new_preflight_while_ready_exists": true,
+    "max_new_preflight_only_batches_when_no_ready_assets": 1,
+    "candidate_target_per_invocation_when_ready_exists": 1,
+    "continue_to_next_ready_asset_after_fail_closed": true,
+    "primary_throughput_metric": "NEW_OR_MATERIALLY_REWORKED_V2_KOREAN_DDS_CANDIDATES_TO_C_QA",
+    "qa_strictness_unchanged": true,
+    "hard_candidate_success_condition": true,
+    "preflight_fallback_requires_no_runnable_ready_tier": true,
+    "preflight_evidence_not_success_when_ready_exists": true,
+    "zero_candidate_exception": "ONLY_WHEN_NO_RUNNABLE_DIRECT_REWORK_RENDER_READY_ONE_STAGE_OR_EXISTING_CANDIDATE_REWORK_AFTER_FRESH_SCAN",
+    "acceleration": {
+      "mode": "QUALITY_PRESERVING_FAMILY_TEMPLATE_FAST_PATH",
+      "routes": [
+        "FAST_PATH",
+        "QUALITY_PATH",
+        "EXCEPTION_QUEUE"
+      ],
+      "fast_path_requires_evidence_backed_family": true,
+      "fast_path_quality_threshold_same_as_quality_path": true,
+      "semantic_translation_reuse": true,
+      "style_family_reuse": true,
+      "asset_specific_geometry_required": true,
+      "deterministic_render_preferred": true,
+      "background_reconstruction_order": [
+        "TRANSPARENT_OR_TEXT_ONLY",
+        "FLAT_COLOR",
+        "ANALYTIC_GRADIENT",
+        "REPEATABLE_TEXTURE_OR_PATCH",
+        "CONSTRAINED_INPAINTING"
+      ],
+      "generative_reconstruction_fallback_only": true,
+      "render_measure_refit_same_invocation": true,
+      "batch_compatible_family_members": true,
+      "exception_does_not_block_independent_assets": true,
+      "template_is_not_approval_evidence": true,
+      "c_independent_final_candidate_validation": true,
+      "throughput_counts_candidate_dds_only": true
+    },
+    "same_task_completion": {
+      "required": true,
+      "trigger": "ANY_STEP_MAKES_ASSET_RENDER_READY",
+      "continue_through": [
+        "KOREAN_RENDER",
+        "MEASURE_REFIT",
+        "EXACT_DDS_ENCODE",
+        "DECODED_FINAL_SELF_QA",
+        "PERSIST_CANDIDATE"
+      ],
+      "forbid_success_terminal_states": [
+        "RENDER_READY",
+        "CLEAN_PLATE_READY",
+        "KOREAN_RENDER_NEXT",
+        "STYLE_READY"
+      ],
+      "primary_success_field": "candidate_dds_modified",
+      "zero_candidate_requires_post_evidence_rescan": true,
+      "fallback_cannot_replace_newly_runnable_render": true
+    },
+    "render_handoff": {
+      "consume_latest_readiness_after": true,
+      "render_next_tokens": [
+        "KOREAN_RENDER_NEXT",
+        "RENDER_READY",
+        "CLEAN_PLATE_READY_STYLE_SLANT_MEASURED__KOREAN_RENDER_NEXT"
+      ],
+      "priority_over_new_preflight": true,
+      "priority_over_runtime_isolation_fallback": true,
+      "qa_pending_does_not_block_same_asset_render_when_latest_evidence_is_producer_self_verified_and_no_c_rejection_exists": false,
+      "c_accepted_render_next_must_be_selected_before_unrelated_fallback": true
+    }
+  },
+  "source_transport": {
+    "state_ssot": "github:korean-localization-clean",
+    "large_binary_store": "google_drive",
+    "canonical_hd_source": {
+      "provider": "google_drive",
+      "account": "ezflash557",
+      "folder_id": "1TpFYOgf0ulxmj6lJozHjAS-69asQajXr",
+      "allowed_subtree": "OutRun2006_Korean_Artifacts/90_ARCHIVE/LOCALIZATION_SNAPSHOT_20260927_0302/03_ORIGINAL_REFERENCE/hd_source/OR2-HD-GUI-v0.25.10a/textures/load",
+      "read_only": true,
+      "historical_localized_outputs_allowed": false
+    },
+    "acquisition_order": [
+      "GOOGLE_DRIVE_EXACT_RELATIVE_PATH",
+      "PINNED_UPSTREAM_DIRECT_FILE",
+      "PINNED_V0.25.10A_RELEASE"
+    ],
+    "missing_object_behavior": "FALL_THROUGH_NEXT_TIER",
+    "identity_gate": "CANONICAL_INVENTORY_SHA_DIMENSIONS_FORMAT",
+    "producer_requirement": "A/B MUST attempt approved Drive exact-relative-path source acquisition before declaring canonical source unavailable or selecting source-reacquisition-only preflight."
   }
 }
