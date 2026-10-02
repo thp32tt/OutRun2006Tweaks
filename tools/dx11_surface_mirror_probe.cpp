@@ -133,6 +133,40 @@ int main()
             context.Get(), color, depth, liveTargetBinding.snapshotToken))
         return fail("R145 live OM target binding seals exact RTV DSV identity");
 
+    NativeSurfaceMirror extraColor;
+    if (!extraColor.initialize(
+            device.Get(),
+            ResourceRole::Color,
+            64,
+            32,
+            D3DFMT_A8R8G8B8,
+            D3DPOOL_DEFAULT,
+            D3DUSAGE_RENDERTARGET,
+            D3DMULTISAMPLE_NONE,
+            0))
+        return fail("R145 extra RTV surface setup failed");
+    ID3D11RenderTargetView* extraRtvs[2] = {
+        color.render_target_view(),
+        extraColor.render_target_view(),
+    };
+    context->OMSetRenderTargets(
+        2, extraRtvs, depth.depth_stencil_view());
+    const auto extraTargetBinding =
+        binding.binding_readiness(context.Get(), color, depth);
+    if (!extraTargetBinding.inputValid ||
+        !extraTargetBinding.ownerReady ||
+        !extraTargetBinding.pairCurrent ||
+        !extraTargetBinding.contextMatches ||
+        !extraTargetBinding.colorViewCurrent ||
+        !extraTargetBinding.depthViewCurrent ||
+        extraTargetBinding.rtvBoundExact ||
+        !extraTargetBinding.dsvBoundExact ||
+        extraTargetBinding.ready ||
+        extraTargetBinding.snapshotToken != 0 ||
+        binding.validate_binding_snapshot(
+            context.Get(), color, depth, liveTargetBinding.snapshotToken))
+        return fail("R145 live OM target binding rejects extra RTV slot");
+
     context->OMSetRenderTargets(0, nullptr, nullptr);
     const auto missingTargetBinding =
         binding.binding_readiness(context.Get(), color, depth);

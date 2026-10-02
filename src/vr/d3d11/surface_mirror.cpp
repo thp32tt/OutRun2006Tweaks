@@ -1,5 +1,6 @@
 #include "surface_mirror.hpp"
 
+#include <array>
 #include <utility>
 
 namespace outrun::vr::dx11
@@ -402,13 +403,21 @@ namespace outrun::vr::dx11
         if (!out.contextMatches)
             return out;
 
-        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> observedRtv;
+        std::array<
+            ID3D11RenderTargetView*,
+            D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT> observedRtvs{};
         Microsoft::WRL::ComPtr<ID3D11DepthStencilView> observedDsv;
         context->OMGetRenderTargets(
-            1,
-            observedRtv.ReleaseAndGetAddressOf(),
+            D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT,
+            observedRtvs.data(),
             observedDsv.ReleaseAndGetAddressOf());
-        out.rtvBoundExact = observedRtv.Get() == rtv_.Get();
+        out.rtvBoundExact = observedRtvs[0] == rtv_.Get();
+        for (UINT slot = 1;
+             slot < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
+             ++slot) {
+            if (observedRtvs[slot] != nullptr)
+                out.rtvBoundExact = false;
+        }
         out.dsvBoundExact = observedDsv.Get() == dsv_.Get();
         out.ready =
             out.pairCurrent &&
@@ -427,12 +436,16 @@ namespace outrun::vr::dx11
             mix(static_cast<std::uint64_t>(
                 reinterpret_cast<std::uintptr_t>(context)));
             mix(static_cast<std::uint64_t>(
-                reinterpret_cast<std::uintptr_t>(observedRtv.Get())));
+                reinterpret_cast<std::uintptr_t>(observedRtvs[0])));
             mix(static_cast<std::uint64_t>(
                 reinterpret_cast<std::uintptr_t>(observedDsv.Get())));
             mix(color.mirror_serial());
             mix(depth.mirror_serial());
             out.snapshotToken = hash == 0 ? 1 : hash;
+        }
+        for (auto* observedRtv : observedRtvs) {
+            if (observedRtv)
+                observedRtv->Release();
         }
         return out;
     }
