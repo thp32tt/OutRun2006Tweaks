@@ -2650,7 +2650,7 @@ int main()
             d3d.context, multiStageDrawReady.requiredTextureMask,
             multiStageSamplers, multiStageTextures,
             multiStageBindingSet.snapshotToken),
-        "R136 aggregate two-stage PS binding captures exact live identity");
+        "R136 multi-stage PS binding set seals every required stage");
 
     const auto multiStageTexturedDraw =
         outrun::vr::dx11::
@@ -2676,7 +2676,7 @@ int main()
                 multiStageDrawReady, d3d.context,
                 multiStageSamplers, multiStageTextures,
                 multiStageTexturedDraw.snapshotToken),
-        "R136 aggregate two-stage PS binding composes exact draw readiness");
+        "R136 multi-stage textured draw accepts exact aggregate PS identity");
 
     const auto multiStageBoundDraw =
         outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
@@ -2686,7 +2686,7 @@ int main()
         multiStageBoundDraw.ready &&
         multiStageBoundDraw.pipelineBindingMatchesDraw &&
         multiStageBoundDraw.snapshotToken != 0,
-        "R136 aggregate textured draw remains compatible with R134 pipeline identity");
+        "R136 aggregate PS identity composes with R134 bound draw evidence");
 
     auto forgedMultiStageBindingSet = multiStageBindingSet;
     forgedMultiStageBindingSet.stageSnapshotTokens[1] ^=
