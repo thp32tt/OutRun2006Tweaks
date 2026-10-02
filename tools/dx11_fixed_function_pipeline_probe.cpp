@@ -347,7 +347,45 @@ int main()
             "R168 LASTPIXEL remains dispatch-scoped rather than globally blocking triangles");
     }
 
+    {
+        auto wrapOff = base_state();
+        const auto wrapOffPipeline = translate_pipeline(wrapOff);
+        require(
+            wrapOffPipeline.exact() &&
+            (wrapOffPipeline.unsupported &
+             PipelineUnsupportedTextureCoordinateWrap) == 0,
+            "R170 zero texture-coordinate wrap masks must remain exact");
+
+        auto wrapStage0 = wrapOff;
+        wrapStage0.textureCoordinateWrap[0] = D3DWRAP_U;
+        const auto wrapStage0Pipeline = translate_pipeline(wrapStage0);
+        require(
+            !wrapStage0Pipeline.exact() &&
+            (wrapStage0Pipeline.unsupported &
+             PipelineUnsupportedTextureCoordinateWrap) != 0,
+            "R170 nonzero D3DRS_WRAP0 must fail closed");
+
+        auto wrapStage7 = wrapOff;
+        wrapStage7.textureCoordinateWrap[7] = D3DWRAP_V | D3DWRAP_W;
+        const auto wrapStage7Pipeline = translate_pipeline(wrapStage7);
+        require(
+            !wrapStage7Pipeline.exact() &&
+            (wrapStage7Pipeline.unsupported &
+             PipelineUnsupportedTextureCoordinateWrap) != 0,
+            "R170 nonzero D3DRS_WRAP7 must fail closed");
+
+        const auto fixedWrapStage7 =
+            translate_fixed_function_pipeline_with_shader_semantics(
+                wrapStage7, true, stages, true, 0x00, 0x00, textureTypes);
+        require(
+            !fixedWrapStage7.exact() &&
+            (fixedWrapStage7.renderStates.unsupported &
+             PipelineUnsupportedTextureCoordinateWrap) != 0,
+            "R170 fixed-function handoff must retain texture-coordinate wrap blocker");
+    }
+
     std::cout
+        << "DX11 texture-coordinate wrap fail-closed R170: PASS\n"
         << "DX11 line-raster provenance R168: PASS\n"
         << "DX11 fixed-function dithering fail-closed R165: PASS\n"
         << "DX11 fixed-function vertex-blend fail-closed R163: PASS\n"
