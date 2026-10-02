@@ -1801,7 +1801,9 @@ struct NativeFixedFunctionIndexedSourceContentReadiness {
     bool sourceRangeReady{};
     bool boundDrawReady{};
     bool indexMirrorReady{};
+    bool directDispatchMatchesIndexedSeal{};
     bool dispatchMatchesSourceRange{};
+    bool indexMirrorMatchesGeometry{};
     bool indexFormatMatchesBinding{};
     bool inspectionExact{};
     bool sourceValuesInRange{};
@@ -1812,7 +1814,9 @@ struct NativeFixedFunctionIndexedSourceContentReadiness {
     UINT observedMaxIndex{};
     std::uint64_t indexContentHash{};
     std::uint64_t indexedDispatchSnapshotToken{};
+    std::uint64_t directDispatchSnapshotToken{};
     std::uint64_t sourceRangeSnapshotToken{};
+    std::uint64_t geometrySnapshotToken{};
     std::uint64_t boundDrawSnapshotToken{};
     std::uint64_t indexMirrorSnapshotToken{};
     std::uint64_t snapshotToken{};
@@ -1821,7 +1825,9 @@ struct NativeFixedFunctionIndexedSourceContentReadiness {
 [[nodiscard]] NativeFixedFunctionIndexedSourceContentReadiness
 compose_fixed_function_indexed_source_content_readiness(
     const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedDispatch,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& directDispatch,
     const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
     const NativeManagedBufferShadow& indexBuffer,
     ID3D11Device* expectedDevice,
@@ -1829,7 +1835,9 @@ compose_fixed_function_indexed_source_content_readiness(
 
 [[nodiscard]] bool validate_fixed_function_indexed_source_content_snapshot(
     const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedDispatch,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& directDispatch,
     const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
     const NativeManagedBufferShadow& indexBuffer,
     ID3D11Device* expectedDevice,
