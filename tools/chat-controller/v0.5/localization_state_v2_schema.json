@@ -1,0 +1,36 @@
+{
+  "version": "state-v2",
+  "management_model": "asset_commit_based",
+  "task_id_runtime_management": false,
+  "lanes": {
+    "A": {
+      "role": "producer",
+      "output": "material_commit"
+    },
+    "B": {
+      "role": "producer",
+      "output": "material_commit"
+    },
+    "C": {
+      "role": "qa",
+      "input": "producer_commits"
+    }
+  },
+  "required_state": [
+    "asset_path",
+    "lane",
+    "state",
+    "commit_sha",
+    "qa_result"
+  ],
+  "states": [
+    "READY",
+    "WORKING",
+    "COMMIT_CREATED",
+    "QA_PENDING",
+    "PASS",
+    "REWORK",
+    "HOLD"
+  ],
+  "legacy_task_ids": "history_only"
+}
