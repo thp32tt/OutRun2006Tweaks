@@ -260,6 +260,7 @@ for marker in (
     "R31TelemetryNoteUnstable()",
     "R31TelemetryNoteFragile()",
     "R31TelemetryResetFrameWindow()",
+    "R31TelemetryFrameSnapshot()",
     "R31TelemetryLiveWvpChecks()",
     "R31TelemetryLiveWvpRejects()",
 ):
