@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "4d4281b446644650834c72ced677df60369e8a46",
+  "state_parent_head": "134af3f70e3d5abd07951d8ef22a59b2e59c73be",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -55,7 +55,7 @@
     "result_sha": "b408e7957421b461a3c1975f276265493586a2a3",
     "validation_bearing_sha": "869cd337f4ce2990bb0dd45e936ac8bc8f9b23a2",
     "retaining_descendant_sha": "a329783c00047673d0075cfaca7af10bdcad1873",
-    "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; CONFIGURE_IN_PROGRESS_AT_CHECKPOINT; COMPILE_NOT_CLAIMED",
+    "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER_AND_CONFIGURE; BUILD_CANCELLED_BEFORE_COMPLETION; COMPILE_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
@@ -872,14 +872,14 @@
       "material_result_sha": "b408e7957421b461a3c1975f276265493586a2a3",
       "validation_bearing_sha": "869cd337f4ce2990bb0dd45e936ac8bc8f9b23a2",
       "retaining_descendant_sha": "a329783c00047673d0075cfaca7af10bdcad1873",
-      "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; CONFIGURE_IN_PROGRESS_AT_CHECKPOINT; COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER_AND_CONFIGURE; BUILD_CANCELLED_BEFORE_COMPLETION; COMPILE_NOT_CLAIMED",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5948681416,
       "validation_run_id": 36987425721,
       "validation_job_id": 110775639816,
-      "run_state_commit": "095685456cb10e2da798fbc6b877fae8c05f22e8"
+      "run_state_commit": "4d4281b446644650834c72ced677df60369e8a46"
     },
     {
       "unit_id": "DX11_FFP_D3DTOP_ADD_SUPPORT",
