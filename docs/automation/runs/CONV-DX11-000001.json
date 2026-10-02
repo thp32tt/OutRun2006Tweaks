@@ -983,8 +983,10 @@
           "reason": "Dormant readiness/capture/test/guard work only; no native game Draw* routing, RS/OM binding activation, runtime candidate payload or release package behavior was enabled."
         },
         "C6_STATE": {
-          "status": "PERSISTING_WITH_THIS_STATE_UPDATE",
-          "exact_next_action": "Keep NativeDrawPathActive disabled. In a later independent unit, consume the sealed output-state payload in a dormant D3D11 RS/OM binding owner/probe without routing game Draw*, and obtain a non-superseded hosted WARP/Win32 result before any activation discussion."
+          "status": "COMPLETE_WITH_STATE_COMMITS",
+          "run_state_checkpoint_commit": "6f7e9c5a511ef5d40d6ba3b7999d50624b461672",
+          "lane_state_commit": "c12a0e1332323a1d8aa9ab9174a4bf8aa2f96235",
+          "exact_next_action": "Keep NativeDrawPathActive disabled. Consume the sealed output-state payload only in a dormant D3D11 RS/OM binding owner/probe, then obtain a non-superseded hosted Win32/WARP result before any native Draw* activation discussion."
         }
       },
       "scope_guards": {
