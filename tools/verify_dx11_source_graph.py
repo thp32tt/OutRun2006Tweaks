@@ -2239,6 +2239,34 @@ def main() -> None:
             + ", ".join(missing_r152_indexed_source_values)
         )
 
+    r153_indexed_source_binding_contract = [
+        ("struct NativeFixedFunctionIndexedSourceBindingReadiness",
+         NATIVE_BACKEND_HPP, "R153 live IA/source-value binding identity"),
+        ("compose_fixed_function_indexed_source_binding_readiness(",
+         NATIVE_BACKEND_CPP, "R153 source-binding compositor"),
+        ("validate_fixed_function_indexed_source_value_snapshot(",
+         NATIVE_BACKEND_CPP, "R153 revalidates the complete R152 lineage"),
+        ("boundDraw.indexFormat == expectedIndexFormat",
+         NATIVE_BACKEND_CPP, "R153 D3D9/DXGI index-format equality"),
+        ("out.indexOffsetExact = boundDraw.indexOffset == 0u;",
+         NATIVE_BACKEND_CPP, "R153 whole-mirror IA offset proof"),
+        ("R153 indexed source binding seals live IA format and offset",
+         CONSTANT_BUFFER_PROBE, "R153 positive source-binding proof"),
+        ("R153 indexed source binding rejects source format drift",
+         CONSTANT_BUFFER_PROBE, "R153 source-format drift rejection"),
+        ("R153 indexed source binding rejects live IA index offset drift",
+         CONSTANT_BUFFER_PROBE, "R153 live IA offset drift rejection"),
+    ]
+    missing_r153_indexed_source_binding = [
+        meaning for token, source, meaning in r153_indexed_source_binding_contract
+        if token not in source
+    ]
+    if missing_r153_indexed_source_binding:
+        raise SystemExit(
+            "DX11 R153 indexed source-binding contract drift: "
+            + ", ".join(missing_r153_indexed_source_binding)
+        )
+
     r148_generated_fan_dispatch_contract = [
         (
             "struct NativeFixedFunctionFanDrawDispatchReadiness",
@@ -2484,6 +2512,12 @@ def main() -> None:
             or "validate_fixed_function_indexed_source_range_snapshot(" in runtime_source
             or "compose_fixed_function_indexed_direct_dispatch_readiness(" in runtime_source
             or "validate_fixed_function_indexed_direct_dispatch_snapshot(" in runtime_source
+            or "compose_fixed_function_indexed_source_value_readiness(" in runtime_source
+            or "validate_fixed_function_indexed_source_value_snapshot(" in runtime_source
+            or "compose_fixed_function_indexed_source_binding_readiness(" in runtime_source
+            or "validate_fixed_function_indexed_source_binding_snapshot(" in runtime_source
+            or ".index_range_readiness(" in runtime_source
+            or ".validate_index_range_readiness_snapshot(" in runtime_source
             or "compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(" in runtime_source
             or "validate_fixed_function_nonindexed_triangle_fan_draw_dispatch_snapshot(" in runtime_source
             or "compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(" in runtime_source
