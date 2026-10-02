@@ -1004,6 +1004,49 @@ def main() -> None:
             + ", ".join(missing_r126_output_binding_provenance)
         )
 
+    r131_output_binding_draw_contract = [
+        (
+            "surface_pair_snapshot_token_ != 0",
+            NATIVE_BACKEND_HPP,
+            "R131 R126 owner seals surface-pair identity",
+        ),
+        (
+            "surface_pair_snapshot_token_ = surfacePair.snapshotToken;",
+            NATIVE_BACKEND_CPP,
+            "R131 surface-pair token capture",
+        ),
+        (
+            "token, surface_pair_snapshot_token_",
+            NATIVE_BACKEND_CPP,
+            "R131 surface-pair token participates in binding identity",
+        ),
+        (
+            "outputStateBinding.surface_pair_snapshot_token() ==",
+            CONSTANT_BUFFER_PROBE,
+            "R131 hosted owner surface identity assertion",
+        ),
+        (
+            "const NativeFixedFunctionOutputStateBinding& outputBinding",
+            NATIVE_BACKEND_HPP,
+            "R131 draw composition requires concrete binding owner",
+        ),
+        (
+            "outputBinding.snapshot_token() != 0",
+            NATIVE_BACKEND_CPP,
+            "R131 draw readiness requires a concrete binding token",
+        ),
+    ]
+    missing_r131_output_binding_draw = [
+        meaning
+        for token, source, meaning in r131_output_binding_draw_contract
+        if token not in source
+    ]
+    if missing_r131_output_binding_draw:
+        raise SystemExit(
+            "DX11 R131 output-binding draw contract drift: "
+            + ", ".join(missing_r131_output_binding_draw)
+        )
+
     stencil_snapshot_contract = {
         "DWORD stencilReadMask = 0xFFFFFFFFu;": "stencil read mask snapshot",
         "DWORD stencilRef = 0;": "dynamic stencil reference snapshot",
@@ -3726,12 +3769,16 @@ def main() -> None:
             "R120 explicit render-state readiness",
         "bool surfacePairReady{}":
             "R120 explicit output-surface readiness",
+        "bool outputBindingReady{}":
+            "R131 concrete RS/OM binding readiness",
         "bool geometryReady{}":
             "R122 explicit geometry readiness",
         "std::uint64_t renderStateSnapshotToken{}":
             "R120 render-state snapshot identity",
         "std::uint64_t surfacePairSnapshotToken{}":
             "R120 output-surface snapshot identity",
+        "std::uint64_t outputBindingSnapshotToken{}":
+            "R131 concrete RS/OM binding identity",
         "const NativeSurfacePairReadiness& surfacePair":
             "R120 surface-pair composition input",
         "compose_fixed_function_draw_readiness(":
@@ -3757,6 +3804,14 @@ def main() -> None:
             "R120 surface-pair input validity prerequisite",
         "surfacePair.ready && surfacePair.snapshotToken != 0":
             "R120 surface-pair readiness prerequisite",
+        "outputBinding.render_state_snapshot_token() == renderState.snapshotToken":
+            "R131 binding/render-state identity match",
+        "outputBinding.surface_pair_snapshot_token() == surfacePair.snapshotToken":
+            "R131 binding/surface-pair identity match",
+        "outputBinding.output_state_snapshot_token() == outputState.snapshotToken":
+            "R131 binding/output-state identity match",
+        "out.outputBindingReady":
+            "R131 concrete binding prerequisite",
         "out.componentSnapshotsPresent =":
             "R120 explicit component-token aggregation",
         "drawToken, out.activationSnapshotToken":
@@ -3765,6 +3820,8 @@ def main() -> None:
             "R120 render-state identity in draw token",
         "drawToken, out.surfacePairSnapshotToken":
             "R120 output-surface identity in draw token",
+        "drawToken, out.outputBindingSnapshotToken":
+            "R131 concrete binding identity in draw token",
         "drawToken, out.geometrySnapshotToken":
             "R122 geometry identity in draw token",
     }.items():
@@ -3774,16 +3831,22 @@ def main() -> None:
             )
 
     for token, meaning in {
-        "R124 draw readiness composes activation, render-state, surface, output-state, and geometry snapshots":
-            "R124 positive composition proof",
-        "R120 draw readiness fails closed on missing component evidence":
-            "R120 missing-evidence fail-closed proof",
-        "R120 draw snapshot changes with render-state identity":
-            "R120 render-state identity invalidation proof",
-        "R120 draw snapshot changes with output-surface identity":
-            "R120 output-surface identity invalidation proof",
+        "R131 draw readiness composes sealed output binding identity":
+            "R131 positive binding-gated composition proof",
+        "R131 draw readiness fails closed on missing binding evidence":
+            "R131 missing binding fail-closed proof",
+        "R131 draw binding rejects render-state identity drift":
+            "R131 render-state/binding mismatch proof",
+        "R131 draw binding rejects surface-pair identity drift":
+            "R131 surface-pair/binding mismatch proof",
+        "R131 draw binding rejects output-state identity drift":
+            "R131 output-state/binding mismatch proof",
+        "R131 draw snapshot still changes with independent geometry identity":
+            "R131 independent geometry identity proof",
         "DX11 fixed-function draw readiness composition R120: PASS":
             "R120 hosted probe completion marker",
+        "DX11 draw output-binding readiness R131: PASS":
+            "R131 hosted probe completion marker",
     }.items():
         if token not in CONSTANT_BUFFER_PROBE:
             raise SystemExit(
