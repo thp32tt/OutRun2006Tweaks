@@ -683,6 +683,61 @@ def verify_dxvk_continuation_chain() -> None:
                 "end without an explicit padding contract"
             )
 
+        # Some exact windows (notably F44/F45) contain code, a long INT3
+        # alignment span, and then more code inside one canonical capture. Those
+        # bytes are represented as one-byte instruction rows so the generic
+        # geometry remains contiguous. Treat runs of four or more INT3 rows as
+        # structural padding and fail closed unless fallthrough was already
+        # terminated before the run. Canonical all_bytes_match then proves the
+        # padding bytes themselves, while this guard proves the control-flow
+        # shape around them.
+        internal_int3_padding_spans: list[tuple[int, int]] = []
+        int3_run_start: int | None = None
+        for row_index, (_rva, instruction_hex, _asm) in enumerate(instruction_rows):
+            is_int3 = bytes.fromhex(instruction_hex) == b"\xCC"
+            if is_int3 and int3_run_start is None:
+                int3_run_start = row_index
+            if not is_int3 and int3_run_start is not None:
+                if row_index - int3_run_start >= 4:
+                    internal_int3_padding_spans.append((int3_run_start, row_index))
+                int3_run_start = None
+        if int3_run_start is not None:
+            if len(instruction_rows) - int3_run_start >= 4:
+                internal_int3_padding_spans.append(
+                    (int3_run_start, len(instruction_rows))
+                )
+
+        for run_start_index, run_end_index in internal_int3_padding_spans:
+            if run_start_index == 0:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} long INT3 padding starts "
+                    "without a preceding terminal instruction"
+                )
+            previous_encoded = bytes.fromhex(
+                instruction_rows[run_start_index - 1][1]
+            )
+            previous_is_non_fallthrough = bool(
+                previous_encoded[:1] in (b"\xC2", b"\xC3", b"\xE9", b"\xEB")
+                or previous_encoded == b"\x0F\x0B"
+            )
+            if not previous_is_non_fallthrough:
+                run_start_rva = instruction_rows[run_start_index][0]
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} long INT3 padding at "
+                    f"0x{run_start_rva:08X} is reachable by fallthrough"
+                )
+            run_start_rva = instruction_rows[run_start_index][0]
+            last_padding_rva = instruction_rows[run_end_index - 1][0]
+            run_end_rva = last_padding_rva + 1
+            if run_end_index < len(instruction_rows):
+                next_code_rva = instruction_rows[run_end_index][0]
+                if next_code_rva != run_end_rva:
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} INT3 padding/code "
+                        f"boundary drift: padding_end=0x{run_end_rva:08X} "
+                        f"next_code=0x{next_code_rva:08X}"
+                    )
+
         declared_branches = analyzer.get(f"{prefix}_BRANCHES", ())
         direct_branch_rows: dict[int, tuple[bytes, int]] = {}
         for instruction_rva, instruction_hex, _instruction_asm in instruction_rows:
@@ -728,6 +783,20 @@ def verify_dxvk_continuation_chain() -> None:
                     f"0x{branch_rva:08X}: declared=0x{expected_target_rva:08X} "
                     f"decoded=0x{decoded_target_rva:08X}"
                 )
+
+        padding_target_hits = [
+            (branch_rva, target_rva, instruction_rows[run_start][0], instruction_rows[run_end - 1][0] + 1)
+            for branch_rva, target_rva in declared_branches
+            for run_start, run_end in internal_int3_padding_spans
+            if instruction_rows[run_start][0]
+            <= target_rva
+            < instruction_rows[run_end - 1][0] + 1
+        ]
+        if padding_target_hits:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} direct BRANCH enters long INT3 "
+                f"padding: {padding_target_hits}"
+            )
 
         # Keep declared direct rel32 CALL metadata tied to the exact decoded
         # instruction rows. This catches off-by-one CALL RVAs or stale targets
