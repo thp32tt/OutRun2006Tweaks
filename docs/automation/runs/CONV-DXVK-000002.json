@@ -4551,11 +4551,11 @@
         },
         "C3_VALIDATE": {
           "status": "COMPLETE",
-          "evidence": "DXVK Canonical Disassembly Evidence run 36986923617 job 110773951176 SUCCESS on exact material SHA: VR backend disassembly contract OK, canonical EXE SHA256 matched, analyzer reported EXACT_EXE_1830F3_TO_183133_PROVENANCE_CAPTURED, artifact 11217519326 digest sha256:a2b6619c22569e3a4a910d95c8d79720e4212913bc2b7472ce27578a245dae83."
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36986923617/job 110773951176 SUCCESS and Backend Conversion Gate run 36986923560/job 110773950945 SUCCESS: static disassembly contract PASS, canonical EXE identity/analyzer PASS, Win32 configure/build PASS, binary existence PASS. Runtime remains UNTESTED."
         },
         "C4_COMMIT": {
           "status": "COMPLETE",
-          "evidence": "Substantive source commit faf83ac4769449bfffa9b2b8130c61f00defa2c3 contains [AUTO:CONV-DXVK-000002]; Issue #14 comment 5948651605 records implementation and exact-SHA validation."
+          "evidence": "Substantive source commit faf83ac4769449bfffa9b2b8130c61f00defa2c3 contains [AUTO:CONV-DXVK-000002]; Issue #14 comments 5948651605 and 5948687685 record implementation, canonical validation and final Backend Conversion Gate success."
         },
         "C5_PACKAGE": {
           "status": "NOT_REQUIRED",
@@ -4568,7 +4568,7 @@
         }
       },
       "validation": {
-        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BUILD",
         "exact_sha": "faf83ac4769449bfffa9b2b8130c61f00defa2c3",
         "dxvk_disassembly_evidence_run_id": 36986923617,
         "dxvk_disassembly_evidence_job_id": 110773951176,
@@ -4585,15 +4585,23 @@
         "artifact_id": 11217519326,
         "artifact_digest": "sha256:a2b6619c22569e3a4a910d95c8d79720e4212913bc2b7472ce27578a245dae83",
         "backend_conversion_gate_run_id": 36986923560,
-        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_CLAIMED_COMPLETE",
-        "runtime_validation": "UNTESTED"
+        "runtime_validation": "UNTESTED",
+        "backend_conversion_gate_job_id": 110773950945,
+        "backend_conversion_gate_status": "SUCCESS",
+        "backend_conversion_gate_conclusion": "success",
+        "backend_disassembly_contract": "PASS",
+        "configure_win32": "PASS",
+        "build_win32": "PASS",
+        "binary_exists": "PASS"
       },
       "issue14_implementation_comment_id": 5948651605,
       "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
       "semantic_promotion": "NONE",
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
-      "exact_next_action": "Exact-decode only complete canonical instructions in validated continuation_59 raw window 0x001830F3..0x00183133. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
+      "exact_next_action": "Exact-decode only complete canonical instructions in validated continuation_59 raw window 0x001830F3..0x00183133. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved.",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BUILD",
+      "issue14_validation_comment_id": 5948687685
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
