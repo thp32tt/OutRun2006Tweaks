@@ -20,6 +20,8 @@ struct FixedFunctionTransformConstants;
 struct FixedFunctionVertexShaderPrototype;
 struct FixedFunctionPixelShaderPrototype;
 struct NativeSurfacePairReadiness;
+class NativeSurfaceMirror;
+class NativeSurfacePairBinding;
 struct NativeTriangleFanIndexBufferReadiness;
 class NativeTriangleFanIndexBuffer;
 struct VertexInputLayoutTranslation;
@@ -1441,6 +1443,65 @@ compose_fixed_function_fully_bound_draw_readiness(
     const NativeManagedBufferShadow* indexBuffer,
     DXGI_FORMAT indexFormat, UINT indexOffset,
     const FixedFunctionTransformConstants& transform,
+    std::uint64_t snapshotToken) noexcept;
+
+// R145 closes the live OM target gap in the direct-geometry dormant pre-draw
+// proof. The existing fully-bound gate is recomputed from the same context and
+// then paired with an exact R130 surface owner live RTV/DSV snapshot. No Draw*
+// call or NativeDrawPathActive promotion occurs here.
+struct NativeFixedFunctionRenderTargetBoundDrawReadiness {
+    bool inputValid{};
+    bool fullyBoundDrawReady{};
+    bool surfaceTargetBindingReady{};
+    bool surfacePairMatchesDraw{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t fullyBoundDrawSnapshotToken{};
+    std::uint64_t surfaceTargetBindingSnapshotToken{};
+    std::uint64_t surfacePairSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionRenderTargetBoundDrawReadiness
+compose_fixed_function_render_target_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat, UINT indexOffset,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_render_target_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat, UINT indexOffset,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
     std::uint64_t snapshotToken) noexcept;
 
 class NativeBackend final {
