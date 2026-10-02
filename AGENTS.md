@@ -187,3 +187,21 @@ The repository has an interactive Windows self-hosted fast-build path in .github
 - PC-fast output is PC_FAST_INCREMENTAL_NOT_FINAL_CI. It never advances the protected runtime baseline and never replaces canonical hosted validation or final packaging.
 - Outside that evening test session, scheduled A/N100/B/C/D work, daytime/manual development, review, CI validation, packaging and ordinary direct-chat edits must not use [pc-build]. When the evening session ends, stop using [pc-build] immediately so the user's PC remains uninvolved.
 
+
+
+## DX11 conversion-branch state override
+
+This branch is a dedicated conversion lane. Before substantial work, read `docs/CONVERSION_LANE_STATE.json` after fetching the current GitHub HEAD.
+
+For this branch, the precedence is:
+1. current GitHub HEAD;
+2. `docs/CONVERSION_LANE_STATE.json`;
+3. the current durable `docs/automation/runs/<TASK_ID>.json`;
+4. this `AGENTS.md`;
+5. inherited/historical `docs/VR_AUTODEV_STATE.json`.
+
+The inherited VR_AUTODEV_STATE may contain older DX9Ex/global project policy. It must not overwrite current DX11 conversion-lane status or priority.
+
+Development is GitHub-only. Missing local PC, RenderDoc, local OpenXR runtime, or an installed Skill is not a blocker for repository source/static/disassembly/GitHub Actions work. Installed Skills are optional helpers only and never completion authority.
+
+A stable assistant response that only reconstructs state, reviews, or describes the next step is not task completion. Continue the same TASK_ID to durable repository work/commit; runtime-only claims remain UNTESTED until user Quest 3/VDXR evidence exists.
