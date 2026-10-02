@@ -1470,6 +1470,7 @@ namespace outrun::vr::dx11
         UINT stream0Stride) noexcept
     {
         VertexInputLayoutTranslation out{};
+        out.stream0Stride = stream0Stride;
         if (!source || count == 0)
         {
             out.fvfPath = fvf != 0;

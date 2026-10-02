@@ -2318,6 +2318,37 @@ def main() -> None:
             + ", ".join(missing_r153_indexed_source_binding)
         )
 
+    r157_input_layout_stride_lineage_contract = [
+        ("UINT stream0Stride = 0;", PIPELINE_TRANSLATION_HPP,
+         "R157 translated input-layout stride identity"),
+        ("out.stream0Stride = stream0Stride;", PIPELINE_TRANSLATION_CPP,
+         "R157 translator captures caller stream stride"),
+        ("hash = mix_readiness_snapshot_token(hash, layout.stream0Stride);",
+         NATIVE_BACKEND_CPP, "R157 pipeline identity hashes stride"),
+        ("bool vertexStrideMatchesInputLayout{};", NATIVE_BACKEND_HPP,
+         "R157 final draw stride lineage gate"),
+        ("vertexStride == layout.stream0Stride", NATIVE_BACKEND_CPP,
+         "R157 live IA stride must equal translated layout stride"),
+        ("boundDraw.vertexStride != boundDraw.inputLayoutStream0Stride",
+         NATIVE_BACKEND_CPP, "R157 copied final-readiness stride drift rejection"),
+        ("R157 final draw rejects live IA stride drift from translated layout",
+         CONSTANT_BUFFER_PROBE, "R157 live-IA stride mismatch rejection"),
+        ("R157 exact IA stride restore keeps final draw snapshot deterministic",
+         CONSTANT_BUFFER_PROBE, "R157 exact stride restore proof"),
+        ("pipelineChangedStride.inputValid", CONSTANT_BUFFER_PROBE,
+         "R157 pipeline input-layout identity includes stride"),
+    ]
+    missing_r157_input_layout_stride_lineage = [
+        meaning
+        for token, source, meaning in r157_input_layout_stride_lineage_contract
+        if token not in source
+    ]
+    if missing_r157_input_layout_stride_lineage:
+        raise SystemExit(
+            "DX11 R157 input-layout stride lineage contract drift: "
+            + ", ".join(missing_r157_input_layout_stride_lineage)
+        )
+
     r148_generated_fan_dispatch_contract = [
         (
             "struct NativeFixedFunctionFanDrawDispatchReadiness",

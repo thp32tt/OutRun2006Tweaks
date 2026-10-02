@@ -278,6 +278,10 @@ namespace outrun::vr::dx11
     {
         std::array<D3D11_INPUT_ELEMENT_DESC, MAXD3DDECLLENGTH> elements{};
         UINT elementCount = 0;
+        // R157 preserves the exact D3D9 stream-0 stride used when descriptor
+        // offsets were validated. D3D11 input-layout objects do not encode
+        // vertex-buffer stride, so final IA readiness must carry it separately.
+        UINT stream0Stride = 0;
         bool exact = false;
         bool declarationPath = false;
         bool fvfPath = false;

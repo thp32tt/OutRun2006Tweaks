@@ -46,11 +46,13 @@ std::uint64_t hash_transform_payload_bytes(
 std::uint64_t hash_pipeline_input_layout_identity(
     const VertexInputLayoutTranslation& layout) noexcept {
     if (!layout.exact || layout.elementCount == 0 ||
-        layout.elementCount > layout.elements.size())
+        layout.elementCount > layout.elements.size() ||
+        layout.stream0Stride == 0)
         return 0;
 
     std::uint64_t hash = 0xcbf29ce484222325ull;
     hash = mix_readiness_snapshot_token(hash, layout.elementCount);
+    hash = mix_readiness_snapshot_token(hash, layout.stream0Stride);
     hash = mix_readiness_snapshot_token(hash, layout.declarationPath ? 1u : 0u);
     hash = mix_readiness_snapshot_token(hash, layout.fvfPath ? 1u : 0u);
     hash = mix_readiness_snapshot_token(hash, layout.fvfPending ? 1u : 0u);
@@ -4383,6 +4385,7 @@ compose_fixed_function_render_target_bound_draw_readiness(
     const NativeSurfaceMirror& depthSurface) noexcept {
     NativeFixedFunctionRenderTargetBoundDrawReadiness out{};
     out.vertexStride = vertexStride;
+    out.inputLayoutStream0Stride = layout.stream0Stride;
     out.vertexOffset = vertexOffset;
     out.vertexBufferByteWidth = vertexBuffer.byte_width();
     out.indexFormat = indexFormat;
@@ -4391,6 +4394,10 @@ compose_fixed_function_render_target_bound_draw_readiness(
     const UINT indexElementBytes =
         indexFormat == DXGI_FORMAT_R16_UINT ? 2u :
         indexFormat == DXGI_FORMAT_R32_UINT ? 4u : 0u;
+    out.vertexStrideMatchesInputLayout =
+        layout.exact &&
+        layout.stream0Stride != 0 &&
+        vertexStride == layout.stream0Stride;
     out.geometryRangeMetadataExact =
         vertexStride != 0 &&
         out.vertexBufferByteWidth != 0 &&
@@ -4440,6 +4447,7 @@ compose_fixed_function_render_target_bound_draw_readiness(
         out.surfaceTargetBindingReady &&
         out.surfacePairMatchesDraw &&
         out.geometryRangeMetadataExact &&
+        out.vertexStrideMatchesInputLayout &&
         out.componentSnapshotsPresent;
     if (out.ready) {
         std::uint64_t token = 0xcbf29ce484222325ull;
@@ -4450,6 +4458,8 @@ compose_fixed_function_render_target_bound_draw_readiness(
         token = mix_readiness_snapshot_token(
             token, out.surfacePairSnapshotToken);
         token = mix_readiness_snapshot_token(token, out.vertexStride);
+        token = mix_readiness_snapshot_token(
+            token, out.inputLayoutStream0Stride);
         token = mix_readiness_snapshot_token(token, out.vertexOffset);
         token = mix_readiness_snapshot_token(token, out.vertexBufferByteWidth);
         token = mix_readiness_snapshot_token(
@@ -5279,9 +5289,12 @@ bool validate_fixed_function_render_target_bound_draw_readiness_integrity(
         !boundDraw.surfaceTargetBindingReady ||
         !boundDraw.surfacePairMatchesDraw ||
         !boundDraw.geometryRangeMetadataExact ||
+        !boundDraw.vertexStrideMatchesInputLayout ||
         !boundDraw.componentSnapshotsPresent ||
         !boundDraw.ready ||
         boundDraw.vertexStride == 0 ||
+        boundDraw.inputLayoutStream0Stride == 0 ||
+        boundDraw.vertexStride != boundDraw.inputLayoutStream0Stride ||
         boundDraw.vertexBufferByteWidth == 0 ||
         boundDraw.vertexOffset > boundDraw.vertexBufferByteWidth ||
         boundDraw.fullyBoundDrawSnapshotToken == 0 ||

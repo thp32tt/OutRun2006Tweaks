@@ -1032,7 +1032,7 @@ int main()
             D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
         "R122 non-indexed geometry ignores unrelated IB identity");
 
-    constexpr UINT geometryVertexStride = 16u;
+    constexpr UINT geometryVertexStride = 24u;
     constexpr UINT geometryVertexOffset = 0u;
     constexpr UINT geometryIndexOffset = 0u;
     require(
@@ -3662,7 +3662,10 @@ int main()
             renderTargetBoundDraw.surfaceTargetBindingReady &&
             renderTargetBoundDraw.surfacePairMatchesDraw &&
             renderTargetBoundDraw.geometryRangeMetadataExact &&
+            renderTargetBoundDraw.vertexStrideMatchesInputLayout &&
             renderTargetBoundDraw.vertexStride == geometryVertexStride &&
+            renderTargetBoundDraw.inputLayoutStream0Stride ==
+                inputLayout.stream0Stride &&
             renderTargetBoundDraw.vertexOffset == geometryVertexOffset &&
             renderTargetBoundDraw.vertexBufferByteWidth == managedVertexBytes.size() &&
             renderTargetBoundDraw.indexFormat == DXGI_FORMAT_R16_UINT &&
@@ -3687,6 +3690,54 @@ int main()
                     outputColorSurface, outputDepthSurface,
                     renderTargetBoundDraw.snapshotToken),
             "R145 final draw seals exact live OM RTV DSV identity");
+
+        constexpr UINT mismatchedLayoutStride = 16u;
+        require(
+            outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+                d3d.context, indexedGeometryReady, managedVertexBuffer,
+                mismatchedLayoutStride, geometryVertexOffset,
+                &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset),
+            "R157 mismatched IA stride binding prerequisite");
+        const auto layoutStrideMismatch =
+            outrun::vr::dx11::
+                compose_fixed_function_render_target_bound_draw_readiness(
+                    multiStageDrawReady, d3d.context, outputStateBinding,
+                    pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                    multiStageSamplers, multiStageTextures,
+                    indexedGeometryReady, managedVertexBuffer,
+                    mismatchedLayoutStride, geometryVertexOffset,
+                    &managedIndexBuffer, DXGI_FORMAT_R16_UINT,
+                    geometryIndexOffset, transform, surfaceTargetBinding,
+                    outputColorSurface, outputDepthSurface);
+        require(
+            layoutStrideMismatch.inputValid &&
+            layoutStrideMismatch.fullyBoundDrawReady &&
+            layoutStrideMismatch.surfaceTargetBindingReady &&
+            layoutStrideMismatch.geometryRangeMetadataExact &&
+            !layoutStrideMismatch.vertexStrideMatchesInputLayout &&
+            layoutStrideMismatch.vertexStride == mismatchedLayoutStride &&
+            layoutStrideMismatch.inputLayoutStream0Stride ==
+                inputLayout.stream0Stride &&
+            !layoutStrideMismatch.ready &&
+            layoutStrideMismatch.snapshotToken == 0,
+            "R157 final draw rejects live IA stride drift from translated layout");
+        require(
+            outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+                d3d.context, indexedGeometryReady, managedVertexBuffer,
+                geometryVertexStride, geometryVertexOffset,
+                &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset) &&
+            outrun::vr::dx11::
+                validate_fixed_function_render_target_bound_draw_snapshot(
+                    multiStageDrawReady, d3d.context, outputStateBinding,
+                    pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                    multiStageSamplers, multiStageTextures,
+                    indexedGeometryReady, managedVertexBuffer,
+                    geometryVertexStride, geometryVertexOffset,
+                    &managedIndexBuffer, DXGI_FORMAT_R16_UINT,
+                    geometryIndexOffset, transform, surfaceTargetBinding,
+                    outputColorSurface, outputDepthSurface,
+                    renderTargetBoundDraw.snapshotToken),
+            "R157 exact IA stride restore keeps final draw snapshot deterministic");
 
         d3d.context->OMSetRenderTargets(0, nullptr, nullptr);
         const auto missingRenderTargets =
@@ -5367,6 +5418,8 @@ int main()
     DevicePair pipelineOtherDevice = create_warp_device();
     auto changedLayout = inputLayout;
     changedLayout.elements[0].SemanticIndex ^= 1u;
+    auto changedStrideLayout = inputLayout;
+    changedStrideLayout.stream0Stride -= 4u;
     auto changedVertexPrototype = vertexPrototype;
     changedVertexPrototype.sourceHash ^= 0x100000001b3ull;
     auto changedPixelPrototype = pixelPrototype;
@@ -5378,6 +5431,9 @@ int main()
     const auto pipelineChangedLayout =
         pipelineBundle.translation_readiness(
             d3d.device, changedLayout, vertexPrototype, pixelPrototype);
+    const auto pipelineChangedStride =
+        pipelineBundle.translation_readiness(
+            d3d.device, changedStrideLayout, vertexPrototype, pixelPrototype);
     const auto pipelineChangedVertex =
         pipelineBundle.translation_readiness(
             d3d.device, inputLayout, changedVertexPrototype, pixelPrototype);
@@ -5394,6 +5450,10 @@ int main()
         !pipelineChangedLayout.inputLayoutMatches &&
         !pipelineChangedLayout.ready &&
         pipelineChangedLayout.snapshotToken == 0 &&
+        pipelineChangedStride.inputValid &&
+        !pipelineChangedStride.inputLayoutMatches &&
+        !pipelineChangedStride.ready &&
+        pipelineChangedStride.snapshotToken == 0 &&
         pipelineChangedVertex.inputValid &&
         !pipelineChangedVertex.vertexShaderMatches &&
         !pipelineChangedVertex.ready &&
