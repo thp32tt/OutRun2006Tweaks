@@ -1668,6 +1668,39 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest primary canonical-disassembly frontier. Future proof collectors must keep all recognized computed integrity gates bound into final proven status; continue frontier work independently without semantic promotion."
+    },
+    {
+      "unit_id": "DXVK_LEGACY_CONTINUATION_RAW_CALL_CENSUS_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "8bdf8d9d0e8ad5dae4347f453fe9b915c81ed8bc",
+      "material_commits": [
+        "4efa329209ebf1a3af04fd5d8ef3984a8f14a456",
+        "0d5a97f896521ef35e416d3ecdbb70fa9538515c",
+        "8bdf8d9d0e8ad5dae4347f453fe9b915c81ed8bc"
+      ],
+      "validation_bearing_descendant_sha": "fbdec361e708da352e7eb6171e8eed3d65832019",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py",
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Legacy continuation proofs 23/24 now require complete raw E8 rel32 census equality with their declared CALL set; the generic continuation verifier requires and AST-validates that every proof returns and consumes exactly one raw-call census guard.",
+      "validation": {
+        "canonical_analyzer_sha": "0d5a97f896521ef35e416d3ecdbb70fa9538515c",
+        "hud_inspector_run_id": 36979662160,
+        "static_exe_analysis_job_id": 110751076789,
+        "static_exe_analysis_conclusion": "success",
+        "repair_sha": "8bdf8d9d0e8ad5dae4347f453fe9b915c81ed8bc",
+        "validation_bearing_descendant_sha": "fbdec361e708da352e7eb6171e8eed3d65832019",
+        "descendant_build_run_id": 36979830082,
+        "descendant_build_job_id": 110751602672,
+        "backend_disassembly_contract": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5947626731,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest canonical-disassembly frontier and retain exhaustive raw-call census fail-closed gating for all continuation proofs."
     }
   ]
 }
