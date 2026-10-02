@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Fail closed when checked-in CMake omits native DX11 translation/census TUs."""
 
+from collections import Counter
 from pathlib import Path
+import re
 from verify_dx11_activation_boundary import main as verify_dx11_activation_boundary
 from verify_dx11_dual_source_contract import main as verify_dx11_dual_source_contract
 
@@ -85,6 +87,55 @@ CONSTANT_BUFFER_CONTRACT_TEXT = (
 
 def main() -> None:
     verify_dx11_dual_source_contract()
+
+    # Fail closed on partial dormant-readiness API commits. Direct-chat lanes
+    # intentionally stage many compose/validate/observe/bind helpers, and a
+    # header-only or cpp-only step can otherwise survive until a later link or
+    # caller exposes it. Keep the public native fixed-function API and its
+    # concrete implementation one-to-one on every source-graph pass.
+    native_api_pattern = re.compile(
+        r"^(?:\[\[nodiscard\]\]\s+)?"
+        r"(?:[A-Za-z_][A-Za-z0-9_:<>,*& \t]*\s+)?"
+        r"((?:compose|validate|observe|bind)_fixed_function_[A-Za-z0-9_]+)"
+        r"\s*\(",
+        re.MULTILINE,
+    )
+    native_definition_pattern = re.compile(
+        r"^(?:[A-Za-z_][A-Za-z0-9_:<>,*& \t]*\s+)?"
+        r"((?:compose|validate|observe|bind)_fixed_function_[A-Za-z0-9_]+)"
+        r"\s*\(",
+        re.MULTILINE,
+    )
+    declared_native_apis = Counter(native_api_pattern.findall(NATIVE_BACKEND_HPP))
+    defined_native_apis = Counter(
+        native_definition_pattern.findall(NATIVE_BACKEND_CPP)
+    )
+    missing_native_definitions = sorted(
+        set(declared_native_apis) - set(defined_native_apis)
+    )
+    undeclared_native_definitions = sorted(
+        set(defined_native_apis) - set(declared_native_apis)
+    )
+    duplicate_native_declarations = sorted(
+        name for name, count in declared_native_apis.items() if count != 1
+    )
+    duplicate_native_definitions = sorted(
+        name for name, count in defined_native_apis.items() if count != 1
+    )
+    if (
+        missing_native_definitions
+        or undeclared_native_definitions
+        or duplicate_native_declarations
+        or duplicate_native_definitions
+    ):
+        raise SystemExit(
+            "DX11 native readiness API declaration/definition drift: "
+            f"missing_defs={missing_native_definitions}; "
+            f"undeclared_defs={undeclared_native_definitions}; "
+            f"duplicate_decls={duplicate_native_declarations}; "
+            f"duplicate_defs={duplicate_native_definitions}"
+        )
+
     cpp_files = sorted(path.relative_to(ROOT).as_posix() for path in DX11.glob("*.cpp"))
     missing = [path for path in cpp_files if f'"{path}"' not in CMAKE]
     if missing:
