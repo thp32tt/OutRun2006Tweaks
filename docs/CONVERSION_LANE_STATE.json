@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "9e88e9d646ed231f376d23be3cef52b8f0c92825",
+  "state_parent_head": "b3ad54cb14c1ddb84d492722fd16c4d615964319",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,16 +52,16 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "fd687017b365b04916399dceec44d8003be182d4",
-    "validation_bearing_sha": "871c0ee11322c9325325efee5813d90a7cab7a0c",
-    "retaining_descendant_sha": "9e88e9d646ed231f376d23be3cef52b8f0c92825",
-    "automation_validation": "PASS_RETAINING_DESCENDANT_BACKEND_GATE_DX11_SOURCE_GRAPH_ACTIVATION_BOUNDARY_CENSUS_ANALYZER; MATERIAL_EXACT_SHA_GATE_CANCELLED_PRE_JOB_BY_DESCENDANT_CHURN; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+    "result_sha": "93d73bfef228fe03cc741a40c7523ad5114a5311",
+    "validation_bearing_sha": "93d73bfef228fe03cc741a40c7523ad5114a5311",
+    "retaining_descendant_sha": "b3ad54cb14c1ddb84d492722fd16c4d615964319",
+    "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36991719434 job 110789312352; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI. R187 D3DTOP_BLENDTEXTUREALPHAPM is retained and its source-graph/activation/census contracts passed on descendant validation; Win32 Configure was cancelled by same-branch descendant churn, so compile/binary/runtime success is not claimed.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation; R187 only extends dormant fixed-function texture-op semantics.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R187 D3DTOP_BLENDTEXTUREALPHAPM and any newer concurrent work already retained at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve newer authenticated vr-dx11-native-r71 descendants, including concurrent source work already retained at HEAD. Fresh-audit the newest HEAD for the next independent runnable DX11 semantic/source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1125,6 +1125,25 @@
         36991583366
       ],
       "validation_job_id": 110788871049
+    },
+    {
+      "unit_id": "DX11_IMPLICIT_TEXTURE_ALPHA_RESOURCE_COVERAGE_GUARD",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "871c0ee11322c9325325efee5813d90a7cab7a0c",
+      "implementation_commits": [
+        "93d73bfef228fe03cc741a40c7523ad5114a5311"
+      ],
+      "material_result_sha": "93d73bfef228fe03cc741a40c7523ad5114a5311",
+      "validation_bearing_sha": "93d73bfef228fe03cc741a40c7523ad5114a5311",
+      "retaining_descendant_sha": "b3ad54cb14c1ddb84d492722fd16c4d615964319",
+      "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36991719434 job 110789312352; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_TEST_STATIC_GUARD",
+      "issue14_comment_id": 5949570905,
+      "validation_run_id": 36991719434,
+      "validation_job_id": 110789312352
     }
   ]
 }
