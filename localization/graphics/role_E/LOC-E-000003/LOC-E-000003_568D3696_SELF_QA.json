@@ -1,0 +1,690 @@
+{
+  "schema_version": 1,
+  "role": "E",
+  "job_id": "LOC-E-000003",
+  "asset": "568D3696",
+  "queue_index": 53,
+  "timestamp_kst": "2026-10-02T14:33:20+09:00",
+  "result": "SELF_QA_PASS_PENDING_C_RUNTIME_UNTESTED",
+  "runtime_validation": "UNTESTED",
+  "canonical_source": {
+    "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+    "sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "linear_size": 16777216,
+      "mips": 13,
+      "fourcc": "DXT5",
+      "bytes": 22369776
+    }
+  },
+  "candidate": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+    "before_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c",
+    "after_sha256": "fe0d710bade6eafc6a24278e78d57bd3ab1c35826d5eac6eb1df079c6fc03b26",
+    "header_128_exact_source": true,
+    "file_size_preserved": true,
+    "lower_mips_1_to_12_byte_identical_before": true
+  },
+  "method": "Rescale/reposition only the six existing Korean glyph rasters that failed C84/C85 exact source-bbox containment; patch only DXT5 mip0 blocks wholly inside each failing sprite cell; preserve all other compressed blocks and mip1-12 bytes verbatim.",
+  "reworked_rows": [
+    "r1",
+    "r2",
+    "r5",
+    "r7",
+    "r8",
+    "r9"
+  ],
+  "rows": [
+    {
+      "key": "r1",
+      "source": "Hit the zippers!",
+      "korean": "지퍼를 맞히세요!",
+      "sprite_cell": [
+        3100,
+        8,
+        3628,
+        112
+      ],
+      "source_bbox": [
+        3117,
+        16,
+        3613,
+        109
+      ],
+      "before_bbox": [
+        3125,
+        13,
+        3600,
+        106
+      ],
+      "after_bbox": [
+        3130,
+        17,
+        3594,
+        108
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "target_bbox": [
+        3130,
+        17,
+        3594,
+        108
+      ],
+      "scale": 0.978494623655914
+    },
+    {
+      "key": "r2",
+      "source": "Hit the cars!",
+      "korean": "차를 맞히세요!",
+      "sprite_cell": [
+        545,
+        2056,
+        974,
+        2160
+      ],
+      "source_bbox": [
+        545,
+        2068,
+        974,
+        2160
+      ],
+      "before_bbox": [
+        555,
+        2062,
+        960,
+        2153
+      ],
+      "after_bbox": [
+        558,
+        2069,
+        958,
+        2159
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "target_bbox": [
+        558,
+        2069,
+        958,
+        2159
+      ],
+      "scale": 0.989010989010989
+    },
+    {
+      "key": "r3",
+      "source": "Dodge the bombs!",
+      "korean": "폭탄을 피하세요!",
+      "sprite_cell": [
+        1140,
+        2054,
+        1775,
+        2165
+      ],
+      "source_bbox": [
+        1140,
+        2061,
+        1775,
+        2165
+      ],
+      "before_bbox": [
+        1204,
+        2061,
+        1706,
+        2158
+      ],
+      "after_bbox": [
+        1204,
+        2061,
+        1706,
+        2158
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "target_bbox": null,
+      "scale": null
+    },
+    {
+      "key": "r4",
+      "source": "Feed the girl!",
+      "korean": "여자친구에게 먹여 주세요!",
+      "sprite_cell": [
+        1988,
+        2053,
+        2445,
+        2164
+      ],
+      "source_bbox": [
+        1988,
+        2061,
+        2445,
+        2164
+      ],
+      "before_bbox": [
+        2005,
+        2074,
+        2426,
+        2142
+      ],
+      "after_bbox": [
+        2005,
+        2074,
+        2426,
+        2142
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "target_bbox": null,
+      "scale": null
+    },
+    {
+      "key": "r5",
+      "source": "Avoid abduction!",
+      "korean": "납치를 피하세요!",
+      "sprite_cell": [
+        2826,
+        2064,
+        3410,
+        2165
+      ],
+      "source_bbox": [
+        2826,
+        2073,
+        3410,
+        2165
+      ],
+      "before_bbox": [
+        2888,
+        2069,
+        3347,
+        2160
+      ],
+      "after_bbox": [
+        2891,
+        2074,
+        3344,
+        2164
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "target_bbox": [
+        2891,
+        2074,
+        3344,
+        2164
+      ],
+      "scale": 0.989010989010989
+    },
+    {
+      "key": "r6",
+      "source": "Avoid the meteors!",
+      "korean": "운석을 피하세요!",
+      "sprite_cell": [
+        1695,
+        2298,
+        2330,
+        2398
+      ],
+      "source_bbox": [
+        1695,
+        2298,
+        2327,
+        2398
+      ],
+      "before_bbox": [
+        1787,
+        2303,
+        2234,
+        2392
+      ],
+      "after_bbox": [
+        1787,
+        2303,
+        2234,
+        2392
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "target_bbox": null,
+      "scale": null
+    },
+    {
+      "key": "r7",
+      "source": "Dribble the beach ball!",
+      "korean": "비치볼을 드리블하세요!",
+      "sprite_cell": [
+        2328,
+        2298,
+        3080,
+        2400
+      ],
+      "source_bbox": [
+        2334,
+        2312,
+        3067,
+        2388
+      ],
+      "before_bbox": [
+        2389,
+        2303,
+        3019,
+        2394
+      ],
+      "after_bbox": [
+        2448,
+        2313,
+        2960,
+        2387
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "target_bbox": [
+        2448,
+        2313,
+        2960,
+        2387
+      ],
+      "scale": 0.8131868131868132
+    },
+    {
+      "key": "r8",
+      "source": "Photograph the sights!",
+      "korean": "명소를 촬영하세요!",
+      "sprite_cell": [
+        3160,
+        2298,
+        3700,
+        2490
+      ],
+      "source_bbox": [
+        3172,
+        2313,
+        3685,
+        2474
+      ],
+      "before_bbox": [
+        3171,
+        2348,
+        3687,
+        2439
+      ],
+      "after_bbox": [
+        3173,
+        2348,
+        3684,
+        2438
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "target_bbox": [
+        3173,
+        2348,
+        3684,
+        2438
+      ],
+      "scale": 0.9903100775193798
+    },
+    {
+      "key": "r9",
+      "source": "Hit the ducks!",
+      "korean": "오리를 맞히세요!",
+      "sprite_cell": [
+        3090,
+        3200,
+        3570,
+        3294
+      ],
+      "source_bbox": [
+        3101,
+        3212,
+        3558,
+        3288
+      ],
+      "before_bbox": [
+        3126,
+        3205,
+        3531,
+        3289
+      ],
+      "after_bbox": [
+        3150,
+        3213,
+        3506,
+        3287
+      ],
+      "containment": "PASS",
+      "reworked": true,
+      "target_bbox": [
+        3150,
+        3213,
+        3506,
+        3287
+      ],
+      "scale": 0.8809523809523809
+    },
+    {
+      "key": "r10",
+      "source": "See the sights!",
+      "korean": "명소를 구경하세요!",
+      "sprite_cell": [
+        2968,
+        3296,
+        3510,
+        3395
+      ],
+      "source_bbox": [
+        2975,
+        3299,
+        3494,
+        3395
+      ],
+      "before_bbox": [
+        2988,
+        3301,
+        3488,
+        3390
+      ],
+      "after_bbox": [
+        2988,
+        3301,
+        3488,
+        3390
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "target_bbox": null,
+      "scale": null
+    },
+    {
+      "key": "r11",
+      "source": "END",
+      "korean": "종료",
+      "sprite_cell": [
+        920,
+        2548,
+        1510,
+        2818
+      ],
+      "source_bbox": [
+        942,
+        2565,
+        1489,
+        2799
+      ],
+      "before_bbox": [
+        1032,
+        2575,
+        1396,
+        2791
+      ],
+      "after_bbox": [
+        1032,
+        2575,
+        1396,
+        2791
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "target_bbox": null,
+      "scale": null
+    },
+    {
+      "key": "r12",
+      "source": "ANSWER",
+      "korean": "정답",
+      "sprite_cell": [
+        2120,
+        2548,
+        3255,
+        2820
+      ],
+      "source_bbox": [
+        2157,
+        2559,
+        3217,
+        2800
+      ],
+      "before_bbox": [
+        2505,
+        2572,
+        2871,
+        2796
+      ],
+      "after_bbox": [
+        2505,
+        2572,
+        2871,
+        2796
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "target_bbox": null,
+      "scale": null
+    },
+    {
+      "key": "r13",
+      "source": "QUESTION",
+      "korean": "문제",
+      "sprite_cell": [
+        748,
+        2880,
+        2070,
+        3180
+      ],
+      "source_bbox": [
+        777,
+        2905,
+        2040,
+        3161
+      ],
+      "before_bbox": [
+        1226,
+        2918,
+        1583,
+        3142
+      ],
+      "after_bbox": [
+        1226,
+        2918,
+        1583,
+        3142
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "target_bbox": null,
+      "scale": null
+    },
+    {
+      "key": "r14",
+      "source": "START",
+      "korean": "시작",
+      "sprite_cell": [
+        2570,
+        2880,
+        3490,
+        3180
+      ],
+      "source_bbox": [
+        2605,
+        2911,
+        3457,
+        3145
+      ],
+      "before_bbox": [
+        2846,
+        2918,
+        3213,
+        3142
+      ],
+      "after_bbox": [
+        2846,
+        2918,
+        3213,
+        3142
+      ],
+      "containment": "PASS",
+      "reworked": false,
+      "target_bbox": null,
+      "scale": null
+    }
+  ],
+  "binary_qa": {
+    "changed_mip0_blocks": 17192,
+    "changed_bytes": 165201,
+    "unexpected_changed_bytes_outside_allowed_blocks": 0,
+    "untouched_row_bbox_drift": [],
+    "source_header_exact": true
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "margins": {
+        "r2": 1,
+        "r1": 1,
+        "r7": 1,
+        "r8": 1,
+        "r9": 1,
+        "r5": 1
+      },
+      "targets": {
+        "r1": [
+          3130,
+          17,
+          3594,
+          108
+        ],
+        "r2": [
+          558,
+          2069,
+          958,
+          2159
+        ],
+        "r5": [
+          2891,
+          2074,
+          3344,
+          2164
+        ],
+        "r7": [
+          2448,
+          2313,
+          2960,
+          2387
+        ],
+        "r8": [
+          3173,
+          2348,
+          3684,
+          2438
+        ],
+        "r9": [
+          3150,
+          3213,
+          3506,
+          3287
+        ]
+      },
+      "scales": {
+        "r1": 0.978494623655914,
+        "r2": 0.989010989010989,
+        "r5": 0.989010989010989,
+        "r7": 0.8131868131868132,
+        "r8": 0.9903100775193798,
+        "r9": 0.8809523809523809
+      },
+      "after_bboxes": {
+        "r1": [
+          3130,
+          17,
+          3594,
+          108
+        ],
+        "r2": [
+          558,
+          2069,
+          958,
+          2159
+        ],
+        "r3": [
+          1204,
+          2061,
+          1706,
+          2158
+        ],
+        "r4": [
+          2005,
+          2074,
+          2426,
+          2142
+        ],
+        "r5": [
+          2891,
+          2074,
+          3344,
+          2164
+        ],
+        "r6": [
+          1787,
+          2303,
+          2234,
+          2392
+        ],
+        "r7": [
+          2448,
+          2313,
+          2960,
+          2387
+        ],
+        "r8": [
+          3173,
+          2348,
+          3684,
+          2438
+        ],
+        "r9": [
+          3150,
+          3213,
+          3506,
+          3287
+        ],
+        "r10": [
+          2988,
+          3301,
+          3488,
+          3390
+        ],
+        "r11": [
+          1032,
+          2575,
+          1396,
+          2791
+        ],
+        "r12": [
+          2505,
+          2572,
+          2871,
+          2796
+        ],
+        "r13": [
+          1226,
+          2918,
+          1583,
+          3142
+        ],
+        "r14": [
+          2846,
+          2918,
+          3213,
+          3142
+        ]
+      },
+      "containment_fail": [],
+      "untouched_bbox_drift": [],
+      "changed_mip0_blocks": 17192
+    }
+  ],
+  "preview": "localization/graphics/role_E/LOC-E-000003/568D3696_rework_preview.png",
+  "notes": "No shared progress/resume/WORKLOG files modified. Runtime/in-game validation not performed. Lower mips preserve the prior localized candidate verbatim to avoid cross-cell DXT block collateral; exact zero-pixel correction is applied to mip0, the atlas level audited by C84/C85."
+}
