@@ -480,6 +480,43 @@ def main() -> None:
             + ", ".join(missing_r185_d3dtop_blenddiffusealpha)
         )
 
+    d3dtop_blendcurrentalpha_contract = [
+        ("case D3DTOP_BLENDCURRENTALPHA:", PIPELINE_TRANSLATION_CPP,
+         "D3DTOP_BLENDCURRENTALPHA readiness/translation case"),
+        ('return first + " * current.a + " + second +',
+         PIPELINE_TRANSLATION_CPP,
+         "D3DTOP_BLENDCURRENTALPHA previous-stage alpha expression"),
+        ("blendCurrentAlphaStages[1].colorOp = D3DTOP_BLENDCURRENTALPHA;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "hosted BLENDCURRENTALPHA color fixture"),
+        ("blendCurrentAlphaStages[1].alphaOp = D3DTOP_BLENDCURRENTALPHA;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "hosted BLENDCURRENTALPHA alpha fixture"),
+        ("sampled1.rgb * current.a + input.diffuse.rgb * (1.0 - current.a)",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "generated RGB previous-stage alpha assertion"),
+        ("sampled1.a * current.a + input.diffuse.a * (1.0 - current.a)",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "generated alpha previous-stage alpha assertion"),
+        ("D3DTOP_BLENDCURRENTALPHA fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE, "offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_BLENDCURRENTALPHA support: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "hosted probe completion"),
+    ]
+    missing_d3dtop_blendcurrentalpha = [
+        meaning
+        for token, source, meaning in d3dtop_blendcurrentalpha_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_BLENDCURRENTALPHA:") < 3:
+        missing_d3dtop_blendcurrentalpha.append(
+            "BLENDCURRENTALPHA must participate in texture-use, HLSL and readiness switches")
+    if missing_d3dtop_blendcurrentalpha:
+        raise SystemExit(
+            "DX11 fixed-function D3DTOP_BLENDCURRENTALPHA contract drift: "
+            + ", ".join(missing_d3dtop_blendcurrentalpha)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.

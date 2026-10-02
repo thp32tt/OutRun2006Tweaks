@@ -798,11 +798,58 @@ int main()
             "R185 D3DTOP_BLENDDIFFUSEALPHA fixed-function shader prototype did not compile");
     }
 
+
+    {
+        std::array<FixedFunctionStageState, 8> blendCurrentAlphaStages{};
+        blendCurrentAlphaStages[0].colorOp = D3DTOP_SELECTARG1;
+        blendCurrentAlphaStages[0].colorArg1 = D3DTA_DIFFUSE;
+        blendCurrentAlphaStages[0].alphaOp = D3DTOP_SELECTARG1;
+        blendCurrentAlphaStages[0].alphaArg1 = D3DTA_DIFFUSE;
+        blendCurrentAlphaStages[0].minFilter = D3DTEXF_POINT;
+        blendCurrentAlphaStages[0].magFilter = D3DTEXF_POINT;
+        blendCurrentAlphaStages[0].mipFilter = D3DTEXF_NONE;
+        blendCurrentAlphaStages[1].colorOp = D3DTOP_BLENDCURRENTALPHA;
+        blendCurrentAlphaStages[1].colorArg1 = D3DTA_TEXTURE;
+        blendCurrentAlphaStages[1].colorArg2 = D3DTA_DIFFUSE;
+        blendCurrentAlphaStages[1].alphaOp = D3DTOP_BLENDCURRENTALPHA;
+        blendCurrentAlphaStages[1].alphaArg1 = D3DTA_TEXTURE;
+        blendCurrentAlphaStages[1].alphaArg2 = D3DTA_DIFFUSE;
+        blendCurrentAlphaStages[1].minFilter = D3DTEXF_POINT;
+        blendCurrentAlphaStages[1].magFilter = D3DTEXF_POINT;
+        blendCurrentAlphaStages[1].mipFilter = D3DTEXF_NONE;
+
+        const auto blendCurrentAlphaShader =
+            generate_fixed_function_pixel_shader_prototype(
+                blendCurrentAlphaStages, true, 0x02u, 0x02u, textureTypes);
+        require(
+            blendCurrentAlphaShader.generated() &&
+                blendCurrentAlphaShader.activeStages == 2,
+            "D3DTOP_BLENDCURRENTALPHA fixed-function stages must become shader-exact");
+        require(
+            blendCurrentAlphaShader.source.find(
+                "float3 nextColor = sampled1.rgb * current.a + input.diffuse.rgb * (1.0 - current.a);") !=
+                std::string::npos &&
+            blendCurrentAlphaShader.source.find(
+                "float nextAlpha = sampled1.a * current.a + input.diffuse.a * (1.0 - current.a);") !=
+                std::string::npos,
+            "D3DTOP_BLENDCURRENTALPHA shader expression drift");
+        const auto blendCurrentAlphaCompile =
+            compile_fixed_function_pixel_shader_prototype(
+                blendCurrentAlphaShader);
+        require(
+            blendCurrentAlphaCompile.attempted &&
+            blendCurrentAlphaCompile.succeeded &&
+            blendCurrentAlphaCompile.result == S_OK &&
+            blendCurrentAlphaCompile.bytecodeBytes != 0,
+            "D3DTOP_BLENDCURRENTALPHA fixed-function shader prototype did not compile");
+    }
+
     std::cout
         << "DX11 fixed-function D3DTOP_BLENDDIFFUSEALPHA support R185: PASS\n"
         << "DX11 fixed-function D3DTOP_ADDSMOOTH support R184: PASS\n"
         << "DX11 fixed-function D3DTOP_ADDSIGNED2X support R183: PASS\n"
         << "DX11 MRT color-write fail-closed: PASS\n"
+        << "DX11 fixed-function D3DTOP_BLENDCURRENTALPHA support: PASS\\n"
         << "DX11 fixed-function D3DTOP_ADDSIGNED support R182: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATE4X support R181: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATE2X support R180: PASS\n"
