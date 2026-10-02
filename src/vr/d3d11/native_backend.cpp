@@ -1957,6 +1957,82 @@ bool NativeFixedFunctionPipelineBundle::bind_for_observation(
     return true;
 }
 
+NativeFixedFunctionPipelineBindingReadiness
+NativeFixedFunctionPipelineBundle::binding_readiness(
+    ID3D11DeviceContext* context,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    std::uint64_t pipelineSnapshotToken) const noexcept {
+    NativeFixedFunctionPipelineBindingReadiness out{};
+    out.pipelineSnapshotToken = pipelineSnapshotToken;
+    out.inputValid = context != nullptr && pipelineSnapshotToken != 0;
+    out.bundleReady = ready();
+    out.translationSnapshotValid =
+        out.inputValid && out.bundleReady &&
+        validate_translation_snapshot(
+            device_.Get(), layout, vertexPrototype, pixelPrototype,
+            pipelineSnapshotToken);
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    if (context)
+        context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    out.contextMatches =
+        contextDevice && device_ && contextDevice.Get() == device_.Get();
+
+    if (out.translationSnapshotValid && out.contextMatches) {
+        Microsoft::WRL::ComPtr<ID3D11InputLayout> boundInputLayout;
+        Microsoft::WRL::ComPtr<ID3D11VertexShader> boundVertexShader;
+        Microsoft::WRL::ComPtr<ID3D11PixelShader> boundPixelShader;
+        context->IAGetInputLayout(boundInputLayout.ReleaseAndGetAddressOf());
+        context->VSGetShader(
+            boundVertexShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+        context->PSGetShader(
+            boundPixelShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+        out.boundExact =
+            boundInputLayout.Get() == input_layout_.Get() &&
+            boundVertexShader.Get() == vertex_shader_.Get() &&
+            boundPixelShader.Get() == pixel_shader_.Get();
+    }
+
+    out.ready =
+        out.inputValid && out.bundleReady && out.contextMatches &&
+        out.translationSnapshotValid && out.boundExact;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(token, pipelineSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(device_.Get())));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(input_layout_.Get())));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(vertex_shader_.Get())));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(pixel_shader_.Get())));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeFixedFunctionPipelineBundle::validate_binding_snapshot(
+    ID3D11DeviceContext* context,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    std::uint64_t pipelineSnapshotToken,
+    std::uint64_t bindingSnapshotToken) const noexcept {
+    if (bindingSnapshotToken == 0)
+        return false;
+    const auto current = binding_readiness(
+        context, layout, vertexPrototype, pixelPrototype,
+        pipelineSnapshotToken);
+    return current.ready && current.snapshotToken == bindingSnapshotToken;
+}
+
 NativeFixedFunctionActivationReadiness
 compose_fixed_function_activation_readiness(
     const NativeFixedFunctionPipelineReadiness& pipeline,
@@ -2424,6 +2500,7 @@ compose_fixed_function_draw_readiness(
     const NativeFixedFunctionGeometryReadiness& geometry) noexcept {
     NativeFixedFunctionDrawReadiness out{};
     out.activationSnapshotToken = activation.snapshotToken;
+    out.pipelineSnapshotToken = activation.pipelineSnapshotToken;
     out.renderStateSnapshotToken = renderState.snapshotToken;
     out.surfacePairSnapshotToken = surfacePair.snapshotToken;
     out.outputStateSnapshotToken = outputState.snapshotToken;
@@ -2472,6 +2549,8 @@ compose_fixed_function_draw_readiness(
         std::uint64_t drawToken = 0xcbf29ce484222325ull;
         drawToken = mix_readiness_snapshot_token(
             drawToken, out.activationSnapshotToken);
+        drawToken = mix_readiness_snapshot_token(
+            drawToken, out.pipelineSnapshotToken);
         drawToken = mix_readiness_snapshot_token(
             drawToken, out.renderStateSnapshotToken);
         drawToken = mix_readiness_snapshot_token(
@@ -2562,6 +2641,60 @@ bool validate_fixed_function_textured_draw_snapshot(
         return false;
     const auto current = compose_fixed_function_textured_draw_readiness(
         draw, context, slot, sampler, texture);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
+NativeFixedFunctionBoundDrawReadiness
+compose_fixed_function_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionTexturedDrawReadiness& texturedDraw,
+    const NativeFixedFunctionPipelineBindingReadiness& pipelineBinding) noexcept {
+    NativeFixedFunctionBoundDrawReadiness out{};
+    out.texturedDrawSnapshotToken = texturedDraw.snapshotToken;
+    out.pipelineBindingSnapshotToken = pipelineBinding.snapshotToken;
+    out.inputValid =
+        draw.inputValid && texturedDraw.inputValid && pipelineBinding.inputValid;
+    out.texturedDrawReady =
+        texturedDraw.ready && texturedDraw.snapshotToken != 0 &&
+        texturedDraw.drawSnapshotToken == draw.snapshotToken;
+    out.pipelineBindingReady =
+        pipelineBinding.ready && pipelineBinding.snapshotToken != 0;
+    out.pipelineBindingMatchesDraw =
+        draw.pipelineSnapshotToken != 0 &&
+        pipelineBinding.pipelineSnapshotToken == draw.pipelineSnapshotToken;
+    out.componentSnapshotsPresent =
+        draw.snapshotToken != 0 &&
+        texturedDraw.snapshotToken != 0 &&
+        pipelineBinding.snapshotToken != 0;
+    out.ready =
+        draw.ready &&
+        out.inputValid &&
+        out.texturedDrawReady &&
+        out.pipelineBindingReady &&
+        out.pipelineBindingMatchesDraw &&
+        out.componentSnapshotsPresent;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.texturedDrawSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.pipelineBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, draw.pipelineSnapshotToken);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionTexturedDrawReadiness& texturedDraw,
+    const NativeFixedFunctionPipelineBindingReadiness& pipelineBinding,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = compose_fixed_function_bound_draw_readiness(
+        draw, texturedDraw, pipelineBinding);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
