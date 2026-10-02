@@ -5,102 +5,86 @@
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
   "checkpoint": "C6_STATE",
-  "status": "COMPLETE_F38_PROVENANCE_STATIC_PASS_RUNTIME_UNTESTED",
+  "status": "F39_PROVENANCE_SOURCE_STATIC_CONTRACT_PASS_CANONICAL_PENDING_RUNTIME_UNTESTED",
   "initial_recovered_head": "936ba3538bd3bc54ccb4da1f582a2d2be7ca9007",
-  "validation_bearing_result_sha": "4b23227f16b2f52e066853c1a2f8f5009aa28587",
-  "result_sha": "4b23227f16b2f52e066853c1a2f8f5009aa28587",
-  "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+  "validation_bearing_result_sha": "6f5d748bde8a0f3b374db40791ef03aa3d863127",
+  "result_sha": "6f5d748bde8a0f3b374db40791ef03aa3d863127",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_DISASM_CONTRACT_STEP_CANONICAL_PENDING_DESCENDANT",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "UNTESTED",
-  "selected_work_item": "DXVK_F38_CANONICAL_EXE_PROVENANCE_0x182E0F_TO_0x182E4F",
-  "summary": "Captured the canonical 64-byte continuation 0x00182E0F..0x00182E4F from the exact F37 instruction boundary with fail-closed predecessor proof, .text placement and probe-geometry gates. Fresh bytes remain raw-only; no function/render/HUD/runtime semantics or ownership were promoted.",
+  "selected_work_item": "DXVK_F39_CANONICAL_PROVENANCE_SOURCE_0x182E4F_TO_0x182E8F",
+  "summary": "Added continuation_48 as the bounded 64-byte raw canonical provenance source at exact predecessor boundary 0x00182E4F. The collector fails closed on the validated F38 proof identity/boundary, .text placement, exact probe geometry and probe-end equality while keeping fresh bytes and rel32 evidence raw-only.",
   "source_commits": [
-    {
-      "sha": "4b23227f16b2f52e066853c1a2f8f5009aa28587",
-      "message": "dxvk: capture canonical 0x182E0F continuation [AUTO:CONV-DXVK-000002]",
-      "role": "material-canonical-provenance-capture",
-      "validation_bearing": true
-    }
+    "6f5d748bde8a0f3b374db40791ef03aa3d863127"
   ],
   "changed_paths": [
     "tools/analyze_outrun_exe.py"
   ],
   "implementation": {
-    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
-    "predecessor_control_flow_status": "EXACT_182DCF_TO_182E0F_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
-    "provenance_status": "EXACT_EXE_182E0F_TO_182E4F_PROVENANCE_CAPTURED",
-    "provenance_start_rva": "0x00182E0F",
-    "provenance_probe_end_rva": "0x00182E4F",
+    "predecessor_control_flow_status": "EXACT_182E0F_TO_182E4F_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+    "provenance_status": "SOURCE_IMPLEMENTED_CANONICAL_VALIDATION_PENDING",
+    "provenance_start_rva": "0x00182E4F",
+    "provenance_probe_end_rva": "0x00182E8F",
     "probe_len": 64,
-    "target_section": ".text",
-    "probe_end_matches": true,
     "semantic_promotion": "NONE",
     "ownership_effect": "NONE"
   },
   "pipeline": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local conversion/run state, regression/problem history and Issue #14; tracked concurrent same-JOB F37 proof/state advancement and did not duplicate it."
+      "evidence": "Recovered AGENTS.md, current task/lane state and concurrent same-JOB frontier; avoided duplicate F37/F38 work and followed the validated F38 exact proof."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
-      "evidence": "Selected the highest-value unfinished runnable static frontier after F37: bounded canonical raw provenance beginning at exact instruction boundary 0x00182E0F."
+      "evidence": "Selected F39 raw provenance 0x00182E4F..0x00182E8F as the highest-value unfinished runnable static frontier after F38 exact proof."
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "evidence": "Material commit 4b23227f16b2f52e066853c1a2f8f5009aa28587 adds continuation_47 constants, fail-closed raw provenance collector, report binding and CLI guard without semantic/ownership promotion."
+      "evidence": "Material commit 6f5d748bde8a0f3b374db40791ef03aa3d863127 adds continuation_48 constants, fail-closed provenance collector, report binding and CLI failure gate."
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE",
-      "evidence": "Exact SHA OutRun EXE HUD Inspector CI run 36980157495 static-exe-analysis job 110752662371 succeeded against canonical EXE SHA256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3 and reported EXACT_EXE_182E0F_TO_182E4F_PROVENANCE_CAPTURED. Exact SHA Build run 36980157464 job 110752693679 passed Verify backend disassembly contract; full Win32 build was still in progress and is not claimed."
+      "status": "PARTIAL_STATIC_PASS_CANONICAL_PENDING",
+      "evidence": "Exact SHA Build run 36980695426 job 110754315270 passed Verify backend disassembly contract. Exact SHA HUD Inspector run 36980695510 was cancelled by a newer retaining descendant before canonical analysis; canonical provenance PASS is therefore not claimed."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
-      "evidence": "Substantive commit 4b23227f16b2f52e066853c1a2f8f5009aa28587 contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947639095 records implementation and validation."
+      "evidence": "Substantive commit 6f5d748bde8a0f3b374db40791ef03aa3d863127 contains required [AUTO:CONV-DXVK-000002]; Issue #14 comment 5947724258 records the material result and validation boundary."
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Static canonical-disassembly provenance tooling only; no runtime payload, selector, backend binary, localization or deployable package content changed."
+      "reason": "Static canonical-disassembly provenance source only; no runtime binary/package/backend selector/localization content changed."
     },
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "evidence": "This durable run record advances the primary canonical-disassembly frontier to validated F38 raw provenance."
+      "evidence": "Durable run state records F39 as a raw source candidate awaiting canonical provenance validation; exact decode is blocked until that validation succeeds."
     }
   },
   "validation": {
-    "exact_sha": "4b23227f16b2f52e066853c1a2f8f5009aa28587",
-    "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
-    "hud_inspector_run_id": 36980157495,
-    "static_exe_analysis_job_id": 110752662371,
-    "static_exe_analysis_conclusion": "success",
-    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
-    "provenance_status": "EXACT_EXE_182E0F_TO_182E4F_PROVENANCE_CAPTURED",
-    "predecessor_status": "EXACT_182DCF_TO_182E0F_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
-    "predecessor_exact": true,
-    "target_section": ".text",
-    "probe_start_rva": "0x00182E0F",
-    "probe_end_rva": "0x00182E4F",
-    "probe_len": 64,
-    "probe_end_matches": true,
-    "artifact_id": 11215470526,
-    "artifact_digest": "sha256:e56c9e624c554dff6dfe7d3db87459c69a633d787eb0009f3606e427a70477bf",
-    "backend_build_run_id": 36980157464,
-    "backend_build_job_id": 110752693679,
+    "exact_sha": "6f5d748bde8a0f3b374db40791ef03aa3d863127",
+    "automation_validation": "PASS_EXACT_SHA_BACKEND_DISASM_CONTRACT_STEP_CANONICAL_PENDING_DESCENDANT",
+    "backend_build_run_id": 36980695426,
+    "backend_build_job_id": 110754315270,
     "backend_disassembly_contract": "PASS",
-    "full_win32_build": "IN_PROGRESS_NOT_CLAIMED",
+    "hud_inspector_run_id": 36980695510,
+    "hud_inspector_conclusion": "CANCELLED_BY_NEWER_SAME_BRANCH_DESCENDANT_BEFORE_CANONICAL_ANALYSIS",
+    "canonical_provenance": "NOT_YET_CLAIMED",
+    "predecessor_proof_sha": "9e1a54d5b782f4779f8161a0686d5ba37640a127",
+    "predecessor_proof_status": "EXACT_182E0F_TO_182E4F_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+    "probe_start_rva": "0x00182E4F",
+    "probe_end_rva": "0x00182E8F",
+    "probe_len": 64,
     "runtime_validation": "UNTESTED"
   },
   "follow_on_frontier": {
-    "provenance_sha": "4b23227f16b2f52e066853c1a2f8f5009aa28587",
-    "provenance_status": "EXACT_EXE_182E0F_TO_182E4F_PROVENANCE_CAPTURED",
-    "provenance_start_rva": "0x00182E0F",
-    "probe_end_rva": "0x00182E4F",
+    "candidate_sha": "6f5d748bde8a0f3b374db40791ef03aa3d863127",
+    "candidate_status": "F39_RAW_PROVENANCE_SOURCE_STATIC_CONTRACT_PASS_CANONICAL_PENDING",
+    "provenance_start_rva": "0x00182E4F",
+    "probe_end_rva": "0x00182E8F",
     "transition": "EXACT_PREDECESSOR_INSTRUCTION_BOUNDARY",
-    "predecessor_proof_status": "EXACT_182DCF_TO_182E0F_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
-    "predecessor_exact": true,
-    "validation_bearing_result_sha": "4b23227f16b2f52e066853c1a2f8f5009aa28587",
+    "predecessor_proof_sha": "9e1a54d5b782f4779f8161a0686d5ba37640a127",
+    "predecessor_proof_status": "EXACT_182E0F_TO_182E4F_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
     "runtime_validation": "UNTESTED"
   },
   "issue14_comments": [
@@ -144,7 +128,8 @@
     5947626731,
     5947639095,
     5947708894,
-    5947726417
+    5947726417,
+    5947724258
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -153,7 +138,7 @@
     "No localization files modified",
     "RUNTIME_VALIDATION remains UNTESTED without matching Quest 3/VDXR evidence"
   ],
-  "next_action": "Exact-decode only complete canonical instructions in 0x00182E0F..0x00182E4F. Resolve predecessor/forward targets only when exact instruction-boundary evidence proves them; preserve any trailing partial instruction raw-only and keep function/render/HUD/runtime semantics unresolved.",
+  "next_action": "Consume a canonical executable analysis from a retaining descendant and require continuation_48 status EXACT_EXE_182E4F_TO_182E8F_PROVENANCE_CAPTURED before exact-decoding any F39 instruction. Keep fresh bytes/function/render/HUD/runtime semantics unresolved until then.",
   "supplemental_completed_static_units": [
     {
       "unit_id": "DXVK_CONTINUATION_ANALYZER_WIRING_FAIL_CLOSED",
@@ -2681,9 +2666,73 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest validated canonical-disassembly frontier; keep rel32 declaration cross-checking active on all exact continuation proofs and advance only from the latest raw/proof edge without function/render/HUD/runtime semantic promotion."
+    },
+    {
+      "unit_id": "DXVK_F39_CANONICAL_PROVENANCE_SOURCE_0x182E4F_TO_0x182E8F",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "6f5d748bde8a0f3b374db40791ef03aa3d863127",
+      "validation_bearing_result_sha": "6f5d748bde8a0f3b374db40791ef03aa3d863127",
+      "commit_message": "dxvk: capture canonical 0x182E4F continuation [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Added continuation_48 as the bounded 64-byte raw canonical provenance source at exact predecessor boundary 0x00182E4F. The collector fails closed on the validated F38 proof identity/boundary, .text placement, exact probe geometry and probe-end equality while keeping fresh bytes and rel32 evidence raw-only.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered AGENTS.md, current task/lane state and concurrent same-JOB frontier; avoided duplicate F37/F38 work and followed the validated F38 exact proof."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected F39 raw provenance 0x00182E4F..0x00182E8F as the highest-value unfinished runnable static frontier after F38 exact proof."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 6f5d748bde8a0f3b374db40791ef03aa3d863127 adds continuation_48 constants, fail-closed provenance collector, report binding and CLI failure gate."
+        },
+        "C3_VALIDATE": {
+          "status": "PARTIAL_STATIC_PASS_CANONICAL_PENDING",
+          "evidence": "Exact SHA Build run 36980695426 job 110754315270 passed Verify backend disassembly contract. Exact SHA HUD Inspector run 36980695510 was cancelled by a newer retaining descendant before canonical analysis; canonical provenance PASS is therefore not claimed."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commit 6f5d748bde8a0f3b374db40791ef03aa3d863127 contains required [AUTO:CONV-DXVK-000002]; Issue #14 comment 5947724258 records the material result and validation boundary."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly provenance source only; no runtime binary/package/backend selector/localization content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Durable run state records F39 as a raw source candidate awaiting canonical provenance validation; exact decode is blocked until that validation succeeds."
+        }
+      },
+      "validation": {
+        "exact_sha": "6f5d748bde8a0f3b374db40791ef03aa3d863127",
+        "automation_validation": "PASS_EXACT_SHA_BACKEND_DISASM_CONTRACT_STEP_CANONICAL_PENDING_DESCENDANT",
+        "backend_build_run_id": 36980695426,
+        "backend_build_job_id": 110754315270,
+        "backend_disassembly_contract": "PASS",
+        "hud_inspector_run_id": 36980695510,
+        "hud_inspector_conclusion": "CANCELLED_BY_NEWER_SAME_BRANCH_DESCENDANT_BEFORE_CANONICAL_ANALYSIS",
+        "canonical_provenance": "NOT_YET_CLAIMED",
+        "predecessor_proof_sha": "9e1a54d5b782f4779f8161a0686d5ba37640a127",
+        "predecessor_proof_status": "EXACT_182E0F_TO_182E4F_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "probe_start_rva": "0x00182E4F",
+        "probe_end_rva": "0x00182E8F",
+        "probe_len": 64,
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5947724258,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_SOURCE_ONLY",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Consume a canonical executable analysis from a retaining descendant and require continuation_48 status EXACT_EXE_182E4F_TO_182E8F_PROVENANCE_CAPTURED before exact-decoding any F39 instruction. Keep fresh bytes/function/render/HUD/runtime semantics unresolved until then."
     }
   ],
-  "issue14_implementation_comment_id": 5947620605,
+  "issue14_implementation_comment_id": 5947724258,
   "semantic_promotion": "NONE",
   "ownership_effect": "NONE"
 }
