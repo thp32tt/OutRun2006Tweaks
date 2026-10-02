@@ -639,6 +639,57 @@ compose_fixed_function_output_state_readiness(
     const NativeSurfacePairReadiness& surfacePair,
     std::uint64_t snapshotToken) noexcept;
 
+// R126 consumes the sealed R116 immutable RS/OM objects plus the R124 dynamic
+// viewport/scissor/blend-factor/sample-mask snapshot into one dormant binding
+// owner. apply() mutates only the explicitly supplied D3D11 context; no D3D9
+// Draw* path calls this owner and native routing remains disabled.
+class NativeFixedFunctionOutputStateBinding final {
+public:
+    NativeFixedFunctionOutputStateBinding() = default;
+    ~NativeFixedFunctionOutputStateBinding() = default;
+    NativeFixedFunctionOutputStateBinding(
+        const NativeFixedFunctionOutputStateBinding&) = delete;
+    NativeFixedFunctionOutputStateBinding& operator=(
+        const NativeFixedFunctionOutputStateBinding&) = delete;
+
+    bool initialize(
+        ID3D11Device* device,
+        const NativeFixedFunctionRenderStateBundle& renderStateBundle,
+        const NativeFixedFunctionRenderStateReadiness& renderState,
+        const NativeFixedFunctionOutputStateReadiness& outputState) noexcept;
+    void shutdown() noexcept;
+    [[nodiscard]] bool apply(ID3D11DeviceContext* context) const noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && blend_state_ && depth_stencil_state_ &&
+            rasterizer_state_ && render_state_snapshot_token_ != 0 &&
+            output_state_snapshot_token_ != 0 && snapshot_token_ != 0;
+    }
+    [[nodiscard]] std::uint64_t render_state_snapshot_token() const noexcept {
+        return render_state_snapshot_token_;
+    }
+    [[nodiscard]] std::uint64_t output_state_snapshot_token() const noexcept {
+        return output_state_snapshot_token_;
+    }
+    [[nodiscard]] std::uint64_t snapshot_token() const noexcept {
+        return snapshot_token_;
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11BlendState> blend_state_;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depth_stencil_state_;
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizer_state_;
+    D3D11_VIEWPORT viewport_{};
+    D3D11_RECT scissor_rect_{};
+    std::array<float, 4> blend_factor_{1.0f, 1.0f, 1.0f, 1.0f};
+    UINT sample_mask_ = 0xFFFFFFFFu;
+    UINT stencil_ref_ = 0;
+    std::uint64_t render_state_snapshot_token_ = 0;
+    std::uint64_t output_state_snapshot_token_ = 0;
+    std::uint64_t snapshot_token_ = 0;
+};
+
 // R120 extends the R117 draw-readiness snapshot with the independently proven
 // R119 color/depth surface-pair identity. A native draw candidate is not ready
 // unless activation, render state, and the exact output-surface pair are all
