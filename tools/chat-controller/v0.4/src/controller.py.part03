@@ -4161,6 +4161,11 @@ def startup_reconcile_queue_state() -> None:
             # new policy rolls a broken input surface to a fresh chat instead.
             task.pop("generic_retry_cooldown_until", None)
         if task.get("phase") == "WAIT_ACTIONS":
+            if CONTROLLER_MODE == "conversion":
+                valid_wait = conversion_reconcile_wait_actions_without_ui(task, now, "STARTUP")
+                if not valid_wait:
+                    rebounds.append(f"vr-pipeline-rearmed:{task.get('task_id')}")
+                    continue
             if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B", "D"}:
                 invalidate_task_commit_cache(str(task.get("branch") or ""), str(task.get("task_id") or ""))
                 commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
@@ -4207,6 +4212,12 @@ def watchdog_rearm_queue_state(now: datetime) -> Optional[str]:
     for task in records:
         if task.get("phase") != "WAIT_ACTIONS":
             continue
+        if CONTROLLER_MODE == "conversion":
+            valid_wait = conversion_reconcile_wait_actions_without_ui(task, now, "WATCHDOG")
+            if not valid_wait:
+                rearmed.append(f"vr-pipeline-rearmed:{task.get('task_id')}")
+                changed = True
+                continue
         if CONTROLLER_MODE == "localization" and task.get("slot") in {"A", "B", "D"}:
             invalidate_task_commit_cache(str(task.get("branch") or ""), str(task.get("task_id") or ""))
             commit = github_find_task_commit(task.get("branch"), task.get("task_id"))
