@@ -4,31 +4,33 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "828eaf8727b8248f4b04e836a840f7e421c0176e",
-  "state_parent_head": "09a16282ae973b61c22b33b97cff534442c78bc4",
-  "material_result_sha": "49955e06ef829a4f15daffb4617f8a76dc6f6d9d",
-  "validation_bearing_sha": "49955e06ef829a4f15daffb4617f8a76dc6f6d9d",
-  "retaining_descendant_sha": "09a16282ae973b61c22b33b97cff534442c78bc4",
+  "base_sha": "9e6a5be14cbf46eccaf6189dce8e0f35d9cb917f",
+  "state_parent_head": "d12f04c3bba33ae24709c2f9756a399e8b589570",
+  "material_result_sha": "dfdb85601eb037bd9a6e24e4734106afb4e17b73",
+  "source_implementation_sha": "09a16282ae973b61c22b33b97cff534442c78bc4",
+  "validation_bearing_sha": "79c067b20399c309b0b8b8d6bd53f6110c71e010",
+  "retaining_descendant_sha": "d12f04c3bba33ae24709c2f9756a399e8b589570",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_FFP_D3DTOP_ADDSIGNED2X_SUPPORT_R183",
-  "selection_reason": "Fresh authenticated HEAD already contained R182 D3DTOP_ADDSIGNED. D3DTOP_ADDSIGNED2X was the next deterministic two-argument fixed-function operation still unsupported; it requires no new captured D3D9 state and is exactly expressible in HLSL as (Arg1 + Arg2 - 0.5) * 2.0.",
-  "summary": "Added dormant native DX11 D3DTOP_ADDSIGNED2X translation for RGB/alpha, hosted generation/offline-compile probes, and a source-graph retention contract. NativeDrawPathActive remains disabled.",
+  "selected_work": "DX11_FFP_D3DTOP_ADDSMOOTH_SUPPORT_R184",
+  "selection_reason": "Fresh authenticated-GitHub audit found D3DTOP_ADDSMOOTH remained fail-closed in fixed-function texture-use detection, HLSL generation and readiness while adjacent arithmetic texture operations were already translated. The gap is independent, dormant and statically testable without Quest/VDXR hardware.",
+  "summary": "Implemented D3DTOP_ADDSMOOTH as Arg1 + Arg2 * (1 - Arg1) for RGB and alpha, wired it through texture-use/readiness gates, added hosted compile-probe fixtures, and added an R184 source-graph retention contract. NativeDrawPathActive remains unchanged.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Authenticated GitHub HEAD recovered as 828eaf8727b8248f4b04e836a840f7e421c0176e; read AGENTS.md, conversion lane state, live task record, regression/problem history and Issue #14.",
-        "No N100/local clone used as product-development truth."
+        "Read AGENTS.md, docs/CONVERSION_LANE_STATE.json, current CONV-DX11-000001 run state, regression/problem history and Issue #14 via authenticated GitHub authority.",
+        "Recovered moving branch HEAD repeatedly during same-branch concurrency; no N100/local clone was used as product-development truth."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Current fixed-function translator already supported SELECTARG1/2, MODULATE/2X/4X, ADD, ADDSIGNED and SUBTRACT.",
-        "D3DTOP_ADDSIGNED2X was absent from texture-use, HLSL expression and readiness switches; official D3D9 semantics are biased add followed by 2x scale."
+        "pipeline_translation.cpp supported SELECTARG1/2, MODULATE/2X/4X, ADD, ADDSIGNED/2X and SUBTRACT but had no ADDSMOOTH case.",
+        "ADDSMOOTH was absent from fixed_function_op_uses_texture, fixed_function_op_expression and validate_fixed_function_op, so the native fixed-function path correctly failed closed but left a conversion gap.",
+        "No regression registry case listed src/vr/d3d11/pipeline_translation.cpp as a riskPath."
       ]
     },
     "C2_IMPLEMENT": {
@@ -39,39 +41,42 @@
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "49955e06ef829a4f15daffb4617f8a76dc6f6d9d"
+        "09a16282ae973b61c22b33b97cff534442c78bc4",
+        "275800fd3ba29d19584c97d3f702a5736e2a0998",
+        "dfdb85601eb037bd9a6e24e4734106afb4e17b73"
       ],
       "details": [
-        "Added D3DTOP_ADDSIGNED2X to texture dependency and readiness switches.",
-        "Generated HLSL computes (Arg1 + Arg2 - 0.5) * 2.0 for RGB and alpha.",
-        "Added hosted generation/offline-compile fixture and source-graph retention guard."
+        "Added D3DTOP_ADDSMOOTH to texture-use and readiness switches.",
+        "Generated exact component-wise HLSL Arg1 + Arg2 * (1 - Arg1) for color and alpha paths.",
+        "Added hosted RGB/alpha generation assertions, shader compile assertion, completion marker and source-graph guard requiring all three translation/readiness cases."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_STATIC_PASS_COMPILE_NOT_CLAIMED",
-      "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36990255571 job 110784776601; Configure was IN_PROGRESS at C6 checkpoint and compile/binary success is not claimed",
+      "status": "COMPLETE_TARGETED_STATIC_PASS_FULL_BUILD_GATE_BLOCKED_UNRELATED",
+      "automation_validation": "PASS_TARGETED_AUTHENTICATED_GITHUB_STATIC_CONTRACT; FULL_BUILD_GATE_BLOCKED_BY_UNRELATED_R129_R175_SOURCE_GRAPH_DRIFT; COMPILE_NOT_CLAIMED",
       "evidence": [
-        "Backend Conversion Gate run 36990255571 job 110784776601 on exact result SHA 49955e06ef829a4f15daffb4617f8a76dc6f6d9d: Verify DX11 source graph=SUCCESS.",
-        "Verify DX11 dormant activation boundary=SUCCESS.",
-        "Test DX11 census analyzer=SUCCESS.",
-        "Configure Win32 was still in progress at the C6 checkpoint; Build Win32 and binary verification had not completed, so compile/binary success is not claimed."
+        "Authenticated retaining descendant 79c067b20399c309b0b8b8d6bd53f6110c71e010 contains exactly three D3DTOP_ADDSMOOTH cases plus the expected RGB/alpha expressions, hosted compile assertion, PASS marker and R184 source-graph contract.",
+        "Build run 36990569774 job 110785558169 reached Verify DX11 source graph and failed on unrelated R129 generated-fan geometry contract drift before compile.",
+        "After an independent R129 repair, Build run 36990677784 job 110785902007 again reached Verify DX11 source graph and failed on unrelated R175 stream-source-frequency contract drift before compile.",
+        "The R184 source/probe/guard commits are retained by later authenticated branch descendants. Compile/binary success is not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "49955e06ef829a4f15daffb4617f8a76dc6f6d9d",
-      "result_commit": "49955e06ef829a4f15daffb4617f8a76dc6f6d9d",
-      "issue14_comment_id": 5949263819
+      "source_commit": "09a16282ae973b61c22b33b97cff534442c78bc4",
+      "result_commit": "dfdb85601eb037bd9a6e24e4734106afb4e17b73",
+      "issue14_comment_id": 5949372862
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant fixed-function source/test/guard unit only; no NativeDrawPathActive change, release payload, localization, transport or other backend was modified."
+      "reason": "Dormant DX11 fixed-function translation/probe/source-graph unit only; no NativeDrawPathActive change, release payload, localization, OpenXR transport or other backend changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving R183 D3DTOP_ADDSIGNED2X support. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "conversion_state_commit": "d12f04c3bba33ae24709c2f9756a399e8b589570",
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving completed R184 ADDSMOOTH and concurrent descendant work. Rerun full Backend Conversion Gate once unrelated source-graph drift no longer blocks it; exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -81,23 +86,22 @@
     "dxvk_lane_modified": false,
     "localization_modified": false,
     "other_backend_modified": false,
-    "native_draw_path_active_changed": false,
     "runtime_validation_claimed": false
   },
-  "issue14_comment_id": 5949263819,
-  "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36990255571 job 110784776601; Configure was IN_PROGRESS at C6 checkpoint and compile/binary success is not claimed",
-  "blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI; this does not block static/source conversion progress.",
-  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving R183 D3DTOP_ADDSIGNED2X support. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5949372862,
+  "automation_validation": "PASS_TARGETED_AUTHENTICATED_GITHUB_STATIC_CONTRACT; FULL_BUILD_GATE_BLOCKED_BY_UNRELATED_R129_R175_SOURCE_GRAPH_DRIFT; COMPILE_NOT_CLAIMED",
+  "blocker": "Quest 3/VDXR runtime parity was not performed. Full Build gate is additionally blocked before compile by unrelated source-graph R175 drift after an earlier unrelated R129 drift; R184 targeted static contract itself passes.",
+  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving completed R184 ADDSMOOTH and concurrent descendant work. Rerun full Backend Conversion Gate once unrelated source-graph drift no longer blocks it; exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "source_head": "09a16282ae973b61c22b33b97cff534442c78bc4",
-  "result_sha": "49955e06ef829a4f15daffb4617f8a76dc6f6d9d",
-  "selected_work_item": "DX11_FFP_D3DTOP_ADDSIGNED2X_SUPPORT_R183",
+  "source_head": "d12f04c3bba33ae24709c2f9756a399e8b589570",
+  "result_sha": "dfdb85601eb037bd9a6e24e4734106afb4e17b73",
+  "selected_work_item": "DX11_FFP_D3DTOP_ADDSMOOTH_SUPPORT_R184",
   "changed_paths": [
     "src/vr/d3d11/pipeline_translation.cpp",
     "tools/dx11_fixed_function_pipeline_probe.cpp",
     "tools/verify_dx11_source_graph.py"
   ],
-  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving R183 D3DTOP_ADDSIGNED2X support. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving completed R184 ADDSMOOTH and concurrent descendant work. Rerun full Backend Conversion Gate once unrelated source-graph drift no longer blocks it; exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
 }
