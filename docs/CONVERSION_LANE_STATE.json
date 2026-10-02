@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "052295e01e8b0c6dd0addfcd014290415312c09e",
+  "state_parent_head": "095685456cb10e2da798fbc6b877fae8c05f22e8",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,16 +52,16 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "f611eaab243bc11756e1d953e50b1e335064d7c1",
-    "validation_bearing_sha": "f611eaab243bc11756e1d953e50b1e335064d7c1",
-    "retaining_descendant_sha": "052295e01e8b0c6dd0addfcd014290415312c09e",
-    "automation_validation": "PASS_GITHUB_AUTHORITATIVE_SOURCE_AND_RETENTION_INSPECTION; EXACT_SHA_ACTIONS_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; COMPILE_NOT_CLAIMED",
+    "result_sha": "b408e7957421b461a3c1975f276265493586a2a3",
+    "validation_bearing_sha": "869cd337f4ce2990bb0dd45e936ac8bc8f9b23a2",
+    "retaining_descendant_sha": "a329783c00047673d0075cfaca7af10bdcad1873",
+    "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; CONFIGURE_IN_PROGRESS_AT_CHECKPOINT; COMPILE_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI. R172 is retained in branch ancestry, but exact-result Actions were cancelled by same-branch descendant churn; compile/runtime success is not claimed.",
   "runtime_next_action": "Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before NativeDrawPathActive may be enabled; R172 changes census identity only and does not activate native routing.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit latest GitHub HEAD for the next independent dormant D3D9 render-state semantic gap, excluding R168 line raster, R169 point raster, R170 WRAP0..7, R171 multisample translation and R172 multisample census identity. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the latest GitHub HEAD for the next independent dormant DX11 semantic/source/static gap, excluding already covered R168-R175 and the unsupported-census schema parity guard. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -864,6 +864,22 @@
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5948655749,
       "run_state_commit": "052295e01e8b0c6dd0addfcd014290415312c09e"
+    },
+    {
+      "unit_id": "DX11_UNSUPPORTED_CENSUS_SCHEMA_PARITY_GUARD",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "f611eaab243bc11756e1d953e50b1e335064d7c1",
+      "material_result_sha": "b408e7957421b461a3c1975f276265493586a2a3",
+      "validation_bearing_sha": "869cd337f4ce2990bb0dd45e936ac8bc8f9b23a2",
+      "retaining_descendant_sha": "a329783c00047673d0075cfaca7af10bdcad1873",
+      "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; CONFIGURE_IN_PROGRESS_AT_CHECKPOINT; COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5948681416,
+      "validation_run_id": 36987425721,
+      "validation_job_id": 110775639816,
+      "run_state_commit": "095685456cb10e2da798fbc6b877fae8c05f22e8"
     }
   ]
 }
