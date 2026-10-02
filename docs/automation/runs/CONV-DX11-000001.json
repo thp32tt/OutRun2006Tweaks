@@ -5,7 +5,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "8b760190868471eb2b02273de53a7d07025847a1",
-  "state_parent_head": "c01bb339838d98fb9156a47a5d93fd42d909b539",
+  "state_parent_head": "06d58d1b1c790ff961ed15b96ef3190b0fbab572",
   "material_result_sha": "d879b6042908389444b45b0f040326855821d69b",
   "validation_bearing_sha": "d879b6042908389444b45b0f040326855821d69b",
   "runtime_validation": "UNTESTED",
@@ -789,8 +789,110 @@
       "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
       "runtime_claim": "NONE",
       "state_persisted": true
+    },
+    {
+      "unit_id": "DX11_MANAGED_BUFFER_EXACT_PLAN_CONSUMER_R125",
+      "job_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_MANAGED_BUFFER_EXACT_PLAN_CONSUMER_REPAIR",
+      "base_sha": "a6ef3fb62afe289052d2a68930b4739a21ff37e3",
+      "material_result_sha": "8a7476d55634ed0c72a5bc5fb3fcfc3f86ce8a1d",
+      "guard_result_sha": "c7fedf8a12e784ae38b21adf04b9f76333a0b031",
+      "validation_bearing_sha": "c7fedf8a12e784ae38b21adf04b9f76333a0b031",
+      "implementation_commits": [
+        "8a7476d55634ed0c72a5bc5fb3fcfc3f86ce8a1d",
+        "c7fedf8a12e784ae38b21adf04b9f76333a0b031"
+      ],
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "R121 changed ordinary D3DPOOL_MANAGED VB/IB mutation plans to planExact=true, but the existing R113 NativeManagedBufferShadow::write_range consumer still rejected mutation.planExact. This made every ordinary managed-buffer CPU-shadow write fail closed and broke the existing R113/R119 hosted WARP readiness path.",
+      "summary": "R125 changes the dormant MANAGED VB/IB CPU-shadow consumer to require the exact R121 mutation plan instead of rejecting it. R119 stale-mirror readiness remains unchanged. Added a source-graph guard tying the R121 producer contract to the R113 consumer.",
+      "changed_paths": [
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Read current GitHub HEAD, AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/automation/runs/CONV-DX11-000001.json, DX11 plan/work-queue context, regression knowledge/history and Issue #14 through the authenticated GitHub connector.",
+            "Detected concurrent same-branch descendant work and preserved it by using current branch contents/CAS updates rather than force-moving refs."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Confirmed translate_buffer_mutation() now emits planExact=true plus requiresCpuShadow=true for ordinary MANAGED VB/IB plans.",
+            "Confirmed NativeManagedBufferShadow::write_range() still rejected mutation.planExact, making the R121 producer contract incompatible with its R113 consumer.",
+            "Confirmed existing hosted probe already exercises full/partial MANAGED VB writes, MANAGED IB upload and R119 stale-snapshot rejection."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "changed_paths": [
+            "src/vr/d3d11/native_backend.cpp",
+            "tools/verify_dx11_source_graph.py"
+          ],
+          "material_commit": "8a7476d55634ed0c72a5bc5fb3fcfc3f86ce8a1d",
+          "guard_commit": "c7fedf8a12e784ae38b21adf04b9f76333a0b031",
+          "details": [
+            "Changed the MANAGED CPU-shadow write gate from rejecting mutation.planExact to rejecting !mutation.planExact.",
+            "Kept requiresCpuShadow and ManagedCpuShadowWrite kind checks intact.",
+            "Added source-graph guard text that requires the exact-plan consumer relationship and explicitly preserves the R119 stale-readiness boundary."
+          ]
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_REMOTE_STATIC",
+          "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_CI_SUPERSEDED_BY_DESCENDANT_PUSH",
+          "evidence": [
+            "Exact GitHub re-fetch of material SHA 8a7476d55634ed0c72a5bc5fb3fcfc3f86ce8a1d shows only src/vr/d3d11/native_backend.cpp changed and the rejection condition is now !mutation.planExact.",
+            "Exact GitHub re-fetch of guard SHA c7fedf8a12e784ae38b21adf04b9f76333a0b031 shows only tools/verify_dx11_source_graph.py changed and asserts the R125 exact-plan consumer contract.",
+            "A later descendant HEAD remained ahead of c7fedf8a with zero behind commits and retained the source fix, guard, full-write/partial-write/index-buffer probe markers and R119 stale-snapshot probe marker.",
+            "Push CI started for the material/guard commits but same-branch churn cancelled/superseded the jobs before hosted compile/probe completion; no hosted compile success is claimed."
+          ],
+          "hosted_probe": "SUPERSEDED_NOT_CLAIMED",
+          "runtime_validation": "UNTESTED"
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "8a7476d55634ed0c72a5bc5fb3fcfc3f86ce8a1d",
+          "guard_commit": "c7fedf8a12e784ae38b21adf04b9f76333a0b031",
+          "issue14_comment_id": 5946547629
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Dormant CPU-shadow/readiness contract repair only. Native Draw* routing, backend activation, runtime candidate payload and package contents were not changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE_WITH_STATE_COMMITS",
+          "lane_state_commit": "d9070aa4bc8e396046ac78bb5f3e1e66cc9865a0",
+          "exact_next_action": "Keep NativeDrawPathActive disabled. Obtain a non-superseded hosted dx11_constant_buffer_probe/source-graph result, then feed exact MANAGED buffer plan/readiness into dormant per-resource census while retaining R119 stale-mirror validation and exhaustive-census/Quest 3 gates."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "live_lock_unlock_routing_changed": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "related_finding_or_regression_keys": [
+        "DX11_MANAGED_BUFFER_EXACT_PLAN_CONSUMER_R125"
+      ],
+      "issue14_comment_id": 5946547629,
+      "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_CI_SUPERSEDED_BY_DESCENDANT_PUSH",
+      "blocker": "Hosted WARP/source-graph completion for this exact result was superseded by same-branch churn. Runtime graphics validation remains UNTESTED; native Draw* activation remains gated by exhaustive exact-build census and Quest 3/VDXR parity.",
+      "next_action": "Keep NativeDrawPathActive disabled. Obtain a non-superseded hosted dx11_constant_buffer_probe/source-graph result, then feed exact MANAGED buffer plan/readiness into dormant per-resource census while retaining R119 stale-mirror validation.",
+      "checkpoint": "C6_STATE",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE",
+      "state_persisted": true
     }
   ],
-  "latest_continuation_unit": "DX11_MANAGED_BUFFER_MUTATION_PLAN_R121",
+  "latest_continuation_unit": "DX11_MANAGED_BUFFER_EXACT_PLAN_CONSUMER_R125",
   "state_persisted_for_continuation": true
 }
