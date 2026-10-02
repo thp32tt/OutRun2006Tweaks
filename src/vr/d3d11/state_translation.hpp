@@ -47,11 +47,13 @@ struct TriangleFanExpansionPlan {
 
 // R123 expands an indexed D3D9 triangle fan while preserving the source index
 // values exactly. The caller retains D3D9 BaseVertexIndex separately as the
-// future D3D11 DrawIndexed BaseVertexLocation; this helper only rewrites fan
+// future D3D11 DrawIndexed BaseVertexLocation; StartIndex is consumed here
+// against the original index buffer. The R32_UINT output only rewrites fan
 // ordering into a triangle-list stream and never activates native Draw*.
 [[nodiscard]] bool materialize_indexed_triangle_fan_indices(
     UINT primitiveCount,
     D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
     const void* sourceIndices,
     UINT sourceIndexCount,
     UINT* expandedIndices,

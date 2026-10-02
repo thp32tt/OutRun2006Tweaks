@@ -172,6 +172,7 @@ bool materialize_triangle_fan_vertex_indices(
 bool materialize_indexed_triangle_fan_indices(
     UINT primitiveCount,
     D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
     const void* sourceIndices,
     UINT sourceIndexCount,
     UINT* expandedIndices,
@@ -186,8 +187,10 @@ bool materialize_indexed_triangle_fan_indices(
     if (expansion.expandedIndexCount == 0u)
         return true;
     if (!sourceIndices || !expandedIndices ||
-        sourceIndexCount < expansion.sourceElementCount ||
         expandedIndexCapacity < expansion.expandedIndexCount)
+        return false;
+    if (startIndex > sourceIndexCount ||
+        expansion.sourceElementCount > sourceIndexCount - startIndex)
         return false;
 
     const auto* sourceBytes =
@@ -212,7 +215,9 @@ bool materialize_indexed_triangle_fan_indices(
             WORD value = 0;
             std::memcpy(
                 &value,
-                sourceBytes + sourceElement * sourceStride,
+                sourceBytes +
+                    static_cast<std::size_t>(startIndex + sourceElement) *
+                        sourceStride,
                 sizeof(value));
             sourceIndex = value;
         }
@@ -221,7 +226,9 @@ bool materialize_indexed_triangle_fan_indices(
             DWORD value = 0;
             std::memcpy(
                 &value,
-                sourceBytes + sourceElement * sourceStride,
+                sourceBytes +
+                    static_cast<std::size_t>(startIndex + sourceElement) *
+                        sourceStride,
                 sizeof(value));
             sourceIndex = value;
         }

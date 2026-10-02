@@ -431,8 +431,12 @@ def main() -> None:
             "R123 indexed triangle-fan source-stream materializer",
         "sourceIndexFormat != D3DFMT_INDEX16":
             "R123 exact D3D9 index-format gate",
-        "sourceIndexCount < expansion.sourceElementCount":
-            "R123 source-index-count fail-closed gate",
+        "startIndex > sourceIndexCount":
+            "R124 StartIndex upper-bound fail-closed gate",
+        "expansion.sourceElementCount > sourceIndexCount - startIndex":
+            "R124 StartIndex-aware source-range fail-closed gate",
+        "static_cast<std::size_t>(startIndex + sourceElement)":
+            "R124 widened byte-offset arithmetic",
         "std::memcpy(":
             "R123 alignment-safe source-index decoding",
         "expandedIndexCapacity < expansion.expandedIndexCount":
@@ -462,12 +466,16 @@ def main() -> None:
             "fan base-vertex overflow fail-closed smoke",
         "zero-primitive triangle fan materialization must be empty-exact":
             "fan empty-stream semantic smoke",
+        "using outrun::vr::dx11::materialize_triangle_fan_vertex_indices;":
+            "R124 semantic probe imports non-indexed fan materializer",
         "INDEX16 triangle fan did not preserve source indices":
-            "R123 INDEX16 source-value preservation proof",
+            "R124 INDEX16 StartIndex preservation proof",
         "INDEX32 triangle fan did not preserve 32-bit source indices":
             "R123 INDEX32 source-value preservation proof",
         "indexed triangle fan short source did not fail before writes":
-            "R123 short-source fail-closed proof",
+            "R124 StartIndex-aware short-source fail-closed proof",
+        "indexed triangle fan StartIndex overflow did not fail before writes":
+            "R124 StartIndex upper-bound negative proof",
         "indexed triangle fan short destination did not fail before writes":
             "R123 short-destination fail-closed proof",
         "indexed triangle fan accepted unsupported index format":
