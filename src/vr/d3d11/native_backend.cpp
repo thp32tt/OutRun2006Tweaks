@@ -474,6 +474,37 @@ bool NativeFixedFunctionTextureView::upload_full_discard(
     return true;
 }
 
+bool bind_fixed_function_texture_stage_for_observation(
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture) noexcept {
+
+    if (!context || !sampler.ready() || !texture.ready() ||
+        slot >= D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT ||
+        slot >= D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT)
+        return false;
+
+    ID3D11Device* samplerDevice = sampler.device();
+    ID3D11Device* textureDevice = texture.device();
+    if (!samplerDevice || !textureDevice || samplerDevice != textureDevice)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    if (!contextDevice || contextDevice.Get() != samplerDevice)
+        return false;
+
+    ID3D11SamplerState* samplerState = sampler.sampler();
+    ID3D11ShaderResourceView* shaderResource = texture.srv();
+    if (!samplerState || !shaderResource)
+        return false;
+
+    context->PSSetSamplers(slot, 1, &samplerState);
+    context->PSSetShaderResources(slot, 1, &shaderResource);
+    return true;
+}
+
 void NativeFixedFunctionTextureView::shutdown() noexcept {
     srv_.Reset();
     texture_.Reset();
