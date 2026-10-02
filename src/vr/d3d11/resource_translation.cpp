@@ -186,6 +186,10 @@ namespace outrun::vr::dx11
             out.kind = readOnly
                 ? BufferMutationUpdateKind::ManagedCpuShadowRead
                 : BufferMutationUpdateKind::ManagedCpuShadowWrite;
+            // R121: the CPU-shadow/reset-generation implementation now makes
+            // this mutation *plan* exact. Live mirror/draw readiness remains
+            // independently gated by requiresCpuShadow and R119 snapshots.
+            out.planExact = true;
             out.requiresCpuShadow = true;
             return out;
         }

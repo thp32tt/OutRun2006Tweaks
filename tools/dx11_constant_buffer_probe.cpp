@@ -366,6 +366,40 @@ int main()
             D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, 0),
         "R99 texture view recovery after fail-closed reset");
 
+    const auto managedVertexWritePlan = translate_buffer_mutation(
+        ResourceRole::Vertex, D3DPOOL_MANAGED, D3DUSAGE_WRITEONLY, 0);
+    require(
+        managedVertexWritePlan.planExact &&
+        managedVertexWritePlan.kind ==
+            BufferMutationUpdateKind::ManagedCpuShadowWrite &&
+        managedVertexWritePlan.requiresCpuShadow,
+        "R121 managed VB write is an exact CPU-shadow mutation plan");
+
+    const auto managedIndexReadPlan = translate_buffer_mutation(
+        ResourceRole::Index, D3DPOOL_MANAGED, 0, D3DLOCK_READONLY);
+    require(
+        managedIndexReadPlan.planExact &&
+        managedIndexReadPlan.kind ==
+            BufferMutationUpdateKind::ManagedCpuShadowRead &&
+        managedIndexReadPlan.requiresCpuShadow,
+        "R121 managed IB read is an exact CPU-shadow mutation plan");
+
+    const auto managedDiscardPlan = translate_buffer_mutation(
+        ResourceRole::Vertex, D3DPOOL_MANAGED, D3DUSAGE_WRITEONLY,
+        D3DLOCK_DISCARD);
+    require(
+        !managedDiscardPlan.planExact &&
+        managedDiscardPlan.kind == BufferMutationUpdateKind::Unsupported,
+        "R121 managed DISCARD remains fail-closed");
+
+    const auto managedNoOverwritePlan = translate_buffer_mutation(
+        ResourceRole::Index, D3DPOOL_MANAGED, D3DUSAGE_WRITEONLY,
+        D3DLOCK_NOOVERWRITE);
+    require(
+        !managedNoOverwritePlan.planExact &&
+        managedNoOverwritePlan.kind == BufferMutationUpdateKind::Unsupported,
+        "R121 managed NOOVERWRITE remains fail-closed");
+
     const auto dynamicDiscardTexture = translate_texture_mutation(
         D3DPOOL_DEFAULT, D3DUSAGE_DYNAMIC, D3DLOCK_DISCARD, true);
     require(

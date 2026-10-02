@@ -169,8 +169,9 @@ namespace outrun::vr::dx11
     // R75 classifies VB/IB Lock flags into a concrete future D3D11 mirror
     // update operation. planExact describes the translation plan only; it
     // does not mean that a live D3D11 mirror path or native draw is enabled.
-    // MANAGED locks remain explicitly pending until the CPU-shadow/reset
-    // generation model exists.
+    // R121 treats ordinary MANAGED read/write locks as exact CPU-shadow
+    // operations now that the R113/R119 shadow/reset-generation model exists.
+    // requiresCpuShadow remains true, so this never proves live draw readiness.
     [[nodiscard]] BufferMutationTranslation translate_buffer_mutation(
         ResourceRole role,
         D3DPOOL pool,
