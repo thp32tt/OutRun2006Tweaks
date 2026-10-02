@@ -238,6 +238,26 @@
       "issue14_implementation_comment_id": 5946854609,
       "scope": "Bounded canonical raw provenance only; no function/render/HUD/runtime semantic promotion.",
       "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_CONCURRENT_PROOF"
+    },
+    {
+      "unit_id": "DXVK_F25_CANONICAL_CONTROL_FLOW_0x182AD7_TO_0x182B17",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "6948d702bb043600c3da425178b074063b086d60",
+      "run_record_commit_sha": "f67a4edc8e1adf283977b706c0bdf797cb0f2814",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "static_contract": "PASS",
+      "control_flow_status": "EXACT_182AD7_TO_182B17_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+      "instruction_count": 24,
+      "direct_rel32_call_count": 5,
+      "prefix_end_rva": "0x00182B17",
+      "dxvk_disassembly_evidence_run_id": 36974646225,
+      "dxvk_disassembly_evidence_job_id": 110735730487,
+      "dxvk_disassembly_evidence_artifact_id": 11212429714,
+      "issue14_implementation_comment_id": 5946858495,
+      "scope": "Exact canonical continuation_34 control-flow/call/predecessor-target proof ending on instruction boundary 0x00182B17; no semantic or runtime promotion.",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER"
     }
   ]
 }
