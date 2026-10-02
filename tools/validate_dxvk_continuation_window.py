@@ -20,15 +20,17 @@ def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def validate_window(data: bytes, start: int, expected_hex: str) -> dict:
+def validate_window(data: bytes, start: int, end: int, expected_hex: str) -> dict:
     expected = bytes.fromhex(expected_hex)
     actual = data[start : start + len(expected)]
     return {
         "offset": hex(start),
+        "end_offset": hex(end),
         "expected_bytes": expected.hex(" "),
         "actual_bytes": actual.hex(" "),
         "matches": actual == expected,
         "available_length": len(actual),
+        "window_contains_overlap": start < end and start + len(expected) <= end,
     }
 
 
@@ -43,11 +45,13 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("binary", type=Path)
     parser.add_argument("--offset", type=lambda x: int(x, 0), required=True)
+    parser.add_argument("--end", type=lambda x: int(x, 0))
     parser.add_argument("--overlap", default=DEFAULT_OVERLAP)
     args = parser.parse_args()
 
     data = args.binary.read_bytes()
-    window = validate_window(data, args.offset, args.overlap)
+    end = args.end if args.end is not None else args.offset + len(bytes.fromhex(args.overlap))
+    window = validate_window(data, args.offset, end, args.overlap)
     result = {
         "binary_sha256": sha256_file(args.binary),
         "runtime_validation": "UNTESTED",
@@ -58,6 +62,11 @@ def main() -> int:
     errors = validate_runtime_claim(result)
     if errors:
         result["errors"] = errors
+        print(json.dumps(result, indent=2))
+        return 1
+
+    if not window["window_contains_overlap"]:
+        result["errors"] = ["overlap_outside_declared_window"]
         print(json.dumps(result, indent=2))
         return 1
 
