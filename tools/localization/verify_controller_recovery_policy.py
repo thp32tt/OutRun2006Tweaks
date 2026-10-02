@@ -37,7 +37,7 @@ required = {
     "watchdog.wait_actions_stale_seconds": int(wd.get("wait_actions_stale_seconds", 9999)) <= 90,
     "watchdog.busy_stall_seconds": int(wd.get("busy_stall_seconds", 0)) >= 1800,
     "watchdog.force_stop_active_generation": wd.get("force_stop_active_generation") is False,
-    "continuous_progression.producer_commit_releases_same_lane": cp.get("producer_commit_releases_same_lane") is True,
+    "continuous_progression.producer_commit_releases_same_lane": cp.get("producer_commit_releases_same_lane") is False,
     "continuous_progression.producer_commit_enqueues_qa": cp.get("producer_commit_enqueues_qa") is True,
     "continuous_progression.producer_waits_for_actions": cp.get("producer_waits_for_actions") is False,
     "continuous_progression.c_batch_waits_for_actions": cp.get("c_batch_waits_for_actions") is True,
@@ -86,7 +86,7 @@ required = {
     "runtime_tuning.fresh_chat_each_task": rt.get("fresh_chat_each_task") is False,
     "runtime_tuning.chat_reuse_max_tasks": int(rt.get("chat_reuse_max_tasks", 0)) == 4,
     "runtime_tuning.chat_reuse_max_age_minutes": int(rt.get("chat_reuse_max_age_minutes", 0)) == 90,
-    "runtime_tuning.previous_task_ui_settle_seconds": int(rt.get("previous_task_ui_settle_seconds", 0)) == 180,
+    "runtime_tuning.previous_task_ui_settle_seconds": int(rt.get("previous_task_ui_settle_seconds", 0)) == 45,
     "runtime_tuning.max_chat_rollovers_per_task": int(rt.get("max_chat_rollovers_per_task", 0)) == 2,
     "runtime_tuning.github_transient_retry_delays": rt.get("github_transient_retry_delays") == [2,5,10,20],
     "runtime_tuning.github_transient_cooldown_seconds": int(rt.get("github_transient_cooldown_seconds", 0)) == 60,
@@ -156,7 +156,7 @@ execution = cfg.get("execution") or {}
 qa = cfg.get("qa_deduplication") or {}
 required["execution.mode"] = execution.get("mode") == "continuous_three_producers_with_c_batch_gate"
 required["execution.qa_consumer"] = execution.get("qa_consumer") == "C"
-required["execution.producer_next_after"] = execution.get("producer_next_after") == "OWN_LANE_DURABLE_COMMIT"
+required["execution.producer_next_after"] = execution.get("producer_next_after") == "PIPELINE_BATCH_COMPLETE_OR_FRESH_SHARD_EXHAUSTION"
 required["execution.producer_individual_actions_gate"] = execution.get("producer_individual_actions_gate") is False
 required["execution.batch_gate_role"] = execution.get("batch_gate_role") == "C"
 required["execution.batch_gate_is_only_runner_validation"] = execution.get("batch_gate_is_only_runner_validation") is True
@@ -247,7 +247,7 @@ if bad:
 
 print("controller recovery policy PASS")
 print("bound Actions poll <=30s, WAIT_ACTIONS recovery <=90s, idle rearm <=90s")
-print("A/B/E release on durable commit; only C batch consumes runner-backed Actions validation")
+print("A/B/E checkpoints remain latched until pipeline batch completion or fresh shard exhaustion; only C batch consumes runner-backed Actions validation")
 print("candidate-completion-first production; no new preflight while render-ready work exists")
 print("three-producer dispatch independent from C QA backlog; E backlog throttle disabled; heartbeat <=15s")
 print("fail-closed NO_WORK guard and full-shard producer scan policy verified")
