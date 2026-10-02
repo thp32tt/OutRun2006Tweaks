@@ -68,6 +68,9 @@ services:
       WATCHDOG_FORCE_STOP_STALLED: "false"
       RATE_LIMIT_BACKOFF_SECONDS: "90,180,300,600"
       MIN_SEND_GAP_SECONDS: "60"
+      SAME_TASK_CONTROL_GAP_SECONDS: "15"
+      PREMATURE_STOP_ROLLOVER_THRESHOLD: "3"
+      PRODUCER_CONTINUATION_COOLDOWN_SECONDS: "15"
       SLOT_DEDUP_SECONDS: "120"
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8787/healthz >/dev/null || exit 1"]
