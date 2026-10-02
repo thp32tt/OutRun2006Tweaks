@@ -1617,7 +1617,10 @@ def localization_producer_seen_result(active: dict, sha: Optional[str]) -> bool:
 def localization_remaining_material_targets(active: dict, limit: int = 12) -> list[dict]:
     """Return runnable controller targets not already candidate-completed in this task."""
     completed = {
-        int(x) for x in (active.get("pipeline_candidate_indices") or [])
+        int(x) for x in (
+            list(active.get("pipeline_candidate_indices") or [])
+            + list(active.get("controller_exclude_indices") or [])
+        )
         if str(x).lstrip("-").isdigit()
     }
     targets = localization_material_target_hints(
