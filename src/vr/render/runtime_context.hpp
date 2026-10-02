@@ -5,7 +5,7 @@
 namespace OutRunVRStereo
 {
     bool IsCurrentGameDevice(IDirect3DDevice9* device) noexcept;
-    bool IsInternalStereoPassActive() noexcept;
+    bool IsInternalStereoPassActive();
     bool StereoWantedForCurrentFrame() noexcept;
     bool TargetIsCurrentBackBuffer() noexcept;
     IDirect3DDevice9* StereoInstalledDeviceSnapshot() noexcept;

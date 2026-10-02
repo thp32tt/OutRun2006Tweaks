@@ -2,7 +2,7 @@
 
 #include <d3d9.h>
 #include "screen_space_kind.hpp"
-#include "../renderer.hpp"
+#include "../ipc/protocol.hpp"
 #include "../runtime_eligibility.hpp"
 
 namespace OutRunVRStereo
