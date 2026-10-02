@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1244,
+  "cycle": 1250,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -257,11 +257,13 @@
     "R84-REF-FINALGRAPH-PREP-0001",
     "R84-REF-GATEC-BATCH21-0001",
     "R84-REF-GATEC-R13-LINKAGE-0010",
-    "R84-REF-GATEC-BUILD-0011"
+    "R84-REF-GATEC-BUILD-0011",
+    "R84-REF-GATED-DEPS-0002",
+    "R84-REF-GATEE-DEPS-0002"
   ],
-  "next": "Consume exact BUILD_GATE 1244 run for this checkpoint SHA. Expected prior link errors should be resolved by external R13/R22 hook definitions. If green, mark Gate C BUILD_VERIFIED and proceed Gate D; if failure, fix first concrete compile/link issue.",
-  "updatedKst": "2026-10-02T20:07:00+09:00",
-  "batchStatus": "R84_GATE_C_BUILD_GATE_1244_TRIGGERED",
+  "next": "Consume exact Gate C BUILD_GATE 1244 run 36998885260. Gate D dependency map is ready; Gate E lower ownership confirms R30 hooks legacy PresentDest/ResetDest from R7 plus R29 draw targets. No Gate D/E source edit before Gate C green.",
+  "updatedKst": "2026-10-02T20:10:00+09:00",
+  "batchStatus": "R84_GATE_C_BUILD_PENDING_DEPENDENCY_MAP_CYCLE_1250",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -492,7 +494,9 @@
     "Cycles 1233-1235 R84-REF-FINALGRAPH-PREP-0001: inspected CMakeLists.txt/cmake.toml final graph ownership. Current baseline marks R29-R32 HEADER_FILE_ONLY, with cumulative split gates turning R33/R32/R31 into real TUs and R34 owner guards. Final cleanup must remove obsolete header-only treatment only after A-E are build-green and must keep cmake.toml/CMakeLists.txt aligned. APPLY_GATE 1235 NO_SAFE_CHANGE while Gate C build is still active. Runtime NEED_HMD_TEST.",
     "Cycles 1236-1238 R84-REF-GATEC-BATCH21-0001: final three-cycle verification for requested 21-cycle batch. Protected R26+R30 graph unchanged; no additional evidence-backed source edit while Gate C exact build is active. APPLY_GATE 1238 NO_SAFE_CHANGE. BUILD_GATE 1238 reuses active exact build validation run 36995965710/job 110802954883 because no build input changed since 1226; verifier PASS, configure IN_PROGRESS at checkpoint. Requested batch advanced exactly 21 cycles from 1217 to 1238. Runtime NEED_HMD_TEST.",
     "Cycles 1239-1241 R84-REF-GATEC-R13-LINKAGE-0010: consumed BUILD_GATE 1226 run 36995965710/job 110802954883. Compile reached link; unresolved externals were ResolveDirectTransportR13, PresentDestR13, ResetDestR22. Concurrent automation commit 4749a45 externalized ResetDestR22 only. This batch externalized the exact existing R13 ResolveDirectTransportR13 and PresentDestR13 definitions by closing/reopening the anonymous namespace around each function; bodies/order unchanged. Verifier now guards R13 linkage. APPLY_GATE 1241 SOURCE_CHANGED=YES. Runtime NEED_HMD_TEST.",
-    "Cycles 1242-1244 R84-REF-GATEC-BUILD-0011: static re-read confirmed ResolveDirectTransportR13, PresentDestR13 and ResetDestR22 definitions are outside anonymous namespaces, and verifier guards R13 linkage. APPLY_GATE 1244 NO_SAFE_CHANGE. BUILD_GATE 1244 intentionally triggered on exact current linkage-repair SHA. Runtime NEED_HMD_TEST."
+    "Cycles 1242-1244 R84-REF-GATEC-BUILD-0011: static re-read confirmed ResolveDirectTransportR13, PresentDestR13 and ResetDestR22 definitions are outside anonymous namespaces, and verifier guards R13 linkage. APPLY_GATE 1244 NO_SAFE_CHANGE. BUILD_GATE 1244 intentionally triggered on exact current linkage-repair SHA. Runtime NEED_HMD_TEST.",
+    "Cycles 1245-1247 R84-REF-GATED-DEPS-0002: mapped R31->R30 seam precisely. R31 consumes four R30 draw hook destinations plus ScreenSpaceInstallState/ClassifyScreenSpacePass/BuildScreenSpaceEyeConstants; existing screen_space_hooks.hpp and screen-space APIs cover the seam. APPLY_GATE 1247 NO_SAFE_CHANGE while Gate C build pending.",
+    "Cycles 1248-1250 R84-REF-GATEE-DEPS-0002: mapped R30->R29/base seam. R30 hook transaction targets legacy PresentDest/ResetDest plus four R29 draw destinations; PresentDest/ResetDest are owned by base R7 implementation while R29 draw targets already have stereo_base_hooks.hpp. APPLY_GATE 1250 NO_SAFE_CHANGE. BUILD_GATE 1250 REUSED_BUILD_EVIDENCE=PENDING run 36998885260 because build input unchanged from 1244. Runtime NEED_HMD_TEST."
   ],
   "campaign": {
     "startCycle": 1202,
