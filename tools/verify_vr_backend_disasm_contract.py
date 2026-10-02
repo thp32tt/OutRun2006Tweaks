@@ -883,6 +883,23 @@ def verify_dxvk_continuation_chain() -> None:
                     f"declaration drift: targets are not successor instruction boundaries: "
                     f"{[f'0x{rva:08X}' for rva in missing_successor_boundaries]}"
                 )
+            padding_predecessor_target_hits = [
+                (
+                    target_rva,
+                    instruction_rows[run_start][0],
+                    instruction_rows[run_end - 1][0] + 1,
+                )
+                for target_rva in resolved_predecessor_targets
+                for run_start, run_end in internal_int3_padding_spans
+                if instruction_rows[run_start][0]
+                <= target_rva
+                < instruction_rows[run_end - 1][0] + 1
+            ]
+            if padding_predecessor_target_hits:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} resolved predecessor target "
+                    f"enters long INT3 padding: {padding_predecessor_target_hits}"
+                )
             if resolved_predecessor_targets:
                 if resolved_predecessor_name not in proof_source:
                     raise SystemExit(
