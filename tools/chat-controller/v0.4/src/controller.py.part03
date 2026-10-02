@@ -59,6 +59,9 @@ def queue_rollover_prompt(active: dict) -> str:
     lines = [
         "[대화 자동 롤오버 재개]",
         f"TASK_ID={active['task_id']}",
+        f"PRODUCTION_ID={active.get('production_id', active['task_id'])}",
+        f"EVENT_ID={active.get('event_id', '')}",
+        f"EVENT_TYPE={active.get('event_type', 'rollover')}",
         f"LANE={active['lane']}",
         f"TARGET_BRANCH={active['branch']}",
         f"ATTEMPT={active['attempt']}/{MAX_TASK_ATTEMPTS}",
@@ -135,8 +138,29 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         return False
 
     active["last_rollover_reason"] = reason
+    previous_event_id = active.get("event_id")
+    previous_event_type = active.get("event_type")
+    previous_rollover_count = int(active.get("rollover_count", active.get("chat_rollovers", 0)))
+    active["chat_rollovers"] = count + 1
+    active["rollover_count"] = count + 1
+    event = append_task_event(reg, active, "rollover")
+    runtime["queue_production_id"] = event.production_id
+    runtime["queue_event_id"] = event.event_id
+    runtime["queue_event_type"] = event.event_type
     result = await send_message(page, queue_rollover_prompt(active))
     if result != "sent":
+        if reg.task_events and reg.task_events[-1].event_id == event.event_id:
+            reg.task_events.pop()
+        active["chat_rollovers"] = count
+        active["rollover_count"] = previous_rollover_count
+        if previous_event_id is None:
+            active.pop("event_id", None)
+        else:
+            active["event_id"] = previous_event_id
+        if previous_event_type is None:
+            active.pop("event_type", None)
+        else:
+            active["event_type"] = previous_event_type
         write_runtime(status="conversation_rollover_failed", last_action=f"{active['task_id']}: rollover send failed: {result}")
         return False
 
@@ -148,7 +172,6 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
 
     active["retry_recovery_attempted"] = False
     active["retry_rollover_pending"] = False
-    active["chat_rollovers"] = count + 1
     active["last_rollover_reason"] = reason
     active["last_rollover_at"] = sent_at.isoformat()
     active["sent_at"] = sent_at.isoformat()
@@ -232,6 +255,11 @@ async def queue_handle_retry_surface(page: Page, reg: Registry, slot: Slot, acti
     if await click_retry_generation(page):
         request_now = datetime.now(TZ)
         note_successful_request(reg, request_now, slot.name)
+        active["retry_count"] = int(active.get("retry_count", 0)) + 1
+        event = append_task_event(reg, active, "retry")
+        runtime["queue_production_id"] = event.production_id
+        runtime["queue_event_id"] = event.event_id
+        runtime["queue_event_type"] = event.event_type
         active["last_retry_click_at"] = request_now.isoformat()
         active["sent_at"] = request_now.isoformat()
         active["last_hash"] = None
@@ -289,12 +317,35 @@ async def queue_send_retry(context: BrowserContext, pages: dict[str, Page], acti
     runtime["queue_failure_context"] = reason
     runtime["queue_qa_batch"] = active.get("qa_batch") or []
 
+    previous_event_id = active.get("event_id")
+    previous_event_type = active.get("event_type")
+    previous_retry_count = int(active.get("retry_count", 0))
+    active["retry_count"] = previous_retry_count + 1
+    event = append_task_event(reg, active, "retry")
+    runtime["queue_production_id"] = event.production_id
+    runtime["queue_event_id"] = event.event_id
+    runtime["queue_event_type"] = event.event_type
+
     prompt = prompt_for_slot(slot, "repair")
     if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
+        if reg.task_events and reg.task_events[-1].event_id == event.event_id:
+            reg.task_events.pop()
+        active["retry_count"] = previous_retry_count
         active["base_sha"] = previous_base
         return False
     result = await send_message(page, prompt)
     if result != "sent":
+        if reg.task_events and reg.task_events[-1].event_id == event.event_id:
+            reg.task_events.pop()
+        active["retry_count"] = previous_retry_count
+        if previous_event_id is None:
+            active.pop("event_id", None)
+        else:
+            active["event_id"] = previous_event_id
+        if previous_event_type is None:
+            active.pop("event_type", None)
+        else:
+            active["event_type"] = previous_event_type
         active["base_sha"] = previous_base
         write_runtime(status="queue_retry_send_failed", last_action=f"{active['task_id']} retry send failed: {result}")
         return False
@@ -444,9 +495,21 @@ async def localization_send_lane_task(
         write_runtime(status="limit_detected", last_action=f"Wave {wave_id} lane {slot_name}: usage limit detected")
         return False
 
-    task_counter = int(q.get("counter", 0)) + 1
-    task_id = f"LOCALIZATION-{target['lane']}-{task_counter:05d}"
-    runtime["queue_task_id"] = task_id
+    minimum_next = queue_lane_minimum_next(q, target["lane"])
+    production_id = allocate_lane_production_id(reg, target["lane"], "LOCALIZATION", minimum_next)
+    draft = {
+        "task_id": production_id,
+        "production_id": production_id,
+        "attempt": 1,
+        "retry_count": 0,
+        "rollover_count": 0,
+        "chat_rollovers": 0,
+    }
+    event = append_task_event(reg, draft, "dispatch")
+    runtime["queue_task_id"] = production_id
+    runtime["queue_production_id"] = production_id
+    runtime["queue_event_id"] = event.event_id
+    runtime["queue_event_type"] = event.event_type
     runtime["queue_lane"] = target["lane"]
     runtime["queue_branch"] = target["branch"]
     runtime["queue_attempt"] = 1
@@ -486,9 +549,13 @@ async def localization_send_lane_task(
     slot.last_result = "parallel_sent"
     save_registry(reg)
 
-    q["counter"] = task_counter
+    production_number = int(production_id.rsplit("-", 1)[-1])
+    q["counter"] = max(int(q.get("counter", 0)), production_number)
     q.setdefault("active_by_lane", {})[slot_name] = {
-        "task_id": task_id,
+        "task_id": production_id,
+        "production_id": production_id,
+        "event_id": event.event_id,
+        "event_type": event.event_type,
         "slot": slot_name,
         "lane": target["lane"],
         "branch": target["branch"],
@@ -496,11 +563,14 @@ async def localization_send_lane_task(
         "base_sha": base_sha,
         "result_sha": None,
         "attempt": 1,
+        "retry_count": 0,
+        "rollover_count": 0,
         "wave_id": wave_id,
         "chat_rollovers": 0,
         "previous_chat_urls": [],
         "active_chat_url": slot.url,
         "phase": "WAIT_CHAT",
+        "status": "WAIT_CHAT",
         "terminal": None,
         "sent_at": sent_at.isoformat(),
         "last_hash": None,
@@ -512,7 +582,7 @@ async def localization_send_lane_task(
     save_queue_state(q)
     write_runtime(
         status="parallel_wave_running",
-        last_action=f"Wave {wave_id}: sent lane {slot_name} as {task_id}",
+        last_action=f"Wave {wave_id}: sent lane {slot_name} as {production_id} event={event.event_id}",
         queue=q,
     )
     return True
