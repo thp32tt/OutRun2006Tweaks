@@ -2584,6 +2584,41 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the verifier guard and newest authoritative canonical frontier; current source contains raw continuation_54 0x00182FBE..0x00182FFE. Validate its canonical provenance if needed, then exact-decode only complete instructions and preserve any cut edge."
+    },
+    {
+      "unit_id": "DXVK_F45_CANONICAL_EXE_PROVENANCE_0x182FBE_TO_0x182FFE",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "dcb22c6bfcc30f93ddc02026929b0aade1e92182",
+      "validation_bearing_result_sha": "e5492a5a38525798a49910e52bdf5c6c618511c0",
+      "run_record_commit_sha": "a43f8e18677fbbcf10d096b8dd5e095f6e489166",
+      "commit_message": "dxvk: capture canonical 0x182FBE continuation [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "F45 raw canonical provenance: 64 bytes at 0x00182FBE..0x00182FFE captured from the exact F44 instruction boundary and validated on a retaining descendant; no semantic or ownership promotion.",
+      "validation": {
+        "automation_validation": "PASS_RETAINING_DESCENDANT_CANONICAL_STATIC",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "hud_inspector_run_id": 36984311969,
+        "hud_inspector_static_job_id": 110765893435,
+        "provenance_status": "EXACT_EXE_182FBE_TO_182FFE_PROVENANCE_CAPTURED",
+        "predecessor_status": "EXACT_182F7E_TO_182FBE_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "predecessor_exact": true,
+        "target_section": ".text",
+        "probe_len": 64,
+        "probe_end_matches": true,
+        "artifact_id": 11216243893,
+        "artifact_digest": "sha256:5155df15443d24ef9ab0e74077ecd6742783ef4deac4f5dceb28a5944a62a7bb",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948226104,
+      "issue14_validation_comment_id": 5948266226,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_CONCURRENT_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Exact-decode only complete canonical instructions in 0x00182FBE..0x00182FFE; preserve the trailing 66 83 cut edge for overlap if incomplete and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
