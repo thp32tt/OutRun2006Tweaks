@@ -4014,6 +4014,98 @@ int main()
                 finalIndexedFanBoundDraw.snapshotToken),
         "R146 indexed fan final draw seals live VS b0 and OM target");
 
+
+    ID3D11Buffer* nullIndexedFanTransformBuffer = nullptr;
+    d3d.context->VSSetConstantBuffers(0, 1, &nullIndexedFanTransformBuffer);
+    const auto indexedFanMissingTransform =
+        outrun::vr::dx11::
+            compose_fixed_function_final_indexed_triangle_fan_bound_draw_readiness(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
+                outputColorSurface, outputDepthSurface);
+    require(
+        indexedFanMissingTransform.completeFanBoundDrawReady &&
+        !indexedFanMissingTransform.transformBindingReady &&
+        indexedFanMissingTransform.surfaceTargetBindingReady &&
+        indexedFanMissingTransform.surfacePairMatchesDraw &&
+        !indexedFanMissingTransform.ready &&
+        indexedFanMissingTransform.snapshotToken == 0 &&
+        !outrun::vr::dx11::
+            validate_fixed_function_final_indexed_triangle_fan_bound_draw_snapshot(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
+                outputColorSurface, outputDepthSurface,
+                finalIndexedFanBoundDraw.snapshotToken),
+        "R146 indexed fan final draw fails closed after VS b0 drift");
+
+    ID3D11Buffer* restoredIndexedFanTransformBuffer =
+        pipelineBundle.transform_buffer().buffer();
+    d3d.context->VSSetConstantBuffers(
+        0, 1, &restoredIndexedFanTransformBuffer);
+
+    d3d.context->OMSetRenderTargets(0, nullptr, nullptr);
+    const auto indexedFanMissingTargets =
+        outrun::vr::dx11::
+            compose_fixed_function_final_indexed_triangle_fan_bound_draw_readiness(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
+                outputColorSurface, outputDepthSurface);
+    require(
+        indexedFanMissingTargets.completeFanBoundDrawReady &&
+        indexedFanMissingTargets.transformBindingReady &&
+        !indexedFanMissingTargets.surfaceTargetBindingReady &&
+        indexedFanMissingTargets.surfacePairMatchesDraw &&
+        !indexedFanMissingTargets.ready &&
+        indexedFanMissingTargets.snapshotToken == 0 &&
+        !outrun::vr::dx11::
+            validate_fixed_function_final_indexed_triangle_fan_bound_draw_snapshot(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
+                outputColorSurface, outputDepthSurface,
+                finalIndexedFanBoundDraw.snapshotToken),
+        "R146 indexed fan final draw fails closed after OM target drift");
+
+    require(
+        surfaceTargetBinding.apply(
+            d3d.context, outputColorSurface, outputDepthSurface) &&
+        outrun::vr::dx11::
+            validate_fixed_function_final_indexed_triangle_fan_bound_draw_snapshot(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
+                outputColorSurface, outputDepthSurface,
+                finalIndexedFanBoundDraw.snapshotToken),
+        "R146 indexed fan final draw restores transform and OM target snapshot");
+
     require(
         !outrun::vr::dx11::
             validate_fixed_function_complete_indexed_triangle_fan_bound_draw_snapshot(

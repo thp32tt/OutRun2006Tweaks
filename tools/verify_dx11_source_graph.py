@@ -1949,6 +1949,12 @@ def main() -> None:
          CONSTANT_BUFFER_PROBE, "R146 deterministic restore proof"),
         ("R146 indexed fan final draw seals live VS b0 and OM target",
          CONSTANT_BUFFER_PROBE, "R146 indexed positive proof"),
+        ("R146 indexed fan final draw fails closed after VS b0 drift",
+         CONSTANT_BUFFER_PROBE, "R146 indexed transform drift negative proof"),
+        ("R146 indexed fan final draw fails closed after OM target drift",
+         CONSTANT_BUFFER_PROBE, "R146 indexed OM target drift negative proof"),
+        ("R146 indexed fan final draw restores transform and OM target snapshot",
+         CONSTANT_BUFFER_PROBE, "R146 indexed deterministic restore proof"),
     ]
     missing_r146_final_fan = [
         meaning
