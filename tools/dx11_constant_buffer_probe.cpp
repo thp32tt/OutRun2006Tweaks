@@ -278,17 +278,45 @@ int main()
         samplerOwner.initialize(d3d.device, linearClampStage),
         "R98 sampler owner reinitialize with linear clamp");
 
-    auto unsupportedLodBiasStage = stages[0];
-    unsupportedLodBiasStage.mipLodBiasBits = 0x3F000000u;
+    auto translatedLodStage = linearClampStage;
+    translatedLodStage.mipLodBiasBits = 0x3F000000u;
+    translatedLodStage.maxMipLevel = 1u;
+    const auto translatedLodSampler =
+        translate_fixed_function_sampler(translatedLodStage);
+    require(
+        translatedLodSampler.exact &&
+        translatedLodSampler.desc.MipLODBias == 0.5f &&
+        translatedLodSampler.desc.MinLOD == 1.0f &&
+        translatedLodSampler.desc.MaxLOD == D3D11_FLOAT32_MAX,
+        "sampler LOD bias/MAXMIPLEVEL translation");
+    require(
+        samplerOwner.initialize(d3d.device, translatedLodStage),
+        "sampler owner accepts translated LOD state");
+    D3D11_SAMPLER_DESC observedLodSampler{};
+    samplerOwner.sampler()->GetDesc(&observedLodSampler);
+    require(
+        observedLodSampler.MipLODBias == 0.5f &&
+        observedLodSampler.MinLOD == 1.0f &&
+        observedLodSampler.MaxLOD == D3D11_FLOAT32_MAX,
+        "created sampler preserves translated LOD state");
+
+    auto unsupportedLodBiasStage = linearClampStage;
+    unsupportedLodBiasStage.mipLodBiasBits = 0x41800000u;
     require(
         !translate_fixed_function_sampler(unsupportedLodBiasStage).exact,
-        "R125 non-default sampler MIP LOD bias must fail closed");
+        "out-of-range sampler MIP LOD bias must fail closed");
 
-    auto unsupportedMaxMipStage = stages[0];
-    unsupportedMaxMipStage.maxMipLevel = 1u;
+    auto unsupportedMaxMipStage = linearClampStage;
+    unsupportedMaxMipStage.maxMipLevel = D3D11_REQ_MIP_LEVELS;
     require(
         !translate_fixed_function_sampler(unsupportedMaxMipStage).exact,
-        "R125 non-default sampler MAXMIPLEVEL must fail closed");
+        "out-of-range sampler MAXMIPLEVEL must fail closed");
+
+    auto unsupportedNoMipLodStage = stages[0];
+    unsupportedNoMipLodStage.maxMipLevel = 1u;
+    require(
+        !translate_fixed_function_sampler(unsupportedNoMipLodStage).exact,
+        "no-mip non-default sampler LOD must fail closed");
 
     auto unsupportedSamplerStage = stages[0];
     unsupportedSamplerStage.minFilter = D3DTEXF_ANISOTROPIC;

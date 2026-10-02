@@ -1594,9 +1594,11 @@ def main() -> None:
         "FixedFunctionUnsupportedTextureTransform": "R87 transform fail-closed reason",
         "D3DTEXF_ANISOTROPIC": "R87 unsupported sampler-filter case",
         "FixedFunctionUnsupportedSamplerFilter": "R87 sampler fail-closed reason",
-        "sampler LOD bias did not fail closed": "R125 sampler LOD bias readiness negative case",
-        "sampler MAXMIPLEVEL did not fail closed": "R125 sampler max-mip readiness negative case",
-        "FixedFunctionUnsupportedSamplerLod": "R125 sampler LOD readiness blocker",
+        "sampler LOD bias/MAXMIPLEVEL did not translate exactly": "sampler LOD positive readiness case",
+        "out-of-range sampler LOD bias did not fail closed": "sampler LOD bias range guard",
+        "out-of-range sampler MAXMIPLEVEL did not fail closed": "sampler MAXMIPLEVEL range guard",
+        "no-mip non-default sampler LOD state did not fail closed": "no-mip LOD fail-closed guard",
+        "FixedFunctionUnsupportedSamplerLod": "sampler LOD readiness blocker",
         "FixedFunctionShaderPrototypeUnsupportedNotReady": "R86 missing-resource fail-closed case",
         "D3DRTYPE_CUBETEXTURE": "R86 unsupported resource-type case",
         "FixedFunctionShaderPrototypeUnsupportedResourceType": "R86 unsupported resource-type blocker",
@@ -2245,7 +2247,11 @@ def main() -> None:
         "D3D11_TEXTURE_ADDRESS_CLAMP": "R98 clamp address mapping",
         "source.mipFilter == D3DTEXF_NONE": "R98 no-mip MaxLOD contract",
         "D3D11_FLOAT32_MAX": "R98 mip-enabled MaxLOD contract",
-        "fixed_function_sampler_lod_supported": "R125 conservative sampler LOD exactness gate",
+        "translate_fixed_function_sampler_lod": "sampler LOD translation gate",
+        "D3D11_MIP_LOD_BIAS_MIN": "D3D11 MipLODBias lower-bound guard",
+        "D3D11_MIP_LOD_BIAS_MAX": "D3D11 MipLODBias upper-bound guard",
+        "D3D11_REQ_MIP_LEVELS": "D3D11 representable mip-index guard",
+        "desc.MinLOD = static_cast<float>(source.maxMipLevel)": "D3D9 MAXMIPLEVEL to D3D11 MinLOD mapping",
     }.items():
         if token not in PIPELINE_TRANSLATION_CPP:
             raise SystemExit(
@@ -2308,10 +2314,16 @@ def main() -> None:
     for token, meaning in {
         "R98 point/wrap sampler translation": "R98 point/wrap descriptor case",
         "R98 linear/clamp sampler translation": "R98 linear/clamp descriptor case",
-        "R125 non-default sampler MIP LOD bias must fail closed":
-            "R125 non-default MIP LOD bias fail-closed proof",
-        "R125 non-default sampler MAXMIPLEVEL must fail closed":
-            "R125 non-default most-detailed-mip fail-closed proof",
+        "sampler LOD bias/MAXMIPLEVEL translation":
+            "positive MIP LOD bias/most-detailed-mip descriptor proof",
+        "created sampler preserves translated LOD state":
+            "created D3D11 sampler LOD descriptor proof",
+        "out-of-range sampler MIP LOD bias must fail closed":
+            "MipLODBias range fail-closed proof",
+        "out-of-range sampler MAXMIPLEVEL must fail closed":
+            "most-detailed-mip range fail-closed proof",
+        "no-mip non-default sampler LOD must fail closed":
+            "no-mip ambiguous LOD state fail-closed proof",
         "R98 anisotropic sampler translation must fail closed":
             "R98 unsupported filter negative case",
         "R98 failed sampler reinitialize must leave owner dormant":

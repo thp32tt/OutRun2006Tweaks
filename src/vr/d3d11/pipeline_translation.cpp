@@ -2,6 +2,7 @@
 
 #include <d3dcompiler.h>
 #include <cmath>
+#include <cstring>
 
 #include "state_translation.hpp"
 
@@ -275,14 +276,44 @@ namespace outrun::vr::dx11
                    value == D3DTADDRESS_CLAMP;
         }
 
-        bool fixed_function_sampler_lod_supported(
-            const FixedFunctionStageState& source) noexcept
+        bool translate_fixed_function_sampler_lod(
+            const FixedFunctionStageState& source,
+            D3D11_SAMPLER_DESC& desc) noexcept
         {
-            // R125 keeps R98 conservative until real-game census proves which
-            // non-default LOD states are required. Never silently substitute
-            // D3D11 defaults for observed D3D9 sampler state.
-            return source.mipLodBiasBits == 0u &&
-                   source.maxMipLevel == 0u;
+            float mipLodBias = 0.0f;
+            static_assert(
+                sizeof(mipLodBias) == sizeof(source.mipLodBiasBits));
+            std::memcpy(
+                &mipLodBias, &source.mipLodBiasBits, sizeof(mipLodBias));
+
+            // D3D9 stores MIPMAPLODBIAS as raw float bits and MAXMIPLEVEL as
+            // the index of the most-detailed mip allowed. D3D11 expresses
+            // those same semantics as MipLODBias and the MinLOD clamp.
+            if (!std::isfinite(mipLodBias) ||
+                mipLodBias < D3D11_MIP_LOD_BIAS_MIN ||
+                mipLodBias > D3D11_MIP_LOD_BIAS_MAX ||
+                source.maxMipLevel >= D3D11_REQ_MIP_LEVELS)
+                return false;
+
+            // D3DTEXF_NONE disables mipmapping. Keep the prior exact
+            // single-level contract and fail closed if non-default D3D9 LOD
+            // state is present in that mode rather than guessing how a driver
+            // would combine an ignored bias/MAXMIPLEVEL with no mip selection.
+            if (source.mipFilter == D3DTEXF_NONE)
+            {
+                if (source.mipLodBiasBits != 0u ||
+                    source.maxMipLevel != 0u)
+                    return false;
+                desc.MipLODBias = 0.0f;
+                desc.MinLOD = 0.0f;
+                desc.MaxLOD = 0.0f;
+                return true;
+            }
+
+            desc.MipLODBias = mipLodBias;
+            desc.MinLOD = static_cast<float>(source.maxMipLevel);
+            desc.MaxLOD = D3D11_FLOAT32_MAX;
+            return true;
         }
 
         D3D11_FILTER translate_fixed_function_filter(
@@ -624,7 +655,7 @@ namespace outrun::vr::dx11
         if (!fixed_function_filter_supported(source.minFilter, false) ||
             !fixed_function_filter_supported(source.magFilter, false) ||
             !fixed_function_filter_supported(source.mipFilter, true) ||
-            !fixed_function_sampler_lod_supported(source) ||
+            !translate_fixed_function_sampler_lod(source, out.desc) ||
             !fixed_function_address_supported(source.addressU) ||
             !fixed_function_address_supported(source.addressV))
             return out;
@@ -636,17 +667,12 @@ namespace outrun::vr::dx11
         // R84 currently accepts Texture2D only, so W is not sampled. Keep a
         // deterministic WRAP value rather than inventing uncaptured D3D9 state.
         out.desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-        out.desc.MipLODBias = 0.0f;
         out.desc.MaxAnisotropy = 1;
         out.desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
         out.desc.BorderColor[0] = 0.0f;
         out.desc.BorderColor[1] = 0.0f;
         out.desc.BorderColor[2] = 0.0f;
         out.desc.BorderColor[3] = 0.0f;
-        out.desc.MinLOD = 0.0f;
-        out.desc.MaxLOD = source.mipFilter == D3DTEXF_NONE
-            ? 0.0f
-            : D3D11_FLOAT32_MAX;
         out.exact = true;
         return out;
     }
@@ -719,7 +745,8 @@ namespace outrun::vr::dx11
                 !fixed_function_address_supported(stage.addressV))
                 out.unsupported |= FixedFunctionUnsupportedSamplerAddress;
 
-            if (!fixed_function_sampler_lod_supported(stage))
+            D3D11_SAMPLER_DESC lodDesc{};
+            if (!translate_fixed_function_sampler_lod(stage, lodDesc))
                 out.unsupported |= FixedFunctionUnsupportedSamplerLod;
         }
 

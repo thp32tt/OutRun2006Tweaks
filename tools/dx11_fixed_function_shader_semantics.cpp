@@ -871,30 +871,49 @@ int main()
             D3DTA_TEXTURE,
             D3DTA_CURRENT,
             0);
+        stages[0].mipFilter = D3DTEXF_LINEAR;
         stages[0].mipLodBiasBits = 0x3F000000u;
-        const auto biasReadiness =
+        stages[0].maxMipLevel = 1u;
+        const auto translatedReadiness =
             translate_fixed_function_readiness(
                 stages, true, 0x01, 0x01);
         require(
-            !biasReadiness.exact(),
-            "sampler LOD bias did not fail closed");
+            translatedReadiness.exact(),
+            "sampler LOD bias/MAXMIPLEVEL did not translate exactly");
         require(
-            (biasReadiness.unsupported &
+            (translatedReadiness.unsupported &
+             FixedFunctionUnsupportedSamplerLod) == 0,
+            "translated sampler LOD state retained blocker");
+
+        stages[0].mipLodBiasBits = 0x41800000u;
+        const auto outOfRangeBiasReadiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x01, 0x01);
+        require(
+            !outOfRangeBiasReadiness.exact(),
+            "out-of-range sampler LOD bias did not fail closed");
+        require(
+            (outOfRangeBiasReadiness.unsupported &
              FixedFunctionUnsupportedSamplerLod) != 0,
-            "sampler LOD bias did not set sampler-LOD blocker");
+            "out-of-range sampler LOD bias did not set blocker");
 
         stages[0].mipLodBiasBits = 0;
-        stages[0].maxMipLevel = 1;
-        const auto maxMipReadiness =
+        stages[0].maxMipLevel = D3D11_REQ_MIP_LEVELS;
+        const auto outOfRangeMaxMipReadiness =
             translate_fixed_function_readiness(
                 stages, true, 0x01, 0x01);
         require(
-            !maxMipReadiness.exact(),
-            "sampler MAXMIPLEVEL did not fail closed");
+            !outOfRangeMaxMipReadiness.exact(),
+            "out-of-range sampler MAXMIPLEVEL did not fail closed");
+
+        stages[0].mipFilter = D3DTEXF_NONE;
+        stages[0].maxMipLevel = 1u;
+        const auto noMipNonDefaultReadiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x01, 0x01);
         require(
-            (maxMipReadiness.unsupported &
-             FixedFunctionUnsupportedSamplerLod) != 0,
-            "sampler MAXMIPLEVEL did not set sampler-LOD blocker");
+            !noMipNonDefaultReadiness.exact(),
+            "no-mip non-default sampler LOD state did not fail closed");
     }
 
     {
