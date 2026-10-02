@@ -1721,52 +1721,32 @@ def main() -> None:
             + ", ".join(missing_r140_complete_bound_draw)
         )
 
-    r140_complete_bound_draw_contract = [
+    r140_complete_ia_parameter_drift_contract = [
         (
-            "struct NativeFixedFunctionCompleteBoundDrawReadiness",
-            NATIVE_BACKEND_HPP,
-            "R140 final live IA geometry evidence container",
-        ),
-        (
-            "compose_fixed_function_complete_bound_draw_readiness(",
-            NATIVE_BACKEND_HPP,
-            "R140 final live IA geometry composition API",
-        ),
-        (
-            "const auto geometryBinding = observe_fixed_function_geometry_binding(",
-            NATIVE_BACKEND_CPP,
-            "R140 final draw reobserves effective IA geometry",
-        ),
-        (
-            "geometryBinding.geometrySnapshotToken == draw.geometrySnapshotToken",
-            NATIVE_BACKEND_CPP,
-            "R140 live IA geometry must match sealed draw geometry",
-        ),
-        (
-            "R140 complete bound draw seals live IA geometry",
+            "R140 complete bound draw rejects live IA vertex stride drift",
             CONSTANT_BUFFER_PROBE,
-            "R140 positive final geometry proof",
+            "R140 exact vertex-stride drift fails closed at final gate",
         ),
         (
-            "R140 complete bound draw rejects live IA topology drift",
+            "R140 complete bound draw rejects live IA index offset drift",
             CONSTANT_BUFFER_PROBE,
-            "R140 live IA drift fail-closed proof",
+            "R140 exact index-offset drift fails closed at final gate",
         ),
         (
-            "R140 complete bound draw restores deterministic geometry snapshot",
+            "R140 complete bound draw restores exact IA binding parameters",
             CONSTANT_BUFFER_PROBE,
-            "R140 deterministic geometry restore proof",
+            "R140 deterministic IA parameter restore proof",
         ),
     ]
-    missing_r140_complete_bound_draw = [
+    missing_r140_complete_ia_parameter_drift = [
         meaning
-        for token, source, meaning in r140_complete_bound_draw_contract
+        for token, source, meaning in r140_complete_ia_parameter_drift_contract
         if token not in source
     ]
-    if missing_r140_complete_bound_draw:
+    if missing_r140_complete_ia_parameter_drift:
         raise SystemExit(
-            "DX11 R140 complete bound draw contract drift: "
-            + ", ".join(missing_r140_complete_bound_draw)
+            "DX11 R140 complete IA parameter drift contract: "
+            + ", ".join(missing_r140_complete_ia_parameter_drift)
         )
 
     runtime_textured_draw_users = []
