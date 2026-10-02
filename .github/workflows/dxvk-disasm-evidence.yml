@@ -7,8 +7,10 @@ on:
     paths:
       - 'tools/analyze_outrun_exe.py'
       - 'tools/verify_vr_backend_disasm_contract.py'
-      - 'tools/extract_dxvk_canonical_window.py'
+      - 'tools/verify_dxvk_continuation_window.py'
       - 'tools/test_extract_dxvk_canonical_window.py'
+      - 'tools/test_verify_dxvk_continuation_window.py'
+      - 'tools/extract_dxvk_canonical_window.py'
       - '.github/workflows/dxvk-disasm-evidence.yml'
   workflow_dispatch:
 
@@ -35,6 +37,10 @@ jobs:
       - name: Verify static disassembly contract
         shell: pwsh
         run: python tools/verify_vr_backend_disasm_contract.py
+
+      - name: Verify DXVK continuation evidence regression tests
+        shell: pwsh
+        run: python -m unittest discover -s tools -p 'test_verify_dxvk_continuation_window.py' -v
 
       - name: Verify canonical window extractor
         shell: pwsh
