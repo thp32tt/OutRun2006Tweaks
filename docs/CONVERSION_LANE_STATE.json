@@ -230,6 +230,16 @@
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false
+    },
+    {
+      "unit_id": "DX11_MANAGED_BUFFER_MIRROR_PLAN_READINESS_R127",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "d2535bae3db9e272c1279a2c9d2e1bc0e9fb1737",
+      "validation_bearing_sha": "d3492c12c001bc4bdcdece27852ef09bd6dbc219",
+      "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_GATE_BUILD_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false
     }
   ]
 }

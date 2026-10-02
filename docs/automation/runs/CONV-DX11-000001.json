@@ -1009,6 +1009,104 @@
       "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
       "runtime_claim": "NONE",
       "state_persisted": true
+    },
+    {
+      "unit_id": "DX11_MANAGED_BUFFER_MIRROR_PLAN_READINESS_R127",
+      "job_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_MANAGED_BUFFER_MIRROR_PLAN_READINESS",
+      "base_sha": "2e68fef8c557a4c4670501f3e095fdca639e7373",
+      "material_result_sha": "d2535bae3db9e272c1279a2c9d2e1bc0e9fb1737",
+      "validation_bearing_sha": "d3492c12c001bc4bdcdece27852ef09bd6dbc219",
+      "implementation_commits": [
+        "d2535bae3db9e272c1279a2c9d2e1bc0e9fb1737"
+      ],
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "R121 made ordinary MANAGED buffer mutation plans exact and R125 made the CPU-shadow writer consume that exact plan, but R119 per-resource mirror readiness still proved only shadow/mirror/device/descriptor identity. R127 closes that static gap by requiring the current MANAGED write mutation plan itself to remain exact before readiness can be nonzero.",
+      "summary": "Added mutationPlanExact to NativeManagedBufferMirrorReadiness, derives it from translate_buffer_mutation for the exact resource role/usage, requires it for ready=true, hashes it into the stale-snapshot identity, and extends the hosted constant-buffer probe plus source-graph drift guard. Native Draw* routing remains disabled.",
+      "changed_paths": [
+        "src/vr/d3d11/native_backend.hpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_constant_buffer_probe.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Read current GitHub HEAD, AGENTS.md, branch-local conversion state/run record, DX11 plan/work queue, regression knowledge/history and Issue #14 through the authenticated GitHub connector.",
+            "Tracked rapid same-JOB branch churn and skipped duplicate R125/output-state/generated-fan work that landed concurrently."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Confirmed R121 translate_buffer_mutation marks ordinary MANAGED read/write plans exact and requires CPU shadow.",
+            "Confirmed R125 repaired NativeManagedBufferShadow::write_range exact-plan polarity, while NativeManagedBufferMirrorReadiness still lacked any mutation-plan exactness proof."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "changed_paths": [
+            "src/vr/d3d11/native_backend.hpp",
+            "src/vr/d3d11/native_backend.cpp",
+            "tools/dx11_constant_buffer_probe.cpp",
+            "tools/verify_dx11_source_graph.py"
+          ],
+          "material_commit": "d2535bae3db9e272c1279a2c9d2e1bc0e9fb1737",
+          "details": [
+            "Added mutationPlanExact to per-resource managed-buffer mirror readiness.",
+            "Readiness now recomputes the exact MANAGED CPU-shadow write plan from role/source usage, requires it before ready=true and mixes the proof into snapshotToken.",
+            "Hosted WARP probe requires mutationPlanExact and source-graph guard fails closed on contract drift."
+          ]
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_REMOTE_STATIC_DESCENDANT_GATE",
+          "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_GATE_BUILD_NOT_CLAIMED",
+          "evidence": [
+            "Re-fetched exact material SHA d2535bae3db9e272c1279a2c9d2e1bc0e9fb1737 and verified only the four intended DX11 source/probe/guard paths changed; no NativeDrawPathActive=true was introduced.",
+            "Exact-SHA Backend Conversion Gate 36972529146 was cancelled during checkout by descendant branch churn and is not claimed as a pass.",
+            "Descendant d3492c12c001bc4bdcdece27852ef09bd6dbc219 contains the material SHA; Backend Conversion Gate 36972573777 passed Verify DX11 source graph, Verify DX11 dormant activation boundary and Test DX11 census analyzer. Win32 build completion is not claimed."
+          ]
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "d2535bae3db9e272c1279a2c9d2e1bc0e9fb1737",
+          "issue14_comment_id": 5946597727
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Dormant per-resource readiness/probe/guard only; no game Draw* routing, backend promotion, runtime candidate payload or release package behavior was activated."
+        },
+        "C6_STATE": {
+          "status": "PERSISTING_WITH_THIS_STATE_COMMIT",
+          "state_parent_head": "c3fe88163dd465219cf60c2700f6c88725da7064",
+          "exact_next_action": "Keep NativeDrawPathActive disabled. Continue from the current GitHub HEAD with the next independent DX11 readiness gap; generated triangle-fan index ownership/binding and geometry composition remain fail-closed until exact hosted/static validation, and exhaustive exact-build census plus Quest 3/VDXR parity remain required before activation."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "related_finding_or_regression_keys": [
+        "DX11-MANAGED-BUFFER-MUTATION-PLAN-R121",
+        "DX11-MANAGED-BUFFER-READINESS-R127"
+      ],
+      "issue14_comment_id": 5946597727,
+      "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_GATE_BUILD_NOT_CLAIMED",
+      "blocker": "Native DX11 Draw* remains disabled. Full Win32/WARP completion for this unit is not claimed; exhaustive exact-build census and Quest 3/VDXR graphics parity remain mandatory before activation.",
+      "next_action": "Keep NativeDrawPathActive disabled and continue the next independent DX11 readiness unit from the latest GitHub HEAD.",
+      "checkpoint": "C6_STATE",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE",
+      "state_persisted": true
     }
   ],
   "latest_continuation_unit": "DX11_DYNAMIC_OUTPUT_STATE_PROVENANCE_R124",
