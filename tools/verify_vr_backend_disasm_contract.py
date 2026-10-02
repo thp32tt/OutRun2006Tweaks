@@ -1066,6 +1066,129 @@ def verify_dxvk_continuation_chain() -> None:
                 f"{raw_call_census_guard}"
             )
 
+        # Keep the exhaustive raw-call census predicate source-coupled to the
+        # raw provenance it is supposed to validate. Requiring the gate name in
+        # proven is insufficient if a later refactor can replace the predicate
+        # with True or compare unrelated locals. Empty-census proofs must negate
+        # the provenance call-candidate list directly. Non-empty proofs must
+        # build their expected set from this continuation's CALLS declaration,
+        # build observed_raw_calls from the provenance candidate list, and make
+        # the final census predicate compare expected calls with an observed set.
+        census_assignments = [
+            node.value
+            for node in ast.walk(proof_ast)
+            if isinstance(node, ast.Assign)
+            and any(
+                isinstance(target, ast.Name)
+                and target.id == raw_call_census_guard
+                for target in node.targets
+            )
+        ]
+        if len(census_assignments) != 1:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} raw-call census predicate is not source-coupled: "
+                f"{raw_call_census_guard} assignments={len(census_assignments)}"
+            )
+        census_expr = census_assignments[0]
+
+        def provenance_field(node: ast.AST) -> str | None:
+            if not (
+                isinstance(node, ast.Subscript)
+                and isinstance(node.value, ast.Name)
+                and node.value.id == "provenance"
+            ):
+                return None
+            key = node.slice
+            if isinstance(key, ast.Constant) and isinstance(key.value, str):
+                return key.value
+            return None
+
+        if raw_call_census_guard == "raw_call_census_empty":
+            if not (
+                isinstance(census_expr, ast.UnaryOp)
+                and isinstance(census_expr.op, ast.Not)
+                and provenance_field(census_expr.operand)
+                    == "raw_outbound_rel32_candidates"
+            ):
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} raw-call census predicate is not source-coupled: "
+                    "raw_call_census_empty must directly negate provenance raw_outbound_rel32_candidates"
+                )
+        else:
+            expected_call_assignments = [
+                node.value
+                for node in ast.walk(proof_ast)
+                if isinstance(node, ast.Assign)
+                and any(
+                    isinstance(target, ast.Name)
+                    and target.id == "expected_raw_calls"
+                    for target in node.targets
+                )
+            ]
+            observed_call_assignments = [
+                node.value
+                for node in ast.walk(proof_ast)
+                if isinstance(node, ast.Assign)
+                and any(
+                    isinstance(target, ast.Name)
+                    and target.id == "observed_raw_calls"
+                    for target in node.targets
+                )
+            ]
+            expected_calls_symbol = f"{prefix}_CALLS"
+            expected_source_ok = bool(
+                len(expected_call_assignments) == 1
+                and isinstance(expected_call_assignments[0], ast.Call)
+                and isinstance(expected_call_assignments[0].func, ast.Name)
+                and expected_call_assignments[0].func.id == "set"
+                and len(expected_call_assignments[0].args) == 1
+                and not expected_call_assignments[0].keywords
+                and isinstance(expected_call_assignments[0].args[0], ast.Name)
+                and expected_call_assignments[0].args[0].id == expected_calls_symbol
+            )
+            if not expected_source_ok:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} raw-call census predicate is not source-coupled: "
+                    f"expected_raw_calls must be set({expected_calls_symbol})"
+                )
+
+            observed_source_ok = bool(
+                len(observed_call_assignments) == 1
+                and isinstance(observed_call_assignments[0], ast.SetComp)
+                and any(
+                    provenance_field(node) == "raw_outbound_rel32_candidates"
+                    for node in ast.walk(observed_call_assignments[0])
+                )
+            )
+            if not observed_source_ok:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} raw-call census predicate is not source-coupled: "
+                    "observed_raw_calls must derive from provenance raw_outbound_rel32_candidates"
+                )
+
+            census_names = {
+                node.id
+                for node in ast.walk(census_expr)
+                if isinstance(node, ast.Name)
+            }
+            census_has_equality = any(
+                isinstance(node, ast.Compare)
+                and any(isinstance(op, ast.Eq) for op in node.ops)
+                for node in ast.walk(census_expr)
+            )
+            observed_census_names = {
+                name for name in census_names if name.startswith("observed_")
+            }
+            if (
+                "expected_raw_calls" not in census_names
+                or not observed_census_names
+                or not census_has_equality
+            ):
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} raw-call census predicate is not source-coupled: "
+                    f"names={sorted(census_names)}"
+                )
+
         # Keep declared direct relative BRANCH metadata tied to the exact
         # decoded instruction rows. This catches off-by-one/stale branch RVAs,
         # omitted direct branches, and target-displacement drift before the
