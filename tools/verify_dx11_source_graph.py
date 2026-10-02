@@ -2045,10 +2045,18 @@ def main() -> None:
                 "DX11 R98 sampler-owner source drift: " + meaning
             )
 
-    if "PSSetSamplers(" in NATIVE_BACKEND_CPP:
-        raise SystemExit(
-            "DX11 R98 sampler owner must remain non-routing; found PSSetSamplers binding"
-        )
+    for token, meaning in {
+        "bind_fixed_function_texture_stage_for_observation":
+            "dormant fixed-function texture-stage binding entrypoint",
+        "D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT":
+            "sampler-slot fail-closed bound",
+        "context->PSSetSamplers(slot, 1, &samplerState)":
+            "same-stage sampler binding",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 dormant texture-stage sampler binding drift: " + meaning
+            )
 
     runtime_sampler_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
@@ -2119,11 +2127,20 @@ def main() -> None:
                 "DX11 R99 texture-view source drift: " + meaning
             )
 
-    if "PSSetShaderResources(" in NATIVE_BACKEND_CPP:
-        raise SystemExit(
-            "DX11 R99 texture view must remain non-routing; "
-            "found PSSetShaderResources binding"
-        )
+    for token, meaning in {
+        "D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT":
+            "SRV-slot fail-closed bound",
+        "samplerDevice != textureDevice":
+            "cross-device owner rejection",
+        "contextDevice.Get() != samplerDevice":
+            "foreign-context rejection",
+        "context->PSSetShaderResources(slot, 1, &shaderResource)":
+            "same-stage SRV binding",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 dormant texture-stage SRV binding drift: " + meaning
+            )
 
     runtime_texture_view_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
@@ -2175,6 +2192,18 @@ def main() -> None:
             "R99 shutdown lifecycle",
         "DX11 fixed-function texture view ownership R99: PASS":
             "R99 probe completion marker",
+        "DX11 dormant texture-stage same-device bind":
+            "texture-stage positive binding case",
+        "DX11 dormant texture-stage binding preserves sampler/SRV identity":
+            "texture-stage binding readback identity",
+        "DX11 dormant texture-stage sampler slot overflow fails closed":
+            "texture-stage sampler slot bound",
+        "DX11 dormant texture-stage SRV slot overflow fails closed":
+            "texture-stage SRV slot bound",
+        "DX11 dormant texture-stage foreign context fails closed":
+            "texture-stage foreign-context rejection",
+        "DX11 dormant texture-stage cross-device owners fail closed":
+            "texture-stage cross-device owner rejection",
     }.items():
         if token not in CONSTANT_BUFFER_PROBE:
             raise SystemExit(
