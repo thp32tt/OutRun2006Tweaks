@@ -3,27 +3,60 @@
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
   "attempt": "2/3",
-  "base_sha": "ec42fd8c6a29c5cf2dc7811ae2e73c83307fe15c",
-  "result_sha": "PENDING",
-  "automation_validation": "UNTESTED_PENDING_GATE",
+  "initial_controller_head": "83e00209698d06d0c1430b38883df037322986e7",
+  "reconciled_head_before_state_commit": "653088a0a16d7abd66549dbbbcc414eb763c42e0",
+  "validation_bearing_source_sha": "85cfe3c20df78aa50e4c19ca94f59bb840f02bf8",
+  "result_sha": "PENDING_STATE_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA_GATE",
   "runtime_validation": "UNTESTED",
   "checkpoint": "C6_STATE",
-  "work_type": "dxvk_conversion_checkpoint",
-  "selected_work_item": "CONTINUE_FROM_EXACT_INSTRUCTION_BOUNDARY_0x00182730",
-  "failure_investigation": {
-    "workflow_run": 36958860314,
-    "conclusion": "cancelled",
-    "job_inspection": "no_jobs_returned_after_completion",
-    "confirmed_failure": "No failed step evidence available; cancellation occurred before actionable job log evidence was exposed."
-  },
-  "changes": {
-    "source_changed": false,
-    "reason": "Do not modify conversion source without a reproducible failing gate step. Preserve evidence and continue bounded DXVK static work."
-  },
-  "evidence": [
-    "HEAD run 36958860314 was d5ae35f13b5ecf14d385401ef8ac0a3a34d8f259.",
-    "CONVERSION_LANE_STATE.json keeps DXVK lane precedence.",
-    "Runtime validation remains UNTESTED."
+  "status": "SOURCE_IMPLEMENTED_EXACT_SHA_VALIDATION_PENDING",
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R278_1827AC_PROVENANCE",
+  "summary": "Implemented DXVK disassembly-lane progress instead of review-only recovery: optimized the analyzer prologue hot path, added a fail-closed canonical-EXE provenance collector for 0x001827AC..0x001827EC, and extended the backend disassembly contract. Concurrent same-lane work advanced HEAD and cancelled the first exact-SHA PR runs, so the task is reconciled onto the latest branch state before re-gating.",
+  "source_commits": [
+    {
+      "sha": "e8405ba3c0910c361a0bc161bb92031367ecc3f3",
+      "message": "[AUTO:CONVERSION-DXVK-00278] optimize disassembly prologue scan",
+      "paths": ["tools/analyze_outrun_exe.py"]
+    },
+    {
+      "sha": "0a23b2d7530599470eff936e0b44f5bd01629a2c",
+      "message": "[AUTO:CONVERSION-DXVK-00278] capture 0x1827AC continuation provenance",
+      "paths": ["tools/analyze_outrun_exe.py"]
+    },
+    {
+      "sha": "85cfe3c20df78aa50e4c19ca94f59bb840f02bf8",
+      "message": "[AUTO:CONVERSION-DXVK-00278] gate continuation provenance and analyzer hot path",
+      "paths": ["tools/verify_vr_backend_disasm_contract.py"]
+    }
   ],
-  "next_action": "Continue exact canonical disassembly window from 0x00182730 and create the next bounded DXVK evidence commit; do not claim runtime or CI success."
+  "implementation": {
+    "analyzer_hot_path": "guess_function_start uses bounded bytes.rfind instead of a Python per-byte reverse loop while preserving nearest known-prologue selection.",
+    "continuation_start_rva": "0x001827AC",
+    "continuation_probe_end_rva": "0x001827EC",
+    "probe_len": 64,
+    "required_overlap": "0f",
+    "expected_status": "EXACT_EXE_1827AC_TO_1827EC_PROVENANCE_CAPTURED",
+    "semantic_scope": "RAW_BYTES_OVERLAP_AND_REL32_CENSUS_ONLY",
+    "function_entry_status": "UNRESOLVED",
+    "render_ownership_status": "UNRESOLVED",
+    "hud_ownership_status": "UNRESOLVED"
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00278.json"
+  ],
+  "validation_observed": {
+    "source_sha": "85cfe3c20df78aa50e4c19ca94f59bb840f02bf8",
+    "backend_disassembly_contract_step": "PASS_BEFORE_SUPERSEDE",
+    "pr_build": "CANCELLED_BY_NEWER_BRANCH_HEAD",
+    "pr_hud_inspector": "CANCELLED_BY_NEWER_BRANCH_HEAD",
+    "pr_openxr": "CANCELLED_BY_NEWER_BRANCH_HEAD",
+    "note": "Cancellation was caused by concurrent same-lane HEAD advancement, not by a confirmed source failure."
+  },
+  "issue14_comments": [5944961256, 5944961557],
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "next_action": "Run exact-SHA automation on this reconciled checkpoint. If provenance passes, exact-decode only complete instructions beginning at 0x001827AC in the next bounded checkpoint; keep runtime validation UNTESTED until Quest 3/VDXR evidence exists."
 }
