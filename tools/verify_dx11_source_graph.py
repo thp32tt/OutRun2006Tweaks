@@ -128,6 +128,56 @@ def main() -> None:
             + ", ".join(missing_r165_dither)
         )
 
+    r170_texture_coordinate_wrap_contract = [
+        ("std::array<DWORD, 8> textureCoordinateWrap{};", D3D9_DRAW_STATE_HPP,
+         "R170 tracked WRAP0..7 state"),
+        ("D3DRS_WRAP0, D3DRS_WRAP1, D3DRS_WRAP2, D3DRS_WRAP3",
+         D3D9_RENDER_STATE_CAPTURE, "R170 primed WRAP0..3"),
+        ("D3DRS_WRAP4, D3DRS_WRAP5, D3DRS_WRAP6, D3DRS_WRAP7",
+         D3D9_RENDER_STATE_CAPTURE, "R170 primed WRAP4..7"),
+        ("read(D3DRS_WRAP0, out.textureCoordinateWrap[0]);",
+         D3D9_RENDER_STATE_CAPTURE, "R170 live WRAP0 capture"),
+        ("read(D3DRS_WRAP7, out.textureCoordinateWrap[7]);",
+         D3D9_RENDER_STATE_CAPTURE, "R170 live WRAP7 capture"),
+        ("PipelineUnsupportedTextureCoordinateWrap = 1u << 18",
+         PIPELINE_TRANSLATION_HPP, "R170 dedicated unsupported bit"),
+        ("for (const auto wrap : source.textureCoordinateWrap)",
+         PIPELINE_TRANSLATION_CPP, "R170 all-stage readiness scan"),
+        ("out.unsupported |= PipelineUnsupportedTextureCoordinateWrap;",
+         PIPELINE_TRANSLATION_CPP, "R170 readiness blocker"),
+        ("R170 zero texture-coordinate wrap masks must remain exact",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R170 positive probe"),
+        ("R170 nonzero D3DRS_WRAP0 must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R170 WRAP0 negative probe"),
+        ("R170 nonzero D3DRS_WRAP7 must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R170 WRAP7 negative probe"),
+        ("DX11 texture-coordinate wrap fail-closed R170: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R170 probe completion marker"),
+        ("bool textureCoordinateWrapObservationComplete{};", RUNTIME_CENSUS,
+         "R170 census observation identity"),
+        ("for (const auto wrap : sig.textureCoordinateWrap)",
+         RUNTIME_CENSUS, "R170 census value hash"),
+        ("signature.textureCoordinateWrap = source.textureCoordinateWrap;",
+         RUNTIME_CENSUS, "R170 census propagation"),
+        ("VR DX11 R170 texture-coordinate wrap state#{}",
+         RUNTIME_CENSUS, "R170 detailed census telemetry"),
+    ]
+    missing_r170_texture_coordinate_wrap = [
+        meaning for token, source, meaning in r170_texture_coordinate_wrap_contract
+        if token not in source
+    ]
+    if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_WRAP0") < 2:
+        missing_r170_texture_coordinate_wrap.append(
+            "R170 WRAP0 must be both primed and captured")
+    if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_WRAP7") < 2:
+        missing_r170_texture_coordinate_wrap.append(
+            "R170 WRAP7 must be both primed and captured")
+    if missing_r170_texture_coordinate_wrap:
+        raise SystemExit(
+            "DX11 R170 texture-coordinate wrap contract drift: "
+            + ", ".join(missing_r170_texture_coordinate_wrap)
+        )
+
     r167_dither_identity_contract = [
         ("bool ditherObservationComplete{};", RUNTIME_CENSUS,
          "R167 census dither observation identity"),
@@ -185,12 +235,12 @@ def main() -> None:
     for token, meaning in [
         ("DX11 R166 unsupported census sentinel out of range",
          "compile-time sentinel bounds assertion"),
-        ("dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={}",
-         "R165/R166 log labels for bits 12..17"),
+        ("dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={},texCoordWrap={}",
+         "R170 log labels for bits 12..18"),
         ("unsupported[12], unsupported[13], unsupported[14], unsupported[15],",
          "R165/R166 log arguments for bits 12..15"),
-        ("unsupported[16], unsupported[17]);",
-         "R165/R166 log arguments for bits 16..17"),
+        ("unsupported[16], unsupported[17], unsupported[18]);",
+         "R170 log arguments for bits 16..18"),
     ]:
         if token not in RUNTIME_CENSUS:
             r166_unsupported_census_errors.append(meaning)
@@ -3444,18 +3494,26 @@ def main() -> None:
          "current unsupported vertex-blend parser"),
         ("?P<dither>", analyzer,
          "current unsupported dither parser"),
+        ("?P<texCoordWrap>", analyzer,
+         "R170 texture-coordinate wrap parser"),
         (
             '"dualSource",\n            "shadeMode",\n'
             '            "clipping",\n            "depthBias",\n'
-            '            "vertexBlend",\n            "dither",',
+            '            "vertexBlend",\n            "dither",\n'
+            '            "texCoordWrap",',
             analyzer,
-            "current unsupported fields participate in aggregate exactness",
+            "R170 unsupported fields participate in aggregate exactness",
         ),
         ("extended_unsupported = run_case(", analyzer_test,
          "current unsupported-tail analyzer regression fixture"),
         ('extended_unsupported["UnsupportedTotalLatest"] == 27',
          analyzer_test,
          "current unsupported-tail aggregate regression assertion"),
+        ("r170_wrap = run_case(", analyzer_test,
+         "R170 wrap analyzer regression fixture"),
+        ('r170_wrap["UnsupportedTotalLatest"] == 8',
+         analyzer_test,
+         "R170 wrap analyzer aggregate assertion"),
     ]
     missing_current_unsupported_analyzer = [
         meaning
