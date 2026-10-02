@@ -1921,6 +1921,19 @@ int main()
         !lockBridgeShadow.mirror_ready(),
         "R104 LockRect bridge shutdown clears capture and ownership");
 
+    managedIndexBuffer.shutdown();
+    managedVertexBuffer.shutdown();
+    require(
+        !managedIndexBuffer.ready() &&
+        !managedIndexBuffer.shadow_valid() &&
+        !managedIndexBuffer.mirror_ready() &&
+        managedIndexBuffer.mirror_buffer() == nullptr &&
+        !managedVertexBuffer.ready() &&
+        !managedVertexBuffer.shadow_valid() &&
+        !managedVertexBuffer.mirror_ready() &&
+        managedVertexBuffer.mirror_buffer() == nullptr,
+        "R113 managed buffer shutdown releases CPU/GPU ownership");
+
     managedShadow.shutdown();
     require(
         !managedShadow.ready() &&
@@ -2013,6 +2026,7 @@ int main()
     std::cout << "DX11 managed Texture2D readiness snapshot token R110: PASS\n";
     std::cout << "DX11 managed Texture2D mirror descriptor exactness R111: PASS\n";
     std::cout << "DX11 fixed-function pipeline translation identity R112: PASS\n";
+    std::cout << "DX11 managed vertex/index buffer mirror R113: PASS\n";
     std::cout << "DX11 fixed-function activation evidence composition R115: PASS\n";
     std::cout << "DX11 fixed-function render-state bundle R116: PASS\n";
     return 0;

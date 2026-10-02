@@ -2642,6 +2642,79 @@ def main() -> None:
                 "DX11 R114 surface-mirror probe drift: " + meaning
             )
 
+    r113_managed_buffer_header = {
+        "class NativeManagedBufferShadow final":
+            "R113 dormant managed VB/IB shadow owner",
+        "bool write_range(":
+            "R113 bounded managed-buffer CPU shadow mutation",
+        "bool recreate_and_upload_mirror(ID3D11Device* device) noexcept":
+            "R113 generation-bound D3D11 buffer mirror creation",
+        "bool mirror_descriptor_exact(":
+            "R113 exact buffer descriptor/device verifier",
+        "ManagedMirrorLifetimeState lifetime_{}":
+            "R113 shared Reset-generation lifetime state",
+        "Microsoft::WRL::ComPtr<ID3D11Buffer> mirror_buffer_":
+            "R113 owned D3D11 buffer mirror",
+    }
+    missing_r113_header = [
+        meaning
+        for token, meaning in r113_managed_buffer_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r113_header:
+        raise SystemExit(
+            "DX11 R113 managed-buffer mirror header drift: "
+            + ", ".join(missing_r113_header)
+        )
+
+    for token, meaning in {
+        "translate_buffer_mutation(":
+            "R113 mutation contract prerequisite",
+        "BufferMutationUpdateKind::ManagedCpuShadowWrite":
+            "R113 writable managed-buffer shadow gate",
+        "if (!shadow_valid() &&":
+            "R113 first-write completeness fail-closed guard",
+        "D3D11_BIND_VERTEX_BUFFER":
+            "R113 vertex-buffer bind mapping",
+        "D3D11_BIND_INDEX_BUFFER":
+            "R113 index-buffer bind mapping",
+        "device->CreateBuffer(":
+            "R113 concrete D3D11 buffer mirror allocation",
+        "lifetime_ = note_managed_mirror_upload(lifetime_)":
+            "R113 mirror generation/shadow-version acknowledgement",
+        "lifetime_ = advance_managed_device_generation(lifetime_)":
+            "R113 Reset generation advance",
+        "mirror_buffer_->GetDevice(":
+            "R113 exact expected-device verification",
+        "desc.StructureByteStride == 0":
+            "R113 exact plain-buffer descriptor check",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R113 managed-buffer mirror source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R113 first managed buffer write must cover the full resource":
+            "R113 incomplete-initial-shadow negative proof",
+        "R113 managed vertex-buffer mirror bytes":
+            "R113 WARP mirror byte-identity proof",
+        "R113 partial managed buffer update invalidates stale mirror":
+            "R113 stale mirror invalidation proof",
+        "R113 Reset preserves managed buffer CPU shadow only":
+            "R113 Reset lifetime proof",
+        "R113 managed index-buffer bind contract":
+            "R113 index-buffer descriptor proof",
+        "R113 managed buffer shutdown releases CPU/GPU ownership":
+            "R113 explicit shutdown lifetime proof",
+        "DX11 managed vertex/index buffer mirror R113: PASS":
+            "R113 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R113 managed-buffer mirror probe drift: " + meaning
+            )
+
     r115_activation_header = {
         "struct NativeFixedFunctionActivationReadiness":
             "R115 composite activation readiness",
