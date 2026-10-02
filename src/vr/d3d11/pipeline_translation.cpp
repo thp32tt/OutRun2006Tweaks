@@ -151,6 +151,7 @@ namespace outrun::vr::dx11
             case D3DTA_TEXTURE:
             case D3DTA_TFACTOR:
             case D3DTA_CONSTANT:
+            case D3DTA_TEMP:
             case D3DTA_SPECULAR:
                 return true;
             default:
@@ -214,6 +215,51 @@ namespace outrun::vr::dx11
         bool fixed_function_argument_uses_current(DWORD value) noexcept
         {
             return (value & D3DTA_SELECTMASK) == D3DTA_CURRENT;
+        }
+
+        bool fixed_function_argument_uses_temp(DWORD value) noexcept
+        {
+            return (value & D3DTA_SELECTMASK) == D3DTA_TEMP;
+        }
+
+        bool fixed_function_op_uses_temp_argument(
+            DWORD op, DWORD arg0, DWORD arg1, DWORD arg2) noexcept
+        {
+            switch (op)
+            {
+            case D3DTOP_SELECTARG1:
+            case D3DTOP_PREMODULATE:
+                return fixed_function_argument_uses_temp(arg1);
+            case D3DTOP_SELECTARG2:
+                return fixed_function_argument_uses_temp(arg2);
+            case D3DTOP_MODULATE:
+            case D3DTOP_MODULATE2X:
+            case D3DTOP_MODULATE4X:
+            case D3DTOP_ADD:
+            case D3DTOP_ADDSIGNED:
+            case D3DTOP_ADDSIGNED2X:
+            case D3DTOP_ADDSMOOTH:
+            case D3DTOP_BLENDDIFFUSEALPHA:
+            case D3DTOP_BLENDCURRENTALPHA:
+            case D3DTOP_BLENDFACTORALPHA:
+            case D3DTOP_BLENDTEXTUREALPHA:
+            case D3DTOP_BLENDTEXTUREALPHAPM:
+            case D3DTOP_MODULATEALPHA_ADDCOLOR:
+            case D3DTOP_MODULATECOLOR_ADDALPHA:
+            case D3DTOP_MODULATEINVALPHA_ADDCOLOR:
+            case D3DTOP_MODULATEINVCOLOR_ADDALPHA:
+            case D3DTOP_DOTPRODUCT3:
+            case D3DTOP_SUBTRACT:
+                return fixed_function_argument_uses_temp(arg1) ||
+                       fixed_function_argument_uses_temp(arg2);
+            case D3DTOP_MULTIPLYADD:
+            case D3DTOP_LERP:
+                return fixed_function_argument_uses_temp(arg0) ||
+                       fixed_function_argument_uses_temp(arg1) ||
+                       fixed_function_argument_uses_temp(arg2);
+            default:
+                return false;
+            }
         }
 
         bool fixed_function_op_uses_current_argument(
@@ -309,6 +355,9 @@ namespace outrun::vr::dx11
                 base = premodulateCurrent
                     ? "(current * sampled" + std::to_string(stageIndex) + ")"
                     : "current";
+                break;
+            case D3DTA_TEMP:
+                base = "temp";
                 break;
             case D3DTA_TEXTURE:
                 base = "sampled" + std::to_string(stageIndex);
@@ -1062,6 +1111,7 @@ namespace outrun::vr::dx11
         bool colorChainDisabled = false;
         bool premodulateColor = false;
         bool premodulateAlpha = false;
+        bool tempAvailable = false;
         for (std::size_t stageIndex = 0;
              stageIndex < source.size(); ++stageIndex)
         {
@@ -1089,10 +1139,22 @@ namespace outrun::vr::dx11
                 stage.alphaOp, stage.alphaArg0, stage.alphaArg1, stage.alphaArg2,
                 FixedFunctionUnsupportedAlphaOp, true, out);
 
-            // R173: generated fixed-function HLSL always writes CURRENT after
-            // each active stage. D3DTA_TEMP would preserve CURRENT and route
-            // the new result through TEMP, which changes later-stage inputs.
-            if (stage.resultArg != D3DTA_CURRENT)
+            // R200: TEMP is a distinct cross-stage register. A stage may read
+            // it only after an earlier active stage wrote RESULTARG=TEMP; the
+            // write itself happens after this stage's arguments are consumed.
+            const bool readsTemp =
+                fixed_function_op_uses_temp_argument(
+                    stage.colorOp, stage.colorArg0,
+                    stage.colorArg1, stage.colorArg2) ||
+                fixed_function_op_uses_temp_argument(
+                    stage.alphaOp, stage.alphaArg0,
+                    stage.alphaArg1, stage.alphaArg2);
+            if (readsTemp && !tempAvailable)
+                out.unsupported |= FixedFunctionUnsupportedResultArg;
+
+            if (stage.resultArg == D3DTA_TEMP)
+                tempAvailable = true;
+            else if (stage.resultArg != D3DTA_CURRENT)
                 out.unsupported |= FixedFunctionUnsupportedResultArg;
 
             const auto stageBit = static_cast<std::uint8_t>(
@@ -1251,7 +1313,8 @@ namespace outrun::vr::dx11
         shader +=
             "float4 main(PSInput input) : SV_Target\n"
             "{\n"
-            "    float4 current = input.diffuse;\n";
+            "    float4 current = input.diffuse;\n"
+            "    float4 temp = 0.0f;\n";
 
         premodulateColor = false;
         premodulateAlpha = false;
@@ -1301,9 +1364,19 @@ namespace outrun::vr::dx11
                 stage.alphaOp, stage.alphaArg0, stage.alphaArg1, stage.alphaArg2,
                 stageIndex, ".a", textureFactor, stage.stageConstant,
                 premodulateCurrentAlpha);
-            shader +=
-                ";\n        current = float4(nextColor, nextAlpha);\n"
-                "    }\n";
+            shader += ";\n";
+            if (stage.resultArg == D3DTA_TEMP)
+            {
+                shader +=
+                    "        temp = float4(nextColor, nextAlpha);\n"
+                    "    }\n";
+            }
+            else
+            {
+                shader +=
+                    "        current = float4(nextColor, nextAlpha);\n"
+                    "    }\n";
+            }
 
             premodulateColor = stage.colorOp == D3DTOP_PREMODULATE;
             premodulateAlpha = stage.alphaOp == D3DTOP_PREMODULATE;

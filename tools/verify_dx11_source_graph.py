@@ -1134,6 +1134,48 @@ def main() -> None:
             + ", ".join(missing_r198_d3dta_specular)
         )
 
+    r200_temp_register_contract = [
+        ("case D3DTA_TEMP:", PIPELINE_TRANSLATION_CPP,
+         "R200 D3DTA_TEMP selector support"),
+        ("fixed_function_op_uses_temp_argument(",
+         PIPELINE_TRANSLATION_CPP,
+         "R200 TEMP dependency classifier"),
+        ("bool tempAvailable = false;", PIPELINE_TRANSLATION_CPP,
+         "R200 readiness TEMP lifetime"),
+        ("stage.resultArg == D3DTA_TEMP", PIPELINE_TRANSLATION_CPP,
+         "R200 TEMP result destination"),
+        ('"    float4 temp = 0.0f;\\n"', PIPELINE_TRANSLATION_CPP,
+         "R200 generated HLSL TEMP register"),
+        ('"        temp = float4(nextColor, nextAlpha);\\n"',
+         PIPELINE_TRANSLATION_CPP,
+         "R200 generated HLSL TEMP write"),
+        ("R200 D3DTSS_RESULTARG TEMP write/read chain must become exact",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R200 hosted TEMP write/read fixture"),
+        ("R200 uninitialized D3DTA_TEMP read must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R200 uninitialized TEMP fail-closed fixture"),
+        ("R200 TEMP register fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R200 offline compile assertion"),
+        ("DX11 fixed-function RESULTARG TEMP register support R200: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R200 hosted probe completion"),
+    ]
+    missing_r200_temp_register = [
+        meaning
+        for token, source, meaning in r200_temp_register_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTA_TEMP:") < 2:
+        missing_r200_temp_register.append(
+            "R200 TEMP must participate in selector validation and HLSL translation")
+    if missing_r200_temp_register:
+        raise SystemExit(
+            "DX11 R200 fixed-function TEMP register contract drift: "
+            + ", ".join(missing_r200_temp_register)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.

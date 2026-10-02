@@ -322,41 +322,87 @@ int main()
     }
 
     {
-        auto currentStages = stages;
-        currentStages[0].colorOp = D3DTOP_SELECTARG1;
-        currentStages[0].colorArg1 = D3DTA_DIFFUSE;
-        currentStages[0].alphaOp = D3DTOP_SELECTARG1;
-        currentStages[0].alphaArg1 = D3DTA_DIFFUSE;
-        currentStages[0].resultArg = D3DTA_CURRENT;
-
-        const auto currentReadiness = translate_fixed_function_readiness(
-            currentStages, true, 0x00, 0x00);
-        require(
-            currentReadiness.exact() &&
-            (currentReadiness.unsupported &
-             FixedFunctionUnsupportedResultArg) == 0,
-            "R173 default D3DTSS_RESULTARG CURRENT must remain exact");
-
-        auto tempStages = currentStages;
+        std::array<FixedFunctionStageState, 8> tempStages{};
+        tempStages[0].colorOp = D3DTOP_SELECTARG1;
+        tempStages[0].colorArg1 = D3DTA_DIFFUSE;
+        tempStages[0].alphaOp = D3DTOP_SELECTARG1;
+        tempStages[0].alphaArg1 = D3DTA_DIFFUSE;
         tempStages[0].resultArg = D3DTA_TEMP;
-        const auto tempReadiness = translate_fixed_function_readiness(
-            tempStages, true, 0x00, 0x00);
-        require(
-            !tempReadiness.exact() &&
-            (tempReadiness.unsupported &
-             FixedFunctionUnsupportedResultArg) != 0,
-            "R173 D3DTSS_RESULTARG TEMP must fail closed");
+        tempStages[0].minFilter = D3DTEXF_POINT;
+        tempStages[0].magFilter = D3DTEXF_POINT;
+        tempStages[0].mipFilter = D3DTEXF_NONE;
 
-        const auto tempPipeline =
-            translate_fixed_function_pipeline_with_shader_semantics(
-                base_state(), true, tempStages, true,
-                0x00, 0x00, textureTypes);
+        tempStages[1].colorOp = D3DTOP_ADD;
+        tempStages[1].colorArg1 = D3DTA_TEMP;
+        tempStages[1].colorArg2 = D3DTA_CURRENT;
+        tempStages[1].alphaOp = D3DTOP_ADD;
+        tempStages[1].alphaArg1 = D3DTA_TEMP;
+        tempStages[1].alphaArg2 = D3DTA_CURRENT;
+        tempStages[1].resultArg = D3DTA_CURRENT;
+        tempStages[1].minFilter = D3DTEXF_POINT;
+        tempStages[1].magFilter = D3DTEXF_POINT;
+        tempStages[1].mipFilter = D3DTEXF_NONE;
+
+        const auto tempReadiness = translate_fixed_function_readiness(
+            tempStages, true, 0x00u, 0x00u);
         require(
-            !tempPipeline.exact() &&
-            !tempPipeline.pixelShader.generated() &&
-            (tempPipeline.pixelShader.unsupported &
-             FixedFunctionShaderPrototypeUnsupportedNotReady) != 0,
-            "R173 TEMP result destination reached generated fixed-function HLSL");
+            tempReadiness.exact() &&
+            (tempReadiness.unsupported &
+             FixedFunctionUnsupportedResultArg) == 0,
+            "R200 D3DTSS_RESULTARG TEMP write/read chain must become exact");
+
+        const auto tempShader =
+            generate_fixed_function_pixel_shader_prototype(
+                tempStages, true, 0x00u, 0x00u, textureTypes);
+        require(
+            tempShader.generated() && tempShader.activeStages == 2,
+            "R200 TEMP register fixture must generate a two-stage shader");
+        require(
+            tempShader.source.find("float4 temp = 0.0f;") !=
+                std::string::npos &&
+            tempShader.source.find(
+                "temp = float4(nextColor, nextAlpha);") !=
+                std::string::npos &&
+            tempShader.source.find(
+                "float3 nextColor = temp.rgb + current.rgb;") !=
+                std::string::npos &&
+            tempShader.source.find(
+                "float nextAlpha = temp.a + current.a;") !=
+                std::string::npos,
+            "R200 TEMP register shader dataflow drift");
+
+        const auto tempCompile =
+            compile_fixed_function_pixel_shader_prototype(tempShader);
+        require(
+            tempCompile.attempted && tempCompile.succeeded &&
+            tempCompile.result == S_OK && tempCompile.bytecodeBytes != 0,
+            "R200 TEMP register fixed-function shader prototype did not compile");
+
+        auto uninitializedTemp = tempStages;
+        uninitializedTemp[0].resultArg = D3DTA_CURRENT;
+        uninitializedTemp[0].colorArg1 = D3DTA_TEMP;
+        uninitializedTemp[0].alphaArg1 = D3DTA_TEMP;
+        uninitializedTemp[1].colorOp = D3DTOP_DISABLE;
+        uninitializedTemp[1].alphaOp = D3DTOP_DISABLE;
+        const auto uninitializedReadiness =
+            translate_fixed_function_readiness(
+                uninitializedTemp, true, 0x00u, 0x00u);
+        require(
+            !uninitializedReadiness.exact() &&
+            (uninitializedReadiness.unsupported &
+             FixedFunctionUnsupportedResultArg) != 0,
+            "R200 uninitialized D3DTA_TEMP read must fail closed");
+
+        auto invalidDestination = tempStages;
+        invalidDestination[0].resultArg = D3DTA_DIFFUSE;
+        const auto invalidDestinationReadiness =
+            translate_fixed_function_readiness(
+                invalidDestination, true, 0x00u, 0x00u);
+        require(
+            !invalidDestinationReadiness.exact() &&
+            (invalidDestinationReadiness.unsupported &
+             FixedFunctionUnsupportedResultArg) != 0,
+            "R200 invalid D3DTSS_RESULTARG selector must fail closed");
     }
 
     {
@@ -1610,7 +1656,7 @@ int main()
         << "DX11 fixed-function D3DTOP_SUBTRACT support R177: PASS\n"
         << "DX11 fixed-function argument modifiers R178: PASS\n"
         << "DX11 fixed-function D3DTOP_ADD support: PASS\n"
-        << "DX11 fixed-function RESULTARG fail-closed R173: PASS\n"
+        << "DX11 fixed-function RESULTARG TEMP register support R200: PASS\n"
         << "DX11 multisample raster provenance R171: PASS\n"
         << "DX11 texture-coordinate wrap fail-closed R170: PASS\n"
         << "DX11 line-raster provenance R168: PASS\n"
