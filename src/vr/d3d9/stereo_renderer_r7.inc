@@ -928,6 +928,8 @@ namespace OutRunVRStereo
 				D3DRS_DEPTHBIAS, D3DRS_SLOPESCALEDEPTHBIAS,
 				D3DRS_DITHERENABLE,
 				D3DRS_LASTPIXEL, D3DRS_ANTIALIASEDLINEENABLE,
+				D3DRS_WRAP0, D3DRS_WRAP1, D3DRS_WRAP2, D3DRS_WRAP3,
+				D3DRS_WRAP4, D3DRS_WRAP5, D3DRS_WRAP6, D3DRS_WRAP7,
 				D3DRS_POINTSIZE, D3DRS_POINTSIZE_MIN,
 				D3DRS_POINTSIZE_MAX, D3DRS_POINTSPRITEENABLE,
 				D3DRS_POINTSCALEENABLE, D3DRS_POINTSCALE_A,
@@ -1746,6 +1748,15 @@ namespace OutRunVRStereo
 		read(D3DRS_POINTSCALE_A, out.pointScaleABits);
 		read(D3DRS_POINTSCALE_B, out.pointScaleBBits);
 		read(D3DRS_POINTSCALE_C, out.pointScaleCBits);
+		// R170 preserves all fixed-function texture-coordinate wrap masks.
+		read(D3DRS_WRAP0, out.textureCoordinateWrap[0]);
+		read(D3DRS_WRAP1, out.textureCoordinateWrap[1]);
+		read(D3DRS_WRAP2, out.textureCoordinateWrap[2]);
+		read(D3DRS_WRAP3, out.textureCoordinateWrap[3]);
+		read(D3DRS_WRAP4, out.textureCoordinateWrap[4]);
+		read(D3DRS_WRAP5, out.textureCoordinateWrap[5]);
+		read(D3DRS_WRAP6, out.textureCoordinateWrap[6]);
+		read(D3DRS_WRAP7, out.textureCoordinateWrap[7]);
 		// R161 keeps D3D9 clipping/user-plane semantics explicit for DX11
 		// readiness instead of silently assuming the D3D11 default.
 		read(D3DRS_CLIPPING, out.clipping);
