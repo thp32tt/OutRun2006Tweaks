@@ -5941,6 +5941,74 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authenticated DXVK canonical frontier and continue the next runnable raw/proof/static unit from current HEAD; every proof assigning expected_external_targets must now match decoded out-of-prefix BRANCH targets and gate final proven."
+    },
+    {
+      "unit_id": "DXVK_F67_CANONICAL_CONTROL_FLOW_0x1832ED_TO_0x18332C",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "5fba09f9021a1b5384b14c4ebfabc24b7445ed36",
+      "validation_bearing_result_sha": "5fba09f9021a1b5384b14c4ebfabc24b7445ed36",
+      "commit_message": "dxvk: prove canonical 0x1832ed control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact-decoded the validated 0x001832ED mandatory-overlap window through 0x0018332C as 28 contiguous complete instructions; proved four direct forward branches and one direct rel32 CALL, carried unresolved targets 0x00183336/0x0018333E/0x00183363, and preserved the trailing E8 cut edge for mandatory overlap.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local state/run records, regression/problem history and Issue #14; repeatedly refreshed same-JOB concurrent branch changes."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "F66 exact-SHA canonical raw provenance supplied 64 bytes at 0x001832ED..0x0018332D; selected its exact control-flow proof as the newest runnable static frontier."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 5fba09f9021a1b5384b14c4ebfabc24b7445ed36 adds continuation_67 exact instruction, branch, call, external-target and cut-edge proof."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36991939568 job 110789921536 completed SUCCESS with static contract, canonical identity and analyzer proof all passing; Backend Conversion Gate run 36991939582 also passed Verify backend disassembly contract."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive source commit contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5949610543 records implementation and exact-SHA validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static disassembly proof only; no runtime DXVK payload, selector/deployment content, binary, or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally without replacing or rewinding any newer concurrently advancing canonical frontier."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "5fba09f9021a1b5384b14c4ebfabc24b7445ed36",
+        "dxvk_canonical_evidence_run_id": 36991939568,
+        "dxvk_canonical_evidence_job_id": 110789921536,
+        "dxvk_canonical_evidence_conclusion": "success",
+        "static_disassembly_contract": "SUCCESS",
+        "canonical_exe_identity": "SUCCESS",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "canonical_exe_analysis": "SUCCESS",
+        "proof_status": "EXACT_1832ED_TO_18332C_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "instruction_count": 28,
+        "evidence_artifact_id": 11219902671,
+        "evidence_artifact_digest": "sha256:87dbc3cbe26cc253c6fee94574358987d16cee98aebf668dbc14a15eca8bc717",
+        "backend_conversion_gate_run_id": 36991939582,
+        "backend_disassembly_contract_step": "SUCCESS",
+        "full_backend_gate_conclusion": "NOT_CLAIMED_IN_PROGRESS_AT_C6",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5949610543,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "BOUNDED_CONTROL_FLOW_ONLY",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authenticated frontier. Capture the mandatory 64-byte overlap beginning at 0x0018332C, complete the trailing E8 rel32 CALL, carry unresolved forward targets 0x00183336/0x0018333E/0x00183363 fail-closed, and keep function/render/HUD/runtime semantics unresolved."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
