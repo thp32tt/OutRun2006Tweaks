@@ -49,7 +49,13 @@ function Invoke-AnalyzerCase {
         [Nullable[int]]$ExpectedMixedCadenceWindows=$null,
         [Nullable[double]]$ExpectedMenuCadenceHz=$null,
         [Nullable[double]]$ExpectedGameplayCadenceHz=$null,
-        [Nullable[bool]]$ExpectedGameplayCadenceDegraded=$null
+        [Nullable[bool]]$ExpectedGameplayCadenceDegraded=$null,
+        [Nullable[int64]]$ExpectedGameplayFreshProjectionCount=$null,
+        [Nullable[int64]]$ExpectedGameplayCachedProjectionCount=$null,
+        [Nullable[double]]$ExpectedGameplayFreshProjectionFraction=$null,
+        [Nullable[int64]]$ExpectedGameplayDirectSubmitCount=$null,
+        [Nullable[int64]]$ExpectedGameplayCachedProjectionSubmitCount=$null,
+        [Nullable[double]]$ExpectedGameplayDirectSubmitFraction=$null
     )
 
     $caseRoot = Join-Path $script:TestRoot $Name
@@ -228,6 +234,34 @@ function Invoke-AnalyzerCase {
     if($null -ne $ExpectedGameplayCadenceDegraded -and
        [bool]$summary.DxvkGameplayCadenceDegraded -ne [bool]$ExpectedGameplayCadenceDegraded){
         throw "${Name}: DxvkGameplayCadenceDegraded=$($summary.DxvkGameplayCadenceDegraded), expected $ExpectedGameplayCadenceDegraded"
+    }
+    if($null -ne $ExpectedGameplayFreshProjectionCount -and
+       [int64]$summary.PresentationCadence.Gameplay.FreshProjectionCount -ne [int64]$ExpectedGameplayFreshProjectionCount){
+        throw "${Name}: Gameplay FreshProjectionCount=$($summary.PresentationCadence.Gameplay.FreshProjectionCount), expected $ExpectedGameplayFreshProjectionCount"
+    }
+    if($null -ne $ExpectedGameplayCachedProjectionCount -and
+       [int64]$summary.PresentationCadence.Gameplay.CachedProjectionCount -ne [int64]$ExpectedGameplayCachedProjectionCount){
+        throw "${Name}: Gameplay CachedProjectionCount=$($summary.PresentationCadence.Gameplay.CachedProjectionCount), expected $ExpectedGameplayCachedProjectionCount"
+    }
+    if($null -ne $ExpectedGameplayFreshProjectionFraction){
+        if($null -eq $summary.PresentationCadence.Gameplay.FreshProjectionFraction -or
+           [math]::Abs([double]$summary.PresentationCadence.Gameplay.FreshProjectionFraction-[double]$ExpectedGameplayFreshProjectionFraction) -gt 0.0001){
+            throw "${Name}: Gameplay FreshProjectionFraction=$($summary.PresentationCadence.Gameplay.FreshProjectionFraction), expected $ExpectedGameplayFreshProjectionFraction"
+        }
+    }
+    if($null -ne $ExpectedGameplayDirectSubmitCount -and
+       [int64]$summary.PresentationCadence.Gameplay.DirectSubmitCount -ne [int64]$ExpectedGameplayDirectSubmitCount){
+        throw "${Name}: Gameplay DirectSubmitCount=$($summary.PresentationCadence.Gameplay.DirectSubmitCount), expected $ExpectedGameplayDirectSubmitCount"
+    }
+    if($null -ne $ExpectedGameplayCachedProjectionSubmitCount -and
+       [int64]$summary.PresentationCadence.Gameplay.CachedProjectionSubmitCount -ne [int64]$ExpectedGameplayCachedProjectionSubmitCount){
+        throw "${Name}: Gameplay CachedProjectionSubmitCount=$($summary.PresentationCadence.Gameplay.CachedProjectionSubmitCount), expected $ExpectedGameplayCachedProjectionSubmitCount"
+    }
+    if($null -ne $ExpectedGameplayDirectSubmitFraction){
+        if($null -eq $summary.PresentationCadence.Gameplay.DirectSubmitFraction -or
+           [math]::Abs([double]$summary.PresentationCadence.Gameplay.DirectSubmitFraction-[double]$ExpectedGameplayDirectSubmitFraction) -gt 0.0001){
+            throw "${Name}: Gameplay DirectSubmitFraction=$($summary.PresentationCadence.Gameplay.DirectSubmitFraction), expected $ExpectedGameplayDirectSubmitFraction"
+        }
     }
     $actualDirectBlockers=@($summary.DxvkDirectEvidenceBlockers)
     foreach($blocker in $ExpectedDirectEvidenceBlockers){
@@ -447,10 +481,10 @@ D3D9: Failed to write shared resource info for a texture
         -GameLog "direct[frames=2359,fallbacks=0,fenceTimeout=0]" `
         -DxvkLog "DXVK: v3.1.1" `
         -HostLog @"
-[R23 pipeline] requestedLayer=menu-local-fixed-projection-cached actualFinal=menu-local-fixed-projection-cached captureMs=0.1 commitCopyMs=0.0 renderMs=0.1 xrWaitFrameMs=9.0 xrFrameIntervalMs=11.1 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=1.0 xrEndFrameMs=1.0 displayPeriodMs=11.1 intervalFrames=450 actualSubmits={menu-local-fixed-projection-cached:450} rejectCounts={none} captureAvgMaxP95=0.1/0.2/0.2 commitAvgMaxP95=0.0/0.0/0.0 renderAvgMaxP95=0.1/0.2/0.2 endAvgMaxP95=1.0/1.5/1.2
-[R23 pipeline] requestedLayer=projection-cached actualFinal=projection-direct-r32-fast captureMs=0.0 commitCopyMs=0.001 renderMs=0.01 xrWaitFrameMs=9.0 xrFrameIntervalMs=30.0 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=29.0 xrEndFrameMs=20.0 displayPeriodMs=11.1 intervalFrames=166 actualSubmits={projection-direct-r32-fast:166} rejectCounts={none} captureAvgMaxP95=0.0/0.1/0.1 commitAvgMaxP95=0.001/0.002/0.002 renderAvgMaxP95=0.01/0.02/0.02 endAvgMaxP95=20.0/24.0/22.0
-[R23 pipeline] requestedLayer=projection-cached actualFinal=projection-direct-r32-fast captureMs=0.0 commitCopyMs=0.001 renderMs=0.01 xrWaitFrameMs=9.2 xrFrameIntervalMs=31.0 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=30.0 xrEndFrameMs=22.0 displayPeriodMs=11.1 intervalFrames=161 actualSubmits={projection-direct-r32-fast:161} rejectCounts={none} captureAvgMaxP95=0.0/0.1/0.1 commitAvgMaxP95=0.001/0.002/0.002 renderAvgMaxP95=0.01/0.02/0.02 endAvgMaxP95=22.0/26.0/24.0
-[R23 pipeline] requestedLayer=projection-cached actualFinal=projection-cached captureMs=0.0 commitCopyMs=0.001 renderMs=0.01 xrWaitFrameMs=9.1 xrFrameIntervalMs=20.0 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=15.0 xrEndFrameMs=10.0 displayPeriodMs=11.1 intervalFrames=250 actualSubmits={menu-local-fixed-projection-cached:100,projection-cached:150} rejectCounts={none} captureAvgMaxP95=0.0/0.1/0.1 commitAvgMaxP95=0.001/0.002/0.002 renderAvgMaxP95=0.01/0.02/0.02 endAvgMaxP95=10.0/12.0/11.0
+[R23 pipeline] requestedLayer=menu-local-fixed-projection-cached actualFinal=menu-local-fixed-projection-cached captureMs=0.1 commitCopyMs=0.0 renderMs=0.1 xrWaitFrameMs=9.0 xrFrameIntervalMs=11.1 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=1.0 xrEndFrameMs=1.0 displayPeriodMs=11.1 intervalFrames=450 actualSubmits={menu-local-fixed-projection-cached:450} rejectCounts={none} captureAvgMaxP95=0.1/0.2/0.2 commitAvgMaxP95=0.0/0.0/0.0 renderAvgMaxP95=0.1/0.2/0.2 endAvgMaxP95=1.0/1.5/1.2 cadence={mode:auto,xr:450,req:0,fresh:0,cached:450,other:0,noLayer:0}
+[R23 pipeline] requestedLayer=projection-cached actualFinal=projection-direct-r32-fast captureMs=0.0 commitCopyMs=0.001 renderMs=0.01 xrWaitFrameMs=9.0 xrFrameIntervalMs=30.0 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=29.0 xrEndFrameMs=20.0 displayPeriodMs=11.1 intervalFrames=166 actualSubmits={projection-direct-r32-fast:166} rejectCounts={none} captureAvgMaxP95=0.0/0.1/0.1 commitAvgMaxP95=0.001/0.002/0.002 renderAvgMaxP95=0.01/0.02/0.02 endAvgMaxP95=20.0/24.0/22.0 cadence={mode:auto,xr:166,req:0,fresh:100,cached:66,other:0,noLayer:0}
+[R23 pipeline] requestedLayer=projection-cached actualFinal=projection-direct-r32-fast captureMs=0.0 commitCopyMs=0.001 renderMs=0.01 xrWaitFrameMs=9.2 xrFrameIntervalMs=31.0 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=30.0 xrEndFrameMs=22.0 displayPeriodMs=11.1 intervalFrames=161 actualSubmits={projection-direct-r32-fast:161} rejectCounts={none} captureAvgMaxP95=0.0/0.1/0.1 commitAvgMaxP95=0.001/0.002/0.002 renderAvgMaxP95=0.01/0.02/0.02 endAvgMaxP95=22.0/26.0/24.0 cadence={mode:auto,xr:161,req:0,fresh:120,cached:41,other:0,noLayer:0}
+[R23 pipeline] requestedLayer=projection-cached actualFinal=projection-cached captureMs=0.0 commitCopyMs=0.001 renderMs=0.01 xrWaitFrameMs=9.1 xrFrameIntervalMs=20.0 cadenceSerialWaitMs=0.0 gamePresentToConsumeMs=15.0 xrEndFrameMs=10.0 displayPeriodMs=11.1 intervalFrames=250 actualSubmits={menu-local-fixed-projection-cached:100,projection-cached:150} rejectCounts={none} captureAvgMaxP95=0.0/0.1/0.1 commitAvgMaxP95=0.001/0.002/0.002 renderAvgMaxP95=0.01/0.02/0.02 endAvgMaxP95=10.0/12.0/11.0 cadence={mode:auto,xr:250,req:0,fresh:100,cached:150,other:0,noLayer:0}
 "@ `
         -ExpectedSharedFailure $false -ExpectedReasons @() `
         -ExpectedDirectFrames 2359 -ExpectedFallbacks 0 `
@@ -459,7 +493,13 @@ D3D9: Failed to write shared resource info for a texture
         -ExpectedMixedCadenceWindows 1 `
         -ExpectedMenuCadenceHz (1000.0/11.1) `
         -ExpectedGameplayCadenceHz (1000.0/30.5) `
-        -ExpectedGameplayCadenceDegraded $true
+        -ExpectedGameplayCadenceDegraded $true `
+        -ExpectedGameplayFreshProjectionCount 220 `
+        -ExpectedGameplayCachedProjectionCount 107 `
+        -ExpectedGameplayFreshProjectionFraction (220.0/327.0) `
+        -ExpectedGameplayDirectSubmitCount 327 `
+        -ExpectedGameplayCachedProjectionSubmitCount 0 `
+        -ExpectedGameplayDirectSubmitFraction 1.0
 
     $queuePath = Join-Path $PSScriptRoot '..\docs\VR_WORK_QUEUE.json'
     $workQueue = Get-Content $queuePath -Raw | ConvertFrom-Json
