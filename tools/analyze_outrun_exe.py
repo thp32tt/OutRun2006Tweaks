@@ -1845,6 +1845,17 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_26_INSTRUCTIONS = (
 )
 
 
+# CONV-DXVK-000002/F18: overlap the cut CMP EAX,imm32 at 0x182920 and
+# capture a fresh bounded canonical window. Keep this provenance-only until
+# the newly exposed bytes have been exact-decoded.
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_RVA = 0x00182920
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_PROBE_LEN = 64
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_PROBE_END_RVA = 0x00182960
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_OVERLAP_BYTES = (
+    GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_26_INCOMPLETE_BYTES
+)
+
+
 GF_TARGET_C_HELPER_1_NEXT_CODE_CONTINUATION_2_INSTRUCTIONS = (
     (0x000283DE, "b9 00 00 80 3f", "mov ecx, 0x3f800000"),
     (0x000283E3, "d9 58 1c", "fstp dword [eax+0x1c]"),
@@ -10899,6 +10910,72 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_26_prefix_pro
     }
 
 
+def collect_guarded_gf_target_c_helper_1_third_callee_continuation_27_provenance(pe: PE) -> dict:
+    """Capture fresh canonical bytes from the cut 0x182920 CMP without semantic promotion."""
+
+    predecessor = collect_guarded_gf_target_c_helper_1_third_callee_continuation_26_prefix_proof(pe)
+    target_rva = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_RVA
+    target_section = next(
+        (section.name for section in pe.sections if section.contains_rva(target_rva)),
+        "",
+    )
+    probe = pe.bytes_at_rva(
+        target_rva, GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_PROBE_LEN
+    )
+    overlap = probe[:len(GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_OVERLAP_BYTES)]
+    inbound = collect_raw_inbound_rel32_candidates(pe, target_rva)
+    outbound = collect_raw_rel32_call_candidates(
+        pe, target_rva, GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_PROBE_LEN
+    )
+    predecessor_exact = (
+        predecessor["status"] == "EXACT_1828E2_TO_182920_CONTROL_FLOW_CAPTURE_EDGE_PROVEN"
+        and predecessor["incomplete_rva"] == target_rva
+        and predecessor["incomplete_matches"]
+        and predecessor["capture_edge_matches"]
+    )
+    overlap_matches = (
+        overlap == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_OVERLAP_BYTES
+    )
+    probe_end_matches = (
+        target_rva + len(probe)
+        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_PROBE_END_RVA
+    )
+    captured = bool(
+        predecessor_exact
+        and target_section == ".text"
+        and len(probe) == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_PROBE_LEN
+        and overlap_matches
+        and probe_end_matches
+    )
+    return {
+        "target_rva": target_rva,
+        "target_section": target_section,
+        "predecessor_status": predecessor["status"],
+        "predecessor_exact": predecessor_exact,
+        "probe_len": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_PROBE_LEN,
+        "probe_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_27_PROBE_END_RVA,
+        "probe_end_matches": probe_end_matches,
+        "overlap_bytes": overlap.hex(" "),
+        "overlap_matches": overlap_matches,
+        "first_16_bytes": probe[:16].hex(" "),
+        "last_16_bytes": probe[-16:].hex(" "),
+        "bytes": probe.hex(" "),
+        "raw_inbound_rel32_candidates": inbound,
+        "raw_outbound_rel32_candidates": outbound,
+        "status": (
+            "EXACT_EXE_182920_TO_182960_PROVENANCE_CAPTURED"
+            if captured
+            else "CALLEE_182920_CONTINUATION_PROVENANCE_CAPTURE_FAILED"
+        ),
+        "start_boundary_status": "PREDECESSOR_INCOMPLETE_CMP_EAX_IMM32_START",
+        "function_entry_status": "UNRESOLVED_AT_182920_AND_FORWARD_BYTES",
+        "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+        "call_semantics": "UNRESOLVED",
+        "ownership_effect": "NONE",
+        "continuation_scope": "RAW_BYTES_OVERLAP_AND_REL32_CENSUS_ONLY",
+    }
+
+
 def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:
     """Record exact-EXE context around guarded GF speech/heart hook RVAs.
 
@@ -11352,6 +11429,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_third_callee_continuation_25_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_25_prefix_proof(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_26_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_26_provenance(pe),
         "guarded_gf_target_c_helper_1_third_callee_continuation_26_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_26_prefix_proof(pe),
+        "guarded_gf_target_c_helper_1_third_callee_continuation_27_provenance": collect_guarded_gf_target_c_helper_1_third_callee_continuation_27_provenance(pe),
         "guarded_gf_target_c_tail_probe": {
             "rva": GF_TARGET_C_TAIL_PROBE_RVA,
             "length": GF_TARGET_C_TAIL_PROBE_LEN,
@@ -13870,6 +13948,27 @@ def main() -> int:
     if helper_1_third_cont_26_proof["status"] != "EXACT_1828E2_TO_182920_CONTROL_FLOW_CAPTURE_EDGE_PROVEN":
         print("guarded_gf_target_c_helper_1_third_callee_continuation_26_prefix_proof=FAILED")
         return 77
+
+    helper_1_third_cont_27 = report[
+        "guarded_gf_target_c_helper_1_third_callee_continuation_27_provenance"
+    ]
+    print(
+        f"gf_target_c_helper_1_third_callee_continuation_27="
+        f"0x{helper_1_third_cont_27['target_rva']:08X} "
+        f"status={helper_1_third_cont_27['status']} "
+        f"predecessor={helper_1_third_cont_27['predecessor_status']} "
+        f"predecessor_exact={helper_1_third_cont_27['predecessor_exact']} "
+        f"section={helper_1_third_cont_27['target_section']} "
+        f"overlap={helper_1_third_cont_27['overlap_bytes']}:"
+        f"match={helper_1_third_cont_27['overlap_matches']} "
+        f"probe_len={helper_1_third_cont_27['probe_len']} "
+        f"probe_end=0x{helper_1_third_cont_27['probe_end_rva']:08X}:"
+        f"match={helper_1_third_cont_27['probe_end_matches']} "
+        f"bytes={helper_1_third_cont_27['bytes']}"
+    )
+    if helper_1_third_cont_27["status"] != "EXACT_EXE_182920_TO_182960_PROVENANCE_CAPTURED":
+        print("guarded_gf_target_c_helper_1_third_callee_continuation_27_provenance=FAILED")
+        return 78
     return 0
 
 
