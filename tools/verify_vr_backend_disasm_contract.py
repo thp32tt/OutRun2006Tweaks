@@ -545,6 +545,32 @@ def verify_dxvk_continuation_chain() -> None:
                 f"DXVK overlap transition {previous_id}->{next_id} raw provenance "
                 f"lost fail-closed overlap validation: {missing_overlap_integrity_markers}"
             )
+
+        # F34/continuation 43 and later overlap collectors carry a stronger
+        # cross-proof contract: the new probe must match the declared overlap,
+        # and that declaration must equal both the predecessor proof's expected
+        # and observed incomplete bytes. Keep legacy evidence readable while
+        # making every modern/future overlap transition fail closed if any side
+        # of that three-way identity is removed.
+        if next_id >= 43:
+            predecessor_cross_proof_markers = (
+                "predecessor_overlap_matches = (",
+                'predecessor["incomplete_expected_bytes"] == overlap.hex(" ")',
+                'predecessor["incomplete_actual_bytes"] == overlap.hex(" ")',
+                "and predecessor_overlap_matches",
+                '"predecessor_overlap_matches": predecessor_overlap_matches',
+            )
+            missing_predecessor_cross_proof_markers = [
+                marker for marker in predecessor_cross_proof_markers
+                if marker not in next_provenance_source
+            ]
+            if missing_predecessor_cross_proof_markers:
+                raise SystemExit(
+                    f"DXVK overlap transition {previous_id}->{next_id} raw provenance "
+                    "lost predecessor incomplete-byte cross-proof: "
+                    f"{missing_predecessor_cross_proof_markers}"
+                )
+
         if previous_incomplete_rva != next_start:
             raise SystemExit(
                 f"DXVK overlap transition {previous_id}->{next_id} starts at "
