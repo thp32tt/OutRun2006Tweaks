@@ -14,6 +14,7 @@
 #include "stereo_renderer_r29.cpp"
 #include "../render/screen_space_kind.hpp"
 #include "../render/stereo_base_policy.hpp"
+#include "../core/stereo_base_hooks.hpp"
 #include "../core/screen_space_hooks.hpp"
 #include "../lifecycle/mono_safety.hpp"
 #include "../lifecycle/frame_accounting.hpp"

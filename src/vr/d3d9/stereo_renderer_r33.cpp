@@ -16,6 +16,7 @@
 #include "../core/review_dispatch_hooks.hpp"
 #include "../core/final_dispatch_hooks.hpp"
 #include "../render/stereo_base_policy.hpp"
+#include "../core/stereo_base_hooks.hpp"
 #include "../render/screen_space_api.hpp"
 #include "../render/fast_path_support.hpp"
 #include "../render/lower_draw_api.hpp"

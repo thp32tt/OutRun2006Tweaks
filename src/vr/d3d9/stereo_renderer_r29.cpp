@@ -19,6 +19,7 @@
 #include "../lifecycle/mono_safety.hpp"
 #include "../state/depth_target_state.hpp"
 #include "../render/stereo_draw_trampoline.hpp"
+#include "../core/stereo_base_hooks.hpp"
 #include "../render/cached_effect_state.hpp"
 #include "../lifecycle/correction_overlay_state.hpp"
 #include "../game/renderer_recovery.hpp"
@@ -361,117 +362,7 @@ namespace OutRunVRStereo
                 fragile, site);
         }
 
-        HRESULT __stdcall DrawPrimitiveDestR29(IDirect3DDevice9* device,
-            D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
-        {
-            auto stereo = [&]() {
-                return CallStereoDrawPrimitive(
-                    device, type, startVertex, primitiveCount);
-            };
-            auto legacy = [&]() {
-                return R27DrawPrimitiveR13Hook.stdcall<HRESULT>(
-                    device, type, startVertex, primitiveCount);
-            };
-            return R29GuardStableDraw(
-                device, stereo, legacy, "R29/DrawPrimitive");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveDestR29(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
-            UINT startIndex, UINT primitiveCount)
-        {
-            auto stereo = [&]() {
-                return CallStereoDrawIndexedPrimitive(
-                    device, type, baseVertexIndex, minVertexIndex,
-                    numVertices, startIndex, primitiveCount);
-            };
-            auto legacy = [&]() {
-                return R27DrawIndexedPrimitiveR13Hook.stdcall<HRESULT>(
-                    device, type, baseVertexIndex, minVertexIndex, numVertices,
-                    startIndex, primitiveCount);
-            };
-            return R29GuardStableDraw(
-                device, stereo, legacy, "R29/DrawIndexedPrimitive");
-        }
-
-        HRESULT __stdcall DrawPrimitiveUPDestR29(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            UINT primitiveCount, const void* data, UINT stride)
-        {
-            auto stereo = [&]() {
-                return CallStereoDrawPrimitiveUP(
-                    device, type, primitiveCount, data, stride);
-            };
-            auto legacy = [&]() {
-                return R27DrawPrimitiveUPR13Hook.stdcall<HRESULT>(
-                    device, type, primitiveCount, data, stride);
-            };
-            return R29GuardStableDraw(
-                device, stereo, legacy, "R29/DrawPrimitiveUP");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveUPDestR29(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
-            const void* indexData, D3DFORMAT indexFormat,
-            const void* vertexData, UINT stride)
-        {
-            auto stereo = [&]() {
-                return CallStereoDrawIndexedPrimitiveUP(
-                    device, type, minVertexIndex, numVertices,
-                    primitiveCount, indexData, indexFormat,
-                    vertexData, stride);
-            };
-            auto legacy = [&]() {
-                return R27DrawIndexedPrimitiveUPR13Hook.stdcall<HRESULT>(
-                    device, type, minVertexIndex, numVertices, primitiveCount,
-                    indexData, indexFormat, vertexData, stride);
-            };
-            return R29GuardStableDraw(
-                device, stereo, legacy, "R29/DrawIndexedPrimitiveUP");
-        }
-
-        HRESULT __stdcall SetRenderStateDestR29(IDirect3DDevice9* device,
-            D3DRENDERSTATETYPE state, DWORD value)
-        {
-            const HRESULT hr = R29SetRenderStateR22Hook.stdcall<HRESULT>(
-                device, state, value);
-            if (FAILED(hr) || !IsGameDevice(device) || InternalStereoPass)
-                return hr;
-
-            switch (state)
-            {
-            case D3DRS_ALPHABLENDENABLE:
-                R29Effect.alphaBlend = value;
-                break;
-            case D3DRS_ALPHATESTENABLE:
-                R29Effect.alphaTest = value;
-                break;
-            case D3DRS_ZWRITEENABLE:
-                R29Effect.zWrite = value;
-                break;
-            case D3DRS_ZENABLE:
-                R29Effect.zEnable = value;
-                break;
-            case D3DRS_CULLMODE:
-                R29Effect.cullMode = value;
-                break;
-            default:
-                return hr;
-            }
-
-            // If the cache has already been live-synchronized, tracked setters
-            // keep it authoritative without any draw-time D3D getter.
-            if (R29Effect.valid)
-            {
-                R29Effect.presentEpoch = PresentEpoch;
-                R29Effect.drawSerial = TopLevelDrawSerial();
-            }
-            return hr;
-        }
-
-        void R29RollbackStereoHooks() noexcept
+                                                void R29RollbackStereoHooks() noexcept
         {
             R29SetRenderStateR22Hook = {};
             R29DrawIndexedPrimitiveUPR27Hook = {};
@@ -638,6 +529,126 @@ namespace OutRunVRStereo
             static VRStereoR29Hook instance;
         };        VRStereoR29Hook VRStereoR29Hook::instance;
     }
+
+HRESULT __stdcall DrawPrimitiveDestR29(IDirect3DDevice9* device,
+        D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
+    {
+        auto stereo = [&]() {
+            return CallStereoDrawPrimitive(
+                device, type, startVertex, primitiveCount);
+        };
+        auto legacy = [&]() {
+            return R27DrawPrimitiveR13Hook.stdcall<HRESULT>(
+                device, type, startVertex, primitiveCount);
+        };
+        return R29GuardStableDraw(
+            device, stereo, legacy, "R29/DrawPrimitive");
+    }
+
+
+
+HRESULT __stdcall DrawIndexedPrimitiveDestR29(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+        UINT startIndex, UINT primitiveCount)
+    {
+        auto stereo = [&]() {
+            return CallStereoDrawIndexedPrimitive(
+                device, type, baseVertexIndex, minVertexIndex,
+                numVertices, startIndex, primitiveCount);
+        };
+        auto legacy = [&]() {
+            return R27DrawIndexedPrimitiveR13Hook.stdcall<HRESULT>(
+                device, type, baseVertexIndex, minVertexIndex, numVertices,
+                startIndex, primitiveCount);
+        };
+        return R29GuardStableDraw(
+            device, stereo, legacy, "R29/DrawIndexedPrimitive");
+    }
+
+
+
+HRESULT __stdcall DrawPrimitiveUPDestR29(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT primitiveCount, const void* data, UINT stride)
+    {
+        auto stereo = [&]() {
+            return CallStereoDrawPrimitiveUP(
+                device, type, primitiveCount, data, stride);
+        };
+        auto legacy = [&]() {
+            return R27DrawPrimitiveUPR13Hook.stdcall<HRESULT>(
+                device, type, primitiveCount, data, stride);
+        };
+        return R29GuardStableDraw(
+            device, stereo, legacy, "R29/DrawPrimitiveUP");
+    }
+
+
+
+HRESULT __stdcall DrawIndexedPrimitiveUPDestR29(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
+        const void* indexData, D3DFORMAT indexFormat,
+        const void* vertexData, UINT stride)
+    {
+        auto stereo = [&]() {
+            return CallStereoDrawIndexedPrimitiveUP(
+                device, type, minVertexIndex, numVertices,
+                primitiveCount, indexData, indexFormat,
+                vertexData, stride);
+        };
+        auto legacy = [&]() {
+            return R27DrawIndexedPrimitiveUPR13Hook.stdcall<HRESULT>(
+                device, type, minVertexIndex, numVertices, primitiveCount,
+                indexData, indexFormat, vertexData, stride);
+        };
+        return R29GuardStableDraw(
+            device, stereo, legacy, "R29/DrawIndexedPrimitiveUP");
+    }
+
+
+
+HRESULT __stdcall SetRenderStateDestR29(IDirect3DDevice9* device,
+        D3DRENDERSTATETYPE state, DWORD value)
+    {
+        const HRESULT hr = R29SetRenderStateR22Hook.stdcall<HRESULT>(
+            device, state, value);
+        if (FAILED(hr) || !IsGameDevice(device) || InternalStereoPass)
+            return hr;
+
+        switch (state)
+        {
+        case D3DRS_ALPHABLENDENABLE:
+            R29Effect.alphaBlend = value;
+            break;
+        case D3DRS_ALPHATESTENABLE:
+            R29Effect.alphaTest = value;
+            break;
+        case D3DRS_ZWRITEENABLE:
+            R29Effect.zWrite = value;
+            break;
+        case D3DRS_ZENABLE:
+            R29Effect.zEnable = value;
+            break;
+        case D3DRS_CULLMODE:
+            R29Effect.cullMode = value;
+            break;
+        default:
+            return hr;
+        }
+
+        // If the cache has already been live-synchronized, tracked setters
+        // keep it authoritative without any draw-time D3D getter.
+        if (R29Effect.valid)
+        {
+            R29Effect.presentEpoch = PresentEpoch;
+            R29Effect.drawSerial = TopLevelDrawSerial();
+        }
+        return hr;
+    }
+
+
 
     void ArmMonoSafety(std::uint64_t extraPresents) noexcept
     {
