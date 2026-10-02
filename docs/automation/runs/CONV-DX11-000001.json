@@ -4,73 +4,75 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "bbf291b9aba2130aaf548fe5e3fd60f05975794d",
-  "state_parent_head": "d879b6042908389444b45b0f040326855821d69b",
-  "material_result_sha": "4647f909cad0edc80306d590f98a33bc14cc6003",
-  "validation_bearing_sha": "4647f909cad0edc80306d590f98a33bc14cc6003",
+  "base_sha": "8b760190868471eb2b02273de53a7d07025847a1",
+  "state_parent_head": "d348f707d1ebea4d727f3e9e7488b97c69525bb2",
+  "material_result_sha": "d879b6042908389444b45b0f040326855821d69b",
+  "validation_bearing_sha": "d879b6042908389444b45b0f040326855821d69b",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_DORMANT_DRAW_READINESS_COMPOSITION_R117",
-  "selection_reason": "R115 combined exact pipeline/input/shader/texture readiness, while R116 owned exact blend/depth-stencil/rasterizer objects separately. Composing those independent snapshots into one stale-token-sensitive draw-readiness identity was the highest-value source/static gap that could be proven without enabling native Draw* or requiring Quest 3/VDXR.",
-  "summary": "Added R117 dormant fixed-function draw-readiness composition. A nonzero draw candidate token now requires both the R115 activation snapshot and the R116 render-state snapshot; missing/not-ready/stale component evidence fails closed. Added hosted probe coverage and source-graph drift guards. Native Draw* routing remains disabled.",
+  "selected_work": "DX11_FIXED_FUNCTION_ALPHA_TEST_PIPELINE_HANDOFF_R118",
+  "selection_reason": "Fixed-function alpha-test HLSL discard semantics were already generated, but generic PipelineTranslation correctly retained PipelineUnsupportedAlphaTest for programmable callers. The highest-value independent static gap was a fail-closed fixed-function-only handoff that can consume the proven shader semantic without weakening the generic pipeline contract.",
+  "summary": "Added a dedicated R118 fixed-function pipeline/shader translation wrapper. Generic translate_pipeline() remains alpha-test-inexact. Only an explicitly observed fixed-function draw with complete state and a successfully generated pixel-shader prototype may clear PipelineUnsupportedAlphaTest; all unrelated blockers remain. Added hosted semantic probe and build/workflow wiring. Native Draw* routing remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read current GitHub branch HEAD, AGENTS.md, docs/CONVERSION_LANE_STATE.json and the current CONV-DX11-000001 run record through the authenticated GitHub connector.",
-        "Read docs/VR_DX11_NATIVE_PLAN.md, docs/VR_REGRESSION_KNOWLEDGE.json and docs/VR_PROBLEM_HISTORY.md; none of the R117 changed paths are registered legacy runtime regression risk paths.",
-        "Read Issue #14 production ledger format before the production write."
+        "Read current GitHub HEAD, AGENTS.md, docs/CONVERSION_LANE_STATE.json, current CONV-DX11-000001 run record, DX11 plan/work-queue context, regression knowledge/history, and Issue #14 through authenticated GitHub.",
+        "Observed concurrent R113-R117 readiness work and rebased selection on the then-current branch instead of duplicating completed units."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Confirmed NativeFixedFunctionActivationReadiness (R115) seals pipeline plus texture-stage evidence but does not include render-state ownership.",
-        "Confirmed NativeFixedFunctionRenderStateReadiness (R116) independently seals concrete D3D11 blend/depth-stencil/rasterizer objects and translation identity.",
-        "Selected fail-closed snapshot composition rather than native binding/routing so the runtime activation gate remains unchanged."
+        "Confirmed translate_pipeline() still sets PipelineUnsupportedAlphaTest whenever D3D9 alpha test is enabled.",
+        "Confirmed generate_fixed_function_pixel_shader_prototype() now models complete fixed-function alpha-test semantics via discard and rejects incomplete/invalid alpha-test observations.",
+        "Selected a fixed-function-only reconciliation wrapper so programmable shader draws cannot inherit fixed-function alpha-test ownership."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
-        "src/vr/d3d11/native_backend.hpp",
-        "src/vr/d3d11/native_backend.cpp",
-        "tools/dx11_constant_buffer_probe.cpp",
-        "tools/verify_dx11_source_graph.py"
+        "src/vr/d3d11/fixed_function_pipeline.hpp",
+        "src/vr/d3d11/fixed_function_pipeline.cpp",
+        "tools/dx11_fixed_function_pipeline_probe.cpp",
+        "CMakeLists.txt",
+        "cmake.toml",
+        ".github/workflows/backend-conversion-gate.yml"
       ],
-      "commit": "4647f909cad0edc80306d590f98a33bc14cc6003",
+      "commit": "d879b6042908389444b45b0f040326855821d69b",
       "details": [
-        "Added NativeFixedFunctionDrawReadiness plus compose/validate APIs.",
-        "Require current nonzero R115 activation and R116 render-state snapshots before producing a draw-readiness token.",
-        "Added positive, missing-evidence, not-ready and render-state-identity-change probe coverage plus source-graph guards."
+        "Added FixedFunctionPipelineShaderTranslation and translate_fixed_function_pipeline_with_shader_semantics().",
+        "The wrapper generates the fixed-function pixel-shader prototype from the same D3D9 alpha-test snapshot before discharging only PipelineUnsupportedAlphaTest.",
+        "Added negative coverage for non-fixed-function draws, incomplete stage observation, invalid compare functions, and preservation of unrelated fog blockers.",
+        "Added a hosted dx11_fixed_function_pipeline_probe target and Backend Conversion Gate execution step."
       ]
     },
     "C3_VALIDATE": {
       "status": "COMPLETE_REMOTE_STATIC",
       "evidence": [
-        "Exact SHA 4647f909cad0edc80306d590f98a33bc14cc6003 was re-fetched and confirmed to contain the R117 header/source/probe/verifier contract.",
-        "Backend Conversion Gate run 36970008626 attempt 1 on the exact material SHA passed Verify DX11 source graph, Verify DX11 dormant activation boundary, DX11 native transport lifetime, dual-source blend, census analyzer and preceding repository static contracts before cancellation during Configure Win32.",
-        "Descendant 8f0f3d6b8bf6a3d80c67934e0d979b59cf163674 preserved the material commit and its Backend Conversion Gate run 36970150014 again passed DX11 source graph, dormant activation boundary, transport/dual-source and census static steps before Win32 build completion was observed.",
-        "No Win32 build completion, hosted-probe execution completion, graphics parity or HMD runtime success is claimed."
+        "Pre-commit structural validation proved the candidate contains the fixed-function observation gate, generated-shader gate, alpha-only unsupported-bit discharge, programmable negative test, and unrelated-blocker preservation test.",
+        "Exact material SHA d879b6042908389444b45b0f040326855821d69b was re-fetched from GitHub and all R118 source/probe/workflow contract markers were confirmed.",
+        "Backend Conversion Gate run 36970517676 on the exact material SHA was automatically started but cancelled by a later descendant branch push under cancel-in-progress.",
+        "Descendant Backend Conversion Gate run 36970534321 also included the material commit but was cancelled by later branch churn before DX11 source-graph/build/probe steps. No hosted compile/probe success is claimed."
       ],
-      "automation_validation": "PASS_REMOTE_STATIC",
-      "ci_result": "STATIC_PASS_BUILD_NOT_CLAIMED"
+      "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
+      "ci_result": "CI_STARTED_CANCELLED_BY_BRANCH_CHURN"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "4647f909cad0edc80306d590f98a33bc14cc6003",
-      "issue14_comment_id": 5946276149
+      "material_commit": "d879b6042908389444b45b0f040326855821d69b",
+      "issue14_comment_id": 5946330718
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant readiness/source-test contract only. Native game Draw* routing, backend promotion, runtime candidate payload and package contents were not activated or changed."
+      "reason": "Dormant translation/readiness and hosted-test contract only. Native game Draw* routing, backend promotion, OpenXR transport, runtime candidate payload, and package contents were not activated."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_THIS_STATE_COMMIT",
-      "exact_next_action": "Keep native Draw* disabled. Consume later exact-SHA/descendant Win32 and DX11 readiness-smoke results when available, then continue the next independent DX11 pipeline/resource/shader readiness gap; runtime graphics claims still require exhaustive exact-build census plus Quest 3/VDXR parity."
+      "exact_next_action": "Keep native Draw* disabled. Consume a later descendant hosted probe/build result when observable, then integrate R118 only into dormant fixed-function census/readiness accounting; runtime activation still requires exhaustive exact-build census and Quest 3/VDXR parity, and programmable alpha-test/SRC1 dual-source remain fail-closed."
     }
   },
   "scope_guards": {
@@ -80,87 +82,19 @@
     "dxvk_lane_modified": false,
     "localization_modified": false
   },
-  "issue14_comment_id": 5946276149,
-  "automation_validation": "PASS_REMOTE_STATIC",
-  "blocker": "Native DX11 Draw* routing remains deliberately disabled. Exact-build exhaustive census and Quest 3/VDXR graphics parity are still required for runtime activation; SRC1 dual-source factors remain fail-closed pending proven second pixel-shader output/linkage.",
-  "next_action": "Keep native Draw* disabled. Consume later exact-SHA/descendant Win32 and DX11 readiness-smoke results when available, then continue another independently provable DX11 readiness item.",
+  "issue14_comment_id": 5946330718,
+  "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
+  "blocker": "Hosted compile/probe completion for R118 has not been observed because Backend Conversion Gate runs were cancelled by rapid descendant pushes. Runtime graphics validation remains UNTESTED; native Draw* activation still requires exhaustive exact-build census plus Quest 3/VDXR parity.",
+  "next_action": "Keep native Draw* disabled. Consume a later descendant hosted probe/build result when branch churn permits, then continue R118 integration into dormant fixed-function census/readiness accounting only.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "prior_completed_unit": {
-    "selected_work": "DX11_BACKEND_GATE_CORE_SMOKE_SPLIT",
-    "material_result_sha": "58fd0ea4f6d36eb3590e7763c13416cc719394a8",
-    "validation_bearing_sha": "58fd0ea4f6d36eb3590e7763c13416cc719394a8",
+    "selected_work": "DX11_DORMANT_DRAW_READINESS_COMPOSITION_R117",
+    "material_result_sha": "4647f909cad0edc80306d590f98a33bc14cc6003",
+    "validation_bearing_sha": "4647f909cad0edc80306d590f98a33bc14cc6003",
     "automation_validation": "PASS_REMOTE_STATIC",
     "runtime_validation": "UNTESTED",
-    "summary": "Separated the mandatory Backend Conversion Gate core validation from dormant-DX11 readiness smoke/probe builds. The core validate job keeps static contracts, Win32 build, binary verification and artifact upload; a DX11-only job depending on validate retains all eight prior smoke/probe executions."
-  },
-  "continuation_units": [
-    {
-      "unit_id": "DX11_DEVICE_SURFACE_MIRROR_R118",
-      "job_id": "CONV-DX11-000001",
-      "lane": "DX11",
-      "selected_work": "DX11_RENDER_TARGET_DEPTH_SURFACE_MIRROR_LIFETIME",
-      "base_sha": "4647f909cad0edc80306d590f98a33bc14cc6003",
-      "material_result_sha": "8f0f3d6b8bf6a3d80c67934e0d979b59cf163674",
-      "successor_consolidation_sha": "703f126ea46f65b2abbaba58182da7dd6595132a",
-      "validation_bearing_sha": "703f126ea46f65b2abbaba58182da7dd6595132a",
-      "implementation_commits": [
-        "8f0f3d6b8bf6a3d80c67934e0d979b59cf163674",
-        "703f126ea46f65b2abbaba58182da7dd6595132a"
-      ],
-      "runtime_validation": "UNTESTED",
-      "runtime_test_performed": false,
-      "n100_used": false,
-      "pc_fast_used": false,
-      "selection_reason": "The current DX11 plan retained explicit render-target/depth-surface mirror lifetime as unfinished R73 readiness work. Existing resource translation had exact Color/DepthStencil descriptor rules but no single dedicated dormant Texture2D+RTV/DSV owner when this unit was selected.",
-      "summary": "Added a dormant generation-bound NativeSurfaceMirror for exact non-MSAA DEFAULT-pool D3D9 render-target/depth-stencil surfaces, WARP probe coverage, checked-in build graph wiring and source-graph guards. A later same-JOB successor consolidated duplicate concurrent ownership into this class and strengthened view-to-texture identity/failure cleanup. Native Draw* routing remains disabled.",
-      "changed_paths": [
-        "src/vr/d3d11/surface_mirror.hpp",
-        "src/vr/d3d11/surface_mirror.cpp",
-        "tools/dx11_surface_mirror_probe.cpp",
-        "CMakeLists.txt",
-        "cmake.toml",
-        ".github/workflows/backend-conversion-gate.yml",
-        "tools/verify_dx11_source_graph.py"
-      ],
-      "validation": {
-        "status": "PASS_STATIC_CONTRACT_BUILD_SUPERSEDED",
-        "evidence": [
-          "Backend Conversion Gate 36970150014 on exact material SHA 8f0f3d6b8bf6a3d80c67934e0d979b59cf163674 passed Verify DX11 source graph, dormant activation boundary, dual-source contract, census analyzer and all preceding static regression/contract checks before concurrency cancelled Configure Win32.",
-          "Backend Conversion Gate 36970352387 on successor SHA 703f126ea46f65b2abbaba58182da7dd6595132a again passed Verify DX11 source graph, dormant activation boundary, dual-source contract, census analyzer and all preceding static checks before a newer same-branch push cancelled Configure Win32.",
-          "No Win32 build or WARP surface probe success is claimed because both runs were superseded before those stages."
-        ],
-        "full_win32_build": "UNCONFIRMED_SUPERSEDED",
-        "warp_probe": "UNCONFIRMED_SUPERSEDED"
-      },
-      "commit": {
-        "required_marker": "[AUTO:CONV-DX11-000001]",
-        "material_commit": "8f0f3d6b8bf6a3d80c67934e0d979b59cf163674",
-        "successor_consolidation_commit": "703f126ea46f65b2abbaba58182da7dd6595132a",
-        "issue14_comment_id": 5946308608
-      },
-      "package": {
-        "status": "NOT_REQUIRED",
-        "reason": "Dormant source/readiness/test work only; no native game Draw* activation, runtime candidate payload, backend promotion or package behavior change."
-      },
-      "state": {
-        "status": "PERSISTED",
-        "exact_next_action": "Keep native Draw* disabled. Continue only an independent DX11 readiness gap; surface activation still requires live D3D9 surface ownership/binding evidence, proven MSAA mapping where needed, exhaustive census and Quest 3/VDXR visual parity."
-      },
-      "scope_guards": {
-        "native_draw_path_activation_changed": false,
-        "native_game_draw_routing": false,
-        "openxr_transport_changed": false,
-        "dxvk_lane_modified": false,
-        "localization_modified": false
-      },
-      "automation_validation": "PASS_STATIC_CONTRACT_BUILD_SUPERSEDED",
-      "blocker": "Full Win32/WARP probe execution for this unit was superseded by newer same-branch pushes; runtime Quest 3/VDXR validation remains unperformed and native Draw* remains disabled.",
-      "next_action": "Continue independent GitHub-only DX11 readiness without native Draw* activation; require a non-superseded Win32/WARP gate before claiming compiled surface-probe validation.",
-      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
-      "runtime_claim": "NONE"
-    }
-  ],
-  "state_persisted_for_continuation": true
+    "summary": "Added R117 dormant fixed-function draw-readiness composition. A nonzero draw candidate token now requires both the R115 activation snapshot and the R116 render-state snapshot; missing/not-ready/stale component evidence fails closed. Added hosted probe coverage and source-graph drift guards. Native Draw* routing remains disabled."
+  }
 }

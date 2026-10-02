@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "d879b6042908389444b45b0f040326855821d69b",
+  "state_parent_head": "d348f707d1ebea4d727f3e9e7488b97c69525bb2",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,15 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "4647f909cad0edc80306d590f98a33bc14cc6003",
-    "validation_bearing_sha": "4647f909cad0edc80306d590f98a33bc14cc6003",
-    "automation_validation": "PASS_REMOTE_STATIC",
+    "result_sha": "d879b6042908389444b45b0f040326855821d69b",
+    "validation_bearing_sha": "d879b6042908389444b45b0f040326855821d69b",
+    "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. SRC1 dual-source blend remains fail-closed until a proven second pixel-shader output/linkage path exists.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until parity proof.",
-  "independent_static_next_action": "R117 dormant draw-readiness composition is complete. Keep native Draw* disabled; consume later exact-SHA/descendant Win32 and DX11 readiness-smoke results when observable, then continue another independently provable pipeline/resource/shader readiness gap without weakening SRC1 dual-source or runtime parity gates.",
+  "independent_static_next_action": "R118 fixed-function alpha-test pipeline/shader handoff is complete and remains dormant. Keep native Draw* disabled; consume a later descendant hosted probe/build result when branch churn permits, then wire R118 only into dormant fixed-function census/readiness accounting while preserving programmable alpha-test, SRC1 dual-source, and Quest 3/VDXR activation gates.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -126,6 +126,16 @@
       "automation_validation": "PASS_STATIC_CONTRACT_BUILD_SUPERSEDED",
       "runtime_validation": "UNTESTED",
       "checkpoint": "STATE_PERSISTED",
+      "native_draw_path_activation_changed": false
+    },
+    {
+      "unit_id": "DX11_FIXED_FUNCTION_ALPHA_TEST_PIPELINE_HANDOFF_R118",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "d879b6042908389444b45b0f040326855821d69b",
+      "validation_bearing_sha": "d879b6042908389444b45b0f040326855821d69b",
+      "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false
     }
   ]
