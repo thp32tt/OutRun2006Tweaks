@@ -1822,6 +1822,40 @@ def main() -> None:
             + ", ".join(missing_r142_complete_fan_bound_draw)
         )
 
+    final_vs_b0_transform_contract = [
+        ("struct NativeFixedFunctionTransformBindingReadiness", NATIVE_BACKEND_HPP,
+         "final VS b0 transform live-binding evidence container"),
+        ("NativeFixedFunctionTransformBuffer::binding_readiness(", NATIVE_BACKEND_CPP,
+         "R96 transform owner live-binding observer"),
+        ("context->VSGetConstantBuffers(", NATIVE_BACKEND_CPP,
+         "live VS b0 constant-buffer readback"),
+        ("payload_hash_ = payloadHash;", NATIVE_BACKEND_CPP,
+         "uploaded WVP payload identity persistence"),
+        ("upload_transform_for_observation(", NATIVE_BACKEND_HPP,
+         "pipeline-bundle transform upload observation API"),
+        ("struct NativeFixedFunctionFullyBoundDrawReadiness", NATIVE_BACKEND_HPP,
+         "final transform-aware dormant pre-draw evidence"),
+        ("compose_fixed_function_fully_bound_draw_readiness(", NATIVE_BACKEND_CPP,
+         "final transform-aware pre-draw composition"),
+        ("final VS b0 transform binding seals exact WVP payload", CONSTANT_BUFFER_PROBE,
+         "positive live b0/WVP identity proof"),
+        ("final fully bound draw fails closed after VS b0 drift", CONSTANT_BUFFER_PROBE,
+         "live VS b0 drift negative proof"),
+        ("final VS b0 restore reproduces fully bound draw snapshot", CONSTANT_BUFFER_PROBE,
+         "deterministic VS b0 restore proof"),
+        ("final VS b0 copied WVP payload drift fails closed", CONSTANT_BUFFER_PROBE,
+         "copied WVP payload-integrity negative proof"),
+    ]
+    missing_final_vs_b0_transform = [
+        meaning for token, source, meaning in final_vs_b0_transform_contract
+        if token not in source
+    ]
+    if missing_final_vs_b0_transform:
+        raise SystemExit(
+            "DX11 final VS b0 transform binding contract drift: "
+            + ", ".join(missing_final_vs_b0_transform)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
@@ -1837,6 +1871,9 @@ def main() -> None:
             or "compose_fixed_function_same_context_bound_draw_readiness(" in runtime_source
             or "compose_fixed_function_complete_bound_draw_readiness(" in runtime_source
             or "validate_fixed_function_complete_bound_draw_snapshot(" in runtime_source
+            or "compose_fixed_function_fully_bound_draw_readiness(" in runtime_source
+            or "validate_fixed_function_fully_bound_draw_snapshot(" in runtime_source
+            or "upload_transform_for_observation(" in runtime_source
             or "compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(" in runtime_source
             or "validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(" in runtime_source
             or "validate_fixed_function_same_context_bound_draw_snapshot(" in runtime_source
