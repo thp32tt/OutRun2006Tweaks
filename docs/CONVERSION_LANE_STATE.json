@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "41027e1b5d38293aa9f420998736156672165841",
+  "state_parent_head": "28315ad8488d74a8744c1c70fc1e6325efa43435",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -13,7 +13,7 @@
       "AGENTS.md",
       "inherited/historical docs/VR_AUTODEV_STATE.json"
     ],
-    "reason": "The inherited VR_AUTODEV_STATE.json contains historical DX9Ex/global policy and must not overwrite current conversion-lane status."
+    "reason": "The inherited VR_AUTODEV_STATE.json contains historical DX9Ex/global policy and must not overwrite current DXVK conversion-lane status."
   },
   "environment": {
     "github_only_development": true,
@@ -51,15 +51,24 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DXVK-00267",
-    "result_sha": "75d91a42fa8fd6d08ab2d0e9048cd42cfd9a9b0b",
-    "automation_validation": "PASS_CORE_GATES_INSPECTOR_PENDING",
+    "task_id": "CONV-DXVK-000002",
+    "result_sha": "5574618845b1dab0f05ac5a3d9b7a15150fd5b45",
+    "run_record_commit_sha": "28315ad8488d74a8744c1c70fc1e6325efa43435",
+    "automation_validation": "PASS",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
+  "latest_static_evidence": {
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "control_flow_status": "EXACT_1827E9_TO_182828_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "raw_continuation_status": "EXACT_EXE_182828_TO_182868_PROVENANCE_CAPTURED",
+    "validated_result_sha": "5574618845b1dab0f05ac5a3d9b7a15150fd5b45",
+    "backend_conversion_gate_run_id": 36968261606,
+    "hud_inspector_run_id": 36968266438
+  },
   "runtime_blocker": "No runtime acceptance claim exists; exact disassembly/control-flow evidence remains review/static evidence only.",
   "runtime_next_action": "Quest 3/VDXR runtime validation remains a later user-hardware gate after a runtime candidate exists.",
-  "independent_static_next_action": "Continue from exact instruction boundary 0x00182635 with a fresh bounded canonical-EXE provenance window; preserve DXVK isolation and do not promote semantics beyond evidence.",
+  "independent_static_next_action": "Exact-decode only complete instructions from the validated canonical-EXE 0x00182828..0x00182868 window. Preserve the cut trailing instruction beginning with byte 0x25 near 0x00182867 as raw-only capture-edge evidence until a fresh overlapping window proves its remaining bytes; do not promote function/render/HUD/runtime semantics beyond evidence.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
