@@ -6974,6 +6974,79 @@ def main() -> None:
             + ", ".join(missing_r173_resultarg)
         )
 
+    r175_argument_modifier_contract = [
+        (
+            "D3DTA_COMPLEMENT and D3DTA_ALPHAREPLICATE are modifiers",
+            PIPELINE_TRANSLATION_CPP,
+            "R175 documented supported modifier boundary",
+        ),
+        (
+            "static_cast<DWORD>(D3DTA_COMPLEMENT) |",
+            PIPELINE_TRANSLATION_CPP,
+            "R175 complement accepted modifier bit",
+        ),
+        (
+            "static_cast<DWORD>(D3DTA_ALPHAREPLICATE);",
+            PIPELINE_TRANSLATION_CPP,
+            "R175 alpha-replicate accepted modifier bit",
+        ),
+        (
+            "if ((value & ~supportedBits) != 0)",
+            PIPELINE_TRANSLATION_CPP,
+            "R175 unknown modifier fail-closed predicate",
+        ),
+        (
+            'std::string(swizzle) == ".rgb"',
+            PIPELINE_TRANSLATION_CPP,
+            "R175 RGB alpha-replication selection",
+        ),
+        (
+            'return "(1.0 - " + base + ")";',
+            PIPELINE_TRANSLATION_CPP,
+            "R175 complement HLSL expression",
+        ),
+        (
+            "observeTextureStageState(D3DTSS_COLORARG1, out.colorArg1);",
+            RUNTIME_CENSUS,
+            "R175 source argument live observation",
+        ),
+        (
+            "hash = hash_mix(hash, stage.colorArg1);",
+            RUNTIME_CENSUS,
+            "R175 source argument census identity",
+        ),
+        (
+            "R175 supported D3DTA modifiers must remain shader-exact",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R175 supported modifier readiness probe",
+        ),
+        (
+            "float3 nextColor = (1.0 - sampled0.aaa);",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R175 combined complement/alpha-replicate HLSL probe",
+        ),
+        (
+            "R175 unknown D3DTA modifier bits must fail closed",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R175 unknown modifier negative probe",
+        ),
+        (
+            "DX11 fixed-function argument modifiers R175: PASS",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R175 hosted probe completion marker",
+        ),
+    ]
+    missing_r175_argument_modifier = [
+        meaning
+        for token, source, meaning in r175_argument_modifier_contract
+        if token not in source
+    ]
+    if missing_r175_argument_modifier:
+        raise SystemExit(
+            "DX11 R175 fixed-function argument modifier contract drift: "
+            + ", ".join(missing_r175_argument_modifier)
+        )
+
     r171_multisample_raster_contract = [
         (
             "DWORD multiSampleAntialias = TRUE;",
