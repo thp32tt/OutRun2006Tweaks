@@ -2121,6 +2121,14 @@ int main()
         !rejectedOutputBinding.ready(),
         "R126 missing R116 snapshot token fails closed");
 
+    NativeFixedFunctionOutputStateBinding staleRenderOutputBinding;
+    require(
+        !staleRenderOutputBinding.initialize(
+            d3d.device, renderStateBundle, renderStateReady,
+            outputStateReady) &&
+        !staleRenderOutputBinding.ready(),
+        "R129 stale R116 bundle generation cannot initialize output binding");
+
     const auto outputBindingTranslation =
         translate_pipeline(outputStateSource);
     require(
@@ -2170,18 +2178,18 @@ int main()
             outputStateReady.snapshotToken ^ 0x1ull),
         "R128 stale output-state snapshot fails closed");
 
-    DevicePair outputBindingOtherDevice = create_warp_device();
+    DevicePair sealedOutputBindingOtherDevice = create_warp_device();
     require(
         !outputBindingBundle.bind_output_state_if_ready(
-            outputBindingOtherDevice.context,
+            sealedOutputBindingOtherDevice.context,
             outputBindingTranslation,
             outputBindingRenderReady.snapshotToken,
             outputStateSource,
             surfacePairReady,
             outputStateReady.snapshotToken),
         "R128 foreign context fails closed");
-    outputBindingOtherDevice.context->Release();
-    outputBindingOtherDevice.device->Release();
+    sealedOutputBindingOtherDevice.context->Release();
+    sealedOutputBindingOtherDevice.device->Release();
 
     require(
         outputBindingBundle.bind_output_state_if_ready(

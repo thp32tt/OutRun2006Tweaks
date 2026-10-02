@@ -1589,6 +1589,33 @@ bool NativeFixedFunctionRenderStateBundle::validate_translation_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+bool NativeFixedFunctionRenderStateBundle::validate_readiness_snapshot(
+    ID3D11Device* expectedDevice,
+    const NativeFixedFunctionRenderStateReadiness& readiness) const noexcept {
+    if (!expectedDevice ||
+        !readiness.inputValid ||
+        !readiness.bundleReady ||
+        !readiness.deviceMatches ||
+        !readiness.translationMatches ||
+        !readiness.ready ||
+        readiness.bundleGeneration == 0 ||
+        readiness.translationIdentity == 0 ||
+        readiness.snapshotToken == 0 ||
+        !ready() ||
+        device_.Get() != expectedDevice ||
+        readiness.bundleGeneration != bundle_generation_ ||
+        readiness.translationIdentity != translation_identity_)
+        return false;
+
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(
+        token, reinterpret_cast<std::uintptr_t>(expectedDevice));
+    token = mix_readiness_snapshot_token(token, translation_identity_);
+    token = mix_readiness_snapshot_token(token, bundle_generation_);
+    token = token == 0 ? 1 : token;
+    return token == readiness.snapshotToken;
+}
+
 bool NativeFixedFunctionRenderStateBundle::bind_output_state_if_ready(
     ID3D11DeviceContext* context,
     const PipelineTranslation& translation,
@@ -2162,6 +2189,7 @@ bool NativeFixedFunctionOutputStateBinding::initialize(
         !outputState.omDynamicExact ||
         !outputState.ready ||
         outputState.snapshotToken == 0 ||
+        !renderStateBundle.validate_readiness_snapshot(device, renderState) ||
         !renderStateBundle.ready() ||
         renderStateBundle.device() != device ||
         !renderStateBundle.blend_state() ||

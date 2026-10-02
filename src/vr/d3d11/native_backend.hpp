@@ -510,6 +510,9 @@ public:
         ID3D11Device* expectedDevice,
         const PipelineTranslation& translation,
         std::uint64_t snapshotToken) const noexcept;
+    [[nodiscard]] bool validate_readiness_snapshot(
+        ID3D11Device* expectedDevice,
+        const NativeFixedFunctionRenderStateReadiness& readiness) const noexcept;
 
     // R128 consumes the sealed R116 immutable render-state identity together
     // with the sealed R124 dynamic output-state identity. This is a dormant
