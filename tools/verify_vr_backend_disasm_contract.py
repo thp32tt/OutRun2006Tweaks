@@ -29,6 +29,16 @@ def verify_dxvk_continuation_chain() -> None:
             raise SystemExit(f"DXVK continuation chain missing analyzer symbol: {name}")
         return analyzer[name]
 
+    def function_source(name: str) -> str:
+        marker = f"def {name}("
+        start = analyzer_source.find(marker)
+        if start < 0:
+            raise SystemExit(f"DXVK continuation collector source missing: {name}")
+        end = analyzer_source.find("\ndef ", start + len(marker))
+        if end < 0:
+            end = len(analyzer_source)
+        return analyzer_source[start:end]
+
     symbol_prefix = "GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_"
     discovered_raw_ids: set[int] = set()
     for name in analyzer:
@@ -58,12 +68,29 @@ def verify_dxvk_continuation_chain() -> None:
 
     for continuation_id in raw_ids:
         prefix = f"{symbol_prefix}{continuation_id}"
-        provenance_collector = analyzer.get(
-            f"collect_guarded_gf_target_c_helper_1_third_callee_continuation_{continuation_id}_provenance"
+        provenance_collector_name = (
+            f"collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
+            f"{continuation_id}_provenance"
         )
+        provenance_collector = analyzer.get(provenance_collector_name)
         if not callable(provenance_collector):
             raise SystemExit(
                 f"DXVK continuation {continuation_id} is missing its provenance collector"
+            )
+        provenance_source = function_source(provenance_collector_name)
+        conservative_raw_markers = (
+            '"semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY"',
+            '"call_semantics": "UNRESOLVED"',
+            '"ownership_effect": "NONE"',
+        )
+        missing_raw_markers = [
+            marker for marker in conservative_raw_markers
+            if marker not in provenance_source
+        ]
+        if missing_raw_markers:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} raw provenance escaped "
+                f"conservative semantic quarantine: {missing_raw_markers}"
             )
         provenance_name = (
             f"guarded_gf_target_c_helper_1_third_callee_continuation_"
@@ -125,12 +152,19 @@ def verify_dxvk_continuation_chain() -> None:
     cut_edge_ids: list[int] = []
     for continuation_id in proof_ids:
         prefix = f"{symbol_prefix}{continuation_id}"
-        proof_collector = analyzer.get(
-            f"collect_guarded_gf_target_c_helper_1_third_callee_continuation_{continuation_id}_prefix_proof"
+        proof_collector_name = (
+            f"collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
+            f"{continuation_id}_prefix_proof"
         )
+        proof_collector = analyzer.get(proof_collector_name)
         if not callable(proof_collector):
             raise SystemExit(
                 f"DXVK continuation {continuation_id} is missing its prefix-proof collector"
+            )
+        proof_source = function_source(proof_collector_name)
+        if '"ownership_effect": "NONE"' not in proof_source:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof unexpectedly promotes ownership"
             )
         proof_name = (
             f"guarded_gf_target_c_helper_1_third_callee_continuation_"
