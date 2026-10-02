@@ -2344,5 +2344,66 @@
       "exact_next_action": "Capture the next bounded canonical continuation starting at 0x00182DCF with mandatory overlap bytes 83 3d 60 bc. Keep that fresh window raw-only until canonical provenance succeeds; then exact-decode only complete instructions and resolve forward target 0x00182E34 only with exact instruction-boundary evidence. Keep function/render/HUD/runtime semantics unresolved.",
       "issue14_validation_comment_id": 5947562196
     }
+  ,
+    {
+      "unit_id": "DXVK_MODERN_OVERLAP_PREDECESSOR_CROSS_PROOF_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "fbdec361e708da352e7eb6171e8eed3d65832019",
+      "commit_message": "test: enforce DXVK overlap cross-proof identity [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Hardened the auto-discovered DXVK continuation verifier so F34/continuation-43 and later overlap provenance must preserve a three-way byte identity between the new probe, the declared overlap, and both predecessor expected/observed incomplete bytes; legacy collectors remain readable.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch/AGENTS/branch-local run and lane state, regression/problem history and Issue #14; tracked concurrent F36/F37 disassembly advancement and avoided duplicate frontier source writes."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Fresh branch-wide audit found modern F34+ overlap collectors already carry predecessor_overlap_matches cross-proof, but the generic verifier did not require that stronger predecessor expected/actual byte identity."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit fbdec361e708da352e7eb6171e8eed3d65832019 adds a modern-overlap fail-closed verifier contract requiring predecessor_overlap_matches assignment, expected/actual predecessor byte equality, captured-gate participation and report retention."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA fbdec361e708da352e7eb6171e8eed3d65832019 Build run 36979830082 job 110751602672 completed Verify backend disassembly contract with conclusion=success. Preflight also confirmed every current modern overlap collector (continuation >=43) with overlap metadata satisfies all five new markers."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit fbdec361e708da352e7eb6171e8eed3d65832019 contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947570664 records the production change."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only hardening; no runtime payload, selector, backend binary, deployment content or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit so the newer concurrent canonical-disassembly frontier remains authoritative."
+        }
+      },
+      "validation": {
+        "exact_sha": "fbdec361e708da352e7eb6171e8eed3d65832019",
+        "automation_validation": "PASS_EXACT_SHA_BACKEND_DISASM_CONTRACT_STEP",
+        "build_run_id": 36979830082,
+        "build_job_id": 110751602672,
+        "backend_disassembly_contract_step": "PASS",
+        "full_win32_build": "IN_PROGRESS_AT_STATE_WRITE_NOT_REQUIRED_FOR_VERIFIER_ONLY_UNIT",
+        "current_modern_overlap_preflight": "PASS",
+        "modern_overlap_baseline_continuation_id": 43,
+        "current_frontier_overlap_continuation_id": 46,
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947570664,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authoritative canonical-disassembly frontier. For every continuation-43+ overlap transition, retain predecessor expected/actual incomplete-byte cross-proof; continue raw/proof work only from the newest validated edge without function/render/HUD/runtime semantic promotion."
+    }
   ]
 }
