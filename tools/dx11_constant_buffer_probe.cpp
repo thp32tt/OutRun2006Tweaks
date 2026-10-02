@@ -2472,6 +2472,8 @@ int main()
         drawReady.requiredTextureMask == 0x1u &&
         drawReady.activationSnapshotToken ==
             texturedActivation.snapshotToken &&
+        drawReady.pipelineSnapshotToken ==
+            texturedActivation.pipelineSnapshotToken &&
         drawReady.renderStateSnapshotToken ==
             outputBindingRenderReady.snapshotToken &&
         drawReady.surfacePairSnapshotToken ==
@@ -2488,6 +2490,31 @@ int main()
             outputStateReady, outputStateBinding, indexedGeometryReady,
             drawReady.snapshotToken),
         "R131 draw readiness composes sealed output binding identity");
+
+    require(
+        pipelineBundle.bind_for_observation(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken),
+        "R134 bound draw pipeline rebind prerequisite");
+    const auto drawPipelineBindingReady =
+        pipelineBundle.binding_readiness(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken);
+    require(
+        drawPipelineBindingReady.inputValid &&
+        drawPipelineBindingReady.bundleReady &&
+        drawPipelineBindingReady.contextMatches &&
+        drawPipelineBindingReady.translationSnapshotValid &&
+        drawPipelineBindingReady.boundExact &&
+        drawPipelineBindingReady.ready &&
+        drawPipelineBindingReady.pipelineSnapshotToken ==
+            pipelineIdentityReady.snapshotToken &&
+        drawPipelineBindingReady.snapshotToken != 0 &&
+        pipelineBundle.validate_binding_snapshot(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken,
+            drawPipelineBindingReady.snapshotToken),
+        "R134 exact IA VS PS binding issues a live snapshot");
 
     const auto texturedDrawReady =
         outrun::vr::dx11::compose_fixed_function_textured_draw_readiness(
@@ -2509,6 +2536,58 @@ int main()
             drawReady, d3d.context, drawTextureStageSlot, samplerOwner, textureView,
             texturedDrawReady.snapshotToken),
         "R133 textured draw readiness composes the exact required PS stage");
+
+    const auto boundDrawReady =
+        outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
+            drawReady, texturedDrawReady, drawPipelineBindingReady);
+    require(
+        boundDrawReady.inputValid &&
+        boundDrawReady.texturedDrawReady &&
+        boundDrawReady.pipelineBindingReady &&
+        boundDrawReady.pipelineBindingMatchesDraw &&
+        boundDrawReady.componentSnapshotsPresent &&
+        boundDrawReady.ready &&
+        boundDrawReady.texturedDrawSnapshotToken ==
+            texturedDrawReady.snapshotToken &&
+        boundDrawReady.pipelineBindingSnapshotToken ==
+            drawPipelineBindingReady.snapshotToken &&
+        boundDrawReady.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_fixed_function_bound_draw_snapshot(
+            drawReady, texturedDrawReady, drawPipelineBindingReady,
+            boundDrawReady.snapshotToken),
+        "R134 bound draw readiness composes exact pipeline binding identity");
+
+    auto mismatchedPipelineBinding = drawPipelineBindingReady;
+    mismatchedPipelineBinding.pipelineSnapshotToken ^= 0x100000001b3ull;
+    const auto mismatchedPipelineBoundDraw =
+        outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
+            drawReady, texturedDrawReady, mismatchedPipelineBinding);
+    require(
+        mismatchedPipelineBoundDraw.pipelineBindingReady &&
+        !mismatchedPipelineBoundDraw.pipelineBindingMatchesDraw &&
+        !mismatchedPipelineBoundDraw.ready &&
+        mismatchedPipelineBoundDraw.snapshotToken == 0,
+        "R134 bound draw rejects mismatched R112 pipeline identity");
+
+    d3d.context->PSSetShader(nullptr, nullptr, 0);
+    const auto staleLivePipelineBinding =
+        pipelineBundle.binding_readiness(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken);
+    require(
+        !staleLivePipelineBinding.boundExact &&
+        !staleLivePipelineBinding.ready &&
+        staleLivePipelineBinding.snapshotToken == 0 &&
+        !pipelineBundle.validate_binding_snapshot(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken,
+            drawPipelineBindingReady.snapshotToken),
+        "R134 live PS binding drift invalidates pipeline binding snapshot");
+    require(
+        pipelineBundle.bind_for_observation(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken),
+        "R134 restore pipeline binding after drift probe");
 
     ID3D11SamplerState* clearDrawSampler = nullptr;
     ID3D11ShaderResourceView* clearDrawSrv = nullptr;
