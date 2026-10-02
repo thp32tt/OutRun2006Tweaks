@@ -15,7 +15,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Byte-for-byte restoration is a recovery-branch invariant, not an upgrade gate.
       - name: Verify exact pre-E controller files
+        if: github.ref == 'refs/heads/recovery/localization-no-e'
         shell: bash
         run: |
           set -euo pipefail
@@ -23,6 +25,12 @@ jobs:
           git cat-file -e "$BASELINE^{commit}"
           git diff --exit-code "$BASELINE" --             tools/chat-controller/v0.4/src/controller.py.part00             tools/chat-controller/v0.4/src/controller.py.part01             tools/chat-controller/v0.4/src/controller.py.part02             tools/chat-controller/v0.4/src/controller.py.part03             tools/chat-controller/v0.4/localization_A.md             tools/chat-controller/v0.4/localization_B.md             tools/chat-controller/v0.4/localization_C.md             tools/chat-controller/v0.4/Dockerfile.portainer             tools/chat-controller/v0.4/entrypoint.direct.sh             tools/chat-controller/v0.4/requirements.direct.txt             tools/chat-controller/v0.4/docker-compose.portainer-localization.yml
           test ! -e tools/chat-controller/v0.4/localization_E.md
+
+      - name: Validate maintained controller execution behavior
+        if: github.ref != 'refs/heads/recovery/localization-no-e'
+        run: |
+          test ! -e tools/chat-controller/v0.4/localization_E.md
+          python tests/test_localization_execution.py
 
       - name: Validate exact pre-E prompt contract
         shell: bash
