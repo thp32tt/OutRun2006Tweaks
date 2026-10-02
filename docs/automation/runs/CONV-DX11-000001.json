@@ -5,7 +5,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "8b760190868471eb2b02273de53a7d07025847a1",
-  "state_parent_head": "9edc5f6952825824d23f6c476e097b85aa6dc530",
+  "state_parent_head": "c01bb339838d98fb9156a47a5d93fd42d909b539",
   "material_result_sha": "d879b6042908389444b45b0f040326855821d69b",
   "validation_bearing_sha": "d879b6042908389444b45b0f040326855821d69b",
   "runtime_validation": "UNTESTED",
@@ -693,6 +693,98 @@
       "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_DESCENDANT_GATE",
       "blocker": "Hosted WARP probe completion for the R121-specific guard has not been observed under current branch churn. Runtime graphics validation remains UNTESTED; native Draw* still requires exhaustive exact-build census plus Quest 3/VDXR parity.",
       "next_action": "Keep NativeDrawPathActive disabled. Consume a non-superseded hosted dx11_constant_buffer_probe result when available, then feed R121 plan exactness into dormant per-resource MANAGED buffer census/readiness only while retaining R119 stale-mirror rejection.",
+      "checkpoint": "C6_STATE",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE",
+      "state_persisted": true
+    },
+    {
+      "unit_id": "DX11_FIXED_FUNCTION_UNLIT_NORMAL_READINESS",
+      "job_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_FIXED_FUNCTION_UNLIT_NORMAL_READINESS",
+      "base_sha": "c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e",
+      "material_result_sha": "6432ca4ad0b8d70f01678990debc376c8d8bee82",
+      "validation_bearing_sha": "6432ca4ad0b8d70f01678990debc376c8d8bee82",
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "The R93 diagnostic fixed-function vertex-shader prototype rejected every D3DFVF_NORMAL layout even when the captured D3D9 LIGHTING render state was known disabled. Fog semantics were runtime-census blocked, so this independent static readiness gap was selected instead.",
+      "summary": "Normal-bearing fixed-function FVFs now generate the dormant DX11 vertex-shader prototype only when lighting observation is complete and LIGHTING=FALSE. Unknown or enabled lighting remains fail-closed, NORMAL0 is carried through the diagnostic VS, census readiness consumes the captured lighting state, and native Draw* activation is unchanged.",
+      "changed_paths": [
+        "src/vr/d3d11/pipeline_translation.hpp",
+        "src/vr/d3d11/pipeline_translation.cpp",
+        "src/vr/d3d11/runtime_census.cpp",
+        "tools/dx11_shader_linkage_probe.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Read AGENTS.md, current conversion lane/run state, DX11 plan/work queue, regression knowledge/history and Issue #14 through the authenticated GitHub connector.",
+            "Tracked rapid same-JOB branch churn and avoided already-landed alpha-test, fog, surface, managed-buffer and triangle-fan units."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Confirmed RenderStateSnapshot already captures D3DRS_LIGHTING while generate_fixed_function_vertex_shader_prototype unconditionally rejected D3DFVF_NORMAL.",
+            "Confirmed generic translate_pipeline retains PipelineUnsupportedLighting for LIGHTING=TRUE, so narrowing only the unlit diagnostic VS readiness does not claim lighting semantics."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "material_commit": "6432ca4ad0b8d70f01678990debc376c8d8bee82",
+          "details": [
+            "Added FixedFunctionLightingState and passed complete captured lighting identity from runtime census into the fixed-function vertex prototype.",
+            "Allowed D3DFVF_NORMAL only for complete LIGHTING=FALSE observations; unknown or enabled lighting preserves FixedFunctionVertexShaderPrototypeUnsupportedNormal.",
+            "Emitted NORMAL0 input/output pass-through in generated diagnostic HLSL.",
+            "Added hosted shader-linkage positive/negative probes and source-graph drift guards."
+          ]
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
+          "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
+          "evidence": [
+            "Re-fetched exact material SHA and all five changed blobs; verified the lighting observation gate, NORMAL0 pass-through, unlit positive case, unknown/lit negative cases and source-graph guard.",
+            "Exact material diff contains no NativeDrawPathActive or localization changes.",
+            "GitHub Actions for the exact SHA started, including Backend Conversion Gate run 36971719554, but were cancelled by descendant branch pushes before hosted build/readiness-probe completion; no hosted build success is claimed."
+          ],
+          "exact_gate_run_id": 36971719554,
+          "runtime_validation": "UNTESTED"
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "6432ca4ad0b8d70f01678990debc376c8d8bee82",
+          "issue14_comment_id": 5946501107
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Dormant translation/census/probe readiness only. No native game Draw* routing, backend promotion, OpenXR transport, runtime candidate payload or package contents changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE_WITH_THIS_STATE_COMMIT",
+          "state_parent_head": "c01bb339838d98fb9156a47a5d93fd42d909b539",
+          "exact_next_action": "Keep native Draw* disabled. Preserve LIGHTING=TRUE and incomplete lighting observations as fail-closed until fixed-function material/light semantics are implemented; use a non-superseded descendant hosted shader-linkage/source-graph result when available."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "related_finding_or_regression_keys": [
+        "DX11_FIXED_FUNCTION_UNLIT_NORMAL_READINESS"
+      ],
+      "issue14_comment_id": 5946501107,
+      "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
+      "blocker": "Hosted build/shader-linkage completion for the exact material SHA was cancelled by rapid descendant pushes. Runtime graphics validation remains UNTESTED; native Draw* activation still requires the existing exhaustive census and Quest 3/VDXR parity gates.",
+      "next_action": "Keep active-lighting fixed-function draws fail-closed; consume a non-superseded hosted shader-linkage/source-graph result when branch churn permits.",
       "checkpoint": "C6_STATE",
       "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
       "runtime_claim": "NONE",
