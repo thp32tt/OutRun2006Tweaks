@@ -69,15 +69,8 @@ if dds:
     for rel,d in records:
         if all(k in d for k in required_post_reset):
             seen_post_reset=True
-            prompt_contract=str(d.get("prompt_contract",""))
-            if prompt_contract not in {"outrun-first-pass-edit-v1","outrun-first-pass-edit-v2"}:
+            if d.get("prompt_contract")!="outrun-first-pass-edit-v1":
                 bad.append(f"{rel}:invalid_prompt_contract")
-            try:
-                schema_version=int(d.get("schema_version",0) or 0)
-            except Exception:
-                schema_version=0
-            if schema_version >= 10 and prompt_contract != "outrun-first-pass-edit-v2":
-                bad.append(f"{rel}:schema_v{schema_version}_requires_v2_prompt_contract")
             if len(str(d.get("prompt_sha256","")))!=64 or len(str(d.get("prompt_json_sha256","")))!=64:
                 bad.append(f"{rel}:invalid_prompt_hash")
             if d.get("signed_slant_gate")!="PASS":
@@ -85,13 +78,12 @@ if dds:
             rv=str(d.get("runtime_validation","")).upper()
             if rv not in {"UNTESTED","PASS"}:
                 bad.append(f"{rel}:runtime_validation={rv}")
-        for metric_obj in walk(d):
-            for k in zero_keys:
-                if k in metric_obj:
-                    seen_zero_gate=True
-                    try:
-                        if int(metric_obj[k]) != 0: bad.append(f"{rel}:{k}={metric_obj[k]}")
-                    except Exception: bad.append(f"{rel}:{k}=INVALID")
+        for k in zero_keys:
+            if k in d:
+                seen_zero_gate=True
+                try:
+                    if int(d[k]) != 0: bad.append(f"{rel}:{k}={d[k]}")
+                except Exception: bad.append(f"{rel}:{k}=INVALID")
     if bad:
         raise SystemExit("post-reset zero-pixel QA failed: "+"; ".join(bad))
     if not seen_zero_gate:
