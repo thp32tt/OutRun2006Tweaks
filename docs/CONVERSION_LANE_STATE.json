@@ -1166,6 +1166,26 @@
       "issue14_comment_id": 5949643379,
       "validation_run_id": 36992160627,
       "validation_job_id": 110790748419
+    },
+    {
+      "unit_id": "DX11_FFP_D3DTOP_MODULATEALPHA_ADDCOLOR_COLOROP_SUPPORT",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "93d73bfef228fe03cc741a40c7523ad5114a5311",
+      "implementation_commits": [
+        "2eaac924ba8d2f971131f21ab9fad4d89bac77c1"
+      ],
+      "source_implementation_sha": "2eaac924ba8d2f971131f21ab9fad4d89bac77c1",
+      "material_result_sha": "2eaac924ba8d2f971131f21ab9fad4d89bac77c1",
+      "validation_bearing_sha": "a73942e981fce7c54888ccbf304ced6c577993d4",
+      "retaining_descendant_sha": "a73942e981fce7c54888ccbf304ced6c577993d4",
+      "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36992154270 job 110790622337; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_SOURCE_TEST_ONLY",
+      "issue14_comment_id": 5949591387,
+      "validation_run_id": 36992154270,
+      "validation_job_id": 110790622337
     }
   ]
 }
