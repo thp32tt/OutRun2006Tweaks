@@ -1492,6 +1492,69 @@ def main() -> None:
             + ", ".join(missing_r134_bound_pipeline_draw)
         )
 
+    r147_graphics_stage_isolation_contract = [
+        (
+            "bool graphicsStageIsolationReady{};",
+            NATIVE_BACKEND_HPP,
+            "R147 graphics-stage isolation readiness field",
+        ),
+        (
+            "context->GSSetShader(nullptr, nullptr, 0);",
+            NATIVE_BACKEND_CPP,
+            "R147 dormant binder clears geometry shader",
+        ),
+        (
+            "context->HSSetShader(nullptr, nullptr, 0);",
+            NATIVE_BACKEND_CPP,
+            "R147 dormant binder clears hull shader",
+        ),
+        (
+            "context->DSSetShader(nullptr, nullptr, 0);",
+            NATIVE_BACKEND_CPP,
+            "R147 dormant binder clears domain shader",
+        ),
+        (
+            "context->GSGetShader(",
+            NATIVE_BACKEND_CPP,
+            "R147 live geometry shader readback",
+        ),
+        (
+            "context->HSGetShader(",
+            NATIVE_BACKEND_CPP,
+            "R147 live hull shader readback",
+        ),
+        (
+            "context->DSGetShader(",
+            NATIVE_BACKEND_CPP,
+            "R147 live domain shader readback",
+        ),
+        (
+            "out.graphicsStageIsolationReady =",
+            NATIVE_BACKEND_CPP,
+            "R147 fixed-function graphics-stage isolation gate",
+        ),
+        (
+            "R147 live GS drift invalidates fixed-function pipeline binding",
+            CONSTANT_BUFFER_PROBE,
+            "R147 WARP fail-closed graphics-stage drift proof",
+        ),
+        (
+            "R147 restore fixed-function graphics stage isolation",
+            CONSTANT_BUFFER_PROBE,
+            "R147 WARP isolation restoration proof",
+        ),
+    ]
+    missing_r147_graphics_stage_isolation = [
+        meaning
+        for token, source, meaning in r147_graphics_stage_isolation_contract
+        if token not in source
+    ]
+    if missing_r147_graphics_stage_isolation:
+        raise SystemExit(
+            "DX11 R147 graphics-stage isolation contract drift: "
+            + ", ".join(missing_r147_graphics_stage_isolation)
+        )
+
     r136_multi_stage_texture_binding_contract = [
         (
             "struct NativeFixedFunctionTextureBindingSetReadiness",

@@ -137,6 +137,43 @@ namespace
             "D3DCompile R93 vertex prototype");
         return bytecode;
     }
+
+    ID3DBlob* compile_geometry_shader()
+    {
+        static const char source[] = R"(
+struct GSIn { float4 position : SV_Position; };
+struct GSOut { float4 position : SV_Position; };
+[maxvertexcount(1)]
+void main(point GSIn input[1], inout PointStream<GSOut> outputStream)
+{
+    GSOut output;
+    output.position = input[0].position;
+    outputStream.Append(output);
+}
+)";
+        ID3DBlob* bytecode = nullptr;
+        ID3DBlob* diagnostics = nullptr;
+        const HRESULT hr = D3DCompile(
+            source,
+            sizeof(source) - 1,
+            "OutRunR147IsolationGeometryShader",
+            nullptr,
+            nullptr,
+            "main",
+            "gs_4_0",
+            D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
+            0,
+            &bytecode,
+            &diagnostics);
+
+        if (diagnostics)
+            diagnostics->Release();
+
+        require(
+            SUCCEEDED(hr) && bytecode != nullptr,
+            "D3DCompile R147 isolation geometry shader");
+        return bytecode;
+    }
 }
 
 int main()
@@ -2138,6 +2175,17 @@ int main()
         "CreateVertexShader R93");
     d3d.context->VSSetShader(vertexShader, nullptr, 0);
 
+    ID3DBlob* isolationGeometryBytecode = compile_geometry_shader();
+    ID3D11GeometryShader* isolationGeometryShader = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateGeometryShader(
+            isolationGeometryBytecode->GetBufferPointer(),
+            isolationGeometryBytecode->GetBufferSize(),
+            nullptr,
+            &isolationGeometryShader)) &&
+        isolationGeometryShader != nullptr,
+        "CreateGeometryShader R147 isolation probe");
+
     NativeFixedFunctionTransformBuffer owner;
     require(!owner.ready(), "R96 owner must start dormant");
     require(owner.upload_generation() == 0,
@@ -2845,6 +2893,10 @@ int main()
         drawPipelineBindingReady.bundleReady &&
         drawPipelineBindingReady.contextMatches &&
         drawPipelineBindingReady.translationSnapshotValid &&
+        drawPipelineBindingReady.geometryShaderClear &&
+        drawPipelineBindingReady.hullShaderClear &&
+        drawPipelineBindingReady.domainShaderClear &&
+        drawPipelineBindingReady.graphicsStageIsolationReady &&
         drawPipelineBindingReady.boundExact &&
         drawPipelineBindingReady.ready &&
         drawPipelineBindingReady.pipelineSnapshotToken ==
@@ -2855,6 +2907,44 @@ int main()
             pipelineIdentityReady.snapshotToken,
             drawPipelineBindingReady.snapshotToken),
         "R134 exact IA VS PS binding issues a live snapshot");
+
+    d3d.context->GSSetShader(isolationGeometryShader, nullptr, 0);
+    const auto graphicsStageIsolationDrift =
+        pipelineBundle.binding_readiness(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken);
+    require(
+        graphicsStageIsolationDrift.inputValid &&
+        graphicsStageIsolationDrift.bundleReady &&
+        graphicsStageIsolationDrift.contextMatches &&
+        graphicsStageIsolationDrift.translationSnapshotValid &&
+        !graphicsStageIsolationDrift.geometryShaderClear &&
+        graphicsStageIsolationDrift.hullShaderClear &&
+        graphicsStageIsolationDrift.domainShaderClear &&
+        !graphicsStageIsolationDrift.graphicsStageIsolationReady &&
+        !graphicsStageIsolationDrift.boundExact &&
+        !graphicsStageIsolationDrift.ready &&
+        graphicsStageIsolationDrift.snapshotToken == 0 &&
+        !pipelineBundle.validate_binding_snapshot(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken,
+            drawPipelineBindingReady.snapshotToken),
+        "R147 live GS drift invalidates fixed-function pipeline binding");
+    require(
+        pipelineBundle.bind_for_observation(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken),
+        "R147 restore fixed-function graphics stage isolation");
+    const auto graphicsStageIsolationRestored =
+        pipelineBundle.binding_readiness(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken);
+    require(
+        graphicsStageIsolationRestored.ready &&
+        graphicsStageIsolationRestored.graphicsStageIsolationReady &&
+        graphicsStageIsolationRestored.snapshotToken ==
+            drawPipelineBindingReady.snapshotToken,
+        "R147 restored graphics stage isolation reproduces pipeline snapshot");
 
     const auto texturedDrawReady =
         outrun::vr::dx11::compose_fixed_function_textured_draw_readiness(
@@ -4633,6 +4723,8 @@ int main()
     fixedFunctionTexture->Release();
     otherDevice.context->Release();
     otherDevice.device->Release();
+    isolationGeometryShader->Release();
+    isolationGeometryBytecode->Release();
     vertexShader->Release();
     d3d.context->Release();
     d3d.device->Release();
@@ -4643,6 +4735,7 @@ int main()
     std::cout << "DX11 constant buffer lifetime R96: PASS\n";
     std::cout << "DX11 fixed-function pipeline bundle R97: PASS\n";
     std::cout << "DX11 dormant fixed-function pipeline object binding: PASS\n";
+    std::cout << "DX11 fixed-function GS/HS/DS isolation R147: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
     std::cout << "DX11 texture mutation readiness R100: PASS\n";

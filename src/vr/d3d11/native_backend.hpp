@@ -674,6 +674,10 @@ struct NativeFixedFunctionPipelineBindingReadiness {
     bool bundleReady{};
     bool contextMatches{};
     bool translationSnapshotValid{};
+    bool geometryShaderClear{};
+    bool hullShaderClear{};
+    bool domainShaderClear{};
+    bool graphicsStageIsolationReady{};
     bool boundExact{};
     bool ready{};
     std::uint64_t pipelineSnapshotToken{};

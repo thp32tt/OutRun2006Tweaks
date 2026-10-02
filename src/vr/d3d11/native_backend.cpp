@@ -2131,22 +2131,43 @@ bool NativeFixedFunctionPipelineBundle::bind_for_observation(
     context->IASetInputLayout(input_layout_.Get());
     context->VSSetShader(vertex_shader_.Get(), nullptr, 0);
     context->PSSetShader(pixel_shader_.Get(), nullptr, 0);
+    // R147 fixed-function draws must not inherit programmable stages that do
+    // not exist in the D3D9 fixed-function contract. Clear them at the same
+    // dormant observation boundary as IA/VS/PS before issuing any readiness.
+    context->GSSetShader(nullptr, nullptr, 0);
+    context->HSSetShader(nullptr, nullptr, 0);
+    context->DSSetShader(nullptr, nullptr, 0);
 
     Microsoft::WRL::ComPtr<ID3D11InputLayout> boundInputLayout;
     Microsoft::WRL::ComPtr<ID3D11VertexShader> boundVertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> boundPixelShader;
+    Microsoft::WRL::ComPtr<ID3D11GeometryShader> boundGeometryShader;
+    Microsoft::WRL::ComPtr<ID3D11HullShader> boundHullShader;
+    Microsoft::WRL::ComPtr<ID3D11DomainShader> boundDomainShader;
     context->IAGetInputLayout(boundInputLayout.ReleaseAndGetAddressOf());
     context->VSGetShader(
         boundVertexShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
     context->PSGetShader(
         boundPixelShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    context->GSGetShader(
+        boundGeometryShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    context->HSGetShader(
+        boundHullShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    context->DSGetShader(
+        boundDomainShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
 
     if (boundInputLayout.Get() != input_layout_.Get() ||
         boundVertexShader.Get() != vertex_shader_.Get() ||
-        boundPixelShader.Get() != pixel_shader_.Get()) {
+        boundPixelShader.Get() != pixel_shader_.Get() ||
+        boundGeometryShader.Get() != nullptr ||
+        boundHullShader.Get() != nullptr ||
+        boundDomainShader.Get() != nullptr) {
         context->IASetInputLayout(nullptr);
         context->VSSetShader(nullptr, nullptr, 0);
         context->PSSetShader(nullptr, nullptr, 0);
+        context->GSSetShader(nullptr, nullptr, 0);
+        context->HSSetShader(nullptr, nullptr, 0);
+        context->DSSetShader(nullptr, nullptr, 0);
         return false;
     }
     return true;
@@ -2179,15 +2200,32 @@ NativeFixedFunctionPipelineBundle::binding_readiness(
         Microsoft::WRL::ComPtr<ID3D11InputLayout> boundInputLayout;
         Microsoft::WRL::ComPtr<ID3D11VertexShader> boundVertexShader;
         Microsoft::WRL::ComPtr<ID3D11PixelShader> boundPixelShader;
+        Microsoft::WRL::ComPtr<ID3D11GeometryShader> boundGeometryShader;
+        Microsoft::WRL::ComPtr<ID3D11HullShader> boundHullShader;
+        Microsoft::WRL::ComPtr<ID3D11DomainShader> boundDomainShader;
         context->IAGetInputLayout(boundInputLayout.ReleaseAndGetAddressOf());
         context->VSGetShader(
             boundVertexShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
         context->PSGetShader(
             boundPixelShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+        context->GSGetShader(
+            boundGeometryShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+        context->HSGetShader(
+            boundHullShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+        context->DSGetShader(
+            boundDomainShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+        out.geometryShaderClear = boundGeometryShader.Get() == nullptr;
+        out.hullShaderClear = boundHullShader.Get() == nullptr;
+        out.domainShaderClear = boundDomainShader.Get() == nullptr;
+        out.graphicsStageIsolationReady =
+            out.geometryShaderClear &&
+            out.hullShaderClear &&
+            out.domainShaderClear;
         out.boundExact =
             boundInputLayout.Get() == input_layout_.Get() &&
             boundVertexShader.Get() == vertex_shader_.Get() &&
-            boundPixelShader.Get() == pixel_shader_.Get();
+            boundPixelShader.Get() == pixel_shader_.Get() &&
+            out.graphicsStageIsolationReady;
     }
 
     out.ready =
@@ -2208,6 +2246,10 @@ NativeFixedFunctionPipelineBundle::binding_readiness(
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint64_t>(
                 reinterpret_cast<std::uintptr_t>(pixel_shader_.Get())));
+        // Version the live binding identity with the R147 isolation contract
+        // so pre-isolation snapshots cannot alias an isolated pipeline proof.
+        token = mix_readiness_snapshot_token(
+            token, out.graphicsStageIsolationReady ? 0x147u : 0u);
         out.snapshotToken = token == 0 ? 1 : token;
     }
     return out;
