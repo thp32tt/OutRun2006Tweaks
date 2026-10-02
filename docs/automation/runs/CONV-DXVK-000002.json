@@ -4758,6 +4758,83 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the inherited-target handoff guard and continue only from the newest branch-authoritative canonical raw/exact frontier; carried targets entering a successor exact capture must be explicitly resolved."
+    },
+    {
+      "unit_id": "DXVK_F53_CANONICAL_CONTROL_FLOW_0x183133_TO_0x183173",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "3234252f267a5a3a057f24b6900aa1878231f1ce",
+      "validation_bearing_result_sha": "3234252f267a5a3a057f24b6900aa1878231f1ce",
+      "commit_message": "dxvk: prove canonical 0x183133 control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Canonical F53 exact proof decodes all 64 validated continuation_60 bytes at 0x00183133..0x00183173 as 20 contiguous complete instructions, resolves predecessor target 0x00183159 on an exact boundary, proves one direct rel32 CALL and one direct rel32 JMP, and ends exactly at 0x00183173 while carrying 0x00183186/0x00183198 forward as unresolved address-only predecessor targets.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Authenticated GitHub branch authority, AGENTS.md, current conversion/run state, regression/problem history and Issue #14 were refreshed repeatedly while concurrent same-JOB commits advanced the frontier."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected and followed the newest runnable canonical frontier; duplicate raw/proof units were skipped as concurrent commits landed, ending on continuation_60 exact control-flow proof."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material analyzer commit 3234252f267a5a3a057f24b6900aa1878231f1ce contains the required marker and exact F53 proof."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact material-SHA OutRun EXE HUD Inspector CI run 36987677912 static-exe-analysis job 110776366478 completed SUCCESS with canonical bytes/proof status and artifact upload."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit contains [AUTO:CONV-DXVK-000002]; Issue #14 validation/implementation comment 5948761716 records the unit."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly proof only; no runtime/package/localization payload changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally in durable task state; lane mirror follows separately so newer primary state is preserved."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "3234252f267a5a3a057f24b6900aa1878231f1ce",
+        "hud_inspector_run_id": 36987677912,
+        "static_exe_analysis_job_id": 110776366478,
+        "proof_status": "EXACT_183133_TO_183173_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "instruction_count": 20,
+        "start_rva": "0x00183133",
+        "prefix_end_rva": "0x00183173",
+        "capture_boundary_matches": true,
+        "branch_target": "0x00183154->0x001832D4",
+        "branch_targets_match": true,
+        "call_target": "0x0018314C->0x00186695",
+        "calls_match": true,
+        "raw_call_census_matches": true,
+        "predecessor_target_contract": true,
+        "resolved_predecessor_targets": [
+          "0x00183159"
+        ],
+        "resolved_predecessor_targets_on_boundaries": true,
+        "remaining_predecessor_external_targets": [
+          "0x00183186",
+          "0x00183198"
+        ],
+        "artifact_id": 11218192408,
+        "artifact_digest": "sha256:2e78b8888670e1e150c9ad649c676312f66b6560b520138bb5c4b77617cc2b87",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5948761716,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_CONCURRENT_PRIMARY_FRONTIER",
+      "semantic_promotion": "BOUNDED_CONTROL_FLOW_ONLY",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve any newer branch-authoritative frontier. If 0x00183173 remains the newest exact proof edge, capture a fresh bounded canonical continuation beginning there, validate provenance, then exact-decode only complete canonical instructions while keeping function/render/HUD/runtime semantics unresolved."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
