@@ -38,6 +38,16 @@ class VerifyDxvkContinuationWindowTests(unittest.TestCase):
         }
         self.assertIn("invalid:overlap-bytes", validate(record))
 
+    def test_rejects_invalid_branch_target_rva(self) -> None:
+        record = {
+            "start_rva": "0x100",
+            "end_rva": "0x104",
+            "overlap_bytes": "8B FF 55",
+            "instruction_count": 1,
+            "branch_targets": [{"rva": "bad"}],
+        }
+        self.assertIn("invalid:branch-target-0-rva", validate(record))
+
 
 if __name__ == "__main__":
     unittest.main()
