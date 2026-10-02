@@ -4,77 +4,74 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "e4eb422cfd57eb2cf28d347b5222ba0123ba35d1",
-  "state_parent_head": "e8ffadba4d4158b614cde41a0158fb6241eff162",
-  "material_result_sha": "7a95c056de9684ea950dcdfd147a57b9a15a769d",
-  "validation_bearing_sha": "7a95c056de9684ea950dcdfd147a57b9a15a769d",
+  "base_sha": "0173af45647eb3d27c46b78968cdebdb2060e246",
+  "state_parent_head": "20fe8de20f516e21012908eaa3449675b153c1b6",
+  "material_result_sha": "603a906e35e606be4a3fd48b97cd8b42ddb87127",
+  "validation_bearing_sha": "20fe8de20f516e21012908eaa3449675b153c1b6",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_DORMANT_TEXTURE_STAGE_BINDING",
-  "selection_reason": "R98 sampler and R99 Texture2D/SRV ownership were exact dormant prerequisites but explicitly stopped before PS-stage binding. This independent gap could be closed without native Draw* activation, runtime hardware, sampler-LOD semantic relaxation, or overlap with the concurrent triangle-fan/surface-pair work.",
-  "summary": "Added a dormant matched PS texture-stage binding primitive for the proven R98 sampler and R99 Texture2D SRV. It requires legal sampler/SRV slot bounds, same-device owner identity and same-device context identity before issuing PSSetSamplers/PSSetShaderResources. Hosted WARP probe coverage locks positive binding/readback plus slot overflow, foreign-context and cross-device-owner fail-closed behavior. Native game Draw* routing remains disabled.",
+  "selected_work": "DX11_TEXTURE_STAGE_BIND_IDENTITY_HAZARD_R131",
+  "selection_reason": "The newly completed dormant PS sampler/SRV texture-stage binder returned true immediately after PSSetShaderResources. D3D11 may silently NULL an SRV that conflicts with an output-bound resource, so readiness could be falsely reported. This was an independent static/WARP-testable correctness gap that did not require native Draw* activation or user hardware.",
+  "summary": "Hardened the dormant DX11 fixed-function texture-stage binder with post-bind sampler/SRV identity readback and rollback of partial PS state on mismatch. Added a WARP RTV/SRV hazard regression and source-graph drift guards. Native game Draw* routing remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read current GitHub branch HEAD, AGENTS.md, docs/CONVERSION_LANE_STATE.json, current CONV-DX11-000001 record, DX11 plan/checkpoint/work-queue context, regression knowledge/history and Issue #14 through the authenticated GitHub connector.",
-        "Observed concurrent R128/R129 output/surface/fan work and selected the independent R98/R99 texture-stage binding gap instead of duplicating those paths."
+        "Read current GitHub HEAD, AGENTS.md, docs/CONVERSION_LANE_STATE.json, current CONV-DX11-000001 record, regression knowledge/history and Issue #14 through the authenticated GitHub connector.",
+        "Observed that DX11_DORMANT_TEXTURE_STAGE_BINDING had completed concurrently and selected its remaining post-bind identity hazard rather than duplicating the already-completed binding unit."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Confirmed NativeFixedFunctionSamplerState owned an exact D3D11 sampler but source-graph policy explicitly prohibited PSSetSamplers.",
-        "Confirmed NativeFixedFunctionTextureView owned an exact Texture2D SRV but source-graph policy explicitly prohibited PSSetShaderResources.",
-        "No matching runtime-regression risk path requires changing Issue #13; native activation and non-default R125 sampler LOD state remain fail-closed."
+        "Confirmed bind_fixed_function_texture_stage_for_observation() validated input/device/slot identity but returned true without checking the effective PS binding.",
+        "D3D11 hazard resolution can leave an SRV slot NULL when that resource is simultaneously bound for output, making a no-readback success result unsafe for dormant readiness composition."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
-        "src/vr/d3d11/native_backend.hpp",
         "src/vr/d3d11/native_backend.cpp",
         "tools/dx11_constant_buffer_probe.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "0173af45647eb3d27c46b78968cdebdb2060e246",
-        "ba894ac6a802f73a31d04f8a58552e5a72046e0c",
-        "f9aa2dd9b308b949370fb9f880abab3a09d95a58",
-        "7a95c056de9684ea950dcdfd147a57b9a15a769d"
+        "cb5bdfa56a952dc03e1ab675b56e77013342d017",
+        "dcc2eb74ede3b725516a15449a6b9c0aaf008ad4",
+        "603a906e35e606be4a3fd48b97cd8b42ddb87127"
       ],
       "details": [
-        "Added bind_fixed_function_texture_stage_for_observation() with legal PS sampler/SRV slot bounds.",
-        "Required sampler owner, texture owner and supplied D3D11 context to share the exact device before any state mutation.",
-        "Bound sampler and SRV as one matched pixel-shader stage without issuing Draw*.",
-        "Added WARP positive/readback identity and fail-closed slot/foreign-context/cross-device-owner probes plus branch-wide source-graph guards."
+        "Read back PS sampler and SRV after binding and require exact object identity.",
+        "If either binding differs, clear both PS slots and fail closed instead of reporting readiness.",
+        "Added a WARP probe that binds the same Texture2D as an RTV, verifies the texture-stage bind fails, and verifies no partial sampler/SRV state remains.",
+        "Added source-graph markers for readback, fail-closed identity gates, rollback and hazard probe coverage."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_REMOTE_STATIC",
+      "status": "COMPLETE_REMOTE_STATIC_CI_PENDING",
+      "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_CI_PENDING",
       "evidence": [
-        "Re-fetched all four changed paths from exact material result SHA lineage and confirmed declaration/implementation, both slot bounds, owner/context device gates, positive/readback probes, negative probes, source-graph guards and no NativeDrawPathActive=true in the changed paths.",
-        "All four implementation commits were re-fetched from GitHub and contain the required [AUTO:CONV-DX11-000001] marker.",
-        "Backend Conversion Gate 36973781914 and exact-SHA Build/architecture runs started for 7a95c056 but were cancelled by a later same-branch descendant push before hosted jobs produced compile/WARP evidence. No hosted build success is claimed."
+        "Re-fetched descendant GitHub HEAD 7c49602b3765ec483871908aa1cfccbae267c530 and confirmed all readback/rollback implementation markers, both new WARP probe markers and all source-graph guard markers were retained.",
+        "GitHub Actions associated with that descendant were pending/queued when checked (Build run 36974113075 among them); no hosted compile or WARP execution success is claimed.",
+        "Material commit 603a906e35e606be4a3fd48b97cd8b42ddb87127 remains an ancestor of the active branch."
       ],
-      "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_BY_DESCENDANT_PUSH",
-      "ci_result": "EXACT_SHA_CI_CANCELLED_BY_DESCENDANT_PUSH"
+      "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "7a95c056de9684ea950dcdfd147a57b9a15a769d",
-      "issue14_comment_id": 5946753098
+      "material_commit": "603a906e35e606be4a3fd48b97cd8b42ddb87127",
+      "issue14_comment_id": 5946792002
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant D3D11 PS-stage binding/test infrastructure only. No native game Draw* routing, backend promotion, OpenXR transport, runtime candidate payload or distributable package contents were activated."
+      "reason": "Dormant binding correctness/test hardening only; no native game Draw* routing, backend promotion, OpenXR transport, runtime candidate payload or distributable package behavior changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATE_COMMITS",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Consume a non-superseded descendant hosted source-graph/Win32/WARP result containing this material when available. The next independent source unit may bind the already-proven R97 fixed-function pipeline objects only behind dormant exact-device/readiness gates; exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before any native Draw* activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Consume a non-superseded hosted Build/WARP result containing 603a906e. Then continue composing proven PS texture-stage sampler/SRV identity with proven RS/OM binding identity into dormant draw-candidate readiness without routing game Draw*; exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -84,29 +81,39 @@
     "dxvk_lane_modified": false,
     "localization_modified": false
   },
-  "issue14_comment_id": 5946753098,
-  "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_BY_DESCENDANT_PUSH",
-  "blocker": "Hosted Win32/WARP execution for the exact material SHA was superseded by same-branch churn. This does not block independent static conversion work. Exact-build exhaustive census and Quest 3/VDXR graphics parity still block native Draw* activation.",
-  "next_action": "Keep NativeDrawPathActive disabled. Consume a non-superseded descendant hosted source-graph/Win32/WARP result containing 7a95c056 when available; otherwise continue the next independent dormant pipeline-binding/readiness unit without relaxing R125 sampler LOD or runtime parity gates.",
+  "issue14_comment_id": 5946792002,
+  "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_CI_PENDING",
+  "blocker": "Hosted Build/WARP results were not complete at validation time. Runtime graphics validation remains UNTESTED; this does not block further independent GitHub-only static/source work.",
+  "next_action": "Keep NativeDrawPathActive disabled. Consume a non-superseded hosted Build/WARP result containing 603a906e; then compose proven PS texture-stage and RS/OM binding identities into dormant draw-candidate readiness without relaxing the runtime parity gate.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "prior_completed_unit": {
-    "selected_work": "DX11_FIXED_FUNCTION_ALPHA_TEST_PIPELINE_HANDOFF_R118",
-    "material_result_sha": "d879b6042908389444b45b0f040326855821d69b",
-    "validation_bearing_sha": "d879b6042908389444b45b0f040326855821d69b",
-    "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
+    "selected_work": "DX11_DORMANT_TEXTURE_STAGE_BINDING",
+    "material_result_sha": "7a95c056de9684ea950dcdfd147a57b9a15a769d",
+    "validation_bearing_sha": "7a95c056de9684ea950dcdfd147a57b9a15a769d",
+    "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_BY_DESCENDANT_PUSH",
     "runtime_validation": "UNTESTED",
     "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
     "checkpoint": "C6_STATE",
-    "summary": "Added a dedicated R118 fixed-function pipeline/shader translation wrapper. Generic translate_pipeline() remains alpha-test-inexact. Only an explicitly observed fixed-function draw with complete state and a successfully generated pixel-shader prototype may clear PipelineUnsupportedAlphaTest; all unrelated blockers remain. Added hosted semantic probe and build/workflow wiring. Native Draw* routing remains disabled.",
+    "summary": "Added a dormant matched PS texture-stage binding primitive for the proven R98 sampler and R99 Texture2D SRV. It requires legal sampler/SRV slot bounds, same-device owner identity and same-device context identity before issuing PSSetSamplers/PSSetShaderResources. Hosted WARP probe coverage locks positive binding/readback plus slot overflow, foreign-context and cross-device-owner fail-closed behavior. Native game Draw* routing remains disabled.",
     "prior_completed_unit": {
-      "selected_work": "DX11_DORMANT_DRAW_READINESS_COMPOSITION_R117",
-      "material_result_sha": "4647f909cad0edc80306d590f98a33bc14cc6003",
-      "validation_bearing_sha": "4647f909cad0edc80306d590f98a33bc14cc6003",
-      "automation_validation": "PASS_REMOTE_STATIC",
+      "selected_work": "DX11_FIXED_FUNCTION_ALPHA_TEST_PIPELINE_HANDOFF_R118",
+      "material_result_sha": "d879b6042908389444b45b0f040326855821d69b",
+      "validation_bearing_sha": "d879b6042908389444b45b0f040326855821d69b",
+      "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
       "runtime_validation": "UNTESTED",
-      "summary": "Added R117 dormant fixed-function draw-readiness composition. A nonzero draw candidate token now requires both the R115 activation snapshot and the R116 render-state snapshot; missing/not-ready/stale component evidence fails closed. Added hosted probe coverage and source-graph drift guards. Native Draw* routing remains disabled."
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "checkpoint": "C6_STATE",
+      "summary": "Added a dedicated R118 fixed-function pipeline/shader translation wrapper. Generic translate_pipeline() remains alpha-test-inexact. Only an explicitly observed fixed-function draw with complete state and a successfully generated pixel-shader prototype may clear PipelineUnsupportedAlphaTest; all unrelated blockers remain. Added hosted semantic probe and build/workflow wiring. Native Draw* routing remains disabled.",
+      "prior_completed_unit": {
+        "selected_work": "DX11_DORMANT_DRAW_READINESS_COMPOSITION_R117",
+        "material_result_sha": "4647f909cad0edc80306d590f98a33bc14cc6003",
+        "validation_bearing_sha": "4647f909cad0edc80306d590f98a33bc14cc6003",
+        "automation_validation": "PASS_REMOTE_STATIC",
+        "runtime_validation": "UNTESTED",
+        "summary": "Added R117 dormant fixed-function draw-readiness composition. A nonzero draw candidate token now requires both the R115 activation snapshot and the R116 render-state snapshot; missing/not-ready/stale component evidence fails closed. Added hosted probe coverage and source-graph drift guards. Native Draw* routing remains disabled."
+      }
     }
   }
 }
