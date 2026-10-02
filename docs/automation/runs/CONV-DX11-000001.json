@@ -4,77 +4,72 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "71fcebb7ec6d4de166b931d934ebb15ebc02ad4c",
-  "state_parent_head": "dce144aecbc6945a2086c22ef5020ff340a71a3e",
-  "material_result_sha": "e181d379e4ec61b863011595e846817b788c0d35",
-  "source_implementation_sha": "e181d379e4ec61b863011595e846817b788c0d35",
-  "validation_bearing_sha": "e181d379e4ec61b863011595e846817b788c0d35",
-  "retaining_descendant_sha": "dce144aecbc6945a2086c22ef5020ff340a71a3e",
+  "base_sha": "e181d379e4ec61b863011595e846817b788c0d35",
+  "state_parent_head": "b88f8970bba0a03c4bf2af09499a4a933124da67",
+  "material_result_sha": "9c15f26db8939f268d4e9f2f0339ebe8869bd55e",
+  "source_implementation_sha": "9c15f26db8939f268d4e9f2f0339ebe8869bd55e",
+  "validation_bearing_sha": "9c15f26db8939f268d4e9f2f0339ebe8869bd55e",
+  "retaining_descendant_sha": "b88f8970bba0a03c4bf2af09499a4a933124da67",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_FFP_TEXTURE_FACTOR_CONSUMPTION_R191",
-  "selection_reason": "Fresh authenticated GitHub audit found R191 D3DRS_TEXTUREFACTOR snapshot/census provenance retained but no DX11 fixed-function shader consumer for D3DTA_TFACTOR or D3DTOP_BLENDFACTORALPHA. Both semantics are exactly expressible from the already captured state without user-PC runtime access.",
-  "summary": "Completed dormant DX11 R191 texture-factor consumption: D3DTA_TFACTOR ARGB-to-RGBA shader constants, D3DTOP_BLENDFACTORALPHA interpolation, live/census generator handoff, hosted semantic/offline-compile coverage and durable source-graph guards. NativeDrawPathActive remains disabled.",
+  "selected_work": "DX11_CENSUS_R191_TEXTURE_FACTOR_ANALYZER_EVIDENCE",
+  "selection_reason": "Fresh authenticated GitHub branch audit found newly emitted R191 texture-factor per-signature census evidence was not parsed by tools/analyze_dx11_census.py, so evidence required for later D3DTA_TFACTOR/BLENDFACTORALPHA decisions was being dropped from reports.",
+  "summary": "Preserved R191 fixed-function texture-factor evidence in the DX11 census analyzer: focused R191 logs are eligible, observed/raw ARGB values are parsed and attached per signature, and a regression fixture proves exact JSON preservation while native activation stays disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read branch AGENTS.md, docs/CONVERSION_LANE_STATE.json, live task state, regression/problem history and Issue #14 through authenticated GitHub authority.",
-        "Re-read moving branch HEAD before each write, avoided duplicate concurrent D3DTOP work, and used no N100/local clone as product-development truth."
+        "Read branch AGENTS.md and current conversion lane/run state through authenticated GitHub authority; preserved concurrent descendants and did not use N100/local clone as product-development truth.",
+        "Fresh branch-wide audit followed the moving HEAD through completed adjacent fixed-function work and selected a non-conflicting analyzer gap."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Fresh authenticated branch audit found R191 D3DRS_TEXTUREFACTOR snapshot/census provenance present but no shader consumer for D3DTA_TFACTOR or D3DTOP_BLENDFACTORALPHA.",
-        "Microsoft Direct3D 9 semantics define D3DTA_TFACTOR from D3DRS_TEXTUREFACTOR and BLENDFACTORALPHA as Arg1/Arg2 interpolation by that state's alpha, so the captured state is sufficient for exact dormant HLSL generation."
+        "R191 runtime_census emits per-signature `ffp texture-factor state` records, but analyze_dx11_census.py had no matching regex/storage/attachment path.",
+        "Dropping texture-factor provenance weakens offline decisions for D3DTA_TFACTOR and D3DTOP_BLENDFACTORALPHA even though the runtime capture already exists."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
-        "src/vr/d3d11/pipeline_translation.hpp",
-        "src/vr/d3d11/pipeline_translation.cpp",
-        "src/vr/d3d11/fixed_function_pipeline.cpp",
-        "src/vr/d3d11/runtime_census.cpp",
-        "tools/dx11_fixed_function_pipeline_probe.cpp",
-        "tools/verify_dx11_source_graph.py"
+        "tools/analyze_dx11_census.py",
+        "tools/test_analyze_dx11_census.py"
       ],
       "implementation_commits": [
-        "e181d379e4ec61b863011595e846817b788c0d35"
+        "9c15f26db8939f268d4e9f2f0339ebe8869bd55e"
       ],
       "details": [
-        "Added D3DTA_TFACTOR argument readiness and normalized 0xAARRGGBB-to-RGBA HLSL constant generation with existing complement/alpha-replicate modifiers preserved.",
-        "Added D3DTOP_BLENDFACTORALPHA dependency/readiness/HLSL translation using D3DRS_TEXTUREFACTOR alpha.",
-        "Propagated captured textureFactor through live fixed-function pipeline and runtime diagnostic shader generation.",
-        "Added hosted generated-HLSL/offline-compile fixtures and extended the R191 source-graph retention guard."
+        "Added R191 texture-factor parser with observed boolean plus exact numeric and hexadecimal ARGB preservation.",
+        "Attached texture-factor evidence to the matching signature and allowed focused R191 logs to participate in analyzer input discovery.",
+        "Added regression coverage that proves JSON preservation and keeps NativeDrawPathActivationAllowed false."
       ]
     },
     "C3_VALIDATE": {
       "status": "COMPLETE_STATIC_EXACT_SHA_PASS_COMPILE_NOT_CLAIMED",
-      "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_STATIC_STEPS_THROUGH_DX11_CENSUS_ANALYZER; WIN32_CONFIGURE_IN_PROGRESS_AT_OBSERVATION; BUILD_BINARY_NOT_CLAIMED",
       "evidence": [
-        "GitHub Build run 36992889181 job 110792948683 on exact material SHA passed HMD baseline, one-click structure, backend disassembly, Verify DX11 source graph, Test DX11 census analyzer, wheel source and FFB math.",
-        "Win32 Configure was cancelled after newer same-branch descendant churn; Build and binary verification were skipped, so compile/binary success is not claimed."
+        "Precommit structural checks passed for regex, R191 log eligibility, parse/attach path, regression fixture, and activation guard.",
+        "Backend Conversion Gate run 36992927041 job 110793277038 on exact material SHA passed steps through Verify DX11 source graph, Verify DX11 dormant activation boundary, and Test DX11 census analyzer.",
+        "Win32 Configure was in progress when observed; no compile or binary success is claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "source_implementation_commit": "e181d379e4ec61b863011595e846817b788c0d35",
-      "result_commit": "e181d379e4ec61b863011595e846817b788c0d35",
-      "issue14_comment_id": 5949807638
+      "result_commit": "9c15f26db8939f268d4e9f2f0339ebe8869bd55e",
+      "issue14_comment_id": 5949803893
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant fixed-function source/test/guard unit only; NativeDrawPathActive, release payload, localization, OpenXR transport and other backend lanes are unchanged."
+      "reason": "Dormant analyzer/test-only unit; no runtime payload, backend activation, localization, DXVK branch, or OpenXR transport change."
     },
     "C6_STATE": {
-      "status": "COMPLETE_WITH_FINAL_VALIDATION_STATE",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R191 texture-factor consumption and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "status": "COMPLETE_WITH_STATIC_VALIDATION",
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R191 texture-factor census analyzer evidence and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -87,25 +82,21 @@
     "native_draw_path_active_changed": false,
     "runtime_validation_claimed": false
   },
-  "issue14_comment_id": 5949807638,
-  "validation_run_id": 36992889181,
-  "validation_job_id": 110792948683,
-  "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
-  "blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA GitHub Build run 36992889181 passed DX11 source-graph/census and preceding static checks; Win32 Configure was cancelled by newer same-branch descendant churn and Build/binary steps were skipped, so compile/binary success is not claimed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R191 texture-factor consumption and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5949803893,
+  "validation_run_id": 36992927041,
+  "validation_job_id": 110793277038,
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_STATIC_STEPS_THROUGH_DX11_CENSUS_ANALYZER; WIN32_CONFIGURE_IN_PROGRESS_AT_OBSERVATION; BUILD_BINARY_NOT_CLAIMED",
+  "blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA Backend Conversion Gate passed all static steps through Test DX11 census analyzer; Win32 Configure was still in progress when observed and compile/binary success is not claimed.",
+  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R191 texture-factor census analyzer evidence and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "source_head": "dce144aecbc6945a2086c22ef5020ff340a71a3e",
-  "result_sha": "e181d379e4ec61b863011595e846817b788c0d35",
-  "selected_work_item": "DX11_FFP_TEXTURE_FACTOR_CONSUMPTION_R191",
+  "source_head": "b88f8970bba0a03c4bf2af09499a4a933124da67",
+  "result_sha": "9c15f26db8939f268d4e9f2f0339ebe8869bd55e",
+  "selected_work_item": "DX11_CENSUS_R191_TEXTURE_FACTOR_ANALYZER_EVIDENCE",
   "changed_paths": [
-    "src/vr/d3d11/pipeline_translation.hpp",
-    "src/vr/d3d11/pipeline_translation.cpp",
-    "src/vr/d3d11/fixed_function_pipeline.cpp",
-    "src/vr/d3d11/runtime_census.cpp",
-    "tools/dx11_fixed_function_pipeline_probe.cpp",
-    "tools/verify_dx11_source_graph.py"
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py"
   ],
-  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R191 texture-factor consumption and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R191 texture-factor census analyzer evidence and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
 }

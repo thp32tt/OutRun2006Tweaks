@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "dce144aecbc6945a2086c22ef5020ff340a71a3e",
+  "state_parent_head": "b88f8970bba0a03c4bf2af09499a4a933124da67",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,16 +52,16 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "e181d379e4ec61b863011595e846817b788c0d35",
-    "validation_bearing_sha": "e181d379e4ec61b863011595e846817b788c0d35",
-    "retaining_descendant_sha": "dce144aecbc6945a2086c22ef5020ff340a71a3e",
-    "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+    "result_sha": "9c15f26db8939f268d4e9f2f0339ebe8869bd55e",
+    "validation_bearing_sha": "9c15f26db8939f268d4e9f2f0339ebe8869bd55e",
+    "retaining_descendant_sha": "b88f8970bba0a03c4bf2af09499a4a933124da67",
+    "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_STATIC_STEPS_THROUGH_DX11_CENSUS_ANALYZER; WIN32_CONFIGURE_IN_PROGRESS_AT_OBSERVATION; BUILD_BINARY_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA GitHub Build run 36992889181 passed DX11 source-graph/census and preceding static checks; Win32 Configure was cancelled by newer same-branch descendant churn and Build/binary steps were skipped, so compile/binary success is not claimed.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation; R191 now consumes captured D3DRS_TEXTUREFACTOR only in dormant fixed-function translation.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R191 texture-factor consumption and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R191 texture-factor census analyzer evidence and all newer retained work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1229,6 +1229,25 @@
       "issue14_comment_id": 5949807638,
       "validation_run_id": 36992889181,
       "validation_job_id": 110792948683
+    },
+    {
+      "unit_id": "DX11_CENSUS_R191_TEXTURE_FACTOR_ANALYZER_EVIDENCE",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "e181d379e4ec61b863011595e846817b788c0d35",
+      "implementation_commits": [
+        "9c15f26db8939f268d4e9f2f0339ebe8869bd55e"
+      ],
+      "material_result_sha": "9c15f26db8939f268d4e9f2f0339ebe8869bd55e",
+      "validation_bearing_sha": "9c15f26db8939f268d4e9f2f0339ebe8869bd55e",
+      "retaining_descendant_sha": "b88f8970bba0a03c4bf2af09499a4a933124da67",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_STATIC_STEPS_THROUGH_DX11_CENSUS_ANALYZER; WIN32_CONFIGURE_IN_PROGRESS_AT_OBSERVATION; BUILD_BINARY_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_ANALYZER_TEST_ONLY",
+      "issue14_comment_id": 5949803893,
+      "validation_run_id": 36992927041,
+      "validation_job_id": 110793277038
     }
   ]
 }
