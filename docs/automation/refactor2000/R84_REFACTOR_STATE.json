@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1382,
+  "cycle": 1388,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -303,11 +303,13 @@
     "R84-REF-GATED-PROJECTION-0015",
     "R84-REF-GATED-DEPTHREAD-0016",
     "R84-REF-GATED-RESTORE-0017",
-    "R84-REF-GATED-FRAMEWRITE-0018"
+    "R84-REF-GATED-FRAMEWRITE-0018",
+    "R84-REF-GATED-COUNTMAP-0019",
+    "R84-REF-GATED-BUILDWAIT-0020"
   ],
-  "next": "Consume Gate D run 37001614851/job 110820361574. Apply only the next concrete compile error, using the mapped neutral APIs; do not expose mutable R7 globals.",
-  "updatedKst": "2026-10-02T20:53:00+09:00",
-  "batchStatus": "R84_GATE_D_BUILD_RUNNING_R31_API_MAP_CYCLE_1382",
+  "next": "Consume exact Gate D run 37001614851/job 110820361574. Usage counts are mapped; apply only next concrete compiler defect.",
+  "updatedKst": "2026-10-02T20:57:00+09:00",
+  "batchStatus": "R84_GATE_D_BUILD_RUNNING_USAGE_MAP_CYCLE_1388",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -589,7 +591,9 @@
     "Cycles 1374-1376 R84-REF-GATED-DEPTHREAD-0016: R31 fast/HUD depth readiness can use TrackedDepthStencilSnapshot, TryBootstrapRightDepthForDispatch, Depth/StencilTestActiveForDispatch plus read-only right-depth/right-stencil sync getters; no mutable globals required. APPLY_GATE 1376 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime NEED_HMD_TEST.",
     "Cycles 1377-1379 R84-REF-GATED-RESTORE-0017: R31 right-eye pass can use TrackedRenderTargetSnapshot/RightEyeSurfaceSnapshot/RightEyeDepthSnapshot/SetRawRenderTarget0/SetRawDepthStencil and fast_path_support RestoreRightPassState; direct raw hook objects can be eliminated. APPLY_GATE 1379 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime NEED_HMD_TEST.",
     "Cycles 1380-1382 R84-REF-GATED-FRAMEWRITE-0018: R31 world/HUD accounting can use RecordWorldStereoDuplicate/RecordHudStereoDuplicate, MarkFrameRightDrawFailed, LatchFrameStereoMetadataIfUnset and RecordRestoreFailure; direct frame globals/counters need not be exported. APPLY_GATE 1382 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime NEED_HMD_TEST.",
-    "BUILD_GATE 1358/1364/1370/1376/1382: REUSED_BUILD_EVIDENCE=IN_PROGRESS exact Gate D run 37001614851/job 110820361574; build input unchanged since cycle 1352."
+    "BUILD_GATE 1358/1364/1370/1376/1382: REUSED_BUILD_EVIDENCE=IN_PROGRESS exact Gate D run 37001614851/job 110820361574; build input unchanged since cycle 1352.",
+    "Cycles 1383-1385 R84-REF-GATED-COUNTMAP-0019: counted remaining R31 lower-runtime accesses for repair sizing: IsGameDevice=6, InternalPassScope=8, PresentEpoch=2, aux=1, VRWorldScale=1, DrawStereoState=3, TrackedDepthStencil=10, FrameStereoPoseSequence=6, raw RT/depth hooks=2 each, restore=2, direct frame/counter writes present. Most have existing neutral APIs. APPLY_GATE 1385 NO_SAFE_CHANGE while exact build active.",
+    "Cycles 1386-1388 R84-REF-GATED-BUILDWAIT-0020: no build input change; BUILD_GATE 1388 REUSED_BUILD_EVIDENCE=IN_PROGRESS run 37001614851/job 110820361574. No duplicate CI triggered. Runtime NEED_HMD_TEST."
   ],
   "campaign": {
     "startCycle": 1202,
