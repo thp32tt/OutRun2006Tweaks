@@ -916,6 +916,29 @@
       "packaging_status": "NOT_REQUIRED_DORMANT_CENSUS_STATIC_GUARD",
       "issue14_comment_id": 5948867312,
       "run_state_commit": "faa9c8c5fc926b83e45b048de5b5f4a22bf63162"
+    },
+    {
+      "unit_id": "DX11_MRT_COLOR_WRITE_MASK_FAIL_CLOSED",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "aaf76b4175e0a00c2d24768988f6f16c81afe387",
+      "implementation_commits": [
+        "52a0f1ffde494d4203e79f19463fbd5c5446dbba",
+        "1af773387bf5835c72c332c0498b24498fb68bc8",
+        "839280130e8b75f4700f4f9248451f65e83cc024"
+      ],
+      "material_result_sha": "839280130e8b75f4700f4f9248451f65e83cc024",
+      "validation_bearing_sha": "8a9884bd414145e88c705fe31071893917f26bf2",
+      "retaining_descendant_sha": "8a9884bd414145e88c705fe31071893917f26bf2",
+      "automation_validation": "PASS_GITHUB_AUTHORITATIVE_DESCENDANT_RETENTION_INSPECTION_AND_SCHEMA_CROSSCHECK; EXACT_SHA_ACTIONS_CANCELLED_BEFORE_JOB_START_BY_DESCENDANT_BRANCH_CHURN; COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_SOURCE_TEST_ONLY",
+      "issue14_comment_id": 5948962859,
+      "validation_run_ids": [
+        36988435735,
+        36988605955
+      ]
     }
   ]
 }
