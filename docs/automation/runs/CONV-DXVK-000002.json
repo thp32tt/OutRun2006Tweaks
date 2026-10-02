@@ -5601,6 +5601,76 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve any newer branch-authoritative frontier. If F63 remains newest, capture a bounded canonical continuation from mandatory overlap 0x001832AF, require the leading E8 byte to match the F63 cut edge, decode its rel32 CALL only after overlap validation, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_PREDECESSOR_BACKEDGE_PROVEN_GATE_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "f1d1a33cf04dd78b27f12bbe66dce1c932355850",
+      "verifier_guard_sha": "abb801774d1075fed3f6f27244e55fb1ae684bc2",
+      "verifier_syntax_fix_sha": "db57bb302c795468b9f491a7d0677f5e961c7120",
+      "validation_bearing_result_sha": "64ca5d42a9b0112ed269723ed40ff004d7a9e143",
+      "commit_message": "dxvk: fail-close continuation 37 backedge proof [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py",
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "The auto-discovered continuation verifier now makes every assigned *_is_predecessor_boundary gate mandatory in final proof success, and legacy continuation_37 now directly gates proven on backward_target_is_predecessor_boundary. This closes a cross-window backedge fail-closed gap without changing render/HUD/runtime semantics.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Read branch-authoritative AGENTS.md, conversion/run state, regression/problem history and Issue #14; refreshed the moving same-JOB branch and skipped concurrently completed F59-F63 frontier work."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Fresh verifier audit found *_is_predecessor_boundary was reported by continuation_37/64 but absent from the generic mandatory proven-gate census."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Verifier guard commit abb801774d1075fed3f6f27244e55fb1ae684bc2; syntax correction db57bb302c795468b9f491a7d0677f5e961c7120; proof fix f1d1a33cf04dd78b27f12bbe66dce1c932355850 adds continuation_37's backward boundary boolean directly to proven."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Initial exact-SHA verifier run exposed the continuation_37 omission. Retaining descendant 64ca5d42a9b0112ed269723ed40ff004d7a9e143 preserves the complete fix; Build run 36990533601 job 110785484453 passed Verify backend disassembly contract and OutRun EXE HUD Inspector CI run 36990533697 static-exe-analysis job 110785622734 passed."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commits abb801774d1075fed3f6f27244e55fb1ae684bc2 and f1d1a33cf04dd78b27f12bbe66dce1c932355850 contain [AUTO:CONV-DXVK-000002]. Issue #14 comments 5949257840 and 5949336248 record implementation, discovered defect, correction and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier/disassembly-proof integrity only; no runtime payload, backend selector/deployment content, or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally so the newer canonical frontier remains primary and is not overwritten."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC",
+        "initial_guard_exact_sha": "abb801774d1075fed3f6f27244e55fb1ae684bc2",
+        "initial_guard_build_run_id": 36990284691,
+        "initial_guard_failure": "PYTHON_ENDSWITH_TYPO_CORRECTED",
+        "corrected_verifier_sha": "db57bb302c795468b9f491a7d0677f5e961c7120",
+        "discovered_proof_gap": "CONTINUATION_37_BACKWARD_TARGET_BOUNDARY_GATE_NOT_DIRECTLY_IN_FINAL_PROVEN",
+        "proof_fix_sha": "f1d1a33cf04dd78b27f12bbe66dce1c932355850",
+        "validation_bearing_descendant_sha": "64ca5d42a9b0112ed269723ed40ff004d7a9e143",
+        "backend_build_run_id": 36990533601,
+        "backend_build_job_id": 110785484453,
+        "backend_disassembly_contract": "SUCCESS",
+        "canonical_static_run_id": 36990533697,
+        "canonical_static_job_id": 110785622734,
+        "canonical_static_analysis": "SUCCESS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5949257840,
+      "issue14_validation_comment_id": 5949336248,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_VERIFIER_PROOF_FIX",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newer branch-authoritative F63 canonical proof. Continue from its mandatory overlap cut edge at 0x001832AF, capture enough canonical bytes to complete the E8 rel32 CALL, and keep function/render/HUD/runtime semantics unresolved until exact evidence proves them."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
