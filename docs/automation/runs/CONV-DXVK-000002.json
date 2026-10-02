@@ -4835,6 +4835,65 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve any newer branch-authoritative frontier. If 0x00183173 remains the newest exact proof edge, capture a fresh bounded canonical continuation beginning there, validate provenance, then exact-decode only complete canonical instructions while keeping function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_LOOP_FAMILY_BRANCH_DECLARATION_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "4431b909343ad2a1e50c4c176b781bb4a48c3920",
+      "automation_validation": "PASS_EXACT_SHA_STATIC_CONTRACT",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Auto-discovered DXVK exact-control-flow verification now treats x86 LOOPNE/LOOPE/LOOP/JECXZ (E0-E3) signed-rel8 instructions as direct branch rows, requiring BRANCHES declaration and exact displacement-target validation.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch authority, AGENTS.md, branch-local lane/run state, regression/problem-history context, and Issue #14. Re-read moving HEAD during concurrent same-JOB disassembly work and avoided duplicate frontier writes."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "After F49/F50/F51 frontier work raced forward concurrently, selected an independent static verifier gap: direct relative branch census covered rel8 Jcc/JMP and rel32 Jcc/JMP but omitted LOOPNE/LOOPE/LOOP/JECXZ E0-E3. Current exact analyzer rows contained zero E0-E3 rows."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 4431b909343ad2a1e50c4c176b781bb4a48c3920 extends the exact instruction-row direct-branch decoder to E0-E3, so undeclared loop-family control flow or target drift fails the generic DXVK continuation contract."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Backend Conversion Gate run 36987496957 job 110775753570 on exact material SHA completed Verify backend disassembly contract=SUCCESS; all contract steps through application-space recenter also succeeded and Configure Win32 succeeded. Build Win32 was still in progress at the validation snapshot and is not required or claimed for this verifier-only unit."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit 4431b909343ad2a1e50c4c176b781bb4a48c3920 contains [AUTO:CONV-DXVK-000002]. Issue #14 comment 5948772139 records the implementation and exact-SHA validation scope."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static disassembly-verifier hardening only; no runtime DXVK payload, selector, backend binary, deployment content, or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit while preserving newer concurrent canonical-disassembly frontier state."
+        }
+      },
+      "validation": {
+        "exact_sha": "4431b909343ad2a1e50c4c176b781bb4a48c3920",
+        "backend_conversion_gate_run_id": 36987496957,
+        "backend_conversion_gate_job_id": 110775753570,
+        "targeted_step": "Verify backend disassembly contract",
+        "targeted_step_conclusion": "success",
+        "static_steps_through_application_space_recenter": "success",
+        "configure_win32": "success",
+        "build_win32": "IN_PROGRESS_AT_VALIDATION_SNAPSHOT_NOT_REQUIRED_FOR_UNIT",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948772139,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "exact_next_action": "Preserve this E0-E3 direct-branch declaration guard while continuing from the newest branch-authoritative canonical continuation frontier; any future LOOPNE/LOOPE/LOOP/JECXZ exact row must be declared in BRANCHES and its signed-rel8 target must match."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
