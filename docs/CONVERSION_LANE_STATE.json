@@ -3802,8 +3802,11 @@
         "artifact_id": 11218267367,
         "artifact_digest": "sha256:6354489ae898c01105cf18d2416353e56c82178d13e6056a143cc8996d4d1938",
         "backend_conversion_gate_run_id": 36987942543,
-        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_CLAIMED",
-        "runtime_validation": "UNTESTED"
+        "backend_conversion_gate_status_at_state_write": "SUCCESS_EXACT_SHA",
+        "runtime_validation": "UNTESTED",
+        "backend_conversion_gate_job_id": 110777147331,
+        "backend_conversion_gate_artifact_id": 11218218652,
+        "backend_conversion_gate_artifact_digest": "sha256:7c87ece4aa39f5b7c116e779ad53f8859e1fee893b3d3dd780e53746309482cc"
       },
       "issue14_implementation_comment_id": 5948793427,
       "issue14_validation_comment_id": 5948844319,
@@ -3812,7 +3815,8 @@
       "semantic_promotion": "NONE",
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
-      "exact_next_action": "Exact-decode only complete canonical instructions in validated continuation_61 raw window 0x00183173..0x001831B3. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
+      "exact_next_action": "Exact-decode only complete canonical instructions in validated continuation_61 raw window 0x00183173..0x001831B3. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved.",
+      "issue14_final_validation_comment_id": 5948906263
     }
   ]
 }
