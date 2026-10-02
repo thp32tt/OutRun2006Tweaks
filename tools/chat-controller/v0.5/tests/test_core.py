@@ -12,6 +12,8 @@ from app.core import (
     initial_state,
     make_job,
     material_commit_ok,
+    GITHUB_CONNECTION_FIRST_LINE,
+    prepare_outgoing_message,
     reconcile_state,
     select_qa_batch,
 )
@@ -92,6 +94,16 @@ class CoreTests(unittest.TestCase):
         self.assertEqual(len(batch), 1)
         self.assertEqual(consume_qa_inputs(state, batch), 1)
         self.assertEqual(state["qa_pending"], [])
+
+    def test_every_outgoing_message_gets_github_instruction_first(self):
+        body = "Repository work rules for this job:\n- Repository: x"
+        rendered = prepare_outgoing_message(body)
+        self.assertEqual(rendered.splitlines()[0], GITHUB_CONNECTION_FIRST_LINE)
+        self.assertEqual(rendered.count(GITHUB_CONNECTION_FIRST_LINE), 1)
+        self.assertEqual(
+            prepare_outgoing_message(rendered),
+            rendered,
+        )
 
     def test_config_has_expected_current_branches(self):
         config = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))

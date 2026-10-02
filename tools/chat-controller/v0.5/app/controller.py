@@ -25,6 +25,7 @@ from .core import (
     make_job,
     material_commit_ok,
     now_iso,
+    prepare_outgoing_message,
     reconcile_state,
     record_completed,
     select_qa_batch,
@@ -533,6 +534,7 @@ async def composer_text(box) -> str:
 
 
 async def send_message(page: Page, message: str) -> str:
+    message = prepare_outgoing_message(message)
     if REQUIRE_PROJECT_URL and not is_project_url(page.url):
         return "wrong_project"
     box = await first_visible(page, INPUT_SELECTORS, wait_ms=8000)

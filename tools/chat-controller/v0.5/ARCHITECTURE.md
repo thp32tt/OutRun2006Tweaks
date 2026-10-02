@@ -31,3 +31,11 @@ Runtime validation is separate. Missing gaming-PC runtime does not block source,
 ## Removed v0.4 concepts
 
 v0.5 has no schema-number negotiation, wave barrier, WAIT_ACTIONS, PREMATURE_STOP, rollover budget, multi-commit same-task batch target, controller_roles policy loading, or assistant-prose completion authority.
+
+## Mandatory GitHub connection first line
+
+Every controller-generated ChatGPT input is decorated at the final send boundary. Its first line is always:
+
+`깃허브 연결은되어 있다 오류가 난다면 정상연결될때까지 무제한 다시 연결 상태를 확인한다`
+
+This applies to new jobs and same-JOB continuation/recovery turns. Individual prompt files cannot bypass it.

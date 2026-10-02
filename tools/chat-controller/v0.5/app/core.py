@@ -7,6 +7,16 @@ from typing import Any, Iterable
 
 STATE_VERSION = 1
 
+GITHUB_CONNECTION_FIRST_LINE = "깃허브 연결은되어 있다 오류가 난다면 정상연결될때까지 무제한 다시 연결 상태를 확인한다"
+
+
+def prepare_outgoing_message(message: str) -> str:
+    """Force the GitHub recovery instruction to be the first line of every controller send."""
+    body = (message or "").lstrip("\r\n")
+    if body == GITHUB_CONNECTION_FIRST_LINE or body.startswith(GITHUB_CONNECTION_FIRST_LINE + "\n"):
+        return body
+    return GITHUB_CONNECTION_FIRST_LINE + "\n" + body
+
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).astimezone().isoformat()
