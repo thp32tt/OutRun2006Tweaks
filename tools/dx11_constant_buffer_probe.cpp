@@ -16,6 +16,7 @@ namespace
     using outrun::vr::dx11::FixedFunctionStageState;
     using outrun::vr::dx11::NativeFixedFunctionPipelineBundle;
     using outrun::vr::dx11::NativeFixedFunctionRenderStateBundle;
+    using outrun::vr::dx11::NativeFixedFunctionOutputStateBinding;
     using outrun::vr::dx11::NativeFixedFunctionSamplerState;
     using outrun::vr::dx11::NativeFixedFunctionTextureView;
     using outrun::vr::dx11::NativeFixedFunctionTransformBuffer;
@@ -1956,6 +1957,92 @@ int main()
             outputStateSource, surfacePairReady,
             outputStateReady.snapshotToken),
         "R124 exact dynamic output state issues a valid snapshot");
+
+    NativeFixedFunctionOutputStateBinding outputStateBinding;
+    require(
+        outputStateBinding.initialize(
+            d3d.device, renderStateBundle, renderStateRecreated,
+            outputStateReady) &&
+        outputStateBinding.ready() &&
+        outputStateBinding.render_state_snapshot_token() ==
+            renderStateRecreated.snapshotToken &&
+        outputStateBinding.output_state_snapshot_token() ==
+            outputStateReady.snapshotToken &&
+        outputStateBinding.snapshot_token() != 0,
+        "R126 exact render/output snapshots initialize dormant binding owner");
+    require(
+        outputStateBinding.apply(d3d.context),
+        "R126 output binding applies exact RS/OM state");
+
+    ID3D11RasterizerState* boundRasterizer = nullptr;
+    ID3D11BlendState* boundBlend = nullptr;
+    ID3D11DepthStencilState* boundDepthStencil = nullptr;
+    UINT boundStencilRef = 0;
+    FLOAT boundBlendFactor[4] = {};
+    UINT boundSampleMask = 0;
+    UINT boundViewportCount = 1;
+    UINT boundScissorCount = 1;
+    D3D11_VIEWPORT boundViewport{};
+    D3D11_RECT boundScissor{};
+    d3d.context->RSGetState(&boundRasterizer);
+    d3d.context->RSGetViewports(&boundViewportCount, &boundViewport);
+    d3d.context->RSGetScissorRects(&boundScissorCount, &boundScissor);
+    d3d.context->OMGetBlendState(
+        &boundBlend, boundBlendFactor, &boundSampleMask);
+    d3d.context->OMGetDepthStencilState(
+        &boundDepthStencil, &boundStencilRef);
+    require(
+        boundRasterizer == renderStateBundle.rasterizer_state() &&
+        boundBlend == renderStateBundle.blend_state() &&
+        boundDepthStencil == renderStateBundle.depth_stencil_state() &&
+        boundStencilRef == renderStateBundle.stencil_ref() &&
+        boundViewportCount == 1 &&
+        boundViewport.TopLeftX == outputStateReady.viewport.TopLeftX &&
+        boundViewport.TopLeftY == outputStateReady.viewport.TopLeftY &&
+        boundViewport.Width == outputStateReady.viewport.Width &&
+        boundViewport.Height == outputStateReady.viewport.Height &&
+        boundViewport.MinDepth == outputStateReady.viewport.MinDepth &&
+        boundViewport.MaxDepth == outputStateReady.viewport.MaxDepth &&
+        boundScissorCount == 1 &&
+        boundScissor.left == outputStateReady.scissorRect.left &&
+        boundScissor.top == outputStateReady.scissorRect.top &&
+        boundScissor.right == outputStateReady.scissorRect.right &&
+        boundScissor.bottom == outputStateReady.scissorRect.bottom &&
+        boundBlendFactor[0] == outputStateReady.blendFactor[0] &&
+        boundBlendFactor[1] == outputStateReady.blendFactor[1] &&
+        boundBlendFactor[2] == outputStateReady.blendFactor[2] &&
+        boundBlendFactor[3] == outputStateReady.blendFactor[3] &&
+        boundSampleMask == outputStateReady.sampleMask,
+        "R126 WARP context exposes the exact sealed RS/OM binding");
+    boundRasterizer->Release();
+    boundBlend->Release();
+    boundDepthStencil->Release();
+
+    DevicePair outputBindingOtherDevice = create_warp_device();
+    require(
+        !outputStateBinding.apply(outputBindingOtherDevice.context),
+        "R126 foreign D3D11 context cannot consume binding owner");
+    outputBindingOtherDevice.context->Release();
+    outputBindingOtherDevice.device->Release();
+
+    NativeFixedFunctionOutputStateBinding rejectedOutputBinding;
+    auto missingOutputSnapshot = outputStateReady;
+    missingOutputSnapshot.snapshotToken = 0;
+    require(
+        !rejectedOutputBinding.initialize(
+            d3d.device, renderStateBundle, renderStateRecreated,
+            missingOutputSnapshot) &&
+        !rejectedOutputBinding.ready(),
+        "R126 missing R124 snapshot token fails closed");
+
+    auto missingRenderStateSnapshot = renderStateRecreated;
+    missingRenderStateSnapshot.snapshotToken = 0;
+    require(
+        !rejectedOutputBinding.initialize(
+            d3d.device, renderStateBundle, missingRenderStateSnapshot,
+            outputStateReady) &&
+        !rejectedOutputBinding.ready(),
+        "R126 missing R116 snapshot token fails closed");
 
     auto incompleteOutputState = outputStateSource;
     incompleteOutputState.outputStateComplete = false;
