@@ -2429,6 +2429,7 @@ compose_fixed_function_draw_readiness(
     out.outputStateSnapshotToken = outputState.snapshotToken;
     out.outputBindingSnapshotToken = outputBinding.snapshot_token();
     out.geometrySnapshotToken = geometry.snapshotToken;
+    out.requiredTextureMask = activation.requiredTextureMask;
     out.inputValid =
         activation.inputValid &&
         renderState.inputValid &&
@@ -2513,7 +2514,18 @@ compose_fixed_function_textured_draw_readiness(
         context, slot, sampler, texture);
     out.drawSnapshotToken = draw.snapshotToken;
     out.textureStageSnapshotToken = textureStage.snapshotToken;
-    out.inputValid = draw.inputValid && textureStage.inputValid;
+    out.requiredTextureMask = draw.requiredTextureMask;
+    out.observedTextureMask =
+        textureStage.slot < 32u ? (1u << textureStage.slot) : 0u;
+    // R133 is deliberately single-stage: one observed PS binding cannot prove
+    // a multi-stage activation mask. Require the exact activation stage bit so
+    // a valid sampler/SRV bound to the wrong slot cannot make the draw ready.
+    out.textureMaskMatches =
+        textureStage.slotValid &&
+        out.requiredTextureMask != 0 &&
+        out.requiredTextureMask == out.observedTextureMask;
+    out.inputValid =
+        draw.inputValid && textureStage.inputValid && out.textureMaskMatches;
     out.drawReady = draw.ready && draw.snapshotToken != 0;
     out.textureStageReady =
         textureStage.ready && textureStage.snapshotToken != 0;
@@ -2523,12 +2535,17 @@ compose_fixed_function_textured_draw_readiness(
         out.inputValid &&
         out.drawReady &&
         out.textureStageReady &&
+        out.textureMaskMatches &&
         out.componentSnapshotsPresent;
     if (out.ready) {
         std::uint64_t token = 0xcbf29ce484222325ull;
         token = mix_readiness_snapshot_token(token, out.drawSnapshotToken);
         token = mix_readiness_snapshot_token(
             token, out.textureStageSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.requiredTextureMask);
+        token = mix_readiness_snapshot_token(
+            token, out.observedTextureMask);
         out.snapshotToken = token == 0 ? 1 : token;
     }
     return out;
