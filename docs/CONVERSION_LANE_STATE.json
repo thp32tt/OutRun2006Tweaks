@@ -720,6 +720,74 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer authoritative primary frontier from current branch state; this unit's raw window has already been exact-decoded by a concurrent descendant, so do not regress the frontier to 0x00182C16."
+    },
+    {
+      "unit_id": "DXVK_CONTINUATION_PREDECESSOR_BINDING_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "27d94ee63aef23f468e55bdeaa0d8a00c46a78d8",
+      "source_commits": [
+        "7349c1ea9f1fe008c5f65bfafd51d3c455123d31",
+        "27d94ee63aef23f468e55bdeaa0d8a00c46a78d8"
+      ],
+      "validation_bearing_descendant_sha": "8b7467af5e15ff8650305ffbc5937f4e68108f1d",
+      "commit_message": "test: allow provenance-sealed DXVK proofs [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Fail-closed continuation source binding: every raw provenance stage after the baseline must consume exactly the immediately preceding prefix proof; every prefix proof must consume exactly its same-stage provenance; any direct predecessor-proof dependency must point exactly once to the immediate predecessor, while provenance-sealed proofs may omit a redundant direct predecessor call.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Read authenticated GitHub HEAD, AGENTS.md, branch-local conversion lane/run state, regression/problem history and Issue #14 while tracking concurrent F30/F31 frontier changes."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected an independent static verifier-integrity gap instead of duplicating the concurrently advancing canonical decode frontier."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commits 7349c1e and repair 27d94ee add exact adjacent predecessor/provenance source-binding checks to the auto-discovered continuation chain verifier."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Fail-before descendant d0a62d4 Build 36976624482/job 110741744888 exposed an over-strict direct-predecessor requirement at continuation 24. Repair 27d94ee retained fail-closed wrong-reference rejection while allowing provenance-sealed proofs. Descendant 8b7467a Build 36976912299/job 110742623211 passed Verify backend disassembly contract; log: VR backend disassembly contract: OK."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commits contain the required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947147128 records implementation, repair and validation lineage."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static Python verifier hardening only; no runtime payload, packaged binary, selector behavior, localization, or deployable backend content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental static unit without replacing the newer authoritative canonical frontier."
+        }
+      },
+      "validation": {
+        "fail_before_sha": "d0a62d402686a63a14881327c9eb2c09933be6cf",
+        "fail_before_build_run_id": 36976624482,
+        "fail_before_job_id": 110741744888,
+        "fail_before_step": "Verify backend disassembly contract",
+        "fail_before_reason": "Continuation 24 prefix proof legitimately seals predecessor evidence through same-stage provenance and has no redundant direct predecessor-proof call.",
+        "repair_sha": "27d94ee63aef23f468e55bdeaa0d8a00c46a78d8",
+        "validation_bearing_descendant_sha": "8b7467af5e15ff8650305ffbc5937f4e68108f1d",
+        "build_run_id": 36976912299,
+        "build_job_id": 110742623211,
+        "targeted_step": "Verify backend disassembly contract",
+        "targeted_step_conclusion": "success",
+        "targeted_log": "VR backend disassembly contract: OK",
+        "full_win32_build": "NOT_REQUIRED_NOT_CLAIMED",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947147128,
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Capture the next bounded canonical 64-byte raw window from exact instruction boundary 0x00182C56 with no overlap. Preserve forward target 0x00182C59 as address/control-flow evidence only until captured and exact-decoded; keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
