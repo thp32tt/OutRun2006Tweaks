@@ -1547,11 +1547,9 @@ def queue_dynamic_prefix() -> str:
     ]
     if CONTROLLER_MODE == "conversion":
         lines += [
-            f"VR_PIPELINE_SCHEMA={CONVERSION_PIPELINE_SCHEMA_VERSION}",
-            "VR_PIPELINE_REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(또는 이유 있는 NOT_REQUIRED)→C6_STATE.",
-            "TASK_RELEASE_RULE=review/state/계획/단일 checkpoint commit은 종료가 아니다. 실제 source/tool/test/workflow/disassembly evidence 변경 + 검증 + durable state까지 같은 TASK_ID에서 완료해야 한다.",
-            "docs/automation/runs/<TASK_ID>.json에 pipeline_schema_version, pipeline C0-C6, changed_paths/work_product, validation, state_persisted=true, next_action, runtime_validation을 기록해.",
-            "C2_IMPLEMENT는 review-only/state-only 문서 변경으로 충족되지 않는다. runtime 부재는 runtime claim만 UNTESTED로 남기고 독립 static/source/CI 작업은 계속한다.",
+            f"VR_PIPELINE_SCHEMA={CONVERSION_PIPELINE_SCHEMA_VERSION}; REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(or reasoned NOT_REQUIRED)→C6_STATE.",
+            "RELEASE=full pipeline only; review/plan/state-only or one checkpoint is nonterminal. C2 needs substantive source/tool/test/workflow/disassembly evidence; runtime absence only keeps runtime=UNTESTED.",
+            "RUN_RECORD=docs/automation/runs/<TASK_ID>.json with pipeline_schema_version, pipeline C0-C6, changed_paths/work_product, validation, state_persisted=true, next_action, runtime_validation.",
         ]
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B", "LOCALIZATION_E"}:
         lines += [
