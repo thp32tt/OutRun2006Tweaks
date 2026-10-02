@@ -282,7 +282,7 @@ def localization_material_target_prompt(active: dict) -> str:
           "or the next runnable own-shard target in the same response.\n"
           "SOURCE_404_POLICY=Git source 404/missing is SOURCE_TRANSPORT_MISS, not blocker. "
           "Use current contract: approved Drive exact path -> pinned v0.25.10a direct file -> verified pinned Release ZIP; "
-          "inventory-verify. All tiers miss => SOURCE_ACQUISITION_EXHAUSTED, then immediately run the next own-shard asset.\n"
+          "inventory-verify. All tiers miss => SOURCE_ACQUISITION_EXHAUSTED, then immediately run the next runnable own-shard asset.\n"
           "CANDIDATE_DESTINATION=Source need not exist at the Git queue path. Persist via the current candidate/metadata convention; "
           "external binary is authoritative only with Git identity/hash/TASK_ID/RESULT_SHA/validation metadata."
     )
