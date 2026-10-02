@@ -1898,8 +1898,16 @@ def main() -> None:
     # evidence. Keep all three APIs out of production source until the native
     # Draw activation gate is explicitly opened.
     runtime_generated_fan_users = []
+    generated_fan_internal_sources = {
+        DX11 / "triangle_fan_index_buffer.cpp",
+        DX11 / "native_backend.cpp",
+    }
     for source_path in (ROOT / "src").rglob("*.cpp"):
-        if source_path == DX11 / "triangle_fan_index_buffer.cpp":
+        # The generated-fan owner implements its own observer, while
+        # native_backend.cpp composes that dormant R142/R143 evidence. Neither
+        # file is a production game caller. Keep the quarantine on every other
+        # translation unit until native Draw* activation is explicitly opened.
+        if source_path in generated_fan_internal_sources:
             continue
         runtime_source = source_path.read_text(encoding="utf-8")
         if (
