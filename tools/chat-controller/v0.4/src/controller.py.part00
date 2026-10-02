@@ -1243,6 +1243,25 @@ def producer_result_candidate_indices(record: dict) -> list[int]:
     return result
 
 
+def producer_result_candidate_paths(record: dict) -> list[str]:
+    """Extract repository/asset paths tied to candidate output in one producer result."""
+    if producer_result_candidate_count(record) <= 0 or not isinstance(record, dict):
+        return []
+    deliverable = record.get("material_deliverable") if isinstance(record.get("material_deliverable"), dict) else {}
+    selection = record.get("selection") if isinstance(record.get("selection"), dict) else {}
+    values = []
+    for source in (record, deliverable, selection):
+        for key in ("candidate_repository_path", "candidate_path", "path"):
+            value = source.get(key)
+            if isinstance(value, str) and value.strip():
+                values.append(value.strip())
+        for key in ("candidate_paths", "candidate_dds_paths"):
+            value = source.get(key)
+            if isinstance(value, list):
+                values.extend(str(x).strip() for x in value if str(x).strip())
+    return list(dict.fromkeys(values))
+
+
 def localization_validate_c_result_commit(
     task_id: str,
     result_sha: str,
