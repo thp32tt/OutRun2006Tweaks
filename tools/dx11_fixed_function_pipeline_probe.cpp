@@ -1548,7 +1548,44 @@ int main()
             "R195 PREMODULATE must leave next-stage CURRENT unchanged when no texture is bound");
     }
 
+
+    {
+        std::array<FixedFunctionStageState, 8> specularStages{};
+        specularStages[0].colorOp = D3DTOP_SELECTARG1;
+        specularStages[0].colorArg1 = D3DTA_SPECULAR;
+        specularStages[0].alphaOp = D3DTOP_SELECTARG1;
+        specularStages[0].alphaArg1 = D3DTA_SPECULAR;
+        specularStages[0].minFilter = D3DTEXF_POINT;
+        specularStages[0].magFilter = D3DTEXF_POINT;
+        specularStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto specularShader =
+            generate_fixed_function_pixel_shader_prototype(
+                specularStages, true, 0x00u, 0x00u, textureTypes);
+        require(
+            specularShader.generated() &&
+                specularShader.activeStages == 1,
+            "R198 D3DTA_SPECULAR selector must become shader-exact");
+        require(
+            specularShader.source.find(
+                "float3 nextColor = input.specular.rgb;") !=
+                std::string::npos &&
+            specularShader.source.find(
+                "float nextAlpha = input.specular.a;") !=
+                std::string::npos,
+            "R198 D3DTA_SPECULAR COLOR1 shader expression drift");
+        const auto specularCompile =
+            compile_fixed_function_pixel_shader_prototype(specularShader);
+        require(
+            specularCompile.attempted &&
+            specularCompile.succeeded &&
+            specularCompile.result == S_OK &&
+            specularCompile.bytecodeBytes != 0,
+            "R198 D3DTA_SPECULAR fixed-function shader prototype did not compile");
+    }
+
     std::cout
+        << "DX11 fixed-function D3DTA_SPECULAR support R198: PASS\n"
         << "DX11 fixed-function D3DTA_CONSTANT per-stage support R197: PASS\n"
         << "DX11 fixed-function D3DTA_CONSTANT per-stage color R197: PASS\n"
         << "DX11 fixed-function D3DTOP_LERP ARG0 support R196: PASS\n"

@@ -255,6 +255,35 @@ VSOutput main(float3 position : POSITION0)
     require(vertexPrototype.sourceHash != 0,
             "R93 vertex shader source hash");
 
+    const auto specularVertexPrototype =
+        generate_fixed_function_vertex_shader_prototype(
+            D3DFVF_XYZ | D3DFVF_SPECULAR,
+            16,
+            { true, FALSE });
+    require(
+        specularVertexPrototype.generated() &&
+        specularVertexPrototype.hasSpecular,
+        "R198 SPECULAR FVF must generate COLOR1 output");
+    require(
+        specularVertexPrototype.source.find(
+            "float4 specular : COLOR1;") != std::string::npos &&
+        specularVertexPrototype.source.find(
+            "output.specular = input.specular;") != std::string::npos,
+        "R198 SPECULAR FVF COLOR1 passthrough drift");
+
+    const auto defaultSpecularVertexPrototype =
+        generate_fixed_function_vertex_shader_prototype(
+            D3DFVF_XYZ,
+            12,
+            { true, FALSE });
+    require(
+        defaultSpecularVertexPrototype.generated() &&
+        !defaultSpecularVertexPrototype.hasSpecular &&
+        defaultSpecularVertexPrototype.source.find(
+            "output.specular = float4(1.0f, 1.0f, 1.0f, 1.0f);") !=
+            std::string::npos,
+        "R198 missing SPECULAR FVF must emit documented opaque-white default");
+
     const auto rhwPrototype =
         generate_fixed_function_vertex_shader_prototype(
             D3DFVF_XYZRHW | D3DFVF_DIFFUSE, 20);
@@ -308,6 +337,20 @@ VSOutput main(float3 position : POSITION0)
     require(pixelPrototype.generated(),
             "R84 fixed-function pixel shader prototype generation");
 
+    std::array<FixedFunctionStageState, 8> specularStages{};
+    specularStages[0].colorOp = D3DTOP_SELECTARG1;
+    specularStages[0].colorArg1 = D3DTA_SPECULAR;
+    specularStages[0].alphaOp = D3DTOP_SELECTARG1;
+    specularStages[0].alphaArg1 = D3DTA_SPECULAR;
+    const auto specularPixelPrototype =
+        generate_fixed_function_pixel_shader_prototype(
+            specularStages, true, 0x00, 0x00, textureTypes);
+    require(
+        specularPixelPrototype.generated() &&
+        specularPixelPrototype.source.find("input.specular") !=
+            std::string::npos,
+        "R198 D3DTA_SPECULAR pixel prototype generation");
+
     ID3DBlob* pixelBytecode = compile_shader(
         pixelPrototype.source.data(),
         pixelPrototype.source.size(),
@@ -323,6 +366,16 @@ VSOutput main(float3 position : POSITION0)
         std::strlen(mismatchedVertexShader),
         "OutRunR92MismatchedVertexShader",
         "vs_4_0");
+    ID3DBlob* specularPixelBytecode = compile_shader(
+        specularPixelPrototype.source.data(),
+        specularPixelPrototype.source.size(),
+        "OutRunR198SpecularPixelShader",
+        "ps_4_0");
+    ID3DBlob* specularVertexBytecode = compile_shader(
+        specularVertexPrototype.source.data(),
+        specularVertexPrototype.source.size(),
+        "OutRunR198SpecularVertexShader",
+        "vs_4_0");
 
     ID3D11ShaderReflection* pixelReflection =
         reflect_shader(pixelBytecode);
@@ -330,6 +383,20 @@ VSOutput main(float3 position : POSITION0)
         reflect_shader(compatibleVertexBytecode);
     ID3D11ShaderReflection* mismatchedVertexReflection =
         reflect_shader(mismatchedVertexBytecode);
+    ID3D11ShaderReflection* specularPixelReflection =
+        reflect_shader(specularPixelBytecode);
+    ID3D11ShaderReflection* specularVertexReflection =
+        reflect_shader(specularVertexBytecode);
+
+    bool specularSawColor0 = false;
+    bool specularSawTexcoord0 = false;
+    require(
+        interfaces_compatible(
+            specularVertexReflection,
+            specularPixelReflection,
+            specularSawColor0,
+            specularSawTexcoord0),
+        "R198 D3DTA_SPECULAR VS/PS COLOR1 interface rejected");
 
     bool sawColor0 = false;
     bool sawTexcoord0 = false;
@@ -353,13 +420,19 @@ VSOutput main(float3 position : POSITION0)
             mismatchSawTexcoord0),
         "UINT COLOR0 mismatch did not fail closed");
 
+    specularVertexReflection->Release();
+    specularPixelReflection->Release();
     mismatchedVertexReflection->Release();
     compatibleVertexReflection->Release();
     pixelReflection->Release();
+    specularVertexBytecode->Release();
+    specularPixelBytecode->Release();
     mismatchedVertexBytecode->Release();
     compatibleVertexBytecode->Release();
     pixelBytecode->Release();
 
-    std::cout << "DX11 shader linkage probe R92: PASS\n";
+    std::cout
+        << "DX11 fixed-function SPECULAR COLOR1 linkage R198: PASS\n"
+        << "DX11 shader linkage probe R92: PASS\n";
     return 0;
 }

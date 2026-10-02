@@ -1084,6 +1084,56 @@ def main() -> None:
             + ", ".join(missing_r197_d3dta_constant)
         )
 
+
+    r198_d3dta_specular_contract = [
+        ("case D3DTA_SPECULAR:", PIPELINE_TRANSLATION_CPP,
+         "R198 D3DTA_SPECULAR selector acceptance"),
+        ('base = "input.specular";', PIPELINE_TRANSLATION_CPP,
+         "R198 D3DTA_SPECULAR COLOR1 pixel expression"),
+        ('"    float4 specular : COLOR1;\\n";', PIPELINE_TRANSLATION_CPP,
+         "R198 pixel COLOR1 input contract"),
+        ("out.hasSpecular = (fvf & D3DFVF_SPECULAR) != 0;",
+         PIPELINE_TRANSLATION_CPP,
+         "R198 FVF SPECULAR ownership"),
+        ('"    output.specular = input.specular;\\n"', PIPELINE_TRANSLATION_CPP,
+         "R198 vertex COLOR1 passthrough"),
+        ('"    output.specular = float4(1.0f, 1.0f, 1.0f, 1.0f);\\n"',
+         PIPELINE_TRANSLATION_CPP,
+         "R198 missing-specular opaque-white default"),
+        ("bool hasSpecular = false;", PIPELINE_TRANSLATION_HPP,
+         "R198 vertex prototype specular identity"),
+        ("specularStages[0].colorArg1 = D3DTA_SPECULAR;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R198 hosted pixel COLOR1 fixture"),
+        ("R198 D3DTA_SPECULAR fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R198 hosted pixel compile assertion"),
+        ("D3DFVF_XYZ | D3DFVF_SPECULAR", SHADER_LINKAGE_PROBE,
+         "R198 hosted vertex COLOR1 fixture"),
+        ("R198 missing SPECULAR FVF must emit documented opaque-white default",
+         SHADER_LINKAGE_PROBE,
+         "R198 missing-specular default assertion"),
+        ("R198 D3DTA_SPECULAR VS/PS COLOR1 interface rejected",
+         SHADER_LINKAGE_PROBE,
+         "R198 VS/PS COLOR1 reflection linkage"),
+        ("DX11 fixed-function D3DTA_SPECULAR support R198: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R198 pixel probe completion"),
+        ("DX11 fixed-function SPECULAR COLOR1 linkage R198: PASS",
+         SHADER_LINKAGE_PROBE,
+         "R198 linkage probe completion"),
+    ]
+    missing_r198_d3dta_specular = [
+        meaning
+        for token, source, meaning in r198_d3dta_specular_contract
+        if token not in source
+    ]
+    if missing_r198_d3dta_specular:
+        raise SystemExit(
+            "DX11 R198 D3DTA_SPECULAR/COLOR1 contract drift: "
+            + ", ".join(missing_r198_d3dta_specular)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
