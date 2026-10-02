@@ -32,6 +32,8 @@ EXPECTED_PROVENANCE_FIELDS = {
 def validate_overlap(contract: OverlapContract) -> None:
     if contract.end_rva <= contract.start_rva:
         raise AssertionError("continuation window must advance")
+    if contract.end_rva - contract.start_rva < len(contract.overlap_bytes):
+        raise AssertionError("continuation window cannot contain full overlap")
     if not contract.overlap_bytes:
         raise AssertionError("partial instruction overlap must be preserved")
     if len(contract.overlap_bytes) < 2:
@@ -60,7 +62,22 @@ def test_changed_tail_is_rejected() -> None:
     assert mutated.overlap_bytes != EXPECTED.overlap_bytes
 
 
+def test_overlap_cannot_extend_past_probe_window() -> None:
+    invalid = OverlapContract(
+        start_rva=0x182FBE,
+        end_rva=0x182FC0,
+        overlap_bytes=bytes.fromhex("66 0f 54 1d 20 91 61"),
+    )
+    try:
+        validate_overlap(invalid)
+    except AssertionError as exc:
+        assert str(exc) == "continuation window cannot contain full overlap"
+    else:
+        raise AssertionError("invalid continuation range accepted")
+
+
 if __name__ == "__main__":
     test_known_dxvk_frontier_overlap()
     test_changed_tail_is_rejected()
+    test_overlap_cannot_extend_past_probe_window()
     print("DXVK continuation overlap contract: PASS")
