@@ -4,81 +4,73 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "0dd353c4147ba412ca9376404c826a0187f49a61",
-  "state_parent_head": "dff8c48005d2f0ca117c369c968a9cacd45e5083",
-  "material_result_sha": "b0d0eee45bfaf843a634b255f6cf25902776df24",
-  "validation_bearing_sha": "df28e8ac4a4244239129dad6b4c2aca5b29bff70",
+  "base_sha": "802fe62657d041f7f8eeda488bfb307e4e474ead",
+  "state_parent_head": "daafe797eda5d308959133ee65ce8eb392a0791c",
+  "material_result_sha": "e1b507248de7891211a8c26775b5c501a97828c9",
+  "validation_bearing_sha": "602b7c0cd72a1bbf8b7a71ab3cafd08f25b8c2ec",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_DIRECT_INDEXED_SOURCE_RANGE_IDENTITY_R149",
-  "selection_reason": "Fresh current-HEAD audit found the R147 direct non-fan dispatch gate sealed the eventual D3D11 Draw/DrawIndexed tuple but did not preserve D3D9 DrawIndexedPrimitive MinVertexIndex/NumVertices source-range semantics. Those arguments disappear from the D3D11 DrawIndexed API, so preserving their exact stale-resistant identity before activation was the highest-value independent static conversion gap.",
-  "summary": "Added dormant R149 indexed source-range readiness preserving BaseVertexIndex, MinVertexIndex, NumVertices, StartIndex and PrimitiveCount with primitive-derived element count. The gate rejects empty live vertex ranges, vertex/index arithmetic overflow, direct triangle-fan use and stale argument drift; probe coverage and source-graph production-caller quarantine retain the contract. Native Draw* remains disabled.",
+  "selected_work": "DX11_R149_INDEXED_POINTLIST_FAILCLOSED",
+  "selection_reason": "Fresh current-HEAD review found R149 could accept D3DPT_POINTLIST because generic primitive translation supports point lists even though D3D9 DrawIndexedPrimitive explicitly does not. This was a fail-open indexed conversion boundary independent of runtime hardware.",
+  "summary": "R149 now rejects indexed D3DPT_POINTLIST readiness, the probe proves inputValid/primitiveExact/ready remain false with no snapshot token, and the source-graph verifier preserves the fail-closed contract. NativeDrawPathActive remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read branch AGENTS.md, current conversion state/run record, regression knowledge/history, Issue #14 and current DX11 source/probe/verifier artifacts through authenticated GitHub authority.",
-        "Tracked concurrent same-branch descendants and retried one GitHub 409 source conflict against the newest blob; no N100/local clone was used as product-development truth."
+        "Read current GitHub HEAD, AGENTS.md, conversion-lane state, durable task record, work queue, regression history/knowledge, and Issue #14 through authenticated GitHub authority.",
+        "Tracked concurrent R149/R150 descendants and published only by fast-forward against the current branch; no N100/local clone was used as product-development truth."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Confirmed R147 direct dispatch seals PrimitiveCount-derived element count, StartVertexLocation/StartIndexLocation/BaseVertexLocation and final live bound-state identity.",
-        "Confirmed D3D9-only MinVertexIndex/NumVertices were not represented in that dispatch identity and would otherwise be lost at the D3D11 DrawIndexed API boundary.",
-        "Bounded R149 to numeric/source-range identity only; it does not claim actual source-index values were scanned against the declared range."
+        "Confirmed R149 primitiveExact inherited translate_primitive(D3DPT_POINTLIST) and only quarantined triangle fans.",
+        "Cross-checked Microsoft D3D9 DrawIndexedPrimitive semantics: D3DPT_POINTLIST is unsupported, while D3D11 DrawIndexed has no MinVertexIndex/NumVertices parameters; readiness must therefore fail closed before any future native indexed activation.",
+        "Bounded this unit to the invalid indexed point-list acceptance only; R149 effective BaseVertexIndex range hardening and R150 lineage work were preserved."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
-        "src/vr/d3d11/native_backend.hpp",
         "src/vr/d3d11/native_backend.cpp",
         "tools/dx11_constant_buffer_probe.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "32e921c1e63697c88fdf9809a0118be9121dc324",
-        "b0d0eee45bfaf843a634b255f6cf25902776df24",
-        "df28e8ac4a4244239129dad6b4c2aca5b29bff70"
+        "e1b507248de7891211a8c26775b5c501a97828c9"
       ],
       "details": [
-        "Added NativeFixedFunctionIndexedSourceRangeReadiness with exact D3D9 indexed source-range argument identity and stale-snapshot validation.",
-        "Derived direct non-fan element count and fail-closed MinVertexIndex+NumVertices and StartIndex+element-count overflow checks; nonzero primitive draws reject an empty declared vertex range and triangle fans remain on the generated-index path.",
-        "Added positive/drift/overflow/fan probe coverage and quarantined both R149 APIs from production source before activation."
+        "Added D3DPT_POINTLIST rejection to R149 primitiveExact.",
+        "Added a deterministic probe asserting point-list source-range readiness has inputValid=false, primitiveExact=false, ready=false and snapshotToken=0.",
+        "Added source-graph drift guards for both the source predicate and probe evidence."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_EXACT_STATIC_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
-      "automation_validation": "PASS_EXACT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+      "status": "COMPLETE_DESCENDANT_STATIC_CONFIGURE_CANCELLED_BY_CHURN",
+      "automation_validation": "PASS_DESCENDANT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
       "evidence": [
-        "Exact validation-bearing SHA df28e8ac4a4244239129dad6b4c2aca5b29bff70 retained the R149 source, probe/verifier markers and production-caller quarantine.",
-        "Build run 36980813692 job 110754710280 on that exact SHA passed Checkout, HMD baseline, one-click structure, backend disassembly contract, Verify DX11 source graph, Test DX11 census analyzer, consolidated wheel source and production wheel FFB math.",
-        "Later same-branch pushes cancelled Configure; Build and downstream binary/WARP steps were skipped, so Win32 compile, WARP executable execution and runtime behavior are not claimed."
+        "Exact material SHA workflows were cancelled before jobs by branch churn; no success is inferred from those cancellations.",
+        "Retaining descendant 602b7c0cd72a1bbf8b7a71ab3cafd08f25b8c2ec differs from the material result only in the durable task-state file.",
+        "Build run 36981119275 job 110755718243 passed HMD baseline, one-click structure, backend disassembly, Verify DX11 source graph, DX11 census analyzer, wheel source and wheel math checks with the R149 point-list guard retained.",
+        "Configure was cancelled by later branch churn, so Win32 compile and WARP probe execution are not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commits": [
-        "32e921c1e63697c88fdf9809a0118be9121dc324",
-        "b0d0eee45bfaf843a634b255f6cf25902776df24",
-        "df28e8ac4a4244239129dad6b4c2aca5b29bff70"
-      ],
-      "issue14_comment_id": 5947732266,
-      "validation_issue14_comment_id": 5947758609
+      "material_commit": "e1b507248de7891211a8c26775b5c501a97828c9",
+      "issue14_comment_id": 5947776709
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant DX11 readiness/probe/static-guard work only; no production Draw* routing, backend activation, OpenXR transport, localization, other backend lane or release payload changed."
+      "reason": "Dormant indexed-readiness semantic guard only. No production Draw* routing, backend activation/promotion, OpenXR transport, localization, or release payload changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATE_COMMIT",
-      "lane_state_commit": "802fe62657d041f7f8eeda488bfb307e4e474ead",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R149. Current descendants already add R150 binding between R147 direct dispatch and R149 source range; validate/persist that existing descendant rather than duplicate it, then continue fresh current-HEAD static review. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R149 indexed source-range identity. Current descendants already add R150 binding between the R147 direct dispatch tuple and R149 source range; validate/persist that work rather than duplicate it, then continue a fresh current-HEAD audit for the next independent dormant DX11 gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -89,22 +81,13 @@
     "localization_modified": false,
     "other_backend_modified": false
   },
-  "issue14_comment_id": 5947732266,
-  "automation_validation": "PASS_EXACT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
-  "blocker": "Exact validation-bearing CI passed all static gates through DX11 source graph/census and wheel math, then same-branch churn cancelled Configure. Win32 Build/WARP execution was skipped; runtime remains UNTESTED.",
-  "next_action": "Keep NativeDrawPathActive disabled. Preserve R149. Current descendants already add R150 binding between R147 direct dispatch and R149 source range; validate/persist that existing descendant rather than duplicate it, then continue a fresh source-wide DX11 dormant-conversion audit. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5947776709,
+  "automation_validation": "PASS_DESCENDANT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+  "blocker": "Win32 compile/WARP probe execution was superseded by branch churn after static gates passed; runtime remains UNTESTED.",
+  "next_action": "Keep NativeDrawPathActive disabled. Preserve R149 indexed source-range identity. Current descendants already add R150 binding between the R147 direct dispatch tuple and R149 source range; validate/persist that work rather than duplicate it, then continue a fresh current-HEAD audit for the next independent dormant DX11 gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "prior_completed_unit": {
-    "selected_work": "DX11_FIXED_FUNCTION_GRAPHICS_STAGE_ISOLATION_R147",
-    "material_result_sha": "6977c6a22ff6aa9eef2dec45dada3164f9b8c120",
-    "validation_bearing_sha": "717a284cee1f35b6074ca388d3d39dca9d56b9e3",
-    "automation_validation": "PASS_DESCENDANT_STATIC_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
-    "runtime_validation": "UNTESTED",
-    "checkpoint": "C6_STATE",
-    "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
-    "issue14_comment_id": 5947553790
-  },
+  "prior_completed_unit": "DX11_DIRECT_INDEXED_SOURCE_RANGE_IDENTITY_R149",
   "validation_issue14_comment_id": 5947758609
 }
