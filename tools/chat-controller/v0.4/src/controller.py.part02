@@ -382,26 +382,34 @@ def load_asset_rows(head: str) -> list[dict]:
 
 
 def producer_prompt(active: dict) -> str:
-    path = active["asset_path"]
-    manifest = {"lane": active["lane"], "asset_path": path, "state": "PRODUCED",
+    manifest = {"lane": active["lane"], "asset_path": "<직접 선택한 canonical queue 경로>", "state": "PRODUCED",
                 "artifact_path": "<실제 DDS 경로>", "artifact_sha": "<Git blob SHA 또는 Drive SHA-256>",
                 "transport": "github", "self_qa_path": "<같은 커밋의 decoded self-QA JSON 경로>",
                 "runtime_validation": "UNTESTED"}
-    lines = [f"LANE={active['lane']}", f"ASSET={path}", "STATE=PRODUCING",
-             f"RESULT_SHA={active.get('result_sha', '')}", f"BASE_SHA={active['base_sha']}",
-             f"TARGET_BRANCH={LOCALIZATION_BRANCH}",
-             "GitHub 연결 플러그인으로 최신 HEAD와 이 자산의 기존 증거를 읽고 미완료 부분만 진행해.",
+    options = active.get("asset_options", [])
+    lines = [f"LANE={active['lane']}", "ASSET_SELECTION=AUTONOMOUS_WITHIN_SHARD", "STATE=SELECTING",
+             f"BASE_SHA={active['base_sha']}", f"TARGET_BRANCH={LOCALIZATION_BRANCH}",
+             "자산 하나를 지정하지 않는다. 최신 canonical queue와 실제 취득 가능한 원본·증거를 확인하여 작업 대상을 스스로 선택해.",
+             "A는 짝수 index, B는 홀수 index만 담당한다. 완료/PASS와 C QA 대기 후보는 재생산하지 마.",
+             "아래 목록은 우선순위 참고다. 첫 항목에 고정되지 말고 실제 제작 가능한 대상을 선택해.",
+             "CANDIDATE_OPTIONS=" + json.dumps(options, ensure_ascii=False, separators=(",", ":")),
+             "GitHub 연결 플러그인으로 최신 HEAD와 기존 증거를 읽어. 첫 경로가 없다는 이유로 연결/권한 없음이나 전체 작업 불가를 선언하지 마.",
+             "연결 도구의 실제 읽기·쓰기 호출 응답을 구분해 판단하고, 쓰기 도구를 탐색하지 않은 채 읽기 전용이라고 단정하지 마.",
+             "404는 source transport miss다. canonical inventory의 경로/해시를 확인하고 승인된 Google Drive canonical HD source transport의 내부 목록·개별 파일을 탐색해.",
+             "Drive miss면 contract의 pinned tag/release 순서로 전환해. 최신 release나 다른 원본으로 임의 대체하지 마.",
+             "한 자산의 원본·권한·영역 문제가 해결되지 않으면 확인한 경로와 실제 오류를 남기고 같은 응답 안에서 다음 자기 shard 자산으로 넘어가.",
+             "후보 탐색 중 매번 사용자에게 진행 여부를 묻거나 첫 실패 보고로 끝내지 마. 후보를 비교한 뒤 가능한 작업을 실제 수행해.",
              "현재 지시는 자산 경로 + 후보 SHA 실행 계약이다. 과거 번호 기반 실행 계약을 재생성하지 마.",
              "candidate-completion-first: ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.",
-             "Git HEAD가 승인한 Google Drive canonical HD source transport를 사용할 수 있다.",
-             f"실제 DDS와 self-QA를 같은 커밋에 넣고 {artifact_record_path(path)}에 아래 JSON을 기록해.",
+             f"선택한 canonical asset_path의 UTF-8 문자열 SHA-256(64자리 소문자 hex)을 key로 계산하여 {ARTIFACT_ROOT}/<key>.json에 아래 JSON을 기록해.",
+             "실제 DDS와 변경된 decoded self-QA 증거, manifest는 같은 material commit에 넣어.",
              json.dumps(manifest, ensure_ascii=False),
              "Drive 출력은 transport=drive와 drive_file_id를 추가하고 실제 bytes SHA-256을 artifact_sha로 기록해.",
-             "Git 출력의 artifact_sha는 DDS Git blob SHA다. self-QA와 원본 영어 비교 증거를 실제 파일로 커밋해.",
-             "준비 작업·설명만으로 PRODUCED를 기록하지 마. 공용 진행 상태는 독립 C QA consumer가 병합한다.",
-             "commit 메시지는 [AUTO:LOCALIZATION-A] 또는 [AUTO:LOCALIZATION-B]와 자산 경로를 사용해.",
+             "Git 출력의 artifact_sha는 DDS Git blob SHA다. 원본 영어 비교 증거도 실제 파일로 커밋해.",
+             "준비 기록만으로 PRODUCED를 선언하지 마. 모든 자기 shard 후보가 실제로 차단된 경우에만 조사한 후보별 근거와 NO_RUNNABLE_ASSET을 보고해.",
+             "공용 진행 상태는 독립 C QA consumer가 병합한다. commit 메시지는 자기 lane의 [AUTO:LOCALIZATION-A] 또는 [AUTO:LOCALIZATION-B]와 선택한 자산 경로를 사용해.",
              "RUNTIME_VALIDATION=UNTESTED. CI-skip 지시어를 넣지 마.",
-             "최종 출력: LANE, ASSET, STATE, RESULT_SHA를 각각 한 줄로 출력해."]
+             "완료한 실제 대상의 LANE, ASSET, STATE, RESULT_SHA를 마지막에 각각 한 줄로 출력해."]
     return "\n".join(lines) + "\n\n" + read_prompt(f"localization_{active['lane']}.md")
 
 
@@ -434,5 +442,6 @@ def conversion_prompt(active: dict) -> str:
         "대상 브랜치의 실제 변경을 commit하고 RESULT_SHA=<40자리 커밋 SHA>를 마지막에 출력해.",
         "실기 검증하지 않았다면 UNTESTED로 기록해. CI-skip 지시어를 넣지 마.",
     ]) + "\n\n" + read_prompt("conversion_dx11.md" if active["lane"] == "A" else "conversion_dxvk.md")
+
 
 

@@ -65,7 +65,7 @@ class LaneAssetTests(unittest.TestCase):
 
     def test_no_duplicate_producer_or_completed_asset(self):
         rows = [dict(index='26', path=PATH, action='localize_text', artwork_status='pending_artwork')]
-        for state in ('PASS', 'QA_PENDING', 'WAIT_GATE', 'BLOCKED'):
+        for state in ('PASS', 'QA_PENDING', 'WAIT_GATE'):
             self.reg.artifact_records[PATH] = dict(state=state)
             self.assertIsNone(m.choose_asset(rows, 'A', self.reg))
         self.reg.artifact_records.clear()
@@ -207,10 +207,12 @@ class LaneAssetTests(unittest.TestCase):
             self.assertIsNone(m.github_file('a.json', SHA))
 
     def test_generated_prompts_use_only_asset_contract(self):
-        a = m.new_producer({'path':PATH}, 'A', HEAD, self.reg)
+        a = m.new_producer([{'index':26,'asset_path':PATH}], 'A', HEAD, self.reg)
         for text in (m.producer_prompt(a), m.qa_prompt(self.candidate())):
             self.assertIsNone(re.search(r'TASK_ID|PRODUCTION_ID|EVENT_ID|ATTEMPT=|CHAT_ROLLOVER', text))
-            self.assertIn('ASSET='+PATH, text)
+            self.assertIn(PATH, text)
+        self.assertNotIn('\nASSET=', m.producer_prompt(a))
+        self.assertIn('ASSET_SELECTION=AUTONOMOUS_WITHIN_SHARD', m.producer_prompt(a))
 
     def test_manual_mode_never_dispatches(self):
         with patch.object(m, 'github_branch_head', return_value=HEAD), \
@@ -263,6 +265,47 @@ class LaneAssetTests(unittest.TestCase):
             asyncio.run(m.poll_gate(self.reg, active))
             self.assertEqual(self.reg.artifact_records[PATH]['state'], 'BLOCKED')
 
+    def test_blocked_source_remains_an_option_after_ready_candidates(self):
+        rows = [dict(index='26',path=PATH,action='localize_text',artwork_status='pending_artwork'),
+                dict(index='28',path='next.dds',action='localize_text',artwork_status='pending_artwork')]
+        self.reg.artifact_records[PATH] = dict(state='BLOCKED',reason='source 404')
+        options = m.producer_options(rows, 'A', self.reg)
+        self.assertEqual([o['asset_path'] for o in options], ['next.dds', PATH])
+        self.assertEqual(options[1]['previous_blocker'], 'source 404')
+
+    def test_autonomous_completion_accepts_second_option_not_missing_first(self):
+        options = [{'index':26,'asset_path':'missing.dds'}, {'index':28,'asset_path':PATH}]
+        active = m.new_producer(options, 'A', HEAD, self.reg)
+        self.reg.active_lanes['A'] = active
+        self.reg.artifact_records[PATH] = self.candidate()
+        with patch.object(m, 'github_api_json', return_value={'status':'ahead'}):
+            self.assertTrue(asyncio.run(m.reconcile_active(self.reg, active, HEAD)))
+        self.assertEqual(active['asset_path'], PATH)
+        self.assertNotIn('A', self.reg.active_lanes)
+        self.assertEqual(self.reg.qa_queue[0]['asset_path'], PATH)
+
+    def test_autonomous_completion_rejects_old_commit_and_other_lane(self):
+        options = [{'index':26,'asset_path':PATH}]
+        active = m.new_producer(options, 'A', HEAD, self.reg)
+        self.reg.artifact_records[PATH] = self.candidate()
+        with patch.object(m, 'github_api_json', return_value={'status':'behind'}):
+            self.assertFalse(asyncio.run(m.reconcile_active(self.reg, active, HEAD)))
+        self.reg.artifact_records[PATH]['lane'] = 'B'
+        with patch.object(m, 'github_api_json') as api:
+            self.assertFalse(asyncio.run(m.reconcile_active(self.reg, active, HEAD)))
+            api.assert_not_called()
+        self.assertEqual(self.reg.qa_queue, [])
+
+    def test_autonomous_no_result_does_not_block_a_fake_asset(self):
+        active = m.new_producer([{'index':26,'asset_path':PATH}], 'A', HEAD, self.reg)
+        self.reg.active_lanes['A'] = active
+        m.block_lane(self.reg, active, 'No runnable source in this pass')
+        self.assertEqual(self.reg.artifact_records, {})
+        self.assertIn('A', self.reg.producer_cooldowns)
+        m.save_registry(self.reg)
+        self.assertEqual(m.load_registry(m.datetime.now(m.TZ)).producer_cooldowns, self.reg.producer_cooldowns)
+
 
 if __name__ == '__main__':
     unittest.main()
+

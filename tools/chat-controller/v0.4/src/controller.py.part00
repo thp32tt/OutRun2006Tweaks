@@ -217,6 +217,7 @@ class Registry:
     active_lanes: dict = field(default_factory=dict)
     artifact_records: dict = field(default_factory=dict)
     qa_queue: list = field(default_factory=list)
+    producer_cooldowns: dict = field(default_factory=dict)
     schema: str = "lane-asset-v1"
     reconciled_head: Optional[str] = None
     rate_limit_attempts: int = 0
@@ -338,10 +339,11 @@ def enqueue_candidate(reg: Registry, record: dict):
         reg.qa_queue.append(item)
 
 
-def choose_asset(rows: list[dict], lane: str, reg: Registry) -> Optional[dict]:
+def producer_options(rows: list[dict], lane: str, reg: Registry) -> list[dict]:
+    """Offer the whole shard for source-aware selection, never bind one asset."""
     if lane not in {"A", "B"}:
         raise ValueError("Only A/B produce DDS assets")
-    occupied = {a["asset_path"] for a in reg.active_lanes.values()}
+    occupied = {a.get("asset_path") for a in reg.active_lanes.values()}
     waiting = {a["asset_path"] for a in reg.qa_queue}
     candidates = []
     for row in rows:
@@ -352,18 +354,28 @@ def choose_asset(rows: list[dict], lane: str, reg: Registry) -> Optional[dict]:
         current = reg.artifact_records.get(path, {})
         if path in occupied or path in waiting:
             continue
-        if current.get("state") in {"PASS", "QA_PENDING", "WAIT_GATE", "BLOCKED"}:
+        if current.get("state") in {"PASS", "QA_PENDING", "WAIT_GATE"}:
             continue
         if row.get("action") != "localize_text" or any(s in status for s in
-                ("preserve", "blocked", "pending_ingame", "runtime", "qa_pending")):
+                ("preserve", "pending_ingame", "runtime", "qa_pending")):
             continue
         if current.get("state") != "REWORK_REQUIRED" and any(s in status for s in ("pass", "complete", "approved")):
             continue
-        priority = (0 if current.get("state") == "REWORK_REQUIRED" or "rework" in status else
+        # A previous transport failure is a hint, not permanent exclusion.
+        priority = (4 if current.get("state") == "BLOCKED" or "blocked" in status else
+                    0 if current.get("state") == "REWORK_REQUIRED" or "rework" in status else
                     1 if "render_ready" in status else 2 if "one_stage" in status else 3)
-        candidates.append((priority, int(row["index"]), row))
-    return min(candidates, default=(0, 0, None), key=lambda item: item[:2])[2]
+        candidates.append((priority, int(row["index"]), {
+            "index": int(row["index"]), "asset_path": path, "artwork_status": status,
+            "previous_blocker": current.get("reason", ""),
+        }))
+    return [item[2] for item in sorted(candidates, key=lambda item: item[:2])]
 
+
+def choose_asset(rows: list[dict], lane: str, reg: Registry) -> Optional[dict]:
+    """Compatibility helper for ranking only; dispatch uses the full option list."""
+    options = producer_options(rows, lane, reg)
+    return next((row for row in rows if options and row["path"] == options[0]["asset_path"]), None)
 
 
 _github_rest_block_until_epoch = 0.0
@@ -838,6 +850,7 @@ async def ensure_logged_in(page: Page) -> bool:
         current_url=page.url,
     )
     return False
+
 
 
 

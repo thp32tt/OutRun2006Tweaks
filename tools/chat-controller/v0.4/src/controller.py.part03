@@ -33,7 +33,11 @@ def block_lane(reg: Registry, active: dict, reason: str):
     active["state"] = "BLOCKED"
     active["reason"] = reason
     record = dict(active)
-    reg.artifact_records[active["asset_path"]] = record
+    if active.get("asset_path"):
+        reg.artifact_records[active["asset_path"]] = record
+    elif active.get("selection_mode") == "autonomous":
+        reg.producer_cooldowns[active["lane"]] = (
+            datetime.now(TZ) + timedelta(seconds=QUEUE_IDLE_REARM_SECONDS)).isoformat()
     reg.active_lanes.pop(active["lane"], None)
     publish_lane(active)
     save_registry(reg)
@@ -128,6 +132,26 @@ async def dispatch_lane(context, pages, reg: Registry, active: dict) -> bool:
 async def reconcile_active(reg: Registry, active: dict, head: str) -> bool:
     path = active["asset_path"]
     if active["lane"] in {"A", "B"}:
+        if active.get("selection_mode") == "autonomous":
+            known = active.get("known_candidates", {})
+            eligible = {item["asset_path"] for item in active.get("asset_options", [])}
+            for selected_path, record in reg.artifact_records.items():
+                sha = record.get("candidate_sha")
+                if (selected_path not in eligible or record.get("lane") != active["lane"] or
+                        record.get("state") != "QA_PENDING" or not sha or known.get(selected_path) == sha):
+                    continue
+                comparison = await asyncio.to_thread(github_api_json,
+                    f"/repos/{GITHUB_REPO}/compare/{active['base_sha']}...{sha}")
+                if comparison.get("status") != "ahead":
+                    continue
+                # Bind ownership to the actual chosen material asset only now.
+                active.update(asset_path=selected_path, artifact_sha=record["artifact_sha"], result_sha=sha)
+                enqueue_candidate(reg, record)
+                reg.active_lanes.pop(active["lane"], None)
+                reg.producer_cooldowns.pop(active["lane"], None)
+                publish_lane(record)
+                return True
+            return False
         record = reg.artifact_records.get(path, {})
         if record.get("candidate_sha") and record.get("candidate_sha") != active.get("previous_candidate_sha"):
             if record.get("state") == "QA_PENDING":
@@ -210,11 +234,11 @@ async def observe_lane(context, pages, reg: Registry, active: dict, head: str):
     block_lane(reg, active, reason)
 
 
-def new_producer(row: dict, lane: str, head: str, reg: Registry) -> dict:
-    previous = reg.artifact_records.get(row["path"], {})
-    return {"lane": lane, "asset_path": row["path"], "artifact_sha": previous.get("artifact_sha", ""),
-            "state": "READY", "base_sha": head, "result_sha": previous.get("candidate_sha", ""),
-            "previous_candidate_sha": previous.get("candidate_sha"),
+def new_producer(options: list[dict], lane: str, head: str, reg: Registry) -> dict:
+    return {"lane": lane, "asset_path": "", "artifact_sha": "", "state": "SELECTING",
+            "selection_mode": "autonomous", "asset_options": options,
+            "known_candidates": {p: r.get("candidate_sha") for p, r in reg.artifact_records.items()},
+            "base_sha": head, "result_sha": "",
             "branch": LOCALIZATION_BRANCH, "workflow": "Localization Automation Gate"}
 
 
@@ -251,9 +275,12 @@ async def localization_cycle(context, pages, reg: Registry):
     for lane in ("A", "B"):
         if lane in reg.active_lanes or len(reg.active_lanes) >= MAX_ACTIVE_LANES:
             continue
-        row = choose_asset(rows, lane, reg)
-        if row:
-            await dispatch_lane(context, pages, reg, new_producer(row, lane, head, reg))
+        cooldown = _parse_iso(reg.producer_cooldowns.get(lane))
+        if cooldown and datetime.now(TZ) < cooldown:
+            continue
+        options = producer_options(rows, lane, reg)
+        if options:
+            await dispatch_lane(context, pages, reg, new_producer(options, lane, head, reg))
     save_registry(reg)
 
 
@@ -338,6 +365,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
