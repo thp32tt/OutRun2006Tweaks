@@ -50,10 +50,13 @@ namespace outrun::vr::dx11
         // exposes no equivalent raster/OM toggle. Keep enabled dithering
         // fail-closed until exact output-format behavior is proven.
         PipelineUnsupportedDither = 1u << 17,
+        // R170: any non-zero D3DRS_WRAP0..7 mask needs fixed-function
+        // vertex-coordinate semantics the dormant native VS does not model.
+        PipelineUnsupportedTextureCoordinateWrap = 1u << 18,
         // R166: one-past-last bit count consumed by the runtime census. Keep
         // this sentinel synchronized with concrete PipelineUnsupported bits;
         // the source-graph gate verifies max(bit)+1 == this value.
-        PipelineUnsupportedBitCount = 18u,
+        PipelineUnsupportedBitCount = 19u,
     };
 
     struct PipelineTranslation
