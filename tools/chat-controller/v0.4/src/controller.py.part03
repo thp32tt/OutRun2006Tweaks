@@ -1920,6 +1920,7 @@ def localization_prepare_c_next_batch(active: dict, batch: list[dict], now: date
     active["runtime_validation"] = "UNTESTED"
     active["c_drain_continuation_pending"] = True
     active["c_drain_waiting"] = False
+    active["qa_batch_finalized"] = False
     active["last_checkpoint_at"] = now.isoformat()
     active["last_checkpoint_stage"] = "C_NEXT_BATCH"
     for key in (
@@ -2383,6 +2384,81 @@ async def localization_process_lane(
                 return
 
             if run.get("conclusion") == "success":
+                if CONTROLLER_MODE == "localization" and lane_key == "C":
+                    # One successful C batch is a checkpoint. Consume it, then drain
+                    # the next ready batch in the same TASK/chat instead of stopping.
+                    active["automation_validation"] = "PASS"
+                    active["runtime_validation"] = "UNTESTED"
+                    active["completed_at"] = now.isoformat()
+                    active["terminal"] = "PASS"
+                    finalize_c_qa_batch(q, active)
+                    active["qa_batch_finalized"] = True
+                    consumed_shas = list(active.get("c_consumed_result_shas") or [])
+                    current_sha = str(active.get("result_sha") or "")
+                    if current_sha and current_sha not in consumed_shas:
+                        consumed_shas.append(current_sha)
+                    active["c_consumed_result_shas"] = consumed_shas[-32:]
+                    active["qa_batches_completed_in_task"] = int(active.get("qa_batches_completed_in_task", 0) or 0) + 1
+                    active["qa_inputs_validated_in_task"] = int(active.get("qa_inputs_validated_in_task", 0) or 0) + len(active.get("qa_batch") or [])
+                    active["last_checkpoint_head"] = current_sha or active.get("last_checkpoint_head")
+                    active["last_checkpoint_at"] = now.isoformat()
+                    active["last_checkpoint_stage"] = "C_BATCH_PASS"
+
+                    next_batch = select_ready_qa_batch(q, now)
+                    if next_batch:
+                        localization_prepare_c_next_batch(active, next_batch, now)
+                        sent = await queue_send_c_execution_continuation(
+                            context, pages, active, "PREVIOUS_BATCH_PASS_CONTINUE_DRAIN"
+                        )
+                        save_queue_state(q)
+                        write_runtime(
+                            status="c_drain_continue",
+                            last_action=(
+                                f"{active['task_id']} C batch PASS; continuing same TASK "
+                                f"batches={active.get('qa_batches_completed_in_task', 0)} "
+                                f"pending={len(q.get('qa_pending', []))}"
+                            ),
+                            queue=q,
+                        )
+                        return
+
+                    if q.get("qa_pending"):
+                        # Inputs exist but are under retry backoff. Keep C latched and
+                        # wake it as soon as any item becomes ready.
+                        active["qa_batch"] = []
+                        active["result_sha"] = None
+                        active["result_message"] = None
+                        active["phase"] = "WAIT_CHAT"
+                        active["terminal"] = None
+                        active["task_latched"] = True
+                        active["controller_stage"] = "WAIT_QA_DRAIN"
+                        active["c_drain_waiting"] = True
+                        active["c_drain_continuation_pending"] = False
+                        for key in (
+                            "gate_run", "last_gate_poll_at", "last_gate_status",
+                            "last_gate_status_changed_at", "gate_jobs",
+                            "last_jobs_refresh_at", "wait_actions_started_at",
+                            "startup_reconcile_pending", "completed_at",
+                        ):
+                            active.pop(key, None)
+                        invalidate_task_commit_cache(active["branch"], active["task_id"])
+                        save_queue_state(q)
+                        write_runtime(
+                            status="c_drain_backoff_wait",
+                            last_action=f"{active['task_id']} C drain remains active; pending={len(q.get('qa_pending', []))} inputs are retry-delayed",
+                            queue=q,
+                        )
+                        return
+
+                    active["terminal"] = "PASS"
+                    active["phase"] = "DONE"
+                    active["task_latched"] = False
+                    active["controller_stage"] = "DONE"
+                    active["completed_at"] = now.isoformat()
+                    q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
+                    save_queue_state(q)
+                    return
+
                 active["automation_validation"] = "PASS"
                 active["runtime_validation"] = "UNTESTED"
                 active["completed_at"] = now.isoformat()
