@@ -521,7 +521,35 @@ int main()
             "D3DTOP_ADD fixed-function shader prototype did not compile");
     }
 
+    {
+        std::array<FixedFunctionStageState, 8> subtractStages{};
+        subtractStages[0].colorOp = D3DTOP_SUBTRACT;
+        subtractStages[0].colorArg1 = D3DTA_TEXTURE;
+        subtractStages[0].colorArg2 = D3DTA_DIFFUSE;
+        subtractStages[0].alphaOp = D3DTOP_SELECTARG1;
+        subtractStages[0].alphaArg1 = D3DTA_TEXTURE;
+        subtractStages[0].minFilter = D3DTEXF_POINT;
+        subtractStages[0].magFilter = D3DTEXF_POINT;
+        subtractStages[0].mipFilter = D3DTEXF_NONE;
+        const auto subtractShader = generate_fixed_function_pixel_shader_prototype(
+            subtractStages, true, 0x01u, 0x01u, textureTypes);
+        require(
+            subtractShader.generated() && subtractShader.activeStages == 1,
+            "R177 D3DTOP_SUBTRACT fixed-function stage must become shader-exact");
+        require(
+            subtractShader.source.find(
+                "float3 nextColor = sampled0.rgb - input.diffuse.rgb;") != std::string::npos,
+            "R177 D3DTOP_SUBTRACT shader expression drift");
+        const auto subtractCompile =
+            compile_fixed_function_pixel_shader_prototype(subtractShader);
+        require(
+            subtractCompile.attempted && subtractCompile.succeeded &&
+            subtractCompile.result == S_OK && subtractCompile.bytecodeBytes != 0,
+            "R177 D3DTOP_SUBTRACT fixed-function shader prototype did not compile");
+    }
+
     std::cout
+        << "DX11 fixed-function D3DTOP_SUBTRACT support R177: PASS\n"
         << "DX11 fixed-function argument modifiers R175: PASS\n"
         << "DX11 fixed-function D3DTOP_ADD support: PASS\n"
         << "DX11 fixed-function RESULTARG fail-closed R173: PASS\n"

@@ -230,6 +230,31 @@ def main() -> None:
             + ", ".join(missing_d3dtop_add)
         )
 
+    r177_d3dtop_subtract_contract = [
+        ("case D3DTOP_SUBTRACT:", PIPELINE_TRANSLATION_CPP,
+         "R177 D3DTOP_SUBTRACT readiness/translation case"),
+        ('return first + " - " + second;', PIPELINE_TRANSLATION_CPP,
+         "R177 D3DTOP_SUBTRACT component-wise shader expression"),
+        ("subtractStages[0].colorOp = D3DTOP_SUBTRACT;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R177 hosted SUBTRACT probe fixture"),
+        ("float3 nextColor = sampled0.rgb - input.diffuse.rgb;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R177 generated HLSL assertion"),
+        ("R177 D3DTOP_SUBTRACT fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R177 offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_SUBTRACT support R177: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R177 hosted probe completion"),
+    ]
+    missing_r177_d3dtop_subtract = [
+        meaning
+        for token, source, meaning in r177_d3dtop_subtract_contract
+        if token not in source
+    ]
+    if missing_r177_d3dtop_subtract:
+        raise SystemExit(
+            "DX11 R177 fixed-function D3DTOP_SUBTRACT contract drift: "
+            + ", ".join(missing_r177_d3dtop_subtract)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.

@@ -171,6 +171,7 @@ namespace outrun::vr::dx11
                 return fixed_function_argument_uses_texture(arg2);
             case D3DTOP_MODULATE:
             case D3DTOP_ADD:
+            case D3DTOP_SUBTRACT:
                 return fixed_function_argument_uses_texture(arg1) ||
                        fixed_function_argument_uses_texture(arg2);
             default:
@@ -234,6 +235,9 @@ namespace outrun::vr::dx11
             case D3DTOP_ADD:
                 // D3D9 D3DTOP_ADD is component-wise Arg1 + Arg2.
                 return first + " + " + second;
+            case D3DTOP_SUBTRACT:
+                // R177: D3D9 defines SUBTRACT as component-wise Arg1 - Arg2.
+                return first + " - " + second;
             default:
                 return {};
             }
@@ -412,6 +416,7 @@ namespace outrun::vr::dx11
                 break;
             case D3DTOP_MODULATE:
             case D3DTOP_ADD:
+            case D3DTOP_SUBTRACT:
                 useArg1 = true;
                 useArg2 = true;
                 break;
