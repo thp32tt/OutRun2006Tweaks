@@ -964,6 +964,14 @@ def queue_dynamic_prefix() -> str:
     if not task_id:
         return ""
     lane = str(runtime.get("queue_lane") or "")
+    source_policy = (
+        "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 저장소/clone/worktree로 우회하지 마. "
+        "단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용하며 GitHub-only라는 이유로 차단하지 마."
+        if lane.startswith("LOCALIZATION_")
+        else
+        "GitHub 최신 HEAD를 최종 상태·결과 SSOT로 유지하되 N100 로컬 저장소/clone/worktree와 Google Drive는 "
+        "보조 입력, 분석, 빌드, 검증, 전송 수단으로 필요할 때 사용해도 된다. 최종 결과와 완료 판정은 대상 Git 브랜치의 실제 material commit으로 남겨."
+    )
     branch = str(runtime.get("queue_branch") or "")
     attempt = int(runtime.get("queue_attempt") or 1)
     failure = str(runtime.get("queue_failure_context") or "").strip()
@@ -981,7 +989,7 @@ def queue_dynamic_prefix() -> str:
         f"TARGET_BRANCH={branch}",
         f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
         *([f"WAVE_ID={wave_id}"] if wave_id else []),
-        "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 저장소/clone/worktree로 우회하지 마. 단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용하며 GitHub-only라는 이유로 차단하지 마.",
+        source_policy,
         "이 작업에서 실제 변경 또는 검토 기록을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
         "필수 GitHub Actions Gate를 소유할 result commit에는 CI-skip 지시어를 넣지 마. 검증 완료 후 bookkeeping/checkpoint 커밋은 Gate 결과와 분리해 기록하고, controller가 validation-bearing result commit을 식별할 수 있게 유지해.",
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
