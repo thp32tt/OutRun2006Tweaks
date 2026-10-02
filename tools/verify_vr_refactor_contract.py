@@ -367,6 +367,30 @@ for rel, source in (("R33", r33), ("R34", r34)):
         errors.append(
             f"{rel} missing R29 owner stereo-recovery safety API")
 
+for banned in ("R22FailClosedEligibility();", "R22ResetBaselineTracking();"):
+    if banned in r34:
+        errors.append(f"R34 retained direct R22 reset fail-close primitive: {banned}")
+if "FailClosedResetBaselineState();" not in r34:
+    errors.append("R34 missing consolidated R22 reset fail-close owner API")
+
+fail_closed_reset = re.search(
+    r"inline void FailClosedResetBaselineState\(\) noexcept\s*\{(?P<body>.*?)\n    \}",
+    r22,
+    re.DOTALL,
+)
+if not fail_closed_reset:
+    errors.append("R22 consolidated reset fail-close owner API missing")
+else:
+    fail_closed_body = fail_closed_reset.group("body")
+    fail_closed_order = [
+        fail_closed_body.find("R22FailClosedEligibility();"),
+        fail_closed_body.find("R22ResetBaselineTracking();"),
+        fail_closed_body.find("InvalidateTrackedRasterShadow();"),
+    ]
+    if min(fail_closed_order) < 0 or fail_closed_order != sorted(fail_closed_order):
+        errors.append(
+            "R22 reset fail-close owner API must preserve eligibility/baseline/raster order")
+
 for rel, source in (("R33", r33), ("R34", r34)):
     if "R31FlushPendingStateBlockResync" in source:
         errors.append(
