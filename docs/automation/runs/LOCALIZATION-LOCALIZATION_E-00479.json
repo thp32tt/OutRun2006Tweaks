@@ -83,10 +83,15 @@
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "retry_required": false,
-  "result_sha": null,
-  "authoritative_result_sha": null,
+  "result_sha": "ef15fdecc728a44c97e7704182eb144fb9c67e88",
+  "authoritative_result_sha": "ef15fdecc728a44c97e7704182eb144fb9c67e88",
   "validation_bearing_result_sha": null,
-  "result_binding_state": "PENDING_IMMUTABLE_RESULT_SHA_BOOKKEEPING",
+  "result_binding_state": "BOUND_TO_PRODUCER_RESULT_PENDING_C_BATCH_GATE",
   "result_commit_message": "localization(E): produce indices128/143 v2 candidates [AUTO:LOCALIZATION-LOCALIZATION_E-00479]",
-  "durable_task_record_in_result_commit": true
+  "durable_task_record_in_result_commit": true,
+  "bookkeeping": {
+    "recorded_at_kst": "2026-10-02T12:39:00+09:00",
+    "producer_result_sha": "ef15fdecc728a44c97e7704182eb144fb9c67e88",
+    "note": "Bookkeeping-only immutable producer RESULT_SHA binding. Candidate material and QA bundle are unchanged. AUTOMATION_VALIDATION remains PENDING until independent C batch consumption; RUNTIME_VALIDATION remains UNTESTED."
+  }
 }
