@@ -1898,15 +1898,114 @@ int main()
     surfacePairReady.depthMirrorSerial = 13;
     surfacePairReady.snapshotToken = 0x120001ull;
 
+    auto outputStateSource = renderStateSource;
+    outputStateSource.outputStateComplete = true;
+    outputStateSource.scissorTestEnable = TRUE;
+    outputStateSource.blendFactor = 0xFF804020u;
+    outputStateSource.multiSampleMask = 0x0F0FF0F0u;
+    outputStateSource.viewport.X = 4;
+    outputStateSource.viewport.Y = 2;
+    outputStateSource.viewport.Width = 56;
+    outputStateSource.viewport.Height = 28;
+    outputStateSource.viewport.MinZ = 0.125f;
+    outputStateSource.viewport.MaxZ = 0.875f;
+    outputStateSource.scissorRect = RECT{5, 3, 58, 29};
+
+    const auto outputStateReady =
+        compose_fixed_function_output_state_readiness(
+            outputStateSource, surfacePairReady);
+    require(
+        outputStateReady.inputValid &&
+        outputStateReady.viewportExact &&
+        outputStateReady.scissorExact &&
+        outputStateReady.omDynamicExact &&
+        outputStateReady.ready &&
+        outputStateReady.viewport.TopLeftX == 4.0f &&
+        outputStateReady.viewport.TopLeftY == 2.0f &&
+        outputStateReady.viewport.Width == 56.0f &&
+        outputStateReady.viewport.Height == 28.0f &&
+        outputStateReady.viewport.MinDepth == 0.125f &&
+        outputStateReady.viewport.MaxDepth == 0.875f &&
+        outputStateReady.scissorRect.left == 5 &&
+        outputStateReady.scissorRect.top == 3 &&
+        outputStateReady.scissorRect.right == 58 &&
+        outputStateReady.scissorRect.bottom == 29 &&
+        outputStateReady.blendFactor[0] == 128.0f / 255.0f &&
+        outputStateReady.blendFactor[1] == 64.0f / 255.0f &&
+        outputStateReady.blendFactor[2] == 32.0f / 255.0f &&
+        outputStateReady.blendFactor[3] == 1.0f &&
+        outputStateReady.sampleMask == 0x0F0FF0F0u &&
+        outputStateReady.snapshotToken != 0 &&
+        validate_fixed_function_output_state_snapshot(
+            outputStateSource, surfacePairReady,
+            outputStateReady.snapshotToken),
+        "R124 exact dynamic output state issues a valid snapshot");
+
+    auto incompleteOutputState = outputStateSource;
+    incompleteOutputState.outputStateComplete = false;
+    const auto incompleteOutputReady =
+        compose_fixed_function_output_state_readiness(
+            incompleteOutputState, surfacePairReady);
+    require(
+        !incompleteOutputReady.inputValid &&
+        !incompleteOutputReady.ready &&
+        incompleteOutputReady.snapshotToken == 0,
+        "R124 incomplete output-state observation fails closed");
+
+    auto invalidViewportState = outputStateSource;
+    invalidViewportState.viewport.Width = 61;
+    const auto invalidViewportReady =
+        compose_fixed_function_output_state_readiness(
+            invalidViewportState, surfacePairReady);
+    require(
+        invalidViewportReady.inputValid &&
+        !invalidViewportReady.viewportExact &&
+        !invalidViewportReady.ready &&
+        invalidViewportReady.snapshotToken == 0,
+        "R124 out-of-bounds viewport fails closed");
+
+    auto invalidScissorState = outputStateSource;
+    invalidScissorState.scissorRect.right = 65;
+    const auto invalidScissorReady =
+        compose_fixed_function_output_state_readiness(
+            invalidScissorState, surfacePairReady);
+    require(
+        invalidScissorReady.inputValid &&
+        invalidScissorReady.viewportExact &&
+        !invalidScissorReady.scissorExact &&
+        !invalidScissorReady.ready &&
+        invalidScissorReady.snapshotToken == 0,
+        "R124 enabled out-of-bounds scissor fails closed");
+
+    auto changedOutputStateSource = outputStateSource;
+    changedOutputStateSource.blendFactor ^= 0x00010000u;
+    changedOutputStateSource.multiSampleMask ^= 0x00000001u;
+    const auto changedOutputStateReady =
+        compose_fixed_function_output_state_readiness(
+            changedOutputStateSource, surfacePairReady);
+    require(
+        changedOutputStateReady.ready &&
+        changedOutputStateReady.snapshotToken != 0 &&
+        changedOutputStateReady.snapshotToken !=
+            outputStateReady.snapshotToken &&
+        !validate_fixed_function_output_state_snapshot(
+            changedOutputStateSource, surfacePairReady,
+            outputStateReady.snapshotToken) &&
+        validate_fixed_function_output_state_snapshot(
+            changedOutputStateSource, surfacePairReady,
+            changedOutputStateReady.snapshotToken),
+        "R124 OM dynamic state changes invalidate output snapshot");
+
     const auto drawReady =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairReady,
+            texturedActivation, renderStateRecreated, surfacePairReady, outputStateReady,
             indexedGeometryReady);
     require(
         drawReady.inputValid &&
         drawReady.activationReady &&
         drawReady.renderStateReady &&
         drawReady.surfacePairReady &&
+        drawReady.outputStateReady &&
         drawReady.geometryReady &&
         drawReady.componentSnapshotsPresent &&
         drawReady.ready &&
@@ -1916,13 +2015,15 @@ int main()
             renderStateRecreated.snapshotToken &&
         drawReady.surfacePairSnapshotToken ==
             surfacePairReady.snapshotToken &&
+        drawReady.outputStateSnapshotToken ==
+            outputStateReady.snapshotToken &&
         drawReady.geometrySnapshotToken ==
             indexedGeometryReady.snapshotToken &&
         drawReady.snapshotToken != 0 &&
         validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated, surfacePairReady,
+            texturedActivation, renderStateRecreated, surfacePairReady, outputStateReady,
             indexedGeometryReady, drawReady.snapshotToken),
-        "R120 draw readiness composes activation, render-state, and surface-pair snapshots");
+        "R124 draw readiness composes activation, render-state, surface, output-state, and geometry snapshots");
 
     auto activationMissingSnapshot = texturedActivation;
     activationMissingSnapshot.snapshotToken = 0;
@@ -1934,32 +2035,39 @@ int main()
     surfacePairMissingSnapshot.snapshotToken = 0;
     auto surfacePairNotReady = surfacePairReady;
     surfacePairNotReady.ready = false;
+    auto outputStateNotReady = outputStateReady;
+    outputStateNotReady.ready = false;
+    outputStateNotReady.snapshotToken = 0;
     const auto missingActivationDraw =
         compose_fixed_function_draw_readiness(
-            activationMissingSnapshot, renderStateRecreated, surfacePairReady,
+            activationMissingSnapshot, renderStateRecreated, surfacePairReady, outputStateReady,
             indexedGeometryReady);
     const auto missingRenderStateDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateMissingSnapshot, surfacePairReady,
+            texturedActivation, renderStateMissingSnapshot, surfacePairReady, outputStateReady,
             indexedGeometryReady);
     const auto pendingRenderStateDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateNotReady, surfacePairReady,
+            texturedActivation, renderStateNotReady, surfacePairReady, outputStateReady,
             indexedGeometryReady);
     const auto missingSurfacePairDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairMissingSnapshot,
+            texturedActivation, renderStateRecreated, surfacePairMissingSnapshot, outputStateReady,
             indexedGeometryReady);
     const auto pendingSurfacePairDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairNotReady,
+            texturedActivation, renderStateRecreated, surfacePairNotReady, outputStateReady,
             indexedGeometryReady);
+    const auto pendingOutputStateDraw =
+        compose_fixed_function_draw_readiness(
+            texturedActivation, renderStateRecreated, surfacePairReady,
+            outputStateNotReady, indexedGeometryReady);
     auto geometryNotReady = indexedGeometryReady;
     geometryNotReady.ready = false;
     geometryNotReady.snapshotToken = 0;
     const auto pendingGeometryDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairReady,
+            texturedActivation, renderStateRecreated, surfacePairReady, outputStateReady,
             geometryNotReady);
     require(
         !missingActivationDraw.ready &&
@@ -1972,6 +2080,8 @@ int main()
         missingSurfacePairDraw.snapshotToken == 0 &&
         !pendingSurfacePairDraw.ready &&
         pendingSurfacePairDraw.snapshotToken == 0 &&
+        !pendingOutputStateDraw.ready &&
+        pendingOutputStateDraw.snapshotToken == 0 &&
         !pendingGeometryDraw.ready &&
         pendingGeometryDraw.snapshotToken == 0,
         "R120 draw readiness fails closed on missing component evidence");
@@ -1980,17 +2090,17 @@ int main()
     changedRenderStateIdentity.snapshotToken ^= 0x9e3779b97f4a7c15ull;
     const auto changedDrawReady =
         compose_fixed_function_draw_readiness(
-            texturedActivation, changedRenderStateIdentity, surfacePairReady,
+            texturedActivation, changedRenderStateIdentity, surfacePairReady, outputStateReady,
             indexedGeometryReady);
     require(
         changedDrawReady.ready &&
         changedDrawReady.snapshotToken != 0 &&
         changedDrawReady.snapshotToken != drawReady.snapshotToken &&
         !validate_fixed_function_draw_snapshot(
-            texturedActivation, changedRenderStateIdentity, surfacePairReady,
+            texturedActivation, changedRenderStateIdentity, surfacePairReady, outputStateReady,
             indexedGeometryReady, drawReady.snapshotToken) &&
         validate_fixed_function_draw_snapshot(
-            texturedActivation, changedRenderStateIdentity, surfacePairReady,
+            texturedActivation, changedRenderStateIdentity, surfacePairReady, outputStateReady,
             indexedGeometryReady, changedDrawReady.snapshotToken),
         "R120 draw snapshot changes with render-state identity");
 
@@ -1998,35 +2108,53 @@ int main()
     changedSurfacePairIdentity.snapshotToken ^= 0x100000001b3ull;
     const auto changedSurfacePairDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, changedSurfacePairIdentity,
+            texturedActivation, renderStateRecreated, changedSurfacePairIdentity, outputStateReady,
             indexedGeometryReady);
     require(
         changedSurfacePairDraw.ready &&
         changedSurfacePairDraw.snapshotToken != 0 &&
         changedSurfacePairDraw.snapshotToken != drawReady.snapshotToken &&
         !validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated, changedSurfacePairIdentity,
+            texturedActivation, renderStateRecreated, changedSurfacePairIdentity, outputStateReady,
             indexedGeometryReady, drawReady.snapshotToken) &&
         validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated, changedSurfacePairIdentity,
+            texturedActivation, renderStateRecreated, changedSurfacePairIdentity, outputStateReady,
             indexedGeometryReady, changedSurfacePairDraw.snapshotToken),
         "R120 draw snapshot changes with output-surface identity");
+
+    const auto changedOutputStateDraw =
+        compose_fixed_function_draw_readiness(
+            texturedActivation, renderStateRecreated, surfacePairReady,
+            changedOutputStateReady, indexedGeometryReady);
+    require(
+        changedOutputStateDraw.ready &&
+        changedOutputStateDraw.snapshotToken != 0 &&
+        changedOutputStateDraw.snapshotToken != drawReady.snapshotToken &&
+        !validate_fixed_function_draw_snapshot(
+            texturedActivation, renderStateRecreated, surfacePairReady,
+            changedOutputStateReady, indexedGeometryReady,
+            drawReady.snapshotToken) &&
+        validate_fixed_function_draw_snapshot(
+            texturedActivation, renderStateRecreated, surfacePairReady,
+            changedOutputStateReady, indexedGeometryReady,
+            changedOutputStateDraw.snapshotToken),
+        "R124 draw snapshot changes with output-state identity");
 
     auto changedGeometryIdentity = indexedGeometryReady;
     changedGeometryIdentity.snapshotToken ^= 0x9e3779b97f4a7c15ull;
     const auto changedGeometryDraw =
         compose_fixed_function_draw_readiness(
-            texturedActivation, renderStateRecreated, surfacePairReady,
+            texturedActivation, renderStateRecreated, surfacePairReady, outputStateReady,
             changedGeometryIdentity);
     require(
         changedGeometryDraw.ready &&
         changedGeometryDraw.snapshotToken != 0 &&
         changedGeometryDraw.snapshotToken != drawReady.snapshotToken &&
         !validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated, surfacePairReady,
+            texturedActivation, renderStateRecreated, surfacePairReady, outputStateReady,
             changedGeometryIdentity, drawReady.snapshotToken) &&
         validate_fixed_function_draw_snapshot(
-            texturedActivation, renderStateRecreated, surfacePairReady,
+            texturedActivation, renderStateRecreated, surfacePairReady, outputStateReady,
             changedGeometryIdentity, changedGeometryDraw.snapshotToken),
         "R122 draw snapshot changes with geometry identity");
 
