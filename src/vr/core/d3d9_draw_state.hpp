@@ -83,6 +83,12 @@ namespace OutRunVR::DrawState
             D3DCOLORWRITEENABLE_GREEN |
             D3DCOLORWRITEENABLE_BLUE |
             D3DCOLORWRITEENABLE_ALPHA;
+        // Preserve D3D9 independent write masks for MRT slots 1..3. Native
+        // fixed-function output currently proves/binds only RT0, so secondary
+        // target overrides must remain visible and fail closed.
+        std::array<DWORD, 3> additionalColorWriteEnable{
+            0x0000000Fu, 0x0000000Fu, 0x0000000Fu
+        };
 
         // R124 dynamic output-state provenance used by dormant DX11 draw
         // readiness. D3D9 BLENDFACTOR maps to D3D11 OMSetBlendState's

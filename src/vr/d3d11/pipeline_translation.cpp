@@ -1563,6 +1563,19 @@ namespace outrun::vr::dx11
             }
         }
 
+        // D3D9 COLORWRITEENABLE1..3 default to 0x0000000F. Until native
+        // MRT output binding exists, any secondary-target write-mask override
+        // cannot be represented by the RT0-only D3D11 path.
+        constexpr DWORD DefaultMrtColorWriteMask = 0x0000000Fu;
+        for (const auto mask : source.additionalColorWriteEnable)
+        {
+            if (mask != DefaultMrtColorWriteMask)
+            {
+                out.unsupported |= PipelineUnsupportedMrtColorWrite;
+                break;
+            }
+        }
+
         if (source.alphaTestEnable != FALSE)
             out.unsupported |= PipelineUnsupportedAlphaTest;
         if (source.fogEnable != FALSE)

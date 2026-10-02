@@ -925,6 +925,8 @@ namespace OutRunVRStereo
 				D3DRS_SHADEMODE, D3DRS_VERTEXBLEND,
 				D3DRS_INDEXEDVERTEXBLENDENABLE,
 				D3DRS_CULLMODE, D3DRS_COLORWRITEENABLE,
+				D3DRS_COLORWRITEENABLE1, D3DRS_COLORWRITEENABLE2,
+				D3DRS_COLORWRITEENABLE3,
 				D3DRS_DEPTHBIAS, D3DRS_SLOPESCALEDEPTHBIAS,
 				D3DRS_DITHERENABLE,
 				D3DRS_LASTPIXEL, D3DRS_ANTIALIASEDLINEENABLE,
@@ -1767,6 +1769,10 @@ namespace OutRunVRStereo
 		read(D3DRS_SCISSORTESTENABLE, out.scissorTestEnable);
 		read(D3DRS_SRGBWRITEENABLE, out.sRGBWriteEnable);
 		read(D3DRS_COLORWRITEENABLE, out.colorWriteEnable);
+		// Preserve independent D3D9 MRT1..3 write masks for native readiness.
+		read(D3DRS_COLORWRITEENABLE1, out.additionalColorWriteEnable[0]);
+		read(D3DRS_COLORWRITEENABLE2, out.additionalColorWriteEnable[1]);
+		read(D3DRS_COLORWRITEENABLE3, out.additionalColorWriteEnable[2]);
 		read(D3DRS_STENCILENABLE, out.stencilEnable);
 		read(D3DRS_STENCILMASK, out.stencilReadMask);
 		read(D3DRS_STENCILWRITEMASK, out.stencilWriteMask);
