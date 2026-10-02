@@ -18,7 +18,11 @@
 #include "../core/dispatch_support.hpp"
 #include "../core/dispatch_support_hooks.hpp"
 #include "../core/review_dispatch_hooks.hpp"
+#include "r13_bridge.hpp"
+#include "../lifecycle/recovery_api.hpp"
+#ifndef OUTRUN_VR_REFACTOR_SPLIT_R32_R31
 #include "stereo_renderer_r31.cpp"
+#endif
 #include "../render/stereo_base_policy.hpp"
 #include "../render/screen_space_api.hpp"
 #include "../render/cached_effect_state.hpp"
