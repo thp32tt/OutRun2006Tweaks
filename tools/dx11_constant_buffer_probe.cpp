@@ -3911,6 +3911,52 @@ int main()
                 finalFanBoundDraw.snapshotToken),
         "R146 nonindexed fan final draw restores transform and OM target snapshot");
 
+
+    const auto fanDispatch =
+        outrun::vr::dx11::
+            compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(
+                liveFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                liveFanOwner, 3u, 7u, transform, surfaceTargetBinding,
+                outputColorSurface, outputDepthSurface);
+    require(
+        fanDispatch.inputValid &&
+        fanDispatch.finalFanBoundDrawReady &&
+        fanDispatch.generatedIndexReady &&
+        fanDispatch.generatedIndexMatchesDispatch &&
+        fanDispatch.dispatchArgumentsExact &&
+        fanDispatch.componentSnapshotsPresent &&
+        fanDispatch.ready &&
+        !fanDispatch.indexedSource &&
+        fanDispatch.primitiveCount == 3u &&
+        fanDispatch.indexCount == 9u &&
+        fanDispatch.startIndexLocation == 0u &&
+        fanDispatch.baseVertexLocation == 0 &&
+        fanDispatch.snapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_fixed_function_nonindexed_triangle_fan_draw_dispatch_snapshot(
+                liveFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                liveFanOwner, 3u, 7u, transform, surfaceTargetBinding,
+                outputColorSurface, outputDepthSurface,
+                fanDispatch.snapshotToken),
+        "R148 generated fan dispatch seals nonindexed DrawIndexed tuple");
+    require(
+        !outrun::vr::dx11::
+            validate_fixed_function_nonindexed_triangle_fan_draw_dispatch_snapshot(
+                liveFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                liveFanOwner, 3u, 8u, transform, surfaceTargetBinding,
+                outputColorSurface, outputDepthSurface,
+                fanDispatch.snapshotToken),
+        "R148 generated fan dispatch rejects nonindexed base-vertex drift");
+
     d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
     const auto fanTopologyDrift =
         outrun::vr::dx11::
@@ -4228,6 +4274,64 @@ int main()
         !indexedFanFormatDrift.ready &&
         indexedFanFormatDrift.snapshotToken == 0,
         "R144 indexed fan final bound draw rejects source format drift");
+
+
+    const auto indexedFanDispatch =
+        outrun::vr::dx11::
+            compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
+                outputColorSurface, outputDepthSurface);
+    require(
+        indexedFanDispatch.inputValid &&
+        indexedFanDispatch.finalFanBoundDrawReady &&
+        indexedFanDispatch.generatedIndexReady &&
+        indexedFanDispatch.generatedIndexMatchesDispatch &&
+        indexedFanDispatch.dispatchArgumentsExact &&
+        indexedFanDispatch.componentSnapshotsPresent &&
+        indexedFanDispatch.ready &&
+        indexedFanDispatch.indexedSource &&
+        indexedFanDispatch.primitiveCount == 2u &&
+        indexedFanDispatch.indexCount == 6u &&
+        indexedFanDispatch.startIndexLocation == 0u &&
+        indexedFanDispatch.baseVertexLocation ==
+            indexedFanBaseVertexLocation &&
+        indexedFanDispatch.sourceIndexSnapshotToken ==
+            liveIndexedSourceReady.snapshotToken &&
+        indexedFanDispatch.snapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
+                outputColorSurface, outputDepthSurface,
+                indexedFanDispatch.snapshotToken),
+        "R148 generated fan dispatch seals indexed DrawIndexed tuple");
+    require(
+        !outrun::vr::dx11::
+            validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation + 1, transform,
+                surfaceTargetBinding, outputColorSurface, outputDepthSurface,
+                indexedFanDispatch.snapshotToken),
+        "R148 generated fan dispatch rejects indexed BaseVertexLocation drift");
 
     require(
         outrun::vr::dx11::bind_fixed_function_geometry_for_observation(

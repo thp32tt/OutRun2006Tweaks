@@ -2090,6 +2090,69 @@ def main() -> None:
             + ", ".join(missing_r147_direct_draw_dispatch)
         )
 
+    r148_generated_fan_dispatch_contract = [
+        (
+            "struct NativeFixedFunctionFanDrawDispatchReadiness",
+            NATIVE_BACKEND_HPP,
+            "R148 generated-fan DrawIndexed tuple identity",
+        ),
+        (
+            "compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(",
+            NATIVE_BACKEND_CPP,
+            "R148 nonindexed fan dispatch compositor",
+        ),
+        (
+            "compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(",
+            NATIVE_BACKEND_CPP,
+            "R148 indexed fan dispatch compositor",
+        ),
+        (
+            "generated.indexCount == primitiveCount * 3u",
+            NATIVE_BACKEND_CPP,
+            "R148 generated fan index-count exactness",
+        ),
+        (
+            "generated.sourceIndexSnapshotToken == currentSource.snapshotToken",
+            NATIVE_BACKEND_CPP,
+            "R148 indexed source provenance remains current at dispatch boundary",
+        ),
+        (
+            "out.startIndexLocation = 0u;",
+            NATIVE_BACKEND_CPP,
+            "R148 generated index buffer always dispatches from index zero",
+        ),
+        (
+            "R148 generated fan dispatch seals nonindexed DrawIndexed tuple",
+            CONSTANT_BUFFER_PROBE,
+            "R148 positive nonindexed dispatch proof",
+        ),
+        (
+            "R148 generated fan dispatch rejects nonindexed base-vertex drift",
+            CONSTANT_BUFFER_PROBE,
+            "R148 nonindexed materialized-base drift rejection",
+        ),
+        (
+            "R148 generated fan dispatch seals indexed DrawIndexed tuple",
+            CONSTANT_BUFFER_PROBE,
+            "R148 positive indexed dispatch proof",
+        ),
+        (
+            "R148 generated fan dispatch rejects indexed BaseVertexLocation drift",
+            CONSTANT_BUFFER_PROBE,
+            "R148 indexed BaseVertexLocation drift rejection",
+        ),
+    ]
+    missing_r148_generated_fan_dispatch = [
+        meaning
+        for token, source, meaning in r148_generated_fan_dispatch_contract
+        if token not in source
+    ]
+    if missing_r148_generated_fan_dispatch:
+        raise SystemExit(
+            "DX11 R148 generated-fan dispatch contract drift: "
+            + ", ".join(missing_r148_generated_fan_dispatch)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
@@ -2111,6 +2174,10 @@ def main() -> None:
             or "validate_fixed_function_render_target_bound_draw_snapshot(" in runtime_source
             or "compose_fixed_function_direct_draw_dispatch_readiness(" in runtime_source
             or "validate_fixed_function_direct_draw_dispatch_snapshot(" in runtime_source
+            or "compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(" in runtime_source
+            or "validate_fixed_function_nonindexed_triangle_fan_draw_dispatch_snapshot(" in runtime_source
+            or "compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(" in runtime_source
+            or "validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(" in runtime_source
             or "compose_fixed_function_final_nonindexed_triangle_fan_bound_draw_readiness(" in runtime_source
             or "validate_fixed_function_final_nonindexed_triangle_fan_bound_draw_snapshot(" in runtime_source
             or "compose_fixed_function_final_indexed_triangle_fan_bound_draw_readiness(" in runtime_source
