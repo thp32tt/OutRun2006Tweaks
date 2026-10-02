@@ -4787,8 +4787,8 @@ def main() -> None:
             "R126 INDEX16 upload readback",
         "R126 INDEX32 source values were narrowed":
             "R126 INDEX32 preservation proof",
-        "R126 foreign-device owner/context did not fail closed":
-            "R126 foreign-device negative proof",
+        "R141 foreign-device live generated fan binding fails closed":
+            "R126/R141 foreign-device owner and live-binding negative proof",
         "R126 rejected replacement retained stale generated IB":
             "R126 stale replacement negative proof",
         "R129 INDEX32 source snapshot provenance was not sealed":
