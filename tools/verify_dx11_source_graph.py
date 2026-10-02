@@ -472,6 +472,82 @@ def main() -> None:
             + ", ".join(missing_separate_alpha_contract)
         )
 
+    alpha_test_shader_contract = {
+        "struct FixedFunctionAlphaTestState":
+            "fixed-function alpha-test shader state contract",
+        "FixedFunctionShaderPrototypeUnsupportedAlphaTestState":
+            "fail-closed alpha-test prototype blocker",
+    }
+    missing_alpha_test_shader_contract = [
+        meaning
+        for token, meaning in alpha_test_shader_contract.items()
+        if token not in PIPELINE_TRANSLATION_HPP
+    ]
+    alpha_test_shader_source_contract = {
+        "fixed_function_alpha_test_supported(":
+            "D3D9 alpha comparison classifier",
+        "case D3DCMP_GREATEREQUAL: return \">=\";":
+            "GREATEREQUAL alpha comparison mapping",
+        "alphaTest.reference & 0xFFu":
+            "8-bit D3D9 ALPHAREF normalization",
+        "if (!(current.a ":
+            "pixel-shader alpha-test discard predicate",
+        "FixedFunctionShaderPrototypeUnsupportedAlphaTestState":
+            "invalid/incomplete alpha-test fail-closed path",
+    }
+    missing_alpha_test_shader_contract += [
+        meaning
+        for token, meaning in alpha_test_shader_source_contract.items()
+        if token not in PIPELINE_TRANSLATION_CPP
+    ]
+    alpha_test_census_contract = {
+        "bool alphaTestObservationComplete{};":
+            "alpha-test census completeness identity",
+        "DWORD alphaTestEnable = FALSE;":
+            "alpha-test enable census identity",
+        "DWORD alphaTestRef{};":
+            "alpha-test reference census identity",
+        "DWORD alphaTestFunc = D3DCMP_ALWAYS;":
+            "alpha-test function census identity",
+        "signature.alphaTestEnable = source.alphaTestEnable;":
+            "captured alpha-test enable propagation",
+        "signature.alphaTestRef = source.alphaRef;":
+            "captured alpha-test reference propagation",
+        "signature.alphaTestFunc = source.alphaFunc;":
+            "captured alpha-test function propagation",
+        "sig.alphaTestRef & 0xFFu":
+            "semantic alpha-reference signature hashing",
+        "FixedFunctionAlphaTestState{":
+            "alpha-test state supplied to diagnostic shader prototype",
+    }
+    missing_alpha_test_shader_contract += [
+        meaning
+        for token, meaning in alpha_test_census_contract.items()
+        if token not in census
+    ]
+    alpha_test_semantic_contract = {
+        "alpha-test reference normalization drifted":
+            "ALPHAREF normalization semantic smoke",
+        "alpha-test GREATEREQUAL semantic drift":
+            "positive alpha comparison semantic smoke",
+        "incomplete alpha-test observation did not fail closed":
+            "incomplete-observation negative semantic smoke",
+        "invalid alpha-test function did not fail closed":
+            "invalid-function negative semantic smoke",
+        "disabled alpha test injected pixel-kill semantics":
+            "disabled-state semantic smoke",
+    }
+    missing_alpha_test_shader_contract += [
+        meaning
+        for token, meaning in alpha_test_semantic_contract.items()
+        if token not in SEMANTIC_SMOKE
+    ]
+    if missing_alpha_test_shader_contract:
+        raise SystemExit(
+            "DX11 fixed-function alpha-test shader contract drift: "
+            + ", ".join(missing_alpha_test_shader_contract)
+        )
+
     stencil_snapshot_contract = {
         "DWORD stencilReadMask = 0xFFFFFFFFu;": "stencil read mask snapshot",
         "DWORD stencilRef = 0;": "dynamic stencil reference snapshot",
