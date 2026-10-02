@@ -84,6 +84,31 @@ namespace OutRunVRStereo
         };
         R31FramePerf R31Frame{};
 
+        inline void R31TelemetryNoteFastWorld() noexcept
+        {
+            R31TelemetryNoteFastWorld();
+        }
+
+        inline void R31TelemetryNoteHud() noexcept
+        {
+            R31TelemetryNoteHud();
+        }
+
+        inline void R31TelemetryNoteFallback() noexcept
+        {
+            ++R31Frame.fallback;
+        }
+
+        inline std::uint64_t R31TelemetryLiveWvpChecks() noexcept
+        {
+            return R31FastWorldLiveValidations;
+        }
+
+        inline std::uint64_t R31TelemetryLiveWvpRejects() noexcept
+        {
+            return R31FastWorldValidationRejects;
+        }
+
         struct R31WindowPerf
         {
             std::uint64_t presents = 0;
@@ -131,7 +156,7 @@ namespace OutRunVRStereo
                     R31Window.main, R31Window.offscreen, R31Window.aux,
                     R31Window.fastWorld, R31Window.hud, R31Window.fragile,
                     R31Window.unstable, R31Window.fallback,
-                    R31FastWorldLiveValidations, R31FastWorldValidationRejects,
+                    R31TelemetryLiveWvpChecks(), R31TelemetryLiveWvpRejects(),
                     OutRunVR::State::StateBlockTracker::RecordingGeneration(),
                     OutRunVR::State::StateBlockTracker::ApplyGeneration());
                 R31Window = {};
@@ -642,7 +667,7 @@ namespace OutRunVRStereo
 
             if (OutRunVR::State::StateBlockTracker::Recording())
             {
-                ++R31Frame.fallback;
+                R31TelemetryNoteFallback();
                 return actualDraw();
             }
 
@@ -661,7 +686,7 @@ namespace OutRunVRStereo
                     return fast.hr;
             }
 
-            ++R31Frame.fallback;
+            R31TelemetryNoteFallback();
             return r29Draw();
         }
 
