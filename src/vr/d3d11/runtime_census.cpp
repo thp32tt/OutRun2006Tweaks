@@ -1586,7 +1586,12 @@ namespace outrun::vr::dx11
                     sig.depthPresent ? 1 : 0,
                     static_cast<int>(sig.depthMultiSampleType),
                     sig.depthMultiSampleQuality,
-                    surfaceMultisampleUnsupported ? 1 : 0);
+                    ((sig.renderTargetPresent &&
+                      (sig.renderTargetMultiSampleType != D3DMULTISAMPLE_NONE ||
+                       sig.renderTargetMultiSampleQuality != 0)) ||
+                     (sig.depthPresent &&
+                      (sig.depthMultiSampleType != D3DMULTISAMPLE_NONE ||
+                       sig.depthMultiSampleQuality != 0))) ? 1 : 0);
 
                 for (std::size_t stageIndex = 0;
                      stageIndex < sig.textureStages.size();
