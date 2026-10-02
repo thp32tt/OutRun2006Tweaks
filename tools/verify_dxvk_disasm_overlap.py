@@ -24,20 +24,24 @@ def validate_overlap(previous: bytes, current: bytes, overlap: bytes) -> bool:
     return previous.endswith(overlap) and current.startswith(overlap)
 
 
+def load_hex_file(path: str) -> bytes:
+    return normalize_hex_bytes(Path(path).read_text(encoding="utf-8"))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--hex-file", required=True)
+    parser.add_argument("--previous-file", required=True)
+    parser.add_argument("--current-file", required=True)
     parser.add_argument("--expected-overlap", required=True)
     args = parser.parse_args()
 
-    actual_text = Path(args.hex_file).read_text(encoding="utf-8")
-    actual = normalize_hex_bytes(actual_text)
+    previous = load_hex_file(args.previous_file)
+    current = load_hex_file(args.current_file)
     expected = normalize_hex_bytes(args.expected_overlap)
 
-    if not validate_overlap(actual, actual, expected):
+    if not validate_overlap(previous, current, expected):
         print("DXVK disassembly overlap: FAIL")
         print(f"expected overlap: {expected.hex(' ')}")
-        print(f"actual bytes:     {actual.hex(' ')}")
         return 1
 
     print("DXVK disassembly overlap: PASS")
