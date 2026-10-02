@@ -169,7 +169,8 @@
     5947402349,
     5947440962,
     5947472184,
-    5947562196
+    5947562196,
+    5947626731
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -2464,6 +2465,42 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest primary canonical-disassembly frontier. Future proof collectors must keep all recognized computed integrity gates bound into final proven status; continue frontier work independently without semantic promotion."
+    },
+    {
+      "unit_id": "DXVK_LEGACY_CONTINUATION_RAW_CALL_CENSUS_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "8bdf8d9d0e8ad5dae4347f453fe9b915c81ed8bc",
+      "material_commits": [
+        "4efa329209ebf1a3af04fd5d8ef3984a8f14a456",
+        "0d5a97f896521ef35e416d3ecdbb70fa9538515c",
+        "8bdf8d9d0e8ad5dae4347f453fe9b915c81ed8bc"
+      ],
+      "validation_bearing_descendant_sha": "fbdec361e708da352e7eb6171e8eed3d65832019",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py",
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Legacy continuation proofs 23/24 now fail closed unless their complete raw E8 rel32 census exactly equals the declared CALL set. The generic auto-discovered continuation verifier requires every exact proof to expose one raw-call census guard, return it, and consume it in the final proven predicate; final-predicate inspection uses Python AST after the initial string-isolation validator exposed a continuation-29 parser defect.",
+      "validation": {
+        "canonical_analyzer_sha": "0d5a97f896521ef35e416d3ecdbb70fa9538515c",
+        "hud_inspector_run_id": 36979662160,
+        "static_exe_analysis_job_id": 110751076789,
+        "static_exe_analysis_conclusion": "success",
+        "initial_backend_gate_run_id": 36979662243,
+        "initial_backend_gate_job_id": 110751085327,
+        "initial_backend_gate_result": "FAIL_EXPECTED_VALIDATOR_PARSER_DEFECT_CAUGHT",
+        "repair_sha": "8bdf8d9d0e8ad5dae4347f453fe9b915c81ed8bc",
+        "validation_bearing_descendant_sha": "fbdec361e708da352e7eb6171e8eed3d65832019",
+        "descendant_build_run_id": 36979830082,
+        "descendant_build_job_id": 110751602672,
+        "backend_disassembly_contract": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5947626731,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest canonical-disassembly frontier; keep exhaustive raw E8 census equality on legacy proofs 23/24 and the generic AST-based proof census gate on all future continuation proofs."
     }
   ]
 }
