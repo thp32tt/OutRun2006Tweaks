@@ -4,80 +4,89 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "d14defae29ce88b442e6db1429c96786e58e9e75",
-  "state_parent_head": "14f51574e9216edda43e7fba751b4d2160399df4",
+  "base_sha": "faa27274d45f1da5b9989965e161f79a0b04d555",
+  "state_parent_head": "141e2d7a772c622489b484a15d3c441fa5dd8743",
   "material_result_sha": "7275187140877c54ebc4901eec07ba0218fdbfad",
-  "source_implementation_sha": "f310967e328aab08c15119d83da2264c2ca93c24",
+  "source_implementation_sha": "1ce005dd16323d31d1970adc195ef33a9aad20c7",
   "validation_bearing_sha": "cf2340a3813fa2556f5c47c0c48bf328f893800f",
-  "retaining_descendant_sha": "14f51574e9216edda43e7fba751b4d2160399df4",
+  "retaining_descendant_sha": "141e2d7a772c622489b484a15d3c441fa5dd8743",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_FFP_D3DTA_CONSTANT_PER_STAGE_REGRESSION_R197",
-  "selection_reason": "Fresh authenticated GitHub audit found R197 D3DTSS_CONSTANT/D3DTA_CONSTANT source and census support landing concurrently, while existing hosted coverage proved only one stage. The missing independent per-stage constant ownership regression was runnable without HMD hardware and directly guards the new semantic.",
-  "summary": "Added a two-stage hosted regression proving distinct D3DTSS_CONSTANT ARGB values are consumed independently by D3DTA_CONSTANT for color and alpha, compile through the dormant fixed-function shader prototype, and remain protected by the DX11 source-graph contract.",
+  "selected_work": "DX11_FFP_D3DTA_CONSTANT_PER_STAGE_SUPPORT_R197",
+  "selection_reason": "Fresh authenticated GitHub audit after R196 found D3DTA_CONSTANT and D3DTSS_CONSTANT entirely absent. Official Direct3D 9 semantics make this an independent per-stage fixed-function color source with a defined 0xFFFFFFFF default and no gaming-PC hardware prerequisite.",
+  "summary": "Implemented dormant native DX11 D3DTA_CONSTANT semantics from captured per-stage D3DTSS_CONSTANT state through signature identity, R197 census evidence, analyzer regression coverage, normalized ARGB-to-RGBA HLSL generation, two-stage isolation probes and source-graph guards.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read AGENTS.md, branch-local conversion state, current task run, regression/history context, and Issue #14 through authenticated GitHub authority.",
-        "Repeated fresh HEAD checks during same-branch churn; preserved concurrent R196/R197/R198 descendants and used no N100/local clone as development truth."
+        "Read current authenticated branch authority, AGENTS.md, conversion state/run record, regression context and Issue #14; repeatedly refreshed HEAD during concurrent same-branch development."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "R197 added per-stage stageConstant identity, D3DTA_CONSTANT HLSL translation, and D3DTSS_CONSTANT census observation/hash/logging.",
-        "Concurrent hosted coverage validated one stage only; it did not prove two stages keep distinct constant values, which is the defining ownership property of D3DTSS_CONSTANT."
+        "Microsoft Direct3D 9 documentation defines D3DTA_CONSTANT as the per-stage D3DTSS_CONSTANT source and the constant default as 0xFFFFFFFF.",
+        "Fresh branch search found no D3DTA_CONSTANT/D3DTSS_CONSTANT implementation before R197."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
+        "src/vr/d3d11/pipeline_translation.hpp",
+        "src/vr/d3d11/pipeline_translation.cpp",
+        "src/vr/d3d11/runtime_census.cpp",
+        "tools/analyze_dx11_census.py",
+        "tools/test_analyze_dx11_census.py",
         "tools/dx11_fixed_function_pipeline_probe.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
+        "0717c3ddb2f4230210530e7b576281a1b85ff35f",
+        "25faf8356efc571643ec9d84bfa5be3dbfd7046d",
+        "1ce005dd16323d31d1970adc195ef33a9aad20c7",
+        "ab8602ef0f75681678688588ca2fa4f10d02b51e",
+        "fc04ff518f26be765b62d062a43e2066a15183f9",
+        "d14defae29ce88b442e6db1429c96786e58e9e75",
         "f310967e328aab08c15119d83da2264c2ca93c24",
         "f50aafbb8bf1d5c8ac3617398f62df3361aa9408",
-        "7275187140877c54ebc4901eec07ba0218fdbfad"
+        "7275187140877c54ebc4901eec07ba0218fdbfad",
+        "cf2340a3813fa2556f5c47c0c48bf328f893800f"
       ],
       "details": [
-        "Added a two-stage no-texture fixture with distinct ARGB constants and color/alpha assertions for both stages.",
-        "Compiled the generated fixed-function pixel shader in the hosted probe.",
-        "Pinned R197 stage identity, D3DTA_CONSTANT translation, runtime observation/hash/log evidence, two-stage fixture, and compile assertion in verify_dx11_source_graph.py.",
-        "Corrected the added PASS output newline."
+        "Added stageConstant with D3D9 default 0xFFFFFFFF.",
+        "Observed and hashed D3DTSS_CONSTANT per texture stage and emitted R197 detailed census evidence.",
+        "Translated D3DTA_CONSTANT into normalized RGBA while preserving argument modifiers and independent per-stage values.",
+        "Added analyzer regressions, two-stage HLSL/offline-compile probe coverage, and source-graph guards."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_STATIC_RETAINING_DESCENDANT_PASS_COMPILE_NOT_CLAIMED",
-      "automation_validation": "PASS_RETAINING_DESCENDANT_BACKEND_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; WIN32_CONFIGURE_IN_PROGRESS_AT_OBSERVATION; BUILD_BINARY_NOT_CLAIMED",
+      "status": "COMPLETE_STATIC_EXACT_SHA_PASS_COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; CONFIGURE_IN_PROGRESS_AT_OBSERVATION; BUILD_BINARY_NOT_CLAIMED",
       "evidence": [
-        "Backend Conversion Gate run 36994292016 job 110797368451 on retaining descendant cf2340a3813fa2556f5c47c0c48bf328f893800f passed queue, HMD baseline, structure, backend disassembly, VR session regressions, DX11 transport, dual-source, DX11 source graph, dormant activation boundary, and DX11 census analyzer steps.",
-        "Win32 Configure was in progress when observed; compile/binary success is not claimed.",
-        "GitHub compare confirmed result SHA 7275187140877c54ebc4901eec07ba0218fdbfad is retained by the validation descendant and newer branch descendants."
+        "Backend Conversion Gate run 36994292016 job 110797368451 on cf2340a3813fa2556f5c47c0c48bf328f893800f completed queue/HMD/one-click/backend-disassembly/session-analysis/native-transport/dual-source checks successfully.",
+        "Verify DX11 source graph, Verify DX11 dormant activation boundary, and Test DX11 census analyzer completed SUCCESS.",
+        "Configure Win32 had started after static checks; compile/binary success is not claimed.",
+        "Current authenticated descendant retains R197 while newer R198 work continues."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "implementation_commits": [
-        "f310967e328aab08c15119d83da2264c2ca93c24",
-        "f50aafbb8bf1d5c8ac3617398f62df3361aa9408",
-        "7275187140877c54ebc4901eec07ba0218fdbfad"
-      ],
+      "source_commit": "25faf8356efc571643ec9d84bfa5be3dbfd7046d",
+      "census_commit": "1ce005dd16323d31d1970adc195ef33a9aad20c7",
       "result_commit": "7275187140877c54ebc4901eec07ba0218fdbfad",
-      "issue14_comment_id": 5950120777
+      "issue14_comment_id": 5950133752
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant hosted regression/source-graph guard only; no runtime payload, native activation, localization, DXVK lane, or OpenXR transport change."
+      "reason": "Dormant fixed-function source/test/census unit only; no native draw activation, release payload, localization, DXVK lane or OpenXR transport change."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATIC_VALIDATION",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R197 D3DTA_CONSTANT per-stage regression coverage and all newer retained R198 work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve completed R197 D3DTA_CONSTANT per-stage semantics and all newer retained R198 work; fresh-audit only the newest authenticated GitHub HEAD for the next independent dormant DX11 source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -90,21 +99,26 @@
     "native_draw_path_active_changed": false,
     "runtime_validation_claimed": false
   },
-  "issue14_comment_id": 5950120777,
+  "issue14_comment_id": 5950133752,
   "validation_run_id": 36994292016,
   "validation_job_id": 110797368451,
-  "automation_validation": "PASS_RETAINING_DESCENDANT_BACKEND_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; WIN32_CONFIGURE_IN_PROGRESS_AT_OBSERVATION; BUILD_BINARY_NOT_CLAIMED",
-  "blocker": "Quest 3/VDXR runtime parity was not performed. Static DX11 source-graph/dormant-activation/census checks passed on a retaining descendant; compile/binary success is not claimed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R197 D3DTA_CONSTANT per-stage regression coverage and all newer retained R198 work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; CONFIGURE_IN_PROGRESS_AT_OBSERVATION; BUILD_BINARY_NOT_CLAIMED",
+  "blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA descendant static validation passed through DX11 source graph, dormant activation boundary and census analyzer; compile/binary success is not claimed.",
+  "next_action": "Keep NativeDrawPathActive disabled. Preserve completed R197 D3DTA_CONSTANT per-stage semantics and all newer retained R198 work; fresh-audit only the newest authenticated GitHub HEAD for the next independent dormant DX11 source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "source_head": "14f51574e9216edda43e7fba751b4d2160399df4",
+  "source_head": "141e2d7a772c622489b484a15d3c441fa5dd8743",
   "result_sha": "7275187140877c54ebc4901eec07ba0218fdbfad",
-  "selected_work_item": "DX11_FFP_D3DTA_CONSTANT_PER_STAGE_REGRESSION_R197",
+  "selected_work_item": "DX11_FFP_D3DTA_CONSTANT_PER_STAGE_SUPPORT_R197",
   "changed_paths": [
+    "src/vr/d3d11/pipeline_translation.hpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
     "tools/dx11_fixed_function_pipeline_probe.cpp",
     "tools/verify_dx11_source_graph.py"
   ],
-  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R197 D3DTA_CONSTANT per-stage regression coverage and all newer retained R198 work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+  "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve completed R197 D3DTA_CONSTANT per-stage semantics and all newer retained R198 work; fresh-audit only the newest authenticated GitHub HEAD for the next independent dormant DX11 source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
 }
