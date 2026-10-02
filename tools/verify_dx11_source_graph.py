@@ -844,7 +844,7 @@ def main() -> None:
          "R193 signed RGB DOTPRODUCT3 expression"),
         ("dotProductStages[0].colorOp = D3DTOP_DOTPRODUCT3;",
          FIXED_FUNCTION_PIPELINE_PROBE,
-         "R193 hosted DOTPRODUCT3 color fixture"),,
+         "R193 hosted DOTPRODUCT3 color fixture"),
         (
             'const auto dotFirst = fixed_function_argument_expression(\n'
             '                    arg1, stageIndex, ".rgb", textureFactor);',
@@ -856,7 +856,7 @@ def main() -> None:
             '                    arg2, stageIndex, ".rgb", textureFactor);',
             PIPELINE_TRANSLATION_CPP,
             "R193 DOTPRODUCT3 second RGB argument must retain texture-factor plumbing",
-        )
+        ),
         ("dotProductStages[0].alphaOp = D3DTOP_DOTPRODUCT3;",
          FIXED_FUNCTION_PIPELINE_PROBE,
          "R193 hosted DOTPRODUCT3 alpha fixture"),
