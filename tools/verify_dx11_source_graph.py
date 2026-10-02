@@ -288,6 +288,39 @@ def main() -> None:
             + ", ".join(missing_r180_d3dtop_modulate2x)
         )
 
+    r181_d3dtop_modulate4x_contract = [
+        ("case D3DTOP_MODULATE4X:", PIPELINE_TRANSLATION_CPP,
+         "R181 D3DTOP_MODULATE4X readiness/translation case"),
+        ('return "(" + first + " * " + second + ") * 4.0";',
+         PIPELINE_TRANSLATION_CPP,
+         "R181 D3DTOP_MODULATE4X component-wise shader expression"),
+        ("modulate4xStages[0].colorOp = D3DTOP_MODULATE4X;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R181 hosted MODULATE4X color fixture"),
+        ("modulate4xStages[0].alphaOp = D3DTOP_MODULATE4X;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R181 hosted MODULATE4X alpha fixture"),
+        ("float3 nextColor = (sampled0.rgb * input.diffuse.rgb) * 4.0;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R181 generated RGB HLSL assertion"),
+        ("float nextAlpha = (sampled0.a * input.diffuse.a) * 4.0;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R181 generated alpha HLSL assertion"),
+        ("R181 D3DTOP_MODULATE4X fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R181 offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_MODULATE4X support R181: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R181 hosted probe completion"),
+    ]
+    missing_r181_d3dtop_modulate4x = [
+        meaning
+        for token, source, meaning in r181_d3dtop_modulate4x_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_MODULATE4X:") < 3:
+        missing_r181_d3dtop_modulate4x.append(
+            "R181 MODULATE4X must participate in texture-use, HLSL and readiness switches")
+    if missing_r181_d3dtop_modulate4x:
+        raise SystemExit(
+            "DX11 R181 fixed-function D3DTOP_MODULATE4X contract drift: "
+            + ", ".join(missing_r181_d3dtop_modulate4x)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.

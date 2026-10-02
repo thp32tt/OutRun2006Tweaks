@@ -620,8 +620,44 @@ int main()
             "R180 D3DTOP_MODULATE2X fixed-function shader prototype did not compile");
     }
 
+    {
+        std::array<FixedFunctionStageState, 8> modulate4xStages{};
+        modulate4xStages[0].colorOp = D3DTOP_MODULATE4X;
+        modulate4xStages[0].colorArg1 = D3DTA_TEXTURE;
+        modulate4xStages[0].colorArg2 = D3DTA_DIFFUSE;
+        modulate4xStages[0].alphaOp = D3DTOP_MODULATE4X;
+        modulate4xStages[0].alphaArg1 = D3DTA_TEXTURE;
+        modulate4xStages[0].alphaArg2 = D3DTA_DIFFUSE;
+        modulate4xStages[0].minFilter = D3DTEXF_POINT;
+        modulate4xStages[0].magFilter = D3DTEXF_POINT;
+        modulate4xStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto modulate4xShader =
+            generate_fixed_function_pixel_shader_prototype(
+                modulate4xStages, true, 0x01u, 0x01u, textureTypes);
+        require(
+            modulate4xShader.generated() && modulate4xShader.activeStages == 1,
+            "R181 D3DTOP_MODULATE4X fixed-function stage must become shader-exact");
+        require(
+            modulate4xShader.source.find(
+                "float3 nextColor = (sampled0.rgb * input.diffuse.rgb) * 4.0;") !=
+                std::string::npos &&
+            modulate4xShader.source.find(
+                "float nextAlpha = (sampled0.a * input.diffuse.a) * 4.0;") !=
+                std::string::npos,
+            "R181 D3DTOP_MODULATE4X shader expression drift");
+        const auto modulate4xCompile =
+            compile_fixed_function_pixel_shader_prototype(modulate4xShader);
+        require(
+            modulate4xCompile.attempted && modulate4xCompile.succeeded &&
+            modulate4xCompile.result == S_OK &&
+            modulate4xCompile.bytecodeBytes != 0,
+            "R181 D3DTOP_MODULATE4X fixed-function shader prototype did not compile");
+    }
+
     std::cout
         << "DX11 MRT color-write fail-closed: PASS\n"
+        << "DX11 fixed-function D3DTOP_MODULATE4X support R181: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATE2X support R180: PASS\n"
         << "DX11 fixed-function D3DTOP_SUBTRACT support R177: PASS\n"
         << "DX11 fixed-function argument modifiers R178: PASS\n"

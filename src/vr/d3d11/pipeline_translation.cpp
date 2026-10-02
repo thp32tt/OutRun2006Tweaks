@@ -171,6 +171,7 @@ namespace outrun::vr::dx11
                 return fixed_function_argument_uses_texture(arg2);
             case D3DTOP_MODULATE:
             case D3DTOP_MODULATE2X:
+            case D3DTOP_MODULATE4X:
             case D3DTOP_ADD:
             case D3DTOP_SUBTRACT:
                 return fixed_function_argument_uses_texture(arg1) ||
@@ -237,6 +238,10 @@ namespace outrun::vr::dx11
                 // D3D9 MODULATE2X multiplies Arg1 and Arg2, then doubles
                 // the component-wise result for brightening.
                 return "(" + first + " * " + second + ") * 2.0";
+            case D3DTOP_MODULATE4X:
+                // D3D9 MODULATE4X multiplies Arg1 and Arg2, then scales
+                // the component-wise result by four.
+                return "(" + first + " * " + second + ") * 4.0";
             case D3DTOP_ADD:
                 // D3D9 D3DTOP_ADD is component-wise Arg1 + Arg2.
                 return first + " + " + second;
@@ -421,6 +426,7 @@ namespace outrun::vr::dx11
                 break;
             case D3DTOP_MODULATE:
             case D3DTOP_MODULATE2X:
+            case D3DTOP_MODULATE4X:
             case D3DTOP_ADD:
             case D3DTOP_SUBTRACT:
                 useArg1 = true;
