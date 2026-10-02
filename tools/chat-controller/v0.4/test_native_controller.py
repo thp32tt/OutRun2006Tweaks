@@ -38,6 +38,7 @@ def load_function(name, **overrides):
               github_find_task_commit=Mock(return_value=None), CONTROLLER_MODE='conversion',
               github_transient_retry_pending=lambda: False,
               native_plugin_instructions=lambda active: 'ALL_TOOLS tool search TOOL_NOT_EXPOSED 404 TARGET_BRANCH',
+              conversion_lane_work_hint=lambda branch: 'CONTROLLER_SELECTED_WORK_TARGET=continue independent static work',
               _is_localization_producer=lambda active: False,
               _is_latched_execution_task=lambda active: False,
               queue_send_producer_execution_continuation=AsyncMock(return_value=False),
