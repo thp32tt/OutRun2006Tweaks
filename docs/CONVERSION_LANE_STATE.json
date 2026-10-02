@@ -139,5 +139,28 @@
       36974226953
     ],
     "runtime_validation": "UNTESTED"
-  }
+  },
+  "supplemental_completed_static_units": [
+    {
+      "unit_id": "DXVK_CONTINUATION_ANALYZER_WIRING_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "c2e2fe67a9fdcaabc34768b85c376585cc1e82a6",
+      "run_record_commit_sha": "5079d67a6823514feafc9a19ed9014f17077d5b4",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "static_contract": "PASS",
+      "dxvk_disassembly_evidence_run_id": 36973860583,
+      "dxvk_disassembly_evidence_job_id": 110733359718,
+      "dxvk_disassembly_evidence_artifact_id": 11213115241,
+      "dxvk_disassembly_evidence_artifact_digest": "sha256:3f6041016527705e04555903700194db860c454b3f0123b461540fb0340dd914",
+      "backend_conversion_gate_run_id": 36973860767,
+      "backend_conversion_gate_job_id": 110733359909,
+      "backend_conversion_gate_artifact_id": 11212562572,
+      "backend_conversion_gate_artifact_digest": "sha256:3adad4baed23c03e3671c9346dc20487c47c0d8ebec306e6b44fa1c1516c244d",
+      "issue14_implementation_comment_id": 5946754878,
+      "scope": "Auto-discovered continuation stages must have canonical analyzer report bindings and nonzero failure guards.",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER"
+    }
+  ]
 }
