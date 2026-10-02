@@ -210,7 +210,7 @@ namespace outrun::vr::dx11
             DWORD renderTargetUsage{};
             D3DPOOL renderTargetPool = D3DPOOL_FORCE_DWORD;
             D3DFORMAT renderTargetFormat = D3DFMT_UNKNOWN;
-            // R176: the dormant surface mirror is exact only for non-MSAA
+            // R177: the dormant surface mirror is exact only for non-MSAA
             // D3D9 surfaces. Preserve source sample type/quality in census
             // identity so an MSAA target cannot alias a single-sample target.
             D3DMULTISAMPLE_TYPE renderTargetMultiSampleType =
@@ -1578,7 +1578,7 @@ namespace outrun::vr::dx11
                     sig.auxiliaryRenderTargetObservationComplete ? 1 : 0,
                     sig.auxiliaryRenderTargetMask);
                 spdlog::info(
-                    "VR DX11 R176 surface MSAA state#{}: rt[present={},type={},quality={}] depth[present={},type={},quality={}] unsupported={}",
+                    "VR DX11 R177 surface MSAA state#{}: rt[present={},type={},quality={}] depth[present={},type={},quality={}] unsupported={}",
                     unique,
                     sig.renderTargetPresent ? 1 : 0,
                     static_cast<int>(sig.renderTargetMultiSampleType),
@@ -2336,7 +2336,7 @@ namespace outrun::vr::dx11
 
         const bool streamSourceFrequencyUnsupported =
             signature.stream0Frequency != 1u;
-        // R176 mirrors NativeSurfaceMirror::source_descriptor_exact(): D3D9
+        // R177 mirrors NativeSurfaceMirror::source_descriptor_exact(): D3D9
         // multisample type/quality are not assumed to map exactly to DXGI.
         const bool surfaceMultisampleUnsupported =
             (signature.renderTargetPresent &&
