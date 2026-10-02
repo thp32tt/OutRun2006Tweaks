@@ -1251,20 +1251,101 @@ def main() -> None:
             + ", ".join(missing_r133_textured_stage_mask)
         )
 
+    r134_bound_pipeline_draw_contract = [
+        (
+            "struct NativeFixedFunctionPipelineBindingReadiness",
+            NATIVE_BACKEND_HPP,
+            "R134 live IA/VS/PS binding readiness identity",
+        ),
+        (
+            "NativeFixedFunctionPipelineBundle::binding_readiness(",
+            NATIVE_BACKEND_CPP,
+            "R134 pipeline binding observation implementation",
+        ),
+        (
+            "out.translationSnapshotValid =",
+            NATIVE_BACKEND_CPP,
+            "R134 R112 translation token revalidation",
+        ),
+        (
+            "boundInputLayout.Get() == input_layout_.Get()",
+            NATIVE_BACKEND_CPP,
+            "R134 exact IA input-layout identity gate",
+        ),
+        (
+            "boundVertexShader.Get() == vertex_shader_.Get()",
+            NATIVE_BACKEND_CPP,
+            "R134 exact VS identity gate",
+        ),
+        (
+            "boundPixelShader.Get() == pixel_shader_.Get()",
+            NATIVE_BACKEND_CPP,
+            "R134 exact PS identity gate",
+        ),
+        (
+            "out.pipelineSnapshotToken = activation.pipelineSnapshotToken;",
+            NATIVE_BACKEND_CPP,
+            "R134 activation pipeline identity propagated into draw",
+        ),
+        (
+            "struct NativeFixedFunctionBoundDrawReadiness",
+            NATIVE_BACKEND_HPP,
+            "R134 final bound-draw evidence container",
+        ),
+        (
+            "pipelineBinding.pipelineSnapshotToken == draw.pipelineSnapshotToken",
+            NATIVE_BACKEND_CPP,
+            "R134 pipeline binding must match draw activation pipeline",
+        ),
+        (
+            "R134 exact IA VS PS binding issues a live snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R134 positive live pipeline-binding proof",
+        ),
+        (
+            "R134 bound draw readiness composes exact pipeline binding identity",
+            CONSTANT_BUFFER_PROBE,
+            "R134 positive final binding composition proof",
+        ),
+        (
+            "R134 bound draw rejects mismatched R112 pipeline identity",
+            CONSTANT_BUFFER_PROBE,
+            "R134 pipeline-token mismatch fail-closed proof",
+        ),
+        (
+            "R134 live PS binding drift invalidates pipeline binding snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R134 live pipeline binding drift fail-closed proof",
+        ),
+    ]
+    missing_r134_bound_pipeline_draw = [
+        meaning
+        for token, source, meaning in r134_bound_pipeline_draw_contract
+        if token not in source
+    ]
+    if missing_r134_bound_pipeline_draw:
+        raise SystemExit(
+            "DX11 R134 bound pipeline draw contract drift: "
+            + ", ".join(missing_r134_bound_pipeline_draw)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
             continue
-        if "compose_fixed_function_textured_draw_readiness(" in source_path.read_text(
-            encoding="utf-8"
+        runtime_source = source_path.read_text(encoding="utf-8")
+        if (
+            "compose_fixed_function_textured_draw_readiness(" in runtime_source
+            or "compose_fixed_function_bound_draw_readiness(" in runtime_source
+            or ".binding_readiness(" in runtime_source
         ):
             runtime_textured_draw_users.append(
                 source_path.relative_to(ROOT).as_posix()
             )
     if runtime_textured_draw_users:
         raise SystemExit(
-            "DX11 R132/R133 textured draw readiness gained a production caller "
-            "before activation gate: " + ", ".join(runtime_textured_draw_users)
+            "DX11 R132/R133/R134 dormant binding readiness gained a production "
+            "caller before activation gate: " + ", ".join(runtime_textured_draw_users)
         )
 
     stencil_snapshot_contract = {
