@@ -6713,6 +6713,81 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authenticated DXVK canonical frontier and continue its next runnable raw/proof/static unit; exhaustive raw-call census predicates are now source-coupled to declared CALLS metadata and raw provenance."
+    },
+    {
+      "unit_id": "DXVK_F76_CANONICAL_EXE_PROVENANCE_0x18342A_TO_0x18346A",
+      "job_id": "CONV-DXVK-000002",
+      "initial_material_sha": "45c788635eb8b3c696b830ae1d6dadd4be460ddc",
+      "result_sha": "75eaf8416c19121fd0352c5eafb6e3242714d257",
+      "validation_bearing_result_sha": "75eaf8416c19121fd0352c5eafb6e3242714d257",
+      "commit_message": "dxvk: align continuation 72 analyzer telemetry [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Captured exact canonical raw provenance at the F75 instruction boundary 0x0018342A..0x0018346A with a 64-byte .text probe, exact predecessor-boundary lineage, zero inherited forward-target debt and raw rel32 census only. Corrected the analyzer success telemetry key required by the auto-discovered static contract; no semantic/runtime promotion.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered fresh authenticated GitHub HEAD, AGENTS.md, branch-local conversion/run state, regression/problem-history context and Issue #14; skipped already-completed concurrent F73/F74/F75 work."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Fresh F75 proof established an exact instruction/capture boundary at 0x0018342A with unresolved_forward_targets=[], making the next 64-byte raw canonical window the highest-value non-duplicated runnable DXVK static item."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 45c788635eb8b3c696b830ae1d6dadd4be460ddc added continuation_72 raw provenance. Correction commit 75eaf8416c19121fd0352c5eafb6e3242714d257 aligned success telemetry with the automatic verifier after fail-closed CI rejected the first spelling."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36994432556 job 110797785468 SUCCESS on 75eaf8416c19121fd0352c5eafb6e3242714d257. Backend Conversion Gate run 36994432567 job 110797785915 passed backend disassembly contract and all static checks through application-space recenter. Canonical provenance status EXACT_EXE_18342A_TO_18346A_PROVENANCE_CAPTURED."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Both substantive source commits contain [AUTO:CONV-DXVK-000002]. Issue #14 implementation/validation event 5950185460 records the unit."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly raw provenance only; no runtime payload, selector, packaged binary, other backend branch or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted supplementally to preserve any newer concurrent primary canonical frontier."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "75eaf8416c19121fd0352c5eafb6e3242714d257",
+        "dxvk_disassembly_evidence_run_id": 36994432556,
+        "dxvk_disassembly_evidence_job_id": 110797785468,
+        "evidence_artifact_id": 11221206355,
+        "evidence_artifact_digest": "sha256:d602e55c1325e11f5837f8f7e65a6b2a5722cdab91332ebdeb20c0b5b400454a",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "provenance_status": "EXACT_EXE_18342A_TO_18346A_PROVENANCE_CAPTURED",
+        "predecessor_exact": true,
+        "predecessor_boundary": true,
+        "inherited_forward_targets": [],
+        "target_section": ".text",
+        "probe_len": 64,
+        "probe_end_rva": "0x0018346A",
+        "probe_end_matches": true,
+        "raw_outbound_rel32_candidate_count": 3,
+        "first_16_bytes": "59 c3 6a 10 68 b8 91 61 00 e8 6c 00 00 00 83 3d",
+        "last_16_bytes": "85 c0 74 0b 8b 76 fc 83 ee 09 89 75 e4 eb 03 8b",
+        "backend_conversion_gate_run_id": 36994432567,
+        "backend_conversion_gate_job_id": 110797785915,
+        "backend_disassembly_contract_step": "SUCCESS",
+        "static_steps_through_recenter": "SUCCESS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5950185460,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authenticated frontier. Exact-decode only complete canonical instructions in validated continuation_72 0x0018342A..0x0018346A, resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
