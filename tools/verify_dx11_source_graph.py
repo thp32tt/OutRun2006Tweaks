@@ -218,6 +218,16 @@ def main() -> None:
         "(sampleKey & (sampleStride - 1u)) != 0u": "R114 hashed sampled-mode gate",
         "sampleStride > 1u": "R114 exhaustive-mode sampling bypass gate",
         "unique <= DetailedSignatureLogCap": "R114 compile instrumentation uses named detail cap",
+        "FixedFunctionPipelineShaderExactSamples": "R120 fixed-function pipeline/shader exact census counter",
+        "FixedFunctionPipelineShaderPendingSamples": "R120 fixed-function pipeline/shader pending census counter",
+        "FixedFunctionAlphaTestShaderOwnedSamples": "R120 shader-owned alpha-test census counter",
+        "fixedFunctionPipelineShaderExact": "R120 per-signature handoff readiness",
+        "fixedFunctionPipelineShaderUnsupported": "R120 per-signature reconciled render-state mask",
+        "fixedFunctionAlphaTestOwnedByPixelShader": "R120 per-signature alpha-test ownership evidence",
+        "translate_fixed_function_pipeline_with_shader_semantics": "R120 consumes the R118 fixed-function handoff",
+        "pipelineShader.renderStates.unsupported": "R120 records reconciled fixed-function render-state blockers",
+        "const auto& shaderPrototype = pipelineShader.pixelShader": "R120 uses the reconciled pixel-shader prototype",
+        "ffpPipelineShader[exact={},pending={},alphaTestOwned={}]": "R120 summary telemetry",
         "shaderTranslationExact = false": "native shader translation remains fail-closed",
     }
     if "(++stride % SampleStride)" in census:
