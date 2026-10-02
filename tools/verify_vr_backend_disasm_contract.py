@@ -171,6 +171,30 @@ def verify_dxvk_continuation_chain() -> None:
                 f"DXVK continuation {continuation_id} raw provenance escaped "
                 f"conservative semantic quarantine: {missing_raw_markers}"
             )
+
+        # Keep emitted raw evidence tied to the same local values validated by
+        # the collector. This prevents a fail-closed captured predicate from
+        # coexisting with stale target/predecessor/census fields in CI output.
+        raw_evidence_result_markers = (
+            '"target_rva": target_rva',
+            '"target_section": target_section',
+            '"predecessor_status": predecessor["status"]',
+            '"predecessor_exact": predecessor_exact',
+            '"probe_end_matches": probe_end_matches',
+            '"bytes": probe.hex(" ")',
+            '"raw_inbound_rel32_candidates": inbound',
+            '"raw_outbound_rel32_candidates": outbound',
+        )
+        missing_raw_evidence_bindings = [
+            marker for marker in raw_evidence_result_markers
+            if marker not in provenance_source
+        ]
+        if missing_raw_evidence_bindings:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} raw provenance evidence result drift: "
+                f"{missing_raw_evidence_bindings}"
+            )
+
         capture_integrity_markers = (
             "predecessor_exact",
             '"predecessor_exact": predecessor_exact',
