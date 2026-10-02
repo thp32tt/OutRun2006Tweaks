@@ -12,13 +12,17 @@ import json
 from pathlib import Path
 
 
-def _hex_bytes(value: object) -> bytes:
+def _parse_hex_bytes(value: object) -> tuple[bytes, bool]:
     if not isinstance(value, str) or not value.strip():
-        return b""
+        return b"", False
     try:
-        return bytes.fromhex(value)
+        return bytes.fromhex(value), True
     except ValueError:
-        return b""
+        return b"", False
+
+
+def _hex_bytes(value: object) -> bytes:
+    return _parse_hex_bytes(value)[0]
 
 
 def _valid_rva(value: object) -> bool:
@@ -40,11 +44,15 @@ def validate(record: dict) -> list[str]:
     elif int(end, 16) <= int(start, 16):
         errors.append("invalid_rva_range")
 
-    overlap = _hex_bytes(record.get("overlap_bytes"))
+    overlap, overlap_valid = _parse_hex_bytes(record.get("overlap_bytes"))
+    if record.get("overlap_bytes") and not overlap_valid:
+        errors.append("invalid_overlap_hex")
     if not overlap:
         errors.append("missing_overlap_bytes")
 
-    payload = _hex_bytes(record.get("bytes"))
+    payload, payload_valid = _parse_hex_bytes(record.get("bytes"))
+    if record.get("bytes") and not payload_valid:
+        errors.append("invalid_payload_hex")
     if payload and _valid_rva(start) and _valid_rva(end):
         if len(payload) != int(end, 16) - int(start, 16):
             errors.append("byte_window_length_mismatch")
