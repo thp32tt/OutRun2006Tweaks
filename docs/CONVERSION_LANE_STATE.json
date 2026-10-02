@@ -672,6 +672,21 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5948211572
+    },
+    {
+      "unit_id": "DX11_INDEXED_FAN_DECLARED_VERTEX_RANGE",
+      "task_id": "CONV-DX11-000001",
+      "source_implementation_sha": "4c54cbc03538bc562e3c407d7bf3121033d23b21",
+      "material_result_sha": "4c54cbc03538bc562e3c407d7bf3121033d23b21",
+      "identity_stabilization_sha": "946673c1098bf519d320c093b5199f121bcd7dee",
+      "validation_bearing_sha": "f5c9f60af51772503e9d1f293088128833e0b1f6",
+      "retaining_descendant_sha": "f5c9f60af51772503e9d1f293088128833e0b1f6",
+      "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_SOURCE_GRAPH_ACTIVATION_CENSUS_CONFIGURE_IN_PROGRESS_COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "STATE_PERSISTED",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5948112514,
+      "identity_issue14_comment_id": 5948250681
     }
   ]
 }
