@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "13f7b04d2fa7a6881301105ec64badc4cd306869",
+  "state_parent_head": "1b743cb73adaa851b4121e34f48be97cd233bbfd",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,15 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "55ca31b8ff3ba961f7d342ef8e80543ef8202e24",
-    "validation_bearing_sha": "55ca31b8ff3ba961f7d342ef8e80543ef8202e24",
-    "automation_validation": "PASS_EXACT_DX11_SOURCE_GRAPH_BUILD_RUN_CANCELLED_AFTER_STATIC_STEP",
+    "result_sha": "22b3eb20828ff7c9d95a98f9f60385e1b8711855",
+    "validation_bearing_sha": "22b3eb20828ff7c9d95a98f9f60385e1b8711855",
+    "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_ACTIVATION_CENSUS_BUILD_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. Direct final bound-draw evidence now includes exact live VS-b0/WVP transform binding; generated-fan and current live OM target-binding descendants remain dormant and do not activate Draw*.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until Quest 3/VDXR parity proof.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Consume a non-superseded static/build result for the current descendant live OM RTV/DSV target-binding contract (source present through 2510000cce8d221a191497ceb20529ee6a4a4418 or its retained descendants). If that gate passes, perform a fresh source-wide review for the next dormant DX11 conversion gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve the R145 all-RTV-slot fail-closed OM target contract. Next inspect the current non-indexed and indexed generated-fan final-readiness paths and, only if they still do not consume NativeSurfacePairBinding live target identity, add that same-context surface-target gate before any future DrawIndexed activation. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -448,6 +448,17 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5947354326
+    },
+    {
+      "unit_id": "DX11_R145_LIVE_OM_EXTRA_RTV_EXACTNESS",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "22b3eb20828ff7c9d95a98f9f60385e1b8711855",
+      "validation_bearing_sha": "22b3eb20828ff7c9d95a98f9f60385e1b8711855",
+      "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_ACTIVATION_CENSUS_BUILD_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5947444226
     }
   ]
 }
