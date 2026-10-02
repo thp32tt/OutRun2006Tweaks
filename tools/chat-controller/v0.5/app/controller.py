@@ -361,12 +361,21 @@ def render_continuation_prompt(
     job: dict[str, Any],
     reason: str,
 ) -> str:
+    transport_hint = ""
+    if lane["role"] == "localization_producer":
+        transport_hint = (
+            " If DDS upload is too large for one GitHub connector call, do not stop: use "
+            ".github/workflows/localization-binary-import-v05.yml via "
+            "localization/graphics/binary_staging/v05/<JOB_ID>/ chunk files and manifest.json; "
+            "the importer creates the material [AUTO:<JOB_ID>] DDS commit."
+        )
     return (
         f"CONTINUE JOB_ID={job['job_id']} on {lane['branch']}.\n"
         f"{reason}\n"
         "This is the same atomic job, not a new task. Do not recap or re-plan. "
         "Resume from the current Git state and finish the assigned material work, validation, "
-        f"and commit with [AUTO:{job['job_id']}]. "
+        f"and commit with [AUTO:{job['job_id']}]."
+        f"{transport_hint} "
         "If no runnable work truly remains, use CONTROLLER_IDLE=NO_RUNNABLE_WORK."
     )
 

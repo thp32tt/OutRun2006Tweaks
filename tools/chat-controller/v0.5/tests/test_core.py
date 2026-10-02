@@ -105,6 +105,12 @@ class CoreTests(unittest.TestCase):
             rendered,
         )
 
+    def test_localization_prompt_has_chunked_binary_fallback(self):
+        prompt = (ROOT / "prompts" / "localization_producer.md").read_text(encoding="utf-8")
+        self.assertIn("localization-binary-import-v05.yml", prompt)
+        self.assertIn("binary_staging/v05/<JOB_ID>/", prompt)
+        self.assertIn("manifest.json", prompt)
+
     def test_config_has_expected_current_branches(self):
         config = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))
         loc = config["modes"]["localization"]["lanes"]

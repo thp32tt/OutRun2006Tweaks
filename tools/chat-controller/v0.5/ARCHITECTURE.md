@@ -39,3 +39,8 @@ Every controller-generated ChatGPT input is decorated at the final send boundary
 `깃허브 연결은되어 있다 오류가 난다면 정상연결될때까지 무제한 다시 연결 상태를 확인한다`
 
 This applies to new jobs and same-JOB continuation/recovery turns. Individual prompt files cannot bypass it.
+
+
+## Large localization binary transport
+
+Localization producers must not treat connector payload-size limits as material blockers. Large DDS candidates are transported as connector-safe ASCII chunks under \`localization/graphics/binary_staging/v05/<JOB_ID>/\`; \`manifest.json\` is written last. The branch workflow \`.github/workflows/localization-binary-import-v05.yml\` reconstructs, validates SHA256/size/DDS signature, removes staging, and publishes the final \`hd_candidates\` DDS in a material commit containing the same \`[AUTO:<JOB_ID>]\` marker.

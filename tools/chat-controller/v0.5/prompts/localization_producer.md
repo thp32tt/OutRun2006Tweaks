@@ -8,6 +8,17 @@ If the first asset is genuinely blocked, immediately choose another runnable ass
 
 Producer jobs do not edit shared progress/resume/WORKLOG reconciliation. C owns shared QA reconciliation.
 
+Binary DDS transport rule:
+- Do not end the job because a DDS/base64 payload is too large for one GitHub connector call.
+- The target branch contains \`.github/workflows/localization-binary-import-v05.yml\` specifically for this case.
+- Encode the finished DDS as \`xz+base64\` (or \`base64\`), split the encoded ASCII into connector-safe chunks (recommended <= 200000 characters each), and stage them under \`localization/graphics/binary_staging/v05/<JOB_ID>/\`.
+- Name chunks \`payload.part000\`, \`payload.part001\`, ... and upload all chunks first.
+- Upload \`manifest.json\` LAST. Its JSON fields are: \`job_id\`, \`output_path\`, \`sha256\`, \`size\`, \`encoding\`, and ordered \`parts\`.
+- \`output_path\` must be the final \`localization/graphics/hd_candidates/.../*.dds\` path and \`job_id\` must be the current JOB_ID.
+- Prefer GitHub low-level Git objects (\`create_blob\` for each text chunk, then one \`create_tree\` + \`create_commit\` + non-force \`update_ref\`) so staging is one atomic branch commit rather than dozens of contents-API commits.
+- After the manifest reaches the branch, inspect GitHub Actions / branch commits. The importer reconstructs and SHA256-validates the DDS, removes staging, and creates the material commit containing \`[AUTO:<JOB_ID>]\`.
+- If the importer fails, inspect its workflow logs, repair the staged payload/manifest, and continue the SAME JOB_ID. A connector payload-size error is transport fallback, not a terminal blocker.
+
 If a fresh full-shard check proves there is no runnable unfinished material work, end the response with exactly:
 CONTROLLER_IDLE=NO_RUNNABLE_WORK
 Do not create an empty/status commit in that case.
