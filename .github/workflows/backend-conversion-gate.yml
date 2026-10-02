@@ -223,3 +223,15 @@ jobs:
           if (-not $probe) { throw "DX11 surface mirror probe executable missing" }
           & $probe.FullName
           if ($LASTEXITCODE -ne 0) { throw "DX11 surface mirror probe failed with exit code $LASTEXITCODE" }
+
+
+      - name: Build DX11 fixed-function pipeline handoff probe
+        run: cmake --build build-auto --config Release --target dx11_fixed_function_pipeline_probe
+
+      - name: Run DX11 fixed-function pipeline handoff probe
+        shell: pwsh
+        run: |
+          $probe = Get-ChildItem build-auto -Recurse -Filter dx11_fixed_function_pipeline_probe.exe | Select-Object -First 1
+          if (-not $probe) { throw "DX11 fixed-function pipeline handoff probe executable missing" }
+          & $probe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "DX11 fixed-function pipeline handoff probe failed with exit code $LASTEXITCODE" }

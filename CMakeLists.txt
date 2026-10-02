@@ -594,6 +594,8 @@ set(outrun2006tweaks_SOURCES
 	"src/vr/d3d11/native_shared_eye_ring.hpp"
 	"src/vr/d3d11/pipeline_translation.cpp"
 	"src/vr/d3d11/pipeline_translation.hpp"
+	"src/vr/d3d11/fixed_function_pipeline.cpp"
+	"src/vr/d3d11/fixed_function_pipeline.hpp"
 	"src/vr/d3d11/resource_translation.cpp"
 	"src/vr/d3d11/resource_translation.hpp"
 	"src/vr/d3d11/surface_mirror.cpp"
@@ -1015,5 +1017,38 @@ target_include_directories(dx11_surface_mirror_probe PUBLIC
 )
 
 target_link_libraries(dx11_surface_mirror_probe PUBLIC
+    d3d11.lib
+)
+
+
+# Target: dx11_fixed_function_pipeline_probe
+set(dx11_fixed_function_pipeline_probe_SOURCES
+    "tools/dx11_fixed_function_pipeline_probe.cpp"
+    "src/vr/d3d11/fixed_function_pipeline.cpp"
+    "src/vr/d3d11/pipeline_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp"
+)
+
+add_executable(dx11_fixed_function_pipeline_probe)
+
+target_sources(dx11_fixed_function_pipeline_probe PRIVATE ${dx11_fixed_function_pipeline_probe_SOURCES})
+
+target_compile_features(dx11_fixed_function_pipeline_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_fixed_function_pipeline_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_fixed_function_pipeline_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_fixed_function_pipeline_probe PUBLIC
+    d3dcompiler.lib
     d3d11.lib
 )
