@@ -20,6 +20,8 @@ def load_function(name, **overrides):
               GITHUB_BROKER_ENABLED=False, NATIVE_PLUGIN_PROTOCOL_VERSION=2,
               GITHUB_ASSISTANT_RECOVERY_MAX=2, GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS=300,
               SAME_TASK_CONTROL_GAP_SECONDS=15,
+              PREMATURE_STOP_ROLLOVER_THRESHOLD=3,
+              PRODUCER_CONTINUATION_COOLDOWN_SECONDS=15,
               QUEUE_STABLE_SECONDS=30, QUEUE_RESULT_GRACE_SECONDS=180,
               _parse_iso=lambda x: datetime.fromisoformat(x) if x else None,
               stable_hash=lambda x: hashlib.sha256(x.encode()).hexdigest(),
@@ -30,7 +32,8 @@ def load_function(name, **overrides):
               native_plugin_instructions=lambda active: 'ALL_TOOLS tool search TOOL_NOT_EXPOSED 404 TARGET_BRANCH',
               _is_localization_producer=lambda active: False,
               queue_send_producer_execution_continuation=AsyncMock(return_value=False),
-              queue_send_same_chat_control_message=AsyncMock(return_value=True))
+              queue_send_same_chat_control_message=AsyncMock(return_value=True),
+              queue_rollover_chat=AsyncMock(return_value=True))
     ns.update(overrides)
     node = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), FUNCTIONS[name]], type_ignores=[])
     exec(compile(ast.fix_missing_locations(node), '<controller>', 'exec'), ns)
@@ -472,6 +475,106 @@ class NativeControllerTests(unittest.TestCase):
         node_source = ast.get_source_segment(SOURCE, FUNCTIONS['queue_send_same_chat_control_message']) or ''
         self.assertIn('same_task_control_send_guard_reason', node_source)
         self.assertNotIn('guard = send_guard_reason(', node_source)
+
+    def test_producer_premature_stop_escalates_to_rollover_on_third_turn(self):
+        same_chat = AsyncMock(return_value=True)
+        rollover = AsyncMock(return_value=True)
+        f, _ = load_function(
+            'queue_send_producer_execution_continuation',
+            _is_localization_producer=lambda active: True,
+            queue_send_same_chat_control_message=same_chat,
+            queue_rollover_chat=rollover,
+        )
+        active = self.active()
+        active.update(
+            lane='LOCALIZATION_E',
+            branch='korean-localization-clean',
+            sent_at='2026-10-02T00:00:00+00:00',
+            task_latched=True,
+            chat_rollovers=0,
+        )
+        self.assertTrue(asyncio.run(f(None, {}, active, 'h1')))
+        self.assertEqual(active['premature_stop_count'], 1)
+        self.assertTrue(active['task_latched'])
+        self.assertEqual(active['controller_stage'], 'WAIT_MATERIAL_COMMIT')
+        self.assertEqual(same_chat.call_count, 1)
+        rollover.assert_not_awaited()
+
+        active['sent_at'] = '2026-10-02T00:01:00+00:00'
+        self.assertTrue(asyncio.run(f(None, {}, active, 'h2')))
+        self.assertEqual(active['premature_stop_count'], 2)
+        self.assertEqual(same_chat.call_count, 2)
+        rollover.assert_not_awaited()
+
+        active['sent_at'] = '2026-10-02T00:02:00+00:00'
+        self.assertTrue(asyncio.run(f(None, {}, active, 'h3')))
+        rollover.assert_awaited_once()
+        self.assertEqual(active['premature_stop_count'], 0)
+        self.assertEqual(active['premature_stop_total'], 3)
+        self.assertEqual(active['phase'], 'WAIT_CHAT')
+        self.assertTrue(active['task_latched'])
+
+    def test_same_premature_turn_is_counted_only_once_until_controller_sends_again(self):
+        same_chat = AsyncMock(return_value=False)
+        rollover = AsyncMock(return_value=False)
+        f, _ = load_function(
+            'queue_send_producer_execution_continuation',
+            _is_localization_producer=lambda active: True,
+            queue_send_same_chat_control_message=same_chat,
+            queue_rollover_chat=rollover,
+        )
+        active = self.active()
+        active.update(
+            lane='LOCALIZATION_A',
+            branch='korean-localization-clean',
+            sent_at='2026-10-02T00:00:00+00:00',
+            task_latched=True,
+            chat_rollovers=0,
+        )
+        asyncio.run(f(None, {}, active, 'same'))
+        asyncio.run(f(None, {}, active, 'same'))
+        asyncio.run(f(None, {}, active, 'same'))
+        self.assertEqual(active['premature_stop_count'], 1)
+        self.assertEqual(active['premature_stop_total'], 1)
+        rollover.assert_not_awaited()
+
+    def test_rollover_prompt_carries_persistent_task_checkpoint(self):
+        f, _ = load_function(
+            'queue_rollover_prompt',
+            CONTROLLER_MODE='localization',
+            MAX_TASK_ATTEMPTS=3,
+            localization_controller_contract_fingerprint=lambda: ('38', 'b' * 40),
+            localization_final_artwork_progress_hint=lambda branch: 'FINAL_ARTWORK_PROGRESS=0/95 (0%); MODE=FINAL_ARTWORK_CONVERGENCE',
+            _is_localization_producer=lambda active: True,
+        )
+        active = self.active()
+        active.update(
+            lane='LOCALIZATION_E',
+            branch='korean-localization-clean',
+            task_id='LOCALIZATION-LOCALIZATION_E-00479',
+            task_latched=True,
+            controller_stage='WAIT_MATERIAL_COMMIT',
+            last_checkpoint_head='c' * 40,
+            premature_stop_total=3,
+        )
+        prompt = f(active)
+        self.assertIn('ACTIVE_TASK_LATCH=ON', prompt)
+        self.assertIn('CONTROLLER_STAGE=WAIT_MATERIAL_COMMIT', prompt)
+        self.assertIn('LAST_CHECKPOINT_HEAD=' + 'c' * 40, prompt)
+        self.assertIn('FIRST_EXECUTION_ACTION=DO_NOT_PLAN', prompt)
+        self.assertIn('FINAL_ARTWORK_PROGRESS=0/95', prompt)
+
+    def test_latched_localization_producer_rollover_budget_is_soft(self):
+        node_source = ast.get_source_segment(SOURCE, FUNCTIONS['queue_rollover_chat']) or ''
+        self.assertIn('rollover_soft_limit_exceeded', node_source)
+        self.assertIn('task_latched', node_source)
+        self.assertIn('_is_localization_producer', node_source)
+
+    def test_valid_producer_commit_releases_active_task_latch(self):
+        node_source = ast.get_source_segment(SOURCE, FUNCTIONS['finalize_localization_producer_commit']) or ''
+        self.assertIn('active["task_latched"] = False', node_source)
+        self.assertIn('active["controller_stage"] = "DONE"', node_source)
+        self.assertIn('last_material_progress_at', node_source)
 
     def test_retry_surface_stable_response_preempts_generic_retry_cooldown(self):
         native = AsyncMock(return_value=True)
