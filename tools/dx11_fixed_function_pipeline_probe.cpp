@@ -856,6 +856,16 @@ int main()
         blendTextureAlphaStages[0].magFilter = D3DTEXF_POINT;
         blendTextureAlphaStages[0].mipFilter = D3DTEXF_NONE;
 
+        const auto blendTextureAlphaMissingResource =
+            translate_fixed_function_readiness(
+                blendTextureAlphaStages, true, 0x00u, 0x00u);
+        require(
+            !blendTextureAlphaMissingResource.exact() &&
+            (blendTextureAlphaMissingResource.unsupported &
+             FixedFunctionUnsupportedResourceStageCoverage) != 0,
+            "R186 implicit texture-alpha resource coverage must fail closed");
+
+
         const auto blendTextureAlphaShader =
             generate_fixed_function_pixel_shader_prototype(
                 blendTextureAlphaStages, true, 0x01u, 0x01u, textureTypes);
@@ -894,6 +904,16 @@ int main()
         blendTextureAlphaPmStages[0].minFilter = D3DTEXF_POINT;
         blendTextureAlphaPmStages[0].magFilter = D3DTEXF_POINT;
         blendTextureAlphaPmStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto blendTextureAlphaPmMissingResource =
+            translate_fixed_function_readiness(
+                blendTextureAlphaPmStages, true, 0x00u, 0x00u);
+        require(
+            !blendTextureAlphaPmMissingResource.exact() &&
+            (blendTextureAlphaPmMissingResource.unsupported &
+             FixedFunctionUnsupportedResourceStageCoverage) != 0,
+            "R187 implicit texture-alpha resource coverage must fail closed");
+
 
         const auto blendTextureAlphaPmShader =
             generate_fixed_function_pixel_shader_prototype(

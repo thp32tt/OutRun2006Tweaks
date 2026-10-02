@@ -585,6 +585,33 @@ def main() -> None:
             + ", ".join(missing_r187_d3dtop_blendtexturealphapm)
         )
 
+    implicit_texture_alpha_resource_coverage_contract = [
+        ("blendTextureAlphaMissingResource", FIXED_FUNCTION_PIPELINE_PROBE,
+         "R186 missing-resource readiness fixture"),
+        ("R186 implicit texture-alpha resource coverage must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R186 missing-resource fail-closed assertion"),
+        ("blendTextureAlphaPmMissingResource", FIXED_FUNCTION_PIPELINE_PROBE,
+         "R187 missing-resource readiness fixture"),
+        ("R187 implicit texture-alpha resource coverage must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R187 missing-resource fail-closed assertion"),
+        ("FixedFunctionUnsupportedResourceStageCoverage",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "implicit texture-alpha resource coverage blocker"),
+    ]
+    missing_implicit_texture_alpha_resource_coverage = [
+        meaning
+        for token, source, meaning
+        in implicit_texture_alpha_resource_coverage_contract
+        if token not in source
+    ]
+    if missing_implicit_texture_alpha_resource_coverage:
+        raise SystemExit(
+            "DX11 implicit texture-alpha resource coverage contract drift: "
+            + ", ".join(missing_implicit_texture_alpha_resource_coverage)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
