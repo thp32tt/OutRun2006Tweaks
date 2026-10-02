@@ -8,30 +8,70 @@
   "target_branch": "korean-localization-clean",
   "attempt": "1/3",
   "chat_rollover": 12,
-  "recorded_at_kst": "2026-10-02T12:33:00+09:00",
-  "base_head_sha": "b5cb49b3960e351bc1948d3bd1a9321d729dbee6",
-  "base_sha": "b5cb49b3960e351bc1948d3bd1a9321d729dbee6",
+  "recorded_at_kst": "2026-10-02T12:40:00+09:00",
+  "base_head_sha": "9cd891d545de9e7fd30db4d80b34ecf0b3b73917",
+  "base_sha": "9cd891d545de9e7fd30db4d80b34ecf0b3b73917",
   "commit_mode": "VALIDATION_BEARING_C_CHECKPOINT",
-  "result": "REWORK_REQUIRED_INDEX61_C4A2937B_POST_RESET_SOURCE_LINEAGE_VIOLATION_RUNTIME_UNTESTED",
-  "summary": "C independently reviewed the exact B00342 result for index61/C4A2937B. Canonical HD source identity, DDS geometry/header, semantic repair intent and reported zero-pixel containment are consistent, but the producer QA explicitly identifies its clean plate as C85_CURRENT_CANDIDATE_LOCAL_TWO_ELEMENT_CLEAN_PLATE and reuses the unchanged pre-reset C85 Korean candidate for the other 19 regions. The mandatory 2026-09-29 generation-reset contract forbids using any older Korean candidate pixels/clean plate/mask/crop/composite as construction input and requires rebuilding from the exact English HD source. Therefore the exact B00342 candidate is non-promotable and is returned REWORK_REQUIRED to lane B. C does not rewrite candidate DDS bytes. No real-game test was performed.",
+  "result": "PASS_C_BATCH_FOUR_SUPERSEDED_INPUTS_RUNTIME_UNTESTED",
+  "summary": "C00476 reconciled the four immutable B-lane inputs surfaced by the concurrent C batch checkpoint against current schema43 Git HEAD. All four are now superseded by later accepted material/state and therefore must not be re-promoted or rewrite shared candidate state: B00062's four preflight assets all advanced to later C dispositions; B00167 index152 was explicitly replaced by current-contract B00185/C138 on the unchanged candidate; B00253 index139 duplicates an already-authoritative SOURCE_ACQUISITION_EXHAUSTED state accepted through B00195/C141; B00277 index97 rebuild spec was superseded by B00283/C164 static-pass candidate. Runtime remains UNTESTED.",
   "qa_batch_inputs": [
     {
-      "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00062",
       "lane": "LOCALIZATION_B",
-      "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
-      "result_message": "localization(B): rework index61 C4A2937B semantics [AUTO:LOCALIZATION-LOCALIZATION_B-00342]",
-      "producer_id": "P00214",
+      "result_sha": "2579efe87a6f20d7a9c12c930dec122d125d04d8",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "1d0c05d29118192c5c10f40ee857fb26ae366622",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00253",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "434c0169e1b34f5c9ee1bcc3952300a921361cd1",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00277",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "a29d448a64014c1020a025509878a5ad5dba56c9",
       "automation_validation": "PENDING",
       "validation_mode": "C_BATCH_GATE"
     }
   ],
   "qa_dispositions": [
     {
-      "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
-      "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
-      "status": "REWORK_REQUIRED",
-      "production_readiness": "REWORK_REQUIRED_REBUILD_ENTIRE_INDEX61_FROM_EXACT_ENGLISH_HD_SOURCE",
-      "reason": "Exact producer evidence states clean_plate.lineage=C85_CURRENT_CANDIDATE_LOCAL_TWO_ELEMENT_CLEAN_PLATE, integrated_self_qa.current_candidate_fingerprint_gate=PASS_EXACT_C85_LINEAGE, and unchanged_19_element_heavy_qa_reused=true. C85 predates the mandatory 2026-09-29 generation reset. The current contract forbids reusing any older Korean candidate pixels, cleaned background, glyphs, masks, patches, crops or composites and requires every localized graphic to restart from the exact English HD source DDS. Containment/header PASS cannot override this lineage gate. Lane B must rebuild the full index61 atlas from the exact English HD source while preserving the corrected semantics 하트선을 통과하세요! and 스테이지 보너스, then regenerate fresh v2 clean-plate/review/QA evidence."
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00062",
+      "result_sha": "2579efe87a6f20d7a9c12c930dec122d125d04d8",
+      "status": "SUPERSEDED",
+      "production_readiness": "SUPERSEDED_BY_LATER_PER_ASSET_C_RECONCILIATION",
+      "reason": "B00062 was an early preflight-only four-asset semantic/cell mapping checkpoint for indices188/212/226/232. Current asset_queue records later authoritative C dispositions for every asset: index188 C120/B00129 preflight, index212 C121/B00134 preflight, index226 C148/B00216 static QA pass, and index232 C175/B00332 static QA pass. Reapplying B00062 would regress current state."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00167",
+      "result_sha": "1d0c05d29118192c5c10f40ee857fb26ae366622",
+      "status": "SUPERSEDED",
+      "production_readiness": "SUPERSEDED_BY_B00185_C138_CURRENT_CONTRACT_REEMISSION",
+      "reason": "The index152 candidate bytes remain unchanged at current blob 5d938fd663669715cdebcbff675b3499c888d200, but current asset_queue explicitly records C135 rejecting exact B00167 for the newer verifier-contract shape and C138 accepting B00185@01c58ad3 as the current-contract re-emission on the same candidate fingerprint. B00167 must not be promoted again."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00253",
+      "result_sha": "434c0169e1b34f5c9ee1bcc3952300a921361cd1",
+      "status": "SUPERSEDED",
+      "production_readiness": "SUPERSEDED_DUPLICATE_SOURCE_EXHAUSTION_STATE",
+      "reason": "B00253 re-established index139 SOURCE_ACQUISITION_EXHAUSTED with pinned bundle member SHA-256 4c85be80... at 2048x1024 versus canonical inventory 45cd9acf... at 512x256. Current asset_queue already carries authoritative Q00039/C141 B00195 PASS with the same fail-closed source-exhaustion state. The uploaded pinned archive independently reproduces B00253's 4c85be80... member identity, but this later duplicate must not overwrite existing authoritative state."
+    },
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00277",
+      "result_sha": "a29d448a64014c1020a025509878a5ad5dba56c9",
+      "status": "SUPERSEDED",
+      "production_readiness": "SUPERSEDED_BY_B00283_C164_STATIC_PASS",
+      "reason": "B00277 contains only the index97 native-v2 rebuild specification after C161 rejected the then-current candidate. Current asset_queue records newer B00283@f231efac accepted by Q00062/C164 with source bad9701a, candidate 85a50bb9 and STATIC_QA PASS. The older rebuild spec is therefore consumed only as history."
     }
   ],
   "policy_resolution": {
@@ -59,28 +99,19 @@
     "resume_state_blob_sha": "13c468ebf5c9cf5d72e451fe86bc16a1f62cfdc0"
   },
   "independent_verification": {
-    "queue_index": 61,
-    "asset": "C4A2937B",
-    "exact_uploaded_source_archive_member": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
-    "uploaded_source_identity": "PASS_SHA256_HEADER128_DIMENSIONS_MIP1",
-    "producer_source_identity": "PASS_MATCHES_EXACT_UPLOADED_HD_SOURCE",
-    "semantic_repair": {
-      "Cut the line!": "하트선을 통과하세요!",
-      "STAGE BONUS": "스테이지 보너스",
-      "status": "PASS_SEMANTIC_INTENT"
-    },
-    "producer_reported_zero_pixel_metrics": {
-      "changed_pixels_outside_edit_mask": 0,
-      "changed_pixels_outside_source_region": 0,
-      "changed_pixels_in_protected_mask": 0,
-      "introduced_alpha_outside_source_region": 0,
-      "alpha_changed_outside_edit_mask": 0,
-      "one_pixel_overflow_count": 0
-    },
-    "visual_review_artifacts_present": true,
-    "candidate_lineage": "FAIL_PRE_RESET_C85_KOREAN_CANDIDATE_REUSED_AS_CLEAN_PLATE",
-    "generation_reset_gate": "REWORK_REQUIRED",
-    "candidate_promotable": false
+    "batch_identity": "TASK_ID@RESULT_SHA",
+    "current_asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "b00062_current_state_crosscheck": "PASS_ALL_FOUR_ASSETS_HAVE_LATER_C_DISPOSITIONS",
+    "b00167_current_candidate_blob_sha": "5d938fd663669715cdebcbff675b3499c888d200",
+    "b00167_current_state_crosscheck": "PASS_B00185_C138_IS_LATER_AUTHORITATIVE_REEMISSION",
+    "b00253_uploaded_release_member_sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+    "b00253_uploaded_release_member_dimensions": [
+      2048,
+      1024
+    ],
+    "b00253_current_state_crosscheck": "PASS_EXISTING_C141_SOURCE_ACQUISITION_EXHAUSTED",
+    "b00277_current_state_crosscheck": "PASS_B00283_C164_LATER_STATIC_QA",
+    "candidate_dds_rewritten_by_c": false
   },
   "required_rework": {
     "owner_lane": "LOCALIZATION_B",
@@ -112,10 +143,12 @@
     "candidate_dds_rewritten_by_c": false
   },
   "material_deliverable": {
-    "type": "INDEPENDENT_C_INDEX61_LINEAGE_GATE_REWORK_DISPOSITION",
-    "reviewed_inputs": 1,
+    "type": "INDEPENDENT_C_FOUR_INPUT_SUPERSESSION_RECONCILE",
+    "reviewed_inputs": 4,
     "producer_inputs_pass": 0,
-    "producer_inputs_rework_required": 1,
+    "producer_inputs_rework_required": 0,
+    "producer_inputs_hold": 0,
+    "producer_inputs_superseded": 4,
     "candidate_dds_modified_by_c": false,
     "shared_state_candidate_promotion": false,
     "materially_reduces_unresolved_work": true,
@@ -147,5 +180,16 @@
   "result_sha": null,
   "authoritative_result_sha": null,
   "validation_bearing_result_sha": null,
-  "result_commit_message": "localization(C): reject index61 pre-reset lineage [AUTO:LOCALIZATION-LOCALIZATION_C-00476]"
+  "result_commit_message": "localization(C): drain four superseded QA inputs [AUTO:LOCALIZATION-LOCALIZATION_C-00476]",
+  "checkpoint_sequence": 1,
+  "checkpoint_kind": "DRAIN_STALE_QA_BACKLOG_BY_CURRENT_HEAD_SUPERSESSION",
+  "deferred_candidate_checkpoint": {
+    "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+    "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
+    "queue_index": 61,
+    "asset": "C4A2937B",
+    "independent_disposition_prepared": "REWORK_REQUIRED_POST_RESET_SOURCE_LINEAGE_VIOLATION",
+    "prior_c00476_commit": "9ebdd6ae0a27d940730de23c56c1679157bfd052",
+    "note": "Retained for the next same-TASK C drain checkpoint after this four-input controller batch is durably validated; no repeat visual/source analysis required."
+  }
 }
