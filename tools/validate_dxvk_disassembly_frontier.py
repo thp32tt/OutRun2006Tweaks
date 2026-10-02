@@ -22,7 +22,12 @@ def _hex_bytes(value: object) -> bytes:
 
 
 def _valid_rva(value: object) -> bool:
-    return isinstance(value, str) and value.startswith("0x") and int(value, 16) >= 0
+    if not isinstance(value, str) or not value.startswith("0x"):
+        return False
+    try:
+        return int(value, 16) >= 0
+    except ValueError:
+        return False
 
 
 def validate(record: dict) -> list[str]:
@@ -38,6 +43,13 @@ def validate(record: dict) -> list[str]:
     overlap = _hex_bytes(record.get("overlap_bytes"))
     if not overlap:
         errors.append("missing_overlap_bytes")
+
+    payload = _hex_bytes(record.get("bytes"))
+    if payload and _valid_rva(start) and _valid_rva(end):
+        if len(payload) != int(end, 16) - int(start, 16):
+            errors.append("byte_window_length_mismatch")
+        if overlap and payload[: len(overlap)] != overlap:
+            errors.append("overlap_prefix_mismatch")
 
     branches = record.get("branch_targets")
     if branches is not None:
