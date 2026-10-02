@@ -17,7 +17,10 @@
 #define NOMINMAX
 #endif
 
+#ifndef OUTRUN_VR_REFACTOR_SPLIT_R33_R32
 #include "stereo_renderer_r32.cpp"
+#endif
+#include "hook_mgr.hpp"
 #include "../state/state_block_tracker.hpp"
 #include "../core/dispatch_support.hpp"
 #include "../core/review_dispatch_hooks.hpp"

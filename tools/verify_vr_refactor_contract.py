@@ -814,8 +814,9 @@ if '#include "../core/review_dispatch_hooks.hpp"' not in r32:
     errors.append("R32 review-dispatch hook API include missing")
 if '#include "../core/review_dispatch_hooks.hpp"' not in r33:
     errors.append("R33 review-dispatch hook API include missing")
-if '#include "stereo_renderer_r32.cpp"' not in r33:
-    errors.append("R32->R33 textual include removed before build/link gate")
+if '#ifndef OUTRUN_VR_REFACTOR_SPLIT_R33_R32' not in r33 or \
+        '#include "stereo_renderer_r32.cpp"' not in r33:
+    errors.append("R32->R33 split gate lost guarded legacy include")
 r32_instance = r32.find("VRStereoR32ReviewHook VRStereoR32ReviewHook::instance;")
 for marker in (
     "HRESULT __stdcall DrawPrimitiveDestR32(",
@@ -864,6 +865,12 @@ for marker in (
         errors.append(
             f"R33 hook destination has not crossed the anonymous implementation boundary: {marker}")
 
+
+# Gate B source split contract.
+if '#include "hook_mgr.hpp"' not in r33:
+    errors.append("R33 split TU missing explicit hook foundation include")
+if "OUTRUN_VR_REFACTOR_SPLIT_R33_R32" not in r33:
+    errors.append("R33 split TU gate macro missing")
 
 # Gate A explicit dependency contract.
 for marker in (

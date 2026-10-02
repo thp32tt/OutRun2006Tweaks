@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  r34-r33-split:
+  r34-r32-split:
     if: github.ref == 'refs/heads/vr-refactor-r84-2000c-20261001' || github.head_ref == 'vr-refactor-r84-2000c-20261001' || github.event_name == 'workflow_dispatch'
     runs-on: windows-2022
     steps:
@@ -25,13 +25,13 @@ jobs:
         shell: pwsh
         run: python tools/verify_vr_refactor_contract.py
 
-      - name: Configure R34/R33 split
+      - name: Configure R34/R32 cumulative split
         shell: pwsh
         run: |
           Remove-Item Env:CI -ErrorAction SilentlyContinue
           mkdir build-refactor
           cd build-refactor
-          cmake -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R34_R33=ON ..
+          cmake -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R34_R33=ON -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=ON ..
 
-      - name: Build split graph
+      - name: Build cumulative split graph
         run: cmake --build build-refactor --config Release

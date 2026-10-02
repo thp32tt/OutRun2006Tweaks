@@ -140,6 +140,17 @@ if(OUTRUN_VR_REFACTOR_SPLIT_R34_R33)
     add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R34_R33=1)
     message(STATUS "OutRun VR refactor gate: R33 + R34 separate translation units")
 endif()
+option(OUTRUN_VR_REFACTOR_SPLIT_R33_R32 "Refactor gate: compile R32-R34 as separate translation units" OFF)
+if(OUTRUN_VR_REFACTOR_SPLIT_R33_R32)
+    if(NOT OUTRUN_VR_REFACTOR_SPLIT_R34_R33)
+        message(FATAL_ERROR "R33/R32 split requires R34/R33 split gate")
+    endif()
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r32.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R33_R32=1)
+    message(STATUS "OutRun VR refactor gate: R32 + R33 + R34 separate translation units")
+endif()
 set_source_files_properties(
     src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp
     src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp
