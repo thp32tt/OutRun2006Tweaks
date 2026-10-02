@@ -4,31 +4,30 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "21565053d1bd6105de798148d7e34253d9ce9a1a",
-  "state_parent_head": "7c5e963907391050be62543a6a01456c3bb46434",
-  "material_result_sha": "148e76926966f1e4bdb2ec5e12ee6d8a0be47655",
-  "validation_bearing_sha": "cd823563f92fef892190ce294184dac89892748f",
+  "base_sha": "2698e22a522712e1ee0eb79587710b44479c8440",
+  "state_parent_head": "946673c1098bf519d320c093b5199f121bcd7dee",
+  "material_result_sha": "67ec86f4406c3c1734c7f4a741829fcac5f433e1",
+  "validation_bearing_sha": "b9259d5f846d07b30dbbea832a31817d12cd4462",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_INPUT_LAYOUT_STRIDE_LINEAGE_R158",
-  "selection_reason": "The D3D9 input-layout translator validated element extents against stream0Stride but discarded that stride, while final live IA readiness independently accepted vertexStride. The hosted probe concretely used a 24-byte translated FVF layout with a 16-byte IA stride, leaving layout semantics and live IA fetch stride unjoined.",
-  "summary": "R158 preserves stream0Stride in VertexInputLayoutTranslation, hashes it into pipeline identity, requires final live IA vertexStride to equal the translated-layout stride, seals the relation into final readiness/snapshot integrity, and adds deterministic mismatch/restore probes plus source-graph guards. Native Draw* remains disabled.",
+  "selected_work": "DX11_SAMPLER_BORDER_PROVENANCE_R160",
+  "selection_reason": "R159 enabled MIRROR/MIRRORONCE but explicitly left D3DTADDRESS_BORDER fail-closed only because D3DSAMP_BORDERCOLOR provenance was not captured. The existing per-stage census can observe that state directly, making BORDER the highest-value independent sampler compatibility gap available without runtime hardware.",
+  "summary": "R160 captures D3DSAMP_BORDERCOLOR per fixed-function stage, hashes/logs it in the census signature, maps D3DTADDRESS_BORDER to D3D11_TEXTURE_ADDRESS_BORDER, converts D3D9 AARRGGBB to D3D11 RGBA float channels, and adds semantic/WARP/source-graph guards. NativeDrawPathActive remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read AGENTS.md, current conversion state/run record and live branch work through authenticated GitHub authority.",
-        "Tracked rapid same-branch R152-R157 churn, rebased on current HEAD and avoided overwriting concurrent DX11 work."
+        "Read branch AGENTS.md, docs/CONVERSION_LANE_STATE.json, current task run, regression knowledge/history, and Issue #14 through authenticated GitHub authority.",
+        "Recovered rapid same-branch R157-R159 descendants and reselected work against fresh HEAD to avoid duplicating concurrent units."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "translate_vertex_input_layout consumed stream0Stride to validate descriptor byte extents but VertexInputLayoutTranslation did not retain it.",
-        "hash_pipeline_input_layout_identity omitted stride and final live IA readiness accepted vertexStride independently.",
-        "The hosted probe translated D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1 at 24 bytes while binding geometry at 16 bytes."
+        "Confirmed R159 supports WRAP/MIRROR/CLAMP/MIRRORONCE and intentionally rejects BORDER because FixedFunctionStageState lacked D3DSAMP_BORDERCOLOR.",
+        "Confirmed runtime_census already observes per-stage sampler fields through GetSamplerState, so exact BORDER provenance is statically implementable."
       ]
     },
     "C2_IMPLEMENT": {
@@ -36,134 +35,56 @@
       "changed_paths": [
         "src/vr/d3d11/pipeline_translation.hpp",
         "src/vr/d3d11/pipeline_translation.cpp",
-        "src/vr/d3d11/native_backend.hpp",
-        "src/vr/d3d11/native_backend.cpp",
+        "src/vr/d3d11/runtime_census.cpp",
+        "tools/dx11_fixed_function_shader_semantics.cpp",
         "tools/dx11_constant_buffer_probe.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "148e76926966f1e4bdb2ec5e12ee6d8a0be47655",
-        "69f5ef459e47da85999e506ff54bc6d7a4d8fbba"
+        "67ec86f4406c3c1734c7f4a741829fcac5f433e1"
       ],
       "details": [
-        "Preserved stream0Stride in translated layout identity and hashed it into the native pipeline translation snapshot.",
-        "Required final live IA vertexStride to equal inputLayout.stream0Stride and sealed both values in final readiness integrity/token.",
-        "Corrected positive hosted fixture to 24-byte stride and added a 16-byte live IA drift rejection plus deterministic restore proof.",
-        "Renamed this unit from R157 to R158 after concurrent direct line-raster work also claimed R157; logic was unchanged."
+        "Added per-stage borderColor provenance and census observation/hash/logging.",
+        "Enabled exact BORDER address translation and AARRGGBB-to-RGBA conversion.",
+        "Added semantic smoke, WARP sampler descriptor probe, and source-graph drift guards."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_STATIC",
-      "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_SOURCE_GRAPH_AND_CENSUS_CONFIGURE_IN_PROGRESS_COMPILE_NOT_CLAIMED",
+      "status": "COMPLETE_STATIC_CI_CANCELLED_BY_BRANCH_CHURN",
+      "automation_validation": "PASS_GITHUB_AUTHORITATIVE_STATIC_CONTRACT_RETENTION_ACTIONS_CANCELLED_BY_BRANCH_CHURN_COMPILE_NOT_CLAIMED",
       "evidence": [
-        "GitHub compare proved current descendants retain material commit 148e76926966f1e4bdb2ec5e12ee6d8a0be47655 and follow-up 69f5ef459e47da85999e506ff54bc6d7a4d8fbba with behind_by=0 at validation capture.",
-        "Build run 36983436710 on post-rename retaining descendant cd823563f92fef892190ce294184dac89892748f passed Verify DX11 source graph and Test DX11 census analyzer.",
-        "Configure was in progress at validation capture; full Win32 compile/build and Quest 3/VDXR runtime are not claimed."
+        "GitHub-authoritative material commit diff inspected and all intended R160 declaration/translation/census/probe/guard tokens verified.",
+        "Retaining descendant b9259d5f846d07b30dbbea832a31817d12cd4462 still contains every R160 contract token across all six changed paths.",
+        "Exact material-SHA OpenXR architecture, HUD inspector and Build workflows were cancelled by rapid same-branch churn; compile and hosted WARP execution are not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "148e76926966f1e4bdb2ec5e12ee6d8a0be47655",
-      "followup_commit": "69f5ef459e47da85999e506ff54bc6d7a4d8fbba",
-      "issue14_comment_id": 5948076533
+      "material_commit": "67ec86f4406c3c1734c7f4a741829fcac5f433e1",
+      "issue14_comment_id": 5948211572
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant DX11 input-layout/live-IA readiness, probe and static-guard work only; no production Draw* routing, backend activation, OpenXR transport, localization, DXVK lane or release payload changed."
+      "reason": "Dormant DX11 sampler/census/readiness/probe work only; no native Draw* routing, backend activation, OpenXR transport, localization, other backend branch, or release payload changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R158 input-layout/live-IA stride lineage and fresh-audit current HEAD for the next independent dormant DX11 semantics gap without duplicating R152-R158 work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R160 BORDER provenance and fresh-audit current HEAD for the next independent dormant DX11 semantic/compatibility gap, avoiding concurrent R161+ work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
-    "native_draw_path_activation_changed": false,
-    "native_game_draw_routing": false,
-    "openxr_transport_changed": false,
-    "dxvk_lane_modified": false,
-    "localization_modified": false,
-    "other_backend_modified": false
+    "native_draw_path_active_changed": false,
+    "other_backend_branch_changed": false,
+    "localization_changed": false
   },
-  "issue14_comment_id": 5948076533,
-  "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_SOURCE_GRAPH_AND_CENSUS_CONFIGURE_IN_PROGRESS_COMPILE_NOT_CLAIMED",
-  "blocker": "Full Win32 compile/build and Quest 3/VDXR runtime validation are not claimed. Post-rename retaining-descendant GitHub DX11 source-graph and census static gates passed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Preserve R158 input-layout/live-IA stride lineage and fresh-audit current HEAD for the next independent dormant DX11 semantics gap without duplicating R152-R158 work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5948211572,
+  "automation_validation": "PASS_GITHUB_AUTHORITATIVE_STATIC_CONTRACT_RETENTION_ACTIONS_CANCELLED_BY_BRANCH_CHURN_COMPILE_NOT_CLAIMED",
+  "blocker": null,
+  "next_action": "Keep NativeDrawPathActive disabled. Preserve R160 BORDER provenance and fresh-audit current HEAD for the next independent dormant DX11 semantic/compatibility gap, avoiding concurrent R161+ work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "prior_completed_unit": "DX11_INDEXED_FAN_VERTEX_CAPACITY_R156",
-  "validation_issue14_comment_id": 5948053649,
-  "followup_disambiguation_sha": "69f5ef459e47da85999e506ff54bc6d7a4d8fbba",
-  "completed_supporting_repairs": [
-    {
-      "id": "DX11_R156_INDEXED_FAN_CAPACITY_FIXTURE_REPAIR",
-      "material_result_sha": "72abb66e109f4409ac41ce1f3c0c45ea28684bad",
-      "base_sha": "cd823563f92fef892190ce294184dac89892748f",
-      "summary": "Repaired the R156 hosted indexed-fan capacity fixture: observed max 9 makes BaseVertexLocation -3 end at byte 168 within the 256-byte managed VB, while the +1 overrun case ends at byte 264 and fails closed. The source-graph verifier now guards this exact boundary.",
-      "changed_paths": [
-        "tools/dx11_constant_buffer_probe.cpp",
-        "tools/verify_dx11_source_graph.py"
-      ],
-      "stages": {
-        "C0_RECOVER": {
-          "status": "COMPLETE",
-          "evidence": [
-            "Recovered current GitHub branch/state and tracked same-branch concurrent work.",
-            "Read regression knowledge/history and production ledger before write."
-          ]
-        },
-        "C1_REVIEW": {
-          "status": "COMPLETE",
-          "evidence": [
-            "Prior positive fixture implied (16 - 3 + 1) * 24 = 336 bytes against a 256-byte managed VB, contradicting its expected vertexBufferRangeExact=true."
-          ]
-        },
-        "C2_IMPLEMENT": {
-          "status": "COMPLETE",
-          "implementation_commits": [
-            "72abb66e109f4409ac41ce1f3c0c45ea28684bad"
-          ],
-          "details": [
-            "Bounded source fixture to observed max 9, kept forged R155 source content distinct, added explicit boundary precondition and source-graph guards."
-          ]
-        },
-        "C3_VALIDATE": {
-          "status": "COMPLETE_STATIC_COMPILE_NOT_CLAIMED",
-          "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_GATES_EXACT_RUN_CANCELLED_BY_BRANCH_CHURN",
-          "evidence": [
-            "Material commit remains in current branch ancestry.",
-            "Retaining descendant Backend Conversion Gate run 36983528196 passed Verify DX11 source graph, dormant activation boundary, native transport, dual-source and census static gates.",
-            "Exact material run 36983455435 was cancelled by branch churn before job details; compile/WARP/probe execution not claimed."
-          ],
-          "runtime_validation": "UNTESTED"
-        },
-        "C4_COMMIT": {
-          "status": "COMPLETE",
-          "required_marker": "[AUTO:CONV-DX11-000001]",
-          "material_commit": "72abb66e109f4409ac41ce1f3c0c45ea28684bad",
-          "issue14_comment_id": 5948106384
-        },
-        "C5_PACKAGE": {
-          "status": "NOT_REQUIRED",
-          "reason": "Test-fixture/source-graph repair only; no runtime draw routing, backend activation, transport, localization, DXVK or release payload changed."
-        },
-        "C6_STATE": {
-          "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
-          "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R158 input-layout/live-IA stride lineage and fresh-audit current HEAD for the next independent dormant DX11 semantics gap without duplicating R152-R158 work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
-        }
-      },
-      "scope_guards": {
-        "native_draw_path_activation_changed": false,
-        "native_game_draw_routing": false,
-        "openxr_transport_changed": false,
-        "dxvk_lane_modified": false,
-        "localization_modified": false,
-        "other_backend_modified": false
-      },
-      "issue14_comment_id": 5948106384,
-      "runtime_validation": "UNTESTED"
-    }
-  ]
+  "prior_completed_unit": "DX11_SAMPLER_MIRROR_ADDRESS_R159"
 }
