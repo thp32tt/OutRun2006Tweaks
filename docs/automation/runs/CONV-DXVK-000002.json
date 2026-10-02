@@ -5097,6 +5097,68 @@
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Exact-decode only complete canonical instructions in validated continuation_61 raw window 0x00183173..0x001831B3. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved.",
       "issue14_final_validation_comment_id": 5948906263
+    },
+    {
+      "unit_id": "DXVK_PREFIXED_DIRECT_BRANCH_DECLARATION_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "df20df24e62766c2a7b1b893c23de8c8322dffdc",
+      "validation_bearing_result_sha": "df20df24e62766c2a7b1b893c23de8c8322dffdc",
+      "commit_message": "test: cover prefixed DXVK direct branches [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Auto-discovered DXVK exact-control-flow verification now decodes legacy-prefixed direct relative branches before BRANCHES census/target comparison, including prefixed rel8 Jcc/JMP/LOOP-family forms, address-size-prefixed rel32 near branches, and operand-size-prefixed rel16 near branches; built-in decoder vectors guard the target math.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub AGENTS/current branch lane/run/work-queue/history and repeatedly refreshed moving same-JOB HEAD; duplicate canonical frontier writes were skipped when concurrent commits won them."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected an independent verifier gap: direct-branch census covered unprefixed rel8/rel32 and E0-E3 forms but could miss valid legacy-prefixed direct relative branches."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material verifier commit df20df24e62766c2a7b1b893c23de8c8322dffdc adds a legacy-prefix-aware direct-branch target decoder, decoder vectors, and routes generic continuation BRANCHES census through it."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact material-SHA DXVK Canonical Disassembly Evidence run 36988321609 job 110778363059 SUCCESS: VR backend disassembly contract: OK, canonical EXE SHA256 matched, analyzer completed and evidence artifact uploaded. Backend Conversion Gate 36988321532 was still in progress at snapshot and is not claimed complete."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commit df20df24e62766c2a7b1b893c23de8c8322dffdc contains [AUTO:CONV-DXVK-000002]; Issue #14 comment 5948893066 records implementation and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier hardening only; no runtime DXVK payload, backend binary, selector, deployment content, or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted supplementally without replacing the newer concurrently advancing canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "df20df24e62766c2a7b1b893c23de8c8322dffdc",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36988321609,
+        "dxvk_disassembly_evidence_job_id": 110778363059,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "artifact_id": 11217404705,
+        "artifact_digest": "sha256:710d54a8937baadefc7f40b370236fb05c14608f386bb40ad6ccab89b66e3fa1",
+        "backend_conversion_gate_run_id": 36988321532,
+        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_CLAIMED",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948893066,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authenticated DXVK canonical frontier and this prefixed-direct-branch census invariant; continue the next independent static/raw/proof unit without promoting function/render/HUD/runtime semantics."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
