@@ -1941,6 +1941,54 @@ compose_fixed_function_indexed_fan_source_content_readiness(
     ID3D11Device* expectedDevice,
     std::uint64_t snapshotToken) noexcept;
 
+
+// R153 live-revalidation hardening closes the stale-snapshot gap after the
+// source-value/IA-format seal. It reobserves the current IA index buffer on the
+// caller's D3D11 context and requires the exact current R119 managed mirror,
+// format and offset before any future DrawIndexed activation. No Draw* is issued.
+struct NativeFixedFunctionIndexedSourceLiveBindingReadiness {
+    bool inputValid{};
+    bool sourceBindingReady{};
+    bool contextMatchesMirror{};
+    bool indexMirrorCurrent{};
+    bool liveIndexBufferExact{};
+    bool liveIndexFormatExact{};
+    bool liveIndexOffsetExact{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    DXGI_FORMAT observedIndexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT observedIndexOffset{};
+    std::uint64_t sourceBindingSnapshotToken{};
+    std::uint64_t indexMirrorSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionIndexedSourceLiveBindingReadiness
+compose_fixed_function_indexed_source_live_binding_readiness(
+    const NativeFixedFunctionIndexedSourceBindingReadiness& sourceBinding,
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    ID3D11DeviceContext* context,
+    const NativeManagedBufferShadow& indexBuffer) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_indexed_source_live_binding_snapshot(
+    const NativeFixedFunctionIndexedSourceBindingReadiness& sourceBinding,
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    ID3D11DeviceContext* context,
+    const NativeManagedBufferShadow& indexBuffer,
+    std::uint64_t snapshotToken) noexcept;
+
 // R148 seals the eventual DrawIndexed tuple for generated triangle fans after
 // the R146 live IA/VS-b0/OM proof. This remains dormant evidence only and does
 // not issue DrawIndexed or enable NativeDrawPathActive.

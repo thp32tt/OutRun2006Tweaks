@@ -4110,6 +4110,85 @@ int main()
                     indexedSourceBinding.snapshotToken),
             "R153 indexed source binding rejects live IA index offset drift");
 
+
+        const auto indexedSourceLiveBinding =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_live_binding_readiness(
+                    indexedSourceBinding, indexedSourceValueLineage,
+                    indexedDirectDispatch, indexedDirectLineage,
+                    indexedSourceRange, indexedGeometryReady,
+                    indexedSourceValues, renderTargetBoundDraw,
+                    d3d.context, managedIndexBuffer);
+        require(
+            indexedSourceLiveBinding.inputValid &&
+            indexedSourceLiveBinding.sourceBindingReady &&
+            indexedSourceLiveBinding.contextMatchesMirror &&
+            indexedSourceLiveBinding.indexMirrorCurrent &&
+            indexedSourceLiveBinding.liveIndexBufferExact &&
+            indexedSourceLiveBinding.liveIndexFormatExact &&
+            indexedSourceLiveBinding.liveIndexOffsetExact &&
+            indexedSourceLiveBinding.componentSnapshotsPresent &&
+            indexedSourceLiveBinding.ready &&
+            indexedSourceLiveBinding.observedIndexFormat ==
+                DXGI_FORMAT_R16_UINT &&
+            indexedSourceLiveBinding.observedIndexOffset == 0u &&
+            indexedSourceLiveBinding.snapshotToken != 0 &&
+            outrun::vr::dx11::
+                validate_fixed_function_indexed_source_live_binding_snapshot(
+                    indexedSourceBinding, indexedSourceValueLineage,
+                    indexedDirectDispatch, indexedDirectLineage,
+                    indexedSourceRange, indexedGeometryReady,
+                    indexedSourceValues, renderTargetBoundDraw,
+                    d3d.context, managedIndexBuffer,
+                    indexedSourceLiveBinding.snapshotToken),
+            "R153 live source binding reobserves current IA index mirror");
+
+        d3d.context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0u);
+        const auto indexedSourceLiveBindingDrift =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_live_binding_readiness(
+                    indexedSourceBinding, indexedSourceValueLineage,
+                    indexedDirectDispatch, indexedDirectLineage,
+                    indexedSourceRange, indexedGeometryReady,
+                    indexedSourceValues, renderTargetBoundDraw,
+                    d3d.context, managedIndexBuffer);
+        require(
+            indexedSourceLiveBindingDrift.inputValid &&
+            indexedSourceLiveBindingDrift.sourceBindingReady &&
+            indexedSourceLiveBindingDrift.contextMatchesMirror &&
+            indexedSourceLiveBindingDrift.indexMirrorCurrent &&
+            !indexedSourceLiveBindingDrift.liveIndexBufferExact &&
+            !indexedSourceLiveBindingDrift.ready &&
+            indexedSourceLiveBindingDrift.snapshotToken == 0 &&
+            !outrun::vr::dx11::
+                validate_fixed_function_indexed_source_live_binding_snapshot(
+                    indexedSourceBinding, indexedSourceValueLineage,
+                    indexedDirectDispatch, indexedDirectLineage,
+                    indexedSourceRange, indexedGeometryReady,
+                    indexedSourceValues, renderTargetBoundDraw,
+                    d3d.context, managedIndexBuffer,
+                    indexedSourceLiveBinding.snapshotToken),
+            "R153 live source binding rejects post-snapshot IA index drift");
+
+        d3d.context->IASetIndexBuffer(
+            managedIndexBuffer.mirror_buffer(), DXGI_FORMAT_R16_UINT, 0u);
+        const auto indexedSourceLiveBindingRestored =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_live_binding_readiness(
+                    indexedSourceBinding, indexedSourceValueLineage,
+                    indexedDirectDispatch, indexedDirectLineage,
+                    indexedSourceRange, indexedGeometryReady,
+                    indexedSourceValues, renderTargetBoundDraw,
+                    d3d.context, managedIndexBuffer);
+        require(
+            indexedSourceLiveBindingRestored.ready &&
+            indexedSourceLiveBindingRestored.liveIndexBufferExact &&
+            indexedSourceLiveBindingRestored.liveIndexFormatExact &&
+            indexedSourceLiveBindingRestored.liveIndexOffsetExact &&
+            indexedSourceLiveBindingRestored.snapshotToken ==
+                indexedSourceLiveBinding.snapshotToken,
+            "R153 live source binding restores deterministic IA identity");
+
         const auto indexedSourceValuesOutOfRange =
             managedIndexBuffer.index_range_readiness(
                 managedIndexReady, D3DFMT_INDEX16, 0u, 6u, 1u, 3u);

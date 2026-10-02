@@ -2511,6 +2511,38 @@ def main() -> None:
             + ", ".join(missing_r151_direct_bound_buffer_capacity)
         )
 
+
+    r153_live_index_binding_contract = [
+        ("struct NativeFixedFunctionIndexedSourceLiveBindingReadiness",
+         NATIVE_BACKEND_HPP, "R153 live IA revalidation identity"),
+        ("compose_fixed_function_indexed_source_live_binding_readiness(",
+         NATIVE_BACKEND_CPP, "R153 live IA revalidation compositor"),
+        ("out.indexMirrorCurrent =", NATIVE_BACKEND_CPP,
+         "R153 current R119 mirror identity"),
+        ("out.liveIndexBufferExact =", NATIVE_BACKEND_CPP,
+         "R153 current IA index-buffer identity"),
+        ("out.liveIndexFormatExact =", NATIVE_BACKEND_CPP,
+         "R153 current IA index-format identity"),
+        ("out.liveIndexOffsetExact =", NATIVE_BACKEND_CPP,
+         "R153 current IA index-offset identity"),
+        ("R153 live source binding reobserves current IA index mirror",
+         CONSTANT_BUFFER_PROBE, "R153 live IA positive proof"),
+        ("R153 live source binding rejects post-snapshot IA index drift",
+         CONSTANT_BUFFER_PROBE, "R153 stale live IA rejection"),
+        ("R153 live source binding restores deterministic IA identity",
+         CONSTANT_BUFFER_PROBE, "R153 live IA restore proof"),
+    ]
+    missing_r153_live_index_binding = [
+        meaning
+        for token, source, meaning in r153_live_index_binding_contract
+        if token not in source
+    ]
+    if missing_r153_live_index_binding:
+        raise SystemExit(
+            "DX11 R153 live index-binding contract drift: "
+            + ", ".join(missing_r153_live_index_binding)
+        )
+
     r154_nonindexed_fan_vertex_capacity_contract = [
         ("bool vertexBufferRangeExact{};", NATIVE_BACKEND_HPP,
          "R154 generated-fan vertex capacity readiness"),
@@ -2648,7 +2680,7 @@ def main() -> None:
             or "validate_fixed_function_indexed_source_value_snapshot(" in runtime_source
             or "compose_fixed_function_indexed_source_binding_readiness(" in runtime_source
             or "validate_fixed_function_indexed_source_binding_snapshot(" in runtime_source
-            or ".index_range_readiness(" in runtime_source
+            or "compose_fixed_function_indexed_source_live_binding_readiness(" in runtime_source\n            or "validate_fixed_function_indexed_source_live_binding_snapshot(" in runtime_source\n            or ".index_range_readiness(" in runtime_source
             or ".validate_index_range_readiness_snapshot(" in runtime_source
             or "compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(" in runtime_source
             or "validate_fixed_function_nonindexed_triangle_fan_draw_dispatch_snapshot(" in runtime_source

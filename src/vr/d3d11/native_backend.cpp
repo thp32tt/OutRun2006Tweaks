@@ -5161,6 +5161,117 @@ bool validate_fixed_function_indexed_source_binding_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+
+NativeFixedFunctionIndexedSourceLiveBindingReadiness
+compose_fixed_function_indexed_source_live_binding_readiness(
+    const NativeFixedFunctionIndexedSourceBindingReadiness& sourceBinding,
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    ID3D11DeviceContext* context,
+    const NativeManagedBufferShadow& indexBuffer) noexcept {
+
+    NativeFixedFunctionIndexedSourceLiveBindingReadiness out{};
+    out.sourceBindingSnapshotToken = sourceBinding.snapshotToken;
+    out.indexMirrorSnapshotToken = sourceValues.mirrorSnapshotToken;
+    out.inputValid =
+        context != nullptr &&
+        sourceBinding.ready &&
+        sourceValues.ready;
+    if (!out.inputValid)
+        return out;
+
+    out.sourceBindingReady =
+        validate_fixed_function_indexed_source_binding_snapshot(
+            sourceValueLineage, dispatch, indexedLineage, sourceRange,
+            geometry, sourceValues, boundDraw, sourceBinding.snapshotToken);
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    out.contextMatchesMirror =
+        contextDevice &&
+        indexBuffer.mirror_device() == contextDevice.Get();
+
+    if (out.contextMatchesMirror) {
+        const auto currentMirror =
+            indexBuffer.mirror_readiness(contextDevice.Get());
+        out.indexMirrorCurrent =
+            currentMirror.ready &&
+            currentMirror.role == ResourceRole::Index &&
+            currentMirror.snapshotToken == sourceValues.mirrorSnapshotToken;
+    }
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer> observedIndexBuffer;
+    context->IAGetIndexBuffer(
+        observedIndexBuffer.ReleaseAndGetAddressOf(),
+        &out.observedIndexFormat, &out.observedIndexOffset);
+    out.liveIndexBufferExact =
+        observedIndexBuffer.Get() == indexBuffer.mirror_buffer();
+    out.liveIndexFormatExact =
+        out.observedIndexFormat == sourceBinding.boundIndexFormat;
+    out.liveIndexOffsetExact =
+        out.observedIndexOffset == sourceBinding.boundIndexOffset;
+    out.componentSnapshotsPresent =
+        sourceBinding.snapshotToken != 0 &&
+        sourceValues.mirrorSnapshotToken != 0;
+    out.ready =
+        out.sourceBindingReady &&
+        out.contextMatchesMirror &&
+        out.indexMirrorCurrent &&
+        out.liveIndexBufferExact &&
+        out.liveIndexFormatExact &&
+        out.liveIndexOffsetExact &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.sourceBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.indexMirrorSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(context)));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(
+                    observedIndexBuffer.Get())));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.observedIndexFormat));
+        token = mix_readiness_snapshot_token(token, out.observedIndexOffset);
+        token = mix_readiness_snapshot_token(token, 0x1531u);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_indexed_source_live_binding_snapshot(
+    const NativeFixedFunctionIndexedSourceBindingReadiness& sourceBinding,
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    ID3D11DeviceContext* context,
+    const NativeManagedBufferShadow& indexBuffer,
+    std::uint64_t snapshotToken) noexcept {
+
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        compose_fixed_function_indexed_source_live_binding_readiness(
+            sourceBinding, sourceValueLineage, dispatch, indexedLineage,
+            sourceRange, geometry, sourceValues, boundDraw, context,
+            indexBuffer);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 bool validate_fixed_function_render_target_bound_draw_readiness_integrity(
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept {
     if (!boundDraw.inputValid ||
