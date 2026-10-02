@@ -273,6 +273,28 @@
       "issue14_implementation_comment_id": 5946872134,
       "scope": "Continuation 35 raw canonical provenance 0x00182B17..0x00182B57 from an exact predecessor instruction boundary; no overlap metadata or semantic promotion.",
       "exact_next_action": "Exact-decode only complete instructions in canonical 0x00182B17..0x00182B57; preserve any trailing partial instruction raw-only and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_CONTINUATION_SUCCESS_TELEMETRY_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "60dddd4d896689f8740b564ef56157c7704ddc9c",
+      "run_record_commit_sha": "cf1b0bf0be683f686900a1219df95bcacdd3a921",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BUILD",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "static_contract": "PASS",
+      "dxvk_disassembly_evidence_run_id": 36974483943,
+      "dxvk_disassembly_evidence_job_id": 110735240895,
+      "dxvk_disassembly_evidence_artifact_id": 11212404711,
+      "dxvk_disassembly_evidence_artifact_digest": "sha256:5a022a69a6f3f501a1ecb735573c8b28015a6bbedba6732d0625bd0d001cb7b9",
+      "backend_conversion_gate_run_id": 36974483982,
+      "backend_conversion_gate_job_id": 110735240966,
+      "backend_conversion_gate_artifact_id": 11213051763,
+      "backend_conversion_gate_artifact_digest": "sha256:adb9c2252f4146861fb3f499efd9ad461bd22beacba320c271ed39754196be1b",
+      "issue14_implementation_comment_id": 5946893824,
+      "scope": "Auto-discovered continuation raw/proof stages must retain canonical analyzer success telemetry as well as report/failure wiring; analyzer source is loaded once for chain verification.",
+      "exact_next_action": "Preserve the newest authoritative primary disassembly frontier; continue only from its current validated/candidate edge without semantic promotion.",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER"
     }
   ]
 }
