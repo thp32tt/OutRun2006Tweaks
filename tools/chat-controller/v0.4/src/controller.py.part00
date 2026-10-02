@@ -1339,13 +1339,13 @@ def conversion_pipeline_status_ok(stage: str, value) -> bool:
     else:
         status = str(value or "").strip().upper()
     allowed = {
-        "C0_RECOVER": {"COMPLETE", "PASS", "DONE"},
-        "C1_REVIEW": {"COMPLETE", "PASS", "DONE"},
-        "C2_IMPLEMENT": {"COMPLETE", "PASS", "DONE", "IMPLEMENTED"},
-        "C3_VALIDATE": {"COMPLETE", "PASS", "DONE"},
-        "C4_COMMIT": {"COMPLETE", "PASS", "DONE"},
-        "C5_PACKAGE": {"COMPLETE", "PASS", "DONE", "NOT_REQUIRED"},
-        "C6_STATE": {"COMPLETE", "PASS", "DONE"},
+        "C0_RECOVER": {"COMPLETE", "PASS", "DONE", "RECOVER", "RECOVERED"},
+        "C1_REVIEW": {"COMPLETE", "PASS", "DONE", "REVIEW", "REVIEWED"},
+        "C2_IMPLEMENT": {"COMPLETE", "PASS", "DONE", "IMPLEMENT", "IMPLEMENTED"},
+        "C3_VALIDATE": {"COMPLETE", "PASS", "DONE", "VALIDATE", "VALIDATED"},
+        "C4_COMMIT": {"COMPLETE", "PASS", "DONE", "COMMIT", "COMMITTED"},
+        "C5_PACKAGE": {"COMPLETE", "PASS", "DONE", "PACKAGE", "PACKAGED", "NOT_REQUIRED"},
+        "C6_STATE": {"COMPLETE", "PASS", "DONE", "STATE", "PERSISTED"},
     }
     return status in allowed.get(stage, set())
 
@@ -1436,12 +1436,25 @@ def conversion_validate_pipeline_result_commit(
         reasons.append(f"PIPELINE_SCHEMA_LT_{CONVERSION_PIPELINE_SCHEMA_VERSION}:{schema}")
 
     pipeline = record.get("pipeline") if isinstance(record.get("pipeline"), dict) else {}
+    legacy_stage_keys = {
+        "C0_RECOVER": "c0",
+        "C1_REVIEW": "c1",
+        "C2_IMPLEMENT": "c2",
+        "C3_VALIDATE": "c3",
+        "C4_COMMIT": "c4",
+        "C5_PACKAGE": "c5",
+        "C6_STATE": "c6",
+    }
+    stage_values = {}
     for stage in CONVERSION_PIPELINE_STAGES:
         value = pipeline.get(stage)
+        if value is None:
+            value = record.get(legacy_stage_keys.get(stage, ""))
+        stage_values[stage] = value
         if not conversion_pipeline_status_ok(stage, value):
             reasons.append(f"PIPELINE_STAGE_{stage}:INCOMPLETE")
 
-    c5 = pipeline.get("C5_PACKAGE")
+    c5 = stage_values.get("C5_PACKAGE")
     c5_status = str(
         (c5.get("status") if isinstance(c5, dict) else c5) or ""
     ).strip().upper()
