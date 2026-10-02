@@ -1141,7 +1141,7 @@ async def queue_send_conversion_execution_continuation(
         "HEAD/AGENTS/상태복구/리뷰/계획은 중간 단계다. 첫 출력부터 연결된 GitHub 도구를 호출해. "
         "PIPELINE_REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(필요 없으면 이유+NOT_REQUIRED)→C6_STATE. "
         "C1에서 발견한 실제 independent work를 C2에서 source/tool/test/workflow/disassembly evidence로 구현하고, C3 검증 후 C4/C6까지 같은 TASK_ID에서 끝내. "
-        "review-only/state-only commit 하나로 종료하지 마. 로컬 개발 PC, RenderDoc, OpenXR runtime 부재는 "
+        "Skill은 직접 도움이 될 때만 사용하고 미노출/부적합은 blocker가 아니다. review-only/state-only commit 하나로 종료하지 마. 로컬 개발 PC, RenderDoc, OpenXR runtime 부재는 "
         "source/static/disassembly/GitHub Actions 작업의 blocker가 아니다. runtime claim만 UNTESTED로 남겨. "
         "docs/automation/runs/<TASK_ID>.json에 pipeline C0-C6, changed_paths/work_product, validation, state_persisted=true, next_action을 기록한 "
         "새 [AUTO:TASK_ID] durable commit까지 진행해. RESULT_SHA=NOT_CREATED/다음 단계 설명만으로 종료하지 마."
