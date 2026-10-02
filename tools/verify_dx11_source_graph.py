@@ -2487,6 +2487,33 @@ def main() -> None:
             + ", ".join(missing_r154_nonindexed_fan_vertex_capacity)
         )
 
+    r155_indexed_fan_source_content_contract = [
+        ("hash_indexed_triangle_fan_window(", NATIVE_BACKEND_HPP,
+         "R155 managed source shadow fan-content hasher"),
+        ("NativeFixedFunctionIndexedFanSourceContentReadiness", NATIVE_BACKEND_HPP,
+         "R155 indexed fan source-content readiness"),
+        ("generated.contentHash == expectedExpandedContentHash", NATIVE_BACKEND_CPP,
+         "R155 generated immutable IB content comparison"),
+        ("out.sourceContentSnapshotToken = sourceContent.snapshotToken;",
+         NATIVE_BACKEND_CPP, "R155 source-content lineage reaches dispatch"),
+        ("R155 indexed fan source content matches exact managed IB shadow",
+         CONSTANT_BUFFER_PROBE, "R155 positive managed-source proof"),
+        ("R155 indexed fan source content rejects borrowed token with foreign bytes",
+         CONSTANT_BUFFER_PROBE, "R155 pointer/token substitution rejection"),
+        ("DX11 indexed fan source content R155: PASS",
+         CONSTANT_BUFFER_PROBE, "R155 hosted probe completion marker"),
+    ]
+    missing_r155_indexed_fan_source_content = [
+        meaning
+        for token, source, meaning in r155_indexed_fan_source_content_contract
+        if token not in source
+    ]
+    if missing_r155_indexed_fan_source_content:
+        raise SystemExit(
+            "DX11 R155 indexed fan source-content contract drift: "
+            + ", ".join(missing_r155_indexed_fan_source_content)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":

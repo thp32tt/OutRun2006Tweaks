@@ -1169,6 +1169,79 @@ NativeManagedBufferShadow::index_range_readiness(
     return out;
 }
 
+bool NativeManagedBufferShadow::hash_indexed_triangle_fan_window(
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount,
+    UINT primitiveCount,
+    std::uint64_t expectedShadowVersion,
+    std::uint64_t& expandedContentHash) const noexcept {
+
+    expandedContentHash = 0;
+    if (!ready() ||
+        role_ != ResourceRole::Index ||
+        !shadow_valid() ||
+        expectedShadowVersion == 0 ||
+        lifetime_.cpuShadowVersion != expectedShadowVersion)
+        return false;
+
+    const auto expansion = translate_triangle_fan_expansion(primitiveCount);
+    if (!expansion.exact ||
+        expansion.sourceElementCount == 0 ||
+        expansion.expandedIndexCount == 0)
+        return false;
+
+    const std::uint64_t elementBytes =
+        sourceIndexFormat == D3DFMT_INDEX16 ? 2ull :
+        sourceIndexFormat == D3DFMT_INDEX32 ? 4ull : 0ull;
+    if (elementBytes == 0 ||
+        startIndex > sourceIndexCount ||
+        expansion.sourceElementCount > sourceIndexCount - startIndex)
+        return false;
+
+    const std::uint64_t declaredBytes =
+        static_cast<std::uint64_t>(sourceIndexCount) * elementBytes;
+    const std::uint64_t firstByte =
+        static_cast<std::uint64_t>(startIndex) * elementBytes;
+    const std::uint64_t requiredBytes =
+        static_cast<std::uint64_t>(expansion.sourceElementCount) * elementBytes;
+    if (declaredBytes > static_cast<std::uint64_t>(byte_width_) ||
+        firstByte > static_cast<std::uint64_t>(byte_width_) ||
+        requiredBytes > static_cast<std::uint64_t>(byte_width_) - firstByte)
+        return false;
+
+    std::uint64_t hash = 0xcbf29ce484222325ull;
+    for (UINT expandedIndex = 0;
+         expandedIndex < expansion.expandedIndexCount;
+         ++expandedIndex) {
+        UINT sourceElement = 0;
+        if (!triangle_fan_source_element(
+                primitiveCount, expandedIndex, sourceElement))
+            return false;
+
+        const std::size_t byteOffset =
+            static_cast<std::size_t>(
+                static_cast<std::uint64_t>(startIndex + sourceElement) *
+                elementBytes);
+        UINT value = 0;
+        if (sourceIndexFormat == D3DFMT_INDEX16) {
+            std::uint16_t value16 = 0;
+            std::memcpy(
+                &value16, shadow_.data() + byteOffset, sizeof(value16));
+            value = value16;
+        } else {
+            std::uint32_t value32 = 0;
+            std::memcpy(
+                &value32, shadow_.data() + byteOffset, sizeof(value32));
+            value = value32;
+        }
+        hash = mix_readiness_snapshot_token(hash, value);
+    }
+
+    expandedContentHash = hash == 0 ? 1 : hash;
+    return true;
+}
+
 bool NativeManagedBufferShadow::validate_index_range_readiness_snapshot(
     const NativeManagedBufferMirrorReadiness& mirror,
     D3DFORMAT sourceIndexFormat,
@@ -5433,6 +5506,90 @@ validate_fixed_function_nonindexed_triangle_fan_draw_dispatch_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+NativeFixedFunctionIndexedFanSourceContentReadiness
+compose_fixed_function_indexed_fan_source_content_readiness(
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    ID3D11Device* expectedDevice) noexcept {
+
+    NativeFixedFunctionIndexedFanSourceContentReadiness out{};
+    const auto generated = generatedIndexBuffer.readiness(expectedDevice);
+    const auto source = sourceIndexBuffer.mirror_readiness(expectedDevice);
+    out.generatedIndexSnapshotToken = generated.snapshotToken;
+    out.sourceIndexSnapshotToken = source.snapshotToken;
+    out.generatedContentHash = generated.contentHash;
+
+    out.inputValid =
+        expectedDevice != nullptr &&
+        generated.ready &&
+        generated.indexedSource &&
+        source.ready &&
+        source.role == ResourceRole::Index;
+    out.generatedIndexReady =
+        generated.ready && generated.snapshotToken != 0;
+    out.sourceIndexReady =
+        source.ready && source.snapshotToken != 0;
+    out.sourceProvenanceMatches =
+        out.inputValid &&
+        generated.sourceIndexSnapshotToken == source.snapshotToken &&
+        generated.sourceIndexFormat != D3DFMT_UNKNOWN;
+
+    std::uint64_t expectedExpandedContentHash = 0;
+    const bool contentHashReady =
+        out.sourceProvenanceMatches &&
+        sourceIndexBuffer.hash_indexed_triangle_fan_window(
+            generated.sourceIndexFormat,
+            generated.sourceStartIndex,
+            generated.sourceIndexCount,
+            generated.primitiveCount,
+            source.shadowVersion,
+            expectedExpandedContentHash);
+    out.expectedExpandedContentHash = expectedExpandedContentHash;
+    out.expandedContentExact =
+        contentHashReady &&
+        expectedExpandedContentHash != 0 &&
+        generated.contentHash == expectedExpandedContentHash;
+    out.componentSnapshotsPresent =
+        generated.snapshotToken != 0 &&
+        source.snapshotToken != 0;
+    out.ready =
+        out.inputValid &&
+        out.generatedIndexReady &&
+        out.sourceIndexReady &&
+        out.sourceProvenanceMatches &&
+        out.expandedContentExact &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.generatedIndexSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceIndexSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.expectedExpandedContentHash);
+        token = mix_readiness_snapshot_token(
+            token, out.generatedContentHash);
+        token = mix_readiness_snapshot_token(token, 0x155u);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_indexed_fan_source_content_snapshot(
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    ID3D11Device* expectedDevice,
+    std::uint64_t snapshotToken) noexcept {
+
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        compose_fixed_function_indexed_fan_source_content_readiness(
+            sourceIndexBuffer, generatedIndexBuffer, expectedDevice);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 NativeFixedFunctionFanDrawDispatchReadiness
 compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
     const NativeFixedFunctionDrawReadiness& draw,
@@ -5471,6 +5628,9 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
     const auto generated = generatedIndexBuffer.readiness(contextDevice.Get());
     const auto currentSource =
         sourceIndexBuffer.mirror_readiness(contextDevice.Get());
+    const auto sourceContent =
+        compose_fixed_function_indexed_fan_source_content_readiness(
+            sourceIndexBuffer, generatedIndexBuffer, contextDevice.Get());
 
     out.primitiveCount = primitiveCount;
     out.indexCount = generated.indexCount;
@@ -5479,15 +5639,17 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
     out.finalFanBoundDrawSnapshotToken = finalBound.snapshotToken;
     out.generatedIndexSnapshotToken = generated.snapshotToken;
     out.sourceIndexSnapshotToken = currentSource.snapshotToken;
+    out.sourceContentSnapshotToken = sourceContent.snapshotToken;
     out.inputValid =
         context != nullptr && contextDevice.Get() != nullptr &&
         finalBound.inputValid && generated.deviceMatches &&
-        currentSource.inputValid;
+        currentSource.inputValid && sourceContent.inputValid;
     out.finalFanBoundDrawReady =
         finalBound.ready && finalBound.snapshotToken != 0;
     out.generatedIndexReady =
         generated.ready && generated.snapshotToken != 0 &&
-        currentSource.ready && currentSource.snapshotToken != 0;
+        currentSource.ready && currentSource.snapshotToken != 0 &&
+        sourceContent.ready && sourceContent.snapshotToken != 0;
 
     const UINT maxValue = std::numeric_limits<UINT>::max();
     const bool countExact =
@@ -5502,13 +5664,17 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
         generated.sourceIndexCount == sourceIndexCount &&
         generated.sourceIndexSnapshotToken != 0 &&
         generated.sourceIndexSnapshotToken == currentSource.snapshotToken &&
+        sourceContent.generatedIndexSnapshotToken == generated.snapshotToken &&
+        sourceContent.sourceIndexSnapshotToken == currentSource.snapshotToken &&
+        sourceContent.expandedContentExact &&
         countExact;
     out.dispatchArgumentsExact =
         out.generatedIndexMatchesDispatch && out.startIndexLocation == 0u;
     out.componentSnapshotsPresent =
         finalBound.snapshotToken != 0 &&
         generated.snapshotToken != 0 &&
-        currentSource.snapshotToken != 0;
+        currentSource.snapshotToken != 0 &&
+        sourceContent.snapshotToken != 0;
     out.ready =
         out.inputValid && out.finalFanBoundDrawReady &&
         out.generatedIndexReady && out.generatedIndexMatchesDispatch &&
@@ -5521,6 +5687,8 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
             token, out.generatedIndexSnapshotToken);
         token = mix_readiness_snapshot_token(
             token, out.sourceIndexSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceContentSnapshotToken);
         token = mix_readiness_snapshot_token(token, primitiveCount);
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint32_t>(sourceIndexFormat));

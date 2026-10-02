@@ -4573,10 +4573,21 @@ int main()
                 liveFanOwner, 3u, 7u, completeFanBoundDraw.snapshotToken),
         "R142 complete fan bound draw restores deterministic live IA snapshot");
 
-    const auto liveIndexedSourceReady =
-        managedIndexBuffer.mirror_readiness(d3d.device);
     const std::array<std::uint16_t, 5> liveIndexedFanSource{
         99u, 4u, 8u, 15u, 16u};
+    NativeManagedBufferShadow liveIndexedFanSourceBuffer;
+    require(
+        liveIndexedFanSourceBuffer.initialize(
+            ResourceRole::Index,
+            static_cast<UINT>(sizeof(liveIndexedFanSource)),
+            0) &&
+        liveIndexedFanSourceBuffer.write_range(
+            0, liveIndexedFanSource.data(),
+            static_cast<UINT>(sizeof(liveIndexedFanSource))) &&
+        liveIndexedFanSourceBuffer.recreate_and_upload_mirror(d3d.device),
+        "R155 indexed fan managed source prerequisite");
+    const auto liveIndexedSourceReady =
+        liveIndexedFanSourceBuffer.mirror_readiness(d3d.device);
     NativeTriangleFanIndexBuffer liveIndexedFanOwner;
     require(
         liveIndexedSourceReady.ready &&
@@ -4589,6 +4600,47 @@ int main()
         "R144 indexed generated fan owner prerequisite");
     const auto liveIndexedFanOwnerReady =
         liveIndexedFanOwner.readiness(d3d.device);
+    const auto liveIndexedFanSourceContent =
+        outrun::vr::dx11::compose_fixed_function_indexed_fan_source_content_readiness(
+            liveIndexedFanSourceBuffer, liveIndexedFanOwner, d3d.device);
+    require(
+        liveIndexedFanSourceContent.inputValid &&
+        liveIndexedFanSourceContent.generatedIndexReady &&
+        liveIndexedFanSourceContent.sourceIndexReady &&
+        liveIndexedFanSourceContent.sourceProvenanceMatches &&
+        liveIndexedFanSourceContent.expandedContentExact &&
+        liveIndexedFanSourceContent.componentSnapshotsPresent &&
+        liveIndexedFanSourceContent.ready &&
+        liveIndexedFanSourceContent.expectedExpandedContentHash ==
+            liveIndexedFanOwnerReady.contentHash &&
+        liveIndexedFanSourceContent.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_fixed_function_indexed_fan_source_content_snapshot(
+            liveIndexedFanSourceBuffer, liveIndexedFanOwner, d3d.device,
+            liveIndexedFanSourceContent.snapshotToken),
+        "R155 indexed fan source content matches exact managed IB shadow");
+
+    const std::array<std::uint16_t, 5> forgedIndexedFanSource{
+        99u, 4u, 8u, 15u, 17u};
+    NativeTriangleFanIndexBuffer forgedIndexedFanOwner;
+    require(
+        forgedIndexedFanOwner.initialize_indexed(
+            d3d.device, 2u, D3DFMT_INDEX16, 1u,
+            forgedIndexedFanSource.data(),
+            static_cast<UINT>(forgedIndexedFanSource.size()),
+            liveIndexedSourceReady.snapshotToken),
+        "R155 forged indexed fan owner prerequisite");
+    const auto forgedIndexedFanSourceContent =
+        outrun::vr::dx11::compose_fixed_function_indexed_fan_source_content_readiness(
+            liveIndexedFanSourceBuffer, forgedIndexedFanOwner, d3d.device);
+    require(
+        forgedIndexedFanSourceContent.inputValid &&
+        forgedIndexedFanSourceContent.generatedIndexReady &&
+        forgedIndexedFanSourceContent.sourceIndexReady &&
+        forgedIndexedFanSourceContent.sourceProvenanceMatches &&
+        !forgedIndexedFanSourceContent.expandedContentExact &&
+        !forgedIndexedFanSourceContent.ready &&
+        forgedIndexedFanSourceContent.snapshotToken == 0,
+        "R155 indexed fan source content rejects borrowed token with foreign bytes");
     const auto liveIndexedFanGeometryReady =
         outrun::vr::dx11::
             compose_fixed_function_indexed_triangle_fan_geometry_readiness(
@@ -4629,7 +4681,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation);
@@ -4656,7 +4708,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation,
@@ -4670,7 +4722,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
@@ -4693,7 +4745,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
@@ -4710,7 +4762,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
@@ -4728,7 +4780,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
@@ -4749,7 +4801,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
@@ -4767,7 +4819,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
@@ -4784,7 +4836,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
@@ -4799,7 +4851,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation + 1,
@@ -4813,7 +4865,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX32, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation);
@@ -4834,7 +4886,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
@@ -4855,6 +4907,8 @@ int main()
             indexedFanBaseVertexLocation &&
         indexedFanDispatch.sourceIndexSnapshotToken ==
             liveIndexedSourceReady.snapshotToken &&
+        indexedFanDispatch.sourceContentSnapshotToken ==
+            liveIndexedFanSourceContent.snapshotToken &&
         indexedFanDispatch.snapshotToken != 0 &&
         outrun::vr::dx11::
             validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(
@@ -4862,7 +4916,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation, transform, surfaceTargetBinding,
@@ -4876,7 +4930,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
                 indexedFanBaseVertexLocation + 1, transform,
@@ -5395,6 +5449,7 @@ int main()
     std::cout << "DX11 fixed-function SO/predication isolation R148: PASS\n";
     std::cout << "DX11 direct bound-buffer capacity R151: PASS\n";
     std::cout << "DX11 indexed source binding R153: PASS\n";
+    std::cout << "DX11 indexed fan source content R155: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
     std::cout << "DX11 texture mutation readiness R100: PASS\n";

@@ -358,6 +358,16 @@ public:
         return byte_width_;
     }
 
+    // R155 hashes the exact indexed triangle-fan expansion implied by the
+    // current MANAGED index CPU shadow. No raw shadow pointer escapes.
+    [[nodiscard]] bool hash_indexed_triangle_fan_window(
+        D3DFORMAT sourceIndexFormat,
+        UINT startIndex,
+        UINT sourceIndexCount,
+        UINT primitiveCount,
+        std::uint64_t expectedShadowVersion,
+        std::uint64_t& expandedContentHash) const noexcept;
+
     [[nodiscard]] bool mirror_descriptor_exact(
         ID3D11Device* expectedDevice) const noexcept;
     [[nodiscard]] NativeManagedBufferMirrorReadiness mirror_readiness(
@@ -1897,6 +1907,37 @@ compose_fixed_function_indexed_source_binding_readiness(
     const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
     std::uint64_t snapshotToken) noexcept;
 
+// R155 proves that an indexed triangle-fan's generated immutable IB was
+// materialized from the exact current MANAGED source-IB CPU shadow, rather than
+// from an unrelated pointer carrying a borrowed mirror snapshot token. This is
+// dormant provenance evidence only and never issues DrawIndexed.
+struct NativeFixedFunctionIndexedFanSourceContentReadiness {
+    bool inputValid{};
+    bool generatedIndexReady{};
+    bool sourceIndexReady{};
+    bool sourceProvenanceMatches{};
+    bool expandedContentExact{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t generatedIndexSnapshotToken{};
+    std::uint64_t sourceIndexSnapshotToken{};
+    std::uint64_t expectedExpandedContentHash{};
+    std::uint64_t generatedContentHash{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionIndexedFanSourceContentReadiness
+compose_fixed_function_indexed_fan_source_content_readiness(
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    ID3D11Device* expectedDevice) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_indexed_fan_source_content_snapshot(
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    ID3D11Device* expectedDevice,
+    std::uint64_t snapshotToken) noexcept;
+
 // R148 seals the eventual DrawIndexed tuple for generated triangle fans after
 // the R146 live IA/VS-b0/OM proof. This remains dormant evidence only and does
 // not issue DrawIndexed or enable NativeDrawPathActive.
@@ -1920,6 +1961,7 @@ struct NativeFixedFunctionFanDrawDispatchReadiness {
     std::uint64_t finalFanBoundDrawSnapshotToken{};
     std::uint64_t generatedIndexSnapshotToken{};
     std::uint64_t sourceIndexSnapshotToken{};
+    std::uint64_t sourceContentSnapshotToken{};
     std::uint64_t snapshotToken{};
 };
 
