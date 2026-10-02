@@ -1584,7 +1584,7 @@ def queue_dynamic_prefix() -> str:
     if CONTROLLER_MODE == "conversion":
         lines += [
             f"VR_PIPELINE_SCHEMA={CONVERSION_PIPELINE_SCHEMA_VERSION}; REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(or reasoned NOT_REQUIRED)→C6_STATE.",
-            "RELEASE=full pipeline only; review/plan/state-only or one checkpoint is nonterminal. C2 needs substantive source/tool/test/workflow/disassembly evidence; runtime absence only keeps runtime=UNTESTED.",
+            "RELEASE=full pipeline only; review/plan/state/checkpoint is nonterminal. C2 needs source/tool/test/workflow/disassembly work; runtime absence only keeps runtime=UNTESTED.",
             "RUN_RECORD=docs/automation/runs/<TASK_ID>.json with pipeline_schema_version, pipeline C0-C6, changed_paths/work_product, validation, state_persisted=true, next_action, runtime_validation.",
             conversion_lane_work_hint(branch),
         ]
