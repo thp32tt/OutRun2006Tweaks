@@ -596,6 +596,8 @@ set(outrun2006tweaks_SOURCES
 	"src/vr/d3d11/pipeline_translation.hpp"
 	"src/vr/d3d11/resource_translation.cpp"
 	"src/vr/d3d11/resource_translation.hpp"
+	"src/vr/d3d11/surface_mirror.cpp"
+	"src/vr/d3d11/surface_mirror.hpp"
 	"src/vr/d3d11/runtime_census.cpp"
 	"src/vr/d3d11/runtime_census.hpp"
 	"src/vr/d3d11/startup_census.cpp"
@@ -984,4 +986,34 @@ target_link_libraries(dx11_native_transport_probe PUBLIC
     d3d11.lib
     dxgi.lib
     dxguid.lib
+)
+
+# Target: dx11_surface_mirror_probe
+set(dx11_surface_mirror_probe_SOURCES
+    "tools/dx11_surface_mirror_probe.cpp"
+    "src/vr/d3d11/surface_mirror.cpp"
+    "src/vr/d3d11/resource_translation.cpp"
+)
+
+add_executable(dx11_surface_mirror_probe)
+
+target_sources(dx11_surface_mirror_probe PRIVATE ${dx11_surface_mirror_probe_SOURCES})
+
+target_compile_features(dx11_surface_mirror_probe PUBLIC
+    cxx_std_20
+)
+
+target_compile_options(dx11_surface_mirror_probe PUBLIC
+    "/GS"
+    "/utf-8"
+)
+
+target_include_directories(dx11_surface_mirror_probe PUBLIC
+    "src/"
+    "shared/"
+    "include/"
+)
+
+target_link_libraries(dx11_surface_mirror_probe PUBLIC
+    d3d11.lib
 )

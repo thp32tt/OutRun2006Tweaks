@@ -460,3 +460,15 @@ include-directories = ["src/", "shared/", "include/"]
 compile-options = ["/GS", "/utf-8"]
 compile-features = ["cxx_std_20"]
 link-libraries = ["d3d11.lib", "dxgi.lib", "dxguid.lib"]
+
+[target.dx11_surface_mirror_probe]
+type = "executable"
+sources = [
+    "tools/dx11_surface_mirror_probe.cpp",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3d11.lib"]

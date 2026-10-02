@@ -33,6 +33,15 @@ SHADER_LINKAGE_PROBE = (
 CONSTANT_BUFFER_PROBE = (
     ROOT / "tools" / "dx11_constant_buffer_probe.cpp"
 ).read_text(encoding="utf-8")
+SURFACE_MIRROR_HPP = (
+    ROOT / "src" / "vr" / "d3d11" / "surface_mirror.hpp"
+).read_text(encoding="utf-8")
+SURFACE_MIRROR_CPP = (
+    ROOT / "src" / "vr" / "d3d11" / "surface_mirror.cpp"
+).read_text(encoding="utf-8")
+SURFACE_MIRROR_PROBE = (
+    ROOT / "tools" / "dx11_surface_mirror_probe.cpp"
+).read_text(encoding="utf-8")
 PIPELINE_TRANSLATION_HPP = (
     ROOT / "src" / "vr" / "d3d11" / "pipeline_translation.hpp"
 ).read_text(encoding="utf-8")
@@ -266,6 +275,57 @@ def main() -> None:
             "DX11 R73 resource behavior contract drift: "
             + ", ".join(missing_resource_contract)
         )
+
+    surface_mirror_contract_text = SURFACE_MIRROR_HPP + "\n" + SURFACE_MIRROR_CPP
+    surface_mirror_contract = {
+        "class NativeSurfaceMirror": "dedicated dormant RT/depth mirror owner",
+        "ResourceRole::Color": "render-target role gate",
+        "ResourceRole::DepthStencil": "depth-stencil role gate",
+        "ResourceMirrorLifetime::DeviceGeneration": "Reset-bound surface lifetime",
+        "D3DMULTISAMPLE_NONE": "unproven MSAA remains fail-closed",
+        "CreateTexture2D": "concrete D3D11 surface mirror allocation",
+        "CreateRenderTargetView": "concrete RTV ownership",
+        "CreateDepthStencilView": "concrete DSV ownership",
+        "observe_device_reset": "Reset invalidation transition",
+        "mirror_generation_ != device_generation_": "stale generation readiness gate",
+        "descriptor_exact": "concrete descriptor/view identity verifier",
+    }
+    missing_surface_mirror_contract = [
+        meaning
+        for token, meaning in surface_mirror_contract.items()
+        if token not in surface_mirror_contract_text
+    ]
+    if "NativeDrawPathActive" in surface_mirror_contract_text:
+        missing_surface_mirror_contract.append(
+            "surface mirror must not activate native Draw* routing"
+        )
+    for graph_text, graph_name in (
+        (CMAKE, "checked-in CMake"),
+        (CMAKE_TOML, "cmake.toml"),
+        (BACKEND_GATE, "backend conversion gate"),
+    ):
+        if "dx11_surface_mirror_probe" not in graph_text:
+            missing_surface_mirror_contract.append(
+                f"{graph_name} omits dx11_surface_mirror_probe"
+            )
+    probe_contract = {
+        "D3D_DRIVER_TYPE_WARP": "CI-safe software D3D11 device",
+        "color.observe_device_reset();": "Reset invalidation smoke",
+        "color.recreate(device.Get())": "post-Reset recreation smoke",
+        "D3DPOOL_MANAGED": "MANAGED RT negative smoke",
+        "D3DMULTISAMPLE_2_SAMPLES": "MSAA fail-closed negative smoke",
+    }
+    missing_surface_mirror_contract += [
+        meaning
+        for token, meaning in probe_contract.items()
+        if token not in SURFACE_MIRROR_PROBE
+    ]
+    if missing_surface_mirror_contract:
+        raise SystemExit(
+            "DX11 dormant surface-mirror contract drift: "
+            + ", ".join(missing_surface_mirror_contract)
+        )
+
 
     dual_source_blend_contract = {
         "case D3DBLEND_SRCCOLOR2: return {D3D11_BLEND_SRC1_COLOR, false};":
