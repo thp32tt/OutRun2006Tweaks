@@ -4318,11 +4318,11 @@
         },
         "C3_VALIDATE": {
           "status": "COMPLETE",
-          "evidence": "DXVK Canonical Disassembly Evidence run 36986121318 job 110771431774 succeeded on exact material SHA. Backend Conversion Gate run 36986121305 passed all static/test/configure stages and was building Win32 at state write; no build or runtime claim is required for this static proof."
+          "evidence": "DXVK Canonical Disassembly Evidence run 36986121318 job 110771431774 succeeded on exact material SHA; Backend Conversion Gate run 36986121305 job 110771431636 also completed success on exact material SHA, including all static/tests, Win32 configure/build, binary verification and artifact upload."
         },
         "C4_COMMIT": {
           "status": "COMPLETE",
-          "evidence": "Substantive material commit fea0ec49d13a3e6cb8822a0741af8aeb39b29aa9 contains [AUTO:CONV-DXVK-000002]; Issue #14 comment 5948511475 appended."
+          "evidence": "Substantive material commit fea0ec49d13a3e6cb8822a0741af8aeb39b29aa9 contains [AUTO:CONV-DXVK-000002]; Issue #14 comments 5948511475 and 5948571318 persist implementation plus final exact-SHA validation."
         },
         "C5_PACKAGE": {
           "status": "NOT_REQUIRED",
@@ -4335,7 +4335,7 @@
         }
       },
       "validation": {
-        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BUILD",
         "exact_sha": "fea0ec49d13a3e6cb8822a0741af8aeb39b29aa9",
         "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
         "dxvk_disassembly_evidence_run_id": 36986121318,
@@ -4358,8 +4358,11 @@
         "incomplete_rva": "0x001830B3",
         "incomplete_bytes": "66 0f 54 05 50 91 61",
         "backend_conversion_gate_run_id": 36986121305,
-        "backend_conversion_gate_status_at_state_write": "STATIC_TEST_CONFIGURE_PASS_WIN32_BUILD_IN_PROGRESS_NOT_REQUIRED",
-        "runtime_validation": "UNTESTED"
+        "backend_conversion_gate_status_at_state_write": "SUCCESS_EXACT_SHA",
+        "runtime_validation": "UNTESTED",
+        "backend_conversion_gate_job_id": 110771431636,
+        "backend_conversion_gate_artifact_id": 11217901601,
+        "backend_conversion_gate_artifact_digest": "sha256:d7a5928ac5fe9b82a12fe78577b5e7de4d97569893a7ea4ba812eb1078a8bea0"
       },
       "issue14_implementation_comment_id": 5948511475,
       "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
@@ -4367,7 +4370,8 @@
       "semantic_promotion": "NONE",
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
-      "exact_next_action": "Preserve any newer branch-authoritative frontier. If this remains the newest proof edge, capture canonical bytes from 0x001830B3 with mandatory 66 0f 54 05 50 91 61 overlap, validate provenance, then exact-decode only complete instructions; keep function/render/HUD/runtime semantics unresolved."
+      "exact_next_action": "Preserve any newer branch-authoritative frontier. If this remains the newest proof edge, capture canonical bytes from 0x001830B3 with mandatory 66 0f 54 05 50 91 61 overlap, validate provenance, then exact-decode only complete instructions; keep function/render/HUD/runtime semantics unresolved.",
+      "issue14_validation_comment_id": 5948571318
     },
     {
       "unit_id": "DXVK_F49_CANONICAL_EXE_PROVENANCE_0x1830B3_TO_0x1830F3",
