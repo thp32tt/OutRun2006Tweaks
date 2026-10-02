@@ -15,6 +15,9 @@ namespace OutRunVR::DrawState
         DWORD destBlend = D3DBLEND_ZERO;
         DWORD blendOp = D3DBLENDOP_ADD;
         DWORD separateAlphaBlendEnable = FALSE;
+        DWORD srcBlendAlpha = D3DBLEND_ONE;
+        DWORD destBlendAlpha = D3DBLEND_ZERO;
+        DWORD blendOpAlpha = D3DBLENDOP_ADD;
 
         DWORD alphaTestEnable = FALSE;
         DWORD alphaRef = 0;

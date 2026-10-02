@@ -18,6 +18,7 @@ namespace
     using outrun::vr::dx11::FixedFunctionUnsupportedStageChain;
     using outrun::vr::dx11::FixedFunctionUnsupportedTextureTransform;
     using outrun::vr::dx11::PipelineUnsupportedBlend;
+    using outrun::vr::dx11::PipelineUnsupportedSeparateAlphaBlend;
     using outrun::vr::dx11::PipelineUnsupportedStencil;
     using outrun::vr::dx11::compile_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::translate_pipeline;
@@ -198,6 +199,68 @@ int main()
         require(
             rt.DestBlend == D3D11_BLEND_INV_SRC1_COLOR,
             "INVSRCCOLOR2 destination blend mapping drifted");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.alphaBlendEnable = TRUE;
+        state.srcBlend = D3DBLEND_SRCALPHA;
+        state.destBlend = D3DBLEND_INVSRCALPHA;
+        state.separateAlphaBlendEnable = TRUE;
+        state.srcBlendAlpha = D3DBLEND_SRCCOLOR;
+        state.destBlendAlpha = D3DBLEND_INVDESTCOLOR;
+        state.blendOpAlpha = D3DBLENDOP_REVSUBTRACT;
+
+        const auto translated = translate_pipeline(state);
+        const auto& rt = translated.blend.RenderTarget[0];
+        require(
+            (translated.unsupported & PipelineUnsupportedSeparateAlphaBlend) == 0,
+            "separate alpha blend did not translate exactly");
+        require(
+            rt.SrcBlendAlpha == D3D11_BLEND_SRC_ALPHA &&
+            rt.DestBlendAlpha == D3D11_BLEND_INV_DEST_ALPHA &&
+            rt.BlendOpAlpha == D3D11_BLEND_OP_REV_SUBTRACT,
+            "separate alpha blend factors or operation drifted");
+        require(
+            rt.SrcBlend == D3D11_BLEND_SRC_ALPHA &&
+            rt.DestBlend == D3D11_BLEND_INV_SRC_ALPHA,
+            "separate alpha translation changed RGB blend factors");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.alphaBlendEnable = TRUE;
+        state.separateAlphaBlendEnable = TRUE;
+        state.srcBlendAlpha = D3DBLEND_BOTHSRCALPHA;
+
+        const auto translated = translate_pipeline(state);
+        require(
+            (translated.unsupported & PipelineUnsupportedSeparateAlphaBlend) != 0,
+            "legacy BOTH shortcut must fail closed in separate alpha state");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.alphaBlendEnable = FALSE;
+        state.separateAlphaBlendEnable = TRUE;
+        state.srcBlend = D3DBLEND_ONE;
+        state.destBlend = D3DBLEND_ZERO;
+        state.srcBlendAlpha = D3DBLEND_SRCCOLOR2;
+        state.destBlendAlpha = D3DBLEND_INVSRCCOLOR2;
+
+        const auto translated = translate_pipeline(state);
+        const auto& rt = translated.blend.RenderTarget[0];
+        require(
+            (translated.unsupported & PipelineUnsupportedSeparateAlphaBlend) == 0,
+            "disabled alpha blending must ignore separate alpha state");
+        require(
+            rt.SrcBlendAlpha == rt.SrcBlend &&
+            rt.DestBlendAlpha == rt.DestBlend &&
+            rt.BlendOpAlpha == rt.BlendOp,
+            "disabled separate alpha state did not retain valid mirrored descriptor");
     }
 
     {

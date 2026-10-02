@@ -23,6 +23,39 @@ namespace outrun::vr::dx11
             return mask;
         }
 
+        TranslationResult<D3D11_BLEND> translate_separate_alpha_blend_factor(
+            D3DBLEND value) noexcept
+        {
+            // D3D9 blend factors are RGBA vectors. For the independent alpha
+            // equation only the alpha component matters, while D3D11 forbids
+            // *_COLOR enums in SrcBlendAlpha/DestBlendAlpha. Canonicalize
+            // those vector-equivalent factors instead of rejecting an exact
+            // D3D9 state. Legacy BOTH* shortcuts are valid only for
+            // D3DRS_SRCBLEND, and SRC*COLOR2 has no defined alpha component,
+            // so translate_blend() deliberately keeps those fail-closed.
+            switch (value)
+            {
+            case D3DBLEND_SRCCOLOR:
+            case D3DBLEND_SRCALPHA:
+                return { D3D11_BLEND_SRC_ALPHA, true };
+            case D3DBLEND_INVSRCCOLOR:
+            case D3DBLEND_INVSRCALPHA:
+                return { D3D11_BLEND_INV_SRC_ALPHA, true };
+            case D3DBLEND_DESTCOLOR:
+            case D3DBLEND_DESTALPHA:
+                return { D3D11_BLEND_DEST_ALPHA, true };
+            case D3DBLEND_INVDESTCOLOR:
+            case D3DBLEND_INVDESTALPHA:
+                return { D3D11_BLEND_INV_DEST_ALPHA, true };
+            case D3DBLEND_SRCALPHASAT:
+                // Its D3D9 alpha component is exactly 1, matching the D3D11
+                // SRC_ALPHA_SAT alpha factor.
+                return { D3D11_BLEND_SRC_ALPHA_SAT, true };
+            default:
+                return translate_blend(value);
+            }
+        }
+
         struct DeclTypeTranslation
         {
             DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
@@ -1144,8 +1177,24 @@ namespace outrun::vr::dx11
             (!srcBlend.exact || !dstBlend.exact || !blendOp.exact))
             out.unsupported |= PipelineUnsupportedBlend;
 
-        if (source.separateAlphaBlendEnable != FALSE)
-            out.unsupported |= PipelineUnsupportedSeparateAlphaBlend;
+        if (rt.BlendEnable && source.separateAlphaBlendEnable != FALSE)
+        {
+            const auto srcBlendAlpha = translate_separate_alpha_blend_factor(
+                static_cast<D3DBLEND>(source.srcBlendAlpha));
+            const auto dstBlendAlpha = translate_separate_alpha_blend_factor(
+                static_cast<D3DBLEND>(source.destBlendAlpha));
+            const auto blendOpAlpha = translate_blend_op(
+                static_cast<D3DBLENDOP>(source.blendOpAlpha));
+
+            rt.SrcBlendAlpha = srcBlendAlpha.value;
+            rt.DestBlendAlpha = dstBlendAlpha.value;
+            rt.BlendOpAlpha = blendOpAlpha.value;
+            if (!srcBlendAlpha.exact || !dstBlendAlpha.exact ||
+                !blendOpAlpha.exact)
+            {
+                out.unsupported |= PipelineUnsupportedSeparateAlphaBlend;
+            }
+        }
 
         if (source.zEnable == D3DZB_USEW)
             out.unsupported |= PipelineUnsupportedWBuffer;

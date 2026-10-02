@@ -356,6 +356,56 @@ def main() -> None:
             + ", ".join(missing_triangle_fan_expansion_contract)
         )
 
+    separate_alpha_snapshot_contract = {
+        "DWORD srcBlendAlpha = D3DBLEND_ONE;": "separate alpha source factor snapshot",
+        "DWORD destBlendAlpha = D3DBLEND_ZERO;": "separate alpha destination factor snapshot",
+        "DWORD blendOpAlpha = D3DBLENDOP_ADD;": "separate alpha operation snapshot",
+    }
+    missing_separate_alpha_contract = [
+        meaning
+        for token, meaning in separate_alpha_snapshot_contract.items()
+        if token not in D3D9_DRAW_STATE_HPP
+    ]
+    separate_alpha_capture_contract = {
+        "read(D3DRS_SRCBLENDALPHA, out.srcBlendAlpha);": "capture separate alpha source factor",
+        "read(D3DRS_DESTBLENDALPHA, out.destBlendAlpha);": "capture separate alpha destination factor",
+        "read(D3DRS_BLENDOPALPHA, out.blendOpAlpha);": "capture separate alpha operation",
+    }
+    missing_separate_alpha_contract += [
+        meaning
+        for token, meaning in separate_alpha_capture_contract.items()
+        if token not in D3D9_RENDER_STATE_CAPTURE
+    ]
+    separate_alpha_translation_contract = {
+        "translate_separate_alpha_blend_factor": "alpha-component blend-factor canonicalization",
+        "case D3DBLEND_SRCCOLOR:": "D3D9 source-color alpha-component handling",
+        "return { D3D11_BLEND_SRC_ALPHA, true };": "D3D11 alpha-safe source factor",
+        "rt.SrcBlendAlpha = srcBlendAlpha.value;": "separate alpha source descriptor",
+        "rt.DestBlendAlpha = dstBlendAlpha.value;": "separate alpha destination descriptor",
+        "rt.BlendOpAlpha = blendOpAlpha.value;": "separate alpha operation descriptor",
+        "PipelineUnsupportedSeparateAlphaBlend": "fail-closed separate alpha gate",
+    }
+    missing_separate_alpha_contract += [
+        meaning
+        for token, meaning in separate_alpha_translation_contract.items()
+        if token not in PIPELINE_TRANSLATION_CPP
+    ]
+    separate_alpha_semantic_contract = {
+        "separate alpha blend did not translate exactly": "positive separate-alpha semantic smoke",
+        "legacy BOTH shortcut must fail closed in separate alpha state": "role-invalid BOTH* negative smoke",
+        "disabled alpha blending must ignore separate alpha state": "disabled-state semantic smoke",
+    }
+    missing_separate_alpha_contract += [
+        meaning
+        for token, meaning in separate_alpha_semantic_contract.items()
+        if token not in SEMANTIC_SMOKE
+    ]
+    if missing_separate_alpha_contract:
+        raise SystemExit(
+            "DX11 separate-alpha translation contract drift: "
+            + ", ".join(missing_separate_alpha_contract)
+        )
+
     stencil_snapshot_contract = {
         "DWORD stencilReadMask = 0xFFFFFFFFu;": "stencil read mask snapshot",
         "DWORD stencilRef = 0;": "dynamic stencil reference snapshot",
