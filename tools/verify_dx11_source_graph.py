@@ -1417,9 +1417,9 @@ def main() -> None:
             "R134 positive live pipeline-binding proof",
         ),
         (
-            "R134 bound draw readiness composes exact pipeline binding identity",
+            "R138 bound draw reobserves exact live RS OM binding",
             CONSTANT_BUFFER_PROBE,
-            "R134 positive final binding composition proof",
+            "R134 pipeline identity remains composed into the final bound draw",
         ),
         (
             "R134 bound draw rejects mismatched R112 pipeline identity",
