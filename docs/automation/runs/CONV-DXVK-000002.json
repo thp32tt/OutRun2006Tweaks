@@ -4969,6 +4969,73 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve any newer branch-authoritative exact proof; if 0x00183173 remains the exact edge, capture the next bounded canonical continuation there and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_RAW_PROVENANCE_ADDRESS_COUPLING_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "44397660717a9b6f45acbeb91cc1fa46316892f2",
+      "commit_message": "test: bind DXVK raw census to capture window [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Fail closed unless every auto-discovered DXVK continuation raw-provenance collector reads probe bytes and inbound/outbound rel32 census from exactly its local target_rva and continuation PROBE_LEN symbol, preventing stale-RVA/stale-window evidence from satisfying otherwise valid status and geometry contracts.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local conversion/task state, work queue and Issue #14. Concurrent same-JOB canonical work had already superseded the stale primary next action, so no duplicate frontier edit was attempted."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected an independent verifier evidence-integrity gap: captured/report/predecessor checks did not statically bind actual probe/inbound/outbound raw reads to the declared continuation address window."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 44397660717a9b6f45acbeb91cc1fa46316892f2 adds AST address-coupling guards for probe, inbound rel32 census and outbound rel32 census across every auto-discovered continuation."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36987626917 job 110776164231 SUCCESS, including static contract, canonical EXE identity/analyzer and evidence upload. Exact-SHA Backend Conversion Gate run 36987626908 job 110776164239 SUCCESS, including all contract tests, Win32 configure/build, binary verification and artifact upload."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit 44397660717a9b6f45acbeb91cc1fa46316892f2 contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5948847118 records implementation and exact-SHA validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier hardening only; no runtime payload, backend selector, deployable candidate or localization changed. CI artifacts are validation outputs only."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit without replacing the newer concurrently advancing canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "44397660717a9b6f45acbeb91cc1fa46316892f2",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_GATE",
+        "dxvk_disassembly_evidence_run_id": 36987626917,
+        "dxvk_disassembly_evidence_job_id": 110776164231,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "dxvk_disassembly_evidence_artifact_id": 11217698557,
+        "dxvk_disassembly_evidence_artifact_digest": "sha256:008856e9ae6eecda0877f8cca81ec0508b2bbea511f155ae73777033f89455b0",
+        "backend_conversion_gate_run_id": 36987626908,
+        "backend_conversion_gate_job_id": 110776164239,
+        "backend_conversion_gate_conclusion": "success",
+        "backend_conversion_gate_artifact_id": 11217249763,
+        "backend_conversion_gate_artifact_digest": "sha256:96562c8ef50f7799fdaa0889f9a40ceb1501c17737b41912f3b70a94cf587a54",
+        "backend_disassembly_contract": "PASS",
+        "configure_win32": "PASS",
+        "build_win32": "PASS",
+        "binary_exists": "PASS",
+        "artifact_upload": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948847118,
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Continue only from the newest authenticated DXVK branch frontier. Preserve the raw-provenance address-coupling invariant: probe, inbound census and outbound census must remain tied to target_rva and the exact continuation PROBE_LEN."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
