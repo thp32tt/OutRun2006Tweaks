@@ -1677,7 +1677,7 @@ def queue_dynamic_prefix() -> str:
         lines += [
             f"VR_PIPELINE_SCHEMA={CONVERSION_PIPELINE_SCHEMA_VERSION}; REQUIRED=C0_RECOVER→C1_REVIEW→C2_IMPLEMENT→C3_VALIDATE→C4_COMMIT→C5_PACKAGE(or reasoned NOT_REQUIRED)→C6_STATE.",
             "CONTINUOUS_PIPELINE=ON: C0-C6+Gate PASS is a checkpoint while CONVERSION_LANE_STATE lacks static_pipeline_complete/development_complete=true.",
-            "RELEASE=static/development complete only. One review/plan/cycle is nonterminal; C2 needs real source/tool/test/workflow/disassembly work. runtime may remain UNTESTED.",
+            "RELEASE=static/development complete only. One review/cycle is nonterminal; C2 needs real source/tool/test/workflow/disassembly work. runtime may remain UNTESTED.",
             "RUN_RECORD=docs/automation/runs/<TASK_ID>.json; keep same TASK_ID for the next full cycle.",
             conversion_lane_work_hint(branch),
         ]
