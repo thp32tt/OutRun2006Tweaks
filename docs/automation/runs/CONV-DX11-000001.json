@@ -1107,6 +1107,105 @@
       "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
       "runtime_claim": "NONE",
       "state_persisted": true
+    },
+    {
+      "unit_id": "DX11_OUTPUT_STATE_BINDING_R126",
+      "job_id": "CONV-DX11-000001",
+      "task_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_OUTPUT_STATE_BINDING_R126",
+      "base_sha": "6f7e9c5a511ef5d40d6ba3b7999d50624b461672",
+      "material_result_sha": "4ca2588aed2eb54efdfe19ba45c0740c9a4e8a51",
+      "validation_bearing_sha": "4ca2588aed2eb54efdfe19ba45c0740c9a4e8a51",
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "The current branch-local durable next action explicitly required consuming the sealed R124 viewport/scissor/blend-factor/sample-mask readiness in a dormant D3D11 RS/OM binding owner and hosted WARP probe. This closes a concrete source/static gap without enabling NativeDrawPathActive or requiring Quest 3 hardware.",
+      "summary": "Added NativeFixedFunctionOutputStateBinding. It seals exact R116 Blend/DepthStencil/Rasterizer objects together with the R124 dynamic output-state snapshot, rejects missing component identities or foreign devices, and applies RS/OM state only to an explicitly supplied matching D3D11 context. Added WARP positive/negative coverage and source-graph drift guards. Native game Draw* routing remains disabled.",
+      "changed_paths": [
+        "src/vr/d3d11/native_backend.hpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_constant_buffer_probe.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "implementation_commits": [
+        "eaeb6f84e6e0bf0d498508e59c7901e56db7e415",
+        "c7401287a78cfda9b616ae5dcf9dada96b16ef3b",
+        "7f702fa049b18522c37d9cec01875f33409c6c1b",
+        "4ca2588aed2eb54efdfe19ba45c0740c9a4e8a51"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Read current GitHub AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/automation/runs/CONV-DX11-000001.json, docs/VR_DX11_NATIVE_PLAN.md, regression knowledge/history and Issue #14 via the authenticated GitHub connector.",
+            "Observed concurrent R127 managed-buffer readiness work in current branch contents and avoided duplicating it; selected the still-authoritative R124 output-state binding next action."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "R116 already owns exact BlendState/DepthStencilState/RasterizerState objects but deliberately does not bind them.",
+            "R124 already seals viewport, scissor, blend factor and multisample mask into a fail-closed snapshot but explicitly states that nothing binds RS/OM state.",
+            "No matching historical DX11 output-state riskPath/problem-history entry required a protected runtime regression update."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "changed_paths": [
+            "src/vr/d3d11/native_backend.hpp",
+            "src/vr/d3d11/native_backend.cpp",
+            "tools/dx11_constant_buffer_probe.cpp",
+            "tools/verify_dx11_source_graph.py"
+          ],
+          "material_commit": "4ca2588aed2eb54efdfe19ba45c0740c9a4e8a51",
+          "details": [
+            "Added dormant NativeFixedFunctionOutputStateBinding with exact R116/R124 component-token requirements and exact-device ownership.",
+            "apply() binds RasterizerState, viewport, scissor rectangle, BlendState/blend factor/sample mask and DepthStencilState/stencil ref only to a matching explicit D3D11 context.",
+            "Added WARP probe coverage for exact bound state, foreign-context rejection and missing R116/R124 token fail-closed behavior.",
+            "Added source-graph drift guards for the complete R126 owner/apply/probe contract."
+          ]
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_REMOTE_STATIC",
+          "evidence": [
+            "Re-fetched all four changed files from the active GitHub branch and confirmed the R126 declaration, component-token gates, exact-device gate, RS/OM binding calls, positive/negative WARP probe markers and source-graph guard.",
+            "Confirmed the modified files contain no NativeDrawPathActive=true activation.",
+            "Exact material SHA Build run 36973044392 job 110730919352 was started by GitHub Actions but cancelled by descendant branch churn; no hosted compile/WARP success is claimed from that run."
+          ],
+          "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
+          "ci_result": "CI_STARTED_CANCELLED_BY_BRANCH_CHURN"
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "4ca2588aed2eb54efdfe19ba45c0740c9a4e8a51",
+          "issue14_comment_id": 5946681061
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Dormant state-binding/readiness infrastructure and hosted probe only. No native game Draw* routing, backend promotion, OpenXR transport, runtime candidate payload or tester package changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE_WITH_THIS_STATE_COMMIT",
+          "exact_next_action": "Keep NativeDrawPathActive disabled. Obtain a non-superseded descendant hosted Build/WARP result containing R126; then continue the next independent dormant resource/binding/readiness gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "issue14_comment_id": 5946681061,
+      "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
+      "blocker": "Hosted compile/WARP execution for the exact material SHA was superseded by branch churn. This does not block independent static development; Quest 3/VDXR runtime acceptance remains separately required before activation.",
+      "next_action": "Keep NativeDrawPathActive disabled. Obtain a non-superseded descendant hosted Build/WARP result containing R126; then continue the next independent dormant resource/binding/readiness gap.",
+      "checkpoint": "C6_STATE",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE"
     }
   ],
   "latest_continuation_unit": "DX11_DYNAMIC_OUTPUT_STATE_PROVENANCE_R124",
