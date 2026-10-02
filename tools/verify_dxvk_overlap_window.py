@@ -1,17 +1,31 @@
 #!/usr/bin/env python3
 """Fail-closed verifier for DXVK disassembly continuation overlap windows.
 
-This tool intentionally validates only byte-window/provenance contracts. It does
-not infer functions, render ownership, or runtime behavior.
+This tool validates byte-window/provenance contracts only. It does not infer
+functions, render ownership, or runtime behavior from disassembly bytes.
 """
 
 import argparse
 import json
-from pathlib import Path
 
 
 def parse_hex(value: str) -> bytes:
-    return bytes.fromhex(value.replace("0x", "").replace(" ", ""))
+    compact = value.replace("0x", "").replace(" ", "")
+    if len(compact) % 2:
+        raise ValueError("hex byte input must contain complete bytes")
+    return bytes.fromhex(compact)
+
+
+def verify(expected_rva: str, actual_rva: str, expected_bytes: str, actual_bytes: str) -> dict:
+    result = {
+        "expected_rva": expected_rva.lower(),
+        "actual_rva": actual_rva.lower(),
+        "bytes_match": parse_hex(expected_bytes) == parse_hex(actual_bytes),
+        "provenance_match": expected_rva.lower() == actual_rva.lower(),
+        "runtime_validation": "UNTESTED",
+    }
+    result["passed"] = result["bytes_match"] and result["provenance_match"]
+    return result
 
 
 def main() -> int:
@@ -23,14 +37,12 @@ def main() -> int:
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
-    result = {
-        "expected_rva": args.expected_rva.lower(),
-        "actual_rva": args.actual_rva.lower(),
-        "bytes_match": parse_hex(args.expected_bytes) == parse_hex(args.actual_bytes),
-        "provenance_match": args.expected_rva.lower() == args.actual_rva.lower(),
-        "runtime_validation": "UNTESTED",
-    }
-    result["passed"] = result["bytes_match"] and result["provenance_match"]
+    result = verify(
+        args.expected_rva,
+        args.actual_rva,
+        args.expected_bytes,
+        args.actual_bytes,
+    )
 
     if args.json:
         print(json.dumps(result, indent=2))
