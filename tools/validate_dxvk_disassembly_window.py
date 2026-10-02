@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate bounded DXVK disassembly evidence windows.
+"""Validate bounded DXVK raw disassembly evidence windows.
 
 This tool intentionally performs byte-window bookkeeping only. It does not infer
 render/runtime semantics from incomplete disassembly. It helps CI reject
@@ -9,12 +9,9 @@ malformed evidence records before promotion to later analysis stages.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
-
-
-def parse_rva(value: str) -> int:
-    return int(value, 0)
 
 
 def validate(record: dict) -> list[str]:
@@ -31,16 +28,22 @@ def validate(record: dict) -> list[str]:
 
     if not isinstance(data, str):
         errors.append("bytes must be a hex string")
-    else:
-        compact = "".join(data.split())
-        if len(compact) % 2:
-            errors.append("bytes hex string has odd length")
-        elif not all(c in "0123456789abcdefABCDEF" for c in compact):
-            errors.append("bytes contains non-hex characters")
-        elif isinstance(start, int) and isinstance(end, int):
-            expected = end - start
-            if len(compact) // 2 != expected:
-                errors.append("byte length does not match RVA window length")
+        return errors
+
+    compact = "".join(data.split())
+    if len(compact) % 2:
+        errors.append("bytes hex string has odd length")
+    elif not all(c in "0123456789abcdefABCDEF" for c in compact):
+        errors.append("bytes contains non-hex characters")
+    elif isinstance(start, int) and isinstance(end, int):
+        if len(compact) // 2 != end - start:
+            errors.append("byte length does not match RVA window length")
+
+    if not errors:
+        expected_sha = record.get("sha256")
+        actual_sha = hashlib.sha256(bytes.fromhex(compact)).hexdigest()
+        if expected_sha is not None and str(expected_sha).lower() != actual_sha:
+            errors.append("sha256 does not match byte window")
 
     return errors
 
