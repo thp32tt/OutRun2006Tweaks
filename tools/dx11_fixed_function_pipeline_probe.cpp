@@ -1549,7 +1549,7 @@ int main()
     }
 
     std::cout
-        << "DX11 fixed-function D3DTA_CONSTANT per-stage support R197: PASS\\n"
+        << "DX11 fixed-function D3DTA_CONSTANT per-stage support R197: PASS\n"
         << "DX11 fixed-function D3DTA_CONSTANT per-stage color R197: PASS\n"
         << "DX11 fixed-function D3DTOP_LERP ARG0 support R196: PASS\n"
         << "DX11 fixed-function PREMODULATE stage-chain support R195: PASS\n"
