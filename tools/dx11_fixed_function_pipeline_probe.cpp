@@ -148,7 +148,42 @@ int main()
             "disabled alpha test should need no shader-owned blocker discharge");
     }
 
+    {
+        auto gouraudState = base_state();
+        gouraudState.shadeMode = D3DSHADE_GOURAUD;
+        const auto gouraud = translate_pipeline(gouraudState);
+        require(
+            gouraud.exact() &&
+            (gouraud.unsupported & PipelineUnsupportedShadeMode) == 0,
+            "R158 Gouraud shade mode remains exact");
+
+        auto flatState = gouraudState;
+        flatState.shadeMode = D3DSHADE_FLAT;
+        const auto flat = translate_pipeline(flatState);
+        require(
+            !flat.exact() &&
+            (flat.unsupported & PipelineUnsupportedShadeMode) != 0,
+            "R158 flat shade mode remains fail closed");
+        const auto fixedFlat =
+            translate_fixed_function_pipeline_with_shader_semantics(
+                flatState, true, stages, true, 0x00, 0x00, textureTypes);
+        require(
+            !fixedFlat.exact() &&
+            (fixedFlat.renderStates.unsupported &
+             PipelineUnsupportedShadeMode) != 0,
+            "R158 shader handoff retains flat shade blocker");
+
+        auto phongState = gouraudState;
+        phongState.shadeMode = D3DSHADE_PHONG;
+        const auto phong = translate_pipeline(phongState);
+        require(
+            !phong.exact() &&
+            (phong.unsupported & PipelineUnsupportedShadeMode) != 0,
+            "R158 phong shade mode remains fail closed");
+    }
+
     std::cout
-        << "DX11 fixed-function alpha-test pipeline handoff R118: PASS\n";
+        << "DX11 fixed-function alpha-test pipeline handoff R118: PASS\n"
+        << "DX11 fixed-function shade-mode fail-closed R158: PASS\n";
     return 0;
 }

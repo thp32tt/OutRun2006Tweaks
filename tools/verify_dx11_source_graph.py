@@ -35,6 +35,9 @@ SHADER_LINKAGE_PROBE = (
 CONSTANT_BUFFER_PROBE = (
     ROOT / "tools" / "dx11_constant_buffer_probe.cpp"
 ).read_text(encoding="utf-8")
+FIXED_FUNCTION_PIPELINE_PROBE = (
+    ROOT / "tools" / "dx11_fixed_function_pipeline_probe.cpp"
+).read_text(encoding="utf-8")
 SURFACE_MIRROR_HPP = (
     ROOT / "src" / "vr" / "d3d11" / "surface_mirror.hpp"
 ).read_text(encoding="utf-8")
@@ -87,6 +90,42 @@ CONSTANT_BUFFER_CONTRACT_TEXT = (
 
 def main() -> None:
     verify_dx11_dual_source_contract()
+
+    r158_shade_mode_contract = [
+        ("DWORD shadeMode = D3DSHADE_GOURAUD;", D3D9_DRAW_STATE_HPP,
+         "R158 tracked shade-mode field and Gouraud default"),
+        ("read(D3DRS_SHADEMODE, out.shadeMode);", D3D9_RENDER_STATE_CAPTURE,
+         "R158 live shade-mode capture"),
+        ("PipelineUnsupportedShadeMode = 1u << 13", PIPELINE_TRANSLATION_HPP,
+         "R158 dedicated unsupported shade-mode bit"),
+        ("source.shadeMode != D3DSHADE_GOURAUD", PIPELINE_TRANSLATION_CPP,
+         "R158 non-Gouraud fail-closed predicate"),
+        ("out.unsupported |= PipelineUnsupportedShadeMode;",
+         PIPELINE_TRANSLATION_CPP, "R158 pipeline readiness blocker"),
+        ("R158 Gouraud shade mode remains exact", FIXED_FUNCTION_PIPELINE_PROBE,
+         "R158 Gouraud positive fixture"),
+        ("R158 flat shade mode remains fail closed", FIXED_FUNCTION_PIPELINE_PROBE,
+         "R158 FLAT negative fixture"),
+        ("R158 shader handoff retains flat shade blocker",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R158 ownership handoff negative fixture"),
+        ("R158 phong shade mode remains fail closed", FIXED_FUNCTION_PIPELINE_PROBE,
+         "R158 PHONG negative fixture"),
+        ("DX11 fixed-function shade-mode fail-closed R158: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R158 hosted probe completion marker"),
+    ]
+    missing_r158_shade_mode = [
+        meaning
+        for token, source, meaning in r158_shade_mode_contract
+        if token not in source
+    ]
+    if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_SHADEMODE") < 2:
+        missing_r158_shade_mode.append(
+            "R158 SHADEMODE must be both primed and captured")
+    if missing_r158_shade_mode:
+        raise SystemExit(
+            "DX11 R158 shade-mode contract drift: "
+            + ", ".join(missing_r158_shade_mode)
+        )
 
     # Fail closed on partial dormant-readiness API commits. Direct-chat lanes
     # intentionally stage many compose/validate/observe/bind helpers, and a

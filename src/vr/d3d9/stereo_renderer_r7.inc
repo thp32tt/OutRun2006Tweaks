@@ -922,7 +922,7 @@ namespace OutRunVRStereo
 				D3DRS_SEPARATEALPHABLENDENABLE,
 				D3DRS_SRCBLENDALPHA, D3DRS_DESTBLENDALPHA,
 				D3DRS_BLENDOPALPHA, D3DRS_ALPHATESTENABLE,
-				D3DRS_CULLMODE, D3DRS_COLORWRITEENABLE,
+				D3DRS_SHADEMODE, D3DRS_CULLMODE, D3DRS_COLORWRITEENABLE,
 				D3DRS_STENCILENABLE, D3DRS_STENCILMASK,
 				D3DRS_STENCILWRITEMASK, D3DRS_STENCILREF,
 				D3DRS_STENCILFAIL, D3DRS_STENCILZFAIL,
@@ -1706,6 +1706,9 @@ namespace OutRunVRStereo
 		read(D3DRS_ALPHAREF, out.alphaRef);
 		read(D3DRS_ALPHAFUNC, out.alphaFunc);
 
+		// R158 captures SHADEMODE as part of the same tracked render-state
+		// snapshot so DX11 readiness cannot silently assume Gouraud shading.
+		read(D3DRS_SHADEMODE, out.shadeMode);
 		read(D3DRS_CULLMODE, out.cullMode);
 		read(D3DRS_FILLMODE, out.fillMode);
 		read(D3DRS_SCISSORTESTENABLE, out.scissorTestEnable);
