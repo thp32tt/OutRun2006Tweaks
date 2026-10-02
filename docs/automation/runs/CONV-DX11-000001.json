@@ -4,30 +4,30 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "e176d66f92fd6916a544dc2bbcdb91283792fb0c",
-  "state_parent_head": "b12603f32eceb456ec67b7ff119cafa636d5294c",
-  "material_result_sha": "d82e348ddea8a25e5bd5ab4405632d10940ba71e",
-  "validation_bearing_sha": "bb1b262832510bae5c52ca0a47af4a2c81f976a3",
+  "base_sha": "5cf025e20382f6db5d6cf3297dd738bcfafb911c",
+  "state_parent_head": "395a9fbdac2d6b4eec951cbd09ed7ba9eef14557",
+  "material_result_sha": "ecccde1dc4c14061ee116474f808ab090661db1c",
+  "validation_bearing_sha": "8dcec97abd7b1bfb05c9ccd57ed73c3d334af582",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_LIVE_OUTPUT_BINDING_READBACK_R137",
-  "selection_reason": "R126 apply() installed sealed RS/OM state but no reusable readiness object proved that the effective same-device D3D11 context still retained the exact rasterizer, viewport/scissor, blend state/factor/sample mask, depth-stencil state and stencil ref. This remained an independent dormant pre-draw evidence gap after pipeline and texture binding work.",
-  "summary": "Implemented fail-closed live RS/OM binding observation for NativeFixedFunctionOutputStateBinding, with exact same-context state readback, snapshot validation, drift rejection and deterministic restore probes. Corrected the pre-existing analyzer/verifier R120-summary guard that blocked hosted source-graph validation. Finalized the unit as R137 to avoid R135 texture-mask and R136 aggregate-PS numbering collisions.",
+  "selected_work": "DX11_FINAL_BOUND_DRAW_LIVE_OUTPUT_BINDING_R138",
+  "selection_reason": "The authoritative DX11 lane state named composition of the exact R137 live RS/OM binding snapshot into final dormant bound-draw evidence as the next independent static action. R134/R136 already covered live pipeline and aggregate PS identity, leaving output-state drift as the remaining final-bound gap.",
+  "summary": "R138 reobserves the R137 live RS/OM binding during final dormant bound-draw composition, requires the live output-owner token to match the identity sealed by the draw, incorporates the live output snapshot into the final token, and fails closed on RS drift. Positive, drift, deterministic-restore probes and source-graph guards were added. Native Draw* routing remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read current GitHub HEAD, AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/automation/runs/CONV-DX11-000001.json, regression knowledge/history and Issue #14 through the authenticated GitHub connector.",
-        "Tracked rapid concurrent descendants and rebased only when target-file blob identities were unchanged, avoiding overwrite of aggregate-PS and census work."
+        "Read authoritative GitHub branch HEAD, AGENTS.md, branch-local conversion state/run record, regression knowledge/history and Issue #14 through the authenticated GitHub connector.",
+        "Tracked concurrent same-branch descendants and preserved them by fast-forward-only GitHub commits."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Confirmed R126 NativeFixedFunctionOutputStateBinding::apply() sets RS/OM state after a same-device check but exposes no reusable live-binding readiness snapshot.",
-        "Confirmed existing R133/R134-era evidence covers texture/pipeline object identity while final dormant draw evidence did not prove effective live RS/OM identity."
+        "Confirmed R137 exposes exact live RS/OM readback but R134 final bound-draw composition did not consume that live readiness.",
+        "Confirmed final bound-draw could therefore retain otherwise valid pipeline/PS evidence after a later rasterizer/output-state drift."
       ]
     },
     "C2_IMPLEMENT": {
@@ -39,43 +39,39 @@
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "d82e348ddea8a25e5bd5ab4405632d10940ba71e",
-        "346c18011f4f35a970a2c1fc5be2b76f273cc5b4",
-        "132b862871f0f8b03e0ac9cad4e946a7cf495f4d",
-        "bb1b262832510bae5c52ca0a47af4a2c81f976a3"
+        "ecccde1dc4c14061ee116474f808ab090661db1c",
+        "e20692d728ea80799904339724260231a26e7467"
       ],
       "details": [
-        "Added NativeFixedFunctionOutputBindingReadiness and same-device RS/OM readback validation covering rasterizer, viewport, scissor, blend state/factor/sample mask, depth-stencil state and stencil ref.",
-        "Issued a nonzero readiness token only when every live output binding remains exact; stale live state fails closed.",
-        "Added positive, rasterizer-drift and deterministic-restore hosted probe contracts.",
-        "Aligned the analyzer source-graph guard with already-supported R120 census summaries and finalized this independent unit as R137."
+        "Extended NativeFixedFunctionBoundDrawReadiness with live output-binding readiness, lineage and snapshot identity.",
+        "Final composition calls NativeFixedFunctionOutputStateBinding::binding_readiness on the supplied D3D11 context and requires the live owner identity to match draw.outputBindingSnapshotToken.",
+        "Added live RS drift fail-closed and deterministic restore probes; corrected the historical R134 probe-string guard after CI exposed the stale contract."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_EXACT_STATIC_CI_CANCELLED_DURING_CHECKOUT_AFTER_GUARD_FIX",
-      "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_DURING_CHECKOUT_AFTER_GUARD_FIX",
+      "status": "COMPLETE_REMOTE_STATIC_DESCENDANT_CONFIGURE_CANCELLED",
+      "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
       "evidence": [
-        "GitHub exact material diff d82e348ddea8a25e5bd5ab4405632d10940ba71e changed only the four intended DX11 source/probe/guard paths and contains positive, drift and restore R137 live-output binding evidence (subsequently relabeled without changing implementation semantics).",
-        "Build run 36975573494 reached Verify DX11 source graph and failed on a pre-existing analyzer/verifier R120-summary compatibility drift before the new live-output contract; 346c18011f4f35a970a2c1fc5be2b76f273cc5b4 aligned that guard with analyze_dx11_census.py.",
-        "Validation-bearing bb1b262832510bae5c52ca0a47af4a2c81f976a3 retains the R137 header/probe/verifier markers. Build run 36976142670 was cancelled during Checkout by descendant branch churn, so no hosted source-graph, compiler or WARP execution success is claimed after the guard fix.",
-        "Current descendants retained the R137 live-output markers while continuing independent aggregate-PS work."
+        "Backend Conversion Gate run 36976686506 on descendant 8dcec97 passed queue/baseline/structure/backend-disassembly/session-analysis, DX11 native transport, dual-source, DX11 source graph, dormant activation boundary and DX11 census static gates.",
+        "PR Build run 36976689702 on the same descendant passed DX11 source graph, census and preceding static checks.",
+        "Both runs were cancelled by later same-branch pushes during Configure; no Win32 build or WARP execution success is claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "d82e348ddea8a25e5bd5ab4405632d10940ba71e",
-      "validation_bearing_commit": "bb1b262832510bae5c52ca0a47af4a2c81f976a3",
-      "issue14_comment_id": 5947015143
+      "material_commit": "ecccde1dc4c14061ee116474f808ab090661db1c",
+      "guard_commit": "e20692d728ea80799904339724260231a26e7467",
+      "issue14_comment_id": 5947157876
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant readiness/readback, probe and source-graph validation only; no native game Draw* routing, backend activation, OpenXR transport, localization or release package selection changed."
+      "reason": "Dormant DX11 readiness/test/guard work only. No native game Draw* routing, backend activation, OpenXR transport, localization or release packaging changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. The source descendant now contains aggregate multi-stage PS binding evidence; next independent static work should compose the exact R137 live RS/OM binding snapshot with the final dormant bound-draw evidence so pipeline, aggregate PS, output/surface state and geometry are all proven on the same context without issuing game Draw*. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. R138 live RS/OM final-bound composition is complete and current descendants already add R139 same-context live reobservation plus direct live IA geometry evidence. The current R140 API declared at 931d4b8448e9a734b0816d9693b1b151e69d009e still needs its implementation/probes/guard completed so exact live VB/optional-IB/stride/offset/index-format/topology identity is composed with the same-context final dormant pre-draw proof. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -85,21 +81,21 @@
     "dxvk_lane_modified": false,
     "localization_modified": false
   },
-  "issue14_comment_id": 5947015143,
-  "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_DURING_CHECKOUT_AFTER_GUARD_FIX",
-  "blocker": "Hosted validation after the R120 guard fix was cancelled during Checkout by descendant branch churn. Runtime hardware validation was not performed.",
-  "next_action": "Keep NativeDrawPathActive disabled. The source descendant now contains aggregate multi-stage PS binding evidence; next independent static work should compose the exact R137 live RS/OM binding snapshot with the final dormant bound-draw evidence so pipeline, aggregate PS, output/surface state and geometry are all proven on the same context without issuing game Draw*. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5947157876,
+  "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+  "blocker": "Hosted Win32 configure/build was superseded by rapid descendant branch pushes after all relevant static gates passed. Runtime hardware validation was not performed.",
+  "next_action": "Keep NativeDrawPathActive disabled. R138 live RS/OM final-bound composition is complete and current descendants already add R139 same-context live reobservation plus direct live IA geometry evidence. The current R140 API declared at 931d4b8448e9a734b0816d9693b1b151e69d009e still needs its implementation/probes/guard completed so exact live VB/optional-IB/stride/offset/index-format/topology identity is composed with the same-context final dormant pre-draw proof. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "prior_completed_unit": {
-    "selected_work": "DX11_SRC1_BLEND_CENSUS_EVIDENCE",
-    "material_result_sha": "e176d66f92fd6916a544dc2bbcdb91283792fb0c",
-    "validation_bearing_sha": "e176d66f92fd6916a544dc2bbcdb91283792fb0c",
-    "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_DURING_CHECKOUT",
+    "selected_work": "DX11_LIVE_OUTPUT_BINDING_READBACK_R137",
+    "material_result_sha": "d82e348ddea8a25e5bd5ab4405632d10940ba71e",
+    "validation_bearing_sha": "bb1b262832510bae5c52ca0a47af4a2c81f976a3",
+    "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_DURING_CHECKOUT_AFTER_GUARD_FIX",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
-    "issue14_comment_id": 5946974703
+    "issue14_comment_id": 5947015143
   }
 }

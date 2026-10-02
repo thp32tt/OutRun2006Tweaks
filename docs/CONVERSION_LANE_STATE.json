@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "ecccde1dc4c14061ee116474f808ab090661db1c",
+  "state_parent_head": "395a9fbdac2d6b4eec951cbd09ed7ba9eef14557",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,15 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "d82e348ddea8a25e5bd5ab4405632d10940ba71e",
-    "validation_bearing_sha": "bb1b262832510bae5c52ca0a47af4a2c81f976a3",
-    "automation_validation": "PASS_EXACT_STATIC_CONTRACT_CI_CANCELLED_DURING_CHECKOUT_AFTER_GUARD_FIX",
+    "result_sha": "ecccde1dc4c14061ee116474f808ab090661db1c",
+    "validation_bearing_sha": "8dcec97abd7b1bfb05c9ccd57ed73c3d334af582",
+    "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
-  "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. Static dormant evidence now includes R136 aggregate live PS sampler/SRV binding identity and R137 live RS/OM binding readback; composing those live identities into the final dormant bound-draw evidence remains an independent static pre-activation step.",
-  "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until parity proof.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. The source descendant now contains aggregate multi-stage PS binding evidence; next independent static work should compose the exact R137 live RS/OM binding snapshot with the final dormant bound-draw evidence so pipeline, aggregate PS, output/surface state and geometry are all proven on the same context without issuing game Draw*. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
+  "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. R138 now composes live RS/OM readback into final dormant bound-draw readiness; later descendants strengthen same-context and IA geometry evidence, but none activate Draw*.",
+  "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until Quest 3/VDXR parity proof.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. R138 live RS/OM final-bound composition is complete and current descendants already add R139 same-context live reobservation plus direct live IA geometry evidence. The current R140 API declared at 931d4b8448e9a734b0816d9693b1b151e69d009e still needs its implementation/probes/guard completed so exact live VB/optional-IB/stride/offset/index-format/topology identity is composed with the same-context final dormant pre-draw proof. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -378,6 +378,18 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5947015143
+    },
+    {
+      "unit_id": "DX11_FINAL_BOUND_DRAW_LIVE_OUTPUT_BINDING_R138",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "ecccde1dc4c14061ee116474f808ab090661db1c",
+      "guard_result_sha": "e20692d728ea80799904339724260231a26e7467",
+      "validation_bearing_sha": "8dcec97abd7b1bfb05c9ccd57ed73c3d334af582",
+      "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5947157876
     }
   ]
 }
