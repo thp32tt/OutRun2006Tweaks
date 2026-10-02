@@ -508,7 +508,7 @@ namespace OutRunVRStereo
             return R20StereoEligibilityGate.load(std::memory_order_acquire);
         }
 
-        HRESULT __stdcall ResetDestR22(IDirect3DDevice9* device,
+    HRESULT __stdcall ResetDestR22(IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
             const bool gameDevice = IsGameDevice(device);
