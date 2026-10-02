@@ -7402,7 +7402,7 @@ def main() -> None:
 
 
     r175_stream_source_frequency_contract = [
-        ("DWORD stream0Frequency = 1u;", RUNTIME_CENSUS,
+        ("UINT stream0Frequency = 1u;", RUNTIME_CENSUS,
          "R175 stream0 frequency identity and D3D9 default"),
         ("device->GetStreamSourceFreq(", RUNTIME_CENSUS,
          "R175 live stream-frequency observation"),
