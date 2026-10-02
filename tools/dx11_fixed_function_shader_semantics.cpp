@@ -17,6 +17,7 @@ namespace
     using outrun::vr::dx11::FixedFunctionStageState;
     using outrun::vr::dx11::FixedFunctionUnsupportedArgument;
     using outrun::vr::dx11::FixedFunctionUnsupportedSamplerFilter;
+    using outrun::vr::dx11::FixedFunctionUnsupportedSamplerLod;
     using outrun::vr::dx11::FixedFunctionUnsupportedStageChain;
     using outrun::vr::dx11::FixedFunctionUnsupportedTextureTransform;
     using outrun::vr::dx11::PipelineUnsupportedBlend;
@@ -858,6 +859,42 @@ int main()
             generate_fixed_function_pixel_shader_prototype(
                 stages, true, 0x01, 0x01, textureTypes);
         require(!prototype.generated(), "texture transform generated HLSL");
+    }
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        stages[0] = active_stage(
+            D3DTOP_SELECTARG1,
+            D3DTA_TEXTURE,
+            D3DTA_CURRENT,
+            D3DTOP_SELECTARG1,
+            D3DTA_TEXTURE,
+            D3DTA_CURRENT,
+            0);
+        stages[0].mipLodBiasBits = 0x3F000000u;
+        const auto biasReadiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x01, 0x01);
+        require(
+            !biasReadiness.exact(),
+            "sampler LOD bias did not fail closed");
+        require(
+            (biasReadiness.unsupported &
+             FixedFunctionUnsupportedSamplerLod) != 0,
+            "sampler LOD bias did not set sampler-LOD blocker");
+
+        stages[0].mipLodBiasBits = 0;
+        stages[0].maxMipLevel = 1;
+        const auto maxMipReadiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x01, 0x01);
+        require(
+            !maxMipReadiness.exact(),
+            "sampler MAXMIPLEVEL did not fail closed");
+        require(
+            (maxMipReadiness.unsupported &
+             FixedFunctionUnsupportedSamplerLod) != 0,
+            "sampler MAXMIPLEVEL did not set sampler-LOD blocker");
     }
 
     {
