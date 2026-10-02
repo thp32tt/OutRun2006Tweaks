@@ -860,6 +860,78 @@
       "runtime_validation": "UNTESTED",
       "state_strategy": "SUPPLEMENTAL_PRESERVE_CONCURRENT_NON_FRONTIER_WORK",
       "exact_next_action": "Exact-decode only complete instructions in canonical 0x00182B96..0x00182BD6 from this validated overlap capture; preserve any trailing partial instruction raw-only and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F28_CANONICAL_CONTROL_FLOW_0x182B96_TO_0x182BD6",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "1ed91e677a0bf951c9f59067b3bf10ec31a663d7",
+      "source_commits": [
+        "7a782bbbaa6b7120615b58d66571f31d807e82c2",
+        "3fd12bfb32ce27c35875ec646ed2fa8dde15336c",
+        "1ed91e677a0bf951c9f59067b3bf10ec31a663d7"
+      ],
+      "commit_message": "dxvk: scope F28 raw candidate evidence [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact-decoded canonical 0x00182B96..0x00182BD6 into 34 complete instructions, completed the predecessor cut rel32 CALL, proved direct/branch control flow including the backward jump to predecessor boundary 0x00182B82, and fail-closed the raw scanner's misaligned 0x00182BA5 E8 displacement as explicit non-CALL evidence.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered current authenticated GitHub branch, AGENTS.md, conversion state/run record, regression/problem history and Issue #14; tracked concurrent same-JOB frontier changes without overwriting them."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the highest-value unfinished F28 follow-up: exact-decode the validated 0x00182B96..0x00182BD6 canonical overlap window and prove bounded control flow without semantic promotion."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commits 7a782bbbaa6b7120615b58d66571f31d807e82c2, 3fd12bfb32ce27c35875ec646ed2fa8dde15336c and final scoped repair 1ed91e677a0bf951c9f59067b3bf10ec31a663d7 add the F28 exact proof and explicit misaligned raw-noncall census."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA 1ed91e677a0bf951c9f59067b3bf10ec31a663d7 passed OutRun EXE HUD Inspector CI run 36975741491 static-exe-analysis job 110739088251 against canonical EXE SHA256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3. Status EXACT_182B96_TO_182BD6_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN; all byte/layout/branch/direct-call/raw-call/raw-noncall/backward-target gates PASS."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Final substantive source commit 1ed91e677a0bf951c9f59067b3bf10ec31a663d7 contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947011588 records the production change and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static/disassembly analyzer evidence only; no runtime payload, selector, backend binary or deployable package content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit while preserving the newer concurrent F29 canonical frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "1ed91e677a0bf951c9f59067b3bf10ec31a663d7",
+        "dxvk_disassembly_evidence_run_id": 36975741491,
+        "dxvk_disassembly_evidence_job_id": 110739088251,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "dxvk_disassembly_evidence_artifact_id": 11213656490,
+        "dxvk_disassembly_evidence_artifact_digest": "sha256:d2b896eecd13974665549720c559fdd004c2a477d4d81e12354758c3b9b730eb",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "control_flow_status": "EXACT_182B96_TO_182BD6_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "instruction_count": 34,
+        "direct_rel32_call_count": 1,
+        "branch_count": 3,
+        "backward_target_rva": "0x00182B82",
+        "backward_target_is_predecessor_boundary": true,
+        "raw_noncall_candidate": "0x00182BA5->0x0014792D",
+        "raw_noncall_census": true,
+        "backend_disassembly_contract": "PASS",
+        "full_win32_build": "NOT_REQUIRED_NOT_CLAIMED",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947011588,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "exact_next_action": "Preserve the newer F29 0x00182BD6..0x00182C16 exact-proof frontier. From the latest GitHub HEAD, continue with the next bounded canonical capture beginning at the exact 0x00182C16 instruction boundary, without overlap unless a newer proof establishes a cut edge; keep the 0x00182C33 forward target and function/render/HUD/runtime semantics unresolved until separately proven."
     }
   ]
 }
