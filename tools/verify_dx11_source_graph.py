@@ -6781,6 +6781,31 @@ def main() -> None:
             FIXED_FUNCTION_PIPELINE_PROBE,
             "R171 hosted probe completion marker",
         ),
+        (
+            "bool multisampleRasterObservationComplete{};",
+            RUNTIME_CENSUS,
+            "R172 multisample-raster census observation identity",
+        ),
+        (
+            "hash, sig.multisampleRasterObservationComplete ? 1u : 0u",
+            RUNTIME_CENSUS,
+            "R172 multisample-raster observation hash",
+        ),
+        (
+            "hash = hash_mix(hash, sig.multiSampleAntialias);",
+            RUNTIME_CENSUS,
+            "R172 multisample-raster value hash",
+        ),
+        (
+            "signature.multiSampleAntialias = source.multiSampleAntialias;",
+            RUNTIME_CENSUS,
+            "R172 multisample-raster capture propagation",
+        ),
+        (
+            "VR DX11 R172 multisample-raster state#{}",
+            RUNTIME_CENSUS,
+            "R172 detailed census evidence",
+        ),
     ]
     missing_r171_multisample_raster = [
         meaning
