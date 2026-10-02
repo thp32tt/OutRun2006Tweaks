@@ -2090,6 +2090,74 @@ def main() -> None:
             + ", ".join(missing_r147_direct_draw_dispatch)
         )
 
+    r149_indexed_source_range_contract = [
+        (
+            "struct NativeFixedFunctionIndexedSourceRangeReadiness",
+            NATIVE_BACKEND_HPP,
+            "R149 D3D9 DrawIndexedPrimitive source-range identity",
+        ),
+        (
+            "compose_fixed_function_indexed_source_range_readiness(",
+            NATIVE_BACKEND_CPP,
+            "R149 indexed source-range compositor",
+        ),
+        (
+            "vertexRangeFits = minVertexIndex <= maxValue - spanMinusOne",
+            NATIVE_BACKEND_CPP,
+            "R149 MinVertexIndex/NumVertices overflow guard",
+        ),
+        (
+            "startIndex <= maxValue - elementCount",
+            NATIVE_BACKEND_CPP,
+            "R149 StartIndex plus fetched-index-count overflow guard",
+        ),
+        (
+            "validate_fixed_function_indexed_source_range_snapshot(",
+            NATIVE_BACKEND_CPP,
+            "R149 stale source-range validator",
+        ),
+        (
+            "R149 indexed source range seals D3D9 DrawIndexedPrimitive arguments",
+            CONSTANT_BUFFER_PROBE,
+            "R149 positive source-range proof",
+        ),
+        (
+            "R149 indexed source range rejects empty vertex range for live primitives",
+            CONSTANT_BUFFER_PROBE,
+            "R149 live-draw empty vertex-range rejection",
+        ),
+        (
+            "R149 indexed source range rejects MinVertexIndex NumVertices overflow",
+            CONSTANT_BUFFER_PROBE,
+            "R149 vertex-range overflow rejection",
+        ),
+        (
+            "R149 indexed source range rejects StartIndex element-count overflow",
+            CONSTANT_BUFFER_PROBE,
+            "R149 index-range overflow rejection",
+        ),
+        (
+            "R149 indexed source range keeps triangle fan on generated-index path",
+            CONSTANT_BUFFER_PROBE,
+            "R149 direct-path fan quarantine",
+        ),
+        (
+            "R149 indexed source range snapshot rejects NumVertices drift",
+            CONSTANT_BUFFER_PROBE,
+            "R149 stale NumVertices identity rejection",
+        ),
+    ]
+    missing_r149_indexed_source_range = [
+        meaning
+        for token, source, meaning in r149_indexed_source_range_contract
+        if token not in source
+    ]
+    if missing_r149_indexed_source_range:
+        raise SystemExit(
+            "DX11 R149 indexed source-range contract drift: "
+            + ", ".join(missing_r149_indexed_source_range)
+        )
+
     r148_generated_fan_dispatch_contract = [
         (
             "struct NativeFixedFunctionFanDrawDispatchReadiness",
@@ -2211,6 +2279,8 @@ def main() -> None:
             or "validate_fixed_function_render_target_bound_draw_snapshot(" in runtime_source
             or "compose_fixed_function_direct_draw_dispatch_readiness(" in runtime_source
             or "validate_fixed_function_direct_draw_dispatch_snapshot(" in runtime_source
+            or "compose_fixed_function_indexed_source_range_readiness(" in runtime_source
+            or "validate_fixed_function_indexed_source_range_snapshot(" in runtime_source
             or "compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(" in runtime_source
             or "validate_fixed_function_nonindexed_triangle_fan_draw_dispatch_snapshot(" in runtime_source
             or "compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(" in runtime_source
