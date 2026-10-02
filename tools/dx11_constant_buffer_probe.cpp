@@ -2589,6 +2589,110 @@ int main()
             pipelineIdentityReady.snapshotToken),
         "R134 restore pipeline binding after drift probe");
 
+    require(
+        pipelineBundle.bind_for_observation(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken),
+        "R134 final bound draw pipeline rebind prerequisite");
+    const auto finalPipelineBindingReady =
+        pipelineBundle.binding_readiness(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken);
+    require(
+        finalPipelineBindingReady.inputValid &&
+        finalPipelineBindingReady.bundleReady &&
+        finalPipelineBindingReady.contextMatches &&
+        finalPipelineBindingReady.translationSnapshotValid &&
+        finalPipelineBindingReady.boundExact &&
+        finalPipelineBindingReady.ready &&
+        finalPipelineBindingReady.pipelineSnapshotToken ==
+            pipelineIdentityReady.snapshotToken &&
+        finalPipelineBindingReady.snapshotToken != 0 &&
+        pipelineBundle.validate_binding_snapshot(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken,
+            finalPipelineBindingReady.snapshotToken),
+        "R134 exact IA VS PS pipeline binding snapshot prerequisite");
+
+    const auto finalBoundDrawReady =
+        outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
+            drawReady, texturedDrawReady, finalPipelineBindingReady);
+    require(
+        finalBoundDrawReady.inputValid &&
+        finalBoundDrawReady.texturedDrawReady &&
+        finalBoundDrawReady.pipelineBindingReady &&
+        finalBoundDrawReady.pipelineBindingMatchesDraw &&
+        finalBoundDrawReady.componentSnapshotsPresent &&
+        finalBoundDrawReady.ready &&
+        finalBoundDrawReady.texturedDrawSnapshotToken ==
+            texturedDrawReady.snapshotToken &&
+        finalBoundDrawReady.pipelineBindingSnapshotToken ==
+            finalPipelineBindingReady.snapshotToken &&
+        finalBoundDrawReady.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_fixed_function_bound_draw_snapshot(
+            drawReady, texturedDrawReady, finalPipelineBindingReady,
+            finalBoundDrawReady.snapshotToken),
+        "R134 final dormant bound draw composes exact pipeline and R133 evidence");
+
+    auto mismatchedPipelineBinding = finalPipelineBindingReady;
+    mismatchedPipelineBinding.pipelineSnapshotToken ^= 0x100000001b3ull;
+    const auto mismatchedPipelineBoundDraw =
+        outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
+            drawReady, texturedDrawReady, mismatchedPipelineBinding);
+    require(
+        mismatchedPipelineBoundDraw.pipelineBindingReady &&
+        !mismatchedPipelineBoundDraw.pipelineBindingMatchesDraw &&
+        !mismatchedPipelineBoundDraw.ready &&
+        mismatchedPipelineBoundDraw.snapshotToken == 0 &&
+        !outrun::vr::dx11::validate_fixed_function_bound_draw_snapshot(
+            drawReady, texturedDrawReady, mismatchedPipelineBinding,
+            finalBoundDrawReady.snapshotToken),
+        "R134 final bound draw rejects pipeline identity drift");
+
+    auto mismatchedTexturedDraw = texturedDrawReady;
+    mismatchedTexturedDraw.drawSnapshotToken ^= 0x9e3779b97f4a7c15ull;
+    const auto mismatchedTexturedBoundDraw =
+        outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
+            drawReady, mismatchedTexturedDraw, finalPipelineBindingReady);
+    require(
+        !mismatchedTexturedBoundDraw.texturedDrawReady &&
+        !mismatchedTexturedBoundDraw.ready &&
+        mismatchedTexturedBoundDraw.snapshotToken == 0,
+        "R134 final bound draw rejects textured draw identity drift");
+
+    d3d.context->VSSetShader(nullptr, nullptr, 0);
+    const auto driftedPipelineBinding =
+        pipelineBundle.binding_readiness(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken);
+    const auto driftedPipelineBoundDraw =
+        outrun::vr::dx11::compose_fixed_function_bound_draw_readiness(
+            drawReady, texturedDrawReady, driftedPipelineBinding);
+    require(
+        driftedPipelineBinding.inputValid &&
+        driftedPipelineBinding.bundleReady &&
+        driftedPipelineBinding.contextMatches &&
+        driftedPipelineBinding.translationSnapshotValid &&
+        !driftedPipelineBinding.boundExact &&
+        !driftedPipelineBinding.ready &&
+        driftedPipelineBinding.snapshotToken == 0 &&
+        !pipelineBundle.validate_binding_snapshot(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken,
+            finalPipelineBindingReady.snapshotToken) &&
+        !driftedPipelineBoundDraw.pipelineBindingReady &&
+        !driftedPipelineBoundDraw.ready &&
+        driftedPipelineBoundDraw.snapshotToken == 0 &&
+        !outrun::vr::dx11::validate_fixed_function_bound_draw_snapshot(
+            drawReady, texturedDrawReady, driftedPipelineBinding,
+            finalBoundDrawReady.snapshotToken),
+        "R134 final bound draw fails closed after IA VS PS binding drift");
+    require(
+        pipelineBundle.bind_for_observation(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken),
+        "R134 pipeline binding restore after drift probe");
+
     ID3D11SamplerState* clearDrawSampler = nullptr;
     ID3D11ShaderResourceView* clearDrawSrv = nullptr;
     d3d.context->PSSetSamplers(
@@ -3037,6 +3141,7 @@ int main()
     std::cout << "DX11 fixed-function render-state bundle R116: PASS\n";
     std::cout << "DX11 fixed-function draw readiness composition R120: PASS\n";
     std::cout << "DX11 draw output-binding readiness R131: PASS\n";
+    std::cout << "DX11 final dormant bound-draw readiness R134: PASS\n";
     std::cout << "DX11 geometry-gated draw readiness R122: PASS\n";
     std::cout << "DX11 dynamic output-state readiness R124: PASS\n";
     return 0;
