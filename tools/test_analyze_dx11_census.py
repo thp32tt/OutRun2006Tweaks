@@ -922,17 +922,9 @@ def main() -> int:
         {"value": 18, "name": "MODULATEALPHA_ADDCOLOR", "count": 1}
     ]
     assert r198_demand["UnsupportedArgumentSelectors"] == [
-        {"value": 4, "name": "SPECULAR", "count": 1},
         {"value": 5, "name": "TEMP", "count": 1},
     ]
     assert r198_demand["UnsupportedArgumentValues"] == [
-        {
-            "value": 4,
-            "value_hex": "0x00000004",
-            "selector": 4,
-            "selector_name": "SPECULAR",
-            "count": 1,
-        },
         {
             "value": 5,
             "value_hex": "0x00000005",
