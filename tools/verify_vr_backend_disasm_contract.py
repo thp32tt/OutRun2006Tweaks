@@ -310,10 +310,33 @@ def verify_dxvk_continuation_chain() -> None:
                     return True
             return False
 
-        if not has_predecessor_status_equality():
+        predecessor_status_values: set[str] = set()
+        for node in ast.walk(predecessor_exact_value):
+            if not (
+                isinstance(node, ast.Compare)
+                and len(node.ops) == 1
+                and isinstance(node.ops[0], ast.Eq)
+                and len(node.comparators) == 1
+            ):
+                continue
+            left, right = node.left, node.comparators[0]
+            if (
+                predecessor_field(left) == "status"
+                and isinstance(right, ast.Constant)
+                and isinstance(right.value, str)
+            ):
+                predecessor_status_values.add(right.value)
+            elif (
+                predecessor_field(right) == "status"
+                and isinstance(left, ast.Constant)
+                and isinstance(left.value, str)
+            ):
+                predecessor_status_values.add(left.value)
+        if len(predecessor_status_values) != 1:
             raise SystemExit(
-                f"DXVK continuation {continuation_id} predecessor_exact is not tied "
-                "to an exact predecessor status"
+                f"DXVK continuation {continuation_id} predecessor_exact must compare "
+                f"against exactly one predecessor status literal: "
+                f"{sorted(predecessor_status_values)}"
             )
 
         has_overlap_contract = f"{prefix}_OVERLAP_BYTES" in analyzer
@@ -358,15 +381,52 @@ def verify_dxvk_continuation_chain() -> None:
                 )
 
         if continuation_id > raw_ids[0]:
-            expected_predecessor_call = (
+            predecessor_id = continuation_id - 1
+            predecessor_proof_collector_name = (
                 "collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
-                f"{continuation_id - 1}_prefix_proof(pe)"
+                f"{predecessor_id}_prefix_proof"
             )
+            expected_predecessor_call = f"{predecessor_proof_collector_name}(pe)"
             predecessor_proof_calls = provenance_source.count(expected_predecessor_call)
             if predecessor_proof_calls != 1:
                 raise SystemExit(
                     f"DXVK continuation {continuation_id} raw provenance consumes wrong predecessor proof: "
                     f"expected={expected_predecessor_call} proof_calls={predecessor_proof_calls}"
+                )
+
+            predecessor_proof_source = function_source(predecessor_proof_collector_name)
+            predecessor_proof_ast = ast.parse(predecessor_proof_source)
+            predecessor_success_statuses: list[str] = []
+            for return_node in (
+                node
+                for node in ast.walk(predecessor_proof_ast)
+                if isinstance(node, ast.Return) and isinstance(node.value, ast.Dict)
+            ):
+                for key_node, value_node in zip(return_node.value.keys, return_node.value.values):
+                    if not (
+                        isinstance(key_node, ast.Constant)
+                        and key_node.value == "status"
+                        and isinstance(value_node, ast.IfExp)
+                        and isinstance(value_node.test, ast.Name)
+                        and value_node.test.id == "proven"
+                        and isinstance(value_node.body, ast.Constant)
+                        and isinstance(value_node.body.value, str)
+                    ):
+                        continue
+                    predecessor_success_statuses.append(value_node.body.value)
+            if len(predecessor_success_statuses) != 1:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} cannot derive exactly one "
+                    f"success status from predecessor proof {predecessor_id}: "
+                    f"{predecessor_success_statuses}"
+                )
+            expected_predecessor_status = predecessor_success_statuses[0]
+            if predecessor_status_values != {expected_predecessor_status}:
+                raise SystemExit(
+                    f"DXVK continuation predecessor status does not match predecessor proof success: "
+                    f"continuation={continuation_id} "
+                    f"expected={expected_predecessor_status!r} "
+                    f"actual={sorted(predecessor_status_values)!r}"
                 )
         provenance_name = (
             f"guarded_gf_target_c_helper_1_third_callee_continuation_"
