@@ -955,6 +955,41 @@
       "semantic_promotion": "NONE",
       "ownership_effect": "NONE",
       "exact_next_action": "Historical handoff at repair time was to exact-decode canonical 0x00182C95..0x00182CD5; newer branch frontier/state takes precedence because concurrent work has since completed that decode."
+    },
+    {
+      "unit_id": "DXVK_OVERLAP_PROVENANCE_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "f429752ae28ae1027c5f5f5fd02ead8c3ff4c3ed",
+      "validation_bearing_descendant_sha": "936ba3538bd3bc54ccb4da1f582a2d2be7ca9007",
+      "automation_validation": "PASS_DESCENDANT_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "static_contract": "PASS",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "source_commits": [
+        "7e75f690e52a75faa1529212aa3e652f64068912",
+        "f429752ae28ae1027c5f5f5fd02ead8c3ff4c3ed"
+      ],
+      "validation": {
+        "initial_failure_run_id": 36977213502,
+        "initial_failure_job_id": 110743562479,
+        "descendant_build_run_id": 36977418801,
+        "descendant_build_job_id": 110744186707,
+        "backend_disassembly_contract": "PASS",
+        "descendant_hud_inspector_run_id": 36977418796,
+        "descendant_static_exe_analysis_job_id": 110744181787,
+        "canonical_static_analysis": "PASS"
+      },
+      "issue14_implementation_comment_id": 5947174310,
+      "issue14_validation_comment_id": 5947225385,
+      "scope": "Auto-discovered cut-edge overlap collectors must compare actual canonical probe bytes against the declared overlap, fail closed through overlap_matches, expose telemetry, and bind predecessor incomplete-edge evidence while accepting both validated historical and current collector spellings.",
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "exact_next_action": "Preserve the authoritative current canonical-disassembly frontier; from raw 0x00182CD5..0x00182D15, exact-decode only complete instructions and resolve predecessor forward target 0x00182CEB only with exact boundary proof."
     }
   ]
 }
