@@ -94,6 +94,42 @@ CONSTANT_BUFFER_CONTRACT_TEXT = (
 def main() -> None:
     verify_dx11_dual_source_contract()
 
+    # R163 keeps the runtime unsupported-reason census structurally aligned
+    # with every concrete PipelineUnsupported bit. This is activation evidence:
+    # silently dropping a newer blocker would make exhaustive census misleading.
+    pipeline_unsupported_bits = sorted({
+        int(bit)
+        for bit in re.findall(
+            r"PipelineUnsupported[A-Za-z0-9_]+\\s*=\\s*1u\\s*<<\\s*(\\d+)",
+            PIPELINE_TRANSLATION_HPP)
+    })
+    census_bit_count_match = re.search(
+        r"UnsupportedBitCount\\s*=\\s*(\\d+)\\s*;", RUNTIME_CENSUS)
+    expected_pipeline_bits = list(range(16))
+    r163_unsupported_census_errors = []
+    if pipeline_unsupported_bits != expected_pipeline_bits:
+        r163_unsupported_census_errors.append(
+            "PipelineUnsupported bits must remain contiguous 0..15 or the R163 census contract must be updated")
+    if (not census_bit_count_match or
+            int(census_bit_count_match.group(1)) != len(pipeline_unsupported_bits)):
+        r163_unsupported_census_errors.append(
+            "UnsupportedBitCount must cover every concrete PipelineUnsupported bit")
+    for token, meaning in [
+        ("DX11 R163 unsupported census bit coverage drift",
+         "compile-time highest-bit coverage assertion"),
+        ("dualSource={},shadeMode={},clipping={},depthBias={}",
+         "R163 log labels for bits 12..15"),
+        ("unsupported[12], unsupported[13], unsupported[14], unsupported[15]",
+         "R163 log arguments for bits 12..15"),
+    ]:
+        if token not in RUNTIME_CENSUS:
+            r163_unsupported_census_errors.append(meaning)
+    if r163_unsupported_census_errors:
+        raise SystemExit(
+            "DX11 R163 unsupported census coverage drift: "
+            + ", ".join(r163_unsupported_census_errors)
+        )
+
     r162_shade_mode_contract = [
         ("DWORD shadeMode = D3DSHADE_GOURAUD;", D3D9_DRAW_STATE_HPP,
          "R162 tracked shade-mode field and Gouraud default"),
