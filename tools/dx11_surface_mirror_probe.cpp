@@ -127,7 +127,7 @@ int main()
         !liveTargetBinding.rtvBoundExact ||
         !liveTargetBinding.dsvBoundExact ||
         !liveTargetBinding.ready ||
-        liveTargetBinding.surfacePairSnapshotToken != reboundPair.snapshotToken ||
+        liveTargetBinding.surfacePairSnapshotToken != recreatedPair.snapshotToken ||
         liveTargetBinding.snapshotToken == 0 ||
         !binding.validate_binding_snapshot(
             context.Get(), color, depth, liveTargetBinding.snapshotToken))
