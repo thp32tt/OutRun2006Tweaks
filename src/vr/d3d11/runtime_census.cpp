@@ -29,14 +29,19 @@ namespace outrun::vr::dx11
         constexpr std::uint32_t SampleStride = 64u;
         constexpr std::size_t SignatureHashCap = 512u;
         constexpr std::size_t DetailedSignatureLogCap = 64u;
-        // R165: PipelineUnsupported currently spans bits 0..17. Exhaustive
-        // activation census must retain every blocker instead of silently
-        // dropping newer fail-closed render-state reasons.
-        constexpr std::size_t UnsupportedBitCount = 18;
+        // R166 binds the census array directly to the enum-owned one-past-last
+        // sentinel. R165 keeps dithering on its established bit while future
+        // blockers may extend the contiguous range without silent census loss.
+        constexpr std::size_t UnsupportedBitCount =
+            static_cast<std::size_t>(PipelineUnsupportedBitCount);
         static_assert(
             static_cast<std::uint32_t>(PipelineUnsupportedDither) ==
-                (1u << (UnsupportedBitCount - 1u)),
-            "DX11 R165 unsupported census bit coverage drift");
+                (1u << 17),
+            "DX11 R165 unsupported dither bit drift");
+        static_assert(
+            UnsupportedBitCount > 0u &&
+                UnsupportedBitCount <= sizeof(std::uint32_t) * 8u,
+            "DX11 R166 unsupported census sentinel out of range");
         static_assert(
             SampleStride != 0u && (SampleStride & (SampleStride - 1u)) == 0u,
             "DX11 census sample stride must remain a power of two");
