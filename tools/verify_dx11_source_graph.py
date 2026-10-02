@@ -7248,6 +7248,53 @@ def main() -> None:
             + ", ".join(missing_r174_source_mrt)
         )
 
+    r176_surface_msaa_census_contract = [
+        ("D3DMULTISAMPLE_TYPE renderTargetMultiSampleType =",
+         RUNTIME_CENSUS, "R176 RT0 sample-type census identity"),
+        ("DWORD renderTargetMultiSampleQuality = 0;",
+         RUNTIME_CENSUS, "R176 RT0 sample-quality census identity"),
+        ("D3DMULTISAMPLE_TYPE depthMultiSampleType =",
+         RUNTIME_CENSUS, "R176 depth sample-type census identity"),
+        ("DWORD depthMultiSampleQuality = 0;",
+         RUNTIME_CENSUS, "R176 depth sample-quality census identity"),
+        ("sig.renderTargetMultiSampleType = desc.MultiSampleType;",
+         RUNTIME_CENSUS, "R176 RT0 sample-type capture"),
+        ("sig.renderTargetMultiSampleQuality =",
+         RUNTIME_CENSUS, "R176 RT0 sample-quality capture"),
+        ("sig.depthMultiSampleType = desc.MultiSampleType;",
+         RUNTIME_CENSUS, "R176 depth sample-type capture"),
+        ("sig.depthMultiSampleQuality = desc.MultiSampleQuality;",
+         RUNTIME_CENSUS, "R176 depth sample-quality capture"),
+        ("sig.renderTargetMultiSampleType));",
+         RUNTIME_CENSUS, "R176 RT0 sample-type signature hash"),
+        ("hash = hash_mix(hash, sig.renderTargetMultiSampleQuality);",
+         RUNTIME_CENSUS, "R176 RT0 sample-quality signature hash"),
+        ("sig.depthMultiSampleType));",
+         RUNTIME_CENSUS, "R176 depth sample-type signature hash"),
+        ("hash = hash_mix(hash, sig.depthMultiSampleQuality);",
+         RUNTIME_CENSUS, "R176 depth sample-quality signature hash"),
+        ("surfaceMultisampleUnsupported =", RUNTIME_CENSUS,
+         "R176 non-MSAA resource-exactness predicate"),
+        ("signature.renderTargetMultiSampleType != D3DMULTISAMPLE_NONE",
+         RUNTIME_CENSUS, "R176 RT0 MSAA fail-closed gate"),
+        ("signature.depthMultiSampleType != D3DMULTISAMPLE_NONE",
+         RUNTIME_CENSUS, "R176 depth MSAA fail-closed gate"),
+        ("VR DX11 R176 surface MSAA state#{}", RUNTIME_CENSUS,
+         "R176 detailed source-surface MSAA telemetry"),
+        ("unproven D3D9-to-DXGI MSAA mapping must fail closed",
+         SURFACE_MIRROR_PROBE, "surface mirror MSAA rejection oracle"),
+    ]
+    missing_r176_surface_msaa_census = [
+        meaning
+        for token, source, meaning in r176_surface_msaa_census_contract
+        if token not in source
+    ]
+    if missing_r176_surface_msaa_census:
+        raise SystemExit(
+            "DX11 R176 surface MSAA census contract drift: "
+            + ", ".join(missing_r176_surface_msaa_census)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
