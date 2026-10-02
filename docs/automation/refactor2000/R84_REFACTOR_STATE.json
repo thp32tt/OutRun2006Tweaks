@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1226,
+  "cycle": 1229,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -251,11 +251,12 @@
     "R84-REF-BUILDGATE-C-0001",
     "R84-REF-GATEC-HOOKFRAMEWORK-0006",
     "R84-REF-GATEC-VERIFY-0007",
-    "R84-REF-GATEC-STATIC-0008"
+    "R84-REF-GATEC-STATIC-0008",
+    "R84-REF-GATED-PREP-0001"
   ],
-  "next": "Consume exact BUILD_GATE 1226 run created by this checkpoint SHA. Because workflow concurrency cancels older in-progress runs, this latest SHA supersedes run 36995619331. If compile fails, repair only the first concrete Gate C dependency.",
-  "updatedKst": "2026-10-02T19:34:00+09:00",
-  "batchStatus": "R84_GATE_C_BUILD_GATE_1226_TRIGGERED",
+  "next": "Wait for exact BUILD_GATE 1226 run 36995965710 to start/complete after cancellation cleanup of superseded run 36995619331. In parallel Gate D dependency inventory is ready: R31 references four R30 draw destinations plus ScreenSpaceInstallState/ClassifyScreenSpacePass/BuildScreenSpaceEyeConstants; do not split Gate D until Gate C is green.",
+  "updatedKst": "2026-10-02T19:36:00+09:00",
+  "batchStatus": "R84_GATE_C_BUILD_PENDING_GATE_D_PREP_CYCLE_1229",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -480,7 +481,8 @@
     "Cycles 1215-1217 R84-REF-GATEC-HOOKFRAMEWORK-0005: consumed exact Gate C run 36989036395/job 110780663431 for HEAD lineage. Verifier PASS; configure PASS; compile FAIL. FAILURE_CLASS=PRODUCT_DEFECT. First concrete compile signature: stereo_renderer_r32.cpp(1336) HookManager undeclared / ReportAsyncResult not found, followed by Hook base undefined at 1366. Ownership evidence: hook framework is declared in src/hook_mgr.hpp and was previously inherited through the textual include chain. Minimal source repair identified: explicit R32 dependency on ../../hook_mgr.hpp only; no Reset/Present/DirectGPU/ACK/fence/copy/StateBlock semantics change. APPLY_GATE 1217 attempted twice with exact HEAD/blob CAS but connector safety filter blocked update_file; SOURCE_CHANGED=NO due tool block, not NO_SAFE_CHANGE. Runtime NEED_HMD_TEST.",
     "Cycles 1218-1220 R84-REF-GATEC-HOOKFRAMEWORK-0006: added explicit ../../hook_mgr.hpp dependency to R32 independent TU; hook bodies/order unchanged. APPLY_GATE 1220 SOURCE_CHANGED=YES commit 436746c15068c68bd142d65e4d79e7dce229df51. BUILD_GATE 1220 exact run 36995619331/job 110801538218 started. Runtime NEED_HMD_TEST.",
     "Cycles 1221-1223 R84-REF-GATEC-VERIFY-0007: verifier now pins R32 explicit hook framework include so textual-chain dependency cannot regress. APPLY_GATE 1223 SOURCE_CHANGED=VERIFIER_ONLY; build input changed, BUILD_GATE 1226 required. Runtime NEED_HMD_TEST.",
-    "Cycles 1224-1226 R84-REF-GATEC-STATIC-0008: re-scanned R32 independent-TU direct lower-runtime/transport identifiers after hook_mgr repair. Previously reported Settings/SharedState/raw hook/DirectTransportSlots direct accesses remain eliminated or flow through neutral facades; no additional evidence-backed source change before compile. APPLY_GATE 1226 NO_SAFE_CHANGE. BUILD_GATE 1226 intentionally retriggered on latest source+verifier SHA; older in-progress 1220 run may be cancelled by workflow concurrency. Runtime NEED_HMD_TEST."
+    "Cycles 1224-1226 R84-REF-GATEC-STATIC-0008: re-scanned R32 independent-TU direct lower-runtime/transport identifiers after hook_mgr repair. Previously reported Settings/SharedState/raw hook/DirectTransportSlots direct accesses remain eliminated or flow through neutral facades; no additional evidence-backed source change before compile. APPLY_GATE 1226 NO_SAFE_CHANGE. BUILD_GATE 1226 intentionally retriggered on latest source+verifier SHA; older in-progress 1220 run may be cancelled by workflow concurrency. Runtime NEED_HMD_TEST.",
+    "Cycles 1227-1229 R84-REF-GATED-PREP-0001: review-only Gate D dependency inventory while Gate C build queue drains. R31 direct R30-facing dependencies are four R30 draw hook destinations plus ScreenSpaceInstallState/ClassifyScreenSpacePass/BuildScreenSpaceEyeConstants; screen_space_hooks.hpp already covers draw targets and existing render API covers screen-space helpers. No Gate D source edit because Gate C is not yet green. APPLY_GATE 1229 NO_SAFE_CHANGE. Runtime NEED_HMD_TEST."
   ],
   "campaign": {
     "startCycle": 1202,
