@@ -1,0 +1,151 @@
+{
+  "schema_version": 43,
+  "controller_schema_version": 43,
+  "schema": "outrun-c00476-index61-post-reset-lineage-independent-qa-v43",
+  "task_id": "LOCALIZATION-LOCALIZATION_C-00476",
+  "lane": "LOCALIZATION_C",
+  "role": "INDEPENDENT_BATCH_QA_CONSUMER_SHARED_STATE_RECONCILE",
+  "target_branch": "korean-localization-clean",
+  "attempt": "1/3",
+  "chat_rollover": 12,
+  "recorded_at_kst": "2026-10-02T12:33:00+09:00",
+  "base_head_sha": "b5cb49b3960e351bc1948d3bd1a9321d729dbee6",
+  "base_sha": "b5cb49b3960e351bc1948d3bd1a9321d729dbee6",
+  "commit_mode": "VALIDATION_BEARING_C_CHECKPOINT",
+  "result": "REWORK_REQUIRED_INDEX61_C4A2937B_POST_RESET_SOURCE_LINEAGE_VIOLATION_RUNTIME_UNTESTED",
+  "summary": "C independently reviewed the exact B00342 result for index61/C4A2937B. Canonical HD source identity, DDS geometry/header, semantic repair intent and reported zero-pixel containment are consistent, but the producer QA explicitly identifies its clean plate as C85_CURRENT_CANDIDATE_LOCAL_TWO_ELEMENT_CLEAN_PLATE and reuses the unchanged pre-reset C85 Korean candidate for the other 19 regions. The mandatory 2026-09-29 generation-reset contract forbids using any older Korean candidate pixels/clean plate/mask/crop/composite as construction input and requires rebuilding from the exact English HD source. Therefore the exact B00342 candidate is non-promotable and is returned REWORK_REQUIRED to lane B. C does not rewrite candidate DDS bytes. No real-game test was performed.",
+  "qa_batch_inputs": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+      "lane": "LOCALIZATION_B",
+      "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
+      "result_message": "localization(B): rework index61 C4A2937B semantics [AUTO:LOCALIZATION-LOCALIZATION_B-00342]",
+      "producer_id": "P00214",
+      "automation_validation": "PENDING",
+      "validation_mode": "C_BATCH_GATE"
+    }
+  ],
+  "qa_dispositions": [
+    {
+      "task_id": "LOCALIZATION-LOCALIZATION_B-00342",
+      "result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
+      "status": "REWORK_REQUIRED",
+      "production_readiness": "REWORK_REQUIRED_REBUILD_ENTIRE_INDEX61_FROM_EXACT_ENGLISH_HD_SOURCE",
+      "reason": "Exact producer evidence states clean_plate.lineage=C85_CURRENT_CANDIDATE_LOCAL_TWO_ELEMENT_CLEAN_PLATE, integrated_self_qa.current_candidate_fingerprint_gate=PASS_EXACT_C85_LINEAGE, and unchanged_19_element_heavy_qa_reused=true. C85 predates the mandatory 2026-09-29 generation reset. The current contract forbids reusing any older Korean candidate pixels, cleaned background, glyphs, masks, patches, crops or composites and requires every localized graphic to restart from the exact English HD source DDS. Containment/header PASS cannot override this lineage gate. Lane B must rebuild the full index61 atlas from the exact English HD source while preserving the corrected semantics 하트선을 통과하세요! and 스테이지 보너스, then regenerate fresh v2 clean-plate/review/QA evidence."
+    }
+  ],
+  "policy_resolution": {
+    "dispatch_controller_schema_version": 43,
+    "dispatch_controller_config_blob_sha": "e6cc40a12511f7d9a0cd09b1da49acc1b7c2c648",
+    "automation_contract_blob_sha": "fa805264375e45ebd99731b88f532ff953bd02f7",
+    "orientation_policy_blob_sha": "791e53094be2abde6eb2fb55b6220b84a872e3e0",
+    "resolution": "LATEST_HEAD_SCHEMA43_AND_CURRENT_GENERATION_RESET_POLICY_APPLIED"
+  },
+  "input_fingerprint": {
+    "producer_result_sha": "89231474a0d059e84fa324a46fba1c6f989a3ed6",
+    "producer_candidate_sha256": "e31487c2d8023ce79a07999bec3fa673517dcc1332f69074c05bea3f4b4417d7",
+    "current_candidate_git_blob_sha": "ac02eaf2bb6ddc64dec27cfa3f3b13681b03765a",
+    "canonical_source_git_blob_sha": "aa0e87be65349bca1ddad278f8f336f9511c95f5",
+    "canonical_source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+    "canonical_source_header128_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f",
+    "uploaded_hd_archive_sha256": "76f85ed2ca27344a4292ac7e010a786579b4eebb1a370c0aa126fcb2b231d958",
+    "source_dimensions": [
+      4096,
+      4096
+    ],
+    "source_mip_count": 1,
+    "asset_queue_blob_sha": "dc4672c4e248af8a34558362eaf3d277daa380e5",
+    "progress_blob_sha": "9b93e2a1467e7568fee88f35bc2fa0dba69c1f91",
+    "resume_state_blob_sha": "13c468ebf5c9cf5d72e451fe86bc16a1f62cfdc0"
+  },
+  "independent_verification": {
+    "queue_index": 61,
+    "asset": "C4A2937B",
+    "exact_uploaded_source_archive_member": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "uploaded_source_identity": "PASS_SHA256_HEADER128_DIMENSIONS_MIP1",
+    "producer_source_identity": "PASS_MATCHES_EXACT_UPLOADED_HD_SOURCE",
+    "semantic_repair": {
+      "Cut the line!": "하트선을 통과하세요!",
+      "STAGE BONUS": "스테이지 보너스",
+      "status": "PASS_SEMANTIC_INTENT"
+    },
+    "producer_reported_zero_pixel_metrics": {
+      "changed_pixels_outside_edit_mask": 0,
+      "changed_pixels_outside_source_region": 0,
+      "changed_pixels_in_protected_mask": 0,
+      "introduced_alpha_outside_source_region": 0,
+      "alpha_changed_outside_edit_mask": 0,
+      "one_pixel_overflow_count": 0
+    },
+    "visual_review_artifacts_present": true,
+    "candidate_lineage": "FAIL_PRE_RESET_C85_KOREAN_CANDIDATE_REUSED_AS_CLEAN_PLATE",
+    "generation_reset_gate": "REWORK_REQUIRED",
+    "candidate_promotable": false
+  },
+  "required_rework": {
+    "owner_lane": "LOCALIZATION_B",
+    "queue_index": 61,
+    "asset": "C4A2937B",
+    "rebuild_scope": "FULL_INDEX61_ATLAS_FROM_EXACT_ENGLISH_HD_SOURCE",
+    "forbid_reuse": [
+      "C85 Korean candidate pixels",
+      "pre-reset clean plate",
+      "pre-reset masks/patches/crops/composites"
+    ],
+    "preserve_semantics": [
+      "하트선을 통과하세요!",
+      "스테이지 보너스"
+    ],
+    "required_evidence": [
+      "fresh source-derived clean plate",
+      "fresh v2 prompt/spec",
+      "fresh source-vs-candidate PNG review set",
+      "fresh machine QA with zero-pixel/protected-mask metrics",
+      "exact DDS header/orientation/alpha checks"
+    ],
+    "runtime_validation": "UNTESTED"
+  },
+  "de_duplication": {
+    "identity": "TASK_ID@RESULT_SHA",
+    "exact_input_checked_once": true,
+    "completed_work_repeated": false,
+    "candidate_dds_rewritten_by_c": false
+  },
+  "material_deliverable": {
+    "type": "INDEPENDENT_C_INDEX61_LINEAGE_GATE_REWORK_DISPOSITION",
+    "reviewed_inputs": 1,
+    "producer_inputs_pass": 0,
+    "producer_inputs_rework_required": 1,
+    "candidate_dds_modified_by_c": false,
+    "shared_state_candidate_promotion": false,
+    "materially_reduces_unresolved_work": true,
+    "report": "docs/automation/runs/LOCALIZATION-LOCALIZATION_C-00476.json"
+  },
+  "throughput_kpis": {
+    "production_complete": {
+      "new_this_checkpoint": 0
+    },
+    "rework_returned": [
+      "LOCALIZATION-LOCALIZATION_B-00342@index61/C4A2937B"
+    ],
+    "runtime_validated": []
+  },
+  "candidate_dds_modified": false,
+  "shared_state_modified": false,
+  "peer_candidate_files_modified": false,
+  "runtime_test_performed": false,
+  "build_performed": false,
+  "n100_used": false,
+  "local_clone_used": false,
+  "google_drive_used": false,
+  "google_drive_write_performed": false,
+  "uploaded_archive_used": true,
+  "vr_ffb_dx_changes": false,
+  "automation_validation": "PENDING_UNTIL_C_BATCH_GATE",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "result_sha": null,
+  "authoritative_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_commit_message": "localization(C): reject index61 pre-reset lineage [AUTO:LOCALIZATION-LOCALIZATION_C-00476]"
+}
