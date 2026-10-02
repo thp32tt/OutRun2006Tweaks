@@ -826,17 +826,11 @@ def finalize_c_qa_batch(q: dict, task: dict) -> None:
 
 
 async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
-    """Run exactly one A/B producer wave, then gate the next wave on C QA."""
+    """Run A/B as continuous producers and C as an independent batched QA consumer."""
     now = datetime.now(TZ)
     q = load_queue_state()
     reg = load_registry(now)
     active_by_lane = q.setdefault("active_by_lane", {})
-
-    # Recovery branch is permanently A/B/C-only. Drop stale E/legacy lane state
-    # that may still exist in a reused localization Docker volume.
-    for stale_lane in list(active_by_lane):
-        if stale_lane not in {"A", "B", "C"}:
-            active_by_lane.pop(stale_lane, None)
 
     # One-time migration from the old single-active localization queue.
     legacy = q.get("active")
@@ -845,8 +839,8 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
         if legacy_slot in {"A", "B", "C"}:
             legacy.setdefault("terminal", None)
             active_by_lane[legacy_slot] = legacy
-        q["active"] = None
-        save_queue_state(q)
+            q["active"] = None
+            save_queue_state(q)
 
     if rate_limit_active(reg, now):
         write_runtime(
@@ -856,144 +850,74 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
         )
         return
 
-    # Advance only the lanes belonging to the current wave.
+    # Advance all three lanes independently. C never blocks A/B production.
     for lane_key in ("A", "B", "C"):
         if lane_key in active_by_lane:
             await localization_process_lane(context, pages, q, lane_key)
 
     active_by_lane = q.setdefault("active_by_lane", {})
 
-    # Retire completed A/B tasks and freeze their immutable TASK_ID@RESULT_SHA
-    # records for the current wave's C gate.
-    changed = False
+    # Retire completed producers immediately and enqueue immutable task/result SHAs for C.
+    producer_retired = []
     for lane_key in ("A", "B"):
         task = active_by_lane.get(lane_key)
         if task and task.get("phase") == "DONE":
-            enqueue_producer_result_for_qa(q, task)
+            if enqueue_producer_result_for_qa(q, task):
+                producer_retired.append(f"{task.get('task_id')}->{task.get('result_sha')}")
             active_by_lane.pop(lane_key, None)
-            changed = True
 
-    # C is the barrier. A new producer wave is forbidden until the C task for the
-    # current wave is terminal and its reconciliation commit is durable.
+    # Retire one finished C batch without touching producer slots.
     ctask = active_by_lane.get("C")
     if ctask and ctask.get("phase") == "DONE":
         finalize_c_qa_batch(q, ctask)
         active_by_lane.pop("C", None)
-        q["wave_id"] = None
-        q["wave_started_at"] = None
-        q["wave_producer_lanes"] = []
-        q["wave_qa_task_id"] = ctask.get("task_id")
-        q["wave_qa_result_sha"] = ctask.get("result_sha")
-        changed = True
-        save_queue_state(q)
-        write_runtime(
-            status="parallel_wave_complete",
-            last_action=f"{ctask.get('wave_id')}: C barrier terminal; next A/B wave unlocked",
-            queue=q,
-        )
-        return
 
-    if changed:
+    if producer_retired or (ctask and ctask.get("phase") == "DONE"):
         save_queue_state(q)
 
-    wave_id = q.get("wave_id")
-
-    # Open a new wave only when there is no previous wave waiting for C.
-    if not wave_id:
-        q["wave_counter"] = int(q.get("wave_counter", 0)) + 1
-        wave_id = f"W{q['wave_counter']:05d}"
-        q["wave_id"] = wave_id
-        q["wave_started_at"] = now.isoformat()
-        q["wave_producer_lanes"] = []
-        q["wave_qa_task_id"] = None
-        q["wave_qa_result_sha"] = None
-        save_queue_state(q)
-
-    # Recover which producer lanes have already reached a terminal record in this
-    # wave. This survives container restarts because completed/blocked state is durable.
-    terminal_lanes = set()
-    for record in list(q.get("completed", [])) + list(q.get("blocked", [])):
-        if record.get("wave_id") == wave_id and record.get("lane") in {"LOCALIZATION_A", "LOCALIZATION_B"}:
-            terminal_lanes.add("A" if record.get("lane") == "LOCALIZATION_A" else "B")
-
-    # Dispatch each producer exactly once for this wave. Send gaps can defer the
-    # second lane to the next tick without changing the wave id.
+    # Keep both producers fed independently. No A+B/C barrier exists.
     for lane_key in ("A", "B"):
-        if lane_key in active_by_lane or lane_key in terminal_lanes:
+        active_by_lane = q.setdefault("active_by_lane", {})
+        if lane_key in active_by_lane:
             continue
-        if await localization_send_lane_task(context, pages, q, lane_key, wave_id):
+        producer_id = f"P{int(q.get('producer_counter', 0)) + 1:05d}"
+        if await localization_send_lane_task(context, pages, q, lane_key, producer_id):
             q["producer_counter"] = int(q.get("producer_counter", 0)) + 1
-            lanes = set(q.get("wave_producer_lanes") or [])
-            lanes.add(lane_key)
-            q["wave_producer_lanes"] = sorted(lanes)
             save_queue_state(q)
 
+    # C consumes immutable producer results in batches. Waiting briefly for coalescing
+    # reduces repeated source/header/atlas/shared-state work without pausing production.
     active_by_lane = q.setdefault("active_by_lane", {})
-    if any(k in active_by_lane for k in ("A", "B")):
-        write_runtime(
-            status="parallel_wave_running",
-            last_action=f"{wave_id}: waiting for A/B material terminals before C",
-            queue=q,
-        )
-        return
+    pending = q.get("qa_pending", [])
+    if "C" not in active_by_lane and pending:
+        batch = pending[:LOCALIZATION_QA_BATCH_SIZE]
+        oldest = _parse_iso(batch[0].get("completed_at")) or now
+        age = (now - oldest).total_seconds()
+        if len(batch) < LOCALIZATION_QA_BATCH_SIZE and age < LOCALIZATION_QA_COALESCE_SECONDS:
+            write_runtime(
+                status="qa_batch_coalescing",
+                last_action=f"C QA collecting batch: {len(batch)}/{LOCALIZATION_QA_BATCH_SIZE}, oldest {int(age)}s",
+                queue=q,
+            )
+            return
+        qa_id = f"Q{int(q.get('qa_batch_counter', 0)) + 1:05d}"
+        if await localization_send_lane_task(context, pages, q, "C", qa_id, qa_batch=batch):
+            q["qa_batch_counter"] = int(q.get("qa_batch_counter", 0)) + 1
+            save_queue_state(q)
+            write_runtime(
+                status="qa_batch_running",
+                last_action=f"{qa_id}: C reviewing {len(batch)} producer results while A/B continue",
+                queue=q,
+            )
+            return
 
-    # Recompute terminal lanes after possible producer retirement.
-    terminal_lanes = set()
-    for record in list(q.get("completed", [])) + list(q.get("blocked", [])):
-        if record.get("wave_id") == wave_id and record.get("lane") in {"LOCALIZATION_A", "LOCALIZATION_B"}:
-            terminal_lanes.add("A" if record.get("lane") == "LOCALIZATION_A" else "B")
-
-    if terminal_lanes != {"A", "B"}:
-        write_runtime(
-            status="parallel_wave_running",
-            last_action=f"{wave_id}: producer barrier {sorted(terminal_lanes)}; waiting for both A/B terminals",
-            queue=q,
-        )
-        return
-
-    # Only current-wave immutable producer results are passed to C.
-    batch = [
-        item for item in q.get("qa_pending", [])
-        if item.get("producer_id") == wave_id
-    ]
-
-    if "C" in active_by_lane:
-        write_runtime(
-            status="parallel_c_barrier",
-            last_action=f"{wave_id}: C QA barrier running",
-            queue=q,
-        )
-        return
-
-    if not batch:
-        # Both producer slots ended without a material result. There is nothing for
-        # C to validate; close this empty wave without fabricating a QA commit.
-        q["wave_id"] = None
-        q["wave_started_at"] = None
-        q["wave_producer_lanes"] = []
-        save_queue_state(q)
-        write_runtime(
-            status="parallel_wave_complete",
-            last_action=f"{wave_id}: no material producer result; empty wave closed",
-            queue=q,
-        )
-        return
-
-    qa_id = f"Q{int(q.get('qa_batch_counter', 0)) + 1:05d}"
-    if await localization_send_lane_task(context, pages, q, "C", wave_id, qa_batch=batch):
-        q["qa_batch_counter"] = int(q.get("qa_batch_counter", 0)) + 1
-        q["wave_qa_task_id"] = q.get("active_by_lane", {}).get("C", {}).get("task_id")
-        save_queue_state(q)
-        write_runtime(
-            status="parallel_c_barrier",
-            last_action=f"{wave_id}: C reviewing {len(batch)} immutable A/B result(s); next wave locked",
-            queue=q,
-        )
-        return
-
+    active_by_lane = q.setdefault("active_by_lane", {})
     write_runtime(
-        status="parallel_c_barrier",
-        last_action=f"{wave_id}: A/B terminal; waiting to dispatch C barrier",
+        status="continuous_production_qa_running",
+        last_action=(
+            f"A/B continuous producers; C QA pending={len(q.get('qa_pending', []))} "
+            f"active={','.join(sorted(active_by_lane.keys())) or 'none'}"
+        ),
         queue=q,
     )
 
