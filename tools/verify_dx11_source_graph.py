@@ -2720,6 +2720,33 @@ def main() -> None:
             + ", ".join(missing_r155_direct_pointlist_raster)
         )
 
+    r157_direct_line_raster_contract = [
+        ("bool lineRasterSemanticsExact{};", NATIVE_BACKEND_HPP,
+         "R157 direct line-raster semantic gate"),
+        ("primitive != D3DPT_LINELIST && primitive != D3DPT_LINESTRIP",
+         NATIVE_BACKEND_CPP, "R157 line-list/line-strip fail-closed assignment"),
+        ("out.lineRasterSemanticsExact &&", NATIVE_BACKEND_CPP,
+         "R157 readiness requires proven line-raster semantics"),
+        ("out.lineRasterSemanticsExact ? 0x157u : 0u", NATIVE_BACKEND_CPP,
+         "R157 direct-dispatch snapshot contract version"),
+        ("R157 line fixture reaches exact dormant IA topology",
+         CONSTANT_BUFFER_PROBE, "R157 exact line topology fixture"),
+        ("R157 direct line raster semantics remain fail closed",
+         CONSTANT_BUFFER_PROBE, "R157 line-raster fail-closed proof"),
+        ("DX11 direct line raster semantics R157: PASS",
+         CONSTANT_BUFFER_PROBE, "R157 hosted probe completion marker"),
+    ]
+    missing_r157_direct_line_raster = [
+        meaning
+        for token, source, meaning in r157_direct_line_raster_contract
+        if token not in source
+    ]
+    if missing_r157_direct_line_raster:
+        raise SystemExit(
+            "DX11 R157 direct line-raster contract drift: "
+            + ", ".join(missing_r157_direct_line_raster)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
