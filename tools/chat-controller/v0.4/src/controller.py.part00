@@ -308,6 +308,7 @@ runtime = {
     "localization_slot_dedup_seconds": LOCALIZATION_SLOT_DEDUP_SECONDS,
     "same_task_control_gap_seconds": SAME_TASK_CONTROL_GAP_SECONDS,
     "premature_stop_rollover_threshold": PREMATURE_STOP_ROLLOVER_THRESHOLD,
+    "producer_premature_stop_rollover_threshold": PRODUCER_PREMATURE_STOP_ROLLOVER_THRESHOLD,
     "producer_continuation_cooldown_seconds": PRODUCER_CONTINUATION_COOLDOWN_SECONDS,
     "configured_slot_count": CHAT_SLOTS,
     "max_task_attempts": MAX_TASK_ATTEMPTS,
