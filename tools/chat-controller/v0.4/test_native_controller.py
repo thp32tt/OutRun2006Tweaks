@@ -23,6 +23,9 @@ def load_function(name, **overrides):
               SAME_TASK_CONTROL_GAP_SECONDS=15,
               PREMATURE_STOP_ROLLOVER_THRESHOLD=3,
               PRODUCER_PREMATURE_STOP_ROLLOVER_THRESHOLD=2,
+              CONVERSION_PREMATURE_STOP_ROLLOVER_THRESHOLD=2,
+              CONVERSION_PIPELINE_SCHEMA_VERSION=2,
+              CONVERSION_PIPELINE_STAGES=("C0_RECOVER","C1_REVIEW","C2_IMPLEMENT","C3_VALIDATE","C4_COMMIT","C5_PACKAGE","C6_STATE"),
               PRODUCER_CONTINUATION_COOLDOWN_SECONDS=15,
               LOCALIZATION_PRODUCER_TARGET_CANDIDATES=2,
               LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS=8,
@@ -81,6 +84,12 @@ class NativeControllerTests(unittest.TestCase):
                 self.assertIn('KOREAN_RENDER', prompt)
                 self.assertIn('[AUTO:TASK_ID]', prompt)
                 self.assertLessEqual(len(prompt.encode()), 1700)
+            elif name in ('conversion_dx11', 'conversion_dxvk'):
+                self.assertIn('C0_RECOVER', prompt)
+                self.assertIn('C2_IMPLEMENT', prompt)
+                self.assertIn('C6_STATE', prompt)
+                self.assertIn('pipeline_schema_version=2', prompt)
+                self.assertLessEqual(len(prompt.encode()), 1200)
             else:
                 self.assertLessEqual(len(prompt.encode()), 650)
             self.assertIn('Skill', prompt)
@@ -774,7 +783,7 @@ class NativeControllerTests(unittest.TestCase):
         self.assertEqual(active['attempt'], 1)
         self.assertEqual(active['phase'], 'WAIT_CHAT')
 
-    def test_conversion_premature_stop_rolls_same_task_on_third_turn(self):
+    def test_conversion_premature_stop_rolls_same_task_on_second_turn(self):
         same_chat = AsyncMock(return_value=True)
         rollover = AsyncMock(return_value=True)
         f, _ = load_function(
@@ -795,12 +804,9 @@ class NativeControllerTests(unittest.TestCase):
         self.assertEqual(active['premature_stop_count'], 1)
         active['sent_at'] = '2026-10-02T00:01:00+00:00'
         self.assertTrue(asyncio.run(f(None, {}, active, 'h2')))
-        self.assertEqual(active['premature_stop_count'], 2)
-        active['sent_at'] = '2026-10-02T00:02:00+00:00'
-        self.assertTrue(asyncio.run(f(None, {}, active, 'h3')))
         rollover.assert_awaited_once()
         self.assertEqual(active['premature_stop_count'], 0)
-        self.assertEqual(active['premature_stop_total'], 3)
+        self.assertEqual(active['premature_stop_total'], 2)
         self.assertTrue(active['task_latched'])
         self.assertEqual(active['phase'], 'WAIT_CHAT')
 
@@ -889,7 +895,9 @@ class NativeControllerTests(unittest.TestCase):
     def test_conversion_parallel_dispatch_uses_conversion_task_prefix(self):
         source = ast.get_source_segment(SOURCE, FUNCTIONS['localization_send_lane_task']) or ''
         self.assertIn('"CONVERSION" if CONTROLLER_MODE == "conversion"', source)
-        self.assertIn('"WAIT_DURABLE_RESULT" if CONTROLLER_MODE == "conversion"', source)
+        self.assertIn('"C0_RECOVER" if CONTROLLER_MODE == "conversion"', source)
+        self.assertIn('"conversion_pipeline_schema_version"', source)
+        self.assertIn('"conversion_pipeline_required_stages"', source)
 
     def test_no_progress_is_handled_even_when_send_deferred(self):
         self.assertTrue('queue_handle_native_response' in FUNCTIONS)
