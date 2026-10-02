@@ -573,6 +573,19 @@ def verify_dxvk_continuation_chain() -> None:
                     f"declaration drift: targets are not successor instruction boundaries: "
                     f"{[f'0x{rva:08X}' for rva in missing_successor_boundaries]}"
                 )
+            if resolved_predecessor_name not in proof_source:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} declares resolved predecessor "
+                    "targets but its proof does not consume the declaration"
+                )
+            if (
+                resolved_predecessor_targets
+                and "resolved_predecessor_targets_on_boundaries" not in proof_source
+            ):
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} resolved predecessor targets "
+                    "are not guarded by an exact-boundary proof"
+                )
         proof_status_fail_closed_markers = (
             "proven = bool(",
             '"status"',
