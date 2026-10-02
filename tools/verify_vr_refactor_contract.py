@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -886,13 +887,14 @@ if '#include "../ipc/protocol.hpp"' not in read("src/vr/lifecycle/frame_accounti
     errors.append("frame accounting does not include canonical IPC failure contract")
 for legacy in (
     "IsGameDevice(",
-    "InternalStereoPass",
     "StereoWanted()",
     "TargetIsBackBuffer()",
     "StereoInstalledDevice.load(",
 ):
     if legacy in r34:
         errors.append(f"R34 retained implicit lower-TU runtime dependency: {legacy}")
+if re.search(r"\\bInternalStereoPass\\b", r34):
+    errors.append("R34 retained implicit lower-TU runtime dependency: InternalStereoPass")
 
 
 if errors:
