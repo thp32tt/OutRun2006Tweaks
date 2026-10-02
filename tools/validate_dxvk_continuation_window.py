@@ -25,7 +25,8 @@ def parse_hex_window(value: str) -> bytes:
 
 def validate_window(data: bytes, start: int, end: int, expected_hex: str) -> dict:
     expected = parse_hex_window(expected_hex)
-    actual = data[start : start + len(expected)]
+    valid_slice = 0 <= start <= end <= len(data)
+    actual = data[start : start + len(expected)] if valid_slice else b""
     return {
         "offset": hex(start),
         "end_offset": hex(end),
@@ -35,7 +36,7 @@ def validate_window(data: bytes, start: int, end: int, expected_hex: str) -> dic
         "available_length": len(actual),
         "expected_length": len(expected),
         "window_contains_overlap": start < end and start + len(expected) <= end,
-        "window_within_binary": 0 <= start <= end <= len(data),
+        "window_within_binary": valid_slice,
     }
 
 
