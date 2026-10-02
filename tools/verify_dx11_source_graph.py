@@ -2794,8 +2794,8 @@ def main() -> None:
             + ", ".join(missing_r156_indexed_fan_vertex_capacity)
         )
 
-    r160_indexed_fan_declared_vertex_range_contract = [
-        ("R160: preserve D3D9 indexed-fan declared vertex range",
+    indexed_fan_declared_vertex_range_contract = [
+        ("DX11-FAN-DECLARED-RANGE: preserve D3D9 indexed-fan declared vertex range",
          r156_indexed_fan_dispatch_body, "R158 declared source-range proof"),
         ("sourceDeclaredVertexRangeExact", NATIVE_BACKEND_HPP,
          "R158 declared-range readiness field"),
@@ -2807,24 +2807,24 @@ def main() -> None:
          r156_indexed_fan_dispatch_body, "R158 NumVertices lineage"),
         ("expansion.sourceElementCount, out.sourceMinVertexIndex",
          r156_indexed_fan_dispatch_body, "R158 bounded MANAGED source scan"),
-        ("out.sourceDeclaredVertexRangeExact ? 0x160u : 0u",
+        ("out.sourceDeclaredVertexRangeExact ? 0x46414e52u : 0u",
          r156_indexed_fan_dispatch_body, "R158 declared range in snapshot"),
-        ("out.sourceValuesWithinDeclaredRange ? 0x1601u : 0u",
+        ("out.sourceValuesWithinDeclaredRange ? 0x46414e53u : 0u",
          r156_indexed_fan_dispatch_body, "R158 source-value proof in snapshot"),
-        ("R160 indexed fan dispatch rejects source index outside D3D9 declared vertex range",
+        ("indexed fan dispatch rejects source index outside D3D9 declared vertex range",
          CONSTANT_BUFFER_PROBE, "R158 fail-closed declared range probe"),
-        ("DX11 indexed fan declared vertex range R160: PASS",
+        ("DX11 indexed fan declared vertex range: PASS",
          CONSTANT_BUFFER_PROBE, "R158 hosted probe completion marker"),
     ]
-    missing_r160_indexed_fan_declared_vertex_range = [
+    missing_indexed_fan_declared_vertex_range = [
         meaning
-        for token, source, meaning in r160_indexed_fan_declared_vertex_range_contract
+        for token, source, meaning in indexed_fan_declared_vertex_range_contract
         if token not in source
     ]
-    if missing_r160_indexed_fan_declared_vertex_range:
+    if missing_indexed_fan_declared_vertex_range:
         raise SystemExit(
-            "DX11 R160 indexed fan declared vertex-range contract drift: "
-            + ", ".join(missing_r160_indexed_fan_declared_vertex_range)
+            "DX11 indexed fan declared vertex-range contract drift: "
+            + ", ".join(missing_indexed_fan_declared_vertex_range)
         )
 
     r160_indexed_fan_declared_vb_capacity_contract = [
