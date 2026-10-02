@@ -2,25 +2,28 @@
   "task_id": "CONVERSION-DXVK-00278",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
-  "attempt": 1,
-  "base_sha": "83e00209698d06d0c1430b38883df037322986e7",
-  "result_sha": "PENDING_COMMIT_RESPONSE",
-  "automation_validation": "RECORD_COMMIT_CREATED",
+  "attempt": "2/3",
+  "base_sha": "ec42fd8c6a29c5cf2dc7811ae2e73c83307fe15c",
+  "result_sha": "PENDING",
+  "automation_validation": "UNTESTED_PENDING_GATE",
   "runtime_validation": "UNTESTED",
-  "runtime_test_required": false,
   "checkpoint": "C6_STATE",
-  "work_type": "durable_task_checkpoint",
-  "selected_work_item": "CONTINUE_FROM_EXACT_INSTRUCTION_BOUNDARY_0x00182635",
-  "summary": "Recovered DXVK conversion lane state from GitHub HEAD. Confirmed branch isolation, conversion state precedence, and next bounded static/disassembly continuation point. No runtime claim and no backend promotion performed.",
+  "work_type": "dxvk_conversion_checkpoint",
+  "selected_work_item": "CONTINUE_FROM_EXACT_INSTRUCTION_BOUNDARY_0x00182730",
+  "failure_investigation": {
+    "workflow_run": 36958860314,
+    "conclusion": "cancelled",
+    "job_inspection": "no_jobs_returned_after_completion",
+    "confirmed_failure": "No failed step evidence available; cancellation occurred before actionable job log evidence was exposed."
+  },
+  "changes": {
+    "source_changed": false,
+    "reason": "Do not modify conversion source without a reproducible failing gate step. Preserve evidence and continue bounded DXVK static work."
+  },
   "evidence": [
-    "GitHub HEAD before task: 83e00209698d06d0c1430b38883df037322986e7.",
-    "docs/CONVERSION_LANE_STATE.json selects DXVK lane state over inherited VR state.",
-    "Runtime validation remains UNTESTED until Quest 3/VDXR evidence exists."
+    "HEAD run 36958860314 was d5ae35f13b5ecf14d385401ef8ac0a3a34d8f259.",
+    "CONVERSION_LANE_STATE.json keeps DXVK lane precedence.",
+    "Runtime validation remains UNTESTED."
   ],
-  "changed_paths": [
-    "docs/automation/runs/CONVERSION-DXVK-00278.json"
-  ],
-  "source_changed": false,
-  "runtime_claim": "NONE",
-  "next_action": "Continue bounded canonical EXE provenance/disassembly work from 0x00182635 while preserving DXVK isolation."
+  "next_action": "Continue exact canonical disassembly window from 0x00182730 and create the next bounded DXVK evidence commit; do not claim runtime or CI success."
 }
