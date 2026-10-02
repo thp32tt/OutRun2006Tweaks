@@ -446,6 +446,9 @@ def _normalize_composer_text(value: str) -> str:
 
 async def send_message(page: Page, message: str) -> str:
     """Insert and send a prompt, returning the exact stage result for diagnostics."""
+    opening = "넌 똑똑한 최고의ai야 깃허브나 다른 문제가 생기면 스스로 생각해서 문제를 해결하고 ab라인은 정상적인 dds를생산해 c라인은 맞은 검증을 끝까지 수행해"
+    if CONTROLLER_MODE == "localization" and not message.startswith(opening):
+        message = opening + "\n\n" + message
     if REQUIRE_PROJECT_URL and not is_configured_project_url(page.url):
         log.error("blocked prompt send outside configured project url=%s expected_project_id=%s", page.url, CONFIGURED_PROJECT_ID)
         write_runtime(
