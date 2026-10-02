@@ -2511,6 +2511,44 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Exact-decode only complete canonical instructions in validated continuation_53 raw bytes 0x00182F7E..0x00182FBE; preserve any trailing cut edge and keep runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F44_CANONICAL_CONTROL_FLOW_0x182F7E_TO_0x182FBE",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "b1366bb99e21a2b18c788f616c7d4896a00bb22e",
+      "validation_bearing_result_sha": "1f286a7ecc23f8219dc02a808a46a2232215c868",
+      "verifier_validation_descendant_sha": "6af5f0f6d2b346d2efa61bd9a7046396d4e2db86",
+      "run_record_commit_sha": "bd8c4e457a8f4b8984c72d6e763da7436374149f",
+      "commit_message": "dxvk: prove canonical 0x182F7E control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Validated F44 canonical control-flow/capture-boundary proof: 32 contiguous complete instructions across 0x00182F7E..0x00182FBE, exact internal short-branch targets 0x00182FBB/0x00182FB0, empty direct rel32 CALL census, and exact capture-end instruction boundary.",
+      "validation": {
+        "automation_validation": "PASS_RETAINING_DESCENDANT_CANONICAL_STATIC",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "hud_inspector_run_id": 36983887152,
+        "hud_inspector_static_job_id": 110764386792,
+        "proof_status": "EXACT_182F7E_TO_182FBE_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "instruction_count": 32,
+        "branch_targets_match": true,
+        "internal_branch_targets_on_boundaries": true,
+        "external_targets": [],
+        "raw_call_census_empty": true,
+        "capture_boundary_matches": true,
+        "verifier_validation_descendant_sha": "6af5f0f6d2b346d2efa61bd9a7046396d4e2db86",
+        "verifier_run_id": 36984084736,
+        "verifier_job_id": 110765006050,
+        "backend_disassembly_contract": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948208838,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_F45_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve any newer F45 frontier beginning at 0x00182FBE; do not regress primary state to F44. Continue validation/exact decode only from the newest authoritative edge."
     }
   ]
 }
