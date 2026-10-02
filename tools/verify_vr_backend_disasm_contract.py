@@ -536,6 +536,94 @@ def verify_dxvk_continuation_chain() -> None:
                 f"{sorted(predecessor_status_values)}"
             )
 
+        # Keep raw provenance inherited predecessor forward-target lineage
+        # fail-closed. Some captures carry unresolved branch targets across
+        # one or more windows before an exact decode can promote them to
+        # RESOLVED_PREDECESSOR_TARGET_RVAS. If a collector reports that carry,
+        # predecessor_exact must consume the predecessor proof's
+        # unresolved_forward_targets field and pin it to one explicit,
+        # non-empty, unique integer literal sequence. This prevents a later
+        # refactor from retaining the telemetry field while silently dropping
+        # the lineage gate from canonical provenance acceptance.
+        inherited_forward_return_values: list[ast.AST] = []
+        for return_node in (
+            node
+            for node in ast.walk(provenance_ast)
+            if isinstance(node, ast.Return) and isinstance(node.value, ast.Dict)
+        ):
+            for key_node, value_node in zip(return_node.value.keys, return_node.value.values):
+                if (
+                    isinstance(key_node, ast.Constant)
+                    and key_node.value == "inherited_predecessor_forward_targets"
+                ):
+                    inherited_forward_return_values.append(value_node)
+
+        carries_inherited_forward_targets = bool(
+            inherited_forward_return_values
+            or "unresolved_forward_targets" in predecessor_fields
+        )
+        if carries_inherited_forward_targets:
+            if len(inherited_forward_return_values) != 1:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} raw provenance inherited "
+                    "forward-target telemetry is ambiguous or missing: "
+                    f"bindings={len(inherited_forward_return_values)}"
+                )
+            if (
+                predecessor_field(inherited_forward_return_values[0])
+                != "unresolved_forward_targets"
+            ):
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} raw provenance inherited "
+                    "forward-target telemetry is not bound directly to predecessor "
+                    "unresolved_forward_targets"
+                )
+
+            inherited_forward_equalities: list[ast.AST] = []
+            for node in ast.walk(predecessor_exact_value):
+                if not (
+                    isinstance(node, ast.Compare)
+                    and len(node.ops) == 1
+                    and isinstance(node.ops[0], ast.Eq)
+                    and len(node.comparators) == 1
+                ):
+                    continue
+                left, right = node.left, node.comparators[0]
+                if predecessor_field(left) == "unresolved_forward_targets":
+                    inherited_forward_equalities.append(right)
+                elif predecessor_field(right) == "unresolved_forward_targets":
+                    inherited_forward_equalities.append(left)
+
+            if len(inherited_forward_equalities) != 1:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} raw provenance predecessor_exact "
+                    "must contain exactly one unresolved_forward_targets equality: "
+                    f"comparisons={len(inherited_forward_equalities)}"
+                )
+            expected_targets_node = inherited_forward_equalities[0]
+            if not isinstance(expected_targets_node, (ast.List, ast.Tuple, ast.Set)):
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} raw provenance inherited "
+                    "forward-target gate must compare against an explicit int literal sequence"
+                )
+            expected_inherited_forward_targets = [
+                element.value
+                for element in expected_targets_node.elts
+                if isinstance(element, ast.Constant)
+                and isinstance(element.value, int)
+                and not isinstance(element.value, bool)
+            ]
+            if (
+                not expected_inherited_forward_targets
+                or len(expected_inherited_forward_targets) != len(expected_targets_node.elts)
+                or len(expected_inherited_forward_targets)
+                != len(set(expected_inherited_forward_targets))
+            ):
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} raw provenance inherited "
+                    "forward-target gate must use a non-empty unique int literal sequence"
+                )
+
         has_overlap_contract = f"{prefix}_OVERLAP_BYTES" in analyzer
         if has_overlap_contract:
             required_predecessor_fields = {"status", "incomplete_rva", "incomplete_matches"}
