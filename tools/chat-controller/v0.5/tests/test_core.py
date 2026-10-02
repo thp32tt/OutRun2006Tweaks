@@ -13,6 +13,7 @@ from app.core import (
     make_job,
     material_commit_ok,
     GITHUB_CONNECTION_FIRST_LINE,
+    GITHUB_TOOL_RECOVERY_MESSAGE,
     prepare_outgoing_message,
     github_tool_unavailable_response,
     retry_surface_has_platform_error,
@@ -128,6 +129,10 @@ class CoreTests(unittest.TestCase):
         self.assertFalse(retry_surface_has_platform_error("Retry this task when GitHub is ready"))
         self.assertTrue(retry_surface_has_platform_error("Something went wrong. Try again."))
         self.assertTrue(retry_surface_has_platform_error("응답 생성 중 오류가 발생했습니다. 다시 시도"))
+
+    def test_same_chat_github_recovery_message_is_minimal(self):
+        rendered = prepare_outgoing_message(GITHUB_TOOL_RECOVERY_MESSAGE)
+        self.assertEqual(rendered.splitlines(), [GITHUB_CONNECTION_FIRST_LINE, "진행해"])
 
     def test_localization_prompt_has_chunked_binary_fallback(self):
         prompt = (ROOT / "prompts" / "localization_producer.md").read_text(encoding="utf-8")

@@ -9,6 +9,7 @@ import re
 STATE_VERSION = 1
 
 GITHUB_CONNECTION_FIRST_LINE = "깃허브 연결은되어 있다 오류가 난다면 정상연결될때까지 무제한 다시 연결 상태를 확인한다"
+GITHUB_TOOL_RECOVERY_MESSAGE = "진행해"
 
 
 def prepare_outgoing_message(message: str) -> str:

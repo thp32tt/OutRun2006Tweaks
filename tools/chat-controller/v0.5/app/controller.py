@@ -26,6 +26,7 @@ from .core import (
     material_commit_ok,
     now_iso,
     prepare_outgoing_message,
+    GITHUB_TOOL_RECOVERY_MESSAGE,
     github_tool_unavailable_response,
     retry_surface_has_platform_error,
     reconcile_state,
@@ -786,7 +787,9 @@ class Controller:
             return
 
         baseline = stable_hash(await last_assistant_text(page))
-        if job.get("force_full_prompt", True):
+        if job.get("github_tool_retry_same_chat"):
+            prompt = GITHUB_TOOL_RECOVERY_MESSAGE
+        elif job.get("force_full_prompt", True):
             prompt = render_full_prompt(lane, job)
         else:
             reason = "No valid material AUTO commit was found for the previous turn."
@@ -823,6 +826,7 @@ class Controller:
         job["verify_started_at"] = None
         job["next_send_at"] = None
         job["force_full_prompt"] = False
+        job["github_tool_retry_same_chat"] = False
 
         chat_url = await wait_for_chat_url(page)
         if chat_url:
@@ -904,13 +908,24 @@ class Controller:
         if github_tool_unavailable_response(text):
             attempts = int(job.get("github_tool_recovery_attempts", 0) or 0) + 1
             job["github_tool_recovery_attempts"] = attempts
-            lane["last_result"] = f"github_tool_unavailable:{attempts}"
+            job["github_tool_retry_same_chat"] = True
+            job["status"] = "READY"
+            job["next_send_at"] = (
+                datetime.now(TZ) + timedelta(seconds=SAME_CHAT_CONTINUATION_GAP_SECONDS)
+            ).isoformat()
+            job["baseline_assistant_hash"] = None
+            job["response_hash"] = None
+            job["response_last_changed_at"] = None
+            job["verify_started_at"] = None
+            lane["last_result"] = f"github_tool_unavailable_same_chat_retry:{attempts}"
             save_state(self.state)
             write_runtime(
                 status="github_tool_recovery",
-                last_action=f"{lane['name']} {job['job_id']} connector unavailable attempt {attempts}; recycle same JOB",
+                last_action=(
+                    f"{lane['name']} {job['job_id']} connector unavailable attempt {attempts}; "
+                    "retry same chat with 진행해"
+                ),
             )
-            await self.recycle_chat(lane, "github_tool_unavailable")
             return
 
         job["github_tool_recovery_attempts"] = 0

@@ -40,6 +40,8 @@ Every controller-generated ChatGPT input is decorated at the final send boundary
 
 This applies to new jobs and same-JOB continuation/recovery turns. Individual prompt files cannot bypass it.
 
+GitHub tool-unavailable replies are retried in the SAME chat and SAME JOB_ID by sending only '진행해' after the mandatory first line. This repeats without an attempt limit. A new chat is reserved for actual platform/conversation failure.
+
 
 ## Large localization binary transport
 
