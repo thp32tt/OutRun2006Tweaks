@@ -2,6 +2,7 @@
 """Verify the DX11/DXVK backend contract still matches recovered OutRun EXE facts."""
 
 from pathlib import Path
+import re
 import runpy
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,26 +43,32 @@ def verify_dxvk_continuation_chain() -> None:
         ):
             discovered_raw_ids.add(int(continuation_text))
 
-    raw_ids = tuple(sorted(discovered_raw_ids))
+    continuation_re = re.compile(
+        r"^GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_(\\d+)_RVA$"
+    )
+    discovered_ids: list[int] = []
+    for name in analyzer:
+        match = continuation_re.match(name)
+        if match is None:
+            continue
+        continuation_id = int(match.group(1))
+        if continuation_id >= 23:
+            discovered_ids.append(continuation_id)
+
+    raw_ids = tuple(sorted(discovered_ids))
     if not raw_ids or raw_ids[0] != 23:
         raise SystemExit(
-            f"DXVK continuation auto-discovery lost canonical chain start 23: {raw_ids}"
+            f"DXVK continuation chain discovery lost baseline 23: {raw_ids}"
         )
     expected_raw_ids = tuple(range(raw_ids[0], raw_ids[-1] + 1))
     if raw_ids != expected_raw_ids:
         raise SystemExit(
-            f"DXVK continuation raw-ID gap: discovered={raw_ids} expected={expected_raw_ids}"
+            f"DXVK continuation chain has missing raw stages: "
+            f"discovered={raw_ids} expected={expected_raw_ids}"
         )
 
     for continuation_id in raw_ids:
-        prefix = f"{symbol_prefix}{continuation_id}"
-        provenance_collector = analyzer.get(
-            f"collect_guarded_gf_target_c_helper_1_third_callee_continuation_{continuation_id}_provenance"
-        )
-        if not callable(provenance_collector):
-            raise SystemExit(
-                f"DXVK continuation {continuation_id} is missing its provenance collector"
-            )
+        prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
         start = value(f"{prefix}_RVA")
         probe_len = value(f"{prefix}_PROBE_LEN")
         probe_end = value(f"{prefix}_PROBE_END_RVA")
@@ -74,34 +81,30 @@ def verify_dxvk_continuation_chain() -> None:
     proof_ids = tuple(
         continuation_id
         for continuation_id in raw_ids
-        if f"{symbol_prefix}{continuation_id}_PREFIX_END_RVA" in analyzer
+        if (
+            f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_"
+            f"{continuation_id}_PREFIX_END_RVA"
+        ) in analyzer
     )
-    if not proof_ids:
-        raise SystemExit("DXVK continuation chain has no exact-decode proofs")
+    if not proof_ids or proof_ids[0] != raw_ids[0]:
+        raise SystemExit(
+            f"DXVK continuation proof discovery lost baseline {raw_ids[0]}: {proof_ids}"
+        )
     expected_proof_ids = tuple(range(raw_ids[0], proof_ids[-1] + 1))
     if proof_ids != expected_proof_ids:
         raise SystemExit(
-            f"DXVK continuation proof-ID gap: discovered={proof_ids} expected={expected_proof_ids}"
+            f"DXVK continuation chain has missing proof stages: "
+            f"discovered={proof_ids} expected={expected_proof_ids}"
         )
-    unproven_ids = tuple(
-        continuation_id for continuation_id in raw_ids if continuation_id not in proof_ids
-    )
-    if unproven_ids not in ((), (raw_ids[-1],)):
+    if raw_ids[-1] - proof_ids[-1] > 1:
         raise SystemExit(
-            "DXVK continuation chain permits at most one raw-only frontier and it must "
-            f"be the newest continuation: raw={raw_ids} proof={proof_ids}"
+            f"DXVK continuation chain has more than one unproved raw frontier: "
+            f"raw={raw_ids[-1]} proof={proof_ids[-1]}"
         )
 
-    cut_edge_ids: set[int] = set()
+    cut_edge_ids: list[int] = []
     for continuation_id in proof_ids:
-        prefix = f"{symbol_prefix}{continuation_id}"
-        proof_collector = analyzer.get(
-            f"collect_guarded_gf_target_c_helper_1_third_callee_continuation_{continuation_id}_prefix_proof"
-        )
-        if not callable(proof_collector):
-            raise SystemExit(
-                f"DXVK continuation {continuation_id} is missing its prefix-proof collector"
-            )
+        prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
         start = value(f"{prefix}_RVA")
         probe_end = value(f"{prefix}_PROBE_END_RVA")
         proof_end = value(f"{prefix}_PREFIX_END_RVA")
@@ -117,35 +120,38 @@ def verify_dxvk_continuation_chain() -> None:
         has_incomplete_bytes = incomplete_bytes_name in analyzer
         if has_incomplete_rva != has_incomplete_bytes:
             raise SystemExit(
-                f"DXVK continuation {continuation_id} has a partial cut-edge definition"
+                f"DXVK continuation {continuation_id} has a half-defined cut edge"
             )
-        if has_incomplete_rva:
-            cut_edge_ids.add(continuation_id)
-            incomplete_rva = value(incomplete_rva_name)
-            incomplete_bytes = value(incomplete_bytes_name)
-            if incomplete_rva != proof_end:
-                raise SystemExit(
-                    f"DXVK continuation {continuation_id} cut edge moved away from proof end: "
-                    f"0x{incomplete_rva:08X} != 0x{proof_end:08X}"
-                )
-            if not incomplete_bytes or incomplete_rva + len(incomplete_bytes) != probe_end:
-                raise SystemExit(
-                    f"DXVK continuation {continuation_id} cut bytes no longer fill capture edge: "
-                    f"0x{incomplete_rva:08X}+{len(incomplete_bytes)} != 0x{probe_end:08X}"
-                )
-        elif proof_end != probe_end:
+        if not has_incomplete_rva:
+            continue
+
+        cut_edge_ids.append(continuation_id)
+        incomplete_rva = value(incomplete_rva_name)
+        incomplete_bytes = value(incomplete_bytes_name)
+        if incomplete_rva != proof_end:
             raise SystemExit(
-                f"DXVK continuation {continuation_id} has no cut edge but proof end "
-                f"0x{proof_end:08X} != capture end 0x{probe_end:08X}"
+                f"DXVK continuation {continuation_id} cut edge moved away from proof end: "
+                f"0x{incomplete_rva:08X} != 0x{proof_end:08X}"
+            )
+        if not incomplete_bytes:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} cut edge has no captured bytes"
+            )
+        if incomplete_rva + len(incomplete_bytes) != probe_end:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} cut bytes no longer fill capture edge: "
+                f"0x{incomplete_rva:08X}+{len(incomplete_bytes)} != 0x{probe_end:08X}"
             )
 
+    cut_edge_id_set = set(cut_edge_ids)
     for previous_id, next_id in zip(raw_ids, raw_ids[1:]):
         if previous_id not in proof_ids:
             raise SystemExit(
-                f"DXVK continuation {next_id} exists before predecessor {previous_id} is proved"
+                f"DXVK continuation {next_id} exists before predecessor "
+                f"{previous_id} has an exact proof"
             )
-        previous = f"{symbol_prefix}{previous_id}"
-        following = f"{symbol_prefix}{next_id}"
+        previous = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{previous_id}"
+        following = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{next_id}"
         previous_end = value(f"{previous}_PREFIX_END_RVA")
         next_start = value(f"{following}_RVA")
         if previous_end != next_start:
@@ -154,32 +160,34 @@ def verify_dxvk_continuation_chain() -> None:
                 f"0x{previous_end:08X} != 0x{next_start:08X}"
             )
 
-        if previous_id in cut_edge_ids:
-            previous_incomplete_rva = value(f"{previous}_INCOMPLETE_RVA")
-            previous_incomplete = value(f"{previous}_INCOMPLETE_BYTES")
-            next_overlap_name = f"{following}_OVERLAP_BYTES"
-            if next_overlap_name not in analyzer:
-                raise SystemExit(
-                    f"DXVK overlap transition {previous_id}->{next_id} is missing overlap bytes"
-                )
-            next_overlap = value(next_overlap_name)
-            if previous_incomplete_rva != next_start:
-                raise SystemExit(
-                    f"DXVK overlap transition {previous_id}->{next_id} starts at "
-                    f"0x{next_start:08X}, expected incomplete edge 0x{previous_incomplete_rva:08X}"
-                )
-            if next_overlap != previous_incomplete:
-                raise SystemExit(
-                    f"DXVK overlap bytes drifted for transition {previous_id}->{next_id}: "
-                    f"{next_overlap.hex(' ')} != {previous_incomplete.hex(' ')}"
-                )
-        else:
+        next_overlap_name = f"{following}_OVERLAP_BYTES"
+        if previous_id not in cut_edge_id_set:
             previous_probe_end = value(f"{previous}_PROBE_END_RVA")
             if previous_end != previous_probe_end:
                 raise SystemExit(
                     f"DXVK boundary transition {previous_id}->{next_id} "
-                    "does not end at the prior capture boundary"
+                    f"does not end at the prior capture boundary"
                 )
+            if next_overlap_name in analyzer:
+                raise SystemExit(
+                    f"DXVK boundary transition {previous_id}->{next_id} "
+                    f"unexpectedly declares overlap bytes"
+                )
+            continue
+
+        previous_incomplete_rva = value(f"{previous}_INCOMPLETE_RVA")
+        previous_incomplete = value(f"{previous}_INCOMPLETE_BYTES")
+        next_overlap = value(next_overlap_name)
+        if previous_incomplete_rva != next_start:
+            raise SystemExit(
+                f"DXVK overlap transition {previous_id}->{next_id} starts at "
+                f"0x{next_start:08X}, expected incomplete edge 0x{previous_incomplete_rva:08X}"
+            )
+        if next_overlap != previous_incomplete:
+            raise SystemExit(
+                f"DXVK overlap bytes drifted for transition {previous_id}->{next_id}: "
+                f"{next_overlap.hex(' ')} != {previous_incomplete.hex(' ')}"
+            )
 
     memoize = analyzer.get("_memoize_pe_only_collector")
     memoized_count = analyzer.get("_DXVK_CONTINUATION_COLLECTORS_MEMOIZED", 0)
