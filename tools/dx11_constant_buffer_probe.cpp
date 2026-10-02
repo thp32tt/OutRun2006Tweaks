@@ -4943,6 +4943,7 @@ int main()
         indexedFanDispatch.finalFanBoundDrawReady &&
         indexedFanDispatch.generatedIndexReady &&
         indexedFanDispatch.generatedIndexMatchesDispatch &&
+        indexedFanDispatch.vertexBufferRangeExact &&
         indexedFanDispatch.dispatchArgumentsExact &&
         indexedFanDispatch.componentSnapshotsPresent &&
         indexedFanDispatch.ready &&
@@ -4970,6 +4971,30 @@ int main()
                 outputColorSurface, outputDepthSurface,
                 indexedFanDispatch.snapshotToken),
         "R148 generated fan dispatch seals indexed DrawIndexed tuple");
+
+    const auto indexedFanVertexOverrun =
+        outrun::vr::dx11::
+            compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                1, transform, surfaceTargetBinding,
+                outputColorSurface, outputDepthSurface);
+    require(
+        indexedFanVertexOverrun.inputValid &&
+        indexedFanVertexOverrun.finalFanBoundDrawReady &&
+        indexedFanVertexOverrun.generatedIndexReady &&
+        indexedFanVertexOverrun.generatedIndexMatchesDispatch &&
+        !indexedFanVertexOverrun.vertexBufferRangeExact &&
+        !indexedFanVertexOverrun.dispatchArgumentsExact &&
+        !indexedFanVertexOverrun.ready &&
+        indexedFanVertexOverrun.snapshotToken == 0,
+        "R156 indexed fan dispatch rejects effective vertex buffer overrun");
+
     require(
         !outrun::vr::dx11::
             validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(
@@ -5497,6 +5522,7 @@ int main()
     std::cout << "DX11 direct bound-buffer capacity R151: PASS\n";
     std::cout << "DX11 indexed source binding R153: PASS\n";
     std::cout << "DX11 indexed fan source content R155: PASS\n";
+    std::cout << "DX11 indexed fan vertex capacity R156: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
     std::cout << "DX11 texture mutation readiness R100: PASS\n";
