@@ -56,10 +56,3 @@ The full localization-owned text/graphics state from the historical prototype ha
 - 9 font atlases + 1 Hangul name-entry atlas identified.
 
 Prototype K1 build/run evidence is historical only. Clean upstream build and runtime evidence is mandatory before packaging.
-
-## Naming consistency policy — songs and stage/course names
-
-- Song/music titles are protected titles: **do not translate or transliterate them**. Preserve the exact source title, including subtitle/remix/year suffixes and capitalization where the source artwork/text requires it.
-- Stage/course proper names use **Korean transliteration consistently**, not semantic translation. Examples: `Coniferous Forest -> 코니퍼러스 포레스트`, `Ancient Ruins -> 에인션트 루인스`, `Desert -> 데저트`.
-- Generic UI words such as `Stage`, `Next Stage`, `Course Select`, mission instructions, and descriptive prose remain normal Korean localization; this rule applies to proper stage/course names only.
-- Producer and C QA must reject a candidate that translates/transliterates a protected song title or mixes semantic translation and transliteration for canonical stage/course proper names.
