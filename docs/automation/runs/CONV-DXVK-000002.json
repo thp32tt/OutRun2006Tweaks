@@ -333,6 +333,41 @@
       "semantic_promotion": "NONE",
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED"
+    },
+    {
+      "unit_id": "DXVK_F25_CANONICAL_CONTROL_FLOW_0x182AD7_TO_0x182B17",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "6948d702bb043600c3da425178b074063b086d60",
+      "validation_bearing_result_sha": "6948d702bb043600c3da425178b074063b086d60",
+      "commit_message": "dxvk: prove canonical 0x182AD7 control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact-decoded the full canonical continuation_34 window 0x00182AD7..0x00182B17: 24 contiguous instructions, five direct rel32 CALLs, predecessor forward targets 0x00182ADD/0x00182ADE resolved to instruction boundaries, and an exact instruction-boundary capture end at 0x00182B17 with no cut-edge bytes.",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "validation": {
+        "exact_sha": "6948d702bb043600c3da425178b074063b086d60",
+        "dxvk_disassembly_evidence_run_id": 36974646225,
+        "dxvk_disassembly_evidence_job_id": 110735730487,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "dxvk_disassembly_evidence_artifact_id": 11212429714,
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "static_disassembly_contract": "PASS",
+        "proof_status": "EXACT_182AD7_TO_182B17_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "instruction_count": 24,
+        "direct_rel32_call_count": 5,
+        "prefix_end_rva": "0x00182B17",
+        "capture_boundary_matches": true,
+        "predecessor_target_boundaries": true,
+        "backend_conversion_gate_run_id": 36974646218,
+        "backend_conversion_gate_status": "IN_PROGRESS_AT_STATE_WRITE_NO_PASS_CLAIM",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5946858495,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "next_action": "Capture the next bounded canonical raw provenance beginning at 0x00182B17 with no overlap because continuation_34 ends on an exact instruction boundary; keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
