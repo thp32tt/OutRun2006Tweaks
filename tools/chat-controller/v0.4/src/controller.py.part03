@@ -3454,7 +3454,11 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             legacy.setdefault("premature_stop_total", 0)
             legacy["controller_stage"] = (
                 "WAIT_ACTIONS" if legacy.get("phase") == "WAIT_ACTIONS"
-                else legacy.get("controller_stage") or "WAIT_DURABLE_RESULT"
+                else (
+                    "C0_RECOVER"
+                    if legacy.get("controller_stage") in {None, "", "WAIT_DURABLE_RESULT"}
+                    else legacy.get("controller_stage")
+                )
             )
             active_by_lane[legacy_slot] = legacy
             q["active"] = None
@@ -4211,7 +4215,8 @@ def startup_reconcile_queue_state() -> None:
                     else task.get("controller_stage") or "WAIT_MATERIAL_COMMIT"
                 )
             else:
-                task["controller_stage"] = task.get("controller_stage") or "WAIT_DURABLE_RESULT"
+                if task.get("controller_stage") in {None, "", "WAIT_DURABLE_RESULT"}:
+                    task["controller_stage"] = "C0_RECOVER"
             # Old releases could persist a five-minute generic-Retry circuit. The
             # new policy rolls a broken input surface to a fresh chat instead.
             task.pop("generic_retry_cooldown_until", None)
