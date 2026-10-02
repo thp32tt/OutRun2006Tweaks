@@ -3770,6 +3770,49 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authenticated DXVK frontier and continue the next independent static/raw/proof unit; keep probe/inbound/outbound raw evidence address-coupled to target_rva and exact PROBE_LEN."
+    },
+    {
+      "unit_id": "DXVK_F54_CANONICAL_EXE_PROVENANCE_0x183173_TO_0x1831B3",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "b15ed885a47f9e61f149d35c87824a7e631b5976",
+      "validation_bearing_result_sha": "b15ed885a47f9e61f149d35c87824a7e631b5976",
+      "commit_message": "dxvk: capture canonical 0x183173 continuation [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Bounded canonical raw continuation 0x00183173..0x001831B3 captured from the exact 0x00183173 predecessor instruction boundary; inherited predecessor targets 0x00183186/0x00183198 are carried forward and fresh bytes/rel32 candidates remain raw-only with no render/HUD/runtime semantic promotion.",
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "b15ed885a47f9e61f149d35c87824a7e631b5976",
+        "dxvk_disassembly_evidence_run_id": 36987942608,
+        "dxvk_disassembly_evidence_job_id": 110777148226,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "provenance_status": "EXACT_EXE_183173_TO_1831B3_PROVENANCE_CAPTURED",
+        "predecessor_status": "EXACT_183133_TO_183173_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "predecessor_exact": true,
+        "predecessor_end_is_instruction_boundary": true,
+        "inherited_predecessor_external_targets": [
+          "0x00183186",
+          "0x00183198"
+        ],
+        "probe_start_rva": "0x00183173",
+        "probe_end_rva": "0x001831B3",
+        "probe_len": 64,
+        "artifact_id": 11218267367,
+        "artifact_digest": "sha256:6354489ae898c01105cf18d2416353e56c82178d13e6056a143cc8996d4d1938",
+        "backend_conversion_gate_run_id": 36987942543,
+        "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NOT_CLAIMED",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948793427,
+      "issue14_validation_comment_id": 5948844319,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Exact-decode only complete canonical instructions in validated continuation_61 raw window 0x00183173..0x001831B3. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
