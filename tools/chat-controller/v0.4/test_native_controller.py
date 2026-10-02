@@ -800,6 +800,47 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('SUBSTANTIVE_WORK_MISSING:REVIEW_OR_STATE_ONLY',reasons)
         self.assertTrue(any(x.startswith('PIPELINE_STAGE_C2_IMPLEMENT') for x in reasons))
 
+    def test_legacy_dx11_checkpoint_resumes_at_c2_not_c0(self):
+        status_ok, _ = load_function('conversion_pipeline_status_ok')
+        changed_paths, _ = load_function('conversion_pipeline_changed_paths')
+        has_work, _ = load_function(
+            'conversion_pipeline_has_substantive_work',
+            conversion_pipeline_changed_paths=changed_paths,
+        )
+        next_stage, _ = load_function('conversion_pipeline_next_stage')
+        record={
+            'task_id':'CONVERSION-DX11-00279',
+            'lane':'DX11',
+            'c0':'RECOVER',
+            'c1':'REVIEW',
+            'c2':'IMPLEMENT_PENDING',
+            'c3':'VALIDATE_PENDING',
+            'c4':'COMMIT',
+            'c5':'PACKAGE_PENDING',
+            'c6':'STATE',
+            'next_action':'implement actual gate cancellation fix',
+            'runtime_validation':'UNTESTED',
+        }
+        def fetch(path, ref):
+            if path.endswith('CONVERSION-DX11-00279.json'):
+                return record
+            return {'development_complete':False}
+        validator, _ = load_function(
+            'conversion_validate_pipeline_result_commit',
+            github_json_file_at_ref=fetch,
+            conversion_pipeline_status_ok=status_ok,
+            conversion_pipeline_has_substantive_work=has_work,
+            CONVERSION_PIPELINE_SCHEMA_VERSION=2,
+            CONVERSION_PIPELINE_STAGES=("C0_RECOVER","C1_REVIEW","C2_IMPLEMENT","C3_VALIDATE","C4_COMMIT","C5_PACKAGE","C6_STATE"),
+        )
+        valid,reasons,_=validator(
+            'CONVERSION-DX11-00279','f'*40,'DX11','vr-dx11-native-r71'
+        )
+        self.assertFalse(valid)
+        self.assertEqual(next_stage(reasons),'C2_IMPLEMENT')
+        self.assertFalse(any(x.startswith('PIPELINE_STAGE_C0_RECOVER') for x in reasons))
+        self.assertFalse(any(x.startswith('PIPELINE_STAGE_C1_REVIEW') for x in reasons))
+
     def test_conversion_pipeline_validator_accepts_full_c0_c6_transaction(self):
         status_ok, _ = load_function('conversion_pipeline_status_ok')
         changed_paths, _ = load_function('conversion_pipeline_changed_paths')
