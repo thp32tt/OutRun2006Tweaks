@@ -187,3 +187,21 @@ The repository has an interactive Windows self-hosted fast-build path in .github
 - PC-fast output is PC_FAST_INCREMENTAL_NOT_FINAL_CI. It never advances the protected runtime baseline and never replaces canonical hosted validation or final packaging.
 - Outside that evening test session, scheduled A/N100/B/C/D work, daytime/manual development, review, CI validation, packaging and ordinary direct-chat edits must not use [pc-build]. When the evening session ends, stop using [pc-build] immediately so the user's PC remains uninvolved.
 
+
+
+## Optional installed skills and GitHub-only execution
+
+Development may be performed entirely through the connected GitHub repository and GitHub Actions. A local development PC, RenderDoc capture, or local OpenXR runtime is not required for source/static/CI progress.
+
+Installed Skills are optional helpers, not dependencies or completion authorities. Use them only when they directly reduce uncertainty or accelerate the current checkpoint:
+- `outrun-vr-execution-router` for resume/implementation-first routing;
+- `outrun-openxr-lifecycle-validator` for OpenXR session/frame/swapchain/recenter state;
+- `outrun-stereo-rendering-auditor` for eye/state/HUD/world-marker correctness;
+- `outrun-directgpu-sync-auditor` for shared-resource/copy/wait/ACK ownership;
+- `reverse-engineering-github-only` for checked-in EXE/disassembly/map evidence;
+- `outrun-vr-runtime-log-analyzer` when user runtime logs are supplied;
+- `outrun-github-only-build-gate` and `outrun-durable-task-recorder` for exact-SHA validation and durable completion.
+
+If a Skill is unavailable, unsuitable, or would repeat already-completed analysis, continue with the existing repository workflow. Never stop merely because a Skill or local GUI tool is missing.
+
+A state-reconstruction/review/plan-only response is intermediate whenever authorized runnable work exists. Continue C2 IMPLEMENT -> C3 VALIDATE -> C4 COMMIT -> C6 STATE. Runtime-only conclusions remain `UNTESTED` until user Quest 3/VDXR evidence exists.
