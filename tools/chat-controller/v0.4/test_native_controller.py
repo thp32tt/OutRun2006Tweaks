@@ -21,6 +21,7 @@ def load_function(name, **overrides):
               GITHUB_ASSISTANT_RECOVERY_MAX=2, GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS=300,
               SAME_TASK_CONTROL_GAP_SECONDS=15,
               PREMATURE_STOP_ROLLOVER_THRESHOLD=3,
+              PRODUCER_PREMATURE_STOP_ROLLOVER_THRESHOLD=2,
               PRODUCER_CONTINUATION_COOLDOWN_SECONDS=15,
               QUEUE_STABLE_SECONDS=30, QUEUE_RESULT_GRACE_SECONDS=180,
               _parse_iso=lambda x: datetime.fromisoformat(x) if x else None,
@@ -42,7 +43,8 @@ def load_function(name, **overrides):
                   'composer_visible': True,
                   'retry_surface': 'retry',
               }),
-              persist_retry_diagnostic=Mock())
+              persist_retry_diagnostic=Mock(),
+              localization_material_target_prompt=lambda active: 'CONTROLLER_SELECTED_MATERIAL_TARGETS=T1:index=94;asset=2DA43E41;status=rework_required_zero_pixel_or_artifact;path=x')
     ns.update(overrides)
     node = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), FUNCTIONS[name]], type_ignores=[])
     exec(compile(ast.fix_missing_locations(node), '<controller>', 'exec'), ns)
@@ -422,7 +424,9 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('실제 material 작업', prompt)
         self.assertIn('사용자 확인을 기다리지 말고', prompt)
         self.assertIn('[AUTO:TASK_ID]', prompt)
-        self.assertIn('도구 호출과 실제 변경부터 수행', prompt)
+        self.assertIn('첫 출력은 설명이 아니라', prompt)
+        self.assertIn('CONTROLLER_SELECTED_MATERIAL_TARGETS=', prompt)
+        self.assertIn('실제 변경부터 수행', prompt)
 
     def test_conversion_no_commit_response_forces_execution_continuation(self):
         continuation = AsyncMock(return_value=True)
@@ -624,7 +628,7 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('same_task_control_send_guard_reason', node_source)
         self.assertNotIn('guard = send_guard_reason(', node_source)
 
-    def test_producer_premature_stop_escalates_to_rollover_on_third_turn(self):
+    def test_producer_premature_stop_escalates_to_rollover_on_second_turn(self):
         same_chat = AsyncMock(return_value=True)
         rollover = AsyncMock(return_value=True)
         f, _ = load_function(
@@ -650,15 +654,10 @@ class NativeControllerTests(unittest.TestCase):
 
         active['sent_at'] = '2026-10-02T00:01:00+00:00'
         self.assertTrue(asyncio.run(f(None, {}, active, 'h2')))
-        self.assertEqual(active['premature_stop_count'], 2)
-        self.assertEqual(same_chat.call_count, 2)
-        rollover.assert_not_awaited()
-
-        active['sent_at'] = '2026-10-02T00:02:00+00:00'
-        self.assertTrue(asyncio.run(f(None, {}, active, 'h3')))
         rollover.assert_awaited_once()
         self.assertEqual(active['premature_stop_count'], 0)
-        self.assertEqual(active['premature_stop_total'], 3)
+        self.assertEqual(active['premature_stop_total'], 2)
+        self.assertEqual(same_chat.call_count, 1)
         self.assertEqual(active['phase'], 'WAIT_CHAT')
         self.assertTrue(active['task_latched'])
 
@@ -709,8 +708,22 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('ACTIVE_TASK_LATCH=ON', prompt)
         self.assertIn('CONTROLLER_STAGE=WAIT_MATERIAL_COMMIT', prompt)
         self.assertIn('LAST_CHECKPOINT_HEAD=' + 'c' * 40, prompt)
-        self.assertIn('FIRST_EXECUTION_ACTION=DO_NOT_PLAN', prompt)
+        self.assertIn('FIRST_EXECUTION_ACTION=CALL_CONNECTED_TOOL', prompt)
+        self.assertIn('CONTROLLER_SELECTED_MATERIAL_TARGETS=', prompt)
         self.assertIn('FINAL_ARTWORK_PROGRESS=0/95', prompt)
+
+    def test_localization_producer_dispatch_injects_concrete_material_target(self):
+        send_source = ast.get_source_segment(SOURCE, FUNCTIONS['localization_send_lane_task']) or ''
+        cont_source = ast.get_source_segment(SOURCE, FUNCTIONS['queue_send_producer_execution_continuation']) or ''
+        roll_source = ast.get_source_segment(SOURCE, FUNCTIONS['queue_rollover_prompt']) or ''
+        helper_source = ast.get_source_segment(SOURCE, FUNCTIONS['localization_material_target_hints']) or ''
+        self.assertIn('localization_material_target_prompt', send_source)
+        self.assertIn('localization_material_target_prompt', cont_source)
+        self.assertIn('localization_material_target_prompt', roll_source)
+        self.assertIn('rework_required', helper_source)
+        self.assertIn('candidate_qa_pending', helper_source)
+        self.assertIn('source_identity_mismatch', helper_source)
+        self.assertIn('idx % 3', helper_source)
 
     def test_latched_localization_producer_rollover_budget_is_soft(self):
         node_source = ast.get_source_segment(SOURCE, FUNCTIONS['queue_rollover_chat']) or ''
