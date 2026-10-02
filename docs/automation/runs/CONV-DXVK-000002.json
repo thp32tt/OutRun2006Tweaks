@@ -7,14 +7,14 @@
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_CANONICAL_STATIC_PASS_RUNTIME_UNTESTED",
   "initial_recovered_head": "7065ef31a7c1baf46388abe569bf37660e51fcbc",
-  "validation_bearing_result_sha": "b6482cd27acd035783d021b65b1748534c3618f6",
-  "result_sha": "b6482cd27acd035783d021b65b1748534c3618f6",
+  "validation_bearing_result_sha": "d1b54c9e124f8728cba045a03314385d98674b0e",
+  "result_sha": "d1b54c9e124f8728cba045a03314385d98674b0e",
   "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
-  "runtime_claim": "NONE",
-  "selected_work_item": "DXVK_F24_CANONICAL_EXE_PROVENANCE_0x182A99_TO_0x182AD9",
-  "summary": "Completed the F24 bounded canonical provenance capture at 0x00182A99..0x00182AD9: required the exact F23 control-flow cut edge, overlapped the incomplete rel32 CALL bytes e8 01, proved .text placement and exact 64-byte probe geometry on the canonical EXE, captured raw inbound/outbound rel32 evidence, and kept function/render/HUD/runtime semantics unresolved.",
+  "runtime_claim": "UNTESTED",
+  "selected_work_item": "DXVK_F30_CANONICAL_CONTROL_FLOW_0x182C16_TO_0x182C56",
+  "summary": "Exact-decoded canonical 0x00182C16..0x00182C56: 30 contiguous complete instructions, five branch targets, predecessor target 0x00182C33 resolved to an instruction boundary, new forward target 0x00182C59 retained address-only, exact capture boundary at 0x00182C56, and no runtime semantic promotion.",
   "source_commits": [
     {
       "sha": "b6482cd27acd035783d021b65b1748534c3618f6",
@@ -24,9 +24,7 @@
     }
   ],
   "changed_paths": [
-    "tools/analyze_outrun_exe.py",
-    "docs/automation/runs/CONV-DXVK-000002.json",
-    "docs/CONVERSION_LANE_STATE.json"
+    "tools/analyze_outrun_exe.py"
   ],
   "implementation": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
@@ -94,18 +92,20 @@
     "notes": "No Quest 3/VDXR or in-game runtime test was performed. Canonical disassembly/static CI evidence is not runtime acceptance evidence."
   },
   "follow_on_frontier": {
-    "predecessor_proof_sha": "843564d89b095d7b695fbb8a40302afb00e8c68a",
-    "predecessor_control_flow_status": "EXACT_182BD6_TO_182C16_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
-    "provenance_sha": "7cf1ac5f58b00923cab3e16824a52b2534e48bc6",
-    "provenance_target_status": "EXACT_EXE_182BD6_TO_182C16_PROVENANCE_CAPTURED_VALIDATED_ON_DESCENDANT",
-    "provenance_start_rva": "0x00182BD6",
-    "probe_end_rva": "0x00182C16",
+    "predecessor_proof_sha": "d1b54c9e124f8728cba045a03314385d98674b0e",
+    "predecessor_control_flow_status": "EXACT_182C16_TO_182C56_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+    "provenance_sha": "9b1bd77923f66eb47733933a9cd2ed67fa2b976f",
+    "provenance_target_status": "EXACT_EXE_182C16_TO_182C56_PROVENANCE_CAPTURED_VALIDATED",
+    "provenance_start_rva": "0x00182C16",
+    "probe_end_rva": "0x00182C56",
     "transition": "EXACT_BOUNDARY_NO_OVERLAP",
-    "forward_target_rva": "0x00182C33",
+    "resolved_predecessor_target_rva": "0x00182C33",
+    "resolved_predecessor_target_status": "INSTRUCTION_BOUNDARY_PROVEN",
+    "forward_target_rva": "0x00182C59",
     "forward_target_status": "ADDRESS_ONLY_OUTSIDE_CAPTURE",
-    "validation_bearing_result_sha": "843564d89b095d7b695fbb8a40302afb00e8c68a",
-    "dxvk_disassembly_evidence_run_id": 36975944440,
-    "dxvk_disassembly_evidence_job_id": 110739677984,
+    "validation_bearing_result_sha": "d1b54c9e124f8728cba045a03314385d98674b0e",
+    "dxvk_disassembly_evidence_run_id": 36976415428,
+    "dxvk_disassembly_evidence_job_id": 110741111319,
     "runtime_validation": "UNTESTED"
   },
   "issue14_comments": [
@@ -130,7 +130,8 @@
     5946872134,
     5946893824,
     5946905253,
-    5947028855
+    5947028855,
+    5947079394
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -139,7 +140,7 @@
     "No localization files modified",
     "RUNTIME_VALIDATION remains UNTESTED without matching Quest 3/VDXR evidence"
   ],
-  "next_action": "Capture the next bounded canonical window from exact instruction boundary 0x00182C16 with no overlap. Use fresh evidence to resolve forward target 0x00182C33 only if it lands on a proven instruction boundary; keep function/render/HUD/runtime semantics unresolved.",
+  "next_action": "Capture the next bounded canonical 64-byte raw window from exact instruction boundary 0x00182C56 with no overlap. Preserve forward target 0x00182C59 as address/control-flow evidence only until captured and exact-decoded; keep function/render/HUD/runtime semantics unresolved.",
   "supplemental_completed_static_units": [
     {
       "unit_id": "DXVK_CONTINUATION_ANALYZER_WIRING_FAIL_CLOSED",
@@ -1088,6 +1089,50 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Capture the next bounded canonical window from exact instruction boundary 0x00182C16 with no overlap. Use fresh evidence to resolve forward target 0x00182C33 only if it lands on a proven instruction boundary; keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F30_CANONICAL_CONTROL_FLOW_0x182C16_TO_0x182C56",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "d1b54c9e124f8728cba045a03314385d98674b0e",
+      "commit_message": "dxvk: prove canonical 0x182C16 control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact-decoded canonical 0x00182C16..0x00182C56 as 30 contiguous complete instructions, proved five branch targets, resolved predecessor forward target 0x00182C33 onto an instruction boundary, retained 0x00182C59 as address-only outside capture, and kept function/render/HUD/runtime semantics unresolved.",
+      "validation": {
+        "exact_sha": "d1b54c9e124f8728cba045a03314385d98674b0e",
+        "dxvk_disassembly_evidence_run_id": 36976415428,
+        "dxvk_disassembly_evidence_job_id": 110741111319,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "proof_status": "EXACT_182C16_TO_182C56_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "predecessor_exact": true,
+        "start_boundary_proven": true,
+        "instruction_count": 30,
+        "internal_branch_targets": [
+          "0x00182C2E",
+          "0x00182C2F"
+        ],
+        "resolved_predecessor_targets": [
+          "0x00182C33"
+        ],
+        "external_forward_targets": [
+          "0x00182C59"
+        ],
+        "raw_rel32_call_census_empty": true,
+        "capture_end_rva": "0x00182C56",
+        "capture_end_is_instruction_boundary": true,
+        "backend_conversion_gate_run_id": 36976415403,
+        "backend_gate_overall_at_state_write": "IN_PROGRESS_NOT_REQUIRED_FOR_THIS_STATIC_UNIT",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947079394,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_TOOLING_ONLY",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "state_strategy": "LATEST_PRIMARY_FRONTIER",
+      "exact_next_action": "Capture the next bounded canonical 64-byte raw window from exact instruction boundary 0x00182C56 without overlap. Preserve forward target 0x00182C59 as address/control-flow evidence only until captured and exact-decoded; keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
