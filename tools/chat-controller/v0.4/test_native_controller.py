@@ -627,6 +627,90 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('GITHUB_TASK_COMMIT_CACHE_SECONDS: "15"',compose)
         self.assertIn('PREVIOUS_TASK_UI_SETTLE_SECONDS: "45"',compose)
 
+    def test_c_plan_only_response_continues_same_batch(self):
+        continuation=AsyncMock(return_value=True)
+        rollover=AsyncMock(return_value=False)
+        f, _ = load_function(
+            'queue_handle_native_response',
+            CONTROLLER_MODE='localization',
+            _is_localization_producer=lambda active:False,
+            queue_send_c_execution_continuation=continuation,
+            queue_rollover_chat=rollover,
+        )
+        active=self.active()
+        active.update(
+            task_id='LOCALIZATION-LOCALIZATION_C-00476',
+            lane='LOCALIZATION_C',
+            qa_batch=[{'task_id':'B-1','result_sha':'b'*40}],
+            sent_at='2026-10-02T00:00:00+00:00',
+        )
+        self.assertTrue(asyncio.run(f(None,{},active,'상태 확인 완료. 다음 단계에서 QA를 수행하겠습니다.')))
+        continuation.assert_awaited_once()
+        self.assertEqual(active['c_premature_stop_count'],1)
+        self.assertEqual(active['task_id'],'LOCALIZATION-LOCALIZATION_C-00476')
+
+    def test_c_second_plan_only_turn_rolls_same_task(self):
+        continuation=AsyncMock(return_value=True)
+        rollover=AsyncMock(return_value=True)
+        f, _ = load_function(
+            'queue_handle_native_response',
+            CONTROLLER_MODE='localization',
+            _is_localization_producer=lambda active:False,
+            queue_send_c_execution_continuation=continuation,
+            queue_rollover_chat=rollover,
+        )
+        active=self.active()
+        active.update(
+            task_id='LOCALIZATION-LOCALIZATION_C-00476',
+            lane='LOCALIZATION_C',
+            qa_batch=[{'task_id':'B-1','result_sha':'b'*40}],
+            sent_at='2026-10-02T00:00:00+00:00',
+            c_premature_stop_count=1,
+            c_premature_stop_total=1,
+            c_premature_stop_counted_for_send_at='older',
+        )
+        self.assertTrue(asyncio.run(f(None,{},active,'또 계획만 출력')))
+        rollover.assert_awaited_once()
+        self.assertEqual(active['c_premature_stop_count'],0)
+
+    def test_c_rollover_carries_current_qa_batch(self):
+        f, _ = load_function(
+            'queue_rollover_prompt',
+            CONTROLLER_MODE='localization',
+            MAX_TASK_ATTEMPTS=3,
+            localization_controller_contract_fingerprint=lambda:('43','f'*40),
+            localization_final_artwork_progress_hint=lambda branch:'FINAL_ARTWORK_PROGRESS=0/95 (0%); MODE=FINAL_ARTWORK_CONVERGENCE',
+            _is_localization_producer=lambda active:False,
+        )
+        active=self.active()
+        active.update(
+            task_id='LOCALIZATION-LOCALIZATION_C-00476',
+            lane='LOCALIZATION_C',
+            branch='korean-localization-clean',
+            task_latched=True,
+            controller_stage='WAIT_QA_RESULT',
+            qa_batch=[{'task_id':'B-1','result_sha':'b'*40}],
+            qa_batches_completed_in_task=3,
+        )
+        prompt=f(active)
+        self.assertIn('ACTIVE_TASK_LATCH=ON',prompt)
+        self.assertIn('QA_BATCHES_COMPLETED=3',prompt)
+        self.assertIn('QA_BATCH_INPUTS=',prompt)
+        self.assertIn('B-1',prompt)
+        self.assertIn('FIRST_EXECUTION_ACTION=CALL_CONNECTED_TOOL',prompt)
+
+    def test_blocked_producer_recovery_cannot_bypass_batch_gate(self):
+        source=ast.get_source_segment(SOURCE, FUNCTIONS['reconcile_localization_blocked_producer_commits']) or ''
+        self.assertIn('localization_record_producer_checkpoint',source)
+        self.assertIn('pipeline_release_decision',source)
+        self.assertIn('CONTINUE_PIPELINE',source)
+        self.assertIn('pipeline_continuation_pending',source)
+
+    def test_c_retirement_does_not_double_finalize_already_drained_batch(self):
+        source=ast.get_source_segment(SOURCE, FUNCTIONS['localization_parallel_cycle']) or ''
+        self.assertIn('if not ctask.get("qa_batch_finalized")',source)
+        self.assertIn('finalize_c_qa_batch(q, ctask)',source)
+
     def test_conversion_no_commit_response_forces_execution_continuation(self):
         continuation = AsyncMock(return_value=True)
         recovery = AsyncMock(return_value=True)
