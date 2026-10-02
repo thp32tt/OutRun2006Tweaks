@@ -1729,6 +1729,32 @@ compose_fixed_function_indexed_source_range_readiness(
     UINT startIndex,
     std::uint64_t snapshotToken) noexcept;
 
+// R150 joins the exact R147 native DrawIndexed tuple with the R149 D3D9
+// source-range identity. D3D11 drops MinVertexIndex/NumVertices at dispatch,
+// so activation must carry both snapshots and prove their shared arguments
+// still describe the same draw before any native DrawIndexed call.
+struct NativeFixedFunctionIndexedDirectDispatchReadiness {
+    bool inputValid{};
+    bool directDispatchReady{};
+    bool sourceRangeReady{};
+    bool dispatchMatchesSourceRange{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t directDispatchSnapshotToken{};
+    std::uint64_t sourceRangeSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionIndexedDirectDispatchReadiness
+compose_fixed_function_indexed_direct_dispatch_readiness(
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_indexed_direct_dispatch_snapshot(
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    std::uint64_t snapshotToken) noexcept;
+
 // R148 seals the eventual DrawIndexed tuple for generated triangle fans after
 // the R146 live IA/VS-b0/OM proof. This remains dormant evidence only and does
 // not issue DrawIndexed or enable NativeDrawPathActive.
