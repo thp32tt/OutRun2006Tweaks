@@ -12,15 +12,20 @@ from __future__ import annotations
 OVERLAP = bytes.fromhex("66 0f 54 1d 20 91 61")
 
 
+class WindowError(AssertionError):
+    pass
+
+
 def validate_window(prefix: bytes, next_window: bytes) -> None:
-    assert prefix[-len(OVERLAP) :] == OVERLAP
-    assert next_window.startswith(OVERLAP)
+    if prefix[-len(OVERLAP) :] != OVERLAP:
+        raise WindowError("missing canonical continuation overlap")
+    if not next_window.startswith(OVERLAP):
+        raise WindowError("continuation window does not preserve overlap")
 
 
 def reject_truncated_tail(window: bytes, minimum_tail: int = 7) -> None:
-    # The validated frontier ends on an instruction boundary.  A continuation
-    # probe shorter than the known overlap must remain unresolved evidence.
-    assert len(window) >= minimum_tail
+    if len(window) < minimum_tail:
+        raise WindowError("truncated overlap accepted")
 
 
 def main() -> int:
