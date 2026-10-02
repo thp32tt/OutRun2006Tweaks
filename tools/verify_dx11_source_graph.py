@@ -905,8 +905,8 @@ def main() -> None:
          "R194 COLORARG0 census identity"),
         ("hash = hash_mix(hash, stage.alphaArg0);", RUNTIME_CENSUS,
          "R194 ALPHAARG0 census identity"),
-        ("VR DX11 R194 ffp signature#{}", RUNTIME_CENSUS,
-         "R194 ARG0 detailed census evidence"),
+        ("VR DX11 R197 ffp signature#{}", RUNTIME_CENSUS,
+         "R194 ARG0 detailed census evidence retained by R197 log revision"),
         ("case D3DTOP_MULTIPLYADD:", PIPELINE_TRANSLATION_CPP,
          "R194 MULTIPLYADD dependency/HLSL/readiness case"),
         ('return first + " + " + second + " * " + third;',
@@ -4389,8 +4389,8 @@ def main() -> None:
         ROOT / "tools" / "test_analyze_dx11_census.py"
     ).read_text(encoding="utf-8")
     r194_arg0_analyzer_contract = [
-        ("|160|173|194)", analyzer,
-         "R194 fixed-function log revision parser"),
+        ("|160|173|194|197)", analyzer,
+         "R194/R197 fixed-function log revision parser"),
         ("?P<colorArg0>", analyzer,
          "R194 COLORARG0 parser group"),
         ("?P<alphaArg0>", analyzer,
