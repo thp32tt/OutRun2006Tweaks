@@ -210,6 +210,12 @@ namespace outrun::vr::dx11
             DWORD renderTargetUsage{};
             D3DPOOL renderTargetPool = D3DPOOL_FORCE_DWORD;
             D3DFORMAT renderTargetFormat = D3DFMT_UNKNOWN;
+            // R176: the dormant surface mirror is exact only for non-MSAA
+            // D3D9 surfaces. Preserve source sample type/quality in census
+            // identity so an MSAA target cannot alias a single-sample target.
+            D3DMULTISAMPLE_TYPE renderTargetMultiSampleType =
+                D3DMULTISAMPLE_NONE;
+            DWORD renderTargetMultiSampleQuality = 0;
             // R174: RT0 alone is insufficient source-output provenance.
             // Preserve D3D9 auxiliary MRT slots 1..3 in sampled identity so
             // multi-target draws cannot alias the one-color-target path.
@@ -218,6 +224,9 @@ namespace outrun::vr::dx11
             DWORD depthUsage{};
             D3DPOOL depthPool = D3DPOOL_FORCE_DWORD;
             D3DFORMAT depthFormat = D3DFMT_UNKNOWN;
+            D3DMULTISAMPLE_TYPE depthMultiSampleType =
+                D3DMULTISAMPLE_NONE;
+            DWORD depthMultiSampleQuality = 0;
             std::array<TextureStageResourceState, 8> textureStages{};
             std::uint8_t textureResourcePresentMask{};
             std::uint8_t textureResourceExactMask{};
@@ -372,11 +381,17 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.renderTargetPool));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.renderTargetFormat));
             hash = hash_mix(
+                hash, static_cast<std::uint32_t>(sig.renderTargetMultiSampleType));
+            hash = hash_mix(hash, sig.renderTargetMultiSampleQuality);
+            hash = hash_mix(
                 hash, sig.auxiliaryRenderTargetObservationComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.auxiliaryRenderTargetMask);
             hash = hash_mix(hash, sig.depthUsage);
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.depthPool));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.depthFormat));
+            hash = hash_mix(
+                hash, static_cast<std::uint32_t>(sig.depthMultiSampleType));
+            hash = hash_mix(hash, sig.depthMultiSampleQuality);
             for (const auto& texture : sig.textureStages)
             {
                 hash = hash_mix(hash, texture.present ? 1u : 0u);
@@ -1030,6 +1045,9 @@ namespace outrun::vr::dx11
                     sig.renderTargetUsage = desc.Usage;
                     sig.renderTargetPool = desc.Pool;
                     sig.renderTargetFormat = desc.Format;
+                    sig.renderTargetMultiSampleType = desc.MultiSampleType;
+                    sig.renderTargetMultiSampleQuality =
+                        desc.MultiSampleQuality;
                 }
                 else
                     sig.resourceIntrospectionComplete = false;
@@ -1083,6 +1101,8 @@ namespace outrun::vr::dx11
                     sig.depthUsage = desc.Usage;
                     sig.depthPool = desc.Pool;
                     sig.depthFormat = desc.Format;
+                    sig.depthMultiSampleType = desc.MultiSampleType;
+                    sig.depthMultiSampleQuality = desc.MultiSampleQuality;
                 }
                 else
                     sig.resourceIntrospectionComplete = false;
@@ -1503,6 +1523,16 @@ namespace outrun::vr::dx11
                     unique,
                     sig.auxiliaryRenderTargetObservationComplete ? 1 : 0,
                     sig.auxiliaryRenderTargetMask);
+                spdlog::info(
+                    "VR DX11 R176 surface MSAA state#{}: rt[present={},type={},quality={}] depth[present={},type={},quality={}] unsupported={}",
+                    unique,
+                    sig.renderTargetPresent ? 1 : 0,
+                    static_cast<int>(sig.renderTargetMultiSampleType),
+                    sig.renderTargetMultiSampleQuality,
+                    sig.depthPresent ? 1 : 0,
+                    static_cast<int>(sig.depthMultiSampleType),
+                    sig.depthMultiSampleQuality,
+                    surfaceMultisampleUnsupported ? 1 : 0);
 
                 for (std::size_t stageIndex = 0;
                      stageIndex < sig.textureStages.size();
@@ -2240,6 +2270,15 @@ namespace outrun::vr::dx11
 
         const bool streamSourceFrequencyUnsupported =
             signature.stream0Frequency != 1u;
+        // R176 mirrors NativeSurfaceMirror::source_descriptor_exact(): D3D9
+        // multisample type/quality are not assumed to map exactly to DXGI.
+        const bool surfaceMultisampleUnsupported =
+            (signature.renderTargetPresent &&
+             (signature.renderTargetMultiSampleType != D3DMULTISAMPLE_NONE ||
+              signature.renderTargetMultiSampleQuality != 0)) ||
+            (signature.depthPresent &&
+             (signature.depthMultiSampleType != D3DMULTISAMPLE_NONE ||
+              signature.depthMultiSampleQuality != 0));
 
         bool behaviorDescriptorExact = true;
         bool mutationTelemetryRequired = false;
@@ -2284,7 +2323,8 @@ namespace outrun::vr::dx11
             signature.depthPresent, ResourceRole::DepthStencil,
             signature.depthPool, signature.depthUsage);
 
-        if (!behaviorDescriptorExact || streamSourceFrequencyUnsupported)
+        if (!behaviorDescriptorExact || streamSourceFrequencyUnsupported ||
+            surfaceMultisampleUnsupported)
             ResourceBehaviorUnsupportedSamples.fetch_add(
                 1, std::memory_order_relaxed);
         if (mutationTelemetryRequired)
@@ -2315,7 +2355,8 @@ namespace outrun::vr::dx11
         // activation prerequisite. It deliberately does not clear the older
         // mutation-telemetry/resource-lifetime blocker or activate native draw.
         if (!behaviorDescriptorExact || mutationTelemetryRequired ||
-            managedShadowRequired || streamSourceFrequencyUnsupported)
+            managedShadowRequired || streamSourceFrequencyUnsupported ||
+            surfaceMultisampleUnsupported)
             resourcesExact = false;
 
         if (signature.indexed &&
