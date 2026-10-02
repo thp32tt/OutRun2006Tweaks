@@ -34,7 +34,7 @@ jobs:
         run: docker compose -f tools/chat-controller/localization/docker-compose.portainer.yml config >/tmp/compose.yml
       - name: Build localization-only image
         run: |
-          docker build -t outrun-localization-only:test tools/chat-controller/localization
+          docker build -t outrun-localization-only:test -f tools/chat-controller/localization/Dockerfile.portainer tools/chat-controller/localization
           docker run --rm --entrypoint sh outrun-localization-only:test -c 'test -f /opt/outrun/prompts/localization_A.md && test -f /opt/outrun/prompts/localization_B.md && test -f /opt/outrun/prompts/localization_C.md && test ! -e /opt/outrun/prompts/vr_A.md && test ! -e /opt/outrun/prompts/conversion_dx11.md'
       - name: Runtime smoke test
         shell: bash
