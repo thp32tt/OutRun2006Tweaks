@@ -2063,7 +2063,7 @@
         "C6_STATE": {
           "status": "COMPLETE",
           "state_persisted": true,
-          "evidence": "Recorded as a supplemental completed unit so the newer concurrent F36 raw source frontier is not overwritten."
+          "evidence": "Recorded as a supplemental completed unit; fresh branch check preserves descendant F36 control-flow proof b2e0f73a64aa00b4290f54db7196e39c88f9cd74 rather than regressing the primary frontier."
         }
       },
       "validation": {
@@ -2095,11 +2095,11 @@
       },
       "issue14_implementation_comment_id": 5947440962,
       "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_ONLY",
-      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_F36_RAW_FRONTIER",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_F36_CONTROL_FLOW_FRONTIER",
       "semantic_promotion": "NONE",
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
-      "exact_next_action": "Preserve the newer F36 raw frontier beginning at exact boundary 0x00182D93. Exact-decode only complete canonical instructions and resolve 0x00182D95/0x00182D96/0x00182D9A only with exact instruction-boundary evidence; keep function/render/HUD/runtime semantics unresolved."
+      "exact_next_action": "Preserve descendant F36 proof b2e0f73a64aa00b4290f54db7196e39c88f9cd74. Its exact proof ends at 0x00182DCF with incomplete bytes 83 3d 60 bc and forward target 0x00182E34 still address-only; next capture must overlap those four bytes before exact-decoding further, with function/render/HUD/runtime semantics unresolved."
     },
     {
       "unit_id": "DXVK_CONTINUATION_PROOF_SEMANTIC_QUARANTINE",
