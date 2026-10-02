@@ -338,6 +338,30 @@
       "issue14_implementation_comment_id": 5946905253,
       "scope": "Continuation 36 raw canonical provenance from exact predecessor boundary 0x00182B57 through 0x00182B97; no semantic or runtime promotion.",
       "exact_next_action": "Exact-decode complete instructions before cut rel32 CALL opcode 0x00182B96:e8; preserve the cut edge raw-only and extend it with a fresh canonical overlap capture."
+    },
+    {
+      "unit_id": "DXVK_CONTINUATION_PROBE_LEN_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "1328045fb2a563fb45447db280198debea7b72ae",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "static_contract": "PASS",
+      "dxvk_disassembly_evidence_run_id": 36975098254,
+      "dxvk_disassembly_evidence_job_id": 110737088680,
+      "backend_conversion_gate_run_id": 36975098348,
+      "backend_conversion_gate_status_at_state_write": "IN_PROGRESS_NO_PASS_CLAIM",
+      "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+      "issue14_implementation_comment_id": 5946937477,
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "scope": "Fail closed unless every auto-discovered F23+ DXVK continuation retains the canonical 64-byte bounded probe before geometry is accepted.",
+      "reason": "The dynamic verifier previously accepted any probe length with self-consistent start/end geometry, allowing an empty or truncated frontier to appear structurally valid.",
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "next_action": "Exact-decode only complete instructions in the validated canonical 0x00182B57..0x00182B97 window. Preserve the trailing cut rel32 CALL opcode at 0x00182B96 (e8) raw-only; after proving that cut edge, use a fresh bounded overlap capture before decoding beyond it. Keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
