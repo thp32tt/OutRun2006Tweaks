@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1189,
+  "cycle": 1195,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -243,11 +243,13 @@
     "R84-REF-INTERFACE-0006",
     "R84-REF-BUILDGATE-A-0001",
     "R84-REF-BUILDGATE-A-0002",
-    "R84-REF-BUILDGATE-A-0003"
+    "R84-REF-BUILDGATE-A-0003",
+    "R84-REF-BUILDGATE-B-0001",
+    "R84-REF-BUILDGATE-B-0002"
   ],
-  "next": "Build Gate B: keep R34/R33 split enabled, guard R33 textual include of stereo_renderer_r32.cpp, compile R32 as a separate TU, and consume exact Win32 Release compile/link errors. Do not start Gate C until Gate B is BUILD_VERIFIED.",
-  "updatedKst": "2026-10-02T12:01:00+09:00",
-  "batchStatus": "R84_BUILD_GATE_A_VERIFIED_CYCLE_1189",
+  "next": "Consume GitHub-hosted Gate B run 36961186184 job 110695037585 for exact SHA 792480b46fa8790cbdfc19551fdde2fae8b3e87f. If build fails, fix only the first concrete compile/link dependency and rerun on the same lineage. If green, record BUILD_VERIFIED Gate B and begin Gate C owner-correct R22/R13 deep-target facades before splitting R32/R31.",
+  "updatedKst": "2026-10-02T12:42:00+09:00",
+  "batchStatus": "R84_BUILD_GATE_B_ACTIVE_CYCLE_1195",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -459,6 +461,8 @@
     "Cycles 1178-1180 R84-REF-INTERFACE-0006: inventoried remaining deep hook targets. R30 PresentDest/ResetDest are owned by stereo_renderer_r7.inc; R32 ResetDestR22 by R22; R32 ResolveDirectTransportR13/PresentDestR13 by R13. No runtime source change: active lower-layer hook targets were intentionally left untouched. Build-gated split order A(R34/R33)->B(R33/R32)->C(R32/R31)->D(R31/R30)->E(R30/R29) documented.",
     "Cycles 1181-1183 R84-REF-BUILDGATE-A-0001: added dedicated GitHub-hosted Win32 R34/R33 split build option/workflow and draft PR #83 validation surface. First run 36956450252 exposed VERIFIER_DEFECT: substring search confused ReadFinalDispatchInstallState with public FinalDispatchInstallState; fixed at e51a5dd3088bf6d8a079050116236077564d1021. Production branch unchanged. Runtime UNTESTED.",
     "Cycles 1184-1186 R84-REF-BUILDGATE-A-0002: Gate A compile run 36956596561 reached real build and exposed implicit textual-include dependencies: hook foundations, R7 runtime context, R22 RasterReplayScope, and stale frame_accounting stereo_failure include. Added runtime_context.hpp, raster_replay_scope.hpp, explicit R34 hook foundation include, and corrected frame_accounting to ipc/protocol.hpp at aef455e2e52201d08702e2a1f1170dcaf443e1ed. Corrected exact-identifier verifier at 21df03a0f3e780f7d65871358f8e41588030f599. Current Gate A run 36957281240 in progress. RUNTIME_VALIDATION=UNTESTED.",
-    "Cycles 1187-1189 R84-REF-BUILDGATE-A-0003: Gate A BUILD_VERIFIED on SHA bb76ea7bbe9dc68d89b813ea4f3872fd5651ee6e. GitHub-hosted workflow run 36957956806 job 110685058860 passed verifier, configure, and Win32 Release compile+link with R33/R34 as separate TUs. Earlier latent full-chain defects fixed: Win32 NOMINMAX ordering, runtime_context/raster replay facades, canonical IPC includes, R33 state verifier substring bug, and R29 literal \\\\n escape. Production branch unchanged; runtime/HMD remains UNTESTED."
+    "Cycles 1187-1189 R84-REF-BUILDGATE-A-0003: Gate A BUILD_VERIFIED on SHA bb76ea7bbe9dc68d89b813ea4f3872fd5651ee6e. GitHub-hosted workflow run 36957956806 job 110685058860 passed verifier, configure, and Win32 Release compile+link with R33/R34 as separate TUs. Earlier latent full-chain defects fixed: Win32 NOMINMAX ordering, runtime_context/raster replay facades, canonical IPC includes, R33 state verifier substring bug, and R29 literal \\\\n escape. Production branch unchanged; runtime/HMD remains UNTESTED.",
+    "Cycles 1190-1192 R84-REF-BUILDGATE-B-0001: Gate B cumulative R34/R33 + R33/R32 split run 36958531456 job 110686824910 exposed PRODUCT_DEFECT/implicit include dependencies plus Win32 min/max pollution. Added NOMINMAX at R32 TU start and owner-neutral runtime/raw-draw/depth facades at 8300ec814f241366d3bb27481ff0597cf8880bb1. Follow-up static dependency review found further R33 access to R7 stereo resources/frame accounting.",
+    "Cycles 1193-1195 R84-REF-BUILDGATE-B-0002: extracted R33 stereo runtime facade and neutral FastWorldDispatchConstants at 84f5f245932f30e6a16e0c4e86a8bc5097db8db6, then removed the remaining local FormatHasStencil dependency at build-input SHA 792480b46fa8790cbdfc19551fdde2fae8b3e87f. Exact GitHub-hosted Gate B run 36961186184 job 110695037585: verifier PASS; configure currently in progress, build pending at checkpoint time. RUNTIME_VALIDATION=UNTESTED. Do not start Gate C until this exact Gate B lineage is BUILD_VERIFIED."
   ]
 }
