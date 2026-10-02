@@ -11126,6 +11126,13 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_23_prefix_pro
         })
         calls_match = calls_match and matches
 
+    expected_raw_calls = set(GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_23_CALLS)
+    observed_raw_calls = {
+        (item["call_rva"], item["target_rva"])
+        for item in provenance["raw_outbound_rel32_candidates"]
+    }
+    raw_call_census_matches = observed_raw_calls == expected_raw_calls
+
     predecessor_rows = []
     predecessor_targets_match = True
     for rva, expected in GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_23_PREDECESSOR_TARGET_BYTES:
@@ -11161,6 +11168,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_23_prefix_pro
         and branch_targets_match
         and internal_branch_targets_on_boundaries
         and calls_match
+        and raw_call_census_matches
         and predecessor_targets_match
         and incomplete_matches
     )
@@ -11180,6 +11188,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_23_prefix_pro
         "internal_branch_targets_on_boundaries": internal_branch_targets_on_boundaries,
         "calls": call_rows,
         "calls_match": calls_match,
+        "raw_call_census_matches": raw_call_census_matches,
         "predecessor_targets": predecessor_rows,
         "predecessor_targets_match": predecessor_targets_match,
         "incomplete_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_23_INCOMPLETE_RVA,
@@ -11345,6 +11354,13 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_24_prefix_pro
         })
         calls_match = calls_match and matches
 
+    expected_raw_calls = set(GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_24_CALLS)
+    observed_raw_calls = {
+        (item["call_rva"], item["target_rva"])
+        for item in provenance["raw_outbound_rel32_candidates"]
+    }
+    raw_call_census_matches = observed_raw_calls == expected_raw_calls
+
     predecessor_rows = []
     predecessor_targets_match = True
     for rva, expected in GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_24_PREDECESSOR_TARGET_BYTES:
@@ -11381,6 +11397,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_24_prefix_pro
         and branch_targets_match
         and internal_branch_targets_on_boundaries
         and calls_match
+        and raw_call_census_matches
         and predecessor_targets_match
     )
     return {
@@ -11399,6 +11416,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_24_prefix_pro
         "internal_branch_targets_on_boundaries": internal_branch_targets_on_boundaries,
         "calls": call_rows,
         "calls_match": calls_match,
+        "raw_call_census_matches": raw_call_census_matches,
         "predecessor_targets": predecessor_rows,
         "predecessor_targets_match": predecessor_targets_match,
         "capture_end_rva": provenance["probe_end_rva"],
