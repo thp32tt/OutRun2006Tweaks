@@ -9,7 +9,7 @@
   "initial_recovered_head": "936ba3538bd3bc54ccb4da1f582a2d2be7ca9007",
   "validation_bearing_result_sha": "b2e0f73a64aa00b4290f54db7196e39c88f9cd74",
   "result_sha": "b2e0f73a64aa00b4290f54db7196e39c88f9cd74",
-  "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+  "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_GATE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "UNTESTED",
@@ -73,7 +73,7 @@
   },
   "validation": {
     "exact_sha": "b2e0f73a64aa00b4290f54db7196e39c88f9cd74",
-    "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+    "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_GATE",
     "dxvk_disassembly_evidence_run_id": 36979358581,
     "dxvk_disassembly_evidence_job_id": 110750121123,
     "dxvk_disassembly_evidence_conclusion": "success",
