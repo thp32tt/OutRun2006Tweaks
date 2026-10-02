@@ -5,11 +5,11 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "108a0455cc8b4fe060fa58695ac01a9f4cc35484",
-  "state_parent_head": "ee0d41992589bfb0ac76d7baad044471c5b85b61",
+  "state_parent_head": "fa96af8dc7b918783a24b17f3ccc1ce5826c835b",
   "material_result_sha": "a73942e981fce7c54888ccbf304ced6c577993d4",
   "source_implementation_sha": "b3ad54cb14c1ddb84d492722fd16c4d615964319",
   "validation_bearing_sha": "a73942e981fce7c54888ccbf304ced6c577993d4",
-  "retaining_descendant_sha": "ee0d41992589bfb0ac76d7baad044471c5b85b61",
+  "retaining_descendant_sha": "fa96af8dc7b918783a24b17f3ccc1ce5826c835b",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
@@ -52,11 +52,11 @@
     },
     "C3_VALIDATE": {
       "status": "COMPLETE_STATIC_EXACT_SHA_PASS_COMPILE_NOT_CLAIMED",
-      "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_STATIC_STEPS_DX11_SOURCE_GRAPH_AND_CENSUS; CONFIGURE_IN_PROGRESS_AT_C6; COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
       "evidence": [
         "Authenticated GitHub source-contract check on exact result SHA a73942e981fce7c54888ccbf304ced6c577993d4 passed: three switch sites, exact RGB HLSL expression, positive fixture, ALPHAOP rejection, offline-compile assertion and source-graph guard are present.",
-        "GitHub Build run 36992160627 job 110790748419 on exact result SHA completed Checkout, HMD baseline, one-click structure, backend disassembly, Verify DX11 source graph, Test DX11 census analyzer, wheel source and FFB math with SUCCESS; Configure was in progress at C6.",
-        "Compile/binary/hosted-probe execution is not claimed from the in-progress workflow."
+        "GitHub Build run 36992160627 job 110790748419 on exact result SHA completed Checkout, HMD baseline, one-click structure, backend disassembly, Verify DX11 source graph, Test DX11 census analyzer, wheel source and FFB math with SUCCESS.",
+        "Win32 Configure was cancelled by newer same-branch descendant churn; Build, binary verification and hosted-probe execution were skipped, so compile/binary success is not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
@@ -89,13 +89,13 @@
   "issue14_comment_id": 5949643379,
   "validation_run_id": 36992160627,
   "validation_job_id": 110790748419,
-  "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_STATIC_STEPS_DX11_SOURCE_GRAPH_AND_CENSUS; CONFIGURE_IN_PROGRESS_AT_C6; COMPILE_NOT_CLAIMED",
-  "blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA GitHub workflow static DX11 source-graph/census checks passed; configure/build were not complete at C6, so compile/binary success is not claimed.",
+  "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+  "blocker": "Quest 3/VDXR runtime parity was not performed. Exact-SHA GitHub Build run 36992160627 passed DX11 source-graph/census and preceding static checks; Win32 Configure was cancelled by descendant branch churn and Build/binary steps were skipped, so compile/binary success is not claimed.",
   "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R188 D3DTOP_MODULATECOLOR_ADDALPHA and newer concurrent work already retained at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "source_head": "ee0d41992589bfb0ac76d7baad044471c5b85b61",
+  "source_head": "fa96af8dc7b918783a24b17f3ccc1ce5826c835b",
   "result_sha": "a73942e981fce7c54888ccbf304ced6c577993d4",
   "selected_work_item": "DX11_FFP_D3DTOP_MODULATECOLOR_ADDALPHA_SUPPORT_R188",
   "changed_paths": [
