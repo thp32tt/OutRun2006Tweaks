@@ -269,6 +269,9 @@ namespace outrun::vr::dx11
             DWORD pointScaleABits = 0x3F800000u;
             DWORD pointScaleBBits = 0u;
             DWORD pointScaleCBits = 0u;
+            // R170: preserve all eight D3DRS_WRAP stage masks in draw identity.
+            bool textureCoordinateWrapObservationComplete{};
+            std::array<DWORD, 8> textureCoordinateWrap{};
             bool alphaTestObservationComplete{};
             DWORD alphaTestEnable = FALSE;
             DWORD alphaTestRef{};
@@ -463,6 +466,10 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.pointScaleABits);
             hash = hash_mix(hash, sig.pointScaleBBits);
             hash = hash_mix(hash, sig.pointScaleCBits);
+            hash = hash_mix(
+                hash, sig.textureCoordinateWrapObservationComplete ? 1u : 0u);
+            for (const auto wrap : sig.textureCoordinateWrap)
+                hash = hash_mix(hash, wrap);
             hash = hash_mix(
                 hash, sig.fixedFunctionTranslationReady ? 1u : 0u);
             hash = hash_mix(
@@ -1408,6 +1415,14 @@ namespace outrun::vr::dx11
                     unique,
                     sig.ditherObservationComplete ? 1 : 0,
                     sig.ditherEnable != FALSE ? 1 : 0);
+                spdlog::info(
+                    "VR DX11 R170 texture-coordinate wrap state#{}: observed={} wrap=[{},{},{},{},{},{},{},{}]",
+                    unique,
+                    sig.textureCoordinateWrapObservationComplete ? 1 : 0,
+                    sig.textureCoordinateWrap[0], sig.textureCoordinateWrap[1],
+                    sig.textureCoordinateWrap[2], sig.textureCoordinateWrap[3],
+                    sig.textureCoordinateWrap[4], sig.textureCoordinateWrap[5],
+                    sig.textureCoordinateWrap[6], sig.textureCoordinateWrap[7]);
 
                 for (std::size_t stageIndex = 0;
                      stageIndex < sig.textureStages.size();
@@ -1637,7 +1652,7 @@ namespace outrun::vr::dx11
             const auto sampleStride = census_sample_stride();
             const auto samplingScheme = census_sampling_scheme();
             spdlog::info(
-                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] dualSourceBlend[any={},rgbSrc={},rgbDst={},alphaSrc={},alphaDst={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={},dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={}]",
+                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] dualSourceBlend[any={},rgbSrc={},rgbDst={},alphaSrc={},alphaDst={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={},dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={},texCoordWrap={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -1747,7 +1762,7 @@ namespace outrun::vr::dx11
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],
                 unsupported[8], unsupported[9], unsupported[10], unsupported[11],
                 unsupported[12], unsupported[13], unsupported[14], unsupported[15],
-                unsupported[16], unsupported[17]);
+                unsupported[16], unsupported[17], unsupported[18]);
         }
 
         void note_unsupported(std::uint32_t mask) noexcept
@@ -2102,6 +2117,9 @@ namespace outrun::vr::dx11
         signature.pointScaleABits = source.pointScaleABits;
         signature.pointScaleBBits = source.pointScaleBBits;
         signature.pointScaleCBits = source.pointScaleCBits;
+        signature.textureCoordinateWrapObservationComplete =
+            captured && source.complete;
+        signature.textureCoordinateWrap = source.textureCoordinateWrap;
         signature.alphaTestObservationComplete =
             captured && source.complete;
         signature.alphaTestEnable = source.alphaTestEnable;
