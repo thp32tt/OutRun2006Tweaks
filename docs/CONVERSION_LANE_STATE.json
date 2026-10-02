@@ -4870,6 +4870,67 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authenticated frontier. Capture the mandatory 64-byte overlap at 0x0018336B..0x001833AB to complete the trailing E8 rel32 CALL, carry unresolved forward target 0x00183380 fail-closed, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_MODERN_OVERLAP_LINEAGE_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "10d15dbb16bf1c501f35e58fbb5b30a4f8ff44f9",
+      "validation_bearing_result_sha": "10d15dbb16bf1c501f35e58fbb5b30a4f8ff44f9",
+      "commit_message": "test: fail-close DXVK overlap lineage [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Hardened the backend disassembly verifier so modern mandatory-overlap continuations (>=43) fail closed if predecessor capture_edge_matches consumption or predecessor_overlap_matches lineage binding is removed, preventing byte-geometry/status-only acceptance after a refactor.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch state, AGENTS.md, current lane/run state, regression/problem history and Issue #14 while refreshing concurrent same-JOB frontier changes."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Observed that modern overlap collectors already consume predecessor capture-edge and overlap-byte lineage, while verifier enforcement allowed deletion of those gates because one was optional-by-presence and the other was not required."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 10d15dbb16bf1c501f35e58fbb5b30a4f8ff44f9 strengthens tools/verify_vr_backend_disasm_contract.py for continuation >=43 without touching analyzer frontier, other backend branches or localization."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "GitHub Build run 36992308249 rerun job 110791839544 passed Verify HMD-proven VR baseline, Verify one-click VR structure contract, Verify backend disassembly contract and Verify consolidated wheel FFB source."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit contains [AUTO:CONV-DXVK-000002]; Issue #14 comment 5949674353 records the change and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only change; no runtime payload, deployment content, binary or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally so the newer canonical F69 frontier remains authoritative and is not rewound."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_STATIC_BACKEND_CONTRACT",
+        "exact_sha": "10d15dbb16bf1c501f35e58fbb5b30a4f8ff44f9",
+        "build_run_id": 36992308249,
+        "build_rerun_job_id": 110791839544,
+        "hmd_baseline_step": "SUCCESS",
+        "vr_structure_step": "SUCCESS",
+        "backend_disassembly_contract_step": "SUCCESS",
+        "wheel_ffb_source_step": "SUCCESS",
+        "full_build_conclusion": "NOT_CLAIMED_AFTER_VALIDATION_BEARING_STEP",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5949674353,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authenticated canonical frontier. Keep the modern overlap lineage guard active while continuation work advances; no runtime validation is required for this verifier-only unit."
     }
   ]
 }
