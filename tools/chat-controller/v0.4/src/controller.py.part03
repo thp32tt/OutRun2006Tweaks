@@ -243,11 +243,14 @@ def localization_material_target_hints(branch: str, lane: str, limit: int = 2) -
 
 
 def localization_material_target_prompt(active: dict) -> str:
-    targets = localization_material_target_hints(
-        str(active.get("branch") or "korean-localization-clean"),
-        str(active.get("lane") or ""),
-        limit=2,
-    )
+    if active.get("pipeline_candidate_indices"):
+        targets = localization_remaining_material_targets(active, limit=2)
+    else:
+        targets = localization_material_target_hints(
+            str(active.get("branch") or "korean-localization-clean"),
+            str(active.get("lane") or ""),
+            limit=2,
+        )
     if not targets:
         return (
             "CONTROLLER_SELECTED_TARGET=NONE; fresh Git scan only as much as needed to choose "
@@ -290,8 +293,17 @@ def queue_rollover_prompt(active: dict) -> str:
                 f"CONTROLLER_STAGE={active.get('controller_stage') or 'WAIT_MATERIAL_COMMIT'}",
                 f"LAST_CHECKPOINT_HEAD={active.get('last_checkpoint_head') or active.get('base_sha') or ''}",
                 f"PREMATURE_STOP_RECOVERY_TOTAL={int(active.get('premature_stop_total', 0) or 0)}",
+                f"PIPELINE_CANDIDATES={int(active.get('pipeline_candidate_count', 0) or 0)}/{LOCALIZATION_PRODUCER_TARGET_CANDIDATES}",
                 "FIRST_EXECUTION_ACTION=CALL_CONNECTED_TOOL. Do not emit a status/plan paragraph before the first tool call.",
                 localization_material_target_prompt(active),
+            ]
+        elif str(active.get("lane") or "") == "LOCALIZATION_C":
+            lines += [
+                "ACTIVE_TASK_LATCH=ON",
+                f"CONTROLLER_STAGE={active.get('controller_stage') or 'WAIT_QA_RESULT'}",
+                f"QA_BATCHES_COMPLETED={int(active.get('qa_batches_completed_in_task', 0) or 0)}",
+                "QA_BATCH_INPUTS=" + json.dumps(active.get("qa_batch") or [], ensure_ascii=False, separators=(",", ":")),
+                "FIRST_EXECUTION_ACTION=CALL_CONNECTED_TOOL. Validate every immutable QA input; do not stop after one item or a plan.",
             ]
     elif CONTROLLER_MODE == "conversion" and active.get("task_latched", True):
         lines += [
