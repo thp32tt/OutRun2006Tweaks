@@ -3879,8 +3879,8 @@ def main() -> None:
             "R124 scissor bounds proof",
         "R124 OM dynamic state changes invalidate output snapshot":
             "R124 OM identity invalidation proof",
-        "R124 draw snapshot changes with output-state identity":
-            "R124 final-draw output identity invalidation",
+        "R131 draw binding rejects output-state identity drift":
+            "R124 output-state identity propagates into R131 final draw readiness",
         "DX11 dynamic output-state readiness R124: PASS":
             "R124 hosted probe marker",
     }.items():
