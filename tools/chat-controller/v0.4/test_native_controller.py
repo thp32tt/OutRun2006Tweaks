@@ -35,7 +35,14 @@ def load_function(name, **overrides):
               queue_send_producer_execution_continuation=AsyncMock(return_value=False),
               queue_send_conversion_execution_continuation=AsyncMock(return_value=False),
               queue_send_same_chat_control_message=AsyncMock(return_value=True),
-              queue_rollover_chat=AsyncMock(return_value=True))
+              queue_rollover_chat=AsyncMock(return_value=True),
+              collect_retry_diagnostic=AsyncMock(return_value={
+                  'at': datetime.now(timezone.utc).isoformat(),
+                  'classification': 'GENERIC_RETRY_COMPOSER_PRESENT',
+                  'composer_visible': True,
+                  'retry_surface': 'retry',
+              }),
+              persist_retry_diagnostic=Mock())
     ns.update(overrides)
     node = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), FUNCTIONS[name]], type_ignores=[])
     exec(compile(ast.fix_missing_locations(node), '<controller>', 'exec'), ns)
@@ -668,6 +675,78 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('active["task_latched"] = False', node_source)
         self.assertIn('active["controller_stage"] = "DONE"', node_source)
         self.assertIn('last_material_progress_at', node_source)
+
+    def test_retry_diagnostic_classifies_missing_composer_without_chat_dump(self):
+        f, ns = load_function(
+            'collect_retry_diagnostic',
+            CONTROLLER_MODE='conversion',
+            first_visible=AsyncMock(return_value=None),
+            INPUT_SELECTORS=[],
+            composer_diagnostics=AsyncMock(return_value=[{
+                'tag':'DIV','role':'textbox','visible':False,'frame_url':'https://chatgpt.com/'
+            }]),
+            current_assistant_text=AsyncMock(return_value=''),
+            RATE_LIMIT_PATTERNS=[r'too many requests'],
+            CONVERSATION_LIMIT_PATTERNS=[r'conversation.{0,20}limit'],
+            LIMIT_PATTERNS=[r'usage limit'],
+        )
+        page=SimpleNamespace(url='https://chatgpt.com/g/project/c/chat', title=AsyncMock(return_value='ChatGPT'))
+        slot=SimpleNamespace(name='B')
+        active=self.active()
+        active.update(lane='DXVK', branch='vr-dxvk-r71-disasm', generic_retry_clicks=2, chat_rollovers=1)
+        d=asyncio.run(f(page,slot,active,'Something went wrong. Retry',busy=False))
+        self.assertEqual(d['classification'],'GENERIC_RETRY_COMPOSER_MISSING')
+        self.assertFalse(d['composer_visible'])
+        self.assertEqual(d['task_id'],'TASK-1')
+        self.assertEqual(d['generic_retry_clicks'],2)
+        self.assertIn('Retry',d['retry_surface'])
+        self.assertNotIn('assistant_text',d)
+
+    def test_retry_diagnostic_classifies_rate_limit(self):
+        f, _ = load_function(
+            'collect_retry_diagnostic',
+            CONTROLLER_MODE='localization',
+            first_visible=AsyncMock(return_value=object()),
+            INPUT_SELECTORS=[],
+            composer_diagnostics=AsyncMock(return_value=[]),
+            current_assistant_text=AsyncMock(return_value=''),
+            RATE_LIMIT_PATTERNS=[r'too many requests'],
+            CONVERSATION_LIMIT_PATTERNS=[],
+            LIMIT_PATTERNS=[],
+        )
+        page=SimpleNamespace(url='https://chatgpt.com/', title=AsyncMock(return_value='ChatGPT'))
+        d=asyncio.run(f(page,SimpleNamespace(name='A'),self.active(),'Too many requests. Retry',busy=False))
+        self.assertEqual(d['classification'],'RATE_LIMIT')
+        self.assertTrue(d['composer_visible'])
+        self.assertIsNotNone(d['rate_limit_match'])
+
+    def test_retry_handler_persists_structured_diagnostic(self):
+        diag={
+            'at': datetime.now(timezone.utc).isoformat(),
+            'classification':'GENERIC_RETRY_COMPOSER_MISSING',
+            'composer_visible':False,
+            'retry_surface':'Something went wrong. Retry',
+        }
+        persist=Mock()
+        f, _ = load_function(
+            'queue_handle_retry_surface',
+            first_visible=AsyncMock(return_value=object()), RETRY_SELECTORS=[],
+            detect_busy=AsyncMock(return_value=False),
+            retry_surface_text=AsyncMock(return_value='Something went wrong. Retry'),
+            collect_retry_diagnostic=AsyncMock(return_value=diag),
+            persist_retry_diagnostic=persist,
+            RATE_LIMIT_PATTERNS=[],
+            current_assistant_text=AsyncMock(return_value=''),
+            GENERIC_RETRY_ROLLOVER_CLICKS=2, RETRY_BUTTON_COOLDOWN_SECONDS=45,
+            send_guard_reason=lambda *args:None, click_retry_generation=AsyncMock(return_value=True),
+            note_successful_request=Mock(), save_registry=Mock(),
+        )
+        active=self.active(); slot=SimpleNamespace(name='A')
+        self.assertTrue(asyncio.run(f(None,{},None,None,slot,active,{'active':active})))
+        persist.assert_called_once_with(diag)
+        self.assertEqual(active['last_retry_classification'],'GENERIC_RETRY_COMPOSER_MISSING')
+        self.assertFalse(active['last_retry_composer_visible'])
+        self.assertEqual(active['last_retry_recovery_action'],'CONTROLLED_RETRY_CLICK')
 
     def test_persistent_generic_retry_rolls_same_task_to_fresh_chat(self):
         rollover = AsyncMock(return_value=True)
