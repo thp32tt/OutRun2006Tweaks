@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Validate DXVK disassembly continuation evidence overlap.
 
-This is a static evidence helper only. It does not infer runtime semantics.
+Static evidence helper only. It does not infer runtime semantics.
 It verifies that a continuation window preserves the mandatory overlap bytes
-captured at the predecessor boundary before a decoder is allowed to consume
-following bytes.
+captured at a predecessor boundary before following bytes are decoded.
 """
 
 from __future__ import annotations
@@ -17,7 +16,7 @@ DEFAULT_OVERLAP = "66 0f 54 1d 20 91 61"
 
 
 def normalize_bytes(value: str) -> bytes:
-    """Convert a human byte sequence into bytes with clear input validation."""
+    """Convert a human byte sequence into bytes with strict validation."""
     compact = value.lower().replace("0x", "").replace(",", " ")
     parts = [p for p in compact.split() if p]
     if not parts:
@@ -36,6 +35,7 @@ def validate_window(overlap: str, window: str) -> tuple[bool, str]:
         actual = normalize_bytes(window)
     except ValueError as exc:
         return False, str(exc)
+
     if len(actual) < len(expected):
         return False, "continuation window shorter than required overlap"
     if actual[: len(expected)] != expected:
