@@ -1421,10 +1421,21 @@ def verify_dxvk_continuation_chain() -> None:
             for name in assigned_names
             if name.endswith("_is_predecessor_boundary")
         }
+        # A proof can carry an unresolved predecessor target exactly to a
+        # capture edge (for example continuation_65 at the lone E8 opcode).
+        # Any explicit *_cut_target_matches predicate is lineage-critical: if
+        # later refactoring drops it from proven while leaving the telemetry
+        # assignment intact, the canonical chain must fail closed.
+        inherited_cut_target_gates = {
+            name
+            for name in assigned_names
+            if name.endswith("_cut_target_matches")
+        }
         required_proven_gates = (
             mandatory_proven_gates
             | (assigned_names & conditional_integrity_gates)
             | predecessor_boundary_gates
+            | inherited_cut_target_gates
         )
         missing_proven_gates = sorted(required_proven_gates - proven_gate_names)
         if missing_proven_gates:
