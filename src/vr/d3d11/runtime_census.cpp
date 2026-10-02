@@ -201,7 +201,7 @@ namespace outrun::vr::dx11
             // R175: D3D9 stream frequency controls indexed/instanced vertex
             // reuse. The dormant DX11 input layout is strictly per-vertex, so
             // only the D3D9 default frequency of one is currently exact.
-            DWORD stream0Frequency = 1u;
+            UINT stream0Frequency = 1u;
             DWORD vertexUsage{};
             D3DPOOL vertexPool = D3DPOOL_FORCE_DWORD;
             DWORD indexUsage{};

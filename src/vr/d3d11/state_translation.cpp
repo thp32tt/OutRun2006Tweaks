@@ -111,7 +111,7 @@ TriangleFanExpansionPlan translate_triangle_fan_expansion(
         return out;
     }
 
-    const UINT maxValue = std::numeric_limits<UINT>::max();
+    const UINT maxValue = (std::numeric_limits<UINT>::max)();
     if (primitiveCount > maxValue / 3u)
         return out;
 
@@ -151,7 +151,7 @@ bool materialize_triangle_fan_vertex_indices(
         expandedIndexCapacity < expansion.expandedIndexCount)
         return false;
 
-    const UINT maxValue = std::numeric_limits<UINT>::max();
+    const UINT maxValue = (std::numeric_limits<UINT>::max)();
     if (baseVertex >
         maxValue - (expansion.sourceElementCount - 1u))
         return false;

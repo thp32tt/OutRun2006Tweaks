@@ -92,6 +92,29 @@ CONSTANT_BUFFER_CONTRACT_TEXT = (
 
 
 def main() -> None:
+    # GitHub's Win32 build includes Windows headers that may define max as a
+    # function-like macro. Keep numeric_limits::max invocations macro-safe,
+    # and keep GetStreamSourceFreq's output storage type API-exact.
+    msvc_compile_portability_errors = []
+    for source_name, source in [
+        ("native_backend.cpp", NATIVE_BACKEND_CPP),
+        ("state_translation.cpp", STATE_TRANSLATION_CPP),
+        ("triangle_fan_index_buffer.cpp", TRIANGLE_FAN_INDEX_BUFFER_CPP),
+    ]:
+        if re.search(r"std::numeric_limits<[^>]+>::max\(\)", source):
+            msvc_compile_portability_errors.append(
+                source_name + " contains macro-vulnerable numeric_limits::max()"
+            )
+    if "UINT stream0Frequency = 1u;" not in RUNTIME_CENSUS:
+        msvc_compile_portability_errors.append(
+            "runtime census stream frequency storage must match UINT* API"
+        )
+    if msvc_compile_portability_errors:
+        raise SystemExit(
+            "DX11 MSVC compile-portability contract drift: "
+            + ", ".join(msvc_compile_portability_errors)
+        )
+
     verify_dx11_dual_source_contract()
 
     r165_dither_contract = [

@@ -112,9 +112,9 @@ bool NativeTriangleFanIndexBuffer::initialize_materialized(
 
     if (!device || !indices || indexCount == 0 ||
         indexCount >
-            std::numeric_limits<UINT>::max() /
+            (std::numeric_limits<UINT>::max)() /
                 static_cast<UINT>(sizeof(UINT)) ||
-        generation_ == std::numeric_limits<std::uint64_t>::max())
+        generation_ == (std::numeric_limits<std::uint64_t>::max)())
         return false;
 
     const std::uint64_t contentHash = hash_indices(indices, indexCount);
@@ -153,7 +153,7 @@ bool NativeTriangleFanIndexBuffer::descriptor_exact(
         return false;
 
     if (index_count_ >
-        std::numeric_limits<UINT>::max() /
+        (std::numeric_limits<UINT>::max)() /
             static_cast<UINT>(sizeof(UINT)))
         return false;
 

@@ -2945,7 +2945,7 @@ compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
             if (!triangle_fan_source_element(
                     primitiveCount, expandedIndex, sourceElement) ||
                 baseVertex >
-                    std::numeric_limits<UINT>::max() - sourceElement) {
+                    (std::numeric_limits<UINT>::max)() - sourceElement) {
                 exactIndices = false;
                 break;
             }
@@ -3290,9 +3290,9 @@ bool NativeFixedFunctionOutputStateBinding::initialize(
     D3D11_RECT sealedScissor = outputState.scissorRect;
     if (!sourceScissorEnabled) {
         if (surfacePair.width >
-                static_cast<UINT>(std::numeric_limits<LONG>::max()) ||
+                static_cast<UINT>((std::numeric_limits<LONG>::max)()) ||
             surfacePair.height >
-                static_cast<UINT>(std::numeric_limits<LONG>::max()))
+                static_cast<UINT>((std::numeric_limits<LONG>::max)()))
             return false;
         sealedScissor.left = 0;
         sealedScissor.top = 0;
@@ -4755,7 +4755,7 @@ static bool direct_draw_element_count(
         return primitive != D3DPT_TRIANGLEFAN &&
             translate_primitive(primitive).exact;
 
-    const UINT maxValue = std::numeric_limits<UINT>::max();
+    const UINT maxValue = (std::numeric_limits<UINT>::max)();
     switch (primitive) {
     case D3DPT_POINTLIST:
         elementCount = primitiveCount;
@@ -4814,7 +4814,7 @@ compose_fixed_function_indexed_source_range_readiness(
         primitive != D3DPT_POINTLIST &&
         primitive != D3DPT_TRIANGLEFAN;
 
-    const UINT maxValue = std::numeric_limits<UINT>::max();
+    const UINT maxValue = (std::numeric_limits<UINT>::max)();
     const bool vertexCountCompatible =
         primitiveCount == 0u || numVertices != 0u;
     bool vertexRangeFits = primitiveCount == 0u;
@@ -5365,7 +5365,7 @@ compose_fixed_function_direct_draw_dispatch_readiness(
         indexed
             ? startVertexLocation == 0u
             : (startIndexLocation == 0u && baseVertexLocation == 0);
-    const UINT maxValue = std::numeric_limits<UINT>::max();
+    const UINT maxValue = (std::numeric_limits<UINT>::max)();
     const bool rangeExact =
         countExact &&
         (indexed
@@ -5548,7 +5548,7 @@ compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(
     out.generatedIndexReady =
         generated.ready && generated.snapshotToken != 0;
 
-    const UINT maxValue = std::numeric_limits<UINT>::max();
+    const UINT maxValue = (std::numeric_limits<UINT>::max)();
     const bool countExact =
         primitiveCount <= maxValue / 3u &&
         generated.indexCount == primitiveCount * 3u;
@@ -5580,7 +5580,7 @@ compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(
             static_cast<std::uint64_t>(vertexOffset) +
             (maxVertex + 1ull) * static_cast<std::uint64_t>(vertexStride);
         out.vertexBufferRangeExact =
-            maxVertex <= std::numeric_limits<UINT>::max() &&
+            maxVertex <= (std::numeric_limits<UINT>::max)() &&
             endByte <= static_cast<std::uint64_t>(vertexBuffer.byte_width());
     }
 
@@ -5794,7 +5794,7 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
         currentSource.ready && currentSource.snapshotToken != 0 &&
         sourceContent.ready && sourceContent.snapshotToken != 0;
 
-    const UINT maxValue = std::numeric_limits<UINT>::max();
+    const UINT maxValue = (std::numeric_limits<UINT>::max)();
     const bool countExact =
         primitiveCount <= maxValue / 3u &&
         generated.indexCount == primitiveCount * 3u;
