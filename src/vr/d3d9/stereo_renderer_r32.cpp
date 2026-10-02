@@ -1153,10 +1153,7 @@ namespace OutRunVRStereo
         void R32InvalidateResetCaches() noexcept
         {
             R29Effect = {};
-            R31BlockedVerifiedGeneration = 0;
-            R31FastWorldCandidates = 0;
-            R31EyeCache = {};
-            R31TelemetryResetFrameWindow();
+            R31ResetFastPathState();
             R23LastStateSampleDrawSerial = 0;
             R23LastStateSampleEpoch = 0;
             OutRunVRRenderer::R29InvalidateRendererStateAfterExternalRestore();
