@@ -47,7 +47,7 @@ namespace OutRunVRStereo
             R22ResetBaselineTracking();
             InvalidateTrackedRasterShadow();
             R33InvalidateDepthStencilCache();
-            R29ArmMonoSafety();
+            ArmStereoRecoverySafety();
             RightDepthSynchronized = false;
             RightStencilSynchronized = false;
 
@@ -213,7 +213,7 @@ namespace OutRunVRStereo
                     R34ResetReplayBlocked.store(
                         true, std::memory_order_release);
                     OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
-                    R29ArmMonoSafety();
+                    ArmStereoRecoverySafety();
                     if (!R34FirstLostDeviceBypassLogged)
                     {
                         R34FirstLostDeviceBypassLogged = true;
