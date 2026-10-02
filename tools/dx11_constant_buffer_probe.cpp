@@ -27,6 +27,7 @@ namespace
     using outrun::vr::dx11::NativeManagedTextureShadow;
     using outrun::vr::dx11::NativeManagedTextureStageReadiness;
     using outrun::vr::dx11::NativeSurfacePairReadiness;
+    using outrun::vr::dx11::NativeTriangleFanIndexBuffer;
     using outrun::vr::dx11::NativeTriangleFanIndexBufferReadiness;
     using outrun::vr::dx11::PipelineUnsupportedBlend;
     using outrun::vr::dx11::compose_fixed_function_activation_readiness;
@@ -1148,8 +1149,12 @@ int main()
     generatedFanReady.resourcesOwned = true;
     generatedFanReady.deviceMatches = true;
     generatedFanReady.descriptorExact = true;
+    generatedFanReady.sourceProvenanceExact = true;
+    generatedFanReady.indexedSource = false;
     generatedFanReady.ready = true;
     generatedFanReady.indexCount = 9;
+    generatedFanReady.primitiveCount = 3;
+    generatedFanReady.baseVertex = 7;
     generatedFanReady.generation = 1;
     generatedFanReady.contentHash = 0xd8928727f6a47b73ull;
     generatedFanReady.snapshotToken = 0x1280F11ull;
@@ -1201,6 +1206,18 @@ int main()
             managedVertexPostResetReady, staleGeneratedFan, 3u, 7u,
             expandedNonIndexedFan.snapshotToken),
         "R128 fan geometry rejects mismatched or stale generated IB identity");
+
+    auto wrongFanProvenance = generatedFanReady;
+    wrongFanProvenance.baseVertex = 8u;
+    const auto wrongProvenanceFanGeometry =
+        compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
+            managedVertexPostResetReady, wrongFanProvenance, 3u, 7u);
+    require(
+        wrongProvenanceFanGeometry.generatedIndexBufferReady &&
+        !wrongProvenanceFanGeometry.generatedIndexBufferMatchesDraw &&
+        !wrongProvenanceFanGeometry.ready &&
+        wrongProvenanceFanGeometry.snapshotToken == 0,
+        "R142 non-indexed fan geometry rejects owner provenance drift");
 
     auto overflowGeneratedFan = generatedFanReady;
     overflowGeneratedFan.indexCount = 3;
@@ -3200,6 +3217,148 @@ int main()
             &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
             completeBoundDraw.snapshotToken),
         "R140 complete bound draw restores exact IA binding parameters");
+
+
+    NativeTriangleFanIndexBuffer liveFanOwner;
+    require(
+        liveFanOwner.initialize_nonindexed(d3d.device, 3u, 7u),
+        "R142 generated fan owner prerequisite");
+    const auto liveFanOwnerReady = liveFanOwner.readiness(d3d.device);
+    const auto liveFanVertexReady =
+        managedVertexBuffer.mirror_readiness(d3d.device);
+    const auto liveFanGeometryReady =
+        compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
+            liveFanVertexReady, liveFanOwnerReady, 3u, 7u);
+    require(
+        liveFanGeometryReady.ready &&
+        liveFanGeometryReady.generatedIndexBufferMatchesDraw &&
+        liveFanGeometryReady.generatedIndexBufferSnapshotToken ==
+            liveFanOwnerReady.snapshotToken,
+        "R142 generated fan geometry prerequisite");
+
+    const auto liveFanDrawReady =
+        compose_fixed_function_draw_readiness(
+            multiStageActivation, outputBindingRenderReady, surfacePairReady,
+            outputStateReady, outputStateBinding, liveFanGeometryReady);
+    require(
+        liveFanDrawReady.ready &&
+        liveFanDrawReady.geometrySnapshotToken ==
+            liveFanGeometryReady.snapshotToken,
+        "R142 generated fan sealed draw prerequisite");
+
+    ID3D11Buffer* liveFanVertexBuffer =
+        managedVertexBuffer.mirror_buffer();
+    d3d.context->IASetVertexBuffers(
+        0, 1, &liveFanVertexBuffer,
+        &geometryVertexStride, &geometryVertexOffset);
+    require(
+        liveFanOwner.bind(d3d.context),
+        "R142 bind generated fan IA prerequisite");
+
+    const auto completeFanBoundDraw =
+        outrun::vr::dx11::
+            compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(
+                liveFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                liveFanOwner, 3u, 7u);
+    require(
+        completeFanBoundDraw.inputValid &&
+        completeFanBoundDraw.sameContextBoundDrawReady &&
+        completeFanBoundDraw.geometryReady &&
+        completeFanBoundDraw.geometryMatchesDraw &&
+        completeFanBoundDraw.vertexBufferBoundExact &&
+        completeFanBoundDraw.generatedIndexBindingReady &&
+        completeFanBoundDraw.generatedIndexMatchesGeometry &&
+        completeFanBoundDraw.componentSnapshotsPresent &&
+        completeFanBoundDraw.ready &&
+        completeFanBoundDraw.geometrySnapshotToken ==
+            liveFanGeometryReady.snapshotToken &&
+        completeFanBoundDraw.vertexBufferSnapshotToken ==
+            liveFanVertexReady.snapshotToken &&
+        completeFanBoundDraw.generatedIndexBindingSnapshotToken != 0 &&
+        completeFanBoundDraw.snapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(
+                liveFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                liveFanOwner, 3u, 7u, completeFanBoundDraw.snapshotToken),
+        "R142 complete fan bound draw seals live VB and generated IB");
+
+    d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    const auto fanTopologyDrift =
+        outrun::vr::dx11::
+            compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(
+                liveFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                liveFanOwner, 3u, 7u);
+    require(
+        fanTopologyDrift.sameContextBoundDrawReady &&
+        fanTopologyDrift.geometryReady &&
+        fanTopologyDrift.geometryMatchesDraw &&
+        fanTopologyDrift.vertexBufferBoundExact &&
+        !fanTopologyDrift.generatedIndexBindingReady &&
+        !fanTopologyDrift.ready &&
+        fanTopologyDrift.snapshotToken == 0 &&
+        !outrun::vr::dx11::
+            validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(
+                liveFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                liveFanOwner, 3u, 7u, completeFanBoundDraw.snapshotToken),
+        "R142 complete fan bound draw rejects generated IB topology drift");
+    require(
+        liveFanOwner.bind(d3d.context),
+        "R142 restore generated fan topology after drift");
+
+    const UINT liveFanStrideDrift = geometryVertexStride + 4u;
+    d3d.context->IASetVertexBuffers(
+        0, 1, &liveFanVertexBuffer,
+        &liveFanStrideDrift, &geometryVertexOffset);
+    const auto fanVertexDrift =
+        outrun::vr::dx11::
+            compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(
+                liveFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                liveFanOwner, 3u, 7u);
+    require(
+        fanVertexDrift.sameContextBoundDrawReady &&
+        fanVertexDrift.geometryReady &&
+        fanVertexDrift.geometryMatchesDraw &&
+        !fanVertexDrift.vertexBufferBoundExact &&
+        fanVertexDrift.generatedIndexBindingReady &&
+        fanVertexDrift.generatedIndexMatchesGeometry &&
+        !fanVertexDrift.ready &&
+        fanVertexDrift.snapshotToken == 0,
+        "R142 complete fan bound draw rejects live VB stride drift");
+
+    d3d.context->IASetVertexBuffers(
+        0, 1, &liveFanVertexBuffer,
+        &geometryVertexStride, &geometryVertexOffset);
+    require(
+        outrun::vr::dx11::
+            validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(
+                liveFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                liveFanOwner, 3u, 7u, completeFanBoundDraw.snapshotToken),
+        "R142 complete fan bound draw restores deterministic live IA snapshot");
+
+    require(
+        outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+            d3d.context, indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset),
+        "R142 restore direct IA geometry after generated fan proof");
 
     auto mismatchedPipelineBinding = drawPipelineBindingReady;
     mismatchedPipelineBinding.pipelineSnapshotToken ^= 0x100000001b3ull;
