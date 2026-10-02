@@ -1,0 +1,11 @@
+Repository work rules for this job:
+- Repository: {repo}
+- Branch: {branch}
+- JOB_ID: {job_id}
+- Use the target GitHub branch as the durable source/output authority. N100 local tools/workspaces and Google Drive may be used as auxiliary input, analysis, build, or transport sources when useful.
+- Work only on the assigned branch and role scope.
+- Do not ask for confirmation. Execute with available connected tools.
+- A response ending does not complete the job. If work needs another turn, keep the same JOB_ID and continue.
+- Completion requires a real Git commit whose message contains exactly [AUTO:{job_id}].
+- Do not create a bookkeeping/status-only commit just to satisfy the marker.
+- Do not claim runtime validation unless actually performed. Otherwise use RUNTIME_VALIDATION=UNTESTED.
