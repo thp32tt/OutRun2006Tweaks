@@ -2732,6 +2732,35 @@ def main() -> None:
             + ", ".join(missing_r158_indexed_fan_declared_vertex_range)
         )
 
+    r160_indexed_fan_declared_vb_capacity_contract = [
+        ("bool sourceDeclaredVertexBufferRangeExact{};", NATIVE_BACKEND_HPP,
+         "R160 declared-window VB capacity readiness"),
+        ("R160: MinVertexIndex/NumVertices describe the complete D3D9 source",
+         r156_indexed_fan_dispatch_body, "R160 declared D3D9 window proof"),
+        ("effectiveDeclaredMaxVertex", r156_indexed_fan_dispatch_body,
+         "R160 BaseVertexLocation declared maximum"),
+        ("declaredEndByte <=", r156_indexed_fan_dispatch_body,
+         "R160 managed VB byte-capacity bound"),
+        ("out.sourceDeclaredVertexBufferRangeExact ? 0x160u : 0u",
+         r156_indexed_fan_dispatch_body, "R160 declared-capacity snapshot identity"),
+        ("indexedFanDispatch.sourceDeclaredVertexBufferRangeExact",
+         CONSTANT_BUFFER_PROBE, "R160 positive declared-capacity proof"),
+        ("R160 indexed fan rejects declared vertex window beyond managed VB",
+         CONSTANT_BUFFER_PROBE, "R160 declared-capacity overrun rejection"),
+        ("DX11 indexed fan declared VB capacity R160: PASS",
+         CONSTANT_BUFFER_PROBE, "R160 hosted probe completion marker"),
+    ]
+    missing_r160_indexed_fan_declared_vb_capacity = [
+        meaning
+        for token, source, meaning in r160_indexed_fan_declared_vb_capacity_contract
+        if token not in source
+    ]
+    if missing_r160_indexed_fan_declared_vb_capacity:
+        raise SystemExit(
+            "DX11 R160 indexed fan declared VB-capacity contract drift: "
+            + ", ".join(missing_r160_indexed_fan_declared_vb_capacity)
+        )
+
     r155_direct_pointlist_raster_contract = [
         ("bool pointRasterSemanticsExact{};", NATIVE_BACKEND_HPP,
          "R155 direct point-list raster semantic gate"),

@@ -2014,6 +2014,10 @@ struct NativeFixedFunctionFanDrawDispatchReadiness {
     // inside that declared source-vertex interval before D3D11 DrawIndexed.
     bool sourceDeclaredVertexRangeExact{};
     bool sourceValuesWithinDeclaredRange{};
+    // R160 separately seals the complete D3D9 declared source-vertex window
+    // against the managed VB capacity. R156 continues to represent the exact
+    // observed source-index fetch capacity.
+    bool sourceDeclaredVertexBufferRangeExact{};
     bool dispatchArgumentsExact{};
     bool componentSnapshotsPresent{};
     bool ready{};

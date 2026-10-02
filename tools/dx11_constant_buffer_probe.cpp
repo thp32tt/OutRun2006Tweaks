@@ -5133,7 +5133,7 @@ int main()
                 liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
-                indexedFanBaseVertexLocation, 4u, 13u, transform,
+                indexedFanBaseVertexLocation, 4u, 6u, transform,
                 surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface);
     require(
@@ -5143,9 +5143,10 @@ int main()
         indexedFanDispatch.generatedIndexMatchesDispatch &&
         indexedFanDispatch.sourceDeclaredVertexRangeExact &&
         indexedFanDispatch.sourceValuesWithinDeclaredRange &&
+        indexedFanDispatch.sourceDeclaredVertexBufferRangeExact &&
         indexedFanDispatch.sourceMinVertexIndex == 4u &&
-        indexedFanDispatch.sourceNumVertices == 13u &&
-        indexedFanDispatch.sourceMaxVertexIndex == 16u &&
+        indexedFanDispatch.sourceNumVertices == 6u &&
+        indexedFanDispatch.sourceMaxVertexIndex == indexedFanObservedMaxIndex &&
         indexedFanDispatch.vertexBufferRangeExact &&
         indexedFanDispatch.dispatchArgumentsExact &&
         indexedFanDispatch.componentSnapshotsPresent &&
@@ -5173,7 +5174,7 @@ int main()
                 liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
-                indexedFanBaseVertexLocation, 4u, 13u, transform,
+                indexedFanBaseVertexLocation, 4u, 6u, transform,
                 surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface,
                 indexedFanDispatch.snapshotToken),
@@ -5189,7 +5190,7 @@ int main()
                 liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
-                1, 4u, 13u, transform, surfaceTargetBinding,
+                1, 4u, 6u, transform, surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface);
     require(
         indexedFanVertexOverrun.inputValid &&
@@ -5202,6 +5203,7 @@ int main()
         indexedFanVertexOverrun.sourceDeclaredVertexRangeExact &&
         indexedFanVertexOverrun.sourceValuesWithinDeclaredRange &&
         !indexedFanVertexOverrun.vertexBufferRangeExact &&
+        !indexedFanVertexOverrun.sourceDeclaredVertexBufferRangeExact &&
         !indexedFanVertexOverrun.dispatchArgumentsExact &&
         !indexedFanVertexOverrun.ready &&
         indexedFanVertexOverrun.snapshotToken == 0,
@@ -5217,7 +5219,7 @@ int main()
                 liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
-                indexedFanBaseVertexLocation, 4u, 12u, transform,
+                indexedFanBaseVertexLocation, 4u, 5u, transform,
                 surfaceTargetBinding, outputColorSurface, outputDepthSurface);
     require(
         indexedFanDeclaredRangeMismatch.inputValid &&
@@ -5227,13 +5229,41 @@ int main()
         indexedFanDeclaredRangeMismatch.sourceDeclaredVertexRangeExact &&
         !indexedFanDeclaredRangeMismatch.sourceValuesWithinDeclaredRange &&
         indexedFanDeclaredRangeMismatch.sourceObservedMinIndex == 4u &&
-        indexedFanDeclaredRangeMismatch.sourceObservedMaxIndex == 16u &&
+        indexedFanDeclaredRangeMismatch.sourceObservedMaxIndex ==
+            indexedFanObservedMaxIndex &&
         indexedFanDeclaredRangeMismatch.sourceValueSnapshotToken == 0 &&
         !indexedFanDeclaredRangeMismatch.vertexBufferRangeExact &&
+        !indexedFanDeclaredRangeMismatch.sourceDeclaredVertexBufferRangeExact &&
         !indexedFanDeclaredRangeMismatch.dispatchArgumentsExact &&
         !indexedFanDeclaredRangeMismatch.ready &&
         indexedFanDeclaredRangeMismatch.snapshotToken == 0,
         "R158 indexed fan dispatch rejects source index outside D3D9 declared vertex range");
+
+    const auto indexedFanDeclaredCapacityOverrun =
+        outrun::vr::dx11::
+            compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation, 4u, 13u, transform,
+                surfaceTargetBinding, outputColorSurface, outputDepthSurface);
+    require(
+        indexedFanDeclaredCapacityOverrun.inputValid &&
+        indexedFanDeclaredCapacityOverrun.finalFanBoundDrawReady &&
+        indexedFanDeclaredCapacityOverrun.generatedIndexReady &&
+        indexedFanDeclaredCapacityOverrun.generatedIndexMatchesDispatch &&
+        indexedFanDeclaredCapacityOverrun.sourceDeclaredVertexRangeExact &&
+        indexedFanDeclaredCapacityOverrun.sourceValuesWithinDeclaredRange &&
+        indexedFanDeclaredCapacityOverrun.vertexBufferRangeExact &&
+        !indexedFanDeclaredCapacityOverrun.sourceDeclaredVertexBufferRangeExact &&
+        !indexedFanDeclaredCapacityOverrun.dispatchArgumentsExact &&
+        !indexedFanDeclaredCapacityOverrun.ready &&
+        indexedFanDeclaredCapacityOverrun.snapshotToken == 0,
+        "R160 indexed fan rejects declared vertex window beyond managed VB");
 
     require(
         !outrun::vr::dx11::
@@ -5245,7 +5275,7 @@ int main()
                 liveIndexedFanSourceBuffer, liveIndexedFanOwner, 2u,
                 D3DFMT_INDEX16, 1u,
                 static_cast<UINT>(liveIndexedFanSource.size()),
-                indexedFanBaseVertexLocation + 1, 4u, 13u, transform,
+                indexedFanBaseVertexLocation + 1, 4u, 6u, transform,
                 surfaceTargetBinding, outputColorSurface, outputDepthSurface,
                 indexedFanDispatch.snapshotToken),
         "R148 generated fan dispatch rejects indexed BaseVertexLocation drift");
@@ -5773,6 +5803,7 @@ int main()
     std::cout << "DX11 indexed fan source content R155: PASS\n";
     std::cout << "DX11 indexed fan vertex capacity R156: PASS\n";
     std::cout << "DX11 indexed fan declared vertex range R158: PASS\n";
+    std::cout << "DX11 indexed fan declared VB capacity R160: PASS\n";
     std::cout << "DX11 direct line raster semantics R157: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";

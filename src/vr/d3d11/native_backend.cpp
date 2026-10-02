@@ -5874,11 +5874,41 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
                 endByte <= static_cast<std::uint64_t>(vertexBuffer.byte_width());
         }
     }
+    // R160: MinVertexIndex/NumVertices describe the complete D3D9 source
+    // vertex window, not only the indices observed in this draw. Preserve the
+    // existing R156 observed-fetch proof, but also require the full declared
+    // window after BaseVertexLocation to fit the exact managed VB capacity.
+    out.sourceDeclaredVertexBufferRangeExact = false;
+    if (out.sourceDeclaredVertexRangeExact &&
+        out.sourceValuesWithinDeclaredRange &&
+        vertexStride != 0u &&
+        vertexBuffer.byte_width() != 0u &&
+        vertexOffset <= vertexBuffer.byte_width()) {
+        const std::int64_t effectiveDeclaredMinVertex =
+            static_cast<std::int64_t>(baseVertexLocation) +
+            static_cast<std::int64_t>(out.sourceMinVertexIndex);
+        const std::int64_t effectiveDeclaredMaxVertex =
+            static_cast<std::int64_t>(baseVertexLocation) +
+            static_cast<std::int64_t>(out.sourceMaxVertexIndex);
+        if (effectiveDeclaredMinVertex >= 0 &&
+            effectiveDeclaredMaxVertex >= effectiveDeclaredMinVertex &&
+            effectiveDeclaredMaxVertex <= static_cast<std::int64_t>(maxValue)) {
+            const std::uint64_t declaredEndByte =
+                static_cast<std::uint64_t>(vertexOffset) +
+                (static_cast<std::uint64_t>(effectiveDeclaredMaxVertex) + 1ull) *
+                    static_cast<std::uint64_t>(vertexStride);
+            out.sourceDeclaredVertexBufferRangeExact =
+                declaredEndByte <=
+                static_cast<std::uint64_t>(vertexBuffer.byte_width());
+        }
+    }
+
     out.dispatchArgumentsExact =
         out.generatedIndexMatchesDispatch &&
         out.sourceDeclaredVertexRangeExact &&
         out.sourceValuesWithinDeclaredRange &&
         out.vertexBufferRangeExact &&
+        out.sourceDeclaredVertexBufferRangeExact &&
         out.startIndexLocation == 0u;
     out.componentSnapshotsPresent =
         finalBound.snapshotToken != 0 &&
@@ -5916,6 +5946,8 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
             token, out.sourceDeclaredVertexRangeExact ? 0x158u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.sourceValuesWithinDeclaredRange ? 0x1581u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceDeclaredVertexBufferRangeExact ? 0x160u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.vertexBufferRangeExact ? 0x156u : 0u);
         token = mix_readiness_snapshot_token(token, primitiveCount);
