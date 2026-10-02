@@ -626,6 +626,18 @@ def verify_dxvk_continuation_chain() -> None:
         has_overlap_contract = f"{prefix}_OVERLAP_BYTES" in analyzer
         if has_overlap_contract:
             required_predecessor_fields = {"status", "incomplete_rva", "incomplete_matches"}
+            # Continuation 43 introduced the modern mandatory-overlap contract:
+            # the successor must consume the predecessor proof's capture-edge
+            # predicate and independently bind the predecessor's exact cut bytes.
+            # Treating these as optional lets a refactor delete either lineage
+            # gate while retaining byte geometry and a superficially exact status.
+            if continuation_id >= 43:
+                required_predecessor_fields.add("capture_edge_matches")
+                if "predecessor_overlap_matches" not in assigned_names:
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} modern overlap provenance "
+                        "lost predecessor_overlap_matches lineage gate"
+                    )
             missing_predecessor_fields = sorted(
                 required_predecessor_fields - predecessor_fields
             )
