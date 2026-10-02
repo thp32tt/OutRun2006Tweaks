@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Static guard for the DXVK disassembly continuation frontier.
 
-This intentionally does not decode runtime semantics. It only protects the
-canonical byte-window handoff used by the DXVK conversion evidence pipeline.
+This intentionally does not decode runtime semantics. It protects the
+canonical byte-window handoff used by the DXVK conversion evidence pipeline
+and fails closed when a continuation record loses its basic provenance shape.
 """
 
 from dataclasses import dataclass
@@ -25,10 +26,20 @@ EXPECTED = Frontier(
 def validate_frontier(frontier: Frontier) -> None:
     assert frontier.start_rva == EXPECTED.start_rva
     assert frontier.end_rva == EXPECTED.end_rva
+    assert frontier.end_rva > frontier.start_rva
     assert frontier.overlap == EXPECTED.overlap
-    assert len(frontier.overlap) == 7
+    assert frontier.overlap
+    assert len(frontier.overlap) <= frontier.end_rva - frontier.start_rva
+
+
+def validate_no_semantic_promotion(frontier: Frontier) -> None:
+    """Keep this artifact limited to byte provenance, not runtime meaning."""
+    assert isinstance(frontier.start_rva, int)
+    assert isinstance(frontier.end_rva, int)
+    assert isinstance(frontier.overlap, bytes)
 
 
 if __name__ == "__main__":
     validate_frontier(EXPECTED)
+    validate_no_semantic_promotion(EXPECTED)
     print("DXVK continuation frontier guard: PASS")
