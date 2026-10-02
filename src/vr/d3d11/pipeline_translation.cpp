@@ -186,6 +186,7 @@ namespace outrun::vr::dx11
             case D3DTOP_ADDSMOOTH:
             case D3DTOP_BLENDDIFFUSEALPHA:
             case D3DTOP_BLENDCURRENTALPHA:
+            case D3DTOP_MODULATEALPHA_ADDCOLOR:
             case D3DTOP_SUBTRACT:
                 return fixed_function_argument_uses_texture(arg1) ||
                        fixed_function_argument_uses_texture(arg2);
@@ -298,6 +299,14 @@ namespace outrun::vr::dx11
                     "sampled" + std::to_string(stageIndex) + ".a";
                 return first + " + " + second +
                        " * (1.0 - " + textureAlpha + ")";
+            }
+            case D3DTOP_MODULATEALPHA_ADDCOLOR:
+            {
+                // Direct3D 9 defines this COLOROP-only operation as
+                // Arg1.rgb + Arg1.a * Arg2.rgb.
+                const auto firstAlpha = fixed_function_argument_expression(
+                    arg1, stageIndex, ".a");
+                return first + " + " + firstAlpha + " * " + second;
             }
             case D3DTOP_SUBTRACT:
                 // R177: D3D9 defines SUBTRACT as component-wise Arg1 - Arg2.
@@ -466,6 +475,7 @@ namespace outrun::vr::dx11
             DWORD arg1,
             DWORD arg2,
             std::uint32_t opBit,
+            bool alphaOperation,
             FixedFunctionTranslationReadiness& out) noexcept
         {
             bool useArg1 = false;
@@ -490,6 +500,16 @@ namespace outrun::vr::dx11
             case D3DTOP_BLENDTEXTUREALPHA:
             case D3DTOP_BLENDTEXTUREALPHAPM:
             case D3DTOP_SUBTRACT:
+                useArg1 = true;
+                useArg2 = true;
+                break;
+            case D3DTOP_MODULATEALPHA_ADDCOLOR:
+                // This Direct3D 9 operation is valid only for COLOROP.
+                if (alphaOperation)
+                {
+                    out.unsupported |= opBit;
+                    return;
+                }
                 useArg1 = true;
                 useArg2 = true;
                 break;
@@ -841,10 +861,10 @@ namespace outrun::vr::dx11
 
             validate_fixed_function_op(
                 stage.colorOp, stage.colorArg1, stage.colorArg2,
-                FixedFunctionUnsupportedColorOp, out);
+                FixedFunctionUnsupportedColorOp, false, out);
             validate_fixed_function_op(
                 stage.alphaOp, stage.alphaArg1, stage.alphaArg2,
-                FixedFunctionUnsupportedAlphaOp, out);
+                FixedFunctionUnsupportedAlphaOp, true, out);
 
             // R173: generated fixed-function HLSL always writes CURRENT after
             // each active stage. D3DTA_TEMP would preserve CURRENT and route

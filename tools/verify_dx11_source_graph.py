@@ -612,6 +612,49 @@ def main() -> None:
             + ", ".join(missing_implicit_texture_alpha_resource_coverage)
         )
 
+    modulatealpha_addcolor_contract = [
+        ("case D3DTOP_MODULATEALPHA_ADDCOLOR:", PIPELINE_TRANSLATION_CPP,
+         "D3DTOP_MODULATEALPHA_ADDCOLOR dependency/readiness/translation case"),
+        ("bool alphaOperation,", PIPELINE_TRANSLATION_CPP,
+         "color-only readiness discriminator"),
+        ('return first + " + " + firstAlpha + " * " + second;',
+         PIPELINE_TRANSLATION_CPP,
+         "MODULATEALPHA_ADDCOLOR RGB expression"),
+        ("FixedFunctionUnsupportedColorOp, false, out", PIPELINE_TRANSLATION_CPP,
+         "COLOROP validator channel identity"),
+        ("FixedFunctionUnsupportedAlphaOp, true, out", PIPELINE_TRANSLATION_CPP,
+         "ALPHAOP validator channel identity"),
+        ("modulateAlphaAddColorStages[0].colorOp =",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "hosted MODULATEALPHA_ADDCOLOR color fixture"),
+        ("sampled0.rgb + sampled0.a * input.diffuse.rgb",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "generated RGB MODULATEALPHA_ADDCOLOR assertion"),
+        ("FixedFunctionUnsupportedAlphaOp) != 0",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "color-only ALPHAOP rejection assertion"),
+        ("D3DTOP_MODULATEALPHA_ADDCOLOR fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_MODULATEALPHA_ADDCOLOR COLOROP support: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "hosted probe completion"),
+    ]
+    missing_modulatealpha_addcolor = [
+        meaning
+        for token, source, meaning in modulatealpha_addcolor_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count(
+            "case D3DTOP_MODULATEALPHA_ADDCOLOR:") < 3:
+        missing_modulatealpha_addcolor.append(
+            "MODULATEALPHA_ADDCOLOR must participate in dependency, HLSL and readiness switches")
+    if missing_modulatealpha_addcolor:
+        raise SystemExit(
+            "DX11 fixed-function D3DTOP_MODULATEALPHA_ADDCOLOR contract drift: "
+            + ", ".join(missing_modulatealpha_addcolor)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
