@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "095685456cb10e2da798fbc6b877fae8c05f22e8",
+  "state_parent_head": "4d4281b446644650834c72ced677df60369e8a46",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -880,6 +880,27 @@
       "validation_run_id": 36987425721,
       "validation_job_id": 110775639816,
       "run_state_commit": "095685456cb10e2da798fbc6b877fae8c05f22e8"
+    },
+    {
+      "unit_id": "DX11_FFP_D3DTOP_ADD_SUPPORT",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "052295e01e8b0c6dd0addfcd014290415312c09e",
+      "implementation_commits": [
+        "1c17552e3376299c46a34b0511db9965f80b9691",
+        "51a575dad01db7fa618affab4e4a1e5b60311e13",
+        "a81ef2ef2937c8d24374edaa2598a3d95914613c"
+      ],
+      "material_result_sha": "a81ef2ef2937c8d24374edaa2598a3d95914613c",
+      "validation_bearing_sha": "a329783c00047673d0075cfaca7af10bdcad1873",
+      "retaining_descendant_sha": "a329783c00047673d0075cfaca7af10bdcad1873",
+      "automation_validation": "PASS_GITHUB_AUTHORITATIVE_EXACT_SOURCE_CONTRACT_AND_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_ACTIVATION_CENSUS; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_SOURCE_TEST_ONLY",
+      "issue14_comment_id": 5948761756,
+      "validation_run_id": 36987643511,
+      "validation_job_id": 110776219526
     }
   ]
 }
