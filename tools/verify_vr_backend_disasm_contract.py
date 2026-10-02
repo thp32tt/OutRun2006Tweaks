@@ -382,6 +382,51 @@ def verify_dxvk_continuation_chain() -> None:
         # canonical-EXE execution stage. Recognize the branch encodings used by
         # continuation proofs: rel8 Jcc/JMP and rel32 Jcc/JMP.
         instruction_rows = value(f"{prefix}_INSTRUCTIONS")
+
+        # Validate the declared instruction tuple geometry before canonical-EXE
+        # execution. Proof collectors gate their runtime status on contiguous
+        # rows, but stale/gapped/overlapping metadata should fail the static
+        # contract immediately instead of waiting for the evidence workflow.
+        declared_start_rva = value(f"{prefix}_RVA")
+        declared_prefix_end_rva = value(f"{prefix}_PREFIX_END_RVA")
+        if not instruction_rows:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} has no exact instruction rows"
+            )
+        static_next_rva = declared_start_rva
+        static_instruction_rvas: set[int] = set()
+        for instruction_rva, instruction_hex, _instruction_asm in instruction_rows:
+            if instruction_rva in static_instruction_rvas:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} declares duplicate instruction RVA "
+                    f"0x{instruction_rva:08X}"
+                )
+            static_instruction_rvas.add(instruction_rva)
+            try:
+                encoded = bytes.fromhex(instruction_hex)
+            except ValueError as exc:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} has invalid instruction hex at "
+                    f"0x{instruction_rva:08X}: {instruction_hex!r}"
+                ) from exc
+            if not encoded:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} has empty instruction bytes at "
+                    f"0x{instruction_rva:08X}"
+                )
+            if instruction_rva != static_next_rva:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} instruction geometry drift: "
+                    f"expected=0x{static_next_rva:08X} actual=0x{instruction_rva:08X}"
+                )
+            static_next_rva = instruction_rva + len(encoded)
+        if static_next_rva != declared_prefix_end_rva:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} instruction geometry end drift: "
+                f"decoded_end=0x{static_next_rva:08X} "
+                f"prefix_end=0x{declared_prefix_end_rva:08X}"
+            )
+
         declared_branches = analyzer.get(f"{prefix}_BRANCHES", ())
         direct_branch_rows: dict[int, tuple[bytes, int]] = {}
         for instruction_rva, instruction_hex, _instruction_asm in instruction_rows:
