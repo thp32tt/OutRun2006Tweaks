@@ -5675,13 +5675,54 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
         sourceContent.sourceIndexSnapshotToken == currentSource.snapshotToken &&
         sourceContent.expandedContentExact &&
         countExact;
+    // R156: indexed fan capacity follows the exact source indices that R155
+    // proved were used to materialize the generated immutable fan stream.
+    // D3D11 applies BaseVertexLocation after fetching those generated indices,
+    // so both the signed effective vertex interval and the resulting VB byte
+    // interval must remain representable and inside the same live IA owner.
+    out.vertexBufferRangeExact = false;
+    const auto expansion = translate_triangle_fan_expansion(primitiveCount);
+    NativeManagedIndexRangeReadiness sourceVertexWindow{};
+    if (currentSource.ready && expansion.exact &&
+        expansion.sourceElementCount != 0u) {
+        sourceVertexWindow = sourceIndexBuffer.index_range_readiness(
+            currentSource, sourceIndexFormat, startIndex,
+            expansion.sourceElementCount, 0u, maxValue);
+    }
+    if (out.generatedIndexMatchesDispatch &&
+        sourceVertexWindow.ready &&
+        sourceVertexWindow.snapshotToken != 0 &&
+        sourceVertexWindow.mirrorSnapshotToken == currentSource.snapshotToken &&
+        vertexStride != 0u &&
+        vertexBuffer.byte_width() != 0u &&
+        vertexOffset <= vertexBuffer.byte_width()) {
+        const std::int64_t effectiveMinVertex =
+            static_cast<std::int64_t>(baseVertexLocation) +
+            static_cast<std::int64_t>(sourceVertexWindow.observedMinIndex);
+        const std::int64_t effectiveMaxVertex =
+            static_cast<std::int64_t>(baseVertexLocation) +
+            static_cast<std::int64_t>(sourceVertexWindow.observedMaxIndex);
+        if (effectiveMinVertex >= 0 &&
+            effectiveMaxVertex >= effectiveMinVertex &&
+            effectiveMaxVertex <= static_cast<std::int64_t>(maxValue)) {
+            const std::uint64_t endByte =
+                static_cast<std::uint64_t>(vertexOffset) +
+                (static_cast<std::uint64_t>(effectiveMaxVertex) + 1ull) *
+                    static_cast<std::uint64_t>(vertexStride);
+            out.vertexBufferRangeExact =
+                endByte <= static_cast<std::uint64_t>(vertexBuffer.byte_width());
+        }
+    }
     out.dispatchArgumentsExact =
-        out.generatedIndexMatchesDispatch && out.startIndexLocation == 0u;
+        out.generatedIndexMatchesDispatch &&
+        out.vertexBufferRangeExact &&
+        out.startIndexLocation == 0u;
     out.componentSnapshotsPresent =
         finalBound.snapshotToken != 0 &&
         generated.snapshotToken != 0 &&
         currentSource.snapshotToken != 0 &&
-        sourceContent.snapshotToken != 0;
+        sourceContent.snapshotToken != 0 &&
+        sourceVertexWindow.snapshotToken != 0;
     out.ready =
         out.inputValid && out.finalFanBoundDrawReady &&
         out.generatedIndexReady && out.generatedIndexMatchesDispatch &&
@@ -5696,6 +5737,10 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
             token, out.sourceIndexSnapshotToken);
         token = mix_readiness_snapshot_token(
             token, out.sourceContentSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, sourceVertexWindow.snapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.vertexBufferRangeExact ? 0x156u : 0u);
         token = mix_readiness_snapshot_token(token, primitiveCount);
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint32_t>(sourceIndexFormat));
