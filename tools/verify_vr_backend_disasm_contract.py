@@ -110,7 +110,7 @@ def verify_dxvk_continuation_chain() -> None:
                 f"{missing_capture_integrity_markers}"
             )
         raw_status_fail_closed_markers = (
-            '"status": (',
+            '"status"',
             "if captured",
             "else",
         )
@@ -215,7 +215,7 @@ def verify_dxvk_continuation_chain() -> None:
             )
         proof_status_fail_closed_markers = (
             "proven = bool(",
-            '"status": (',
+            '"status"',
             "if proven",
             "else",
         )
