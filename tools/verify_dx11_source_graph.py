@@ -767,6 +767,43 @@ def main() -> None:
             + ", ".join(missing_r190_d3dtop_modulateinvcolor_addalpha)
         )
 
+
+    r191_texture_factor_census_contract = [
+        ("DWORD textureFactor = 0xFFFFFFFFu;", D3D9_DRAW_STATE_HPP,
+         "R191 texture-factor snapshot and D3D9 default"),
+        ("D3DRS_TEXTUREFACTOR,", D3D9_RENDER_STATE_CAPTURE,
+         "R191 tracked texture-factor priming"),
+        ("read(D3DRS_TEXTUREFACTOR, out.textureFactor);",
+         D3D9_RENDER_STATE_CAPTURE,
+         "R191 live texture-factor capture"),
+        ("bool textureFactorObservationComplete{};", RUNTIME_CENSUS,
+         "R191 texture-factor census completeness"),
+        ("DWORD textureFactor = 0xFFFFFFFFu;", RUNTIME_CENSUS,
+         "R191 texture-factor census value"),
+        ("hash, sig.textureFactorObservationComplete ? 1u : 0u",
+         RUNTIME_CENSUS,
+         "R191 texture-factor completeness hash"),
+        ("hash = hash_mix(hash, sig.textureFactor);", RUNTIME_CENSUS,
+         "R191 texture-factor value hash"),
+        ("signature.textureFactor = source.textureFactor;", RUNTIME_CENSUS,
+         "R191 texture-factor propagation"),
+        ("VR DX11 R191 ffp texture-factor state#{}", RUNTIME_CENSUS,
+         "R191 texture-factor detailed evidence"),
+    ]
+    missing_r191_texture_factor_census = [
+        meaning
+        for token, source, meaning in r191_texture_factor_census_contract
+        if token not in source
+    ]
+    if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_TEXTUREFACTOR") < 2:
+        missing_r191_texture_factor_census.append(
+            "R191 TEXTUREFACTOR must be both primed and captured")
+    if missing_r191_texture_factor_census:
+        raise SystemExit(
+            "DX11 R191 fixed-function texture-factor census contract drift: "
+            + ", ".join(missing_r191_texture_factor_census)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
