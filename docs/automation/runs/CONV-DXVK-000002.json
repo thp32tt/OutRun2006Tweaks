@@ -6299,6 +6299,69 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authenticated frontier. Exact-decode only complete canonical instructions from validated continuation_69 bytes at 0x0018336B..0x001833AB, complete the leading E8 rel32 CALL, resolve inherited 0x00183380 only on an exact instruction boundary if it enters the prefix, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_FORWARD_TARGET_DEBT_TRANSITION_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "eef18d4bba1c7afe840de9d7bc6e8a2b14f94539",
+      "validation_bearing_result_sha": "eef18d4bba1c7afe840de9d7bc6e8a2b14f94539",
+      "commit_message": "test: bind DXVK forward-target debt transitions [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Hardened the backend disassembly verifier so modern exact continuation proofs reconcile unresolved forward-target debt as predecessor debt minus explicit resolved predecessor targets plus newly decoded direct forward branches. The guard rejects invented resolutions, silently dropped carry, targets carried past the capture that should resolve them, ambiguous/non-literal lineage, and mismatched current debt.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local lane/run state, docs/VR_WORK_QUEUE.json, regression/problem history and Issue #14; repeatedly refreshed the moving same-JOB frontier and avoided duplicate F67/F68 proof work."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Fresh verifier audit found raw successor lineage was fail-closed, but proof-to-proof unresolved_forward_targets contents were not reconciled against predecessor debt, RESOLVED_PREDECESSOR_TARGET_RVAS and newly decoded forward branches."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit eef18d4bba1c7afe840de9d7bc6e8a2b14f94539 adds the proof debt-transition invariant to tools/verify_vr_backend_disasm_contract.py without modifying analyzer frontier, another backend branch or localization."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact material SHA GitHub Build run 36992810960 job 110792697199 completed Verify HMD-proven VR baseline, Verify one-click VR structure contract, Verify backend disassembly contract, Verify consolidated wheel FFB source and Test production wheel FFB math successfully. Win32 Configure was cancelled by descendant churn; compile/binary PASS is not claimed."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5949815918 records implementation and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only change; no runtime payload, deployment content, binary, other backend branch or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally while preserving the newer F70 canonical raw frontier and its exact next action."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_STATIC_BACKEND_CONTRACT",
+        "exact_sha": "eef18d4bba1c7afe840de9d7bc6e8a2b14f94539",
+        "build_run_id": 36992810960,
+        "build_job_id": 110792697199,
+        "hmd_baseline_step": "SUCCESS",
+        "vr_structure_step": "SUCCESS",
+        "backend_disassembly_contract_step": "SUCCESS",
+        "wheel_ffb_source_step": "SUCCESS",
+        "wheel_ffb_math_step": "SUCCESS",
+        "win32_configure": "CANCELLED_BY_DESCENDANT_BRANCH_CHURN",
+        "build_binary_artifact_steps": "SKIPPED_NO_COMPILE_CLAIM",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5949815918,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authenticated canonical frontier. Continue exact-decode work from validated continuation_69 raw bytes at 0x0018336B..0x001833AB while keeping the forward-target debt-transition verifier invariant active."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
