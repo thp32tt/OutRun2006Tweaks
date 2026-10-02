@@ -4,77 +4,74 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "833a2ab27b9b21e19d6fdcd5a35ebc037fedf90f",
-  "state_parent_head": "233f533b973aef6faf2c8e80c24578efac04ca46",
-  "material_result_sha": "7d153fbbfcc57c9b091b13add82b1d8d3f0e3909",
-  "validation_bearing_sha": "839280130e8b75f4700f4f9248451f65e83cc024",
-  "retaining_descendant_sha": "233f533b973aef6faf2c8e80c24578efac04ca46",
+  "base_sha": "828eaf8727b8248f4b04e836a840f7e421c0176e",
+  "state_parent_head": "09a16282ae973b61c22b33b97cff534442c78bc4",
+  "material_result_sha": "49955e06ef829a4f15daffb4617f8a76dc6f6d9d",
+  "validation_bearing_sha": "49955e06ef829a4f15daffb4617f8a76dc6f6d9d",
+  "retaining_descendant_sha": "09a16282ae973b61c22b33b97cff534442c78bc4",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_DYNAMIC_OUTPUT_STATE_CENSUS_IDENTITY_R179",
-  "selection_reason": "Fresh GitHub-authoritative audit found that R124 already captures blend factor, multisample mask, viewport and scissor and native DX11 output binding consumes those values, while runtime_census omitted them from SourceSignature/hash. Distinct dynamic-output draws could therefore alias the same census identity and overstate parity evidence.",
-  "summary": "Sealed R124 dynamic D3D9 output state into DX11 census identity: observation completeness, blend factor, sample mask, viewport, scissor rectangle and scissor enable are captured, hashed and logged, with a source-graph guard tied to the existing native output-state consumers. The unit was renumbered from R176 to R179 to avoid concurrent identifier collisions.",
+  "selected_work": "DX11_FFP_D3DTOP_ADDSIGNED2X_SUPPORT_R183",
+  "selection_reason": "Fresh authenticated HEAD already contained R182 D3DTOP_ADDSIGNED. D3DTOP_ADDSIGNED2X was the next deterministic two-argument fixed-function operation still unsupported; it requires no new captured D3D9 state and is exactly expressible in HLSL as (Arg1 + Arg2 - 0.5) * 2.0.",
+  "summary": "Added dormant native DX11 D3DTOP_ADDSIGNED2X translation for RGB/alpha, hosted generation/offline-compile probes, and a source-graph retention contract. NativeDrawPathActive remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read AGENTS.md, docs/CONVERSION_LANE_STATE.json, the live CONV-DX11-000001 run record, regression/problem history and Issue #14 through authenticated GitHub authority.",
-        "Repeatedly recovered the moving branch HEAD during same-branch DX11 concurrency; no N100/local clone was used as product-development truth."
+        "Authenticated GitHub HEAD recovered as 828eaf8727b8248f4b04e836a840f7e421c0176e; read AGENTS.md, conversion lane state, live task record, regression/problem history and Issue #14.",
+        "No N100/local clone used as product-development truth."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "RenderStateSnapshot/CaptureTrackedRenderStateSnapshot already preserve outputStateComplete, blendFactor, multiSampleMask, viewport and scissorRect.",
-        "NativeFixedFunctionOutputStateReadiness and NativeOutputStateBinding already consume/bind those dynamic values, but runtime_census SourceSignature/hash omitted them."
+        "Current fixed-function translator already supported SELECTARG1/2, MODULATE/2X/4X, ADD, ADDSIGNED and SUBTRACT.",
+        "D3DTOP_ADDSIGNED2X was absent from texture-use, HLSL expression and readiness switches; official D3D9 semantics are biased add followed by 2x scale."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
-        "src/vr/d3d11/runtime_census.cpp",
+        "src/vr/d3d11/pipeline_translation.cpp",
+        "tools/dx11_fixed_function_pipeline_probe.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "7d153fbbfcc57c9b091b13add82b1d8d3f0e3909",
-        "89f43b044faf3597249cdc2130028033e52a1783",
-        "9078d848d7fc14d3f367c54d2d005f73c4d558bb",
-        "4273aab8c8ddeefe8417841925aa12252c225ef7"
+        "49955e06ef829a4f15daffb4617f8a76dc6f6d9d"
       ],
       "details": [
-        "Added output-state observation completeness and raw dynamic values to SourceSignature.",
-        "Hash now includes blend factor, multisample mask, viewport integer geometry, exact MinZ/MaxZ bit patterns, scissor rectangle and scissor enable.",
-        "Added bounded R179 detailed output-state telemetry and source-graph retention checks tied to the native output-state binding consumers.",
-        "Renumbered only labels/guard identifiers from the initially chosen R176 to R179 after concurrent work claimed adjacent identifiers; semantics were unchanged."
+        "Added D3DTOP_ADDSIGNED2X to texture dependency and readiness switches.",
+        "Generated HLSL computes (Arg1 + Arg2 - 0.5) * 2.0 for RGB and alpha.",
+        "Added hosted generation/offline-compile fixture and source-graph retention guard."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_STATIC_RETAINING_DESCENDANT_PASS_COMPILE_NOT_CLAIMED",
-      "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+      "status": "COMPLETE_STATIC_PASS_COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36990255571 job 110784776601; Configure was IN_PROGRESS at C6 checkpoint and compile/binary success is not claimed",
       "evidence": [
-        "Result commit 4273aab8c8ddeefe8417841925aa12252c225ef7 is retained by authenticated branch descendants with the R179 source/hash/log/guard tokens intact.",
-        "Build run 36988610057 job 110779304318 on retaining descendant 839280130e8b75f4700f4f9248451f65e83cc024 completed Verify DX11 source graph=SUCCESS.",
-        "The same job completed Test DX11 census analyzer=SUCCESS and all preceding static baseline/disassembly checks=SUCCESS.",
-        "Configure was cancelled by later same-branch churn; Build and binary verification were skipped, so compile/binary success is not claimed."
+        "Backend Conversion Gate run 36990255571 job 110784776601 on exact result SHA 49955e06ef829a4f15daffb4617f8a76dc6f6d9d: Verify DX11 source graph=SUCCESS.",
+        "Verify DX11 dormant activation boundary=SUCCESS.",
+        "Test DX11 census analyzer=SUCCESS.",
+        "Configure Win32 was still in progress at the C6 checkpoint; Build Win32 and binary verification had not completed, so compile/binary success is not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "7d153fbbfcc57c9b091b13add82b1d8d3f0e3909",
-      "result_commit": "4273aab8c8ddeefe8417841925aa12252c225ef7",
-      "issue14_comment_id": 5948977232
+      "material_commit": "49955e06ef829a4f15daffb4617f8a76dc6f6d9d",
+      "result_commit": "49955e06ef829a4f15daffb4617f8a76dc6f6d9d",
+      "issue14_comment_id": 5949263819
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant DX11 census/static-guard change only; no NativeDrawPathActive change, release payload, localization, OpenXR transport or other backend changed."
+      "reason": "Dormant fixed-function source/test/guard unit only; no NativeDrawPathActive change, release payload, localization, transport or other backend was modified."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving completed R177 surface-MSAA, R178 argument-modifier, R179 dynamic-output census identity, R180 MODULATE2X and MRT color-write work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving R183 D3DTOP_ADDSIGNED2X support. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -87,19 +84,20 @@
     "native_draw_path_active_changed": false,
     "runtime_validation_claimed": false
   },
-  "issue14_comment_id": 5948977232,
-  "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
-  "blocker": "Quest 3/VDXR runtime parity was not performed. Retaining-descendant static DX11 source-graph and census-analyzer validation passed, but Configure was cancelled by same-branch churn and compile/binary success is not claimed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving completed R177 surface-MSAA, R178 argument-modifier, R179 dynamic-output census identity, R180 MODULATE2X and MRT color-write work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5949263819,
+  "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36990255571 job 110784776601; Configure was IN_PROGRESS at C6 checkpoint and compile/binary success is not claimed",
+  "blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI; this does not block static/source conversion progress.",
+  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving R183 D3DTOP_ADDSIGNED2X support. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "source_head": "233f533b973aef6faf2c8e80c24578efac04ca46",
-  "result_sha": "4273aab8c8ddeefe8417841925aa12252c225ef7",
-  "selected_work_item": "DX11_DYNAMIC_OUTPUT_STATE_CENSUS_IDENTITY_R179",
+  "source_head": "09a16282ae973b61c22b33b97cff534442c78bc4",
+  "result_sha": "49955e06ef829a4f15daffb4617f8a76dc6f6d9d",
+  "selected_work_item": "DX11_FFP_D3DTOP_ADDSIGNED2X_SUPPORT_R183",
   "changed_paths": [
-    "src/vr/d3d11/runtime_census.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "tools/dx11_fixed_function_pipeline_probe.cpp",
     "tools/verify_dx11_source_graph.py"
   ],
-  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving completed R177 surface-MSAA, R178 argument-modifier, R179 dynamic-output census identity, R180 MODULATE2X and MRT color-write work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving R183 D3DTOP_ADDSIGNED2X support. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
 }
