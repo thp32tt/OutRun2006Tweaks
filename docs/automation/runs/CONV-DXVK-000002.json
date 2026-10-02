@@ -150,7 +150,9 @@
     5947846126,
     5947892877,
     5947895623,
-    5947874404
+    5947874404,
+    5947885886,
+    5947904107
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -2984,6 +2986,74 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Exact-decode only complete canonical instructions in 0x00182ECB..0x00182F0B. Preserve any trailing partial instruction raw-only and require overlap at a cut edge; keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_CUT_EDGE_DECODE_CONTINUITY_STATIC_CONTRACT",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "5a6d271dab0f89d48d347362fccdbbfe8426b812",
+      "validation_bearing_result_sha": "b5a108b16c1eaf7bd511b486aa12f92c409d12b7",
+      "commit_message": "test: verify DXVK cut-edge decode continuity [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Generic DXVK continuation validation now requires each proven overlap successor to start exactly at the overlap RVA and requires predecessor cut bytes to be a strict prefix of the successor's first complete exact instruction, closing a structural gap between overlap provenance and decoded control-flow evidence.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Read AGENTS.md, authenticated current GitHub branch/state, docs/VR_WORK_QUEUE.json, regression/problem-history inputs and Issue #14. Current HEAD was repeatedly refreshed because concurrent same-JOB work advanced F40/F41 during execution."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Avoided duplicate F40/F41, branch-declaration and instruction-geometry work already claimed by concurrent descendants; selected the independent cut-edge-to-successor-decode integrity gap."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 5a6d271dab0f89d48d347362fccdbbfe8426b812 adds exact first-row RVA alignment, overlap-prefix identity and strict incomplete-prefix validation to tools/verify_vr_backend_disasm_contract.py."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Material Build run 36982098255 reached the new verifier but failed first on inherited d14d3120 instruction-padding geometry. Retaining descendant b5a108b16c1eaf7bd511b486aa12f92c409d12b7 (ahead 1/behind 0, new guards retained) fixed only that parent issue and passed DXVK Canonical Disassembly Evidence run 36982107380/job 110758714684 including static contract, canonical EXE SHA256 identity, analyzer execution and artifact upload. Build run 36982111237/job 110758937889 independently passed backend disassembly contract and adjacent static checks."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive material commit 5a6d271dab0f89d48d347362fccdbbfe8426b812 contains [AUTO:CONV-DXVK-000002]. Issue #14 implementation/validation comments are 5947885886 and 5947904107."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Verifier-only static tooling change; no deployable/runtime DXVK payload, selector, localization or binary changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Lane supplemental state persisted at 1dfb8d269c036a3369ccd9ada47b42237adde289; this run-record update completes the durable C0-C6 mirror without replacing the newer primary canonical frontier."
+        }
+      },
+      "validation": {
+        "exact_material_sha": "5a6d271dab0f89d48d347362fccdbbfe8426b812",
+        "initial_build_run_id": 36982098255,
+        "initial_build_job_id": 110758686291,
+        "initial_failure": "Inherited d14d3120 instruction geometry did not honor continuation_26 explicit padding; not caused by cut-edge continuity checks.",
+        "validation_bearing_descendant_sha": "b5a108b16c1eaf7bd511b486aa12f92c409d12b7",
+        "automation_validation": "PASS_DESCENDANT_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36982107380,
+        "dxvk_disassembly_evidence_job_id": 110758714684,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "artifact_id": 11215334781,
+        "artifact_digest": "sha256:dfd3e82c483e870186746166aa0ec2fe99f376132767dd573063906de168dbb8",
+        "build_run_id": 36982111237,
+        "build_job_id": 110758937889,
+        "backend_disassembly_contract": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947885886,
+      "issue14_validation_comment_id": 5947904107,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Do not recreate F40/F41 work already present. Preserve the current primary canonical frontier; b5a108b1 canonical evidence validates continuation_50 raw provenance at 0x00182ECB..0x00182F0B, so exact-decode only complete instructions if that remains the branch-current frontier, with any trailing partial bytes kept for mandatory overlap."
     }
   ],
   "issue14_implementation_comment_id": 5947846126,
