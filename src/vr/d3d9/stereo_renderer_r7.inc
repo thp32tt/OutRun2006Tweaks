@@ -1,4 +1,4 @@
-#ifndef WIN32_LEAN_AND_MEAN
+// Ensure the owner-neutral declaration is visible before the out-of-line\n// InternalStereoPassScope definitions in this implementation unit.\n#include "../render/stereo_runtime_facade.hpp"\n#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #ifndef NOMINMAX
