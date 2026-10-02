@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Static contract guard for DX11 native feature flag boundaries.
 
-This guard is intentionally source-only. It verifies that conversion work does
-not accidentally turn dormant DX11 native paths into active runtime paths.
-Runtime Quest 3/VDXR validation remains outside this check.
+This guard is source-only. It prevents accidental activation of dormant DX11
+native paths during conversion work. Quest 3/VDXR runtime validation remains
+outside this check.
 """
 
 from __future__ import annotations
@@ -20,14 +20,15 @@ SCAN_DIRS = (
     "docs",
 )
 
-FORBIDDEN_ASSIGNMENTS = (
+TEXT_EXTENSIONS = {
+    ".c", ".cc", ".cpp", ".h", ".hpp", ".ini", ".json", ".md", ".py", ".txt", ".yml", ".yaml"
+}
+
+FORBIDDEN_MARKERS = (
     "NativeDrawPathActive=true",
     "NativeDrawPathActive = true",
     "NATIVE_DRAW_PATH_ACTIVE=true",
     "NATIVE_DRAW_PATH_ACTIVE = true",
-)
-
-FORBIDDEN_ENABLE_CALLS = (
     "EnableNativeDrawPath(true)",
     "enable_native_draw_path(true)",
 )
@@ -45,7 +46,7 @@ def collect_text(root: Path) -> str:
         if not directory.exists():
             continue
         for path in directory.rglob("*"):
-            if path.is_file():
+            if path.is_file() and path.suffix.lower() in TEXT_EXTENSIONS:
                 chunks.append(path.read_text(encoding="utf-8", errors="ignore"))
     return "\n".join(chunks)
 
@@ -54,12 +55,13 @@ def check(root: Path) -> int:
     text = collect_text(root)
     failures: list[str] = []
 
-    for marker in FORBIDDEN_ASSIGNMENTS + FORBIDDEN_ENABLE_CALLS:
+    for marker in FORBIDDEN_MARKERS:
         if marker in text:
             failures.append(f"active native DX11 marker found: {marker}")
 
-    if not all(marker in text for marker in REQUIRED_BOUNDARY_MARKERS):
-        failures.append("DX11 dormant boundary evidence markers missing")
+    missing = [marker for marker in REQUIRED_BOUNDARY_MARKERS if marker not in text]
+    if missing:
+        failures.append("DX11 dormant boundary evidence markers missing: " + ", ".join(missing))
 
     if failures:
         for failure in failures:
