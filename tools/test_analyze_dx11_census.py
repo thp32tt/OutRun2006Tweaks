@@ -658,7 +658,7 @@ def main() -> int:
     assert r114_saturated["NativeDrawPathActivationAllowed"] is False
 
     exhaustive = run_case(
-        "VR DX11 R114 census: samples=4 exact=4 fixedFn=4 programmable=0 "
+        "VR DX11 R120 census: samples=4 exact=4 fixedFn=4 programmable=0 "
         "topologyUnsupported=0 signatures=4 "
         "sampling[drawsSeen=4,stride=1,scheme=2] "
         "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
@@ -667,6 +667,7 @@ def main() -> int:
         "mutationTelemetryRequired=0,managedShadowRequired=0,"
         "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
         "depthUnsupported=0] "
+        "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
         "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
         "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
         "depthCmp=0,cull=0]\n"
@@ -688,7 +689,39 @@ def main() -> int:
     assert exhaustive_coverage["NonExhaustive"] is False
     assert exhaustive_coverage["ExhaustiveDrawCoverage"] is True
     assert exhaustive_coverage["ActivationProof"] is False
+    exhaustive_dual_source = exhaustive["ActivationEvidence"]["DualSourceBlend"]
+    assert exhaustive_dual_source["AnySamples"] == 0
+    assert exhaustive_dual_source["ExhaustiveNoUsageObserved"] is True
+    assert exhaustive_dual_source["TranslationStillFailClosed"] is True
+    assert exhaustive_dual_source["ActivationProof"] is False
     assert exhaustive["NativeDrawPathActivationAllowed"] is False
+
+    src1_demand = run_case(
+        "VR DX11 R120 census: samples=4 exact=3 fixedFn=4 programmable=0 "
+        "topologyUnsupported=0 signatures=4 "
+        "sampling[drawsSeen=4,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "dualSourceBlend[any=2,rgbSrc=1,rgbDst=0,alphaSrc=1,alphaDst=1] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=2,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert src1_demand["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    src1_evidence = src1_demand["ActivationEvidence"]["DualSourceBlend"]
+    assert src1_evidence["AnySamples"] == 2
+    assert src1_evidence["RgbSourceSamples"] == 1
+    assert src1_evidence["RgbDestSamples"] == 0
+    assert src1_evidence["AlphaSourceSamples"] == 1
+    assert src1_evidence["AlphaDestSamples"] == 1
+    assert src1_evidence["ExhaustiveNoUsageObserved"] is False
+    assert src1_evidence["TranslationStillFailClosed"] is True
+    assert src1_evidence["ActivationProof"] is False
+    assert src1_demand["NativeDrawPathActivationAllowed"] is False
 
     r72 = run_case(
         "VR DX11 R72 signature#1: primitive=4 fixedFn=1\n"
@@ -711,7 +744,7 @@ def main() -> int:
     assert r72["LatestSummary"]["mutationTelemetryRequired"] == 0
     assert r72["LatestSummary"]["managedShadowRequired"] == 0
 
-    print("DX11 census analyzer regression R114 exhaustive-mode: PASS")
+    print("DX11 census analyzer regression R120/SRC1 exhaustive-mode: PASS")
     return 0
 
 

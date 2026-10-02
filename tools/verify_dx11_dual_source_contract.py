@@ -8,6 +8,9 @@ STATE = ROOT / "src" / "vr" / "d3d11" / "state_translation.cpp"
 PIPELINE = ROOT / "src" / "vr" / "d3d11" / "pipeline_translation.cpp"
 PIPELINE_HPP = ROOT / "src" / "vr" / "d3d11" / "pipeline_translation.hpp"
 SEMANTIC_SMOKE = ROOT / "tools" / "dx11_fixed_function_shader_semantics.cpp"
+RUNTIME_CENSUS = ROOT / "src" / "vr" / "d3d11" / "runtime_census.cpp"
+CENSUS_ANALYZER = ROOT / "tools" / "analyze_dx11_census.py"
+CENSUS_ANALYZER_TEST = ROOT / "tools" / "test_analyze_dx11_census.py"
 
 
 def require_fail_closed_case(state: str, d3d9: str, d3d11: str) -> None:
@@ -28,6 +31,9 @@ def main() -> None:
     pipeline = PIPELINE.read_text(encoding="utf-8")
     pipeline_hpp = PIPELINE_HPP.read_text(encoding="utf-8")
     semantic_smoke = SEMANTIC_SMOKE.read_text(encoding="utf-8")
+    runtime_census = RUNTIME_CENSUS.read_text(encoding="utf-8")
+    census_analyzer = CENSUS_ANALYZER.read_text(encoding="utf-8")
+    census_analyzer_test = CENSUS_ANALYZER_TEST.read_text(encoding="utf-8")
 
     required_blocker_contract = [
         (
@@ -118,9 +124,36 @@ def main() -> None:
             + ", ".join(missing_smokes)
         )
 
+    census_contract = {
+        "DualSourceBlendSamples": (runtime_census, "runtime SRC1 demand counter"),
+        "dualSourceBlend[any={}": (runtime_census, "runtime SRC1 summary"),
+        '"VR DX11 R120"': (census_analyzer, "current R120 log recognition"),
+        "dualSourceBlendAny": (census_analyzer, "SRC1 analyzer fields"),
+        '"DualSourceBlend"': (census_analyzer, "SRC1 analyzer evidence block"),
+        '"ExhaustiveNoUsageObserved"': (
+            census_analyzer, "exhaustive-only zero-demand proof"
+        ),
+        "src1_demand = run_case(": (
+            census_analyzer_test, "positive SRC1 demand analyzer regression"
+        ),
+        '"ExhaustiveNoUsageObserved"] is True': (
+            census_analyzer_test, "exhaustive zero-demand analyzer regression"
+        ),
+    }
+    missing_census_contract = [
+        meaning
+        for token, (source, meaning) in census_contract.items()
+        if token not in source
+    ]
+    if missing_census_contract:
+        raise SystemExit(
+            "dual-source blend census evidence drift: "
+            + ", ".join(missing_census_contract)
+        )
+
     print(
         "DX11 dual-source blend contract: PASS "
-        "(fail-closed, single-target shader generator)"
+        "(fail-closed, single-target shader generator, exact demand census wired)"
     )
 
 

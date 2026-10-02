@@ -109,6 +109,14 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> TextureStagePendingResources{0};
         std::atomic<std::uint64_t> IndexedSamples{0};
         std::atomic<std::uint64_t> TexturedSamples{0};
+        // Exact demand evidence for the still fail-closed D3D9 SRC1 blend
+        // factors. Sampled zero is not absence proof; only exhaustive
+        // stride=1 coverage may establish that no observed draw requested it.
+        std::atomic<std::uint64_t> DualSourceBlendSamples{0};
+        std::atomic<std::uint64_t> DualSourceRgbSourceSamples{0};
+        std::atomic<std::uint64_t> DualSourceRgbDestSamples{0};
+        std::atomic<std::uint64_t> DualSourceAlphaSourceSamples{0};
+        std::atomic<std::uint64_t> DualSourceAlphaDestSamples{0};
         std::array<std::atomic<std::uint64_t>, UnsupportedBitCount>
             UnsupportedCounts{};
         std::atomic<ULONGLONG> LastLogMs{0};
@@ -255,6 +263,13 @@ namespace outrun::vr::dx11
             bool resourceIntrospectionComplete{true};
             bool fixedFunction{};
         };
+
+        bool is_src1_blend_factor(DWORD value) noexcept
+        {
+            const auto blend = static_cast<D3DBLEND>(value);
+            return blend == D3DBLEND_SRCCOLOR2 ||
+                   blend == D3DBLEND_INVSRCCOLOR2;
+        }
 
         std::uint64_t hash_mix(std::uint64_t hash, std::uint64_t value) noexcept
         {
@@ -1522,7 +1537,7 @@ namespace outrun::vr::dx11
             const auto sampleStride = census_sample_stride();
             const auto samplingScheme = census_sampling_scheme();
             spdlog::info(
-                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] dualSourceBlend[any={},rgbSrc={},rgbDst={},alphaSrc={},alphaDst={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -1623,6 +1638,11 @@ namespace outrun::vr::dx11
                     std::memory_order_relaxed),
                 TextureStageManagedShadowPendingResources.load(
                     std::memory_order_relaxed),
+                DualSourceBlendSamples.load(std::memory_order_relaxed),
+                DualSourceRgbSourceSamples.load(std::memory_order_relaxed),
+                DualSourceRgbDestSamples.load(std::memory_order_relaxed),
+                DualSourceAlphaSourceSamples.load(std::memory_order_relaxed),
+                DualSourceAlphaDestSamples.load(std::memory_order_relaxed),
                 unsupported[0], unsupported[1], unsupported[2], unsupported[3],
                 unsupported[4], unsupported[5], unsupported[6], unsupported[7],
                 unsupported[8], unsupported[9], unsupported[10], unsupported[11]);
@@ -1885,6 +1905,36 @@ namespace outrun::vr::dx11
         OutRunVR::DrawState::RenderStateSnapshot source{};
         const bool captured =
             OutRunVRStereo::CaptureTrackedRenderStateSnapshot(device, source);
+
+        const bool blendStateObserved =
+            captured && source.complete && source.alphaBlendEnable != FALSE;
+        const bool dualSourceRgbSource =
+            blendStateObserved && is_src1_blend_factor(source.srcBlend);
+        const bool dualSourceRgbDest =
+            blendStateObserved && is_src1_blend_factor(source.destBlend);
+        const bool separateAlphaObserved =
+            blendStateObserved && source.separateAlphaBlendEnable != FALSE;
+        const bool dualSourceAlphaSource =
+            separateAlphaObserved &&
+            is_src1_blend_factor(source.srcBlendAlpha);
+        const bool dualSourceAlphaDest =
+            separateAlphaObserved &&
+            is_src1_blend_factor(source.destBlendAlpha);
+        const bool dualSourceBlend =
+            dualSourceRgbSource || dualSourceRgbDest ||
+            dualSourceAlphaSource || dualSourceAlphaDest;
+
+        if (dualSourceBlend)
+            DualSourceBlendSamples.fetch_add(1, std::memory_order_relaxed);
+        if (dualSourceRgbSource)
+            DualSourceRgbSourceSamples.fetch_add(1, std::memory_order_relaxed);
+        if (dualSourceRgbDest)
+            DualSourceRgbDestSamples.fetch_add(1, std::memory_order_relaxed);
+        if (dualSourceAlphaSource)
+            DualSourceAlphaSourceSamples.fetch_add(1, std::memory_order_relaxed);
+        if (dualSourceAlphaDest)
+            DualSourceAlphaDestSamples.fetch_add(1, std::memory_order_relaxed);
+
         const auto translated = translate_pipeline(source);
         const auto topology = translate_primitive(primitive);
 

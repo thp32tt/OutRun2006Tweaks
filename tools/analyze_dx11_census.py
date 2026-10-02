@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 SUMMARY_RE = re.compile(
-    r"VR DX11 R(?:7[23456789]|8[012345]|114) census: "
+    r"VR DX11 R(?:7[23456789]|8[012345]|114|120) census: "
     r"samples=(?P<samples>\d+) exact=(?P<exact>\d+) "
     r"fixedFn=(?P<fixedFn>\d+) programmable=(?P<programmable>\d+) "
     r"topologyUnsupported=(?P<topologyUnsupported>\d+) "
@@ -85,6 +85,11 @@ SUMMARY_RE = re.compile(
     r"(?:textureStageManagedShadow\[required=(?P<textureStageManagedShadowRequired>\d+),"
     r"ready=(?P<textureStageManagedShadowReady>\d+),"
     r"pending=(?P<textureStageManagedShadowPending>\d+)\] )?"
+    r"(?:dualSourceBlend\[any=(?P<dualSourceBlendAny>\d+),"
+    r"rgbSrc=(?P<dualSourceBlendRgbSrc>\d+),"
+    r"rgbDst=(?P<dualSourceBlendRgbDst>\d+),"
+    r"alphaSrc=(?P<dualSourceBlendAlphaSrc>\d+),"
+    r"alphaDst=(?P<dualSourceBlendAlphaDst>\d+)\] )?"
     r"unsupported\[incomplete=(?P<incomplete>\d+),"
     r"wbuffer=(?P<wbuffer>\d+),sepAlpha=(?P<sepAlpha>\d+),"
     r"alphaTest=(?P<alphaTest>\d+),stencil=(?P<stencil>\d+),"
@@ -195,6 +200,7 @@ def main() -> int:
             and "VR DX11 R84" not in text
             and "VR DX11 R85" not in text
             and "VR DX11 R114" not in text
+            and "VR DX11 R120" not in text
         ):
             continue
         source_logs.append(log_path.name)
@@ -480,6 +486,21 @@ def main() -> int:
         == managed_texture_shadow_evidence["RequiredSamples"]
     )
 
+    dual_source_blend_evidence = {
+        "AnySamples": latest["dualSourceBlendAny"] if latest else 0,
+        "RgbSourceSamples": latest["dualSourceBlendRgbSrc"] if latest else 0,
+        "RgbDestSamples": latest["dualSourceBlendRgbDst"] if latest else 0,
+        "AlphaSourceSamples": latest["dualSourceBlendAlphaSrc"] if latest else 0,
+        "AlphaDestSamples": latest["dualSourceBlendAlphaDst"] if latest else 0,
+        "ExhaustiveNoUsageObserved": bool(
+            exhaustive_draw_coverage
+            and latest
+            and latest["dualSourceBlendAny"] == 0
+        ),
+        "TranslationStillFailClosed": True,
+        "ActivationProof": False,
+    }
+
     report = {
         "SchemaVersion": 2,
         "Status": status,
@@ -488,6 +509,7 @@ def main() -> int:
             "CensusExactness": sampled_exactness,
             "SamplingCoverage": sampling_coverage,
             "ManagedTextureShadow": managed_texture_shadow_evidence,
+            "DualSourceBlend": dual_source_blend_evidence,
         },
         "ActivationNote": (
             "R114 defaults to hashed-ordinal sampled diagnostics. "
@@ -496,7 +518,9 @@ def main() -> int:
             "Signature hash/detail caps remain separate diagnostic-detail evidence. "
             "Even exhaustive exact census remains diagnostic only: ActivationProof and "
             "NativeDrawPathActivationAllowed stay false, and exact-build HMD graphics "
-            "parity is still required before native draw routing."
+            "parity is still required before native draw routing. "
+            "SRC1 dual-source blend remains fail-closed; zero demand is treated as "
+            "absence evidence only under exhaustive draw coverage."
         ),
         "SourceLogs": source_logs,
         "Startup": startup,
