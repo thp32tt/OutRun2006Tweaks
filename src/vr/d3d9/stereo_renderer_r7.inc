@@ -1639,6 +1639,8 @@ namespace OutRunVRStereo
 		return StereoInstalledDevice.load(std::memory_order_acquire);
 	}
 	bool IsVRTelemetryEnabled() noexcept { return Settings::VRTelemetry; }
+	bool AnyAuxRenderTargetActiveSnapshot() noexcept { return AnyAuxRenderTargetActive(); }
+	float StereoWorldScaleSnapshot() noexcept { return Settings::VRWorldScale; }
 	InternalStereoPassScope::InternalStereoPassScope() noexcept
 		: previous_(InternalStereoPass)
 	{

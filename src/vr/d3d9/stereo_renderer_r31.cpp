@@ -145,7 +145,7 @@ namespace OutRunVRStereo
             ++R31Frame.draws;
             if (TargetIsCurrentBackBuffer()) ++R31Frame.main;
             else ++R31Frame.offscreen;
-            if (AnyAuxRenderTargetActive()) ++R31Frame.aux;
+            if (AnyAuxRenderTargetActiveSnapshot()) ++R31Frame.aux;
         }
 
         bool R31GetSavedViewport(IDirect3DDevice9* device,
@@ -194,7 +194,7 @@ namespace OutRunVRStereo
             const D3DMATRIX& projection,
             const D3DMATRIX& inverseProjection) noexcept
         {
-            const float worldScale = Settings::VRWorldScale;
+            const float worldScale = StereoWorldScaleSnapshot();
             if (R31EyeCache.valid &&
                 R31EyeCache.poseSequence == stereo.poseSequence &&
                 R31EyeCache.worldScale == worldScale &&
