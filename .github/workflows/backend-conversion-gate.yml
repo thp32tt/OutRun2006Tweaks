@@ -9,7 +9,7 @@ on:
 
 concurrency:
   group: backend-conversion-gate-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -92,7 +92,7 @@ jobs:
         run: |
           (Get-Content build-auto/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/safetyhook-build/src/safetyhook.vcxproj
           (Get-Content build-auto/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/zydis-build/Zydis.vcxproj
-          (Get-Content build-auto/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/zydis-build/zycore/Zycore.vcxproj
+          (Get-Content build-auto/_deps/zycore-build/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-auto/_deps/zycore-build/Zycore.vcxproj
           Set-Content -Path build-auto/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ""
           (Get-Content build-auto/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-auto/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
 
