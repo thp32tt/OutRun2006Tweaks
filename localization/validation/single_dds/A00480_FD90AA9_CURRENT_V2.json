@@ -1,0 +1,136 @@
+{
+  "schema_version": 16,
+  "schema": "outrun-a00480-index121-current-v2-single-dds-isolation-v1",
+  "case_id": "A00480_FD90AA9_CURRENT_V2",
+  "task_id": "LOCALIZATION-LOCALIZATION_A-00480",
+  "lane": "LOCALIZATION_A",
+  "chat_rollover": 5,
+  "branch": "korean-localization-clean",
+  "base_head_sha": "733b2723a3ac3449bde13c72e319dce6b029197e",
+  "active": true,
+  "purpose": "Create a concrete DDS_ONLY runtime-isolation input for the current C170-static-QA FD90AA9 generation-v2 candidate. The only prior FD90AA9 isolation manifest points to the superseded 72cbf2cc candidate, so this manifest binds the current 5bb3a83b candidate without rerendering or repeating heavy QA. Runtime remains UNTESTED.",
+  "selection": {
+    "shard": "A_ODD_INDEX",
+    "queue_index": 121,
+    "current_ready_status_rows": 0,
+    "fallback_ladder_step": 3,
+    "reason": "No current A-shard artwork_status is DIRECT_REWORK_REQUIRED, RENDER_READY, or ONE_STAGE_TO_RENDER. Index121 has a current C170 STATIC_QA PASS candidate but only a stale isolation manifest for an older candidate."
+  },
+  "asset": {
+    "id": "FD90AA9",
+    "queue_index": 121,
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "raw_orientation": "flip_y",
+    "localized_regions": 29,
+    "semantic_entries": 29,
+    "current_queue_status": "c170_static_qa_pass_runtime_untested"
+  },
+  "source": {
+    "authority": "C170_ACCEPTED_CANONICAL_SOURCE_FINGERPRINT_REUSED",
+    "canonical_transport": "APPROVED_GOOGLE_DRIVE_EXACT_PATH",
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "drive_file_id": "1J5LBV_dkJQ280Y_oDOn6JZj-n22cI4eX",
+    "sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "raw_orientation": "flip_y"
+    }
+  },
+  "candidate": {
+    "storage": "GOOGLE_DRIVE_CURRENT_PIPELINE_EXACT_DDS_ZIP",
+    "repository_path": null,
+    "drive_folder_id": "1J7pnOXo8Koe4zYZfJVeYuCMIvlP5O3VC",
+    "drive_file_id": "1d7iviLACITHKqIksf-IvV2SNuuVrpSoX",
+    "archive_sha256": "5a99823875512d79977cda7be02f1af5f11ee99d625cb4153172a7a2bcd990e5",
+    "member": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "sha256": "5bb3a83b1011086f637462268490432e846bbdddbef85810f5677b77642ac1ca",
+    "bytes": 67108992,
+    "dds": {
+      "width": 4096,
+      "height": 4096,
+      "format": "RGBA32",
+      "mipmaps": 1,
+      "raw_orientation": "flip_y"
+    },
+    "unchanged_fingerprint_proof": {
+      "producer_task": "LOCALIZATION-LOCALIZATION_B-00310",
+      "producer_result_sha": "3498a4f476e41b89c0fdd856af1c0a460c0b5e60",
+      "producer_report": "localization/graphics/role_B/20261001-B00310-P00188/B00310_P00188_FD90AA9_V2_STYLE_REWORK_REPORT.json",
+      "producer_report_blob_sha": "5e6c96054721853e7f713df19c8746acbc313d2d",
+      "shared_queue_blob_sha": "3b9513c496b82dac2012dd45c06daddf4bc62e9e",
+      "shared_queue_status": "c170_static_qa_pass_runtime_untested",
+      "c170_queue_evidence": "Q00068 C170 consumed B00310@3498a4f4 PASS STATIC_QA",
+      "unchanged_for_this_manifest": true
+    }
+  },
+  "qa_evidence": {
+    "producer_material_task": "LOCALIZATION-LOCALIZATION_B-00310",
+    "producer_material_result_sha": "3498a4f476e41b89c0fdd856af1c0a460c0b5e60",
+    "producer_report": "localization/graphics/role_B/20261001-B00310-P00188/B00310_P00188_FD90AA9_V2_STYLE_REWORK_REPORT.json",
+    "mandatory_review_directory": "localization/graphics/KOREAN_PNG_REVIEW/FD90AA9",
+    "current_queue_blob_sha": "3b9513c496b82dac2012dd45c06daddf4bc62e9e",
+    "independent_static_status": "C170_Q00068_PASS_STATIC_QA_RUNTIME_UNTESTED",
+    "heavy_qa_reused": true,
+    "heavy_qa_rerun": false,
+    "header_128_exact": true,
+    "source_regions": 29,
+    "changed_pixels_outside_declared_source_regions": 0,
+    "alpha_changed_pixels_outside_declared_source_regions": 0,
+    "final_render_bbox_containment": "PASS_29_OF_29_MIN_2PX_MARGIN",
+    "signed_slant_evidence": "PASS_29_OF_29",
+    "one_pixel_overflow": 0,
+    "source_language_residue": "NONE_OBSERVED_BY_C170",
+    "broken_hangul": "NONE_OBSERVED_BY_C170",
+    "clipping_cover_box_wrong_artwork_resolution_loss": "NONE_OBSERVED_BY_C170",
+    "final_approved": false
+  },
+  "material_delta": {
+    "previous_manifest": "localization/validation/single_dds/P00155_B00269_FD90AA9.json",
+    "previous_candidate_sha256": "72cbf2ccfd8fe2a1cd507a1c9037427fcce2311e0a978e2e9bc0c4fd75f97445",
+    "previous_manifest_status": "STALE_FOR_CURRENT_CANDIDATE",
+    "current_candidate_sha256": "5bb3a83b1011086f637462268490432e846bbdddbef85810f5677b77642ac1ca",
+    "current_schema16_manifest": true,
+    "candidate_bytes_unchanged_by_this_task": true,
+    "materially_reduces_unresolved_work": true
+  },
+  "package": {
+    "mode": "DDS_ONLY",
+    "include_exactly_one_dds": true,
+    "external_candidate_current_pipeline": true,
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "source_candidate_from_drive_zip": {
+      "file_id": "1d7iviLACITHKqIksf-IvV2SNuuVrpSoX",
+      "archive_sha256": "5a99823875512d79977cda7be02f1af5f11ee99d625cb4153172a7a2bcd990e5",
+      "member": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+      "member_sha256": "5bb3a83b1011086f637462268490432e846bbdddbef85810f5677b77642ac1ca"
+    },
+    "exclude_runtime_ko_tsv": true,
+    "exclude_other_dds": true,
+    "runtime_overrides": {
+      "UseNewTextureAllocator": "false",
+      "EnableTextureCache": "false",
+      "SceneTextureReplacement": "false",
+      "UITextureReplacement": "true",
+      "KoreanTextOverlayTest": "false",
+      "KoreanTrace": "false"
+    }
+  },
+  "runtime_test_requirements": [
+    "Load only the authoritative 5bb3a83b... FD90AA9 replacement DDS and exercise every selector/options state that uses the 29 localized regions.",
+    "Capture readable/game-orientation evidence and confirm FLIP_Y storage interpretation.",
+    "Check native scaling, alpha/transparency, position, clipping, preserved artwork and zero-pixel overflow.",
+    "Confirm protected song titles, vehicle/model text, speed/player markers and route/map/icon artwork remain unchanged.",
+    "Do not promote runtime approval without real-game evidence."
+  ],
+  "candidate_dds_modified": false,
+  "materially_reduces_unresolved_work": true,
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "n100_used": false,
+  "local_clone_used": false
+}

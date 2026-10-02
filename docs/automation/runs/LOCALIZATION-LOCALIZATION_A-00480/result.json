@@ -2,15 +2,43 @@
   "TASK_ID": "LOCALIZATION-LOCALIZATION_A-00480",
   "LANE": "LOCALIZATION_A",
   "role": "A",
+  "chat_rollover": 5,
+  "base_head_sha": "733b2723a3ac3449bde13c72e319dce6b029197e",
   "automation_validation": "PENDING",
   "validation_mode": "C_BATCH_GATE",
   "runtime_validation": "UNTESTED",
-  "result": "BLOCKER_RECORDED",
+  "result": "PASS_MATERIAL_FALLBACK_DDS_ONLY_ISOLATION_MANIFEST_PENDING_C",
   "notes": [
-    "Read current contract and state from korean-localization-clean HEAD.",
-    "No authoritative RENDER_READY or ONE_STAGE_TO_RENDER asset was available in current inspected state.",
-    "No DDS candidate was rendered to avoid creating non-authoritative output without required source/candidate evidence."
+    "Re-read current korean-localization-clean HEAD and authoritative queue state.",
+    "Confirmed there are no current A-shard rows whose artwork_status is DIRECT_REWORK_REQUIRED, RENDER_READY, or ONE_STAGE_TO_RENDER.",
+    "Replaced the prior blocker-only outcome with fallback-ladder step 3 material progress: a current-schema DDS_ONLY isolation manifest for the C170-static-QA FD90AA9 candidate.",
+    "The prior FD90AA9 isolation manifest references superseded candidate 72cbf2cc; the new manifest binds current candidate 5bb3a83b and its approved current-pipeline Drive bundle.",
+    "No DDS bytes were rerendered; heavy static QA is reused from immutable B00310 plus current C170 shared queue evidence.",
+    "Runtime game testing was not performed."
   ],
+  "selected_target": {
+    "index": 121,
+    "asset": "FD90AA9",
+    "queue_path": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "queue_status": "c170_static_qa_pass_runtime_untested"
+  },
+  "material_deliverable": {
+    "type": "CURRENT_V2_DDS_ONLY_ISOLATION_MANIFEST",
+    "path": "localization/validation/single_dds/A00480_FD90AA9_CURRENT_V2.json",
+    "candidate_sha256": "5bb3a83b1011086f637462268490432e846bbdddbef85810f5677b77642ac1ca",
+    "candidate_bundle_sha256": "5a99823875512d79977cda7be02f1af5f11ee99d625cb4153172a7a2bcd990e5",
+    "candidate_dds_modified": false,
+    "materially_reduces_unresolved_work": true
+  },
+  "evidence": {
+    "queue_blob_sha": "3b9513c496b82dac2012dd45c06daddf4bc62e9e",
+    "producer_result_sha": "3498a4f476e41b89c0fdd856af1c0a460c0b5e60",
+    "producer_report_blob_sha": "5e6c96054721853e7f713df19c8746acbc313d2d",
+    "prior_blocker_record_commit": "9dae72bf042e85627d656cc1bee11732a6bc449d"
+  },
   "source_policy": "canonical HD source transport remains read-only input only",
-  "lane_scope": "role_A lane-local record only"
+  "lane_scope": "role_A odd-index lane-local material fallback",
+  "n100_used": false,
+  "local_clone_used": false,
+  "runtime_test_performed": false
 }
