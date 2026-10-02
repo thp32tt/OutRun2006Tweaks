@@ -308,7 +308,7 @@ def main() -> int:
                     if value is None:
                         continue
                     if key in {"colorArg1", "colorArg2", "alphaArg1", "alphaArg2",
-                               "texCoord", "texTransform"}:
+                               "texCoord", "texTransform", "samplerBorderColor"}:
                         parsed[key] = int(value, 16)
                         parsed[key + "_hex"] = "0x" + value.upper()
                     else:
