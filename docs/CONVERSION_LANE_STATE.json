@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "0477103ac828639c587d02c24bd983062f0742b4",
+  "state_parent_head": "6432ca4ad0b8d70f01678990debc376c8d8bee82",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,15 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
-    "validation_bearing_sha": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
-    "automation_validation": "PASS_STATIC_CONTRACT",
+    "result_sha": "badcb1f7bacb5f555eb3d355f71f7dd3f268d6dd",
+    "validation_bearing_sha": "badcb1f7bacb5f555eb3d355f71f7dd3f268d6dd",
+    "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_AFTER_STATIC_PHASE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. SRC1 dual-source blend remains fail-closed until a proven second pixel-shader output/linkage path exists.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until parity proof.",
-  "independent_static_next_action": "Keep native Draw* disabled. Obtain a non-superseded Win32/WARP hosted probe when branch churn permits, then continue independent DX11 output-state readiness (viewport/scissor/OM-state provenance) without weakening R119/R120 fail-closed snapshots.",
+  "independent_static_next_action": "Keep native Draw* disabled. R123 indexed fan expansion is static-ready, and descendant 7716fa911645fffa0e95ec8787922392bc1b0d11 additionally preserves StartIndex. Next implement owned generated D3D11 index-buffer upload/binding readiness before R121/R123 fan expansion can satisfy R122 geometry readiness. Full Win32/WARP execution and Quest 3/VDXR parity remain required before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -165,6 +165,16 @@
       "material_result_sha": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
       "validation_bearing_sha": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
       "automation_validation": "PASS_STATIC_CONTRACT",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false
+    },
+    {
+      "unit_id": "DX11_INDEXED_TRIANGLE_FAN_EXPANSION_R123",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "badcb1f7bacb5f555eb3d355f71f7dd3f268d6dd",
+      "validation_bearing_sha": "badcb1f7bacb5f555eb3d355f71f7dd3f268d6dd",
+      "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_AFTER_STATIC_PHASE",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false

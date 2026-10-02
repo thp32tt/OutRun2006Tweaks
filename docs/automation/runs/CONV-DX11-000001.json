@@ -5,7 +5,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "8b760190868471eb2b02273de53a7d07025847a1",
-  "state_parent_head": "0477103ac828639c587d02c24bd983062f0742b4",
+  "state_parent_head": "6432ca4ad0b8d70f01678990debc376c8d8bee82",
   "material_result_sha": "d879b6042908389444b45b0f040326855821d69b",
   "validation_bearing_sha": "d879b6042908389444b45b0f040326855821d69b",
   "runtime_validation": "UNTESTED",
@@ -399,8 +399,114 @@
       "checkpoint": "C6_STATE",
       "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
       "runtime_claim": "NONE"
+    },
+    {
+      "unit_id": "DX11_INDEXED_TRIANGLE_FAN_EXPANSION_R123",
+      "job_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_INDEXED_TRIANGLE_FAN_SOURCE_STREAM_EXPANSION",
+      "base_sha": "65c8ed7d84ada85c5510e10cc0f1ecfab325be4d",
+      "material_result_sha": "badcb1f7bacb5f555eb3d355f71f7dd3f268d6dd",
+      "validation_bearing_sha": "badcb1f7bacb5f555eb3d355f71f7dd3f268d6dd",
+      "implementation_commits": [
+        "badcb1f7bacb5f555eb3d355f71f7dd3f268d6dd"
+      ],
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "R121 covered only non-indexed fan ordinals while R122 intentionally rejected TRIANGLEFAN. DrawIndexedPrimitive(D3DPT_TRIANGLEFAN) still lacked an exact INDEX16/INDEX32 source-index expansion primitive, an independent static prerequisite that does not require runtime hardware.",
+      "summary": "R123 expands indexed D3D9 triangle fans into triangle-list UINT indices while preserving exact INDEX16/INDEX32 source values. Alignment-safe decoding plus format/source-length/destination-capacity fail-closed checks are covered by semantic smoke tests and source-graph guards. BaseVertexIndex is deliberately not folded into source values.",
+      "changed_paths": [
+        "src/vr/d3d11/state_translation.hpp",
+        "src/vr/d3d11/state_translation.cpp",
+        "tools/dx11_fixed_function_shader_semantics.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Read AGENTS.md, current DX11 lane/run state, DX11 plan/work-queue, regression knowledge/problem history and Issue #14 using the authenticated GitHub connector.",
+            "Tracked concurrent R119-R122 same-branch commits and refreshed HEAD before write; avoided duplicating surface-pair, fog, alpha-test census, managed-buffer and geometry-readiness work.",
+            "Reviewed the broad src/vr/** regression trigger; no active DX9Ex owner, HUD, Reset/Present, OpenXR transport, DXVK or localization path was changed."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "R121 materialize_triangle_fan_vertex_indices handles non-indexed ordinal expansion only.",
+            "R122 geometry readiness correctly keeps TRIANGLEFAN fail-closed because generated index-buffer ownership/upload is not yet proven.",
+            "No existing helper preserved bound D3D9 INDEX16/INDEX32 source values for indexed fan expansion."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "changed_paths": [
+            "src/vr/d3d11/state_translation.hpp",
+            "src/vr/d3d11/state_translation.cpp",
+            "tools/dx11_fixed_function_shader_semantics.cpp",
+            "tools/verify_dx11_source_graph.py"
+          ],
+          "material_commit": "badcb1f7bacb5f555eb3d355f71f7dd3f268d6dd",
+          "details": [
+            "Added materialize_indexed_triangle_fan_indices for D3DFMT_INDEX16 and D3DFMT_INDEX32.",
+            "Used memcpy-based source decoding so unaligned source pointers do not cause typed-load assumptions.",
+            "Rejected unsupported format, short source streams and short destinations before any output write.",
+            "Added INDEX16/INDEX32 preservation tests, negative no-partial-write cases, empty-fan proof and source-graph drift guards."
+          ]
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_REMOTE_STATIC_CI_CANCELLED_AFTER_STATIC_PHASE",
+          "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_AFTER_STATIC_PHASE",
+          "evidence": [
+            "Exact material SHA was re-fetched and the intended API/implementation/tests/guards were confirmed on all four changed paths.",
+            "Backend Conversion Gate 36971449402 passed queue/baseline/one-click/disassembly/session regressions, DX11 transport, dual-source, Verify DX11 source graph, dormant activation boundary and DX11 census analyzer.",
+            "The exact-SHA gate was cancelled at Configure Win32 after a newer descendant push; Build Win32 and readiness smoke probes did not produce a success claim.",
+            "VR PC Fast Test Build 36971449395 was SKIPPED. No N100, gaming PC, game execution, HMD or OpenXR runtime validation was performed."
+          ],
+          "gate_run_id": 36971449402,
+          "full_win32_build": "UNCONFIRMED_SUPERSEDED",
+          "runtime_validation": "UNTESTED"
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "badcb1f7bacb5f555eb3d355f71f7dd3f268d6dd",
+          "issue14_comment_id": 5946440631
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Dormant translation/test/guard work only. No generated D3D11 index buffer is owned or bound, no native Draw* routing/backend promotion/runtime candidate/package behavior was activated."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE_WITH_THIS_STATE_COMMIT",
+          "state_parent_head": "6432ca4ad0b8d70f01678990debc376c8d8bee82",
+          "exact_next_action": "Keep native Draw* disabled. Descendant 7716fa911645fffa0e95ec8787922392bc1b0d11 preserves StartIndex on top of R123; next add owned generated D3D11 index-buffer upload/binding readiness before fan expansion can satisfy R122 geometry readiness."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "generated_index_buffer_binding_added": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "related_finding_or_regression_keys": [
+        "DX11-TRIANGLE-FAN-INDEXED-EXPANSION-R123",
+        "DX11-TRIANGLE-FAN-EXPANSION-R121",
+        "DX11-GEOMETRY-READINESS-R122"
+      ],
+      "issue14_comment_id": 5946440631,
+      "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_AFTER_STATIC_PHASE",
+      "blocker": "Triangle fans remain fail-closed in R122 until generated D3D11 index-buffer ownership/upload/binding joins readiness. Runtime parity remains untested.",
+      "next_action": "Implement generated index-buffer ownership/upload/binding readiness without enabling native Draw*.",
+      "checkpoint": "C6_STATE",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE"
     }
   ],
-  "latest_continuation_unit": "DX11_DRAW_SURFACE_PAIR_READINESS_R120",
+  "latest_continuation_unit": "DX11_INDEXED_TRIANGLE_FAN_EXPANSION_R123",
   "state_persisted_for_continuation": true
 }
