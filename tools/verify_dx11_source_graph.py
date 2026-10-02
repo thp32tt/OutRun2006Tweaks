@@ -1928,6 +1928,39 @@ def main() -> None:
             + ", ".join(missing_r145_final_live_om_target)
         )
 
+    r146_final_fan_contract = [
+        ("struct NativeFixedFunctionFinalFanBoundDrawReadiness", NATIVE_BACKEND_HPP,
+         "R146 generated-fan final readiness identity"),
+        ("compose_fixed_function_final_nonindexed_triangle_fan_bound_draw_readiness(",
+         NATIVE_BACKEND_CPP, "R146 nonindexed fan final composition"),
+        ("compose_fixed_function_final_indexed_triangle_fan_bound_draw_readiness(",
+         NATIVE_BACKEND_CPP, "R146 indexed fan final composition"),
+        ("validate_fixed_function_final_nonindexed_triangle_fan_bound_draw_snapshot(",
+         NATIVE_BACKEND_HPP, "R146 nonindexed fan final validator"),
+        ("validate_fixed_function_final_indexed_triangle_fan_bound_draw_snapshot(",
+         NATIVE_BACKEND_HPP, "R146 indexed fan final validator"),
+        ("R146 nonindexed fan final draw seals live VS b0 and OM target",
+         CONSTANT_BUFFER_PROBE, "R146 nonindexed positive proof"),
+        ("R146 nonindexed fan final draw fails closed after VS b0 drift",
+         CONSTANT_BUFFER_PROBE, "R146 transform drift negative proof"),
+        ("R146 nonindexed fan final draw fails closed after OM target drift",
+         CONSTANT_BUFFER_PROBE, "R146 OM target drift negative proof"),
+        ("R146 nonindexed fan final draw restores transform and OM target snapshot",
+         CONSTANT_BUFFER_PROBE, "R146 deterministic restore proof"),
+        ("R146 indexed fan final draw seals live VS b0 and OM target",
+         CONSTANT_BUFFER_PROBE, "R146 indexed positive proof"),
+    ]
+    missing_r146_final_fan = [
+        meaning
+        for token, source, meaning in r146_final_fan_contract
+        if token not in source
+    ]
+    if missing_r146_final_fan:
+        raise SystemExit(
+            "DX11 R146 generated-fan final binding contract drift: "
+            + ", ".join(missing_r146_final_fan)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
@@ -1947,6 +1980,10 @@ def main() -> None:
             or "validate_fixed_function_fully_bound_draw_snapshot(" in runtime_source
             or "compose_fixed_function_render_target_bound_draw_readiness(" in runtime_source
             or "validate_fixed_function_render_target_bound_draw_snapshot(" in runtime_source
+            or "compose_fixed_function_final_nonindexed_triangle_fan_bound_draw_readiness(" in runtime_source
+            or "validate_fixed_function_final_nonindexed_triangle_fan_bound_draw_snapshot(" in runtime_source
+            or "compose_fixed_function_final_indexed_triangle_fan_bound_draw_readiness(" in runtime_source
+            or "validate_fixed_function_final_indexed_triangle_fan_bound_draw_snapshot(" in runtime_source
             or "upload_transform_for_observation(" in runtime_source
             or "compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(" in runtime_source
             or "validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(" in runtime_source
@@ -1965,7 +2002,7 @@ def main() -> None:
             )
     if runtime_textured_draw_users:
         raise SystemExit(
-            "DX11 R132/R133/R134/R136/R137/R138/R139/R140/R141/R142/R143/R144/R145 dormant binding readiness gained a production "
+            "DX11 R132/R133/R134/R136/R137/R138/R139/R140/R141/R142/R143/R144/R145/R146 dormant binding readiness gained a production "
             "caller before activation gate: " + ", ".join(runtime_textured_draw_users)
         )
 

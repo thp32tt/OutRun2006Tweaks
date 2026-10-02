@@ -1504,6 +1504,124 @@ compose_fixed_function_render_target_bound_draw_readiness(
     const NativeSurfaceMirror& depthSurface,
     std::uint64_t snapshotToken) noexcept;
 
+// R146 extends the dormant final pre-draw proof to generated triangle fans.
+// R142/R144 already seal current generated-fan IA state; this layer additionally
+// requires the exact live VS-b0/WVP binding and the exact live OM RTV/DSV pair.
+// It remains observation-only and never issues Draw* or enables NativeDrawPathActive.
+struct NativeFixedFunctionFinalFanBoundDrawReadiness {
+    bool inputValid{};
+    bool completeFanBoundDrawReady{};
+    bool transformBindingReady{};
+    bool surfaceTargetBindingReady{};
+    bool surfacePairMatchesDraw{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t completeFanBoundDrawSnapshotToken{};
+    std::uint64_t transformBindingSnapshotToken{};
+    std::uint64_t transformPayloadHash{};
+    std::uint64_t surfaceTargetBindingSnapshotToken{};
+    std::uint64_t surfacePairSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionFinalFanBoundDrawReadiness
+compose_fixed_function_final_nonindexed_triangle_fan_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_final_nonindexed_triangle_fan_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t snapshotToken) noexcept;
+
+[[nodiscard]] NativeFixedFunctionFinalFanBoundDrawReadiness
+compose_fixed_function_final_indexed_triangle_fan_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount,
+    INT baseVertexLocation,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_final_indexed_triangle_fan_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount,
+    INT baseVertexLocation,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t snapshotToken) noexcept;
+
 class NativeBackend final {
 public:
     NativeBackend() = default;
