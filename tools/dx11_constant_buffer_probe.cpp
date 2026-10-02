@@ -41,6 +41,7 @@ namespace
     using outrun::vr::dx11::translate_pipeline;
     using outrun::vr::dx11::translate_texture_mutation;
     using outrun::vr::dx11::translate_vertex_input_layout;
+    using outrun::vr::dx11::bind_fixed_function_texture_stage_for_observation;
 
     void require(bool condition, const char* message)
     {
@@ -382,6 +383,64 @@ int main()
             d3d.device, fixedFunctionTexture,
             D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, 0),
         "R99 texture view recovery after fail-closed reset");
+
+    constexpr UINT textureStageSlot = 3;
+    require(
+        bind_fixed_function_texture_stage_for_observation(
+            d3d.context, textureStageSlot, samplerOwner, textureView),
+        "DX11 dormant texture-stage same-device bind");
+
+    ID3D11SamplerState* observedStageSampler = nullptr;
+    ID3D11ShaderResourceView* observedStageSrv = nullptr;
+    d3d.context->PSGetSamplers(
+        textureStageSlot, 1, &observedStageSampler);
+    d3d.context->PSGetShaderResources(
+        textureStageSlot, 1, &observedStageSrv);
+    require(
+        observedStageSampler == samplerOwner.sampler() &&
+        observedStageSrv == textureView.srv(),
+        "DX11 dormant texture-stage binding preserves sampler/SRV identity");
+    if (observedStageSampler)
+        observedStageSampler->Release();
+    if (observedStageSrv)
+        observedStageSrv->Release();
+
+    require(
+        !bind_fixed_function_texture_stage_for_observation(
+            d3d.context, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT,
+            samplerOwner, textureView),
+        "DX11 dormant texture-stage sampler slot overflow fails closed");
+    require(
+        !bind_fixed_function_texture_stage_for_observation(
+            d3d.context, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT,
+            samplerOwner, textureView),
+        "DX11 dormant texture-stage SRV slot overflow fails closed");
+
+    DevicePair textureStageOtherDevice = create_warp_device();
+    require(
+        !bind_fixed_function_texture_stage_for_observation(
+            textureStageOtherDevice.context, 0, samplerOwner, textureView),
+        "DX11 dormant texture-stage foreign context fails closed");
+
+    NativeFixedFunctionSamplerState foreignStageSampler;
+    require(
+        foreignStageSampler.initialize(
+            textureStageOtherDevice.device, stages[0]),
+        "DX11 dormant texture-stage foreign sampler prerequisite");
+    require(
+        !bind_fixed_function_texture_stage_for_observation(
+            d3d.context, 0, foreignStageSampler, textureView),
+        "DX11 dormant texture-stage cross-device owners fail closed");
+    foreignStageSampler.shutdown();
+    textureStageOtherDevice.context->Release();
+    textureStageOtherDevice.device->Release();
+
+    ID3D11SamplerState* nullSampler = nullptr;
+    ID3D11ShaderResourceView* nullSrv = nullptr;
+    d3d.context->PSSetSamplers(
+        textureStageSlot, 1, &nullSampler);
+    d3d.context->PSSetShaderResources(
+        textureStageSlot, 1, &nullSrv);
 
     const auto managedVertexWritePlan = translate_buffer_mutation(
         ResourceRole::Vertex, D3DPOOL_MANAGED, D3DUSAGE_WRITEONLY, 0);
