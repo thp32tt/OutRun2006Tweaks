@@ -4446,6 +4446,71 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest branch-authoritative canonical frontier. Keep unresolved predecessor forward targets fail-closed across future raw provenance handoffs; continue canonical exact-decode/mandatory-overlap work without promoting function/render/HUD/runtime semantics."
+    },
+    {
+      "unit_id": "DXVK_RAW_INHERITED_FORWARD_TARGET_LINEAGE_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "44d9ddd8411d464ba801c42c96cf05a9d13e33f5",
+      "validation_bearing_result_sha": "64ca5d42a9b0112ed269723ed40ff004d7a9e143",
+      "commit_message": "test: guard DXVK inherited raw targets [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Strengthens the generic DXVK raw-continuation contract so inherited unresolved forward-target debt must remain part of predecessor_exact, be emitted through the exact inherited_predecessor_forward_targets telemetry key, and be pinned to one explicit non-empty unique integer target sequence.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub AGENTS.md, branch-local lane/run state, regression/problem history and Issue #14; refreshed the moving same-JOB branch repeatedly."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "F62 raw provenance depended on inherited predecessor unresolved_forward_targets. The earlier carry guard proved presence for continuation>=65 but did not enforce exact telemetry-key identity or an explicit unique target sequence."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 44d9ddd8411d464ba801c42c96cf05a9d13e33f5 adds generic fail-closed AST checks for inherited raw forward-target lineage."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Material SHA initially exposed an inherited parent backedge-contract failure at continuation_37. Direct descendant f1d1a33 corrected that proof. Retaining descendant 64ca5d42 is ahead_by=2 from the material SHA; Build run 36990533601 job 110785484453 passed Verify backend disassembly contract, and HUD Inspector run 36990533697 job 110785622734 passed canonical static-exe-analysis."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5949344031 records implementation, inherited failure cause and retaining-descendant validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier/evidence-integrity hardening only; no runtime payload, backend selector/deployment content, binary, or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally in lane/run state without replacing the newer branch-authoritative canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC",
+        "material_sha": "44d9ddd8411d464ba801c42c96cf05a9d13e33f5",
+        "validation_bearing_descendant_sha": "64ca5d42a9b0112ed269723ed40ff004d7a9e143",
+        "descendant_ahead_by": 2,
+        "initial_material_build_run_id": 36990475745,
+        "initial_failure": "INHERITED_PARENT_CONTINUATION_37_BACKEDGE_GATE_NOT_THIS_LINEAGE_RULE",
+        "corrective_descendant_sha": "f1d1a33cf04dd78b27f12bbe66dce1c932355850",
+        "backend_conversion_gate_run_id": 36990533601,
+        "backend_disassembly_contract_job_id": 110785484453,
+        "backend_disassembly_contract": "SUCCESS",
+        "hud_inspector_run_id": 36990533697,
+        "static_exe_analysis_job_id": 110785622734,
+        "static_exe_analysis": "SUCCESS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5949344031,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest branch-authoritative canonical frontier. Continue raw/proof work only from that edge; inherited unresolved forward-target lineage is now fail-closed automatically, with no function/render/HUD/runtime semantic promotion."
     }
   ]
 }
