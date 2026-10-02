@@ -1,8 +1,7 @@
-# v0.4 compatibility wrapper: builds the v0.5 controller.
 services:
   outrun-chat-controller-vr:
     build:
-      context: ../v0.5
+      context: .
       dockerfile: Dockerfile.portainer
     container_name: outrun-chat-controller-vr
     restart: unless-stopped

@@ -1,10 +1,9 @@
-# v0.4 compatibility wrapper: builds the v0.5 controller.
 services:
-  outrun-chat-controller-vr:
+  outrun-chat-controller-localization:
     build:
-      context: ../v0.5
+      context: .
       dockerfile: Dockerfile.portainer
-    container_name: outrun-chat-controller-vr
+    container_name: outrun-chat-controller-localization
     restart: unless-stopped
     init: true
     shm_size: "768m"
@@ -13,17 +12,18 @@ services:
     cpus: 1.5
     environment:
       TZ: Asia/Seoul
-      CONTROLLER_MODE: conversion
+      CONTROLLER_MODE: localization
       AUTO_SEND: "${AUTO_SEND:-true}"
       GITHUB_REPO: thp32tt/OutRun2006Tweaks
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
-      CHATGPT_PROJECT_URL: "${VR_PROJECT_URL:-}"
+      CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
       REQUIRE_PROJECT_URL: "true"
       PREFERRED_THINKING_LEVEL: High
       TICK_SECONDS: "15"
       SEND_GAP_SECONDS: "30"
       SAME_CHAT_CONTINUATION_GAP_SECONDS: "20"
       TURN_IDLE_GRACE_SECONDS: "8"
+      QA_BATCH_SIZE: "4"
       NO_WORK_RETRY_SECONDS: "600"
       CHAT_REUSE_MAX_JOBS: "12"
       CHAT_REUSE_MAX_AGE_MINUTES: "240"
@@ -31,14 +31,14 @@ services:
       STATUS_PORT: "8787"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
     ports:
-      - "6080:6080"
-      - "8787:8787"
+      - "6081:6080"
+      - "8788:8787"
     volumes:
-      - outrun_chat_vr_data:/data
-      - outrun_chat_vr_logs:/logs
+      - outrun_chat_localization_data:/data
+      - outrun_chat_localization_logs:/logs
 
 volumes:
-  outrun_chat_vr_data:
-    name: outrun_chat_vr_data
-  outrun_chat_vr_logs:
-    name: outrun_chat_vr_logs
+  outrun_chat_localization_data:
+    name: outrun_chat_localization_data
+  outrun_chat_localization_logs:
+    name: outrun_chat_localization_logs
