@@ -177,6 +177,16 @@ def queue_rollover_prompt(active: dict) -> str:
                 f"PREMATURE_STOP_RECOVERY_TOTAL={int(active.get('premature_stop_total', 0) or 0)}",
                 "FIRST_EXECUTION_ACTION=DO_NOT_PLAN; resume material/tool execution immediately.",
             ]
+    elif CONTROLLER_MODE == "conversion" and active.get("task_latched", True):
+        lines += [
+            "GITHUB_ONLY_DEVELOPMENT=true",
+            "ACTIVE_TASK_LATCH=ON",
+            f"CONTROLLER_STAGE={active.get('controller_stage') or 'WAIT_DURABLE_RESULT'}",
+            f"LAST_CHECKPOINT_HEAD={active.get('last_checkpoint_head') or active.get('base_sha') or ''}",
+            f"PREMATURE_STOP_RECOVERY_TOTAL={int(active.get('premature_stop_total', 0) or 0)}",
+            "FIRST_EXECUTION_ACTION=DO_NOT_PLAN; continue the requested repository work immediately.",
+            "No local PC/RenderDoc/OpenXR runtime is required for source/static/CI progress.",
+        ]
     lines += [
         "같은 TASK_ID를 계속해. 완료 작업 반복 금지. 실기 미검증이면 RUNTIME_VALIDATION=UNTESTED.",
     ]
@@ -192,7 +202,7 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         return False
     count = int(active.get("chat_rollovers", 0))
     if count >= MAX_CHAT_ROLLOVERS_PER_TASK:
-        if _is_localization_producer(active) and active.get("task_latched", True):
+        if _is_latched_execution_task(active) and active.get("task_latched", True):
             # Producer continuity outranks the legacy per-task chat budget.
             # Rollovers are already gated by explicit failure signals and send spacing.
             active["rollover_soft_limit_exceeded"] = count
@@ -566,6 +576,11 @@ def _is_localization_producer(active: dict) -> bool:
     )
 
 
+def _is_latched_execution_task(active: dict) -> bool:
+    """Tasks whose assistant turn must not be treated as task completion."""
+    return _is_localization_producer(active) or CONTROLLER_MODE == "conversion"
+
+
 async def queue_send_producer_execution_continuation(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -658,6 +673,92 @@ async def queue_send_producer_execution_continuation(
     return sent
 
 
+async def queue_send_conversion_execution_continuation(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    active: dict,
+    response_hash: str,
+) -> bool:
+    """Keep conversion TASK active when a stable assistant turn ends without a task commit."""
+    now = datetime.now(TZ)
+    active["task_latched"] = True
+    active["controller_stage"] = "WAIT_DURABLE_RESULT"
+
+    turn_key = str(active.get("sent_at") or active.get("dispatch_started_at") or "")
+    if active.get("premature_stop_counted_for_send_at") != turn_key:
+        active["premature_stop_count"] = int(active.get("premature_stop_count", 0) or 0) + 1
+        active["premature_stop_total"] = int(active.get("premature_stop_total", 0) or 0) + 1
+        active["premature_stop_counted_for_send_at"] = turn_key
+        active["last_premature_stop_at"] = now.isoformat()
+        active["last_premature_response_hash"] = response_hash
+
+    latest_head = github_branch_head(active["branch"])
+    if not latest_head:
+        return False
+
+    active["last_checkpoint_head"] = latest_head
+    active["last_checkpoint_at"] = now.isoformat()
+    active["last_checkpoint_stage"] = "WAIT_DURABLE_RESULT"
+
+    strikes = int(active.get("premature_stop_count", 0) or 0)
+    if strikes >= PREMATURE_STOP_ROLLOVER_THRESHOLD:
+        reason = (
+            f"PREMATURE_STOP:{strikes} consecutive conversion turns ended without a durable TASK commit; "
+            "same TASK_ID must continue from checkpoint in a fresh chat."
+        )
+        active["failure_context"] = reason
+        active["assistant_claim_verification"] = "PREMATURE_STOP_ROLLOVER_REQUIRED"
+        rolled = await queue_rollover_chat(context, pages, active, reason)
+        if rolled:
+            active["premature_stop_count"] = 0
+            active["conversion_continuation_response_hash"] = None
+            active["conversion_continuation_sent_at"] = None
+            active["controller_stage"] = "WAIT_DURABLE_RESULT"
+            active["assistant_claim_verification"] = "PREMATURE_STOP_ROLLOVER_SENT"
+            return True
+        active["phase"] = "WAIT_CHAT"
+        active["terminal"] = None
+        write_runtime(
+            status="conversion_rollover_wait",
+            last_action=f"{active['task_id']} remains ACTIVE; conversion rollover deferred",
+            queue=active,
+        )
+        return True
+
+    if active.get("conversion_continuation_response_hash") == response_hash:
+        last = _parse_iso(active.get("conversion_continuation_sent_at"))
+        if last and (now - last).total_seconds() < PRODUCER_CONTINUATION_COOLDOWN_SECONDS:
+            write_runtime(
+                status="conversion_execution_wait",
+                last_action=f"{active['task_id']} remains ACTIVE waiting for durable repository progress",
+                queue=active,
+            )
+            return True
+
+    prompt = (
+        f"TASK_ID={active['task_id']} BRANCH={active['branch']} HEAD={latest_head}\n"
+        f"GITHUB_ONLY_DEVELOPMENT=true ACTIVE_TASK_LATCH=ON PREMATURE_STOP={strikes}/{PREMATURE_STOP_ROLLOVER_THRESHOLD} "
+        "CONTROLLER_STAGE=WAIT_DURABLE_RESULT. "
+        "HEAD/AGENTS/상태복구/리뷰/계획은 중간 단계다. 로컬 개발 PC, RenderDoc, OpenXR runtime 부재는 "
+        "source/static/disassembly/GitHub Actions 작업의 blocker가 아니다. 설치 Skill은 직접 도움이 될 때만 사용하고 "
+        "없거나 부적합하면 기존 GitHub-only 방식으로 계속해. 지금 실제 지정 작업(소스 수정 또는 bounded evidence 갱신), "
+        "검증, 새 [AUTO:TASK_ID] durable commit까지 진행해. RESULT_SHA=NOT_CREATED/다음 단계 설명만으로 종료하지 마."
+    )
+    sent = await queue_send_same_chat_control_message(
+        context,
+        pages,
+        active,
+        prompt,
+        status="conversion_execution_continuation",
+        result_label="conversion_execution_continuation",
+    )
+    if sent:
+        active["conversion_continuation_response_hash"] = response_hash
+        active["conversion_continuation_sent_at"] = now.isoformat()
+        active["assistant_claim_verification"] = "INTERMEDIATE_STATUS_REJECTED_TASK_STILL_ACTIVE"
+    return sent
+
+
 async def queue_handle_native_response(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -676,6 +777,17 @@ async def queue_handle_native_response(
         active["native_last_response_hash"] = h
         active["assistant_claim_verification"] = "UNVERIFIED_NO_TASK_COMMIT"
         handled = await queue_send_producer_execution_continuation(
+            context, pages, active, h
+        )
+        if handled:
+            return True
+
+    # Conversion workers use the same task-liveness rule. Review/status text is
+    # not a terminal result when the requested durable TASK commit does not exist.
+    if CONTROLLER_MODE == "conversion":
+        active["native_last_response_hash"] = h
+        active["assistant_claim_verification"] = "UNVERIFIED_NO_TASK_COMMIT"
+        handled = await queue_send_conversion_execution_continuation(
             context, pages, active, h
         )
         if handled:
@@ -2340,6 +2452,13 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             "last_gate_poll_at": None,
             "failure_context": "",
             "native_plugin_protocol_version": NATIVE_PLUGIN_PROTOCOL_VERSION,
+            "task_latched": True,
+            "controller_stage": "WAIT_DURABLE_RESULT",
+            "premature_stop_count": 0,
+            "premature_stop_total": 0,
+            "premature_stop_counted_for_send_at": None,
+            "last_checkpoint_head": base_sha,
+            "last_checkpoint_at": dispatch_started_at.isoformat(),
         }
         save_queue_state(q)
         write_runtime(
@@ -2389,6 +2508,9 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         if task_commit:
             active["result_sha"] = task_commit["sha"]
             active["result_message"] = task_commit["message"]
+            active["last_checkpoint_head"] = task_commit["sha"]
+            active["last_checkpoint_at"] = now.isoformat()
+            active["controller_stage"] = "WAIT_ACTIONS"
             active["phase"] = "WAIT_ACTIONS"
             active["wait_actions_started_at"] = now.isoformat()
             active["last_gate_poll_at"] = None
@@ -2637,6 +2759,8 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             record["automation_validation"] = "PASS"
             record["runtime_validation"] = "UNTESTED"
             record["completed_at"] = now.isoformat()
+            record["task_latched"] = False
+            record["controller_stage"] = "DONE"
             q["completed"] = (q.get("completed", []) + [record])[-100:]
             q["active"] = None
             completed_slot = next((s for s in reg.slots if s.name == record.get("slot")), None)
@@ -2669,6 +2793,8 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         record["automation_validation"] = "FAIL"
         record["runtime_validation"] = "UNTESTED"
         record["blocked_at"] = now.isoformat()
+        record["task_latched"] = False
+        record["controller_stage"] = "BLOCKED"
         q["blocked"] = (q.get("blocked", []) + [record])[-100:]
         q["active"] = None
         blocked_slot = next((s for s in reg.slots if s.name == record.get("slot")), None)
