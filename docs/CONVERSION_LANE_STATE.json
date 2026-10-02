@@ -52,40 +52,38 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DXVK-000002",
-    "result_sha": "6f5d748bde8a0f3b374db40791ef03aa3d863127",
-    "validation_bearing_result_sha": "ec2edac95638b6a37d06847ddd6f31dd9868a1cf",
-    "run_record_commit_sha": "e43951f3d6b381a6d761591ec27684018b97eeaa",
-    "automation_validation": "PASS_DESCENDANT_CANONICAL_STATIC_PLUS_EXACT_MATERIAL_CONTRACT",
+    "result_sha": "e8f58fef02282b19e7e98ac7d91081e07396455b",
+    "validation_bearing_result_sha": "e8f58fef02282b19e7e98ac7d91081e07396455b",
+    "run_record_commit_sha": "b9cede5d269bb0a515089d87d7eaee7917c9487e",
+    "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
-    "predecessor_control_flow_status": "EXACT_182E0F_TO_182E4F_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
-    "provenance_status": "EXACT_EXE_182E4F_TO_182E8F_PROVENANCE_CAPTURED",
-    "material_result_sha": "6f5d748bde8a0f3b374db40791ef03aa3d863127",
-    "validation_bearing_result_sha": "ec2edac95638b6a37d06847ddd6f31dd9868a1cf",
-    "dxvk_disassembly_evidence_run_id": 36980811199,
-    "dxvk_disassembly_evidence_job_id": 110754673582,
+    "predecessor_control_flow_status": "EXACT_182E4F_TO_182E8E_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "provenance_status": "EXACT_EXE_182E8E_TO_182ECE_PROVENANCE_CAPTURED",
+    "material_result_sha": "e8f58fef02282b19e7e98ac7d91081e07396455b",
+    "validation_bearing_result_sha": "e8f58fef02282b19e7e98ac7d91081e07396455b",
+    "dxvk_disassembly_evidence_run_id": 36981185690,
+    "dxvk_disassembly_evidence_job_id": 110755843721,
     "static_exe_analysis_status": "SUCCESS",
-    "evidence_artifact_id": 11215501370,
-    "evidence_artifact_digest": "sha256:34a760c483835ea0c8216935628cce44e135cbb38d6114e7e8444ac6880d0bf8",
-    "provenance_start_rva": "0x00182E4F",
-    "provenance_probe_end_rva": "0x00182E8F",
+    "evidence_artifact_id": 11214884220,
+    "evidence_artifact_digest": "sha256:de71745502f899114347640df7b35ed1f86e2037570bd8d7f2fb0da45e6e5fda",
+    "provenance_start_rva": "0x00182E8E",
+    "provenance_probe_end_rva": "0x00182ECE",
     "probe_len": 64,
+    "overlap_bytes": "3d",
+    "overlap_matches": true,
+    "predecessor_overlap_matches": true,
     "target_section": ".text",
     "probe_end_matches": true,
-    "trailing_partial_rva": "0x00182E8E",
-    "trailing_partial_bytes": "3d",
-    "issue14_implementation_comment_id": 5947724258,
-    "issue14_validation_comment_id": 5947751800,
-    "material_backend_build_run_id": 36980695426,
-    "material_backend_disassembly_contract": "PASS",
+    "issue14_implementation_comment_id": 5947788675,
     "runtime_validation": "UNTESTED"
   },
   "runtime_blocker": "No runtime acceptance claim exists; canonical provenance/static CI evidence only.",
   "runtime_next_action": "Quest 3/VDXR runtime validation remains a later user-hardware gate after a runtime candidate exists.",
-  "independent_static_next_action": "Exact-decode only complete canonical instructions in 0x00182E4F..0x00182E8F. Preserve the trailing 0x3D opcode at 0x00182E8E raw-only and require overlap for the next bounded capture; keep function/render/HUD/runtime semantics unresolved.",
+  "independent_static_next_action": "Exact-decode only complete canonical instructions in 0x00182E8E..0x00182ECE. Resolve branch/call targets only with exact byte evidence, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -132,15 +130,14 @@
     "next_task_rule": "AFTER_FULL_PIPELINE_GATE_PASS_DISPATCH_NEXT_INDEPENDENT_WORK_IMMEDIATELY"
   },
   "follow_on_frontier": {
-    "provenance_sha": "6f5d748bde8a0f3b374db40791ef03aa3d863127",
-    "validation_bearing_result_sha": "ec2edac95638b6a37d06847ddd6f31dd9868a1cf",
-    "provenance_status": "EXACT_EXE_182E4F_TO_182E8F_PROVENANCE_CAPTURED",
-    "provenance_start_rva": "0x00182E4F",
-    "probe_end_rva": "0x00182E8F",
-    "transition": "INCOMPLETE_3D_OPCODE_AT_182E8E_REQUIRES_OVERLAP",
-    "trailing_partial_rva": "0x00182E8E",
-    "trailing_partial_bytes": "3d",
-    "predecessor_proof_status": "EXACT_182E0F_TO_182E4F_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+    "provenance_sha": "e8f58fef02282b19e7e98ac7d91081e07396455b",
+    "validation_bearing_result_sha": "e8f58fef02282b19e7e98ac7d91081e07396455b",
+    "provenance_status": "EXACT_EXE_182E8E_TO_182ECE_PROVENANCE_CAPTURED",
+    "provenance_start_rva": "0x00182E8E",
+    "probe_end_rva": "0x00182ECE",
+    "transition": "MANDATORY_3D_OVERLAP_FROM_F39_CAPTURE_EDGE_VALIDATED",
+    "overlap_bytes": "3d",
+    "predecessor_proof_status": "EXACT_182E4F_TO_182E8E_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
     "predecessor_exact": true,
     "runtime_validation": "UNTESTED"
   },
@@ -1949,6 +1946,77 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Exact-decode only complete canonical instructions in 0x00182E4F..0x00182E8F. Preserve the trailing 0x3D opcode at 0x00182E8E raw-only and require overlap for the next bounded capture; keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F40_CANONICAL_EXE_PROVENANCE_0x182E8E_TO_0x182ECE",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "e8f58fef02282b19e7e98ac7d91081e07396455b",
+      "validation_bearing_result_sha": "e8f58fef02282b19e7e98ac7d91081e07396455b",
+      "run_record_commit_sha": "b9cede5d269bb0a515089d87d7eaee7917c9487e",
+      "commit_message": "dxvk: capture canonical 0x182E8E continuation [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Captured and validated the next 64-byte canonical raw continuation at 0x00182E8E..0x00182ECE by overlapping the F39 cut opcode 0x3D. Exact-SHA evidence proves predecessor/cut-edge identity, overlap equality, .text placement and probe geometry while fresh bytes remain semantically quarantined.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch authority, AGENTS.md, lane/run state, regression/problem history and Issue #14; concurrent F39 proof was detected and not duplicated."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the mandatory raw overlap after the F39 incomplete CMP opcode at 0x00182E8E as the highest-value unfinished static frontier."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit e8f58fef02282b19e7e98ac7d91081e07396455b adds continuation_49 overlap provenance constants, fail-closed collector, report binding and CLI guard."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36981185690/job 110755843721 succeeded, including static contract, canonical EXE identity, analyzer execution and artifact upload."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commit contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947788675 records the change."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly provenance tooling only; no runtime/deployable payload or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Run record b9cede5d269bb0a515089d87d7eaee7917c9487e and this lane-state update persist the validated F40 raw frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "e8f58fef02282b19e7e98ac7d91081e07396455b",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36981185690,
+        "dxvk_disassembly_evidence_job_id": 110755843721,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "artifact_id": 11214884220,
+        "artifact_digest": "sha256:de71745502f899114347640df7b35ed1f86e2037570bd8d7f2fb0da45e6e5fda",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "provenance_status": "EXACT_EXE_182E8E_TO_182ECE_PROVENANCE_CAPTURED",
+        "predecessor_status": "EXACT_182E4F_TO_182E8E_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "predecessor_exact": true,
+        "probe_start_rva": "0x00182E8E",
+        "probe_end_rva": "0x00182ECE",
+        "probe_len": 64,
+        "overlap_bytes": "3d",
+        "overlap_matches": true,
+        "predecessor_overlap_matches": true,
+        "target_section": ".text",
+        "probe_end_matches": true,
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947788675,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Exact-decode only complete canonical instructions in 0x00182E8E..0x00182ECE; preserve any trailing partial instruction for mandatory overlap and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
