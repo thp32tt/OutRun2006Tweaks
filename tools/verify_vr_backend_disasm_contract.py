@@ -1578,6 +1578,16 @@ def main() -> None:
         ],
     )
     verify_dxvk_continuation_chain()
+    require(
+        ".github/workflows/dxvk-disasm-evidence.yml",
+        [
+            "CANONICAL_EXE_SHA256: 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+            "- name: Verify canonical executable identity",
+            "$actualHash = (Get-FileHash analysis-input/OR2006C2C.EXE -Algorithm SHA256).Hash.ToLowerInvariant()",
+            "$expectedHash = $env:CANONICAL_EXE_SHA256.ToLowerInvariant()",
+            'throw "Canonical OutRun executable SHA256 mismatch: expected=$expectedHash actual=$actualHash"',
+        ],
+    )
     print("VR backend disassembly contract: OK")
 
 
