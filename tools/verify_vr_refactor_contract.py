@@ -1000,6 +1000,43 @@ for forbidden in (
 if "FormatHasStencil(" in r33:
     errors.append("R33 regained direct base depth-format helper dependency")
 
+
+# Gate C phase 1: R32 independent-TU general runtime facade extraction.
+for marker in (
+    "CurrentPresentEpochSnapshot",
+    "SetRawStereoWvpBatch",
+):
+    if marker not in stereo_runtime_facade:
+        errors.append(f"stereo runtime facade missing Gate C runtime marker: {marker}")
+if "InvalidateRightDepthStencilForLeftWrite" not in depth_runtime:
+    errors.append("depth runtime facade missing Gate C invalidation marker")
+for required in (
+    '../core/dispatch_result.hpp',
+    '../render/runtime_context.hpp',
+    '../render/stereo_runtime_facade.hpp',
+    '../render/raw_draw_api.hpp',
+    '../render/fast_path_support.hpp',
+    '../state/depth_stencil_runtime.hpp',
+    '../state/right_depth_stencil_sync.hpp',
+):
+    if required not in r32:
+        errors.append(f"R32 independent TU missing explicit Gate C dependency: {required}")
+for forbidden in (
+    "Settings::VRTelemetry",
+    "IsGameDevice(device)",
+    "InternalPassScope",
+    "EnsureStereoResources(device)",
+    "TryBootstrapRightDepthFromRecentClear(device)",
+    "SetRenderTargetHook.stdcall",
+    "SetDepthStencilSurfaceHook.stdcall",
+    "DrawPrimitiveHook.stdcall",
+    "DrawIndexedPrimitiveHook.stdcall",
+    "DrawPrimitiveUPHook.stdcall",
+    "DrawIndexedPrimitiveUPHook.stdcall",
+):
+    if forbidden in r32:
+        errors.append(f"R32 retained direct general-runtime dependency after Gate C phase 1: {forbidden}")
+
 if errors:
     print("R84 refactor contract FAILED")
     for error in errors:

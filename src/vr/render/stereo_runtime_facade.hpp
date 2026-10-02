@@ -37,6 +37,9 @@ namespace OutRunVRStereo
 
     std::uintptr_t CurrentVertexShaderIdentitySnapshot() noexcept;
     std::uint32_t CurrentFrameStereoPoseSequence() noexcept;
+    std::uint64_t CurrentPresentEpochSnapshot() noexcept;
+    HRESULT SetRawStereoWvpBatch(
+        IDirect3DDevice9* device, const float* constants) noexcept;
     void LatchFrameStereoMetadataIfUnset(
         std::uint32_t poseSequence,
         const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept;

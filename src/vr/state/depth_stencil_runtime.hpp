@@ -8,4 +8,6 @@ namespace OutRunVRStereo
     bool TrackedDepthStencilHasStencil() noexcept;
     bool LeftDrawMayWriteDepthLive(IDirect3DDevice9* device) noexcept;
     bool LeftDrawMayWriteStencilLive(IDirect3DDevice9* device) noexcept;
+    void InvalidateRightDepthStencilForLeftWrite(
+        IDirect3DDevice9* device) noexcept;
 }

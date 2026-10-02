@@ -1695,6 +1695,18 @@ namespace OutRunVRStereo
 	{
 		return FrameStereoPoseSequence;
 	}
+	std::uint64_t CurrentPresentEpochSnapshot() noexcept
+	{
+		return PresentEpoch;
+	}
+	HRESULT SetRawStereoWvpBatch(
+		IDirect3DDevice9* device, const float* constants) noexcept
+	{
+		if (!device || !constants)
+			return E_INVALIDARG;
+		return device->SetVertexShaderConstantF(
+			OutRunWvpRegister, constants, OutRunWvpRegisterCount);
+	}
 	void LatchFrameStereoMetadataIfUnset(
 		std::uint32_t poseSequence,
 		const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
@@ -1741,6 +1753,11 @@ namespace OutRunVRStereo
 	bool LeftDrawMayWriteStencilLive(IDirect3DDevice9* device) noexcept
 	{
 		return LeftDrawMayWriteStencil(device);
+	}
+	void InvalidateRightDepthStencilForLeftWrite(
+		IDirect3DDevice9* device) noexcept
+	{
+		InvalidateRightDepthStencilIfLeftMayWrite(device);
 	}
 	HRESULT CallRawDrawPrimitive(
 		IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
