@@ -23,7 +23,8 @@
 #include "../render/cached_effect_state.hpp"
 #include "../lifecycle/correction_overlay_state.hpp"
 #include "../game/renderer_recovery.hpp"
-#include "vr/game/render_semantics.hpp"\n
+#include "vr/game/render_semantics.hpp"
+
 namespace OutRunVRStereo
 {
     namespace
