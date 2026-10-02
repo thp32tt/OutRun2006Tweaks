@@ -7215,6 +7215,69 @@ def main() -> None:
             + ", ".join(missing_r175_stream_source_frequency)
         )
 
+    r176_output_state_census_contract = [
+        ("bool outputStateObservationComplete{};", RUNTIME_CENSUS,
+         "R176 output-state observation identity"),
+        ("DWORD outputBlendFactor = 0xFFFFFFFFu;", RUNTIME_CENSUS,
+         "R176 blend-factor identity"),
+        ("DWORD outputMultiSampleMask = 0xFFFFFFFFu;", RUNTIME_CENSUS,
+         "R176 sample-mask identity"),
+        ("D3DVIEWPORT9 outputViewport{};", RUNTIME_CENSUS,
+         "R176 viewport identity"),
+        ("RECT outputScissorRect{};", RUNTIME_CENSUS,
+         "R176 scissor rectangle identity"),
+        ("DWORD outputScissorTestEnable = FALSE;", RUNTIME_CENSUS,
+         "R176 scissor-enable identity"),
+        ("std::uint32_t float_bits(float value) noexcept", RUNTIME_CENSUS,
+         "R176 float-bit hashing helper"),
+        ("hash, sig.outputStateObservationComplete ? 1u : 0u", RUNTIME_CENSUS,
+         "R176 observation completeness hash"),
+        ("hash = hash_mix(hash, sig.outputBlendFactor);", RUNTIME_CENSUS,
+         "R176 blend-factor hash"),
+        ("hash = hash_mix(hash, sig.outputMultiSampleMask);", RUNTIME_CENSUS,
+         "R176 sample-mask hash"),
+        ("float_bits(sig.outputViewport.MinZ)", RUNTIME_CENSUS,
+         "R176 viewport minimum-depth hash"),
+        ("float_bits(sig.outputViewport.MaxZ)", RUNTIME_CENSUS,
+         "R176 viewport maximum-depth hash"),
+        ("sig.outputScissorRect.left", RUNTIME_CENSUS,
+         "R176 scissor rectangle hash"),
+        ("hash = hash_mix(hash, sig.outputScissorTestEnable);", RUNTIME_CENSUS,
+         "R176 scissor-enable hash"),
+        ("captured && source.complete && source.outputStateComplete;",
+         RUNTIME_CENSUS, "R176 output-state completeness propagation"),
+        ("signature.outputBlendFactor = source.blendFactor;", RUNTIME_CENSUS,
+         "R176 blend-factor capture propagation"),
+        ("signature.outputMultiSampleMask = source.multiSampleMask;", RUNTIME_CENSUS,
+         "R176 sample-mask capture propagation"),
+        ("signature.outputViewport = source.viewport;", RUNTIME_CENSUS,
+         "R176 viewport capture propagation"),
+        ("signature.outputScissorRect = source.scissorRect;", RUNTIME_CENSUS,
+         "R176 scissor capture propagation"),
+        ("signature.outputScissorTestEnable = source.scissorTestEnable;",
+         RUNTIME_CENSUS, "R176 scissor-enable capture propagation"),
+        ("VR DX11 R176 output state#{}", RUNTIME_CENSUS,
+         "R176 detailed output-state telemetry"),
+        ("out.sampleMask = source.multiSampleMask;", NATIVE_BACKEND_CPP,
+         "R124/R176 sample-mask native consumer"),
+        ("context->RSSetViewports(1, &viewport_);", NATIVE_BACKEND_CPP,
+         "R124/R176 viewport native binding"),
+        ("context->RSSetScissorRects(1, &scissor_rect_);", NATIVE_BACKEND_CPP,
+         "R124/R176 scissor native binding"),
+        ("context->OMSetBlendState(", NATIVE_BACKEND_CPP,
+         "R124/R176 dynamic blend/sample-mask native binding"),
+    ]
+    missing_r176_output_state_census = [
+        meaning
+        for token, source, meaning in r176_output_state_census_contract
+        if token not in source
+    ]
+    if missing_r176_output_state_census:
+        raise SystemExit(
+            "DX11 R176 dynamic output-state census contract drift: "
+            + ", ".join(missing_r176_output_state_census)
+        )
+
     r174_source_mrt_contract = [
         ("bool auxiliaryRenderTargetObservationComplete = true;", RUNTIME_CENSUS,
          "R174 auxiliary MRT observation identity"),
