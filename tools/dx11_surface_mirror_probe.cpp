@@ -126,6 +126,7 @@ int main()
         !liveTargetBinding.depthViewCurrent ||
         !liveTargetBinding.rtvBoundExact ||
         !liveTargetBinding.dsvBoundExact ||
+        !liveTargetBinding.unorderedAccessClear ||
         !liveTargetBinding.ready ||
         liveTargetBinding.surfacePairSnapshotToken != recreatedPair.snapshotToken ||
         liveTargetBinding.snapshotToken == 0 ||
@@ -161,11 +162,71 @@ int main()
         !extraTargetBinding.depthViewCurrent ||
         extraTargetBinding.rtvBoundExact ||
         !extraTargetBinding.dsvBoundExact ||
+        !extraTargetBinding.unorderedAccessClear ||
         extraTargetBinding.ready ||
         extraTargetBinding.snapshotToken != 0 ||
         binding.validate_binding_snapshot(
             context.Get(), color, depth, liveTargetBinding.snapshotToken))
         return fail("R145 live OM target binding rejects extra RTV slot");
+
+    if (featureLevel >= D3D_FEATURE_LEVEL_11_0) {
+        D3D11_BUFFER_DESC uavBufferDesc{};
+        uavBufferDesc.ByteWidth = 16;
+        uavBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        uavBufferDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+        uavBufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+        uavBufferDesc.StructureByteStride = 4;
+
+        Microsoft::WRL::ComPtr<ID3D11Buffer> unexpectedUavBuffer;
+        if (FAILED(device->CreateBuffer(
+                &uavBufferDesc, nullptr,
+                unexpectedUavBuffer.ReleaseAndGetAddressOf())) ||
+            !unexpectedUavBuffer)
+            return fail("R146 unexpected OM UAV buffer setup failed");
+
+        D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+        uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+        uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+        uavDesc.Buffer.FirstElement = 0;
+        uavDesc.Buffer.NumElements = 4;
+        Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> unexpectedUav;
+        if (FAILED(device->CreateUnorderedAccessView(
+                unexpectedUavBuffer.Get(), &uavDesc,
+                unexpectedUav.ReleaseAndGetAddressOf())) ||
+            !unexpectedUav)
+            return fail("R146 unexpected OM UAV view setup failed");
+
+        ID3D11RenderTargetView* exactRtv = color.render_target_view();
+        ID3D11UnorderedAccessView* exactUav = unexpectedUav.Get();
+        context->OMSetRenderTargetsAndUnorderedAccessViews(
+            1, &exactRtv, depth.depth_stencil_view(),
+            1, 1, &exactUav, nullptr);
+        const auto unexpectedUavBinding =
+            binding.binding_readiness(context.Get(), color, depth);
+        if (!unexpectedUavBinding.inputValid ||
+            !unexpectedUavBinding.ownerReady ||
+            !unexpectedUavBinding.pairCurrent ||
+            !unexpectedUavBinding.contextMatches ||
+            !unexpectedUavBinding.colorViewCurrent ||
+            !unexpectedUavBinding.depthViewCurrent ||
+            !unexpectedUavBinding.rtvBoundExact ||
+            !unexpectedUavBinding.dsvBoundExact ||
+            unexpectedUavBinding.unorderedAccessClear ||
+            unexpectedUavBinding.ready ||
+            unexpectedUavBinding.snapshotToken != 0 ||
+            binding.validate_binding_snapshot(
+                context.Get(), color, depth, liveTargetBinding.snapshotToken))
+            return fail("R146 live OM target binding rejects unexpected UAV");
+
+        if (!binding.apply(context.Get(), color, depth))
+            return fail("R146 live OM target apply did not clear unexpected UAV");
+        const auto clearedUavBinding =
+            binding.binding_readiness(context.Get(), color, depth);
+        if (!clearedUavBinding.ready ||
+            !clearedUavBinding.unorderedAccessClear ||
+            clearedUavBinding.snapshotToken != liveTargetBinding.snapshotToken)
+            return fail("R146 live OM target restore changed snapshot identity");
+    }
 
     context->OMSetRenderTargets(0, nullptr, nullptr);
     const auto missingTargetBinding =

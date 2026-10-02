@@ -367,7 +367,12 @@ namespace outrun::vr::dx11
             return false;
 
         ID3D11RenderTargetView* rtv = rtv_.Get();
-        context->OMSetRenderTargets(1, &rtv, dsv_.Get());
+        std::array<
+            ID3D11UnorderedAccessView*,
+            D3D11_PS_CS_UAV_REGISTER_COUNT - 1> clearedUavs{};
+        context->OMSetRenderTargetsAndUnorderedAccessViews(
+            1, &rtv, dsv_.Get(), 1,
+            static_cast<UINT>(clearedUavs.size()), clearedUavs.data(), nullptr);
         return binding_readiness(context, color, depth).ready;
     }
 
@@ -419,13 +424,27 @@ namespace outrun::vr::dx11
                 out.rtvBoundExact = false;
         }
         out.dsvBoundExact = observedDsv.Get() == dsv_.Get();
+
+        std::array<
+            ID3D11UnorderedAccessView*,
+            D3D11_PS_CS_UAV_REGISTER_COUNT - 1> observedUavs{};
+        context->OMGetRenderTargetsAndUnorderedAccessViews(
+            0, nullptr, nullptr, 1,
+            static_cast<UINT>(observedUavs.size()), observedUavs.data());
+        out.unorderedAccessClear = true;
+        for (auto* observedUav : observedUavs) {
+            if (observedUav != nullptr)
+                out.unorderedAccessClear = false;
+        }
+
         out.ready =
             out.pairCurrent &&
             out.contextMatches &&
             out.colorViewCurrent &&
             out.depthViewCurrent &&
             out.rtvBoundExact &&
-            out.dsvBoundExact;
+            out.dsvBoundExact &&
+            out.unorderedAccessClear;
         if (out.ready) {
             std::uint64_t hash = 1469598103934665603ull;
             const auto mix = [&hash](std::uint64_t value) noexcept {
@@ -446,6 +465,10 @@ namespace outrun::vr::dx11
         for (auto* observedRtv : observedRtvs) {
             if (observedRtv)
                 observedRtv->Release();
+        }
+        for (auto* observedUav : observedUavs) {
+            if (observedUav)
+                observedUav->Release();
         }
         return out;
     }

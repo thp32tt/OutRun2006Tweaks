@@ -135,6 +135,7 @@ namespace outrun::vr::dx11
         bool depthViewCurrent{};
         bool rtvBoundExact{};
         bool dsvBoundExact{};
+        bool unorderedAccessClear{};
         bool ready{};
         std::uint64_t surfacePairSnapshotToken{};
         std::uint64_t snapshotToken{};
