@@ -502,6 +502,25 @@ bool bind_fixed_function_texture_stage_for_observation(
 
     context->PSSetSamplers(slot, 1, &samplerState);
     context->PSSetShaderResources(slot, 1, &shaderResource);
+
+    // D3D11 silently NULLs an SRV when it conflicts with a resource that is
+    // already bound for output. Treat that hazard resolution as a failed
+    // observation bind instead of reporting a false-positive readiness state.
+    Microsoft::WRL::ComPtr<ID3D11SamplerState> boundSampler;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> boundResource;
+    context->PSGetSamplers(
+        slot, 1, boundSampler.ReleaseAndGetAddressOf());
+    context->PSGetShaderResources(
+        slot, 1, boundResource.ReleaseAndGetAddressOf());
+    if (boundSampler.Get() != samplerState ||
+        boundResource.Get() != shaderResource) {
+        ID3D11SamplerState* nullSampler = nullptr;
+        ID3D11ShaderResourceView* nullResource = nullptr;
+        context->PSSetSamplers(slot, 1, &nullSampler);
+        context->PSSetShaderResources(slot, 1, &nullResource);
+        return false;
+    }
+
     return true;
 }
 
