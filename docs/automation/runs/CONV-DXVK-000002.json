@@ -1343,6 +1343,74 @@
       "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
       "runtime_validation": "UNTESTED",
       "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER"
+    },
+    {
+      "unit_id": "DXVK_CONTINUATION_PREDECESSOR_BINDING_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "27d94ee63aef23f468e55bdeaa0d8a00c46a78d8",
+      "source_commits": [
+        "7349c1ea9f1fe008c5f65bfafd51d3c455123d31",
+        "27d94ee63aef23f468e55bdeaa0d8a00c46a78d8"
+      ],
+      "validation_bearing_descendant_sha": "8b7467af5e15ff8650305ffbc5937f4e68108f1d",
+      "commit_message": "test: allow provenance-sealed DXVK proofs [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Hardened the auto-discovered continuation chain against stale/non-adjacent source wiring while preserving the established provenance-sealed proof pattern.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered current authenticated GitHub branch, AGENTS.md, lane/run state, regression/problem records and Issue #14; concurrent canonical frontier commits were tracked and not overwritten."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected an independent chain-integrity verifier gap rather than duplicating the active F30/F31 disassembly frontier."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "7349c1e added strict adjacent predecessor/provenance binding; 27d94ee repaired the one over-strict assumption so provenance-sealed prefix proofs remain valid while wrong direct predecessor references still fail closed."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Fail-before Build 36976624482/job 110741744888 identified the continuation-24 false rejection. Descendant 8b7467af5e15ff8650305ffbc5937f4e68108f1d retains repair 27d94ee as ancestor and Build 36976912299/job 110742623211 passed Verify backend disassembly contract with 'VR backend disassembly contract: OK'."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commits 7349c1e and 27d94ee contain [AUTO:CONV-DXVK-000002]; Issue #14 comment 5947147128 records the complete implementation/repair/validation lineage."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only unit; no runtime payload, binary package, selector, localization, or deployment artifact changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as supplemental completed static work while preserving the newer authoritative primary frontier."
+        }
+      },
+      "validation": {
+        "fail_before_sha": "d0a62d402686a63a14881327c9eb2c09933be6cf",
+        "fail_before_build_run_id": 36976624482,
+        "fail_before_job_id": 110741744888,
+        "fail_before_step_conclusion": "failure",
+        "repair_sha": "27d94ee63aef23f468e55bdeaa0d8a00c46a78d8",
+        "validation_bearing_descendant_sha": "8b7467af5e15ff8650305ffbc5937f4e68108f1d",
+        "validation_lineage": "ANCESTOR_BEHIND_0",
+        "build_run_id": 36976912299,
+        "build_job_id": 110742623211,
+        "targeted_step": "Verify backend disassembly contract",
+        "targeted_step_conclusion": "success",
+        "targeted_log": "VR backend disassembly contract: OK",
+        "full_win32_build": "NOT_REQUIRED_NOT_CLAIMED",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947147128,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "exact_next_action": "Exact-decode only complete instructions in canonical 0x00182C56..0x00182C96. Resolve predecessor forward target 0x00182C59 only if exact instruction-boundary evidence proves it; preserve any trailing partial instruction raw-only and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
