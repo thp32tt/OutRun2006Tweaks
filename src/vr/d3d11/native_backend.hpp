@@ -1,6 +1,7 @@
 #pragma once
 
 #include "resource_translation.hpp"
+#include "vr/core/d3d9_draw_state.hpp"
 
 #include <array>
 #include <cstddef>
