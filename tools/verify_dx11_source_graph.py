@@ -271,6 +271,40 @@ def main() -> None:
             + ", ".join(missing_dual_source_blend_contract)
         )
 
+    legacy_both_source_blend_contract = {
+        "sourceBlendValue == D3DBLEND_BOTHSRCALPHA":
+            "legacy BOTHSRCALPHA is interpreted only from SRCBLEND",
+        "dstBlend = { D3D11_BLEND_INV_SRC_ALPHA, true };":
+            "BOTHSRCALPHA overrides DESTBLEND with INV_SRC_ALPHA",
+        "sourceBlendValue == D3DBLEND_BOTHINVSRCALPHA":
+            "legacy BOTHINVSRCALPHA is interpreted only from SRCBLEND",
+        "dstBlend = { D3D11_BLEND_SRC_ALPHA, true };":
+            "BOTHINVSRCALPHA overrides DESTBLEND with SRC_ALPHA",
+    }
+    missing_legacy_both_source_blend_contract = [
+        meaning
+        for token, meaning in legacy_both_source_blend_contract.items()
+        if token not in PIPELINE_TRANSLATION_CPP
+    ]
+    semantic_legacy_blend_contract = {
+        "BOTHSRCALPHA source shortcut did not translate exactly":
+            "BOTHSRCALPHA positive semantic smoke",
+        "BOTHINVSRCALPHA source shortcut did not translate exactly":
+            "BOTHINVSRCALPHA positive semantic smoke",
+        "destination BOTHSRCALPHA must remain fail-closed":
+            "destination misuse negative semantic smoke",
+    }
+    missing_legacy_both_source_blend_contract += [
+        meaning
+        for token, meaning in semantic_legacy_blend_contract.items()
+        if token not in SEMANTIC_SMOKE
+    ]
+    if missing_legacy_both_source_blend_contract:
+        raise SystemExit(
+            "DX11 legacy both-source blend contract drift: "
+            + ", ".join(missing_legacy_both_source_blend_contract)
+        )
+
     census_r73_contract = {
         "ResourceBehaviorUnsupportedSamples": "unmodelled descriptor counter",
         "ResourceMutationTelemetryRequiredSamples": "lock/update blocker counter",

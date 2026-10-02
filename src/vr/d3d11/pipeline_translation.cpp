@@ -1109,12 +1109,29 @@ namespace outrun::vr::dx11
         rt.RenderTargetWriteMask = translate_color_write_mask(
             source.colorWriteEnable);
 
-        const auto srcBlend = translate_blend(
-            static_cast<D3DBLEND>(source.srcBlend));
-        const auto dstBlend = translate_blend(
+        const auto sourceBlendValue =
+            static_cast<D3DBLEND>(source.srcBlend);
+        auto srcBlend = translate_blend(sourceBlendValue);
+        auto dstBlend = translate_blend(
             static_cast<D3DBLEND>(source.destBlend));
         const auto blendOp = translate_blend_op(
             static_cast<D3DBLENDOP>(source.blendOp));
+
+        // D3DBLEND_BOTHSRCALPHA/BOTHINVSRCALPHA are legacy source-state
+        // shortcuts: when used as D3DRS_SRCBLEND they override DESTBLEND.
+        // Keep translate_blend() role-agnostic/fail-closed so the same enum
+        // values remain unsupported if they are observed in a destination
+        // blend render state.
+        if (sourceBlendValue == D3DBLEND_BOTHSRCALPHA)
+        {
+            srcBlend = { D3D11_BLEND_SRC_ALPHA, true };
+            dstBlend = { D3D11_BLEND_INV_SRC_ALPHA, true };
+        }
+        else if (sourceBlendValue == D3DBLEND_BOTHINVSRCALPHA)
+        {
+            srcBlend = { D3D11_BLEND_INV_SRC_ALPHA, true };
+            dstBlend = { D3D11_BLEND_SRC_ALPHA, true };
+        }
 
         rt.SrcBlend = srcBlend.value;
         rt.DestBlend = dstBlend.value;

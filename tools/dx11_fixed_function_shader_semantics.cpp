@@ -16,7 +16,9 @@ namespace
     using outrun::vr::dx11::FixedFunctionUnsupportedSamplerFilter;
     using outrun::vr::dx11::FixedFunctionUnsupportedStageChain;
     using outrun::vr::dx11::FixedFunctionUnsupportedTextureTransform;
+    using outrun::vr::dx11::PipelineUnsupportedBlend;
     using outrun::vr::dx11::compile_fixed_function_pixel_shader_prototype;
+    using outrun::vr::dx11::translate_pipeline;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::translate_fixed_function_readiness;
 
@@ -72,6 +74,59 @@ namespace
 
 int main()
 {
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.alphaBlendEnable = TRUE;
+        state.srcBlend = D3DBLEND_BOTHSRCALPHA;
+        state.destBlend = D3DBLEND_ZERO;
+
+        const auto translated = translate_pipeline(state);
+        const auto& rt = translated.blend.RenderTarget[0];
+        require(
+            (translated.unsupported & PipelineUnsupportedBlend) == 0,
+            "BOTHSRCALPHA source shortcut did not translate exactly");
+        require(
+            rt.SrcBlend == D3D11_BLEND_SRC_ALPHA &&
+            rt.DestBlend == D3D11_BLEND_INV_SRC_ALPHA,
+            "BOTHSRCALPHA did not override destination blend");
+        require(
+            rt.SrcBlendAlpha == D3D11_BLEND_SRC_ALPHA &&
+            rt.DestBlendAlpha == D3D11_BLEND_INV_SRC_ALPHA,
+            "BOTHSRCALPHA alpha factors drifted");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.alphaBlendEnable = TRUE;
+        state.srcBlend = D3DBLEND_BOTHINVSRCALPHA;
+        state.destBlend = D3DBLEND_ONE;
+
+        const auto translated = translate_pipeline(state);
+        const auto& rt = translated.blend.RenderTarget[0];
+        require(
+            (translated.unsupported & PipelineUnsupportedBlend) == 0,
+            "BOTHINVSRCALPHA source shortcut did not translate exactly");
+        require(
+            rt.SrcBlend == D3D11_BLEND_INV_SRC_ALPHA &&
+            rt.DestBlend == D3D11_BLEND_SRC_ALPHA,
+            "BOTHINVSRCALPHA did not override destination blend");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.alphaBlendEnable = TRUE;
+        state.srcBlend = D3DBLEND_SRCALPHA;
+        state.destBlend = D3DBLEND_BOTHSRCALPHA;
+
+        const auto translated = translate_pipeline(state);
+        require(
+            (translated.unsupported & PipelineUnsupportedBlend) != 0,
+            "destination BOTHSRCALPHA must remain fail-closed");
+    }
+
     std::array<D3DRESOURCETYPE, 8> textureTypes{};
     textureTypes.fill(D3DRTYPE_TEXTURE);
 
