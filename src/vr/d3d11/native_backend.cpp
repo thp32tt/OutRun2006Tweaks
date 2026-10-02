@@ -1857,21 +1857,143 @@ bool validate_fixed_function_geometry_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+NativeFixedFunctionOutputStateReadiness
+compose_fixed_function_output_state_readiness(
+    const OutRunVR::DrawState::RenderStateSnapshot& source,
+    const NativeSurfacePairReadiness& surfacePair) noexcept {
+    NativeFixedFunctionOutputStateReadiness out{};
+    out.sampleMask = source.multiSampleMask;
+
+    if (!source.outputStateComplete ||
+        !surfacePair.inputValid ||
+        !surfacePair.ready ||
+        surfacePair.snapshotToken == 0 ||
+        surfacePair.width == 0 ||
+        surfacePair.height == 0)
+        return out;
+
+    out.inputValid = true;
+
+    const std::uint64_t viewportRight =
+        static_cast<std::uint64_t>(source.viewport.X) +
+        static_cast<std::uint64_t>(source.viewport.Width);
+    const std::uint64_t viewportBottom =
+        static_cast<std::uint64_t>(source.viewport.Y) +
+        static_cast<std::uint64_t>(source.viewport.Height);
+    out.viewportExact =
+        source.viewport.Width != 0 &&
+        source.viewport.Height != 0 &&
+        viewportRight <= surfacePair.width &&
+        viewportBottom <= surfacePair.height &&
+        source.viewport.MinZ >= 0.0f &&
+        source.viewport.MinZ <= source.viewport.MaxZ &&
+        source.viewport.MaxZ <= 1.0f;
+
+    out.viewport.TopLeftX = static_cast<float>(source.viewport.X);
+    out.viewport.TopLeftY = static_cast<float>(source.viewport.Y);
+    out.viewport.Width = static_cast<float>(source.viewport.Width);
+    out.viewport.Height = static_cast<float>(source.viewport.Height);
+    out.viewport.MinDepth = source.viewport.MinZ;
+    out.viewport.MaxDepth = source.viewport.MaxZ;
+
+    out.scissorRect.left = source.scissorRect.left;
+    out.scissorRect.top = source.scissorRect.top;
+    out.scissorRect.right = source.scissorRect.right;
+    out.scissorRect.bottom = source.scissorRect.bottom;
+    const bool scissorBoundsExact =
+        source.scissorRect.left >= 0 &&
+        source.scissorRect.top >= 0 &&
+        source.scissorRect.right >= source.scissorRect.left &&
+        source.scissorRect.bottom >= source.scissorRect.top &&
+        static_cast<std::uint64_t>(source.scissorRect.right) <=
+            surfacePair.width &&
+        static_cast<std::uint64_t>(source.scissorRect.bottom) <=
+            surfacePair.height;
+    out.scissorExact =
+        source.scissorTestEnable == FALSE || scissorBoundsExact;
+
+    constexpr float channelScale = 1.0f / 255.0f;
+    out.blendFactor[0] =
+        static_cast<float>((source.blendFactor >> 16) & 0xffu) *
+        channelScale;
+    out.blendFactor[1] =
+        static_cast<float>((source.blendFactor >> 8) & 0xffu) *
+        channelScale;
+    out.blendFactor[2] =
+        static_cast<float>(source.blendFactor & 0xffu) *
+        channelScale;
+    out.blendFactor[3] =
+        static_cast<float>((source.blendFactor >> 24) & 0xffu) *
+        channelScale;
+    out.omDynamicExact = true;
+
+    out.ready =
+        out.inputValid &&
+        out.viewportExact &&
+        out.scissorExact &&
+        out.omDynamicExact;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, surfacePair.snapshotToken);
+        token = mix_readiness_snapshot_token(token, source.viewport.X);
+        token = mix_readiness_snapshot_token(token, source.viewport.Y);
+        token = mix_readiness_snapshot_token(token, source.viewport.Width);
+        token = mix_readiness_snapshot_token(token, source.viewport.Height);
+        std::uint32_t minDepthBits = 0;
+        std::uint32_t maxDepthBits = 0;
+        std::memcpy(
+            &minDepthBits, &source.viewport.MinZ, sizeof(minDepthBits));
+        std::memcpy(
+            &maxDepthBits, &source.viewport.MaxZ, sizeof(maxDepthBits));
+        token = mix_readiness_snapshot_token(token, minDepthBits);
+        token = mix_readiness_snapshot_token(token, maxDepthBits);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(source.scissorRect.left));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(source.scissorRect.top));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(source.scissorRect.right));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(source.scissorRect.bottom));
+        token = mix_readiness_snapshot_token(
+            token, source.scissorTestEnable != FALSE ? 1u : 0u);
+        token = mix_readiness_snapshot_token(token, source.blendFactor);
+        token = mix_readiness_snapshot_token(token, source.multiSampleMask);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_output_state_snapshot(
+    const OutRunVR::DrawState::RenderStateSnapshot& source,
+    const NativeSurfacePairReadiness& surfacePair,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        compose_fixed_function_output_state_readiness(source, surfacePair);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 NativeFixedFunctionDrawReadiness
 compose_fixed_function_draw_readiness(
     const NativeFixedFunctionActivationReadiness& activation,
     const NativeFixedFunctionRenderStateReadiness& renderState,
     const NativeSurfacePairReadiness& surfacePair,
+    const NativeFixedFunctionOutputStateReadiness& outputState,
     const NativeFixedFunctionGeometryReadiness& geometry) noexcept {
     NativeFixedFunctionDrawReadiness out{};
     out.activationSnapshotToken = activation.snapshotToken;
     out.renderStateSnapshotToken = renderState.snapshotToken;
     out.surfacePairSnapshotToken = surfacePair.snapshotToken;
+    out.outputStateSnapshotToken = outputState.snapshotToken;
     out.geometrySnapshotToken = geometry.snapshotToken;
     out.inputValid =
         activation.inputValid &&
         renderState.inputValid &&
         surfacePair.inputValid &&
+        outputState.inputValid &&
         geometry.inputValid;
     out.activationReady =
         activation.ready && activation.snapshotToken != 0;
@@ -1879,18 +2001,22 @@ compose_fixed_function_draw_readiness(
         renderState.ready && renderState.snapshotToken != 0;
     out.surfacePairReady =
         surfacePair.ready && surfacePair.snapshotToken != 0;
+    out.outputStateReady =
+        outputState.ready && outputState.snapshotToken != 0;
     out.geometryReady =
         geometry.ready && geometry.snapshotToken != 0;
     out.componentSnapshotsPresent =
         activation.snapshotToken != 0 &&
         renderState.snapshotToken != 0 &&
         surfacePair.snapshotToken != 0 &&
+        outputState.snapshotToken != 0 &&
         geometry.snapshotToken != 0;
     out.ready =
         out.inputValid &&
         out.activationReady &&
         out.renderStateReady &&
         out.surfacePairReady &&
+        out.outputStateReady &&
         out.geometryReady &&
         out.componentSnapshotsPresent;
     if (out.ready) {
@@ -1902,6 +2028,8 @@ compose_fixed_function_draw_readiness(
         drawToken = mix_readiness_snapshot_token(
             drawToken, out.surfacePairSnapshotToken);
         drawToken = mix_readiness_snapshot_token(
+            drawToken, out.outputStateSnapshotToken);
+        drawToken = mix_readiness_snapshot_token(
             drawToken, out.geometrySnapshotToken);
         out.snapshotToken = drawToken == 0 ? 1 : drawToken;
     }
@@ -1912,12 +2040,13 @@ bool validate_fixed_function_draw_snapshot(
     const NativeFixedFunctionActivationReadiness& activation,
     const NativeFixedFunctionRenderStateReadiness& renderState,
     const NativeSurfacePairReadiness& surfacePair,
+    const NativeFixedFunctionOutputStateReadiness& outputState,
     const NativeFixedFunctionGeometryReadiness& geometry,
     std::uint64_t snapshotToken) noexcept {
     if (snapshotToken == 0)
         return false;
     const auto current = compose_fixed_function_draw_readiness(
-        activation, renderState, surfacePair, geometry);
+        activation, renderState, surfacePair, outputState, geometry);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
