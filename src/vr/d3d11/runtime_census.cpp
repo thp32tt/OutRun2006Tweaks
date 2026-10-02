@@ -281,7 +281,7 @@ namespace outrun::vr::dx11
             // census identity so per-draw raster variants cannot alias.
             bool multisampleRasterObservationComplete{};
             DWORD multiSampleAntialias = TRUE;
-            // R176: R124 already carries the dynamic output state consumed by
+            // R179: R124 already carries the dynamic output state consumed by
             // native DX11 binding. Seal it into census identity so draws that
             // differ only by blend factor, sample mask, viewport or scissor
             // cannot alias the same sampled signature.
@@ -1551,7 +1551,7 @@ namespace outrun::vr::dx11
                     sig.multisampleRasterObservationComplete ? 1 : 0,
                     sig.multiSampleAntialias != FALSE ? 1 : 0);
                 spdlog::info(
-                    "VR DX11 R176 output state#{}: observed={} scissorEnable={} blendFactor=0x{:08X} sampleMask=0x{:08X} viewport=[{},{},{},{},minZBits=0x{:08X},maxZBits=0x{:08X}] scissor=[{},{},{},{}]",
+                    "VR DX11 R179 output state#{}: observed={} scissorEnable={} blendFactor=0x{:08X} sampleMask=0x{:08X} viewport=[{},{},{},{},minZBits=0x{:08X},maxZBits=0x{:08X}] scissor=[{},{},{},{}]",
                     unique,
                     sig.outputStateObservationComplete ? 1 : 0,
                     sig.outputScissorTestEnable != FALSE ? 1 : 0,
