@@ -2,7 +2,6 @@
 """Verify the DX11/DXVK backend contract still matches recovered OutRun EXE facts."""
 
 from pathlib import Path
-import re
 import runpy
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,19 +42,7 @@ def verify_dxvk_continuation_chain() -> None:
         ):
             discovered_raw_ids.add(int(continuation_text))
 
-    continuation_re = re.compile(
-        r"^GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_(\\d+)_RVA$"
-    )
-    discovered_ids: list[int] = []
-    for name in analyzer:
-        match = continuation_re.match(name)
-        if match is None:
-            continue
-        continuation_id = int(match.group(1))
-        if continuation_id >= 23:
-            discovered_ids.append(continuation_id)
-
-    raw_ids = tuple(sorted(discovered_ids))
+    raw_ids = tuple(sorted(discovered_raw_ids))
     if not raw_ids or raw_ids[0] != 23:
         raise SystemExit(
             f"DXVK continuation chain discovery lost baseline 23: {raw_ids}"
@@ -68,7 +55,14 @@ def verify_dxvk_continuation_chain() -> None:
         )
 
     for continuation_id in raw_ids:
-        prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
+        prefix = f"{symbol_prefix}{continuation_id}"
+        provenance_collector = analyzer.get(
+            f"collect_guarded_gf_target_c_helper_1_third_callee_continuation_{continuation_id}_provenance"
+        )
+        if not callable(provenance_collector):
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} is missing its provenance collector"
+            )
         start = value(f"{prefix}_RVA")
         probe_len = value(f"{prefix}_PROBE_LEN")
         probe_end = value(f"{prefix}_PROBE_END_RVA")
@@ -104,7 +98,14 @@ def verify_dxvk_continuation_chain() -> None:
 
     cut_edge_ids: list[int] = []
     for continuation_id in proof_ids:
-        prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
+        prefix = f"{symbol_prefix}{continuation_id}"
+        proof_collector = analyzer.get(
+            f"collect_guarded_gf_target_c_helper_1_third_callee_continuation_{continuation_id}_prefix_proof"
+        )
+        if not callable(proof_collector):
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} is missing its prefix-proof collector"
+            )
         start = value(f"{prefix}_RVA")
         probe_end = value(f"{prefix}_PROBE_END_RVA")
         proof_end = value(f"{prefix}_PREFIX_END_RVA")
@@ -123,6 +124,11 @@ def verify_dxvk_continuation_chain() -> None:
                 f"DXVK continuation {continuation_id} has a half-defined cut edge"
             )
         if not has_incomplete_rva:
+            if proof_end != probe_end:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} has no cut edge but proof end "
+                    f"0x{proof_end:08X} != capture end 0x{probe_end:08X}"
+                )
             continue
 
         cut_edge_ids.append(continuation_id)
@@ -150,8 +156,8 @@ def verify_dxvk_continuation_chain() -> None:
                 f"DXVK continuation {next_id} exists before predecessor "
                 f"{previous_id} has an exact proof"
             )
-        previous = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{previous_id}"
-        following = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{next_id}"
+        previous = f"{symbol_prefix}{previous_id}"
+        following = f"{symbol_prefix}{next_id}"
         previous_end = value(f"{previous}_PREFIX_END_RVA")
         next_start = value(f"{following}_RVA")
         if previous_end != next_start:
@@ -177,6 +183,10 @@ def verify_dxvk_continuation_chain() -> None:
 
         previous_incomplete_rva = value(f"{previous}_INCOMPLETE_RVA")
         previous_incomplete = value(f"{previous}_INCOMPLETE_BYTES")
+        if next_overlap_name not in analyzer:
+            raise SystemExit(
+                f"DXVK overlap transition {previous_id}->{next_id} is missing overlap bytes"
+            )
         next_overlap = value(next_overlap_name)
         if previous_incomplete_rva != next_start:
             raise SystemExit(
