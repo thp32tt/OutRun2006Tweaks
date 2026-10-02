@@ -2009,7 +2009,7 @@ struct NativeFixedFunctionFanDrawDispatchReadiness {
     // fail-closed capacity proof to indexed fans using exact R155 source
     // content plus an R152 MANAGED source-index window snapshot.
     bool vertexBufferRangeExact{};
-    // R158 preserves D3D9 DrawIndexedPrimitive MinVertexIndex/NumVertices for
+    // R160 preserves D3D9 DrawIndexedPrimitive MinVertexIndex/NumVertices for
     // indexed triangle fans and proves the exact MANAGED source values stay
     // inside that declared source-vertex interval before D3D11 DrawIndexed.
     bool sourceDeclaredVertexRangeExact{};

@@ -5237,7 +5237,7 @@ int main()
         !indexedFanDeclaredRangeMismatch.dispatchArgumentsExact &&
         !indexedFanDeclaredRangeMismatch.ready &&
         indexedFanDeclaredRangeMismatch.snapshotToken == 0,
-        "R158 indexed fan dispatch rejects source index outside D3D9 declared vertex range");
+        "R160 indexed fan dispatch rejects source index outside D3D9 declared vertex range");
 
     const auto indexedFanDeclaredCapacityOverrun =
         outrun::vr::dx11::
@@ -5802,7 +5802,7 @@ int main()
     std::cout << "DX11 indexed source binding R153: PASS\n";
     std::cout << "DX11 indexed fan source content R155: PASS\n";
     std::cout << "DX11 indexed fan vertex capacity R156: PASS\n";
-    std::cout << "DX11 indexed fan declared vertex range R158: PASS\n";
+    std::cout << "DX11 indexed fan declared vertex range R160: PASS\n";
     std::cout << "DX11 indexed fan declared VB capacity R160: PASS\n";
     std::cout << "DX11 direct line raster semantics R157: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";

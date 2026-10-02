@@ -5798,7 +5798,7 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
         primitiveCount <= maxValue / 3u &&
         generated.indexCount == primitiveCount * 3u;
 
-    // R158: preserve D3D9 indexed-fan declared vertex range. D3D11
+    // R160: preserve D3D9 indexed-fan declared vertex range. D3D11
     // DrawIndexed has no MinVertexIndex/NumVertices arguments, so the dormant
     // readiness chain must retain them and prove the exact source index values
     // stay within that caller-declared interval before activation.
@@ -5943,9 +5943,9 @@ compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
         token = mix_readiness_snapshot_token(
             token, out.sourceMaxVertexIndex);
         token = mix_readiness_snapshot_token(
-            token, out.sourceDeclaredVertexRangeExact ? 0x158u : 0u);
+            token, out.sourceDeclaredVertexRangeExact ? 0x160u : 0u);
         token = mix_readiness_snapshot_token(
-            token, out.sourceValuesWithinDeclaredRange ? 0x1581u : 0u);
+            token, out.sourceValuesWithinDeclaredRange ? 0x1601u : 0u);
         token = mix_readiness_snapshot_token(
             token, out.sourceDeclaredVertexBufferRangeExact ? 0x160u : 0u);
         token = mix_readiness_snapshot_token(
