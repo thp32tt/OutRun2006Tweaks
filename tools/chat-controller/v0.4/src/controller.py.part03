@@ -1686,13 +1686,17 @@ async def localization_handle_producer_commit(
     task_commit: dict,
     now: datetime,
 ) -> bool:
-    """Validate producer task evidence before release. False means same TASK remains active."""
-    valid, reasons, _record = localization_validate_producer_result_commit(
-        active["task_id"], task_commit["sha"]
+    """Accept one immutable producer checkpoint; release only after the whole batch gate."""
+    sha = str(task_commit.get("sha") or "")
+    if localization_producer_seen_result(active, sha):
+        return False
+
+    valid, reasons, record = localization_validate_producer_result_commit(
+        active["task_id"], sha
     )
-    if not valid:
+    if not valid or not isinstance(record, dict):
         await localization_recover_rejected_producer_commit(
-            context, pages, active, task_commit, reasons
+            context, pages, active, task_commit, reasons or ["INVALID_PRODUCER_RECORD"]
         )
         return False
     for key in (
@@ -1701,12 +1705,35 @@ async def localization_handle_producer_commit(
         "producer_no_work_recovery_sent_at",
     ):
         active.pop(key, None)
-    finalize_localization_producer_commit(q, active, task_commit, now)
-    return True
+
+    release, reason = localization_record_producer_checkpoint(
+        q, active, task_commit, record, now
+    )
+    active["pipeline_release_decision"] = reason
+    invalidate_task_commit_cache(active["branch"], active["task_id"])
+
+    if release:
+        finalize_localization_producer_commit(q, active, task_commit, now)
+        active["pipeline_release_decision"] = reason
+        return True
+
+    # A valid intermediate commit is a checkpoint, not TASK completion.
+    active["phase"] = "WAIT_CHAT"
+    active["terminal"] = None
+    active["task_latched"] = True
+    active["controller_stage"] = "CONTINUE_PIPELINE"
+    active["pipeline_continuation_pending"] = True
+    active.pop("completed_at", None)
+    active.pop("wait_actions_started_at", None)
+    active.pop("startup_reconcile_pending", None)
+    sent = await queue_send_producer_pipeline_continuation(context, pages, active)
+    if sent:
+        active["pipeline_continuation_pending"] = False
+    return False
 
 
 def finalize_localization_producer_commit(q: dict, active: dict, task_commit: dict, now: datetime) -> None:
-    """Release A/B/E on durable commit; validation is deferred to the C batch gate."""
+    """Release A/B/E only after the configured producer pipeline batch is complete/exhausted."""
     active["result_sha"] = task_commit["sha"]
     active["result_message"] = task_commit.get("message")
     active["automation_validation"] = "PENDING"
