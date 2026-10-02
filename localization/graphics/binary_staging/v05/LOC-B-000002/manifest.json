@@ -6,5 +6,6 @@
   "encoding": "xz+base64",
   "parts": [
     "payload.part000"
-  ]
+  ],
+  "material_publish_retry": "2026-10-02T15:26:00+09:00"
 }
