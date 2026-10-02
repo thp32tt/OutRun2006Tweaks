@@ -428,8 +428,7 @@ namespace OutRunVRStereo
             ++R29StableTwoEyeDraws;
             if (R33TelemetryEnabled())
             {
-                ++R31FastWorldDraws;
-                ++R31Frame.fastWorld;
+                R31TelemetryNoteFastWorld();
             }
 
             if (FrameStereoPoseSequence == 0)
@@ -596,8 +595,7 @@ namespace OutRunVRStereo
             ++R30ScreenSpaceFovDraws;
             if (R33TelemetryEnabled())
             {
-                ++R31HudDraws;
-                ++R31Frame.hud;
+                R31TelemetryNoteHud();
             }
 
             if (FAILED(rightHr))
@@ -632,7 +630,7 @@ namespace OutRunVRStereo
             if (OutRunVR::State::StateBlockTracker::Recording())
             {
                 if (telemetry)
-                    ++R31Frame.fallback;
+                    R31TelemetryNoteFallback();
                 return actualDraw();
             }
 
@@ -656,7 +654,7 @@ namespace OutRunVRStereo
             // reclassify a draw that R33 already rejected using live state.
             R31DiscardUnreliableDrawCaches();
             if (telemetry)
-                ++R31Frame.fallback;
+                R31TelemetryNoteFallback();
             return R32LowerFailClosed(device,
                 std::forward<LowerR29Draw>(lowerR29Draw));
         }
