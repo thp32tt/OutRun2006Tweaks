@@ -58,6 +58,7 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> UnsupportedTextureFormatSamples{0};
         std::atomic<std::uint64_t> UnsupportedColorFormatSamples{0};
         std::atomic<std::uint64_t> UnsupportedDepthFormatSamples{0};
+        std::atomic<std::uint64_t> UnsupportedAuxiliaryRenderTargetSamples{0};
         std::atomic<std::uint64_t> ResourceIntrospectionFailureSamples{0};
         std::atomic<std::uint64_t> ResourceBehaviorUnsupportedSamples{0};
         std::atomic<std::uint64_t> ResourceMutationTelemetryRequiredSamples{0};
@@ -205,6 +206,11 @@ namespace outrun::vr::dx11
             DWORD renderTargetUsage{};
             D3DPOOL renderTargetPool = D3DPOOL_FORCE_DWORD;
             D3DFORMAT renderTargetFormat = D3DFMT_UNKNOWN;
+            // R174: RT0 alone is insufficient source-output provenance.
+            // Preserve D3D9 auxiliary MRT slots 1..3 in sampled identity so
+            // multi-target draws cannot alias the one-color-target path.
+            bool auxiliaryRenderTargetObservationComplete = true;
+            std::uint8_t auxiliaryRenderTargetMask{};
             DWORD depthUsage{};
             D3DPOOL depthPool = D3DPOOL_FORCE_DWORD;
             D3DFORMAT depthFormat = D3DFMT_UNKNOWN;
@@ -360,6 +366,9 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.renderTargetUsage);
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.renderTargetPool));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.renderTargetFormat));
+            hash = hash_mix(
+                hash, sig.auxiliaryRenderTargetObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.auxiliaryRenderTargetMask);
             hash = hash_mix(hash, sig.depthUsage);
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.depthPool));
             hash = hash_mix(hash, static_cast<std::uint32_t>(sig.depthFormat));
@@ -1015,6 +1024,38 @@ namespace outrun::vr::dx11
                 rt0->Release();
             }
 
+            // R174: native DX11 output readiness owns exactly one color target.
+            // Query only source-supported MRT slots; any bound auxiliary target
+            // remains explicit fail-closed census evidence.
+            D3DCAPS9 caps{};
+            if (FAILED(device->GetDeviceCaps(&caps)))
+            {
+                sig.auxiliaryRenderTargetObservationComplete = false;
+                sig.resourceIntrospectionComplete = false;
+            }
+            else
+            {
+                for (DWORD index = 1; index <= 3; ++index)
+                {
+                    if (index >= caps.NumSimultaneousRTs)
+                        break;
+                    IDirect3DSurface9* auxiliary = nullptr;
+                    const HRESULT auxiliaryHr = device->GetRenderTarget(index, &auxiliary);
+                    if (FAILED(auxiliaryHr) && auxiliaryHr != D3DERR_NOTFOUND)
+                    {
+                        sig.auxiliaryRenderTargetObservationComplete = false;
+                        sig.resourceIntrospectionComplete = false;
+                    }
+                    else if (auxiliary)
+                    {
+                        sig.auxiliaryRenderTargetMask |=
+                            static_cast<std::uint8_t>(1u << (index - 1u));
+                    }
+                    if (auxiliary)
+                        auxiliary->Release();
+                }
+            }
+
             IDirect3DSurface9* depth = nullptr;
             const HRESULT depthHr = device->GetDepthStencilSurface(&depth);
             if (FAILED(depthHr) && depthHr != D3DERR_NOTFOUND)
@@ -1441,6 +1482,12 @@ namespace outrun::vr::dx11
                     sig.textureCoordinateWrap[4], sig.textureCoordinateWrap[5],
                     sig.textureCoordinateWrap[6], sig.textureCoordinateWrap[7]);
 
+                spdlog::info(
+                    "VR DX11 R174 source MRT state#{}: observed={} mask=0x{:02X}",
+                    unique,
+                    sig.auxiliaryRenderTargetObservationComplete ? 1 : 0,
+                    sig.auxiliaryRenderTargetMask);
+
                 for (std::size_t stageIndex = 0;
                      stageIndex < sig.textureStages.size();
                      ++stageIndex)
@@ -1670,7 +1717,7 @@ namespace outrun::vr::dx11
             const auto sampleStride = census_sample_stride();
             const auto samplingScheme = census_sampling_scheme();
             spdlog::info(
-                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] dualSourceBlend[any={},rgbSrc={},rgbDst={},alphaSrc={},alphaDst={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={},dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={},texCoordWrap={}]",
+                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={},auxRenderTargetUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] dualSourceBlend[any={},rgbSrc={},rgbDst={},alphaSrc={},alphaDst={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={},dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={},texCoordWrap={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -1696,6 +1743,8 @@ namespace outrun::vr::dx11
                 UnsupportedTextureFormatSamples.load(std::memory_order_relaxed),
                 UnsupportedColorFormatSamples.load(std::memory_order_relaxed),
                 UnsupportedDepthFormatSamples.load(std::memory_order_relaxed),
+                UnsupportedAuxiliaryRenderTargetSamples.load(
+                    std::memory_order_relaxed),
                 ResourceMutationWriteUnlocks.load(std::memory_order_relaxed),
                 ResourceMutationReadOnlyUnlocks.load(std::memory_order_relaxed),
                 ResourceMutationDiscardWriteUnlocks.load(std::memory_order_relaxed),
@@ -2165,6 +2214,13 @@ namespace outrun::vr::dx11
         if (!signature.resourceIntrospectionComplete)
             ResourceIntrospectionFailureSamples.fetch_add(
                 1, std::memory_order_relaxed);
+
+        if (signature.auxiliaryRenderTargetMask != 0)
+        {
+            UnsupportedAuxiliaryRenderTargetSamples.fetch_add(
+                1, std::memory_order_relaxed);
+            resourcesExact = false;
+        }
 
         bool behaviorDescriptorExact = true;
         bool mutationTelemetryRequired = false;

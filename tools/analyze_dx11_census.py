@@ -29,7 +29,8 @@ SUMMARY_RE = re.compile(
     r"indexUnsupported=(?P<indexUnsupported>\d+),"
     r"textureUnsupported=(?P<textureUnsupported>\d+),"
     r"colorUnsupported=(?P<colorUnsupported>\d+),"
-    r"depthUnsupported=(?P<depthUnsupported>\d+)\] "
+    r"depthUnsupported=(?P<depthUnsupported>\d+)"
+    r"(?:,auxRenderTargetUnsupported=(?P<auxRenderTargetUnsupported>\d+))?\] "
     r"(?:mutation\[writeUnlocks=(?P<mutationWriteUnlocks>\d+),"
     r"readOnlyUnlocks=(?P<mutationReadOnlyUnlocks>\d+),"
     r"discardWriteUnlocks=(?P<mutationDiscardWriteUnlocks>\d+),"
@@ -364,6 +365,7 @@ def main() -> int:
             "textureUnsupported",
             "colorUnsupported",
             "depthUnsupported",
+            "auxRenderTargetUnsupported",
             "incomplete",
             "wbuffer",
             "sepAlpha",

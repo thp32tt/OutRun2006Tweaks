@@ -7106,6 +7106,39 @@ def main() -> None:
             + ", ".join(missing_r168_line_raster)
         )
 
+    r174_source_mrt_contract = [
+        ("bool auxiliaryRenderTargetObservationComplete = true;", RUNTIME_CENSUS,
+         "R174 auxiliary MRT observation identity"),
+        ("std::uint8_t auxiliaryRenderTargetMask{};", RUNTIME_CENSUS,
+         "R174 auxiliary MRT mask identity"),
+        ("device->GetDeviceCaps(&caps)", RUNTIME_CENSUS,
+         "R174 source MRT capability bound"),
+        ("device->GetRenderTarget(index, &auxiliary)", RUNTIME_CENSUS,
+         "R174 source MRT live observation"),
+        ("hash, sig.auxiliaryRenderTargetObservationComplete ? 1u : 0u",
+         RUNTIME_CENSUS, "R174 MRT observation hash"),
+        ("hash = hash_mix(hash, sig.auxiliaryRenderTargetMask);",
+         RUNTIME_CENSUS, "R174 MRT mask hash"),
+        ("UnsupportedAuxiliaryRenderTargetSamples", RUNTIME_CENSUS,
+         "R174 dedicated MRT unsupported counter"),
+        ("signature.auxiliaryRenderTargetMask != 0", RUNTIME_CENSUS,
+         "R174 resource exactness fail-closed gate"),
+        ("auxRenderTargetUnsupported={}", RUNTIME_CENSUS,
+         "R174 summary unsupported label"),
+        ("VR DX11 R174 source MRT state#{}", RUNTIME_CENSUS,
+         "R174 detailed source MRT telemetry"),
+    ]
+    missing_r174_source_mrt = [
+        meaning
+        for token, source, meaning in r174_source_mrt_contract
+        if token not in source
+    ]
+    if missing_r174_source_mrt:
+        raise SystemExit(
+            "DX11 R174 source MRT census contract drift: "
+            + ", ".join(missing_r174_source_mrt)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

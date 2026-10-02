@@ -753,6 +753,26 @@ def main() -> int:
     assert extended_unsupported["LatestSummary"]["texCoordWrap"] == 0
     assert extended_unsupported["NativeDrawPathActivationAllowed"] is False
 
+    r174_source_mrt = run_case(
+        "VR DX11 R120 census: samples=4 exact=2 fixedFn=4 programmable=0 "
+        "topologyUnsupported=0 signatures=4 "
+        "sampling[drawsSeen=4,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0,auxRenderTargetUnsupported=2] "
+        "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r174_source_mrt["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert r174_source_mrt["UnsupportedTotalLatest"] == 2
+    assert r174_source_mrt["LatestSummary"]["auxRenderTargetUnsupported"] == 2
+    assert r174_source_mrt["NativeDrawPathActivationAllowed"] is False
+
     r170_wrap = run_case(
         "VR DX11 R120 census: samples=4 exact=0 fixedFn=4 programmable=0 "
         "topologyUnsupported=0 signatures=4 "
