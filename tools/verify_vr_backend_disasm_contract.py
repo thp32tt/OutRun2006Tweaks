@@ -1024,6 +1024,8 @@ def verify_dxvk_continuation_chain() -> None:
             "predecessor_targets_match",
             "resolved_forward_targets_on_boundaries",
             "resolved_prior_forward_target_is_boundary",
+            "known_backward_target_is_boundary",
+            "remaining_predecessor_target_outside_capture",
             "predecessor_target_contract",
             "resolved_predecessor_targets_on_boundaries",
             "incoming_call_matches",
