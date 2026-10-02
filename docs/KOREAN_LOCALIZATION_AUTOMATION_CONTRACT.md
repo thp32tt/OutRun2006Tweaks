@@ -172,6 +172,33 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 
 
 
+## Continuous pipeline task completion (schema 43)
+
+The controller, not assistant prose, owns producer/C task release.
+
+### A/B/E producer batch
+
+A/B/E keep the same TASK_ID across intermediate material commits. Each valid immutable material commit is a checkpoint and may be enqueued to C as TASK_ID@RESULT_SHA, but it does not automatically release the producer.
+
+Normal producer release requires one of:
+- at least 2 actual new/materially reworked candidate DDS outputs in the current TASK;
+- at least 1 candidate plus a fresh own-shard scan proving no second runnable completion-tier/material target remains;
+- a valid true-no-work result after the fresh completion guard proves the own shard has no runnable material work.
+
+A CLEAN_PLATE, mask, reconstruction, typography measurement, RENDER_READY transition, or other pre-candidate checkpoint keeps the TASK latched. If that checkpoint makes its asset renderable, the same TASK continues through Korean render, measure/refit, exact DDS encode, decoded-final self-QA and candidate persistence before changing assets.
+
+Every accepted checkpoint updates the durable controller checkpoint. Repeated plan/status-only turns remain recoverable and do not release the TASK.
+
+### C continuous drain
+
+C validates every immutable input in QA_BATCH_INPUTS. A C result that omits any supplied TASK_ID@RESULT_SHA input is rejected before Actions binding.
+
+A successful C batch/Gate is a checkpoint while additional qa_pending inputs are ready. C keeps the same TASK_ID and chat, loads the next ready batch, validates it, commits another [AUTO:TASK_ID] result, and repeats.
+
+If qa_pending exists only in retry backoff, C remains latched in WAIT_QA_DRAIN and resumes when an input becomes ready. C releases only when no ready/pending QA work remains for that drain cycle.
+
+Runtime validation remains separate. RUNTIME_VALIDATION=UNTESTED does not prevent static current-v2 production completion.
+
 ## Recovery-policy reconciliation (schema 42)
 
 The legacy numeric chat-rollover and lane-exception thresholds remain bounded recovery triggers, not automatic terminal conditions for a latched A/B/E producer.
