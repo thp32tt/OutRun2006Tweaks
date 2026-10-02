@@ -19,7 +19,7 @@
     "qa_consumer": "C",
     "qa_queue": "qa_pending",
     "qa_batch_size": 4,
-    "qa_coalesce_seconds": 60,
+    "qa_coalesce_seconds": 15,
     "producer_next_after": "PIPELINE_BATCH_COMPLETE_OR_FRESH_SHARD_EXHAUSTION",
     "c_gates_production": false,
     "compatibility_fallback": "sequential_producers_with_independent_qa",
@@ -82,7 +82,7 @@
       "consumes": "qa_pending",
       "input_identity": "TASK_ID@RESULT_SHA",
       "batch_size": 4,
-      "coalesce_seconds": 60,
+      "coalesce_seconds": 15,
       "candidate_write_policy": "RETURN_REWORK_TO_OWNING_A_B_OR_E",
       "blocks_producers": false,
       "automation_validation": "C_BATCH_GATE",
@@ -211,7 +211,7 @@
       "recovered_blocked_producer_remove_from_blocked": true
     },
     "continuous_progression": {
-      "producer_commit_releases_same_lane": true,
+      "producer_commit_releases_same_lane": false,
       "producer_commit_enqueues_qa": true,
       "producer_waits_for_actions": false,
       "c_batch_waits_for_actions": true,
@@ -278,7 +278,12 @@
       "producer_premature_stop_rollover_threshold": 2,
       "producer_first_valid_material_commit_does_not_release_task": true,
       "c_same_task_batch_drain": true,
-      "c_incomplete_batch_commit_rejected": true
+      "c_incomplete_batch_commit_rejected": true,
+      "producer_checkpoint_keeps_same_lane": true,
+      "producer_release_condition": "PIPELINE_BATCH_COMPLETE_OR_FRESH_SHARD_EXHAUSTION",
+      "c_batch_pass_releases_c": false,
+      "c_batch_pass_continues_same_task_when_pending": true,
+      "c_release_condition": "NO_READY_OR_PENDING_QA_INPUTS"
     },
     "state_persistence": {
       "atomic_primary_writes": true,
@@ -307,7 +312,7 @@
     "queue_stable_seconds": 30,
     "github_discovery_poll_seconds": 60,
     "github_bound_run_poll_seconds": 30,
-    "github_task_commit_cache_seconds": 60,
+    "github_task_commit_cache_seconds": 15,
     "github_actions_discovery_cache_seconds": 60,
     "bound_run_nonterminal_cache_ttl_seconds": 0,
     "queue_next_task_delay_seconds": 15,
@@ -323,7 +328,7 @@
       600
     ],
     "localization_qa_batch_size": 4,
-    "localization_qa_coalesce_seconds": 60,
+    "localization_qa_coalesce_seconds": 15,
     "localization_same_slot_send_gap_seconds": 90,
     "localization_slot_dedup_seconds": 30,
     "localization_extra_producer_qa_pause_threshold": 16,
@@ -342,7 +347,7 @@
     "memory_fatal_restart_percent": 92,
     "chat_reuse_max_tasks": 4,
     "chat_reuse_max_age_minutes": 90,
-    "previous_task_ui_settle_seconds": 180,
+    "previous_task_ui_settle_seconds": 45,
     "max_chat_rollovers_per_task": 2,
     "github_transient_retry_delays": [
       2,
