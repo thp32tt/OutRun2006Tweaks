@@ -1791,12 +1791,23 @@ def parse_pe(data: bytes) -> PE:
 
 
 def guess_function_start(text: bytes, text_rva: int, index: int) -> int | None:
+    """Return the nearest known prologue in the bounded backward window.
+
+    Use bytes.rfind so the hot inbound-rel32 census does not execute a Python
+    loop for every byte of every candidate.  The search bounds preserve the
+    prior startswith semantics, including accepting a prologue whose first byte
+    is exactly at *index*.
+    """
+
     lo = max(0, index - 0x500)
     prologues = (b"\x55\x8b\xec", b"\x53\x56\x57", b"\x56\x8b\xf1")
-    for pos in range(index, lo - 1, -1):
-        if any(text.startswith(p, pos) for p in prologues):
-            return text_rva + pos
-    return None
+    nearest = -1
+    for prologue in prologues:
+        hi = min(len(text), index + len(prologue))
+        pos = text.rfind(prologue, lo, hi)
+        if pos > nearest and pos <= index:
+            nearest = pos
+    return text_rva + nearest if nearest >= 0 else None
 
 
 def find_calls(pe: PE) -> list[dict]:
