@@ -31,7 +31,9 @@ def load_function(name, **overrides):
               github_transient_retry_pending=lambda: False,
               native_plugin_instructions=lambda active: 'ALL_TOOLS tool search TOOL_NOT_EXPOSED 404 TARGET_BRANCH',
               _is_localization_producer=lambda active: False,
+              _is_latched_execution_task=lambda active: False,
               queue_send_producer_execution_continuation=AsyncMock(return_value=False),
+              queue_send_conversion_execution_continuation=AsyncMock(return_value=False),
               queue_send_same_chat_control_message=AsyncMock(return_value=True),
               queue_rollover_chat=AsyncMock(return_value=True))
     ns.update(overrides)
@@ -63,6 +65,8 @@ class NativeControllerTests(unittest.TestCase):
                 self.assertLessEqual(len(prompt.encode()), 1500)
             else:
                 self.assertLessEqual(len(prompt.encode()), 650)
+            self.assertIn('Skill', prompt)
+            self.assertIn('blocker', prompt)
 
     def test_preflight_does_not_claim_browser_plugin_connected(self):
         f, ns = load_function('queue_send_github_recovery')
@@ -412,6 +416,87 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('사용자 확인을 기다리지 말고', prompt)
         self.assertIn('[AUTO:TASK_ID]', prompt)
         self.assertIn('도구 호출과 실제 변경부터 수행', prompt)
+
+    def test_conversion_no_commit_response_forces_execution_continuation(self):
+        continuation = AsyncMock(return_value=True)
+        recovery = AsyncMock(return_value=True)
+        f, _ = load_function(
+            'queue_handle_native_response',
+            CONTROLLER_MODE='conversion',
+            _is_localization_producer=lambda active: False,
+            queue_send_conversion_execution_continuation=continuation,
+            queue_send_github_recovery=recovery,
+        )
+        active = self.active()
+        active.update(lane='DX11', branch='vr-dx11-native-r71')
+        text_value = 'HEAD 확인 완료. 다음 단계에서 구현하겠습니다. RESULT_SHA=NOT_CREATED'
+        self.assertTrue(asyncio.run(f(None, {}, active, text_value)))
+        continuation.assert_awaited_once()
+        recovery.assert_not_awaited()
+        self.assertEqual(active['task_id'], 'TASK-1')
+        self.assertEqual(active['attempt'], 1)
+        self.assertEqual(active['phase'], 'WAIT_CHAT')
+
+    def test_conversion_premature_stop_rolls_same_task_on_third_turn(self):
+        same_chat = AsyncMock(return_value=True)
+        rollover = AsyncMock(return_value=True)
+        f, _ = load_function(
+            'queue_send_conversion_execution_continuation',
+            CONTROLLER_MODE='conversion',
+            queue_send_same_chat_control_message=same_chat,
+            queue_rollover_chat=rollover,
+        )
+        active = self.active()
+        active.update(
+            lane='DX11',
+            branch='vr-dx11-native-r71',
+            sent_at='2026-10-02T00:00:00+00:00',
+            chat_rollovers=0,
+            task_latched=True,
+        )
+        self.assertTrue(asyncio.run(f(None, {}, active, 'h1')))
+        self.assertEqual(active['premature_stop_count'], 1)
+        active['sent_at'] = '2026-10-02T00:01:00+00:00'
+        self.assertTrue(asyncio.run(f(None, {}, active, 'h2')))
+        self.assertEqual(active['premature_stop_count'], 2)
+        active['sent_at'] = '2026-10-02T00:02:00+00:00'
+        self.assertTrue(asyncio.run(f(None, {}, active, 'h3')))
+        rollover.assert_awaited_once()
+        self.assertEqual(active['premature_stop_count'], 0)
+        self.assertEqual(active['premature_stop_total'], 3)
+        self.assertTrue(active['task_latched'])
+        self.assertEqual(active['phase'], 'WAIT_CHAT')
+
+    def test_conversion_continuation_is_github_only_and_skill_optional(self):
+        f, ns = load_function(
+            'queue_send_conversion_execution_continuation',
+            CONTROLLER_MODE='conversion',
+        )
+        active = self.active()
+        active.update(branch='vr-dxvk-r71-disasm', lane='DXVK')
+        self.assertTrue(asyncio.run(f(None, {}, active, 'h1')))
+        prompt = ns['queue_send_same_chat_control_message'].call_args.args[3]
+        self.assertIn('GITHUB_ONLY_DEVELOPMENT=true', prompt)
+        self.assertIn('로컬 개발 PC', prompt)
+        self.assertIn('Skill', prompt)
+        self.assertIn('[AUTO:TASK_ID]', prompt)
+        self.assertIn('RESULT_SHA=NOT_CREATED', prompt)
+
+    def test_latched_execution_identity_includes_conversion(self):
+        loc = lambda active: active.get('lane') == 'LOCALIZATION_A'
+        f, _ = load_function(
+            '_is_latched_execution_task',
+            CONTROLLER_MODE='conversion',
+            _is_localization_producer=loc,
+        )
+        self.assertTrue(f({'lane':'DX11'}))
+        f2, _ = load_function(
+            '_is_latched_execution_task',
+            CONTROLLER_MODE='localization',
+            _is_localization_producer=loc,
+        )
+        self.assertTrue(f2({'lane':'LOCALIZATION_A'}))
+        self.assertFalse(f2({'lane':'LOCALIZATION_C'}))
 
     def test_no_progress_is_handled_even_when_send_deferred(self):
         self.assertTrue('queue_handle_native_response' in FUNCTIONS)
