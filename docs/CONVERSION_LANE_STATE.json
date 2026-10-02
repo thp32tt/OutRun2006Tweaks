@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
@@ -41,7 +41,14 @@
     "assistant_turn_end_is_task_end": false,
     "recovery_status_review_plan_only": "CONTINUE_SAME_TASK_ID",
     "local_tool_absence_is_terminal": false,
-    "runtime_evidence_absence_blocks_only_runtime_claims": true
+    "runtime_evidence_absence_blocks_only_runtime_claims": true,
+    "review_only_commit_is_task_end": false,
+    "checkpoint_commit_is_task_end": false,
+    "normal_success_requires_full_c0_c6": true,
+    "substantive_c2_required": true,
+    "c3_validation_required": true,
+    "c6_state_required": true,
+    "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00274",
@@ -58,6 +65,44 @@
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
     "Do not activate or promote semantics without the branch-specific evidence gate.",
     "When runtime-only evidence is unavailable, continue independent GitHub-only source/static/CI work instead of stopping.",
-    "Installed Skills are optional helpers; if unavailable or unsuitable, continue without them."
-  ]
+    "Installed Skills are optional helpers; if unavailable or unsuitable, continue without them.",
+    "A controller conversion TASK must normally complete C0 through C6 for one selected work item before release.",
+    "A review-only, plan-only, state-only or single checkpoint commit is nonterminal and must continue under the same TASK_ID.",
+    "C2 must produce substantive source/tool/test/workflow/disassembly evidence unless branch state explicitly marks development_complete=true.",
+    "C5 may be NOT_REQUIRED only with an explicit reason; runtime UNTESTED remains separate."
+  ],
+  "controller_pipeline": {
+    "schema_version": 2,
+    "task_scope": "ONE_SELECTED_WORK_ITEM_THROUGH_FULL_C0_C6",
+    "required_stages": [
+      "C0_RECOVER",
+      "C1_REVIEW",
+      "C2_IMPLEMENT",
+      "C3_VALIDATE",
+      "C4_COMMIT",
+      "C5_PACKAGE",
+      "C6_STATE"
+    ],
+    "c5_rule": "COMPLETE_OR_REASONED_NOT_REQUIRED",
+    "normal_release_requires": [
+      "FULL_C0_C6_RUN_RECORD",
+      "SUBSTANTIVE_NON_STATE_CHANGED_PATH",
+      "VALIDATION_EVIDENCE",
+      "STATE_PERSISTED_TRUE",
+      "EXACT_NEXT_ACTION",
+      "GATE_ELIGIBLE_AUTO_TASK_COMMIT"
+    ],
+    "nonterminal": [
+      "C0_RECOVERY_ONLY",
+      "C1_REVIEW_ONLY",
+      "PLAN_ONLY",
+      "STATE_ONLY_COMMIT",
+      "CHECKPOINT_ONLY_COMMIT",
+      "RESULT_SHA_NOT_CREATED",
+      "LOCAL_RUNTIME_UNAVAILABLE"
+    ],
+    "runtime_rule": "UNTESTED_DOES_NOT_BLOCK_SOURCE_STATIC_DISASSEMBLY_CI_PROGRESS",
+    "interruption_rule": "PARTIAL_C0_C6_CHECKPOINT_IS_FOR_RESUME_ONLY_NOT_NORMAL_TASK_SUCCESS",
+    "next_task_rule": "AFTER_FULL_PIPELINE_GATE_PASS_DISPATCH_NEXT_INDEPENDENT_WORK_IMMEDIATELY"
+  }
 }
