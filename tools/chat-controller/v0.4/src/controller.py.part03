@@ -1938,6 +1938,74 @@ def localization_prepare_c_next_batch(active: dict, batch: list[dict], now: date
     invalidate_task_commit_cache(active["branch"], active["task_id"])
 
 
+async def localization_handle_discovered_commit(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    q: dict,
+    active: dict,
+    lane_key: str,
+    task_commit: dict,
+    now: datetime,
+) -> bool:
+    """Handle a newly observed localization commit; return False when it is already consumed."""
+    if CONTROLLER_MODE != "localization":
+        return False
+    sha = str(task_commit.get("sha") or "")
+    if lane_key in {"A", "B", "D"}:
+        if localization_producer_seen_result(active, sha):
+            return False
+        accepted = await localization_handle_producer_commit(
+            context, pages, q, active, task_commit, now
+        )
+        if accepted:
+            write_runtime(
+                status="producer_batch_complete",
+                last_action=(
+                    f"{active['task_id']} producer batch complete "
+                    f"candidates={active.get('pipeline_candidate_count', 0)}/"
+                    f"{LOCALIZATION_PRODUCER_TARGET_CANDIDATES}"
+                ),
+                queue=q,
+            )
+        else:
+            write_runtime(
+                status="producer_pipeline_active",
+                last_action=(
+                    f"{active['task_id']} checkpoint accepted; continuing same TASK "
+                    f"candidates={active.get('pipeline_candidate_count', 0)}/"
+                    f"{LOCALIZATION_PRODUCER_TARGET_CANDIDATES}"
+                ),
+                queue=q,
+            )
+        return True
+
+    if lane_key == "C":
+        if localization_c_result_seen(active, sha):
+            return False
+        handled = await localization_bind_c_commit(
+            context, pages, active, task_commit, now
+        )
+        if handled and active.get("phase") == "WAIT_ACTIONS":
+            if github_actions_skip_directive(str(active.get("result_message") or "")):
+                recovery = await recover_missing_gate_run(context, pages, active, now)
+                if recovery:
+                    action, reason = recovery
+                    write_runtime(
+                        status="qa_missing_gate_recovery",
+                        last_action=f"{active['task_id']} {action}: {reason}",
+                        queue=active,
+                    )
+            else:
+                write_runtime(
+                    status="qa_wait_actions",
+                    last_action=f"{active['task_id']} C batch result {sha[:8]} bound; exact Gate pending",
+                    queue=q,
+                )
+        return handled
+
+    return False
+
+
 async def localization_process_lane(
     context: BrowserContext,
     pages: dict[str, Page],
