@@ -18,10 +18,13 @@ def main() -> None:
 
     required = [
         '"lane": "DX11"',
+        '"branch": "vr-dx11-native-r71"',
         '"github_only_development": true',
         '"runtime_validation": "UNTESTED"',
         '"dxvk_lane_modified": false',
         '"localization_modified": false',
+        '"other_backend_modified": false',
+        '"native_draw_path_activation_changed": false',
     ]
     missing = [token for token in required if token not in state]
     if missing:
@@ -30,7 +33,10 @@ def main() -> None:
     if "DX11 Native is the primary implementation/performance lane" not in agents:
         raise SystemExit("DX11 priority policy marker missing")
 
-    print("DX11 conversion lane guard R201: PASS")
+    if "DXVK is the secondary implementation/performance lane" not in agents:
+        raise SystemExit("backend priority isolation marker missing")
+
+    print("DX11 conversion lane guard R202: PASS")
 
 
 if __name__ == "__main__":
