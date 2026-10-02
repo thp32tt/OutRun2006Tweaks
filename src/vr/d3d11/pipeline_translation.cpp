@@ -169,6 +169,10 @@ namespace outrun::vr::dx11
                 return fixed_function_argument_uses_texture(arg1);
             case D3DTOP_SELECTARG2:
                 return fixed_function_argument_uses_texture(arg2);
+            case D3DTOP_BLENDTEXTUREALPHA:
+                // R186: the blend factor itself is this stage's sampled
+                // texture alpha, even when neither argument selects texture.
+                return true;
             case D3DTOP_MODULATE:
             case D3DTOP_MODULATE2X:
             case D3DTOP_MODULATE4X:
@@ -273,6 +277,15 @@ namespace outrun::vr::dx11
                 // result alpha as the interpolation factor.
                 return first + " * current.a + " + second +
                        " * (1.0 - current.a)";
+            case D3DTOP_BLENDTEXTUREALPHA:
+            {
+                // R186: D3D9 BLENDTEXTUREALPHA uses this stage's sampled
+                // texture alpha as the scalar interpolation factor.
+                const auto textureAlpha =
+                    "sampled" + std::to_string(stageIndex) + ".a";
+                return first + " * " + textureAlpha + " + " + second +
+                       " * (1.0 - " + textureAlpha + ")";
+            }
             case D3DTOP_SUBTRACT:
                 // R177: D3D9 defines SUBTRACT as component-wise Arg1 - Arg2.
                 return first + " - " + second;
@@ -461,6 +474,7 @@ namespace outrun::vr::dx11
             case D3DTOP_ADDSMOOTH:
             case D3DTOP_BLENDDIFFUSEALPHA:
             case D3DTOP_BLENDCURRENTALPHA:
+            case D3DTOP_BLENDTEXTUREALPHA:
             case D3DTOP_SUBTRACT:
                 useArg1 = true;
                 useArg2 = true;

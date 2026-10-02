@@ -517,6 +517,39 @@ def main() -> None:
             + ", ".join(missing_d3dtop_blendcurrentalpha)
         )
 
+    r186_d3dtop_blendtexturealpha_contract = [
+        ("case D3DTOP_BLENDTEXTUREALPHA:", PIPELINE_TRANSLATION_CPP,
+         "R186 D3DTOP_BLENDTEXTUREALPHA readiness/translation case"),
+        ("even when neither argument selects texture.", PIPELINE_TRANSLATION_CPP,
+         "R186 intrinsic texture dependency"),
+        ('"sampled" + std::to_string(stageIndex) + ".a";',
+         PIPELINE_TRANSLATION_CPP, "R186 sampled texture-alpha factor"),
+        ("blendTextureAlphaStages[0].colorOp = D3DTOP_BLENDTEXTUREALPHA;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R186 hosted color fixture"),
+        ("blendTextureAlphaStages[0].alphaOp = D3DTOP_BLENDTEXTUREALPHA;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R186 hosted alpha fixture"),
+        ("float3 nextColor = input.diffuse.rgb * sampled0.a + current.rgb * (1.0 - sampled0.a);",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R186 RGB HLSL assertion"),
+        ("float nextAlpha = input.diffuse.a * sampled0.a + current.a * (1.0 - sampled0.a);",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R186 alpha HLSL assertion"),
+        ("R186 D3DTOP_BLENDTEXTUREALPHA fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R186 offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_BLENDTEXTUREALPHA support R186: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R186 hosted probe completion"),
+    ]
+    missing_r186_d3dtop_blendtexturealpha = [
+        meaning for token, source, meaning in r186_d3dtop_blendtexturealpha_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_BLENDTEXTUREALPHA:") < 3:
+        missing_r186_d3dtop_blendtexturealpha.append(
+            "R186 BLENDTEXTUREALPHA must participate in texture-use, HLSL and readiness switches")
+    if missing_r186_d3dtop_blendtexturealpha:
+        raise SystemExit(
+            "DX11 R186 fixed-function D3DTOP_BLENDTEXTUREALPHA contract drift: "
+            + ", ".join(missing_r186_d3dtop_blendtexturealpha)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
