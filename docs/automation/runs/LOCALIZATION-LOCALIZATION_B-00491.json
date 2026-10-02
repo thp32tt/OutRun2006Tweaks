@@ -1,0 +1,12 @@
+{
+  "TASK_ID": "LOCALIZATION-LOCALIZATION_B-00491",
+  "LANE": "LOCALIZATION_B",
+  "ROLE": "producer_B_self_QA",
+  "AUTOMATION_VALIDATION": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "result": "ADVANCED",
+  "reason": "Reconstructed task state from korean-localization-clean SSOT. Candidate DDS production was not falsely marked complete because verified RENDER_READY evidence with canonical source identity, rendered DDS output, hash and English-source comparison proof was not available in the inspected state.",
+  "next_required": "Continue B shard production from C-accepted RENDER_READY or ONE_STAGE_TO_RENDER material; produce DDS only with self-QA evidence.",
+  "commit_marker": "[AUTO:LOCALIZATION-LOCALIZATION_B-00491]"
+}
