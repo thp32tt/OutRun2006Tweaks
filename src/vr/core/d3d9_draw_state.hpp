@@ -43,6 +43,12 @@ namespace OutRunVR::DrawState
         // equivalent. Preserve it so enabled legacy dithering cannot be
         // silently accepted as the native default.
         DWORD ditherEnable = FALSE;
+        // R168: preserve line-raster provenance separately from topology.
+        // D3D11 can represent antialiased-line intent, but D3D10+ removed
+        // D3D9 LASTPIXEL control, so direct line draws remain fail-closed
+        // until endpoint coverage is explicitly emulated.
+        DWORD lastPixel = TRUE;
+        DWORD antialiasedLineEnable = FALSE;
         // R161: D3D9 user clipping is not reproduced by the native DX11
         // fixed-function path. Preserve both gates so non-default semantics
         // fail closed instead of being erased by DepthClipEnable=TRUE.

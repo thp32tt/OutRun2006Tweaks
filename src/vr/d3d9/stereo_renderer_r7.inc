@@ -927,6 +927,7 @@ namespace OutRunVRStereo
 				D3DRS_CULLMODE, D3DRS_COLORWRITEENABLE,
 				D3DRS_DEPTHBIAS, D3DRS_SLOPESCALEDEPTHBIAS,
 				D3DRS_DITHERENABLE,
+				D3DRS_LASTPIXEL, D3DRS_ANTIALIASEDLINEENABLE,
 				D3DRS_CLIPPING, D3DRS_CLIPPLANEENABLE,
 				D3DRS_STENCILENABLE, D3DRS_STENCILMASK,
 				D3DRS_STENCILWRITEMASK, D3DRS_STENCILREF,
@@ -1725,6 +1726,11 @@ namespace OutRunVRStereo
 		// R165 preserves legacy dithering provenance. Native DX11 has no
 		// matching switch, so readiness must see and reject the enabled case.
 		read(D3DRS_DITHERENABLE, out.ditherEnable);
+		// R168 preserves line-raster provenance. LASTPIXEL cannot be directly
+		// represented by D3D11 and therefore remains a separate activation
+		// blocker; ANTIALIASEDLINEENABLE maps to rasterizer state below.
+		read(D3DRS_LASTPIXEL, out.lastPixel);
+		read(D3DRS_ANTIALIASEDLINEENABLE, out.antialiasedLineEnable);
 		// R161 keeps D3D9 clipping/user-plane semantics explicit for DX11
 		// readiness instead of silently assuming the D3D11 default.
 		read(D3DRS_CLIPPING, out.clipping);

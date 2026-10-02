@@ -6618,6 +6618,69 @@ def main() -> None:
             "DX11 R108-R111 observation-only registry mirror API gained a runtime census caller"
         )
 
+    r168_line_raster_contract = [
+        (
+            "DWORD lastPixel = TRUE;",
+            DRAW_STATE_HEADER,
+            "R168 LASTPIXEL snapshot provenance",
+        ),
+        (
+            "DWORD antialiasedLineEnable = FALSE;",
+            DRAW_STATE_HEADER,
+            "R168 antialiased-line snapshot provenance",
+        ),
+        (
+            "D3DRS_LASTPIXEL, D3DRS_ANTIALIASEDLINEENABLE",
+            STEREO_R7,
+            "R168 tracked line-raster priming",
+        ),
+        (
+            "read(D3DRS_LASTPIXEL, out.lastPixel);",
+            STEREO_R7,
+            "R168 LASTPIXEL capture",
+        ),
+        (
+            "read(D3DRS_ANTIALIASEDLINEENABLE, out.antialiasedLineEnable);",
+            STEREO_R7,
+            "R168 antialiased-line capture",
+        ),
+        (
+            "out.rasterizer.AntialiasedLineEnable =\n            source.antialiasedLineEnable != FALSE;",
+            PIPELINE_TRANSLATION_CPP,
+            "R168 D3D11 line-AA translation",
+        ),
+        (
+            "primitive != D3DPT_LINELIST && primitive != D3DPT_LINESTRIP;",
+            NATIVE_BACKEND_CPP,
+            "R168 LASTPIXEL keeps direct lines fail closed",
+        ),
+        (
+            "R168 D3D9 antialiased-line intent reaches D3D11 rasterizer state",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R168 positive line-AA translation probe",
+        ),
+        (
+            "R168 LASTPIXEL remains dispatch-scoped rather than globally blocking triangles",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R168 LASTPIXEL scope probe",
+        ),
+        (
+            "DX11 line-raster provenance R168: PASS",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R168 hosted probe completion marker",
+        ),
+    ]
+    missing_r168_line_raster = [
+        meaning
+        for token, source, meaning in r168_line_raster_contract
+        if token not in source
+    ]
+    if missing_r168_line_raster:
+        raise SystemExit(
+            "DX11 R168 line-raster provenance drift: "
+            + ", ".join(missing_r168_line_raster)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

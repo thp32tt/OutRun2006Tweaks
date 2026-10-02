@@ -1474,7 +1474,12 @@ namespace outrun::vr::dx11
         out.rasterizer.ScissorEnable =
             source.scissorTestEnable != FALSE;
         out.rasterizer.MultisampleEnable = FALSE;
-        out.rasterizer.AntialiasedLineEnable = FALSE;
+        // R168: D3D11 retains an explicit antialiased-line switch, so carry
+        // the captured D3D9 intent instead of silently forcing it off.
+        // LASTPIXEL has no D3D11 rasterizer equivalent and remains guarded at
+        // direct-line dispatch readiness rather than being misrepresented here.
+        out.rasterizer.AntialiasedLineEnable =
+            source.antialiasedLineEnable != FALSE;
 
         // R161: the native path currently assumes normal D3D9 frustum
         // clipping and does not emit SV_ClipDistance for user clip planes.

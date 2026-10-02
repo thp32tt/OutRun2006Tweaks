@@ -321,7 +321,34 @@ int main()
             "R165 fixed-function shader handoff must retain dithering blocker");
     }
 
+    {
+        auto lineRaster = base_state();
+        lineRaster.lastPixel = TRUE;
+        lineRaster.antialiasedLineEnable = FALSE;
+        const auto aliasedLinePipeline = translate_pipeline(lineRaster);
+        require(
+            aliasedLinePipeline.exact() &&
+            aliasedLinePipeline.rasterizer.AntialiasedLineEnable == FALSE,
+            "R168 aliased D3D9 line intent maps to disabled D3D11 line AA");
+
+        auto antialiasedLine = lineRaster;
+        antialiasedLine.antialiasedLineEnable = TRUE;
+        const auto antialiasedLinePipeline = translate_pipeline(antialiasedLine);
+        require(
+            antialiasedLinePipeline.exact() &&
+            antialiasedLinePipeline.rasterizer.AntialiasedLineEnable == TRUE,
+            "R168 D3D9 antialiased-line intent reaches D3D11 rasterizer state");
+
+        auto noLastPixel = lineRaster;
+        noLastPixel.lastPixel = FALSE;
+        const auto noLastPixelPipeline = translate_pipeline(noLastPixel);
+        require(
+            noLastPixelPipeline.exact(),
+            "R168 LASTPIXEL remains dispatch-scoped rather than globally blocking triangles");
+    }
+
     std::cout
+        << "DX11 line-raster provenance R168: PASS\n"
         << "DX11 fixed-function dithering fail-closed R165: PASS\n"
         << "DX11 fixed-function vertex-blend fail-closed R163: PASS\n"
         << "DX11 fixed-function clipping fail-closed R161: PASS\n"

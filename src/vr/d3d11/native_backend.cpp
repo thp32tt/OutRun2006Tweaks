@@ -5431,9 +5431,10 @@ compose_fixed_function_direct_draw_dispatch_readiness(
     // point-sprite raster state is captured and translated. Topology alone
     // is not sufficient evidence of fixed-function raster equivalence.
     out.pointRasterSemanticsExact = primitive != D3DPT_POINTLIST;
-    // R157 keeps LINELIST/LINESTRIP fail-closed until D3D9 line-raster
-    // semantics such as LASTPIXEL and ANTIALIASEDLINEENABLE are captured and
-    // translated. Exact topology/arguments alone cannot prove raster parity.
+    // R168 captures/translates ANTIALIASEDLINEENABLE, but D3D10+ removed
+    // D3D9 LASTPIXEL control. Exact topology/arguments plus AA state still
+    // cannot prove endpoint coverage, so direct line draws remain fail-closed
+    // until LASTPIXEL is explicitly emulated.
     out.lineRasterSemanticsExact =
         primitive != D3DPT_LINELIST && primitive != D3DPT_LINESTRIP;
     out.dispatchArgumentsExact =

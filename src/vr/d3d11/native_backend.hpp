@@ -1711,8 +1711,9 @@ struct NativeFixedFunctionDirectDrawDispatchReadiness {
     // R155: D3D9 POINTLIST raster behavior depends on point-size/point-sprite
     // state that is not yet sealed by the dormant DX11 draw snapshot.
     bool pointRasterSemanticsExact{};
-    // R157: direct D3D9 line primitives also depend on line-raster state
-    // (including LASTPIXEL/ANTIALIASEDLINEENABLE) that is not yet sealed.
+    // R168: ANTIALIASEDLINEENABLE is captured and translated, but D3D10+
+    // removed D3D9 LASTPIXEL control. Keep direct lines fail-closed until
+    // endpoint coverage is explicitly emulated and sealed.
     bool lineRasterSemanticsExact{};
     bool bufferRangeExact{};
     bool dispatchArgumentsExact{};
