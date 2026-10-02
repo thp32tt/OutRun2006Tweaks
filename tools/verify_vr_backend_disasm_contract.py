@@ -376,10 +376,61 @@ def verify_dxvk_continuation_chain() -> None:
                 f"{raw_call_census_guard}"
             )
 
+        # Keep declared direct relative BRANCH metadata tied to the exact
+        # decoded instruction rows. This catches off-by-one/stale branch RVAs,
+        # omitted direct branches, and target-displacement drift before the
+        # canonical-EXE execution stage. Recognize the branch encodings used by
+        # continuation proofs: rel8 Jcc/JMP and rel32 Jcc/JMP.
+        instruction_rows = value(f"{prefix}_INSTRUCTIONS")
+        declared_branches = analyzer.get(f"{prefix}_BRANCHES", ())
+        direct_branch_rows: dict[int, tuple[bytes, int]] = {}
+        for instruction_rva, instruction_hex, _instruction_asm in instruction_rows:
+            encoded = bytes.fromhex(instruction_hex)
+            decoded_target_rva = None
+            if len(encoded) == 2 and (
+                encoded[0] == 0xEB or 0x70 <= encoded[0] <= 0x7F
+            ):
+                rel8 = int.from_bytes(encoded[1:2], byteorder="little", signed=True)
+                decoded_target_rva = (instruction_rva + 2 + rel8) & 0xFFFFFFFF
+            elif len(encoded) == 5 and encoded[0] == 0xE9:
+                rel32 = int.from_bytes(encoded[1:5], byteorder="little", signed=True)
+                decoded_target_rva = (instruction_rva + 5 + rel32) & 0xFFFFFFFF
+            elif (
+                len(encoded) == 6
+                and encoded[0] == 0x0F
+                and 0x80 <= encoded[1] <= 0x8F
+            ):
+                rel32 = int.from_bytes(encoded[2:6], byteorder="little", signed=True)
+                decoded_target_rva = (instruction_rva + 6 + rel32) & 0xFFFFFFFF
+            if decoded_target_rva is not None:
+                direct_branch_rows[instruction_rva] = (encoded, decoded_target_rva)
+
+        declared_branch_rvas = [
+            branch_rva for branch_rva, _target_rva in declared_branches
+        ]
+        if len(declared_branch_rvas) != len(set(declared_branch_rvas)):
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} declares duplicate direct BRANCH RVAs: "
+                f"{declared_branch_rvas}"
+            )
+        if set(direct_branch_rows) != set(declared_branch_rvas):
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} direct BRANCH declaration drift: "
+                f"instruction_rvas={sorted(direct_branch_rows)} "
+                f"declared_rvas={sorted(declared_branch_rvas)}"
+            )
+        for branch_rva, expected_target_rva in declared_branches:
+            _encoded, decoded_target_rva = direct_branch_rows[branch_rva]
+            if decoded_target_rva != expected_target_rva:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} direct BRANCH target drift at "
+                    f"0x{branch_rva:08X}: declared=0x{expected_target_rva:08X} "
+                    f"decoded=0x{decoded_target_rva:08X}"
+                )
+
         # Keep declared direct rel32 CALL metadata tied to the exact decoded
         # instruction rows. This catches off-by-one CALL RVAs or stale targets
         # before canonical-EXE execution reaches telemetry formatting/census.
-        instruction_rows = value(f"{prefix}_INSTRUCTIONS")
         declared_calls = analyzer.get(f"{prefix}_CALLS", ())
         direct_rel32_rows: dict[int, bytes] = {}
         for instruction_rva, instruction_hex, _instruction_asm in instruction_rows:
