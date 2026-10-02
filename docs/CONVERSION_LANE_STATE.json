@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "c01bb339838d98fb9156a47a5d93fd42d909b539",
+  "state_parent_head": "327df620b925f488ac828e83c624ba7a8e49d0d3",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,15 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e",
-    "validation_bearing_sha": "c1c3838e4eb82d35d8ba9cc5a7c2d8481caef10e",
-    "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_DESCENDANT_GATE",
+    "result_sha": "c7fedf8a12e784ae38b21adf04b9f76333a0b031",
+    "validation_bearing_sha": "c7fedf8a12e784ae38b21adf04b9f76333a0b031",
+    "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_CI_SUPERSEDED_BY_DESCENDANT_PUSH",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. SRC1 dual-source blend remains fail-closed until a proven second pixel-shader output/linkage path exists.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until parity proof.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Consume a non-superseded hosted dx11_constant_buffer_probe result when available, then feed R121 MANAGED buffer plan exactness into dormant per-resource census/readiness while retaining R119 stale-mirror rejection and all exhaustive-census/Quest 3 activation gates.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Obtain a non-superseded hosted dx11_constant_buffer_probe/source-graph result for the R125 exact-plan consumer, then feed exact MANAGED buffer plan/readiness into dormant per-resource census while retaining R119 stale-mirror validation and exhaustive-census/Quest 3 activation gates.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -206,6 +206,17 @@
       "material_result_sha": "6432ca4ad0b8d70f01678990debc376c8d8bee82",
       "validation_bearing_sha": "6432ca4ad0b8d70f01678990debc376c8d8bee82",
       "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false
+    },
+    {
+      "unit_id": "DX11_MANAGED_BUFFER_EXACT_PLAN_CONSUMER_R125",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "8a7476d55634ed0c72a5bc5fb3fcfc3f86ce8a1d",
+      "guard_result_sha": "c7fedf8a12e784ae38b21adf04b9f76333a0b031",
+      "validation_bearing_sha": "c7fedf8a12e784ae38b21adf04b9f76333a0b031",
+      "automation_validation": "PASS_REMOTE_STATIC_CONTRACT_CI_SUPERSEDED_BY_DESCENDANT_PUSH",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false
