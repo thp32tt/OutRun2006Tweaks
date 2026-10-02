@@ -156,6 +156,64 @@
       "issue14_implementation_comment_id": 5946754878,
       "scope": "Auto-discovered continuation stages must have canonical analyzer report bindings and nonzero failure guards.",
       "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER"
+    },
+    {
+      "unit_id": "DXVK_SESSION_CREATE_ATTESTATION_IDENTITY",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "c3673c9717b7023073e6d1710943a15140106d2e",
+      "commit_message": "fix: validate DXVK creation attestation IDs [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_dxvk_session.py",
+        "tools/test_analyze_dxvk_session.py"
+      ],
+      "summary": "Fail closed when create-device provider attestation IDs are non-positive or duplicated, and select the newest creation probe by the producer's process-global attestation sequence rather than log-file enumeration order.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch/AGENTS/lane/task/regression state and Issue #14 while concurrent disassembly work advanced on the same JOB_ID."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected an independent DXVK static evidence-integrity gap to avoid duplicating the concurrently advancing canonical continuation frontier. Producer code proves ProviderAttestationSequence is process-global and monotonically increasing."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit c3673c9717b7023073e6d1710943a15140106d2e adds positive/unique creation-attestation ID validation, max-sequence newest-probe selection, report fields, and duplicate/file-order regression cases."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Backend Conversion Gate run 36974515952 job 110735335916 on exact SHA c3673c9717b7023073e6d1710943a15140106d2e passed Test DXVK session analyzer plus all static contract steps through application-space recenter. Win32 configure/build remained in progress at state write and is not required for this Python evidence-integrity unit."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive source/test commit c3673c9717b7023073e6d1710943a15140106d2e contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5946842078 records the change and validation scope."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Session-analysis Python tooling/test hardening only; no runtime payload, selector, packaged backend binary, or deployment content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit without replacing the newer primary canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "c3673c9717b7023073e6d1710943a15140106d2e",
+        "backend_conversion_gate_run_id": 36974515952,
+        "backend_conversion_gate_job_id": 110735335916,
+        "targeted_test": "Test DXVK session analyzer",
+        "targeted_test_conclusion": "success",
+        "static_steps_through_recenter": "success",
+        "win32_build": "IN_PROGRESS_AT_STATE_WRITE_NOT_REQUIRED_FOR_UNIT",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5946842078,
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the current primary disassembly frontier from the newest branch state. For future DXVK session evidence, treat DXVK_DEVICE_CREATION_ATTESTATION_IDS_INVALID as a fail-closed provider-identity failure and never promote runtime identity from duplicated/replayed creation attestation IDs."
     }
   ]
 }
