@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "c80739b5c36b0cf2f920da12db769451eee28e19",
+  "state_parent_head": "ac68ca9e2cae30130387bdb1e9a42fb6c8717c12",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,15 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "b41263b81180606a5902250c17382c7879e69a00",
-    "validation_bearing_sha": "b41263b81180606a5902250c17382c7879e69a00",
-    "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_AND_CENSUS_BUILD_CANCELLED_BY_DESCENDANT_CHURN",
+    "result_sha": "44989d0f7f35b268db8415a7e5f2b19ff0561278",
+    "validation_bearing_sha": "44989d0f7f35b268db8415a7e5f2b19ff0561278",
+    "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. R138 now composes live RS/OM readback into final dormant bound-draw readiness; later descendants strengthen same-context and IA geometry evidence, but none activate Draw*.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until Quest 3/VDXR parity proof.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Do not duplicate completed R138 or the current descendant R139/R140 same-context/live-IA work. First consume a non-superseded CI result for the R140 complete-bound-draw contract now present through 395a9fbdac2d6b4eec951cbd09ed7ba9eef14557; it must retain exact live pipeline, aggregate PS, RS/OM and VB/optional-IB/stride/offset/index-format/topology evidence without a production Draw* caller. If that static/build gate passes, perform a fresh source-wide review for the next dormant conversion gap. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Do not duplicate completed R141 or the current descendant R142 generated-fan final-readiness work. Current descendants already implement, probe and harden R142; first consume a non-superseded static/build result for that latest contract, then perform a fresh source-wide review for the next dormant conversion gap (including live OM RTV/DSV target identity if it is still only provenance-sealed). Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -413,6 +413,18 @@
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5947178276,
       "run_state_commit": "b0a090fa55cdf6748a148ea01abb1c13b1b231a1"
+    },
+    {
+      "unit_id": "DX11_GENERATED_FAN_LIVE_IA_HARDENING_R141",
+      "task_id": "CONV-DX11-000001",
+      "source_implementation_sha": "2b37693baf999be400b6127762291aa3339c908a",
+      "material_result_sha": "44989d0f7f35b268db8415a7e5f2b19ff0561278",
+      "validation_bearing_sha": "44989d0f7f35b268db8415a7e5f2b19ff0561278",
+      "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5947277201
     }
   ]
 }

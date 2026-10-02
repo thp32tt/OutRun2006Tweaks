@@ -4,87 +4,69 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "8dcec97abd7b1bfb05c9ccd57ed73c3d334af582",
-  "state_parent_head": "13f03a7bfd929e5db5bcfa08f1025b852eaec797",
-  "material_result_sha": "b41263b81180606a5902250c17382c7879e69a00",
-  "validation_bearing_sha": "b41263b81180606a5902250c17382c7879e69a00",
+  "base_sha": "0aa9ce3c0005e83a674ce8bd59d3e044ec67c113",
+  "state_parent_head": "ac68ca9e2cae30130387bdb1e9a42fb6c8717c12",
+  "material_result_sha": "44989d0f7f35b268db8415a7e5f2b19ff0561278",
+  "validation_bearing_sha": "44989d0f7f35b268db8415a7e5f2b19ff0561278",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_SAME_CONTEXT_FINAL_BOUND_DRAW",
-  "selection_reason": "R138 reobserved live RS/OM state on the final caller context but still accepted precomputed textured-draw and pipeline-binding readiness values. That left a static evidence-splicing gap: final dormant readiness could combine aggregate PS and IA/VS/PS evidence captured from a different context. The selected unit closes that gap without activating game Draw*.",
-  "summary": "Added a same-context final dormant bound-draw composition entrypoint that reobserves all required aggregate PS sampler/SRV bindings and IA/VS/PS pipeline identity on one caller-supplied D3D11 context, then composes them with R138 live RS/OM evidence. Added positive, PS-pipeline drift, aggregate-PS drift, RS/OM drift and deterministic-restore probes plus a production-caller source-graph guard.",
+  "selected_work": "DX11_GENERATED_FAN_LIVE_IA_HARDENING_R141",
+  "selection_reason": "After consuming R140 static evidence, a fresh branch-wide review found R141 generated-fan live IA implementation/probes landing concurrently while exact-SHA CI exposed stale R126/R141 source-graph text and live index-format/index-offset branches lacked direct probe coverage. This unit hardens that static boundary without duplicating the completed R141 implementation.",
+  "summary": "Hardened R141 generated triangle-fan live IA evidence with explicit nonzero R32_UINT index-offset drift and wrong R16_UINT index-format fail-closed probes, deterministic restoration, and stale source-graph marker repair. Exact material-SHA static gates passed through DX11 census; Configure was cancelled by descendant branch churn. Native Draw* remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read current GitHub HEAD, AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/automation/runs/CONV-DX11-000001.json, current work queue/regression history and Issue #14 through the authenticated GitHub connector.",
-        "Detected rapid same-branch descendants throughout the run, used GitHub blob/ref authority for each write, and verified b41263b81180606a5902250c17382c7879e69a00 remains an ancestor of current descendants."
+        "Read current GitHub HEAD, AGENTS.md, branch-local state/task, regression knowledge/history and Issue #14 through authenticated GitHub.",
+        "Tracked rapid same-branch descendants and preserved them through fast-forward-only writes; material SHA remains an ancestor of current HEAD."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Confirmed R138 final bound-draw composition reobserved R137 output binding from the supplied context but trusted caller-provided NativeFixedFunctionTexturedDrawReadiness and NativeFixedFunctionPipelineBindingReadiness.",
-        "Confirmed aggregate PS readiness and pipeline binding APIs can reobserve their own live state, so the final composer could own those observations and eliminate cross-context readiness splicing without issuing Draw*."
+        "Consumed R140 static gate evidence before selecting the next frontier.",
+        "Found R141 source/probes concurrently landed, exact-SHA Backend Conversion Gate 36977616593 failed at stale R126/R141 source-graph text, and format/offset live IA branches lacked direct probe coverage."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
-        "src/vr/d3d11/native_backend.hpp",
-        "src/vr/d3d11/native_backend.cpp",
-        "tools/dx11_constant_buffer_probe.cpp",
+        "tools/dx11_triangle_fan_index_buffer_probe.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "dea813a4511d9dd3a3d6ded8ee65843b46823f26",
-        "d17fa7f70edf5a57713e04e853d00898ff9f5781",
-        "75a6ca3123093ab32941a663908c1ade8ea2e9e5",
-        "b41263b81180606a5902250c17382c7879e69a00"
+        "44989d0f7f35b268db8415a7e5f2b19ff0561278"
       ],
       "details": [
-        "Added compose_fixed_function_same_context_bound_draw_readiness and validator declarations.",
-        "The implementation reobserves multi-stage textured-draw readiness and pipeline binding readiness on the same context, then delegates to R138 for live RS/OM reobservation.",
-        "Added WARP-oriented probes for positive same-context composition, live PS pipeline drift, aggregate PS drift, live RS/OM drift, and deterministic restore.",
-        "Extended verify_dx11_source_graph.py with the same-context contract and production-caller dormancy guard."
+        "Added fail-closed nonzero index-offset and wrong-index-format live generated-fan IA probes.",
+        "Added deterministic restore validation after drift.",
+        "Aligned stale duplicate R141 guard tokens with actual probe contract."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_EXACT_STATIC_BUILD_CANCELLED_BY_DESCENDANT_CHURN",
-      "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_AND_CENSUS_BUILD_CANCELLED_BY_DESCENDANT_CHURN",
+      "status": "COMPLETE_REMOTE_STATIC_DESCENDANT_CONFIGURE_CANCELLED",
+      "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
       "evidence": [
-        "Exact result SHA b41263b81180606a5902250c17382c7879e69a00 Build run 36976922508 job 110742662857 passed Checkout, HMD baseline, one-click structure, backend disassembly contract, Verify DX11 source graph, Test DX11 census analyzer and consolidated wheel source.",
-        "The same exact-SHA job was cancelled by descendant branch churn before Configure/Build, so Win32 compiler/WARP execution success is not claimed.",
-        "One explicit job rerun (job 110743065327) was also cancelled by descendant branch churn before the DX11 source-graph/compile stages; the already-recorded first-attempt exact-SHA static successes remain the validation evidence.",
-        "GitHub compare proved b41263b81180606a5902250c17382c7879e69a00 is retained as an ancestor of newer branch descendants."
+        "Backend Conversion Gate 36977822060 on exact material SHA passed queue/baseline/structure/backend-disassembly/session-analysis, DX11 transport, dual-source, DX11 source graph, dormant activation boundary and DX11 census analyzer.",
+        "Configure Win32 was cancelled by later same-branch descendants; no Win32 build or WARP executable PASS is claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "b41263b81180606a5902250c17382c7879e69a00",
-      "implementation_commits": [
-        "dea813a4511d9dd3a3d6ded8ee65843b46823f26",
-        "d17fa7f70edf5a57713e04e853d00898ff9f5781",
-        "75a6ca3123093ab32941a663908c1ade8ea2e9e5",
-        "b41263b81180606a5902250c17382c7879e69a00"
-      ],
-      "issue14_comment_id": 5947178276
+      "material_commit": "44989d0f7f35b268db8415a7e5f2b19ff0561278",
+      "issue14_comment_id": 5947277201
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant DX11 readiness, probe and static-guard work only. No native game Draw* route, backend activation/promotion, OpenXR transport, localization or release package selection changed."
+      "reason": "Dormant DX11 test/guard hardening only; no native Draw* routing, activation, OpenXR transport, localization or release packaging changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Do not duplicate completed R138 or the current descendant R139/R140 same-context/live-IA work. First consume a non-superseded CI result for the R140 complete-bound-draw contract now present through 395a9fbdac2d6b4eec951cbd09ed7ba9eef14557; it must retain exact live pipeline, aggregate PS, RS/OM and VB/optional-IB/stride/offset/index-format/topology evidence without a production Draw* caller. If that static/build gate passes, perform a fresh source-wide review for the next dormant conversion gap. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
-      "state_commits": [
-        "b0a090fa55cdf6748a148ea01abb1c13b1b231a1",
-        "13f03a7bfd929e5db5bcfa08f1025b852eaec797"
-      ]
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Do not duplicate completed R141 or the current descendant R142 generated-fan final-readiness work. Current descendants already implement, probe and harden R142; first consume a non-superseded static/build result for that latest contract, then perform a fresh source-wide review for the next dormant conversion gap (including live OM RTV/DSV target identity if it is still only provenance-sealed). Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -94,21 +76,21 @@
     "dxvk_lane_modified": false,
     "localization_modified": false
   },
-  "issue14_comment_id": 5947178276,
-  "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_AND_CENSUS_BUILD_CANCELLED_BY_DESCENDANT_CHURN",
-  "blocker": "Hosted Win32 Configure/Build and WARP probe execution for exact SHA b41263b81180606a5902250c17382c7879e69a00 were skipped after repeated descendant branch churn. This does not invalidate the exact-SHA source-graph/census successes and does not block independent GitHub-only static work. Runtime hardware validation was not performed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Do not duplicate completed R138 or the current descendant R139/R140 same-context/live-IA work. First consume a non-superseded CI result for the R140 complete-bound-draw contract now present through 395a9fbdac2d6b4eec951cbd09ed7ba9eef14557; it must retain exact live pipeline, aggregate PS, RS/OM and VB/optional-IB/stride/offset/index-format/topology evidence without a production Draw* caller. If that static/build gate passes, perform a fresh source-wide review for the next dormant conversion gap. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5947277201,
+  "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+  "blocker": "Hosted Win32 Configure/Build and WARP probe execution for exact material SHA were superseded by descendant branch churn after all relevant static gates passed. Runtime hardware validation was not performed.",
+  "next_action": "Keep NativeDrawPathActive disabled. Do not duplicate completed R141 or the current descendant R142 generated-fan final-readiness work. Current descendants already implement, probe and harden R142; first consume a non-superseded static/build result for that latest contract, then perform a fresh source-wide review for the next dormant conversion gap (including live OM RTV/DSV target identity if it is still only provenance-sealed). Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
   "prior_completed_unit": {
-    "selected_work": "DX11_FINAL_BOUND_DRAW_LIVE_OUTPUT_BINDING_R138",
-    "material_result_sha": "ecccde1dc4c14061ee116474f808ab090661db1c",
-    "validation_bearing_sha": "8dcec97abd7b1bfb05c9ccd57ed73c3d334af582",
-    "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_GATES_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+    "selected_work": "DX11_SAME_CONTEXT_FINAL_BOUND_DRAW",
+    "material_result_sha": "b41263b81180606a5902250c17382c7879e69a00",
+    "validation_bearing_sha": "b41263b81180606a5902250c17382c7879e69a00",
+    "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_AND_CENSUS_BUILD_CANCELLED_BY_DESCENDANT_CHURN",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
-    "issue14_comment_id": 5947157876
+    "issue14_comment_id": 5947178276
   }
 }
