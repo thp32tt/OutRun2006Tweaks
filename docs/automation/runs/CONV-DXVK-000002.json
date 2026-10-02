@@ -55,7 +55,7 @@
     },
     "C3_VALIDATE": {
       "status": "COMPLETE",
-      "evidence": "Exact SHA b2e0f73a64aa00b4290f54db7196e39c88f9cd74 passed DXVK Canonical Disassembly Evidence run 36979358581/job 110750121123 against canonical EXE SHA256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3; backend disassembly contract OK and proof status EXACT_182D93_TO_182DCF_CONTROL_FLOW_CAPTURE_EDGE_PROVEN. Backend Conversion Gate 36979358483 had all static contract steps through recenter PASS and was still building Win32 at state write; full build is not required for this static proof and is not claimed."
+      "evidence": "Exact SHA b2e0f73a64aa00b4290f54db7196e39c88f9cd74 passed DXVK Canonical Disassembly Evidence run 36979358581/job 110750121123 and Backend Conversion Gate run 36979358483/job 110750120184. Canonical proof status is EXACT_182D93_TO_182DCF_CONTROL_FLOW_CAPTURE_EDGE_PROVEN; Win32 configure/build, binary verification and artifact upload all passed."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
@@ -104,8 +104,15 @@
     "capture_edge_matches": true,
     "backend_conversion_gate_run_id": 36979358483,
     "backend_static_steps_through_recenter": "PASS",
-    "full_win32_build": "IN_PROGRESS_AT_STATE_WRITE_NOT_REQUIRED_FOR_STATIC_PROOF_NOT_CLAIMED",
-    "runtime_validation": "UNTESTED"
+    "full_win32_build": "PASS",
+    "runtime_validation": "UNTESTED",
+    "backend_conversion_gate_job_id": 110750120184,
+    "backend_conversion_gate_conclusion": "success",
+    "configure_win32": "PASS",
+    "build_win32": "PASS",
+    "binary_exists": "PASS",
+    "backend_conversion_gate_artifact_id": 11215226232,
+    "backend_conversion_gate_artifact_digest": "sha256:6713022192b04c6a1a45acdc393f92724f56632bc3ebabb935a3bd77795a945e"
   },
   "follow_on_frontier": {
     "proof_sha": "b2e0f73a64aa00b4290f54db7196e39c88f9cd74",
@@ -161,7 +168,8 @@
     5947388153,
     5947402349,
     5947440962,
-    5947472184
+    5947472184,
+    5947562196
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -2268,7 +2276,7 @@
         },
         "C3_VALIDATE": {
           "status": "COMPLETE",
-          "evidence": "Exact SHA b2e0f73a64aa00b4290f54db7196e39c88f9cd74 passed DXVK Canonical Disassembly Evidence run 36979358581/job 110750121123 against canonical EXE SHA256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3; backend disassembly contract OK and proof status EXACT_182D93_TO_182DCF_CONTROL_FLOW_CAPTURE_EDGE_PROVEN. Backend Conversion Gate 36979358483 had all static contract steps through recenter PASS and was still building Win32 at state write; full build is not required for this static proof and is not claimed."
+          "evidence": "Exact SHA b2e0f73a64aa00b4290f54db7196e39c88f9cd74 passed DXVK Canonical Disassembly Evidence run 36979358581/job 110750121123 and Backend Conversion Gate run 36979358483/job 110750120184, including Win32 configure/build, binary verification and artifact upload."
         },
         "C4_COMMIT": {
           "status": "COMPLETE",
@@ -2317,8 +2325,15 @@
         "capture_edge_matches": true,
         "backend_conversion_gate_run_id": 36979358483,
         "backend_static_steps_through_recenter": "PASS",
-        "full_win32_build": "IN_PROGRESS_AT_STATE_WRITE_NOT_REQUIRED_FOR_STATIC_PROOF_NOT_CLAIMED",
-        "runtime_validation": "UNTESTED"
+        "full_win32_build": "PASS",
+        "runtime_validation": "UNTESTED",
+        "backend_conversion_gate_job_id": 110750120184,
+        "backend_conversion_gate_conclusion": "success",
+        "configure_win32": "PASS",
+        "build_win32": "PASS",
+        "binary_exists": "PASS",
+        "backend_conversion_gate_artifact_id": 11215226232,
+        "backend_conversion_gate_artifact_digest": "sha256:6713022192b04c6a1a45acdc393f92724f56632bc3ebabb935a3bd77795a945e"
       },
       "issue14_implementation_comment_id": 5947472184,
       "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_ONLY",
@@ -2326,7 +2341,8 @@
       "semantic_promotion": "NONE",
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
-      "exact_next_action": "Capture the next bounded canonical continuation starting at 0x00182DCF with mandatory overlap bytes 83 3d 60 bc. Keep that fresh window raw-only until canonical provenance succeeds; then exact-decode only complete instructions and resolve forward target 0x00182E34 only with exact instruction-boundary evidence. Keep function/render/HUD/runtime semantics unresolved."
+      "exact_next_action": "Capture the next bounded canonical continuation starting at 0x00182DCF with mandatory overlap bytes 83 3d 60 bc. Keep that fresh window raw-only until canonical provenance succeeds; then exact-decode only complete instructions and resolve forward target 0x00182E34 only with exact instruction-boundary evidence. Keep function/render/HUD/runtime semantics unresolved.",
+      "issue14_validation_comment_id": 5947562196
     }
   ]
 }
