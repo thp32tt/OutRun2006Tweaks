@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
-"""Static guard helper for DX11 conversion lane invariants."""
+"""Static guard helper for DX11 conversion lane invariants.
+
+This is a repository-only check. It does not claim runtime validation.
+"""
 
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+REQUIRED_STATE_TOKENS = (
+    "NativeDrawPathActive disabled",
+    '"runtime_validation": "UNTESTED"',
+)
 
 
 def require_file_token(relative_path: str, token: str) -> None:
@@ -14,17 +23,15 @@ def require_file_token(relative_path: str, token: str) -> None:
         )
 
 
-def main() -> None:
-    # Keep activation disabled until exact-build/runtime evidence exists.
-    require_file_token(
-        "docs/CONVERSION_LANE_STATE.json",
-        "NativeDrawPathActive disabled",
-    )
-    require_file_token(
-        "docs/CONVERSION_LANE_STATE.json",
-        "runtime_validation",
-    )
+def main() -> int:
+    state_file = "docs/CONVERSION_LANE_STATE.json"
+    for token in REQUIRED_STATE_TOKENS:
+        require_file_token(state_file, token)
+
+    print("DX11_CONVERSION_LANE_GUARD=PASS")
+    print("RUNTIME_VALIDATION=UNTESTED")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
