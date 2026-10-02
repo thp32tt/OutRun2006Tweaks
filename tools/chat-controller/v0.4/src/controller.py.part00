@@ -82,6 +82,11 @@ MEMORY_IDLE_RESTART_PERCENT = max(50.0, min(95.0, float(os.getenv("MEMORY_IDLE_R
 MEMORY_FATAL_RESTART_PERCENT = max(MEMORY_IDLE_RESTART_PERCENT + 1.0, min(99.0, float(os.getenv("MEMORY_FATAL_RESTART_PERCENT", "92"))))
 LOCALIZATION_QA_BATCH_SIZE = max(1, int(os.getenv("LOCALIZATION_QA_BATCH_SIZE", "4")))
 LOCALIZATION_QA_COALESCE_SECONDS = max(0, int(os.getenv("LOCALIZATION_QA_COALESCE_SECONDS", "60")))
+LOCALIZATION_PRODUCER_TARGET_CANDIDATES = max(1, int(os.getenv("LOCALIZATION_PRODUCER_TARGET_CANDIDATES", "2")))
+LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS = max(
+    LOCALIZATION_PRODUCER_TARGET_CANDIDATES,
+    int(os.getenv("LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS", "8")),
+)
 LOCALIZATION_E_QA_PAUSE_THRESHOLD = max(1, int(os.getenv("LOCALIZATION_E_QA_PAUSE_THRESHOLD", "16")))
 LOCALIZATION_E_QA_RESUME_THRESHOLD = max(0, min(LOCALIZATION_E_QA_PAUSE_THRESHOLD - 1, int(os.getenv("LOCALIZATION_E_QA_RESUME_THRESHOLD", "12"))))
 LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS", "90")))
@@ -304,6 +309,8 @@ runtime = {
     "memory_fatal_restart_percent": MEMORY_FATAL_RESTART_PERCENT,
     "localization_qa_batch_size": LOCALIZATION_QA_BATCH_SIZE,
     "localization_qa_coalesce_seconds": LOCALIZATION_QA_COALESCE_SECONDS,
+    "localization_producer_target_candidates": LOCALIZATION_PRODUCER_TARGET_CANDIDATES,
+    "localization_producer_max_material_commits": LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS,
     "localization_same_slot_send_gap_seconds": LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS,
     "localization_slot_dedup_seconds": LOCALIZATION_SLOT_DEDUP_SECONDS,
     "same_task_control_gap_seconds": SAME_TASK_CONTROL_GAP_SECONDS,
@@ -1176,6 +1183,100 @@ def producer_result_claims_no_work(record: dict) -> bool:
     ):
         return True
     return False
+
+
+def producer_result_candidate_count(record: dict) -> int:
+    """Return how many actual candidate DDS outputs this immutable producer result represents."""
+    if not isinstance(record, dict):
+        return 0
+    deliverable = record.get("material_deliverable") if isinstance(record.get("material_deliverable"), dict) else {}
+    explicit_keys = (
+        "candidate_dds_count",
+        "candidate_count",
+        "new_candidate_count",
+        "material_candidate_count",
+    )
+    for source in (record, deliverable):
+        for key in explicit_keys:
+            value = source.get(key)
+            if value is None:
+                continue
+            try:
+                return max(0, int(value))
+            except (TypeError, ValueError):
+                pass
+    for source in (record, deliverable):
+        for key in ("candidate_paths", "candidate_dds_paths", "candidates"):
+            value = source.get(key)
+            if isinstance(value, list) and value:
+                return len(value)
+    modified = record.get("candidate_dds_modified")
+    if modified is None:
+        modified = deliverable.get("candidate_dds_modified")
+    reworked = record.get("materially_reworked_candidate")
+    if reworked is None:
+        reworked = deliverable.get("materially_reworked_candidate")
+    return 1 if modified is True or reworked is True else 0
+
+
+def producer_result_candidate_indices(record: dict) -> list[int]:
+    """Extract asset indices whose candidate was actually emitted/reworked in this result."""
+    if producer_result_candidate_count(record) <= 0 or not isinstance(record, dict):
+        return []
+    selection = record.get("selection") if isinstance(record.get("selection"), dict) else {}
+    values = []
+    for key in ("index", "selected_index"):
+        if selection.get(key) is not None:
+            values.append(selection.get(key))
+    for key in ("indices", "selected_indices", "reviewed_indices"):
+        value = selection.get(key)
+        if isinstance(value, list):
+            values.extend(value)
+    result = []
+    for value in values:
+        try:
+            idx = int(value)
+        except (TypeError, ValueError):
+            continue
+        if idx not in result:
+            result.append(idx)
+    return result
+
+
+def localization_validate_c_result_commit(
+    task_id: str,
+    result_sha: str,
+    qa_batch: list[dict],
+) -> tuple[bool, list[str], Optional[dict]]:
+    """Require a C result to cover every immutable TASK_ID@RESULT_SHA input in its batch."""
+    record_path = f"docs/automation/runs/{task_id}.json"
+    record = github_json_file_at_ref(record_path, result_sha)
+    if not record:
+        return False, ["C_TASK_RESULT_FILE_MISSING"], None
+    if str(record.get("task_id") or "") != task_id:
+        return False, ["C_TASK_RESULT_ID_MISMATCH"], record
+
+    expected = {
+        f"{str(item.get('task_id') or '')}@{str(item.get('result_sha') or '')}"
+        for item in (qa_batch or [])
+        if item.get("task_id") and item.get("result_sha")
+    }
+    actual: set[str] = set()
+    raw_inputs = record.get("inputs")
+    if not isinstance(raw_inputs, list):
+        raw_inputs = record.get("qa_inputs") if isinstance(record.get("qa_inputs"), list) else []
+    for item in raw_inputs:
+        if isinstance(item, str):
+            actual.add(item.strip())
+        elif isinstance(item, dict):
+            task = str(item.get("task_id") or "")
+            sha = str(item.get("result_sha") or "")
+            if task and sha:
+                actual.add(f"{task}@{sha}")
+    missing = sorted(expected - actual)
+    if missing:
+        return False, ["C_BATCH_INPUTS_MISSING:" + ",".join(missing[:8])], record
+    return True, [], record
 
 
 def localization_validate_producer_result_commit(task_id: str, result_sha: str) -> tuple[bool, list[str], Optional[dict]]:
