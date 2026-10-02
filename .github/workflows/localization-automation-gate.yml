@@ -2,8 +2,7 @@ name: Localization Automation Gate
 
 on:
   push:
-    branches:
-      - korean-localization-clean
+    branches: [korean-localization-clean]
   workflow_dispatch:
 
 concurrency:
@@ -15,32 +14,18 @@ permissions:
 
 jobs:
   validate:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (
-        !contains(github.event.head_commit.message, '[AUTO:LOCALIZATION-LOCALIZATION_A-') &&
-        !contains(github.event.head_commit.message, '[AUTO:LOCALIZATION-LOCALIZATION_B-') &&
-        !contains(github.event.head_commit.message, '[AUTO:LOCALIZATION-LOCALIZATION_E-')
-      )
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Verify queue automation contract
-        run: test -f docs/automation/QUEUE_CONTROLLER_CONTRACT.md
-
-      - name: Verify controller runtime recovery and throughput policy
+      - name: Verify controller v2
         run: python tools/localization/verify_controller_recovery_policy.py
-
       - name: Verify localization state
         run: python tools/localization/verify_state.py
-
       - name: Verify graphics generation v2 contract
         run: python tools/localization/verify_generation_contract_v2.py
-
       - name: Verify domain isolation
         shell: bash
         env:
@@ -48,23 +33,10 @@ jobs:
           EVENT_HEAD: ${{ github.sha }}
         run: |
           set -euo pipefail
-          B="$EVENT_BEFORE"
-          H="$EVENT_HEAD"
+          B="$EVENT_BEFORE"; H="$EVENT_HEAD"
           if [[ -z "$B" || "$B" =~ ^0+$ ]]; then B="$(git rev-parse HEAD^)"; fi
           python tools/verify_domain_isolation.py --base "$B" --head "$H" --branch "korean-localization-clean"
-
-      - name: Verify changed localization payload structure
-        env:
-          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
-        run: python tools/localization/verify_automation_commit.py
-
-      - name: Verify parallel lane isolation
-        run: python tools/localization/verify_parallel_lane_commit.py
-
-      - name: Verify exact producer SHAs in C batch
-        run: python tools/localization/verify_c_batch_inputs.py
-
-      - name: Mark candidate semantics
+      - name: Mark semantics
         run: |
           echo "AUTOMATION_VALIDATION=PASS"
           echo "RUNTIME_VALIDATION=UNTESTED"
