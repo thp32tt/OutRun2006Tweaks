@@ -224,6 +224,139 @@ def verify_dxvk_continuation_chain() -> None:
                 f"DXVK continuation {continuation_id} raw provenance status is not fail-closed: "
                 f"{missing_raw_status_markers}"
             )
+        # DXVK raw predecessor_exact contract: the final captured gate already
+        # depends on predecessor_exact, but that intermediate predicate must in
+        # turn consume the predecessor proof's exact status and the geometry
+        # that joins the two captures. Otherwise a future collector could keep
+        # calling the right proof while accidentally replacing predecessor_exact
+        # with a weaker predicate (or True) and silently break fail-closed chain
+        # continuity.
+        provenance_ast = ast.parse(provenance_source)
+        predecessor_exact_values = [
+            node.value
+            for node in ast.walk(provenance_ast)
+            if isinstance(node, ast.Assign)
+            and any(
+                isinstance(target, ast.Name) and target.id == "predecessor_exact"
+                for target in node.targets
+            )
+        ]
+        if len(predecessor_exact_values) != 1:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} raw provenance has ambiguous "
+                f"predecessor_exact predicate: assignments={len(predecessor_exact_values)}"
+            )
+        predecessor_exact_value = predecessor_exact_values[0]
+
+        def predecessor_field(node: ast.AST) -> str | None:
+            if not (
+                isinstance(node, ast.Subscript)
+                and isinstance(node.value, ast.Name)
+                and node.value.id == "predecessor"
+            ):
+                return None
+            key = node.slice
+            if isinstance(key, ast.Constant) and isinstance(key.value, str):
+                return key.value
+            return None
+
+        predecessor_fields = {
+            field
+            for node in ast.walk(predecessor_exact_value)
+            if (field := predecessor_field(node)) is not None
+        }
+
+        def has_predecessor_equality(field: str, other_name: str) -> bool:
+            for node in ast.walk(predecessor_exact_value):
+                if not (
+                    isinstance(node, ast.Compare)
+                    and len(node.ops) == 1
+                    and isinstance(node.ops[0], ast.Eq)
+                    and len(node.comparators) == 1
+                ):
+                    continue
+                left, right = node.left, node.comparators[0]
+                if (
+                    predecessor_field(left) == field
+                    and isinstance(right, ast.Name)
+                    and right.id == other_name
+                ) or (
+                    predecessor_field(right) == field
+                    and isinstance(left, ast.Name)
+                    and left.id == other_name
+                ):
+                    return True
+            return False
+
+        def has_predecessor_status_equality() -> bool:
+            for node in ast.walk(predecessor_exact_value):
+                if not (
+                    isinstance(node, ast.Compare)
+                    and len(node.ops) == 1
+                    and isinstance(node.ops[0], ast.Eq)
+                    and len(node.comparators) == 1
+                ):
+                    continue
+                left, right = node.left, node.comparators[0]
+                if (
+                    predecessor_field(left) == "status"
+                    and isinstance(right, ast.Constant)
+                    and isinstance(right.value, str)
+                ) or (
+                    predecessor_field(right) == "status"
+                    and isinstance(left, ast.Constant)
+                    and isinstance(left.value, str)
+                ):
+                    return True
+            return False
+
+        if not has_predecessor_status_equality():
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} predecessor_exact is not tied "
+                "to an exact predecessor status"
+            )
+
+        has_overlap_contract = f"{prefix}_OVERLAP_BYTES" in analyzer
+        if has_overlap_contract:
+            required_predecessor_fields = {"status", "incomplete_rva", "incomplete_matches"}
+            missing_predecessor_fields = sorted(
+                required_predecessor_fields - predecessor_fields
+            )
+            if missing_predecessor_fields:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} overlap predecessor_exact lost "
+                    f"cut-edge fields: {missing_predecessor_fields}"
+                )
+            if not has_predecessor_equality("incomplete_rva", "target_rva"):
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} overlap predecessor_exact does "
+                    "not join predecessor incomplete_rva to target_rva"
+                )
+        else:
+            required_predecessor_fields = {"status", "prefix_end_rva"}
+            missing_predecessor_fields = sorted(
+                required_predecessor_fields - predecessor_fields
+            )
+            if missing_predecessor_fields:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} boundary predecessor_exact lost "
+                    f"capture-edge fields: {missing_predecessor_fields}"
+                )
+            if not has_predecessor_equality("prefix_end_rva", "target_rva"):
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} boundary predecessor_exact does "
+                    "not join predecessor prefix_end_rva to target_rva"
+                )
+            boundary_fields = {
+                "capture_end_is_instruction_boundary",
+                "capture_boundary_matches",
+            }
+            if not (predecessor_fields & boundary_fields):
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} boundary predecessor_exact lost "
+                    "its proven instruction/capture-boundary gate"
+                )
+
         if continuation_id > raw_ids[0]:
             expected_predecessor_call = (
                 "collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
@@ -572,19 +705,6 @@ def verify_dxvk_continuation_chain() -> None:
                     f"DXVK continuation {continuation_id} resolved predecessor target "
                     f"declaration drift: targets are not successor instruction boundaries: "
                     f"{[f'0x{rva:08X}' for rva in missing_successor_boundaries]}"
-                )
-            if resolved_predecessor_name not in proof_source:
-                raise SystemExit(
-                    f"DXVK continuation {continuation_id} declares resolved predecessor "
-                    "targets but its proof does not consume the declaration"
-                )
-            if (
-                resolved_predecessor_targets
-                and "resolved_predecessor_targets_on_boundaries" not in proof_source
-            ):
-                raise SystemExit(
-                    f"DXVK continuation {continuation_id} resolved predecessor targets "
-                    "are not guarded by an exact-boundary proof"
                 )
         proof_status_fail_closed_markers = (
             "proven = bool(",
