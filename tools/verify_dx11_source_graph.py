@@ -1876,6 +1876,8 @@ def main() -> None:
             or "upload_transform_for_observation(" in runtime_source
             or "compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(" in runtime_source
             or "validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(" in runtime_source
+            or "compose_fixed_function_complete_indexed_triangle_fan_bound_draw_readiness(" in runtime_source
+            or "validate_fixed_function_complete_indexed_triangle_fan_bound_draw_snapshot(" in runtime_source
             or "validate_fixed_function_same_context_bound_draw_snapshot(" in runtime_source
             or "bind_fixed_function_geometry_for_observation(" in runtime_source
             or "observe_fixed_function_geometry_binding(" in runtime_source
@@ -1889,7 +1891,7 @@ def main() -> None:
             )
     if runtime_textured_draw_users:
         raise SystemExit(
-            "DX11 R132/R133/R134/R136/R137/R138/R139/R140/R141/R142 dormant binding readiness gained a production "
+            "DX11 R132/R133/R134/R136/R137/R138/R139/R140/R141/R142/R143/R144 dormant binding readiness gained a production "
             "caller before activation gate: " + ", ".join(runtime_textured_draw_users)
         )
 
@@ -4831,6 +4833,64 @@ def main() -> None:
         raise SystemExit(
             "DX11 R143 indexed fan geometry contract drift: "
             + ", ".join(missing_r143_indexed_fan_geometry)
+        )
+
+    r144_indexed_fan_final_contract = [
+        (
+            "struct NativeFixedFunctionCompleteIndexedFanBoundDrawReadiness",
+            NATIVE_BACKEND_HPP,
+            "R144 indexed fan final readiness identity",
+        ),
+        (
+            "compose_fixed_function_complete_indexed_triangle_fan_bound_draw_readiness(",
+            NATIVE_BACKEND_HPP,
+            "R144 indexed fan final composition API",
+        ),
+        (
+            "currentSourceIndex.snapshotToken ==\n            currentGeometry.indexBufferSnapshotToken",
+            NATIVE_BACKEND_CPP,
+            "R144 current source-index mirror is retained through final composition",
+        ),
+        (
+            "currentFan.indexedSource &&",
+            NATIVE_BACKEND_CPP,
+            "R144 generated owner is indexed-source provenance",
+        ),
+        (
+            "currentFan.baseVertex == 0 &&",
+            NATIVE_BACKEND_CPP,
+            "R144 generated indexed fan keeps BaseVertexLocation out of materialized indices",
+        ),
+        (
+            "static_cast<std::uint32_t>(baseVertexLocation)",
+            NATIVE_BACKEND_CPP,
+            "R144 final snapshot seals future DrawIndexed BaseVertexLocation",
+        ),
+        (
+            "R144 indexed fan final bound draw seals source provenance and live generated IA",
+            CONSTANT_BUFFER_PROBE,
+            "R144 positive final indexed fan proof",
+        ),
+        (
+            "R144 indexed fan final snapshot rejects BaseVertexLocation drift",
+            CONSTANT_BUFFER_PROBE,
+            "R144 BaseVertexLocation drift rejection",
+        ),
+        (
+            "R144 indexed fan final bound draw rejects source format drift",
+            CONSTANT_BUFFER_PROBE,
+            "R144 source-index format drift rejection",
+        ),
+    ]
+    missing_r144_indexed_fan_final = [
+        meaning
+        for token, source, meaning in r144_indexed_fan_final_contract
+        if token not in source
+    ]
+    if missing_r144_indexed_fan_final:
+        raise SystemExit(
+            "DX11 R144 indexed fan final bound-draw contract drift: "
+            + ", ".join(missing_r144_indexed_fan_final)
         )
 
     r120_draw_readiness_header = {
