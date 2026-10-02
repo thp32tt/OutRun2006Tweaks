@@ -13,7 +13,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -397,14 +397,15 @@ def save_registry(reg: Registry):
     tmp.replace(REGISTRY_FILE)
 
 
-def allocate_lane_production_id(reg: Registry, lane: str, prefix: str) -> str:
+def allocate_lane_production_id(reg: Registry, lane: str, prefix: str, minimum_next: int = 1) -> str:
     """Allocate exactly one production number for a new dispatch.
 
     Retry, rollover, continue and reconcile must never call this function.
-    Counters are lane-scoped when PRODUCTION_COUNTER_MODE=lane.
+    Counters are lane-scoped when PRODUCTION_COUNTER_MODE=lane. minimum_next
+    safely migrates an existing v1 queue without reusing historical numbers.
     """
     key = lane if PRODUCTION_COUNTER_MODE == "lane" else "__global__"
-    next_id = int(reg.next_production_id.get(key, 1))
+    next_id = max(int(reg.next_production_id.get(key, 1)), int(minimum_next or 1))
     reg.next_production_id[key] = next_id + 1
     return f"{prefix}-{lane}-{next_id:05d}"
 
