@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - recovery/localization-no-e
+      - chat-controller-downloads
   workflow_dispatch:
 
 jobs:
