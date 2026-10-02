@@ -21,8 +21,12 @@ TranslationResult<D3D11_BLEND> translate_blend(D3DBLEND value) noexcept {
     case D3DBLEND_SRCALPHASAT: return {D3D11_BLEND_SRC_ALPHA_SAT, true};
     case D3DBLEND_BLENDFACTOR: return {D3D11_BLEND_BLEND_FACTOR, true};
     case D3DBLEND_INVBLENDFACTOR: return {D3D11_BLEND_INV_BLEND_FACTOR, true};
-    case D3DBLEND_SRCCOLOR2: return {D3D11_BLEND_SRC1_COLOR, true};
-    case D3DBLEND_INVSRCCOLOR2: return {D3D11_BLEND_INV_SRC1_COLOR, true};
+    // D3D11 has matching SRC1 blend enums, but the current native fixed-
+    // function pixel-shader prototype emits only SV_Target0. Until a second
+    // color output and its linkage are proven, dual-source blend must remain
+    // fail-closed rather than being counted as exact activation evidence.
+    case D3DBLEND_SRCCOLOR2: return {D3D11_BLEND_SRC1_COLOR, false};
+    case D3DBLEND_INVSRCCOLOR2: return {D3D11_BLEND_INV_SRC1_COLOR, false};
     case D3DBLEND_BOTHSRCALPHA: return {D3D11_BLEND_SRC_ALPHA, false};
     case D3DBLEND_BOTHINVSRCALPHA: return {D3D11_BLEND_INV_SRC_ALPHA, false};
     default: return {D3D11_BLEND_ONE, false};
