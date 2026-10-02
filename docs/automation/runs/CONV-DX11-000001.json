@@ -47,12 +47,13 @@
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_STATIC_COMPILE_NOT_CLAIMED",
-      "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; CONFIGURE_IN_PROGRESS_AT_CHECKPOINT; COMPILE_NOT_CLAIMED",
+      "status": "COMPLETE_STATIC_CONFIGURE_PASS_BUILD_CANCELLED",
+      "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER_AND_CONFIGURE; BUILD_CANCELLED_BEFORE_COMPLETION; COMPILE_NOT_CLAIMED",
       "evidence": [
-        "Material commit b408e7957421b461a3c1975f276265493586a2a3 retained on later same-branch descendants.",
+        "Material commit b408e7957421b461a3c1975f276265493586a2a3 is retained on the final C6 branch state.",
         "Build run 36987425721 job 110775639816 on retaining descendant 869cd337f4ce2990bb0dd45e936ac8bc8f9b23a2 passed Verify DX11 source graph.",
-        "The same job passed Test DX11 census analyzer. Configure was still in progress at the validation checkpoint; Build had not run, so compile success is not claimed."
+        "The same job passed Test DX11 census analyzer and Configure.",
+        "The Build step was cancelled before completion after later branch movement; binary verification and packaging steps were skipped, so compile/binary success is not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
@@ -80,8 +81,8 @@
     "other_backend_modified": false
   },
   "issue14_comment_id": 5948681416,
-  "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER; CONFIGURE_IN_PROGRESS_AT_CHECKPOINT; COMPILE_NOT_CLAIMED",
-  "blocker": "No runtime blocker for this static verifier unit. Full compile was not yet reached in the observed validation job because Configure remained in progress at checkpoint time.",
+  "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER_AND_CONFIGURE; BUILD_CANCELLED_BEFORE_COMPLETION; COMPILE_NOT_CLAIMED",
+  "blocker": "The observed retaining-descendant CI passed source-graph, census-analyzer and Configure checks, but its Build step was cancelled before completion after later branch movement. Compile/binary success is therefore not claimed.",
   "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the latest GitHub HEAD for the next independent dormant DX11 semantic/source/static gap, excluding already covered R168-R175 and this unsupported-census schema parity guard. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
