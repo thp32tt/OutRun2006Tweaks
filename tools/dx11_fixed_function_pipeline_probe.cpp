@@ -378,6 +378,43 @@ int main()
     }
 
     {
+        auto defaultMrt = base_state();
+        const auto defaultMrtPipeline = translate_pipeline(defaultMrt);
+        require(
+            defaultMrtPipeline.exact() &&
+            (defaultMrtPipeline.unsupported &
+             PipelineUnsupportedMrtColorWrite) == 0,
+            "default MRT color-write masks must remain exact");
+
+        auto mrt1Masked = defaultMrt;
+        mrt1Masked.additionalColorWriteEnable[0] = D3DCOLORWRITEENABLE_RED;
+        const auto mrt1Pipeline = translate_pipeline(mrt1Masked);
+        require(
+            !mrt1Pipeline.exact() &&
+            (mrt1Pipeline.unsupported &
+             PipelineUnsupportedMrtColorWrite) != 0,
+            "non-default COLORWRITEENABLE1 must fail closed");
+
+        auto mrt3Masked = defaultMrt;
+        mrt3Masked.additionalColorWriteEnable[2] = 0u;
+        const auto mrt3Pipeline = translate_pipeline(mrt3Masked);
+        require(
+            !mrt3Pipeline.exact() &&
+            (mrt3Pipeline.unsupported &
+             PipelineUnsupportedMrtColorWrite) != 0,
+            "non-default COLORWRITEENABLE3 must fail closed");
+
+        const auto fixedMrt3 =
+            translate_fixed_function_pipeline_with_shader_semantics(
+                mrt3Masked, true, stages, true, 0x00, 0x00, textureTypes);
+        require(
+            !fixedMrt3.exact() &&
+            (fixedMrt3.renderStates.unsupported &
+             PipelineUnsupportedMrtColorWrite) != 0,
+            "fixed-function handoff must retain MRT color-write blocker");
+    }
+
+    {
         auto lineRaster = base_state();
         lineRaster.lastPixel = TRUE;
         lineRaster.antialiasedLineEnable = FALSE;
@@ -584,6 +621,7 @@ int main()
     }
 
     std::cout
+        << "DX11 MRT color-write fail-closed: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATE2X support R179: PASS\n"
         << "DX11 fixed-function D3DTOP_SUBTRACT support R177: PASS\n"
         << "DX11 fixed-function argument modifiers R178: PASS\n"

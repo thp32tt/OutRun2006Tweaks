@@ -751,6 +751,7 @@ def main() -> int:
     assert extended_unsupported["LatestSummary"]["vertexBlend"] == 6
     assert extended_unsupported["LatestSummary"]["dither"] == 7
     assert extended_unsupported["LatestSummary"]["texCoordWrap"] == 0
+    assert extended_unsupported["LatestSummary"]["mrtColorWrite"] == 0
     assert extended_unsupported["NativeDrawPathActivationAllowed"] is False
 
     r174_source_mrt = run_case(
@@ -792,7 +793,30 @@ def main() -> int:
     assert r170_wrap["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
     assert r170_wrap["UnsupportedTotalLatest"] == 8
     assert r170_wrap["LatestSummary"]["texCoordWrap"] == 8
+    assert r170_wrap["LatestSummary"]["mrtColorWrite"] == 0
     assert r170_wrap["NativeDrawPathActivationAllowed"] is False
+
+    mrt_color_write = run_case(
+        "VR DX11 R120 census: samples=4 exact=0 fixedFn=4 programmable=0 "
+        "topologyUnsupported=0 signatures=4 "
+        "sampling[drawsSeen=4,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0,auxRenderTargetUnsupported=0] "
+        "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0,dualSource=0,shadeMode=0,clipping=0,"
+        "depthBias=0,vertexBlend=0,dither=0,texCoordWrap=0,"
+        "mrtColorWrite=9]\n"
+    )
+    assert mrt_color_write["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert mrt_color_write["UnsupportedTotalLatest"] == 9
+    assert mrt_color_write["LatestSummary"]["mrtColorWrite"] == 9
+    assert mrt_color_write["NativeDrawPathActivationAllowed"] is False
 
     r72 = run_case(
         "VR DX11 R72 signature#1: primitive=4 fixedFn=1\n"

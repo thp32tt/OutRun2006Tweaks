@@ -3655,13 +3655,15 @@ def main() -> None:
          "current unsupported dither parser"),
         ("?P<texCoordWrap>", analyzer,
          "R170 texture-coordinate wrap parser"),
+        ("?P<mrtColorWrite>", analyzer,
+         "MRT color-write parser"),
         (
             '"dualSource",\n            "shadeMode",\n'
             '            "clipping",\n            "depthBias",\n'
             '            "vertexBlend",\n            "dither",\n'
-            '            "texCoordWrap",',
+            '            "texCoordWrap",\n            "mrtColorWrite",',
             analyzer,
-            "R170 unsupported fields participate in aggregate exactness",
+            "current unsupported fields participate in aggregate exactness",
         ),
         ("extended_unsupported = run_case(", analyzer_test,
          "current unsupported-tail analyzer regression fixture"),
@@ -7381,6 +7383,58 @@ def main() -> None:
         raise SystemExit(
             "DX11 R177 surface MSAA census contract drift: "
             + ", ".join(missing_r177_surface_msaa_census)
+        )
+
+    mrt_color_write_contract = [
+        ("std::array<DWORD, 3> additionalColorWriteEnable{",
+         D3D9_DRAW_STATE_HPP, "tracked MRT color-write fields"),
+        ("D3DRS_COLORWRITEENABLE1, D3DRS_COLORWRITEENABLE2,",
+         D3D9_RENDER_STATE_CAPTURE, "primed MRT color-write states"),
+        ("read(D3DRS_COLORWRITEENABLE1, out.additionalColorWriteEnable[0]);",
+         D3D9_RENDER_STATE_CAPTURE, "live COLORWRITEENABLE1 capture"),
+        ("read(D3DRS_COLORWRITEENABLE3, out.additionalColorWriteEnable[2]);",
+         D3D9_RENDER_STATE_CAPTURE, "live COLORWRITEENABLE3 capture"),
+        ("PipelineUnsupportedMrtColorWrite = 1u <<",
+         PIPELINE_TRANSLATION_HPP, "dedicated MRT color-write blocker"),
+        ("for (const auto mask : source.additionalColorWriteEnable)",
+         PIPELINE_TRANSLATION_CPP, "all-secondary-target readiness scan"),
+        ("out.unsupported |= PipelineUnsupportedMrtColorWrite;",
+         PIPELINE_TRANSLATION_CPP, "fail-closed pipeline gate"),
+        ("bool mrtColorWriteObservationComplete{};", RUNTIME_CENSUS,
+         "census observation identity"),
+        ("for (const auto mask : sig.additionalColorWriteEnable)",
+         RUNTIME_CENSUS, "census mask hash"),
+        ("signature.additionalColorWriteEnable =",
+         RUNTIME_CENSUS, "census propagation"),
+        ("VR DX11 MRT color-write state#{}",
+         RUNTIME_CENSUS, "detailed census telemetry"),
+        ("?P<mrtColorWrite>", analyzer, "unsupported parser group"),
+        ('"mrtColorWrite",', analyzer, "unsupported aggregate key"),
+        ("mrt_color_write = run_case(", analyzer_test,
+         "analyzer regression fixture"),
+        ('mrt_color_write["UnsupportedTotalLatest"] == 9',
+         analyzer_test, "analyzer aggregate assertion"),
+        ("non-default COLORWRITEENABLE1 must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE, "MRT1 negative probe"),
+        ("fixed-function handoff must retain MRT color-write blocker",
+         FIXED_FUNCTION_PIPELINE_PROBE, "fixed-function handoff probe"),
+        ("DX11 MRT color-write fail-closed: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "hosted probe completion marker"),
+    ]
+    missing_mrt_color_write = [
+        meaning for token, source, meaning in mrt_color_write_contract
+        if token not in source
+    ]
+    if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_COLORWRITEENABLE1") < 2:
+        missing_mrt_color_write.append(
+            "COLORWRITEENABLE1 must be both primed and captured")
+    if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_COLORWRITEENABLE3") < 2:
+        missing_mrt_color_write.append(
+            "COLORWRITEENABLE3 must be both primed and captured")
+    if missing_mrt_color_write:
+        raise SystemExit(
+            "DX11 MRT color-write contract drift: "
+            + ", ".join(missing_mrt_color_write)
         )
 
     verify_dx11_activation_boundary()
