@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "b26574148b794eb049815612f0ab4ddcb0e875a7",
+  "state_parent_head": "8183a582a8d718aeee47d9d2b503525aebb4504c",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -494,6 +494,18 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5947549727
+    },
+    {
+      "unit_id": "DX11_R146_INDEXED_FAN_FINAL_DRIFT_HARDENING",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "9fb8b92ecb1af016de6b9f48a6b101ecad07ea29",
+      "validation_bearing_sha": "9fb8b92ecb1af016de6b9f48a6b101ecad07ea29",
+      "retaining_descendant_sha": "8183a582a8d718aeee47d9d2b503525aebb4504c",
+      "automation_validation": "PASS_EXACT_DX11_SOURCE_GRAPH_AND_CENSUS_BUILD_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5947558697
     }
   ]
 }
