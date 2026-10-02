@@ -151,6 +151,67 @@ private:
     std::uint64_t upload_generation_ = 0;
 };
 
+// R113 dormant CPU shadow plus generation-bound D3D11 mirror for D3D9
+// MANAGED vertex/index buffers. This is readiness infrastructure only: no
+// game Lock/Unlock hook or native draw path routes through it yet.
+class NativeManagedBufferShadow final {
+public:
+    NativeManagedBufferShadow() = default;
+    ~NativeManagedBufferShadow() = default;
+    NativeManagedBufferShadow(const NativeManagedBufferShadow&) = delete;
+    NativeManagedBufferShadow& operator=(const NativeManagedBufferShadow&) = delete;
+
+    bool initialize(
+        ResourceRole role,
+        UINT byteWidth,
+        DWORD sourceUsage) noexcept;
+    bool write_range(
+        UINT offset,
+        const void* source,
+        UINT sourceBytes) noexcept;
+    bool recreate_and_upload_mirror(ID3D11Device* device) noexcept;
+    void observe_device_reset() noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return metadata_valid_ && byte_width_ != 0 &&
+            shadow_.size() == byte_width_;
+    }
+    [[nodiscard]] bool shadow_valid() const noexcept {
+        return lifetime_.cpuShadowValid;
+    }
+    [[nodiscard]] bool mirror_ready() const noexcept {
+        return managed_mirror_ready(lifetime_) &&
+            mirror_device_ && mirror_buffer_;
+    }
+    [[nodiscard]] std::uint64_t shadow_version() const noexcept {
+        return lifetime_.cpuShadowVersion;
+    }
+    [[nodiscard]] std::uint64_t device_generation() const noexcept {
+        return lifetime_.deviceGeneration;
+    }
+    [[nodiscard]] ID3D11Device* mirror_device() const noexcept {
+        return mirror_device_.Get();
+    }
+    [[nodiscard]] ID3D11Buffer* mirror_buffer() const noexcept {
+        return mirror_buffer_.Get();
+    }
+    [[nodiscard]] bool mirror_descriptor_exact(
+        ID3D11Device* expectedDevice) const noexcept;
+
+private:
+    void release_mirror() noexcept;
+
+    ResourceRole role_ = ResourceRole::Vertex;
+    DWORD source_usage_ = 0;
+    UINT byte_width_ = 0;
+    bool metadata_valid_ = false;
+    std::vector<std::uint8_t> shadow_;
+    ManagedMirrorLifetimeState lifetime_{};
+    Microsoft::WRL::ComPtr<ID3D11Device> mirror_device_;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> mirror_buffer_;
+};
+
 // R102 dormant CPU shadow for a single-mip uncompressed D3D9 MANAGED
 // Texture2D. R103 adds concrete generation-bound D3D11 DEFAULT mirror/SRV
 // recreation from the shadow. R104 adds the LockRect source transaction.

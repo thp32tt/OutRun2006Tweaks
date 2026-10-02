@@ -17,11 +17,13 @@ namespace
     using outrun::vr::dx11::NativeFixedFunctionSamplerState;
     using outrun::vr::dx11::NativeFixedFunctionTextureView;
     using outrun::vr::dx11::NativeFixedFunctionTransformBuffer;
+    using outrun::vr::dx11::NativeManagedBufferShadow;
     using outrun::vr::dx11::NativeManagedTextureRegistry;
     using outrun::vr::dx11::NativeManagedTextureShadow;
     using outrun::vr::dx11::NativeManagedTextureStageReadiness;
     using outrun::vr::dx11::compose_fixed_function_activation_readiness;
     using outrun::vr::dx11::validate_fixed_function_activation_snapshot;
+    using outrun::vr::dx11::ResourceRole;
     using outrun::vr::dx11::TextureMutationUpdateKind;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::generate_fixed_function_transform_constants;
@@ -518,6 +520,127 @@ int main()
     require(
         dynamicTextureView.upload_generation() == 2,
         "R101 upload generation must advance monotonically");
+
+    NativeManagedBufferShadow managedVertexBuffer;
+    require(
+        managedVertexBuffer.initialize(
+            ResourceRole::Vertex, 32, D3DUSAGE_WRITEONLY),
+        "R113 managed vertex-buffer shadow initialize");
+    require(
+        managedVertexBuffer.ready() &&
+        !managedVertexBuffer.shadow_valid() &&
+        !managedVertexBuffer.mirror_ready(),
+        "R113 managed vertex-buffer shadow starts content-invalid");
+
+    std::array<unsigned char, 32> managedVertexBytes{};
+    for (std::size_t index = 0; index < managedVertexBytes.size(); ++index)
+        managedVertexBytes[index] =
+            static_cast<unsigned char>(0x20u + index);
+
+    require(
+        !managedVertexBuffer.write_range(
+            4, managedVertexBytes.data() + 4, 8),
+        "R113 first managed buffer write must cover the full resource");
+    require(
+        managedVertexBuffer.write_range(
+            0, managedVertexBytes.data(),
+            static_cast<UINT>(managedVertexBytes.size())) &&
+        managedVertexBuffer.shadow_valid() &&
+        managedVertexBuffer.shadow_version() == 1,
+        "R113 full managed vertex-buffer write establishes CPU shadow");
+    require(
+        managedVertexBuffer.recreate_and_upload_mirror(d3d.device) &&
+        managedVertexBuffer.mirror_ready() &&
+        managedVertexBuffer.mirror_descriptor_exact(d3d.device),
+        "R113 managed vertex-buffer mirror upload");
+
+    D3D11_BUFFER_DESC managedVertexDesc{};
+    managedVertexBuffer.mirror_buffer()->GetDesc(&managedVertexDesc);
+    require(
+        managedVertexDesc.ByteWidth == managedVertexBytes.size() &&
+        managedVertexDesc.Usage == D3D11_USAGE_DEFAULT &&
+        managedVertexDesc.BindFlags == D3D11_BIND_VERTEX_BUFFER &&
+        managedVertexDesc.CPUAccessFlags == 0,
+        "R113 managed vertex-buffer descriptor contract");
+
+    D3D11_BUFFER_DESC managedVertexStagingDesc = managedVertexDesc;
+    managedVertexStagingDesc.Usage = D3D11_USAGE_STAGING;
+    managedVertexStagingDesc.BindFlags = 0;
+    managedVertexStagingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+    ID3D11Buffer* managedVertexStaging = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateBuffer(
+            &managedVertexStagingDesc, nullptr, &managedVertexStaging)) &&
+        managedVertexStaging != nullptr,
+        "R113 managed vertex-buffer staging prerequisite");
+    d3d.context->CopyResource(
+        managedVertexStaging, managedVertexBuffer.mirror_buffer());
+    D3D11_MAPPED_SUBRESOURCE managedVertexMap{};
+    require(
+        SUCCEEDED(d3d.context->Map(
+            managedVertexStaging, 0, D3D11_MAP_READ, 0, &managedVertexMap)) &&
+        managedVertexMap.pData != nullptr &&
+        std::memcmp(
+            managedVertexMap.pData,
+            managedVertexBytes.data(),
+            managedVertexBytes.size()) == 0,
+        "R113 managed vertex-buffer mirror bytes");
+    d3d.context->Unmap(managedVertexStaging, 0);
+    managedVertexStaging->Release();
+
+    const unsigned char managedVertexPatch[] = {0xe1, 0xe2, 0xe3, 0xe4};
+    require(
+        managedVertexBuffer.write_range(
+            8, managedVertexPatch,
+            static_cast<UINT>(sizeof(managedVertexPatch))) &&
+        managedVertexBuffer.shadow_version() == 2 &&
+        !managedVertexBuffer.mirror_ready() &&
+        managedVertexBuffer.mirror_buffer() == nullptr,
+        "R113 partial managed buffer update invalidates stale mirror");
+    require(
+        !managedVertexBuffer.write_range(
+            31, managedVertexPatch,
+            static_cast<UINT>(sizeof(managedVertexPatch))),
+        "R113 out-of-range managed buffer write must fail closed");
+    require(
+        managedVertexBuffer.recreate_and_upload_mirror(d3d.device),
+        "R113 managed vertex-buffer mirror recreation");
+    managedVertexBuffer.observe_device_reset();
+    require(
+        managedVertexBuffer.device_generation() == 2 &&
+        managedVertexBuffer.shadow_valid() &&
+        managedVertexBuffer.shadow_version() == 2 &&
+        !managedVertexBuffer.mirror_ready() &&
+        managedVertexBuffer.mirror_buffer() == nullptr,
+        "R113 Reset preserves managed buffer CPU shadow only");
+    require(
+        managedVertexBuffer.recreate_and_upload_mirror(d3d.device) &&
+        managedVertexBuffer.mirror_descriptor_exact(d3d.device),
+        "R113 post-Reset managed vertex-buffer mirror recreation");
+
+    NativeManagedBufferShadow managedIndexBuffer;
+    std::array<unsigned short, 6> managedIndexBytes{0, 1, 2, 2, 3, 0};
+    require(
+        managedIndexBuffer.initialize(
+            ResourceRole::Index,
+            static_cast<UINT>(sizeof(managedIndexBytes)),
+            0) &&
+        managedIndexBuffer.write_range(
+            0, managedIndexBytes.data(),
+            static_cast<UINT>(sizeof(managedIndexBytes))) &&
+        managedIndexBuffer.recreate_and_upload_mirror(d3d.device) &&
+        managedIndexBuffer.mirror_descriptor_exact(d3d.device),
+        "R113 managed index-buffer mirror upload");
+    D3D11_BUFFER_DESC managedIndexDesc{};
+    managedIndexBuffer.mirror_buffer()->GetDesc(&managedIndexDesc);
+    require(
+        managedIndexDesc.BindFlags == D3D11_BIND_INDEX_BUFFER,
+        "R113 managed index-buffer bind contract");
+    NativeManagedBufferShadow invalidManagedBuffer;
+    require(
+        !invalidManagedBuffer.initialize(
+            ResourceRole::Texture, 32, 0),
+        "R113 non-buffer managed shadow must fail closed");
 
     NativeManagedTextureShadow managedShadow;
     require(

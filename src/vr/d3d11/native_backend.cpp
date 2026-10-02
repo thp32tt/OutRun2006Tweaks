@@ -421,6 +421,179 @@ void NativeFixedFunctionTextureView::shutdown() noexcept {
     upload_generation_ = 0;
 }
 
+bool NativeManagedBufferShadow::initialize(
+    ResourceRole role,
+    UINT byteWidth,
+    DWORD sourceUsage) noexcept {
+
+    shutdown();
+    if ((role != ResourceRole::Vertex && role != ResourceRole::Index) ||
+        byteWidth == 0)
+        return false;
+
+    const auto behavior = translate_resource_behavior(
+        role, D3DPOOL_MANAGED, sourceUsage);
+    const UINT expectedBind =
+        role == ResourceRole::Vertex
+            ? D3D11_BIND_VERTEX_BUFFER
+            : D3D11_BIND_INDEX_BUFFER;
+    if (!behavior.descriptorExact ||
+        behavior.lifetime != ResourceMirrorLifetime::ManagedCpuShadow ||
+        !behavior.requiresCpuShadow ||
+        behavior.usage != D3D11_USAGE_DEFAULT ||
+        behavior.cpuAccessFlags != 0 ||
+        behavior.bindFlags != expectedBind)
+        return false;
+
+    try {
+        shadow_.assign(static_cast<std::size_t>(byteWidth), 0);
+    } catch (...) {
+        shutdown();
+        return false;
+    }
+
+    role_ = role;
+    source_usage_ = sourceUsage;
+    byte_width_ = byteWidth;
+    metadata_valid_ = true;
+    lifetime_ = {};
+    return true;
+}
+
+bool NativeManagedBufferShadow::write_range(
+    UINT offset,
+    const void* source,
+    UINT sourceBytes) noexcept {
+
+    if (!ready() || !source || sourceBytes == 0 ||
+        offset > byte_width_ || sourceBytes > byte_width_ - offset)
+        return false;
+
+    const auto mutation = translate_buffer_mutation(
+        role_, D3DPOOL_MANAGED, source_usage_, 0);
+    if (mutation.kind != BufferMutationUpdateKind::ManagedCpuShadowWrite ||
+        !mutation.requiresCpuShadow || mutation.planExact)
+        return false;
+
+    // Until a complete initial image exists, a partial Lock cannot establish
+    // deterministic contents for the untouched bytes.
+    if (!shadow_valid() &&
+        (offset != 0 || sourceBytes != byte_width_))
+        return false;
+
+    std::memcpy(
+        shadow_.data() + static_cast<std::size_t>(offset),
+        source,
+        static_cast<std::size_t>(sourceBytes));
+    release_mirror();
+    lifetime_ = note_managed_shadow_write(lifetime_);
+    return true;
+}
+
+bool NativeManagedBufferShadow::recreate_and_upload_mirror(
+    ID3D11Device* device) noexcept {
+
+    if (!ready() || !shadow_valid() || !device)
+        return false;
+
+    const auto behavior = translate_resource_behavior(
+        role_, D3DPOOL_MANAGED, source_usage_);
+    const UINT expectedBind =
+        role_ == ResourceRole::Vertex
+            ? D3D11_BIND_VERTEX_BUFFER
+            : D3D11_BIND_INDEX_BUFFER;
+    if (!behavior.descriptorExact ||
+        behavior.lifetime != ResourceMirrorLifetime::ManagedCpuShadow ||
+        !behavior.requiresCpuShadow ||
+        behavior.usage != D3D11_USAGE_DEFAULT ||
+        behavior.cpuAccessFlags != 0 ||
+        behavior.bindFlags != expectedBind)
+        return false;
+
+    release_mirror();
+
+    D3D11_BUFFER_DESC desc{};
+    desc.ByteWidth = byte_width_;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = expectedBind;
+
+    D3D11_SUBRESOURCE_DATA initialData{};
+    initialData.pSysMem = shadow_.data();
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer> buffer;
+    if (FAILED(device->CreateBuffer(
+            &desc, &initialData, buffer.ReleaseAndGetAddressOf())) ||
+        !buffer)
+        return false;
+
+    mirror_device_ = device;
+    mirror_buffer_ = std::move(buffer);
+    lifetime_ = note_managed_mirror_upload(lifetime_);
+    if (!mirror_ready()) {
+        release_mirror();
+        return false;
+    }
+    return true;
+}
+
+bool NativeManagedBufferShadow::mirror_descriptor_exact(
+    ID3D11Device* expectedDevice) const noexcept {
+
+    if (!expectedDevice ||
+        mirror_device_.Get() != expectedDevice ||
+        !mirror_buffer_)
+        return false;
+
+    const auto behavior = translate_resource_behavior(
+        role_, D3DPOOL_MANAGED, source_usage_);
+    const UINT expectedBind =
+        role_ == ResourceRole::Vertex
+            ? D3D11_BIND_VERTEX_BUFFER
+            : D3D11_BIND_INDEX_BUFFER;
+    if (!behavior.descriptorExact ||
+        behavior.lifetime != ResourceMirrorLifetime::ManagedCpuShadow ||
+        !behavior.requiresCpuShadow ||
+        behavior.usage != D3D11_USAGE_DEFAULT ||
+        behavior.cpuAccessFlags != 0 ||
+        behavior.bindFlags != expectedBind)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> bufferDevice;
+    mirror_buffer_->GetDevice(bufferDevice.ReleaseAndGetAddressOf());
+    if (!bufferDevice || bufferDevice.Get() != expectedDevice)
+        return false;
+
+    D3D11_BUFFER_DESC desc{};
+    mirror_buffer_->GetDesc(&desc);
+    return desc.ByteWidth == byte_width_ &&
+        desc.Usage == behavior.usage &&
+        desc.BindFlags == behavior.bindFlags &&
+        desc.CPUAccessFlags == behavior.cpuAccessFlags &&
+        desc.MiscFlags == 0 &&
+        desc.StructureByteStride == 0;
+}
+
+void NativeManagedBufferShadow::observe_device_reset() noexcept {
+    release_mirror();
+    lifetime_ = advance_managed_device_generation(lifetime_);
+}
+
+void NativeManagedBufferShadow::release_mirror() noexcept {
+    mirror_buffer_.Reset();
+    mirror_device_.Reset();
+    lifetime_.mirrorValid = false;
+}
+
+void NativeManagedBufferShadow::shutdown() noexcept {
+    release_mirror();
+    role_ = ResourceRole::Vertex;
+    source_usage_ = 0;
+    byte_width_ = 0;
+    metadata_valid_ = false;
+    shadow_.clear();
+    lifetime_ = {};
+}
+
 bool NativeManagedTextureShadow::initialize(
     D3DFORMAT sourceFormat,
     UINT width,
