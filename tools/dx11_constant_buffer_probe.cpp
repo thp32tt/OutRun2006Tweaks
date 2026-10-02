@@ -4029,6 +4029,87 @@ int main()
                     indexedSourceValueLineage.snapshotToken),
             "R152 indexed source values bind exact IB contents to R150 lineage");
 
+        const auto indexedSourceBinding =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_binding_readiness(
+                    indexedSourceValueLineage, indexedDirectDispatch,
+                    indexedDirectLineage, indexedSourceRange,
+                    indexedGeometryReady, indexedSourceValues,
+                    renderTargetBoundDraw);
+        require(
+            indexedSourceBinding.inputValid &&
+            indexedSourceBinding.sourceValueLineageReady &&
+            indexedSourceBinding.boundDrawReady &&
+            indexedSourceBinding.boundDrawMatchesLineage &&
+            indexedSourceBinding.indexFormatMatchesSourceValues &&
+            indexedSourceBinding.indexOffsetExact &&
+            indexedSourceBinding.componentSnapshotsPresent &&
+            indexedSourceBinding.ready &&
+            indexedSourceBinding.sourceIndexFormat == D3DFMT_INDEX16 &&
+            indexedSourceBinding.boundIndexFormat == DXGI_FORMAT_R16_UINT &&
+            indexedSourceBinding.boundIndexOffset == 0u &&
+            indexedSourceBinding.snapshotToken != 0 &&
+            outrun::vr::dx11::
+                validate_fixed_function_indexed_source_binding_snapshot(
+                    indexedSourceValueLineage, indexedDirectDispatch,
+                    indexedDirectLineage, indexedSourceRange,
+                    indexedGeometryReady, indexedSourceValues,
+                    renderTargetBoundDraw, indexedSourceBinding.snapshotToken),
+            "R153 indexed source binding seals live IA format and offset");
+
+        auto indexedSourceValuesFormatDrift = indexedSourceValues;
+        indexedSourceValuesFormatDrift.sourceIndexFormat = D3DFMT_INDEX32;
+        const auto indexedSourceValueLineageFormatDrift =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_value_readiness(
+                    indexedDirectDispatch, indexedDirectLineage,
+                    indexedSourceRange, indexedGeometryReady,
+                    indexedSourceValuesFormatDrift);
+        const auto indexedSourceBindingFormatDrift =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_binding_readiness(
+                    indexedSourceValueLineageFormatDrift,
+                    indexedDirectDispatch, indexedDirectLineage,
+                    indexedSourceRange, indexedGeometryReady,
+                    indexedSourceValuesFormatDrift, renderTargetBoundDraw);
+        require(
+            indexedSourceValueLineageFormatDrift.ready &&
+            indexedSourceBindingFormatDrift.inputValid &&
+            indexedSourceBindingFormatDrift.sourceValueLineageReady &&
+            indexedSourceBindingFormatDrift.boundDrawReady &&
+            !indexedSourceBindingFormatDrift.indexFormatMatchesSourceValues &&
+            indexedSourceBindingFormatDrift.indexOffsetExact &&
+            !indexedSourceBindingFormatDrift.ready &&
+            indexedSourceBindingFormatDrift.snapshotToken == 0,
+            "R153 indexed source binding rejects source format drift");
+
+        auto indexedBoundDrawOffsetDrift = renderTargetBoundDraw;
+        indexedBoundDrawOffsetDrift.indexOffset = 2u;
+        const auto indexedSourceBindingOffsetDrift =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_binding_readiness(
+                    indexedSourceValueLineage, indexedDirectDispatch,
+                    indexedDirectLineage, indexedSourceRange,
+                    indexedGeometryReady, indexedSourceValues,
+                    indexedBoundDrawOffsetDrift);
+        require(
+            indexedSourceBindingOffsetDrift.inputValid &&
+            indexedSourceBindingOffsetDrift.sourceValueLineageReady &&
+            !indexedSourceBindingOffsetDrift.boundDrawReady &&
+            indexedSourceBindingOffsetDrift.boundDrawMatchesLineage &&
+            indexedSourceBindingOffsetDrift.indexFormatMatchesSourceValues &&
+            !indexedSourceBindingOffsetDrift.indexOffsetExact &&
+            !indexedSourceBindingOffsetDrift.ready &&
+            indexedSourceBindingOffsetDrift.snapshotToken == 0 &&
+            !outrun::vr::dx11::
+                validate_fixed_function_indexed_source_binding_snapshot(
+                    indexedSourceValueLineage, indexedDirectDispatch,
+                    indexedDirectLineage, indexedSourceRange,
+                    indexedGeometryReady, indexedSourceValues,
+                    indexedBoundDrawOffsetDrift,
+                    indexedSourceBinding.snapshotToken),
+            "R153 indexed source binding rejects live IA index offset drift");
+
         const auto indexedSourceValuesOutOfRange =
             managedIndexBuffer.index_range_readiness(
                 managedIndexReady, D3DFMT_INDEX16, 0u, 6u, 1u, 3u);
@@ -5273,6 +5354,7 @@ int main()
     std::cout << "DX11 fixed-function GS/HS/DS isolation R147: PASS\n";
     std::cout << "DX11 fixed-function SO/predication isolation R148: PASS\n";
     std::cout << "DX11 direct bound-buffer capacity R151: PASS\n";
+    std::cout << "DX11 indexed source binding R153: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
     std::cout << "DX11 texture mutation readiness R100: PASS\n";
