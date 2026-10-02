@@ -2411,5 +2411,6 @@ int main()
     std::cout << "DX11 fixed-function render-state bundle R116: PASS\n";
     std::cout << "DX11 fixed-function draw readiness composition R120: PASS\n";
     std::cout << "DX11 geometry-gated draw readiness R122: PASS\n";
+    std::cout << "DX11 dynamic output-state readiness R124: PASS\n";
     return 0;
 }
