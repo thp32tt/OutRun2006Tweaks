@@ -3,6 +3,7 @@
 #include "state_translation.hpp"
 
 #include <limits>
+#include <utility>
 #include <vector>
 
 namespace outrun::vr::dx11 {
