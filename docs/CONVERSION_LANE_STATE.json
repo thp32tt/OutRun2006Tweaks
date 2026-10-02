@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "2510000cce8d221a191497ceb20529ee6a4a4418",
+  "state_parent_head": "232c5b3429ee498a66f491276f2a566e84f56cf1",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,16 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "5646574723603ed9c85c34b0561e4feea6ae3cef",
-    "guard_result_sha": "bffb7773e8755dad04914cb99f604ae0af6be172",
-    "validation_bearing_sha": "ddc5ddc6b826d629b16161bb2f2baac7e68fce87",
-    "automation_validation": "PASS_DESCENDANT_SOURCE_GRAPH_ACTIVATION_CENSUS_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+    "result_sha": "55ca31b8ff3ba961f7d342ef8e80543ef8202e24",
+    "validation_bearing_sha": "55ca31b8ff3ba961f7d342ef8e80543ef8202e24",
+    "automation_validation": "PASS_EXACT_DX11_SOURCE_GRAPH_BUILD_RUN_CANCELLED_AFTER_STATIC_STEP",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. Direct final bound-draw evidence now includes exact live VS-b0/WVP transform binding; generated-fan and current live OM target-binding descendants remain dormant and do not activate Draw*.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until Quest 3/VDXR parity proof.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Do not duplicate the completed direct VS-b0 transform-binding unit or the R141-R143 generated-fan work already present in descendants. Current HEAD has started live OM RTV/DSV target-binding readiness; finish/probe/guard that current unit first. After it is durable, extend the same exact VS-b0/WVP transform evidence to generated-fan final readiness (non-indexed and indexed) or unify the final pre-draw gates. Exhaustive exact-build census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Consume a non-superseded static/build result for the current descendant live OM RTV/DSV target-binding contract (source present through 2510000cce8d221a191497ceb20529ee6a4a4418 or its retained descendants). If that gate passes, perform a fresh source-wide review for the next dormant DX11 conversion gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -438,6 +437,17 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5947368155
+    },
+    {
+      "unit_id": "DX11_GENERATED_FAN_DORMANCY_GUARD_FIX",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "55ca31b8ff3ba961f7d342ef8e80543ef8202e24",
+      "validation_bearing_sha": "55ca31b8ff3ba961f7d342ef8e80543ef8202e24",
+      "automation_validation": "PASS_EXACT_DX11_SOURCE_GRAPH_BUILD_RUN_CANCELLED_AFTER_STATIC_STEP",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5947354326
     }
   ]
 }
