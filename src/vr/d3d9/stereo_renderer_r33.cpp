@@ -920,4 +920,11 @@ namespace OutRunVRStereo
 
         VRStereoR33DispatchHook VRStereoR33DispatchHook::instance;
     }
+
+    inline void FailClosedDepthStencilState() noexcept
+    {
+        R33InvalidateDepthStencilCache();
+        RightDepthSynchronized = false;
+        RightStencilSynchronized = false;
+    }
 }
