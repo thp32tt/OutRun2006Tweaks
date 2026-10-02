@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "f697fa2f4d3def152c2f7b5f38a8501dc00911c1",
+  "state_parent_head": "6c89e87392bc13f5499e45462ed22d987a0953d7",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,15 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "3a49588c47f342c8687666203b36252c24709f3b",
-    "validation_bearing_sha": "f697fa2f4d3def152c2f7b5f38a8501dc00911c1",
-    "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_GATES_COMPILE_NOT_CLAIMED",
+    "result_sha": "69f5ef459e47da85999e506ff54bc6d7a4d8fbba",
+    "validation_bearing_sha": "cd823563f92fef892190ce294184dac89892748f",
+    "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_SOURCE_GRAPH_AND_CENSUS_CONFIGURE_IN_PROGRESS_COMPILE_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI. R156 retaining-descendant static gates passed; Win32 compile/hosted WARP execution are not claimed.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until Quest 3/VDXR parity proof.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve R156 indexed generated-fan source-value plus BaseVertexLocation vertex-capacity identity, then fresh-audit current HEAD for the next independent dormant DX11 semantic gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve R158 input-layout/live-IA stride lineage and fresh-audit current HEAD for the next independent dormant DX11 semantics gap without duplicating R152-R158 work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -647,6 +647,19 @@
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5948035385,
       "validation_issue14_comment_id": 5948053649
+    },
+    {
+      "unit_id": "DX11_INPUT_LAYOUT_STRIDE_LINEAGE_R158",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "148e76926966f1e4bdb2ec5e12ee6d8a0be47655",
+      "followup_disambiguation_sha": "69f5ef459e47da85999e506ff54bc6d7a4d8fbba",
+      "validation_bearing_sha": "cd823563f92fef892190ce294184dac89892748f",
+      "retaining_descendant_sha": "6c89e87392bc13f5499e45462ed22d987a0953d7",
+      "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_SOURCE_GRAPH_AND_CENSUS_CONFIGURE_IN_PROGRESS_COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5948076533
     }
   ]
 }

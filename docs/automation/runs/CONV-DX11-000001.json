@@ -4,75 +4,78 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "38b9c74edaea9beb5164a6ab0c1280ee6902b490",
-  "state_parent_head": "60b423791b0fd476d53d535c9dd9bdb4ace3950c",
-  "material_result_sha": "3a49588c47f342c8687666203b36252c24709f3b",
-  "validation_bearing_sha": "f697fa2f4d3def152c2f7b5f38a8501dc00911c1",
+  "base_sha": "21565053d1bd6105de798148d7e34253d9ce9a1a",
+  "state_parent_head": "6c89e87392bc13f5499e45462ed22d987a0953d7",
+  "material_result_sha": "148e76926966f1e4bdb2ec5e12ee6d8a0be47655",
+  "validation_bearing_sha": "cd823563f92fef892190ce294184dac89892748f",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_INDEXED_FAN_VERTEX_CAPACITY_R156",
-  "selection_reason": "R154 sealed nonindexed fan VB capacity and R155 sealed indexed fan source-content provenance, but indexed generated-fan dispatch still lacked an exact proof that the actual source index values plus BaseVertexLocation stay inside the live managed vertex-buffer byte range.",
-  "summary": "R156 scans the exact current MANAGED source-index window used by the R155-proven generated fan, seals observed source extrema, applies BaseVertexLocation with signed 64-bit arithmetic, and fails closed when the resulting effective vertex interval exceeds the managed VB byte capacity. Hosted probes cover positive lineage and deterministic effective-VB overrun rejection. Native Draw* remains disabled.",
+  "selected_work": "DX11_INPUT_LAYOUT_STRIDE_LINEAGE_R158",
+  "selection_reason": "The D3D9 input-layout translator validated element extents against stream0Stride but discarded that stride, while final live IA readiness independently accepted vertexStride. The hosted probe concretely used a 24-byte translated FVF layout with a 16-byte IA stride, leaving layout semantics and live IA fetch stride unjoined.",
+  "summary": "R158 preserves stream0Stride in VertexInputLayoutTranslation, hashes it into pipeline identity, requires final live IA vertexStride to equal the translated-layout stride, seals the relation into final readiness/snapshot integrity, and adds deterministic mismatch/restore probes plus source-graph guards. Native Draw* remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read AGENTS.md, current conversion state/run record, regression/history evidence and Issue #14 through authenticated GitHub authority.",
-        "Tracked rapid same-branch descendants and avoided duplicating concurrently completed R153-R155 work."
+        "Read AGENTS.md, current conversion state/run record and live branch work through authenticated GitHub authority.",
+        "Tracked rapid same-branch R152-R157 churn, rebased on current HEAD and avoided overwriting concurrent DX11 work."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "R154 explicitly left indexed fan source-value capacity as a separate gate.",
-        "R155 proved generated fan content provenance but did not prove source index extrema plus BaseVertexLocation fit the managed VB."
+        "translate_vertex_input_layout consumed stream0Stride to validate descriptor byte extents but VertexInputLayoutTranslation did not retain it.",
+        "hash_pipeline_input_layout_identity omitted stride and final live IA readiness accepted vertexStride independently.",
+        "The hosted probe translated D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1 at 24 bytes while binding geometry at 16 bytes."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
+        "src/vr/d3d11/pipeline_translation.hpp",
+        "src/vr/d3d11/pipeline_translation.cpp",
+        "src/vr/d3d11/native_backend.hpp",
         "src/vr/d3d11/native_backend.cpp",
         "tools/dx11_constant_buffer_probe.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "94fee58b9f48d0c1ed16d92be51f58230d6d7a3c",
-        "f13ab0bb52d403369f824318051aef79a7c86ba3",
-        "3a49588c47f342c8687666203b36252c24709f3b"
+        "148e76926966f1e4bdb2ec5e12ee6d8a0be47655",
+        "69f5ef459e47da85999e506ff54bc6d7a4d8fbba"
       ],
       "details": [
-        "Indexed fan dispatch scans exactly expansion.sourceElementCount values from the current MANAGED source-index mirror.",
-        "Observed min/max source indices are combined with BaseVertexLocation using signed 64-bit arithmetic and checked against the same managed VB stride/offset/byte width.",
-        "The source-value snapshot and capacity result are mixed into readiness identity; a deterministic overrun probe and source-graph contract were added.",
-        "Later same-lane descendants added exposed source extrema/snapshot assertions while retaining the material commits."
+        "Preserved stream0Stride in translated layout identity and hashed it into the native pipeline translation snapshot.",
+        "Required final live IA vertexStride to equal inputLayout.stream0Stride and sealed both values in final readiness integrity/token.",
+        "Corrected positive hosted fixture to 24-byte stride and added a 16-byte live IA drift rejection plus deterministic restore proof.",
+        "Renamed this unit from R157 to R158 after concurrent direct line-raster work also claimed R157; logic was unchanged."
       ]
     },
     "C3_VALIDATE": {
       "status": "COMPLETE_STATIC",
-      "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_GATES_COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_SOURCE_GRAPH_AND_CENSUS_CONFIGURE_IN_PROGRESS_COMPILE_NOT_CLAIMED",
       "evidence": [
-        "GitHub compare proved f697fa2f4d3def152c2f7b5f38a8501dc00911c1 is ahead of 3a49588c47f342c8687666203b36252c24709f3b with behind_by=0.",
-        "Build run 36983110108 job 110762245730 passed Checkout, HMD baseline, one-click structure, backend disassembly contract, Verify DX11 source graph, DX11 census analyzer, wheel source and wheel math steps.",
-        "Configure was still in progress at validation capture; Win32 build, hosted WARP execution and Quest 3/VDXR runtime are not claimed."
+        "GitHub compare proved current descendants retain material commit 148e76926966f1e4bdb2ec5e12ee6d8a0be47655 and follow-up 69f5ef459e47da85999e506ff54bc6d7a4d8fbba with behind_by=0 at validation capture.",
+        "Build run 36983436710 on post-rename retaining descendant cd823563f92fef892190ce294184dac89892748f passed Verify DX11 source graph and Test DX11 census analyzer.",
+        "Configure was in progress at validation capture; full Win32 compile/build and Quest 3/VDXR runtime are not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "3a49588c47f342c8687666203b36252c24709f3b",
-      "issue14_comment_id": 5948035385,
-      "validation_issue14_comment_id": 5948053649
+      "material_commit": "148e76926966f1e4bdb2ec5e12ee6d8a0be47655",
+      "followup_commit": "69f5ef459e47da85999e506ff54bc6d7a4d8fbba",
+      "issue14_comment_id": 5948076533
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant DX11 readiness/probe/static-guard work only; no production Draw* routing, backend activation, OpenXR transport, localization, other backend lane or release payload changed."
+      "reason": "Dormant DX11 input-layout/live-IA readiness, probe and static-guard work only; no production Draw* routing, backend activation, OpenXR transport, localization, DXVK lane or release payload changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R156 indexed fan source-value/BaseVertex capacity proof and fresh-audit current HEAD for the next independent dormant DX11 semantics gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R158 input-layout/live-IA stride lineage and fresh-audit current HEAD for the next independent dormant DX11 semantics gap without duplicating R152-R158 work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -83,13 +86,14 @@
     "localization_modified": false,
     "other_backend_modified": false
   },
-  "issue14_comment_id": 5948035385,
-  "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_GATES_COMPILE_NOT_CLAIMED",
-  "blocker": "Win32 compile/hosted WARP and Quest 3/VDXR runtime validation are not claimed. Retaining-descendant GitHub static gates passed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Preserve R156 indexed fan source-value/BaseVertex capacity proof and fresh-audit current HEAD for the next independent dormant DX11 semantics gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5948076533,
+  "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_SOURCE_GRAPH_AND_CENSUS_CONFIGURE_IN_PROGRESS_COMPILE_NOT_CLAIMED",
+  "blocker": "Full Win32 compile/build and Quest 3/VDXR runtime validation are not claimed. Post-rename retaining-descendant GitHub DX11 source-graph and census static gates passed.",
+  "next_action": "Keep NativeDrawPathActive disabled. Preserve R158 input-layout/live-IA stride lineage and fresh-audit current HEAD for the next independent dormant DX11 semantics gap without duplicating R152-R158 work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "prior_completed_unit": "DX11_INDEXED_FAN_SOURCE_CONTENT_PROVENANCE_R155",
-  "validation_issue14_comment_id": 5948053649
+  "prior_completed_unit": "DX11_INDEXED_FAN_VERTEX_CAPACITY_R156",
+  "validation_issue14_comment_id": 5948053649,
+  "followup_disambiguation_sha": "69f5ef459e47da85999e506ff54bc6d7a4d8fbba"
 }
