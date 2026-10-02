@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "dbb03b83074ca293af5ba0ad31dad76111236351",
+  "state_parent_head": "7f7122ef86bb88063d52c840d57593f894b8416d",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,7 +54,7 @@
     "task_id": "CONV-DXVK-000002",
     "result_sha": "dd469b73ae535584285dd823233b0b74e36f154d",
     "validation_bearing_result_sha": "dd469b73ae535584285dd823233b0b74e36f154d",
-    "run_record_commit_sha": "dbb03b83074ca293af5ba0ad31dad76111236351",
+    "run_record_commit_sha": "7f7122ef86bb88063d52c840d57593f894b8416d",
     "automation_validation": "PASS",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
@@ -71,11 +71,16 @@
     "backend_disassembly_contract": "PASS",
     "capture_end_rva": "0x001828A7",
     "capture_end_is_instruction_boundary": true,
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "decoded_complete_instruction_count": 16,
+    "dxvk_disassembly_evidence_job_id": 110720831900,
+    "backend_conversion_gate_job_id": 110720831863,
+    "backend_conversion_gate_artifact_id": 11211735633,
+    "issue14_comment_id": 5946273182
   },
   "runtime_blocker": "No runtime acceptance claim exists; exact disassembly/control-flow evidence remains review/static evidence only.",
   "runtime_next_action": "Quest 3/VDXR runtime validation remains a later user-hardware gate after a runtime candidate exists.",
-  "independent_static_next_action": "Capture a fresh bounded canonical-EXE continuation beginning at the proven instruction boundary 0x001828A7. Validate raw provenance first, include nearby external branch targets 0x001828A9/0x001828B3/0x001828C4 when reached, then exact-decode only complete instructions without promoting function/render/HUD/runtime semantics beyond evidence.",
+  "independent_static_next_action": "Capture a fresh bounded canonical-EXE continuation beginning at the proven instruction boundary 0x001828A7. Resolve nearby forward branch targets 0x001828A9/0x001828B3/0x001828C4 and call target 0x001828F2 only with fresh canonical evidence, then exact-decode only complete instructions without promoting function/render/HUD/runtime semantics beyond evidence.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
