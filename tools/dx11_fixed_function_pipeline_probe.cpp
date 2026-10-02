@@ -440,7 +440,37 @@ int main()
             "R170 fixed-function handoff must retain texture-coordinate wrap blocker");
     }
 
+    {
+        std::array<FixedFunctionStageState, 8> addStages{};
+        addStages[0].colorOp = D3DTOP_ADD;
+        addStages[0].colorArg1 = D3DTA_TEXTURE;
+        addStages[0].colorArg2 = D3DTA_DIFFUSE;
+        addStages[0].alphaOp = D3DTOP_SELECTARG1;
+        addStages[0].alphaArg1 = D3DTA_TEXTURE;
+        addStages[0].minFilter = D3DTEXF_POINT;
+        addStages[0].magFilter = D3DTEXF_POINT;
+        addStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto addShader = generate_fixed_function_pixel_shader_prototype(
+            addStages, true, 0x01u, 0x01u, textureTypes);
+        require(
+            addShader.generated() && addShader.activeStages == 1,
+            "D3DTOP_ADD fixed-function stage must become shader-exact");
+        require(
+            addShader.source.find(
+                "float3 nextColor = sampled0.rgb + input.diffuse.rgb;") !=
+                std::string::npos,
+            "D3DTOP_ADD shader expression drift");
+        const auto addCompile =
+            compile_fixed_function_pixel_shader_prototype(addShader);
+        require(
+            addCompile.attempted && addCompile.succeeded &&
+            addCompile.result == S_OK && addCompile.bytecodeBytes != 0,
+            "D3DTOP_ADD fixed-function shader prototype did not compile");
+    }
+
     std::cout
+        << "DX11 fixed-function D3DTOP_ADD support: PASS\n"
         << "DX11 fixed-function RESULTARG fail-closed R173: PASS\n"
         << "DX11 multisample raster provenance R171: PASS\n"
         << "DX11 texture-coordinate wrap fail-closed R170: PASS\n"
