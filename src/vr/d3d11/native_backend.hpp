@@ -21,6 +21,7 @@ struct FixedFunctionVertexShaderPrototype;
 struct FixedFunctionPixelShaderPrototype;
 struct NativeSurfacePairReadiness;
 struct NativeTriangleFanIndexBufferReadiness;
+class NativeTriangleFanIndexBuffer;
 struct VertexInputLayoutTranslation;
 struct FixedFunctionStageState;
 struct PipelineTranslation;
@@ -1203,6 +1204,65 @@ compose_fixed_function_complete_bound_draw_readiness(
     const NativeManagedBufferShadow* indexBuffer,
     DXGI_FORMAT indexFormat,
     UINT indexOffset,
+    std::uint64_t snapshotToken) noexcept;
+
+// R142 extends the complete dormant pre-draw proof to non-indexed D3D9
+// triangle fans. It reconstructs the fan geometry from the current managed
+// vertex mirror plus the generated-index owner, then observes exact slot-0 VB
+// and generated R32_UINT IB/topology state on the same context. No Draw* call
+// is issued and NativeDrawPathActive remains unchanged.
+struct NativeFixedFunctionCompleteFanBoundDrawReadiness {
+    bool inputValid{};
+    bool sameContextBoundDrawReady{};
+    bool geometryReady{};
+    bool geometryMatchesDraw{};
+    bool vertexBufferBoundExact{};
+    bool generatedIndexBindingReady{};
+    bool generatedIndexMatchesGeometry{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t sameContextBoundDrawSnapshotToken{};
+    std::uint64_t geometrySnapshotToken{};
+    std::uint64_t vertexBufferSnapshotToken{};
+    std::uint64_t generatedIndexBindingSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionCompleteFanBoundDrawReadiness
+compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex,
     std::uint64_t snapshotToken) noexcept;
 
 class NativeBackend final {
