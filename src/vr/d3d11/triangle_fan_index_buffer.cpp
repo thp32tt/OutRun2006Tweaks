@@ -230,6 +230,73 @@ bool NativeTriangleFanIndexBuffer::validate_readiness_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+NativeTriangleFanIndexBufferBindingReadiness
+NativeTriangleFanIndexBuffer::binding_readiness(
+    ID3D11DeviceContext* context) const noexcept {
+    NativeTriangleFanIndexBufferBindingReadiness out{};
+    out.inputValid = context != nullptr;
+    if (!out.inputValid)
+        return out;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    context->GetDevice(contextDevice.GetAddressOf());
+    out.contextMatches =
+        contextDevice && contextDevice.Get() == device_.Get();
+
+    const auto owner = readiness(contextDevice.Get());
+    out.ownerReady = owner.ready && owner.snapshotToken != 0;
+    out.ownerSnapshotToken = owner.snapshotToken;
+    if (!out.contextMatches || !out.ownerReady)
+        return out;
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer> observedBuffer;
+    DXGI_FORMAT observedFormat = DXGI_FORMAT_UNKNOWN;
+    UINT observedOffset = 0;
+    context->IAGetIndexBuffer(
+        observedBuffer.GetAddressOf(), &observedFormat, &observedOffset);
+    D3D11_PRIMITIVE_TOPOLOGY observedTopology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    context->IAGetPrimitiveTopology(&observedTopology);
+
+    out.bufferBoundExact = observedBuffer.Get() == buffer_.Get();
+    out.formatExact = observedFormat == DXGI_FORMAT_R32_UINT;
+    out.offsetExact = observedOffset == 0;
+    out.topologyExact =
+        observedTopology == D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    out.ready =
+        out.bufferBoundExact &&
+        out.formatExact &&
+        out.offsetExact &&
+        out.topologyExact;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_index_token(token, out.ownerSnapshotToken);
+        token = mix_index_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(context)));
+        token = mix_index_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(observedBuffer.Get())));
+        token = mix_index_token(
+            token, static_cast<std::uint32_t>(observedFormat));
+        token = mix_index_token(token, observedOffset);
+        token = mix_index_token(
+            token, static_cast<std::uint32_t>(observedTopology));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeTriangleFanIndexBuffer::validate_binding_snapshot(
+    ID3D11DeviceContext* context,
+    std::uint64_t snapshotToken) const noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = binding_readiness(context);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 bool NativeTriangleFanIndexBuffer::bind(
     ID3D11DeviceContext* context) const noexcept {
     if (!ready() || !context)
@@ -242,7 +309,7 @@ bool NativeTriangleFanIndexBuffer::bind(
 
     context->IASetIndexBuffer(buffer_.Get(), DXGI_FORMAT_R32_UINT, 0);
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    return true;
+    return binding_readiness(context).ready;
 }
 
 void NativeTriangleFanIndexBuffer::shutdown() noexcept {
