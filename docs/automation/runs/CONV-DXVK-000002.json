@@ -4292,6 +4292,82 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve this guard and newest authoritative continuation frontier; continue only the first unfinished canonical raw/exact/static unit from current HEAD."
+    },
+    {
+      "unit_id": "DXVK_F48_CANONICAL_CONTROL_FLOW_0x18307A_TO_0x1830B3",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "fea0ec49d13a3e6cb8822a0741af8aeb39b29aa9",
+      "validation_bearing_result_sha": "fea0ec49d13a3e6cb8822a0741af8aeb39b29aa9",
+      "commit_message": "dxvk: prove canonical 0x18307A control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact continuation_57 proof: 15 complete canonical instructions over 0x0018307A..0x001830B3, two exact branches, one exact rel32 CALL, predecessor forward targets 0x0018308D/0x00183092 resolved onto exact instruction boundaries, and trailing cut ANDPD bytes preserved for mandatory overlap.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered current GitHub branch/AGENTS/lane/run/work-queue/regression state and Issue #14; branch concurrency was refreshed before selection."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected exact control-flow proof of the canonical-validated continuation_57 raw frontier as the highest-value unfinished runnable static unit."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit fea0ec49d13a3e6cb8822a0741af8aeb39b29aa9 implements exact instruction/branch/CALL/predecessor-target/capture-edge proof."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "DXVK Canonical Disassembly Evidence run 36986121318 job 110771431774 succeeded on exact material SHA. Backend Conversion Gate run 36986121305 passed all static/test/configure stages and was building Win32 at state write; no build or runtime claim is required for this static proof."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive material commit fea0ec49d13a3e6cb8822a0741af8aeb39b29aa9 contains [AUTO:CONV-DXVK-000002]; Issue #14 comment 5948511475 appended."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static disassembly proof only; no runtime/package/backend binary/localization payload changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as supplemental completion without replacing concurrently newer task/frontier state."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "fea0ec49d13a3e6cb8822a0741af8aeb39b29aa9",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "dxvk_disassembly_evidence_run_id": 36986121318,
+        "dxvk_disassembly_evidence_job_id": 110771431774,
+        "artifact_id": 11216954405,
+        "artifact_digest": "sha256:6930bb7bba6dbea8be2475af1b58204b5cd164fbe8e5554261db71bc809cd369",
+        "proof_status": "EXACT_18307A_TO_1830B3_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "instruction_count": 15,
+        "branches": [
+          "0x001830AA->0x001830D1",
+          "0x001830B1->0x00183063"
+        ],
+        "direct_rel32_calls": [
+          "0x00183085->0x00189F10"
+        ],
+        "resolved_predecessor_targets": [
+          "0x0018308D",
+          "0x00183092"
+        ],
+        "incomplete_rva": "0x001830B3",
+        "incomplete_bytes": "66 0f 54 05 50 91 61",
+        "backend_conversion_gate_run_id": 36986121305,
+        "backend_conversion_gate_status_at_state_write": "STATIC_TEST_CONFIGURE_PASS_WIN32_BUILD_IN_PROGRESS_NOT_REQUIRED",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948511475,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve any newer branch-authoritative frontier. If this remains the newest proof edge, capture canonical bytes from 0x001830B3 with mandatory 66 0f 54 05 50 91 61 overlap, validate provenance, then exact-decode only complete instructions; keep function/render/HUD/runtime semantics unresolved."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
