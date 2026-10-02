@@ -5,16 +5,16 @@
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
   "checkpoint": "C6_STATE",
-  "status": "COMPLETE_AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "status": "COMPLETE_SELECTED_UNIT_RUNTIME_UNTESTED",
   "initial_recovered_head": "15d61f8a26cb3ba7f6c802b8fe24f6eb4081cddb",
-  "validation_bearing_result_sha": "5574618845b1dab0f05ac5a3d9b7a15150fd5b45",
-  "result_sha": "5574618845b1dab0f05ac5a3d9b7a15150fd5b45",
-  "automation_validation": "PASS",
+  "validation_bearing_result_sha": "e329b329ec464fc427412afc9bc0f509a884290b",
+  "result_sha": "6b66fb90dfb89944dd40c6498f24f54bd3acee0b",
+  "automation_validation": "PASS_SELECTED_UNIT_ON_DESCENDANT",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
-  "selected_work_item": "DXVK_F13_F14_CANONICAL_EXE_CONTINUATION_0x1827E9_TO_0x182868",
-  "summary": "Advanced the DXVK disassembly-first lane with exact canonical-EXE control-flow proof from 0x001827E9 through exclusive 0x00182828, then a fail-closed 64-byte provenance continuation from the incomplete TEST opcode at 0x00182828 through 0x00182868. No function, render, HUD, ownership or runtime semantics were promoted beyond the evidence.",
+  "selected_work_item": "DXVK_F14_CANONICAL_EXE_CONTROL_FLOW_0x182828_TO_0x182867",
+  "summary": "Completed the DXVK canonical-EXE F14 control-flow proof from 0x00182828 through exclusive 0x00182867, validating 20 complete instructions, exact relative branch/call targets, predecessor target bytes, and the fail-closed incomplete 0x25 AND EAX,imm32 capture edge. A same-JOB descendant also added and validated the next raw provenance window at 0x00182867..0x001828A7. No function, render, HUD, ownership or runtime semantics were promoted.",
   "source_commits": [
     {
       "sha": "618729b2e4297e77910c1254e72acb350634582d",
@@ -24,6 +24,17 @@
       "sha": "5574618845b1dab0f05ac5a3d9b7a15150fd5b45",
       "message": "dxvk: capture canonical 0x182828 continuation [AUTO:CONV-DXVK-000002]",
       "validation_bearing": true
+    },
+    {
+      "sha": "9432aa619504835707c4a0eaaad1068ec2890cc7",
+      "message": "dxvk: prove canonical 0x182828 control flow [AUTO:CONV-DXVK-000002]",
+      "role": "material-analyzer-proof"
+    },
+    {
+      "sha": "6b66fb90dfb89944dd40c6498f24f54bd3acee0b",
+      "message": "test: lock dxvk 0x182828 disasm proof [AUTO:CONV-DXVK-000002]",
+      "role": "material-contract-proof",
+      "validation_bearing_material": true
     }
   ],
   "changed_paths": [
@@ -52,38 +63,38 @@
   "pipeline": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Read AGENTS.md and docs/CONVERSION_LANE_STATE.json from current GitHub branch; branch-local conversion state and current GitHub HEAD treated as authority."
+      "evidence": "Read AGENTS.md, branch-local docs/CONVERSION_LANE_STATE.json, current durable run record, regression/history risk context, and Issue #14 from authenticated GitHub branch state."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
-      "evidence": "Selected the highest-value unfinished branch-local canonical-EXE continuation chain and preserved fail-closed semantics at capture edges."
+      "evidence": "Selected F14 exact-decode of the already validated 0x00182828..0x00182868 canonical window; bounded decode stops at raw byte 0x25 at 0x00182867."
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "evidence": "Material analyzer and disassembly-contract changes are in source commits 618729b2e4297e77910c1254e72acb350634582d and 5574618845b1dab0f05ac5a3d9b7a15150fd5b45."
+      "evidence": "Material analyzer proof commit 9432aa619504835707c4a0eaaad1068ec2890cc7 and contract commit 6b66fb90dfb89944dd40c6498f24f54bd3acee0b add exact instruction/branch/call/predecessor/capture-edge verification."
     },
     "C3_VALIDATE": {
       "status": "COMPLETE",
-      "evidence": "Exact-SHA canonical EXE analysis and Backend Conversion Gate both passed."
+      "evidence": "GitHub Actions artifact 11197647438 independently matched canonical EXE SHA256 and local byte/target checks. Descendant exact-head OutRun EXE HUD Inspector run 36969203659 static job 110719464690 SUCCESS reports EXACT_182828_TO_182867_CONTROL_FLOW_CAPTURE_EDGE_PROVEN with all booleans true; Build run 36969203675 passed Verify backend disassembly contract."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
-      "evidence": "Two substantive commits contain the required [AUTO:CONV-DXVK-000002] marker."
+      "evidence": "Substantive source/test commits 9432aa619504835707c4a0eaaad1068ec2890cc7 and 6b66fb90dfb89944dd40c6498f24f54bd3acee0b contain the required [AUTO:CONV-DXVK-000002] marker."
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "This work item changes disassembly/static-evidence tooling only and does not create or alter a runtime candidate payload. The exact-SHA Backend Conversion Gate still built and verified the Win32 binary."
+      "reason": "Disassembly/static-evidence tooling only; no runtime payload semantics or candidate activation changed. Runtime validation remains separate."
     },
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "exact_next_action": "Exact-decode only the complete instructions exposed by the validated 0x00182828..0x00182868 canonical window. Preserve the trailing cut instruction beginning with byte 0x25 near the capture end as raw-only until a fresh overlapping window proves the remaining bytes; do not infer render/HUD/runtime semantics from control-flow shape."
+      "exact_next_action": "Exact-decode only complete instructions from the validated canonical 0x00182867..0x001828A7 F15 window. Preserve any cut trailing instruction as raw overlap; do not infer function/render/HUD/runtime semantics."
     }
   },
   "validation": {
-    "exact_sha": "5574618845b1dab0f05ac5a3d9b7a15150fd5b45",
-    "hud_inspector_run_id": 36968266438,
-    "static_exe_analysis_job_id": 110716752069,
+    "exact_sha": "e329b329ec464fc427412afc9bc0f509a884290b",
+    "hud_inspector_run_id": 36969203659,
+    "static_exe_analysis_job_id": 110719464690,
     "static_exe_analysis": "PASS",
     "canonical_provenance": "EXACT_EXE_182828_TO_182868_PROVENANCE_CAPTURED",
     "previous_control_flow_exact_sha": "618729b2e4297e77910c1254e72acb350634582d",
@@ -97,11 +108,20 @@
     "binary_exists": "PASS",
     "artifact_upload": "PASS",
     "pc_fast": "SKIPPED_NOT_AUTHORIZED",
-    "notes": "No Quest 3/VDXR runtime test was performed. CI/build evidence is not runtime acceptance evidence."
+    "notes": "No Quest 3/VDXR runtime test was performed. CI/static evidence is not runtime acceptance evidence.",
+    "material_result_sha": "6b66fb90dfb89944dd40c6498f24f54bd3acee0b",
+    "validation_mode": "DESCENDANT_EXACT_TREE_CONTAINS_MATERIAL_COMMITS",
+    "canonical_control_flow": "EXACT_182828_TO_182867_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "continuation_24_provenance": "EXACT_EXE_182867_TO_1828A7_PROVENANCE_CAPTURED",
+    "build_run_id": 36969203675,
+    "direct_material_sha_runs": "SUPERSEDED_BY_NEWER_SAME_JOB_DESCENDANTS",
+    "runtime_validation": "UNTESTED"
   },
   "issue14_comments": [
     5946039322,
-    5946042892
+    5946042892,
+    5946116300,
+    5946200824
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -110,5 +130,35 @@
     "No localization files modified",
     "RUNTIME_VALIDATION remains UNTESTED without matching Quest 3/VDXR evidence"
   ],
-  "next_action": "Exact-decode only complete instructions from canonical RVA 0x00182828 using the validated 64-byte window through 0x00182868; preserve the cut trailing opcode beginning with 0x25 as raw capture-edge evidence and extend it only with a fresh overlap window."
+  "next_action": "Exact-decode only complete instructions from canonical RVA 0x00182867 using the validated 64-byte window through 0x001828A7; preserve any cut trailing instruction as raw capture-edge evidence and extend it only with a fresh overlap window.",
+  "current_branch_head_at_c6": "e329b329ec464fc427412afc9bc0f509a884290b",
+  "control_flow_followup": {
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "start_rva": "0x00182828",
+    "prefix_end_rva": "0x00182867",
+    "status": "EXACT_182828_TO_182867_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "instruction_count": 20,
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "branches_match": true,
+    "calls_match": true,
+    "predecessor_targets_match": true,
+    "incomplete_rva": "0x00182867",
+    "incomplete_bytes": "25",
+    "incomplete_expected_instruction": "AND EAX, imm32",
+    "incomplete_status": "OPCODE_ONLY",
+    "ownership_effect": "NONE",
+    "semantic_promotion": "NONE"
+  },
+  "follow_on_provenance": {
+    "start_rva": "0x00182867",
+    "probe_end_rva": "0x001828A7",
+    "probe_len": 64,
+    "required_overlap": "25",
+    "status": "EXACT_EXE_182867_TO_1828A7_PROVENANCE_CAPTURED",
+    "validation_bearing_sha": "e329b329ec464fc427412afc9bc0f509a884290b",
+    "hud_inspector_run_id": 36969203659,
+    "static_exe_analysis_job_id": 110719464690,
+    "note": "Follow-on same-JOB work is validated raw provenance only; exact decoding remains the next independent static item."
+  }
 }
