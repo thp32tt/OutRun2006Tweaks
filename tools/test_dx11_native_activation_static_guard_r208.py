@@ -7,6 +7,7 @@ activation change.
 """
 
 from pathlib import Path
+import re
 import sys
 
 REQUIRED = (
@@ -49,6 +50,11 @@ def read_sources(root: Path) -> str:
     return "\n".join(sources)
 
 
+def normalize_source(text: str) -> str:
+    """Normalize harmless whitespace variants before activation checks."""
+    return re.sub(r"\s+", "", text)
+
+
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     state = root / "docs" / "CONVERSION_LANE_STATE.json"
@@ -63,8 +69,9 @@ def main() -> int:
         return 1
 
     source = read_sources(root)
+    normalized_source = normalize_source(source)
     for marker in FORBIDDEN_ACTIVATION_MARKERS:
-        if marker in source:
+        if marker.replace(" ", "") in normalized_source:
             print("unexpected activation marker:", marker)
             return 1
 
