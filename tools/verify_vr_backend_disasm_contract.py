@@ -2,6 +2,7 @@
 """Verify the DX11/DXVK backend contract still matches recovered OutRun EXE facts."""
 
 from pathlib import Path
+import runpy
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -11,6 +12,102 @@ def require(path: str, needles: list[str]) -> None:
     missing = [needle for needle in needles if needle not in text]
     if missing:
         raise SystemExit(f"{path}: missing disassembly contract evidence: {missing}")
+
+
+def verify_dxvk_continuation_chain() -> None:
+    """Fail closed if canonical continuation capture/proof edges drift apart."""
+
+    analyzer = runpy.run_path(
+        str(ROOT / "tools/analyze_outrun_exe.py"),
+        run_name="dxvk_disasm_contract_analyzer",
+    )
+
+    def value(name: str):
+        if name not in analyzer:
+            raise SystemExit(f"DXVK continuation chain missing analyzer symbol: {name}")
+        return analyzer[name]
+
+    raw_ids = (23, 24, 25, 26, 27, 28)
+    for continuation_id in raw_ids:
+        prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
+        start = value(f"{prefix}_RVA")
+        probe_len = value(f"{prefix}_PROBE_LEN")
+        probe_end = value(f"{prefix}_PROBE_END_RVA")
+        if start + probe_len != probe_end:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} probe geometry drift: "
+                f"0x{start:08X}+{probe_len} != 0x{probe_end:08X}"
+            )
+
+    proof_ids = (23, 24, 25, 26, 27)
+    for continuation_id in proof_ids:
+        prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
+        start = value(f"{prefix}_RVA")
+        probe_end = value(f"{prefix}_PROBE_END_RVA")
+        proof_end = value(f"{prefix}_PREFIX_END_RVA")
+        if not start <= proof_end <= probe_end:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof end escaped raw probe: "
+                f"0x{proof_end:08X} not in 0x{start:08X}..0x{probe_end:08X}"
+            )
+
+    cut_edge_ids = (23, 25, 26, 27)
+    for continuation_id in cut_edge_ids:
+        prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
+        proof_end = value(f"{prefix}_PREFIX_END_RVA")
+        incomplete_rva = value(f"{prefix}_INCOMPLETE_RVA")
+        incomplete_bytes = value(f"{prefix}_INCOMPLETE_BYTES")
+        probe_end = value(f"{prefix}_PROBE_END_RVA")
+        if incomplete_rva != proof_end:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} cut edge moved away from proof end: "
+                f"0x{incomplete_rva:08X} != 0x{proof_end:08X}"
+            )
+        if incomplete_rva + len(incomplete_bytes) != probe_end:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} cut bytes no longer fill capture edge: "
+                f"0x{incomplete_rva:08X}+{len(incomplete_bytes)} != 0x{probe_end:08X}"
+            )
+
+    transitions = (
+        (23, 24, "overlap"),
+        (24, 25, "boundary"),
+        (25, 26, "overlap"),
+        (26, 27, "overlap"),
+        (27, 28, "overlap"),
+    )
+    for previous_id, next_id, mode in transitions:
+        previous = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{previous_id}"
+        following = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{next_id}"
+        previous_end = value(f"{previous}_PREFIX_END_RVA")
+        next_start = value(f"{following}_RVA")
+        if previous_end != next_start:
+            raise SystemExit(
+                f"DXVK continuation chain gap {previous_id}->{next_id}: "
+                f"0x{previous_end:08X} != 0x{next_start:08X}"
+            )
+        if mode == "boundary":
+            previous_probe_end = value(f"{previous}_PROBE_END_RVA")
+            if previous_end != previous_probe_end:
+                raise SystemExit(
+                    f"DXVK boundary transition {previous_id}->{next_id} "
+                    f"does not end at the prior capture boundary"
+                )
+            continue
+
+        previous_incomplete_rva = value(f"{previous}_INCOMPLETE_RVA")
+        previous_incomplete = value(f"{previous}_INCOMPLETE_BYTES")
+        next_overlap = value(f"{following}_OVERLAP_BYTES")
+        if previous_incomplete_rva != next_start:
+            raise SystemExit(
+                f"DXVK overlap transition {previous_id}->{next_id} starts at "
+                f"0x{next_start:08X}, expected incomplete edge 0x{previous_incomplete_rva:08X}"
+            )
+        if not previous_incomplete or next_overlap != previous_incomplete:
+            raise SystemExit(
+                f"DXVK overlap bytes drifted for transition {previous_id}->{next_id}: "
+                f"{next_overlap.hex(' ')} != {previous_incomplete.hex(' ')}"
+            )
 
 
 def main() -> None:
@@ -1480,6 +1577,7 @@ def main() -> None:
             '"runtime_validation": "UNTESTED"',
         ],
     )
+    verify_dxvk_continuation_chain()
     print("VR backend disassembly contract: OK")
 
 
