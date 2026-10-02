@@ -321,6 +321,39 @@ def main() -> None:
             + ", ".join(missing_r181_d3dtop_modulate4x)
         )
 
+    r182_d3dtop_addsigned_contract = [
+        ("case D3DTOP_ADDSIGNED:", PIPELINE_TRANSLATION_CPP,
+         "R182 D3DTOP_ADDSIGNED readiness/translation case"),
+        ('return first + " + " + second + " - 0.5";',
+         PIPELINE_TRANSLATION_CPP,
+         "R182 D3DTOP_ADDSIGNED biased-add shader expression"),
+        ("addSignedStages[0].colorOp = D3DTOP_ADDSIGNED;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R182 hosted ADDSIGNED color fixture"),
+        ("addSignedStages[0].alphaOp = D3DTOP_ADDSIGNED;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R182 hosted ADDSIGNED alpha fixture"),
+        ("float3 nextColor = sampled0.rgb + input.diffuse.rgb - 0.5;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R182 generated RGB HLSL assertion"),
+        ("float nextAlpha = sampled0.a + input.diffuse.a - 0.5;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R182 generated alpha HLSL assertion"),
+        ("R182 D3DTOP_ADDSIGNED fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R182 offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_ADDSIGNED support R182: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R182 hosted probe completion"),
+    ]
+    missing_r182_d3dtop_addsigned = [
+        meaning
+        for token, source, meaning in r182_d3dtop_addsigned_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_ADDSIGNED:") < 3:
+        missing_r182_d3dtop_addsigned.append(
+            "R182 ADDSIGNED must participate in texture-use, HLSL and readiness switches")
+    if missing_r182_d3dtop_addsigned:
+        raise SystemExit(
+            "DX11 R182 fixed-function D3DTOP_ADDSIGNED contract drift: "
+            + ", ".join(missing_r182_d3dtop_addsigned)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
