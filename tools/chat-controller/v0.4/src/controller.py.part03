@@ -1545,9 +1545,12 @@ async def localization_send_lane_task(
         "native_plugin_protocol_version": NATIVE_PLUGIN_PROTOCOL_VERSION,
         "task_latched": True if CONTROLLER_MODE in {"conversion", "localization"} else slot_name in {"A", "B", "C", "D"},
         "controller_stage": (
-            "WAIT_DURABLE_RESULT" if CONTROLLER_MODE == "conversion"
+            "C0_RECOVER" if CONTROLLER_MODE == "conversion"
             else ("WAIT_MATERIAL_COMMIT" if slot_name in {"A", "B", "D"} else "WAIT_QA_RESULT")
         ),
+        "conversion_pipeline_schema_version": CONVERSION_PIPELINE_SCHEMA_VERSION if CONTROLLER_MODE == "conversion" else None,
+        "conversion_pipeline_required_stages": list(CONVERSION_PIPELINE_STAGES) if CONTROLLER_MODE == "conversion" else None,
+        "conversion_pipeline_validation": "PENDING" if CONTROLLER_MODE == "conversion" else None,
         "pipeline_candidate_count": 0 if CONTROLLER_MODE == "localization" and slot_name in {"A", "B", "D"} else None,
         "pipeline_material_commit_count": 0 if CONTROLLER_MODE == "localization" and slot_name in {"A", "B", "D"} else None,
         "pipeline_result_shas": [] if CONTROLLER_MODE == "localization" and slot_name in {"A", "B", "D"} else None,
