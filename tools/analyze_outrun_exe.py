@@ -3107,10 +3107,10 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_52_INSTRUCTIONS = (
 )
 
 
-# CONV-DXVK-000002/F44: continuation 52 ends seven bytes into the ANDPD
-# XMM3,m128 instruction at 0x182F7E. Overlap those exact canonical bytes and
-# capture the next bounded 64-byte window. Fresh bytes and rel32 candidates
-# remain raw-only until a later exact decode proves instruction boundaries.
+# CONV-DXVK-000002/F44: continuation 52 ends seven bytes into an ANDPD
+# memory instruction at 0x182F7E. Overlap those exact predecessor bytes and
+# capture the next bounded canonical window. Fresh bytes and rel32 candidates
+# remain raw-only until exact canonical decode proves instruction boundaries.
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_53_RVA = 0x00182F7E
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_53_PROBE_LEN = 64
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_53_PROBE_END_RVA = 0x00182FBE
