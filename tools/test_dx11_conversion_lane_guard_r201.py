@@ -25,6 +25,8 @@ def main() -> None:
         '"localization_modified": false',
         '"other_backend_modified": false',
         '"native_draw_path_activation_changed": false',
+        '"Keep NativeDrawPathActive disabled."',
+        '"Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation."',
     ]
     missing = [token for token in required if token not in state]
     if missing:
@@ -36,7 +38,10 @@ def main() -> None:
     if "DXVK is the secondary implementation/performance lane" not in agents:
         raise SystemExit("backend priority isolation marker missing")
 
-    print("DX11 conversion lane guard R202: PASS")
+    if "runtime validation" not in agents.lower():
+        raise SystemExit("runtime validation policy marker missing")
+
+    print("DX11 conversion lane guard R203: PASS")
 
 
 if __name__ == "__main__":
