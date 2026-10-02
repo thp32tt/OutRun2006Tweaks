@@ -242,12 +242,12 @@ else:
 
 for rel, source in (("R32", r32), ("R33", r33), ("R34", r34)):
     for banned in (
-        "R31FastWorldCandidates",
         "R31FastWorldDraws",
         "R31FastWorldLiveValidations",
         "R31FastWorldValidationRejects",
         "R31HudDraws",
-        "R31Frame.",
+        "R31Frame",
+        "R31Window",
     ):
         if banned in source:
             errors.append(
@@ -257,6 +257,9 @@ for marker in (
     "R31TelemetryNoteFastWorld()",
     "R31TelemetryNoteHud()",
     "R31TelemetryNoteFallback()",
+    "R31TelemetryNoteUnstable()",
+    "R31TelemetryNoteFragile()",
+    "R31TelemetryResetFrameWindow()",
     "R31TelemetryLiveWvpChecks()",
     "R31TelemetryLiveWvpRejects()",
 ):
