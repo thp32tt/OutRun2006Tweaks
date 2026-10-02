@@ -1,0 +1,26 @@
+{
+  "task_id": "CONVERSION-DXVK-00278",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "83e00209698d06d0c1430b38883df037322986e7",
+  "result_sha": "PENDING_COMMIT_RESPONSE",
+  "automation_validation": "RECORD_COMMIT_CREATED",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "checkpoint": "C6_STATE",
+  "work_type": "durable_task_checkpoint",
+  "selected_work_item": "CONTINUE_FROM_EXACT_INSTRUCTION_BOUNDARY_0x00182635",
+  "summary": "Recovered DXVK conversion lane state from GitHub HEAD. Confirmed branch isolation, conversion state precedence, and next bounded static/disassembly continuation point. No runtime claim and no backend promotion performed.",
+  "evidence": [
+    "GitHub HEAD before task: 83e00209698d06d0c1430b38883df037322986e7.",
+    "docs/CONVERSION_LANE_STATE.json selects DXVK lane state over inherited VR state.",
+    "Runtime validation remains UNTESTED until Quest 3/VDXR evidence exists."
+  ],
+  "changed_paths": [
+    "docs/automation/runs/CONVERSION-DXVK-00278.json"
+  ],
+  "source_changed": false,
+  "runtime_claim": "NONE",
+  "next_action": "Continue bounded canonical EXE provenance/disassembly work from 0x00182635 while preserving DXVK isolation."
+}
