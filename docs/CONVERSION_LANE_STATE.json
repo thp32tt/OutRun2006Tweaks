@@ -3953,6 +3953,79 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve any newer branch-authoritative frontier. continuation_62 raw provenance already starts at mandatory overlap 0x001831B2; validate/decode that frontier next without promoting function/render/HUD/runtime semantics."
+    },
+    {
+      "unit_id": "DXVK_F57_CANONICAL_CONTROL_FLOW_0x1831B2_TO_0x1831F0",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "e449af5409962afec5a1915451550891c25f2b44",
+      "validation_bearing_result_sha": "e449af5409962afec5a1915451550891c25f2b44",
+      "commit_message": "dxvk: prove canonical 0x1831B2 control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Canonical F57 exact proof decodes 20 contiguous complete instructions in 0x001831B2..0x001831F0, proves internal branches 0x001831C7->0x001831CB and 0x001831D1->0x001831D8, address-only forward branch 0x001831E0->0x00183219, direct CALL 0x001831B5->0x00185FCA, and preserves trailing DD 1C at 0x001831F0 as a mandatory-overlap cut edge.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub AGENTS.md, branch-local lane/run state, current work queue, regression/problem history and Issue #14; moving same-JOB HEAD was refreshed and already-completed F55 work was skipped."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Concurrent work had completed F55 and added validated continuation_62 raw provenance. Selected 0x001831B2..0x001831F2 exact decode as the highest-value unfinished canonical static frontier."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit e449af5409962afec5a1915451550891c25f2b44 exact-decodes the complete prefix, direct control flow/call target and fail-closed incomplete DD 1C capture edge."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "OutRun EXE HUD Inspector CI run 36988910745 static-exe-analysis job 110780711993 SUCCESS on run head e449af5409962afec5a1915451550891c25f2b44; canonical analyzer emitted EXACT_1831B2_TO_1831F0_CONTROL_FLOW_CAPTURE_EDGE_PROVEN and uploaded evidence artifact 11218508152."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commit e449af5409962afec5a1915451550891c25f2b44 contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5949059329 records implementation and exact-run validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static disassembly/control-flow proof only; no runtime DXVK payload, backend selector, deployment content or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted supplementally while preserving the newer concurrent continuation_63 raw frontier at 0x001831F0."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_RUN_CANONICAL_STATIC",
+        "exact_sha": "e449af5409962afec5a1915451550891c25f2b44",
+        "hud_inspector_run_id": 36988910745,
+        "static_exe_analysis_job_id": 110780711993,
+        "static_exe_analysis_conclusion": "success",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "proof_status": "EXACT_1831B2_TO_1831F0_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "instruction_count": 20,
+        "prefix_end_rva": "0x001831F0",
+        "branches": [
+          "0x001831C7->0x001831CB",
+          "0x001831D1->0x001831D8",
+          "0x001831E0->0x00183219"
+        ],
+        "call_target": "0x001831B5->0x00185FCA",
+        "incomplete_rva": "0x001831F0",
+        "incomplete_bytes": "dd 1c",
+        "capture_edge_matches": true,
+        "raw_call_census_matches": true,
+        "artifact_id": 11218508152,
+        "artifact_digest": "sha256:c33f2f6d996c43eff6821112daaaa15eb8b51ccc772d84161bf08d27c777f520",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5949059329,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "BOUNDED_CONTROL_FLOW_ONLY",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newer continuation_63 raw frontier at 0x001831F0..0x00183230. Validate its canonical raw evidence if still pending, then exact-decode only complete instructions with mandatory DD 1C overlap while keeping function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
