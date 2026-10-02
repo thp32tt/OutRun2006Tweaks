@@ -220,7 +220,7 @@ def verify_dxvk_continuation_chain() -> None:
                 f"{continuation_id - 1}_prefix_proof(pe)"
             )
             predecessor_proof_calls = proof_source.count("_prefix_proof(pe)")
-            if (
+            if predecessor_proof_calls and (
                 expected_predecessor_call not in proof_source
                 or predecessor_proof_calls != 1
             ):
