@@ -4734,6 +4734,12 @@ def main() -> None:
             "R129 source index snapshot identity",
         "bool bind(ID3D11DeviceContext* context) const noexcept":
             "R126 explicit dormant bind primitive",
+        "struct NativeTriangleFanIndexBufferBindingReadiness":
+            "R141 live generated-fan IA binding readiness",
+        "binding_readiness(ID3D11DeviceContext* context) const noexcept;":
+            "R141 live generated-fan binding observation API",
+        "bool validate_binding_snapshot(":
+            "R141 stale live generated-fan binding validator",
     }
     missing_r126_fan_index = [
         meaning
@@ -4763,6 +4769,14 @@ def main() -> None:
             "R129 persisted indexed-source snapshot provenance",
         "token, out.sourceIndexSnapshotToken":
             "R129 indexed-source snapshot in readiness identity",
+        "context->IAGetIndexBuffer(":
+            "R141 live generated-fan index-buffer readback",
+        "context->IAGetPrimitiveTopology(":
+            "R141 live generated-fan topology readback",
+        "out.ownerSnapshotToken = owner.snapshotToken;":
+            "R141 generated-fan owner readiness identity",
+        "return binding_readiness(context).ready;":
+            "R141 bind verifies effective IA state",
     }.items():
         if token not in TRIANGLE_FAN_INDEX_BUFFER_CPP:
             missing_r126_fan_index.append(meaning)
@@ -4785,6 +4799,16 @@ def main() -> None:
             "R129 hosted probe completion marker",
         "DX11 triangle-fan generated index buffer R126: PASS":
             "R126 hosted probe completion marker",
+        "R141 live generated fan IA binding seals exact owner identity":
+            "R141 positive live generated-fan IA proof",
+        "R141 live generated fan IA binding fails closed after topology drift":
+            "R141 live topology drift negative proof",
+        "R141 reupload invalidates stale live generated fan binding identity":
+            "R141 owner recreation stale-binding proof",
+        "R141 foreign-device live generated fan binding fails closed":
+            "R141 foreign-context fail-closed proof",
+        "DX11 triangle-fan live IA binding R141: PASS":
+            "R141 hosted probe completion marker",
     }.items():
         if token not in TRIANGLE_FAN_INDEX_BUFFER_PROBE:
             missing_r126_fan_index.append(meaning)
