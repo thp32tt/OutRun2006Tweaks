@@ -92,6 +92,23 @@ def verify_dxvk_continuation_chain() -> None:
                 f"DXVK continuation {continuation_id} raw provenance escaped "
                 f"conservative semantic quarantine: {missing_raw_markers}"
             )
+        capture_integrity_markers = (
+            "predecessor_exact",
+            '"predecessor_exact": predecessor_exact',
+            'target_section == ".text"',
+            "len(probe) ==",
+            "probe_end_matches",
+            "captured = bool(",
+        )
+        missing_capture_integrity_markers = [
+            marker for marker in capture_integrity_markers
+            if marker not in provenance_source
+        ]
+        if missing_capture_integrity_markers:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} raw provenance lost capture-integrity gate: "
+                f"{missing_capture_integrity_markers}"
+            )
         provenance_name = (
             f"guarded_gf_target_c_helper_1_third_callee_continuation_"
             f"{continuation_id}_provenance"
