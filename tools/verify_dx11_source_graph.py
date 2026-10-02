@@ -42,6 +42,15 @@ SURFACE_MIRROR_CPP = (
 SURFACE_MIRROR_PROBE = (
     ROOT / "tools" / "dx11_surface_mirror_probe.cpp"
 ).read_text(encoding="utf-8")
+TRIANGLE_FAN_INDEX_BUFFER_HPP = (
+    ROOT / "src" / "vr" / "d3d11" / "triangle_fan_index_buffer.hpp"
+).read_text(encoding="utf-8")
+TRIANGLE_FAN_INDEX_BUFFER_CPP = (
+    ROOT / "src" / "vr" / "d3d11" / "triangle_fan_index_buffer.cpp"
+).read_text(encoding="utf-8")
+TRIANGLE_FAN_INDEX_BUFFER_PROBE = (
+    ROOT / "tools" / "dx11_triangle_fan_index_buffer_probe.cpp"
+).read_text(encoding="utf-8")
 PIPELINE_TRANSLATION_HPP = (
     ROOT / "src" / "vr" / "d3d11" / "pipeline_translation.hpp"
 ).read_text(encoding="utf-8")
@@ -3445,6 +3454,77 @@ def main() -> None:
             raise SystemExit(
                 "DX11 R120 draw-readiness probe drift: " + meaning
             )
+
+    r126_triangle_fan_index_buffer_contract = {
+        "class NativeTriangleFanIndexBuffer final":
+            "R126 generated index-buffer owner",
+        "initialize_nonindexed(":
+            "R126 non-indexed fan upload API",
+        "initialize_indexed(":
+            "R126 indexed fan upload API",
+        "NativeTriangleFanIndexBufferReadiness readiness(":
+            "R126 readiness snapshot API",
+        "bool bind(ID3D11DeviceContext* context) const noexcept":
+            "R126 explicit dormant bind primitive",
+    }
+    missing_r126_fan_index = [
+        meaning
+        for token, meaning in r126_triangle_fan_index_buffer_contract.items()
+        if token not in TRIANGLE_FAN_INDEX_BUFFER_HPP
+    ]
+    for token, meaning in {
+        "materialize_triangle_fan_vertex_indices(":
+            "R126 consumes non-indexed fan materialization",
+        "materialize_indexed_triangle_fan_indices(":
+            "R126 consumes indexed fan materialization",
+        "desc.Usage = D3D11_USAGE_IMMUTABLE;":
+            "R126 immutable upload ownership",
+        "desc.BindFlags = D3D11_BIND_INDEX_BUFFER;":
+            "R126 index-buffer bind descriptor",
+        "context->IASetIndexBuffer(buffer_.Get(), DXGI_FORMAT_R32_UINT, 0);":
+            "R126 R32_UINT IA binding",
+        "context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);":
+            "R126 triangle-list IA binding",
+        "contextDevice.Get() != device_.Get()":
+            "R126 foreign-context fail-closed gate",
+        "shutdown();":
+            "R126 replacement invalidates prior ownership",
+    }.items():
+        if token not in TRIANGLE_FAN_INDEX_BUFFER_CPP:
+            missing_r126_fan_index.append(meaning)
+    for token, meaning in {
+        "R126 non-indexed fan upload bytes drifted":
+            "R126 non-indexed GPU upload readback",
+        "R126 INDEX16 StartIndex upload bytes drifted":
+            "R126 INDEX16 upload readback",
+        "R126 INDEX32 source values were narrowed":
+            "R126 INDEX32 preservation proof",
+        "R126 foreign-device owner/context did not fail closed":
+            "R126 foreign-device negative proof",
+        "R126 rejected replacement retained stale generated IB":
+            "R126 stale replacement negative proof",
+        "DX11 triangle-fan generated index buffer R126: PASS":
+            "R126 hosted probe completion marker",
+    }.items():
+        if token not in TRIANGLE_FAN_INDEX_BUFFER_PROBE:
+            missing_r126_fan_index.append(meaning)
+    for graph, token, meaning in [
+        (CMAKE_TOML, "[target.dx11_triangle_fan_index_buffer_probe]",
+         "R126 cmake.toml probe target"),
+        (CMAKE, "# Target: dx11_triangle_fan_index_buffer_probe",
+         "R126 checked-in CMake probe target"),
+        (BACKEND_GATE, "--target dx11_triangle_fan_index_buffer_probe",
+         "R126 hosted build step"),
+        (BACKEND_GATE, "dx11_triangle_fan_index_buffer_probe.exe",
+         "R126 hosted run step"),
+    ]:
+        if token not in graph:
+            missing_r126_fan_index.append(meaning)
+    if missing_r126_fan_index:
+        raise SystemExit(
+            "DX11 R126 generated triangle-fan index-buffer contract drift: "
+            + ", ".join(missing_r126_fan_index)
+        )
 
     if (
         "recreate_and_upload_mirror_for_observation(" in census
