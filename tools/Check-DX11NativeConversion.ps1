@@ -33,6 +33,10 @@ if ($state.lane -ne 'DX11') {
     Write-Error 'Conversion lane is not DX11.'
 }
 
+if ($state.branch -ne 'vr-dx11-native-r71') {
+    Write-Error ('Unexpected DX11 branch state: ' + $state.branch)
+}
+
 if ($state.task_liveness.normal_success_requires -notcontains 'SUBSTANTIVE_C2_REQUIRED') {
     Write-Error 'DX11 task contract does not require substantive implementation.'
 }
@@ -54,9 +58,14 @@ if ($stateText -match 'NativeDrawPathActive"\s*:\s*true') {
     Write-Error 'DX11 guard detected native draw activation in static state.'
 }
 
+if ($state.latest_durable_task.checkpoint -ne 'C6_STATE') {
+    Write-Error 'DX11 state is not persisted at a resumable checkpoint.'
+}
+
 Write-Output 'DX11_STATIC_CONVERSION_GUARD=PASS'
 Write-Output 'NATIVE_DRAW_PATH_GATE=STATIC_EVIDENCE_PRESENT'
 Write-Output 'DORMANT_ACTIVATION_GUARD=PASS'
+Write-Output 'STATE_CHECKPOINT_GUARD=PASS'
 Write-Output ('BRANCH=' + $state.branch)
 Write-Output ('TASK=' + $state.latest_durable_task.task_id)
 Write-Output ('RUNTIME_VALIDATION=' + $state.latest_durable_task.runtime_validation)
