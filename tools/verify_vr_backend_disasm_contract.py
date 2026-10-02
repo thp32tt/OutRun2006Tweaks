@@ -654,6 +654,72 @@ def verify_dxvk_continuation_chain() -> None:
 
         has_overlap_contract = f"{prefix}_OVERLAP_BYTES" in analyzer
         if has_overlap_contract:
+            # Modern overlap collectors are canonical-evidence boundaries, so
+            # verify their byte-geometry expressions structurally rather than
+            # accepting matching source-text fragments. This prevents comments,
+            # dead strings, or reassigned locals from satisfying the contract.
+            if continuation_id >= 43:
+                expected_overlap_name = f"{prefix}_OVERLAP_BYTES"
+                overlap_expr = single_assignment_value("overlap")
+                if not is_name(overlap_expr, expected_overlap_name):
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} overlap source is not "
+                        f"bound directly to {expected_overlap_name}"
+                    )
+
+                overlap_actual_expr = single_assignment_value("overlap_actual")
+                overlap_slice = (
+                    overlap_actual_expr.slice
+                    if isinstance(overlap_actual_expr, ast.Subscript)
+                    else None
+                )
+                overlap_upper = (
+                    overlap_slice.upper
+                    if isinstance(overlap_slice, ast.Slice)
+                    else None
+                )
+                overlap_actual_ok = bool(
+                    isinstance(overlap_actual_expr, ast.Subscript)
+                    and is_name(overlap_actual_expr.value, "probe")
+                    and isinstance(overlap_slice, ast.Slice)
+                    and overlap_slice.lower is None
+                    and overlap_slice.step is None
+                    and isinstance(overlap_upper, ast.Call)
+                    and isinstance(overlap_upper.func, ast.Name)
+                    and overlap_upper.func.id == "len"
+                    and len(overlap_upper.args) == 1
+                    and not overlap_upper.keywords
+                    and is_name(overlap_upper.args[0], "overlap")
+                )
+                if not overlap_actual_ok:
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} overlap_actual geometry is not "
+                        "structurally bound to probe[:len(overlap)]"
+                    )
+
+                overlap_matches_expr = single_assignment_value("overlap_matches")
+                overlap_matches_ok = bool(
+                    isinstance(overlap_matches_expr, ast.Compare)
+                    and len(overlap_matches_expr.ops) == 1
+                    and isinstance(overlap_matches_expr.ops[0], ast.Eq)
+                    and len(overlap_matches_expr.comparators) == 1
+                    and (
+                        (
+                            is_name(overlap_matches_expr.left, "overlap_actual")
+                            and is_name(overlap_matches_expr.comparators[0], "overlap")
+                        )
+                        or (
+                            is_name(overlap_matches_expr.left, "overlap")
+                            and is_name(overlap_matches_expr.comparators[0], "overlap_actual")
+                        )
+                    )
+                )
+                if not overlap_matches_ok:
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} overlap_matches is not "
+                        "an exact overlap_actual == overlap comparison"
+                    )
+
             required_predecessor_fields = {"status", "incomplete_rva", "incomplete_matches"}
             # Continuation 43 introduced the modern mandatory-overlap contract:
             # the successor must consume the predecessor proof's capture-edge
