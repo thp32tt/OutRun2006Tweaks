@@ -625,6 +625,69 @@ def verify_dxvk_continuation_chain() -> None:
                     f"expected={expected_predecessor_status!r} "
                     f"actual={sorted(predecessor_status_values)!r}"
                 )
+
+            # F62/continuation 65 and later: when the predecessor proof carries
+            # unresolved forward branch targets, the next raw collector must
+            # preserve that control-flow debt in both its fail-closed
+            # predecessor_exact predicate and emitted raw evidence. Without
+            # this guard a new 64-byte capture could remain byte/geometry exact
+            # while silently forgetting branch targets that still need boundary
+            # resolution in a later exact proof.
+            if continuation_id >= 65:
+                predecessor_return_keys: set[str] = set()
+                for return_node in (
+                    node
+                    for node in ast.walk(predecessor_proof_ast)
+                    if isinstance(node, ast.Return) and isinstance(node.value, ast.Dict)
+                ):
+                    for key_node in return_node.value.keys:
+                        if (
+                            isinstance(key_node, ast.Constant)
+                            and isinstance(key_node.value, str)
+                        ):
+                            predecessor_return_keys.add(key_node.value)
+
+                if "unresolved_forward_targets" in predecessor_return_keys:
+                    unresolved_forward_target_compared = any(
+                        isinstance(node, ast.Compare)
+                        and len(node.ops) == 1
+                        and isinstance(node.ops[0], ast.Eq)
+                        and len(node.comparators) == 1
+                        and (
+                            predecessor_field(node.left) == "unresolved_forward_targets"
+                            or predecessor_field(node.comparators[0])
+                                == "unresolved_forward_targets"
+                        )
+                        for node in ast.walk(predecessor_exact_value)
+                    )
+                    if not unresolved_forward_target_compared:
+                        raise SystemExit(
+                            f"DXVK continuation {continuation_id} raw provenance dropped unresolved forward-target carry "
+                            "from predecessor_exact"
+                        )
+
+                    inherited_target_bindings: list[str] = []
+                    for return_node in (
+                        node
+                        for node in ast.walk(provenance_ast)
+                        if isinstance(node, ast.Return) and isinstance(node.value, ast.Dict)
+                    ):
+                        for key_node, value_node in zip(
+                            return_node.value.keys, return_node.value.values
+                        ):
+                            if (
+                                isinstance(key_node, ast.Constant)
+                                and isinstance(key_node.value, str)
+                                and predecessor_field(value_node)
+                                    == "unresolved_forward_targets"
+                            ):
+                                inherited_target_bindings.append(key_node.value)
+                    if len(inherited_target_bindings) != 1:
+                        raise SystemExit(
+                            f"DXVK continuation {continuation_id} raw provenance must emit exactly one "
+                            "inherited unresolved-forward-target evidence field: "
+                            f"bindings={inherited_target_bindings}"
+                        )
         provenance_name = (
             f"guarded_gf_target_c_helper_1_third_callee_continuation_"
             f"{continuation_id}_provenance"
