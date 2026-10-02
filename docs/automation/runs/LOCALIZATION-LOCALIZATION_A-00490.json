@@ -1,0 +1,13 @@
+{
+  "TASK_ID": "LOCALIZATION-LOCALIZATION_A-00490",
+  "LANE": "LOCALIZATION_A",
+  "WAVE_ID": "P00323",
+  "role": "A",
+  "status": "BLOCKER_RECORDED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "runtime_validation": "UNTESTED",
+  "blocker": "No existing RENDER_READY or ONE_STAGE_TO_RENDER candidate evidence was discoverable for this lane from the current branch evidence. A new DDS candidate was not fabricated without canonical source, masks, clean plate, bbox evidence, encode validation, and English-source comparison proof.",
+  "source": "korean-localization-clean GitHub SSOT",
+  "notes": "Lane-local task record only. No shared progress files modified."
+}
