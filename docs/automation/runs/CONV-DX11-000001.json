@@ -4,76 +4,70 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "d1f216f3ad0e54ac344a2cf946da605133a46590",
-  "state_parent_head": "8e008f0c4cb135d5c6a74730716686eb5e00cdb3",
-  "material_result_sha": "acf2075c71664b12586c2215214538d1f7f352a7",
-  "validation_bearing_sha": "388cf8a44421491cfee985ce4425debf6d50d3c1",
+  "base_sha": "73308f22dd56b59da1aa5d56113b34dd49cbe18f",
+  "state_parent_head": "58fd0ea4f6d36eb3590e7763c13416cc719394a8",
+  "material_result_sha": "58fd0ea4f6d36eb3590e7763c13416cc719394a8",
+  "validation_bearing_sha": "58fd0ea4f6d36eb3590e7763c13416cc719394a8",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_LEGACY_BOTH_SOURCE_BLEND_PAIR_TRANSLATION",
-  "selection_reason": "The branch plan still listed D3DBLEND_BOTHSRCALPHA/BOTHINVSRCALPHA pair-aware conversion as an unfinished static readiness gap. It is source/static work and does not require Quest 3/VDXR runtime hardware.",
-  "summary": "Implemented D3D9 legacy BOTHSRCALPHA/BOTHINVSRCALPHA SRCBLEND override semantics in the dormant DX11 pipeline translation, while keeping destination-state misuse and SRC1 dual-source blending fail-closed. Added semantic smoke coverage and source-graph/CI guards. Native Draw* routing remains disabled.",
+  "selected_work": "DX11_BACKEND_GATE_CORE_SMOKE_SPLIT",
+  "selection_reason": "The branch-local CONVERSION-DX11-00279 record was still IMPLEMENT_PENDING after repeated monolithic Backend Conversion Gate cancellations. Splitting expensive DX11 smoke/probes from the mandatory Win32 artifact gate is GitHub-only workflow work and does not require Quest 3/VDXR runtime hardware.",
+  "summary": "Separated the mandatory Backend Conversion Gate core validation from dormant-DX11 readiness smoke/probe builds. The core validate job keeps static contracts, Win32 build, binary verification and artifact upload; a DX11-only job depending on validate retains all eight prior smoke/probe executions.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "GitHub HEAD and AGENTS.md read through authenticated connector",
-        "docs/CONVERSION_LANE_STATE.json and branch DX11 plan read",
-        "VR regression knowledge/problem history and Issue #14 production ledger contract read"
+        "Read AGENTS.md, docs/CONVERSION_LANE_STATE.json and docs/automation/runs/CONV-DX11-000001.json from vr-dx11-native-r71 through the authenticated GitHub connector.",
+        "Read docs/automation/runs/CONVERSION-DX11-00279.json; it was IMPLEMENT_PENDING with exact next action to separate expensive DX11 smoke builds from the mandatory artifact gate.",
+        "Read Issue #14 production ledger and current Backend Conversion Gate workflow."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Confirmed state_translation role-agnostic BOTH* mappings were intentionally inexact",
-        "Confirmed translate_pipeline lacked D3D9 SRCBLEND pair override semantics",
-        "Selected branch-plan known gap without requiring runtime hardware"
+        "CONVERSION-DX11-00279 recorded Backend Conversion Gate 36960361966 cancelled during Build Win32 after earlier static contract steps passed.",
+        "The current monolithic validate job placed eight DX11 semantic/object/linkage/constant-buffer/native-transport smoke/probe build+run pairs before final binary verification/artifact upload.",
+        "Selected workflow isolation rather than runtime renderer changes so native Draw* remains dormant."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
-        "src/vr/d3d11/pipeline_translation.cpp",
-        "tools/dx11_fixed_function_shader_semantics.cpp",
-        "tools/verify_dx11_source_graph.py"
+        ".github/workflows/backend-conversion-gate.yml"
       ],
-      "commit": "acf2075c71664b12586c2215214538d1f7f352a7"
+      "commit": "58fd0ea4f6d36eb3590e7763c13416cc719394a8",
+      "details": [
+        "Kept mandatory static checks, Win32 configure/build, binary verification and artifact upload in validate.",
+        "Moved all eight DX11 readiness smoke/probe build+run pairs into dx11-smoke.",
+        "Made dx11-smoke DX11-branch-only and dependent on validate so the mandatory artifact gate completes first."
+      ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_SELECTED_UNIT",
+      "status": "COMPLETE_REMOTE_STATIC",
       "evidence": [
-        "Backend Conversion Gate 36968000578 on 388cf8a44421491cfee985ce4425debf6d50d3c1: Verify DX11 dual-source blend contract PASS",
-        "Backend Conversion Gate 36968000578: Verify DX11 source graph PASS",
-        "Backend Conversion Gate 36968000578: Verify DX11 dormant activation boundary PASS",
-        "Backend Conversion Gate 36968000578: Test DX11 census analyzer PASS",
-        "Backend Conversion Gate 36968000578: Configure Win32 PASS and Build Win32 PASS",
-        "Backend Conversion Gate 36968000578: Build and Run DX11 fixed-function shader semantic smoke PASS",
-        "The workflow was later cancelled only because the branch advanced to newer same-JOB commits; the selected-unit checks above completed successfully before cancellation.",
-        "At current state parent, newer gates continue to pass dual-source/source-graph/dormant-activation static checks."
+        "Re-fetched exact commit 58fd0ea4f6d36eb3590e7763c13416cc719394a8 and workflow blob 49f913d3afb85c360737b3b3ce64c81fbad5563d through GitHub.",
+        "Confirmed validate contains no DX11 smoke build step and still contains Build Win32 plus backend-autovalidated binary artifact upload.",
+        "Confirmed dx11-smoke has needs: validate, is restricted to vr-dx11-native-r71, and retains all eight previous smoke/probe run steps.",
+        "Commit combined status endpoint returned no statuses at observation time; no GitHub Actions success is claimed."
       ],
-      "full_gate_conclusion": "SUPERSEDED_BY_NEWER_BRANCH_HEAD",
-      "selected_unit_validation": "PASS"
+      "automation_validation": "PASS_REMOTE_STATIC",
+      "ci_result": "UNCONFIRMED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "acf2075c71664b12586c2215214538d1f7f352a7",
-      "followup_same_job_commits": [
-        "388cf8a44421491cfee985ce4425debf6d50d3c1",
-        "609e0e803d7d63e3c1eaa5b81510b47314486254",
-        "7299c29cddf4709ab29a9ca30bf5078e166811e6",
-        "7db646d1d54e4714df54e1609274028c20177cbe"
-      ]
+      "material_commit": "58fd0ea4f6d36eb3590e7763c13416cc719394a8",
+      "issue14_comment_id": 5946206816
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant translation/readiness work only. No native game Draw* activation, backend promotion, runtime candidate, or package payload change was requested or justified."
+      "reason": "Workflow-only validation-structure change; no runtime binary semantics, backend activation, candidate payload or package content was intentionally changed."
     },
     "C6_STATE": {
-      "status": "COMPLETE_WITH_THIS_STATE_COMMIT",
-      "exact_next_action": "Continue independent DX11 readiness work without activating native Draw*. Preserve SRC1 dual-source blend fail-closed until proven SV_Target1/linkage evidence; runtime activation still requires exhaustive exact-build census plus Quest 3/VDXR parity."
+      "status": "COMPLETE_WITH_FOLLOWUP_STATE_COMMITS",
+      "exact_next_action": "Consume exact-SHA Backend Conversion Gate results for 58fd0ea4f6d36eb3590e7763c13416cc719394a8 when observable. Regardless, keep native Draw* disabled and continue only independently provable DX11 pipeline/resource/shader readiness work until exhaustive census and Quest 3/VDXR parity exist."
     }
   },
   "scope_guards": {
@@ -83,11 +77,19 @@
     "dxvk_lane_modified": false,
     "localization_modified": false
   },
-  "issue14_comment_id": 5945991937,
-  "automation_validation": "PASS_SELECTED_UNIT",
+  "issue14_comment_id": 5946206816,
+  "automation_validation": "PASS_REMOTE_STATIC",
   "blocker": "Native DX11 Draw* routing remains deliberately disabled. Exact-build exhaustive census and Quest 3/VDXR graphics parity are still required for runtime activation; SRC1 dual-source factors remain fail-closed pending proven second pixel-shader output/linkage.",
-  "next_action": "Continue independent GitHub-only DX11 readiness work. Do not activate native Draw* until exhaustive census and Quest 3/VDXR parity evidence exist.",
+  "next_action": "Consume exact-SHA Backend Conversion Gate results for 58fd0ea4f6d36eb3590e7763c13416cc719394a8 when observable. Regardless, keep native Draw* disabled and continue only independently provable DX11 pipeline/resource/shader readiness work until exhaustive census and Quest 3/VDXR parity exist.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
-  "runtime_claim": "NONE"
+  "runtime_claim": "NONE",
+  "prior_completed_unit": {
+    "selected_work": "DX11_LEGACY_BOTH_SOURCE_BLEND_PAIR_TRANSLATION",
+    "material_result_sha": "acf2075c71664b12586c2215214538d1f7f352a7",
+    "validation_bearing_sha": "388cf8a44421491cfee985ce4425debf6d50d3c1",
+    "automation_validation": "PASS_SELECTED_UNIT",
+    "runtime_validation": "UNTESTED",
+    "summary": "Implemented D3D9 legacy BOTHSRCALPHA/BOTHINVSRCALPHA SRCBLEND override semantics in the dormant DX11 pipeline translation, while keeping destination-state misuse and SRC1 dual-source blending fail-closed. Added semantic smoke coverage and source-graph/CI guards. Native Draw* routing remains disabled."
+  }
 }
