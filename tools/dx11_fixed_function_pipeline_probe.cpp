@@ -1335,7 +1335,75 @@ int main()
             "R191 texture-factor fixed-function shader prototype did not compile");
     }
 
+    {
+        std::array<FixedFunctionStageState, 8> premodulateStages{};
+        premodulateStages[0].colorOp = D3DTOP_PREMODULATE;
+        premodulateStages[0].colorArg1 = D3DTA_DIFFUSE;
+        premodulateStages[0].alphaOp = D3DTOP_PREMODULATE;
+        premodulateStages[0].alphaArg1 = D3DTA_DIFFUSE;
+        premodulateStages[0].minFilter = D3DTEXF_POINT;
+        premodulateStages[0].magFilter = D3DTEXF_POINT;
+        premodulateStages[0].mipFilter = D3DTEXF_NONE;
+
+        premodulateStages[1].colorOp = D3DTOP_SELECTARG1;
+        premodulateStages[1].colorArg1 = D3DTA_CURRENT;
+        premodulateStages[1].alphaOp = D3DTOP_SELECTARG1;
+        premodulateStages[1].alphaArg1 = D3DTA_CURRENT;
+        premodulateStages[1].minFilter = D3DTEXF_POINT;
+        premodulateStages[1].magFilter = D3DTEXF_POINT;
+        premodulateStages[1].mipFilter = D3DTEXF_NONE;
+
+        const auto premodulateShader =
+            generate_fixed_function_pixel_shader_prototype(
+                premodulateStages, true, 0x02u, 0x02u, textureTypes);
+        require(
+            premodulateShader.generated() &&
+                premodulateShader.activeStages == 2,
+            "R195 D3DTOP_PREMODULATE two-stage fixture must become shader-exact");
+        require(
+            premodulateShader.source.find(
+                "Texture2D texture1 : register(t1);") != std::string::npos &&
+            premodulateShader.source.find(
+                "float3 nextColor = (current * sampled1).rgb;") !=
+                std::string::npos &&
+            premodulateShader.source.find(
+                "float nextAlpha = (current * sampled1).a;") !=
+                std::string::npos,
+            "R195 D3DTOP_PREMODULATE must premultiply next-stage CURRENT by its bound texture");
+
+        const auto premodulateCompile =
+            compile_fixed_function_pixel_shader_prototype(premodulateShader);
+        require(
+            premodulateCompile.attempted &&
+            premodulateCompile.succeeded &&
+            premodulateCompile.result == S_OK &&
+            premodulateCompile.bytecodeBytes != 0,
+            "R195 D3DTOP_PREMODULATE fixed-function shader prototype did not compile");
+
+        const auto inexactNextTexture =
+            translate_fixed_function_readiness(
+                premodulateStages, true, 0x02u, 0x00u);
+        require(
+            (inexactNextTexture.unsupported &
+             FixedFunctionUnsupportedResourceStageCoverage) != 0,
+            "R195 PREMODULATE implicit next-stage texture dependency must fail closed when inexact");
+
+        const auto noNextTextureShader =
+            generate_fixed_function_pixel_shader_prototype(
+                premodulateStages, true, 0x00u, 0x00u, textureTypes);
+        require(
+            noNextTextureShader.generated() &&
+            noNextTextureShader.source.find("Texture2D texture1") ==
+                std::string::npos &&
+            noNextTextureShader.source.find(
+                "float3 nextColor = current.rgb;") != std::string::npos &&
+            noNextTextureShader.source.find(
+                "float nextAlpha = current.a;") != std::string::npos,
+            "R195 PREMODULATE must leave next-stage CURRENT unchanged when no texture is bound");
+    }
+
     std::cout
+        << "DX11 fixed-function PREMODULATE stage-chain support R195: PASS\n"
         << "DX11 fixed-function D3DTOP_MULTIPLYADD ARG0 support R194: PASS\n"
         << "DX11 fixed-function texture-factor consumption R191: PASS\n"
         << "DX11 fixed-function D3DTOP_DOTPRODUCT3 support R193: PASS\n"
