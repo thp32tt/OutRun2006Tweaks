@@ -690,7 +690,43 @@ int main()
             "R182 D3DTOP_ADDSIGNED fixed-function shader prototype did not compile");
     }
 
+    {
+        std::array<FixedFunctionStageState, 8> addSigned2xStages{};
+        addSigned2xStages[0].colorOp = D3DTOP_ADDSIGNED2X;
+        addSigned2xStages[0].colorArg1 = D3DTA_TEXTURE;
+        addSigned2xStages[0].colorArg2 = D3DTA_DIFFUSE;
+        addSigned2xStages[0].alphaOp = D3DTOP_ADDSIGNED2X;
+        addSigned2xStages[0].alphaArg1 = D3DTA_TEXTURE;
+        addSigned2xStages[0].alphaArg2 = D3DTA_DIFFUSE;
+        addSigned2xStages[0].minFilter = D3DTEXF_POINT;
+        addSigned2xStages[0].magFilter = D3DTEXF_POINT;
+        addSigned2xStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto addSigned2xShader =
+            generate_fixed_function_pixel_shader_prototype(
+                addSigned2xStages, true, 0x01u, 0x01u, textureTypes);
+        require(
+            addSigned2xShader.generated() && addSigned2xShader.activeStages == 1,
+            "R183 D3DTOP_ADDSIGNED2X fixed-function stage must become shader-exact");
+        require(
+            addSigned2xShader.source.find(
+                "float3 nextColor = (sampled0.rgb + input.diffuse.rgb - 0.5) * 2.0;") !=
+                std::string::npos &&
+            addSigned2xShader.source.find(
+                "float nextAlpha = (sampled0.a + input.diffuse.a - 0.5) * 2.0;") !=
+                std::string::npos,
+            "R183 D3DTOP_ADDSIGNED2X shader expression drift");
+        const auto addSigned2xCompile =
+            compile_fixed_function_pixel_shader_prototype(addSigned2xShader);
+        require(
+            addSigned2xCompile.attempted && addSigned2xCompile.succeeded &&
+            addSigned2xCompile.result == S_OK &&
+            addSigned2xCompile.bytecodeBytes != 0,
+            "R183 D3DTOP_ADDSIGNED2X fixed-function shader prototype did not compile");
+    }
+
     std::cout
+        << "DX11 fixed-function D3DTOP_ADDSIGNED2X support R183: PASS\n"
         << "DX11 MRT color-write fail-closed: PASS\n"
         << "DX11 fixed-function D3DTOP_ADDSIGNED support R182: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATE4X support R181: PASS\n"

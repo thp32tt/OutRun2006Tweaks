@@ -354,6 +354,39 @@ def main() -> None:
             + ", ".join(missing_r182_d3dtop_addsigned)
         )
 
+    r183_d3dtop_addsigned2x_contract = [
+        ("case D3DTOP_ADDSIGNED2X:", PIPELINE_TRANSLATION_CPP,
+         "R183 D3DTOP_ADDSIGNED2X readiness/translation case"),
+        ('return "(" + first + " + " + second + " - 0.5) * 2.0";',
+         PIPELINE_TRANSLATION_CPP,
+         "R183 D3DTOP_ADDSIGNED2X biased doubled shader expression"),
+        ("addSigned2xStages[0].colorOp = D3DTOP_ADDSIGNED2X;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R183 hosted ADDSIGNED2X color fixture"),
+        ("addSigned2xStages[0].alphaOp = D3DTOP_ADDSIGNED2X;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R183 hosted ADDSIGNED2X alpha fixture"),
+        ("float3 nextColor = (sampled0.rgb + input.diffuse.rgb - 0.5) * 2.0;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R183 generated RGB HLSL assertion"),
+        ("float nextAlpha = (sampled0.a + input.diffuse.a - 0.5) * 2.0;",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R183 generated alpha HLSL assertion"),
+        ("R183 D3DTOP_ADDSIGNED2X fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R183 offline compile assertion"),
+        ("DX11 fixed-function D3DTOP_ADDSIGNED2X support R183: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R183 hosted probe completion"),
+    ]
+    missing_r183_d3dtop_addsigned2x = [
+        meaning
+        for token, source, meaning in r183_d3dtop_addsigned2x_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_ADDSIGNED2X:") < 3:
+        missing_r183_d3dtop_addsigned2x.append(
+            "R183 ADDSIGNED2X must participate in texture-use, HLSL and readiness switches")
+    if missing_r183_d3dtop_addsigned2x:
+        raise SystemExit(
+            "DX11 R183 fixed-function D3DTOP_ADDSIGNED2X contract drift: "
+            + ", ".join(missing_r183_d3dtop_addsigned2x)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.

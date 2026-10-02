@@ -174,6 +174,7 @@ namespace outrun::vr::dx11
             case D3DTOP_MODULATE4X:
             case D3DTOP_ADD:
             case D3DTOP_ADDSIGNED:
+            case D3DTOP_ADDSIGNED2X:
             case D3DTOP_SUBTRACT:
                 return fixed_function_argument_uses_texture(arg1) ||
                        fixed_function_argument_uses_texture(arg2);
@@ -250,6 +251,10 @@ namespace outrun::vr::dx11
                 // R182: D3D9 ADDSIGNED applies a -0.5 bias after adding
                 // Arg1 and Arg2 component-wise.
                 return first + " + " + second + " - 0.5";
+            case D3DTOP_ADDSIGNED2X:
+                // R183: D3D9 ADDSIGNED2X applies the ADDSIGNED -0.5 bias,
+                // then doubles the component-wise result.
+                return "(" + first + " + " + second + " - 0.5) * 2.0";
             case D3DTOP_SUBTRACT:
                 // R177: D3D9 defines SUBTRACT as component-wise Arg1 - Arg2.
                 return first + " - " + second;
@@ -434,6 +439,7 @@ namespace outrun::vr::dx11
             case D3DTOP_MODULATE4X:
             case D3DTOP_ADD:
             case D3DTOP_ADDSIGNED:
+            case D3DTOP_ADDSIGNED2X:
             case D3DTOP_SUBTRACT:
                 useArg1 = true;
                 useArg2 = true;
