@@ -1168,14 +1168,15 @@
           ]
         },
         "C3_VALIDATE": {
-          "status": "COMPLETE_REMOTE_STATIC",
+          "status": "COMPLETE_REMOTE_STATIC_CI_BLOCKED_BY_BRANCH_CHURN",
           "evidence": [
             "Re-fetched all four changed files from the active GitHub branch and confirmed the R126 declaration, component-token gates, exact-device gate, RS/OM binding calls, positive/negative WARP probe markers and source-graph guard.",
             "Confirmed the modified files contain no NativeDrawPathActive=true activation.",
-            "Exact material SHA Build run 36973044392 job 110730919352 was started by GitHub Actions but cancelled by descendant branch churn; no hosted compile/WARP success is claimed from that run."
+            "Exact material SHA Build run 36973044392 job 110730919352 was started by GitHub Actions but cancelled by descendant branch churn; no hosted compile/WARP success is claimed from that run.",
+            "Explicit rerun of Build run 36973044392 created job 110732299240; it progressed from queued to in_progress, then was cancelled during Checkout by branch concurrency. Source-graph/census/configure/build steps were skipped. This is a second same-condition cancellation, not a compile/test failure."
           ],
-          "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
-          "ci_result": "CI_STARTED_CANCELLED_BY_BRANCH_CHURN"
+          "automation_validation": "PASS_REMOTE_STATIC_CI_RETRY_CANCELLED_BY_BRANCH_CHURN",
+          "ci_result": "TWO_CI_ATTEMPTS_CANCELLED_BY_BRANCH_CHURN"
         },
         "C4_COMMIT": {
           "status": "COMPLETE",
@@ -1189,7 +1190,7 @@
         },
         "C6_STATE": {
           "status": "COMPLETE_WITH_THIS_STATE_COMMIT",
-          "exact_next_action": "Keep NativeDrawPathActive disabled. Obtain a non-superseded descendant hosted Build/WARP result containing R126; then continue the next independent dormant resource/binding/readiness gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+          "exact_next_action": "Keep NativeDrawPathActive disabled. Treat exact-SHA hosted validation as BLOCKED_BY_BRANCH_CHURN after two cancellations; on the next independent static unit, compose the concrete R126 RS/OM binding identity into dormant draw-candidate readiness without routing game Draw*. Consume a future non-superseded descendant hosted Build/WARP result when available."
         }
       },
       "scope_guards": {
@@ -1200,9 +1201,9 @@
         "localization_modified": false
       },
       "issue14_comment_id": 5946681061,
-      "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
-      "blocker": "Hosted compile/WARP execution for the exact material SHA was superseded by branch churn. This does not block independent static development; Quest 3/VDXR runtime acceptance remains separately required before activation.",
-      "next_action": "Keep NativeDrawPathActive disabled. Obtain a non-superseded descendant hosted Build/WARP result containing R126; then continue the next independent dormant resource/binding/readiness gap.",
+      "automation_validation": "PASS_REMOTE_STATIC_CI_RETRY_CANCELLED_BY_BRANCH_CHURN",
+      "blocker": "Exact material SHA Build run 36973044392 was cancelled by branch concurrency twice (initial job 110730919352 and retry job 110732299240, the retry during checkout before static/build steps). Per repository failure policy, do not spin the unchanged exact-SHA retry indefinitely; consume a future descendant hosted result. Quest 3/VDXR runtime acceptance remains separately required before activation.",
+      "next_action": "Keep NativeDrawPathActive disabled. Treat exact-SHA hosted validation as BLOCKED_BY_BRANCH_CHURN after two cancellations; on the next independent static unit, compose the concrete R126 RS/OM binding identity into dormant draw-candidate readiness without routing game Draw*. Consume a future non-superseded descendant hosted Build/WARP result when available.",
       "checkpoint": "C6_STATE",
       "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
       "runtime_claim": "NONE"
