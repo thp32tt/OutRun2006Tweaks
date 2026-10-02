@@ -8,8 +8,10 @@
 
 namespace
 {
+    using outrun::vr::dx11::FixedFunctionAlphaTestState;
     using outrun::vr::dx11::FixedFunctionPixelShaderCompileProbe;
     using outrun::vr::dx11::FixedFunctionPixelShaderPrototype;
+    using outrun::vr::dx11::FixedFunctionShaderPrototypeUnsupportedAlphaTestState;
     using outrun::vr::dx11::FixedFunctionShaderPrototypeUnsupportedNotReady;
     using outrun::vr::dx11::FixedFunctionShaderPrototypeUnsupportedResourceType;
     using outrun::vr::dx11::FixedFunctionStageState;
@@ -405,6 +407,91 @@ int main()
 
     std::array<D3DRESOURCETYPE, 8> textureTypes{};
     textureTypes.fill(D3DRTYPE_TEXTURE);
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        stages[0] = active_stage(
+            D3DTOP_SELECTARG1,
+            D3DTA_DIFFUSE,
+            D3DTA_CURRENT,
+            D3DTOP_SELECTARG1,
+            D3DTA_DIFFUSE,
+            D3DTA_CURRENT,
+            0);
+
+        const auto prototype =
+            generate_fixed_function_pixel_shader_prototype(
+                stages, true, 0x00, 0x00, textureTypes,
+                FixedFunctionAlphaTestState{
+                    true, TRUE, 128u, D3DCMP_GREATEREQUAL
+                });
+        require(
+            prototype.generated(),
+            "enabled alpha-test prototype was not generated");
+        require(
+            prototype.source.find(
+                "const float alphaRef = (128.0f / 255.0f);") !=
+                std::string::npos,
+            "alpha-test reference normalization drifted");
+        require(
+            prototype.source.find(
+                "if (!(current.a >= alphaRef)) discard;") !=
+                std::string::npos,
+            "alpha-test GREATEREQUAL semantic drift");
+        require_compiles(prototype, "alpha-test GREATEREQUAL compile");
+    }
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        const auto prototype =
+            generate_fixed_function_pixel_shader_prototype(
+                stages, true, 0x00, 0x00, textureTypes,
+                FixedFunctionAlphaTestState{
+                    false, TRUE, 0u, D3DCMP_ALWAYS
+                });
+        require(
+            !prototype.generated(),
+            "incomplete alpha-test observation did not fail closed");
+        require(
+            (prototype.unsupported &
+             FixedFunctionShaderPrototypeUnsupportedAlphaTestState) != 0,
+            "incomplete alpha-test observation missed blocker");
+    }
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        const auto prototype =
+            generate_fixed_function_pixel_shader_prototype(
+                stages, true, 0x00, 0x00, textureTypes,
+                FixedFunctionAlphaTestState{
+                    true, TRUE, 0u, 0xFFFFFFFFu
+                });
+        require(
+            !prototype.generated(),
+            "invalid alpha-test function did not fail closed");
+        require(
+            (prototype.unsupported &
+             FixedFunctionShaderPrototypeUnsupportedAlphaTestState) != 0,
+            "invalid alpha-test function missed blocker");
+    }
+
+    {
+        std::array<FixedFunctionStageState, 8> stages{};
+        const auto prototype =
+            generate_fixed_function_pixel_shader_prototype(
+                stages, true, 0x00, 0x00, textureTypes,
+                FixedFunctionAlphaTestState{
+                    true, FALSE, 255u, 0xFFFFFFFFu
+                });
+        require(
+            prototype.generated(),
+            "disabled alpha test incorrectly rejected irrelevant function");
+        require(
+            prototype.source.find("alphaRef") == std::string::npos &&
+            prototype.source.find("discard;") == std::string::npos,
+            "disabled alpha test injected pixel-kill semantics");
+        require_compiles(prototype, "disabled alpha-test passthrough compile");
+    }
 
     {
         std::array<FixedFunctionStageState, 8> stages{};

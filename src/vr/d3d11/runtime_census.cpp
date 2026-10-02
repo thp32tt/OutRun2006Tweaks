@@ -213,6 +213,10 @@ namespace outrun::vr::dx11
             bool shaderMixedPair{};
             bool shaderTranslationExact{};
             bool fixedFunctionStateCoverageExact{};
+            bool alphaTestObservationComplete{};
+            DWORD alphaTestEnable = FALSE;
+            DWORD alphaTestRef{};
+            DWORD alphaTestFunc = D3DCMP_ALWAYS;
             bool fixedFunctionTranslationReady{};
             std::uint32_t fixedFunctionTranslationUnsupported{};
             UINT fixedFunctionActiveStages{};
@@ -311,6 +315,11 @@ namespace outrun::vr::dx11
                 hash = hash_mix(hash, stage.addressU);
                 hash = hash_mix(hash, stage.addressV);
             }
+            hash = hash_mix(
+                hash, sig.alphaTestObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.alphaTestEnable);
+            hash = hash_mix(hash, sig.alphaTestRef & 0xFFu);
+            hash = hash_mix(hash, sig.alphaTestFunc);
             hash = hash_mix(hash, sig.minFilter);
             hash = hash_mix(hash, sig.magFilter);
             hash = hash_mix(hash, sig.mipFilter);
@@ -1087,7 +1096,13 @@ namespace outrun::vr::dx11
                             sig.fixedFunctionStateCoverageExact,
                             sig.textureResourcePresentMask,
                             sig.textureResourceExactMask,
-                            textureTypes);
+                            textureTypes,
+                            FixedFunctionAlphaTestState{
+                                sig.alphaTestObservationComplete,
+                                sig.alphaTestEnable,
+                                sig.alphaTestRef,
+                                sig.alphaTestFunc
+                            });
                     compileProbe =
                         compile_fixed_function_pixel_shader_prototype(
                             prototype);
@@ -1825,6 +1840,12 @@ namespace outrun::vr::dx11
         if (vs) vs->Release();
         if (ps) ps->Release();
 
+        signature.alphaTestObservationComplete =
+            captured && source.complete;
+        signature.alphaTestEnable = source.alphaTestEnable;
+        signature.alphaTestRef = source.alphaRef;
+        signature.alphaTestFunc = source.alphaFunc;
+
         const bool inputLayoutExact = signature.inputLayoutExact;
         const bool shaderTranslationExact =
             signature.shaderTranslationExact;
@@ -1987,7 +2008,13 @@ namespace outrun::vr::dx11
                     signature.fixedFunctionStateCoverageExact,
                     signature.textureResourcePresentMask,
                     signature.textureResourceExactMask,
-                    textureTypes);
+                    textureTypes,
+                    FixedFunctionAlphaTestState{
+                        signature.alphaTestObservationComplete,
+                        signature.alphaTestEnable,
+                        signature.alphaTestRef,
+                        signature.alphaTestFunc
+                    });
             signature.fixedFunctionShaderPrototypeGenerated =
                 shaderPrototype.generated();
             signature.fixedFunctionShaderPrototypeUnsupported =

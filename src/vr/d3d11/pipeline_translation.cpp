@@ -209,6 +209,40 @@ namespace outrun::vr::dx11
             }
         }
 
+        bool fixed_function_alpha_test_supported(
+            DWORD value) noexcept
+        {
+            switch (static_cast<D3DCMPFUNC>(value))
+            {
+            case D3DCMP_NEVER:
+            case D3DCMP_LESS:
+            case D3DCMP_EQUAL:
+            case D3DCMP_LESSEQUAL:
+            case D3DCMP_GREATER:
+            case D3DCMP_NOTEQUAL:
+            case D3DCMP_GREATEREQUAL:
+            case D3DCMP_ALWAYS:
+                return true;
+            default:
+                return false;
+            }
+        }
+
+        const char* fixed_function_alpha_compare_operator(
+            DWORD value) noexcept
+        {
+            switch (static_cast<D3DCMPFUNC>(value))
+            {
+            case D3DCMP_LESS:         return "<";
+            case D3DCMP_EQUAL:        return "==";
+            case D3DCMP_LESSEQUAL:    return "<=";
+            case D3DCMP_GREATER:      return ">";
+            case D3DCMP_NOTEQUAL:     return "!=";
+            case D3DCMP_GREATEREQUAL: return ">=";
+            default:                  return nullptr;
+            }
+        }
+
         std::uint64_t hash_bytes(
             const void* data, std::size_t size) noexcept
         {
@@ -684,7 +718,8 @@ namespace outrun::vr::dx11
         bool observationComplete,
         std::uint8_t textureResourcePresentMask,
         std::uint8_t textureResourceExactMask,
-        const std::array<D3DRESOURCETYPE, 8>& textureResourceTypes)
+        const std::array<D3DRESOURCETYPE, 8>& textureResourceTypes,
+        FixedFunctionAlphaTestState alphaTest)
     {
         FixedFunctionPixelShaderPrototype out{};
         const auto readiness = translate_fixed_function_readiness(
@@ -697,6 +732,15 @@ namespace outrun::vr::dx11
         {
             out.unsupported |=
                 FixedFunctionShaderPrototypeUnsupportedNotReady;
+            return out;
+        }
+
+        if (!alphaTest.observationComplete ||
+            (alphaTest.enabled != FALSE &&
+             !fixed_function_alpha_test_supported(alphaTest.function)))
+        {
+            out.unsupported |=
+                FixedFunctionShaderPrototypeUnsupportedAlphaTestState;
             return out;
         }
 
@@ -810,6 +854,27 @@ namespace outrun::vr::dx11
             shader +=
                 ";\n        current = float4(nextColor, nextAlpha);\n"
                 "    }\n";
+        }
+
+        if (alphaTest.enabled != FALSE)
+        {
+            const auto alphaFunction =
+                static_cast<D3DCMPFUNC>(alphaTest.function);
+            if (alphaFunction == D3DCMP_NEVER)
+            {
+                shader +=
+                    "    discard; // D3D9 alpha test NEVER\n";
+            }
+            else if (alphaFunction != D3DCMP_ALWAYS)
+            {
+                shader += "    const float alphaRef = (";
+                shader += std::to_string(alphaTest.reference & 0xFFu);
+                shader += ".0f / 255.0f);\n";
+                shader += "    if (!(current.a ";
+                shader += fixed_function_alpha_compare_operator(
+                    alphaTest.function);
+                shader += " alphaRef)) discard;\n";
+            }
         }
 
         shader += "    return current;\n}\n";

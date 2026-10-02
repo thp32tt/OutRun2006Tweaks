@@ -119,6 +119,18 @@ namespace outrun::vr::dx11
         FixedFunctionShaderPrototypeUnsupportedNone = 0,
         FixedFunctionShaderPrototypeUnsupportedNotReady = 1u << 0,
         FixedFunctionShaderPrototypeUnsupportedResourceType = 1u << 1,
+        FixedFunctionShaderPrototypeUnsupportedAlphaTestState = 1u << 2,
+    };
+
+    // D3D9 alpha testing is pixel-shader behavior in the native DX11 path.
+    // Keep the state explicit in the diagnostic prototype so readiness
+    // evidence cannot silently drop ALPHAREF/ALPHAFUNC semantics.
+    struct FixedFunctionAlphaTestState
+    {
+        bool observationComplete = true;
+        DWORD enabled = FALSE;
+        DWORD reference = 0;
+        DWORD function = D3DCMP_ALWAYS;
     };
 
     struct FixedFunctionPixelShaderPrototype
@@ -143,7 +155,8 @@ namespace outrun::vr::dx11
         bool observationComplete,
         std::uint8_t textureResourcePresentMask,
         std::uint8_t textureResourceExactMask,
-        const std::array<D3DRESOURCETYPE, 8>& textureResourceTypes);
+        const std::array<D3DRESOURCETYPE, 8>& textureResourceTypes,
+        FixedFunctionAlphaTestState alphaTest = {});
 
     // R85 compiles the generated R84 source only as an offline diagnostic
     // probe. The bytecode is immediately discarded and never bound to a
