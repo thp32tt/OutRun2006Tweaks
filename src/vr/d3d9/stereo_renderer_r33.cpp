@@ -292,7 +292,7 @@ namespace OutRunVRStereo
             {
                 if (R33TelemetryEnabled() && IsGameDevice(device) &&
                     !InternalStereoPass && TargetIsBackBuffer())
-                    ++R31Frame.unstable;
+                    R31TelemetryNoteUnstable();
                 return {};
             }
 
@@ -307,7 +307,7 @@ namespace OutRunVRStereo
             if (fragile)
             {
                 if (R33TelemetryEnabled())
-                    ++R31Frame.fragile;
+                    R31TelemetryNoteFragile();
                 return {};
             }
 
