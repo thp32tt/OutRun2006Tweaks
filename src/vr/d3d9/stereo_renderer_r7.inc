@@ -922,6 +922,7 @@ namespace OutRunVRStereo
 				D3DRS_SEPARATEALPHABLENDENABLE,
 				D3DRS_SRCBLENDALPHA, D3DRS_DESTBLENDALPHA,
 				D3DRS_BLENDOPALPHA, D3DRS_ALPHATESTENABLE,
+				D3DRS_TEXTUREFACTOR,
 				D3DRS_SHADEMODE, D3DRS_VERTEXBLEND,
 				D3DRS_INDEXEDVERTEXBLENDENABLE,
 				D3DRS_CULLMODE, D3DRS_COLORWRITEENABLE,
@@ -1720,6 +1721,9 @@ namespace OutRunVRStereo
 		read(D3DRS_ALPHATESTENABLE, out.alphaTestEnable);
 		read(D3DRS_ALPHAREF, out.alphaRef);
 		read(D3DRS_ALPHAFUNC, out.alphaFunc);
+		// R191 observes the global fixed-function texture factor through the
+		// existing tracked render-state shadow; no new D3D9 hook is installed.
+		read(D3DRS_TEXTUREFACTOR, out.textureFactor);
 
 		// R162 captures SHADEMODE as part of the same tracked render-state
 		// snapshot so DX11 readiness cannot silently assume Gouraud shading.
