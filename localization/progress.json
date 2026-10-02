@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-02T15:26:06+09:00",
+  "updated_at_kst": "2026-10-01T17:28:12+09:00",
   "branch": "korean-localization-clean",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -139,7 +139,7 @@
       "pending_indices": []
     }
   },
-  "next_checkpoint": "LOC-C-000004 reconciled four current material candidates at HEAD after independent QA: index198/9FC88069 PASS STATIC_QA -> PRODUCTION_COMPLETE; index53/568D3696 REWORK_REQUIRED because LOC-E-000003 reused older Korean raster/mip bytes contrary to generation-reset exact-English-source rule; indices159/4EDA9DE3 and201/A9ABD877 HOLD because current course-title family font-size evidence is missing despite exact transport/comparison hashes and visual/canonical checks passing. Stale index61/C4A2937B QA_PENDING was reconciled to its already-authoritative C00476 REWORK_REQUIRED disposition without duplicate QA. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C177/Q00075 AUTHORITATIVE GATE PASS: validation-bearing retry result 50f29f674ddbd046784a6fd6854e23c247b4d90e passed Localization Automation Gate 36836426454 attempt 1 after stale recovery-verifier alignment 5dda33d7. A00348@index24 PASS PREFLIGHT_ONLY runtime-binder regression evidence; A00350@index225 PASS PREFLIGHT_ONLY SOURCE_ACQUISITION_EXHAUSTED reactivation guard; A00364 REWORK_REQUIRED for no material payload beyond review record. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
