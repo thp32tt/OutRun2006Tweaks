@@ -2449,16 +2449,6 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_40_RVA = 0x00182C56
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_40_PROBE_LEN = 64
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_40_PROBE_END_RVA = 0x00182C96
 
-# CONV-DXVK-000002/F32: overlap the incomplete CMP opcode at 0x182C95 and
-# capture the next bounded canonical window. Fresh bytes remain raw-only until
-# an exact canonical decode proves complete instructions/control flow.
-GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_41_RVA = 0x00182C95
-GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_41_PROBE_LEN = 64
-GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_41_PROBE_END_RVA = 0x00182CD5
-GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_41_OVERLAP_BYTES = (
-    GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_40_INCOMPLETE_BYTES
-)
-
 # CONV-DXVK-000002/F31: exact-decode every complete instruction exposed by
 # the canonical 0x182C56 window. The 64-byte capture ends one byte into the
 # next CMP at 0x182C95, so preserve that opcode for the next overlap.
@@ -2499,6 +2489,18 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_40_INSTRUCTIONS = (
     (0x00182C90, "89 48 0c", "mov [eax+0x0c], ecx"),
     (0x00182C93, "33 f6", "xor esi, esi"),
 )
+
+
+# CONV-DXVK-000002/F32: overlap the incomplete CMP opcode at 0x182C95 and
+# capture the next bounded canonical window. Fresh bytes remain raw-only until
+# an exact canonical decode proves complete instructions/control flow.
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_41_RVA = 0x00182C95
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_41_PROBE_LEN = 64
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_41_PROBE_END_RVA = 0x00182CD5
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_41_OVERLAP_BYTES = (
+    GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_40_INCOMPLETE_BYTES
+)
+
 
 
 # CONV-DXVK-000002/F30: exact-decode every complete instruction in the
