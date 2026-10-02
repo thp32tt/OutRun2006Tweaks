@@ -1,5 +1,5 @@
 {
-  "schema_version": 40,
+  "schema_version": 41,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -917,5 +917,32 @@
       ],
       "resume_phase": "WAIT_CHAT"
     }
+  },
+  "capability_routing": {
+    "mode": "OPTIONAL_HELPFUL_ONLY",
+    "skills_are_required": false,
+    "missing_skill_is_blocker": false,
+    "skill_failure_is_blocker": false,
+    "local_development_pc_required": false,
+    "github_only_continuation": true,
+    "producer_preferred": [
+      "outrun-localization-execution-router",
+      "outrun-dds-finalization-executor",
+      "outrun-durable-task-recorder",
+      "outrun-github-only-build-gate"
+    ],
+    "producer_conditional": {
+      "outrun-localization-text-region-recovery": "ONLY_IF_SOURCE_TEXT_OR_REGION_MISSING_OR_DISPUTED",
+      "outrun-korean-translation-consistency": "ONLY_IF_CANONICAL_KOREAN_MISSING_CONFLICTING_OR_C_REJECTED",
+      "directxtex-texture-converter-outrun": "ONLY_WHEN_DDS_FORMAT_CONVERSION_OR_INSPECTION_IS_DIRECTLY_HELPFUL"
+    },
+    "c_preferred": [
+      "outrun-c-static-qa-reconciler",
+      "outrun-durable-task-recorder",
+      "outrun-github-only-build-gate"
+    ],
+    "anti_restart_rule": "SKILLS_MUST_RESUME_CURRENT_CHECKPOINT_NOT_RESTART_COMPLETED_OCR_TRANSLATION_PREFLIGHT",
+    "fallback": "CONTINUE_EXISTING_GITHUB_ONLY_CONTRACT_WITHOUT_SKILL",
+    "completion_authority": "CONTROLLER_AND_DURABLE_GIT_EVIDENCE_NOT_SKILL_PROSE"
   }
 }
