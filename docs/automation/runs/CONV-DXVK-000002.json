@@ -151,7 +151,8 @@
     5947182916,
     5947231747,
     5947306139,
-    5947334794
+    5947334794,
+    5947371527
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -1871,6 +1872,82 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the validated F34 raw frontier 0x00182D14..0x00182D54. Exact-decode only complete canonical instructions, resolve predecessor forward target 0x00182D21 only if exact instruction-boundary evidence proves it, preserve any trailing partial instruction raw-only, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F34_CANONICAL_EXE_PROVENANCE_0x182D14_TO_0x182D54",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "895e5aad32948bf900c90ebb3da4ed7c0dd8ff8c",
+      "source_commits": [
+        "27be49b786e02dfe61bca4262475bdfb1b34f91b",
+        "895e5aad32948bf900c90ebb3da4ed7c0dd8ff8c"
+      ],
+      "validation_bearing_result_sha": "895e5aad32948bf900c90ebb3da4ed7c0dd8ff8c",
+      "commit_message": "dxvk: satisfy overlap probe contract [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Captured F34 canonical raw provenance 0x00182D14..0x00182D54 from the proven F33 cut-edge F7 byte and retained fail-closed canonical probe equality plus predecessor overlap identity. The fresh window remains provenance-only in this unit; a newer concurrent descendant has since exact-decoded it.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local conversion/run state, regression/problem history and Issue #14; tracked concurrent same-JOB frontier advancement."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the first unfinished canonical static frontier after F33 proof: bounded overlap capture beginning at incomplete F7 0x00182D14."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 27be49b786e02dfe61bca4262475bdfb1b34f91b added continuation_43 raw provenance; repair 895e5aad32948bf900c90ebb3da4ed7c0dd8ff8c preserved direct canonical overlap equality while retaining predecessor overlap validation."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact repair SHA passed DXVK Canonical Disassembly Evidence run 36978304876/job 110746884968: backend disassembly contract OK, canonical EXE SHA256 matched, continuation_43=EXACT_EXE_182D14_TO_182D54_PROVENANCE_CAPTURED, overlap f7 matched, and probe end 0x00182D54 matched. Backend Conversion Gate 36978304874 passed static contracts through Win32 configure at state capture; full build is not required for this Python provenance unit and is not claimed here."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive source commits 27be49b786e02dfe61bca4262475bdfb1b34f91b and 895e5aad32948bf900c90ebb3da4ed7c0dd8ff8c contain the required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947371527 records the direct-chat transaction."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static/disassembly analyzer provenance only; no runtime payload, selector, backend binary, localization, or deployable package content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as supplemental history without replacing the newer concurrent authoritative canonical frontier."
+        }
+      },
+      "validation": {
+        "fail_before_sha": "27be49b786e02dfe61bca4262475bdfb1b34f91b",
+        "fail_before_dxvk_disassembly_run_id": 36978158616,
+        "fail_before_job_id": 110746440511,
+        "fail_before_reason": "DXVK overlap transition 42->43 raw provenance no longer compares canonical probe bytes against the declared overlap",
+        "exact_sha": "895e5aad32948bf900c90ebb3da4ed7c0dd8ff8c",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36978304876,
+        "dxvk_disassembly_evidence_job_id": 110746884968,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "dxvk_disassembly_evidence_artifact_id": 11214756454,
+        "dxvk_disassembly_evidence_artifact_digest": "sha256:63d86bc640a06ed280745ea59e188f1b05c5cd5c782d1ba0e52cb1646a75e366",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "provenance_status": "EXACT_EXE_182D14_TO_182D54_PROVENANCE_CAPTURED",
+        "overlap_bytes": "f7",
+        "overlap_matches": true,
+        "probe_end_rva": "0x00182D54",
+        "probe_end_matches": true,
+        "backend_conversion_gate_run_id": 36978304874,
+        "backend_static_steps_through_configure": "PASS",
+        "full_win32_build": "IN_PROGRESS_AT_STATE_CAPTURE_NOT_REQUIRED_FOR_UNIT",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947371527,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newer authoritative descendant frontier; current branch already advances beyond this raw window. Do not regress F34 to raw-only state. Continue only from the newest validated/candidate edge, preserving each trailing partial instruction raw-only until its bounded overlap capture is proven."
     }
   ]
 }
