@@ -769,6 +769,40 @@ def verify_dxvk_continuation_chain() -> None:
                 f"{next_overlap.hex(' ')} != {previous_incomplete.hex(' ')}"
             )
 
+        # Once the overlapping successor has an exact proof, require the prior
+        # cut bytes to be a strict prefix of that proof's first complete
+        # instruction. Equality would mean the predecessor incorrectly marked
+        # a complete instruction as cut; a non-prefix would mean the overlap
+        # provenance and decoded successor can silently describe different
+        # byte streams even though their RVAs line up.
+        if next_id in proof_ids:
+            next_instruction_rows = value(f"{following}_INSTRUCTIONS")
+            if not next_instruction_rows:
+                raise SystemExit(
+                    f"DXVK overlap transition {previous_id}->{next_id} proof has no instruction rows"
+                )
+            first_instruction_rva, first_instruction_hex, _first_instruction_asm = (
+                next_instruction_rows[0]
+            )
+            first_instruction = bytes.fromhex(first_instruction_hex)
+            if first_instruction_rva != next_start:
+                raise SystemExit(
+                    f"DXVK overlap transition {previous_id}->{next_id} first decoded instruction "
+                    f"starts at 0x{first_instruction_rva:08X}, expected 0x{next_start:08X}"
+                )
+            if not first_instruction.startswith(next_overlap):
+                raise SystemExit(
+                    f"DXVK overlap transition {previous_id}->{next_id} cut-edge overlap does not prefix "
+                    f"the first decoded instruction: overlap={next_overlap.hex(' ')} "
+                    f"instruction={first_instruction.hex(' ')}"
+                )
+            if len(next_overlap) >= len(first_instruction):
+                raise SystemExit(
+                    f"DXVK overlap transition {previous_id}->{next_id} cut edge is not a strict "
+                    f"instruction prefix: overlap_len={len(next_overlap)} "
+                    f"instruction_len={len(first_instruction)}"
+                )
+
     memoize = analyzer.get("_memoize_pe_only_collector")
     memoized_count = analyzer.get("_DXVK_CONTINUATION_COLLECTORS_MEMOIZED", 0)
     pe_type = analyzer.get("PE")
