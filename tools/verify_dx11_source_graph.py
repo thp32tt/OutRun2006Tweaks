@@ -2634,6 +2634,83 @@ def main() -> None:
                 "DX11 R115 activation-composition probe drift: " + meaning
             )
 
+    r116_render_state_header = {
+        "struct NativeFixedFunctionRenderStateReadiness":
+            "R116 render-state readiness snapshot",
+        "class NativeFixedFunctionRenderStateBundle final":
+            "R116 dormant render-state owner",
+        "Microsoft::WRL::ComPtr<ID3D11BlendState> blend_state_":
+            "R116 owned blend-state object",
+        "Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depth_stencil_state_":
+            "R116 owned depth-stencil object",
+        "Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizer_state_":
+            "R116 owned rasterizer object",
+        "std::uint64_t translation_identity_ = 0":
+            "R116 persisted render-state identity",
+    }
+    missing_r116_header = [
+        meaning
+        for token, meaning in r116_render_state_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r116_header:
+        raise SystemExit(
+            "DX11 R116 render-state header drift: "
+            + ", ".join(missing_r116_header)
+        )
+
+    for token, meaning in {
+        "hash_pipeline_render_state_identity(":
+            "R116 canonical render-state identity",
+        "device->CreateBlendState(":
+            "R116 concrete blend-state creation",
+        "device->CreateDepthStencilState(":
+            "R116 concrete depth-stencil creation",
+        "device->CreateRasterizerState(":
+            "R116 concrete rasterizer creation",
+        "stencil_ref_ = translation.stencil_ref":
+            "R116 dynamic stencil-reference ownership",
+        "translation_identity_ = translationIdentity":
+            "R116 persisted translation identity",
+        "blend_state_->GetDevice(":
+            "R116 live blend-state device verification",
+        "depth_stencil_state_->GetDevice(":
+            "R116 live depth-stencil device verification",
+        "rasterizer_state_->GetDevice(":
+            "R116 live rasterizer device verification",
+        "translation_identity_ == translationIdentity":
+            "R116 exact translation provenance comparison",
+        "snapshotToken, translationIdentity":
+            "R116 translation identity in readiness token",
+        "snapshotToken, bundle_generation_":
+            "R116 recreation generation in readiness token",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R116 render-state source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R116 render-state bundle owns exact translated state objects":
+            "R116 concrete object ownership proof",
+        "R116 exact render-state translation issues a valid snapshot":
+            "R116 positive readiness snapshot",
+        "R116 changed render-state identity fails closed":
+            "R116 translation identity invalidation proof",
+        "R116 foreign device cannot claim render-state readiness":
+            "R116 foreign-device rejection",
+        "R116 inexact render-state translation must fail closed":
+            "R116 inexact-translation rejection",
+        "R116 render-state bundle recreation invalidates stale snapshot":
+            "R116 recreation stale-token proof",
+        "DX11 fixed-function render-state bundle R116: PASS":
+            "R116 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R116 render-state probe drift: " + meaning
+            )
+
     if (
         "recreate_and_upload_mirror_for_observation(" in census
         or "mirror_readiness(" in census
