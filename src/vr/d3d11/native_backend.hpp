@@ -1150,6 +1150,61 @@ compose_fixed_function_same_context_bound_draw_readiness(
     const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
     std::uint64_t snapshotToken) noexcept;
 
+// R140 closes the remaining direct-geometry observation gap in the final
+// dormant pre-draw proof. R139 reobserves aggregate PS, IA/VS/PS and RS/OM
+// state from one context; R140 additionally requires the exact live slot-0
+// VB/optional IB/stride/offset/topology snapshot sealed by the draw geometry.
+// This remains observation evidence only and never issues Draw*.
+struct NativeFixedFunctionCompleteBoundDrawReadiness {
+    bool inputValid{};
+    bool sameContextBoundDrawReady{};
+    bool geometryBindingReady{};
+    bool geometryBindingMatchesDraw{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t sameContextBoundDrawSnapshotToken{};
+    std::uint64_t geometryBindingSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionCompleteBoundDrawReadiness
+compose_fixed_function_complete_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_complete_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset,
+    std::uint64_t snapshotToken) noexcept;
+
 class NativeBackend final {
 public:
     NativeBackend() = default;
