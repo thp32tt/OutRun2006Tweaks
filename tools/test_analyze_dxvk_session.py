@@ -27,6 +27,8 @@ PROBE_STARTUP = (
     PROBE_BASE + " source=startup-observer attestation=2" + PROBE_NATIVE
 )
 PROBE_CREATE_EX_LEGACY = PROBE_BASE + " source=create-device-ex attestation=1"
+VALID_PROVIDER_SHA256 = "a" * 64
+OTHER_PROVIDER_SHA256 = "b" * 64
 
 
 def run_case(
@@ -42,10 +44,17 @@ def run_case(
     expected_attestation_ids_valid: bool = True,
     expected_provider_attestation: int | None = 1,
     expected_native_transport: bool | None = True,
+    provider_sha256: str | None = VALID_PROVIDER_SHA256,
+    expected_provider_sha256: str | None = VALID_PROVIDER_SHA256,
+    expected_provider_hash_match: bool | None = True,
 ) -> None:
     with tempfile.TemporaryDirectory(prefix=f"dxvk-analyzer-{name}-") as temp:
         session = Path(temp)
-        preflight = {"Dxvk": {"Provider": {"Sha256": "fixture-sha256"}}}
+        preflight = {"Dxvk": {"Provider": {}}}
+        if provider_sha256 is not None:
+            preflight["Dxvk"]["Provider"]["Sha256"] = provider_sha256
+        if expected_provider_sha256 is not None:
+            preflight["Dxvk"]["ExpectedSha256"] = expected_provider_sha256
         if expected_version is not None:
             preflight["Dxvk"]["Version"] = expected_version
         (session / "VR_ONE_CLICK_PREFLIGHT.json").write_text(
@@ -87,6 +96,9 @@ def run_case(
         actual_native_transport = report.get(
             "NativeTransportPrerequisitesObserved"
         )
+        actual_provider_hash_match = report.get(
+            "PreflightProviderSha256MatchesExpected"
+        )
         if (
             actual_status != expected_status
             or actual_match is not expected_match
@@ -95,19 +107,22 @@ def run_case(
             or actual_ids_valid is not expected_attestation_ids_valid
             or actual_provider_attestation != expected_provider_attestation
             or actual_native_transport is not expected_native_transport
+            or actual_provider_hash_match is not expected_provider_hash_match
         ):
             raise AssertionError(
                 f"{name}: status={actual_status!r} match={actual_match!r} "
                 f"create_count={actual_count!r} reattest={actual_passed!r} "
                 f"ids_valid={actual_ids_valid!r} "
                 f"provider_attestation={actual_provider_attestation!r} "
-                f"native_transport={actual_native_transport!r}; "
+                f"native_transport={actual_native_transport!r} "
+                f"provider_hash_match={actual_provider_hash_match!r}; "
                 f"expected status={expected_status!r} match={expected_match!r} "
                 f"create_count={expected_create_count!r} "
                 f"reattest={expected_reattest_passed!r} "
                 f"ids_valid={expected_attestation_ids_valid!r} "
                 f"provider_attestation={expected_provider_attestation!r} "
-                f"native_transport={expected_native_transport!r}"
+                f"native_transport={expected_native_transport!r} "
+                f"provider_hash_match={expected_provider_hash_match!r}"
             )
 
 
@@ -118,6 +133,43 @@ def main() -> int:
         runtime_versions=["3.1.1"],
         expected_status="STOCK_DXVK_PROVIDER_VERIFIED",
         expected_match=True,
+    )
+    run_case(
+        "preflight-provider-hash-missing",
+        expected_version="3.1.1",
+        runtime_versions=["3.1.1"],
+        expected_status="DXVK_PREFLIGHT_PROVIDER_SHA256_MISSING",
+        expected_match=True,
+        provider_sha256=None,
+        expected_provider_hash_match=None,
+    )
+    run_case(
+        "preflight-expected-provider-hash-missing",
+        expected_version="3.1.1",
+        runtime_versions=["3.1.1"],
+        expected_status="DXVK_PREFLIGHT_PROVIDER_SHA256_MISSING",
+        expected_match=True,
+        expected_provider_sha256=None,
+        expected_provider_hash_match=None,
+    )
+    run_case(
+        "preflight-provider-hash-invalid",
+        expected_version="3.1.1",
+        runtime_versions=["3.1.1"],
+        expected_status="DXVK_PREFLIGHT_PROVIDER_SHA256_INVALID",
+        expected_match=True,
+        provider_sha256="not-a-sha256",
+        expected_provider_sha256="not-a-sha256",
+        expected_provider_hash_match=None,
+    )
+    run_case(
+        "preflight-provider-hash-mismatch",
+        expected_version="3.1.1",
+        runtime_versions=["3.1.1"],
+        expected_status="DXVK_PREFLIGHT_PROVIDER_SHA256_MISMATCH",
+        expected_match=True,
+        expected_provider_sha256=OTHER_PROVIDER_SHA256,
+        expected_provider_hash_match=False,
     )
     run_case(
         "version-unobserved",

@@ -151,12 +151,28 @@ def main() -> int:
         for probe in creation_probes
     )
     expected_version = None
-    expected_hash = None
+    provider_hash = None
+    expected_provider_hash = None
     if isinstance(preflight, dict) and isinstance(preflight.get("Dxvk"), dict):
         expected_version = preflight["Dxvk"].get("Version")
         provider = preflight["Dxvk"].get("Provider")
         if isinstance(provider, dict):
-            expected_hash = provider.get("Sha256")
+            provider_hash = provider.get("Sha256")
+        expected_provider_hash = preflight["Dxvk"].get("ExpectedSha256")
+
+    sha256_re = re.compile(r"^[0-9A-Fa-f]{64}$")
+    provider_hash_valid = (
+        isinstance(provider_hash, str) and sha256_re.fullmatch(provider_hash) is not None
+    )
+    expected_provider_hash_valid = (
+        isinstance(expected_provider_hash, str)
+        and sha256_re.fullmatch(expected_provider_hash) is not None
+    )
+    provider_hash_matches_expected = None
+    if provider_hash_valid and expected_provider_hash_valid:
+        provider_hash_matches_expected = (
+            provider_hash.lower() == expected_provider_hash.lower()
+        )
 
     unique_versions = sorted(set(detected_versions))
     version_match = None
@@ -186,6 +202,12 @@ def main() -> int:
         status = "GAME_LOCAL_PROVIDER_WITHOUT_STOCK_DXVK_INTEROP"
     elif not expected_version:
         status = "DXVK_PREFLIGHT_VERSION_MISSING"
+    elif provider_hash is None or expected_provider_hash is None:
+        status = "DXVK_PREFLIGHT_PROVIDER_SHA256_MISSING"
+    elif not provider_hash_valid or not expected_provider_hash_valid:
+        status = "DXVK_PREFLIGHT_PROVIDER_SHA256_INVALID"
+    elif provider_hash_matches_expected is not True:
+        status = "DXVK_PREFLIGHT_PROVIDER_SHA256_MISMATCH"
     elif not unique_versions:
         status = "DXVK_RUNTIME_VERSION_UNOBSERVED"
     elif version_match is not True:
@@ -210,7 +232,11 @@ def main() -> int:
         "DeviceCreationAttestationIds": creation_attestation_ids,
         "DeviceCreationAttestationIdsValid": creation_attestation_ids_valid,
         "PreflightDxvkVersion": expected_version,
-        "PreflightProviderSha256": expected_hash,
+        "PreflightProviderSha256": provider_hash,
+        "PreflightExpectedProviderSha256": expected_provider_hash,
+        "PreflightProviderSha256Valid": provider_hash_valid,
+        "PreflightExpectedProviderSha256Valid": expected_provider_hash_valid,
+        "PreflightProviderSha256MatchesExpected": provider_hash_matches_expected,
         "DetectedDxvkVersions": unique_versions,
         "RuntimeVersionMatchesPreflight": version_match,
         "NativeTransportPrerequisitesObserved": (
