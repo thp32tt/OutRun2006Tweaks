@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "0ee584aae99aa5c32e122bfcd7db8f9a3c623617",
+  "state_parent_head": "c80739b5c36b0cf2f920da12db769451eee28e19",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,9 +52,9 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "5194dd02a1feb05bef67d74dc2f90e038dd080c0",
-    "validation_bearing_sha": "5194dd02a1feb05bef67d74dc2f90e038dd080c0",
-    "automation_validation": "PASS_EXACT_STATIC_GATES_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN",
+    "result_sha": "b41263b81180606a5902250c17382c7879e69a00",
+    "validation_bearing_sha": "b41263b81180606a5902250c17382c7879e69a00",
+    "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_AND_CENSUS_BUILD_CANCELLED_BY_DESCENDANT_CHURN",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
@@ -401,6 +401,18 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5947169671
+    },
+    {
+      "unit_id": "DX11_SAME_CONTEXT_FINAL_BOUND_DRAW",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "b41263b81180606a5902250c17382c7879e69a00",
+      "validation_bearing_sha": "b41263b81180606a5902250c17382c7879e69a00",
+      "automation_validation": "PASS_EXACT_STATIC_SOURCE_GRAPH_AND_CENSUS_BUILD_CANCELLED_BY_DESCENDANT_CHURN",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5947178276,
+      "run_state_commit": "b0a090fa55cdf6748a148ea01abb1c13b1b231a1"
     }
   ]
 }
