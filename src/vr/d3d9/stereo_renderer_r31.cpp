@@ -360,7 +360,7 @@ namespace OutRunVRStereo
 
             bool leftWvpOk = false;
             {
-                InternalPassScope guard;
+                InternalStereoPassScope guard;
                 leftWvpOk = SetWvpOneRegisterAtATime(
                     device, draw.eyeConstants[0]);
             }
@@ -368,7 +368,7 @@ namespace OutRunVRStereo
             {
                 bool rolledBack = false;
                 {
-                    InternalPassScope guard;
+                    InternalStereoPassScope guard;
                     rolledBack = SetWvpOneRegisterAtATime(
                         device, draw.originalConstants);
                 }
@@ -395,7 +395,7 @@ namespace OutRunVRStereo
                 ReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed, site, result.hr);
                 bool restored = false;
                 {
-                    InternalPassScope guard;
+                    InternalStereoPassScope guard;
                     restored = SetWvpOneRegisterAtATime(
                         device, draw.originalConstants);
                 }
@@ -404,19 +404,17 @@ namespace OutRunVRStereo
                 return result;
             }
 
-            IDirect3DSurface9* savedRt = TrackedRenderTarget;
+            IDirect3DSurface9* savedRt = TrackedRenderTargetSnapshot();
             IDirect3DSurface9* savedDepth = TrackedDepthStencilSnapshot();
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
             bool restoreOk = true;
             {
-                InternalPassScope guard;
-                rightHr = SetRenderTargetHook.stdcall<HRESULT>(
-                    device, 0u, RightEyeSurface);
+                InternalStereoPassScope guard;
+                rightHr = SetRawRenderTarget0(device, RightEyeSurfaceSnapshot());
                 if (SUCCEEDED(rightHr))
-                    rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
-                        device, TrackedDepthStencilSnapshot() ? RightEyeDepth : nullptr);
+                    rightHr = SetRawDepthStencil(device, TrackedDepthStencilSnapshot() ? RightEyeDepthSnapshot() : nullptr);
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) && !SetWvpOneRegisterAtATime(
@@ -522,14 +520,14 @@ namespace OutRunVRStereo
 
             bool leftWvpOk = false;
             {
-                InternalPassScope guard;
+                InternalStereoPassScope guard;
                 leftWvpOk = SetWvpOneRegisterAtATime(device, eyeConstants[0]);
             }
             if (!leftWvpOk)
             {
                 bool rolledBack = false;
                 {
-                    InternalPassScope guard;
+                    InternalStereoPassScope guard;
                     rolledBack = SetWvpOneRegisterAtATime(device, original);
                 }
                 if (!rolledBack)
@@ -552,7 +550,7 @@ namespace OutRunVRStereo
             {
                 bool restored = false;
                 {
-                    InternalPassScope guard;
+                    InternalStereoPassScope guard;
                     restored = SetWvpOneRegisterAtATime(device, original);
                 }
                 ReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed, site, result.hr);
@@ -561,19 +559,17 @@ namespace OutRunVRStereo
                 return result;
             }
 
-            IDirect3DSurface9* savedRt = TrackedRenderTarget;
+            IDirect3DSurface9* savedRt = TrackedRenderTargetSnapshot();
             IDirect3DSurface9* savedDepth = TrackedDepthStencilSnapshot();
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
             bool restoreOk = true;
             {
-                InternalPassScope guard;
-                rightHr = SetRenderTargetHook.stdcall<HRESULT>(
-                    device, 0u, RightEyeSurface);
+                InternalStereoPassScope guard;
+                rightHr = SetRawRenderTarget0(device, RightEyeSurfaceSnapshot());
                 if (SUCCEEDED(rightHr))
-                    rightHr = SetDepthStencilSurfaceHook.stdcall<HRESULT>(
-                        device, TrackedDepthStencilSnapshot() ? RightEyeDepth : nullptr);
+                    rightHr = SetRawDepthStencil(device, TrackedDepthStencilSnapshot() ? RightEyeDepthSnapshot() : nullptr);
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) &&
