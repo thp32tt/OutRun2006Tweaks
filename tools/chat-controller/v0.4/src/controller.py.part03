@@ -2793,6 +2793,7 @@ def finalize_c_qa_batch(q: dict, task: dict) -> None:
                 producer["validated_by_qa_result_sha"] = task.get("result_sha")
         consumed = set(input_keys)
         q["qa_pending"] = [x for x in q.get("qa_pending", []) if _qa_item_key(x) not in consumed]
+        _localization_material_target_cache.clear()
     else:
         # C infrastructure/controller/Gate failure is diagnostic, not validation.
         # Keep every immutable TASK_ID@RESULT_SHA input pending, but rotate the
