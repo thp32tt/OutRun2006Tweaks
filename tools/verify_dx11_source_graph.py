@@ -6621,27 +6621,27 @@ def main() -> None:
     r168_line_raster_contract = [
         (
             "DWORD lastPixel = TRUE;",
-            DRAW_STATE_HEADER,
+            D3D9_DRAW_STATE_HPP,
             "R168 LASTPIXEL snapshot provenance",
         ),
         (
             "DWORD antialiasedLineEnable = FALSE;",
-            DRAW_STATE_HEADER,
+            D3D9_DRAW_STATE_HPP,
             "R168 antialiased-line snapshot provenance",
         ),
         (
             "D3DRS_LASTPIXEL, D3DRS_ANTIALIASEDLINEENABLE",
-            STEREO_R7,
+            D3D9_RENDER_STATE_CAPTURE,
             "R168 tracked line-raster priming",
         ),
         (
             "read(D3DRS_LASTPIXEL, out.lastPixel);",
-            STEREO_R7,
+            D3D9_RENDER_STATE_CAPTURE,
             "R168 LASTPIXEL capture",
         ),
         (
             "read(D3DRS_ANTIALIASEDLINEENABLE, out.antialiasedLineEnable);",
-            STEREO_R7,
+            D3D9_RENDER_STATE_CAPTURE,
             "R168 antialiased-line capture",
         ),
         (
