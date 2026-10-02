@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from collections import Counter
 from pathlib import Path
 
 SUMMARY_RE = re.compile(
@@ -173,6 +174,155 @@ FFP_SHADER_COMPILE_RE = re.compile(
     r"diagnosticsBytes=(?P<diagnosticsBytes>\d+) "
     r"profile=(?P<profile>[A-Za-z0-9_]+)"
 )
+
+
+
+# R198: keep this diagnostic support table aligned with the dormant translator.
+# It does not promote native draw routing; it only turns detailed stage logs into
+# actionable evidence for the remaining fixed-function semantic gaps.
+FFP_COLOR_SUPPORTED_OPS = frozenset({
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+    18, 19, 20, 21, 24, 25, 26,
+})
+FFP_ALPHA_SUPPORTED_OPS = frozenset({
+    2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24, 25, 26,
+})
+FFP_SUPPORTED_ARGUMENT_SELECTORS = frozenset({0, 1, 2, 3, 6})
+FFP_ARGUMENT_SELECT_MASK = 0x0F
+FFP_ARGUMENT_SUPPORTED_BITS = 0x3F
+FFP_RESULTARG_CURRENT = 1
+
+FFP_OP_NAMES = {
+    1: "DISABLE",
+    2: "SELECTARG1",
+    3: "SELECTARG2",
+    4: "MODULATE",
+    5: "MODULATE2X",
+    6: "MODULATE4X",
+    7: "ADD",
+    8: "ADDSIGNED",
+    9: "ADDSIGNED2X",
+    10: "SUBTRACT",
+    11: "ADDSMOOTH",
+    12: "BLENDDIFFUSEALPHA",
+    13: "BLENDTEXTUREALPHA",
+    14: "BLENDFACTORALPHA",
+    15: "BLENDTEXTUREALPHAPM",
+    16: "BLENDCURRENTALPHA",
+    17: "PREMODULATE",
+    18: "MODULATEALPHA_ADDCOLOR",
+    19: "MODULATECOLOR_ADDALPHA",
+    20: "MODULATEINVALPHA_ADDCOLOR",
+    21: "MODULATEINVCOLOR_ADDALPHA",
+    22: "BUMPENVMAP",
+    23: "BUMPENVMAPLUMINANCE",
+    24: "DOTPRODUCT3",
+    25: "MULTIPLYADD",
+    26: "LERP",
+}
+FFP_ARGUMENT_NAMES = {
+    0: "DIFFUSE",
+    1: "CURRENT",
+    2: "TEXTURE",
+    3: "TFACTOR",
+    4: "SPECULAR",
+    5: "TEMP",
+    6: "CONSTANT",
+}
+
+
+def fixed_function_used_argument_fields(op: int, prefix: str) -> tuple[str, ...]:
+    if op in {2, 17}:
+        return (prefix + "Arg1",)
+    if op == 3:
+        return (prefix + "Arg2",)
+    if op in {25, 26}:
+        return (prefix + "Arg0", prefix + "Arg1", prefix + "Arg2")
+    return (prefix + "Arg1", prefix + "Arg2")
+
+
+def summarize_fixed_function_detailed_stage_demand(
+    fixed_function: dict[int, list[dict]],
+    latest: dict[str, int] | None,
+) -> dict:
+    color_ops: Counter[int] = Counter()
+    alpha_ops: Counter[int] = Counter()
+    argument_selectors: Counter[int] = Counter()
+    argument_values: Counter[int] = Counter()
+    result_args: Counter[int] = Counter()
+    detailed_stages = 0
+
+    def inspect_arguments(stage: dict, op: int, prefix: str) -> None:
+        for key in fixed_function_used_argument_fields(op, prefix):
+            value = stage.get(key)
+            if value is None:
+                continue
+            selector = value & FFP_ARGUMENT_SELECT_MASK
+            unknown_bits = value & ~FFP_ARGUMENT_SUPPORTED_BITS
+            if unknown_bits or selector not in FFP_SUPPORTED_ARGUMENT_SELECTORS:
+                argument_values[value] += 1
+                argument_selectors[selector] += 1
+
+    for stages in fixed_function.values():
+        for stage in stages:
+            color_op = stage.get("colorOp")
+            if color_op is None or color_op == 1:
+                continue
+            detailed_stages += 1
+
+            if color_op not in FFP_COLOR_SUPPORTED_OPS:
+                color_ops[color_op] += 1
+            else:
+                inspect_arguments(stage, color_op, "color")
+
+            alpha_op = stage.get("alphaOp")
+            if alpha_op not in FFP_ALPHA_SUPPORTED_OPS:
+                alpha_ops[alpha_op] += 1
+            else:
+                inspect_arguments(stage, alpha_op, "alpha")
+
+            result_arg = stage.get("resultArg", FFP_RESULTARG_CURRENT)
+            if result_arg != FFP_RESULTARG_CURRENT:
+                result_args[result_arg] += 1
+
+    def enum_counts(counter: Counter[int], names: dict[int, str]) -> list[dict]:
+        return [
+            {"value": value, "name": names.get(value, "UNKNOWN"), "count": count}
+            for value, count in sorted(counter.items())
+        ]
+
+    unsupported_argument_values = [
+        {
+            "value": value,
+            "value_hex": f"0x{value:08X}",
+            "selector": value & FFP_ARGUMENT_SELECT_MASK,
+            "selector_name": FFP_ARGUMENT_NAMES.get(
+                value & FFP_ARGUMENT_SELECT_MASK, "UNKNOWN"
+            ),
+            "count": count,
+        }
+        for value, count in sorted(argument_values.items())
+    ]
+
+    has_unsupported = bool(
+        color_ops or alpha_ops or argument_values or result_args
+    )
+    return {
+        "DetailedStages": detailed_stages,
+        "UnsupportedColorOps": enum_counts(color_ops, FFP_OP_NAMES),
+        "UnsupportedAlphaOps": enum_counts(alpha_ops, FFP_OP_NAMES),
+        "UnsupportedArgumentSelectors": enum_counts(
+            argument_selectors, FFP_ARGUMENT_NAMES
+        ),
+        "UnsupportedArgumentValues": unsupported_argument_values,
+        "NonCurrentResultArgs": enum_counts(result_args, FFP_ARGUMENT_NAMES),
+        "HasUnsupportedObservedSemantics": has_unsupported,
+        "CoverageLimitedByDetailCap": bool(
+            latest and latest.get("signatureDetailSkipped", 0) > 0
+        ),
+        "DiagnosticOnly": True,
+        "ActivationProof": False,
+    }
 
 
 def int_fields(match: re.Match[str]) -> dict[str, int]:
@@ -371,6 +521,9 @@ def main() -> int:
         )
 
     latest = summaries[-1] if summaries else None
+    fixed_function_detailed_stage_demand = (
+        summarize_fixed_function_detailed_stage_demand(fixed_function, latest)
+    )
     unsupported_total = None
     if latest:
         unsupported_keys = [
@@ -557,6 +710,7 @@ def main() -> int:
             "SamplingCoverage": sampling_coverage,
             "ManagedTextureShadow": managed_texture_shadow_evidence,
             "DualSourceBlend": dual_source_blend_evidence,
+            "FixedFunctionDetailedStageDemand": fixed_function_detailed_stage_demand,
         },
         "ActivationNote": (
             "R114 defaults to hashed-ordinal sampled diagnostics. "
