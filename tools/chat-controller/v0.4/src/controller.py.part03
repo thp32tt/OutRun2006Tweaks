@@ -3560,21 +3560,30 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
         # after the task already committed its result, so check the exact task marker first.
         task_commit = github_find_task_commit(active["branch"], active["task_id"])
         if task_commit:
-            active["result_sha"] = task_commit["sha"]
-            active["result_message"] = task_commit["message"]
-            active["last_checkpoint_head"] = task_commit["sha"]
-            active["last_checkpoint_at"] = now.isoformat()
-            active["controller_stage"] = "WAIT_ACTIONS"
-            active["phase"] = "WAIT_ACTIONS"
-            active["wait_actions_started_at"] = now.isoformat()
-            active["last_gate_poll_at"] = None
-            save_queue_state(q)
-            write_runtime(
-                status="queue_wait_actions",
-                last_action=f"{active['task_id']} durable task commit found -> {active['result_sha']}",
-                queue=active,
-            )
-            return
+            if CONTROLLER_MODE == "conversion":
+                handled = await conversion_handle_discovered_commit(
+                    context, pages, q, active, task_commit, now
+                )
+                save_queue_state(q)
+                if handled:
+                    return
+                task_commit = None
+            else:
+                active["result_sha"] = task_commit["sha"]
+                active["result_message"] = task_commit["message"]
+                active["last_checkpoint_head"] = task_commit["sha"]
+                active["last_checkpoint_at"] = now.isoformat()
+                active["controller_stage"] = "WAIT_ACTIONS"
+                active["phase"] = "WAIT_ACTIONS"
+                active["wait_actions_started_at"] = now.isoformat()
+                active["last_gate_poll_at"] = None
+                save_queue_state(q)
+                write_runtime(
+                    status="queue_wait_actions",
+                    last_action=f"{active['task_id']} durable task commit found -> {active['result_sha']}",
+                    queue=active,
+                )
+                return
 
         skipped_commit = github_find_task_commit(
             active["branch"], active["task_id"], allow_ci_skip_fallback=True
@@ -3699,29 +3708,38 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
             save_queue_state(q)
             return
         else:
-            active["result_sha"] = task_commit["sha"]
-            active["result_message"] = task_commit["message"]
-            active["phase"] = "WAIT_ACTIONS"
-            active["wait_actions_started_at"] = now.isoformat()
-            active["last_gate_poll_at"] = None
-            if github_actions_skip_directive(active["result_message"]):
-                recovery = await recover_missing_gate_run(context, pages, active, now)
+            if CONTROLLER_MODE == "conversion":
+                handled = await conversion_handle_discovered_commit(
+                    context, pages, q, active, task_commit, now
+                )
                 save_queue_state(q)
-                if recovery:
-                    action, reason = recovery
-                    write_runtime(
-                        status="queue_missing_gate_recovery",
-                        last_action=f"{active['task_id']} {action}: {reason}",
-                        queue=active,
-                    )
+                if handled:
+                    return
+                task_commit = None
+            else:
+                active["result_sha"] = task_commit["sha"]
+                active["result_message"] = task_commit["message"]
+                active["phase"] = "WAIT_ACTIONS"
+                active["wait_actions_started_at"] = now.isoformat()
+                active["last_gate_poll_at"] = None
+                if github_actions_skip_directive(active["result_message"]):
+                    recovery = await recover_missing_gate_run(context, pages, active, now)
+                    save_queue_state(q)
+                    if recovery:
+                        action, reason = recovery
+                        write_runtime(
+                            status="queue_missing_gate_recovery",
+                            last_action=f"{active['task_id']} {action}: {reason}",
+                            queue=active,
+                        )
+                    return
+                save_queue_state(q)
+                write_runtime(
+                    status="queue_wait_actions",
+                    last_action=f"{active['task_id']} -> {active['result_sha']} (exact task commit)",
+                    queue=active,
+                )
                 return
-            save_queue_state(q)
-            write_runtime(
-                status="queue_wait_actions",
-                last_action=f"{active['task_id']} -> {active['result_sha']} (exact task commit)",
-                queue=active,
-            )
-            return
 
     if active["phase"] == "WAIT_ACTIONS":
         bound_run_id = (active.get("gate_run") or {}).get("id")
