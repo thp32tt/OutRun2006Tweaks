@@ -329,6 +329,30 @@ def verify_dxvk_continuation_chain() -> None:
                 f"DXVK overlap transition {previous_id}->{next_id} is missing overlap bytes"
             )
         next_overlap = value(next_overlap_name)
+        next_provenance_collector_name = (
+            f"collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
+            f"{next_id}_provenance"
+        )
+        next_provenance_source = function_source(next_provenance_collector_name)
+        overlap_integrity_markers = (
+            f"{following}_OVERLAP_BYTES",
+            "overlap_actual = probe[: len(overlap)]",
+            "overlap_matches = overlap_actual == overlap",
+            "and overlap_matches",
+            '"overlap_matches": overlap_matches',
+            'predecessor["incomplete_rva"] == target_rva',
+            'predecessor["incomplete_matches"]',
+            'predecessor["capture_edge_matches"]',
+        )
+        missing_overlap_integrity_markers = [
+            marker for marker in overlap_integrity_markers
+            if marker not in next_provenance_source
+        ]
+        if missing_overlap_integrity_markers:
+            raise SystemExit(
+                f"DXVK overlap transition {previous_id}->{next_id} raw provenance "
+                f"lost fail-closed overlap validation: {missing_overlap_integrity_markers}"
+            )
         if previous_incomplete_rva != next_start:
             raise SystemExit(
                 f"DXVK overlap transition {previous_id}->{next_id} starts at "
