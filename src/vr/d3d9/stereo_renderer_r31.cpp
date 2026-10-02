@@ -149,6 +149,14 @@ namespace OutRunVRStereo
             R31Window = {};
         }
 
+        inline void R31ResetFastPathState() noexcept
+        {
+            R31BlockedVerifiedGeneration = 0;
+            R31FastWorldCandidates = 0;
+            R31EyeCache = {};
+            R31TelemetryResetFrameWindow();
+        }
+
         void R31FinalizePerfFrame() noexcept
         {
             if (R31Frame.epoch == 0 || R31Frame.draws == 0)
