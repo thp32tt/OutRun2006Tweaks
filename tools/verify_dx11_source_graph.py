@@ -888,6 +888,94 @@ def main() -> None:
             + ", ".join(missing_r124_output)
         )
 
+    r132_pipeline_binding_contract = [
+        (
+            "bind_for_observation(",
+            NATIVE_BACKEND_HPP,
+            "R132 dormant R97 pipeline binding API",
+        ),
+        (
+            "NativeFixedFunctionPipelineBundle::bind_for_observation(",
+            NATIVE_BACKEND_CPP,
+            "R132 dormant R97 pipeline binding implementation",
+        ),
+        (
+            "context->IASetInputLayout(input_layout_.Get());",
+            NATIVE_BACKEND_CPP,
+            "R132 exact input-layout binding",
+        ),
+        (
+            "context->VSSetShader(vertex_shader_.Get(), nullptr, 0);",
+            NATIVE_BACKEND_CPP,
+            "R132 exact vertex-shader binding",
+        ),
+        (
+            "context->PSSetShader(pixel_shader_.Get(), nullptr, 0);",
+            NATIVE_BACKEND_CPP,
+            "R132 exact pixel-shader binding",
+        ),
+        (
+            "contextDevice.Get() != device_.Get()",
+            NATIVE_BACKEND_CPP,
+            "R132 exact-device context gate",
+        ),
+        (
+            "dormant pipeline binding accepts exact same-device R97 snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R132 hosted WARP positive binding probe",
+        ),
+        (
+            "dormant pipeline binding preserves exact IA VS PS identity",
+            CONSTANT_BUFFER_PROBE,
+            "R132 bound-object identity readback proof",
+        ),
+        (
+            "dormant pipeline binding rejects missing R97 snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R132 missing-snapshot negative probe",
+        ),
+        (
+            "dormant pipeline binding rejects stale R97 snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R132 stale-snapshot negative probe",
+        ),
+        (
+            "dormant pipeline binding rejects foreign D3D11 context",
+            CONSTANT_BUFFER_PROBE,
+            "R132 foreign-context negative probe",
+        ),
+        (
+            "DX11 dormant fixed-function pipeline object binding: PASS",
+            CONSTANT_BUFFER_PROBE,
+            "R132 hosted probe completion marker",
+        ),
+    ]
+    missing_r132_pipeline_binding = [
+        meaning
+        for token, source, meaning in r132_pipeline_binding_contract
+        if token not in source
+    ]
+    runtime_pipeline_binding_users = []
+    for source_path in (ROOT / "src").rglob("*.cpp"):
+        if source_path == DX11 / "native_backend.cpp":
+            continue
+        if ".bind_for_observation(" in source_path.read_text(
+            encoding="utf-8", errors="ignore"
+        ):
+            runtime_pipeline_binding_users.append(
+                source_path.relative_to(ROOT).as_posix()
+            )
+    if runtime_pipeline_binding_users:
+        missing_r132_pipeline_binding.append(
+            "R132 dormant pipeline binding gained production callers: "
+            + ", ".join(runtime_pipeline_binding_users)
+        )
+    if missing_r132_pipeline_binding:
+        raise SystemExit(
+            "DX11 R132 dormant pipeline-binding contract drift: "
+            + ", ".join(missing_r132_pipeline_binding)
+        )
+
     r126_output_binding_contract = [
         (
             "class NativeFixedFunctionOutputStateBinding final",
