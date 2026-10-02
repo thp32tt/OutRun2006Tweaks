@@ -1513,6 +1513,17 @@ namespace outrun::vr::dx11
         if (source.ditherEnable != FALSE)
             out.unsupported |= PipelineUnsupportedDither;
 
+        // R170: WRAP0..7 is a fixed-function coordinate operation, not
+        // sampler addressing. Keep every non-default mask fail-closed.
+        for (const auto wrap : source.textureCoordinateWrap)
+        {
+            if (wrap != 0u)
+            {
+                out.unsupported |= PipelineUnsupportedTextureCoordinateWrap;
+                break;
+            }
+        }
+
         if (source.alphaTestEnable != FALSE)
             out.unsupported |= PipelineUnsupportedAlphaTest;
         if (source.fogEnable != FALSE)
