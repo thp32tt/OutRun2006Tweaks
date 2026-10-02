@@ -150,6 +150,7 @@ namespace outrun::vr::dx11
             case D3DTA_CURRENT:
             case D3DTA_TEXTURE:
             case D3DTA_TFACTOR:
+            case D3DTA_CONSTANT:
                 return true;
             default:
                 return false;
@@ -289,11 +290,12 @@ namespace outrun::vr::dx11
             std::size_t stageIndex,
             const char* swizzle,
             DWORD textureFactor,
+            DWORD stageConstant,
             bool premodulateCurrent = false)
         {
-            const auto normalizedByte = [textureFactor](unsigned shift)
+            const auto normalizedByte = [](DWORD color, unsigned shift)
             {
-                return std::to_string((textureFactor >> shift) & 0xFFu) +
+                return std::to_string((color >> shift) & 0xFFu) +
                        ".0f / 255.0f";
             };
             std::string base;
@@ -314,9 +316,19 @@ namespace outrun::vr::dx11
                 // D3DCOLOR is 0xAARRGGBB; materialize a normalized RGBA
                 // constant so existing COMPLEMENT/ALPHAREPLICATE handling
                 // remains identical to other fixed-function arguments.
-                base = "float4(" + normalizedByte(16) + ", " +
-                       normalizedByte(8) + ", " + normalizedByte(0) + ", " +
-                       normalizedByte(24) + ")";
+                base = "float4(" + normalizedByte(textureFactor, 16) + ", " +
+                       normalizedByte(textureFactor, 8) + ", " +
+                       normalizedByte(textureFactor, 0) + ", " +
+                       normalizedByte(textureFactor, 24) + ")";
+                break;
+            case D3DTA_CONSTANT:
+                // R197: D3DTSS_CONSTANT is a per-stage 0xAARRGGBB color.
+                // Materialize normalized RGBA so the existing argument
+                // modifiers retain identical behavior.
+                base = "float4(" + normalizedByte(stageConstant, 16) + ", " +
+                       normalizedByte(stageConstant, 8) + ", " +
+                       normalizedByte(stageConstant, 0) + ", " +
+                       normalizedByte(stageConstant, 24) + ")";
                 break;
             default:
                 return {};
@@ -343,13 +355,14 @@ namespace outrun::vr::dx11
             std::size_t stageIndex,
             const char* swizzle,
             DWORD textureFactor,
+            DWORD stageConstant,
             bool premodulateCurrent = false)
         {
             const auto first = fixed_function_argument_expression(
-                arg1, stageIndex, swizzle, textureFactor,
+                arg1, stageIndex, swizzle, textureFactor, stageConstant,
                 premodulateCurrent);
             const auto second = fixed_function_argument_expression(
-                arg2, stageIndex, swizzle, textureFactor,
+                arg2, stageIndex, swizzle, textureFactor, stageConstant,
                 premodulateCurrent);
             switch (op)
             {
@@ -426,7 +439,7 @@ namespace outrun::vr::dx11
                 // Direct3D 9 defines this COLOROP-only operation as
                 // Arg1.rgb + Arg1.a * Arg2.rgb.
                 const auto firstAlpha = fixed_function_argument_expression(
-                    arg1, stageIndex, ".a", textureFactor,
+                    arg1, stageIndex, ".a", textureFactor, stageConstant,
                     premodulateCurrent);
                 return first + " + " + firstAlpha + " * " + second;
             }
@@ -436,7 +449,7 @@ namespace outrun::vr::dx11
                 // Arg1.rgb * Arg2.rgb + Arg1.a, with Arg1.a replicated
                 // across the RGB result.
                 const auto firstAlpha = fixed_function_argument_expression(
-                    arg1, stageIndex, ".a", textureFactor,
+                    arg1, stageIndex, ".a", textureFactor, stageConstant,
                     premodulateCurrent);
                 return first + " * " + second + " + " + firstAlpha;
             }
@@ -445,7 +458,7 @@ namespace outrun::vr::dx11
                 // R189: D3D9 defines this COLOROP-only operation as
                 // Arg1.rgb + (1 - Arg1.a) * Arg2.rgb.
                 const auto firstAlpha = fixed_function_argument_expression(
-                    arg1, stageIndex, ".a", textureFactor,
+                    arg1, stageIndex, ".a", textureFactor, stageConstant,
                     premodulateCurrent);
                 return first + " + (1.0 - " + firstAlpha + ") * " + second;
             }
@@ -454,7 +467,7 @@ namespace outrun::vr::dx11
                 // R190: D3D9 defines this COLOROP-only operation as
                 // (1 - Arg1.rgb) * Arg2.rgb + Arg1.a.
                 const auto firstAlpha = fixed_function_argument_expression(
-                    arg1, stageIndex, ".a", textureFactor,
+                    arg1, stageIndex, ".a", textureFactor, stageConstant,
                     premodulateCurrent);
                 return "(1.0 - " + first + ") * " + second + " + " +
                        firstAlpha;
@@ -468,10 +481,10 @@ namespace outrun::vr::dx11
                 // signed values (2*x-1), computes their three-component dot
                 // product, and replicates the scalar through the destination.
                 const auto dotFirst = fixed_function_argument_expression(
-                    arg1, stageIndex, ".rgb", textureFactor,
+                    arg1, stageIndex, ".rgb", textureFactor, stageConstant,
                     premodulateCurrent);
                 const auto dotSecond = fixed_function_argument_expression(
-                    arg2, stageIndex, ".rgb", textureFactor,
+                    arg2, stageIndex, ".rgb", textureFactor, stageConstant,
                     premodulateCurrent);
                 return "dot((" + dotFirst + " * 2.0 - 1.0), (" +
                        dotSecond + " * 2.0 - 1.0))";
@@ -481,7 +494,7 @@ namespace outrun::vr::dx11
                 // R194: Direct3D 9 defines MULTIPLYADD as
                 // Arg1 + Arg2 * Arg0, where ARG0 is the third stage source.
                 const auto third = fixed_function_argument_expression(
-                    arg0, stageIndex, swizzle, textureFactor,
+                    arg0, stageIndex, swizzle, textureFactor, stageConstant,
                     premodulateCurrent);
                 return first + " + " + second + " * " + third;
             }
@@ -490,7 +503,7 @@ namespace outrun::vr::dx11
                 // R196: Direct3D 9 linearly interpolates Arg1 toward Arg2
                 // using ARG0 as the per-component proportion.
                 const auto proportion = fixed_function_argument_expression(
-                    arg0, stageIndex, swizzle, textureFactor,
+                    arg0, stageIndex, swizzle, textureFactor, stageConstant,
                     premodulateCurrent);
                 return first + " * " + proportion + " + " + second +
                        " * (1.0 - " + proportion + ")";
@@ -1273,12 +1286,12 @@ namespace outrun::vr::dx11
             shader += "        float3 nextColor = ";
             shader += fixed_function_op_expression(
                 stage.colorOp, stage.colorArg0, stage.colorArg1, stage.colorArg2,
-                stageIndex, ".rgb", textureFactor,
+                stageIndex, ".rgb", textureFactor, stage.stageConstant,
                 premodulateCurrentColor);
             shader += ";\n        float nextAlpha = ";
             shader += fixed_function_op_expression(
                 stage.alphaOp, stage.alphaArg0, stage.alphaArg1, stage.alphaArg2,
-                stageIndex, ".a", textureFactor,
+                stageIndex, ".a", textureFactor, stage.stageConstant,
                 premodulateCurrentAlpha);
             shader +=
                 ";\n        current = float4(nextColor, nextAlpha);\n"
