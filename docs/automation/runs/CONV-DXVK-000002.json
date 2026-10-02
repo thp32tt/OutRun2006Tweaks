@@ -9,7 +9,7 @@
   "initial_recovered_head": "936ba3538bd3bc54ccb4da1f582a2d2be7ca9007",
   "validation_bearing_result_sha": "0c548edfcd8f5cefccd77b6efa55f93977d506e1",
   "result_sha": "0c548edfcd8f5cefccd77b6efa55f93977d506e1",
-  "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+  "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BUILD",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "UNTESTED",
@@ -47,7 +47,7 @@
     },
     "C3_VALIDATE": {
       "status": "COMPLETE",
-      "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36981524422 job 110756917055 succeeded against the canonical EXE and reported EXACT_182E8E_TO_182ECB_CONTROL_FLOW_CAPTURE_EDGE_PROVEN. Backend Conversion Gate run 36981524500 job 110756917426 passed all static contract steps through application-space recenter; Win32 configure/build was still in progress at state write and is not claimed."
+      "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36981524422 job 110756917055 succeeded against the canonical EXE and reported EXACT_182E8E_TO_182ECB_CONTROL_FLOW_CAPTURE_EDGE_PROVEN. Exact-SHA Backend Conversion Gate run 36981524500 job 110756917426 completed SUCCESS, including all static contracts, Configure Win32, Build Win32 and binary-existence verification."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
@@ -86,8 +86,12 @@
     "backend_conversion_gate_run_id": 36981524500,
     "backend_conversion_gate_job_id": 110756917426,
     "backend_static_steps_through_recenter": "PASS",
-    "full_win32_build": "IN_PROGRESS_NOT_REQUIRED_FOR_STATIC_PROOF_NOT_CLAIMED",
-    "runtime_validation": "UNTESTED"
+    "full_win32_build": "PASS",
+    "runtime_validation": "UNTESTED",
+    "backend_conversion_gate_conclusion": "success",
+    "configure_win32": "PASS",
+    "build_win32": "PASS",
+    "verify_binary_exists": "PASS"
   },
   "follow_on_frontier": {
     "provenance_sha": "e8f58fef02282b19e7e98ac7d91081e07396455b",
@@ -147,7 +151,8 @@
     5947724258,
     5947751800,
     5947788675,
-    5947846126
+    5947846126,
+    5947892877
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -2784,7 +2789,7 @@
         },
         "C3_VALIDATE": {
           "status": "COMPLETE",
-          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36981524422 job 110756917055 succeeded against the canonical EXE and reported EXACT_182E8E_TO_182ECB_CONTROL_FLOW_CAPTURE_EDGE_PROVEN. Backend Conversion Gate run 36981524500 job 110756917426 passed all static contract steps through application-space recenter; Win32 configure/build was still in progress at state write and is not claimed."
+          "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence run 36981524422 job 110756917055 succeeded with proof status EXACT_182E8E_TO_182ECB_CONTROL_FLOW_CAPTURE_EDGE_PROVEN. Exact-SHA Backend Conversion Gate run 36981524500 job 110756917426 completed SUCCESS through Configure Win32, Build Win32 and binary verification."
         },
         "C4_COMMIT": {
           "status": "COMPLETE",
@@ -2802,7 +2807,7 @@
       },
       "validation": {
         "exact_sha": "0c548edfcd8f5cefccd77b6efa55f93977d506e1",
-        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BUILD",
         "dxvk_disassembly_evidence_run_id": 36981524422,
         "dxvk_disassembly_evidence_job_id": 110756917055,
         "dxvk_disassembly_evidence_conclusion": "success",
@@ -2823,8 +2828,12 @@
         "backend_conversion_gate_run_id": 36981524500,
         "backend_conversion_gate_job_id": 110756917426,
         "backend_static_steps_through_recenter": "PASS",
-        "full_win32_build": "IN_PROGRESS_NOT_REQUIRED_FOR_STATIC_PROOF_NOT_CLAIMED",
-        "runtime_validation": "UNTESTED"
+        "full_win32_build": "PASS",
+        "runtime_validation": "UNTESTED",
+        "backend_conversion_gate_conclusion": "success",
+        "configure_win32": "PASS",
+        "build_win32": "PASS",
+        "verify_binary_exists": "PASS"
       },
       "issue14_comment_id": 5947846126,
       "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
@@ -2832,10 +2841,12 @@
       "semantic_promotion": "NONE",
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
-      "exact_next_action": "Capture canonical continuation 50 from 0x00182ECB with mandatory 66 0F 7E overlap; keep fresh bytes and raw rel32 census only until exact decode proves the cut instruction, and keep function/render/HUD/runtime semantics unresolved."
+      "exact_next_action": "Capture canonical continuation 50 from 0x00182ECB with mandatory 66 0F 7E overlap; keep fresh bytes and raw rel32 census only until exact decode proves the cut instruction, and keep function/render/HUD/runtime semantics unresolved.",
+      "issue14_validation_comment_id": 5947892877
     }
   ],
   "issue14_implementation_comment_id": 5947846126,
   "semantic_promotion": "NONE",
-  "ownership_effect": "NONE"
+  "ownership_effect": "NONE",
+  "issue14_validation_comment_id": 5947892877
 }
