@@ -4,72 +4,78 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "f611eaab243bc11756e1d953e50b1e335064d7c1",
-  "state_parent_head": "a329783c00047673d0075cfaca7af10bdcad1873",
-  "material_result_sha": "b408e7957421b461a3c1975f276265493586a2a3",
-  "validation_bearing_sha": "869cd337f4ce2990bb0dd45e936ac8bc8f9b23a2",
+  "base_sha": "833a2ab27b9b21e19d6fdcd5a35ebc037fedf90f",
+  "state_parent_head": "29cd9b9c60d297ac127011c8430648f85b3a7938",
+  "material_result_sha": "aaf76b4175e0a00c2d24768988f6f16c81afe387",
+  "validation_bearing_sha": "aaf76b4175e0a00c2d24768988f6f16c81afe387",
+  "retaining_descendant_sha": "29cd9b9c60d297ac127011c8430648f85b3a7938",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_UNSUPPORTED_CENSUS_SCHEMA_PARITY_GUARD",
-  "selection_reason": "Concurrent R170-R172 work closed the durable WRAP0..7 and multisample items before this transaction. Fresh current-source audit found a recurring structural risk instead: PipelineUnsupported can grow while the runtime R120 summary and census analyzer/parser aggregate lag behind. Existing R166/R170 guards pinned explicit historical tails but did not automatically reject the next omitted bit.",
-  "summary": "Added a structural source-graph verifier that derives the concrete PipelineUnsupported bitset and requires exact ordered parity across runtime unsupported labels/arguments, analyzer named groups, and analyzer aggregate accounting. This turns future unsupported-schema drift into a deterministic CI failure without changing native draw routing.",
+  "selected_work": "DX11_SURFACE_MSAA_CENSUS_IDENTITY_R177",
+  "selection_reason": "Fresh GitHub-authoritative audit found NativeSurfaceMirror already rejects nonzero D3D9 MultiSampleType/MultiSampleQuality as an unproven D3D9-to-DXGI mapping, while runtime_census source identity tracked RT/depth usage/pool/format but omitted source sample type/quality. MSAA and single-sample source surfaces could therefore alias census evidence.",
+  "summary": "Sealed D3D9 RT0/depth MultiSampleType and MultiSampleQuality into DX11 runtime census identity, resource-exactness fail-closed gating and detailed telemetry; added a source-graph regression guard tied to the existing surface-mirror MSAA rejection oracle. Renumbered this independent unit to R177 after concurrent work claimed another census number.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Authenticated GitHub confirmed vr-dx11-native-r71 and AGENTS.md conversion-lane precedence.",
-        "Read docs/CONVERSION_LANE_STATE.json, current CONV-DX11-000001 run record, regression/problem history and Issue #14 production ledger.",
-        "Fresh branch audit deduplicated concurrent R168 line-raster, R169 point-raster, R170 WRAP0..7, R171 multisample translation and R172 multisample census work."
+        "Read AGENTS.md, docs/CONVERSION_LANE_STATE.json, the live task record, regression/history context and Issue #14 through authenticated GitHub authority.",
+        "Recovered current branch HEAD repeatedly during same-branch churn; no N100/local clone was used as product truth."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Preflight parsed concrete PipelineUnsupported bits 0..18 from pipeline_translation.hpp.",
-        "Current R120 runtime unsupported labels and unsupported[0..18] arguments matched the analyzer named groups and aggregate tail exactly.",
-        "The source-graph verifier still relied on hard-coded tail tokens, so a future bit could be added to only part of the census pipeline before static CI detected the drift."
+        "NativeSurfaceMirror::source_descriptor_exact() already fails closed for source_multisample_type_ != D3DMULTISAMPLE_NONE or nonzero source_multisample_quality_.",
+        "runtime_census.cpp captured RT0/depth Usage, Pool and Format but not D3DSURFACE_DESC MultiSampleType/MultiSampleQuality, leaving a source-identity alias."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
+        "src/vr/d3d11/runtime_census.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "b408e7957421b461a3c1975f276265493586a2a3"
+        "189eeef19be70b449555ccf86c00802157e0fb2e",
+        "475e444e0ad53d99a5ad4a087fadd1f914ff45be",
+        "866fc699ea5483c32e3acd33a25c4ebd40485f24",
+        "f7376bdf14282c36481bd2565d603e8f9b9493c8",
+        "aaf76b4175e0a00c2d24768988f6f16c81afe387"
       ],
       "details": [
-        "Derive runtime unsupported summary labels and require their count to equal the concrete enum bit count.",
-        "Require the R120 summary call to enumerate every unsupported[n] argument exactly once in bit order.",
-        "Require analyzer named groups to match runtime labels exactly and to form the ordered unsupported aggregate tail."
+        "Captured and hashed RT0/depth source MultiSampleType and MultiSampleQuality.",
+        "Folded non-default source surface MSAA into fail-closed resourcesExact accounting, matching the existing dormant surface-mirror contract.",
+        "Added bounded R177 detailed telemetry and a static source-graph guard; corrected an early telemetry scope reference before final validation.",
+        "Preserved concurrent source work by renumbering this unit from the initially chosen R176 to R177."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_STATIC_CONFIGURE_PASS_BUILD_CANCELLED",
-      "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER_AND_CONFIGURE; BUILD_CANCELLED_BEFORE_COMPLETION; COMPILE_NOT_CLAIMED",
+      "status": "COMPLETE_STATIC_EXACT_SHA_ACTIONS_PARTIAL_COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_GITHUB_AUTHORITATIVE_STATIC_CONTRACT_AND_RETENTION; EXACT_SHA_BUILD_AND_HUD_ACTIONS_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; OPENXR_ACTION_WAS_IN_PROGRESS_AT_STATE_PREP; COMPILE_NOT_CLAIMED",
       "evidence": [
-        "Material commit b408e7957421b461a3c1975f276265493586a2a3 is retained on the final C6 branch state.",
-        "Build run 36987425721 job 110775639816 on retaining descendant 869cd337f4ce2990bb0dd45e936ac8bc8f9b23a2 passed Verify DX11 source graph.",
-        "The same job passed Test DX11 census analyzer and Configure.",
-        "The Build step was cancelled before completion after later branch movement; binary verification and packaging steps were skipped, so compile/binary success is not claimed."
+        "Authenticated latest-branch source inspection found every required R177 capture/hash/fail-closed/telemetry/verifier token; static contract result PASS with no missing tokens.",
+        "Scope check confirmed the R177 detailed telemetry no longer references surfaceMultisampleUnsupported before declaration.",
+        "Branch HEAD 29cd9b9c60d297ac127011c8430648f85b3a7938 is a retaining descendant of aaf76b4175e0a00c2d24768988f6f16c81afe387 (no divergence observed at C6 preparation).",
+        "Exact-SHA Build run 36988260083 and HUD Inspector run 36988260063 were cancelled by descendant branch churn; OpenXR architecture run 36988260210 was still in progress when C6 was prepared. No compile success is claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "b408e7957421b461a3c1975f276265493586a2a3",
-      "issue14_comment_id": 5948681416
+      "material_commit": "aaf76b4175e0a00c2d24768988f6f16c81afe387",
+      "source_commit": "189eeef19be70b449555ccf86c00802157e0fb2e",
+      "issue14_comment_id": 5948867312
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Static verifier-only guard; no runtime draw routing, D3D11 implementation payload, OpenXR transport, package contents, localization or other backend changed."
+      "reason": "Dormant DX11 census/static-guard work only; no NativeDrawPathActive change, game draw routing, transport, release artifact, localization, or other backend changed."
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the latest GitHub HEAD for the next independent dormant DX11 semantic/source/static gap, excluding already covered R168-R175 and this unsupported-census schema parity guard. Preserve exact-build exhaustive census and Quest 3/VDXR parity as activation prerequisites."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the latest GitHub HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed units already retained on the branch including R177 surface-MSAA census identity and concurrent later census work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -80,19 +86,19 @@
     "localization_modified": false,
     "other_backend_modified": false
   },
-  "issue14_comment_id": 5948681416,
-  "automation_validation": "PASS_RETAINING_DESCENDANT_DX11_SOURCE_GRAPH_AND_CENSUS_ANALYZER_AND_CONFIGURE; BUILD_CANCELLED_BEFORE_COMPLETION; COMPILE_NOT_CLAIMED",
-  "blocker": "The observed retaining-descendant CI passed source-graph, census-analyzer and Configure checks, but its Build step was cancelled before completion after later branch movement. Compile/binary success is therefore not claimed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the latest GitHub HEAD for the next independent dormant DX11 semantic/source/static gap, excluding already covered R168-R175 and this unsupported-census schema parity guard. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5948867312,
+  "automation_validation": "PASS_GITHUB_AUTHORITATIVE_STATIC_CONTRACT_AND_RETENTION; EXACT_SHA BUILD/HUD CANCELLED BY DESCENDANT CHURN; COMPILE_NOT_CLAIMED",
+  "blocker": "Quest 3/VDXR runtime validation was not performed. Exact material-SHA Build/HUD Actions were cancelled by same-branch descendant churn; compile success is not claimed.",
+  "next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the latest GitHub HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed units already retained on the branch including R177 surface-MSAA census identity and concurrent later census work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "prior_completed_unit": "DX11_MULTISAMPLE_RASTER_CENSUS_IDENTITY_R172",
-  "source_head": "a329783c00047673d0075cfaca7af10bdcad1873",
-  "result_sha": "b408e7957421b461a3c1975f276265493586a2a3",
-  "selected_work_item": "DX11_UNSUPPORTED_CENSUS_SCHEMA_PARITY_GUARD",
+  "source_head": "29cd9b9c60d297ac127011c8430648f85b3a7938",
+  "result_sha": "aaf76b4175e0a00c2d24768988f6f16c81afe387",
+  "selected_work_item": "DX11_SURFACE_MSAA_CENSUS_IDENTITY_R177",
   "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
     "tools/verify_dx11_source_graph.py"
   ],
-  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the latest GitHub HEAD for the next independent dormant DX11 semantic/source/static gap, excluding already covered R168-R175 and this unsupported-census schema parity guard. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+  "exact_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the latest GitHub HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed units already retained on the branch including R177 surface-MSAA census identity and concurrent later census work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
 }
