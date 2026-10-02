@@ -2619,6 +2619,79 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer exact F45 proof d1f88252b885a1988730c778b70ca4f8001e81c6 ending at 0x00182FFC with incomplete bytes 66 83. Continue only by capturing a fresh bounded canonical continuation at 0x00182FFC with mandatory overlap; keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_RAW_PREDECESSOR_EXACT_STATIC_CONTRACT",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "4d0e8d53d126e3f217ce7a1805f87c580c020629",
+      "validation_bearing_result_sha": "05a088a3f7dc743573e15367a3e292410f75cbf7",
+      "commit_message": "dxvk: harden continuation predecessor proof contract [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Generic DXVK continuation validation now AST-checks each raw provenance collector's predecessor_exact predicate so exact predecessor status and capture-join geometry cannot be weakened while the outer captured gate still appears valid. Overlap transitions require incomplete_rva/incomplete_matches and target equality; boundary transitions require prefix_end_rva target equality plus a proven boundary flag.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch authority, AGENTS.md, branch-local conversion/run state, work queue, regression/problem history and Issue #14. Repeatedly refreshed HEAD during concurrent same-JOB F43/F44/F45 work and avoided duplicating the moving canonical frontier."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected an independent verifier gap after fresh branch-wide review: captured already depended on predecessor_exact and provenance called the predecessor proof, but the static contract did not validate predecessor_exact's own exact status/geometry dependencies."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 4d0e8d53d126e3f217ce7a1805f87c580c020629 adds AST fail-closed validation for predecessor_exact in tools/verify_vr_backend_disasm_contract.py."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact material SHA passed DXVK Canonical Disassembly Evidence run 36983785846/job 110764070513 and Backend Conversion Gate run 36983785848/job 110764069988 including Win32 build. Retaining descendant 05a088a3f7dc743573e15367a3e292410f75cbf7 is ahead_by=11/behind_by=0, retains the contract, and independently passed canonical run 36984174604/job 110765290634 plus Backend Conversion Gate run 36984174557/job 110765290388."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive material commit 4d0e8d53d126e3f217ce7a1805f87c580c020629 contains required [AUTO:CONV-DXVK-000002]; Issue #14 comment 5948289880 records implementation, integration lineage and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier/test contract only; no deployable DXVK payload, runtime selector, backend binary, localization or other backend branch content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted supplementally in both lane and durable run state so concurrently newer canonical frontier/source work remains primary and is not overwritten."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_MATERIAL_AND_RETAINING_DESCENDANT_STATIC",
+        "exact_material_sha": "4d0e8d53d126e3f217ce7a1805f87c580c020629",
+        "material_dxvk_disassembly_evidence_run_id": 36983785846,
+        "material_dxvk_disassembly_evidence_job_id": 110764070513,
+        "material_artifact_id": 11216761737,
+        "material_artifact_digest": "sha256:29949a0154dc774c00e59a85cd981a436301cfbd9c8357896475f8ae164fce09",
+        "material_backend_conversion_gate_run_id": 36983785848,
+        "material_backend_conversion_gate_job_id": 110764069988,
+        "material_backend_conversion_gate_conclusion": "success",
+        "validation_bearing_descendant_sha": "05a088a3f7dc743573e15367a3e292410f75cbf7",
+        "descendant_ahead_by": 11,
+        "descendant_behind_by": 0,
+        "descendant_dxvk_disassembly_evidence_run_id": 36984174604,
+        "descendant_dxvk_disassembly_evidence_job_id": 110765290634,
+        "descendant_artifact_id": 11216777502,
+        "descendant_artifact_digest": "sha256:3c9ae56ac4e71cb8d4f6aecdffcfb9a8820d0bf742f086b6d7efb0297010330d",
+        "descendant_backend_conversion_gate_run_id": 36984174557,
+        "descendant_backend_conversion_gate_job_id": 110765290388,
+        "descendant_backend_conversion_gate_conclusion": "success",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "predecessor_exact_ast_contract_retained": true,
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5948289880,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the current branch-authoritative canonical frontier and select the first unfinished exact decode/provenance/static unit from current HEAD; do not overwrite newer continuation work or infer runtime/render semantics."
     }
   ]
 }
