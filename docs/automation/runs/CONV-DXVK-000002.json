@@ -138,7 +138,7 @@
     "No localization files modified",
     "RUNTIME_VALIDATION remains UNTESTED without matching Quest 3/VDXR evidence"
   ],
-  "next_action": "Exact-decode only complete instructions in canonical 0x00182B57..0x00182B97. Preserve the trailing cut rel32 CALL opcode at 0x00182B96 (e8) raw-only; keep function/render/HUD/runtime semantics unresolved.",
+  "next_action": "Exact-decode only complete instructions in canonical 0x00182B96..0x00182BD6 from validated F28 overlap provenance. Preserve any trailing partial instruction raw-only and keep function/render/HUD/runtime semantics unresolved.",
   "supplemental_completed_static_units": [
     {
       "unit_id": "DXVK_CONTINUATION_ANALYZER_WIRING_FAIL_CLOSED",
@@ -778,6 +778,88 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Treat missing, malformed, or mismatched DXVK preflight provider SHA-256 as untrusted identity evidence. Preserve the newest canonical-disassembly frontier from current branch state; runtime provider/visual claims still require matching Quest 3/VDXR evidence."
+    },
+    {
+      "unit_id": "DXVK_F28_CANONICAL_EXE_PROVENANCE_0x182B96_TO_0x182BD6",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "b8cfb7720e01a1d7fd64d1dacfd1a52db42f0f23",
+      "validation_bearing_result_sha": "b8cfb7720e01a1d7fd64d1dacfd1a52db42f0f23",
+      "commit_message": "dxvk: capture canonical 0x182B96 overlap [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Captured continuation 37 canonical raw provenance at the F27 cut rel32 CALL edge 0x00182B96 through 0x00182BD6, requiring exact predecessor capture-edge proof, e8 overlap identity, .text placement and exact 64-byte geometry while leaving all fresh semantics unresolved.",
+      "implementation": {
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "predecessor_control_flow_status": "EXACT_182B57_TO_182B96_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "provenance_status": "EXACT_EXE_182B96_TO_182BD6_PROVENANCE_CAPTURED",
+        "provenance_start_rva": "0x00182B96",
+        "provenance_probe_end_rva": "0x00182BD6",
+        "probe_len": 64,
+        "transition": "CUT_REL32_CALL_OPCODE_OVERLAP",
+        "overlap_bytes": "e8",
+        "overlap_matches": true,
+        "target_section": ".text",
+        "probe_end_matches": true,
+        "semantic_promotion": "NONE",
+        "ownership_effect": "NONE"
+      },
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD plus AGENTS.md, branch-local conversion state/run record, regression/problem history and Issue #14; followed current same-JOB F27 frontier instead of stale controller schemas."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the explicit unfinished F27 cut-edge follow-up: a fresh bounded canonical overlap capture beginning at 0x00182B96 before any further decode."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit b8cfb7720e01a1d7fd64d1dacfd1a52db42f0f23 adds continuation 37 geometry, exact predecessor/cut-edge gate, overlap identity, raw rel32 census, report wiring, success telemetry and fail-closed exit."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA b8cfb7720e01a1d7fd64d1dacfd1a52db42f0f23 passed OutRun EXE HUD Inspector CI static-exe-analysis run 36975296598/job 110737703116 against the pinned canonical EXE. Analyzer reported EXACT_EXE_182B96_TO_182BD6_PROVENANCE_CAPTURED with predecessor_exact=true, overlap=e8 match=true, .text, probe_len=64 and exact probe end. Build run 36975296461 passed Verify backend disassembly contract but was superseded/cancelled before Win32 Configure/Build, so no compile PASS is claimed."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive analyzer commit b8cfb7720e01a1d7fd64d1dacfd1a52db42f0f23 contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5946947114 records implementation and exact static validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static/disassembly provenance tooling only; no runtime payload, selector, backend binary or deployable package content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit; primary/concurrent non-frontier state is preserved."
+        }
+      },
+      "validation": {
+        "exact_sha": "b8cfb7720e01a1d7fd64d1dacfd1a52db42f0f23",
+        "dxvk_disassembly_evidence_run_id": 36975296598,
+        "dxvk_disassembly_evidence_job_id": 110737703116,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "dxvk_disassembly_evidence_artifact_id": 11213427298,
+        "dxvk_disassembly_evidence_artifact_digest": "sha256:b140928c7017d2e2a80bad87319ea8a9d482dcb9d71c3bc1954f587f1c82fd4a",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "provenance_status": "EXACT_EXE_182B96_TO_182BD6_PROVENANCE_CAPTURED",
+        "predecessor_exact": true,
+        "overlap_matches": true,
+        "target_section": ".text",
+        "probe_len": 64,
+        "probe_end_rva": "0x00182BD6",
+        "probe_end_matches": true,
+        "backend_disassembly_contract": "PASS",
+        "generic_win32_build": "CANCELLED_BY_BRANCH_CONCURRENCY_NO_PASS_CLAIM",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5946947114,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_CONCURRENT_NON_FRONTIER_WORK",
+      "exact_next_action": "Exact-decode only complete instructions in canonical 0x00182B96..0x00182BD6 from this validated overlap capture; preserve any trailing partial instruction raw-only and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
