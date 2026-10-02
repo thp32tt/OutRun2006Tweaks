@@ -346,6 +346,21 @@ int main()
         observedBorderSampler.BorderColor[3] == 128.0f / 255.0f,
         "R160 created BORDER sampler descriptor preserves ARGB color");
 
+    auto srgbStage = linearClampStage;
+    srgbStage.srgbTexture = TRUE;
+    require(
+        !translate_fixed_function_sampler(srgbStage).exact,
+        "sampler sRGB decode must fail closed without sRGB SRV");
+    require(
+        !samplerOwner.initialize(d3d.device, srgbStage),
+        "sampler owner rejects sRGB decode without sRGB SRV");
+    require(
+        !samplerOwner.ready(),
+        "failed sRGB sampler initialize leaves owner dormant");
+    require(
+        samplerOwner.initialize(d3d.device, linearClampStage),
+        "sampler owner recovers after sRGB fail-closed probe");
+
     auto translatedLodStage = linearClampStage;
     translatedLodStage.mipLodBiasBits = 0x3F000000u;
     translatedLodStage.maxMipLevel = 1u;
