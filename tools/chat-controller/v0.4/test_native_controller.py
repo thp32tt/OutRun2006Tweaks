@@ -436,6 +436,187 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('CONTROLLER_SELECTED_MATERIAL_TARGETS=', prompt)
         self.assertIn('실제 변경부터 수행', prompt)
 
+    def test_producer_candidate_count_and_two_candidate_batch_release(self):
+        count_fn, _ = load_function('producer_result_candidate_count')
+        indices_fn, _ = load_function(
+            'producer_result_candidate_indices',
+            producer_result_candidate_count=count_fn,
+        )
+        enqueue = Mock(return_value=True)
+        checkpoint, _ = load_function(
+            'localization_record_producer_checkpoint',
+            localization_producer_seen_result=lambda active, sha: False,
+            producer_result_candidate_count=count_fn,
+            producer_result_candidate_indices=indices_fn,
+            enqueue_producer_result_for_qa=enqueue,
+            localization_remaining_material_targets=lambda active: [{'index':163}],
+            producer_result_claims_no_work=lambda record: False,
+            LOCALIZATION_PRODUCER_TARGET_CANDIDATES=2,
+            LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS=8,
+        )
+        q={'qa_pending':[]}
+        active=dict(
+            task_id='LOCALIZATION-LOCALIZATION_B-00477',
+            lane='LOCALIZATION_B',
+            branch='korean-localization-clean',
+            pipeline_result_shas=[],
+            pipeline_candidate_indices=[],
+        )
+        record1={
+            'task_id':active['task_id'],
+            'candidate_dds_modified':True,
+            'selection':{'index':94},
+            'material_deliverable':{'candidate_dds_modified':True},
+        }
+        release, reason=checkpoint(q,active,{'sha':'1'*40,'message':'m1'},record1,datetime.now(timezone.utc))
+        self.assertFalse(release)
+        self.assertIn('CONTINUE_PIPELINE', reason)
+        self.assertEqual(active['pipeline_candidate_count'],1)
+        self.assertEqual(active['pipeline_candidate_indices'],[94])
+        self.assertEqual(enqueue.call_count,1)
+
+        checkpoint2, _ = load_function(
+            'localization_record_producer_checkpoint',
+            localization_producer_seen_result=lambda active, sha: sha in active.get('pipeline_result_shas',[]),
+            producer_result_candidate_count=count_fn,
+            producer_result_candidate_indices=indices_fn,
+            enqueue_producer_result_for_qa=enqueue,
+            localization_remaining_material_targets=lambda active: [{'index':205}],
+            producer_result_claims_no_work=lambda record: False,
+            LOCALIZATION_PRODUCER_TARGET_CANDIDATES=2,
+            LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS=8,
+        )
+        record2={
+            'task_id':active['task_id'],
+            'candidate_dds_modified':True,
+            'selection':{'index':163},
+            'material_deliverable':{'candidate_dds_modified':True},
+        }
+        release2, reason2=checkpoint2(q,active,{'sha':'2'*40,'message':'m2'},record2,datetime.now(timezone.utc))
+        self.assertTrue(release2)
+        self.assertIn('TARGET_REACHED:2/2', reason2)
+        self.assertEqual(active['pipeline_candidate_count'],2)
+        self.assertEqual(enqueue.call_count,2)
+
+    def test_intermediate_producer_commit_keeps_same_task_latched(self):
+        finalize=Mock()
+        continuation=AsyncMock(return_value=True)
+        f, _ = load_function(
+            'localization_handle_producer_commit',
+            localization_producer_seen_result=lambda active, sha: False,
+            localization_validate_producer_result_commit=Mock(return_value=(True,[],{'candidate_dds_modified':True})),
+            localization_record_producer_checkpoint=Mock(return_value=(False,'CONTINUE_PIPELINE:candidates=1/2')),
+            invalidate_task_commit_cache=Mock(),
+            finalize_localization_producer_commit=finalize,
+            queue_send_producer_pipeline_continuation=continuation,
+        )
+        active=self.active()
+        active.update(
+            task_id='LOCALIZATION-LOCALIZATION_B-00477',
+            branch='korean-localization-clean',
+            lane='LOCALIZATION_B',
+            task_latched=True,
+        )
+        accepted=asyncio.run(f(None,{}, {}, active, {'sha':'a'*40,'message':'material'}, datetime.now(timezone.utc)))
+        self.assertFalse(accepted)
+        self.assertEqual(active['phase'],'WAIT_CHAT')
+        self.assertTrue(active['task_latched'])
+        self.assertEqual(active['controller_stage'],'CONTINUE_PIPELINE')
+        self.assertTrue(continuation.await_count)
+        finalize.assert_not_called()
+
+    def test_c_result_requires_every_immutable_batch_input(self):
+        batch=[
+            {'task_id':'A-1','result_sha':'a'*40},
+            {'task_id':'B-2','result_sha':'b'*40},
+        ]
+        def missing_fetch(path, ref):
+            return {'task_id':'C-1','inputs':['A-1@'+'a'*40]}
+        f, _ = load_function(
+            'localization_validate_c_result_commit',
+            github_json_file_at_ref=missing_fetch,
+        )
+        valid,reasons,_=f('C-1','c'*40,batch)
+        self.assertFalse(valid)
+        self.assertIn('C_BATCH_INPUTS_MISSING',reasons[0])
+
+        def full_fetch(path, ref):
+            return {'task_id':'C-1','inputs':['A-1@'+'a'*40,'B-2@'+'b'*40]}
+        f2, _ = load_function(
+            'localization_validate_c_result_commit',
+            github_json_file_at_ref=full_fetch,
+        )
+        valid2,reasons2,_=f2('C-1','d'*40,batch)
+        self.assertTrue(valid2)
+        self.assertEqual(reasons2,[])
+
+    def test_c_incomplete_commit_is_rejected_before_actions(self):
+        continuation=AsyncMock(return_value=True)
+        invalidate=Mock()
+        f, _ = load_function(
+            'localization_bind_c_commit',
+            localization_c_result_seen=lambda active, sha: False,
+            localization_validate_c_result_commit=Mock(return_value=(False,['C_BATCH_INPUTS_MISSING:B-2'],{})),
+            invalidate_task_commit_cache=invalidate,
+            queue_send_c_execution_continuation=continuation,
+        )
+        active=self.active()
+        active.update(
+            task_id='LOCALIZATION-LOCALIZATION_C-00476',
+            branch='korean-localization-clean',
+            lane='LOCALIZATION_C',
+            qa_batch=[{'task_id':'B-2','result_sha':'b'*40}],
+            task_latched=True,
+        )
+        handled=asyncio.run(f(None,{},active,{'sha':'c'*40,'message':'partial'},datetime.now(timezone.utc)))
+        self.assertTrue(handled)
+        self.assertEqual(active['phase'],'WAIT_CHAT')
+        self.assertEqual(active['controller_stage'],'WAIT_QA_RESULT')
+        self.assertIsNone(active['result_sha'])
+        continuation.assert_awaited_once()
+        invalidate.assert_called_once()
+
+    def test_c_valid_commit_binds_exact_sha_to_actions(self):
+        f, _ = load_function(
+            'localization_bind_c_commit',
+            localization_c_result_seen=lambda active, sha: False,
+            localization_validate_c_result_commit=Mock(return_value=(True,[],{})),
+        )
+        active=self.active()
+        active.update(
+            task_id='LOCALIZATION-LOCALIZATION_C-00476',
+            branch='korean-localization-clean',
+            lane='LOCALIZATION_C',
+            qa_batch=[{'task_id':'B-2','result_sha':'b'*40}],
+        )
+        handled=asyncio.run(f(None,{},active,{'sha':'c'*40,'message':'complete'},datetime.now(timezone.utc)))
+        self.assertTrue(handled)
+        self.assertEqual(active['phase'],'WAIT_ACTIONS')
+        self.assertEqual(active['result_sha'],'c'*40)
+        self.assertEqual(active['controller_stage'],'WAIT_ACTIONS')
+
+    def test_c_success_path_continues_drain_in_same_task(self):
+        source=ast.get_source_segment(SOURCE, FUNCTIONS['localization_process_lane']) or ''
+        self.assertIn('finalize_c_qa_batch(q, active)',source)
+        self.assertIn('localization_prepare_c_next_batch(active, next_batch, now)',source)
+        self.assertIn('qa_batches_completed_in_task',source)
+        self.assertIn('c_drain_waiting',source)
+        self.assertIn('PREVIOUS_BATCH_PASS_CONTINUE_DRAIN',source)
+
+    def test_localization_dispatch_initializes_pipeline_latches(self):
+        source=ast.get_source_segment(SOURCE, FUNCTIONS['localization_send_lane_task']) or ''
+        self.assertIn('"pipeline_candidate_count"',source)
+        self.assertIn('"qa_batches_completed_in_task"',source)
+        self.assertIn('"c_consumed_result_shas"',source)
+        self.assertIn('True if CONTROLLER_MODE in {"conversion", "localization"}',source)
+
+    def test_localization_compose_tunes_continuous_pipeline(self):
+        compose=(ROOT/'docker-compose.portainer-localization.yml').read_text()
+        self.assertIn('LOCALIZATION_PRODUCER_TARGET_CANDIDATES: "2"',compose)
+        self.assertIn('LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS: "8"',compose)
+        self.assertIn('GITHUB_TASK_COMMIT_CACHE_SECONDS: "15"',compose)
+        self.assertIn('PREVIOUS_TASK_UI_SETTLE_SECONDS: "45"',compose)
+
     def test_conversion_no_commit_response_forces_execution_continuation(self):
         continuation = AsyncMock(return_value=True)
         recovery = AsyncMock(return_value=True)
