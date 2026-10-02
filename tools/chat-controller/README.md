@@ -1,7 +1,9 @@
 # OutRun Chat Controller
 
-Current production design: v0.5.
+Current production controller: v0.5.
 
-v0.4 is retained only as historical implementation source. Its scheduler contracts, prompts, queue schema and PREMATURE_STOP/WAIT_ACTIONS logic are not authoritative.
+tools/chat-controller/v0.5/ is the only authoritative controller implementation and rule set.
 
-Use v0.5 for new builds. The v0.4 Portainer compose files are compatibility wrappers that build v0.5 so existing stacks can migrate without changing their compose path.
+tools/chat-controller/v0.4/ contains only Portainer compatibility compose wrappers plus a retirement notice. The former v0.4 Python controller, prompts, packaged archives and scheduler rules have been removed from the current branch. They remain available only through Git history.
+
+Existing Portainer stacks may keep their current v0.4 compose path; those wrappers build ../v0.5.

@@ -1,1 +1,0 @@
-OutRun 2006 한글화 Git 상태 정리 작업만 수행해줘. GPT Library는 사용하지 말고 thp32tt/OutRun2006Tweaks의 korean-localization-clean 브랜치만 기준으로 최신 변경과 WORKLOG/승인 상태를 확인해. 미커밋 또는 미반영된 한글화 결과가 현재 세션에 실제 존재할 때만 같은 브랜치에 반영하고, 이미 동기화된 내용은 반복하지 마. VR/FFB 병합, 번역·그래픽 신규 제작, 빌드·테스트는 하지 마.
