@@ -704,10 +704,14 @@ public:
     [[nodiscard]] bool ready() const noexcept {
         return device_ && blend_state_ && depth_stencil_state_ &&
             rasterizer_state_ && render_state_snapshot_token_ != 0 &&
+            surface_pair_snapshot_token_ != 0 &&
             output_state_snapshot_token_ != 0 && snapshot_token_ != 0;
     }
     [[nodiscard]] std::uint64_t render_state_snapshot_token() const noexcept {
         return render_state_snapshot_token_;
+    }
+    [[nodiscard]] std::uint64_t surface_pair_snapshot_token() const noexcept {
+        return surface_pair_snapshot_token_;
     }
     [[nodiscard]] std::uint64_t output_state_snapshot_token() const noexcept {
         return output_state_snapshot_token_;
@@ -727,20 +731,22 @@ private:
     UINT sample_mask_ = 0xFFFFFFFFu;
     UINT stencil_ref_ = 0;
     std::uint64_t render_state_snapshot_token_ = 0;
+    std::uint64_t surface_pair_snapshot_token_ = 0;
     std::uint64_t output_state_snapshot_token_ = 0;
     std::uint64_t snapshot_token_ = 0;
 };
 
-// R120 extends the R117 draw-readiness snapshot with the independently proven
-// R119 color/depth surface-pair identity. A native draw candidate is not ready
-// unless activation, render state, and the exact output-surface pair are all
-// current and nonzero. This remains dormant evidence only.
+// R131 extends the dormant draw-readiness snapshot through the concrete R126
+// RS/OM binding identity. A candidate is not ready unless the binding was built
+// from the same render-state, surface-pair and dynamic-output snapshots carried
+// by the draw candidate. This remains dormant evidence only; no Draw* routing.
 struct NativeFixedFunctionDrawReadiness {
     bool inputValid{};
     bool activationReady{};
     bool renderStateReady{};
     bool surfacePairReady{};
     bool outputStateReady{};
+    bool outputBindingReady{};
     bool geometryReady{};
     bool componentSnapshotsPresent{};
     bool ready{};
@@ -748,6 +754,7 @@ struct NativeFixedFunctionDrawReadiness {
     std::uint64_t renderStateSnapshotToken{};
     std::uint64_t surfacePairSnapshotToken{};
     std::uint64_t outputStateSnapshotToken{};
+    std::uint64_t outputBindingSnapshotToken{};
     std::uint64_t geometrySnapshotToken{};
     std::uint64_t snapshotToken{};
 };
@@ -758,6 +765,7 @@ compose_fixed_function_draw_readiness(
     const NativeFixedFunctionRenderStateReadiness& renderState,
     const NativeSurfacePairReadiness& surfacePair,
     const NativeFixedFunctionOutputStateReadiness& outputState,
+    const NativeFixedFunctionOutputStateBinding& outputBinding,
     const NativeFixedFunctionGeometryReadiness& geometry) noexcept;
 
 [[nodiscard]] bool validate_fixed_function_draw_snapshot(
@@ -765,6 +773,7 @@ compose_fixed_function_draw_readiness(
     const NativeFixedFunctionRenderStateReadiness& renderState,
     const NativeSurfacePairReadiness& surfacePair,
     const NativeFixedFunctionOutputStateReadiness& outputState,
+    const NativeFixedFunctionOutputStateBinding& outputBinding,
     const NativeFixedFunctionGeometryReadiness& geometry,
     std::uint64_t snapshotToken) noexcept;
 
