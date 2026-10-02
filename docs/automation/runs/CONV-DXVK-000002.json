@@ -1133,6 +1133,69 @@
       "runtime_validation": "UNTESTED",
       "state_strategy": "LATEST_PRIMARY_FRONTIER",
       "exact_next_action": "Capture the next bounded canonical 64-byte raw window from exact instruction boundary 0x00182C56 without overlap. Preserve forward target 0x00182C59 as address/control-flow evidence only until captured and exact-decoded; keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_RAW_CONTINUATION_CAPTURE_INTEGRITY_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "e9a3a10a4335984b3a093c6f74ab3b00bf18b530",
+      "commit_message": "test: fail closed on DXVK raw capture gates [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Auto-discovered DXVK raw continuation provenance now fails the static contract unless each collector retains predecessor-exact evidence, .text placement, exact bounded probe-length validation, probe-end geometry validation, and a captured fail-closed decision.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch/AGENTS/lane/run/regression state and Issue #14. Detected concurrent F30/F31 disassembly frontier activity and avoided duplicate frontier edits."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected an independent static verifier gap: the auto-discovered continuation contract checked semantic quarantine/report wiring/probe geometry but did not require each provenance collector to retain its source-level capture-integrity gates."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit e9a3a10a4335984b3a093c6f74ab3b00bf18b530 adds fail-closed capture-integrity marker checks for every auto-discovered raw continuation provenance collector."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA e9a3a10a4335984b3a093c6f74ab3b00bf18b530 passed DXVK Canonical Disassembly Evidence run 36976297225/job 110740762874, including Checkout exact source SHA, Verify static disassembly contract, canonical EXE identity, canonical analysis, evidence identity, and artifact upload. Artifact 11213473945 digest sha256:4905b3ca0b52169b21eb31be4b3ca9d3f38fc30d09727a782ae626ccc1043996. Backend Conversion Gate 36976297231 also passed backend disassembly/static steps through Configure Win32; Build Win32 was still in progress at state capture and is not required for this Python verifier unit. Direct descendant d1b54c9e124f8728cba045a03314385d98674b0e independently passed the canonical disassembly workflow while retaining this change."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit e9a3a10a4335984b3a093c6f74ab3b00bf18b530 contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5947099166 records the production change and validation scope."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static Python verifier hardening only; no runtime payload, selector, backend binary, or deployable package content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "exact_next_action": "Capture the next bounded canonical 64-byte raw window from exact instruction boundary 0x00182C56 with no overlap. Preserve forward target 0x00182C59 as address/control-flow evidence only until captured and exact-decoded; keep function/render/HUD/runtime semantics unresolved."
+        }
+      },
+      "validation": {
+        "exact_sha": "e9a3a10a4335984b3a093c6f74ab3b00bf18b530",
+        "dxvk_disassembly_evidence_run_id": 36976297225,
+        "dxvk_disassembly_evidence_job_id": 110740762874,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "dxvk_disassembly_evidence_artifact_id": 11213473945,
+        "dxvk_disassembly_evidence_artifact_digest": "sha256:4905b3ca0b52169b21eb31be4b3ca9d3f38fc30d09727a782ae626ccc1043996",
+        "backend_conversion_gate_run_id": 36976297231,
+        "backend_disassembly_contract": "PASS",
+        "backend_static_steps_through_configure_win32": "PASS",
+        "full_win32_build": "IN_PROGRESS_AT_STATE_CAPTURE_NOT_REQUIRED_FOR_UNIT",
+        "descendant_sha": "d1b54c9e124f8728cba045a03314385d98674b0e",
+        "descendant_dxvk_disassembly_evidence_run_id": 36976415428,
+        "descendant_dxvk_disassembly_evidence_job_id": 110741111319,
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947099166,
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Capture the next bounded canonical 64-byte raw window from exact instruction boundary 0x00182C56 with no overlap. Preserve forward target 0x00182C59 as address/control-flow evidence only until captured and exact-decoded; keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
