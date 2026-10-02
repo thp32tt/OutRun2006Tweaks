@@ -1269,6 +1269,66 @@ int main()
     }
 
 
+
+    {
+        std::array<FixedFunctionStageState, 8> lerpStages{};
+        lerpStages[0].colorOp = D3DTOP_LERP;
+        lerpStages[0].colorArg0 = D3DTA_TEXTURE;
+        lerpStages[0].colorArg1 = D3DTA_DIFFUSE;
+        lerpStages[0].colorArg2 = D3DTA_TFACTOR;
+        lerpStages[0].alphaOp = D3DTOP_LERP;
+        lerpStages[0].alphaArg0 = D3DTA_TEXTURE;
+        lerpStages[0].alphaArg1 = D3DTA_DIFFUSE;
+        lerpStages[0].alphaArg2 = D3DTA_TFACTOR;
+        lerpStages[0].minFilter = D3DTEXF_POINT;
+        lerpStages[0].magFilter = D3DTEXF_POINT;
+        lerpStages[0].mipFilter = D3DTEXF_NONE;
+
+        constexpr DWORD lerpFactor = 0x80402010u;
+        const auto lerpShader =
+            generate_fixed_function_pixel_shader_prototype(
+                lerpStages, true, 0x01u, 0x01u, textureTypes,
+                FixedFunctionAlphaTestState{}, lerpFactor);
+        require(
+            lerpShader.generated() && lerpShader.activeStages == 1,
+            "R196 D3DTOP_LERP ARG0 fixture must become shader-exact");
+        require(
+            lerpShader.source.find(
+                "float3 nextColor = input.diffuse.rgb * sampled0.rgb + float4(64.0f / 255.0f, 32.0f / 255.0f, 16.0f / 255.0f, 128.0f / 255.0f).rgb * (1.0 - sampled0.rgb);") !=
+                std::string::npos &&
+            lerpShader.source.find(
+                "float nextAlpha = input.diffuse.a * sampled0.a + float4(64.0f / 255.0f, 32.0f / 255.0f, 16.0f / 255.0f, 128.0f / 255.0f).a * (1.0 - sampled0.a);") !=
+                std::string::npos,
+            "R196 D3DTOP_LERP Arg1*Arg0 + Arg2*(1-Arg0) expression drift");
+
+        const auto lerpCompile =
+            compile_fixed_function_pixel_shader_prototype(lerpShader);
+        require(
+            lerpCompile.attempted &&
+            lerpCompile.succeeded &&
+            lerpCompile.result == S_OK &&
+            lerpCompile.bytecodeBytes != 0,
+            "R196 D3DTOP_LERP fixed-function shader prototype did not compile");
+
+        const auto missingLerpTexture =
+            translate_fixed_function_readiness(
+                lerpStages, true, 0x00u, 0x00u);
+        require(
+            (missingLerpTexture.unsupported &
+             FixedFunctionUnsupportedResourceStageCoverage) != 0,
+            "R196 D3DTOP_LERP ARG0 texture dependency must fail closed");
+
+        auto unsupportedLerpArg0 = lerpStages;
+        unsupportedLerpArg0[0].colorArg0 = D3DTA_SPECULAR;
+        const auto invalidLerpArg0 =
+            translate_fixed_function_readiness(
+                unsupportedLerpArg0, true, 0x01u, 0x01u);
+        require(
+            (invalidLerpArg0.unsupported &
+             FixedFunctionUnsupportedArgument) != 0,
+            "R196 D3DTOP_LERP unsupported ARG0 selector must fail closed");
+    }
+
     {
         std::array<FixedFunctionStageState, 8> textureFactorStages{};
         textureFactorStages[0].colorOp = D3DTOP_SELECTARG1;
@@ -1403,6 +1463,7 @@ int main()
     }
 
     std::cout
+        << "DX11 fixed-function D3DTOP_LERP ARG0 support R196: PASS\n"
         << "DX11 fixed-function PREMODULATE stage-chain support R195: PASS\n"
         << "DX11 fixed-function D3DTOP_MULTIPLYADD ARG0 support R194: PASS\n"
         << "DX11 fixed-function texture-factor consumption R191: PASS\n"
