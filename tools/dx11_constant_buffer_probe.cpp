@@ -4427,6 +4427,54 @@ int main()
             pointListDirectDispatch.snapshotToken == 0,
             "R155 direct point-list raster semantics remain fail closed");
 
+        const std::array<D3DPRIMITIVETYPE, 2> directLinePrimitives{
+            D3DPT_LINELIST, D3DPT_LINESTRIP};
+        for (const auto linePrimitive : directLinePrimitives) {
+            const auto lineGeometryReady =
+                outrun::vr::dx11::compose_fixed_function_geometry_readiness(
+                    managedVertexPostResetReady, false, managedIndexReady,
+                    linePrimitive);
+            require(
+                lineGeometryReady.ready &&
+                outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+                    d3d.context, lineGeometryReady, managedVertexBuffer,
+                    geometryVertexStride, geometryVertexOffset,
+                    nullptr, DXGI_FORMAT_UNKNOWN, 0u),
+                "R157 line fixture reaches exact dormant IA topology");
+
+            const auto lineDrawReady = compose_fixed_function_draw_readiness(
+                multiStageActivation, outputBindingRenderReady, surfacePairReady,
+                outputStateReady, outputStateBinding, lineGeometryReady);
+            const auto lineRenderTargetBoundDraw =
+                outrun::vr::dx11::
+                    compose_fixed_function_render_target_bound_draw_readiness(
+                        lineDrawReady, d3d.context, outputStateBinding,
+                        pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                        multiStageSamplers, multiStageTextures,
+                        lineGeometryReady, managedVertexBuffer,
+                        geometryVertexStride, geometryVertexOffset,
+                        nullptr, DXGI_FORMAT_UNKNOWN, 0u, transform,
+                        surfaceTargetBinding, outputColorSurface, outputDepthSurface);
+            const auto lineDirectDispatch =
+                outrun::vr::dx11::compose_fixed_function_direct_draw_dispatch_readiness(
+                    lineRenderTargetBoundDraw, lineDrawReady, lineGeometryReady,
+                    linePrimitive, 1u, false, 0u, 0u, 0);
+            require(
+                lineRenderTargetBoundDraw.ready &&
+                lineDirectDispatch.inputValid &&
+                lineDirectDispatch.renderTargetBoundDrawReady &&
+                lineDirectDispatch.geometryReady &&
+                lineDirectDispatch.geometryMatchesDraw &&
+                lineDirectDispatch.topologyMatchesGeometry &&
+                lineDirectDispatch.pointRasterSemanticsExact &&
+                !lineDirectDispatch.lineRasterSemanticsExact &&
+                lineDirectDispatch.bufferRangeExact &&
+                lineDirectDispatch.dispatchArgumentsExact &&
+                !lineDirectDispatch.ready &&
+                lineDirectDispatch.snapshotToken == 0,
+                "R157 direct line raster semantics remain fail closed");
+        }
+
         require(
             outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
                 d3d.context, indexedGeometryReady, managedVertexBuffer,
@@ -5668,6 +5716,7 @@ int main()
     std::cout << "DX11 indexed source binding R153: PASS\n";
     std::cout << "DX11 indexed fan source content R155: PASS\n";
     std::cout << "DX11 indexed fan vertex capacity R156: PASS\n";
+    std::cout << "DX11 direct line raster semantics R157: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
     std::cout << "DX11 texture mutation readiness R100: PASS\n";
