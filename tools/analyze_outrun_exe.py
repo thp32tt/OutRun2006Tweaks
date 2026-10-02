@@ -24282,8 +24282,8 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_71_prefix_pro
         == provenance["probe_end_rva"]
         == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_71_PROBE_END_RVA
     )
-    expected_external_targets: set[int] = set()
-    unresolved_forward_targets: list[int] = []
+    expected_external_targets = set()
+    unresolved_forward_targets = []
     proven = bool(
         predecessor_exact
         and start_completion_proven
