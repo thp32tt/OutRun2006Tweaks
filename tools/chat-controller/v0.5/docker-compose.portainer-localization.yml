@@ -13,6 +13,9 @@ services:
     environment:
       TZ: Asia/Seoul
       CONTROLLER_MODE: localization
+      LOCALIZATION_PIPELINE: A_B_THEN_C_BARRIER
+      LOCALIZATION_QUEUE: localization/graphics/asset_queue_v2.csv
+      LOCALIZATION_CONFIG: localization/controller_roles.json
       AUTO_SEND: "${AUTO_SEND:-true}"
       GITHUB_REPO: thp32tt/OutRun2006Tweaks
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
@@ -36,9 +39,15 @@ services:
     volumes:
       - outrun_chat_localization_data:/data
       - outrun_chat_localization_logs:/logs
+    networks:
+      - outrun_localization_network
 
 volumes:
   outrun_chat_localization_data:
     name: outrun_chat_localization_data
   outrun_chat_localization_logs:
     name: outrun_chat_localization_logs
+
+networks:
+  outrun_localization_network:
+    name: outrun_localization_network
