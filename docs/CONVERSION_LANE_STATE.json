@@ -988,6 +988,33 @@
       "ownership_effect": "NONE",
       "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
       "exact_next_action": "Preserve the authoritative current canonical-disassembly frontier; from raw 0x00182CD5..0x00182D15, exact-decode only complete instructions and resolve predecessor forward target 0x00182CEB only with exact boundary proof."
+    },
+    {
+      "unit_id": "DXVK_CONTINUATION_STATUS_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "material_result_sha": "6a5905462a943054f30786e81a346410d9a0fe7c",
+      "result_sha": "8f9687d4ee599df77c6c0cecd7fa22f79ce570a9",
+      "validation_bearing_result_sha": "8f9687d4ee599df77c6c0cecd7fa22f79ce570a9",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Auto-discovered DXVK continuation raw/proof success statuses must remain fail-closed on captured/proven predicates; valid inline and parenthesized Python conditional forms are accepted.",
+      "fail_before_dxvk_disassembly_evidence_run_id": 36977665326,
+      "dxvk_disassembly_evidence_run_id": 36977726336,
+      "dxvk_disassembly_evidence_job_id": 110745096544,
+      "dxvk_disassembly_evidence_artifact_id": 11214690125,
+      "dxvk_disassembly_evidence_artifact_digest": "sha256:d77b9e4b526f0cda328696bb1436ce3d7f9defd59f70896b9326547b7d596891",
+      "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+      "backend_conversion_gate_run_id": 36977726332,
+      "issue14_implementation_comment_id": 5947255554,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "exact_next_action": "Preserve the current F33 raw canonical frontier at 0x00182CD5..0x00182D15. Exact-decode only complete instructions from that validated window, preserve any trailing partial instruction raw-only, and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
