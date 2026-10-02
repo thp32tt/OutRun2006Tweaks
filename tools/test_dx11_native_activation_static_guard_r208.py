@@ -19,6 +19,11 @@ FORBIDDEN_ACTIVATION_MARKERS = (
     "AUTO_ENABLE_NATIVE_DRAW_PATH",
 )
 
+SCAN_ROOTS = (
+    "src/vr/d3d11",
+    "vrhost/src",
+)
+
 
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
@@ -33,11 +38,17 @@ def main() -> int:
         print("missing required evidence markers:", ", ".join(missing))
         return 1
 
-    source = "\n".join(
-        path.read_text(encoding="utf-8", errors="ignore")
-        for path in root.glob("src/vr/d3d11/*")
-        if path.is_file()
-    )
+    sources = []
+    for relative in SCAN_ROOTS:
+        scan_root = root / relative
+        if scan_root.exists():
+            sources.extend(
+                path.read_text(encoding="utf-8", errors="ignore")
+                for path in scan_root.rglob("*")
+                if path.is_file()
+            )
+
+    source = "\n".join(sources)
     for marker in FORBIDDEN_ACTIVATION_MARKERS:
         if marker in source:
             print("unexpected activation marker:", marker)
