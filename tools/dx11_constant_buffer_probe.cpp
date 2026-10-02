@@ -3974,6 +3974,99 @@ int main()
             indexedIndexBufferOverrun.snapshotToken == 0,
             "R151 direct indexed dispatch rejects index buffer overrun");
 
+        const auto indexedSourceValues =
+            managedIndexBuffer.index_range_readiness(
+                managedIndexReady, D3DFMT_INDEX16,
+                indexedSourceRange.startIndex,
+                indexedSourceRange.elementCount,
+                indexedSourceRange.minVertexIndex,
+                indexedSourceRange.maxVertexIndex);
+        require(
+            indexedSourceValues.inputValid &&
+            indexedSourceValues.shadowValid &&
+            indexedSourceValues.indexFormatExact &&
+            indexedSourceValues.mirrorSnapshotExact &&
+            indexedSourceValues.byteRangeExact &&
+            indexedSourceValues.valuesWithinDeclaredRange &&
+            indexedSourceValues.ready &&
+            indexedSourceValues.startIndex == 0u &&
+            indexedSourceValues.indexCount == 6u &&
+            indexedSourceValues.observedMinIndex == 0u &&
+            indexedSourceValues.observedMaxIndex == 3u &&
+            indexedSourceValues.mirrorSnapshotToken ==
+                managedIndexReady.snapshotToken &&
+            indexedSourceValues.contentHash != 0 &&
+            indexedSourceValues.snapshotToken != 0 &&
+            managedIndexBuffer.validate_index_range_readiness_snapshot(
+                managedIndexReady, D3DFMT_INDEX16, 0u, 6u, 0u, 3u,
+                indexedSourceValues.snapshotToken),
+            "R152 indexed source values scan exact managed IB range");
+
+        const auto indexedSourceValueLineage =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_value_readiness(
+                    indexedDirectDispatch, indexedDirectLineage,
+                    indexedSourceRange, indexedGeometryReady,
+                    indexedSourceValues);
+        require(
+            indexedSourceValueLineage.inputValid &&
+            indexedSourceValueLineage.directDispatchReady &&
+            indexedSourceValueLineage.indexedLineageReady &&
+            indexedSourceValueLineage.sourceRangeReady &&
+            indexedSourceValueLineage.geometryReady &&
+            indexedSourceValueLineage.sourceValuesReady &&
+            indexedSourceValueLineage.dispatchMatchesLineage &&
+            indexedSourceValueLineage.geometryMatchesSourceValues &&
+            indexedSourceValueLineage.sourceValuesMatchRange &&
+            indexedSourceValueLineage.componentSnapshotsPresent &&
+            indexedSourceValueLineage.ready &&
+            indexedSourceValueLineage.snapshotToken != 0 &&
+            outrun::vr::dx11::
+                validate_fixed_function_indexed_source_value_snapshot(
+                    indexedDirectDispatch, indexedDirectLineage,
+                    indexedSourceRange, indexedGeometryReady,
+                    indexedSourceValues,
+                    indexedSourceValueLineage.snapshotToken),
+            "R152 indexed source values bind exact IB contents to R150 lineage");
+
+        const auto indexedSourceValuesOutOfRange =
+            managedIndexBuffer.index_range_readiness(
+                managedIndexReady, D3DFMT_INDEX16, 0u, 6u, 1u, 3u);
+        require(
+            indexedSourceValuesOutOfRange.inputValid &&
+            indexedSourceValuesOutOfRange.byteRangeExact &&
+            !indexedSourceValuesOutOfRange.valuesWithinDeclaredRange &&
+            !indexedSourceValuesOutOfRange.ready &&
+            indexedSourceValuesOutOfRange.snapshotToken == 0,
+            "R152 indexed source values reject index outside declared vertex range");
+
+        auto forgedManagedIndexReady = managedIndexReady;
+        forgedManagedIndexReady.snapshotToken ^= 1u;
+        const auto indexedSourceValuesForgedMirror =
+            managedIndexBuffer.index_range_readiness(
+                forgedManagedIndexReady, D3DFMT_INDEX16, 0u, 6u, 0u, 3u);
+        require(
+            indexedSourceValuesForgedMirror.inputValid &&
+            !indexedSourceValuesForgedMirror.mirrorSnapshotExact &&
+            !indexedSourceValuesForgedMirror.ready &&
+            indexedSourceValuesForgedMirror.snapshotToken == 0,
+            "R152 indexed source values reject forged managed IB snapshot");
+
+        auto forgedIndexedGeometry = indexedGeometryReady;
+        forgedIndexedGeometry.indexBufferSnapshotToken ^= 1u;
+        const auto indexedSourceValueGeometryDrift =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_value_readiness(
+                    indexedDirectDispatch, indexedDirectLineage,
+                    indexedSourceRange, forgedIndexedGeometry,
+                    indexedSourceValues);
+        require(
+            indexedSourceValueGeometryDrift.inputValid &&
+            !indexedSourceValueGeometryDrift.geometryMatchesSourceValues &&
+            !indexedSourceValueGeometryDrift.ready &&
+            indexedSourceValueGeometryDrift.snapshotToken == 0,
+            "R152 indexed source values reject geometry IB identity drift");
+
         require(
             !outrun::vr::dx11::
                 validate_fixed_function_direct_draw_dispatch_snapshot(

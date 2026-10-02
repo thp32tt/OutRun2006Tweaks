@@ -2198,6 +2198,47 @@ def main() -> None:
             + ", ".join(missing_r149_indexed_source_range)
         )
 
+    r152_indexed_source_values_contract = [
+        ("struct NativeManagedIndexRangeReadiness", NATIVE_BACKEND_HPP,
+         "R152 managed IB source-value readiness"),
+        ("index_range_readiness(", NATIVE_BACKEND_CPP,
+         "R152 managed IB CPU-shadow scanner"),
+        ("currentMirror.snapshotToken == mirror.snapshotToken", NATIVE_BACKEND_CPP,
+         "R152 exact R119 mirror lineage"),
+        ("std::memcpy(&value16, source, sizeof(value16))", NATIVE_BACKEND_CPP,
+         "R152 unaligned-safe INDEX16 scan"),
+        ("std::memcpy(&value32, source, sizeof(value32))", NATIVE_BACKEND_CPP,
+         "R152 unaligned-safe INDEX32 scan"),
+        ("value < minVertexIndex || value > maxVertexIndex", NATIVE_BACKEND_CPP,
+         "R152 source index declared-range rejection"),
+        ("struct NativeFixedFunctionIndexedSourceValueReadiness", NATIVE_BACKEND_HPP,
+         "R152 final direct indexed source-value lineage"),
+        ("compose_fixed_function_indexed_source_value_readiness(", NATIVE_BACKEND_CPP,
+         "R152 final source-value compositor"),
+        ("geometry.indexBufferSnapshotToken == sourceValues.mirrorSnapshotToken",
+         NATIVE_BACKEND_CPP, "R152 geometry/source IB identity join"),
+        ("R152 indexed source values scan exact managed IB range",
+         CONSTANT_BUFFER_PROBE, "R152 positive managed IB scan proof"),
+        ("R152 indexed source values bind exact IB contents to R150 lineage",
+         CONSTANT_BUFFER_PROBE, "R152 positive final lineage proof"),
+        ("R152 indexed source values reject index outside declared vertex range",
+         CONSTANT_BUFFER_PROBE, "R152 out-of-declared-range rejection"),
+        ("R152 indexed source values reject forged managed IB snapshot",
+         CONSTANT_BUFFER_PROBE, "R152 forged mirror rejection"),
+        ("R152 indexed source values reject geometry IB identity drift",
+         CONSTANT_BUFFER_PROBE, "R152 geometry/source mirror mismatch rejection"),
+    ]
+    missing_r152_indexed_source_values = [
+        meaning
+        for token, source, meaning in r152_indexed_source_values_contract
+        if token not in source
+    ]
+    if missing_r152_indexed_source_values:
+        raise SystemExit(
+            "DX11 R152 indexed source-value contract drift: "
+            + ", ".join(missing_r152_indexed_source_values)
+        )
+
     r148_generated_fan_dispatch_contract = [
         (
             "struct NativeFixedFunctionFanDrawDispatchReadiness",

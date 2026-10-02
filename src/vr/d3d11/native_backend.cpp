@@ -1054,6 +1054,138 @@ bool NativeManagedBufferShadow::validate_mirror_readiness_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+NativeManagedIndexRangeReadiness
+NativeManagedBufferShadow::index_range_readiness(
+    const NativeManagedBufferMirrorReadiness& mirror,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT indexCount,
+    UINT minVertexIndex,
+    UINT maxVertexIndex) const noexcept {
+
+    NativeManagedIndexRangeReadiness out{};
+    out.sourceIndexFormat = sourceIndexFormat;
+    out.startIndex = startIndex;
+    out.indexCount = indexCount;
+    out.minVertexIndex = minVertexIndex;
+    out.maxVertexIndex = maxVertexIndex;
+    out.shadowVersion = lifetime_.cpuShadowVersion;
+    out.mirrorSnapshotToken = mirror.snapshotToken;
+
+    out.inputValid =
+        ready() &&
+        role_ == ResourceRole::Index &&
+        mirror.inputValid &&
+        mirror.role == ResourceRole::Index &&
+        mirror.snapshotToken != 0;
+    if (!out.inputValid)
+        return out;
+
+    out.shadowValid = shadow_valid() && mirror.shadowValid;
+    const auto currentMirror = mirror_readiness(mirror_device_.Get());
+    out.mirrorSnapshotExact =
+        currentMirror.ready &&
+        currentMirror.snapshotToken == mirror.snapshotToken &&
+        currentMirror.shadowVersion == lifetime_.cpuShadowVersion;
+    out.indexFormatExact =
+        sourceIndexFormat == D3DFMT_INDEX16 ||
+        sourceIndexFormat == D3DFMT_INDEX32;
+
+    const std::uint64_t elementBytes =
+        sourceIndexFormat == D3DFMT_INDEX16 ? 2ull :
+        sourceIndexFormat == D3DFMT_INDEX32 ? 4ull : 0ull;
+    if (elementBytes != 0) {
+        const std::uint64_t startByte =
+            static_cast<std::uint64_t>(startIndex) * elementBytes;
+        const std::uint64_t scanBytes =
+            static_cast<std::uint64_t>(indexCount) * elementBytes;
+        out.byteRangeExact =
+            startByte <= static_cast<std::uint64_t>(byte_width_) &&
+            scanBytes <=
+                static_cast<std::uint64_t>(byte_width_) - startByte;
+    }
+
+    if (!out.shadowValid ||
+        !out.mirrorSnapshotExact ||
+        !out.indexFormatExact ||
+        !out.byteRangeExact)
+        return out;
+
+    if (indexCount != 0 && minVertexIndex > maxVertexIndex)
+        return out;
+
+    std::uint64_t contentHash = 0xcbf29ce484222325ull;
+    out.valuesWithinDeclaredRange = true;
+    if (indexCount != 0)
+        out.observedMinIndex = (std::numeric_limits<UINT>::max)();
+
+    const std::size_t elementSize = static_cast<std::size_t>(elementBytes);
+    const std::size_t firstByte =
+        static_cast<std::size_t>(startIndex) * elementSize;
+    for (UINT i = 0; i < indexCount; ++i) {
+        UINT value = 0;
+        const auto* source =
+            shadow_.data() + firstByte +
+            static_cast<std::size_t>(i) * elementSize;
+        if (sourceIndexFormat == D3DFMT_INDEX16) {
+            std::uint16_t value16 = 0;
+            std::memcpy(&value16, source, sizeof(value16));
+            value = value16;
+        } else {
+            std::uint32_t value32 = 0;
+            std::memcpy(&value32, source, sizeof(value32));
+            value = value32;
+        }
+        if (value < out.observedMinIndex)
+            out.observedMinIndex = value;
+        if (value > out.observedMaxIndex)
+            out.observedMaxIndex = value;
+        contentHash = mix_readiness_snapshot_token(contentHash, value);
+        if (value < minVertexIndex || value > maxVertexIndex)
+            out.valuesWithinDeclaredRange = false;
+    }
+    out.contentHash = contentHash == 0 ? 1 : contentHash;
+    out.ready =
+        out.valuesWithinDeclaredRange &&
+        out.mirrorSnapshotExact &&
+        out.mirrorSnapshotToken != 0;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(token, out.mirrorSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.shadowVersion);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.sourceIndexFormat));
+        token = mix_readiness_snapshot_token(token, out.startIndex);
+        token = mix_readiness_snapshot_token(token, out.indexCount);
+        token = mix_readiness_snapshot_token(token, out.minVertexIndex);
+        token = mix_readiness_snapshot_token(token, out.maxVertexIndex);
+        token = mix_readiness_snapshot_token(token, out.observedMinIndex);
+        token = mix_readiness_snapshot_token(token, out.observedMaxIndex);
+        token = mix_readiness_snapshot_token(token, out.contentHash);
+        token = mix_readiness_snapshot_token(token, 0x152u);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeManagedBufferShadow::validate_index_range_readiness_snapshot(
+    const NativeManagedBufferMirrorReadiness& mirror,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT indexCount,
+    UINT minVertexIndex,
+    UINT maxVertexIndex,
+    std::uint64_t snapshotToken) const noexcept {
+
+    if (snapshotToken == 0)
+        return false;
+    const auto current = index_range_readiness(
+        mirror, sourceIndexFormat, startIndex, indexCount,
+        minVertexIndex, maxVertexIndex);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 void NativeManagedBufferShadow::observe_device_reset() noexcept {
     release_mirror();
     lifetime_ = advance_managed_device_generation(lifetime_);
@@ -4759,6 +4891,100 @@ bool validate_fixed_function_indexed_direct_dispatch_snapshot(
     const auto current =
         compose_fixed_function_indexed_direct_dispatch_readiness(
             dispatch, sourceRange, boundDraw);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
+NativeFixedFunctionIndexedSourceValueReadiness
+compose_fixed_function_indexed_source_value_readiness(
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues) noexcept {
+
+    NativeFixedFunctionIndexedSourceValueReadiness out{};
+    out.directDispatchSnapshotToken = dispatch.snapshotToken;
+    out.indexedLineageSnapshotToken = indexedLineage.snapshotToken;
+    out.sourceRangeSnapshotToken = sourceRange.snapshotToken;
+    out.geometrySnapshotToken = geometry.snapshotToken;
+    out.sourceValuesSnapshotToken = sourceValues.snapshotToken;
+
+    out.inputValid =
+        dispatch.ready &&
+        dispatch.indexed &&
+        indexedLineage.ready &&
+        sourceRange.ready &&
+        geometry.ready &&
+        sourceValues.ready;
+    out.directDispatchReady = dispatch.ready && dispatch.indexed;
+    out.indexedLineageReady = indexedLineage.ready;
+    out.sourceRangeReady = sourceRange.ready;
+    out.geometryReady =
+        geometry.ready &&
+        geometry.indexBufferRequired &&
+        geometry.indexBufferReady;
+    out.sourceValuesReady = sourceValues.ready;
+    out.dispatchMatchesLineage =
+        indexedLineage.directDispatchSnapshotToken == dispatch.snapshotToken &&
+        indexedLineage.sourceRangeSnapshotToken == sourceRange.snapshotToken;
+    out.geometryMatchesSourceValues =
+        dispatch.geometrySnapshotToken == geometry.snapshotToken &&
+        geometry.indexBufferSnapshotToken == sourceValues.mirrorSnapshotToken;
+    out.sourceValuesMatchRange =
+        sourceValues.startIndex == sourceRange.startIndex &&
+        sourceValues.indexCount == sourceRange.elementCount &&
+        sourceValues.minVertexIndex == sourceRange.minVertexIndex &&
+        sourceValues.maxVertexIndex == sourceRange.maxVertexIndex;
+    out.componentSnapshotsPresent =
+        dispatch.snapshotToken != 0 &&
+        indexedLineage.snapshotToken != 0 &&
+        sourceRange.snapshotToken != 0 &&
+        geometry.snapshotToken != 0 &&
+        sourceValues.snapshotToken != 0 &&
+        sourceValues.mirrorSnapshotToken != 0;
+    out.ready =
+        out.inputValid &&
+        out.directDispatchReady &&
+        out.indexedLineageReady &&
+        out.sourceRangeReady &&
+        out.geometryReady &&
+        out.sourceValuesReady &&
+        out.dispatchMatchesLineage &&
+        out.geometryMatchesSourceValues &&
+        out.sourceValuesMatchRange &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.directDispatchSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.indexedLineageSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceRangeSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.geometrySnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceValuesSnapshotToken);
+        token = mix_readiness_snapshot_token(token, 0x152u);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_indexed_source_value_snapshot(
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    std::uint64_t snapshotToken) noexcept {
+
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        compose_fixed_function_indexed_source_value_readiness(
+            dispatch, indexedLineage, sourceRange, geometry, sourceValues);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
