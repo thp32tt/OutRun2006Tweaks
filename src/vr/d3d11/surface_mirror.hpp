@@ -121,7 +121,7 @@ namespace outrun::vr::dx11
         const NativeSurfaceMirror& depth,
         std::uint64_t snapshotToken) noexcept;
 
-    // R129 consumes one sealed R119 surface-pair identity into a dormant
+    // R130 consumes one sealed R119 surface-pair identity into a dormant
     // OM render-target binding owner. apply() revalidates the live mirrors
     // before binding, so Reset/recreation invalidates stale owners. No game
     // Draw* path constructs or calls this owner.
