@@ -164,6 +164,16 @@ class CoreTests(unittest.TestCase):
             )
         )
 
+    def test_detects_real_missing_branch_dds_responses(self):
+        samples = [
+            "현재 branch에서 실제 원본 DDS 파일을 확인할 수 없었다. canonical source/candidate를 확보할 수 없었다.",
+            "현재 선택 가능한 B shard REWORK 항목 중 실제 DDS binary source를 GitHub branch에서 읽을 수 있는 대상이 확인되지 않았다.",
+            "이번 응답 내에서는 DDS 원본/후보 바이너리 확보와 렌더링·SHA 검증·Git 커밋까지 완료할 수 있는 상태까지 도달하지 못했습니다.",
+            "GitHub에서 해당 DDS 경로를 직접 조회했으나 파일 객체가 존재하지 않아 canonical source를 확보할 수 없었다.",
+        ]
+        for sample in samples:
+            self.assertTrue(localization_binary_blocker_response(sample), sample)
+
     def test_binary_recovery_message_forces_server_side_action(self):
         rendered = prepare_outgoing_message(LOCALIZATION_BINARY_RECOVERY_MESSAGE)
         self.assertEqual(rendered.splitlines()[0], GITHUB_CONNECTION_FIRST_LINE)

@@ -79,6 +79,9 @@ RATE_LIMIT_BACKOFF_SECONDS = [
     if x.strip()
 ]
 GITHUB_SCAN_LIMIT = max(30, min(100, int(os.getenv("GITHUB_SCAN_LIMIT", "100"))))
+GITHUB_TOOL_SAME_CHAT_ATTEMPTS = max(
+    1, int(os.getenv("GITHUB_TOOL_SAME_CHAT_ATTEMPTS", "3"))
+)
 
 INPUT_SELECTORS = [
     "#prompt-textarea",
@@ -965,7 +968,44 @@ class Controller:
             )
             return
 
-        if github_unavailable or github_read_limited:
+        if github_unavailable:
+            attempts = int(job.get("github_tool_recovery_attempts", 0) or 0) + 1
+            job["github_tool_recovery_attempts"] = attempts
+            if attempts >= GITHUB_TOOL_SAME_CHAT_ATTEMPTS:
+                lane["last_result"] = f"connector_unavailable_reacquire_chat:{attempts}"
+                await self.recycle_chat(lane, "github_tool_unavailable_reacquire")
+                job["github_tool_recovery_attempts"] = 0
+                save_state(self.state)
+                write_runtime(
+                    status="github_tool_reacquire",
+                    last_action=(
+                        f"{lane['name']} {job['job_id']} connector unavailable {attempts} times; "
+                        "new chat will reacquire authenticated GitHub tools"
+                    ),
+                )
+                return
+
+            job["github_tool_retry_same_chat"] = True
+            job["status"] = "READY"
+            job["next_send_at"] = (
+                datetime.now(TZ) + timedelta(seconds=SAME_CHAT_CONTINUATION_GAP_SECONDS)
+            ).isoformat()
+            job["baseline_assistant_hash"] = None
+            job["response_hash"] = None
+            job["response_last_changed_at"] = None
+            job["verify_started_at"] = None
+            lane["last_result"] = f"connector_unavailable_same_chat_retry:{attempts}"
+            save_state(self.state)
+            write_runtime(
+                status="github_tool_recovery",
+                last_action=(
+                    f"{lane['name']} {job['job_id']} connector unavailable attempt {attempts}; "
+                    "retry same chat before reacquire"
+                ),
+            )
+            return
+
+        if github_read_limited:
             attempts = int(job.get("github_tool_recovery_attempts", 0) or 0) + 1
             job["github_tool_recovery_attempts"] = attempts
             job["github_tool_retry_same_chat"] = True
@@ -977,14 +1017,13 @@ class Controller:
             job["response_hash"] = None
             job["response_last_changed_at"] = None
             job["verify_started_at"] = None
-            reason = "connector_unavailable" if github_unavailable else "github_read_limit"
-            lane["last_result"] = f"{reason}_same_chat_retry:{attempts}"
+            lane["last_result"] = f"github_read_limit_same_chat_retry:{attempts}"
             save_state(self.state)
             write_runtime(
                 status="github_tool_recovery",
                 last_action=(
-                    f"{lane['name']} {job['job_id']} {reason} attempt {attempts}; "
-                    "retry same chat with 진행해"
+                    f"{lane['name']} {job['job_id']} generic read-limit attempt {attempts}; "
+                    "retry same chat"
                 ),
             )
             return
@@ -1077,6 +1116,35 @@ class Controller:
         job = lane.get("job")
         if not isinstance(job, dict):
             return
+
+        if lane["role"] == "localization_qa" and not (job.get("qa_inputs") or []):
+            inputs = select_qa_batch(
+                self.state, int(lane.get("qa_batch_size") or QA_BATCH_SIZE)
+            )
+            if not inputs:
+                if lane.get("last_result") != "waiting_for_producer_commit":
+                    lane["last_result"] = "waiting_for_producer_commit"
+                    save_state(self.state)
+                    write_runtime(
+                        status="qa_waiting",
+                        last_action=f"{lane['name']} waits for producer material commit",
+                    )
+                return
+            job["qa_inputs"] = inputs
+            try:
+                job["base_sha"] = github_branch_head(lane["branch"])
+            except Exception as exc:
+                lane["last_result"] = f"github_head_error:{exc!r}"
+                return
+            job["status"] = "READY"
+            job["force_full_prompt"] = True
+            job["next_send_at"] = now_iso()
+            job["baseline_assistant_hash"] = None
+            job["response_hash"] = None
+            job["response_last_changed_at"] = None
+            job["verify_started_at"] = None
+            lane["last_result"] = f"qa_batch_attached:{len(inputs)}"
+            save_state(self.state)
 
         page = await self.get_page(lane)
         status = job.get("status")

@@ -67,6 +67,11 @@ LOCALIZATION_BINARY_BLOCKER_PATTERNS = [
     r"(?:github|git허브|깃허브).{0,160}(?:text api|텍스트 api|utf-?8).{0,220}(?:binary|바이너리|dds).{0,220}(?:읽|read|access|접근|payload|bytes|바이트|확보).{0,120}(?:못|불가|없|cannot|unavailable|failed)",
     r"(?:binary|바이너리|dds).{0,180}(?:payload|bytes|바이트|원본).{0,220}(?:직접 읽|읽을 수 없|확보되지|접근할 수 없|cannot read|cannot access|unavailable|not available)",
     r"(?:원본|source).{0,80}dds.{0,180}(?:payload|bytes|바이트|입력).{0,180}(?:확보되지|없|불가|cannot|unavailable)",
+    r"(?:실제|canonical|원본).{0,120}(?:dds|binary|바이너리).{0,220}(?:확인할 수 없|확보할 수 없|확보되지|읽을 수 없|존재하지|없었다|불가)",
+    r"(?:dds|binary|바이너리).{0,180}(?:source|원본|candidate|후보).{0,220}(?:branch|브랜치).{0,180}(?:없|확인되지|읽을 수 없|존재하지)",
+    r"(?:canonical source|canonical source/candidate|원본/후보).{0,220}(?:확보할 수 없|확보되지|확보하지 못|도달하지 못|없었다)",
+    r"(?:dds 원본/후보|원본/후보 바이너리|source binary).{0,220}(?:확보|읽기|접근).{0,160}(?:못|불가|없|도달하지 못)",
+    r"(?:파일 객체|file object).{0,120}(?:존재하지|없).{0,180}(?:dds|source|candidate|canonical)",
 ]
 
 
