@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "ab891f9b31c2fafda275d852b25ce75aaa46e853",
+  "state_parent_head": "0477103ac828639c587d02c24bd983062f0742b4",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,15 +52,15 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
-    "validation_bearing_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
-    "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_AFTER_STATIC_PHASE",
+    "result_sha": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
+    "validation_bearing_sha": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
+    "automation_validation": "PASS_STATIC_CONTRACT",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
   "runtime_blocker": "Exact-build exhaustive census and Quest 3/VDXR graphics parity evidence are still required before native Draw* activation. SRC1 dual-source blend remains fail-closed until a proven second pixel-shader output/linkage path exists.",
   "runtime_next_action": "In an eventual exact-build runtime session, collect exhaustive DX11 census evidence with OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1; native Draw* activation remains disabled until parity proof.",
-  "independent_static_next_action": "Consume the exact-SHA Backend Conversion Gate result for a564becad3d390c84034e3bd666b2714f5781d81 when complete. Then use exhaustive R119 fog evidence to determine which D3D9 fog modes actually occur before implementing shader semantics. Keep native Draw* disabled and fog translation fail-closed until exact semantics and Quest 3/VDXR parity are proven.",
+  "independent_static_next_action": "Keep native Draw* disabled. Obtain a non-superseded Win32/WARP hosted probe when branch churn permits, then continue independent DX11 output-state readiness (viewport/scissor/OM-state provenance) without weakening R119/R120 fail-closed snapshots.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -155,6 +155,16 @@
       "guard_result_sha": "12690c3de37f724e062da046ed3097b64fd931fe",
       "validation_bearing_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
       "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_CI",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false
+    },
+    {
+      "unit_id": "DX11_DRAW_SURFACE_PAIR_READINESS_R120",
+      "task_id": "CONV-DX11-000001",
+      "material_result_sha": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
+      "validation_bearing_sha": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
+      "automation_validation": "PASS_STATIC_CONTRACT",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false

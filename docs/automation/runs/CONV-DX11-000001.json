@@ -5,7 +5,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "8b760190868471eb2b02273de53a7d07025847a1",
-  "state_parent_head": "1b64c8f751d0c07fc17594f5c20c03f3bb8736c2",
+  "state_parent_head": "0477103ac828639c587d02c24bd983062f0742b4",
   "material_result_sha": "d879b6042908389444b45b0f040326855821d69b",
   "validation_bearing_sha": "d879b6042908389444b45b0f040326855821d69b",
   "runtime_validation": "UNTESTED",
@@ -84,8 +84,8 @@
   },
   "issue14_comment_id": 5946330718,
   "automation_validation": "PASS_REMOTE_STATIC_CI_CANCELLED_BY_DESCENDANT_PUSH",
-  "blocker": "Hosted compile/probe completion for R118 has not been observed because Backend Conversion Gate runs were cancelled by rapid descendant pushes. Runtime graphics validation remains UNTESTED; native Draw* activation still requires exhaustive exact-build census plus Quest 3/VDXR parity.",
-  "next_action": "Keep native Draw* disabled. Consume a later descendant hosted probe/build result when branch churn permits, then continue R118 integration into dormant fixed-function census/readiness accounting only.",
+  "blocker": "Native DX11 Draw* remains disabled. Full Win32/WARP execution for this exact unit was superseded by branch churn, and exact-build exhaustive census plus Quest 3/VDXR graphics parity are still required before runtime activation.",
+  "next_action": "Keep native Draw* disabled. Obtain a non-superseded Win32/WARP hosted probe when branch churn permits, then continue independent DX11 output-state readiness (viewport/scissor/OM-state provenance) without weakening R119/R120 fail-closed snapshots.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "NONE",
@@ -297,8 +297,110 @@
       "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
       "runtime_claim": "NONE",
       "state_persisted": true
+    },
+    {
+      "unit_id": "DX11_DRAW_SURFACE_PAIR_READINESS_R120",
+      "job_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_DRAW_SURFACE_PAIR_READINESS",
+      "base_sha": "a564becad3d390c84034e3bd666b2714f5781d81",
+      "material_result_sha": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
+      "validation_bearing_sha": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
+      "implementation_commits": [
+        "01947e34f8fb4af58f0b50b1b2921907bc267e76"
+      ],
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "R119 already sealed exact color/depth mirror identity and Reset-generation freshness, but R117 draw-readiness still became ready from activation plus render-state snapshots alone. The highest-value independent static gap was to require the R119 output-surface pair in the dormant draw candidate identity without enabling native Draw*.",
+      "summary": "R120 binds the existing R119 color/depth surface-pair snapshot into dormant fixed-function draw readiness. Missing/not-ready surface evidence fails closed, the surface-pair token participates in the draw token, and hosted probe/source-graph guards cover positive composition and stale identity changes. Native Draw* remains disabled.",
+      "changed_paths": [
+        "src/vr/d3d11/native_backend.hpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_constant_buffer_probe.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Read AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/automation/runs/CONV-DX11-000001.json, docs/VR_REGRESSION_KNOWLEDGE.json, docs/VR_PROBLEM_HISTORY.md and Issue #14 through the authenticated GitHub connector.",
+            "Tracked concurrent same-branch work and re-read the current GitHub HEAD before writing; discovered R119 surface-pair readiness had already landed and selected the non-overlapping draw-composition gap."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "R119 surface_mirror readiness already required exact color/depth descriptors, matching dimensions, current Reset generations and monotonic mirror serials.",
+            "R117 NativeFixedFunctionDrawReadiness consumed only R115 activation plus R116 render-state snapshots, so a nonzero draw-ready token did not prove any current output RT/depth identity."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "changed_paths": [
+            "src/vr/d3d11/native_backend.hpp",
+            "src/vr/d3d11/native_backend.cpp",
+            "tools/dx11_constant_buffer_probe.cpp",
+            "tools/verify_dx11_source_graph.py"
+          ],
+          "material_commit": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
+          "details": [
+            "Added NativeSurfacePairReadiness as a required R120 draw-readiness input and persisted surfacePairReady/surfacePairSnapshotToken.",
+            "Required surfacePair.inputValid, surfacePair.ready and nonzero surfacePair.snapshotToken before issuing a draw-readiness token.",
+            "Mixed the output-surface pair snapshot into the draw token so recreated/changed output identity invalidates stale draw snapshots.",
+            "Extended hosted probe coverage and source-graph guards for positive composition, missing/not-ready surface evidence and output-surface identity invalidation."
+          ]
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_STATIC_CONTRACT_BUILD_SUPERSEDED",
+          "automation_validation": "PASS_STATIC_CONTRACT",
+          "evidence": [
+            "Backend Conversion Gate run 36970997686 on exact material SHA passed queue/baseline/one-click/disassembly/session regressions, DX11 native transport contract, dual-source contract, Verify DX11 source graph, Verify DX11 dormant activation boundary and DX11 census analyzer.",
+            "The exact-SHA gate was cancelled at Configure Win32 by a newer same-branch push after all static DX11 contract/analyzer steps succeeded; Build Win32 and DX11 readiness smoke probes did not execute.",
+            "Re-fetched exact material commit through GitHub and confirmed only the four intended DX11 source/test/guard paths changed."
+          ],
+          "gate_run_id": 36970997686,
+          "full_win32_build": "UNCONFIRMED_SUPERSEDED",
+          "warp_probe": "UNCONFIRMED_SUPERSEDED",
+          "runtime_validation": "UNTESTED"
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "01947e34f8fb4af58f0b50b1b2921907bc267e76",
+          "issue14_comment_id": 5946396748
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Dormant readiness/test/guard work only; no native game Draw* routing, OM binding, backend promotion, runtime candidate payload or package behavior was activated."
+        },
+        "C6_STATE": {
+          "status": "PERSISTING_WITH_THIS_STATE_COMMIT",
+          "state_parent_head": "0477103ac828639c587d02c24bd983062f0742b4",
+          "exact_next_action": "Keep native Draw* disabled. Obtain a non-superseded Win32/WARP hosted probe when branch churn permits, then continue independent DX11 output-state readiness (viewport/scissor/OM-state provenance) without weakening R119/R120 fail-closed snapshots; exhaustive exact-build census plus Quest 3/VDXR parity remain required before activation."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "related_finding_or_regression_keys": [
+        "DX11-DRAW-SURFACE-PAIR-READINESS-001",
+        "DX11-DRAW-ACTIVATION-SURFACE-001"
+      ],
+      "issue14_comment_id": 5946396748,
+      "automation_validation": "PASS_STATIC_CONTRACT",
+      "blocker": "Native DX11 Draw* remains disabled. Full Win32/WARP execution for this exact unit was superseded by branch churn, and exact-build exhaustive census plus Quest 3/VDXR graphics parity are still required before runtime activation.",
+      "next_action": "Keep native Draw* disabled. Obtain a non-superseded Win32/WARP hosted probe when branch churn permits, then continue independent DX11 output-state readiness (viewport/scissor/OM-state provenance) without weakening R119/R120 fail-closed snapshots.",
+      "checkpoint": "C6_STATE",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE"
     }
   ],
-  "latest_continuation_unit": "DX11_FIXED_FUNCTION_PIPELINE_CENSUS_ACCOUNTING_R120",
+  "latest_continuation_unit": "DX11_DRAW_SURFACE_PAIR_READINESS_R120",
   "state_persisted_for_continuation": true
 }
