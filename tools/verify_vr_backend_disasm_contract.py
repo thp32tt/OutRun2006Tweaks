@@ -746,17 +746,15 @@ def verify_dxvk_continuation_chain() -> None:
                         f"{len(predecessor_unresolved_forward_values)}"
                     )
 
-                predecessor_has_unresolved_forward_debt = False
-                if predecessor_unresolved_forward_values:
-                    unresolved_value = predecessor_unresolved_forward_values[0]
-                    if isinstance(unresolved_value, (ast.List, ast.Tuple, ast.Set)):
-                        predecessor_has_unresolved_forward_debt = bool(unresolved_value.elts)
-                    else:
-                        # A computed value cannot be proven empty statically, so
-                        # conservatively require the successor to carry it.
-                        predecessor_has_unresolved_forward_debt = True
+                # Presence of the field is itself lineage state, including an
+                # explicitly empty list. Successors must consume and emit that
+                # state so a proved-empty debt cannot silently disappear and
+                # later be confused with a collector that never checked it.
+                predecessor_declares_forward_lineage = bool(
+                    predecessor_unresolved_forward_values
+                )
 
-                if predecessor_has_unresolved_forward_debt:
+                if predecessor_declares_forward_lineage:
                     unresolved_forward_target_compared = any(
                         isinstance(node, ast.Compare)
                         and len(node.ops) == 1
