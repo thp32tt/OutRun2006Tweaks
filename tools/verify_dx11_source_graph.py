@@ -1455,14 +1455,19 @@ def main() -> None:
             "R136 aggregate PS sampler/SRV binding identity",
         ),
         (
+            "std::array<std::uint64_t, 8> stageSnapshotTokens{}",
+            NATIVE_BACKEND_HPP,
+            "R136 per-required-stage snapshot identity",
+        ),
+        (
             "observe_fixed_function_texture_binding_set(",
             NATIVE_BACKEND_CPP,
             "R136 aggregate live PS binding observer",
         ),
         (
-            "std::array<std::uint64_t, 8> stageSnapshotTokens{}",
-            NATIVE_BACKEND_HPP,
-            "R136 per-required-stage snapshot identity",
+            "(requiredTextureMask & ~kFixedFunctionStageMask) == 0",
+            NATIVE_BACKEND_CPP,
+            "R136 fixed-function stage 0-7 mask gate",
         ),
         (
             "out.observedTextureMask |= stageBit;",
@@ -1470,9 +1475,14 @@ def main() -> None:
             "R136 exact bound-stage coverage mask",
         ),
         (
-            "out.observedTextureMask == out.requiredTextureMask",
+            "out.stageSnapshotTokens[slot] = stage.snapshotToken;",
             NATIVE_BACKEND_CPP,
-            "R136 every required stage must be exact",
+            "R136 exact per-stage live identity capture",
+        ),
+        (
+            "validate_fixed_function_texture_binding_set_readiness_integrity(",
+            NATIVE_BACKEND_CPP,
+            "R136 copied aggregate snapshot self-integrity gate",
         ),
         (
             "compose_fixed_function_multistage_textured_draw_readiness(",
@@ -1480,34 +1490,49 @@ def main() -> None:
             "R136 aggregate binding-to-draw composition",
         ),
         (
+            "context, draw.requiredTextureMask, samplers, textures",
+            NATIVE_BACKEND_CPP,
+            "R136 draw composition reobserves current live PS bindings",
+        ),
+        (
             "textureBindings.requiredTextureMask == out.requiredTextureMask",
             NATIVE_BACKEND_CPP,
-            "R136 aggregate mask must match sealed draw mask",
+            "R136 aggregate mask must match sealed R135 draw mask",
         ),
         (
-            "R136 multi-stage PS binding set seals every required stage",
+            "R136 aggregate two-stage PS binding captures exact live identity",
             CONSTANT_BUFFER_PROBE,
-            "R136 positive aggregate live binding proof",
+            "R136 positive two-stage live binding proof",
         ),
         (
-            "R136 multi-stage textured draw accepts exact aggregate PS identity",
+            "R136 aggregate two-stage PS binding composes exact draw readiness",
             CONSTANT_BUFFER_PROBE,
             "R136 positive aggregate draw proof",
         ),
         (
-            "R136 aggregate PS identity composes with R134 bound draw evidence",
+            "R136 aggregate textured draw remains compatible with R134 pipeline identity",
             CONSTANT_BUFFER_PROBE,
             "R136 aggregate identity reaches final dormant bound-draw evidence",
         ),
         (
-            "R136 aggregate PS binding drift fails closed",
+            "R136 aggregate binding snapshot rejects copied stage-token drift",
             CONSTANT_BUFFER_PROBE,
-            "R136 one-stage live drift invalidates the aggregate snapshot",
+            "R136 copied aggregate identity drift fails closed",
         ),
         (
-            "R136 multi-stage textured draw rejects one stale required binding",
+            "R136 aggregate binding fails closed after one required PS stage drifts",
             CONSTANT_BUFFER_PROBE,
-            "R136 stale aggregate cannot produce textured draw readiness",
+            "R136 one-stage live drift invalidates aggregate identity",
+        ),
+        (
+            "R136 multistage draw reobserves live PS binding drift",
+            CONSTANT_BUFFER_PROBE,
+            "R136 downstream draw reobserves instead of trusting stale aggregate",
+        ),
+        (
+            "R136 aggregate binding rejects stages outside fixed-function 0-7",
+            CONSTANT_BUFFER_PROBE,
+            "R136 unsupported stage-mask bits fail closed",
         ),
     ]
     missing_r136_multi_stage_texture_binding = [
@@ -1529,7 +1554,9 @@ def main() -> None:
         if (
             "compose_fixed_function_textured_draw_readiness(" in runtime_source
             or "compose_fixed_function_multistage_textured_draw_readiness(" in runtime_source
+            or "validate_fixed_function_multistage_textured_draw_snapshot(" in runtime_source
             or "observe_fixed_function_texture_binding_set(" in runtime_source
+            or "validate_fixed_function_texture_binding_set_snapshot(" in runtime_source
             or "compose_fixed_function_bound_draw_readiness(" in runtime_source
             or ".binding_readiness(" in runtime_source
         ):
