@@ -1623,5 +1623,52 @@ class NativeControllerTests(unittest.TestCase):
         ns['queue_handle_native_response'].assert_not_called()
 
 
+    def test_localization_material_prompt_forbids_git_404_stop(self):
+        node_source = ast.get_source_segment(SOURCE, FUNCTIONS['localization_material_target_prompt']) or ''
+        self.assertIn('SOURCE_TRANSPORT_MISS', node_source)
+        self.assertIn('approved Drive exact path', node_source)
+        self.assertIn('pinned v0.25.10a direct file', node_source)
+        self.assertIn('verified pinned Release ZIP', node_source)
+        self.assertIn('SOURCE_ACQUISITION_EXHAUSTED', node_source)
+        self.assertIn('next runnable own-shard asset', node_source)
+        self.assertIn('CANDIDATE_DESTINATION', node_source)
+
+    def test_localization_policy_refresh_detects_legacy_and_drift(self):
+        f, _ = load_function(
+            'localization_policy_refresh_reason',
+            localization_controller_contract_fingerprint=lambda: ('43', 'f' * 40),
+        )
+        legacy = {'task_id': 'LOCALIZATION-LOCALIZATION_A-00478'}
+        self.assertIn('CONTROLLER_POLICY_FINGERPRINT_MISSING', f(legacy))
+        current = dict(
+            legacy,
+            localization_policy_schema_version='43',
+            localization_policy_config_blob_sha='f' * 40,
+        )
+        self.assertIsNone(f(current))
+        stale = dict(
+            legacy,
+            localization_policy_schema_version='42',
+            localization_policy_config_blob_sha='8' * 40,
+        )
+        reason = f(stale)
+        self.assertIn('CONTROLLER_POLICY_DRIFT', reason)
+        self.assertIn('task_schema=42', reason)
+        self.assertIn('current_schema=43', reason)
+
+    def test_localization_wait_chat_has_live_policy_refresh_gate(self):
+        node_source = ast.get_source_segment(SOURCE, FUNCTIONS['localization_process_lane']) or ''
+        self.assertIn('localization_policy_refresh_reason', node_source)
+        self.assertIn('CONTROLLER_POLICY_REFRESH_REQUIRED', node_source)
+        self.assertIn('policy_refresh_rollover', node_source)
+        self.assertIn('queue_rollover_chat', node_source)
+
+    def test_localization_dispatch_persists_policy_fingerprint(self):
+        node_source = ast.get_source_segment(SOURCE, FUNCTIONS['localization_send_lane_task']) or ''
+        self.assertIn('localization_schema_version', node_source)
+        self.assertIn('localization_policy_schema_version', node_source)
+        self.assertIn('localization_policy_config_blob_sha', node_source)
+
+
 if __name__ == '__main__':
     unittest.main()
