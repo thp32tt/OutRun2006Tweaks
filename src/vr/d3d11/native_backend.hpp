@@ -807,6 +807,16 @@ public:
         const FixedFunctionPixelShaderPrototype& pixelPrototype,
         std::uint64_t snapshotToken) const noexcept;
 
+    // Dormant exact-device binding primitive for the already-sealed R97
+    // pipeline identity. This binds only IA/VS/PS objects for observation;
+    // it does not upload per-draw constants or issue a Draw* call.
+    [[nodiscard]] bool bind_for_observation(
+        ID3D11DeviceContext* context,
+        const VertexInputLayoutTranslation& layout,
+        const FixedFunctionVertexShaderPrototype& vertexPrototype,
+        const FixedFunctionPixelShaderPrototype& pixelPrototype,
+        std::uint64_t snapshotToken) const noexcept;
+
     [[nodiscard]] bool ready() const noexcept {
         return device_ && vertex_shader_ && pixel_shader_ && input_layout_ &&
             transform_buffer_.ready();
