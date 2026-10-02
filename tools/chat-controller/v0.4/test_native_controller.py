@@ -1035,6 +1035,81 @@ class NativeControllerTests(unittest.TestCase):
         self.assertIn('PREVIOUS_TASK_UI_SETTLE_SECONDS: "45"',compose)
         self.assertIn('SLOT_DEDUP_SECONDS: "45"',compose)
 
+    def test_conversion_lane_static_complete_requires_explicit_lane_state_completion(self):
+        f, _ = load_function(
+            'conversion_lane_static_complete',
+            github_json_file_at_ref=lambda path, ref: {
+                'static_pipeline_complete':False,
+                'development_complete':False,
+                'independent_static_next_action':'implement next DX11 ownership path',
+            },
+        )
+        complete, reason=f('vr-dx11-native-r71')
+        self.assertFalse(complete)
+        self.assertIn('NEXT_STATIC_ACTION:',reason)
+
+        f2, _ = load_function(
+            'conversion_lane_static_complete',
+            github_json_file_at_ref=lambda path, ref: {
+                'static_pipeline_complete':True,
+                'development_complete':False,
+            },
+        )
+        complete2, reason2=f2('vr-dx11-native-r71')
+        self.assertTrue(complete2)
+        self.assertEqual(reason2,'STATIC_PIPELINE_COMPLETE')
+
+    def test_conversion_completed_cycle_rearms_same_task(self):
+        invalidate=Mock()
+        f, _ = load_function(
+            'conversion_prepare_next_cycle',
+            invalidate_task_commit_cache=invalidate,
+        )
+        active=self.active()
+        active.update(
+            task_id='CONVERSION-DX11-00283',
+            lane='DX11',
+            branch='vr-dx11-native-r71',
+            result_sha='a'*40,
+            conversion_cycle_count=0,
+            conversion_consumed_result_shas=[],
+            task_latched=True,
+            controller_stage='WAIT_ACTIONS',
+            gate_run={'id':123},
+        )
+        now=datetime.now(timezone.utc)
+        f(active,'a'*40,now,'NEXT_STATIC_ACTION:implement next unit')
+        self.assertEqual(active['task_id'],'CONVERSION-DX11-00283')
+        self.assertEqual(active['phase'],'WAIT_CHAT')
+        self.assertTrue(active['task_latched'])
+        self.assertEqual(active['controller_stage'],'C0_RECOVER')
+        self.assertEqual(active['conversion_cycle_count'],1)
+        self.assertIn('a'*40,active['conversion_consumed_result_shas'])
+        self.assertTrue(active['conversion_cycle_continuation_pending'])
+        self.assertIsNone(active['result_sha'])
+        self.assertNotIn('gate_run',active)
+        invalidate.assert_called_once()
+
+    def test_conversion_success_path_continues_until_static_complete(self):
+        source=ast.get_source_segment(SOURCE, FUNCTIONS['localization_process_lane']) or ''
+        self.assertIn('conversion_lane_static_complete',source)
+        self.assertIn('conversion_prepare_next_cycle',source)
+        self.assertIn('queue_send_conversion_cycle_continuation',source)
+        self.assertIn('conversion_cycle_continue',source)
+        self.assertIn('full C0-C6 + Gate cycle PASS',source)
+
+    def test_conversion_consumed_cycle_sha_is_not_rebound(self):
+        f, _ = load_function('conversion_result_seen')
+        active={'conversion_consumed_result_shas':['a'*40,'b'*40]}
+        self.assertTrue(f(active,'a'*40))
+        self.assertFalse(f(active,'c'*40))
+
+    def test_conversion_dispatch_initializes_cycle_state(self):
+        source=ast.get_source_segment(SOURCE, FUNCTIONS['localization_send_lane_task']) or ''
+        self.assertIn('"conversion_cycle_count"',source)
+        self.assertIn('"conversion_consumed_result_shas"',source)
+        self.assertIn('"conversion_cycle_continuation_pending"',source)
+
     def test_conversion_no_commit_response_forces_execution_continuation(self):
         continuation = AsyncMock(return_value=True)
         recovery = AsyncMock(return_value=True)
