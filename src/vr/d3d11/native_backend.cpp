@@ -607,6 +607,74 @@ bool validate_fixed_function_texture_stage_binding_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+NativeFixedFunctionTextureBindingSetReadiness
+observe_fixed_function_texture_binding_set(
+    ID3D11DeviceContext* context,
+    std::uint32_t requiredTextureMask,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures) noexcept {
+    NativeFixedFunctionTextureBindingSetReadiness out{};
+    constexpr std::uint32_t kFixedFunctionStageMask = 0xffu;
+    out.requiredTextureMask = requiredTextureMask;
+    out.requiredMaskValid =
+        requiredTextureMask != 0 &&
+        (requiredTextureMask & ~kFixedFunctionStageMask) == 0;
+    out.inputValid = context != nullptr && out.requiredMaskValid;
+    if (!out.inputValid)
+        return out;
+
+    for (UINT slot = 0; slot < 8; ++slot) {
+        const std::uint32_t stageBit = 1u << slot;
+        if ((requiredTextureMask & stageBit) == 0)
+            continue;
+
+        const auto* sampler = samplers[slot];
+        const auto* texture = textures[slot];
+        if (!sampler || !texture)
+            continue;
+
+        const auto stage = observe_fixed_function_texture_stage_binding(
+            context, slot, *sampler, *texture);
+        if (!stage.ready || stage.snapshotToken == 0)
+            continue;
+
+        out.observedTextureMask |= stageBit;
+        out.stageSnapshotTokens[slot] = stage.snapshotToken;
+    }
+
+    out.allRequiredBoundExact =
+        out.observedTextureMask == out.requiredTextureMask;
+    out.ready = out.inputValid && out.allRequiredBoundExact;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(token, out.requiredTextureMask);
+        token = mix_readiness_snapshot_token(token, out.observedTextureMask);
+        for (UINT slot = 0; slot < 8; ++slot) {
+            const std::uint32_t stageBit = 1u << slot;
+            if ((requiredTextureMask & stageBit) == 0)
+                continue;
+            token = mix_readiness_snapshot_token(token, stageBit);
+            token = mix_readiness_snapshot_token(
+                token, out.stageSnapshotTokens[slot]);
+        }
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_texture_binding_set_snapshot(
+    ID3D11DeviceContext* context,
+    std::uint32_t requiredTextureMask,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = observe_fixed_function_texture_binding_set(
+        context, requiredTextureMask, samplers, textures);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 void NativeFixedFunctionTextureView::shutdown() noexcept {
     srv_.Reset();
     texture_.Reset();
@@ -2785,6 +2853,61 @@ bool validate_fixed_function_textured_draw_snapshot(
         return false;
     const auto current = compose_fixed_function_textured_draw_readiness(
         draw, context, slot, sampler, texture);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
+NativeFixedFunctionTexturedDrawReadiness
+compose_fixed_function_multistage_textured_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionTextureBindingSetReadiness& textureBindings) noexcept {
+    NativeFixedFunctionTexturedDrawReadiness out{};
+    out.drawSnapshotToken = draw.snapshotToken;
+    out.textureStageSnapshotToken = textureBindings.snapshotToken;
+    out.requiredTextureMask = draw.requiredTextureMask;
+    out.observedTextureMask = textureBindings.observedTextureMask;
+    out.textureMaskMatches =
+        textureBindings.requiredMaskValid &&
+        out.requiredTextureMask != 0 &&
+        textureBindings.requiredTextureMask == out.requiredTextureMask &&
+        out.observedTextureMask == out.requiredTextureMask;
+    out.inputValid =
+        draw.inputValid &&
+        textureBindings.inputValid &&
+        out.textureMaskMatches;
+    out.drawReady = validate_fixed_function_draw_readiness_integrity(draw);
+    out.textureStageReady =
+        textureBindings.ready && textureBindings.snapshotToken != 0;
+    out.componentSnapshotsPresent =
+        draw.snapshotToken != 0 && textureBindings.snapshotToken != 0;
+    out.ready =
+        out.inputValid &&
+        out.drawReady &&
+        out.textureStageReady &&
+        out.textureMaskMatches &&
+        out.componentSnapshotsPresent;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(token, out.drawSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.textureStageSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.requiredTextureMask);
+        token = mix_readiness_snapshot_token(
+            token, out.observedTextureMask);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_multistage_textured_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionTextureBindingSetReadiness& textureBindings,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        compose_fixed_function_multistage_textured_draw_readiness(
+            draw, textureBindings);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
