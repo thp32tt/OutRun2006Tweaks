@@ -127,6 +127,49 @@ def main() -> None:
             + ", ".join(missing_r158_shade_mode)
         )
 
+    r161_clipping_contract = [
+        ("DWORD clipping = TRUE;", D3D9_DRAW_STATE_HPP,
+         "R161 tracked D3D9 clipping field and default"),
+        ("DWORD clipPlaneEnable = 0;", D3D9_DRAW_STATE_HPP,
+         "R161 tracked user clip-plane enable mask"),
+        ("read(D3DRS_CLIPPING, out.clipping);", D3D9_RENDER_STATE_CAPTURE,
+         "R161 live clipping capture"),
+        ("read(D3DRS_CLIPPLANEENABLE, out.clipPlaneEnable);",
+         D3D9_RENDER_STATE_CAPTURE, "R161 live clip-plane mask capture"),
+        ("PipelineUnsupportedClipping = 1u << 14", PIPELINE_TRANSLATION_HPP,
+         "R161 dedicated clipping unsupported bit"),
+        ("source.clipping == FALSE || source.clipPlaneEnable != 0u",
+         PIPELINE_TRANSLATION_CPP, "R161 non-equivalent clipping predicate"),
+        ("out.unsupported |= PipelineUnsupportedClipping;",
+         PIPELINE_TRANSLATION_CPP, "R161 pipeline readiness blocker"),
+        ("R161 default D3D9 clipping must remain exact",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R161 default positive fixture"),
+        ("R161 disabled D3D9 clipping must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R161 clipping-disable negative fixture"),
+        ("R161 enabled D3D9 user clip plane must fail closed",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R161 user-plane negative fixture"),
+        ("R161 fixed-function shader handoff must retain clipping blocker",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R161 ownership handoff negative fixture"),
+        ("DX11 fixed-function clipping fail-closed R161: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE, "R161 hosted probe completion marker"),
+    ]
+    missing_r161_clipping = [
+        meaning
+        for token, source, meaning in r161_clipping_contract
+        if token not in source
+    ]
+    if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_CLIPPING") < 2:
+        missing_r161_clipping.append(
+            "R161 CLIPPING must be both primed and captured")
+    if D3D9_RENDER_STATE_CAPTURE.count("D3DRS_CLIPPLANEENABLE") < 2:
+        missing_r161_clipping.append(
+            "R161 CLIPPLANEENABLE must be both primed and captured")
+    if missing_r161_clipping:
+        raise SystemExit(
+            "DX11 R161 clipping contract drift: "
+            + ", ".join(missing_r161_clipping)
+        )
+
     # Fail closed on partial dormant-readiness API commits. Direct-chat lanes
     # intentionally stage many compose/validate/observe/bind helpers, and a
     # header-only or cpp-only step can otherwise survive until a later link or
