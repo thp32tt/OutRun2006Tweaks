@@ -8,6 +8,8 @@
 #include "../telemetry/performance_types.hpp"
 #include "../telemetry/performance_clock.hpp"
 #include "../render/effect_state_snapshot.hpp"
+#include "../core/dispatch_support.hpp"
+#include "../core/dispatch_support_hooks.hpp"
 #include "../core/review_dispatch_hooks.hpp"
 #include "stereo_renderer_r31.cpp"
 #include "../render/stereo_base_policy.hpp"

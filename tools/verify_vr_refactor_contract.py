@@ -22,6 +22,7 @@ r33 = read("src/vr/d3d9/stereo_renderer_r33.cpp")
 r34 = read("src/vr/d3d9/stereo_renderer_r34.cpp")
 final_dispatch_hooks = read("src/vr/core/final_dispatch_hooks.hpp")
 review_dispatch_hooks = read("src/vr/core/review_dispatch_hooks.hpp")
+dispatch_support_hooks = read("src/vr/core/dispatch_support_hooks.hpp")
 
 for marker in (
     "class StateBlockTracker final",
@@ -695,6 +696,38 @@ if reset_begin >= 0 and rollback_begin > reset_begin:
         if legacy in callback_region:
             errors.append(f"R34 callback bypassed lifecycle facade: {legacy}")
 
+
+# R84 staged interface extraction: R31 -> R32 seam.
+for marker in (
+    "DrawPrimitiveDestR31(",
+    "DrawIndexedPrimitiveDestR31(",
+    "DrawPrimitiveUPDestR31(",
+    "DrawIndexedPrimitiveUPDestR31(",
+):
+    if marker not in dispatch_support_hooks:
+        errors.append(f"R31 dispatch-support hook API missing declaration: {marker}")
+if '#include "../core/dispatch_support_hooks.hpp"' not in r31:
+    errors.append("R31 dispatch-support hook API include missing")
+if '#include "../core/dispatch_support_hooks.hpp"' not in r32:
+    errors.append("R32 dispatch-support hook API include missing")
+if '#include "../core/dispatch_support.hpp"' not in r32:
+    errors.append("R32 neutral dispatch-support API include missing")
+if '#include "stereo_renderer_r31.cpp"' not in r32:
+    errors.append("R31->R32 textual include removed before deep-hook/build gate")
+r31_instance = r31.find("VRStereoR31PerfHook VRStereoR31PerfHook::instance;")
+for marker in (
+    "HRESULT __stdcall DrawPrimitiveDestR31(",
+    "HRESULT __stdcall DrawIndexedPrimitiveDestR31(",
+    "HRESULT __stdcall DrawPrimitiveUPDestR31(",
+    "HRESULT __stdcall DrawIndexedPrimitiveUPDestR31(",
+):
+    pos = r31.find(marker)
+    if r31_instance < 0 or pos <= r31_instance:
+        errors.append(
+            f"R31 hook destination has not crossed the anonymous implementation boundary: {marker}")
+for deep_target in ("ResetDestR22", "ResolveDirectTransportR13", "PresentDestR13"):
+    if deep_target not in r32:
+        errors.append(f"R32 deep-hook dependency inventory changed unexpectedly: {deep_target}")
 
 # R84 staged interface extraction: R32 -> R33 seam.
 for marker in (

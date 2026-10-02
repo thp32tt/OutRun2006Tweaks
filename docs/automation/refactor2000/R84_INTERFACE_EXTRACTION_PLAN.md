@@ -40,4 +40,6 @@ Goal: remove the textual R29 -> R30 -> R31 -> R32 -> R33 -> R34 implementation i
 
 - Stage 1 / R33 -> R34 seam: hook destinations exposed through `final_dispatch_hooks.hpp`; textual include intentionally preserved.
 - Stage 2 / R32 -> R33 seam: hook destinations exposed through `review_dispatch_hooks.hpp`; textual include intentionally preserved.
-- Next: repeat the same boundary extraction for R31 -> R32. No textual implementation include is removed until an explicit build/link gate is allowed.
+- Stage 3 / R31 -> R32 seam: R31 draw destinations exposed through `dispatch_support_hooks.hpp`, and R32 now names the neutral `dispatch_support.hpp` API explicitly.
+- R32 still reaches through the chain to `ResetDestR22`, `ResolveDirectTransportR13`, and `PresentDestR13`. These deep hook targets are the next prerequisite before the R31 textual include can be removed.
+- No textual implementation include is removed until an explicit build/link gate is allowed.

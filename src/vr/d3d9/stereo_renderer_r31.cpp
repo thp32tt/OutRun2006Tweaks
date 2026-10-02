@@ -34,6 +34,7 @@
 #include "../render/eye_tail_cache.hpp"
 #include "../telemetry/stereo_dispatch_counters.hpp"
 #include "../core/dispatch_result.hpp"
+#include "../core/dispatch_support_hooks.hpp"
 
 namespace OutRunVRStereo
 {
@@ -637,75 +638,7 @@ namespace OutRunVRStereo
             return lowerDraw();
         }
 
-        HRESULT __stdcall DrawPrimitiveDestR31(IDirect3DDevice9* device,
-            D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
-        {
-            auto actual = [&]() {
-                return DrawPrimitiveHook.stdcall<HRESULT>(
-                    device, type, startVertex, primitiveCount);
-            };
-            auto r29 = [&]() {
-                return LowerDrawPrimitive(
-                    device, type, startVertex, primitiveCount);
-            };
-            return R31Dispatch(device, actual, r29, "R31/DrawPrimitive");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveDestR31(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
-            UINT startIndex, UINT primitiveCount)
-        {
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
-                    baseVertexIndex, minVertexIndex, numVertices, startIndex,
-                    primitiveCount);
-            };
-            auto r29 = [&]() {
-                return LowerDrawIndexedPrimitive(device, type,
-                    baseVertexIndex, minVertexIndex, numVertices,
-                    startIndex, primitiveCount);
-            };
-            return R31Dispatch(device, actual, r29,
-                "R31/DrawIndexedPrimitive");
-        }
-
-        HRESULT __stdcall DrawPrimitiveUPDestR31(IDirect3DDevice9* device,
-            D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
-            UINT stride)
-        {
-            auto actual = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, primitiveCount, data, stride);
-            };
-            auto r29 = [&]() {
-                return LowerDrawPrimitiveUP(
-                    device, type, primitiveCount, data, stride);
-            };
-            return R31Dispatch(device, actual, r29, "R31/DrawPrimitiveUP");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveUPDestR31(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
-            const void* indexData, D3DFORMAT indexFormat,
-            const void* vertexData, UINT stride)
-        {
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
-                    minVertexIndex, numVertices, primitiveCount, indexData,
-                    indexFormat, vertexData, stride);
-            };
-            auto r29 = [&]() {
-                return LowerDrawIndexedPrimitiveUP(device, type,
-                    minVertexIndex, numVertices, primitiveCount,
-                    indexData, indexFormat, vertexData, stride);
-            };
-            return R31Dispatch(device, actual, r29,
-                "R31/DrawIndexedPrimitiveUP");
-        }
-
-        void R31BlockCurrentVerifiedGeneration() noexcept
+                                        void R31BlockCurrentVerifiedGeneration() noexcept
         {
             float ignored[16]{};
             std::uint32_t generation = 0, pose = 0;
@@ -1089,6 +1022,82 @@ namespace OutRunVRStereo
 
         VRStereoR31PerfHook VRStereoR31PerfHook::instance;
     }
+
+HRESULT __stdcall DrawPrimitiveDestR31(IDirect3DDevice9* device,
+        D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
+    {
+        auto actual = [&]() {
+            return DrawPrimitiveHook.stdcall<HRESULT>(
+                device, type, startVertex, primitiveCount);
+        };
+        auto r29 = [&]() {
+            return LowerDrawPrimitive(
+                device, type, startVertex, primitiveCount);
+        };
+        return R31Dispatch(device, actual, r29, "R31/DrawPrimitive");
+    }
+
+
+
+HRESULT __stdcall DrawIndexedPrimitiveDestR31(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+        UINT startIndex, UINT primitiveCount)
+    {
+        auto actual = [&]() {
+            return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
+                baseVertexIndex, minVertexIndex, numVertices, startIndex,
+                primitiveCount);
+        };
+        auto r29 = [&]() {
+            return LowerDrawIndexedPrimitive(device, type,
+                baseVertexIndex, minVertexIndex, numVertices,
+                startIndex, primitiveCount);
+        };
+        return R31Dispatch(device, actual, r29,
+            "R31/DrawIndexedPrimitive");
+    }
+
+
+
+HRESULT __stdcall DrawPrimitiveUPDestR31(IDirect3DDevice9* device,
+        D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
+        UINT stride)
+    {
+        auto actual = [&]() {
+            return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                device, type, primitiveCount, data, stride);
+        };
+        auto r29 = [&]() {
+            return LowerDrawPrimitiveUP(
+                device, type, primitiveCount, data, stride);
+        };
+        return R31Dispatch(device, actual, r29, "R31/DrawPrimitiveUP");
+    }
+
+
+
+HRESULT __stdcall DrawIndexedPrimitiveUPDestR31(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
+        const void* indexData, D3DFORMAT indexFormat,
+        const void* vertexData, UINT stride)
+    {
+        auto actual = [&]() {
+            return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
+                minVertexIndex, numVertices, primitiveCount, indexData,
+                indexFormat, vertexData, stride);
+        };
+        auto r29 = [&]() {
+            return LowerDrawIndexedPrimitiveUP(device, type,
+                minVertexIndex, numVertices, primitiveCount,
+                indexData, indexFormat, vertexData, stride);
+        };
+        return R31Dispatch(device, actual, r29,
+            "R31/DrawIndexedPrimitiveUP");
+    }
+
+
 
     bool IsGameStateBlockRecording() noexcept
     {
