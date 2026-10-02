@@ -121,6 +121,25 @@ namespace outrun::vr::dx11
         const NativeSurfaceMirror& depth,
         std::uint64_t snapshotToken) noexcept;
 
+    // R145 observes the effective OM render-target/depth-target state after
+    // the dormant R130 owner has been applied. A token is issued only while
+    // the sealed surface-pair mirrors are still current and the exact RTV/DSV
+    // are live on the caller-supplied same-device context.
+    struct NativeSurfacePairBindingReadiness
+    {
+        bool inputValid{};
+        bool ownerReady{};
+        bool pairCurrent{};
+        bool contextMatches{};
+        bool colorViewCurrent{};
+        bool depthViewCurrent{};
+        bool rtvBoundExact{};
+        bool dsvBoundExact{};
+        bool ready{};
+        std::uint64_t surfacePairSnapshotToken{};
+        std::uint64_t snapshotToken{};
+    };
+
     // R130 consumes one sealed R119 surface-pair identity into a dormant
     // OM render-target binding owner. apply() revalidates the live mirrors
     // before binding, so Reset/recreation invalidates stale owners. No game
@@ -143,6 +162,15 @@ namespace outrun::vr::dx11
             ID3D11DeviceContext* context,
             const NativeSurfaceMirror& color,
             const NativeSurfaceMirror& depth) const noexcept;
+        [[nodiscard]] NativeSurfacePairBindingReadiness binding_readiness(
+            ID3D11DeviceContext* context,
+            const NativeSurfaceMirror& color,
+            const NativeSurfaceMirror& depth) const noexcept;
+        [[nodiscard]] bool validate_binding_snapshot(
+            ID3D11DeviceContext* context,
+            const NativeSurfaceMirror& color,
+            const NativeSurfaceMirror& depth,
+            std::uint64_t snapshotToken) const noexcept;
 
         [[nodiscard]] bool ready() const noexcept
         {
