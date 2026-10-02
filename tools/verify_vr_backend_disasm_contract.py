@@ -720,6 +720,70 @@ def verify_dxvk_continuation_chain() -> None:
                         "an exact overlap_actual == overlap comparison"
                     )
 
+                # predecessor_overlap_matches must be the exact conjunction of
+                # predecessor expected/actual cut bytes against overlap.hex(" ").
+                # Presence alone is insufficient: a literal True or unrelated
+                # predicate would otherwise let captured provenance sever the
+                # canonical predecessor byte-lineage contract.
+                predecessor_overlap_expr = single_assignment_value(
+                    "predecessor_overlap_matches"
+                )
+
+                def is_overlap_hex_call(node: ast.AST) -> bool:
+                    return bool(
+                        isinstance(node, ast.Call)
+                        and isinstance(node.func, ast.Attribute)
+                        and node.func.attr == "hex"
+                        and is_name(node.func.value, "overlap")
+                        and len(node.args) == 1
+                        and isinstance(node.args[0], ast.Constant)
+                        and node.args[0].value == " "
+                        and not node.keywords
+                    )
+
+                def predecessor_overlap_field(node: ast.AST) -> str | None:
+                    if not (
+                        isinstance(node, ast.Compare)
+                        and len(node.ops) == 1
+                        and isinstance(node.ops[0], ast.Eq)
+                        and len(node.comparators) == 1
+                    ):
+                        return None
+                    left, right = node.left, node.comparators[0]
+                    left_field = predecessor_field(left)
+                    right_field = predecessor_field(right)
+                    if left_field is not None and is_overlap_hex_call(right):
+                        return left_field
+                    if right_field is not None and is_overlap_hex_call(left):
+                        return right_field
+                    return None
+
+                predecessor_overlap_fields = (
+                    [
+                        predecessor_overlap_field(value)
+                        for value in predecessor_overlap_expr.values
+                    ]
+                    if isinstance(predecessor_overlap_expr, ast.BoolOp)
+                    and isinstance(predecessor_overlap_expr.op, ast.And)
+                    and len(predecessor_overlap_expr.values) == 2
+                    else []
+                )
+                expected_predecessor_overlap_fields = {
+                    "incomplete_expected_bytes",
+                    "incomplete_actual_bytes",
+                }
+                if (
+                    len(predecessor_overlap_fields) != 2
+                    or None in predecessor_overlap_fields
+                    or set(predecessor_overlap_fields)
+                    != expected_predecessor_overlap_fields
+                ):
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} "
+                        "predecessor_overlap_matches is not structurally bound to "
+                        "predecessor expected/actual incomplete bytes and overlap.hex(' ')"
+                    )
+
             required_predecessor_fields = {"status", "incomplete_rva", "incomplete_matches"}
             # Continuation 43 introduced the modern mandatory-overlap contract:
             # the successor must consume the predecessor proof's capture-edge
