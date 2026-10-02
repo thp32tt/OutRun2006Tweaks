@@ -1803,6 +1803,46 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Exact-decode only complete canonical instructions in 0x00182E0F..0x00182E4F. Resolve predecessor/forward targets only when exact instruction-boundary evidence proves them; preserve any trailing partial instruction raw-only and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F38_CANONICAL_CONTROL_FLOW_0x182E0F_TO_0x182E4F",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "9e1a54d5b782f4779f8161a0686d5ba37640a127",
+      "material_commits": [
+        "bcc6810a85afce72bc0df9981f73f582b5067b8e",
+        "9e1a54d5b782f4779f8161a0686d5ba37640a127"
+      ],
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact-decoded canonical 0x00182E0F..0x00182E4F into 22 complete instructions, proved five conditional branches and both direct rel32 calls, and resolved 0x00182E1F plus inherited 0x00182E34 onto exact instruction boundaries. Initial exact-SHA validation caught a call-RVA typo; the repair commit corrected it before final PASS.",
+      "validation": {
+        "exact_sha": "9e1a54d5b782f4779f8161a0686d5ba37640a127",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36980630354,
+        "dxvk_disassembly_evidence_job_id": 110754110970,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "artifact_id": 11215078798,
+        "artifact_digest": "sha256:ae73f027698e70cd354aa546abae41c7f8de4c764bae2b2c2c32ee271b0dc298",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "proof_status": "EXACT_182E0F_TO_182E4F_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+        "instruction_count": 22,
+        "resolved_predecessor_target_rvas": [
+          "0x00182E1F",
+          "0x00182E34"
+        ],
+        "backend_conversion_gate_run_id": 36980630372,
+        "backend_conversion_gate_job_id": 110754110823,
+        "backend_static_steps_through_recenter": "PASS",
+        "full_win32_build": "IN_PROGRESS_NOT_REQUIRED_FOR_STATIC_PROOF_NOT_CLAIMED",
+        "runtime_validation": "UNTESTED"
+      },
+      "pipeline_status": "C0_C6_COMPLETE_SUPPLEMENTAL_PRESERVE_NEWER_FRONTIER",
+      "issue14_comment_id": 5947708894,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newer 0x00182E4F raw continuation frontier and continue exact canonical decode only after its provenance gate succeeds."
     }
   ]
 }
