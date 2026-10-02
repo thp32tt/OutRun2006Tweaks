@@ -177,7 +177,7 @@ FFP_SHADER_COMPILE_RE = re.compile(
 
 
 
-# R198: keep this diagnostic support table aligned with the dormant translator.
+# Detailed-demand census: keep this support table aligned with the dormant translator.
 # It does not promote native draw routing; it only turns detailed stage logs into
 # actionable evidence for the remaining fixed-function semantic gaps.
 FFP_COLOR_SUPPORTED_OPS = frozenset({
@@ -187,10 +187,11 @@ FFP_COLOR_SUPPORTED_OPS = frozenset({
 FFP_ALPHA_SUPPORTED_OPS = frozenset({
     2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 24, 25, 26,
 })
-FFP_SUPPORTED_ARGUMENT_SELECTORS = frozenset({0, 1, 2, 3, 4, 6})
+FFP_SUPPORTED_ARGUMENT_SELECTORS = frozenset({0, 1, 2, 3, 4, 5, 6})
 FFP_ARGUMENT_SELECT_MASK = 0x0F
 FFP_ARGUMENT_SUPPORTED_BITS = 0x3F
 FFP_RESULTARG_CURRENT = 1
+FFP_SUPPORTED_RESULT_ARGS = frozenset({1, 5})  # CURRENT, TEMP
 
 FFP_OP_NAMES = {
     1: "DISABLE",
@@ -250,6 +251,7 @@ def summarize_fixed_function_detailed_stage_demand(
     argument_selectors: Counter[int] = Counter()
     argument_values: Counter[int] = Counter()
     result_args: Counter[int] = Counter()
+    unsupported_result_args: Counter[int] = Counter()
     detailed_stages = 0
     duplicate_stage_records = 0
     # R199: detail lines may be repeated across collected logs. A signature
@@ -295,6 +297,8 @@ def summarize_fixed_function_detailed_stage_demand(
             result_arg = stage.get("resultArg", FFP_RESULTARG_CURRENT)
             if result_arg != FFP_RESULTARG_CURRENT:
                 result_args[result_arg] += 1
+            if result_arg not in FFP_SUPPORTED_RESULT_ARGS:
+                unsupported_result_args[result_arg] += 1
 
     def enum_counts(counter: Counter[int], names: dict[int, str]) -> list[dict]:
         return [
@@ -316,7 +320,7 @@ def summarize_fixed_function_detailed_stage_demand(
     ]
 
     has_unsupported = bool(
-        color_ops or alpha_ops or argument_values or result_args
+        color_ops or alpha_ops or argument_values or unsupported_result_args
     )
     return {
         "DetailedStages": detailed_stages,
@@ -328,6 +332,9 @@ def summarize_fixed_function_detailed_stage_demand(
         ),
         "UnsupportedArgumentValues": unsupported_argument_values,
         "NonCurrentResultArgs": enum_counts(result_args, FFP_ARGUMENT_NAMES),
+        "UnsupportedResultArgs": enum_counts(
+            unsupported_result_args, FFP_ARGUMENT_NAMES
+        ),
         "HasUnsupportedObservedSemantics": has_unsupported,
         "CoverageLimitedByDetailCap": bool(
             latest and latest.get("signatureDetailSkipped", 0) > 0
