@@ -2153,6 +2153,43 @@ def main() -> None:
             + ", ".join(missing_r148_generated_fan_dispatch)
         )
 
+    r148_draw_side_effect_isolation_contract = [
+        ("streamOutputTargetsClear", NATIVE_BACKEND_HPP,
+         "R148 stream-output isolation readiness field"),
+        ("predicationClear", NATIVE_BACKEND_HPP,
+         "R148 predication isolation readiness field"),
+        ("drawSideEffectIsolationReady", NATIVE_BACKEND_HPP,
+         "R148 aggregate draw side-effect isolation identity"),
+        ("context->SOSetTargets(", NATIVE_BACKEND_CPP,
+         "R148 binder clears stream-output targets"),
+        ("context->SetPredication(nullptr, FALSE)", NATIVE_BACKEND_CPP,
+         "R148 binder clears draw predication"),
+        ("context->SOGetTargets(", NATIVE_BACKEND_CPP,
+         "R148 live stream-output readback"),
+        ("context->GetPredication(", NATIVE_BACKEND_CPP,
+         "R148 live predication readback"),
+        ("out.drawSideEffectIsolationReady ? 0x148u : 0u",
+         NATIVE_BACKEND_CPP, "R148 live-binding token version"),
+        ("R148 live SO target drift invalidates fixed-function pipeline binding",
+         CONSTANT_BUFFER_PROBE, "R148 SO drift fail-closed proof"),
+        ("R148 live predication drift invalidates fixed-function pipeline binding",
+         CONSTANT_BUFFER_PROBE, "R148 predication drift fail-closed proof"),
+        ("R148 restored SO isolation reproduces pipeline snapshot",
+         CONSTANT_BUFFER_PROBE, "R148 SO deterministic restore proof"),
+        ("R148 restored predication isolation reproduces pipeline snapshot",
+         CONSTANT_BUFFER_PROBE, "R148 predication deterministic restore proof"),
+    ]
+    missing_r148_draw_side_effect_isolation = [
+        meaning
+        for token, source, meaning in r148_draw_side_effect_isolation_contract
+        if token not in source
+    ]
+    if missing_r148_draw_side_effect_isolation:
+        raise SystemExit(
+            "DX11 R148 draw side-effect isolation contract drift: "
+            + ", ".join(missing_r148_draw_side_effect_isolation)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":

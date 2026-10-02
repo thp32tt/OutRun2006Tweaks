@@ -667,8 +667,10 @@ struct NativeFixedFunctionPipelineReadiness {
 };
 
 // R134 observes the concrete IA/VS/PS objects after the dormant R132 binder.
-// Its token is tied to the exact R112 translation snapshot and same-device COM
-// identities. This is observation evidence only and never issues Draw*.
+// R147 adds GS/HS/DS isolation, and R148 additionally requires stream-output
+// targets plus draw predication to be clear. Its token is tied to the exact
+// R112 translation snapshot and same-device COM identities. This is
+// observation evidence only and never issues Draw*.
 struct NativeFixedFunctionPipelineBindingReadiness {
     bool inputValid{};
     bool bundleReady{};
@@ -678,6 +680,9 @@ struct NativeFixedFunctionPipelineBindingReadiness {
     bool hullShaderClear{};
     bool domainShaderClear{};
     bool graphicsStageIsolationReady{};
+    bool streamOutputTargetsClear{};
+    bool predicationClear{};
+    bool drawSideEffectIsolationReady{};
     bool boundExact{};
     bool ready{};
     std::uint64_t pipelineSnapshotToken{};

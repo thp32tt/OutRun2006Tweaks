@@ -2137,6 +2137,13 @@ bool NativeFixedFunctionPipelineBundle::bind_for_observation(
     context->GSSetShader(nullptr, nullptr, 0);
     context->HSSetShader(nullptr, nullptr, 0);
     context->DSSetShader(nullptr, nullptr, 0);
+    ID3D11Buffer* nullStreamOutputTargets[D3D11_SO_BUFFER_SLOT_COUNT]{};
+    UINT nullStreamOutputOffsets[D3D11_SO_BUFFER_SLOT_COUNT]{};
+    context->SOSetTargets(
+        D3D11_SO_BUFFER_SLOT_COUNT,
+        nullStreamOutputTargets,
+        nullStreamOutputOffsets);
+    context->SetPredication(nullptr, FALSE);
 
     Microsoft::WRL::ComPtr<ID3D11InputLayout> boundInputLayout;
     Microsoft::WRL::ComPtr<ID3D11VertexShader> boundVertexShader;
@@ -2144,6 +2151,9 @@ bool NativeFixedFunctionPipelineBundle::bind_for_observation(
     Microsoft::WRL::ComPtr<ID3D11GeometryShader> boundGeometryShader;
     Microsoft::WRL::ComPtr<ID3D11HullShader> boundHullShader;
     Microsoft::WRL::ComPtr<ID3D11DomainShader> boundDomainShader;
+    ID3D11Buffer* boundStreamOutputTargets[D3D11_SO_BUFFER_SLOT_COUNT]{};
+    Microsoft::WRL::ComPtr<ID3D11Predicate> boundPredicate;
+    BOOL boundPredicateValue = FALSE;
     context->IAGetInputLayout(boundInputLayout.ReleaseAndGetAddressOf());
     context->VSGetShader(
         boundVertexShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
@@ -2155,19 +2165,39 @@ bool NativeFixedFunctionPipelineBundle::bind_for_observation(
         boundHullShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
     context->DSGetShader(
         boundDomainShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+    context->SOGetTargets(
+        D3D11_SO_BUFFER_SLOT_COUNT, boundStreamOutputTargets);
+    context->GetPredication(
+        boundPredicate.ReleaseAndGetAddressOf(), &boundPredicateValue);
+    bool streamOutputTargetsClear = true;
+    for (UINT slot = 0; slot < D3D11_SO_BUFFER_SLOT_COUNT; ++slot) {
+        if (boundStreamOutputTargets[slot]) {
+            streamOutputTargetsClear = false;
+            boundStreamOutputTargets[slot]->Release();
+            boundStreamOutputTargets[slot] = nullptr;
+        }
+    }
+    const bool predicationClear = boundPredicate.Get() == nullptr;
 
     if (boundInputLayout.Get() != input_layout_.Get() ||
         boundVertexShader.Get() != vertex_shader_.Get() ||
         boundPixelShader.Get() != pixel_shader_.Get() ||
         boundGeometryShader.Get() != nullptr ||
         boundHullShader.Get() != nullptr ||
-        boundDomainShader.Get() != nullptr) {
+        boundDomainShader.Get() != nullptr ||
+        !streamOutputTargetsClear ||
+        !predicationClear) {
         context->IASetInputLayout(nullptr);
         context->VSSetShader(nullptr, nullptr, 0);
         context->PSSetShader(nullptr, nullptr, 0);
         context->GSSetShader(nullptr, nullptr, 0);
         context->HSSetShader(nullptr, nullptr, 0);
         context->DSSetShader(nullptr, nullptr, 0);
+        context->SOSetTargets(
+            D3D11_SO_BUFFER_SLOT_COUNT,
+            nullStreamOutputTargets,
+            nullStreamOutputOffsets);
+        context->SetPredication(nullptr, FALSE);
         return false;
     }
     return true;
@@ -2203,6 +2233,9 @@ NativeFixedFunctionPipelineBundle::binding_readiness(
         Microsoft::WRL::ComPtr<ID3D11GeometryShader> boundGeometryShader;
         Microsoft::WRL::ComPtr<ID3D11HullShader> boundHullShader;
         Microsoft::WRL::ComPtr<ID3D11DomainShader> boundDomainShader;
+        ID3D11Buffer* boundStreamOutputTargets[D3D11_SO_BUFFER_SLOT_COUNT]{};
+        Microsoft::WRL::ComPtr<ID3D11Predicate> boundPredicate;
+        BOOL boundPredicateValue = FALSE;
         context->IAGetInputLayout(boundInputLayout.ReleaseAndGetAddressOf());
         context->VSGetShader(
             boundVertexShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
@@ -2214,6 +2247,10 @@ NativeFixedFunctionPipelineBundle::binding_readiness(
             boundHullShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
         context->DSGetShader(
             boundDomainShader.ReleaseAndGetAddressOf(), nullptr, nullptr);
+        context->SOGetTargets(
+            D3D11_SO_BUFFER_SLOT_COUNT, boundStreamOutputTargets);
+        context->GetPredication(
+            boundPredicate.ReleaseAndGetAddressOf(), &boundPredicateValue);
         out.geometryShaderClear = boundGeometryShader.Get() == nullptr;
         out.hullShaderClear = boundHullShader.Get() == nullptr;
         out.domainShaderClear = boundDomainShader.Get() == nullptr;
@@ -2221,11 +2258,23 @@ NativeFixedFunctionPipelineBundle::binding_readiness(
             out.geometryShaderClear &&
             out.hullShaderClear &&
             out.domainShaderClear;
+        out.streamOutputTargetsClear = true;
+        for (UINT slot = 0; slot < D3D11_SO_BUFFER_SLOT_COUNT; ++slot) {
+            if (boundStreamOutputTargets[slot]) {
+                out.streamOutputTargetsClear = false;
+                boundStreamOutputTargets[slot]->Release();
+                boundStreamOutputTargets[slot] = nullptr;
+            }
+        }
+        out.predicationClear = boundPredicate.Get() == nullptr;
+        out.drawSideEffectIsolationReady =
+            out.streamOutputTargetsClear && out.predicationClear;
         out.boundExact =
             boundInputLayout.Get() == input_layout_.Get() &&
             boundVertexShader.Get() == vertex_shader_.Get() &&
             boundPixelShader.Get() == pixel_shader_.Get() &&
-            out.graphicsStageIsolationReady;
+            out.graphicsStageIsolationReady &&
+            out.drawSideEffectIsolationReady;
     }
 
     out.ready =
@@ -2246,10 +2295,13 @@ NativeFixedFunctionPipelineBundle::binding_readiness(
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint64_t>(
                 reinterpret_cast<std::uintptr_t>(pixel_shader_.Get())));
-        // Version the live binding identity with the R147 isolation contract
-        // so pre-isolation snapshots cannot alias an isolated pipeline proof.
+        // Version the live binding identity with both R147 shader-stage and
+        // R148 SO/predication isolation so older snapshots cannot alias this
+        // stronger dormant draw proof.
         token = mix_readiness_snapshot_token(
             token, out.graphicsStageIsolationReady ? 0x147u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.drawSideEffectIsolationReady ? 0x148u : 0u);
         out.snapshotToken = token == 0 ? 1 : token;
     }
     return out;

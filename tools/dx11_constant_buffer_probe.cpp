@@ -2186,6 +2186,26 @@ int main()
         isolationGeometryShader != nullptr,
         "CreateGeometryShader R147 isolation probe");
 
+    D3D11_BUFFER_DESC isolationStreamOutputDesc{};
+    isolationStreamOutputDesc.ByteWidth = 64;
+    isolationStreamOutputDesc.Usage = D3D11_USAGE_DEFAULT;
+    isolationStreamOutputDesc.BindFlags = D3D11_BIND_STREAM_OUTPUT;
+    ID3D11Buffer* isolationStreamOutputBuffer = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateBuffer(
+            &isolationStreamOutputDesc, nullptr,
+            &isolationStreamOutputBuffer)) &&
+        isolationStreamOutputBuffer != nullptr,
+        "CreateBuffer R148 stream-output isolation probe");
+    D3D11_QUERY_DESC isolationPredicateDesc{};
+    isolationPredicateDesc.Query = D3D11_QUERY_OCCLUSION_PREDICATE;
+    ID3D11Predicate* isolationPredicate = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreatePredicate(
+            &isolationPredicateDesc, &isolationPredicate)) &&
+        isolationPredicate != nullptr,
+        "CreatePredicate R148 draw-predication isolation probe");
+
     NativeFixedFunctionTransformBuffer owner;
     require(!owner.ready(), "R96 owner must start dormant");
     require(owner.upload_generation() == 0,
@@ -2897,6 +2917,9 @@ int main()
         drawPipelineBindingReady.hullShaderClear &&
         drawPipelineBindingReady.domainShaderClear &&
         drawPipelineBindingReady.graphicsStageIsolationReady &&
+        drawPipelineBindingReady.streamOutputTargetsClear &&
+        drawPipelineBindingReady.predicationClear &&
+        drawPipelineBindingReady.drawSideEffectIsolationReady &&
         drawPipelineBindingReady.boundExact &&
         drawPipelineBindingReady.ready &&
         drawPipelineBindingReady.pipelineSnapshotToken ==
@@ -2942,9 +2965,88 @@ int main()
     require(
         graphicsStageIsolationRestored.ready &&
         graphicsStageIsolationRestored.graphicsStageIsolationReady &&
+        graphicsStageIsolationRestored.streamOutputTargetsClear &&
+        graphicsStageIsolationRestored.predicationClear &&
+        graphicsStageIsolationRestored.drawSideEffectIsolationReady &&
         graphicsStageIsolationRestored.snapshotToken ==
             drawPipelineBindingReady.snapshotToken,
         "R147 restored graphics stage isolation reproduces pipeline snapshot");
+
+    UINT isolationStreamOutputOffset = 0;
+    d3d.context->SOSetTargets(
+        1, &isolationStreamOutputBuffer, &isolationStreamOutputOffset);
+    const auto streamOutputIsolationDrift =
+        pipelineBundle.binding_readiness(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken);
+    require(
+        streamOutputIsolationDrift.inputValid &&
+        streamOutputIsolationDrift.graphicsStageIsolationReady &&
+        !streamOutputIsolationDrift.streamOutputTargetsClear &&
+        streamOutputIsolationDrift.predicationClear &&
+        !streamOutputIsolationDrift.drawSideEffectIsolationReady &&
+        !streamOutputIsolationDrift.boundExact &&
+        !streamOutputIsolationDrift.ready &&
+        streamOutputIsolationDrift.snapshotToken == 0 &&
+        !pipelineBundle.validate_binding_snapshot(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken,
+            drawPipelineBindingReady.snapshotToken),
+        "R148 live SO target drift invalidates fixed-function pipeline binding");
+    require(
+        pipelineBundle.bind_for_observation(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken),
+        "R148 restore fixed-function stream-output isolation");
+    const auto streamOutputIsolationRestored =
+        pipelineBundle.binding_readiness(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken);
+    require(
+        streamOutputIsolationRestored.ready &&
+        streamOutputIsolationRestored.streamOutputTargetsClear &&
+        streamOutputIsolationRestored.predicationClear &&
+        streamOutputIsolationRestored.drawSideEffectIsolationReady &&
+        streamOutputIsolationRestored.snapshotToken ==
+            drawPipelineBindingReady.snapshotToken,
+        "R148 restored SO isolation reproduces pipeline snapshot");
+
+    d3d.context->SetPredication(isolationPredicate, TRUE);
+    const auto predicationIsolationDrift =
+        pipelineBundle.binding_readiness(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken);
+    require(
+        predicationIsolationDrift.inputValid &&
+        predicationIsolationDrift.graphicsStageIsolationReady &&
+        predicationIsolationDrift.streamOutputTargetsClear &&
+        !predicationIsolationDrift.predicationClear &&
+        !predicationIsolationDrift.drawSideEffectIsolationReady &&
+        !predicationIsolationDrift.boundExact &&
+        !predicationIsolationDrift.ready &&
+        predicationIsolationDrift.snapshotToken == 0 &&
+        !pipelineBundle.validate_binding_snapshot(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken,
+            drawPipelineBindingReady.snapshotToken),
+        "R148 live predication drift invalidates fixed-function pipeline binding");
+    require(
+        pipelineBundle.bind_for_observation(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken),
+        "R148 restore fixed-function draw-predication isolation");
+    const auto predicationIsolationRestored =
+        pipelineBundle.binding_readiness(
+            d3d.context, inputLayout, vertexPrototype, pixelPrototype,
+            pipelineIdentityReady.snapshotToken);
+    require(
+        predicationIsolationRestored.ready &&
+        predicationIsolationRestored.streamOutputTargetsClear &&
+        predicationIsolationRestored.predicationClear &&
+        predicationIsolationRestored.drawSideEffectIsolationReady &&
+        predicationIsolationRestored.snapshotToken ==
+            drawPipelineBindingReady.snapshotToken,
+        "R148 restored predication isolation reproduces pipeline snapshot");
 
     const auto texturedDrawReady =
         outrun::vr::dx11::compose_fixed_function_textured_draw_readiness(
@@ -4826,6 +4928,8 @@ int main()
     fixedFunctionTexture->Release();
     otherDevice.context->Release();
     otherDevice.device->Release();
+    isolationPredicate->Release();
+    isolationStreamOutputBuffer->Release();
     isolationGeometryShader->Release();
     isolationGeometryBytecode->Release();
     vertexShader->Release();
@@ -4839,6 +4943,7 @@ int main()
     std::cout << "DX11 fixed-function pipeline bundle R97: PASS\n";
     std::cout << "DX11 dormant fixed-function pipeline object binding: PASS\n";
     std::cout << "DX11 fixed-function GS/HS/DS isolation R147: PASS\n";
+    std::cout << "DX11 fixed-function SO/predication isolation R148: PASS\n";
     std::cout << "DX11 fixed-function sampler ownership R98: PASS\n";
     std::cout << "DX11 fixed-function texture view ownership R99: PASS\n";
     std::cout << "DX11 texture mutation readiness R100: PASS\n";
