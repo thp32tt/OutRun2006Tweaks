@@ -3753,6 +3753,89 @@ int main()
                     0u, 0u, 0, indexedDirectDispatch.snapshotToken),
             "R147 direct indexed dispatch seals DrawIndexed arguments");
 
+        const auto indexedSourceRange =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_range_readiness(
+                    D3DPT_TRIANGLELIST, 2u, 0, 0u, 4u, 0u);
+        require(
+            indexedSourceRange.inputValid &&
+            indexedSourceRange.primitiveExact &&
+            indexedSourceRange.vertexRangeExact &&
+            indexedSourceRange.indexRangeExact &&
+            indexedSourceRange.ready &&
+            indexedSourceRange.topology ==
+                D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST &&
+            indexedSourceRange.primitiveCount == 2u &&
+            indexedSourceRange.elementCount == 6u &&
+            indexedSourceRange.baseVertexIndex == 0 &&
+            indexedSourceRange.minVertexIndex == 0u &&
+            indexedSourceRange.numVertices == 4u &&
+            indexedSourceRange.maxVertexIndex == 3u &&
+            indexedSourceRange.startIndex == 0u &&
+            indexedSourceRange.snapshotToken != 0 &&
+            outrun::vr::dx11::
+                validate_fixed_function_indexed_source_range_snapshot(
+                    D3DPT_TRIANGLELIST, 2u, 0, 0u, 4u, 0u,
+                    indexedSourceRange.snapshotToken),
+            "R149 indexed source range seals D3D9 DrawIndexedPrimitive arguments");
+
+        const auto indexedSourceRangeMissingVertices =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_range_readiness(
+                    D3DPT_TRIANGLELIST, 2u, 0, 0u, 0u, 0u);
+        require(
+            indexedSourceRangeMissingVertices.inputValid &&
+            indexedSourceRangeMissingVertices.primitiveExact &&
+            !indexedSourceRangeMissingVertices.vertexRangeExact &&
+            indexedSourceRangeMissingVertices.indexRangeExact &&
+            !indexedSourceRangeMissingVertices.ready &&
+            indexedSourceRangeMissingVertices.snapshotToken == 0,
+            "R149 indexed source range rejects empty vertex range for live primitives");
+
+        const auto indexedSourceRangeVertexOverflow =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_range_readiness(
+                    D3DPT_TRIANGLELIST, 1u, 0,
+                    std::numeric_limits<UINT>::max(), 2u, 0u);
+        require(
+            indexedSourceRangeVertexOverflow.inputValid &&
+            !indexedSourceRangeVertexOverflow.vertexRangeExact &&
+            indexedSourceRangeVertexOverflow.indexRangeExact &&
+            !indexedSourceRangeVertexOverflow.ready &&
+            indexedSourceRangeVertexOverflow.snapshotToken == 0,
+            "R149 indexed source range rejects MinVertexIndex NumVertices overflow");
+
+        const auto indexedSourceRangeIndexOverflow =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_range_readiness(
+                    D3DPT_TRIANGLELIST, 2u, 0, 0u, 4u,
+                    std::numeric_limits<UINT>::max() - 5u);
+        require(
+            indexedSourceRangeIndexOverflow.inputValid &&
+            indexedSourceRangeIndexOverflow.vertexRangeExact &&
+            !indexedSourceRangeIndexOverflow.indexRangeExact &&
+            !indexedSourceRangeIndexOverflow.ready &&
+            indexedSourceRangeIndexOverflow.snapshotToken == 0,
+            "R149 indexed source range rejects StartIndex element-count overflow");
+
+        const auto indexedSourceRangeFan =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_range_readiness(
+                    D3DPT_TRIANGLEFAN, 2u, 0, 0u, 4u, 0u);
+        require(
+            !indexedSourceRangeFan.inputValid &&
+            !indexedSourceRangeFan.primitiveExact &&
+            !indexedSourceRangeFan.ready &&
+            indexedSourceRangeFan.snapshotToken == 0,
+            "R149 indexed source range keeps triangle fan on generated-index path");
+
+        require(
+            !outrun::vr::dx11::
+                validate_fixed_function_indexed_source_range_snapshot(
+                    D3DPT_TRIANGLELIST, 2u, 0, 0u, 3u, 0u,
+                    indexedSourceRange.snapshotToken),
+            "R149 indexed source range snapshot rejects NumVertices drift");
+
         require(
             !outrun::vr::dx11::
                 validate_fixed_function_direct_draw_dispatch_snapshot(
