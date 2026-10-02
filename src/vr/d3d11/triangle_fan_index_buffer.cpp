@@ -31,6 +31,10 @@ bool NativeTriangleFanIndexBuffer::initialize_nonindexed(
     ID3D11Device* device,
     UINT primitiveCount,
     UINT baseVertex) noexcept {
+    // R126 fail-closed reinitialization: a rejected replacement must not leave
+    // a previously generated fan stream eligible for a later bind.
+    shutdown();
+
     const auto plan = translate_triangle_fan_expansion(primitiveCount);
     if (!device || !plan.exact || plan.expandedIndexCount == 0)
         return false;
@@ -56,6 +60,9 @@ bool NativeTriangleFanIndexBuffer::initialize_indexed(
     UINT startIndex,
     const void* sourceIndices,
     UINT sourceIndexCount) noexcept {
+    // Preserve the same fail-closed replacement rule for indexed fans.
+    shutdown();
+
     const auto plan = translate_triangle_fan_expansion(primitiveCount);
     if (!device || !plan.exact || plan.expandedIndexCount == 0)
         return false;
