@@ -3506,6 +3506,115 @@ def main() -> None:
     analyzer_test = (
         ROOT / "tools" / "test_analyze_dx11_census.py"
     ).read_text(encoding="utf-8")
+    # Keep the enum-owned unsupported bitset, runtime summary, parser schema
+    # and aggregate accounting structurally synchronized. Earlier R166/R170
+    # guards pinned specific tails; this parity check makes a future new bit
+    # fail closed unless every consumer is extended in the same change.
+    unsupported_schema_errors = []
+    unsupported_summary_match = re.search(
+        r"unsupported\[([A-Za-z0-9_]+=\{\}(?:,[A-Za-z0-9_]+=\{\})*)\]",
+        RUNTIME_CENSUS,
+    )
+    runtime_unsupported_labels = []
+    if not unsupported_summary_match:
+        unsupported_schema_errors.append(
+            "runtime census unsupported summary labels are not discoverable"
+        )
+    else:
+        runtime_unsupported_labels = [
+            item.split("=", 1)[0]
+            for item in unsupported_summary_match.group(1).split(",")
+        ]
+        if len(runtime_unsupported_labels) != len(pipeline_unsupported_bits):
+            unsupported_schema_errors.append(
+                "runtime census unsupported label count must equal "
+                "PipelineUnsupportedBitCount"
+            )
+
+    summary_start = RUNTIME_CENSUS.find('"VR DX11 R120 census:')
+    summary_end = (
+        RUNTIME_CENSUS.find(");", summary_start)
+        if summary_start >= 0 else -1
+    )
+    if summary_start < 0 or summary_end < 0:
+        unsupported_schema_errors.append(
+            "runtime census R120 summary call is not discoverable"
+        )
+    else:
+        summary_call = RUNTIME_CENSUS[summary_start:summary_end + 2]
+        runtime_unsupported_indices = [
+            int(value)
+            for value in re.findall(
+                r"unsupported\[(\d+)\]", summary_call
+            )
+        ]
+        if runtime_unsupported_indices != expected_pipeline_bits:
+            unsupported_schema_errors.append(
+                "runtime census summary arguments must enumerate every "
+                "PipelineUnsupported bit exactly once in order"
+            )
+
+    parser_start = analyzer.find('r"unsupported\\[')
+    parser_end = (
+        analyzer.find("\n)\n\nBOOTSTRAP_RE", parser_start)
+        if parser_start >= 0 else -1
+    )
+    if parser_start < 0 or parser_end < 0:
+        unsupported_schema_errors.append(
+            "census analyzer unsupported parser block is not discoverable"
+        )
+        analyzer_unsupported_groups = []
+    else:
+        analyzer_unsupported_groups = re.findall(
+            r"\?P<([A-Za-z_][A-Za-z0-9_]*)>",
+            analyzer[parser_start:parser_end],
+        )
+        if len(analyzer_unsupported_groups) != len(pipeline_unsupported_bits):
+            unsupported_schema_errors.append(
+                "census analyzer unsupported group count must equal "
+                "PipelineUnsupportedBitCount"
+            )
+
+    unsupported_keys_start = analyzer.find("unsupported_keys = [")
+    unsupported_keys_end = (
+        analyzer.find("]\n        unsupported_total", unsupported_keys_start)
+        if unsupported_keys_start >= 0 else -1
+    )
+    if unsupported_keys_start < 0 or unsupported_keys_end < 0:
+        unsupported_schema_errors.append(
+            "census analyzer unsupported aggregate key list is not discoverable"
+        )
+    else:
+        aggregate_keys = re.findall(
+            r'"([A-Za-z_][A-Za-z0-9_]*)"',
+            analyzer[unsupported_keys_start:unsupported_keys_end],
+        )
+        if (
+            analyzer_unsupported_groups and
+            aggregate_keys[-len(analyzer_unsupported_groups):]
+            != analyzer_unsupported_groups
+        ):
+            unsupported_schema_errors.append(
+                "census analyzer unsupported parser groups must be the "
+                "ordered aggregate tail"
+            )
+
+    if (
+        runtime_unsupported_labels and
+        analyzer_unsupported_groups and
+        runtime_unsupported_labels != analyzer_unsupported_groups
+    ):
+        unsupported_schema_errors.append(
+            "runtime unsupported labels and analyzer named groups must "
+            "match exactly in order"
+        )
+
+    if unsupported_schema_errors:
+        raise SystemExit(
+            "DX11 unsupported census schema parity drift: "
+            + ", ".join(unsupported_schema_errors)
+        )
+
     current_unsupported_analyzer_contract = [
         ("?P<dualSource>", analyzer,
          "current unsupported dual-source parser"),
