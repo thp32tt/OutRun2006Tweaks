@@ -1018,6 +1018,59 @@ async def conversion_handle_discovered_commit(
     return False
 
 
+def conversion_reconcile_wait_actions_without_ui(
+    task: dict,
+    now: datetime,
+    source: str,
+) -> bool:
+    """Return True only when persisted WAIT_ACTIONS still satisfies the full VR pipeline gate."""
+    branch = str(task.get("branch") or "")
+    task_id = str(task.get("task_id") or "")
+    if not branch or not task_id:
+        return False
+    invalidate_task_commit_cache(branch, task_id)
+    commit = github_find_task_commit(branch, task_id, allow_ci_skip_fallback=True)
+    if not commit:
+        return True
+    sha = str(commit.get("sha") or "")
+    valid, reasons, _record = conversion_validate_pipeline_result_commit(
+        task_id, sha, str(task.get("lane") or ""), branch
+    )
+    skip_directive = github_actions_skip_directive(str(commit.get("message") or ""))
+    if valid and not skip_directive:
+        if task.get("result_sha") != sha:
+            task["result_sha"] = sha
+            task["result_message"] = commit.get("message")
+            task["gate_run"] = None
+            task["last_gate_poll_at"] = None
+            task["wait_actions_started_at"] = now.isoformat()
+        task["conversion_pipeline_validation"] = "PASS_C0_C6"
+        return True
+
+    if skip_directive:
+        reasons = list(reasons) + [f"FINAL_COMMIT_CI_SKIP_DIRECTIVE:{skip_directive}"]
+    task["phase"] = "WAIT_CHAT"
+    task["terminal"] = None
+    task["result_sha"] = None
+    task["task_latched"] = True
+    task["conversion_pipeline_validation"] = "INCOMPLETE"
+    task["conversion_pipeline_rejected_sha"] = sha
+    task["conversion_pipeline_reject_reasons"] = reasons
+    task["controller_stage"] = conversion_pipeline_next_stage(reasons)
+    task["last_checkpoint_head"] = sha or task.get("last_checkpoint_head")
+    task["last_checkpoint_at"] = now.isoformat()
+    task["last_checkpoint_stage"] = task["controller_stage"]
+    task["conversion_pipeline_continuation_pending"] = True
+    task["failure_context"] = f"VR_PIPELINE_REARMED_{source}"
+    for key in (
+        "gate_run", "last_gate_poll_at", "last_gate_status",
+        "last_gate_status_changed_at", "gate_jobs", "last_jobs_refresh_at",
+        "wait_actions_started_at", "startup_reconcile_pending", "completed_at",
+    ):
+        task.pop(key, None)
+    return False
+
+
 async def queue_send_conversion_execution_continuation(
     context: BrowserContext,
     pages: dict[str, Page],
