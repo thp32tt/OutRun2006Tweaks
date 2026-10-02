@@ -16,11 +16,18 @@ FORBIDDEN = (
     "ENABLE_NATIVE_DRAW_PATH=1",
 )
 
+SKIP_DIRS = {
+    ".git",
+    "build",
+    "out",
+    "dist",
+}
+
 
 def scan(root: Path) -> list[str]:
     hits: list[str] = []
     for path in root.rglob("*"):
-        if not path.is_file() or ".git" in path.parts:
+        if not path.is_file() or any(part in SKIP_DIRS for part in path.parts):
             continue
         try:
             text = path.read_text(encoding="utf-8", errors="ignore")
