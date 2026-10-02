@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "e5afcfc1f5d818f0ebe6918cb43afb9cb685980b",
+  "state_parent_head": "3b9110369a622b15dafeb75fc297216aeea2f0d5",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -882,6 +882,79 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer F32 raw capture beginning at overlapped 0x00182C95. Exact-decode only complete canonical instructions in 0x00182C95..0x00182CD5 from fresh canonical evidence, preserve any trailing partial instruction raw-only, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F32_DECLARATION_ORDER_REPAIR",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "8521b59bb84e4a7ab0e39ad59d0fae34186dea69",
+      "validation_bearing_result_sha": "8521b59bb84e4a7ab0e39ad59d0fae34186dea69",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Reordered the F32 continuation_41 overlap declaration after continuation_40 INCOMPLETE_BYTES so the analyzer imports cleanly; exact canonical CI then captured the 0x00182C95 overlap window successfully.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local conversion/run state, regression/problem history and Issue #14 while tracking concurrent F31/F32 advancement."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the exact-SHA F32 Canonical Disassembly failure as the highest-value runnable static blocker; failure was a deterministic declaration-order NameError."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 8521b59bb84e4a7ab0e39ad59d0fae34186dea69 moves continuation_41 overlap metadata after continuation_40 INCOMPLETE_BYTES without changing runtime semantics."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "DXVK Canonical Disassembly Evidence run 36977105497 job 110743203646 passed on exact SHA; continuation_41 reported EXACT_EXE_182C95_TO_182CD5_PROVENANCE_CAPTURED with overlap 3b and exact probe end. Backend Conversion Gate run 36977105536 passed the backend disassembly contract and all static steps through application-space recenter; Win32 build status is separately recorded and is not required to validate this Python declaration-order repair."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive source commit 8521b59bb84e4a7ab0e39ad59d0fae34186dea69 contains [AUTO:CONV-DXVK-000002]; Issue #14 comment 5947182916 records the change and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Python disassembly-analyzer declaration-order repair only; no runtime payload, backend binary, selector, localization, or deployable package content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit without replacing newer concurrent primary-frontier state."
+        }
+      },
+      "validation": {
+        "fail_before_sha": "2fcd53083052d901bd2a2b2d6f6b0ebcd7373830",
+        "fail_before_dxvk_disassembly_run_id": 36977006244,
+        "fail_before_job_id": 110742897546,
+        "fail_before_reason": "NameError: GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_40_INCOMPLETE_BYTES referenced before declaration.",
+        "exact_sha": "8521b59bb84e4a7ab0e39ad59d0fae34186dea69",
+        "dxvk_disassembly_evidence_run_id": 36977105497,
+        "dxvk_disassembly_evidence_job_id": 110743203646,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "dxvk_disassembly_evidence_artifact_id": 11214061058,
+        "dxvk_disassembly_evidence_artifact_digest": "sha256:8807227ae0b62feb2c2bac495fa8c6a4b3cc36fe554692564650bc2b1d43add1",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "provenance_status": "EXACT_EXE_182C95_TO_182CD5_PROVENANCE_CAPTURED",
+        "overlap_bytes": "3b",
+        "overlap_matches": true,
+        "probe_end_rva": "0x00182CD5",
+        "probe_end_matches": true,
+        "backend_conversion_gate_run_id": 36977105536,
+        "backend_disassembly_contract_step": "PASS",
+        "backend_static_steps_through_recenter": "PASS",
+        "backend_gate_overall_at_state_write": "COMPLETED_SUCCESS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947182916,
+      "package": "NOT_REQUIRED_STATIC_ANALYZER_ORDERING_FIX",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "exact_next_action": "Historical handoff at repair time was to exact-decode canonical 0x00182C95..0x00182CD5; newer branch frontier/state takes precedence because concurrent work has since completed that decode."
     }
   ]
 }
