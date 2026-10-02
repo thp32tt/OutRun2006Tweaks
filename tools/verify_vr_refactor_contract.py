@@ -267,6 +267,32 @@ for marker in (
     if marker not in r31:
         errors.append(f"R31 missing owner telemetry API: {marker}")
 
+for name, required in (
+    ("R31TelemetryNoteFastWorld", ("++R31FastWorldDraws;", "++R31Frame.fastWorld;")),
+    ("R31TelemetryNoteHud", ("++R31HudDraws;", "++R31Frame.hud;")),
+):
+    match = re.search(
+        rf"inline void {name}\(\) noexcept\s*\{{(?P<body>.*?)\n        \}}",
+        r31,
+        re.DOTALL,
+    )
+    if not match:
+        errors.append(f"R31 telemetry owner body missing: {name}")
+        continue
+    body = match.group("body")
+    if f"{name}();" in body:
+        errors.append(f"R31 telemetry owner recurses into itself: {name}")
+    for required_marker in required:
+        if required_marker not in body:
+            errors.append(
+                f"R31 telemetry owner missing counter update: {name} -> {required_marker}")
+
+window_decl = r31.find("R31WindowPerf R31Window{};")
+reset_window = r31.find("inline void R31TelemetryResetFrameWindow()")
+if min(window_decl, reset_window) < 0 or not window_decl < reset_window:
+    errors.append(
+        "R31 telemetry reset API must be declared after the R31 window owner")
+
 for rel, source in (("R33", r33), ("R34", r34)):
     if "R31FlushPendingStateBlockResync" in source:
         errors.append(
