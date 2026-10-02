@@ -85,6 +85,8 @@ LOCALIZATION_E_QA_RESUME_THRESHOLD = max(0, min(LOCALIZATION_E_QA_PAUSE_THRESHOL
 LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS", "90")))
 LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_SECONDS", "30")))
 SAME_TASK_CONTROL_GAP_SECONDS = max(5, int(os.getenv("SAME_TASK_CONTROL_GAP_SECONDS", "15")))
+PREMATURE_STOP_ROLLOVER_THRESHOLD = max(2, int(os.getenv("PREMATURE_STOP_ROLLOVER_THRESHOLD", "3")))
+PRODUCER_CONTINUATION_COOLDOWN_SECONDS = max(5, int(os.getenv("PRODUCER_CONTINUATION_COOLDOWN_SECONDS", "15")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
 CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
 MAX_CHAT_ROLLOVERS_PER_TASK = max(1, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "2")))
@@ -301,6 +303,8 @@ runtime = {
     "localization_same_slot_send_gap_seconds": LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS,
     "localization_slot_dedup_seconds": LOCALIZATION_SLOT_DEDUP_SECONDS,
     "same_task_control_gap_seconds": SAME_TASK_CONTROL_GAP_SECONDS,
+    "premature_stop_rollover_threshold": PREMATURE_STOP_ROLLOVER_THRESHOLD,
+    "producer_continuation_cooldown_seconds": PRODUCER_CONTINUATION_COOLDOWN_SECONDS,
     "configured_slot_count": CHAT_SLOTS,
     "max_task_attempts": MAX_TASK_ATTEMPTS,
     "conversation_rollover_enabled": CONVERSATION_ROLLOVER_ENABLED,
