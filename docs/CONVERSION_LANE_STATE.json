@@ -738,9 +738,9 @@
         "3259cf8faf398981ce2d5d0b0d9bf1d6399015c3"
       ],
       "material_result_sha": "3259cf8faf398981ce2d5d0b0d9bf1d6399015c3",
-      "validation_bearing_sha": "3259cf8faf398981ce2d5d0b0d9bf1d6399015c3",
-      "retaining_descendant_sha": "38b4ec4c9fc11fc1976482de80b66a45f875f37a",
-      "automation_validation": "PARTIAL_EXACT_SHA_STATIC_PRECHECKS_PASS_SOURCE_GRAPH_BLOCKED_BY_CONCURRENT_R164_UNSUPPORTED_CENSUS_GUARD; SRGB_SOURCE_RETENTION_AND_PARSER_FIXTURE_PASS",
+      "validation_bearing_sha": "3aefbdcf0344ae70cabc925c3293a0f4c42505c4",
+      "retaining_descendant_sha": "94cf2e7fb072ef58541c7c112e51a0707e638afa",
+      "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER; COMPILE_NOT_CLAIMED_DUE_BRANCH_CHURN",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
