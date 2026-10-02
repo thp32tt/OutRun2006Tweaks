@@ -152,7 +152,8 @@
     5947231747,
     5947306139,
     5947334794,
-    5947371527
+    5947371527,
+    5947373054
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -1948,6 +1949,78 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer authoritative descendant frontier; current branch already advances beyond this raw window. Do not regress F34 to raw-only state. Continue only from the newest validated/candidate edge, preserving each trailing partial instruction raw-only until its bounded overlap capture is proven."
+    },
+    {
+      "unit_id": "DXVK_F34_CANONICAL_CONTROL_FLOW_0x182D14_TO_0x182D53",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "1427dac55e8e1900849377cc8ec67377f0bf8ac5",
+      "commit_message": "dxvk: prove canonical 0x182D14 control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Exact canonical control-flow proof for 0x00182D14..0x00182D53: 22 complete instructions, predecessor target 0x00182D21 boundary-proven, internal target 0x00182D3D boundary-proven, external 0x00182D59 preserved address-only, trailing 0x00182D53:F7 preserved for overlap.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered current authenticated GitHub branch authority and branch-local lane/run state; tracked concurrent same-JOB descendants."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected exact decode/proof of canonically validated F34 raw overlap as highest-value unfinished static work."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Commit 1427dac55e8e1900849377cc8ec67377f0bf8ac5 implements continuation 43 exact instructions, branches, predecessor-target proof, cut edge and fail-closed analyzer wiring."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA passed DXVK Canonical Disassembly Evidence run 36978531083/job 110747581540; Backend Conversion Gate run 36978531119 had all static/contract/test steps through application-space recenter PASS at state write."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commit contains required [AUTO:CONV-DXVK-000002] marker and Issue #14 comment 5947373054 records the production event."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly analyzer proof only; no runtime/deployment payload changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Recorded supplementally to preserve the newer F35 raw source frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "1427dac55e8e1900849377cc8ec67377f0bf8ac5",
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36978531083,
+        "dxvk_disassembly_evidence_job_id": 110747581540,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "evidence_artifact_id": 11214212927,
+        "evidence_artifact_digest": "sha256:9c55a6818ce19ebd4a6a70be0451340cc9e55007220d66c2a24475e46ae93961",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "proof_status": "EXACT_182D14_TO_182D53_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "instruction_count": 22,
+        "branch_targets_match": true,
+        "internal_branch_targets_on_boundaries": true,
+        "calls_match": true,
+        "raw_call_census_matches": true,
+        "resolved_predecessor_target_rva": "0x00182D21",
+        "resolved_predecessor_target_boundary": true,
+        "incomplete_rva": "0x00182D53",
+        "incomplete_bytes": "f7",
+        "incomplete_matches": true,
+        "capture_edge_matches": true,
+        "backend_conversion_gate_run_id": 36978531119,
+        "backend_static_steps_through_recenter": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5947373054,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "exact_next_action": "Preserve descendant f9c6a2c4932a7b8a41e91390f84794bc69b837cc F35 raw overlap capture 0x00182D53..0x00182D93; validate canonical provenance before exact decode, and resolve 0x00182D59 only with exact instruction-boundary proof."
     }
   ]
 }
