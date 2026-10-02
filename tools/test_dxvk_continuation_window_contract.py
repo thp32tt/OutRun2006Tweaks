@@ -17,6 +17,8 @@ class WindowError(AssertionError):
 
 
 def validate_window(prefix: bytes, next_window: bytes) -> None:
+    if not prefix or not next_window:
+        raise WindowError("empty continuation window accepted")
     if prefix[-len(OVERLAP) :] != OVERLAP:
         raise WindowError("missing canonical continuation overlap")
     if not next_window.startswith(OVERLAP):
@@ -28,12 +30,18 @@ def reject_truncated_tail(window: bytes, minimum_tail: int = 7) -> None:
         raise WindowError("truncated overlap accepted")
 
 
+def reject_short_overlap(overlap: bytes) -> None:
+    if overlap != OVERLAP:
+        raise WindowError("non-canonical overlap accepted")
+
+
 def main() -> int:
     validate_window(
         bytes.fromhex("90 90 66 0f 54 1d 20 91 61"),
         bytes.fromhex("66 0f 54 1d 20 91 61 48 89"),
     )
     reject_truncated_tail(OVERLAP)
+    reject_short_overlap(OVERLAP)
     print("DXVK continuation window contract: OK")
     return 0
 
