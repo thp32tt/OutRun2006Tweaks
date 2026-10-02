@@ -190,6 +190,7 @@ namespace outrun::vr::dx11
             case D3DTOP_MODULATECOLOR_ADDALPHA:
             case D3DTOP_MODULATEINVALPHA_ADDCOLOR:
             case D3DTOP_MODULATEINVCOLOR_ADDALPHA:
+            case D3DTOP_DOTPRODUCT3:
             case D3DTOP_SUBTRACT:
                 return fixed_function_argument_uses_texture(arg1) ||
                        fixed_function_argument_uses_texture(arg2);
@@ -340,6 +341,18 @@ namespace outrun::vr::dx11
             case D3DTOP_SUBTRACT:
                 // R177: D3D9 defines SUBTRACT as component-wise Arg1 - Arg2.
                 return first + " - " + second;
+            case D3DTOP_DOTPRODUCT3:
+            {
+                // R193: D3D9 DOTPRODUCT3 interprets both RGB arguments as
+                // signed values (2*x-1), computes their three-component dot
+                // product, and replicates the scalar through the destination.
+                const auto dotFirst = fixed_function_argument_expression(
+                    arg1, stageIndex, ".rgb");
+                const auto dotSecond = fixed_function_argument_expression(
+                    arg2, stageIndex, ".rgb");
+                return "dot((" + dotFirst + " * 2.0 - 1.0), (" +
+                       dotSecond + " * 2.0 - 1.0))";
+            }
             default:
                 return {};
             }
@@ -528,6 +541,7 @@ namespace outrun::vr::dx11
             case D3DTOP_BLENDCURRENTALPHA:
             case D3DTOP_BLENDTEXTUREALPHA:
             case D3DTOP_BLENDTEXTUREALPHAPM:
+            case D3DTOP_DOTPRODUCT3:
             case D3DTOP_SUBTRACT:
                 useArg1 = true;
                 useArg2 = true;

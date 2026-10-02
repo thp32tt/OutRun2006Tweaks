@@ -1161,7 +1161,54 @@ int main()
             "R190 D3DTOP_MODULATEINVCOLOR_ADDALPHA must remain fail-closed as ALPHAOP");
     }
 
+    {
+        std::array<FixedFunctionStageState, 8> dotProductStages{};
+        dotProductStages[0].colorOp = D3DTOP_DOTPRODUCT3;
+        dotProductStages[0].colorArg1 = D3DTA_TEXTURE;
+        dotProductStages[0].colorArg2 = D3DTA_DIFFUSE;
+        dotProductStages[0].alphaOp = D3DTOP_DOTPRODUCT3;
+        dotProductStages[0].alphaArg1 = D3DTA_TEXTURE;
+        dotProductStages[0].alphaArg2 = D3DTA_DIFFUSE;
+        dotProductStages[0].minFilter = D3DTEXF_POINT;
+        dotProductStages[0].magFilter = D3DTEXF_POINT;
+        dotProductStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto dotProductShader =
+            generate_fixed_function_pixel_shader_prototype(
+                dotProductStages, true, 0x01u, 0x01u, textureTypes);
+        require(
+            dotProductShader.generated() &&
+                dotProductShader.activeStages == 1,
+            "R193 D3DTOP_DOTPRODUCT3 COLOROP/ALPHAOP must become shader-exact");
+        require(
+            dotProductShader.source.find(
+                "float3 nextColor = dot((sampled0.rgb * 2.0 - 1.0), (input.diffuse.rgb * 2.0 - 1.0));") !=
+                std::string::npos &&
+            dotProductShader.source.find(
+                "float nextAlpha = dot((sampled0.rgb * 2.0 - 1.0), (input.diffuse.rgb * 2.0 - 1.0));") !=
+                std::string::npos,
+            "R193 D3DTOP_DOTPRODUCT3 signed RGB dot-product shader expression drift");
+
+        const auto dotProductCompile =
+            compile_fixed_function_pixel_shader_prototype(dotProductShader);
+        require(
+            dotProductCompile.attempted &&
+            dotProductCompile.succeeded &&
+            dotProductCompile.result == S_OK &&
+            dotProductCompile.bytecodeBytes != 0,
+            "R193 D3DTOP_DOTPRODUCT3 fixed-function shader prototype did not compile");
+
+        const auto missingTextureReadiness =
+            translate_fixed_function_readiness(
+                dotProductStages, true, 0x00u, 0x00u);
+        require(
+            (missingTextureReadiness.unsupported &
+             FixedFunctionUnsupportedResourceStageCoverage) != 0,
+            "R193 D3DTOP_DOTPRODUCT3 texture dependency must fail closed without exact resource coverage");
+    }
+
     std::cout
+        << "DX11 fixed-function D3DTOP_DOTPRODUCT3 support R193: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATEINVCOLOR_ADDALPHA COLOROP support R190: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATEINVALPHA_ADDCOLOR COLOROP support R189: PASS\n"
         << "DX11 fixed-function D3DTOP_MODULATECOLOR_ADDALPHA COLOROP support R188: PASS\n"

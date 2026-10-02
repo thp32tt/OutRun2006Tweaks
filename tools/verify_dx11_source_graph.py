@@ -804,6 +804,48 @@ def main() -> None:
             + ", ".join(missing_r191_texture_factor_census)
         )
 
+    r193_d3dtop_dotproduct3_contract = [
+        ("case D3DTOP_DOTPRODUCT3:", PIPELINE_TRANSLATION_CPP,
+         "R193 D3DTOP_DOTPRODUCT3 dependency/readiness/translation case"),
+        ('return "dot((" + dotFirst + " * 2.0 - 1.0), (" +',
+         PIPELINE_TRANSLATION_CPP,
+         "R193 signed RGB DOTPRODUCT3 expression"),
+        ("dotProductStages[0].colorOp = D3DTOP_DOTPRODUCT3;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R193 hosted DOTPRODUCT3 color fixture"),
+        ("dotProductStages[0].alphaOp = D3DTOP_DOTPRODUCT3;",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R193 hosted DOTPRODUCT3 alpha fixture"),
+        ("sampled0.rgb * 2.0 - 1.0",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R193 signed sampled RGB transform"),
+        ("input.diffuse.rgb * 2.0 - 1.0",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R193 signed diffuse RGB transform"),
+        ("R193 D3DTOP_DOTPRODUCT3 fixed-function shader prototype did not compile",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R193 offline compile assertion"),
+        ("R193 D3DTOP_DOTPRODUCT3 texture dependency must fail closed without exact resource coverage",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R193 texture-resource fail-closed assertion"),
+        ("DX11 fixed-function D3DTOP_DOTPRODUCT3 support R193: PASS",
+         FIXED_FUNCTION_PIPELINE_PROBE,
+         "R193 hosted probe completion"),
+    ]
+    missing_r193_d3dtop_dotproduct3 = [
+        meaning
+        for token, source, meaning in r193_d3dtop_dotproduct3_contract
+        if token not in source
+    ]
+    if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_DOTPRODUCT3:") < 3:
+        missing_r193_d3dtop_dotproduct3.append(
+            "R193 DOTPRODUCT3 must participate in dependency, HLSL and readiness switches")
+    if missing_r193_d3dtop_dotproduct3:
+        raise SystemExit(
+            "DX11 R193 fixed-function D3DTOP_DOTPRODUCT3 contract drift: "
+            + ", ".join(missing_r193_d3dtop_dotproduct3)
+        )
+
     # R166 makes the enum-owned one-past-last sentinel the census authority.
     # The concrete unsupported bits must stay contiguous, the sentinel must be
     # max(bit)+1, and runtime_census must size its array from that sentinel.
