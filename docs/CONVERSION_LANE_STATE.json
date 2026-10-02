@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "09a16282ae973b61c22b33b97cff534442c78bc4",
+  "state_parent_head": "2273e766ba6768aa5236e57d88908362ad8fadc5",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,16 +52,16 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "49955e06ef829a4f15daffb4617f8a76dc6f6d9d",
-    "validation_bearing_sha": "49955e06ef829a4f15daffb4617f8a76dc6f6d9d",
-    "retaining_descendant_sha": "09a16282ae973b61c22b33b97cff534442c78bc4",
-    "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36990255571 job 110784776601; Configure was IN_PROGRESS at C6 checkpoint and compile/binary success is not claimed",
+    "result_sha": "dfdb85601eb037bd9a6e24e4734106afb4e17b73",
+    "validation_bearing_sha": "79c067b20399c309b0b8b8d6bd53f6110c71e010",
+    "retaining_descendant_sha": "2273e766ba6768aa5236e57d88908362ad8fadc5",
+    "automation_validation": "PASS_TARGETED_AUTHENTICATED_GITHUB_STATIC_CONTRACT; Build runs 36990569774 and 36990677784 blocked before compile by unrelated source-graph R129/R175 drift; COMPILE_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
-  "runtime_blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI. R183 exact-SHA source-graph, dormant-activation and census-analyzer static gates passed; compile/binary and runtime success are not claimed.",
+  "runtime_blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI. R184 ADDSMOOTH static contract is retained; full Build gate was blocked before compile by unrelated source-graph R129/R175 drift, so compile/runtime success is not claimed.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving R183 D3DTOP_ADDSIGNED2X support. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, preserving completed R184 D3DTOP_ADDSMOOTH support and concurrent descendant work. Rerun the full Backend Conversion Gate once unrelated source-graph drift no longer blocks it.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -998,6 +998,30 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5949263819
+    },
+    {
+      "unit_id": "DX11_FFP_D3DTOP_ADDSMOOTH_SUPPORT_R184",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "9e6a5be14cbf46eccaf6189dce8e0f35d9cb917f",
+      "implementation_commits": [
+        "09a16282ae973b61c22b33b97cff534442c78bc4",
+        "275800fd3ba29d19584c97d3f702a5736e2a0998",
+        "dfdb85601eb037bd9a6e24e4734106afb4e17b73"
+      ],
+      "source_implementation_sha": "09a16282ae973b61c22b33b97cff534442c78bc4",
+      "material_result_sha": "dfdb85601eb037bd9a6e24e4734106afb4e17b73",
+      "validation_bearing_sha": "79c067b20399c309b0b8b8d6bd53f6110c71e010",
+      "retaining_descendant_sha": "2273e766ba6768aa5236e57d88908362ad8fadc5",
+      "automation_validation": "PASS_TARGETED_AUTHENTICATED_GITHUB_STATIC_CONTRACT; Build runs 36990569774 and 36990677784 blocked before compile by unrelated source-graph R129/R175 drift; COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_SOURCE_TEST_ONLY",
+      "issue14_comment_id": 5949372862,
+      "validation_run_ids": [
+        36990569774,
+        36990677784
+      ]
     }
   ]
 }
