@@ -5,86 +5,78 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "2698e22a522712e1ee0eb79587710b44479c8440",
-  "state_parent_head": "946673c1098bf519d320c093b5199f121bcd7dee",
-  "material_result_sha": "67ec86f4406c3c1734c7f4a741829fcac5f433e1",
-  "validation_bearing_sha": "b9259d5f846d07b30dbbea832a31817d12cd4462",
+  "state_parent_head": "6385d383b04a6539eb6b9cd1b102a5d3a756963a",
+  "material_result_sha": "8204de3c411b327cb857e6348160968a49b37273",
+  "validation_bearing_sha": "1bdb7f50ca3ae2c9653b3301983a772890e4e393",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_SAMPLER_BORDER_PROVENANCE_R160",
-  "selection_reason": "R159 enabled MIRROR/MIRRORONCE but explicitly left D3DTADDRESS_BORDER fail-closed only because D3DSAMP_BORDERCOLOR provenance was not captured. The existing per-stage census can observe that state directly, making BORDER the highest-value independent sampler compatibility gap available without runtime hardware.",
-  "summary": "R160 captures D3DSAMP_BORDERCOLOR per fixed-function stage, hashes/logs it in the census signature, maps D3DTADDRESS_BORDER to D3D11_TEXTURE_ADDRESS_BORDER, converts D3D9 AARRGGBB to D3D11 RGBA float channels, and adds semantic/WARP/source-graph guards. NativeDrawPathActive remains disabled.",
+  "selected_work": "DX11_SHADEMODE_CAPTURE_FAILCLOSED_R162",
+  "selection_reason": "D3DRS_SHADEMODE was absent from the tracked D3D9 snapshot/native DX11 pipeline contract and census identity, so non-Gouraud interpolation could be erased by otherwise exact readiness.",
+  "summary": "R162 captures D3D9 SHADEMODE, accepts only GOURAUD as exact, keeps FLAT/PHONG fail-closed, adds probes/source-graph guards and seals shade-mode observation/value into census signature hashing.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read branch AGENTS.md, docs/CONVERSION_LANE_STATE.json, current task run, regression knowledge/history, and Issue #14 through authenticated GitHub authority.",
-        "Recovered rapid same-branch R157-R159 descendants and reselected work against fresh HEAD to avoid duplicating concurrent units."
+        "GitHub-authoritative branch/state/regression/Issue #14 reviewed; concurrent descendants retained with non-force updates."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Confirmed R159 supports WRAP/MIRROR/CLAMP/MIRRORONCE and intentionally rejects BORDER because FixedFunctionStageState lacked D3DSAMP_BORDERCOLOR.",
-        "Confirmed runtime_census already observes per-stage sampler fields through GetSamplerState, so exact BORDER provenance is statically implementable."
+        "D3DRS_SHADEMODE was absent from the tracked snapshot/native pipeline contract and census identity."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "changed_paths": [
-        "src/vr/d3d11/pipeline_translation.hpp",
-        "src/vr/d3d11/pipeline_translation.cpp",
-        "src/vr/d3d11/runtime_census.cpp",
-        "tools/dx11_fixed_function_shader_semantics.cpp",
-        "tools/dx11_constant_buffer_probe.cpp",
-        "tools/verify_dx11_source_graph.py"
-      ],
       "implementation_commits": [
-        "67ec86f4406c3c1734c7f4a741829fcac5f433e1"
+        "34e1b84224928e607449d34391b8e9278a21ea52",
+        "8204de3c411b327cb857e6348160968a49b37273"
       ],
       "details": [
-        "Added per-stage borderColor provenance and census observation/hash/logging.",
-        "Enabled exact BORDER address translation and AARRGGBB-to-RGBA conversion.",
-        "Added semantic smoke, WARP sampler descriptor probe, and source-graph drift guards."
+        "Added SHADEMODE capture/default, non-Gouraud fail-closed translation, GOURAUD/FLAT/PHONG probes, source-graph guard and census identity. Renumbered provisional R158 to R162 because R158 already belongs to input-layout stride lineage."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_STATIC_CI_CANCELLED_BY_BRANCH_CHURN",
-      "automation_validation": "PASS_GITHUB_AUTHORITATIVE_STATIC_CONTRACT_RETENTION_ACTIONS_CANCELLED_BY_BRANCH_CHURN_COMPILE_NOT_CLAIMED",
+      "status": "COMPLETE_STATIC_COMPILE_NOT_CLAIMED",
+      "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_SOURCE_GRAPH_ACTIVATION_CENSUS_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
       "evidence": [
-        "GitHub-authoritative material commit diff inspected and all intended R160 declaration/translation/census/probe/guard tokens verified.",
-        "Retaining descendant b9259d5f846d07b30dbbea832a31817d12cd4462 still contains every R160 contract token across all six changed paths.",
-        "Exact material-SHA OpenXR architecture, HUD inspector and Build workflows were cancelled by rapid same-branch churn; compile and hosted WARP execution are not claimed."
+        "Backend Conversion Gate run 36984239202 job 110765505697 on retaining descendant passed DX11 source graph, dormant activation boundary and census analyzer plus preceding static gates; Configure was cancelled by branch churn, Build/WARP/runtime not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "67ec86f4406c3c1734c7f4a741829fcac5f433e1",
-      "issue14_comment_id": 5948211572
+      "material_commit": "8204de3c411b327cb857e6348160968a49b37273",
+      "issue14_comment_id": 5948225989
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant DX11 sampler/census/readiness/probe work only; no native Draw* routing, backend activation, OpenXR transport, localization, other backend branch, or release payload changed."
+      "reason": "Dormant DX11 state/readiness/census/probe/static-guard unit; no production Draw* routing, backend activation, transport, localization, DXVK or release payload change."
     },
     "C6_STATE": {
-      "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R160 BORDER provenance and fresh-audit current HEAD for the next independent dormant DX11 semantic/compatibility gap, avoiding concurrent R161+ work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "status": "COMPLETE_WITH_THIS_STATE_UPDATE",
+      "exact_next_action": "Preserve R162 and continue only from latest GitHub HEAD after deduplicating newer work; native Draw* remains disabled pending exact-build exhaustive census and Quest 3/VDXR parity."
     }
   },
   "scope_guards": {
-    "native_draw_path_active_changed": false,
-    "other_backend_branch_changed": false,
-    "localization_changed": false
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "openxr_transport_changed": false,
+    "dxvk_lane_modified": false,
+    "localization_modified": false,
+    "other_backend_modified": false
   },
-  "issue14_comment_id": 5948211572,
-  "automation_validation": "PASS_GITHUB_AUTHORITATIVE_STATIC_CONTRACT_RETENTION_ACTIONS_CANCELLED_BY_BRANCH_CHURN_COMPILE_NOT_CLAIMED",
-  "blocker": null,
-  "next_action": "Keep NativeDrawPathActive disabled. Preserve R160 BORDER provenance and fresh-audit current HEAD for the next independent dormant DX11 semantic/compatibility gap, avoiding concurrent R161+ work. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5948225989,
+  "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_SOURCE_GRAPH_ACTIVATION_CENSUS_CONFIGURE_CANCELLED_BY_BRANCH_CHURN",
+  "blocker": "Win32 compile/build, hosted WARP smoke execution and Quest 3/VDXR runtime are not claimed; retaining-descendant static CI gates passed.",
+  "next_action": "Preserve R162 and continue from latest GitHub HEAD after deduplicating newer work; native Draw* remains disabled.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "prior_completed_unit": "DX11_SAMPLER_MIRROR_ADDRESS_R159"
+  "prior_completed_unit": "DX11_SAMPLER_BORDER_PROVENANCE_R160",
+  "initial_material_sha": "34e1b84224928e607449d34391b8e9278a21ea52",
+  "prior_material_result_sha": "67ec86f4406c3c1734c7f4a741829fcac5f433e1"
 }
