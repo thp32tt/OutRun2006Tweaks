@@ -23,6 +23,12 @@ EXPECTED = OverlapContract(
 )
 
 
+EXPECTED_PROVENANCE_FIELDS = {
+    "transition": "MANDATORY_66_0F_54_1D_20_91_61_OVERLAP_FROM_F43_CAPTURE_EDGE_VALIDATED",
+    "predecessor_proof_status": "EXACT_182F45_TO_182F7E_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+}
+
+
 def validate_overlap(contract: OverlapContract) -> None:
     if contract.end_rva <= contract.start_rva:
         raise AssertionError("continuation window must advance")
@@ -32,8 +38,15 @@ def validate_overlap(contract: OverlapContract) -> None:
         raise AssertionError("x86 overlap is too short to validate instruction prefix")
 
 
+def validate_provenance_metadata(metadata: dict[str, str]) -> None:
+    for key, expected in EXPECTED_PROVENANCE_FIELDS.items():
+        if metadata.get(key) != expected:
+            raise AssertionError(f"missing canonical provenance field: {key}")
+
+
 def test_known_dxvk_frontier_overlap() -> None:
     validate_overlap(EXPECTED)
+    validate_provenance_metadata(EXPECTED_PROVENANCE_FIELDS)
     assert EXPECTED.start_rva == 0x182F7E
     assert EXPECTED.overlap_bytes.hex(" ") == "66 0f 54 1d 20 91 61"
 
