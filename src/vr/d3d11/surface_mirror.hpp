@@ -120,4 +120,43 @@ namespace outrun::vr::dx11
         const NativeSurfaceMirror& color,
         const NativeSurfaceMirror& depth,
         std::uint64_t snapshotToken) noexcept;
+
+    // R129 consumes one sealed R119 surface-pair identity into a dormant
+    // OM render-target binding owner. apply() revalidates the live mirrors
+    // before binding, so Reset/recreation invalidates stale owners. No game
+    // Draw* path constructs or calls this owner.
+    class NativeSurfacePairBinding final
+    {
+    public:
+        NativeSurfacePairBinding() = default;
+        ~NativeSurfacePairBinding() = default;
+        NativeSurfacePairBinding(const NativeSurfacePairBinding&) = delete;
+        NativeSurfacePairBinding& operator=(const NativeSurfacePairBinding&) = delete;
+
+        bool initialize(
+            ID3D11Device* device,
+            const NativeSurfaceMirror& color,
+            const NativeSurfaceMirror& depth,
+            const NativeSurfacePairReadiness& readiness) noexcept;
+        void shutdown() noexcept;
+        [[nodiscard]] bool apply(
+            ID3D11DeviceContext* context,
+            const NativeSurfaceMirror& color,
+            const NativeSurfaceMirror& depth) const noexcept;
+
+        [[nodiscard]] bool ready() const noexcept
+        {
+            return device_ && rtv_ && dsv_ && surface_pair_snapshot_token_ != 0;
+        }
+        [[nodiscard]] std::uint64_t surface_pair_snapshot_token() const noexcept
+        {
+            return surface_pair_snapshot_token_;
+        }
+
+    private:
+        Microsoft::WRL::ComPtr<ID3D11Device> device_;
+        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> rtv_;
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilView> dsv_;
+        std::uint64_t surface_pair_snapshot_token_ = 0;
+    };
 }
