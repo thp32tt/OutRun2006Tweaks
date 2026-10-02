@@ -2565,6 +2565,35 @@ def main() -> None:
             + ", ".join(missing_r155_indexed_fan_source_content)
         )
 
+    r156_indexed_fan_vertex_capacity_contract = [
+        ("R156: indexed fan capacity follows the exact source indices",
+         NATIVE_BACKEND_CPP, "R156 indexed-fan effective vertex capacity proof"),
+        ("sourceIndexBuffer.index_range_readiness(",
+         NATIVE_BACKEND_CPP, "R156 exact MANAGED source-index window scan"),
+        ("out.sourceValueSnapshotToken = sourceVertexWindow.snapshotToken;",
+         NATIVE_BACKEND_CPP, "R156 source-value snapshot lineage"),
+        ("effectiveMinVertex >= 0",
+         NATIVE_BACKEND_CPP, "R156 negative effective vertex rejection"),
+        ("endByte <= static_cast<std::uint64_t>(vertexBuffer.byte_width())",
+         NATIVE_BACKEND_CPP, "R156 indexed-fan VB byte capacity bound"),
+        ("out.vertexBufferRangeExact ? 0x156u : 0u",
+         NATIVE_BACKEND_CPP, "R156 capacity identity in dispatch token"),
+        ("R156 indexed fan dispatch rejects effective vertex buffer overrun",
+         CONSTANT_BUFFER_PROBE, "R156 effective VB overrun fail-closed proof"),
+        ("DX11 indexed fan vertex capacity R156: PASS",
+         CONSTANT_BUFFER_PROBE, "R156 hosted probe completion marker"),
+    ]
+    missing_r156_indexed_fan_vertex_capacity = [
+        meaning
+        for token, source, meaning in r156_indexed_fan_vertex_capacity_contract
+        if token not in source
+    ]
+    if missing_r156_indexed_fan_vertex_capacity:
+        raise SystemExit(
+            "DX11 R156 indexed fan vertex-capacity contract drift: "
+            + ", ".join(missing_r156_indexed_fan_vertex_capacity)
+        )
+
     r155_direct_pointlist_raster_contract = [
         ("bool pointRasterSemanticsExact{};", NATIVE_BACKEND_HPP,
          "R155 direct point-list raster semantic gate"),
