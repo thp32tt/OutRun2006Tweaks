@@ -3431,6 +3431,42 @@ def main() -> None:
     analyzer_test = (
         ROOT / "tools" / "test_analyze_dx11_census.py"
     ).read_text(encoding="utf-8")
+    current_unsupported_analyzer_contract = [
+        ("?P<dualSource>", analyzer,
+         "current unsupported dual-source parser"),
+        ("?P<shadeMode>", analyzer,
+         "current unsupported shade-mode parser"),
+        ("?P<clipping>", analyzer,
+         "current unsupported clipping parser"),
+        ("?P<depthBias>", analyzer,
+         "current unsupported depth-bias parser"),
+        ("?P<vertexBlend>", analyzer,
+         "current unsupported vertex-blend parser"),
+        ("?P<dither>", analyzer,
+         "current unsupported dither parser"),
+        (
+            '"dualSource",\n            "shadeMode",\n'
+            '            "clipping",\n            "depthBias",\n'
+            '            "vertexBlend",\n            "dither",',
+            analyzer,
+            "current unsupported fields participate in aggregate exactness",
+        ),
+        ("extended_unsupported = run_case(", analyzer_test,
+         "current unsupported-tail analyzer regression fixture"),
+        ('extended_unsupported["UnsupportedTotalLatest"] == 27',
+         analyzer_test,
+         "current unsupported-tail aggregate regression assertion"),
+    ]
+    missing_current_unsupported_analyzer = [
+        meaning
+        for token, source, meaning in current_unsupported_analyzer_contract
+        if token not in source
+    ]
+    if missing_current_unsupported_analyzer:
+        raise SystemExit(
+            "DX11 current unsupported census analyzer contract drift: "
+            + ", ".join(missing_current_unsupported_analyzer)
+        )
     if '"NativeDrawPathActivationAllowed": False' not in analyzer:
         raise SystemExit("DX11 census must remain observation-only")
     if '"OBSERVED_SAMPLE_TRANSLATION_EXACT"' in analyzer:
