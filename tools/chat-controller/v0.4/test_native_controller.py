@@ -73,11 +73,13 @@ class NativeControllerTests(unittest.TestCase):
             self.assertNotIn('BROKER_', prompt)
             self.assertIn('플러그인', prompt)
             if name in ('localization_A', 'localization_B', 'localization_E'):
-                self.assertIn('qa_pending/candidate_awaiting_C', prompt)
+                self.assertIn('C qa_pending', prompt)
                 self.assertIn('producer 종료 조건이 아니다', prompt)
                 self.assertIn('RESULT_SHA=NOT_CREATED', prompt)
-                self.assertIn('같은 응답에서 실제 material 작업', prompt)
-                self.assertIn('FINAL_ARTWORK_FIRST', prompt)
+                self.assertIn('PIPELINE_BATCH', prompt)
+                self.assertIn('DDS candidate 2개', prompt)
+                self.assertIn('KOREAN_RENDER', prompt)
+                self.assertIn('[AUTO:TASK_ID]', prompt)
                 self.assertLessEqual(len(prompt.encode()), 1700)
             else:
                 self.assertLessEqual(len(prompt.encode()), 650)
