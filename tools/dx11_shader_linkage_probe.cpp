@@ -338,6 +338,11 @@ VSOutput main(float3 position : POSITION0)
             "R84 fixed-function pixel shader prototype generation");
 
     std::array<FixedFunctionStageState, 8> specularStages{};
+    // Keep the R198 linkage fixture on the same fully observed sampler
+    // defaults as every other active fixed-function stage. The SPECULAR
+    // selector itself does not sample texture, but readiness still validates
+    // captured sampler state for active stages.
+    specularStages[0] = active_stage();
     specularStages[0].colorOp = D3DTOP_SELECTARG1;
     specularStages[0].colorArg1 = D3DTA_SPECULAR;
     specularStages[0].alphaOp = D3DTOP_SELECTARG1;
