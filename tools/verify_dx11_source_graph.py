@@ -1721,6 +1721,54 @@ def main() -> None:
             + ", ".join(missing_r140_complete_bound_draw)
         )
 
+    r140_complete_bound_draw_contract = [
+        (
+            "struct NativeFixedFunctionCompleteBoundDrawReadiness",
+            NATIVE_BACKEND_HPP,
+            "R140 final live IA geometry evidence container",
+        ),
+        (
+            "compose_fixed_function_complete_bound_draw_readiness(",
+            NATIVE_BACKEND_HPP,
+            "R140 final live IA geometry composition API",
+        ),
+        (
+            "const auto geometryBinding = observe_fixed_function_geometry_binding(",
+            NATIVE_BACKEND_CPP,
+            "R140 final draw reobserves effective IA geometry",
+        ),
+        (
+            "geometryBinding.geometrySnapshotToken == draw.geometrySnapshotToken",
+            NATIVE_BACKEND_CPP,
+            "R140 live IA geometry must match sealed draw geometry",
+        ),
+        (
+            "R140 complete bound draw seals live IA geometry",
+            CONSTANT_BUFFER_PROBE,
+            "R140 positive final geometry proof",
+        ),
+        (
+            "R140 complete bound draw rejects live IA topology drift",
+            CONSTANT_BUFFER_PROBE,
+            "R140 live IA drift fail-closed proof",
+        ),
+        (
+            "R140 complete bound draw restores deterministic geometry snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R140 deterministic geometry restore proof",
+        ),
+    ]
+    missing_r140_complete_bound_draw = [
+        meaning
+        for token, source, meaning in r140_complete_bound_draw_contract
+        if token not in source
+    ]
+    if missing_r140_complete_bound_draw:
+        raise SystemExit(
+            "DX11 R140 complete bound draw contract drift: "
+            + ", ".join(missing_r140_complete_bound_draw)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
@@ -1734,6 +1782,8 @@ def main() -> None:
             or "validate_fixed_function_texture_binding_set_snapshot(" in runtime_source
             or "compose_fixed_function_bound_draw_readiness(" in runtime_source
             or "compose_fixed_function_same_context_bound_draw_readiness(" in runtime_source
+            or "compose_fixed_function_complete_bound_draw_readiness(" in runtime_source
+            or "validate_fixed_function_complete_bound_draw_snapshot(" in runtime_source
             or "validate_fixed_function_same_context_bound_draw_snapshot(" in runtime_source
             or "bind_fixed_function_geometry_for_observation(" in runtime_source
             or "observe_fixed_function_geometry_binding(" in runtime_source
