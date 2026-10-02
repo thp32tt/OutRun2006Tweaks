@@ -3423,6 +3423,65 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve any newer branch-authoritative frontier. If no newer continuation supersedes this edge, capture a fresh bounded canonical continuation beginning at exact instruction boundary 0x00183133, validate provenance before exact decode, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_INHERITED_PREDECESSOR_TARGET_RESOLUTION_GUARD",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "da9a4daa9ea9f85294d67fffd7f6523ab0e0d040",
+      "validation_bearing_result_sha": "872dfb4e53fe6fbe83dc9cc639035d7ea52e6c28",
+      "run_record_commit_sha": "be33b20c1c111d8c8d62d2f346f3359e75e18bce",
+      "commit_message": "dxvk: guard inherited predecessor target resolution [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Fail-closed verifier guard closes the two-window inherited forward-target handoff gap: a target carried by remaining_predecessor_target_outside_capture must be explicitly resolved once it enters the immediate successor exact capture.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Authenticated GitHub branch/state/history/Issue #14 recovered; moving same-JOB frontier refreshed repeatedly."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the generic inherited-target handoff gap after concurrent workers had already advanced the canonical F49/F50 frontier."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material verifier commit da9a4daa9ea9f85294d67fffd7f6523ab0e0d040."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Retaining descendant 872dfb4e53fe6fbe83dc9cc639035d7ea52e6c28 is one analyzer-only commit ahead; Build 36987414677 job 110775495070 Verify backend disassembly contract SUCCESS."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Required AUTO marker is in the substantive material commit; Issue #14 comment 5948715884 appended."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier-only hardening; no deployable backend or localization payload changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Run record be33b20c1c111d8c8d62d2f346f3359e75e18bce plus this lane mirror preserve the completed unit supplementally."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_GATE",
+        "exact_material_sha": "da9a4daa9ea9f85294d67fffd7f6523ab0e0d040",
+        "retaining_descendant_sha": "872dfb4e53fe6fbe83dc9cc639035d7ea52e6c28",
+        "backend_conversion_gate_run_id": 36987414677,
+        "backend_conversion_gate_job_id": 110775495070,
+        "backend_disassembly_contract": "SUCCESS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5948715884,
+      "package": "NOT_REQUIRED_STATIC_VERIFIER_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve this inherited-target handoff invariant and continue from the newest branch-authoritative canonical continuation frontier without overwriting newer primary state."
     }
   ]
 }
