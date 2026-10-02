@@ -2030,6 +2030,25 @@ def main() -> None:
             + ", ".join(missing_r146_final_fan)
         )
 
+    r147_indexed_final_fan_negative_contract = [
+        ("R147 indexed fan final draw fails closed after VS b0 drift",
+         CONSTANT_BUFFER_PROBE, "R147 indexed transform drift negative proof"),
+        ("R147 indexed fan final draw fails closed after OM target drift",
+         CONSTANT_BUFFER_PROBE, "R147 indexed OM target drift negative proof"),
+        ("R147 indexed fan final draw restores transform and OM target snapshot",
+         CONSTANT_BUFFER_PROBE, "R147 indexed deterministic restore proof"),
+    ]
+    missing_r147_indexed_final_fan_negative = [
+        meaning
+        for token, source, meaning in r147_indexed_final_fan_negative_contract
+        if token not in source
+    ]
+    if missing_r147_indexed_final_fan_negative:
+        raise SystemExit(
+            "DX11 R147 indexed final fan negative contract drift: "
+            + ", ".join(missing_r147_indexed_final_fan_negative)
+        )
+
     r147_direct_draw_dispatch_contract = [
         ("struct NativeFixedFunctionDirectDrawDispatchReadiness", NATIVE_BACKEND_HPP,
          "R147 direct dispatch readiness identity"),
