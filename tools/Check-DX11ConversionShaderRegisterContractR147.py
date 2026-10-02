@@ -10,6 +10,7 @@ from pathlib import Path
 import sys
 
 
+SCAN_SUFFIXES = ("*.cpp", "*.hpp", "*.h", "*.c")
 TRACKED_MARKERS = (
     "D3DTA_TEMP",
     "D3DTSS_RESULTARG",
@@ -21,10 +22,22 @@ FORBIDDEN = (
 )
 
 
+def iter_sources(root: Path):
+    seen = set()
+    for pattern in SCAN_SUFFIXES:
+        for path in root.rglob(pattern):
+            if path not in seen:
+                seen.add(path)
+                yield path
+
+
 def scan(root: Path) -> int:
     failures = []
     seen_marker = False
-    for path in root.rglob("*.cpp"):
+    scanned = 0
+
+    for path in iter_sources(root):
+        scanned += 1
         try:
             text = path.read_text(encoding="utf-8", errors="ignore")
         except OSError:
@@ -34,6 +47,9 @@ def scan(root: Path) -> int:
         for token in FORBIDDEN:
             if token in text:
                 failures.append(f"{path}: forbidden contract token: {token}")
+
+    if scanned == 0:
+        failures.append("no DX11 source files were scanned")
     if not seen_marker:
         failures.append("DX11 fixed-function translation markers were not found")
     if failures:
