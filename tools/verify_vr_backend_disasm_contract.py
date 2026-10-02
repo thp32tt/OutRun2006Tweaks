@@ -2096,6 +2096,49 @@ def verify_dxvk_continuation_chain() -> None:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} has a half-defined cut edge"
             )
+
+        # Modern continuation proofs use an explicit cut-edge contract: the
+        # captured incomplete bytes and capture-edge geometry are evidence, not
+        # optional telemetry. Conditional gate discovery alone is insufficient
+        # because deleting both assignments would also delete them from the set
+        # of gates that proven is required to consume. Require the modern proof
+        # template to assign, gate, and emit both values even at the newest
+        # frontier before a successor raw window exists.
+        if has_incomplete_rva and continuation_id >= 26:
+            required_cut_edge_gates = {"incomplete_matches", "capture_edge_matches"}
+            missing_cut_edge_assignments = sorted(
+                required_cut_edge_gates - assigned_names
+            )
+            if missing_cut_edge_assignments:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} modern cut-edge proof lost required evidence gates: "
+                    f"{missing_cut_edge_assignments}"
+                )
+
+            missing_cut_edge_proven_gates = sorted(
+                required_cut_edge_gates - proven_gate_names
+            )
+            if missing_cut_edge_proven_gates:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} modern cut-edge proof does not gate proven status on: "
+                    f"{missing_cut_edge_proven_gates}"
+                )
+
+            cut_edge_result_bindings = (
+                '"incomplete_matches": incomplete_matches',
+                '"capture_edge_matches": capture_edge_matches',
+            )
+            missing_cut_edge_result_bindings = [
+                marker
+                for marker in cut_edge_result_bindings
+                if marker not in proof_source
+            ]
+            if missing_cut_edge_result_bindings:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} modern cut-edge proof lost emitted evidence bindings: "
+                    f"{missing_cut_edge_result_bindings}"
+                )
+
         if not has_incomplete_rva:
             if proof_end != probe_end:
                 raise SystemExit(
