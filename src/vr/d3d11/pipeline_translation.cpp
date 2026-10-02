@@ -132,7 +132,7 @@ namespace outrun::vr::dx11
 
         bool fixed_function_argument_supported(DWORD value) noexcept
         {
-            // R175: D3DTA_COMPLEMENT and D3DTA_ALPHAREPLICATE are modifiers
+            // R178: D3DTA_COMPLEMENT and D3DTA_ALPHAREPLICATE are modifiers
             // on an otherwise supported argument selector. Preserve those
             // fixed-function semantics in generated HLSL while keeping every
             // unknown modifier bit fail-closed.
@@ -199,7 +199,7 @@ namespace outrun::vr::dx11
             default:
                 return {};
             }
-            // R175: ALPHAREPLICATE substitutes the source alpha for the
+            // R178: ALPHAREPLICATE substitutes the source alpha for the
             // RGB argument. It is a no-op for the scalar alpha path. Apply
             // COMPLEMENT after selecting/replicating the source argument.
             if ((value & static_cast<DWORD>(D3DTA_ALPHAREPLICATE)) != 0 &&
