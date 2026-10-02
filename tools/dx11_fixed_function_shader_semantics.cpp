@@ -127,6 +127,74 @@ int main()
             "destination BOTHSRCALPHA must remain fail-closed");
     }
 
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.alphaBlendEnable = TRUE;
+        state.srcBlend = D3DBLEND_SRCCOLOR2;
+        state.destBlend = D3DBLEND_ONE;
+
+        const auto translated = translate_pipeline(state);
+        const auto& rt = translated.blend.RenderTarget[0];
+        require(
+            (translated.unsupported & PipelineUnsupportedBlend) != 0,
+            "SRCCOLOR2 source blend must remain fail-closed without SV_Target1");
+        require(
+            rt.SrcBlend == D3D11_BLEND_SRC1_COLOR,
+            "SRCCOLOR2 source blend mapping drifted");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.alphaBlendEnable = TRUE;
+        state.srcBlend = D3DBLEND_INVSRCCOLOR2;
+        state.destBlend = D3DBLEND_ONE;
+
+        const auto translated = translate_pipeline(state);
+        const auto& rt = translated.blend.RenderTarget[0];
+        require(
+            (translated.unsupported & PipelineUnsupportedBlend) != 0,
+            "INVSRCCOLOR2 source blend must remain fail-closed without SV_Target1");
+        require(
+            rt.SrcBlend == D3D11_BLEND_INV_SRC1_COLOR,
+            "INVSRCCOLOR2 source blend mapping drifted");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.alphaBlendEnable = TRUE;
+        state.srcBlend = D3DBLEND_ONE;
+        state.destBlend = D3DBLEND_SRCCOLOR2;
+
+        const auto translated = translate_pipeline(state);
+        const auto& rt = translated.blend.RenderTarget[0];
+        require(
+            (translated.unsupported & PipelineUnsupportedBlend) != 0,
+            "SRCCOLOR2 destination blend must remain fail-closed without SV_Target1");
+        require(
+            rt.DestBlend == D3D11_BLEND_SRC1_COLOR,
+            "SRCCOLOR2 destination blend mapping drifted");
+    }
+
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+        state.alphaBlendEnable = TRUE;
+        state.srcBlend = D3DBLEND_ONE;
+        state.destBlend = D3DBLEND_INVSRCCOLOR2;
+
+        const auto translated = translate_pipeline(state);
+        const auto& rt = translated.blend.RenderTarget[0];
+        require(
+            (translated.unsupported & PipelineUnsupportedBlend) != 0,
+            "INVSRCCOLOR2 destination blend must remain fail-closed without SV_Target1");
+        require(
+            rt.DestBlend == D3D11_BLEND_INV_SRC1_COLOR,
+            "INVSRCCOLOR2 destination blend mapping drifted");
+    }
+
     std::array<D3DRESOURCETYPE, 8> textureTypes{};
     textureTypes.fill(D3DRTYPE_TEXTURE);
 
