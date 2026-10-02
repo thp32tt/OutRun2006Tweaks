@@ -504,6 +504,21 @@ def main() -> None:
         for token, source, meaning in r130_surface_binding_contract
         if token not in source
     ]
+    runtime_surface_binding_users = []
+    for source_path in (ROOT / "src").rglob("*.cpp"):
+        if source_path == DX11 / "surface_mirror.cpp":
+            continue
+        if "NativeSurfacePairBinding" in source_path.read_text(
+            encoding="utf-8", errors="ignore"
+        ):
+            runtime_surface_binding_users.append(
+                source_path.relative_to(ROOT).as_posix()
+            )
+    if runtime_surface_binding_users:
+        missing_surface_mirror_contract.append(
+            "R130 dormant surface binding gained production callers: "
+            + ", ".join(runtime_surface_binding_users)
+        )
     if missing_surface_mirror_contract:
         raise SystemExit(
             "DX11 dormant surface-mirror contract drift: "
