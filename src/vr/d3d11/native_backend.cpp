@@ -2628,6 +2628,118 @@ bool validate_fixed_function_nonindexed_triangle_fan_geometry_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+// R143 composes the current managed source-index identity with the generated
+// indexed triangle-fan owner. It proves provenance only; no IA binding or Draw*
+// is performed here.
+NativeFixedFunctionGeometryReadiness
+compose_fixed_function_indexed_triangle_fan_geometry_readiness(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    const NativeManagedBufferMirrorReadiness& sourceIndexBuffer,
+    const NativeTriangleFanIndexBufferReadiness& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount) noexcept {
+    NativeFixedFunctionGeometryReadiness out{};
+    const auto expansion = translate_triangle_fan_expansion(primitiveCount);
+    const bool sourceFormatExact =
+        sourceIndexFormat == D3DFMT_INDEX16 ||
+        sourceIndexFormat == D3DFMT_INDEX32;
+    const bool sourceRangeExact =
+        expansion.exact &&
+        startIndex <= sourceIndexCount &&
+        expansion.sourceElementCount <= sourceIndexCount - startIndex;
+
+    out.indexBufferRequired = true;
+    out.generatedIndexBufferRequired = true;
+    out.topology = expansion.topology;
+    out.vertexBufferSnapshotToken = vertexBuffer.snapshotToken;
+    out.indexBufferSnapshotToken = sourceIndexBuffer.snapshotToken;
+    out.generatedIndexBufferSnapshotToken =
+        generatedIndexBuffer.snapshotToken;
+
+    out.inputValid =
+        vertexBuffer.inputValid &&
+        vertexBuffer.role == ResourceRole::Vertex &&
+        sourceIndexBuffer.inputValid &&
+        sourceIndexBuffer.role == ResourceRole::Index &&
+        expansion.exact &&
+        expansion.expandedIndexCount != 0 &&
+        sourceFormatExact &&
+        sourceRangeExact;
+    out.vertexBufferReady =
+        vertexBuffer.ready && vertexBuffer.snapshotToken != 0;
+    out.indexBufferReady =
+        sourceIndexBuffer.ready && sourceIndexBuffer.snapshotToken != 0;
+    out.generatedIndexBufferReady =
+        generatedIndexBuffer.ready &&
+        generatedIndexBuffer.sourceProvenanceExact &&
+        generatedIndexBuffer.indexedSource &&
+        generatedIndexBuffer.snapshotToken != 0;
+    out.generatedIndexBufferMatchesDraw =
+        out.generatedIndexBufferReady &&
+        generatedIndexBuffer.indexCount == expansion.expandedIndexCount &&
+        generatedIndexBuffer.primitiveCount == primitiveCount &&
+        generatedIndexBuffer.sourceIndexFormat == sourceIndexFormat &&
+        generatedIndexBuffer.sourceStartIndex == startIndex &&
+        generatedIndexBuffer.sourceIndexCount == sourceIndexCount &&
+        generatedIndexBuffer.sourceIndexSnapshotToken ==
+            sourceIndexBuffer.snapshotToken &&
+        generatedIndexBuffer.contentHash != 0;
+    out.topologyReady =
+        expansion.exact &&
+        expansion.topology == D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    out.componentSnapshotsPresent =
+        vertexBuffer.snapshotToken != 0 &&
+        sourceIndexBuffer.snapshotToken != 0 &&
+        generatedIndexBuffer.snapshotToken != 0;
+    out.ready =
+        out.inputValid &&
+        out.vertexBufferReady &&
+        out.indexBufferReady &&
+        out.generatedIndexBufferReady &&
+        out.generatedIndexBufferMatchesDraw &&
+        out.topologyReady &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.vertexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.indexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.generatedIndexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(token, primitiveCount);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(sourceIndexFormat));
+        token = mix_readiness_snapshot_token(token, startIndex);
+        token = mix_readiness_snapshot_token(token, sourceIndexCount);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.topology));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_indexed_triangle_fan_geometry_snapshot(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    const NativeManagedBufferMirrorReadiness& sourceIndexBuffer,
+    const NativeTriangleFanIndexBufferReadiness& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        compose_fixed_function_indexed_triangle_fan_geometry_readiness(
+            vertexBuffer, sourceIndexBuffer, generatedIndexBuffer,
+            primitiveCount, sourceIndexFormat, startIndex, sourceIndexCount);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 NativeFixedFunctionOutputStateReadiness
 compose_fixed_function_output_state_readiness(
     const OutRunVR::DrawState::RenderStateSnapshot& source,

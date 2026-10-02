@@ -1843,6 +1843,8 @@ def main() -> None:
             or "bind_fixed_function_geometry_for_observation(" in runtime_source
             or "observe_fixed_function_geometry_binding(" in runtime_source
             or "validate_fixed_function_geometry_binding_snapshot(" in runtime_source
+            or "compose_fixed_function_indexed_triangle_fan_geometry_readiness(" in runtime_source
+            or "validate_fixed_function_indexed_triangle_fan_geometry_snapshot(" in runtime_source
             or ".binding_readiness(" in runtime_source
         ):
             runtime_textured_draw_users.append(
@@ -4716,6 +4718,74 @@ def main() -> None:
         raise SystemExit(
             "DX11 R129 generated fan geometry contract drift: "
             + ", ".join(missing_r129_generated_fan_geometry)
+        )
+
+    r143_indexed_fan_geometry_contract = [
+        (
+            "compose_fixed_function_indexed_triangle_fan_geometry_readiness(",
+            NATIVE_BACKEND_HPP,
+            "R143 indexed fan geometry readiness API",
+        ),
+        (
+            "validate_fixed_function_indexed_triangle_fan_geometry_snapshot(",
+            NATIVE_BACKEND_HPP,
+            "R143 indexed fan geometry snapshot validator",
+        ),
+        (
+            "generatedIndexBuffer.sourceIndexSnapshotToken ==\n            sourceIndexBuffer.snapshotToken",
+            NATIVE_BACKEND_CPP,
+            "R143 current source-index mirror provenance match",
+        ),
+        (
+            "generatedIndexBuffer.sourceIndexFormat == sourceIndexFormat",
+            NATIVE_BACKEND_CPP,
+            "R143 indexed fan source-format identity",
+        ),
+        (
+            "generatedIndexBuffer.sourceStartIndex == startIndex",
+            NATIVE_BACKEND_CPP,
+            "R143 indexed fan StartIndex identity",
+        ),
+        (
+            "generatedIndexBuffer.sourceIndexCount == sourceIndexCount",
+            NATIVE_BACKEND_CPP,
+            "R143 indexed fan source extent identity",
+        ),
+        (
+            "R143 indexed fan geometry seals current source-index mirror provenance",
+            CONSTANT_BUFFER_PROBE,
+            "R143 positive indexed fan lineage proof",
+        ),
+        (
+            "R143 indexed fan geometry rejects stale source-index snapshot",
+            CONSTANT_BUFFER_PROBE,
+            "R143 stale source-index lineage rejection",
+        ),
+        (
+            "R143 indexed fan geometry rejects format start and count drift",
+            CONSTANT_BUFFER_PROBE,
+            "R143 indexed draw-parameter drift rejection",
+        ),
+        (
+            "R143 indexed fan geometry rejects source role and sealed range drift",
+            CONSTANT_BUFFER_PROBE,
+            "R143 source-role and sealed-range rejection",
+        ),
+        (
+            "DX11 indexed triangle-fan geometry readiness R143: PASS",
+            CONSTANT_BUFFER_PROBE,
+            "R143 hosted probe completion marker",
+        ),
+    ]
+    missing_r143_indexed_fan_geometry = [
+        meaning
+        for token, source, meaning in r143_indexed_fan_geometry_contract
+        if token not in source
+    ]
+    if missing_r143_indexed_fan_geometry:
+        raise SystemExit(
+            "DX11 R143 indexed fan geometry contract drift: "
+            + ", ".join(missing_r143_indexed_fan_geometry)
         )
 
     r120_draw_readiness_header = {

@@ -1234,6 +1234,105 @@ int main()
         overflowFanGeometry.snapshotToken == 0,
         "R129 non-indexed fan base-vertex overflow fails closed");
 
+    auto indexedGeneratedFanReady = generatedFanReady;
+    indexedGeneratedFanReady.sourceProvenanceExact = true;
+    indexedGeneratedFanReady.indexedSource = true;
+    indexedGeneratedFanReady.primitiveCount = 3u;
+    indexedGeneratedFanReady.sourceIndexFormat = D3DFMT_INDEX16;
+    indexedGeneratedFanReady.sourceStartIndex = 2u;
+    indexedGeneratedFanReady.sourceIndexCount = 8u;
+    indexedGeneratedFanReady.sourceIndexSnapshotToken =
+        managedIndexReady.snapshotToken;
+    indexedGeneratedFanReady.snapshotToken = 0x1430F11ull;
+
+    const auto indexedFanGeometry =
+        outrun::vr::dx11::
+            compose_fixed_function_indexed_triangle_fan_geometry_readiness(
+                managedVertexPostResetReady, managedIndexReady,
+                indexedGeneratedFanReady, 3u, D3DFMT_INDEX16, 2u, 8u);
+    require(
+        indexedFanGeometry.inputValid &&
+        indexedFanGeometry.vertexBufferReady &&
+        indexedFanGeometry.indexBufferRequired &&
+        indexedFanGeometry.indexBufferReady &&
+        indexedFanGeometry.generatedIndexBufferRequired &&
+        indexedFanGeometry.generatedIndexBufferReady &&
+        indexedFanGeometry.generatedIndexBufferMatchesDraw &&
+        indexedFanGeometry.topologyReady &&
+        indexedFanGeometry.componentSnapshotsPresent &&
+        indexedFanGeometry.ready &&
+        indexedFanGeometry.topology ==
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST &&
+        indexedFanGeometry.indexBufferSnapshotToken ==
+            managedIndexReady.snapshotToken &&
+        indexedFanGeometry.generatedIndexBufferSnapshotToken ==
+            indexedGeneratedFanReady.snapshotToken &&
+        indexedFanGeometry.snapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_fixed_function_indexed_triangle_fan_geometry_snapshot(
+                managedVertexPostResetReady, managedIndexReady,
+                indexedGeneratedFanReady, 3u, D3DFMT_INDEX16, 2u, 8u,
+                indexedFanGeometry.snapshotToken),
+        "R143 indexed fan geometry seals current source-index mirror provenance");
+
+    auto staleIndexedFan = indexedGeneratedFanReady;
+    staleIndexedFan.sourceIndexSnapshotToken ^= 0x100000001b3ull;
+    staleIndexedFan.snapshotToken ^= 0x100000001b3ull;
+    const auto staleIndexedFanGeometry =
+        outrun::vr::dx11::
+            compose_fixed_function_indexed_triangle_fan_geometry_readiness(
+                managedVertexPostResetReady, managedIndexReady,
+                staleIndexedFan, 3u, D3DFMT_INDEX16, 2u, 8u);
+    require(
+        staleIndexedFanGeometry.generatedIndexBufferReady &&
+        !staleIndexedFanGeometry.generatedIndexBufferMatchesDraw &&
+        !staleIndexedFanGeometry.ready &&
+        staleIndexedFanGeometry.snapshotToken == 0,
+        "R143 indexed fan geometry rejects stale source-index snapshot");
+
+    const auto formatDriftIndexedFanGeometry =
+        outrun::vr::dx11::
+            compose_fixed_function_indexed_triangle_fan_geometry_readiness(
+                managedVertexPostResetReady, managedIndexReady,
+                indexedGeneratedFanReady, 3u, D3DFMT_INDEX32, 2u, 8u);
+    const auto startDriftIndexedFanGeometry =
+        outrun::vr::dx11::
+            compose_fixed_function_indexed_triangle_fan_geometry_readiness(
+                managedVertexPostResetReady, managedIndexReady,
+                indexedGeneratedFanReady, 3u, D3DFMT_INDEX16, 3u, 8u);
+    const auto countDriftIndexedFanGeometry =
+        outrun::vr::dx11::
+            compose_fixed_function_indexed_triangle_fan_geometry_readiness(
+                managedVertexPostResetReady, managedIndexReady,
+                indexedGeneratedFanReady, 3u, D3DFMT_INDEX16, 2u, 7u);
+    require(
+        !formatDriftIndexedFanGeometry.generatedIndexBufferMatchesDraw &&
+        !formatDriftIndexedFanGeometry.ready &&
+        !startDriftIndexedFanGeometry.generatedIndexBufferMatchesDraw &&
+        !startDriftIndexedFanGeometry.ready &&
+        !countDriftIndexedFanGeometry.generatedIndexBufferMatchesDraw &&
+        !countDriftIndexedFanGeometry.ready,
+        "R143 indexed fan geometry rejects format start and count drift");
+
+    auto wrongSourceIndexRole = managedIndexReady;
+    wrongSourceIndexRole.role = ResourceRole::Vertex;
+    const auto wrongSourceRoleIndexedFanGeometry =
+        outrun::vr::dx11::
+            compose_fixed_function_indexed_triangle_fan_geometry_readiness(
+                managedVertexPostResetReady, wrongSourceIndexRole,
+                indexedGeneratedFanReady, 3u, D3DFMT_INDEX16, 2u, 8u);
+    require(
+        !wrongSourceRoleIndexedFanGeometry.inputValid &&
+        !wrongSourceRoleIndexedFanGeometry.ready &&
+        wrongSourceRoleIndexedFanGeometry.snapshotToken == 0 &&
+        !outrun::vr::dx11::
+            validate_fixed_function_indexed_triangle_fan_geometry_snapshot(
+                managedVertexPostResetReady, managedIndexReady,
+                indexedGeneratedFanReady, 3u, D3DFMT_INDEX16, 2u, 7u,
+                indexedFanGeometry.snapshotToken),
+        "R143 indexed fan geometry rejects source role and sealed range drift");
+    std::cout << "DX11 indexed triangle-fan geometry readiness R143: PASS\n";
+
     NativeManagedBufferShadow invalidManagedBuffer;
     require(
         !invalidManagedBuffer.initialize(

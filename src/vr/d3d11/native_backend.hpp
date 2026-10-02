@@ -793,6 +793,33 @@ validate_fixed_function_nonindexed_triangle_fan_geometry_snapshot(
     UINT baseVertex,
     std::uint64_t snapshotToken) noexcept;
 
+// R143 closes the indexed triangle-fan geometry lineage gap without activating
+// Draw*. The generated R126/R129 owner is accepted only when it was built from
+// the exact current source-index mirror snapshot and the same primitive count,
+// index format, StartIndex and source-index extent supplied to this compositor.
+// The source index buffer remains provenance evidence; the generated R32_UINT
+// triangle-list owner is the eventual IA index stream.
+[[nodiscard]] NativeFixedFunctionGeometryReadiness
+compose_fixed_function_indexed_triangle_fan_geometry_readiness(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    const NativeManagedBufferMirrorReadiness& sourceIndexBuffer,
+    const NativeTriangleFanIndexBufferReadiness& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_indexed_triangle_fan_geometry_snapshot(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    const NativeManagedBufferMirrorReadiness& sourceIndexBuffer,
+    const NativeTriangleFanIndexBufferReadiness& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount,
+    std::uint64_t snapshotToken) noexcept;
+
 // R124 seals D3D9 dynamic output state into a dormant D3D11-ready snapshot.
 // It proves viewport/scissor geometry plus the OM blend factor/sample mask
 // against the current output-surface extent. Nothing here binds RS/OM state.
