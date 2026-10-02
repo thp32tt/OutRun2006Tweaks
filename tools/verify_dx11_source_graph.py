@@ -3401,6 +3401,9 @@ def main() -> None:
     analyzer = (ROOT / "tools" / "analyze_dx11_census.py").read_text(
         encoding="utf-8"
     )
+    analyzer_test = (
+        ROOT / "tools" / "test_analyze_dx11_census.py"
+    ).read_text(encoding="utf-8")
     if '"NativeDrawPathActivationAllowed": False' not in analyzer:
         raise SystemExit("DX11 census must remain observation-only")
     if '"OBSERVED_SAMPLE_TRANSLATION_EXACT"' in analyzer:
@@ -3655,8 +3658,8 @@ def main() -> None:
          "semantic readiness negative sRGB probe"),
         ("sampler owner rejects sRGB decode without sRGB SRV",
          CONSTANT_BUFFER_PROBE, "hosted sampler-owner sRGB rejection"),
-        ("samplerSrgb", ANALYZER, "census analyzer exposes sampler sRGB state"),
-        ("samplerSrgb", ANALYZER_TEST,
+        ("samplerSrgb", analyzer, "census analyzer exposes sampler sRGB state"),
+        ("samplerSrgb", analyzer_test,
          "census analyzer regression covers sampler sRGB state"),
     ]
     missing_sampler_srgb_provenance = [
