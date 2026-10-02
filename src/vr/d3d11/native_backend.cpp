@@ -2578,6 +2578,9 @@ compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
         generatedIndexBuffer.snapshotToken != 0;
     out.generatedIndexBufferMatchesDraw =
         out.generatedIndexBufferReady &&
+        !generatedIndexBuffer.indexedSource &&
+        generatedIndexBuffer.primitiveCount == primitiveCount &&
+        generatedIndexBuffer.baseVertex == baseVertex &&
         generatedIndexBuffer.indexCount == expansion.expandedIndexCount &&
         generatedIndexBuffer.contentHash == expectedContentHash;
     out.topologyReady =
@@ -3449,6 +3452,154 @@ bool validate_fixed_function_complete_bound_draw_snapshot(
         layout, vertexPrototype, pixelPrototype, samplers, textures,
         geometry, vertexBuffer, vertexStride, vertexOffset,
         indexBuffer, indexFormat, indexOffset);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
+NativeFixedFunctionCompleteFanBoundDrawReadiness
+compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex) noexcept {
+    NativeFixedFunctionCompleteFanBoundDrawReadiness out{};
+    const auto boundDraw =
+        compose_fixed_function_same_context_bound_draw_readiness(
+            draw, context, outputStateBinding, pipelineBundle,
+            layout, vertexPrototype, pixelPrototype, samplers, textures);
+    out.sameContextBoundDrawSnapshotToken = boundDraw.snapshotToken;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    if (context)
+        context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+
+    const auto currentVertex =
+        vertexBuffer.mirror_readiness(contextDevice.Get());
+    const auto currentFan =
+        generatedIndexBuffer.readiness(contextDevice.Get());
+    const auto currentGeometry =
+        compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
+            currentVertex, currentFan, primitiveCount, baseVertex);
+    const auto fanBinding =
+        generatedIndexBuffer.binding_readiness(context);
+
+    out.geometrySnapshotToken = currentGeometry.snapshotToken;
+    out.vertexBufferSnapshotToken = currentVertex.snapshotToken;
+    out.generatedIndexBindingSnapshotToken = fanBinding.snapshotToken;
+    out.inputValid =
+        context != nullptr &&
+        contextDevice != nullptr &&
+        vertexStride != 0 &&
+        boundDraw.inputValid &&
+        currentGeometry.inputValid &&
+        fanBinding.inputValid;
+    out.sameContextBoundDrawReady =
+        boundDraw.ready && boundDraw.snapshotToken != 0;
+    out.geometryReady =
+        currentGeometry.ready && currentGeometry.snapshotToken != 0;
+    out.geometryMatchesDraw =
+        draw.geometrySnapshotToken != 0 &&
+        currentGeometry.snapshotToken == draw.geometrySnapshotToken;
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer> observedVertexBuffer;
+    UINT observedStride = 0;
+    UINT observedVertexOffset = 0;
+    if (context) {
+        context->IAGetVertexBuffers(
+            0, 1, observedVertexBuffer.ReleaseAndGetAddressOf(),
+            &observedStride, &observedVertexOffset);
+    }
+    out.vertexBufferBoundExact =
+        contextDevice &&
+        vertexBuffer.mirror_device() == contextDevice.Get() &&
+        currentVertex.ready &&
+        currentVertex.snapshotToken ==
+            currentGeometry.vertexBufferSnapshotToken &&
+        observedVertexBuffer.Get() == vertexBuffer.mirror_buffer() &&
+        observedStride == vertexStride &&
+        observedVertexOffset == vertexOffset;
+    out.generatedIndexBindingReady =
+        fanBinding.ready && fanBinding.snapshotToken != 0;
+    out.generatedIndexMatchesGeometry =
+        currentFan.ready &&
+        currentFan.snapshotToken != 0 &&
+        currentGeometry.generatedIndexBufferRequired &&
+        currentGeometry.generatedIndexBufferSnapshotToken ==
+            currentFan.snapshotToken &&
+        fanBinding.ownerSnapshotToken == currentFan.snapshotToken;
+    out.componentSnapshotsPresent =
+        boundDraw.snapshotToken != 0 &&
+        currentGeometry.snapshotToken != 0 &&
+        currentVertex.snapshotToken != 0 &&
+        fanBinding.snapshotToken != 0;
+    out.ready =
+        out.inputValid &&
+        out.sameContextBoundDrawReady &&
+        out.geometryReady &&
+        out.geometryMatchesDraw &&
+        out.vertexBufferBoundExact &&
+        out.generatedIndexBindingReady &&
+        out.generatedIndexMatchesGeometry &&
+        out.componentSnapshotsPresent;
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.sameContextBoundDrawSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.geometrySnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.vertexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.generatedIndexBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(
+                    observedVertexBuffer.Get())));
+        token = mix_readiness_snapshot_token(token, observedStride);
+        token = mix_readiness_snapshot_token(token, observedVertexOffset);
+        token = mix_readiness_snapshot_token(token, primitiveCount);
+        token = mix_readiness_snapshot_token(token, baseVertex);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool
+validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current =
+        compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(
+            draw, context, outputStateBinding, pipelineBundle,
+            layout, vertexPrototype, pixelPrototype, samplers, textures,
+            vertexBuffer, vertexStride, vertexOffset,
+            generatedIndexBuffer, primitiveCount, baseVertex);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
