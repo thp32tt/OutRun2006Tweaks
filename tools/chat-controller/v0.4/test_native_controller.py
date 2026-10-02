@@ -2,6 +2,7 @@
 import ast
 import asyncio
 import hashlib
+import json
 import re
 from pathlib import Path
 from types import SimpleNamespace
@@ -16,7 +17,7 @@ FUNCTIONS = {n.name: n for n in TREE.body if isinstance(n, (ast.FunctionDef, ast
 
 
 def load_function(name, **overrides):
-    ns = dict(re=re, datetime=datetime, timedelta=timedelta, TZ=timezone.utc,
+    ns = dict(re=re, json=json, datetime=datetime, timedelta=timedelta, TZ=timezone.utc,
               GITHUB_BROKER_ENABLED=False, NATIVE_PLUGIN_PROTOCOL_VERSION=2,
               GITHUB_ASSISTANT_RECOVERY_MAX=2, GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS=300,
               SAME_TASK_CONTROL_GAP_SECONDS=15,
