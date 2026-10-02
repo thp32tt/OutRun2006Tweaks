@@ -167,7 +167,16 @@ def queue_rollover_prompt(active: dict) -> str:
         lines += [
             f"CONTROLLER_SCHEMA_VERSION={schema_version}",
             f"CONTROLLER_CONFIG_BLOB_SHA={config_blob_sha}",
+            localization_final_artwork_progress_hint(active["branch"]),
         ]
+        if _is_localization_producer(active):
+            lines += [
+                "ACTIVE_TASK_LATCH=ON",
+                f"CONTROLLER_STAGE={active.get('controller_stage') or 'WAIT_MATERIAL_COMMIT'}",
+                f"LAST_CHECKPOINT_HEAD={active.get('last_checkpoint_head') or active.get('base_sha') or ''}",
+                f"PREMATURE_STOP_RECOVERY_TOTAL={int(active.get('premature_stop_total', 0) or 0)}",
+                "FIRST_EXECUTION_ACTION=DO_NOT_PLAN; resume material/tool execution immediately.",
+            ]
     lines += [
         "같은 TASK_ID를 계속해. 완료 작업 반복 금지. 실기 미검증이면 RUNTIME_VALIDATION=UNTESTED.",
     ]
@@ -183,11 +192,17 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         return False
     count = int(active.get("chat_rollovers", 0))
     if count >= MAX_CHAT_ROLLOVERS_PER_TASK:
-        active["failure_context"] = (
-            f"conversation rollover limit reached ({MAX_CHAT_ROLLOVERS_PER_TASK}) after: {reason}"
-        )
-        active["phase"] = "BLOCKED"
-        return False
+        if _is_localization_producer(active) and active.get("task_latched", True):
+            # Producer continuity outranks the legacy per-task chat budget.
+            # Rollovers are already gated by explicit failure signals and send spacing.
+            active["rollover_soft_limit_exceeded"] = count
+            active["assistant_claim_verification"] = "ACTIVE_TASK_LATCH_ROLLOVER_RECOVERY"
+        else:
+            active["failure_context"] = (
+                f"conversation rollover limit reached ({MAX_CHAT_ROLLOVERS_PER_TASK}) after: {reason}"
+            )
+            active["phase"] = "BLOCKED"
+            return False
 
     now = datetime.now(TZ)
     reg = load_registry(now)
@@ -557,30 +572,76 @@ async def queue_send_producer_execution_continuation(
     active: dict,
     response_hash: str,
 ) -> bool:
-    """A producer status/plan response without a durable task commit is never terminal."""
+    """Keep a producer TASK latched through premature assistant turn termination."""
     now = datetime.now(TZ)
-    if active.get("producer_continuation_response_hash") == response_hash:
-        last = _parse_iso(active.get("producer_continuation_sent_at"))
-        if last and (now - last).total_seconds() < GITHUB_TOOLING_RETRY_COOLDOWN_SECONDS:
-            write_runtime(
-                status="producer_execution_wait",
-                last_action=f"{active['task_id']} waiting for material execution / durable Git result",
-                queue=active,
-            )
-            return True
+    active["task_latched"] = True
+    active["controller_stage"] = "WAIT_MATERIAL_COMMIT"
+
+    # Count at most once for the controller request that produced this assistant turn.
+    # send_message/control traffic updates active["sent_at"], making the next turn a
+    # new countable observation even if the model repeats identical prose.
+    turn_key = str(active.get("sent_at") or active.get("dispatch_started_at") or "")
+    if active.get("premature_stop_counted_for_send_at") != turn_key:
+        active["premature_stop_count"] = int(active.get("premature_stop_count", 0) or 0) + 1
+        active["premature_stop_total"] = int(active.get("premature_stop_total", 0) or 0) + 1
+        active["premature_stop_counted_for_send_at"] = turn_key
+        active["last_premature_stop_at"] = now.isoformat()
+        active["last_premature_response_hash"] = response_hash
 
     latest_head = github_branch_head(active["branch"])
     if not latest_head:
         return False
 
+    active["last_checkpoint_head"] = latest_head
+    active["last_checkpoint_at"] = now.isoformat()
+    active["last_checkpoint_stage"] = "WAIT_MATERIAL_COMMIT"
+
+    strikes = int(active.get("premature_stop_count", 0) or 0)
+    if strikes >= PREMATURE_STOP_ROLLOVER_THRESHOLD:
+        reason = (
+            f"PREMATURE_STOP:{strikes} consecutive assistant turns ended without a durable material result; "
+            "same TASK_ID must continue from the persistent controller checkpoint in a fresh chat."
+        )
+        active["failure_context"] = reason
+        active["assistant_claim_verification"] = "PREMATURE_STOP_ROLLOVER_REQUIRED"
+        rolled = await queue_rollover_chat(context, pages, active, reason)
+        if rolled:
+            active["premature_stop_count"] = 0
+            active["producer_continuation_response_hash"] = None
+            active["producer_continuation_sent_at"] = None
+            active["controller_stage"] = "WAIT_MATERIAL_COMMIT"
+            active["assistant_claim_verification"] = "PREMATURE_STOP_ROLLOVER_SENT"
+            return True
+        # A send/rate-limit guard may defer rollover. Keep the task active and
+        # retry later; never convert this recoverable state to terminal failure.
+        active["phase"] = "WAIT_CHAT"
+        active["terminal"] = None
+        write_runtime(
+            status="producer_rollover_wait",
+            last_action=f"{active['task_id']} remains ACTIVE; premature-stop rollover deferred",
+            queue=active,
+        )
+        return True
+
+    if active.get("producer_continuation_response_hash") == response_hash:
+        last = _parse_iso(active.get("producer_continuation_sent_at"))
+        if last and (now - last).total_seconds() < PRODUCER_CONTINUATION_COOLDOWN_SECONDS:
+            write_runtime(
+                status="producer_execution_wait",
+                last_action=f"{active['task_id']} remains ACTIVE waiting for material execution / durable Git result",
+                queue=active,
+            )
+            return True
+
     prompt = (
         f"TASK_ID={active['task_id']} BRANCH={active['branch']} HEAD={latest_head}\n"
-        "INTERMEDIATE_STATUS_NOT_TERMINAL. 상태 재구성, HEAD 확인, 후보 스캔, 계획/다음 단계 작성은 중간 단계다. "
-        "RESULT_SHA=NOT_CREATED/미커밋 상태로 응답을 끝내지 마. 사용자 확인을 기다리지 말고 지금 이 TASK_ID에서 "
-        "실제 material 작업을 계속 실행해. 자기 shard의 runnable/fallback 작업을 수행하고 검증한 뒤 "
-        "반드시 새 [AUTO:TASK_ID] durable commit까지 만든 후에만 결과를 종료 보고해. "
-        "현재 후보가 막히면 계약의 fallback ladder로 다음 독립 미완료 작업을 계속해. "
-        "'다음 단계'를 다시 설명하지 말고 도구 호출과 실제 변경부터 수행해."
+        f"ACTIVE_TASK_LATCH=ON PREMATURE_STOP={strikes}/{PREMATURE_STOP_ROLLOVER_THRESHOLD} "
+        "CONTROLLER_STAGE=WAIT_MATERIAL_COMMIT. "
+        "INTERMEDIATE_STATUS_NOT_TERMINAL. 상태 재구성/HEAD 확인/후보 스캔/계획은 이미 끝난 중간 단계로 취급해. "
+        "RESULT_SHA=NOT_CREATED/미커밋 상태로 응답을 끝내지 마. 사용자 확인 없이 지금 도구 호출부터 시작해서 "
+        "실제 DDS/material 작업→검증→새 [AUTO:TASK_ID] durable commit까지 같은 TASK_ID에서 계속해. "
+        "현재 asset이 dependency-blocked면 같은 shard의 다음 독립 runnable asset으로 즉시 전환해. "
+        "'다음 단계'를 설명하지 말고 실행해."
     )
     sent = await queue_send_same_chat_control_message(
         context,
@@ -593,7 +654,7 @@ async def queue_send_producer_execution_continuation(
     if sent:
         active["producer_continuation_response_hash"] = response_hash
         active["producer_continuation_sent_at"] = now.isoformat()
-        active["assistant_claim_verification"] = "INTERMEDIATE_STATUS_REJECTED"
+        active["assistant_claim_verification"] = "INTERMEDIATE_STATUS_REJECTED_TASK_STILL_ACTIVE"
     return sent
 
 
@@ -988,6 +1049,13 @@ async def localization_send_lane_task(
         "failure_context": "",
         "qa_batch": [dict(item) for item in (qa_batch or [])],
         "native_plugin_protocol_version": NATIVE_PLUGIN_PROTOCOL_VERSION,
+        "task_latched": slot_name in {"A", "B", "D"},
+        "controller_stage": "WAIT_MATERIAL_COMMIT" if slot_name in {"A", "B", "D"} else "WAIT_QA_RESULT",
+        "premature_stop_count": 0,
+        "premature_stop_total": 0,
+        "premature_stop_counted_for_send_at": None,
+        "last_checkpoint_head": base_sha,
+        "last_checkpoint_at": dispatch_started_at.isoformat(),
     }
     q["counter"] = task_counter
     q.setdefault("active_by_lane", {})[slot_name] = provisional
@@ -1110,6 +1178,8 @@ async def localization_recover_rejected_producer_commit(
     active["assistant_claim_verification"] = "REJECTED_NO_WORK_COMPLETION"
     active["phase"] = "WAIT_CHAT"
     active["terminal"] = None
+    active["task_latched"] = True
+    active["controller_stage"] = "WAIT_MATERIAL_COMMIT"
     active["result_sha"] = None
     active["automation_validation"] = "PENDING"
     invalidate_task_commit_cache(active["branch"], active["task_id"])
@@ -1181,6 +1251,11 @@ def finalize_localization_producer_commit(q: dict, active: dict, task_commit: di
     active["completed_at"] = now.isoformat()
     active["terminal"] = "PRODUCED"
     active["phase"] = "DONE"
+    active["task_latched"] = False
+    active["controller_stage"] = "DONE"
+    active["last_material_progress_at"] = now.isoformat()
+    active["last_checkpoint_head"] = task_commit["sha"]
+    active["last_checkpoint_at"] = now.isoformat()
     for key in (
         "gate_run",
         "last_gate_poll_at",
@@ -1216,6 +1291,8 @@ def localization_reconcile_producer_commit_without_ui(
     active["producer_no_work_rejected_sha"] = task_commit.get("sha")
     active["producer_no_work_guard_reasons"] = reasons
     active["assistant_claim_verification"] = "REJECTED_NO_WORK_COMPLETION"
+    active["task_latched"] = True
+    active["controller_stage"] = "WAIT_MATERIAL_COMMIT"
     active["failure_context"] = f"NO_WORK_GUARD_REARMED_{source}"
     active.pop("completed_at", None)
     active.pop("batch_validation_pending", None)
