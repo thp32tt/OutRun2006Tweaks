@@ -1190,46 +1190,62 @@ def main() -> None:
             + ", ".join(missing_detailed_ffp_demand_census)
         )
 
-    r200_temp_register_contract = [
+    r201_temp_default_contract = [
         ("case D3DTA_TEMP:", PIPELINE_TRANSLATION_CPP,
-         "R200 D3DTA_TEMP selector support"),
-        ("fixed_function_op_uses_temp_argument(",
-         PIPELINE_TRANSLATION_CPP,
-         "R200 TEMP dependency classifier"),
-        ("bool tempAvailable = false;", PIPELINE_TRANSLATION_CPP,
-         "R200 readiness TEMP lifetime"),
-        ("stage.resultArg == D3DTA_TEMP", PIPELINE_TRANSLATION_CPP,
-         "R200 TEMP result destination"),
+         "R200/R201 D3DTA_TEMP selector support"),
+        ("stage.resultArg != D3DTA_TEMP", PIPELINE_TRANSLATION_CPP,
+         "R201 CURRENT/TEMP result destination gate"),
         ('"    float4 temp = 0.0f;\\n"', PIPELINE_TRANSLATION_CPP,
-         "R200 generated HLSL TEMP register"),
+         "R201 generated HLSL TEMP default-zero register"),
         ('"        temp = float4(nextColor, nextAlpha);\\n"',
          PIPELINE_TRANSLATION_CPP,
          "R200 generated HLSL TEMP write"),
         ("R200 D3DTSS_RESULTARG TEMP write/read chain must become exact",
          FIXED_FUNCTION_PIPELINE_PROBE,
          "R200 hosted TEMP write/read fixture"),
-        ("R200 uninitialized D3DTA_TEMP read must fail closed",
+        ("R201 default-zero D3DTA_TEMP read must remain exact",
          FIXED_FUNCTION_PIPELINE_PROBE,
-         "R200 uninitialized TEMP fail-closed fixture"),
-        ("R200 TEMP register fixed-function shader prototype did not compile",
+         "R201 default-zero TEMP readiness fixture"),
+        ("R201 default-zero TEMP fixed-function shader did not compile",
          FIXED_FUNCTION_PIPELINE_PROBE,
-         "R200 offline compile assertion"),
-        ("DX11 fixed-function RESULTARG TEMP register support R200: PASS",
+         "R201 default-zero TEMP offline compile assertion"),
+        ("DX11 fixed-function TEMP default-zero semantics R201: PASS",
          FIXED_FUNCTION_PIPELINE_PROBE,
-         "R200 hosted probe completion"),
+         "R201 hosted probe completion"),
+        ("RESULTARG-001 default-zero TEMP read must remain exact",
+         SEMANTIC_SMOKE,
+         "R201 semantic smoke default-zero TEMP readiness"),
+        ("RESULTARG-001 default-zero TEMP shader semantics drift",
+         SEMANTIC_SMOKE,
+         "R201 semantic smoke default-zero TEMP shader dataflow"),
+        ("FFP_SUPPORTED_ARGUMENT_SELECTORS = frozenset({0, 1, 2, 3, 4, 5, 6})",
+         analyzer,
+         "R200 census TEMP selector support"),
+        ("FFP_SUPPORTED_RESULT_ARGS = frozenset({1, 5})",
+         analyzer,
+         "R200 census CURRENT/TEMP destination support"),
+        ('r198_demand["UnsupportedResultArgs"] == [',
+         analyzer_test,
+         "R200 census invalid RESULTARG separation"),
     ]
-    missing_r200_temp_register = [
+    missing_r201_temp_default = [
         meaning
-        for token, source, meaning in r200_temp_register_contract
+        for token, source, meaning in r201_temp_default_contract
         if token not in source
     ]
+    if "bool tempAvailable = false;" in PIPELINE_TRANSLATION_CPP:
+        missing_r201_temp_default.append(
+            "R201 TEMP default-zero read must not depend on a prior write")
+    if "fixed_function_op_uses_temp_argument(" in PIPELINE_TRANSLATION_CPP:
+        missing_r201_temp_default.append(
+            "R201 obsolete TEMP-before-write dependency classifier must be removed")
     if PIPELINE_TRANSLATION_CPP.count("case D3DTA_TEMP:") < 2:
-        missing_r200_temp_register.append(
-            "R200 TEMP must participate in selector validation and HLSL translation")
-    if missing_r200_temp_register:
+        missing_r201_temp_default.append(
+            "R200/R201 TEMP must participate in selector validation and HLSL translation")
+    if missing_r201_temp_default:
         raise SystemExit(
-            "DX11 R200 fixed-function TEMP register contract drift: "
-            + ", ".join(missing_r200_temp_register)
+            "DX11 R201 fixed-function TEMP default contract drift: "
+            + ", ".join(missing_r201_temp_default)
         )
 
     # R166 makes the enum-owned one-past-last sentinel the census authority.

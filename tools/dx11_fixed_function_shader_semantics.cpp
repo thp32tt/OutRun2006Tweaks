@@ -935,10 +935,22 @@ int main()
             translate_fixed_function_readiness(
                 uninitializedTemp, true, 0x00, 0x00);
         require(
-            !uninitializedResult.exact() &&
+            uninitializedResult.exact() &&
             (uninitializedResult.unsupported &
-             FixedFunctionUnsupportedResultArg) != 0,
-            "RESULTARG-001 uninitialized TEMP read must fail closed");
+             FixedFunctionUnsupportedResultArg) == 0,
+            "RESULTARG-001 default-zero TEMP read must remain exact");
+        const auto uninitializedPrototype =
+            generate_fixed_function_pixel_shader_prototype(
+                uninitializedTemp, true, 0x00, 0x00, textureTypes);
+        require(
+            uninitializedPrototype.generated() &&
+            uninitializedPrototype.source.find("float4 temp = 0.0f;") !=
+                std::string::npos &&
+            uninitializedPrototype.source.find(
+                "float3 nextColor = temp.rgb;") != std::string::npos &&
+            uninitializedPrototype.source.find(
+                "float nextAlpha = temp.a;") != std::string::npos,
+            "RESULTARG-001 default-zero TEMP shader semantics drift");
     }
 
     {

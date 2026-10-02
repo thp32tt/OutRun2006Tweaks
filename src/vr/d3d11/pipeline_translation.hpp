@@ -101,9 +101,9 @@ namespace outrun::vr::dx11
         // current native Texture2D SRV path is not yet format-promoted to an
         // sRGB view, so nonzero state must remain fail-closed.
         FixedFunctionUnsupportedSamplerSrgb = 1u << 11,
-        // R200: D3DTSS_RESULTARG may target CURRENT or TEMP. This bit guards
-        // invalid destinations and TEMP reads before an earlier stage has
-        // initialized the temporary register.
+        // R201: D3DTSS_RESULTARG may target CURRENT or TEMP. TEMP is readable
+        // from its D3D9 default transparent-black value even before a write;
+        // this bit therefore guards only invalid result destinations.
         FixedFunctionUnsupportedResultArg = 1u << 12,
     };
 
@@ -122,9 +122,9 @@ namespace outrun::vr::dx11
         // R197: D3DTSS_CONSTANT is an ARGB per-stage color selected by
         // D3DTA_CONSTANT. Direct3D 9 defines an opaque-white default.
         DWORD stageConstant = 0xFFFFFFFFu;
-        // D3D9 defaults stage output to CURRENT. R200 models TEMP as a
-        // separate cross-stage register while preserving CURRENT when a stage
-        // explicitly redirects its result to D3DTA_TEMP.
+        // D3D9 defaults stage output to CURRENT. TEMP is a separate
+        // cross-stage register initialized to transparent black; redirecting a
+        // result to TEMP preserves CURRENT.
         DWORD resultArg = D3DTA_CURRENT;
         DWORD texCoordIndex = 0;
         DWORD textureTransformFlags = D3DTTFF_DISABLE;

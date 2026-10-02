@@ -388,10 +388,30 @@ int main()
             translate_fixed_function_readiness(
                 uninitializedTemp, true, 0x00u, 0x00u);
         require(
-            !uninitializedReadiness.exact() &&
+            uninitializedReadiness.exact() &&
             (uninitializedReadiness.unsupported &
-             FixedFunctionUnsupportedResultArg) != 0,
-            "R200 uninitialized D3DTA_TEMP read must fail closed");
+             FixedFunctionUnsupportedResultArg) == 0,
+            "R201 default-zero D3DTA_TEMP read must remain exact");
+        const auto uninitializedShader =
+            generate_fixed_function_pixel_shader_prototype(
+                uninitializedTemp, true, 0x00u, 0x00u, textureTypes);
+        require(
+            uninitializedShader.generated() &&
+            uninitializedShader.source.find("float4 temp = 0.0f;") !=
+                std::string::npos &&
+            uninitializedShader.source.find(
+                "float3 nextColor = temp.rgb;") != std::string::npos &&
+            uninitializedShader.source.find(
+                "float nextAlpha = temp.a;") != std::string::npos,
+            "R201 default-zero TEMP shader semantics drift");
+        const auto uninitializedCompile =
+            compile_fixed_function_pixel_shader_prototype(uninitializedShader);
+        require(
+            uninitializedCompile.attempted &&
+            uninitializedCompile.succeeded &&
+            uninitializedCompile.result == S_OK &&
+            uninitializedCompile.bytecodeBytes != 0,
+            "R201 default-zero TEMP fixed-function shader did not compile");
 
         auto invalidDestination = tempStages;
         invalidDestination[0].resultArg = D3DTA_DIFFUSE;
@@ -1656,7 +1676,7 @@ int main()
         << "DX11 fixed-function D3DTOP_SUBTRACT support R177: PASS\n"
         << "DX11 fixed-function argument modifiers R178: PASS\n"
         << "DX11 fixed-function D3DTOP_ADD support: PASS\n"
-        << "DX11 fixed-function RESULTARG TEMP register support R200: PASS\n"
+        << "DX11 fixed-function TEMP default-zero semantics R201: PASS\n"
         << "DX11 multisample raster provenance R171: PASS\n"
         << "DX11 texture-coordinate wrap fail-closed R170: PASS\n"
         << "DX11 line-raster provenance R168: PASS\n"

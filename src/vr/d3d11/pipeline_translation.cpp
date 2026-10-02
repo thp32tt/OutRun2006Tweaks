@@ -217,51 +217,6 @@ namespace outrun::vr::dx11
             return (value & D3DTA_SELECTMASK) == D3DTA_CURRENT;
         }
 
-        bool fixed_function_argument_uses_temp(DWORD value) noexcept
-        {
-            return (value & D3DTA_SELECTMASK) == D3DTA_TEMP;
-        }
-
-        bool fixed_function_op_uses_temp_argument(
-            DWORD op, DWORD arg0, DWORD arg1, DWORD arg2) noexcept
-        {
-            switch (op)
-            {
-            case D3DTOP_SELECTARG1:
-            case D3DTOP_PREMODULATE:
-                return fixed_function_argument_uses_temp(arg1);
-            case D3DTOP_SELECTARG2:
-                return fixed_function_argument_uses_temp(arg2);
-            case D3DTOP_MODULATE:
-            case D3DTOP_MODULATE2X:
-            case D3DTOP_MODULATE4X:
-            case D3DTOP_ADD:
-            case D3DTOP_ADDSIGNED:
-            case D3DTOP_ADDSIGNED2X:
-            case D3DTOP_ADDSMOOTH:
-            case D3DTOP_BLENDDIFFUSEALPHA:
-            case D3DTOP_BLENDCURRENTALPHA:
-            case D3DTOP_BLENDFACTORALPHA:
-            case D3DTOP_BLENDTEXTUREALPHA:
-            case D3DTOP_BLENDTEXTUREALPHAPM:
-            case D3DTOP_MODULATEALPHA_ADDCOLOR:
-            case D3DTOP_MODULATECOLOR_ADDALPHA:
-            case D3DTOP_MODULATEINVALPHA_ADDCOLOR:
-            case D3DTOP_MODULATEINVCOLOR_ADDALPHA:
-            case D3DTOP_DOTPRODUCT3:
-            case D3DTOP_SUBTRACT:
-                return fixed_function_argument_uses_temp(arg1) ||
-                       fixed_function_argument_uses_temp(arg2);
-            case D3DTOP_MULTIPLYADD:
-            case D3DTOP_LERP:
-                return fixed_function_argument_uses_temp(arg0) ||
-                       fixed_function_argument_uses_temp(arg1) ||
-                       fixed_function_argument_uses_temp(arg2);
-            default:
-                return false;
-            }
-        }
-
         bool fixed_function_op_uses_current_argument(
             DWORD op, DWORD arg0, DWORD arg1, DWORD arg2) noexcept
         {
@@ -1111,7 +1066,6 @@ namespace outrun::vr::dx11
         bool colorChainDisabled = false;
         bool premodulateColor = false;
         bool premodulateAlpha = false;
-        bool tempAvailable = false;
         for (std::size_t stageIndex = 0;
              stageIndex < source.size(); ++stageIndex)
         {
@@ -1139,22 +1093,11 @@ namespace outrun::vr::dx11
                 stage.alphaOp, stage.alphaArg0, stage.alphaArg1, stage.alphaArg2,
                 FixedFunctionUnsupportedAlphaOp, true, out);
 
-            // R200: TEMP is a distinct cross-stage register. A stage may read
-            // it only after an earlier active stage wrote RESULTARG=TEMP; the
-            // write itself happens after this stage's arguments are consumed.
-            const bool readsTemp =
-                fixed_function_op_uses_temp_argument(
-                    stage.colorOp, stage.colorArg0,
-                    stage.colorArg1, stage.colorArg2) ||
-                fixed_function_op_uses_temp_argument(
-                    stage.alphaOp, stage.alphaArg0,
-                    stage.alphaArg1, stage.alphaArg2);
-            if (readsTemp && !tempAvailable)
-                out.unsupported |= FixedFunctionUnsupportedResultArg;
-
-            if (stage.resultArg == D3DTA_TEMP)
-                tempAvailable = true;
-            else if (stage.resultArg != D3DTA_CURRENT)
+            // R201: D3D9 defines the TEMP register's device default as
+            // transparent black, so TEMP is readable before any stage writes
+            // it. RESULTARG itself remains exact only for CURRENT or TEMP.
+            if (stage.resultArg != D3DTA_CURRENT &&
+                stage.resultArg != D3DTA_TEMP)
                 out.unsupported |= FixedFunctionUnsupportedResultArg;
 
             const auto stageBit = static_cast<std::uint8_t>(
