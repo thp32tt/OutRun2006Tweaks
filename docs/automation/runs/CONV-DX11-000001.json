@@ -891,8 +891,124 @@
       "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
       "runtime_claim": "NONE",
       "state_persisted": true
+    },
+    {
+      "unit_id": "DX11_DYNAMIC_OUTPUT_STATE_PROVENANCE_R124",
+      "job_id": "CONV-DX11-000001",
+      "lane": "DX11",
+      "selected_work": "DX11_DYNAMIC_OUTPUT_STATE_PROVENANCE",
+      "base_sha": "7716fa911645fffa0e95ec8787922392bc1b0d11",
+      "material_result_sha": "0c2d584a46dbfb6808434ddeaa3f94a1d54d9ad7",
+      "validation_bearing_sha": "5f390182dedff22c8be47b9b519f619c4f794e57",
+      "implementation_commits": [
+        "4c38e138bf9ad67c056d603da5f878bee5db3fad",
+        "03077d1726f9ce5a5f023cb7b1ba3cc672b3aff3",
+        "ccd34f6caff1b9c181531e05f94f3471fd93b1b2",
+        "9edc5f6952825824d23f6c476e097b85aa6dc530",
+        "29edace77cc11d3e93e2bad9f8d38c1f81d650cf",
+        "9cd39ed5ef36b85720993781a4ceb65c17a598f5",
+        "c01bb339838d98fb9156a47a5d93fd42d909b539",
+        "0c2d584a46dbfb6808434ddeaa3f94a1d54d9ad7"
+      ],
+      "runtime_validation": "UNTESTED",
+      "runtime_test_performed": false,
+      "n100_used": false,
+      "pc_fast_used": false,
+      "selection_reason": "The durable branch-local next action identified viewport/scissor/OM-state provenance as the next independent DX11 readiness gap. Existing composite draw readiness sealed activation, translated render state, exact output surfaces and geometry, but did not prove the D3D9 dynamic viewport, scissor rectangle, blend factor or multisample mask identity.",
+      "summary": "Added passive D3D9 dynamic output-state capture and a fail-closed dormant DX11 output-state readiness snapshot. Viewport/scissor are validated against the exact surface-pair extent, D3DCOLOR BLENDFACTOR is translated to RGBA float factors, MULTISAMPLEMASK is preserved, and the output-state token is now required by composite fixed-function draw readiness. Native Draw* remains disabled.",
+      "changed_paths": [
+        "src/vr/core/d3d9_draw_state.hpp",
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "src/vr/d3d11/native_backend.hpp",
+        "src/vr/d3d11/native_backend.cpp",
+        "tools/dx11_constant_buffer_probe.cpp",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "stages": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Read current branch AGENTS.md, conversion lane state, current run record, DX11 plan, regression knowledge/history and Issue #14 through the authenticated GitHub connector.",
+            "Detected same-JOB branch churn and selected the documented independent output-state readiness gap rather than duplicating concurrent triangle-fan or managed-buffer work."
+          ]
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": [
+            "Confirmed RenderStateSnapshot tracked scissor enable and stencil reference but not the actual viewport/scissor rectangle or OM blend-factor/sample-mask dynamic state.",
+            "Confirmed NativeFixedFunctionDrawReadiness required activation/render-state/surface-pair/geometry snapshots but had no dynamic output-state snapshot."
+          ]
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "changed_paths": [
+            "src/vr/core/d3d9_draw_state.hpp",
+            "src/vr/d3d9/stereo_renderer_r7.inc",
+            "src/vr/d3d11/native_backend.hpp",
+            "src/vr/d3d11/native_backend.cpp",
+            "tools/dx11_constant_buffer_probe.cpp",
+            "tools/verify_dx11_source_graph.py"
+          ],
+          "material_commit": "0c2d584a46dbfb6808434ddeaa3f94a1d54d9ad7",
+          "details": [
+            "Captured D3DRS_BLENDFACTOR, D3DRS_MULTISAMPLEMASK, GetViewport and GetScissorRect with a separate outputStateComplete bit so legacy render-state completeness semantics are unchanged.",
+            "Added NativeFixedFunctionOutputStateReadiness with surface-extent viewport/scissor bounds, ARGB-to-RGBA blend-factor conversion, sample-mask propagation and stale snapshot token validation.",
+            "Required the output-state snapshot in composite fixed-function draw readiness and mixed it into the draw token.",
+            "Added hosted WARP probe cases and source-graph drift guards for exact, incomplete, out-of-bounds and stale-identity behavior."
+          ]
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE_REMOTE_STATIC",
+          "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_CI_BUILD_SUPERSEDED",
+          "evidence": [
+            "Exact material SHA 0c2d584a46dbfb6808434ddeaa3f94a1d54d9ad7 was re-fetched through authenticated GitHub and contains the six intended R124 source/test/guard paths with the explicit draw-state header dependency.",
+            "Descendant 5f390182dedff22c8be47b9b519f619c4f794e57 retained the R124 paths. Build run 36972454520 job 110729124678 passed Verify DX11 source graph and Test DX11 census analyzer.",
+            "The same descendant job was cancelled by a later same-branch push during an unrelated wheel-FFB step, so Configure/Build and the hosted WARP readiness probe did not complete and are not claimed.",
+            "An earlier descendant source-graph failure was caused by concurrent triangle_fan_index_buffer.cpp missing from CMake; later concurrent commits repaired that unrelated graph omission before the successful R124-bearing source-graph pass."
+          ],
+          "source_graph": "PASS_DESCENDANT_CI",
+          "census_analyzer": "PASS_DESCENDANT_CI",
+          "full_win32_build": "UNCONFIRMED_SUPERSEDED",
+          "hosted_warp_probe": "UNCONFIRMED_SUPERSEDED",
+          "runtime_validation": "UNTESTED"
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "required_marker": "[AUTO:CONV-DX11-000001]",
+          "material_commit": "0c2d584a46dbfb6808434ddeaa3f94a1d54d9ad7",
+          "issue14_comment_id": 5946561851
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Dormant readiness/capture/test/guard work only; no native game Draw* routing, RS/OM binding activation, runtime candidate payload or release package behavior was enabled."
+        },
+        "C6_STATE": {
+          "status": "PERSISTING_WITH_THIS_STATE_UPDATE",
+          "exact_next_action": "Keep NativeDrawPathActive disabled. In a later independent unit, consume the sealed output-state payload in a dormant D3D11 RS/OM binding owner/probe without routing game Draw*, and obtain a non-superseded hosted WARP/Win32 result before any activation discussion."
+        }
+      },
+      "scope_guards": {
+        "native_draw_path_activation_changed": false,
+        "native_game_draw_routing": false,
+        "live_rs_om_binding_changed": false,
+        "openxr_transport_changed": false,
+        "dxvk_lane_modified": false,
+        "localization_modified": false
+      },
+      "related_finding_or_regression_keys": [
+        "DX11-DYNAMIC-OUTPUT-STATE-R124",
+        "DX11-DRAW-OUTPUT-STATE-READINESS-001"
+      ],
+      "issue14_comment_id": 5946561851,
+      "automation_validation": "PASS_REMOTE_STATIC_DESCENDANT_CI_BUILD_SUPERSEDED",
+      "blocker": "Native DX11 Draw* remains disabled. Full Win32/WARP execution for this unit was superseded by same-branch churn, and exact-build exhaustive census plus Quest 3/VDXR graphics parity are still required before runtime activation.",
+      "next_action": "Keep NativeDrawPathActive disabled. Consume the output-state readiness payload only in a dormant RS/OM binding owner/probe, then obtain non-superseded hosted Win32/WARP validation.",
+      "checkpoint": "C6_STATE",
+      "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
+      "runtime_claim": "NONE",
+      "state_persisted": true
     }
   ],
-  "latest_continuation_unit": "DX11_MANAGED_BUFFER_EXACT_PLAN_CONSUMER_R125",
+  "latest_continuation_unit": "DX11_DYNAMIC_OUTPUT_STATE_PROVENANCE_R124",
   "state_persisted_for_continuation": true
 }
