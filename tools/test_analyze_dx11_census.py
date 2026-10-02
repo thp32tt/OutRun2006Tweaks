@@ -329,7 +329,7 @@ def main() -> int:
         "psBytes=0,psVersion=0x00000000,psHash=0x0000000000000000] "
         "ffpCoverage[exact=1] ffpReadiness[ready=0,mask=0x00000004,"
         "activeStages=3]\n"
-        "VR DX11 R160 ffp signature#1 stage#2: "
+        "VR DX11 R173 ffp signature#1 stage#2: "
         "color[op=4,arg1=0x00000002,arg2=0x00000001] "
         "alpha[op=4,arg1=0x00000002,arg2=0x00000001] "
         "resultArg=0x00000005 texCoord=0x00000002 texTransform=0x00000000 "
