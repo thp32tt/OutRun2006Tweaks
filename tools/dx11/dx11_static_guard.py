@@ -20,6 +20,8 @@ FORBIDDEN_RUNTIME_ENABLE_MARKERS = (
     "ForceNativeDrawPath",
     "EnableNativeDrawPath(true)",
     "native_draw_activation_override = true",
+    "native_draw_path_active: true",
+    "nativeDrawPathActive=true",
 )
 
 SCANNED_SUFFIXES = {
@@ -31,6 +33,7 @@ SCANNED_SUFFIXES = {
     ".cmake",
     ".py",
     ".ps1",
+    ".json",
 }
 
 
