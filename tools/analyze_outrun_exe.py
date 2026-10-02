@@ -15209,6 +15209,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_37_prefix_pro
         and calls_match
         and raw_call_census_matches
         and predecessor_target_contract
+        and backward_target_is_predecessor_boundary
     )
     return {
         "start_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_37_RVA,
