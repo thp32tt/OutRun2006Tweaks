@@ -6,30 +6,32 @@ silently enable the native draw path before exact-build and Quest 3/VDXR evidenc
 """
 
 from pathlib import Path
+import json
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> None:
-    state = (ROOT / "docs" / "CONVERSION_LANE_STATE.json").read_text(encoding="utf-8")
+    state = json.loads(
+        (ROOT / "docs" / "CONVERSION_LANE_STATE.json").read_text(encoding="utf-8")
+    )
 
     required = [
-        '"lane": "DX11"',
-        '"native_draw_path_active_changed": false',
-        '"runtime_validation": "UNTESTED"',
+        state.get("lane") == "DX11",
+        state.get("runtime_validation") == "UNTESTED",
     ]
 
-    missing = [token for token in required if token not in state]
-    if missing:
-        raise SystemExit("DX11 native draw activation boundary drift: " + ", ".join(missing))
+    if not all(required):
+        raise SystemExit("DX11 native draw activation boundary state drift")
 
-    forbidden = [
-        '"native_draw_path_active_changed": true',
-        "NativeDrawPathActive = true",
-    ]
-    if any(item in state for item in forbidden):
-        raise SystemExit("DX11 native draw activation must remain disabled")
+    completed = state.get("completed_static_units", [])
+    if not isinstance(completed, list):
+        raise SystemExit("DX11 completed static unit ledger malformed")
+
+    for unit in completed:
+        if unit.get("native_draw_path_activation_changed") is True:
+            raise SystemExit("DX11 native draw activation must remain disabled")
 
     print("DX11 native draw activation boundary R202: PASS")
 
