@@ -5,7 +5,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "base_sha": "802fe62657d041f7f8eeda488bfb307e4e474ead",
-  "state_parent_head": "daafe797eda5d308959133ee65ce8eb392a0791c",
+  "state_parent_head": "1820f1bea9a8b03b2ef558bd005f52c7e108226d",
   "material_result_sha": "e1b507248de7891211a8c26775b5c501a97828c9",
   "validation_bearing_sha": "602b7c0cd72a1bbf8b7a71ab3cafd08f25b8c2ec",
   "runtime_validation": "UNTESTED",
@@ -88,6 +88,6 @@
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "prior_completed_unit": "DX11_DIRECT_INDEXED_SOURCE_RANGE_IDENTITY_R149",
+  "prior_completed_unit": "DX11_R149_INDEXED_POINTLIST_FAILCLOSED",
   "validation_issue14_comment_id": 5947758609
 }
