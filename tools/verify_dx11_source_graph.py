@@ -1961,6 +1961,49 @@ def main() -> None:
             + ", ".join(missing_r146_final_fan)
         )
 
+    r147_direct_draw_dispatch_contract = [
+        ("struct NativeFixedFunctionDirectDrawDispatchReadiness", NATIVE_BACKEND_HPP,
+         "R147 direct dispatch readiness identity"),
+        ("validate_fixed_function_render_target_bound_draw_readiness_integrity(",
+         NATIVE_BACKEND_CPP, "R147 copied R145 readiness integrity validator"),
+        ("direct_draw_element_count(", NATIVE_BACKEND_CPP,
+         "R147 exact direct primitive element-count conversion"),
+        ("geometry.indexBufferRequired == indexed", NATIVE_BACKEND_CPP,
+         "R147 direct indexed/nonindexed geometry mode match"),
+        ("boundDraw.surfacePairSnapshotToken == draw.surfacePairSnapshotToken",
+         NATIVE_BACKEND_CPP, "R147 final target identity remains tied to sealed draw"),
+        ("startIndexLocation <= maxValue - elementCount", NATIVE_BACKEND_CPP,
+         "R147 DrawIndexed range overflow guard"),
+        ("startVertexLocation <= maxValue - elementCount", NATIVE_BACKEND_CPP,
+         "R147 Draw range overflow guard"),
+        ("compose_fixed_function_direct_draw_dispatch_readiness(", NATIVE_BACKEND_CPP,
+         "R147 direct dispatch composition API"),
+        ("validate_fixed_function_direct_draw_dispatch_snapshot(", NATIVE_BACKEND_CPP,
+         "R147 stale direct dispatch validator"),
+        ("R147 direct indexed dispatch seals DrawIndexed arguments",
+         CONSTANT_BUFFER_PROBE, "R147 positive indexed dispatch proof"),
+        ("R147 direct indexed dispatch snapshot rejects StartIndexLocation drift",
+         CONSTANT_BUFFER_PROBE, "R147 indexed start drift proof"),
+        ("R147 direct nonindexed dispatch seals Draw start vertex",
+         CONSTANT_BUFFER_PROBE, "R147 positive nonindexed dispatch proof"),
+        ("R147 direct nonindexed dispatch snapshot rejects StartVertexLocation drift",
+         CONSTANT_BUFFER_PROBE, "R147 nonindexed start drift proof"),
+        ("R147 direct dispatch keeps triangle fan fail closed",
+         CONSTANT_BUFFER_PROBE, "R147 fan remains on generated-index path"),
+        ("R147 direct dispatch rejects element-count overflow",
+         CONSTANT_BUFFER_PROBE, "R147 element-count overflow proof"),
+    ]
+    missing_r147_direct_draw_dispatch = [
+        meaning
+        for token, source, meaning in r147_direct_draw_dispatch_contract
+        if token not in source
+    ]
+    if missing_r147_direct_draw_dispatch:
+        raise SystemExit(
+            "DX11 R147 direct draw dispatch contract drift: "
+            + ", ".join(missing_r147_direct_draw_dispatch)
+        )
+
     runtime_textured_draw_users = []
     for source_path in (ROOT / "src").rglob("*.cpp"):
         if source_path == DX11 / "native_backend.cpp":
@@ -1980,6 +2023,8 @@ def main() -> None:
             or "validate_fixed_function_fully_bound_draw_snapshot(" in runtime_source
             or "compose_fixed_function_render_target_bound_draw_readiness(" in runtime_source
             or "validate_fixed_function_render_target_bound_draw_snapshot(" in runtime_source
+            or "compose_fixed_function_direct_draw_dispatch_readiness(" in runtime_source
+            or "validate_fixed_function_direct_draw_dispatch_snapshot(" in runtime_source
             or "compose_fixed_function_final_nonindexed_triangle_fan_bound_draw_readiness(" in runtime_source
             or "validate_fixed_function_final_nonindexed_triangle_fan_bound_draw_snapshot(" in runtime_source
             or "compose_fixed_function_final_indexed_triangle_fan_bound_draw_readiness(" in runtime_source

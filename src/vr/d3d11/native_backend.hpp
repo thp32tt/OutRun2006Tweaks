@@ -1622,6 +1622,62 @@ validate_fixed_function_final_indexed_triangle_fan_bound_draw_snapshot(
     const NativeSurfaceMirror& depthSurface,
     std::uint64_t snapshotToken) noexcept;
 
+
+// R147 seals the exact Draw/DrawIndexed argument tuple for direct non-fan
+// geometry after the R145 live-state proof. This is dormant dispatch evidence
+// only: it neither calls Draw* nor changes NativeDrawPathActive.
+struct NativeFixedFunctionDirectDrawDispatchReadiness {
+    bool inputValid{};
+    bool renderTargetBoundDrawReady{};
+    bool geometryReady{};
+    bool geometryMatchesDraw{};
+    bool surfacePairMatchesDraw{};
+    bool topologyMatchesGeometry{};
+    bool dispatchArgumentsExact{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    bool indexed{};
+    D3D11_PRIMITIVE_TOPOLOGY topology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    UINT primitiveCount{};
+    UINT elementCount{};
+    UINT startVertexLocation{};
+    UINT startIndexLocation{};
+    INT baseVertexLocation{};
+    std::uint64_t renderTargetBoundDrawSnapshotToken{};
+    std::uint64_t drawSnapshotToken{};
+    std::uint64_t geometrySnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] bool
+validate_fixed_function_render_target_bound_draw_readiness_integrity(
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept;
+
+[[nodiscard]] NativeFixedFunctionDirectDrawDispatchReadiness
+compose_fixed_function_direct_draw_dispatch_readiness(
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    bool indexed,
+    UINT startVertexLocation,
+    UINT startIndexLocation,
+    INT baseVertexLocation) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_direct_draw_dispatch_snapshot(
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    bool indexed,
+    UINT startVertexLocation,
+    UINT startIndexLocation,
+    INT baseVertexLocation,
+    std::uint64_t snapshotToken) noexcept;
+
 class NativeBackend final {
 public:
     NativeBackend() = default;

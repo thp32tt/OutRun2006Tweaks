@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <limits>
 
 #include <d3dcompiler.h>
 #include <d3d11.h>
@@ -3533,6 +3534,127 @@ int main()
                     outputColorSurface, outputDepthSurface,
                     renderTargetBoundDraw.snapshotToken),
             "R145 live OM target restore reproduces final draw snapshot");
+
+        const auto indexedDirectDispatch =
+            outrun::vr::dx11::
+                compose_fixed_function_direct_draw_dispatch_readiness(
+                    renderTargetBoundDraw, multiStageDrawReady,
+                    indexedGeometryReady, D3DPT_TRIANGLELIST, 2u, true,
+                    0u, 0u, 0);
+        require(
+            indexedDirectDispatch.inputValid &&
+            indexedDirectDispatch.renderTargetBoundDrawReady &&
+            indexedDirectDispatch.geometryReady &&
+            indexedDirectDispatch.geometryMatchesDraw &&
+            indexedDirectDispatch.surfacePairMatchesDraw &&
+            indexedDirectDispatch.topologyMatchesGeometry &&
+            indexedDirectDispatch.dispatchArgumentsExact &&
+            indexedDirectDispatch.componentSnapshotsPresent &&
+            indexedDirectDispatch.ready &&
+            indexedDirectDispatch.indexed &&
+            indexedDirectDispatch.elementCount == 6u &&
+            indexedDirectDispatch.snapshotToken != 0 &&
+            outrun::vr::dx11::
+                validate_fixed_function_direct_draw_dispatch_snapshot(
+                    renderTargetBoundDraw, multiStageDrawReady,
+                    indexedGeometryReady, D3DPT_TRIANGLELIST, 2u, true,
+                    0u, 0u, 0, indexedDirectDispatch.snapshotToken),
+            "R147 direct indexed dispatch seals DrawIndexed arguments");
+
+        require(
+            !outrun::vr::dx11::
+                validate_fixed_function_direct_draw_dispatch_snapshot(
+                    renderTargetBoundDraw, multiStageDrawReady,
+                    indexedGeometryReady, D3DPT_TRIANGLELIST, 2u, true,
+                    0u, 1u, 0, indexedDirectDispatch.snapshotToken),
+            "R147 direct indexed dispatch snapshot rejects StartIndexLocation drift");
+
+        const auto directFanDispatch =
+            outrun::vr::dx11::
+                compose_fixed_function_direct_draw_dispatch_readiness(
+                    renderTargetBoundDraw, multiStageDrawReady,
+                    indexedGeometryReady, D3DPT_TRIANGLEFAN, 2u, true,
+                    0u, 0u, 0);
+        require(
+            !directFanDispatch.topologyMatchesGeometry &&
+            !directFanDispatch.dispatchArgumentsExact &&
+            !directFanDispatch.ready &&
+            directFanDispatch.snapshotToken == 0,
+            "R147 direct dispatch keeps triangle fan fail closed");
+
+        const auto overflowDirectDispatch =
+            outrun::vr::dx11::
+                compose_fixed_function_direct_draw_dispatch_readiness(
+                    renderTargetBoundDraw, multiStageDrawReady,
+                    indexedGeometryReady, D3DPT_TRIANGLELIST,
+                    std::numeric_limits<UINT>::max(), true, 0u, 0u, 0);
+        require(
+            !overflowDirectDispatch.dispatchArgumentsExact &&
+            !overflowDirectDispatch.ready &&
+            overflowDirectDispatch.snapshotToken == 0,
+            "R147 direct dispatch rejects element-count overflow");
+
+        require(
+            outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+                d3d.context, nonIndexedGeometryReady, managedVertexBuffer,
+                geometryVertexStride, geometryVertexOffset,
+                nullptr, DXGI_FORMAT_UNKNOWN, 0),
+            "R147 nonindexed direct IA prerequisite");
+        const auto nonIndexedDirectDrawReady =
+            compose_fixed_function_draw_readiness(
+                multiStageActivation, outputBindingRenderReady, surfacePairReady,
+                outputStateReady, outputStateBinding, nonIndexedGeometryReady);
+        require(
+            nonIndexedDirectDrawReady.ready,
+            "R147 nonindexed direct sealed draw prerequisite");
+        const auto nonIndexedRenderTargetBoundDraw =
+            outrun::vr::dx11::
+                compose_fixed_function_render_target_bound_draw_readiness(
+                    nonIndexedDirectDrawReady, d3d.context, outputStateBinding,
+                    pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                    multiStageSamplers, multiStageTextures,
+                    nonIndexedGeometryReady, managedVertexBuffer,
+                    geometryVertexStride, geometryVertexOffset,
+                    nullptr, DXGI_FORMAT_UNKNOWN, 0u, transform,
+                    surfaceTargetBinding, outputColorSurface, outputDepthSurface);
+        require(
+            nonIndexedRenderTargetBoundDraw.ready,
+            "R147 nonindexed final bound-state prerequisite");
+
+        const auto nonIndexedDirectDispatch =
+            outrun::vr::dx11::
+                compose_fixed_function_direct_draw_dispatch_readiness(
+                    nonIndexedRenderTargetBoundDraw, nonIndexedDirectDrawReady,
+                    nonIndexedGeometryReady, D3DPT_TRIANGLESTRIP, 2u, false,
+                    1u, 0u, 0);
+        require(
+            nonIndexedDirectDispatch.ready &&
+            !nonIndexedDirectDispatch.indexed &&
+            nonIndexedDirectDispatch.elementCount == 4u &&
+            nonIndexedDirectDispatch.startVertexLocation == 1u &&
+            nonIndexedDirectDispatch.startIndexLocation == 0u &&
+            nonIndexedDirectDispatch.baseVertexLocation == 0 &&
+            nonIndexedDirectDispatch.snapshotToken != 0 &&
+            outrun::vr::dx11::
+                validate_fixed_function_direct_draw_dispatch_snapshot(
+                    nonIndexedRenderTargetBoundDraw, nonIndexedDirectDrawReady,
+                    nonIndexedGeometryReady, D3DPT_TRIANGLESTRIP, 2u, false,
+                    1u, 0u, 0, nonIndexedDirectDispatch.snapshotToken),
+            "R147 direct nonindexed dispatch seals Draw start vertex");
+        require(
+            !outrun::vr::dx11::
+                validate_fixed_function_direct_draw_dispatch_snapshot(
+                    nonIndexedRenderTargetBoundDraw, nonIndexedDirectDrawReady,
+                    nonIndexedGeometryReady, D3DPT_TRIANGLESTRIP, 2u, false,
+                    2u, 0u, 0, nonIndexedDirectDispatch.snapshotToken),
+            "R147 direct nonindexed dispatch snapshot rejects StartVertexLocation drift");
+
+        require(
+            outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+                d3d.context, indexedGeometryReady, managedVertexBuffer,
+                geometryVertexStride, geometryVertexOffset,
+                &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset),
+            "R147 restore indexed direct IA after dispatch proof");
     }
 
     NativeTriangleFanIndexBuffer liveFanOwner;

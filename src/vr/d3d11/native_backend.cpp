@@ -4404,6 +4404,191 @@ validate_fixed_function_final_indexed_triangle_fan_bound_draw_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+
+static bool direct_draw_element_count(
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    UINT& elementCount) noexcept {
+    elementCount = 0;
+    if (primitiveCount == 0)
+        return primitive != D3DPT_TRIANGLEFAN &&
+            translate_primitive(primitive).exact;
+
+    const UINT maxValue = std::numeric_limits<UINT>::max();
+    switch (primitive) {
+    case D3DPT_POINTLIST:
+        elementCount = primitiveCount;
+        return true;
+    case D3DPT_LINELIST:
+        if (primitiveCount > maxValue / 2u)
+            return false;
+        elementCount = primitiveCount * 2u;
+        return true;
+    case D3DPT_LINESTRIP:
+        if (primitiveCount == maxValue)
+            return false;
+        elementCount = primitiveCount + 1u;
+        return true;
+    case D3DPT_TRIANGLELIST:
+        if (primitiveCount > maxValue / 3u)
+            return false;
+        elementCount = primitiveCount * 3u;
+        return true;
+    case D3DPT_TRIANGLESTRIP:
+        if (primitiveCount > maxValue - 2u)
+            return false;
+        elementCount = primitiveCount + 2u;
+        return true;
+    case D3DPT_TRIANGLEFAN:
+    default:
+        return false;
+    }
+}
+
+bool validate_fixed_function_render_target_bound_draw_readiness_integrity(
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept {
+    if (!boundDraw.inputValid ||
+        !boundDraw.fullyBoundDrawReady ||
+        !boundDraw.surfaceTargetBindingReady ||
+        !boundDraw.surfacePairMatchesDraw ||
+        !boundDraw.componentSnapshotsPresent ||
+        !boundDraw.ready ||
+        boundDraw.fullyBoundDrawSnapshotToken == 0 ||
+        boundDraw.surfaceTargetBindingSnapshotToken == 0 ||
+        boundDraw.surfacePairSnapshotToken == 0 ||
+        boundDraw.snapshotToken == 0)
+        return false;
+
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(
+        token, boundDraw.fullyBoundDrawSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, boundDraw.surfaceTargetBindingSnapshotToken);
+    token = mix_readiness_snapshot_token(
+        token, boundDraw.surfacePairSnapshotToken);
+    if (token == 0)
+        token = 1;
+    return token == boundDraw.snapshotToken;
+}
+
+NativeFixedFunctionDirectDrawDispatchReadiness
+compose_fixed_function_direct_draw_dispatch_readiness(
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    bool indexed,
+    UINT startVertexLocation,
+    UINT startIndexLocation,
+    INT baseVertexLocation) noexcept {
+    NativeFixedFunctionDirectDrawDispatchReadiness out{};
+    out.indexed = indexed;
+    out.primitiveCount = primitiveCount;
+    out.startVertexLocation = startVertexLocation;
+    out.startIndexLocation = startIndexLocation;
+    out.baseVertexLocation = baseVertexLocation;
+    out.renderTargetBoundDrawSnapshotToken = boundDraw.snapshotToken;
+    out.drawSnapshotToken = draw.snapshotToken;
+    out.geometrySnapshotToken = geometry.snapshotToken;
+
+    const auto topology = translate_primitive(primitive);
+    out.topology = topology.value;
+
+    UINT elementCount = 0;
+    const bool countExact =
+        direct_draw_element_count(primitive, primitiveCount, elementCount);
+    out.elementCount = countExact ? elementCount : 0u;
+
+    const bool argumentsCanonical =
+        indexed
+            ? startVertexLocation == 0u
+            : (startIndexLocation == 0u && baseVertexLocation == 0);
+    const UINT maxValue = std::numeric_limits<UINT>::max();
+    const bool rangeExact =
+        countExact &&
+        (indexed
+            ? startIndexLocation <= maxValue - elementCount
+            : startVertexLocation <= maxValue - elementCount);
+
+    const bool drawIntegrity =
+        validate_fixed_function_draw_readiness_integrity(draw);
+    out.inputValid =
+        drawIntegrity &&
+        geometry.inputValid &&
+        boundDraw.inputValid;
+    out.renderTargetBoundDrawReady =
+        validate_fixed_function_render_target_bound_draw_readiness_integrity(
+            boundDraw);
+    out.geometryReady =
+        validate_fixed_function_direct_geometry_readiness_integrity(geometry);
+    out.geometryMatchesDraw =
+        draw.geometrySnapshotToken != 0 &&
+        geometry.snapshotToken == draw.geometrySnapshotToken &&
+        geometry.indexBufferRequired == indexed;
+    out.surfacePairMatchesDraw =
+        boundDraw.surfacePairSnapshotToken != 0 &&
+        boundDraw.surfacePairSnapshotToken == draw.surfacePairSnapshotToken;
+    out.topologyMatchesGeometry =
+        topology.exact &&
+        topology.value != D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED &&
+        topology.value == geometry.topology;
+    out.dispatchArgumentsExact =
+        argumentsCanonical && rangeExact;
+    out.componentSnapshotsPresent =
+        boundDraw.snapshotToken != 0 &&
+        draw.snapshotToken != 0 &&
+        geometry.snapshotToken != 0;
+    out.ready =
+        out.inputValid &&
+        out.renderTargetBoundDrawReady &&
+        draw.ready &&
+        out.geometryReady &&
+        out.geometryMatchesDraw &&
+        out.surfacePairMatchesDraw &&
+        out.topologyMatchesGeometry &&
+        out.dispatchArgumentsExact &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.renderTargetBoundDrawSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.drawSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.geometrySnapshotToken);
+        token = mix_readiness_snapshot_token(token, indexed ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(primitive));
+        token = mix_readiness_snapshot_token(token, primitiveCount);
+        token = mix_readiness_snapshot_token(token, elementCount);
+        token = mix_readiness_snapshot_token(token, startVertexLocation);
+        token = mix_readiness_snapshot_token(token, startIndexLocation);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(baseVertexLocation));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_fixed_function_direct_draw_dispatch_snapshot(
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    bool indexed,
+    UINT startVertexLocation,
+    UINT startIndexLocation,
+    INT baseVertexLocation,
+    std::uint64_t snapshotToken) noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = compose_fixed_function_direct_draw_dispatch_readiness(
+        boundDraw, draw, geometry, primitive, primitiveCount, indexed,
+        startVertexLocation, startIndexLocation, baseVertexLocation);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 void NativeFixedFunctionPipelineBundle::shutdown() noexcept {
     transform_buffer_.shutdown();
     input_layout_.Reset();
