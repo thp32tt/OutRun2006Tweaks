@@ -19,6 +19,7 @@ namespace
     using outrun::vr::dx11::FixedFunctionUnsupportedSamplerAddress;
     using outrun::vr::dx11::FixedFunctionUnsupportedSamplerFilter;
     using outrun::vr::dx11::FixedFunctionUnsupportedSamplerLod;
+    using outrun::vr::dx11::FixedFunctionUnsupportedSamplerSrgb;
     using outrun::vr::dx11::FixedFunctionUnsupportedStageChain;
     using outrun::vr::dx11::FixedFunctionUnsupportedTextureTransform;
     using outrun::vr::dx11::PipelineUnsupportedBlend;
@@ -865,6 +866,23 @@ int main()
             borderSampler.desc.BorderColor[2] == 16.0f / 255.0f &&
             borderSampler.desc.BorderColor[3] == 128.0f / 255.0f,
             "R160 border sampler ARGB to RGBA translation drift");
+
+        stages[0].srgbTexture = TRUE;
+        const auto srgbReadiness =
+            translate_fixed_function_readiness(
+                stages, true, 0x01, 0x01);
+        const auto srgbSampler =
+            translate_fixed_function_sampler(stages[0]);
+        require(
+            !srgbReadiness.exact(),
+            "sampler sRGB decode did not fail closed");
+        require(
+            (srgbReadiness.unsupported &
+             FixedFunctionUnsupportedSamplerSrgb) != 0,
+            "sampler sRGB decode did not set blocker");
+        require(
+            !srgbSampler.exact,
+            "sampler sRGB decode unexpectedly translated without sRGB SRV");
     }
 
     {
