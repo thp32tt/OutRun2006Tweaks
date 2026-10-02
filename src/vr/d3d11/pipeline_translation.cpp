@@ -161,6 +161,7 @@ namespace outrun::vr::dx11
             case D3DTOP_SELECTARG2:
                 return fixed_function_argument_uses_texture(arg2);
             case D3DTOP_MODULATE:
+            case D3DTOP_ADD:
                 return fixed_function_argument_uses_texture(arg1) ||
                        fixed_function_argument_uses_texture(arg2);
             default:
@@ -211,6 +212,9 @@ namespace outrun::vr::dx11
                 return second;
             case D3DTOP_MODULATE:
                 return first + " * " + second;
+            case D3DTOP_ADD:
+                // D3D9 D3DTOP_ADD is component-wise Arg1 + Arg2.
+                return first + " + " + second;
             default:
                 return {};
             }
@@ -388,6 +392,7 @@ namespace outrun::vr::dx11
                 useArg2 = true;
                 break;
             case D3DTOP_MODULATE:
+            case D3DTOP_ADD:
                 useArg1 = true;
                 useArg2 = true;
                 break;
