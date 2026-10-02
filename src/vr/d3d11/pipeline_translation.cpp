@@ -275,6 +275,16 @@ namespace outrun::vr::dx11
                    value == D3DTADDRESS_CLAMP;
         }
 
+        bool fixed_function_sampler_lod_supported(
+            const FixedFunctionStageState& source) noexcept
+        {
+            // R125 keeps R98 conservative until real-game census proves which
+            // non-default LOD states are required. Never silently substitute
+            // D3D11 defaults for observed D3D9 sampler state.
+            return source.mipLodBiasBits == 0u &&
+                   source.maxMipLevel == 0u;
+        }
+
         D3D11_FILTER translate_fixed_function_filter(
             DWORD minFilter,
             DWORD magFilter,
@@ -614,6 +624,7 @@ namespace outrun::vr::dx11
         if (!fixed_function_filter_supported(source.minFilter, false) ||
             !fixed_function_filter_supported(source.magFilter, false) ||
             !fixed_function_filter_supported(source.mipFilter, true) ||
+            !fixed_function_sampler_lod_supported(source) ||
             !fixed_function_address_supported(source.addressU) ||
             !fixed_function_address_supported(source.addressV))
             return out;
@@ -707,6 +718,9 @@ namespace outrun::vr::dx11
             if (!fixed_function_address_supported(stage.addressU) ||
                 !fixed_function_address_supported(stage.addressV))
                 out.unsupported |= FixedFunctionUnsupportedSamplerAddress;
+
+            if (!fixed_function_sampler_lod_supported(stage))
+                out.unsupported |= FixedFunctionUnsupportedSamplerLod;
         }
 
         return out;
