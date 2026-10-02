@@ -26,8 +26,13 @@ $disabledActivationEvidence = @(
     'native_draw_path_activation_changed=false'
 )
 
-$extensions = @('*.cpp','*.hpp','*.h','*.json','*.md','*.ps1')
-$files = Get-ChildItem -Path $Root -Recurse -File -Include $extensions -ErrorAction SilentlyContinue
+$extensions = @('*.cpp','*.hpp','*.h','*.json','*.md','*.ps1','*.ini','*.cmake')
+$excludedDirectories = @('.git','out','build','node_modules')
+$files = Get-ChildItem -Path $Root -Recurse -File -Include $extensions -ErrorAction SilentlyContinue |
+    Where-Object {
+        $relative = $_.FullName.Substring($Root.Length).TrimStart('\','/')
+        -not ($excludedDirectories | Where-Object { $relative -like "$_/*" })
+    }
 
 $matches = @()
 $forbiddenMatches = @()
