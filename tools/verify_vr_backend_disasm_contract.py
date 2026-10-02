@@ -1096,6 +1096,73 @@ def verify_dxvk_continuation_chain() -> None:
                     f"decoded=0x{decoded_target_rva:08X}"
                 )
 
+        # If a proof names its expected external branch-target set, validate
+        # that declaration immediately against the exact decoded BRANCH metadata.
+        # Previously this declaration was consumed primarily by the successor
+        # handoff check, so the newest frontier could carry a stale set until a
+        # later continuation existed. Keep the current proof fail-closed too.
+        current_external_assignments = [
+            node.value
+            for node in ast.walk(proof_ast)
+            if isinstance(node, ast.Assign)
+            and any(
+                isinstance(target, ast.Name)
+                and target.id == "expected_external_targets"
+                for target in node.targets
+            )
+        ]
+        if len(current_external_assignments) > 1:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} current proof has ambiguous "
+                "expected_external_targets assignments: "
+                f"{len(current_external_assignments)}"
+            )
+        if current_external_assignments:
+            external_node = current_external_assignments[0]
+            if isinstance(external_node, ast.Set):
+                declared_expected_external_targets = {
+                    element.value
+                    for element in external_node.elts
+                    if (
+                        isinstance(element, ast.Constant)
+                        and isinstance(element.value, int)
+                        and not isinstance(element.value, bool)
+                    )
+                }
+                if len(declared_expected_external_targets) != len(external_node.elts):
+                    raise SystemExit(
+                        f"DXVK continuation {continuation_id} current proof "
+                        "expected_external_targets is not an int literal set"
+                    )
+            elif (
+                isinstance(external_node, ast.Call)
+                and isinstance(external_node.func, ast.Name)
+                and external_node.func.id == "set"
+                and not external_node.args
+                and not external_node.keywords
+            ):
+                declared_expected_external_targets = set()
+            else:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} current proof "
+                    "expected_external_targets must be a literal int set"
+                )
+
+            current_start = value(f"{prefix}_RVA")
+            current_end = value(f"{prefix}_PREFIX_END_RVA")
+            decoded_external_targets = {
+                target_rva
+                for _branch_rva, target_rva in declared_branches
+                if not (current_start <= target_rva < current_end)
+            }
+            if declared_expected_external_targets != decoded_external_targets:
+                raise SystemExit(
+                    f"DXVK continuation {continuation_id} current proof "
+                    "expected_external_targets declaration drift: "
+                    f"declared={sorted(declared_expected_external_targets)} "
+                    f"decoded={sorted(decoded_external_targets)}"
+                )
+
         padding_target_hits = [
             (branch_rva, target_rva, instruction_rows[run_start][0], instruction_rows[run_end - 1][0] + 1)
             for branch_rva, target_rva in declared_branches
@@ -1409,6 +1476,7 @@ def verify_dxvk_continuation_chain() -> None:
             "incomplete_matches",
             "capture_edge_matches",
             "capture_edge_target_matches",
+            "expected_external_targets",
         }
         # Cross-window backedge proofs use an explicit boolean to prove that a
         # backward target lands on an already exact-decoded predecessor
