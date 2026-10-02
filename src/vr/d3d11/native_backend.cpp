@@ -2226,11 +2226,14 @@ bool NativeFixedFunctionOutputStateBinding::initialize(
     sample_mask_ = outputState.sampleMask;
     stencil_ref_ = renderStateBundle.stencil_ref();
     render_state_snapshot_token_ = renderStateSnapshotToken;
+    surface_pair_snapshot_token_ = surfacePair.snapshotToken;
     output_state_snapshot_token_ = outputStateSnapshotToken;
 
     std::uint64_t token = 0xcbf29ce484222325ull;
     token = mix_readiness_snapshot_token(
         token, render_state_snapshot_token_);
+    token = mix_readiness_snapshot_token(
+        token, surface_pair_snapshot_token_);
     token = mix_readiness_snapshot_token(
         token, output_state_snapshot_token_);
     token = mix_readiness_snapshot_token(
@@ -2260,6 +2263,7 @@ void NativeFixedFunctionOutputStateBinding::shutdown() noexcept {
     sample_mask_ = 0xFFFFFFFFu;
     stencil_ref_ = 0;
     render_state_snapshot_token_ = 0;
+    surface_pair_snapshot_token_ = 0;
     output_state_snapshot_token_ = 0;
     snapshot_token_ = 0;
 }
@@ -2291,12 +2295,14 @@ compose_fixed_function_draw_readiness(
     const NativeFixedFunctionRenderStateReadiness& renderState,
     const NativeSurfacePairReadiness& surfacePair,
     const NativeFixedFunctionOutputStateReadiness& outputState,
+    const NativeFixedFunctionOutputStateBinding& outputBinding,
     const NativeFixedFunctionGeometryReadiness& geometry) noexcept {
     NativeFixedFunctionDrawReadiness out{};
     out.activationSnapshotToken = activation.snapshotToken;
     out.renderStateSnapshotToken = renderState.snapshotToken;
     out.surfacePairSnapshotToken = surfacePair.snapshotToken;
     out.outputStateSnapshotToken = outputState.snapshotToken;
+    out.outputBindingSnapshotToken = outputBinding.snapshot_token();
     out.geometrySnapshotToken = geometry.snapshotToken;
     out.inputValid =
         activation.inputValid &&
@@ -2312,6 +2318,12 @@ compose_fixed_function_draw_readiness(
         surfacePair.ready && surfacePair.snapshotToken != 0;
     out.outputStateReady =
         outputState.ready && outputState.snapshotToken != 0;
+    out.outputBindingReady =
+        outputBinding.ready() &&
+        outputBinding.render_state_snapshot_token() == renderState.snapshotToken &&
+        outputBinding.surface_pair_snapshot_token() == surfacePair.snapshotToken &&
+        outputBinding.output_state_snapshot_token() == outputState.snapshotToken &&
+        outputBinding.snapshot_token() != 0;
     out.geometryReady =
         geometry.ready && geometry.snapshotToken != 0;
     out.componentSnapshotsPresent =
@@ -2319,6 +2331,7 @@ compose_fixed_function_draw_readiness(
         renderState.snapshotToken != 0 &&
         surfacePair.snapshotToken != 0 &&
         outputState.snapshotToken != 0 &&
+        outputBinding.snapshot_token() != 0 &&
         geometry.snapshotToken != 0;
     out.ready =
         out.inputValid &&
@@ -2326,6 +2339,7 @@ compose_fixed_function_draw_readiness(
         out.renderStateReady &&
         out.surfacePairReady &&
         out.outputStateReady &&
+        out.outputBindingReady &&
         out.geometryReady &&
         out.componentSnapshotsPresent;
     if (out.ready) {
@@ -2339,6 +2353,8 @@ compose_fixed_function_draw_readiness(
         drawToken = mix_readiness_snapshot_token(
             drawToken, out.outputStateSnapshotToken);
         drawToken = mix_readiness_snapshot_token(
+            drawToken, out.outputBindingSnapshotToken);
+        drawToken = mix_readiness_snapshot_token(
             drawToken, out.geometrySnapshotToken);
         out.snapshotToken = drawToken == 0 ? 1 : drawToken;
     }
@@ -2350,12 +2366,13 @@ bool validate_fixed_function_draw_snapshot(
     const NativeFixedFunctionRenderStateReadiness& renderState,
     const NativeSurfacePairReadiness& surfacePair,
     const NativeFixedFunctionOutputStateReadiness& outputState,
+    const NativeFixedFunctionOutputStateBinding& outputBinding,
     const NativeFixedFunctionGeometryReadiness& geometry,
     std::uint64_t snapshotToken) noexcept {
     if (snapshotToken == 0)
         return false;
     const auto current = compose_fixed_function_draw_readiness(
-        activation, renderState, surfacePair, outputState, geometry);
+        activation, renderState, surfacePair, outputState, outputBinding, geometry);
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
