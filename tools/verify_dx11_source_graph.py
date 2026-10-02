@@ -847,15 +847,17 @@ def main() -> None:
          "R193 hosted DOTPRODUCT3 color fixture"),
         (
             'const auto dotFirst = fixed_function_argument_expression(\n'
-            '                    arg1, stageIndex, ".rgb", textureFactor);',
+            '                    arg1, stageIndex, ".rgb", textureFactor,\n'
+            '                    premodulateCurrent);',
             PIPELINE_TRANSLATION_CPP,
-            "R193 DOTPRODUCT3 first RGB argument must retain texture-factor plumbing",
+            "R193 DOTPRODUCT3 first RGB argument must retain texture-factor/premodulate plumbing",
         ),
         (
             'const auto dotSecond = fixed_function_argument_expression(\n'
-            '                    arg2, stageIndex, ".rgb", textureFactor);',
+            '                    arg2, stageIndex, ".rgb", textureFactor,\n'
+            '                    premodulateCurrent);',
             PIPELINE_TRANSLATION_CPP,
-            "R193 DOTPRODUCT3 second RGB argument must retain texture-factor plumbing",
+            "R193 DOTPRODUCT3 second RGB argument must retain texture-factor/premodulate plumbing",
         ),
         ("dotProductStages[0].alphaOp = D3DTOP_DOTPRODUCT3;",
          FIXED_FUNCTION_PIPELINE_PROBE,
