@@ -314,6 +314,19 @@ def main() -> None:
         for token, meaning in r121_managed_buffer_probe_contract.items()
         if token not in CONSTANT_BUFFER_PROBE
     ]
+    r125_managed_buffer_exact_consumer_contract = {
+        "R125: R121 made ordinary MANAGED buffer mutation plans exact.":
+            "R125 exact-plan consumer rationale",
+        "!mutation.requiresCpuShadow || !mutation.planExact":
+            "R125 managed-buffer shadow requires the exact R121 plan",
+        "R119 mirror readiness still independently rejects stale snapshots.":
+            "R125 stale-readiness boundary remains explicit",
+    }
+    missing_r121_managed_buffer_plan += [
+        meaning
+        for token, meaning in r125_managed_buffer_exact_consumer_contract.items()
+        if token not in NATIVE_BACKEND_CPP
+    ]
     if missing_r121_managed_buffer_plan:
         raise SystemExit(
             "DX11 R121 managed-buffer mutation-plan contract drift: "
