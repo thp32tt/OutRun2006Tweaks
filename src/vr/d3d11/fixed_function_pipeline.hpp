@@ -28,7 +28,8 @@ namespace outrun::vr::dx11
         {
             return fixedFunctionObserved &&
                 renderStates.exact() &&
-                pixelShader.generated();
+                pixelShader.generated() &&
+                (!alphaTestOwnedByPixelShader || pixelShader.generated());
         }
     };
 
