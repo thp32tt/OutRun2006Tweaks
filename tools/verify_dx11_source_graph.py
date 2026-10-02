@@ -1167,9 +1167,9 @@ def main() -> None:
             "R132 positive PS binding snapshot proof",
         ),
         (
-            "R132 textured draw readiness composes PS binding with R131 draw identity",
+            "R133 textured draw readiness composes the exact required PS stage",
             CONSTANT_BUFFER_PROBE,
-            "R132 positive textured draw composition proof",
+            "R133 positive textured draw composition proof",
         ),
         (
             "R132 textured draw readiness fails closed after PS binding drift",
@@ -1186,6 +1186,85 @@ def main() -> None:
         raise SystemExit(
             "DX11 R132 textured-draw readiness contract drift: "
             + ", ".join(missing_r132_textured_draw)
+        )
+
+    r133_textured_stage_mask_contract = [
+        (
+            "std::uint32_t requiredTextureMask{};",
+            NATIVE_BACKEND_HPP,
+            "R133 draw-level required texture-stage mask provenance",
+        ),
+        (
+            "bool textureMaskMatches{};",
+            NATIVE_BACKEND_HPP,
+            "R133 explicit stage-mask identity gate",
+        ),
+        (
+            "std::uint32_t observedTextureMask{};",
+            NATIVE_BACKEND_HPP,
+            "R133 observed PS stage bit provenance",
+        ),
+        (
+            "out.requiredTextureMask = activation.requiredTextureMask;",
+            NATIVE_BACKEND_CPP,
+            "R133 activation mask propagated into draw readiness",
+        ),
+        (
+            "out.requiredTextureMask == out.observedTextureMask",
+            NATIVE_BACKEND_CPP,
+            "R133 exact single-stage mask match",
+        ),
+        (
+            "out.textureMaskMatches &&",
+            NATIVE_BACKEND_CPP,
+            "R133 stage-mask gate participates in final readiness",
+        ),
+        (
+            "token, out.requiredTextureMask",
+            NATIVE_BACKEND_CPP,
+            "R133 required stage mask sealed into textured draw token",
+        ),
+        (
+            "token, out.observedTextureMask",
+            NATIVE_BACKEND_CPP,
+            "R133 observed stage bit sealed into textured draw token",
+        ),
+        (
+            "R133 textured draw rejects texture stage outside activation mask",
+            CONSTANT_BUFFER_PROBE,
+            "R133 wrong-stage fail-closed proof",
+        ),
+        (
+            "R133 single-stage observer rejects multi-stage activation mask",
+            CONSTANT_BUFFER_PROBE,
+            "R133 partial multi-stage evidence fail-closed proof",
+        ),
+    ]
+    missing_r133_textured_stage_mask = [
+        meaning
+        for token, source, meaning in r133_textured_stage_mask_contract
+        if token not in source
+    ]
+    if missing_r133_textured_stage_mask:
+        raise SystemExit(
+            "DX11 R133 textured-draw stage-mask contract drift: "
+            + ", ".join(missing_r133_textured_stage_mask)
+        )
+
+    runtime_textured_draw_users = []
+    for source_path in (ROOT / "src").rglob("*.cpp"):
+        if source_path == DX11 / "native_backend.cpp":
+            continue
+        if "compose_fixed_function_textured_draw_readiness(" in source_path.read_text(
+            encoding="utf-8"
+        ):
+            runtime_textured_draw_users.append(
+                source_path.relative_to(ROOT).as_posix()
+            )
+    if runtime_textured_draw_users:
+        raise SystemExit(
+            "DX11 R132/R133 textured draw readiness gained a production caller "
+            "before activation gate: " + ", ".join(runtime_textured_draw_users)
         )
 
     stencil_snapshot_contract = {
