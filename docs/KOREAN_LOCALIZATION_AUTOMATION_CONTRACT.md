@@ -172,6 +172,18 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 
 
 
+## Active-task latch and premature-stop recovery (schema 39)
+
+A/B/E producer TASK_IDs are controller-latched until the controller accepts a durable producer result. An assistant turn ending is never task completion by itself.
+
+- A plan/status-only assistant response without a durable TASK_ID result is `PREMATURE_STOP_RECOVERABLE`, not terminal.
+- First and second premature stops use a same-chat execution continuation. The controller keeps the same TASK_ID and ATTEMPT and requires immediate tool/material execution.
+- On the third consecutive premature stop, the controller opens a fresh project chat but preserves the same TASK_ID, ATTEMPT, branch, controller stage and latest Git checkpoint. This is conversation recovery, not task retry or new work.
+- The legacy per-task chat rollover budget must not terminally block a latched A/B/E producer. Rate-limit and send-spacing guards still apply.
+- The persistent controller stage during this recovery is `WAIT_MATERIAL_COMMIT`. The rollover prompt must carry the latest checkpoint HEAD and instruct the worker to execute rather than re-plan.
+- A dependency-blocked asset does not release the TASK. Continue with another independent runnable asset in the producer's own shard.
+- The latch is released only when the controller validates the durable producer result against current completion/material rules. Runtime remains separately `UNTESTED` unless the user supplies integrated-game evidence.
+
 ## Final-artwork convergence mode (schema 38)
 
 While `final_artwork_completed < final_artwork_total` or `final_artwork_percent < 100`, localization production is in **final-artwork convergence mode**. The objective of A/B/E is to increase the number of current-v2 Korean DDS assets that reach C static QA production-complete state, not to maximize plans, reports, runtime manifests, source probes, or preflight records.
