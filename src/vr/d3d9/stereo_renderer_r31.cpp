@@ -115,6 +115,11 @@ namespace OutRunVRStereo
             R31Window = {};
         }
 
+        inline R31FramePerf R31TelemetryFrameSnapshot() noexcept
+        {
+            return R31Frame;
+        }
+
         inline std::uint64_t R31TelemetryLiveWvpChecks() noexcept
         {
             return R31FastWorldLiveValidations;
