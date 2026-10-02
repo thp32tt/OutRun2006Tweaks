@@ -22,6 +22,7 @@
 #include "stereo_renderer_r30.cpp"
 #include "../render/stereo_base_policy.hpp"
 #include "../render/screen_space_api.hpp"
+#include "../core/screen_space_hooks.hpp"
 #include "../render/lower_draw_api.hpp"
 #include "../render/cached_effect_state.hpp"
 #include "../lifecycle/mono_safety.hpp"

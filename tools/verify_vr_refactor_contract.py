@@ -23,6 +23,7 @@ r34 = read("src/vr/d3d9/stereo_renderer_r34.cpp")
 final_dispatch_hooks = read("src/vr/core/final_dispatch_hooks.hpp")
 review_dispatch_hooks = read("src/vr/core/review_dispatch_hooks.hpp")
 dispatch_support_hooks = read("src/vr/core/dispatch_support_hooks.hpp")
+screen_space_hooks = read("src/vr/core/screen_space_hooks.hpp")
 
 for marker in (
     "class StateBlockTracker final",
@@ -696,6 +697,33 @@ if reset_begin >= 0 and rollback_begin > reset_begin:
         if legacy in callback_region:
             errors.append(f"R34 callback bypassed lifecycle facade: {legacy}")
 
+
+# R84 staged interface extraction: R30 -> R31 seam.
+for marker in (
+    "DrawPrimitiveDestR30(",
+    "DrawIndexedPrimitiveDestR30(",
+    "DrawPrimitiveUPDestR30(",
+    "DrawIndexedPrimitiveUPDestR30(",
+):
+    if marker not in screen_space_hooks:
+        errors.append(f"R30 screen-space hook API missing declaration: {marker}")
+if '#include "../core/screen_space_hooks.hpp"' not in r30:
+    errors.append("R30 screen-space hook API include missing")
+if '#include "../core/screen_space_hooks.hpp"' not in r31:
+    errors.append("R31 screen-space hook API include missing")
+if '#include "stereo_renderer_r30.cpp"' not in r31:
+    errors.append("R30->R31 textual include removed before build/link gate")
+r30_instance = r30.find("VRStereoR30HudHook VRStereoR30HudHook::instance;")
+for marker in (
+    "HRESULT __stdcall DrawPrimitiveDestR30(",
+    "HRESULT __stdcall DrawIndexedPrimitiveDestR30(",
+    "HRESULT __stdcall DrawPrimitiveUPDestR30(",
+    "HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(",
+):
+    pos = r30.find(marker)
+    if r30_instance < 0 or pos <= r30_instance:
+        errors.append(
+            f"R30 hook destination has not crossed the anonymous implementation boundary: {marker}")
 
 # R84 staged interface extraction: R31 -> R32 seam.
 for marker in (

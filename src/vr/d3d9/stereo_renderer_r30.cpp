@@ -14,6 +14,7 @@
 #include "stereo_renderer_r29.cpp"
 #include "../render/screen_space_kind.hpp"
 #include "../render/stereo_base_policy.hpp"
+#include "../core/screen_space_hooks.hpp"
 #include "../lifecycle/mono_safety.hpp"
 #include "../lifecycle/frame_accounting.hpp"
 #include "../state/depth_target_state.hpp"
@@ -2999,99 +3000,7 @@ namespace OutRunVRStereo
             return lowerDraw();
         }
 
-        HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
-            D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
-        {
-            const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
-                device, type, startVertex, primitiveCount);
-            if (xyzrhw != E_NOTIMPL)
-                return xyzrhw;
-
-            auto actual = [&]() {
-                return DrawPrimitiveHook.stdcall<HRESULT>(
-                    device, type, startVertex, primitiveCount);
-            };
-            auto r29 = [&]() {
-                return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
-                    device, type, startVertex, primitiveCount);
-            };
-            return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawPrimitive");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveDestR30(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
-            UINT startIndex, UINT primitiveCount)
-        {
-            const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
-                device, type, baseVertexIndex, minVertexIndex, numVertices,
-                startIndex, primitiveCount);
-            if (xyzrhw != E_NOTIMPL)
-                return xyzrhw;
-
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
-                    baseVertexIndex, minVertexIndex, numVertices, startIndex,
-                    primitiveCount);
-            };
-            auto r29 = [&]() {
-                return R30DrawIndexedPrimitiveR29Hook.stdcall<HRESULT>(device, type,
-                    baseVertexIndex, minVertexIndex, numVertices, startIndex,
-                    primitiveCount);
-            };
-            return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawIndexedPrimitive");
-        }
-
-        HRESULT __stdcall DrawPrimitiveUPDestR30(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            UINT primitiveCount, const void* data, UINT stride)
-        {
-            const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
-                device, type, primitiveCount, data, stride);
-            if (xyzrhw != E_NOTIMPL)
-                return xyzrhw;
-
-            auto actual = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, primitiveCount, data, stride);
-            };
-            auto r29 = [&]() {
-                return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
-                    device, type, primitiveCount, data, stride);
-            };
-            return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawPrimitiveUP");
-        }
-
-        HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(
-            IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
-            UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
-            const void* indexData, D3DFORMAT indexFormat,
-            const void* vertexData, UINT stride)
-        {
-            const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
-                device, type, minVertexIndex, numVertices, primitiveCount,
-                indexData, indexFormat, vertexData, stride);
-            if (xyzrhw != E_NOTIMPL)
-                return xyzrhw;
-
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
-                    minVertexIndex, numVertices, primitiveCount, indexData,
-                    indexFormat, vertexData, stride);
-            };
-            auto r29 = [&]() {
-                return R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>(device,
-                    type, minVertexIndex, numVertices, primitiveCount,
-                    indexData, indexFormat, vertexData, stride);
-            };
-            return R30GuardScreenSpace(
-                device, actual, r29, "R30/DrawIndexedPrimitiveUP");
-        }
-
-        void R30RollbackHooks() noexcept
+                                        void R30RollbackHooks() noexcept
         {
             R30ResetR29Hook = {};
             R30PresentR29Hook = {};
@@ -3266,6 +3175,106 @@ namespace OutRunVRStereo
 
         VRStereoR30HudHook VRStereoR30HudHook::instance;
     }
+
+HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
+        D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
+    {
+        const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
+            device, type, startVertex, primitiveCount);
+        if (xyzrhw != E_NOTIMPL)
+            return xyzrhw;
+
+        auto actual = [&]() {
+            return DrawPrimitiveHook.stdcall<HRESULT>(
+                device, type, startVertex, primitiveCount);
+        };
+        auto r29 = [&]() {
+            return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
+                device, type, startVertex, primitiveCount);
+        };
+        return R30GuardScreenSpace(
+            device, actual, r29, "R30/DrawPrimitive");
+    }
+
+
+
+HRESULT __stdcall DrawIndexedPrimitiveDestR30(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
+        UINT startIndex, UINT primitiveCount)
+    {
+        const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
+            device, type, baseVertexIndex, minVertexIndex, numVertices,
+            startIndex, primitiveCount);
+        if (xyzrhw != E_NOTIMPL)
+            return xyzrhw;
+
+        auto actual = [&]() {
+            return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
+                baseVertexIndex, minVertexIndex, numVertices, startIndex,
+                primitiveCount);
+        };
+        auto r29 = [&]() {
+            return R30DrawIndexedPrimitiveR29Hook.stdcall<HRESULT>(device, type,
+                baseVertexIndex, minVertexIndex, numVertices, startIndex,
+                primitiveCount);
+        };
+        return R30GuardScreenSpace(
+            device, actual, r29, "R30/DrawIndexedPrimitive");
+    }
+
+
+
+HRESULT __stdcall DrawPrimitiveUPDestR30(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT primitiveCount, const void* data, UINT stride)
+    {
+        const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
+            device, type, primitiveCount, data, stride);
+        if (xyzrhw != E_NOTIMPL)
+            return xyzrhw;
+
+        auto actual = [&]() {
+            return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                device, type, primitiveCount, data, stride);
+        };
+        auto r29 = [&]() {
+            return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
+                device, type, primitiveCount, data, stride);
+        };
+        return R30GuardScreenSpace(
+            device, actual, r29, "R30/DrawPrimitiveUP");
+    }
+
+
+
+HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(
+        IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
+        UINT minVertexIndex, UINT numVertices, UINT primitiveCount,
+        const void* indexData, D3DFORMAT indexFormat,
+        const void* vertexData, UINT stride)
+    {
+        const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
+            device, type, minVertexIndex, numVertices, primitiveCount,
+            indexData, indexFormat, vertexData, stride);
+        if (xyzrhw != E_NOTIMPL)
+            return xyzrhw;
+
+        auto actual = [&]() {
+            return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
+                minVertexIndex, numVertices, primitiveCount, indexData,
+                indexFormat, vertexData, stride);
+        };
+        auto r29 = [&]() {
+            return R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>(device,
+                type, minVertexIndex, numVertices, primitiveCount,
+                indexData, indexFormat, vertexData, stride);
+        };
+        return R30GuardScreenSpace(
+            device, actual, r29, "R30/DrawIndexedPrimitiveUP");
+    }
+
+
 
     OutRunVR::Render::ScreenSpaceKind
     ClassifyScreenSpacePass(IDirect3DDevice9* device) noexcept
