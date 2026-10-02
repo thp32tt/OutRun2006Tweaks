@@ -1,6 +1,7 @@
 // Ensure the owner-neutral declaration is visible before the out-of-line
 // InternalStereoPassScope definitions in this implementation unit.
 #include "../render/stereo_runtime_facade.hpp"
+#include "../transport/direct_transport_runtime.hpp"
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -1691,6 +1692,21 @@ namespace OutRunVRStereo
 	{
 		return CurrentVertexShaderIdentity.load(std::memory_order_acquire);
 	}
+	std::uintptr_t MaskCurrentVertexShaderIdentity() noexcept
+	{
+		return CurrentVertexShaderIdentity.exchange(
+			0, std::memory_order_acq_rel);
+	}
+	void RestoreCurrentVertexShaderIdentityIfEmpty(
+		std::uintptr_t savedIdentity) noexcept
+	{
+		if (savedIdentity == 0)
+			return;
+		std::uintptr_t expected = 0;
+		CurrentVertexShaderIdentity.compare_exchange_strong(
+			expected, savedIdentity,
+			std::memory_order_acq_rel, std::memory_order_acquire);
+	}
 	std::uint32_t CurrentFrameStereoPoseSequence() noexcept
 	{
 		return FrameStereoPoseSequence;
@@ -1758,6 +1774,110 @@ namespace OutRunVRStereo
 		IDirect3DDevice9* device) noexcept
 	{
 		InvalidateRightDepthStencilIfLeftMayWrite(device);
+	}
+	DirectTransportIdentitySnapshot
+	DirectTransportIdentitySnapshotForOverlay() noexcept
+	{
+		DirectTransportIdentitySnapshot out{};
+		out.sharedStatePresent = SharedState != nullptr;
+		out.interopVerified = DirectInteropVerified;
+		if (SharedState)
+		{
+			out.hostPid = SharedState->hostPid;
+			out.hostAdapterLuidLow = SharedState->hostAdapterLuidLow;
+			out.hostAdapterLuidHigh = SharedState->hostAdapterLuidHigh;
+		}
+		return out;
+	}
+	bool DirectTransportResourcesReadyRuntime() noexcept
+	{
+		return DirectTransportResourcesReady;
+	}
+	bool EnsureDirectTransportResourcesRuntime(
+		IDirect3DDevice9* device) noexcept
+	{
+		return EnsureDirectTransportResources(device);
+	}
+	void InvalidateDirectTransportInteropResourcesRuntime() noexcept
+	{
+		ReleaseDirectTransportSlots();
+		ReleaseCom(DirectInteropProbeFence);
+		ReleaseCom(DirectInteropProbeSurface);
+		ReleaseCom(DirectInteropProbeTexture);
+		DirectInteropProbeHandle = nullptr;
+		DirectInteropProbeToken = 0;
+		DirectInteropVerified = false;
+		if (SharedState && SharedState->magic == OutRunVR::SharedMagic)
+		{
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(
+				&SharedState->clientInteropProbeHandle), 0);
+			InterlockedExchange(reinterpret_cast<volatile LONG*>(
+				&SharedState->clientInteropProbeToken), 0);
+		}
+	}
+	bool ReadDirectTransportSlotView(
+		std::uint32_t slotIndex,
+		DirectTransportSlotView& out) noexcept
+	{
+		if (slotIndex >= DirectTransportSlots.size())
+			return false;
+		const auto& slot = DirectTransportSlots[slotIndex];
+		out.leftSurface = slot.leftSurface;
+		out.rightSurface = slot.rightSurface;
+		out.fence = slot.fence;
+		out.frameId = slot.frameId;
+		return true;
+	}
+	void CommitDirectTransportProducerSlot(
+		std::uint32_t slotIndex,
+		std::uint32_t frameId) noexcept
+	{
+		if (slotIndex >= DirectTransportSlots.size())
+			return;
+		auto& slot = DirectTransportSlots[slotIndex];
+		slot.producerPending = true;
+		slot.pendingFrameId = frameId;
+		slot.frameId = frameId;
+		slot.published = false;
+		ActiveDirectTransportSlot = slotIndex;
+	}
+	IDirect3DSurface9* DirectTransportBackBufferSnapshot() noexcept
+	{
+		return BackBuffer;
+	}
+	std::uint32_t DirectTransportWidthSnapshot() noexcept
+	{
+		return DirectTransportWidth;
+	}
+	std::uint32_t DirectTransportHeightSnapshot() noexcept
+	{
+		return DirectTransportHeight;
+	}
+	D3DFORMAT DirectTransportFormatSnapshot() noexcept
+	{
+		return DirectTransportFormat;
+	}
+	bool DirectTransportFrameIdAtOrAfter(
+		std::uint32_t current,
+		std::uint32_t reference) noexcept
+	{
+		return FrameIdAtOrAfter(current, reference);
+	}
+	void NoteDirectTransportFenceTimeoutRuntime() noexcept
+	{
+		++DirectTransportFenceTimeouts;
+	}
+	void NoteDirectTransportRingBackpressureRuntime() noexcept
+	{
+		++DirectTransportRingBackpressure;
+	}
+	std::uint64_t DirectTransportFenceTimeoutCount() noexcept
+	{
+		return DirectTransportFenceTimeouts;
+	}
+	std::uint64_t DirectTransportRingBackpressureCount() noexcept
+	{
+		return DirectTransportRingBackpressure;
 	}
 	HRESULT CallRawDrawPrimitive(
 		IDirect3DDevice9* device, D3DPRIMITIVETYPE type,

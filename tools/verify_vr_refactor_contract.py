@@ -24,6 +24,7 @@ r34 = read("src/vr/d3d9/stereo_renderer_r34.cpp")
 runtime_context = read("src/vr/render/runtime_context.hpp")
 raw_draw_api = read("src/vr/render/raw_draw_api.hpp")
 depth_runtime = read("src/vr/state/depth_stencil_runtime.hpp")
+direct_transport_runtime = read("src/vr/transport/direct_transport_runtime.hpp")
 stereo_runtime_facade = read("src/vr/render/stereo_runtime_facade.hpp")
 fast_path_support = read("src/vr/render/fast_path_support.hpp")
 final_dispatch_hooks = read("src/vr/core/final_dispatch_hooks.hpp")
@@ -1036,6 +1037,51 @@ for forbidden in (
 ):
     if forbidden in r32:
         errors.append(f"R32 retained direct general-runtime dependency after Gate C phase 1: {forbidden}")
+
+
+# Gate C phase 2: R32 DirectGPU state must flow through the neutral transport facade.
+for marker in (
+    "DirectTransportIdentitySnapshotForOverlay",
+    "DirectTransportResourcesReadyRuntime",
+    "EnsureDirectTransportResourcesRuntime",
+    "InvalidateDirectTransportInteropResourcesRuntime",
+    "ReadDirectTransportSlotView",
+    "CommitDirectTransportProducerSlot",
+    "DirectTransportBackBufferSnapshot",
+    "DirectTransportWidthSnapshot",
+    "DirectTransportHeightSnapshot",
+    "DirectTransportFormatSnapshot",
+    "DirectTransportFrameIdAtOrAfter",
+    "NoteDirectTransportFenceTimeoutRuntime",
+    "NoteDirectTransportRingBackpressureRuntime",
+    "DirectTransportRingBackpressureCount",
+):
+    if marker not in direct_transport_runtime:
+        errors.append(f"direct transport runtime facade missing Gate C marker: {marker}")
+for marker in (
+    "MaskCurrentVertexShaderIdentity",
+    "RestoreCurrentVertexShaderIdentityIfEmpty",
+):
+    if marker not in stereo_runtime_facade:
+        errors.append(f"stereo runtime facade missing Gate C shader-mask marker: {marker}")
+for forbidden in (
+    "SharedState",
+    "DirectInteropVerified",
+    "DirectInteropProbeFence",
+    "DirectInteropProbeSurface",
+    "DirectInteropProbeTexture",
+    "DirectInteropProbeHandle",
+    "DirectInteropProbeToken",
+    "DirectTransportSlots",
+    "DirectTransportResourcesReady",
+    "EnsureDirectTransportResources(",
+    "ReleaseDirectTransportSlots(",
+    "ActiveDirectTransportSlot",
+    "CurrentVertexShaderIdentity.exchange",
+    "CurrentVertexShaderIdentity.compare_exchange",
+):
+    if forbidden in r32:
+        errors.append(f"R32 retained direct transport/base state after Gate C phase 2: {forbidden}")
 
 if errors:
     print("R84 refactor contract FAILED")

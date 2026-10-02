@@ -44,6 +44,7 @@
 #include "../lifecycle/frame_accounting.hpp"
 #include "../state/depth_target_state.hpp"
 #include "../transport/direct_gpu_state.hpp"
+#include "../transport/direct_transport_runtime.hpp"
 #include "../lifecycle/safety_overlay_state.hpp"
 #include "../lifecycle/frame_lifecycle.hpp"
 #include "../game/renderer_recovery.hpp"
@@ -548,7 +549,7 @@ namespace OutRunVRStereo
             {
                 DiscardUnreliableDrawCaches();
                 const std::uintptr_t cachedShader =
-                    CurrentVertexShaderIdentity.load(std::memory_order_acquire);
+                    CurrentVertexShaderIdentitySnapshot();
                 if (!LiveShaderMatches(device, cachedShader))
                     return {};
             }
@@ -687,14 +688,11 @@ namespace OutRunVRStereo
                 return lowerDraw();
 
             const std::uintptr_t savedIdentity =
-                CurrentVertexShaderIdentity.exchange(0, std::memory_order_acq_rel);
+                MaskCurrentVertexShaderIdentity();
             const HRESULT hr = lowerDraw();
             if (savedIdentity != 0)
             {
-                std::uintptr_t expected = 0;
-                CurrentVertexShaderIdentity.compare_exchange_strong(
-                    expected, savedIdentity,
-                    std::memory_order_acq_rel, std::memory_order_acquire);
+                RestoreCurrentVertexShaderIdentityIfEmpty(savedIdentity);
             }
             ++R32FailClosedZeroDisparityDraws;
             return hr;
@@ -745,11 +743,12 @@ namespace OutRunVRStereo
 
         bool R32DirectIdentityMatches() noexcept
         {
-            return SharedState && DirectInteropVerified &&
+            const auto identity = DirectTransportIdentitySnapshotForOverlay();
+            return identity.sharedStatePresent && identity.interopVerified &&
                 R32DirectHostPid != 0 &&
-                R32DirectHostPid == SharedState->hostPid &&
-                R32DirectHostLuidLow == SharedState->hostAdapterLuidLow &&
-                R32DirectHostLuidHigh == SharedState->hostAdapterLuidHigh;
+                R32DirectHostPid == identity.hostPid &&
+                R32DirectHostLuidLow == identity.hostAdapterLuidLow &&
+                R32DirectHostLuidHigh == identity.hostAdapterLuidHigh;
         }
 
         void R32InvalidateDirectInteropOnly() noexcept
@@ -757,45 +756,36 @@ namespace OutRunVRStereo
             R32ClearPendingProducerFences();
             R32DirectCopyPathRejected = false;
             R32DirectCopyRejectHr = D3D_OK;
-            ReleaseDirectTransportSlots();
-            ReleaseCom(DirectInteropProbeFence);
-            ReleaseCom(DirectInteropProbeSurface);
-            ReleaseCom(DirectInteropProbeTexture);
-            DirectInteropProbeHandle = nullptr;
-            DirectInteropProbeToken = 0;
-            DirectInteropVerified = false;
-            if (SharedState && SharedState->magic == OutRunVR::SharedMagic)
-            {
-                InterlockedExchange(reinterpret_cast<volatile LONG*>(
-                    &SharedState->clientInteropProbeHandle), 0);
-                InterlockedExchange(reinterpret_cast<volatile LONG*>(
-                    &SharedState->clientInteropProbeToken), 0);
-            }
+            InvalidateDirectTransportInteropResourcesRuntime();
             R32ForgetDirectIdentity();
             ++R32DirectIdentityInvalidations;
         }
 
         bool R32EnsureDirectResources(IDirect3DDevice9* device) noexcept
         {
-            if (DirectTransportResourcesReady && R32DirectIdentityMatches())
+            if (DirectTransportResourcesReadyRuntime() &&
+                R32DirectIdentityMatches())
             {
                 if (IsVRTelemetryEnabled()) ++R32DirectProbeCacheHits;
                 return true;
             }
 
-            if (DirectTransportResourcesReady && !R32DirectIdentityMatches())
+            if (DirectTransportResourcesReadyRuntime() &&
+                !R32DirectIdentityMatches())
                 R32InvalidateDirectInteropOnly();
 
-            if (!DirectTransportResourcesReady)
+            if (!DirectTransportResourcesReadyRuntime())
                 R32ClearPendingProducerFences();
-            if (!EnsureDirectTransportResources(device))
-                return false;
-            if (!SharedState || !DirectInteropVerified)
+            if (!EnsureDirectTransportResourcesRuntime(device))
                 return false;
 
-            R32DirectHostPid = SharedState->hostPid;
-            R32DirectHostLuidLow = SharedState->hostAdapterLuidLow;
-            R32DirectHostLuidHigh = SharedState->hostAdapterLuidHigh;
+            const auto identity = DirectTransportIdentitySnapshotForOverlay();
+            if (!identity.sharedStatePresent || !identity.interopVerified)
+                return false;
+
+            R32DirectHostPid = identity.hostPid;
+            R32DirectHostLuidLow = identity.hostAdapterLuidLow;
+            R32DirectHostLuidHigh = identity.hostAdapterLuidHigh;
             return true;
         }
 
@@ -893,7 +883,7 @@ namespace OutRunVRStereo
                 if (expired)
                 {
                     if (IsVRTelemetryEnabled()) ++R32DirectFenceBudgetFallbacks;
-                    ++DirectTransportFenceTimeouts;
+                    NoteDirectTransportFenceTimeoutRuntime();
                     if (!R32FirstFenceBudgetLogged)
                     {
                         R32FirstFenceBudgetLogged = true;
@@ -914,7 +904,9 @@ namespace OutRunVRStereo
                 !R32ProducerFencePending[slotIndex])
                 return true;
 
-            auto& slot = DirectTransportSlots[slotIndex];
+            DirectTransportSlotView slot{};
+            if (!ReadDirectTransportSlotView(slotIndex, slot))
+                return false;
             if (!slot.fence)
             {
                 R32DirectCopyPathRejected = true;
@@ -934,7 +926,7 @@ namespace OutRunVRStereo
             if (ready == S_FALSE)
             {
                 if (IsVRTelemetryEnabled()) ++R32PendingFenceBlocks;
-                ++DirectTransportRingBackpressure;
+                NoteDirectTransportRingBackpressureRuntime();
                 if (!R32FirstPendingFenceLogged)
                 {
                     R32FirstPendingFenceLogged = true;
@@ -959,7 +951,7 @@ namespace OutRunVRStereo
             if (!IsDirectTransportOverlayReady())
                 return R32ResolveDirectR13Hook.call<bool>(device, frameId);
             if (!frameId || !R32EnsureDirectResources(device) ||
-                !BackBuffer || !RightEyeSurfaceSnapshot())
+                !DirectTransportBackBufferSnapshot() || !RightEyeSurfaceSnapshot())
                 return false;
             // R32EnsureDirectResources must run before this cached rejection:
             // host PID/LUID or transport-generation changes invalidate the old
@@ -972,16 +964,18 @@ namespace OutRunVRStereo
             if (!R32DrainPendingProducerFence(slotIndex))
                 return false;
 
-            auto& slot = DirectTransportSlots[slotIndex];
+            DirectTransportSlotView slot{};
+            if (!ReadDirectTransportSlotView(slotIndex, slot))
+                return false;
             if (slot.frameId)
             {
                 std::uint32_t gpuCompleted = 0;
                 const bool ackValid =
                     ReadDirectTransportGpuCompletedFrame(slotIndex, gpuCompleted);
-                if (!ackValid || !FrameIdAtOrAfter(gpuCompleted, slot.frameId))
+                if (!ackValid || !DirectTransportFrameIdAtOrAfter(gpuCompleted, slot.frameId))
                 {
                     NoteDirectTransportAckBackpressure();
-                    ++DirectTransportRingBackpressure;
+                    NoteDirectTransportRingBackpressureRuntime();
                     return false;
                 }
             }
@@ -993,7 +987,7 @@ namespace OutRunVRStereo
                     OutRunVR::Telemetry::QpcFrequency() > 0 &&
                     QueryPerformanceCounter(&copyStart) != FALSE;
 
-                const HRESULT leftCopy = device->StretchRect(BackBuffer, nullptr,
+                const HRESULT leftCopy = device->StretchRect(DirectTransportBackBufferSnapshot(), nullptr,
                     slot.leftSurface, nullptr, D3DTEXF_NONE);
                 const HRESULT rightCopy = SUCCEEDED(leftCopy)
                     ? device->StretchRect(RightEyeSurfaceSnapshot(), nullptr,
@@ -1014,8 +1008,8 @@ namespace OutRunVRStereo
                         R32DirectCopyMaxQpcTicksSinceLog =
                             std::max(R32DirectCopyMaxQpcTicksSinceLog, ticks);
                         R32DirectCopyPixels +=
-                            static_cast<std::uint64_t>(DirectTransportWidth) *
-                            static_cast<std::uint64_t>(DirectTransportHeight) * 2ull;
+                            static_cast<std::uint64_t>(DirectTransportWidthSnapshot()) *
+                            static_cast<std::uint64_t>(DirectTransportHeightSnapshot()) * 2ull;
                     }
                 }
 
@@ -1059,11 +1053,7 @@ namespace OutRunVRStereo
             // post-Present publication contract. DirectTransportFrameReadyAfterPresent()
             // is still the sole owner that marks the slot published after Present;
             // it requires this exact frame identity plus producerPending.
-            slot.producerPending = true;
-            slot.pendingFrameId = frameId;
-            slot.frameId = frameId;
-            slot.published = false;
-            ActiveDirectTransportSlot = slotIndex;
+            CommitDirectTransportProducerSlot(slotIndex, frameId);
             return true;
         }
 
@@ -1120,7 +1110,7 @@ namespace OutRunVRStereo
                 R32Counters.directFenceWaitSamples = R32DirectFenceWaitSamples;
                 R32Counters.directFencePolls = R32DirectFencePolls;
                 R32Counters.directFenceWaitUs = R32DirectFenceWaitUsTotal;
-                R32Counters.directBackpressure = DirectTransportRingBackpressure;
+                R32Counters.directBackpressure = DirectTransportRingBackpressureCount();
                 R32Counters.pendingDrain = R32PendingFenceDrains;
                 R32Counters.pendingBlock = R32PendingFenceBlocks;
                 R32Counters.pendingError = R32PendingFenceErrors;
@@ -1195,7 +1185,7 @@ namespace OutRunVRStereo
                 fencePolls,
                 fenceAvgUs,
                 R32DirectFenceWaitUsMax,
-                DirectTransportRingBackpressure - R32Counters.directBackpressure,
+                DirectTransportRingBackpressureCount() - R32Counters.directBackpressure,
                 R32PendingFenceDrains - R32Counters.pendingDrain,
                 R32PendingFenceBlocks - R32Counters.pendingBlock,
                 R32PendingFenceErrors - R32Counters.pendingError,
@@ -1203,9 +1193,9 @@ namespace OutRunVRStereo
                 copyAvgUs,
                 OutRunVR::Telemetry::QpcTicksToUs(R32DirectCopyMaxQpcTicksSinceLog),
                 (R32DirectCopyPixels - R32Counters.directCopyPixels) / 1000000ull,
-                DirectTransportWidth,
-                DirectTransportHeight,
-                static_cast<int>(DirectTransportFormat),
+                DirectTransportWidthSnapshot(),
+                DirectTransportHeightSnapshot(),
+                static_cast<int>(DirectTransportFormatSnapshot()),
                 R32ResetEpochRearms - R32Counters.resetRearm,
                 R32ResetFailures - R32Counters.resetFail);
 
@@ -1224,7 +1214,7 @@ namespace OutRunVRStereo
             R32Counters.directFenceWaitSamples = R32DirectFenceWaitSamples;
             R32Counters.directFencePolls = R32DirectFencePolls;
             R32Counters.directFenceWaitUs = R32DirectFenceWaitUsTotal;
-            R32Counters.directBackpressure = DirectTransportRingBackpressure;
+            R32Counters.directBackpressure = DirectTransportRingBackpressureCount();
             R32Counters.pendingDrain = R32PendingFenceDrains;
             R32Counters.pendingBlock = R32PendingFenceBlocks;
             R32Counters.pendingError = R32PendingFenceErrors;

@@ -36,6 +36,9 @@ namespace OutRunVRStereo
         IDirect3DDevice9* device, IDirect3DSurface9* surface) noexcept;
 
     std::uintptr_t CurrentVertexShaderIdentitySnapshot() noexcept;
+    std::uintptr_t MaskCurrentVertexShaderIdentity() noexcept;
+    void RestoreCurrentVertexShaderIdentityIfEmpty(
+        std::uintptr_t savedIdentity) noexcept;
     std::uint32_t CurrentFrameStereoPoseSequence() noexcept;
     std::uint64_t CurrentPresentEpochSnapshot() noexcept;
     HRESULT SetRawStereoWvpBatch(
