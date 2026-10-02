@@ -49,6 +49,10 @@ jobs:
         shell: pwsh
         run: python tools/verify_dx11_native_transport_contract.py
 
+      - name: Verify DX11 dual-source blend contract
+        shell: pwsh
+        run: python tools/verify_dx11_dual_source_contract.py
+
       - name: Verify DX11 source graph
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py

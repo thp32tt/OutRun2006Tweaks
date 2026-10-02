@@ -83,6 +83,11 @@ def main() -> None:
             + ", ".join(absent)
         )
 
+    if "python tools/verify_dx11_dual_source_contract.py" not in BACKEND_GATE:
+        raise SystemExit(
+            "DX11 backend conversion gate omits dual-source blend contract validator"
+        )
+
     census = (DX11 / "runtime_census.cpp").read_text(encoding="utf-8")
     pipeline_header = (DX11 / "pipeline_translation.hpp").read_text(encoding="utf-8")
     pipeline_translation = (DX11 / "pipeline_translation.cpp").read_text(
