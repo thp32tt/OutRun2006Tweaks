@@ -675,6 +675,44 @@ bool validate_fixed_function_texture_binding_set_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+bool validate_fixed_function_texture_binding_set_readiness_integrity(
+    const NativeFixedFunctionTextureBindingSetReadiness& textureBindings) noexcept {
+    constexpr std::uint32_t kFixedFunctionStageMask = 0xffu;
+    if (!textureBindings.inputValid ||
+        !textureBindings.requiredMaskValid ||
+        !textureBindings.allRequiredBoundExact ||
+        !textureBindings.ready ||
+        textureBindings.snapshotToken == 0 ||
+        textureBindings.requiredTextureMask == 0 ||
+        (textureBindings.requiredTextureMask & ~kFixedFunctionStageMask) != 0 ||
+        textureBindings.observedTextureMask !=
+            textureBindings.requiredTextureMask)
+        return false;
+
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(
+        token, textureBindings.requiredTextureMask);
+    token = mix_readiness_snapshot_token(
+        token, textureBindings.observedTextureMask);
+    for (UINT slot = 0; slot < 8; ++slot) {
+        const std::uint32_t stageBit = 1u << slot;
+        const bool required =
+            (textureBindings.requiredTextureMask & stageBit) != 0;
+        if (!required) {
+            if (textureBindings.stageSnapshotTokens[slot] != 0)
+                return false;
+            continue;
+        }
+        if (textureBindings.stageSnapshotTokens[slot] == 0)
+            return false;
+        token = mix_readiness_snapshot_token(token, stageBit);
+        token = mix_readiness_snapshot_token(
+            token, textureBindings.stageSnapshotTokens[slot]);
+    }
+    token = token == 0 ? 1 : token;
+    return token == textureBindings.snapshotToken;
+}
+
 void NativeFixedFunctionTextureView::shutdown() noexcept {
     srv_.Reset();
     texture_.Reset();
@@ -2870,13 +2908,17 @@ compose_fixed_function_multistage_textured_draw_readiness(
         out.requiredTextureMask != 0 &&
         textureBindings.requiredTextureMask == out.requiredTextureMask &&
         out.observedTextureMask == out.requiredTextureMask;
+    const bool drawSnapshotValid =
+        validate_fixed_function_draw_readiness_integrity(draw);
+    const bool textureBindingSnapshotValid =
+        validate_fixed_function_texture_binding_set_readiness_integrity(
+            textureBindings);
     out.inputValid =
-        draw.inputValid &&
-        textureBindings.inputValid &&
+        drawSnapshotValid &&
+        textureBindingSnapshotValid &&
         out.textureMaskMatches;
-    out.drawReady = validate_fixed_function_draw_readiness_integrity(draw);
-    out.textureStageReady =
-        textureBindings.ready && textureBindings.snapshotToken != 0;
+    out.drawReady = drawSnapshotValid;
+    out.textureStageReady = textureBindingSnapshotValid;
     out.componentSnapshotsPresent =
         draw.snapshotToken != 0 && textureBindings.snapshotToken != 0;
     out.ready =
