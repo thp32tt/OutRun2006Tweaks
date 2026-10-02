@@ -3,6 +3,7 @@
 #include <Windows.h>
 
 #include "runtime_census.hpp"
+#include "fixed_function_pipeline.hpp"
 #include "native_backend.hpp"
 #include "resource_translation.hpp"
 
@@ -95,6 +96,9 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> FixedFunctionStateCoverageFailureSamples{0};
         std::atomic<std::uint64_t> FixedFunctionTranslationReadySamples{0};
         std::atomic<std::uint64_t> FixedFunctionTranslationPendingSamples{0};
+        std::atomic<std::uint64_t> FixedFunctionPipelineShaderExactSamples{0};
+        std::atomic<std::uint64_t> FixedFunctionPipelineShaderPendingSamples{0};
+        std::atomic<std::uint64_t> FixedFunctionAlphaTestShaderOwnedSamples{0};
         std::atomic<std::uint64_t> FixedFunctionShaderPrototypeGeneratedSamples{0};
         std::atomic<std::uint64_t> FixedFunctionShaderPrototypePendingSamples{0};
         std::atomic<std::uint64_t> FixedFunctionShaderCompileSucceededSignatures{0};
@@ -220,6 +224,9 @@ namespace outrun::vr::dx11
             bool fixedFunctionTranslationReady{};
             std::uint32_t fixedFunctionTranslationUnsupported{};
             UINT fixedFunctionActiveStages{};
+            bool fixedFunctionPipelineShaderExact{};
+            std::uint32_t fixedFunctionPipelineShaderUnsupported{};
+            bool fixedFunctionAlphaTestOwnedByPixelShader{};
             bool fixedFunctionShaderPrototypeGenerated{};
             std::uint32_t fixedFunctionShaderPrototypeUnsupported{};
             std::uint64_t fixedFunctionShaderPrototypeHash{};
@@ -350,6 +357,12 @@ namespace outrun::vr::dx11
             hash = hash_mix(
                 hash, sig.fixedFunctionTranslationUnsupported);
             hash = hash_mix(hash, sig.fixedFunctionActiveStages);
+            hash = hash_mix(
+                hash, sig.fixedFunctionPipelineShaderExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.fixedFunctionPipelineShaderUnsupported);
+            hash = hash_mix(
+                hash, sig.fixedFunctionAlphaTestOwnedByPixelShader ? 1u : 0u);
             hash = hash_mix(
                 hash, sig.fixedFunctionShaderPrototypeGenerated ? 1u : 0u);
             hash = hash_mix(
@@ -1157,6 +1170,13 @@ namespace outrun::vr::dx11
                     ? FixedFunctionTranslationReadySamples
                     : FixedFunctionTranslationPendingSamples).fetch_add(
                         1, std::memory_order_relaxed);
+                (sig.fixedFunctionPipelineShaderExact
+                    ? FixedFunctionPipelineShaderExactSamples
+                    : FixedFunctionPipelineShaderPendingSamples).fetch_add(
+                        1, std::memory_order_relaxed);
+                if (sig.fixedFunctionAlphaTestOwnedByPixelShader)
+                    FixedFunctionAlphaTestShaderOwnedSamples.fetch_add(
+                        1, std::memory_order_relaxed);
                 (sig.fixedFunctionShaderPrototypeGenerated
                     ? FixedFunctionShaderPrototypeGeneratedSamples
                     : FixedFunctionShaderPrototypePendingSamples).fetch_add(
@@ -1310,6 +1330,13 @@ namespace outrun::vr::dx11
                         sig.fixedFunctionShaderPrototypeBytes,
                         sig.fixedFunctionActiveStages);
 
+                    spdlog::info(
+                        "VR DX11 R120 ffp pipeline/shader handoff#{}: exact={} renderMask=0x{:08X} alphaTestOwnedByPixelShader={}",
+                        unique,
+                        sig.fixedFunctionPipelineShaderExact ? 1 : 0,
+                        sig.fixedFunctionPipelineShaderUnsupported,
+                        sig.fixedFunctionAlphaTestOwnedByPixelShader ? 1 : 0);
+
                     if (sig.fixedFunctionShaderPrototypeGenerated)
                     {
                         spdlog::info(
@@ -1451,7 +1478,7 @@ namespace outrun::vr::dx11
             const auto sampleStride = census_sample_stride();
             const auto samplingScheme = census_sampling_scheme();
             spdlog::info(
-                "VR DX11 R114 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
+                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -1526,6 +1553,12 @@ namespace outrun::vr::dx11
                 FixedFunctionTranslationReadySamples.load(
                     std::memory_order_relaxed),
                 FixedFunctionTranslationPendingSamples.load(
+                    std::memory_order_relaxed),
+                FixedFunctionPipelineShaderExactSamples.load(
+                    std::memory_order_relaxed),
+                FixedFunctionPipelineShaderPendingSamples.load(
+                    std::memory_order_relaxed),
+                FixedFunctionAlphaTestShaderOwnedSamples.load(
                     std::memory_order_relaxed),
                 FixedFunctionShaderPrototypeGeneratedSamples.load(
                     std::memory_order_relaxed),
@@ -2002,19 +2035,27 @@ namespace outrun::vr::dx11
                 textureTypes[stageIndex] =
                     signature.textureStages[stageIndex].type;
 
-            const auto shaderPrototype =
-                generate_fixed_function_pixel_shader_prototype(
+            // R120 consumes the R118 fixed-function-only alpha-test handoff
+            // strictly as census/readiness evidence. The generic pipeline
+            // unsupported mask above remains untouched, shaderTranslationExact
+            // stays fail-closed, and no game draw is routed to D3D11.
+            const auto pipelineShader =
+                translate_fixed_function_pipeline_with_shader_semantics(
+                    source,
+                    fixedFunction,
                     signature.fixedFunctionStages,
                     signature.fixedFunctionStateCoverageExact,
                     signature.textureResourcePresentMask,
                     signature.textureResourceExactMask,
-                    textureTypes,
-                    FixedFunctionAlphaTestState{
-                        signature.alphaTestObservationComplete,
-                        signature.alphaTestEnable,
-                        signature.alphaTestRef,
-                        signature.alphaTestFunc
-                    });
+                    textureTypes);
+            signature.fixedFunctionPipelineShaderExact =
+                pipelineShader.exact();
+            signature.fixedFunctionPipelineShaderUnsupported =
+                pipelineShader.renderStates.unsupported;
+            signature.fixedFunctionAlphaTestOwnedByPixelShader =
+                pipelineShader.alphaTestOwnedByPixelShader;
+
+            const auto& shaderPrototype = pipelineShader.pixelShader;
             signature.fixedFunctionShaderPrototypeGenerated =
                 shaderPrototype.generated();
             signature.fixedFunctionShaderPrototypeUnsupported =
