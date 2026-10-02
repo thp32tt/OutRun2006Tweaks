@@ -30152,7 +30152,7 @@ def main() -> int:
         "guarded_gf_target_c_helper_1_third_callee_continuation_72_provenance"
     ]
     print(
-        f"gf_target_c_helper_1_third_callee_continuation_72_provenance="
+        f"gf_target_c_helper_1_third_callee_continuation_72="
         f"0x{helper_1_third_cont_72['target_rva']:08X} "
         f"status={helper_1_third_cont_72['status']} "
         f"predecessor={helper_1_third_cont_72['predecessor_status']} "
