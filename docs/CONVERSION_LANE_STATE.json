@@ -2809,6 +2809,49 @@
       "scope": "Bounded canonical raw provenance only; no function/render/HUD/runtime semantic promotion.",
       "exact_next_action": "Preserve any newer authoritative frontier. If continuation_55 remains the newest raw-only edge, exact-decode only complete canonical instructions in 0x00182FFC..0x0018303C, resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved.",
       "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER"
+    },
+    {
+      "unit_id": "DXVK_F46_CANONICAL_CONTROL_FLOW_0x182FFC_TO_0x18303B",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "123d4b8248427813e53df091faba3abd84529961",
+      "validation_bearing_result_sha": "123d4b8248427813e53df091faba3abd84529961",
+      "run_record_commit_sha": "dbf3a614ba95df04e771cb04a878f7a844c89fbc",
+      "commit_message": "dxvk: prove canonical 0x182FFC control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Validated F46 canonical control-flow/capture-edge proof: 13 contiguous complete instructions across 0x00182FFC..0x0018303B, exact completion of predecessor 66 83 cut bytes, predecessor forward target 0x00183004 resolved to an exact instruction boundary, exact internal branch target 0x00183010, external target 0x0018A5EB, empty direct rel32 CALL census, and mandatory trailing 66 overlap at 0x0018303B.",
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "dxvk_disassembly_evidence_run_id": 36985162932,
+        "dxvk_disassembly_evidence_job_id": 110768418111,
+        "artifact_id": 11216234970,
+        "artifact_digest": "sha256:f455baae727cb1ba4886063b3219cb4b363afa87a2fb1d9143dff56eace29e03",
+        "proof_status": "EXACT_182FFC_TO_18303B_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "instruction_count": 13,
+        "branch_targets_match": true,
+        "internal_branch_targets_on_boundaries": true,
+        "external_targets": [
+          "0x0018A5EB"
+        ],
+        "raw_call_census_empty": true,
+        "predecessor_target_contract": true,
+        "resolved_predecessor_target_rva": "0x00183004",
+        "resolved_predecessor_target_is_boundary": true,
+        "incomplete_rva": "0x0018303B",
+        "incomplete_bytes": "66",
+        "incomplete_matches": true,
+        "capture_edge_matches": true,
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948352683,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_CONTINUATION_56_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newer branch-authoritative continuation_56 raw frontier at 0x0018303B..0x0018307B with mandatory overlap byte 66. Validate its canonical provenance if needed, then exact-decode only complete instructions, preserve any subsequent cut edge, and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
