@@ -2151,6 +2151,18 @@ def main() -> None:
             "foreign-context rejection",
         "context->PSSetShaderResources(slot, 1, &shaderResource)":
             "same-stage SRV binding",
+        "context->PSGetSamplers(":
+            "post-bind sampler identity readback",
+        "context->PSGetShaderResources(":
+            "post-bind SRV identity readback",
+        "boundSampler.Get() != samplerState":
+            "sampler identity fail-closed gate",
+        "boundResource.Get() != shaderResource":
+            "SRV hazard/identity fail-closed gate",
+        "context->PSSetSamplers(slot, 1, &nullSampler)":
+            "partial sampler binding rollback",
+        "context->PSSetShaderResources(slot, 1, &nullResource)":
+            "partial SRV binding rollback",
     }.items():
         if token not in NATIVE_BACKEND_CPP:
             raise SystemExit(
@@ -2217,6 +2229,10 @@ def main() -> None:
             "texture-stage SRV slot bound",
         "DX11 dormant texture-stage foreign context fails closed":
             "texture-stage foreign-context rejection",
+        "DX11 dormant texture-stage output hazard fails closed":
+            "texture-stage RTV/SRV hazard rejection",
+        "DX11 dormant texture-stage failed bind clears partial state":
+            "texture-stage failed-bind rollback proof",
         "DX11 dormant texture-stage cross-device owners fail closed":
             "texture-stage cross-device owner rejection",
     }.items():
