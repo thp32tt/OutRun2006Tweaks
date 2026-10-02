@@ -28,7 +28,15 @@ def validate_window(data: bytes, start: int, expected_hex: str) -> dict:
         "expected_bytes": expected.hex(" "),
         "actual_bytes": actual.hex(" "),
         "matches": actual == expected,
+        "available_length": len(actual),
     }
+
+
+def validate_runtime_claim(record: dict) -> list[str]:
+    errors = []
+    if record.get("runtime_validation", "UNTESTED") != "UNTESTED":
+        errors.append("runtime_claim_not_allowed")
+    return errors
 
 
 def main() -> int:
@@ -38,14 +46,23 @@ def main() -> int:
     parser.add_argument("--overlap", default=DEFAULT_OVERLAP)
     args = parser.parse_args()
 
+    data = args.binary.read_bytes()
+    window = validate_window(data, args.offset, args.overlap)
     result = {
         "binary_sha256": sha256_file(args.binary),
         "runtime_validation": "UNTESTED",
         "provenance_only": True,
-        "window": validate_window(args.binary.read_bytes(), args.offset, args.overlap),
+        "window": window,
     }
+
+    errors = validate_runtime_claim(result)
+    if errors:
+        result["errors"] = errors
+        print(json.dumps(result, indent=2))
+        return 1
+
     print(json.dumps(result, indent=2))
-    return 0 if result["window"]["matches"] else 1
+    return 0 if window["matches"] else 1
 
 
 if __name__ == "__main__":
