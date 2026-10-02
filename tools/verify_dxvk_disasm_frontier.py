@@ -22,6 +22,8 @@ def main() -> int:
     end = data.get("proof_end_rva") or data.get("probe_end_rva")
     runtime = data.get("runtime_validation")
     capture_edge = data.get("capture_edge_matches")
+    overlap_required = data.get("overlap_required")
+    overlap_bytes = data.get("overlap_bytes")
 
     if not isinstance(start, str) or not isinstance(end, str):
         raise SystemExit("missing exact RVA frontier")
@@ -29,6 +31,8 @@ def main() -> int:
         raise SystemExit("runtime claim must remain UNTESTED")
     if capture_edge is False:
         raise SystemExit("capture edge mismatch")
+    if overlap_required is True and not isinstance(overlap_bytes, str):
+        raise SystemExit("required overlap evidence missing")
 
     start_value = int(start, 16)
     end_value = int(end, 16)
