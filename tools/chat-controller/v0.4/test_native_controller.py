@@ -505,6 +505,62 @@ class NativeControllerTests(unittest.TestCase):
         self.assertTrue(f2({'lane':'LOCALIZATION_A'}))
         self.assertTrue(f2({'lane':'LOCALIZATION_C', 'slot':'C'}))
 
+    def test_conversion_parallel_migrates_legacy_b_and_dispatches_missing_dx11(self):
+        q = {
+            'counter': 269,
+            'active': {
+                'task_id':'CONVERSION-DXVK-00269',
+                'slot':'B',
+                'lane':'DXVK',
+                'branch':'vr-dxvk-r71-disasm',
+                'workflow':'Backend Conversion Gate',
+                'phase':'WAIT_ACTIONS',
+                'attempt':1,
+                'sent_at':'2026-10-02T02:00:00+00:00',
+                'result_sha':'a'*40,
+            },
+            'active_by_lane': {},
+            'completed': [],
+            'blocked': [],
+        }
+        reg = SimpleNamespace(
+            slots=[
+                SimpleNamespace(name='A', last_sent_at='2026-10-02T00:30:00+00:00', last_task_completed_at=None),
+                SimpleNamespace(name='B', last_sent_at='2026-10-02T02:00:00+00:00', last_task_completed_at=None),
+            ]
+        )
+        send = AsyncMock(return_value=True)
+        process = AsyncMock(return_value=None)
+        f, ns = load_function(
+            'conversion_parallel_cycle',
+            CONTROLLER_MODE='conversion',
+            load_queue_state=lambda:q,
+            load_registry=lambda now:reg,
+            reconcile_legacy_conversion_blocked=Mock(),
+            queue_upgrade_native_context=AsyncMock(return_value=False),
+            rate_limit_active=lambda *args:False,
+            localization_process_lane_isolated=process,
+            localization_safe_send_lane_task=send,
+            save_registry=Mock(),
+        )
+        asyncio.run(f(None,{}))
+        self.assertIsNone(q['active'])
+        self.assertEqual(q['active_by_lane']['B']['task_id'],'CONVERSION-DXVK-00269')
+        self.assertTrue(q['active_by_lane']['B']['task_latched'])
+        self.assertEqual(q['active_by_lane']['B']['controller_stage'],'WAIT_ACTIONS')
+        process.assert_awaited()
+        self.assertEqual(send.await_args.args[3], 'A')
+
+    def test_conversion_parallel_scheduler_is_selected(self):
+        source = ast.get_source_segment(SOURCE, FUNCTIONS['scheduler_loop']) or ''
+        self.assertIn('CONTROLLER_MODE == "conversion"', source)
+        self.assertIn('await conversion_parallel_cycle(context, pages)', source)
+
+    def test_conversion_parallel_dispatch_uses_conversion_task_prefix(self):
+        source = ast.get_source_segment(SOURCE, FUNCTIONS['localization_send_lane_task']) or ''
+        self.assertIn('"CONVERSION" if CONTROLLER_MODE == "conversion"', source)
+        self.assertIn('"WAIT_DURABLE_RESULT" if CONTROLLER_MODE == "conversion"', source)
+
     def test_no_progress_is_handled_even_when_send_deferred(self):
         self.assertTrue('queue_handle_native_response' in FUNCTIONS)
         f, ns = load_function('queue_handle_native_response', queue_send_github_recovery=AsyncMock(return_value=False))
