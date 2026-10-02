@@ -3558,6 +3558,130 @@ int main()
                 liveFanOwner, 3u, 7u, completeFanBoundDraw.snapshotToken),
         "R142 complete fan bound draw restores deterministic live IA snapshot");
 
+    const auto liveIndexedSourceReady =
+        managedIndexBuffer.mirror_readiness(d3d.device);
+    const std::array<std::uint16_t, 5> liveIndexedFanSource{
+        99u, 4u, 8u, 15u, 16u};
+    NativeTriangleFanIndexBuffer liveIndexedFanOwner;
+    require(
+        liveIndexedSourceReady.ready &&
+        liveIndexedSourceReady.role == ResourceRole::Index &&
+        liveIndexedFanOwner.initialize_indexed(
+            d3d.device, 2u, D3DFMT_INDEX16, 1u,
+            liveIndexedFanSource.data(),
+            static_cast<UINT>(liveIndexedFanSource.size()),
+            liveIndexedSourceReady.snapshotToken),
+        "R144 indexed generated fan owner prerequisite");
+    const auto liveIndexedFanOwnerReady =
+        liveIndexedFanOwner.readiness(d3d.device);
+    const auto liveIndexedFanGeometryReady =
+        outrun::vr::dx11::
+            compose_fixed_function_indexed_triangle_fan_geometry_readiness(
+                liveFanVertexReady, liveIndexedSourceReady,
+                liveIndexedFanOwnerReady, 2u, D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()));
+    require(
+        liveIndexedFanGeometryReady.ready &&
+        liveIndexedFanGeometryReady.indexBufferSnapshotToken ==
+            liveIndexedSourceReady.snapshotToken &&
+        liveIndexedFanGeometryReady.generatedIndexBufferSnapshotToken ==
+            liveIndexedFanOwnerReady.snapshotToken,
+        "R144 indexed fan geometry prerequisite");
+
+    const auto liveIndexedFanDrawReady =
+        compose_fixed_function_draw_readiness(
+            multiStageActivation, outputBindingRenderReady, surfacePairReady,
+            outputStateReady, outputStateBinding,
+            liveIndexedFanGeometryReady);
+    require(
+        liveIndexedFanDrawReady.ready &&
+        liveIndexedFanDrawReady.geometrySnapshotToken ==
+            liveIndexedFanGeometryReady.snapshotToken,
+        "R144 indexed fan sealed draw prerequisite");
+
+    d3d.context->IASetVertexBuffers(
+        0, 1, &liveFanVertexBuffer,
+        &geometryVertexStride, &geometryVertexOffset);
+    require(
+        liveIndexedFanOwner.bind(d3d.context),
+        "R144 bind indexed generated fan IA prerequisite");
+
+    constexpr INT indexedFanBaseVertexLocation = -3;
+    const auto completeIndexedFanBoundDraw =
+        outrun::vr::dx11::
+            compose_fixed_function_complete_indexed_triangle_fan_bound_draw_readiness(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation);
+    require(
+        completeIndexedFanBoundDraw.inputValid &&
+        completeIndexedFanBoundDraw.sameContextBoundDrawReady &&
+        completeIndexedFanBoundDraw.geometryReady &&
+        completeIndexedFanBoundDraw.geometryMatchesDraw &&
+        completeIndexedFanBoundDraw.sourceIndexBufferCurrent &&
+        completeIndexedFanBoundDraw.vertexBufferBoundExact &&
+        completeIndexedFanBoundDraw.generatedIndexBindingReady &&
+        completeIndexedFanBoundDraw.generatedIndexMatchesGeometry &&
+        completeIndexedFanBoundDraw.componentSnapshotsPresent &&
+        completeIndexedFanBoundDraw.ready &&
+        completeIndexedFanBoundDraw.geometrySnapshotToken ==
+            liveIndexedFanGeometryReady.snapshotToken &&
+        completeIndexedFanBoundDraw.sourceIndexBufferSnapshotToken ==
+            liveIndexedSourceReady.snapshotToken &&
+        completeIndexedFanBoundDraw.generatedIndexBindingSnapshotToken != 0 &&
+        completeIndexedFanBoundDraw.snapshotToken != 0 &&
+        outrun::vr::dx11::
+            validate_fixed_function_complete_indexed_triangle_fan_bound_draw_snapshot(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation,
+                completeIndexedFanBoundDraw.snapshotToken),
+        "R144 indexed fan final bound draw seals source provenance and live generated IA");
+
+    require(
+        !outrun::vr::dx11::
+            validate_fixed_function_complete_indexed_triangle_fan_bound_draw_snapshot(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX16, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation + 1,
+                completeIndexedFanBoundDraw.snapshotToken),
+        "R144 indexed fan final snapshot rejects BaseVertexLocation drift");
+
+    const auto indexedFanFormatDrift =
+        outrun::vr::dx11::
+            compose_fixed_function_complete_indexed_triangle_fan_bound_draw_readiness(
+                liveIndexedFanDrawReady, d3d.context, outputStateBinding,
+                pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
+                multiStageSamplers, multiStageTextures,
+                managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
+                managedIndexBuffer, liveIndexedFanOwner, 2u,
+                D3DFMT_INDEX32, 1u,
+                static_cast<UINT>(liveIndexedFanSource.size()),
+                indexedFanBaseVertexLocation);
+    require(
+        indexedFanFormatDrift.sameContextBoundDrawReady &&
+        !indexedFanFormatDrift.geometryReady &&
+        !indexedFanFormatDrift.geometryMatchesDraw &&
+        indexedFanFormatDrift.generatedIndexBindingReady &&
+        !indexedFanFormatDrift.ready &&
+        indexedFanFormatDrift.snapshotToken == 0,
+        "R144 indexed fan final bound draw rejects source format drift");
+
     require(
         outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
             d3d.context, indexedGeometryReady, managedVertexBuffer,
