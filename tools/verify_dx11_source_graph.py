@@ -526,16 +526,67 @@ def main() -> None:
         )
 
 
-    dual_source_blend_contract = {
-        "case D3DBLEND_SRCCOLOR2: return {D3D11_BLEND_SRC1_COLOR, false};":
-            "dual-source source-color blend stays fail-closed without SV_Target1 proof",
-        "case D3DBLEND_INVSRCCOLOR2: return {D3D11_BLEND_INV_SRC1_COLOR, false};":
-            "inverse dual-source source-color blend stays fail-closed without SV_Target1 proof",
-    }
+    dual_source_blend_contract = [
+        (
+            "PipelineUnsupportedDualSourceBlend = 1u << 12",
+            PIPELINE_TRANSLATION_HPP,
+            "dedicated dual-source blend blocker",
+        ),
+        (
+            "case D3DBLEND_SRCCOLOR2: return {D3D11_BLEND_SRC1_COLOR, false};",
+            STATE_TRANSLATION_CPP,
+            "dual-source source-color mapping stays fail-closed without SV_Target1 proof",
+        ),
+        (
+            "case D3DBLEND_INVSRCCOLOR2: return {D3D11_BLEND_INV_SRC1_COLOR, false};",
+            STATE_TRANSLATION_CPP,
+            "inverse dual-source source-color mapping stays fail-closed without SV_Target1 proof",
+        ),
+        (
+            "is_dual_source_blend_factor",
+            PIPELINE_TRANSLATION_CPP,
+            "dual-source factor classifier",
+        ),
+        (
+            "dualSourceBlendRequested",
+            PIPELINE_TRANSLATION_CPP,
+            "draw-state dual-source provenance",
+        ),
+        (
+            "out.unsupported |= PipelineUnsupportedDualSourceBlend;",
+            PIPELINE_TRANSLATION_CPP,
+            "dedicated fail-closed dual-source pipeline blocker",
+        ),
+        (
+            "SRCCOLOR2 source blend must report dedicated dual-source blocker",
+            SEMANTIC_SMOKE,
+            "source SRC1 semantic blocker proof",
+        ),
+        (
+            "INVSRCCOLOR2 source blend must report dedicated dual-source blocker",
+            SEMANTIC_SMOKE,
+            "inverse source SRC1 semantic blocker proof",
+        ),
+        (
+            "SRCCOLOR2 destination blend must report dedicated dual-source blocker",
+            SEMANTIC_SMOKE,
+            "destination SRC1 semantic blocker proof",
+        ),
+        (
+            "INVSRCCOLOR2 destination blend must report dedicated dual-source blocker",
+            SEMANTIC_SMOKE,
+            "inverse destination SRC1 semantic blocker proof",
+        ),
+        (
+            "disabled alpha blending must ignore dormant dual-source factors",
+            SEMANTIC_SMOKE,
+            "disabled blend does not create a false dual-source blocker",
+        ),
+    ]
     missing_dual_source_blend_contract = [
         meaning
-        for token, meaning in dual_source_blend_contract.items()
-        if token not in STATE_TRANSLATION_CPP
+        for token, source, meaning in dual_source_blend_contract
+        if token not in source
     ]
     if missing_dual_source_blend_contract:
         raise SystemExit(
