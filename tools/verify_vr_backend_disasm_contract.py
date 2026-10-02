@@ -17,8 +17,10 @@ def require(path: str, needles: list[str]) -> None:
 def verify_dxvk_continuation_chain() -> None:
     """Auto-discover and fail closed if canonical continuation capture/proof edges drift apart."""
 
+    analyzer_path = ROOT / "tools/analyze_outrun_exe.py"
+    analyzer_source = analyzer_path.read_text(encoding="utf-8")
     analyzer = runpy.run_path(
-        str(ROOT / "tools/analyze_outrun_exe.py"),
+        str(analyzer_path),
         run_name="dxvk_disasm_contract_analyzer",
     )
 
@@ -63,7 +65,6 @@ def verify_dxvk_continuation_chain() -> None:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} is missing its provenance collector"
             )
-        analyzer_source = (ROOT / "tools/analyze_outrun_exe.py").read_text(encoding="utf-8")
         provenance_name = (
             f"guarded_gf_target_c_helper_1_third_callee_continuation_"
             f"{continuation_id}_provenance"
@@ -80,6 +81,13 @@ def verify_dxvk_continuation_chain() -> None:
         if f"{provenance_name}=FAILED" not in analyzer_source:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} missing analyzer failure guard"
+            )
+        raw_success_marker = (
+            f"gf_target_c_helper_1_third_callee_continuation_{continuation_id}="
+        )
+        if raw_success_marker not in analyzer_source:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} missing analyzer success telemetry"
             )
         start = value(f"{prefix}_RVA")
         probe_len = value(f"{prefix}_PROBE_LEN")
@@ -140,6 +148,13 @@ def verify_dxvk_continuation_chain() -> None:
         if f"{proof_name}=FAILED" not in analyzer_source:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} proof missing analyzer failure guard"
+            )
+        proof_success_marker = (
+            f"gf_target_c_helper_1_third_callee_continuation_{continuation_id}_proof="
+        )
+        if proof_success_marker not in analyzer_source:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof missing analyzer success telemetry"
             )
         start = value(f"{prefix}_RVA")
         probe_end = value(f"{prefix}_PROBE_END_RVA")
