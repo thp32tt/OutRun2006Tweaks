@@ -792,7 +792,7 @@ def verify_dxvk_continuation_chain() -> None:
             predecessor_proof_ids = [
                 int(match.group(1))
                 for match in re.finditer(
-                    r"collect_guarded_gf_target_c_helper_1_third_callee_continuation_(\\d+)_prefix_proof\\(pe\\)",
+                    r"collect_guarded_gf_target_c_helper_1_third_callee_continuation_(\d+)_prefix_proof\(pe\)",
                     proof_source,
                 )
             ]
