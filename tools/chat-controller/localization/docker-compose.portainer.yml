@@ -1,0 +1,88 @@
+services:
+  outrun-localization-controller:
+    build:
+      context: .
+      dockerfile: Dockerfile.portainer
+    container_name: outrun-localization-controller
+    restart: unless-stopped
+    init: true
+    shm_size: "768m"
+    mem_limit: 3g
+    mem_reservation: 1g
+    cpus: 1.5
+    environment:
+      TZ: Asia/Seoul
+      CONTROLLER_MODE: "localization"
+      AUTO_SEND: "${AUTO_SEND:-true}"
+      QUEUE_MODE: "true"
+      LOCALIZATION_PARALLEL: "true"
+      PARALLEL_LANE_STAGGER_SECONDS: "15"
+      PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS: "15"
+      LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS: "15"
+      LOCALIZATION_SLOT_DEDUP_SECONDS: "30"
+      HEARTBEAT_SECONDS: "15"
+      LOCALIZATION_QA_BATCH_SIZE: "4"
+      LOCALIZATION_QA_COALESCE_SECONDS: "30"
+      QUEUE_CHECK_SECONDS: "15"
+      QUEUE_STABLE_SECONDS: "30"
+      QUEUE_RESULT_GRACE_SECONDS: "180"
+      WAIT_CHAT_STUCK_SECONDS: "180"
+      GENERIC_RETRY_MAX_CLICKS: "1"
+      GITHUB_POLL_SECONDS: "60"
+      GITHUB_TASK_COMMIT_CACHE_SECONDS: "60"
+      GITHUB_ACTIONS_CACHE_SECONDS: "60"
+      WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS: "600"
+      GITHUB_BOUND_RUN_POLL_SECONDS: "30"
+      WAIT_ACTIONS_STALE_SECONDS: "75"
+      QUEUE_NEXT_TASK_DELAY_SECONDS: "15"
+      QUEUE_IDLE_REARM_SECONDS: "90"
+      MAX_TASK_ATTEMPTS: "3"
+      CONVERSATION_ROLLOVER_ENABLED: "true"
+      MAX_CHAT_ROLLOVERS_PER_TASK: "5"
+      GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
+      GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
+      CHAT_SLOTS: "3"
+      CHAT_DAY_ROLLOVER_HOUR: "2"
+      CHATGPT_BASE_URL: "https://chatgpt.com/"
+      CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
+      REQUIRE_PROJECT_URL: "true"
+      PREFERRED_THINKING_LEVEL: "High"
+      STRICT_THINKING_LEVEL: "true"
+      FRESH_CHAT_EACH_RUN: "false"
+      RETRY_BUTTON_COOLDOWN_SECONDS: "45"
+      VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
+      STATUS_PORT: "8787"
+      NOVNC_PUBLIC_URL: "http://192.168.0.48:6081/vnc.html"
+      WATCHDOG_ENABLED: "${WATCHDOG_ENABLED:-true}"
+      WATCHDOG_STALL_MINUTES: "25"
+      WATCHDOG_BUSY_STALL_MINUTES: "30"
+      WATCHDOG_CHECK_SECONDS: "30"
+      WATCHDOG_MAX_RESUMES_PER_RUN: "1"
+      WATCHDOG_FORCE_STOP_STALLED: "false"
+      RATE_LIMIT_BACKOFF_SECONDS: "90,180,300,600"
+      MIN_SEND_GAP_SECONDS: "60"
+      SLOT_DEDUP_SECONDS: "120"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8787/status >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    ports:
+      - "6081:6080"
+      - "8788:8787"
+    volumes:
+      - outrun_chat_localization_data:/data
+      - outrun_chat_localization_logs:/logs
+    networks:
+      - outrun_localization_network
+
+volumes:
+  outrun_chat_localization_data:
+    name: outrun_chat_localization_data
+  outrun_chat_localization_logs:
+    name: outrun_chat_localization_logs
+
+networks:
+  outrun_localization_network:
+    name: outrun_localization_network

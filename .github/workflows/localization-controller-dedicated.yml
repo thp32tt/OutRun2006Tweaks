@@ -1,0 +1,53 @@
+name: Dedicated Localization Controller
+
+on:
+  push:
+    branches: [chat-controller-downloads]
+    paths:
+      - 'tools/chat-controller/localization/**'
+      - '.github/workflows/localization-controller-dedicated.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate localization-only contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT=tools/chat-controller/localization
+          cat "$ROOT"/src/controller.py.part* >/tmp/controller.py
+          python -m py_compile /tmp/controller.py
+          grep -q 'LOCALIZATION_ONLY = True' "$ROOT/src/controller.py.part00"
+          grep -q 'CHAT_SLOTS = 3' "$ROOT/src/controller.py.part00"
+          grep -q 'GENERIC_RETRY_MAX_CLICKS' "$ROOT/src/controller.py.part00"
+          grep -q 'WAIT_CHAT_STUCK_SECONDS' "$ROOT/src/controller.py.part00"
+          grep -q 'COMPOSER_HEALTH_ROLLOVER' "$ROOT/src/controller.py.part03"
+          grep -q 'FRESH_CHAT_ROLLOVER' "$ROOT/src/controller.py.part03"
+          test ! -e "$ROOT/vr_A.md"
+          test ! -e "$ROOT/conversion_dx11.md"
+          ! grep -q 'COPY vr_' "$ROOT/Dockerfile.portainer"
+          ! grep -q 'COPY conversion_' "$ROOT/Dockerfile.portainer"
+      - name: Validate compose
+        run: docker compose -f tools/chat-controller/localization/docker-compose.portainer.yml config >/tmp/compose.yml
+      - name: Build localization-only image
+        run: |
+          docker build -t outrun-localization-only:test tools/chat-controller/localization
+          docker run --rm --entrypoint sh outrun-localization-only:test -c 'test -f /opt/outrun/prompts/localization_A.md && test -f /opt/outrun/prompts/localization_B.md && test -f /opt/outrun/prompts/localization_C.md && test ! -e /opt/outrun/prompts/vr_A.md && test ! -e /opt/outrun/prompts/conversion_dx11.md'
+      - name: Runtime smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run -d --name loc-smoke -e AUTO_SEND=false -e REQUIRE_PROJECT_URL=false -e CHAT_SLOTS=3 outrun-localization-only:test
+          trap 'docker rm -f loc-smoke >/dev/null 2>&1 || true' EXIT
+          ok=0
+          for i in $(seq 1 30); do
+            if docker exec loc-smoke curl -fsS http://127.0.0.1:8787/status >/tmp/status.html 2>/dev/null; then ok=1; break; fi
+            sleep 3
+          done
+          docker logs loc-smoke || true
+          test "$ok" = "1"
+          grep -q 'Controller mode:</b> localization' /tmp/status.html
+          grep -q '&quot;localization_only&quot;: true' /tmp/status.html
