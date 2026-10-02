@@ -721,6 +721,30 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "issue14_comment_id": 5948284234
+    },
+    {
+      "unit_id": "DX11_SAMPLER_SRGB_PROVENANCE_FAILCLOSED",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "ebbeb449f9728d43d33678b0745753e459b41595",
+      "implementation_commits": [
+        "3611957233af1159de891af5c45587bf4b54c102",
+        "784a71e832842b5ab6290f20bcd316dd7fe2d721",
+        "078bd4c3decc9ea056b390ac48920cfc95c27faf",
+        "9042f912e71193b1c9fef61426cbcd85f334e95d",
+        "385521f54db9628168a1b8e374c96ff4de8fac30",
+        "c7110fcde412e7bcefdcfb099c4a6e67382985ea",
+        "4579bde180ff3e59d36269abaf71ea741a91fa39",
+        "348f6fc76e65d04302ba971837b63f6329c223e4",
+        "3259cf8faf398981ce2d5d0b0d9bf1d6399015c3"
+      ],
+      "material_result_sha": "3259cf8faf398981ce2d5d0b0d9bf1d6399015c3",
+      "validation_bearing_sha": "3259cf8faf398981ce2d5d0b0d9bf1d6399015c3",
+      "retaining_descendant_sha": "38b4ec4c9fc11fc1976482de80b66a45f875f37a",
+      "automation_validation": "PARTIAL_EXACT_SHA_STATIC_PRECHECKS_PASS_SOURCE_GRAPH_BLOCKED_BY_CONCURRENT_R164_UNSUPPORTED_CENSUS_GUARD; SRGB_SOURCE_RETENTION_AND_PARSER_FIXTURE_PASS",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5948321550
     }
   ]
 }
