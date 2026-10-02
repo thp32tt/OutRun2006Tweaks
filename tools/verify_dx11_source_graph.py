@@ -255,12 +255,12 @@ def main() -> None:
             + ", ".join(missing_r177_d3dtop_subtract)
         )
 
-    r179_d3dtop_modulate2x_contract = [
+    r180_d3dtop_modulate2x_contract = [
         ("case D3DTOP_MODULATE2X:", PIPELINE_TRANSLATION_CPP,
-         "R179 D3DTOP_MODULATE2X readiness/translation case"),
+         "R180 D3DTOP_MODULATE2X readiness/translation case"),
         ('return "(" + first + " * " + second + ") * 2.0";',
          PIPELINE_TRANSLATION_CPP,
-         "R179 D3DTOP_MODULATE2X component-wise shader expression"),
+         "R180 D3DTOP_MODULATE2X component-wise shader expression"),
         ("modulate2xStages[0].colorOp = D3DTOP_MODULATE2X;",
          FIXED_FUNCTION_PIPELINE_PROBE, "R179 hosted MODULATE2X color fixture"),
         ("modulate2xStages[0].alphaOp = D3DTOP_MODULATE2X;",
@@ -269,23 +269,23 @@ def main() -> None:
          FIXED_FUNCTION_PIPELINE_PROBE, "R179 generated RGB HLSL assertion"),
         ("float nextAlpha = (sampled0.a * input.diffuse.a) * 2.0;",
          FIXED_FUNCTION_PIPELINE_PROBE, "R179 generated alpha HLSL assertion"),
-        ("R179 D3DTOP_MODULATE2X fixed-function shader prototype did not compile",
+        ("R180 D3DTOP_MODULATE2X fixed-function shader prototype did not compile",
          FIXED_FUNCTION_PIPELINE_PROBE, "R179 offline compile assertion"),
-        ("DX11 fixed-function D3DTOP_MODULATE2X support R179: PASS",
+        ("DX11 fixed-function D3DTOP_MODULATE2X support R180: PASS",
          FIXED_FUNCTION_PIPELINE_PROBE, "R179 hosted probe completion"),
     ]
-    missing_r179_d3dtop_modulate2x = [
+    missing_r180_d3dtop_modulate2x = [
         meaning
-        for token, source, meaning in r179_d3dtop_modulate2x_contract
+        for token, source, meaning in r180_d3dtop_modulate2x_contract
         if token not in source
     ]
     if PIPELINE_TRANSLATION_CPP.count("case D3DTOP_MODULATE2X:") < 3:
-        missing_r179_d3dtop_modulate2x.append(
-            "R179 MODULATE2X must participate in texture-use, HLSL and readiness switches")
-    if missing_r179_d3dtop_modulate2x:
+        missing_r180_d3dtop_modulate2x.append(
+            "R180 MODULATE2X must participate in texture-use, HLSL and readiness switches")
+    if missing_r180_d3dtop_modulate2x:
         raise SystemExit(
-            "DX11 R179 fixed-function D3DTOP_MODULATE2X contract drift: "
-            + ", ".join(missing_r179_d3dtop_modulate2x)
+            "DX11 R180 fixed-function D3DTOP_MODULATE2X contract drift: "
+            + ", ".join(missing_r180_d3dtop_modulate2x)
         )
 
     # R166 makes the enum-owned one-past-last sentinel the census authority.
