@@ -53,6 +53,10 @@ function Invoke-AnalyzerCase {
         [Nullable[int64]]$ExpectedGameplayFreshProjectionCount=$null,
         [Nullable[int64]]$ExpectedGameplayCachedProjectionCount=$null,
         [Nullable[double]]$ExpectedGameplayFreshProjectionFraction=$null,
+        [Nullable[int]]$ExpectedGameplayCadenceEvidenceWindows=$null,
+        [Nullable[int64]]$ExpectedGameplayXrFrameCount=$null,
+        [Nullable[double]]$ExpectedGameplayFreshProjectionHzEstimate=$null,
+        [Nullable[double]]$ExpectedGameplayCachedProjectionHzEstimate=$null,
         [Nullable[int64]]$ExpectedGameplayDirectSubmitCount=$null,
         [Nullable[int64]]$ExpectedGameplayCachedProjectionSubmitCount=$null,
         [Nullable[double]]$ExpectedGameplayDirectSubmitFraction=$null
@@ -238,6 +242,10 @@ function Invoke-AnalyzerCase {
     if($null -ne $ExpectedGameplayFreshProjectionCount -and [int64]$summary.PresentationCadence.Gameplay.FreshProjectionCount -ne [int64]$ExpectedGameplayFreshProjectionCount){throw "${Name}: Gameplay FreshProjectionCount mismatch"}
     if($null -ne $ExpectedGameplayCachedProjectionCount -and [int64]$summary.PresentationCadence.Gameplay.CachedProjectionCount -ne [int64]$ExpectedGameplayCachedProjectionCount){throw "${Name}: Gameplay CachedProjectionCount mismatch"}
     if($null -ne $ExpectedGameplayFreshProjectionFraction -and ($null -eq $summary.PresentationCadence.Gameplay.FreshProjectionFraction -or [math]::Abs([double]$summary.PresentationCadence.Gameplay.FreshProjectionFraction-[double]$ExpectedGameplayFreshProjectionFraction) -gt 0.0001)){throw "${Name}: Gameplay FreshProjectionFraction mismatch"}
+    if($null -ne $ExpectedGameplayCadenceEvidenceWindows -and [int]$summary.PresentationCadence.Gameplay.CadenceEvidenceWindowCount -ne [int]$ExpectedGameplayCadenceEvidenceWindows){throw "${Name}: Gameplay CadenceEvidenceWindowCount mismatch"}
+    if($null -ne $ExpectedGameplayXrFrameCount -and [int64]$summary.PresentationCadence.Gameplay.XrFrameCount -ne [int64]$ExpectedGameplayXrFrameCount){throw "${Name}: Gameplay XrFrameCount mismatch"}
+    if($null -ne $ExpectedGameplayFreshProjectionHzEstimate -and ($null -eq $summary.PresentationCadence.Gameplay.FreshProjectionHzEstimate -or [math]::Abs([double]$summary.PresentationCadence.Gameplay.FreshProjectionHzEstimate-[double]$ExpectedGameplayFreshProjectionHzEstimate) -gt 0.05)){throw "${Name}: Gameplay FreshProjectionHzEstimate mismatch"}
+    if($null -ne $ExpectedGameplayCachedProjectionHzEstimate -and ($null -eq $summary.PresentationCadence.Gameplay.CachedProjectionHzEstimate -or [math]::Abs([double]$summary.PresentationCadence.Gameplay.CachedProjectionHzEstimate-[double]$ExpectedGameplayCachedProjectionHzEstimate) -gt 0.05)){throw "${Name}: Gameplay CachedProjectionHzEstimate mismatch"}
     if($null -ne $ExpectedGameplayDirectSubmitCount -and [int64]$summary.PresentationCadence.Gameplay.DirectSubmitCount -ne [int64]$ExpectedGameplayDirectSubmitCount){throw "${Name}: Gameplay DirectSubmitCount mismatch"}
     if($null -ne $ExpectedGameplayCachedProjectionSubmitCount -and [int64]$summary.PresentationCadence.Gameplay.CachedProjectionSubmitCount -ne [int64]$ExpectedGameplayCachedProjectionSubmitCount){throw "${Name}: Gameplay CachedProjectionSubmitCount mismatch"}
     if($null -ne $ExpectedGameplayDirectSubmitFraction -and ($null -eq $summary.PresentationCadence.Gameplay.DirectSubmitFraction -or [math]::Abs([double]$summary.PresentationCadence.Gameplay.DirectSubmitFraction-[double]$ExpectedGameplayDirectSubmitFraction) -gt 0.0001)){throw "${Name}: Gameplay DirectSubmitFraction mismatch"}
@@ -475,6 +483,10 @@ D3D9: Failed to write shared resource info for a texture
         -ExpectedGameplayFreshProjectionCount 220 `
         -ExpectedGameplayCachedProjectionCount 107 `
         -ExpectedGameplayFreshProjectionFraction (220.0/327.0) `
+        -ExpectedGameplayCadenceEvidenceWindows 2 `
+        -ExpectedGameplayXrFrameCount 327 `
+        -ExpectedGameplayFreshProjectionHzEstimate ((1000.0/30.5)*(220.0/327.0)) `
+        -ExpectedGameplayCachedProjectionHzEstimate ((1000.0/30.5)*(107.0/327.0)) `
         -ExpectedGameplayDirectSubmitCount 327 `
         -ExpectedGameplayCachedProjectionSubmitCount 0 `
         -ExpectedGameplayDirectSubmitFraction 1.0
