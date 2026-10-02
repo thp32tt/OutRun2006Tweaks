@@ -1,5 +1,5 @@
 {
-  "schema_version": 38,
+  "schema_version": 39,
   "branch": "korean-localization-clean",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
@@ -875,5 +875,34 @@
     "next_steps_only_response": "INVALID_INTERMEDIATE_STATUS",
     "controller_action_on_no_commit_response": "CONTINUE_SAME_TASK_ID_WITH_EXECUTION_PROMPT",
     "attempt_increment": false
+  },
+  "producer_continuity_recovery": {
+    "active_task_latch": true,
+    "applies_to": [
+      "LOCALIZATION_A",
+      "LOCALIZATION_B",
+      "LOCALIZATION_E"
+    ],
+    "release_only_on": "CONTROLLER_VALIDATED_DURABLE_PRODUCER_RESULT",
+    "assistant_turn_end_is_task_end": false,
+    "plan_or_status_without_commit": "PREMATURE_STOP_RECOVERABLE",
+    "same_chat_continuation_first": true,
+    "same_chat_control_gap_seconds": 15,
+    "premature_stop_rollover_threshold": 3,
+    "escalation": "THREE_CONSECUTIVE_PREMATURE_STOPS_THEN_FRESH_CHAT_SAME_TASK_ID",
+    "rollover_preserves": [
+      "TASK_ID",
+      "ATTEMPT",
+      "branch",
+      "controller_stage",
+      "last_checkpoint_head"
+    ],
+    "rollover_attempt_increment": false,
+    "rollover_new_task": false,
+    "legacy_rollover_budget_is_terminal_for_latched_producer": false,
+    "persistent_controller_stage": "WAIT_MATERIAL_COMMIT",
+    "blocked_asset_behavior": "SKIP_TO_NEXT_INDEPENDENT_RUNNABLE_ASSET_IN_OWN_SHARD",
+    "user_confirmation_required": false,
+    "runtime_validation_default": "UNTESTED"
   }
 }
