@@ -23,6 +23,9 @@ def load_function(name, **overrides):
               PREMATURE_STOP_ROLLOVER_THRESHOLD=3,
               PRODUCER_PREMATURE_STOP_ROLLOVER_THRESHOLD=2,
               PRODUCER_CONTINUATION_COOLDOWN_SECONDS=15,
+              LOCALIZATION_PRODUCER_TARGET_CANDIDATES=2,
+              LOCALIZATION_PRODUCER_MAX_MATERIAL_COMMITS=8,
+              LOCALIZATION_QA_BATCH_SIZE=4,
               QUEUE_STABLE_SECONDS=30, QUEUE_RESULT_GRACE_SECONDS=180,
               _parse_iso=lambda x: datetime.fromisoformat(x) if x else None,
               stable_hash=lambda x: hashlib.sha256(x.encode()).hexdigest(),
@@ -44,7 +47,10 @@ def load_function(name, **overrides):
                   'retry_surface': 'retry',
               }),
               persist_retry_diagnostic=Mock(),
-              localization_material_target_prompt=lambda active: 'CONTROLLER_SELECTED_MATERIAL_TARGETS=T1:index=94;asset=2DA43E41;status=rework_required_zero_pixel_or_artifact;path=x')
+              localization_material_target_prompt=lambda active: 'CONTROLLER_SELECTED_MATERIAL_TARGETS=T1:index=94;asset=2DA43E41;status=rework_required_zero_pixel_or_artifact;path=x',
+              localization_producer_seen_result=lambda active, sha: False,
+              localization_c_result_seen=lambda active, sha: False,
+              queue_send_c_execution_continuation=AsyncMock(return_value=True))
     ns.update(overrides)
     node = ast.Module(body=[ast.ImportFrom(module='__future__', names=[ast.alias(name='annotations')], level=0), FUNCTIONS[name]], type_ignores=[])
     exec(compile(ast.fix_missing_locations(node), '<controller>', 'exec'), ns)
@@ -300,7 +306,9 @@ class NativeControllerTests(unittest.TestCase):
         self.assertEqual(reasons, ['FINAL_ARTWORK_INCOMPLETE:0/95'])
 
     def test_producer_release_paths_use_no_work_guard(self):
-        self.assertGreaterEqual(SOURCE.count('await localization_handle_producer_commit('), 4)
+        self.assertGreaterEqual(SOURCE.count('localization_handle_producer_commit('), 3)
+        self.assertIn('localization_handle_discovered_commit', SOURCE)
+        self.assertIn('localization_record_producer_checkpoint', SOURCE)
         self.assertIn('NO_WORK_GUARD_REJECTED', SOURCE)
         self.assertIn('TASK_RESULT_FILE_MISSING', SOURCE)
         self.assertIn("'커밋할 변경 없음'은 종료 사유가 아니다", SOURCE)
