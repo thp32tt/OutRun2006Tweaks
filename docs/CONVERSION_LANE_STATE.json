@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "f3e2174140a80fd2a63b4c45e0b79421d6a4b5fa",
+  "state_parent_head": "1c57437ff78defe38f11fb86b2a594c26124b095",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -2236,6 +2236,84 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Exact-decode only complete canonical instructions in 0x00182ECB..0x00182F0B. Preserve any trailing partial instruction raw-only and require overlap at a cut edge; keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F41_CANONICAL_CONTROL_FLOW_0x182ECB_TO_0x182F09",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "d9c70af253368acfa27c3bcc25c75c6398c0f7dc",
+      "validation_bearing_result_sha": "4832348615b6473f59e2830f81da8ed84f7200c6",
+      "run_record_commit_sha": "1c57437ff78defe38f11fb86b2a594c26124b095",
+      "commit_message": "dxvk: prove canonical 0x182ECB control flow [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Validated exact canonical F41 control flow through 0x00182F09: 16 complete instructions, exact internal/external branch targets, empty direct rel32 CALL census, and preserved BA ED capture-edge bytes for mandatory overlap into the newer F42 frontier.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Authenticated GitHub branch/state and required regression/ledger context recovered; concurrent F41/F42 writes were repeatedly refreshed and de-duplicated."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected exact decode of the already validated continuation_50 raw window as the highest-value unfinished static unit."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit d9c70af253368acfa27c3bcc25c75c6398c0f7dc adds exact instruction, branch and cut-edge proof for 0x00182ECB..0x00182F09."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Canonical EXE static analysis on retaining PR merge d83fc545d41e99ab771fe8dc1ae80c4d2a6ddb75 passed with proof status EXACT_182ECB_TO_182F09_CONTROL_FLOW_CAPTURE_EDGE_PROVEN; exact-SHA retaining descendant 4832348615b6473f59e2830f81da8ed84f7200c6 passed DXVK Canonical Disassembly Evidence run 36982462978/job 110759832685 and gated F42 raw provenance on this predecessor proof."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit contains [AUTO:CONV-DXVK-000002]; Issue #14 comment 5947962663."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly proof only; no deployable/runtime payload or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Durable run record commit 1c57437ff78defe38f11fb86b2a594c26124b095 plus this supplemental lane-state entry preserve the proof without replacing newer F42 primary state."
+        }
+      },
+      "validation": {
+        "exact_material_sha": "d9c70af253368acfa27c3bcc25c75c6398c0f7dc",
+        "validation_bearing_descendant_sha": "4832348615b6473f59e2830f81da8ed84f7200c6",
+        "automation_validation": "PASS_DESCENDANT_CANONICAL_STATIC",
+        "retaining_pr_merge_sha": "d83fc545d41e99ab771fe8dc1ae80c4d2a6ddb75",
+        "hud_inspector_run_id": 36982362578,
+        "hud_inspector_static_job_id": 110759530836,
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "proof_status": "EXACT_182ECB_TO_182F09_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "instruction_count": 16,
+        "branch_targets_match": true,
+        "internal_branch_targets_on_boundaries": true,
+        "external_targets": [
+          "0x00182F2D",
+          "0x00182F32",
+          "0x00182F6A"
+        ],
+        "raw_call_census_empty": true,
+        "predecessor_target_contract": true,
+        "incomplete_rva": "0x00182F09",
+        "incomplete_bytes": "ba ed",
+        "capture_edge_matches": true,
+        "exact_descendant_dxvk_disassembly_evidence_run_id": 36982462978,
+        "exact_descendant_dxvk_disassembly_evidence_job_id": 110759832685,
+        "descendant_predecessor_status": "EXACT_182ECB_TO_182F09_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "descendant_predecessor_exact": true,
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_comment_id": 5947962663,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_F42_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve current F42 primary frontier at 0x00182F09..0x00182F49; exact-decode complete instructions only, preserve any new cut edge for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
