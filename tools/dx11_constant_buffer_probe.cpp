@@ -3871,6 +3871,50 @@ int main()
                     indexedSourceRange.snapshotToken),
             "R149 indexed source range snapshot rejects NumVertices drift");
 
+        const auto indexedDirectLineage =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_direct_dispatch_readiness(
+                    indexedDirectDispatch, indexedSourceRange);
+        require(
+            indexedDirectLineage.inputValid &&
+            indexedDirectLineage.directDispatchReady &&
+            indexedDirectLineage.sourceRangeReady &&
+            indexedDirectLineage.dispatchMatchesSourceRange &&
+            indexedDirectLineage.componentSnapshotsPresent &&
+            indexedDirectLineage.ready &&
+            indexedDirectLineage.directDispatchSnapshotToken ==
+                indexedDirectDispatch.snapshotToken &&
+            indexedDirectLineage.sourceRangeSnapshotToken ==
+                indexedSourceRange.snapshotToken &&
+            indexedDirectLineage.snapshotToken != 0 &&
+            outrun::vr::dx11::
+                validate_fixed_function_indexed_direct_dispatch_snapshot(
+                    indexedDirectDispatch, indexedSourceRange,
+                    indexedDirectLineage.snapshotToken),
+            "R150 indexed direct dispatch binds R147 tuple to R149 source range");
+
+        const auto indexedSourceRangeStartDrift =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_source_range_readiness(
+                    D3DPT_TRIANGLELIST, 2u, 0, 0u, 4u, 1u);
+        const auto indexedDirectLineageDrift =
+            outrun::vr::dx11::
+                compose_fixed_function_indexed_direct_dispatch_readiness(
+                    indexedDirectDispatch, indexedSourceRangeStartDrift);
+        require(
+            indexedSourceRangeStartDrift.ready &&
+            indexedDirectLineageDrift.inputValid &&
+            indexedDirectLineageDrift.directDispatchReady &&
+            indexedDirectLineageDrift.sourceRangeReady &&
+            !indexedDirectLineageDrift.dispatchMatchesSourceRange &&
+            !indexedDirectLineageDrift.ready &&
+            indexedDirectLineageDrift.snapshotToken == 0 &&
+            !outrun::vr::dx11::
+                validate_fixed_function_indexed_direct_dispatch_snapshot(
+                    indexedDirectDispatch, indexedSourceRangeStartDrift,
+                    indexedDirectLineage.snapshotToken),
+            "R150 indexed direct dispatch rejects R149 StartIndex lineage drift");
+
         require(
             !outrun::vr::dx11::
                 validate_fixed_function_direct_draw_dispatch_snapshot(
