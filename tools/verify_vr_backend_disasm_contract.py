@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Verify the DX11/DXVK backend contract still matches recovered OutRun EXE facts."""
 
+import ast
 from pathlib import Path
 import re
 import runpy
@@ -13,6 +14,52 @@ def require(path: str, needles: list[str]) -> None:
     missing = [needle for needle in needles if needle not in text]
     if missing:
         raise SystemExit(f"{path}: missing disassembly contract evidence: {missing}")
+
+
+def _function_assignment_names(source: str) -> set[str]:
+    """Return simple local names assigned anywhere in one collector source block."""
+
+    tree = ast.parse(source)
+    names: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name):
+                    names.add(target.id)
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            names.add(node.target.id)
+    return names
+
+
+def _final_proven_gate_names(source: str) -> set[str]:
+    """Return names consumed by the collector's exact final proven bool expression."""
+
+    tree = ast.parse(source)
+    proven_values = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign):
+            continue
+        if any(isinstance(target, ast.Name) and target.id == "proven" for target in node.targets):
+            proven_values.append(node.value)
+    if len(proven_values) != 1:
+        raise SystemExit(
+            "DXVK continuation proof must contain exactly one final proven assignment: "
+            f"found={len(proven_values)}"
+        )
+    value = proven_values[0]
+    if not (
+        isinstance(value, ast.Call)
+        and isinstance(value.func, ast.Name)
+        and value.func.id == "bool"
+        and len(value.args) == 1
+        and not value.keywords
+    ):
+        raise SystemExit("DXVK continuation proof final proven assignment must be bool(<gates>)")
+    return {
+        node.id
+        for node in ast.walk(value.args[0])
+        if isinstance(node, ast.Name)
+    }
 
 
 def verify_dxvk_continuation_chain() -> None:
@@ -282,6 +329,47 @@ def verify_dxvk_continuation_chain() -> None:
             raise SystemExit(
                 f"DXVK continuation {continuation_id} prefix proof status is not fail-closed: "
                 f"{missing_proof_status_markers}"
+            )
+        assigned_names = _function_assignment_names(proof_source)
+        proven_gate_names = _final_proven_gate_names(proof_source)
+        mandatory_proven_gates = {
+            "contiguous",
+            "all_bytes_match",
+            "prefix_end_matches",
+        }
+        conditional_integrity_gates = {
+            "predecessor_exact",
+            "start_boundary_proven",
+            "start_completion_proven",
+            "instruction_end_matches",
+            "capture_end_is_instruction_boundary",
+            "capture_boundary_matches",
+            "branch_targets_match",
+            "internal_branch_targets_on_boundaries",
+            "calls_match",
+            "raw_call_census_matches",
+            "raw_call_census_empty",
+            "predecessor_targets_match",
+            "resolved_forward_targets_on_boundaries",
+            "resolved_prior_forward_target_is_boundary",
+            "predecessor_target_contract",
+            "resolved_predecessor_targets_on_boundaries",
+            "incoming_call_matches",
+            "incoming_call_target_is_boundary",
+            "padding_matches",
+            "incomplete_matches",
+            "capture_edge_matches",
+            "capture_edge_target_matches",
+        }
+        required_proven_gates = (
+            mandatory_proven_gates
+            | (assigned_names & conditional_integrity_gates)
+        )
+        missing_proven_gates = sorted(required_proven_gates - proven_gate_names)
+        if missing_proven_gates:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} proof status dropped required fail-closed gates: "
+                f"{missing_proven_gates}"
             )
         expected_provenance_call = (
             "collect_guarded_gf_target_c_helper_1_third_callee_continuation_"
