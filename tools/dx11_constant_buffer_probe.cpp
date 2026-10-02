@@ -2035,14 +2035,39 @@ int main()
             outputStateReady.snapshotToken),
         "R124 exact dynamic output state issues a valid snapshot");
 
+    const auto outputBindingTranslation =
+        translate_pipeline(outputStateSource);
+    require(
+        outputBindingTranslation.exact() &&
+        outputBindingTranslation.rasterizer.ScissorEnable,
+        "R126 output-state binding translation prerequisite");
+
+    NativeFixedFunctionRenderStateBundle outputBindingRenderStateBundle;
+    require(
+        outputBindingRenderStateBundle.initialize(
+            d3d.device, outputBindingTranslation),
+        "R126 output-state binding render bundle initialize");
+    const auto outputBindingRenderReady =
+        outputBindingRenderStateBundle.translation_readiness(
+            d3d.device, outputBindingTranslation);
+    require(
+        outputBindingRenderReady.ready &&
+        outputBindingRenderReady.snapshotToken != 0,
+        "R126 output-state binding render snapshot prerequisite");
+
     NativeFixedFunctionOutputStateBinding outputStateBinding;
     require(
         outputStateBinding.initialize(
-            d3d.device, renderStateBundle, renderStateRecreated,
-            outputStateReady) &&
+            d3d.device,
+            outputBindingRenderStateBundle,
+            outputBindingTranslation,
+            outputBindingRenderReady.snapshotToken,
+            outputStateSource,
+            surfacePairReady,
+            outputStateReady.snapshotToken) &&
         outputStateBinding.ready() &&
         outputStateBinding.render_state_snapshot_token() ==
-            renderStateRecreated.snapshotToken &&
+            outputBindingRenderReady.snapshotToken &&
         outputStateBinding.output_state_snapshot_token() ==
             outputStateReady.snapshotToken &&
         outputStateBinding.snapshot_token() != 0,
@@ -2069,10 +2094,11 @@ int main()
     d3d.context->OMGetDepthStencilState(
         &boundDepthStencil, &boundStencilRef);
     require(
-        boundRasterizer == renderStateBundle.rasterizer_state() &&
-        boundBlend == renderStateBundle.blend_state() &&
-        boundDepthStencil == renderStateBundle.depth_stencil_state() &&
-        boundStencilRef == renderStateBundle.stencil_ref() &&
+        boundRasterizer == outputBindingRenderStateBundle.rasterizer_state() &&
+        boundBlend == outputBindingRenderStateBundle.blend_state() &&
+        boundDepthStencil ==
+            outputBindingRenderStateBundle.depth_stencil_state() &&
+        boundStencilRef == outputBindingRenderStateBundle.stencil_ref() &&
         boundViewportCount == 1 &&
         boundViewport.TopLeftX == outputStateReady.viewport.TopLeftX &&
         boundViewport.TopLeftY == outputStateReady.viewport.TopLeftY &&
@@ -2091,9 +2117,12 @@ int main()
         boundBlendFactor[3] == outputStateReady.blendFactor[3] &&
         boundSampleMask == outputStateReady.sampleMask,
         "R126 WARP context exposes the exact sealed RS/OM binding");
-    boundRasterizer->Release();
-    boundBlend->Release();
-    boundDepthStencil->Release();
+    if (boundRasterizer)
+        boundRasterizer->Release();
+    if (boundBlend)
+        boundBlend->Release();
+    if (boundDepthStencil)
+        boundDepthStencil->Release();
 
     DevicePair outputBindingOtherDevice = create_warp_device();
     require(
@@ -2103,164 +2132,54 @@ int main()
     outputBindingOtherDevice.device->Release();
 
     NativeFixedFunctionOutputStateBinding rejectedOutputBinding;
-    auto missingOutputSnapshot = outputStateReady;
-    missingOutputSnapshot.snapshotToken = 0;
     require(
         !rejectedOutputBinding.initialize(
-            d3d.device, renderStateBundle, renderStateRecreated,
-            missingOutputSnapshot) &&
+            d3d.device,
+            outputBindingRenderStateBundle,
+            outputBindingTranslation,
+            outputBindingRenderReady.snapshotToken,
+            outputStateSource,
+            surfacePairReady,
+            0) &&
         !rejectedOutputBinding.ready(),
         "R126 missing R124 snapshot token fails closed");
-
-    auto missingRenderStateSnapshot = renderStateRecreated;
-    missingRenderStateSnapshot.snapshotToken = 0;
     require(
         !rejectedOutputBinding.initialize(
-            d3d.device, renderStateBundle, missingRenderStateSnapshot,
-            outputStateReady) &&
+            d3d.device,
+            outputBindingRenderStateBundle,
+            outputBindingTranslation,
+            0,
+            outputStateSource,
+            surfacePairReady,
+            outputStateReady.snapshotToken) &&
         !rejectedOutputBinding.ready(),
         "R126 missing R116 snapshot token fails closed");
 
-    NativeFixedFunctionOutputStateBinding staleRenderOutputBinding;
     require(
-        !staleRenderOutputBinding.initialize(
-            d3d.device, renderStateBundle, renderStateReady,
-            outputStateReady) &&
-        !staleRenderOutputBinding.ready(),
-        "R129 stale R116 bundle generation cannot initialize output binding");
-
-    const auto outputBindingTranslation =
-        translate_pipeline(outputStateSource);
-    require(
-        outputBindingTranslation.exact() &&
-        outputBindingTranslation.rasterizer.ScissorEnable,
-        "R128 output-state binding translation prerequisite");
-
-    NativeFixedFunctionRenderStateBundle outputBindingBundle;
-    require(
-        outputBindingBundle.initialize(
-            d3d.device, outputBindingTranslation),
-        "R128 output-state binding bundle initialize");
-    const auto outputBindingRenderReady =
-        outputBindingBundle.translation_readiness(
-            d3d.device, outputBindingTranslation);
-    require(
-        outputBindingRenderReady.ready &&
-        outputBindingRenderReady.snapshotToken != 0,
-        "R128 output-state binding render snapshot prerequisite");
-
-    require(
-        !renderStateBundle.bind_output_state_if_ready(
-            d3d.context,
+        !rejectedOutputBinding.initialize(
+            d3d.device,
+            renderStateBundle,
             renderStateTranslation,
             renderStateRecreated.snapshotToken,
             outputStateSource,
             surfacePairReady,
-            outputStateReady.snapshotToken),
-        "R128 scissor-enable mismatch between sealed states fails closed");
+            outputStateReady.snapshotToken) &&
+        !rejectedOutputBinding.ready(),
+        "R126 mismatched sealed scissor state fails closed");
 
+    auto staleOutputBindingSource = outputStateSource;
+    staleOutputBindingSource.blendFactor ^= 0x00010000u;
     require(
-        !outputBindingBundle.bind_output_state_if_ready(
-            d3d.context,
-            outputBindingTranslation,
-            outputBindingRenderReady.snapshotToken ^ 0x1ull,
-            outputStateSource,
-            surfacePairReady,
-            outputStateReady.snapshotToken),
-        "R128 stale render-state snapshot fails closed");
-    require(
-        !outputBindingBundle.bind_output_state_if_ready(
-            d3d.context,
+        !rejectedOutputBinding.initialize(
+            d3d.device,
+            outputBindingRenderStateBundle,
             outputBindingTranslation,
             outputBindingRenderReady.snapshotToken,
-            outputStateSource,
+            staleOutputBindingSource,
             surfacePairReady,
-            outputStateReady.snapshotToken ^ 0x1ull),
-        "R128 stale output-state snapshot fails closed");
-
-    DevicePair sealedOutputBindingOtherDevice = create_warp_device();
-    require(
-        !outputBindingBundle.bind_output_state_if_ready(
-            sealedOutputBindingOtherDevice.context,
-            outputBindingTranslation,
-            outputBindingRenderReady.snapshotToken,
-            outputStateSource,
-            surfacePairReady,
-            outputStateReady.snapshotToken),
-        "R128 foreign context fails closed");
-    sealedOutputBindingOtherDevice.context->Release();
-    sealedOutputBindingOtherDevice.device->Release();
-
-    require(
-        outputBindingBundle.bind_output_state_if_ready(
-            d3d.context,
-            outputBindingTranslation,
-            outputBindingRenderReady.snapshotToken,
-            outputStateSource,
-            surfacePairReady,
-            outputStateReady.snapshotToken),
-        "R128 exact sealed states bind dormant RS/OM output state");
-
-    ID3D11RasterizerState* observedRasterizer = nullptr;
-    d3d.context->RSGetState(&observedRasterizer);
-    require(
-        observedRasterizer == outputBindingBundle.rasterizer_state(),
-        "R128 rasterizer binding identity");
-    if (observedRasterizer)
-        observedRasterizer->Release();
-
-    UINT observedViewportCount = 1;
-    D3D11_VIEWPORT observedViewport{};
-    d3d.context->RSGetViewports(
-        &observedViewportCount, &observedViewport);
-    require(
-        observedViewportCount == 1 &&
-        observedViewport.TopLeftX == outputStateReady.viewport.TopLeftX &&
-        observedViewport.TopLeftY == outputStateReady.viewport.TopLeftY &&
-        observedViewport.Width == outputStateReady.viewport.Width &&
-        observedViewport.Height == outputStateReady.viewport.Height &&
-        observedViewport.MinDepth == outputStateReady.viewport.MinDepth &&
-        observedViewport.MaxDepth == outputStateReady.viewport.MaxDepth,
-        "R128 viewport binding preserves sealed output state");
-
-    UINT observedScissorCount = 1;
-    D3D11_RECT observedScissor{};
-    d3d.context->RSGetScissorRects(
-        &observedScissorCount, &observedScissor);
-    require(
-        observedScissorCount == 1 &&
-        observedScissor.left == outputStateReady.scissorRect.left &&
-        observedScissor.top == outputStateReady.scissorRect.top &&
-        observedScissor.right == outputStateReady.scissorRect.right &&
-        observedScissor.bottom == outputStateReady.scissorRect.bottom,
-        "R128 scissor binding preserves sealed output state");
-
-    ID3D11BlendState* observedBlendState = nullptr;
-    FLOAT observedBlendFactor[4]{};
-    UINT observedSampleMask = 0;
-    d3d.context->OMGetBlendState(
-        &observedBlendState, observedBlendFactor, &observedSampleMask);
-    require(
-        observedBlendState == outputBindingBundle.blend_state() &&
-        observedBlendFactor[0] == outputStateReady.blendFactor[0] &&
-        observedBlendFactor[1] == outputStateReady.blendFactor[1] &&
-        observedBlendFactor[2] == outputStateReady.blendFactor[2] &&
-        observedBlendFactor[3] == outputStateReady.blendFactor[3] &&
-        observedSampleMask == outputStateReady.sampleMask,
-        "R128 blend-factor/sample-mask binding preserves sealed output state");
-    if (observedBlendState)
-        observedBlendState->Release();
-
-    ID3D11DepthStencilState* observedDepthState = nullptr;
-    UINT observedStencilRef = 0;
-    d3d.context->OMGetDepthStencilState(
-        &observedDepthState, &observedStencilRef);
-    require(
-        observedDepthState == outputBindingBundle.depth_stencil_state() &&
-        observedStencilRef == outputBindingBundle.stencil_ref(),
-        "R128 depth/stencil binding preserves sealed render state");
-    if (observedDepthState)
-        observedDepthState->Release();
+            outputStateReady.snapshotToken) &&
+        !rejectedOutputBinding.ready(),
+        "R126 stale R124 source/token pair fails closed");
 
     auto incompleteOutputState = outputStateSource;
     incompleteOutputState.outputStateComplete = false;
@@ -2733,6 +2652,5 @@ int main()
     std::cout << "DX11 fixed-function draw readiness composition R120: PASS\n";
     std::cout << "DX11 geometry-gated draw readiness R122: PASS\n";
     std::cout << "DX11 dynamic output-state readiness R124: PASS\n";
-    std::cout << "DX11 dormant RS/OM output-state binding R128: PASS\n";
     return 0;
 }

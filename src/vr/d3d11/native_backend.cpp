@@ -1616,58 +1616,6 @@ bool NativeFixedFunctionRenderStateBundle::validate_readiness_snapshot(
     return token == readiness.snapshotToken;
 }
 
-bool NativeFixedFunctionRenderStateBundle::bind_output_state_if_ready(
-    ID3D11DeviceContext* context,
-    const PipelineTranslation& translation,
-    std::uint64_t translationSnapshotToken,
-    const OutRunVR::DrawState::RenderStateSnapshot& source,
-    const NativeSurfacePairReadiness& surfacePair,
-    std::uint64_t outputStateSnapshotToken) const noexcept {
-
-    if (!context || !device_ ||
-        !validate_translation_snapshot(
-            device_.Get(), translation, translationSnapshotToken) ||
-        !validate_fixed_function_output_state_snapshot(
-            source, surfacePair, outputStateSnapshotToken))
-        return false;
-
-    const bool sourceScissorEnabled = source.scissorTestEnable != FALSE;
-    if (translation.rasterizer.ScissorEnable != sourceScissorEnabled)
-        return false;
-
-    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
-    context->GetDevice(contextDevice.ReleaseAndGetAddressOf());
-    if (!contextDevice || contextDevice.Get() != device_.Get())
-        return false;
-
-    const auto output =
-        compose_fixed_function_output_state_readiness(source, surfacePair);
-    if (!output.ready || output.snapshotToken != outputStateSnapshotToken)
-        return false;
-
-    D3D11_RECT scissor = output.scissorRect;
-    if (!sourceScissorEnabled) {
-        if (surfacePair.width >
-                static_cast<UINT>(std::numeric_limits<LONG>::max()) ||
-            surfacePair.height >
-                static_cast<UINT>(std::numeric_limits<LONG>::max()))
-            return false;
-        scissor.left = 0;
-        scissor.top = 0;
-        scissor.right = static_cast<LONG>(surfacePair.width);
-        scissor.bottom = static_cast<LONG>(surfacePair.height);
-    }
-
-    context->RSSetState(rasterizer_state_.Get());
-    context->RSSetViewports(1, &output.viewport);
-    context->RSSetScissorRects(1, &scissor);
-    context->OMSetBlendState(
-        blend_state_.Get(), output.blendFactor.data(), output.sampleMask);
-    context->OMSetDepthStencilState(
-        depth_stencil_state_.Get(), stencil_ref_);
-    return true;
-}
-
 void NativeFixedFunctionRenderStateBundle::shutdown() noexcept {
     rasterizer_state_.Reset();
     depth_stencil_state_.Reset();
@@ -2170,26 +2118,20 @@ bool validate_fixed_function_output_state_snapshot(
 bool NativeFixedFunctionOutputStateBinding::initialize(
     ID3D11Device* device,
     const NativeFixedFunctionRenderStateBundle& renderStateBundle,
-    const NativeFixedFunctionRenderStateReadiness& renderState,
-    const NativeFixedFunctionOutputStateReadiness& outputState) noexcept {
+    const PipelineTranslation& translation,
+    std::uint64_t renderStateSnapshotToken,
+    const OutRunVR::DrawState::RenderStateSnapshot& source,
+    const NativeSurfacePairReadiness& surfacePair,
+    std::uint64_t outputStateSnapshotToken) noexcept {
 
     shutdown();
     if (!device ||
-        !renderState.inputValid ||
-        !renderState.bundleReady ||
-        !renderState.deviceMatches ||
-        !renderState.translationMatches ||
-        !renderState.ready ||
-        renderState.bundleGeneration == 0 ||
-        renderState.translationIdentity == 0 ||
-        renderState.snapshotToken == 0 ||
-        !outputState.inputValid ||
-        !outputState.viewportExact ||
-        !outputState.scissorExact ||
-        !outputState.omDynamicExact ||
-        !outputState.ready ||
-        outputState.snapshotToken == 0 ||
-        !renderStateBundle.validate_readiness_snapshot(device, renderState) ||
+        renderStateSnapshotToken == 0 ||
+        outputStateSnapshotToken == 0 ||
+        !renderStateBundle.validate_translation_snapshot(
+            device, translation, renderStateSnapshotToken) ||
+        !validate_fixed_function_output_state_snapshot(
+            source, surfacePair, outputStateSnapshotToken) ||
         !renderStateBundle.ready() ||
         renderStateBundle.device() != device ||
         !renderStateBundle.blend_state() ||
@@ -2197,17 +2139,44 @@ bool NativeFixedFunctionOutputStateBinding::initialize(
         !renderStateBundle.rasterizer_state())
         return false;
 
+    const bool sourceScissorEnabled = source.scissorTestEnable != FALSE;
+    if (translation.rasterizer.ScissorEnable != sourceScissorEnabled)
+        return false;
+
+    const auto renderState =
+        renderStateBundle.translation_readiness(device, translation);
+    const auto outputState =
+        compose_fixed_function_output_state_readiness(source, surfacePair);
+    if (!renderState.ready ||
+        renderState.snapshotToken != renderStateSnapshotToken ||
+        !outputState.ready ||
+        outputState.snapshotToken != outputStateSnapshotToken)
+        return false;
+
+    D3D11_RECT sealedScissor = outputState.scissorRect;
+    if (!sourceScissorEnabled) {
+        if (surfacePair.width >
+                static_cast<UINT>(std::numeric_limits<LONG>::max()) ||
+            surfacePair.height >
+                static_cast<UINT>(std::numeric_limits<LONG>::max()))
+            return false;
+        sealedScissor.left = 0;
+        sealedScissor.top = 0;
+        sealedScissor.right = static_cast<LONG>(surfacePair.width);
+        sealedScissor.bottom = static_cast<LONG>(surfacePair.height);
+    }
+
     device_ = device;
     blend_state_ = renderStateBundle.blend_state();
     depth_stencil_state_ = renderStateBundle.depth_stencil_state();
     rasterizer_state_ = renderStateBundle.rasterizer_state();
     viewport_ = outputState.viewport;
-    scissor_rect_ = outputState.scissorRect;
+    scissor_rect_ = sealedScissor;
     blend_factor_ = outputState.blendFactor;
     sample_mask_ = outputState.sampleMask;
     stencil_ref_ = renderStateBundle.stencil_ref();
-    render_state_snapshot_token_ = renderState.snapshotToken;
-    output_state_snapshot_token_ = outputState.snapshotToken;
+    render_state_snapshot_token_ = renderStateSnapshotToken;
+    output_state_snapshot_token_ = outputStateSnapshotToken;
 
     std::uint64_t token = 0xcbf29ce484222325ull;
     token = mix_readiness_snapshot_token(

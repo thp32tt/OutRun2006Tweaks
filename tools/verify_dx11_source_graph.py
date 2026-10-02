@@ -951,6 +951,44 @@ def main() -> None:
             + ", ".join(missing_r126_output_binding)
         )
 
+    r126_output_binding_provenance_contract = [
+        (
+            "renderStateBundle.validate_translation_snapshot(",
+            NATIVE_BACKEND_CPP,
+            "R126 live render-state snapshot revalidation",
+        ),
+        (
+            "validate_fixed_function_output_state_snapshot(",
+            NATIVE_BACKEND_CPP,
+            "R126 live R124 source/surface snapshot revalidation",
+        ),
+        (
+            "translation.rasterizer.ScissorEnable != sourceScissorEnabled",
+            NATIVE_BACKEND_CPP,
+            "R126 immutable/dynamic scissor consistency gate",
+        ),
+        (
+            "R126 mismatched sealed scissor state fails closed",
+            CONSTANT_BUFFER_PROBE,
+            "R126 cross-snapshot scissor mismatch negative proof",
+        ),
+        (
+            "R126 stale R124 source/token pair fails closed",
+            CONSTANT_BUFFER_PROBE,
+            "R126 stale output provenance negative proof",
+        ),
+    ]
+    missing_r126_output_binding_provenance = [
+        meaning
+        for token, source, meaning in r126_output_binding_provenance_contract
+        if token not in source
+    ]
+    if missing_r126_output_binding_provenance:
+        raise SystemExit(
+            "DX11 R126 output-state provenance contract drift: "
+            + ", ".join(missing_r126_output_binding_provenance)
+        )
+
     stencil_snapshot_contract = {
         "DWORD stencilReadMask = 0xFFFFFFFFu;": "stencil read mask snapshot",
         "DWORD stencilRef = 0;": "dynamic stencil reference snapshot",
@@ -3560,59 +3598,6 @@ def main() -> None:
             raise SystemExit(
                 "DX11 R124 output-state probe drift: " + meaning
             )
-
-    r128_output_binding_header = {
-        "bind_output_state_if_ready(":
-            "R128 dormant RS/OM binding API",
-        "std::uint64_t translationSnapshotToken":
-            "R128 sealed render-state snapshot input",
-        "std::uint64_t outputStateSnapshotToken":
-            "R128 sealed output-state snapshot input",
-    }
-    missing_r128_output_binding = [
-        meaning
-        for token, meaning in r128_output_binding_header.items()
-        if token not in NATIVE_BACKEND_HPP
-    ]
-    for token, meaning in {
-        "validate_fixed_function_output_state_snapshot(":
-            "R128 validates dynamic output-state identity",
-        "translation.rasterizer.ScissorEnable != sourceScissorEnabled":
-            "R128 cross-snapshot scissor consistency gate",
-        "context->RSSetState(rasterizer_state_.Get())":
-            "R128 rasterizer binding",
-        "context->RSSetViewports(1, &output.viewport)":
-            "R128 viewport binding",
-        "context->RSSetScissorRects(1, &scissor)":
-            "R128 scissor binding",
-        "context->OMSetBlendState(":
-            "R128 blend-factor/sample-mask binding",
-        "context->OMSetDepthStencilState(":
-            "R128 depth/stencil binding",
-    }.items():
-        if token not in NATIVE_BACKEND_CPP:
-            missing_r128_output_binding.append(meaning)
-    for token, meaning in {
-        "R128 scissor-enable mismatch between sealed states fails closed":
-            "R128 cross-snapshot negative probe",
-        "R128 stale render-state snapshot fails closed":
-            "R128 stale render snapshot negative probe",
-        "R128 stale output-state snapshot fails closed":
-            "R128 stale output snapshot negative probe",
-        "R128 foreign context fails closed":
-            "R128 foreign-context negative probe",
-        "R128 exact sealed states bind dormant RS/OM output state":
-            "R128 positive hosted binding probe",
-        "DX11 dormant RS/OM output-state binding R128: PASS":
-            "R128 hosted probe completion marker",
-    }.items():
-        if token not in CONSTANT_BUFFER_PROBE:
-            missing_r128_output_binding.append(meaning)
-    if missing_r128_output_binding:
-        raise SystemExit(
-            "DX11 R128 dormant output-state binding contract drift: "
-            + ", ".join(missing_r128_output_binding)
-        )
 
     r129_generated_fan_geometry_contract = [
         (

@@ -514,17 +514,6 @@ public:
         ID3D11Device* expectedDevice,
         const NativeFixedFunctionRenderStateReadiness& readiness) const noexcept;
 
-    // R128 consumes the sealed R116 immutable render-state identity together
-    // with the sealed R124 dynamic output-state identity. This is a dormant
-    // RS/OM binding primitive only; it never dispatches a D3D11 Draw* call.
-    bool bind_output_state_if_ready(
-        ID3D11DeviceContext* context,
-        const PipelineTranslation& translation,
-        std::uint64_t translationSnapshotToken,
-        const OutRunVR::DrawState::RenderStateSnapshot& source,
-        const NativeSurfacePairReadiness& surfacePair,
-        std::uint64_t outputStateSnapshotToken) const noexcept;
-
     [[nodiscard]] bool ready() const noexcept {
         return device_ && blend_state_ && depth_stencil_state_ &&
             rasterizer_state_;
@@ -676,10 +665,10 @@ compose_fixed_function_output_state_readiness(
     const NativeSurfacePairReadiness& surfacePair,
     std::uint64_t snapshotToken) noexcept;
 
-// R126 consumes the sealed R116 immutable RS/OM objects plus the R124 dynamic
-// viewport/scissor/blend-factor/sample-mask snapshot into one dormant binding
-// owner. apply() mutates only the explicitly supplied D3D11 context; no D3D9
-// Draw* path calls this owner and native routing remains disabled.
+// R126 consumes an exact live R116 translation snapshot plus a freshly
+// recomputed R124 source/surface snapshot into one dormant binding owner.
+// initialize() cross-checks immutable rasterizer scissor enable against the
+// dynamic source state before sealing RS/OM bindings. apply() never Draw*s.
 class NativeFixedFunctionOutputStateBinding final {
 public:
     NativeFixedFunctionOutputStateBinding() = default;
@@ -692,8 +681,11 @@ public:
     bool initialize(
         ID3D11Device* device,
         const NativeFixedFunctionRenderStateBundle& renderStateBundle,
-        const NativeFixedFunctionRenderStateReadiness& renderState,
-        const NativeFixedFunctionOutputStateReadiness& outputState) noexcept;
+        const PipelineTranslation& translation,
+        std::uint64_t renderStateSnapshotToken,
+        const OutRunVR::DrawState::RenderStateSnapshot& source,
+        const NativeSurfacePairReadiness& surfacePair,
+        std::uint64_t outputStateSnapshotToken) noexcept;
     void shutdown() noexcept;
     [[nodiscard]] bool apply(ID3D11DeviceContext* context) const noexcept;
 
