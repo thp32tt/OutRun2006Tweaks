@@ -14,6 +14,7 @@ namespace
 {
     using outrun::vr::dx11::FixedFunctionStageState;
     using outrun::vr::dx11::NativeFixedFunctionPipelineBundle;
+    using outrun::vr::dx11::NativeFixedFunctionRenderStateBundle;
     using outrun::vr::dx11::NativeFixedFunctionSamplerState;
     using outrun::vr::dx11::NativeFixedFunctionTextureView;
     using outrun::vr::dx11::NativeFixedFunctionTransformBuffer;
@@ -21,6 +22,7 @@ namespace
     using outrun::vr::dx11::NativeManagedTextureRegistry;
     using outrun::vr::dx11::NativeManagedTextureShadow;
     using outrun::vr::dx11::NativeManagedTextureStageReadiness;
+    using outrun::vr::dx11::PipelineUnsupportedBlend;
     using outrun::vr::dx11::compose_fixed_function_activation_readiness;
     using outrun::vr::dx11::validate_fixed_function_activation_snapshot;
     using outrun::vr::dx11::ResourceRole;
@@ -29,6 +31,7 @@ namespace
     using outrun::vr::dx11::generate_fixed_function_transform_constants;
     using outrun::vr::dx11::generate_fixed_function_vertex_shader_prototype;
     using outrun::vr::dx11::translate_fixed_function_sampler;
+    using outrun::vr::dx11::translate_pipeline;
     using outrun::vr::dx11::translate_texture_mutation;
     using outrun::vr::dx11::translate_vertex_input_layout;
 
@@ -1447,6 +1450,111 @@ int main()
     require(owner.initialize(d3d.device),
             "R96 owner initialize");
 
+    OutRunVR::DrawState::RenderStateSnapshot renderStateSource{};
+    renderStateSource.complete = true;
+    renderStateSource.stencilEnable = TRUE;
+    renderStateSource.stencilRef = 0x5au;
+    renderStateSource.stencilFunc = D3DCMP_ALWAYS;
+    const auto renderStateTranslation =
+        translate_pipeline(renderStateSource);
+    require(
+        renderStateTranslation.exact(),
+        "R116 render-state translation prerequisite");
+
+    NativeFixedFunctionRenderStateBundle renderStateBundle;
+    require(
+        !renderStateBundle.ready(),
+        "R116 render-state bundle must start dormant");
+    require(
+        renderStateBundle.initialize(d3d.device, renderStateTranslation),
+        "R116 render-state bundle initialize");
+    require(
+        renderStateBundle.ready() &&
+        renderStateBundle.device() == d3d.device &&
+        renderStateBundle.blend_state() != nullptr &&
+        renderStateBundle.depth_stencil_state() != nullptr &&
+        renderStateBundle.rasterizer_state() != nullptr &&
+        renderStateBundle.stencil_ref() == 0x5au,
+        "R116 render-state bundle owns exact translated state objects");
+
+    const auto renderStateReady =
+        renderStateBundle.translation_readiness(
+            d3d.device, renderStateTranslation);
+    require(
+        renderStateReady.inputValid &&
+        renderStateReady.bundleReady &&
+        renderStateReady.deviceMatches &&
+        renderStateReady.translationMatches &&
+        renderStateReady.ready &&
+        renderStateReady.bundleGeneration != 0 &&
+        renderStateReady.translationIdentity != 0 &&
+        renderStateReady.snapshotToken != 0 &&
+        renderStateBundle.validate_translation_snapshot(
+            d3d.device, renderStateTranslation,
+            renderStateReady.snapshotToken),
+        "R116 exact render-state translation issues a valid snapshot");
+
+    auto changedRenderStateTranslation = renderStateTranslation;
+    changedRenderStateTranslation.stencil_ref ^= 0x1u;
+    const auto changedRenderStateReady =
+        renderStateBundle.translation_readiness(
+            d3d.device, changedRenderStateTranslation);
+    require(
+        changedRenderStateReady.inputValid &&
+        changedRenderStateReady.bundleReady &&
+        changedRenderStateReady.deviceMatches &&
+        !changedRenderStateReady.translationMatches &&
+        !changedRenderStateReady.ready &&
+        changedRenderStateReady.snapshotToken == 0 &&
+        !renderStateBundle.validate_translation_snapshot(
+            d3d.device, changedRenderStateTranslation,
+            renderStateReady.snapshotToken),
+        "R116 changed render-state identity fails closed");
+
+    DevicePair renderStateOtherDevice = create_warp_device();
+    const auto foreignRenderStateReady =
+        renderStateBundle.translation_readiness(
+            renderStateOtherDevice.device, renderStateTranslation);
+    require(
+        foreignRenderStateReady.inputValid &&
+        foreignRenderStateReady.bundleReady &&
+        !foreignRenderStateReady.deviceMatches &&
+        !foreignRenderStateReady.ready &&
+        foreignRenderStateReady.snapshotToken == 0,
+        "R116 foreign device cannot claim render-state readiness");
+    renderStateOtherDevice.context->Release();
+    renderStateOtherDevice.device->Release();
+
+    const auto renderStateInitialToken = renderStateReady.snapshotToken;
+    const auto renderStateInitialGeneration =
+        renderStateReady.bundleGeneration;
+    auto inexactRenderStateTranslation = renderStateTranslation;
+    inexactRenderStateTranslation.unsupported |= PipelineUnsupportedBlend;
+    require(
+        !renderStateBundle.initialize(
+            d3d.device, inexactRenderStateTranslation) &&
+        !renderStateBundle.ready(),
+        "R116 inexact render-state translation must fail closed");
+    require(
+        renderStateBundle.initialize(d3d.device, renderStateTranslation),
+        "R116 render-state bundle recreate");
+    const auto renderStateRecreated =
+        renderStateBundle.translation_readiness(
+            d3d.device, renderStateTranslation);
+    require(
+        renderStateRecreated.ready &&
+        renderStateRecreated.bundleGeneration >
+            renderStateInitialGeneration &&
+        renderStateRecreated.snapshotToken != 0 &&
+        renderStateRecreated.snapshotToken != renderStateInitialToken &&
+        !renderStateBundle.validate_translation_snapshot(
+            d3d.device, renderStateTranslation,
+            renderStateInitialToken) &&
+        renderStateBundle.validate_translation_snapshot(
+            d3d.device, renderStateTranslation,
+            renderStateRecreated.snapshotToken),
+        "R116 render-state bundle recreation invalidates stale snapshot");
+
     NativeFixedFunctionPipelineBundle pipelineBundle;
     require(!pipelineBundle.ready(),
             "R97 bundle must start dormant");
@@ -1806,5 +1914,6 @@ int main()
     std::cout << "DX11 managed Texture2D mirror descriptor exactness R111: PASS\n";
     std::cout << "DX11 fixed-function pipeline translation identity R112: PASS\n";
     std::cout << "DX11 fixed-function activation evidence composition R115: PASS\n";
+    std::cout << "DX11 fixed-function render-state bundle R116: PASS\n";
     return 0;
 }
