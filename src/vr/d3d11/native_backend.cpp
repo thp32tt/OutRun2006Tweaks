@@ -594,6 +594,9 @@ bool NativeManagedBufferShadow::recreate_and_upload_mirror(
         release_mirror();
         return false;
     }
+    ++mirror_instance_generation_;
+    if (mirror_instance_generation_ == 0)
+        ++mirror_instance_generation_;
     return true;
 }
 
@@ -634,6 +637,87 @@ bool NativeManagedBufferShadow::mirror_descriptor_exact(
         desc.StructureByteStride == 0;
 }
 
+NativeManagedBufferMirrorReadiness
+NativeManagedBufferShadow::mirror_readiness(
+    ID3D11Device* expectedDevice) const noexcept {
+
+    NativeManagedBufferMirrorReadiness out{};
+    out.deviceGeneration = lifetime_.deviceGeneration;
+    out.shadowVersion = lifetime_.cpuShadowVersion;
+    out.mirrorGeneration = lifetime_.mirrorGeneration;
+    out.mirrorShadowVersion = lifetime_.mirrorShadowVersion;
+    out.mirrorInstanceGeneration = mirror_instance_generation_;
+
+    out.inputValid = ready() && expectedDevice != nullptr;
+    if (!out.inputValid)
+        return out;
+
+    out.shadowValid = lifetime_.cpuShadowValid;
+    out.resourcesOwned = mirror_device_ && mirror_buffer_;
+    out.lifetimeCurrent = managed_mirror_ready(lifetime_);
+    out.deviceMatches =
+        out.resourcesOwned && mirror_device_.Get() == expectedDevice;
+    if (out.deviceMatches) {
+        Microsoft::WRL::ComPtr<ID3D11Device> bufferDevice;
+        mirror_buffer_->GetDevice(bufferDevice.ReleaseAndGetAddressOf());
+        out.deviceMatches =
+            bufferDevice && bufferDevice.Get() == expectedDevice;
+    }
+    out.descriptorExact =
+        out.deviceMatches && mirror_descriptor_exact(expectedDevice);
+    out.ready =
+        out.shadowValid &&
+        out.resourcesOwned &&
+        out.lifetimeCurrent &&
+        out.deviceMatches &&
+        out.descriptorExact &&
+        out.mirrorInstanceGeneration != 0;
+
+    if (out.ready) {
+        std::uint64_t snapshotToken = 0xcbf29ce484222325ull;
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(this)));
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedDevice)));
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(mirror_buffer_.Get())));
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, static_cast<std::uint32_t>(role_));
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, source_usage_);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, byte_width_);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, out.deviceGeneration);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, out.shadowVersion);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, out.mirrorGeneration);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, out.mirrorShadowVersion);
+        snapshotToken = mix_readiness_snapshot_token(
+            snapshotToken, out.mirrorInstanceGeneration);
+        out.snapshotToken = snapshotToken == 0 ? 1 : snapshotToken;
+    }
+    return out;
+}
+
+bool NativeManagedBufferShadow::validate_mirror_readiness_snapshot(
+    ID3D11Device* expectedDevice,
+    std::uint64_t snapshotToken) const noexcept {
+
+    if (snapshotToken == 0)
+        return false;
+    const auto current = mirror_readiness(expectedDevice);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
 void NativeManagedBufferShadow::observe_device_reset() noexcept {
     release_mirror();
     lifetime_ = advance_managed_device_generation(lifetime_);
@@ -653,6 +737,7 @@ void NativeManagedBufferShadow::shutdown() noexcept {
     metadata_valid_ = false;
     shadow_.clear();
     lifetime_ = {};
+    mirror_instance_generation_ = 0;
 }
 
 bool NativeManagedTextureShadow::initialize(

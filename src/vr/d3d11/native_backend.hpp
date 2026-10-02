@@ -152,6 +152,27 @@ private:
     std::uint64_t upload_generation_ = 0;
 };
 
+// R119 seals one R113 MANAGED vertex/index buffer mirror into a fail-closed
+// readiness snapshot. The token binds CPU-shadow version, device generation,
+// mirror instance, descriptor and expected-device identity. This is dormant
+// evidence only; it does not route a game Lock/Unlock or Draw* call to D3D11.
+struct NativeManagedBufferMirrorReadiness
+{
+    bool inputValid{};
+    bool shadowValid{};
+    bool resourcesOwned{};
+    bool lifetimeCurrent{};
+    bool deviceMatches{};
+    bool descriptorExact{};
+    bool ready{};
+    std::uint64_t deviceGeneration{};
+    std::uint64_t shadowVersion{};
+    std::uint64_t mirrorGeneration{};
+    std::uint64_t mirrorShadowVersion{};
+    std::uint64_t mirrorInstanceGeneration{};
+    std::uint64_t snapshotToken{};
+};
+
 // R113 dormant CPU shadow plus generation-bound D3D11 mirror for D3D9
 // MANAGED vertex/index buffers. This is readiness infrastructure only: no
 // game Lock/Unlock hook or native draw path routes through it yet.
@@ -199,6 +220,14 @@ public:
     }
     [[nodiscard]] bool mirror_descriptor_exact(
         ID3D11Device* expectedDevice) const noexcept;
+    [[nodiscard]] NativeManagedBufferMirrorReadiness mirror_readiness(
+        ID3D11Device* expectedDevice) const noexcept;
+    [[nodiscard]] bool validate_mirror_readiness_snapshot(
+        ID3D11Device* expectedDevice,
+        std::uint64_t snapshotToken) const noexcept;
+    [[nodiscard]] std::uint64_t mirror_instance_generation() const noexcept {
+        return mirror_instance_generation_;
+    }
 
 private:
     void release_mirror() noexcept;
@@ -211,6 +240,7 @@ private:
     ManagedMirrorLifetimeState lifetime_{};
     Microsoft::WRL::ComPtr<ID3D11Device> mirror_device_;
     Microsoft::WRL::ComPtr<ID3D11Buffer> mirror_buffer_;
+    std::uint64_t mirror_instance_generation_ = 0;
 };
 
 // R102 dormant CPU shadow for a single-mip uncompressed D3D9 MANAGED

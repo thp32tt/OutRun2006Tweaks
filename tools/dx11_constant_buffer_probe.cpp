@@ -557,6 +557,45 @@ int main()
         managedVertexBuffer.mirror_descriptor_exact(d3d.device),
         "R113 managed vertex-buffer mirror upload");
 
+    const auto managedVertexReady =
+        managedVertexBuffer.mirror_readiness(d3d.device);
+    require(
+        managedVertexReady.inputValid &&
+        managedVertexReady.shadowValid &&
+        managedVertexReady.resourcesOwned &&
+        managedVertexReady.lifetimeCurrent &&
+        managedVertexReady.deviceMatches &&
+        managedVertexReady.descriptorExact &&
+        managedVertexReady.ready &&
+        managedVertexReady.deviceGeneration == 1 &&
+        managedVertexReady.shadowVersion == 1 &&
+        managedVertexReady.mirrorGeneration == 1 &&
+        managedVertexReady.mirrorShadowVersion == 1 &&
+        managedVertexReady.mirrorInstanceGeneration == 1 &&
+        managedVertexReady.snapshotToken != 0 &&
+        managedVertexBuffer.validate_mirror_readiness_snapshot(
+            d3d.device, managedVertexReady.snapshotToken),
+        "R119 managed vertex-buffer mirror issues exact readiness snapshot");
+    const auto managedVertexInitialToken = managedVertexReady.snapshotToken;
+
+    DevicePair managedBufferOtherDevice = create_warp_device();
+    const auto managedVertexForeignReady =
+        managedVertexBuffer.mirror_readiness(managedBufferOtherDevice.device);
+    require(
+        managedVertexForeignReady.inputValid &&
+        managedVertexForeignReady.shadowValid &&
+        managedVertexForeignReady.resourcesOwned &&
+        managedVertexForeignReady.lifetimeCurrent &&
+        !managedVertexForeignReady.deviceMatches &&
+        !managedVertexForeignReady.descriptorExact &&
+        !managedVertexForeignReady.ready &&
+        managedVertexForeignReady.snapshotToken == 0 &&
+        !managedVertexBuffer.validate_mirror_readiness_snapshot(
+            managedBufferOtherDevice.device, managedVertexInitialToken),
+        "R119 foreign device cannot claim managed-buffer readiness");
+    managedBufferOtherDevice.context->Release();
+    managedBufferOtherDevice.device->Release();
+
     D3D11_BUFFER_DESC managedVertexDesc{};
     managedVertexBuffer.mirror_buffer()->GetDesc(&managedVertexDesc);
     require(
@@ -600,6 +639,18 @@ int main()
         !managedVertexBuffer.mirror_ready() &&
         managedVertexBuffer.mirror_buffer() == nullptr,
         "R113 partial managed buffer update invalidates stale mirror");
+    const auto managedVertexAfterWrite =
+        managedVertexBuffer.mirror_readiness(d3d.device);
+    require(
+        managedVertexAfterWrite.inputValid &&
+        managedVertexAfterWrite.shadowValid &&
+        !managedVertexAfterWrite.resourcesOwned &&
+        !managedVertexAfterWrite.lifetimeCurrent &&
+        !managedVertexAfterWrite.ready &&
+        managedVertexAfterWrite.snapshotToken == 0 &&
+        !managedVertexBuffer.validate_mirror_readiness_snapshot(
+            d3d.device, managedVertexInitialToken),
+        "R119 shadow mutation invalidates managed-buffer snapshot");
     require(
         !managedVertexBuffer.write_range(
             31, managedVertexPatch,
@@ -608,6 +659,21 @@ int main()
     require(
         managedVertexBuffer.recreate_and_upload_mirror(d3d.device),
         "R113 managed vertex-buffer mirror recreation");
+    const auto managedVertexAfterWriteRecreate =
+        managedVertexBuffer.mirror_readiness(d3d.device);
+    require(
+        managedVertexAfterWriteRecreate.ready &&
+        managedVertexAfterWriteRecreate.shadowVersion == 2 &&
+        managedVertexAfterWriteRecreate.mirrorShadowVersion == 2 &&
+        managedVertexAfterWriteRecreate.mirrorInstanceGeneration == 2 &&
+        managedVertexAfterWriteRecreate.snapshotToken != 0 &&
+        managedVertexAfterWriteRecreate.snapshotToken != managedVertexInitialToken &&
+        managedVertexBuffer.validate_mirror_readiness_snapshot(
+            d3d.device, managedVertexAfterWriteRecreate.snapshotToken),
+        "R119 managed-buffer recreation issues fresh snapshot");
+    const auto managedVertexPreResetToken =
+        managedVertexAfterWriteRecreate.snapshotToken;
+
     managedVertexBuffer.observe_device_reset();
     require(
         managedVertexBuffer.device_generation() == 2 &&
@@ -616,10 +682,36 @@ int main()
         !managedVertexBuffer.mirror_ready() &&
         managedVertexBuffer.mirror_buffer() == nullptr,
         "R113 Reset preserves managed buffer CPU shadow only");
+    const auto managedVertexAfterReset =
+        managedVertexBuffer.mirror_readiness(d3d.device);
+    require(
+        managedVertexAfterReset.inputValid &&
+        managedVertexAfterReset.shadowValid &&
+        !managedVertexAfterReset.resourcesOwned &&
+        !managedVertexAfterReset.lifetimeCurrent &&
+        !managedVertexAfterReset.ready &&
+        managedVertexAfterReset.snapshotToken == 0 &&
+        !managedVertexBuffer.validate_mirror_readiness_snapshot(
+            d3d.device, managedVertexPreResetToken),
+        "R119 Reset invalidates managed-buffer readiness snapshot");
     require(
         managedVertexBuffer.recreate_and_upload_mirror(d3d.device) &&
         managedVertexBuffer.mirror_descriptor_exact(d3d.device),
         "R113 post-Reset managed vertex-buffer mirror recreation");
+    const auto managedVertexPostResetReady =
+        managedVertexBuffer.mirror_readiness(d3d.device);
+    require(
+        managedVertexPostResetReady.ready &&
+        managedVertexPostResetReady.deviceGeneration == 2 &&
+        managedVertexPostResetReady.shadowVersion == 2 &&
+        managedVertexPostResetReady.mirrorGeneration == 2 &&
+        managedVertexPostResetReady.mirrorShadowVersion == 2 &&
+        managedVertexPostResetReady.mirrorInstanceGeneration == 3 &&
+        managedVertexPostResetReady.snapshotToken != 0 &&
+        managedVertexPostResetReady.snapshotToken != managedVertexPreResetToken &&
+        managedVertexBuffer.validate_mirror_readiness_snapshot(
+            d3d.device, managedVertexPostResetReady.snapshotToken),
+        "R119 post-Reset managed-buffer mirror issues generation-current snapshot");
 
     NativeManagedBufferShadow managedIndexBuffer;
     std::array<unsigned short, 6> managedIndexBytes{0, 1, 2, 2, 3, 0};
@@ -639,6 +731,15 @@ int main()
     require(
         managedIndexDesc.BindFlags == D3D11_BIND_INDEX_BUFFER,
         "R113 managed index-buffer bind contract");
+    const auto managedIndexReady =
+        managedIndexBuffer.mirror_readiness(d3d.device);
+    require(
+        managedIndexReady.ready &&
+        managedIndexReady.snapshotToken != 0 &&
+        managedIndexReady.mirrorInstanceGeneration == 1 &&
+        managedIndexBuffer.validate_mirror_readiness_snapshot(
+            d3d.device, managedIndexReady.snapshotToken),
+        "R119 managed index-buffer mirror issues exact readiness snapshot");
     NativeManagedBufferShadow invalidManagedBuffer;
     require(
         !invalidManagedBuffer.initialize(
@@ -1987,6 +2088,7 @@ int main()
     std::cout << "DX11 managed Texture2D mirror descriptor exactness R111: PASS\n";
     std::cout << "DX11 fixed-function pipeline translation identity R112: PASS\n";
     std::cout << "DX11 managed vertex/index buffer mirror R113: PASS\n";
+    std::cout << "DX11 managed buffer mirror readiness snapshot R119: PASS\n";
     std::cout << "DX11 fixed-function activation evidence composition R115: PASS\n";
     std::cout << "DX11 fixed-function render-state bundle R116: PASS\n";
     std::cout << "DX11 fixed-function draw readiness composition R117: PASS\n";

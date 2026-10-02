@@ -2784,6 +2784,77 @@ def main() -> None:
                 "DX11 R113 managed-buffer mirror probe drift: " + meaning
             )
 
+    r119_managed_buffer_readiness_header = {
+        "struct NativeManagedBufferMirrorReadiness":
+            "R119 managed-buffer readiness snapshot",
+        "bool lifetimeCurrent{}":
+            "R119 generation-current readiness gate",
+        "std::uint64_t mirrorInstanceGeneration{}":
+            "R119 mirror-instance identity",
+        "NativeManagedBufferMirrorReadiness mirror_readiness(":
+            "R119 readiness observation API",
+        "validate_mirror_readiness_snapshot(":
+            "R119 stale-snapshot validator",
+        "std::uint64_t mirror_instance_generation_ = 0":
+            "R119 monotonic mirror-instance owner",
+    }
+    missing_r119_header = [
+        meaning
+        for token, meaning in r119_managed_buffer_readiness_header.items()
+        if token not in NATIVE_BACKEND_HPP
+    ]
+    if missing_r119_header:
+        raise SystemExit(
+            "DX11 R119 managed-buffer readiness header drift: "
+            + ", ".join(missing_r119_header)
+        )
+
+    for token, meaning in {
+        "NativeManagedBufferShadow::mirror_readiness(":
+            "R119 readiness implementation",
+        "out.lifetimeCurrent = managed_mirror_ready(lifetime_)":
+            "R119 current-generation lifetime proof",
+        "out.deviceMatches =":
+            "R119 expected-device gate",
+        "out.descriptorExact =":
+            "R119 exact descriptor gate",
+        "snapshotToken, out.deviceGeneration":
+            "R119 device generation token identity",
+        "snapshotToken, out.shadowVersion":
+            "R119 CPU shadow version token identity",
+        "snapshotToken, out.mirrorInstanceGeneration":
+            "R119 mirror instance token identity",
+        "++mirror_instance_generation_":
+            "R119 successful recreation generation advance",
+    }.items():
+        if token not in NATIVE_BACKEND_CPP:
+            raise SystemExit(
+                "DX11 R119 managed-buffer readiness source drift: " + meaning
+            )
+
+    for token, meaning in {
+        "R119 managed vertex-buffer mirror issues exact readiness snapshot":
+            "R119 positive VB snapshot proof",
+        "R119 foreign device cannot claim managed-buffer readiness":
+            "R119 foreign-device rejection",
+        "R119 shadow mutation invalidates managed-buffer snapshot":
+            "R119 CPU mutation stale-token proof",
+        "R119 managed-buffer recreation issues fresh snapshot":
+            "R119 mirror-recreation token proof",
+        "R119 Reset invalidates managed-buffer readiness snapshot":
+            "R119 Reset stale-token proof",
+        "R119 post-Reset managed-buffer mirror issues generation-current snapshot":
+            "R119 post-Reset fresh-token proof",
+        "R119 managed index-buffer mirror issues exact readiness snapshot":
+            "R119 IB positive snapshot proof",
+        "DX11 managed buffer mirror readiness snapshot R119: PASS":
+            "R119 hosted probe completion marker",
+    }.items():
+        if token not in CONSTANT_BUFFER_PROBE:
+            raise SystemExit(
+                "DX11 R119 managed-buffer readiness probe drift: " + meaning
+            )
+
     r115_activation_header = {
         "struct NativeFixedFunctionActivationReadiness":
             "R115 composite activation readiness",
