@@ -24,6 +24,12 @@ namespace outrun::vr::dx11
             return mask;
         }
 
+        bool is_dual_source_blend_factor(D3DBLEND value) noexcept
+        {
+            return value == D3DBLEND_SRCCOLOR2 ||
+                   value == D3DBLEND_INVSRCCOLOR2;
+        }
+
         TranslationResult<D3D11_BLEND> translate_separate_alpha_blend_factor(
             D3DBLEND value) noexcept
         {
@@ -1262,11 +1268,15 @@ namespace outrun::vr::dx11
 
         const auto sourceBlendValue =
             static_cast<D3DBLEND>(source.srcBlend);
+        const auto destinationBlendValue =
+            static_cast<D3DBLEND>(source.destBlend);
         auto srcBlend = translate_blend(sourceBlendValue);
-        auto dstBlend = translate_blend(
-            static_cast<D3DBLEND>(source.destBlend));
+        auto dstBlend = translate_blend(destinationBlendValue);
         const auto blendOp = translate_blend_op(
             static_cast<D3DBLENDOP>(source.blendOp));
+        const bool dualSourceBlendRequested =
+            is_dual_source_blend_factor(sourceBlendValue) ||
+            is_dual_source_blend_factor(destinationBlendValue);
 
         // D3DBLEND_BOTHSRCALPHA/BOTHINVSRCALPHA are legacy source-state
         // shortcuts: when used as D3DRS_SRCBLEND they override DESTBLEND.
@@ -1290,6 +1300,9 @@ namespace outrun::vr::dx11
         rt.SrcBlendAlpha = srcBlend.value;
         rt.DestBlendAlpha = dstBlend.value;
         rt.BlendOpAlpha = blendOp.value;
+
+        if (rt.BlendEnable && dualSourceBlendRequested)
+            out.unsupported |= PipelineUnsupportedDualSourceBlend;
 
         if (rt.BlendEnable &&
             (!srcBlend.exact || !dstBlend.exact || !blendOp.exact))
