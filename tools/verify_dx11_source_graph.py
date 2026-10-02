@@ -202,6 +202,8 @@ def main() -> None:
         "D3DSAMP_MINFILTER": "R81 per-stage sampler min filter observation",
         "D3DSAMP_MAGFILTER": "R81 per-stage sampler mag filter observation",
         "D3DSAMP_MIPFILTER": "R81 per-stage sampler mip filter observation",
+        "D3DSAMP_MIPMAPLODBIAS": "R125 per-stage sampler MIP LOD bias observation",
+        "D3DSAMP_MAXMIPLEVEL": "R125 per-stage sampler most-detailed-mip observation",
         "D3DSAMP_ADDRESSU": "R81 per-stage sampler U addressing observation",
         "D3DSAMP_ADDRESSV": "R81 per-stage sampler V addressing observation",
         "fixedFunctionStateCoverageExact": "R81 fixed-function coverage readiness evidence",
@@ -1797,6 +1799,9 @@ def main() -> None:
         "FixedFunctionSamplerTranslation": "R98 concrete sampler translation result",
         "D3D11_SAMPLER_DESC desc": "R98 D3D11 sampler descriptor",
         "translate_fixed_function_sampler": "R98 sampler translation entrypoint",
+        "mipLodBiasBits": "R125 sampler MIP LOD bias provenance",
+        "maxMipLevel": "R125 sampler most-detailed-mip provenance",
+        "FixedFunctionUnsupportedSamplerLod": "R125 sampler LOD unsupported reason",
     }
     missing_r98_translation_header = [
         meaning
@@ -1815,6 +1820,7 @@ def main() -> None:
         "D3D11_TEXTURE_ADDRESS_CLAMP": "R98 clamp address mapping",
         "source.mipFilter == D3DTEXF_NONE": "R98 no-mip MaxLOD contract",
         "D3D11_FLOAT32_MAX": "R98 mip-enabled MaxLOD contract",
+        "fixed_function_sampler_lod_supported": "R125 conservative sampler LOD exactness gate",
     }.items():
         if token not in PIPELINE_TRANSLATION_CPP:
             raise SystemExit(
@@ -1869,6 +1875,10 @@ def main() -> None:
     for token, meaning in {
         "R98 point/wrap sampler translation": "R98 point/wrap descriptor case",
         "R98 linear/clamp sampler translation": "R98 linear/clamp descriptor case",
+        "R125 non-default sampler MIP LOD bias must fail closed":
+            "R125 non-default MIP LOD bias fail-closed proof",
+        "R125 non-default sampler MAXMIPLEVEL must fail closed":
+            "R125 non-default most-detailed-mip fail-closed proof",
         "R98 anisotropic sampler translation must fail closed":
             "R98 unsupported filter negative case",
         "R98 failed sampler reinitialize must leave owner dormant":
