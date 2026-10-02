@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "b3ad54cb14c1ddb84d492722fd16c4d615964319",
+  "state_parent_head": "a187a2f48152a24fd52cfdad1725902cac8e0244",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -52,16 +52,16 @@
   },
   "latest_durable_task": {
     "task_id": "CONV-DX11-000001",
-    "result_sha": "93d73bfef228fe03cc741a40c7523ad5114a5311",
-    "validation_bearing_sha": "93d73bfef228fe03cc741a40c7523ad5114a5311",
-    "retaining_descendant_sha": "b3ad54cb14c1ddb84d492722fd16c4d615964319",
-    "automation_validation": "PASS_EXACT_SHA_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_AND_CENSUS_ANALYZER; Backend Conversion Gate run 36991719434 job 110789312352; WIN32_CONFIGURE_CANCELLED_BY_DESCENDANT_BRANCH_CHURN; BUILD_SKIPPED_COMPILE_NOT_CLAIMED",
+    "result_sha": "a73942e981fce7c54888ccbf304ced6c577993d4",
+    "validation_bearing_sha": "a73942e981fce7c54888ccbf304ced6c577993d4",
+    "retaining_descendant_sha": "a187a2f48152a24fd52cfdad1725902cac8e0244",
+    "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_STATIC_STEPS_DX11_SOURCE_GRAPH_AND_CENSUS; CONFIGURE_IN_PROGRESS_AT_C6; COMPILE_NOT_CLAIMED",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
   },
-  "runtime_blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI. R187 D3DTOP_BLENDTEXTUREALPHAPM is retained and its source-graph/activation/census contracts passed on descendant validation; Win32 Configure was cancelled by same-branch descendant churn, so compile/binary/runtime success is not claimed.",
-  "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation; R187 only extends dormant fixed-function texture-op semantics.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve newer authenticated vr-dx11-native-r71 descendants, including concurrent source work already retained at HEAD. Fresh-audit the newest HEAD for the next independent runnable DX11 semantic/source/static gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "runtime_blocker": "Quest 3/VDXR runtime parity remains unavailable in GitHub CI. R188 D3DTOP_MODULATECOLOR_ADDALPHA exact-SHA source-graph/census validation passed; configure/build were not complete at C6, so compile/binary/runtime success is not claimed.",
+  "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation; R188 only extends dormant fixed-function texture-op semantics.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for the next independent dormant DX11 semantic/source/static gap, excluding completed R188 D3DTOP_MODULATECOLOR_ADDALPHA and newer concurrent work already retained at HEAD. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1144,6 +1144,28 @@
       "issue14_comment_id": 5949570905,
       "validation_run_id": 36991719434,
       "validation_job_id": 110789312352
+    },
+    {
+      "unit_id": "DX11_FFP_D3DTOP_MODULATECOLOR_ADDALPHA_SUPPORT_R188",
+      "task_id": "CONV-DX11-000001",
+      "base_sha": "108a0455cc8b4fe060fa58695ac01a9f4cc35484",
+      "implementation_commits": [
+        "b3ad54cb14c1ddb84d492722fd16c4d615964319",
+        "8897737da96bfe841237f9ce8ba21c998996b04e",
+        "a73942e981fce7c54888ccbf304ced6c577993d4"
+      ],
+      "source_implementation_sha": "b3ad54cb14c1ddb84d492722fd16c4d615964319",
+      "material_result_sha": "a73942e981fce7c54888ccbf304ced6c577993d4",
+      "validation_bearing_sha": "a73942e981fce7c54888ccbf304ced6c577993d4",
+      "retaining_descendant_sha": "a187a2f48152a24fd52cfdad1725902cac8e0244",
+      "automation_validation": "PASS_EXACT_SHA_BUILD_WORKFLOW_STATIC_STEPS_DX11_SOURCE_GRAPH_AND_CENSUS; CONFIGURE_IN_PROGRESS_AT_C6; COMPILE_NOT_CLAIMED",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_SOURCE_TEST_ONLY",
+      "issue14_comment_id": 5949643379,
+      "validation_run_id": 36992160627,
+      "validation_job_id": 110790748419
     }
   ]
 }
