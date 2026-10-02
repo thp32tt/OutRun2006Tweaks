@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00272",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "d870ffd21c196b445ea66cb89e6b30d509b43098",
+  "result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "selected_work": "DX11_BOUNDED_SOURCE_REVIEW_RESUME",
+  "summary": "Recovered DX11 conversion lane from GitHub HEAD. Verified branch-local state precedence and preserved runtime claims as UNTESTED. Next action is bounded source/static conversion work only.",
+  "changed_paths": [
+    "docs/automation/runs/CONVERSION-DX11-00272.json"
+  ],
+  "scope_guards": {
+    "vr_d3d9ex_focus_modified": false,
+    "dxvk_lane_modified": false,
+    "native_draw_activation_changed": false
+  },
+  "validation": {
+    "github_recovery": "PASS",
+    "automation_gate": "PENDING"
+  },
+  "checkpoint": "C0_RECOVER",
+  "status": "IN_PROGRESS"
+}
