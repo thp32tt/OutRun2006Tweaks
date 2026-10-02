@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-03T03:19:32+09:00",
+  "updatedKst": "2026-10-03T07:58:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 330,
+  "cycle": 639,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -41,9 +41,10 @@
     "VR-REFACTOR-STATE-0004C",
     "VR-REFACTOR-STATE-0004D",
     "VR-REFACTOR-STATE-0004E",
-    "VR-REFACTOR-STATE-0004F"
+    "VR-REFACTOR-STATE-0004F",
+    "VR-REFACTOR-STATE-0004G"
   ],
-  "next": "Continue from validated 0004F by reviewing the remaining cross-layer reset/cache ownership one owner at a time (R29 effect cache and R23 live-state sample reset are next candidates). Preserve reset ordering, hot-path cost, and exact-SHA CI for every source batch.",
+  "next": "Continue from validated 0004G by reviewing the remaining R32 cross-layer R29 effect-state telemetry reads. Prefer an owner snapshot/read API only if it removes coupling without adding hot-path work or changing the existing 64-draw freshness semantics. Keep runtime-visible behavior frozen and require test-first verifier coverage plus exact-SHA CI.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -70,11 +71,14 @@
     "VR-REFACTOR-STATE-0004D replaces eight R31 direct calls to the private R29ArmMonoSafety helper with inline R29 owner API ArmStereoRecoverySafety. The wrapper forwards the same default two-present safety horizon and adds no extra runtime work after inlining.",
     "300-cycle continuation completed as 60 persistent review batches x 5 lenses (architecture/integration, ownership/lifetime, stereo correctness, performance, adversarial/failure), for 300 static review checks. Source-edit gates were evaluated every 3 cycles and build gates every 6 cycles; unchanged/no-op gates were skipped per repository policy instead of manufacturing edits or duplicate builds.",
     "VR-REFACTOR-STATE-0004E encapsulates R31 telemetry ownership: R32/R33/R34 no longer read or write R31 frame/window/live-WVP counters directly. R31 exposes inline note/snapshot/getter/reset APIs; verifier guards direct upper-layer access, recursive wrappers, and declaration order. The corrected source batch was exact-SHA validated before continuing.",
-    "VR-REFACTOR-STATE-0004F moves R31 fast-path reset ownership behind R31ResetFastPathState. R32 preserves the previous reset sequence (blocked generation -> validation cadence -> eye cache -> telemetry frame/window) without directly mutating R31 internals. R29 effect-cache and R23 live-state reset ownership remain intentionally separate for the next atomic review."
+    "VR-REFACTOR-STATE-0004F moves R31 fast-path reset ownership behind R31ResetFastPathState. R32 preserves the previous reset sequence (blocked generation -> validation cadence -> eye cache -> telemetry frame/window) without directly mutating R31 internals. R29 effect-cache and R23 live-state reset ownership remain intentionally separate for the next atomic review.",
+    "309-cycle continuation completed as 61 persistent review batches x 5 lenses plus 4 targeted ownership checks = 309 static review checks. Source-edit gates were evaluated every 3 requested cycles and build gates every 6; unchanged/no-op gates were skipped instead of manufacturing commits or duplicate builds.",
+    "VR-REFACTOR-STATE-0004G removes R32 Reset's remaining direct writes into R29 effect-cache state and R23 live-state sample cursors. R32InvalidateResetCaches now preserves the exact previous order by calling InvalidateEffectStateCache(), then R31ResetFastPathState(), then InvalidateLiveStateSample().",
+    "TDD evidence for 0004G: verifier-only SHA 1d91402abfda6dbbef25367967218a646159e3e5 failed DX9Ex Active Validation run 37074682810 exactly on the three direct-owner violations and missing owner APIs; implementation SHA 2897a8176bbde4de3a567bb0e6ce86ddf9084899 passed the strengthened verifier and full exact-SHA validation."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0004F_BUILD_VERIFIED",
-  "validatedSourceSha": "5204aa57dd7a3b362792de28447c685a9cdf852f",
-  "validationRunId": 37045990391,
+  "batchStatus": "VR-REFACTOR-STATE-0004G_BUILD_VERIFIED",
+  "validatedSourceSha": "2897a8176bbde4de3a567bb0e6ce86ddf9084899",
+  "validationRunId": 37074742797,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
