@@ -3792,6 +3792,71 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer branch-authoritative continuation_55 raw frontier that begins at 0x00182FFC with mandatory 66 83 overlap. Validate/decode only from its current canonical evidence and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_F46_CANONICAL_EXE_PROVENANCE_0x182FFC_TO_0x18303C",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "2d83d701949d2de3fa9480540ee81db697248f4d",
+      "commit_message": "dxvk: capture canonical 0x182FFC continuation [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+      "dxvk_disassembly_evidence_run_id": 36984846807,
+      "dxvk_disassembly_evidence_job_id": 110767408796,
+      "evidence_artifact_id": 11216996799,
+      "evidence_artifact_digest": "sha256:9bb02fd5f0b71c2a07b13227b0356d7e97e415b3c193d187785df6fb92b67ac7",
+      "provenance_status": "EXACT_EXE_182FFC_TO_18303C_PROVENANCE_CAPTURED",
+      "provenance_start_rva": "0x00182FFC",
+      "probe_end_rva": "0x0018303C",
+      "probe_len": 64,
+      "overlap_bytes": "66 83",
+      "overlap_matches": true,
+      "predecessor_overlap_matches": true,
+      "predecessor_proof_status": "EXACT_182FBE_TO_182FFC_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+      "predecessor_exact": true,
+      "target_section": ".text",
+      "probe_end_matches": true,
+      "issue14_implementation_comment_id": 5948296105,
+      "issue14_validation_comment_id": 5948306847,
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "scope": "Bounded canonical raw provenance only; fresh bytes/rel32 candidates remain semantically quarantined and no runtime/render/HUD behavior is promoted.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered current GitHub branch authority, AGENTS.md, branch-local lane/run state, current work queue, regression/problem history and Issue #14 while same-job concurrent commits advanced."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the first unclaimed canonical raw frontier after F45 exact proof: mandatory 66 83 overlap at 0x00182FFC."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 2d83d701949d2de3fa9480540ee81db697248f4d adds continuation_55 bounded raw provenance, overlap/predecessor/.text/probe fail-closed gates, report binding and CLI failure guard."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA DXVK Canonical Disassembly Evidence run 36984846807 job 110767408796 passed the backend disassembly contract, canonical EXE identity, analyzer and artifact upload; continuation_55 reported EXACT_EXE_182FFC_TO_18303C_PROVENANCE_CAPTURED."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive source commit 2d83d701949d2de3fa9480540ee81db697248f4d contains the required [AUTO:CONV-DXVK-000002] marker; Issue #14 comments 5948296105 and 5948306847 record implementation and validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly provenance tooling only; no deployable DXVK payload, selector, backend binary or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit so concurrent newer primary/frontier state is not overwritten."
+        }
+      },
+      "exact_next_action": "Preserve any newer authoritative frontier. If continuation_55 remains the newest raw-only edge, exact-decode only complete canonical instructions in 0x00182FFC..0x0018303C, resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
     }
   ],
   "issue14_implementation_comment_id": 5948133867,
