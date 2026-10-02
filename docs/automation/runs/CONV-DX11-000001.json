@@ -4,66 +4,67 @@
   "task_id": "CONV-DX11-000001",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "base_sha": "f8e779233a4051624bd5f221166b3bce37278962",
-  "state_parent_head": "111a802e238edc8c6b279e72fc4258b62c9fb046",
-  "material_result_sha": "38b9c74edaea9beb5164a6ab0c1280ee6902b490",
-  "validation_bearing_sha": "38b9c74edaea9beb5164a6ab0c1280ee6902b490",
+  "base_sha": "38b9c74edaea9beb5164a6ab0c1280ee6902b490",
+  "state_parent_head": "60b423791b0fd476d53d535c9dd9bdb4ace3950c",
+  "material_result_sha": "3a49588c47f342c8687666203b36252c24709f3b",
+  "validation_bearing_sha": "f697fa2f4d3def152c2f7b5f38a8501dc00911c1",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "n100_used": false,
   "pc_fast_used": false,
-  "selected_work": "DX11_INDEXED_FAN_SOURCE_CONTENT_PROVENANCE_R155",
-  "selection_reason": "Fresh current-HEAD audit found indexed triangle-fan generation trusted a caller-supplied sourceIndices pointer independently from the MANAGED source-IB snapshot token. A caller could therefore materialize foreign index bytes while borrowing a valid source mirror token and still satisfy R143/R148 provenance. R155 closes that dormant pre-dispatch integrity gap without activating Draw*.",
-  "summary": "R155 hashes the exact triangle-fan expansion implied by the current MANAGED source-IB CPU shadow and requires the generated immutable R32_UINT fan IB content hash to match. A dedicated managed-source positive fixture and a borrowed-token/foreign-bytes negative fixture seal the contract; indexed fan dispatch now carries the R155 snapshot. Native Draw* remains disabled.",
+  "selected_work": "DX11_INDEXED_FAN_VERTEX_CAPACITY_R156",
+  "selection_reason": "R154 sealed nonindexed fan VB capacity and R155 sealed indexed fan source-content provenance, but indexed generated-fan dispatch still lacked an exact proof that the actual source index values plus BaseVertexLocation stay inside the live managed vertex-buffer byte range.",
+  "summary": "R156 scans the exact current MANAGED source-index window used by the R155-proven generated fan, seals observed source extrema, applies BaseVertexLocation with signed 64-bit arithmetic, and fails closed when the resulting effective vertex interval exceeds the managed VB byte capacity. Hosted probes cover positive lineage and deterministic effective-VB overrun rejection. Native Draw* remains disabled.",
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": [
-        "Read branch AGENTS.md, current conversion state/run record, work queue, regression knowledge/history and Issue #14 through authenticated GitHub authority.",
-        "Tracked rapid same-branch descendants through 111a802e238edc8c6b279e72fc4258b62c9fb046; material commit 38b9c74edaea9beb5164a6ab0c1280ee6902b490 remains a fast-forward ancestor."
+        "Read AGENTS.md, current conversion state/run record, regression/history evidence and Issue #14 through authenticated GitHub authority.",
+        "Tracked rapid same-branch descendants and avoided duplicating concurrently completed R153-R155 work."
       ]
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
       "evidence": [
-        "Confirmed R152 seals direct indexed source values and R153 seals direct live IA index format/offset, while indexed triangle-fan generation remained on its separate generated-IB path.",
-        "Found NativeTriangleFanIndexBuffer::initialize_indexed accepted arbitrary sourceIndices bytes plus an independently supplied sourceIndexSnapshotToken; existing fan readiness compared metadata/token but not generated content to the MANAGED CPU shadow.",
-        "Selected indexed fan source-content provenance as the highest-value independent dormant DX11 correctness gap."
+        "R154 explicitly left indexed fan source-value capacity as a separate gate.",
+        "R155 proved generated fan content provenance but did not prove source index extrema plus BaseVertexLocation fit the managed VB."
       ]
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
       "changed_paths": [
-        "src/vr/d3d11/native_backend.hpp",
         "src/vr/d3d11/native_backend.cpp",
         "tools/dx11_constant_buffer_probe.cpp",
         "tools/verify_dx11_source_graph.py"
       ],
       "implementation_commits": [
-        "38b9c74edaea9beb5164a6ab0c1280ee6902b490"
+        "94fee58b9f48d0c1ed16d92be51f58230d6d7a3c",
+        "f13ab0bb52d403369f824318051aef79a7c86ba3",
+        "3a49588c47f342c8687666203b36252c24709f3b"
       ],
       "details": [
-        "Added a bounded MANAGED index-shadow fan-expansion hasher that exposes only the derived hash, never the raw CPU shadow pointer.",
-        "Added NativeFixedFunctionIndexedFanSourceContentReadiness and snapshot validation binding generated fan owner identity to the current source mirror and exact expanded index content.",
-        "Indexed fan dispatch now requires and carries the R155 source-content snapshot.",
-        "Hosted probes use a dedicated MANAGED fan source for the positive path and prove a borrowed-token/foreign-bytes owner fails closed; source-graph guard retains the contract."
+        "Indexed fan dispatch scans exactly expansion.sourceElementCount values from the current MANAGED source-index mirror.",
+        "Observed min/max source indices are combined with BaseVertexLocation using signed 64-bit arithmetic and checked against the same managed VB stride/offset/byte width.",
+        "The source-value snapshot and capacity result are mixed into readiness identity; a deterministic overrun probe and source-graph contract were added.",
+        "Later same-lane descendants added exposed source extrema/snapshot assertions while retaining the material commits."
       ]
     },
     "C3_VALIDATE": {
-      "status": "COMPLETE_EXACT_STATIC_CI_CANCELLED_BY_CHURN",
-      "automation_validation": "PASS_EXACT_COMMIT_STATIC_CONTRACT_CI_CANCELLED_BY_BRANCH_CHURN",
+      "status": "COMPLETE_STATIC",
+      "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_GATES_COMPILE_NOT_CLAIMED",
       "evidence": [
-        "Exact material commit static contract check passed: all R155 declaration/implementation/probe/guard tokens present, dedicated MANAGED source fixture present, forged pointer/token negative present, and no context->Draw* call appears in native_backend.cpp.",
-        "Material commit GitHub Backend Conversion Gate run 36982383630 and Build run 36982388240 were cancelled before useful execution by rapid same-branch descendant churn; compile/hosted WARP success is not claimed.",
-        "Current descendant 111a802e238edc8c6b279e72fc4258b62c9fb046 retained 38b9c74edaea9beb5164a6ab0c1280ee6902b490 as a fast-forward ancestor when C6 state was prepared."
+        "GitHub compare proved f697fa2f4d3def152c2f7b5f38a8501dc00911c1 is ahead of 3a49588c47f342c8687666203b36252c24709f3b with behind_by=0.",
+        "Build run 36983110108 job 110762245730 passed Checkout, HMD baseline, one-click structure, backend disassembly contract, Verify DX11 source graph, DX11 census analyzer, wheel source and wheel math steps.",
+        "Configure was still in progress at validation capture; Win32 build, hosted WARP execution and Quest 3/VDXR runtime are not claimed."
       ],
       "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
       "required_marker": "[AUTO:CONV-DX11-000001]",
-      "material_commit": "38b9c74edaea9beb5164a6ab0c1280ee6902b490",
-      "issue14_comment_id": 5947946483
+      "material_commit": "3a49588c47f342c8687666203b36252c24709f3b",
+      "issue14_comment_id": 5948035385,
+      "validation_issue14_comment_id": 5948053649
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
@@ -71,7 +72,7 @@
     },
     "C6_STATE": {
       "status": "COMPLETE_WITH_STATE_COMMIT",
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R155 indexed generated-fan source-content provenance. Fresh-audit current HEAD for the next independent indexed generated-fan semantic gap, especially effective generated index plus BaseVertexLocation vertex-capacity/range identity, without duplicating R152/R153 direct-indexed lineage or R154 nonindexed-fan capacity. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
+      "exact_next_action": "Keep NativeDrawPathActive disabled. Preserve R156 indexed fan source-value/BaseVertex capacity proof and fresh-audit current HEAD for the next independent dormant DX11 semantics gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation."
     }
   },
   "scope_guards": {
@@ -82,12 +83,13 @@
     "localization_modified": false,
     "other_backend_modified": false
   },
-  "issue14_comment_id": 5947946483,
-  "automation_validation": "PASS_EXACT_COMMIT_STATIC_CONTRACT_CI_CANCELLED_BY_BRANCH_CHURN",
-  "blocker": "GitHub CI for the exact material SHA was cancelled before useful execution by same-branch churn. Exact static contract validation passed; Win32 compile, hosted WARP execution, and Quest 3/VDXR runtime parity are not claimed.",
-  "next_action": "Keep NativeDrawPathActive disabled. Preserve R155 indexed generated-fan source-content provenance. Fresh-audit current HEAD for the next independent indexed generated-fan semantic gap, especially effective generated index plus BaseVertexLocation vertex-capacity/range identity, without duplicating R152/R153 direct-indexed lineage or R154 nonindexed-fan capacity. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
+  "issue14_comment_id": 5948035385,
+  "automation_validation": "PASS_RETAINING_DESCENDANT_STATIC_GATES_COMPILE_NOT_CLAIMED",
+  "blocker": "Win32 compile/hosted WARP and Quest 3/VDXR runtime validation are not claimed. Retaining-descendant GitHub static gates passed.",
+  "next_action": "Keep NativeDrawPathActive disabled. Preserve R156 indexed fan source-value/BaseVertex capacity proof and fresh-audit current HEAD for the next independent dormant DX11 semantics gap. Exact-build exhaustive census and Quest 3/VDXR parity remain mandatory before activation.",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_STATIC_RUNTIME_UNTESTED",
   "runtime_claim": "UNTESTED",
-  "prior_completed_unit": "DX11_NONINDEXED_FAN_VERTEX_CAPACITY_R154"
+  "prior_completed_unit": "DX11_INDEXED_FAN_SOURCE_CONTENT_PROVENANCE_R155",
+  "validation_issue14_comment_id": 5948053649
 }
