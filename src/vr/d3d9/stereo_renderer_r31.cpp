@@ -432,7 +432,7 @@ namespace OutRunVRStereo
                     savedViewport, draw.originalConstants, true);
             }
 
-            FrameHadDuplicatedDraw = true;
+            RecordHudStereoDuplicate();
             FrameHadWorldStereo = true;
             ++DuplicatedDraws;
             ++WorldStereoDraws;
@@ -456,7 +456,7 @@ namespace OutRunVRStereo
 
             if (FAILED(rightHr))
             {
-                FrameRightDrawFailed = true;
+                MarkFrameRightDrawFailed();
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
                 ReportStereoFailure(rightFailure, site, rightHr);
                 ArmMonoSafety();
@@ -587,9 +587,8 @@ namespace OutRunVRStereo
                     savedViewport, original, true);
             }
 
-            FrameHadDuplicatedDraw = true;
-            ++DuplicatedDraws;
-            ++NonWorldDuplicatedDraws;
+            RecordHudStereoDuplicate();
+            
             NoteStableTwoEyeDraw();
             NoteScreenSpaceFovDraw();
             ++R31HudDraws;
@@ -604,7 +603,7 @@ namespace OutRunVRStereo
 
             if (FAILED(rightHr))
             {
-                FrameRightDrawFailed = true;
+                MarkFrameRightDrawFailed();
                 InvalidateRightDepthStencilIfLeftMayWrite(device);
                 ReportStereoFailure(rightFailure, site, rightHr);
                 ArmMonoSafety();
@@ -973,7 +972,7 @@ namespace OutRunVRStereo
                     }
 
                     IDirect3DDevice9* const device =
-                        StereoInstalledDevice.load(std::memory_order_acquire);
+                        StereoInstalledDeviceSnapshot();
                     OutRunVR::State::StateBlockTracker::SetR31Reliable(false);
                     OutRunVR::State::StateBlockTracker::ResetCoverageLoss();
                     const bool stateHooks =
