@@ -140,6 +140,10 @@ FFP_RE = re.compile(
     r"(?:,border=0x(?P<samplerBorderColor>[0-9A-Fa-f]+))?"
     r"(?:,srgb=(?P<samplerSrgb>\d+))?\])?"
 )
+FFP_TEXTURE_FACTOR_RE = re.compile(
+    r"VR DX11 R191 ffp texture-factor state#(?P<signature>\d+): "
+    r"observed=(?P<observed>[01]) argb=0x(?P<argb>[0-9A-Fa-f]{8})"
+)
 TEXTURE_RE = re.compile(
     r"VR DX11 R8[345] texture signature#(?P<signature>\d+) stage#(?P<stage>\d+): "
     r"observed=(?P<observed>[01]) type=(?P<type>-?\d+) "
@@ -189,6 +193,7 @@ def main() -> int:
     signatures: dict[int, dict] = {}
     declarations: dict[int, list[dict]] = {}
     fixed_function: dict[int, list[dict]] = {}
+    fixed_function_texture_factors: dict[int, dict] = {}
     texture_stages: dict[int, list[dict]] = {}
     fixed_function_shader_prototypes: dict[int, dict] = {}
     fixed_function_shader_compiles: dict[int, dict] = {}
@@ -210,6 +215,7 @@ def main() -> int:
             and "VR DX11 R85" not in text
             and "VR DX11 R114" not in text
             and "VR DX11 R120" not in text
+            and "VR DX11 R191" not in text
         ):
             continue
         source_logs.append(log_path.name)
@@ -290,6 +296,17 @@ def main() -> int:
                 }
                 continue
 
+            match = FFP_TEXTURE_FACTOR_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data["signature"])
+                fixed_function_texture_factors[signature_id] = {
+                    "observed": bool(int(data["observed"])),
+                    "argb": int(data["argb"], 16),
+                    "argb_hex": "0x" + data["argb"].upper(),
+                }
+                continue
+
             match = TEXTURE_RE.search(line)
             if match:
                 data = match.groupdict()
@@ -330,6 +347,9 @@ def main() -> int:
         )
         signature["fixed_function_stages"] = sorted(
             fixed_function.get(signature_id, []), key=lambda item: item["stage"]
+        )
+        signature["fixed_function_texture_factor"] = (
+            fixed_function_texture_factors.get(signature_id)
         )
         signature["texture_stages"] = sorted(
             texture_stages.get(signature_id, []), key=lambda item: item["stage"]

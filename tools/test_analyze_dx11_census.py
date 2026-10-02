@@ -839,7 +839,21 @@ def main() -> int:
     assert r72["LatestSummary"]["mutationTelemetryRequired"] == 0
     assert r72["LatestSummary"]["managedShadowRequired"] == 0
 
-    print("DX11 census analyzer regression R120/SRC1 exhaustive-mode: PASS")
+    r191_texture_factor = run_case(
+        "VR DX11 R72 signature#7: primitive=4 fixedFn=1\n"
+        "VR DX11 R191 ffp texture-factor state#7: observed=1 argb=0x80402010\n"
+    )
+    assert r191_texture_factor["SourceLogs"] == ["OutRun2006Tweaks.log"]
+    assert r191_texture_factor["UniqueSignaturesCaptured"] == 1
+    assert r191_texture_factor["Signatures"][0]["id"] == 7
+    assert r191_texture_factor["Signatures"][0]["fixed_function_texture_factor"] == {
+        "observed": True,
+        "argb": 0x80402010,
+        "argb_hex": "0x80402010",
+    }
+    assert r191_texture_factor["NativeDrawPathActivationAllowed"] is False
+
+    print("DX11 census analyzer regression R120/SRC1/R191 exhaustive-mode: PASS")
     return 0
 
 
