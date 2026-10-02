@@ -1370,6 +1370,7 @@ def queue_dynamic_prefix() -> str:
     if lane in {"LOCALIZATION_A", "LOCALIZATION_B", "LOCALIZATION_E"}:
         lines += [
             "현재 CONTROLLER_CONFIG_BLOB_SHA의 localization/controller_roles.json/canonical contract를 다시 읽어 producer 규칙을 적용해. 과거 캐시 금지.",
+            f"PIPELINE_BATCH_TARGET={LOCALIZATION_PRODUCER_TARGET_CANDIDATES} candidate DDS. 첫 material commit은 checkpoint일 수 있으며 target/신선한 shard exhaustion 전에는 TASK 종료 금지.",
             "C qa_pending/candidate_awaiting_C는 C consumer backlog일 뿐 producer 종료 조건이 아니다. 자기 shard 전체를 계속 스캔해.",
             "NO_WORK_GUARD=FAIL_CLOSED: 미완료 guard가 하나라도 있으면 review-only/no-change로 종료 금지; 같은 TASK_ID로 material 작업 계속.",
             final_artwork_hint,
@@ -1378,6 +1379,7 @@ def queue_dynamic_prefix() -> str:
     if qa_batch:
         lines += [
             "QA_BATCH_INPUTS=" + json.dumps(qa_batch, ensure_ascii=False, separators=(",", ":")),
+            "C_CONTINUOUS_DRAIN=ON: 모든 QA_BATCH_INPUTS를 검증하고 commit/Gate PASS 후 qa_pending의 다음 ready batch를 같은 TASK_ID에서 계속 처리해.",
             "C batch 규칙은 현재 CONTROLLER_CONFIG_BLOB_SHA의 Git 계약을 그대로 적용해.",
             *([final_artwork_hint, "C는 current-v2 static PASS를 runtime과 분리해 final_artwork_completed/percent에 즉시 reconcile해."] if CONTROLLER_MODE == "localization" else []),
         ]
