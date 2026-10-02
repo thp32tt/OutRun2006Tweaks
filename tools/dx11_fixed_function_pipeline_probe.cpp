@@ -548,7 +548,43 @@ int main()
             "R177 D3DTOP_SUBTRACT fixed-function shader prototype did not compile");
     }
 
+    {
+        std::array<FixedFunctionStageState, 8> modulate2xStages{};
+        modulate2xStages[0].colorOp = D3DTOP_MODULATE2X;
+        modulate2xStages[0].colorArg1 = D3DTA_TEXTURE;
+        modulate2xStages[0].colorArg2 = D3DTA_DIFFUSE;
+        modulate2xStages[0].alphaOp = D3DTOP_MODULATE2X;
+        modulate2xStages[0].alphaArg1 = D3DTA_TEXTURE;
+        modulate2xStages[0].alphaArg2 = D3DTA_DIFFUSE;
+        modulate2xStages[0].minFilter = D3DTEXF_POINT;
+        modulate2xStages[0].magFilter = D3DTEXF_POINT;
+        modulate2xStages[0].mipFilter = D3DTEXF_NONE;
+
+        const auto modulate2xShader =
+            generate_fixed_function_pixel_shader_prototype(
+                modulate2xStages, true, 0x01u, 0x01u, textureTypes);
+        require(
+            modulate2xShader.generated() && modulate2xShader.activeStages == 1,
+            "R179 D3DTOP_MODULATE2X fixed-function stage must become shader-exact");
+        require(
+            modulate2xShader.source.find(
+                "float3 nextColor = (sampled0.rgb * input.diffuse.rgb) * 2.0;") !=
+                std::string::npos &&
+            modulate2xShader.source.find(
+                "float nextAlpha = (sampled0.a * input.diffuse.a) * 2.0;") !=
+                std::string::npos,
+            "R179 D3DTOP_MODULATE2X shader expression drift");
+        const auto modulate2xCompile =
+            compile_fixed_function_pixel_shader_prototype(modulate2xShader);
+        require(
+            modulate2xCompile.attempted && modulate2xCompile.succeeded &&
+            modulate2xCompile.result == S_OK &&
+            modulate2xCompile.bytecodeBytes != 0,
+            "R179 D3DTOP_MODULATE2X fixed-function shader prototype did not compile");
+    }
+
     std::cout
+        << "DX11 fixed-function D3DTOP_MODULATE2X support R179: PASS\n"
         << "DX11 fixed-function D3DTOP_SUBTRACT support R177: PASS\n"
         << "DX11 fixed-function argument modifiers R178: PASS\n"
         << "DX11 fixed-function D3DTOP_ADD support: PASS\n"
