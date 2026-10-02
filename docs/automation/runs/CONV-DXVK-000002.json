@@ -3299,6 +3299,83 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newer F43 raw frontier at 0x00182F45..0x00182F85. Exact-decode only complete canonical instructions from that validated window, resolve targets only from exact bytes, and preserve any new cut edge for mandatory overlap."
+    },
+    {
+      "unit_id": "DXVK_F44_CANONICAL_EXE_PROVENANCE_0x182F7E_TO_0x182FBE",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "c6af263262513aabfb3dca617fb0b907b3310b54",
+      "validation_bearing_result_sha": "a62e1cf9ab54a660aae4dda84905a9b7a9f896b6",
+      "commit_message": "dxvk: capture canonical 0x182F7E continuation [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Captured the next bounded 64-byte canonical raw continuation at 0x00182F7E..0x00182FBE with mandatory seven-byte overlap 66 0f 54 1d 20 91 61 from the proven F43 cut ANDPD. Exact predecessor identity, overlap equality, .text placement and probe geometry are fail-closed; fresh bytes remain semantically quarantined.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub branch authority, AGENTS.md, current run/lane state, regression/problem-history inputs and Issue #14; repeatedly refreshed HEAD to avoid duplicate concurrent F43/F44 work."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the first unclaimed canonical frontier after F43 proof: mandatory overlap capture from the seven incomplete ANDPD bytes at 0x00182F7E."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit c6af263262513aabfb3dca617fb0b907b3310b54 adds continuation_53 raw provenance, exact predecessor/overlap fail-closed gates, report binding, telemetry and CLI guard."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact material SHA reached DXVK Canonical Disassembly Evidence run 36983488953/job 110763138840 but failed a pre-existing F43 proof-chain static contract before canonical EXE analysis. Retaining descendant a62e1cf9ab54a660aae4dda84905a9b7a9f896b6 is two commits ahead/zero behind, normalizes that inherited predecessor proof while retaining F44, and passes full canonical evidence run 36983655888/job 110763664199 with EXACT_EXE_182F7E_TO_182FBE_PROVENANCE_CAPTURED."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive material commit c6af263262513aabfb3dca617fb0b907b3310b54 contains required [AUTO:CONV-DXVK-000002]; Issue #14 implementation and validation comments are 5948079715 and 5948116292."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical-disassembly provenance tooling only; no deployable/runtime DXVK payload, selector, backend binary or localization changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted in the durable task run without overwriting a newer proof frontier if concurrent source work has already advanced beyond raw F44."
+        }
+      },
+      "validation": {
+        "exact_material_sha": "c6af263262513aabfb3dca617fb0b907b3310b54",
+        "initial_dxvk_disassembly_evidence_run_id": 36983488953,
+        "initial_dxvk_disassembly_evidence_job_id": 110763138840,
+        "initial_failure": "Inherited F43 proof used two predecessor-proof calls; static contract rejected proof_calls=2 before canonical EXE analysis.",
+        "validation_bearing_descendant_sha": "a62e1cf9ab54a660aae4dda84905a9b7a9f896b6",
+        "descendant_ahead_by": 2,
+        "descendant_behind_by": 0,
+        "automation_validation": "PASS_DESCENDANT_CANONICAL_STATIC",
+        "dxvk_disassembly_evidence_run_id": 36983655888,
+        "dxvk_disassembly_evidence_job_id": 110763664199,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "artifact_id": 11215793656,
+        "artifact_digest": "sha256:6dbe4947c62abc710eefb5591bc304e9f3ad89294c51c389df5a1a436732537b",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "provenance_status": "EXACT_EXE_182F7E_TO_182FBE_PROVENANCE_CAPTURED",
+        "predecessor_status": "EXACT_182F45_TO_182F7E_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+        "predecessor_exact": true,
+        "probe_start_rva": "0x00182F7E",
+        "probe_end_rva": "0x00182FBE",
+        "probe_len": 64,
+        "overlap_bytes": "66 0f 54 1d 20 91 61",
+        "overlap_matches": true,
+        "predecessor_overlap_matches": true,
+        "target_section": ".text",
+        "probe_end_matches": true,
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5948079715,
+      "issue14_validation_comment_id": 5948116292,
+      "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROVENANCE_ONLY",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Exact-decode only complete canonical instructions in 0x00182F7E..0x00182FBE. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
     }
   ],
   "issue14_implementation_comment_id": 5948018337,
