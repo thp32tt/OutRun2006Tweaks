@@ -814,6 +814,12 @@ compose_fixed_function_draw_readiness(
     const NativeFixedFunctionOutputStateBinding& outputBinding,
     const NativeFixedFunctionGeometryReadiness& geometry) noexcept;
 
+// R135 validates the self-contained identity carried by a composed draw
+// readiness value. This prevents downstream bind-readiness code from accepting
+// a copied snapshot whose required texture-stage mask was changed afterward.
+[[nodiscard]] bool validate_fixed_function_draw_readiness_integrity(
+    const NativeFixedFunctionDrawReadiness& draw) noexcept;
+
 [[nodiscard]] bool validate_fixed_function_draw_snapshot(
     const NativeFixedFunctionActivationReadiness& activation,
     const NativeFixedFunctionRenderStateReadiness& renderState,

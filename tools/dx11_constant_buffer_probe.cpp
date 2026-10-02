@@ -2485,6 +2485,7 @@ int main()
         drawReady.geometrySnapshotToken ==
             indexedGeometryReady.snapshotToken &&
         drawReady.snapshotToken != 0 &&
+        validate_fixed_function_draw_readiness_integrity(drawReady) &&
         validate_fixed_function_draw_snapshot(
             texturedActivation, outputBindingRenderReady, surfacePairReady,
             outputStateReady, outputStateBinding, indexedGeometryReady,
@@ -2644,6 +2645,23 @@ int main()
         wrongTextureStageDraw.snapshotToken == 0,
         "R133 textured draw rejects texture stage outside activation mask");
 
+    auto forgedTextureMaskDraw = drawReady;
+    forgedTextureMaskDraw.requiredTextureMask =
+        (1u << textureStageSlot);
+    const auto forgedTextureMaskTexturedDraw =
+        outrun::vr::dx11::compose_fixed_function_textured_draw_readiness(
+            forgedTextureMaskDraw, d3d.context, textureStageSlot,
+            samplerOwner, textureView);
+    require(
+        forgedTextureMaskTexturedDraw.textureStageReady &&
+        forgedTextureMaskTexturedDraw.textureMaskMatches &&
+        !outrun::vr::dx11::validate_fixed_function_draw_readiness_integrity(
+            forgedTextureMaskDraw) &&
+        !forgedTextureMaskTexturedDraw.drawReady &&
+        !forgedTextureMaskTexturedDraw.ready &&
+        forgedTextureMaskTexturedDraw.snapshotToken == 0,
+        "R135 textured readiness rejects unsealed required-stage mask drift");
+
     auto multiStageDraw = drawReady;
     multiStageDraw.requiredTextureMask = 0x3u;
     const auto partialMultiStageDraw =
@@ -2652,6 +2670,7 @@ int main()
     require(
         partialMultiStageDraw.textureStageReady &&
         !partialMultiStageDraw.textureMaskMatches &&
+        !partialMultiStageDraw.drawReady &&
         !partialMultiStageDraw.ready &&
         partialMultiStageDraw.snapshotToken == 0,
         "R133 single-stage observer rejects multi-stage activation mask");
@@ -3054,6 +3073,7 @@ int main()
     std::cout << "DX11 fixed-function draw readiness composition R120: PASS\n";
     std::cout << "DX11 draw output-binding readiness R131: PASS\n";
     std::cout << "DX11 final dormant bound-draw readiness R134: PASS\n";
+    std::cout << "DX11 draw texture-mask snapshot integrity R135: PASS\n";
     std::cout << "DX11 geometry-gated draw readiness R122: PASS\n";
     std::cout << "DX11 dynamic output-state readiness R124: PASS\n";
     return 0;

@@ -4227,6 +4227,12 @@ def main() -> None:
             "R131 concrete binding identity in draw token",
         "drawToken, out.geometrySnapshotToken":
             "R122 geometry identity in draw token",
+        "drawToken, out.requiredTextureMask":
+            "R135 required texture mask in draw identity",
+        "validate_fixed_function_draw_readiness_integrity(":
+            "R135 self-contained draw snapshot integrity validator",
+        "out.drawReady =\n        validate_fixed_function_draw_readiness_integrity(draw);":
+            "R135 textured draw integrity gate",
     }.items():
         if token not in NATIVE_BACKEND_CPP:
             raise SystemExit(
@@ -4250,6 +4256,10 @@ def main() -> None:
             "R120 hosted probe completion marker",
         "DX11 draw output-binding readiness R131: PASS":
             "R131 hosted probe completion marker",
+        "R135 textured readiness rejects unsealed required-stage mask drift":
+            "R135 forged texture-mask negative proof",
+        "DX11 draw texture-mask snapshot integrity R135: PASS":
+            "R135 hosted probe completion marker",
     }.items():
         if token not in CONSTANT_BUFFER_PROBE:
             raise SystemExit(

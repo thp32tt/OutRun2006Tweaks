@@ -2561,9 +2561,45 @@ compose_fixed_function_draw_readiness(
             drawToken, out.outputBindingSnapshotToken);
         drawToken = mix_readiness_snapshot_token(
             drawToken, out.geometrySnapshotToken);
+        drawToken = mix_readiness_snapshot_token(
+            drawToken, out.requiredTextureMask);
         out.snapshotToken = drawToken == 0 ? 1 : drawToken;
     }
     return out;
+}
+
+bool validate_fixed_function_draw_readiness_integrity(
+    const NativeFixedFunctionDrawReadiness& draw) noexcept {
+    if (!draw.inputValid ||
+        !draw.activationReady ||
+        !draw.renderStateReady ||
+        !draw.surfacePairReady ||
+        !draw.outputStateReady ||
+        !draw.outputBindingReady ||
+        !draw.geometryReady ||
+        !draw.componentSnapshotsPresent ||
+        !draw.ready ||
+        draw.activationSnapshotToken == 0 ||
+        draw.pipelineSnapshotToken == 0 ||
+        draw.renderStateSnapshotToken == 0 ||
+        draw.surfacePairSnapshotToken == 0 ||
+        draw.outputStateSnapshotToken == 0 ||
+        draw.outputBindingSnapshotToken == 0 ||
+        draw.geometrySnapshotToken == 0 ||
+        draw.snapshotToken == 0)
+        return false;
+
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(token, draw.activationSnapshotToken);
+    token = mix_readiness_snapshot_token(token, draw.pipelineSnapshotToken);
+    token = mix_readiness_snapshot_token(token, draw.renderStateSnapshotToken);
+    token = mix_readiness_snapshot_token(token, draw.surfacePairSnapshotToken);
+    token = mix_readiness_snapshot_token(token, draw.outputStateSnapshotToken);
+    token = mix_readiness_snapshot_token(token, draw.outputBindingSnapshotToken);
+    token = mix_readiness_snapshot_token(token, draw.geometrySnapshotToken);
+    token = mix_readiness_snapshot_token(token, draw.requiredTextureMask);
+    token = token == 0 ? 1 : token;
+    return token == draw.snapshotToken;
 }
 
 bool validate_fixed_function_draw_snapshot(
@@ -2605,7 +2641,8 @@ compose_fixed_function_textured_draw_readiness(
         out.requiredTextureMask == out.observedTextureMask;
     out.inputValid =
         draw.inputValid && textureStage.inputValid && out.textureMaskMatches;
-    out.drawReady = draw.ready && draw.snapshotToken != 0;
+    out.drawReady =
+        validate_fixed_function_draw_readiness_integrity(draw);
     out.textureStageReady =
         textureStage.ready && textureStage.snapshotToken != 0;
     out.componentSnapshotsPresent =
@@ -2652,8 +2689,12 @@ compose_fixed_function_bound_draw_readiness(
     NativeFixedFunctionBoundDrawReadiness out{};
     out.texturedDrawSnapshotToken = texturedDraw.snapshotToken;
     out.pipelineBindingSnapshotToken = pipelineBinding.snapshotToken;
+    const bool drawSnapshotValid =
+        validate_fixed_function_draw_readiness_integrity(draw);
     out.inputValid =
-        draw.inputValid && texturedDraw.inputValid && pipelineBinding.inputValid;
+        drawSnapshotValid &&
+        texturedDraw.inputValid &&
+        pipelineBinding.inputValid;
     out.texturedDrawReady =
         texturedDraw.ready && texturedDraw.snapshotToken != 0 &&
         texturedDraw.drawSnapshotToken == draw.snapshotToken;
