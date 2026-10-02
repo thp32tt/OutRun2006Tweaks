@@ -39,7 +39,7 @@ def verify_dxvk_continuation_chain() -> None:
                 f"0x{start:08X}+{probe_len} != 0x{probe_end:08X}"
             )
 
-    proof_ids = (23, 24, 25, 26, 27, 28)
+    proof_ids = (23, 24, 25, 26, 27, 28, 29)
     for continuation_id in proof_ids:
         prefix = f"GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_{continuation_id}"
         start = value(f"{prefix}_RVA")
@@ -1612,6 +1612,24 @@ def main() -> None:
             'RAW_BYTES_AND_REL32_CENSUS_ONLY',
             'gf_target_c_helper_1_third_callee_continuation_29=',
             'guarded_gf_target_c_helper_1_third_callee_continuation_29_provenance=FAILED',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_29_PREFIX_END_RVA = 0x001829DD',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_29_BRANCHES = (',
+            '(0x001829A2, 0x001829AF)',
+            '(0x001829D9, 0x001829F2)',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_29_CALLS = ()',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_29_INSTRUCTIONS = (',
+            '(0x0018299D, "59", "pop ecx")',
+            '(0x001829DB, "85 c0", "test eax, eax")',
+            'def collect_guarded_gf_target_c_helper_1_third_callee_continuation_29_prefix_proof(pe: PE) -> dict:',
+            '"guarded_gf_target_c_helper_1_third_callee_continuation_29_prefix_proof": collect_guarded_gf_target_c_helper_1_third_callee_continuation_29_prefix_proof(pe)',
+            'EXACT_18299D_TO_1829DD_CONTROL_FLOW_BOUNDARY_PROVEN',
+            'EXACT_18299D_POP_ECX_BOUNDARY_PROVEN',
+            'EXACT_1829A4_1829AC_1829AF_1829C7_INTERNAL_TARGET_BOUNDARIES_PROVEN',
+            'FORWARD_TARGET_1829F2_ADDRESS_ONLY_OUTSIDE_CAPTURE',
+            'EXACT_CAPTURE_END_INSTRUCTION_BOUNDARY_1829DD',
+            'INDIRECT_CALLS_ONLY_NO_REL32_CALLS_IN_CAPTURE',
+            'gf_target_c_helper_1_third_callee_continuation_29_proof=',
+            'guarded_gf_target_c_helper_1_third_callee_continuation_29_prefix_proof=FAILED',
             'text.rfind(prologue, lo, hi)',
             'def collect_guarded_gf_hook_provenance(pe: PE, calls: list[dict]) -> list[dict]:',
             '"guarded_gf_hook_provenance": collect_guarded_gf_hook_provenance(pe, calls)',
