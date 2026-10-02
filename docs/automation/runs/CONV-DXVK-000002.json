@@ -125,7 +125,8 @@
     5946796577,
     5946842078,
     5946854609,
-    5946872134
+    5946872134,
+    5946893824
   ],
   "constraints": [
     "GitHub-only repository authority",
@@ -448,6 +449,73 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Exact-decode only complete instructions in canonical 0x00182B17..0x00182B57, preserve any trailing partial instruction raw-only if present, and keep function/render/HUD/runtime semantics unresolved."
+    },
+    {
+      "unit_id": "DXVK_CONTINUATION_SUCCESS_TELEMETRY_FAIL_CLOSED",
+      "job_id": "CONV-DXVK-000002",
+      "result_sha": "60dddd4d896689f8740b564ef56157c7704ddc9c",
+      "commit_message": "test: require DXVK continuation success telemetry [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/verify_vr_backend_disasm_contract.py"
+      ],
+      "summary": "Auto-discovered DXVK continuation provenance/proof stages must expose canonical analyzer success telemetry in addition to report binding and fail-closed failure guards; analyzer source text is read once for the full chain verification.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, branch-local lane/run/regression state and Issue #14 while concurrent same-JOB canonical continuation work was advancing."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Skipped duplicate continuation_33/34 work already committed concurrently and selected an independent verifier gap: discovered stages could satisfy collector/report/failure wiring without a required canonical success telemetry marker."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "Material commit 60dddd4d896689f8740b564ef56157c7704ddc9c requires raw/proof success telemetry markers for every auto-discovered stage and hoists analyzer source loading out of the raw-stage loop."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "Exact SHA 60dddd4d896689f8740b564ef56157c7704ddc9c passed DXVK Canonical Disassembly Evidence run 36974483943/job 110735240895 and Backend Conversion Gate run 36974483982/job 110735240966, including Win32 configure/build/binary verification/artifact upload."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive verifier commit 60dddd4d896689f8740b564ef56157c7704ddc9c contains required [AUTO:CONV-DXVK-000002] marker; Issue #14 comment 5946893824 records implementation and exact validation."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static verifier hardening only; no runtime payload, selector, packaged backend binary, or deployable content changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Persisted as a supplemental completed static unit without replacing the newer concurrently advancing canonical-disassembly frontier."
+        }
+      },
+      "validation": {
+        "exact_sha": "60dddd4d896689f8740b564ef56157c7704ddc9c",
+        "dxvk_disassembly_evidence_run_id": 36974483943,
+        "dxvk_disassembly_evidence_job_id": 110735240895,
+        "dxvk_disassembly_evidence_conclusion": "success",
+        "dxvk_disassembly_evidence_artifact_id": 11212404711,
+        "dxvk_disassembly_evidence_artifact_digest": "sha256:5a022a69a6f3f501a1ecb735573c8b28015a6bbedba6732d0625bd0d001cb7b9",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "backend_conversion_gate_run_id": 36974483982,
+        "backend_conversion_gate_job_id": 110735240966,
+        "backend_conversion_gate_conclusion": "success",
+        "backend_conversion_gate_artifact_id": 11213051763,
+        "backend_conversion_gate_artifact_digest": "sha256:adb9c2252f4146861fb3f499efd9ad461bd22beacba320c271ed39754196be1b",
+        "backend_disassembly_contract": "PASS",
+        "configure_win32": "PASS",
+        "build_win32": "PASS",
+        "binary_exists": "PASS",
+        "artifact_upload": "PASS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5946893824,
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the latest authoritative canonical frontier. At state write raw continuation 36 is present while exact proof reaches continuation 35; validate/decode only from the newest current canonical edge and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
