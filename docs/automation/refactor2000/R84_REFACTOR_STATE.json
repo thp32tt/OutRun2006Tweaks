@@ -4,7 +4,7 @@
   "sourceBranch": "vr-d3d9ex-candidate/RECOVER-R84-PROVEN-BASELINE-20260930",
   "sourceBaselineSha": "902a89ea5de96d650631833a8d2ea8afe5f0a3bf",
   "workBranch": "vr-refactor-r84-2000c-20261001",
-  "cycle": 1162,
+  "cycle": 1177,
   "totalCycles": 2000,
   "applyEvery": 3,
   "buildPolicy": "DO_NOT_BUILD_USE_SKIP_CI",
@@ -234,11 +234,16 @@
     "R84-REF-GUARD-0016",
     "R84-REF-LIFECYCLE-0059",
     "R84-REF-VERIFY-0012",
-    "R84-REF-VERIFY-0013"
+    "R84-REF-VERIFY-0013",
+    "R84-REF-INTERFACE-0001",
+    "R84-REF-INTERFACE-0002",
+    "R84-REF-INTERFACE-0003",
+    "R84-REF-INTERFACE-0004",
+    "R84-REF-INTERFACE-0005"
   ],
-  "next": "Cycles 1163-1165: if campaign continues, design a staged interface-extraction plan for breaking R29->R34 textual .cpp include chain without changing hook targets; review-only until build validation is explicitly allowed. APPLY_GATE at 1165.",
-  "updatedKst": "2026-10-02T10:15:00+09:00",
-  "batchStatus": "R84_USER_BATCH_200_COMPLETE_CYCLE_1162",
+  "next": "Cycles 1178-1180: inventory remaining deep hook targets (R30 PresentDest/ResetDest; R32 ResetDestR22/ResolveDirectTransportR13/PresentDestR13), map owners and existing neutral APIs, and prepare build-gated translation-unit split plan. Do not remove .cpp includes without explicit build/link validation.",
+  "updatedKst": "2026-10-02T11:24:00+09:00",
+  "batchStatus": "R84_INTERFACE_EXTRACTION_STAGE1_5_COMPLETE_CYCLE_1177",
   "notes": [
     "Cycles 1-50 pushes triggered repository-wide Build workflow unexpectedly; from cycle 51 onward commit messages use [skip ci]. Existing runs could not be cancelled with available GitHub capability.",
     "Checkpoint timestamp corrected to authoritative KST at end of this bounded chat run; cycle/source commit counts unchanged.",
@@ -440,6 +445,12 @@
     "Cycles 1152-1154 R84-REF-GUARD-0016: Protected Golden contracts re-reviewed against current source boundaries; no HUD/SkyGlow/XYZRHW semantic changes introduced in this batch. APPLY_GATE 1154 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 1155-1157 R84-REF-LIFECYCLE-0059: Recovery/Reset/Present ownership final pass found no behavior-neutral merge safe without build/runtime evidence. APPLY_GATE 1157 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
     "Cycles 1158-1160 R84-REF-VERIFY-0012: Final verifier and ownership pass found no concrete regression or safe atomic source edit remaining in this 200-cycle batch. APPLY_GATE 1160 SOURCE_CHANGED=NO NO_SAFE_CHANGE. Runtime UNTESTED.",
-    "Cycles 1161-1162 R84-REF-VERIFY-0013: durable final verification for requested 200-cycle batch. Critical source/verifier invariants re-read at current branch; textual include chain remains the main structural debt and requires staged interface extraction plus build validation. SOURCE_CHANGED=NO. Batch advanced exactly 200 cycles from 962 to 1162. Runtime UNTESTED."
+    "Cycles 1161-1162 R84-REF-VERIFY-0013: durable final verification for requested 200-cycle batch. Critical source/verifier invariants re-read at current branch; textual include chain remains the main structural debt and requires staged interface extraction plus build validation. SOURCE_CHANGED=NO. Batch advanced exactly 200 cycles from 962 to 1162. Runtime UNTESTED.",
+    "Cycles 1163-1165 R84-REF-INTERFACE-0001: R33->R34 seam: exposed R33 Reset/Present/4 draw hook destinations through final_dispatch_hooks.hpp while preserving stereo_renderer_r33.cpp textual include. APPLY_GATE 1165 SOURCE_CHANGED=YES commit 5d18fa027fa256fb5c8f22ba5c60fc91843902eb [skip ci]. Textual implementation include intentionally preserved pending build/link gate. Runtime UNTESTED.",
+    "Cycles 1166-1168 R84-REF-INTERFACE-0002: R32->R33 seam: exposed R32 Reset/Present/4 draw hook destinations through review_dispatch_hooks.hpp while preserving stereo_renderer_r32.cpp textual include. APPLY_GATE 1168 SOURCE_CHANGED=YES commit cb6c58552da349430dc4755f523c1c359d49d19d [skip ci]. Textual implementation include intentionally preserved pending build/link gate. Runtime UNTESTED.",
+    "Cycles 1169-1171 R84-REF-INTERFACE-0003: R31->R32 seam: exposed R31 draw hook destinations through dispatch_support_hooks.hpp and made R32 neutral dispatch_support.hpp dependency explicit; deep R22/R13 targets remain inventoried. APPLY_GATE 1171 SOURCE_CHANGED=YES commit 48bbfc45bbb2a7002425bc064b78f9f9bde4002e [skip ci]. Textual implementation include intentionally preserved pending build/link gate. Runtime UNTESTED.",
+    "Cycles 1172-1174 R84-REF-INTERFACE-0004: R30->R31 seam: exposed R30 HUD/XYZRHW draw hook destinations through screen_space_hooks.hpp while preserving stereo_renderer_r30.cpp textual include. APPLY_GATE 1174 SOURCE_CHANGED=YES commit 74f39d7be4dca25359a39a59b9654bfa5abc5f52 [skip ci]. Textual implementation include intentionally preserved pending build/link gate. Runtime UNTESTED.",
+    "Cycles 1175-1177 R84-REF-INTERFACE-0005: R29->R30/R33 seam: exposed R29 draw destinations plus SetRenderStateDestR29 through stereo_base_hooks.hpp; R30 deep PresentDest/ResetDest dependency remains inventoried. APPLY_GATE 1177 SOURCE_CHANGED=YES commit 1b35781239d9563a1d1a1f02d65c7c405e1d1e8b [skip ci]. Textual implementation include intentionally preserved pending build/link gate. Runtime UNTESTED.",
+    "Interface extraction source re-read at commit 1b35781239d9563a1d1a1f02d65c7c405e1d1e8b confirmed R29-R33 hook destinations are externally declared/defined, verifier guards reference all five new headers, and the R29->R34 textual include chain remains fully preserved. No CMake/build/Actions change was made."
   ]
 }
