@@ -1,49 +1,43 @@
 {
   "task_id": "LOCALIZATION-LOCALIZATION_C-00482",
-  "lane": "LOCALIZATION_C",
   "wave_id": "Q00110",
+  "run": "C178",
+  "lane": "LOCALIZATION_C",
   "target_branch": "korean-localization-clean",
-  "validation_mode": "C_BATCH_GATE",
-  "automation_validation": "PENDING",
-  "runtime_validation": "UNTESTED",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "recorded_at_kst": "2026-10-02T20:56:00+09:00",
+  "result": "PASS_Q00110_3_INPUT_PASS_1_SUPERSEDED_3_STATIC_ASSET_PASS_INDEX236_RENDER_READY_INDEX230_SOURCE_IDENTITY_MISMATCH_RUNTIME_UNTESTED",
   "qa_dispositions": [
-    {
-      "task_id": "LOCALIZATION-LOCALIZATION_A-00351",
-      "result_sha": "7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
-      "status": "HOLD_STRICT_RECHECK",
-      "reason": "Producer evidence record identifies candidate payload, but independent C batch promotion requires fresh immutable candidate comparison artifacts and current-head reconciliation."
-    },
-    {
-      "task_id": "LOCALIZATION-LOCALIZATION_B-00347",
-      "result_sha": "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
-      "status": "HOLD_STRICT_RECHECK",
-      "reason": "Awaiting full lane-local evidence reconciliation against current HEAD before approval."
-    },
-    {
-      "task_id": "LOCALIZATION-LOCALIZATION_A-00352",
-      "result_sha": "b5d39094ce2f9941e7807349b563e31f4d19654b",
-      "status": "HOLD_STRICT_RECHECK",
-      "reason": "Awaiting full lane-local evidence reconciliation against current HEAD before approval."
-    },
-    {
-      "task_id": "LOCALIZATION-LOCALIZATION_B-00353",
-      "result_sha": "ff18b8aa855da74e0f1070661ff0462a53f58513",
-      "status": "HOLD_STRICT_RECHECK",
-      "reason": "Preflight/source identity evidence requires candidate promotion checks before final disposition."
-    }
+    [
+      "LOCALIZATION-LOCALIZATION_A-00351",
+      "7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
+      "PASS",
+      "222_STATIC_QA_PASS"
+    ],
+    [
+      "LOCALIZATION-LOCALIZATION_B-00347",
+      "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
+      "PASS",
+      "94_163_STATIC_QA_PASS"
+    ],
+    [
+      "LOCALIZATION-LOCALIZATION_A-00352",
+      "b5d39094ce2f9941e7807349b563e31f4d19654b",
+      "SUPERSEDED",
+      "51_NEWER_LOC_A_CANDIDATE"
+    ],
+    [
+      "LOCALIZATION-LOCALIZATION_B-00353",
+      "ff18b8aa855da74e0f1070661ff0462a53f58513",
+      "PASS",
+      "230_SOURCE_IDENTITY_MISMATCH_236_RENDER_READY"
+    ]
   ],
-  "production_readiness": "PREFLIGHT_ONLY",
-  "shared_next_actions": [
-    "RENDER_READY candidates take priority over unrelated preflight expansion.",
-    "Re-run only unresolved strict QA gates with unchanged immutable input SHAs.",
-    "Keep runtime validation UNTESTED until integrated game test evidence exists."
-  ],
-  "qa_batch_inputs": [
-    "7abc6bf2ccf534d25909aff466feb7ce5c4160ac",
-    "fa9c8bf687b17318d00bee52e615f134b6ee7b3f",
-    "b5d39094ce2f9941e7807349b563e31f4d19654b",
-    "ff18b8aa855da74e0f1070661ff0462a53f58513"
-  ],
-  "n100_used": false,
-  "vr_ffb_dx_changes": false
+  "report": "localization/graphics/role_C/20261002-2056-C178/C178_Q00110_INDEPENDENT_QA_BATCH.json",
+  "candidate_dds_modified": false,
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PENDING",
+  "validation_mode": "C_BATCH_GATE",
+  "result_commit_message": "localization(C): QA Q00110 four-input batch [AUTO:LOCALIZATION-LOCALIZATION_C-00482]"
 }
