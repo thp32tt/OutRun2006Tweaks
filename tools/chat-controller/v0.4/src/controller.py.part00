@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse
 import base64
 import asyncio
+import csv
+import io
 import html
 import json
 import logging
@@ -87,6 +89,7 @@ LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_
 SAME_TASK_CONTROL_GAP_SECONDS = max(5, int(os.getenv("SAME_TASK_CONTROL_GAP_SECONDS", "15")))
 PREMATURE_STOP_ROLLOVER_THRESHOLD = max(2, int(os.getenv("PREMATURE_STOP_ROLLOVER_THRESHOLD", "3")))
 PRODUCER_CONTINUATION_COOLDOWN_SECONDS = max(5, int(os.getenv("PRODUCER_CONTINUATION_COOLDOWN_SECONDS", "15")))
+PRODUCER_PREMATURE_STOP_ROLLOVER_THRESHOLD = max(1, int(os.getenv("PRODUCER_PREMATURE_STOP_ROLLOVER_THRESHOLD", "2")))
 MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
 CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
 MAX_CHAT_ROLLOVERS_PER_TASK = max(1, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "2")))
