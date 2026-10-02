@@ -5419,6 +5419,78 @@
       "ownership_effect": "NONE",
       "runtime_validation": "UNTESTED",
       "exact_next_action": "Preserve the newest authenticated DXVK canonical frontier and continue its next runnable raw/proof/static unit; exhaustive raw-call census predicates are now source-coupled to declared CALLS metadata and raw provenance."
+    },
+    {
+      "unit_id": "DXVK_F76_CANONICAL_EXE_PROVENANCE_0x18342A_TO_0x18346A",
+      "job_id": "CONV-DXVK-000002",
+      "initial_material_sha": "45c788635eb8b3c696b830ae1d6dadd4be460ddc",
+      "result_sha": "75eaf8416c19121fd0352c5eafb6e3242714d257",
+      "validation_bearing_result_sha": "75eaf8416c19121fd0352c5eafb6e3242714d257",
+      "run_record_commit_sha": "4fc877cc68eaf2ca0a0a2196a4ee33e5ebb527c7",
+      "commit_message": "dxvk: align continuation 72 analyzer telemetry [AUTO:CONV-DXVK-000002]",
+      "changed_paths": [
+        "tools/analyze_outrun_exe.py"
+      ],
+      "summary": "Captured exact canonical raw provenance at 0x0018342A..0x0018346A from the F75 exact instruction boundary, requiring .text, exact 64-byte geometry, predecessor exactness and zero inherited forward-target debt. First fail-closed CI exposed a telemetry-key contract mismatch, corrected on the validation-bearing SHA.",
+      "pipeline": {
+        "C0_RECOVER": {
+          "status": "COMPLETE",
+          "evidence": "Recovered fresh authenticated GitHub branch authority and branch-local durable context; avoided duplicate F73-F75 work."
+        },
+        "C1_REVIEW": {
+          "status": "COMPLETE",
+          "evidence": "Selected the next exact-boundary raw canonical window 0x0018342A..0x0018346A."
+        },
+        "C2_IMPLEMENT": {
+          "status": "COMPLETE",
+          "evidence": "45c788635eb8b3c696b830ae1d6dadd4be460ddc added F76 raw provenance; 75eaf8416c19121fd0352c5eafb6e3242714d257 corrected the required analyzer success telemetry key."
+        },
+        "C3_VALIDATE": {
+          "status": "COMPLETE",
+          "evidence": "DXVK Canonical Disassembly Evidence 36994432556/110797785468 SUCCESS exact SHA; Backend Conversion Gate 36994432567/110797785915 passed backend disassembly contract and static steps through recenter."
+        },
+        "C4_COMMIT": {
+          "status": "COMPLETE",
+          "evidence": "Substantive commits contain [AUTO:CONV-DXVK-000002]; Issue #14 comment 5950185460 recorded."
+        },
+        "C5_PACKAGE": {
+          "status": "NOT_REQUIRED",
+          "reason": "Static canonical provenance only; no runtime/package payload changed."
+        },
+        "C6_STATE": {
+          "status": "COMPLETE",
+          "state_persisted": true,
+          "evidence": "Run record 4fc877cc68eaf2ca0a0a2196a4ee33e5ebb527c7 and this lane entry preserve the result supplementally without rewinding newer frontier state."
+        }
+      },
+      "validation": {
+        "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC",
+        "exact_sha": "75eaf8416c19121fd0352c5eafb6e3242714d257",
+        "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+        "provenance_status": "EXACT_EXE_18342A_TO_18346A_PROVENANCE_CAPTURED",
+        "predecessor_exact": true,
+        "predecessor_boundary": true,
+        "inherited_forward_targets": [],
+        "target_section": ".text",
+        "probe_len": 64,
+        "probe_end_rva": "0x0018346A",
+        "probe_end_matches": true,
+        "raw_outbound_rel32_candidate_count": 3,
+        "dxvk_disassembly_evidence_run_id": 36994432556,
+        "dxvk_disassembly_evidence_job_id": 110797785468,
+        "evidence_artifact_id": 11221206355,
+        "evidence_artifact_digest": "sha256:d602e55c1325e11f5837f8f7e65a6b2a5722cdab91332ebdeb20c0b5b400454a",
+        "backend_conversion_gate_run_id": 36994432567,
+        "backend_conversion_gate_job_id": 110797785915,
+        "backend_disassembly_contract_step": "SUCCESS",
+        "runtime_validation": "UNTESTED"
+      },
+      "issue14_implementation_comment_id": 5950185460,
+      "state_strategy": "SUPPLEMENTAL_PRESERVE_NEWER_PRIMARY_FRONTIER",
+      "semantic_promotion": "NONE",
+      "ownership_effect": "NONE",
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Preserve the newest authenticated frontier. Exact-decode only complete canonical instructions in validated continuation_72 0x0018342A..0x0018346A; resolve exact branch/call targets only, preserve any trailing partial instruction for mandatory overlap, and keep function/render/HUD/runtime semantics unresolved."
     }
   ]
 }
