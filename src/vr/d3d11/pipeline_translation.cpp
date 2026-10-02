@@ -744,6 +744,12 @@ namespace outrun::vr::dx11
                 stage.alphaOp, stage.alphaArg1, stage.alphaArg2,
                 FixedFunctionUnsupportedAlphaOp, out);
 
+            // R173: generated fixed-function HLSL always writes CURRENT after
+            // each active stage. D3DTA_TEMP would preserve CURRENT and route
+            // the new result through TEMP, which changes later-stage inputs.
+            if (stage.resultArg != D3DTA_CURRENT)
+                out.unsupported |= FixedFunctionUnsupportedResultArg;
+
             const bool usesTexture =
                 fixed_function_op_uses_texture(
                     stage.colorOp, stage.colorArg1, stage.colorArg2) ||

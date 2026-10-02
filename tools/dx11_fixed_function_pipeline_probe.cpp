@@ -322,6 +322,44 @@ int main()
     }
 
     {
+        auto currentStages = stages;
+        currentStages[0].colorOp = D3DTOP_SELECTARG1;
+        currentStages[0].colorArg1 = D3DTA_DIFFUSE;
+        currentStages[0].alphaOp = D3DTOP_SELECTARG1;
+        currentStages[0].alphaArg1 = D3DTA_DIFFUSE;
+        currentStages[0].resultArg = D3DTA_CURRENT;
+
+        const auto currentReadiness = translate_fixed_function_readiness(
+            currentStages, true, 0x00, 0x00);
+        require(
+            currentReadiness.exact() &&
+            (currentReadiness.unsupported &
+             FixedFunctionUnsupportedResultArg) == 0,
+            "R173 default D3DTSS_RESULTARG CURRENT must remain exact");
+
+        auto tempStages = currentStages;
+        tempStages[0].resultArg = D3DTA_TEMP;
+        const auto tempReadiness = translate_fixed_function_readiness(
+            tempStages, true, 0x00, 0x00);
+        require(
+            !tempReadiness.exact() &&
+            (tempReadiness.unsupported &
+             FixedFunctionUnsupportedResultArg) != 0,
+            "R173 D3DTSS_RESULTARG TEMP must fail closed");
+
+        const auto tempPipeline =
+            translate_fixed_function_pipeline_with_shader_semantics(
+                base_state(), true, tempStages, true,
+                0x00, 0x00, textureTypes);
+        require(
+            !tempPipeline.exact() &&
+            !tempPipeline.pixelShader.generated() &&
+            (tempPipeline.pixelShader.unsupported &
+             FixedFunctionShaderPrototypeUnsupportedNotReady) != 0,
+            "R173 TEMP result destination reached generated fixed-function HLSL");
+    }
+
+    {
         auto multisampleOn = base_state();
         multisampleOn.multiSampleAntialias = TRUE;
         const auto multisampleOnPipeline = translate_pipeline(multisampleOn);
@@ -403,6 +441,7 @@ int main()
     }
 
     std::cout
+        << "DX11 fixed-function RESULTARG fail-closed R173: PASS\n"
         << "DX11 multisample raster provenance R171: PASS\n"
         << "DX11 texture-coordinate wrap fail-closed R170: PASS\n"
         << "DX11 line-raster provenance R168: PASS\n"

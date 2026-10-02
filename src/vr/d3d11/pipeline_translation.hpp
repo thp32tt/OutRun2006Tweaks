@@ -98,6 +98,10 @@ namespace outrun::vr::dx11
         // current native Texture2D SRV path is not yet format-promoted to an
         // sRGB view, so nonzero state must remain fail-closed.
         FixedFunctionUnsupportedSamplerSrgb = 1u << 11,
+        // R173: D3DTSS_RESULTARG can redirect a stage result to D3DTA_TEMP.
+        // The current diagnostic/native fixed-function shader prototype always
+        // advances CURRENT, so any non-default destination must fail closed.
+        FixedFunctionUnsupportedResultArg = 1u << 12,
     };
 
     struct FixedFunctionStageState
@@ -108,6 +112,9 @@ namespace outrun::vr::dx11
         DWORD alphaOp = D3DTOP_DISABLE;
         DWORD alphaArg1 = D3DTA_TEXTURE;
         DWORD alphaArg2 = D3DTA_CURRENT;
+        // D3D9 defaults stage output to CURRENT. TEMP changes the dependency
+        // graph across later stages and is not modeled by the current HLSL.
+        DWORD resultArg = D3DTA_CURRENT;
         DWORD texCoordIndex = 0;
         DWORD textureTransformFlags = D3DTTFF_DISABLE;
         DWORD minFilter = D3DTEXF_NONE;

@@ -6745,6 +6745,64 @@ def main() -> None:
             + ", ".join(missing_r169_point_raster_provenance)
         )
 
+    r173_resultarg_contract = [
+        (
+            "FixedFunctionUnsupportedResultArg = 1u << 12",
+            PIPELINE_TRANSLATION_HPP,
+            "R173 RESULTARG unsupported readiness bit",
+        ),
+        (
+            "DWORD resultArg = D3DTA_CURRENT;",
+            PIPELINE_TRANSLATION_HPP,
+            "R173 RESULTARG default provenance",
+        ),
+        (
+            "if (stage.resultArg != D3DTA_CURRENT)",
+            PIPELINE_TRANSLATION_CPP,
+            "R173 non-CURRENT readiness fail-closed gate",
+        ),
+        (
+            "FixedFunctionUnsupportedResultArg;",
+            PIPELINE_TRANSLATION_CPP,
+            "R173 RESULTARG readiness blocker",
+        ),
+        (
+            "D3DTSS_RESULTARG, out.resultArg",
+            RUNTIME_CENSUS,
+            "R173 RESULTARG runtime observation",
+        ),
+        (
+            "hash = hash_mix(hash, stage.resultArg);",
+            RUNTIME_CENSUS,
+            "R173 RESULTARG census identity",
+        ),
+        (
+            "resultArg=0x{:08X}",
+            RUNTIME_CENSUS,
+            "R173 RESULTARG detailed evidence",
+        ),
+        (
+            "R173 D3DTSS_RESULTARG TEMP must fail closed",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R173 TEMP negative probe",
+        ),
+        (
+            "DX11 fixed-function RESULTARG fail-closed R173: PASS",
+            FIXED_FUNCTION_PIPELINE_PROBE,
+            "R173 hosted probe completion marker",
+        ),
+    ]
+    missing_r173_resultarg = [
+        meaning
+        for token, source, meaning in r173_resultarg_contract
+        if token not in source
+    ]
+    if missing_r173_resultarg:
+        raise SystemExit(
+            "DX11 R173 fixed-function RESULTARG contract drift: "
+            + ", ".join(missing_r173_resultarg)
+        )
+
     r171_multisample_raster_contract = [
         (
             "DWORD multiSampleAntialias = TRUE;",

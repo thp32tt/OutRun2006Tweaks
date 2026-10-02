@@ -390,6 +390,7 @@ namespace outrun::vr::dx11
                 hash = hash_mix(hash, stage.alphaOp);
                 hash = hash_mix(hash, stage.alphaArg1);
                 hash = hash_mix(hash, stage.alphaArg2);
+                hash = hash_mix(hash, stage.resultArg);
                 hash = hash_mix(hash, stage.texCoordIndex);
                 hash = hash_mix(hash, stage.textureTransformFlags);
                 hash = hash_mix(hash, stage.minFilter);
@@ -1114,6 +1115,9 @@ namespace outrun::vr::dx11
                     observeTextureStageState(D3DTSS_ALPHAOP, out.alphaOp);
                     observeTextureStageState(D3DTSS_ALPHAARG1, out.alphaArg1);
                     observeTextureStageState(D3DTSS_ALPHAARG2, out.alphaArg2);
+                    // R173: RESULTARG affects supported SELECTARG/MODULATE
+                    // chains even when all argument/op enums are otherwise exact.
+                    observeTextureStageState(D3DTSS_RESULTARG, out.resultArg);
                     observeTextureStageState(
                         D3DTSS_TEXCOORDINDEX, out.texCoordIndex);
                     observeTextureStageState(
@@ -1547,7 +1551,7 @@ namespace outrun::vr::dx11
                             continue;
 
                         spdlog::info(
-                            "VR DX11 R160 ffp signature#{} stage#{}: color[op={},arg1=0x{:08X},arg2=0x{:08X}] alpha[op={},arg1=0x{:08X},arg2=0x{:08X}] texCoord=0x{:08X} texTransform=0x{:08X} sampler[min={},mag={},mip={},u={},v={},border=0x{:08X},srgb={}]",
+                            "VR DX11 R173 ffp signature#{} stage#{}: color[op={},arg1=0x{:08X},arg2=0x{:08X}] alpha[op={},arg1=0x{:08X},arg2=0x{:08X}] resultArg=0x{:08X} texCoord=0x{:08X} texTransform=0x{:08X} sampler[min={},mag={},mip={},u={},v={},border=0x{:08X},srgb={}]",
                             unique,
                             stageIndex,
                             stage.colorOp,
@@ -1556,6 +1560,7 @@ namespace outrun::vr::dx11
                             stage.alphaOp,
                             stage.alphaArg1,
                             stage.alphaArg2,
+                            stage.resultArg,
                             stage.texCoordIndex,
                             stage.textureTransformFlags,
                             stage.minFilter,
