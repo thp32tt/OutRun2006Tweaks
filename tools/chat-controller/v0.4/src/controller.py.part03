@@ -2690,6 +2690,45 @@ async def localization_process_lane(
                 return
 
             if run.get("conclusion") == "success":
+                if CONTROLLER_MODE == "conversion":
+                    valid_pipeline, pipeline_reasons, _pipeline_record = conversion_validate_pipeline_result_commit(
+                        str(active.get("task_id") or ""),
+                        str(active.get("result_sha") or ""),
+                        str(active.get("lane") or ""),
+                        str(active.get("branch") or ""),
+                    )
+                    if not valid_pipeline:
+                        rejected_sha = str(active.get("result_sha") or "")
+                        active["phase"] = "WAIT_CHAT"
+                        active["terminal"] = None
+                        active["result_sha"] = None
+                        active["task_latched"] = True
+                        active["conversion_pipeline_validation"] = "INCOMPLETE_AFTER_GATE"
+                        active["conversion_pipeline_rejected_sha"] = rejected_sha
+                        active["conversion_pipeline_reject_reasons"] = pipeline_reasons
+                        active["controller_stage"] = conversion_pipeline_next_stage(pipeline_reasons)
+                        active["last_checkpoint_head"] = rejected_sha or active.get("last_checkpoint_head")
+                        active["last_checkpoint_at"] = now.isoformat()
+                        active["last_checkpoint_stage"] = active["controller_stage"]
+                        for key in (
+                            "gate_run", "last_gate_poll_at", "last_gate_status",
+                            "last_gate_status_changed_at", "gate_jobs",
+                            "last_jobs_refresh_at", "wait_actions_started_at",
+                        ):
+                            active.pop(key, None)
+                        invalidate_task_commit_cache(active["branch"], active["task_id"])
+                        sent = await queue_send_conversion_pipeline_continuation(
+                            context, pages, active, pipeline_reasons, rejected_sha
+                        )
+                        if not sent:
+                            active["conversion_pipeline_continuation_pending"] = True
+                        save_queue_state(q)
+                        write_runtime(
+                            status="conversion_gate_pipeline_rearmed",
+                            last_action=f"{active['task_id']} Gate passed but C0-C6 evidence was incomplete; same TASK rearmed",
+                            queue=q,
+                        )
+                        return
                 if CONTROLLER_MODE == "localization" and lane_key == "C":
                     # One successful C batch is a checkpoint. Consume it, then drain
                     # the next ready batch in the same TASK/chat instead of stopping.
