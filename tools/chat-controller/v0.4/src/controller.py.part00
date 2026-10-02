@@ -415,12 +415,35 @@ def production_id_from_identifier(identifier: str) -> str:
     return re.sub(r"-E\d{3}$", "", value)
 
 
+def queue_lane_minimum_next(q: dict, lane: str) -> int:
+    """Return a collision-safe migration floor from v1 queue history."""
+    seen = [int(q.get("counter", 0))]
+    records = []
+    if isinstance(q.get("active"), dict):
+        records.append(q["active"])
+    records.extend(v for v in q.get("active_by_lane", {}).values() if isinstance(v, dict))
+    records.extend(v for key in ("completed", "blocked") for v in q.get(key, []) if isinstance(v, dict))
+    for record in records:
+        if str(record.get("lane") or "") != lane:
+            continue
+        identifier = production_id_from_identifier(record.get("production_id") or record.get("task_id") or "")
+        match = re.search(r"-(\d{5,})$", identifier)
+        if match:
+            seen.append(int(match.group(1)))
+    return max(seen, default=0) + 1
+
+
+def next_task_event_id(reg: Registry, production_id: str) -> str:
+    count = sum(1 for e in reg.task_events if e.production_id == production_id)
+    return f"{production_id}-E{count + 1:03d}"
+
+
 def append_task_event(reg: Registry, active: dict, event_type: str) -> TaskEvent:
     production_id = str(active.get("production_id") or active.get("task_id") or "").strip()
     if not production_id:
         raise ValueError("PRODUCTION_ID_REQUIRED")
     existing = [e for e in reg.task_events if e.production_id == production_id]
-    event_id = f"{production_id}-E{len(existing) + 1:03d}"
+    event_id = next_task_event_id(reg, production_id)
     event = TaskEvent(
         event_id=event_id,
         production_id=production_id,
@@ -922,8 +945,14 @@ def queue_dynamic_prefix() -> str:
     failure = str(runtime.get("queue_failure_context") or "").strip()
     wave_id = str(runtime.get("queue_wave_id") or "").strip()
     qa_batch = runtime.get("queue_qa_batch") or []
+    production_id = str(runtime.get("queue_production_id") or task_id).strip()
+    event_id = str(runtime.get("queue_event_id") or "").strip()
+    event_type = str(runtime.get("queue_event_type") or "").strip()
     lines = [
         f"[자동 큐 작업] TASK_ID={task_id}",
+        f"PRODUCTION_ID={production_id}",
+        *([f"EVENT_ID={event_id}"] if event_id else []),
+        *([f"EVENT_TYPE={event_type}"] if event_type else []),
         f"LANE={lane}",
         f"TARGET_BRANCH={branch}",
         f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
