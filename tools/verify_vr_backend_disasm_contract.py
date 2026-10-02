@@ -835,6 +835,29 @@ def verify_dxvk_continuation_chain() -> None:
                     f"decoded=0x{decoded_target_rva:08X}"
                 )
 
+        # A direct relative call into a long INT3 alignment span is just as
+        # structurally invalid as a branch entering that span. The branch
+        # guard above cannot see CALL metadata, so reject those targets here
+        # after the call declarations and rel32 displacements are proven exact.
+        padding_call_target_hits = [
+            (
+                call_rva,
+                target_rva,
+                instruction_rows[run_start][0],
+                instruction_rows[run_end - 1][0] + 1,
+            )
+            for call_rva, target_rva in declared_calls
+            for run_start, run_end in internal_int3_padding_spans
+            if instruction_rows[run_start][0]
+            <= target_rva
+            < instruction_rows[run_end - 1][0] + 1
+        ]
+        if padding_call_target_hits:
+            raise SystemExit(
+                f"DXVK continuation {continuation_id} direct CALL enters long INT3 padding: "
+                f"{padding_call_target_hits}"
+            )
+
         # Keep optional RESOLVED_PREDECESSOR_TARGET_RVAS metadata tied to the
         # successor proof without assuming how the predecessor learned each
         # forward target. Some targets are inherited across more than one raw
