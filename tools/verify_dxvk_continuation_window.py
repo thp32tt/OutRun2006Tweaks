@@ -38,6 +38,25 @@ def _parse_bytes(value: object) -> bytes | None:
         return None
 
 
+def _validate_branch_targets(value: object) -> list[str]:
+    errors: list[str] = []
+    if value is None:
+        return errors
+    if not isinstance(value, list):
+        return ["invalid:branch-targets-type"]
+
+    for index, target in enumerate(value):
+        if not isinstance(target, dict):
+            errors.append(f"invalid:branch-target-{index}-type")
+            continue
+        if "rva" not in target:
+            errors.append(f"missing:branch-target-{index}-rva")
+            continue
+        if _hex_rva(target.get("rva")) is None:
+            errors.append(f"invalid:branch-target-{index}-rva")
+    return errors
+
+
 def validate(record: dict) -> list[str]:
     errors: list[str] = []
 
@@ -68,10 +87,7 @@ def validate(record: dict) -> list[str]:
         elif overlap is not None and not parsed_window.startswith(overlap):
             errors.append("invalid:overlap-mismatch")
 
-    targets = record.get("branch_targets")
-    if targets is not None and not isinstance(targets, list):
-        errors.append("invalid:branch-targets-type")
-
+    errors.extend(_validate_branch_targets(record.get("branch_targets")))
     return errors
 
 
