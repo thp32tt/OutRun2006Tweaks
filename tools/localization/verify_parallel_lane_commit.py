@@ -12,7 +12,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 head = os.environ.get("VERIFY_HEAD", "").strip() or "HEAD"
 message = subprocess.check_output(["git", "log", "-1", "--pretty=%B", head], cwd=ROOT, text=True)
-m = re.search(r"\[AUTO:(LOCALIZATION-LOCALIZATION_([ABCE])-\d+)\]", message)
+m = re.search(r"\[AUTO:(LOCALIZATION-LOCALIZATION_([ABC])-\d+)\]", message)
 if not m:
     print("parallel-lane-gate: commit is not a controller localization task; no lane restriction applied")
     raise SystemExit(0)
@@ -25,12 +25,11 @@ shared = {
     "localization/resume_state.json",
     "localization/WORKLOG.md",
     "localization/progress.json",
-    "localization/progress/progress.json",
     "localization/progress/STATUS.md",
     "localization/graphics/asset_queue.csv",
 }
 
-if lane in {"A", "B", "E"}:
+if lane in {"A", "B"}:
     bad_shared = sorted(set(changed) & shared)
     if bad_shared:
         print(f"{task_id}: A/B parallel production may not modify shared state:")
@@ -66,18 +65,18 @@ if lane in {"A", "B", "E"}:
             if name:
                 by_basename.setdefault(name, []).append(idx)
 
-    expected_remainder = {"A": 0, "B": 1, "E": 2}[lane]
-    shard_errors = []
+    expected_parity = 1 if lane == "A" else 0
+    parity_errors = []
     for p in changed:
         if not p.lower().endswith(".dds"):
             continue
         name = pathlib.PurePosixPath(p).name.lower()
         indices = by_basename.get(name, [])
-        if len(indices) == 1 and indices[0] % 3 != expected_remainder:
-            shard_errors.append((p, indices[0]))
-    if shard_errors:
-        print(f"{task_id}: DDS changed outside lane {lane} modulo-3 shard:")
-        for p, idx in shard_errors:
+        if len(indices) == 1 and indices[0] % 2 != expected_parity:
+            parity_errors.append((p, indices[0]))
+    if parity_errors:
+        print(f"{task_id}: DDS changed outside lane {lane} parity shard:")
+        for p, idx in parity_errors:
             print(f" - index={idx} {p}")
         raise SystemExit(1)
 
@@ -88,13 +87,9 @@ if lane in {"A", "B", "E"}:
     if dds_changes:
         evidence_prefix = f"localization/graphics/role_{lane}/"
         evidence = [p for p in changed if p.startswith(evidence_prefix) and (p.endswith(".json") or p.endswith(".png") or p.endswith(".jpg"))]
-        # This lane-isolation verifier checks that a DDS-producing A/B/E task
-        # carries lane-local evidence. Machine-readable PASS provenance,
-        # zero-pixel/protected-mask metrics and prompt/slant gates are enforced
-        # separately by verify_automation_commit.py on the same immutable SHA.
-        # Do not infer QA validity from evidence filenames.
-        if not evidence:
-            print(f"{task_id}: DDS change blocked: missing lane-local production/QA evidence")
+        required_tokens = ("CLEAN", "SOURCE", "CANDIDATE", "COMPARE", "QA", "MASK")
+        if not any(any(t in pathlib.PurePosixPath(p).name.upper() for t in required_tokens) for p in evidence):
+            print(f"{task_id}: DDS change blocked: missing post-reset clean-generation QA evidence")
             raise SystemExit(1)
 
     run_prefix = "docs/automation/runs/"
