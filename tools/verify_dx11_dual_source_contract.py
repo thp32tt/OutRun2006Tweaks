@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 STATE = ROOT / "src" / "vr" / "d3d11" / "state_translation.cpp"
 PIPELINE = ROOT / "src" / "vr" / "d3d11" / "pipeline_translation.cpp"
+PIPELINE_HPP = ROOT / "src" / "vr" / "d3d11" / "pipeline_translation.hpp"
 SEMANTIC_SMOKE = ROOT / "tools" / "dx11_fixed_function_shader_semantics.cpp"
 
 
@@ -25,7 +26,61 @@ def require_fail_closed_case(state: str, d3d9: str, d3d11: str) -> None:
 def main() -> None:
     state = STATE.read_text(encoding="utf-8")
     pipeline = PIPELINE.read_text(encoding="utf-8")
+    pipeline_hpp = PIPELINE_HPP.read_text(encoding="utf-8")
     semantic_smoke = SEMANTIC_SMOKE.read_text(encoding="utf-8")
+
+    required_blocker_contract = [
+        (
+            "PipelineUnsupportedDualSourceBlend = 1u << 12",
+            pipeline_hpp,
+            "dedicated dual-source unsupported bit",
+        ),
+        (
+            "bool is_dual_source_blend_factor(D3DBLEND value) noexcept",
+            pipeline,
+            "dual-source D3D9 factor classifier",
+        ),
+        (
+            "value == D3DBLEND_SRCCOLOR2",
+            pipeline,
+            "SRCCOLOR2 classifier membership",
+        ),
+        (
+            "value == D3DBLEND_INVSRCCOLOR2",
+            pipeline,
+            "INVSRCCOLOR2 classifier membership",
+        ),
+        (
+            "is_dual_source_blend_factor(sourceBlendValue)",
+            pipeline,
+            "source-factor dual-source detection",
+        ),
+        (
+            "is_dual_source_blend_factor(destinationBlendValue)",
+            pipeline,
+            "destination-factor dual-source detection",
+        ),
+        (
+            "if (rt.BlendEnable && dualSourceBlendRequested)",
+            pipeline,
+            "dual-source blocker is gated by active blending",
+        ),
+        (
+            "out.unsupported |= PipelineUnsupportedDualSourceBlend;",
+            pipeline,
+            "dedicated dual-source blocker propagation",
+        ),
+    ]
+    missing_blocker_contract = [
+        meaning
+        for token, source, meaning in required_blocker_contract
+        if token not in source
+    ]
+    if missing_blocker_contract:
+        raise SystemExit(
+            "dual-source blend blocker provenance missing: "
+            + ", ".join(missing_blocker_contract)
+        )
 
     require_fail_closed_case(
         state, "D3DBLEND_SRCCOLOR2", "D3D11_BLEND_SRC1_COLOR"
@@ -48,6 +103,11 @@ def main() -> None:
         "INVSRCCOLOR2 source blend must remain fail-closed without SV_Target1",
         "SRCCOLOR2 destination blend must remain fail-closed without SV_Target1",
         "INVSRCCOLOR2 destination blend must remain fail-closed without SV_Target1",
+        "SRCCOLOR2 source blend must report dedicated dual-source blocker",
+        "INVSRCCOLOR2 source blend must report dedicated dual-source blocker",
+        "SRCCOLOR2 destination blend must report dedicated dual-source blocker",
+        "INVSRCCOLOR2 destination blend must report dedicated dual-source blocker",
+        "disabled alpha blending must ignore dormant dual-source factors",
     ]
     missing_smokes = [
         token for token in required_semantic_smokes if token not in semantic_smoke
