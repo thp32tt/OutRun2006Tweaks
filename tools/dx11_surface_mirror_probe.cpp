@@ -116,6 +116,45 @@ int main()
         boundDsv.Get() != depth.depth_stencil_view())
         return fail("R130 OM render-target binding identity drifted");
 
+    const auto liveTargetBinding =
+        binding.binding_readiness(context.Get(), color, depth);
+    if (!liveTargetBinding.inputValid ||
+        !liveTargetBinding.ownerReady ||
+        !liveTargetBinding.pairCurrent ||
+        !liveTargetBinding.contextMatches ||
+        !liveTargetBinding.colorViewCurrent ||
+        !liveTargetBinding.depthViewCurrent ||
+        !liveTargetBinding.rtvBoundExact ||
+        !liveTargetBinding.dsvBoundExact ||
+        !liveTargetBinding.ready ||
+        liveTargetBinding.surfacePairSnapshotToken != reboundPair.snapshotToken ||
+        liveTargetBinding.snapshotToken == 0 ||
+        !binding.validate_binding_snapshot(
+            context.Get(), color, depth, liveTargetBinding.snapshotToken))
+        return fail("R145 live OM target binding seals exact RTV DSV identity");
+
+    context->OMSetRenderTargets(0, nullptr, nullptr);
+    const auto missingTargetBinding =
+        binding.binding_readiness(context.Get(), color, depth);
+    if (!missingTargetBinding.inputValid ||
+        !missingTargetBinding.ownerReady ||
+        !missingTargetBinding.pairCurrent ||
+        !missingTargetBinding.contextMatches ||
+        !missingTargetBinding.colorViewCurrent ||
+        !missingTargetBinding.depthViewCurrent ||
+        missingTargetBinding.rtvBoundExact ||
+        missingTargetBinding.dsvBoundExact ||
+        missingTargetBinding.ready ||
+        missingTargetBinding.snapshotToken != 0 ||
+        binding.validate_binding_snapshot(
+            context.Get(), color, depth, liveTargetBinding.snapshotToken))
+        return fail("R145 live OM target binding fails closed after RTV DSV unbind");
+
+    if (!binding.apply(context.Get(), color, depth) ||
+        !binding.validate_binding_snapshot(
+            context.Get(), color, depth, liveTargetBinding.snapshotToken))
+        return fail("R145 live OM target binding restores deterministic snapshot");
+
     Microsoft::WRL::ComPtr<ID3D11Device> foreignDevice;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> foreignContext;
     D3D_FEATURE_LEVEL foreignFeatureLevel = D3D_FEATURE_LEVEL_9_1;
@@ -214,5 +253,6 @@ int main()
 
     std::cout << "DX11 dormant surface mirror probe passed\n";
     std::cout << "DX11 dormant surface-pair binding R130: PASS\n";
+    std::cout << "DX11 live OM target binding R145: PASS\n";
     return 0;
 }
