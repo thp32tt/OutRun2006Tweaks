@@ -1259,9 +1259,21 @@ def verify_dxvk_continuation_chain() -> None:
             "capture_edge_matches",
             "capture_edge_target_matches",
         }
+        # Cross-window backedge proofs use an explicit boolean to prove that a
+        # backward target lands on an already exact-decoded predecessor
+        # instruction boundary. Treat every such assigned gate as mandatory in
+        # the final proven predicate. Without this dynamic suffix rule, current
+        # continuation_37/64 backedge evidence could keep reporting a boundary
+        # field while a later edit accidentally drops it from proof success.
+        predecessor_boundary_gates = {
+            name
+            for name in assigned_names
+            if name.endsWith("_is_predecessor_boundary")
+        }
         required_proven_gates = (
             mandatory_proven_gates
             | (assigned_names & conditional_integrity_gates)
+            | predecessor_boundary_gates
         )
         missing_proven_gates = sorted(required_proven_gates - proven_gate_names)
         if missing_proven_gates:
