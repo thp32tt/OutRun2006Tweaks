@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "ae7d2d2aed033f3f0b191559d5a55c42b62eb953",
+  "state_parent_head": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -51,38 +51,37 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DX11-00311",
-    "production_id": "CONVERSION-DX11-00311",
-    "event_id": "CONVERSION-DX11-00311-E003",
-    "event_type": "retry",
-    "attempt": "3/3",
-    "dispatch_source": "CURRENT_USER_QUEUE_RETRY",
-    "result_sha": "ae7d2d2aed033f3f0b191559d5a55c42b62eb953",
-    "source_implementation_sha": "5e2df83a6c271b7ec2934807c145a984ee6bdb63",
-    "validation_bearing_sha": "ae7d2d2aed033f3f0b191559d5a55c42b62eb953",
-    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_RESOURCE_BEHAVIOR_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+    "task_id": "CONVERSION-DX11-00313",
+    "production_id": "CONVERSION-DXVK-00312",
+    "event_id": "CONVERSION-DXVK-00312-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "dispatch_source": "CURRENT_USER_QUEUE_ROLLOVER",
+    "result_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+    "source_implementation_sha": "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0",
+    "validation_bearing_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SHADER_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "issue14_comment_id": 5972403229,
-    "implementation_comment_id": 5972290556,
-    "repair_comment_id": 5972312790,
-    "validation_comment_id": 5972403229,
-    "validation_run_id": 37145322599,
-    "validation_job_id": 111267944089,
-    "readiness_smoke_job_id": 111268949781,
-    "artifact_id": 11282013519,
-    "artifact_digest": "sha256:14e54c09bdf79ed33a288c41e0664fe3ee2aa2c5a30eee2d717b1be10f6f46f9",
-    "run_record_commit": "712ea19dec2fec417d95390dfe12d86461f4c695",
+    "issue14_comment_id": 5972672201,
+    "implementation_comment_id": 5972594143,
+    "repair_comment_id": 5972604116,
+    "validation_comment_id": 5972672201,
+    "validation_run_id": 37147160605,
+    "validation_job_id": 111273377482,
+    "readiness_smoke_job_id": 111274312544,
+    "artifact_id": 11282288258,
+    "artifact_digest": "sha256:b98f948fd7e315ed5a724f37c8c431dbc5474a8bf2b6909d93204291f28bb79f",
     "superseded_failed_gate": {
-      "result_sha": "5e2df83a6c271b7ec2934807c145a984ee6bdb63",
-      "run_id": 37145172272,
-      "validate_job_id": 111267501883
-    },
-    "dispatch_metadata_correction_comment_id": 5972403229
+      "result_sha": "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0",
+      "run_id": 37147082560,
+      "validate_job_id": 111273151337,
+      "reason": "pre-R220 R219 final ExactSamples verifier literal only"
+    }
   },
-  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00311. Exact-SHA hosted validation passed for ae7d2d2aed033f3f0b191559d5a55c42b62eb953, including R219 resource-behavior/source-graph/dormant-activation/census checks, Win32 build/binary and DX11 readiness smoke. This is diagnostic/source readiness evidence, not in-game/HMD proof.",
+  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00313. Exact-SHA hosted validation passed for 0b4c704f2ce798e15ed75e87811e70e8f028339d, including R220 shader-readiness/source-graph/dormant-activation/census checks, Win32 build/binary and DX11 readiness smoke. This is diagnostic/source readiness evidence, not in-game/HMD proof.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before native draw activation or visual/runtime correctness claims.",
-  "independent_static_next_action": "Preserve R219 explicit resourceBehaviorExact sampled identity/final ExactSamples gate together with R213-R218 exactness protections; from the newest authenticated vr-dx11-native-r71 HEAD, select one new independent dormant DX11 source/static gap. Resource mutation/lifetime promotion, programmable shader translation and runtime/transport parity remain fail-closed.",
+  "independent_static_next_action": "Preserve R220 explicit shaderReadinessExact sampled identity/final ExactSamples gate together with R213-R219 exactness protections; from the newest authenticated vr-dx11-native-r71 HEAD, select one new independent dormant DX11 source/static gap. Resource mutation/lifetime promotion, programmable shader translation and runtime/transport parity remain fail-closed.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1713,26 +1712,56 @@
         "reason": "pre-R219 R175 verifier literal only"
       },
       "dispatch_metadata_correction_comment_id": 5972403229
+    },
+    {
+      "unit_id": "DX11_R220_SHADER_READINESS_EXACT_SAMPLES_SCOPE_GUARD",
+      "task_id": "CONVERSION-DX11-00313",
+      "production_id": "CONVERSION-DXVK-00312",
+      "event_id": "CONVERSION-DXVK-00312-E001",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "base_sha": "f971d4b1c0088dc7ef3125a82e2eda7f1c6dd6bc",
+      "implementation_commits": [
+        "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0",
+        "0b4c704f2ce798e15ed75e87811e70e8f028339d"
+      ],
+      "source_implementation_sha": "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0",
+      "material_result_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+      "validation_bearing_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SHADER_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_CENSUS_STATIC_ONLY",
+      "issue14_comment_id": 5972672201,
+      "implementation_comment_id": 5972594143,
+      "repair_comment_id": 5972604116,
+      "validation_comment_id": 5972672201,
+      "validation_run_id": 37147160605,
+      "validation_job_id": 111273377482,
+      "readiness_smoke_job_id": 111274312544,
+      "artifact_id": 11282288258,
+      "artifact_digest": "sha256:b98f948fd7e315ed5a724f37c8c431dbc5474a8bf2b6909d93204291f28bb79f",
+      "superseded_failed_gate": {
+        "result_sha": "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0",
+        "run_id": 37147082560,
+        "validate_job_id": 111273151337,
+        "reason": "pre-R220 R219 final ExactSamples verifier literal only"
+      }
     }
   ],
   "controller_dispatch": {
-    "task_id": "CONVERSION-DX11-00311",
-    "production_id": "CONVERSION-DX11-00311",
-    "event_id": "CONVERSION-DX11-00311-E003",
-    "event_type": "retry",
-    "attempt": "3/3",
-    "source": "CURRENT_USER_QUEUE_RETRY",
-    "material_result_sha": "ae7d2d2aed033f3f0b191559d5a55c42b62eb953",
-    "validation_bearing_result_sha": "ae7d2d2aed033f3f0b191559d5a55c42b62eb953",
-    "implementation_comment_id": 5972290556,
-    "repair_comment_id": 5972312790,
-    "validation_comment_id": 5972403229,
-    "dispatch_metadata_correction": {
-      "corrected_from_production_id": "CONVERSION-DXVK-00310",
-      "corrected_from_event_id": "CONVERSION-DXVK-00310-E002",
-      "corrected_from_event_type": "rollover",
-      "corrected_from_attempt": "1/3",
-      "material_and_validation_bearing_sha_unchanged": true
-    }
+    "task_id": "CONVERSION-DX11-00313",
+    "production_id": "CONVERSION-DXVK-00312",
+    "event_id": "CONVERSION-DXVK-00312-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_ROLLOVER",
+    "material_result_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+    "source_implementation_sha": "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0",
+    "validation_bearing_result_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+    "implementation_comment_id": 5972594143,
+    "repair_comment_id": 5972604116,
+    "validation_comment_id": 5972672201
   }
 }
