@@ -1849,6 +1849,20 @@ namespace outrun::vr::dx11
                             pixelCompileProbe.diagnosticsHash,
                             pixelCompileProbe.diagnosticsBytes);
                     }
+                    if (sig.fixedFunctionVertexShaderPrototypeGenerated)
+                    {
+                        spdlog::info(
+                            "VR DX11 R223 ffp vertex shader compile#{}: attempted={} succeeded={} hr=0x{:08X} bytecodeHash=0x{:016X} bytecodeBytes={} diagnosticsHash=0x{:016X} diagnosticsBytes={} profile=vs_4_0",
+                            unique,
+                            vertexCompileProbe.attempted ? 1 : 0,
+                            vertexCompileProbe.succeeded ? 1 : 0,
+                            static_cast<std::uint32_t>(
+                                vertexCompileProbe.result),
+                            vertexCompileProbe.bytecodeHash,
+                            vertexCompileProbe.bytecodeBytes,
+                            vertexCompileProbe.diagnosticsHash,
+                            vertexCompileProbe.diagnosticsBytes);
+                    }
 
                     for (std::size_t stageIndex = 0;
                          stageIndex < sig.fixedFunctionStages.size();
