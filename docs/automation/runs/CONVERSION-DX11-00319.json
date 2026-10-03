@@ -1,13 +1,13 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00319",
-  "production_id": "CONVERSION-DXVK-00318",
+  "production_id": "CONVERSION-DX11-00319",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "1/3",
-  "event_id": "CONVERSION-DXVK-00318-E001",
-  "event_type": "rollover",
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "attempt": "3/3",
+  "event_id": "CONVERSION-DX11-00319-E003",
+  "event_type": "retry",
+  "status": "IN_PROGRESS_ATTEMPT3_EXACT_SHA_GATE_PENDING",
   "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
   "runtime_validation": "UNTESTED",
   "base_sha": "96d4c42ac56626294a44b205c22a417a0545c28b",
@@ -45,13 +45,13 @@
       "evidence": "Added a diagnostic R93 vertex D3DCompile probe (vs_4_0), retained generated vertex source in the sampled signature for the bounded unique-signature probe, required VS+PS pair compile success before admitting FixedFunctionShaderCompileExactHashes, and extended hosted semantic/static contracts."
     },
     "C3_VALIDATE": {
-      "status": "LOCAL_STATIC_PASS_EXACT_SHA_GATE_PENDING",
+      "status": "LOCAL_STATIC_PASS_ATTEMPT3_EXACT_SHA_GATE_PENDING",
       "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
-      "evidence": "Local checks passed: verify_dx11_source_graph.py, verify_dx11_activation_boundary.py, test_analyze_dx11_census.py, verify_dx11_dual_source_contract.py, verify_dx11_native_transport_contract.py, verify_vr_backend_disasm_contract.py, and verify_vr_proven_baseline.py. Exact-SHA Windows Backend Conversion Gate remains required after material publication."
+      "evidence": "Attempts 1 and 2 were cancelled by same-branch concurrency after static checks passed; no code/test failure was observed. Attempt 3 adds a negative hosted semantic assertion for fail-closed unsupported vertex prototypes, then requires one uninterrupted exact-SHA Backend Conversion Gate."
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "PENDING_ATTEMPT3_RESULT_SHA_PUBLICATION",
+      "validation_bearing_result_sha": "PENDING_ATTEMPT3_RESULT_SHA"
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
@@ -60,7 +60,7 @@
     "C6_STATE": {
       "status": "PENDING",
       "state_persisted": false,
-      "exact_next_action": "Publish the material result commit without CI-skip to vr-dx11-native-r71, require its exact-SHA Backend Conversion Gate including Win32 build and DX11 readiness smoke, then persist validation IDs and lane state."
+      "exact_next_action": "Publish one attempt-3 material result SHA with the R223 negative semantic assertion, allow only that SHA's Backend Conversion Gate to run, then persist PASS bookkeeping separately with CI skip."
     }
   },
   "regression_assessment": {
@@ -71,11 +71,27 @@
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "controller_dispatch": {
-    "production_id": "CONVERSION-DXVK-00318",
-    "event_id": "CONVERSION-DXVK-00318-E001",
-    "event_type": "rollover",
-    "attempt": "1/3",
-    "source": "CURRENT_USER_QUEUE_ROLLOVER"
+    "production_id": "CONVERSION-DX11-00319",
+    "event_id": "CONVERSION-DX11-00319-E003",
+    "event_type": "retry",
+    "attempt": "3/3",
+    "source": "CURRENT_USER_QUEUE_RETRY"
   },
-  "exact_next_action": "Publish the material result commit without CI-skip to vr-dx11-native-r71, require its exact-SHA Backend Conversion Gate including Win32 build and DX11 readiness smoke, then persist validation IDs and lane state."
+  "exact_next_action": "Publish one attempt-3 material result SHA with the R223 negative semantic assertion, allow only that SHA's Backend Conversion Gate to run, then persist PASS bookkeeping separately with CI skip.",
+  "retry_history": [
+    {
+      "attempt": "1/3",
+      "run_id": 37152497554,
+      "result_sha": "08213eb5ceb1498d101e0c88d9df8cc878499114",
+      "conclusion": "cancelled",
+      "evidence": "Static checks and Win32 configure passed; build was externally cancelled by same-branch concurrency before completion."
+    },
+    {
+      "attempt": "2/3",
+      "run_id": 37152678339,
+      "result_sha": "d8628e148aa65bff22c96bda2727ba3042e23658",
+      "conclusion": "cancelled",
+      "evidence": "Static checks passed; configure was externally cancelled by same-branch concurrency. No source/test failure was observed."
+    }
+  ]
 }
