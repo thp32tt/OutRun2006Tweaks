@@ -1,5 +1,3 @@
-[Reading 8907 lines from start (total: 8907 lines, 0 remaining)]
-
 #!/usr/bin/env python3
 """Fail closed when checked-in CMake omits native DX11 translation/census TUs."""
 
@@ -8907,5 +8905,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
