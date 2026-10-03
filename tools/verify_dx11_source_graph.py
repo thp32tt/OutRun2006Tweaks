@@ -8877,6 +8877,12 @@ def main() -> None:
             + ", ".join(missing_r223_vertex_compile_exactness)
         )
 
+    if "compileProbe." in RUNTIME_CENSUS:
+        raise SystemExit(
+            "DX11 R223 stale compileProbe identifier remains after "
+            "pixel/vertex compiler-probe split"
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
