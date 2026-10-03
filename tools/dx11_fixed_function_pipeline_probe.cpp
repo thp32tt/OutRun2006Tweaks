@@ -1274,6 +1274,12 @@ int main()
     }
 
 
+    // R201 made D3DTA_TEMP a supported default-zero source. Keep the older
+    // R194/R196 negative ARG0 probes on a selector value that is actually
+    // outside the D3DTA source enum while still inside D3DTA_SELECTMASK.
+    constexpr DWORD invalidArgumentSelector =
+        static_cast<DWORD>(D3DTA_SELECTMASK);
+
     {
         std::array<FixedFunctionStageState, 8> multiplyAddStages{};
         multiplyAddStages[0].colorOp = D3DTOP_MULTIPLYADD;
@@ -1324,7 +1330,7 @@ int main()
             "R194 D3DTOP_MULTIPLYADD ARG0 texture dependency must fail closed");
 
         auto unsupportedArg0Stages = multiplyAddStages;
-        unsupportedArg0Stages[0].colorArg0 = D3DTA_TEMP;
+        unsupportedArg0Stages[0].colorArg0 = invalidArgumentSelector;
         const auto unsupportedArg0 =
             translate_fixed_function_readiness(
                 unsupportedArg0Stages, true, 0x01u, 0x01u);
@@ -1385,7 +1391,7 @@ int main()
             "R196 D3DTOP_LERP ARG0 texture dependency must fail closed");
 
         auto unsupportedLerpArg0 = lerpStages;
-        unsupportedLerpArg0[0].colorArg0 = D3DTA_TEMP;
+        unsupportedLerpArg0[0].colorArg0 = invalidArgumentSelector;
         const auto invalidLerpArg0 =
             translate_fixed_function_readiness(
                 unsupportedLerpArg0, true, 0x01u, 0x01u);
