@@ -7,7 +7,7 @@ rm -f /data/browser-profile/SingletonLock \
       /data/browser-profile/SingletonSocket \
       /tmp/.X99-lock
 
-VNC_PASSWORD="\${VNC_PASSWORD:-change-me}"
+VNC_PASSWORD="${VNC_PASSWORD:-change-me}"
 PASSFILE=/data/.vncpasswd
 x11vnc -storepasswd "$VNC_PASSWORD" "$PASSFILE" >/dev/null
 
