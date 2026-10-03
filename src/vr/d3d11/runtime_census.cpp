@@ -54,6 +54,12 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> FixedFunctionSamples{0};
         std::atomic<std::uint64_t> ProgrammableSamples{0};
         std::atomic<std::uint64_t> UnsupportedTopologySamples{0};
+        // R211: topology mapping alone is not enough for D3D9 point/line
+        // raster equivalence. The dormant dispatch already fails these
+        // primitives closed until point-size/sprite and LASTPIXEL semantics
+        // are implemented; census exactness must preserve the same boundary.
+        std::atomic<std::uint64_t> PointRasterUnsupportedSamples{0};
+        std::atomic<std::uint64_t> LineRasterUnsupportedSamples{0};
         std::atomic<std::uint64_t> UnsupportedIndexFormatSamples{0};
         std::atomic<std::uint64_t> UnsupportedTextureFormatSamples{0};
         std::atomic<std::uint64_t> UnsupportedColorFormatSamples{0};
@@ -1879,12 +1885,14 @@ namespace outrun::vr::dx11
             const auto sampleStride = census_sample_stride();
             const auto samplingScheme = census_sampling_scheme();
             spdlog::info(
-                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={},auxRenderTargetUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] dualSourceBlend[any={},rgbSrc={},rgbDst={},alphaSrc={},alphaDst={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={},dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={},texCoordWrap={},mrtColorWrite={},specular={}]",
+                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} rasterSemantics[pointUnsupported={},lineUnsupported={}] signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={},auxRenderTargetUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] dualSourceBlend[any={},rgbSrc={},rgbDst={},alphaSrc={},alphaDst={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={},dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={},texCoordWrap={},mrtColorWrite={},specular={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
                 ProgrammableSamples.load(std::memory_order_relaxed),
                 UnsupportedTopologySamples.load(std::memory_order_relaxed),
+                PointRasterUnsupportedSamples.load(std::memory_order_relaxed),
+                LineRasterUnsupportedSamples.load(std::memory_order_relaxed),
                 UniqueDrawSignatures.load(std::memory_order_relaxed),
                 DrawCallsSeen.load(std::memory_order_relaxed),
                 sampleStride,
@@ -2294,6 +2302,22 @@ namespace outrun::vr::dx11
         if (!topology.exact)
             UnsupportedTopologySamples.fetch_add(1, std::memory_order_relaxed);
 
+        // R211 mirrors the existing dormant direct-dispatch semantic gates.
+        // D3D11 POINTLIST does not reproduce D3D9 fixed-function point size /
+        // sprite behavior, and D3D10+ has no D3DRS_LASTPIXEL equivalent for
+        // line endpoint coverage. Keep these samples out of ExactSamples even
+        // though their IA topology enum itself has a direct D3D11 mapping.
+        const bool pointRasterSemanticsExact =
+            primitive != D3DPT_POINTLIST;
+        const bool lineRasterSemanticsExact =
+            primitive != D3DPT_LINELIST && primitive != D3DPT_LINESTRIP;
+        if (!pointRasterSemanticsExact)
+            PointRasterUnsupportedSamples.fetch_add(
+                1, std::memory_order_relaxed);
+        if (!lineRasterSemanticsExact)
+            LineRasterUnsupportedSamples.fetch_add(
+                1, std::memory_order_relaxed);
+
         IDirect3DVertexShader9* vs = nullptr;
         IDirect3DPixelShader9* ps = nullptr;
         const bool vsOk = SUCCEEDED(device->GetVertexShader(&vs));
@@ -2598,6 +2622,7 @@ namespace outrun::vr::dx11
         note_signature(signature, primitive);
 
         if (unsupported == PipelineUnsupportedNone && topology.exact &&
+            pointRasterSemanticsExact && lineRasterSemanticsExact &&
             resourcesExact && inputLayoutExact && shaderTranslationExact)
             ExactSamples.fetch_add(1, std::memory_order_relaxed);
 

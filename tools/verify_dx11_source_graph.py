@@ -179,6 +179,37 @@ def main() -> None:
             + ", ".join(missing_r202_specular_enable)
         )
 
+    r211_raster_census_contract = [
+        ("PointRasterUnsupportedSamples", RUNTIME_CENSUS,
+         "R211 point-raster census blocker counter"),
+        ("LineRasterUnsupportedSamples", RUNTIME_CENSUS,
+         "R211 line-raster census blocker counter"),
+        ("const bool pointRasterSemanticsExact =", RUNTIME_CENSUS,
+         "R211 point-raster exactness gate"),
+        ("const bool lineRasterSemanticsExact =", RUNTIME_CENSUS,
+         "R211 line-raster exactness gate"),
+        ("pointRasterSemanticsExact && lineRasterSemanticsExact &&", RUNTIME_CENSUS,
+         "R211 ExactSamples parity with dormant dispatch"),
+        ("rasterSemantics[pointUnsupported={},lineUnsupported={}]", RUNTIME_CENSUS,
+         "R211 periodic census blocker telemetry"),
+        ("pointRasterUnsupported", DX11_CENSUS_ANALYZER,
+         "R211 analyzer point blocker parsing"),
+        ("lineRasterUnsupported", DX11_CENSUS_ANALYZER,
+         "R211 analyzer line blocker parsing"),
+        ("r211_raster_semantics = run_case(", DX11_CENSUS_ANALYZER_TEST,
+         "R211 analyzer regression fixture"),
+    ]
+    missing_r211_raster_census = [
+        meaning
+        for token, source, meaning in r211_raster_census_contract
+        if token not in source
+    ]
+    if missing_r211_raster_census:
+        raise SystemExit(
+            "DX11 R211 raster census exactness drift: "
+            + ", ".join(missing_r211_raster_census)
+        )
+
     r165_dither_contract = [
         ("DWORD ditherEnable = FALSE;", D3D9_DRAW_STATE_HPP,
          "R165 tracked dither field and disabled default"),

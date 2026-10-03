@@ -14,6 +14,8 @@ SUMMARY_RE = re.compile(
     r"samples=(?P<samples>\d+) exact=(?P<exact>\d+) "
     r"fixedFn=(?P<fixedFn>\d+) programmable=(?P<programmable>\d+) "
     r"topologyUnsupported=(?P<topologyUnsupported>\d+) "
+    r"(?:rasterSemantics\[pointUnsupported=(?P<pointRasterUnsupported>\d+),"
+    r"lineUnsupported=(?P<lineRasterUnsupported>\d+)\] )?"
     r"signatures=(?P<signatures>\d+) "
     r"(?:sampling\[drawsSeen=(?P<samplingDrawsSeen>\d+),"
     r"stride=(?P<samplingStride>\d+),scheme=(?P<samplingScheme>\d+)\] "
@@ -548,6 +550,8 @@ def main() -> int:
     if latest:
         unsupported_keys = [
             "topologyUnsupported",
+            "pointRasterUnsupported",
+            "lineRasterUnsupported",
             "introspectionFailure",
             "behaviorUnsupported",
             "mutationTelemetryRequired",

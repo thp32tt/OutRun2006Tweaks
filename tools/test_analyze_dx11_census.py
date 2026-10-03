@@ -968,6 +968,28 @@ def main() -> int:
     assert r198_unsupported_demand["NativeDrawPathActivationAllowed"] is False
 
     print("DX11 census analyzer regression R120/SRC1/R191/R194/R197/R198/R199/R200 demand: PASS")
+    r211_raster_semantics = run_case(
+        "VR DX11 R120 census: samples=3 exact=1 fixedFn=3 programmable=0 "
+        "topologyUnsupported=0 "
+        "rasterSemantics[pointUnsupported=1,lineUnsupported=1] signatures=3 "
+        "sampling[drawsSeen=3,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r211_raster_semantics["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert r211_raster_semantics["LatestSummary"]["pointRasterUnsupported"] == 1
+    assert r211_raster_semantics["LatestSummary"]["lineRasterUnsupported"] == 1
+    assert r211_raster_semantics["UnsupportedTotalLatest"] == 2
+    assert r211_raster_semantics["NativeDrawPathActivationAllowed"] is False
+
     return 0
 
 
