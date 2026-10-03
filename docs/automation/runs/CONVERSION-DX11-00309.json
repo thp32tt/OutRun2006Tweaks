@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00309",
+  "production_id": "CONVERSION-DXVK-00308",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00308-E001",
+  "event_type": "rollover",
+  "status": "IN_PROGRESS",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "ae73a6786c790d65c6d58235d7d2376aae0bb218",
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_marker": "[AUTO:CONVERSION-DX11-00309]",
+  "selected_work_item": "DX11_R218_FFP_READINESS_EXACT_SAMPLES_SCOPE_GUARD",
+  "summary": "R218 makes the final DX11 ExactSamples boundary explicitly require complete fixed-function stage/sampler observation and translation readiness in addition to the existing fixed-function, resource, input-layout, output-state and shader exactness gates. This is diagnostic/activation-readiness hardening only; NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00309.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated branch HEAD ae73a6786c790d65c6d58235d7d2376aae0bb218, VR_BACKEND_100_REVIEW_INDEX, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_AUTODEV_STATE, VR_RUN_STATE, VR_REVIEW_FINDINGS, Set-05/07/09/10 review evidence, regression knowledge/history, and prior CONVERSION-DX11-00307 durable result."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Set-05 F20/F21 are indirectly coupled today because fixed-function pixel-shader generation consumes translate_fixed_function_readiness(), but the final ExactSamples predicate only names fixedFunction and shaderTranslationExact. Explicitly carrying fixedFunctionStateCoverageExact and fixedFunctionTranslationReady at the final boundary prevents future shader-translation changes from widening diagnostic exactness without the FFP stage/sampler gate.",
+      "review_lenses": {
+        "architecture": "Diagnostic census/activation-readiness boundary only; NativeDrawPathActive remains disabled and no backend ownership changes.",
+        "ownership_lifetime": "No COM/resource lifetime, Reset, transport generation, fence or ACK behavior changes.",
+        "stereo_correctness": "No WVP, eye routing, projection, HUD, shader output or presentation behavior changes.",
+        "performance": "Two boolean conjunctions on the already-sampled diagnostic path only; no new GPU work or allocations.",
+        "adversarial": "A future widening of shaderTranslationExact cannot by itself make incomplete FFP observation/readiness samples count exact."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Prepared explicit fixedFunctionStateCoverageExact and fixedFunctionTranslationReady gates in runtime_census.cpp and bound both activation-boundary/source-graph verifiers to the new final predicate."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "evidence": "Await exact-SHA Backend Conversion Gate on the material result commit."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "validation_bearing_result_sha": null
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Diagnostic census/static activation-boundary hardening only; no runtime package identity change."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false
+    }
+  },
+  "regression_assessment": {
+    "related_key": "VR-STARTUP-WHITE-001_PATH_MATCH_ONLY_TRIGGER_NOT_MET",
+    "evidence": "src/vr/** is a broad risk path, but this task changes only sampled diagnostic ExactSamples accounting and static verifier expectations. It does not touch startup/device creation/reset/present, stereo transport, shared resources, host fallback, profiles or configuration."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00308",
+    "event_id": "CONVERSION-DXVK-00308-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_DISPATCH"
+  },
+  "exact_next_action": "Run the exact-SHA Backend Conversion Gate for the material result commit. If PASS, persist PASS evidence in a separate bookkeeping commit while preserving validation_bearing_result_sha; keep RUNTIME_VALIDATION=UNTESTED."
+}

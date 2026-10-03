@@ -2665,14 +2665,17 @@ namespace outrun::vr::dx11
 
         note_signature(signature, primitive);
 
-        // R216 makes the fixed-function scope explicit at the final
-        // ExactSamples boundary instead of relying only on the current R215
-        // assignment site for shaderTranslationExact. Programmable D3D9
-        // shaders therefore remain fail-closed until a separate translation
-        // implementation and activation review deliberately change this gate.
+        // R218 keeps the final ExactSamples boundary explicitly tied to the
+        // complete fixed-function stage/sampler readiness contract. R215's
+        // shaderTranslationExact currently depends on the same readiness, but
+        // retaining the observation/readiness gates here prevents a later
+        // shader-translation widening from silently promoting incomplete FFP
+        // samples. Programmable D3D9 shaders and native draw remain dormant.
         if (unsupported == PipelineUnsupportedNone && topology.exact &&
             pointRasterSemanticsExact && lineRasterSemanticsExact &&
             signature.fixedFunction &&
+            signature.fixedFunctionStateCoverageExact &&
+            signature.fixedFunctionTranslationReady &&
             resourcesExact && inputLayoutExact &&
             signature.outputStateObservationComplete &&
             signature.shaderTranslationExact)
