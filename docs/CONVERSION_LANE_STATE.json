@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "350bce608d7283bd5216463d7447b037e5cab252",
+  "state_parent_head": "2356c8bc124212c23526ec302df1a5cbef33baf5",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -51,22 +51,22 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DX11-00296",
-    "result_sha": "350bce608d7283bd5216463d7447b037e5cab252",
-    "source_implementation_sha": "7fde73a717ffe09633378e9c4e25d70cfd33fc60",
-    "validation_bearing_sha": "350bce608d7283bd5216463d7447b037e5cab252",
+    "task_id": "CONVERSION-DX11-00298",
+    "result_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
+    "source_implementation_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
+    "validation_bearing_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
     "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "issue14_comment_id": 5970296784,
-    "validation_run_id": 37130573349,
-    "validation_job_id": 111224768198,
-    "readiness_smoke_job_id": 111225759251,
-    "artifact_id": 11276976177
+    "issue14_comment_id": 5970512861,
+    "validation_run_id": 37132328700,
+    "validation_job_id": 111229737462,
+    "readiness_smoke_job_id": 111230619838,
+    "artifact_id": 11277347657
   },
-  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00296. Exact-SHA hosted validation passed for 350bce608d7283bd5216463d7447b037e5cab252, including Win32 build/binary and DX11 readiness smoke; this is not in-game/HMD proof.",
+  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00298. Exact-SHA hosted validation passed for 2356c8bc124212c23526ec302df1a5cbef33baf5, including source/static checks, Win32 build/binary and DX11 readiness smoke; this is not in-game/HMD proof.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation or visual/runtime correctness claims.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve the R205/R211 point/line raster census exactness boundary and prior retained fixed-function semantics; fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for one new independent dormant DX11 source/static gap. Runtime parity remains separately required.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve the R212 RT0 COLORWRITEENABLE census identity boundary together with prior retained fixed-function and point/line semantics; fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for one new independent dormant DX11 source/static gap. Runtime parity remains separately required.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1472,6 +1472,28 @@
       "artifact_id": 11276976177,
       "artifact_digest": "sha256:695e60cc02f7f2e1bd993f12c05c9e694c543fd41c9c112eeaf27749ea47c912",
       "superseded_gate_run_id": 37130328766
+    },
+    {
+      "unit_id": "DX11_RT0_COLOR_WRITE_CENSUS_IDENTITY_R212",
+      "task_id": "CONVERSION-DX11-00298",
+      "base_sha": "48d3fdc9a5795344e477f5df53da2d37e274cc57",
+      "implementation_commits": [
+        "2356c8bc124212c23526ec302df1a5cbef33baf5"
+      ],
+      "source_implementation_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
+      "material_result_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
+      "validation_bearing_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_WITH_WIN32_BUILD_BINARY_AND_DX11_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_CENSUS_STATIC_ONLY",
+      "issue14_comment_id": 5970512861,
+      "validation_run_id": 37132328700,
+      "validation_job_id": 111229737462,
+      "readiness_smoke_job_id": 111230619838,
+      "artifact_id": 11277347657,
+      "artifact_digest": "sha256:a33ac4a86821ef348dc9d8f03e3f665cdcf433d1dd203d7fe4f5e34d447c77eb"
     }
   ]
 }
