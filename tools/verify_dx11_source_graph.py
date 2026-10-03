@@ -167,16 +167,6 @@ def main() -> None:
             RUNTIME_CENSUS,
             "R204 runtime unsupported summary field",
         ),
-        (
-            "?P<specular>",
-            analyzer,
-            "R204 analyzer unsupported parser field",
-        ),
-        (
-            "\"specular\"",
-            analyzer,
-            "R204 analyzer aggregate key",
-        ),
     ]
     missing_r202_specular_enable = [
         meaning
@@ -4789,19 +4779,25 @@ def main() -> None:
          "R170 texture-coordinate wrap parser"),
         ("?P<mrtColorWrite>", analyzer,
          "MRT color-write parser"),
+        ("?P<specular>", analyzer,
+         "R204 dedicated specular parser"),
         (
             '"dualSource",\n            "shadeMode",\n'
             '            "clipping",\n            "depthBias",\n'
             '            "vertexBlend",\n            "dither",\n'
-            '            "texCoordWrap",\n            "mrtColorWrite",',
+            '            "texCoordWrap",\n            "mrtColorWrite",\n'
+            '            "specular",',
             analyzer,
             "current unsupported fields participate in aggregate exactness",
         ),
         ("extended_unsupported = run_case(", analyzer_test,
          "current unsupported-tail analyzer regression fixture"),
-        ('extended_unsupported["UnsupportedTotalLatest"] == 27',
+        ('extended_unsupported["UnsupportedTotalLatest"] == 35',
          analyzer_test,
          "current unsupported-tail aggregate regression assertion"),
+        ('extended_unsupported["LatestSummary"]["specular"] == 8',
+         analyzer_test,
+         "R204 dedicated specular analyzer regression assertion"),
         ("r170_wrap = run_case(", analyzer_test,
          "R170 wrap analyzer regression fixture"),
         ('r170_wrap["UnsupportedTotalLatest"] == 8',
