@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00311",
+  "production_id": "CONVERSION-DXVK-00310",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00310-E002",
+  "event_type": "rollover",
+  "status": "IN_PROGRESS",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "9c4b56402bdcf90aadc3eae1ad4ca0c4bb3b2873",
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_marker": "[AUTO:CONVERSION-DX11-00311]",
+  "selected_work_item": "DX11_R219_RESOURCE_BEHAVIOR_EXACT_SAMPLES_SCOPE_GUARD",
+  "summary": "R219 makes the F18 resource descriptor/mutation/lifetime readiness boundary explicit in each sampled DX11 signature, hashes that derived state, and requires resourceBehaviorExact directly at the final ExactSamples predicate. Existing fail-closed mutation telemetry, managed-shadow, stream-frequency and surface-MSAA blockers remain unchanged; NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/test_dx11_census_log_contract_r131.py",
+    "docs/automation/runs/CONVERSION-DX11-00311.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated vr-dx11-native-r71 HEAD 9c4b56402bdcf90aadc3eae1ad4ca0c4bb3b2873, VR_BACKEND_100_REVIEW_INDEX, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, branch-local CONVERSION_LANE_STATE, Set-05/07/09/10 findings, VR_AUTODEV_STATE, VR_REGRESSION_KNOWLEDGE and VR_PROBLEM_HISTORY. Prior R218 task is durable and was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Set-05 F18 remains an activation blocker. Current resourcesExact is fail-closed for descriptor, mutation telemetry, managed-shadow, stream-frequency and surface-MSAA behavior, but that readiness is only an aggregate local. The final ExactSamples predicate does not directly name the F18 behavior gate, and sampled identity does not preserve its derived result as an explicit invariant.",
+      "review_lenses": {
+        "architecture": "Make resource behavior a named dormant activation-readiness gate without enabling any native draw route.",
+        "ownership_lifetime": "Preserve existing mutationTelemetryRequired and managedShadowRequired blockers; no resource ownership or Reset lifetime is promoted.",
+        "stereo_correctness": "No WVP, eye routing, presentation, HUD or shared-frame behavior changes.",
+        "performance": "Four boolean hash inputs and boolean assignments on already-sampled census draws only; no GPU work or allocation.",
+        "adversarial": "A later refactor of aggregate resourcesExact cannot silently bypass F18 mutation/lifetime readiness because the final predicate and signature identity now require the explicit derived gate."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Prepared R219 per-signature resource behavior fields, sampled hash identity, explicit final ExactSamples gate, and static verifier bindings. Existing resource behavior semantics remain fail-closed."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "evidence": "Await exact-SHA Backend Conversion Gate on the material result commit."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "validation_bearing_result_sha": null
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant census/static activation-boundary hardening only; no user runtime candidate or package identity change."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false
+    }
+  },
+  "regression_assessment": {
+    "related_key": "VR-STARTUP-WHITE-001_PATH_MATCH_ONLY_TRIGGER_NOT_MET",
+    "evidence": "src/vr/** is a broad historical risk path, but R219 only changes sampled diagnostic accounting and static verification. Startup/device creation/reset/present, stereo transport/shared resources, host fallback, profiles and configuration are unchanged."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00310",
+    "event_id": "CONVERSION-DXVK-00310-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_DISPATCH"
+  },
+  "exact_next_action": "Run the exact-SHA Backend Conversion Gate for the material result commit. If PASS, persist C3-C6 evidence in separate bookkeeping commits while preserving validation_bearing_result_sha; keep RUNTIME_VALIDATION=UNTESTED."
+}

@@ -26,7 +26,8 @@ def main() -> None:
         "std::uint64_t hash_signature(",
         "hash_mix",
         "sig.resourceIntrospectionComplete ? 1u : 0u",
-        "signature.",
+        "sig.resourceBehaviorExact ? 1u : 0u",
+        "signature.resourceBehaviorExact &&",
         "ExactSamples.fetch_add",
     ]
     missing = [token for token in required if token not in census]

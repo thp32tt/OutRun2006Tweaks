@@ -376,6 +376,13 @@ namespace outrun::vr::dx11
             bool textured{};
             bool depthPresent{};
             bool resourceIntrospectionComplete{true};
+            // R219: keep F18 resource-behavior readiness as explicit sampled
+            // identity and final ExactSamples state instead of hiding it only
+            // inside the aggregate resourcesExact local.
+            bool resourceBehaviorDescriptorExact{};
+            bool resourceMutationTelemetryRequired{};
+            bool resourceManagedShadowRequired{};
+            bool resourceBehaviorExact{};
             bool fixedFunction{};
         };
 
@@ -450,6 +457,18 @@ namespace outrun::vr::dx11
             // to retain the same default values.
             hash = hash_mix(
                 hash, sig.resourceIntrospectionComplete ? 1u : 0u);
+            // R219: derived resource-behavior readiness participates in
+            // sampled identity. A future change to aggregate resource
+            // accounting must not let mutation/lifetime blockers alias an
+            // otherwise identical resource-ready draw.
+            hash = hash_mix(
+                hash, sig.resourceBehaviorDescriptorExact ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.resourceMutationTelemetryRequired ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.resourceManagedShadowRequired ? 1u : 0u);
+            hash = hash_mix(
+                hash, sig.resourceBehaviorExact ? 1u : 0u);
             for (const auto& texture : sig.textureStages)
             {
                 hash = hash_mix(hash, texture.present ? 1u : 0u);
@@ -2525,6 +2544,20 @@ namespace outrun::vr::dx11
             ResourceManagedShadowRequiredSamples.fetch_add(
                 1, std::memory_order_relaxed);
 
+        // R219 keeps the F18 descriptor/mutation/lifetime boundary explicit
+        // on each sampled signature. This does not promote mutation telemetry
+        // or managed shadows to exact; those remain independent blockers.
+        signature.resourceBehaviorDescriptorExact = behaviorDescriptorExact;
+        signature.resourceMutationTelemetryRequired =
+            mutationTelemetryRequired;
+        signature.resourceManagedShadowRequired = managedShadowRequired;
+        signature.resourceBehaviorExact =
+            behaviorDescriptorExact &&
+            !mutationTelemetryRequired &&
+            !managedShadowRequired &&
+            !streamSourceFrequencyUnsupported &&
+            !surfaceMultisampleUnsupported;
+
         const bool managedTextureShadowRequired =
             signature.textureManagedShadowRequiredMask != 0;
         const bool managedTextureShadowReady =
@@ -2545,9 +2578,7 @@ namespace outrun::vr::dx11
         // R106 exposes managed Texture2D shadow readiness as an independent
         // activation prerequisite. It deliberately does not clear the older
         // mutation-telemetry/resource-lifetime blocker or activate native draw.
-        if (!behaviorDescriptorExact || mutationTelemetryRequired ||
-            managedShadowRequired || streamSourceFrequencyUnsupported ||
-            surfaceMultisampleUnsupported)
+        if (!signature.resourceBehaviorExact)
             resourcesExact = false;
 
         if (signature.indexed &&
@@ -2676,6 +2707,7 @@ namespace outrun::vr::dx11
             signature.fixedFunction &&
             signature.fixedFunctionStateCoverageExact &&
             signature.fixedFunctionTranslationReady &&
+            signature.resourceBehaviorExact &&
             resourcesExact && inputLayoutExact &&
             signature.outputStateObservationComplete &&
             signature.shaderTranslationExact)
