@@ -10,7 +10,7 @@
   "result_sha": "0b8fae742c61d2e7280d59991033ce9ba01317f9",
   "validation_bearing_result_sha": "0b8fae742c61d2e7280d59991033ce9ba01317f9",
   "attempt": "1/3",
-  "status": "VALIDATED_C6_PENDING",
+  "status": "COMPLETE",
   "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
@@ -116,9 +116,9 @@
       "reason": "Static canonical disassembly/control-flow evidence only; no runtime payload, selector, deployment content or package identity changed."
     },
     "C6_STATE": {
-      "status": "IN_PROGRESS",
-      "state_persisted": false,
-      "evidence": "Validation is complete; this first CI-skipped bookkeeping commit records exact result/gates before lane-state publication."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "evidence": "Schema-2 durable task record and branch-local lane state now persist CONVERSION-DXVK-00314. Validation-bearing result remains 0b8fae742c61d2e7280d59991033ce9ba01317f9; bookkeeping is CI-skipped and does not replace exact-SHA validation. RUNTIME_VALIDATION remains UNTESTED."
     }
   },
   "blocker": "No automatic-validation blocker remains. Runtime acceptance remains explicitly untested.",
@@ -130,5 +130,6 @@
     "event_id": "CONVERSION-DX11-00313-E002",
     "event_type": "retry",
     "attempt": "1/3"
-  }
+  },
+  "run_record_commit_sha": "4fe1bb563e2523cafca7a309a6b85a9abe6c8534"
 }
