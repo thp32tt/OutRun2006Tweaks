@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-03T07:58:00+09:00",
+  "updatedKst": "2026-10-03T22:31:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 639,
+  "cycle": 684,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -42,9 +42,14 @@
     "VR-REFACTOR-STATE-0004D",
     "VR-REFACTOR-STATE-0004E",
     "VR-REFACTOR-STATE-0004F",
-    "VR-REFACTOR-STATE-0004G"
+    "VR-REFACTOR-STATE-0004G",
+    "VR-REFACTOR-STATE-0004H",
+    "VR-REFACTOR-STATE-0004I",
+    "VR-REFACTOR-STATE-0004J",
+    "VR-REFACTOR-STATE-0004K",
+    "VR-REFACTOR-STATE-0004L"
   ],
-  "next": "Continue from validated 0004G by reviewing the remaining R32 cross-layer R29 effect-state telemetry reads. Prefer an owner snapshot/read API only if it removes coupling without adding hot-path work or changing the existing 64-draw freshness semantics. Keep runtime-visible behavior frozen and require test-first verifier coverage plus exact-SHA CI.",
+  "next": "TEST_CANDIDATE_READY: runtime-test exact source f0ca6721dfe83c2ed3fd851898ca8a31ec7c8df3 before further structural source changes. After user Quest 3/VDXR evidence, resume the 1000-cycle plan from cycle 684 using only findings not invalidated by runtime results.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -74,11 +79,18 @@
     "VR-REFACTOR-STATE-0004F moves R31 fast-path reset ownership behind R31ResetFastPathState. R32 preserves the previous reset sequence (blocked generation -> validation cadence -> eye cache -> telemetry frame/window) without directly mutating R31 internals. R29 effect-cache and R23 live-state reset ownership remain intentionally separate for the next atomic review.",
     "309-cycle continuation completed as 61 persistent review batches x 5 lenses plus 4 targeted ownership checks = 309 static review checks. Source-edit gates were evaluated every 3 requested cycles and build gates every 6; unchanged/no-op gates were skipped instead of manufacturing commits or duplicate builds.",
     "VR-REFACTOR-STATE-0004G removes R32 Reset's remaining direct writes into R29 effect-cache state and R23 live-state sample cursors. R32InvalidateResetCaches now preserves the exact previous order by calling InvalidateEffectStateCache(), then R31ResetFastPathState(), then InvalidateLiveStateSample().",
-    "TDD evidence for 0004G: verifier-only SHA 1d91402abfda6dbbef25367967218a646159e3e5 failed DX9Ex Active Validation run 37074682810 exactly on the three direct-owner violations and missing owner APIs; implementation SHA 2897a8176bbde4de3a567bb0e6ce86ddf9084899 passed the strengthened verifier and full exact-SHA validation."
+    "TDD evidence for 0004G: verifier-only SHA 1d91402abfda6dbbef25367967218a646159e3e5 failed DX9Ex Active Validation run 37074682810 exactly on the three direct-owner violations and missing owner APIs; implementation SHA 2897a8176bbde4de3a567bb0e6ce86ddf9084899 passed the strengthened verifier and full exact-SHA validation.",
+    "Post-0004G continuation contributed 15 commits under the user-requested 3-cycle-per-commit cadence, recorded as 45 additional structural cycles (639 -> 684).",
+    "VR-REFACTOR-STATE-0004H encapsulates R29 effect telemetry behind an owner snapshot consumed by R32 without changing the existing 64-draw freshness rule.",
+    "VR-REFACTOR-STATE-0004I routes R34 raster invalidation through the R22 owner boundary.",
+    "VR-REFACTOR-STATE-0004J routes R33/R34 recovery-safety requests through the R29 owner API.",
+    "VR-REFACTOR-STATE-0004K consolidates R22 reset fail-close eligibility/baseline/raster ordering behind an R22 owner API.",
+    "VR-REFACTOR-STATE-0004L consolidates R33 depth/stencil fail-close ownership and routes the upper consumer through the owner API.",
+    "Exact-SHA f0ca6721dfe83c2ed3fd851898ca8a31ec7c8df3 is frozen as the next user runtime-test candidate: DX9Ex Active Validation 37078942512 policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation 37078942490 SUCCESS; HUD Inspector 37078942533 SUCCESS. Package artifact 11257812939 uploaded and package validation succeeded."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0004G_BUILD_VERIFIED",
-  "validatedSourceSha": "2897a8176bbde4de3a567bb0e6ce86ddf9084899",
-  "validationRunId": 37074742797,
+  "batchStatus": "VR-REFACTOR-STATE-0004L_TEST_CANDIDATE_READY",
+  "validatedSourceSha": "f0ca6721dfe83c2ed3fd851898ca8a31ec7c8df3",
+  "validationRunId": 37078942512,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -86,6 +98,19 @@
     "game": "SUCCESS",
     "fullChainCompile": "SUCCESS",
     "package": "SUCCESS",
-    "domainIsolation": "SUCCESS"
+    "domainIsolation": "SUCCESS",
+    "hudInspector": "SUCCESS",
+    "staticExeAnalysis": "SUCCESS"
+  },
+  "testCandidate": {
+    "sourceSha": "f0ca6721dfe83c2ed3fd851898ca8a31ec7c8df3",
+    "workflowRunId": 37078942512,
+    "artifactId": 11257812939,
+    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-f0ca6721dfe83c2ed3fd851898ca8a31ec7c8df3",
+    "artifactSizeBytes": 2729080,
+    "artifactDigestSha256": "9b11365f23f35c1e0ba608f2fa997e552382a016369b2f4357770127c539c676",
+    "innerPackageSha256": "9230d168e119352f03389421428cd6cc6042b2910e9d38f432e3631af90fc915",
+    "defaultProfile": "CORRECTNESS",
+    "userRuntimeVerified": false
   }
 }
