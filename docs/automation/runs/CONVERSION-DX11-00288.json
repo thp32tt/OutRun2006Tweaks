@@ -1,0 +1,121 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00288",
+  "production_id": "CONVERSION-DX11-00288",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "3/3",
+  "event_id": "CONVERSION-DX11-00288-E003",
+  "event_type": "retry",
+  "status": "BLOCKED_ATTEMPTS_EXHAUSTED",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "e06629639402d1510ca27f1008f509e9e8853605",
+  "result_sha": "dee75adcee5855a2ccb63d76c8de595578daa78a",
+  "validation_bearing_result_sha": "dee75adcee5855a2ccb63d76c8de595578daa78a",
+  "result_marker": "[AUTO:CONVERSION-DX11-00288]",
+  "selected_work_item": "DX11_D3DRS_SPECULARENABLE_FAIL_CLOSED_R202",
+  "summary": "Capture D3DRS_SPECULARENABLE provenance and fail closed in the dormant DX11 fixed-function translation when post-texture specular semantics are active. Static/source/build validation passed, but the required exact-SHA Backend Conversion Gate remains failed because the readiness constant-buffer probe target has unresolved linkage dependencies after the third automatic repair attempt.",
+  "changed_paths": [
+    "src/vr/core/d3d9_draw_state.hpp",
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "tools/dx11_fixed_function_shader_semantics.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "tools/dx11_constant_buffer_probe.cpp"
+  ],
+  "implementation_commits": [
+    "6a9d3ce03c11a9b35b61e2e4f6c2b32246aae53e",
+    "43beeca3631c37e248cbf03200c8fa50b98f7dba",
+    "4b76a20fbdbd3c59c2a1cf0af0c19e71cac6ea5c",
+    "98460ef4800040c76c90b5a5bd71c75a007588a8",
+    "805feba62d3acc5e6210a6db21f3ca7a0369e9b1",
+    "730b472507dfa5b191de795634f8e0342cbb37c8",
+    "dee75adcee5855a2ccb63d76c8de595578daa78a"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub branch state, AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/CONVERSION_LANE_STATE.json and docs/automation/QUEUE_CONTROLLER_CONTRACT.md. Inspected the controller-specified failed Backend Conversion Gate run 37120895029. ATTEMPT is 3/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "D3DRS_SPECULARENABLE is a fixed-function post-texture color semantic that was not represented by the dormant DX11 translation readiness. Treating it as exact could permit an unmodelled specular add. The safe conversion behavior is provenance capture plus fail-closed gating while native draw remains dormant."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "changed_paths": [
+        "src/vr/core/d3d9_draw_state.hpp",
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "src/vr/d3d11/pipeline_translation.cpp",
+        "tools/dx11_fixed_function_shader_semantics.cpp",
+        "tools/verify_dx11_source_graph.py",
+        "tools/dx11_constant_buffer_probe.cpp"
+      ],
+      "summary": "Added specular-enable snapshot/capture, fail-closed PipelineUnsupportedLighting behavior, semantic and source-graph regression guards, plus MSVC portability repairs in the constant-buffer probe. NativeDrawPath activation was not changed."
+    },
+    "C3_VALIDATE": {
+      "status": "FAIL_ATTEMPTS_EXHAUSTED",
+      "validation_bearing_result_sha": "dee75adcee5855a2ccb63d76c8de595578daa78a",
+      "backend_conversion_gate_run_id": 37121647337,
+      "validate_job_id": 111198774046,
+      "readiness_smoke_job_id": 111199612099,
+      "passed_evidence": [
+        "Verify queue automation contract",
+        "Verify HMD-proven baseline",
+        "Verify one-click structure contract",
+        "Verify backend disassembly contract",
+        "Test VR session auto-analysis regressions",
+        "Verify DX11 native transport lifetime contract",
+        "Verify DX11 dual-source blend contract",
+        "Test/verify DX11 static surface contract",
+        "Verify DX11 source graph",
+        "Verify DX11 dormant activation boundary",
+        "Test DX11 census analyzer",
+        "Configure Win32",
+        "Build Win32",
+        "Verify binary exists",
+        "Artifact upload",
+        "Readiness semantic/input/shader probes through DX11 shader linkage probe"
+      ],
+      "failure_signature": "DX11 readiness smoke job failed at Build DX11 constant buffer probe: LNK1120 with 11 unresolved externals, including NativeTriangleFanIndexBuffer readiness/binding/initialize/bind and NativeSurfaceMirror/NativeSurfacePairBinding symbols.",
+      "prior_gate_run_id": 37121135862,
+      "prior_gate_note": "Exact SHA 805feba62d3acc5e6210a6db21f3ca7a0369e9b1 passed validate/build and fixed-function semantic smoke, then failed constant-buffer probe compile. 730b472507dfa5b191de795634f8e0342cbb37c8 repaired compile portability and was superseded by the guard commit dee75adcee5855a2ccb63d76c8de595578daa78a.",
+      "automatic_repairs_exhausted": true,
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "marker_present": true,
+      "result_commits": [
+        "6a9d3ce03c11a9b35b61e2e4f6c2b32246aae53e",
+        "43beeca3631c37e248cbf03200c8fa50b98f7dba",
+        "4b76a20fbdbd3c59c2a1cf0af0c19e71cac6ea5c",
+        "98460ef4800040c76c90b5a5bd71c75a007588a8",
+        "805feba62d3acc5e6210a6db21f3ca7a0369e9b1",
+        "730b472507dfa5b191de795634f8e0342cbb37c8",
+        "dee75adcee5855a2ccb63d76c8de595578daa78a"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant source/static/probe correctness work only; no runtime candidate or packaging request was justified, and the required Gate did not pass."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_comment_id": 5969055236,
+      "exact_next_action": "Do not attempt a fourth automatic repair under CONVERSION-DX11-00288. In a later independent DX11 task, repair the constant-buffer probe target linkage to include NativeTriangleFanIndexBuffer and NativeSurfaceMirror/NativeSurfacePairBinding implementations, then rerun the exact-SHA Backend Conversion Gate. Preserve D3DRS_SPECULARENABLE fail-closed semantics and keep NativeDrawPathActive disabled."
+    }
+  },
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "FAIL",
+    "run_id": 37121647337,
+    "head_sha": "dee75adcee5855a2ccb63d76c8de595578daa78a",
+    "reason": "validate/build job passed, but DX11 readiness smoke failed at constant-buffer probe link with 11 unresolved externals; automatic repair limit 3/3 reached."
+  },
+  "native_draw_path_activation_changed": false,
+  "issue14_comment_id": 5969055236,
+  "exact_next_action": "Controller should not release this task as PASS. Preserve the material result for follow-up, record the blocker, and dispatch a later independent DX11 task to fix readiness-probe linkage before revalidation."
+}
