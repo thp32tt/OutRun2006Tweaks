@@ -141,13 +141,7 @@ namespace outrun::vr::dx11
                 static_cast<DWORD>(D3DTA_ALPHAREPLICATE);
             const DWORD supportedBits =
                 static_cast<DWORD>(D3DTA_SELECTMASK) | supportedModifiers;
-            const DWORD modifierBits = value & supportedModifiers;
-            // R202: D3D9 permits one modifier on an argument selector.
-            // Treat COMPLEMENT|ALPHAREPLICATE together as unproven instead
-            // of inventing an ordering for a combination outside that
-            // documented contract.
-            if ((value & ~supportedBits) != 0 ||
-                modifierBits == supportedModifiers)
+            if ((value & ~supportedBits) != 0)
                 return false;
 
             switch (value & D3DTA_SELECTMASK)
