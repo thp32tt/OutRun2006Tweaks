@@ -109,6 +109,7 @@ def main() -> None:
         ("native_backend.cpp", NATIVE_BACKEND_CPP),
         ("state_translation.cpp", STATE_TRANSLATION_CPP),
         ("triangle_fan_index_buffer.cpp", TRIANGLE_FAN_INDEX_BUFFER_CPP),
+        ("dx11_constant_buffer_probe.cpp", CONSTANT_BUFFER_PROBE),
     ]:
         if re.search(r"std::numeric_limits<[^>]+>::max\(\)", source):
             msvc_compile_portability_errors.append(
@@ -117,6 +118,10 @@ def main() -> None:
     if "UINT stream0Frequency = 1u;" not in RUNTIME_CENSUS:
         msvc_compile_portability_errors.append(
             "runtime census stream frequency storage must match UINT* API"
+        )
+    if "using outrun::vr::dx11::BufferMutationUpdateKind;" not in CONSTANT_BUFFER_PROBE:
+        msvc_compile_portability_errors.append(
+            "constant-buffer probe must import BufferMutationUpdateKind"
         )
     if msvc_compile_portability_errors:
         raise SystemExit(
