@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "093665805f0d52964e6f8ab704328679d87654b6",
+  "state_parent_head": "47ea1c460c1b766d391cf8c5bb5ec9e1de1bf7a9",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -51,64 +51,54 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DXVK-00291",
-    "result_sha": "d2db80f6f4a0a5e82a2ee66641405f1ea30dd0a1",
-    "validation_bearing_result_sha": "d2db80f6f4a0a5e82a2ee66641405f1ea30dd0a1",
-    "run_record_commit_sha": "093665805f0d52964e6f8ab704328679d87654b6",
+    "task_id": "CONVERSION-DXVK-00293",
+    "result_sha": "c7c9b9c2b4dbe7c2f5f21d3be6e4d5a32ab44810",
+    "validation_bearing_result_sha": "c7c9b9c2b4dbe7c2f5f21d3be6e4d5a32ab44810",
+    "run_record_commit_sha": "47ea1c460c1b766d391cf8c5bb5ec9e1de1bf7a9",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
-    "production_id": "CONVERSION-DXVK-00291",
-    "event_id": "CONVERSION-DXVK-00291-E002",
-    "event_type": "rollover",
-    "chat_rollover": 3,
-    "rollover_is_retry": false,
-    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
-    "metadata_correction_comment_id": 5969473575,
-    "metadata_correction_history": [
-      {
-        "event_id": "CONVERSION-DXVK-00291-E001",
-        "chat_rollover": 2,
-        "issue14_comment_id": 5969435604
-      },
-      {
-        "event_id": "CONVERSION-DXVK-00291-E002",
-        "chat_rollover": 3,
-        "issue14_comment_id": 5969473575
-      }
-    ]
+    "production_id": "CONVERSION-DX11-00292",
+    "event_id": "CONVERSION-DX11-00292-E003",
+    "event_type": "retry"
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
-    "proof_source_sha": "77df2970779f884b1ce150c5b9086a45383bebe8",
+    "proof_source_sha": "c7c9b9c2b4dbe7c2f5f21d3be6e4d5a32ab44810",
     "provenance_source_sha": "d2db80f6f4a0a5e82a2ee66641405f1ea30dd0a1",
-    "material_result_sha": "d2db80f6f4a0a5e82a2ee66641405f1ea30dd0a1",
-    "validation_bearing_result_sha": "d2db80f6f4a0a5e82a2ee66641405f1ea30dd0a1",
-    "proof_status": "EXACT_1834A9_TO_1834E9_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+    "material_result_sha": "c7c9b9c2b4dbe7c2f5f21d3be6e4d5a32ab44810",
+    "validation_bearing_result_sha": "c7c9b9c2b4dbe7c2f5f21d3be6e4d5a32ab44810",
+    "proof_status": "EXACT_1834E9_TO_183528_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
     "provenance_status": "EXACT_EXE_1834E9_TO_183529_PROVENANCE_CAPTURED",
-    "proof_start_rva": "0x001834A9",
-    "proof_end_rva": "0x001834E9",
-    "next_raw_start_rva": "0x001834E9",
-    "next_raw_end_rva": "0x00183529",
-    "next_raw_trailing_capture_edge_rva": "0x00183528",
-    "next_raw_trailing_capture_bytes": "8b",
-    "next_action_kind": "EXACT_DECODE_CURRENT_VALIDATED_RAW_WINDOW",
-    "dxvk_disassembly_evidence_run_id": 37124622298,
-    "dxvk_disassembly_evidence_job_id": 111207315662,
+    "proof_start_rva": "0x001834E9",
+    "proof_end_rva": "0x00183528",
+    "instruction_count": 31,
+    "branch_targets": [
+      "0x00183510->0x001835C1"
+    ],
+    "unresolved_forward_targets": [
+      "0x001835C1"
+    ],
+    "trailing_capture_edge_rva": "0x00183528",
+    "trailing_capture_edge_bytes": "8b",
+    "next_raw_start_rva": "0x00183528",
+    "next_raw_end_rva": "0x00183568",
+    "dxvk_disassembly_evidence_run_id": 37126681164,
+    "dxvk_disassembly_evidence_job_id": 111213279672,
     "static_exe_analysis_status": "SUCCESS",
-    "evidence_artifact_id": 11274299376,
-    "evidence_artifact_digest": "sha256:c8418321ace5b177a2f8281829893cef3aac6c3a5ff9f50d28e3f208d5c6bd21",
-    "backend_conversion_gate_run_id": 37124622370,
-    "backend_conversion_gate_job_id": 111207315772,
+    "evidence_artifact_id": 11275156943,
+    "evidence_artifact_digest": "sha256:f230a6edec6b17608ba3b4cc1927c0d3d6a3006533694efa4951ebf11aa6d0f6",
+    "backend_conversion_gate_run_id": 37126681155,
+    "backend_conversion_gate_job_id": 111213279682,
     "backend_conversion_gate_status": "SUCCESS",
-    "backend_conversion_gate_artifact_id": 11274329690,
-    "backend_conversion_gate_artifact_digest": "sha256:9906d29c1fad8445875920dcbad679709c0ed7e795d1c85c70248deb4d954088",
+    "backend_conversion_gate_artifact_id": 11275552918,
+    "backend_conversion_gate_artifact_digest": "sha256:405b7f805ae06936629c45d00496b98da7b830e2720f1b1bf8c7831bc27ab5eb",
     "runtime_validation": "UNTESTED"
   },
-  "runtime_blocker": "No runtime acceptance claim exists; canonical provenance/static CI evidence only.",
+  "runtime_blocker": "No runtime acceptance claim exists; exact canonical static/control-flow proof and hosted build evidence only.",
   "runtime_next_action": "Quest 3/VDXR runtime validation remains a later user-hardware gate after a runtime candidate exists.",
-  "independent_static_next_action": "Exact-decode only complete canonical instructions in validated continuation_75 0x001834E9..0x00183529. Preserve the trailing 0x8B at 0x00183528 for mandatory overlap, resolve branch/call targets only from exact bytes, carry unresolved forward-target debt fail-closed, and keep function/render/HUD/runtime semantics unresolved.",
+  "independent_static_next_action": "Capture mandatory-overlap continuation_76 canonical provenance at 0x00183528..0x00183568 from the exact-SHA frontier. Require the leading 0x8B overlap to complete the cut instruction, carry unresolved forward target 0x001835C1 fail-closed, census raw rel32 calls only as raw evidence, and keep function/render/HUD/runtime semantics unresolved.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -155,18 +145,21 @@
     "next_task_rule": "AFTER_FULL_PIPELINE_GATE_PASS_DISPATCH_NEXT_INDEPENDENT_WORK_IMMEDIATELY"
   },
   "follow_on_frontier": {
-    "provenance_sha": "d2db80f6f4a0a5e82a2ee66641405f1ea30dd0a1",
-    "validation_bearing_result_sha": "d2db80f6f4a0a5e82a2ee66641405f1ea30dd0a1",
-    "provenance_status": "EXACT_EXE_1834E9_TO_183529_PROVENANCE_CAPTURED",
-    "provenance_start_rva": "0x001834E9",
-    "probe_end_rva": "0x00183529",
-    "predecessor_proof_source_sha": "77df2970779f884b1ce150c5b9086a45383bebe8",
-    "predecessor_proof_status": "EXACT_1834A9_TO_1834E9_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+    "provenance_sha": "c7c9b9c2b4dbe7c2f5f21d3be6e4d5a32ab44810",
+    "validation_bearing_result_sha": "c7c9b9c2b4dbe7c2f5f21d3be6e4d5a32ab44810",
+    "provenance_status": "NEXT_RAW_CANDIDATE_CAPTURED_BY_EXACT_SHA_EXTRACTOR",
+    "predecessor_proof_source_sha": "c7c9b9c2b4dbe7c2f5f21d3be6e4d5a32ab44810",
+    "predecessor_proof_status": "EXACT_1834E9_TO_183528_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
     "predecessor_exact": true,
-    "trailing_raw_edge_rva": "0x00183528",
-    "trailing_raw_edge_bytes": "8b",
-    "trailing_edge_status": "INCOMPLETE_OPCODE_REQUIRES_OVERLAP",
-    "next_action_kind": "EXACT_DECODE_CURRENT_VALIDATED_RAW_WINDOW",
+    "inherited_unresolved_forward_targets": [
+      "0x001835C1"
+    ],
+    "next_raw_candidate_source_sha": "c7c9b9c2b4dbe7c2f5f21d3be6e4d5a32ab44810",
+    "next_raw_start_rva": "0x00183528",
+    "next_raw_end_rva": "0x00183568",
+    "next_raw_overlap_bytes": "8b",
+    "next_raw_overlap_status": "MANDATORY_OVERLAP_FROM_PREDECESSOR_INCOMPLETE_EDGE",
+    "next_action_kind": "CAPTURE_OVERLAP_CANONICAL_PROVENANCE",
     "runtime_validation": "UNTESTED"
   },
   "supplemental_completed_static_units": [
