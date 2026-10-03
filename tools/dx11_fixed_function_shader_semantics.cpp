@@ -26,6 +26,7 @@ namespace
     using outrun::vr::dx11::FixedFunctionUnsupportedTextureTransform;
     using outrun::vr::dx11::PipelineUnsupportedBlend;
     using outrun::vr::dx11::PipelineUnsupportedDualSourceBlend;
+    using outrun::vr::dx11::PipelineUnsupportedLighting;
     using outrun::vr::dx11::PipelineUnsupportedSeparateAlphaBlend;
     using outrun::vr::dx11::PipelineUnsupportedStencil;
     using outrun::vr::dx11::compile_fixed_function_pixel_shader_prototype;
@@ -91,6 +92,23 @@ namespace
 
 int main()
 {
+    {
+        OutRunVR::DrawState::RenderStateSnapshot state{};
+        state.complete = true;
+
+        const auto baseline = translate_pipeline(state);
+        require(
+            (baseline.unsupported & PipelineUnsupportedLighting) == 0,
+            "default disabled specular state must remain exact");
+
+        state.specularEnable = TRUE;
+        const auto specular = translate_pipeline(state);
+        require(
+            (specular.unsupported & PipelineUnsupportedLighting) != 0 &&
+            !specular.exact(),
+            "R202 enabled D3DRS_SPECULARENABLE must fail closed");
+    }
+
     {
         OutRunVR::DrawState::RenderStateSnapshot state{};
         state.complete = true;
