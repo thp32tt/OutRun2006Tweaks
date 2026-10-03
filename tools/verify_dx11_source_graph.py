@@ -8877,10 +8877,25 @@ def main() -> None:
             + ", ".join(missing_r223_vertex_compile_exactness)
         )
 
+    r223_compile_log_contract = [
+        ("pixelCompileProbe.attempted ? 1 : 0",
+         "R223 pixel compiler telemetry uses the live probe"),
+        ("vertexCompileProbe.attempted ? 1 : 0",
+         "R223 vertex compiler telemetry uses the live probe"),
+        ("profile=vs_4_0", "R223 vertex compiler telemetry profile"),
+    ]
+    missing_r223_compile_log = [
+        meaning for token, meaning in r223_compile_log_contract
+        if token not in RUNTIME_CENSUS
+    ]
     if "compileProbe." in RUNTIME_CENSUS:
+        missing_r223_compile_log.append(
+            "stale pre-R223 compileProbe identifier remains in runtime census"
+        )
+    if missing_r223_compile_log:
         raise SystemExit(
-            "DX11 R223 stale compileProbe identifier remains after "
-            "pixel/vertex compiler-probe split"
+            "DX11 R223 compiler telemetry contract drift: "
+            + ", ".join(missing_r223_compile_log)
         )
 
     verify_dx11_activation_boundary()
