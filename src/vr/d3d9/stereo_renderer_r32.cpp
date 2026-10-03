@@ -1377,8 +1377,8 @@ namespace OutRunVRStereo
             R32InstallState.store(State::Pending, std::memory_order_release);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const auto r31 = R31InstallState.load(std::memory_order_acquire);
-                const auto r22 = R22InstallState.load(std::memory_order_acquire);
+                const auto r31 = R31InstallStatus();
+                const auto r22 = R22InstallStatus();
                 const auto r13 = R13InstallState.load(std::memory_order_acquire);
                 if (r31 == State::Failed || r22 == State::Failed ||
                     r13 == R13InstallFailed)
