@@ -365,6 +365,20 @@ for rel, source in (("R33", r33), ("R34", r34)):
         errors.append(
             f"{rel} missing R29 owner stereo-recovery safety API")
 
+for banned in ("R29ArmMonoSafety(", "R29MonoSafetyThroughEpoch"):
+    if banned in r32:
+        errors.append(
+            f"R32 retained private R29 recovery-safety dependency: {banned}")
+for marker in (
+    "ArmStereoRecoverySafety(",
+    "SetStereoRecoverySafetyThroughEpoch(",
+):
+    if marker not in r32:
+        errors.append(
+            f"R32 missing R29 recovery-safety owner API: {marker}")
+if "SetStereoRecoverySafetyThroughEpoch(" not in r29:
+    errors.append("R29 missing exact-epoch recovery-safety owner API")
+
 for banned in ("R22FailClosedEligibility();", "R22ResetBaselineTracking();"):
     if banned in r34:
         errors.append(f"R34 retained direct R22 reset fail-close primitive: {banned}")
