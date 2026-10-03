@@ -8507,8 +8507,9 @@ def main() -> None:
          "R175 default-only exactness contract"),
         ("!behaviorDescriptorExact || streamSourceFrequencyUnsupported",
          RUNTIME_CENSUS, "R175 resource behavior unsupported accounting"),
-        ("managedShadowRequired || streamSourceFrequencyUnsupported",
-         RUNTIME_CENSUS, "R175 resourcesExact fail-closed gate"),
+        ("!streamSourceFrequencyUnsupported &&",
+         RUNTIME_CENSUS,
+         "R175 stream-frequency remains explicit in R219 resourceBehaviorExact fail-closed gate"),
         ("VR DX11 R175 stream0-frequency state#{}", RUNTIME_CENSUS,
          "R175 detailed stream-frequency telemetry"),
     ]
