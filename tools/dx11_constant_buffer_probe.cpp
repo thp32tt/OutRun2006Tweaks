@@ -36,6 +36,7 @@ namespace
     using outrun::vr::dx11::validate_fixed_function_activation_snapshot;
     using outrun::vr::dx11::validate_fixed_function_nonindexed_triangle_fan_geometry_snapshot;
     using outrun::vr::dx11::ResourceRole;
+    using outrun::vr::dx11::BufferMutationUpdateKind;
     using outrun::vr::dx11::TextureMutationUpdateKind;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::generate_fixed_function_transform_constants;
@@ -3914,7 +3915,7 @@ int main()
             outrun::vr::dx11::
                 compose_fixed_function_indexed_source_range_readiness(
                     D3DPT_TRIANGLELIST, 1u, 0,
-                    std::numeric_limits<UINT>::max(), 2u, 0u);
+                    (std::numeric_limits<UINT>::max)(), 2u, 0u);
         require(
             indexedSourceRangeVertexOverflow.inputValid &&
             !indexedSourceRangeVertexOverflow.vertexRangeExact &&
@@ -3939,7 +3940,7 @@ int main()
             outrun::vr::dx11::
                 compose_fixed_function_indexed_source_range_readiness(
                     D3DPT_TRIANGLELIST, 1u, 1,
-                    std::numeric_limits<UINT>::max(), 1u, 0u);
+                    (std::numeric_limits<UINT>::max)(), 1u, 0u);
         require(
             indexedSourceRangeEffectiveVertexOverflow.inputValid &&
             !indexedSourceRangeEffectiveVertexOverflow.vertexRangeExact &&
@@ -3962,7 +3963,7 @@ int main()
             outrun::vr::dx11::
                 compose_fixed_function_indexed_source_range_readiness(
                     D3DPT_TRIANGLELIST, 2u, 0, 0u, 4u,
-                    std::numeric_limits<UINT>::max() - 5u);
+                    (std::numeric_limits<UINT>::max)() - 5u);
         require(
             indexedSourceRangeIndexOverflow.inputValid &&
             indexedSourceRangeIndexOverflow.vertexRangeExact &&
@@ -4362,7 +4363,7 @@ int main()
                 compose_fixed_function_direct_draw_dispatch_readiness(
                     renderTargetBoundDraw, multiStageDrawReady,
                     indexedGeometryReady, D3DPT_TRIANGLELIST,
-                    std::numeric_limits<UINT>::max(), true, 0u, 0u, 0);
+                    (std::numeric_limits<UINT>::max)(), true, 0u, 0u, 0);
         require(
             !overflowDirectDispatch.dispatchArgumentsExact &&
             !overflowDirectDispatch.ready &&
