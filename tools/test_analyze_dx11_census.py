@@ -559,6 +559,11 @@ def main() -> int:
         {
             "session-a.log": (
                 "VR DX11 R85 signature#1: primitive=4 fixedFn=1 fvf=0x000001C4\n"
+                "VR DX11 R72 decl signature#1 elem#0: stream=0 offset=0 type=2 "
+                "method=0 usage=0 usageIndex=0\n"
+                "VR DX11 R85 texture signature#1 stage#0: observed=1 type=3 pool=1 "
+                "usage=0x00000000 fmt=21 exact=1\n"
+                "VR DX11 R191 ffp texture-factor state#1: observed=1 argb=0x11223344\n"
                 "VR DX11 R85 ffp shader compile#1: attempted=1 succeeded=1 "
                 "hr=0x00000000 bytecodeHash=0xAAAAAAAAAAAAAAAA bytecodeBytes=512 "
                 "diagnosticsHash=0x0000000000000000 diagnosticsBytes=0 profile=ps_4_0\n"
@@ -568,6 +573,11 @@ def main() -> int:
             ),
             "session-b.log": (
                 "VR DX11 R85 signature#1: primitive=5 fixedFn=1 fvf=0x000002C4\n"
+                "VR DX11 R72 decl signature#1 elem#0: stream=1 offset=16 type=3 "
+                "method=0 usage=3 usageIndex=1\n"
+                "VR DX11 R85 texture signature#1 stage#0: observed=1 type=4 pool=0 "
+                "usage=0x00000001 fmt=22 exact=0\n"
+                "VR DX11 R191 ffp texture-factor state#1: observed=1 argb=0xAABBCCDD\n"
                 "VR DX11 R85 ffp shader compile#1: attempted=1 succeeded=1 "
                 "hr=0x00000000 bytecodeHash=0xBBBBBBBBBBBBBBBB bytecodeBytes=768 "
                 "diagnosticsHash=0x0000000000000000 diagnosticsBytes=0 profile=ps_4_0\n"
@@ -584,6 +594,13 @@ def main() -> int:
     }
     assert set(r225_signatures) == {"session-a.log", "session-b.log"}
     assert r225_signatures["session-a.log"]["id"] == 1
+    assert r225_signatures["session-a.log"]["declaration"][0]["stream"] == 0
+    assert r225_signatures["session-a.log"]["declaration"][0]["offset"] == 0
+    assert r225_signatures["session-a.log"]["texture_stages"][0]["format"] == 21
+    assert (
+        r225_signatures["session-a.log"]["fixed_function_texture_factor"]["argb_hex"]
+        == "0x11223344"
+    )
     assert (
         r225_signatures["session-a.log"]["fixed_function_shader_compile"][
             "bytecode_hash_hex"
@@ -597,6 +614,13 @@ def main() -> int:
         == "0x1111111111111111"
     )
     assert r225_signatures["session-b.log"]["id"] == 1
+    assert r225_signatures["session-b.log"]["declaration"][0]["stream"] == 1
+    assert r225_signatures["session-b.log"]["declaration"][0]["offset"] == 16
+    assert r225_signatures["session-b.log"]["texture_stages"][0]["format"] == 22
+    assert (
+        r225_signatures["session-b.log"]["fixed_function_texture_factor"]["argb_hex"]
+        == "0xAABBCCDD"
+    )
     assert (
         r225_signatures["session-b.log"]["fixed_function_shader_compile"][
             "bytecode_hash_hex"
