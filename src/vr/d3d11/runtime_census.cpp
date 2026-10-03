@@ -1840,14 +1840,14 @@ namespace outrun::vr::dx11
                         spdlog::info(
                             "VR DX11 R85 ffp shader compile#{}: attempted={} succeeded={} hr=0x{:08X} bytecodeHash=0x{:016X} bytecodeBytes={} diagnosticsHash=0x{:016X} diagnosticsBytes={} profile=ps_4_0",
                             unique,
-                            compileProbe.attempted ? 1 : 0,
-                            compileProbe.succeeded ? 1 : 0,
+                            pixelCompileProbe.attempted ? 1 : 0,
+                            pixelCompileProbe.succeeded ? 1 : 0,
                             static_cast<std::uint32_t>(
-                                compileProbe.result),
-                            compileProbe.bytecodeHash,
-                            compileProbe.bytecodeBytes,
-                            compileProbe.diagnosticsHash,
-                            compileProbe.diagnosticsBytes);
+                                pixelCompileProbe.result),
+                            pixelCompileProbe.bytecodeHash,
+                            pixelCompileProbe.bytecodeBytes,
+                            pixelCompileProbe.diagnosticsHash,
+                            pixelCompileProbe.diagnosticsBytes);
                     }
 
                     for (std::size_t stageIndex = 0;
