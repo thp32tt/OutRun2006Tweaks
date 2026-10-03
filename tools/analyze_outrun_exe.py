@@ -28434,7 +28434,12 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_84_provenance
         and predecessor["incomplete_rva"] == target_rva
         and predecessor["incomplete_matches"]
         and predecessor["capture_edge_matches"]
-        and predecessor["unresolved_forward_targets"] == inherited_targets
+        and predecessor["unresolved_forward_targets"] == [
+            0x00183722,
+            0x00183726,
+            0x0018372A,
+            0x0018373A,
+        ]
     )
     probe_end_matches = (
         target_rva + len(probe)
