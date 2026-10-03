@@ -1346,14 +1346,14 @@ def main() -> None:
     for token, meaning in [
         ("DX11 R166 unsupported census sentinel out of range",
          "compile-time sentinel bounds assertion"),
-        ("dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={},texCoordWrap={},mrtColorWrite={}",
-         "current log labels for bits 12..19"),
+        ("dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={},texCoordWrap={},mrtColorWrite={},specular={}",
+         "current log labels for bits 12..20"),
         ("unsupported[12], unsupported[13], unsupported[14], unsupported[15],",
          "R165/R166 log arguments for bits 12..15"),
         ("unsupported[16], unsupported[17], unsupported[18],",
-         "current log argument prefix for bits 16..19"),
-        ("unsupported[19]);",
-         "MRT color-write log argument for bit 19"),
+         "current log argument prefix for bits 16..20"),
+        ("unsupported[19], unsupported[20]);",
+         "R204 MRT/specular log arguments for bits 19..20"),
     ]:
         if token not in RUNTIME_CENSUS:
             r166_unsupported_census_errors.append(meaning)
