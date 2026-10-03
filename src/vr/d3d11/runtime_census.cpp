@@ -2659,11 +2659,14 @@ namespace outrun::vr::dx11
 
         note_signature(signature, primitive);
 
-        // R215 retains the R213 output-state boundary and additionally admits
-        // only the fixed-function shader subset sealed above. Programmable
-        // shaders remain fail-closed, and this census is still diagnostic-only.
+        // R216 makes the fixed-function scope explicit at the final
+        // ExactSamples boundary instead of relying only on the current R215
+        // assignment site for shaderTranslationExact. Programmable D3D9
+        // shaders therefore remain fail-closed until a separate translation
+        // implementation and activation review deliberately change this gate.
         if (unsupported == PipelineUnsupportedNone && topology.exact &&
             pointRasterSemanticsExact && lineRasterSemanticsExact &&
+            signature.fixedFunction &&
             resourcesExact && inputLayoutExact &&
             signature.outputStateObservationComplete &&
             signature.shaderTranslationExact)
