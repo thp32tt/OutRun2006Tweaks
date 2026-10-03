@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "3ad382934f50ad3e7a8343d2bde5e98820c68a02",
+  "state_parent_head": "093665805f0d52964e6f8ab704328679d87654b6",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,18 +54,30 @@
     "task_id": "CONVERSION-DXVK-00291",
     "result_sha": "d2db80f6f4a0a5e82a2ee66641405f1ea30dd0a1",
     "validation_bearing_result_sha": "d2db80f6f4a0a5e82a2ee66641405f1ea30dd0a1",
-    "run_record_commit_sha": "3ad382934f50ad3e7a8343d2bde5e98820c68a02",
+    "run_record_commit_sha": "093665805f0d52964e6f8ab704328679d87654b6",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
     "production_id": "CONVERSION-DXVK-00291",
-    "event_id": "CONVERSION-DXVK-00291-E001",
+    "event_id": "CONVERSION-DXVK-00291-E002",
     "event_type": "rollover",
-    "chat_rollover": 2,
+    "chat_rollover": 3,
     "rollover_is_retry": false,
     "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
-    "metadata_correction_comment_id": 5969435604
+    "metadata_correction_comment_id": 5969473575,
+    "metadata_correction_history": [
+      {
+        "event_id": "CONVERSION-DXVK-00291-E001",
+        "chat_rollover": 2,
+        "issue14_comment_id": 5969435604
+      },
+      {
+        "event_id": "CONVERSION-DXVK-00291-E002",
+        "chat_rollover": 3,
+        "issue14_comment_id": 5969473575
+      }
+    ]
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
