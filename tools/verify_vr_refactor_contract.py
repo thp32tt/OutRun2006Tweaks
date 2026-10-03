@@ -379,6 +379,20 @@ for marker in (
 if "SetStereoRecoverySafetyThroughEpoch(" not in r29:
     errors.append("R29 missing exact-epoch recovery-safety owner API")
 
+for banned in ("R22InstallState", "R31InstallState"):
+    if banned in r32:
+        errors.append(
+            f"R32 retained direct lower-layer install-state dependency: {banned}")
+for marker, source, owner in (
+    ("R22InstallStatus()", r22, "R22"),
+    ("R31InstallStatus()", r31, "R31"),
+):
+    if marker not in source:
+        errors.append(f"{owner} missing install-state owner query API: {marker}")
+for marker in ("R22InstallStatus()", "R31InstallStatus()"):
+    if marker not in r32:
+        errors.append(f"R32 missing lower-layer install-state owner query: {marker}")
+
 for banned in ("R22FailClosedEligibility();", "R22ResetBaselineTracking();"):
     if banned in r34:
         errors.append(f"R34 retained direct R22 reset fail-close primitive: {banned}")
