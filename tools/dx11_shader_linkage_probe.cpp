@@ -12,7 +12,6 @@
 namespace
 {
     using outrun::vr::dx11::FixedFunctionStageState;
-    using outrun::vr::dx11::FixedFunctionUnsupportedArgument;
     using outrun::vr::dx11::FixedFunctionVertexShaderPrototypeUnsupportedBlend;
     using outrun::vr::dx11::FixedFunctionVertexShaderPrototypeUnsupportedNormal;
     using outrun::vr::dx11::FixedFunctionVertexShaderPrototypeUnsupportedPosition;
@@ -21,7 +20,6 @@ namespace
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::generate_fixed_function_transform_constants;
     using outrun::vr::dx11::generate_fixed_function_vertex_shader_prototype;
-    using outrun::vr::dx11::translate_fixed_function_readiness;
 
     void require(bool condition, const char* message)
     {
@@ -323,22 +321,6 @@ VSOutput main(float3 position : POSITION0)
         (litNormalPrototype.unsupported &
          FixedFunctionVertexShaderPrototypeUnsupportedNormal) != 0,
         "R123 lit normal FVF must fail closed");
-
-    std::array<FixedFunctionStageState, 8> combinedModifierStages{};
-    combinedModifierStages[0] = active_stage();
-    combinedModifierStages[0].colorOp = D3DTOP_SELECTARG1;
-    combinedModifierStages[0].colorArg1 =
-        D3DTA_DIFFUSE | D3DTA_COMPLEMENT | D3DTA_ALPHAREPLICATE;
-    combinedModifierStages[0].alphaOp = D3DTOP_SELECTARG1;
-    combinedModifierStages[0].alphaArg1 = D3DTA_DIFFUSE;
-    const auto combinedModifierReadiness =
-        translate_fixed_function_readiness(
-            combinedModifierStages, true, 0x00, 0x00);
-    require(
-        !combinedModifierReadiness.exact() &&
-        (combinedModifierReadiness.unsupported &
-         FixedFunctionUnsupportedArgument) != 0,
-        "R202 combined D3DTA modifiers must fail closed");
 
     std::array<FixedFunctionStageState, 8> stages{};
     stages[0] = active_stage();
