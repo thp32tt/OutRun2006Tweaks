@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "2b86b238ed0bde47bd2993d42afd9d4025ecdb2d",
+  "state_parent_head": "9814378aa282e3cedd39368663e0a70a6cfb937b",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,7 +54,7 @@
     "task_id": "CONVERSION-DXVK-00316",
     "result_sha": "4e88cf82d4f7ed5ae4b2dd06b813b44e472a0762",
     "validation_bearing_result_sha": "4e88cf82d4f7ed5ae4b2dd06b813b44e472a0762",
-    "run_record_commit_sha": "2b86b238ed0bde47bd2993d42afd9d4025ecdb2d",
+    "run_record_commit_sha": "9814378aa282e3cedd39368663e0a70a6cfb937b",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
