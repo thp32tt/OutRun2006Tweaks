@@ -26577,7 +26577,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_78_prefix_pro
             == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_78_PROBE_END_RVA
     )
     expected_external_targets = {0x00183538}
-    unresolved_forward_targets: list[int] = []
+    unresolved_forward_targets = []
     proven = bool(
         predecessor_exact
         and start_boundary_proven
