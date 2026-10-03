@@ -999,3 +999,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Current canonical candidate state: PASS pending in-game `C4A2937B, 9F060EC1, D6DC1380, 48DEBE77`; REWORK `FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, 62BEBF33, E3FD08BE, C075FB49, FD90AA9`. 201 elements / 93 failing exact source-bbox checks.
 - Final `approved_dds` remains empty because isolated DDS_ONLY in-game validation is mandatory before final approval.
 - No build, VR/FFB, or GPT Library use. Report: `localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json`.
+
+## 2026-10-04 A recovery test — FF2462BB clean-plate rework
+- Recovery branch A odd-shard priority index 51 `FF2462BB` reworked from exact HD source.
+- C85 failing 21/21 elements now exact source-bbox containment PASS; 15 prior PASS elements remain byte-identical.
+- 6 elements were repositioned losslessly; 15 were rerendered at native resolution with Noto Sans CJK Bold. No localized raster scaling/resampling was used.
+- Clean-plate source-glyph residue: 0 pixels. Clean-plate and final mask validators: PASS; changed pixels outside target cells/protected regions: 0.
+- Candidate SHA-256: `9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08`. DDS header matches exact HD source.
+- `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
+- Next A priority: odd index 53 `568D3696`.
+- Evidence: `localization/graphics/role_A/20261004-A-RECOVERY01/`.

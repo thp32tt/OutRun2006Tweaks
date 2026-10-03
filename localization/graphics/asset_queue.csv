@@ -32,7 +32,7 @@ index,path,action,artwork_status,transcription_status,notes
 48,textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass2 transcription saved
 49,textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass2 transcription saved
 50,textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
-51,textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds,localize_text,rework_required_zero_pixel_or_artifact,transcribed_reviewed,A78 59 semantic / 68 regions; B79+C75+D74 static gates pass; in-game approval pending
+51,textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds,localize_text,a_recovery01_cleanplate_selfqa_pass_pending_c,transcribed_reviewed,A_RECOVERY01 clean-plate native rework: 21/21 C85-failing elements exact-bbox PASS; 15 prior PASS elements byte-identical; no raster scaling; candidate 9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08; clean/final mask validators PASS; RUNTIME_VALIDATION=UNTESTED; C final QA pending
 52,textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds,zoom_review,blocked_review,needs_zoom_review,
 53,textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds,localize_text,rework_required_zero_pixel_or_artifact,transcribed_reviewed,A80 14/14; B81+C76+D75 static gates pass; in-game/context approval pending
 54,textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds,localize_text,rework_required_zero_pixel_or_artifact,transcribed_reviewed,A81 17/17 candidate; B82 first QA PASS; C/D and in-game approval pending

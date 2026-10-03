@@ -1,0 +1,10 @@
+{
+  "target_reworked": 21,
+  "prior_pass_untouched": 15,
+  "prior_pass_byte_identical": 15,
+  "changed_pixels_vs_before": 278393,
+  "changed_pixels_outside_target_cells": 0,
+  "all_target_bbox_pass": true,
+  "header_128_exact": true,
+  "runtime_validation": "UNTESTED"
+}

@@ -1,0 +1,622 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261004-A-RECOVERY01",
+  "branch": "korean-localization-recovery-20260928",
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "method": "EXACT_HD_SOURCE -> binary SOURCE_TEXT_MASK -> CLEAN_PLATE -> lossless reposition where possible / native-resolution Noto Sans CJK Bold rerender otherwise -> static QA; no raster scaling",
+  "source_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "before_sha256": "c9ae1b1222ddd1516160912cdd6d28dcd65ac17e4dc806d1c51f05feb10c0b9c",
+  "candidate_sha256": "9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08",
+  "dimensions": [
+    4096,
+    2048
+  ],
+  "dds_header_128_exact_to_source": true,
+  "reworked_elements": 21,
+  "lossless_reposition_elements": [
+    "SCREAMING",
+    "ENTER_ACCOUNT_NAME",
+    "ENTER_ACCOUNT_PASSWORD",
+    "LOAD_SAVE",
+    "ENTER_XBOX_PASSCODE",
+    "LOGIN_TO_ACCOUNT"
+  ],
+  "native_rerender_elements": [
+    "CHEATING",
+    "CREATE_ACCOUNT",
+    "BAD_NAME",
+    "GOOD_ATTITUDE",
+    "DELETE_ACCOUNT_SMALL",
+    "IN_MENU",
+    "SIGN_IN",
+    "DELETE_ACCOUNT_BIG",
+    "REGISTER_NEW_ACCOUNT_BIG",
+    "START_1",
+    "GOAL_1",
+    "START_2",
+    "GOAL_2",
+    "START_3",
+    "GOAL_3"
+  ],
+  "quality_gates": {
+    "source_glyph_pixels_remaining_in_clean_plate": 0,
+    "all_21_within_original_bbox": true,
+    "changed_pixels_outside_allowed_original_bboxes": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "raster_resampling_of_localized_glyphs": false,
+    "font_coverage": "PASS_NotoSansCJKBold",
+    "clean_plate_intermediate": "PASS_STATIC",
+    "runtime_validation": "UNTESTED"
+  },
+  "rows": [
+    {
+      "key": "SCREAMING",
+      "source": "SCREAMING",
+      "korean": "고성",
+      "mode": "lossless_reposition",
+      "original_bbox": [
+        9,
+        260,
+        285,
+        301
+      ],
+      "previous_localized_bbox": [
+        6,
+        261,
+        79,
+        301
+      ],
+      "new_localized_bbox": [
+        9,
+        261,
+        82,
+        301
+      ],
+      "font_size": null,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "ENTER_ACCOUNT_NAME",
+      "source": "ENTER ACCOUNT NAME:",
+      "korean": "계정 이름 입력:",
+      "mode": "lossless_reposition",
+      "original_bbox": [
+        2,
+        321,
+        558,
+        361
+      ],
+      "previous_localized_bbox": [
+        6,
+        322,
+        261,
+        362
+      ],
+      "new_localized_bbox": [
+        6,
+        321,
+        261,
+        361
+      ],
+      "font_size": null,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "CHEATING",
+      "source": "CHEATING",
+      "korean": "부정행위",
+      "mode": "native_render",
+      "original_bbox": [
+        1122,
+        197,
+        1356,
+        237
+      ],
+      "previous_localized_bbox": [
+        1123,
+        196,
+        1273,
+        237
+      ],
+      "new_localized_bbox": [
+        1124,
+        197,
+        1266,
+        236
+      ],
+      "font_size": 40,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "ENTER_ACCOUNT_PASSWORD",
+      "source": "ENTER ACCOUNT PASSWORD:",
+      "korean": "계정 비밀번호 입력:",
+      "mode": "lossless_reposition",
+      "original_bbox": [
+        1137,
+        388,
+        1785,
+        429
+      ],
+      "previous_localized_bbox": [
+        1138,
+        389,
+        1476,
+        430
+      ],
+      "new_localized_bbox": [
+        1138,
+        388,
+        1476,
+        429
+      ],
+      "font_size": null,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "CREATE_ACCOUNT",
+      "source": "CREATE ACCOUNT",
+      "korean": "계정 만들기",
+      "mode": "native_render",
+      "original_bbox": [
+        2180,
+        133,
+        2584,
+        173
+      ],
+      "previous_localized_bbox": [
+        2181,
+        132,
+        2379,
+        173
+      ],
+      "new_localized_bbox": [
+        2182,
+        133,
+        2370,
+        172
+      ],
+      "font_size": 40,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "BAD_NAME",
+      "source": "BAD NAME",
+      "korean": "부적절한 이름",
+      "mode": "native_render",
+      "original_bbox": [
+        2241,
+        197,
+        2488,
+        236
+      ],
+      "previous_localized_bbox": [
+        2241,
+        196,
+        2480,
+        237
+      ],
+      "new_localized_bbox": [
+        2253,
+        197,
+        2475,
+        235
+      ],
+      "font_size": 39,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "GOOD_ATTITUDE",
+      "source": "GOOD ATTITUDE",
+      "korean": "좋은 태도",
+      "mode": "native_render",
+      "original_bbox": [
+        2240,
+        261,
+        2603,
+        301
+      ],
+      "previous_localized_bbox": [
+        2241,
+        260,
+        2402,
+        301
+      ],
+      "new_localized_bbox": [
+        2242,
+        261,
+        2396,
+        300
+      ],
+      "font_size": 40,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "DELETE_ACCOUNT_SMALL",
+      "source": "DELETE ACCOUNT",
+      "korean": "계정 삭제",
+      "mode": "native_render",
+      "original_bbox": [
+        2560,
+        393,
+        2961,
+        433
+      ],
+      "previous_localized_bbox": [
+        2561,
+        393,
+        2721,
+        434
+      ],
+      "new_localized_bbox": [
+        2562,
+        393,
+        2714,
+        432
+      ],
+      "font_size": 40,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "LOAD_SAVE",
+      "source": "LOAD / SAVE",
+      "korean": "불러오기 / 저장",
+      "mode": "lossless_reposition",
+      "original_bbox": [
+        3253,
+        136,
+        3546,
+        181
+      ],
+      "previous_localized_bbox": [
+        3254,
+        138,
+        3520,
+        182
+      ],
+      "new_localized_bbox": [
+        3254,
+        137,
+        3520,
+        181
+      ],
+      "font_size": null,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "IN_MENU",
+      "source": "In Menu",
+      "korean": "메뉴",
+      "mode": "native_render",
+      "original_bbox": [
+        2414,
+        9,
+        2580,
+        49
+      ],
+      "previous_localized_bbox": [
+        2463,
+        9,
+        2537,
+        50
+      ],
+      "new_localized_bbox": [
+        2462,
+        9,
+        2533,
+        48
+      ],
+      "font_size": 40,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "SIGN_IN",
+      "source": "SIGN IN",
+      "korean": "로그인",
+      "mode": "native_render",
+      "original_bbox": [
+        0,
+        455,
+        268,
+        518
+      ],
+      "previous_localized_bbox": [
+        7,
+        454,
+        187,
+        518
+      ],
+      "new_localized_bbox": [
+        9,
+        455,
+        184,
+        517
+      ],
+      "font_size": 66,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "DELETE_ACCOUNT_BIG",
+      "source": "DELETE ACCOUNT",
+      "korean": "계정 삭제",
+      "mode": "native_render",
+      "original_bbox": [
+        3,
+        540,
+        641,
+        602
+      ],
+      "previous_localized_bbox": [
+        6,
+        539,
+        265,
+        604
+      ],
+      "new_localized_bbox": [
+        7,
+        540,
+        251,
+        601
+      ],
+      "font_size": 64,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "ENTER_XBOX_PASSCODE",
+      "source": "ENTER XBOX PASSCODE",
+      "korean": "XBOX 패스코드 입력",
+      "mode": "lossless_reposition",
+      "original_bbox": [
+        906,
+        456,
+        1875,
+        522
+      ],
+      "previous_localized_bbox": [
+        906,
+        455,
+        1487,
+        520
+      ],
+      "new_localized_bbox": [
+        906,
+        456,
+        1487,
+        521
+      ],
+      "font_size": null,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "REGISTER_NEW_ACCOUNT_BIG",
+      "source": "REGISTER NEW ACCOUNT",
+      "korean": "새 계정 등록",
+      "mode": "native_render",
+      "original_bbox": [
+        2470,
+        543,
+        3399,
+        606
+      ],
+      "previous_localized_bbox": [
+        2476,
+        542,
+        2816,
+        607
+      ],
+      "new_localized_bbox": [
+        2477,
+        543,
+        2803,
+        605
+      ],
+      "font_size": 65,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "LOGIN_TO_ACCOUNT",
+      "source": "LOGIN TO ACCOUNT",
+      "korean": "계정 로그인",
+      "mode": "lossless_reposition",
+      "original_bbox": [
+        2470,
+        1333,
+        2920,
+        1380
+      ],
+      "previous_localized_bbox": [
+        2594,
+        1329,
+        2793,
+        1370
+      ],
+      "new_localized_bbox": [
+        2594,
+        1333,
+        2793,
+        1374
+      ],
+      "font_size": null,
+      "stroke_width": 0,
+      "containment": "PASS"
+    },
+    {
+      "key": "START_1",
+      "source": "Start",
+      "korean": "시작",
+      "mode": "native_render",
+      "original_bbox": [
+        1335,
+        737,
+        1449,
+        785
+      ],
+      "previous_localized_bbox": [
+        1341,
+        726,
+        1429,
+        779
+      ],
+      "new_localized_bbox": [
+        1353,
+        738,
+        1431,
+        784
+      ],
+      "font_size": 39,
+      "stroke_width": 4,
+      "containment": "PASS"
+    },
+    {
+      "key": "GOAL_1",
+      "source": "Goal",
+      "korean": "골",
+      "mode": "native_render",
+      "original_bbox": [
+        1965,
+        737,
+        2068,
+        785
+      ],
+      "previous_localized_bbox": [
+        1985,
+        727,
+        2033,
+        777
+      ],
+      "new_localized_bbox": [
+        1994,
+        738,
+        2038,
+        784
+      ],
+      "font_size": 42,
+      "stroke_width": 4,
+      "containment": "PASS"
+    },
+    {
+      "key": "START_2",
+      "source": "Start",
+      "korean": "시작",
+      "mode": "native_render",
+      "original_bbox": [
+        2111,
+        737,
+        2225,
+        785
+      ],
+      "previous_localized_bbox": [
+        2119,
+        726,
+        2207,
+        779
+      ],
+      "new_localized_bbox": [
+        2129,
+        738,
+        2207,
+        784
+      ],
+      "font_size": 39,
+      "stroke_width": 4,
+      "containment": "PASS"
+    },
+    {
+      "key": "GOAL_2",
+      "source": "Goal",
+      "korean": "골",
+      "mode": "native_render",
+      "original_bbox": [
+        2741,
+        737,
+        2844,
+        785
+      ],
+      "previous_localized_bbox": [
+        2765,
+        727,
+        2813,
+        777
+      ],
+      "new_localized_bbox": [
+        2770,
+        738,
+        2814,
+        784
+      ],
+      "font_size": 42,
+      "stroke_width": 4,
+      "containment": "PASS"
+    },
+    {
+      "key": "START_3",
+      "source": "Start",
+      "korean": "시작",
+      "mode": "native_render",
+      "original_bbox": [
+        2887,
+        737,
+        3001,
+        785
+      ],
+      "previous_localized_bbox": [
+        2899,
+        726,
+        2987,
+        779
+      ],
+      "new_localized_bbox": [
+        2905,
+        738,
+        2983,
+        784
+      ],
+      "font_size": 39,
+      "stroke_width": 4,
+      "containment": "PASS"
+    },
+    {
+      "key": "GOAL_3",
+      "source": "Goal",
+      "korean": "골",
+      "mode": "native_render",
+      "original_bbox": [
+        3517,
+        737,
+        3620,
+        785
+      ],
+      "previous_localized_bbox": [
+        3543,
+        727,
+        3591,
+        777
+      ],
+      "new_localized_bbox": [
+        3546,
+        738,
+        3590,
+        784
+      ],
+      "font_size": 42,
+      "stroke_width": 4,
+      "containment": "PASS"
+    }
+  ],
+  "status": "A_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME"
+}

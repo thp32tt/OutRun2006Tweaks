@@ -1,6 +1,6 @@
 {
   "schema_version": 54,
-  "branch": "korean-localization-clean",
+  "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
     "sha": "08e5efb4deea4066c440307ec009c868a30562d3"
@@ -1250,5 +1250,21 @@
     "direct_queue_scope": 126,
     "approved_dds_count": 0,
     "runtime_validation": "PENDING_ISOLATED_DDS_ONLY_INGAME"
+  },
+  "a_recovery01_ff2462bb": {
+    "run": "20261004-A-RECOVERY01",
+    "status": "A_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "candidate_sha256": "9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08",
+    "reworked_elements": 21,
+    "prior_pass_elements_unchanged": 15,
+    "clean_plate_report": "localization/graphics/role_A/20261004-A-RECOVERY01/A_RECOVERY01_CLEAN_PLATE_VALIDATION.json",
+    "final_mask_report": "localization/graphics/role_A/20261004-A-RECOVERY01/A_RECOVERY01_FINAL_MASK_VALIDATION.json",
+    "production_report": "localization/graphics/role_A/20261004-A-RECOVERY01/A_RECOVERY01_FF2462BB_REPORT.json",
+    "runtime_validation": "UNTESTED",
+    "next_a_target": {
+      "index": 53,
+      "asset": "568D3696",
+      "status": "rework_required_zero_pixel_or_artifact"
+    }
   }
 }

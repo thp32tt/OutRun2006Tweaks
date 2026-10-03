@@ -600,3 +600,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Current PASS pending isolated DDS_ONLY in-game: `C4A2937B, 9F060EC1, D6DC1380, 48DEBE77`. Final approved/locked count remains **0**.
 - Remaining full scope: 12 current reworks + 63 localize_text pending production + 47 zoom_review HOLD_STRICT_RECHECK. No build; no VR/FFB; no GPT Library.
 - Report: `localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json`.
+
+## 2026-10-04 A recovery test — FF2462BB clean-plate rework
+- Recovery branch A odd-shard priority index 51 `FF2462BB` reworked from exact HD source.
+- C85 failing 21/21 elements now exact source-bbox containment PASS; 15 prior PASS elements remain byte-identical.
+- 6 elements were repositioned losslessly; 15 were rerendered at native resolution with Noto Sans CJK Bold. No localized raster scaling/resampling was used.
+- Clean-plate source-glyph residue: 0 pixels. Clean-plate and final mask validators: PASS; changed pixels outside target cells/protected regions: 0.
+- Candidate SHA-256: `9e6f0247e54302b0c81d84f24f02ec255af4c027916e3bdfe4726f0839f2de08`. DDS header matches exact HD source.
+- `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
+- Next A priority: odd index 53 `568D3696`.
+- Evidence: `localization/graphics/role_A/20261004-A-RECOVERY01/`.
