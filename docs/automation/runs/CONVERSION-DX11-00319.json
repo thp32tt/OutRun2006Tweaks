@@ -1,18 +1,18 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00319",
-  "production_id": "CONVERSION-DX11-00319",
+  "production_id": "CONVERSION-DXVK-00318",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "3/3",
-  "event_id": "CONVERSION-DX11-00319-E003",
-  "event_type": "retry",
-  "status": "IN_PROGRESS_ATTEMPT3_EXACT_SHA_GATE_PENDING",
-  "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00318-E001",
+  "event_type": "rollover",
+  "status": "IN_PROGRESS_REPAIR_EXACT_SHA_GATE_PENDING",
+  "automation_validation": "LOCAL_STATIC_PASS_REPAIR_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
   "runtime_validation": "UNTESTED",
   "base_sha": "96d4c42ac56626294a44b205c22a417a0545c28b",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "PENDING_REPAIR_RESULT_SHA",
+  "validation_bearing_result_sha": "PENDING_REPAIR_RESULT_SHA",
   "result_marker": "[AUTO:CONVERSION-DX11-00319]",
   "selected_work_item": "DX11_R223_FIXED_FUNCTION_VERTEX_SHADER_COMPILE_EXACT_SAMPLES_GATE",
   "summary": "R223 closes the remaining fixed-function compiler-readiness gap in ExactSamples: the bounded unique-signature probe now requires both the generated R93 vertex shader and R84 pixel shader to compile successfully before a signature can be cached as compiler-exact. NativeDrawPath remains dormant.",
@@ -45,13 +45,15 @@
       "evidence": "Added a diagnostic R93 vertex D3DCompile probe (vs_4_0), retained generated vertex source in the sampled signature for the bounded unique-signature probe, required VS+PS pair compile success before admitting FixedFunctionShaderCompileExactHashes, and extended hosted semantic/static contracts."
     },
     "C3_VALIDATE": {
-      "status": "LOCAL_STATIC_PASS_ATTEMPT3_EXACT_SHA_GATE_PENDING",
-      "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
-      "evidence": "Attempts 1 and 2 were cancelled by same-branch concurrency after static checks passed; no code/test failure was observed. Attempt 3 adds a negative hosted semantic assertion for fail-closed unsupported vertex prototypes, then requires one uninterrupted exact-SHA Backend Conversion Gate."
+      "status": "LOCAL_STATIC_PASS_REPAIR_EXACT_SHA_GATE_PENDING",
+      "automation_validation": "LOCAL_STATIC_PASS_REPAIR_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+      "evidence": "Exact-SHA Gate 37152991657 on 5e69e22f17abc57b7bdde71bc53fed51da975899 passed all static/source checks and Win32 configure but failed Build Win32 because runtime_census.cpp detailed R85 telemetry retained seven stale pre-R223 compileProbe identifiers after the probe was split into pixelCompileProbe/vertexCompileProbe. Repair updates telemetry to live pixel/vertex probes and adds a source-graph guard rejecting stale compileProbe identifiers. N100 source-graph, dormant activation, census analyzer, py_compile and diff checks pass."
     },
     "C4_COMMIT": {
-      "status": "PENDING_ATTEMPT3_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_ATTEMPT3_RESULT_SHA"
+      "status": "MATERIAL_IMPLEMENTATION_AND_TEST_COMMITTED_REPAIR_PENDING_RESULT_SHA",
+      "source_implementation_sha": "08213eb5ceb1498d101e0c88d9df8cc878499114",
+      "material_test_sha": "5e69e22f17abc57b7bdde71bc53fed51da975899",
+      "validation_bearing_result_sha": "PENDING_REPAIR_RESULT_SHA"
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
@@ -60,7 +62,7 @@
     "C6_STATE": {
       "status": "PENDING",
       "state_persisted": false,
-      "exact_next_action": "Publish one attempt-3 material result SHA with the R223 negative semantic assertion, allow only that SHA's Backend Conversion Gate to run, then persist PASS bookkeeping separately with CI skip."
+      "exact_next_action": "Publish the narrow R223 compiler-telemetry repair without CI skip, require its uninterrupted exact-SHA Backend Conversion Gate including readiness smoke, then persist C6 bookkeeping separately with CI skip."
     }
   },
   "regression_assessment": {
@@ -71,27 +73,37 @@
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "controller_dispatch": {
-    "production_id": "CONVERSION-DX11-00319",
-    "event_id": "CONVERSION-DX11-00319-E003",
-    "event_type": "retry",
-    "attempt": "3/3",
-    "source": "CURRENT_USER_QUEUE_RETRY"
+    "production_id": "CONVERSION-DXVK-00318",
+    "event_id": "CONVERSION-DXVK-00318-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_ROLLOVER"
   },
-  "exact_next_action": "Publish one attempt-3 material result SHA with the R223 negative semantic assertion, allow only that SHA's Backend Conversion Gate to run, then persist PASS bookkeeping separately with CI skip.",
-  "retry_history": [
+  "exact_next_action": "Publish the narrow R223 compiler-telemetry repair without CI skip, require its uninterrupted exact-SHA Backend Conversion Gate including readiness smoke, then persist C6 bookkeeping separately with CI skip.",
+  "source_implementation_sha": "08213eb5ceb1498d101e0c88d9df8cc878499114",
+  "implementation_commits": [
+    "08213eb5ceb1498d101e0c88d9df8cc878499114",
+    "5e69e22f17abc57b7bdde71bc53fed51da975899"
+  ],
+  "superseded_gate_history": [
     {
-      "attempt": "1/3",
-      "run_id": 37152497554,
       "result_sha": "08213eb5ceb1498d101e0c88d9df8cc878499114",
-      "conclusion": "cancelled",
-      "evidence": "Static checks and Win32 configure passed; build was externally cancelled by same-branch concurrency before completion."
+      "run_id": 37152497554,
+      "conclusion": "cancelled_by_same_branch_concurrency_before_complete_build",
+      "task_attempt_incremented": false
     },
     {
-      "attempt": "2/3",
-      "run_id": 37152678339,
       "result_sha": "d8628e148aa65bff22c96bda2727ba3042e23658",
-      "conclusion": "cancelled",
-      "evidence": "Static checks passed; configure was externally cancelled by same-branch concurrency. No source/test failure was observed."
+      "run_id": 37152678339,
+      "conclusion": "cancelled_by_same_branch_concurrency_during_configure",
+      "task_attempt_incremented": false
+    },
+    {
+      "result_sha": "5e69e22f17abc57b7bdde71bc53fed51da975899",
+      "run_id": 37152991657,
+      "validate_job_id": 111290537662,
+      "conclusion": "failure",
+      "reason": "stale runtime_census telemetry identifier compileProbe remained after R223 split into pixelCompileProbe/vertexCompileProbe"
     }
   ]
 }

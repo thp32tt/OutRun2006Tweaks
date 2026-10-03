@@ -1,3 +1,5 @@
+[Reading 2799 lines from start (total: 2799 lines, 0 remaining)]
+
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
@@ -1840,14 +1842,28 @@ namespace outrun::vr::dx11
                         spdlog::info(
                             "VR DX11 R85 ffp shader compile#{}: attempted={} succeeded={} hr=0x{:08X} bytecodeHash=0x{:016X} bytecodeBytes={} diagnosticsHash=0x{:016X} diagnosticsBytes={} profile=ps_4_0",
                             unique,
-                            compileProbe.attempted ? 1 : 0,
-                            compileProbe.succeeded ? 1 : 0,
+                            pixelCompileProbe.attempted ? 1 : 0,
+                            pixelCompileProbe.succeeded ? 1 : 0,
                             static_cast<std::uint32_t>(
-                                compileProbe.result),
-                            compileProbe.bytecodeHash,
-                            compileProbe.bytecodeBytes,
-                            compileProbe.diagnosticsHash,
-                            compileProbe.diagnosticsBytes);
+                                pixelCompileProbe.result),
+                            pixelCompileProbe.bytecodeHash,
+                            pixelCompileProbe.bytecodeBytes,
+                            pixelCompileProbe.diagnosticsHash,
+                            pixelCompileProbe.diagnosticsBytes);
+                    }
+                    if (sig.fixedFunctionVertexShaderPrototypeGenerated)
+                    {
+                        spdlog::info(
+                            "VR DX11 R223 ffp vertex shader compile#{}: attempted={} succeeded={} hr=0x{:08X} bytecodeHash=0x{:016X} bytecodeBytes={} diagnosticsHash=0x{:016X} diagnosticsBytes={} profile=vs_4_0",
+                            unique,
+                            vertexCompileProbe.attempted ? 1 : 0,
+                            vertexCompileProbe.succeeded ? 1 : 0,
+                            static_cast<std::uint32_t>(
+                                vertexCompileProbe.result),
+                            vertexCompileProbe.bytecodeHash,
+                            vertexCompileProbe.bytecodeBytes,
+                            vertexCompileProbe.diagnosticsHash,
+                            vertexCompileProbe.diagnosticsBytes);
                     }
 
                     for (std::size_t stageIndex = 0;
@@ -2783,3 +2799,5 @@ namespace outrun::vr::dx11
         maybe_log();
     }
 }
+
+[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]

@@ -1,3 +1,5 @@
+[Reading 8907 lines from start (total: 8907 lines, 0 remaining)]
+
 #!/usr/bin/env python3
 """Fail closed when checked-in CMake omits native DX11 translation/census TUs."""
 
@@ -8877,6 +8879,27 @@ def main() -> None:
             + ", ".join(missing_r223_vertex_compile_exactness)
         )
 
+    r223_compile_log_contract = [
+        ("pixelCompileProbe.attempted ? 1 : 0",
+         "R223 pixel compiler telemetry uses the live probe"),
+        ("vertexCompileProbe.attempted ? 1 : 0",
+         "R223 vertex compiler telemetry uses the live probe"),
+        ("profile=vs_4_0", "R223 vertex compiler telemetry profile"),
+    ]
+    missing_r223_compile_log = [
+        meaning for token, meaning in r223_compile_log_contract
+        if token not in RUNTIME_CENSUS
+    ]
+    if "compileProbe." in RUNTIME_CENSUS:
+        missing_r223_compile_log.append(
+            "stale pre-R223 compileProbe identifier remains in runtime census"
+        )
+    if missing_r223_compile_log:
+        raise SystemExit(
+            "DX11 R223 compiler telemetry contract drift: "
+            + ", ".join(missing_r223_compile_log)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
@@ -8884,3 +8907,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
