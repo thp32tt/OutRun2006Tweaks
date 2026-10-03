@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00331",
+  "production_id": "CONVERSION-DXVK-00330",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00330-E001",
+  "event_type": "retry",
+  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "0094fa2723ccb4a1ec1210b5191c95f1c82b6d04",
+  "result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX11-00331]",
+  "selected_work_item": "DX11_R229_BOOTSTRAP_SKIP_OUTCOME_PROVENANCE",
+  "summary": "R229 preserves explicit R72 bootstrap-probe skip telemetry in the offline DX11 census analyzer. Per-log reports now distinguish a fail-closed bootstrap skip caused by compatibility/adapter-LUID gating from genuinely missing or truncated bootstrap evidence, while keeping NativeDrawPath dormant and all evidence diagnostic-only.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00331.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 HEAD 0094fa2723ccb4a1ec1210b5191c95f1c82b6d04. Read AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md and Set05, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, docs/VR_AUTODEV_STATE.json, docs/VR_RUN_STATE.md, docs/VR_REGRESSION_KNOWLEDGE.json, docs/VR_PROBLEM_HISTORY.md and recent Issue #14 production ledger. R228/00329 is durable and was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R72 runtime telemetry explicitly logs 'bootstrap probe skipped: compatible=<0|1> adapterLuidValid=<0|1>' when the native bootstrap probe is fail-closed before initialize(), but analyze_dx11_census.py ignored that record. R228 therefore made an explicit compatibility/LUID rejection indistinguishable from absent/truncated bootstrap evidence in multi-log coverage.",
+      "review_lenses": {
+        "architecture": "Keep the fix in the offline census analyzer/test/verifier path; no renderer, DX9Ex baseline, OpenXR transport or native draw routing changes.",
+        "ownership_lifetime": "No D3D9/D3D11 COM, Reset, resource generation, fence or consumer-ACK lifetime changes.",
+        "stereo_correctness": "No WVP, projection, HUD, sky/effects, recenter or menu behavior changes.",
+        "performance": "Offline parsing/report aggregation only; runtime hot path unchanged.",
+        "adversarial": "Two recognized logs are used: one completed bootstrap probe and one explicit skipped probe. The analyzer must preserve the skip reason and count both logs as having a bootstrap outcome without claiming both completed a bootstrap probe or enabling activation."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added BOOTSTRAP_SKIP_RE; BootstrapSkipped and LatestBootstrapSkipByLog provenance; LogsWithBootstrapSkip/LogsWithBootstrapOutcome and explicit outcome-completeness flags; regression fixture for one ready and one explicitly skipped log; source-graph drift guards. Existing AllSourceLogsHaveBootstrap remains false for a skipped probe, DiagnosticOnly remains true, ActivationProof remains false, and NativeDrawPathActivationAllowed remains false."
+    },
+    "C3_VALIDATE": {
+      "status": "LOCAL_STATIC_PASS_EXACT_SHA_GATE_PENDING",
+      "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+      "evidence": "TDD RED on the base analyzer showed no BootstrapSkipped or LatestBootstrapSkipByLog keys and treated the explicit skip as missing bootstrap evidence. GREEN local validation passed py_compile, test_analyze_dx11_census.py, verify_dx11_source_graph.py, verify_dx11_activation_boundary.py, verify_dx11_dual_source_contract.py, verify_dx11_native_transport_contract.py, verify_vr_backend_disasm_contract.py, test_dx11_static_surface_contract.py, dx11_native_static_surface_contract_check.py with CI-equivalent paths, verify_vr_proven_baseline.py (44 guards), custom R229 two-log fixture, and git diff --check."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA_PUBLICATION",
+      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census analyzer evidence-integrity/reporting change only; no runtime binary behavior or distributable package identity change intended."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false,
+      "exact_next_action": "Publish the R229 material result without CI skip, require its exact-SHA Backend Conversion Gate, then persist PASS task/lane bookkeeping separately while keeping RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "regression_assessment": {
+    "related_key": "DX11_R229_BOOTSTRAP_SKIP_OUTCOME_PROVENANCE",
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "evidence": "No matching runtime regression riskPath/problem-history ownership for tools/analyze_dx11_census.py, tools/test_analyze_dx11_census.py or tools/verify_dx11_source_graph.py. Changed paths are offline analyzer/test/verifier plus task bookkeeping only."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00330",
+    "event_id": "CONVERSION-DXVK-00330-E001",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Publish the R229 bootstrap-skip outcome provenance material result without CI skip and require its exact-SHA Backend Conversion Gate."
+}

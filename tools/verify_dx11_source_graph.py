@@ -9025,6 +9025,37 @@ def main() -> None:
             + ", ".join(missing_r228_multi_log_startup_bootstrap_coverage)
         )
 
+    r229_bootstrap_skip_outcome_contract = [
+        ("BOOTSTRAP_SKIP_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R229 explicit bootstrap-skip parser"),
+        ("bootstrap_skipped: list[dict] = []",
+         DX11_CENSUS_ANALYZER, "R229 bootstrap-skip evidence list"),
+        ("latest_bootstrap_skip_by_log: dict[str, dict] = {}",
+         DX11_CENSUS_ANALYZER, "R229 per-log latest bootstrap-skip map"),
+        ('"LogsWithBootstrapSkip": len(latest_bootstrap_skip_by_log)',
+         DX11_CENSUS_ANALYZER, "R229 bootstrap-skip coverage accounting"),
+        ('"AllSourceLogsHaveBootstrapOutcome": all_source_logs_have_bootstrap_outcome',
+         DX11_CENSUS_ANALYZER, "R229 explicit bootstrap outcome completeness"),
+        ('"BootstrapSkipped": bootstrap_skipped',
+         DX11_CENSUS_ANALYZER, "R229 bootstrap-skip report export"),
+        ("r229_bootstrap_skip_outcome = run_cases(",
+         DX11_CENSUS_ANALYZER_TEST, "R229 bootstrap-skip multi-log regression fixture"),
+        ("VR DX11 R72 bootstrap probe skipped: compatible=0 adapterLuidValid=1",
+         DX11_CENSUS_ANALYZER_TEST, "R229 explicit skip telemetry fixture"),
+        ('"LogsWithBootstrapOutcome": 2',
+         DX11_CENSUS_ANALYZER_TEST, "R229 explicit outcome completeness assertion"),
+    ]
+    missing_r229_bootstrap_skip_outcome = [
+        meaning
+        for token, source, meaning in r229_bootstrap_skip_outcome_contract
+        if token not in source
+    ]
+    if missing_r229_bootstrap_skip_outcome:
+        raise SystemExit(
+            "DX11 R229 bootstrap-skip outcome drift: "
+            + ", ".join(missing_r229_bootstrap_skip_outcome)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

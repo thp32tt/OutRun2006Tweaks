@@ -116,6 +116,10 @@ BOOTSTRAP_RE = re.compile(
     r"selectedLuidValid=(?P<selectedLuidValid>[01]) "
     r"selectedLuid=(?P<luidHigh>[0-9A-Fa-f]{8}):(?P<luidLow>[0-9A-Fa-f]{8})"
 )
+BOOTSTRAP_SKIP_RE = re.compile(
+    r"VR DX11 R72 bootstrap probe skipped: compatible=(?P<compatible>[01]) "
+    r"adapterLuidValid=(?P<adapterLuidValid>[01])"
+)
 
 STARTUP_RE = re.compile(
     r"VR DX11 R71 census: observed=(?P<observed>[01]) "
@@ -382,6 +386,7 @@ def main() -> int:
 
     startup: list[dict] = []
     bootstrap: list[dict] = []
+    bootstrap_skipped: list[dict] = []
     summaries: list[dict] = []
     # R225: runtime signature ids are insertion-order ordinals and restart for
     # every process. Scope every detail/evidence record by source log so two
@@ -442,6 +447,17 @@ def main() -> int:
                 }
                 bootstrap_entry["source_log"] = source_log
                 bootstrap.append(bootstrap_entry)
+                continue
+
+            match = BOOTSTRAP_SKIP_RE.search(line)
+            if match:
+                data = match.groupdict()
+                bootstrap_skip_entry = {
+                    "compatible": bool(int(data["compatible"])),
+                    "adapter_luid_valid": bool(int(data["adapterLuidValid"])),
+                    "source_log": source_log,
+                }
+                bootstrap_skipped.append(bootstrap_skip_entry)
                 continue
 
             match = SUMMARY_RE.search(line)
@@ -626,20 +642,38 @@ def main() -> int:
     latest_bootstrap_by_log: dict[str, dict] = {}
     for entry in bootstrap:
         latest_bootstrap_by_log[entry["source_log"]] = entry
+    # R229: a bootstrap skip is an explicit fail-closed runtime outcome, not
+    # missing/truncated evidence. Preserve it separately so multi-log reports
+    # can distinguish "probe skipped" from "no bootstrap outcome observed".
+    latest_bootstrap_skip_by_log: dict[str, dict] = {}
+    for entry in bootstrap_skipped:
+        latest_bootstrap_skip_by_log[entry["source_log"]] = entry
+    bootstrap_outcome_logs = set(latest_bootstrap_by_log) | set(
+        latest_bootstrap_skip_by_log
+    )
     all_source_logs_have_startup = bool(source_logs) and (
         len(latest_startup_by_log) == len(source_logs)
     )
     all_source_logs_have_bootstrap = bool(source_logs) and (
         len(latest_bootstrap_by_log) == len(source_logs)
     )
+    all_source_logs_have_bootstrap_outcome = bool(source_logs) and (
+        len(bootstrap_outcome_logs) == len(source_logs)
+    )
     startup_bootstrap_coverage = {
         "SourceLogs": len(source_logs),
         "LogsWithStartup": len(latest_startup_by_log),
         "LogsWithBootstrap": len(latest_bootstrap_by_log),
+        "LogsWithBootstrapSkip": len(latest_bootstrap_skip_by_log),
+        "LogsWithBootstrapOutcome": len(bootstrap_outcome_logs),
         "AllSourceLogsHaveStartup": all_source_logs_have_startup,
         "AllSourceLogsHaveBootstrap": all_source_logs_have_bootstrap,
+        "AllSourceLogsHaveBootstrapOutcome": all_source_logs_have_bootstrap_outcome,
         "AllSourceLogsHaveStartupAndBootstrap": bool(
             all_source_logs_have_startup and all_source_logs_have_bootstrap
+        ),
+        "AllSourceLogsHaveStartupAndBootstrapOutcome": bool(
+            all_source_logs_have_startup and all_source_logs_have_bootstrap_outcome
         ),
         "DiagnosticOnly": True,
         "ActivationProof": False,
@@ -898,8 +932,10 @@ def main() -> int:
         "SourceLogs": source_logs,
         "Startup": startup,
         "Bootstrap": bootstrap,
+        "BootstrapSkipped": bootstrap_skipped,
         "LatestStartupByLog": latest_startup_by_log,
         "LatestBootstrapByLog": latest_bootstrap_by_log,
+        "LatestBootstrapSkipByLog": latest_bootstrap_skip_by_log,
         "StartupBootstrapCoverage": startup_bootstrap_coverage,
         "LatestSummary": latest,
         "LatestSummariesByLog": latest_summaries_by_log,

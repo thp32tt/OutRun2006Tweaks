@@ -802,9 +802,13 @@ def main() -> int:
         "SourceLogs": 2,
         "LogsWithStartup": 2,
         "LogsWithBootstrap": 1,
+        "LogsWithBootstrapSkip": 0,
+        "LogsWithBootstrapOutcome": 1,
         "AllSourceLogsHaveStartup": True,
         "AllSourceLogsHaveBootstrap": False,
+        "AllSourceLogsHaveBootstrapOutcome": False,
         "AllSourceLogsHaveStartupAndBootstrap": False,
+        "AllSourceLogsHaveStartupAndBootstrapOutcome": False,
         "DiagnosticOnly": True,
         "ActivationProof": False,
     }
@@ -813,6 +817,52 @@ def main() -> int:
             "StartupBootstrapCoverage"
         ]["AllSourceLogsHaveStartupAndBootstrap"]
         is False
+    )
+
+    r229_bootstrap_skip_outcome = run_cases(
+        {
+            "session-a-ready.log": (
+                "VR DX11 R71 census: observed=1 size=1280x720 sourceFormat=21 "
+                "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+                "VR DX11 R72 bootstrap probe: ready=1 featureLevel=0xB000 "
+                "selectedLuidValid=1 selectedLuid=AAAAAAAA:11111111\n"
+            ),
+            "session-b-skipped.log": (
+                "VR DX11 R71 census: observed=1 size=1920x1080 sourceFormat=22 "
+                "nativeFormat=29 msaa=4 bootstrapCompatible=0\n"
+                "VR DX11 R72 bootstrap probe skipped: compatible=0 adapterLuidValid=1\n"
+            ),
+        }
+    )
+    assert r229_bootstrap_skip_outcome["BootstrapSkipped"] == [
+        {
+            "compatible": False,
+            "adapter_luid_valid": True,
+            "source_log": "session-b-skipped.log",
+        }
+    ]
+    assert set(r229_bootstrap_skip_outcome["LatestBootstrapSkipByLog"]) == {
+        "session-b-skipped.log"
+    }
+    assert r229_bootstrap_skip_outcome["StartupBootstrapCoverage"] == {
+        "SourceLogs": 2,
+        "LogsWithStartup": 2,
+        "LogsWithBootstrap": 1,
+        "LogsWithBootstrapSkip": 1,
+        "LogsWithBootstrapOutcome": 2,
+        "AllSourceLogsHaveStartup": True,
+        "AllSourceLogsHaveBootstrap": False,
+        "AllSourceLogsHaveBootstrapOutcome": True,
+        "AllSourceLogsHaveStartupAndBootstrap": False,
+        "AllSourceLogsHaveStartupAndBootstrapOutcome": True,
+        "DiagnosticOnly": True,
+        "ActivationProof": False,
+    }
+    assert (
+        r229_bootstrap_skip_outcome["ActivationEvidence"][
+            "StartupBootstrapCoverage"
+        ]["AllSourceLogsHaveBootstrapOutcome"]
+        is True
     )
 
     r106 = run_case(
