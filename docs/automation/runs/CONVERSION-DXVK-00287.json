@@ -2,7 +2,7 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DXVK-00287",
   "production_id": "CONVERSION-DXVK-00287",
-  "event_id": "CONVERSION-DXVK-00287-E002",
+  "event_id": "CONVERSION-DXVK-00287-E003",
   "event_type": "rollover",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
@@ -99,7 +99,7 @@
     }
   },
   "next_action": "Exact-decode only complete canonical instructions in the validated continuation_74 raw window 0x001834A9..0x001834E9. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, carry unresolved forward-target debt fail-closed, and keep function/render/HUD/runtime semantics unresolved.",
-  "chat_rollover": 3,
+  "chat_rollover": 4,
   "rollover_is_retry": false,
   "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
   "metadata_correction": {
@@ -122,5 +122,18 @@
     "semantic_promotion": "NONE",
     "ownership_effect": "NONE"
   },
-  "exact_next_action": "Exact-decode only complete canonical instructions in the validated continuation_74 raw window 0x001834A9..0x001834E9. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, carry unresolved forward-target debt fail-closed, and keep function/render/HUD/runtime semantics unresolved."
+  "exact_next_action": "Exact-decode only complete canonical instructions in the validated continuation_74 raw window 0x001834A9..0x001834E9. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, carry unresolved forward-target debt fail-closed, and keep function/render/HUD/runtime semantics unresolved.",
+  "rollover_events": [
+    {
+      "event_id": "CONVERSION-DXVK-00287-E002",
+      "event_type": "rollover",
+      "chat_rollover": 3
+    },
+    {
+      "event_id": "CONVERSION-DXVK-00287-E003",
+      "event_type": "rollover",
+      "chat_rollover": 4,
+      "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
+    }
+  ]
 }
