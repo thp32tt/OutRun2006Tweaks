@@ -921,6 +921,12 @@ namespace OutRunVRStereo
         VRStereoR33DispatchHook VRStereoR33DispatchHook::instance;
     }
 
+    inline OutRunVR::RuntimeEligibility::InstallState
+    R33InstallStatus() noexcept
+    {
+        return R33InstallState.load(std::memory_order_acquire);
+    }
+
     inline void FailClosedDepthStencilState() noexcept
     {
         R33InvalidateDepthStencilCache();
