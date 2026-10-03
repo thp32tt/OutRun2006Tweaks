@@ -8629,6 +8629,37 @@ def main() -> None:
             + ", ".join(missing_r177_surface_msaa_census)
         )
 
+    r212_rt0_color_write_census_contract = [
+        ("read(D3DRS_COLORWRITEENABLE, out.colorWriteEnable);",
+         D3D9_RENDER_STATE_CAPTURE, "R212 live RT0 color-write capture"),
+        ("rt.RenderTargetWriteMask = translate_color_write_mask(",
+         PIPELINE_TRANSLATION_CPP, "R212 exact RT0 write-mask translation"),
+        ("bool rt0ColorWriteObservationComplete{};", RUNTIME_CENSUS,
+         "R212 RT0 color-write observation identity"),
+        ("DWORD colorWriteEnable =", RUNTIME_CENSUS,
+         "R212 RT0 color-write value identity"),
+        ("hash, sig.rt0ColorWriteObservationComplete ? 1u : 0u",
+         RUNTIME_CENSUS, "R212 RT0 observation hash"),
+        ("hash = hash_mix(hash, sig.colorWriteEnable);",
+         RUNTIME_CENSUS, "R212 RT0 write-mask hash"),
+        ("signature.rt0ColorWriteObservationComplete =",
+         RUNTIME_CENSUS, "R212 RT0 observation propagation"),
+        ("signature.colorWriteEnable = source.colorWriteEnable;",
+         RUNTIME_CENSUS, "R212 RT0 write-mask propagation"),
+        ("VR DX11 R212 RT0 color-write state#{}",
+         RUNTIME_CENSUS, "R212 detailed RT0 color-write telemetry"),
+    ]
+    missing_r212_rt0_color_write_census = [
+        meaning
+        for token, source, meaning in r212_rt0_color_write_census_contract
+        if token not in source
+    ]
+    if missing_r212_rt0_color_write_census:
+        raise SystemExit(
+            "DX11 R212 RT0 color-write census identity drift: "
+            + ", ".join(missing_r212_rt0_color_write_census)
+        )
+
     mrt_color_write_contract = [
         ("std::array<DWORD, 3> additionalColorWriteEnable{",
          D3D9_DRAW_STATE_HPP, "tracked MRT color-write fields"),

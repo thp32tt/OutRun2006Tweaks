@@ -324,6 +324,15 @@ namespace outrun::vr::dx11
             // R170: preserve all eight D3DRS_WRAP stage masks in draw identity.
             bool textureCoordinateWrapObservationComplete{};
             std::array<DWORD, 8> textureCoordinateWrap{};
+            // R212: RT0 COLORWRITEENABLE is translated exactly into the D3D11
+            // blend descriptor. Preserve it in sampled draw identity so draws
+            // that differ only by destination channel writes cannot alias.
+            bool rt0ColorWriteObservationComplete{};
+            DWORD colorWriteEnable =
+                D3DCOLORWRITEENABLE_RED |
+                D3DCOLORWRITEENABLE_GREEN |
+                D3DCOLORWRITEENABLE_BLUE |
+                D3DCOLORWRITEENABLE_ALPHA;
             bool mrtColorWriteObservationComplete{};
             std::array<DWORD, 3> additionalColorWriteEnable{
                 0x0000000Fu, 0x0000000Fu, 0x0000000Fu
@@ -577,6 +586,9 @@ namespace outrun::vr::dx11
                 hash, sig.textureCoordinateWrapObservationComplete ? 1u : 0u);
             for (const auto wrap : sig.textureCoordinateWrap)
                 hash = hash_mix(hash, wrap);
+            hash = hash_mix(
+                hash, sig.rt0ColorWriteObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.colorWriteEnable);
             hash = hash_mix(
                 hash, sig.mrtColorWriteObservationComplete ? 1u : 0u);
             for (const auto mask : sig.additionalColorWriteEnable)
@@ -1619,6 +1631,11 @@ namespace outrun::vr::dx11
                     unique,
                     sig.stream0Frequency);
                 spdlog::info(
+                    "VR DX11 R212 RT0 color-write state#{}: observed={} mask=0x{:08X}",
+                    unique,
+                    sig.rt0ColorWriteObservationComplete ? 1 : 0,
+                    sig.colorWriteEnable);
+                spdlog::info(
                     "VR DX11 MRT color-write state#{}: observed={} masks=[0x{:08X},0x{:08X},0x{:08X}]",
                     unique,
                     sig.mrtColorWriteObservationComplete ? 1 : 0,
@@ -2391,6 +2408,9 @@ namespace outrun::vr::dx11
         signature.textureCoordinateWrapObservationComplete =
             captured && source.complete;
         signature.textureCoordinateWrap = source.textureCoordinateWrap;
+        signature.rt0ColorWriteObservationComplete =
+            captured && source.complete;
+        signature.colorWriteEnable = source.colorWriteEnable;
         signature.mrtColorWriteObservationComplete =
             captured && source.complete;
         signature.additionalColorWriteEnable =
