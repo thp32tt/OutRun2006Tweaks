@@ -11,7 +11,7 @@
   "validation_bearing_result_sha": "a2b839f1a71720631685a135ede339f7a59afc6e",
   "attempt": "1/3",
   "status": "COMPLETE",
-  "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_DISASM_CONTRACT",
+  "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
@@ -86,10 +86,16 @@
         "safe_reactivation_contract": "success",
         "application_space_recenter_contract": "success",
         "configure_win32": "success",
-        "vc2022_workaround": "success"
+        "vc2022_workaround": "success",
+        "build_win32": "success",
+        "verify_binary_exists": "success",
+        "upload_artifact": "success"
       },
-      "full_job_status_at_state_write": "IN_PROGRESS_BUILD_WIN32_NOT_CLAIMED_COMPLETE",
-      "full_build_required_for_this_unit": false
+      "full_job_status_at_state_write": "SUCCESS",
+      "full_build_required_for_this_unit": false,
+      "conclusion": "success",
+      "artifact_id": 11277625939,
+      "artifact_digest": "sha256:e5028ca96a74174208cdfd03a90d36abbf338ca7b557e185d493ab2795fa4ca2"
     }
   },
   "pipeline": {
@@ -107,11 +113,11 @@
     },
     "C3_VALIDATE": {
       "status": "COMPLETE",
-      "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence 37131581441/111227592540 completed SUCCESS with artifact 11277146341. HUD Inspector static-exe-analysis 37131584862/111227602625 completed SUCCESS. Backend Conversion Gate 37131581487/111227592841 passed all conversion/static contract steps through Win32 configure and dependency workaround; its full Win32 build was still in progress at state write and is not required for this analyzer-only static proof. No HMD/game runtime test was performed."
+      "evidence": "Exact-SHA DXVK Canonical Disassembly Evidence 37131581441/111227592540 completed SUCCESS with artifact 11277146341. HUD Inspector static-exe-analysis 37131584862/111227602625 completed SUCCESS. Backend Conversion Gate 37131581487/111227592841 completed SUCCESS including Win32 configure/build, binary verification and artifact 11277625939. No HMD/game runtime test was performed."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
-      "evidence": "Material result commit a2b839f1a71720631685a135ede339f7a59afc6e contains exact marker [AUTO:CONVERSION-DXVK-00297] and no CI-skip directive. Issue #14 comment 5970378799 records implementation and exact-SHA validation scope."
+      "evidence": "Material result commit a2b839f1a71720631685a135ede339f7a59afc6e contains exact marker [AUTO:CONVERSION-DXVK-00297] and no CI-skip directive. Issue #14 comments 5970378799 and 5970403277 record implementation plus final exact-SHA validation."
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
@@ -151,8 +157,9 @@
   "blocker": "No automatic static-validation blocker remains for this bounded analyzer proof. Runtime acceptance remains explicitly untested and separate.",
   "next_action": "Capture the next canonical raw provenance window from the exact instruction boundary 0x00183568 using the initial 64-byte window 0x00183568..0x001835A8. Carry unresolved targets 0x001835A1/0x001835AC/0x001835B3/0x001835BA/0x001835C1 fail-closed, exact-decode only proven bytes, and keep function/render/HUD/runtime semantics unresolved.",
   "exact_next_action": "Capture the next canonical raw provenance window from the exact instruction boundary 0x00183568 using the initial 64-byte window 0x00183568..0x001835A8. Carry unresolved targets 0x001835A1/0x001835AC/0x001835B3/0x001835BA/0x001835C1 fail-closed, exact-decode only proven bytes, and keep function/render/HUD/runtime semantics unresolved.",
-  "validated_at_kst": "2026-10-04T00:04:37+09:00",
+  "validated_at_kst": "2026-10-04T00:05:00+09:00",
   "chat_rollover": 2,
   "rollover_is_retry": false,
-  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+  "issue14_validation_comment_id": 5970403277
 }
