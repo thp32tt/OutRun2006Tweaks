@@ -1,5 +1,3 @@
-[Reading 2799 lines from start (total: 2799 lines, 0 remaining)]
-
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
@@ -2799,5 +2797,3 @@ namespace outrun::vr::dx11
         maybe_log();
     }
 }
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
