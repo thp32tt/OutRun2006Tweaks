@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00315",
-  "production_id": "CONVERSION-DX11-00315",
+  "production_id": "CONVERSION-DXVK-00314",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "event_id": "CONVERSION-DX11-00315-E001",
+  "event_id": "CONVERSION-DXVK-00314-E001",
   "event_type": "rollover",
   "status": "COMPLETE",
   "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R221_SHADER_COMPILE_COVERAGE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
@@ -55,7 +55,7 @@
       ],
       "validation_bearing_result_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
       "issue14_implementation_comment_id": 5972830799,
-      "issue14_validation_comment_id": 5972895805
+      "issue14_validation_comment_id": 5972893328
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
@@ -65,8 +65,8 @@
       "status": "COMPLETE",
       "state_persisted": true,
       "issue14_implementation_comment_id": 5972830799,
-      "issue14_validation_comment_id": 5972895805,
-      "dispatch_metadata_correction_comment_id": 5972895805,
+      "issue14_validation_comment_id": 5972893328,
+      "dispatch_metadata_correction_comment_id": 5972914979,
       "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Preserve R221 compile-readiness coverage separation and R213-R220 exactness protections; programmable shader translation, native draw activation and Quest 3/VDXR runtime parity remain fail-closed until their own evidence gates pass."
     }
   },
@@ -78,8 +78,8 @@
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "controller_dispatch": {
-    "production_id": "CONVERSION-DX11-00315",
-    "event_id": "CONVERSION-DX11-00315-E001",
+    "production_id": "CONVERSION-DXVK-00314",
+    "event_id": "CONVERSION-DXVK-00314-E001",
     "event_type": "rollover",
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE_ROLLOVER",
@@ -87,8 +87,8 @@
     "source_implementation_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
     "validation_bearing_result_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
     "implementation_comment_id": 5972830799,
-    "validation_comment_id": 5972895805,
-    "dispatch_metadata_correction_comment_id": 5972895805
+    "validation_comment_id": 5972893328,
+    "dispatch_metadata_correction_comment_id": 5972914979
   },
   "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Preserve R221 compile-readiness coverage separation and R213-R220 exactness protections; programmable shader translation, native draw activation and Quest 3/VDXR runtime parity remain fail-closed until their own evidence gates pass.",
   "source_implementation_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
@@ -97,7 +97,8 @@
   ],
   "issue14_comment_ids": [
     5972830799,
-    5972895805
+    5972893328,
+    5972914979
   ],
   "release_gate": {
     "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
@@ -110,17 +111,18 @@
     "artifact_digest": "sha256:99e66142660bb74b4ac1e206b3f012d50a5259cc6d258338e00b6e54cf4de3dd"
   },
   "dispatch_metadata_correction": {
-    "authoritative_production_id": "CONVERSION-DX11-00315",
-    "authoritative_event_id": "CONVERSION-DX11-00315-E001",
+    "authoritative_production_id": "CONVERSION-DXVK-00314",
+    "authoritative_event_id": "CONVERSION-DXVK-00314-E001",
     "authoritative_event_type": "rollover",
     "authoritative_attempt": "1/3",
     "corrected_from": {
-      "production_id": "CONVERSION-DXVK-00314",
-      "event_id": "CONVERSION-DXVK-00314-E001",
+      "production_id": "CONVERSION-DX11-00315",
+      "event_id": "CONVERSION-DX11-00315-E001",
       "event_type": "rollover",
       "attempt": "1/3"
     },
-    "evidence_comment_id": 5972895805,
+    "evidence_comment_id": 5972914979,
+    "superseded_issue_comment_id": 5972895805,
     "material_and_validation_bearing_sha_unchanged": true
   }
 }

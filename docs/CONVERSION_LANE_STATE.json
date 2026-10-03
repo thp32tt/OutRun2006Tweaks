@@ -52,8 +52,8 @@
   },
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00315",
-    "production_id": "CONVERSION-DX11-00315",
-    "event_id": "CONVERSION-DX11-00315-E001",
+    "production_id": "CONVERSION-DXVK-00314",
+    "event_id": "CONVERSION-DXVK-00314-E001",
     "event_type": "rollover",
     "attempt": "1/3",
     "dispatch_source": "CURRENT_USER_QUEUE_ROLLOVER",
@@ -63,15 +63,15 @@
     "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R221_SHADER_COMPILE_COVERAGE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "issue14_comment_id": 5972895805,
+    "issue14_comment_id": 5972914979,
     "implementation_comment_id": 5972830799,
-    "validation_comment_id": 5972895805,
+    "validation_comment_id": 5972893328,
     "validation_run_id": 37148931205,
     "validation_job_id": 111278512220,
     "readiness_smoke_job_id": 111279448754,
     "artifact_id": 11282803468,
     "artifact_digest": "sha256:99e66142660bb74b4ac1e206b3f012d50a5259cc6d258338e00b6e54cf4de3dd",
-    "dispatch_metadata_correction_comment_id": 5972895805
+    "dispatch_metadata_correction_comment_id": 5972914979
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00315. Exact-SHA hosted validation passed for 823e91150ab33d8584bb81fc09d750cae518cb79, including R221 shader-compile coverage/source-graph/dormant-activation/census checks, Win32 build/binary and DX11 readiness smoke. This is diagnostic/source readiness evidence, not in-game/HMD proof.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before native draw activation or visual/runtime correctness claims.",
@@ -1747,8 +1747,8 @@
     {
       "unit_id": "DX11_R221_FIXED_FUNCTION_SHADER_COMPILE_COVERAGE_CAP_GUARD",
       "task_id": "CONVERSION-DX11-00315",
-      "production_id": "CONVERSION-DX11-00315",
-      "event_id": "CONVERSION-DX11-00315-E001",
+      "production_id": "CONVERSION-DXVK-00314",
+      "event_id": "CONVERSION-DXVK-00314-E001",
       "event_type": "rollover",
       "attempt": "1/3",
       "base_sha": "68d59edfb7af151a4d2039a5d98bc7cc24c2179d",
@@ -1763,21 +1763,21 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "packaging_status": "NOT_REQUIRED_DORMANT_CENSUS_DIAGNOSTIC_ONLY",
-      "issue14_comment_id": 5972895805,
+      "issue14_comment_id": 5972914979,
       "implementation_comment_id": 5972830799,
-      "validation_comment_id": 5972895805,
+      "validation_comment_id": 5972893328,
       "validation_run_id": 37148931205,
       "validation_job_id": 111278512220,
       "readiness_smoke_job_id": 111279448754,
       "artifact_id": 11282803468,
       "artifact_digest": "sha256:99e66142660bb74b4ac1e206b3f012d50a5259cc6d258338e00b6e54cf4de3dd",
-      "dispatch_metadata_correction_comment_id": 5972895805
+      "dispatch_metadata_correction_comment_id": 5972914979
     }
   ],
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00315",
-    "production_id": "CONVERSION-DX11-00315",
-    "event_id": "CONVERSION-DX11-00315-E001",
+    "production_id": "CONVERSION-DXVK-00314",
+    "event_id": "CONVERSION-DXVK-00314-E001",
     "event_type": "rollover",
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE_ROLLOVER",
@@ -1785,13 +1785,14 @@
     "source_implementation_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
     "validation_bearing_result_sha": "823e91150ab33d8584bb81fc09d750cae518cb79",
     "implementation_comment_id": 5972830799,
-    "validation_comment_id": 5972895805,
-    "dispatch_metadata_correction_comment_id": 5972895805,
+    "validation_comment_id": 5972893328,
+    "dispatch_metadata_correction_comment_id": 5972914979,
     "dispatch_metadata_correction": {
-      "corrected_from_production_id": "CONVERSION-DXVK-00314",
-      "corrected_from_event_id": "CONVERSION-DXVK-00314-E001",
+      "corrected_from_production_id": "CONVERSION-DX11-00315",
+      "corrected_from_event_id": "CONVERSION-DX11-00315-E001",
       "corrected_from_event_type": "rollover",
       "corrected_from_attempt": "1/3",
+      "superseded_issue_comment_id": 5972895805,
       "material_and_validation_bearing_sha_unchanged": true
     }
   }
