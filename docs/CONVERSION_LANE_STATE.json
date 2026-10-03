@@ -58,16 +58,18 @@
     "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "issue14_comment_id": 5970820470,
+    "issue14_comment_id": 5970725189,
     "validation_run_id": 37134564287,
     "validation_job_id": 111236341808,
     "readiness_smoke_job_id": 111237313421,
     "artifact_id": 11278551482,
-    "artifact_digest": "sha256:3b308a4a04a823c04b6fff4f5b7f394fc848cf1eb7e0115139c28a4e35753bdf"
+    "artifact_digest": "sha256:3b308a4a04a823c04b6fff4f5b7f394fc848cf1eb7e0115139c28a4e35753bdf",
+    "validation_comment_id": 5970821437,
+    "authoritative_metadata_correction_comment_id": 5970840152
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00300. Exact-SHA hosted validation passed for 3670d3ed6b072c4203e1e40b7de590d7235b95ad, including source/static checks, Win32 build/binary and DX11 readiness smoke; this is not in-game/HMD proof.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation or visual/runtime correctness claims.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve R213 dynamic-output observation fail-closed ExactSamples gating and prior retained semantics; fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for one new independent dormant DX11 source/static gap. Runtime parity remains separately required.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve the R213 dynamic-output observation fail-closed ExactSamples gate and prior retained exactness work; fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for one new independent dormant DX11 source/static gap. Runtime parity remains separately required.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1506,7 +1508,15 @@
       "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
-      "native_draw_path_activation_changed": false
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5970725189,
+      "validation_comment_id": 5970821437,
+      "authoritative_metadata_correction_comment_id": 5970840152,
+      "validation_run_id": 37134564287,
+      "validation_job_id": 111236341808,
+      "readiness_smoke_job_id": 111237313421,
+      "artifact_id": 11278551482,
+      "artifact_digest": "sha256:3b308a4a04a823c04b6fff4f5b7f394fc848cf1eb7e0115139c28a4e35753bdf"
     }
   ]
 }
