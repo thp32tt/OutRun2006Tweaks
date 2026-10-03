@@ -1,9 +1,11 @@
 # Korean Localization Automation Contract
 
-This is the canonical contract for the N100 A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, localization/WORKLOG.md, localization/progress.json, localization/resume_state.json, localization/graphics/README.md and localization/graphics/ORIENTATION_POLICY.md. Repository state on korean-localization-clean is the only work state; do not use GPT Library as a work store.
+> Recovery baseline: 2026-09-28 10:12 KST (`11631c5f12037bcd01cda1af57ec9bc564af4bcf`). Keep this branch intentionally small and production-focused. Do not import later controller schemas, event-ID layers, queue engines, or VR/FFB rules unless separately proven necessary.
+
+This is the canonical contract for the N100 A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, localization/WORKLOG.md, localization/progress.json, localization/resume_state.json, localization/graphics/README.md and localization/graphics/ORIENTATION_POLICY.md. Repository state on korean-localization-recovery-20260928 is the only work state; do not use GPT Library as a work store.
 
 ## Isolation and source rules
-- Work only on korean-localization-clean. Never merge VR/FFB source or history.
+- Work only on korean-localization-recovery-20260928. Never merge VR/FFB source or history.
 - Preserve the independent original-mod Korean patch architecture.
 - When an HD-mod DDS exists it is the graphics baseline. Never upscale an older low-resolution Korean DDS.
 - Read DDS headers and preserve dimensions, format/compression, alpha and mip behavior.
@@ -38,7 +40,7 @@ The controller prompt may be intentionally minimal. The following commands are s
 - `OutRun 한글화 B 실행`
 - `OutRun 한글화 C 실행`
 
-On any of those commands, first fetch the latest `korean-localization-clean`, read this contract and all required state/policy files named at the top of this document, resolve the requested role below, perform the work, update Git state, commit/push when changed, and verify the resulting SHA. The Docker/controller prompt must not duplicate the detailed rules from this file.
+On any of those commands, first fetch the latest `korean-localization-recovery-20260928`, read this contract and all required state/policy files named at the top of this document, resolve the requested role below, perform the work, update Git state, commit/push when changed, and verify the resulting SHA. The Docker/controller prompt must not duplicate the detailed rules from this file.
 
 ## Dual-production lane schedule
 - A (:00): PRODUCTION LANE A + self-QA. Create/rework actual localization assets continuously from A's queue shard. Run zero-pixel-overflow QA on every touched element and immediately fix failures in the same run. Do not spend the run only reviewing when producible work remains.
@@ -63,4 +65,4 @@ On any of those commands, first fetch the latest `korean-localization-clean`, re
 ## State and completion
 Do not repeat completed work. Resume from current Git progress/resume state. Each completed batch updates its machine-readable report, localization/WORKLOG.md and localization/progress/STATUS.md as applicable.
 Before approval inspect raw DDS and readable/game orientation; use in-game screenshot validation when available.
-Git synchronization is mandatory at the end of each role when that role changed files: commit/push only its localization changes to korean-localization-clean and verify the resulting commit SHA. Do not create empty commits. Resolve conflicts by preserving current localization work and never importing VR/FFB changes.
+Git synchronization is mandatory at the end of each role when that role changed files: commit/push only its localization changes to korean-localization-recovery-20260928 and verify the resulting commit SHA. Do not create empty commits. Resolve conflicts by preserving current localization work and never importing VR/FFB changes.

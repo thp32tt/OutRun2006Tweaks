@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "branch": "korean-localization-clean",
+  "branch": "korean-localization-recovery-20260928",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
   "command_map": {
     "A": "OutRun 한글화 A 실행",
@@ -35,7 +35,7 @@
   ],
   "zero_pixel_overflow": true,
   "missing_evidence_status": "HOLD_STRICT_RECHECK",
-  "controller_prompt_policy": "Keep prompts minimal; workflow rules live in Git. Do not duplicate contract logic in Docker.",
+  "controller_prompt_policy": "Keep prompts minimal; workflow rules live in Git. Do not duplicate contract logic in Docker or ChatGPT Project instructions.",
   "work_steal": {
     "enabled": true,
     "condition": "primary shard has no actionable production work and latest Git refresh confirms target has no newer current-cycle production/state change",

@@ -1,5 +1,7 @@
 # Korean Localization Controller Commands
 
+> Recovery branch only. Keep scheduled prompts short; all workflow rules stay in this Git branch.
+
 The controller should keep its scheduled prompt minimal. Workflow logic lives in Git.
 
 ## Allowed short commands
@@ -11,7 +13,7 @@ OutRun 한글화 C 실행
 ```
 
 Each command means:
-1. checkout/fetch latest `thp32tt/OutRun2006Tweaks` branch `korean-localization-clean`;
+1. checkout/fetch latest `thp32tt/OutRun2006Tweaks` branch `korean-localization-recovery-20260928`;
 2. read `docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md` first;
 3. read all state/policy files required by that contract;
 4. execute the selected role until the available run budget is exhausted or no actionable work remains;
