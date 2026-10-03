@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
+  "state_parent_head": "ea595bfd67529585ea33e43e16d3ea13ec5662bc",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -51,25 +51,24 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DX11-00302",
-    "result_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
-    "source_implementation_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
-    "validation_bearing_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
-    "automation_validation": "PASS_EXACT_SHA_CENSUS_IDENTITY_GUARD_BACKEND_CONVERSION_GATE_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+    "task_id": "CONVERSION-DX11-00304",
+    "result_sha": "ea595bfd67529585ea33e43e16d3ea13ec5662bc",
+    "source_implementation_sha": "debc28fe34e4e34aca7bfec640d838d8357d45d6",
+    "validation_bearing_sha": "ea595bfd67529585ea33e43e16d3ea13ec5662bc",
+    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_R215_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "issue14_comment_id": 5971080914,
-    "validation_run_id": 37136741723,
-    "validation_job_id": 111242698824,
-    "readiness_smoke_job_id": 111243656265,
-    "artifact_id": 11279325012,
-    "artifact_digest": "sha256:c36624e1a04fa21abb568f017107704b6ec1c0276e9c3feaf482ef7e060b5b37",
-    "validation_comment_id": 5971127095,
-    "authoritative_metadata_correction_comment_id": 5971142005
+    "issue14_comment_id": 5971449743,
+    "validation_run_id": 37138824112,
+    "validation_job_id": 111248824299,
+    "readiness_smoke_job_id": 111249755401,
+    "artifact_id": 11279548211,
+    "artifact_digest": "sha256:3194d8afc85bb2594d254e0d7436a6caf7a1deabc1deb71a696ed22cc3ec6dd7",
+    "validation_comment_id": 5971449743
   },
-  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00302. Exact-SHA hosted validation passed for 973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84, including Win32 build/binary and DX11 readiness smoke; the repaired R214 census identity guard also passed exact-SHA standalone execution. This is not in-game/HMD proof.",
-  "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation or visual/runtime correctness claims.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve the R214 census identity guard against durable census behavior together with the R213 output-state ExactSamples gate; fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for one new independent dormant DX11 source/static gap. Runtime parity remains separately required.",
+  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00304. Exact-SHA hosted validation passed for ea595bfd67529585ea33e43e16d3ea13ec5662bc, including R215 source-graph/dormant-boundary/census-analyzer checks, Win32 build/binary and DX11 readiness smoke. This is diagnostic/source readiness evidence, not in-game/HMD proof.",
+  "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before native draw activation or visual/runtime correctness claims.",
+  "independent_static_next_action": "Preserve the R215 fixed-function shaderTranslationExact gate and prior R213/R214 census boundaries; from the newest authenticated vr-dx11-native-r71 HEAD, select one new independent dormant DX11 source/static gap. Programmable shader translation and runtime/transport parity remain fail-closed.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1536,6 +1535,34 @@
       "readiness_smoke_job_id": 111243656265,
       "artifact_id": 11279325012,
       "artifact_digest": "sha256:c36624e1a04fa21abb568f017107704b6ec1c0276e9c3feaf482ef7e060b5b37"
+    },
+    {
+      "unit_id": "DX11_R215_FIXED_FUNCTION_SHADER_TRANSLATION_EXACTNESS_GATE",
+      "task_id": "CONVERSION-DX11-00304",
+      "base_sha": "6d11d27e79fa3d0bf4ebb896b52aae0d082f473d",
+      "implementation_commits": [
+        "debc28fe34e4e34aca7bfec640d838d8357d45d6",
+        "3905f611836c90a1e128f7cf4cbfc443144f9eda",
+        "ea595bfd67529585ea33e43e16d3ea13ec5662bc"
+      ],
+      "source_implementation_sha": "debc28fe34e4e34aca7bfec640d838d8357d45d6",
+      "material_result_sha": "ea595bfd67529585ea33e43e16d3ea13ec5662bc",
+      "validation_bearing_sha": "ea595bfd67529585ea33e43e16d3ea13ec5662bc",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_R215_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_CENSUS_STATIC_ONLY",
+      "issue14_comment_id": 5971449743,
+      "validation_run_id": 37138824112,
+      "validation_job_id": 111248824299,
+      "readiness_smoke_job_id": 111249755401,
+      "artifact_id": 11279548211,
+      "artifact_digest": "sha256:3194d8afc85bb2594d254e0d7436a6caf7a1deabc1deb71a696ed22cc3ec6dd7",
+      "superseded_failed_gate_runs": [
+        37138570146,
+        37138670652
+      ]
     }
   ]
 }
