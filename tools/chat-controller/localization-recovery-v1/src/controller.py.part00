@@ -1,0 +1,505 @@
+from __future__ import annotations
+
+import argparse
+import asyncio
+import html
+import json
+import logging
+import os
+import re
+import threading
+import time
+from dataclasses import dataclass, asdict
+from datetime import datetime, timedelta
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from typing import Optional
+from zoneinfo import ZoneInfo
+
+from playwright.async_api import async_playwright, BrowserContext, Page, TimeoutError as PlaywrightTimeoutError
+
+TZ = ZoneInfo(os.getenv("TZ", "Asia/Seoul"))
+CHATGPT_BASE_URL = os.getenv("CHATGPT_BASE_URL", "https://chatgpt.com/").strip()
+CHATGPT_PROJECT_URL = os.getenv("CHATGPT_PROJECT_URL", "").strip()
+BASE_URL = CHATGPT_PROJECT_URL or CHATGPT_BASE_URL
+REQUIRE_PROJECT_URL = os.getenv("REQUIRE_PROJECT_URL", "false").lower() == "true"
+AUTO_SEND_REQUESTED = os.getenv("AUTO_SEND", "false").lower() == "true"
+PROJECT_SCOPE_READY = bool(CHATGPT_PROJECT_URL) or not REQUIRE_PROJECT_URL
+AUTO_SEND = AUTO_SEND_REQUESTED and PROJECT_SCOPE_READY
+CONTROLLER_MODE = os.getenv("CONTROLLER_MODE", "localization").strip().lower()
+if CONTROLLER_MODE not in {"localization", "vr"}:
+    raise ValueError(f"Unsupported CONTROLLER_MODE={CONTROLLER_MODE!r}; expected localization or vr")
+SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
+CHAT_SLOTS = max(1, int(os.getenv("CHAT_SLOTS", "6")))
+ROLLOVER_HOUR = int(os.getenv("CHAT_DAY_ROLLOVER_HOUR", "2"))
+STATUS_PORT = int(os.getenv("STATUS_PORT", "8787"))
+WATCHDOG_ENABLED = os.getenv("WATCHDOG_ENABLED", "true").lower() == "true"
+WATCHDOG_STALL_MINUTES = int(os.getenv("WATCHDOG_STALL_MINUTES", "12"))
+WATCHDOG_BUSY_STALL_MINUTES = int(os.getenv("WATCHDOG_BUSY_STALL_MINUTES", "20"))
+WATCHDOG_CHECK_SECONDS = int(os.getenv("WATCHDOG_CHECK_SECONDS", "60"))
+WATCHDOG_MAX_RESUMES_PER_RUN = int(os.getenv("WATCHDOG_MAX_RESUMES_PER_RUN", "1"))
+WATCHDOG_FORCE_STOP_STALLED = os.getenv("WATCHDOG_FORCE_STOP_STALLED", "false").lower() == "true"
+RATE_LIMIT_BACKOFF_SECONDS = [
+    max(10, int(x.strip()))
+    for x in os.getenv("RATE_LIMIT_BACKOFF_SECONDS", "30,60,120").split(",")
+    if x.strip()
+]
+if not RATE_LIMIT_BACKOFF_SECONDS:
+    RATE_LIMIT_BACKOFF_SECONDS = [30, 60, 120]
+MIN_SEND_GAP_SECONDS = max(0, int(os.getenv("MIN_SEND_GAP_SECONDS", "45")))
+SLOT_DEDUP_SECONDS = max(0, int(os.getenv("SLOT_DEDUP_SECONDS", "120")))
+FRESH_CHAT_EACH_RUN = os.getenv("FRESH_CHAT_EACH_RUN", "true").lower() == "true"
+RETRY_BUTTON_COOLDOWN_SECONDS = max(10, int(os.getenv("RETRY_BUTTON_COOLDOWN_SECONDS", "45")))
+PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
+STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "true"
+PROFILE_DIR = Path("/data/browser-profile")
+STATE_DIR = Path("/data/state")
+REGISTRY_FILE = STATE_DIR / "chat_registry.json"
+RUNTIME_FILE = STATE_DIR / "runtime_status.json"
+PROMPTS_DIR = Path("/opt/outrun/prompts")
+LOG_FILE = Path("/logs/controller.log")
+
+LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+    handlers=[logging.StreamHandler(), logging.FileHandler(LOG_FILE)],
+)
+log = logging.getLogger("outrun-controller")
+
+RATE_LIMIT_PATTERNS = [
+    r"too many requests",
+    r"http\s*429",
+    r"\b429\b.{0,80}(request|rate|limit)",
+    r"rate limit(?:ed|ing)?",
+    r"request(?:s)?.{0,30}(too many|limit|throttl)",
+    r"요청.{0,12}(너무 많|한도|제한)",
+    r"너무 많은 요청",
+]
+
+LIMIT_PATTERNS = [
+    r"you.?ve reached.*limit",
+    r"usage limit",
+    r"limit reached",
+    r"try again later",
+    r"사용량.{0,8}한도",
+    r"한도에.{0,8}도달",
+    r"사용 한도",
+    r"나중에 다시",
+]
+BUSY_SELECTORS = [
+    "button[data-testid='stop-button']",
+    "button:has-text('Stop generating')",
+    "button:has-text('Stop streaming')",
+    "button:has-text('생성 중지')",
+    "button:has-text('응답 중지')",
+]
+CONTINUE_GENERATING_SELECTORS = [
+    "button:has-text('Continue generating')",
+    "button:has-text('계속 생성')",
+    "button:has-text('계속해서 생성')",
+]
+RETRY_SELECTORS = [
+    "button:has-text('Retry')",
+    "button:has-text('Try again')",
+    "button:has-text('다시 시도')",
+    "button:has-text('재시도')",
+]
+ASSISTANT_MESSAGE_SELECTORS = [
+    "[data-message-author-role='assistant']",
+]
+
+THINKING_CACHE_TTL_SECONDS = 3600
+_thinking_verified_cache: dict[int, tuple[str, float, str]] = {}
+
+INPUT_SELECTORS = [
+    "#prompt-textarea",
+    "div#prompt-textarea",
+    "[data-testid='prompt-textarea']",
+    "[data-testid='composer'] textarea",
+    "[data-testid='composer'] [contenteditable='true']",
+    "textarea[placeholder*='Message' i]",
+    "textarea[placeholder*='Ask ChatGPT' i]",
+    "textarea[placeholder*='메시지']",
+    "[contenteditable='true'][data-lexical-editor='true']",
+    "div.ProseMirror[contenteditable='true']",
+    "[role='textbox'][contenteditable='true']",
+    "[role='textbox']",
+    "form textarea",
+    "form [contenteditable='true']",
+    "[contenteditable='true']",
+]
+
+LOGGED_IN_SELECTORS = [
+    "button[data-testid*='profile']",
+    "button[aria-label*='profile' i]",
+    "button[aria-label*='account' i]",
+    "nav a[href='/']",
+]
+
+@dataclass
+class Slot:
+    name: str
+    url: Optional[str] = None
+    runs: int = 0
+    last_sent_at: Optional[str] = None
+    last_result: Optional[str] = None
+    last_assistant_hash: Optional[str] = None
+    last_assistant_change_at: Optional[str] = None
+    watchdog_resumes_since_schedule: int = 0
+    last_watchdog_at: Optional[str] = None
+
+@dataclass
+class Registry:
+    logical_date: str
+    next_slot: int
+    slots: list[Slot]
+    rate_limit_attempts: int = 0
+    rate_limit_until: Optional[str] = None
+    last_global_send_at: Optional[str] = None
+
+runtime = {
+    "started_at": datetime.now(TZ).isoformat(),
+    "auto_send": AUTO_SEND,
+    "auto_send_requested": AUTO_SEND_REQUESTED,
+    "controller_mode": CONTROLLER_MODE,
+    "project_url_configured": bool(CHATGPT_PROJECT_URL),
+    "require_project_url": REQUIRE_PROJECT_URL,
+    "start_url": BASE_URL,
+    "schedule_minutes": SCHEDULE_MINUTES,
+    "status": "starting",
+    "last_tick": None,
+    "last_action": None,
+    "last_error": None,
+    "watchdog_enabled": WATCHDOG_ENABLED,
+    "watchdog_stall_minutes": WATCHDOG_STALL_MINUTES,
+    "watchdog_busy_stall_minutes": WATCHDOG_BUSY_STALL_MINUTES,
+    "watchdog_force_stop_stalled": WATCHDOG_FORCE_STOP_STALLED,
+    "preferred_thinking_level": PREFERRED_THINKING_LEVEL,
+    "strict_thinking_level": STRICT_THINKING_LEVEL,
+    "last_thinking_level_result": None,
+    "rate_limit_backoff_seconds": RATE_LIMIT_BACKOFF_SECONDS,
+    "min_send_gap_seconds": MIN_SEND_GAP_SECONDS,
+    "slot_dedup_seconds": SLOT_DEDUP_SECONDS,
+    "fresh_chat_each_run": FRESH_CHAT_EACH_RUN,
+    "retry_button_cooldown_seconds": RETRY_BUTTON_COOLDOWN_SECONDS,
+    "rate_limit_attempts": 0,
+    "rate_limit_until": None,
+}
+
+def write_runtime(**updates):
+    runtime.update(updates)
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    RUNTIME_FILE.write_text(json.dumps(runtime, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def logical_date(now: datetime) -> str:
+    shifted = now - timedelta(days=1) if now.hour < ROLLOVER_HOUR else now
+    return shifted.date().isoformat()
+
+
+def new_registry(now: datetime) -> Registry:
+    return Registry(
+        logical_date=logical_date(now),
+        next_slot=0,
+        slots=[Slot(name=chr(ord('A') + i)) for i in range(CHAT_SLOTS)],
+        rate_limit_attempts=0,
+        rate_limit_until=None,
+        last_global_send_at=None,
+    )
+
+
+def load_registry(now: datetime) -> Registry:
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    if not REGISTRY_FILE.exists():
+        reg = new_registry(now)
+        save_registry(reg)
+        return reg
+    try:
+        raw = json.loads(REGISTRY_FILE.read_text(encoding="utf-8"))
+        reg = Registry(
+            logical_date=raw["logical_date"],
+            next_slot=int(raw.get("next_slot", 0)),
+            slots=[Slot(**s) for s in raw["slots"]],
+            rate_limit_attempts=int(raw.get("rate_limit_attempts", 0)),
+            rate_limit_until=raw.get("rate_limit_until"),
+            last_global_send_at=raw.get("last_global_send_at"),
+        )
+    except Exception:
+        log.exception("registry read failed; recreating")
+        reg = new_registry(now)
+    if reg.logical_date != logical_date(now):
+        archive = STATE_DIR / f"chat_registry_{reg.logical_date}.json"
+        try:
+            if REGISTRY_FILE.exists():
+                archive.write_text(REGISTRY_FILE.read_text(encoding="utf-8"), encoding="utf-8")
+        except Exception:
+            log.exception("registry archive failed")
+        reg = new_registry(now)
+        save_registry(reg)
+        log.info("daily chat generation rolled over: %s", reg.logical_date)
+    elif len(reg.slots) != CHAT_SLOTS:
+        # Resize without discarding progress: preserve A..N existing slot state.
+        old_len = len(reg.slots)
+        if CHAT_SLOTS < old_len:
+            reg.slots = reg.slots[:CHAT_SLOTS]
+        else:
+            for i in range(old_len, CHAT_SLOTS):
+                reg.slots.append(Slot(name=chr(ord('A') + i)))
+        reg.next_slot = reg.next_slot % CHAT_SLOTS
+        save_registry(reg)
+        log.info("resized chat slots from %s to %s while preserving state", old_len, CHAT_SLOTS)
+    return reg
+
+
+def save_registry(reg: Registry):
+    payload = {
+        "logical_date": reg.logical_date,
+        "next_slot": reg.next_slot,
+        "slots": [asdict(s) for s in reg.slots],
+        "rate_limit_attempts": reg.rate_limit_attempts,
+        "rate_limit_until": reg.rate_limit_until,
+        "last_global_send_at": reg.last_global_send_at,
+    }
+    tmp = REGISTRY_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(REGISTRY_FILE)
+
+
+def read_prompt(filename: str) -> str:
+    path = PROMPTS_DIR / filename
+    return path.read_text(encoding="utf-8").strip()
+
+
+async def first_visible(page: Page, selectors: list[str], total_wait_ms: int = 10000):
+    """Wait for React composer hydration instead of sampling the DOM once."""
+    deadline = time.time() + (total_wait_ms / 1000)
+    while time.time() < deadline:
+        for frame in page.frames:
+            for sel in selectors:
+                try:
+                    loc = frame.locator(sel).first
+                    if await loc.count() and await loc.is_visible(timeout=250):
+                        return loc
+                except Exception:
+                    continue
+        await page.wait_for_timeout(250)
+    return None
+
+
+async def composer_diagnostics(page: Page) -> list[dict]:
+    """Return safe structural metadata only; never capture user/chat text."""
+    rows = []
+    for frame in page.frames:
+        try:
+            found = await frame.locator("textarea, input, [contenteditable], [role='textbox']").evaluate_all("""els => els.slice(0,40).map(el => ({
+                tag: el.tagName,
+                id: el.id || '',
+                role: el.getAttribute('role') || '',
+                placeholder: el.getAttribute('placeholder') || '',
+                contenteditable: el.getAttribute('contenteditable') || '',
+                testid: el.getAttribute('data-testid') || '',
+                aria: el.getAttribute('aria-label') || '',
+                cls: (typeof el.className === 'string' ? el.className : '').slice(0,160),
+                visible: !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)
+            }))""")
+            for row in found:
+                row["frame_url"] = frame.url[:180]
+                rows.append(row)
+        except Exception:
+            continue
+    return rows[:60]
+
+
+async def page_text(page: Page) -> str:
+    try:
+        return (await page.locator("body").inner_text(timeout=3000)).lower()
+    except Exception:
+        return ""
+
+
+ERROR_SURFACE_SELECTORS = [
+    "[role='alert']",
+    "[role='status']",
+    "[data-sonner-toast]",
+    "[data-testid*='toast']",
+    "[data-testid*='error']",
+    "[class*='toast']",
+    "[class*='error']",
+    "dialog",
+    "[role='dialog']",
+    "form",
+]
+
+
+async def visible_error_surface_text(page: Page) -> str:
+    """Collect only visible transient/error UI, excluding sidebar/chat-history text."""
+    chunks = []
+    for sel in ERROR_SURFACE_SELECTORS:
+        try:
+            loc = page.locator(sel)
+            count = await loc.count()
+            for i in range(min(count, 20)):
+                item = loc.nth(i)
+                try:
+                    if not await item.is_visible(timeout=120):
+                        continue
+                    text = (await item.inner_text(timeout=500)).strip()
+                    if text:
+                        chunks.append(text)
+                except Exception:
+                    continue
+        except Exception:
+            continue
+    return "\n".join(chunks).lower()
+
+
+async def detect_rate_limit(page: Page) -> bool:
+    text = await visible_error_surface_text(page)
+    matched = [p for p in RATE_LIMIT_PATTERNS if re.search(p, text, flags=re.I | re.S)]
+    if matched:
+        write_runtime(
+            last_rate_limit_match=matched[0],
+            last_rate_limit_surface=text[:500],
+        )
+        return True
+    return False
+
+
+async def detect_limit(page: Page) -> bool:
+    text = await visible_error_surface_text(page)
+    matched = [p for p in LIMIT_PATTERNS if re.search(p, text, flags=re.I | re.S)]
+    if matched:
+        write_runtime(
+            last_usage_limit_match=matched[0],
+            last_usage_limit_surface=text[:500],
+        )
+        return True
+    return False
+
+
+def _parse_iso(value: Optional[str]) -> Optional[datetime]:
+    if not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(value)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=TZ)
+        return dt.astimezone(TZ)
+    except Exception:
+        return None
+
+
+def rate_limit_active(reg: Registry, now: datetime) -> bool:
+    until = _parse_iso(reg.rate_limit_until)
+    return bool(until and now < until)
+
+
+def rate_limit_seconds_remaining(reg: Registry, now: datetime) -> int:
+    until = _parse_iso(reg.rate_limit_until)
+    if not until:
+        return 0
+    return max(0, int((until - now).total_seconds()))
+
+
+def mark_rate_limit(reg: Registry, now: datetime, source: str):
+    reg.rate_limit_attempts = max(0, reg.rate_limit_attempts) + 1
+    idx = min(reg.rate_limit_attempts - 1, len(RATE_LIMIT_BACKOFF_SECONDS) - 1)
+    delay_sec = RATE_LIMIT_BACKOFF_SECONDS[idx]
+    reg.rate_limit_until = (now + timedelta(seconds=delay_sec)).isoformat()
+    save_registry(reg)
+    write_runtime(
+        status="rate_limited_backoff",
+        last_action=f"Too many requests detected ({source}); backing off {delay_sec}s",
+        rate_limit_attempts=reg.rate_limit_attempts,
+        rate_limit_until=reg.rate_limit_until,
+    )
+    log.warning(
+        "rate limit detected source=%s attempt=%s backoff=%ss until=%s",
+        source, reg.rate_limit_attempts, delay_sec, reg.rate_limit_until,
+    )
+
+
+def note_successful_request(reg: Registry, now: datetime):
+    reg.last_global_send_at = now.isoformat()
+    reg.rate_limit_attempts = 0
+    reg.rate_limit_until = None
+    write_runtime(
+        rate_limit_attempts=0,
+        rate_limit_until=None,
+    )
+
+
+def send_guard_reason(reg: Registry, slot: Optional[Slot], now: datetime) -> Optional[str]:
+    if rate_limit_active(reg, now):
+        return f"rate_limit_backoff:{rate_limit_seconds_remaining(reg, now)}s"
+
+    last_global = _parse_iso(reg.last_global_send_at)
+    if last_global and MIN_SEND_GAP_SECONDS > 0:
+        age = (now - last_global).total_seconds()
+        if age < MIN_SEND_GAP_SECONDS:
+            return f"global_send_gap:{int(MIN_SEND_GAP_SECONDS - age)}s"
+
+    if slot and slot.last_sent_at and SLOT_DEDUP_SECONDS > 0:
+        last_slot = _parse_iso(slot.last_sent_at)
+        if last_slot:
+            age = (now - last_slot).total_seconds()
+            if age < SLOT_DEDUP_SECONDS:
+                return f"slot_dedup:{int(SLOT_DEDUP_SECONDS - age)}s"
+    return None
+
+
+async def detect_busy(page: Page) -> bool:
+    for sel in BUSY_SELECTORS:
+        try:
+            loc = page.locator(sel).first
+            if await loc.count() and await loc.is_visible(timeout=300):
+                return True
+        except Exception:
+            continue
+    return False
+
+
+async def ensure_logged_in(page: Page) -> bool:
+    # Never navigate here: each A~F tab must keep its own chat URL.
+    # Only initialize a truly blank tab.
+    if not page.url or page.url == "about:blank":
+        await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
+
+    # Require the actual composer (or current model picker), not merely sidebar/nav UI.
+    deadline = time.time() + 30
+    while time.time() < deadline:
+        box = await first_visible(page, INPUT_SELECTORS)
+        if box:
+            return True
+
+        model_selectors = [
+            "button[aria-label='ChatGPT 모델 선택']",
+            "button[aria-label='Select ChatGPT model']",
+            "button[aria-label*='모델 선택']",
+        ]
+        for sel in model_selectors:
+            try:
+                loc = page.locator(sel).first
+                if await loc.count() and await loc.is_visible(timeout=200):
+                    return True
+            except Exception:
+                continue
+
+        txt = await page_text(page)
+        if any(x in txt for x in ("log in", "sign up", "로그인", "가입")):
+            # Give redirects/client hydration a few seconds before declaring logged out.
+            if time.time() + 3 < deadline:
+                await page.wait_for_timeout(1000)
+                continue
+            return False
+
+        await page.wait_for_timeout(500)
+
+    write_runtime(
+        status="login_detection_failed",
+        last_action=f"ChatGPT composer/model picker could not be verified at {page.url}",
+        current_url=page.url,
+    )
+    return False
+
