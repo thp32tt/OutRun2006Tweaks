@@ -103,7 +103,8 @@ SUMMARY_RE = re.compile(
     r"clipping=(?P<clipping>\d+),depthBias=(?P<depthBias>\d+),"
     r"vertexBlend=(?P<vertexBlend>\d+),dither=(?P<dither>\d+)"
     r"(?:,texCoordWrap=(?P<texCoordWrap>\d+)"
-    r"(?:,mrtColorWrite=(?P<mrtColorWrite>\d+))?)?)?\]"
+    r"(?:,mrtColorWrite=(?P<mrtColorWrite>\d+)"
+    r"(?:,specular=(?P<specular>\d+))?)?)?)?\]"
 )
 
 BOOTSTRAP_RE = re.compile(
@@ -588,6 +589,7 @@ def main() -> int:
             "dither",
             "texCoordWrap",
             "mrtColorWrite",
+            "specular",
         ]
         unsupported_total = sum(latest[key] for key in unsupported_keys)
 

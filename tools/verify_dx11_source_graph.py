@@ -143,14 +143,39 @@ def main() -> None:
             "R202 live specular-enable capture",
         ),
         (
-            "source.lighting != FALSE || source.specularEnable != FALSE",
+            "source.specularEnable != FALSE",
             PIPELINE_TRANSLATION_CPP,
-            "R202 native pipeline specular fail-closed predicate",
+            "R202/R204 native pipeline specular fail-closed predicate",
         ),
         (
-            "R202 enabled D3DRS_SPECULARENABLE must fail closed",
+            "PipelineUnsupportedSpecular = 1u << 20",
+            PIPELINE_TRANSLATION_HPP,
+            "R204 dedicated post-texture specular blocker identity",
+        ),
+        (
+            "R204 enabled D3DRS_SPECULARENABLE must use dedicated fail-closed blocker",
             SEMANTIC_SMOKE,
-            "R202 semantic regression probe",
+            "R204 dedicated specular semantic regression probe",
+        ),
+        (
+            "R204 lighting and specular blockers must remain independently observable",
+            SEMANTIC_SMOKE,
+            "R204 lighting/specular blocker separation",
+        ),
+        (
+            "specular={}]",
+            RUNTIME_CENSUS,
+            "R204 runtime unsupported summary field",
+        ),
+        (
+            "?P<specular>",
+            analyzer,
+            "R204 analyzer unsupported parser field",
+        ),
+        (
+            "\"specular\"",
+            analyzer,
+            "R204 analyzer aggregate key",
         ),
     ]
     missing_r202_specular_enable = [

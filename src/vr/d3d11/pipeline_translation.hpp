@@ -56,10 +56,14 @@ namespace outrun::vr::dx11
         // D3D9 COLORWRITEENABLE1..3 configure secondary MRT write masks.
         // Native fixed-function output currently owns RT0 only.
         PipelineUnsupportedMrtColorWrite = 1u << 19,
+        // R204: keep the post-texture D3DRS_SPECULARENABLE semantic distinct
+        // from fixed-function lighting. Both remain fail-closed, but exact
+        // census evidence must be able to identify which blocker was observed.
+        PipelineUnsupportedSpecular = 1u << 20,
         // R166: one-past-last bit count consumed by the runtime census. Keep
         // this sentinel synchronized with concrete PipelineUnsupported bits;
         // the source-graph gate verifies max(bit)+1 == this value.
-        PipelineUnsupportedBitCount = 20u,
+        PipelineUnsupportedBitCount = 21u,
     };
 
     struct PipelineTranslation

@@ -1945,12 +1945,14 @@ namespace outrun::vr::dx11
             out.unsupported |= PipelineUnsupportedAlphaTest;
         if (source.fogEnable != FALSE)
             out.unsupported |= PipelineUnsupportedFog;
-        // R202: D3DRS_SPECULARENABLE performs a fixed-function
-        // specular add after the texture cascade. The dormant native shader
-        // path does not model that operation, so share the existing lighting
-        // blocker until explicit post-texture specular semantics exist.
-        if (source.lighting != FALSE || source.specularEnable != FALSE)
+        if (source.lighting != FALSE)
             out.unsupported |= PipelineUnsupportedLighting;
+        // R202/R204: D3DRS_SPECULARENABLE performs a fixed-function
+        // specular add after the texture cascade. The dormant native shader
+        // path still does not model that operation; keep it fail-closed on a
+        // dedicated bit so census demand is not conflated with lighting.
+        if (source.specularEnable != FALSE)
+            out.unsupported |= PipelineUnsupportedSpecular;
         if (source.sRGBWriteEnable != FALSE)
             out.unsupported |= PipelineUnsupportedSrgbWrite;
         if (!source.complete)

@@ -27,6 +27,7 @@ namespace
     using outrun::vr::dx11::PipelineUnsupportedBlend;
     using outrun::vr::dx11::PipelineUnsupportedDualSourceBlend;
     using outrun::vr::dx11::PipelineUnsupportedLighting;
+    using outrun::vr::dx11::PipelineUnsupportedSpecular;
     using outrun::vr::dx11::PipelineUnsupportedSeparateAlphaBlend;
     using outrun::vr::dx11::PipelineUnsupportedStencil;
     using outrun::vr::dx11::compile_fixed_function_pixel_shader_prototype;
@@ -98,15 +99,24 @@ int main()
 
         const auto baseline = translate_pipeline(state);
         require(
-            (baseline.unsupported & PipelineUnsupportedLighting) == 0,
+            (baseline.unsupported &
+             (PipelineUnsupportedLighting | PipelineUnsupportedSpecular)) == 0,
             "default disabled specular state must remain exact");
 
         state.specularEnable = TRUE;
         const auto specular = translate_pipeline(state);
         require(
-            (specular.unsupported & PipelineUnsupportedLighting) != 0 &&
+            (specular.unsupported & PipelineUnsupportedSpecular) != 0 &&
+            (specular.unsupported & PipelineUnsupportedLighting) == 0 &&
             !specular.exact(),
-            "R202 enabled D3DRS_SPECULARENABLE must fail closed");
+            "R204 enabled D3DRS_SPECULARENABLE must use dedicated fail-closed blocker");
+
+        state.lighting = TRUE;
+        const auto lightingAndSpecular = translate_pipeline(state);
+        require(
+            (lightingAndSpecular.unsupported & PipelineUnsupportedLighting) != 0 &&
+            (lightingAndSpecular.unsupported & PipelineUnsupportedSpecular) != 0,
+            "R204 lighting and specular blockers must remain independently observable");
     }
 
     {

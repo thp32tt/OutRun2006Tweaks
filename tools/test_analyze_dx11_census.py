@@ -740,10 +740,11 @@ def main() -> int:
         "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
         "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
         "depthCmp=0,cull=0,dualSource=2,shadeMode=3,clipping=4,"
-        "depthBias=5,vertexBlend=6,dither=7]\n"
+        "depthBias=5,vertexBlend=6,dither=7,texCoordWrap=0,"
+        "mrtColorWrite=0,specular=8]\n"
     )
     assert extended_unsupported["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
-    assert extended_unsupported["UnsupportedTotalLatest"] == 27
+    assert extended_unsupported["UnsupportedTotalLatest"] == 35
     assert extended_unsupported["LatestSummary"]["dualSource"] == 2
     assert extended_unsupported["LatestSummary"]["shadeMode"] == 3
     assert extended_unsupported["LatestSummary"]["clipping"] == 4
@@ -752,6 +753,7 @@ def main() -> int:
     assert extended_unsupported["LatestSummary"]["dither"] == 7
     assert extended_unsupported["LatestSummary"]["texCoordWrap"] == 0
     assert extended_unsupported["LatestSummary"]["mrtColorWrite"] == 0
+    assert extended_unsupported["LatestSummary"]["specular"] == 8
     assert extended_unsupported["NativeDrawPathActivationAllowed"] is False
 
     r174_source_mrt = run_case(
