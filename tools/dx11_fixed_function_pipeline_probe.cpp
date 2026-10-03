@@ -1445,6 +1445,9 @@ int main()
         stageConstantStages[0].alphaOp = D3DTOP_SELECTARG1;
         stageConstantStages[0].alphaArg1 = D3DTA_CONSTANT;
         stageConstantStages[0].stageConstant = 0x80402010u;
+        stageConstantStages[0].minFilter = D3DTEXF_POINT;
+        stageConstantStages[0].magFilter = D3DTEXF_POINT;
+        stageConstantStages[0].mipFilter = D3DTEXF_NONE;
 
         stageConstantStages[1].colorOp = D3DTOP_ADD;
         stageConstantStages[1].colorArg1 = D3DTA_CURRENT;
@@ -1453,6 +1456,9 @@ int main()
         stageConstantStages[1].alphaArg1 = D3DTA_CURRENT;
         stageConstantStages[1].alphaArg2 = D3DTA_CONSTANT;
         stageConstantStages[1].stageConstant = 0xFF102030u;
+        stageConstantStages[1].minFilter = D3DTEXF_POINT;
+        stageConstantStages[1].magFilter = D3DTEXF_POINT;
+        stageConstantStages[1].mipFilter = D3DTEXF_NONE;
 
         const auto stageConstantShader =
             generate_fixed_function_pixel_shader_prototype(
