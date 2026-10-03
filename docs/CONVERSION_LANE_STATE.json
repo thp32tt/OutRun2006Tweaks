@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "940b8f8c4de68f3f5f06d855e753d3be7307a5d2",
+  "state_parent_head": "6a032c052cd0255472a7c06d91965a6f9fe98b53",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -59,14 +59,38 @@
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
-    "production_id": "CONVERSION-DX11-00298",
-    "event_id": "CONVERSION-DX11-00298-E001",
+    "production_id": "CONVERSION-DXVK-00299",
+    "event_id": "CONVERSION-DXVK-00299-E003",
     "event_type": "rollover",
     "rollover_is_retry": false,
     "issue14_comment_ids": [
       5970610791,
-      5970647437
-    ]
+      5970647437,
+      5970668668
+    ],
+    "chat_rollover": 4,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "dispatch_metadata_correction": {
+      "corrected_from": {
+        "production_id": "CONVERSION-DXVK-00299",
+        "event_id": "CONVERSION-DXVK-00299-E001",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 2,
+        "rollover_is_retry": false
+      },
+      "authoritative_request": {
+        "production_id": "CONVERSION-DXVK-00299",
+        "event_id": "CONVERSION-DXVK-00299-E003",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 4,
+        "rollover_is_retry": false
+      },
+      "material_result_unchanged": true,
+      "validation_bearing_result_unchanged": true,
+      "correction_comment_id": 5970668668
+    }
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
