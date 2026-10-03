@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "2f485f490fd8bf1502f3d31f6e0b8be26fd6aba9",
+  "state_parent_head": "de896ba905c7a93fa9172ec895b204853300885c",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,14 +54,14 @@
     "task_id": "CONVERSION-DXVK-00289",
     "result_sha": "77df2970779f884b1ce150c5b9086a45383bebe8",
     "validation_bearing_result_sha": "77df2970779f884b1ce150c5b9086a45383bebe8",
-    "run_record_commit_sha": "2f485f490fd8bf1502f3d31f6e0b8be26fd6aba9",
+    "run_record_commit_sha": "de896ba905c7a93fa9172ec895b204853300885c",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "rollover_event_id": "CONVERSION-DXVK-00289-E003",
-    "chat_rollover": 4,
     "attempt": "1/3",
-    "rollover_is_retry": false
+    "production_id": "CONVERSION-DX11-00288",
+    "event_id": "CONVERSION-DX11-00288-E003",
+    "event_type": "retry"
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
