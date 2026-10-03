@@ -393,6 +393,21 @@ for marker in ("R22InstallStatus()", "R31InstallStatus()"):
     if marker not in r32:
         errors.append(f"R32 missing lower-layer install-state owner query: {marker}")
 
+if "R32InstallState" in r33:
+    errors.append("R33 retained direct R32 install-state dependency")
+if "R33InstallState" in r34:
+    errors.append("R34 retained direct R33 install-state dependency")
+for marker, source, owner in (
+    ("R32InstallStatus()", r32, "R32"),
+    ("R33InstallStatus()", r33, "R33"),
+):
+    if marker not in source:
+        errors.append(f"{owner} missing install-state owner query API: {marker}")
+if "R32InstallStatus()" not in r33:
+    errors.append("R33 missing R32 install-state owner query")
+if "R33InstallStatus()" not in r34:
+    errors.append("R34 missing R33 install-state owner query")
+
 for banned in ("R22FailClosedEligibility();", "R22ResetBaselineTracking();"):
     if banned in r34:
         errors.append(f"R34 retained direct R22 reset fail-close primitive: {banned}")
