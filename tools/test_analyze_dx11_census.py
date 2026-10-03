@@ -636,6 +636,7 @@ def main() -> int:
         "declSamples=0 indexedSamples=0 texturedSamples=0 "
         "resourceExact[introspectionFailure=0,indexUnsupported=0,"
         "textureUnsupported=0,colorUnsupported=0,depthUnsupported=0] "
+        "ffpShaderCompile[succeeded=64,failed=0,skippedCap=3] "
         "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
         "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
         "depthCmp=0,cull=0]\n"
@@ -657,6 +658,8 @@ def main() -> int:
     assert r114_coverage["DetailedSignatureLogSkippedSignatures"] == 448
     assert r114_coverage["SignatureHashCapSaturated"] is True
     assert r114_coverage["DetailedSignatureLogCapSaturated"] is True
+    assert r114_coverage["ShaderCompileSkippedSignatureCap"] == 3
+    assert r114_coverage["ShaderCompileCoverageComplete"] is False
     assert r114_coverage["NonExhaustive"] is True
     assert r114_coverage["ActivationProof"] is False
     assert r114_saturated["NativeDrawPathActivationAllowed"] is False
@@ -692,6 +695,8 @@ def main() -> int:
     assert exhaustive_coverage["Scheme"] == "EXHAUSTIVE_V1"
     assert exhaustive_coverage["NonExhaustive"] is False
     assert exhaustive_coverage["ExhaustiveDrawCoverage"] is True
+    assert exhaustive_coverage["ShaderCompileSkippedSignatureCap"] == 0
+    assert exhaustive_coverage["ShaderCompileCoverageComplete"] is True
     assert exhaustive_coverage["ActivationProof"] is False
     exhaustive_dual_source = exhaustive["ActivationEvidence"]["DualSourceBlend"]
     assert exhaustive_dual_source["AnySamples"] == 0

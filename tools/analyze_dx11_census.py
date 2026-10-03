@@ -652,6 +652,12 @@ def main() -> int:
         "DetailedSignatureLogCapSaturated": bool(
             latest and latest["signatureDetailSkipped"] > 0
         ),
+        "ShaderCompileSkippedSignatureCap": (
+            latest["fixedFunctionShaderCompileSkippedCap"] if latest else 0
+        ),
+        "ShaderCompileCoverageComplete": bool(
+            latest and latest["fixedFunctionShaderCompileSkippedCap"] == 0
+        ),
         "NonExhaustive": not exhaustive_draw_coverage,
         "ExhaustiveDrawCoverage": exhaustive_draw_coverage,
         "ActivationProof": False,
@@ -742,6 +748,8 @@ def main() -> int:
             "R114 defaults to hashed-ordinal sampled diagnostics. "
             "When the runtime explicitly reports scheme=2, stride=1, and samples equal "
             "drawsSeen, the report records exhaustive source-draw census coverage. "
+            "The 64-entry detailed-log cap no longer limits fixed-function D3DCompile probes; "
+            "compile coverage is skipped only when the independent signature-hash cap is exceeded. "
             "Signature hash/detail caps remain separate diagnostic-detail evidence. "
             "Even exhaustive exact census remains diagnostic only: ActivationProof and "
             "NativeDrawPathActivationAllowed stay false, and exact-build HMD graphics "

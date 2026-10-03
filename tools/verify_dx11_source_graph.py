@@ -1764,7 +1764,7 @@ def main() -> None:
         "generate_fixed_function_pixel_shader_prototype": "R84 runtime source-generation evidence",
         "FixedFunctionShaderCompileSucceededSignatures": "R85 successful unique-signature compile probes",
         "FixedFunctionShaderCompileFailedSignatures": "R85 failed unique-signature compile probes",
-        "FixedFunctionShaderCompileSkippedSignatureCap": "R85 bounded instrumentation cap",
+        "FixedFunctionShaderCompileSkippedSignatureCap": "R221 signature-hash-cap compile coverage evidence",
         "compile_fixed_function_pixel_shader_prototype": "R85 census compiler probe invocation",
         "SignatureHashCap = 512u": "R114 bounded unique-signature hash cap",
         "DetailedSignatureLogCap = 64u": "R114 bounded detailed-signature log cap",
@@ -1773,7 +1773,6 @@ def main() -> None:
         "mix_sample_ordinal": "R114 hashed draw-ordinal sampler",
         "(sampleKey & (sampleStride - 1u)) != 0u": "R114 hashed sampled-mode gate",
         "sampleStride > 1u": "R114 exhaustive-mode sampling bypass gate",
-        "unique <= DetailedSignatureLogCap": "R114 compile instrumentation uses named detail cap",
         "FixedFunctionPipelineShaderExactSamples": "R120 fixed-function pipeline/shader exact census counter",
         "FixedFunctionPipelineShaderPendingSamples": "R120 fixed-function pipeline/shader pending census counter",
         "FixedFunctionAlphaTestShaderOwnedSamples": "R120 shader-owned alpha-test census counter",
@@ -8794,6 +8793,29 @@ def main() -> None:
             "DX11 R220 shader-readiness ExactSamples contract drift: "
             + ", ".join(missing_r220_shader_readiness)
         )
+
+    compile_probe_start = RUNTIME_CENSUS.find(
+        "FixedFunctionPixelShaderCompileProbe compileProbe{};"
+    )
+    signature_log_start = RUNTIME_CENSUS.find(
+        "if (inserted && unique <= DetailedSignatureLogCap)", compile_probe_start
+    )
+    if compile_probe_start < 0 or signature_log_start < 0:
+        raise SystemExit("DX11 R221 shader compile coverage block not found")
+    compile_probe_block = RUNTIME_CENSUS[compile_probe_start:signature_log_start]
+    if "unique <= DetailedSignatureLogCap" in compile_probe_block:
+        raise SystemExit(
+            "DX11 R221 shader compile coverage drift: detailed log cap must not cap compile probes"
+        )
+    for token in [
+        "if (inserted && sig.fixedFunction &&",
+        "else if (signatureHashCapHit && sig.fixedFunction &&",
+        "FixedFunctionShaderCompileSkippedSignatureCap.fetch_add",
+    ]:
+        if token not in compile_probe_block:
+            raise SystemExit(
+                "DX11 R221 shader compile coverage drift: missing " + token
+            )
 
     verify_dx11_activation_boundary()
 

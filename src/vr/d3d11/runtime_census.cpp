@@ -1423,45 +1423,48 @@ namespace outrun::vr::dx11
                     1, std::memory_order_relaxed);
 
             FixedFunctionPixelShaderCompileProbe compileProbe{};
+            // R221: detailed signature logging is intentionally bounded at 64,
+            // but compile-readiness evidence must not inherit that presentation
+            // cap. Probe every newly tracked fixed-function signature up to the
+            // independent SignatureHashCap; only genuinely untracked signatures
+            // beyond that hash cap count as skipped compile coverage.
             if (inserted && sig.fixedFunction &&
                 sig.fixedFunctionShaderPrototypeGenerated)
             {
-                if (unique <= DetailedSignatureLogCap)
-                {
-                    std::array<D3DRESOURCETYPE, 8> textureTypes{};
-                    for (std::size_t stageIndex = 0;
-                         stageIndex < sig.textureStages.size();
-                         ++stageIndex)
-                        textureTypes[stageIndex] =
-                            sig.textureStages[stageIndex].type;
+                std::array<D3DRESOURCETYPE, 8> textureTypes{};
+                for (std::size_t stageIndex = 0;
+                     stageIndex < sig.textureStages.size();
+                     ++stageIndex)
+                    textureTypes[stageIndex] =
+                        sig.textureStages[stageIndex].type;
 
-                    const auto prototype =
-                        generate_fixed_function_pixel_shader_prototype(
-                            sig.fixedFunctionStages,
-                            sig.fixedFunctionStateCoverageExact,
-                            sig.textureResourcePresentMask,
-                            sig.textureResourceExactMask,
-                            textureTypes,
-                            FixedFunctionAlphaTestState{
-                                sig.alphaTestObservationComplete,
-                                sig.alphaTestEnable,
-                                sig.alphaTestRef,
-                                sig.alphaTestFunc
-                            },
-                            sig.textureFactor);
-                    compileProbe =
-                        compile_fixed_function_pixel_shader_prototype(
-                            prototype);
-                    (compileProbe.succeeded
-                        ? FixedFunctionShaderCompileSucceededSignatures
-                        : FixedFunctionShaderCompileFailedSignatures).fetch_add(
-                            1, std::memory_order_relaxed);
-                }
-                else
-                {
-                    FixedFunctionShaderCompileSkippedSignatureCap.fetch_add(
+                const auto prototype =
+                    generate_fixed_function_pixel_shader_prototype(
+                        sig.fixedFunctionStages,
+                        sig.fixedFunctionStateCoverageExact,
+                        sig.textureResourcePresentMask,
+                        sig.textureResourceExactMask,
+                        textureTypes,
+                        FixedFunctionAlphaTestState{
+                            sig.alphaTestObservationComplete,
+                            sig.alphaTestEnable,
+                            sig.alphaTestRef,
+                            sig.alphaTestFunc
+                        },
+                        sig.textureFactor);
+                compileProbe =
+                    compile_fixed_function_pixel_shader_prototype(
+                        prototype);
+                (compileProbe.succeeded
+                    ? FixedFunctionShaderCompileSucceededSignatures
+                    : FixedFunctionShaderCompileFailedSignatures).fetch_add(
                         1, std::memory_order_relaxed);
-                }
+            }
+            else if (signatureHashCapHit && sig.fixedFunction &&
+                sig.fixedFunctionShaderPrototypeGenerated)
+            {
+                FixedFunctionShaderCompileSkippedSignatureCap.fetch_add(
+                    1, std::memory_order_relaxed);
             }
 
             if (sig.vertexDeclaration)
