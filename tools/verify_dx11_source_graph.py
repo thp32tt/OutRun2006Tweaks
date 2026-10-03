@@ -8660,6 +8660,27 @@ def main() -> None:
             + ", ".join(missing_r212_rt0_color_write_census)
         )
 
+    r213_output_state_exactness_contract = [
+        ("bool outputStateObservationComplete{};", RUNTIME_CENSUS,
+         "R213 output-state observation identity"),
+        ("captured && source.complete && source.outputStateComplete;",
+         RUNTIME_CENSUS, "R213 output-state observation propagation"),
+        ("if (!source.outputStateComplete ||", NATIVE_BACKEND_CPP,
+         "native output-state readiness fail-closed boundary"),
+        ("signature.outputStateObservationComplete &&", RUNTIME_CENSUS,
+         "R213 ExactSamples output-state observation gate"),
+    ]
+    missing_r213_output_state_exactness = [
+        meaning
+        for token, source, meaning in r213_output_state_exactness_contract
+        if token not in source
+    ]
+    if missing_r213_output_state_exactness:
+        raise SystemExit(
+            "DX11 R213 output-state census exactness drift: "
+            + ", ".join(missing_r213_output_state_exactness)
+        )
+
     mrt_color_write_contract = [
         ("std::array<DWORD, 3> additionalColorWriteEnable{",
          D3D9_DRAW_STATE_HPP, "tracked MRT color-write fields"),

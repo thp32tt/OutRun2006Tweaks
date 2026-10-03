@@ -2641,9 +2641,14 @@ namespace outrun::vr::dx11
 
         note_signature(signature, primitive);
 
+        // R213: the dormant native output-state binder rejects snapshots when
+        // viewport/scissor/blend-factor/sample-mask observation is incomplete.
+        // Keep census ExactSamples at least as strict as that readiness boundary.
         if (unsupported == PipelineUnsupportedNone && topology.exact &&
             pointRasterSemanticsExact && lineRasterSemanticsExact &&
-            resourcesExact && inputLayoutExact && shaderTranslationExact)
+            resourcesExact && inputLayoutExact &&
+            signature.outputStateObservationComplete &&
+            shaderTranslationExact)
             ExactSamples.fetch_add(1, std::memory_order_relaxed);
 
         maybe_log();
