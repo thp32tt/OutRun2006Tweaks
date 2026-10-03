@@ -1733,7 +1733,7 @@ def main() -> None:
         "InputLayoutUnsupportedSamples": "R78/R79 unsupported layout evidence counter",
         "InputLayoutFvfExactSamples": "R79 exact FVF layout evidence counter",
         "InputLayoutFvfPendingSamples": "R79 unsupported FVF blocker counter",
-        "signature.fixedFunction &&\n            signature.fixedFunctionStateCoverageExact &&\n            signature.fixedFunctionTranslationReady &&\n            signature.resourceBehaviorExact &&\n            resourcesExact && inputLayoutExact &&\n            signature.outputStateObservationComplete &&\n            signature.shaderTranslationExact": "R219 final ExactSamples explicitly preserves F18 resource-behavior readiness plus R218 FFP and R215 shader gates",
+        "signature.fixedFunction &&\n            signature.fixedFunctionStateCoverageExact &&\n            signature.fixedFunctionTranslationReady &&\n            signature.resourceBehaviorExact &&\n            resourcesExact && inputLayoutExact &&\n            signature.outputStateObservationComplete &&\n            signature.shaderReadinessExact &&\n            signature.shaderTranslationExact": "R219/R220 final ExactSamples explicitly preserves F18 resource-behavior readiness, R218 FFP and the distinct F21 shader-readiness gate",
         "translate_vertex_input_layout": "R78 runtime declaration classifier",
         "GetVertexShader": "vertex shader observation",
         "GetPixelShader": "pixel shader observation",
