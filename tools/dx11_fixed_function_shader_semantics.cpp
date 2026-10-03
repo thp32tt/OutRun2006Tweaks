@@ -117,6 +117,23 @@ int main()
                 "R223 compiled vertex bytecode is empty");
         require(vertexProbe.bytecodeHash != 0,
                 "R223 compiled vertex bytecode hash is empty");
+
+        auto rejectedVertexPrototype = vertexPrototype;
+        rejectedVertexPrototype.unsupported =
+            outrun::vr::dx11::
+                FixedFunctionVertexShaderPrototypeUnsupportedInputLayout;
+        const FixedFunctionVertexShaderCompileProbe rejectedVertexProbe =
+            compile_fixed_function_vertex_shader_prototype(
+                rejectedVertexPrototype);
+        require(!rejectedVertexProbe.attempted,
+                "R223 unsupported vertex compile probe must not be attempted");
+        require(!rejectedVertexProbe.succeeded,
+                "R223 unsupported vertex compile probe must fail closed");
+        require(rejectedVertexProbe.result == E_FAIL,
+                "R223 unsupported vertex compile result must remain E_FAIL");
+        require(rejectedVertexProbe.bytecodeBytes == 0 &&
+                    rejectedVertexProbe.bytecodeHash == 0,
+                "R223 unsupported vertex compile must not retain bytecode");
     }
 
     {
