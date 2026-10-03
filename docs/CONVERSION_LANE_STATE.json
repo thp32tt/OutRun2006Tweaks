@@ -52,13 +52,13 @@
   },
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00323",
-    "production_id": "CONVERSION-DX11-00323",
-    "event_id": "CONVERSION-DX11-00323-E005",
-    "event_type": "retry",
-    "attempt": "3/3",
-    "dispatch_source": "CURRENT_USER_QUEUE_RETRY",
+    "production_id": "CONVERSION-DXVK-00322",
+    "event_id": "CONVERSION-DXVK-00322-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "dispatch_source": "CURRENT_USER_QUEUE",
     "result_sha": "3bf9e729ad4c2dcae4bf706eda5fde78898163f9",
-    "source_implementation_sha": "3bf9e729ad4c2dcae4bf706eda5fde78898163f9",
+    "source_implementation_sha": "6d361290e0565475c06ba9dee690e711469edc38",
     "validation_bearing_sha": "3bf9e729ad4c2dcae4bf706eda5fde78898163f9",
     "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R225_MULTI_LOG_SIGNATURE_NAMESPACE_ISOLATION_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
@@ -70,10 +70,21 @@
     "artifact_digest": "sha256:430c5a4ec595bd2feff4a30efa25763d8978426e7c06f0bdce9ac95c5d69d5c6",
     "run_record_path": "docs/automation/runs/CONVERSION-DX11-00323.json",
     "dispatch_metadata_correction": {
-      "corrected_from_event_id": "CONVERSION-DX11-00323-E002",
-      "corrected_from_attempt": "1/3",
+      "corrected_from_event_id": "CONVERSION-DX11-00323-E005",
+      "corrected_from_attempt": "3/3",
+      "corrected_to_event_id": "CONVERSION-DXVK-00322-E001",
+      "corrected_to_attempt": "1/3",
+      "reason": "same-task branch-concurrency cancellations are SUPERSEDED, not retries",
       "material_and_validation_bearing_sha_unchanged": true
-    }
+    },
+    "implementation_commits": [
+      "6d361290e0565475c06ba9dee690e711469edc38",
+      "7cc3e2fc0ea14037868f26aa171126787db65857",
+      "8d678600e4f4360df6470a9319bb3ff5f080d799",
+      "4bbe70bbc1f5c472211155c1cf632fd4c4c67156",
+      "3bf9e729ad4c2dcae4bf706eda5fde78898163f9"
+    ],
+    "implementation_comment_id": 5973825690
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00323. Exact-SHA hosted validation passed for 3bf9e729ad4c2dcae4bf706eda5fde78898163f9, including R225 multi-log census signature namespace isolation, source-graph/dormant-activation/census checks, Win32 build/binary and DX11 readiness smoke. This is source/static/hosted evidence, not in-game/HMD proof.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before native draw activation or visual/runtime correctness claims.",
@@ -1844,10 +1855,10 @@
     {
       "unit_id": "DX11_R225_MULTI_LOG_SIGNATURE_NAMESPACE_ISOLATION",
       "task_id": "CONVERSION-DX11-00323",
-      "production_id": "CONVERSION-DX11-00323",
-      "event_id": "CONVERSION-DX11-00323-E005",
-      "event_type": "retry",
-      "attempt": "3/3",
+      "production_id": "CONVERSION-DXVK-00322",
+      "event_id": "CONVERSION-DXVK-00322-E001",
+      "event_type": "rollover",
+      "attempt": "1/3",
       "base_sha": "af39a4e36f1234afa5229fc98e041a582b1e9a5f",
       "implementation_commits": [
         "6d361290e0565475c06ba9dee690e711469edc38",
@@ -1856,7 +1867,7 @@
         "4bbe70bbc1f5c472211155c1cf632fd4c4c67156",
         "3bf9e729ad4c2dcae4bf706eda5fde78898163f9"
       ],
-      "source_implementation_sha": "3bf9e729ad4c2dcae4bf706eda5fde78898163f9",
+      "source_implementation_sha": "6d361290e0565475c06ba9dee690e711469edc38",
       "material_result_sha": "3bf9e729ad4c2dcae4bf706eda5fde78898163f9",
       "validation_bearing_sha": "3bf9e729ad4c2dcae4bf706eda5fde78898163f9",
       "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R225_MULTI_LOG_SIGNATURE_NAMESPACE_ISOLATION_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
@@ -1870,10 +1881,14 @@
       "artifact_id": 11285308766,
       "artifact_digest": "sha256:430c5a4ec595bd2feff4a30efa25763d8978426e7c06f0bdce9ac95c5d69d5c6",
       "dispatch_metadata_correction": {
-        "corrected_from_event_id": "CONVERSION-DX11-00323-E002",
-        "corrected_from_attempt": "1/3",
+        "corrected_from_event_id": "CONVERSION-DX11-00323-E005",
+        "corrected_from_attempt": "3/3",
+        "corrected_to_event_id": "CONVERSION-DXVK-00322-E001",
+        "corrected_to_attempt": "1/3",
+        "reason": "same-task branch-concurrency cancellations are SUPERSEDED, not retries",
         "material_and_validation_bearing_sha_unchanged": true
-      }
+      },
+      "implementation_comment_id": 5973825690
     }
   ],
   "controller_dispatch": {
