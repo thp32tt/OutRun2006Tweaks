@@ -58,15 +58,23 @@
     "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "issue14_comment_id": 5971591685,
+    "issue14_comment_id": 5971618955,
     "validation_run_id": 37139600955,
     "validation_job_id": 111251105508,
     "readiness_smoke_job_id": 111252044368,
     "artifact_id": 11279637775,
     "artifact_digest": "sha256:00d82cfbfadfb5a96f36a21c39125cbebbe0fcabd70ed31cd8739f3e63a40502",
     "validation_comment_id": 5971591685,
-    "authoritative_metadata_correction_comment_id": 5971548076,
-    "superseded_issue_comment_id": 5971516225
+    "authoritative_metadata_correction_comment_id": 5971618955,
+    "production_id": "CONVERSION-DX11-00304",
+    "event_id": "CONVERSION-DX11-00304-E003",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "dispatch_source": "CURRENT_USER_QUEUE_DISPATCH",
+    "superseded_dispatch_comment_ids": [
+      5971548076,
+      5971591685
+    ]
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00305. Exact-SHA hosted validation passed for 078b3ec1bbcaebde9fc79abf37da22c83e45bf47, including R216 source-graph/dormant-boundary/census-analyzer checks, Win32 build/binary and DX11 readiness smoke. This is diagnostic/source readiness evidence, not in-game/HMD proof.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before native draw activation or visual/runtime correctness claims.",
@@ -1584,15 +1592,33 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "packaging_status": "NOT_REQUIRED_DORMANT_CENSUS_STATIC_ONLY",
-      "issue14_comment_id": 5971591685,
+      "issue14_comment_id": 5971618955,
       "validation_run_id": 37139600955,
       "validation_job_id": 111251105508,
       "readiness_smoke_job_id": 111252044368,
       "artifact_id": 11279637775,
       "artifact_digest": "sha256:00d82cfbfadfb5a96f36a21c39125cbebbe0fcabd70ed31cd8739f3e63a40502",
       "validation_comment_id": 5971591685,
-      "authoritative_metadata_correction_comment_id": 5971548076,
-      "superseded_issue_comment_id": 5971516225
+      "authoritative_metadata_correction_comment_id": 5971618955,
+      "production_id": "CONVERSION-DX11-00304",
+      "event_id": "CONVERSION-DX11-00304-E003",
+      "event_type": "retry",
+      "attempt": "1/3",
+      "superseded_dispatch_comment_ids": [
+        5971548076,
+        5971591685
+      ]
     }
-  ]
+  ],
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00305",
+    "production_id": "CONVERSION-DX11-00304",
+    "event_id": "CONVERSION-DX11-00304-E003",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_DISPATCH",
+    "material_result_sha": "078b3ec1bbcaebde9fc79abf37da22c83e45bf47",
+    "validation_bearing_result_sha": "078b3ec1bbcaebde9fc79abf37da22c83e45bf47",
+    "metadata_correction_comment_id": 5971618955
+  }
 }
