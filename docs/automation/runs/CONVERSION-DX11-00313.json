@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00313",
-  "production_id": "CONVERSION-DXVK-00312",
+  "production_id": "CONVERSION-DX11-00313",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "1/3",
-  "event_id": "CONVERSION-DXVK-00312-E001",
-  "event_type": "rollover",
+  "attempt": "2/3",
+  "event_id": "CONVERSION-DX11-00313-E002",
+  "event_type": "retry",
   "status": "COMPLETE",
   "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SHADER_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
@@ -69,7 +69,8 @@
       "issue14_implementation_comment_id": 5972594143,
       "issue14_repair_comment_id": 5972604116,
       "issue14_validation_comment_id": 5972672201,
-      "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Preserve R220 and R213-R219 exactness protections; programmable shader translation and Quest 3/VDXR runtime parity remain separate fail-closed gates."
+      "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Preserve R220 and R213-R219 exactness protections; programmable shader translation and Quest 3/VDXR runtime parity remain separate fail-closed gates.",
+      "dispatch_metadata_correction_comment_id": 5972674428
     }
   },
   "regression_assessment": {
@@ -80,11 +81,18 @@
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "controller_dispatch": {
-    "production_id": "CONVERSION-DXVK-00312",
-    "event_id": "CONVERSION-DXVK-00312-E001",
-    "event_type": "rollover",
-    "attempt": "1/3",
-    "source": "CURRENT_USER_QUEUE_ROLLOVER"
+    "production_id": "CONVERSION-DX11-00313",
+    "event_id": "CONVERSION-DX11-00313-E002",
+    "event_type": "retry",
+    "attempt": "2/3",
+    "source": "CURRENT_USER_QUEUE_RETRY",
+    "material_result_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+    "source_implementation_sha": "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0",
+    "validation_bearing_result_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+    "implementation_comment_id": 5972594143,
+    "repair_comment_id": 5972604116,
+    "validation_comment_id": 5972672201,
+    "dispatch_metadata_correction_comment_id": 5972674428
   },
   "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion task from the newest authenticated GitHub HEAD; keep programmable shader translation, native draw activation and Quest 3/VDXR runtime claims fail-closed until their own evidence gates pass.",
   "superseded_failed_gate": {
@@ -113,5 +121,19 @@
     5972594143,
     5972604116,
     5972672201
-  ]
+  ],
+  "dispatch_metadata_correction": {
+    "authoritative_production_id": "CONVERSION-DX11-00313",
+    "authoritative_event_id": "CONVERSION-DX11-00313-E002",
+    "authoritative_event_type": "retry",
+    "authoritative_attempt": "2/3",
+    "corrected_from": {
+      "production_id": "CONVERSION-DXVK-00312",
+      "event_id": "CONVERSION-DXVK-00312-E001",
+      "event_type": "rollover",
+      "attempt": "1/3"
+    },
+    "evidence_comment_id": 5972674428,
+    "material_and_validation_bearing_sha_unchanged": true
+  }
 }
