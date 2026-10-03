@@ -1182,4 +1182,9 @@ namespace OutRunVRStereo
         VRStereoR31PerfHook VRStereoR31PerfHook::instance;
     }
 
+    inline OutRunVR::RuntimeEligibility::InstallState
+    R31InstallStatus() noexcept
+    {
+        return R31InstallState.load(std::memory_order_acquire);
+    }
 }
