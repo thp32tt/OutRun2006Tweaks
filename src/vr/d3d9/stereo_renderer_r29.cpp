@@ -619,4 +619,10 @@ namespace OutRunVRStereo
     {
         R29ArmMonoSafety(extraPresents);
     }
+
+    inline void SetStereoRecoverySafetyThroughEpoch(
+        std::uint64_t throughEpoch) noexcept
+    {
+        R29MonoSafetyThroughEpoch = throughEpoch;
+    }
 }
