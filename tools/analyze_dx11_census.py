@@ -72,6 +72,7 @@ SUMMARY_RE = re.compile(
     r"fvfPending=(?P<inputLayoutFvfPending>\d+)\] )?"
     r"(?:shaderReadiness\[introspectionFailure=(?P<shaderIntrospectionFailure>\d+),"
     r"mixedPair=(?P<shaderMixedPair>\d+),"
+    r"(?:translationExact=(?P<shaderTranslationExact>\d+),)?"
     r"fixedFunctionPending=(?P<shaderFixedFunctionPending>\d+),"
     r"programmablePending=(?P<shaderProgrammablePending>\d+)\] )?"
     r"(?:ffpCoverage\[exact=(?P<fixedFunctionCoverageExact>\d+),"

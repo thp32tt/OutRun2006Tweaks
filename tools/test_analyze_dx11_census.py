@@ -259,7 +259,7 @@ def main() -> int:
         "mirrorGeneration=0,mirrorVersion=0,mirrorReady=0] "
         "inputLayout[exact=64,unsupported=0,fvfExact=60,fvfPending=0] "
         "shaderReadiness[introspectionFailure=0,mixedPair=0,"
-        "fixedFunctionPending=60,programmablePending=4] "
+        "translationExact=0,fixedFunctionPending=60,programmablePending=4] "
         "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
         "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
         "depthCmp=0,cull=0]\n"
@@ -268,6 +268,7 @@ def main() -> int:
     assert r80["NativeDrawPathActivationAllowed"] is False
     assert r80["LatestSummary"]["shaderIntrospectionFailure"] == 0
     assert r80["LatestSummary"]["shaderMixedPair"] == 0
+    assert r80["LatestSummary"]["shaderTranslationExact"] == 0
     assert r80["LatestSummary"]["shaderFixedFunctionPending"] == 60
     assert r80["LatestSummary"]["shaderProgrammablePending"] == 4
     assert r80["LatestSummary"]["inputLayoutUnsupported"] == 0

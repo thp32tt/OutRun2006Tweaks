@@ -109,6 +109,9 @@ namespace outrun::vr::dx11
         std::atomic<std::uint64_t> InputLayoutFvfPendingSamples{0};
         std::atomic<std::uint64_t> ShaderIntrospectionFailureSamples{0};
         std::atomic<std::uint64_t> ShaderMixedPairSamples{0};
+        // R215 counts the narrow fixed-function subset whose already-dormant
+        // VS/PS source generators and transform contract are all exact.
+        std::atomic<std::uint64_t> ShaderTranslationExactSamples{0};
         std::atomic<std::uint64_t> ShaderFixedFunctionPendingSamples{0};
         std::atomic<std::uint64_t> ShaderProgrammablePendingSamples{0};
         std::atomic<std::uint64_t> FixedFunctionStateCoverageExactSamples{0};
@@ -1044,9 +1047,10 @@ namespace outrun::vr::dx11
                 shaderQueryComplete &&
                 ((vertexShader != nullptr) != (pixelShader != nullptr));
 
-            // R80 is deliberately fail-closed: no native D3D11 shader
-            // translator or complete fixed-function emulation exists yet.
-            // Fingerprints are evidence for F21; they are not readiness.
+            // R80 starts fail-closed. R215 may promote only the later
+            // fixed-function branch after its resource-dependent pixel
+            // prototype, vertex prototype and WVP transform are all exact.
+            // Programmable D3D9 shaders remain unsupported.
             sig.shaderTranslationExact = false;
 
             device->GetFVF(&sig.fvf);
@@ -1451,6 +1455,9 @@ namespace outrun::vr::dx11
                     1, std::memory_order_relaxed);
             else if (sig.shaderMixedPair)
                 ShaderMixedPairSamples.fetch_add(
+                    1, std::memory_order_relaxed);
+            else if (sig.shaderTranslationExact)
+                ShaderTranslationExactSamples.fetch_add(
                     1, std::memory_order_relaxed);
             else if (sig.fixedFunction)
                 ShaderFixedFunctionPendingSamples.fetch_add(
@@ -1902,7 +1909,7 @@ namespace outrun::vr::dx11
             const auto sampleStride = census_sample_stride();
             const auto samplingScheme = census_sampling_scheme();
             spdlog::info(
-                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} rasterSemantics[pointUnsupported={},lineUnsupported={}] signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={},auxRenderTargetUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] dualSourceBlend[any={},rgbSrc={},rgbDst={},alphaSrc={},alphaDst={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={},dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={},texCoordWrap={},mrtColorWrite={},specular={}]",
+                "VR DX11 R120 census: samples={} exact={} fixedFn={} programmable={} topologyUnsupported={} rasterSemantics[pointUnsupported={},lineUnsupported={}] signatures={} sampling[drawsSeen={},stride={},scheme={}] signatureCaps[hashCap={},hashCapHitSamples={},detailCap={},detailSkipped={}] declSamples={} indexedSamples={} texturedSamples={} resourceExact[introspectionFailure={},behaviorUnsupported={},mutationTelemetryRequired={},managedShadowRequired={},indexUnsupported={},textureUnsupported={},colorUnsupported={},depthUnsupported={},auxRenderTargetUnsupported={}] mutation[writeUnlocks={},readOnlyUnlocks={},discardWriteUnlocks={},noOverwriteWriteUnlocks={}] mutationPlan[exact={},unsupported={},managedShadow={},mapWrite={},mapDiscard={},mapNoOverwrite={},updateSubresource={}] textureMutation[writeUnlocks={},readOnlyUnlocks={},descriptorFailures={},updateTextureSuccesses={},updateTextureFailures={},updateSurfaceSuccesses={},updateSurfaceFailures={}] managedLifetime[shadowWrites={},shadowReads={},resetSuccesses={},shadowPreserved={},deviceGeneration={},shadowVersion={},mirrorGeneration={},mirrorVersion={},mirrorReady={}] managedTextureShadow[requiredSamples={},readySamples={},pendingSamples={}] managedTextureMutationSource[updateTextureInvalidations={},updateSurfaceInvalidations={}] inputLayout[exact={},unsupported={},fvfExact={},fvfPending={}] shaderReadiness[introspectionFailure={},mixedPair={},translationExact={},fixedFunctionPending={},programmablePending={}] ffpCoverage[exact={},queryFailure={}] ffpReadiness[ready={},pending={}] ffpPipelineShader[exact={},pending={},alphaTestOwned={}] ffpShaderPrototype[generated={},pending={}] ffpShaderCompile[succeeded={},failed={},skippedCap={}] textureStageResource[bound={},exact={},pending={}] textureStageManagedShadow[required={},ready={},pending={}] dualSourceBlend[any={},rgbSrc={},rgbDst={},alphaSrc={},alphaDst={}] unsupported[incomplete={},wbuffer={},sepAlpha={},alphaTest={},stencil={},fog={},lighting={},srgb={},fill={},blend={},depthCmp={},cull={},dualSource={},shadeMode={},clipping={},depthBias={},vertexBlend={},dither={},texCoordWrap={},mrtColorWrite={},specular={}]",
                 Samples.load(std::memory_order_relaxed),
                 ExactSamples.load(std::memory_order_relaxed),
                 FixedFunctionSamples.load(std::memory_order_relaxed),
@@ -1972,6 +1979,7 @@ namespace outrun::vr::dx11
                 InputLayoutFvfPendingSamples.load(std::memory_order_relaxed),
                 ShaderIntrospectionFailureSamples.load(std::memory_order_relaxed),
                 ShaderMixedPairSamples.load(std::memory_order_relaxed),
+                ShaderTranslationExactSamples.load(std::memory_order_relaxed),
                 ShaderFixedFunctionPendingSamples.load(std::memory_order_relaxed),
                 ShaderProgrammablePendingSamples.load(std::memory_order_relaxed),
                 FixedFunctionStateCoverageExactSamples.load(
@@ -2432,8 +2440,6 @@ namespace outrun::vr::dx11
         signature.fogVertexMode = source.fogVertexMode;
 
         const bool inputLayoutExact = signature.inputLayoutExact;
-        const bool shaderTranslationExact =
-            signature.shaderTranslationExact;
 
         bool resourcesExact = signature.resourceIntrospectionComplete;
         if (!signature.resourceIntrospectionComplete)
@@ -2637,18 +2643,30 @@ namespace outrun::vr::dx11
                 shaderPrototype.sourceHash;
             signature.fixedFunctionShaderPrototypeBytes =
                 static_cast<UINT>(shaderPrototype.source.size());
+
+            // R215 closes the original R80 fixed-function census gap without
+            // promoting programmable D3D9 shaders or activating native draw.
+            // The dormant native pipeline consumes these same generated VS/PS
+            // and transform contracts, while input/resource/output readiness
+            // remain independent ExactSamples gates below.
+            signature.shaderTranslationExact =
+                signature.shaderIntrospectionComplete &&
+                !signature.shaderMixedPair &&
+                signature.fixedFunctionPipelineShaderExact &&
+                signature.fixedFunctionVertexShaderPrototypeGenerated &&
+                signature.fixedFunctionTransformExact;
         }
 
         note_signature(signature, primitive);
 
-        // R213: the dormant native output-state binder rejects snapshots when
-        // viewport/scissor/blend-factor/sample-mask observation is incomplete.
-        // Keep census ExactSamples at least as strict as that readiness boundary.
+        // R215 retains the R213 output-state boundary and additionally admits
+        // only the fixed-function shader subset sealed above. Programmable
+        // shaders remain fail-closed, and this census is still diagnostic-only.
         if (unsupported == PipelineUnsupportedNone && topology.exact &&
             pointRasterSemanticsExact && lineRasterSemanticsExact &&
             resourcesExact && inputLayoutExact &&
             signature.outputStateObservationComplete &&
-            shaderTranslationExact)
+            signature.shaderTranslationExact)
             ExactSamples.fetch_add(1, std::memory_order_relaxed);
 
         maybe_log();

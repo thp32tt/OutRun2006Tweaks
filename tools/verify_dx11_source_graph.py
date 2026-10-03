@@ -210,6 +210,37 @@ def main() -> None:
             + ", ".join(missing_r211_raster_census)
         )
 
+    r215_shader_translation_exactness_contract = [
+        ("ShaderTranslationExactSamples", RUNTIME_CENSUS,
+         "R215 exact fixed-function shader census counter"),
+        ("signature.shaderTranslationExact =", RUNTIME_CENSUS,
+         "R215 fixed-function shader exactness assignment"),
+        ("signature.fixedFunctionPipelineShaderExact &&", RUNTIME_CENSUS,
+         "R215 pixel/pipeline shader readiness gate"),
+        ("signature.fixedFunctionVertexShaderPrototypeGenerated &&", RUNTIME_CENSUS,
+         "R215 vertex shader source readiness gate"),
+        ("signature.fixedFunctionTransformExact;", RUNTIME_CENSUS,
+         "R215 WVP transform readiness gate"),
+        ("translationExact={}", RUNTIME_CENSUS,
+         "R215 periodic shader readiness telemetry"),
+        ("signature.shaderTranslationExact)", RUNTIME_CENSUS,
+         "R215 ExactSamples shader gate"),
+        ("shaderTranslationExact", DX11_CENSUS_ANALYZER,
+         "R215 analyzer shader exactness parsing"),
+        ("translationExact=0", DX11_CENSUS_ANALYZER_TEST,
+         "R215 analyzer regression fixture"),
+    ]
+    missing_r215_shader_translation_exactness = [
+        meaning
+        for token, source, meaning in r215_shader_translation_exactness_contract
+        if token not in source
+    ]
+    if missing_r215_shader_translation_exactness:
+        raise SystemExit(
+            "DX11 R215 shader translation exactness drift: "
+            + ", ".join(missing_r215_shader_translation_exactness)
+        )
+
     r165_dither_contract = [
         ("DWORD ditherEnable = FALSE;", D3D9_DRAW_STATE_HPP,
          "R165 tracked dither field and disabled default"),
