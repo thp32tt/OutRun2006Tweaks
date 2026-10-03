@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "2356c8bc124212c23526ec302df1a5cbef33baf5",
+  "state_parent_head": "3670d3ed6b072c4203e1e40b7de590d7235b95ad",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -51,23 +51,23 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DX11-00298",
-    "result_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
-    "source_implementation_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
-    "validation_bearing_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
+    "task_id": "CONVERSION-DX11-00300",
+    "result_sha": "3670d3ed6b072c4203e1e40b7de590d7235b95ad",
+    "source_implementation_sha": "0504e094bca1aee71451702d58b5aefb5932ee59",
+    "validation_bearing_sha": "3670d3ed6b072c4203e1e40b7de590d7235b95ad",
     "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "issue14_comment_id": 5970543154,
-    "validation_run_id": 37132328700,
-    "validation_job_id": 111229737462,
-    "readiness_smoke_job_id": 111230619838,
-    "artifact_id": 11277347657,
-    "validation_comment_id": 5970519083
+    "issue14_comment_id": 5970820470,
+    "validation_run_id": 37134564287,
+    "validation_job_id": 111236341808,
+    "readiness_smoke_job_id": 111237313421,
+    "artifact_id": 11278551482,
+    "artifact_digest": "sha256:3b308a4a04a823c04b6fff4f5b7f394fc848cf1eb7e0115139c28a4e35753bdf"
   },
-  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00298. Exact-SHA hosted validation passed for 2356c8bc124212c23526ec302df1a5cbef33baf5, including source/static checks, Win32 build/binary and DX11 readiness smoke; this is not in-game/HMD proof.",
+  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00300. Exact-SHA hosted validation passed for 3670d3ed6b072c4203e1e40b7de590d7235b95ad, including source/static checks, Win32 build/binary and DX11 readiness smoke; this is not in-game/HMD proof.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation or visual/runtime correctness claims.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve the R212 RT0 COLORWRITEENABLE census identity boundary together with prior retained fixed-function and point/line semantics; fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for one new independent dormant DX11 source/static gap. Runtime parity remains separately required.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve R213 dynamic-output observation fail-closed ExactSamples gating and prior retained semantics; fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for one new independent dormant DX11 source/static gap. Runtime parity remains separately required.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1496,6 +1496,17 @@
       "artifact_id": 11277347657,
       "artifact_digest": "sha256:a33ac4a86821ef348dc9d8f03e3f665cdcf433d1dd203d7fe4f5e34d447c77eb",
       "validation_comment_id": 5970519083
+    },
+    {
+      "unit_id": "DX11_R213_OUTPUT_STATE_EXACTNESS_GATE",
+      "task_id": "CONVERSION-DX11-00300",
+      "material_result_sha": "0504e094bca1aee71451702d58b5aefb5932ee59",
+      "guard_result_sha": "3670d3ed6b072c4203e1e40b7de590d7235b95ad",
+      "validation_bearing_sha": "3670d3ed6b072c4203e1e40b7de590d7235b95ad",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false
     }
   ]
 }
