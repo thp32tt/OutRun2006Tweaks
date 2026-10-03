@@ -1,11 +1,11 @@
 # Korean Localization Automation Contract
 
-This is the canonical contract for the N100 A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, localization/WORKLOG.md, localization/progress/progress.json, localization/resume_state.json, localization/graphics/README.md and localization/graphics/ORIENTATION_POLICY.md. Repository state on korean-localization-clean is the only work state; do not use GPT Library as a work store.
+This is the canonical contract for the N100 A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, localization/WORKLOG.md, localization/progress/progress.json, localization/resume_state.json, localization/graphics/README.md and localization/graphics/ORIENTATION_POLICY.md. Repository state on korean-localization-20260928-clean-v1 is the only work state; do not use GPT Library as a work store.
 
 Progress-path compatibility: `localization/progress/progress.json` is the canonical progress state. `localization/progress.json` exists only as an exact compatibility mirror for legacy project instructions and MUST remain byte-for-byte identical. New automation must use the canonical nested path. C synchronization is responsible for updating the compatibility mirror whenever canonical progress changes; CI rejects drift.
 
 ## Isolation and source rules
-- Work only on korean-localization-clean. Never merge VR/FFB source or history.
+- Work only on korean-localization-20260928-clean-v1. Never merge VR/FFB source or history.
 - Preserve the independent original-mod Korean patch architecture.
 - When an HD-mod DDS exists it is the graphics baseline. Never upscale an older low-resolution Korean DDS.
 - Read DDS headers and preserve dimensions, format/compression, alpha and mip behavior.
@@ -40,7 +40,7 @@ The controller prompt may be intentionally minimal. The following commands are s
 - `OutRun 한글화 B 실행`
 - `OutRun 한글화 C 실행`
 
-On any of those commands, first fetch the latest `korean-localization-clean`, read this contract and all required state/policy files named at the top of this document, resolve the requested role below, perform the work, update Git state, commit/push when changed, and verify the resulting SHA. The Docker/controller prompt must not duplicate the detailed rules from this file.
+On any of those commands, first fetch the latest `korean-localization-20260928-clean-v1`, read this contract and all required state/policy files named at the top of this document, resolve the requested role below, perform the work, update Git state, commit/push when changed, and verify the resulting SHA. The Docker/controller prompt must not duplicate the detailed rules from this file.
 
 ## Parallel dual-production dispatch
 - A and B are independent production workers and SHOULD run concurrently when the controller runtime supports multiple active conversations/workers.
@@ -75,4 +75,20 @@ Do not repeat completed work. Resume from current Git progress/resume state.
 - C synchronization-barrier completion reconciles both A/B terminal results into `localization/resume_state.json`, `localization/WORKLOG.md`, `localization/progress/STATUS.md`, `localization/graphics/asset_queue.csv` and other shared summaries as applicable.
 - A no-action or blocker result is still durable: write a unique task record and commit it with the required `[AUTO:<TASK_ID>]` marker; do not create an empty commit.
 Before approval inspect raw DDS and readable/game orientation; use in-game screenshot validation when available.
-Git synchronization is mandatory at the end of each role: re-fetch latest `korean-localization-clean`, preserve peer-lane commits, commit/push only the role's permitted localization changes, and verify the resulting task commit SHA. Never import VR/FFB changes.
+Git synchronization is mandatory at the end of each role: re-fetch latest `korean-localization-20260928-clean-v1`, preserve peer-lane commits, commit/push only the role's permitted localization changes, and verify the resulting task commit SHA. Never import VR/FFB changes.
+
+
+## Clean-v1 controller invariants (2026-10-03)
+
+This branch intentionally restores the simple 2026-09-28 A/B/C operating model.
+
+- The Docker controller sends only short role commands plus TASK_ID and target branch.
+- A and B run in parallel. C starts only after both A and B have durable Git task commits.
+- After C has a durable Git task commit, the next A+B wave starts immediately.
+- Completion authority is the Git commit containing the exact [AUTO:<TASK_ID>] marker on this branch.
+- Retry, browser recovery, or continuing the same chat never consumes a new production TASK_ID.
+- Do not introduce C0-C6 pipeline stages, EVENT_ID, rollover schemas, per-step Actions gates, task latches, or status-only checkpoint loops into the controller.
+- A role must do executable localization work while it exists. Inspection is part of work, not a terminal result by itself.
+- A/B should process multiple independent actionable assets per invocation while runtime/tool budget allows, as already required by the throughput rule.
+- Runtime game validation remains UNTESTED unless it was actually performed.
+- Controller state is disposable orchestration metadata. Repository state on this branch is the durable source of truth.
