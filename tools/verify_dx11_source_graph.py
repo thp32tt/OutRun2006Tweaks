@@ -8921,6 +8921,30 @@ def main() -> None:
             + ", ".join(missing_r224_vertex_compile_analyzer)
         )
 
+    r225_multi_log_signature_namespace_contract = [
+        ("SignatureKey = tuple[str, int]",
+         DX11_CENSUS_ANALYZER, "R225 source-log signature namespace type"),
+        ("signature_key = (source_log, signature_id)",
+         DX11_CENSUS_ANALYZER, "R225 per-log signature key"),
+        ('"source_log": source_log',
+         DX11_CENSUS_ANALYZER, "R225 report provenance field"),
+        ("r225_multi_log = run_cases(",
+         DX11_CENSUS_ANALYZER_TEST, "R225 multi-log regression fixture"),
+        ('r225_multi_log["UniqueSignaturesCaptured"] == 2',
+         DX11_CENSUS_ANALYZER_TEST, "R225 cross-session collision assertion"),
+    ]
+    missing_r225_multi_log_signature_namespace = [
+        meaning
+        for token, source, meaning
+        in r225_multi_log_signature_namespace_contract
+        if token not in source
+    ]
+    if missing_r225_multi_log_signature_namespace:
+        raise SystemExit(
+            "DX11 R225 multi-log signature namespace drift: "
+            + ", ".join(missing_r225_multi_log_signature_namespace)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
