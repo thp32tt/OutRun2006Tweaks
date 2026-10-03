@@ -1,7 +1,7 @@
 # Graphics Orientation & Preserve Policy
 
 Updated: 2026-09-26 22:46 KST
-Branch: `korean-localization-clean`
+Branch: `korean-localization-recovery-20260928`
 
 This policy is mandatory for all Korean graphics localization work.
 
@@ -103,7 +103,7 @@ The artifact check must be performed on both the raw DDS view and the readable/g
 
 ## GitHub persistence rule
 
-The canonical localization branch is **`korean-localization-clean`**.
+The canonical localization branch for this recovery workflow is **`korean-localization-recovery-20260928`**.
 
 For every completed graphics batch or QA-rule change:
 - update this branch's localization progress/resume metadata,
@@ -153,3 +153,64 @@ Effective 2026-09-28:
 - Missing or ambiguous source-region evidence is **HOLD_STRICT_RECHECK**, not PASS.
 - Static containment PASS does not override the mandatory isolated `DDS_ONLY` in-game validation gate.
 - Canonical audit record: `localization/graphics/FULL_PIXEL_BOUNDARY_AUDIT_20260928.json`.
+
+
+## Recovery quality pipeline: clean plate before lettering
+
+This section imports image-quality techniques without importing later controller/automation machinery. It applies to newly produced or materially reworked localized graphics.
+
+### 1. Glyph-footprint removal, not rectangle erasure
+- Build the removal mask from the complete source glyph/effect footprint: fill, outline, shadow, glow and antialias fringe.
+- Never erase a whole OCR/text rectangle merely because text was detected there.
+- Keep sprite borders, panel borders, separator lines, icons, logos, preserve-original labels and neighboring cells in an explicit protected mask.
+- Mask dilation may include source antialias/shadow/glow residue, but must be clipped by protected artwork.
+
+### 2. Background-aware reconstruction
+Before removing source text, classify the underlying background:
+- flat/near-flat -> reconstruct from verified neighboring source pixels;
+- smooth gradient -> reconstruct a continuous source-faithful gradient;
+- patterned/textured/artwork -> use source-constrained reconstruction/inpainting or faithful redraw;
+- transparent/semitransparent -> reconstruct RGB and alpha together; never insert an opaque backing.
+
+Perform removal/reconstruction at the exact HD source resolution. Downscale/inpaint/upscale is forbidden for final artwork.
+
+### 3. Mandatory clean-plate gate
+For every translated image element use:
+
+`EXACT_HD_SOURCE -> SOURCE_TEXT_MASK -> PROTECTED_MASK -> CLEAN_PLATE -> KOREAN_LETTERING -> DDS_CANDIDATE`
+
+Retain the source mask, protected mask, clean plate and final candidate as separate QA evidence.
+
+Do not place Korean lettering until the clean plate has:
+- no source-script/old-Korean residue;
+- no rectangular patch, seam or erasure halo;
+- no damaged border, icon, logo or unrelated artwork;
+- no gradient/texture discontinuity;
+- no unintended alpha discontinuity.
+
+### 4. Fit and font gate before pixels are committed
+- Verify that the selected font contains every required Hangul/symbol glyph; tofu/fallback mixing is FAIL.
+- Measure source typography height, scale, alignment and effects first.
+- Measure the Korean glyph/effect footprint before final rendering.
+- If it does not fit, try source-faithful spacing/line break, then smaller source-faithful size, then an approved shorter translation.
+- Do not distort glyphs or add generic outline/shadow/glow merely to make text readable.
+- If source-faithful quality cannot be achieved automatically, mark `MANUAL_RECONSTRUCTION_REQUIRED`.
+
+### 5. Two-stage validation
+Validate twice:
+1. CLEAN_PLATE vs exact source — removal/reconstruction defects only.
+2. FINAL KOREAN CANDIDATE vs exact source — containment, overlap, clipping, residue, protected-artwork changes, alpha and DDS properties.
+
+For multi-element atlases, translated masks must not newly overlap each other or protected artwork.
+
+### 6. Fail closed
+Ambiguous detection, masks, reconstruction, orientation, font coverage or fit never becomes an automatic PASS. Preserve the exact source and use `HOLD_STRICT_RECHECK` or `MANUAL_RECONSTRUCTION_REQUIRED`.
+
+### 7. Evidence and runtime separation
+Record source identity/hash and static QA evidence for new/reworked candidates. Upscaled previews are human-inspection aids only; pixel decisions use exact decoded source resolution.
+
+Static validation does not claim an in-game pass. Until the game was actually tested, record `RUNTIME_VALIDATION=UNTESTED`.
+
+Tool support:
+- `tools/localization/validate_clean_plate.py` checks changes against allowed/protected masks and fails closed.
+- `tools/localization/render_artwork.py` is proof-overlay only and must never be treated as a final DDS renderer.

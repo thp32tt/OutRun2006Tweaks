@@ -2,7 +2,7 @@
 
 > Recovery baseline: 2026-09-28 10:12 KST (`11631c5f12037bcd01cda1af57ec9bc564af4bcf`). Keep this branch intentionally small and production-focused. Do not import later controller schemas, event-ID layers, queue engines, or VR/FFB rules unless separately proven necessary.
 
-This is the canonical contract for the N100 A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, localization/WORKLOG.md, localization/progress.json, localization/resume_state.json, localization/graphics/README.md and localization/graphics/ORIENTATION_POLICY.md. Repository state on korean-localization-recovery-20260928 is the only work state; do not use GPT Library as a work store.
+This is the canonical contract for the N100 A/B/C localization controller. Every run MUST read this file first, then docs/KOREAN_LOCALIZATION.md, docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md, localization/WORKLOG.md, localization/progress.json, localization/resume_state.json, localization/graphics/README.md and localization/graphics/ORIENTATION_POLICY.md. Repository state on korean-localization-recovery-20260928 is the only work state; do not use GPT Library as a work store.
 
 ## Isolation and source rules
 - Work only on korean-localization-recovery-20260928. Never merge VR/FFB source or history.
@@ -66,3 +66,12 @@ On any of those commands, first fetch the latest `korean-localization-recovery-2
 Do not repeat completed work. Resume from current Git progress/resume state. Each completed batch updates its machine-readable report, localization/WORKLOG.md and localization/progress/STATUS.md as applicable.
 Before approval inspect raw DDS and readable/game orientation; use in-game screenshot validation when available.
 Git synchronization is mandatory at the end of each role when that role changed files: commit/push only its localization changes to korean-localization-recovery-20260928 and verify the resulting commit SHA. Do not create empty commits. Resolve conflicts by preserving current localization work and never importing VR/FFB changes.
+
+
+## Quality layer separation
+- Image-quality rules are independent from controller scheduling/state logic.
+- For every newly produced or materially reworked localized graphics asset, follow `docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md`.
+- Preserve the pipeline: exact HD source -> source-text mask -> protected-artwork mask -> clean plate -> Korean lettering -> final candidate -> static QA.
+- Do not invalidate every historical approved candidate merely because this quality layer was imported. Apply it to new/reworked assets and to existing assets only when QA evidence flags a concrete defect.
+- Static QA and runtime/in-game validation are separate. If runtime validation was not actually performed, record `RUNTIME_VALIDATION=UNTESTED`.
+- These quality requirements MUST NOT introduce new scheduler schemas, Production/Event IDs, rollover state machines, C0-C6 orchestration, or other controller bookkeeping.
