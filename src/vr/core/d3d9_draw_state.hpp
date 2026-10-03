@@ -131,6 +131,10 @@ namespace OutRunVR::DrawState
         DWORD rangeFogEnable = FALSE;
         DWORD fogVertexMode = D3DFOG_NONE;
         DWORD lighting = FALSE;
+        // R202: D3DRS_SPECULARENABLE adds interpolated specular color after
+        // the texture cascade. Preserve it independently so native readiness
+        // cannot mistake that post-texture fixed-function behavior for exact.
+        DWORD specularEnable = FALSE;
 
         bool complete = false;
     };
