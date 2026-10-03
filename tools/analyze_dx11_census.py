@@ -424,22 +424,24 @@ def main() -> int:
         for line in text.splitlines():
             match = STARTUP_RE.search(line)
             if match:
-                startup.append(int_fields(match))
+                startup_entry = int_fields(match)
+                startup_entry["source_log"] = source_log
+                startup.append(startup_entry)
                 continue
 
             match = BOOTSTRAP_RE.search(line)
             if match:
                 data = match.groupdict()
-                bootstrap.append(
-                    {
-                        "ready": bool(int(data["ready"])),
-                        "feature_level_hex": "0x" + data["featureLevel"].upper(),
-                        "selected_luid_valid": bool(int(data["selectedLuidValid"])),
-                        "selected_luid": (
-                            data["luidHigh"].upper() + ":" + data["luidLow"].upper()
-                        ),
-                    }
-                )
+                bootstrap_entry = {
+                    "ready": bool(int(data["ready"])),
+                    "feature_level_hex": "0x" + data["featureLevel"].upper(),
+                    "selected_luid_valid": bool(int(data["selectedLuidValid"])),
+                    "selected_luid": (
+                        data["luidHigh"].upper() + ":" + data["luidLow"].upper()
+                    ),
+                }
+                bootstrap_entry["source_log"] = source_log
+                bootstrap.append(bootstrap_entry)
                 continue
 
             match = SUMMARY_RE.search(line)

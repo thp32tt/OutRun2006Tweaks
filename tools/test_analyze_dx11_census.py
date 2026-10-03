@@ -732,6 +732,43 @@ def main() -> int:
         "AllSourceLogsHavePeriodicSummary": False,
     }
 
+    r227_multi_log_startup_bootstrap = run_cases(
+        {
+            "session-a-startup.log": (
+                "VR DX11 R71 census: observed=1 size=1280x720 sourceFormat=21 "
+                "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+                "VR DX11 R72 bootstrap probe: ready=1 featureLevel=0xB000 "
+                "selectedLuidValid=1 selectedLuid=AAAAAAAA:11111111\n"
+            ),
+            "session-b-startup.log": (
+                "VR DX11 R71 census: observed=1 size=1920x1080 sourceFormat=22 "
+                "nativeFormat=29 msaa=4 bootstrapCompatible=0\n"
+                "VR DX11 R72 bootstrap probe: ready=0 featureLevel=0xA100 "
+                "selectedLuidValid=1 selectedLuid=BBBBBBBB:22222222\n"
+            ),
+        }
+    )
+    assert [entry["source_log"] for entry in r227_multi_log_startup_bootstrap["Startup"]] == [
+        "session-a-startup.log",
+        "session-b-startup.log",
+    ]
+    assert r227_multi_log_startup_bootstrap["Startup"][0]["width"] == 1280
+    assert r227_multi_log_startup_bootstrap["Startup"][1]["width"] == 1920
+    assert [entry["source_log"] for entry in r227_multi_log_startup_bootstrap["Bootstrap"]] == [
+        "session-a-startup.log",
+        "session-b-startup.log",
+    ]
+    assert r227_multi_log_startup_bootstrap["Bootstrap"][0]["ready"] is True
+    assert (
+        r227_multi_log_startup_bootstrap["Bootstrap"][0]["selected_luid"]
+        == "AAAAAAAA:11111111"
+    )
+    assert r227_multi_log_startup_bootstrap["Bootstrap"][1]["ready"] is False
+    assert (
+        r227_multi_log_startup_bootstrap["Bootstrap"][1]["selected_luid"]
+        == "BBBBBBBB:22222222"
+    )
+
     r106 = run_case(
         "VR DX11 R85 signature#1: primitive=4 fixedFn=1\n"
         "VR DX11 R85 texture signature#1 stage#0: observed=1 type=3 pool=1 "

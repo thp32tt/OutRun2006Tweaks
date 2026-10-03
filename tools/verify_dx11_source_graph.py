@@ -8973,6 +8973,30 @@ def main() -> None:
             + ", ".join(missing_r226_multi_log_summary_scope)
         )
 
+    r227_multi_log_startup_bootstrap_provenance_contract = [
+        ("startup_entry[\"source_log\"] = source_log",
+         DX11_CENSUS_ANALYZER, "R227 startup source-log provenance"),
+        ("bootstrap_entry[\"source_log\"] = source_log",
+         DX11_CENSUS_ANALYZER, "R227 bootstrap source-log provenance"),
+        ("r227_multi_log_startup_bootstrap = run_cases(",
+         DX11_CENSUS_ANALYZER_TEST, "R227 multi-log startup/bootstrap regression fixture"),
+        ("session-a-startup.log",
+         DX11_CENSUS_ANALYZER_TEST, "R227 first startup/bootstrap source assertion"),
+        ("session-b-startup.log",
+         DX11_CENSUS_ANALYZER_TEST, "R227 second startup/bootstrap source assertion"),
+    ]
+    missing_r227_multi_log_startup_bootstrap_provenance = [
+        meaning
+        for token, source, meaning
+        in r227_multi_log_startup_bootstrap_provenance_contract
+        if token not in source
+    ]
+    if missing_r227_multi_log_startup_bootstrap_provenance:
+        raise SystemExit(
+            "DX11 R227 multi-log startup/bootstrap provenance drift: "
+            + ", ".join(missing_r227_multi_log_startup_bootstrap_provenance)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
