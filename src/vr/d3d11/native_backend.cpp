@@ -5321,6 +5321,12 @@ bool validate_fixed_function_render_target_bound_draw_readiness_integrity(
     token = mix_readiness_snapshot_token(token, boundDraw.surfaceTargetBindingSnapshotToken);
     token = mix_readiness_snapshot_token(token, boundDraw.surfacePairSnapshotToken);
     token = mix_readiness_snapshot_token(token, boundDraw.vertexStride);
+    // R158/R203: keep copied-readiness integrity hashing byte-for-byte
+    // symmetric with compose_fixed_function_render_target_bound_draw_readiness.
+    // Omitting the translated stream-0 stride makes a valid R145 snapshot
+    // fail its own integrity check and incorrectly blocks R147 dispatch.
+    token = mix_readiness_snapshot_token(
+        token, boundDraw.inputLayoutStream0Stride);
     token = mix_readiness_snapshot_token(token, boundDraw.vertexOffset);
     token = mix_readiness_snapshot_token(token, boundDraw.vertexBufferByteWidth);
     token = mix_readiness_snapshot_token(

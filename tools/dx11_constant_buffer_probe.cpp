@@ -3732,6 +3732,9 @@ int main()
             renderTargetBoundDraw.indexBufferByteWidth == sizeof(managedIndexBytes) &&
             renderTargetBoundDraw.componentSnapshotsPresent &&
             renderTargetBoundDraw.ready &&
+            outrun::vr::dx11::
+                validate_fixed_function_render_target_bound_draw_readiness_integrity(
+                    renderTargetBoundDraw) &&
             renderTargetBoundDraw.surfaceTargetBindingSnapshotToken ==
                 surfaceTargetBindingReady.snapshotToken &&
             renderTargetBoundDraw.surfacePairSnapshotToken ==
