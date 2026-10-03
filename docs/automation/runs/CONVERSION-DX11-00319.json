@@ -8,7 +8,7 @@
   "event_id": "CONVERSION-DXVK-00318-E001",
   "event_type": "rollover",
   "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
   "runtime_validation": "UNTESTED",
   "base_sha": "96d4c42ac56626294a44b205c22a417a0545c28b",
   "result_sha": "PENDING_RESULT_COMMIT_SHA",
@@ -45,9 +45,9 @@
       "evidence": "Added a diagnostic R93 vertex D3DCompile probe (vs_4_0), retained generated vertex source in the sampled signature for the bounded unique-signature probe, required VS+PS pair compile success before admitting FixedFunctionShaderCompileExactHashes, and extended hosted semantic/static contracts."
     },
     "C3_VALIDATE": {
-      "status": "PENDING",
-      "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
-      "evidence": "N100 pre-publication checks PASS: verify_vr_proven_baseline (44 guards), backend disassembly contract, DX11 native transport contract, dual-source contract, static-surface analyzer/check, verify_dx11_source_graph including R223, dormant activation boundary, census analyzer regression, py_compile and git diff --check. Hosted exact-SHA Backend Conversion Gate remains required."
+      "status": "LOCAL_STATIC_PASS_EXACT_SHA_GATE_PENDING",
+      "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+      "evidence": "Local checks passed: verify_dx11_source_graph.py, verify_dx11_activation_boundary.py, test_analyze_dx11_census.py, verify_dx11_dual_source_contract.py, verify_dx11_native_transport_contract.py, verify_vr_backend_disasm_contract.py, and verify_vr_proven_baseline.py. Exact-SHA Windows Backend Conversion Gate remains required after material publication."
     },
     "C4_COMMIT": {
       "status": "PENDING_RESULT_SHA_PUBLICATION",
@@ -60,7 +60,7 @@
     "C6_STATE": {
       "status": "PENDING",
       "state_persisted": false,
-      "exact_next_action": "Publish one non-CI-skipped material result, require its exact-SHA Backend Conversion Gate, then persist validation IDs and lane state in separate CI-skipped bookkeeping commits."
+      "exact_next_action": "Publish the material result commit without CI-skip to vr-dx11-native-r71, require its exact-SHA Backend Conversion Gate including Win32 build and DX11 readiness smoke, then persist validation IDs and lane state."
     }
   },
   "regression_assessment": {
@@ -77,5 +77,5 @@
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE_ROLLOVER"
   },
-  "exact_next_action": "Run local R223 source/semantic checks, publish the material commit without CI-skip, and require its exact-SHA Backend Conversion Gate."
+  "exact_next_action": "Publish the material result commit without CI-skip to vr-dx11-native-r71, require its exact-SHA Backend Conversion Gate including Win32 build and DX11 readiness smoke, then persist validation IDs and lane state."
 }
