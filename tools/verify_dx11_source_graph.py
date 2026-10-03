@@ -126,6 +126,39 @@ def main() -> None:
 
     verify_dx11_dual_source_contract()
 
+    r202_specular_enable_contract = [
+        (
+            "DWORD specularEnable = FALSE;",
+            D3D9_DRAW_STATE_HPP,
+            "R202 tracked specular-enable field and disabled default",
+        ),
+        (
+            "read(D3DRS_SPECULARENABLE, out.specularEnable);",
+            D3D9_RENDER_STATE_CAPTURE,
+            "R202 live specular-enable capture",
+        ),
+        (
+            "source.lighting != FALSE || source.specularEnable != FALSE",
+            PIPELINE_TRANSLATION_CPP,
+            "R202 native pipeline specular fail-closed predicate",
+        ),
+        (
+            "R202 enabled D3DRS_SPECULARENABLE must fail closed",
+            SEMANTIC_SMOKE,
+            "R202 semantic regression probe",
+        ),
+    ]
+    missing_r202_specular_enable = [
+        meaning
+        for token, source, meaning in r202_specular_enable_contract
+        if token not in source
+    ]
+    if missing_r202_specular_enable:
+        raise SystemExit(
+            "DX11 R202 specular-enable contract drift: "
+            + ", ".join(missing_r202_specular_enable)
+        )
+
     r165_dither_contract = [
         ("DWORD ditherEnable = FALSE;", D3D9_DRAW_STATE_HPP,
          "R165 tracked dither field and disabled default"),
