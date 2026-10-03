@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DXVK-00320",
-  "production_id": "CONVERSION-DX11-00319",
-  "event_id": "CONVERSION-DX11-00319-E003",
-  "event_type": "retry",
+  "production_id": "CONVERSION-DXVK-00320",
+  "event_id": "CONVERSION-DXVK-00320-E001",
+  "event_type": "rollover",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
   "base_sha": "f8ea5c0872c69c0d6c310352cf3454df700b6dcb",
@@ -118,9 +118,37 @@
   "exact_next_action": "Exact-decode only complete canonical instructions from validated continuation_82 0x0018369D..0x001836DD. Resolve the three raw rel32 candidates only when exact instruction alignment proves them; preserve any trailing partial instruction as mandatory overlap and keep function/render/HUD/runtime semantics unresolved.",
   "validated_at_kst": "2026-10-04T06:03:01+09:00",
   "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00320",
+    "event_id": "CONVERSION-DXVK-00320-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false
+  },
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+  "prior_controller_dispatch": {
     "production_id": "CONVERSION-DX11-00319",
     "event_id": "CONVERSION-DX11-00319-E003",
     "event_type": "retry",
     "attempt": "1/3"
+  },
+  "dispatch_metadata_correction": {
+    "reason": "Current rollover dispatch is authoritative; only stale pre-rollover production/event metadata is corrected. Material result, validation-bearing SHA, exact-SHA gate results, runtime status, and next frontier are unchanged.",
+    "material_result_unchanged": true,
+    "validation_bearing_result_unchanged": true,
+    "automation_validation_unchanged": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
+    "runtime_validation_unchanged": "UNTESTED",
+    "attempt_incremented": false
+  },
+  "resume_reconstruction": {
+    "initial_recovered_head": "1a44c43289714382919967f92217796c6ea63f5f",
+    "recovered_material_result": "1a44c43289714382919967f92217796c6ea63f5f",
+    "material_result_reused": true,
+    "implementation_repeated": false,
+    "attempt_incremented": false,
+    "recovered_pipeline_status": "C0_THROUGH_C6_COMPLETE_AFTER_EXACT_SHA_GATES",
+    "metadata_correction": "Updated stale retry dispatch identifiers to the authoritative rollover dispatch only; material/validation-bearing SHA, gate evidence, runtime status, and next frontier are unchanged."
   }
 }
