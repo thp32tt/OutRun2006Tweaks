@@ -281,6 +281,12 @@ namespace outrun::vr::dx11
             // census identity so per-draw raster variants cannot alias.
             bool multisampleRasterObservationComplete{};
             DWORD multiSampleAntialias = TRUE;
+            // R205: R168 captures D3D9 LASTPIXEL and line-AA provenance, while
+            // direct line dispatch remains fail-closed. Seal both values into
+            // sampled identity so distinct line-raster states cannot alias.
+            bool lineRasterObservationComplete{};
+            DWORD lastPixel = TRUE;
+            DWORD antialiasedLineEnable = FALSE;
             // R179: R124 already carries the dynamic output state consumed by
             // native DX11 binding. Seal it into census identity so draws that
             // differ only by blend factor, sample mask, viewport or scissor
@@ -525,6 +531,10 @@ namespace outrun::vr::dx11
             hash = hash_mix(
                 hash, sig.multisampleRasterObservationComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.multiSampleAntialias);
+            hash = hash_mix(
+                hash, sig.lineRasterObservationComplete ? 1u : 0u);
+            hash = hash_mix(hash, sig.lastPixel);
+            hash = hash_mix(hash, sig.antialiasedLineEnable);
             hash = hash_mix(
                 hash, sig.outputStateObservationComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.outputBlendFactor);
@@ -1567,6 +1577,12 @@ namespace outrun::vr::dx11
                     sig.multisampleRasterObservationComplete ? 1 : 0,
                     sig.multiSampleAntialias != FALSE ? 1 : 0);
                 spdlog::info(
+                    "VR DX11 R205 line-raster state#{}: observed={} lastPixel={} antialiased={}",
+                    unique,
+                    sig.lineRasterObservationComplete ? 1 : 0,
+                    sig.lastPixel != FALSE ? 1 : 0,
+                    sig.antialiasedLineEnable != FALSE ? 1 : 0);
+                spdlog::info(
                     "VR DX11 R179 output state#{}: observed={} scissorEnable={} blendFactor=0x{:08X} sampleMask=0x{:08X} viewport=[{},{},{},{},minZBits=0x{:08X},maxZBits=0x{:08X}] scissor=[{},{},{},{}]",
                     unique,
                     sig.outputStateObservationComplete ? 1 : 0,
@@ -2324,6 +2340,10 @@ namespace outrun::vr::dx11
         signature.multisampleRasterObservationComplete =
             captured && source.complete;
         signature.multiSampleAntialias = source.multiSampleAntialias;
+        signature.lineRasterObservationComplete =
+            captured && source.complete;
+        signature.lastPixel = source.lastPixel;
+        signature.antialiasedLineEnable = source.antialiasedLineEnable;
         signature.outputStateObservationComplete =
             captured && source.complete && source.outputStateComplete;
         signature.outputBlendFactor = source.blendFactor;

@@ -8360,6 +8360,69 @@ def main() -> None:
             + ", ".join(missing_r168_line_raster)
         )
 
+    r205_line_raster_census_contract = [
+        (
+            "bool lineRasterObservationComplete{};",
+            RUNTIME_CENSUS,
+            "R205 line-raster census observation identity",
+        ),
+        (
+            "DWORD lastPixel = TRUE;",
+            RUNTIME_CENSUS,
+            "R205 LASTPIXEL census identity",
+        ),
+        (
+            "DWORD antialiasedLineEnable = FALSE;",
+            RUNTIME_CENSUS,
+            "R205 antialiased-line census identity",
+        ),
+        (
+            "hash, sig.lineRasterObservationComplete ? 1u : 0u",
+            RUNTIME_CENSUS,
+            "R205 line-raster observation hash",
+        ),
+        (
+            "hash = hash_mix(hash, sig.lastPixel);",
+            RUNTIME_CENSUS,
+            "R205 LASTPIXEL value hash",
+        ),
+        (
+            "hash = hash_mix(hash, sig.antialiasedLineEnable);",
+            RUNTIME_CENSUS,
+            "R205 antialiased-line value hash",
+        ),
+        (
+            "signature.lastPixel = source.lastPixel;",
+            RUNTIME_CENSUS,
+            "R205 LASTPIXEL capture propagation",
+        ),
+        (
+            "signature.antialiasedLineEnable = source.antialiasedLineEnable;",
+            RUNTIME_CENSUS,
+            "R205 antialiased-line capture propagation",
+        ),
+        (
+            "VR DX11 R205 line-raster state#{}",
+            RUNTIME_CENSUS,
+            "R205 detailed line-raster census evidence",
+        ),
+        (
+            "primitive != D3DPT_LINELIST && primitive != D3DPT_LINESTRIP;",
+            NATIVE_BACKEND_CPP,
+            "R205 direct line dispatch remains fail closed",
+        ),
+    ]
+    missing_r205_line_raster_census = [
+        meaning
+        for token, source, meaning in r205_line_raster_census_contract
+        if token not in source
+    ]
+    if missing_r205_line_raster_census:
+        raise SystemExit(
+            "DX11 R205 line-raster census identity drift: "
+            + ", ".join(missing_r205_line_raster_census)
+        )
+
 
     r175_stream_source_frequency_contract = [
         ("UINT stream0Frequency = 1u;", RUNTIME_CENSUS,
