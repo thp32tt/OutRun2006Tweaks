@@ -235,6 +235,9 @@ FFP_OP_NAMES = {
     25: "MULTIPLYADD",
     26: "LERP",
 }
+SignatureKey = tuple[str, int]
+
+
 FFP_ARGUMENT_NAMES = {
     0: "DIFFUSE",
     1: "CURRENT",
@@ -257,7 +260,7 @@ def fixed_function_used_argument_fields(op: int, prefix: str) -> tuple[str, ...]
 
 
 def summarize_fixed_function_detailed_stage_demand(
-    fixed_function: dict[int, list[dict]],
+    fixed_function: dict[SignatureKey, list[dict]],
     latest: dict[str, int] | None,
 ) -> dict:
     color_ops: Counter[int] = Counter()
@@ -268,10 +271,12 @@ def summarize_fixed_function_detailed_stage_demand(
     unsupported_result_args: Counter[int] = Counter()
     detailed_stages = 0
     duplicate_stage_records = 0
-    # R199: detail lines may be repeated across collected logs. A signature
-    # hashes its stage state, so identical signature/stage payloads are one
-    # semantic observation and must not inflate conversion-demand counts.
-    seen_stage_records: set[tuple[int, tuple[tuple[str, int], ...]]] = set()
+    # R199/R225: detail lines may repeat, but runtime signature ids are local
+    # to one process/log. Drop true duplicates only inside the same source-log
+    # namespace; never merge unrelated signature#N records across sessions.
+    seen_stage_records: set[
+        tuple[SignatureKey, tuple[tuple[str, int], ...]]
+    ] = set()
 
     def inspect_arguments(stage: dict, op: int, prefix: str) -> None:
         for key in fixed_function_used_argument_fields(op, prefix):
@@ -284,9 +289,9 @@ def summarize_fixed_function_detailed_stage_demand(
                 argument_values[value] += 1
                 argument_selectors[selector] += 1
 
-    for signature_id, stages in fixed_function.items():
+    for signature_key, stages in fixed_function.items():
         for stage in stages:
-            stage_record = (signature_id, tuple(sorted(stage.items())))
+            stage_record = (signature_key, tuple(sorted(stage.items())))
             if stage_record in seen_stage_records:
                 duplicate_stage_records += 1
                 continue
@@ -378,14 +383,17 @@ def main() -> int:
     startup: list[dict] = []
     bootstrap: list[dict] = []
     summaries: list[dict] = []
-    signatures: dict[int, dict] = {}
-    declarations: dict[int, list[dict]] = {}
-    fixed_function: dict[int, list[dict]] = {}
-    fixed_function_texture_factors: dict[int, dict] = {}
-    texture_stages: dict[int, list[dict]] = {}
-    fixed_function_shader_prototypes: dict[int, dict] = {}
-    fixed_function_shader_compiles: dict[int, dict] = {}
-    fixed_function_vertex_shader_compiles: dict[int, dict] = {}
+    # R225: runtime signature ids are insertion-order ordinals and restart for
+    # every process. Scope every detail/evidence record by source log so two
+    # separate sessions' signature#1 records can never overwrite each other.
+    signatures: dict[SignatureKey, dict] = {}
+    declarations: dict[SignatureKey, list[dict]] = {}
+    fixed_function: dict[SignatureKey, list[dict]] = {}
+    fixed_function_texture_factors: dict[SignatureKey, dict] = {}
+    texture_stages: dict[SignatureKey, list[dict]] = {}
+    fixed_function_shader_prototypes: dict[SignatureKey, dict] = {}
+    fixed_function_shader_compiles: dict[SignatureKey, dict] = {}
+    fixed_function_vertex_shader_compiles: dict[SignatureKey, dict] = {}
     source_logs: list[str] = []
 
     for log_path in log_files:
@@ -411,6 +419,7 @@ def main() -> int:
         ):
             continue
         source_logs.append(log_path.name)
+        source_log = log_path.name
 
         for line in text.splitlines():
             match = STARTUP_RE.search(line)
@@ -441,9 +450,14 @@ def main() -> int:
             match = SIGNATURE_RE.search(line)
             if match:
                 signature_id = int(match.group("id"))
+                signature_key = (source_log, signature_id)
                 signatures.setdefault(
-                    signature_id,
-                    {"id": signature_id, "raw": match.group("body")},
+                    signature_key,
+                    {
+                        "source_log": source_log,
+                        "id": signature_id,
+                        "raw": match.group("body"),
+                    },
                 )
                 continue
 
@@ -451,14 +465,16 @@ def main() -> int:
             if match:
                 data = int_fields(match)
                 signature_id = data.pop("signature")
-                declarations.setdefault(signature_id, []).append(data)
+                signature_key = (source_log, signature_id)
+                declarations.setdefault(signature_key, []).append(data)
                 continue
 
             match = FFP_SHADER_COMPILE_RE.search(line)
             if match:
                 data = match.groupdict()
                 signature_id = int(data.pop("signature"))
-                fixed_function_shader_compiles[signature_id] = {
+                signature_key = (source_log, signature_id)
+                fixed_function_shader_compiles[signature_key] = {
                     "attempted": bool(int(data["attempted"])),
                     "succeeded": bool(int(data["succeeded"])),
                     "result": int(data["hr"], 16),
@@ -477,7 +493,8 @@ def main() -> int:
             if match:
                 data = match.groupdict()
                 signature_id = int(data.pop("signature"))
-                fixed_function_vertex_shader_compiles[signature_id] = {
+                signature_key = (source_log, signature_id)
+                fixed_function_vertex_shader_compiles[signature_key] = {
                     "attempted": bool(int(data["attempted"])),
                     "succeeded": bool(int(data["succeeded"])),
                     "result": int(data["hr"], 16),
@@ -496,7 +513,8 @@ def main() -> int:
             if match:
                 data = match.groupdict()
                 signature_id = int(data.pop("signature"))
-                fixed_function_shader_prototypes[signature_id] = {
+                signature_key = (source_log, signature_id)
+                fixed_function_shader_prototypes[signature_key] = {
                     "generated": bool(int(data["generated"])),
                     "unsupported_mask": int(data["mask"], 16),
                     "unsupported_mask_hex": "0x" + data["mask"].upper(),
@@ -511,7 +529,8 @@ def main() -> int:
             if match:
                 data = match.groupdict()
                 signature_id = int(data["signature"])
-                fixed_function_texture_factors[signature_id] = {
+                signature_key = (source_log, signature_id)
+                fixed_function_texture_factors[signature_key] = {
                     "observed": bool(int(data["observed"])),
                     "argb": int(data["argb"], 16),
                     "argb_hex": "0x" + data["argb"].upper(),
@@ -522,6 +541,7 @@ def main() -> int:
             if match:
                 data = match.groupdict()
                 signature_id = int(data.pop("signature"))
+                signature_key = (source_log, signature_id)
                 stage = int(data.pop("stage"))
                 parsed = {"stage": stage}
                 for key, value in data.items():
@@ -532,13 +552,14 @@ def main() -> int:
                         parsed[key + "_hex"] = "0x" + value.upper()
                     else:
                         parsed[key] = int(value)
-                texture_stages.setdefault(signature_id, []).append(parsed)
+                texture_stages.setdefault(signature_key, []).append(parsed)
                 continue
 
             match = FFP_RE.search(line)
             if match:
                 data = match.groupdict()
                 signature_id = int(data.pop("signature"))
+                signature_key = (source_log, signature_id)
                 stage = int(data.pop("stage"))
                 parsed = {"stage": stage}
                 for key, value in data.items():
@@ -552,29 +573,29 @@ def main() -> int:
                         parsed[key + "_hex"] = "0x" + value.upper()
                     else:
                         parsed[key] = int(value)
-                fixed_function.setdefault(signature_id, []).append(parsed)
+                fixed_function.setdefault(signature_key, []).append(parsed)
 
-    for signature_id, signature in signatures.items():
+    for signature_key, signature in signatures.items():
         signature["declaration"] = sorted(
-            declarations.get(signature_id, []), key=lambda item: item["element"]
+            declarations.get(signature_key, []), key=lambda item: item["element"]
         )
         signature["fixed_function_stages"] = sorted(
-            fixed_function.get(signature_id, []), key=lambda item: item["stage"]
+            fixed_function.get(signature_key, []), key=lambda item: item["stage"]
         )
         signature["fixed_function_texture_factor"] = (
-            fixed_function_texture_factors.get(signature_id)
+            fixed_function_texture_factors.get(signature_key)
         )
         signature["texture_stages"] = sorted(
-            texture_stages.get(signature_id, []), key=lambda item: item["stage"]
+            texture_stages.get(signature_key, []), key=lambda item: item["stage"]
         )
         signature["fixed_function_shader_prototype"] = (
-            fixed_function_shader_prototypes.get(signature_id)
+            fixed_function_shader_prototypes.get(signature_key)
         )
         signature["fixed_function_shader_compile"] = (
-            fixed_function_shader_compiles.get(signature_id)
+            fixed_function_shader_compiles.get(signature_key)
         )
         signature["fixed_function_vertex_shader_compile"] = (
-            fixed_function_vertex_shader_compiles.get(signature_id)
+            fixed_function_vertex_shader_compiles.get(signature_key)
         )
 
     latest = summaries[-1] if summaries else None
