@@ -13,11 +13,12 @@ ROOT = Path(__file__).resolve().parents[1]
 ANALYZER = ROOT / "tools" / "analyze_dx11_census.py"
 
 
-def run_case(log_text: str) -> dict:
+def run_cases(logs: dict[str, str]) -> dict:
     with tempfile.TemporaryDirectory() as tmp:
         session = Path(tmp) / "session"
         session.mkdir()
-        (session / "OutRun2006Tweaks.log").write_text(log_text, encoding="utf-8")
+        for name, log_text in logs.items():
+            (session / name).write_text(log_text, encoding="utf-8")
         output = Path(tmp) / "report.json"
         subprocess.run(
             [
@@ -31,6 +32,10 @@ def run_case(log_text: str) -> dict:
             check=True,
         )
         return json.loads(output.read_text(encoding="utf-8"))
+
+
+def run_case(log_text: str) -> dict:
+    return run_cases({"OutRun2006Tweaks.log": log_text})
 
 
 def main() -> int:
@@ -549,6 +554,61 @@ def main() -> int:
     assert vertex_compile_probe["bytecode_bytes"] == 640
     assert vertex_compile_probe["diagnostics_bytes"] == 0
     assert vertex_compile_probe["profile"] == "vs_4_0"
+
+    r225_multi_log = run_cases(
+        {
+            "session-a.log": (
+                "VR DX11 R85 signature#1: primitive=4 fixedFn=1 fvf=0x000001C4\n"
+                "VR DX11 R85 ffp shader compile#1: attempted=1 succeeded=1 "
+                "hr=0x00000000 bytecodeHash=0xAAAAAAAAAAAAAAAA bytecodeBytes=512 "
+                "diagnosticsHash=0x0000000000000000 diagnosticsBytes=0 profile=ps_4_0\n"
+                "VR DX11 R223 ffp vertex shader compile#1: attempted=1 succeeded=1 "
+                "hr=0x00000000 bytecodeHash=0x1111111111111111 bytecodeBytes=640 "
+                "diagnosticsHash=0x0000000000000000 diagnosticsBytes=0 profile=vs_4_0\n"
+            ),
+            "session-b.log": (
+                "VR DX11 R85 signature#1: primitive=5 fixedFn=1 fvf=0x000002C4\n"
+                "VR DX11 R85 ffp shader compile#1: attempted=1 succeeded=1 "
+                "hr=0x00000000 bytecodeHash=0xBBBBBBBBBBBBBBBB bytecodeBytes=768 "
+                "diagnosticsHash=0x0000000000000000 diagnosticsBytes=0 profile=ps_4_0\n"
+                "VR DX11 R223 ffp vertex shader compile#1: attempted=1 succeeded=1 "
+                "hr=0x00000000 bytecodeHash=0x2222222222222222 bytecodeBytes=896 "
+                "diagnosticsHash=0x0000000000000000 diagnosticsBytes=0 profile=vs_4_0\n"
+            ),
+        }
+    )
+    assert r225_multi_log["UniqueSignaturesCaptured"] == 2
+    r225_signatures = {
+        signature["source_log"]: signature
+        for signature in r225_multi_log["Signatures"]
+    }
+    assert set(r225_signatures) == {"session-a.log", "session-b.log"}
+    assert r225_signatures["session-a.log"]["id"] == 1
+    assert (
+        r225_signatures["session-a.log"]["fixed_function_shader_compile"][
+            "bytecode_hash_hex"
+        ]
+        == "0xAAAAAAAAAAAAAAAA"
+    )
+    assert (
+        r225_signatures["session-a.log"]["fixed_function_vertex_shader_compile"][
+            "bytecode_hash_hex"
+        ]
+        == "0x1111111111111111"
+    )
+    assert r225_signatures["session-b.log"]["id"] == 1
+    assert (
+        r225_signatures["session-b.log"]["fixed_function_shader_compile"][
+            "bytecode_hash_hex"
+        ]
+        == "0xBBBBBBBBBBBBBBBB"
+    )
+    assert (
+        r225_signatures["session-b.log"]["fixed_function_vertex_shader_compile"][
+            "bytecode_hash_hex"
+        ]
+        == "0x2222222222222222"
+    )
 
     r106 = run_case(
         "VR DX11 R85 signature#1: primitive=4 fixedFn=1\n"
