@@ -443,7 +443,9 @@ sources = [
     "src/vr/d3d11/native_backend.cpp",
     "src/vr/d3d11/pipeline_translation.cpp",
     "src/vr/d3d11/resource_translation.cpp",
-    "src/vr/d3d11/state_translation.cpp"
+    "src/vr/d3d11/state_translation.cpp",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp"
 ]
 include-directories = ["src/", "shared/", "include/"]
 compile-options = ["/GS", "/utf-8"]
