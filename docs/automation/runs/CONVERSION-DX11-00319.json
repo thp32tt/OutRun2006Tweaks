@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00319",
+  "production_id": "CONVERSION-DXVK-00318",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00318-E001",
+  "event_type": "rollover",
+  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "96d4c42ac56626294a44b205c22a417a0545c28b",
+  "result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX11-00319]",
+  "selected_work_item": "DX11_R223_FIXED_FUNCTION_VERTEX_SHADER_COMPILE_EXACT_SAMPLES_GATE",
+  "summary": "R223 closes the remaining fixed-function compiler-readiness gap in ExactSamples: the bounded unique-signature probe now requires both the generated R93 vertex shader and R84 pixel shader to compile successfully before a signature can be cached as compiler-exact. NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/pipeline_translation.hpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/dx11_fixed_function_shader_semantics.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00319.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated vr-dx11-native-r71 HEAD 96d4c42ac56626294a44b205c22a417a0545c28b; read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md/Set05, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_AUTODEV_STATE.json, VR_RUN_STATE.md, VR_REGRESSION_KNOWLEDGE.json, VR_PROBLEM_HISTORY.md and Issue #14. R222/00317 is durable and was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R222 makes ExactSamples consume actual fixed-function pixel D3DCompile success, but the per-signature vertex side still stops at generated-source readiness. The R93 vertex source varies with FVF/input semantics, so a generated vertex shader that fails D3DCompile could still be counted exact.",
+      "review_lenses": {
+        "architecture": "Mirror the existing diagnostic-only pixel compiler probe for the R93 vertex source and require pair success; no native draw ownership change.",
+        "ownership_lifetime": "Generated source and bytecode remain temporary diagnostic data; no D3D11 device object, reset, resource generation, shared-surface or transport lifetime changes.",
+        "stereo_correctness": "No WVP values, eye routing, HUD, OpenXR submission or presentation behavior changes.",
+        "performance": "Compile only newly tracked fixed-function signatures under the existing SignatureHashCap=512; repeated signatures reuse the cached pair-success identity.",
+        "adversarial": "Vertex compile failure, pixel compile failure, missing prototype, signature-cap overflow, and a racing repeat before the first pair probe completes remain non-exact."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added a diagnostic R93 vertex D3DCompile probe (vs_4_0), retained generated vertex source in the sampled signature for the bounded unique-signature probe, required VS+PS pair compile success before admitting FixedFunctionShaderCompileExactHashes, and extended hosted semantic/static contracts."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+      "evidence": "N100 pre-publication checks PASS: verify_vr_proven_baseline (44 guards), backend disassembly contract, DX11 native transport contract, dual-source contract, static-surface analyzer/check, verify_dx11_source_graph including R223, dormant activation boundary, census analyzer regression, py_compile and git diff --check. Hosted exact-SHA Backend Conversion Gate remains required."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA_PUBLICATION",
+      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant compiler-readiness/census evidence only; no runtime candidate or package identity changes."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false,
+      "exact_next_action": "Publish one non-CI-skipped material result, require its exact-SHA Backend Conversion Gate, then persist validation IDs and lane state in separate CI-skipped bookkeeping commits."
+    }
+  },
+  "regression_assessment": {
+    "related_key": "NONE_DIRECT_RUNTIME_PATH_MATCH",
+    "evidence": "The change is confined to dormant DX11 diagnostic compiler readiness plus static/smoke verification. It does not touch startup/device creation/reset/present, D3D9 stereo/HUD ownership, transport/shared resources or OpenXR submission."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00318",
+    "event_id": "CONVERSION-DXVK-00318-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_ROLLOVER"
+  },
+  "exact_next_action": "Run local R223 source/semantic checks, publish the material commit without CI-skip, and require its exact-SHA Backend Conversion Gate."
+}

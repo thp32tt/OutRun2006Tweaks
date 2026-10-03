@@ -12,6 +12,8 @@ namespace
     using outrun::vr::dx11::FixedFunctionAlphaTestState;
     using outrun::vr::dx11::FixedFunctionPixelShaderCompileProbe;
     using outrun::vr::dx11::FixedFunctionPixelShaderPrototype;
+    using outrun::vr::dx11::FixedFunctionLightingState;
+    using outrun::vr::dx11::FixedFunctionVertexShaderCompileProbe;
     using outrun::vr::dx11::FixedFunctionShaderPrototypeUnsupportedAlphaTestState;
     using outrun::vr::dx11::FixedFunctionShaderPrototypeUnsupportedNotReady;
     using outrun::vr::dx11::FixedFunctionShaderPrototypeUnsupportedResourceType;
@@ -31,6 +33,7 @@ namespace
     using outrun::vr::dx11::PipelineUnsupportedSeparateAlphaBlend;
     using outrun::vr::dx11::PipelineUnsupportedStencil;
     using outrun::vr::dx11::compile_fixed_function_pixel_shader_prototype;
+    using outrun::vr::dx11::compile_fixed_function_vertex_shader_prototype;
     using outrun::vr::dx11::translate_pipeline;
     using outrun::vr::dx11::translate_primitive;
     using outrun::vr::dx11::translate_triangle_fan_expansion;
@@ -38,6 +41,7 @@ namespace
     using outrun::vr::dx11::materialize_triangle_fan_vertex_indices;
     using outrun::vr::dx11::materialize_indexed_triangle_fan_indices;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
+    using outrun::vr::dx11::generate_fixed_function_vertex_shader_prototype;
     using outrun::vr::dx11::translate_fixed_function_readiness;
     using outrun::vr::dx11::translate_fixed_function_sampler;
 
@@ -93,6 +97,28 @@ namespace
 
 int main()
 {
+    {
+        const auto vertexPrototype =
+            generate_fixed_function_vertex_shader_prototype(
+                D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1,
+                24u,
+                FixedFunctionLightingState{true, FALSE});
+        require(vertexPrototype.generated(),
+                "R223 generated vertex prototype missing");
+        const FixedFunctionVertexShaderCompileProbe vertexProbe =
+            compile_fixed_function_vertex_shader_prototype(vertexPrototype);
+        require(vertexProbe.attempted,
+                "R223 vertex compile probe was not attempted");
+        require(vertexProbe.succeeded,
+                "R223 generated vertex HLSL did not compile");
+        require(vertexProbe.result == S_OK,
+                "R223 vertex D3DCompile did not return S_OK");
+        require(vertexProbe.bytecodeBytes > 0,
+                "R223 compiled vertex bytecode is empty");
+        require(vertexProbe.bytecodeHash != 0,
+                "R223 compiled vertex bytecode hash is empty");
+    }
+
     {
         OutRunVR::DrawState::RenderStateSnapshot state{};
         state.complete = true;

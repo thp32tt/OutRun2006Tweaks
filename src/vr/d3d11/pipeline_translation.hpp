@@ -301,6 +301,23 @@ namespace outrun::vr::dx11
         UINT stream0Stride,
         FixedFunctionLightingState lighting = {});
 
+    // R223 mirrors the R85 pixel compiler probe for the generated R93 vertex
+    // source. The bytecode remains diagnostic-only and is never bound.
+    struct FixedFunctionVertexShaderCompileProbe
+    {
+        bool attempted = false;
+        bool succeeded = false;
+        HRESULT result = E_FAIL;
+        UINT bytecodeBytes = 0;
+        std::uint64_t bytecodeHash = 0;
+        UINT diagnosticsBytes = 0;
+        std::uint64_t diagnosticsHash = 0;
+    };
+
+    [[nodiscard]] FixedFunctionVertexShaderCompileProbe
+    compile_fixed_function_vertex_shader_prototype(
+        const FixedFunctionVertexShaderPrototype& prototype) noexcept;
+
     // R94 translates passively observed D3D9 WORLD/VIEW/PROJECTION state
     // into the row-major b0 payload consumed by the R93 diagnostic vertex
     // prototype. This is binding-readiness evidence only; no runtime D3D11

@@ -8795,7 +8795,7 @@ def main() -> None:
         )
 
     compile_probe_start = RUNTIME_CENSUS.find(
-        "FixedFunctionPixelShaderCompileProbe compileProbe{};"
+        "FixedFunctionPixelShaderCompileProbe pixelCompileProbe{};"
     )
     signature_log_start = RUNTIME_CENSUS.find(
         "if (inserted && unique <= DetailedSignatureLogCap)", compile_probe_start
@@ -8824,8 +8824,8 @@ def main() -> None:
          "R222 signature observer returns compile readiness"),
         ("FixedFunctionShaderCompileExactHashes.find(hash) !=",
          RUNTIME_CENSUS, "R222 repeated-signature cached compile lookup"),
-        ("if (compileProbe.succeeded)", RUNTIME_CENSUS,
-         "R222 compile success admission boundary"),
+        ("pixelCompileProbe.succeeded &&", RUNTIME_CENSUS,
+         "R222 pixel compile success remains an admission requirement"),
         ("FixedFunctionShaderCompileExactHashes.insert(hash);",
          RUNTIME_CENSUS, "R222 compile success cache insertion"),
         ("return shaderCompileReadinessExact;", RUNTIME_CENSUS,
@@ -8846,6 +8846,35 @@ def main() -> None:
         raise SystemExit(
             "DX11 R222 shader-compile ExactSamples contract drift: "
             + ", ".join(missing_r222_shader_compile_exactness)
+        )
+
+    r223_vertex_compile_exact_samples_contract = [
+        ("FixedFunctionVertexShaderCompileProbe", PIPELINE_TRANSLATION_HPP,
+         "R223 vertex compiler probe type"),
+        ("compile_fixed_function_vertex_shader_prototype(",
+         PIPELINE_TRANSLATION_HPP, "R223 vertex compiler probe declaration"),
+        ('"vs_4_0"', PIPELINE_TRANSLATION_CPP,
+         "R223 generated vertex source compiler target"),
+        ("fixedFunctionVertexShaderPrototypeSource", RUNTIME_CENSUS,
+         "R223 per-signature generated vertex source retention"),
+        ("FixedFunctionVertexShaderCompileProbe vertexCompileProbe{};",
+         RUNTIME_CENSUS, "R223 bounded vertex compile probe"),
+        ("pixelCompileProbe.succeeded &&\n                    vertexCompileProbe.succeeded",
+         RUNTIME_CENSUS, "R223 VS/PS pair compile exactness gate"),
+        ("compile_fixed_function_vertex_shader_prototype(",
+         RUNTIME_CENSUS, "R223 census vertex compile invocation"),
+        ("compile_fixed_function_vertex_shader_prototype(vertexPrototype)",
+         SEMANTIC_SMOKE, "R223 hosted vertex compiler smoke"),
+    ]
+    missing_r223_vertex_compile_exactness = [
+        meaning
+        for token, source, meaning in r223_vertex_compile_exact_samples_contract
+        if token not in source
+    ]
+    if missing_r223_vertex_compile_exactness:
+        raise SystemExit(
+            "DX11 R223 vertex-shader compile ExactSamples contract drift: "
+            + ", ".join(missing_r223_vertex_compile_exactness)
         )
 
     verify_dx11_activation_boundary()

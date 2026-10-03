@@ -1681,6 +1681,56 @@ namespace outrun::vr::dx11
         return out;
     }
 
+    FixedFunctionVertexShaderCompileProbe
+    compile_fixed_function_vertex_shader_prototype(
+        const FixedFunctionVertexShaderPrototype& prototype) noexcept
+    {
+        FixedFunctionVertexShaderCompileProbe out{};
+        if (!prototype.generated())
+            return out;
+
+        out.attempted = true;
+        ID3DBlob* bytecode = nullptr;
+        ID3DBlob* diagnostics = nullptr;
+        out.result = D3DCompile(
+            prototype.source.data(),
+            prototype.source.size(),
+            "OutRunR93FixedFunctionVertexPrototype",
+            nullptr,
+            nullptr,
+            "main",
+            "vs_4_0",
+            D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3,
+            0,
+            &bytecode,
+            &diagnostics);
+
+        if (diagnostics)
+        {
+            out.diagnosticsBytes =
+                static_cast<UINT>(diagnostics->GetBufferSize());
+            out.diagnosticsHash = hash_bytes(
+                diagnostics->GetBufferPointer(),
+                diagnostics->GetBufferSize());
+        }
+
+        if (SUCCEEDED(out.result) && bytecode)
+        {
+            out.succeeded = true;
+            out.bytecodeBytes =
+                static_cast<UINT>(bytecode->GetBufferSize());
+            out.bytecodeHash = hash_bytes(
+                bytecode->GetBufferPointer(),
+                bytecode->GetBufferSize());
+        }
+
+        if (diagnostics)
+            diagnostics->Release();
+        if (bytecode)
+            bytecode->Release();
+        return out;
+    }
+
     PipelineTranslation translate_pipeline(
         const OutRunVR::DrawState::RenderStateSnapshot& source) noexcept
     {

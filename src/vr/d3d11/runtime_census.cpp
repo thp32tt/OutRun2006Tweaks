@@ -144,9 +144,9 @@ namespace outrun::vr::dx11
         std::atomic<ULONGLONG> LastLogMs{0};
         std::mutex SignatureMutex;
         std::unordered_set<std::uint64_t> SignatureHashes;
-        // R222: cache only fixed-function signatures whose generated pixel
-        // shader source actually compiled successfully. ExactSamples must not
-        // promote source-generation readiness into compiler readiness.
+        // R223: cache only fixed-function signatures whose generated vertex
+        // and pixel shader sources both compiled successfully. ExactSamples
+        // must not promote source-generation readiness into compiler readiness.
         std::unordered_set<std::uint64_t> FixedFunctionShaderCompileExactHashes;
 
         struct BufferMutationEvidence
@@ -375,6 +375,9 @@ namespace outrun::vr::dx11
             std::uint32_t fixedFunctionVertexShaderPrototypeUnsupported{};
             std::uint64_t fixedFunctionVertexShaderPrototypeHash{};
             UINT fixedFunctionVertexShaderPrototypeBytes{};
+            // R223 retains the already-generated per-signature vertex source
+            // only long enough for the bounded unique-signature compiler probe.
+            std::string fixedFunctionVertexShaderPrototypeSource;
             bool fixedFunctionTransformExact{};
             std::uint32_t fixedFunctionTransformUnsupported{};
             std::uint64_t fixedFunctionTransformHash{};
@@ -1359,6 +1362,8 @@ namespace outrun::vr::dx11
                     vertexPrototype.sourceHash;
                 sig.fixedFunctionVertexShaderPrototypeBytes =
                     static_cast<UINT>(vertexPrototype.source.size());
+                sig.fixedFunctionVertexShaderPrototypeSource =
+                    vertexPrototype.source;
 
                 // R94 observes WORLD/VIEW/PROJECTION only on the already
                 // sampled diagnostic path. It does not hook SetTransform or
@@ -1434,14 +1439,15 @@ namespace outrun::vr::dx11
                 DetailedSignatureLogSkippedSignatures.fetch_add(
                     1, std::memory_order_relaxed);
 
-            FixedFunctionPixelShaderCompileProbe compileProbe{};
+            FixedFunctionPixelShaderCompileProbe pixelCompileProbe{};
+            FixedFunctionVertexShaderCompileProbe vertexCompileProbe{};
             // R221: detailed signature logging is intentionally bounded at 64,
             // but compile-readiness evidence must not inherit that presentation
-            // cap. Probe every newly tracked fixed-function signature up to the
-            // independent SignatureHashCap; only genuinely untracked signatures
-            // beyond that hash cap count as skipped compile coverage.
+            // cap. R223 strengthens the bounded probe to require both generated
+            // fixed-function pipeline shaders for each tracked signature.
             if (inserted && sig.fixedFunction &&
-                sig.fixedFunctionShaderPrototypeGenerated)
+                sig.fixedFunctionShaderPrototypeGenerated &&
+                sig.fixedFunctionVertexShaderPrototypeGenerated)
             {
                 std::array<D3DRESOURCETYPE, 8> textureTypes{};
                 for (std::size_t stageIndex = 0;
@@ -1450,7 +1456,7 @@ namespace outrun::vr::dx11
                     textureTypes[stageIndex] =
                         sig.textureStages[stageIndex].type;
 
-                const auto prototype =
+                const auto pixelPrototype =
                     generate_fixed_function_pixel_shader_prototype(
                         sig.fixedFunctionStages,
                         sig.fixedFunctionStateCoverageExact,
@@ -1464,14 +1470,29 @@ namespace outrun::vr::dx11
                             sig.alphaTestFunc
                         },
                         sig.textureFactor);
-                compileProbe =
+                pixelCompileProbe =
                     compile_fixed_function_pixel_shader_prototype(
-                        prototype);
-                (compileProbe.succeeded
+                        pixelPrototype);
+
+                FixedFunctionVertexShaderPrototype vertexPrototype{};
+                vertexPrototype.unsupported =
+                    sig.fixedFunctionVertexShaderPrototypeUnsupported;
+                vertexPrototype.sourceHash =
+                    sig.fixedFunctionVertexShaderPrototypeHash;
+                vertexPrototype.source =
+                    sig.fixedFunctionVertexShaderPrototypeSource;
+                vertexCompileProbe =
+                    compile_fixed_function_vertex_shader_prototype(
+                        vertexPrototype);
+
+                const bool pipelineCompileSucceeded =
+                    pixelCompileProbe.succeeded &&
+                    vertexCompileProbe.succeeded;
+                (pipelineCompileSucceeded
                     ? FixedFunctionShaderCompileSucceededSignatures
                     : FixedFunctionShaderCompileFailedSignatures).fetch_add(
                         1, std::memory_order_relaxed);
-                if (compileProbe.succeeded)
+                if (pipelineCompileSucceeded)
                 {
                     std::lock_guard<std::mutex> lock(SignatureMutex);
                     FixedFunctionShaderCompileExactHashes.insert(hash);
@@ -1479,7 +1500,8 @@ namespace outrun::vr::dx11
                 }
             }
             else if (signatureHashCapHit && sig.fixedFunction &&
-                sig.fixedFunctionShaderPrototypeGenerated)
+                sig.fixedFunctionShaderPrototypeGenerated &&
+                sig.fixedFunctionVertexShaderPrototypeGenerated)
             {
                 FixedFunctionShaderCompileSkippedSignatureCap.fetch_add(
                     1, std::memory_order_relaxed);
