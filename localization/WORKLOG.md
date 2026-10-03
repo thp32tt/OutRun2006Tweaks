@@ -1009,3 +1009,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
 - Next A priority: odd index 53 `568D3696`.
 - Evidence: `localization/graphics/role_A/20261004-A-RECOVERY01/`.
+
+## 2026-10-04 A recovery — 568D3696 clean-plate rework
+- A odd-shard priority index 53 `568D3696` selected after confirming index 51 `FF2462BB` was already complete in current HEAD.
+- Reworked the 6 C85 exact-bbox failures (`r1,r2,r5,r7,r8,r9`) from the exact HD source using source-text/protected masks, a separately validated clean plate, and native-resolution Korean lettering; no localized glyph raster scaling.
+- DXT5 4096x4096 / 13 mip structure and exact 128-byte source header preserved. Only failed-cell DXT5 blocks were replaced; top-level collateral changed pixels outside those failed block cells: 0.
+- Final decoded candidate: 14/14 exact original-bbox containment PASS; clean-plate validator PASS; final protected-mask validator PASS; changed/alpha-changed pixels outside all permitted text cells: 0.
+- Visual comparison self-QA PASS for source palette/layered outline, residue, seams and clipping. Candidate SHA-256: `2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d`.
+- `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
+- Next A REWORK priority: odd index 57 `39229D64`.
+- Evidence: `localization/graphics/role_A/20261004-A-RECOVERY02/`.

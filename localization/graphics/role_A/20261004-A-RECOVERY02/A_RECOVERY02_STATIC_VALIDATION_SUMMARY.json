@@ -1,0 +1,12 @@
+{
+  "asset": "568D3696",
+  "run": "20261004-A-RECOVERY02",
+  "status": "A_RECOVERY02_SELF_QA_PASS_PENDING_C",
+  "candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+  "bbox_pass": true,
+  "collateral_pixels": 0,
+  "clean_plate": "PASS",
+  "final_mask": "PASS",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "visual_compare": "PASS"
+}

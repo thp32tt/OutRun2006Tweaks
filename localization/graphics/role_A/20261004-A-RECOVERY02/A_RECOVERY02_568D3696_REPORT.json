@@ -1,0 +1,488 @@
+{
+  "schema_version": 2,
+  "role": "A",
+  "run": "20261004-A-RECOVERY02",
+  "branch": "korean-localization-recovery-20260928",
+  "asset": "textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+  "method": "EXACT_HD_SOURCE -> SOURCE_TEXT_MASK -> PROTECTED_MASK -> CLEAN_PLATE -> native-resolution Korean rerender for 6 C85-failing elements -> DXT5 block splice -> STATIC_QA",
+  "source_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+  "before_sha256": "be524947b63a676648ca8e22348ce7d3802cd3100d14fa7ac58045fa9260fd5c",
+  "candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "compression": "DXT5",
+  "mipmaps": 13,
+  "dds_header_128_exact_to_source": true,
+  "reworked_elements": [
+    "r1",
+    "r2",
+    "r5",
+    "r7",
+    "r8",
+    "r9"
+  ],
+  "preserved_prior_pass_elements": [
+    "r3",
+    "r4",
+    "r6",
+    "r10",
+    "r11",
+    "r12",
+    "r13",
+    "r14"
+  ],
+  "native_render": [
+    {
+      "key": "r1",
+      "korean": "지퍼를 맞히세요!",
+      "font_size": 64,
+      "stroke_outer": 8,
+      "stroke_white": 6,
+      "stroke_inner": 3,
+      "target_bbox_inset": [
+        3121,
+        20,
+        3609,
+        105
+      ]
+    },
+    {
+      "key": "r2",
+      "korean": "차를 맞히세요!",
+      "font_size": 62,
+      "stroke_outer": 8,
+      "stroke_white": 6,
+      "stroke_inner": 3,
+      "target_bbox_inset": [
+        549,
+        2072,
+        970,
+        2156
+      ]
+    },
+    {
+      "key": "r5",
+      "korean": "납치를 피하세요!",
+      "font_size": 62,
+      "stroke_outer": 8,
+      "stroke_white": 6,
+      "stroke_inner": 3,
+      "target_bbox_inset": [
+        2830,
+        2077,
+        3406,
+        2161
+      ]
+    },
+    {
+      "key": "r7",
+      "korean": "비치볼을 드리블하세요!",
+      "font_size": 56,
+      "stroke_outer": 7,
+      "stroke_white": 5,
+      "stroke_inner": 3,
+      "target_bbox_inset": [
+        2338,
+        2316,
+        3063,
+        2384
+      ]
+    },
+    {
+      "key": "r8",
+      "korean": "명소를 촬영하세요!",
+      "font_size": 61,
+      "stroke_outer": 8,
+      "stroke_white": 5,
+      "stroke_inner": 3,
+      "target_bbox_inset": [
+        3176,
+        2317,
+        3681,
+        2470
+      ]
+    },
+    {
+      "key": "r9",
+      "korean": "오리를 맞히세요!",
+      "font_size": 54,
+      "stroke_outer": 7,
+      "stroke_white": 5,
+      "stroke_inner": 3,
+      "target_bbox_inset": [
+        3105,
+        3216,
+        3554,
+        3284
+      ]
+    }
+  ],
+  "quality_gates": {
+    "clean_plate_validation": "PASS",
+    "all_14_within_original_bbox": true,
+    "top_level_changed_pixels_outside_failed_block_cells_vs_prior_candidate": 0,
+    "final_protected_mask_validation": "PASS",
+    "final_changed_pixels_outside_all_block_aligned_text_cells": 0,
+    "final_alpha_changed_outside_all_block_aligned_text_cells": 0,
+    "font_coverage": "PASS_NotoSansCJKBlack",
+    "raster_resampling_of_localized_glyphs": false,
+    "runtime_validation": "UNTESTED",
+    "visual_compare": "PASS_SOURCE_PALETTE_AND_LAYERED_OUTLINE_NO_CLIPPING_RESIDUE",
+    "clean_plate_source_text_residue_pixels": 0
+  },
+  "rows": [
+    {
+      "key": "r1",
+      "source": "Hit the zippers!",
+      "korean": "지퍼를 맞히세요!",
+      "reworked": true,
+      "original_bbox": [
+        3117,
+        16,
+        3613,
+        109
+      ],
+      "previous_localized_bbox": [
+        3125,
+        13,
+        3600,
+        106
+      ],
+      "new_localized_bbox": [
+        3133,
+        24,
+        3593,
+        101
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r2",
+      "source": "Hit the cars!",
+      "korean": "차를 맞히세요!",
+      "reworked": true,
+      "original_bbox": [
+        545,
+        2068,
+        974,
+        2160
+      ],
+      "previous_localized_bbox": [
+        555,
+        2062,
+        960,
+        2153
+      ],
+      "new_localized_bbox": [
+        562,
+        2076,
+        952,
+        2151
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r3",
+      "source": "Dodge the bombs!",
+      "korean": "폭탄을 피하세요!",
+      "reworked": false,
+      "original_bbox": [
+        1140,
+        2061,
+        1775,
+        2165
+      ],
+      "previous_localized_bbox": [
+        1204,
+        2061,
+        1706,
+        2158
+      ],
+      "new_localized_bbox": [
+        1204,
+        2061,
+        1705,
+        2157
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r4",
+      "source": "Feed the girl!",
+      "korean": "여자친구에게 먹여 주세요!",
+      "reworked": false,
+      "original_bbox": [
+        1988,
+        2061,
+        2445,
+        2164
+      ],
+      "previous_localized_bbox": [
+        2005,
+        2074,
+        2426,
+        2142
+      ],
+      "new_localized_bbox": [
+        2005,
+        2074,
+        2425,
+        2141
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r5",
+      "source": "Avoid abduction!",
+      "korean": "납치를 피하세요!",
+      "reworked": true,
+      "original_bbox": [
+        2826,
+        2073,
+        3410,
+        2165
+      ],
+      "previous_localized_bbox": [
+        2888,
+        2069,
+        3347,
+        2160
+      ],
+      "new_localized_bbox": [
+        2896,
+        2081,
+        3339,
+        2156
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r6",
+      "source": "Avoid the meteors!",
+      "korean": "운석을 피하세요!",
+      "reworked": false,
+      "original_bbox": [
+        1695,
+        2298,
+        2327,
+        2398
+      ],
+      "previous_localized_bbox": [
+        1787,
+        2303,
+        2234,
+        2392
+      ],
+      "new_localized_bbox": [
+        1787,
+        2303,
+        2233,
+        2391
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r7",
+      "source": "Dribble the beach ball!",
+      "korean": "비치볼을 드리블하세요!",
+      "reworked": true,
+      "original_bbox": [
+        2334,
+        2312,
+        3067,
+        2388
+      ],
+      "previous_localized_bbox": [
+        2389,
+        2303,
+        3019,
+        2394
+      ],
+      "new_localized_bbox": [
+        2423,
+        2316,
+        2977,
+        2384
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r8",
+      "source": "Photograph the sights!",
+      "korean": "명소를 촬영하세요!",
+      "reworked": true,
+      "original_bbox": [
+        3172,
+        2313,
+        3685,
+        2474
+      ],
+      "previous_localized_bbox": [
+        3171,
+        2348,
+        3687,
+        2439
+      ],
+      "new_localized_bbox": [
+        3182,
+        2356,
+        3674,
+        2430
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r9",
+      "source": "Hit the ducks!",
+      "korean": "오리를 맞히세요!",
+      "reworked": true,
+      "original_bbox": [
+        3101,
+        3212,
+        3558,
+        3288
+      ],
+      "previous_localized_bbox": [
+        3126,
+        3205,
+        3531,
+        3289
+      ],
+      "new_localized_bbox": [
+        3133,
+        3217,
+        3522,
+        3283
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r10",
+      "source": "See the sights!",
+      "korean": "명소를 구경하세요!",
+      "reworked": false,
+      "original_bbox": [
+        2975,
+        3299,
+        3494,
+        3395
+      ],
+      "previous_localized_bbox": [
+        2988,
+        3301,
+        3488,
+        3390
+      ],
+      "new_localized_bbox": [
+        2988,
+        3301,
+        3487,
+        3389
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r11",
+      "source": "END",
+      "korean": "종료",
+      "reworked": false,
+      "original_bbox": [
+        942,
+        2565,
+        1489,
+        2799
+      ],
+      "previous_localized_bbox": [
+        1032,
+        2575,
+        1396,
+        2791
+      ],
+      "new_localized_bbox": [
+        1032,
+        2575,
+        1395,
+        2790
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r12",
+      "source": "ANSWER",
+      "korean": "정답",
+      "reworked": false,
+      "original_bbox": [
+        2157,
+        2559,
+        3217,
+        2800
+      ],
+      "previous_localized_bbox": [
+        2505,
+        2572,
+        2871,
+        2796
+      ],
+      "new_localized_bbox": [
+        2505,
+        2572,
+        2870,
+        2795
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r13",
+      "source": "QUESTION",
+      "korean": "문제",
+      "reworked": false,
+      "original_bbox": [
+        777,
+        2905,
+        2040,
+        3161
+      ],
+      "previous_localized_bbox": [
+        1226,
+        2918,
+        1583,
+        3142
+      ],
+      "new_localized_bbox": [
+        1226,
+        2918,
+        1582,
+        3141
+      ],
+      "containment": "PASS"
+    },
+    {
+      "key": "r14",
+      "source": "START",
+      "korean": "시작",
+      "reworked": false,
+      "original_bbox": [
+        2605,
+        2911,
+        3457,
+        3145
+      ],
+      "previous_localized_bbox": [
+        2846,
+        2918,
+        3213,
+        3142
+      ],
+      "new_localized_bbox": [
+        2846,
+        2918,
+        3212,
+        3141
+      ],
+      "containment": "PASS"
+    }
+  ],
+  "status": "A_RECOVERY02_SELF_QA_PASS_PENDING_C"
+}

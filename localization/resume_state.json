@@ -1266,5 +1266,23 @@
       "asset": "568D3696",
       "status": "rework_required_zero_pixel_or_artifact"
     }
+  },
+  "a_recovery02_568d3696": {
+    "run": "20261004-A-RECOVERY02",
+    "status": "A_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+    "reworked_elements": 6,
+    "prior_pass_elements_preserved": 8,
+    "compression": "DXT5",
+    "mipmaps": 13,
+    "clean_plate_report": "localization/graphics/role_A/20261004-A-RECOVERY02/A_RECOVERY02_CLEAN_PLATE_VALIDATION.json",
+    "final_mask_report": "localization/graphics/role_A/20261004-A-RECOVERY02/A_RECOVERY02_FINAL_MASK_VALIDATION.json",
+    "production_report": "localization/graphics/role_A/20261004-A-RECOVERY02/A_RECOVERY02_568D3696_REPORT.json",
+    "runtime_validation": "UNTESTED",
+    "next_a_target": {
+      "index": 57,
+      "asset": "39229D64",
+      "status": "rework_required_zero_pixel_or_artifact"
+    }
   }
 }
