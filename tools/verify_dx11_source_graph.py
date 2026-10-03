@@ -8771,6 +8771,30 @@ def main() -> None:
             + ", ".join(missing_mrt_color_write)
         )
 
+    r220_shader_readiness_exact_samples_contract = [
+        ("bool shaderReadinessExact{};", RUNTIME_CENSUS,
+         "R220 sampled shader readiness identity"),
+        ("sig.shaderReadinessExact ? 1u : 0u", RUNTIME_CENSUS,
+         "R220 sampled shader readiness hash identity"),
+        ("signature.fixedFunction &&\n            signature.shaderTranslationExact;",
+         RUNTIME_CENSUS,
+         "R220 fixed-function-only shader readiness derivation"),
+        ("signature.shaderReadinessExact &&", RUNTIME_CENSUS,
+         "R220 final ExactSamples shader readiness gate"),
+        ("Programmable D3D9 shader", RUNTIME_CENSUS,
+         "R220 programmable shader fail-closed rationale"),
+    ]
+    missing_r220_shader_readiness = [
+        meaning
+        for token, source, meaning in r220_shader_readiness_exact_samples_contract
+        if token not in source
+    ]
+    if missing_r220_shader_readiness:
+        raise SystemExit(
+            "DX11 R220 shader-readiness ExactSamples contract drift: "
+            + ", ".join(missing_r220_shader_readiness)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

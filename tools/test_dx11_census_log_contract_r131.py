@@ -27,7 +27,9 @@ def main() -> None:
         "hash_mix",
         "sig.resourceIntrospectionComplete ? 1u : 0u",
         "sig.resourceBehaviorExact ? 1u : 0u",
+        "sig.shaderReadinessExact ? 1u : 0u",
         "signature.resourceBehaviorExact &&",
+        "signature.shaderReadinessExact &&",
         "ExactSamples.fetch_add",
     ]
     missing = [token for token in required if token not in census]

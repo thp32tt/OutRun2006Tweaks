@@ -264,6 +264,10 @@ namespace outrun::vr::dx11
             bool shaderIntrospectionComplete{};
             bool shaderMixedPair{};
             bool shaderTranslationExact{};
+            // R220: keep the shader activation-readiness boundary distinct
+            // from translation implementation state. Programmable D3D9 shader
+            // pairs remain fail-closed until a dedicated translator is proven.
+            bool shaderReadinessExact{};
             bool fixedFunctionStateCoverageExact{};
             // R162: preserve interpolation provenance in the sampled draw
             // identity so non-Gouraud state cannot alias an exact signature.
@@ -555,6 +559,7 @@ namespace outrun::vr::dx11
             hash = hash_mix(hash, sig.shaderIntrospectionComplete ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderMixedPair ? 1u : 0u);
             hash = hash_mix(hash, sig.shaderTranslationExact ? 1u : 0u);
+            hash = hash_mix(hash, sig.shaderReadinessExact ? 1u : 0u);
             hash = hash_mix(
                 hash, sig.fixedFunctionStateCoverageExact ? 1u : 0u);
             hash = hash_mix(
@@ -2694,6 +2699,16 @@ namespace outrun::vr::dx11
                 signature.fixedFunctionTransformExact;
         }
 
+        // R220 closes the remaining F21 scope hazard: the sampled readiness
+        // identity must explicitly prove the currently supported fixed-function
+        // shader path. A future programmable translator cannot silently inherit
+        // ExactSamples by widening shaderTranslationExact alone.
+        signature.shaderReadinessExact =
+            signature.shaderIntrospectionComplete &&
+            !signature.shaderMixedPair &&
+            signature.fixedFunction &&
+            signature.shaderTranslationExact;
+
         note_signature(signature, primitive);
 
         // R218 keeps the final ExactSamples boundary explicitly tied to the
@@ -2710,6 +2725,7 @@ namespace outrun::vr::dx11
             signature.resourceBehaviorExact &&
             resourcesExact && inputLayoutExact &&
             signature.outputStateObservationComplete &&
+            signature.shaderReadinessExact &&
             signature.shaderTranslationExact)
             ExactSamples.fetch_add(1, std::memory_order_relaxed);
 
