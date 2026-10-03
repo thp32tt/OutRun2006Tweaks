@@ -58,13 +58,14 @@
     "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_R215_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "issue14_comment_id": 5971449743,
+    "issue14_comment_id": 5971345269,
     "validation_run_id": 37138824112,
     "validation_job_id": 111248824299,
     "readiness_smoke_job_id": 111249755401,
     "artifact_id": 11279548211,
     "artifact_digest": "sha256:3194d8afc85bb2594d254e0d7436a6caf7a1deabc1deb71a696ed22cc3ec6dd7",
-    "validation_comment_id": 5971449743
+    "validation_comment_id": 5971452617,
+    "authoritative_metadata_correction_comment_id": 5971490265
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00304. Exact-SHA hosted validation passed for ea595bfd67529585ea33e43e16d3ea13ec5662bc, including R215 source-graph/dormant-boundary/census-analyzer checks, Win32 build/binary and DX11 readiness smoke. This is diagnostic/source readiness evidence, not in-game/HMD proof.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before native draw activation or visual/runtime correctness claims.",
@@ -1553,7 +1554,7 @@
       "checkpoint": "C6_STATE",
       "native_draw_path_activation_changed": false,
       "packaging_status": "NOT_REQUIRED_DORMANT_CENSUS_STATIC_ONLY",
-      "issue14_comment_id": 5971449743,
+      "issue14_comment_id": 5971345269,
       "validation_run_id": 37138824112,
       "validation_job_id": 111248824299,
       "readiness_smoke_job_id": 111249755401,
@@ -1562,7 +1563,10 @@
       "superseded_failed_gate_runs": [
         37138570146,
         37138670652
-      ]
+      ],
+      "validation_comment_id": 5971452617,
+      "authoritative_metadata_correction_comment_id": 5971490265,
+      "superseded_issue_comment_id": 5971449743
     }
   ]
 }
