@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00296",
-  "production_id": "CONVERSION-DX11-00296",
+  "production_id": "CONVERSION-DXVK-00295",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "event_id": "CONVERSION-DX11-00296-E001",
+  "event_id": "CONVERSION-DXVK-00295-E002",
   "event_type": "rollover",
   "status": "COMPLETE",
   "automation_validation": "PASS",
@@ -121,14 +121,14 @@
   "issue14_comment_ids": [
     5970178488,
     5970214838,
-    5970293757
+    5970293757,
+    5970290630,
+    5970313639
   ],
   "exact_next_action": "Continue only with a new independent DX11 source/static conversion task from the newest authenticated GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
-  "chat_rollover": 2,
-  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
   "controller_resume": {
-    "final_event_id": "CONVERSION-DX11-00296-E001",
+    "final_event_id": "CONVERSION-DXVK-00295-E002",
     "final_attempt": "1/3",
-    "note": "The rollover is not a retry. Recovery observed an already-materialized same-task R205 commit at 7fde73a717ffe09633378e9c4e25d70cfd33fc60 and continued from it without repeating completed work; final exact-SHA validation covers descendant material result 350bce608d7283bd5216463d7447b037e5cab252."
+    "note": "Current rollover dispatch metadata is authoritative. The same-task intermediate Gate on 7fde73a717ffe09633378e9c4e25d70cfd33fc60 was cancelled by descendant 350bce608d7283bd5216463d7447b037e5cab252 and classified SUPERSEDED, not a failed attempt. Final exact-SHA validation remains PASS on 350bce608d7283bd5216463d7447b037e5cab252."
   }
 }
