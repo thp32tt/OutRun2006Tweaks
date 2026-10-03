@@ -5,27 +5,28 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "event_id": "CONVERSION-DX11-00323-E001",
+  "event_id": "CONVERSION-DX11-00323-E002",
   "event_type": "rollover",
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R225_MULTI_LOG_SIGNATURE_NAMESPACE_ISOLATION_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
   "base_sha": "af39a4e36f1234afa5229fc98e041a582b1e9a5f",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "3bf9e729ad4c2dcae4bf706eda5fde78898163f9",
+  "validation_bearing_result_sha": "3bf9e729ad4c2dcae4bf706eda5fde78898163f9",
   "result_marker": "[AUTO:CONVERSION-DX11-00323]",
   "selected_work_item": "DX11_R225_MULTI_LOG_SIGNATURE_NAMESPACE_ISOLATION",
   "summary": "R225 prevents the offline DX11 census analyzer from merging unrelated process-local signature ordinals across multiple log files. Runtime signature#N values are insertion-order ids that restart per process; analyzer evidence is now keyed by source-log plus signature id, so R223/R224 VS/PS compiler evidence and all per-signature details stay attached to the correct session.",
   "changed_paths": [
     "tools/analyze_dx11_census.py",
     "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
     "docs/automation/runs/CONVERSION-DX11-00323.json"
   ],
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
       "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 HEAD af39a4e36f1234afa5229fc98e041a582b1e9a5f. Read AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md and Set05, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, docs/VR_AUTODEV_STATE.json, docs/VR_RUN_STATE.md, docs/VR_REGRESSION_KNOWLEDGE.json, docs/VR_PROBLEM_HISTORY.md and production ledger Issue #14. R224/00321 is durable and was not repeated.",
-      "resume_evidence": "CHAT_ROLLOVER=2 recovered the existing /home/chatgpt-runner/work/dx11-00323 worktree at GitHub SSOT af39a4e36f1234afa5229fc98e041a582b1e9a5f. The rollover was queue-response expiry, not a task retry, so ATTEMPT remains 1/3; the already-completed R225 RED/GREEN work was continued rather than restarted."
+      "resume_evidence": "CHAT_ROLLOVER=3 recovered GitHub SSOT at material HEAD 3bf9e729ad4c2dcae4bf706eda5fde78898163f9; rollover was caused by queue result grace-period expiry with no assistant response, not by task failure, so ATTEMPT remains 1/3. Existing C0-C4 material work was not repeated."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
@@ -43,22 +44,37 @@
       "evidence": "Introduced SignatureKey=(source_log, signature_id), applied it consistently to declarations, fixed-function stage data, texture stages, texture factor, shader prototype and both PS/VS compile evidence, emitted source_log provenance per signature, and added a two-log regression fixture that is executed by the existing Backend Conversion Gate census-analyzer test step."
     },
     "C3_VALIDATE": {
-      "status": "LOCAL_STATIC_PASS_EXACT_SHA_GATE_PENDING",
-      "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
-      "evidence": "TDD RED reproduced logs=2 signatures=1 and AssertionError before the analyzer fix. GREEN produced logs=2 signatures=2. py_compile, test_analyze_dx11_census.py, verify_dx11_source_graph.py, verify_dx11_activation_boundary.py, verify_dx11_dual_source_contract.py, verify_dx11_native_transport_contract.py, verify_vr_backend_disasm_contract.py, test_dx11_static_surface_contract.py, dx11_native_static_surface_contract_check.py, verify_vr_proven_baseline.py (44 guards), and git diff --check all passed locally. The existing exact-SHA Backend Conversion Gate directly executes test_analyze_dx11_census.py."
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R225_MULTI_LOG_SIGNATURE_NAMESPACE_ISOLATION_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Local static/TDD validation passed. Exact-SHA Backend Conversion Gate run 37156679578 completed success for 3bf9e729ad4c2dcae4bf706eda5fde78898163f9; validate job 111301507805 passed source graph, dormant activation, census analyzer, Win32 build/binary checks and artifact publication, and DX11 readiness smoke job 111302383294 passed. No Quest 3/VDXR runtime test was performed."
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "COMPLETE",
+      "material_result_sha": "3bf9e729ad4c2dcae4bf706eda5fde78898163f9",
+      "validation_bearing_result_sha": "3bf9e729ad4c2dcae4bf706eda5fde78898163f9",
+      "result_marker": "[AUTO:CONVERSION-DX11-00323]",
+      "implementation_commits": [
+        "6d361290e0565475c06ba9dee690e711469edc38",
+        "7cc3e2fc0ea14037868f26aa171126787db65857",
+        "8d678600e4f4360df6470a9319bb3ff5f080d799",
+        "4bbe70bbc1f5c472211155c1cf632fd4c4c67156",
+        "3bf9e729ad4c2dcae4bf706eda5fde78898163f9"
+      ]
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
       "reason": "Offline analyzer evidence-integrity change only; no runtime candidate or package identity changes."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "Publish one non-CI-skipped material result to vr-dx11-native-r71, require its exact-SHA Backend Conversion Gate, then persist PASS task/lane bookkeeping separately with CI skip while keeping runtime validation UNTESTED."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37156679578,
+      "validation_job_id": 111301507805,
+      "readiness_smoke_job_id": 111302383294,
+      "artifact_id": 11285308766,
+      "artifact_digest": "sha256:430c5a4ec595bd2feff4a30efa25763d8978426e7c06f0bdce9ac95c5d69d5c6",
+      "exact_next_action": "Preserve R223/R224 compiler census evidence and R225 per-log signature namespace isolation, keep NativeDrawPath dormant, and select the next independent DX11 source/static gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate."
     }
   },
   "regression_assessment": {
@@ -74,16 +90,27 @@
   "runtime_claim": "NONE",
   "controller_dispatch": {
     "production_id": "CONVERSION-DX11-00323",
-    "event_id": "CONVERSION-DX11-00323-E001",
+    "event_id": "CONVERSION-DX11-00323-E002",
     "event_type": "rollover",
     "attempt": "1/3",
-    "chat_rollover": 2,
+    "chat_rollover": 3,
     "rollover_is_retry": false,
     "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
     "source": "CURRENT_USER_QUEUE_ROLLOVER"
   },
-  "exact_next_action": "Publish the R225 multi-log signature namespace isolation material result without CI skip, require its exact-SHA Backend Conversion Gate, then persist C6 state separately.",
-  "chat_rollover": 2,
+  "exact_next_action": "Preserve R223/R224 compiler census evidence and R225 per-log signature namespace isolation, keep NativeDrawPath dormant, and select the next independent DX11 source/static gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+  "chat_rollover": 3,
   "rollover_is_retry": false,
-  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37156679578,
+      "result_sha": "3bf9e729ad4c2dcae4bf706eda5fde78898163f9",
+      "conclusion": "success",
+      "validate_job_id": 111301507805,
+      "readiness_smoke_job_id": 111302383294,
+      "artifact_id": 11285308766,
+      "artifact_digest": "sha256:430c5a4ec595bd2feff4a30efa25763d8978426e7c06f0bdce9ac95c5d69d5c6"
+    }
+  }
 }
