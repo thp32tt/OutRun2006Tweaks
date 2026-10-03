@@ -93,7 +93,8 @@
     "issue14_material_comment_id": 5973183232,
     "issue14_validation_comment_id": 5973229606,
     "semantic_promotion": "BOUNDED_CONTROL_FLOW_CALL_AND_CAPTURE_EDGE_ONLY",
-    "ownership_effect": "NONE"
+    "ownership_effect": "NONE",
+    "lane_state_commit_sha": "d1e2bf8437feb99690e8e7e24919db36a2942c45"
   },
   "pipeline": {
     "C0_RECOVER": {
@@ -123,7 +124,7 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "evidence": "Schema-2 durable task record and branch-local lane state are persisted in the C6 bookkeeping commit. Material/validation-bearing SHA remains a709894c29aa8a7eef018f5ff342a167440308ab; RUNTIME_VALIDATION remains UNTESTED."
+      "evidence": "Schema-2 durable task record and branch-local lane state are persisted in d1e2bf8437feb99690e8e7e24919db36a2942c45. Material/validation-bearing SHA remains a709894c29aa8a7eef018f5ff342a167440308ab; RUNTIME_VALIDATION remains UNTESTED."
     }
   },
   "blocker": "No automatic-validation blocker remains. Runtime acceptance is explicitly untested and separate.",
@@ -136,5 +137,5 @@
     "event_type": "rollover",
     "attempt": "1/3"
   },
-  "run_record_commit_sha": "7f9ab7b68192a7f58dcd6e4816bb5ab5d2585e18"
+  "run_record_commit_sha": "d1e2bf8437feb99690e8e7e24919db36a2942c45"
 }
