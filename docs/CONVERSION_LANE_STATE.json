@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "3670d3ed6b072c4203e1e40b7de590d7235b95ad",
+  "state_parent_head": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -51,25 +51,24 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DX11-00300",
-    "result_sha": "3670d3ed6b072c4203e1e40b7de590d7235b95ad",
-    "source_implementation_sha": "0504e094bca1aee71451702d58b5aefb5932ee59",
-    "validation_bearing_sha": "3670d3ed6b072c4203e1e40b7de590d7235b95ad",
-    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+    "task_id": "CONVERSION-DX11-00302",
+    "result_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
+    "source_implementation_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
+    "validation_bearing_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
+    "automation_validation": "PASS_EXACT_SHA_CENSUS_IDENTITY_GUARD_READONLY_CHECK_BACKEND_CONVERSION_GATE_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "issue14_comment_id": 5970725189,
-    "validation_run_id": 37134564287,
-    "validation_job_id": 111236341808,
-    "readiness_smoke_job_id": 111237313421,
-    "artifact_id": 11278551482,
-    "artifact_digest": "sha256:3b308a4a04a823c04b6fff4f5b7f394fc848cf1eb7e0115139c28a4e35753bdf",
-    "validation_comment_id": 5970821437,
-    "authoritative_metadata_correction_comment_id": 5970840152
+    "issue14_comment_id": 5971124760,
+    "validation_run_id": 37136741723,
+    "validation_job_id": 111242698824,
+    "readiness_smoke_job_id": 111243656265,
+    "artifact_id": 11279325012,
+    "artifact_digest": "sha256:c36624e1a04fa21abb568f017107704b6ec1c0276e9c3feaf482ef7e060b5b37",
+    "validation_comment_id": 5971124760
   },
-  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00300. Exact-SHA hosted validation passed for 3670d3ed6b072c4203e1e40b7de590d7235b95ad, including source/static checks, Win32 build/binary and DX11 readiness smoke; this is not in-game/HMD proof.",
+  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00302. Exact-SHA hosted validation passed for 973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84, including Win32 build/binary and DX11 readiness smoke; the repaired R214 census identity guard also passed an exact-HEAD read-only source-contract check. This is not in-game/HMD proof.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before activation or visual/runtime correctness claims.",
-  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve the R213 dynamic-output observation fail-closed ExactSamples gate and prior retained exactness work; fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for one new independent dormant DX11 source/static gap. Runtime parity remains separately required.",
+  "independent_static_next_action": "Keep NativeDrawPathActive disabled. Preserve the R214 census identity guard against durable census behavior together with the R213 output-state ExactSamples gate; fresh-audit the newest authenticated vr-dx11-native-r71 HEAD for one new independent dormant DX11 source/static gap. Runtime parity remains separately required.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -1517,6 +1516,23 @@
       "readiness_smoke_job_id": 111237313421,
       "artifact_id": 11278551482,
       "artifact_digest": "sha256:3b308a4a04a823c04b6fff4f5b7f394fc848cf1eb7e0115139c28a4e35753bdf"
+    },
+    {
+      "unit_id": "DX11_CENSUS_IDENTITY_GUARD_R214",
+      "task_id": "CONVERSION-DX11-00302",
+      "material_result_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
+      "guard_result_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
+      "validation_bearing_sha": "973a5df0f2fd1a7d8e3b8745ec0a00e7f570fe84",
+      "automation_validation": "PASS_EXACT_SHA_CENSUS_IDENTITY_GUARD_READONLY_CHECK_BACKEND_CONVERSION_GATE_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "issue14_comment_id": 5971124760,
+      "validation_run_id": 37136741723,
+      "validation_job_id": 111242698824,
+      "readiness_smoke_job_id": 111243656265,
+      "artifact_id": 11279325012,
+      "artifact_digest": "sha256:c36624e1a04fa21abb568f017107704b6ec1c0276e9c3feaf482ef7e060b5b37"
     }
   ]
 }
