@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "11660d9a24c9ec599f2bc14ddcf0750bac8d756a",
+  "state_parent_head": "9916cc5e5732da9a5cca93f9928d80468d46819e",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,17 +54,44 @@
     "task_id": "CONVERSION-DXVK-00308",
     "result_sha": "2ab1dcc1f5ff4925c2742149b31ed93a2175f261",
     "validation_bearing_result_sha": "2ab1dcc1f5ff4925c2742149b31ed93a2175f261",
-    "run_record_commit_sha": "11660d9a24c9ec599f2bc14ddcf0750bac8d756a",
+    "run_record_commit_sha": "9916cc5e5732da9a5cca93f9928d80468d46819e",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
-    "production_id": "CONVERSION-DX11-00307",
-    "event_id": "CONVERSION-DX11-00307-E001",
+    "production_id": "CONVERSION-DXVK-00308",
+    "event_id": "CONVERSION-DXVK-00308-E001",
     "event_type": "rollover",
     "dxvk_disassembly_evidence_run_id": 37142415224,
     "backend_conversion_gate_run_id": 37142415111,
-    "runtime_test_performed": false
+    "runtime_test_performed": false,
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "source_normalization_descendant_sha": "765d24f049b6f628d7213a724fe3e7ed1f34ba5e",
+    "source_normalization_effect": "COMMENT_AND_WHITESPACE_ONLY_NO_SEMANTIC_CHANGE",
+    "dispatch_metadata_correction": {
+      "corrected_from": {
+        "production_id": "CONVERSION-DX11-00307",
+        "event_id": "CONVERSION-DX11-00307-E001",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": null,
+        "rollover_is_retry": null
+      },
+      "authoritative_request": {
+        "task_id": "CONVERSION-DXVK-00308",
+        "production_id": "CONVERSION-DXVK-00308",
+        "event_id": "CONVERSION-DXVK-00308-E001",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 2,
+        "rollover_is_retry": false
+      },
+      "reason": "Current active-chat E001 rollover is authoritative and does not increment ATTEMPT. Material result, exact-SHA validation, runtime status and next frontier remain unchanged.",
+      "material_result_unchanged": true,
+      "validation_bearing_result_unchanged": true
+    }
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
