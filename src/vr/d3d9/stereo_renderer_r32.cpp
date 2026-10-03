@@ -1465,4 +1465,10 @@ namespace OutRunVRStereo
 
         VRStereoR32ReviewHook VRStereoR32ReviewHook::instance;
     }
+
+    inline OutRunVR::RuntimeEligibility::InstallState
+    R32InstallStatus() noexcept
+    {
+        return R32InstallState.load(std::memory_order_acquire);
+    }
 }
