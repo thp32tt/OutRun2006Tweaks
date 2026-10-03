@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00317",
-  "production_id": "CONVERSION-DX11-00317",
+  "production_id": "CONVERSION-DXVK-00316",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "event_id": "CONVERSION-DX11-00317-E001",
+  "event_id": "CONVERSION-DXVK-00316-E001",
   "event_type": "rollover",
   "status": "COMPLETE",
   "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R222_SHADER_COMPILE_EXACT_SAMPLES_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
@@ -82,8 +82,8 @@
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "controller_dispatch": {
-    "production_id": "CONVERSION-DX11-00317",
-    "event_id": "CONVERSION-DX11-00317-E001",
+    "production_id": "CONVERSION-DXVK-00316",
+    "event_id": "CONVERSION-DXVK-00316-E001",
     "event_type": "rollover",
     "attempt": "1/3",
     "chat_rollover": 2,
@@ -95,7 +95,16 @@
     "implementation_comment_id": 5973029273,
     "repair_comment_id": 5973039586,
     "validation_comment_id": 5973119998,
-    "dispatch_metadata_correction_comment_id": 5973121054
+    "dispatch_metadata_correction_comment_id": 5973121054,
+    "dispatch_metadata_correction": {
+      "authoritative_production_id": "CONVERSION-DXVK-00316",
+      "authoritative_event_id": "CONVERSION-DXVK-00316-E001",
+      "authoritative_event_type": "rollover",
+      "authoritative_attempt": "1/3",
+      "corrected_from_production_id": "CONVERSION-DX11-00317",
+      "corrected_from_event_id": "CONVERSION-DX11-00317-E001",
+      "material_and_validation_bearing_sha_unchanged": true
+    }
   },
   "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Preserve R222 per-signature compile-readiness gating together with R213-R221 exactness protections; programmable shader translation, native draw activation and Quest 3/VDXR runtime parity remain fail-closed until their own evidence gates pass.",
   "source_implementation_sha": "7d5fd2c047f27d78ff4728f358eb99ebf9af473b",
@@ -130,19 +139,16 @@
   "chat_rollover": 2,
   "rollover_is_retry": false,
   "dispatch_metadata_correction": {
-    "authoritative_production_id": "CONVERSION-DX11-00317",
-    "authoritative_event_id": "CONVERSION-DX11-00317-E001",
+    "authoritative_production_id": "CONVERSION-DXVK-00316",
+    "authoritative_event_id": "CONVERSION-DXVK-00316-E001",
     "authoritative_event_type": "rollover",
     "authoritative_attempt": "1/3",
-    "chat_rollover": 2,
-    "rollover_is_retry": false,
     "corrected_from": {
-      "production_id": "CONVERSION-DXVK-00316",
-      "event_id": "CONVERSION-DXVK-00316-E001",
+      "production_id": "CONVERSION-DX11-00317",
+      "event_id": "CONVERSION-DX11-00317-E001",
       "event_type": "rollover",
       "attempt": "1/3"
     },
-    "evidence_comment_id": 5973121054,
     "material_and_validation_bearing_sha_unchanged": true
   }
 }

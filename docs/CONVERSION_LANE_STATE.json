@@ -52,8 +52,8 @@
   },
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00317",
-    "production_id": "CONVERSION-DX11-00317",
-    "event_id": "CONVERSION-DX11-00317-E001",
+    "production_id": "CONVERSION-DXVK-00316",
+    "event_id": "CONVERSION-DXVK-00316-E001",
     "event_type": "rollover",
     "attempt": "1/3",
     "chat_rollover": 2,
@@ -1779,8 +1779,8 @@
     {
       "unit_id": "DX11_R222_FIXED_FUNCTION_SHADER_COMPILE_EXACT_SAMPLES_GATE",
       "task_id": "CONVERSION-DX11-00317",
-      "production_id": "CONVERSION-DX11-00317",
-      "event_id": "CONVERSION-DX11-00317-E001",
+      "production_id": "CONVERSION-DXVK-00316",
+      "event_id": "CONVERSION-DXVK-00316-E001",
       "event_type": "rollover",
       "attempt": "1/3",
       "chat_rollover": 2,
@@ -1818,8 +1818,8 @@
   ],
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00317",
-    "production_id": "CONVERSION-DX11-00317",
-    "event_id": "CONVERSION-DX11-00317-E001",
+    "production_id": "CONVERSION-DXVK-00316",
+    "event_id": "CONVERSION-DXVK-00316-E001",
     "event_type": "rollover",
     "attempt": "1/3",
     "chat_rollover": 2,
@@ -1833,10 +1833,12 @@
     "validation_comment_id": 5973121054,
     "dispatch_metadata_correction_comment_id": 5973121054,
     "dispatch_metadata_correction": {
-      "corrected_from_production_id": "CONVERSION-DXVK-00316",
-      "corrected_from_event_id": "CONVERSION-DXVK-00316-E001",
-      "corrected_from_event_type": "rollover",
-      "corrected_from_attempt": "1/3",
+      "authoritative_production_id": "CONVERSION-DXVK-00316",
+      "authoritative_event_id": "CONVERSION-DXVK-00316-E001",
+      "authoritative_event_type": "rollover",
+      "authoritative_attempt": "1/3",
+      "corrected_from_production_id": "CONVERSION-DX11-00317",
+      "corrected_from_event_id": "CONVERSION-DX11-00317-E001",
       "material_and_validation_bearing_sha_unchanged": true
     }
   }
