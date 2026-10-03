@@ -4545,16 +4545,22 @@ int main()
             "R147 restore indexed direct IA after dispatch proof");
     }
 
+    constexpr UINT liveFanBaseVertex = 5u;
     NativeTriangleFanIndexBuffer liveFanOwner;
     require(
-        liveFanOwner.initialize_nonindexed(d3d.device, 3u, 7u),
+        liveFanOwner.initialize_nonindexed(
+            d3d.device, 3u, liveFanBaseVertex),
         "R142 generated fan owner prerequisite");
     const auto liveFanOwnerReady = liveFanOwner.readiness(d3d.device);
+    require(
+        (static_cast<std::uint64_t>(liveFanBaseVertex) + 5ull) *
+                geometryVertexStride <= managedVertexBuffer.byte_width(),
+        "R154 positive fan fixture fits managed vertex-buffer capacity");
     const auto liveFanVertexReady =
         managedVertexBuffer.mirror_readiness(d3d.device);
     const auto liveFanGeometryReady =
         compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
-            liveFanVertexReady, liveFanOwnerReady, 3u, 7u);
+            liveFanVertexReady, liveFanOwnerReady, 3u, liveFanBaseVertex);
     require(
         liveFanGeometryReady.ready &&
         liveFanGeometryReady.generatedIndexBufferMatchesDraw &&
@@ -4588,7 +4594,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u);
+                liveFanOwner, 3u, liveFanBaseVertex);
     require(
         completeFanBoundDraw.inputValid &&
         completeFanBoundDraw.sameContextBoundDrawReady &&
@@ -4611,7 +4617,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u, completeFanBoundDraw.snapshotToken),
+                liveFanOwner, 3u, liveFanBaseVertex, completeFanBoundDraw.snapshotToken),
         "R142 complete fan bound draw seals live VB and generated IB");
 
     const auto finalFanBoundDraw =
@@ -4621,7 +4627,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u, transform, surfaceTargetBinding,
+                liveFanOwner, 3u, liveFanBaseVertex, transform, surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface);
     require(
         finalFanBoundDraw.inputValid &&
@@ -4641,7 +4647,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u, transform, surfaceTargetBinding,
+                liveFanOwner, 3u, liveFanBaseVertex, transform, surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface,
                 finalFanBoundDraw.snapshotToken),
         "R146 nonindexed fan final draw seals live VS b0 and OM target");
@@ -4655,7 +4661,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u, transform, surfaceTargetBinding,
+                liveFanOwner, 3u, liveFanBaseVertex, transform, surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface);
     require(
         fanMissingTransform.completeFanBoundDrawReady &&
@@ -4669,7 +4675,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u, transform, surfaceTargetBinding,
+                liveFanOwner, 3u, liveFanBaseVertex, transform, surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface,
                 finalFanBoundDraw.snapshotToken),
         "R146 nonindexed fan final draw fails closed after VS b0 drift");
@@ -4685,7 +4691,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u, transform, surfaceTargetBinding,
+                liveFanOwner, 3u, liveFanBaseVertex, transform, surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface);
     require(
         fanMissingTargets.completeFanBoundDrawReady &&
@@ -4704,7 +4710,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u, transform, surfaceTargetBinding,
+                liveFanOwner, 3u, liveFanBaseVertex, transform, surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface,
                 finalFanBoundDraw.snapshotToken),
         "R146 nonindexed fan final draw restores transform and OM target snapshot");
@@ -4717,7 +4723,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u, transform, surfaceTargetBinding,
+                liveFanOwner, 3u, liveFanBaseVertex, transform, surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface);
     require(
         fanDispatch.inputValid &&
@@ -4740,7 +4746,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u, transform, surfaceTargetBinding,
+                liveFanOwner, 3u, liveFanBaseVertex, transform, surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface,
                 fanDispatch.snapshotToken),
         "R148 generated fan dispatch seals nonindexed DrawIndexed tuple");
@@ -4751,7 +4757,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 8u, transform, surfaceTargetBinding,
+                liveFanOwner, 3u, liveFanBaseVertex + 1u, transform, surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface,
                 fanDispatch.snapshotToken),
         "R148 generated fan dispatch rejects nonindexed base-vertex drift");
@@ -4768,7 +4774,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, fanCapacityOverrunStride,
-                geometryVertexOffset, liveFanOwner, 3u, 7u, transform,
+                geometryVertexOffset, liveFanOwner, 3u, liveFanBaseVertex, transform,
                 surfaceTargetBinding, outputColorSurface, outputDepthSurface);
     require(
         fanCapacityOverrun.inputValid &&
@@ -4790,7 +4796,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u, transform, surfaceTargetBinding,
+                liveFanOwner, 3u, liveFanBaseVertex, transform, surfaceTargetBinding,
                 outputColorSurface, outputDepthSurface,
                 fanDispatch.snapshotToken),
         "R154 nonindexed fan dispatch restores bounded vertex span");
@@ -4803,7 +4809,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u);
+                liveFanOwner, 3u, liveFanBaseVertex);
     require(
         fanTopologyDrift.sameContextBoundDrawReady &&
         fanTopologyDrift.geometryReady &&
@@ -4818,7 +4824,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u, completeFanBoundDraw.snapshotToken),
+                liveFanOwner, 3u, liveFanBaseVertex, completeFanBoundDraw.snapshotToken),
         "R142 complete fan bound draw rejects generated IB topology drift");
     require(
         liveFanOwner.bind(d3d.context),
@@ -4835,7 +4841,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u);
+                liveFanOwner, 3u, liveFanBaseVertex);
     require(
         fanVertexDrift.sameContextBoundDrawReady &&
         fanVertexDrift.geometryReady &&
@@ -4857,7 +4863,7 @@ int main()
                 pipelineBundle, inputLayout, vertexPrototype, pixelPrototype,
                 multiStageSamplers, multiStageTextures,
                 managedVertexBuffer, geometryVertexStride, geometryVertexOffset,
-                liveFanOwner, 3u, 7u, completeFanBoundDraw.snapshotToken),
+                liveFanOwner, 3u, liveFanBaseVertex, completeFanBoundDraw.snapshotToken),
         "R142 complete fan bound draw restores deterministic live IA snapshot");
 
     // R156 capacity fixture is intentionally bounded by the 256-byte managed
