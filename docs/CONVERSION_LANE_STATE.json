@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "ed957e8ddf749b00abe9fb535223bf15301aefef",
+  "state_parent_head": "8d6fdef27d5348c4a251dd3bf4910539aaf4ca6b",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,14 +54,14 @@
     "task_id": "CONVERSION-DXVK-00328",
     "result_sha": "f1650aa4f68d27ec3ba48e2c2b4a406090a5ecbf",
     "validation_bearing_result_sha": "f1650aa4f68d27ec3ba48e2c2b4a406090a5ecbf",
-    "run_record_commit_sha": "ed957e8ddf749b00abe9fb535223bf15301aefef",
+    "run_record_commit_sha": "8d6fdef27d5348c4a251dd3bf4910539aaf4ca6b",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
-    "production_id": "CONVERSION-DX11-00327",
-    "event_id": "CONVERSION-DX11-00327-E003",
-    "event_type": "retry",
+    "production_id": "CONVERSION-DXVK-00328",
+    "event_id": "CONVERSION-DXVK-00328-E002",
+    "event_type": "rollover",
     "dxvk_disassembly_evidence_run_id": 37161235577,
     "dxvk_disassembly_evidence_job_id": 111314922671,
     "backend_conversion_gate_run_id": 37161235565,
@@ -69,8 +69,30 @@
     "runtime_test_performed": false,
     "issue14_material_comment_id": 5974506783,
     "issue14_repair_comment_id": 5974514470,
-    "issue14_validation_comment_id": 5974559873,
-    "repair_count_within_attempt": 1
+    "issue14_validation_comment_id": 5974561678,
+    "repair_count_within_attempt": 1,
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "attempt_incremented": false,
+    "prior_controller_dispatch": {
+      "production_id": "CONVERSION-DX11-00327",
+      "event_id": "CONVERSION-DX11-00327-E003",
+      "event_type": "retry",
+      "attempt": "1/3"
+    },
+    "dispatch_metadata_correction": {
+      "reason": "Current rollover dispatch CONVERSION-DXVK-00328 / CONVERSION-DXVK-00328-E002 / rollover / ATTEMPT=1/3 / CHAT_ROLLOVER=2 supersedes only the prior material-producing dispatch metadata CONVERSION-DX11-00327 / CONVERSION-DX11-00327-E003 / retry. Material result f1650aa4, exact-SHA gates, runtime status and follow-on frontier are unchanged.",
+      "material_result_unchanged": true,
+      "validation_bearing_result_unchanged": true,
+      "automation_validation_unchanged": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
+      "runtime_validation_unchanged": "UNTESTED",
+      "c0_c6_completion_unchanged": true,
+      "attempt_incremented": false,
+      "authoritative_issue14_validation_comment_id": 5974561678,
+      "superseded_dispatch_validation_comment_id": 5974559873,
+      "run_record_metadata_commit_sha": "8d6fdef27d5348c4a251dd3bf4910539aaf4ca6b"
+    }
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
