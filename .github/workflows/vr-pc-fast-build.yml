@@ -26,6 +26,7 @@ on:
       - vr-nightly-r64-text-disprank-20260927
       - vr-r65-one-run-20260927
       - vr-dx11-native-r71
+      - test/dx11-exhaustive-census-20261004
 
 concurrency:
   # Only real PC builds serialize with each other. Ordinary source pushes that
