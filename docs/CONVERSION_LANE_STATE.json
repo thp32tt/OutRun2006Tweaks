@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "fd31f62b1de54a22b133ca2eb3b3bd97dcd6104f",
+  "state_parent_head": "cf52c75b6a6c773f069a0af4a886c9c98e3d0e28",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,18 +54,43 @@
     "task_id": "CONVERSION-DXVK-00303",
     "result_sha": "d09c7498f66c8b001ff1fbe086ed78109e0a620d",
     "validation_bearing_result_sha": "d09c7498f66c8b001ff1fbe086ed78109e0a620d",
-    "run_record_commit_sha": "fd31f62b1de54a22b133ca2eb3b3bd97dcd6104f",
+    "run_record_commit_sha": "cf52c75b6a6c773f069a0af4a886c9c98e3d0e28",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
-    "production_id": "CONVERSION-DX11-00302",
-    "event_id": "CONVERSION-DX11-00302-E001",
+    "production_id": "CONVERSION-DXVK-00303",
+    "event_id": "CONVERSION-DXVK-00303-E001",
     "event_type": "rollover",
     "issue14_comment_ids": [
       5971184001,
-      5971235544
-    ]
+      5971235544,
+      5971248824
+    ],
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "dispatch_metadata_correction": {
+      "corrected_from": {
+        "production_id": "CONVERSION-DX11-00302",
+        "event_id": "CONVERSION-DX11-00302-E001",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": null
+      },
+      "authoritative_request": {
+        "production_id": "CONVERSION-DXVK-00303",
+        "event_id": "CONVERSION-DXVK-00303-E001",
+        "event_type": "rollover",
+        "chat_rollover": 2,
+        "attempt": "1/3",
+        "rollover_is_retry": false
+      },
+      "reason": "The current active-chat E001 rollover is authoritative. This is not a retry. Only dispatch/C6 bookkeeping is corrected; material result, exact-SHA validation, runtime status and next frontier are unchanged.",
+      "material_result_unchanged": true,
+      "validation_bearing_result_unchanged": true,
+      "correction_comment_id": 5971248824
+    }
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
@@ -101,8 +126,8 @@
     "backend_conversion_gate_artifact_digest": "sha256:20645847f85da7bd9921dfb89dce94ac7f404d161470013bb4243d309e0d36ac",
     "runtime_validation": "UNTESTED"
   },
-  "runtime_blocker": "No runtime acceptance claim exists; exact canonical control-flow proof and hosted build/static evidence only.",
-  "runtime_next_action": "Quest 3/VDXR runtime validation remains a later user-hardware gate after a runtime candidate exists.",
+  "runtime_blocker": "No runtime acceptance claim exists; exact canonical provenance, local auxiliary analyzer evidence and hosted exact-SHA build/static evidence only.",
+  "runtime_next_action": "Quest 3/VDXR runtime validation remains a later user-hardware gate when a runtime candidate changes behavior.",
   "independent_static_next_action": "Exact-decode only complete canonical instructions from validated continuation_78 0x001835A7..0x001835E7. Structurally verify direct relative branches/calls only where instruction alignment proves them; resolve inherited 0x001835AC/0x001835B3/0x001835BA/0x001835C1 only on exact instruction boundaries; preserve any trailing incomplete/cut-edge bytes as mandatory overlap; keep function/render/HUD/runtime semantics unresolved.",
   "policy": [
     "Do not modify another backend lane.",
