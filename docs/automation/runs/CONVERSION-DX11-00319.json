@@ -1,13 +1,13 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00319",
-  "production_id": "CONVERSION-DXVK-00318",
+  "production_id": "CONVERSION-DX11-00319",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "1/3",
-  "event_id": "CONVERSION-DXVK-00318-E001",
-  "event_type": "rollover",
-  "status": "IN_PROGRESS_REPAIR_EXACT_SHA_GATE_PENDING",
+  "attempt": "3/3",
+  "event_id": "CONVERSION-DX11-00319-E003",
+  "event_type": "retry",
+  "status": "IN_PROGRESS_ATTEMPT3_REPAIR_EXACT_SHA_GATE_PENDING",
   "automation_validation": "LOCAL_STATIC_PASS_REPAIR_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
   "runtime_validation": "UNTESTED",
   "base_sha": "96d4c42ac56626294a44b205c22a417a0545c28b",
@@ -47,10 +47,10 @@
     "C3_VALIDATE": {
       "status": "LOCAL_STATIC_PASS_REPAIR_EXACT_SHA_GATE_PENDING",
       "automation_validation": "LOCAL_STATIC_PASS_REPAIR_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
-      "evidence": "Exact-SHA Gate 37152991657 on 5e69e22f17abc57b7bdde71bc53fed51da975899 passed all static/source checks and Win32 configure but failed Build Win32 because runtime_census.cpp detailed R85 telemetry retained seven stale pre-R223 compileProbe identifiers after the probe was split into pixelCompileProbe/vertexCompileProbe. Repair updates telemetry to live pixel/vertex probes and adds a source-graph guard rejecting stale compileProbe identifiers. N100 source-graph, dormant activation, census analyzer, py_compile and diff checks pass."
+      "evidence": "Exact-SHA Gate 37152991657 on 5e69e22f17abc57b7bdde71bc53fed51da975899 failed only at Build Win32 because seven stale compileProbe identifiers remained in runtime_census.cpp telemetry. A concurrent repair commit 0ae024bbf7a46fcff8fc9dad142357bffbdea63e then accidentally embedded Desktop Commander output wrappers into runtime_census.cpp and verify_dx11_source_graph.py. Attempt 3 repair restores clean files, uses pixelCompileProbe/vertexCompileProbe telemetry, and guards against stale compileProbe identifiers."
     },
     "C4_COMMIT": {
-      "status": "MATERIAL_IMPLEMENTATION_AND_TEST_COMMITTED_REPAIR_PENDING_RESULT_SHA",
+      "status": "PENDING_CLEAN_REPAIR_RESULT_SHA_PUBLICATION",
       "source_implementation_sha": "08213eb5ceb1498d101e0c88d9df8cc878499114",
       "material_test_sha": "5e69e22f17abc57b7bdde71bc53fed51da975899",
       "validation_bearing_result_sha": "PENDING_REPAIR_RESULT_SHA"
@@ -62,7 +62,7 @@
     "C6_STATE": {
       "status": "PENDING",
       "state_persisted": false,
-      "exact_next_action": "Publish the narrow R223 compiler-telemetry repair without CI skip, require its uninterrupted exact-SHA Backend Conversion Gate including readiness smoke, then persist C6 bookkeeping separately with CI skip."
+      "exact_next_action": "Publish the clean R223 telemetry repair without CI skip, run one uninterrupted exact-SHA Backend Conversion Gate, then persist PASS bookkeeping separately with CI skip."
     }
   },
   "regression_assessment": {
@@ -73,13 +73,13 @@
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "controller_dispatch": {
-    "production_id": "CONVERSION-DXVK-00318",
-    "event_id": "CONVERSION-DXVK-00318-E001",
-    "event_type": "rollover",
-    "attempt": "1/3",
-    "source": "CURRENT_USER_QUEUE_ROLLOVER"
+    "production_id": "CONVERSION-DX11-00319",
+    "event_id": "CONVERSION-DX11-00319-E003",
+    "event_type": "retry",
+    "attempt": "3/3",
+    "source": "CURRENT_USER_QUEUE_RETRY"
   },
-  "exact_next_action": "Publish the narrow R223 compiler-telemetry repair without CI skip, require its uninterrupted exact-SHA Backend Conversion Gate including readiness smoke, then persist C6 bookkeeping separately with CI skip.",
+  "exact_next_action": "Publish the clean R223 telemetry repair without CI skip, run one uninterrupted exact-SHA Backend Conversion Gate, then persist PASS bookkeeping separately with CI skip.",
   "source_implementation_sha": "08213eb5ceb1498d101e0c88d9df8cc878499114",
   "implementation_commits": [
     "08213eb5ceb1498d101e0c88d9df8cc878499114",
@@ -104,6 +104,27 @@
       "validate_job_id": 111290537662,
       "conclusion": "failure",
       "reason": "stale runtime_census telemetry identifier compileProbe remained after R223 split into pixelCompileProbe/vertexCompileProbe"
+    }
+  ],
+  "retry_history": [
+    {
+      "attempt": "1/3",
+      "run_id": 37152497554,
+      "result_sha": "08213eb5ceb1498d101e0c88d9df8cc878499114",
+      "conclusion": "cancelled_by_same_branch_concurrency"
+    },
+    {
+      "attempt": "2/3",
+      "run_id": 37152678339,
+      "result_sha": "d8628e148aa65bff22c96bda2727ba3042e23658",
+      "conclusion": "cancelled_by_same_branch_concurrency"
+    },
+    {
+      "attempt": "3/3",
+      "run_id": 37152991657,
+      "result_sha": "5e69e22f17abc57b7bdde71bc53fed51da975899",
+      "conclusion": "build_failure",
+      "reason": "stale compileProbe identifier in runtime_census telemetry"
     }
   ]
 }
