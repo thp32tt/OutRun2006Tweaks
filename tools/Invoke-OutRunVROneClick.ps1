@@ -83,13 +83,14 @@ if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
 # DLL starts outrun-vr-host.exe via AutoLaunchHost; this launcher never starts a
 # second host process.
 $oldDx11Census = $env:OUTRUN_VR_DX11_CENSUS
+$oldDx11CensusExhaustive = $env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE
 if ($target -and [string]$target.RendererTarget -eq 'dx11-native') {
-    # R72 is observation-only. Source draw/state census is enabled
-    # automatically, but NativeDrawPathActive remains false and no draw is
-    # redirected to D3D11.
+    # HMD diagnostic candidate: observe every source draw while native routing stays disabled.
     $env:OUTRUN_VR_DX11_CENSUS = '1'
+    $env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE = '1'
 } else {
     $env:OUTRUN_VR_DX11_CENSUS = $null
+    $env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE = $null
 }
 
 $oneClickExitCode = 0
@@ -105,6 +106,7 @@ try {
     }
 } finally {
     $env:OUTRUN_VR_DX11_CENSUS = $oldDx11Census
+    $env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE = $oldDx11CensusExhaustive
 }
 
 exit $oneClickExitCode
