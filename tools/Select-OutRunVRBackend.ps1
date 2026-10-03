@@ -263,14 +263,14 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
         $text = Set-IniSectionValue $text "Graphics" "TransparencySupersampling" "false"
     } elseif ($Backend -eq "d3d9") {
-        # DX9Ex focus branch: D3D9 is the reference backend. DirectGPU remains optional
-        # so SBS/Desktop Duplication can still fail open while Ex promotion is tested.
+        # A/B performance isolation: keep the exact DX9Ex renderer branch but
+        # force the same DirectGPU-only policy used by the DX11 diagnostic mode.
         $text = Set-IniSectionValue $text "VR" "RenderBackend" "1"
         $text = Set-IniSectionValue $text "VR" "Enabled" "true"
         $text = Set-IniSectionValue $text "VR" "AutoLaunchHost" "true"
         $text = Set-IniSectionValue $text "VR" "AutoEnableWhenHostPresent" "true"
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
-        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "false"
+        $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
     } else {
         $value = switch ($Backend) {
