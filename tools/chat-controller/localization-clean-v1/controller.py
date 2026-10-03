@@ -28,6 +28,7 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 PROJECT_URL = os.getenv("LOCALIZATION_PROJECT_URL", "").strip()
 AUTO_SEND = os.getenv("AUTO_SEND", "false").lower() == "true"
 POLL_SECONDS = max(10, int(os.getenv("POLL_SECONDS", "15")))
+GITHUB_POLL_SECONDS = max(30, int(os.getenv("GITHUB_POLL_SECONDS", "60")))
 STABLE_SECONDS = max(10, int(os.getenv("STABLE_SECONDS", "30")))
 NUDGE_SECONDS = max(60, int(os.getenv("NUDGE_SECONDS", "180")))
 RECOVERY_SECONDS = max(600, int(os.getenv("RECOVERY_SECONDS", "1200")))
@@ -84,6 +85,8 @@ runtime = {
     "branch": BRANCH,
     "auto_send": AUTO_SEND,
 }
+_commit_cache: list[dict] = []
+_commit_cache_at = 0.0
 
 
 @dataclass
@@ -132,7 +135,12 @@ def save_state(s: ControllerState) -> None:
 
 def load_state() -> ControllerState:
     if not STATE_FILE.exists():
-        return new_state()
+        s = new_state()
+        try:
+            s.wave = discover_next_wave()
+        except Exception as exc:
+            log.warning("could not discover previous wave markers: %r", exc)
+        return s
     raw = json.loads(STATE_FILE.read_text(encoding="utf-8"))
     if raw.get("schema") != 1:
         raise RuntimeError("Unsupported controller state schema")
@@ -159,9 +167,14 @@ def github_json(path: str):
         return json.loads(resp.read().decode("utf-8"))
 
 
-def github_commits(limit: int = 100) -> list[dict]:
-    q = urllib.parse.urlencode({"sha": BRANCH, "per_page": str(min(100, limit))})
-    return github_json(f"/repos/{REPO}/commits?{q}")
+def github_commits(limit: int = 100, force: bool = False) -> list[dict]:
+    global _commit_cache, _commit_cache_at
+    now = time.time()
+    if force or not _commit_cache or now - _commit_cache_at >= GITHUB_POLL_SECONDS:
+        q = urllib.parse.urlencode({"sha": BRANCH, "per_page": "100"})
+        _commit_cache = github_json(f"/repos/{REPO}/commits?{q}")
+        _commit_cache_at = now
+    return _commit_cache[:min(100, limit)]
 
 
 def github_head() -> str:
@@ -180,6 +193,16 @@ def marker_commit(task_id: str) -> Optional[dict]:
         if marker in message:
             return {"sha": item["sha"], "message": message}
     return None
+
+
+def discover_next_wave() -> int:
+    highest = 0
+    rx = re.compile(r"\[AUTO:LOCALIZATION-[ABC]-W(\d{5})\]")
+    for item in github_commits(100, force=True):
+        message = item.get("commit", {}).get("message", "")
+        for m in rx.finditer(message):
+            highest = max(highest, int(m.group(1)))
+    return highest + 1
 
 
 def task_id(role: str, wave: int) -> str:
@@ -298,13 +321,12 @@ async def send(page: Page, message: str) -> bool:
     if box is None:
         return False
     try:
-        tag = await box.evaluate("el => el.tagName.toLowerCase()")
-        if tag == "textarea":
+        try:
             await box.fill(message)
-        else:
+        except Exception:
             await box.click()
             await page.keyboard.press("Control+A")
-            await page.keyboard.type(message)
+            await page.keyboard.insert_text(message)
         await page.keyboard.press("Enter")
         return True
     except Exception as exc:
@@ -314,7 +336,8 @@ async def send(page: Page, message: str) -> bool:
 
 async def fresh_page(context: BrowserContext, old: Optional[Page]) -> Page:
     page = await context.new_page()
-    await page.goto(PROJECT_URL, wait_until="domcontentloaded", timeout=60000)
+    if PROJECT_URL:
+        await page.goto(PROJECT_URL, wait_until="domcontentloaded", timeout=60000)
     if old is not None and not old.is_closed():
         try:
             await old.close()
