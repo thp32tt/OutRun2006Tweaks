@@ -1708,6 +1708,7 @@ def main() -> None:
     census_contract = {
         "resourceIntrospectionComplete": "sample-level fail-closed resource observation",
         "ResourceIntrospectionFailureSamples": "durable failure counter",
+        "sig.resourceIntrospectionComplete ? 1u : 0u": "R217 resource-introspection completeness participates in sampled signature identity",
         "bool resourcesExact = signature.resourceIntrospectionComplete;": "exactness starts from observation completeness",
         "if (!signature.resourceIntrospectionComplete)": "durable failure accounting gate",
         "if (unsupported == PipelineUnsupportedNone && topology.exact &&": "pipeline/topology exact-sample gate",

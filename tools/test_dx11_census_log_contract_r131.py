@@ -25,6 +25,7 @@ def main() -> None:
         "VR DX11 R114 census ACTIVE:",
         "std::uint64_t hash_signature(",
         "hash_mix",
+        "sig.resourceIntrospectionComplete ? 1u : 0u",
         "signature.",
         "ExactSamples.fetch_add",
     ]

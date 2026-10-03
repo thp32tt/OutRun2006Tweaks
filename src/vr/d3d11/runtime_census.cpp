@@ -444,6 +444,12 @@ namespace outrun::vr::dx11
             hash = hash_mix(
                 hash, static_cast<std::uint32_t>(sig.depthMultiSampleType));
             hash = hash_mix(hash, sig.depthMultiSampleQuality);
+            // R217: resource observation completeness is part of sampled
+            // signature identity. Failed descriptor/introspection paths must
+            // not alias a fully observed draw whose descriptor fields happen
+            // to retain the same default values.
+            hash = hash_mix(
+                hash, sig.resourceIntrospectionComplete ? 1u : 0u);
             for (const auto& texture : sig.textureStages)
             {
                 hash = hash_mix(hash, texture.present ? 1u : 0u);
