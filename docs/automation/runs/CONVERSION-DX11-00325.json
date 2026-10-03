@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00325",
+  "production_id": "CONVERSION-DXVK-00324",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00324-E002",
+  "event_type": "rollover",
+  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "843e763c2bd0518bd85707c6bb3840f6b4be3089",
+  "result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX11-00325]",
+  "selected_work_item": "DX11_R226_MULTI_LOG_SUMMARY_SCOPE_FAIL_CLOSED",
+  "summary": "R226 makes offline multi-log DX11 census status conservative across sessions. Each periodic summary now carries source-log provenance; the analyzer retains the latest summary per log, aggregates latest-session evidence instead of trusting the lexicographically last log, and refuses exactness when any recognized source log lacks a periodic summary.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00325.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 HEAD 843e763c2bd0518bd85707c6bb3840f6b4be3089. Read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md and Set05, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_AUTODEV_STATE.json, VR_RUN_STATE.md, VR_REGRESSION_KNOWLEDGE.json, VR_PROBLEM_HISTORY.md and recent Issue #14 ledger entries. R225/00323 exact-SHA Gate is durable and was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R225 correctly scopes per-signature detail evidence by source log, but periodic census summaries remained a single global list and LatestSummary/status used only the final lexicographically scanned log. A later exact log could therefore hide unsupported evidence from an earlier log, and an exact log could be promoted even when another recognized DX11 log had no periodic summary.",
+      "review_lenses": {
+        "architecture": "Keep the fix inside the offline census analyzer/test/verifier path; no runtime draw routing, shader translation, OpenXR or DX9Ex changes.",
+        "ownership_lifetime": "No D3D9/D3D11 resource, COM, Reset, Present or transport lifetime changes.",
+        "stereo_correctness": "No WVP, eye routing, HUD, sky/effect, projection or recenter behavior changes.",
+        "performance": "Only offline report aggregation over the latest summary per source log; runtime hot path is unchanged.",
+        "adversarial": "TDD fixture orders an unsupported log before an exact exhaustive log so the old analyzer incorrectly reports exact; a second fixture includes one recognized log without a summary and requires fail-closed pending status."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Periodic summaries now record source_log, LatestSummariesByLog and SummaryCoverage are emitted, latest-session counts are rolled up across logs, exact/exhaustive status requires complete per-log periodic-summary coverage, and any observed unsupported evidence remains dominant. Managed-texture, dual-source, sampling/cap and detailed-stage coverage evidence are aggregated across per-log latest summaries. Added R226 regression fixtures and source-graph drift guards."
+    },
+    "C3_VALIDATE": {
+      "status": "LOCAL_STATIC_PASS_EXACT_SHA_GATE_PENDING",
+      "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+      "evidence": "TDD RED reproduced old status OBSERVED_EXHAUSTIVE_TRANSLATION_EXACT_DIAGNOSTIC_ONLY for two logs where the first had mutationTelemetryRequired=64 and the second was exhaustive exact. GREEN reports UNSUPPORTED_BEHAVIOR_OBSERVED with Samples=68, ExactSamples=4 and UnsupportedTotalLatest=64; a recognized log missing a periodic summary yields TRANSLATION_EXACTNESS_PENDING. py_compile, test_analyze_dx11_census.py, verify_dx11_source_graph.py, verify_dx11_activation_boundary.py, verify_dx11_dual_source_contract.py, verify_dx11_native_transport_contract.py, verify_vr_backend_disasm_contract.py, test_dx11_static_surface_contract.py, dx11_native_static_surface_contract_check.py, verify_vr_proven_baseline.py (44 guards), and git diff --check all passed locally."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA_PUBLICATION",
+      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census analyzer evidence-integrity/status aggregation only; no runtime binary behavior or package identity change is intended."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false,
+      "exact_next_action": "Publish one non-CI-skipped R226 material result to vr-dx11-native-r71, require its exact-SHA Backend Conversion Gate, then persist PASS task/lane bookkeeping separately with CI skip while keeping runtime validation UNTESTED."
+    }
+  },
+  "regression_assessment": {
+    "related_key": "DX11_R226_MULTI_LOG_SUMMARY_SCOPE_FAIL_CLOSED",
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F22_SAMPLING_AND_SIGNATURE_SATURATION",
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "evidence": "Changed paths are offline analyzer/test/verifier plus task bookkeeping only. No runtime source, DX9Ex baseline, startup, Reset/Present, HUD/world stereo, transport or OpenXR path changes."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00324",
+    "event_id": "CONVERSION-DXVK-00324-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Publish the R226 multi-log summary-scope fail-closed material result without CI skip, require its exact-SHA Backend Conversion Gate, then persist C6 state separately."
+}

@@ -8945,6 +8945,34 @@ def main() -> None:
             + ", ".join(missing_r225_multi_log_signature_namespace)
         )
 
+    r226_multi_log_summary_scope_contract = [
+        ('summary["source_log"] = source_log',
+         DX11_CENSUS_ANALYZER, "R226 summary source-log provenance"),
+        ("latest_summaries_by_log: dict[str, dict] = {}",
+         DX11_CENSUS_ANALYZER, "R226 per-log latest summary map"),
+        ('"AllSourceLogsHavePeriodicSummary": all_source_logs_have_summary',
+         DX11_CENSUS_ANALYZER, "R226 summary completeness evidence"),
+        ('elif not all_source_logs_have_summary:',
+         DX11_CENSUS_ANALYZER, "R226 partial-summary fail-closed status"),
+        ("r226_multi_log_summary = run_cases(",
+         DX11_CENSUS_ANALYZER_TEST, "R226 multi-log summary regression fixture"),
+        ('r226_multi_log_summary["UnsupportedTotalLatest"] == 64',
+         DX11_CENSUS_ANALYZER_TEST, "R226 cross-session unsupported rollup assertion"),
+        ('r226_partial_summary["Status"] == "TRANSLATION_EXACTNESS_PENDING"',
+         DX11_CENSUS_ANALYZER_TEST, "R226 missing-summary fail-closed assertion"),
+    ]
+    missing_r226_multi_log_summary_scope = [
+        meaning
+        for token, source, meaning
+        in r226_multi_log_summary_scope_contract
+        if token not in source
+    ]
+    if missing_r226_multi_log_summary_scope:
+        raise SystemExit(
+            "DX11 R226 multi-log summary scope drift: "
+            + ", ".join(missing_r226_multi_log_summary_scope)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

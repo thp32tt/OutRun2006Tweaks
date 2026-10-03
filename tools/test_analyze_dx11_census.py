@@ -634,6 +634,104 @@ def main() -> int:
         == "0x2222222222222222"
     )
 
+    r226_multi_log_summary = run_cases(
+        {
+            "session-a-unsupported.log": (
+                "VR DX11 R73 census: samples=64 exact=0 fixedFn=64 programmable=0 "
+                "topologyUnsupported=0 signatures=1 declSamples=0 indexedSamples=64 "
+                "texturedSamples=64 "
+                "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+                "mutationTelemetryRequired=64,managedShadowRequired=0,"
+                "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+                "depthUnsupported=0] "
+                "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+                "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+                "depthCmp=0,cull=0]\n"
+            ),
+            "session-b-exact.log": (
+                "VR DX11 R120 census: samples=4 exact=4 fixedFn=4 programmable=0 "
+                "topologyUnsupported=0 signatures=4 "
+                "sampling[drawsSeen=4,stride=1,scheme=2] "
+                "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,"
+                "detailSkipped=0] "
+                "declSamples=0 indexedSamples=0 texturedSamples=0 "
+                "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+                "mutationTelemetryRequired=0,managedShadowRequired=0,"
+                "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+                "depthUnsupported=0] "
+                "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
+                "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+                "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+                "depthCmp=0,cull=0]\n"
+            ),
+        }
+    )
+    assert r226_multi_log_summary["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert r226_multi_log_summary["UnsupportedTotalLatest"] == 64
+    assert (
+        r226_multi_log_summary["ActivationEvidence"]["CensusExactness"]["Samples"]
+        == 68
+    )
+    assert (
+        r226_multi_log_summary["ActivationEvidence"]["CensusExactness"]["ExactSamples"]
+        == 4
+    )
+    assert (
+        r226_multi_log_summary["ActivationEvidence"]["CensusExactness"]["AllSampledExact"]
+        is False
+    )
+    assert r226_multi_log_summary["SummaryCoverage"] == {
+        "SourceLogs": 2,
+        "LogsWithPeriodicSummary": 2,
+        "AllSourceLogsHavePeriodicSummary": True,
+    }
+    assert set(r226_multi_log_summary["LatestSummariesByLog"]) == {
+        "session-a-unsupported.log",
+        "session-b-exact.log",
+    }
+    assert (
+        r226_multi_log_summary["LatestSummariesByLog"][
+            "session-a-unsupported.log"
+        ]["mutationTelemetryRequired"]
+        == 64
+    )
+    assert (
+        r226_multi_log_summary["LatestSummariesByLog"]["session-b-exact.log"][
+            "samplingScheme"
+        ]
+        == 2
+    )
+
+    r226_partial_summary = run_cases(
+        {
+            "session-a-no-summary.log": (
+                "VR DX11 R85 signature#1: primitive=4 fixedFn=1 fvf=0x000001C4\n"
+            ),
+            "session-b-exact.log": (
+                "VR DX11 R120 census: samples=4 exact=4 fixedFn=4 programmable=0 "
+                "topologyUnsupported=0 signatures=4 "
+                "sampling[drawsSeen=4,stride=1,scheme=2] "
+                "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,"
+                "detailSkipped=0] "
+                "declSamples=0 indexedSamples=0 texturedSamples=0 "
+                "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+                "mutationTelemetryRequired=0,managedShadowRequired=0,"
+                "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+                "depthUnsupported=0] "
+                "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
+                "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+                "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+                "depthCmp=0,cull=0]\n"
+            ),
+        }
+    )
+    assert r226_partial_summary["Status"] == "TRANSLATION_EXACTNESS_PENDING"
+    assert r226_partial_summary["SummaryCoverage"] == {
+        "SourceLogs": 2,
+        "LogsWithPeriodicSummary": 1,
+        "AllSourceLogsHavePeriodicSummary": False,
+    }
+
     r106 = run_case(
         "VR DX11 R85 signature#1: primitive=4 fixedFn=1\n"
         "VR DX11 R85 texture signature#1 stage#0: observed=1 type=3 pool=1 "

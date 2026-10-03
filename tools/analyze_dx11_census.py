@@ -444,7 +444,9 @@ def main() -> int:
 
             match = SUMMARY_RE.search(line)
             if match:
-                summaries.append(int_fields(match))
+                summary = int_fields(match)
+                summary["source_log"] = source_log
+                summaries.append(summary)
                 continue
 
             match = SIGNATURE_RE.search(line)
@@ -598,12 +600,22 @@ def main() -> int:
             fixed_function_vertex_shader_compiles.get(signature_key)
         )
 
-    latest = summaries[-1] if summaries else None
-    fixed_function_detailed_stage_demand = (
-        summarize_fixed_function_detailed_stage_demand(fixed_function, latest)
+    latest_summaries_by_log: dict[str, dict] = {}
+    for summary in summaries:
+        latest_summaries_by_log[summary["source_log"]] = summary
+    latest_summaries = [
+        latest_summaries_by_log[source_log]
+        for source_log in source_logs
+        if source_log in latest_summaries_by_log
+    ]
+    all_source_logs_have_summary = bool(source_logs) and (
+        len(latest_summaries) == len(source_logs)
     )
+    latest = latest_summaries[-1] if latest_summaries else None
+
     unsupported_total = None
-    if latest:
+    unsupported_keys: list[str] = []
+    if latest_summaries:
         unsupported_keys = [
             "topologyUnsupported",
             "pointRasterUnsupported",
@@ -651,38 +663,66 @@ def main() -> int:
             "mrtColorWrite",
             "specular",
         ]
-        unsupported_total = sum(latest[key] for key in unsupported_keys)
+        unsupported_total = sum(
+            int(summary.get(key, 0))
+            for summary in latest_summaries
+            for key in unsupported_keys
+        )
+
+    def sum_latest(key: str) -> int:
+        return sum(int(summary.get(key, 0)) for summary in latest_summaries)
+
+    def shared_latest(key: str) -> int:
+        values = {int(summary.get(key, 0)) for summary in latest_summaries}
+        return next(iter(values)) if len(values) == 1 else 0
+
+    def summary_unsupported_total(summary: dict) -> int:
+        return sum(int(summary.get(key, 0)) for key in unsupported_keys)
+
+    def summary_is_exhaustive(summary: dict) -> bool:
+        return bool(
+            summary["samplingScheme"] == 2
+            and summary["samplingStride"] == 1
+            and summary["samplingDrawsSeen"] > 0
+            and summary["samples"] == summary["samplingDrawsSeen"]
+        )
 
     exhaustive_draw_coverage = bool(
-        latest
-        and latest["samplingScheme"] == 2
-        and latest["samplingStride"] == 1
-        and latest["samplingDrawsSeen"] > 0
-        and latest["samples"] == latest["samplingDrawsSeen"]
+        all_source_logs_have_summary
+        and all(summary_is_exhaustive(summary) for summary in latest_summaries)
+    )
+    latest_summary_exact = bool(
+        latest and latest["exact"] == latest["samples"]
+    )
+    all_sampled_exact = bool(
+        all_source_logs_have_summary
+        and latest_summary_exact
+        and all(
+            summary["samples"] > 0
+            and summary["exact"] == summary["samples"]
+            and summary_unsupported_total(summary) == 0
+            for summary in latest_summaries
+        )
     )
 
     sampled_exactness = {
-        "Samples": latest["samples"] if latest else 0,
-        "ExactSamples": latest["exact"] if latest else 0,
+        "Samples": sum_latest("samples"),
+        "ExactSamples": sum_latest("exact"),
         "UnsupportedTotal": unsupported_total,
-        "AllSampledExact": bool(
-            latest
-            and latest["samples"] > 0
-            and latest["exact"] == latest["samples"]
-            and unsupported_total == 0
-        ),
+        "AllSampledExact": all_sampled_exact,
         "DiagnosticOnly": True,
         "ExhaustiveDrawCoverage": exhaustive_draw_coverage,
         "ActivationProof": False,
     }
 
-    sampling_scheme_id = latest["samplingScheme"] if latest else 0
-    sampling_coverage = {
-        "DrawsSeen": latest["samplingDrawsSeen"] if latest else 0,
-        "Samples": latest["samples"] if latest else 0,
-        "Stride": latest["samplingStride"] if latest else 0,
-        "SchemeId": sampling_scheme_id,
-        "Scheme": (
+    sampling_scheme_ids = {
+        int(summary.get("samplingScheme", 0)) for summary in latest_summaries
+    }
+    sampling_scheme_id = shared_latest("samplingScheme")
+    sampling_scheme = (
+        "MIXED"
+        if len(sampling_scheme_ids) > 1
+        else (
             "EXHAUSTIVE_V1"
             if sampling_scheme_id == 2
             else (
@@ -690,33 +730,55 @@ def main() -> int:
                 if sampling_scheme_id == 1
                 else "LEGACY_OR_UNSPECIFIED"
             )
+        )
+    )
+    sampling_coverage = {
+        "DrawsSeen": sum_latest("samplingDrawsSeen"),
+        "Samples": sum_latest("samples"),
+        "Stride": shared_latest("samplingStride"),
+        "SchemeId": sampling_scheme_id,
+        "Scheme": sampling_scheme,
+        "SignatureHashCap": shared_latest("signatureHashCap"),
+        "SignatureHashCapHitSamples": sum_latest("signatureHashCapHitSamples"),
+        "DetailedSignatureLogCap": shared_latest("signatureDetailCap"),
+        "DetailedSignatureLogSkippedSignatures": sum_latest("signatureDetailSkipped"),
+        "SignatureHashCapSaturated": any(
+            summary.get("signatureHashCapHitSamples", 0) > 0
+            for summary in latest_summaries
         ),
-        "SignatureHashCap": latest["signatureHashCap"] if latest else 0,
-        "SignatureHashCapHitSamples": (
-            latest["signatureHashCapHitSamples"] if latest else 0
+        "DetailedSignatureLogCapSaturated": any(
+            summary.get("signatureDetailSkipped", 0) > 0
+            for summary in latest_summaries
         ),
-        "DetailedSignatureLogCap": (
-            latest["signatureDetailCap"] if latest else 0
-        ),
-        "DetailedSignatureLogSkippedSignatures": (
-            latest["signatureDetailSkipped"] if latest else 0
-        ),
-        "SignatureHashCapSaturated": bool(
-            latest and latest["signatureHashCapHitSamples"] > 0
-        ),
-        "DetailedSignatureLogCapSaturated": bool(
-            latest and latest["signatureDetailSkipped"] > 0
-        ),
-        "ShaderCompileSkippedSignatureCap": (
-            latest["fixedFunctionShaderCompileSkippedCap"] if latest else 0
+        "ShaderCompileSkippedSignatureCap": sum_latest(
+            "fixedFunctionShaderCompileSkippedCap"
         ),
         "ShaderCompileCoverageComplete": bool(
-            latest and latest["fixedFunctionShaderCompileSkippedCap"] == 0
+            all_source_logs_have_summary
+            and all(
+                summary.get("fixedFunctionShaderCompileSkippedCap", 0) == 0
+                for summary in latest_summaries
+            )
         ),
         "NonExhaustive": not exhaustive_draw_coverage,
         "ExhaustiveDrawCoverage": exhaustive_draw_coverage,
         "ActivationProof": False,
     }
+
+    summary_coverage = {
+        "SourceLogs": len(source_logs),
+        "LogsWithPeriodicSummary": len(latest_summaries_by_log),
+        "AllSourceLogsHavePeriodicSummary": all_source_logs_have_summary,
+    }
+
+    fixed_function_detailed_stage_demand = summarize_fixed_function_detailed_stage_demand(
+        fixed_function,
+        (
+            {"signatureDetailSkipped": sum_latest("signatureDetailSkipped")}
+            if latest_summaries
+            else None
+        ),
+    )
 
     if not source_logs:
         status = "NO_DX11_CENSUS_LOG"
@@ -724,6 +786,8 @@ def main() -> int:
         status = "CENSUS_ACTIVE_NO_PERIODIC_SUMMARY"
     elif unsupported_total != 0:
         status = "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    elif not all_source_logs_have_summary:
+        status = "TRANSLATION_EXACTNESS_PENDING"
     elif sampled_exactness["AllSampledExact"] and exhaustive_draw_coverage:
         status = "OBSERVED_EXHAUSTIVE_TRANSLATION_EXACT_DIAGNOSTIC_ONLY"
     elif (
@@ -737,29 +801,17 @@ def main() -> int:
         status = "TRANSLATION_EXACTNESS_PENDING"
 
     managed_texture_shadow_evidence = {
-        "RequiredSamples": (
-            latest["managedTextureShadowRequiredSamples"] if latest else 0
+        "RequiredSamples": sum_latest("managedTextureShadowRequiredSamples"),
+        "ReadySamples": sum_latest("managedTextureShadowReadySamples"),
+        "PendingSamples": sum_latest("managedTextureShadowPendingSamples"),
+        "RequiredStages": sum_latest("textureStageManagedShadowRequired"),
+        "ReadyStages": sum_latest("textureStageManagedShadowReady"),
+        "PendingStages": sum_latest("textureStageManagedShadowPending"),
+        "UpdateTextureInvalidations": sum_latest(
+            "managedTextureUpdateTextureInvalidations"
         ),
-        "ReadySamples": (
-            latest["managedTextureShadowReadySamples"] if latest else 0
-        ),
-        "PendingSamples": (
-            latest["managedTextureShadowPendingSamples"] if latest else 0
-        ),
-        "RequiredStages": (
-            latest["textureStageManagedShadowRequired"] if latest else 0
-        ),
-        "ReadyStages": (
-            latest["textureStageManagedShadowReady"] if latest else 0
-        ),
-        "PendingStages": (
-            latest["textureStageManagedShadowPending"] if latest else 0
-        ),
-        "UpdateTextureInvalidations": (
-            latest["managedTextureUpdateTextureInvalidations"] if latest else 0
-        ),
-        "UpdateSurfaceInvalidations": (
-            latest["managedTextureUpdateSurfaceInvalidations"] if latest else 0
+        "UpdateSurfaceInvalidations": sum_latest(
+            "managedTextureUpdateSurfaceInvalidations"
         ),
     }
     managed_texture_shadow_evidence["ExternalMutationInvalidations"] = (
@@ -774,15 +826,13 @@ def main() -> int:
     )
 
     dual_source_blend_evidence = {
-        "AnySamples": latest["dualSourceBlendAny"] if latest else 0,
-        "RgbSourceSamples": latest["dualSourceBlendRgbSrc"] if latest else 0,
-        "RgbDestSamples": latest["dualSourceBlendRgbDst"] if latest else 0,
-        "AlphaSourceSamples": latest["dualSourceBlendAlphaSrc"] if latest else 0,
-        "AlphaDestSamples": latest["dualSourceBlendAlphaDst"] if latest else 0,
+        "AnySamples": sum_latest("dualSourceBlendAny"),
+        "RgbSourceSamples": sum_latest("dualSourceBlendRgbSrc"),
+        "RgbDestSamples": sum_latest("dualSourceBlendRgbDst"),
+        "AlphaSourceSamples": sum_latest("dualSourceBlendAlphaSrc"),
+        "AlphaDestSamples": sum_latest("dualSourceBlendAlphaDst"),
         "ExhaustiveNoUsageObserved": bool(
-            exhaustive_draw_coverage
-            and latest
-            and latest["dualSourceBlendAny"] == 0
+            exhaustive_draw_coverage and sum_latest("dualSourceBlendAny") == 0
         ),
         "TranslationStillFailClosed": True,
         "ActivationProof": False,
@@ -816,6 +866,8 @@ def main() -> int:
         "Startup": startup,
         "Bootstrap": bootstrap,
         "LatestSummary": latest,
+        "LatestSummariesByLog": latest_summaries_by_log,
+        "SummaryCoverage": summary_coverage,
         "AllSummaries": summaries,
         "UnsupportedTotalLatest": unsupported_total,
         "UniqueSignaturesCaptured": len(signatures),
