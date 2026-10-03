@@ -615,6 +615,36 @@ def main() -> int:
     )
     latest = latest_summaries[-1] if latest_summaries else None
 
+    # R228: R227 made startup/bootstrap entries attributable, but callers still
+    # had to scan global lists to detect missing or repeated per-session evidence.
+    # Preserve the latest record for each source log and expose completeness
+    # explicitly. This remains diagnostic evidence only; native activation stays
+    # fail-closed behind its independent gates.
+    latest_startup_by_log: dict[str, dict] = {}
+    for entry in startup:
+        latest_startup_by_log[entry["source_log"]] = entry
+    latest_bootstrap_by_log: dict[str, dict] = {}
+    for entry in bootstrap:
+        latest_bootstrap_by_log[entry["source_log"]] = entry
+    all_source_logs_have_startup = bool(source_logs) and (
+        len(latest_startup_by_log) == len(source_logs)
+    )
+    all_source_logs_have_bootstrap = bool(source_logs) and (
+        len(latest_bootstrap_by_log) == len(source_logs)
+    )
+    startup_bootstrap_coverage = {
+        "SourceLogs": len(source_logs),
+        "LogsWithStartup": len(latest_startup_by_log),
+        "LogsWithBootstrap": len(latest_bootstrap_by_log),
+        "AllSourceLogsHaveStartup": all_source_logs_have_startup,
+        "AllSourceLogsHaveBootstrap": all_source_logs_have_bootstrap,
+        "AllSourceLogsHaveStartupAndBootstrap": bool(
+            all_source_logs_have_startup and all_source_logs_have_bootstrap
+        ),
+        "DiagnosticOnly": True,
+        "ActivationProof": False,
+    }
+
     unsupported_total = None
     unsupported_keys: list[str] = []
     if latest_summaries:
@@ -847,6 +877,7 @@ def main() -> int:
         "ActivationEvidence": {
             "CensusExactness": sampled_exactness,
             "SamplingCoverage": sampling_coverage,
+            "StartupBootstrapCoverage": startup_bootstrap_coverage,
             "ManagedTextureShadow": managed_texture_shadow_evidence,
             "DualSourceBlend": dual_source_blend_evidence,
             "FixedFunctionDetailedStageDemand": fixed_function_detailed_stage_demand,
@@ -867,6 +898,9 @@ def main() -> int:
         "SourceLogs": source_logs,
         "Startup": startup,
         "Bootstrap": bootstrap,
+        "LatestStartupByLog": latest_startup_by_log,
+        "LatestBootstrapByLog": latest_bootstrap_by_log,
+        "StartupBootstrapCoverage": startup_bootstrap_coverage,
         "LatestSummary": latest,
         "LatestSummariesByLog": latest_summaries_by_log,
         "SummaryCoverage": summary_coverage,

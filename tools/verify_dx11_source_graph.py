@@ -8997,6 +8997,34 @@ def main() -> None:
             + ", ".join(missing_r227_multi_log_startup_bootstrap_provenance)
         )
 
+    r228_multi_log_startup_bootstrap_coverage_contract = [
+        ("latest_startup_by_log: dict[str, dict] = {}",
+         DX11_CENSUS_ANALYZER, "R228 per-log latest startup map"),
+        ("latest_bootstrap_by_log: dict[str, dict] = {}",
+         DX11_CENSUS_ANALYZER, "R228 per-log latest bootstrap map"),
+        ('"AllSourceLogsHaveStartupAndBootstrap": bool(',
+         DX11_CENSUS_ANALYZER, "R228 startup/bootstrap completeness evidence"),
+        ('"StartupBootstrapCoverage": startup_bootstrap_coverage',
+         DX11_CENSUS_ANALYZER, "R228 activation-evidence coverage export"),
+        ("r228_startup_bootstrap_coverage = run_cases(",
+         DX11_CENSUS_ANALYZER_TEST, "R228 partial bootstrap coverage regression fixture"),
+        ('"LogsWithBootstrap": 1',
+         DX11_CENSUS_ANALYZER_TEST, "R228 missing bootstrap accounting assertion"),
+        ('"AllSourceLogsHaveStartupAndBootstrap": False',
+         DX11_CENSUS_ANALYZER_TEST, "R228 completeness fail-closed evidence assertion"),
+    ]
+    missing_r228_multi_log_startup_bootstrap_coverage = [
+        meaning
+        for token, source, meaning
+        in r228_multi_log_startup_bootstrap_coverage_contract
+        if token not in source
+    ]
+    if missing_r228_multi_log_startup_bootstrap_coverage:
+        raise SystemExit(
+            "DX11 R228 multi-log startup/bootstrap coverage drift: "
+            + ", ".join(missing_r228_multi_log_startup_bootstrap_coverage)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

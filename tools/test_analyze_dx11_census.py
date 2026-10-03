@@ -769,6 +769,52 @@ def main() -> int:
         == "BBBBBBBB:22222222"
     )
 
+    r228_startup_bootstrap_coverage = run_cases(
+        {
+            "session-a-complete.log": (
+                "VR DX11 R71 census: observed=1 size=1280x720 sourceFormat=21 "
+                "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+                "VR DX11 R72 bootstrap probe: ready=0 featureLevel=0xA000 "
+                "selectedLuidValid=1 selectedLuid=AAAAAAAA:11111111\n"
+                "VR DX11 R72 bootstrap probe: ready=1 featureLevel=0xB000 "
+                "selectedLuidValid=1 selectedLuid=AAAAAAAA:22222222\n"
+            ),
+            "session-b-missing-bootstrap.log": (
+                "VR DX11 R71 census: observed=1 size=1920x1080 sourceFormat=22 "
+                "nativeFormat=29 msaa=4 bootstrapCompatible=1\n"
+            ),
+        }
+    )
+    assert set(r228_startup_bootstrap_coverage["LatestStartupByLog"]) == {
+        "session-a-complete.log",
+        "session-b-missing-bootstrap.log",
+    }
+    assert set(r228_startup_bootstrap_coverage["LatestBootstrapByLog"]) == {
+        "session-a-complete.log",
+    }
+    assert (
+        r228_startup_bootstrap_coverage["LatestBootstrapByLog"][
+            "session-a-complete.log"
+        ]["selected_luid"]
+        == "AAAAAAAA:22222222"
+    )
+    assert r228_startup_bootstrap_coverage["StartupBootstrapCoverage"] == {
+        "SourceLogs": 2,
+        "LogsWithStartup": 2,
+        "LogsWithBootstrap": 1,
+        "AllSourceLogsHaveStartup": True,
+        "AllSourceLogsHaveBootstrap": False,
+        "AllSourceLogsHaveStartupAndBootstrap": False,
+        "DiagnosticOnly": True,
+        "ActivationProof": False,
+    }
+    assert (
+        r228_startup_bootstrap_coverage["ActivationEvidence"][
+            "StartupBootstrapCoverage"
+        ]["AllSourceLogsHaveStartupAndBootstrap"]
+        is False
+    )
+
     r106 = run_case(
         "VR DX11 R85 signature#1: primitive=4 fixedFn=1\n"
         "VR DX11 R85 texture signature#1 stage#0: observed=1 type=3 pool=1 "
