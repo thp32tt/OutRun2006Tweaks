@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00298",
-  "production_id": "CONVERSION-DX11-00298",
+  "production_id": "CONVERSION-DXVK-00297",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "event_id": "CONVERSION-DX11-00298-E001",
+  "event_id": "CONVERSION-DXVK-00297-E001",
   "event_type": "rollover",
   "status": "COMPLETE",
   "automation_validation": "PASS",
@@ -16,7 +16,7 @@
   "validation_bearing_result_sha": "2356c8bc124212c23526ec302df1a5cbef33baf5",
   "result_marker": "[AUTO:CONVERSION-DX11-00298]",
   "selected_work_item": "DX11_R212_RT0_COLOR_WRITE_CENSUS_IDENTITY",
-  "summary": "Recovered the already-materialized R212 implementation after chat rollover, verified that RT0 D3DRS_COLORWRITEENABLE observation completeness and raw write-mask value are included in sampled DX11 census identity/hash and detailed telemetry, and completed exact-SHA hosted validation including Win32 build/binary and the full DX11 readiness smoke suite. NativeDrawPath activation was not changed.",
+  "summary": "Selected and completed R212 from branch HEAD 48d3fdc9a5795344e477f5df53da2d37e274cc57: RT0 D3DRS_COLORWRITEENABLE observation completeness and raw write-mask value now participate in sampled DX11 census identity/hash and detailed telemetry, with source-graph guards tying live capture to the already-exact D3D11 RenderTargetWriteMask translation. NativeDrawPath activation was not changed.",
   "changed_paths": [
     "src/vr/d3d11/runtime_census.cpp",
     "tools/verify_dx11_source_graph.py"
@@ -27,11 +27,19 @@
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered authenticated GitHub branch HEAD 2356c8bc124212c23526ec302df1a5cbef33baf5; confirmed docs/automation/runs/CONVERSION-DX11-00298.json was absent while the material commit already existed. The user-supplied E001 rollover metadata is authoritative, so ATTEMPT remains 1/3."
+      "evidence": "Started from authenticated GitHub branch HEAD 48d3fdc9a5795344e477f5df53da2d37e274cc57. Read AGENTS.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, docs/VR_AUTODEV_STATE.json, docs/VR_RUN_STATE.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, regression/history files and Issue #14. CONVERSION-DX11-00296 was complete and no CONVERSION-DX11-00298 run record existed."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
-      "finding": "RT0 D3DRS_COLORWRITEENABLE was already live-captured and exactly translated to D3D11 RenderTargetWriteMask, but unlike COLORWRITEENABLE1..3 it was absent from sampled SourceSignature identity. Exact draws differing only in RT0 destination-channel writes could therefore alias in census diagnostics."
+      "finding": "RT0 D3DRS_COLORWRITEENABLE was already live-captured and exactly translated to D3D11 RenderTargetWriteMask, but unlike COLORWRITEENABLE1..3 it was absent from sampled SourceSignature identity. Exact draws differing only in RT0 destination-channel writes could therefore alias in census diagnostics.",
+      "review_lenses": {
+        "architecture": "Census-only evidence gap; no selector, transport, packaging, activation, or vr-d3d9ex-focus modification required.",
+        "ownership_lifetime": "No COM/resource ownership, synchronization, reset, or device-generation behavior changed.",
+        "stereo_correctness": "RT0 destination-channel write masks affect visible pixel output, so distinct masks must remain distinguishable in exhaustive sampled evidence.",
+        "performance": "Only two hash mixes per sampled signature plus detail telemetry for admitted unique signatures; no new render-state objects, copies, waits, or per-draw allocations.",
+        "adversarial": "NativeFixedFunctionRenderStateBundle already hashes the translated blend descriptor, so runtime render-state identity was already correct; the defect was limited to census signature evidence."
+      },
+      "regression_history": "No matching runtime regression case or prior RT0 COLORWRITEENABLE census-identity unit was found. Existing COLORWRITEENABLE1..3 MRT fail-closed work remains separate and retained."
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
@@ -97,8 +105,9 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "issue14_comment_id": 5970512861,
-      "exact_next_action": "Release CONVERSION-DX11-00298 as automation PASS under authoritative E001 rollover metadata. Keep NativeDrawPathActive disabled. Preserve R212 RT0 color-write census identity and select one new independent dormant DX11 source/static gap from the newest authenticated branch HEAD. Matching Quest 3/VDXR evidence remains mandatory before runtime/visual parity or activation claims."
+      "issue14_comment_id": 5970543154,
+      "exact_next_action": "Release CONVERSION-DX11-00298 as automation PASS under authoritative E001 rollover metadata. Keep NativeDrawPathActive disabled. Preserve R212 RT0 color-write census identity and select one new independent dormant DX11 source/static gap from the newest authenticated branch HEAD. Matching Quest 3/VDXR evidence remains mandatory before runtime/visual parity or activation claims.",
+      "validation_comment_id": 5970519083
     }
   },
   "release_gate": {
@@ -110,20 +119,20 @@
     "readiness_smoke_job_id": 111230619838
   },
   "native_draw_path_activation_changed": false,
-  "issue14_comment_id": 5970512861,
+  "issue14_comment_id": 5970543154,
   "issue14_comment_ids": [
     5970442665,
-    5970512861
+    5970512861,
+    5970519083,
+    5970543154
   ],
-  "authoritative_metadata_correction_comment_id": 5970512861,
+  "authoritative_metadata_correction_comment_id": 5970543154,
   "exact_next_action": "Continue only with a new independent DX11 source/static conversion task from the newest authenticated GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
-  "controller_resume": {
-    "final_event_id": "CONVERSION-DX11-00298-E001",
-    "final_attempt": "1/3",
-    "chat_rollover": 2,
-    "rollover_is_retry": false,
-    "note": "The user-supplied E001 rollover metadata is authoritative. The rollover was caused by the queue result grace period expiring before an assistant response was detected; it is not a task failure and does not consume a retry attempt."
-  },
-  "chat_rollover": 2,
-  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00297",
+    "event_id": "CONVERSION-DXVK-00297-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_DISPATCH"
+  }
 }
