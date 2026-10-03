@@ -5938,20 +5938,30 @@ def main() -> None:
     constant_probe_source_block = CMAKE.split(
         "set(dx11_constant_buffer_probe_SOURCES", 1
     )[-1].split(")", 1)[0]
-    if '"src/vr/d3d11/resource_translation.cpp"' not in constant_probe_source_block:
-        raise SystemExit(
-            "DX11 R99 constant-buffer probe generated CMake must link "
-            "resource_translation.cpp"
-        )
+    for required_source in (
+        "resource_translation.cpp",
+        "surface_mirror.cpp",
+        "triangle_fan_index_buffer.cpp",
+    ):
+        if f'"src/vr/d3d11/{required_source}"' not in constant_probe_source_block:
+            raise SystemExit(
+                "DX11 R99 constant-buffer probe generated CMake must link "
+                + required_source
+            )
 
     constant_probe_toml_block = CMAKE_TOML.split(
         "[target.dx11_constant_buffer_probe]", 1
     )[-1].split("[target.", 1)[0]
-    if '"src/vr/d3d11/resource_translation.cpp"' not in constant_probe_toml_block:
-        raise SystemExit(
-            "DX11 R99 constant-buffer probe cmake.toml must link "
-            "resource_translation.cpp"
-        )
+    for required_source in (
+        "resource_translation.cpp",
+        "surface_mirror.cpp",
+        "triangle_fan_index_buffer.cpp",
+    ):
+        if f'"src/vr/d3d11/{required_source}"' not in constant_probe_toml_block:
+            raise SystemExit(
+                "DX11 R99 constant-buffer probe cmake.toml must link "
+                + required_source
+            )
 
     for token, meaning in {
         "R99 texture view must start dormant": "R99 dormant initial state",
