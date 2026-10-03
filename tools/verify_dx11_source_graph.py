@@ -8817,6 +8817,37 @@ def main() -> None:
                 "DX11 R221 shader compile coverage drift: missing " + token
             )
 
+    r222_shader_compile_exact_samples_contract = [
+        ("FixedFunctionShaderCompileExactHashes;", RUNTIME_CENSUS,
+         "R222 successful compile signature cache"),
+        ("bool note_signature(", RUNTIME_CENSUS,
+         "R222 signature observer returns compile readiness"),
+        ("FixedFunctionShaderCompileExactHashes.find(hash) !=",
+         RUNTIME_CENSUS, "R222 repeated-signature cached compile lookup"),
+        ("if (compileProbe.succeeded)", RUNTIME_CENSUS,
+         "R222 compile success admission boundary"),
+        ("FixedFunctionShaderCompileExactHashes.insert(hash);",
+         RUNTIME_CENSUS, "R222 compile success cache insertion"),
+        ("return shaderCompileReadinessExact;", RUNTIME_CENSUS,
+         "R222 fail-closed signature readiness result"),
+        ("const bool shaderCompileReadinessExact =\n            note_signature(signature, primitive);",
+         RUNTIME_CENSUS, "R222 sampled compile readiness capture"),
+        ("signature.shaderReadinessExact &&\n            shaderCompileReadinessExact &&\n            signature.shaderTranslationExact",
+         RUNTIME_CENSUS, "R222 final ExactSamples compile-readiness gate"),
+        ("existing signature observed\n            // before another thread finishes its first compile probe remains",
+         RUNTIME_CENSUS, "R222 concurrent first-probe fail-closed rule"),
+    ]
+    missing_r222_shader_compile_exactness = [
+        meaning
+        for token, source, meaning in r222_shader_compile_exact_samples_contract
+        if token not in source
+    ]
+    if missing_r222_shader_compile_exactness:
+        raise SystemExit(
+            "DX11 R222 shader-compile ExactSamples contract drift: "
+            + ", ".join(missing_r222_shader_compile_exactness)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

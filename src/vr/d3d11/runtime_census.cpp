@@ -144,6 +144,10 @@ namespace outrun::vr::dx11
         std::atomic<ULONGLONG> LastLogMs{0};
         std::mutex SignatureMutex;
         std::unordered_set<std::uint64_t> SignatureHashes;
+        // R222: cache only fixed-function signatures whose generated pixel
+        // shader source actually compiled successfully. ExactSamples must not
+        // promote source-generation readiness into compiler readiness.
+        std::unordered_set<std::uint64_t> FixedFunctionShaderCompileExactHashes;
 
         struct BufferMutationEvidence
         {
@@ -1394,13 +1398,14 @@ namespace outrun::vr::dx11
             return sig;
         }
 
-        void note_signature(
+        bool note_signature(
             const SourceSignature& sig,
             D3DPRIMITIVETYPE primitive) noexcept
         {
             const auto hash = hash_signature(sig, primitive);
             bool inserted = false;
             bool signatureHashCapHit = false;
+            bool shaderCompileReadinessExact = false;
             std::uint64_t unique = 0;
             {
                 std::lock_guard<std::mutex> lock(SignatureMutex);
@@ -1411,6 +1416,13 @@ namespace outrun::vr::dx11
                         inserted = SignatureHashes.insert(hash).second;
                     else
                         signatureHashCapHit = true;
+                }
+                else if (sig.fixedFunction &&
+                    sig.fixedFunctionShaderPrototypeGenerated)
+                {
+                    shaderCompileReadinessExact =
+                        FixedFunctionShaderCompileExactHashes.find(hash) !=
+                        FixedFunctionShaderCompileExactHashes.end();
                 }
                 unique = SignatureHashes.size();
             }
@@ -1459,6 +1471,12 @@ namespace outrun::vr::dx11
                     ? FixedFunctionShaderCompileSucceededSignatures
                     : FixedFunctionShaderCompileFailedSignatures).fetch_add(
                         1, std::memory_order_relaxed);
+                if (compileProbe.succeeded)
+                {
+                    std::lock_guard<std::mutex> lock(SignatureMutex);
+                    FixedFunctionShaderCompileExactHashes.insert(hash);
+                    shaderCompileReadinessExact = true;
+                }
             }
             else if (signatureHashCapHit && sig.fixedFunction &&
                 sig.fixedFunctionShaderPrototypeGenerated)
@@ -1863,6 +1881,12 @@ namespace outrun::vr::dx11
                     }
                 }
             }
+
+            // R222 fail-closed concurrency rule: an existing signature observed
+            // before another thread finishes its first compile probe remains
+            // non-exact for that sample. A later sample may reuse the cached
+            // successful result; failed or hash-cap-skipped signatures never do.
+            return shaderCompileReadinessExact;
         }
 
         bool census_exhaustive() noexcept
@@ -2712,7 +2736,8 @@ namespace outrun::vr::dx11
             signature.fixedFunction &&
             signature.shaderTranslationExact;
 
-        note_signature(signature, primitive);
+        const bool shaderCompileReadinessExact =
+            note_signature(signature, primitive);
 
         // R218 keeps the final ExactSamples boundary explicitly tied to the
         // complete fixed-function stage/sampler readiness contract. R215's
@@ -2729,6 +2754,7 @@ namespace outrun::vr::dx11
             resourcesExact && inputLayoutExact &&
             signature.outputStateObservationComplete &&
             signature.shaderReadinessExact &&
+            shaderCompileReadinessExact &&
             signature.shaderTranslationExact)
             ExactSamples.fetch_add(1, std::memory_order_relaxed);
 
