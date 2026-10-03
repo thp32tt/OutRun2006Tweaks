@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "44a945f7a5eae919543fa47c7bbf6ff0deb5aab4",
+  "state_parent_head": "64f7be032caf0a5b320e9d1f144079939961360a",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,7 +54,7 @@
     "task_id": "CONVERSION-DXVK-00287",
     "result_sha": "f50a32d1da951b7744261128f046e403099385fd",
     "validation_bearing_result_sha": "f50a32d1da951b7744261128f046e403099385fd",
-    "run_record_commit_sha": "44a945f7a5eae919543fa47c7bbf6ff0deb5aab4",
+    "run_record_commit_sha": "64f7be032caf0a5b320e9d1f144079939961360a",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE"
@@ -5490,7 +5490,7 @@
       "task_id": "CONVERSION-DXVK-00287",
       "result_sha": "f50a32d1da951b7744261128f046e403099385fd",
       "validation_bearing_result_sha": "f50a32d1da951b7744261128f046e403099385fd",
-      "run_record_commit_sha": "44a945f7a5eae919543fa47c7bbf6ff0deb5aab4",
+      "run_record_commit_sha": "64f7be032caf0a5b320e9d1f144079939961360a",
       "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
       "runtime_validation": "UNTESTED",
       "checkpoint": "C6_STATE",
