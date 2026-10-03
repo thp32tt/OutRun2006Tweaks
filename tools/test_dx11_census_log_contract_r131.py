@@ -17,10 +17,16 @@ def main() -> None:
         ROOT / "src" / "vr" / "d3d11" / "runtime_census.cpp"
     ).read_text(encoding="utf-8")
 
+    # R214: bind this guard to durable census behavior instead of the stale
+    # "runtime census" prose fragment, which no longer exists in the source.
+    # These tokens jointly prove that census activation telemetry, sampled
+    # signature identity, and ExactSamples accounting remain wired.
     required = [
-        "runtime census",
+        "VR DX11 R114 census ACTIVE:",
+        "std::uint64_t hash_signature(",
         "hash_mix",
         "signature.",
+        "ExactSamples.fetch_add",
     ]
     missing = [token for token in required if token not in census]
     if missing:
@@ -28,7 +34,7 @@ def main() -> None:
             "DX11 census identity contract drift: " + ", ".join(missing)
         )
 
-    print("DX11 census identity contract R131: PASS")
+    print("DX11 census identity contract R131/R214: PASS")
 
 
 if __name__ == "__main__":
