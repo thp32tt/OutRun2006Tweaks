@@ -116,7 +116,7 @@ def main() -> None:
         [
             "void observe_source_draw(",
             "ExactSamples.fetch_add",
-            "resourcesExact && inputLayoutExact &&\n            signature.outputStateObservationComplete &&\n            shaderTranslationExact",
+            "resourcesExact && inputLayoutExact &&\n            signature.outputStateObservationComplete &&\n            signature.shaderTranslationExact",
             "OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE",
             "census_sample_stride()",
             "census_sampling_scheme()",
