@@ -1799,6 +1799,9 @@ namespace OutRunVRStereo
 		read(D3DRS_RANGEFOGENABLE, out.rangeFogEnable);
 		read(D3DRS_FOGVERTEXMODE, out.fogVertexMode);
 		read(D3DRS_LIGHTING, out.lighting);
+		// R202 preserves the post-texture specular-add render state for the
+		// dormant DX11 exactness gate.
+		read(D3DRS_SPECULARENABLE, out.specularEnable);
 
 		// R124 keeps output-state completeness separate from the historical
 		// render-state completeness bit so passive census behavior does not
