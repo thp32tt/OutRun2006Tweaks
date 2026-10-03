@@ -933,6 +933,8 @@ set(dx11_constant_buffer_probe_SOURCES
     "src/vr/d3d11/pipeline_translation.cpp"
     "src/vr/d3d11/resource_translation.cpp"
     "src/vr/d3d11/state_translation.cpp"
+    "src/vr/d3d11/surface_mirror.cpp"
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp"
 )
 
 add_executable(dx11_constant_buffer_probe)
