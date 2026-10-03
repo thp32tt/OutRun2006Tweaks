@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "b366ea789f8c778d61cdc1aa4a46ec30622924d0",
+  "state_parent_head": "ae3fc168de869f1f6f1d79ad5fc0a8ee2eaf106e",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,13 +54,13 @@
     "task_id": "CONVERSION-DXVK-00324",
     "result_sha": "af8d2694333b82feee3aaf312c5a0413edd8c24e",
     "validation_bearing_result_sha": "af8d2694333b82feee3aaf312c5a0413edd8c24e",
-    "run_record_commit_sha": "b366ea789f8c778d61cdc1aa4a46ec30622924d0",
+    "run_record_commit_sha": "ae3fc168de869f1f6f1d79ad5fc0a8ee2eaf106e",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
     "production_id": "CONVERSION-DXVK-00324",
-    "event_id": "CONVERSION-DXVK-00324-E001",
+    "event_id": "CONVERSION-DXVK-00324-E002",
     "event_type": "rollover",
     "dxvk_disassembly_evidence_run_id": 37157736776,
     "dxvk_disassembly_evidence_job_id": 111304570327,
@@ -69,24 +69,34 @@
     "runtime_test_performed": false,
     "issue14_material_comment_id": 5974015236,
     "issue14_validation_comment_id": 5974061172,
-    "chat_rollover": 2,
+    "chat_rollover": 3,
     "rollover_is_retry": false,
     "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
     "prior_controller_dispatch": {
-      "production_id": "CONVERSION-DX11-00323",
-      "event_id": "CONVERSION-DX11-00323-E005",
-      "event_type": "retry",
-      "attempt": "1/3"
+      "production_id": "CONVERSION-DXVK-00324",
+      "event_id": "CONVERSION-DXVK-00324-E001",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false
     },
     "dispatch_metadata_correction": {
-      "reason": "Current CONVERSION-DXVK-00324-E001 rollover dispatch is authoritative; stale prior-lane production/event metadata is corrected without changing material result, exact-SHA validation, runtime status, or next frontier.",
+      "reason": "Current CONVERSION-DXVK-00324-E002 rollover dispatch (CHAT_ROLLOVER=3) is authoritative. Earlier same-task bookkeeping was successively written with stale DX11-00323-E005 and then prior-rollover E001 metadata. This update changes dispatch/chat-rollover/resume metadata only; material result af8d2694, exact-SHA validation, runtime status and next frontier remain unchanged.",
       "material_result_unchanged": true,
       "validation_bearing_result_unchanged": true,
       "automation_validation_unchanged": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
       "runtime_validation_unchanged": "UNTESTED",
-      "attempt_incremented": false
+      "attempt_incremented": false,
+      "authoritative_event_id": "CONVERSION-DXVK-00324-E002",
+      "authoritative_chat_rollover": 3,
+      "run_record_metadata_commit_sha": "ae3fc168de869f1f6f1d79ad5fc0a8ee2eaf106e",
+      "stale_issue14_comment_ids": [
+        5974015236,
+        5974061172,
+        5974077881
+      ]
     },
-    "dispatch_metadata_correction_commit_sha": "b366ea789f8c778d61cdc1aa4a46ec30622924d0"
+    "dispatch_metadata_correction_commit_sha": "ae3fc168de869f1f6f1d79ad5fc0a8ee2eaf106e"
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
