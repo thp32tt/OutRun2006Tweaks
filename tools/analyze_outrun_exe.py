@@ -4165,11 +4165,10 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_78_INSTRUCTIONS = (
     (0x001835E3, "8b 29", "mov ebp, [ecx]"),
 )
 
-# CONVERSION-DXVK-00308/F90: continuation_78 exact-decode ends with the
-# incomplete 8B 41 bytes at 0x1835E5. Capture the next canonical 64-byte
-# raw window from that same two-byte overlap. This unit records provenance
-# and the raw rel32 census only; function/render/HUD/runtime semantics remain
-# unresolved until a later exact-decode proof.
+# CONVERSION-DXVK-00308/F90: continuation_78 exact-decode ends at the cut
+# 8B 41 instruction bytes at 0x1835E5. Capture the next canonical 64-byte
+# window from the same overlap edge. This unit records raw provenance and
+# rel32 census only; function/render/HUD/runtime semantics remain unresolved.
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_79_RVA = 0x001835E5
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_79_PROBE_LEN = 64
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_79_PROBE_END_RVA = 0x00183625
@@ -26705,13 +26704,13 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_79_provenance
         "probe_len": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_79_PROBE_LEN,
         "probe_end_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_79_PROBE_END_RVA,
         "probe_end_matches": probe_end_matches,
-        "overlap_expected_bytes": overlap.hex(" ") ,
-        "overlap_actual_bytes": overlap_actual.hex(" ") ,
+        "overlap_expected_bytes": overlap.hex(" "),
+        "overlap_actual_bytes": overlap_actual.hex(" "),
         "overlap_matches": overlap_matches,
         "predecessor_overlap_matches": predecessor_overlap_matches,
-        "first_16_bytes": probe[:16].hex(" ") ,
-        "last_16_bytes": probe[-16:].hex(" ") ,
-        "bytes": probe.hex(" ") ,
+        "first_16_bytes": probe[:16].hex(" "),
+        "last_16_bytes": probe[-16:].hex(" "),
+        "bytes": probe.hex(" "),
         "raw_inbound_rel32_candidates": inbound,
         "raw_outbound_rel32_candidates": outbound,
         "status": (
