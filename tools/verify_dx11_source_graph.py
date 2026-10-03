@@ -8898,6 +8898,29 @@ def main() -> None:
             + ", ".join(missing_r223_compile_log)
         )
 
+    r224_vertex_compile_analyzer_contract = [
+        ("FFP_VERTEX_SHADER_COMPILE_RE = re.compile(",
+         DX11_CENSUS_ANALYZER, "R224 vertex compiler telemetry parser"),
+        ("VR DX11 R223 ffp vertex shader compile#",
+         DX11_CENSUS_ANALYZER, "R224 vertex compiler log grammar"),
+        ("fixed_function_vertex_shader_compiles",
+         DX11_CENSUS_ANALYZER, "R224 vertex compiler evidence store"),
+        ('signature["fixed_function_vertex_shader_compile"]',
+         DX11_CENSUS_ANALYZER, "R224 per-signature analyzer output"),
+        ("VR DX11 R223 ffp vertex shader compile#1",
+         DX11_CENSUS_ANALYZER_TEST, "R224 analyzer regression fixture"),
+    ]
+    missing_r224_vertex_compile_analyzer = [
+        meaning
+        for token, source, meaning in r224_vertex_compile_analyzer_contract
+        if token not in source
+    ]
+    if missing_r224_vertex_compile_analyzer:
+        raise SystemExit(
+            "DX11 R224 vertex-compiler analyzer parity drift: "
+            + ", ".join(missing_r224_vertex_compile_analyzer)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

@@ -178,6 +178,16 @@ FFP_SHADER_COMPILE_RE = re.compile(
     r"diagnosticsBytes=(?P<diagnosticsBytes>\d+) "
     r"profile=(?P<profile>[A-Za-z0-9_]+)"
 )
+FFP_VERTEX_SHADER_COMPILE_RE = re.compile(
+    r"VR DX11 R223 ffp vertex shader compile#(?P<signature>\d+): "
+    r"attempted=(?P<attempted>[01]) succeeded=(?P<succeeded>[01]) "
+    r"hr=0x(?P<hr>[0-9A-Fa-f]+) "
+    r"bytecodeHash=0x(?P<bytecodeHash>[0-9A-Fa-f]+) "
+    r"bytecodeBytes=(?P<bytecodeBytes>\d+) "
+    r"diagnosticsHash=0x(?P<diagnosticsHash>[0-9A-Fa-f]+) "
+    r"diagnosticsBytes=(?P<diagnosticsBytes>\d+) "
+    r"profile=(?P<profile>[A-Za-z0-9_]+)"
+)
 
 
 
@@ -375,6 +385,7 @@ def main() -> int:
     texture_stages: dict[int, list[dict]] = {}
     fixed_function_shader_prototypes: dict[int, dict] = {}
     fixed_function_shader_compiles: dict[int, dict] = {}
+    fixed_function_vertex_shader_compiles: dict[int, dict] = {}
     source_logs: list[str] = []
 
     for log_path in log_files:
@@ -396,6 +407,7 @@ def main() -> int:
             and "VR DX11 R191" not in text
             and "VR DX11 R194" not in text
             and "VR DX11 R197" not in text
+            and "VR DX11 R223" not in text
         ):
             continue
         source_logs.append(log_path.name)
@@ -447,6 +459,25 @@ def main() -> int:
                 data = match.groupdict()
                 signature_id = int(data.pop("signature"))
                 fixed_function_shader_compiles[signature_id] = {
+                    "attempted": bool(int(data["attempted"])),
+                    "succeeded": bool(int(data["succeeded"])),
+                    "result": int(data["hr"], 16),
+                    "result_hex": "0x" + data["hr"].upper(),
+                    "bytecode_hash": int(data["bytecodeHash"], 16),
+                    "bytecode_hash_hex": "0x" + data["bytecodeHash"].upper(),
+                    "bytecode_bytes": int(data["bytecodeBytes"]),
+                    "diagnostics_hash": int(data["diagnosticsHash"], 16),
+                    "diagnostics_hash_hex": "0x" + data["diagnosticsHash"].upper(),
+                    "diagnostics_bytes": int(data["diagnosticsBytes"]),
+                    "profile": data["profile"],
+                }
+                continue
+
+            match = FFP_VERTEX_SHADER_COMPILE_RE.search(line)
+            if match:
+                data = match.groupdict()
+                signature_id = int(data.pop("signature"))
+                fixed_function_vertex_shader_compiles[signature_id] = {
                     "attempted": bool(int(data["attempted"])),
                     "succeeded": bool(int(data["succeeded"])),
                     "result": int(data["hr"], 16),
@@ -541,6 +572,9 @@ def main() -> int:
         )
         signature["fixed_function_shader_compile"] = (
             fixed_function_shader_compiles.get(signature_id)
+        )
+        signature["fixed_function_vertex_shader_compile"] = (
+            fixed_function_vertex_shader_compiles.get(signature_id)
         )
 
     latest = summaries[-1] if summaries else None

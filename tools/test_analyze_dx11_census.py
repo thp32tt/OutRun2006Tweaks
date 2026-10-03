@@ -491,6 +491,9 @@ def main() -> int:
         "VR DX11 R85 ffp shader compile#1: attempted=1 succeeded=1 "
         "hr=0x00000000 bytecodeHash=0xA1B2C3D4E5F60718 bytecodeBytes=512 "
         "diagnosticsHash=0x0000000000000000 diagnosticsBytes=0 profile=ps_4_0\n"
+        "VR DX11 R223 ffp vertex shader compile#1: attempted=1 succeeded=1 "
+        "hr=0x00000000 bytecodeHash=0x1122334455667788 bytecodeBytes=640 "
+        "diagnosticsHash=0x0000000000000000 diagnosticsBytes=0 profile=vs_4_0\n"
         "VR DX11 R85 texture signature#1 stage#1: observed=1 type=3 pool=1 "
         "usage=0x00000000 fmt=21 exact=1\n"
         "VR DX11 R85 census: samples=1 exact=0 fixedFn=1 programmable=0 "
@@ -535,6 +538,17 @@ def main() -> int:
     assert compile_probe["bytecode_bytes"] == 512
     assert compile_probe["diagnostics_bytes"] == 0
     assert compile_probe["profile"] == "ps_4_0"
+    vertex_compile_probe = r85["Signatures"][0].get(
+        "fixed_function_vertex_shader_compile"
+    )
+    assert vertex_compile_probe is not None
+    assert vertex_compile_probe["attempted"] is True
+    assert vertex_compile_probe["succeeded"] is True
+    assert vertex_compile_probe["result_hex"] == "0x00000000"
+    assert vertex_compile_probe["bytecode_hash_hex"] == "0x1122334455667788"
+    assert vertex_compile_probe["bytecode_bytes"] == 640
+    assert vertex_compile_probe["diagnostics_bytes"] == 0
+    assert vertex_compile_probe["profile"] == "vs_4_0"
 
     r106 = run_case(
         "VR DX11 R85 signature#1: primitive=4 fixedFn=1\n"
