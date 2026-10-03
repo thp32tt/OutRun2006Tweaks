@@ -7,12 +7,12 @@
   "attempt": "1/3",
   "event_id": "CONVERSION-DXVK-00318-E001",
   "event_type": "rollover",
-  "status": "IN_PROGRESS_REPAIR_EXACT_SHA_GATE_PENDING",
-  "automation_validation": "LOCAL_STATIC_PASS_REPAIR_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "status": "IN_PROGRESS_TRANSFER_REPAIR_EXACT_SHA_GATE_PENDING",
+  "automation_validation": "LOCAL_STATIC_PASS_TRANSFER_REPAIR_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
   "runtime_validation": "UNTESTED",
   "base_sha": "96d4c42ac56626294a44b205c22a417a0545c28b",
-  "result_sha": "PENDING_REPAIR_RESULT_SHA",
-  "validation_bearing_result_sha": "PENDING_REPAIR_RESULT_SHA",
+  "result_sha": "PENDING_TRANSFER_REPAIR_RESULT_SHA",
+  "validation_bearing_result_sha": "PENDING_TRANSFER_REPAIR_RESULT_SHA",
   "result_marker": "[AUTO:CONVERSION-DX11-00319]",
   "selected_work_item": "DX11_R223_FIXED_FUNCTION_VERTEX_SHADER_COMPILE_EXACT_SAMPLES_GATE",
   "summary": "R223 closes the remaining fixed-function compiler-readiness gap in ExactSamples: the bounded unique-signature probe now requires both the generated R93 vertex shader and R84 pixel shader to compile successfully before a signature can be cached as compiler-exact. NativeDrawPath remains dormant.",
@@ -45,15 +45,16 @@
       "evidence": "Added a diagnostic R93 vertex D3DCompile probe (vs_4_0), retained generated vertex source in the sampled signature for the bounded unique-signature probe, required VS+PS pair compile success before admitting FixedFunctionShaderCompileExactHashes, and extended hosted semantic/static contracts."
     },
     "C3_VALIDATE": {
-      "status": "LOCAL_STATIC_PASS_REPAIR_EXACT_SHA_GATE_PENDING",
-      "automation_validation": "LOCAL_STATIC_PASS_REPAIR_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
-      "evidence": "Exact-SHA Gate 37152991657 on 5e69e22f17abc57b7bdde71bc53fed51da975899 passed all static/source checks and Win32 configure but failed Build Win32 because runtime_census.cpp detailed R85 telemetry retained seven stale pre-R223 compileProbe identifiers after the probe was split into pixelCompileProbe/vertexCompileProbe. Repair updates telemetry to live pixel/vertex probes and adds a source-graph guard rejecting stale compileProbe identifiers. N100 source-graph, dormant activation, census analyzer, py_compile and diff checks pass."
+      "status": "LOCAL_STATIC_PASS_TRANSFER_REPAIR_EXACT_SHA_GATE_PENDING",
+      "automation_validation": "LOCAL_STATIC_PASS_TRANSFER_REPAIR_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+      "evidence": "Gate 37153330535 on 0ae024bbf7a46fcff8fc9dad142357bffbdea63e failed at Verify DX11 source graph with SyntaxError because N100 read_file display wrappers were accidentally serialized into runtime_census.cpp and verify_dx11_source_graph.py during Git-data publication. This was a transfer/serialization defect, not an R223 code-contract failure. The next result removes only those wrappers while retaining the validated R223 telemetry repair and verifier guard."
     },
     "C4_COMMIT": {
-      "status": "MATERIAL_IMPLEMENTATION_AND_TEST_COMMITTED_REPAIR_PENDING_RESULT_SHA",
+      "status": "MATERIAL_R223_AND_REPAIRS_COMMITTED_TRANSFER_REPAIR_PENDING_RESULT_SHA",
       "source_implementation_sha": "08213eb5ceb1498d101e0c88d9df8cc878499114",
       "material_test_sha": "5e69e22f17abc57b7bdde71bc53fed51da975899",
-      "validation_bearing_result_sha": "PENDING_REPAIR_RESULT_SHA"
+      "compiler_telemetry_repair_sha": "0ae024bbf7a46fcff8fc9dad142357bffbdea63e",
+      "validation_bearing_result_sha": "PENDING_TRANSFER_REPAIR_RESULT_SHA"
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
@@ -62,7 +63,7 @@
     "C6_STATE": {
       "status": "PENDING",
       "state_persisted": false,
-      "exact_next_action": "Publish the narrow R223 compiler-telemetry repair without CI skip, require its uninterrupted exact-SHA Backend Conversion Gate including readiness smoke, then persist C6 bookkeeping separately with CI skip."
+      "exact_next_action": "Publish the wrapper-clean transfer repair without CI skip, require its exact-SHA Backend Conversion Gate through Win32 build and DX11 readiness smoke, then persist C6 bookkeeping separately with CI skip."
     }
   },
   "regression_assessment": {
@@ -79,11 +80,12 @@
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE_ROLLOVER"
   },
-  "exact_next_action": "Publish the narrow R223 compiler-telemetry repair without CI skip, require its uninterrupted exact-SHA Backend Conversion Gate including readiness smoke, then persist C6 bookkeeping separately with CI skip.",
+  "exact_next_action": "Publish the wrapper-clean transfer repair without CI skip, require its exact-SHA Backend Conversion Gate through Win32 build and DX11 readiness smoke, then persist C6 bookkeeping separately with CI skip.",
   "source_implementation_sha": "08213eb5ceb1498d101e0c88d9df8cc878499114",
   "implementation_commits": [
     "08213eb5ceb1498d101e0c88d9df8cc878499114",
-    "5e69e22f17abc57b7bdde71bc53fed51da975899"
+    "5e69e22f17abc57b7bdde71bc53fed51da975899",
+    "0ae024bbf7a46fcff8fc9dad142357bffbdea63e"
   ],
   "superseded_gate_history": [
     {
@@ -104,6 +106,13 @@
       "validate_job_id": 111290537662,
       "conclusion": "failure",
       "reason": "stale runtime_census telemetry identifier compileProbe remained after R223 split into pixelCompileProbe/vertexCompileProbe"
+    },
+    {
+      "result_sha": "0ae024bbf7a46fcff8fc9dad142357bffbdea63e",
+      "run_id": 37153330535,
+      "validate_job_id": 111291509903,
+      "conclusion": "failure",
+      "reason": "N100 read_file display wrappers accidentally serialized into two source files during Git-data transfer; verifier hit SyntaxError before R223 logic validation"
     }
   ]
 }
