@@ -14,15 +14,15 @@ services:
       TZ: Asia/Seoul
       GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
       TARGET_BRANCH: "korean-localization-20260928-clean-v1"
-      GITHUB_TOKEN: "\${GITHUB_TOKEN:-}"
-      LOCALIZATION_PROJECT_URL: "\${LOCALIZATION_PROJECT_URL:-}"
-      AUTO_SEND: "\${AUTO_SEND:-false}"
+      GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
+      LOCALIZATION_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
+      AUTO_SEND: "${AUTO_SEND:-false}"
       POLL_SECONDS: "15"
       STABLE_SECONDS: "30"
       NUDGE_SECONDS: "180"
       RECOVERY_SECONDS: "1200"
       MAX_NUDGES: "4"
-      VNC_PASSWORD: "\${VNC_PASSWORD:-change-me}"
+      VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
       STATUS_PORT: "8787"
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8787/status >/dev/null || exit 1"]
