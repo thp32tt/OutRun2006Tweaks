@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00296",
-  "production_id": "CONVERSION-DXVK-00295",
+  "production_id": "CONVERSION-DX11-00296",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "1/3",
-  "event_id": "CONVERSION-DXVK-00295-E002",
-  "event_type": "rollover",
+  "attempt": "2/3",
+  "event_id": "CONVERSION-DX11-00296-E003",
+  "event_type": "retry",
   "status": "COMPLETE",
   "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
@@ -15,7 +15,7 @@
   "result_sha": "350bce608d7283bd5216463d7447b037e5cab252",
   "validation_bearing_result_sha": "350bce608d7283bd5216463d7447b037e5cab252",
   "result_marker": "[AUTO:CONVERSION-DX11-00296]",
-  "selected_work_item": "DX11_R205_R211_LINE_IDENTITY_AND_POINT_LINE_RASTER_CENSUS_EXACTNESS",
+  "selected_work_item": "DX11_POINT_LINE_RASTER_CENSUS_EXACTNESS_R205_R211",
   "summary": "Recovered the in-flight R205 line-raster census identity commit, preserved its LASTPIXEL/ANTIALIASEDLINEENABLE signature provenance, then closed the remaining census/readiness mismatch by excluding POINTLIST and line primitives from ExactSamples while their D3D9 raster semantics remain intentionally fail-closed. Added point/line unsupported counters plus analyzer/regression/source-graph parity. NativeDrawPath activation remains disabled.",
   "changed_paths": [
     "src/vr/d3d11/runtime_census.cpp",
@@ -30,7 +30,7 @@
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered authenticated GitHub state from d617ba0b5e6f5bb3b6b0d3e28699ba8c32190033 with no CONVERSION-DX11-00296 run record. During recovery the same task advanced to 7fde73a717ffe09633378e9c4e25d70cfd33fc60; that material change was inspected and retained rather than repeated. The user rollover metadata is authoritative, so ATTEMPT remains 1/3."
+      "evidence": "Recovered the current GitHub HEAD and required branch-local review/automation/state documents, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, regression/history files and Issue #14. For retry E003, explicitly inspected FAILURE_CONTEXT Backend Conversion Gate 37130328766: it was on intermediate SHA 7fde73a717ffe09633378e9c4e25d70cfd33fc60, passed source/static/census/configure checks, then was cancelled during Build Win32 after newer material SHA 350bce608d7283bd5216463d7447b037e5cab252 was pushed. Per QUEUE_CONTROLLER_CONTRACT this run is SUPERSEDED rather than an automation failure. Existing C2 work was retained and not repeated."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
@@ -87,7 +87,13 @@
       "artifact_id": 11276976177,
       "artifact_name": "backend-autovalidated-vr-dx11-native-r71-350bce608d7283bd5216463d7447b037e5cab252",
       "artifact_digest": "sha256:695e60cc02f7f2e1bd993f12c05c9e694c543fd41c9c112eeaf27749ea47c912",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "superseded_intermediate_gate": {
+        "run_id": 37130328766,
+        "head_sha": "7fde73a717ffe09633378e9c4e25d70cfd33fc60",
+        "conclusion": "cancelled",
+        "classification": "SUPERSEDED_BY_350bce608d7283bd5216463d7447b037e5cab252"
+      }
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
@@ -104,8 +110,9 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "issue14_comment_id": 5970293757,
-      "exact_next_action": "Keep NativeDrawPathActive disabled. Use R205/R211 line identity and point/line blocker counts in future exact-build exhaustive census, then choose the next independent dormant DX11 source/static conversion gap from the newest authenticated HEAD. Matching Quest 3/VDXR evidence remains mandatory before runtime/visual parity or activation claims."
+      "issue14_comment_id": 5970296784,
+      "exact_next_action": "Release CONVERSION-DX11-00296 as automation PASS. Keep NativeDrawPathActive disabled. Preserve R205/R211 point/line raster census exactness and select one new independent dormant DX11 source/static gap from the newest authenticated branch HEAD. Matching Quest 3/VDXR evidence remains mandatory before runtime/visual parity or activation claims.",
+      "lane_state_commit": "7b648ec08b9f011484b394c312c73972a794d264"
     }
   },
   "release_gate": {
@@ -117,18 +124,25 @@
     "readiness_smoke_job_id": 111225759251
   },
   "native_draw_path_activation_changed": false,
-  "issue14_comment_id": 5970293757,
+  "issue14_comment_id": 5970296784,
   "issue14_comment_ids": [
     5970178488,
     5970214838,
     5970293757,
     5970290630,
-    5970313639
+    5970313639,
+    5970296784
   ],
   "exact_next_action": "Continue only with a new independent DX11 source/static conversion task from the newest authenticated GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
   "controller_resume": {
-    "final_event_id": "CONVERSION-DXVK-00295-E002",
-    "final_attempt": "1/3",
-    "note": "Current rollover dispatch metadata is authoritative. The same-task intermediate Gate on 7fde73a717ffe09633378e9c4e25d70cfd33fc60 was cancelled by descendant 350bce608d7283bd5216463d7447b037e5cab252 and classified SUPERSEDED, not a failed attempt. Final exact-SHA validation remains PASS on 350bce608d7283bd5216463d7447b037e5cab252."
-  }
+    "final_event_id": "CONVERSION-DX11-00296-E003",
+    "final_attempt": "2/3",
+    "failure_context_run_id": 37130328766,
+    "failure_context_classification": "SUPERSEDED",
+    "note": "Attempt 2 retained the already-materialized R205/R211 commits, validated exact material SHA 350bce608d7283bd5216463d7447b037e5cab252 through Backend Conversion Gate 37130573349, and persisted C6 state. The superseded cancelled run did not require a repair change."
+  },
+  "retaining_descendant_sha": "7b648ec08b9f011484b394c312c73972a794d264",
+  "authoritative_metadata_correction_comment_id": 5970296784,
+  "chat_rollover": 3,
+  "resume_reason": "Controller retry after Backend Conversion Gate run 37130328766 was reported cancelled. Inspection proved that intermediate-SHA run was superseded by newer material result 350bce608d7283bd5216463d7447b037e5cab252; attempt 2 resumed at exact-SHA validation without repeating completed implementation."
 }
