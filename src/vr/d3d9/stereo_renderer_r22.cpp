@@ -892,6 +892,12 @@ namespace OutRunVRStereo
         VRR22SafetyOverlayHook VRR22SafetyOverlayHook::instance;
     }
 
+    inline OutRunVR::RuntimeEligibility::InstallState
+    R22InstallStatus() noexcept
+    {
+        return R22InstallState.load(std::memory_order_acquire);
+    }
+
     OutRunVR::State::D3D9RasterSnapshot GetTrackedRasterShadow() noexcept
     {
         return R22ShadowState;
