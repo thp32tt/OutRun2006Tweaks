@@ -8,12 +8,12 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
 repo=Path.cwd()
-run="20261005-C115-313DB8CB"
+run="20261005-C116-313DB8CB"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
 ap=repo/"localization/graphics/role_A/20261005-A-PRODUCTION19"
 rep=json.loads((ap/"A_PRODUCTION19_313DB8CB_REPORT.json").read_text(encoding="utf-8"))
-source=Path("/tmp/C115_313DB8CB_source.dds")
+source=Path("/tmp/C116_313DB8CB_source.dds")
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+rep["source_provenance"]["commit"]+"/"+rep["source_provenance"]["path"]
 urllib.request.urlretrieve(url,source)
 candidate=repo/rep["candidate_path"]
@@ -106,6 +106,6 @@ res={
  "controller_visual_qa":"PENDING",
  "runtime_validation":"UNTESTED"
 }
-(out/"C115_313DB8CB_MACHINE_QA.json").write_text(json.dumps(res,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("C115_313DB8CB",res["machine_status"],rep["candidate_sha256"],flush=True)
+(out/"C116_313DB8CB_MACHINE_QA.json").write_text(json.dumps(res,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+print("C116_313DB8CB",res["machine_status"],rep["candidate_sha256"],flush=True)
 if not ok: raise SystemExit(2)
