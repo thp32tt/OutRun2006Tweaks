@@ -20,13 +20,13 @@ source_sha_expected='3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4c
 spec=[
  ('name','NAME','이름',(48,744,230,812),0.00,'opaque_header'),
  ('status','STATUS','상태',(1628,744,1818,812),0.00,'opaque_header'),
- ('stage','Stage','스테이지',(1080,796,1248,876),0.10,'transparent'),
- ('next_stage','Next Stage','다음 스테이지',(1310,866,1635,974),0.10,'transparent'),
- ('ghost','Ghost','고스트',(1640,866,1840,990),0.10,'transparent'),
- ('total_time','Total Time','총 시간',(36,1640,820,1840),0.10,'transparent'),
- ('slipstream','Slipstream','슬립스트림',(950,1660,1368,1835),0.08,'transparent'),
- ('new_record','NEW Record!!','신기록!!',(1628,1638,1905,1840),0.08,'transparent'),
- ('extend_time','Extend Time','시간 연장',(835,1830,1820,2048),0.11,'transparent'),
+ ('stage','Stage','스테이지',(1060,820,1225,910),0.10,'transparent'),
+ ('next_stage','Next Stage','다음 스테이지',(1300,895,1640,990),0.10,'transparent'),
+ ('ghost','Ghost','고스트',(1640,895,1840,990),0.10,'transparent'),
+ ('total_time','Total Time','총 시간',(36,1688,850,1845),0.10,'transparent'),
+ ('slipstream','Slipstream','슬립스트림',(860,1700,1420,1840),0.08,'transparent'),
+ ('new_record','NEW Record!!','신기록!!',(1600,1700,1910,1860),0.08,'transparent'),
+ ('extend_time','Extend Time','시간 연장',(800,1870,1820,2048),0.11,'transparent'),
 ]
 
 urllib.request.urlretrieve(source_url,source)
