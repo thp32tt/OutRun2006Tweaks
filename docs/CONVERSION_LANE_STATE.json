@@ -75,7 +75,7 @@
       "attempt": "1/3",
       "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH"
     },
-    "run_record_commit_sha": null
+    "run_record_commit_sha": "89232203cc79fa7ddc1346ca0f484705bb82e014"
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
