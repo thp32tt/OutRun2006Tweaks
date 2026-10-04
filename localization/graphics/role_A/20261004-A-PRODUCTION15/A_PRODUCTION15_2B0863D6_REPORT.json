@@ -1,0 +1,588 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261004-A-PRODUCTION15",
+  "worker": "github-actions",
+  "base_head": "2a3320bc164b8e95e98f4f5e3637470a12d3d63f",
+  "index": 135,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "1875af13ea28e27a4b61f917e43d561e6527106e",
+    "sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+    "classification": "authoritative high-resolution source; stale filename suffix, DDS header 2048x256 RGBA32"
+  },
+  "source_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+  "candidate_sha256": "ea24324be8abe19d11a807c457c143bdad464597554c7792c2f3a716214caf75",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+  "structure": {
+    "dimensions": [
+      2048,
+      256
+    ],
+    "format": "RGBA32",
+    "pitch": 8192,
+    "mipmaps": 1,
+    "bytes": 2097280,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "translations": [
+    {
+      "source": "PROFESSIONAL",
+      "korean": "프로"
+    },
+    {
+      "source": "NOVICE",
+      "korean": "초급"
+    },
+    {
+      "source": "OUTRUN",
+      "korean": "아웃런"
+    },
+    {
+      "source": "INTERMEDIATE B",
+      "korean": "중급 B"
+    },
+    {
+      "source": "INTERMEDIATE A",
+      "korean": "중급 A"
+    },
+    {
+      "source": "CHANGE CLASS",
+      "korean": "클래스 변경"
+    },
+    {
+      "source": "CLASS",
+      "korean": "클래스"
+    },
+    {
+      "source": "ACCELERATION",
+      "korean": "가속"
+    },
+    {
+      "source": "MAX SPEED",
+      "korean": "최고 속도"
+    },
+    {
+      "source": "HANDLING",
+      "korean": "핸들링"
+    }
+  ],
+  "class_badge_background_reconstruction": "row-wise red-background median inside source white-text mask; badge border/background preserved",
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION15/2B0863D6_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION15/2B0863D6_HD_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      256
+    ],
+    "changed_pixels": 99421,
+    "changed_bbox": [
+      128,
+      28,
+      1962,
+      246
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION15/2B0863D6_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION15/2B0863D6_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      256
+    ],
+    "changed_pixels": 101753,
+    "changed_bbox": [
+      128,
+      28,
+      1962,
+      246
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_total": 101753,
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "clean_plate_source_text_residue_pixels": 0
+  },
+  "rows": [
+    {
+      "key": "professional",
+      "region_idx": 0,
+      "source": "PROFESSIONAL",
+      "korean": "프로",
+      "style": "gray",
+      "original_bbox": [
+        189,
+        185,
+        698,
+        245
+      ],
+      "localized_bbox": [
+        377,
+        187,
+        509,
+        243
+      ],
+      "source_width": 509,
+      "source_height": 60,
+      "localized_width": 132,
+      "localized_height": 56,
+      "delta_left": 188,
+      "delta_right": 189,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        189,
+        11,
+        698,
+        71
+      ],
+      "raw_localized_bbox": [
+        377,
+        13,
+        509,
+        69
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 75,
+      "rework_status": "A_PRODUCTION15_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "novice",
+      "region_idx": 1,
+      "source": "NOVICE",
+      "korean": "초급",
+      "style": "gray",
+      "original_bbox": [
+        1154,
+        187,
+        1399,
+        246
+      ],
+      "localized_bbox": [
+        1222,
+        189,
+        1330,
+        244
+      ],
+      "source_width": 245,
+      "source_height": 59,
+      "localized_width": 108,
+      "localized_height": 55,
+      "delta_left": 68,
+      "delta_right": 69,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1154,
+        10,
+        1399,
+        69
+      ],
+      "raw_localized_bbox": [
+        1222,
+        12,
+        1330,
+        67
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 62,
+      "rework_status": "A_PRODUCTION15_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "outrun",
+      "region_idx": 2,
+      "source": "OUTRUN",
+      "korean": "아웃런",
+      "style": "gray",
+      "original_bbox": [
+        423,
+        107,
+        700,
+        166
+      ],
+      "localized_bbox": [
+        485,
+        109,
+        637,
+        164
+      ],
+      "source_width": 277,
+      "source_height": 59,
+      "localized_width": 152,
+      "localized_height": 55,
+      "delta_left": 62,
+      "delta_right": 63,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        423,
+        90,
+        700,
+        149
+      ],
+      "raw_localized_bbox": [
+        485,
+        92,
+        637,
+        147
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 58,
+      "rework_status": "A_PRODUCTION15_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "intermediate_b",
+      "region_idx": 3,
+      "source": "INTERMEDIATE B",
+      "korean": "중급 B",
+      "style": "gray",
+      "original_bbox": [
+        830,
+        108,
+        1396,
+        164
+      ],
+      "localized_bbox": [
+        1034,
+        110,
+        1191,
+        162
+      ],
+      "source_width": 566,
+      "source_height": 56,
+      "localized_width": 157,
+      "localized_height": 52,
+      "delta_left": 204,
+      "delta_right": 205,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        830,
+        92,
+        1396,
+        148
+      ],
+      "raw_localized_bbox": [
+        1034,
+        94,
+        1191,
+        146
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 59,
+      "rework_status": "A_PRODUCTION15_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "intermediate_a",
+      "region_idx": 4,
+      "source": "INTERMEDIATE A",
+      "korean": "중급 A",
+      "style": "gray",
+      "original_bbox": [
+        128,
+        28,
+        696,
+        84
+      ],
+      "localized_bbox": [
+        334,
+        30,
+        490,
+        82
+      ],
+      "source_width": 568,
+      "source_height": 56,
+      "localized_width": 156,
+      "localized_height": 52,
+      "delta_left": 206,
+      "delta_right": 206,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        128,
+        172,
+        696,
+        228
+      ],
+      "raw_localized_bbox": [
+        334,
+        174,
+        490,
+        226
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 59,
+      "rework_status": "A_PRODUCTION15_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "change_class",
+      "region_idx": 5,
+      "source": "CHANGE CLASS",
+      "korean": "클래스 변경",
+      "style": "gray",
+      "original_bbox": [
+        840,
+        38,
+        1243,
+        86
+      ],
+      "localized_bbox": [
+        934,
+        40,
+        1149,
+        84
+      ],
+      "source_width": 403,
+      "source_height": 48,
+      "localized_width": 215,
+      "localized_height": 44,
+      "delta_left": 94,
+      "delta_right": 94,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        840,
+        170,
+        1243,
+        218
+      ],
+      "raw_localized_bbox": [
+        934,
+        172,
+        1149,
+        216
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 46,
+      "rework_status": "A_PRODUCTION15_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "class",
+      "region_idx": 6,
+      "source": "CLASS",
+      "korean": "클래스",
+      "style": "badge_white",
+      "original_bbox": [
+        1292,
+        50,
+        1428,
+        87
+      ],
+      "localized_bbox": [
+        1313,
+        52,
+        1407,
+        85
+      ],
+      "source_width": 136,
+      "source_height": 37,
+      "localized_width": 94,
+      "localized_height": 33,
+      "delta_left": 21,
+      "delta_right": 21,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1292,
+        169,
+        1428,
+        206
+      ],
+      "raw_localized_bbox": [
+        1313,
+        171,
+        1407,
+        204
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 35,
+      "rework_status": "A_PRODUCTION15_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "acceleration",
+      "region_idx": 7,
+      "source": "ACCELERATION",
+      "korean": "가속",
+      "style": "gray",
+      "original_bbox": [
+        1475,
+        48,
+        1736,
+        81
+      ],
+      "localized_bbox": [
+        1578,
+        50,
+        1632,
+        79
+      ],
+      "source_width": 261,
+      "source_height": 33,
+      "localized_width": 54,
+      "localized_height": 29,
+      "delta_left": 103,
+      "delta_right": 104,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1475,
+        175,
+        1736,
+        208
+      ],
+      "raw_localized_bbox": [
+        1578,
+        177,
+        1632,
+        206
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 30,
+      "rework_status": "A_PRODUCTION15_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "max_speed",
+      "region_idx": 8,
+      "source": "MAX SPEED",
+      "korean": "최고 속도",
+      "style": "gray",
+      "original_bbox": [
+        1746,
+        48,
+        1962,
+        81
+      ],
+      "localized_bbox": [
+        1796,
+        50,
+        1912,
+        79
+      ],
+      "source_width": 216,
+      "source_height": 33,
+      "localized_width": 116,
+      "localized_height": 29,
+      "delta_left": 50,
+      "delta_right": 50,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1746,
+        175,
+        1962,
+        208
+      ],
+      "raw_localized_bbox": [
+        1796,
+        177,
+        1912,
+        206
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 30,
+      "rework_status": "A_PRODUCTION15_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "handling",
+      "region_idx": 9,
+      "source": "HANDLING",
+      "korean": "핸들링",
+      "style": "gray",
+      "original_bbox": [
+        1412,
+        128,
+        1597,
+        161
+      ],
+      "localized_bbox": [
+        1465,
+        130,
+        1543,
+        158
+      ],
+      "source_width": 185,
+      "source_height": 33,
+      "localized_width": 78,
+      "localized_height": 28,
+      "delta_left": 53,
+      "delta_right": 54,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1412,
+        95,
+        1597,
+        128
+      ],
+      "raw_localized_bbox": [
+        1465,
+        98,
+        1543,
+        126
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 30,
+      "rework_status": "A_PRODUCTION15_NEW_HD_CANDIDATE"
+    }
+  ],
+  "all_10_readable_and_raw_bbox_pass": true,
+  "all_10_size_ceiling_pass": true,
+  "all_10_positive_margin": true,
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A_PRODUCTION15_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
