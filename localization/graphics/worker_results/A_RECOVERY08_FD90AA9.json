@@ -1,0 +1,17 @@
+{
+  "run": "20261004-A-RECOVERY08",
+  "asset": "FD90AA9",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "input_candidate_sha256": "58a8bd06a38375694da7d3109fc2615ccd6d45092828f7eb5b7a9317afc13010",
+  "candidate_sha256": "0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b",
+  "c92_blocking_failures_before": 4,
+  "c92_target_rows_rebuilt": 4,
+  "reworked_bbox_pass": "4/4",
+  "unaffected_layers_preserved_exact": "25/25",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "changes_vs_a07_outside_four_source_bboxes": 0,
+  "runtime_validation": "UNTESTED",
+  "status": "A_RECOVERY08_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "report": "localization/graphics/role_A/20261004-A-RECOVERY08/A_RECOVERY08_FD90AA9_REPORT.json"
+}

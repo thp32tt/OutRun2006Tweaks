@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261004-A-RECOVERY08",
+  "worker": "github-actions",
+  "base_head": "db199af78e73a116736dd1ac6da436aea359797a",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "c92_return_report": "localization/graphics/role_C/20261004-1740-C92/C92_FD90AA9_FINAL_QA.json",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "input_candidate_sha256": "58a8bd06a38375694da7d3109fc2615ccd6d45092828f7eb5b7a9317afc13010",
+  "candidate_sha256": "0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b",
+  "method": "C92 visual-return repair on GitHub-hosted worker: preserve 25 A07 layers exact; remove four returned A07 layers to clean plate; expand More Engine glyph/effect cleanup with high-frequency source mask clipped away from You; harmonic RGBA inpaint; fresh native Korean rerender; physically isolate three overlapping expert labels into non-overlapping vertical atlas bands; exact source-header RGBA32 encode; decoded static QA",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "header_128_exact_source": true,
+    "bytes": 67108992
+  },
+  "c92_blocking_failures": [
+    "more_engine",
+    "experts_long",
+    "for_experts",
+    "normal_difficult"
+  ],
+  "engine_cleanup": {
+    "source_bbox": [
+      2772,
+      376,
+      3187,
+      448
+    ],
+    "safe_cleanup_bbox": [
+      2772,
+      376,
+      3169,
+      448
+    ],
+    "mask_bbox": [
+      2772,
+      376,
+      3169,
+      448
+    ],
+    "mask_pixels": 28584,
+    "mask_overlap_with_you_localized_pixels": 0,
+    "method": "source high-frequency glyph/effect mask + A07 prior source mask + harmonic RGBA inpaint"
+  },
+  "reworked_rows": [
+    {
+      "key": "more_engine",
+      "source": "More Engine sound",
+      "korean": "엔진음 크게",
+      "original_bbox": [
+        2772,
+        376,
+        3187,
+        448
+      ],
+      "localized_bbox": [
+        2851,
+        385,
+        3086,
+        438
+      ],
+      "delta_left": 79,
+      "delta_right": 101,
+      "delta_top": 9,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        2772,
+        3648,
+        3187,
+        3720
+      ],
+      "raw_localized_bbox": [
+        2851,
+        3658,
+        3086,
+        3711
+      ],
+      "raw_delta_left": 79,
+      "raw_delta_right": 101,
+      "raw_delta_top": 10,
+      "raw_delta_bottom": 9,
+      "raw_containment": "PASS",
+      "placement_zone": [
+        2790,
+        380,
+        3148,
+        444
+      ],
+      "font_size": 48,
+      "rework_status": "A_RECOVERY08_FRESH_RECONSTRUCTION"
+    },
+    {
+      "key": "experts_long",
+      "source": "For Experts & Long distance to the goal",
+      "korean": "상급자용 · 골까지 장거리",
+      "original_bbox": [
+        1907,
+        602,
+        3406,
+        781
+      ],
+      "localized_bbox": [
+        2335,
+        625,
+        2985,
+        693
+      ],
+      "delta_left": 428,
+      "delta_right": 421,
+      "delta_top": 23,
+      "delta_bottom": 88,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        1907,
+        3315,
+        3406,
+        3494
+      ],
+      "raw_localized_bbox": [
+        2335,
+        3403,
+        2985,
+        3471
+      ],
+      "raw_delta_left": 428,
+      "raw_delta_right": 421,
+      "raw_delta_top": 88,
+      "raw_delta_bottom": 23,
+      "raw_containment": "PASS",
+      "placement_zone": [
+        1940,
+        618,
+        3380,
+        700
+      ],
+      "font_size": 62,
+      "rework_status": "A_RECOVERY08_FRESH_RECONSTRUCTION"
+    },
+    {
+      "key": "for_experts",
+      "source": "For Experts",
+      "korean": "상급자용",
+      "original_bbox": [
+        1766,
+        704,
+        2304,
+        896
+      ],
+      "localized_bbox": [
+        1948,
+        788,
+        2151,
+        847
+      ],
+      "delta_left": 182,
+      "delta_right": 153,
+      "delta_top": 84,
+      "delta_bottom": 49,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        1766,
+        3200,
+        2304,
+        3392
+      ],
+      "raw_localized_bbox": [
+        1948,
+        3249,
+        2151,
+        3308
+      ],
+      "raw_delta_left": 182,
+      "raw_delta_right": 153,
+      "raw_delta_top": 49,
+      "raw_delta_bottom": 84,
+      "raw_containment": "PASS",
+      "placement_zone": [
+        1810,
+        785,
+        2290,
+        850
+      ],
+      "font_size": 54,
+      "rework_status": "A_RECOVERY08_FRESH_RECONSTRUCTION"
+    },
+    {
+      "key": "normal_difficult",
+      "source": "Normal difficult",
+      "korean": "보통 난이도",
+      "original_bbox": [
+        2547,
+        704,
+        3354,
+        896
+      ],
+      "localized_bbox": [
+        2801,
+        793,
+        3108,
+        861
+      ],
+      "delta_left": 254,
+      "delta_right": 246,
+      "delta_top": 89,
+      "delta_bottom": 35,
+      "containment": "PASS",
+      "raw_original_bbox": [
+        2547,
+        3200,
+        3354,
+        3392
+      ],
+      "raw_localized_bbox": [
+        2801,
+        3235,
+        3108,
+        3303
+      ],
+      "raw_delta_left": 254,
+      "raw_delta_right": 246,
+      "raw_delta_top": 35,
+      "raw_delta_bottom": 89,
+      "raw_containment": "PASS",
+      "placement_zone": [
+        2580,
+        785,
+        3330,
+        870
+      ],
+      "font_size": 62,
+      "rework_status": "A_RECOVERY08_FRESH_RECONSTRUCTION"
+    }
+  ],
+  "preserved_unaffected_target_layer_diffs": {
+    "outsp_course": 0,
+    "out2_course": 0,
+    "you": 0,
+    "gas_pedal": 0,
+    "run15": 0,
+    "maximum_speed": 0,
+    "enter_selection": 0,
+    "same_conditions": 0,
+    "transmission2": 0,
+    "view_choices": 0,
+    "select_game_mode": 0,
+    "select_car": 0,
+    "select_course": 0,
+    "select_music": 0,
+    "select_transmission": 0,
+    "shortcut_features": 0,
+    "selected_sp": 0,
+    "selected_out2": 0,
+    "select_car_setting": 0,
+    "versus_mode": 0,
+    "gear_change": 0,
+    "player_battle_desc": 0,
+    "new_course_desc": 0,
+    "orig_course_desc": 0,
+    "random_music": 0
+  },
+  "preserved_unaffected_count": 25,
+  "changes_vs_a07_outside_four_source_bboxes": 0,
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-RECOVERY08/_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-RECOVERY08/FD90AA9_CLEAN_PLATE_RECOVERY08.png",
+    "size": [
+      4096,
+      4096
+    ],
+    "changed_pixels": 1538245,
+    "changed_bbox": [
+      0,
+      374,
+      4034,
+      2573
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-RECOVERY08/_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-RECOVERY08/_FINAL_DECODED_READABLE.png",
+    "size": [
+      4096,
+      4096
+    ],
+    "changed_pixels": 2145458,
+    "changed_bbox": [
+      0,
+      374,
+      4034,
+      2573
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "fresh_layer_overlap_pairs": [],
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A_RECOVERY08_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
