@@ -300,9 +300,10 @@ async def conversion_cycle(context, pages, reg: Registry):
         previous = reg.artifact_records.get(asset, {})
         if previous.get("state") == "BLOCKED":
             continue
+        workflow = "DX9Ex Active Validation" if lane == "C" else "Backend Conversion Gate"
         active = {"lane": lane, "asset_path": asset, "artifact_sha": "", "state": "READY",
                   "base_sha": head, "result_sha": "", "branch": branch,
-                  "workflow": "Backend Conversion Gate"}
+                  "workflow": workflow}
         await dispatch_lane(context, pages, reg, active)
     save_registry(reg)
 
