@@ -28,6 +28,12 @@ jobs:
       - name: Lane asset identity, restart, material evidence and QA regression tests
         run: python3 tools/chat-controller/v0.4/tests/test_event_model_v2.py -v
 
+      - name: VR Controller v2 DX11/DXVK/DX9Ex regression tests
+        run: |
+          cat tools/chat-controller/v0.4/src-vr-v2/controller.py.part* > /tmp/controller-vr-v2.py
+          python3 -m py_compile /tmp/controller-vr-v2.py
+          python3 tools/chat-controller/v0.4/tests/test_vr_v2_dx9ex.py -v
+
       - name: Separate legacy localization implementation regression tests
         run: python3 tests/test_localization_execution.py
 
@@ -47,6 +53,8 @@ jobs:
           done
           grep -Fq 'EXPECTED_PROJECT_ID: "g-p-6ab9a64fc428819198c7f39765d764bf"' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
           grep -Fq 'COPY src/controller.py.part*' tools/chat-controller/v0.4/Dockerfile.portainer
+          grep -Fq 'dockerfile: Dockerfile.portainer-vr' tools/chat-controller/v0.4/docker-compose.portainer-vr.yml
+          grep -Fq 'COPY src-vr-v2/controller.py.part*' tools/chat-controller/v0.4/Dockerfile.portainer-vr
 
       - name: Verify prompt isolation and project guards
         run: |
@@ -63,6 +71,6 @@ jobs:
           assert 'is_configured_project_url(page.url)' in src
           assert 'ensure_thinking_level(page)' in src
           assert 'Google Drive canonical HD source transport' in src
-          for name in ('conversion_dx11.md', 'conversion_dxvk.md'):
+          for name in ('conversion_dx11.md', 'conversion_dxvk.md', 'conversion_dx9ex.md'):
               assert (root / name).stat().st_size
           PY
