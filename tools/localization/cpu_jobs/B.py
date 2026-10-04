@@ -11,12 +11,14 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
 RUN="20261005-B-PRODUCTION45"
 ASSET="textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds"
 INDEX=130
+# Sorted readable-layout order after the exact raw rotate-180 transform:
+# three stacked course rows, then bottom-left average-rank and bottom-right SP course.
 LABELS=[
  ("MIX 1 COURSE","믹스 1 코스"),
  ("MIX 2 COURSE","믹스 2 코스"),
  ("OUTRUN2 COURSE","아웃런2 코스"),
- ("OUTRUN2SP COURSE","아웃런2 SP 코스"),
  ("AVERAGE RANK:","평균 랭크:"),
+ ("OUTRUN2SP COURSE","아웃런2 SP 코스"),
 ]
 
 def main():
@@ -48,11 +50,13 @@ def main():
     if (W,H)!=(2048,512): raise RuntimeError(("dimensions",W,H))
     if sb[:128]!=hb[:128]: raise RuntimeError("historical header mismatch")
 
-    # Historical orientation record says this atlas stores the text mirror-X in raw DDS.
+    # Controller visual inspection of exact source proved the five target labels are
+    # stored rotate-180 in raw DDS. Work in true readable orientation, then restore
+    # that exact raw transform at encode time.
     src_raw=Image.frombytes("RGBA",(W,H),sb[128:],"raw","RGBA")
     hist_raw=Image.frombytes("RGBA",(W,H),hb[128:],"raw","RGBA")
-    src=src_raw.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
-    hist=hist_raw.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+    src=src_raw.transpose(Image.Transpose.ROTATE_180)
+    hist=hist_raw.transpose(Image.Transpose.ROTATE_180)
     sa=np.asarray(src,dtype=np.uint8); ha=np.asarray(hist,dtype=np.uint8)
     src_alpha=sa[:,:,3]>0
     base_diff=np.any(sa!=ha,axis=2)
@@ -245,11 +249,11 @@ def main():
 
     target=np.zeros((H,W),bool)
     for m in target_masks: target|=m
-    final_raw=final.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+    final_raw=final.transpose(Image.Transpose.ROTATE_180)
     payload=sb[:128]+final_raw.tobytes("raw","RGBA")
     candidate.write_bytes(payload); cand_sha=sha(payload)
     cb=candidate.read_bytes(); _,_,_=meta(cb)
-    dec_raw=Image.frombytes("RGBA",(W,H),cb[128:],"raw","RGBA"); dec=dec_raw.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+    dec_raw=Image.frombytes("RGBA",(W,H),cb[128:],"raw","RGBA"); dec=dec_raw.transpose(Image.Transpose.ROTATE_180)
     if cb[:128]!=sb[:128] or ImageChops.difference(final,dec).getbbox() is not None: raise RuntimeError("DDS roundtrip/header")
     da=np.asarray(dec,dtype=np.uint8)
 
@@ -303,15 +307,15 @@ def main():
     for c in contacts:rs.paste(c,(0,yy));yy+=c.height+4
     rs.save(out/"B_PRODUCTION45_176_ROW_CONTACT_2X.jpg",quality=96)
 
-    raws=[card("SOURCE_RAW_MIRROR_X",src_raw),card("FINAL_RAW_MIRROR_X",dec_raw)]
+    raws=[card("SOURCE_RAW_ROTATE_180",src_raw),card("FINAL_RAW_ROTATE_180",dec_raw)]
     rr=Image.new("RGB",(W,(H+25)*2),"white");rr.paste(raws[0],(0,0));rr.paste(raws[1],(0,H+25));rr.thumbnail((1600,1000),Image.Resampling.LANCZOS);rr.save(out/"B_PRODUCTION45_176_RAW_COMPARE.jpg",quality=96)
 
     report={"schema_version":1,"role":"B","run":RUN,"queue_index":INDEX,"asset":ASSET,
       "readiness_tier":"RENDER_READY_COMPLETED_SAME_INVOCATION","source_sha256":source_sha,
       "historical_discovery_sha256":hist_sha,"historical_discovery_only":True,"historical_localized_pixels_reused":False,
       "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
-      "method":"exact 2048x512 RGBA32 source; historical candidate only as target-region hint; exact connected source-alpha/effect component masks; alpha-only clean plate; fresh Hangul render; exact-header mirror-X DDS; decoded static QA",
-      "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_x"},
+      "method":"exact 2048x512 RGBA32 source; historical candidate only as target-region hint; exact connected source-alpha/effect component masks; alpha-only clean plate; fresh Hangul render; exact-header rotate-180 DDS; decoded static QA",
+      "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":mips,"header_128_exact":True,"raw_orientation":"rotate_180"},
       "segments_total":5,"preserved_original":["numeric rank marker","unrelated artwork"],"rows":rows,
       "containment":{"elements_total":5,"elements_pass":5,"changed_pixels_outside_original_bboxes":outside,
         "alpha_changed_pixels_outside_original_bboxes":alpha_out,"target_pixels_outside_original_bboxes":target_out,
