@@ -1,0 +1,51 @@
+{
+  "run": "20261004-B-PRODUCTION19",
+  "queue_index": 164,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_sumo_fe_cvt_Exst/5B65E08C_512x256.dds",
+  "source_sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "format": "RGBA32",
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ]
+  },
+  "historical_diff_bbox": [
+    590,
+    565,
+    1493,
+    659
+  ],
+  "mapped_hd_base_bbox": [
+    590,
+    565,
+    1493,
+    659
+  ],
+  "mapped_hd_cell": [
+    554,
+    529,
+    1529,
+    695
+  ],
+  "cell_border_transparent_fraction": 0.9401840490797546,
+  "cell_alpha_pixels": 43111,
+  "cell_alpha_bbox_local": [
+    0,
+    0,
+    939,
+    166
+  ],
+  "source": "SELECT LICENSE",
+  "korean": "라이선스 선택",
+  "historical_pixels_reusable": false,
+  "candidate_written": false,
+  "status": "ONE_STAGE_TO_RENDER_DIAGNOSTIC_READY"
+}
