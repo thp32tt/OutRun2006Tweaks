@@ -773,10 +773,12 @@ def main() -> int:
     )
     latest = latest_summaries[-1] if latest_summaries else None
 
-    # R235: reconcile the current startup's emitted signature headers with the
-    # current periodic summary. A detail-cap skip is explicit evidence, while a
-    # silently missing header is not. Keep this diagnostic-only, but make
-    # incomplete or internally inconsistent per-log evidence directly visible.
+    # R235/R236: reconcile the current startup's emitted signature headers
+    # with the current periodic summary. A detail-cap skip is explicit evidence,
+    # while a silently missing header is not. R236 additionally separates
+    # count-accounting completeness from hash-universe coverage: once the
+    # signature hash cap is hit, the reported unique-signature count can still
+    # reconcile exactly even though further unique signatures are suppressed.
     current_signature_evidence_by_log: dict[str, dict] = {}
     for source_log in source_logs:
         summary = current_summaries_by_log.get(source_log)
@@ -785,13 +787,20 @@ def main() -> int:
         expected = int(summary.get("signatures", 0))
         captured = len(current_signatures_by_log.get(source_log, []))
         detail_skipped = int(summary.get("signatureDetailSkipped", 0))
+        hash_cap_hit_samples = int(summary.get("signatureHashCapHitSamples", 0))
         accounted = captured + detail_skipped
+        accounted_complete = accounted == expected
+        coverage_complete = accounted_complete and hash_cap_hit_samples == 0
         current_signature_evidence_by_log[source_log] = {
             "ExpectedSignatures": expected,
             "CapturedSignatures": captured,
             "DetailSkippedSignatures": detail_skipped,
             "AccountedSignatures": accounted,
-            "Complete": accounted == expected,
+            "HashCapHitSamples": hash_cap_hit_samples,
+            "HashCapSaturated": hash_cap_hit_samples > 0,
+            "AccountedComplete": accounted_complete,
+            "CoverageComplete": coverage_complete,
+            "Complete": accounted_complete,
         }
     current_signature_evidence_missing_logs = sorted(
         source_log
@@ -803,11 +812,20 @@ def main() -> int:
         for source_log, evidence in current_signature_evidence_by_log.items()
         if evidence["AccountedSignatures"] > evidence["ExpectedSignatures"]
     )
+    current_signature_hash_cap_saturated_logs = sorted(
+        source_log
+        for source_log, evidence in current_signature_evidence_by_log.items()
+        if evidence["HashCapSaturated"]
+    )
     all_current_signature_evidence_accounted = bool(source_logs) and (
         all_source_logs_have_summary
         and len(current_signature_evidence_by_log) == len(source_logs)
         and not current_signature_evidence_missing_logs
         and not current_signature_evidence_overcount_logs
+    )
+    all_current_signature_evidence_coverage_complete = bool(
+        all_current_signature_evidence_accounted
+        and not current_signature_hash_cap_saturated_logs
     )
 
     all_source_logs_have_startup = bool(source_logs) and (
@@ -1106,8 +1124,14 @@ def main() -> int:
         "CurrentSignatureEvidenceOvercountLogs": (
             current_signature_evidence_overcount_logs
         ),
+        "CurrentSignatureHashCapSaturatedLogs": (
+            current_signature_hash_cap_saturated_logs
+        ),
         "AllCurrentSignatureEvidenceAccounted": (
             all_current_signature_evidence_accounted
+        ),
+        "AllCurrentSignatureEvidenceCoverageComplete": (
+            all_current_signature_evidence_coverage_complete
         ),
         "DiagnosticOnly": True,
         "ActivationProof": False,

@@ -1192,6 +1192,10 @@ def main() -> int:
         "CapturedSignatures": 1,
         "DetailSkippedSignatures": 0,
         "AccountedSignatures": 1,
+        "HashCapHitSamples": 0,
+        "HashCapSaturated": False,
+        "AccountedComplete": False,
+        "CoverageComplete": False,
         "Complete": False,
     }
     assert r235_coverage["CurrentSignatureEvidenceByLog"]["session-b-accounted.log"] == {
@@ -1199,11 +1203,80 @@ def main() -> int:
         "CapturedSignatures": 1,
         "DetailSkippedSignatures": 1,
         "AccountedSignatures": 2,
+        "HashCapHitSamples": 0,
+        "HashCapSaturated": False,
+        "AccountedComplete": True,
+        "CoverageComplete": True,
         "Complete": True,
     }
     assert (
         r235_current_signature_evidence_reconciliation["ActivationEvidence"]
         ["SignatureEvidenceCoverage"]["AllCurrentSignatureEvidenceAccounted"]
+        is False
+    )
+    assert r235_coverage["CurrentSignatureHashCapSaturatedLogs"] == []
+    assert r235_coverage["AllCurrentSignatureEvidenceCoverageComplete"] is False
+
+    r236_current_signature_hash_cap_coverage_boundary = run_cases(
+        {
+            "session-a-saturated.log": (
+                "VR DX11 R71 census: observed=1 size=1280x720 sourceFormat=21 "
+                "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+                "VR DX11 R85 signature#1: primitive=4 fixedFn=1 fvf=0x000001C4\n"
+                "VR DX11 R120 census: samples=4 exact=4 fixedFn=4 programmable=0 "
+                "topologyUnsupported=0 signatures=1 "
+                "sampling[drawsSeen=4,stride=1,scheme=2] "
+                "signatureCaps[hashCap=1,hashCapHitSamples=3,detailCap=64,detailSkipped=0] "
+                "declSamples=0 indexedSamples=0 texturedSamples=0 "
+                "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+                "mutationTelemetryRequired=0,managedShadowRequired=0,"
+                "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+                "depthUnsupported=0] "
+                "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+                "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+                "depthCmp=0,cull=0]\n"
+            ),
+            "session-b-complete.log": (
+                "VR DX11 R71 census: observed=1 size=1920x1080 sourceFormat=22 "
+                "nativeFormat=29 msaa=0 bootstrapCompatible=1\n"
+                "VR DX11 R85 signature#1: primitive=5 fixedFn=1 fvf=0x000002C4\n"
+                "VR DX11 R120 census: samples=4 exact=4 fixedFn=4 programmable=0 "
+                "topologyUnsupported=0 signatures=1 "
+                "sampling[drawsSeen=4,stride=1,scheme=2] "
+                "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+                "declSamples=0 indexedSamples=0 texturedSamples=0 "
+                "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+                "mutationTelemetryRequired=0,managedShadowRequired=0,"
+                "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+                "depthUnsupported=0] "
+                "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+                "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+                "depthCmp=0,cull=0]\n"
+            ),
+        }
+    )
+    r236_coverage = r236_current_signature_hash_cap_coverage_boundary[
+        "SignatureCoverage"
+    ]
+    assert r236_coverage["CurrentSignatureEvidenceMissingLogs"] == []
+    assert r236_coverage["CurrentSignatureEvidenceOvercountLogs"] == []
+    assert r236_coverage["AllCurrentSignatureEvidenceAccounted"] is True
+    assert r236_coverage["CurrentSignatureHashCapSaturatedLogs"] == [
+        "session-a-saturated.log"
+    ]
+    assert r236_coverage["AllCurrentSignatureEvidenceCoverageComplete"] is False
+    assert r236_coverage["CurrentSignatureEvidenceByLog"]["session-a-saturated.log"][
+        "AccountedComplete"
+    ] is True
+    assert r236_coverage["CurrentSignatureEvidenceByLog"]["session-a-saturated.log"][
+        "CoverageComplete"
+    ] is False
+    assert r236_coverage["CurrentSignatureEvidenceByLog"]["session-b-complete.log"][
+        "CoverageComplete"
+    ] is True
+    assert (
+        r236_current_signature_hash_cap_coverage_boundary["ActivationEvidence"]
+        ["SignatureEvidenceCoverage"]["AllCurrentSignatureEvidenceCoverageComplete"]
         is False
     )
 

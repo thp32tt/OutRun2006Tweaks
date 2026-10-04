@@ -9243,6 +9243,33 @@ def main() -> None:
             + ", ".join(missing_r235_current_signature_evidence_reconciliation)
         )
 
+    r236_current_signature_hash_cap_coverage_boundary_contract = [
+        ('hash_cap_hit_samples = int(summary.get("signatureHashCapHitSamples", 0))',
+         DX11_CENSUS_ANALYZER, "R236 per-log signature hash-cap evidence"),
+        ('"HashCapSaturated": hash_cap_hit_samples > 0',
+         DX11_CENSUS_ANALYZER, "R236 per-log signature hash-cap saturation export"),
+        ("current_signature_hash_cap_saturated_logs = sorted(",
+         DX11_CENSUS_ANALYZER, "R236 saturated-log aggregation"),
+        ('"AllCurrentSignatureEvidenceCoverageComplete": (',
+         DX11_CENSUS_ANALYZER, "R236 fail-closed signature universe coverage export"),
+        ("r236_current_signature_hash_cap_coverage_boundary = run_cases(",
+         DX11_CENSUS_ANALYZER_TEST, "R236 hash-cap coverage regression fixture"),
+        ('["AllCurrentSignatureEvidenceAccounted"] is True',
+         DX11_CENSUS_ANALYZER_TEST, "R236 accounted-but-saturated boundary assertion"),
+        ('["AllCurrentSignatureEvidenceCoverageComplete"] is False',
+         DX11_CENSUS_ANALYZER_TEST, "R236 saturated coverage fail-closed assertion"),
+    ]
+    missing_r236_current_signature_hash_cap_coverage_boundary = [
+        meaning
+        for token, source, meaning in r236_current_signature_hash_cap_coverage_boundary_contract
+        if token not in source
+    ]
+    if missing_r236_current_signature_hash_cap_coverage_boundary:
+        raise SystemExit(
+            "DX11 R236 current signature hash-cap coverage boundary drift: "
+            + ", ".join(missing_r236_current_signature_hash_cap_coverage_boundary)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
