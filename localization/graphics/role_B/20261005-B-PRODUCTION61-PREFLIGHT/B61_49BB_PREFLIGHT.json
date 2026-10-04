@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION61-PREFLIGHT",
+  "index": 152,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_SEMANTIC_BINDING",
+  "source_sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+  "structure": {
+    "dimensions": [
+      512,
+      128
+    ],
+    "format": "A8",
+    "raw_mode": "A8",
+    "pixel_format_words": [
+      32,
+      4,
+      894720068,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "raw_orientation": "mirror_y"
+  },
+  "regions": [
+    {
+      "region_idx": 0,
+      "cell": [
+        0,
+        80,
+        116,
+        48
+      ],
+      "source_alpha_bbox": [
+        0,
+        80,
+        114,
+        128
+      ]
+    },
+    {
+      "region_idx": 1,
+      "cell": [
+        116,
+        80,
+        116,
+        48
+      ],
+      "source_alpha_bbox": [
+        120,
+        80,
+        232,
+        128
+      ]
+    },
+    {
+      "region_idx": 2,
+      "cell": [
+        232,
+        80,
+        116,
+        48
+      ],
+      "source_alpha_bbox": [
+        232,
+        80,
+        348,
+        128
+      ]
+    },
+    {
+      "region_idx": 3,
+      "cell": [
+        348,
+        80,
+        116,
+        48
+      ],
+      "source_alpha_bbox": [
+        348,
+        80,
+        464,
+        128
+      ]
+    },
+    {
+      "region_idx": 4,
+      "cell": [
+        0,
+        32,
+        116,
+        48
+      ],
+      "source_alpha_bbox": [
+        0,
+        32,
+        114,
+        80
+      ]
+    },
+    {
+      "region_idx": 5,
+      "cell": [
+        116,
+        32,
+        116,
+        48
+      ],
+      "source_alpha_bbox": [
+        120,
+        32,
+        226,
+        80
+      ]
+    }
+  ],
+  "cross_reference_semantics": [
+    "PROTOTYPE",
+    "INSTRUMENTAL",
+    "GUITAR MIX",
+    "EURO REMIX",
+    "1989",
+    "1986"
+  ],
+  "policy": "preserve year badges; localize only proven semantic abbreviations",
+  "status": "B61_ONE_STAGE_TO_RENDER_DIAGNOSTIC_COMPLETE",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
