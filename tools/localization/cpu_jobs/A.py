@@ -228,7 +228,7 @@ diff=dmask(src,decoded)
 outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
 alpha_out=count(ImageChops.multiply(ImageChops.difference(src.getchannel("A"),decoded.getchannel("A")).point(lambda v:255 if v else 0),ImageOps.invert(allowed)))
 prot=count(ImageChops.multiply(diff,protected))
-source_residue=count(ImageChops.multiply(balpha(clean),source_text_mask))
+source_residue=count(ImageChops.multiply(source_text_mask,ImageOps.invert(dmask(src,clean))))
 
 def gray(im):
     bg=Image.new("RGBA",im.size,(90,90,90,255)); bg.alpha_composite(im); return bg.convert("RGB")
