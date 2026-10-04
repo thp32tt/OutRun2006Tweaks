@@ -53,7 +53,7 @@ for idx,en,ko in specs:
  for yy in range(5,ch-5):
   for xx in range(5,cw-5):
    r,g,b,a=pix[xx,yy]
-   if a>180 and max(r,g,b)<220: bgvals.append((r,g,b,a))
+   if a>180 and (max(r,g,b)-min(r,g,b))>30: bgvals.append((r,g,b,a))
  if len(bgvals)<100: raise RuntimeError(("bg samples",idx,len(bgvals)))
  bg=tuple(int(statistics.median(v[i] for v in bgvals)) for i in range(4))
  mask=Image.new("L",(cw,ch),0); mp=mask.load()
