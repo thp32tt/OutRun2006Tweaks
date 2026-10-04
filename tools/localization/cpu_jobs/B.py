@@ -3,7 +3,7 @@ import hashlib, json, os, struct, subprocess, urllib.request
 from collections import Counter
 from pathlib import Path
 import numpy as np
-from PIL import Image, ImageChops, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFont, ImageFilter
 
 if os.environ.get('OUTRUN_CPU_WORKER') != 'github-actions' or os.environ.get('OUTRUN_CPU_ROLE') != 'B':
     raise SystemExit('GitHub-hosted localization CPU worker / role B only')
@@ -80,7 +80,7 @@ def otsu_threshold(vals):
         if between>best: best=between; threshold=t
     return threshold
 
-def components(mask,min_pixels=2):
+def components(mask,min_pixels=2,allow_bottom_edge=False):
     h,w=mask.shape; seen=np.zeros((h,w),bool); keep=np.zeros((h,w),bool)
     for y in range(h):
         for x in range(w):
@@ -91,29 +91,43 @@ def components(mask,min_pixels=2):
                 for nx,ny in ((xx-1,yy),(xx+1,yy),(xx,yy-1),(xx,yy+1)):
                     if 0<=nx<w and 0<=ny<h and mask[ny,nx] and not seen[ny,nx]:
                         seen[ny,nx]=1; stack.append((nx,ny))
-            if len(pts)>=min_pixels:
-                for xx,yy in pts: keep[yy,xx]=1
+            if len(pts)<min_pixels: continue
+            xs=[q[0] for q in pts]; ys=[q[1] for q in pts]
+            touches=min(xs)==0 or max(xs)==w-1 or min(ys)==0 or (max(ys)==h-1 and not allow_bottom_edge)
+            if touches: continue
+            for xx,yy in pts: keep[yy,xx]=1
     return keep
 
 def source_mask_for(key,cell,bg_kind):
     x0,y0,x1,y1=cell; crop=np.asarray(src.crop(cell),dtype=np.uint8); h,w,_=crop.shape
-    if bg_kind=='transparent':
+    bw=max(2,min(10,min(h,w)//10))
+    border=np.concatenate([crop[:bw].reshape(-1,4),crop[-bw:].reshape(-1,4),crop[:,:bw].reshape(-1,4),crop[:,-bw:].reshape(-1,4)],axis=0)
+    transparent_fraction=float(np.mean(border[:,3]<=1))
+    if transparent_fraction>=0.55:
         rawmask=(crop[:,:,3]>1)
-        bg_meta={'type':'transparent','transparent_fraction':float(np.mean(crop[:,:,3]<=1))}
+        mode='transparent'
+        bg_meta={'type':mode,'border_transparent_fraction':transparent_fraction}
     else:
-        rgb=crop[:,:,:3].astype(np.float32); lum=(.2126*rgb[:,:,0]+.7152*rgb[:,:,1]+.0722*rgb[:,:,2])
-        # Remove the header strip's horizontal shading per scanline, then select only pixels materially darker than their row background.
-        row_med=np.median(lum,axis=1)[:,None]
-        rawmask=(lum < (row_med-24.0))&(crop[:,:,3]>200)
-        bg_meta={'type':'opaque_header','segmentation':'row_luminance_minus_24','row_median_min':float(row_med.min()),'row_median_max':float(row_med.max())}
-    keep=components(rawmask,2)
+        # Opaque/semitransparent panel: subtract the scanline-local background so horizontal gradients/bands are preserved.
+        rgb=crop[:,:,:3].astype(np.int16); alpha=crop[:,:,3].astype(np.int16)
+        row_rgb=np.median(rgb,axis=1).astype(np.int16)[:,None,:]
+        row_a=np.median(alpha,axis=1).astype(np.int16)[:,None]
+        color_diff=np.max(np.abs(rgb-row_rgb),axis=2)
+        alpha_diff=np.abs(alpha-row_a)
+        rawmask=((color_diff>10)|(alpha_diff>10))&(crop[:,:,3]>1)
+        mode='opaque_or_semitransparent_row_reconstruct'
+        bg_meta={'type':mode,'border_transparent_fraction':transparent_fraction,'color_diff_threshold':10,'alpha_diff_threshold':10}
+    keep=components(rawmask,2,allow_bottom_edge=(key=='extend_time'))
+    if mode!='transparent':
+        # Include antialias/effect fringe around the detected source glyph footprint, but keep it inside the manual cell.
+        keep=np.asarray(Image.fromarray((keep*255).astype(np.uint8),'L').filter(ImageFilter.MaxFilter(3)))>0
     full=Image.new('L',src.size,0); full.paste(Image.fromarray((keep*255).astype(np.uint8),'L'),(x0,y0))
     bb=full.getbbox()
     if not bb: raise RuntimeError(f'empty source text mask {key}: cell={cell} meta={bg_meta}')
     margins=(bb[0]-x0,bb[1]-y0,x1-bb[2],y1-bb[3])
     edge_bottom_ok=(key=='extend_time' and bb[3]==src.height and y1==src.height)
     if margins[0]<=0 or margins[1]<=0 or margins[2]<=0 or (margins[3]<=0 and not edge_bottom_ok):
-        raise RuntimeError(f'cell clips source text {key}: cell={cell} bbox={bb} margins={margins}')
+        raise RuntimeError(f'cell clips source text {key}: cell={cell} bbox={bb} margins={margins} meta={bg_meta}')
     return full,bb,bg_meta
 
 def row_background(crop,mask):
@@ -206,7 +220,7 @@ allowed=rect_mask(src.size,list(source_bboxes.values())); protected=ImageChops.i
 clean=src.copy()
 for key,en,ko,cell,slant,bg in spec:
     x0,y0,x1,y1=cell; local=source_masks[key].crop(cell)
-    if bg=='transparent':
+    if mask_meta[key]['type']=='transparent':
         a=np.asarray(clean).copy(); lm=np.asarray(source_masks[key])>0; a[lm]=(0,0,0,0); clean=Image.fromarray(a,'RGBA')
     else:
         rec=row_background(src.crop(cell),local); clean.paste(rec,cell)
@@ -239,7 +253,7 @@ cm=cm.point(lambda v:255 if v else 0); clean_out=count(ImageChops.multiply(cm,Im
 # Transparent elements must be completely cleared under the source effect mask.
 residue=0
 for key,en,ko,cell,slant,bg in spec:
-    if bg=='transparent': residue+=count(ImageChops.multiply(bin_alpha(clean),source_masks[key]))
+    if mask_meta[key]['type']=='transparent': residue+=count(ImageChops.multiply(bin_alpha(clean),source_masks[key]))
 if any((outside,protected_changes,alpha_out,clean_out,residue)): raise RuntimeError(('static gate',outside,protected_changes,alpha_out,clean_out,residue))
 overlap=[]; keys=list(layers)
 for i in range(len(keys)):
