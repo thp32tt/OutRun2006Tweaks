@@ -1,0 +1,393 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261004-B-RECOVERY04",
+  "base_head": "e13d49b8268e7c3bb8c043dca48a66c8f31cf02f",
+  "queue_index": 44,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+  "source_upstream_repo": "Sonic-TV/OR2006Sprites",
+  "source_upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+  "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+  "candidate_sha256": "3090f2664bab3065502b10a98f93d17e92a64a3725dc1b7a4bb790648a5da6e7",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+  "method": "pinned exact HD upstream source -> isolated source alpha glyph/effect masks -> protected mask -> transparent clean plate -> 12 fresh native-resolution Korean labels -> exact RGBA32 source-header DDS encode -> decoded static QA; TOP unchanged; mph/km/h/numeric/player markers preserved",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "pf_flags": 65,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "channel_layout": "RGBA masks preserved"
+  },
+  "segments_total": 13,
+  "segments_materially_changed": 12,
+  "segments_preserved_original": 1,
+  "preserved_segments": [
+    "TOP"
+  ],
+  "preserved_nontext": [
+    "mph",
+    "km/h",
+    "numeric markers",
+    "1P/2P/3P badges",
+    "vehicle sprites",
+    "bowling pins",
+    "flags",
+    "arrows",
+    "sector/result numeric glyphs"
+  ],
+  "clean_plate": {
+    "changed_pixels_outside_source_text_mask": 0,
+    "source_text_residue_pixels": 0,
+    "status": "PASS"
+  },
+  "containment": {
+    "elements_checked": 12,
+    "elements_pass": 12,
+    "elements_fail": 0,
+    "changed_pixels_outside_permitted_source_bboxes": 0,
+    "alpha_changed_outside_permitted_source_bboxes": 0,
+    "protected_changes": 0,
+    "target_overlap_pairs": [],
+    "status": "PASS"
+  },
+  "rows": [
+    {
+      "key": "sector2",
+      "source": "Sector2",
+      "korean": "섹터 2",
+      "native_rendered_text": "섹터 2",
+      "semantic_note": null,
+      "original_bbox": [
+        8,
+        100,
+        190,
+        160
+      ],
+      "localized_bbox": [
+        29,
+        101,
+        168,
+        159
+      ],
+      "delta_left": 21,
+      "delta_right": 22,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "native_font_size": 51,
+      "fresh_glyph_slant": 0.12,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "sector1",
+      "source": "Sector1",
+      "korean": "섹터 1",
+      "native_rendered_text": "섹터 1",
+      "semantic_note": null,
+      "original_bbox": [
+        208,
+        100,
+        385,
+        160
+      ],
+      "localized_bbox": [
+        227,
+        101,
+        364,
+        159
+      ],
+      "delta_left": 19,
+      "delta_right": 21,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "native_font_size": 51,
+      "fresh_glyph_slant": 0.12,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "win",
+      "source": "WIN",
+      "korean": "승리",
+      "native_rendered_text": "승리",
+      "semantic_note": null,
+      "original_bbox": [
+        418,
+        110,
+        500,
+        151
+      ],
+      "localized_bbox": [
+        428,
+        111,
+        490,
+        150
+      ],
+      "delta_left": 10,
+      "delta_right": 10,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "native_font_size": 32,
+      "fresh_glyph_slant": 0.0,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "lose",
+      "source": "LOSE",
+      "korean": "패배",
+      "native_rendered_text": "패배",
+      "semantic_note": null,
+      "original_bbox": [
+        528,
+        109,
+        635,
+        152
+      ],
+      "localized_bbox": [
+        548,
+        110,
+        614,
+        151
+      ],
+      "delta_left": 20,
+      "delta_right": 21,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "native_font_size": 34,
+      "fresh_glyph_slant": 0.0,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "result",
+      "source": "Result",
+      "korean": "결과",
+      "native_rendered_text": "결과",
+      "semantic_note": null,
+      "original_bbox": [
+        32,
+        180,
+        247,
+        249
+      ],
+      "localized_bbox": [
+        83,
+        181,
+        197,
+        248
+      ],
+      "delta_left": 51,
+      "delta_right": 50,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "native_font_size": 56,
+      "fresh_glyph_slant": 0.14,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "ranking",
+      "source": "Ranking",
+      "korean": "랭킹",
+      "native_rendered_text": "랭킹",
+      "semantic_note": null,
+      "original_bbox": [
+        289,
+        180,
+        555,
+        259
+      ],
+      "localized_bbox": [
+        357,
+        181,
+        488,
+        258
+      ],
+      "delta_left": 68,
+      "delta_right": 67,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "native_font_size": 68,
+      "fresh_glyph_slant": 0.14,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "stage",
+      "source": "Stage",
+      "korean": "스테이지",
+      "native_rendered_text": "스테이지",
+      "semantic_note": null,
+      "original_bbox": [
+        571,
+        179,
+        765,
+        259
+      ],
+      "localized_bbox": [
+        574,
+        189,
+        763,
+        248
+      ],
+      "delta_left": 3,
+      "delta_right": 2,
+      "delta_top": 10,
+      "delta_bottom": 11,
+      "containment": "PASS",
+      "native_font_size": 48,
+      "fresh_glyph_slant": 0.14,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "rank",
+      "source": "Rank1",
+      "korean": "랭크 1",
+      "native_rendered_text": "랭크",
+      "semantic_note": "preserved original 1P badge supplies player 1 marker",
+      "original_bbox": [
+        788,
+        180,
+        964,
+        249
+      ],
+      "localized_bbox": [
+        818,
+        181,
+        930,
+        248
+      ],
+      "delta_left": 30,
+      "delta_right": 34,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "native_font_size": 59,
+      "fresh_glyph_slant": 0.12,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "you",
+      "source": "You",
+      "korean": "나",
+      "native_rendered_text": "나",
+      "semantic_note": null,
+      "original_bbox": [
+        1759,
+        193,
+        1897,
+        260
+      ],
+      "localized_bbox": [
+        1797,
+        194,
+        1858,
+        259
+      ],
+      "delta_left": 38,
+      "delta_right": 39,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "native_font_size": 56,
+      "fresh_glyph_slant": 0.12,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "diff",
+      "source": "Diff",
+      "korean": "차이",
+      "native_rendered_text": "차이",
+      "semantic_note": null,
+      "original_bbox": [
+        1853,
+        312,
+        1975,
+        381
+      ],
+      "localized_bbox": [
+        1856,
+        313,
+        1972,
+        379
+      ],
+      "delta_left": 3,
+      "delta_right": 3,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "native_font_size": 60,
+      "fresh_glyph_slant": 0.12,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "sector3",
+      "source": "Sector3",
+      "korean": "섹터 3",
+      "native_rendered_text": "섹터 3",
+      "semantic_note": null,
+      "original_bbox": [
+        1832,
+        1180,
+        2013,
+        1240
+      ],
+      "localized_bbox": [
+        1852,
+        1181,
+        1992,
+        1239
+      ],
+      "delta_left": 20,
+      "delta_right": 21,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "native_font_size": 51,
+      "fresh_glyph_slant": 0.12,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "rival",
+      "source": "Rival",
+      "korean": "라이벌",
+      "native_rendered_text": "라이벌",
+      "semantic_note": null,
+      "original_bbox": [
+        498,
+        1412,
+        705,
+        1486
+      ],
+      "localized_bbox": [
+        509,
+        1413,
+        695,
+        1485
+      ],
+      "delta_left": 11,
+      "delta_right": 10,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "native_font_size": 65,
+      "fresh_glyph_slant": 0.14,
+      "prior_localized_raster_resampled": false
+    }
+  ],
+  "manual_visual_qa": "PENDING_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_RECOVERY04_STATIC_PASS_PENDING_MANUAL_SELF_QA_AND_C"
+}

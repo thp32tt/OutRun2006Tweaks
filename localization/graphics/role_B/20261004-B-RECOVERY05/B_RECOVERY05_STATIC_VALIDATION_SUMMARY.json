@@ -1,0 +1,20 @@
+{
+  "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+  "candidate_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
+  "canonical_channel_layout": "raw_RGBA",
+  "bbox_pass": "11/11",
+  "c88_failed_rework_pass": "7/7",
+  "prior_pass_exact": {
+    "course_or2": 0,
+    "wait_other": 0,
+    "handling": 0,
+    "single_play": 0
+  },
+  "clean_residue": 0,
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected_changes": 0,
+  "overlaps": 0,
+  "header_exact": true,
+  "status": "PASS"
+}
