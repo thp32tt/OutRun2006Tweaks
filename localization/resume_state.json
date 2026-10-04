@@ -355,8 +355,8 @@
         "d_final_qa_report": "localization/graphics/role_D/20260927-2014-D83/D83_FINAL_QA_RECONCILE_REPORT.json"
       },
       "C075FB49": {
-        "status": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
-        "candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+        "status": "A_RECOVERY05_SELF_QA_PASS_PENDING_C_AND_INGAME",
+        "candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
         "completed_transcription_entries": 16,
         "localized_regions": 17,
@@ -380,7 +380,18 @@
         "c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
         "c_candidate_changed": false,
         "d83_same_sha_binary_preflight_valid": true,
-        "d_final_qa_report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json"
+        "d_final_qa_report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json",
+        "a_recovery05_report": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_C075FB49_REPORT.json",
+        "a_recovery05_clean_plate_report": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_CLEAN_PLATE_VALIDATION.json",
+        "a_recovery05_final_mask_report": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_FINAL_MASK_VALIDATION.json",
+        "a_recovery05_all_17_bbox_pass": true,
+        "a_recovery05_visual_qa": "PASS",
+        "runtime_validation": "UNTESTED",
+        "a_recovery05_changed_sha_supersedes_prior_static_qa": true,
+        "c_revalidation_status": "PENDING_AFTER_CHANGED_SHA",
+        "prior_candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+        "prior_c_strict_qa_report": "localization/graphics/role_C/20260927-2112-C82/C82_C075_FD90_9F_STRICT_QA_REPORT.json",
+        "prior_d_final_qa_report": "localization/graphics/role_D/20260927-2122-D84/D84_FINAL_QA_RECONCILE_REPORT.json"
       },
       "FD90AA9": {
         "status": "D84_FINAL_STATIC_QA_PASS_PENDING_INGAME",
@@ -640,7 +651,9 @@
         "48DEBE77": "fa0f6e27ebabfd81d67ecea3ec204361046d650dc6cf8ab00c1b6580ee58aca0"
       },
       "result": "STATIC_STRICT_QA_PASS_PENDING_D_INGAME"
-    }
+    },
+    "latest_a_recovery_report": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_C075FB49_REPORT.json",
+    "latest_a_recovery_candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c"
   },
   "runtime_packages": {
     "k1": {
@@ -1434,5 +1447,33 @@
     },
     "runtime_validation": "UNTESTED",
     "vr_ffb_dx11_dxvk_changes": false
+  },
+  "a_recovery05_c075fb49": {
+    "run": "20261004-A-RECOVERY05",
+    "base_head": "890ebd143723c9dc20b4e3c1fa1dcff702b0a49b",
+    "status": "A_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
+    "c85_reworked_elements": 9,
+    "native_rerenders": 5,
+    "overlap_safe_exact_shift": 1,
+    "canonical_normalization_only": 3,
+    "all_17_bbox_pass": true,
+    "prior_c85_pass_elements_preserved_safe_exact": 8,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "clean_plate_report": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_CLEAN_PLATE_VALIDATION.json",
+    "final_mask_report": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_FINAL_MASK_VALIDATION.json",
+    "production_report": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_C075FB49_REPORT.json",
+    "visual_compare": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_C075FB49_COMPARE.png",
+    "visual_qa": "PASS",
+    "runtime_validation": "UNTESTED",
+    "next_a_target": {
+      "index": 57,
+      "asset": "39229D64",
+      "status": "rework_required_dds_structure_cleanplate",
+      "source": "C87 concurrent feedback after A_RECOVERY05 selection"
+    },
+    "integration_head": "c65649e66eb789ea6b2984f324236e5db2b3fc00"
   }
 }
