@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import hashlib, json, os, struct, subprocess
+import hashlib, json, os, struct, subprocess, urllib.request
 from pathlib import Path
 
 import numpy as np
@@ -25,6 +25,7 @@ ASSETS = [
         "allowed": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_ALLOWED_TEXT_REGION_MASK.png",
         "final_protected": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_PROTECTED_MASK.png",
         "target_mask": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_TARGET_TEXT_MASK.png",
+        "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
         "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
         "candidate_sha256": "6f64736a53589379a00dc831e8605f0f8f140ffd52837f951e0a24fcd9d89c8a",
         "expected_rows": 21,
@@ -213,6 +214,13 @@ results = []
 for spec in ASSETS:
     key = spec["key"]
     source_path = repo / spec["source"]
+    if not source_path.exists():
+        source_url = spec.get("source_url")
+        if not source_url:
+            raise RuntimeError(f"{key} source missing from repository and no pinned source_url is defined")
+        tmp_source = Path("/tmp") / f"C90_{key}_SOURCE.dds"
+        urllib.request.urlretrieve(source_url, tmp_source)
+        source_path = tmp_source
     candidate_path = repo / spec["candidate"]
     producer_path = repo / spec["producer_report"]
     if sha256(source_path) != spec["source_sha256"]:
