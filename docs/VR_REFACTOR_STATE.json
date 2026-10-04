@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-05T03:55:25+09:00",
+  "updatedKst": "2026-10-05T04:58:39+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -63,9 +63,10 @@
     "VR-REFACTOR-STATE-0004X",
     "VR-REFACTOR-CI-0003",
     "VR-REFACTOR-POST1000-R34-READINESS-OWNERSHIP-0001",
-    "VR-REFACTOR-POST1000-R34-READINESS-WORKER-FOLD-0002"
+    "VR-REFACTOR-POST1000-R34-READINESS-WORKER-FOLD-0002",
+    "VR-REFACTOR-POST1000-R34-COMPAT-REGISTRATION-FOLD-0003"
   ],
-  "next": "Do not repeat cycles 0..1000 or CONVERSION-DX9EX-00376/00379. R33 is the sole terminal readiness/replay-health publication owner; R34 is a zero-physical-hook, zero-worker compatibility observer. Continue only the next bounded post-1000 structural successor supported by current source/static evidence, otherwise return to explicit DX9Ex runtime/general maintenance. Quest3/VDXR runtime remains UNTESTED.",
+  "next": "Do not repeat cycles 0..1000 or CONVERSION-DX9EX-00376/00379/00382. R33 owns terminal readiness/replay-health plus the historical OpenXRVRStereoR34ResetGuard compatibility registration; R34 is an include-only final-TU shim with zero physical hooks, zero worker, zero install-state ownership, and zero Hook registration. Continue only the next bounded post-1000 structural successor supported by current source/static evidence, otherwise return to explicit DX9Ex runtime/general maintenance. Quest3/VDXR runtime remains UNTESTED.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -132,7 +133,8 @@
     "No projection, eye transform, HUD/world semantic classification, Present ownership, wait, allocation, D3D getter, or hot-path synchronization was added by cycle 910->1000 owner cleanup. Shared frame/transport fields whose extraction could alter Present/interop behavior were intentionally deferred rather than mechanically moved.",
     "F11 gameplay overlay fix remains included in the latest package, but Quest3/VDXR runtime validation is still required before VR-F11-OVERLAY-DIPLOPIA-001 can be marked fixed.",
     "Post-1000 maintenance VR-REFACTOR-POST1000-R34-READINESS-OWNERSHIP-0001: material d0991bfc2966cbc353d5c25c6bc0d72a4eb1ff04 removes R34InstallState duplicate ownership after R34 physical detours were folded into R33, preserves R34 as a compatibility async readiness observer, tightens the R34 hook-graph ceiling to zero, and guards against duplicate install-state ownership returning. DX9Ex Active Validation 37222316846 policy/full-chain/host/game/package SUCCESS; Domain Isolation 37222316862 SUCCESS; HUD Inspector 37222316810 SUCCESS. Runtime remains UNTESTED.",
-    "Post-1000 maintenance VR-REFACTOR-POST1000-R34-READINESS-WORKER-FOLD-0002: source material a641273826b164cb49b17dac11a6d2bc3c5af3d9 moves initial replay-health synchronization and terminal R33/R34 compatibility readiness publication into R33, removes the R34 polling/worker thread, and preserves R34 as a zero-physical-hook compatibility observer. Validation follow-up 9ec83f6b1269e3438e6430fa6a6efb2076103182 repairs a stale R31 fallback ordering verifier anchor; exact-SHA DX9Ex Active Validation 37225909401 policy/host/game/full-chain/package SUCCESS, Domain Isolation 37225909385 SUCCESS, source HUD Inspector 37225633102 SUCCESS, and N100 local policy Python suite PASS. Runtime remains UNTESTED."
+    "Post-1000 maintenance VR-REFACTOR-POST1000-R34-READINESS-WORKER-FOLD-0002: source material a641273826b164cb49b17dac11a6d2bc3c5af3d9 moves initial replay-health synchronization and terminal R33/R34 compatibility readiness publication into R33, removes the R34 polling/worker thread, and preserves R34 as a zero-physical-hook compatibility observer. Validation follow-up 9ec83f6b1269e3438e6430fa6a6efb2076103182 repairs a stale R31 fallback ordering verifier anchor; exact-SHA DX9Ex Active Validation 37225909401 policy/host/game/full-chain/package SUCCESS, Domain Isolation 37225909385 SUCCESS, source HUD Inspector 37225633102 SUCCESS, and N100 local policy Python suite PASS. Runtime remains UNTESTED.",
+    "Post-1000 maintenance VR-REFACTOR-POST1000-R34-COMPAT-REGISTRATION-FOLD-0003: material f189d27a76e161eb00f52107e668690a91380475 moves the historical OpenXRVRStereoR34ResetGuard Hook registration from R34 into R33, leaving stereo_renderer_r34.cpp as an include-only final-TU shim while preserving the existing build-matrix entry point. Exact-SHA DX9Ex Active Validation 37229862542 policy/host/game/full-chain/package SUCCESS; Domain Isolation 37229862557 SUCCESS; HUD Inspector 37229862561 SUCCESS; N100 local architecture/R51/R32-R34/hook-graph/refactor/near-plane suite PASS. Package artifact 11313378950 digest sha256:b445c0003a54efb3ec7710f41f61871c8f88dd6cc20982af930c933374759c13. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-1000_BUILD_VERIFIED",
   "validatedSourceSha": "245c35ca3ce07b304526312eab14d6f4c1f09ecd",
