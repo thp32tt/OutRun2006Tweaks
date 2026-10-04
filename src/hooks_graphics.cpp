@@ -1686,8 +1686,9 @@ class VSyncOverride : public Hook
 			}
 
 			params.MultiSampleType = sampleType;
-			params.MultiSampleQuality =
-				std::min(colorQuality, depthQuality) - 1;
+			const DWORD commonQuality =
+				colorQuality < depthQuality ? colorQuality : depthQuality;
+			params.MultiSampleQuality = commonQuality - 1;
 			spdlog::info(
 				"VR DX9Ex AA: explicit {}x MSAA selected quality={} (colorLevels={} depthLevels={}); replaces ambiguous NONMASKABLE game AA",
 				static_cast<int>(sampleType), params.MultiSampleQuality,
