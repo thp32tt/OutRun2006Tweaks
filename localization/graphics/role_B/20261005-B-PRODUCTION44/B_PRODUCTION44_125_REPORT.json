@@ -9,16 +9,16 @@
   "historical_discovery_sha256": "c66b8a0b1294a5ada7f28ebb0023bb461c26aac4b99da4c5da60894dce8a3f83",
   "historical_discovery_only": true,
   "historical_localized_pixels_reused": false,
-  "candidate_sha256": "f16b9d7a2f89beb95c04bd8bcebe5b26abf6b18c4b4e2641f184d8956556d399",
+  "candidate_sha256": "023dbc3331adc14501a7ce67f5aa23fa820cf310ca0be0a61c5a271cded957fe",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
-  "method": "exact original 1024x1024 RGBA32 source -> historical candidate only as region-discovery hint -> source-alpha/effect mask -> alpha-only transparent clean plate with hidden RGB preserved -> fresh native Hangul render -> exact-header raw identity DDS -> decoded static QA",
+  "method": "exact original 1024x1024 RGBA32 source -> historical candidate only as region-discovery hint -> source-alpha/effect mask -> alpha-only transparent clean plate with hidden RGB preserved -> fresh native Hangul render -> exact-header raw rotate-180 DDS -> decoded static QA",
   "structure": {
     "width": 1024,
     "height": 1024,
     "format": "RGBA32",
     "mipmaps": 1,
     "header_128_exact": true,
-    "raw_orientation": "identity"
+    "raw_orientation": "rotate_180"
   },
   "segments_total": 7,
   "rows": [
@@ -28,38 +28,38 @@
       "korean": "타임 어택 모드 / 15코스",
       "stage_name": false,
       "discovery_bbox": [
-        1,
-        0,
-        268,
-        67
+        366,
+        504,
+        1021,
+        577
       ],
       "original_bbox": [
-        9,
-        4,
-        258,
-        59
+        376,
+        512,
+        1013,
+        558
       ],
-      "source_mask_density": 0.4150419861263235,
-      "source_alpha_density": 0.41861993428258487,
+      "source_mask_density": 0.44996928537301206,
+      "source_alpha_density": 0.45034468636953107,
       "localized_bbox": [
-        14,
-        18,
-        252,
-        45
+        502,
+        513,
+        886,
+        557
       ],
-      "source_width": 249,
-      "source_height": 55,
-      "localized_width": 238,
-      "localized_height": 27,
-      "delta_left": 5,
-      "delta_right": 6,
-      "delta_top": 14,
-      "delta_bottom": 14,
+      "source_width": 637,
+      "source_height": 46,
+      "localized_width": 384,
+      "localized_height": 44,
+      "delta_left": 126,
+      "delta_right": 127,
+      "delta_top": 1,
+      "delta_bottom": 1,
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "font_size": 24,
-      "stroke_width": 1,
-      "slant": 0.32,
+      "font_size": 39,
+      "stroke_width": 2,
+      "slant": 0.10310206598828293,
       "palette": {
         "fill_top": [
           57,
@@ -88,38 +88,38 @@
       "korean": "알파인",
       "stage_name": true,
       "discovery_bbox": [
-        1,
-        61,
-        201,
-        143
+        849,
+        577,
+        1023,
+        659
       ],
       "original_bbox": [
-        9,
-        80,
-        191,
-        135
+        859,
+        585,
+        1015,
+        640
       ],
-      "source_mask_density": 0.4117882117882118,
-      "source_alpha_density": 0.42337662337662335,
+      "source_mask_density": 0.4398601398601399,
+      "source_alpha_density": 0.4438228438228438,
       "localized_bbox": [
-        27,
-        81,
-        172,
-        134
+        869,
+        586,
+        1004,
+        639
       ],
-      "source_width": 182,
+      "source_width": 156,
       "source_height": 55,
-      "localized_width": 145,
+      "localized_width": 135,
       "localized_height": 53,
-      "delta_left": 18,
-      "delta_right": 19,
+      "delta_left": 10,
+      "delta_right": 11,
       "delta_top": 1,
       "delta_bottom": 1,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "font_size": 49,
       "stroke_width": 3,
-      "slant": 0.32,
+      "slant": 0.0,
       "palette": {
         "fill_top": [
           57,
@@ -148,151 +148,31 @@
       "korean": "에인션트 루인스",
       "stage_name": true,
       "discovery_bbox": [
-        1,
-        138,
-        270,
-        219
+        652,
+        656,
+        1022,
+        727
       ],
       "original_bbox": [
-        9,
-        156,
-        256,
-        211
-      ],
-      "source_mask_density": 0.4230401177769599,
-      "source_alpha_density": 0.4305483989694516,
-      "localized_bbox": [
-        11,
-        163,
-        254,
-        203
-      ],
-      "source_width": 247,
-      "source_height": 55,
-      "localized_width": 243,
-      "localized_height": 40,
-      "delta_left": 2,
-      "delta_right": 2,
-      "delta_top": 7,
-      "delta_bottom": 8,
-      "containment": "PASS",
-      "size_ceiling": "PASS",
-      "font_size": 36,
-      "stroke_width": 2,
-      "slant": 0.32,
-      "palette": {
-        "fill_top": [
-          57,
-          54,
-          46,
-          255
-        ],
-        "fill_bottom": [
-          57,
-          54,
-          46,
-          255
-        ],
-        "outline": [
-          57,
-          54,
-          46,
-          255
-        ]
-      },
-      "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
-    },
-    {
-      "n": 4,
-      "source": "Bay Area",
-      "korean": "베이 에어리어",
-      "stage_name": true,
-      "discovery_bbox": [
-        1,
-        217,
-        243,
-        292
-      ],
-      "original_bbox": [
-        9,
-        230,
-        232,
-        284
-      ],
-      "source_mask_density": 0.41762165753197145,
-      "source_alpha_density": 0.41762165753197145,
-      "localized_bbox": [
-        10,
-        237,
-        231,
-        277
-      ],
-      "source_width": 223,
-      "source_height": 54,
-      "localized_width": 221,
-      "localized_height": 40,
-      "delta_left": 1,
-      "delta_right": 1,
-      "delta_top": 7,
-      "delta_bottom": 7,
-      "containment": "PASS",
-      "size_ceiling": "PASS",
-      "font_size": 37,
-      "stroke_width": 2,
-      "slant": 0.32,
-      "palette": {
-        "fill_top": [
-          57,
-          54,
-          46,
-          255
-        ],
-        "fill_bottom": [
-          57,
-          54,
-          46,
-          255
-        ],
-        "outline": [
-          57,
-          54,
-          46,
-          255
-        ]
-      },
-      "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
-    },
-    {
-      "n": 5,
-      "source": "Big Forest",
-      "korean": "빅 포레스트",
-      "stage_name": true,
-      "discovery_bbox": [
-        2,
-        297,
-        372,
-        368
-      ],
-      "original_bbox": [
-        10,
-        316,
-        362,
-        360
+        662,
+        664,
+        1014,
+        708
       ],
       "source_mask_density": 0.49328512396694213,
       "source_alpha_density": 0.49548037190082644,
       "localized_bbox": [
-        91,
-        317,
-        281,
-        359
+        707,
+        665,
+        969,
+        707
       ],
       "source_width": 352,
       "source_height": 44,
-      "localized_width": 190,
+      "localized_width": 262,
       "localized_height": 42,
-      "delta_left": 81,
-      "delta_right": 81,
+      "delta_left": 45,
+      "delta_right": 45,
       "delta_top": 1,
       "delta_bottom": 1,
       "containment": "PASS",
@@ -323,36 +203,156 @@
       "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
     },
     {
+      "n": 4,
+      "source": "Bay Area",
+      "korean": "베이 에어리어",
+      "stage_name": true,
+      "discovery_bbox": [
+        781,
+        732,
+        1023,
+        807
+      ],
+      "original_bbox": [
+        792,
+        740,
+        1015,
+        794
+      ],
+      "source_mask_density": 0.41762165753197145,
+      "source_alpha_density": 0.41762165753197145,
+      "localized_bbox": [
+        795,
+        746,
+        1012,
+        787
+      ],
+      "source_width": 223,
+      "source_height": 54,
+      "localized_width": 217,
+      "localized_height": 41,
+      "delta_left": 3,
+      "delta_right": 3,
+      "delta_top": 6,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "font_size": 38,
+      "stroke_width": 2,
+      "slant": 0.0,
+      "palette": {
+        "fill_top": [
+          57,
+          54,
+          46,
+          255
+        ],
+        "fill_bottom": [
+          57,
+          54,
+          46,
+          255
+        ],
+        "outline": [
+          57,
+          54,
+          46,
+          255
+        ]
+      },
+      "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
+    },
+    {
+      "n": 5,
+      "source": "Big Forest",
+      "korean": "빅 포레스트",
+      "stage_name": true,
+      "discovery_bbox": [
+        754,
+        805,
+        1023,
+        886
+      ],
+      "original_bbox": [
+        768,
+        813,
+        1015,
+        868
+      ],
+      "source_mask_density": 0.4230401177769599,
+      "source_alpha_density": 0.4305483989694516,
+      "localized_bbox": [
+        773,
+        814,
+        1010,
+        867
+      ],
+      "source_width": 247,
+      "source_height": 55,
+      "localized_width": 237,
+      "localized_height": 53,
+      "delta_left": 5,
+      "delta_right": 5,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "font_size": 49,
+      "stroke_width": 3,
+      "slant": 0.0,
+      "palette": {
+        "fill_top": [
+          57,
+          54,
+          46,
+          255
+        ],
+        "fill_bottom": [
+          57,
+          54,
+          46,
+          255
+        ],
+        "outline": [
+          57,
+          54,
+          46,
+          255
+        ]
+      },
+      "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
+    },
+    {
       "n": 6,
       "source": "Canyon",
       "korean": "캐니언",
       "stage_name": true,
       "discovery_bbox": [
-        1,
-        365,
-        175,
-        447
+        823,
+        881,
+        1023,
+        963
       ],
       "original_bbox": [
-        9,
-        384,
-        165,
-        439
+        833,
+        889,
+        1015,
+        944
       ],
-      "source_mask_density": 0.4398601398601399,
-      "source_alpha_density": 0.4438228438228438,
+      "source_mask_density": 0.4117882117882118,
+      "source_alpha_density": 0.42337662337662335,
       "localized_bbox": [
-        13,
-        385,
-        160,
-        438
+        850,
+        890,
+        997,
+        943
       ],
-      "source_width": 156,
+      "source_width": 182,
       "source_height": 55,
       "localized_width": 147,
       "localized_height": 53,
-      "delta_left": 4,
-      "delta_right": 5,
+      "delta_left": 17,
+      "delta_right": 18,
       "delta_top": 1,
       "delta_bottom": 1,
       "containment": "PASS",
@@ -388,37 +388,37 @@
       "korean": "케이프 웨이",
       "stage_name": true,
       "discovery_bbox": [
-        3,
-        447,
-        658,
-        520
+        756,
+        957,
+        1023,
+        1024
       ],
       "original_bbox": [
-        11,
-        466,
-        648,
-        512
+        766,
+        965,
+        1015,
+        1020
       ],
-      "source_mask_density": 0.44996928537301206,
-      "source_alpha_density": 0.45034468636953107,
+      "source_mask_density": 0.4150419861263235,
+      "source_alpha_density": 0.41861993428258487,
       "localized_bbox": [
-        226,
-        467,
-        432,
-        511
+        767,
+        966,
+        1014,
+        1019
       ],
-      "source_width": 637,
-      "source_height": 46,
-      "localized_width": 206,
-      "localized_height": 44,
-      "delta_left": 215,
-      "delta_right": 216,
+      "source_width": 249,
+      "source_height": 55,
+      "localized_width": 247,
+      "localized_height": 53,
+      "delta_left": 1,
+      "delta_right": 1,
       "delta_top": 1,
       "delta_bottom": 1,
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "font_size": 41,
-      "stroke_width": 2,
+      "font_size": 49,
+      "stroke_width": 3,
       "slant": 0.32,
       "palette": {
         "fill_top": [

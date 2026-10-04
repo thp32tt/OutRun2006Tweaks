@@ -7,10 +7,10 @@
   ],
   "changed_pixels": 45181,
   "changed_bbox": [
-    9,
-    4,
-    648,
-    512
+    376,
+    512,
+    1015,
+    1020
   ],
   "changed_pixels_outside_edit_mask": 0,
   "changed_pixels_in_protected_mask": 0,
