@@ -38,7 +38,7 @@ Required variables:
 Side-by-side test ports:
 
 - noVNC: `http://<N100-IP>:6082/vnc.html`
-- status: `http://<N100-IP>:8789/`
+- status: `http://<N100-IP>:8788/`
 
 ## First deployment rule
 
