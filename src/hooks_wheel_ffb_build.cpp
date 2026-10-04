@@ -59,7 +59,7 @@ namespace Settings
     Setting<int> WheelFFBFeelRevision{
         "WheelFFB", "FeelRevision", 0,
         "Internal one-shot migration version for wheel FFB feel defaults.",
-        Range<int>{ 0, 6 }
+        Range<int>{ 0, 7 }
     };
 }
 
@@ -417,15 +417,15 @@ namespace
         Settings::WheelFFBReversalReleaseRate = 0.30f;
         Settings::WheelFFBRoadTexture = 0.60f;
         Settings::WheelFFBTireSlip = 0.04f;
-        Settings::WheelFFBWallImpact = 0.38f;
+        Settings::WheelFFBWallImpact = 0.55f;
         Settings::WheelFFBGearShift = 0.60f;
         Settings::WheelFFBEngineVibration = false;
         Settings::WheelFFBEngineIdle = 0.20f;
         Settings::WheelFFBUseHardwareSpring = true;
         Settings::WheelFFBUseHardwareDamper = true;
         Settings::WheelFFBUsePeriodicEffects = false;
-        Settings::WheelFFBInvertForce = false;
-        Settings::WheelFFBInvertSpring = false;
+        Settings::WheelFFBInvertForce = true;
+        Settings::WheelFFBInvertSpring = true;
         Settings::WheelFFBDebugLog = true;
         Settings::VibrationMode = 0;
     }
@@ -448,15 +448,15 @@ namespace
         Settings::WheelFFBReversalReleaseRate = 0.30f;
         Settings::WheelFFBRoadTexture = 0.60f;
         Settings::WheelFFBTireSlip = 0.04f;
-        Settings::WheelFFBWallImpact = 0.38f;
+        Settings::WheelFFBWallImpact = 0.55f;
         Settings::WheelFFBGearShift = 0.60f;
         Settings::WheelFFBEngineVibration = false;
         Settings::WheelFFBEngineIdle = 0.20f;
         Settings::WheelFFBUseHardwareSpring = true;
         Settings::WheelFFBUseHardwareDamper = true;
         Settings::WheelFFBUsePeriodicEffects = false;
-        Settings::WheelFFBInvertForce = false;
-        Settings::WheelFFBInvertSpring = false;
+        Settings::WheelFFBInvertForce = true;
+        Settings::WheelFFBInvertSpring = true;
         Settings::WheelFFBDebugLog = true;
         Settings::VibrationMode = 0;
     }
@@ -535,7 +535,28 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
     // the core and must not be pre-shaped by the Modern DD wrapper.
     if (car && ffbModel == WheelFFBMath::Model::ModernDD)
     {
-        const RoadSurfaceProfile surface = sample_surface_profile(car);
+        RoadSurfaceProfile surface = sample_surface_profile(car);
+        {
+            const std::array<unsigned, 4> masks = {
+                surface.surfaceMask[0], surface.surfaceMask[1],
+                surface.surfaceMask[2], surface.surfaceMask[3]
+            };
+            if (WheelFFBMath::primary_asphalt_water_false_positive(
+                    stage.uniqueStage, surface.collisionContext,
+                    masks, surface.waterWheelMask))
+            {
+                surface.minimum = 0.25f;
+                surface.maximum = 0.25f;
+                surface.spread = 0.0f;
+                surface.nonWaterMinimum = 0.25f;
+                surface.nonWaterMaximum = 0.25f;
+                surface.waterWheelMask = 0;
+                surface.validSamples = 4;
+                surface.nonWaterSamples = 4;
+                for (int i = 0; i < 4; ++i)
+                    surface.wheelRoughness[i] = 0.25f;
+            }
+        }
         const bool rawMixedSurface =
             surface.validSamples >= 2 && surface.spread >= 0.08f;
 
@@ -911,6 +932,28 @@ namespace
                 changed = true;
             }
 
+            if (revision < 7)
+            {
+                // R9 hardware log: the selected force model and its required
+                // DirectInput polarity must not be independent state. Modern on
+                // the tested R3 needs both reversals ON; Arcade/Hybrid/PS2 need
+                // both OFF. Use the ConstantForce tactile carrier by default for
+                // all modes because the R3 hardware periodic path was accepted by
+                // the driver but several expected effects were physically absent.
+                const auto model = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                const bool modern = model == WheelFFBMath::Model::ModernDD;
+                Settings::WheelFFBInvertForce = modern;
+                Settings::WheelFFBInvertSpring = modern;
+                Settings::WheelFFBUsePeriodicEffects = false;
+                if (modern &&
+                    nearly(static_cast<float>(Settings::WheelFFBWallImpact), 0.38f))
+                    Settings::WheelFFBWallImpact = 0.55f;
+                Settings::WheelFFBFeelRevision = 7;
+                revision = 7;
+                changed = true;
+            }
+
             if (!changed)
                 return true;
 
@@ -1042,7 +1085,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_physics_preset();
-                    Settings::WheelFFBFeelRevision = 6;
+                    Settings::WheelFFBFeelRevision = 7;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
@@ -1058,7 +1101,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_natural_preset();
-                    Settings::WheelFFBFeelRevision = 6;
+                    Settings::WheelFFBFeelRevision = 7;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))

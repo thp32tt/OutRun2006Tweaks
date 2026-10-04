@@ -553,12 +553,12 @@ namespace WheelProfileStore
             {"SteeringWeight","1.60"}, {"MechanicalTrail","0.30"},
             {"TrailResponseLead","0.40"}, {"PhysicsSAT","true"},
             {"GripLoss","0.65"}, {"LateralDeadzone","1.5"},
-            {"WeightTransfer","0.15"}, {"WallImpact","0.38"},
+            {"WeightTransfer","0.15"}, {"WallImpact","0.55"},
             {"GearShift","0.60"}, {"RoadTexture","0.60"},
             {"TireSlip","0.04"}, {"EngineVibration","false"},
             {"EngineIdle","0.20"}, {"SlewRate","0.12"},
             {"ReversalReleaseRate","0.30"}, {"UsePeriodicEffects","false"},
-            {"InvertForce","false"}, {"InvertSpring","false"},
+            {"InvertForce","true"}, {"InvertSpring","true"},
         };
 
         const auto pick = [&](std::string_view name, std::string_view value)
@@ -579,28 +579,32 @@ namespace WheelProfileStore
             if (auto v=pick("RoadTexture","1.0")) return v;
             if (auto v=pick("WallImpact","1.0")) return v;
             if (auto v=pick("GearShift","1.0")) return v;
-            if (auto v=pick("UsePeriodicEffects","true")) return v;
+            if (auto v=pick("UsePeriodicEffects","false")) return v;
+            if (auto v=pick("InvertForce","false")) return v;
+            if (auto v=pick("InvertSpring","false")) return v;
         }
         else if (model == 2) // Arcade + Modern Hybrid
         {
             if (auto v=pick("Model","2")) return v;
             if (auto v=pick("PhysicsSAT","true")) return v;
-            if (auto v=pick("SpringStrength","0.65")) return v;
-            if (auto v=pick("SpringSaturation","0.95")) return v;
+            if (auto v=pick("SpringStrength","0.22")) return v;
+            if (auto v=pick("SpringSaturation","0.55")) return v;
             if (auto v=pick("DamperStrength","0.28")) return v;
             if (auto v=pick("UseHardwareDamper","true")) return v;
-            if (auto v=pick("SteeringWeight","1.45")) return v;
-            if (auto v=pick("MechanicalTrail","0.25")) return v;
-            if (auto v=pick("TrailResponseLead","0.25")) return v;
+            if (auto v=pick("SteeringWeight","1.60")) return v;
+            if (auto v=pick("MechanicalTrail","0.30")) return v;
+            if (auto v=pick("TrailResponseLead","0.40")) return v;
             if (auto v=pick("GripLoss","0.65")) return v;
             if (auto v=pick("WeightTransfer","0.15")) return v;
-            if (auto v=pick("SlewRate","0.040")) return v;
-            if (auto v=pick("ReversalReleaseRate","0.12")) return v;
+            if (auto v=pick("SlewRate","0.12")) return v;
+            if (auto v=pick("ReversalReleaseRate","0.30")) return v;
             if (auto v=pick("RoadTexture","1.0")) return v;
             if (auto v=pick("WallImpact","1.0")) return v;
             if (auto v=pick("GearShift","1.0")) return v;
-            if (auto v=pick("TireSlip","0.20")) return v;
-            if (auto v=pick("UsePeriodicEffects","true")) return v;
+            if (auto v=pick("TireSlip","0.04")) return v;
+            if (auto v=pick("UsePeriodicEffects","false")) return v;
+            if (auto v=pick("InvertForce","false")) return v;
+            if (auto v=pick("InvertSpring","false")) return v;
         }
         else if (model == 3) // PS2 Original
         {
@@ -610,7 +614,10 @@ namespace WheelProfileStore
             if (auto v=pick("SpringSaturation","0.775")) return v;
             if (auto v=pick("DamperStrength","0.30")) return v;
             if (auto v=pick("RoadTexture","1.0")) return v;
-            if (auto v=pick("UsePeriodicEffects","true")) return v;
+            if (auto v=pick("WallImpact","0.75")) return v;
+            if (auto v=pick("UsePeriodicEffects","false")) return v;
+            if (auto v=pick("InvertForce","false")) return v;
+            if (auto v=pick("InvertSpring","false")) return v;
         }
         else
         {

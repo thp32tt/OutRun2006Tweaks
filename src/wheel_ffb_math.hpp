@@ -273,7 +273,10 @@ namespace WheelFFBMath
     // Keep normal-corner feel unchanged, then add only the missing
     // mechanical/caster self-steer in a large drift. Pneumatic trail and the
     // existing re-grip/return suppression are deliberately untouched.
-    constexpr float DeepSlipMechanicalBoost = 1.50f;
+    // R9 hardware A/B: the R3 log showed plenty of computed deep-slip SAT, but
+    // the wheel did not self-countersteer strongly enough.  Raise only the
+    // mechanical/caster component in deep slip; normal-corner SAT is unchanged.
+    constexpr float DeepSlipMechanicalBoost = 1.70f;
     constexpr float DeepSlipMechanicalStartRad = 0.18f;
     constexpr float DeepSlipMechanicalFullRad = 0.32f;
 
@@ -356,6 +359,89 @@ namespace WheelFFBMath
             proven_primary_rough_road_section(uniqueStage, roadSection);
     }
 
+
+    // R9 runtime-log fix: several water-capable stages report mask 0x2 as a
+    // water material even while every wheel is on the ordinary primary road.
+    // Treat only the unambiguous all-four / collision-context-zero case as the
+    // primary-asphalt false positive. Actual mixed/water contacts remain intact.
+    inline bool primary_asphalt_water_false_positive(
+        int uniqueStage,
+        int collisionContext,
+        const std::array<unsigned, 4>& masks,
+        unsigned waterWheelMask)
+    {
+        // Hardware evidence currently proves this false-positive only on
+        // Imperial Avenue (unique stage 14). Keep other water-capable stages
+        // untouched until their own runtime traces establish the same case.
+        if (uniqueStage != 14 ||
+            collisionContext != 0 || waterWheelMask != 0x0Fu)
+            return false;
+        for (unsigned mask : masks)
+            if (mask != PrimaryAsphaltSurfaceMask)
+                return false;
+        return true;
+    }
+
+    // Common PC/DD contact layer used only to make the physically obvious
+    // 0/1/2/3/4-wheel contact states distinguishable.  It does not replace the
+    // Lindbergh or PS2 source-model effects; those remain the primary model
+    // semantics and this envelope fills otherwise silent curb/transition cases.
+    inline float contact_tactile_envelope(
+        const std::array<float, 4>& wheelRoughness,
+        unsigned waterWheelMask)
+    {
+        float sum = 0.0f;
+        for (int i = 0; i < 4; ++i)
+        {
+            if ((waterWheelMask & (1u << i)) != 0)
+                continue;
+            const float r = std::isfinite(wheelRoughness[i])
+                ? wheelRoughness[i] : 0.25f;
+            const float excess = std::clamp(
+                (r - 0.25f) / 0.60f, 0.0f, 1.0f);
+            sum += std::sqrt(excess);
+        }
+        // Average preserves wheel count, while 2x gain makes a two-wheel curb
+        // clearly tactile without letting full-width rough pavement exceed 1.0.
+        return std::clamp((sum * 0.25f) * 2.0f, 0.0f, 1.0f);
+    }
+
+    inline float common_contact_tactile_amplitude(
+        float contactEnvelope,
+        float speedNorm,
+        float roadSetting,
+        float outputStrength)
+    {
+        if (!std::isfinite(contactEnvelope) || !std::isfinite(speedNorm) ||
+            !std::isfinite(roadSetting) || !std::isfinite(outputStrength))
+            return 0.0f;
+        const float speedGate = smoothstep01(
+            (std::clamp(speedNorm, 0.0f, 1.0f) - 0.04f) / 0.18f);
+        const float roadScale = std::clamp(roadSetting / 0.60f, 0.0f, 1.67f);
+        const float gainScale = std::clamp(outputStrength / 0.70f, 0.0f, 2.0f);
+        return std::clamp(
+            0.28f * std::clamp(contactEnvelope, 0.0f, 1.0f) *
+                speedGate * roadScale * gainScale,
+            0.0f, 0.32f);
+    }
+
+    // Direction-independent collision texture.  The directional rack kick is
+    // still model-owned; this alternating pulse guarantees that a head-on wall
+    // hit is tactile even when the lateral-direction estimator correctly returns
+    // zero.  PS2 uses this as an explicit PC host assist, not a claimed retail
+    // ConstantForce event.
+    inline float collision_tactile_pulse(int impactFrame, float hostScale)
+    {
+        static constexpr std::array<float, 5> Pattern = {
+            0.32f, -0.28f, 0.20f, -0.14f, 0.08f
+        };
+        if (impactFrame < 0 || impactFrame >= static_cast<int>(Pattern.size()))
+            return 0.0f;
+        hostScale = std::isfinite(hostScale)
+            ? std::clamp(hostScale, 0.0f, 1.0f) : 0.0f;
+        return Pattern[static_cast<size_t>(impactFrame)] * hostScale;
+    }
+
     inline float software_road_tactile_frequency(float requestedHz)
     {
         if (!std::isfinite(requestedHz) || requestedHz <= 0.0f) return 0.0f;
@@ -401,11 +487,16 @@ namespace WheelFFBMath
 
     inline float physics_return_relief(float alpha, float steerRate)
     {
-        // Relieve only torque doing positive work on the moving wheel.
-        // Steering centre is irrelevant to front-tyre SAT direction.
+        // Relieve only torque already accelerating the rack in the aligning
+        // direction.  R8's 15% release noticeably hid DD self-countersteer.
+        // Keep a small anti-whip relief in normal corners, but retain nearly all
+        // aligning torque once front slip is large enough to require recovery.
         const float t = -alpha * steerRate > 0.0f
             ? std::clamp(std::abs(steerRate) / 0.08f, 0.0f, 1.0f) : 0.0f;
-        return 1.0f - 0.15f * t*t*(3.0f - 2.0f*t);
+        const float deepSlipT = smoothstep01(
+            (std::abs(alpha) - 0.14f) / 0.12f);
+        const float maxRelief = 0.10f + (0.03f - 0.10f) * deepSlipT;
+        return 1.0f - maxRelief * t*t*(3.0f - 2.0f*t);
     }
 
     using ResponseLUT = std::array<float, 11>;

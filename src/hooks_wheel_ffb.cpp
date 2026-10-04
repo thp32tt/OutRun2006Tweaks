@@ -746,26 +746,50 @@ namespace
 
             float roughness = 0.0f;
             DWORD waterFlag = 0;
-            float wheelRoughness[4]{};
-            bool wheelWater[4]{};
-            for (int i = 0; i < 4; ++i)
-            {
-                DWORD wheelWaterFlag = 0;
-                const float surfaceRoughness = static_cast<float>(sub_1149C0(
-                    car->water_flag_24C[i],
-                    static_cast<int>(car->OnRoadPlace_5C.loadColiType_0),
-                    &wheelWaterFlag));
-                wheelRoughness[i] = std::isfinite(surfaceRoughness)
-                    ? surfaceRoughness : 0.0f;
-                wheelWater[i] = (wheelWaterFlag & 1u) != 0;
-                waterFlag |= wheelWaterFlag;
-                roughness = std::max(roughness, wheelRoughness[i]);
-            }
+            std::array<float, 4> wheelRoughness{};
+            std::array<bool, 4> wheelWater{};
+            std::array<unsigned, 4> surfaceMasks{};
+            unsigned waterWheelMask = 0;
 
             const int stageNumber = Game::GetNowStageNum(8);
             const int uniqueStage = Game::GetStageUniqueNum(stageNumber);
             const int roadSection =
                 static_cast<int>(car->OnRoadPlace_5C.roadSectionNum_8);
+            const int collisionContext =
+                static_cast<int>(car->OnRoadPlace_5C.loadColiType_0);
+
+            for (int i = 0; i < 4; ++i)
+            {
+                surfaceMasks[i] = car->water_flag_24C[i];
+                DWORD wheelWaterFlag = 0;
+                const float surfaceRoughness = static_cast<float>(sub_1149C0(
+                    surfaceMasks[i], collisionContext, &wheelWaterFlag));
+                wheelRoughness[i] = std::isfinite(surfaceRoughness)
+                    ? surfaceRoughness : 0.0f;
+                wheelWater[i] = (wheelWaterFlag & 1u) != 0;
+                if (wheelWater[i])
+                    waterWheelMask |= (1u << i);
+                waterFlag |= wheelWaterFlag;
+                roughness = std::max(roughness, wheelRoughness[i]);
+            }
+
+            // Imperial Avenue and related water-capable stage tables can map
+            // ordinary all-four-wheel mask-0x2 primary road to the water branch.
+            // The hardware log showed that this produced continuous 0.76 roughness
+            // and near-full road vibration across the entire stage.  Correct only
+            // the unambiguous all-primary / all-water / collision-context-zero case.
+            if (WheelFFBMath::primary_asphalt_water_false_positive(
+                    uniqueStage, collisionContext, surfaceMasks, waterWheelMask))
+            {
+                roughness = 0.25f;
+                waterFlag = 0;
+                waterWheelMask = 0;
+                for (int i = 0; i < 4; ++i)
+                {
+                    wheelRoughness[i] = 0.25f;
+                    wheelWater[i] = false;
+                }
+            }
 
             const auto arcade_rough_contact = [&](int i)
             {
@@ -778,15 +802,17 @@ namespace
             const bool rightArcadeRough =
                 arcade_rough_contact(1) || arcade_rough_contact(3);
 
-            // Road texture and tire-slip envelopes.  sub_1149C0 returns
-            // ~0.25 for ordinary asphalt; that is a material baseline, not a
-            // request to vibrate the wheel.  The Xbox routine only enters its
-            // stronger surface branch above roughly 0.30, so remove that
-            // baseline here and ramp rough surfaces from 0.30 -> 0.85.
+            // Preserve per-wheel contact instead of collapsing the entire car to
+            // max(roughness). This makes 0/1/2/3/4-wheel curb/off-road contact
+            // progressively different and gives a two-wheel curb a tactile cue
+            // before the whole car has already crossed into grass.
             const float textureRoughness =
-                std::clamp((roughness - 0.30f) / 0.55f, 0.0f, 1.0f);
+                std::clamp((roughness - 0.25f) / 0.60f, 0.0f, 1.0f);
             const float roadSpeedGate =
                 std::clamp((speedNorm - 0.05f) / 0.20f, 0.0f, 1.0f);
+            const float contactTactileEnvelope =
+                WheelFFBMath::contact_tactile_envelope(
+                    wheelRoughness, waterWheelMask);
 
             bool sawSnowPrimary = false;
             bool sawNonPrimarySnowMix = false;
@@ -805,10 +831,13 @@ namespace
             const float materialRoadTextureScale =
                 snowPrimaryRoad ? SnowIceRoadTextureScale : 1.0f;
 
-            float roadAmp =
-                textureRoughness * roadSpeedGate *
-                static_cast<float>(Settings::WheelFFBRoadTexture) * outputStrength *
-                materialRoadTextureScale;
+            const float configuredRoadDetail = std::clamp(
+                static_cast<float>(Settings::WheelFFBRoadTexture), 0.0f, 1.0f);
+            const float commonContactTactile =
+                WheelFFBMath::common_contact_tactile_amplitude(
+                    contactTactileEnvelope, speedNorm, configuredRoadDetail,
+                    modelOutputStrength) * materialRoadTextureScale;
+            float roadAmp = commonContactTactile;
             float roadFreq = 25.0f + 12.0f * speedNorm;
             float ps2SurfaceEnvelope = 0.0f;
             int ps2RoadRaw = 0;
@@ -934,6 +963,12 @@ namespace
                 arcadeSurfaceTransitionCode_ = -1;
                 lastArcadeSurfaceCode_ = -1;
             }
+
+            // Model-native Arcade/PS2 effects remain authoritative when they are
+            // stronger, but the common DD contact layer fills silent curb/contact
+            // gaps.  In particular, PS2 raw magnitudes below its recovered retail
+            // Type-4 threshold still get a modest PC tactile cue instead of silence.
+            roadAmp = std::max(roadAmp, commonContactTactile);
 
             if (!arcadeEffects && !ps2Original &&
                 waterFlag && roughness > 0.7f && speedNorm > 0.70f && splashTimer_ <= 0)
@@ -3902,6 +3937,16 @@ namespace
             {
                 if (crashImpulseTimer_ > CrashCooldownFrames)
                 {
+                    const int impactFrame =
+                        CrashTimerFrames - crashImpulseTimer_;
+                    // Always provide a short alternating collision texture.
+                    // Directional model-specific kicks are added below. This
+                    // keeps head-on hits tactile when impact direction is zero
+                    // and gives PS2 a clearly-labelled PC host collision cue.
+                    result += WheelFFBMath::collision_tactile_pulse(
+                        impactFrame,
+                        static_cast<float>(Settings::WheelFFBWallImpact));
+
                     if (arcadeEffects)
                     {
                         // OutRun2Real.cpp groups hard wall requests into two
@@ -3909,8 +3954,6 @@ namespace
                         // OutRun2Real profile uses FeedbackLength=80 ms for
                         // ConstantForce. Emit the nearest 60 Hz representation;
                         // the remaining crash timer is collision debounce.
-                        const int impactFrame =
-                            CrashTimerFrames - crashImpulseTimer_;
                         if (impactFrame < WheelFFBMath::ArcadeConstantEventFrames)
                         {
                             result += crashImpactDirection_ * crashArcadeStrength_ *
@@ -3921,25 +3964,20 @@ namespace
                     }
                     else if (ps2Original)
                     {
-                        // Retail SLPM contains a valid directional ConstantForce
-                        // transport capped at 220/255, but the recovered direct
-                        // calls to its two source-float setter write 0/0. No
-                        // non-zero retail event caller has been verified, so do
-                        // not invent a PS2 wall/collision mapping from C2C.
-                        const int impactFrame =
-                            CrashTimerFrames - crashImpulseTimer_;
-                        if (impactFrame == 0 &&
-                            Settings::WheelFFBDebugLog)
+                        // The retail directional ConstantForce caller is still
+                        // unverified, so PS2 does not synthesize a directional
+                        // rack kick. The shared alternating pulse above is an
+                        // explicit PC/DD tactile assist, not a PS2-original claim.
+                        if (impactFrame == 0 && Settings::WheelFFBDebugLog)
                         {
                             spdlog::info(
-                                "WheelFFB PS2: C2C collision detected; no verified non-zero retail ConstantForce caller, event output suppressed");
+                                "WheelFFB PS2: C2C collision detected; retail directional ConstantForce remains suppressed, shared host tactile pulse active");
                         }
                     }
                     else
                     {
                         // Modern DD uses a short kick/rebound so an impact
                         // remains tactile without holding the rack to one side.
-                        const int impactFrame = CrashTimerFrames - crashImpulseTimer_;
                         if (impactFrame < 3)
                             result += crashImpulseForce_;
                         else if (impactFrame < 6)
