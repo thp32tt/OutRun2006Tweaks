@@ -5,11 +5,11 @@
     2048,
     2048
   ],
-  "changed_pixels": 108078,
+  "changed_pixels": 114436,
   "changed_bbox": [
-    50,
-    10,
-    1787,
+    48,
+    14,
+    1791,
     1979
   ],
   "changed_pixels_outside_edit_mask": 0,
