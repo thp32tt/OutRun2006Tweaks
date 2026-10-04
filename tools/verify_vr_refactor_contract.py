@@ -16,6 +16,7 @@ def text(rel: str) -> str:
 
 r22 = text("src/vr/d3d9/stereo_renderer_r22.cpp")
 r23 = text("src/vr/d3d9/stereo_renderer_r23.cpp")
+r13 = text("src/vr/d3d9/stereo_renderer_r13.cpp")
 r29 = text("src/vr/d3d9/stereo_renderer_r29.cpp")
 r26 = text("src/vr/d3d9/stereo_renderer_r26.cpp")
 r31 = text("src/vr/d3d9/stereo_renderer_r31.cpp")
@@ -378,6 +379,15 @@ for marker in (
             f"R32 missing R29 recovery-safety owner API: {marker}")
 if "SetStereoRecoverySafetyThroughEpoch(" not in r29:
     errors.append("R29 missing exact-epoch recovery-safety owner API")
+
+for banned in ("R13InstallState", "R13InstallReady", "R13InstallFailed"):
+    if banned in r32:
+        errors.append(
+            f"R32 retained direct R13 install-state dependency: {banned}")
+if "R13InstallStatus()" not in r13:
+    errors.append("R13 missing install-state owner query API")
+if "R13InstallStatus()" not in r32:
+    errors.append("R32 missing R13 install-state owner query")
 
 for banned in ("R22InstallState", "R31InstallState"):
     if banned in r32:
