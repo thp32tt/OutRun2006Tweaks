@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION51-PREFLIGHT",
+  "queue_index": 132,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+  "source_sha256": "3656adbd699b7852cb5fcf4bb01fc4f1f65bbd9d7d39e12e7a1c2ac5a49fef1d",
+  "historical_sha256": "a775eff64b49ac61f107a55ab0233f89fc6cdaa0bfd6e97d3fa5aa112180dc45",
+  "structure": {
+    "width": 1024,
+    "height": 512,
+    "format": "RGBA32",
+    "mipmaps": 1
+  },
+  "status": "PREFLIGHT_ORIENTATION_VISUAL_REQUIRED_SAME_INVOCATION",
+  "candidate_written": false,
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
