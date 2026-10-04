@@ -85,7 +85,7 @@ def main():
         sel=np.all(q==mode,axis=1).reshape(h,w)
         bg=np.median(roi[sel],axis=0) if np.any(sel) else np.median(roi.reshape(-1,4),axis=0)
         dist=np.sqrt(np.sum((roi[:,:,:3]-bg[:3])**2,axis=2))
-        core=(dist>14)&(roi[:,:,3]>max(8,bg[3]*0.20))
+        core=(dist>14)
         core[:2,:]=0;core[-2:,:]=0;core[:,:2]=0;core[:,-2:]=0
         ll,nn=ndimage.label(core,np.ones((3,3),dtype=np.uint8)); kept=np.zeros_like(core)
         for j in range(1,nn+1):
@@ -101,7 +101,7 @@ def main():
         # Join adjacent glyph fragments before recovering antialias/effect fringe.
         joined=np.asarray(Image.fromarray((kept.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0
         near=np.asarray(Image.fromarray((joined.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(5)))>0
-        sm_local=near & (dist>4) & (roi[:,:,3]>3)
+        sm_local=near & (dist>4)
         yy,xx=np.nonzero(sm_local)
         if len(xx)<30: raise RuntimeError(("source text mask too small",idx,cell,int(len(xx)),bg.tolist()))
         bb=[x0+int(xx.min()),y0+int(yy.min()),x0+int(xx.max())+1,y0+int(yy.max())+1]
@@ -110,7 +110,9 @@ def main():
         sm=np.zeros((H,W),bool);sm[y0:y1,x0:x1]=sm_local;sms.append(sm);full|=sm
         rows.append({"n":idx,"source":en,"korean":ko,"historical_hint_bbox":cell,"measurement_cell":[x0,y0,x1,y1],
                      "original_bbox":bb,"source_effect_pixels":int(len(xx)),"mask_density":dens,
-                     "background_rgba":[float(v) for v in bg]})
+                     "background_rgba":[float(v) for v in bg],
+                     "source_effect_alpha_min":int(np.min(sa[sm,3])),"source_effect_alpha_max":int(np.max(sa[sm,3])),
+                     "source_effect_alpha_median":float(np.median(sa[sm,3]))})
 
     for i in range(4):
         for j in range(i+1,4):
