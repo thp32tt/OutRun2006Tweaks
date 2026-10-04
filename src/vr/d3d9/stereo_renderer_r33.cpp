@@ -38,9 +38,6 @@ namespace OutRunVRStereo
         SafetyHookInline R33DrawPrimitiveUPR32Hook{};
         SafetyHookInline R33DrawIndexedPrimitiveUPR32Hook{};
 
-        std::atomic<OutRunVR::RuntimeEligibility::InstallState> R33InstallState{
-            OutRunVR::RuntimeEligibility::InstallState::Pending };
-
         struct R33DepthStencilWriteState
         {
             DWORD zEnable = D3DZB_TRUE;
@@ -1005,13 +1002,11 @@ namespace OutRunVRStereo
         DWORD WINAPI R33InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
-            R33InstallState.store(State::Pending, std::memory_order_release);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 const auto r32 = R32InstallStatus();
                 if (r32 == State::Failed)
                 {
-                    R33InstallState.store(State::Failed, std::memory_order_release);
                     R33ReportInstallResult(false);
                     return 0;
                 }
@@ -1043,8 +1038,6 @@ namespace OutRunVRStereo
                     if (!R33EnableHooks())
                     {
                         R33RollbackHooks();
-                        R33InstallState.store(State::Failed,
-                            std::memory_order_release);
                         R33ReportInstallResult(false);
                         spdlog::error(
                             "VR R33: final reset/state/draw hook transaction was partial; corrected R32 remains authoritative");
@@ -1056,7 +1049,6 @@ namespace OutRunVRStereo
                     if (installedDevice)
                         R33SynchronizeResetReplayGuardState(installedDevice);
 
-                    R33InstallState.store(State::Ready, std::memory_order_release);
                     R33ReportInstallResult(true);
                     spdlog::info(
                         "VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY; top-level telemetry counted once when enabled; corrected R32->R22 Reset lifecycle + depth/stencil cache ACTIVE");
@@ -1065,7 +1057,6 @@ namespace OutRunVRStereo
                 Sleep(25);
             }
 
-            R33InstallState.store(State::Failed, std::memory_order_release);
             R33ReportInstallResult(false);
             return 0;
         }
@@ -1084,9 +1075,6 @@ namespace OutRunVRStereo
                     nullptr, 0, R33InstallThread, nullptr, 0, nullptr);
                 if (!thread)
                 {
-                    R33InstallState.store(
-                        OutRunVR::RuntimeEligibility::InstallState::Failed,
-                        std::memory_order_release);
                     R33ReportInstallResult(false);
                     return false;
                 }
