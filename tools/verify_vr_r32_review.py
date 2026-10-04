@@ -260,6 +260,7 @@ r33_guard = require(
     "SetExternalSafetyBlock(!healthy)",
     "R33SynchronizeResetReplayGuardState(",
     "R33ReportInstallResult(",
+    "R9TrackedMainDepthHasStencil()",
     "Present/pre",
     "R33PresentR32Hook.stdcall<HRESULT>",
 )
@@ -272,8 +273,14 @@ for banned in (
         "class VRStereoR34ResetGuardHook",
         "OpenXRVRStereoR34ResetGuard",
         "R33InstallStatus()",
-        "R33InstallState"):
+        "R33InstallState",
+        "R9MainDepthKnown",
+        "R9MainDepthIdentity",
+        "R9MainDepthDesc"):
     if banned in r33_guard:
+        if banned.startswith("R9MainDepth"):
+            raise SystemExit(
+                f"R33 retained direct R9 main-depth metadata dependency: {banned}")
         raise SystemExit(
             f"R33 retained retired R34 compatibility observer/status alias: {banned}")
 

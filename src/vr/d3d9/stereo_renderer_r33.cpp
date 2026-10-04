@@ -179,14 +179,6 @@ namespace OutRunVRStereo
             R33DepthStencilState.valid = false;
         }
 
-        bool R33TrackedDepthHasStencil() noexcept
-        {
-            if (!TrackedDepthStencil || !R9MainDepthKnown ||
-                TrackedDepthStencil != R9MainDepthIdentity)
-                return false;
-            return FormatHasStencil(R9MainDepthDesc.Format);
-        }
-
         bool R33ReadDepthStencilWriteState(IDirect3DDevice9* device) noexcept
         {
             if (!device)
@@ -214,7 +206,7 @@ namespace OutRunVRStereo
                 return false;
             }
 
-            if (R33TrackedDepthHasStencil())
+            if (R9TrackedMainDepthHasStencil())
             {
                 if (FAILED(device->GetRenderState(
                         D3DRS_STENCILENABLE, &next.stencilEnable)) ||
@@ -297,7 +289,7 @@ namespace OutRunVRStereo
             const auto& s = R33DepthStencilState;
             mayWriteDepth = s.zEnable != D3DZB_FALSE && s.zWrite != FALSE;
 
-            if (!R33TrackedDepthHasStencil() || s.stencilEnable == FALSE ||
+            if (!R9TrackedMainDepthHasStencil() || s.stencilEnable == FALSE ||
                 s.stencilWriteMask == 0)
                 return true;
 

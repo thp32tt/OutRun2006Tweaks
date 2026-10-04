@@ -987,6 +987,13 @@ namespace OutRunVRStereo
 		return R9MainDepthGeneration;
 	}
 
+	inline bool R9TrackedMainDepthHasStencil() noexcept
+	{
+		return TrackedDepthStencil && R9MainDepthKnown &&
+			TrackedDepthStencil == R9MainDepthIdentity &&
+			FormatHasStencil(R9MainDepthDesc.Format);
+	}
+
 	inline void R9SynchronizeDepthContentSerials() noexcept
 	{
 		std::uint64_t serial = std::max(

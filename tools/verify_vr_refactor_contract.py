@@ -138,6 +138,18 @@ for rel, source in (("R20", r20), ("R23", r23), ("R33", r33)):
 if "R9MainDepthGenerationValue()" not in r9:
     errors.append("R9 missing main-depth generation owner query API")
 
+# Post-1000 R33 owner-boundary continuation: the final dispatcher may ask R9
+# whether the currently tracked main depth carries stencil, but must not read
+# R9's private identity/descriptor/known-state tuple directly.
+if "inline bool R9TrackedMainDepthHasStencil() noexcept" not in r9:
+    errors.append("R9 missing tracked-main-depth stencil owner query API")
+if "R9TrackedMainDepthHasStencil()" not in r33:
+    errors.append("R33 missing R9 tracked-main-depth stencil owner query")
+for banned in ("R9MainDepthKnown", "R9MainDepthIdentity", "R9MainDepthDesc"):
+    if banned in r33:
+        errors.append(
+            f"R33 retained direct R9 main-depth metadata dependency: {banned}")
+
 if "R9DrawCalls" in r20:
     errors.append("R20 retained direct R9 draw-count dependency")
 if "R9DrawCallCount()" not in r20:
