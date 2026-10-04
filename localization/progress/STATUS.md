@@ -709,16 +709,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - C88 modified no DDS. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_C/20261004-1529-C88/C88_RECOVERY_FINAL_QA.json.
 
-
-## 2026-10-04 16:04 KST — CPU compute offload policy
-- Reassigned N100 to orchestration-first duty. Full-resolution DDS/Pillow/NumPy rendering and static pixel QA are off-host by default when repository inputs are available.
-- Added GitHub-hosted `Localization CPU Worker` execution for deterministic A/B/C role scripts under `tools/localization/cpu_jobs/`; worker outputs are restricted to candidate/evidence paths and cannot update shared controller state.
-- ChatGPT native sandbox remains preferred for analysis/compute that does not require large binary write-back. N100 heavy-Python is fallback-only for local-only/runtime inputs or hosted-worker failure.
-- Execution placement only; queue parity, quality gates, VR/FFB/DX11/DXVK exclusions, and runtime-validation semantics are unchanged.
-
-
-### CPU worker smoke verification
-- GitHub Actions run `37184959349` completed **SUCCESS** from trigger commit `10aa51fe3d46ba229be29b60dfd66937d8353ed8`.
-- Hosted worker identified itself as `github-actions` on Azure Linux with 4 logical CPUs; Python dependencies loaded successfully and a 4096x4096 NumPy/Pillow smoke transform completed.
-- Worker output was committed back to the recovery branch as `96da1ec2354261de5ac1374240875a0ff7396411`; evidence: `localization/graphics/worker_results/CPU_WORKER_SMOKE_20261004.json`.
-- This verifies the off-N100 compute/write-back path end to end. Existing role invocations already in progress before the policy change may finish on N100; subsequent runs must use the new placement policy.
+## 2026-10-04 16:00 KST — C89 568D3696 corrective final QA
+- Continued from remote C88 and did not repeat C88-completed FA7BBB13 / C075FB49 / 2DA43E41 review.
+- Corrected the C88 568D3696 clean-plate evidence defect: the persisted source-text mask overlapped the protected separator/artwork edge by 856 pixels at [545,2160,2446,2165].
+- C removed those 856 protected pixels from the source-text mask and restored the exact HD source pixels at the same positions in the clean plate. The deployable DDS itself was not changed.
+- Corrected clean-plate validator: PASS, changed pixels outside edit mask = 0, protected changes = 0, alpha changes outside = 0.
+- Exact-source final candidate validator: PASS, outside/protected/alpha = 0. The corrected clean plate plus current final pixels inside the allowed text-region mask reconstructs the current decoded candidate exactly (0 differing pixels).
+- C88 unchanged-candidate gates remain valid: 14/14 bbox PASS, all 6 former C85 bbox failures fixed, 8/8 prior-PASS elements exact.
+- Decision: C89_PIXEL_VISUAL_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED; no in-game claim and no VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261004-1600-C89/.

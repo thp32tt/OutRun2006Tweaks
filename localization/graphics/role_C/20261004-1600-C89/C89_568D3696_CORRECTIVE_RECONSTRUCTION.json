@@ -1,0 +1,52 @@
+{
+  "source_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+  "candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+  "header_128_exact": true,
+  "source_text_protected_overlap_before": 856,
+  "source_text_protected_overlap_after": 0,
+  "corrected_pixels_restored_from_exact_source": 856,
+  "corrected_clean_plate_vs_original_a_clean_plate_changed_pixels": 856,
+  "allowed_text_protected_overlap": 0,
+  "reconstructed_final_diff_pixels": 0,
+  "reconstructed_final_exact_to_current_candidate_decoded_rgba": true,
+  "corrected_clean_plate_full_png_sha256": "4f737ea386d83156bbee06aaf39ae468bb3e58d998a9f448bcc2e04defca7c65",
+  "corrected_clean_plate_rgba_sha256": "6095723e283956f82e1543606cff92e280ac7c7c34f39908c19fb707deca0f9f",
+  "corrected_clean_plate_storage": {
+    "mode": "lossless_vertical_tiles",
+    "assembly": "stack tiles 0..3 at y=0,1024,2048,3072",
+    "tiles": [
+      {
+        "index": 0,
+        "y0": 0,
+        "y1": 1024,
+        "path": "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_CORRECTED_TILE_0.png",
+        "sha256": "02dc8e14ec061150278850d5171bde1837fd45b9db355f388af720980f4293df",
+        "bytes": 1579629
+      },
+      {
+        "index": 1,
+        "y0": 1024,
+        "y1": 2048,
+        "path": "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_CORRECTED_TILE_1.png",
+        "sha256": "3805db891443ac7c2d7ee5ee28edf9658df901d6b6dc32cc42b1dcf3485007bd",
+        "bytes": 1087512
+      },
+      {
+        "index": 2,
+        "y0": 2048,
+        "y1": 3072,
+        "path": "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_CORRECTED_TILE_2.png",
+        "sha256": "647054732e48b93dfe9b1bbe01ea375d0249200940f7860ee7ecf2f0beb9309d",
+        "bytes": 580213
+      },
+      {
+        "index": 3,
+        "y0": 3072,
+        "y1": 4096,
+        "path": "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_CORRECTED_TILE_3.png",
+        "sha256": "8d98a178ca7d714dc33449b1694bfdee0813be041a384f64fb302dc9eb061fd0",
+        "bytes": 1083660
+      }
+    ]
+  }
+}

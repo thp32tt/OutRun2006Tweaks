@@ -1,0 +1,27 @@
+{
+  "source": "/tmp/c89qa/source.png",
+  "candidate": "C89 corrected clean plate (lossless 4-tile persisted evidence; full image validated locally)",
+  "size": [
+    4096,
+    4096
+  ],
+  "changed_pixels": 1203624,
+  "changed_bbox": [
+    545,
+    16,
+    3685,
+    3396
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "status": "PASS",
+  "candidate_full_png_sha256": "4f737ea386d83156bbee06aaf39ae468bb3e58d998a9f448bcc2e04defca7c65",
+  "candidate_rgba_sha256": "6095723e283956f82e1543606cff92e280ac7c7c34f39908c19fb707deca0f9f",
+  "candidate_tiles": [
+    "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_CORRECTED_TILE_0.png",
+    "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_CORRECTED_TILE_1.png",
+    "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_CORRECTED_TILE_2.png",
+    "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_CORRECTED_TILE_3.png"
+  ]
+}

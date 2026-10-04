@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "run": "20261004-1600-C89",
+  "role": "C",
+  "timestamp_kst": "2026-10-04T16:00:34+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "base_head": "4c4846d4b8dc544ff6c612ae1cfb729832ce8642",
+  "scope": {
+    "reason": "Small C corrective rework for the C88 568D3696 clean-plate protected-pixel failure; completed C88 assets were not repeated.",
+    "asset": "568D3696",
+    "queue_index": 53
+  },
+  "source": {
+    "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+    "sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813"
+  },
+  "candidate": {
+    "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+    "sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+    "changed_by_c": false
+  },
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "DXT5",
+    "mipmaps": 13,
+    "header_128_exact_to_source": true,
+    "raw_orientation": "mirror_y"
+  },
+  "c88_defect": {
+    "decision": "REWORK_REQUIRED_CLEAN_PLATE_PROTECTED_DAMAGE",
+    "source_text_protected_overlap_pixels": 856,
+    "protected_change_bbox": [
+      545,
+      2160,
+      2446,
+      2165
+    ],
+    "final_candidate_validator": "PASS"
+  },
+  "c89_corrective_rework": {
+    "source_text_mask_correction": "remove all pixels also marked protected",
+    "protected_overlap_removed_pixels": 856,
+    "corrected_source_text_protected_overlap_pixels": 0,
+    "clean_plate_correction": "restore exact HD source pixels only at the 856-pixel protected overlap",
+    "corrected_clean_plate_changed_pixels_vs_a_clean_plate": 856,
+    "corrected_mask": "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_SOURCE_TEXT_MASK_CORRECTED.png",
+    "corrected_clean_plate_storage": {
+      "mode": "lossless_vertical_tiles",
+      "assembly": "stack tiles 0..3 at y=0,1024,2048,3072",
+      "full_png_sha256": "4f737ea386d83156bbee06aaf39ae468bb3e58d998a9f448bcc2e04defca7c65",
+      "full_rgba_sha256": "6095723e283956f82e1543606cff92e280ac7c7c34f39908c19fb707deca0f9f",
+      "tiles": [
+        "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_CORRECTED_TILE_0.png",
+        "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_CORRECTED_TILE_1.png",
+        "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_CORRECTED_TILE_2.png",
+        "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_CORRECTED_TILE_3.png"
+      ]
+    }
+  },
+  "validation": {
+    "inherited_unchanged_candidate_bbox_gate": "C88_PASS_14_OF_14",
+    "inherited_c85_failure_gate": "C88_PASS_6_OF_6",
+    "inherited_prior_pass_exact_gate": "C88_PASS_8_OF_8",
+    "corrected_clean_plate": {
+      "status": "PASS",
+      "changed_pixels": 1203624,
+      "changed_pixels_outside_edit_mask": 0,
+      "changed_pixels_in_protected_mask": 0,
+      "alpha_changed_outside_edit_mask": 0,
+      "report": "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CLEAN_PLATE_VALIDATION.json"
+    },
+    "final_candidate": {
+      "status": "PASS",
+      "changed_pixels": 1556410,
+      "changed_pixels_outside_edit_mask": 0,
+      "changed_pixels_in_protected_mask": 0,
+      "alpha_changed_outside_edit_mask": 0,
+      "report": "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_FINAL_VALIDATION.json"
+    },
+    "pipeline_reconstruction": {
+      "method": "corrected clean plate + current candidate pixels inside allowed text-region mask",
+      "decoded_rgba_diff_pixels_vs_current_candidate": 0,
+      "exact": true,
+      "report": "localization/graphics/role_C/20261004-1600-C89/C89_568D3696_CORRECTIVE_RECONSTRUCTION.json"
+    },
+    "visual_qa": "PASS_CORRECTED_PROTECTED_SEPARATOR_RESTORED"
+  },
+  "c_decision": "C89_PIXEL_VISUAL_PASS_PENDING_INGAME",
+  "runtime_validation": "UNTESTED",
+  "in_game_claimed": false,
+  "vr_ffb_dx11_dxvk_changes": false
+}
