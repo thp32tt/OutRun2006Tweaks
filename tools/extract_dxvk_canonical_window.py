@@ -6,9 +6,11 @@ from __future__ import annotations
 import argparse
 import ast
 import hashlib
+import importlib.util
 import json
 import re
 import struct
+import sys
 from pathlib import Path
 from typing import Sequence
 
@@ -19,6 +21,20 @@ _PROOF_RE = re.compile(
 _CONST_RE = re.compile(
     r"^GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_(\d+)_(INCOMPLETE_RVA|PREFIX_END_RVA)$"
 )
+
+_F124_FRONTIER_CONTINUATION_ID = 95
+_F124_START_RVA = 0x00183A0C
+_F124_END_RVA = 0x00183A4C
+_F124_OVERLAP_BYTES = bytes.fromhex("83")
+_F124_EXPECTED_BYTES = bytes.fromhex(
+    "83 fa 20 88 4c 02 04 73 25 80 7d 0f 00 75 0e 8b "
+    "ca bb 00 00 00 80 d3 eb 8b 4d 08 09 19 bb 00 00 "
+    "00 80 8b ca d3 eb 8d 44 b8 44 09 18 eb 29 80 7d "
+    "0f 00 75 10 8d 4a e0 bb 00 00 00 80 d3 eb 8b 4d"
+)
+_F124_INHERITED_FORWARD_TARGETS = [0x00183A63, 0x00183B6F]
+_F124_PREDECESSOR_STATUS = "EXACT_1839CD_TO_183A0C_CONTROL_FLOW_WITH_183A0C_CUT_EDGE_PROVEN"
+_F124_CAPTURE_STATUS = "EXACT_EXE_183A0C_TO_183A4C_PROVENANCE_CAPTURED"
 
 
 def discover_frontier_rva(source_path: Path) -> dict:
@@ -189,6 +205,76 @@ def extract_window(
     }
 
 
+def _load_frontier_analyzer(source_path: Path):
+    module_name = "_dxvk_frontier_analyzer"
+    spec = importlib.util.spec_from_file_location(module_name, source_path)
+    if spec is None or spec.loader is None:
+        raise ValueError(f"cannot import frontier analyzer: {source_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.modules.pop(module_name, None)
+    return module
+
+
+def validate_f124_frontier_contract(
+    *, frontier: dict, payload: dict, exe_path: Path, source_path: Path, length: int
+) -> dict:
+    """Fail closed on F124 raw provenance without semantic promotion."""
+    if frontier.get("continuation_id") != _F124_FRONTIER_CONTINUATION_ID:
+        return {}
+    actual = bytes.fromhex(payload.get("bytes_hex", ""))
+    if (
+        frontier.get("rva") != _F124_START_RVA
+        or length != len(_F124_EXPECTED_BYTES)
+        or payload.get("rva_start") != f"0x{_F124_START_RVA:08X}"
+        or payload.get("rva_end_exclusive") != f"0x{_F124_END_RVA:08X}"
+        or payload.get("section") != ".text"
+        or not actual.startswith(_F124_OVERLAP_BYTES)
+        or actual != _F124_EXPECTED_BYTES
+    ):
+        raise ValueError("F124 canonical frontier contract mismatch")
+
+    analyzer = _load_frontier_analyzer(source_path)
+    pe = analyzer.parse_pe(exe_path.read_bytes())
+    predecessor = analyzer.collect_guarded_gf_target_c_helper_1_third_callee_continuation_95_prefix_proof(pe)
+    if (
+        predecessor.get("status") != _F124_PREDECESSOR_STATUS
+        or predecessor.get("prefix_end_rva") != _F124_START_RVA
+        or predecessor.get("incomplete_rva") != _F124_START_RVA
+        or predecessor.get("incomplete_expected_bytes") != _F124_OVERLAP_BYTES.hex(" ")
+        or predecessor.get("incomplete_actual_bytes") != _F124_OVERLAP_BYTES.hex(" ")
+        or not predecessor.get("incomplete_matches")
+        or not predecessor.get("capture_edge_matches")
+        or predecessor.get("unresolved_forward_targets") != _F124_INHERITED_FORWARD_TARGETS
+    ):
+        raise ValueError("F124 predecessor proof/debt mismatch")
+
+    inbound = analyzer.collect_raw_inbound_rel32_candidates(pe, _F124_START_RVA)
+    outbound = analyzer.collect_raw_rel32_call_candidates(pe, _F124_START_RVA, length)
+    if inbound or outbound:
+        raise ValueError("F124 raw rel32 census is not empty")
+
+    return {
+        "frontier_contract_status": _F124_CAPTURE_STATUS,
+        "frontier_predecessor_status": predecessor["status"],
+        "frontier_overlap_bytes": _F124_OVERLAP_BYTES.hex(" "),
+        "frontier_overlap_matches": True,
+        "frontier_exact_bytes_match": True,
+        "frontier_inherited_unresolved_forward_targets": [
+            f"0x{rva:08X}" for rva in _F124_INHERITED_FORWARD_TARGETS
+        ],
+        "frontier_raw_inbound_rel32_count": 0,
+        "frontier_raw_outbound_rel32_count": 0,
+        "frontier_semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+        "frontier_call_semantics": "UNRESOLVED",
+        "frontier_ownership_effect": "NONE",
+        "frontier_runtime_validation": "UNTESTED",
+    }
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--exe", type=Path, required=True)
@@ -218,6 +304,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         payload["frontier_continuation_id"] = frontier["continuation_id"]
         payload["frontier_basis"] = frontier["basis"]
         payload["frontier_source"] = str(args.frontier_source)
+        payload.update(
+            validate_f124_frontier_contract(
+                frontier=frontier,
+                payload=payload,
+                exe_path=args.exe,
+                source_path=args.frontier_source,
+                length=args.length,
+            )
+        )
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",

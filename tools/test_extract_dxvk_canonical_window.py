@@ -136,6 +136,27 @@ class FrontierDiscoveryTests(unittest.TestCase):
             self.assertEqual(result["rva"], 0x2000)
             self.assertEqual(result["basis"], "PREFIX_END_RVA")
 
+    def test_f124_contract_metadata_is_pinned(self):
+        self.assertEqual(sut._F124_FRONTIER_CONTINUATION_ID, 95)
+        self.assertEqual(sut._F124_START_RVA, 0x00183A0C)
+        self.assertEqual(sut._F124_END_RVA, 0x00183A4C)
+        self.assertEqual(sut._F124_OVERLAP_BYTES, bytes.fromhex("83"))
+        self.assertEqual(len(sut._F124_EXPECTED_BYTES), 64)
+        self.assertEqual(
+            sut._F124_INHERITED_FORWARD_TARGETS,
+            [0x00183A63, 0x00183B6F],
+        )
+
+    def test_f124_nonmatching_frontier_is_not_promoted(self):
+        result = sut.validate_f124_frontier_contract(
+            frontier={"continuation_id": 94, "rva": 0x001839CD},
+            payload={},
+            exe_path=Path("unused"),
+            source_path=Path("unused"),
+            length=64,
+        )
+        self.assertEqual(result, {})
+
 
 if __name__ == "__main__":
     unittest.main()
