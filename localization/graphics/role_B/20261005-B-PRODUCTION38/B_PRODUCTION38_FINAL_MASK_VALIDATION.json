@@ -1,0 +1,19 @@
+{
+  "source": "/tmp/1A43_source.png",
+  "candidate": "/tmp/1A43_final.png",
+  "size": [
+    2048,
+    256
+  ],
+  "changed_pixels": 176474,
+  "changed_bbox": [
+    387,
+    13,
+    1589,
+    245
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "status": "PASS"
+}
