@@ -74,8 +74,8 @@ namespace OutRunVRStereo
             // per Present plus a sparse 64-draw bound covers StateBlock::Apply,
             // which can bypass the setter hook, without four getters per draw.
             if (R29Effect.valid && R29Effect.presentEpoch == PresentEpoch &&
-                R23GameDrawSerial >= R29Effect.drawSerial &&
-                R23GameDrawSerial - R29Effect.drawSerial < 64)
+                TopLevelDrawSerial() >= R29Effect.drawSerial &&
+                TopLevelDrawSerial() - R29Effect.drawSerial < 64)
                 return true;
 
             DWORD alphaBlend = FALSE;
@@ -102,7 +102,7 @@ namespace OutRunVRStereo
             R29Effect.cullMode = cullMode;
             R29Effect.valid = true;
             R29Effect.presentEpoch = PresentEpoch;
-            R29Effect.drawSerial = R23GameDrawSerial;
+            R29Effect.drawSerial = TopLevelDrawSerial();
             ++R29EffectStateSyncs;
             return true;
         }
@@ -453,7 +453,7 @@ namespace OutRunVRStereo
             if (R29Effect.valid)
             {
                 R29Effect.presentEpoch = PresentEpoch;
-                R29Effect.drawSerial = R23GameDrawSerial;
+                R29Effect.drawSerial = TopLevelDrawSerial();
             }
             return hr;
         }
@@ -599,8 +599,8 @@ namespace OutRunVRStereo
         out = {};
         if (!R29Effect.valid ||
             R29Effect.presentEpoch != PresentEpoch ||
-            R23GameDrawSerial < R29Effect.drawSerial ||
-            R23GameDrawSerial - R29Effect.drawSerial >= 64)
+            TopLevelDrawSerial() < R29Effect.drawSerial ||
+            TopLevelDrawSerial() - R29Effect.drawSerial >= 64)
             return false;
 
         out.alphaBlend = R29Effect.alphaBlend;
