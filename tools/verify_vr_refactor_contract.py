@@ -618,6 +618,8 @@ if "R32InstallStatus()" not in r33:
     errors.append("R33 missing R32 install-state owner query")
 if "R33InstallStatus()" in r33:
     errors.append("R33 retained obsolete compatibility-only install-status observer API")
+if "R33InstallState" in r33:
+    errors.append("R33 retained write-only final install state after observer retirement")
 
 # Post-1000 hook-chain flattening: all former R34 runtime responsibilities are
 # owned by R33. The source shim and historical R34 compatibility Hook/status
@@ -751,14 +753,11 @@ else:
     install_body = r33[install_start:install_end]
     sync_pos = install_body.find(
         "R33SynchronizeResetReplayGuardState(installedDevice)")
-    ready_pos = install_body.find(
-        "R33InstallState.store(State::Ready", sync_pos)
     publish_pos = install_body.find(
-        "R33ReportInstallResult(true)", ready_pos)
-    if min(sync_pos, ready_pos, publish_pos) < 0 or not (
-            sync_pos < ready_pos < publish_pos):
+        "R33ReportInstallResult(true)", sync_pos)
+    if min(sync_pos, publish_pos) < 0 or not (sync_pos < publish_pos):
         errors.append(
-            "R33 must synchronize replay-health before Ready and terminal publication")
+            "R33 must synchronize replay-health before terminal publication")
 
 
 fail_closed_depth = re.search(

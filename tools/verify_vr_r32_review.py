@@ -271,7 +271,8 @@ if r34_path.exists():
 for banned in (
         "class VRStereoR34ResetGuardHook",
         "OpenXRVRStereoR34ResetGuard",
-        "R33InstallStatus()"):
+        "R33InstallStatus()",
+        "R33InstallState"):
     if banned in r33_guard:
         raise SystemExit(
             f"R33 retained retired R34 compatibility observer/status alias: {banned}")
