@@ -9938,6 +9938,55 @@ def main() -> None:
             + ", ".join(missing_r251_programmable_nonindexed_direct_dispatch)
         )
 
+    r252_programmable_indexed_direct_dispatch_contract = [
+        ("struct NativeProgrammableShaderIndexedDirectDispatchReadiness",
+         NATIVE_BACKEND_HPP, "R252 programmable indexed dispatch readiness type"),
+        ("indexed_direct_dispatch_readiness(",
+         NATIVE_BACKEND_HPP, "R252 indexed dispatch readiness declaration"),
+        ("validate_indexed_direct_dispatch_snapshot(",
+         NATIVE_BACKEND_HPP, "R252 indexed dispatch snapshot validator"),
+        ("direct_draw_element_count(primitiveType, primitiveCount, indexCount)",
+         NATIVE_BACKEND_CPP, "R252 exact indexed primitive-count translation"),
+        ("out.sourceVertexRangeExact =",
+         NATIVE_BACKEND_CPP, "R252 declared D3D9 source-vertex range gate"),
+        ("out.effectiveVertexRangeExact =",
+         NATIVE_BACKEND_CPP, "R252 BaseVertexIndex effective-range gate"),
+        ("out.indexBufferRangeExact =",
+         NATIVE_BACKEND_CPP, "R252 index-buffer byte-range gate"),
+        ("out.vertexBufferRangeExact =",
+         NATIVE_BACKEND_CPP, "R252 vertex-buffer byte-range gate"),
+        ("R252 exact programmable indexed dispatch and source range",
+         CONSTANT_BUFFER_PROBE, "R252 exact dispatch/source-range regression"),
+        ("R252 stale R249 geometry receipt cannot seal indexed dispatch",
+         CONSTANT_BUFFER_PROBE, "R252 stale geometry snapshot regression"),
+        ("R252 out-of-range index window fails closed",
+         CONSTANT_BUFFER_PROBE, "R252 index byte-range regression"),
+        ("R252 out-of-range declared vertex window fails closed",
+         CONSTANT_BUFFER_PROBE, "R252 vertex byte-range regression"),
+        ("R252 negative effective vertex range fails closed",
+         CONSTANT_BUFFER_PROBE, "R252 signed BaseVertexIndex regression"),
+        ("R252 indexed primitive-count overflow fails closed",
+         CONSTANT_BUFFER_PROBE, "R252 count overflow regression"),
+        ("R252 same indexed dispatch arguments are idempotent",
+         CONSTANT_BUFFER_PROBE, "R252 idempotence regression"),
+        ("R252 live IA drift invalidates indexed dispatch receipt",
+         CONSTANT_BUFFER_PROBE, "R252 live IA drift regression"),
+        ("R252 device reinitialize invalidates indexed dispatch receipt",
+         CONSTANT_BUFFER_PROBE, "R252 device-generation regression"),
+        ("R252 fresh device generation receives distinct indexed dispatch receipt",
+         CONSTANT_BUFFER_PROBE, "R252 fresh-generation regression"),
+    ]
+    missing_r252_programmable_indexed_direct_dispatch = [
+        meaning for token, source, meaning
+        in r252_programmable_indexed_direct_dispatch_contract
+        if token not in source
+    ]
+    if missing_r252_programmable_indexed_direct_dispatch:
+        raise SystemExit(
+            "DX11 R252 programmable indexed direct-dispatch drift: "
+            + ", ".join(missing_r252_programmable_indexed_direct_dispatch)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
