@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00379",
+  "production_id": "CONVERSION-DX9EX-00379",
+  "event_id": "CONVERSION-DX9EX-00379-E001",
+  "event_type": "rollover",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_POLICY",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "b327c4232d910b6b61cad01051425875250e5689",
+  "source_material_sha": "a641273826b164cb49b17dac11a6d2bc3c5af3d9",
+  "result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+  "material_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+  "validation_bearing_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00379]",
+  "selected_work_item": "VR-REFACTOR-POST1000-R34-READINESS-WORKER-FOLD-0002",
+  "summary": "Resumed an in-progress DX9Ex post-1000 refactor without repeating completed work. The recovered source material folds R34 readiness polling into R33 so R33 owns replay-health synchronization and terminal compatibility publication while R34 becomes a zero-worker/zero-physical-hook observer. During resumed validation, a pre-existing stale R31 verifier anchor was independently reproduced at the prior validated SHA and repaired before exact-SHA Windows validation.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/d3d9/stereo_renderer_r34.cpp",
+    "tools/verify_vr_r32_review.py",
+    "tools/verify_vr_refactor_contract.py"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered vr-d3d9ex-focus at in-progress material a641273826b164cb49b17dac11a6d2bc3c5af3d9 with parent b327c4232d910b6b61cad01051425875250e5689. No docs/automation/runs/CONVERSION-DX9EX-00379.json existed. ATTEMPT remained 1/3 because rollover was not a retry."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Recovered material removes R34 polling/worker ownership after functional Reset/Present/draw responsibilities had already moved into R33. N100 exact-HEAD validation additionally exposed a stale pre-existing R31 verifier anchor ('const bool stateHooks =') that was absent at both prior validated d0991bfc and current source while fallback End->Begin->Create ordering remained intact."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Source material a641273826b164cb49b17dac11a6d2bc3c5af3d9 moves initial replay-health synchronization and both R33/R34 compatibility terminal status publication into R33 and removes R34InstallThread/CreateThread/Sleep/reporting ownership. Validation fix 9ec83f6b1269e3438e6430fa6a6efb2076103182 replaces the stale R31 verifier anchor with exact fallbackEndArmed/fallbackBeginArmed/fallbackCreateArmed ordering checks."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_POLICY",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 9ec83f6b1269e3438e6430fa6a6efb2076103182: DX9Ex Active Validation 37225909401 policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation Guard 37225909385 SUCCESS; N100 local architecture/R51/R32-R34/hook-graph/refactor/near-plane suite PASS. Source-bearing SHA a641273826b164cb49b17dac11a6d2bc3c5af3d9: HUD Inspector 37225633102 SUCCESS. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "source_material_sha": "a641273826b164cb49b17dac11a6d2bc3c5af3d9",
+      "result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+      "validation_bearing_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+      "result_marker": "[AUTO:CONVERSION-DX9EX-00379]"
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "DX9Ex Active package artifact 11312022802, digest sha256:fd05b4613350ec6d2227f98325c35ea6a0f97c47c3552b1e851a91306ac12316, size 2730696 bytes; package validation SUCCESS. This is not Quest3/VDXR runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "evidence": "This run record and VR_REFACTOR_STATE successor entry are committed together after validation-bearing exact-SHA gates completed."
+    }
+  },
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37225909401,
+      "conclusion": "success",
+      "exact_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+      "jobs": {
+        "policy": 111505541113,
+        "host": 111505605304,
+        "game": 111505605325,
+        "full_chain_compile": 111505605328,
+        "package": 111506430686
+      },
+      "artifact_id": 11312022802,
+      "artifact_digest": "sha256:fd05b4613350ec6d2227f98325c35ea6a0f97c47c3552b1e851a91306ac12316"
+    },
+    "domain_isolation": {
+      "run_id": 37225909385,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 37225633102,
+      "conclusion": "success",
+      "source_sha": "a641273826b164cb49b17dac11a6d2bc3c5af3d9",
+      "artifact_id": 11312286173,
+      "artifact_digest": "sha256:7895067b7709ad5ab0cf2a31e993d21ed811f9fd37d54a11f33081eec5558750"
+    },
+    "n100_local_policy": {
+      "exact_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+      "conclusion": "success",
+      "checks": [
+        "verify_vr_architecture.py",
+        "verify_vr_r51_runtime_contract.py",
+        "verify_vr_r32_review.py",
+        "verify_vr_hook_graph.py",
+        "verify_vr_refactor_contract.py",
+        "verify_vr_nearplane_active_gate.py"
+      ]
+    }
+  },
+  "next_action": "Do not repeat CONVERSION-DX9EX-00379. Preserve R33 as the terminal readiness/replay-health owner and R34 as a zero-worker, zero-physical-hook compatibility observer. Select only the next bounded post-1000 successor supported by current source evidence. Runtime visual/stability claims remain gated on Quest3/VDXR evidence.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00379",
+    "production_id": "CONVERSION-DX9EX-00379",
+    "event_id": "CONVERSION-DX9EX-00379-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+    "validation_bearing_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+    "runtime_validation": "UNTESTED",
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
+  },
+  "validated_at_kst": "2026-10-05T03:55:25+09:00"
+}
