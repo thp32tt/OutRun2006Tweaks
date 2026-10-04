@@ -740,11 +740,11 @@ namespace OutRunVRStereo
             R23InstallState.store(State::Pending, std::memory_order_release);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                if (R9InstallState.load(std::memory_order_acquire) == R9InstallFailed ||
-                    R13InstallState.load(std::memory_order_acquire) == R13InstallFailed ||
-                    OutRunVR::RuntimeEligibility::IsFailed(R20InstallState) ||
-                    OutRunVR::RuntimeEligibility::IsFailed(R21InstallState) ||
-                    OutRunVR::RuntimeEligibility::IsFailed(R22InstallState))
+                if (R9InstallStatus() == R9InstallStatusValue::Failed ||
+                    R13InstallStatus() == R13InstallStatusValue::Failed ||
+                    R20InstallStatus() == State::Failed ||
+                    R21InstallStatus() == State::Failed ||
+                    R22InstallStatus() == State::Failed)
                 {
                     R23InstallState.store(State::Failed, std::memory_order_release);
                     OutRunVR::RuntimeEligibility::MarkSafetyOverlayUnavailable();
@@ -756,7 +756,7 @@ namespace OutRunVRStereo
                     return 0;
                 }
 
-                if (OutRunVR::RuntimeEligibility::IsReady(R22InstallState))
+                if (R22InstallStatus() == State::Ready)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
                     R23ClearR22Hook = safetyhook::create_inline(
