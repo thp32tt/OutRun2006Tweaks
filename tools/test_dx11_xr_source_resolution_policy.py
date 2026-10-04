@@ -31,22 +31,25 @@ require(
     "Desktop must remain the default A path",
 )
 candidate_start = "if($DX11SourceResolution -eq 'XR_NATIVE_2496X2688'){"
-require(runner, candidate_start, "XR-native B candidate gate")
+require(runner, candidate_start, "runtime-rejected XR-native request gate")
 start = runner.index(candidate_start)
 end = runner.index("    $profile=[ordered]@{", start)
 candidate = runner[start:end]
 
+for forbidden, meaning in (
+    ("'-width','2496'", "portrait game-source width override"),
+    ("'-height','2688'", "portrait game-source height override"),
+    ("'-MirrorFitDesktop=true'", "portrait mirror-fit workaround"),
+):
+    if forbidden in candidate:
+        raise SystemExit(f"runtime-rejected {meaning} must not be launched")
+
 for literal, meaning in (
-    ("'-width','2496'", "XR-native source width"),
-    ("'-height','2688'", "XR-native source height"),
-    ("'-MirrorFitDesktop=true'", "desktop mirror fit"),
+    ("DESKTOP_ASPECT_SAFE_AFTER_XR_NATIVE_REJECT", "safe fallback identity"),
+    ("per-eye OpenXR target, not a valid game logical canvas", "runtime rejection rationale"),
+    ("OpenXR keeps its native eye swapchain", "XR/game resolution separation"),
 ):
     require(candidate, literal, meaning)
-
-if runner.count("'-width','2496'") != 1:
-    raise SystemExit("2496 width override must exist only in the opt-in B candidate")
-if runner.count("'-height','2688'") != 1:
-    raise SystemExit("2688 height override must exist only in the opt-in B candidate")
 
 for literal, meaning in (
     ('"dx11SourceResolutionProfile=$dx11SourceResolutionProfile"', "A/B identity log"),

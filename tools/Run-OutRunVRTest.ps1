@@ -183,15 +183,15 @@ if($backend -eq 'd3d9'){
     )
     $dx11SourceResolutionProfile=$DX11SourceResolution
     if($DX11SourceResolution -eq 'XR_NATIVE_2496X2688'){
-        # B candidate only. Preserve Desktop as the default A path until
-        # Quest 3/VDXR A/B evidence justifies promotion.
-        $dx11SourceWidth=2496
-        $dx11SourceHeight=2688
-        $gameArgs += @(
-            '-width','2496',
-            '-height','2688',
-            '-MirrorFitDesktop=true'
-        )
+        # 2026-10-04 Quest 3/VDXR runtime evidence rejected the old B candidate.
+        # 2496x2688 is a per-eye OpenXR target, not a valid game logical canvas:
+        # feeding that portrait size into Game::screen_resolution stretches the
+        # 4:3 menu/vehicle selector, collapses HUD coordinates toward centre and
+        # increases game-side fill cost. Keep the HMD swapchain native in the
+        # host, but preserve the desktop/game source aspect until a dedicated
+        # offscreen eye-size path exists that does not mutate UI coordinates.
+        Write-Warning 'XR_NATIVE_2496X2688 game-source override was runtime-rejected; using Desktop source aspect while OpenXR keeps its native eye swapchain.'
+        $dx11SourceResolutionProfile='DESKTOP_ASPECT_SAFE_AFTER_XR_NATIVE_REJECT'
     }
     $profile=[ordered]@{
         Name=$TestProfile
