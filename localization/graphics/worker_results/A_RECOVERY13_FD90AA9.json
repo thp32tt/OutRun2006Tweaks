@@ -1,0 +1,21 @@
+{
+  "run": "20261005-A-RECOVERY13",
+  "asset": "FD90AA9",
+  "index": 121,
+  "input_candidate_sha256": "0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b",
+  "candidate_sha256": "c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401",
+  "reworked_rows": 4,
+  "preserved_rows": 25,
+  "bbox_pass": "29/29",
+  "size_ceiling": "29/29",
+  "reworked_positive_margin": "4/4",
+  "clean_plate_validator": "PASS",
+  "reworked_pair_overlap_pixels": 0,
+  "reworked_touch_pairs": [],
+  "reworked_vs_preserved_1px_guard_conflicts": {},
+  "changes_vs_input_outside_4_returned_source_bboxes": 0,
+  "preserved_25_all_zero": true,
+  "worker_status": "A_RECOVERY13_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FD90AA9_REPORT.json"
+}

@@ -1,0 +1,1130 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-RECOVERY13",
+  "worker": "github-actions",
+  "index": 121,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "input_candidate_sha256": "0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b",
+  "candidate_sha256": "c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "pitch": 16384,
+    "mipmaps": 1,
+    "header_128_exact_source": true,
+    "raw_orientation": "mirror_y"
+  },
+  "c109_return_reason": "source typography slant/italic mismatch on More Engine Sound and experts/normal-difficult rows",
+  "reworked_keys": [
+    "more_engine",
+    "experts_long",
+    "for_experts",
+    "normal_difficult"
+  ],
+  "shear_by_key": {
+    "more_engine": 0.32,
+    "experts_long": 0.26,
+    "for_experts": 0.3,
+    "normal_difficult": 0.27
+  },
+  "method": "preserve A_RECOVERY08 clean plate and source-family Korean fill/outline/effects; materially right-shear only the four C109-returned Korean layers inside their isolated placement zones; preserve the other 25 localized rows and all unrelated atlas pixels exact",
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-RECOVERY13/FD90AA9_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-RECOVERY13/FD90AA9_CLEAN_PLATE.png",
+    "size": [
+      4096,
+      4096
+    ],
+    "changed_pixels": 1538245,
+    "changed_bbox": [
+      0,
+      374,
+      4034,
+      2573
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "style_meta": {
+    "more_engine": {
+      "shear": 0.32,
+      "input_actual_bbox": [
+        2851,
+        385,
+        3086,
+        438
+      ],
+      "fit_zone": [
+        2792,
+        382,
+        3146,
+        442
+      ],
+      "new_bbox": [
+        2849,
+        385,
+        3088,
+        438
+      ]
+    },
+    "experts_long": {
+      "shear": 0.26,
+      "input_actual_bbox": [
+        2335,
+        625,
+        2985,
+        693
+      ],
+      "fit_zone": [
+        1942,
+        620,
+        3378,
+        698
+      ],
+      "new_bbox": [
+        2334,
+        625,
+        2987,
+        693
+      ]
+    },
+    "for_experts": {
+      "shear": 0.3,
+      "input_actual_bbox": [
+        1948,
+        788,
+        2151,
+        847
+      ],
+      "fit_zone": [
+        1812,
+        787,
+        2288,
+        848
+      ],
+      "new_bbox": [
+        1947,
+        788,
+        2152,
+        847
+      ]
+    },
+    "normal_difficult": {
+      "shear": 0.27,
+      "input_actual_bbox": [
+        2801,
+        793,
+        3108,
+        861
+      ],
+      "fit_zone": [
+        2582,
+        787,
+        3328,
+        868
+      ],
+      "new_bbox": [
+        2798,
+        793,
+        3111,
+        861
+      ]
+    }
+  },
+  "rows": [
+    {
+      "key": "outsp_course",
+      "original_bbox": [
+        1126,
+        374,
+        1678,
+        449
+      ],
+      "localized_bbox": [
+        1194,
+        376,
+        1622,
+        443
+      ],
+      "delta_left": 68,
+      "delta_right": 56,
+      "delta_top": 2,
+      "delta_bottom": 6,
+      "source_size": [
+        552,
+        75
+      ],
+      "localized_size": [
+        428,
+        67
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "out2_course",
+      "original_bbox": [
+        1776,
+        374,
+        2232,
+        449
+      ],
+      "localized_bbox": [
+        1828,
+        376,
+        2178,
+        446
+      ],
+      "delta_left": 52,
+      "delta_right": 54,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "source_size": [
+        456,
+        75
+      ],
+      "localized_size": [
+        350,
+        70
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "more_engine",
+      "source": "More Engine sound",
+      "korean": "엔진음 크게",
+      "original_bbox": [
+        2772,
+        376,
+        3187,
+        448
+      ],
+      "localized_bbox": [
+        2849,
+        385,
+        3088,
+        438
+      ],
+      "delta_left": 77,
+      "delta_right": 99,
+      "delta_top": 9,
+      "delta_bottom": 10,
+      "source_width": 415,
+      "source_height": 72,
+      "localized_width": 239,
+      "localized_height": 53,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        2772,
+        3648,
+        3187,
+        3720
+      ],
+      "raw_localized_bbox": [
+        2849,
+        3658,
+        3088,
+        3711
+      ],
+      "raw_containment": "PASS",
+      "placement_zone": [
+        2790,
+        380,
+        3148,
+        444
+      ],
+      "shear": 0.32,
+      "rework_status": "A_RECOVERY13_SOURCE_SLANT_RERENDER"
+    },
+    {
+      "key": "you",
+      "original_bbox": [
+        3169,
+        376,
+        3334,
+        445
+      ],
+      "localized_bbox": [
+        3237,
+        378,
+        3294,
+        438
+      ],
+      "delta_left": 68,
+      "delta_right": 40,
+      "delta_top": 2,
+      "delta_bottom": 7,
+      "source_size": [
+        165,
+        69
+      ],
+      "localized_size": [
+        57,
+        60
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "gas_pedal",
+      "original_bbox": [
+        3490,
+        391,
+        3748,
+        440
+      ],
+      "localized_bbox": [
+        3530,
+        393,
+        3708,
+        438
+      ],
+      "delta_left": 40,
+      "delta_right": 40,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        258,
+        49
+      ],
+      "localized_size": [
+        178,
+        45
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "run15",
+      "original_bbox": [
+        0,
+        517,
+        934,
+        620
+      ],
+      "localized_bbox": [
+        62,
+        533,
+        864,
+        604
+      ],
+      "delta_left": 62,
+      "delta_right": 70,
+      "delta_top": 16,
+      "delta_bottom": 16,
+      "source_size": [
+        934,
+        103
+      ],
+      "localized_size": [
+        802,
+        71
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "maximum_speed",
+      "original_bbox": [
+        922,
+        499,
+        1408,
+        620
+      ],
+      "localized_bbox": [
+        995,
+        518,
+        1327,
+        600
+      ],
+      "delta_left": 73,
+      "delta_right": 81,
+      "delta_top": 19,
+      "delta_bottom": 20,
+      "source_size": [
+        486,
+        121
+      ],
+      "localized_size": [
+        332,
+        82
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "enter_selection",
+      "original_bbox": [
+        3456,
+        517,
+        3893,
+        627
+      ],
+      "localized_bbox": [
+        3550,
+        532,
+        3828,
+        611
+      ],
+      "delta_left": 94,
+      "delta_right": 65,
+      "delta_top": 15,
+      "delta_bottom": 16,
+      "source_size": [
+        437,
+        110
+      ],
+      "localized_size": [
+        278,
+        79
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "same_conditions",
+      "original_bbox": [
+        14,
+        614,
+        1894,
+        730
+      ],
+      "localized_bbox": [
+        193,
+        631,
+        1691,
+        712
+      ],
+      "delta_left": 179,
+      "delta_right": 203,
+      "delta_top": 17,
+      "delta_bottom": 18,
+      "source_size": [
+        1880,
+        116
+      ],
+      "localized_size": [
+        1498,
+        81
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "transmission2",
+      "original_bbox": [
+        1221,
+        722,
+        1805,
+        843
+      ],
+      "localized_bbox": [
+        1385,
+        748,
+        1789,
+        841
+      ],
+      "delta_left": 164,
+      "delta_right": 16,
+      "delta_top": 26,
+      "delta_bottom": 2,
+      "source_size": [
+        584,
+        121
+      ],
+      "localized_size": [
+        404,
+        93
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "experts_long",
+      "source": "For Experts & Long distance to the goal",
+      "korean": "상급자용 · 골까지 장거리",
+      "original_bbox": [
+        1907,
+        602,
+        3406,
+        781
+      ],
+      "localized_bbox": [
+        2334,
+        625,
+        2987,
+        693
+      ],
+      "delta_left": 427,
+      "delta_right": 419,
+      "delta_top": 23,
+      "delta_bottom": 88,
+      "source_width": 1499,
+      "source_height": 179,
+      "localized_width": 653,
+      "localized_height": 68,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1907,
+        3315,
+        3406,
+        3494
+      ],
+      "raw_localized_bbox": [
+        2334,
+        3403,
+        2987,
+        3471
+      ],
+      "raw_containment": "PASS",
+      "placement_zone": [
+        1940,
+        618,
+        3380,
+        700
+      ],
+      "shear": 0.26,
+      "rework_status": "A_RECOVERY13_SOURCE_SLANT_RERENDER"
+    },
+    {
+      "key": "view_choices",
+      "original_bbox": [
+        3525,
+        614,
+        3882,
+        730
+      ],
+      "localized_bbox": [
+        3563,
+        632,
+        3855,
+        712
+      ],
+      "delta_left": 38,
+      "delta_right": 27,
+      "delta_top": 18,
+      "delta_bottom": 18,
+      "source_size": [
+        357,
+        116
+      ],
+      "localized_size": [
+        292,
+        80
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "for_experts",
+      "source": "For Experts",
+      "korean": "상급자용",
+      "original_bbox": [
+        1766,
+        704,
+        2304,
+        896
+      ],
+      "localized_bbox": [
+        1947,
+        788,
+        2152,
+        847
+      ],
+      "delta_left": 181,
+      "delta_right": 152,
+      "delta_top": 84,
+      "delta_bottom": 49,
+      "source_width": 538,
+      "source_height": 192,
+      "localized_width": 205,
+      "localized_height": 59,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1766,
+        3200,
+        2304,
+        3392
+      ],
+      "raw_localized_bbox": [
+        1947,
+        3249,
+        2152,
+        3308
+      ],
+      "raw_containment": "PASS",
+      "placement_zone": [
+        1810,
+        785,
+        2290,
+        850
+      ],
+      "shear": 0.3,
+      "rework_status": "A_RECOVERY13_SOURCE_SLANT_RERENDER"
+    },
+    {
+      "key": "normal_difficult",
+      "source": "Normal difficult",
+      "korean": "보통 난이도",
+      "original_bbox": [
+        2547,
+        704,
+        3354,
+        896
+      ],
+      "localized_bbox": [
+        2798,
+        793,
+        3111,
+        861
+      ],
+      "delta_left": 251,
+      "delta_right": 243,
+      "delta_top": 89,
+      "delta_bottom": 35,
+      "source_width": 807,
+      "source_height": 192,
+      "localized_width": 313,
+      "localized_height": 68,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        2547,
+        3200,
+        3354,
+        3392
+      ],
+      "raw_localized_bbox": [
+        2798,
+        3235,
+        3111,
+        3303
+      ],
+      "raw_containment": "PASS",
+      "placement_zone": [
+        2580,
+        785,
+        3330,
+        870
+      ],
+      "shear": 0.27,
+      "rework_status": "A_RECOVERY13_SOURCE_SLANT_RERENDER"
+    },
+    {
+      "key": "select_game_mode",
+      "original_bbox": [
+        166,
+        819,
+        1166,
+        973
+      ],
+      "localized_bbox": [
+        347,
+        846,
+        1037,
+        971
+      ],
+      "delta_left": 181,
+      "delta_right": 129,
+      "delta_top": 27,
+      "delta_bottom": 2,
+      "source_size": [
+        1000,
+        154
+      ],
+      "localized_size": [
+        690,
+        125
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "select_car",
+      "original_bbox": [
+        243,
+        947,
+        1156,
+        1111
+      ],
+      "localized_bbox": [
+        487,
+        981,
+        954,
+        1092
+      ],
+      "delta_left": 244,
+      "delta_right": 202,
+      "delta_top": 34,
+      "delta_bottom": 19,
+      "source_size": [
+        913,
+        164
+      ],
+      "localized_size": [
+        467,
+        111
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "select_course",
+      "original_bbox": [
+        302,
+        1062,
+        1085,
+        1213
+      ],
+      "localized_bbox": [
+        386,
+        1097,
+        893,
+        1211
+      ],
+      "delta_left": 84,
+      "delta_right": 192,
+      "delta_top": 35,
+      "delta_bottom": 2,
+      "source_size": [
+        783,
+        151
+      ],
+      "localized_size": [
+        507,
+        114
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "select_music",
+      "original_bbox": [
+        1549,
+        819,
+        2571,
+        990
+      ],
+      "localized_bbox": [
+        1892,
+        857,
+        2358,
+        970
+      ],
+      "delta_left": 343,
+      "delta_right": 213,
+      "delta_top": 38,
+      "delta_bottom": 20,
+      "source_size": [
+        1022,
+        171
+      ],
+      "localized_size": [
+        466,
+        113
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "select_transmission",
+      "original_bbox": [
+        1563,
+        947,
+        2589,
+        1092
+      ],
+      "localized_bbox": [
+        1737,
+        975,
+        2436,
+        1090
+      ],
+      "delta_left": 174,
+      "delta_right": 153,
+      "delta_top": 28,
+      "delta_bottom": 2,
+      "source_size": [
+        1026,
+        145
+      ],
+      "localized_size": [
+        699,
+        115
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "shortcut_features",
+      "original_bbox": [
+        1587,
+        1062,
+        2611,
+        1213
+      ],
+      "localized_bbox": [
+        1770,
+        1097,
+        2400,
+        1211
+      ],
+      "delta_left": 183,
+      "delta_right": 211,
+      "delta_top": 35,
+      "delta_bottom": 2,
+      "source_size": [
+        1024,
+        151
+      ],
+      "localized_size": [
+        630,
+        114
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "selected_sp",
+      "original_bbox": [
+        63,
+        1183,
+        2227,
+        1348
+      ],
+      "localized_bbox": [
+        971,
+        1199,
+        1662,
+        1319
+      ],
+      "delta_left": 908,
+      "delta_right": 565,
+      "delta_top": 16,
+      "delta_bottom": 29,
+      "source_size": [
+        2164,
+        165
+      ],
+      "localized_size": [
+        691,
+        120
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "selected_out2",
+      "original_bbox": [
+        90,
+        1306,
+        2125,
+        1484
+      ],
+      "localized_bbox": [
+        222,
+        1336,
+        2016,
+        1477
+      ],
+      "delta_left": 132,
+      "delta_right": 109,
+      "delta_top": 30,
+      "delta_bottom": 7,
+      "source_size": [
+        2035,
+        178
+      ],
+      "localized_size": [
+        1794,
+        141
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "select_car_setting",
+      "original_bbox": [
+        2419,
+        1183,
+        3394,
+        1367
+      ],
+      "localized_bbox": [
+        2770,
+        1194,
+        3343,
+        1356
+      ],
+      "delta_left": 351,
+      "delta_right": 51,
+      "delta_top": 11,
+      "delta_bottom": 11,
+      "source_size": [
+        975,
+        184
+      ],
+      "localized_size": [
+        573,
+        162
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "versus_mode",
+      "original_bbox": [
+        2226,
+        1306,
+        2995,
+        1486
+      ],
+      "localized_bbox": [
+        2311,
+        1306,
+        2767,
+        1475
+      ],
+      "delta_left": 85,
+      "delta_right": 228,
+      "delta_top": 0,
+      "delta_bottom": 11,
+      "source_size": [
+        769,
+        180
+      ],
+      "localized_size": [
+        456,
+        169
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "gear_change",
+      "original_bbox": [
+        3587,
+        1304,
+        4034,
+        1501
+      ],
+      "localized_bbox": [
+        3648,
+        1330,
+        4022,
+        1499
+      ],
+      "delta_left": 61,
+      "delta_right": 12,
+      "delta_top": 26,
+      "delta_bottom": 2,
+      "source_size": [
+        447,
+        197
+      ],
+      "localized_size": [
+        374,
+        169
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "player_battle_desc",
+      "original_bbox": [
+        3093,
+        1446,
+        3994,
+        1668
+      ],
+      "localized_bbox": [
+        3095,
+        1454,
+        3633,
+        1632
+      ],
+      "delta_left": 2,
+      "delta_right": 361,
+      "delta_top": 8,
+      "delta_bottom": 36,
+      "source_size": [
+        901,
+        222
+      ],
+      "localized_size": [
+        538,
+        178
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "new_course_desc",
+      "original_bbox": [
+        3008,
+        1587,
+        3828,
+        1827
+      ],
+      "localized_bbox": [
+        3010,
+        1654,
+        3826,
+        1790
+      ],
+      "delta_left": 2,
+      "delta_right": 2,
+      "delta_top": 67,
+      "delta_bottom": 37,
+      "source_size": [
+        820,
+        240
+      ],
+      "localized_size": [
+        816,
+        136
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "orig_course_desc",
+      "original_bbox": [
+        3008,
+        1754,
+        3662,
+        1995
+      ],
+      "localized_bbox": [
+        3010,
+        1822,
+        3660,
+        1975
+      ],
+      "delta_left": 2,
+      "delta_right": 2,
+      "delta_top": 68,
+      "delta_bottom": 20,
+      "source_size": [
+        654,
+        241
+      ],
+      "localized_size": [
+        650,
+        153
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    },
+    {
+      "key": "random_music",
+      "original_bbox": [
+        1741,
+        2360,
+        2720,
+        2573
+      ],
+      "localized_bbox": [
+        1957,
+        2362,
+        2530,
+        2544
+      ],
+      "delta_left": 216,
+      "delta_right": 190,
+      "delta_top": 2,
+      "delta_bottom": 29,
+      "source_size": [
+        979,
+        213
+      ],
+      "localized_size": [
+        573,
+        182
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "rework_status": "C109_PASS_PRESERVED_PIXEL_EXACT"
+    }
+  ],
+  "all_29_bbox_pass": true,
+  "all_29_size_ceiling_pass": true,
+  "all_4_reworked_positive_margin": true,
+  "localized_pair_overlap_pixels_reworked": 0,
+  "localized_pair_overlaps_reworked": {},
+  "localized_touch_pairs_reworked": [],
+  "reworked_vs_preserved_1px_guard_conflicts": {},
+  "changes_vs_input_outside_4_c109_returned_source_bboxes": 0,
+  "decoded_changes_outside_4_c109_returned_source_bboxes": 0,
+  "preserved_25_input_pixel_diffs": {
+    "outsp_course": 0,
+    "out2_course": 0,
+    "you": 0,
+    "gas_pedal": 0,
+    "run15": 0,
+    "maximum_speed": 0,
+    "enter_selection": 0,
+    "same_conditions": 0,
+    "transmission2": 0,
+    "view_choices": 0,
+    "select_game_mode": 0,
+    "select_car": 0,
+    "select_course": 0,
+    "select_music": 0,
+    "select_transmission": 0,
+    "shortcut_features": 0,
+    "selected_sp": 0,
+    "selected_out2": 0,
+    "select_car_setting": 0,
+    "versus_mode": 0,
+    "gear_change": 0,
+    "player_battle_desc": 0,
+    "new_course_desc": 0,
+    "orig_course_desc": 0,
+    "random_music": 0
+  },
+  "preserved_25_all_zero": true,
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A_RECOVERY13_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
