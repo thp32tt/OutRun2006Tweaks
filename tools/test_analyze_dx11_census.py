@@ -1105,6 +1105,44 @@ def main() -> int:
         == "0xBBBBBBBBBBBBBBBB"
     )
 
+    r234_current_startup_signature_scope = run_case(
+        "VR DX11 R71 census: observed=1 size=1280x720 sourceFormat=21 "
+        "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+        "VR DX11 R85 signature#1: primitive=4 fixedFn=1 fvf=0x000001C4\n"
+        "VR DX11 R194 ffp signature#1 stage#0: "
+        "color[op=23,arg1=0x00000002,arg2=0x00000001] "
+        "alpha[op=2,arg1=0x00000002,arg2=0x00000001] "
+        "texCoord=0x00000000 texTransform=0x00000000\n"
+        "VR DX11 R71 census: observed=1 size=1920x1080 sourceFormat=22 "
+        "nativeFormat=29 msaa=0 bootstrapCompatible=1\n"
+        "VR DX11 R85 signature#1: primitive=5 fixedFn=1 fvf=0x000002C4\n"
+        "VR DX11 R194 ffp signature#1 stage#0: "
+        "color[op=4,arg1=0x00000002,arg2=0x00000001] "
+        "alpha[op=4,arg1=0x00000002,arg2=0x00000001] "
+        "texCoord=0x00000000 texTransform=0x00000000\n"
+    )
+    assert r234_current_startup_signature_scope["UniqueSignaturesCaptured"] == 2
+    assert r234_current_startup_signature_scope["CurrentUniqueSignaturesCaptured"] == 1
+    assert [
+        signature["startup_epoch"]
+        for signature in r234_current_startup_signature_scope["CurrentSignatures"]
+    ] == [2]
+    assert r234_current_startup_signature_scope["LatestStartupEpochByLog"] == {
+        "runtime.log": 2
+    }
+    assert (
+        r234_current_startup_signature_scope["ActivationEvidence"][
+            "FixedFunctionDetailedStageDemand"
+        ]["HasUnsupportedObservedSemantics"]
+        is False
+    )
+    assert (
+        r234_current_startup_signature_scope[
+            "HistoricalFixedFunctionDetailedStageDemand"
+        ]["HasUnsupportedObservedSemantics"]
+        is True
+    )
+
     r106 = run_case(
         "VR DX11 R85 signature#1: primitive=4 fixedFn=1\n"
         "VR DX11 R85 texture signature#1 stage#0: observed=1 type=3 pool=1 "

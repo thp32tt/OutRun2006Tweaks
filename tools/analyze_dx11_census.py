@@ -404,6 +404,7 @@ def main() -> int:
     fixed_function_vertex_shader_compiles: dict[SignatureKey, dict] = {}
     source_logs: list[str] = []
     latest_startup_line_by_log: dict[str, int] = {}
+    latest_startup_epoch_by_log: dict[str, int] = {}
     latest_bootstrap_outcome_line_by_log: dict[str, int] = {}
     latest_summary_line_by_log: dict[str, int] = {}
 
@@ -432,11 +433,13 @@ def main() -> int:
         source_logs.append(log_path.name)
         source_log = log_path.name
         startup_epoch = 0
+        latest_startup_epoch_by_log[source_log] = startup_epoch
 
         for line_number, line in enumerate(text.splitlines(), start=1):
             match = STARTUP_RE.search(line)
             if match:
                 startup_epoch += 1
+                latest_startup_epoch_by_log[source_log] = startup_epoch
                 startup_entry = int_fields(match)
                 startup_entry["source_log"] = source_log
                 startup.append(startup_entry)
@@ -632,6 +635,30 @@ def main() -> int:
         signature["fixed_function_vertex_shader_compile"] = (
             fixed_function_vertex_shader_compiles.get(signature_key)
         )
+
+    # R234: R233 prevents signature-id collisions across accumulated process
+    # epochs, but historical signatures must not be presented as current
+    # activation evidence. Preserve full history while deriving a current view
+    # from the latest startup epoch in each source log. Legacy logs without an
+    # R71 startup marker remain in epoch 0 and therefore remain current.
+    current_signatures = {
+        signature_key: signature
+        for signature_key, signature in signatures.items()
+        if signature_key[1] == latest_startup_epoch_by_log.get(signature_key[0], 0)
+    }
+    current_signatures_by_log = {
+        source_log: [
+            current_signatures[signature_key]
+            for signature_key in sorted(current_signatures)
+            if signature_key[0] == source_log
+        ]
+        for source_log in source_logs
+    }
+    current_fixed_function = {
+        signature_key: stages
+        for signature_key, stages in fixed_function.items()
+        if signature_key[1] == latest_startup_epoch_by_log.get(signature_key[0], 0)
+    }
 
     latest_summaries_by_log: dict[str, dict] = {}
     for summary in summaries:
@@ -958,8 +985,11 @@ def main() -> int:
         "AllLogsWithStartupHaveLatestSummary": all_logs_with_startup_have_latest_summary,
     }
 
+    historical_fixed_function_detailed_stage_demand = (
+        summarize_fixed_function_detailed_stage_demand(fixed_function, None)
+    )
     fixed_function_detailed_stage_demand = summarize_fixed_function_detailed_stage_demand(
-        fixed_function,
+        current_fixed_function,
         (
             {"signatureDetailSkipped": sum_latest("signatureDetailSkipped")}
             if latest_summaries
@@ -1056,6 +1086,7 @@ def main() -> int:
         "BootstrapSkipped": bootstrap_skipped,
         "BootstrapOutcomes": bootstrap_outcomes,
         "LatestStartupByLog": latest_startup_by_log,
+        "LatestStartupEpochByLog": latest_startup_epoch_by_log,
         "LatestBootstrapByLog": latest_bootstrap_by_log,
         "LatestBootstrapSkipByLog": latest_bootstrap_skip_by_log,
         "LatestBootstrapOutcomeByLog": latest_bootstrap_outcome_by_log,
@@ -1070,7 +1101,24 @@ def main() -> int:
         "SummaryCoverage": summary_coverage,
         "AllSummaries": summaries,
         "UnsupportedTotalLatest": unsupported_total,
+        "SignatureCoverage": {
+            "HistoricalUniqueSignatures": len(signatures),
+            "CurrentUniqueSignatures": len(current_signatures),
+            "LogsWithCurrentSignatures": sum(
+                1 for entries in current_signatures_by_log.values() if entries
+            ),
+            "DiagnosticOnly": True,
+            "ActivationProof": False,
+        },
         "UniqueSignaturesCaptured": len(signatures),
+        "CurrentUniqueSignaturesCaptured": len(current_signatures),
+        "CurrentSignaturesByLog": current_signatures_by_log,
+        "CurrentSignatures": [
+            current_signatures[key] for key in sorted(current_signatures)
+        ],
+        "HistoricalFixedFunctionDetailedStageDemand": (
+            historical_fixed_function_detailed_stage_demand
+        ),
         "Signatures": [signatures[key] for key in sorted(signatures)],
     }
 

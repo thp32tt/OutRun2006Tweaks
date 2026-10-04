@@ -9181,6 +9181,37 @@ def main() -> None:
             + ", ".join(missing_r233_accumulated_log_signature_epoch)
         )
 
+    r234_current_startup_signature_scope_contract = [
+        ("latest_startup_epoch_by_log: dict[str, int] = {}",
+         DX11_CENSUS_ANALYZER, "R234 per-log current startup epoch map"),
+        ("latest_startup_epoch_by_log[source_log] = startup_epoch",
+         DX11_CENSUS_ANALYZER, "R234 current epoch advance tracking"),
+        ("current_signatures = {",
+         DX11_CENSUS_ANALYZER, "R234 current signature evidence view"),
+        ("current_fixed_function = {",
+         DX11_CENSUS_ANALYZER, "R234 current fixed-function demand scope"),
+        ('"CurrentUniqueSignaturesCaptured": len(current_signatures)',
+         DX11_CENSUS_ANALYZER, "R234 current signature count export"),
+        ('"HistoricalFixedFunctionDetailedStageDemand": (',
+         DX11_CENSUS_ANALYZER, "R234 historical demand provenance export"),
+        ("r234_current_startup_signature_scope = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R234 accumulated-log current epoch fixture"),
+        ('["CurrentUniqueSignaturesCaptured"] == 1',
+         DX11_CENSUS_ANALYZER_TEST, "R234 stale signature exclusion assertion"),
+        ('["HasUnsupportedObservedSemantics"]\n        is False',
+         DX11_CENSUS_ANALYZER_TEST, "R234 current demand stale-semantics rejection"),
+    ]
+    missing_r234_current_startup_signature_scope = [
+        meaning
+        for token, source, meaning in r234_current_startup_signature_scope_contract
+        if token not in source
+    ]
+    if missing_r234_current_startup_signature_scope:
+        raise SystemExit(
+            "DX11 R234 current startup signature scope drift: "
+            + ", ".join(missing_r234_current_startup_signature_scope)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
