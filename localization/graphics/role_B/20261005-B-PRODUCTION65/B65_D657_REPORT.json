@@ -1,0 +1,440 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION65",
+  "index": 220,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
+  "source_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+  "candidate_sha256": "6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5",
+  "structure": {
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "semantic_binding": {
+    "B64_regions": {
+      "0": "TIME ATTACK",
+      "1": "COAST 2 COAST",
+      "2": "HEART ATTACK",
+      "3": "TIME ATTACK",
+      "4": "OUTRUN",
+      "5": "SEND GAME INVITE",
+      "6": "REMOVE FRIEND"
+    },
+    "stale_transcription_correction": "TIME ATTACK has two physical occurrences"
+  },
+  "source_style": {
+    "group_font_sizes": {
+      "red": 144,
+      "gray": 57,
+      "small": 30
+    },
+    "fill_rgba": {
+      "red": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "gray": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "small": [
+        63,
+        71,
+        74,
+        255
+      ]
+    },
+    "same_color_weight_stroke": 2
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "source": "TIME ATTACK",
+      "korean": "타임 어택",
+      "style_group": "red",
+      "cell": [
+        0,
+        340,
+        1780,
+        172
+      ],
+      "original_bbox": [
+        14,
+        352,
+        1361,
+        500
+      ],
+      "source_pixels": 100007,
+      "localized_bbox": [
+        16,
+        356,
+        559,
+        496
+      ],
+      "source_width": 1347,
+      "source_height": 148,
+      "localized_width": 543,
+      "localized_height": 140,
+      "delta_left": 2,
+      "delta_right": 802,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_size": 144,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Bold",
+      "fill_rgba": [
+        186,
+        0,
+        0,
+        255
+      ],
+      "same_color_weight_stroke": 2
+    },
+    {
+      "region_idx": 1,
+      "source": "COAST 2 COAST",
+      "korean": "코스트 2 코스트",
+      "style_group": "gray",
+      "cell": [
+        0,
+        252,
+        1004,
+        88
+      ],
+      "original_bbox": [
+        20,
+        266,
+        626,
+        330
+      ],
+      "source_pixels": 17021,
+      "localized_bbox": [
+        22,
+        273,
+        397,
+        322
+      ],
+      "source_width": 606,
+      "source_height": 64,
+      "localized_width": 375,
+      "localized_height": 49,
+      "delta_left": 2,
+      "delta_right": 229,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_size": 57,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Bold",
+      "fill_rgba": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "same_color_weight_stroke": 2
+    },
+    {
+      "region_idx": 2,
+      "source": "HEART ATTACK",
+      "korean": "하트 어택",
+      "style_group": "gray",
+      "cell": [
+        1004,
+        252,
+        800,
+        88
+      ],
+      "original_bbox": [
+        1022,
+        268,
+        1558,
+        330
+      ],
+      "source_pixels": 16968,
+      "localized_bbox": [
+        1024,
+        270,
+        1244,
+        328
+      ],
+      "source_width": 536,
+      "source_height": 62,
+      "localized_width": 220,
+      "localized_height": 58,
+      "delta_left": 2,
+      "delta_right": 314,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_size": 57,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Bold",
+      "fill_rgba": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "same_color_weight_stroke": 2
+    },
+    {
+      "region_idx": 3,
+      "source": "TIME ATTACK",
+      "korean": "타임 어택",
+      "style_group": "gray",
+      "cell": [
+        0,
+        164,
+        788,
+        88
+      ],
+      "original_bbox": [
+        17,
+        180,
+        509,
+        242
+      ],
+      "source_pixels": 15105,
+      "localized_bbox": [
+        19,
+        182,
+        237,
+        240
+      ],
+      "source_width": 492,
+      "source_height": 62,
+      "localized_width": 218,
+      "localized_height": 58,
+      "delta_left": 2,
+      "delta_right": 272,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_size": 57,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Bold",
+      "fill_rgba": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "same_color_weight_stroke": 2
+    },
+    {
+      "region_idx": 4,
+      "source": "OUTRUN",
+      "korean": "아웃런",
+      "style_group": "gray",
+      "cell": [
+        788,
+        164,
+        668,
+        88
+      ],
+      "original_bbox": [
+        808,
+        180,
+        1097,
+        242
+      ],
+      "source_pixels": 10273,
+      "localized_bbox": [
+        810,
+        182,
+        965,
+        240
+      ],
+      "source_width": 289,
+      "source_height": 62,
+      "localized_width": 155,
+      "localized_height": 58,
+      "delta_left": 2,
+      "delta_right": 132,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_size": 57,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Bold",
+      "fill_rgba": [
+        78,
+        96,
+        100,
+        255
+      ],
+      "same_color_weight_stroke": 2
+    },
+    {
+      "region_idx": 5,
+      "source": "SEND GAME INVITE",
+      "korean": "게임 초대 보내기",
+      "style_group": "small",
+      "cell": [
+        0,
+        100,
+        1116,
+        64
+      ],
+      "original_bbox": [
+        3,
+        115,
+        462,
+        153
+      ],
+      "source_pixels": 9088,
+      "localized_bbox": [
+        5,
+        117,
+        213,
+        151
+      ],
+      "source_width": 459,
+      "source_height": 38,
+      "localized_width": 208,
+      "localized_height": 34,
+      "delta_left": 2,
+      "delta_right": 249,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_size": 30,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Bold",
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "same_color_weight_stroke": 2
+    },
+    {
+      "region_idx": 6,
+      "source": "REMOVE FRIEND",
+      "korean": "친구 삭제",
+      "style_group": "small",
+      "cell": [
+        0,
+        36,
+        1116,
+        64
+      ],
+      "original_bbox": [
+        3,
+        51,
+        395,
+        89
+      ],
+      "source_pixels": 8195,
+      "localized_bbox": [
+        5,
+        53,
+        124,
+        87
+      ],
+      "source_width": 392,
+      "source_height": 38,
+      "localized_width": 119,
+      "localized_height": 34,
+      "delta_left": 2,
+      "delta_right": 271,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "font_size": 30,
+      "font_file": "NotoSansCJK-Bold.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Bold",
+      "fill_rgba": [
+        63,
+        71,
+        74,
+        255
+      ],
+      "same_color_weight_stroke": 2
+    }
+  ],
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION65/D657_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION65/D657_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      512
+    ],
+    "changed_pixels": 176657,
+    "changed_bbox": [
+      3,
+      51,
+      1558,
+      500
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION65/D657_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION65/D657_FINAL_DECODED.png",
+    "size": [
+      2048,
+      512
+    ],
+    "changed_pixels": 184593,
+    "changed_bbox": [
+      3,
+      51,
+      1558,
+      500
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "outside": 0,
+    "alpha_outside": 0,
+    "exact_source_residue": 0,
+    "overlap": 0,
+    "touch_pairs": []
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "status": "B_PRODUCTION65_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
