@@ -59,6 +59,15 @@ def main():
     # Keep four dominant rows in the known text band.
     merged=[b for b in merged if 70<=b[1]<=260 and b[0]>=520]
     merged=sorted(merged,key=lambda b:b[1])
+    # Historical draft bars for SPECIAL REQUEST 2/3 are vertically contiguous,
+    # so the diff labels them as one ~2-row component. Split only this proven
+    # 3-component case when the final component is about twice the normal row height.
+    if len(merged)==3:
+        hs=[b[3]-b[1] for b in merged]
+        base=(hs[0]+hs[1])/2.0
+        if hs[2]>=1.7*base:
+            b=merged[2]; mid=(b[1]+b[3])//2
+            merged=merged[:2]+[[b[0],b[1],b[2],mid],[b[0],mid,b[2],b[3]]]
     if len(merged)!=4:
         (out/"B51_DISCOVERY_FAIL.json").write_text(json.dumps({"components":comps[:20],"merged":merged},indent=2)+"\n")
         raise RuntimeError(("expected four historical row hints",len(merged)))
