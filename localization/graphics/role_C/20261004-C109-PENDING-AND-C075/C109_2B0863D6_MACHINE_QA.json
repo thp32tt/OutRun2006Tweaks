@@ -1,0 +1,331 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-C109-PENDING-AND-C075",
+  "asset": "2B0863D6",
+  "candidate_sha256": "2f3e99f468367e056ee3c6edfdb412b1fe5f10f27387a463472b07aeaa335fbb",
+  "source_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+  "source_header_128_exact": true,
+  "structure": {
+    "width": 2048,
+    "height": 256,
+    "pitch": 8192,
+    "mips": 1,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "raw_orientation": "mirror_y"
+  },
+  "source_png_vs_decoded_source_diff_pixels": 0,
+  "decoded_candidate_vs_persisted_final_diff_pixels": 0,
+  "clean_changed_pixels_outside_source_text_mask": 0,
+  "source_text_mask_pixels_unchanged_in_clean_plate": 0,
+  "final_changed_pixels_in_protected_mask": 0,
+  "target_pixels_outside_union_source_bboxes": 0,
+  "target_pixels_outside_union_localized_bboxes": 0,
+  "persisted_allowed_mask_xor_vs_union_source_bboxes": 0,
+  "target_pixels_outside_persisted_allowed_mask": 0,
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_pairs": [],
+  "rows": [
+    {
+      "key": "professional",
+      "original_bbox": [
+        189,
+        185,
+        698,
+        245
+      ],
+      "localized_bbox": [
+        377,
+        187,
+        509,
+        243
+      ],
+      "delta_left": 188,
+      "delta_right": 189,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        509,
+        60
+      ],
+      "localized_size": [
+        132,
+        56
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "novice",
+      "original_bbox": [
+        1154,
+        187,
+        1399,
+        246
+      ],
+      "localized_bbox": [
+        1222,
+        189,
+        1330,
+        244
+      ],
+      "delta_left": 68,
+      "delta_right": 69,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        245,
+        59
+      ],
+      "localized_size": [
+        108,
+        55
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun",
+      "original_bbox": [
+        423,
+        107,
+        700,
+        166
+      ],
+      "localized_bbox": [
+        485,
+        109,
+        637,
+        164
+      ],
+      "delta_left": 62,
+      "delta_right": 63,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        277,
+        59
+      ],
+      "localized_size": [
+        152,
+        55
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "intermediate_b",
+      "original_bbox": [
+        830,
+        108,
+        1396,
+        164
+      ],
+      "localized_bbox": [
+        1034,
+        110,
+        1191,
+        162
+      ],
+      "delta_left": 204,
+      "delta_right": 205,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        566,
+        56
+      ],
+      "localized_size": [
+        157,
+        52
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "intermediate_a",
+      "original_bbox": [
+        128,
+        28,
+        696,
+        84
+      ],
+      "localized_bbox": [
+        334,
+        30,
+        490,
+        82
+      ],
+      "delta_left": 206,
+      "delta_right": 206,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        568,
+        56
+      ],
+      "localized_size": [
+        156,
+        52
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "change_class",
+      "original_bbox": [
+        840,
+        38,
+        1243,
+        86
+      ],
+      "localized_bbox": [
+        934,
+        40,
+        1149,
+        84
+      ],
+      "delta_left": 94,
+      "delta_right": 94,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        403,
+        48
+      ],
+      "localized_size": [
+        215,
+        44
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "class",
+      "original_bbox": [
+        1292,
+        50,
+        1429,
+        87
+      ],
+      "localized_bbox": [
+        1313,
+        52,
+        1407,
+        85
+      ],
+      "delta_left": 21,
+      "delta_right": 22,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        137,
+        37
+      ],
+      "localized_size": [
+        94,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "acceleration",
+      "original_bbox": [
+        1475,
+        48,
+        1736,
+        81
+      ],
+      "localized_bbox": [
+        1578,
+        50,
+        1632,
+        79
+      ],
+      "delta_left": 103,
+      "delta_right": 104,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        261,
+        33
+      ],
+      "localized_size": [
+        54,
+        29
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "max_speed",
+      "original_bbox": [
+        1746,
+        48,
+        1962,
+        81
+      ],
+      "localized_bbox": [
+        1796,
+        50,
+        1912,
+        79
+      ],
+      "delta_left": 50,
+      "delta_right": 50,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        216,
+        33
+      ],
+      "localized_size": [
+        116,
+        29
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "handling",
+      "original_bbox": [
+        1412,
+        128,
+        1597,
+        161
+      ],
+      "localized_bbox": [
+        1465,
+        130,
+        1543,
+        158
+      ],
+      "delta_left": 53,
+      "delta_right": 54,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "source_size": [
+        185,
+        33
+      ],
+      "localized_size": [
+        78,
+        28
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "extra": {},
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}

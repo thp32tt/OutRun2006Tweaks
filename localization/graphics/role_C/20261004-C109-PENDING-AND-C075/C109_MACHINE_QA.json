@@ -1,0 +1,2634 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-C109-PENDING-AND-C075",
+  "results": [
+    {
+      "schema_version": 1,
+      "role": "C",
+      "run": "20261004-C109-PENDING-AND-C075",
+      "asset": "AD720950",
+      "candidate_sha256": "6dad37489e7027b8f546c38b3729167697965fc8e33fcabff46f09aba1677955",
+      "source_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+      "source_header_128_exact": true,
+      "structure": {
+        "width": 4096,
+        "height": 1024,
+        "pitch": 16384,
+        "mips": 1,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_orientation": "mirror_y"
+      },
+      "source_png_vs_decoded_source_diff_pixels": 0,
+      "decoded_candidate_vs_persisted_final_diff_pixels": 0,
+      "clean_changed_pixels_outside_source_text_mask": 0,
+      "source_text_mask_pixels_unchanged_in_clean_plate": 0,
+      "final_changed_pixels_in_protected_mask": 0,
+      "target_pixels_outside_union_source_bboxes": 0,
+      "target_pixels_outside_union_localized_bboxes": 0,
+      "persisted_allowed_mask_xor_vs_union_source_bboxes": 0,
+      "target_pixels_outside_persisted_allowed_mask": 0,
+      "localized_pair_overlap_pixels": 0,
+      "localized_touch_pairs": [],
+      "rows": [
+        {
+          "key": "symbols",
+          "original_bbox": [
+            3757,
+            76,
+            3957,
+            131
+          ],
+          "localized_bbox": [
+            3811,
+            78,
+            3902,
+            129
+          ],
+          "delta_left": 54,
+          "delta_right": 55,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            200,
+            55
+          ],
+          "localized_size": [
+            91,
+            51
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "caps_lock",
+          "original_bbox": [
+            3759,
+            276,
+            3995,
+            331
+          ],
+          "localized_bbox": [
+            3761,
+            278,
+            3992,
+            328
+          ],
+          "delta_left": 2,
+          "delta_right": 3,
+          "delta_top": 2,
+          "delta_bottom": 3,
+          "source_size": [
+            236,
+            55
+          ],
+          "localized_size": [
+            231,
+            50
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "accents",
+          "original_bbox": [
+            3756,
+            377,
+            3948,
+            421
+          ],
+          "localized_bbox": [
+            3797,
+            379,
+            3906,
+            419
+          ],
+          "delta_left": 41,
+          "delta_right": 42,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            192,
+            44
+          ],
+          "localized_size": [
+            109,
+            40
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "done",
+          "original_bbox": [
+            3759,
+            474,
+            3876,
+            518
+          ],
+          "localized_bbox": [
+            3780,
+            476,
+            3854,
+            516
+          ],
+          "delta_left": 21,
+          "delta_right": 22,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            117,
+            44
+          ],
+          "localized_size": [
+            74,
+            40
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "backspace_r1",
+          "original_bbox": [
+            863,
+            376,
+            1094,
+            431
+          ],
+          "localized_bbox": [
+            911,
+            378,
+            1045,
+            429
+          ],
+          "delta_left": 48,
+          "delta_right": 49,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            231,
+            55
+          ],
+          "localized_size": [
+            134,
+            51
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "space_r1",
+          "original_bbox": [
+            264,
+            473,
+            397,
+            528
+          ],
+          "localized_bbox": [
+            286,
+            475,
+            375,
+            526
+          ],
+          "delta_left": 22,
+          "delta_right": 22,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            133,
+            55
+          ],
+          "localized_size": [
+            89,
+            51
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "backspace_r2",
+          "original_bbox": [
+            2103,
+            376,
+            2334,
+            431
+          ],
+          "localized_bbox": [
+            2151,
+            378,
+            2285,
+            429
+          ],
+          "delta_left": 48,
+          "delta_right": 49,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            231,
+            55
+          ],
+          "localized_size": [
+            134,
+            51
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "space_r2",
+          "original_bbox": [
+            1504,
+            473,
+            1637,
+            528
+          ],
+          "localized_bbox": [
+            1526,
+            475,
+            1615,
+            526
+          ],
+          "delta_left": 22,
+          "delta_right": 22,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            133,
+            55
+          ],
+          "localized_size": [
+            89,
+            51
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "backspace_r3",
+          "original_bbox": [
+            3343,
+            376,
+            3574,
+            431
+          ],
+          "localized_bbox": [
+            3391,
+            378,
+            3525,
+            429
+          ],
+          "delta_left": 48,
+          "delta_right": 49,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            231,
+            55
+          ],
+          "localized_size": [
+            134,
+            51
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "space_r3",
+          "original_bbox": [
+            2744,
+            473,
+            2877,
+            528
+          ],
+          "localized_bbox": [
+            2766,
+            475,
+            2855,
+            526
+          ],
+          "delta_left": 22,
+          "delta_right": 22,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            133,
+            55
+          ],
+          "localized_size": [
+            89,
+            51
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "backspace_r5",
+          "original_bbox": [
+            2479,
+            864,
+            2710,
+            919
+          ],
+          "localized_bbox": [
+            2527,
+            866,
+            2661,
+            917
+          ],
+          "delta_left": 48,
+          "delta_right": 49,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            231,
+            55
+          ],
+          "localized_size": [
+            134,
+            51
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "space_r5",
+          "original_bbox": [
+            1880,
+            961,
+            2013,
+            1016
+          ],
+          "localized_bbox": [
+            1902,
+            963,
+            1991,
+            1014
+          ],
+          "delta_left": 22,
+          "delta_right": 22,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            133,
+            55
+          ],
+          "localized_size": [
+            89,
+            51
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "backspace_r6",
+          "original_bbox": [
+            3719,
+            864,
+            3950,
+            919
+          ],
+          "localized_bbox": [
+            3767,
+            866,
+            3901,
+            917
+          ],
+          "delta_left": 48,
+          "delta_right": 49,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            231,
+            55
+          ],
+          "localized_size": [
+            134,
+            51
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "space_r6",
+          "original_bbox": [
+            3120,
+            961,
+            3253,
+            1016
+          ],
+          "localized_bbox": [
+            3142,
+            963,
+            3231,
+            1014
+          ],
+          "delta_left": 22,
+          "delta_right": 22,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            133,
+            55
+          ],
+          "localized_size": [
+            89,
+            51
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "extra": {},
+      "machine_status": "PASS",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "schema_version": 1,
+      "role": "C",
+      "run": "20261004-C109-PENDING-AND-C075",
+      "asset": "BF3EE5C6",
+      "candidate_sha256": "30cc2167b1650ab0a7b1c579c7d29118065007f0474f7207ce993ab1b19e45fa",
+      "source_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+      "source_header_128_exact": true,
+      "structure": {
+        "width": 2048,
+        "height": 2048,
+        "pitch": 8192,
+        "mips": 1,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_orientation": "mirror_y"
+      },
+      "source_png_vs_decoded_source_diff_pixels": 0,
+      "decoded_candidate_vs_persisted_final_diff_pixels": 0,
+      "clean_changed_pixels_outside_source_text_mask": 0,
+      "source_text_mask_pixels_unchanged_in_clean_plate": 0,
+      "final_changed_pixels_in_protected_mask": 0,
+      "target_pixels_outside_union_source_bboxes": 0,
+      "target_pixels_outside_union_localized_bboxes": 0,
+      "persisted_allowed_mask_xor_vs_union_source_bboxes": 0,
+      "target_pixels_outside_persisted_allowed_mask": 0,
+      "localized_pair_overlap_pixels": 0,
+      "localized_touch_pairs": [],
+      "rows": [
+        {
+          "key": "rank_stage",
+          "original_bbox": [
+            12,
+            163,
+            615,
+            245
+          ],
+          "localized_bbox": [
+            70,
+            165,
+            557,
+            243
+          ],
+          "delta_left": 58,
+          "delta_right": 58,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            603,
+            82
+          ],
+          "localized_size": [
+            487,
+            78
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "normal",
+          "original_bbox": [
+            729,
+            192,
+            1012,
+            251
+          ],
+          "localized_bbox": [
+            822,
+            194,
+            919,
+            249
+          ],
+          "delta_left": 93,
+          "delta_right": 93,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            283,
+            59
+          ],
+          "localized_size": [
+            97,
+            55
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "tuned_a",
+          "original_bbox": [
+            1116,
+            193,
+            1342,
+            251
+          ],
+          "localized_bbox": [
+            1183,
+            195,
+            1274,
+            249
+          ],
+          "delta_left": 67,
+          "delta_right": 68,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            226,
+            58
+          ],
+          "localized_size": [
+            91,
+            54
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "tuned_b",
+          "original_bbox": [
+            1476,
+            193,
+            1702,
+            251
+          ],
+          "localized_bbox": [
+            1543,
+            195,
+            1634,
+            249
+          ],
+          "delta_left": 67,
+          "delta_right": 68,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            226,
+            58
+          ],
+          "localized_size": [
+            91,
+            54
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "top_ghost",
+          "original_bbox": [
+            572,
+            272,
+            1374,
+            392
+          ],
+          "localized_bbox": [
+            682,
+            274,
+            1263,
+            390
+          ],
+          "delta_left": 110,
+          "delta_right": 111,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            802,
+            120
+          ],
+          "localized_size": [
+            581,
+            116
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "double",
+          "original_bbox": [
+            0,
+            400,
+            500,
+            528
+          ],
+          "localized_bbox": [
+            120,
+            402,
+            379,
+            526
+          ],
+          "delta_left": 120,
+          "delta_right": 121,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            500,
+            128
+          ],
+          "localized_size": [
+            259,
+            124
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "strike",
+          "original_bbox": [
+            548,
+            392,
+            1000,
+            528
+          ],
+          "localized_bbox": [
+            550,
+            410,
+            998,
+            510
+          ],
+          "delta_left": 2,
+          "delta_right": 2,
+          "delta_top": 18,
+          "delta_bottom": 18,
+          "source_size": [
+            452,
+            136
+          ],
+          "localized_size": [
+            448,
+            100
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "goal",
+          "original_bbox": [
+            600,
+            552,
+            1016,
+            680
+          ],
+          "localized_bbox": [
+            728,
+            554,
+            887,
+            678
+          ],
+          "delta_left": 128,
+          "delta_right": 129,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            416,
+            128
+          ],
+          "localized_size": [
+            159,
+            124
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "spare",
+          "original_bbox": [
+            1104,
+            544,
+            1520,
+            688
+          ],
+          "localized_bbox": [
+            1112,
+            546,
+            1511,
+            686
+          ],
+          "delta_left": 8,
+          "delta_right": 9,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            416,
+            144
+          ],
+          "localized_size": [
+            399,
+            140
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "shift_up",
+          "original_bbox": [
+            158,
+            710,
+            900,
+            878
+          ],
+          "localized_bbox": [
+            181,
+            712,
+            876,
+            876
+          ],
+          "delta_left": 23,
+          "delta_right": 24,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            742,
+            168
+          ],
+          "localized_size": [
+            695,
+            164
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "rank",
+          "original_bbox": [
+            1068,
+            756,
+            1413,
+            882
+          ],
+          "localized_bbox": [
+            1131,
+            758,
+            1350,
+            879
+          ],
+          "delta_left": 63,
+          "delta_right": 63,
+          "delta_top": 2,
+          "delta_bottom": 3,
+          "source_size": [
+            345,
+            126
+          ],
+          "localized_size": [
+            219,
+            121
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "turkey",
+          "original_bbox": [
+            1572,
+            992,
+            2012,
+            1140
+          ],
+          "localized_bbox": [
+            1642,
+            994,
+            1942,
+            1138
+          ],
+          "delta_left": 70,
+          "delta_right": 70,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            440,
+            148
+          ],
+          "localized_size": [
+            300,
+            144
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "go",
+          "original_bbox": [
+            25,
+            1161,
+            805,
+            1517
+          ],
+          "localized_bbox": [
+            52,
+            1163,
+            778,
+            1515
+          ],
+          "delta_left": 27,
+          "delta_right": 27,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            780,
+            356
+          ],
+          "localized_size": [
+            726,
+            352
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "extra": {},
+      "machine_status": "PASS",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "schema_version": 1,
+      "role": "C",
+      "run": "20261004-C109-PENDING-AND-C075",
+      "asset": "2B0863D6",
+      "candidate_sha256": "2f3e99f468367e056ee3c6edfdb412b1fe5f10f27387a463472b07aeaa335fbb",
+      "source_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+      "source_header_128_exact": true,
+      "structure": {
+        "width": 2048,
+        "height": 256,
+        "pitch": 8192,
+        "mips": 1,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_orientation": "mirror_y"
+      },
+      "source_png_vs_decoded_source_diff_pixels": 0,
+      "decoded_candidate_vs_persisted_final_diff_pixels": 0,
+      "clean_changed_pixels_outside_source_text_mask": 0,
+      "source_text_mask_pixels_unchanged_in_clean_plate": 0,
+      "final_changed_pixels_in_protected_mask": 0,
+      "target_pixels_outside_union_source_bboxes": 0,
+      "target_pixels_outside_union_localized_bboxes": 0,
+      "persisted_allowed_mask_xor_vs_union_source_bboxes": 0,
+      "target_pixels_outside_persisted_allowed_mask": 0,
+      "localized_pair_overlap_pixels": 0,
+      "localized_touch_pairs": [],
+      "rows": [
+        {
+          "key": "professional",
+          "original_bbox": [
+            189,
+            185,
+            698,
+            245
+          ],
+          "localized_bbox": [
+            377,
+            187,
+            509,
+            243
+          ],
+          "delta_left": 188,
+          "delta_right": 189,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            509,
+            60
+          ],
+          "localized_size": [
+            132,
+            56
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "novice",
+          "original_bbox": [
+            1154,
+            187,
+            1399,
+            246
+          ],
+          "localized_bbox": [
+            1222,
+            189,
+            1330,
+            244
+          ],
+          "delta_left": 68,
+          "delta_right": 69,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            245,
+            59
+          ],
+          "localized_size": [
+            108,
+            55
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "outrun",
+          "original_bbox": [
+            423,
+            107,
+            700,
+            166
+          ],
+          "localized_bbox": [
+            485,
+            109,
+            637,
+            164
+          ],
+          "delta_left": 62,
+          "delta_right": 63,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            277,
+            59
+          ],
+          "localized_size": [
+            152,
+            55
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "intermediate_b",
+          "original_bbox": [
+            830,
+            108,
+            1396,
+            164
+          ],
+          "localized_bbox": [
+            1034,
+            110,
+            1191,
+            162
+          ],
+          "delta_left": 204,
+          "delta_right": 205,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            566,
+            56
+          ],
+          "localized_size": [
+            157,
+            52
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "intermediate_a",
+          "original_bbox": [
+            128,
+            28,
+            696,
+            84
+          ],
+          "localized_bbox": [
+            334,
+            30,
+            490,
+            82
+          ],
+          "delta_left": 206,
+          "delta_right": 206,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            568,
+            56
+          ],
+          "localized_size": [
+            156,
+            52
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "change_class",
+          "original_bbox": [
+            840,
+            38,
+            1243,
+            86
+          ],
+          "localized_bbox": [
+            934,
+            40,
+            1149,
+            84
+          ],
+          "delta_left": 94,
+          "delta_right": 94,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            403,
+            48
+          ],
+          "localized_size": [
+            215,
+            44
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "class",
+          "original_bbox": [
+            1292,
+            50,
+            1429,
+            87
+          ],
+          "localized_bbox": [
+            1313,
+            52,
+            1407,
+            85
+          ],
+          "delta_left": 21,
+          "delta_right": 22,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            137,
+            37
+          ],
+          "localized_size": [
+            94,
+            33
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "acceleration",
+          "original_bbox": [
+            1475,
+            48,
+            1736,
+            81
+          ],
+          "localized_bbox": [
+            1578,
+            50,
+            1632,
+            79
+          ],
+          "delta_left": 103,
+          "delta_right": 104,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            261,
+            33
+          ],
+          "localized_size": [
+            54,
+            29
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "max_speed",
+          "original_bbox": [
+            1746,
+            48,
+            1962,
+            81
+          ],
+          "localized_bbox": [
+            1796,
+            50,
+            1912,
+            79
+          ],
+          "delta_left": 50,
+          "delta_right": 50,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            216,
+            33
+          ],
+          "localized_size": [
+            116,
+            29
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "handling",
+          "original_bbox": [
+            1412,
+            128,
+            1597,
+            161
+          ],
+          "localized_bbox": [
+            1465,
+            130,
+            1543,
+            158
+          ],
+          "delta_left": 53,
+          "delta_right": 54,
+          "delta_top": 2,
+          "delta_bottom": 3,
+          "source_size": [
+            185,
+            33
+          ],
+          "localized_size": [
+            78,
+            28
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "extra": {},
+      "machine_status": "PASS",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "schema_version": 1,
+      "role": "C",
+      "run": "20261004-C109-PENDING-AND-C075",
+      "asset": "C075FB49",
+      "candidate_sha256": "fc75a1a1b267dbc43f240483ffc1ec67e3d3dddd05061e504ab4c0c4ca2efacd",
+      "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "source_header_128_exact": true,
+      "structure": {
+        "width": 2048,
+        "height": 2048,
+        "pitch": 8192,
+        "mips": 1,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_orientation": "mirror_y"
+      },
+      "source_png_vs_decoded_source_diff_pixels": 0,
+      "decoded_candidate_vs_persisted_final_diff_pixels": 0,
+      "clean_changed_pixels_outside_source_text_mask": null,
+      "source_text_mask_pixels_unchanged_in_clean_plate": 0,
+      "final_changed_pixels_in_protected_mask": 0,
+      "target_pixels_outside_union_source_bboxes": 0,
+      "target_pixels_outside_union_localized_bboxes": 0,
+      "persisted_allowed_mask_xor_vs_union_source_bboxes": 0,
+      "target_pixels_outside_persisted_allowed_mask": 0,
+      "localized_pair_overlap_pixels": 0,
+      "localized_touch_pairs": [],
+      "rows": [
+        {
+          "key": "long_distance",
+          "original_bbox": [
+            574,
+            29,
+            1120,
+            129
+          ],
+          "localized_bbox": [
+            744,
+            40,
+            949,
+            118
+          ],
+          "delta_left": 170,
+          "delta_right": 171,
+          "delta_top": 11,
+          "delta_bottom": 11,
+          "source_size": [
+            546,
+            100
+          ],
+          "localized_size": [
+            205,
+            78
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "keep_passing",
+          "original_bbox": [
+            1,
+            143,
+            520,
+            236
+          ],
+          "localized_bbox": [
+            40,
+            165,
+            482,
+            215
+          ],
+          "delta_left": 39,
+          "delta_right": 38,
+          "delta_top": 22,
+          "delta_bottom": 21,
+          "source_size": [
+            519,
+            93
+          ],
+          "localized_size": [
+            442,
+            50
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "drift",
+          "original_bbox": [
+            500,
+            120,
+            720,
+            228
+          ],
+          "localized_bbox": [
+            517,
+            149,
+            704,
+            200
+          ],
+          "delta_left": 17,
+          "delta_right": 16,
+          "delta_top": 29,
+          "delta_bottom": 28,
+          "source_size": [
+            220,
+            108
+          ],
+          "localized_size": [
+            187,
+            51
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "maximum_speed",
+          "original_bbox": [
+            680,
+            120,
+            1137,
+            227
+          ],
+          "localized_bbox": [
+            723,
+            129,
+            1093,
+            219
+          ],
+          "delta_left": 43,
+          "delta_right": 44,
+          "delta_top": 9,
+          "delta_bottom": 8,
+          "source_size": [
+            457,
+            107
+          ],
+          "localized_size": [
+            370,
+            90
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "transmission",
+          "original_bbox": [
+            1,
+            200,
+            600,
+            370
+          ],
+          "localized_bbox": [
+            117,
+            233,
+            483,
+            360
+          ],
+          "delta_left": 116,
+          "delta_right": 117,
+          "delta_top": 33,
+          "delta_bottom": 10,
+          "source_size": [
+            599,
+            170
+          ],
+          "localized_size": [
+            366,
+            127
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "dont_crash",
+          "original_bbox": [
+            550,
+            200,
+            1070,
+            370
+          ],
+          "localized_bbox": [
+            602,
+            259,
+            1018,
+            325
+          ],
+          "delta_left": 52,
+          "delta_right": 52,
+          "delta_top": 59,
+          "delta_bottom": 45,
+          "source_size": [
+            520,
+            170
+          ],
+          "localized_size": [
+            416,
+            66
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "go_gate",
+          "original_bbox": [
+            1020,
+            200,
+            1590,
+            370
+          ],
+          "localized_bbox": [
+            1077,
+            261,
+            1532,
+            319
+          ],
+          "delta_left": 57,
+          "delta_right": 58,
+          "delta_top": 61,
+          "delta_bottom": 51,
+          "source_size": [
+            570,
+            170
+          ],
+          "localized_size": [
+            455,
+            58
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "for_experts",
+          "original_bbox": [
+            1530,
+            200,
+            1980,
+            370
+          ],
+          "localized_bbox": [
+            1606,
+            251,
+            1949,
+            343
+          ],
+          "delta_left": 76,
+          "delta_right": 31,
+          "delta_top": 51,
+          "delta_bottom": 27,
+          "source_size": [
+            450,
+            170
+          ],
+          "localized_size": [
+            343,
+            92
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "tuned_setting",
+          "original_bbox": [
+            40,
+            1195,
+            245,
+            1305
+          ],
+          "localized_bbox": [
+            100,
+            1204,
+            183,
+            1296
+          ],
+          "delta_left": 60,
+          "delta_right": 62,
+          "delta_top": 9,
+          "delta_bottom": 9,
+          "source_size": [
+            205,
+            110
+          ],
+          "localized_size": [
+            83,
+            92
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "normal_setting",
+          "original_bbox": [
+            381,
+            1195,
+            600,
+            1305
+          ],
+          "localized_bbox": [
+            448,
+            1204,
+            533,
+            1296
+          ],
+          "delta_left": 67,
+          "delta_right": 67,
+          "delta_top": 9,
+          "delta_bottom": 9,
+          "source_size": [
+            219,
+            110
+          ],
+          "localized_size": [
+            85,
+            92
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "new_course_desc",
+          "original_bbox": [
+            242,
+            1394,
+            767,
+            1602
+          ],
+          "localized_bbox": [
+            283,
+            1448,
+            725,
+            1549
+          ],
+          "delta_left": 41,
+          "delta_right": 42,
+          "delta_top": 54,
+          "delta_bottom": 53,
+          "source_size": [
+            525,
+            208
+          ],
+          "localized_size": [
+            442,
+            101
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "original_course_desc",
+          "original_bbox": [
+            830,
+            1394,
+            1305,
+            1609
+          ],
+          "localized_bbox": [
+            864,
+            1409,
+            1272,
+            1594
+          ],
+          "delta_left": 34,
+          "delta_right": 33,
+          "delta_top": 15,
+          "delta_bottom": 15,
+          "source_size": [
+            475,
+            215
+          ],
+          "localized_size": [
+            408,
+            185
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "conditions",
+          "original_bbox": [
+            1325,
+            1410,
+            1655,
+            1545
+          ],
+          "localized_bbox": [
+            1412,
+            1441,
+            1561,
+            1513
+          ],
+          "delta_left": 87,
+          "delta_right": 94,
+          "delta_top": 31,
+          "delta_bottom": 32,
+          "source_size": [
+            330,
+            135
+          ],
+          "localized_size": [
+            149,
+            72
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "random",
+          "original_bbox": [
+            1710,
+            1435,
+            2008,
+            1515
+          ],
+          "localized_bbox": [
+            1780,
+            1442,
+            1938,
+            1506
+          ],
+          "delta_left": 70,
+          "delta_right": 70,
+          "delta_top": 7,
+          "delta_bottom": 9,
+          "source_size": [
+            298,
+            80
+          ],
+          "localized_size": [
+            158,
+            64
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "normal_balance",
+          "original_bbox": [
+            875,
+            1632,
+            1265,
+            1704
+          ],
+          "localized_bbox": [
+            968,
+            1650,
+            1166,
+            1690
+          ],
+          "delta_left": 93,
+          "delta_right": 99,
+          "delta_top": 18,
+          "delta_bottom": 14,
+          "source_size": [
+            390,
+            72
+          ],
+          "localized_size": [
+            198,
+            40
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "more_bgm_1",
+          "original_bbox": [
+            890,
+            1720,
+            1265,
+            1792
+          ],
+          "localized_bbox": [
+            957,
+            1732,
+            1193,
+            1774
+          ],
+          "delta_left": 67,
+          "delta_right": 72,
+          "delta_top": 12,
+          "delta_bottom": 18,
+          "source_size": [
+            375,
+            72
+          ],
+          "localized_size": [
+            236,
+            42
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "more_bgm_2",
+          "original_bbox": [
+            1300,
+            1720,
+            1655,
+            1792
+          ],
+          "localized_bbox": [
+            1325,
+            1732,
+            1630,
+            1787
+          ],
+          "delta_left": 25,
+          "delta_right": 25,
+          "delta_top": 12,
+          "delta_bottom": 5,
+          "source_size": [
+            355,
+            72
+          ],
+          "localized_size": [
+            305,
+            55
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "extra": {},
+      "machine_status": "PASS",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "schema_version": 1,
+      "role": "C",
+      "run": "20261004-C109-PENDING-AND-C075",
+      "asset": "FD90AA9",
+      "candidate_sha256": "0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b",
+      "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "source_header_128_exact": true,
+      "structure": {
+        "width": 4096,
+        "height": 4096,
+        "pitch": 16384,
+        "mips": 1,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "raw_orientation": "mirror_y"
+      },
+      "source_png_vs_decoded_source_diff_pixels": 0,
+      "decoded_candidate_vs_persisted_final_diff_pixels": 0,
+      "clean_changed_pixels_outside_source_text_mask": 0,
+      "source_text_mask_pixels_unchanged_in_clean_plate": 823,
+      "final_changed_pixels_in_protected_mask": 608833,
+      "target_pixels_outside_union_source_bboxes": 0,
+      "target_pixels_outside_union_localized_bboxes": 0,
+      "persisted_allowed_mask_xor_vs_union_source_bboxes": null,
+      "target_pixels_outside_persisted_allowed_mask": null,
+      "localized_pair_overlap_pixels": 0,
+      "localized_touch_pairs": [],
+      "rows": [
+        {
+          "key": "outsp_course",
+          "original_bbox": [
+            1126,
+            374,
+            1678,
+            449
+          ],
+          "localized_bbox": [
+            1194,
+            376,
+            1622,
+            443
+          ],
+          "delta_left": 68,
+          "delta_right": 56,
+          "delta_top": 2,
+          "delta_bottom": 6,
+          "source_size": [
+            552,
+            75
+          ],
+          "localized_size": [
+            428,
+            67
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "out2_course",
+          "original_bbox": [
+            1776,
+            374,
+            2232,
+            449
+          ],
+          "localized_bbox": [
+            1828,
+            376,
+            2178,
+            446
+          ],
+          "delta_left": 52,
+          "delta_right": 54,
+          "delta_top": 2,
+          "delta_bottom": 3,
+          "source_size": [
+            456,
+            75
+          ],
+          "localized_size": [
+            350,
+            70
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "more_engine",
+          "original_bbox": [
+            2772,
+            376,
+            3187,
+            448
+          ],
+          "localized_bbox": [
+            2851,
+            385,
+            3086,
+            438
+          ],
+          "delta_left": 79,
+          "delta_right": 101,
+          "delta_top": 9,
+          "delta_bottom": 10,
+          "source_size": [
+            415,
+            72
+          ],
+          "localized_size": [
+            235,
+            53
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "you",
+          "original_bbox": [
+            3169,
+            376,
+            3334,
+            445
+          ],
+          "localized_bbox": [
+            3237,
+            378,
+            3294,
+            438
+          ],
+          "delta_left": 68,
+          "delta_right": 40,
+          "delta_top": 2,
+          "delta_bottom": 7,
+          "source_size": [
+            165,
+            69
+          ],
+          "localized_size": [
+            57,
+            60
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "gas_pedal",
+          "original_bbox": [
+            3490,
+            391,
+            3748,
+            440
+          ],
+          "localized_bbox": [
+            3530,
+            393,
+            3708,
+            438
+          ],
+          "delta_left": 40,
+          "delta_right": 40,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            258,
+            49
+          ],
+          "localized_size": [
+            178,
+            45
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "run15",
+          "original_bbox": [
+            0,
+            517,
+            934,
+            620
+          ],
+          "localized_bbox": [
+            62,
+            533,
+            864,
+            604
+          ],
+          "delta_left": 62,
+          "delta_right": 70,
+          "delta_top": 16,
+          "delta_bottom": 16,
+          "source_size": [
+            934,
+            103
+          ],
+          "localized_size": [
+            802,
+            71
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "maximum_speed",
+          "original_bbox": [
+            922,
+            499,
+            1408,
+            620
+          ],
+          "localized_bbox": [
+            995,
+            518,
+            1327,
+            600
+          ],
+          "delta_left": 73,
+          "delta_right": 81,
+          "delta_top": 19,
+          "delta_bottom": 20,
+          "source_size": [
+            486,
+            121
+          ],
+          "localized_size": [
+            332,
+            82
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "enter_selection",
+          "original_bbox": [
+            3456,
+            517,
+            3893,
+            627
+          ],
+          "localized_bbox": [
+            3550,
+            532,
+            3828,
+            611
+          ],
+          "delta_left": 94,
+          "delta_right": 65,
+          "delta_top": 15,
+          "delta_bottom": 16,
+          "source_size": [
+            437,
+            110
+          ],
+          "localized_size": [
+            278,
+            79
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "same_conditions",
+          "original_bbox": [
+            14,
+            614,
+            1894,
+            730
+          ],
+          "localized_bbox": [
+            193,
+            631,
+            1691,
+            712
+          ],
+          "delta_left": 179,
+          "delta_right": 203,
+          "delta_top": 17,
+          "delta_bottom": 18,
+          "source_size": [
+            1880,
+            116
+          ],
+          "localized_size": [
+            1498,
+            81
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "transmission2",
+          "original_bbox": [
+            1221,
+            722,
+            1805,
+            843
+          ],
+          "localized_bbox": [
+            1385,
+            748,
+            1789,
+            841
+          ],
+          "delta_left": 164,
+          "delta_right": 16,
+          "delta_top": 26,
+          "delta_bottom": 2,
+          "source_size": [
+            584,
+            121
+          ],
+          "localized_size": [
+            404,
+            93
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "experts_long",
+          "original_bbox": [
+            1907,
+            602,
+            3406,
+            781
+          ],
+          "localized_bbox": [
+            2335,
+            625,
+            2985,
+            693
+          ],
+          "delta_left": 428,
+          "delta_right": 421,
+          "delta_top": 23,
+          "delta_bottom": 88,
+          "source_size": [
+            1499,
+            179
+          ],
+          "localized_size": [
+            650,
+            68
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "view_choices",
+          "original_bbox": [
+            3525,
+            614,
+            3882,
+            730
+          ],
+          "localized_bbox": [
+            3563,
+            632,
+            3855,
+            712
+          ],
+          "delta_left": 38,
+          "delta_right": 27,
+          "delta_top": 18,
+          "delta_bottom": 18,
+          "source_size": [
+            357,
+            116
+          ],
+          "localized_size": [
+            292,
+            80
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "for_experts",
+          "original_bbox": [
+            1766,
+            704,
+            2304,
+            896
+          ],
+          "localized_bbox": [
+            1948,
+            788,
+            2151,
+            847
+          ],
+          "delta_left": 182,
+          "delta_right": 153,
+          "delta_top": 84,
+          "delta_bottom": 49,
+          "source_size": [
+            538,
+            192
+          ],
+          "localized_size": [
+            203,
+            59
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "normal_difficult",
+          "original_bbox": [
+            2547,
+            704,
+            3354,
+            896
+          ],
+          "localized_bbox": [
+            2801,
+            793,
+            3108,
+            861
+          ],
+          "delta_left": 254,
+          "delta_right": 246,
+          "delta_top": 89,
+          "delta_bottom": 35,
+          "source_size": [
+            807,
+            192
+          ],
+          "localized_size": [
+            307,
+            68
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "select_game_mode",
+          "original_bbox": [
+            166,
+            819,
+            1166,
+            973
+          ],
+          "localized_bbox": [
+            347,
+            846,
+            1037,
+            971
+          ],
+          "delta_left": 181,
+          "delta_right": 129,
+          "delta_top": 27,
+          "delta_bottom": 2,
+          "source_size": [
+            1000,
+            154
+          ],
+          "localized_size": [
+            690,
+            125
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "select_car",
+          "original_bbox": [
+            243,
+            947,
+            1156,
+            1111
+          ],
+          "localized_bbox": [
+            487,
+            981,
+            954,
+            1092
+          ],
+          "delta_left": 244,
+          "delta_right": 202,
+          "delta_top": 34,
+          "delta_bottom": 19,
+          "source_size": [
+            913,
+            164
+          ],
+          "localized_size": [
+            467,
+            111
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "select_course",
+          "original_bbox": [
+            302,
+            1062,
+            1085,
+            1213
+          ],
+          "localized_bbox": [
+            386,
+            1097,
+            893,
+            1211
+          ],
+          "delta_left": 84,
+          "delta_right": 192,
+          "delta_top": 35,
+          "delta_bottom": 2,
+          "source_size": [
+            783,
+            151
+          ],
+          "localized_size": [
+            507,
+            114
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "select_music",
+          "original_bbox": [
+            1549,
+            819,
+            2571,
+            990
+          ],
+          "localized_bbox": [
+            1892,
+            857,
+            2358,
+            970
+          ],
+          "delta_left": 343,
+          "delta_right": 213,
+          "delta_top": 38,
+          "delta_bottom": 20,
+          "source_size": [
+            1022,
+            171
+          ],
+          "localized_size": [
+            466,
+            113
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "select_transmission",
+          "original_bbox": [
+            1563,
+            947,
+            2589,
+            1092
+          ],
+          "localized_bbox": [
+            1737,
+            975,
+            2436,
+            1090
+          ],
+          "delta_left": 174,
+          "delta_right": 153,
+          "delta_top": 28,
+          "delta_bottom": 2,
+          "source_size": [
+            1026,
+            145
+          ],
+          "localized_size": [
+            699,
+            115
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "shortcut_features",
+          "original_bbox": [
+            1587,
+            1062,
+            2611,
+            1213
+          ],
+          "localized_bbox": [
+            1770,
+            1097,
+            2400,
+            1211
+          ],
+          "delta_left": 183,
+          "delta_right": 211,
+          "delta_top": 35,
+          "delta_bottom": 2,
+          "source_size": [
+            1024,
+            151
+          ],
+          "localized_size": [
+            630,
+            114
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "selected_sp",
+          "original_bbox": [
+            63,
+            1183,
+            2227,
+            1348
+          ],
+          "localized_bbox": [
+            971,
+            1199,
+            1662,
+            1319
+          ],
+          "delta_left": 908,
+          "delta_right": 565,
+          "delta_top": 16,
+          "delta_bottom": 29,
+          "source_size": [
+            2164,
+            165
+          ],
+          "localized_size": [
+            691,
+            120
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "selected_out2",
+          "original_bbox": [
+            90,
+            1306,
+            2125,
+            1484
+          ],
+          "localized_bbox": [
+            222,
+            1336,
+            2016,
+            1477
+          ],
+          "delta_left": 132,
+          "delta_right": 109,
+          "delta_top": 30,
+          "delta_bottom": 7,
+          "source_size": [
+            2035,
+            178
+          ],
+          "localized_size": [
+            1794,
+            141
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "select_car_setting",
+          "original_bbox": [
+            2419,
+            1183,
+            3394,
+            1367
+          ],
+          "localized_bbox": [
+            2770,
+            1194,
+            3343,
+            1356
+          ],
+          "delta_left": 351,
+          "delta_right": 51,
+          "delta_top": 11,
+          "delta_bottom": 11,
+          "source_size": [
+            975,
+            184
+          ],
+          "localized_size": [
+            573,
+            162
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "versus_mode",
+          "original_bbox": [
+            2226,
+            1306,
+            2995,
+            1486
+          ],
+          "localized_bbox": [
+            2311,
+            1306,
+            2767,
+            1475
+          ],
+          "delta_left": 85,
+          "delta_right": 228,
+          "delta_top": 0,
+          "delta_bottom": 11,
+          "source_size": [
+            769,
+            180
+          ],
+          "localized_size": [
+            456,
+            169
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "gear_change",
+          "original_bbox": [
+            3587,
+            1304,
+            4034,
+            1501
+          ],
+          "localized_bbox": [
+            3648,
+            1330,
+            4022,
+            1499
+          ],
+          "delta_left": 61,
+          "delta_right": 12,
+          "delta_top": 26,
+          "delta_bottom": 2,
+          "source_size": [
+            447,
+            197
+          ],
+          "localized_size": [
+            374,
+            169
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "player_battle_desc",
+          "original_bbox": [
+            3093,
+            1446,
+            3994,
+            1668
+          ],
+          "localized_bbox": [
+            3095,
+            1454,
+            3633,
+            1632
+          ],
+          "delta_left": 2,
+          "delta_right": 361,
+          "delta_top": 8,
+          "delta_bottom": 36,
+          "source_size": [
+            901,
+            222
+          ],
+          "localized_size": [
+            538,
+            178
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "new_course_desc",
+          "original_bbox": [
+            3008,
+            1587,
+            3828,
+            1827
+          ],
+          "localized_bbox": [
+            3010,
+            1654,
+            3826,
+            1790
+          ],
+          "delta_left": 2,
+          "delta_right": 2,
+          "delta_top": 67,
+          "delta_bottom": 37,
+          "source_size": [
+            820,
+            240
+          ],
+          "localized_size": [
+            816,
+            136
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "orig_course_desc",
+          "original_bbox": [
+            3008,
+            1754,
+            3662,
+            1995
+          ],
+          "localized_bbox": [
+            3010,
+            1822,
+            3660,
+            1975
+          ],
+          "delta_left": 2,
+          "delta_right": 2,
+          "delta_top": 68,
+          "delta_bottom": 20,
+          "source_size": [
+            654,
+            241
+          ],
+          "localized_size": [
+            650,
+            153
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "random_music",
+          "original_bbox": [
+            1741,
+            2360,
+            2720,
+            2573
+          ],
+          "localized_bbox": [
+            1957,
+            2362,
+            2530,
+            2544
+          ],
+          "delta_left": 216,
+          "delta_right": 190,
+          "delta_top": 2,
+          "delta_bottom": 29,
+          "source_size": [
+            979,
+            213
+          ],
+          "localized_size": [
+            573,
+            182
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "extra": {
+        "changed_pixels_vs_input_outside_four_reworked_source_bboxes": 0,
+        "preserved_unaffected_report_all_zero": true
+      },
+      "machine_status": "FAIL",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "machine_pass_assets": [
+    "AD720950",
+    "BF3EE5C6",
+    "2B0863D6",
+    "C075FB49"
+  ],
+  "machine_fail_assets": [
+    "FD90AA9"
+  ],
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
