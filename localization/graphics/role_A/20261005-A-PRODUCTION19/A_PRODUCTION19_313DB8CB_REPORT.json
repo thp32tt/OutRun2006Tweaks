@@ -3,7 +3,7 @@
   "role": "A",
   "run": "20261005-A-PRODUCTION19",
   "worker": "github-actions",
-  "base_head": "35768dacdc0180650f878a0968a3a62c0c26efcf",
+  "base_head": "b50b0e03b9f20235ac7c8c97e21955de0bc351a6",
   "index": 139,
   "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
   "source_provenance": {
@@ -15,7 +15,7 @@
     "classification": "authoritative high-resolution source; DDS header 2048x1024 RGBA32"
   },
   "source_sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
-  "candidate_sha256": "898c445e04c6398a641cd58a1346d6e72a702d19548dd7a6682cf3d64795be50",
+  "candidate_sha256": "c44a9ccd62e2b78fb17ec10f7a50a6de32dc1a0f84a44f2595b3e7ffaa0cc0ea",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds",
   "structure": {
     "dimensions": [
@@ -46,7 +46,11 @@
       255,
       255
     ],
-    "family": "heavy plain white sans, shared style"
+    "family": "heavy plain white sans, shared style",
+    "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "font_face_index": 1,
+    "font_pattern": "Noto Sans CJK KR:style=Black",
+    "same_color_weight_stroke": 1
   },
   "clean_plate_validator": {
     "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION19/313DB8CB_HD_SOURCE_READABLE.png",
@@ -74,7 +78,7 @@
       2048,
       1024
     ],
-    "changed_pixels": 6814,
+    "changed_pixels": 6686,
     "changed_bbox": [
       1405,
       981,
@@ -105,16 +109,16 @@
         1018
       ],
       "localized_bbox": [
-        1446,
+        1447,
         984,
         1502,
         1016
       ],
       "source_width": 139,
       "source_height": 36,
-      "localized_width": 56,
+      "localized_width": 55,
       "localized_height": 32,
-      "delta_left": 41,
+      "delta_left": 42,
       "delta_right": 42,
       "delta_top": 2,
       "delta_bottom": 2,
@@ -128,15 +132,19 @@
         42
       ],
       "raw_localized_bbox": [
-        1446,
+        1447,
         8,
         1502,
         40
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 33,
-      "style": "source-matched heavy plain white sans; no invented outline/slant",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 31,
+      "same_color_weight_stroke": 1,
+      "style": "source-matched heavy plain white sans; same-color weight reinforcement only; no contrasting outline/slant",
       "rework_status": "A_PRODUCTION19_NEW_EXACT_HD_CANDIDATE"
     },
     {
@@ -157,17 +165,17 @@
         1017
       ],
       "localized_bbox": [
-        1787,
+        1788,
         983,
-        1847,
+        1846,
         1015
       ],
       "source_width": 174,
       "source_height": 36,
-      "localized_width": 60,
+      "localized_width": 58,
       "localized_height": 32,
-      "delta_left": 57,
-      "delta_right": 57,
+      "delta_left": 58,
+      "delta_right": 58,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -180,15 +188,19 @@
         43
       ],
       "raw_localized_bbox": [
-        1787,
+        1788,
         9,
-        1847,
+        1846,
         41
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 34,
-      "style": "source-matched heavy plain white sans; no invented outline/slant",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 32,
+      "same_color_weight_stroke": 1,
+      "style": "source-matched heavy plain white sans; same-color weight reinforcement only; no contrasting outline/slant",
       "rework_status": "A_PRODUCTION19_NEW_EXACT_HD_CANDIDATE"
     }
   ],
@@ -198,7 +210,7 @@
   "localized_label_overlap_pixels": 0,
   "localized_label_touch_pixels": 0,
   "decoded_changes": {
-    "changed_pixels_total": 6814,
+    "changed_pixels_total": 6686,
     "changed_pixels_outside_source_bboxes": 0,
     "alpha_changed_pixels_outside_source_bboxes": 0,
     "protected_visible_pixels_changed": 0,
