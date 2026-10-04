@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
 
 repo=Path.cwd()
 branch="korean-localization-recovery-20260928"
-run="20261005-C129-12519155"
+run="20261005-C130-12519155"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -89,8 +89,8 @@ except FileNotFoundError:
       "machine_status":"BLOCKED_BY_B_PRODUCTION44","producer_state":fail,
       "controller_visual_qa":"NOT_RUN","runtime_validation":"UNTESTED"
     }
-    (out/"C129_12519155_MACHINE_QA.json").write_text(json.dumps(blocked,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    (wr/"C129_12519155.json").write_text(json.dumps(blocked,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    (out/"C130_12519155_MACHINE_QA.json").write_text(json.dumps(blocked,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    (wr/"C130_12519155.json").write_text(json.dumps(blocked,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps(blocked,ensure_ascii=False))
     raise SystemExit(0)
 
@@ -178,7 +178,7 @@ for rr in rep["rows"]:
       "containment":"PASS" if contain else "FAIL",
       "size_ceiling":"PASS" if size_ok else "FAIL",
       "edge_touch_high_risk":edge,
-      "rework_status":"C129_REVALIDATED"
+      "rework_status":"C130_REVALIDATED"
     })
     row_masks.append((str(rr["n"]),rm))
 
@@ -219,7 +219,7 @@ res={
  "controller_visual_qa":"PENDING",
  "runtime_validation":"UNTESTED"
 }
-(out/"C129_12519155_MACHINE_QA.json").write_text(json.dumps(res,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"C130_12519155_MACHINE_QA.json").write_text(json.dumps(res,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 
 def composite(img,bg=(64,64,64,255)):
     z=Image.new("RGBA",img.size,bg)
@@ -238,7 +238,7 @@ sheet=Image.new("RGB",(2048,2100),"white")
 sheet.paste(cards[0],(0,0)); sheet.paste(cards[1],(1024,0))
 sheet.paste(cards[2],(0,1050)); sheet.paste(cards[3],(1024,1050))
 sheet.thumbnail((1800,1800),Image.Resampling.LANCZOS)
-sheet.save(out/"C129_125_COMPARE.jpg",quality=96)
+sheet.save(out/"C130_125_COMPARE.jpg",quality=96)
 
 src_rgb=composite(src_img); clean_rgb=composite(clean_img); fin_rgb=composite(cand_img)
 contacts=[]
@@ -258,13 +258,13 @@ row_sheet=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in 
 yy=0
 for c in contacts:
     row_sheet.paste(c,(0,yy)); yy+=c.height+4
-row_sheet.save(out/"C129_125_ROW_CONTACT_2X.jpg",quality=96)
+row_sheet.save(out/"C130_125_ROW_CONTACT_2X.jpg",quality=96)
 
 raws=[card("SOURCE_RAW_MIRROR_X",src_raw),card("FINAL_RAW_MIRROR_X",cand_raw)]
 raw_sheet=Image.new("RGB",(1024,2100),"white")
 raw_sheet.paste(raws[0],(0,0)); raw_sheet.paste(raws[1],(0,1050))
 raw_sheet.thumbnail((1200,1800),Image.Resampling.LANCZOS)
-raw_sheet.save(out/"C129_125_RAW_COMPARE.jpg",quality=96)
+raw_sheet.save(out/"C130_125_RAW_COMPARE.jpg",quality=96)
 
 summary={
  "run":run,"asset":"12519155","index":128,
@@ -276,7 +276,7 @@ summary={
  "localized_overlap_pixels":pair_overlap,"touch_pairs":len(touch_pairs),
  "stage_naming_policy":res["stage_naming_policy"],
  "runtime_validation":"UNTESTED",
- "report":f"localization/graphics/role_C/{run}/C129_12519155_MACHINE_QA.json"
+ "report":f"localization/graphics/role_C/{run}/C130_12519155_MACHINE_QA.json"
 }
-(wr/"C129_12519155.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"C130_12519155.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False),flush=True)
