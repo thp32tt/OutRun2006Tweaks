@@ -1,5 +1,5 @@
 {
-  "schema_version": 59,
+  "schema_version": 60,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_PRODUCTION15 produced odd index 135 2B0863D6 from authoritative 2048x256 Release HD source; final candidate 2f3e99f468367e056ee3c6edfdb412b1fe5f10f27387a463472b07aeaa335fbb passed A static/visual self-QA after same-run CLASS residue rework and awaits independent C final QA plus isolated in-game validation.",
     "A_PRODUCTION14 produced odd index 49 BF3EE5C6 from authoritative 2048x2048 Release HD source; candidate 30cc2167b1650ab0a7b1c579c7d29118065007f0474f7207ce993ab1b19e45fa passed A static/visual self-QA and awaits independent C final QA plus isolated in-game validation.",
     "A_PRODUCTION13 produced odd index 47 AD720950 from authoritative 4096x1024 Release HD source; candidate 6dad37489e7027b8f546c38b3729167697965fc8e33fcabff46f09aba1677955 passed A static/visual self-QA and awaits independent C final QA plus isolated in-game validation.",
     "A_PRODUCTION12 produced odd index 89 43B07A77 from authoritative 2048x256 Release HD source; candidate d2311d4c20327363bacf8b336e925e527ef8c5c8f13a385b0a2fb2e25a946cbc passed A static/visual self-QA and awaits independent C final QA plus isolated in-game validation.",
@@ -2128,6 +2129,37 @@
     "alpha_changed_pixels_outside_original_bboxes": 0,
     "protected_visible_pixels_changed": 0,
     "controller_visual_qa": "PASS",
+    "runtime_validation": "UNTESTED",
+    "c_final_qa": "PENDING",
+    "in_game_validation": "PENDING"
+  },
+  "a_production15_2b0863d6": {
+    "run": "20261004-A-PRODUCTION15",
+    "status": "A_PRODUCTION15_HD_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "index": 135,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+    "source_path": "Sonic-TV/OR2006Sprites@3ce344e7 Release/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+    "source_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
+    "source_dimensions": [
+      2048,
+      256
+    ],
+    "source_format": "RGBA32",
+    "candidate_sha256": "2f3e99f468367e056ee3c6edfdb412b1fe5f10f27387a463472b07aeaa335fbb",
+    "superseded_candidate_sha256": "ea24324be8abe19d11a807c457c143bdad464597554c7792c2f3a716214caf75",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
+    "report": "localization/graphics/role_A/20261004-A-PRODUCTION15/A_PRODUCTION15_2B0863D6_REPORT.json",
+    "localized_occurrences": 10,
+    "bbox_pass": "10/10 readable + raw",
+    "size_ceiling_pass": "10/10",
+    "positive_margin": "10/10",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "controller_visual_qa": "PASS",
+    "visual_rework": "initial CLASS badge source antialias residue removed in same run",
     "runtime_validation": "UNTESTED",
     "c_final_qa": "PENDING",
     "in_game_validation": "PENDING"

@@ -69,7 +69,7 @@ index,path,action,artwork_status,transcription_status,notes
 130,textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds,localize_text,pending_artwork,transcribed_reviewed,pass7 transcription saved
 132,textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass7 transcription saved
 133,textures/load/spr_sprani_sumo_fe_cvt_Exst/25F697C6_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass7 transcription saved
-135,textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds,localize_text,pending_artwork,transcribed_reviewed,pass7 transcription saved
+135,textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds,localize_text,a_production15_hd_selfqa_pass_pending_c,transcribed_reviewed,A_PRODUCTION15 authoritative Release HD 2048x256 RGBA32 candidate; 10/10 readable+raw exact-bbox PASS; 10/10 source-size ceiling PASS; positive margins 10/10; clean/final validators PASS; changed/alpha/protected outside exact bboxes=0; CLASS badge source fringe reworked in same run; visual QA PASS; candidate 2f3e99f468367e056ee3c6edfdb412b1fe5f10f27387a463472b07aeaa335fbb; RUNTIME_VALIDATION=UNTESTED; C final QA + isolated in-game pending
 136,textures/load/spr_sprani_sumo_fe_cvt_Exst/2B785F6A_512x512.dds,zoom_review,blocked_review,needs_zoom_review,
 137,textures/load/spr_sprani_sumo_fe_cvt_Exst/30CF0D_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 139,textures/load/spr_sprani_sumo_fe_cvt_Exst/313DB8CB_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass7 transcription saved

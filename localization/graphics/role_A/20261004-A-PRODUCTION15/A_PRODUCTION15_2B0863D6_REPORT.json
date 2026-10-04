@@ -582,7 +582,9 @@
   "all_10_readable_and_raw_bbox_pass": true,
   "all_10_size_ceiling_pass": true,
   "all_10_positive_margin": true,
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_ROW_CONTACT_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A_PRODUCTION15_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_PRODUCTION15_HD_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_qa_notes": "Manual readable SOURCE/CLEAN/FINAL, 10-row contact and raw mirror_y review PASS after same-run CLASS badge cleanup. Initial persisted candidate ea24324be8abe19d11a807c457c143bdad464597554c7792c2f3a716214caf75 was rejected by A controller visual QA for visible source CLASS antialias residue in the reconstructed red pill; retry expanded the glyph-footprint reconstruction from row-color deviation and removed the residue. Final gray labels and red CLASS badge are source-faithful with no clipping, overlap, seam, patch box, alpha halo, protected-art damage, source-English residue, or orientation regression.",
+  "superseded_candidate_sha256": "ea24324be8abe19d11a807c457c143bdad464597554c7792c2f3a716214caf75"
 }
