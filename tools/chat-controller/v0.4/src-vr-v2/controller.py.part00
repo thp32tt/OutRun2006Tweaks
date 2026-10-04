@@ -1,0 +1,1343 @@
+from __future__ import annotations
+
+import argparse
+import base64
+import asyncio
+import html
+import json
+import logging
+import os
+import re
+import threading
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from dataclasses import dataclass, asdict, field
+from datetime import datetime, timedelta
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from typing import Optional
+from zoneinfo import ZoneInfo
+
+from playwright.async_api import async_playwright, BrowserContext, Page, TimeoutError as PlaywrightTimeoutError
+
+TZ = ZoneInfo(os.getenv("TZ", "Asia/Seoul"))
+CHATGPT_BASE_URL = os.getenv("CHATGPT_BASE_URL", "https://chatgpt.com/").strip()
+CHATGPT_PROJECT_URL = os.getenv("CHATGPT_PROJECT_URL", "").strip()
+EXPECTED_PROJECT_ID = os.getenv("EXPECTED_PROJECT_ID", "").strip()
+BASE_URL = CHATGPT_PROJECT_URL or CHATGPT_BASE_URL
+REQUIRE_PROJECT_URL = os.getenv("REQUIRE_PROJECT_URL", "false").lower() == "true"
+
+def _project_id_from_url(url: str) -> Optional[str]:
+    try:
+        path = urllib.parse.urlparse(url or "").path
+    except Exception:
+        return None
+    m = re.search(r"/g/(g-p-[A-Za-z0-9]+)", path)
+    return m.group(1) if m else None
+
+CONFIGURED_PROJECT_ID = _project_id_from_url(CHATGPT_PROJECT_URL)
+PROJECT_ID_MATCH = not EXPECTED_PROJECT_ID or CONFIGURED_PROJECT_ID == EXPECTED_PROJECT_ID
+AUTO_SEND_REQUESTED = os.getenv("AUTO_SEND", "false").lower() == "true"
+PROJECT_SCOPE_READY = (bool(CHATGPT_PROJECT_URL) or not REQUIRE_PROJECT_URL) and PROJECT_ID_MATCH
+AUTO_SEND = AUTO_SEND_REQUESTED and PROJECT_SCOPE_READY
+CONTROLLER_MODE = os.getenv("CONTROLLER_MODE", "localization").strip().lower()
+if CONTROLLER_MODE == "vr":
+    CONTROLLER_MODE = "conversion"
+if CONTROLLER_MODE not in {"localization", "conversion"}:
+    raise ValueError(f"Unsupported CONTROLLER_MODE={CONTROLLER_MODE!r}; expected localization or conversion")
+
+QUEUE_MODE = os.getenv("QUEUE_MODE", "true").lower() == "true"
+QUEUE_CHECK_SECONDS = max(10, int(os.getenv("QUEUE_CHECK_SECONDS", "15")))
+QUEUE_STABLE_SECONDS = max(10, int(os.getenv("QUEUE_STABLE_SECONDS", "30")))
+QUEUE_RESULT_GRACE_SECONDS = max(30, int(os.getenv("QUEUE_RESULT_GRACE_SECONDS", "180")))
+GITHUB_POLL_SECONDS = max(15, int(os.getenv("GITHUB_POLL_SECONDS", "60")))
+GITHUB_BOUND_RUN_POLL_SECONDS = max(10, int(os.getenv("GITHUB_BOUND_RUN_POLL_SECONDS", "30")))
+GITHUB_TASK_COMMIT_CACHE_SECONDS = max(15, int(os.getenv("GITHUB_TASK_COMMIT_CACHE_SECONDS", "60")))
+GITHUB_ACTIONS_CACHE_SECONDS = max(10, int(os.getenv("GITHUB_ACTIONS_CACHE_SECONDS", "60")))
+WAIT_ACTIONS_STALE_SECONDS = max(GITHUB_BOUND_RUN_POLL_SECONDS, int(os.getenv("WAIT_ACTIONS_STALE_SECONDS", "75")))
+WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS = max(GITHUB_POLL_SECONDS, int(os.getenv("WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS", "600")))
+QUEUE_NEXT_TASK_DELAY_SECONDS = max(0, int(os.getenv("QUEUE_NEXT_TASK_DELAY_SECONDS", "15")))
+QUEUE_IDLE_REARM_SECONDS = max(30, int(os.getenv("QUEUE_IDLE_REARM_SECONDS", "90")))
+LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "true"
+PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "15")))
+PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS", "15")))
+HEARTBEAT_SECONDS = max(5, int(os.getenv("HEARTBEAT_SECONDS", "15")))
+LOCALIZATION_QA_BATCH_SIZE = max(1, int(os.getenv("LOCALIZATION_QA_BATCH_SIZE", "4")))
+LOCALIZATION_QA_COALESCE_SECONDS = max(0, int(os.getenv("LOCALIZATION_QA_COALESCE_SECONDS", "30")))
+LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS", "15")))
+LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_SECONDS", "30")))
+MAX_TASK_ATTEMPTS = max(1, int(os.getenv("MAX_TASK_ATTEMPTS", "3")))
+CONVERSATION_ROLLOVER_ENABLED = os.getenv("CONVERSATION_ROLLOVER_ENABLED", "true").lower() == "true"
+MAX_CHAT_ROLLOVERS_PER_TASK = max(0, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "5")))
+TASK_EVENT_MODEL = os.getenv("TASK_EVENT_MODEL", "v2").strip().lower()
+PRODUCTION_COUNTER_MODE = os.getenv("PRODUCTION_COUNTER_MODE", "lane").strip().lower()
+GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
+SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
+CHAT_SLOTS = 3 if CONTROLLER_MODE == "localization" else max(1, int(os.getenv("CHAT_SLOTS", "6")))
+ROLLOVER_HOUR = int(os.getenv("CHAT_DAY_ROLLOVER_HOUR", "2"))
+STATUS_PORT = int(os.getenv("STATUS_PORT", "8787"))
+NOVNC_PUBLIC_URL = os.getenv("NOVNC_PUBLIC_URL", "").strip()
+WATCHDOG_ENABLED = os.getenv("WATCHDOG_ENABLED", "true").lower() == "true"
+WATCHDOG_STALL_MINUTES = int(os.getenv("WATCHDOG_STALL_MINUTES", "12"))
+WATCHDOG_BUSY_STALL_MINUTES = int(os.getenv("WATCHDOG_BUSY_STALL_MINUTES", "20"))
+WATCHDOG_CHECK_SECONDS = int(os.getenv("WATCHDOG_CHECK_SECONDS", "60"))
+WATCHDOG_MAX_RESUMES_PER_RUN = int(os.getenv("WATCHDOG_MAX_RESUMES_PER_RUN", "1"))
+WATCHDOG_FORCE_STOP_STALLED = os.getenv("WATCHDOG_FORCE_STOP_STALLED", "false").lower() == "true"
+RATE_LIMIT_BACKOFF_SECONDS = [
+    max(10, int(x.strip()))
+    for x in os.getenv("RATE_LIMIT_BACKOFF_SECONDS", "30,60,120").split(",")
+    if x.strip()
+]
+if not RATE_LIMIT_BACKOFF_SECONDS:
+    RATE_LIMIT_BACKOFF_SECONDS = [30, 60, 120]
+MIN_SEND_GAP_SECONDS = max(0, int(os.getenv("MIN_SEND_GAP_SECONDS", "45")))
+SLOT_DEDUP_SECONDS = max(0, int(os.getenv("SLOT_DEDUP_SECONDS", "120")))
+FRESH_CHAT_EACH_RUN = os.getenv("FRESH_CHAT_EACH_RUN", "true").lower() == "true"
+RETRY_BUTTON_COOLDOWN_SECONDS = max(10, int(os.getenv("RETRY_BUTTON_COOLDOWN_SECONDS", "45")))
+PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
+STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "true"
+PROFILE_DIR = Path("/data/browser-profile")
+STATE_DIR = Path("/data/state")
+REGISTRY_FILE = STATE_DIR / "chat_registry.json"
+RUNTIME_FILE = STATE_DIR / "runtime_status.json"
+QUEUE_FILE = STATE_DIR / "queue_state.json"
+PROMPTS_DIR = Path("/opt/outrun/prompts")
+GAME_MOD_CONTEXT = (
+    "Context: This is authorized offline game-mod/VR development for the user's local copy of OutRun 2006. "
+    "Reverse engineering, DLL hooking, disassembly, and binary analysis are used only for rendering/VR interoperability and debugging, "
+    "not for cybersecurity exploitation, malware, cheating, or unauthorized access."
+)
+LOG_FILE = Path("/logs/controller.log")
+
+LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+    handlers=[logging.StreamHandler(), logging.FileHandler(LOG_FILE)],
+)
+log = logging.getLogger("outrun-controller")
+
+RATE_LIMIT_PATTERNS = [
+    r"too many requests",
+    r"http\s*429",
+    r"\b429\b.{0,80}(request|rate|limit)",
+    r"rate limit(?:ed|ing)?",
+    r"request(?:s)?.{0,30}(too many|limit|throttl)",
+    r"요청.{0,12}(너무 많|한도|제한)",
+    r"너무 많은 요청",
+]
+
+CONVERSATION_LIMIT_PATTERNS = [
+    r"maximum (?:conversation|chat) length",
+    r"(?:conversation|chat).{0,40}(?:too long|maximum length|length limit|limit reached)",
+    r"you.?ve reached.{0,40}(?:maximum|limit).{0,40}(?:conversation|chat)",
+    r"start (?:a )?new (?:chat|conversation).{0,60}(?:continue|because|limit|length)",
+    r"(?:continue|start over).{0,40}(?:new chat|new conversation)",
+    r"이 대화.{0,30}(?:최대|한도|길이)",
+    r"대화.{0,30}(?:너무 길|길이 한도|최대 길이|한도에 도달)",
+    r"새 (?:채팅|대화).{0,40}(?:시작|계속|이어)",
+]
+
+LIMIT_PATTERNS = [
+    r"you.?ve reached.*limit",
+    r"usage limit",
+    r"limit reached",
+    r"try again later",
+    r"사용량.{0,8}한도",
+    r"한도에.{0,8}도달",
+    r"사용 한도",
+    r"나중에 다시",
+]
+
+BUSY_SELECTORS = [
+    "button[data-testid='stop-button']",
+    "button:has-text('Stop generating')",
+    "button:has-text('Stop streaming')",
+    "button:has-text('생성 중지')",
+    "button:has-text('응답 중지')",
+]
+CONTINUE_GENERATING_SELECTORS = [
+    "button:has-text('Continue generating')",
+    "button:has-text('계속 생성')",
+    "button:has-text('계속해서 생성')",
+]
+RETRY_SELECTORS = [
+    "button:has-text('Retry')",
+    "button:has-text('Try again')",
+    "button:has-text('다시 시도')",
+    "button:has-text('재시도')",
+]
+ASSISTANT_MESSAGE_SELECTORS = [
+    "[data-message-author-role='assistant']",
+]
+
+THINKING_CACHE_TTL_SECONDS = 3600
+_thinking_verified_cache: dict[int, tuple[str, float, str]] = {}
+
+INPUT_SELECTORS = [
+    "#prompt-textarea",
+    "div#prompt-textarea",
+    "[data-testid='prompt-textarea']",
+    "[data-testid='composer'] textarea",
+    "[data-testid='composer'] [contenteditable='true']",
+    "textarea[placeholder*='Message' i]",
+    "textarea[placeholder*='Ask ChatGPT' i]",
+    "textarea[placeholder*='메시지']",
+    "[contenteditable='true'][data-lexical-editor='true']",
+    "div.ProseMirror[contenteditable='true']",
+    "[role='textbox'][contenteditable='true']",
+    "[role='textbox']",
+    "form textarea",
+    "form [contenteditable='true']",
+    "[contenteditable='true']",
+]
+
+LOGGED_IN_SELECTORS = [
+    "button[data-testid*='profile']",
+    "button[aria-label*='profile' i]",
+    "button[aria-label*='account' i]",
+    "nav a[href='/']",
+]
+
+@dataclass
+class Slot:
+    name: str
+    url: Optional[str] = None
+    runs: int = 0
+    last_sent_at: Optional[str] = None
+    last_result: Optional[str] = None
+    last_assistant_hash: Optional[str] = None
+    last_assistant_change_at: Optional[str] = None
+    watchdog_resumes_since_schedule: int = 0
+    last_watchdog_at: Optional[str] = None
+
+@dataclass
+class TaskEvent:
+    event_id: str
+    production_id: str
+    event_type: str
+    attempt: int
+    retry_count: int
+    rollover_count: int
+    created_at: str
+
+
+@dataclass
+class Registry:
+    logical_date: str
+    next_slot: int
+    slots: list[Slot]
+    next_production_id: dict[str, int] = field(default_factory=dict)
+    task_events: list[TaskEvent] = field(default_factory=list)
+    rate_limit_attempts: int = 0
+    rate_limit_until: Optional[str] = None
+    last_global_send_at: Optional[str] = None
+    last_global_send_slot: Optional[str] = None
+
+runtime = {
+    "started_at": datetime.now(TZ).isoformat(),
+    "auto_send": AUTO_SEND,
+    "auto_send_requested": AUTO_SEND_REQUESTED,
+    "controller_mode": CONTROLLER_MODE,
+    "queue_mode": QUEUE_MODE,
+    "queue_check_seconds": QUEUE_CHECK_SECONDS,
+    "queue_stable_seconds": QUEUE_STABLE_SECONDS,
+    "queue_result_grace_seconds": QUEUE_RESULT_GRACE_SECONDS,
+    "github_poll_seconds": GITHUB_POLL_SECONDS,
+    "github_bound_run_poll_seconds": GITHUB_BOUND_RUN_POLL_SECONDS,
+    "github_task_commit_cache_seconds": GITHUB_TASK_COMMIT_CACHE_SECONDS,
+    "github_actions_cache_seconds": GITHUB_ACTIONS_CACHE_SECONDS,
+    "wait_actions_stale_seconds": WAIT_ACTIONS_STALE_SECONDS,
+    "wait_actions_no_run_timeout_seconds": WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS,
+    "github_token_configured": bool(GITHUB_TOKEN),
+    "queue_next_task_delay_seconds": QUEUE_NEXT_TASK_DELAY_SECONDS,
+    "queue_idle_rearm_seconds": QUEUE_IDLE_REARM_SECONDS,
+    "localization_parallel": LOCALIZATION_PARALLEL,
+    "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
+    "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
+    "heartbeat_seconds": HEARTBEAT_SECONDS,
+    "localization_qa_batch_size": LOCALIZATION_QA_BATCH_SIZE,
+    "localization_qa_coalesce_seconds": LOCALIZATION_QA_COALESCE_SECONDS,
+    "localization_same_slot_send_gap_seconds": LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS,
+    "localization_slot_dedup_seconds": LOCALIZATION_SLOT_DEDUP_SECONDS,
+    "max_task_attempts": MAX_TASK_ATTEMPTS,
+    "conversation_rollover_enabled": CONVERSATION_ROLLOVER_ENABLED,
+    "max_chat_rollovers_per_task": MAX_CHAT_ROLLOVERS_PER_TASK,
+    "project_url_configured": bool(CHATGPT_PROJECT_URL),
+    "require_project_url": REQUIRE_PROJECT_URL,
+    "configured_project_id": CONFIGURED_PROJECT_ID,
+    "expected_project_id": EXPECTED_PROJECT_ID or None,
+    "project_id_match": PROJECT_ID_MATCH,
+    "start_url": BASE_URL,
+    "novnc_public_url": NOVNC_PUBLIC_URL or None,
+    "schedule_minutes": SCHEDULE_MINUTES,
+    "status": "starting",
+    "last_tick": None,
+    "queue_loop_heartbeat_at": None,
+    "last_scheduler_decision_at": None,
+    "last_scheduler_decision": None,
+    "blocked_reason": None,
+    "last_action": None,
+    "last_error": None,
+    "watchdog_enabled": WATCHDOG_ENABLED,
+    "watchdog_stall_minutes": WATCHDOG_STALL_MINUTES,
+    "watchdog_busy_stall_minutes": WATCHDOG_BUSY_STALL_MINUTES,
+    "watchdog_force_stop_stalled": WATCHDOG_FORCE_STOP_STALLED,
+    "preferred_thinking_level": PREFERRED_THINKING_LEVEL,
+    "strict_thinking_level": STRICT_THINKING_LEVEL,
+    "last_thinking_level_result": None,
+    "rate_limit_backoff_seconds": RATE_LIMIT_BACKOFF_SECONDS,
+    "min_send_gap_seconds": MIN_SEND_GAP_SECONDS,
+    "slot_dedup_seconds": SLOT_DEDUP_SECONDS,
+    "fresh_chat_each_run": FRESH_CHAT_EACH_RUN,
+    "retry_button_cooldown_seconds": RETRY_BUTTON_COOLDOWN_SECONDS,
+    "rate_limit_attempts": 0,
+    "rate_limit_until": None,
+}
+
+
+def write_runtime(**updates):
+    now = datetime.now(TZ)
+    if updates.get("last_action") is not None:
+        runtime["last_scheduler_decision_at"] = now.isoformat()
+        runtime["last_scheduler_decision"] = updates.get("last_action")
+    status = str(updates.get("status", ""))
+    if "blocked" in status or status in {"queue_error", "watchdog_error", "login_required", "limit_detected"}:
+        runtime["blocked_reason"] = updates.get("last_action") or updates.get("last_error") or status
+    elif status in {"idle", "sent", "queue_wait_chat", "queue_wait_actions", "parallel_wave_running",
+                    "parallel_wait_actions", "parallel_wave_complete", "queue_pass",
+                    "parallel_c_barrier", "startup_reconcile"}:
+        runtime["blocked_reason"] = None
+    runtime.update(updates)
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    RUNTIME_FILE.write_text(json.dumps(runtime, ensure_ascii=False, indent=2), encoding="utf-8")
+
+def logical_date(now: datetime) -> str:
+    shifted = now - timedelta(days=1) if now.hour < ROLLOVER_HOUR else now
+    return shifted.date().isoformat()
+
+
+def new_registry(now: datetime) -> Registry:
+    return Registry(
+        logical_date=logical_date(now),
+        next_slot=0,
+        slots=[Slot(name=chr(ord('A') + i)) for i in range(CHAT_SLOTS)],
+        next_production_id={},
+        task_events=[],
+        rate_limit_attempts=0,
+        rate_limit_until=None,
+        last_global_send_at=None,
+        last_global_send_slot=None,
+    )
+
+
+def load_registry(now: datetime) -> Registry:
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    if not REGISTRY_FILE.exists():
+        reg = new_registry(now)
+        save_registry(reg)
+        return reg
+    try:
+        raw = json.loads(REGISTRY_FILE.read_text(encoding="utf-8"))
+        reg = Registry(
+            logical_date=raw["logical_date"],
+            next_slot=int(raw.get("next_slot", 0)),
+            slots=[Slot(**s) for s in raw["slots"]],
+            next_production_id={str(k): int(v) for k, v in dict(raw.get("next_production_id", {})).items()},
+            task_events=[TaskEvent(**e) for e in raw.get("task_events", []) if isinstance(e, dict)],
+            rate_limit_attempts=int(raw.get("rate_limit_attempts", 0)),
+            rate_limit_until=raw.get("rate_limit_until"),
+            last_global_send_at=raw.get("last_global_send_at"),
+            last_global_send_slot=raw.get("last_global_send_slot"),
+        )
+    except Exception:
+        log.exception("registry read failed; recreating")
+        reg = new_registry(now)
+    if reg.logical_date != logical_date(now):
+        archive = STATE_DIR / f"chat_registry_{reg.logical_date}.json"
+        try:
+            if REGISTRY_FILE.exists():
+                archive.write_text(REGISTRY_FILE.read_text(encoding="utf-8"), encoding="utf-8")
+        except Exception:
+            log.exception("registry archive failed")
+        reg = new_registry(now)
+        save_registry(reg)
+        log.info("daily chat generation rolled over: %s", reg.logical_date)
+    elif len(reg.slots) != CHAT_SLOTS:
+        # Resize without discarding progress: preserve A..N existing slot state.
+        old_len = len(reg.slots)
+        if CHAT_SLOTS < old_len:
+            reg.slots = reg.slots[:CHAT_SLOTS]
+        else:
+            for i in range(old_len, CHAT_SLOTS):
+                reg.slots.append(Slot(name=chr(ord('A') + i)))
+        reg.next_slot = reg.next_slot % CHAT_SLOTS
+        save_registry(reg)
+        log.info("resized chat slots from %s to %s while preserving state", old_len, CHAT_SLOTS)
+    return reg
+
+
+def save_registry(reg: Registry):
+    payload = {
+        "logical_date": reg.logical_date,
+        "next_slot": reg.next_slot,
+        "slots": [asdict(s) for s in reg.slots],
+        "next_production_id": dict(reg.next_production_id),
+        "task_events": [asdict(e) for e in reg.task_events[-5000:]],
+        "rate_limit_attempts": reg.rate_limit_attempts,
+        "rate_limit_until": reg.rate_limit_until,
+        "last_global_send_at": reg.last_global_send_at,
+        "last_global_send_slot": reg.last_global_send_slot,
+    }
+    tmp = REGISTRY_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(REGISTRY_FILE)
+
+
+def allocate_lane_production_id(reg: Registry, lane: str, prefix: str, minimum_next: int = 1) -> str:
+    """Allocate exactly one production number for a new dispatch.
+
+    Retry, rollover, continue and reconcile must never call this function.
+    Counters are lane-scoped when PRODUCTION_COUNTER_MODE=lane. minimum_next
+    safely migrates an existing v1 queue without reusing historical numbers.
+    """
+    key = lane if PRODUCTION_COUNTER_MODE == "lane" else "__global__"
+    next_id = max(int(reg.next_production_id.get(key, 1)), int(minimum_next or 1))
+    reg.next_production_id[key] = next_id + 1
+    return f"{prefix}-{lane}-{next_id:05d}"
+
+
+def production_id_from_identifier(identifier: str) -> str:
+    value = str(identifier or "").strip()
+    return re.sub(r"-E\d{3}$", "", value)
+
+
+def queue_lane_minimum_next(q: dict, lane: str) -> int:
+    """Return a collision-safe migration floor from v1 queue history.
+
+    Once lane history exists, do not let the legacy global counter couple lane
+    numbering again. The global counter is only a first-migration fallback.
+    """
+    seen = []
+    records = []
+    if isinstance(q.get("active"), dict):
+        records.append(q["active"])
+    records.extend(v for v in q.get("active_by_lane", {}).values() if isinstance(v, dict))
+    records.extend(v for key in ("completed", "blocked") for v in q.get(key, []) if isinstance(v, dict))
+    for record in records:
+        if str(record.get("lane") or "") != lane:
+            continue
+        identifier = production_id_from_identifier(record.get("production_id") or record.get("task_id") or "")
+        match = re.search(r"-(\d{5,})$", identifier)
+        if match:
+            seen.append(int(match.group(1)))
+    if seen:
+        return max(seen) + 1
+    return int(q.get("counter", 0)) + 1
+
+
+def next_task_event_id(reg: Registry, production_id: str) -> str:
+    count = sum(1 for e in reg.task_events if e.production_id == production_id)
+    return f"{production_id}-E{count + 1:03d}"
+
+
+def append_task_event(reg: Registry, active: dict, event_type: str) -> TaskEvent:
+    production_id = str(active.get("production_id") or active.get("task_id") or "").strip()
+    if not production_id:
+        raise ValueError("PRODUCTION_ID_REQUIRED")
+    existing = [e for e in reg.task_events if e.production_id == production_id]
+    event_id = next_task_event_id(reg, production_id)
+    event = TaskEvent(
+        event_id=event_id,
+        production_id=production_id,
+        event_type=event_type,
+        attempt=int(active.get("attempt", 1)),
+        retry_count=int(active.get("retry_count", 0)),
+        rollover_count=int(active.get("rollover_count", active.get("chat_rollovers", 0))),
+        created_at=datetime.now(TZ).isoformat(),
+    )
+    reg.task_events.append(event)
+    active["production_id"] = production_id
+    active["task_id"] = production_id  # compatibility alias for existing Git markers
+    active["event_id"] = event_id
+    active["event_type"] = event_type
+    active["retry_count"] = event.retry_count
+    active["rollover_count"] = event.rollover_count
+    return event
+
+
+def read_prompt(filename: str) -> str:
+    path = PROMPTS_DIR / filename
+    return path.read_text(encoding="utf-8").strip()
+
+
+def load_queue_state() -> dict:
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    if not QUEUE_FILE.exists():
+        state = {
+            "counter": 0,
+            "active": None,
+            "task_event_model": TASK_EVENT_MODEL,
+            "production_counter_mode": PRODUCTION_COUNTER_MODE,
+            "active_by_lane": {},
+            "wave_counter": 0,
+            "wave_id": None,
+            "wave_started_at": None,
+            "producer_counter": 0,
+            "qa_batch_counter": 0,
+            "qa_pending": [],
+            "qa_completed": [],
+            "qa_blocked": [],
+            "completed": [],
+            "blocked": [],
+            "last_github_poll_at": None,
+            "conversion_blocked_reconcile_version": 0,
+        }
+        save_queue_state(state)
+        return state
+    try:
+        raw = json.loads(QUEUE_FILE.read_text(encoding="utf-8"))
+        raw.setdefault("counter", 0)
+        raw.setdefault("active", None)
+        raw.setdefault("task_event_model", TASK_EVENT_MODEL)
+        raw.setdefault("production_counter_mode", PRODUCTION_COUNTER_MODE)
+        raw.setdefault("active_by_lane", {})
+        raw.setdefault("wave_counter", 0)
+        raw.setdefault("wave_id", None)
+        raw.setdefault("wave_started_at", None)
+        raw.setdefault("producer_counter", 0)
+        raw.setdefault("qa_batch_counter", 0)
+        raw.setdefault("qa_pending", [])
+        raw.setdefault("qa_completed", [])
+        raw.setdefault("qa_blocked", [])
+        raw.setdefault("completed", [])
+        raw.setdefault("blocked", [])
+        raw.setdefault("last_github_poll_at", None)
+        raw.setdefault("conversion_blocked_reconcile_version", 0)
+        return raw
+    except Exception:
+        # Never overwrite a damaged checkpoint with an empty queue and duplicate work.
+        log.exception("queue state read failed; preserved for recovery")
+        raise
+
+
+
+def save_queue_state(state: dict):
+    """Persist v2 identity fields while retaining task_id as a compatibility alias."""
+    state["task_event_model"] = TASK_EVENT_MODEL
+    state["production_counter_mode"] = PRODUCTION_COUNTER_MODE
+    records = []
+    if isinstance(state.get("active"), dict):
+        records.append(state["active"])
+    records.extend(v for v in state.get("active_by_lane", {}).values() if isinstance(v, dict))
+    for record in records:
+        production_id = str(record.get("production_id") or record.get("task_id") or "").strip()
+        if production_id:
+            record["production_id"] = production_id
+            record["task_id"] = production_id
+        record.setdefault("event_id", "")
+        record.setdefault("event_type", "dispatch")
+        record.setdefault("attempt", 1)
+        record.setdefault("retry_count", 0)
+        record.setdefault("rollover_count", int(record.get("chat_rollovers", 0)))
+        record["status"] = str(record.get("phase") or record.get("status") or "PENDING")
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    tmp = QUEUE_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp.replace(QUEUE_FILE)
+
+
+_github_rest_block_until_epoch = 0.0
+_github_commit_list_cache: dict[str, tuple[float, list]] = {}
+_github_actions_cache: dict[str, tuple[float, dict]] = {}
+
+
+def _github_blocked_seconds() -> int:
+    return max(0, int(_github_rest_block_until_epoch - time.time()))
+
+
+def github_api_json(path: str) -> dict:
+    global _github_rest_block_until_epoch
+    now_epoch = time.time()
+    if now_epoch < _github_rest_block_until_epoch:
+        raise RuntimeError(f"github REST temporarily paused for {_github_blocked_seconds()}s after rate limit")
+
+    url = "https://api.github.com" + path
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "outrun-chat-controller/0.5",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if GITHUB_TOKEN:
+        headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            reset = resp.headers.get("X-RateLimit-Reset")
+            write_runtime(
+                github_rate_limit_remaining=resp.headers.get("X-RateLimit-Remaining"),
+                github_rate_limit_limit=resp.headers.get("X-RateLimit-Limit"),
+                github_rate_limit_reset=reset,
+                github_api_blocked_until=None,
+                last_github_error=None,
+            )
+            return data
+    except urllib.error.HTTPError as e:
+        if e.code == 429 or (e.code == 403 and (e.headers.get("Retry-After") or e.headers.get("X-RateLimit-Remaining") == "0")):
+            retry_after = e.headers.get("Retry-After")
+            reset = e.headers.get("X-RateLimit-Reset")
+            until = time.time() + 300
+            if retry_after:
+                try:
+                    until = max(until, time.time() + int(retry_after) + 5)
+                except ValueError:
+                    pass
+            if reset:
+                try:
+                    until = max(until, float(reset) + 5)
+                except ValueError:
+                    pass
+            _github_rest_block_until_epoch = until
+            write_runtime(
+                github_rate_limit_remaining=e.headers.get("X-RateLimit-Remaining"),
+                github_rate_limit_limit=e.headers.get("X-RateLimit-Limit"),
+                github_rate_limit_reset=reset,
+                github_api_blocked_until=datetime.fromtimestamp(until, TZ).isoformat(),
+                last_github_error=f"HTTP {e.code} rate limit; REST paused until {datetime.fromtimestamp(until, TZ).isoformat()}",
+            )
+        elif e.code in {401, 403}:
+            write_runtime(github_blocker="GITHUB_AUTHORIZATION_REQUIRED", last_github_error=f"HTTP {e.code}: authorization denied")
+        elif e.code == 404:
+            write_runtime(github_lookup_miss=path)
+        raise
+
+
+def github_branch_head(branch: str) -> Optional[str]:
+    try:
+        q = urllib.parse.quote(branch, safe="")
+        data = github_api_json(f"/repos/{GITHUB_REPO}/git/ref/heads/{q}")
+        return data.get("object", {}).get("sha")
+    except Exception as e:
+        log.warning("github branch lookup failed branch=%s error=%r", branch, e)
+        write_runtime(last_github_error=f"branch:{branch}:{e!r}")
+        return None
+
+
+def github_commit_message(sha: str) -> Optional[str]:
+    try:
+        data = github_api_json(f"/repos/{GITHUB_REPO}/commits/{sha}")
+        return data.get("commit", {}).get("message", "")
+    except Exception as e:
+        log.warning("github commit lookup failed sha=%s error=%r", sha, e)
+        return None
+
+
+GITHUB_ACTIONS_SKIP_PATTERNS = [
+    r"\[(?:skip ci|ci skip|no ci|skip actions|actions skip)\]",
+    r"(?im)^skip-checks:\s*true\s*$",
+]
+
+
+def github_actions_skip_directive(message: str) -> Optional[str]:
+    """Return the CI-skip directive that would prevent a required push workflow."""
+    for pattern in GITHUB_ACTIONS_SKIP_PATTERNS:
+        match = re.search(pattern, message or "", flags=re.I)
+        if match:
+            return match.group(0).strip()
+    return None
+
+
+def github_find_task_commit(branch: str, task_id: str, per_page: int = 100) -> Optional[dict]:
+    """Find a task commit using a short shared branch-history cache to protect REST rate limits."""
+    try:
+        now_mono = time.monotonic()
+        cached = _github_commit_list_cache.get(branch)
+        if cached and now_mono - cached[0] < GITHUB_TASK_COMMIT_CACHE_SECONDS:
+            data = cached[1]
+        else:
+            q = urllib.parse.urlencode({"sha": branch, "per_page": max(1, min(per_page, 100))})
+            data = github_api_json(f"/repos/{GITHUB_REPO}/commits?{q}")
+            if isinstance(data, list):
+                _github_commit_list_cache[branch] = (now_mono, data)
+        expected = f"[AUTO:{task_id}]"
+        for item in data if isinstance(data, list) else []:
+            message = item.get("commit", {}).get("message", "")
+            if expected not in message:
+                continue
+            if github_actions_skip_directive(message):
+                continue
+            return {
+                "sha": item.get("sha"),
+                "message": message,
+                "html_url": item.get("html_url"),
+            }
+        return None
+    except Exception as e:
+        log.warning("github task commit lookup failed branch=%s task=%s error=%r", branch, task_id, e)
+        write_runtime(last_github_error=f"task-commit:{branch}:{task_id}:{e!r}")
+        return None
+
+
+
+_producer_result_evidence_cache: dict = {}
+
+
+def classify_localization_result(record: dict, files: list[dict], task_id: str) -> tuple[str, str]:
+    """Check immutable content, never accept the assistant's summary as production."""
+    if record.get("TASK_ID", record.get("task_id")) != task_id:
+        return "REJECTED", "TASK_RECORD_ID_MISMATCH"
+    outcome = str(record.get("result", record.get("status", ""))).upper()
+    if outcome in {"BLOCKED", "FAILED", "FAIL", "NO_WORK", "NO_CHANGE", "PENDING"} or record.get("blocker"):
+        return "REJECTED", "BLOCKER_IS_NOT_PRODUCTION"
+    changed = [f.get("filename", "") for f in files if f.get("status") != "removed"]
+    substantive = [p for p in changed if p.startswith("localization/")
+                   and not p.startswith(("localization/progress", "localization/resume_state"))
+                   and p.rsplit("/", 1)[-1].lower() not in {"worklog.md", "readme.md", "status.md", "asset_queue.csv"}]
+    if any(p.lower().endswith(".dds") for p in substantive):
+        return "PRODUCED", "DDS_CHANGED"
+    artifacts = record.get("candidate_artifacts", [])
+    if isinstance(artifacts, list):
+        for artifact in artifacts:
+            if not isinstance(artifact, dict):
+                continue
+            if (artifact.get("role") == "korean_candidate"
+                    and str(artifact.get("path", "")).lower().endswith(".dds")
+                    and re.fullmatch(r"[0-9a-fA-F]{64}", str(artifact.get("sha256", "")))
+                    and artifact.get("drive_file_id")
+                    and any(p.lower().endswith(".json") and "qa" in p.lower() for p in substantive)):
+                return "PRODUCED", "EXTERNAL_DDS_DECLARED_REQUIRES_C_VERIFICATION"
+    if substantive:
+        return "ADVANCED", "PREREQUISITE_CHANGE_ONLY"
+    return "REJECTED", "BOOKKEEPING_ONLY_NO_ARTIFACT"
+
+
+def _task_records(payload, task_id):
+    """Match either production identity or one of its event identities."""
+    requested = str(task_id or "").strip()
+    production_id = production_id_from_identifier(requested)
+    if isinstance(payload, dict):
+        record_task = str(payload.get("TASK_ID", payload.get("task_id", "")) or "")
+        record_production = str(payload.get("production_id", "") or "")
+        record_event = str(payload.get("event_id", "") or "")
+        if requested in {record_task, record_production, record_event} or production_id in {record_task, record_production}:
+            yield payload
+        for value in payload.values():
+            if isinstance(value, (dict, list)):
+                yield from _task_records(value, task_id)
+    elif isinstance(payload, list):
+        for value in payload:
+            yield from _task_records(value, task_id)
+
+
+def github_task_record(ref: str, task_id: str) -> Optional[dict]:
+    """Resolve exact, variants, dispatch, reconcile, rollover, lane/number, number.
+
+    Reads remain pinned to the caller's immutable HEAD/result SHA. Only 404 is
+    a candidate miss; authorization, throttling and incomplete trees propagate.
+    """
+    def read(path):
+        try:
+            encoded = urllib.parse.quote(path, safe="/")
+            data = github_api_json(f"/repos/{GITHUB_REPO}/contents/{encoded}?ref={urllib.parse.quote(ref, safe='')}")
+        except urllib.error.HTTPError as exc:
+            if exc.code == 404:
+                return []
+            raise
+        try:
+            payload = json.loads(base64.b64decode(data["content"]).decode("utf-8"))
+        except (ValueError, KeyError, TypeError):
+            return []
+        return list(_task_records(payload, task_id))
+
+    def newest(records):
+        return max(records, key=lambda r: (int(r.get("ATTEMPT", r.get("attempt", 1))),
+                    int(r.get("CHAT_ROLLOVER", r.get("chat_rollovers", 0))),
+                    str(r.get("updated_at", r.get("timestamp", "")))))
+
+    requested_id = str(task_id or "").strip()
+    production_id = production_id_from_identifier(requested_id)
+    exact_candidates = [
+        f"docs/automation/runs/{requested_id}.json",
+        f"docs/automation/runs/{production_id}.json",
+    ]
+    records = []
+    for exact in dict.fromkeys(exact_candidates):
+        records.extend(read(exact))
+        if records:
+            break
+    if records:
+        return newest(records)
+    tree = github_api_json(f"/repos/{GITHUB_REPO}/git/trees/{ref}?recursive=1")
+    if tree.get("truncated"):
+        raise RuntimeError("TASK_LOOKUP_TREE_TRUNCATED")
+    paths = sorted(x["path"] for x in tree.get("tree", [])
+                   if x.get("type") == "blob" and x["path"].startswith("docs/automation/")
+                   and x["path"].endswith(".json"))
+    number = production_id.rsplit("-", 1)[-1]
+    lane = production_id.rsplit("-", 1)[0].split("-")[-1]
+    predicates = [
+        lambda p: p.startswith(f"docs/automation/runs/{requested_id}.") or p.startswith(f"docs/automation/runs/{production_id}."),
+        lambda p: "dispatch" in p.lower(),
+        lambda p: "reconcile" in p.lower(),
+        lambda p: "rollover" in p.lower(),
+        lambda p: lane.lower() in p.lower() and number in p,
+        lambda p: number in p,
+    ]
+    visited = set(exact_candidates)
+    for predicate in predicates:
+        records = []
+        for path in paths:
+            if path not in visited and predicate(path):
+                visited.add(path)
+                records.extend(read(path))
+        if records:
+            return newest(records)
+    return None
+
+
+def restore_task_counters(active: dict, record: dict) -> None:
+    if record.get("TASK_ID", record.get("task_id")) != active["task_id"]:
+        raise ValueError("TASK_RECORD_ID_MISMATCH")
+    # Never roll durable local progress backwards or count a rollover as retry.
+    active["attempt"] = max(int(active.get("attempt", 1)), int(record.get("ATTEMPT", record.get("attempt", 1))))
+    active["chat_rollovers"] = max(int(active.get("chat_rollovers", 0)), int(record.get("CHAT_ROLLOVER", record.get("chat_rollovers", 0))))
+
+
+def github_localization_result_evidence(task_commit: dict, task_id: str) -> tuple[str, str]:
+    """Read task record and complete changed-file list at exactly the producer SHA."""
+    sha = task_commit["sha"]
+    key = (sha, task_id)
+    if key in _producer_result_evidence_cache:
+        return _producer_result_evidence_cache[key]
+    try:
+        record = github_task_record(sha, task_id)
+        if record is None:
+            return "REJECTED", "TASK_RECORD_MISSING_AFTER_FALLBACK"
+        files = []
+        for page in range(1, 31):
+            commit = github_api_json(f"/repos/{GITHUB_REPO}/commits/{sha}?per_page=100&page={page}")
+            batch = commit.get("files", [])
+            files.extend(batch)
+            if len(batch) < 100:
+                break
+        else:
+            return "REJECTED", "COMMIT_FILE_LIST_TRUNCATED"
+        result = classify_localization_result(record, files, task_id)
+        if len(_producer_result_evidence_cache) >= 256:
+            _producer_result_evidence_cache.clear()
+        _producer_result_evidence_cache[key] = result
+        return result
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return "REJECTED", "TASK_RECORD_OR_COMMIT_MISSING_AT_RESULT_SHA"
+        log.warning("producer evidence HTTP failure sha=%s code=%s", sha, exc.code)
+        return "RETRY", f"RESULT_EVIDENCE_HTTP_{exc.code}"
+    except (ValueError, KeyError, TypeError) as exc:
+        return "REJECTED", "INVALID_TASK_RECORD_OR_COMMIT_RESPONSE"
+    except Exception as exc:
+        # Transient read errors must be retried, never cached as an authorization verdict.
+        log.warning("producer evidence read failed sha=%s error=%r", sha, exc)
+        return "RETRY", "RESULT_EVIDENCE_READ_FAILED"
+
+
+def _normalize_github_run(r: dict) -> dict:
+    return {
+        "id": r.get("id"),
+        "name": r.get("name"),
+        "status": r.get("status"),
+        "conclusion": r.get("conclusion"),
+        "html_url": r.get("html_url"),
+        "event": r.get("event"),
+        "head_sha": r.get("head_sha"),
+        "created_at": r.get("created_at"),
+        "updated_at": r.get("updated_at"),
+    }
+
+
+def github_action_run_by_id(run_id: int, sha: str, workflow_name: str) -> Optional[dict]:
+    try:
+        r = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs/{int(run_id)}")
+        if not isinstance(r, dict):
+            return None
+        if r.get("head_sha") != sha or r.get("name") != workflow_name:
+            log.warning("bound actions run mismatch id=%s expected_sha=%s actual_sha=%s", run_id, sha, r.get("head_sha"))
+            return None
+        return _normalize_github_run(r)
+    except Exception as e:
+        log.warning("github exact actions lookup failed run=%s sha=%s error=%r", run_id, sha, e)
+        write_runtime(last_github_error=f"actions-run:{run_id}:{sha}:{e!r}")
+        return None
+
+
+def github_action_jobs_summary(run_id: int) -> list[dict]:
+    try:
+        payload = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs/{int(run_id)}/jobs?per_page=100")
+        jobs = payload.get("jobs", []) if isinstance(payload, dict) else []
+        return [{
+            "id": j.get("id"),
+            "name": j.get("name"),
+            "status": j.get("status"),
+            "conclusion": j.get("conclusion"),
+            "started_at": j.get("started_at"),
+            "completed_at": j.get("completed_at"),
+        } for j in jobs]
+    except Exception as e:
+        log.warning("github actions jobs lookup failed run=%s error=%r", run_id, e)
+        write_runtime(last_github_error=f"actions-jobs:{run_id}:{e!r}")
+        return []
+
+
+def github_gate_run(branch: str, sha: str, workflow_name: str, run_id: Optional[int] = None, force_discovery: bool = False) -> Optional[dict]:
+    if run_id:
+        return github_action_run_by_id(int(run_id), sha, workflow_name)
+    try:
+        now_mono = time.monotonic()
+        cached = _github_actions_cache.get(branch)
+        if cached and not force_discovery and now_mono - cached[0] < GITHUB_ACTIONS_CACHE_SECONDS:
+            payload = cached[1]
+        else:
+            q = urllib.parse.urlencode({"branch": branch, "per_page": 30})
+            payload = github_api_json(f"/repos/{GITHUB_REPO}/actions/runs?{q}")
+            if isinstance(payload, dict):
+                _github_actions_cache[branch] = (now_mono, payload)
+        matches = [
+            r for r in payload.get("workflow_runs", [])
+            if r.get("head_sha") == sha and r.get("name") == workflow_name
+        ]
+        if not matches:
+            return None
+        matches.sort(key=lambda r: r.get("created_at", ""), reverse=True)
+        return _normalize_github_run(matches[0])
+    except Exception as e:
+        log.warning("github actions discovery failed branch=%s sha=%s error=%r", branch, sha, e)
+        write_runtime(last_github_error=f"actions-discovery:{branch}:{sha}:{e!r}")
+        return None
+
+def queue_target_for_slot(slot_name: str) -> dict:
+    if CONTROLLER_MODE == "conversion":
+        if slot_name == "B":
+            return {
+                "lane": "DXVK",
+                "branch": "vr-dxvk-r71-disasm",
+                "workflow": "Backend Conversion Gate",
+            }
+        if slot_name == "C":
+            return {
+                "lane": "DX9EX",
+                "branch": "vr-d3d9ex-focus",
+                "workflow": "DX9Ex Active Validation",
+            }
+        return {
+            "lane": "DX11",
+            "branch": "vr-dx11-native-r71",
+            "workflow": "Backend Conversion Gate",
+        }
+    if slot_name not in {"A", "B", "C"}:
+        raise ValueError(f"Retired or unsupported localization lane: {slot_name}")
+    role = slot_name
+    return {
+        "lane": f"LOCALIZATION_{role}",
+        "branch": "korean-localization-clean",
+        "workflow": "Localization Automation Gate",
+    }
+
+
+LOCALIZATION_EXECUTION_POLICY = (
+    "GitHub은 연결된 플러그인으로 사용한다. 초기 도구 목록에 없다는 이유로 연결/권한 없음을 단정하지 마. "
+    "ALL_TOOLS 또는 제공된 도구 검색에서 GitHub read/write 기능과 호출 스키마를 탐색한 뒤 실제 호출해. "
+    "읽기 성공, 쓰기 기능 발견, 실제 쓰기 성공은 구분해 기록한다. "
+    "쓰기 경로는 update_file 또는 create_blob -> create_tree -> create_commit -> update_ref(force=false)다. "
+    "실제 오류는 호출 기능/대상/ref/HTTP 코드/비밀정보를 제거한 응답으로 입증한다. "
+    "404는 경로/ref/transport miss, 429는 backoff, 401/403은 응답으로 인증/권한/한도 원인을 구분한다. "
+    "도구 탐색 실패는 TOOL_DISCOVERY_INCOMPLETE이며 권한 거부 증거가 아니다. "
+    "읽기가 가능하면 HEAD와 TASK 기록 확인부터 실행하고 실패한 기능만 복구해. "
+    "RENDER_READY가 없으면 pending_artwork의 원본 취득/영역/마스크 등 미완료 단계를 실제 수행한다. "
+    "자산 하나가 차단되면 근거를 보존하고 다른 실행 가능한 자산을 진행한다. "
+    "보고만 하는 커밋은 제작 성과가 아니다. 실제 DDS 변경 또는 외부 candidate_artifacts 증빙이 있어야 PRODUCED다. "
+    "Drive DDS는 task JSON의 candidate_artifacts에 role=korean_candidate, path(.dds), "
+    "sha256(64자리), drive_file_id를 기록하고 같은 커밋에 self-QA 증빙을 포함한다. "
+    "준비 단계의 실제 변경은 ADVANCED이며 DDS 제작 건수/완료로 세지 않는다. "
+    "상태 안내로 끝내지 말고 실제 작업을 계속하며 RUNTIME_VALIDATION=UNTESTED를 유지한다."
+)
+
+
+def queue_dynamic_prefix() -> str:
+    task_id = str(runtime.get("queue_task_id") or "").strip()
+    if not task_id:
+        return ""
+    lane = str(runtime.get("queue_lane") or "")
+    source_policy = (
+        "GitHub 최신 HEAD를 상태·진행·QA SSOT로 사용하고 N100 로컬 저장소/clone/worktree로 우회하지 마. "
+        "단, 현재 Git HEAD가 승인한 Google Drive canonical HD source transport는 원본 DDS 취득에 사용하며 GitHub-only라는 이유로 차단하지 마."
+        if lane.startswith("LOCALIZATION_")
+        else
+        "GitHub 최신 HEAD를 최종 상태·결과 SSOT로 유지하되 N100 로컬 저장소/clone/worktree와 Google Drive는 "
+        "보조 입력, 분석, 빌드, 검증, 전송 수단으로 필요할 때 사용해도 된다. 최종 결과와 완료 판정은 대상 Git 브랜치의 실제 material commit으로 남겨."
+    )
+    branch = str(runtime.get("queue_branch") or "")
+    attempt = int(runtime.get("queue_attempt") or 1)
+    failure = str(runtime.get("queue_failure_context") or "").strip()
+    wave_id = str(runtime.get("queue_wave_id") or "").strip()
+    qa_batch = runtime.get("queue_qa_batch") or []
+    production_id = str(runtime.get("queue_production_id") or task_id).strip()
+    event_id = str(runtime.get("queue_event_id") or "").strip()
+    event_type = str(runtime.get("queue_event_type") or "").strip()
+    lines = [
+        f"[자동 큐 작업] TASK_ID={task_id}",
+        f"PRODUCTION_ID={production_id}",
+        *([f"EVENT_ID={event_id}"] if event_id else []),
+        *([f"EVENT_TYPE={event_type}"] if event_type else []),
+        f"LANE={lane}",
+        f"TARGET_BRANCH={branch}",
+        f"ATTEMPT={attempt}/{MAX_TASK_ATTEMPTS}",
+        *([f"WAVE_ID={wave_id}"] if wave_id else []),
+        source_policy,
+        "이 작업에서 실제 변경 또는 검토 기록을 Git에 남기고 커밋 메시지에 정확히 [AUTO:" + task_id + "] 를 포함해.",
+        "필수 GitHub Actions Gate를 소유할 result commit에는 CI-skip 지시어를 넣지 마. 검증 완료 후 bookkeeping/checkpoint 커밋은 Gate 결과와 분리해 기록하고, controller가 validation-bearing result commit을 식별할 수 있게 유지해.",
+        "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
+        "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
+    ]
+    if lane.startswith("LOCALIZATION_"):
+        lines.append(LOCALIZATION_EXECUTION_POLICY)
+    if lane in {"LOCALIZATION_A", "LOCALIZATION_B"}:
+        lines += [
+            "A/B producer는 개별 GitHub Actions Gate를 기다리지 않는다. A/B material commit 후 C QA와 C Gate를 완료해야 다음 생산 wave를 시작한다. A는 짝수 index, B는 홀수 index를 소유한다. E lane/shard는 사용하지 않는다.",
+            "이 producer task record의 AUTOMATION_VALIDATION은 PENDING으로 남기고 validation_mode=C_BATCH_GATE로 기록해. 최종 자동 검증 권한은 후속 C batch Gate에 있다.",
+            "생산 우선순위는 candidate-completion-first다. C가 받아들인 RENDER_READY 또는 ONE_STAGE_TO_RENDER 자산이 shard에 있으면 새 unrelated preflight/work-order를 시작하지 말고 그 자산을 실제 Korean DDS candidate까지 완료해.",
+            "baseline/slant/style 측정만 남았다면 같은 invocation에서 측정하고 render -> measure/refit -> DDS encode -> decoded-final self-QA까지 이어가. ready 자산이 있는 동안 preflight-only 결과로 종료하지 마.",
+            "ready 자산이 모두 fail-closed일 때만 정확한 blocker를 기록하고 다음 ready 자산을 시도해. ready 자산이 전혀 없을 때만 새 preflight-only batch를 최대 1개 확장해.",
+        ]
+    if qa_batch:
+        lines += [
+            "이 C 작업은 독립 QA 소비자다. 아래 생산 결과들을 하나의 배치로 중복 없이 검수하고 공용 상태를 한 번만 병합해.",
+            "QA_BATCH_INPUTS=" + json.dumps(qa_batch, ensure_ascii=False, separators=(",", ":")),
+            "각 입력의 TASK_ID + RESULT_SHA를 고정 기준으로 사용하고, 동일 candidate/source/contract fingerprint의 무거운 검증은 한 번만 수행해.",
+            "각 input에 대해 qa_dispositions를 기록해: PASS, REWORK_REQUIRED, HOLD_STRICT_RECHECK, SUPERSEDED 중 하나. C commit 하나의 Localization Automation Gate가 이 batch 전체의 자동 검증이다.",
+            "C가 pre-generation evidence를 PASS할 때 가능한 경우 production_readiness를 RENDER_READY, ONE_STAGE_TO_RENDER, PREFLIGHT_ONLY 중 하나로 분류하고 shared next_actions는 candidate 완성을 unrelated preflight보다 앞에 둬.",
+        ]
+    if failure:
+        lines += [
+            "",
+            "이전 실행의 미완료 사유를 확인하고 해당 단계부터 실제 작업을 재개해. Actions 실패가 명시된 경우에만 해당 run을 확인해.",
+            "FAILURE_CONTEXT=" + failure,
+        ]
+    return "\n".join(lines) + "\n\n"
+
+async def first_visible(page: Page, selectors: list[str], total_wait_ms: int = 10000):
+    """Wait for React composer hydration instead of sampling the DOM once."""
+    deadline = time.time() + (total_wait_ms / 1000)
+    while time.time() < deadline:
+        for frame in page.frames:
+            for sel in selectors:
+                try:
+                    loc = frame.locator(sel).first
+                    if await loc.count() and await loc.is_visible(timeout=250):
+                        return loc
+                except Exception:
+                    continue
+        await page.wait_for_timeout(250)
+    return None
+
+
+async def composer_diagnostics(page: Page) -> list[dict]:
+    """Return safe structural metadata only; never capture user/chat text."""
+    rows = []
+    for frame in page.frames:
+        try:
+            found = await frame.locator("textarea, input, [contenteditable], [role='textbox']").evaluate_all("""els => els.slice(0,40).map(el => ({
+                tag: el.tagName,
+                id: el.id || '',
+                role: el.getAttribute('role') || '',
+                placeholder: el.getAttribute('placeholder') || '',
+                contenteditable: el.getAttribute('contenteditable') || '',
+                testid: el.getAttribute('data-testid') || '',
+                aria: el.getAttribute('aria-label') || '',
+                cls: (typeof el.className === 'string' ? el.className : '').slice(0,160),
+                visible: !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)
+            }))""")
+            for row in found:
+                row["frame_url"] = frame.url[:180]
+                rows.append(row)
+        except Exception:
+            continue
+    return rows[:60]
+
+
+async def page_text(page: Page) -> str:
+    try:
+        return (await page.locator("body").inner_text(timeout=3000)).lower()
+    except Exception:
+        return ""
+
+
+ERROR_SURFACE_SELECTORS = [
+    "[role='alert']",
+    "[role='status']",
+    "[data-sonner-toast]",
+    "[data-testid*='toast']",
+    "[data-testid*='error']",
+    "[class*='toast']",
+    "[class*='error']",
+    "dialog",
+    "[role='dialog']",
+    "form",
+]
+
+
+async def visible_error_surface_text(page: Page) -> str:
+    """Collect only visible transient/error UI, excluding sidebar/chat-history text."""
+    chunks = []
+    for sel in ERROR_SURFACE_SELECTORS:
+        try:
+            loc = page.locator(sel)
+            count = await loc.count()
+            for i in range(min(count, 20)):
+                item = loc.nth(i)
+                try:
+                    if not await item.is_visible(timeout=120):
+                        continue
+                    text = (await item.inner_text(timeout=500)).strip()
+                    if text:
+                        chunks.append(text)
+                except Exception:
+                    continue
+        except Exception:
+            continue
+    return "\n".join(chunks).lower()
+
+
+async def retry_surface_text(page: Page) -> str:
+    """Read only the local UI around a visible Retry button; avoid chat-history false positives."""
+    loc = await first_visible(page, RETRY_SELECTORS, total_wait_ms=500)
+    if loc is None:
+        return ""
+    try:
+        text = await loc.evaluate("""el => {
+            let node = el;
+            let best = '';
+            for (let i = 0; i < 6 && node; i++, node = node.parentElement) {
+                const t = (node.innerText || '').trim();
+                if (t.length > best.length && t.length <= 2000) best = t;
+            }
+            return best;
+        }""")
+        return (text or "").lower()
+    except Exception:
+        return ""
+
+
+async def retry_looks_rate_limited(page: Page) -> bool:
+    text = await retry_surface_text(page)
+    matched = [p for p in RATE_LIMIT_PATTERNS if re.search(p, text, flags=re.I | re.S)]
+    if matched:
+        write_runtime(
+            last_rate_limit_match=matched[0],
+            last_rate_limit_surface=text[:500],
+        )
+        return True
+    return False
+
+
+async def detect_rate_limit(page: Page) -> bool:
+    text = await visible_error_surface_text(page)
+    matched = [p for p in RATE_LIMIT_PATTERNS if re.search(p, text, flags=re.I | re.S)]
+    if matched:
+        write_runtime(
+            last_rate_limit_match=matched[0],
+            last_rate_limit_surface=text[:500],
+        )
+        return True
+    return False
+
+
+async def detect_conversation_limit(page: Page) -> bool:
+    """Detect a per-thread length limit, distinct from account/rate limits."""
+    surface = await visible_error_surface_text(page)
+    matched = [p for p in CONVERSATION_LIMIT_PATTERNS if re.search(p, surface, flags=re.I | re.S)]
+    if not matched:
+        # Some conversation-length notices replace the composer without using a
+        # toast/dialog. Only inspect the full page when the composer is absent.
+        composer = await first_visible(page, INPUT_SELECTORS, total_wait_ms=500)
+        if composer is None:
+            body = await page_text(page)
+            matched = [p for p in CONVERSATION_LIMIT_PATTERNS if re.search(p, body, flags=re.I | re.S)]
+            if matched:
+                surface = body
+    if matched:
+        write_runtime(
+            last_conversation_limit_match=matched[0],
+            last_conversation_limit_surface=surface[:500],
+        )
+        return True
+    return False
+
+
+async def detect_limit(page: Page) -> bool:
+    text = await visible_error_surface_text(page)
+    # A per-conversation length limit is recoverable by rolling into a new chat;
+    # never misclassify it as an account usage limit.
+    if any(re.search(p, text, flags=re.I | re.S) for p in CONVERSATION_LIMIT_PATTERNS):
+        return False
+    matched = [p for p in LIMIT_PATTERNS if re.search(p, text, flags=re.I | re.S)]
+    if matched:
+        write_runtime(
+            last_usage_limit_match=matched[0],
+            last_usage_limit_surface=text[:500],
+        )
+        return True
+    return False
+
+
+def _parse_iso(value: Optional[str]) -> Optional[datetime]:
+    if not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(value)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=TZ)
+        return dt.astimezone(TZ)
+    except Exception:
+        return None
+
+
+def rate_limit_active(reg: Registry, now: datetime) -> bool:
+    until = _parse_iso(reg.rate_limit_until)
+    return bool(until and now < until)
+
+
+def rate_limit_seconds_remaining(reg: Registry, now: datetime) -> int:
+    until = _parse_iso(reg.rate_limit_until)
+    if not until:
+        return 0
+    return max(0, int((until - now).total_seconds()))
+
+
+def mark_rate_limit(reg: Registry, now: datetime, source: str):
+    reg.rate_limit_attempts = max(0, reg.rate_limit_attempts) + 1
+    idx = min(reg.rate_limit_attempts - 1, len(RATE_LIMIT_BACKOFF_SECONDS) - 1)
+    delay_sec = RATE_LIMIT_BACKOFF_SECONDS[idx]
+    reg.rate_limit_until = (now + timedelta(seconds=delay_sec)).isoformat()
+    save_registry(reg)
+    write_runtime(
+        status="rate_limited_backoff",
+        last_action=f"Too many requests detected ({source}); backing off {delay_sec}s",
+        rate_limit_attempts=reg.rate_limit_attempts,
+        rate_limit_until=reg.rate_limit_until,
+    )
+    log.warning(
+        "rate limit detected source=%s attempt=%s backoff=%ss until=%s",
+        source, reg.rate_limit_attempts, delay_sec, reg.rate_limit_until,
+    )
+
+
+
+def note_successful_request(reg: Registry, now: datetime, slot_name: Optional[str] = None):
+    """Record a request without treating successful traffic as a rate-limit signal."""
+    reg.last_global_send_at = now.isoformat()
+    if slot_name:
+        reg.last_global_send_slot = slot_name
+    save_registry(reg)
+    write_runtime(last_global_send_at=reg.last_global_send_at, last_global_send_slot=reg.last_global_send_slot)
+
+def clear_rate_limit_after_response(reg: Registry):
+    """Clear adaptive backoff only after a genuine assistant response or durable result is observed."""
+    if reg.rate_limit_attempts or reg.rate_limit_until:
+        reg.rate_limit_attempts = 0
+        reg.rate_limit_until = None
+        save_registry(reg)
+        write_runtime(
+            rate_limit_attempts=0,
+            rate_limit_until=None,
+            last_action="Assistant response observed; adaptive rate-limit backoff cleared",
+        )
+
+
+
+def send_guard_reason(reg: Registry, slot: Optional[Slot], now: datetime) -> Optional[str]:
+    if rate_limit_active(reg, now):
+        return f"rate_limit_backoff:{rate_limit_seconds_remaining(reg, now)}s"
+
+    last_global = _parse_iso(reg.last_global_send_at)
+    if last_global and MIN_SEND_GAP_SECONDS > 0:
+        global_gap = MIN_SEND_GAP_SECONDS
+        if slot and CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL:
+            if reg.last_global_send_slot and reg.last_global_send_slot != slot.name:
+                global_gap = min(global_gap, PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS)
+            else:
+                global_gap = min(global_gap, LOCALIZATION_SAME_SLOT_SEND_GAP_SECONDS)
+        age = (now - last_global).total_seconds()
+        if age < global_gap:
+            return f"global_send_gap:{int(global_gap - age)}s"
+
+    if slot and slot.last_sent_at:
+        slot_gap = SLOT_DEDUP_SECONDS
+        if CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL:
+            slot_gap = min(slot_gap, LOCALIZATION_SLOT_DEDUP_SECONDS)
+        if slot_gap > 0:
+            last_slot = _parse_iso(slot.last_sent_at)
+            if last_slot:
+                age = (now - last_slot).total_seconds()
+                if age < slot_gap:
+                    return f"slot_dedup:{int(slot_gap - age)}s"
+    return None
+
+async def detect_busy(page: Page) -> bool:
+    for sel in BUSY_SELECTORS:
+        try:
+            loc = page.locator(sel).first
+            if await loc.count() and await loc.is_visible(timeout=300):
+                return True
+        except Exception:
+            continue
+    return False
+
+
+async def ensure_logged_in(page: Page) -> bool:
+    # Never navigate here: each A~F tab must keep its own chat URL.
+    # Only initialize a truly blank tab.
+    if not page.url or page.url == "about:blank":
+        await page.goto(BASE_URL, wait_until="domcontentloaded", timeout=60000)
+
+    # Require the actual composer (or current model picker), not merely sidebar/nav UI.
+    deadline = time.time() + 30
+    while time.time() < deadline:
+        box = await first_visible(page, INPUT_SELECTORS)
+        if box:
+            return True
+
+        model_selectors = [
+            "button[aria-label='ChatGPT 모델 선택']",
+            "button[aria-label='Select ChatGPT model']",
+            "button[aria-label*='모델 선택']",
+        ]
+        for sel in model_selectors:
+            try:
+                loc = page.locator(sel).first
+                if await loc.count() and await loc.is_visible(timeout=200):
+                    return True
+            except Exception:
+                continue
+
+        txt = await page_text(page)
+        if any(x in txt for x in ("log in", "sign up", "로그인", "가입")):
+            # Give redirects/client hydration a few seconds before declaring logged out.
+            if time.time() + 3 < deadline:
+                await page.wait_for_timeout(1000)
+                continue
+            return False
+
+        await page.wait_for_timeout(500)
+
+    write_runtime(
+        status="login_detection_failed",
+        last_action=f"ChatGPT composer/model picker could not be verified at {page.url}",
+        current_url=page.url,
+    )
+    return False
+
+
+
