@@ -8459,6 +8459,121 @@ bool validate_programmable_draw_candidate_snapshot(
     return current.ready && current.snapshotToken == candidateSnapshotToken;
 }
 
+namespace {
+
+std::uint64_t recompute_programmable_draw_candidate_payload_snapshot(
+    const NativeProgrammableShaderDrawCandidateReadiness& candidate) noexcept {
+    if (candidate.kind == NativeProgrammableShaderDrawCandidateKind::None)
+        return 0;
+
+    std::uint64_t token = 0xcbf29ce484222325ull;
+    token = mix_readiness_snapshot_token(
+        token, static_cast<std::uint32_t>(candidate.kind));
+    token = mix_readiness_snapshot_token(
+        token, candidate.sourceReceiptSnapshotToken);
+    token = mix_readiness_snapshot_token(token, candidate.elementCount);
+    token = mix_readiness_snapshot_token(token, candidate.startLocation);
+    if (candidate.kind == NativeProgrammableShaderDrawCandidateKind::Indexed) {
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(candidate.indexFormat));
+        token = mix_readiness_snapshot_token(token, candidate.indexOffset);
+    }
+    token = mix_readiness_snapshot_token(token, 0x256u);
+    return token == 0 ? 1 : token;
+}
+
+} // namespace
+
+NativeProgrammableShaderDormantPreActivationReadiness
+compose_programmable_dormant_pre_activation_readiness(
+    const NativeProgrammableShaderDrawCandidateReadiness& candidate,
+    std::uint64_t candidateSnapshotToken) noexcept {
+    NativeProgrammableShaderDormantPreActivationReadiness out{};
+    out.kind = candidate.kind;
+    out.indexed = candidate.indexed;
+    out.elementCount = candidate.elementCount;
+    out.startLocation = candidate.startLocation;
+    out.indexFormat = candidate.indexFormat;
+    out.indexOffset = candidate.indexOffset;
+    out.sourceReceiptSnapshotToken = candidate.sourceReceiptSnapshotToken;
+    out.candidateSnapshotToken = candidateSnapshotToken;
+
+    out.inputValid = candidateSnapshotToken != 0;
+    out.candidateReady = candidate.ready;
+    out.candidateSnapshotMatches =
+        candidate.ready && candidate.snapshotToken == candidateSnapshotToken;
+    out.candidatePayloadSnapshotMatches =
+        candidate.ready &&
+        candidate.snapshotToken != 0 &&
+        candidate.snapshotToken ==
+            recompute_programmable_draw_candidate_payload_snapshot(candidate);
+    out.candidateKindValid =
+        (candidate.kind ==
+             NativeProgrammableShaderDrawCandidateKind::NonIndexed &&
+         !candidate.indexed &&
+         candidate.indexFormat == DXGI_FORMAT_UNKNOWN &&
+         candidate.indexOffset == 0u) ||
+        (candidate.kind ==
+             NativeProgrammableShaderDrawCandidateKind::Indexed &&
+         candidate.indexed &&
+         candidate.indexFormat != DXGI_FORMAT_UNKNOWN);
+
+    // R257 is a one-way dormant handoff. These flags are intentionally fixed
+    // rather than caller-provided so a readiness receipt cannot be mistaken
+    // for activation proof or execution authorization.
+    out.diagnosticOnly = true;
+    out.activationProofPresent = false;
+    out.nativeDrawPathActivationAllowed = false;
+    out.drawDispatchAuthorized = false;
+    out.boundaryPreserved =
+        out.diagnosticOnly &&
+        !out.activationProofPresent &&
+        !out.nativeDrawPathActivationAllowed &&
+        !out.drawDispatchAuthorized;
+
+    out.ready =
+        out.inputValid &&
+        out.candidateReady &&
+        out.candidateSnapshotMatches &&
+        out.candidatePayloadSnapshotMatches &&
+        out.candidateKindValid &&
+        out.boundaryPreserved;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.kind));
+        token = mix_readiness_snapshot_token(token, out.indexed ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.sourceReceiptSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.candidateSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.elementCount);
+        token = mix_readiness_snapshot_token(token, out.startLocation);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.indexFormat));
+        token = mix_readiness_snapshot_token(token, out.indexOffset);
+        token = mix_readiness_snapshot_token(token, 1u); // diagnosticOnly
+        token = mix_readiness_snapshot_token(token, 0u); // activation proof
+        token = mix_readiness_snapshot_token(token, 0u); // activation allowed
+        token = mix_readiness_snapshot_token(token, 0u); // dispatch authorized
+        token = mix_readiness_snapshot_token(token, 0x257u);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_programmable_dormant_pre_activation_snapshot(
+    const NativeProgrammableShaderDrawCandidateReadiness& candidate,
+    std::uint64_t candidateSnapshotToken,
+    std::uint64_t preActivationSnapshotToken) noexcept {
+    if (preActivationSnapshotToken == 0)
+        return false;
+    const auto current = compose_programmable_dormant_pre_activation_readiness(
+        candidate, candidateSnapshotToken);
+    return current.ready && current.snapshotToken == preActivationSnapshotToken;
+}
+
 NativeFixedFunctionIndexedSourceRangeReadiness
 compose_fixed_function_indexed_source_range_readiness(
     D3DPRIMITIVETYPE primitive,
