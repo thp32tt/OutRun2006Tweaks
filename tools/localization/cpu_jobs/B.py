@@ -168,8 +168,11 @@ for spec in TARGETS:
     crop=src.crop((x0,y0,x1,y1))
     core=core_mask(crop,spec["kind"])
     if spec["key"]=="random":
-        # Exclude the separate white question-mark icon below the title.
+        # Isolate the RANDOM title from the bright tile rim and separate question-mark icon.
+        core[:12,:]=False
         core[100:,:]=False
+        core[:,:35]=False
+        core[:,-35:]=False
     groups=group_rows(core,spec["expected_lines"])
     if len(groups)!=len(spec["korean"]): raise RuntimeError(("semantic_line_mismatch",spec["key"]))
     for li,((gy0,gy1),ko) in enumerate(zip(groups,spec["korean"]),1):
@@ -178,6 +181,8 @@ for spec in TARGETS:
         abs_core=np.zeros((2048,2048),bool)
         abs_core[y0+gy0:y0+gy1,x0:x1]=core[gy0:gy1]
         dil=np.asarray(Image.fromarray((abs_core*255).astype(np.uint8),"L").filter(ImageFilter.MaxFilter(13)))>0
+        cellmask=np.zeros((2048,2048),bool);cellmask[y0:y1,x0:x1]=True
+        dil &= cellmask
 
         # Estimate panel/background colour from a ring around the source core, then select
         # the complete visible glyph/effect footprint (fill + dark outline/shadow + AA fringe).
