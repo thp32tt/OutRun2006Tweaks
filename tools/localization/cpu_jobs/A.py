@@ -73,40 +73,20 @@ if orange_seed.getbbox()!=(58,46,291,137):
 
 near=orange_seed.filter(ImageFilter.MaxFilter(17))
 npix=near.load()
-
-# Model the untouched yellow badge interior per row. Source text/effect is any nearby
-# deviation from that row background, which captures dark/orange antialias fringe that
-# simple color thresholds would leave behind.
-row_background={}
-for yy in range(ch):
-    yellow=[]
-    for xx in range(24,336):
-        r,g,b,a=pix[xx,yy]
-        if a>200 and r>170 and g>170 and b<80:
-            yellow.append((r,g,b,a))
-    if yellow:
-        row_background[yy]=tuple(int(median([v[k] for v in yellow])) for k in range(4))
-
 effect=Image.new("L",(cw,ch),0); ep=effect.load()
 for yy in range(ch):
-    fill=row_background.get(yy)
-    if fill is None:
-        continue
     for xx in range(cw):
         if not npix[xx,yy]:
             continue
         r,g,b,a=pix[xx,yy]
-        if not a:
-            continue
-        delta=max(abs(r-fill[0]),abs(g-fill[1]),abs(b-fill[2]),abs(a-fill[3]))
-        if delta>2:
+        # Orange/black source lettering + nearby antialias/shadow only. Do not
+        # absorb the white/yellow badge highlight or border into the text mask.
+        if a and (((r-g)>2 and b<100) or (g<212 and b<80)):
             ep[xx,yy]=255
 
 effect_bbox=effect.getbbox()
-if not effect_bbox:
-    raise RuntimeError("source effect mask empty")
-if effect_bbox[0]<50 or effect_bbox[1]<38 or effect_bbox[2]>305 or effect_bbox[3]>150:
-    raise RuntimeError(("source effect bbox escaped safe badge interior",effect_bbox))
+if effect_bbox!=(58,46,292,141):
+    raise RuntimeError(("source effect bbox drift",effect_bbox))
 
 # Reliable per-line split between "No" and "Handicap".
 top_mask=Image.new("L",(cw,ch),0)
@@ -138,9 +118,16 @@ clean_cell=cell.copy(); cp=clean_cell.load()
 for yy in range(ch):
     xs=[xx for xx in range(cw) if ep[xx,yy]]
     if not xs: continue
-    fill=row_background.get(yy)
-    if fill is None:
-        raise RuntimeError(("missing yellow reconstruction row",yy))
+    yellow=[]
+    for xx in range(24,336):
+        if ep[xx,yy]:
+            continue
+        r,g,b,a=pix[xx,yy]
+        if a>200 and r>170 and g>170 and b<80:
+            yellow.append((r,g,b,a))
+    if len(yellow)<12:
+        raise RuntimeError(("insufficient yellow reconstruction samples",yy,len(yellow)))
+    fill=tuple(int(median([v[k] for v in yellow])) for k in range(4))
     for xx in xs:
         cp[xx,yy]=fill
 
@@ -228,8 +215,16 @@ final=clean.copy()
 line_rows=[]
 for key,src_txt,ko_txt,bb,ratio in line_specs:
     x1,y1,x2,y2=bb; bw,bh=x2-x1,y2-y1
-    glyph,fs,shx,shy=render_line(ko_txt,bw,bh,ratio)
-    tx=x1+(bw-glyph.width)//2; ty=y1+(bh-glyph.height)//2
+    render_w=(bw-10) if key=="no" else bw
+    glyph,fs,shx,shy=render_line(ko_txt,render_w,bh,ratio)
+    if key=="no":
+        # Source "No" sits near the left badge highlight. Current zero-overlap
+        # policy requires positive separation, so keep the Korean upper line
+        # inside the same source bbox but right-shift it away from that highlight.
+        tx=x2-glyph.width-1
+    else:
+        tx=x1+(bw-glyph.width)//2
+    ty=y1+(bh-glyph.height)//2
     tx=max(x1+1,min(tx,x2-glyph.width-1)); ty=max(y1+1,min(ty,y2-glyph.height-1))
     final.alpha_composite(glyph,(tx,ty))
     line_rows.append({
