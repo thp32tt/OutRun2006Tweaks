@@ -79,6 +79,7 @@ jobs:
           if ($LASTEXITCODE -ne 1) {
             throw "git grep failed while checking DX11 source hygiene (exit $LASTEXITCODE)"
           }
+          exit 0
 
       - name: Verify DX11 source graph
         shell: pwsh
