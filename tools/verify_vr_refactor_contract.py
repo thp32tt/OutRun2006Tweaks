@@ -32,7 +32,30 @@ raster = text("src/vr/state/d3d9_raster_state.hpp")
 state_block_tracker = text("src/vr/state/state_block_tracker.hpp")
 state_block_recovery = text("src/vr/state/state_block_recovery.hpp")
 state_block_events = text("src/vr/state/state_block_events.hpp")
+overlay_hooks = text("src/overlay/hooks_overlay.cpp")
+render_semantics = text("src/vr/game/render_semantics.hpp")
+r30_safe = text("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
 text("tools/verify_vr_hook_graph.py")
+
+# F11/Tweaks ImGui is external screen-space UI. During gameplay it must not
+# consume a pending game semantic token, and it must enter the already-proven
+# SCREEN_OVERLAY_2D stereo convergence path instead of falling back to R26.
+for marker in (
+    "ScopedExternalOverlaySemantic",
+    "ExternalOverlaySemanticDepth",
+    "if (ExternalOverlaySemanticDepth != 0)",
+):
+    if marker not in render_semantics:
+        errors.append(f"render semantics missing external-overlay guard: {marker}")
+for marker in (
+    "ScopedExternalOverlaySemantic",
+    "RenderScope::ScreenOverlay2D",
+    "ImGui_ImplDX9_RenderDrawData",
+):
+    if marker not in overlay_hooks:
+        errors.append(f"F11 overlay missing explicit stereo semantic scope: {marker}")
+if "CorroboratesScreenOverlay2D" not in r30_safe or "semanticOverlay2D" not in r30_safe:
+    errors.append("active R26+R30 path missing SCREEN_OVERLAY_2D owner route")
 
 if "R22FailClosedReplayState" in r23:
     errors.append("R23 retained private R22 fail-closed replay dependency")
