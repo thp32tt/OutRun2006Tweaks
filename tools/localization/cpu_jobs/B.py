@@ -176,13 +176,16 @@ for spec in TARGETS:
         core[:,-35:]=False
     groups=group_rows(core,spec["expected_lines"])
     if len(groups)!=len(spec["korean"]): raise RuntimeError(("semantic_line_mismatch",spec["key"]))
-    for li,((gy0,gy1),ko) in enumerate(zip(groups,spec["korean"]),1):
+    for gi,((gy0,gy1),ko) in enumerate(zip(groups,spec["korean"])):
+        li=gi+1
         ys,xs=np.nonzero(core[gy0:gy1])
         if not len(xs):raise RuntimeError(("empty_core",spec["key"],li))
         abs_core=np.zeros((2048,2048),bool)
         abs_core[y0+gy0:y0+gy1,x0:x1]=core[gy0:gy1]
-        dil=np.asarray(Image.fromarray((abs_core*255).astype(np.uint8),"L").filter(ImageFilter.MaxFilter(13)))>0
-        cellmask=np.zeros((2048,2048),bool);cellmask[y0:y1,x0:x1]=True
+        dil=np.asarray(Image.fromarray((abs_core*255).astype(np.uint8),"L").filter(ImageFilter.MaxFilter(9)))>0
+        zone_top=max(0,(groups[gi-1][1]+gy0)//2) if gi>0 else max(0,gy0-8)
+        zone_bottom=min(y1-y0,(gy1+groups[gi+1][0])//2) if gi+1<len(groups) else min(y1-y0,gy1+8)
+        cellmask=np.zeros((2048,2048),bool);cellmask[y0+zone_top:y0+zone_bottom,x0:x1]=True
         dil &= cellmask
 
         # Estimate panel/background colour from a ring around the source core, then select
