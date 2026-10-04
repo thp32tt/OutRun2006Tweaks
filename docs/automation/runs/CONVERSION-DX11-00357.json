@@ -2,7 +2,7 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00357",
   "production_id": "CONVERSION-DX11-00357",
-  "event_id": "CONVERSION-DX11-00357-E002",
+  "event_id": "CONVERSION-DX11-00357-E004",
   "event_type": "rollover",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
@@ -99,12 +99,12 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00357",
     "production_id": "CONVERSION-DX11-00357",
-    "event_id": "CONVERSION-DX11-00357-E002",
+    "event_id": "CONVERSION-DX11-00357-E004",
     "event_type": "rollover",
     "attempt": "1/3",
     "rollover_is_retry": false,
     "source": "CURRENT_USER_QUEUE",
-    "chat_rollover": 2,
+    "chat_rollover": 3,
     "resume_reason": "Retry persisted after one recovery attempt",
     "material_result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
     "source_implementation_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
@@ -115,7 +115,7 @@
     "artifact_id": 11296882293,
     "artifact_digest": "sha256:076c5e923210ccd3cb406b6d9fb02f24ce230be638eafa4404337850cb0a6ff0",
     "implementation_comment_id": 5977627098,
-    "dispatch_correction_comment_id": 5977669570,
+    "dispatch_correction_comment_id": 5977704132,
     "validation_comment_id": 5977688286,
     "runtime_validation": "UNTESTED",
     "native_draw_path_activation_changed": false
@@ -157,12 +157,37 @@
     "reason": "The current controller queue message in this task is authoritative. Concurrent rollover bookkeeping at c43e58a3d955eeaff7e721880a66b3b72b4af12c used stale dispatch metadata; it does not change the material result or exact-SHA validation evidence."
   },
   "rollover_is_retry": false,
-  "chat_rollover": 2,
+  "chat_rollover": 3,
   "resume_reason": "Retry persisted after one recovery attempt",
   "material_origin_dispatch": {
     "production_id": "CONVERSION-DXVK-00356",
     "event_id": "CONVERSION-DXVK-00356-E006",
     "event_type": "retry",
     "note": "Inherited producer metadata from the initial material publication; superseded by the current authoritative E002 rollover dispatch. Material and validation-bearing SHA are unchanged."
+  },
+  "rollover_metadata_correction": {
+    "corrected_from": {
+      "task_id": "CONVERSION-DX11-00357",
+      "production_id": "CONVERSION-DX11-00357",
+      "event_id": "CONVERSION-DX11-00357-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false
+    },
+    "corrected_to": {
+      "task_id": "CONVERSION-DX11-00357",
+      "production_id": "CONVERSION-DX11-00357",
+      "event_id": "CONVERSION-DX11-00357-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false,
+      "dispatch_source": "CURRENT_USER_QUEUE",
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "reason": "Current user-issued E004 / CHAT_ROLLOVER=3 dispatch is authoritative. This chat rollover does not increment ATTEMPT. Existing R243 material/result SHA, exact-SHA Gate #1944 evidence, C0-C6 completion and RUNTIME_VALIDATION=UNTESTED remain unchanged.",
+    "dispatch_correction_comment_id": 5977704132,
+    "material_and_validation_bearing_sha_unchanged": true
   }
 }
