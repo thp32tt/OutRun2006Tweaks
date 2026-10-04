@@ -19,6 +19,9 @@ runner = read("tools/Run-OutRunVRTest.ps1")
 hooks_misc = read("src/hooks_misc.cpp")
 vr_settings = read("src/vr/settings.cpp")
 graphics = read("src/hooks_graphics.cpp")
+ui_scaling = read("src/hooks_uiscaling.cpp")
+r30_safe = read("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
+ini = read("OutRun2006Tweaks.ini")
 
 require(
     runner,
@@ -82,4 +85,41 @@ require(
     "internal backbuffer preservation",
 )
 
-print("DX11 XR source-resolution A/B launch policy: PASS")
+
+
+# The game's existing UI Scaling path is the DX11/VR layout SSOT. It already
+# converts OutRun's canonical 640x480 UI into the game canvas without stretching.
+# VR may world-lock/project that result, but must not apply a hidden second
+# default scale that pulls edge HUD/menu elements back toward the centre.
+for literal, meaning in (
+    ("UIScalingMode = 1", "OutRun Online Arcade UI scaling default"),
+    ("HudScale = 1.00", "VR must preserve game UI placement by default"),
+):
+    require(ini, literal, meaning)
+
+require(
+    vr_settings,
+    'Setting<float> VRHudScale{ "VR", "HudScale", 1.00f,',
+    "VR HUD default must be identity scale",
+)
+for literal, meaning in (
+    ("float scale = min(Game::screen_scale->x, Game::screen_scale->y);", "canonical UI contain scale"),
+    ("Game::screen_resolution->x - (Game::original_resolution.x * scale)", "canonical UI horizontal centering"),
+):
+    require(ui_scaling, literal, meaning)
+
+contain_start = "        void R30HudContainScale("
+contain_end = "        enum class R30ScreenSpaceKind"
+require(r30_safe, contain_start, "VR HUD contain transform")
+start = r30_safe.index(contain_start)
+end = r30_safe.index(contain_end, start)
+contain = r30_safe[start:end]
+if "R30HudAspectCompensation(" in contain:
+    raise SystemExit("VR HUD contain path must not add a second automatic aspect correction")
+require(
+    contain,
+    "already-scaled game UI coordinates remain the layout SSOT",
+    "explicit game UI layout ownership contract",
+)
+
+print("DX11 XR source-resolution + UI-scaling SSOT policy: PASS")

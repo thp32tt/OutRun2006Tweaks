@@ -1383,9 +1383,10 @@ namespace OutRunVRStereo
             return hr;
         }
 
-        // User-adjustable projection-space HUD scale. The per-eye FOV affine
-        // remains automatic; this value is only a common-centre size trim after
-        // the headset-specific mapping.
+        // Optional final VR HUD size trim. hooks_uiscaling.cpp already owns the
+        // canonical 640x480 -> game-canvas layout; production default 1.0
+        // preserves those positions before world-lock/per-eye projection.
+        // Values below 1.0 are explicit user overrides that shrink about centre.
         float R30HudScaleValue() noexcept
         {
             return std::clamp(Settings::VRHudScale.get(), 0.30f, 1.20f);
@@ -1679,7 +1680,9 @@ namespace OutRunVRStereo
 
             // R55: modes 3/4 intentionally force a visually obvious 35% scale
             // so HMD testing can prove that this exact final-coordinate path is
-            // presentation-authoritative. Production policy still uses HudScale.
+            // presentation-authoritative. In production, HudScale=1.00 means
+            // the already-scaled game UI coordinates remain the layout SSOT;
+            // this layer only supplies VR world-lock/per-eye projection.
             scaleX = userScale;
             scaleY = userScale;
         }
