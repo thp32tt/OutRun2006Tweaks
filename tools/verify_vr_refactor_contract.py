@@ -619,6 +619,41 @@ for marker, source, owner in (
         errors.append(f"{owner} missing install-state owner query API: {marker}")
 if "R32InstallStatus()" not in r33:
     errors.append("R33 missing R32 install-state owner query")
+
+# Post-1000 hook-chain flattening: R34 must no longer add another physical
+# Reset/Present/draw detour layer above R33. Its compatibility responsibilities
+# are folded into the R33 final dispatcher; R34 becomes a thin readiness ledger.
+for banned in (
+    "SafetyHookInline R34",
+    "safetyhook::create_inline(",
+    "HRESULT __stdcall DrawPrimitiveDestR34",
+    "HRESULT __stdcall DrawIndexedPrimitiveDestR34",
+    "HRESULT __stdcall DrawPrimitiveUPDestR34",
+    "HRESULT __stdcall DrawIndexedPrimitiveUPDestR34",
+    "HRESULT __stdcall ResetDestR34",
+    "HRESULT __stdcall PresentDestR34",
+    "R34EnableHooks()",
+    "R34RollbackHooks()",
+):
+    if banned in r34:
+        errors.append(f"R34 retained physical hook-chain layer: {banned}")
+
+for marker in (
+    "R33GuardStereoRasterState(",
+    "R33SynchronizeResetReplayGuardState(",
+    "R33ResetReplayBlocked",
+    "LastResetStateReplaySucceeded()",
+    "TestCooperativeLevel()",
+    "R30TryXyzrhwPrimitiveVB(",
+    "R30TryXyzrhwIndexedPrimitiveVB(",
+    "R30TryXyzrhwPrimitiveUP(",
+    "R30TryXyzrhwIndexedPrimitiveUP(",
+):
+    if marker not in r33:
+        errors.append(f"R33 missing folded final-dispatch responsibility: {marker}")
+
+if "R33SynchronizeResetReplayGuardState(" not in r34:
+    errors.append("R34 thin readiness layer missing R33 reset-replay sync")
 if "R33InstallStatus()" not in r34:
     errors.append("R34 missing R33 install-state owner query")
 
