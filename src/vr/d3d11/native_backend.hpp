@@ -27,6 +27,7 @@ class NativeTriangleFanIndexBuffer;
 struct VertexInputLayoutTranslation;
 struct FixedFunctionStageState;
 struct PipelineTranslation;
+struct ProgrammableShaderPairCacheIdentity;
 
 struct NativeBackendConfig {
     std::uint32_t width = 0;
@@ -1153,6 +1154,73 @@ compose_fixed_function_bound_draw_readiness(
     ID3D11DeviceContext* context,
     const NativeFixedFunctionOutputStateBinding& outputStateBinding,
     std::uint64_t snapshotToken) noexcept;
+
+// R240 dormant per-device inventory/cache owner for the R239 programmable
+// VS/PS pair identity. This deliberately caches only authenticated identity
+// metadata; it does not translate D3D9 bytecode, create/bind D3D11 shader
+// objects, or participate in NativeDrawPath routing.
+struct NativeProgrammableShaderPairCacheReadiness {
+    bool inputValid{};
+    bool ownerReady{};
+    bool deviceMatches{};
+    bool identityExact{};
+    bool collisionFree{};
+    bool cached{};
+    bool ready{};
+    std::size_t entryCount{};
+    std::uint64_t ownerGeneration{};
+    std::uint64_t cacheKey{};
+    std::uint64_t snapshotToken{};
+};
+
+class NativeProgrammableShaderPairCache final {
+public:
+    NativeProgrammableShaderPairCache() = default;
+    ~NativeProgrammableShaderPairCache() = default;
+    NativeProgrammableShaderPairCache(
+        const NativeProgrammableShaderPairCache&) = delete;
+    NativeProgrammableShaderPairCache& operator=(
+        const NativeProgrammableShaderPairCache&) = delete;
+
+    bool initialize(ID3D11Device* device) noexcept;
+    bool cache_for_observation(
+        const ProgrammableShaderPairCacheIdentity& identity) noexcept;
+    [[nodiscard]] NativeProgrammableShaderPairCacheReadiness readiness(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity) const noexcept;
+    [[nodiscard]] bool validate_snapshot(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t snapshotToken) const noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ != nullptr && owner_generation_ != 0;
+    }
+    [[nodiscard]] ID3D11Device* device() const noexcept {
+        return device_.Get();
+    }
+    [[nodiscard]] std::size_t entry_count() const noexcept {
+        return entries_.size();
+    }
+    [[nodiscard]] std::uint64_t owner_generation() const noexcept {
+        return owner_generation_;
+    }
+
+private:
+    struct Entry {
+        UINT vertexByteSize{};
+        DWORD vertexVersionToken{};
+        std::uint64_t vertexBytecodeHash{};
+        UINT pixelByteSize{};
+        DWORD pixelVersionToken{};
+        std::uint64_t pixelBytecodeHash{};
+    };
+
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    std::unordered_map<std::uint64_t, Entry> entries_;
+    std::uint64_t owner_generation_ = 0;
+};
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
 // input layout, and R96 transform buffer. No game draw path constructs or

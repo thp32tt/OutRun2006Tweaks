@@ -9371,6 +9371,43 @@ def main() -> None:
             )
         )
 
+    r240_programmable_shader_pair_device_cache_contract = [
+        ("class NativeProgrammableShaderPairCache final",
+         NATIVE_BACKEND_HPP,
+         "R240 per-device programmable pair cache owner"),
+        ("NativeProgrammableShaderPairCache::cache_for_observation(",
+         NATIVE_BACKEND_CPP,
+         "R240 programmable cache insertion implementation"),
+        ("identity.translationImplemented",
+         NATIVE_BACKEND_CPP,
+         "R240 identity-only cache must reject translated-state claims"),
+        ("found != entries_.end()",
+         NATIVE_BACKEND_CPP,
+         "R240 duplicate/collision lookup boundary"),
+        ("programmableCache.entry_count() == 1",
+         CONSTANT_BUFFER_PROBE,
+         "R240 duplicate pair dedupe regression"),
+        ("forged cache-key collision fails closed",
+         CONSTANT_BUFFER_PROBE,
+         "R240 cache-key collision fail-closed regression"),
+        ("device reinitialize clears entries and invalidates prior snapshots",
+         CONSTANT_BUFFER_PROBE,
+         "R240 per-device generation isolation regression"),
+    ]
+    missing_r240_programmable_shader_pair_device_cache = [
+        meaning
+        for token, source, meaning
+        in r240_programmable_shader_pair_device_cache_contract
+        if token not in source
+    ]
+    if missing_r240_programmable_shader_pair_device_cache:
+        raise SystemExit(
+            "DX11 R240 programmable shader pair device cache drift: "
+            + ", ".join(
+                missing_r240_programmable_shader_pair_device_cache
+            )
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

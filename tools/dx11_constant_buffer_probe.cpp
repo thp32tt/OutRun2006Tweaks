@@ -27,6 +27,8 @@ namespace
     using outrun::vr::dx11::NativeManagedTextureRegistry;
     using outrun::vr::dx11::NativeManagedTextureShadow;
     using outrun::vr::dx11::NativeManagedTextureStageReadiness;
+    using outrun::vr::dx11::NativeProgrammableShaderPairCache;
+    using outrun::vr::dx11::ProgrammableShaderFunctionIdentity;
     using outrun::vr::dx11::NativeSurfacePairReadiness;
     using outrun::vr::dx11::NativeTriangleFanIndexBuffer;
     using outrun::vr::dx11::NativeTriangleFanIndexBufferReadiness;
@@ -41,6 +43,7 @@ namespace
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
     using outrun::vr::dx11::generate_fixed_function_transform_constants;
     using outrun::vr::dx11::generate_fixed_function_vertex_shader_prototype;
+    using outrun::vr::dx11::seal_programmable_shader_pair_cache_identity;
     using outrun::vr::dx11::translate_fixed_function_sampler;
     using outrun::vr::dx11::translate_pipeline;
     using outrun::vr::dx11::translate_resource_format;
@@ -283,6 +286,140 @@ int main()
         "FixedFunctionTransform must remain 64 bytes");
 
     DevicePair d3d = create_warp_device();
+
+    const ProgrammableShaderFunctionIdentity programmableVs{
+        true,
+        true,
+        128u,
+        D3DVS_VERSION(3, 0),
+        0x1111111111111111ull,
+    };
+    const ProgrammableShaderFunctionIdentity programmablePs{
+        true,
+        true,
+        96u,
+        D3DPS_VERSION(3, 0),
+        0x2222222222222222ull,
+    };
+    const auto programmablePair =
+        seal_programmable_shader_pair_cache_identity(
+            true, false, programmableVs, programmablePs);
+    require(
+        programmablePair.exact_identity() &&
+        !programmablePair.translationImplemented,
+        "R240 programmable pair identity prerequisite");
+
+    NativeProgrammableShaderPairCache programmableCache;
+    require(
+        !programmableCache.ready() &&
+        programmableCache.entry_count() == 0,
+        "R240 programmable cache starts dormant");
+    require(
+        programmableCache.initialize(d3d.device) &&
+        programmableCache.ready() &&
+        programmableCache.device() == d3d.device &&
+        programmableCache.entry_count() == 0,
+        "R240 programmable cache initializes per device");
+    const auto firstCacheGeneration =
+        programmableCache.owner_generation();
+    require(
+        firstCacheGeneration != 0 &&
+        programmableCache.cache_for_observation(programmablePair) &&
+        programmableCache.entry_count() == 1,
+        "R240 programmable pair enters dormant cache");
+    const auto programmableReady =
+        programmableCache.readiness(d3d.device, programmablePair);
+    require(
+        programmableReady.inputValid &&
+        programmableReady.ownerReady &&
+        programmableReady.deviceMatches &&
+        programmableReady.identityExact &&
+        programmableReady.collisionFree &&
+        programmableReady.cached &&
+        programmableReady.ready &&
+        programmableReady.entryCount == 1 &&
+        programmableReady.ownerGeneration == firstCacheGeneration &&
+        programmableReady.cacheKey == programmablePair.cacheKey &&
+        programmableReady.snapshotToken != 0 &&
+        programmableCache.validate_snapshot(
+            d3d.device, programmablePair,
+            programmableReady.snapshotToken),
+        "R240 programmable cache readiness seals exact device identity");
+
+    require(
+        programmableCache.cache_for_observation(programmablePair) &&
+        programmableCache.entry_count() == 1,
+        "R240 duplicate programmable pair dedupes by exact identity");
+    const auto duplicateReady =
+        programmableCache.readiness(d3d.device, programmablePair);
+    require(
+        duplicateReady.ready &&
+        duplicateReady.snapshotToken == programmableReady.snapshotToken,
+        "R240 duplicate programmable pair preserves snapshot identity");
+
+    auto changedPs = programmablePs;
+    changedPs.bytecodeHash ^= 1ull;
+    const auto changedPair =
+        seal_programmable_shader_pair_cache_identity(
+            true, false, programmableVs, changedPs);
+    require(
+        changedPair.exact_identity() &&
+        changedPair.cacheKey != programmablePair.cacheKey &&
+        programmableCache.cache_for_observation(changedPair) &&
+        programmableCache.entry_count() == 2,
+        "R240 distinct programmable pair receives a distinct cache entry");
+    require(
+        programmableCache.validate_snapshot(
+            d3d.device, programmablePair,
+            programmableReady.snapshotToken),
+        "R240 unrelated cache insertion does not stale an exact pair snapshot");
+
+    auto forgedCollision = changedPair;
+    forgedCollision.cacheKey = programmablePair.cacheKey;
+    require(
+        forgedCollision.exact_identity() &&
+        !programmableCache.cache_for_observation(forgedCollision),
+        "R240 forged cache-key collision fails closed");
+    const auto collisionReady =
+        programmableCache.readiness(d3d.device, forgedCollision);
+    require(
+        collisionReady.inputValid &&
+        collisionReady.ownerReady &&
+        collisionReady.deviceMatches &&
+        collisionReady.identityExact &&
+        !collisionReady.collisionFree &&
+        !collisionReady.cached &&
+        !collisionReady.ready &&
+        collisionReady.snapshotToken == 0,
+        "R240 collision readiness cannot authenticate mismatched metadata");
+
+    const auto incompletePair =
+        seal_programmable_shader_pair_cache_identity(
+            false, false, programmableVs, programmablePs);
+    require(
+        !incompletePair.exact_identity() &&
+        !programmableCache.cache_for_observation(incompletePair),
+        "R240 incomplete programmable identity cannot enter cache");
+
+    DevicePair secondDevice = create_warp_device();
+    require(
+        programmableCache.initialize(secondDevice.device) &&
+        programmableCache.ready() &&
+        programmableCache.device() == secondDevice.device &&
+        programmableCache.entry_count() == 0 &&
+        programmableCache.owner_generation() != firstCacheGeneration &&
+        !programmableCache.validate_snapshot(
+            secondDevice.device, programmablePair,
+            programmableReady.snapshotToken),
+        "R240 device reinitialize clears entries and invalidates prior snapshots");
+    require(
+        programmableCache.cache_for_observation(programmablePair) &&
+        programmableCache.entry_count() == 1 &&
+        programmableCache.readiness(
+            secondDevice.device, programmablePair).ready,
+        "R240 exact pair can be re-cached on the new device generation");
+    secondDevice.context->Release();
+    secondDevice.device->Release();
 
     const auto pointWrapSampler =
         translate_fixed_function_sampler(stages[0]);

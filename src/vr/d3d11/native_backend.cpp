@@ -2152,6 +2152,148 @@ void NativeFixedFunctionRenderStateBundle::shutdown() noexcept {
     translation_identity_ = 0;
 }
 
+bool NativeProgrammableShaderPairCache::initialize(
+    ID3D11Device* device) noexcept {
+    shutdown();
+    if (!device)
+        return false;
+
+    device_ = device;
+    ++owner_generation_;
+    if (owner_generation_ == 0)
+        ++owner_generation_;
+    return true;
+}
+
+bool NativeProgrammableShaderPairCache::cache_for_observation(
+    const ProgrammableShaderPairCacheIdentity& identity) noexcept {
+    if (!ready() ||
+        !identity.exact_identity() ||
+        identity.translationImplemented)
+        return false;
+
+    const Entry candidate{
+        identity.vertexShader.byteSize,
+        identity.vertexShader.versionToken,
+        identity.vertexShader.bytecodeHash,
+        identity.pixelShader.byteSize,
+        identity.pixelShader.versionToken,
+        identity.pixelShader.bytecodeHash,
+    };
+    const auto same_entry = [](const Entry& a, const Entry& b) noexcept {
+        return a.vertexByteSize == b.vertexByteSize &&
+               a.vertexVersionToken == b.vertexVersionToken &&
+               a.vertexBytecodeHash == b.vertexBytecodeHash &&
+               a.pixelByteSize == b.pixelByteSize &&
+               a.pixelVersionToken == b.pixelVersionToken &&
+               a.pixelBytecodeHash == b.pixelBytecodeHash;
+    };
+
+    const auto found = entries_.find(identity.cacheKey);
+    if (found != entries_.end())
+        return same_entry(found->second, candidate);
+
+    try {
+        entries_.emplace(identity.cacheKey, candidate);
+    } catch (...) {
+        return false;
+    }
+    return true;
+}
+
+NativeProgrammableShaderPairCacheReadiness
+NativeProgrammableShaderPairCache::readiness(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity) const noexcept {
+    NativeProgrammableShaderPairCacheReadiness out{};
+    out.ownerReady = ready();
+    out.ownerGeneration = owner_generation_;
+    out.entryCount = entries_.size();
+    out.cacheKey = identity.cacheKey;
+    out.identityExact =
+        identity.exact_identity() && !identity.translationImplemented;
+    out.inputValid = expectedDevice != nullptr && out.identityExact;
+    out.deviceMatches =
+        out.ownerReady && expectedDevice != nullptr &&
+        device_.Get() == expectedDevice;
+
+    if (out.inputValid && out.ownerReady) {
+        const auto found = entries_.find(identity.cacheKey);
+        if (found != entries_.end()) {
+            const Entry candidate{
+                identity.vertexShader.byteSize,
+                identity.vertexShader.versionToken,
+                identity.vertexShader.bytecodeHash,
+                identity.pixelShader.byteSize,
+                identity.pixelShader.versionToken,
+                identity.pixelShader.bytecodeHash,
+            };
+            const auto& cached = found->second;
+            out.collisionFree =
+                cached.vertexByteSize == candidate.vertexByteSize &&
+                cached.vertexVersionToken == candidate.vertexVersionToken &&
+                cached.vertexBytecodeHash == candidate.vertexBytecodeHash &&
+                cached.pixelByteSize == candidate.pixelByteSize &&
+                cached.pixelVersionToken == candidate.pixelVersionToken &&
+                cached.pixelBytecodeHash == candidate.pixelBytecodeHash;
+            out.cached = out.collisionFree;
+        }
+    }
+
+    out.ready =
+        out.inputValid &&
+        out.ownerReady &&
+        out.deviceMatches &&
+        out.identityExact &&
+        out.collisionFree &&
+        out.cached &&
+        out.ownerGeneration != 0 &&
+        out.cacheKey != 0;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(this)));
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedDevice)));
+        token = mix_readiness_snapshot_token(token, out.ownerGeneration);
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(
+            token, identity.vertexShader.byteSize);
+        token = mix_readiness_snapshot_token(
+            token, identity.vertexShader.versionToken);
+        token = mix_readiness_snapshot_token(
+            token, identity.vertexShader.bytecodeHash);
+        token = mix_readiness_snapshot_token(
+            token, identity.pixelShader.byteSize);
+        token = mix_readiness_snapshot_token(
+            token, identity.pixelShader.versionToken);
+        token = mix_readiness_snapshot_token(
+            token, identity.pixelShader.bytecodeHash);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeProgrammableShaderPairCache::validate_snapshot(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t snapshotToken) const noexcept {
+    if (snapshotToken == 0)
+        return false;
+    const auto current = readiness(expectedDevice, identity);
+    return current.ready && current.snapshotToken == snapshotToken;
+}
+
+void NativeProgrammableShaderPairCache::shutdown() noexcept {
+    entries_.clear();
+    device_.Reset();
+}
+
 bool NativeFixedFunctionPipelineBundle::initialize(
     ID3D11Device* device,
     const VertexInputLayoutTranslation& layout,

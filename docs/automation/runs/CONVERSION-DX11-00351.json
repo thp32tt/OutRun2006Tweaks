@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00351",
+  "production_id": "CONVERSION-DXVK-00350",
+  "event_id": "CONVERSION-DXVK-00350-E009",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "88b9e7afcbbb49f4e6ba739fce5d509e29bf48dd",
+  "result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX11-00351]",
+  "selected_work_item": "DX11_R240_PROGRAMMABLE_SHADER_PAIR_DEVICE_CACHE_OWNER",
+  "summary": "R240 consumes the R239 stage-typed programmable VS/PS identity in a dormant per-D3D11-device cache owner. It deduplicates exact identities, fails closed on forged cache-key collisions and incomplete/translated-state claims, clears entries across device reinitialization, and binds readiness snapshots to owner/device generation. It does not translate D3D9 bytecode, create/bind programmable D3D11 shaders, or activate NativeDrawPath.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00351.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered DX11 lane at 88b9e7afcbbb49f4e6ba739fce5d509e29bf48dd; read current branch HEAD, VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_DX11_NATIVE_PLAN.md, VR automation/run/review state, Set05, regression knowledge/problem history. R239 is complete and its exact next action selects a dormant per-device programmable translation/object-cache owner."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R239 authenticates programmable shader-pair identity but no per-device owner exists to deduplicate identities, prevent forged cache-key aliasing, or invalidate cached readiness across D3D11 device generations. This is the smallest executable next step before actual bytecode translation/object creation.",
+      "review_lenses": {
+        "architecture": "Add a dormant metadata cache owner in native_backend; no game hook or draw routing.",
+        "ownership_lifetime": "Own only an ID3D11Device COM reference plus copied identity metadata; clear metadata on reinitialize/shutdown.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effect/recenter semantics change.",
+        "performance": "No runtime caller is added; unordered-map work is exercised only by hosted probes.",
+        "adversarial": "Prove exact duplicate dedupe, forged same-key/different-metadata collision rejection, incomplete identity rejection, and old snapshot invalidation across device reinitialize."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderPairCache with per-device generation ownership, exact metadata collision checks, readiness/snapshot validation and fail-closed translated-state rejection; extended dx11_constant_buffer_probe with WARP-hosted positive, dedupe, collision, incomplete-identity and device-generation regressions; added source-graph drift guards."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING_EXACT_SHA_GATE",
+      "automation_validation": "PENDING",
+      "evidence": "Required Backend Conversion Gate must validate the exact material result SHA, including Win32 build and DX11 readiness smoke/constant-buffer probe. No Quest 3/VDXR runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA_PUBLICATION",
+      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant programmable identity cache/readiness infrastructure only; no runtime distributable identity or native draw activation is promoted."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false,
+      "exact_next_action": "Publish R240 material result without CI skip, require its exact-SHA Backend Conversion Gate, then persist final run/lane state while keeping RUNTIME_VALIDATION=UNTESTED and NativeDrawPath dormant."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "native_backend dormant cache/readiness infrastructure and hosted probe only; no D3D9 hook, stereo renderer, transport, OpenXR submission or production NativeDrawPath caller changes."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00351",
+    "production_id": "CONVERSION-DXVK-00350",
+    "event_id": "CONVERSION-DXVK-00350-E009",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Publish R240 as the material result, validate its exact SHA, then finalize C3/C4/C6 without conflating CI with HMD runtime proof."
+}
