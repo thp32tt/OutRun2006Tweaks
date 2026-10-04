@@ -1,6 +1,6 @@
 {
   "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
-  "candidate_sha256": "45bf5ee4f7b18bee4a926f6811c4234192fd540b59c22a52ae0f3bf6e10cbae9",
+  "candidate_sha256": "448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21",
   "bbox_pass": "9/9",
   "clean_plate_outside_mask": 0,
   "transparent_residue_pixels": 0,
