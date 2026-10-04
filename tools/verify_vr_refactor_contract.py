@@ -358,6 +358,15 @@ if "TryGetEffectTelemetrySnapshot(effect)" not in r32:
 if "R22ShadowState =" in r34:
     errors.append("R34 retained direct R22 raster-shadow mutation")
 
+for banned in ("R22ReplayScope", "R22FailClosedReplayState"):
+    if banned in r34:
+        errors.append(
+            f"R34 retained private R22 raster-replay dependency: {banned}")
+if "class R22RasterReplayGuard" not in r22:
+    errors.append("R22 missing public raster-replay owner guard")
+if "R22RasterReplayGuard replay(" not in r34:
+    errors.append("R34 missing R22 raster-replay owner guard")
+
 for rel, source in (("R33", r33), ("R34", r34)):
     if "R29ArmMonoSafety(" in source:
         errors.append(
