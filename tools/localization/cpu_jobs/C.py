@@ -147,11 +147,11 @@ def card(label,img,bg=(64,64,64,255)):
 cards=[card("SOURCE_READABLE",src_img),card("C132_CLEAN",Image.fromarray(clean,"RGBA")),card("C132_FINAL",new_img),card("C132_FINAL_WHITE",new_img,(255,255,255,255))]
 sheet=Image.new("RGB",(2048,2100),"white"); sheet.paste(cards[0],(0,0)); sheet.paste(cards[1],(1024,0)); sheet.paste(cards[2],(0,1050)); sheet.paste(cards[3],(1024,1050)); sheet.thumbnail((1800,1800),Image.Resampling.LANCZOS); sheet.save(out/"C132_125_COMPARE.jpg",quality=96)
 
-src_rgb=comp(src_img); clean_rgb=comp(Image.fromarray(clean,"RGBA")); fin_rgb=comp(new_img)
+src_rgb_img=comp(src_img); clean_rgb_img=comp(Image.fromarray(clean,"RGBA")); fin_rgb_img=comp(new_img)
 contacts=[]
 for r in rows:
     x0,y0,x1,y1=r["original_bbox"]; p=10; cr=(max(0,x0-p),max(0,y0-p),min(1024,x1+p),min(1024,y1+p))
-    ims=[z.crop(cr) for z in (src_rgb,clean_rgb,fin_rgb)]; ims=[z.resize((z.width*2,z.height*2),Image.Resampling.NEAREST) for z in ims]
+    ims=[z.crop(cr) for z in (src_rgb_img,clean_rgb_img,fin_rgb_img)]; ims=[z.resize((z.width*2,z.height*2),Image.Resampling.NEAREST) for z in ims]
     c=Image.new("RGB",(sum(z.width for z in ims)+12,max(z.height for z in ims)+26),"white"); xx=0
     for z in ims: c.paste(z,(xx,26)); xx+=z.width+6
     ImageDraw.Draw(c).text((4,4),f'{r["n"]} {r["source"]} -> {r["korean"]}',fill="black"); contacts.append(c)
