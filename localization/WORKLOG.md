@@ -15,7 +15,7 @@
 
 ### Resume contract
 
-1. Read `localization/progress.json`.
+1. Read `localization/progress/progress.json`.
 2. Read `localization/resume_state.json`.
 3. Continue from the current `resume_from` and queue statuses.
 4. Never overwrite original game assets in Git. Store only translation/manifest/patch metadata.
@@ -955,3 +955,9 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Self-QA: 11/11 exact original-bbox containment PASS; former failures 7/7 PASS; clean-plate validator PASS; final protected-mask validator PASS; changes vs prior candidate outside the 7 failed sprite cells = 0; all 4 prior-PASS cells exact; decoded dark/white-background visual QA PASS for residue, clipping, overlap, protected art and source-family style.
 - `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
 - Evidence: `localization/graphics/role_B/20261004-B-RECOVERY03/`.
+
+## 2026-10-04 15:45 KST — 404 path reference repair
+- Fixed the current resume/startup reference from `localization/progress.json` to the existing machine-readable state file `localization/progress/progress.json`.
+- Cleared stale `resume_state.json.graphics.approved_dds_root` because current approved/user-locked DDS count is 0 after the BATCH69 HD reopen. The former path is retained as `historical_approved_dds_root` for provenance only.
+- Verified `localization/progress/progress.json`, `localization/progress/STATUS.md`, `localization/resume_state.json`, `localization/graphics/README.md`, and `localization/graphics/ORIENTATION_POLICY.md` resolve on the recovery branch. The removed historical approved-DDS directory is no longer a current fetch target.
+- Metadata/path repair only; no DDS, runtime, VR/FFB/DX11/DXVK, or gameplay behavior changed. Build/game execution not required; `RUNTIME_VALIDATION=UNTESTED`.
