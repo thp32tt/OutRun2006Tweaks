@@ -16,7 +16,7 @@ class Continuation94ControlFlowTests(unittest.TestCase):
             SOURCE,
         )
         self.assertIn(
-            "GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_OVERLAP_RVA = 0x001839CD",
+            "GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INCOMPLETE_RVA = 0x001839CD",
             SOURCE,
         )
         self.assertIn(
@@ -58,12 +58,13 @@ class Continuation94ControlFlowTests(unittest.TestCase):
             SOURCE,
         )
 
-    def test_mandatory_overlap_is_fail_closed(self):
+    def test_mandatory_cut_edge_is_fail_closed(self):
         self.assertIn(
-            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_OVERLAP_EXPECTED_BYTES = bytes.fromhex("8b")',
+            'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INCOMPLETE_BYTES = bytes.fromhex("8b")',
             SOURCE,
         )
-        self.assertIn("mandatory_overlap_matches = (", SOURCE)
+        self.assertIn("incomplete_matches = (", SOURCE)
+        self.assertIn("capture_edge_matches = (", SOURCE)
         self.assertIn(
             '"COMPLETE_INSTRUCTIONS_END_AT_1839CD_TRAILING_8B_REQUIRES_OVERLAP"',
             SOURCE,

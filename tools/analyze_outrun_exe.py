@@ -5039,8 +5039,8 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INHERITED_FORWARD_TARGETS = (
 # the validated F120 raw window. The final 0x8B byte at 0x1839CD is not a
 # complete instruction in this capture, so it remains mandatory overlap debt.
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_PREFIX_END_RVA = 0x001839CD
-GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_OVERLAP_RVA = 0x001839CD
-GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_OVERLAP_EXPECTED_BYTES = bytes.fromhex("8b")
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INCOMPLETE_RVA = 0x001839CD
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INCOMPLETE_BYTES = bytes.fromhex("8b")
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INSTRUCTIONS = (
     (0x0018398E, "fe 4c 03 04", "dec byte [ebx+eax+4]"),
     (0x00183992, "75 21", "jne 0x1839b5"),
@@ -31916,22 +31916,24 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_94_prefix_pro
     prefix_end_matches = (
         expected_next == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_PREFIX_END_RVA
     )
-    overlap_bytes = pe.bytes_at_rva(
-        GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_OVERLAP_RVA,
-        len(GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_OVERLAP_EXPECTED_BYTES),
+    incomplete_bytes = pe.bytes_at_rva(
+        GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INCOMPLETE_RVA,
+        len(GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INCOMPLETE_BYTES),
     )
-    mandatory_overlap_matches = (
+    incomplete_matches = (
+        incomplete_bytes
+        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INCOMPLETE_BYTES
+        and bytes.fromhex(provenance["bytes"]).endswith(
+            GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INCOMPLETE_BYTES
+        )
+    )
+    capture_edge_matches = (
         GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_PREFIX_END_RVA
-        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_OVERLAP_RVA
-        and GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_PREFIX_END_RVA
-        + len(GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_OVERLAP_EXPECTED_BYTES)
+        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INCOMPLETE_RVA
+        and GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INCOMPLETE_RVA
+        + len(GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INCOMPLETE_BYTES)
         == provenance["probe_end_rva"]
         == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_PROBE_END_RVA
-        and overlap_bytes
-        == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_OVERLAP_EXPECTED_BYTES
-        and bytes.fromhex(provenance["bytes"]).endswith(
-            GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_OVERLAP_EXPECTED_BYTES
-        )
     )
     raw_call_census_empty = not provenance["raw_outbound_rel32_candidates"]
     expected_external_targets: set[int] = set()
@@ -31952,7 +31954,8 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_94_prefix_pro
         and contiguous
         and all_bytes_match
         and prefix_end_matches
-        and mandatory_overlap_matches
+        and incomplete_matches
+        and capture_edge_matches
         and branch_targets_match
         and internal_branch_targets_on_boundaries
         and set(external_targets) == expected_external_targets
@@ -31974,9 +31977,10 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_94_prefix_pro
         "instructions": rows,
         "instruction_count": len(rows),
         "prefix_end_matches": prefix_end_matches,
-        "mandatory_overlap_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_OVERLAP_RVA,
-        "mandatory_overlap_bytes": overlap_bytes.hex(" "),
-        "mandatory_overlap_matches": mandatory_overlap_matches,
+        "incomplete_rva": GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_94_INCOMPLETE_RVA,
+        "incomplete_bytes": incomplete_bytes.hex(" "),
+        "incomplete_matches": incomplete_matches,
+        "capture_edge_matches": capture_edge_matches,
         "branches": branch_rows,
         "branch_targets_match": branch_targets_match,
         "internal_branch_targets_on_boundaries": internal_branch_targets_on_boundaries,
@@ -39334,9 +39338,10 @@ def main() -> int:
         f"resolved_predecessor_targets={helper_1_third_cont_94_proof['resolved_predecessor_targets']} "
         f"remaining_predecessor_targets={helper_1_third_cont_94_proof['remaining_predecessor_external_targets']} "
         f"prefix_end=0x{helper_1_third_cont_94_proof['prefix_end_rva']:08X} "
-        f"overlap=0x{helper_1_third_cont_94_proof['mandatory_overlap_rva']:08X}:"
-        f"{helper_1_third_cont_94_proof['mandatory_overlap_bytes']}:"
-        f"match={helper_1_third_cont_94_proof['mandatory_overlap_matches']} "
+        f"incomplete=0x{helper_1_third_cont_94_proof['incomplete_rva']:08X}:"
+        f"{helper_1_third_cont_94_proof['incomplete_bytes']}:"
+        f"match={helper_1_third_cont_94_proof['incomplete_matches']} "
+        f"capture_edge={helper_1_third_cont_94_proof['capture_edge_matches']} "
         f"unresolved_forward_targets={helper_1_third_cont_94_proof['unresolved_forward_targets']} "
         f"continuation={helper_1_third_cont_94_proof['continuation_status']} "
         f"ownership_effect={helper_1_third_cont_94_proof['ownership_effect']}"
