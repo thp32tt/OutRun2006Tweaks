@@ -1624,8 +1624,85 @@ class VSyncOverride : public Hook
 	const static int D3DInit_HookAddr = 0xEB66;
 
 	inline static SafetyHookMid dest_hook = {};
+
+	static bool IsNativeD3D9ReferenceLaunch() noexcept
+	{
+		char backend[32]{};
+		const DWORD length = GetEnvironmentVariableA(
+			"OUTRUN_VR_BACKEND", backend, static_cast<DWORD>(std::size(backend)));
+		return length > 0 && length < std::size(backend) &&
+			lstrcmpiA(backend, "d3d9") == 0;
+	}
+
+	static void ConfigureReferenceVRMSAA() noexcept
+	{
+		if (!Settings::VREnabled || !IsNativeD3D9ReferenceLaunch() ||
+			!Game::D3D() || !Game::D3DPresentParams || !Game::D3DAdapterNum)
+			return;
+
+		auto& params = *Game::D3DPresentParams;
+		if (params.SwapEffect != D3DSWAPEFFECT_DISCARD)
+		{
+			spdlog::warn(
+				"VR DX9Ex AA: explicit MSAA skipped because SwapEffect={} is not DISCARD",
+				static_cast<int>(params.SwapEffect));
+			return;
+		}
+
+		const UINT adapter = static_cast<UINT>(*Game::D3DAdapterNum);
+		D3DFORMAT colorFormat = params.BackBufferFormat;
+		if (colorFormat == D3DFMT_UNKNOWN)
+		{
+			D3DDISPLAYMODE mode{};
+			if (FAILED(Game::D3D()->GetAdapterDisplayMode(adapter, &mode)))
+			{
+				spdlog::warn("VR DX9Ex AA: adapter display format unavailable; keeping game AA");
+				return;
+			}
+			colorFormat = mode.Format;
+		}
+
+		const D3DMULTISAMPLE_TYPE candidates[] = {
+			D3DMULTISAMPLE_4_SAMPLES,
+			D3DMULTISAMPLE_2_SAMPLES
+		};
+		for (const auto sampleType : candidates)
+		{
+			DWORD colorQuality = 0;
+			if (FAILED(Game::D3D()->CheckDeviceMultiSampleType(
+					adapter, D3DDEVTYPE_HAL, colorFormat, params.Windowed,
+					sampleType, &colorQuality)) ||
+				colorQuality == 0)
+				continue;
+
+			DWORD depthQuality = colorQuality;
+			if (params.EnableAutoDepthStencil)
+			{
+				if (FAILED(Game::D3D()->CheckDeviceMultiSampleType(
+						adapter, D3DDEVTYPE_HAL, params.AutoDepthStencilFormat,
+						params.Windowed, sampleType, &depthQuality)) ||
+					depthQuality == 0)
+					continue;
+			}
+
+			params.MultiSampleType = sampleType;
+			params.MultiSampleQuality =
+				std::min(colorQuality, depthQuality) - 1;
+			spdlog::info(
+				"VR DX9Ex AA: explicit {}x MSAA selected quality={} (colorLevels={} depthLevels={}); replaces ambiguous NONMASKABLE game AA",
+				static_cast<int>(sampleType), params.MultiSampleQuality,
+				colorQuality, depthQuality);
+			return;
+		}
+
+		spdlog::warn(
+			"VR DX9Ex AA: explicit 4x/2x MSAA unsupported; keeping game AA type={} quality={}",
+			static_cast<int>(params.MultiSampleType), params.MultiSampleQuality);
+	}
+
 	static void destination(safetyhook::Context& ctx)
 	{
+		ConfigureReferenceVRMSAA();
 		if (Settings::VREnabled && Settings::VRDisableDesktopVsync)
 		{
 			Game::D3DPresentParams->PresentationInterval =
@@ -1640,8 +1717,8 @@ class VSyncOverride : public Hook
 					D3DPRESENT_INTERVAL_IMMEDIATE;
 		}
 
-		// TODO: add MultiSampleType / MultiSampleQuality overrides here?
-		//  (doesn't seem any of them are improvement over vanilla "DX/ANTIALIASING = 2" though...)
+		// DX9Ex reference runs select an explicit multisample type above.
+		// Other backends retain the game's original AA presentation parameters.
 	}
 
 public:
