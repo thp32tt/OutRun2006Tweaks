@@ -9089,6 +9089,37 @@ def main() -> None:
             + ", ".join(missing_r230_latest_bootstrap_outcome_order)
         )
 
+    r231_latest_startup_bootstrap_pairing_contract = [
+        ("latest_startup_line_by_log: dict[str, int] = {}",
+         DX11_CENSUS_ANALYZER, "R231 latest startup position map"),
+        ("latest_bootstrap_outcome_line_by_log: dict[str, int] = {}",
+         DX11_CENSUS_ANALYZER, "R231 latest bootstrap outcome position map"),
+        ("latest_startup_bootstrap_outcome_by_log = {",
+         DX11_CENSUS_ANALYZER, "R231 current startup/outcome pairing map"),
+        ('"LogsWithLatestStartupBootstrapOutcome": len(',
+         DX11_CENSUS_ANALYZER, "R231 current startup/outcome coverage count"),
+        ('"AllSourceLogsLatestStartupHasBootstrapOutcome": (',
+         DX11_CENSUS_ANALYZER, "R231 fail-closed current startup coverage"),
+        ('"LatestStartupBootstrapOutcomeByLog": (',
+         DX11_CENSUS_ANALYZER, "R231 current startup/outcome report export"),
+        ("r231_latest_startup_bootstrap_pairing = run_cases(",
+         DX11_CENSUS_ANALYZER_TEST, "R231 accumulated-log regression fixture"),
+        ('"session-a-stale-outcome.log" not in (',
+         DX11_CENSUS_ANALYZER_TEST, "R231 stale outcome rejection assertion"),
+        ('"AllSourceLogsLatestStartupHasBootstrapOutcome": False',
+         DX11_CENSUS_ANALYZER_TEST, "R231 latest-startup fail-closed assertion"),
+    ]
+    missing_r231_latest_startup_bootstrap_pairing = [
+        meaning
+        for token, source, meaning in r231_latest_startup_bootstrap_pairing_contract
+        if token not in source
+    ]
+    if missing_r231_latest_startup_bootstrap_pairing:
+        raise SystemExit(
+            "DX11 R231 latest startup/bootstrap pairing drift: "
+            + ", ".join(missing_r231_latest_startup_bootstrap_pairing)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

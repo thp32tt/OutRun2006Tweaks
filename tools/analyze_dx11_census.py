@@ -401,6 +401,8 @@ def main() -> int:
     fixed_function_shader_compiles: dict[SignatureKey, dict] = {}
     fixed_function_vertex_shader_compiles: dict[SignatureKey, dict] = {}
     source_logs: list[str] = []
+    latest_startup_line_by_log: dict[str, int] = {}
+    latest_bootstrap_outcome_line_by_log: dict[str, int] = {}
 
     for log_path in log_files:
         try:
@@ -427,12 +429,13 @@ def main() -> int:
         source_logs.append(log_path.name)
         source_log = log_path.name
 
-        for line in text.splitlines():
+        for line_number, line in enumerate(text.splitlines(), start=1):
             match = STARTUP_RE.search(line)
             if match:
                 startup_entry = int_fields(match)
                 startup_entry["source_log"] = source_log
                 startup.append(startup_entry)
+                latest_startup_line_by_log[source_log] = line_number
                 continue
 
             match = BOOTSTRAP_RE.search(line)
@@ -449,6 +452,7 @@ def main() -> int:
                 bootstrap_entry["source_log"] = source_log
                 bootstrap.append(bootstrap_entry)
                 bootstrap_outcomes.append({"kind": "probe", **bootstrap_entry})
+                latest_bootstrap_outcome_line_by_log[source_log] = line_number
                 continue
 
             match = BOOTSTRAP_SKIP_RE.search(line)
@@ -461,6 +465,7 @@ def main() -> int:
                 }
                 bootstrap_skipped.append(bootstrap_skip_entry)
                 bootstrap_outcomes.append({"kind": "skip", **bootstrap_skip_entry})
+                latest_bootstrap_outcome_line_by_log[source_log] = line_number
                 continue
 
             match = SUMMARY_RE.search(line)
@@ -673,6 +678,23 @@ def main() -> int:
         set(latest_bootstrap_by_log) & set(latest_bootstrap_skip_by_log)
     )
     bootstrap_outcome_logs = set(latest_bootstrap_outcome_by_log)
+    # R231: R230 orders bootstrap outcomes, but an accumulated source log can
+    # append a newer startup after an older outcome. Only an outcome observed
+    # after the latest startup belongs to the current startup epoch.
+    latest_startup_bootstrap_outcome_by_log = {
+        source_log: latest_bootstrap_outcome_by_log[source_log]
+        for source_log in source_logs
+        if source_log in latest_startup_line_by_log
+        and source_log in latest_bootstrap_outcome_line_by_log
+        and latest_bootstrap_outcome_line_by_log[source_log]
+        > latest_startup_line_by_log[source_log]
+    }
+    latest_startup_missing_bootstrap_outcome_logs = sorted(
+        set(latest_startup_by_log) - set(latest_startup_bootstrap_outcome_by_log)
+    )
+    all_source_logs_latest_startup_has_bootstrap_outcome = bool(source_logs) and (
+        len(latest_startup_bootstrap_outcome_by_log) == len(source_logs)
+    )
     all_source_logs_have_startup = bool(source_logs) and (
         len(latest_startup_by_log) == len(source_logs)
     )
@@ -691,6 +713,12 @@ def main() -> int:
         "LogsWithBootstrap": len(latest_bootstrap_by_log),
         "LogsWithBootstrapSkip": len(latest_bootstrap_skip_by_log),
         "LogsWithBootstrapOutcome": len(bootstrap_outcome_logs),
+        "LogsWithLatestStartupBootstrapOutcome": len(
+            latest_startup_bootstrap_outcome_by_log
+        ),
+        "LatestStartupMissingBootstrapOutcomeLogs": (
+            latest_startup_missing_bootstrap_outcome_logs
+        ),
         "LogsWithLatestBootstrapProbe": len(latest_bootstrap_probe_logs),
         "LogsWithLatestBootstrapSkip": len(latest_bootstrap_skip_logs),
         "LogsWithBootstrapOutcomeHistoryConflict": len(
@@ -700,6 +728,9 @@ def main() -> int:
         "AllSourceLogsHaveStartup": all_source_logs_have_startup,
         "AllSourceLogsHaveBootstrap": all_source_logs_have_bootstrap,
         "AllSourceLogsHaveBootstrapOutcome": all_source_logs_have_bootstrap_outcome,
+        "AllSourceLogsLatestStartupHasBootstrapOutcome": (
+            all_source_logs_latest_startup_has_bootstrap_outcome
+        ),
         "AllSourceLogsLatestBootstrapOutcomeIsProbe": (
             all_source_logs_latest_bootstrap_outcome_is_probe
         ),
@@ -972,6 +1003,9 @@ def main() -> int:
         "LatestBootstrapByLog": latest_bootstrap_by_log,
         "LatestBootstrapSkipByLog": latest_bootstrap_skip_by_log,
         "LatestBootstrapOutcomeByLog": latest_bootstrap_outcome_by_log,
+        "LatestStartupBootstrapOutcomeByLog": (
+            latest_startup_bootstrap_outcome_by_log
+        ),
         "StartupBootstrapCoverage": startup_bootstrap_coverage,
         "LatestSummary": latest,
         "LatestSummariesByLog": latest_summaries_by_log,

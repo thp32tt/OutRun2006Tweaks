@@ -804,6 +804,8 @@ def main() -> int:
         "LogsWithBootstrap": 1,
         "LogsWithBootstrapSkip": 0,
         "LogsWithBootstrapOutcome": 1,
+        "LogsWithLatestStartupBootstrapOutcome": 1,
+        "LatestStartupMissingBootstrapOutcomeLogs": ["session-b-missing-bootstrap.log"],
         "LogsWithLatestBootstrapProbe": 1,
         "LogsWithLatestBootstrapSkip": 0,
         "LogsWithBootstrapOutcomeHistoryConflict": 0,
@@ -811,6 +813,7 @@ def main() -> int:
         "AllSourceLogsHaveStartup": True,
         "AllSourceLogsHaveBootstrap": False,
         "AllSourceLogsHaveBootstrapOutcome": False,
+        "AllSourceLogsLatestStartupHasBootstrapOutcome": False,
         "AllSourceLogsLatestBootstrapOutcomeIsProbe": False,
         "AllSourceLogsHaveStartupAndBootstrap": False,
         "AllSourceLogsHaveStartupAndBootstrapOutcome": False,
@@ -855,6 +858,8 @@ def main() -> int:
         "LogsWithBootstrap": 1,
         "LogsWithBootstrapSkip": 1,
         "LogsWithBootstrapOutcome": 2,
+        "LogsWithLatestStartupBootstrapOutcome": 2,
+        "LatestStartupMissingBootstrapOutcomeLogs": [],
         "LogsWithLatestBootstrapProbe": 1,
         "LogsWithLatestBootstrapSkip": 1,
         "LogsWithBootstrapOutcomeHistoryConflict": 0,
@@ -862,6 +867,7 @@ def main() -> int:
         "AllSourceLogsHaveStartup": True,
         "AllSourceLogsHaveBootstrap": False,
         "AllSourceLogsHaveBootstrapOutcome": True,
+        "AllSourceLogsLatestStartupHasBootstrapOutcome": True,
         "AllSourceLogsLatestBootstrapOutcomeIsProbe": False,
         "AllSourceLogsHaveStartupAndBootstrap": False,
         "AllSourceLogsHaveStartupAndBootstrapOutcome": True,
@@ -905,6 +911,8 @@ def main() -> int:
         "LogsWithBootstrap": 2,
         "LogsWithBootstrapSkip": 2,
         "LogsWithBootstrapOutcome": 2,
+        "LogsWithLatestStartupBootstrapOutcome": 2,
+        "LatestStartupMissingBootstrapOutcomeLogs": [],
         "LogsWithLatestBootstrapProbe": 1,
         "LogsWithLatestBootstrapSkip": 1,
         "LogsWithBootstrapOutcomeHistoryConflict": 2,
@@ -915,6 +923,64 @@ def main() -> int:
         "AllSourceLogsHaveStartup": True,
         "AllSourceLogsHaveBootstrap": True,
         "AllSourceLogsHaveBootstrapOutcome": True,
+        "AllSourceLogsLatestStartupHasBootstrapOutcome": True,
+        "AllSourceLogsLatestBootstrapOutcomeIsProbe": False,
+        "AllSourceLogsHaveStartupAndBootstrap": True,
+        "AllSourceLogsHaveStartupAndBootstrapOutcome": True,
+        "DiagnosticOnly": True,
+        "ActivationProof": False,
+    }
+
+    r231_latest_startup_bootstrap_pairing = run_cases(
+        {
+            "session-a-stale-outcome.log": (
+                "VR DX11 R71 census: observed=1 size=1280x720 sourceFormat=21 "
+                "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+                "VR DX11 R72 bootstrap probe: ready=1 featureLevel=0xB000 "
+                "selectedLuidValid=1 selectedLuid=AAAAAAAA:11111111\n"
+                "VR DX11 R71 census: observed=1 size=1920x1080 sourceFormat=22 "
+                "nativeFormat=29 msaa=0 bootstrapCompatible=1\n"
+            ),
+            "session-b-current-outcome.log": (
+                "VR DX11 R71 census: observed=1 size=1280x720 sourceFormat=21 "
+                "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+                "VR DX11 R72 bootstrap probe: ready=1 featureLevel=0xB000 "
+                "selectedLuidValid=1 selectedLuid=BBBBBBBB:11111111\n"
+                "VR DX11 R71 census: observed=1 size=1920x1080 sourceFormat=22 "
+                "nativeFormat=29 msaa=0 bootstrapCompatible=0\n"
+                "VR DX11 R72 bootstrap probe skipped: compatible=0 adapterLuidValid=1\n"
+            ),
+        }
+    )
+    assert r231_latest_startup_bootstrap_pairing["LatestBootstrapOutcomeByLog"][
+        "session-a-stale-outcome.log"
+    ]["kind"] == "probe"
+    assert "session-a-stale-outcome.log" not in (
+        r231_latest_startup_bootstrap_pairing["LatestStartupBootstrapOutcomeByLog"]
+    )
+    assert r231_latest_startup_bootstrap_pairing[
+        "LatestStartupBootstrapOutcomeByLog"
+    ]["session-b-current-outcome.log"]["kind"] == "skip"
+    assert r231_latest_startup_bootstrap_pairing["StartupBootstrapCoverage"] == {
+        "SourceLogs": 2,
+        "LogsWithStartup": 2,
+        "LogsWithBootstrap": 2,
+        "LogsWithBootstrapSkip": 1,
+        "LogsWithBootstrapOutcome": 2,
+        "LogsWithLatestStartupBootstrapOutcome": 1,
+        "LatestStartupMissingBootstrapOutcomeLogs": [
+            "session-a-stale-outcome.log",
+        ],
+        "LogsWithLatestBootstrapProbe": 1,
+        "LogsWithLatestBootstrapSkip": 1,
+        "LogsWithBootstrapOutcomeHistoryConflict": 1,
+        "BootstrapOutcomeHistoryConflictLogs": [
+            "session-b-current-outcome.log",
+        ],
+        "AllSourceLogsHaveStartup": True,
+        "AllSourceLogsHaveBootstrap": True,
+        "AllSourceLogsHaveBootstrapOutcome": True,
+        "AllSourceLogsLatestStartupHasBootstrapOutcome": False,
         "AllSourceLogsLatestBootstrapOutcomeIsProbe": False,
         "AllSourceLogsHaveStartupAndBootstrap": True,
         "AllSourceLogsHaveStartupAndBootstrapOutcome": True,

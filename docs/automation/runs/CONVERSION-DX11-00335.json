@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00335",
+  "production_id": "CONVERSION-DXVK-00334",
+  "event_id": "CONVERSION-DXVK-00334-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "310b77c74cb9156ec5d205748b0bfffbf49bbf4b",
+  "result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX11-00335]",
+  "selected_work_item": "DX11_R231_LATEST_STARTUP_BOOTSTRAP_PAIRING",
+  "summary": "R231 prevents an older bootstrap probe/skip outcome in an accumulated source log from being attributed to a newer startup epoch. Historical latest bootstrap outcome remains visible, while LatestStartupBootstrapOutcomeByLog contains only outcomes observed after the latest startup.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00335.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub vr-dx11-native-r71 HEAD 310b77c74cb9156ec5d205748b0bfffbf49bbf4b. Read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_AUTODEV_STATE.json and VR_RUN_STATE.md. R230 source is present at HEAD and was not repeated. N100 worktree use is prohibited by queue contract; this task uses GitHub repository objects and Actions only."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R230 preserves probe-vs-skip order, but if an accumulated log ends with a newer startup after the latest bootstrap outcome, the historical outcome can still appear available for the current startup. The analyzer needs explicit latest-startup/outcome pairing.",
+      "review_lenses": {
+        "architecture": "Offline census analyzer/test/verifier only; no vr-d3d9ex-focus or runtime renderer modification.",
+        "ownership_lifetime": "No COM/resource/generation/fence/ACK changes.",
+        "stereo_correctness": "No WVP, HUD, projection, recenter, sky/effect or eye rendering changes.",
+        "performance": "No runtime hot-path code changes; only offline log parsing/reporting.",
+        "adversarial": "Fixture proves startupA/outcomeA/startupB is stale while startupA/outcomeA/startupB/outcomeB is current; historical outcome evidence remains separately visible."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added per-log latest startup/outcome line positions, LatestStartupBootstrapOutcomeByLog, missing-current-outcome logs, current coverage count/boolean, regression fixtures, and source-graph drift guards. Existing historical Bootstrap/BootstrapSkipped/LatestBootstrapOutcomeByLog and diagnostic-only activation policy are preserved."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING_EXACT_SHA_GATE",
+      "automation_validation": "PENDING",
+      "evidence": "Material commit will rely on required exact-SHA Backend Conversion Gate for Python syntax, one-click structure, source graph, dormant activation, census regression, Win32 build/binary and readiness smoke. No runtime/HMD validation performed."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA_PUBLICATION",
+      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census evidence-integrity/reporting change only; no runtime package is required."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false,
+      "exact_next_action": "After exact-SHA Backend Conversion Gate PASS, persist task/lane bookkeeping separately and keep RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "regression_assessment": {
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "runtime_risk_paths_touched": false,
+    "evidence": "Changed paths are offline analyzer/test/verifier plus task bookkeeping; NativeDrawPath remains dormant."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00335",
+    "production_id": "CONVERSION-DXVK-00334",
+    "event_id": "CONVERSION-DXVK-00334-E003",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Publish R231 material result after the preceding exact-SHA gate is no longer in progress, then require the R231 exact-SHA Backend Conversion Gate."
+}
