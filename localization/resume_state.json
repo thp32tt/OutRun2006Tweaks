@@ -1,5 +1,5 @@
 {
-  "schema_version": 64,
+  "schema_version": 65,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "C112/C114 returned B_PRODUCTION28 53CE39D5 candidate 29cdba2ab03746f6e41d145d3dfc568cd1634f7cfc4dcb92a42a425cb2de5925 to producer REWORK: 19/19 bbox+size and structural gates pass, but exact CLEAN plate visual QA shows repeated short dark dash/source-shadow residue in localized selector plates. Zero-residue visual gate FAIL; RUNTIME_VALIDATION=UNTESTED.",
+    "B_PRODUCTION30 repaired C112/C114-returned even index 100 53CE39D5; candidate 08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1 passed hosted 19/19 exact bbox+size, zero outside/protected/overlap/residue gates and controller source/clean/final/row/raw visual self-QA with source-family right slant. Independent C final QA and isolated in-game validation remain pending; RUNTIME_VALIDATION=UNTESTED.",
     "C114 finalized A_RECOVERY13 FD90AA9 candidate c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401: scoped independent machine QA PASS 29/29 bbox+size, zero outside/protected/overlap/touch/collateral outside four returned regions, 25 preserved localized layers exact outside returned regions, and C SOURCE|OLD|NEW/full/raw visual QA PASS. C109 source-slant return resolved; RUNTIME_VALIDATION=UNTESTED.",
     "C111 finalized A_RECOVERY12 C075FB49 candidate d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633: independent 17/17 bbox+size machine QA and C dense/full/raw visual QA PASS; C109 slant return is resolved. Static policy state is C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
     "C111 finalized A_RECOVERY11 BF3EE5C6 candidate 7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68: C110 independent 13/13 bbox+size machine QA and C row/full/raw visual QA PASS; C109 slant return is resolved. Static policy state is C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
@@ -177,9 +177,9 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FD90AA9_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/role_B/20261005-B-PRODUCTION30/B_PRODUCTION30_53CE_REPORT.json",
     "hd_rework_candidates_ready": 15,
-    "hd_rework_remaining": 2,
+    "hd_rework_remaining": 1,
     "hd_partial_rework": {
       "FF2462BB": {
         "status": "C86_PIXEL_VISUAL_PASS_PENDING_INGAME",
@@ -575,13 +575,16 @@
         "runtime_validation": "UNTESTED"
       },
       "53CE39D5": {
-        "status": "C108_REWORK_REQUIRED_SOURCE_RESIDUE_242PX",
-        "candidate_sha256": "ed4a95fcf004650221a87a9c025c2a983aecf60f3d896d2ffb1bc7d2f571bbc7",
+        "status": "B_PRODUCTION30_SELF_QA_PASS_PENDING_C_AND_INGAME",
+        "candidate_sha256": "08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1",
         "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
-        "report": "localization/graphics/role_C/20261004-C108-LATEST-REWORK/C108_CONTROLLER_FINAL_QA.json",
-        "c108_machine_report": "localization/graphics/role_C/20261004-C108-LATEST-REWORK/C108_53CE39D5_MACHINE_QA.json",
-        "c108_source_text_mask_pixels_unchanged_in_clean_plate": 242,
-        "c108_visual_qa": "FAIL_SOURCE_EFFECT_RESIDUE",
+        "report": "localization/graphics/role_B/20261005-B-PRODUCTION30/B_PRODUCTION30_53CE_REPORT.json",
+        "c114_return_report": "localization/graphics/role_C/20261005-C114-FINAL/C114_CROSS_LANE_FINAL_QA.json",
+        "c112_machine_report": "localization/graphics/role_C/20261005-C112-53CE/C112_53CE_MACHINE_QA.json",
+        "b30_bbox_size_pass": "19/19",
+        "b30_clean_source_mask_unchanged": 0,
+        "b30_outside_protected_overlap": 0,
+        "b30_controller_visual_qa": "PASS_NO_VISIBLE_DASH_SHADOW_RESIDUE_SOURCE_SLANT_MATCHED",
         "runtime_validation": "UNTESTED"
       },
       "AD720950": {

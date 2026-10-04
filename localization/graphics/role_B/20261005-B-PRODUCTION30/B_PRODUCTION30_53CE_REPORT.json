@@ -1128,7 +1128,20 @@
       "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     }
   ],
-  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "manual_visual_qa": "PASS_CONTROLLER_SOURCE_CLEAN_FINAL_ROW_CONTACT_AND_RAW: no source dash/shadow residue, clipping, overlap, seam, halo, protected-art damage or orientation regression; Korean reproduces source-family right slant",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_PRODUCTION30_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B_PRODUCTION30_CONTROLLER_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_qa": {
+    "status": "PASS",
+    "reviewed_at_kst": "2026-10-05T02:07:52+09:00",
+    "views": [
+      "B_PRODUCTION30_53CE_COMPARE.jpg",
+      "B_PRODUCTION30_53CE_ROW_CONTACT.jpg",
+      "B_PRODUCTION30_53CE_RAW_COMPARE.jpg"
+    ],
+    "source_residue": "NONE_VISIBLE",
+    "style_slant": "PASS_SOURCE_FAMILY_RIGHT_LEAN",
+    "protected_art": "PASS",
+    "orientation": "PASS_RAW_MIRROR_Y"
+  }
 }

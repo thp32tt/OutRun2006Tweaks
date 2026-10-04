@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T01:40:30+09:00",
+  "updated_at_kst": "2026-10-05T02:07:52+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C114 final QA advances FD90AA9 to pixel/visual policy PASS pending isolated in-game validation and returns B_PRODUCTION28 53CE39D5 to producer REWORK for visible CLEAN-plate dash/shadow residue. 788CE557 remains unchanged C108 producer REWORK. Remaining producer REWORK: 53CE39D5, 788CE557; pending_artwork localize_text remains 50.",
+  "next_checkpoint": "B_PRODUCTION30 resolves C114-returned 53CE39D5 with candidate 08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1: hosted 19/19 exact bbox+size/zero-residue containment PASS plus controller source/clean/final/row/raw visual self-QA PASS and source-family right slant. 53CE39D5 is pending independent C final QA; remaining producer REWORK is 788CE557. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,13 +265,15 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "ZERO_RESIDUE_REWORK_REQUIRED",
+      "status": "ONE_PRODUCER_REWORK_ONE_PENDING_C",
       "assets": [
-        "53CE39D5",
         "788CE557"
       ],
-      "remaining": 2,
-      "note": "FD90AA9 C114 static pixel/visual policy PASS; 53CE39D5 B_PRODUCTION28 fails C exact CLEAN-plate visual residue gate; 788CE557 remains C108 REWORK. RUNTIME_VALIDATION=UNTESTED."
+      "remaining": 1,
+      "note": "53CE39D5 B_PRODUCTION30 self-QA PASS pending C; 788CE557 remains C108 producer REWORK. RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": [
+        "53CE39D5"
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
