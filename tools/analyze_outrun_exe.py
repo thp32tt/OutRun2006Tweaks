@@ -17063,7 +17063,6 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_38_prefix_pro
         "calls": [],
         "calls_match": True,
         "raw_call_census_empty": raw_call_census_empty,
-        "declared_call_table_empty": declared_call_table_empty,
         "raw_call_candidates": provenance["raw_outbound_rel32_candidates"],
         "capture_end_rva": provenance["probe_end_rva"],
         "status": (
@@ -19710,7 +19709,6 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_49_prefix_pro
         and internal_branch_targets_on_boundaries
         and set(external_targets) == expected_external_targets
         and raw_call_census_empty
-        and declared_call_table_empty
         and predecessor_target_contract
         and incomplete_matches
         and capture_edge_matches
@@ -31594,9 +31592,6 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_93_prefix_pro
         == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_93_PROBE_END_RVA
     )
     raw_call_census_empty = not provenance["raw_outbound_rel32_candidates"]
-    declared_call_table_empty = (
-        GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_93_CALLS == ()
-    )
     expected_external_targets = {0x0018399B, 0x001839B5, 0x001839CD}
     derived_unresolved_forward_targets = sorted(set(
         remaining_predecessor_targets + external_targets
@@ -31622,6 +31617,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_93_prefix_pro
         and internal_branch_targets_on_boundaries
         and set(external_targets) == expected_external_targets
         and raw_call_census_empty
+        and declared_call_table_empty
         and predecessor_target_contract
         and resolved_predecessor_targets_on_boundaries
         and debt_transition_matches
@@ -31645,6 +31641,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_93_prefix_pro
         "internal_branch_targets_on_boundaries": internal_branch_targets_on_boundaries,
         "external_targets": external_targets,
         "raw_call_census_empty": raw_call_census_empty,
+        "declared_call_table_empty": declared_call_table_empty,
         "raw_call_candidates": provenance["raw_outbound_rel32_candidates"],
         "predecessor_target_contract": predecessor_target_contract,
         "resolved_predecessor_targets": resolved_predecessor_targets,
