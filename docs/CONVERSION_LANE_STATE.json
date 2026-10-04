@@ -2523,7 +2523,6 @@
       "event_id": "CONVERSION-DX11-00355-E010",
       "event_type": "rollover",
       "attempt": "1/3",
-      "chat_rollover": 6,
       "rollover_is_retry": false,
       "base_sha": "81b6f8e07b4ad795012ec6b011e0206780aaf79e",
       "implementation_commits": [
@@ -2543,8 +2542,7 @@
       "artifact_id": 11295907202,
       "artifact_digest": "sha256:8b743b94fc63a68bf0d15fa10aff2c244b4f8649b4d5c4ebef4ecf3f45122191",
       "implementation_comment_id": 5977281422,
-      "validation_comment_id": 5977332786,
-      "resume_reason": "Retry persisted after one recovery attempt"
+      "validation_comment_id": 5977332786
     }
   ],
   "controller_dispatch": {
