@@ -5,8 +5,8 @@
 // exact single-count draw dispatch, final raster replay preservation, and the
 // ResetEx replay-health guard previously implemented by a separate R34 hook
 // layer. R33 now also owns initial replay-health synchronization and terminal
-// readiness publication; R34 is a compatibility observer with no D3D9 detours
-// or installer worker.
+// readiness publication. The obsolete R34 compatibility observer/status alias
+// is retired; R33 is the sole final dispatcher status owner.
 //
 // R33 is also the final top-level draw boundary: when telemetry is disabled,
 // route accounting and diagnostic counter writes are skipped so the steady
@@ -99,8 +99,6 @@ namespace OutRunVRStereo
         {
             HookManager::ReportAsyncResult(
                 "OpenXRVRStereoR33Dispatch", active);
-            HookManager::ReportAsyncResult(
-                "OpenXRVRStereoR34ResetGuard", active);
         }
 
         void R33ForceResetReplayFailClosed(IDirect3DDevice9* device,
@@ -1101,47 +1099,6 @@ namespace OutRunVRStereo
         VRStereoR33DispatchHook VRStereoR33DispatchHook::instance;
     }
 
-    inline OutRunVR::RuntimeEligibility::InstallState
-    R33InstallStatus() noexcept
-    {
-        return R33InstallState.load(std::memory_order_acquire);
-    }
-
-    namespace
-    {
-        class VRStereoR34ResetGuardHook final : public Hook
-        {
-        public:
-            std::string_view description() override
-            {
-                return "OpenXRVRStereoR34ResetGuard";
-            }
-            bool validate() override { return true; }
-            bool apply() override
-            {
-                using State = OutRunVR::RuntimeEligibility::InstallState;
-                const auto r33 = R33InstallStatus();
-                if (r33 == State::Failed)
-                    return false;
-
-                if (r33 == State::Ready)
-                {
-                    spdlog::info(
-                        "VR R34 OBSERVER: R33 already owns ready replay-health/raster state; no R34 worker or D3D9 detours");
-                }
-                else
-                {
-                    spdlog::info(
-                        "VR R34 OBSERVER: R33 install pending; R33 owns terminal compatibility status publication with no R34 polling worker");
-                }
-                return true;
-            }
-
-            static VRStereoR34ResetGuardHook instance;
-        };
-
-        VRStereoR34ResetGuardHook VRStereoR34ResetGuardHook::instance;
-    }
 
     inline void R33SynchronizeResetReplayGuardState(
         IDirect3DDevice9* device) noexcept
