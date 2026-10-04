@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00374",
-  "production_id": "CONVERSION-DX11-00373",
-  "event_id": "CONVERSION-DX11-00373-E008",
-  "event_type": "retry",
+  "production_id": "CONVERSION-DX11-00374",
+  "event_id": "CONVERSION-DX11-00374-E001",
+  "event_type": "rollover",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
@@ -18,7 +18,7 @@
   "validation_bearing_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
   "result_marker": "[AUTO:CONVERSION-DX11-00374]",
   "selected_work_item": "DX11_R251_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS",
-  "summary": "R251 adds a dormant fail-closed non-indexed programmable dispatch-argument receipt after R250. It revalidates the live R250 geometry binding, converts D3D9 primitive counts to the exact D3D11 vertex count, seals StartVertexLocation plus vertex byte range, rejects stale receipts/live IA drift/device-generation changes/overflow, and still does not issue Draw* or activate NativeDrawPath.",
+  "summary": "R251 adds a dormant fail-closed non-indexed programmable direct-dispatch argument receipt after R250. It revalidates the live R250 geometry binding, translates D3D9 primitive counts to the exact D3D11 vertex count, seals StartVertexLocation plus managed vertex byte range, rejects stale receipts/live IA drift/device-generation changes/overflow, and still does not issue Draw* or activate NativeDrawPath.",
   "changed_paths": [
     "src/vr/d3d11/native_backend.hpp",
     "src/vr/d3d11/native_backend.cpp",
@@ -32,12 +32,12 @@
     "repair_result_sha": "dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7",
     "validation_run_id": 37219099066,
     "validation_conclusion": "success",
-    "note": "00374 consumes the successful E008 exact-SHA Gate as C0 evidence; it does not repeat the R250 rendering implementation."
+    "note": "00374 consumed the successful predecessor repair Gate only as C0 evidence and did not repeat R250."
   },
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered GitHub SSOT at dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7, read review index, AGENTS.md, queue contract and branch-local conversion state. Predecessor 00373 E008 repair Gate 37219099066 completed SUCCESS. New TASK_ID 00374 starts at ATTEMPT=1/3 while preserving the supplied PRODUCTION_ID/EVENT_ID lineage."
+      "evidence": "Recovered GitHub SSOT at dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7. No prior 00374 material result existed at rollover recovery. Predecessor exact-SHA Backend Conversion Gate #37219099066 completed success. ATTEMPT remained 1/3 because E001 is a rollover, not a retry."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
@@ -52,7 +52,7 @@
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "evidence": "Added NativeProgrammableShaderNonIndexedDirectDispatchReadiness plus cache readiness/snapshot validation, exact primitive-count translation, StartVertexLocation/byte-range proof, WARP regressions and source-graph guards."
+      "evidence": "Added NativeProgrammableShaderNonIndexedDirectDispatchReadiness plus cache readiness/snapshot validation, exact overflow-safe primitive-count translation, StartVertexLocation/managed byte-range proof, WARP regressions and source-graph guards. No Draw* or NativeDrawPath activation was added."
     },
     "C3_VALIDATE": {
       "status": "COMPLETE",
@@ -64,7 +64,7 @@
       "readiness_smoke_job_id": 111489677604,
       "artifact_id": 11310351741,
       "artifact_digest": "sha256:bf8d4872a65781ede12130c2a9a4b994b84ad1f16015c5acbf9d259ccb9001fa",
-      "evidence": "Exact-SHA Backend Conversion Gate #37220153246 for 518db8efe987af98521ef5d66e8390859c228e0c completed SUCCESS. Queue contract, DX11 source graph, dormant activation boundary, Win32 build/binary validation and the full readiness smoke suite passed; the R251-bearing constant-buffer probe built and ran successfully."
+      "evidence": "Exact-SHA Backend Conversion Gate #37220153246 for 518db8efe987af98521ef5d66e8390859c228e0c completed SUCCESS. validate and DX11 readiness smoke probes completed success; the R251-bearing dx11_constant_buffer_probe built and ran successfully. Source graph and dormant activation boundary also passed."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
@@ -78,14 +78,13 @@
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant programmable dispatch-argument readiness only; no runtime package or selector changed."
+      "reason": "Dormant programmable direct-dispatch argument/range readiness only; no runtime package, HMD binary distribution or selector changed."
     },
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
       "runtime_validation": "UNTESTED",
-      "issue14_comment_id": 5982586235,
-      "exact_next_action": "Preserve validated R239-R251 programmable ownership/readiness. Under a new TASK_ID, add indexed programmable dispatch/source-range readiness as one separate bounded unit; continue to stop before issuing Draw* or activating NativeDrawPath."
+      "exact_next_action": "Preserve validated R239-R251 programmable ownership/readiness. Under a new TASK_ID, review only the next bounded indexed programmable dispatch/source-range readiness unit; keep Draw*/NativeDrawPath dormant until separately validated."
     }
   },
   "regression_assessment": {
@@ -98,27 +97,22 @@
   "native_draw_path_activation_changed": false,
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00374",
-    "production_id": "CONVERSION-DX11-00373",
-    "event_id": "CONVERSION-DX11-00373-E008",
-    "event_type": "retry",
+    "production_id": "CONVERSION-DX11-00374",
+    "event_id": "CONVERSION-DX11-00374-E001",
+    "event_type": "rollover",
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE",
-    "runtime_validation": "UNTESTED",
-    "native_draw_path_activation_changed": false,
-    "dispatch_source": "CURRENT_USER_QUEUE",
     "material_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
-    "source_implementation_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
     "validation_bearing_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
     "validation_run_id": 37220153246,
-    "validation_run_attempt": 1,
-    "validation_job_id": 111488678722,
-    "readiness_smoke_job_id": 111489677604,
-    "artifact_id": 11310351741,
-    "artifact_digest": "sha256:bf8d4872a65781ede12130c2a9a4b994b84ad1f16015c5acbf9d259ccb9001fa",
-    "implementation_comment_id": 5982586235,
-    "validation_comment_id": 5982586235
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "dispatch_source": "CURRENT_USER_QUEUE"
   },
-  "exact_next_action": "Preserve validated R239-R251 programmable ownership/readiness. Under a new TASK_ID, add indexed programmable dispatch/source-range readiness as one separate bounded unit; continue to stop before issuing Draw* or activating NativeDrawPath.",
+  "exact_next_action": "Preserve validated R239-R251 programmable ownership/readiness. Under a new TASK_ID, review only the next bounded indexed programmable dispatch/source-range readiness unit; keep Draw*/NativeDrawPath dormant.",
   "validation": {
     "backend_conversion_gate": {
       "run_id": 37220153246,
@@ -169,5 +163,8 @@
     ],
     "reason": "CONVERSION-DX11-00374 is the newest explicit task. It started at ATTEMPT=1/3, consumed the completed 00373/E008 automation repair as predecessor evidence, and completed R251 on its own exact validation-bearing SHA.",
     "material_and_validation_bearing_sha_unchanged": true
-  }
+  },
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
 }
