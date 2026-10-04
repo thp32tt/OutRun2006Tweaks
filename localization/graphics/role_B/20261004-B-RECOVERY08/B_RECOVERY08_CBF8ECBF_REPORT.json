@@ -2,7 +2,7 @@
   "schema_version": 1,
   "role": "B",
   "run": "20261004-B-RECOVERY08",
-  "base_head": "c0205af2cfb59cd9ae50f958f8e3ccc2a8f66751",
+  "base_head": "9a0945f7c064a04371f7a647016310b9586ab8a0",
   "queue_index": 50,
   "asset": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
   "readiness_tier": "ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
@@ -10,7 +10,7 @@
   "source_upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
   "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
   "source_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
-  "candidate_sha256": "c94775c7132e32d32bc8ab1c12ffb7fafcdfd5c8aac00e65432e61ab757b4cfb",
+  "candidate_sha256": "ecc4cbb6cdc064d2c7ccccfc378569f1dc7fc8339c46330ec68ec81c8f899df1",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
   "method": "pinned exact HD RGBA32 -> transparent source-glyph masks -> clean plate -> native Korean lettering -> exact-header DDS -> decoded final QA",
   "structure": {
@@ -803,15 +803,15 @@
       "stroke_width": 12,
       "palette": {
         "top": [
-          213,
+          205,
           233,
-          248,
+          249,
           254
         ],
         "bottom": [
-          164,
-          215,
-          244,
+          122,
+          196,
+          240,
           254
         ],
         "outline": [
@@ -887,14 +887,14 @@
       "palette": {
         "top": [
           254,
-          231,
-          215,
+          230,
+          213,
           254
         ],
         "bottom": [
-          254,
-          216,
-          167,
+          255,
+          153,
+          129,
           255
         ],
         "outline": [
@@ -970,15 +970,15 @@
       "palette": {
         "top": [
           254,
-          225,
-          166,
+          221,
+          156,
           254
         ],
         "bottom": [
-          255,
-          196,
-          108,
-          255
+          254,
+          52,
+          22,
+          254
         ],
         "outline": [
           0,
