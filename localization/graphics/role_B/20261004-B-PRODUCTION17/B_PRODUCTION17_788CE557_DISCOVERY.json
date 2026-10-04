@@ -1,0 +1,97 @@
+{
+  "run": "20261004-B-PRODUCTION17",
+  "queue_index": 106,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+  "source_sha256": "4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b",
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "format": "RGBA32",
+    "mips": 1,
+    "raw_orientation": "mirror_y",
+    "header_masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ]
+  },
+  "historical_discovery_boxes": [
+    [
+      0,
+      10,
+      227,
+      61,
+      7901
+    ],
+    [
+      225,
+      18,
+      337,
+      60,
+      2661
+    ],
+    [
+      0,
+      128,
+      418,
+      256,
+      45032
+    ],
+    [
+      399,
+      129,
+      471,
+      256,
+      5403
+    ]
+  ],
+  "mapped_hd_boxes": [
+    [
+      0,
+      40,
+      908,
+      244
+    ],
+    [
+      900,
+      72,
+      1348,
+      240
+    ],
+    [
+      0,
+      512,
+      1672,
+      1024
+    ],
+    [
+      1596,
+      516,
+      1884,
+      1024
+    ]
+  ],
+  "translations": [
+    {
+      "source": "For Experts",
+      "korean": "상급자용"
+    },
+    {
+      "source": "OutRun2SP",
+      "korean": "아웃런2 SP"
+    },
+    {
+      "source": "Music Change",
+      "korean": "음악 변경"
+    },
+    {
+      "source": "Time remaining :",
+      "korean": "남은 시간:"
+    }
+  ],
+  "historical_pixels_reusable": false,
+  "candidate_written": false,
+  "status": "ONE_STAGE_TO_RENDER_DIAGNOSTIC_READY"
+}
