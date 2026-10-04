@@ -611,16 +611,17 @@ if "R32InstallState" in r33:
     errors.append("R33 retained direct R32 install-state dependency")
 for marker, source, owner in (
     ("R32InstallStatus()", r32, "R32"),
-    ("R33InstallStatus()", r33, "R33"),
 ):
     if marker not in source:
         errors.append(f"{owner} missing install-state owner query API: {marker}")
 if "R32InstallStatus()" not in r33:
     errors.append("R33 missing R32 install-state owner query")
+if "R33InstallStatus()" in r33:
+    errors.append("R33 retained obsolete compatibility-only install-status observer API")
 
-# Post-1000 hook-chain flattening: all former R34 runtime responsibilities and
-# the historical R34 compatibility Hook/status registration are owned by R33.
-# The obsolete source shim itself must stay retired from source/build graphs.
+# Post-1000 hook-chain flattening: all former R34 runtime responsibilities are
+# owned by R33. The source shim and historical R34 compatibility Hook/status
+# alias are both retired and must stay absent.
 for marker in (
     "R33GuardStereoRasterState(",
     "R33SynchronizeResetReplayGuardState(",
@@ -636,14 +637,14 @@ for marker in (
     if marker not in r33:
         errors.append(f"R33 missing folded final-dispatch responsibility: {marker}")
 
-for marker in (
-    "class VRStereoR34ResetGuardHook final : public Hook",
-    'return "OpenXRVRStereoR34ResetGuard";',
-    "const auto r33 = R33InstallStatus();",
+for banned in (
+    "class VRStereoR34ResetGuardHook",
+    "OpenXRVRStereoR34ResetGuard",
+    "R33InstallStatus()",
 ):
-    if marker not in r33:
+    if banned in r33:
         errors.append(
-            f"R33 missing folded R34 compatibility registration: {marker}")
+            f"R33 retained retired R34 compatibility observer/status alias: {banned}")
 
 # Post-1000 successor: after the R34 shim retirement, the normal full-chain
 # build must compile R33 directly. Comparison modes may disable R33 in favor of
