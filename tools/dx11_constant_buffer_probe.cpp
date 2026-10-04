@@ -3294,6 +3294,148 @@ int main()
             firstR246BindingSnapshot,
         "R246 same constant-slot binding is idempotent");
 
+    const auto r247UnboundPipeline =
+        programmableCache.pipeline_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken);
+    require(
+        r247UnboundPipeline.inputValid &&
+        r247UnboundPipeline.constantBindingReceiptReady &&
+        r247UnboundPipeline.deviceMatches &&
+        r247UnboundPipeline.contextDeviceMatches &&
+        r247UnboundPipeline.constantBindingSnapshotMatches &&
+        !r247UnboundPipeline.bindingReceiptPresent &&
+        !r247UnboundPipeline.bindingReady &&
+        r247UnboundPipeline.pipelineBindingReceiptGeneration == 0 &&
+        r247UnboundPipeline.snapshotToken == 0 &&
+        !programmableCache.bind_pipeline_objects_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken, 0),
+        "R247 constant-binding receipt must exist before pipeline binding");
+
+    ID3D11DeviceContext* r247DeferredBeforeBinding = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateDeferredContext(
+            0, &r247DeferredBeforeBinding)) &&
+        r247DeferredBeforeBinding != nullptr &&
+        !programmableCache.bind_pipeline_objects_for_observation(
+            r247DeferredBeforeBinding, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken),
+        "R247 non-immediate context cannot establish pipeline binding");
+    r247DeferredBeforeBinding->Release();
+
+    require(
+        programmableCache.bind_pipeline_objects_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken),
+        "R247 exact VS/PS/input-layout pipeline binding");
+    const auto r247PipelineReady =
+        programmableCache.pipeline_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken);
+    require(
+        r247PipelineReady.bindingReady &&
+        r247PipelineReady.bindingReceiptPresent &&
+        r247PipelineReady.vertexShaderMatches &&
+        r247PipelineReady.pixelShaderMatches &&
+        r247PipelineReady.inputLayoutMatches &&
+        r247PipelineReady.pipelineBindingReceiptGeneration != 0 &&
+        r247PipelineReady.snapshotToken != 0 &&
+        programmableCache.validate_pipeline_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken),
+        "R247 exact programmable pipeline binding receipt");
+    const auto firstR247ReceiptGeneration =
+        r247PipelineReady.pipelineBindingReceiptGeneration;
+    const auto firstR247BindingSnapshot =
+        r247PipelineReady.snapshotToken;
+    require(
+        programmableCache.bind_pipeline_objects_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken) &&
+        programmableCache.pipeline_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken).snapshotToken ==
+            firstR247BindingSnapshot,
+        "R247 same programmable pipeline binding is idempotent");
+
+    d3d.context->PSSetShader(nullptr, nullptr, 0);
+    const auto r247DriftedPipeline =
+        programmableCache.pipeline_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken);
+    require(
+        r247DriftedPipeline.bindingReceiptPresent &&
+        r247DriftedPipeline.vertexShaderMatches &&
+        !r247DriftedPipeline.pixelShaderMatches &&
+        r247DriftedPipeline.inputLayoutMatches &&
+        !r247DriftedPipeline.bindingReady &&
+        !programmableCache.validate_pipeline_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            firstR247BindingSnapshot),
+        "R247 external shader drift invalidates pipeline binding receipt");
+
     ID3D11Buffer* r246NullPixelSlot = nullptr;
     d3d.context->PSSetConstantBuffers(0, 1, &r246NullPixelSlot);
     const auto r246DriftedBinding =
@@ -3430,6 +3572,19 @@ VSOutput main(VSInput input)
             firstR245PayloadSnapshot,
             firstR246BindingSnapshot),
         "R246 device reinitialize invalidates constant-binding receipt");
+    require(
+        !programmableCache.validate_pipeline_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            firstR242ObjectSnapshot,
+            inputLayout,
+            firstR243InputLayoutSnapshot,
+            firstR244ConstantStateSnapshot,
+            firstR245PayloadSnapshot,
+            firstR246BindingSnapshot,
+            firstR247BindingSnapshot),
+        "R247 device reinitialize invalidates pipeline-binding receipt");
     require(
         programmableCache.cache_for_observation(programmablePair),
         "R242 fresh cache generation prerequisite");
@@ -3650,6 +3805,58 @@ VSOutput main(VSInput input)
             r245FreshPayloadReady.snapshotToken,
             r246FreshBindingReady.snapshotToken),
         "R246 fresh device generation receives distinct constant-binding receipt");
+    require(
+        !programmableCache.bind_pipeline_objects_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            firstR246BindingSnapshot),
+        "R247 stale constant-binding receipt cannot bind pipeline objects");
+    require(
+        programmableCache.bind_pipeline_objects_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            r246FreshBindingReady.snapshotToken),
+        "R247 fresh R246 receipt binds exact programmable pipeline objects");
+    const auto r247FreshPipelineReady =
+        programmableCache.pipeline_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            r246FreshBindingReady.snapshotToken);
+    require(
+        r247FreshPipelineReady.bindingReady &&
+        r247FreshPipelineReady.bindingReceiptPresent &&
+        r247FreshPipelineReady.vertexShaderMatches &&
+        r247FreshPipelineReady.pixelShaderMatches &&
+        r247FreshPipelineReady.inputLayoutMatches &&
+        r247FreshPipelineReady.pipelineBindingReceiptGeneration !=
+            firstR247ReceiptGeneration &&
+        r247FreshPipelineReady.snapshotToken != firstR247BindingSnapshot &&
+        programmableCache.validate_pipeline_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            r246FreshBindingReady.snapshotToken,
+            r247FreshPipelineReady.snapshotToken),
+        "R247 fresh device generation receives distinct pipeline-binding receipt");
     r244VertexConstants->Release();
     r244PixelConstants->Release();
 

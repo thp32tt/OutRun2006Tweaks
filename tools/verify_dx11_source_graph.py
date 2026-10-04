@@ -9691,6 +9691,57 @@ def main() -> None:
             + ", ".join(missing_r246_programmable_constant_binding_receipt)
         )
 
+    r247_programmable_pipeline_binding_receipt_contract = [
+        ("struct NativeProgrammableShaderPipelineBindingReadiness",
+         NATIVE_BACKEND_HPP, "R247 programmable pipeline-binding readiness type"),
+        ("bind_pipeline_objects_for_observation(",
+         NATIVE_BACKEND_HPP, "R247 pipeline-object binding declaration"),
+        ("pipeline_binding_readiness(",
+         NATIVE_BACKEND_HPP, "R247 pipeline-binding readiness declaration"),
+        ("validate_pipeline_binding_snapshot(",
+         NATIVE_BACKEND_HPP, "R247 pipeline-binding snapshot validation declaration"),
+        ("programmableBindingReceiptGeneration",
+         NATIVE_BACKEND_HPP, "R247 per-entry pipeline-binding receipt generation"),
+        ("expectedContext->VSSetShader(",
+         NATIVE_BACKEND_CPP, "R247 exact VS binding operation"),
+        ("expectedContext->PSSetShader(",
+         NATIVE_BACKEND_CPP, "R247 exact PS binding operation"),
+        ("expectedContext->IASetInputLayout(",
+         NATIVE_BACKEND_CPP, "R247 exact input-layout binding operation"),
+        ("expectedContext->VSGetShader(",
+         NATIVE_BACKEND_CPP, "R247 VS readback gate"),
+        ("expectedContext->PSGetShader(",
+         NATIVE_BACKEND_CPP, "R247 PS readback gate"),
+        ("expectedContext->IAGetInputLayout(",
+         NATIVE_BACKEND_CPP, "R247 input-layout readback gate"),
+        ("constant-binding receipt must exist before pipeline binding",
+         CONSTANT_BUFFER_PROBE, "R247 validated R246 prerequisite"),
+        ("non-immediate context cannot establish pipeline binding",
+         CONSTANT_BUFFER_PROBE, "R247 context regression"),
+        ("exact programmable pipeline binding receipt",
+         CONSTANT_BUFFER_PROBE, "R247 exact binding regression"),
+        ("same programmable pipeline binding is idempotent",
+         CONSTANT_BUFFER_PROBE, "R247 idempotence regression"),
+        ("external shader drift invalidates pipeline binding receipt",
+         CONSTANT_BUFFER_PROBE, "R247 shader-drift regression"),
+        ("device reinitialize invalidates pipeline-binding receipt",
+         CONSTANT_BUFFER_PROBE, "R247 device-generation invalidation regression"),
+        ("stale constant-binding receipt cannot bind pipeline objects",
+         CONSTANT_BUFFER_PROBE, "R247 stale R246 regression"),
+        ("fresh device generation receives distinct pipeline-binding receipt",
+         CONSTANT_BUFFER_PROBE, "R247 fresh receipt regression"),
+    ]
+    missing_r247_programmable_pipeline_binding_receipt = [
+        meaning for token, source, meaning
+        in r247_programmable_pipeline_binding_receipt_contract
+        if token not in source
+    ]
+    if missing_r247_programmable_pipeline_binding_receipt:
+        raise SystemExit(
+            "DX11 R247 programmable pipeline-binding receipt drift: "
+            + ", ".join(missing_r247_programmable_pipeline_binding_receipt)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

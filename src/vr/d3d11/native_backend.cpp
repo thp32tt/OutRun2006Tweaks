@@ -3491,6 +3491,278 @@ bool NativeProgrammableShaderPairCache::validate_constant_binding_snapshot(
            current.snapshotToken == constantBindingSnapshotToken;
 }
 
+bool NativeProgrammableShaderPairCache::bind_pipeline_objects_for_observation(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken) noexcept {
+    if (!expectedContext || !expectedDevice ||
+        !validate_constant_binding_snapshot(
+            expectedContext, expectedDevice, identity, cacheSnapshotToken,
+            slotSnapshotToken, objectSnapshotToken, layout,
+            inputLayoutSnapshotToken, constantStateSnapshotToken,
+            constantPayloadSnapshotToken, constantBindingSnapshotToken))
+        return false;
+
+    const auto found = entries_.find(identity.cacheKey);
+    if (found == entries_.end())
+        return false;
+    auto& entry = found->second;
+    if (!entry.translatedVertexShader || !entry.translatedPixelShader ||
+        !entry.translatedInputLayout ||
+        entry.translationObjectReceiptGeneration == 0 ||
+        entry.inputLayoutReceiptGeneration == 0 ||
+        !entry.constantBindingContext ||
+        entry.constantBindingContext.Get() != expectedContext ||
+        entry.constantBindingReceiptGeneration == 0)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext> immediateContext;
+    expectedContext->GetDevice(contextDevice.GetAddressOf());
+    expectedDevice->GetImmediateContext(immediateContext.GetAddressOf());
+    if (contextDevice.Get() != expectedDevice ||
+        immediateContext.Get() != expectedContext)
+        return false;
+
+    const bool bindingStarted =
+        entry.programmableBindingContext ||
+        entry.programmableBindingReceiptGeneration != 0;
+    if (bindingStarted) {
+        if (entry.programmableBindingContext.Get() != expectedContext ||
+            entry.programmableBindingReceiptGeneration == 0)
+            return false;
+        Microsoft::WRL::ComPtr<ID3D11VertexShader> currentVertexShader;
+        Microsoft::WRL::ComPtr<ID3D11PixelShader> currentPixelShader;
+        Microsoft::WRL::ComPtr<ID3D11InputLayout> currentInputLayout;
+        expectedContext->VSGetShader(
+            currentVertexShader.GetAddressOf(), nullptr, nullptr);
+        expectedContext->PSGetShader(
+            currentPixelShader.GetAddressOf(), nullptr, nullptr);
+        expectedContext->IAGetInputLayout(
+            currentInputLayout.GetAddressOf());
+        return currentVertexShader.Get() == entry.translatedVertexShader.Get() &&
+               currentPixelShader.Get() == entry.translatedPixelShader.Get() &&
+               currentInputLayout.Get() == entry.translatedInputLayout.Get();
+    }
+
+    expectedContext->VSSetShader(
+        entry.translatedVertexShader.Get(), nullptr, 0);
+    expectedContext->PSSetShader(
+        entry.translatedPixelShader.Get(), nullptr, 0);
+    expectedContext->IASetInputLayout(entry.translatedInputLayout.Get());
+
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> currentVertexShader;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> currentPixelShader;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> currentInputLayout;
+    expectedContext->VSGetShader(
+        currentVertexShader.GetAddressOf(), nullptr, nullptr);
+    expectedContext->PSGetShader(
+        currentPixelShader.GetAddressOf(), nullptr, nullptr);
+    expectedContext->IAGetInputLayout(currentInputLayout.GetAddressOf());
+    if (currentVertexShader.Get() != entry.translatedVertexShader.Get() ||
+        currentPixelShader.Get() != entry.translatedPixelShader.Get() ||
+        currentInputLayout.Get() != entry.translatedInputLayout.Get())
+        return false;
+
+    entry.programmableBindingContext = expectedContext;
+    ++programmable_binding_receipt_generation_counter_;
+    if (programmable_binding_receipt_generation_counter_ == 0)
+        ++programmable_binding_receipt_generation_counter_;
+    entry.programmableBindingReceiptGeneration =
+        programmable_binding_receipt_generation_counter_;
+    return true;
+}
+
+NativeProgrammableShaderPipelineBindingReadiness
+NativeProgrammableShaderPairCache::pipeline_binding_readiness(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken) const noexcept {
+    NativeProgrammableShaderPipelineBindingReadiness out{};
+    out.ownerGeneration = owner_generation_;
+    out.cacheKey = identity.cacheKey;
+    out.cacheSnapshotToken = cacheSnapshotToken;
+    out.slotSnapshotToken = slotSnapshotToken;
+    out.objectSnapshotToken = objectSnapshotToken;
+    out.inputLayoutSnapshotToken = inputLayoutSnapshotToken;
+    out.constantStateSnapshotToken = constantStateSnapshotToken;
+    out.constantPayloadSnapshotToken = constantPayloadSnapshotToken;
+    out.constantBindingSnapshotToken = constantBindingSnapshotToken;
+    out.inputLayoutIdentity = hash_pipeline_input_layout_identity(layout);
+    out.inputValid =
+        expectedContext != nullptr && expectedDevice != nullptr &&
+        constantBindingSnapshotToken != 0 &&
+        out.inputLayoutIdentity != 0 &&
+        identity.exact_identity() && !identity.translationImplemented;
+
+    const auto constantBinding = constant_binding_readiness(
+        expectedContext, expectedDevice, identity, cacheSnapshotToken,
+        slotSnapshotToken, objectSnapshotToken, layout,
+        inputLayoutSnapshotToken, constantStateSnapshotToken,
+        constantPayloadSnapshotToken);
+    out.constantBindingReceiptReady = constantBinding.bindingReady;
+    out.deviceMatches = constantBinding.deviceMatches;
+    out.contextDeviceMatches = constantBinding.contextDeviceMatches;
+    out.constantBindingSnapshotMatches =
+        constantBinding.bindingReady &&
+        constantBinding.snapshotToken == constantBindingSnapshotToken;
+    out.slotGeneration = constantBinding.slotGeneration;
+    out.translationObjectReceiptGeneration =
+        constantBinding.translationObjectReceiptGeneration;
+    out.inputLayoutReceiptGeneration =
+        constantBinding.inputLayoutReceiptGeneration;
+    out.constantStateReceiptGeneration =
+        constantBinding.constantStateReceiptGeneration;
+    out.constantPayloadReceiptGeneration =
+        constantBinding.constantPayloadReceiptGeneration;
+    out.constantBindingReceiptGeneration =
+        constantBinding.constantBindingReceiptGeneration;
+
+    if (out.inputValid && out.constantBindingReceiptReady &&
+        out.deviceMatches && out.contextDeviceMatches &&
+        out.constantBindingSnapshotMatches) {
+        const auto found = entries_.find(identity.cacheKey);
+        if (found != entries_.end()) {
+            const auto& entry = found->second;
+            out.pipelineBindingReceiptGeneration =
+                entry.programmableBindingReceiptGeneration;
+            out.bindingReceiptPresent =
+                entry.programmableBindingContext &&
+                entry.programmableBindingContext.Get() == expectedContext &&
+                out.pipelineBindingReceiptGeneration != 0;
+            Microsoft::WRL::ComPtr<ID3D11VertexShader> currentVertexShader;
+            Microsoft::WRL::ComPtr<ID3D11PixelShader> currentPixelShader;
+            Microsoft::WRL::ComPtr<ID3D11InputLayout> currentInputLayout;
+            expectedContext->VSGetShader(
+                currentVertexShader.GetAddressOf(), nullptr, nullptr);
+            expectedContext->PSGetShader(
+                currentPixelShader.GetAddressOf(), nullptr, nullptr);
+            expectedContext->IAGetInputLayout(
+                currentInputLayout.GetAddressOf());
+            out.vertexShaderMatches =
+                currentVertexShader.Get() == entry.translatedVertexShader.Get();
+            out.pixelShaderMatches =
+                currentPixelShader.Get() == entry.translatedPixelShader.Get();
+            out.inputLayoutMatches =
+                currentInputLayout.Get() == entry.translatedInputLayout.Get();
+        }
+    }
+
+    out.bindingReady =
+        out.inputValid && out.constantBindingReceiptReady &&
+        out.deviceMatches && out.contextDeviceMatches &&
+        out.constantBindingSnapshotMatches &&
+        out.bindingReceiptPresent &&
+        out.vertexShaderMatches && out.pixelShaderMatches &&
+        out.inputLayoutMatches &&
+        out.ownerGeneration != 0 && out.slotGeneration != 0 &&
+        out.translationObjectReceiptGeneration != 0 &&
+        out.inputLayoutReceiptGeneration != 0 &&
+        out.constantStateReceiptGeneration != 0 &&
+        out.constantPayloadReceiptGeneration != 0 &&
+        out.constantBindingReceiptGeneration != 0 &&
+        out.pipelineBindingReceiptGeneration != 0 &&
+        out.cacheKey != 0 && out.inputLayoutIdentity != 0;
+
+    if (out.bindingReady) {
+        const auto found = entries_.find(identity.cacheKey);
+        if (found == entries_.end())
+            return {};
+        const auto& entry = found->second;
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(this)));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedContext)));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedDevice)));
+        token = mix_readiness_snapshot_token(token, out.ownerGeneration);
+        token = mix_readiness_snapshot_token(token, out.slotGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.translationObjectReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.inputLayoutReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.constantStateReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.constantPayloadReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.constantBindingReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.pipelineBindingReceiptGeneration);
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(token, out.inputLayoutIdentity);
+        token = mix_readiness_snapshot_token(token, out.cacheSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.slotSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.objectSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.inputLayoutSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.constantStateSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.constantPayloadSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.constantBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(
+                    entry.translatedVertexShader.Get())));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(
+                    entry.translatedPixelShader.Get())));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(
+                    entry.translatedInputLayout.Get())));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeProgrammableShaderPairCache::validate_pipeline_binding_snapshot(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken) const noexcept {
+    if (pipelineBindingSnapshotToken == 0)
+        return false;
+    const auto current = pipeline_binding_readiness(
+        expectedContext, expectedDevice, identity, cacheSnapshotToken,
+        slotSnapshotToken, objectSnapshotToken, layout,
+        inputLayoutSnapshotToken, constantStateSnapshotToken,
+        constantPayloadSnapshotToken, constantBindingSnapshotToken);
+    return current.bindingReady &&
+           current.snapshotToken == pipelineBindingSnapshotToken;
+}
+
 void NativeProgrammableShaderPairCache::shutdown() noexcept {
     entries_.clear();
     device_.Reset();
