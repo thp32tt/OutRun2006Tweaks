@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("B hosted worker only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION37"
+run="20261005-B-PRODUCTION38"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -97,7 +97,8 @@ orange_sel=(pix[:,0]>170)&(pix[:,1]>55)&(pix[:,1]<210)&(pix[:,2]<120)&(pix[:,0].
 white_sel=(pix[:,0]>180)&(pix[:,1]>180)&(pix[:,2]>180)
 dark_sel=lum<105
 orange=tuple(int(x) for x in np.median(pix[orange_sel],axis=0)) if np.any(orange_sel) else (255,145,0,255)
-white=tuple(int(x) for x in np.median(pix[white_sel],axis=0)) if np.any(white_sel) else (245,245,245,255)
+white_rgb=tuple(int(x) for x in np.median(pix[white_sel,:3],axis=0)) if np.any(white_sel) else (255,255,255)
+white=(white_rgb[0],white_rgb[1],white_rgb[2],255)
 dark=tuple(int(x) for x in np.median(pix[dark_sel],axis=0)) if np.any(dark_sel) else (12,24,48,255)
 
 def shear_rgba(im,s):
@@ -117,10 +118,10 @@ def render(text,bb):
     if bx1-bx0<16 or by1-by0<16: raise RuntimeError(("no_block_safe_interior",bb))
     aw,ah=bx1-bx0,by1-by0
     d=ImageDraw.Draw(Image.new("L",(8,8),0))
-    slant=.22
+    slant=.28
     for fs in range(min(180,int(ah*1.05)),9,-1):
         f=ImageFont.truetype(FONT,fs)
-        inner=max(1,round(fs*.045)); outer=max(inner+1,round(fs*.075))
+        inner=max(1,round(fs*.055)); outer=max(inner+1,round(fs*.095))
         tb=d.textbbox((0,0),text,font=f,stroke_width=outer)
         pad=outer+5
         size=(tb[2]-tb[0]+2*pad,tb[3]-tb[1]+2*pad)
@@ -249,8 +250,8 @@ clean_png=out/"1A43E9D9_CLEAN_PLATE.png"; clean.save(clean_png)
 src_png=Path("/tmp/1A43_source.png"); final_png=Path("/tmp/1A43_final.png")
 src.save(src_png); dec.save(final_png)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(src_png),str(clean_png),str(source_mask_png),"--report",str(out/"B_PRODUCTION37_CLEAN_PLATE_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(src_png),str(final_png),str(allowed_png),"--protected-mask",str(protected_png),"--report",str(out/"B_PRODUCTION37_FINAL_MASK_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(src_png),str(clean_png),str(source_mask_png),"--report",str(out/"B_PRODUCTION38_CLEAN_PLATE_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(src_png),str(final_png),str(allowed_png),"--protected-mask",str(protected_png),"--report",str(out/"B_PRODUCTION38_FINAL_MASK_VALIDATION.json")],check=True)
 
 # Source/clean/final evidence.
 def comp(im,bg):
@@ -260,7 +261,7 @@ def card(label,im):
 cards=[card("SOURCE",src),card("CLEAN",clean),card("FINAL",dec)]
 sheet=Image.new("RGB",(W,H*3+84),"white")
 for i,c in enumerate(cards): sheet.paste(c,(0,i*(H+28)))
-sheet.save(out/"B_PRODUCTION37_1A43_SOURCE_CLEAN_FINAL.jpg",quality=96)
+sheet.save(out/"B_PRODUCTION38_1A43_SOURCE_CLEAN_FINAL.jpg",quality=96)
 # 2x row contact.
 contacts=[]
 for row in rows:
@@ -273,7 +274,7 @@ for row in rows:
     ImageDraw.Draw(c).text((4,4),row["source"]+" -> "+row["korean"],fill="black"); contacts.append(c)
 cs=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in contacts)+4),"white"); yy=0
 for c in contacts: cs.paste(c,(0,yy)); yy+=c.height+4
-cs.save(out/"B_PRODUCTION37_1A43_ROW_CONTACT_2X.jpg",quality=96)
+cs.save(out/"B_PRODUCTION38_1A43_ROW_CONTACT_2X.jpg",quality=96)
 
 changed_blocks=0; outside_patch=0; patch=full_blocks|partial_blocks
 for by in range(bh):
@@ -287,7 +288,7 @@ report={
  "schema_version":1,"role":"B","run":run,"queue_index":92,"asset":asset,
  "readiness_tier":"RENDER_READY_COMPLETED_SAME_INVOCATION","source_url":url,"source_sha256":sha(src_dds),
  "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
- "method":"canonical 2048x256 DXT5 HD source; exact two-line source-alpha bboxes; transparent clean plate; fresh native Hangul with source orange/dark/white palette and right slant; block-safe Korean render; partial edge blocks alpha-only source cleanup; decoded QA",
+ "method":"canonical 2048x256 DXT5 HD source; exact two-line source-alpha bboxes; transparent clean plate; fresh native Hangul with source orange/dark palette, opaque white source-family outer rim and stronger right slant; block-safe Korean render; partial edge blocks alpha-only source cleanup; decoded QA",
  "structure":{"width":W,"height":H,"format":"DXT5","mipmaps":1,"header_128_exact":bytes(outb[:128])==sb[:128],"raw_orientation":"mirror_y"},
  "source_visible_pixels_outside_two_text_lines":source_visible_out,
  "palette":{"orange":orange,"dark":dark,"white":white},
@@ -295,9 +296,9 @@ report={
  "containment":{"elements_total":2,"elements_pass":2,"localized_overlap_pixels":0,"visible_pixels_outside_original_bboxes":visible_out,"alpha_changed_pixels_outside_original_bboxes":alpha_out,"source_residue_pixels_outside_target":residue,"status":"PASS"},
  "compressed_patch":{"full_blocks":len(full_blocks),"partial_alpha_only_blocks":len(partial_blocks),"changed_blocks":changed_blocks,"changed_blocks_outside_patch":outside_patch,"partial_color_bytes_preserved":True,"status":"PASS"},
  "manual_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"B_PRODUCTION37_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B_PRODUCTION38_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"B_PRODUCTION37_1A43_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-summary={"run":run,"asset":"1A43E9D9","index":92,"candidate_sha256":cand_sha,"bbox_size_pass":"2/2","visible_outside":visible_out,"alpha_outside":alpha_out,"source_residue":residue,"changed_blocks_outside_patch":outside_patch,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_B/20261005-B-PRODUCTION37/B_PRODUCTION37_1A43_REPORT.json"}
-(wr/"B_PRODUCTION37_1A43E9D9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"B_PRODUCTION38_1A43_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+summary={"run":run,"asset":"1A43E9D9","index":92,"candidate_sha256":cand_sha,"bbox_size_pass":"2/2","visible_outside":visible_out,"alpha_outside":alpha_out,"source_residue":residue,"changed_blocks_outside_patch":outside_patch,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_B/20261005-B-PRODUCTION38/B_PRODUCTION38_1A43_REPORT.json"}
+(wr/"B_PRODUCTION38_1A43E9D9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False))
