@@ -1,13 +1,14 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "role": "B",
   "run": "20261004-B-RECOVERY09",
   "queue_index": 60,
   "asset": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
-  "base_head": "d32f0385e7ddd297b993a35ffecdb65298eabde7",
+  "base_head": "eea28454c22a278b521b717866bff452a588a091",
   "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
-  "input_candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
-  "candidate_sha256": "f78d11bfbef569bebee078aeccd9adbd8e35d89f39e99454174c8c22de7945bb",
+  "coherent_prior_candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
+  "rejected_intermediate_candidate_sha256": "f78d11bfbef569bebee078aeccd9adbd8e35d89f39e99454174c8c22de7945bb",
+  "candidate_sha256": "f822c0727e8ce9c8d0b801fe5a39dd870c43a30d872819c42829040e14474665",
   "structure": {
     "width": 4096,
     "height": 2048,
@@ -24,7 +25,7 @@
     "header_128_exact": true,
     "raw_orientation": "mirror_y"
   },
-  "method": "C_OVERLAP05 producer return: exact-source scoped clean reconstruction for dumped_white + ranking/stage/rank; fresh native Hangul rerender; explicit independent per-row target masks; 2px positive-separation guards; no localized raster scaling; preserve all unrelated candidate pixels byte/pixel-exact",
+  "method": "C_OVERLAP05 producer return: full exact-source alpha cleanup inside four authoritative source text bboxes; restore unrelated crossing localized target pixels; reapply Ranking/Stage/Rank pixel-exact via explicit per-row masks without resampling; dumped_white exact reapply if safely separated else fresh native smaller render; hard 0px overlap + 2px spacing; no collateral outside four source bboxes",
   "rows": [
     {
       "key": "ranking",
@@ -37,32 +38,30 @@
         350
       ],
       "localized_bbox": [
-        210,
-        254,
-        365,
-        341
+        204,
+        248,
+        370,
+        346
       ],
       "source_size": [
         335,
         105
       ],
       "localized_size": [
-        155,
-        87
+        166,
+        98
       ],
-      "delta_left": 90,
-      "delta_right": 90,
-      "delta_top": 9,
-      "delta_bottom": 9,
+      "delta_left": 84,
+      "delta_right": 85,
+      "delta_top": 3,
+      "delta_bottom": 4,
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "localized_pair_overlap_pixels": 0,
-      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
       "positive_separation_px": 2,
-      "native_font_size": 81,
       "native_raster_resampled": false,
-      "style": "gold_white_navy",
-      "rework_status": "B_RECOVERY09_FRESH_NATIVE_ZERO_OVERLAP"
+      "style": "pixel-exact B_RECOVERY02 accepted Korean style",
+      "rework_status": "B_RECOVERY09_EXPLICIT_ROW_MASK_REAPPLY_AFTER_FULL_SOURCE_CLEAN"
     },
     {
       "key": "stage",
@@ -75,32 +74,30 @@
         350
       ],
       "localized_bbox": [
-        463,
-        266,
-        681,
-        329
+        461,
+        249,
+        685,
+        345
       ],
       "source_size": [
         235,
         105
       ],
       "localized_size": [
-        218,
-        63
+        224,
+        96
       ],
-      "delta_left": 8,
-      "delta_right": 9,
-      "delta_top": 21,
-      "delta_bottom": 21,
+      "delta_left": 6,
+      "delta_right": 5,
+      "delta_top": 4,
+      "delta_bottom": 5,
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "localized_pair_overlap_pixels": 0,
-      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
       "positive_separation_px": 2,
-      "native_font_size": 58,
       "native_raster_resampled": false,
-      "style": "gold_white_navy",
-      "rework_status": "B_RECOVERY09_FRESH_NATIVE_ZERO_OVERLAP"
+      "style": "pixel-exact B_RECOVERY02 accepted Korean style",
+      "rework_status": "B_RECOVERY09_EXPLICIT_ROW_MASK_REAPPLY_AFTER_FULL_SOURCE_CLEAN"
     },
     {
       "key": "rank",
@@ -113,32 +110,30 @@
         350
       ],
       "localized_bbox": [
-        707,
-        254,
-        858,
-        340
+        702,
+        252,
+        862,
+        342
       ],
       "source_size": [
         185,
         105
       ],
       "localized_size": [
-        151,
-        86
+        160,
+        90
       ],
-      "delta_left": 17,
-      "delta_right": 17,
-      "delta_top": 9,
-      "delta_bottom": 10,
+      "delta_left": 12,
+      "delta_right": 13,
+      "delta_top": 7,
+      "delta_bottom": 8,
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "localized_pair_overlap_pixels": 0,
-      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
       "positive_separation_px": 2,
-      "native_font_size": 81,
       "native_raster_resampled": false,
-      "style": "white_navy",
-      "rework_status": "B_RECOVERY09_FRESH_NATIVE_ZERO_OVERLAP"
+      "style": "pixel-exact B_RECOVERY02 accepted Korean style",
+      "rework_status": "B_RECOVERY09_EXPLICIT_ROW_MASK_REAPPLY_AFTER_FULL_SOURCE_CLEAN"
     },
     {
       "key": "dumped_white",
@@ -151,9 +146,9 @@
         390
       ],
       "localized_bbox": [
-        3232,
-        278,
-        3539,
+        3228,
+        276,
+        3544,
         358
       ],
       "source_size": [
@@ -161,38 +156,41 @@
         120
       ],
       "localized_size": [
-        307,
-        80
+        316,
+        82
       ],
-      "delta_left": 63,
-      "delta_right": 66,
-      "delta_top": 8,
+      "delta_left": 59,
+      "delta_right": 61,
+      "delta_top": 6,
       "delta_bottom": 32,
       "containment": "PASS",
       "size_ceiling": "PASS",
-      "localized_pair_overlap_pixels": 0,
-      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
       "positive_separation_px": 2,
-      "native_font_size": 77,
+      "native_font_size": 79,
       "native_raster_resampled": false,
-      "style": "white_shadow",
-      "rework_status": "B_RECOVERY09_FRESH_NATIVE_ZERO_OVERLAP"
+      "style": "source white italic face + gray shadow family",
+      "rework_status": "B_RECOVERY09_FRESH_NATIVE_WHITE_SHADOW"
     }
   ],
   "zero_overlap": {
     "new_vs_existing_localized_pixels": 0,
-    "new_vs_protected_source_foreground_pixels": 0,
-    "new_pair_overlap_pixels": 0,
+    "new_vs_existing_with_2px_guard": 0,
+    "new_pair_overlap_or_guard_conflicts": [],
     "positive_separation_px": 2,
     "status": "PASS"
   },
   "clean_plate": {
-    "changed_pixels_outside_selected_source_text_mask": 0,
-    "source_text_residue_pixels": 0,
+    "changed_pixels_outside_selected_source_alpha_mask": 0,
+    "source_alpha_residue_pixels": 0,
+    "status": "PASS"
+  },
+  "source_residue_gate": {
+    "unexplained_source_alpha_pixels_in_selected_regions_after_final": 0,
     "status": "PASS"
   },
   "collateral": {
-    "changed_pixels_vs_input_candidate_outside_selected_source_bboxes": 0,
+    "changed_pixels_vs_coherent_prior_outside_selected_source_bboxes": 0,
     "status": "PASS"
   },
   "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
