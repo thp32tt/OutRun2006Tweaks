@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-2128-C103",
+  "timestamp_kst": "2026-10-04T21:34:14+09:00",
+  "scope": "Cross-lane final QA for new A_PRODUCTION16 841E796B and the latest B_RECOVERY09 v2 A064FDFC zero-overlap repair. Completed unrelated C assets were not repeated.",
+  "assets": [
+    {
+      "asset": "841E796B",
+      "queue_index": 107,
+      "producer_report": "localization/graphics/role_A/20261004-A-PRODUCTION16/A_PRODUCTION16_841E796B_REPORT.json",
+      "machine_report": "localization/graphics/role_C/20261004-2124-C102/C102_841E796B_MACHINE_QA.json",
+      "worker_run_id": 37202048078,
+      "worker_output_commit": "f2c4592214de25341c1bf50d7868e9dfeab5bd93",
+      "candidate_sha256": "6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad",
+      "machine_status": "PASS",
+      "machine_checks": {
+        "decoded_candidate_vs_final_diff_pixels": 0,
+        "outside_allowed_pixels": 0,
+        "clean_outside_source_text_mask": 0,
+        "target_protected_overlap_pixels": 0,
+        "localized_pair_overlap_pixels": 0,
+        "positive_interline_gap_px": 9,
+        "rows_pass": "2/2",
+        "whole_block_source_size_ceiling": "PASS"
+      },
+      "controller_visual_qa": "PASS",
+      "controller_visual_note": "Readable SOURCE/CLEAN/FINAL and line-contact review shows complete source removal on the yellow No Handicap badge, two-line source hierarchy retained (small upper orange italic line / large lower orange italic line), no clipping/touching/halo/seam, and all Ferrari vehicle/model cards and pictograms remain unchanged. Raw mirror_y view is consistent with policy.",
+      "decision": "C103_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "A064FDFC",
+      "queue_index": 60,
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY09/B_RECOVERY09_A064FDFC_REPORT.json",
+      "machine_report": "localization/graphics/role_C/20261004-2128-C103/C103_A064FDFC_MACHINE_QA.json",
+      "worker_run_id": 37202265815,
+      "worker_output_commit": "f171f20feaf84ceb49de5053d6b313644bd9c297",
+      "candidate_sha256": "f822c0727e8ce9c8d0b801fe5a39dd870c43a30d872819c42829040e14474665",
+      "supersedes_rejected_intermediate_sha256": "f78d11bfbef569bebee078aeccd9adbd8e35d89f39e99454174c8c22de7945bb",
+      "machine_status": "PASS",
+      "machine_checks": {
+        "source_header_128_exact": true,
+        "allowed_mask_xor": 0,
+        "source_text_mask_xor": 0,
+        "clean_plate_diff_vs_independent_reconstruction": 0,
+        "new_target_outside_source_bboxes": 0,
+        "new_vs_existing_overlap_pixels": 0,
+        "new_vs_existing_2px_guard_conflicts": 0,
+        "new_pair_overlap_pixels": 0,
+        "unexplained_source_alpha_residue_pixels": 0,
+        "collateral_pixels_outside_selected_bboxes": 0,
+        "rows_pass": "4/4"
+      },
+      "controller_visual_qa": "PASS",
+      "controller_visual_note": "Controller full/readable, dense-group 2x, dumped/stage-clear 2x, row-contact and raw-orientation review PASS. The f78 intermediate residue/overdraw regression is absent. Ranking/Stage/Rank and dumped_white are source-family faithful, remain separated from preserved neighboring atlas content, and show no source-script residue beneath/behind Korean, clipping, new overlap, seam, or protected-art damage.",
+      "decision": "C103_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "summary": {
+    "assets_checked": 2,
+    "pixel_visual_policy_pass": 2,
+    "rework_required_in_this_scope": 0,
+    "global_rework_remaining": [
+      "39229D64",
+      "C075FB49"
+    ],
+    "candidate_changed_by_C": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changes": false
+  }
+}
