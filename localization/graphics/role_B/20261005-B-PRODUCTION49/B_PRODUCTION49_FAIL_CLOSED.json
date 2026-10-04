@@ -1,0 +1,9 @@
+{
+  "run": "20261005-B-PRODUCTION49",
+  "asset": "EBFC709F",
+  "index": 232,
+  "status": "FAIL_CLOSED_DIAGNOSTIC",
+  "exception": "RuntimeError(('cell x edge ambiguous', 'join_small', (0, 270, 520, 390), [8, 287, 520, 390]))",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 141, in <module>\n    try:main()\n        ^^^^^^\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 45, in main\n    raise RuntimeError((\"cell x edge ambiguous\",key,cell,bb))\nRuntimeError: ('cell x edge ambiguous', 'join_small', (0, 270, 520, 390), [8, 287, 520, 390])\n",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
