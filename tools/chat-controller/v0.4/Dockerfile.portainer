@@ -31,6 +31,7 @@ COPY vr_B.md /opt/outrun/prompts/vr_B.md
 COPY vr_C.md /opt/outrun/prompts/vr_C.md
 COPY conversion_dx11.md /opt/outrun/prompts/conversion_dx11.md
 COPY conversion_dxvk.md /opt/outrun/prompts/conversion_dxvk.md
+COPY conversion_dx9ex.md /opt/outrun/prompts/conversion_dx9ex.md
 
 RUN chmod +x /opt/outrun/entrypoint.sh
 
