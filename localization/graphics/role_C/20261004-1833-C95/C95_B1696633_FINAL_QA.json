@@ -1,0 +1,331 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-1833-C95",
+  "base_head": "997018bfbb1dd53884093def56341851aa8afd2a",
+  "asset": "B1696633",
+  "scope": "revalidate newest B_RECOVERY07 worker output that superseded C94; FD90AA9 C93 result and stale B C94 result not repeated",
+  "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_B1696633_REPORT.json",
+  "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+  "candidate_sha256": "448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21",
+  "candidate_changed_by_C": false,
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "depth": 1,
+    "mips": 1,
+    "pf_flags": 65,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "bytes": 16777344,
+    "header_128_exact_to_source": true,
+    "raw_orientation": "mirror_y"
+  },
+  "clean_plate_gate": {
+    "changed_pixels": 286487,
+    "changed_bbox": [
+      51,
+      769,
+      1877,
+      2043
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_gate": {
+    "changed_pixels": 298996,
+    "changed_bbox": [
+      51,
+      769,
+      1877,
+      2043
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "bbox_gate": {
+    "elements": 9,
+    "pass": 9,
+    "fail": 0,
+    "edge_touch_keys": [],
+    "rows": [
+      {
+        "key": "name",
+        "source": "NAME",
+        "korean": "이름",
+        "original_bbox": [
+          74,
+          769,
+          205,
+          805
+        ],
+        "localized_bbox": [
+          110,
+          770,
+          169,
+          804
+        ],
+        "derived_final_vs_clean_bbox": [
+          110,
+          770,
+          169,
+          804
+        ],
+        "delta_left": 36,
+        "delta_right": 36,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS"
+      },
+      {
+        "key": "status",
+        "source": "STATUS",
+        "korean": "상태",
+        "original_bbox": [
+          1639,
+          768,
+          1803,
+          805
+        ],
+        "localized_bbox": [
+          1690,
+          769,
+          1752,
+          804
+        ],
+        "derived_final_vs_clean_bbox": [
+          1690,
+          769,
+          1752,
+          804
+        ],
+        "delta_left": 51,
+        "delta_right": 51,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS"
+      },
+      {
+        "key": "stage",
+        "source": "Stage",
+        "korean": "스테이지",
+        "original_bbox": [
+          1090,
+          835,
+          1214,
+          899
+        ],
+        "localized_bbox": [
+          1092,
+          849,
+          1212,
+          884
+        ],
+        "derived_final_vs_clean_bbox": [
+          1092,
+          849,
+          1212,
+          884
+        ],
+        "delta_left": 2,
+        "delta_right": 2,
+        "delta_top": 14,
+        "delta_bottom": 15,
+        "containment": "PASS"
+      },
+      {
+        "key": "next_stage",
+        "source": "Next Stage",
+        "korean": "다음 스테이지",
+        "original_bbox": [
+          1331,
+          909,
+          1619,
+          976
+        ],
+        "localized_bbox": [
+          1334,
+          916,
+          1615,
+          968
+        ],
+        "derived_final_vs_clean_bbox": [
+          1334,
+          916,
+          1615,
+          968
+        ],
+        "delta_left": 3,
+        "delta_right": 4,
+        "delta_top": 7,
+        "delta_bottom": 8,
+        "containment": "PASS"
+      },
+      {
+        "key": "ghost",
+        "source": "Ghost",
+        "korean": "고스트",
+        "original_bbox": [
+          1668,
+          909,
+          1824,
+          978
+        ],
+        "localized_bbox": [
+          1669,
+          919,
+          1822,
+          968
+        ],
+        "derived_final_vs_clean_bbox": [
+          1669,
+          919,
+          1822,
+          968
+        ],
+        "delta_left": 1,
+        "delta_right": 2,
+        "delta_top": 10,
+        "delta_bottom": 10,
+        "containment": "PASS"
+      },
+      {
+        "key": "total_time",
+        "source": "Total Time",
+        "korean": "총 시간",
+        "original_bbox": [
+          51,
+          1698,
+          841,
+          1841
+        ],
+        "localized_bbox": [
+          245,
+          1700,
+          647,
+          1838
+        ],
+        "derived_final_vs_clean_bbox": [
+          245,
+          1700,
+          647,
+          1838
+        ],
+        "delta_left": 194,
+        "delta_right": 194,
+        "delta_top": 2,
+        "delta_bottom": 3,
+        "containment": "PASS"
+      },
+      {
+        "key": "slipstream",
+        "source": "Slipstream",
+        "korean": "슬립스트림",
+        "original_bbox": [
+          889,
+          1718,
+          1388,
+          1825
+        ],
+        "localized_bbox": [
+          892,
+          1719,
+          1385,
+          1823
+        ],
+        "derived_final_vs_clean_bbox": [
+          892,
+          1719,
+          1385,
+          1823
+        ],
+        "delta_left": 3,
+        "delta_right": 3,
+        "delta_top": 1,
+        "delta_bottom": 2,
+        "containment": "PASS"
+      },
+      {
+        "key": "new_record",
+        "source": "NEW Record!!",
+        "korean": "신기록!!",
+        "original_bbox": [
+          1618,
+          1732,
+          1877,
+          1841
+        ],
+        "localized_bbox": [
+          1619,
+          1734,
+          1876,
+          1839
+        ],
+        "derived_final_vs_clean_bbox": [
+          1619,
+          1734,
+          1876,
+          1839
+        ],
+        "delta_left": 1,
+        "delta_right": 1,
+        "delta_top": 2,
+        "delta_bottom": 2,
+        "containment": "PASS"
+      },
+      {
+        "key": "extend_time",
+        "source": "Extend Time",
+        "korean": "시간 연장",
+        "original_bbox": [
+          834,
+          1899,
+          1777,
+          2043
+        ],
+        "localized_bbox": [
+          1040,
+          1901,
+          1570,
+          2040
+        ],
+        "derived_final_vs_clean_bbox": [
+          1040,
+          1901,
+          1570,
+          2040
+        ],
+        "delta_left": 206,
+        "delta_right": 207,
+        "delta_top": 2,
+        "delta_bottom": 3,
+        "containment": "PASS"
+      }
+    ],
+    "status": "PASS"
+  },
+  "mask_consistency": {
+    "source_text_protected_overlap": 0,
+    "allowed_protected_overlap": 0,
+    "status": "PASS"
+  },
+  "visual_evidence": {
+    "full_compare": "localization/graphics/role_C/20261004-1833-C95/C95_B1696633_FULL_COMPARE.jpg",
+    "row_contact": "localization/graphics/role_C/20261004-1833-C95/C95_B1696633_ROW_CONTACT.jpg",
+    "controller_visual_qa": "PENDING"
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "C95_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "vr_ffb_dx11_dxvk_changes": false
+}
