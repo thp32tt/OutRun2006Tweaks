@@ -7,12 +7,12 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R233_ACCUMULATED_LOG_SIGNATURE_EPOCH_NAMESPACE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
   "base_sha": "68560bca397b3fbf5bbe13e473b8eee1f02c4b9a",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "df84ec00543bdb5e34a8f4dc40213547ce2e9f31",
+  "validation_bearing_result_sha": "df84ec00543bdb5e34a8f4dc40213547ce2e9f31",
   "result_marker": "[AUTO:CONVERSION-DX11-00339]",
   "selected_work_item": "DX11_R233_ACCUMULATED_LOG_SIGNATURE_EPOCH_NAMESPACE",
   "summary": "R233 extends R225 signature namespace isolation from source-log scope to source-log plus startup epoch. In an accumulated log containing multiple process startups, repeated runtime signature IDs and their declaration/compile/detail evidence no longer overwrite or merge across process epochs.",
@@ -43,22 +43,36 @@
       "evidence": "SignatureKey now includes source_log, startup_epoch and signature_id. Each recognized startup advances the per-log epoch; legacy logs without a startup marker remain epoch 0. Signature report entries export startup_epoch and every declaration/FFP/texture/shader compile/prototype detail map uses the same epoch-scoped key. Added an accumulated-log repeated-signature regression and source-graph drift guards."
     },
     "C3_VALIDATE": {
-      "status": "PENDING_EXACT_SHA_GATE",
-      "automation_validation": "PENDING",
-      "evidence": "Required exact-SHA Backend Conversion Gate will validate analyzer regression tests, source graph, dormant activation, Win32 build/binary and DX11 readiness smoke. No Quest 3/VDXR runtime test performed."
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R233_ACCUMULATED_LOG_SIGNATURE_EPOCH_NAMESPACE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1907 run 37168529018 completed success for df84ec00543bdb5e34a8f4dc40213547ce2e9f31. validate job 111336502277 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, session regression, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R233 census analyzer checks, then configured/built Win32, verified the binary and uploaded artifact 11290024040. DX11 readiness smoke job 111337167098 passed fixed-function shader, input-layout/signature, object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and fixed-function pipeline probes. Artifact digest sha256:e62ab28fb7e941d41a95fc840bfa71a6b254a13853f8e950a05df05aa4b4d6bb. No Quest 3/VDXR runtime test was performed."
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "COMPLETE",
+      "material_result_sha": "df84ec00543bdb5e34a8f4dc40213547ce2e9f31",
+      "validation_bearing_result_sha": "df84ec00543bdb5e34a8f4dc40213547ce2e9f31",
+      "result_marker": "[AUTO:CONVERSION-DX11-00339]",
+      "implementation_commits": [
+        "df84ec00543bdb5e34a8f4dc40213547ce2e9f31"
+      ],
+      "source_implementation_sha": "df84ec00543bdb5e34a8f4dc40213547ce2e9f31"
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Offline census evidence-integrity/reporting change only; no runtime distributable identity change intended."
+      "reason": "Offline census evidence-integrity/reporting change only; no runtime distributable identity change."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "Require the exact-SHA Backend Conversion Gate on the R233 material result. After PASS, persist task/lane bookkeeping separately while keeping RUNTIME_VALIDATION=UNTESTED."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37168529018,
+      "validation_job_id": 111336502277,
+      "readiness_smoke_job_id": 111337167098,
+      "artifact_id": 11290024040,
+      "artifact_digest": "sha256:e62ab28fb7e941d41a95fc840bfa71a6b254a13853f8e950a05df05aa4b4d6bb",
+      "implementation_comment_id": 5975448498,
+      "validation_comment_id": 5975496814,
+      "exact_next_action": "Preserve R225-R233 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate."
     }
   },
   "regression_assessment": {
@@ -79,5 +93,17 @@
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE"
   },
-  "exact_next_action": "Publish the R233 material result without CI skip and require its exact-SHA Backend Conversion Gate."
+  "exact_next_action": "Preserve R225-R233 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37168529018,
+      "run_number": 1907,
+      "result_sha": "df84ec00543bdb5e34a8f4dc40213547ce2e9f31",
+      "conclusion": "success",
+      "validate_job_id": 111336502277,
+      "readiness_smoke_job_id": 111337167098,
+      "artifact_id": 11290024040,
+      "artifact_digest": "sha256:e62ab28fb7e941d41a95fc840bfa71a6b254a13853f8e950a05df05aa4b4d6bb"
+    }
+  }
 }
