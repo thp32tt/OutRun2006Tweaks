@@ -173,8 +173,10 @@ for r in rows:
         scale = 1.0
         identified = list(bb)
         status = "PRIOR_PASS_LAYER_PRESERVED"
-    final.alpha_composite(layer)
+    # Copy exact straight-RGBA layer pixels wherever the layer has coverage; do not
+    # alpha-composite a second time, which would alter antialias RGB/alpha versus the accepted candidate.
     tm = binary_alpha(layer)
+    final.paste(layer,(0,0),tm)
     target_masks[key] = tm
     ops.append({
         "key":key,"source":r["source"],"korean":r["korean"],
