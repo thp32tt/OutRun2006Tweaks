@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-04T16:21:33+09:00",
+  "updated_at_kst": "2026-10-04T16:54:35+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -669,5 +669,21 @@
       "C075FB49",
       "FD90AA9"
     ]
+  },
+  "latest_b_first_qa": {
+    "run": "B_RECOVERY06",
+    "worker_run_id": 37187057858,
+    "worker_output_commit": "10ea3238a5ed125bf7f2c28baf392677a7d11c03",
+    "result": "AA04D779_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_INGAME",
+    "assets": {
+      "AA04D779": {
+        "queue_index": 46,
+        "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+        "candidate_sha256": "6f64736a53589379a00dc831e8605f0f8f140ffd52837f951e0a24fcd9d89c8a",
+        "status": "B_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_AND_INGAME",
+        "report": "localization/graphics/role_B/20261004-B-RECOVERY06/B_RECOVERY06_AA04D779_REPORT.json"
+      }
+    },
+    "runtime_validation": "UNTESTED"
   }
 }

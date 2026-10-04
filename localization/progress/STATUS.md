@@ -734,3 +734,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Self-QA: clean-plate validator PASS and final protected-mask validator PASS (outside/protected/alpha = 0); readable + raw containment 15/15 PASS; prior-PASS localized bboxes 8/8 exact; decoded visual QA PASS with no source residue, clipping, seam, or new overlap observed.
 - `RUNTIME_VALIDATION=UNTESTED`; C final QA and isolated in-game validation remain pending. Next A REWORK priority: odd index 121 `FD90AA9`.
 - Evidence: `localization/graphics/role_A/20261004-A-RECOVERY06/`.
+## 2026-10-04 16:54 KST — B recovery06 AA04D779 hosted production
+- Refreshed the current B even shard and skipped stale even REWORK markers 102/104/116 because their B87 rebuild + C81 strict QA evidence is already complete; selected the oldest unfinished even `localize_text` row, index 46 `AA04D779`. Index 44 and B Recovery01-05 were not repeated.
+- Candidate-completion path used the pinned exact HD source from `Sonic-TV/OR2006Sprites@a95efe01d1f136514cef94b0d9e9fd61df021754`, SHA-256 `1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5`.
+- Full-resolution construction/static QA ran on the GitHub-hosted localization CPU worker per the compute-placement contract. Two fail-closed pre-output attempts only tightened source-isolation margins; successful run `37187057858` produced commit `10ea3238a5ed125bf7f2c28baf392677a7d11c03` and candidate `6f64736a53589379a00dc831e8605f0f8f140ffd52837f951e0a24fcd9d89c8a`.
+- Rendered all 21 translated course/sector labels natively. Preserved REV, TOP, You, player-number labels, icons, gray control labels, decorative/numeric artwork and all non-target pixels. RGBA32 2048x2048 / 1 mip / exact 128-byte source header / raw `mirror_y` orientation preserved.
+- Self-QA PASS: 21/21 exact source-bbox containment; clean-plate residue 0; clean/final validators outside/protected/alpha = 0; target overlaps 0; readable dark/white and raw-orientation visual review found no clipping, source residue, protected-art damage or new overlap.
+- `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
+- Evidence: `localization/graphics/role_B/20261004-B-RECOVERY06/`. No VR/FFB/DX11/DXVK work.

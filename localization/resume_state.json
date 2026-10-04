@@ -1678,5 +1678,30 @@
       "asset": "FD90AA9",
       "status": "rework_required_zero_pixel_or_artifact"
     }
+  },
+  "b_recovery06_aa04d779": {
+    "run": "20261004-B-RECOVERY06",
+    "worker_run_id": 37187057858,
+    "worker_trigger_head": "80cb8489cbfea9cfc40704fb2e7579016d8053ca",
+    "worker_output_commit": "10ea3238a5ed125bf7f2c28baf392677a7d11c03",
+    "status": "B_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "queue_index": 46,
+    "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+    "candidate_sha256": "6f64736a53589379a00dc831e8605f0f8f140ffd52837f951e0a24fcd9d89c8a",
+    "native_rerenders": 21,
+    "all_21_bbox_pass": true,
+    "format": "RGBA32",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "clean_plate_report": "localization/graphics/role_B/20261004-B-RECOVERY06/B_RECOVERY06_CLEAN_PLATE_VALIDATION.json",
+    "final_mask_report": "localization/graphics/role_B/20261004-B-RECOVERY06/B_RECOVERY06_FINAL_MASK_VALIDATION.json",
+    "production_report": "localization/graphics/role_B/20261004-B-RECOVERY06/B_RECOVERY06_AA04D779_REPORT.json",
+    "visual_compare": "localization/graphics/role_B/20261004-B-RECOVERY06/B_RECOVERY06_AA04D779_COMPARE.jpg",
+    "raw_compare": "localization/graphics/role_B/20261004-B-RECOVERY06/B_RECOVERY06_AA04D779_RAW_COMPARE.jpg",
+    "runtime_validation": "UNTESTED"
   }
 }

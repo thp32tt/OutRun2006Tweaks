@@ -653,7 +653,37 @@
       "prior_localized_raster_resampled": false
     }
   ],
-  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "manual_visual_qa": "PASS",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_RECOVERY06_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B_RECOVERY06_CANDIDATE_SELFQA_PASS_PENDING_C_AND_INGAME",
+  "worker_run_id": 37187057858,
+  "worker_trigger_head": "80cb8489cbfea9cfc40704fb2e7579016d8053ca",
+  "worker_output_commit": "10ea3238a5ed125bf7f2c28baf392677a7d11c03",
+  "worker_attempts": [
+    {
+      "run_id": 37186834153,
+      "result": "FAIL_CLOSED_PREOUTPUT",
+      "reason": "big_forest isolation margin touched crop boundary"
+    },
+    {
+      "run_id": 37186951031,
+      "result": "FAIL_CLOSED_PREOUTPUT",
+      "reason": "sunny_beach isolation margin touched crop boundary"
+    },
+    {
+      "run_id": 37187057858,
+      "result": "PASS"
+    }
+  ],
+  "visual_qa": {
+    "readable_source_clean_final_dark": "PASS",
+    "readable_final_white_alpha": "PASS",
+    "raw_orientation_source_vs_final": "PASS",
+    "source_text_residue": "NONE_OBSERVED",
+    "clipping_or_bbox_escape": "NONE",
+    "protected_art_or_icon_damage": "NONE_OBSERVED",
+    "new_overlap": "NONE_OBSERVED",
+    "style_fidelity": "PASS_WHITE_NAVY_STAGE_FAMILY_AND_YELLOW_NAVY_SECTOR4",
+    "preserved_original_labels": "REV_TOP_You_player_numbers_and_gray_control_labels"
+  }
 }
