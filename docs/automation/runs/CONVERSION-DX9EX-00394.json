@@ -1,0 +1,149 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00394",
+  "production_id": "CONVERSION-DX9EX-00394",
+  "event_id": "CONVERSION-DX9EX-00394-E002",
+  "event_type": "rollover",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "queue_controller_contract": {
+    "requested_path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "status": "PRESENT_RESTORED_DURING_00394_RECOVERY",
+    "evidence": "At authoritative base 82900c1fc029b09a0e80ba3fa38fc4cd285d37ad the contract was absent. Recovery commit 7a0223563fa4cbb12391b7da738847e0ebf6bdef restored the durable queue-controller contract before material implementation; ATTEMPT remained 1/3 because rollover/recovery was not a task retry."
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_STRUCTURAL",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "82900c1fc029b09a0e80ba3fa38fc4cd285d37ad",
+  "recovery_shas": [
+    "7a0223563fa4cbb12391b7da738847e0ebf6bdef"
+  ],
+  "red_guard_shas": [
+    "229cfe2582894ffb534c3c816170531d22b5a8d6"
+  ],
+  "result_sha": "8d44a9298867d30b8ada0aeb3c05e37a380147fb",
+  "material_result_sha": "8d44a9298867d30b8ada0aeb3c05e37a380147fb",
+  "validation_bearing_result_sha": "8d44a9298867d30b8ada0aeb3c05e37a380147fb",
+  "state_commit_sha": "be825a086814d4794c26d5c98a460f8d68c2ce5f",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00394]",
+  "selected_work_item": "VR-REFACTOR-POST1000-R33-INSTALL-STATE-RETIREMENT-0007",
+  "summary": "Retired R33InstallState after CONVERSION-DX9EX-00391 removed the final R33InstallStatus/R34 compatibility observer, leaving the atomic write-only. The material change removes Pending/Ready/Failed stores while preserving R32InstallStatus prerequisite polling, R33 hook transaction/rollback behavior, replay-health synchronization, and R33ReportInstallResult terminal publication.",
+  "changed_paths": [
+    "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "tools/verify_vr_r32_review.py",
+    "tools/verify_vr_refactor_contract.py",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00394.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub vr-d3d9ex-focus directly. The resumed branch first exposed 229cfe2582894ffb534c3c816170531d22b5a8d6, then authoritative remote history showed the already-landed material 8d44a9298867d30b8ada0aeb3c05e37a380147fb. No CONVERSION-DX9EX-00394 run JSON existed, so duplicate implementation was avoided and work resumed at exact-SHA validation/state persistence. CHAT_ROLLOVER=2 and ATTEMPT=1/3 were preserved."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "After 00391 retired R33InstallStatus() and the R34 compatibility observer/status alias, R33InstallState had no runtime readers and only accepted local Pending/Ready/Failed writes. R32InstallStatus remained the prerequisite owner query and R33ReportInstallResult remained the final terminal publication path."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Guard 229cfe2582894ffb534c3c816170531d22b5a8d6 makes any R33InstallState reintroduction fail closed in the R32 review/refactor verifiers. Material 8d44a9298867d30b8ada0aeb3c05e37a380147fb removes the dead atomic and six store sites without changing the surrounding branch/order or terminal publication calls."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_STRUCTURAL",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 8d44a9298867d30b8ada0aeb3c05e37a380147fb: DX9Ex Active Validation 37241351866 policy/full-chain-compile/host/game/package SUCCESS; Domain Isolation Guard 37241351730 SUCCESS; OutRun EXE HUD Inspector CI 37241351791 static/build SUCCESS. N100 detached exact-SHA py_compile, architecture, R51 runtime contract, R32 review, hook graph, refactor contract, near-plane gate, workflow YAML parse, git diff --check all PASS. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "8d44a9298867d30b8ada0aeb3c05e37a380147fb",
+      "validation_bearing_result_sha": "8d44a9298867d30b8ada0aeb3c05e37a380147fb",
+      "message": "refactor(vr): retire R33 dead install state [AUTO:CONVERSION-DX9EX-00394]",
+      "ci_skip": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "DX9Ex Active package artifact 11317817554, name OutRun2-VR-DX9EX-ACTIVE-8d44a9298867d30b8ada0aeb3c05e37a380147fb, digest sha256:72b6da2986641fc7c3e9f22c0fd398993972fdfa35fdd7bc50442e04c7b20872, size 2730684 bytes. Artifact is build/package evidence only, not Quest3/VDXR runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "state_commit_sha": "be825a086814d4794c26d5c98a460f8d68c2ce5f",
+      "runtime_validation": "UNTESTED",
+      "issue14_validation_comment_id": 5985339233,
+      "issue13_update": "NOT_REQUIRED_NO_RUNTIME_REGRESSION_STATUS_CHANGE"
+    }
+  },
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37241351866,
+      "conclusion": "success",
+      "exact_sha": "8d44a9298867d30b8ada0aeb3c05e37a380147fb",
+      "jobs": {
+        "policy": 111550543777,
+        "full_chain_compile": 111550603305,
+        "host": 111550603316,
+        "game": 111550603337,
+        "package": 111551522476
+      },
+      "artifact_id": 11317817554,
+      "artifact_digest": "sha256:72b6da2986641fc7c3e9f22c0fd398993972fdfa35fdd7bc50442e04c7b20872"
+    },
+    "domain_isolation": {
+      "run_id": 37241351730,
+      "conclusion": "success",
+      "exact_sha": "8d44a9298867d30b8ada0aeb3c05e37a380147fb"
+    },
+    "hud_inspector": {
+      "run_id": 37241351791,
+      "conclusion": "success",
+      "exact_sha": "8d44a9298867d30b8ada0aeb3c05e37a380147fb",
+      "jobs": {
+        "static_exe_analysis": 111550543274,
+        "build_hud_inspector": 111550543353
+      },
+      "artifact_id": 11317522210,
+      "artifact_digest": "sha256:22a5da161ce5e65b59e308da47c4785e127f6ba6bae348b58d8806db865374cd"
+    },
+    "n100_local": {
+      "conclusion": "success",
+      "remote_ls_remote_sha": "8d44a9298867d30b8ada0aeb3c05e37a380147fb",
+      "checks": [
+        "python3 -m py_compile modified/relevant verifiers",
+        "verify_vr_architecture.py",
+        "verify_vr_r51_runtime_contract.py",
+        "verify_vr_r32_review.py",
+        "verify_vr_hook_graph.py",
+        "verify_vr_refactor_contract.py",
+        "verify_vr_nearplane_active_gate.py",
+        "workflow YAML parse",
+        "git diff --check",
+        "git grep confirms R33InstallState appears only in verifier guards"
+      ]
+    }
+  },
+  "next_action": "Do not repeat CONVERSION-DX9EX-00394 or restore R33InstallState/R33InstallStatus/R34 observer aliases. Preserve R33ReportInstallResult as the sole final R33 terminal publication path and R32InstallStatus as the prerequisite owner query. Under a new task, take only the next bounded post-1000 structural successor supported by current source/static evidence; runtime claims remain gated on Quest3/VDXR evidence.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00394",
+    "production_id": "CONVERSION-DX9EX-00394",
+    "event_id": "CONVERSION-DX9EX-00394-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "8d44a9298867d30b8ada0aeb3c05e37a380147fb",
+    "validation_bearing_result_sha": "8d44a9298867d30b8ada0aeb3c05e37a380147fb",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_STRUCTURAL",
+    "runtime_validation": "UNTESTED",
+    "chat_rollover": 2,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "rollover_is_retry": false
+  },
+  "validated_at_kst": "2026-10-05T07:53:30+09:00",
+  "chat_rollover": 2,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "rollover_is_retry": false
+}
