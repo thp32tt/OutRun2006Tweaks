@@ -9897,6 +9897,47 @@ def main() -> None:
             + ", ".join(missing_r250_programmable_nonindexed_geometry_binding_receipt)
         )
 
+    r251_programmable_nonindexed_direct_dispatch_contract = [
+        ("struct NativeProgrammableShaderNonIndexedDirectDispatchReadiness",
+         NATIVE_BACKEND_HPP, "R251 programmable non-indexed dispatch readiness type"),
+        ("nonindexed_direct_dispatch_readiness(",
+         NATIVE_BACKEND_HPP, "R251 dispatch readiness declaration"),
+        ("validate_nonindexed_direct_dispatch_snapshot(",
+         NATIVE_BACKEND_HPP, "R251 dispatch snapshot validator"),
+        ("direct_draw_element_count(primitiveType, primitiveCount, vertexCount)",
+         NATIVE_BACKEND_CPP, "R251 exact primitive-count translation"),
+        ("out.vertexRangeExact =",
+         NATIVE_BACKEND_CPP, "R251 vertex-buffer byte-range gate"),
+        ("out.geometryBindingSnapshotMatches =",
+         NATIVE_BACKEND_CPP, "R251 R250 receipt lineage gate"),
+        ("R251 exact programmable non-indexed direct dispatch arguments",
+         CONSTANT_BUFFER_PROBE, "R251 exact dispatch regression"),
+        ("R251 stale R250 geometry receipt cannot seal dispatch arguments",
+         CONSTANT_BUFFER_PROBE, "R251 stale geometry snapshot regression"),
+        ("R251 out-of-range non-indexed vertex window fails closed",
+         CONSTANT_BUFFER_PROBE, "R251 vertex range regression"),
+        ("R251 primitive-count overflow fails closed",
+         CONSTANT_BUFFER_PROBE, "R251 count overflow regression"),
+        ("R251 same non-indexed direct dispatch arguments are idempotent",
+         CONSTANT_BUFFER_PROBE, "R251 idempotence regression"),
+        ("R251 live IA drift invalidates non-indexed dispatch receipt",
+         CONSTANT_BUFFER_PROBE, "R251 live IA drift regression"),
+        ("R251 device reinitialize invalidates non-indexed dispatch receipt",
+         CONSTANT_BUFFER_PROBE, "R251 device-generation regression"),
+        ("R251 fresh device generation receives distinct non-indexed dispatch receipt",
+         CONSTANT_BUFFER_PROBE, "R251 fresh-generation regression"),
+    ]
+    missing_r251_programmable_nonindexed_direct_dispatch = [
+        meaning for token, source, meaning
+        in r251_programmable_nonindexed_direct_dispatch_contract
+        if token not in source
+    ]
+    if missing_r251_programmable_nonindexed_direct_dispatch:
+        raise SystemExit(
+            "DX11 R251 programmable non-indexed direct-dispatch drift: "
+            + ", ".join(missing_r251_programmable_nonindexed_direct_dispatch)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

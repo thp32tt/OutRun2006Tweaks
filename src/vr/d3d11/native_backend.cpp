@@ -7404,6 +7404,171 @@ static bool direct_draw_element_count(
     }
 }
 
+NativeProgrammableShaderNonIndexedDirectDispatchReadiness
+NativeProgrammableShaderPairCache::nonindexed_direct_dispatch_readiness(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken,
+    D3DPRIMITIVETYPE primitiveType,
+    std::uint64_t topologyBindingSnapshotToken,
+    const NativeManagedBufferShadow& vertexBuffer,
+    std::uint64_t vertexBufferSnapshotToken,
+    UINT vertexStride,
+    UINT vertexOffset,
+    std::uint64_t nonIndexedGeometryBindingSnapshotToken,
+    UINT primitiveCount,
+    UINT startVertexLocation) const noexcept {
+    NativeProgrammableShaderNonIndexedDirectDispatchReadiness out{};
+    out.primitiveCount = primitiveCount;
+    out.startVertexLocation = startVertexLocation;
+    out.vertexStride = vertexStride;
+    out.vertexOffset = vertexOffset;
+    out.vertexBufferByteWidth = vertexBuffer.byte_width();
+    out.geometryBindingSnapshotToken =
+        nonIndexedGeometryBindingSnapshotToken;
+    out.vertexBufferSnapshotToken = vertexBufferSnapshotToken;
+
+    const auto geometry = nonindexed_geometry_binding_readiness(
+        expectedContext, expectedDevice, identity, cacheSnapshotToken,
+        slotSnapshotToken, objectSnapshotToken, layout,
+        inputLayoutSnapshotToken, constantStateSnapshotToken,
+        constantPayloadSnapshotToken, constantBindingSnapshotToken,
+        pipelineBindingSnapshotToken, primitiveType,
+        topologyBindingSnapshotToken, vertexBuffer,
+        vertexBufferSnapshotToken, vertexStride, vertexOffset);
+    out.inputValid =
+        expectedContext != nullptr && expectedDevice != nullptr &&
+        nonIndexedGeometryBindingSnapshotToken != 0 &&
+        vertexBufferSnapshotToken != 0 &&
+        vertexStride != 0 &&
+        out.vertexBufferByteWidth != 0;
+    out.geometryBindingReady = geometry.bindingReady;
+    out.geometryBindingSnapshotMatches =
+        geometry.bindingReady &&
+        geometry.snapshotToken == nonIndexedGeometryBindingSnapshotToken;
+
+    const auto topology = translate_primitive(primitiveType);
+    out.topology = topology.value;
+    out.primitiveExact =
+        topology.exact &&
+        primitiveType != D3DPT_TRIANGLEFAN &&
+        topology.value != D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    out.topologyMatchesGeometry =
+        out.primitiveExact &&
+        geometry.translatedTopology == topology.value;
+
+    UINT vertexCount = 0;
+    out.countExact =
+        direct_draw_element_count(primitiveType, primitiveCount, vertexCount);
+    out.vertexCount = out.countExact ? vertexCount : 0u;
+
+    out.vertexRangeExact = false;
+    if (out.countExact && vertexStride != 0) {
+        const UINT maxValue = (std::numeric_limits<UINT>::max)();
+        const bool elementRangeExact =
+            startVertexLocation <= maxValue - out.vertexCount;
+        if (elementRangeExact) {
+            const std::uint64_t firstByte =
+                static_cast<std::uint64_t>(vertexOffset) +
+                static_cast<std::uint64_t>(startVertexLocation) *
+                    static_cast<std::uint64_t>(vertexStride);
+            const std::uint64_t endByte =
+                firstByte +
+                static_cast<std::uint64_t>(out.vertexCount) *
+                    static_cast<std::uint64_t>(vertexStride);
+            out.vertexRangeExact =
+                firstByte <= out.vertexBufferByteWidth &&
+                endByte <= out.vertexBufferByteWidth;
+        }
+    }
+
+    out.dispatchArgumentsExact =
+        out.countExact && out.vertexRangeExact;
+    out.componentSnapshotsPresent =
+        geometry.snapshotToken != 0 &&
+        geometry.vertexBufferSnapshotToken != 0;
+    out.ready =
+        out.inputValid &&
+        out.geometryBindingReady &&
+        out.geometryBindingSnapshotMatches &&
+        out.primitiveExact &&
+        out.topologyMatchesGeometry &&
+        out.dispatchArgumentsExact &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.geometryBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.vertexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(primitiveType));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.topology));
+        token = mix_readiness_snapshot_token(token, out.primitiveCount);
+        token = mix_readiness_snapshot_token(token, out.vertexCount);
+        token = mix_readiness_snapshot_token(token, out.startVertexLocation);
+        token = mix_readiness_snapshot_token(token, out.vertexStride);
+        token = mix_readiness_snapshot_token(token, out.vertexOffset);
+        token = mix_readiness_snapshot_token(
+            token, out.vertexBufferByteWidth);
+        token = mix_readiness_snapshot_token(
+            token, out.vertexRangeExact ? 0x251u : 0u);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeProgrammableShaderPairCache::
+validate_nonindexed_direct_dispatch_snapshot(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken,
+    D3DPRIMITIVETYPE primitiveType,
+    std::uint64_t topologyBindingSnapshotToken,
+    const NativeManagedBufferShadow& vertexBuffer,
+    std::uint64_t vertexBufferSnapshotToken,
+    UINT vertexStride,
+    UINT vertexOffset,
+    std::uint64_t nonIndexedGeometryBindingSnapshotToken,
+    UINT primitiveCount,
+    UINT startVertexLocation,
+    std::uint64_t directDispatchSnapshotToken) const noexcept {
+    if (directDispatchSnapshotToken == 0)
+        return false;
+    const auto current = nonindexed_direct_dispatch_readiness(
+        expectedContext, expectedDevice, identity, cacheSnapshotToken,
+        slotSnapshotToken, objectSnapshotToken, layout,
+        inputLayoutSnapshotToken, constantStateSnapshotToken,
+        constantPayloadSnapshotToken, constantBindingSnapshotToken,
+        pipelineBindingSnapshotToken, primitiveType,
+        topologyBindingSnapshotToken, vertexBuffer,
+        vertexBufferSnapshotToken, vertexStride, vertexOffset,
+        nonIndexedGeometryBindingSnapshotToken,
+        primitiveCount, startVertexLocation);
+    return current.ready &&
+           current.snapshotToken == directDispatchSnapshotToken;
+}
+
 NativeFixedFunctionIndexedSourceRangeReadiness
 compose_fixed_function_indexed_source_range_readiness(
     D3DPRIMITIVETYPE primitive,

@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "b81c2281fc9b25e2c3d437baa1131714bf3c39ac",
+  "state_parent_head": "dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -2828,16 +2828,14 @@
     }
   ],
   "controller_dispatch": {
-    "task_id": "CONVERSION-DX11-00373",
+    "task_id": "CONVERSION-DX11-00374",
     "production_id": "CONVERSION-DX11-00373",
     "event_id": "CONVERSION-DX11-00373-E008",
     "event_type": "retry",
-    "attempt": "2/3",
+    "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE",
     "runtime_validation": "UNTESTED",
     "native_draw_path_activation_changed": false,
-    "rollover_is_retry": true,
-    "resume_reason": "No authoritative Backend Conversion Gate run was created for result SHA 1e12ad88f58eb8260d246654c00ea47062aa929b after 15296s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
     "dispatch_source": "CURRENT_USER_QUEUE"
   },
   "rollover_metadata_correction": {
@@ -2958,18 +2956,16 @@
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_dispatch_reconciliation": {
-    "task_id": "CONVERSION-DX11-00373",
+    "task_id": "CONVERSION-DX11-00374",
     "authoritative": {
-      "task_id": "CONVERSION-DX11-00373",
+      "task_id": "CONVERSION-DX11-00374",
       "production_id": "CONVERSION-DX11-00373",
       "event_id": "CONVERSION-DX11-00373-E008",
       "event_type": "retry",
-      "attempt": "2/3",
+      "attempt": "1/3",
       "source": "CURRENT_USER_QUEUE",
       "runtime_validation": "UNTESTED",
       "native_draw_path_activation_changed": false,
-      "rollover_is_retry": true,
-      "resume_reason": "No authoritative Backend Conversion Gate run was created for result SHA 1e12ad88f58eb8260d246654c00ea47062aa929b after 15296s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
       "dispatch_source": "CURRENT_USER_QUEUE"
     },
     "superseded": [
@@ -2992,9 +2988,22 @@
         "resume_reason": "Retry persisted after one recovery attempt",
         "source": "CURRENT_USER_QUEUE",
         "dispatch_source": "CURRENT_USER_QUEUE"
+      },
+      {
+        "task_id": "CONVERSION-DX11-00373",
+        "production_id": "CONVERSION-DX11-00373",
+        "event_id": "CONVERSION-DX11-00373-E008",
+        "event_type": "retry",
+        "attempt": "2/3",
+        "source": "CURRENT_USER_QUEUE",
+        "runtime_validation": "UNTESTED",
+        "native_draw_path_activation_changed": false,
+        "rollover_is_retry": true,
+        "resume_reason": "No authoritative Backend Conversion Gate run was created for result SHA 1e12ad88f58eb8260d246654c00ea47062aa929b after 15296s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
+        "dispatch_source": "CURRENT_USER_QUEUE"
       }
     ],
-    "reason": "E008 is an explicit retry at ATTEMPT=2/3 after a false missing-run timeout. R250 rendering work remains complete; this retry repairs exact-SHA Gate discovery and durable state.",
+    "reason": "CONVERSION-DX11-00374 is the newest explicit controller task. It consumes the completed 00373/E008 repair as predecessor evidence and starts a new ATTEMPT=1/3 for R251.",
     "material_and_validation_bearing_sha_unchanged": false
   },
   "current_retry": {
@@ -3006,6 +3015,16 @@
     "recovered_gate_conclusion": "success",
     "result_sha": null,
     "validation_bearing_result_sha": null,
+    "runtime_validation": "UNTESTED"
+  },
+  "current_task": {
+    "status": "VALIDATING",
+    "task_id": "CONVERSION-DX11-00374",
+    "selected_work_item": "DX11_R251_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS",
+    "base_sha": "dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7",
+    "result_sha": null,
+    "validation_bearing_result_sha": null,
+    "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED"
   }
 }

@@ -1,0 +1,97 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00374",
+  "production_id": "CONVERSION-DX11-00373",
+  "event_id": "CONVERSION-DX11-00373-E008",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "VALIDATING",
+  "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_marker": "[AUTO:CONVERSION-DX11-00374]",
+  "selected_work_item": "DX11_R251_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS",
+  "summary": "R251 adds a dormant fail-closed non-indexed programmable dispatch-argument receipt after R250. It revalidates the live R250 geometry binding, converts D3D9 primitive counts to the exact D3D11 vertex count, seals StartVertexLocation plus vertex byte range, rejects stale receipts/live IA drift/device-generation changes/overflow, and still does not issue Draw* or activate NativeDrawPath.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00374.json",
+    "docs/CONVERSION_LANE_STATE.json"
+  ],
+  "predecessor_recovery": {
+    "task_id": "CONVERSION-DX11-00373",
+    "repair_result_sha": "dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7",
+    "validation_run_id": 37219099066,
+    "validation_conclusion": "success",
+    "note": "00374 consumes the successful E008 exact-SHA Gate as C0 evidence; it does not repeat the R250 rendering implementation."
+  },
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT at dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7, read review index, AGENTS.md, queue contract and branch-local conversion state. Predecessor 00373 E008 repair Gate 37219099066 completed SUCCESS. New TASK_ID 00374 starts at ATTEMPT=1/3 while preserving the supplied PRODUCTION_ID/EVENT_ID lineage."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R250 seals the current non-indexed IA geometry binding but does not yet seal the exact Draw vertex-count/StartVertexLocation tuple or prove that the requested non-indexed vertex window fits the current managed vertex buffer. The smallest next pre-Draw boundary is therefore a dormant non-indexed dispatch-argument readiness receipt.",
+      "review_lenses": {
+        "architecture": "Add one R251 readiness/validator boundary only; no Draw*, render-target promotion or NativeDrawPath activation.",
+        "ownership_lifetime": "Recompute current R250 geometry readiness on every R251 observation and require the exact R250 snapshot plus current managed mirror generation.",
+        "stereo_correctness": "No WVP/projection/HUD/surface/OpenXR semantics change; runtime remains UNTESTED.",
+        "performance": "Dormant validation path only; no production hot-path work.",
+        "adversarial": "Fail closed on stale R250 snapshot, live IA drift, primitive-count overflow, out-of-range vertex windows and device-generation replacement."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderNonIndexedDirectDispatchReadiness plus cache readiness/snapshot validation, exact primitive-count translation, StartVertexLocation/byte-range proof, WARP regressions and source-graph guards."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING_EXACT_SHA_CI",
+      "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_MATERIAL_COMMIT",
+      "result_marker": "[AUTO:CONVERSION-DX11-00374]"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant programmable dispatch-argument readiness only; no runtime package or selector changed."
+    },
+    "C6_STATE": {
+      "status": "PENDING_VALIDATION",
+      "state_persisted": false,
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "After exact-SHA validation, persist R251 as the latest durable DX11 unit. Any successor should add indexed programmable dispatch/source-range readiness as a separate bounded unit and must still stop before Draw* routing or NativeDrawPath activation."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "Dormant DX11 programmable readiness and hosted probes only; no production renderer/transport/OpenXR path is activated or changed."
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00374",
+    "production_id": "CONVERSION-DX11-00373",
+    "event_id": "CONVERSION-DX11-00373-E008",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "dispatch_source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "After exact-SHA validation, persist R251 and then select indexed programmable dispatch/source-range readiness under a new TASK_ID; keep Draw*/NativeDrawPath dormant."
+}
