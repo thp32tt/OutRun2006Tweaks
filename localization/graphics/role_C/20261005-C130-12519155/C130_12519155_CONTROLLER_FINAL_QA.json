@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C130",
+  "timestamp_kst": "2026-10-05T05:10:24+09:00",
+  "scope": "latest unfinished handoff only: B_PRODUCTION44 12519155 mirror_y candidate; stale identity/rotate_180 C128/C129 intermediates are superseded and not approval evidence",
+  "candidate_changed_by_C": false,
+  "asset": "12519155",
+  "queue_index": 128,
+  "producer_run": "B_PRODUCTION44",
+  "candidate_sha256": "29a10497efcd82ebe6be7101ea9a4e0c830044992e7ffb9ac567d08dd9c444c8",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION44/B_PRODUCTION44_125_REPORT.json",
+  "machine_report": "localization/graphics/role_C/20261005-C130-12519155/C130_12519155_MACHINE_QA.json",
+  "machine_status": "PASS",
+  "machine_checks": {
+    "header_128_exact": true,
+    "bbox_and_size": "7/7 PASS with positive margins",
+    "raw_orientation": "mirror_y",
+    "stage_naming_policy": "PASS",
+    "clean_changed_pixels_outside_source_mask": 0,
+    "clean_rgb_changed_pixels": 0,
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "target_pixels_outside_original_bboxes": 0,
+    "target_mask_pixels_invisible_in_candidate": 0,
+    "machine_source_residue_pixels_outside_2px_target_guard": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_touch_pairs": []
+  },
+  "controller_visual_qa": "REWORK_REQUIRED",
+  "controller_visual_evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION44/B_PRODUCTION44_125_COMPARE.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION44/B_PRODUCTION44_125_ROW_CONTACT_2X.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION44/B_PRODUCTION44_125_RAW_COMPARE.jpg"
+  ],
+  "controller_visual_note": "Mirror-Y correction resolves the earlier orientation defect and SOURCE is now readable in canonical row order. However CLEAN and FINAL/white-background evidence retain visible thin source-effect/glyph-fringe fragments around all seven rows. These low-alpha remnants are visibly outside the intended Korean lettering despite the producer/machine source-mask counter reporting zero. Zero-residue visual policy therefore overrides machine PASS.",
+  "failed_rows": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "decision": "C130_REWORK_REQUIRED_SOURCE_EFFECT_RESIDUE",
+  "rework_instruction": "Return to B. Rebuild/expand exact-source effect masks and clean plate so all visible English/source-effect fringe is removed before rerender. Preserve current mirror_y transform, stage-name phonetic Hangul, exact source bboxes, positive margins, protected artwork, and zero-overlap constraints; then rerun B self-QA and independent C final QA.",
+  "global_rework_remaining": [
+    "12519155"
+  ],
+  "existing_high_risk_static_pass_assets": [
+    "1A43E9D9"
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94"
+  ],
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
