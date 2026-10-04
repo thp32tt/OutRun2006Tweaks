@@ -1,0 +1,21 @@
+{
+  "source_sha256": "4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b",
+  "candidate_sha256": "cc6727baac1b6946ae92cf5bc5568145c1d3ced2248f1fc134e9cc79c5f17149",
+  "bbox_and_size_pass": "4/4",
+  "changed_outside": 0,
+  "alpha_outside": 0,
+  "source_residue": 0,
+  "leftover_target_fill_pixels": {
+    "for_experts": 0,
+    "outrun2sp": 0,
+    "music_change": 0,
+    "time_remaining": 0
+  },
+  "preserved_source_changed_pixels": 0,
+  "protected_overlap": 0,
+  "two_px_guard_vs_preserved_conflicts": 0,
+  "new_pair_overlap_or_2px_guard_conflicts": 0,
+  "header_128_exact": true,
+  "raw_orientation": "mirror_y",
+  "status": "PASS"
+}
