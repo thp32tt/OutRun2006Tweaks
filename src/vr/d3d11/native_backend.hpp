@@ -1370,6 +1370,44 @@ struct NativeProgrammableShaderPipelineBindingReadiness {
     std::uint64_t snapshotToken{};
 };
 
+// R248 binds one exact directly-translatable D3D9 primitive topology after the
+// validated R247 programmable pipeline-object receipt. D3DPT_TRIANGLEFAN stays
+// fail-closed here because it requires the separate exact expansion/index path.
+// This receipt still does not issue Draw* or activate NativeDrawPath.
+struct NativeProgrammableShaderTopologyBindingReadiness {
+    bool inputValid{};
+    bool pipelineBindingReceiptReady{};
+    bool deviceMatches{};
+    bool contextDeviceMatches{};
+    bool pipelineBindingSnapshotMatches{};
+    bool topologyExact{};
+    bool topologyReceiptPresent{};
+    bool topologyMatches{};
+    bool bindingReady{};
+    std::uint64_t ownerGeneration{};
+    std::uint64_t slotGeneration{};
+    std::uint64_t translationObjectReceiptGeneration{};
+    std::uint64_t inputLayoutReceiptGeneration{};
+    std::uint64_t constantStateReceiptGeneration{};
+    std::uint64_t constantPayloadReceiptGeneration{};
+    std::uint64_t constantBindingReceiptGeneration{};
+    std::uint64_t pipelineBindingReceiptGeneration{};
+    std::uint64_t topologyBindingReceiptGeneration{};
+    std::uint64_t cacheKey{};
+    std::uint64_t inputLayoutIdentity{};
+    D3D11_PRIMITIVE_TOPOLOGY translatedTopology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    std::uint64_t cacheSnapshotToken{};
+    std::uint64_t slotSnapshotToken{};
+    std::uint64_t objectSnapshotToken{};
+    std::uint64_t inputLayoutSnapshotToken{};
+    std::uint64_t constantStateSnapshotToken{};
+    std::uint64_t constantPayloadSnapshotToken{};
+    std::uint64_t constantBindingSnapshotToken{};
+    std::uint64_t pipelineBindingSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;
@@ -1585,6 +1623,50 @@ public:
         std::uint64_t constantPayloadSnapshotToken,
         std::uint64_t constantBindingSnapshotToken,
         std::uint64_t pipelineBindingSnapshotToken) const noexcept;
+    bool bind_primitive_topology_for_observation(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken,
+        std::uint64_t constantPayloadSnapshotToken,
+        std::uint64_t constantBindingSnapshotToken,
+        std::uint64_t pipelineBindingSnapshotToken,
+        D3DPRIMITIVETYPE primitiveType) noexcept;
+    [[nodiscard]] NativeProgrammableShaderTopologyBindingReadiness
+    primitive_topology_binding_readiness(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken,
+        std::uint64_t constantPayloadSnapshotToken,
+        std::uint64_t constantBindingSnapshotToken,
+        std::uint64_t pipelineBindingSnapshotToken,
+        D3DPRIMITIVETYPE primitiveType) const noexcept;
+    [[nodiscard]] bool validate_primitive_topology_binding_snapshot(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken,
+        std::uint64_t constantPayloadSnapshotToken,
+        std::uint64_t constantBindingSnapshotToken,
+        std::uint64_t pipelineBindingSnapshotToken,
+        D3DPRIMITIVETYPE primitiveType,
+        std::uint64_t topologyBindingSnapshotToken) const noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
@@ -1628,6 +1710,10 @@ private:
         std::uint64_t constantBindingReceiptGeneration{};
         Microsoft::WRL::ComPtr<ID3D11DeviceContext> programmableBindingContext;
         std::uint64_t programmableBindingReceiptGeneration{};
+        Microsoft::WRL::ComPtr<ID3D11DeviceContext> topologyBindingContext;
+        D3D11_PRIMITIVE_TOPOLOGY boundPrimitiveTopology =
+            D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+        std::uint64_t topologyBindingReceiptGeneration{};
     };
 
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
@@ -1640,6 +1726,7 @@ private:
     std::uint64_t constant_payload_receipt_generation_counter_ = 0;
     std::uint64_t constant_binding_receipt_generation_counter_ = 0;
     std::uint64_t programmable_binding_receipt_generation_counter_ = 0;
+    std::uint64_t topology_binding_receipt_generation_counter_ = 0;
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88

@@ -3407,6 +3407,184 @@ int main()
             firstR247BindingSnapshot,
         "R247 same programmable pipeline binding is idempotent");
 
+    const auto r248UnboundTopology =
+        programmableCache.primitive_topology_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST);
+    require(
+        r248UnboundTopology.inputValid &&
+        r248UnboundTopology.pipelineBindingReceiptReady &&
+        r248UnboundTopology.deviceMatches &&
+        r248UnboundTopology.contextDeviceMatches &&
+        r248UnboundTopology.pipelineBindingSnapshotMatches &&
+        r248UnboundTopology.topologyExact &&
+        !r248UnboundTopology.topologyReceiptPresent &&
+        !r248UnboundTopology.bindingReady &&
+        r248UnboundTopology.topologyBindingReceiptGeneration == 0 &&
+        r248UnboundTopology.snapshotToken == 0 &&
+        !programmableCache.bind_primitive_topology_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            0, D3DPT_TRIANGLELIST),
+        "R248 pipeline-binding receipt must exist before topology binding");
+
+    require(
+        !programmableCache.bind_primitive_topology_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLEFAN),
+        "R248 triangle fan direct topology remains fail closed");
+
+    ID3D11DeviceContext* r248DeferredBeforeBinding = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateDeferredContext(
+            0, &r248DeferredBeforeBinding)) &&
+        r248DeferredBeforeBinding != nullptr &&
+        !programmableCache.bind_primitive_topology_for_observation(
+            r248DeferredBeforeBinding, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST),
+        "R248 non-immediate context cannot establish topology binding");
+    r248DeferredBeforeBinding->Release();
+
+    require(
+        programmableCache.bind_primitive_topology_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST),
+        "R248 exact translated primitive topology binding");
+    const auto r248TopologyReady =
+        programmableCache.primitive_topology_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST);
+    require(
+        r248TopologyReady.bindingReady &&
+        r248TopologyReady.topologyReceiptPresent &&
+        r248TopologyReady.topologyMatches &&
+        r248TopologyReady.topologyExact &&
+        r248TopologyReady.translatedTopology ==
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST &&
+        r248TopologyReady.topologyBindingReceiptGeneration != 0 &&
+        r248TopologyReady.snapshotToken != 0 &&
+        programmableCache.validate_primitive_topology_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken),
+        "R248 exact primitive topology binding receipt");
+    const auto firstR248ReceiptGeneration =
+        r248TopologyReady.topologyBindingReceiptGeneration;
+    const auto firstR248BindingSnapshot =
+        r248TopologyReady.snapshotToken;
+    require(
+        programmableCache.bind_primitive_topology_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST) &&
+        programmableCache.primitive_topology_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST).snapshotToken ==
+            firstR248BindingSnapshot,
+        "R248 same primitive topology binding is idempotent");
+
+    d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    const auto r248DriftedTopology =
+        programmableCache.primitive_topology_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST);
+    require(
+        r248DriftedTopology.topologyReceiptPresent &&
+        !r248DriftedTopology.topologyMatches &&
+        !r248DriftedTopology.bindingReady &&
+        !programmableCache.validate_primitive_topology_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            firstR248BindingSnapshot),
+        "R248 external topology drift invalidates topology binding receipt");
+    d3d.context->IASetPrimitiveTopology(
+        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
     d3d.context->PSSetShader(nullptr, nullptr, 0);
     const auto r247DriftedPipeline =
         programmableCache.pipeline_binding_readiness(
@@ -3585,6 +3763,21 @@ VSOutput main(VSInput input)
             firstR246BindingSnapshot,
             firstR247BindingSnapshot),
         "R247 device reinitialize invalidates pipeline-binding receipt");
+    require(
+        !programmableCache.validate_primitive_topology_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            firstR242ObjectSnapshot,
+            inputLayout,
+            firstR243InputLayoutSnapshot,
+            firstR244ConstantStateSnapshot,
+            firstR245PayloadSnapshot,
+            firstR246BindingSnapshot,
+            firstR247BindingSnapshot,
+            D3DPT_TRIANGLELIST,
+            firstR248BindingSnapshot),
+        "R248 device reinitialize invalidates topology-binding receipt");
     require(
         programmableCache.cache_for_observation(programmablePair),
         "R242 fresh cache generation prerequisite");
@@ -3857,6 +4050,66 @@ VSOutput main(VSInput input)
             r246FreshBindingReady.snapshotToken,
             r247FreshPipelineReady.snapshotToken),
         "R247 fresh device generation receives distinct pipeline-binding receipt");
+    require(
+        !programmableCache.bind_primitive_topology_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            r246FreshBindingReady.snapshotToken,
+            firstR247BindingSnapshot,
+            D3DPT_TRIANGLESTRIP),
+        "R248 stale pipeline-binding receipt cannot bind topology");
+    require(
+        programmableCache.bind_primitive_topology_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            r246FreshBindingReady.snapshotToken,
+            r247FreshPipelineReady.snapshotToken,
+            D3DPT_TRIANGLESTRIP),
+        "R248 fresh R247 receipt binds exact translated topology");
+    const auto r248FreshTopologyReady =
+        programmableCache.primitive_topology_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            r246FreshBindingReady.snapshotToken,
+            r247FreshPipelineReady.snapshotToken,
+            D3DPT_TRIANGLESTRIP);
+    require(
+        r248FreshTopologyReady.bindingReady &&
+        r248FreshTopologyReady.topologyReceiptPresent &&
+        r248FreshTopologyReady.topologyMatches &&
+        r248FreshTopologyReady.translatedTopology ==
+            D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP &&
+        r248FreshTopologyReady.topologyBindingReceiptGeneration !=
+            firstR248ReceiptGeneration &&
+        r248FreshTopologyReady.snapshotToken != firstR248BindingSnapshot &&
+        programmableCache.validate_primitive_topology_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            r246FreshBindingReady.snapshotToken,
+            r247FreshPipelineReady.snapshotToken,
+            D3DPT_TRIANGLESTRIP,
+            r248FreshTopologyReady.snapshotToken),
+        "R248 fresh device generation receives distinct topology-binding receipt");
     r244VertexConstants->Release();
     r244PixelConstants->Release();
 

@@ -3763,6 +3763,257 @@ bool NativeProgrammableShaderPairCache::validate_pipeline_binding_snapshot(
            current.snapshotToken == pipelineBindingSnapshotToken;
 }
 
+bool NativeProgrammableShaderPairCache::bind_primitive_topology_for_observation(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken,
+    D3DPRIMITIVETYPE primitiveType) noexcept {
+    const auto topology = translate_primitive(primitiveType);
+    if (!expectedContext || !expectedDevice || !topology.exact ||
+        topology.value == D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED ||
+        !validate_pipeline_binding_snapshot(
+            expectedContext, expectedDevice, identity, cacheSnapshotToken,
+            slotSnapshotToken, objectSnapshotToken, layout,
+            inputLayoutSnapshotToken, constantStateSnapshotToken,
+            constantPayloadSnapshotToken, constantBindingSnapshotToken,
+            pipelineBindingSnapshotToken))
+        return false;
+
+    const auto found = entries_.find(identity.cacheKey);
+    if (found == entries_.end())
+        return false;
+    auto& entry = found->second;
+    if (!entry.programmableBindingContext ||
+        entry.programmableBindingContext.Get() != expectedContext ||
+        entry.programmableBindingReceiptGeneration == 0)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext> immediateContext;
+    expectedContext->GetDevice(contextDevice.GetAddressOf());
+    expectedDevice->GetImmediateContext(immediateContext.GetAddressOf());
+    if (contextDevice.Get() != expectedDevice ||
+        immediateContext.Get() != expectedContext)
+        return false;
+
+    const bool bindingStarted =
+        entry.topologyBindingContext ||
+        entry.boundPrimitiveTopology != D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED ||
+        entry.topologyBindingReceiptGeneration != 0;
+    if (bindingStarted) {
+        if (entry.topologyBindingContext.Get() != expectedContext ||
+            entry.boundPrimitiveTopology != topology.value ||
+            entry.topologyBindingReceiptGeneration == 0)
+            return false;
+        D3D11_PRIMITIVE_TOPOLOGY current =
+            D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+        expectedContext->IAGetPrimitiveTopology(&current);
+        return current == entry.boundPrimitiveTopology;
+    }
+
+    expectedContext->IASetPrimitiveTopology(topology.value);
+    D3D11_PRIMITIVE_TOPOLOGY current =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    expectedContext->IAGetPrimitiveTopology(&current);
+    if (current != topology.value)
+        return false;
+
+    entry.topologyBindingContext = expectedContext;
+    entry.boundPrimitiveTopology = topology.value;
+    ++topology_binding_receipt_generation_counter_;
+    if (topology_binding_receipt_generation_counter_ == 0)
+        ++topology_binding_receipt_generation_counter_;
+    entry.topologyBindingReceiptGeneration =
+        topology_binding_receipt_generation_counter_;
+    return true;
+}
+
+NativeProgrammableShaderTopologyBindingReadiness
+NativeProgrammableShaderPairCache::primitive_topology_binding_readiness(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken,
+    D3DPRIMITIVETYPE primitiveType) const noexcept {
+    NativeProgrammableShaderTopologyBindingReadiness out{};
+    out.ownerGeneration = owner_generation_;
+    out.cacheKey = identity.cacheKey;
+    out.cacheSnapshotToken = cacheSnapshotToken;
+    out.slotSnapshotToken = slotSnapshotToken;
+    out.objectSnapshotToken = objectSnapshotToken;
+    out.inputLayoutSnapshotToken = inputLayoutSnapshotToken;
+    out.constantStateSnapshotToken = constantStateSnapshotToken;
+    out.constantPayloadSnapshotToken = constantPayloadSnapshotToken;
+    out.constantBindingSnapshotToken = constantBindingSnapshotToken;
+    out.pipelineBindingSnapshotToken = pipelineBindingSnapshotToken;
+    out.inputLayoutIdentity = hash_pipeline_input_layout_identity(layout);
+    const auto topology = translate_primitive(primitiveType);
+    out.topologyExact =
+        topology.exact &&
+        topology.value != D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    out.translatedTopology = topology.value;
+    out.inputValid =
+        expectedContext != nullptr && expectedDevice != nullptr &&
+        pipelineBindingSnapshotToken != 0 &&
+        out.inputLayoutIdentity != 0 &&
+        identity.exact_identity() && !identity.translationImplemented;
+
+    const auto pipeline = pipeline_binding_readiness(
+        expectedContext, expectedDevice, identity, cacheSnapshotToken,
+        slotSnapshotToken, objectSnapshotToken, layout,
+        inputLayoutSnapshotToken, constantStateSnapshotToken,
+        constantPayloadSnapshotToken, constantBindingSnapshotToken);
+    out.pipelineBindingReceiptReady = pipeline.bindingReady;
+    out.deviceMatches = pipeline.deviceMatches;
+    out.contextDeviceMatches = pipeline.contextDeviceMatches;
+    out.pipelineBindingSnapshotMatches =
+        pipeline.bindingReady &&
+        pipeline.snapshotToken == pipelineBindingSnapshotToken;
+    out.slotGeneration = pipeline.slotGeneration;
+    out.translationObjectReceiptGeneration =
+        pipeline.translationObjectReceiptGeneration;
+    out.inputLayoutReceiptGeneration =
+        pipeline.inputLayoutReceiptGeneration;
+    out.constantStateReceiptGeneration =
+        pipeline.constantStateReceiptGeneration;
+    out.constantPayloadReceiptGeneration =
+        pipeline.constantPayloadReceiptGeneration;
+    out.constantBindingReceiptGeneration =
+        pipeline.constantBindingReceiptGeneration;
+    out.pipelineBindingReceiptGeneration =
+        pipeline.pipelineBindingReceiptGeneration;
+
+    if (out.inputValid && out.pipelineBindingReceiptReady &&
+        out.deviceMatches && out.contextDeviceMatches &&
+        out.pipelineBindingSnapshotMatches && out.topologyExact) {
+        const auto found = entries_.find(identity.cacheKey);
+        if (found != entries_.end()) {
+            const auto& entry = found->second;
+            out.topologyBindingReceiptGeneration =
+                entry.topologyBindingReceiptGeneration;
+            out.topologyReceiptPresent =
+                entry.topologyBindingContext &&
+                entry.topologyBindingContext.Get() == expectedContext &&
+                entry.boundPrimitiveTopology == out.translatedTopology &&
+                out.topologyBindingReceiptGeneration != 0;
+            D3D11_PRIMITIVE_TOPOLOGY current =
+                D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+            expectedContext->IAGetPrimitiveTopology(&current);
+            out.topologyMatches =
+                current == out.translatedTopology &&
+                current == entry.boundPrimitiveTopology;
+        }
+    }
+
+    out.bindingReady =
+        out.inputValid && out.pipelineBindingReceiptReady &&
+        out.deviceMatches && out.contextDeviceMatches &&
+        out.pipelineBindingSnapshotMatches && out.topologyExact &&
+        out.topologyReceiptPresent && out.topologyMatches &&
+        out.ownerGeneration != 0 && out.slotGeneration != 0 &&
+        out.translationObjectReceiptGeneration != 0 &&
+        out.inputLayoutReceiptGeneration != 0 &&
+        out.constantStateReceiptGeneration != 0 &&
+        out.constantPayloadReceiptGeneration != 0 &&
+        out.constantBindingReceiptGeneration != 0 &&
+        out.pipelineBindingReceiptGeneration != 0 &&
+        out.topologyBindingReceiptGeneration != 0 &&
+        out.cacheKey != 0 && out.inputLayoutIdentity != 0;
+
+    if (out.bindingReady) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(this)));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedContext)));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedDevice)));
+        token = mix_readiness_snapshot_token(token, out.ownerGeneration);
+        token = mix_readiness_snapshot_token(token, out.slotGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.translationObjectReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.inputLayoutReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.constantStateReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.constantPayloadReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.constantBindingReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.pipelineBindingReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.topologyBindingReceiptGeneration);
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(token, out.inputLayoutIdentity);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(out.translatedTopology));
+        token = mix_readiness_snapshot_token(token, out.cacheSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.slotSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.objectSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.inputLayoutSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.constantStateSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.constantPayloadSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.constantBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.pipelineBindingSnapshotToken);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeProgrammableShaderPairCache::
+validate_primitive_topology_binding_snapshot(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken,
+    D3DPRIMITIVETYPE primitiveType,
+    std::uint64_t topologyBindingSnapshotToken) const noexcept {
+    if (topologyBindingSnapshotToken == 0)
+        return false;
+    const auto current = primitive_topology_binding_readiness(
+        expectedContext, expectedDevice, identity, cacheSnapshotToken,
+        slotSnapshotToken, objectSnapshotToken, layout,
+        inputLayoutSnapshotToken, constantStateSnapshotToken,
+        constantPayloadSnapshotToken, constantBindingSnapshotToken,
+        pipelineBindingSnapshotToken, primitiveType);
+    return current.bindingReady &&
+           current.snapshotToken == topologyBindingSnapshotToken;
+}
+
 void NativeProgrammableShaderPairCache::shutdown() noexcept {
     entries_.clear();
     device_.Reset();

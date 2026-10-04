@@ -9742,6 +9742,53 @@ def main() -> None:
             + ", ".join(missing_r247_programmable_pipeline_binding_receipt)
         )
 
+    r248_programmable_topology_binding_receipt_contract = [
+        ("struct NativeProgrammableShaderTopologyBindingReadiness",
+         NATIVE_BACKEND_HPP, "R248 programmable topology-binding readiness type"),
+        ("bind_primitive_topology_for_observation(",
+         NATIVE_BACKEND_HPP, "R248 topology binding declaration"),
+        ("primitive_topology_binding_readiness(",
+         NATIVE_BACKEND_HPP, "R248 topology readiness declaration"),
+        ("validate_primitive_topology_binding_snapshot(",
+         NATIVE_BACKEND_HPP, "R248 topology snapshot validation declaration"),
+        ("topologyBindingReceiptGeneration",
+         NATIVE_BACKEND_HPP, "R248 per-entry topology receipt generation"),
+        ("translate_primitive(primitiveType)",
+         NATIVE_BACKEND_CPP, "R248 exact D3D9 primitive translation gate"),
+        ("expectedContext->IASetPrimitiveTopology(topology.value)",
+         NATIVE_BACKEND_CPP, "R248 exact IA topology binding"),
+        ("expectedContext->IAGetPrimitiveTopology(&current)",
+         NATIVE_BACKEND_CPP, "R248 IA topology readback gate"),
+        ("pipeline-binding receipt must exist before topology binding",
+         CONSTANT_BUFFER_PROBE, "R248 validated R247 prerequisite"),
+        ("triangle fan direct topology remains fail closed",
+         CONSTANT_BUFFER_PROBE, "R248 triangle-fan direct bind rejection"),
+        ("non-immediate context cannot establish topology binding",
+         CONSTANT_BUFFER_PROBE, "R248 context regression"),
+        ("exact primitive topology binding receipt",
+         CONSTANT_BUFFER_PROBE, "R248 exact topology binding regression"),
+        ("same primitive topology binding is idempotent",
+         CONSTANT_BUFFER_PROBE, "R248 idempotence regression"),
+        ("external topology drift invalidates topology binding receipt",
+         CONSTANT_BUFFER_PROBE, "R248 topology drift regression"),
+        ("device reinitialize invalidates topology-binding receipt",
+         CONSTANT_BUFFER_PROBE, "R248 device-generation invalidation regression"),
+        ("stale pipeline-binding receipt cannot bind topology",
+         CONSTANT_BUFFER_PROBE, "R248 stale R247 regression"),
+        ("fresh device generation receives distinct topology-binding receipt",
+         CONSTANT_BUFFER_PROBE, "R248 fresh receipt regression"),
+    ]
+    missing_r248_programmable_topology_binding_receipt = [
+        meaning for token, source, meaning
+        in r248_programmable_topology_binding_receipt_contract
+        if token not in source
+    ]
+    if missing_r248_programmable_topology_binding_receipt:
+        raise SystemExit(
+            "DX11 R248 programmable topology-binding receipt drift: "
+            + ", ".join(missing_r248_programmable_topology_binding_receipt)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
