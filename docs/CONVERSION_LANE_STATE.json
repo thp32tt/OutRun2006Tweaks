@@ -192,7 +192,7 @@
     "result_sha": "f50232515d2247c7279ca33e5ea14eecc7326036",
     "validation_bearing_result_sha": "f50232515d2247c7279ca33e5ea14eecc7326036",
     "proof_status": "EXACT_1839CD_TO_183A0C_CONTROL_FLOW_WITH_183A0C_CUT_EDGE_PROVEN",
-    "provenance_status": "EXACT_1839CD_TO_183A0C_CONTROL_FLOW_WITH_183A0C_CUT_EDGE_PROVEN",
+    "provenance_status": "EXACT_EXE_1839CD_TO_183A0D_PROVENANCE_CAPTURED",
     "validated_start_rva": "0x001839CD",
     "complete_instruction_end_rva": "0x00183A0C",
     "capture_end_rva": "0x00183A0D",
