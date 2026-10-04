@@ -1393,3 +1393,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Index 220 -> `b65_self_qa_pass_pending_c`; pending_artwork localize_text=34. Independent C final QA and in-game validation remain pending.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION63/B63_DXT5_FAIL_CLOSED.json`, `localization/graphics/role_B/20261005-B-PRODUCTION65/B65_D657_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION65/B65_CONTROLLER_SELF_QA.json`.
+
+## 2026-10-05 08:57:38 KST — C142 D657C2EB B65 final PASS
+- Reviewed only the new B_PRODUCTION65 index 220 `D657C2EB_512x128.dds`; C141-and-earlier completed PASS assets were not repeated.
+- Hosted C independently pinned the canonical 2048x512 RGBA32/BGRA source and atlas, re-derived seven exact source-alpha regions and confirmed the duplicate physical `TIME ATTACK` occurrence. No canonical visible source pixels remain unclassified.
+- B65 CLEAN matches C's independent exact transparent reconstruction by 0 pixels. Candidate `6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5` preserves the exact 128-byte header and raw `mirror_y`; 7/7 bbox containment, source-size ceiling and positive margins PASS; final outside=0, alpha-outside=0, protected=0, render-outside-target=0, source residue=0, overlap=0, touch=0.
+- Controller SOURCE/CLEAN/FINAL, per-row contacts and raw mirror_y review PASS for `타임 어택 / 코스트 2 코스트 / 하트 어택 / 타임 어택 / 아웃런 / 게임 초대 보내기 / 친구 삭제`. Red, gray and small dark source-style groups remain distinct; no visible English residue, clipping, overlap, seam, halo or orientation regression.
+- Decision: `C142_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Candidate unchanged by C. Producer REWORK=0; pending_artwork localize_text=34.
+- B63 index 152 `49BB5FE5` remains `HOLD_STRICT_RECHECK_DXT5_DECODED_PIXEL_GATE` with no candidate; together with `4F68708E` and `F6811E94` it is a strict no-candidate HOLD. Existing `1A43E9D9` remains HIGH_RISK pending mandatory in-game validation.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C142-D657C2EB/C142_D657_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C142-D657C2EB/C142_D657_MACHINE_QA.json`.

@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C142-D657C2EB",
+  "timestamp_kst": "2026-10-05T08:57:38+09:00",
+  "queue_index": 220,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+  "scope": "new B_PRODUCTION65 handoff only; C141-and-earlier completed PASS assets not repeated",
+  "producer_run": "20261005-B-PRODUCTION65",
+  "source_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+  "candidate_sha256": "6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5",
+  "candidate_changed_by_C": false,
+  "semantic_binding": {
+    "physical_regions": 7,
+    "labels": [
+      "타임 어택",
+      "코스트 2 코스트",
+      "하트 어택",
+      "타임 어택",
+      "아웃런",
+      "게임 초대 보내기",
+      "친구 삭제"
+    ],
+    "duplicate_physical_occurrence": "TIME ATTACK x2"
+  },
+  "independent_machine_qa": {
+    "report": "localization/graphics/role_C/20261005-C142-D657C2EB/C142_D657_MACHINE_QA.json",
+    "status": "PASS",
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "unclassified_visible_source_pixels": 0,
+    "producer_clean_exact_diff_pixels": 0,
+    "bbox_size_positive_margin": "7/7 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": []
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "red_family": "PASS_SHARED_HEAVY_RED_SOURCE_STYLE",
+    "gray_family": "PASS_SHARED_GRAY_SOURCE_STYLE",
+    "small_family": "PASS_SHARED_SMALL_DARK_SOURCE_STYLE",
+    "english_source_residue": "NONE_VISIBLE",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "seam_or_halo": "NONE_VISIBLE",
+    "orientation_regression": "NONE_VISIBLE"
+  },
+  "decision": "C142_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "producer_rework_remaining": 0,
+  "pending_artwork_localize_text": 34,
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94",
+    "49BB5FE5"
+  ],
+  "high_risk_static_pass_assets_existing": [
+    "1A43E9D9"
+  ],
+  "in_game_validation": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
