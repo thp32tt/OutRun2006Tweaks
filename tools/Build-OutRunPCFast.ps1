@@ -156,7 +156,7 @@ foreach ($marker in @(
     'VR R13: stereo hardening ACTIVE',
     'VR R64 D3DX ISOLATE: projected-rank + DispRank-owned ScreenHud post-Draw Flush ACTIVE',
     'VR R66 OPTION ARROW: exact node pinned',
-    'VR R66 GOAL TIME HUD:',
+    'VR R121 GOAL TIME HUD: shared producer-map',
     'VR R69 FLARE FIX: exact projected-screen effect uses centre-eye mono fusion in both eyes'
 )) {
     if (-not $gameAscii.Contains($marker)) {
