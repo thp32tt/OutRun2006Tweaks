@@ -1,3 +1,5 @@
+[Reading 995 lines from start (total: 995 lines, 0 remaining)]
+
 #!/usr/bin/env python3
 """Extract DX11 native-backend census evidence from one OutRun VR session."""
 
@@ -387,6 +389,7 @@ def main() -> int:
     startup: list[dict] = []
     bootstrap: list[dict] = []
     bootstrap_skipped: list[dict] = []
+    bootstrap_outcomes: list[dict] = []
     summaries: list[dict] = []
     # R225: runtime signature ids are insertion-order ordinals and restart for
     # every process. Scope every detail/evidence record by source log so two
@@ -447,6 +450,7 @@ def main() -> int:
                 }
                 bootstrap_entry["source_log"] = source_log
                 bootstrap.append(bootstrap_entry)
+                bootstrap_outcomes.append({"kind": "probe", **bootstrap_entry})
                 continue
 
             match = BOOTSTRAP_SKIP_RE.search(line)
@@ -458,6 +462,7 @@ def main() -> int:
                     "source_log": source_log,
                 }
                 bootstrap_skipped.append(bootstrap_skip_entry)
+                bootstrap_outcomes.append({"kind": "skip", **bootstrap_skip_entry})
                 continue
 
             match = SUMMARY_RE.search(line)
@@ -648,9 +653,28 @@ def main() -> int:
     latest_bootstrap_skip_by_log: dict[str, dict] = {}
     for entry in bootstrap_skipped:
         latest_bootstrap_skip_by_log[entry["source_log"]] = entry
-    bootstrap_outcome_logs = set(latest_bootstrap_by_log) | set(
-        latest_bootstrap_skip_by_log
+    # R230: a source log may append multiple process sessions. Preserve the
+    # interleaved probe/skip order so stale earlier evidence cannot masquerade
+    # as the current outcome for that log. Historical per-kind maps remain
+    # available for provenance, while LatestBootstrapOutcomeByLog is the
+    # authoritative diagnostic view of the most recent observed outcome.
+    latest_bootstrap_outcome_by_log: dict[str, dict] = {}
+    for entry in bootstrap_outcomes:
+        latest_bootstrap_outcome_by_log[entry["source_log"]] = entry
+    latest_bootstrap_probe_logs = {
+        source_log
+        for source_log, entry in latest_bootstrap_outcome_by_log.items()
+        if entry["kind"] == "probe"
+    }
+    latest_bootstrap_skip_logs = {
+        source_log
+        for source_log, entry in latest_bootstrap_outcome_by_log.items()
+        if entry["kind"] == "skip"
+    }
+    bootstrap_outcome_history_conflict_logs = sorted(
+        set(latest_bootstrap_by_log) & set(latest_bootstrap_skip_by_log)
     )
+    bootstrap_outcome_logs = set(latest_bootstrap_outcome_by_log)
     all_source_logs_have_startup = bool(source_logs) and (
         len(latest_startup_by_log) == len(source_logs)
     )
@@ -660,15 +684,27 @@ def main() -> int:
     all_source_logs_have_bootstrap_outcome = bool(source_logs) and (
         len(bootstrap_outcome_logs) == len(source_logs)
     )
+    all_source_logs_latest_bootstrap_outcome_is_probe = bool(source_logs) and (
+        len(latest_bootstrap_probe_logs) == len(source_logs)
+    )
     startup_bootstrap_coverage = {
         "SourceLogs": len(source_logs),
         "LogsWithStartup": len(latest_startup_by_log),
         "LogsWithBootstrap": len(latest_bootstrap_by_log),
         "LogsWithBootstrapSkip": len(latest_bootstrap_skip_by_log),
         "LogsWithBootstrapOutcome": len(bootstrap_outcome_logs),
+        "LogsWithLatestBootstrapProbe": len(latest_bootstrap_probe_logs),
+        "LogsWithLatestBootstrapSkip": len(latest_bootstrap_skip_logs),
+        "LogsWithBootstrapOutcomeHistoryConflict": len(
+            bootstrap_outcome_history_conflict_logs
+        ),
+        "BootstrapOutcomeHistoryConflictLogs": bootstrap_outcome_history_conflict_logs,
         "AllSourceLogsHaveStartup": all_source_logs_have_startup,
         "AllSourceLogsHaveBootstrap": all_source_logs_have_bootstrap,
         "AllSourceLogsHaveBootstrapOutcome": all_source_logs_have_bootstrap_outcome,
+        "AllSourceLogsLatestBootstrapOutcomeIsProbe": (
+            all_source_logs_latest_bootstrap_outcome_is_probe
+        ),
         "AllSourceLogsHaveStartupAndBootstrap": bool(
             all_source_logs_have_startup and all_source_logs_have_bootstrap
         ),
@@ -933,9 +969,11 @@ def main() -> int:
         "Startup": startup,
         "Bootstrap": bootstrap,
         "BootstrapSkipped": bootstrap_skipped,
+        "BootstrapOutcomes": bootstrap_outcomes,
         "LatestStartupByLog": latest_startup_by_log,
         "LatestBootstrapByLog": latest_bootstrap_by_log,
         "LatestBootstrapSkipByLog": latest_bootstrap_skip_by_log,
+        "LatestBootstrapOutcomeByLog": latest_bootstrap_outcome_by_log,
         "StartupBootstrapCoverage": startup_bootstrap_coverage,
         "LatestSummary": latest,
         "LatestSummariesByLog": latest_summaries_by_log,
@@ -957,3 +995,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
