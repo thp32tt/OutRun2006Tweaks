@@ -1,0 +1,150 @@
+{
+  "task_id": "CONVERSION-DXVK-00199",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "a0a369b48c53d833cd493463d5d10c38aa602cf3",
+  "result_sha": "ef199e1f3f842046f8854032d7b2c3f7506b87b1",
+  "validation_bearing_result_sha": "ef199e1f3f842046f8854032d7b2c3f7506b87b1",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R199_182391_FRESH_PROVENANCE",
+  "selection_reason": "CONVERSION-DXVK-00197 exact-decoded through exclusive end 0x182391 and explicitly named fresh exact bytes there as the next independent F13 task. A 96-byte capture includes local forward targets 0x18239F and 0x1823AC without requiring semantic interpretation.",
+  "summary": "ATTEMPT=1 complete. Exact result ef199e1f captures 96 fresh .text bytes from 0x182391 through exclusive end 0x1823F1, covering previously decoded forward targets 0x18239F and 0x1823AC. The capture starts with a9, records four raw outbound rel32 candidates, and preserves all included target addresses as bytes-only evidence without boundary/function/semantic promotion. Backend Conversion Gate, Build, HUD Inspector, OpenXR 6/6 and Hosted Package push/PR passed. No Quest 3/VDXR or in-game test was performed.",
+  "evidence": [
+    "Validation-bearing result ef199e1f3f842046f8854032d7b2c3f7506b87b1 contains analyzer, verifier and run record together, includes [AUTO:CONVERSION-DXVK-00199], and has no CI-skip directive.",
+    "Backend Conversion Gate 36806037996 PASS; validate job 110190468521; artifact 11138006176 digest sha256:5cedfb77d94d40ef4fa8a05ebeea223dd5f5821b9e841f93217023ee4b3254ce.",
+    "HUD Inspector 36806041686 PASS. Static job 110190479897 emitted EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED with predecessor_exact=True, section=.text, probe_len=96, probe_end=0x001823F1, first_byte=a9, targets_in_window=True, inbound_raw=0 and outbound_raw=4.",
+    "Captured target snapshots: 0x182391=a9 ff ff 0f 00 75 f2 83; 0x18239F=dd d8 db 2d f0 60 73 00; 0x1823AC=83 3d 64 fa 85 00 00 0f. These are bytes-only observations; no target boundary/function status is promoted.",
+    "Raw outbound rel32 candidates in the new window are 0x1823C4->0x188877, 0x1823D6->0x188948, 0x1823DB->0x1823ED and 0x1823E8->0x188905.",
+    "HUD analysis artifact 11137607241 digest sha256:49e1f1da20d915115e46875647f94af64b5d4b8ed826b6e82cd7203cd76a89f3; HUD inspector game artifact 11137432945 digest sha256:e301d36a70100fd0868a7ef1586139e45cf8d8edfb5e42aa5ae394be91837893.",
+    "Build 36806041636 PASS; binary artifact 11138130937 digest sha256:9d1c50926c581589dcbe955f9448de0978e9504d608741d1bfe0bf08fa050cc5.",
+    "OpenXR 36806041663 PASS 6/6; host artifact 11138220136 digest sha256:80ef6c274b41461a4d0b0e16ea60d64dc06e0c96ab14985fde3bbe835df48a97.",
+    "Hosted Package push 36806037956 PASS artifact 11137921560 digest sha256:d2ba2166078e89fa8783847ed6ebccbe8c7ead3dfdc18267e697a865fec528a4; PR 36806041642 PASS artifact 11137339517 digest sha256:61b946e9e2de5a40abf860ee8edc3521c21e2544c311fef6758dee36ce10c292.",
+    "VR PC Fast Test Build 36806037978 was SKIPPED by branch policy and is not runtime validation.",
+    "No Quest 3 / VDXR or in-game execution was performed; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00199.json"
+  ],
+  "proof_contract": {
+    "predecessor_status": "EXACT_182331_TO_182391_CONTROL_FLOW_PREFIX_PROVEN",
+    "target_rva": "0x00182391",
+    "probe_len": 96,
+    "probe_end_rva": "0x001823F1",
+    "referenced_target_rvas": [
+      "0x00182391",
+      "0x0018239F",
+      "0x001823AC"
+    ],
+    "expected_status": "EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED",
+    "start_boundary_status": "UNRESOLVED_RAW_BYTES_ONLY",
+    "referenced_target_status": "BYTES_CAPTURED_BOUNDARIES_UNRESOLVED",
+    "function_entry_status": "UNRESOLVED_AT_182391_18239F_1823AC",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "ownership_effect": "NONE",
+    "continuation_scope": "RAW_BYTES_TARGET_BYTES_AND_REL32_CENSUS_ONLY",
+    "first_byte": "a9",
+    "first_16_bytes": "a9 ff ff 0f 00 75 f2 83 7c 24 08 00 75 eb dd d8",
+    "last_16_bytes": "c4 0c c3 8d 54 24 04 e8 18 65 00 00 52 9b d9 3c",
+    "referenced_target_bytes": {
+      "0x00182391": "a9 ff ff 0f 00 75 f2 83",
+      "0x0018239F": "dd d8 db 2d f0 60 73 00",
+      "0x001823AC": "83 3d 64 fa 85 00 00 0f"
+    },
+    "raw_inbound_rel32_candidate_count": 0,
+    "raw_outbound_rel32_candidate_count": 4,
+    "raw_outbound_rel32_candidates": [
+      "0x001823C4->0x00188877",
+      "0x001823D6->0x00188948",
+      "0x001823DB->0x001823ED",
+      "0x001823E8->0x00188905"
+    ]
+  },
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE_UNCHANGED",
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no renderer/provider/selector/package/transport/backend activation behavior changes.",
+    "ownership": "Fresh raw continuation bytes do not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Capture fails closed unless R197 remains exact through exclusive end 0x182391, the new probe starts exactly there in .text, all 96 bytes are available, its exclusive end is exactly 0x1823F1, and all referenced target RVAs are inside the new window. No target-boundary inference is permitted."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_182331_CONTROL_FLOW_PREFIX_PROVEN",
+    "after": "PARTIAL_PLUS_182391_TO_1823F1_PROVENANCE_CAPTURED",
+    "runtime_claim": false
+  },
+  "blocker": "Fresh exact bytes from 0x182391 through 0x1823F0 are now durable and include bytes at 0x18239F and 0x1823AC. However, 0x182391/0x18239F/0x1823AC instruction-boundary/function identities, the four raw rel32 candidate semantics and all render/HUD ownership remain unresolved until a separate exact decode.",
+  "next_action": "ATTEMPT=1 complete. Future independent F13 work may exact-decode the 0x182391 capture, using the newly captured target bytes and raw rel32 census, while keeping function-entry and render/HUD semantics unresolved until separately proven. Runtime remains UNTESTED.",
+  "validation": {
+    "result_sha": "ef199e1f3f842046f8854032d7b2c3f7506b87b1",
+    "automation_validation": "PASS",
+    "proof_status": "EXACT_EXE_182391_TO_1823F1_PROVENANCE_CAPTURED",
+    "proof_start_rva": "0x00182391",
+    "proof_probe_len": 96,
+    "proof_end_rva": "0x001823F1",
+    "proof_first_byte": "a9",
+    "proof_referenced_target_status": "BYTES_CAPTURED_BOUNDARIES_UNRESOLVED",
+    "proof_referenced_target_bytes": {
+      "0x00182391": "a9 ff ff 0f 00 75 f2 83",
+      "0x0018239F": "dd d8 db 2d f0 60 73 00",
+      "0x001823AC": "83 3d 64 fa 85 00 00 0f"
+    },
+    "proof_raw_inbound_rel32_candidate_count": 0,
+    "proof_raw_outbound_rel32_candidate_count": 4,
+    "proof_raw_outbound_rel32_candidates": [
+      "0x001823C4->0x00188877",
+      "0x001823D6->0x00188948",
+      "0x001823DB->0x001823ED",
+      "0x001823E8->0x00188905"
+    ],
+    "proof_function_entry_status": "UNRESOLVED_AT_182391_18239F_1823AC",
+    "proof_semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "proof_ownership_effect": "NONE",
+    "backend_conversion_gate_run_id": 36806037996,
+    "backend_conversion_gate_job_id": 110190468521,
+    "backend_conversion_gate_artifact_id": 11138006176,
+    "backend_conversion_gate_artifact_digest": "sha256:5cedfb77d94d40ef4fa8a05ebeea223dd5f5821b9e841f93217023ee4b3254ce",
+    "build_run_id": 36806041636,
+    "build_binary_artifact_id": 11138130937,
+    "build_binary_artifact_digest": "sha256:9d1c50926c581589dcbe955f9448de0978e9504d608741d1bfe0bf08fa050cc5",
+    "hud_inspector_run_id": 36806041686,
+    "hud_static_analysis_job_id": 110190479897,
+    "hud_analysis_artifact_id": 11137607241,
+    "hud_analysis_artifact_digest": "sha256:49e1f1da20d915115e46875647f94af64b5d4b8ed826b6e82cd7203cd76a89f3",
+    "hud_game_artifact_id": 11137432945,
+    "hud_game_artifact_digest": "sha256:e301d36a70100fd0868a7ef1586139e45cf8d8edfb5e42aa5ae394be91837893",
+    "openxr_run_id": 36806041663,
+    "openxr_jobs_passed": "6/6",
+    "openxr_host_artifact_id": 11138220136,
+    "openxr_host_artifact_digest": "sha256:80ef6c274b41461a4d0b0e16ea60d64dc06e0c96ab14985fde3bbe835df48a97",
+    "hosted_package_push_run_id": 36806037956,
+    "hosted_package_push_artifact_id": 11137921560,
+    "hosted_package_push_artifact_digest": "sha256:d2ba2166078e89fa8783847ed6ebccbe8c7ead3dfdc18267e697a865fec528a4",
+    "hosted_package_pr_run_id": 36806041642,
+    "hosted_package_pr_artifact_id": 11137339517,
+    "hosted_package_pr_artifact_digest": "sha256:61b946e9e2de5a40abf860ee8edc3521c21e2544c311fef6758dee36ce10c292",
+    "pc_fast_run_id": 36806037978,
+    "pc_fast_result": "SKIPPED",
+    "runtime_validation": "UNTESTED"
+  },
+  "source_commits": [
+    {
+      "sha": "ef199e1f3f842046f8854032d7b2c3f7506b87b1",
+      "message": "vr: capture 0x182391 continuation provenance [AUTO:CONVERSION-DXVK-00199]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ]
+}

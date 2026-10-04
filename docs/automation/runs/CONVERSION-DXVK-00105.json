@@ -1,0 +1,76 @@
+{
+  "task_id": "CONVERSION-DXVK-00105",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "base_sha": "fe4b6eb2804808414254df6085ba92bfd47d6885",
+  "result_sha": "c5470a810aae7b199781aef5b28f8258795f116d",
+  "validation_bearing_result_sha": "c5470a810aae7b199781aef5b28f8258795f116d",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R124_DISPGEARPOSITION_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "Advanced Set 04/F13 for the exact DispGearPosition/REV HUD callsites 0xB9096/0xB90B3/0xB90F6. Existing left-side sprite-spacing behavior is preserved, immediate next-draw ScreenHud ownership now derives from GameSemantic::ClassifyCriticalProducer(CallerRva), and compile-time assertions fail closed if any exact caller leaves the canonical ScreenHud range. The generic put_scroll_AdjustPositionLeft callback was removed because these were its only remaining users. No producer range, world/stereo path or unrelated HUD family was widened.",
+  "evidence": [
+    "All three callsites lie inside canonical DispGearPosition SCREEN_HUD range 0xB9000-0xB9200 in the shared disassembly producer catalog.",
+    "hooks_uiscaling.cpp preserves AddSpriteSpacing((int*)(ctx.esp + 4), true) before the shared producer-map ownership handoff.",
+    "render_semantics.hpp compile-time asserts 0xB9096, 0xB90B3 and 0xB90F6 classify as RenderScope::ScreenHud.",
+    "verify_vr_backend_disasm_contract.py requires all three R124 template instantiations and rejects any remaining put_scroll_AdjustPositionLeft legacy callback.",
+    "The same bounded pattern passed prior DX11 automation, but this DXVK result was independently validated on its own exact SHA.",
+    "Validation-bearing source result c5470a810aae7b199781aef5b28f8258795f116d contains [AUTO:CONVERSION-DXVK-00105] and no CI-skip directive.",
+    "Backend Conversion Gate 36650501754 PASS; artifact 11069934261 digest sha256:82ab1731f32bf724a48b98932e66f375c7e1b03394371cfc93f64325f80ab82b.",
+    "Build 36650505268 PASS.",
+    "OpenXR VR architecture 36650505300 PASS across all six jobs.",
+    "OutRun EXE HUD Inspector CI 36650505248 PASS across static analysis and inspector build.",
+    "VR Hosted Test Package push 36650501779 PASS and PR 36650505247 PASS.",
+    "VR PC Fast Test Build 36650501771 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "c5470a810aae7b199781aef5b28f8258795f116d",
+      "message": "vr: route gear REV HUD through shared producer map [AUTO:CONVERSION-DXVK-00105]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36650501754,
+    "backend_conversion_gate_result": "PASS",
+    "backend_conversion_gate_artifact_id": 11069934261,
+    "backend_conversion_gate_artifact_digest": "sha256:82ab1731f32bf724a48b98932e66f375c7e1b03394371cfc93f64325f80ab82b",
+    "build_run_id": 36650505268,
+    "build_result": "PASS",
+    "openxr_run_id": 36650505300,
+    "openxr_result": "PASS",
+    "openxr_jobs_passed": "6/6",
+    "hud_run_id": 36650505248,
+    "hud_result": "PASS",
+    "hosted_package_push_run_id": 36650501779,
+    "hosted_package_push_result": "PASS",
+    "hosted_package_pr_run_id": 36650505247,
+    "hosted_package_pr_result": "PASS",
+    "pc_fast_run_id": 36650501771,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "implementation_comment_id": 5901652930,
+    "validation_comment_id": 5901723537
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_C2CDONTLOSEGF_EXACT_EDGES",
+    "after": "PARTIAL_PLUS_DISPGEARPOSITION_EXACT_EDGES",
+    "runtime_claim": false
+  },
+  "blocker": "No software blocker remains for this bounded DispGearPosition F13 step. Visual/HMD behavior remains untested.",
+  "next_action": "Continue F13 only with another independently proven canonical producer sub-family. Exact PutGhostGapInfo callsite 0xBDE3A is a bounded next candidate already validated on the DX11 lane; preserve its conditional spacing behavior, leave 0xBDAE8 and the four GhostGap ForceLeft/Right sites unchanged for separate provenance, do not widen producer ranges, and keep runtime validation separate."
+}

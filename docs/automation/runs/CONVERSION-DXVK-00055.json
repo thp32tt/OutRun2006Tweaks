@@ -1,0 +1,106 @@
+{
+  "task_id": "CONVERSION-DXVK-00055",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 3,
+  "base_sha": "91ccca5992f1be0c243fd7d51f75f6f82bde33d2",
+  "result_sha": "e64f4c5acfd701e182b870171ee6e2085eeb49d4",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_01_02:F02_VARIANT_ID_NORMALIZATION",
+  "summary": "Closed the remaining DXVK one-click VariantId split by making VR_ONE_CLICK_TARGET.json::VariantId the canonical package/run identity across packaged backend metadata, BUILD_INPUTS and preflight validation.",
+  "selection_reason": "All higher-priority direct DXVK queue items were DONE or genuinely NEED_HMD_TEST. F02 remained a reproducible software-only identity gap on current HEAD and could be completed without hardware evidence.",
+  "changed_paths": [
+    "tools/Build-OutRunPCFast.ps1",
+    "tools/Test-OutRunVROneClickPreflight.ps1",
+    "tools/Test-OutRunVROneClickBehavior.ps1",
+    "tools/Test-VROneClickContract.ps1",
+    "tools/verify_dxvk_reactivation_contract.py",
+    "tools/verify_vr_proven_baseline.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "634ac6593f22e8ec982ee5814c9213dc1f9c35f7",
+      "message": "Normalize DXVK one-click variant identity [AUTO:CONVERSION-DXVK-00055]",
+      "validation_bearing": false,
+      "validation_result": "FAIL",
+      "failure_run_id": 36565147831,
+      "failure": "P9_PC_FAST_CONTRACT baseline verifier still required stale ACTIVE_R26_HUD_R69 literals."
+    },
+    {
+      "sha": "e64f4c5acfd701e182b870171ee6e2085eeb49d4",
+      "message": "Align baseline verifier with canonical DXVK variant [AUTO:CONVERSION-DXVK-00055]",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "behavior_verified": [
+    "VR_ONE_CLICK_TARGET.json::VariantId remains the protected canonical R69_FIXPACK one-click identity.",
+    "Build-OutRunPCFast.ps1 derives both packaged backend VARIANT_ID.txt values and BUILD_INPUTS VariantId from the canonical target instead of duplicating ACTIVE_R26_HUD_R69 or DXVK_SAFE_R71 literals.",
+    "Preflight rejects mismatched backends/d3d9 VARIANT_ID.txt, DXVK backend VARIANT_ID.txt and BUILD_INPUTS VariantId.",
+    "Test-OutRunVROneClickBehavior.ps1 behavior-tests both BUILD_INPUTS mismatch and DXVK backend-metadata mismatch.",
+    "The protected HMD baseline verifier now validates the source-of-truth relationship while still requiring canonical R69_FIXPACK.",
+    "No rendering, provider, DirectGPU, OpenXR, cadence or visual-placement behavior changed."
+  ],
+  "validation": {
+    "backend_conversion_gate_run_id": 36565326204,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36565333137,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36565333146,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36565333070,
+    "hud_result": "PASS",
+    "pc_fast_run_id": 36565326229,
+    "pc_fast_result": "SKIPPED",
+    "initial_failed_gate_run_id": 36565147831,
+    "initial_failure_class": "VERIFIER_DRIFT",
+    "dxvk_one_click_behavior": "PASS"
+  },
+  "regression_scope": {
+    "exact_risk_path_matches": [],
+    "note": "No changed file matched a docs/VR_REGRESSION_KNOWLEDGE.json riskPaths entry. This task changes package identity and validation only."
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5889808409,
+    "issue_14_repair_comment_id": 5889831204,
+    "issue_14_validation_comment_id": 5889954806,
+    "bookkeeping_correction_comment_id": 5889973784
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C1_SELECT_F02_VARIANT_ID_NORMALIZATION",
+    "C2_IMPLEMENT_CANONICAL_VARIANT_ID",
+    "C3_REPAIR_STALE_BASELINE_VERIFIER",
+    "C3_EXACT_SOURCE_VALIDATION_PASS",
+    "C4_RESULT_COMMIT",
+    "C4_5_LEDGER",
+    "C6_STATE"
+  ],
+  "blocker": "No software blocker remains for F02. Existing DXVK visual, host-owned DirectGPU transport and performance gates remain hardware-dependent.",
+  "next_action": "Do not reopen F02 unless package/preflight identity checks regress. Continue existing exact-build Quest3/VDXR DXVK visual, transport and performance validation; keep those runtime conclusions unproven until matching HMD evidence exists.",
+  "attempt_history": [
+    {
+      "attempt": 1,
+      "result": "FAIL",
+      "result_sha": "634ac6593f22e8ec982ee5814c9213dc1f9c35f7",
+      "validation_run_id": 36565147831,
+      "note": "Initial implementation exposed stale P9_PC_FAST_CONTRACT verifier literals before the new F02 behavior tests could run."
+    },
+    {
+      "attempt": 2,
+      "result": "REPAIR_VALIDATION_STARTED",
+      "result_sha": "e64f4c5acfd701e182b870171ee6e2085eeb49d4",
+      "validation_run_id": 36565326204,
+      "note": "Verifier drift repaired without weakening the canonical R69_FIXPACK baseline guard; exact-SHA CI launched."
+    },
+    {
+      "attempt": 3,
+      "result": "PASS",
+      "result_sha": "e64f4c5acfd701e182b870171ee6e2085eeb49d4",
+      "validation_run_id": 36565326204,
+      "note": "Resumed from the same validation-bearing result, consumed successful exact-SHA CI, and finalized durable bookkeeping without repeating the implementation."
+    }
+  ]
+}

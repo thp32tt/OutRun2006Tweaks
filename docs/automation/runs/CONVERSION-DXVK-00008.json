@@ -1,0 +1,202 @@
+{
+  "task_id": "CONVERSION-DXVK-00008",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "base_sha": "d76c5ba4895fbdcc865795f11a2404d1e18aaf17",
+  "result_sha": "27bd1e89bdac1d547bd9994eb5ea51901d08d81a",
+  "automation_validation": "PASS",
+  "runtime_validation": "FAILED",
+  "selected_work_item": "DXVK-CLEAN-PERFORMANCE-PROFILE",
+  "summary": "Selected the highest-priority runnable DXVK item after CONVERSION-DXVK-00006: clean performance-profile isolation. The runner now allows only dxvk-safe + PERFORMANCE to consume the canonical PERFORMANCE profile cadence policy, explicitly forces HudInspector=false for that path, disables OUTRUN_VR_SHADER_FINGERPRINT for that path, and records clean-performance/instrumentation state in RUN_OVERRIDES.txt. DXVK CORRECTNESS, DXVK multiview, D3D9 reference behavior and renderer/provider ownership are unchanged. The one-click contract now parses the profile library, validates the PERFORMANCE cadence arguments and verifies the DXVK SAFE clean-performance branch/instrumentation guards.",
+  "changed_paths": [
+    "tools/Run-OutRunVRTest.ps1",
+    "tools/Test-VROneClickContract.ps1"
+  ],
+  "source_commits": [
+    "b218211169bcdbde314c0bad9ac263b6eac7e2f6",
+    "375e75fbbfa3acc41552b1aeb1c25cf5177f5fc5",
+    "27bd1e89bdac1d547bd9994eb5ea51901d08d81a"
+  ],
+  "review": {
+    "architecture": "Scoped to runner/profile selection only; no renderer, provider, selector payload or vr-d3d9ex-focus mutation.",
+    "lifetime_sync": "No resource lifetime, fence, ACK, Reset or OpenXR ownership changes.",
+    "stereo_correctness": "CORRECTNESS stays on the pre-existing conservative non-D3D9 path; no visual ownership or stereo classification changes.",
+    "performance": "DXVK SAFE PERFORMANCE now uses profile-equivalent cadence and removes forced HUD inspector/shader fingerprint runtime instrumentation while retaining DXVK provider/version logging.",
+    "adversarial": "DXVK multiview is deliberately excluded from the clean-performance condition; no runtime-performance claim is made without Quest 3/VDXR evidence."
+  },
+  "regression_revalidation": [
+    "VR-STARTUP-WHITE-001: launch/profile configuration trigger; automatic checks required and HMD status remains UNTESTED.",
+    "VR-R50-FRAME-STABILITY-PRESERVE-001: cadence/pacing trigger; clean profile is methodology infrastructure only, not a performance verdict."
+  ],
+  "evidence": [
+    "C0 read current branch HEAD, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, VR durable state, Set 08/10 review evidence, prior CONVERSION-DXVK-00006 state, regression knowledge/history and production ledger.",
+    "Set 08 F27/F28/F29 and S08-R10 identify non-equivalent DXVK cadence plus forced HUD inspector/shader fingerprint as blockers to benchmark-grade evidence.",
+    "Prior task state leaves exactly two DXVK items: exact-build Quest 3/VDXR visual parity and DXVK-CLEAN-PERFORMANCE-PROFILE. The former is runtime-blocked, so the latter is the highest-priority runnable software item.",
+    "Run-OutRunVRTest.ps1 limits profile-equivalent launch to backend=dxvk-safe and TestProfile=PERFORMANCE. Other non-D3D9 paths retain the conservative policy.",
+    "PERFORMANCE clean mode explicitly appends -HudInspector=false, clears OUTRUN_VR_SHADER_FINGERPRINT, and records cleanDxvkPerformance/hudInspectorEnabled/shaderFingerprintEnabled.",
+    "Test-VROneClickContract.ps1 checks PERFORMANCE cadence arguments, rejects conservative cadence arguments and statically requires the DXVK SAFE-only clean-performance guards.",
+    "A post-commit self-review found interpolation-prone test literals under StrictMode; commit 27bd1e89bdac1d547bd9994eb5ea51901d08d81a corrects them before canonical CI validation.",
+    "Build workflow 36414470101 PASS on validation checkpoint d288dec167dc770db2ff2f2264b9781acded5929. Verify HMD-proven VR baseline, Verify one-click VR structure contract (including the new DXVK PERFORMANCE cadence/instrumentation assertions), backend disassembly contract, Win32 configure/build, payload verification and artifact uploads all succeeded.",
+    "OpenXR VR architecture 36414470068 PASS on the same checkpoint: host-x64 and all Win32 comparison jobs completed successfully.",
+    "OutRun EXE HUD Inspector CI 36414470078 PASS on the same checkpoint: PowerShell helper syntax, static EXE analysis and Win32 inspector build all succeeded.",
+    "Build artifact 10966778726 digest sha256:789d54575f5b9da9869c1838fa6b2a00978f055084dcbf62d8f741b50dc42060. No N100 clone/worktree, PC-fast runner, Quest 3, VDXR or in-game runtime test was used."
+  ],
+  "open_work_items": [
+    "DXVK-NATIVE-GPU-TRANSPORT-BYPASS-D3D9EX-SHARED-HANDLE",
+    "DXVK-HOST-XREND-FRAME-PACING",
+    "DXVK-EXACT-BUILD-QUEST3-VDXR-MAJOR-CHANGE-GATE"
+  ],
+  "next_action": "Stop cadence-only experiments. Implement a substantial DXVK-native GPU transport that bypasses the failing D3D9Ex shared-handle compatibility path (DXVK interop/Vulkan-to-shareable-D3D11 or equivalent), while preserving the known-good DXVK vehicle/menu rendering. Revisit host xrEndFrame pacing only with the new transport active. Hardware validation is blocked until that major change is built and CI-clean.",
+  "recorded_at": "2026-09-29T00:28:00+09:00",
+  "validation_checkpoint_sha": "d288dec167dc770db2ff2f2264b9781acded5929",
+  "review_checkpoint_commits": [
+    "9e3f4b6710db692ff01dcd09aa3ab4bbef7436f1",
+    "01717d9a9d10c3e3a94083601c32b47f45f6e72c"
+  ],
+  "completed_work_items": [
+    "DXVK-CLEAN-PERFORMANCE-PROFILE"
+  ],
+  "validation": {
+    "build_workflow_run_id": 36414470101,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36414470068,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36414470078,
+    "hud_result": "PASS",
+    "build_artifact_id": 10966778726,
+    "build_artifact_digest": "sha256:789d54575f5b9da9869c1838fa6b2a00978f055084dcbf62d8f741b50dc42060",
+    "openxr_host_artifact_id": 10966832738,
+    "openxr_host_artifact_digest": "sha256:f915a0845dcd2662c194b7b002c862f0e667d843303f6ce548c5457aa02bd8f0",
+    "hud_artifact_id": 10966798628,
+    "hud_artifact_digest": "sha256:b776c3fdaa217379463b12f5e68cd9b6767006d507b846dd35e203e22deabbf3"
+  },
+  "rollover_reviews": [
+    {
+      "chat_rollover": 4,
+      "attempt": 1,
+      "reviewed_head": "a06c3c29f64420be469220d7cea4517c67d0d232",
+      "review_status": "NO_NEW_RUNNABLE_SOFTWARE_WORK",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": [
+        "Recovered vr-dxvk-r71-disasm HEAD a06c3c29f64420be469220d7cea4517c67d0d232 directly from GitHub; no N100 clone/worktree was used.",
+        "Compared source result 27bd1e89bdac1d547bd9994eb5ea51901d08d81a through reviewed HEAD: four later commits changed only CONVERSION-DXVK-00008 run/review documentation; no renderer/runner/test source drift was introduced.",
+        "Reviewed-head workflows all completed successfully: Build 36415535914, OpenXR VR architecture 36415535854, OutRun EXE HUD Inspector CI 36415535922.",
+        "Reviewed-head Build artifact 10968180473 targets head_sha a06c3c29f64420be469220d7cea4517c67d0d232 and has digest sha256:ce5923daf3bae09241edfb9a52bbba15abf9b5a115f5868324a9aac3132360ec.",
+        "The only remaining task item is exact-build Quest 3/VDXR two-pass visual parity plus same-scene PERFORMANCE evidence; GitHub-only automation cannot satisfy that hardware/runtime gate."
+      ],
+      "next_action": "Keep DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY open. Do not repeat completed clean-performance implementation. When Quest 3/VDXR evidence is supplied, compare exact build identity, visual parity and same-scene PERFORMANCE evidence before any DXVK promotion or multiview work.",
+      "reviewed_at": "2026-09-28T22:12:00+09:00"
+    },
+    {
+      "chat_rollover": 5,
+      "attempt": 1,
+      "reviewed_head": "7f2ea3906af494bc634105a913f1004ad6dfceeb",
+      "review_status": "NO_NEW_RUNNABLE_SOFTWARE_WORK",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": [
+        "Recovered vr-dxvk-r71-disasm HEAD 7f2ea3906af494bc634105a913f1004ad6dfceeb directly from GitHub; no N100 clone/worktree was used.",
+        "Compared prior reviewed head a06c3c29f64420be469220d7cea4517c67d0d232 to 7f2ea3906af494bc634105a913f1004ad6dfceeb: exactly one commit changed only docs/automation/runs/CONVERSION-DXVK-00008.json; no renderer, runner, contract test or workflow source drift was introduced.",
+        "Current-head workflows completed successfully: Backend Conversion Gate 36427389875, Build 36427395440, OpenXR VR architecture 36427395425, and OutRun EXE HUD Inspector CI 36427395340. VR PC Fast Test Build 36427390112 was skipped as expected.",
+        "Current-head Backend Conversion Gate artifact 10972905863 targets 7f2ea3906af494bc634105a913f1004ad6dfceeb and has digest sha256:db563a1e4ed2a79bd84c95d96e1a840e2be74f188a962acd4f253f0fcaeb4859.",
+        "The only remaining task item is exact-build Quest 3/VDXR two-pass visual parity plus same-scene PERFORMANCE evidence; GitHub-only automation cannot satisfy that hardware/runtime gate."
+      ],
+      "next_action": "Keep DXVK-EXACT-BUILD-QUEST3-VDXR-TWO-PASS-VISUAL-PARITY open. Do not repeat completed clean-performance implementation. When Quest 3/VDXR evidence is supplied, compare exact build identity, visual parity and same-scene PERFORMANCE evidence before any DXVK promotion or multiview work.",
+      "reviewed_at": "2026-09-28T22:46:24.676+09:00"
+    }
+  ],
+  "runtime_failure": "Quest 3 / Virtual Desktop / VDXR: V7 45 Hz cadence experiment still measured about 30 fps in Virtual Desktop and remained severely stuttery. Vehicle-selection car rendering/color remained visually correct on DXVK. No further micro-profile or cadence-only hardware tests should be requested; next runtime request is gated on a substantial transport/render architecture change.",
+  "runtime_evidence": {
+    "exact_source_sha": "7f2ea3906af494bc634105a913f1004ad6dfceeb",
+    "hardware": "Quest 3 + Virtual Desktop + VDXR; RTX 4070",
+    "dxvk": "3.1.1 x86 stock d3d9.dll",
+    "correctness_result": "FAIL_HMD_PACING",
+    "performance_result": "FAIL_HMD_PACING_SAME_AS_CORRECTNESS",
+    "transport_observation": "DXVK census reports stock interop present but IDirect3DDevice9Ex unavailable; zero-copy cross-process sharing is unavailable and SBS/Desktop Duplication fallback remains active.",
+    "visual_observation": "DXVK menu vehicle color/shading was reported normal where the DX9Ex path showed abnormal vehicle color; treat this as a cross-backend differential clue, not yet a root-cause proof.",
+    "v3_manifest": "DXVKPERF-20260928T143942Z: PERFORMANCE_PLAIN_D3D9, PreferD3D9Ex=false, FramerateLimit=0, FrameCadenceMode=1, HudInspector=false.",
+    "diagnostic_limitation": "The manually compressed V3 session folder contained only session_manifest.json and OR2006C2C_d3d9.log, indicating the ad-hoc package runner did not reach its finally/collector stage before termination. This does not negate the user-observed pacing failure; it limits current V3 host-timing telemetry.",
+    "v4_session": "DXVKEXPERF-20260928T150149Z",
+    "v4_game_exit_code": 0,
+    "v4_d3d9ex_promotion": "PASS: same game-local DXVK provider exposes Direct3DCreate9Ex; CreateDevice promoted successfully; census D3D9Ex=1 stockHr=0 exHr=0.",
+    "v4_directgpu": "FAIL: host reports directSupported=1 but directReady=0; probe handle becomes non-zero but probeAck remains 0. Game reports direct frames=0 with SBS/Desktop Duplication fallback.",
+    "v4_dxvk_shared_handle_failure": "DXVK log reports Failed to open shared D3DKMT handle and Failed to write shared resource info for a texture while probing the shared D3D9 resource.",
+    "v4_pipeline": "Gameplay host telemetry commonly shows 34-36 ms XR frame intervals against an 11.111 ms display period, with xrEndFrame around 24-26 ms while capture/render CPU timings are sub-millisecond in the sampled intervals.",
+    "v4_visual": "Menu vehicle color/shading reported correct even after DXVK provider-local D3D9Ex promotion. Therefore the DX9Ex color regression is not caused by D3D9Ex promotion alone; native/system-provider compatibility/state differences remain a stronger suspect.",
+    "v4_user_result": "HMD stutter unchanged/severe; desktop presentation comparatively smooth."
+  },
+  "runtime_status_notes": [
+    "V4 closes the provider-local D3D9Ex question: DXVK 3.1.1 Create9Ex promotion works, but legacy D3D9 shared-handle DirectGPU interop does not become usable on this native Windows run.",
+    "DirectGPU failure is now transport-specific, not an Ex-promotion failure.",
+    "Vehicle selector color remains correct on DXVK with D3D9Ex=1, weakening the hypothesis that the common Ex promotion/state layer alone causes the DX9Ex color bug.",
+    "The HMD pacing failure persists because V4 remains on SBS/Desktop Duplication; sampled gameplay XR cadence is frequently around one frame per ~34-36 ms."
+  ],
+  "runtime_probe_candidate": {
+    "package": "OutRun2_VR_DXVK_D3D9EX_DIRECTGPU_TEST_7f2ea390_V4",
+    "source_sha": "7f2ea3906af494bc634105a913f1004ad6dfceeb",
+    "binary_payload_change": false,
+    "launch_delta": [
+      "PreferD3D9Ex=true",
+      "DirectGpuOnly=false",
+      "PERFORMANCE cadence retained",
+      "HudInspector=false"
+    ],
+    "rationale": [
+      "The branch IAT hook resolves Direct3DCreate9Ex from the same d3d9 provider that supplied Direct3DCreate9 and explicitly allows third-party provider-local Ex.",
+      "The pinned stock DXVK 3.1.1 x86 d3d9.dll exports Direct3DCreate9Ex.",
+      "A successful promotion can reuse the existing four-slot D3D9Ex-to-D3D11 zero-copy transport and is a smaller, better-isolated test than designing a new transport immediately.",
+      "The test also discriminates the DX9Ex vehicle-color issue: if color regresses only after provider-local Ex promotion, the Ex compatibility/state layer becomes the primary suspect."
+    ],
+    "collector_hardening": "V4 ad-hoc package uses a detached finalizer plus manual COLLECT_DXVK_EX_LOGS_NOW.cmd fallback so forced game termination can still seal logs and restore managed files."
+  },
+  "collector_fix": {
+    "package_revision": "V6",
+    "v4_observed_failure": "COLLECTOR_FAILURE.txt: System.Management.Automation.SessionStateUnauthorizedAccessException: Cannot overwrite variable Host because it is read-only or constant.",
+    "root_cause": "PowerShell variable names are case-insensitive. The portable collector assigned to $host, which collides with the built-in read-only $Host variable.",
+    "v5_status": "SUPERSEDED_UNTESTED: V5 still contained the same $host assignment, so the user was instructed not to test V5.",
+    "v6_fix": [
+      "Rename collector process variable from $host to $vrHostProcess; static check rejects any remaining assignment to $host.",
+      "Retain named cross-process mutex so crashed collectors do not leave a stale file lock.",
+      "Stage the completed session outside the source tree before Compress-Archive.",
+      "Run both detached watcher and synchronous post-game collection; mutex de-duplicates them.",
+      "Keep COLLECT_DXVK_EX_LOGS_NOW.cmd as a safe retry path for the same session.",
+      "Write COLLECTOR_SELFTEST.txt plus explicit GAME_EXIT_CODE and LOG_COLLECTION status."
+    ],
+    "v6_static_validation": "PASS",
+    "runtime_validation": "UNTESTED_FOR_COLLECTOR_V6"
+  },
+  "runtime_pacing_candidate": {
+    "package": "OutRun2_VR_DXVK_D3D9EX_45HZ_FALLBACK_TEST_7f2ea390_V7",
+    "source_sha": "7f2ea3906af494bc634105a913f1004ad6dfceeb",
+    "binary_payload_change": false,
+    "rationale": "V4 gameplay telemetry shows a 90 Hz XR period of 11.111 ms while actual stereo production fluctuates roughly 28-45 fps and sampled XR gameplay intervals are commonly 34-36 ms. Until DXVK native DirectGPU transport exists, fix the producer cadence at 45 Hz so the 90 Hz runtime sees an exact 2:1 ratio and the game avoids attempting an unsustainable 90 Hz stereo producer cadence.",
+    "launch_delta": [
+      "FrameCadenceTargetHz=45",
+      "PreferD3D9Ex=true",
+      "DirectGpuOnly=false",
+      "HudInspector=false"
+    ],
+    "collector": "V6 fixed collector included; PowerShell $Host collision removed.",
+    "runtime_validation": "UNTESTED"
+  },
+  "runtime_evidence_v7": {
+    "session_id": "DXVKEXPERF-20260928T152610Z",
+    "source_sha": "7f2ea3906af494bc634105a913f1004ad6dfceeb",
+    "requested_game_cadence_hz": 45,
+    "xr_runtime_hz": 90,
+    "user_observed_average_hmd_fps": "~30",
+    "direct_gpu": "NOT_READY",
+    "transport": "SBS/Desktop Duplication fallback",
+    "vehicle_selection_color": "PASS / normal",
+    "collector_v6": "PASS: automatic archive completed, no restore errors",
+    "collector_zip_sha256": "9948ecbd3eaf421ef7db3c9a52d8ffd84eefc3a25d79236fd9a26c788b1aa6c1",
+    "pipeline_observation": "Gameplay windows showed ~30-31 ms XR intervals with ~19-21 ms xrEndFrame cost despite capture itself typically staying sub-millisecond; DirectGPU probe handle was published but never acknowledged."
+  },
+  "test_request_policy": {
+    "effective_immediately": true,
+    "rule": "Do not request user hardware tests for cadence/profile/logging-only changes. Request the next Quest 3/VDXR test only after a substantial renderer/transport architecture change has been implemented, built, and automatically validated.",
+    "accepted_visual_baseline": "DXVK vehicle-selection car graphics/color are normal and should be treated as the comparison baseline."
+  }
+}

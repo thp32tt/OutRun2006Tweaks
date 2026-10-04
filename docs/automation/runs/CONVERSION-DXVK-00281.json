@@ -1,0 +1,16 @@
+{
+  "task_id": "CONVERSION-DXVK-00281",
+  "lane": "DXVK",
+  "branch": "vr-dxvk-r71-disasm",
+  "status": "RECOVERED_C0_C1",
+  "base_head_checked": "41027e1b5d38293aa9f420998736156672165841",
+  "previous_checkpoint": "2e78a6e90d3f18ede4926f11fc7eb542790b96d0",
+  "runtime_validation": "UNTESTED",
+  "actions": [
+    "Fetched branch conversion state",
+    "Confirmed GitHub-only constraints",
+    "Confirmed no existing durable record for TASK_ID",
+    "Did not claim implementation or runtime validation"
+  ],
+  "next_action": "Continue C2 implementation from bounded DXVK disassembly evidence window; do not replace evidence with state-only progress"
+}

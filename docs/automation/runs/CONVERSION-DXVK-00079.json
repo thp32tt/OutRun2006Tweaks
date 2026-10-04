@@ -1,0 +1,108 @@
+{
+  "task_id": "CONVERSION-DXVK-00079",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 2,
+  "controller_attempt": "2/3",
+  "chat_rollover": 0,
+  "base_sha": "f88477be77428b2d63da5a3aad36272907b5acac",
+  "initial_result_sha": "56a557c55fa12264d8784e8f0fae2ebb3ebb41f2",
+  "result_sha": "e0f6b1a044c31ac4e2e0edb437a98f92b5d26535",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_01:F04_STEREO_FACADE_MODULARIZATION_PHASE11_R29",
+  "summary": "Completed F04 phase 11 by extracting the unchanged R29 renderer/stereo implementation body into include-free stereo_renderer_r29_overlay.inc and changing the default production stereo facade to compose R26 plus the R29-R34 overlays directly. The initial exact-SHA Backend Conversion Gate exposed an ambiguity in the phase-11 facade verifier because the flattened facade contains two historical render_semantics include boundaries. The repair changed only the verifier to validate the R29 and R34 semantic boundaries explicitly; no runtime source changed in the repair.",
+  "evidence": [
+    "CONVERSION-DXVK-00077 explicitly left R29 -> R26 as the next bounded F04 stereo source-graph candidate.",
+    "Base f88477be77428b2d63da5a3aad36272907b5acac stereo_renderer_r29.cpp content from namespace OutRunVRRenderer through EOF equals result stereo_renderer_r29_overlay.inc after CRLF/LF and terminal-newline normalization: 571 lines / 24271 characters.",
+    "Initial result 56a557c55fa12264d8784e8f0fae2ebb3ebb41f2 failed Backend Conversion Gate 36612128177 only at Verify renderer facade modularization.",
+    "Failure logs showed the generic require_order helper selected the first render_semantics occurrence for a marker intended to represent the later R34 boundary. Phase 11 legitimately exposes the historical R29 semantic include before R29 overlay while retaining the existing later R34 semantic include.",
+    "Repair result e0f6b1a044c31ac4e2e0edb437a98f92b5d26535 changes only tools/verify_vr_facade_modularization.py. It requires R26 < first R29 semantic include < R29 overlay and R33 overlay < last R34 semantic include < R34 namespace, and requires both semantic boundaries to remain present.",
+    "Backend Conversion Gate 36612381231 PASS on exact result SHA, including facade phase-11 verification, semantic catalog, DXVK session/shared-handle/host-owned-transport/pinned-acquisition/SAFE/recenter checks, Win32 build, binary verification, and artifact upload.",
+    "Build 36612386735 PASS on exact result SHA.",
+    "OpenXR VR architecture 36612386604 PASS on exact result SHA across host-x64 and all five Win32 game/comparison jobs.",
+    "OutRun EXE HUD Inspector CI 36612386793 PASS on exact result SHA.",
+    "VR Hosted Test Package 36612386579 (PR) PASS and 36612381293 (push) PASS on exact result SHA.",
+    "VR PC Fast Test Build 36612381166 SKIPPED by policy.",
+    "No Quest3/VDXR or in-game execution was performed."
+  ],
+  "changed_paths": [
+    ".github/workflows/vr-openxr.yml",
+    "src/vr/d3d9/stereo_pipeline.cpp",
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "src/vr/d3d9/stereo_renderer_r29_overlay.inc",
+    "tools/verify_vr_architecture.py",
+    "tools/verify_vr_facade_modularization.py",
+    "tools/verify_vr_proven_baseline.py"
+  ],
+  "source_commits": [
+    {
+      "sha": "56a557c55fa12264d8784e8f0fae2ebb3ebb41f2",
+      "message": "Extract R29 stereo overlay from production facade [AUTO:CONVERSION-DXVK-00079]",
+      "role": "implementation_candidate",
+      "validation_bearing": false,
+      "ci_skip": false,
+      "validation_result": "FAIL",
+      "failure_run_id": 36612128177,
+      "failure_step": "Verify renderer facade modularization"
+    },
+    {
+      "sha": "e0f6b1a044c31ac4e2e0edb437a98f92b5d26535",
+      "message": "Fix phase 11 semantic include boundary guard [AUTO:CONVERSION-DXVK-00079]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "validation": {
+    "failed_backend_conversion_gate_run_id": 36612128177,
+    "failed_backend_conversion_gate_result": "FAIL",
+    "failed_backend_conversion_gate_step": "Verify renderer facade modularization",
+    "backend_conversion_gate_run_id": 36612381231,
+    "backend_conversion_gate_result": "PASS",
+    "build_workflow_run_id": 36612386735,
+    "build_result": "PASS",
+    "openxr_workflow_run_id": 36612386604,
+    "openxr_result": "PASS",
+    "hud_workflow_run_id": 36612386793,
+    "hud_result": "PASS",
+    "hosted_package_pr_run_id": 36612386579,
+    "hosted_package_pr_result": "PASS",
+    "hosted_package_push_run_id": 36612381293,
+    "hosted_package_push_result": "PASS",
+    "pc_fast_run_id": 36612381166,
+    "pc_fast_result": "SKIPPED"
+  },
+  "durable_ledger": {
+    "issue_14_implementation_comment_id": 5896177481,
+    "issue_14_repair_comment_id": 5896205720,
+    "issue_14_validation_comment_id": 5896336701
+  },
+  "regression_scope": {
+    "related": [
+      "VR_BACKEND_100_REVIEW_SET_01:F04",
+      "VR-STARTUP-WHITE-001",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R50-FRAME-STABILITY-PRESERVE-001"
+    ],
+    "note": "Source-graph and verifier ownership changed only. Exact-source equivalence and hosted compile/architecture/package guards passed. No runtime-visible correctness or performance claim is advanced without HMD evidence."
+  },
+  "completed_checkpoints": [
+    "C0_RECOVER",
+    "C0_READ_AGENTS_REVIEW_INDEX_QUEUE_CONTRACT_AND_STATE",
+    "C1_CONFIRM_F04_PHASE11_FROM_PRIOR_NEXT_ACTION",
+    "C2_EXTRACT_R29_OVERLAY_AND_FLATTEN_STEREO_FACADE",
+    "C3_EXACT_SOURCE_EQUIVALENCE_PASS",
+    "C4_INITIAL_RESULT_COMMIT",
+    "C3_INITIAL_GATE_FAIL_FACADE_DUPLICATE_SEMANTIC_MARKER",
+    "C2_REPAIR_PHASE11_FACADE_BOUNDARY_VERIFIER",
+    "C4_VALIDATION_BEARING_RESULT_COMMIT",
+    "C5_EXACT_SHA_AUTOMATION_VALIDATION_PASS",
+    "C6_STATE"
+  ],
+  "automatic_repairs_used": 1,
+  "blocker": "No software blocker remains for F04 phase 11. Runtime correctness remains unverified because no Quest3/VDXR or in-game test was performed.",
+  "next_action": "Treat the next deeper stereo historical include edge R26 -> R23 as a separate bounded F04 task. Preserve diagnostic comparison paths and dependencies, require exact-SHA automated validation, and do not claim runtime correctness without Quest3/VDXR evidence."
+}

@@ -1,0 +1,91 @@
+{
+  "task_id": "CONVERSION-DXVK-00263",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": 1,
+  "controller_attempt": "1/3",
+  "chat_rollover": 1,
+  "base_sha": "7af8ace4de5e8584fe5b4e3fc92a444f376ab371",
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "selected_work_item": "VR_BACKEND_100_REVIEW_SET_04:F13_R263_182569_FRESH_PROVENANCE_CAPTURE",
+  "selection_reason": "CONVERSION-DXVK-00261 exact-decoded the validated 0x00182529..0x00182569 window and proved that the decode ends exactly at 0x00182569 with no partial instruction bytes consumed. Its explicit next action is a fresh exact 64-byte canonical replacement-EXE .text provenance window beginning at 0x00182569 before any further decode or semantic promotion.",
+  "summary": "ATTEMPT=1 implementation staged. Extend canonical replacement-EXE provenance contiguously from the R261-proven exact instruction boundary at 0x00182569 through exclusive 0x001825A9. Record raw bytes plus inbound/outbound rel32 candidates only; do not promote function/callee/render/HUD/runtime semantics.",
+  "evidence": [
+    "C0 GitHub branch HEAD was 7af8ace4de5e8584fe5b4e3fc92a444f376ab371; GitHub branch state and Actions are the SSOT and no N100 clone/worktree is used.",
+    "CONVERSION-DXVK-00263.json was absent on the target branch before this task.",
+    "CONVERSION-DXVK-00261 status is COMPLETE_AUTOMATION_PASS_RUNTIME_UNTESTED and its proof contract reports EXACT_182529_TO_182569_CONTROL_FLOW_PREFIX_PROVEN with capture_end_is_instruction_boundary=true.",
+    "R263 adds a 64-byte raw provenance collector at 0x00182569 with exclusive end 0x001825A9 and exact contiguous predecessor-end identity.",
+    "No renderer/provider/selector/package/transport/runtime source is modified; runtime_validation remains UNTESTED."
+  ],
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DXVK-00263.json"
+  ],
+  "proof_contract": {
+    "predecessor_status": "EXACT_182529_TO_182569_CONTROL_FLOW_PREFIX_PROVEN",
+    "predecessor_provenance_status": "EXACT_EXE_182529_TO_182569_PROVENANCE_CAPTURED",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "start_rva": "0x00182569",
+    "probe_len": 64,
+    "probe_end_rva": "0x001825A9",
+    "prior_capture_end_rva": "0x00182569",
+    "expected_status": "EXACT_EXE_182569_TO_1825A9_PROVENANCE_CAPTURED",
+    "actual_status": "PENDING",
+    "predecessor_exact": "PENDING",
+    "target_section": ".text",
+    "starts_at_prior_capture_end": "PENDING",
+    "probe_end_match": "PENDING",
+    "extends_prior_capture": "PENDING",
+    "raw_inbound_rel32_count": "PENDING",
+    "raw_outbound_rel32_candidates": "PENDING",
+    "start_boundary_status": "R261_EXACT_CAPTURE_END_INSTRUCTION_BOUNDARY",
+    "function_entry_status": "UNRESOLVED_AT_182569_AND_FORWARD_BYTES",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "call_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE",
+    "continuation_scope": "RAW_BYTES_CONTIGUITY_AND_REL32_CENSUS_ONLY"
+  },
+  "runtime_claim": "NONE",
+  "runtime_source_changed": false,
+  "semantic_ownership_promoted": false,
+  "related_regression_key": "VR-DXVK-D3D9EX-SHARED-HANDLE-001",
+  "underlying_runtime_blocker_status": "ACTIVE_UNCHANGED",
+  "review_lenses": {
+    "architecture": "Analyzer/verifier proof only; backend/runtime activation behavior is unchanged.",
+    "ownership": "Fresh raw bytes and rel32 census do not infer ScreenHud/world/render ownership.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Proof fails closed unless R261 exact-boundary evidence remains present, predecessor provenance is exact, the new start equals the prior exclusive end, the probe is exactly 64 bytes in .text and the exclusive end is 0x001825A9."
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "EXACT_182529_TO_182569_CONTROL_FLOW_PREFIX_PROVEN",
+    "after": "PENDING_182569_FRESH_PROVENANCE_CAPTURE",
+    "runtime_claim": false
+  },
+  "blocker": "Automatic validation is pending. The 0x00182569..0x001825A9 window is intentionally raw provenance only; complete instruction boundaries and all semantics remain unresolved until a separate bounded exact-decode task consumes only complete instructions from the validated window.",
+  "next_action": "Run exact-source GitHub Actions validation. If PASS, finalize this record in a separate CI-skipped bookkeeping commit with the validation-bearing result SHA, exact captured bytes and workflow evidence. Runtime remains UNTESTED.",
+  "checkpoint": "C3_VALIDATE",
+  "status": "AUTOMATION_PENDING_RUNTIME_UNTESTED",
+  "source_commits": [
+    {
+      "sha": "36bc95c2e1ce7a10eb66d47e5c26519c0068f24c",
+      "message": "vr: stage 0x182569 provenance analyzer [AUTO:CONVERSION-DXVK-00263] [skip ci]",
+      "role": "staging",
+      "validation_bearing": false,
+      "ci_skip": true
+    },
+    {
+      "sha": "ac9c584495f8f7568fde0aa4a1893d8e6bbec86a",
+      "message": "vr: stage 0x182569 provenance verifier [AUTO:CONVERSION-DXVK-00263] [skip ci]",
+      "role": "staging",
+      "validation_bearing": false,
+      "ci_skip": true
+    }
+  ]
+}

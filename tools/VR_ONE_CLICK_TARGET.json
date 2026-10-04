@@ -1,0 +1,11 @@
+{
+  "SchemaVersion": 1,
+  "RendererTarget": "dxvk",
+  "LaunchBackend": "dxvk-safe",
+  "Stage": "R71-stock-dxvk-3.1.1-two-pass-parity-game-local-provider-verified",
+  "NativeDrawPathActive": false,
+  "VariantId": "R69_FIXPACK",
+  "MergeGate": "docs/VR_DX11_DXVK_BRANCH_POLICY.md",
+  "DxvkVersion": "3.1.1",
+  "DevelopmentBranch": "vr-dxvk-r71-disasm"
+}

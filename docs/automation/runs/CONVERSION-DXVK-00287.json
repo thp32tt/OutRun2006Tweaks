@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00287",
+  "production_id": "CONVERSION-DXVK-00287",
+  "event_id": "CONVERSION-DXVK-00287-E003",
+  "event_type": "rollover",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "base_sha": "2f9a64c08e5140bb14e9bd6ab5ced958feafd046",
+  "result_sha": "f50a32d1da951b7744261128f046e403099385fd",
+  "validation_bearing_result_sha": "f50a32d1da951b7744261128f046e403099385fd",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "summary": "Restored the DXVK continuation evidence validator contract by reintroducing the machine-readable validate(record) path, enforcing exact RVA-range/window-byte coverage, validating overlap and branch-target metadata fail-closed, and adding regression tests without promoting render/HUD/runtime semantics.",
+  "evidence": {
+    "changed_paths": [
+      "tools/verify_dxvk_continuation_window.py",
+      "tools/test_verify_dxvk_continuation_window.py"
+    ],
+    "material_commit_message": "fix: restore DXVK continuation evidence validator contract [AUTO:CONVERSION-DXVK-00287]",
+    "dxvk_canonical_disassembly_evidence": {
+      "run_id": 37120290388,
+      "conclusion": "success",
+      "exact_sha": "f50a32d1da951b7744261128f046e403099385fd",
+      "notable_steps": {
+        "static_disassembly_contract": "success",
+        "continuation_evidence_regression_tests": "success",
+        "canonical_window_extractor": "success",
+        "canonical_executable_identity": "success",
+        "canonical_executable_analysis": "success"
+      }
+    },
+    "backend_conversion_gate": {
+      "run_id": 37120290373,
+      "job_id": 111194916045,
+      "conclusion": "success",
+      "exact_sha": "f50a32d1da951b7744261128f046e403099385fd",
+      "notable_steps": {
+        "queue_automation_contract": "success",
+        "hmd_proven_baseline": "success",
+        "one_click_structure_contract": "success",
+        "package_sha256_integrity": "success",
+        "dxvk_one_click_behavior": "success",
+        "backend_disassembly_contract": "success",
+        "renderer_facade_modularization": "success",
+        "vr_semantic_catalog": "success",
+        "dxvk_session_analyzer": "success",
+        "shared_handle_failure_classification": "success",
+        "host_owned_transport_sync": "success",
+        "pinned_acquisition": "success",
+        "safe_reactivation_contract": "success",
+        "application_space_recenter_contract": "success",
+        "configure_win32": "success",
+        "build_win32": "success",
+        "verify_binary_exists": "success",
+        "upload_artifact": "success"
+      }
+    },
+    "auxiliary_n100_validation": {
+      "role": "auxiliary validation only; GitHub remains SSOT",
+      "exact_sha": "f50a32d1da951b7744261128f046e403099385fd",
+      "unittest_discovery": "6 tests PASS",
+      "git_diff_check": "PASS",
+      "py_compile": "PASS"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub HEAD, AGENTS.md, review index, queue contract and DXVK automation/state evidence."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Current material defect was the continuation evidence validator/test contract mismatch; HMD-only work remained runtime-dependent and was skipped."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added fail-closed machine-readable record validation and exact RVA-range/window-length enforcement plus focused regression coverage."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "evidence": "Exact-SHA DXVK canonical evidence workflow and Backend Conversion Gate both succeeded; auxiliary exact-SHA unit/static checks also passed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material result commit f50a32d1da951b7744261128f046e403099385fd contains exact marker [AUTO:CONVERSION-DXVK-00287] and no CI-skip directive."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Validator/test-only change; no runtime package content change requiring a task-owned package."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "evidence": "Durable schema-2 run record corrected to the authoritative rollover metadata. The validation-bearing material SHA remains f50a32d1da951b7744261128f046e403099385fd; RUNTIME_VALIDATION remains UNTESTED; current lane frontier is 0x001834A9..0x001834E9."
+    }
+  },
+  "next_action": "Exact-decode only complete canonical instructions in the validated continuation_74 raw window 0x001834A9..0x001834E9. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, carry unresolved forward-target debt fail-closed, and keep function/render/HUD/runtime semantics unresolved.",
+  "chat_rollover": 4,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+  "metadata_correction": {
+    "corrected_from": {
+      "production_id": "CONVERSION-DX11-00286",
+      "event_id": "CONVERSION-DX11-00286-E004",
+      "event_type": "retry"
+    },
+    "reason": "Authoritative rollover dispatch metadata from the active user request. This rollover is not a retry, so ATTEMPT remains 1/3.",
+    "material_result_unchanged": true
+  },
+  "issue14_comment_id": 5968814442,
+  "canonical_evidence": {
+    "exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "predecessor_proof_status": "EXACT_183469_TO_1834A9_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
+    "next_raw_provenance_status": "EXACT_EXE_1834A9_TO_1834E9_PROVENANCE_CAPTURED",
+    "next_window_start_rva": "0x001834A9",
+    "next_window_end_rva": "0x001834E9",
+    "runtime_validation": "UNTESTED",
+    "semantic_promotion": "NONE",
+    "ownership_effect": "NONE"
+  },
+  "exact_next_action": "Exact-decode only complete canonical instructions in the validated continuation_74 raw window 0x001834A9..0x001834E9. Resolve branch/call targets only from exact bytes, preserve any trailing partial instruction for mandatory overlap, carry unresolved forward-target debt fail-closed, and keep function/render/HUD/runtime semantics unresolved.",
+  "rollover_events": [
+    {
+      "event_id": "CONVERSION-DXVK-00287-E002",
+      "event_type": "rollover",
+      "chat_rollover": 3
+    },
+    {
+      "event_id": "CONVERSION-DXVK-00287-E003",
+      "event_type": "rollover",
+      "chat_rollover": 4,
+      "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
+    }
+  ]
+}

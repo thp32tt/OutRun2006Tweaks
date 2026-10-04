@@ -42,9 +42,64 @@ policy = require(
     "ClassifyPendingFence",
 )
 
-r32 = require(
+r30_wrapper = require(
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    '#include "stereo_renderer_r29.cpp"',
+    "#include <d3dcompiler.h>",
+    "#include <algorithm>",
+    "#include <array>",
+    "#include <memory>",
+    "#include <mutex>",
+    "#include <unordered_map>",
+    "#include <vector>",
+    '#include "stereo_renderer_r30_overlay.inc"',
+)
+if "namespace Settings" in r30_wrapper or "namespace OutRunVRStereo" in r30_wrapper:
+    raise SystemExit("R30 compatibility wrapper regained implementation body")
+r30 = require(
+    "src/vr/d3d9/stereo_renderer_r30_overlay.inc",
+    "namespace Settings",
+    "VRHudScale",
+    "namespace OutRunVRStereo",
+    "R30DrawPrimitiveR29Hook",
+    "state.depthTestEnabled &&",
+    "state.rhwDepthEvidence",
+    "R30CompositeSkyGlowBeforeHud",
+    "VR R30 HUD: ScreenSpace2D correction READY",
+)
+if "#include" in r30:
+    raise SystemExit("R30 overlay must remain include-free")
+
+r31_wrapper = require(
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    '#include "stereo_renderer_r30.cpp"',
+    '#include "stereo_renderer_r31_overlay.inc"',
+)
+if "namespace OutRunVRStereo" in r31_wrapper:
+    raise SystemExit("R31 compatibility wrapper regained implementation body")
+r31_overlay = require(
+    "src/vr/d3d9/stereo_renderer_r31_overlay.inc",
+    "R31StateBlockTrackingReliable",
+    "GetR28VerifiedProjection",
+    "R31 fast left-eye c64 rollback",
+    "R31 HUD left-eye c64 rollback",
+    "R31StateBlockResyncPending",
+    "R31FlushPendingStateBlockResync",
+    "VR R31 PERF: cached world stereo + draw-route telemetry READY",
+)
+if "#include" in r31_overlay:
+    raise SystemExit("R31 overlay must remain include-free")
+
+r32_wrapper = require(
     "src/vr/d3d9/stereo_renderer_r32.cpp",
+    '#include "r32_policy.hpp"',
     '#include "stereo_renderer_r31.cpp"',
+    '#include "stereo_renderer_r32_overlay.inc"',
+)
+if "namespace OutRunVRStereo" in r32_wrapper:
+    raise SystemExit("R32 compatibility wrapper regained implementation body")
+r32 = require(
+    "src/vr/d3d9/stereo_renderer_r32_overlay.inc",
     "R32ResetR22Hook",
     "reinterpret_cast<void*>(&ResetDestR22)",
     "R32ResetAfterGameReset",
@@ -70,6 +125,8 @@ r32 = require(
     "VR R32 PERF 5s",
     "VR R32 REVIEW2",
 )
+if "#include" in r32:
+    raise SystemExit("R32 overlay must remain include-free")
 if "R32ResetR13Hook" in r32:
     raise SystemExit("R32 must no longer install a competing ResetDestR13 hook")
 if "R22ShadowState = {};" in r32[r32.find("void R32ResetAfterGameReset"):]:
@@ -96,9 +153,15 @@ if min(issue_marker, issue_reject) < 0 or issue_reject < issue_marker:
     raise SystemExit(
         "R32 EVENT Issue failure must quarantine DirectGPU after queued eye copies")
 
-r33 = require(
+r33_wrapper = require(
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     '#include "stereo_renderer_r32.cpp"',
+    '#include "stereo_renderer_r33_overlay.inc"',
+)
+if "namespace OutRunVRStereo" in r33_wrapper:
+    raise SystemExit("R33 compatibility wrapper regained implementation body")
+r33 = require(
+    "src/vr/d3d9/stereo_renderer_r33_overlay.inc",
     "R31OwnedResult R33TryFastWorld",
     "R31OwnedResult R33TryHud",
     "R31ObserveDraw(device)",
@@ -110,6 +173,8 @@ r33 = require(
     "R33 -> R32 -> R22",
     "top-level telemetry counted once",
 )
+if "#include" in r33:
+    raise SystemExit("R33 overlay must remain include-free")
 if "const HRESULT hr = ResetDestR22" in r33:
     raise SystemExit("R33 must not bypass the corrected R32 Reset lifecycle")
 
@@ -151,7 +216,7 @@ bridge = require(
 )
 
 ex_r13 = require(
-    "src/vr/d3d9/ex_device_upgrade_r13.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r13_overlay.inc",
     "ResetCompatDevice",
     "deviceEx->ResetEx",
     "UpdateCompatPresentationState(device, params)",
@@ -169,7 +234,7 @@ if resetex < 0 or restore < resetex:
     raise SystemExit("authoritative R13 ResetEx path must replay classic state after successful ResetEx")
 
 ex_r15 = require(
-    "src/vr/d3d9/ex_device_upgrade_r15.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r15_overlay.inc",
     "SetFinalCompatOverlayReady(false)",
     "SetExternalSafetyBlock(true)",
     "SetExternalSafetyBlock(!healthy)",
@@ -254,7 +319,7 @@ if not (query_error < fault_generation < fast_gate):
     raise SystemExit("R32 host ACK fault must be recorded before the fast-submit generation gate")
 
 r34 = require(
-    "src/vr/d3d9/stereo_renderer_r34.cpp",
+    "src/vr/d3d9/stereo_renderer_r34_overlay.inc",
     "SetExternalSafetyBlock(true)",
     "SetExternalSafetyBlock(!healthy)",
     "Install/state-sync",
@@ -263,7 +328,7 @@ r34 = require(
 if r34.find("Present/pre") > r34.find("R34PresentR33Hook.stdcall<HRESULT>"):
     raise SystemExit("R34 must reassert Reset replay fail-close before lower Present work")
 
-r31 = load("src/vr/d3d9/stereo_renderer_r31.cpp")
+r31 = load("src/vr/d3d9/stereo_renderer_r31_overlay.inc")
 state_enable = r31.find("const bool stateHooks =")
 end_enable = r31.find("R31EndStateBlockHook.enable()", state_enable)
 begin_enable = r31.find("R31BeginStateBlockHook.enable()", state_enable)
@@ -297,7 +362,7 @@ if "c.CommitDirectStereoSource(frame)" in host_r23:
         "R23 production DirectGPU path must bypass legacy snapshot/fence commit")
 
 r14 = require(
-    "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+    "src/vr/d3d9/ex_device_upgrade_r14_overlay.inc",
     "singleLevelTexture",
     "entry.gpu->GetLevelCount() <= 1",
     "R14EnsureSurfaceHooks",
@@ -331,14 +396,14 @@ require(
 )
 
 require(
-    "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "src/vr/d3d9/stereo_renderer_r21_overlay.inc",
     "R21HostStatus::SoftSuspend",
     "VR R21 SOFT-SUSPEND",
     "without baseline reset",
 )
 
 require(
-    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "src/vr/d3d9/stereo_renderer_r23_overlay.inc",
     "SetRenderTarget implicit viewport/scissor transition observed",
     "R23/SetRenderTarget/live-state-capture",
 )
@@ -362,14 +427,14 @@ if "cullNone && alphaBlendEnabled && !depthWriteEnabled;" in effect_policy:
         "effect policy regressed to zero-disparity classification without the depth-test signal")
 
 r31_lazy = require(
-    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "src/vr/d3d9/stereo_renderer_r31_overlay.inc",
     "R31StateBlockResyncPending",
     "R31MarkStateBlockCachesDirty",
     "R31FlushPendingStateBlockResync",
     "lazily re-primed at the next actual draw",
 )
 r33_lazy = require(
-    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/d3d9/stereo_renderer_r33_overlay.inc",
     "R31FlushPendingStateBlockResync(device);",
 )
 
