@@ -8,6 +8,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("B hosted worker only")
 
 repo=Path.cwd()
+# Retry on the serialized hosted-worker queue after the earlier concurrent run was cancelled.
 run="20261004-B-PRODUCTION16"
 outdir=repo/"localization/graphics/role_B"/run
 outdir.mkdir(parents=True,exist_ok=True)
