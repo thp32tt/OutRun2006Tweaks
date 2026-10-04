@@ -103,6 +103,7 @@ if "StateBlockTracker::SetLifecycleHooksReady(false)" not in r22:
 
 for rel, source in (
     ("R20", r20), ("R23", r23), ("R29", r29),
+    ("R30", r30), ("R30_SAFE", r30_safe),
     ("R31", r31), ("R32", r32), ("R33", r33),
 ):
     for banned in ("R9MainDepthContentSerial", "R9MonoDepthContentSerial"):
@@ -118,6 +119,36 @@ for marker in (
 for rel, source in (("R20", r20), ("R23", r23)):
     if "R9SynchronizeDepthContentSerials()" not in source:
         errors.append(f"{rel} missing R9 depth-content synchronization owner API")
+
+for rel, source in (("R30", r30), ("R30_SAFE", r30_safe)):
+    if "R9NoteMainDepthContentWrite()" not in source:
+        errors.append(f"{rel} missing R9 main-depth write owner API")
+
+for rel, source in (("R20", r20), ("R23", r23), ("R33", r33)):
+    if "R9MainDepthGeneration" in source:
+        errors.append(
+            f"{rel} retained direct R9 main-depth generation dependency")
+    if "R9MainDepthGenerationValue()" not in source:
+        errors.append(
+            f"{rel} missing R9 main-depth generation owner query")
+if "R9MainDepthGenerationValue()" not in r9:
+    errors.append("R9 missing main-depth generation owner query API")
+
+if "R9DrawCalls" in r20:
+    errors.append("R20 retained direct R9 draw-count dependency")
+if "R9DrawCallCount()" not in r20:
+    errors.append("R20 missing R9 draw-count owner query")
+if "R9DrawCallCount()" not in r9:
+    errors.append("R9 missing draw-count owner query API")
+
+for rel, source in (("R30", r30), ("R30_SAFE", r30_safe)):
+    if "--R9DrawCalls;" in source:
+        errors.append(f"{rel} retained direct R9 draw-count rollback")
+    if "R9UndoStereoDrawCount();" not in source:
+        errors.append(f"{rel} missing R9 draw-count rollback owner API")
+if "R9UndoStereoDrawCount()" not in r9:
+    errors.append("R9 missing draw-count rollback owner API")
+
 for rel, source in (("R29", r29), ("R31", r31), ("R32", r32), ("R33", r33)):
     if "R9NoteMainDepthContentWrite()" not in source:
         errors.append(f"{rel} missing R9 main-depth write owner API")
