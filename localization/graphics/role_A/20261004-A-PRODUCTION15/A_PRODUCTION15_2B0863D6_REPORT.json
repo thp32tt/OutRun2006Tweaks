@@ -3,7 +3,7 @@
   "role": "A",
   "run": "20261004-A-PRODUCTION15",
   "worker": "github-actions",
-  "base_head": "2a3320bc164b8e95e98f4f5e3637470a12d3d63f",
+  "base_head": "4cf6b6582f5ae5691057fb2fa8e8202631b8e703",
   "index": 135,
   "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
   "source_provenance": {
@@ -15,7 +15,7 @@
     "classification": "authoritative high-resolution source; stale filename suffix, DDS header 2048x256 RGBA32"
   },
   "source_sha256": "dafe21ec29ace60273f3ec10a40072446f3f28232b3f9a8acce3897ade1eff06",
-  "candidate_sha256": "ea24324be8abe19d11a807c457c143bdad464597554c7792c2f3a716214caf75",
+  "candidate_sha256": "2f3e99f468367e056ee3c6edfdb412b1fe5f10f27387a463472b07aeaa335fbb",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/2B0863D6_512x64.dds",
   "structure": {
     "dimensions": [
@@ -79,7 +79,7 @@
       2048,
       256
     ],
-    "changed_pixels": 99421,
+    "changed_pixels": 99646,
     "changed_bbox": [
       128,
       28,
@@ -98,7 +98,7 @@
       2048,
       256
     ],
-    "changed_pixels": 101753,
+    "changed_pixels": 101930,
     "changed_bbox": [
       128,
       28,
@@ -111,7 +111,7 @@
     "status": "PASS"
   },
   "decoded_changes": {
-    "changed_pixels_total": 101753,
+    "changed_pixels_total": 101930,
     "changed_pixels_outside_original_bboxes": 0,
     "alpha_changed_pixels_outside_original_bboxes": 0,
     "protected_visible_pixels_changed": 0,
@@ -403,7 +403,7 @@
       "original_bbox": [
         1292,
         50,
-        1428,
+        1429,
         87
       ],
       "localized_bbox": [
@@ -412,12 +412,12 @@
         1407,
         85
       ],
-      "source_width": 136,
+      "source_width": 137,
       "source_height": 37,
       "localized_width": 94,
       "localized_height": 33,
       "delta_left": 21,
-      "delta_right": 21,
+      "delta_right": 22,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -426,7 +426,7 @@
       "raw_original_bbox": [
         1292,
         169,
-        1428,
+        1429,
         206
       ],
       "raw_localized_bbox": [
