@@ -581,6 +581,24 @@ namespace
             // an Original model. F11/profile transitions already do this too;
             // this runtime guard covers every other live settings path.
             const int runtimeModelValue = static_cast<int>(ffbModel);
+
+            // R10: make polarity model-owned at runtime, not merely a UI preset
+            // side effect. This closes profile/manual paths that could leave
+            // Modern with Original polarity or vice versa while the model ID
+            // itself had already changed.
+            const bool modelReversePolarity =
+                WheelFFBMath::model_uses_r3_reverse_polarity(ffbModel);
+            if (bool(Settings::WheelFFBInvertForce) != modelReversePolarity ||
+                bool(Settings::WheelFFBInvertSpring) != modelReversePolarity)
+            {
+                Settings::WheelFFBInvertForce = modelReversePolarity;
+                Settings::WheelFFBInvertSpring = modelReversePolarity;
+                spdlog::info(
+                    "WheelFFB: R10 model-owned polarity enforced for {}: invertCF={} invertSpring={}",
+                    WheelFFBMath::model_name(ffbModel),
+                    modelReversePolarity, modelReversePolarity);
+            }
+
             if (activeRuntimeModel_ != runtimeModelValue)
             {
                 const int previousModel = activeRuntimeModel_;
@@ -837,8 +855,17 @@ namespace
                 WheelFFBMath::common_contact_tactile_amplitude(
                     contactTactileEnvelope, speedNorm, configuredRoadDetail,
                     modelOutputStrength) * materialRoadTextureScale;
-            float roadAmp = commonContactTactile;
-            float roadFreq = 25.0f + 12.0f * speedNorm;
+            const bool imperialStonePaving =
+                WheelFFBMath::imperial_avenue_stone_paving_pattern(
+                    uniqueStage, collisionContext, surfaceMasks);
+            const float imperialStoneFloor = imperialStonePaving
+                ? WheelFFBMath::imperial_avenue_stone_tactile_amplitude(
+                    speedNorm, configuredRoadDetail, modelOutputStrength)
+                : 0.0f;
+            float roadAmp = std::max(commonContactTactile, imperialStoneFloor);
+            float roadFreq = imperialStonePaving
+                ? (8.0f + 4.0f * speedNorm)
+                : (25.0f + 12.0f * speedNorm);
             float ps2SurfaceEnvelope = 0.0f;
             int ps2RoadRaw = 0;
             if (arcadeEffects)
@@ -968,7 +995,8 @@ namespace
             // stronger, but the common DD contact layer fills silent curb/contact
             // gaps.  In particular, PS2 raw magnitudes below its recovered retail
             // Type-4 threshold still get a modest PC tactile cue instead of silence.
-            roadAmp = std::max(roadAmp, commonContactTactile);
+            roadAmp = std::max(
+                roadAmp, std::max(commonContactTactile, imperialStoneFloor));
 
             if (!arcadeEffects && !ps2Original &&
                 waterFlag && roughness > 0.7f && speedNorm > 0.70f && splashTimer_ <= 0)
@@ -1049,6 +1077,10 @@ namespace
             const float springSpeed = originalConditionBackbone
                 ? 1.0f
                 : (1.0f - 0.88f * springFade);
+            const float driftSpringScale = modernStructural
+                ? WheelFFBMath::drift_center_spring_scale(
+                    vehicleDynamics_.bodySlip())
+                : 1.0f;
             const float configuredSpringStrength = std::clamp(
                 static_cast<float>(Settings::WheelFFBSpringStrength), 0.0f, 1.5f);
             const float ps2SpringUserScale =
@@ -1058,7 +1090,8 @@ namespace
                     WheelFFBPS2::spring_coefficient_norm() * ps2SpringUserScale,
                     0.0f, 1.0f)
                 : std::clamp(
-                    configuredSpringStrength * springSpeed, 0.0f, 1.0f);
+                    configuredSpringStrength * springSpeed * driftSpringScale,
+                    0.0f, 1.0f);
             const float configuredSpringSaturation = std::clamp(
                 static_cast<float>(Settings::WheelFFBSpringSaturation),
                 0.1f, 1.0f);
@@ -1278,6 +1311,7 @@ namespace
             const float trailShape = pneumaticSatShape; // legacy telemetry field name
             const float physicsLoad = 0.62f + 0.48f * lateralLoadSmooth;
             const float rearSlideRelief = 1.0f - 0.15f * gripLoss * bodySlide;
+            float driftAlignmentAssistTelemetry = 0.0f;
             if (vehicleDynamics_.calibrated() && vehicleDynamics_.sampleValid())
             {
                 const float physicsReturnRelief =
@@ -1287,6 +1321,19 @@ namespace
                     (frontSlip > 0.0f ? -1.0f : 1.0f) *
                     physicsShape * satSpeed * physicsLoad * rearSlideRelief *
                     physicsReturnRelief * satStrength;
+
+                // At high chassis sideslip, caster/mechanical trail tends to
+                // steer the front wheels toward the velocity vector. Keep this
+                // assist bounded below the tyre SAT so it corrects the drift
+                // direction without becoming an arcade auto-steer.
+                driftAlignmentAssistTelemetry =
+                    WheelFFBMath::drift_velocity_alignment_assist(
+                        vehicleDynamics_.bodySlip(),
+                        vehicleDynamics_.yawRate(),
+                        steer, speedNorm) *
+                    std::clamp(satStrength / 1.60f, 0.0f, 1.25f);
+                physicsSatTorque += driftAlignmentAssistTelemetry;
+
                 if (!std::isfinite(physicsSatTorque))
                     physicsSatTorque = 0.0f;
             }
@@ -1588,13 +1635,15 @@ namespace
                 {
                     lastTelemetryDetailTick_ = telemetryNow;
                     spdlog::info(
-                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} diPreResponse={} diCorrected={} responseCorrection={}",
+                    "WheelFFB SATMODEL t={} rawBodySlip={} bodySlip={} bodyBlend={} rawYawRate={} yawRate={} yawBlend={} rawFrontSlip={} frontSlip={} frontBlend={} trailResponseSlip={} trailResponseLead={} fyShape={} pneumaticTrail={} pneumaticShape={} mechanicalMix={} mechanicalContribution={} combinedShape={} driftSpringScale={} driftAlign={} stonePaving={} stoneFloor={} diPreResponse={} diCorrected={} responseCorrection={}",
                     telemetryNow,
                     vehicleDynamics_.rawBodySlip(), vehicleDynamics_.bodySlip(), vehicleDynamics_.bodySlipBlend(),
                     vehicleDynamics_.rawYawRate(), vehicleDynamics_.yawRate(), vehicleDynamics_.yawRateBlend(),
                     vehicleDynamics_.rawFrontSlip(), vehicleDynamics_.frontSlip(), vehicleDynamics_.frontSlipBlend(),
                     trailResponseSlip, trailResponseLead, lateralForceShape, pneumaticTrail,
                     pneumaticSatShape, mechanicalTrailMix, mechanicalContribution, physicsShape,
+                    driftSpringScale, driftAlignmentAssistTelemetry,
+                    imperialStonePaving, imperialStoneFloor,
                     levelBeforeResponse, level, bool(Settings::WheelFFBResponseCorrection));
                 // Raw horizontal bases allow row/column x X/Z candidates to be
                 // compared offline without changing the active steering model.
