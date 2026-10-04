@@ -9777,6 +9777,8 @@ def main() -> None:
          CONSTANT_BUFFER_PROBE, "R248 stale R247 regression"),
         ("fresh device generation receives distinct topology-binding receipt",
          CONSTANT_BUFFER_PROBE, "R248 fresh receipt regression"),
+        ("restores prior fixed-function IA geometry after topology probe",
+         CONSTANT_BUFFER_PROBE, "R248 probe-state restoration regression"),
     ]
     missing_r248_programmable_topology_binding_receipt = [
         meaning for token, source, meaning

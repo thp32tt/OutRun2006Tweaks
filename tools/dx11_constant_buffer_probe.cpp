@@ -4110,6 +4110,17 @@ VSOutput main(VSInput input)
             D3DPT_TRIANGLESTRIP,
             r248FreshTopologyReady.snapshotToken),
         "R248 fresh device generation receives distinct topology-binding receipt");
+    require(
+        outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
+            d3d.context, indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset) &&
+        outrun::vr::dx11::validate_fixed_function_geometry_binding_snapshot(
+            d3d.context, indexedGeometryReady, managedVertexBuffer,
+            geometryVertexStride, geometryVertexOffset,
+            &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            indexedGeometryBinding.snapshotToken),
+        "R248 restores prior fixed-function IA geometry after topology probe");
     r244VertexConstants->Release();
     r244PixelConstants->Release();
 
