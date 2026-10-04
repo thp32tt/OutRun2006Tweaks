@@ -9846,6 +9846,57 @@ def main() -> None:
             + ", ".join(missing_r249_programmable_indexed_geometry_binding_receipt)
         )
 
+    r250_programmable_nonindexed_geometry_binding_receipt_contract = [
+        ("struct NativeProgrammableShaderNonIndexedGeometryBindingReadiness",
+         NATIVE_BACKEND_HPP, "R250 programmable non-indexed geometry readiness type"),
+        ("bind_nonindexed_geometry_for_observation(",
+         NATIVE_BACKEND_HPP, "R250 non-indexed geometry binding declaration"),
+        ("nonindexed_geometry_binding_readiness(",
+         NATIVE_BACKEND_HPP, "R250 non-indexed geometry readiness declaration"),
+        ("validate_nonindexed_geometry_binding_snapshot(",
+         NATIVE_BACKEND_HPP, "R250 non-indexed geometry snapshot validator"),
+        ("nonIndexedGeometryBindingReceiptGeneration",
+         NATIVE_BACKEND_HPP, "R250 per-entry non-indexed geometry receipt generation"),
+        ("nonindexed_geometry_binding_receipt_generation_counter_",
+         NATIVE_BACKEND_HPP, "R250 monotonic receipt counter"),
+        ("expectedContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);",
+         NATIVE_BACKEND_CPP, "R250 explicit IA index-buffer clear"),
+        ("out.indexBufferClear =",
+         NATIVE_BACKEND_CPP, "R250 index-buffer clear readback gate"),
+        ("topology-binding receipt must exist before non-indexed geometry binding",
+         CONSTANT_BUFFER_PROBE, "R250 validated R248 prerequisite"),
+        ("stale managed vertex mirror snapshot cannot bind non-indexed geometry",
+         CONSTANT_BUFFER_PROBE, "R250 managed vertex mirror generation regression"),
+        ("non-immediate context cannot establish non-indexed geometry binding",
+         CONSTANT_BUFFER_PROBE, "R250 context regression"),
+        ("exact programmable non-indexed geometry binding receipt",
+         CONSTANT_BUFFER_PROBE, "R250 exact binding regression"),
+        ("same non-indexed geometry binding is idempotent",
+         CONSTANT_BUFFER_PROBE, "R250 idempotence regression"),
+        ("external index binding invalidates explicit IB-clear receipt",
+         CONSTANT_BUFFER_PROBE, "R250 live index-clear drift regression"),
+        ("external vertex binding drift invalidates non-indexed geometry receipt",
+         CONSTANT_BUFFER_PROBE, "R250 live vertex binding drift regression"),
+        ("device reinitialize invalidates non-indexed geometry receipt",
+         CONSTANT_BUFFER_PROBE, "R250 device-generation invalidation regression"),
+        ("stale topology receipt cannot bind non-indexed geometry",
+         CONSTANT_BUFFER_PROBE, "R250 stale R248 regression"),
+        ("fresh device generation receives distinct non-indexed geometry receipt",
+         CONSTANT_BUFFER_PROBE, "R250 fresh receipt regression"),
+        ("R250 restores prior fixed-function IA geometry after non-indexed geometry probe",
+         CONSTANT_BUFFER_PROBE, "R250 probe-state restoration regression"),
+    ]
+    missing_r250_programmable_nonindexed_geometry_binding_receipt = [
+        meaning for token, source, meaning
+        in r250_programmable_nonindexed_geometry_binding_receipt_contract
+        if token not in source
+    ]
+    if missing_r250_programmable_nonindexed_geometry_binding_receipt:
+        raise SystemExit(
+            "DX11 R250 programmable non-indexed geometry-binding receipt drift: "
+            + ", ".join(missing_r250_programmable_nonindexed_geometry_binding_receipt)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

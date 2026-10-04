@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00373",
+  "production_id": "CONVERSION-DX11-00373",
+  "event_id": "CONVERSION-DX11-00373-E002",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "VALIDATING",
+  "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "23800aad835d2f5859017a862ddce5bf977a6f35",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_marker": "[AUTO:CONVERSION-DX11-00373]",
+  "selected_work_item": "DX11_R250_PROGRAMMABLE_NONINDEXED_IA_GEOMETRY_BINDING_RECEIPT",
+  "summary": "R250 adds a dormant fail-closed non-indexed IA geometry binding/readback receipt after validated R248 topology ownership. It binds the exact managed slot-0 vertex mirror with sealed stride/offset identity, explicitly clears the IA index buffer, verifies the clear state by readback, rejects stale mirror/topology/context/device state and live IA drift, and still stops before Draw* routing or NativeDrawPath activation.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00373.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT vr-dx11-native-r71 at 23800aad835d2f5859017a862ddce5bf977a6f35. The latest durable task is CONVERSION-DX11-00371/R249 with material SHA 1e3fb4fd7d3b891a5f633c43e31d67ea2a82a727 and exact next action selecting a bounded non-indexed slot-0 VB geometry receipt with explicit IB-clear state. Current E002 is a chat rollover, not a retry; ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R249 seals indexed VB+IB IA state, but the programmable chain has no separate receipt for non-indexed draws. Reusing indexed ownership would permit a stale live index binding to survive into a future DrawPrimitive path, so the non-indexed boundary must seal the vertex mirror while proving IA index state is explicitly clear.",
+      "review_lenses": {
+        "architecture": "Extend only dormant NativeProgrammableShaderPairCache plus hosted WARP/source-graph probes; do not modify live draw routing or vr-d3d9ex-focus.",
+        "ownership_lifetime": "Consume exact R248 topology ownership and current R119 managed vertex mirror on the same immediate D3D11 context; seal vertex mirror generation, stride, offset and a monotonic R250 receipt.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effect/recenter/presentation semantics change; runtime remains UNTESTED.",
+        "performance": "No production hot path and no Draw* call. IASet/IAGet operations remain dormant observation/probe code only.",
+        "adversarial": "Reject stale R248 topology snapshots, stale vertex mirror snapshots, deferred contexts, device-generation replacement, live vertex binding drift and any non-null/non-UNKNOWN/non-zero IA index binding after sealing."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderNonIndexedGeometryBindingReadiness, bind/readiness/snapshot APIs, per-entry immediate-context/VB receipt ownership, explicit IA index-buffer clear/readback enforcement, monotonic receipt generation, WARP regressions and source-graph drift guards. No Draw* or NativeDrawPath activation was added."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING_EXACT_SHA_CI",
+      "automation_validation": "LOCAL_SOURCE_GRAPH_PASS_EXACT_SHA_CI_PENDING",
+      "runtime_validation": "UNTESTED",
+      "local_evidence": "git diff --check PASS; python3 tools/verify_dx11_source_graph.py PASS including dormant activation boundary. Win32 build/binary/WARP execution requires exact-SHA GitHub Actions validation."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_MATERIAL_COMMIT",
+      "result_marker": "[AUTO:CONVERSION-DX11-00373]"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant programmable non-indexed IA geometry readiness/probe unit only; no runtime selector, transport, deployable package or HMD candidate changed."
+    },
+    "C6_STATE": {
+      "status": "PENDING_VALIDATION",
+      "state_persisted": false,
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "After exact-SHA validation, persist R250 as the latest durable DX11 unit. Any successor must consume the validated programmable geometry receipt in a separate bounded readiness step and must still stop before issuing Draw* or activating NativeDrawPath."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "Dormant DX11 programmable cache and hosted probes only; no production draw/renderer/transport/OpenXR path is activated or changed."
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00373",
+    "production_id": "CONVERSION-DX11-00373",
+    "event_id": "CONVERSION-DX11-00373-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "dispatch_source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "After exact-SHA validation, preserve validated R239-R250 programmable ownership/readiness and keep Draw*/NativeDrawPath dormant; choose the next programmable unit only as a separately reviewed bounded readiness boundary.",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt"
+}
