@@ -4091,6 +4091,44 @@ int main()
             firstR255PreDrawSnapshot),
         "R255 final indexed pre-Draw receipt revalidates while all inputs remain current");
 
+    const auto r256IndexedCandidate =
+        outrun::vr::dx11::compose_programmable_draw_candidate_readiness(
+            r255PreDrawReady, firstR255PreDrawSnapshot);
+    require(
+        r256IndexedCandidate.inputValid &&
+        r256IndexedCandidate.selectedReceiptReady &&
+        r256IndexedCandidate.selectedReceiptSnapshotMatches &&
+        r256IndexedCandidate.componentSnapshotsPresent &&
+        r256IndexedCandidate.ready &&
+        r256IndexedCandidate.kind ==
+            outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::Indexed &&
+        r256IndexedCandidate.indexed &&
+        r256IndexedCandidate.elementCount == 3u &&
+        r256IndexedCandidate.startLocation == 0u &&
+        r256IndexedCandidate.indexFormat == DXGI_FORMAT_R16_UINT &&
+        r256IndexedCandidate.indexOffset == geometryIndexOffset &&
+        r256IndexedCandidate.sourceReceiptSnapshotToken ==
+            firstR255PreDrawSnapshot &&
+        r256IndexedCandidate.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_programmable_draw_candidate_snapshot(
+            r255PreDrawReady, firstR255PreDrawSnapshot,
+            r256IndexedCandidate.snapshotToken),
+        "R256 indexed draw-candidate union accepts current R255 receipt");
+    const auto staleR255CandidateSource =
+        firstR255PreDrawSnapshot == 1ull ? 2ull : 1ull;
+    const auto r256IndexedStale =
+        outrun::vr::dx11::compose_programmable_draw_candidate_readiness(
+            r255PreDrawReady, staleR255CandidateSource);
+    require(
+        r256IndexedStale.selectedReceiptReady &&
+        !r256IndexedStale.selectedReceiptSnapshotMatches &&
+        !r256IndexedStale.ready &&
+        r256IndexedStale.snapshotToken == 0 &&
+        !outrun::vr::dx11::validate_programmable_draw_candidate_snapshot(
+            r255PreDrawReady, staleR255CandidateSource,
+            r256IndexedCandidate.snapshotToken),
+        "R256 indexed draw-candidate union rejects stale R255 receipt");
+
     const auto r252DeclaredRangeExcludesZero =
         programmableCache.indexed_direct_dispatch_readiness(
             d3d.context, d3d.device, programmablePair,
@@ -4763,6 +4801,46 @@ int main()
             1u, 0u, r251DispatchReady.snapshotToken),
         "R251 exact programmable non-indexed direct dispatch arguments");
     const auto firstR251DispatchSnapshot = r251DispatchReady.snapshotToken;
+
+    const auto r256NonIndexedCandidate =
+        outrun::vr::dx11::compose_programmable_draw_candidate_readiness(
+            r251DispatchReady, firstR251DispatchSnapshot);
+    require(
+        r256NonIndexedCandidate.inputValid &&
+        r256NonIndexedCandidate.selectedReceiptReady &&
+        r256NonIndexedCandidate.selectedReceiptSnapshotMatches &&
+        r256NonIndexedCandidate.componentSnapshotsPresent &&
+        r256NonIndexedCandidate.ready &&
+        r256NonIndexedCandidate.kind ==
+            outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::NonIndexed &&
+        !r256NonIndexedCandidate.indexed &&
+        r256NonIndexedCandidate.elementCount == 3u &&
+        r256NonIndexedCandidate.startLocation == 0u &&
+        r256NonIndexedCandidate.indexFormat == DXGI_FORMAT_UNKNOWN &&
+        r256NonIndexedCandidate.indexOffset == 0u &&
+        r256NonIndexedCandidate.sourceReceiptSnapshotToken ==
+            firstR251DispatchSnapshot &&
+        r256NonIndexedCandidate.snapshotToken != 0 &&
+        r256NonIndexedCandidate.snapshotToken !=
+            r256IndexedCandidate.snapshotToken &&
+        outrun::vr::dx11::validate_programmable_draw_candidate_snapshot(
+            r251DispatchReady, firstR251DispatchSnapshot,
+            r256NonIndexedCandidate.snapshotToken),
+        "R256 non-indexed draw-candidate union accepts current R251 receipt");
+    const auto staleR251CandidateSource =
+        firstR251DispatchSnapshot == 1ull ? 2ull : 1ull;
+    const auto r256NonIndexedStale =
+        outrun::vr::dx11::compose_programmable_draw_candidate_readiness(
+            r251DispatchReady, staleR251CandidateSource);
+    require(
+        r256NonIndexedStale.selectedReceiptReady &&
+        !r256NonIndexedStale.selectedReceiptSnapshotMatches &&
+        !r256NonIndexedStale.ready &&
+        r256NonIndexedStale.snapshotToken == 0 &&
+        !outrun::vr::dx11::validate_programmable_draw_candidate_snapshot(
+            r251DispatchReady, staleR251CandidateSource,
+            r256NonIndexedCandidate.snapshotToken),
+        "R256 non-indexed draw-candidate union rejects stale R251 receipt");
 
     const auto r251StaleGeometry =
         programmableCache.nonindexed_direct_dispatch_readiness(

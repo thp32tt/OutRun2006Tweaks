@@ -1654,6 +1654,54 @@ struct NativeProgrammableShaderIndexedPreDrawReadiness {
     std::uint64_t snapshotToken{};
 };
 
+enum class NativeProgrammableShaderDrawCandidateKind : std::uint8_t {
+    None = 0,
+    NonIndexed = 1,
+    Indexed = 2,
+};
+
+// R256 normalizes either a validated R251 non-indexed dispatch receipt or a
+// validated R255 indexed pre-Draw receipt into one branch-tagged dormant
+// candidate. This is deliberately not an activation structure: it owns no
+// device context, issues no Draw/DrawIndexed call and does not change
+// NativeDrawPath state.
+struct NativeProgrammableShaderDrawCandidateReadiness {
+    bool inputValid{};
+    bool selectedReceiptReady{};
+    bool selectedReceiptSnapshotMatches{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    NativeProgrammableShaderDrawCandidateKind kind =
+        NativeProgrammableShaderDrawCandidateKind::None;
+    bool indexed{};
+    UINT elementCount{};
+    UINT startLocation{};
+    DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT indexOffset{};
+    std::uint64_t sourceReceiptSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderDrawCandidateReadiness
+compose_programmable_draw_candidate_readiness(
+    const NativeProgrammableShaderNonIndexedDirectDispatchReadiness& dispatch,
+    std::uint64_t dispatchSnapshotToken) noexcept;
+
+[[nodiscard]] NativeProgrammableShaderDrawCandidateReadiness
+compose_programmable_draw_candidate_readiness(
+    const NativeProgrammableShaderIndexedPreDrawReadiness& preDraw,
+    std::uint64_t preDrawSnapshotToken) noexcept;
+
+[[nodiscard]] bool validate_programmable_draw_candidate_snapshot(
+    const NativeProgrammableShaderNonIndexedDirectDispatchReadiness& dispatch,
+    std::uint64_t dispatchSnapshotToken,
+    std::uint64_t candidateSnapshotToken) noexcept;
+
+[[nodiscard]] bool validate_programmable_draw_candidate_snapshot(
+    const NativeProgrammableShaderIndexedPreDrawReadiness& preDraw,
+    std::uint64_t preDrawSnapshotToken,
+    std::uint64_t candidateSnapshotToken) noexcept;
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;

@@ -10086,6 +10086,43 @@ def main() -> None:
             + ", ".join(missing_r255_programmable_indexed_pre_draw)
         )
 
+    r256_programmable_draw_candidate_union_contract = [
+        ("enum class NativeProgrammableShaderDrawCandidateKind",
+         NATIVE_BACKEND_HPP, "R256 branch-tagged draw-candidate kind"),
+        ("struct NativeProgrammableShaderDrawCandidateReadiness",
+         NATIVE_BACKEND_HPP, "R256 common dormant draw-candidate receipt"),
+        ("compose_programmable_draw_candidate_readiness(",
+         NATIVE_BACKEND_HPP, "R256 draw-candidate composition declarations"),
+        ("validate_programmable_draw_candidate_snapshot(",
+         NATIVE_BACKEND_HPP, "R256 draw-candidate snapshot validators"),
+        ("NativeProgrammableShaderDrawCandidateKind::NonIndexed",
+         NATIVE_BACKEND_CPP, "R256 non-indexed branch identity"),
+        ("NativeProgrammableShaderDrawCandidateKind::Indexed",
+         NATIVE_BACKEND_CPP, "R256 indexed branch identity"),
+        ("out.selectedReceiptSnapshotMatches =",
+         NATIVE_BACKEND_CPP, "R256 selected receipt snapshot gate"),
+        ("token, 0x256u",
+         NATIVE_BACKEND_CPP, "R256 independent snapshot-domain tag"),
+        ("R256 indexed draw-candidate union accepts current R255 receipt",
+         CONSTANT_BUFFER_PROBE, "R256 indexed positive regression"),
+        ("R256 indexed draw-candidate union rejects stale R255 receipt",
+         CONSTANT_BUFFER_PROBE, "R256 indexed stale receipt regression"),
+        ("R256 non-indexed draw-candidate union accepts current R251 receipt",
+         CONSTANT_BUFFER_PROBE, "R256 non-indexed positive regression"),
+        ("R256 non-indexed draw-candidate union rejects stale R251 receipt",
+         CONSTANT_BUFFER_PROBE, "R256 non-indexed stale receipt regression"),
+    ]
+    missing_r256_programmable_draw_candidate_union = [
+        meaning for token, source, meaning
+        in r256_programmable_draw_candidate_union_contract
+        if token not in source
+    ]
+    if missing_r256_programmable_draw_candidate_union:
+        raise SystemExit(
+            "DX11 R256 programmable draw-candidate union drift: "
+            + ", ".join(missing_r256_programmable_draw_candidate_union)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

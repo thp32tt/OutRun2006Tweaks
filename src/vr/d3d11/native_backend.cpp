@@ -8360,6 +8360,105 @@ bool NativeProgrammableShaderPairCache::validate_indexed_pre_draw_snapshot(
     return current.ready && current.snapshotToken == preDrawSnapshotToken;
 }
 
+// R256 creates a common dormant draw-candidate receipt from exactly one
+// already-sealed programmable branch. It does not re-route or issue a draw.
+NativeProgrammableShaderDrawCandidateReadiness
+compose_programmable_draw_candidate_readiness(
+    const NativeProgrammableShaderNonIndexedDirectDispatchReadiness& dispatch,
+    std::uint64_t dispatchSnapshotToken) noexcept {
+    NativeProgrammableShaderDrawCandidateReadiness out{};
+    out.kind = NativeProgrammableShaderDrawCandidateKind::NonIndexed;
+    out.indexed = false;
+    out.elementCount = dispatch.vertexCount;
+    out.startLocation = dispatch.startVertexLocation;
+    out.sourceReceiptSnapshotToken = dispatchSnapshotToken;
+    out.inputValid = dispatchSnapshotToken != 0;
+    out.selectedReceiptReady = dispatch.ready;
+    out.selectedReceiptSnapshotMatches =
+        dispatch.ready && dispatch.snapshotToken == dispatchSnapshotToken;
+    out.componentSnapshotsPresent = dispatch.componentSnapshotsPresent;
+    out.ready =
+        out.inputValid &&
+        out.selectedReceiptReady &&
+        out.selectedReceiptSnapshotMatches &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.kind));
+        token = mix_readiness_snapshot_token(
+            token, out.sourceReceiptSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.elementCount);
+        token = mix_readiness_snapshot_token(token, out.startLocation);
+        token = mix_readiness_snapshot_token(token, 0x256u);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+NativeProgrammableShaderDrawCandidateReadiness
+compose_programmable_draw_candidate_readiness(
+    const NativeProgrammableShaderIndexedPreDrawReadiness& preDraw,
+    std::uint64_t preDrawSnapshotToken) noexcept {
+    NativeProgrammableShaderDrawCandidateReadiness out{};
+    out.kind = NativeProgrammableShaderDrawCandidateKind::Indexed;
+    out.indexed = true;
+    out.elementCount = preDraw.indexCount;
+    out.startLocation = preDraw.startIndexLocation;
+    out.indexFormat = preDraw.indexFormat;
+    out.indexOffset = preDraw.indexOffset;
+    out.sourceReceiptSnapshotToken = preDrawSnapshotToken;
+    out.inputValid = preDrawSnapshotToken != 0;
+    out.selectedReceiptReady = preDraw.ready;
+    out.selectedReceiptSnapshotMatches =
+        preDraw.ready && preDraw.snapshotToken == preDrawSnapshotToken;
+    out.componentSnapshotsPresent = preDraw.componentSnapshotsPresent;
+    out.ready =
+        out.inputValid &&
+        out.selectedReceiptReady &&
+        out.selectedReceiptSnapshotMatches &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.kind));
+        token = mix_readiness_snapshot_token(
+            token, out.sourceReceiptSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.elementCount);
+        token = mix_readiness_snapshot_token(token, out.startLocation);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.indexFormat));
+        token = mix_readiness_snapshot_token(token, out.indexOffset);
+        token = mix_readiness_snapshot_token(token, 0x256u);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool validate_programmable_draw_candidate_snapshot(
+    const NativeProgrammableShaderNonIndexedDirectDispatchReadiness& dispatch,
+    std::uint64_t dispatchSnapshotToken,
+    std::uint64_t candidateSnapshotToken) noexcept {
+    if (candidateSnapshotToken == 0)
+        return false;
+    const auto current = compose_programmable_draw_candidate_readiness(
+        dispatch, dispatchSnapshotToken);
+    return current.ready && current.snapshotToken == candidateSnapshotToken;
+}
+
+bool validate_programmable_draw_candidate_snapshot(
+    const NativeProgrammableShaderIndexedPreDrawReadiness& preDraw,
+    std::uint64_t preDrawSnapshotToken,
+    std::uint64_t candidateSnapshotToken) noexcept {
+    if (candidateSnapshotToken == 0)
+        return false;
+    const auto current = compose_programmable_draw_candidate_readiness(
+        preDraw, preDrawSnapshotToken);
+    return current.ready && current.snapshotToken == candidateSnapshotToken;
+}
+
 NativeFixedFunctionIndexedSourceRangeReadiness
 compose_fixed_function_indexed_source_range_readiness(
     D3DPRIMITIVETYPE primitive,
