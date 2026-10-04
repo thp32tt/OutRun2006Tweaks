@@ -10195,6 +10195,22 @@ def main() -> None:
             + ", ".join(missing_r258_programmable_source_revalidation)
         )
 
+    source_hygiene_marker = "[" + "executed on device:"
+    source_hygiene_contract = [
+        (NATIVE_BACKEND_HPP, "native backend header"),
+        (NATIVE_BACKEND_CPP, "native backend implementation"),
+        (CONSTANT_BUFFER_PROBE, "constant-buffer probe"),
+    ]
+    contaminated_source_hygiene = [
+        meaning for source, meaning in source_hygiene_contract
+        if source_hygiene_marker in source
+    ]
+    if contaminated_source_hygiene:
+        raise SystemExit(
+            "DX11 remote execution transcript contamination: "
+            + ", ".join(contaminated_source_hygiene)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
