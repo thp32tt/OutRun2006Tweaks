@@ -3,13 +3,13 @@
   "role": "A",
   "run": "20261004-A-RECOVERY10",
   "worker": "github-actions",
-  "base_head": "fcb3338609a59123cb7ab43fa34865aa751718f3",
+  "base_head": "a3c2471a2cb756fd1e990fecdfaad6c3a2784356",
   "index": 111,
   "asset": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
   "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
   "fallback_before_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
   "c_overlap05_rejected_sha256": "3e950422775def2508ea42118f41c7a1f7463e2a7106cdcfcfb907b705890c91",
-  "candidate_sha256": "661d27cb28002355e7fea4fa398c2520a02630ba3a1783351e19ff4b9c531498",
+  "candidate_sha256": "fc75a1a1b267dbc43f240483ffc1ec67e3d3dddd05061e504ab4c0c4ca2efacd",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
   "structure": {
     "dimensions": [
@@ -22,7 +22,7 @@
     "header_128_exact": true,
     "raw_orientation": "mirror_y"
   },
-  "method": "canonical HD restore for dense top group -> exact source-alpha removal inside 8 target atlas cells -> reuse C_OVERLAP05 17/17 zero-overlap localized raster deltas -> preserve visually accepted bottom C clean reconstruction -> exact RGBA32 encode",
+  "method": "canonical HD restore for dense top group -> exact source-alpha removal inside 8 target atlas cells -> native source-family Korean rerender for 8 top labels -> reuse visually accepted C placement deltas for bottom 9 -> exact RGBA32 encode",
   "top_rebuilt_keys": [
     "dont_crash",
     "drift",
@@ -90,7 +90,7 @@
       2048,
       2048
     ],
-    "changed_pixels": 584304,
+    "changed_pixels": 504640,
     "changed_bbox": [
       1,
       29,
@@ -107,7 +107,7 @@
   "localized_pair_overlap_pixels": 0,
   "localized_pair_overlaps": {},
   "decoded_changes": {
-    "changed_pixels_total": 584304,
+    "changed_pixels_total": 504640,
     "changed_pixels_outside_original_bboxes": 0,
     "alpha_changed_pixels_outside_original_bboxes": 0,
     "protected_visible_pixels_changed": 0
@@ -124,19 +124,19 @@
         129
       ],
       "localized_bbox": [
-        743,
-        37,
-        951,
-        121
+        744,
+        40,
+        949,
+        118
       ],
-      "delta_left": 169,
-      "delta_right": 169,
-      "delta_top": 8,
-      "delta_bottom": 8,
+      "delta_left": 170,
+      "delta_right": 171,
+      "delta_top": 11,
+      "delta_bottom": 11,
       "source_width": 546,
       "source_height": 100,
-      "localized_width": 208,
-      "localized_height": 84,
+      "localized_width": 205,
+      "localized_height": 78,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -147,17 +147,18 @@
         2019
       ],
       "raw_localized_bbox": [
-        743,
-        1927,
-        951,
-        2011
+        744,
+        1930,
+        949,
+        2008
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "native Noto CJK Black source-family render on A_RECOVERY10 canonical clean plate",
+      "font_size": 71,
       "placement_adjustment": {
         "shift_y": 0
       },
-      "rework_status": "A_RECOVERY10_TOP_CLEAN_REBUILD"
+      "rework_status": "A_RECOVERY10_NATIVE_TOP_REBUILD"
     },
     {
       "key": "keep_passing",
@@ -170,19 +171,19 @@
         236
       ],
       "localized_bbox": [
-        38,
-        150,
-        484,
-        230
+        40,
+        165,
+        482,
+        215
       ],
-      "delta_left": 37,
-      "delta_right": 36,
-      "delta_top": 7,
-      "delta_bottom": 6,
+      "delta_left": 39,
+      "delta_right": 38,
+      "delta_top": 22,
+      "delta_bottom": 21,
       "source_width": 519,
       "source_height": 93,
-      "localized_width": 446,
-      "localized_height": 80,
+      "localized_width": 442,
+      "localized_height": 50,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -193,17 +194,18 @@
         1905
       ],
       "raw_localized_bbox": [
-        38,
-        1818,
-        484,
-        1898
+        40,
+        1833,
+        482,
+        1883
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "native Noto CJK Black source-family render on A_RECOVERY10 canonical clean plate",
+      "font_size": 44,
       "placement_adjustment": {
         "shift_y": 0
       },
-      "rework_status": "A_RECOVERY10_TOP_CLEAN_REBUILD"
+      "rework_status": "A_RECOVERY10_NATIVE_TOP_REBUILD"
     },
     {
       "key": "drift",
@@ -216,19 +218,19 @@
         228
       ],
       "localized_bbox": [
-        516,
-        128,
-        705,
-        221
+        517,
+        149,
+        704,
+        200
       ],
-      "delta_left": 16,
-      "delta_right": 15,
-      "delta_top": 8,
-      "delta_bottom": 7,
+      "delta_left": 17,
+      "delta_right": 16,
+      "delta_top": 29,
+      "delta_bottom": 28,
       "source_width": 220,
       "source_height": 108,
-      "localized_width": 189,
-      "localized_height": 93,
+      "localized_width": 187,
+      "localized_height": 51,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -239,17 +241,18 @@
         1928
       ],
       "raw_localized_bbox": [
-        516,
-        1827,
-        705,
-        1920
+        517,
+        1848,
+        704,
+        1899
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "native Noto CJK Black source-family render on A_RECOVERY10 canonical clean plate",
+      "font_size": 46,
       "placement_adjustment": {
         "shift_y": 0
       },
-      "rework_status": "A_RECOVERY10_TOP_CLEAN_REBUILD"
+      "rework_status": "A_RECOVERY10_NATIVE_TOP_REBUILD"
     },
     {
       "key": "maximum_speed",
@@ -262,19 +265,19 @@
         227
       ],
       "localized_bbox": [
-        712,
-        128,
-        1105,
-        220
+        723,
+        129,
+        1093,
+        219
       ],
-      "delta_left": 32,
-      "delta_right": 32,
-      "delta_top": 8,
-      "delta_bottom": 7,
+      "delta_left": 43,
+      "delta_right": 44,
+      "delta_top": 9,
+      "delta_bottom": 8,
       "source_width": 457,
       "source_height": 107,
-      "localized_width": 393,
-      "localized_height": 92,
+      "localized_width": 370,
+      "localized_height": 90,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -285,17 +288,18 @@
         1928
       ],
       "raw_localized_bbox": [
-        712,
-        1828,
-        1105,
-        1920
+        723,
+        1829,
+        1093,
+        1919
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "native Noto CJK Black source-family render on A_RECOVERY10 canonical clean plate",
+      "font_size": 94,
       "placement_adjustment": {
         "shift_y": 0
       },
-      "rework_status": "A_RECOVERY10_TOP_CLEAN_REBUILD"
+      "rework_status": "A_RECOVERY10_NATIVE_TOP_REBUILD"
     },
     {
       "key": "transmission",
@@ -308,19 +312,19 @@
         370
       ],
       "localized_bbox": [
-        73,
-        232,
-        528,
-        361
+        117,
+        233,
+        483,
+        360
       ],
-      "delta_left": 72,
-      "delta_right": 72,
-      "delta_top": 32,
-      "delta_bottom": 9,
+      "delta_left": 116,
+      "delta_right": 117,
+      "delta_top": 33,
+      "delta_bottom": 10,
       "source_width": 599,
       "source_height": 170,
-      "localized_width": 455,
-      "localized_height": 129,
+      "localized_width": 366,
+      "localized_height": 127,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -331,17 +335,18 @@
         1848
       ],
       "raw_localized_bbox": [
-        73,
-        1687,
-        528,
-        1816
+        117,
+        1688,
+        483,
+        1815
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "native Noto CJK Black source-family render on A_RECOVERY10 canonical clean plate",
+      "font_size": 133,
       "placement_adjustment": {
         "shift_y": 0
       },
-      "rework_status": "A_RECOVERY10_TOP_CLEAN_REBUILD"
+      "rework_status": "A_RECOVERY10_NATIVE_TOP_REBUILD"
     },
     {
       "key": "dont_crash",
@@ -354,19 +359,19 @@
         370
       ],
       "localized_bbox": [
-        600,
-        224,
-        1020,
-        361
+        602,
+        259,
+        1018,
+        325
       ],
-      "delta_left": 50,
-      "delta_right": 50,
-      "delta_top": 24,
-      "delta_bottom": 9,
+      "delta_left": 52,
+      "delta_right": 52,
+      "delta_top": 59,
+      "delta_bottom": 45,
       "source_width": 520,
       "source_height": 170,
-      "localized_width": 420,
-      "localized_height": 137,
+      "localized_width": 416,
+      "localized_height": 66,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -377,17 +382,18 @@
         1848
       ],
       "raw_localized_bbox": [
-        600,
-        1687,
-        1020,
-        1824
+        602,
+        1723,
+        1018,
+        1789
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "native Noto CJK Black source-family render on A_RECOVERY10 canonical clean plate",
+      "font_size": 59,
       "placement_adjustment": {
         "shift_y": 0
       },
-      "rework_status": "A_RECOVERY10_TOP_CLEAN_REBUILD"
+      "rework_status": "A_RECOVERY10_NATIVE_TOP_REBUILD"
     },
     {
       "key": "go_gate",
@@ -400,19 +406,19 @@
         370
       ],
       "localized_bbox": [
-        1074,
-        222,
-        1535,
-        359
+        1077,
+        261,
+        1532,
+        319
       ],
-      "delta_left": 54,
-      "delta_right": 55,
-      "delta_top": 22,
-      "delta_bottom": 11,
+      "delta_left": 57,
+      "delta_right": 58,
+      "delta_top": 61,
+      "delta_bottom": 51,
       "source_width": 570,
       "source_height": 170,
-      "localized_width": 461,
-      "localized_height": 137,
+      "localized_width": 455,
+      "localized_height": 58,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -423,17 +429,18 @@
         1848
       ],
       "raw_localized_bbox": [
-        1074,
-        1689,
-        1535,
-        1826
+        1077,
+        1729,
+        1532,
+        1787
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "native Noto CJK Black source-family render on A_RECOVERY10 canonical clean plate",
+      "font_size": 51,
       "placement_adjustment": {
         "shift_y": 0
       },
-      "rework_status": "A_RECOVERY10_TOP_CLEAN_REBUILD"
+      "rework_status": "A_RECOVERY10_NATIVE_TOP_REBUILD"
     },
     {
       "key": "for_experts",
@@ -446,19 +453,19 @@
         370
       ],
       "localized_bbox": [
-        1604,
-        250,
-        1952,
-        345
+        1606,
+        251,
+        1949,
+        343
       ],
-      "delta_left": 74,
-      "delta_right": 28,
-      "delta_top": 50,
-      "delta_bottom": 25,
+      "delta_left": 76,
+      "delta_right": 31,
+      "delta_top": 51,
+      "delta_bottom": 27,
       "source_width": 450,
       "source_height": 170,
-      "localized_width": 348,
-      "localized_height": 95,
+      "localized_width": 343,
+      "localized_height": 92,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -469,17 +476,18 @@
         1848
       ],
       "raw_localized_bbox": [
-        1604,
-        1703,
-        1952,
-        1798
+        1606,
+        1705,
+        1949,
+        1797
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "native Noto CJK Black source-family render on A_RECOVERY10 canonical clean plate",
+      "font_size": 84,
       "placement_adjustment": {
         "shift_y": 12
       },
-      "rework_status": "A_RECOVERY10_TOP_CLEAN_REBUILD"
+      "rework_status": "A_RECOVERY10_NATIVE_TOP_REBUILD"
     },
     {
       "key": "tuned_setting",
@@ -521,7 +529,8 @@
         844
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "C_OVERLAP05 safe localized raster delta reused on A_RECOVERY10 corrected clean plate",
+      "font_size": null,
       "placement_adjustment": {
         "shift_y": 0
       },
@@ -567,7 +576,8 @@
         844
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "C_OVERLAP05 safe localized raster delta reused on A_RECOVERY10 corrected clean plate",
+      "font_size": null,
       "placement_adjustment": {
         "shift_y": 0
       },
@@ -613,7 +623,8 @@
         600
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "C_OVERLAP05 safe localized raster delta reused on A_RECOVERY10 corrected clean plate",
+      "font_size": null,
       "placement_adjustment": {
         "shift_y": 0
       },
@@ -659,7 +670,8 @@
         639
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "C_OVERLAP05 safe localized raster delta reused on A_RECOVERY10 corrected clean plate",
+      "font_size": null,
       "placement_adjustment": {
         "shift_y": 0
       },
@@ -705,7 +717,8 @@
         607
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "C_OVERLAP05 safe localized raster delta reused on A_RECOVERY10 corrected clean plate",
+      "font_size": null,
       "placement_adjustment": {
         "shift_y": 0
       },
@@ -751,7 +764,8 @@
         606
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "C_OVERLAP05 safe localized raster delta reused on A_RECOVERY10 corrected clean plate",
+      "font_size": null,
       "placement_adjustment": {
         "shift_y": 0
       },
@@ -797,7 +811,8 @@
         398
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "C_OVERLAP05 safe localized raster delta reused on A_RECOVERY10 corrected clean plate",
+      "font_size": null,
       "placement_adjustment": {
         "shift_y": 0
       },
@@ -843,7 +858,8 @@
         316
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "C_OVERLAP05 safe localized raster delta reused on A_RECOVERY10 corrected clean plate",
+      "font_size": null,
       "placement_adjustment": {
         "shift_y": 0
       },
@@ -889,7 +905,8 @@
         316
       ],
       "raw_containment": "PASS",
-      "construction": "C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction": "C_OVERLAP05 safe localized raster delta reused on A_RECOVERY10 corrected clean plate",
+      "font_size": null,
       "placement_adjustment": {
         "shift_y": 0
       },
