@@ -136,7 +136,11 @@ corrected without adding another force-feel retune:
   model-owned Sine/Triangle transports.
 - Current Universal preset buttons stamp feel revision 6 immediately, avoiding
   an unnecessary revision-only migration on the next launch.
-- Structural verifier guards pin all three contracts.
+- **FFB-R0151-F01:** the intercepted Universal Physics/Natural preset helpers now
+  explicitly restore `WheelFFBModel=0`. Without this, switching back from
+  Arcade Original/Hybrid or PS2 could apply Modern-looking values while leaving
+  the previous model's output semantics active.
+- Structural verifier guards pin all four contracts.
 
 No RoadWheelLock, Arcade physical polarity, collisionIndex production gate or
 PS2 evidence-gated value is changed in R8.
