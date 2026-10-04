@@ -192,25 +192,29 @@
     "next_task_rule": "AFTER_FULL_PIPELINE_GATE_PASS_DISPATCH_NEXT_INDEPENDENT_WORK_IMMEDIATELY"
   },
   "follow_on_frontier": {
-    "result_sha": "d6a8841d62e3d4fd9d851a047243a84ca83aae7c",
-    "validation_bearing_result_sha": "d6a8841d62e3d4fd9d851a047243a84ca83aae7c",
+    "result_sha": "23a8876603aba4aae576c2ddb833dc63c6d323e7",
+    "validation_bearing_result_sha": "23a8876603aba4aae576c2ddb833dc63c6d323e7",
     "provenance_status": "EXACT_EXE_183A0C_TO_183A4C_PROVENANCE_CAPTURED",
+    "control_flow_status": "EXACT_183A0C_TO_183A4A_CONTROL_FLOW_WITH_183A4A_CUT_EDGE_PROVEN",
     "predecessor_status": "EXACT_1839CD_TO_183A0C_CONTROL_FLOW_WITH_183A0C_CUT_EDGE_PROVEN",
     "validated_start_rva": "0x00183A0C",
+    "complete_instruction_end_rva": "0x00183A4A",
     "capture_end_rva": "0x00183A4C",
-    "probe_len": 64,
-    "inherited_unresolved_forward_targets": [
+    "unresolved_forward_targets": [
+      "0x00183A50",
       "0x00183A63",
       "0x00183B6F"
     ],
     "predecessor_exact": true,
-    "overlap_bytes": "83",
-    "overlap_status": "EXACT_CUT_EDGE_OVERLAP_PROVEN",
+    "overlap_bytes": "8b 4d",
+    "overlap_status": "MANDATORY_TRAILING_PARTIAL_INSTRUCTION_OVERLAP",
+    "next_frontier_start_rva": "0x00183A4A",
+    "next_frontier_capture_end_rva": "0x00183A8A",
     "raw_inbound_rel32_count": 0,
     "raw_outbound_rel32_count": 0,
-    "next_action_kind": "EXACT_DECODE_VALIDATED_CANONICAL_RAW_WINDOW",
+    "next_action_kind": "CAPTURE_NEXT_CANONICAL_RAW_FRONTIER_FROM_MANDATORY_OVERLAP",
     "runtime_validation": "UNTESTED",
-    "exact_next_action": "Exact-decode only complete canonical instructions from validated F124 raw window 0x00183A0C..0x00183A4C. Resolve inherited targets [0x00183A63,0x00183B6F] only on exact instruction boundaries, preserve any trailing partial instruction for mandatory overlap, carry newly observed branch/call debt fail-closed, and do not promote function/render/HUD/runtime semantics."
+    "exact_next_action": "Capture and pin the exact canonical 64-byte raw frontier 0x00183A4A..0x00183A8A from the F125 mandatory overlap bytes 0x8B 0x4D. Require overlap equality, carry unresolved target debt [0x00183A50,0x00183A63,0x00183B6F] fail-closed, record exact bytes/raw rel32 census only, and do not promote function/render/HUD/runtime semantics."
   },
   "supplemental_completed_static_units": [
     {
