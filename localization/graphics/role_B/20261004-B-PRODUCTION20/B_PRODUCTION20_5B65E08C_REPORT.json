@@ -91,7 +91,43 @@
     "status": "PASS"
   },
   "protected_preserved": "all red panel artwork and all non-target atlas pixels",
-  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "manual_visual_qa": "PASS",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_PRODUCTION20_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B_PRODUCTION20_CANDIDATE_SELFQA_PASS_C106_MACHINE_PASS_PENDING_C_CONTROLLER_VISUAL_AND_INGAME",
+  "worker_run_id": 37204151380,
+  "worker_output_commit": "2ea49bc74435c10b6a452d6150d929aab0c89998",
+  "supersedes_candidate_sha256": "2ef3971842d2ea68f5f098927fb288a6f9ebfdc51a54c364372f0cd10ee70f2c",
+  "visual_qa": {
+    "source_clean_final_readable": "PASS",
+    "white_background_alpha_review": "PASS",
+    "raw_mirror_y_orientation": "PASS",
+    "row_contact_1_of_1": "PASS",
+    "source_text_residue": "NONE_OBSERVED",
+    "clipping_or_bbox_escape": "NONE",
+    "protected_artwork_damage": "NONE_OBSERVED",
+    "new_overlap": "NONE_OBSERVED",
+    "style_fidelity": "PASS_HEAVY_PLAIN_WHITE_SOURCE_FAMILY",
+    "source_vs_localized_height": "94px_vs_90px",
+    "source_effects": "NO_OUTLINE_SHADOW_OR_SLANT_INVENTED"
+  },
+  "c105_stale_machine_qa": {
+    "status": "STALE_SUPERSEDED",
+    "report": "localization/graphics/role_C/20261004-C105-5B65E08C/C105_5B65E08C_MACHINE_QA.json",
+    "tested_candidate_sha256": "2ef3971842d2ea68f5f098927fb288a6f9ebfdc51a54c364372f0cd10ee70f2c",
+    "current_candidate_sha256": "33da77625f6b6af22cab72db30394b6b8c0bdd78e9f9a6166f273d6fab4da609"
+  },
+  "c106_machine_qa": {
+    "status": "PASS",
+    "report": "localization/graphics/role_C/20261004-C106-5B65E08C/C106_5B65E08C_MACHINE_QA.json",
+    "candidate_sha256": "33da77625f6b6af22cab72db30394b6b8c0bdd78e9f9a6166f273d6fab4da609",
+    "source_header_128_exact": true,
+    "bbox_size_pass": "1/1",
+    "target_pixels_outside_allowed_mask": 0,
+    "target_protected_overlap_pixels": 0,
+    "target_2px_guard_vs_protected_conflicts": 0,
+    "clean_changed_pixels_outside_source_text_mask": 0,
+    "source_text_residue_pixels_in_clean_plate": 0,
+    "controller_visual_qa": "PENDING",
+    "runtime_validation": "UNTESTED"
+  }
 }

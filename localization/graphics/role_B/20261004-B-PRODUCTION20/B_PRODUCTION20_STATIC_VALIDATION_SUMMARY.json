@@ -9,5 +9,13 @@
   "two_px_guard_conflicts": 0,
   "header_128_exact": true,
   "raw_orientation": "mirror_y",
-  "status": "PASS"
+  "status": "SELF_QA_AND_C106_MACHINE_PASS_PENDING_C_CONTROLLER_VISUAL_AND_INGAME",
+  "worker_run_id": 37204151380,
+  "worker_output_commit": "2ea49bc74435c10b6a452d6150d929aab0c89998",
+  "manual_visual_qa": "PASS",
+  "c105_machine_qa": "STALE_SUPERSEDED_V1",
+  "runtime_validation": "UNTESTED",
+  "c106_current_sha_machine_qa": "PASS",
+  "c106_report": "localization/graphics/role_C/20261004-C106-5B65E08C/C106_5B65E08C_MACHINE_QA.json",
+  "c106_controller_visual_qa": "PENDING"
 }
