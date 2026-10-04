@@ -266,11 +266,9 @@ r33_guard = require(
 )
 if r33_guard.find("Present/pre") > r33_guard.find("R33PresentR32Hook.stdcall<HRESULT>"):
     raise SystemExit("R33 must reassert Reset replay fail-close before lower Present work")
-r34_shim = require(
-    "src/vr/d3d9/stereo_renderer_r34.cpp",
-    '#include "stereo_renderer_r33.cpp"',
-    "Do not add Hook objects, install state, polling, workers, or D3D9 detours here.",
-)
+r34_path = ROOT / "src/vr/d3d9/stereo_renderer_r34.cpp"
+if r34_path.exists():
+    raise SystemExit("retired R34 source shim reappeared")
 for marker in (
         "class VRStereoR34ResetGuardHook final : public Hook",
         'return "OpenXRVRStereoR34ResetGuard";',
@@ -278,12 +276,6 @@ for marker in (
     if marker not in r33_guard:
         raise SystemExit(
             f"R33 final dispatcher missing folded R34 compatibility registration: {marker}")
-for banned in ("class VRStereoR34ResetGuardHook", "OpenXRVRStereoR34ResetGuard",
-               "R33InstallStatus()", "R34InstallThread", "CreateThread(", "Sleep(",
-               "R33SynchronizeResetReplayGuardState(", "ReportAsyncResult("):
-    if banned in r34_shim:
-        raise SystemExit(
-            f"R34 final-TU shim regained compatibility/runtime ownership: {banned}")
 
 r31 = load("src/vr/d3d9/stereo_renderer_r31.cpp")
 end_enable = r31.find(
@@ -421,7 +413,6 @@ cmake = require(
     "PROPERTIES HEADER_FILE_ONLY TRUE",
     "OUTRUN_VR_POST_REVIEW_FINAL_TUS",
     "ex_device_upgrade_r15.cpp",
-    "stereo_renderer_r34.cpp",
 )
 included_start = cmake.find("set(OUTRUN_VR_INCLUDED_IMPL_TUS")
 included_end = cmake.find(
@@ -443,6 +434,9 @@ if "stereo_renderer_r33.cpp" not in final_section or \
         "outrun_renderer_r29.cpp" not in final_section:
     raise SystemExit("final VR wrapper TU list is incomplete")
 
+if "stereo_renderer_r34.cpp" in cmake:
+    raise SystemExit("cmake.toml retained retired R34 source shim")
+
 generated = require(
     "CMakeLists.txt",
     "set(OUTRUN_VR_INCLUDED_IMPL_TUS",
@@ -451,8 +445,10 @@ generated = require(
     "ex_device_upgrade_r14.cpp",
     "outrun_renderer_r29.cpp",
     "ex_device_upgrade_r15.cpp",
-    "stereo_renderer_r34.cpp",
 )
+if "stereo_renderer_r34.cpp" in generated:
+    raise SystemExit("generated CMakeLists retained retired R34 source shim")
+
 for source in (
     "src/vr/d3d9/stereo_renderer_r31.cpp",
     "src/vr/d3d9/stereo_renderer_r32.cpp",
@@ -482,7 +478,6 @@ for source in (
     "src/vr/d3d9/stereo_renderer_r31.cpp",
     "src/vr/d3d9/stereo_renderer_r32.cpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
-    "src/vr/d3d9/stereo_renderer_r34.cpp",
     "src/vr/game/outrun_renderer_r23.cpp",
     "src/vr/game/outrun_renderer_r29.cpp",
 ):

@@ -59,8 +59,8 @@ unset(_vr_source)
 unset(_vr_header_only)
 
 # R15 remains the post-review device correctness overlay. The stereo full
-# chain now terminates directly at the R33 final dispatcher; R34 remains only an
-# include-only compatibility shim and is never a compiled stereo owner.
+# chain terminates directly at the R33 final dispatcher. The obsolete R34
+# source shim is retired; its historical compatibility status stays in R33.
 set(OUTRUN_VR_POST_REVIEW_FINAL_TUS
     src/vr/d3d9/ex_device_upgrade_r15.cpp
     src/vr/d3d9/stereo_renderer_r33.cpp)
@@ -71,14 +71,13 @@ foreach(_vr_source IN LISTS OUTRUN_VR_POST_REVIEW_FINAL_TUS)
 endforeach()
 set_source_files_properties(
     src/vr/d3d9/ex_device_upgrade_r14.cpp
-    src/vr/d3d9/stereo_renderer_r34.cpp
     PROPERTIES HEADER_FILE_ONLY TRUE)
 unset(_vr_source)
 
 # Production-safe stereo draw owner. The user-visible regression reproduced on
 # Quest while the monitor SBS remained individually plausible is tied to the
 # post-e20 R29+ fast L+R/HUD dispatch chain. Default back to the last proven
-# R26/R23/R22/R13/R9 draw + R23 renderer boundary. R29-R34 comparison builds
+# R26/R23/R22/R13/R9 draw + R23 renderer boundary. R29-R33 comparison builds
 # remain available only when this option is explicitly disabled.
 option(OUTRUN_VR_SAFE_DRAW_COMPARE "Use proven R26/R23 safe stereo draw production path" ON)
 set_source_files_properties(
@@ -109,7 +108,7 @@ endif()
 # C1/C2 regression-isolation builds. These keep current R15/transport/texture
 # work and renderer R29 installation, but compile a shorter stereo owner chain.
 # C1 = R29 fast L+R + restored R23/R27/R28 perspective-world classification.
-# C2 = C1 + R30 asymmetric-FOV HUD correction. R31-R34 stay excluded in both.
+# C2 = C1 + R30 asymmetric-FOV HUD correction. R31-R33 stay excluded in both.
 option(OUTRUN_VR_C1_COMPARE "Build C1: R29 fast L+R with R27/R28 classification" OFF)
 option(OUTRUN_VR_C2_COMPARE "Build C2: C1 plus R30 HUD correction" OFF)
 set_source_files_properties(

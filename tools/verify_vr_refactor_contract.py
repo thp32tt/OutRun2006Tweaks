@@ -27,7 +27,9 @@ r26 = text("src/vr/d3d9/stereo_renderer_r26.cpp")
 r31 = text("src/vr/d3d9/stereo_renderer_r31.cpp")
 r32 = text("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = text("src/vr/d3d9/stereo_renderer_r33.cpp")
-r34 = text("src/vr/d3d9/stereo_renderer_r34.cpp")
+r34_path = ROOT / "src/vr/d3d9/stereo_renderer_r34.cpp"
+if r34_path.exists():
+    errors.append("retired R34 source shim reappeared")
 cmake = text("CMakeLists.txt")
 cmake_toml = text("cmake.toml")
 renderer_r29 = text("src/vr/game/outrun_renderer_r29.cpp")
@@ -360,7 +362,7 @@ else:
 
 # Cycle 911-1000 owner-boundary convergence.
 # Upper layers may update lower-layer telemetry only through owner APIs.
-for rel, source in (("R31", r31), ("R32", r32), ("R33", r33), ("R34", r34)):
+for rel, source in (("R31", r31), ("R32", r32), ("R33", r33)):
     if "++R29StableTwoEyeDraws;" in source:
         errors.append(
             f"{rel} retained direct R29 stable-two-eye telemetry mutation")
@@ -410,7 +412,7 @@ for marker in (
     if marker not in r32:
         errors.append(f"R32 missing R13 DirectGPU owner API use: {marker}")
 
-for rel, source in (("R32", r32), ("R33", r33), ("R34", r34)):
+for rel, source in (("R32", r32), ("R33", r33)):
     for banned in (
         "R31FastWorldDraws",
         "R31FastWorldLiveValidations",
@@ -471,7 +473,7 @@ for banned in (
     if banned in r32:
         errors.append(
             f"R32 retained direct R31 reset-state ownership: {banned}")
-    if banned in r33 or banned in r34:
+    if banned in r33:
         errors.append(
             f"upper renderer retained direct R31 reset-state ownership: {banned}")
 
@@ -540,9 +542,6 @@ if "R29ArmMonoSafety(" in r33:
     errors.append("R33 retained private R29 mono-safety helper dependency")
 if "ArmStereoRecoverySafety(" not in r33:
     errors.append("R33 missing R29 owner stereo-recovery safety API")
-if "R29ArmMonoSafety(" in r34:
-    errors.append("R34 thin readiness layer retained private R29 helper dependency")
-
 for banned in ("R29ArmMonoSafety(", "R29MonoSafetyThroughEpoch"):
     if banned in r32:
         errors.append(
@@ -610,8 +609,6 @@ for marker in ("R22InstallStatus()", "R31InstallStatus()"):
 
 if "R32InstallState" in r33:
     errors.append("R33 retained direct R32 install-state dependency")
-if "R33InstallState" in r34:
-    errors.append("R34 retained direct R33 install-state dependency")
 for marker, source, owner in (
     ("R32InstallStatus()", r32, "R32"),
     ("R33InstallStatus()", r33, "R33"),
@@ -621,25 +618,9 @@ for marker, source, owner in (
 if "R32InstallStatus()" not in r33:
     errors.append("R33 missing R32 install-state owner query")
 
-# Post-1000 hook-chain flattening: R34 must no longer add another physical
-# Reset/Present/draw detour layer above R33. Runtime responsibilities and the
-# historical R34 compatibility Hook registration are owned by R33; R34 is only
-# the final-TU include shim selected by existing build matrices.
-for banned in (
-    "SafetyHookInline R34",
-    "safetyhook::create_inline(",
-    "HRESULT __stdcall DrawPrimitiveDestR34",
-    "HRESULT __stdcall DrawIndexedPrimitiveDestR34",
-    "HRESULT __stdcall DrawPrimitiveUPDestR34",
-    "HRESULT __stdcall DrawIndexedPrimitiveUPDestR34",
-    "HRESULT __stdcall ResetDestR34",
-    "HRESULT __stdcall PresentDestR34",
-    "R34EnableHooks()",
-    "R34RollbackHooks()",
-):
-    if banned in r34:
-        errors.append(f"R34 retained physical hook-chain layer: {banned}")
-
+# Post-1000 hook-chain flattening: all former R34 runtime responsibilities and
+# the historical R34 compatibility Hook/status registration are owned by R33.
+# The obsolete source shim itself must stay retired from source/build graphs.
 for marker in (
     "R33GuardStereoRasterState(",
     "R33SynchronizeResetReplayGuardState(",
@@ -655,19 +636,6 @@ for marker in (
     if marker not in r33:
         errors.append(f"R33 missing folded final-dispatch responsibility: {marker}")
 
-for banned in (
-    "R34InstallState",
-    "R34InstallThread",
-    "CreateThread(",
-    "Sleep(",
-    "R33SynchronizeResetReplayGuardState(",
-    "ReportAsyncResult(",
-):
-    if banned in r34:
-        errors.append(
-            f"R34 passive readiness observer regained worker/state ownership: {banned}")
-if "R33InstallStatus()" in r34:
-    errors.append("R34 final-TU shim retained R33 install-state observer logic")
 for marker in (
     "class VRStereoR34ResetGuardHook final : public Hook",
     'return "OpenXRVRStereoR34ResetGuard";',
@@ -676,16 +644,8 @@ for marker in (
     if marker not in r33:
         errors.append(
             f"R33 missing folded R34 compatibility registration: {marker}")
-for banned in (
-    "class VRStereoR34ResetGuardHook",
-    "OpenXRVRStereoR34ResetGuard",
-    "namespace OutRunVRStereo",
-):
-    if banned in r34:
-        errors.append(
-            f"R34 final-TU shim retained compatibility Hook ownership: {banned}")
 
-# Post-1000 successor: once R34 is an include-only shim, the normal full-chain
+# Post-1000 successor: after the R34 shim retirement, the normal full-chain
 # build must compile R33 directly. Comparison modes may disable R33 in favor of
 # their isolated owner, but R34 must never become a compiled stereo owner again.
 post_review = re.search(
@@ -702,16 +662,8 @@ else:
     if "src/vr/d3d9/stereo_renderer_r34.cpp" in body:
         errors.append("CMake retained R34 shim as post-review compiled final TU")
 
-header_only = re.search(
-    r"set_source_files_properties\(\s*"
-    r"src/vr/d3d9/ex_device_upgrade_r14\.cpp\s*"
-    r"src/vr/d3d9/stereo_renderer_r34\.cpp\s*"
-    r"PROPERTIES HEADER_FILE_ONLY TRUE\)",
-    cmake,
-    re.DOTALL,
-)
-if not header_only:
-    errors.append("CMake must keep R34 shim HEADER_FILE_ONLY in the normal graph")
+if "src/vr/d3d9/stereo_renderer_r34.cpp" in cmake:
+    errors.append("CMake retained retired R34 source shim")
 
 owners = re.search(
     r"set\(_vr_stereo_owner_candidates(?P<body>.*?)\)",
@@ -756,11 +708,8 @@ else:
         errors.append("cmake.toml full-chain final TU must terminate directly at R33")
     if "src/vr/d3d9/stereo_renderer_r34.cpp" in body:
         errors.append("cmake.toml retained R34 shim as post-review compiled final TU")
-if not re.search(
-    r"set_source_files_properties\(\s*src/vr/d3d9/ex_device_upgrade_r14\.cpp\s*"
-    r"src/vr/d3d9/stereo_renderer_r34\.cpp\s*PROPERTIES HEADER_FILE_ONLY TRUE\)",
-    cmake_toml, re.DOTALL):
-    errors.append("cmake.toml must keep R34 shim HEADER_FILE_ONLY in the normal graph")
+if "src/vr/d3d9/stereo_renderer_r34.cpp" in cmake_toml:
+    errors.append("cmake.toml retained retired R34 source shim")
 generator_owners = re.search(
     r"set\(_vr_stereo_owner_candidates(?P<body>.*?)\)", cmake_toml, re.DOTALL)
 if not generator_owners:
@@ -790,14 +739,6 @@ for banned in ("R22FailClosedEligibility();", "R22ResetBaselineTracking();"):
 if "FailClosedResetBaselineState();" not in r33:
     errors.append("R33 missing consolidated R22 reset fail-close owner API")
 
-for banned in (
-    "R33DepthStencilState.valid = false;",
-    "RightDepthSynchronized = false;",
-    "RightStencilSynchronized = false;",
-):
-    if banned in r34:
-        errors.append(
-            f"R34 thin readiness layer retained R33 depth/stencil implementation state: {banned}")
 if "FailClosedDepthStencilState();" not in r33:
     errors.append("R33 final dispatcher missing consolidated depth/stencil owner API")
 
@@ -859,9 +800,6 @@ if "R31FlushPendingStateBlockResync" in r33:
     errors.append("R33 regained R31 StateBlock resync execution dependency")
 if "StateBlockRecovery::FlushPendingResync(device)" not in r33:
     errors.append("R33 missing neutral StateBlock recovery boundary")
-if "R31FlushPendingStateBlockResync" in r34 or         "StateBlockRecovery::FlushPendingResync(device)" in r34:
-    errors.append("R34 thin readiness layer must not execute draw-time StateBlock recovery")
-
 if "StateBlockRecovery::Configure(" not in r31:
     errors.append("R31 missing neutral StateBlock recovery callback registration")
 if "StateBlockEvents::Configure(" not in r31:
@@ -973,7 +911,7 @@ elif "StateBlockTracker::MarkCoverageLost()" not in r22_apply_owner.group(0):
 if "R31FlushPendingStateBlockResync" in r31:
     errors.append("R31 retained obsolete StateBlock resync execution wrapper")
 
-for rel, source in (("R31", r31), ("R32", r32), ("R33", r33), ("R34", r34)):
+for rel, source in (("R31", r31), ("R32", r32), ("R33", r33)):
     if "R31StateBlockRecording" in source:
         errors.append(
             f"{rel} regained R31 StateBlock recording-state dependency")

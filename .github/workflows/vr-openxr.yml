@@ -106,6 +106,9 @@ jobs:
               'R32LowerFailClosed',
               'R30DrawPrimitiveR29Hook',
               'R33ResetR32Hook.stdcall<HRESULT>',
+              'R33ResetReplayBlocked',
+              'LastResetStateReplaySucceeded',
+              'stereo remains fail-closed',
               'top-level telemetry counted once'
             )
             'src/vr/d3d9/ex_device_upgrade_r14.cpp' = @(
@@ -116,11 +119,6 @@ jobs:
             'src/vr/d3d9/ex_device_upgrade_r15.cpp' = @(
               'D3DSBT_ALL',
               'Ex promotion rolled back transactionally'
-            )
-            'src/vr/d3d9/stereo_renderer_r34.cpp' = @(
-              'R34ResetReplayBlocked',
-              'LastResetStateReplaySucceeded',
-              'stereo remains fail-closed'
             )
             'src/vr/d3d9/vr_pass_policy.hpp' = @(
               'EffectStereoPolicy',
@@ -239,7 +237,6 @@ jobs:
             'stereo_renderer_r31.cpp',
             'stereo_renderer_r32.cpp',
             'stereo_renderer_r33.cpp',
-            'stereo_renderer_r34.cpp',
             'outrun_renderer_r29.cpp'
           )) {
             $escaped = [regex]::Escape($excluded)
@@ -331,7 +328,6 @@ jobs:
             'stereo_renderer_r31.cpp',
             'stereo_renderer_r32.cpp',
             'stereo_renderer_r33.cpp',
-            'stereo_renderer_r34.cpp',
             'outrun_renderer_r29.cpp'
           )) {
             $escaped = [regex]::Escape($includedOnly)
@@ -414,7 +410,6 @@ jobs:
             'stereo_renderer_r26_compare.cpp',
             'stereo_renderer_r29_c1_compare.cpp',
             'stereo_renderer_r30_c2_compare.cpp',
-            'stereo_renderer_r34.cpp',
             'outrun_renderer_r29.cpp'
           )) {
             $escaped = [regex]::Escape($excluded)
@@ -496,8 +491,7 @@ jobs:
             'stereo_renderer_r30_c2_compare.cpp',
             'stereo_renderer_r31.cpp',
             'stereo_renderer_r32.cpp',
-            'stereo_renderer_r33.cpp',
-            'stereo_renderer_r34.cpp'
+            'stereo_renderer_r33.cpp'
           )) {
             $escaped = [regex]::Escape($excluded)
             $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'
@@ -583,8 +577,7 @@ jobs:
             'stereo_renderer_r29_c1_compare.cpp',
             'stereo_renderer_r31.cpp',
             'stereo_renderer_r32.cpp',
-            'stereo_renderer_r33.cpp',
-            'stereo_renderer_r34.cpp'
+            'stereo_renderer_r33.cpp'
           )) {
             $escaped = [regex]::Escape($excluded)
             $pattern = '<ClCompile Include="[^"]*[\\/]' + $escaped + '"'

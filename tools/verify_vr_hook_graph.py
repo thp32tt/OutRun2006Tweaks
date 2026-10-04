@@ -23,7 +23,6 @@ CHAIN = {
     "src/vr/d3d9/stereo_renderer_r31.cpp": "stereo_renderer_r30.cpp",
     "src/vr/d3d9/stereo_renderer_r32.cpp": "stereo_renderer_r31.cpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp": "stereo_renderer_r32.cpp",
-    "src/vr/d3d9/stereo_renderer_r34.cpp": "stereo_renderer_r33.cpp",
 }
 
 MAX_HOOKS = {
@@ -39,7 +38,6 @@ MAX_HOOKS = {
     "src/vr/d3d9/stereo_renderer_r31.cpp": 8,
     "src/vr/d3d9/stereo_renderer_r32.cpp": 7,
     "src/vr/d3d9/stereo_renderer_r33.cpp": 7,
-    "src/vr/d3d9/stereo_renderer_r34.cpp": 0,
 }
 
 errors = []
