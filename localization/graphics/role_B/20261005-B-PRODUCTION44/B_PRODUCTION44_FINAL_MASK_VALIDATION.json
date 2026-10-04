@@ -5,11 +5,11 @@
     1024,
     1024
   ],
-  "changed_pixels": 50801,
+  "changed_pixels": 51081,
   "changed_bbox": [
-    376,
+    9,
     4,
-    1015,
+    648,
     512
   ],
   "changed_pixels_outside_edit_mask": 0,

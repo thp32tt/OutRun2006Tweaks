@@ -1,9 +1,0 @@
-{
-  "run": "20261005-B-PRODUCTION44",
-  "asset": "12519155",
-  "index": 128,
-  "status": "FAIL_CLOSED_DIAGNOSTIC",
-  "exception": "RuntimeError(('expected_7_regions', 8))",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 322, in <module>\n    main()\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 94, in main\n    raise RuntimeError((\"expected_7_regions\",len(best)))\nRuntimeError: ('expected_7_regions', 8)\n",
-  "RUNTIME_VALIDATION": "UNTESTED"
-}
