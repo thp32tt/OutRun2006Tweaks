@@ -1,0 +1,89 @@
+{
+  "asset": "841E796B",
+  "source_result": "A_PRODUCTION16",
+  "candidate_sha256": "6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad",
+  "structure": {
+    "width": 2048,
+    "height": 512,
+    "pitch": 8192,
+    "mipmaps": 1,
+    "pf_size": 32,
+    "pf_flags": 65,
+    "fourcc": 0,
+    "rgb_bits": 32,
+    "r_mask": 255,
+    "g_mask": 65280,
+    "b_mask": 16711680,
+    "a_mask": 4278190080
+  },
+  "candidate_matches_producer_sha": true,
+  "decoded_candidate_vs_persisted_final_diff_pixels": 0,
+  "final_changed_pixels_outside_exact_allowed_mask": 0,
+  "clean_changed_pixels_outside_source_text_mask": 0,
+  "localized_target_vs_protected_visible_overlap_pixels": 0,
+  "localized_pair_overlap_pixels": 0,
+  "positive_interline_gap_px": 9,
+  "rows": [
+    {
+      "key": "no",
+      "original_bbox": [
+        1534,
+        258,
+        1602,
+        300
+      ],
+      "localized_bbox": [
+        1545,
+        263,
+        1601,
+        295
+      ],
+      "delta_left": 11,
+      "delta_right": 1,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "source_size": [
+        68,
+        42
+      ],
+      "localized_size": [
+        56,
+        32
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "handicap",
+      "original_bbox": [
+        1548,
+        303,
+        1768,
+        353
+      ],
+      "localized_bbox": [
+        1590,
+        304,
+        1725,
+        352
+      ],
+      "delta_left": 42,
+      "delta_right": 43,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "source_size": [
+        220,
+        50
+      ],
+      "localized_size": [
+        135,
+        48
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}

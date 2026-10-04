@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-2124-C102",
+  "scope": "new/changed A_PRODUCTION16 841E796B plus C-returned B_RECOVERY09 A064FDFC only; completed unrelated assets not repeated",
+  "results": [
+    {
+      "asset": "841E796B",
+      "source_result": "A_PRODUCTION16",
+      "candidate_sha256": "6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad",
+      "structure": {
+        "width": 2048,
+        "height": 512,
+        "pitch": 8192,
+        "mipmaps": 1,
+        "pf_size": 32,
+        "pf_flags": 65,
+        "fourcc": 0,
+        "rgb_bits": 32,
+        "r_mask": 255,
+        "g_mask": 65280,
+        "b_mask": 16711680,
+        "a_mask": 4278190080
+      },
+      "candidate_matches_producer_sha": true,
+      "decoded_candidate_vs_persisted_final_diff_pixels": 0,
+      "final_changed_pixels_outside_exact_allowed_mask": 0,
+      "clean_changed_pixels_outside_source_text_mask": 0,
+      "localized_target_vs_protected_visible_overlap_pixels": 0,
+      "localized_pair_overlap_pixels": 0,
+      "positive_interline_gap_px": 9,
+      "rows": [
+        {
+          "key": "no",
+          "original_bbox": [
+            1534,
+            258,
+            1602,
+            300
+          ],
+          "localized_bbox": [
+            1545,
+            263,
+            1601,
+            295
+          ],
+          "delta_left": 11,
+          "delta_right": 1,
+          "delta_top": 5,
+          "delta_bottom": 5,
+          "source_size": [
+            68,
+            42
+          ],
+          "localized_size": [
+            56,
+            32
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "handicap",
+          "original_bbox": [
+            1548,
+            303,
+            1768,
+            353
+          ],
+          "localized_bbox": [
+            1590,
+            304,
+            1725,
+            352
+          ],
+          "delta_left": 42,
+          "delta_right": 43,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "source_size": [
+            220,
+            50
+          ],
+          "localized_size": [
+            135,
+            48
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "machine_status": "PASS",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "A064FDFC",
+      "source_result": "B_RECOVERY09",
+      "candidate_sha256": "f78d11bfbef569bebee078aeccd9adbd8e35d89f39e99454174c8c22de7945bb",
+      "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "candidate_matches_producer_sha": true,
+      "structure": {
+        "width": 4096,
+        "height": 2048,
+        "pitch": 16384,
+        "mipmaps": 1,
+        "pf_size": 32,
+        "pf_flags": 65,
+        "fourcc": 0,
+        "rgb_bits": 32,
+        "r_mask": 255,
+        "g_mask": 65280,
+        "b_mask": 16711680,
+        "a_mask": 4278190080
+      },
+      "source_header_128_exact": true,
+      "derived_localized_target_pixels_outside_selected_allowed_mask": 1485598,
+      "derived_vs_persisted_target_mask_xor_pixels": 1485603,
+      "localized_pair_overlap_pixels": 0,
+      "rows": [
+        {
+          "key": "ranking",
+          "original_bbox": [
+            120,
+            245,
+            455,
+            350
+          ],
+          "localized_bbox": [
+            210,
+            254,
+            365,
+            341
+          ],
+          "delta_left": 90,
+          "delta_right": 90,
+          "delta_top": 9,
+          "delta_bottom": 9,
+          "source_size": [
+            335,
+            105
+          ],
+          "localized_size": [
+            155,
+            87
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "stage",
+          "original_bbox": [
+            455,
+            245,
+            690,
+            350
+          ],
+          "localized_bbox": [
+            463,
+            266,
+            681,
+            329
+          ],
+          "delta_left": 8,
+          "delta_right": 9,
+          "delta_top": 21,
+          "delta_bottom": 21,
+          "source_size": [
+            235,
+            105
+          ],
+          "localized_size": [
+            218,
+            63
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "rank",
+          "original_bbox": [
+            690,
+            245,
+            875,
+            350
+          ],
+          "localized_bbox": [
+            707,
+            254,
+            858,
+            340
+          ],
+          "delta_left": 17,
+          "delta_right": 17,
+          "delta_top": 9,
+          "delta_bottom": 10,
+          "source_size": [
+            185,
+            105
+          ],
+          "localized_size": [
+            151,
+            86
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "dumped_white",
+          "original_bbox": [
+            3169,
+            270,
+            3605,
+            390
+          ],
+          "localized_bbox": [
+            3232,
+            278,
+            3539,
+            358
+          ],
+          "delta_left": 63,
+          "delta_right": 66,
+          "delta_top": 8,
+          "delta_bottom": 32,
+          "source_size": [
+            436,
+            120
+          ],
+          "localized_size": [
+            307,
+            80
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "machine_status": "FAIL",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "machine_pass_assets": [
+    "841E796B"
+  ],
+  "machine_fail_assets": [
+    "A064FDFC"
+  ],
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
