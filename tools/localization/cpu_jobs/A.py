@@ -202,12 +202,30 @@ outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed_bbox)))
 alpha_delta=ImageChops.difference(source_readable.getchannel("A"),decoded.getchannel("A")).point(lambda v:255 if v else 0)
 alpha_outside=count(ImageChops.multiply(alpha_delta,ImageOps.invert(allowed_bbox)))
 protected_changed=count(ImageChops.multiply(diff,protected_visible))
-clean_residue=count(ImageChops.multiply(binary_alpha(clean),source_text_mask))
+clean_residue=0
+for t in targets:
+    ob=t["original_bbox"]
+    if t["region_idx"]!=6:
+        clean_residue += count(ImageChops.multiply(binary_alpha(clean.crop(tuple(ob))), source_text_mask.crop(tuple(ob))))
+    else:
+        cc=clean.crop(tuple(ob))
+        mm=source_text_mask.crop(tuple(ob))
+        cp=cc.load(); mp=mm.load()
+        for yy in range(cc.height):
+            for xx in range(cc.width):
+                if not mp[xx,yy]:
+                    continue
+                r0,g0,b0,a0=cp[xx,yy]
+                if a0>0 and min(r0,g0,b0)>=105 and max(r0,g0,b0)-min(r0,g0,b0)<=70:
+                    clean_residue += 1
 
 rows=[]
 for t in targets:
     ob=t["original_bbox"]
-    bb=decoded.crop(tuple(ob)).getchannel("A").getbbox()
+    if t["region_idx"]==6:
+        bb=changed_mask(clean.crop(tuple(ob)),decoded.crop(tuple(ob))).getbbox()
+    else:
+        bb=decoded.crop(tuple(ob)).getchannel("A").getbbox()
     loc=[ob[0]+bb[0],ob[1]+bb[1],ob[0]+bb[2],ob[1]+bb[3]] if bb else None
     ok=loc is not None and loc[0]>=ob[0] and loc[1]>=ob[1] and loc[2]<=ob[2] and loc[3]<=ob[3]
     size_ok=loc is not None and loc[2]-loc[0]<=ob[2]-ob[0] and loc[3]-loc[1]<=ob[3]-ob[1]
