@@ -7,12 +7,12 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R244_PROGRAMMABLE_CONSTANT_STATE_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
   "base_sha": "94da651d8333634320bc3f2c31ded701deea5b16",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+  "validation_bearing_result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
   "result_marker": "[AUTO:CONVERSION-DX11-00359]",
   "selected_work_item": "DX11_R244_PROGRAMMABLE_CONSTANT_STATE_RECEIPT",
   "summary": "R244 adds a dormant fail-closed programmable constant-state ownership receipt on top of a validated R243 input-layout receipt. It owns one exact same-device VS/PS D3D11 constant-buffer pair and seals exact DEFAULT/CONSTANT_BUFFER descriptors plus byte widths. It does not upload payloads, bind constant-buffer slots, route Draw*, or claim programmable translation/runtime parity.",
@@ -44,23 +44,44 @@
       "evidence": "Added R244 constant-state readiness/attach/snapshot APIs, per-entry owned VS/PS constant buffers, exact descriptor/byte-width checks and monotonic receipt generation; extended WARP probe and source-graph guards for prerequisite, same-device exactness, idempotence and fail-closed stale/replacement/foreign-device paths."
     },
     "C3_VALIDATE": {
-      "status": "PENDING_EXACT_SHA_GATE",
-      "automation_validation": "PENDING",
-      "local_auxiliary_validation": "PENDING",
-      "evidence": "Exact-SHA Backend Conversion Gate including DX11 readiness smoke/constant-buffer probe is required. No Quest 3/VDXR runtime test performed."
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R244_PROGRAMMABLE_CONSTANT_STATE_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "local_auxiliary_validation": "PASS",
+      "evidence": "Exact-SHA Backend Conversion Gate #1947 run 37186697270 completed SUCCESS for efe3122bc71702a0a23b50038573e85479de950e. Validate job 111390018301 passed queue/baseline/structure/disassembly/session checks, DX11 transport/dual-source/static-surface/source-graph including R244, dormant activation, census, Win32 configure/build/binary verification and artifact upload. DX11 readiness smoke job 111390674780 passed every probe; Build/Run DX11 constant buffer probe both succeeded and exercised R244 exact-R243 prerequisite, same-device VS/PS ID3D11Buffer ownership, exact DEFAULT/CONSTANT_BUFFER descriptors and byte widths, idempotence, foreign-device rejection, metadata mismatch, replacement rejection, stale-R243 rejection and device-generation invalidation/fresh receipt. Auxiliary static gate set passed on the exact SHA. Artifact 11297300899 digest sha256:0f16c058a0e40b5ed6681ad00027731ad95e296bb7355b384c71e14849fd8bb3. No Quest 3/VDXR runtime test was performed.",
+      "validation_run_id": 37186697270,
+      "validation_run_number": 1947,
+      "validation_job_id": 111390018301,
+      "readiness_smoke_job_id": 111390674780,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11297300899,
+      "artifact_digest": "sha256:0f16c058a0e40b5ed6681ad00027731ad95e296bb7355b384c71e14849fd8bb3"
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "COMPLETE",
+      "material_result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+      "validation_bearing_result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+      "source_implementation_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+      "result_marker": "[AUTO:CONVERSION-DX11-00359]",
+      "implementation_commits": [
+        "efe3122bc71702a0a23b50038573e85479de950e"
+      ]
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant ownership/descriptor receipt only; no production upload/binding/shader translation/Draw*/transport/runtime distributable behavior."
+      "reason": "R244 is a dormant programmable constant-buffer ownership/descriptor receipt. It adds no production payload upload/binding, shader translation, Draw* routing, transport change or runtime distributable behavior."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "Publish the R244 result without CI skip, require exact-SHA Backend Conversion Gate including readiness smoke, append Issue #14 evidence, then persist C3/C4/C6 with RUNTIME_VALIDATION=UNTESTED."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37186697270,
+      "validation_job_id": 111390018301,
+      "readiness_smoke_job_id": 111390674780,
+      "artifact_id": 11297300899,
+      "artifact_digest": "sha256:0f16c058a0e40b5ed6681ad00027731ad95e296bb7355b384c71e14849fd8bb3",
+      "implementation_comment_id": 5977810669,
+      "validation_comment_id": 5977861554,
+      "exact_next_action": "Release CONVERSION-DX11-00359 as complete. Preserve R239 programmable identity, R240 per-device cache, R241 translation-slot ownership, R242 translated-object receipt, R243 input-layout receipt and R244 constant-buffer ownership/descriptor receipt. Keep NativeDrawPath dormant. The next independent programmable unit may add one fail-closed constant-payload identity/upload-readiness boundary consuming validated R244 evidence, without live slot binding or Draw* routing."
     }
   },
   "regression_assessment": {
@@ -79,7 +100,36 @@
     "event_id": "CONVERSION-DXVK-00358-E002",
     "event_type": "retry",
     "attempt": "1/3",
-    "source": "CURRENT_USER_QUEUE"
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+    "source_implementation_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+    "validation_bearing_result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+    "validation_run_id": 37186697270,
+    "validation_job_id": 111390018301,
+    "readiness_smoke_job_id": 111390674780,
+    "artifact_id": 11297300899,
+    "artifact_digest": "sha256:0f16c058a0e40b5ed6681ad00027731ad95e296bb7355b384c71e14849fd8bb3",
+    "implementation_comment_id": 5977810669,
+    "validation_comment_id": 5977861554,
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false
   },
-  "exact_next_action": "Publish R244 as validation-bearing material result, validate that exact SHA, then finalize C3/C4/C6 without conflating automated validation with HMD runtime proof."
+  "exact_next_action": "Release CONVERSION-DX11-00359 as complete. Preserve R239 programmable identity, R240 per-device cache, R241 translation-slot ownership, R242 translated-object receipt, R243 input-layout receipt and R244 constant-buffer ownership/descriptor receipt. Keep NativeDrawPath dormant. The next independent programmable unit may add one fail-closed constant-payload identity/upload-readiness boundary consuming validated R244 evidence, without live slot binding or Draw* routing.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37186697270,
+      "run_number": 1947,
+      "result_sha": "efe3122bc71702a0a23b50038573e85479de950e",
+      "conclusion": "success",
+      "validate_job_id": 111390018301,
+      "readiness_smoke_job_id": 111390674780,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11297300899,
+      "artifact_digest": "sha256:0f16c058a0e40b5ed6681ad00027731ad95e296bb7355b384c71e14849fd8bb3"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5977810669,
+    "validation_comment_id": 5977861554
+  }
 }
