@@ -1,359 +1,287 @@
 #!/usr/bin/env python3
-import hashlib, json, os, struct, subprocess, urllib.request
+import hashlib, json, os, struct, subprocess
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageChops
 
 if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "C":
-    raise SystemExit("This deterministic job must run in the GitHub-hosted localization CPU worker as role C.")
+    raise SystemExit("Run only in GitHub-hosted localization CPU worker as role C.")
 
-repo = Path.cwd()
-run = "20261004-1650-C90"
-outdir = repo / "localization/graphics/role_C" / run
-outdir.mkdir(parents=True, exist_ok=True)
+repo=Path.cwd()
+run="20261004-1720-C91"
+outdir=repo/"localization/graphics/role_C"/run
+outdir.mkdir(parents=True,exist_ok=True)
 
-ASSETS = [
-    {
-        "key": "AA04D779",
-        "source": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
-        "candidate": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
-        "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY06/B_RECOVERY06_AA04D779_REPORT.json",
-        "source_mask": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_SOURCE_TEXT_MASK.png",
-        "clean": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_CLEAN_PLATE.png",
-        "clean_protected": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_PROTECTED_MASK.png",
-        "allowed": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_ALLOWED_TEXT_REGION_MASK.png",
-        "final_protected": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_PROTECTED_MASK.png",
-        "target_mask": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_TARGET_TEXT_MASK.png",
-        "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
-        "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
-        "candidate_sha256": "6f64736a53589379a00dc831e8605f0f8f140ffd52837f951e0a24fcd9d89c8a",
-        "expected_rows": 21,
-        "return_context": "new B_RECOVERY06 hosted exact-HD candidate",
-    },
-    {
-        "key": "19CEDB9",
-        "source": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
-        "candidate": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
-        "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY04/B_RECOVERY04_19CEDB9_REPORT.json",
-        "source_mask": "localization/graphics/role_B/20261004-B-RECOVERY04/19CEDB9_SOURCE_TEXT_MASK.png",
-        "clean": "localization/graphics/role_B/20261004-B-RECOVERY04/19CEDB9_CLEAN_PLATE.png",
-        "clean_protected": "localization/graphics/role_B/20261004-B-RECOVERY04/19CEDB9_PROTECTED_MASK.png",
-        "allowed": "localization/graphics/role_B/20261004-B-RECOVERY04/19CEDB9_ALLOWED_TEXT_REGION_MASK.png",
-        "final_protected": "localization/graphics/role_B/20261004-B-RECOVERY04/19CEDB9_PROTECTED_MASK.png",
-        "target_mask": "localization/graphics/role_B/20261004-B-RECOVERY04/19CEDB9_TARGET_TEXT_MASK.png",
-        "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
-        "candidate_sha256": "3090f2664bab3065502b10a98f93d17e92a64a3725dc1b7a4bb790648a5da6e7",
-        "expected_rows": 12,
-        "return_context": "new hosted exact-HD candidate",
-    },
-    {
-        "key": "2DA43E41",
-        "source": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
-        "candidate": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
-        "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY05/B_RECOVERY05_2DA43E41_REPORT.json",
-        "source_mask": "localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_SOURCE_TEXT_MASK_CANONICAL.png",
-        "clean": "localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_CLEAN_PLATE_CANONICAL.png",
-        "clean_protected": "localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_PROTECTED_MASK.png",
-        "allowed": "localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_ALLOWED_TEXT_REGION_MASK.png",
-        "final_protected": "localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_PROTECTED_MASK.png",
-        "target_mask": "localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_TARGET_TEXT_MASK.png",
-        "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
-        "candidate_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
-        "expected_rows": 11,
-        "return_context": "C88 canonical-decode visual corruption return repaired by B_RECOVERY05",
-    },
-    {
-        "key": "39229D64",
-        "source": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
-        "candidate": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
-        "producer_report": "localization/graphics/role_A/20261004-A-RECOVERY06/A_RECOVERY06_39229D64_REPORT.json",
-        "source_mask": "localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_SOURCE_TEXT_MASK.png",
-        "clean": "localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_CLEAN_PLATE.png",
-        "clean_protected": "localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_CLEAN_PLATE_PROTECTED_MASK.png",
-        "allowed": "localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_ALLOWED_TEXT_REGION_MASK.png",
-        "final_protected": "localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_PROTECTED_MASK.png",
-        "target_mask": None,
-        "source_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
-        "candidate_sha256": "67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a",
-        "expected_rows": 15,
-        "return_context": "C87 DDS structure + clean-plate evidence return repaired by A_RECOVERY06",
-    },
+ASSETS=[
+ {
+  "key":"571E78F3",
+  "source":"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+  "candidate":"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+  "source_sha":"17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+  "input_sha":"0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+  "rows":[
+   {"key":"571E78F3_1","korean":"타임 어택 모드","sprite_cell":[380,8,1340,140],"original_bbox":[395,15,1330,140],"input_localized_bbox":[541,12,1262,140],"scale":0.94},
+   {"key":"571E78F3_2","korean":"15코스 연속","sprite_cell":[500,132,1612,252],"original_bbox":[520,132,1590,245],"input_localized_bbox":[818,136,1293,248],"scale":0.94},
+  ]
+ },
+ {
+  "key":"62BEBF33",
+  "source":"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+  "candidate":"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+  "source_sha":"f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+  "input_sha":"def5f018e3effa33d1473dfa0c2c8cab390f88cf76284a81945128f8995ee09d",
+  "rows":[
+   {"key":"62BEBF33_1","korean":"아웃런 모드","sprite_cell":[380,44,1372,208],"original_bbox":[392,52,1357,201],"input_localized_bbox":[565,51,1186,199],"scale":0.96},
+  ]
+ },
+ {
+  "key":"E3FD08BE",
+  "source":"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+  "candidate":"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+  "source_sha":"ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+  "input_sha":"12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+  "rows":[
+   {"key":"E3FD08BE_1","korean":"하트 어택 모드","sprite_cell":[380,44,1640,208],"original_bbox":[393,54,1628,200],"input_localized_bbox":[632,53,1388,198],"scale":0.96},
+  ]
+ },
 ]
 
-def sha256(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
-def load_dds(path):
-    p = Path(path)
-    data = p.read_bytes()
-    if data[:4] != b"DDS ":
-        raise RuntimeError(f"not DDS: {p}")
-    h = struct.unpack_from("<I", data, 12)[0]
-    w = struct.unpack_from("<I", data, 16)[0]
-    pitch = struct.unpack_from("<I", data, 20)[0]
-    depth = struct.unpack_from("<I", data, 24)[0]
-    mips = struct.unpack_from("<I", data, 28)[0]
-    pf_flags = struct.unpack_from("<I", data, 80)[0]
-    fourcc = data[84:88]
-    bpp = struct.unpack_from("<I", data, 88)[0]
-    masks = struct.unpack_from("<IIII", data, 92)
-    if fourcc != b"\0\0\0\0" or bpp != 32:
-        raise RuntimeError(f"unsupported C90 DDS format: {p} fourcc={fourcc!r} bpp={bpp}")
-    if masks != (0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000):
-        raise RuntimeError(f"unexpected channel masks: {p} {masks!r}")
-    if pitch != w * 4 or len(data) != 128 + w * h * 4:
-        raise RuntimeError(f"unexpected RGBA layout: {p}")
-    raw = np.frombuffer(data, dtype=np.uint8, offset=128).reshape(h, w, 4).copy()
-    readable = np.flipud(raw).copy()
-    return {
-        "bytes": data,
-        "header": data[:128],
-        "raw": raw,
-        "readable": readable,
-        "structure": {
-            "width": w, "height": h, "pitch": pitch, "depth": depth, "mips": mips,
-            "pf_flags": pf_flags, "fourcc": "00000000", "bpp": bpp,
-            "masks": [hex(x) for x in masks],
-        },
-    }
+def dds_meta(p):
+ b=Path(p).read_bytes()
+ if b[:4]!=b"DDS ": raise RuntimeError("not DDS "+str(p))
+ h=struct.unpack_from("<I",b,12)[0]; w=struct.unpack_from("<I",b,16)[0]
+ mips=struct.unpack_from("<I",b,28)[0]; fourcc=b[84:88]
+ if fourcc!=b"DXT5": raise RuntimeError(("expected DXT5",p,fourcc))
+ need=128+((w+3)//4)*((h+3)//4)*16
+ if mips!=1 or len(b)!=need: raise RuntimeError(("unexpected DXT5 layout",p,w,h,mips,len(b),need))
+ return b,{"width":w,"height":h,"mips":mips,"fourcc":"DXT5","bytes":len(b)}
 
-def load_rgba_png(path, size):
-    im = Image.open(path).convert("RGBA")
-    if im.size != size:
-        raise RuntimeError(f"PNG size mismatch {path}: {im.size} != {size}")
-    return np.asarray(im, dtype=np.uint8).copy()
+def decode_readable(p):
+ raw=Image.open(p).convert("RGBA")
+ return raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 
-def load_mask(path, size):
-    im = Image.open(path).convert("L")
-    if im.size != size:
-        raise RuntimeError(f"mask size mismatch {path}: {im.size} != {size}")
-    return np.asarray(im, dtype=np.uint8) > 0
+def rectmask(size,boxes):
+ m=Image.new("L",size,0); d=ImageDraw.Draw(m)
+ for x0,y0,x1,y1 in boxes: d.rectangle((x0,y0,x1-1,y1-1),fill=255)
+ return m
 
 def bool_bbox(mask):
-    ys, xs = np.nonzero(mask)
-    if len(xs) == 0:
-        return None
-    return [int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1]
+ ys,xs=np.nonzero(mask)
+ if not len(xs): return None
+ return [int(xs.min()),int(ys.min()),int(xs.max())+1,int(ys.max())+1]
 
-def validate_stage(src, cand, edit, protected):
-    diff = np.any(src != cand, axis=2)
-    adiff = src[:, :, 3] != cand[:, :, 3]
-    return {
-        "changed_pixels": int(diff.sum()),
-        "changed_bbox": bool_bbox(diff),
-        "changed_pixels_outside_edit_mask": int(np.logical_and(diff, np.logical_not(edit)).sum()),
-        "changed_pixels_in_protected_mask": int(np.logical_and(diff, protected).sum()),
-        "alpha_changed_outside_edit_mask": int(np.logical_and(adiff, np.logical_not(edit)).sum()),
-    }
+def count_visible_diff(a,b,allowed):
+ aa=np.asarray(a,dtype=np.uint8); bb=np.asarray(b,dtype=np.uint8)
+ diff=np.any(aa!=bb,axis=2)
+ visible=(aa[:,:,3]>0)|(bb[:,:,3]>0)
+ outside=np.logical_and(np.logical_and(diff,visible),np.logical_not(allowed))
+ alpha=np.logical_and(aa[:,:,3]!=bb[:,:,3],np.logical_not(allowed))
+ return int(np.count_nonzero(diff)),int(np.count_nonzero(outside)),int(np.count_nonzero(alpha)),bool_bbox(diff)
 
-def panel(arr, label, max_w=700, max_h=700):
-    im = Image.fromarray(arr, "RGBA")
-    bg = Image.new("RGBA", im.size, (64, 64, 64, 255))
-    bg.alpha_composite(im)
-    v = bg.convert("RGB")
-    v.thumbnail((max_w, max_h), Image.Resampling.LANCZOS)
-    f = ImageFont.load_default()
-    card = Image.new("RGB", (v.width, v.height + 24), "white")
-    card.paste(v, (0, 24))
-    ImageDraw.Draw(card).text((5, 5), label, fill="black", font=f)
-    return card
+def card(label,im,bg=(64,64,64,255),max_w=900,max_h=420):
+ q=Image.new("RGBA",im.size,bg); q.alpha_composite(im); v=q.convert("RGB")
+ v.thumbnail((max_w,max_h),Image.Resampling.LANCZOS)
+ c=Image.new("RGB",(v.width,v.height+28),"white"); c.paste(v,(0,28))
+ ImageDraw.Draw(c).text((5,5),label,fill="black",font=ImageFont.load_default())
+ return c
 
-def save_full_compare(key, src, clean, final, raw_src, raw_final):
-    cards = [
-        panel(src, "SOURCE_READABLE"),
-        panel(clean, "CLEAN_READABLE"),
-        panel(final, "FINAL_READABLE"),
-        panel(raw_src, "SOURCE_RAW"),
-        panel(raw_final, "FINAL_RAW"),
-    ]
-    gap = 8
-    top_h = max(c.height for c in cards[:3])
-    bot_h = max(c.height for c in cards[3:])
-    top_w = sum(c.width for c in cards[:3]) + gap * 2
-    bot_w = sum(c.width for c in cards[3:]) + gap
-    sheet = Image.new("RGB", (max(top_w, bot_w), top_h + bot_h + gap), "white")
-    x = 0
-    for c in cards[:3]:
-        sheet.paste(c, (x, 0)); x += c.width + gap
-    x = 0
-    for c in cards[3:]:
-        sheet.paste(c, (x, top_h + gap)); x += c.width + gap
-    sheet.save(outdir / f"C90_{key}_FULL_COMPARE.jpg", quality=93)
+def save_compare(key,src,clean,before,final):
+ cards=[card("SOURCE_READABLE",src),card("CLEAN_READABLE",clean),card("BEFORE_READABLE",before),card("FINAL_READABLE",final),
+        card("SOURCE_RAW",src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)),card("FINAL_RAW",final.transpose(Image.Transpose.FLIP_TOP_BOTTOM))]
+ gap=8; cols=2
+ widths=[max(cards[i].width for i in range(c,len(cards),cols)) for c in range(cols)]
+ rowhs=[]
+ for r in range((len(cards)+cols-1)//cols): rowhs.append(max(cards[i].height for i in range(r*cols,min((r+1)*cols,len(cards)))))
+ sheet=Image.new("RGB",(sum(widths)+gap,max(sum(rowhs)+gap*(len(rowhs)-1),1)),"white")
+ y=0
+ for r,rh in enumerate(rowhs):
+  x=0
+  for c in range(cols):
+   i=r*cols+c
+   if i<len(cards): sheet.paste(cards[i],(x,y))
+   x+=widths[c]+gap
+  y+=rh+gap
+ sheet.save(outdir/f"C91_{key}_FULL_COMPARE.jpg",quality=94)
 
-def save_row_contact(key, src, clean, final, rows):
-    f = ImageFont.load_default()
-    cards = []
-    for row in rows:
-        b = row["original_bbox"]
-        pad = 8
-        x0 = max(0, int(b[0]) - pad); y0 = max(0, int(b[1]) - pad)
-        x1 = min(src.shape[1], int(b[2]) + pad); y1 = min(src.shape[0], int(b[3]) + pad)
-        crops = []
-        for arr, tag in ((src, "SRC"), (clean, "CLEAN"), (final, "FINAL")):
-            im = Image.fromarray(arr[y0:y1, x0:x1], "RGBA")
-            bg = Image.new("RGBA", im.size, (70,70,70,255)); bg.alpha_composite(im)
-            v = bg.convert("RGB")
-            scale = min(2.0, 360 / max(1, v.width), 130 / max(1, v.height))
-            if scale != 1.0:
-                v = v.resize((max(1,int(v.width*scale)), max(1,int(v.height*scale))), Image.Resampling.NEAREST)
-            card = Image.new("RGB", (370, 158), "white")
-            card.paste(v, ((370-v.width)//2, 24 + (130-v.height)//2))
-            ImageDraw.Draw(card).text((4,4), f"{row['key']} {tag}", fill="black", font=f)
-            crops.append(card)
-        strip = Image.new("RGB", (370*3+12, 158), "white")
-        for i,c in enumerate(crops): strip.paste(c, (i*(370+6), 0))
-        cards.append(strip)
-    sheet = Image.new("RGB", (cards[0].width, sum(c.height for c in cards)), "white")
-    y = 0
-    for c in cards:
-        sheet.paste(c, (0,y)); y += c.height
-    sheet.save(outdir / f"C90_{key}_ROW_CONTACT.jpg", quality=94)
+def save_rows(key,src,before,final,rows):
+ strips=[]
+ font=ImageFont.load_default()
+ for row in rows:
+  x0,y0,x1,y1=row["sprite_cell"]; pad=8
+  cr=(max(0,x0-pad),max(0,y0-pad),min(src.width,x1+pad),min(src.height,y1+pad))
+  cs=[]
+  for tag,im in (("SRC",src),("BEFORE",before),("FINAL",final)):
+   q=Image.new("RGBA",im.size,(64,64,64,255)); q.alpha_composite(im)
+   v=q.convert("RGB").crop(cr); v.thumbnail((700,220),Image.Resampling.LANCZOS)
+   c=Image.new("RGB",(720,250),"white"); c.paste(v,((720-v.width)//2,25+(220-v.height)//2))
+   ImageDraw.Draw(c).text((5,5),f'{row["key"]} {tag}',fill="black",font=font); cs.append(c)
+  strip=Image.new("RGB",(720*3+12,250),"white")
+  for i,c in enumerate(cs): strip.paste(c,(i*(720+6),0))
+  strips.append(strip)
+ sheet=Image.new("RGB",(strips[0].width,sum(x.height for x in strips)),"white")
+ y=0
+ for s in strips: sheet.paste(s,(0,y)); y+=s.height
+ sheet.save(outdir/f"C91_{key}_ROW_CONTACT.jpg",quality=95)
 
-results = []
+# nvcompress is used only for the touched DXT5 blocks; current candidate header and all untouched blocks remain byte-exact.
+if not Path("/usr/bin/nvcompress").exists():
+ subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+ subprocess.run(["sudo","apt-get","install","-y","-qq","libnvtt-bin"],check=True)
+nvcompress=Path("/usr/bin/nvcompress")
+if not nvcompress.exists(): raise RuntimeError("nvcompress unavailable")
+
+all_results=[]
 for spec in ASSETS:
-    key = spec["key"]
-    source_path = repo / spec["source"]
-    if not source_path.exists():
-        source_url = spec.get("source_url")
-        if not source_url:
-            raise RuntimeError(f"{key} source missing from repository and no pinned source_url is defined")
-        tmp_source = Path("/tmp") / f"C90_{key}_SOURCE.dds"
-        urllib.request.urlretrieve(source_url, tmp_source)
-        source_path = tmp_source
-    candidate_path = repo / spec["candidate"]
-    producer_path = repo / spec["producer_report"]
-    if sha256(source_path) != spec["source_sha256"]:
-        raise RuntimeError(f"{key} source SHA mismatch")
-    if sha256(candidate_path) != spec["candidate_sha256"]:
-        raise RuntimeError(f"{key} candidate SHA mismatch")
+ key=spec["key"]; source=repo/spec["source"]; cand=repo/spec["candidate"]
+ if sha(source)!=spec["source_sha"]: raise RuntimeError(key+" source SHA mismatch")
+ if sha(cand)!=spec["input_sha"]: raise RuntimeError(key+" input candidate SHA mismatch")
+ sb,smeta=dds_meta(source); cb,cmeta=dds_meta(cand)
+ if sb[:128]!=cb[:128] or smeta!=cmeta: raise RuntimeError(key+" current candidate structure/header drift")
+ src=decode_readable(source); before=decode_readable(cand)
+ if src.size!=(smeta["width"],smeta["height"]): raise RuntimeError(key+" decode size mismatch")
+ W,H=src.size
 
-    src_dds = load_dds(source_path)
-    cand_dds = load_dds(candidate_path)
-    if src_dds["header"] != cand_dds["header"]:
-        raise RuntimeError(f"{key} candidate header not exact source header")
-    if src_dds["structure"] != cand_dds["structure"]:
-        raise RuntimeError(f"{key} structure drift")
+ allowed_boxes=[r["original_bbox"] for r in spec["rows"]]
+ allowed_img=rectmask(src.size,allowed_boxes); allowed=np.asarray(allowed_img)>0
+ protected_img=ImageChops.invert(allowed_img)
 
-    h = src_dds["structure"]["height"]; w = src_dds["structure"]["width"]; size = (w,h)
-    src = src_dds["readable"]
-    final = cand_dds["readable"]
-    clean = load_rgba_png(repo / spec["clean"], size)
-    source_mask = load_mask(repo / spec["source_mask"], size)
-    clean_protected = load_mask(repo / spec["clean_protected"], size)
-    allowed = load_mask(repo / spec["allowed"], size)
-    final_protected = load_mask(repo / spec["final_protected"], size)
-    target = load_mask(repo / spec["target_mask"], size) if spec["target_mask"] else None
+ # Exact transparent clean plate for these standalone text atlases: remove only canonical source-alpha pixels inside exact source bboxes.
+ src_arr=np.asarray(src,dtype=np.uint8).copy(); clean_arr=src_arr.copy()
+ source_text=np.zeros((H,W),dtype=bool)
+ for row in spec["rows"]:
+  x0,y0,x1,y1=row["original_bbox"]
+  source_text[y0:y1,x0:x1]=src_arr[y0:y1,x0:x1,3]>0
+ clean_arr[source_text]=0
+ clean=Image.fromarray(clean_arr,"RGBA")
+ source_mask=Image.fromarray((source_text.astype(np.uint8)*255),"L")
+ clean_total,clean_out,clean_alpha_out,clean_bbox=count_visible_diff(src,clean,source_text)
+ if clean_out or clean_alpha_out: raise RuntimeError((key,"clean gate",clean_out,clean_alpha_out))
+ 
+ # Small C corrective rework: downscale accepted localized raster (never upscale), center with margin inside exact C85 source bbox.
+ final=before.copy()
+ final_arr=np.asarray(final,dtype=np.uint8).copy()
+ transformed=[]
+ for row in spec["rows"]:
+  cx0,cy0,cx1,cy1=row["sprite_cell"]
+  # Clear the full isolated cell; these assets are standalone label atlases and the C81 visual evidence confirms no protected non-text art in these cells.
+  final_arr[cy0:cy1,cx0:cx1]=0
+ final=Image.fromarray(final_arr,"RGBA")
+ for row in spec["rows"]:
+  ib=row["input_localized_bbox"]; ob=row["original_bbox"]
+  crop=before.crop(tuple(ib))
+  ab=crop.getchannel("A").getbbox()
+  if not ab: raise RuntimeError((key,row["key"],"empty input Korean crop"))
+  crop=crop.crop(ab)
+  avail_w=max(1,(ob[2]-ob[0])-8); avail_h=max(1,(ob[3]-ob[1])-8)
+  scale=min(float(row["scale"]),avail_w/crop.width,avail_h/crop.height)
+  if not (0<scale<=1): raise RuntimeError((key,row["key"],"bad scale",scale))
+  nw=max(1,round(crop.width*scale)); nh=max(1,round(crop.height*scale))
+  glyph=crop.resize((nw,nh),Image.Resampling.LANCZOS)
+  gab=glyph.getchannel("A").getbbox()
+  if not gab: raise RuntimeError((key,row["key"],"empty scaled glyph"))
+  glyph=glyph.crop(gab); nw,nh=glyph.size
+  px=ob[0]+((ob[2]-ob[0])-nw)//2; py=ob[1]+((ob[3]-ob[1])-nh)//2
+  if px<ob[0] or py<ob[1] or px+nw>ob[2] or py+nh>ob[3]: raise RuntimeError((key,row["key"],"fit fail"))
+  final.alpha_composite(glyph,(px,py))
+  transformed.append({"key":row["key"],"scale":scale,"precompress_bbox":[px,py,px+nw,py+nh]})
 
-    producer = json.loads(producer_path.read_text(encoding="utf-8"))
-    rows = producer["rows"]
-    if len(rows) != spec["expected_rows"]:
-        raise RuntimeError(f"{key} row count {len(rows)} != {spec['expected_rows']}")
+ # Compress a full raw-orientation scratch image with nvcompress; only selected blocks will be taken.
+ raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+ tmp_png=Path("/tmp")/f"C91_{key}_raw.png"; tmp_dds=Path("/tmp")/f"C91_{key}_nv.dds"
+ raw_final.save(tmp_png)
+ subprocess.run([str(nvcompress),"-bc3","-nomips",str(tmp_png),str(tmp_dds)],check=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
+ tb,tmeta=dds_meta(tmp_dds)
+ tmp_dec=Image.open(tmp_dds).convert("RGBA")
+ arr_target=np.asarray(raw_final,dtype=np.int16); arr_dec=np.asarray(tmp_dec,dtype=np.int16)
+ mae=float(np.mean(np.abs(arr_target-arr_dec)))
+ mae_flip=float(np.mean(np.abs(arr_target-np.flipud(arr_dec))))
+ if mae_flip+0.5<mae: raise RuntimeError((key,"nvcompress orientation flip suspected",mae,mae_flip))
 
-    clean_gate = validate_stage(src, clean, source_mask, clean_protected)
-    final_gate = validate_stage(src, final, allowed, final_protected)
-    clean_mask_protected_overlap = int(np.logical_and(source_mask, clean_protected).sum())
-    allowed_protected_overlap = int(np.logical_and(allowed, final_protected).sum())
+ out=bytearray(cb); bw=(W+3)//4; bh=(H+3)//4
+ patch_blocks=set()
+ for row in spec["rows"]:
+  # Patch all BC3 blocks intersecting old or exact source bbox; conversion to raw mirror-y coordinates is explicit.
+  ib=row["input_localized_bbox"]; ob=row["original_bbox"]
+  ux0=min(ib[0],ob[0]); uy0=min(ib[1],ob[1]); ux1=max(ib[2],ob[2]); uy1=max(ib[3],ob[3])
+  ry0=H-uy1; ry1=H-uy0
+  bx0=max(0,ux0//4); bx1=min(bw,(ux1+3)//4); by0=max(0,ry0//4); by1=min(bh,(ry1+3)//4)
+  for by in range(by0,by1):
+   for bx in range(bx0,bx1): patch_blocks.add((bx,by))
+ for bx,by in patch_blocks:
+  i=128+(by*bw+bx)*16
+  out[i:i+16]=tb[i:i+16]
+ cand.write_bytes(out)
+ output_sha=sha(cand)
+ fb,fmeta=dds_meta(cand)
+ if fb[:128]!=sb[:128] or fmeta!=smeta: raise RuntimeError(key+" output header/structure mismatch")
+ final_dec=decode_readable(cand)
 
-    row_union = np.zeros((h,w), dtype=bool)
-    row_checks = []
-    edge_touch = []
-    for row in rows:
-        ob = [int(x) for x in row["original_bbox"]]
-        lb = [int(x) for x in row.get("localized_bbox", row.get("localized_changed_bbox"))]
-        contained = ob[0] <= lb[0] and ob[1] <= lb[1] and lb[2] <= ob[2] and lb[3] <= ob[3]
-        if not contained or row.get("containment") != "PASS":
-            raise RuntimeError(f"{key} bbox fail {row['key']}: {ob} {lb}")
-        row_union[ob[1]:ob[3], ob[0]:ob[2]] = True
-        deltas = [lb[0]-ob[0], ob[2]-lb[2], lb[1]-ob[1], ob[3]-lb[3]]
-        if min(deltas) == 0:
-            edge_touch.append(row["key"])
-        row_checks.append({
-            "key": row["key"],
-            "original_bbox": ob,
-            "localized_bbox": lb,
-            "delta_left": deltas[0],
-            "delta_right": deltas[1],
-            "delta_top": deltas[2],
-            "delta_bottom": deltas[3],
-            "containment": "PASS",
-            "rework_status": row.get("rework_status", "PRODUCER_RESULT_RECHECKED"),
-        })
+ # C91 exact decoded gates.
+ final_total,final_out,final_alpha_out,final_bbox=count_visible_diff(src,final_dec,allowed)
+ if final_out or final_alpha_out: raise RuntimeError((key,"final outside gate",final_out,final_alpha_out,final_bbox))
+ changed_blocks=0; outside_patch_blocks=0
+ for by in range(bh):
+  for bx in range(bw):
+   i=128+(by*bw+bx)*16
+   if cb[i:i+16]!=fb[i:i+16]:
+    changed_blocks+=1
+    if (bx,by) not in patch_blocks: outside_patch_blocks+=1
+ if outside_patch_blocks: raise RuntimeError((key,"compressed collateral",outside_patch_blocks))
 
-    allowed_outside_row_union = int(np.logical_and(allowed, np.logical_not(row_union)).sum())
-    target_outside_allowed = int(np.logical_and(target, np.logical_not(allowed)).sum()) if target is not None else None
-    target_in_protected = int(np.logical_and(target, final_protected).sum()) if target is not None else None
+ row_reports=[]
+ target=np.zeros((H,W),dtype=bool)
+ for row,tmeta_row in zip(spec["rows"],transformed):
+  cx0,cy0,cx1,cy1=row["sprite_cell"]; ob=row["original_bbox"]
+  alpha=np.asarray(final_dec.getchannel("A"))>0
+  local=np.zeros_like(alpha); local[cy0:cy1,cx0:cx1]=alpha[cy0:cy1,cx0:cx1]
+  lb=bool_bbox(local)
+  if not lb: raise RuntimeError((key,row["key"],"no final alpha"))
+  ok=lb[0]>=ob[0] and lb[1]>=ob[1] and lb[2]<=ob[2] and lb[3]<=ob[3]
+  if not ok: raise RuntimeError((key,row["key"],"post-BC3 containment fail",ob,lb))
+  target[lb[1]:lb[3],lb[0]:lb[2]] |= alpha[lb[1]:lb[3],lb[0]:lb[2]]
+  row_reports.append({
+   "key":row["key"],"korean":row["korean"],"sprite_cell":row["sprite_cell"],
+   "original_bbox":ob,"input_localized_bbox":row["input_localized_bbox"],"localized_bbox":lb,
+   "delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],"delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],
+   "containment":"PASS","rework_status":"C91_SMALL_CORRECTIVE_DOWNSCALE_CENTER",
+   "requested_scale":row["scale"],"actual_precompress_scale":tmeta_row["scale"],
+   "precompress_bbox":tmeta_row["precompress_bbox"]
+  })
 
-    machine_pass = (
-        clean_gate["changed_pixels_outside_edit_mask"] == 0 and
-        clean_gate["changed_pixels_in_protected_mask"] == 0 and
-        clean_gate["alpha_changed_outside_edit_mask"] == 0 and
-        final_gate["changed_pixels_outside_edit_mask"] == 0 and
-        final_gate["changed_pixels_in_protected_mask"] == 0 and
-        final_gate["alpha_changed_outside_edit_mask"] == 0 and
-        clean_mask_protected_overlap == 0 and
-        allowed_protected_overlap == 0 and
-        allowed_outside_row_union == 0 and
-        (target_outside_allowed in (None,0)) and
-        (target_in_protected in (None,0))
-    )
-    if not machine_pass:
-        raise RuntimeError(f"{key} C90 machine gate failed")
+ source_mask.save(outdir/f"C91_{key}_SOURCE_TEXT_MASK.png")
+ allowed_img.save(outdir/f"C91_{key}_ALLOWED_TEXT_REGION_MASK.png")
+ protected_img.save(outdir/f"C91_{key}_PROTECTED_MASK.png")
+ clean.save(outdir/f"C91_{key}_CLEAN_PLATE.png")
+ Image.fromarray((target.astype(np.uint8)*255),"L").save(outdir/f"C91_{key}_TARGET_TEXT_MASK.png")
+ save_compare(key,src,clean,before,final_dec)
+ save_rows(key,src,before,final_dec,spec["rows"])
 
-    save_full_compare(key, src, clean, final, src_dds["raw"], cand_dds["raw"])
-    save_row_contact(key, src, clean, final, rows)
+ result={
+  "asset":key,"source_path":spec["source"],"candidate_path":spec["candidate"],
+  "source_sha256":spec["source_sha"],"input_candidate_sha256":spec["input_sha"],"candidate_sha256":output_sha,
+  "method":"C91 small corrective rework: exact canonical DXT5 source -> source-alpha clean plate evidence -> accepted current Korean raster downscale (no upscale) + recenter inside exact C85 source bbox -> nvcompress BC3 scratch -> patch only affected BC3 blocks into current exact-header candidate -> decoded strict QA",
+  "structure":{**smeta,"header_128_exact_canonical":True,"raw_orientation":"mirror_y"},
+  "clean_plate_gate":{"changed_pixels":clean_total,"changed_bbox":clean_bbox,"visible_changed_pixels_outside_source_text_mask":clean_out,"alpha_changed_pixels_outside_source_text_mask":clean_alpha_out,"status":"PASS"},
+  "final_gate":{"changed_pixels":final_total,"changed_bbox":final_bbox,"visible_changed_pixels_outside_allowed_bboxes":final_out,"alpha_changed_pixels_outside_allowed_bboxes":final_alpha_out,"status":"PASS"},
+  "compressed_patch_gate":{"patched_blocks":len(patch_blocks),"changed_blocks_vs_input_candidate":changed_blocks,"changed_blocks_outside_patch_set":outside_patch_blocks,"status":"PASS"},
+  "bbox_gate":{"elements":len(row_reports),"pass":len(row_reports),"fail":0,"rows":row_reports,"status":"PASS"},
+  "nvcompress_mae_raw_rgba":mae,"nvcompress_mae_if_flipped":mae_flip,
+  "manual_visual_qa":"PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation":"UNTESTED",
+  "status":"C91_WORKER_CORRECTIVE_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_INGAME"
+ }
+ (outdir/f"C91_{key}_REPORT.json").write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+ all_results.append(result)
 
-    results.append({
-        "asset": key,
-        "source_path": spec["source"],
-        "candidate_path": spec["candidate"],
-        "producer_report": spec["producer_report"],
-        "source_sha256": spec["source_sha256"],
-        "candidate_sha256": spec["candidate_sha256"],
-        "return_context": spec["return_context"],
-        "structure": {**src_dds["structure"], "header_128_exact_to_source": True, "raw_orientation": "mirror_y"},
-        "clean_plate_gate": {**clean_gate, "status": "PASS"},
-        "final_candidate_gate": {**final_gate, "status": "PASS"},
-        "mask_consistency": {
-            "source_text_protected_overlap_pixels": clean_mask_protected_overlap,
-            "allowed_protected_overlap_pixels": allowed_protected_overlap,
-            "allowed_pixels_outside_union_of_original_bboxes": allowed_outside_row_union,
-            "target_pixels_outside_allowed": target_outside_allowed,
-            "target_pixels_in_protected": target_in_protected,
-            "status": "PASS",
-        },
-        "bbox_gate": {
-            "elements": len(row_checks),
-            "pass": len(row_checks),
-            "fail": 0,
-            "edge_touch_keys": edge_touch,
-            "rows": row_checks,
-            "status": "PASS",
-        },
-        "visual_evidence": {
-            "full_compare": f"localization/graphics/role_C/{run}/C90_{key}_FULL_COMPARE.jpg",
-            "row_contact": f"localization/graphics/role_C/{run}/C90_{key}_ROW_CONTACT.jpg",
-            "controller_visual_qa": "PENDING",
-        },
-        "runtime_validation": "UNTESTED",
-        "machine_decision": "STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA",
-    })
-
-base_head = subprocess.check_output(["git","rev-parse","HEAD"], text=True).strip()
-report = {
-    "schema_version": 1,
-    "role": "C",
-    "run": run,
-    "base_head": base_head,
-    "scope": "new shared-state pending-C candidates only; C88/C89-completed assets not repeated",
-    "assets": results,
-    "summary": {
-        "assets_checked": len(results),
-        "machine_pass": len(results),
-        "machine_fail": 0,
-        "runtime_validation": "UNTESTED",
-        "vr_ffb_dx11_dxvk_changes": False,
-    },
+summary={
+ "schema_version":1,"role":"C","run":run,"base_head":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
+ "scope":"C small corrective rework of the three remaining C85 DXT5 exact-bbox failures; completed C90 assets not repeated; FD90AA9 large rework intentionally left for A/B producer lane",
+ "assets":all_results,
+ "summary":{"assets_reworked":3,"elements_reworked":4,"static_pass":3,"static_fail":0,"runtime_validation":"UNTESTED","vr_ffb_dx11_dxvk_changes":False},
+ "RUNTIME_VALIDATION":"UNTESTED"
 }
-(outdir / "C90_HOSTED_STATIC_QA.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-print("C90_HOSTED_STATIC_QA_DONE", [x["asset"] for x in results])
+(outdir/"C91_DXT5_CORRECTIVE_STATIC_QA.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+print("C91_DXT5_CORRECTIVE_DONE",[(x["asset"],x["candidate_sha256"]) for x in all_results])
