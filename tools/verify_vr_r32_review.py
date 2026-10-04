@@ -259,17 +259,23 @@ r33_guard = require(
     "SetExternalSafetyBlock(true)",
     "SetExternalSafetyBlock(!healthy)",
     "R33SynchronizeResetReplayGuardState(",
+    "R33ReportInstallResult(",
+    "OpenXRVRStereoR34ResetGuard",
     "Present/pre",
     "R33PresentR32Hook.stdcall<HRESULT>",
 )
 if r33_guard.find("Present/pre") > r33_guard.find("R33PresentR32Hook.stdcall<HRESULT>"):
     raise SystemExit("R33 must reassert Reset replay fail-close before lower Present work")
-require(
+r34_observer = require(
     "src/vr/d3d9/stereo_renderer_r34.cpp",
-    "R33SynchronizeResetReplayGuardState(installedDevice)",
     "R33InstallStatus()",
-    "no R34 D3D9 detours installed",
+    "no R34 worker or D3D9 detours",
 )
+for banned in ("R34InstallThread", "CreateThread(", "Sleep(",
+               "R33SynchronizeResetReplayGuardState(", "ReportAsyncResult("):
+    if banned in r34_observer:
+        raise SystemExit(
+            f"R34 compatibility observer regained worker/state ownership: {banned}")
 
 r31 = load("src/vr/d3d9/stereo_renderer_r31.cpp")
 state_enable = r31.find("const bool stateHooks =")

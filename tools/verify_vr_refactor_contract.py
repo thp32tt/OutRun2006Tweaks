@@ -640,6 +640,7 @@ for banned in (
 for marker in (
     "R33GuardStereoRasterState(",
     "R33SynchronizeResetReplayGuardState(",
+    "R33ReportInstallResult(",
     "R33ResetReplayBlocked",
     "LastResetStateReplaySucceeded()",
     "TestCooperativeLevel()",
@@ -651,14 +652,21 @@ for marker in (
     if marker not in r33:
         errors.append(f"R33 missing folded final-dispatch responsibility: {marker}")
 
-if "R34InstallState" in r34:
-    errors.append("R34 passive readiness observer regained duplicate install-state ownership")
-if "R33SynchronizeResetReplayGuardState(" not in r34:
-    errors.append("R34 thin readiness layer missing R33 reset-replay sync")
+for banned in (
+    "R34InstallState",
+    "R34InstallThread",
+    "CreateThread(",
+    "Sleep(",
+    "R33SynchronizeResetReplayGuardState(",
+    "ReportAsyncResult(",
+):
+    if banned in r34:
+        errors.append(
+            f"R34 passive readiness observer regained worker/state ownership: {banned}")
 if "R33InstallStatus()" not in r34:
     errors.append("R34 missing R33 install-state owner query")
-if "ReportAsyncResult(" not in r34:
-    errors.append("R34 passive readiness observer missing compatibility async-result reporting")
+if '"OpenXRVRStereoR34ResetGuard"' not in r33:
+    errors.append("R33 missing R34 compatibility terminal-status publication")
 
 for banned in ("R22FailClosedEligibility();", "R22ResetBaselineTracking();"):
     if banned in r33:
@@ -676,6 +684,24 @@ for banned in (
             f"R34 thin readiness layer retained R33 depth/stencil implementation state: {banned}")
 if "FailClosedDepthStencilState();" not in r33:
     errors.append("R33 final dispatcher missing consolidated depth/stencil owner API")
+
+install_start = r33.find("DWORD WINAPI R33InstallThread(")
+install_end = r33.find("class VRStereoR33DispatchHook", install_start)
+if install_start < 0 or install_end <= install_start:
+    errors.append("R33 install transaction body missing")
+else:
+    install_body = r33[install_start:install_end]
+    sync_pos = install_body.find(
+        "R33SynchronizeResetReplayGuardState(installedDevice)")
+    ready_pos = install_body.find(
+        "R33InstallState.store(State::Ready", sync_pos)
+    publish_pos = install_body.find(
+        "R33ReportInstallResult(true)", ready_pos)
+    if min(sync_pos, ready_pos, publish_pos) < 0 or not (
+            sync_pos < ready_pos < publish_pos):
+        errors.append(
+            "R33 must synchronize replay-health before Ready and terminal publication")
+
 
 fail_closed_depth = re.search(
     r"inline void FailClosedDepthStencilState\(\) noexcept\s*\{(?P<body>.*?)\n    \}",

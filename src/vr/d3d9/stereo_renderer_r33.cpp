@@ -4,8 +4,9 @@
 // game-side callback boundary and owns depth/stencil write-state caching,
 // exact single-count draw dispatch, final raster replay preservation, and the
 // ResetEx replay-health guard previously implemented by a separate R34 hook
-// layer. R34 is now only a readiness/state-sync ledger and installs no D3D9
-// detours.
+// layer. R33 now also owns initial replay-health synchronization and terminal
+// readiness publication; R34 is a compatibility observer with no D3D9 detours
+// or installer worker.
 //
 // R33 is also the final top-level draw boundary: when telemetry is disabled,
 // route accounting and diagnostic counter writes are skipped so the steady
@@ -23,6 +24,8 @@ namespace OutRunVRD3D9ExUpgradeR13
 
 namespace OutRunVRStereo
 {
+    inline void R33SynchronizeResetReplayGuardState(
+        IDirect3DDevice9* device) noexcept;
     inline void FailClosedDepthStencilState() noexcept;
 
     namespace
@@ -90,6 +93,14 @@ namespace OutRunVRStereo
         inline bool R33TelemetryEnabled() noexcept
         {
             return Settings::VRTelemetry;
+        }
+
+        void R33ReportInstallResult(bool active) noexcept
+        {
+            HookManager::ReportAsyncResult(
+                "OpenXRVRStereoR33Dispatch", active);
+            HookManager::ReportAsyncResult(
+                "OpenXRVRStereoR34ResetGuard", active);
         }
 
         void R33ForceResetReplayFailClosed(IDirect3DDevice9* device,
@@ -1003,8 +1014,7 @@ namespace OutRunVRStereo
                 if (r32 == State::Failed)
                 {
                     R33InstallState.store(State::Failed, std::memory_order_release);
-                    HookManager::ReportAsyncResult(
-                        "OpenXRVRStereoR33Dispatch", false);
+                    R33ReportInstallResult(false);
                     return 0;
                 }
                 if (r32 == State::Ready)
@@ -1037,16 +1047,19 @@ namespace OutRunVRStereo
                         R33RollbackHooks();
                         R33InstallState.store(State::Failed,
                             std::memory_order_release);
-                        HookManager::ReportAsyncResult(
-                            "OpenXRVRStereoR33Dispatch", false);
+                        R33ReportInstallResult(false);
                         spdlog::error(
                             "VR R33: final reset/state/draw hook transaction was partial; corrected R32 remains authoritative");
                         return 0;
                     }
 
+                    IDirect3DDevice9* const installedDevice =
+                        StereoInstalledDevice.load(std::memory_order_acquire);
+                    if (installedDevice)
+                        R33SynchronizeResetReplayGuardState(installedDevice);
+
                     R33InstallState.store(State::Ready, std::memory_order_release);
-                    HookManager::ReportAsyncResult(
-                        "OpenXRVRStereoR33Dispatch", true);
+                    R33ReportInstallResult(true);
                     spdlog::info(
                         "VR R33 DISPATCH: R33TryFastWorld/R33TryHud + direct R29 fallback READY; top-level telemetry counted once when enabled; corrected R32->R22 Reset lifecycle + depth/stencil cache ACTIVE");
                     return 0;
@@ -1055,7 +1068,7 @@ namespace OutRunVRStereo
             }
 
             R33InstallState.store(State::Failed, std::memory_order_release);
-            HookManager::ReportAsyncResult("OpenXRVRStereoR33Dispatch", false);
+            R33ReportInstallResult(false);
             return 0;
         }
 
@@ -1076,6 +1089,7 @@ namespace OutRunVRStereo
                     R33InstallState.store(
                         OutRunVR::RuntimeEligibility::InstallState::Failed,
                         std::memory_order_release);
+                    R33ReportInstallResult(false);
                     return false;
                 }
                 CloseHandle(thread);
