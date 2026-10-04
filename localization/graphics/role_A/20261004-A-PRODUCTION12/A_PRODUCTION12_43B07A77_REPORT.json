@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261004-A-PRODUCTION12",
+  "worker": "github-actions",
+  "base_head": "2fb39e00de2a4c7f7255e1b1253e3623913f584a",
+  "index": 89,
+  "asset": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "ca95f45529f841405c89bf0c00be25abcc0b5802",
+    "sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+    "path": "Release/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+    "classification": "authoritative high-resolution source; stale filename suffix, DDS header 2048x256 RGBA32"
+  },
+  "source_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+  "candidate_sha256": "d2311d4c20327363bacf8b336e925e527ef8c5c8f13a385b0a2fb2e25a946cbc",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+  "structure": {
+    "dimensions": [
+      2048,
+      256
+    ],
+    "format": "RGBA32",
+    "pitch": 8192,
+    "mipmaps": 1,
+    "bytes": 2097280,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "translation": {
+    "source": "Game Over",
+    "korean": "게임 오버"
+  },
+  "original_bbox": [
+    1,
+    13,
+    1494,
+    251
+  ],
+  "localized_bbox": [
+    337,
+    21,
+    1157,
+    243
+  ],
+  "delta_left": 336,
+  "delta_right": 337,
+  "delta_top": 8,
+  "delta_bottom": 8,
+  "containment": "PASS",
+  "font_size": 205,
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION12/43B07A77_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION12/43B07A77_HD_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      256
+    ],
+    "changed_pixels": 233748,
+    "changed_bbox": [
+      1,
+      13,
+      1494,
+      251
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION12/43B07A77_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION12/43B07A77_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      256
+    ],
+    "changed_pixels": 264296,
+    "changed_bbox": [
+      1,
+      13,
+      1494,
+      251
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_total": 264296,
+    "changed_pixels_outside_original_bbox": 0,
+    "alpha_changed_pixels_outside_original_bbox": 0,
+    "protected_visible_pixels_changed": 0,
+    "clean_plate_source_text_residue_pixels": 0
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A_PRODUCTION12_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
