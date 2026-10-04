@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "63505ca94baf206a857717ea9b250cceed0b479c",
+  "state_parent_head": "17f28f77b2066e0540dc18208e5b7a96c6b739b3",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,22 +54,38 @@
     "task_id": "CONVERSION-DXVK-00348",
     "result_sha": "2d8b2b69f20baa4f0ec955f57924e251728a3f9a",
     "validation_bearing_result_sha": "2d8b2b69f20baa4f0ec955f57924e251728a3f9a",
-    "run_record_commit_sha": "63505ca94baf206a857717ea9b250cceed0b479c",
+    "run_record_commit_sha": "17f28f77b2066e0540dc18208e5b7a96c6b739b3",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
-    "production_id": "CONVERSION-DXVK-00348",
-    "event_id": "CONVERSION-DXVK-00348-E004",
+    "production_id": "CONVERSION-DX11-00347",
+    "event_id": "CONVERSION-DX11-00347-E002",
     "event_type": "rollover",
     "dxvk_disassembly_evidence_run_id": 37175141070,
     "dxvk_disassembly_evidence_job_id": 111356102801,
     "backend_conversion_gate_run_id": 37175141118,
     "backend_conversion_gate_job_id": 111356102851,
     "runtime_test_performed": false,
-    "rollover_is_retry": false,
-    "chat_rollover": 3,
-    "resume_reason": "Retry persisted after one recovery attempt"
+    "issue14_material_comment_id": 5976290223,
+    "issue14_validation_comment_id": 5976323337,
+    "prior_controller_dispatch": {
+      "production_id": "CONVERSION-DXVK-00348",
+      "event_id": "CONVERSION-DXVK-00348-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "dispatch_metadata_correction": {
+      "authoritative_production_id": "CONVERSION-DX11-00347",
+      "authoritative_event_id": "CONVERSION-DX11-00347-E002",
+      "attempt_incremented": false,
+      "material_result_unchanged": true,
+      "validation_bearing_result_unchanged": true,
+      "runtime_validation_unchanged": "UNTESTED"
+    }
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
@@ -104,11 +120,12 @@
     "backend_conversion_gate_artifact_id": 11292134177,
     "backend_conversion_gate_artifact_digest": "sha256:405310f99978b3c9f057e6d9ce56632af00fb508b385127399fc28f1054552bb",
     "continuation_status": "RAW_CAPTURE_REQUIRES_EXACT_DECODE",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "raw_outbound_rel32_count": 0
   },
   "runtime_blocker": "No runtime acceptance claim exists; exact canonical F110 provenance and exact-SHA automated build evidence only.",
   "runtime_next_action": "Quest 3/VDXR runtime validation remains a separate later hardware gate for runtime-visible behavior; this static disassembly unit does not claim runtime correctness.",
-  "independent_static_next_action": "Exact-decode complete canonical instructions from the fully pinned continuation_89 window 0x0018384F..0x0018388F, require inherited target 0x00183854 to resolve only from exact bytes/control flow, preserve any trailing partial instruction as the next mandatory overlap, and keep function/render/HUD/runtime semantics unresolved until separately proven.",
+  "independent_static_next_action": "Exact-decode the 25 complete canonical instructions in the validated continuation_89 window 0x0018384F..0x0018388F. Resolve inherited target 0x00183854 on an exact instruction boundary, prove 0x0018384F->0x0018385A and 0x00183856->0x00183842 only from exact bytes, and keep function/render/HUD/runtime semantics unresolved.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -171,6 +188,12 @@
     "next_action_kind": "EXACT_DECODE_VALIDATED_RAW_CONTINUATION",
     "next_decode_start_rva": "0x0018384F",
     "next_decode_end_rva_exclusive": "0x0018388F",
+    "expected_complete_instruction_count": 25,
+    "expected_inherited_target_resolution_rva": "0x00183854",
+    "expected_branch_checks": [
+      "0x0018384F->0x0018385A",
+      "0x00183856->0x00183842"
+    ],
     "runtime_validation": "UNTESTED",
     "exact_bytes_match": true,
     "canonical_bytes_pinned": true
