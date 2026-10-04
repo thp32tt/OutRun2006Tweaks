@@ -3,6 +3,7 @@
 #include "game_addrs.hpp"
 #include "overlay/overlay.hpp"
 #include "interpolation.hpp"
+#include "vr/game/render_semantics.hpp"
 
 namespace OutRunVRRenderer
 {
@@ -161,6 +162,8 @@ namespace SumoUISpriteReplay
 		uint32_t kind;
 		SPRARGS args;
 		SPRARGS2 args2;
+		OutRunVR::GameSemantic::RenderScope vrScope =
+			OutRunVR::GameSemantic::RenderScope::None;
 	};
 
 	static Entry Captured[Game::SpriteNodeMax];
@@ -196,6 +199,9 @@ namespace SumoUISpriteReplay
 				entry.kind = node->kind_C;
 				entry.args = node->args_10;
 				entry.args2 = node->args2_58;
+				entry.vrScope =
+					OutRunVR::GameSemantic::PeekSpriteNodeScope(
+						node, OutRunVR::GameSemantic::RenderScope::None);
 			}
 		}
 	}
@@ -235,6 +241,16 @@ namespace SumoUISpriteReplay
 			node->kind_C = entry.kind;
 			node->args_10 = entry.args;
 			node->args2_58 = entry.args2;
+
+			// The replay node is a fresh allocation. Preserve only semantics that
+			// were explicitly attached to the original node; untagged queue
+			// content remains the existing ScreenOverlay2D fallback at render time.
+			if (entry.vrScope !=
+				OutRunVR::GameSemantic::RenderScope::None)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+					node, entry.vrScope);
+			}
 		}
 	}
 

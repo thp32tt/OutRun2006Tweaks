@@ -185,6 +185,21 @@ namespace OutRunVR::GameSemantic
         }
     }
 
+    inline RenderScope PeekSpriteNodeScope(
+        const void* node,
+        RenderScope fallback = RenderScope::None) noexcept
+    {
+        if (node)
+        {
+            for (std::size_t i = 0; i < SpriteNodeSemanticCount; ++i)
+            {
+                if (SpriteNodeSemanticTags[i].node == node)
+                    return SpriteNodeSemanticTags[i].scope;
+            }
+        }
+        return fallback;
+    }
+
     inline RenderScope ConsumeSpriteNodeScope(
         const void* node,
         RenderScope fallback = RenderScope::ScreenOverlay2D) noexcept

@@ -96,3 +96,33 @@ This is not runtime proof. `RUNTIME_VALIDATION=UNTESTED` until Quest 3/VDXR conf
 - Source baseline before build trigger: `44322402216fde565ccf99fd257153a0f1d0a369`.
 - Runtime focus: verify the folded R34 guards in the R33 dispatcher and the matching final-dispatch regression guard under real HMD/gameplay execution.
 - Expected build: protected DX9Ex PC-fast package plus DX9Ex Active Validation package; user runtime validation remains pending.
+
+
+## VR-HUD-SUMO-REPLAY-SEMANTIC-LOSS-001 — replayed UI loses explicit VR ownership
+
+**Status:** FIX_CANDIDATE / BUILD_PENDING / NEED_HMD_TEST  
+**Recorded:** 2026-10-05 KST  
+**Scope:** DX9Ex Active (R26 world + R30 HUD)
+
+### Static defect
+
+`SumoUISpriteReplay` snapshots tick-generated SpriteNodes so front-end/UI content remains visible on rendered frames where `numUpdates == 0`. Before this candidate it copied only priority/kind/SPRARGS/SPRARGS2. A replayed node is a fresh allocation, while VR semantic tags are keyed by the original SpriteNode pointer. Exact `ScreenHud` or `WorldBillboard` ownership was therefore lost on replay frames and the fresh node fell back to generic `ScreenOverlay2D`.
+
+### Candidate fix
+
+- add non-consuming `PeekSpriteNodeScope()` to the semantic registry;
+- snapshot the original node's explicit `RenderScope`;
+- after replay allocates the fresh node, re-register only a non-`None` explicit scope on that node;
+- do not promote untagged nodes and do not change the canonical queue fallback;
+- do not change UIScaling coordinates, SkyGlow, lens-flare behavior, world projection, or R30 HUD placement math.
+
+### Runtime gate
+
+Quest 3 / VDXR should specifically check:
+1. remaining doubled/head-following white result text;
+2. OutRun +TIME / checkpoint time text when reproduced;
+3. ordinary HUD/menu elements for no regression;
+4. rival/world markers for preserved world anchoring;
+5. frame pacing above 60 FPS.
+
+A build PASS is not runtime proof. `RUNTIME_VALIDATION=UNTESTED` until HMD evidence is supplied.
