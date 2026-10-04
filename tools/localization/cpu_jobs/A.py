@@ -104,33 +104,48 @@ residue=count(ImageChops.multiply(balpha(clean),source_text_mask))
 if residue: raise RuntimeError(("clean residue",residue))
 
 def resolve_font():
-    for pat in ["Noto Sans CJK KR:style=Black","Noto Sans CJK KR:style=Bold","Noto Sans CJK KR"]:
-        try: fp=subprocess.check_output(["fc-match","-f","%{file}",pat],text=True).strip()
-        except Exception: fp=""
-        if fp and Path(fp).exists() and "NotoSansCJK" in Path(fp).name: return fp
+    pats=["Noto Sans CJK KR:style=Black","Noto Sans CJK KR:style=Bold","Noto Sans CJK KR"]
+    def pick():
+        for pat in pats:
+            try:
+                spec=subprocess.check_output(["fc-match","-f","%{file}|%{index}",pat],text=True).strip()
+            except Exception:
+                spec=""
+            if "|" not in spec:
+                continue
+            fp,idx=spec.rsplit("|",1)
+            try: idx=int(idx or "0")
+            except Exception: idx=0
+            if fp and Path(fp).exists() and "NotoSansCJK" in Path(fp).name:
+                return fp,idx,pat
+        return None
+    got=pick()
+    if got: return got
     subprocess.run(["sudo","apt-get","update","-qq"],check=True)
     subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
-    fp=subprocess.check_output(["fc-match","-f","%{file}","Noto Sans CJK KR:style=Black"],text=True).strip()
-    if not fp: raise RuntimeError("font missing")
-    return fp
-FONT=resolve_font()
+    got=pick()
+    if not got: raise RuntimeError("font missing")
+    return got
+FONT,FONT_INDEX,FONT_PATTERN=resolve_font()
 
 def render(text,ob):
     aw,ah=ob[2]-ob[0],ob[3]-ob[1]
     for fs in range(max(18,int(ah*1.35)),12,-1):
-        f=ImageFont.truetype(FONT,fs)
+        f=ImageFont.truetype(FONT,fs,index=FONT_INDEX)
+        weight_stroke=1
         d=ImageDraw.Draw(Image.new("L",(8,8),0))
-        tb=d.textbbox((0,0),text,font=f)
-        pad=6
+        tb=d.textbbox((0,0),text,font=f,stroke_width=weight_stroke)
+        pad=7
         layer=Image.new("RGBA",(tb[2]-tb[0]+pad*2,tb[3]-tb[1]+pad*2),(0,0,0,0))
-        ImageDraw.Draw(layer).text((pad-tb[0],pad-tb[1]),text,font=f,fill=fill_color)
+        ImageDraw.Draw(layer).text((pad-tb[0],pad-tb[1]),text,font=f,fill=fill_color,
+                                   stroke_width=weight_stroke,stroke_fill=fill_color)
         bb=layer.getchannel("A").getbbox()
         if not bb: continue
         layer=layer.crop(bb)
         if layer.width<=aw-4 and layer.height<=ah-4:
             tx=ob[0]+(aw-layer.width)//2
             ty=ob[1]+(ah-layer.height)//2
-            return layer,(tx,ty),fs
+            return layer,(tx,ty),fs,weight_stroke
     raise RuntimeError(("fit",text,ob))
 
 final=clean.copy()
@@ -138,7 +153,7 @@ masks={}
 rows=[]
 for r0 in rows0:
     ob=r0["original_bbox"]
-    layer,(tx,ty),fs=render(r0["korean"],ob)
+    layer,(tx,ty),fs,weight_stroke=render(r0["korean"],ob)
     final.alpha_composite(layer,(tx,ty))
     lm=Image.new("L",(W,H),0); lm.paste(layer.getchannel("A").point(lambda v:255 if v else 0),(tx,ty))
     masks[r0["key"]]=lm
@@ -151,7 +166,7 @@ for r0 in rows0:
       "delta_left":loc[0]-ob[0],"delta_right":ob[2]-loc[2],"delta_top":loc[1]-ob[1],"delta_bottom":ob[3]-loc[3],
       "containment":"PASS" if contain else "FAIL","size_ceiling":"PASS" if size_ok else "FAIL","positive_margin":"PASS" if positive else "EDGE_TOUCH_OR_FAIL",
       "raw_original_bbox":[ob[0],H-ob[3],ob[2],H-ob[1]],"raw_localized_bbox":[loc[0],H-loc[3],loc[2],H-loc[1]],"raw_containment":"PASS" if contain else "FAIL",
-      "font":"Noto Sans CJK KR Black/Bold","font_size":fs,"style":"source-matched heavy plain white sans; no invented outline/slant",
+      "font":"Noto Sans CJK KR Black/Bold","font_file":FONT,"font_face_index":FONT_INDEX,"font_pattern":FONT_PATTERN,"font_size":fs,"same_color_weight_stroke":weight_stroke,"style":"source-matched heavy plain white sans; same-color weight reinforcement only; no contrasting outline/slant",
       "rework_status":"A_PRODUCTION19_NEW_EXACT_HD_CANDIDATE"})
 
 overlap=count(ImageChops.multiply(masks["tuned"],masks["normal"]))
@@ -204,7 +219,7 @@ report={"schema_version":1,"role":"A","run":run,"worker":os.environ.get("OUTRUN_
  "source_sha256":SOURCE_SHA,"candidate_sha256":CANDIDATE_SHA,"candidate_path":str(candidate.relative_to(repo)),
  "structure":{"dimensions":[W,H],"format":"RGBA32","pitch":pitch,"mipmaps":mips,"bytes":len(sb),"header_128_exact":True,"raw_orientation":"mirror_y"},
  "translation":[{"source":"TUNED","korean":"튜닝"},{"source":"NORMAL","korean":"일반"}],
- "source_style":{"fill_median":fill_color,"family":"heavy plain white sans, shared style"},
+ "source_style":{"fill_median":fill_color,"family":"heavy plain white sans, shared style","font_file":FONT,"font_face_index":FONT_INDEX,"font_pattern":FONT_PATTERN,"same_color_weight_stroke":1},
  "clean_plate_validator":cleanrep,"final_mask_validator":finalrep,"rows":rows,
  "all_2_readable_and_raw_bbox_pass":all_bbox,"all_2_size_ceiling_pass":all_size,"all_2_positive_margin":all_positive,
  "localized_label_overlap_pixels":overlap,"localized_label_touch_pixels":touch,
