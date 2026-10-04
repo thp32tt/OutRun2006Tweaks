@@ -7,12 +7,12 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "status": "IN_PROGRESS_REPAIR_1_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R234_CURRENT_STARTUP_SIGNATURE_EVIDENCE_SCOPE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
   "base_sha": "b1f189725f95036bad6b416d956cb79ad2ce0bf2",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "19f73e492c16bea74a6ff90147649ed9f70771f3",
+  "validation_bearing_result_sha": "19f73e492c16bea74a6ff90147649ed9f70771f3",
   "result_marker": "[AUTO:CONVERSION-DX11-00341]",
   "selected_work_item": "DX11_R234_CURRENT_STARTUP_SIGNATURE_EVIDENCE_SCOPE",
   "summary": "R234 separates current-startup signature and fixed-function detailed-demand evidence from historical epochs in accumulated DX11 census logs. R233 collision isolation is preserved, while stale prior-process signature semantics no longer appear in the current ActivationEvidence view.",
@@ -43,27 +43,42 @@
       "evidence": "Track latest startup epoch per source log; derive current_signatures/current_fixed_function from that epoch (legacy logs remain epoch 0); export current signature coverage separately; make ActivationEvidence.FixedFunctionDetailedStageDemand current-epoch scoped; preserve historical Signatures and HistoricalFixedFunctionDetailedStageDemand; add regression and source-graph drift guards."
     },
     "C3_VALIDATE": {
-      "status": "REPAIR_1_PENDING_EXACT_SHA_GATE",
-      "automation_validation": "PENDING",
-      "evidence": "Exact-SHA Backend Conversion Gate #1909 run 37169725378 failed only in Test DX11 census analyzer after source graph and dormant activation passed. The R234 regression incorrectly expected run_case() to emit runtime.log; the helper actually writes OutRun2006Tweaks.log. Repair 1 changes only that fixture expectation and will be validated on a new exact result SHA. No Quest 3/VDXR runtime test performed."
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R234_CURRENT_STARTUP_SIGNATURE_EVIDENCE_SCOPE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1910 run 37169808520 completed success for repair/result SHA 19f73e492c16bea74a6ff90147649ed9f70771f3. validate job 111340259031 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, session regression, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R234 census analyzer regressions, then configured/built Win32, verified the binary and uploaded artifact 11291260648. DX11 readiness smoke job 111341085153 passed fixed-function shader, input-layout/signature, object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and fixed-function pipeline probes. Artifact digest sha256:2f44040c831e225429e5112aea91f702e2b6243f5cf93ebc5fb137f6a1602340. Prior Gate #1909 failed only because the new test expected the wrong run_case filename; repair 1 corrected the fixture without changing analyzer production logic. No Quest 3/VDXR runtime test was performed."
     },
     "C4_COMMIT": {
-      "status": "REPAIR_1_PENDING_RESULT_SHA_PUBLICATION",
+      "status": "COMPLETE",
+      "material_result_sha": "19f73e492c16bea74a6ff90147649ed9f70771f3",
+      "validation_bearing_result_sha": "19f73e492c16bea74a6ff90147649ed9f70771f3",
+      "result_marker": "[AUTO:CONVERSION-DX11-00341]",
+      "implementation_commits": [
+        "4e09db62ec2f8403185abef233efc5ac05666bc9",
+        "19f73e492c16bea74a6ff90147649ed9f70771f3"
+      ],
       "source_implementation_sha": "4e09db62ec2f8403185abef233efc5ac05666bc9",
       "failed_validation_bearing_sha": "4e09db62ec2f8403185abef233efc5ac05666bc9",
       "failed_validation_run_id": 37169725378,
       "failed_validation_job_id": 111340023898,
-      "repair_count": 1,
-      "validation_bearing_result_sha": "PENDING_REPAIR_RESULT_SHA"
+      "repair_count": 1
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Offline census evidence-integrity/reporting change only; no runtime distributable identity change intended."
+      "reason": "Offline census evidence-integrity/reporting change only; no runtime distributable identity change."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "Publish repair 1 result without CI skip and require its exact-SHA Backend Conversion Gate."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37169808520,
+      "validation_job_id": 111340259031,
+      "readiness_smoke_job_id": 111341085153,
+      "artifact_id": 11291260648,
+      "artifact_digest": "sha256:2f44040c831e225429e5112aea91f702e2b6243f5cf93ebc5fb137f6a1602340",
+      "implementation_comment_id": 5975600302,
+      "repair_comment_id": 5975608847,
+      "validation_comment_id": 5975667075,
+      "exact_next_action": "Preserve R225-R234 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate."
     }
   },
   "regression_assessment": {
@@ -84,7 +99,7 @@
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE"
   },
-  "exact_next_action": "Publish repair 1 result without CI skip and require its exact-SHA Backend Conversion Gate.",
+  "exact_next_action": "Preserve R225-R234 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
   "repair_history": [
     {
       "repair": 1,
@@ -94,5 +109,22 @@
       "failure": "R234 regression fixture asserted LatestStartupEpochByLog key \"runtime.log\" although run_case() writes \"OutRun2006Tweaks.log\".",
       "fix": "Align the fixture expectation to the run_case() helper filename; no analyzer production logic changed."
     }
-  ]
+  ],
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37169808520,
+      "run_number": 1910,
+      "result_sha": "19f73e492c16bea74a6ff90147649ed9f70771f3",
+      "conclusion": "success",
+      "validate_job_id": 111340259031,
+      "readiness_smoke_job_id": 111341085153,
+      "artifact_id": 11291260648,
+      "artifact_digest": "sha256:2f44040c831e225429e5112aea91f702e2b6243f5cf93ebc5fb137f6a1602340"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5975600302,
+    "repair_comment_id": 5975608847,
+    "validation_comment_id": 5975667075
+  }
 }
