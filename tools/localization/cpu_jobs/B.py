@@ -2,7 +2,7 @@
 import hashlib,json,os,struct,subprocess
 from pathlib import Path
 import numpy as np
-from PIL import Image,ImageChops,ImageDraw,ImageFont
+from PIL import Image,ImageChops,ImageDraw,ImageFont,ImageFilter
 
 if os.environ.get('OUTRUN_CPU_WORKER')!='github-actions' or os.environ.get('OUTRUN_CPU_ROLE')!='B':
     raise SystemExit('GitHub-hosted localization CPU worker / role B only')
@@ -31,7 +31,7 @@ def bbox(mask):
 def count(mask):return int(np.count_nonzero(np.asarray(mask)>0))
 def dilate(mask,n=2):
  im=Image.fromarray((mask.astype(np.uint8)*255),'L')
- for _ in range(n):im=im.filter(__import__('PIL').ImageFilter.MaxFilter(3))
+ for _ in range(n):im=im.filter(ImageFilter.MaxFilter(3))
  return np.asarray(im)>0
 
 def font(style='Black'):
