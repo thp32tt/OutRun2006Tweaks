@@ -1,0 +1,15 @@
+{
+  "run": "20261005-B-PRODUCTION44",
+  "asset": "12519155",
+  "index": 128,
+  "candidate_sha256": "124e202911577c33e13040a8ae36adc283c5c48571daed624781b2fa20916af2",
+  "bbox_size_pass": "7/7",
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "source_residue": 0,
+  "localized_overlap_pairs": 0,
+  "worker_status": "B_PRODUCTION44_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION44/B_PRODUCTION44_125_REPORT.json"
+}
