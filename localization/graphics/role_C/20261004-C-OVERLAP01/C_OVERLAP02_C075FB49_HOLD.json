@@ -1,0 +1,19 @@
+{
+  "asset": "C075FB49",
+  "review_number": 5,
+  "candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
+  "producer_report": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_C075FB49_REPORT.json",
+  "ambiguous_row": "keep_passing",
+  "ambiguous_row_localized_bbox": [
+    1,
+    143,
+    520,
+    236
+  ],
+  "evidence": "persisted clean plate equals current candidate inside keep_passing localized bbox, so clean-vs-candidate yields no separable target layer for that localized row",
+  "zero_overlap_gate": "HOLD_STRICT_RECHECK",
+  "required_rework": "producer must persist explicit per-row TARGET_TEXT_MASK / separable clean plate or reconstruct the overlapping dense top-label group before C can prove 0-pixel localized-to-localized overlap",
+  "candidate_changed_by_C": false,
+  "runtime_validation": "UNTESTED",
+  "status": "HOLD_STRICT_RECHECK_ZERO_OVERLAP_TARGET_OWNERSHIP"
+}

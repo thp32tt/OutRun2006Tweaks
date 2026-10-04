@@ -1,0 +1,25 @@
+{
+  "asset": "A064FDFC",
+  "review_number": 6,
+  "candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
+  "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json",
+  "blocking_row": "dumped_white",
+  "source_bbox": [
+    3169,
+    270,
+    3605,
+    390
+  ],
+  "current_effect_bbox": [
+    3172,
+    274,
+    3603,
+    385
+  ],
+  "evidence": "zero-overlap corrective search found no placement from scale 0.88 down through the fail-closed floor while preserving exact source-bbox containment, protected-artwork clearance, and positive localized-label separation",
+  "zero_overlap_gate": "HOLD_STRICT_RECHECK",
+  "required_rework": "producer-lane reconstruction of dumped_white / adjacent protected geometry with explicit separable target masks; do not infer PASS from prior bbox containment",
+  "candidate_changed_by_C": false,
+  "runtime_validation": "UNTESTED",
+  "status": "HOLD_STRICT_RECHECK_ZERO_OVERLAP_NO_SAFE_PLACEMENT"
+}

@@ -1,0 +1,671 @@
+{
+  "schema_version": 1,
+  "run": "20261004-C-OVERLAP01",
+  "retry": "same review 2/5/6 task; C075 ambiguous ownership and A064 no-safe-placement are explicit HOLD instead of aborting the successful review-2 corrective path",
+  "policy": "zero-overlap: any 1px localized-to-localized or localized-to-protected/preserved foreground overlap FAIL; exact source bbox size ceiling retained",
+  "assets": [
+    "39229D64",
+    "C075FB49",
+    "A064FDFC"
+  ],
+  "results": [
+    {
+      "asset": "C075FB49",
+      "review_number": 5,
+      "candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
+      "producer_report": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_C075FB49_REPORT.json",
+      "ambiguous_row": "keep_passing",
+      "ambiguous_row_localized_bbox": [
+        1,
+        143,
+        520,
+        236
+      ],
+      "evidence": "persisted clean plate equals current candidate inside keep_passing localized bbox, so clean-vs-candidate yields no separable target layer for that localized row",
+      "zero_overlap_gate": "HOLD_STRICT_RECHECK",
+      "required_rework": "producer must persist explicit per-row TARGET_TEXT_MASK / separable clean plate or reconstruct the overlapping dense top-label group before C can prove 0-pixel localized-to-localized overlap",
+      "candidate_changed_by_C": false,
+      "runtime_validation": "UNTESTED",
+      "status": "HOLD_STRICT_RECHECK_ZERO_OVERLAP_TARGET_OWNERSHIP"
+    },
+    {
+      "asset": "A064FDFC",
+      "review_number": 6,
+      "candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json",
+      "blocking_row": "dumped_white",
+      "source_bbox": [
+        3169,
+        270,
+        3605,
+        390
+      ],
+      "current_effect_bbox": [
+        3172,
+        274,
+        3603,
+        385
+      ],
+      "evidence": "zero-overlap corrective search found no placement from scale 0.88 down through the fail-closed floor while preserving exact source-bbox containment, protected-artwork clearance, and positive localized-label separation",
+      "zero_overlap_gate": "HOLD_STRICT_RECHECK",
+      "required_rework": "producer-lane reconstruction of dumped_white / adjacent protected geometry with explicit separable target masks; do not infer PASS from prior bbox containment",
+      "candidate_changed_by_C": false,
+      "runtime_validation": "UNTESTED",
+      "status": "HOLD_STRICT_RECHECK_ZERO_OVERLAP_NO_SAFE_PLACEMENT"
+    },
+    {
+      "asset": "39229D64",
+      "review_number": 2,
+      "before_candidate_sha256": "67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a",
+      "candidate_sha256": "a6930ccc74a89a9781b655a7c39e2768984b11735ac3da863b66b72fa50b6a30",
+      "rows_total": 15,
+      "rows_pass": 15,
+      "source_size_ceiling_failures": 0,
+      "protected_overlap_pixels": 0,
+      "localized_pair_overlap_pixels": 0,
+      "changed_pixels_outside_allowed_text_region": 0,
+      "changed_pixels_in_protected_mask": 0,
+      "source_text_residue_policy": "clean-plate rebuild; source text is not copied into regenerated localized layers",
+      "multi_line_style": "uniform downscale preserves existing source-matched per-line effect relationships",
+      "rows": [
+        {
+          "key": "hearts",
+          "source": "Hearts",
+          "korean": "하트",
+          "source_bbox": [
+            1715,
+            5,
+            2048,
+            102
+          ],
+          "old_effect_bbox": [
+            1797,
+            7,
+            1965,
+            100
+          ],
+          "new_effect_bbox": [
+            1806,
+            12,
+            1957,
+            96
+          ],
+          "source_size": [
+            333,
+            97
+          ],
+          "new_size": [
+            151,
+            84
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 3,
+          "placement_displacement_l1": 1,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "technical_bonus",
+          "source": "Technical Bonus",
+          "korean": "테크니컬 보너스",
+          "source_bbox": [
+            2393,
+            77,
+            3610,
+            259
+          ],
+          "old_effect_bbox": [
+            2393,
+            77,
+            3610,
+            259
+          ],
+          "new_effect_bbox": [
+            2454,
+            86,
+            3549,
+            250
+          ],
+          "source_size": [
+            1217,
+            182
+          ],
+          "new_size": [
+            1095,
+            164
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 5,
+          "placement_displacement_l1": 0,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "mission_cleared",
+          "source": "MISSION CLEARED!",
+          "korean": "미션 성공!",
+          "source_bbox": [
+            128,
+            256,
+            1587,
+            787
+          ],
+          "old_effect_bbox": [
+            128,
+            256,
+            1587,
+            787
+          ],
+          "new_effect_bbox": [
+            201,
+            282,
+            1514,
+            760
+          ],
+          "source_size": [
+            1459,
+            531
+          ],
+          "new_size": [
+            1313,
+            478
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 12,
+          "placement_displacement_l1": 0,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "total_rank_green",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "source_bbox": [
+            512,
+            896,
+            1101,
+            1075
+          ],
+          "old_effect_bbox": [
+            526,
+            905,
+            1087,
+            1065
+          ],
+          "new_effect_bbox": [
+            554,
+            913,
+            1059,
+            1057
+          ],
+          "source_size": [
+            589,
+            179
+          ],
+          "new_size": [
+            505,
+            144
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 5,
+          "placement_displacement_l1": 0,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "storing",
+          "source": "STORING ONLINE RECORD...",
+          "korean": "온라인 기록 저장 중...",
+          "source_bbox": [
+            1652,
+            858,
+            2975,
+            998
+          ],
+          "old_effect_bbox": [
+            1652,
+            858,
+            2975,
+            998
+          ],
+          "new_effect_bbox": [
+            1718,
+            865,
+            2909,
+            991
+          ],
+          "source_size": [
+            1323,
+            140
+          ],
+          "new_size": [
+            1191,
+            126
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 4,
+          "placement_displacement_l1": 0,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "special_request",
+          "source": "SPECIAL REQUEST",
+          "korean": "스페셜 요청",
+          "source_bbox": [
+            1644,
+            1114,
+            2624,
+            1267
+          ],
+          "old_effect_bbox": [
+            1644,
+            1114,
+            2624,
+            1267
+          ],
+          "new_effect_bbox": [
+            1693,
+            1122,
+            2575,
+            1260
+          ],
+          "source_size": [
+            980,
+            153
+          ],
+          "new_size": [
+            882,
+            138
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 5,
+          "placement_displacement_l1": 0,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "target",
+          "source": "Target",
+          "korean": "목표",
+          "source_bbox": [
+            2625,
+            555,
+            2825,
+            640
+          ],
+          "old_effect_bbox": [
+            2653,
+            556,
+            2796,
+            638
+          ],
+          "new_effect_bbox": [
+            2660,
+            560,
+            2789,
+            634
+          ],
+          "source_size": [
+            200,
+            85
+          ],
+          "new_size": [
+            129,
+            74
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 3,
+          "placement_displacement_l1": 0,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "start",
+          "source": "START",
+          "korean": "시작",
+          "source_bbox": [
+            2487,
+            1016,
+            2662,
+            1085
+          ],
+          "old_effect_bbox": [
+            2515,
+            1017,
+            2633,
+            1084
+          ],
+          "new_effect_bbox": [
+            2521,
+            1020,
+            2627,
+            1080
+          ],
+          "source_size": [
+            175,
+            69
+          ],
+          "new_size": [
+            106,
+            60
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 2,
+          "placement_displacement_l1": 0,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "goal",
+          "source": "GOAL",
+          "korean": "골",
+          "source_bbox": [
+            2975,
+            1016,
+            3131,
+            1085
+          ],
+          "old_effect_bbox": [
+            3020,
+            1016,
+            3086,
+            1085
+          ],
+          "new_effect_bbox": [
+            3024,
+            1020,
+            3083,
+            1082
+          ],
+          "source_size": [
+            156,
+            69
+          ],
+          "new_size": [
+            59,
+            62
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 2,
+          "placement_displacement_l1": 1,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "hit_ghost",
+          "source": "Hit the ghost!",
+          "korean": "고스트를 맞히세요!",
+          "source_bbox": [
+            3163,
+            1017,
+            3633,
+            1106
+          ],
+          "old_effect_bbox": [
+            3166,
+            1027,
+            3626,
+            1096
+          ],
+          "new_effect_bbox": [
+            3189,
+            1030,
+            3603,
+            1092
+          ],
+          "source_size": [
+            470,
+            89
+          ],
+          "new_size": [
+            414,
+            62
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 3,
+          "placement_displacement_l1": 0,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "exit",
+          "source": "EXIT",
+          "korean": "종료",
+          "source_bbox": [
+            3083,
+            1143,
+            3494,
+            1281
+          ],
+          "old_effect_bbox": [
+            3083,
+            1143,
+            3494,
+            1281
+          ],
+          "new_effect_bbox": [
+            3104,
+            1150,
+            3474,
+            1274
+          ],
+          "source_size": [
+            411,
+            138
+          ],
+          "new_size": [
+            370,
+            124
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 4,
+          "placement_displacement_l1": 0,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "collect_stars",
+          "source": "Collect the stars!",
+          "korean": "별을 모으세요!",
+          "source_bbox": [
+            3469,
+            1172,
+            3998,
+            1267
+          ],
+          "old_effect_bbox": [
+            3479,
+            1172,
+            3985,
+            1267
+          ],
+          "new_effect_bbox": [
+            3504,
+            1176,
+            3959,
+            1262
+          ],
+          "source_size": [
+            529,
+            95
+          ],
+          "new_size": [
+            455,
+            86
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 3,
+          "placement_displacement_l1": 1,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "mission_failed",
+          "source": "MISSION FAILED!",
+          "korean": "미션 실패!",
+          "source_bbox": [
+            1984,
+            1280,
+            3187,
+            1792
+          ],
+          "old_effect_bbox": [
+            1984,
+            1280,
+            3187,
+            1792
+          ],
+          "new_effect_bbox": [
+            2044,
+            1306,
+            3127,
+            1767
+          ],
+          "source_size": [
+            1203,
+            512
+          ],
+          "new_size": [
+            1083,
+            461
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 12,
+          "placement_displacement_l1": 0,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "total_rank_brown",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "source_bbox": [
+            717,
+            1915,
+            1318,
+            2099
+          ],
+          "old_effect_bbox": [
+            729,
+            1925,
+            1305,
+            2088
+          ],
+          "new_effect_bbox": [
+            758,
+            1933,
+            1276,
+            2080
+          ],
+          "source_size": [
+            601,
+            184
+          ],
+          "new_size": [
+            518,
+            147
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 6,
+          "placement_displacement_l1": 0,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        },
+        {
+          "key": "total_rank_pink",
+          "source": "Total Rank",
+          "korean": "종합 랭크",
+          "source_bbox": [
+            2598,
+            1900,
+            3238,
+            2099
+          ],
+          "old_effect_bbox": [
+            2607,
+            1912,
+            3229,
+            2087
+          ],
+          "new_effect_bbox": [
+            2638,
+            1920,
+            3198,
+            2078
+          ],
+          "source_size": [
+            640,
+            199
+          ],
+          "new_size": [
+            560,
+            158
+          ],
+          "scale_from_current_effect": 0.9,
+          "positive_inset_px": 6,
+          "placement_displacement_l1": 0,
+          "size_ceiling": "PASS",
+          "protected_overlap_pixels": 0,
+          "localized_overlap_pixels": 0,
+          "overlap_gate": "PASS",
+          "style_preservation": "PASS_CURRENT_APPROVED_RASTER_EFFECT_PRESERVED_WITH_UNIFORM_DOWNSCALE"
+        }
+      ],
+      "runtime_validation": "UNTESTED",
+      "status": "STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA"
+    }
+  ],
+  "machine_pass_assets": [
+    "39229D64"
+  ],
+  "hold_strict_recheck_assets": [
+    "C075FB49",
+    "A064FDFC"
+  ],
+  "machine_status": "PASS_WITH_EXPLICIT_HOLD",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}
