@@ -58,9 +58,9 @@
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
-    "production_id": "CONVERSION-DX11-00369",
-    "event_id": "CONVERSION-DX11-00369-E003",
-    "event_type": "retry",
+    "production_id": "CONVERSION-DXVK-00370",
+    "event_id": "CONVERSION-DXVK-00370-E001",
+    "event_type": "rollover",
     "dxvk_disassembly_evidence_run_id": 37199931166,
     "dxvk_disassembly_evidence_job_id": 111429354149,
     "backend_conversion_gate_run_id": 37199931190,
@@ -69,13 +69,19 @@
     "issue14_implementation_validation_comment_id": 5979639433,
     "controller_dispatch": {
       "task_id": "CONVERSION-DXVK-00370",
-      "production_id": "CONVERSION-DX11-00369",
-      "event_id": "CONVERSION-DX11-00369-E003",
-      "event_type": "retry",
+      "production_id": "CONVERSION-DXVK-00370",
+      "event_id": "CONVERSION-DXVK-00370-E001",
+      "event_type": "rollover",
       "attempt": "1/3",
-      "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH"
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+      "source": "CURRENT_USER_ROLLOVER"
     },
-    "run_record_commit_sha": "89232203cc79fa7ddc1346ca0f484705bb82e014"
+    "run_record_commit_sha": "89232203cc79fa7ddc1346ca0f484705bb82e014",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
@@ -115,7 +121,8 @@
     "semantic_promotion": "NONE",
     "ownership_effect": "NONE",
     "runtime_validation": "UNTESTED",
-    "issue14_implementation_validation_comment_id": 5979639433
+    "issue14_implementation_validation_comment_id": 5979639433,
+    "static_exe_analysis_status": "SUCCESS"
   },
   "runtime_blocker": "No runtime acceptance claim exists; F122 is exact canonical raw provenance/static-build evidence only.",
   "runtime_next_action": "Quest 3/VDXR runtime validation remains a separate later hardware gate for runtime-visible behavior.",
@@ -186,7 +193,10 @@
     "raw_outbound_rel32_count": 0,
     "next_action_kind": "EXACT_DECODE_VALIDATED_RAW_FRONTIER",
     "runtime_validation": "UNTESTED",
-    "exact_next_action": "Exact-decode only complete canonical instructions from validated F122 raw window 0x001839CD..0x00183A0D. Resolve inherited targets [0x001839CD,0x001839D2,0x00183B6F] only on exact instruction boundaries, preserve any trailing partial bytes for mandatory overlap, carry newly observed branch/call debt fail-closed, and do not promote function/render/HUD/runtime semantics."
+    "exact_next_action": "Exact-decode only complete canonical instructions from validated F122 raw window 0x001839CD..0x00183A0D. Resolve inherited targets [0x001839CD,0x001839D2,0x00183B6F] only on exact instruction boundaries, preserve any trailing partial bytes for mandatory overlap, carry newly observed branch/call debt fail-closed, and do not promote function/render/HUD/runtime semantics.",
+    "predecessor_exact": true,
+    "overlap_bytes": "8b",
+    "provenance_status": "EXACT_EXE_1839CD_TO_183A0D_PROVENANCE_CAPTURED"
   },
   "supplemental_completed_static_units": [
     {
@@ -5560,11 +5570,14 @@
   ],
   "controller_dispatch": {
     "task_id": "CONVERSION-DXVK-00370",
-    "production_id": "CONVERSION-DX11-00369",
-    "event_id": "CONVERSION-DX11-00369-E003",
-    "event_type": "retry",
+    "production_id": "CONVERSION-DXVK-00370",
+    "event_id": "CONVERSION-DXVK-00370-E001",
+    "event_type": "rollover",
     "attempt": "1/3",
-    "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "source": "CURRENT_USER_ROLLOVER",
     "material_result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
     "validation_bearing_result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
     "runtime_validation": "UNTESTED"
@@ -5600,33 +5613,29 @@
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_dispatch_metadata_correction": {
-    "task_id": "CONVERSION-DXVK-00368",
     "corrected_from": {
-      "production_id": "CONVERSION-DX11-00367",
-      "event_id": "CONVERSION-DX11-00367-E003",
+      "task_id": "CONVERSION-DXVK-00370",
+      "production_id": "CONVERSION-DX11-00369",
+      "event_id": "CONVERSION-DX11-00369-E003",
       "event_type": "retry",
       "attempt": "1/3",
-      "controller_dispatch": {
-        "task_id": "CONVERSION-DXVK-00368",
-        "production_id": "CONVERSION-DX11-00367",
-        "event_id": "CONVERSION-DX11-00367-E003",
-        "event_type": "retry",
-        "attempt": "1/3",
-        "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH"
-      }
+      "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH",
+      "material_result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+      "validation_bearing_result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+      "runtime_validation": "UNTESTED"
     },
     "corrected_to": {
-      "task_id": "CONVERSION-DXVK-00368",
-      "production_id": "CONVERSION-DXVK-00368",
-      "event_id": "CONVERSION-DXVK-00368-E002",
+      "task_id": "CONVERSION-DXVK-00370",
+      "production_id": "CONVERSION-DXVK-00370",
+      "event_id": "CONVERSION-DXVK-00370-E001",
       "event_type": "rollover",
       "attempt": "1/3",
       "chat_rollover": 2,
       "rollover_is_retry": false,
-      "resume_reason": "Retry persisted after one recovery attempt",
+      "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
       "source": "CURRENT_USER_ROLLOVER"
     },
-    "reason": "Newest explicit user rollover metadata supersedes stale retry dispatch bookkeeping; no material or validation SHA changed.",
+    "reason": "Newest explicit user rollover metadata supersedes prior automatic queue-dispatch bookkeeping. Rollover is not a retry; ATTEMPT remains 1/3. Material, validation-bearing SHA and exact-SHA gate evidence are unchanged.",
     "material_and_validation_bearing_sha_unchanged": true
   }
 }
