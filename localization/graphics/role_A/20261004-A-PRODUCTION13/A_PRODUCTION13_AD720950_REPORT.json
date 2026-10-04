@@ -1,0 +1,751 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261004-A-PRODUCTION13",
+  "worker": "github-actions",
+  "base_head": "7d21cadb5c95e5a7402868779963fc2ab035146e",
+  "index": 47,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "98b120d89b690068e5e50edbb1e7dcd28b9ea928",
+    "sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+    "path": "Release/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+    "classification": "authoritative high-resolution source; stale filename suffix, DDS header 4096x1024 RGBA32"
+  },
+  "source_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
+  "candidate_sha256": "3d19d75aa02b3f44ff59ee4dbe33a6832f453811142fb734669ef3ff46d68f29",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
+  "structure": {
+    "dimensions": [
+      4096,
+      1024
+    ],
+    "format": "RGBA32",
+    "pitch": 16384,
+    "mipmaps": 1,
+    "bytes": 16777344,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "translation_policy": {
+    "localized_unique": [
+      "Symbols->기호",
+      "Caps Lock->대문자 고정",
+      "Backspace->지우기",
+      "Accents->악센트",
+      "Done->완료",
+      "Space->공백"
+    ],
+    "preserved_unchanged": [
+      "Shift"
+    ],
+    "character_glyph_rows": "preserved pixel-identical; separate Hangul name-entry/font work"
+  },
+  "target_occurrences": 14,
+  "preserved_shift_bbox": [
+    3757,
+    176,
+    3873,
+    222
+  ],
+  "preserved_shift_pixel_diffs": 0,
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION13/AD720950_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION13/AD720950_HD_CLEAN_PLATE.png",
+    "size": [
+      4096,
+      1024
+    ],
+    "changed_pixels": 61696,
+    "changed_bbox": [
+      264,
+      76,
+      3995,
+      1016
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION13/AD720950_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION13/AD720950_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      4096,
+      1024
+    ],
+    "changed_pixels": 70703,
+    "changed_bbox": [
+      264,
+      76,
+      3995,
+      1016
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_total": 70703,
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "clean_plate_source_text_residue_pixels": 0
+  },
+  "rows": [
+    {
+      "key": "symbols",
+      "region_idx": 4,
+      "source": "Symbols",
+      "korean": "기호",
+      "original_bbox": [
+        3757,
+        76,
+        3957,
+        131
+      ],
+      "localized_bbox": [
+        3810,
+        78,
+        3904,
+        129
+      ],
+      "source_width": 200,
+      "source_height": 55,
+      "localized_width": 94,
+      "localized_height": 51,
+      "delta_left": 53,
+      "delta_right": 53,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        3757,
+        893,
+        3957,
+        948
+      ],
+      "raw_localized_bbox": [
+        3810,
+        895,
+        3904,
+        946
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 54,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "caps_lock",
+      "region_idx": 4,
+      "source": "Caps Lock",
+      "korean": "대문자 고정",
+      "original_bbox": [
+        3759,
+        276,
+        3995,
+        331
+      ],
+      "localized_bbox": [
+        3761,
+        280,
+        3992,
+        327
+      ],
+      "source_width": 236,
+      "source_height": 55,
+      "localized_width": 231,
+      "localized_height": 47,
+      "delta_left": 2,
+      "delta_right": 3,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        3759,
+        693,
+        3995,
+        748
+      ],
+      "raw_localized_bbox": [
+        3761,
+        697,
+        3992,
+        744
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 50,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "accents",
+      "region_idx": 4,
+      "source": "Accents",
+      "korean": "악센트",
+      "original_bbox": [
+        3756,
+        377,
+        3948,
+        421
+      ],
+      "localized_bbox": [
+        3796,
+        379,
+        3908,
+        419
+      ],
+      "source_width": 192,
+      "source_height": 44,
+      "localized_width": 112,
+      "localized_height": 40,
+      "delta_left": 40,
+      "delta_right": 40,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        3756,
+        603,
+        3948,
+        647
+      ],
+      "raw_localized_bbox": [
+        3796,
+        605,
+        3908,
+        645
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 42,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "done",
+      "region_idx": 4,
+      "source": "Done",
+      "korean": "완료",
+      "original_bbox": [
+        3759,
+        474,
+        3876,
+        518
+      ],
+      "localized_bbox": [
+        3779,
+        476,
+        3856,
+        516
+      ],
+      "source_width": 117,
+      "source_height": 44,
+      "localized_width": 77,
+      "localized_height": 40,
+      "delta_left": 20,
+      "delta_right": 20,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        3759,
+        506,
+        3876,
+        550
+      ],
+      "raw_localized_bbox": [
+        3779,
+        508,
+        3856,
+        548
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 44,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "backspace_r1",
+      "region_idx": 1,
+      "source": "Backspace",
+      "korean": "지우기",
+      "original_bbox": [
+        863,
+        376,
+        1094,
+        431
+      ],
+      "localized_bbox": [
+        908,
+        378,
+        1048,
+        429
+      ],
+      "source_width": 231,
+      "source_height": 55,
+      "localized_width": 140,
+      "localized_height": 51,
+      "delta_left": 45,
+      "delta_right": 46,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        863,
+        593,
+        1094,
+        648
+      ],
+      "raw_localized_bbox": [
+        908,
+        595,
+        1048,
+        646
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 54,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "space_r1",
+      "region_idx": 1,
+      "source": "Space",
+      "korean": "공백",
+      "original_bbox": [
+        264,
+        473,
+        397,
+        528
+      ],
+      "localized_bbox": [
+        284,
+        475,
+        376,
+        526
+      ],
+      "source_width": 133,
+      "source_height": 55,
+      "localized_width": 92,
+      "localized_height": 51,
+      "delta_left": 20,
+      "delta_right": 21,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        264,
+        496,
+        397,
+        551
+      ],
+      "raw_localized_bbox": [
+        284,
+        498,
+        376,
+        549
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 54,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "backspace_r2",
+      "region_idx": 2,
+      "source": "Backspace",
+      "korean": "지우기",
+      "original_bbox": [
+        2103,
+        376,
+        2334,
+        431
+      ],
+      "localized_bbox": [
+        2148,
+        378,
+        2288,
+        429
+      ],
+      "source_width": 231,
+      "source_height": 55,
+      "localized_width": 140,
+      "localized_height": 51,
+      "delta_left": 45,
+      "delta_right": 46,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        2103,
+        593,
+        2334,
+        648
+      ],
+      "raw_localized_bbox": [
+        2148,
+        595,
+        2288,
+        646
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 54,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "space_r2",
+      "region_idx": 2,
+      "source": "Space",
+      "korean": "공백",
+      "original_bbox": [
+        1504,
+        473,
+        1637,
+        528
+      ],
+      "localized_bbox": [
+        1524,
+        475,
+        1616,
+        526
+      ],
+      "source_width": 133,
+      "source_height": 55,
+      "localized_width": 92,
+      "localized_height": 51,
+      "delta_left": 20,
+      "delta_right": 21,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1504,
+        496,
+        1637,
+        551
+      ],
+      "raw_localized_bbox": [
+        1524,
+        498,
+        1616,
+        549
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 54,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "backspace_r3",
+      "region_idx": 3,
+      "source": "Backspace",
+      "korean": "지우기",
+      "original_bbox": [
+        3343,
+        376,
+        3574,
+        431
+      ],
+      "localized_bbox": [
+        3388,
+        378,
+        3528,
+        429
+      ],
+      "source_width": 231,
+      "source_height": 55,
+      "localized_width": 140,
+      "localized_height": 51,
+      "delta_left": 45,
+      "delta_right": 46,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        3343,
+        593,
+        3574,
+        648
+      ],
+      "raw_localized_bbox": [
+        3388,
+        595,
+        3528,
+        646
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 54,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "space_r3",
+      "region_idx": 3,
+      "source": "Space",
+      "korean": "공백",
+      "original_bbox": [
+        2744,
+        473,
+        2877,
+        528
+      ],
+      "localized_bbox": [
+        2764,
+        475,
+        2856,
+        526
+      ],
+      "source_width": 133,
+      "source_height": 55,
+      "localized_width": 92,
+      "localized_height": 51,
+      "delta_left": 20,
+      "delta_right": 21,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        2744,
+        496,
+        2877,
+        551
+      ],
+      "raw_localized_bbox": [
+        2764,
+        498,
+        2856,
+        549
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 54,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "backspace_r5",
+      "region_idx": 5,
+      "source": "Backspace",
+      "korean": "지우기",
+      "original_bbox": [
+        2479,
+        864,
+        2710,
+        919
+      ],
+      "localized_bbox": [
+        2524,
+        866,
+        2664,
+        917
+      ],
+      "source_width": 231,
+      "source_height": 55,
+      "localized_width": 140,
+      "localized_height": 51,
+      "delta_left": 45,
+      "delta_right": 46,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        2479,
+        105,
+        2710,
+        160
+      ],
+      "raw_localized_bbox": [
+        2524,
+        107,
+        2664,
+        158
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 54,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "space_r5",
+      "region_idx": 5,
+      "source": "Space",
+      "korean": "공백",
+      "original_bbox": [
+        1880,
+        961,
+        2013,
+        1016
+      ],
+      "localized_bbox": [
+        1900,
+        963,
+        1992,
+        1014
+      ],
+      "source_width": 133,
+      "source_height": 55,
+      "localized_width": 92,
+      "localized_height": 51,
+      "delta_left": 20,
+      "delta_right": 21,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1880,
+        8,
+        2013,
+        63
+      ],
+      "raw_localized_bbox": [
+        1900,
+        10,
+        1992,
+        61
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 54,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "backspace_r6",
+      "region_idx": 6,
+      "source": "Backspace",
+      "korean": "지우기",
+      "original_bbox": [
+        3719,
+        864,
+        3950,
+        919
+      ],
+      "localized_bbox": [
+        3764,
+        866,
+        3904,
+        917
+      ],
+      "source_width": 231,
+      "source_height": 55,
+      "localized_width": 140,
+      "localized_height": 51,
+      "delta_left": 45,
+      "delta_right": 46,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        3719,
+        105,
+        3950,
+        160
+      ],
+      "raw_localized_bbox": [
+        3764,
+        107,
+        3904,
+        158
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 54,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "space_r6",
+      "region_idx": 6,
+      "source": "Space",
+      "korean": "공백",
+      "original_bbox": [
+        3120,
+        961,
+        3253,
+        1016
+      ],
+      "localized_bbox": [
+        3140,
+        963,
+        3232,
+        1014
+      ],
+      "source_width": 133,
+      "source_height": 55,
+      "localized_width": 92,
+      "localized_height": 51,
+      "delta_left": 20,
+      "delta_right": 21,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        3120,
+        8,
+        3253,
+        63
+      ],
+      "raw_localized_bbox": [
+        3140,
+        10,
+        3232,
+        61
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 54,
+      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
+    }
+  ],
+  "all_14_readable_and_raw_bbox_pass": true,
+  "all_14_size_ceiling_pass": true,
+  "all_14_positive_margin": true,
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A_PRODUCTION13_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
