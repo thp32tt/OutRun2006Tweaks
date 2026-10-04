@@ -91,10 +91,11 @@ for r in rows:
 # Start from C clean because bottom nine regions already passed controller visual review.
 # Remove all C top cleanup artifacts by restoring canonical source across the top source-bbox union.
 clean=c_clean.copy()
-for r in rows:
-    if r["key"] not in top_keys: continue
-    x1,y1,x2,y2=map(int,r["source_bbox"])
-    clean.paste(src.crop((x1,y1,x2,y2)),(x1,y1))
+# Replace the complete dense text band with canonical HD source before any removal.
+# C's failed clean introduced semi-transparent reconstruction strips outside its row bboxes;
+# restoring the full atlas band removes those artifacts without touching the next model-name row.
+top_restore_rect=(0,0,W,368)
+clean.paste(src.crop(top_restore_rect),(0,0))
 
 # Exact top source-text mask: only nonzero source alpha inside each target's own text-only atlas cell.
 top_source_mask=Image.new("L",(W,H),0)
@@ -257,7 +258,7 @@ report={
  "candidate_path":str(candidate.relative_to(repo)),
  "structure":{"dimensions":[W,H],"format":"RGBA32","pitch":pitch,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
  "method":"canonical HD restore for dense top group -> exact source-alpha removal inside 8 target atlas cells -> reuse C_OVERLAP05 17/17 zero-overlap localized raster deltas -> preserve visually accepted bottom C clean reconstruction -> exact RGBA32 encode",
- "top_rebuilt_keys":sorted(top_keys),
+ "top_rebuilt_keys":sorted(top_keys),"top_restore_rect":list(top_restore_rect),
  "preserved_source_labels":preserved_cells,
  "preserved_source_label_pixel_diffs":preserved_diffs,
  "clean_plate_validator":clean_rep,"final_mask_validator":final_rep,
