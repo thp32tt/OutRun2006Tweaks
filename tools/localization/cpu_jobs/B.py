@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("B hosted worker only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION38"
+run="20261005-B-PRODUCTION39"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -74,7 +74,10 @@ source_visible_out=int(np.count_nonzero(alpha & ~source_mask))
 if source_visible_out: raise RuntimeError(("unexpected_preserved_artwork",source_visible_out))
 
 clean_arr=sa.copy()
-clean_arr[source_mask]=(0,0,0,0)
+# Remove source lettering by alpha only. Preserve hidden RGB so DXT5 cleanup blocks can
+# keep source color bytes exact and C can distinguish true Korean target pixels from
+# harmless transparent-block recompression.
+clean_arr[source_mask,3]=0
 clean=Image.fromarray(clean_arr,"RGBA")
 
 def font_path():
@@ -176,7 +179,7 @@ for row in rows:
     x0,y0,x1,y1=row["original_bbox"]; allowed[y0:y1,x0:x1]=True
 allowed_raw=np.flipud(allowed); srcmask_raw=np.flipud(source_mask); target_raw=np.flipud(target)
 source_raw_alpha=np.flipud(sa[:,:,3])
-bw=W//4; bh=H//4; outb=bytearray(sb); full_blocks=set(); partial_blocks=set()
+bw=W//4; bh=H//4; outb=bytearray(sb); full_blocks=set(); source_only_full_blocks=set(); partial_blocks=set()
 
 def alpha_idx(block):
     bits=int.from_bytes(block[2:8],"little")
@@ -191,14 +194,30 @@ for by in range(bh):
     for bx in range(bw):
         x=bx*4; am=allowed_raw[y:y+4,x:x+4]
         if not np.any(am): continue
-        off=128+(by*bw+bx)*16
-        # Full block entirely inside an original source bbox may use freshly compressed Korean.
-        if np.all(am):
-            outb[off:off+16]=tb[off:off+16]; full_blocks.add((bx,by)); continue
-        # Edge block: target is forbidden by block-safe render. Clear only original source
-        # glyph alpha indices and preserve source color bytes exactly.
-        if np.any(target_raw[y:y+4,x:x+4]): raise RuntimeError(("target_in_partial_block",bx,by))
         sm=srcmask_raw[y:y+4,x:x+4]
+        tm=target_raw[y:y+4,x:x+4]
+        if not np.any(sm) and not np.any(tm):
+            continue
+        off=128+(by*bw+bx)*16
+        # Actual Korean pixels are deliberately block-safe, so only fully allowed blocks
+        # may be freshly compressed. This confines all color endpoint changes to target blocks.
+        if np.any(tm):
+            if not np.all(am): raise RuntimeError(("target_in_partial_block",bx,by))
+            outb[off:off+16]=tb[off:off+16]
+            full_blocks.add((bx,by))
+            continue
+        # Source-English cleanup without Korean: preserve the original BC3 color block.
+        # For a fully allowed block, borrow only the alpha block from the transparent clean
+        # render; RGB endpoint/index bytes remain byte-exact to source.
+        if np.all(am):
+            nb=tb[off:off+8]+sb[off+8:off+16]
+            if nb[8:]!=sb[off+8:off+16]: raise RuntimeError("source-only full color bytes changed")
+            outb[off:off+16]=nb
+            source_only_full_blocks.add((bx,by))
+            continue
+        # Partial edge source cleanup: target is forbidden. Clear only original source glyph
+        # alpha indices and preserve all source color bytes exactly.
+        if np.any(tm): raise RuntimeError(("target_in_partial_block",bx,by))
         if not np.any(sm): continue
         ob=bytes(outb[off:off+16]); idx=alpha_idx(ob)
         sa4=source_raw_alpha[y:y+4,x:x+4]
@@ -250,8 +269,8 @@ clean_png=out/"1A43E9D9_CLEAN_PLATE.png"; clean.save(clean_png)
 src_png=Path("/tmp/1A43_source.png"); final_png=Path("/tmp/1A43_final.png")
 src.save(src_png); dec.save(final_png)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(src_png),str(clean_png),str(source_mask_png),"--report",str(out/"B_PRODUCTION38_CLEAN_PLATE_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(src_png),str(final_png),str(allowed_png),"--protected-mask",str(protected_png),"--report",str(out/"B_PRODUCTION38_FINAL_MASK_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(src_png),str(clean_png),str(source_mask_png),"--report",str(out/"B_PRODUCTION39_CLEAN_PLATE_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(src_png),str(final_png),str(allowed_png),"--protected-mask",str(protected_png),"--report",str(out/"B_PRODUCTION39_FINAL_MASK_VALIDATION.json")],check=True)
 
 # Source/clean/final evidence.
 def comp(im,bg):
@@ -261,7 +280,7 @@ def card(label,im):
 cards=[card("SOURCE",src),card("CLEAN",clean),card("FINAL",dec)]
 sheet=Image.new("RGB",(W,H*3+84),"white")
 for i,c in enumerate(cards): sheet.paste(c,(0,i*(H+28)))
-sheet.save(out/"B_PRODUCTION38_1A43_SOURCE_CLEAN_FINAL.jpg",quality=96)
+sheet.save(out/"B_PRODUCTION39_1A43_SOURCE_CLEAN_FINAL.jpg",quality=96)
 # 2x row contact.
 contacts=[]
 for row in rows:
@@ -274,9 +293,9 @@ for row in rows:
     ImageDraw.Draw(c).text((4,4),row["source"]+" -> "+row["korean"],fill="black"); contacts.append(c)
 cs=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in contacts)+4),"white"); yy=0
 for c in contacts: cs.paste(c,(0,yy)); yy+=c.height+4
-cs.save(out/"B_PRODUCTION38_1A43_ROW_CONTACT_2X.jpg",quality=96)
+cs.save(out/"B_PRODUCTION39_1A43_ROW_CONTACT_2X.jpg",quality=96)
 
-changed_blocks=0; outside_patch=0; patch=full_blocks|partial_blocks
+changed_blocks=0; outside_patch=0; patch=full_blocks|source_only_full_blocks|partial_blocks
 for by in range(bh):
     for bx in range(bw):
         off=128+(by*bw+bx)*16
@@ -288,17 +307,17 @@ report={
  "schema_version":1,"role":"B","run":run,"queue_index":92,"asset":asset,
  "readiness_tier":"RENDER_READY_COMPLETED_SAME_INVOCATION","source_url":url,"source_sha256":sha(src_dds),
  "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
- "method":"canonical 2048x256 DXT5 HD source; exact two-line source-alpha bboxes; transparent clean plate; fresh native Hangul with source orange/dark palette, opaque white source-family outer rim and stronger right slant; block-safe Korean render; partial edge blocks alpha-only source cleanup; decoded QA",
+ "method":"canonical 2048x256 DXT5 HD source; exact two-line source-alpha bboxes; alpha-zero clean plate with hidden RGB preserved; fresh native Hangul with source orange/dark palette, opaque white source-family outer rim and right slant; only target blocks re-encode color; source-only cleanup preserves source color bytes and changes alpha only; decoded QA",
  "structure":{"width":W,"height":H,"format":"DXT5","mipmaps":1,"header_128_exact":bytes(outb[:128])==sb[:128],"raw_orientation":"mirror_y"},
  "source_visible_pixels_outside_two_text_lines":source_visible_out,
  "palette":{"orange":orange,"dark":dark,"white":white},
  "rows":rows,
  "containment":{"elements_total":2,"elements_pass":2,"localized_overlap_pixels":0,"visible_pixels_outside_original_bboxes":visible_out,"alpha_changed_pixels_outside_original_bboxes":alpha_out,"source_residue_pixels_outside_target":residue,"status":"PASS"},
- "compressed_patch":{"full_blocks":len(full_blocks),"partial_alpha_only_blocks":len(partial_blocks),"changed_blocks":changed_blocks,"changed_blocks_outside_patch":outside_patch,"partial_color_bytes_preserved":True,"status":"PASS"},
+ "compressed_patch":{"target_reencoded_blocks":len(full_blocks),"source_only_full_alpha_blocks":len(source_only_full_blocks),"partial_alpha_only_blocks":len(partial_blocks),"changed_blocks":changed_blocks,"changed_blocks_outside_patch":outside_patch,"source_only_color_bytes_preserved":True,"partial_color_bytes_preserved":True,"status":"PASS"},
  "manual_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"B_PRODUCTION38_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B_PRODUCTION39_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"B_PRODUCTION38_1A43_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-summary={"run":run,"asset":"1A43E9D9","index":92,"candidate_sha256":cand_sha,"bbox_size_pass":"2/2","visible_outside":visible_out,"alpha_outside":alpha_out,"source_residue":residue,"changed_blocks_outside_patch":outside_patch,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_B/20261005-B-PRODUCTION38/B_PRODUCTION38_1A43_REPORT.json"}
-(wr/"B_PRODUCTION38_1A43E9D9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"B_PRODUCTION39_1A43_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+summary={"run":run,"asset":"1A43E9D9","index":92,"candidate_sha256":cand_sha,"bbox_size_pass":"2/2","visible_outside":visible_out,"alpha_outside":alpha_out,"source_residue":residue,"changed_blocks_outside_patch":outside_patch,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_B/20261005-B-PRODUCTION39/B_PRODUCTION39_1A43_REPORT.json"}
+(wr/"B_PRODUCTION39_1A43E9D9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False))
