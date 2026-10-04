@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION56-PREFLIGHT",
+  "index": 140,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_SEMANTIC_BINDING",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "2da84d800f3df0606df148c353f25c2f25a47573",
+    "sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds"
+  },
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "bytes": 8388736,
+    "header_128_preservable": true,
+    "raw_orientation": "mirror_y"
+  },
+  "atlas": {
+    "git_blob_sha1": "7829c90426d563960440dd70b9b7ae74b3b76c0d",
+    "regions": [
+      {
+        "region_idx": 0,
+        "name": "sprite_457",
+        "cell": [
+          0,
+          864,
+          1760,
+          160
+        ],
+        "source_alpha_bbox": [
+          7,
+          905,
+          840,
+          1003
+        ],
+        "source_width": 833,
+        "source_height": 98,
+        "alpha_pixels": 39670
+      },
+      {
+        "region_idx": 1,
+        "name": "sprite_458",
+        "cell": [
+          0,
+          704,
+          1760,
+          160
+        ],
+        "source_alpha_bbox": [
+          13,
+          749,
+          793,
+          847
+        ],
+        "source_width": 780,
+        "source_height": 98,
+        "alpha_pixels": 36919
+      },
+      {
+        "region_idx": 2,
+        "name": "sprite_459",
+        "cell": [
+          0,
+          544,
+          1760,
+          160
+        ],
+        "source_alpha_bbox": [
+          7,
+          589,
+          815,
+          687
+        ],
+        "source_width": 808,
+        "source_height": 98,
+        "alpha_pixels": 39608
+      },
+      {
+        "region_idx": 3,
+        "name": "sprite_460",
+        "cell": [
+          0,
+          384,
+          1760,
+          160
+        ],
+        "source_alpha_bbox": [
+          7,
+          432,
+          652,
+          527
+        ],
+        "source_width": 645,
+        "source_height": 95,
+        "alpha_pixels": 35210
+      },
+      {
+        "region_idx": 4,
+        "name": "sprite_461",
+        "cell": [
+          0,
+          308,
+          744,
+          76
+        ],
+        "source_alpha_bbox": [
+          162,
+          318,
+          583,
+          382
+        ],
+        "source_width": 421,
+        "source_height": 64,
+        "alpha_pixels": 22431
+      }
+    ]
+  },
+  "expected_semantics": [
+    "PRESS START",
+    "SHOWROOM",
+    "SELECT MODE",
+    "SELECT RACE",
+    "SELECT STAGE"
+  ],
+  "semantic_binding": "PENDING_CONTROLLER_VISUAL_BINDING_FROM_REGION_CONTACT",
+  "candidate_written": false,
+  "next_same_invocation": "bind the five source strings to region indices from contact sheet, then render/encode/self-QA without opening another unrelated task",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B56_ONE_STAGE_TO_RENDER_DIAGNOSTIC_COMPLETE"
+}

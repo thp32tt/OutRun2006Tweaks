@@ -1,0 +1,118 @@
+{
+  "run": "20261005-B-PRODUCTION56-PREFLIGHT",
+  "index": 140,
+  "asset": "31C58963",
+  "source_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "bytes": 8388736,
+    "header_128_preservable": true,
+    "raw_orientation": "mirror_y"
+  },
+  "regions": [
+    {
+      "region_idx": 0,
+      "name": "sprite_457",
+      "cell": [
+        0,
+        864,
+        1760,
+        160
+      ],
+      "source_alpha_bbox": [
+        7,
+        905,
+        840,
+        1003
+      ],
+      "source_width": 833,
+      "source_height": 98,
+      "alpha_pixels": 39670
+    },
+    {
+      "region_idx": 1,
+      "name": "sprite_458",
+      "cell": [
+        0,
+        704,
+        1760,
+        160
+      ],
+      "source_alpha_bbox": [
+        13,
+        749,
+        793,
+        847
+      ],
+      "source_width": 780,
+      "source_height": 98,
+      "alpha_pixels": 36919
+    },
+    {
+      "region_idx": 2,
+      "name": "sprite_459",
+      "cell": [
+        0,
+        544,
+        1760,
+        160
+      ],
+      "source_alpha_bbox": [
+        7,
+        589,
+        815,
+        687
+      ],
+      "source_width": 808,
+      "source_height": 98,
+      "alpha_pixels": 39608
+    },
+    {
+      "region_idx": 3,
+      "name": "sprite_460",
+      "cell": [
+        0,
+        384,
+        1760,
+        160
+      ],
+      "source_alpha_bbox": [
+        7,
+        432,
+        652,
+        527
+      ],
+      "source_width": 645,
+      "source_height": 95,
+      "alpha_pixels": 35210
+    },
+    {
+      "region_idx": 4,
+      "name": "sprite_461",
+      "cell": [
+        0,
+        308,
+        744,
+        76
+      ],
+      "source_alpha_bbox": [
+        162,
+        318,
+        583,
+        382
+      ],
+      "source_width": 421,
+      "source_height": 64,
+      "alpha_pixels": 22431
+    }
+  ],
+  "status": "B56_ONE_STAGE_TO_RENDER_DIAGNOSTIC_COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION56-PREFLIGHT/B56_31C_PREFLIGHT.json"
+}
