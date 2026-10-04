@@ -191,13 +191,16 @@ def render_plain(text, ob):
     max_fs=max(16,int(ah*1.22))
     for fs in range(max_fs,11,-1):
         font=ImageFont.truetype(FONT,fs)
+        # Source Latin labels are heavy condensed white glyphs. Use a same-color
+        # micro-stroke to match visual weight without inventing an outline effect.
+        sw=max(1,fs//22)
         d=ImageDraw.Draw(Image.new("L",(8,8),0))
-        tb=d.textbbox((0,0),text,font=font,stroke_width=0)
+        tb=d.textbbox((0,0),text,font=font,stroke_width=sw)
         tw,th=tb[2]-tb[0],tb[3]-tb[1]
-        pad=4
+        pad=sw+4
         glyph=Image.new("RGBA",(tw+pad*2,th+pad*2),(0,0,0,0))
         gd=ImageDraw.Draw(glyph)
-        gd.text((pad-tb[0],pad-tb[1]),text,font=font,fill=(255,255,255,255))
+        gd.text((pad-tb[0],pad-tb[1]),text,font=font,fill=(255,255,255,255),stroke_width=sw,stroke_fill=(255,255,255,255))
         bb=glyph.getchannel("A").getbbox()
         if not bb:
             continue
@@ -280,7 +283,7 @@ for t in targets:
         "raw_original_bbox":raw_ob,"raw_localized_bbox":raw_loc,
         "raw_containment":"PASS" if ok else "FAIL",
         "font":"Noto Sans CJK KR Black/Bold","font_size":t["font_size"],
-        "style":"source-matched plain white antialiased text; no outline/shadow",
+        "style":"source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
         "rework_status":"A_PRODUCTION13_NEW_HD_CANDIDATE"
     })
 all_bbox=all(r["containment"]=="PASS" and r["raw_containment"]=="PASS" for r in rows)
