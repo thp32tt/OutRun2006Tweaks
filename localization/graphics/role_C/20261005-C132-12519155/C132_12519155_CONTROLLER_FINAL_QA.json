@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C132",
+  "timestamp_kst": "2026-10-05T05:32:27+09:00",
+  "scope": "only current unfinished C130-returned asset: 12519155; completed C127 and earlier PASS assets were not repeated",
+  "candidate_changed_by_C": true,
+  "asset": "12519155",
+  "queue_index": 128,
+  "input_candidate_sha256": "29a10497efcd82ebe6be7101ea9a4e0c830044992e7ffb9ac567d08dd9c444c8",
+  "candidate_sha256": "14bc44a69775206c5771023408d0752ee925542fda48359c14c4e5b2f767119d",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
+  "machine_report": "localization/graphics/role_C/20261005-C132-12519155/C132_12519155_MACHINE_QA.json",
+  "machine_status": "PASS",
+  "machine_checks": {
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "bbox_and_size": "7/7 PASS with positive margins",
+    "bbox_provenance": "remeasured from exact-source alpha/effect pixels in row midpoint bands; prior historical-diff boxes superseded",
+    "full_source_effect_pixels": 47185,
+    "clean_changed_pixels_outside_source_effect": 0,
+    "clean_rgb_changed_pixels": 0,
+    "clean_source_effect_alpha_remaining": 0,
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "target_pixels_outside_original_bboxes": 0,
+    "target_mask_pixels_invisible_in_candidate": 0,
+    "source_residue_pixels_outside_2px_target_guard": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "stage_naming_policy": "PASS"
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_evidence": [
+    "localization/graphics/role_C/20261005-C132-12519155/C132_125_COMPARE.jpg",
+    "localization/graphics/role_C/20261005-C132-12519155/C132_125_ROW_CONTACT_2X.jpg",
+    "localization/graphics/role_C/20261005-C132-12519155/C132_125_RAW_COMPARE.jpg"
+  ],
+  "controller_visual_note": "C132 CLEAN is visually free of the thin English/source-effect fringe that caused C130 REWORK. FINAL and white-background views contain only the seven intended Korean labels; no clipping, overlap, seam, halo, source residue, or protected-art damage is visible. Raw evidence preserves mirror_y orientation.",
+  "decision": "C132_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "global_rework_remaining": [],
+  "existing_high_risk_static_pass_assets": [
+    "1A43E9D9"
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94"
+  ],
+  "pending_production_localize_text": 41,
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

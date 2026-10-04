@@ -1021,3 +1021,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Existing 1A43E9D9 remains HIGH_RISK static PASS pending mandatory in-game validation. 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD.
 - RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_C/20261005-C127-D41D0B1/C127_D41D0B1_CONTROLLER_FINAL_QA.json
+
+## 2026-10-05 05:32:27 KST — C132 12519155 corrective final PASS
+- Consumed only the current C130-returned REWORK index 128 `12519155_256x256.dds`; completed C127 and earlier PASS assets were not repeated.
+- C130 machine containment was PASS but controller visual QA proved the historical-diff source bboxes clipped thin source-effect fringe. C132 therefore remeasured each of the seven source glyph/effect bboxes directly from canonical source alpha within row-separated bands and rebuilt the clean plate.
+- Final candidate `14bc44a69775206c5771023408d0752ee925542fda48359c14c4e5b2f767119d` (input `29a10497efcd82ebe6be7101ea9a4e0c830044992e7ffb9ac567d08dd9c444c8`): exact 1024x1024 RGBA32 header and raw `mirror_y` preserved; 47,185 source-effect pixels cleared; 7/7 bbox+size PASS with positive margins; clean/source residue/outside/alpha/overlap/touch all 0; canonical phonetic stage names PASS.
+- Controller SOURCE/CLEAN/FINAL, 2x row-contact and raw review PASS. The C130 fringe is absent; no clipping, overlap, seam, halo, residue, or protected-art damage is visible.
+- Decision: `C132_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Producer REWORK=0; pending_artwork localize_text=41. Existing 1A43E9D9 remains HIGH_RISK pending mandatory in-game validation; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C132-12519155/C132_12519155_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C132-12519155/C132_12519155_MACHINE_QA.json`.

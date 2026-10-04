@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T04:24:35+09:00",
+  "updated_at_kst": "2026-10-05T05:32:27+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,7 +50,7 @@
       "total": 243
     },
     "graphics_localization": {
-      "status": "static_qa_active_rework_required",
+      "status": "static_qa_active",
       "transcription_percent": 100,
       "draft_artwork_percent": 100,
       "final_artwork_percent": 0,
@@ -110,7 +110,7 @@
       "blocked_context_indices": []
     },
     "graphics_artwork": {
-      "status": "static_qa_active_rework_required",
+      "status": "static_qa_active",
       "final_artwork_percent": 0,
       "draft_percent": 100,
       "completed": 0,
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C127 final QA advances latest B_PRODUCTION43 D41D0B1 to pixel/visual policy PASS pending isolated in-game validation; B42 one-line render is superseded. Existing 1A43E9D9 remains static HIGH_RISK edge-touch pending mandatory in-game validation. Producer REWORK=0; strict DXT5 no-candidate HOLD 4F68708E/F6811E94; pending_artwork localize_text=42.",
+  "next_checkpoint": "C132 resolves C130-returned 12519155 with exact-source alpha/effect bbox remeasurement and controller visual PASS. Producer REWORK=0; pending_artwork localize_text=41; 1A43E9D9 remains HIGH_RISK pending mandatory in-game validation; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -268,7 +268,7 @@
       "status": "ZERO_PRODUCER_REWORK_REQUIRED",
       "assets": [],
       "remaining": 0,
-      "note": "D41D0B1 latest B_PRODUCTION43 passes C127 machine+controller final static QA. 1A43E9D9 remains HIGH_RISK static PASS pending in-game; 4F68708E/F6811E94 remain strict no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
+      "note": "12519155 C130 source-effect residue is resolved by C132 candidate 14bc44a69775206c5771023408d0752ee925542fda48359c14c4e5b2f767119d. 1A43E9D9 remains HIGH_RISK static PASS pending in-game; 4F68708E/F6811E94 remain strict no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": []
     },
     "latest_d_final_qa": {
@@ -293,14 +293,14 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C127",
-      "report": "localization/graphics/role_C/20261005-C127-D41D0B1/C127_D41D0B1_CONTROLLER_FINAL_QA.json",
+      "run": "C132",
+      "report": "localization/graphics/role_C/20261005-C132-12519155/C132_12519155_CONTROLLER_FINAL_QA.json",
       "result": "1_PIXEL_VISUAL_PASS_GLOBAL_0_REWORK_REMAIN",
-      "candidate_changed_by_C": false,
+      "candidate_changed_by_C": true,
       "assets_checked": 1,
-      "physical_elements_checked": 2,
+      "physical_elements_checked": 7,
       "pixel_visual_pass_assets": [
-        "D41D0B1"
+        "12519155"
       ],
       "high_risk_static_pass_assets_existing": [
         "1A43E9D9"
@@ -312,14 +312,14 @@
         "F6811E94"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 42,
+      "pending_production_localize_text": 41,
       "machine_evidence": {
-        "D41D0B1": "localization/graphics/role_C/20261005-C127-D41D0B1/C127_D41D0B1_MACHINE_QA.json"
+        "12519155": "localization/graphics/role_C/20261005-C132-12519155/C132_12519155_MACHINE_QA.json"
       },
       "controller_visual": {
-        "D41D0B1": "PASS"
+        "12519155": "PASS"
       },
-      "in_game_validation": "PENDING; 1A43E9D9 remains REQUIRED_BEFORE_FINAL_APPROVAL"
+      "in_game_validation": "PENDING; 1A43E9D9 remains REQUIRED_BEFORE_FINAL_APPROVAL; C132 RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_RECOVERY04_05",
