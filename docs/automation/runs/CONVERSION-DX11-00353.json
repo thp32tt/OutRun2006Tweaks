@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00353",
-  "production_id": "CONVERSION-DXVK-00352",
-  "event_id": "CONVERSION-DXVK-00352-E004",
+  "production_id": "CONVERSION-DX11-00353",
+  "event_id": "CONVERSION-DX11-00353-E002",
   "event_type": "rollover",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
@@ -95,12 +95,14 @@
   "runtime_claim": "NONE",
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00353",
-    "production_id": "CONVERSION-DXVK-00352",
-    "event_id": "CONVERSION-DXVK-00352-E004",
+    "production_id": "CONVERSION-DX11-00353",
+    "event_id": "CONVERSION-DX11-00353-E002",
     "event_type": "rollover",
     "attempt": "1/3",
     "rollover_is_retry": false,
-    "source": "CURRENT_USER_QUEUE"
+    "source": "CURRENT_USER_QUEUE",
+    "chat_rollover": 2,
+    "resume_reason": "Retry persisted after one recovery attempt"
   },
   "exact_next_action": "Release CONVERSION-DX11-00353 as complete. Preserve R239 identity, R240 per-device cache and R241 translation-slot ownership semantics; keep NativeDrawPath dormant. The next independent programmable-shader unit may add one fail-closed translated-object receipt/attachment boundary to a validated R241 slot, without draw routing; input linkage/constants remain subsequent bounded units.",
   "validation": {
@@ -119,5 +121,28 @@
   "issue14": {
     "implementation_comment_id": 5976969775,
     "validation_comment_id": 5977011442
+  },
+  "chat_rollover": 2,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "rollover_metadata_correction": {
+    "corrected_from": {
+      "production_id": "CONVERSION-DXVK-00352",
+      "event_id": "CONVERSION-DXVK-00352-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": null,
+      "rollover_is_retry": false
+    },
+    "corrected_to": {
+      "production_id": "CONVERSION-DX11-00353",
+      "event_id": "CONVERSION-DX11-00353-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false
+    },
+    "reason": "Current user-issued rollover dispatch is authoritative. This is a chat rollover, not a retry, so ATTEMPT remains 1/3. Material implementation/result SHA, exact-SHA gate evidence, C0-C6 completion and RUNTIME_VALIDATION=UNTESTED are unchanged.",
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "material_and_validation_bearing_sha_unchanged": true
   }
 }
