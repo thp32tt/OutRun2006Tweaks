@@ -567,7 +567,36 @@
       "historical_localized_raster_reused": false
     }
   ],
-  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "manual_visual_qa": "PASS",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_RECOVERY07_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B_RECOVERY07_CANDIDATE_SELFQA_PASS_PENDING_C_VISUAL_AND_INGAME",
+  "worker_run_id": 37192291421,
+  "worker_trigger_head": "e56177c0ede651ca8033274e5d3782334a7d8501",
+  "worker_output_commit": "e6cfec583a08a004e0f025c7991624b6ff5853c5",
+  "visual_qa": {
+    "source_clean_final_readable": "PASS",
+    "white_background_alpha_review": "PASS",
+    "raw_mirror_y_orientation": "PASS",
+    "row_contact_9_of_9": "PASS",
+    "source_text_residue": "NONE_OBSERVED",
+    "clipping_or_bbox_escape": "NONE",
+    "protected_art_or_unrelated_label_damage": "NONE_OBSERVED",
+    "new_overlap": "NONE_OBSERVED",
+    "style_fidelity": "PASS",
+    "source_effect_reconstruction": {
+      "slipstream_speed_streaks": "RESTORED",
+      "new_record_yellow_halo": "RESTORED"
+    },
+    "header_cleanup": {
+      "NAME": "PASS",
+      "STATUS": "PASS_NO_ENGLISH_RESIDUE"
+    }
+  },
+  "c95_machine_qa": {
+    "status": "C95_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA",
+    "candidate_sha256": "448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21",
+    "report": "localization/graphics/role_C/20261004-1833-C95/C95_B1696633_FINAL_QA.json",
+    "bbox_pass": "9/9",
+    "clean_final_outside_protected_alpha": 0
+  }
 }

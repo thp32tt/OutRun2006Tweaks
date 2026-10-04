@@ -1903,5 +1903,45 @@
     "runtime_validation": "UNTESTED",
     "in_game_validation": "PENDING",
     "c_final_qa": "PENDING"
+  },
+  "b_recovery07_b1696633": {
+    "run": "20261004-B-RECOVERY07",
+    "queue_index": 48,
+    "status": "B_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_VISUAL_AND_INGAME",
+    "worker_run_id": 37192291421,
+    "worker_trigger_head": "e56177c0ede651ca8033274e5d3782334a7d8501",
+    "worker_output_commit": "e6cfec583a08a004e0f025c7991624b6ff5853c5",
+    "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+    "candidate_sha256": "448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21",
+    "native_rerenders": 9,
+    "all_9_bbox_pass": true,
+    "format": "RGBA32",
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "source_effects_restored": [
+      "Slipstream speed streaks",
+      "NEW Record yellow halo"
+    ],
+    "production_report": "localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_B1696633_REPORT.json",
+    "clean_plate_report": "localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_CLEAN_PLATE_VALIDATION.json",
+    "final_mask_report": "localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_FINAL_MASK_VALIDATION.json",
+    "visual_compare": "localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_B1696633_COMPARE.jpg",
+    "row_contact": "localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_B1696633_ROW_CONTACT.jpg",
+    "raw_compare": "localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_B1696633_RAW_COMPARE.jpg",
+    "c95_machine_qa": {
+      "status": "C95_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA",
+      "report": "localization/graphics/role_C/20261004-1833-C95/C95_B1696633_FINAL_QA.json",
+      "candidate_sha256": "448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21"
+    },
+    "runtime_validation": "UNTESTED",
+    "next_b_target_hint": {
+      "index": 50,
+      "asset": "CBF8ECBF",
+      "status": "pending_artwork"
+    }
   }
 }

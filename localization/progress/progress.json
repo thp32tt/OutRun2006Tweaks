@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-04T17:43:11+09:00",
+  "updated_at_kst": "2026-10-04T18:34:29+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C91 repaired 571E78F3/62BEBF33/E3FD08BE to strict pixel+visual PASS pending isolated DDS_ONLY in-game. C92 independently checked A_RECOVERY07 FD90AA9: machine gates and 29/29 exact-bbox pass, but high-zoom visual QA rejects visible source-English residue in more_engine plus shared-layer overdraw. FD90AA9 remains the sole C85 REWORK asset (19 producer-owned failed elements). 61 additional localize_text rows remain pending production; 47 zoom_review rows remain HOLD_STRICT_RECHECK.",
+  "next_checkpoint": "A_RECOVERY08 FD90AA9 and B_RECOVERY07 B1696633 are producer self-QA PASS pending independent C controller visual/final QA and isolated in-game validation. B1696633 also has C95 same-SHA static machine PASS (9/9). Next B even-shard production hint: index 50 CBF8ECBF pending_artwork. RUNTIME_VALIDATION remains UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -661,17 +661,18 @@
     ]
   },
   "latest_b_first_qa": {
-    "run": "B_RECOVERY06",
-    "worker_run_id": 37187057858,
-    "worker_output_commit": "10ea3238a5ed125bf7f2c28baf392677a7d11c03",
-    "result": "AA04D779_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_INGAME",
+    "run": "B_RECOVERY07",
+    "worker_run_id": 37192291421,
+    "worker_output_commit": "e6cfec583a08a004e0f025c7991624b6ff5853c5",
+    "result": "B1696633_NEW_CANDIDATE_SELF_QA_PASS_C95_MACHINE_PASS_PENDING_C_VISUAL_INGAME",
     "assets": {
-      "AA04D779": {
-        "queue_index": 46,
-        "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
-        "candidate_sha256": "6f64736a53589379a00dc831e8605f0f8f140ffd52837f951e0a24fcd9d89c8a",
-        "status": "B_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_AND_INGAME",
-        "report": "localization/graphics/role_B/20261004-B-RECOVERY06/B_RECOVERY06_AA04D779_REPORT.json"
+      "B1696633": {
+        "queue_index": 48,
+        "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+        "candidate_sha256": "448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21",
+        "status": "B_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_VISUAL_AND_INGAME",
+        "report": "localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_B1696633_REPORT.json",
+        "c95_report": "localization/graphics/role_C/20261004-1833-C95/C95_B1696633_FINAL_QA.json"
       }
     },
     "runtime_validation": "UNTESTED"
