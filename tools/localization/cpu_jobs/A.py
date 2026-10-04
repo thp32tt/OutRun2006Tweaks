@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os, json, hashlib, struct, subprocess
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageChops, ImageOps
+from PIL import Image, ImageDraw, ImageChops, ImageOps, ImageFont, ImageFilter
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="A":
     raise SystemExit("GitHub-hosted role A required")
@@ -143,25 +143,105 @@ if clean_rep["status"]!="PASS": raise RuntimeError(("clean validator",clean_rep)
 top_clean_residue=count(ImageChops.multiply(binary_alpha(clean),top_source_mask))
 if top_clean_residue!=0: raise RuntimeError(("top clean residue",top_clean_residue))
 
-# Extract only the Korean/effect delta from C's safely placed candidate relative to C's clean,
-# then composite those deltas over the corrected clean plate. This preserves C's 17/17
-# zero-overlap placement while discarding all source residue that was shared by C clean+candidate.
+# Native top lettering avoids C's rejected rectangular/cleanup raster fragments entirely.
+# Bottom nine localized rasters were not part of C's visual failure and may reuse C's safe deltas.
+def resolve_font():
+    pats=["Noto Sans CJK KR:style=Black","Noto Sans CJK KR:style=Bold","Noto Sans CJK KR"]
+    for pat in pats:
+        try:
+            fp=subprocess.check_output(["fc-match","-f","%{file}",pat],text=True).strip()
+        except Exception:
+            fp=""
+        if fp and Path(fp).exists() and "NotoSansCJK" in Path(fp).name:
+            return fp
+    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
+    for pat in pats:
+        fp=subprocess.check_output(["fc-match","-f","%{file}",pat],text=True).strip()
+        if fp and Path(fp).exists():
+            return fp
+    raise RuntimeError("Noto CJK KR font unavailable")
+
+FONT=resolve_font()
+top_style={
+ "long_distance":{"fill":(224,62,68,255),"inner":(10,25,70,255),"outer":(248,248,245,255),"shadow":(9,12,30,180),"outer_r":0.075,"inner_r":0.040,"shadow_r":0.035,"slant":0.13},
+ "for_experts":{"fill":(224,62,68,255),"inner":(10,25,70,255),"outer":(248,248,245,255),"shadow":(9,12,30,180),"outer_r":0.075,"inner_r":0.040,"shadow_r":0.035,"slant":0.13},
+ "keep_passing":{"fill":(255,218,42,255),"inner":(7,20,67,255),"outer":(250,250,245,255),"shadow":(7,12,30,180),"outer_r":0.070,"inner_r":0.038,"shadow_r":0.035,"slant":0.04},
+ "drift":{"fill":(255,218,42,255),"inner":(7,20,67,255),"outer":(250,250,245,255),"shadow":(7,12,30,180),"outer_r":0.070,"inner_r":0.038,"shadow_r":0.035,"slant":0.03},
+ "dont_crash":{"fill":(255,218,42,255),"inner":(7,20,67,255),"outer":(250,250,245,255),"shadow":(7,12,30,180),"outer_r":0.070,"inner_r":0.038,"shadow_r":0.035,"slant":0.03},
+ "go_gate":{"fill":(255,218,42,255),"inner":(7,20,67,255),"outer":(250,250,245,255),"shadow":(7,12,30,180),"outer_r":0.070,"inner_r":0.038,"shadow_r":0.035,"slant":0.03},
+ "maximum_speed":{"fill":(245,245,245,255),"inner":None,"outer":None,"shadow":(70,70,70,160),"outer_r":0.0,"inner_r":0.0,"shadow_r":0.035,"slant":0.18},
+ "transmission":{"fill":(245,245,245,255),"inner":None,"outer":None,"shadow":(70,70,70,160),"outer_r":0.0,"inner_r":0.0,"shadow_r":0.040,"slant":0.18},
+}
+
+def shear_rgba(im,slant):
+    if not slant: return im
+    extra=max(4,int(abs(slant)*im.height)+6)
+    c=Image.new("RGBA",(im.width+extra*2,im.height),(0,0,0,0)); c.alpha_composite(im,(extra,0))
+    outi=c.transform(c.size,Image.Transform.AFFINE,(1,-slant,slant*c.height,0,1,0),resample=Image.Resampling.BICUBIC)
+    bb=outi.getchannel("A").getbbox()
+    return outi.crop(bb) if bb else outi
+
+def render_top(text,key,maxw,maxh):
+    st=top_style[key]
+    for fs in range(max(20,int(maxh*1.15)),11,-1):
+        font=ImageFont.truetype(FONT,fs)
+        outer=max(0,round(fs*st["outer_r"])); inner=max(0,round(fs*st["inner_r"])); shadow=max(0,round(fs*st["shadow_r"]))
+        maxstroke=max(outer,inner); pad=maxstroke+shadow+10
+        d=ImageDraw.Draw(Image.new("L",(8,8),0))
+        bb=d.textbbox((0,0),text,font=font,stroke_width=maxstroke)
+        cw=max(1,bb[2]-bb[0]+pad*2); ch=max(1,bb[3]-bb[1]+pad*2)
+        layer=Image.new("RGBA",(cw,ch),(0,0,0,0))
+        pos=(pad-bb[0],pad-bb[1])
+        if shadow:
+            sd=ImageDraw.Draw(layer)
+            sd.text((pos[0]+shadow,pos[1]+shadow),text,font=font,fill=st["shadow"],stroke_width=outer,stroke_fill=st["shadow"])
+        if outer and st["outer"] is not None:
+            ImageDraw.Draw(layer).text(pos,text,font=font,fill=st["outer"],stroke_width=outer,stroke_fill=st["outer"])
+        if inner and st["inner"] is not None:
+            ImageDraw.Draw(layer).text(pos,text,font=font,fill=st["fill"],stroke_width=inner,stroke_fill=st["inner"])
+        else:
+            ImageDraw.Draw(layer).text(pos,text,font=font,fill=st["fill"])
+        abb=layer.getchannel("A").getbbox()
+        if not abb: continue
+        layer=layer.crop(abb)
+        layer=shear_rgba(layer,st["slant"])
+        if layer.width<=maxw-2 and layer.height<=maxh-2:
+            return layer,fs
+    raise RuntimeError(("top render fit failed",key,text,maxw,maxh))
+
 final=clean.copy()
 localized_masks={}
 rows_out=[]
 for r in rows:
     key=r["key"]; nb=list(map(int,r["new_effect_bbox"]))
     x1,y1,x2,y2=nb
-    cc=c_clean.crop(nb); cn=c_new.crop(nb)
-    lm=changed_mask(cc,cn)
-    if not lm.getbbox(): raise RuntimeError(("empty localized delta",key))
     shift_y=12 if key=="for_experts" else 0
-    dx,dy=x1,y1+shift_y
-    global_m=Image.new("L",(W,H),0); global_m.paste(lm,(dx,dy))
-    localized_masks[key]=global_m
-    final.paste(cn,(dx,dy),lm)
-    lb=lm.getbbox()
-    loc=[dx+lb[0],dy+lb[1],dx+lb[2],dy+lb[3]]
+    if key in top_keys:
+        env=[x1,y1+shift_y,x2,y2+shift_y]
+        ew,eh=env[2]-env[0],env[3]-env[1]
+        layer,fs=render_top(r["korean"],key,ew,eh)
+        dx=env[0]+(ew-layer.width)//2; dy=env[1]+(eh-layer.height)//2
+        lm=layer.getchannel("A").point(lambda v:255 if v else 0)
+        final.alpha_composite(layer,(dx,dy))
+        global_m=Image.new("L",(W,H),0); global_m.paste(lm,(dx,dy))
+        localized_masks[key]=global_m
+        lb=lm.getbbox()
+        loc=[dx+lb[0],dy+lb[1],dx+lb[2],dy+lb[3]]
+        construction="native Noto CJK Black source-family render on A_RECOVERY10 canonical clean plate"
+        font_size=fs
+    else:
+        cc=c_clean.crop(nb); cn=c_new.crop(nb)
+        lm=changed_mask(cc,cn)
+        if not lm.getbbox(): raise RuntimeError(("empty localized delta",key))
+        dx,dy=x1,y1
+        global_m=Image.new("L",(W,H),0); global_m.paste(lm,(dx,dy))
+        localized_masks[key]=global_m
+        final.paste(cn,(dx,dy),lm)
+        lb=lm.getbbox()
+        loc=[dx+lb[0],dy+lb[1],dx+lb[2],dy+lb[3]]
+        construction="C_OVERLAP05 safe localized raster delta reused on A_RECOVERY10 corrected clean plate"
+        font_size=None
     ob=list(map(int,r["source_bbox"]))
     ok=loc[0]>=ob[0] and loc[1]>=ob[1] and loc[2]<=ob[2] and loc[3]<=ob[3]
     size_ok=(loc[2]-loc[0])<=(ob[2]-ob[0]) and (loc[3]-loc[1])<=(ob[3]-ob[1])
@@ -178,9 +258,9 @@ for r in rows:
       "raw_original_bbox":[ob[0],H-ob[3],ob[2],H-ob[1]],
       "raw_localized_bbox":[loc[0],H-loc[3],loc[2],H-loc[1]],
       "raw_containment":"PASS" if ok else "FAIL",
-      "construction":"C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "construction":construction,"font_size":font_size,
       "placement_adjustment":{"shift_y":shift_y},
-      "rework_status":"A_RECOVERY10_TOP_CLEAN_REBUILD" if key in top_keys else "A_RECOVERY10_C_PLACEMENT_REUSED"
+      "rework_status":"A_RECOVERY10_NATIVE_TOP_REBUILD" if key in top_keys else "A_RECOVERY10_C_PLACEMENT_REUSED"
     })
 
 # Pairwise localized-mask overlap must be zero for every physical occurrence.
@@ -230,7 +310,7 @@ all_positive=all(r["positive_margin"]=="PASS" for r in rows_out)
 def gray(im):
     bg=Image.new("RGBA",im.size,(72,72,72,255)); bg.alpha_composite(im); return bg.convert("RGB")
 thumb=(1024,1024)
-panels=[src,c_clean,c_new,decoded]
+panels=[src,clean,c_new,decoded]
 sheet=Image.new("RGB",(thumb[0]*2,thumb[1]*2),(60,60,60))
 for i,p in enumerate(panels):
     sheet.paste(gray(p).resize(thumb,Image.Resampling.LANCZOS),((i%2)*thumb[0],(i//2)*thumb[1]))
@@ -256,7 +336,7 @@ report={
  "c_overlap05_rejected_sha256":C_REJECTED_SHA,"candidate_sha256":candidate_sha,
  "candidate_path":str(candidate.relative_to(repo)),
  "structure":{"dimensions":[W,H],"format":"RGBA32","pitch":pitch,"mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
- "method":"canonical HD restore for dense top group -> exact source-alpha removal inside 8 target atlas cells -> reuse C_OVERLAP05 17/17 zero-overlap localized raster deltas -> preserve visually accepted bottom C clean reconstruction -> exact RGBA32 encode",
+ "method":"canonical HD restore for dense top group -> exact source-alpha removal inside 8 target atlas cells -> native source-family Korean rerender for 8 top labels -> reuse visually accepted C placement deltas for bottom 9 -> exact RGBA32 encode",
  "top_rebuilt_keys":sorted(top_keys),"top_restore_rect":list(top_restore_rect),
  "preserved_source_labels":preserved_cells,
  "preserved_source_label_pixel_diffs":preserved_diffs,
