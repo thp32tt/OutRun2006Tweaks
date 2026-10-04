@@ -40,7 +40,7 @@ ASSETS = [
         "clean_protected": "localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_PROTECTED_MASK.png",
         "allowed": "localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_ALLOWED_TEXT_REGION_MASK.png",
         "final_protected": "localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_PROTECTED_MASK.png",
-        "target_mask": "localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_TARGET_TEXT_MASK_CANONICAL.png",
+        "target_mask": "localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_TARGET_TEXT_MASK.png",
         "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
         "candidate_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
         "expected_rows": 11,
