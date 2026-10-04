@@ -74,7 +74,8 @@
       "event_type": "retry",
       "attempt": "1/3",
       "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH"
-    }
+    },
+    "run_record_commit_sha": "67670cceb1518f3b7f3c8575ec50b7862d7ccba5"
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
