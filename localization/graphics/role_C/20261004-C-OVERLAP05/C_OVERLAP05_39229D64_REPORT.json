@@ -1,0 +1,650 @@
+{
+  "asset": "39229D64",
+  "review_number": 2,
+  "before_candidate_sha256": "a6930ccc74a89a9781b655a7c39e2768984b11735ac3da863b66b72fa50b6a30",
+  "candidate_sha256": "dfa2c39fba8c397191af804767ede25fef35f92b5b21f583130190b701bdb9a4",
+  "full_erase_pixels": 1766661,
+  "rows_total": 15,
+  "rows_pass": 15,
+  "size_failures": 0,
+  "localized_pair_overlap_pixels": 0,
+  "protected_overlap_pixels": 0,
+  "changed_pixels_outside_allowed_text_region": 0,
+  "changed_pixels_in_protected_outside_allowed": 0,
+  "method": "full target-region clean reconstruction from current-vs-source diff + source-text mask; all Korean effects re-isolated; positive inset/downscale; hard 0-pixel inter-label placement",
+  "rows": [
+    {
+      "key": "hearts",
+      "source": "Hearts",
+      "korean": "하트",
+      "source_bbox": [
+        1715,
+        5,
+        2048,
+        102
+      ],
+      "old_effect_bbox": [
+        1806,
+        12,
+        1957,
+        96
+      ],
+      "new_effect_bbox": [
+        1814,
+        16,
+        1950,
+        92
+      ],
+      "source_size": [
+        333,
+        97
+      ],
+      "new_size": [
+        136,
+        76
+      ],
+      "delta_size": [
+        -197,
+        -21
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 3,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "technical_bonus",
+      "source": "Technical Bonus",
+      "korean": "테크니컬 보너스",
+      "source_bbox": [
+        2393,
+        77,
+        3610,
+        259
+      ],
+      "old_effect_bbox": [
+        2454,
+        85,
+        3550,
+        251
+      ],
+      "new_effect_bbox": [
+        2509,
+        94,
+        3495,
+        243
+      ],
+      "source_size": [
+        1217,
+        182
+      ],
+      "new_size": [
+        986,
+        149
+      ],
+      "delta_size": [
+        -231,
+        -33
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 5,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "mission_cleared",
+      "source": "MISSION CLEARED!",
+      "korean": "미션 성공!",
+      "source_bbox": [
+        128,
+        256,
+        1587,
+        787
+      ],
+      "old_effect_bbox": [
+        200,
+        282,
+        1515,
+        761
+      ],
+      "new_effect_bbox": [
+        266,
+        306,
+        1450,
+        737
+      ],
+      "source_size": [
+        1459,
+        531
+      ],
+      "new_size": [
+        1184,
+        431
+      ],
+      "delta_size": [
+        -275,
+        -100
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 10,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "total_rank_green",
+      "source": "Total Rank",
+      "korean": "종합 랭크",
+      "source_bbox": [
+        512,
+        896,
+        1101,
+        1075
+      ],
+      "old_effect_bbox": [
+        553,
+        913,
+        1059,
+        1057
+      ],
+      "new_effect_bbox": [
+        578,
+        920,
+        1033,
+        1050
+      ],
+      "source_size": [
+        589,
+        179
+      ],
+      "new_size": [
+        455,
+        130
+      ],
+      "delta_size": [
+        -134,
+        -49
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 5,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "storing",
+      "source": "STORING ONLINE RECORD...",
+      "korean": "온라인 기록 저장 중...",
+      "source_bbox": [
+        1652,
+        858,
+        2975,
+        998
+      ],
+      "old_effect_bbox": [
+        1717,
+        864,
+        2910,
+        992
+      ],
+      "new_effect_bbox": [
+        1776,
+        870,
+        2850,
+        985
+      ],
+      "source_size": [
+        1323,
+        140
+      ],
+      "new_size": [
+        1074,
+        115
+      ],
+      "delta_size": [
+        -249,
+        -25
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 4,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "special_request",
+      "source": "SPECIAL REQUEST",
+      "korean": "스페셜 요청",
+      "source_bbox": [
+        1644,
+        1114,
+        2624,
+        1267
+      ],
+      "old_effect_bbox": [
+        1692,
+        1122,
+        2576,
+        1261
+      ],
+      "new_effect_bbox": [
+        1736,
+        1129,
+        2532,
+        1254
+      ],
+      "source_size": [
+        980,
+        153
+      ],
+      "new_size": [
+        796,
+        125
+      ],
+      "delta_size": [
+        -184,
+        -28
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 5,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "target",
+      "source": "Target",
+      "korean": "목표",
+      "source_bbox": [
+        2625,
+        555,
+        2825,
+        640
+      ],
+      "old_effect_bbox": [
+        2649,
+        555,
+        2796,
+        638
+      ],
+      "new_effect_bbox": [
+        2656,
+        559,
+        2788,
+        634
+      ],
+      "source_size": [
+        200,
+        85
+      ],
+      "new_size": [
+        132,
+        75
+      ],
+      "delta_size": [
+        -68,
+        -10
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 3,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "start",
+      "source": "START",
+      "korean": "시작",
+      "source_bbox": [
+        2487,
+        1016,
+        2662,
+        1085
+      ],
+      "old_effect_bbox": [
+        2498,
+        1020,
+        2627,
+        1081
+      ],
+      "new_effect_bbox": [
+        2504,
+        1023,
+        2620,
+        1078
+      ],
+      "source_size": [
+        175,
+        69
+      ],
+      "new_size": [
+        116,
+        55
+      ],
+      "delta_size": [
+        -59,
+        -14
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 2,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "source_bbox": [
+        2975,
+        1016,
+        3131,
+        1085
+      ],
+      "old_effect_bbox": [
+        3012,
+        1020,
+        3130,
+        1083
+      ],
+      "new_effect_bbox": [
+        3018,
+        1023,
+        3124,
+        1080
+      ],
+      "source_size": [
+        156,
+        69
+      ],
+      "new_size": [
+        106,
+        57
+      ],
+      "delta_size": [
+        -50,
+        -12
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 2,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "hit_ghost",
+      "source": "Hit the ghost!",
+      "korean": "고스트를 맞히세요!",
+      "source_bbox": [
+        3163,
+        1017,
+        3633,
+        1106
+      ],
+      "old_effect_bbox": [
+        3163,
+        1017,
+        3633,
+        1106
+      ],
+      "new_effect_bbox": [
+        3186,
+        1022,
+        3609,
+        1102
+      ],
+      "source_size": [
+        470,
+        89
+      ],
+      "new_size": [
+        423,
+        80
+      ],
+      "delta_size": [
+        -47,
+        -9
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 3,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "exit",
+      "source": "EXIT",
+      "korean": "종료",
+      "source_bbox": [
+        3083,
+        1143,
+        3494,
+        1281
+      ],
+      "old_effect_bbox": [
+        3083,
+        1143,
+        3494,
+        1281
+      ],
+      "new_effect_bbox": [
+        3104,
+        1150,
+        3474,
+        1274
+      ],
+      "source_size": [
+        411,
+        138
+      ],
+      "new_size": [
+        370,
+        124
+      ],
+      "delta_size": [
+        -41,
+        -14
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 4,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "collect_stars",
+      "source": "Collect the stars!",
+      "korean": "별을 모으세요!",
+      "source_bbox": [
+        3469,
+        1172,
+        3998,
+        1267
+      ],
+      "old_effect_bbox": [
+        3469,
+        1172,
+        3998,
+        1267
+      ],
+      "new_effect_bbox": [
+        3496,
+        1176,
+        3972,
+        1262
+      ],
+      "source_size": [
+        529,
+        95
+      ],
+      "new_size": [
+        476,
+        86
+      ],
+      "delta_size": [
+        -53,
+        -9
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 3,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "mission_failed",
+      "source": "MISSION FAILED!",
+      "korean": "미션 실패!",
+      "source_bbox": [
+        1984,
+        1280,
+        3187,
+        1792
+      ],
+      "old_effect_bbox": [
+        2043,
+        1280,
+        3187,
+        1768
+      ],
+      "new_effect_bbox": [
+        2100,
+        1304,
+        3130,
+        1743
+      ],
+      "source_size": [
+        1203,
+        512
+      ],
+      "new_size": [
+        1030,
+        439
+      ],
+      "delta_size": [
+        -173,
+        -73
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 10,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "total_rank_brown",
+      "source": "Total Rank",
+      "korean": "종합 랭크",
+      "source_bbox": [
+        717,
+        1915,
+        1318,
+        2099
+      ],
+      "old_effect_bbox": [
+        757,
+        1932,
+        1276,
+        2080
+      ],
+      "new_effect_bbox": [
+        783,
+        1940,
+        1250,
+        2073
+      ],
+      "source_size": [
+        601,
+        184
+      ],
+      "new_size": [
+        467,
+        133
+      ],
+      "delta_size": [
+        -134,
+        -51
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 6,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "total_rank_pink",
+      "source": "Total Rank",
+      "korean": "종합 랭크",
+      "source_bbox": [
+        2598,
+        1900,
+        3238,
+        2099
+      ],
+      "old_effect_bbox": [
+        2638,
+        1919,
+        3198,
+        2078
+      ],
+      "new_effect_bbox": [
+        2666,
+        1927,
+        3170,
+        2070
+      ],
+      "source_size": [
+        640,
+        199
+      ],
+      "new_size": [
+        504,
+        143
+      ],
+      "delta_size": [
+        -136,
+        -56
+      ],
+      "scale_from_old": 0.9,
+      "positive_inset_px": 6,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    }
+  ],
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "status": "STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}

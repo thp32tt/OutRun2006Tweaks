@@ -1,0 +1,27 @@
+{
+  "asset": "A064FDFC",
+  "review_number": 6,
+  "candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
+  "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json",
+  "blocking_row": "rank",
+  "source_bbox": [
+    690,
+    245,
+    875,
+    350
+  ],
+  "current_effect_bbox": [
+    702,
+    252,
+    862,
+    342
+  ],
+  "latest_worker_failure": "NO_ZERO_OVERLAP_PLACEMENT after full target-region clean reconstruction; no placement remained through the fail-closed search while retaining exact source-bbox containment, protected-art clearance, and positive inter-label spacing",
+  "prior_blocking_observation": "dumped_white also failed the earlier stricter zero-overlap placement attempt",
+  "zero_overlap_gate": "REWORK_REQUIRED",
+  "required_rework": "B producer lane must reconstruct the dense ranking/top-label group with explicit separable per-row target masks and source-faithful spacing; C must not approve bbox containment alone",
+  "candidate_changed_by_C": false,
+  "controller_visual_qa": "NOT_RUN_FAIL_CLOSED",
+  "runtime_validation": "UNTESTED",
+  "status": "REWORK_REQUIRED_ZERO_OVERLAP_NO_SAFE_PLACEMENT"
+}

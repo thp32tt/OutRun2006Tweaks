@@ -1,0 +1,734 @@
+{
+  "asset": "C075FB49",
+  "review_number": 5,
+  "before_candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
+  "candidate_sha256": "3e950422775def2508ea42118f41c7a1f7463e2a7106cdcfcfb907b705890c91",
+  "full_erase_pixels": 723120,
+  "rows_total": 17,
+  "rows_pass": 17,
+  "size_failures": 0,
+  "localized_pair_overlap_pixels": 0,
+  "protected_overlap_pixels": 0,
+  "changed_pixels_outside_allowed_text_region": 0,
+  "changed_pixels_in_protected_outside_allowed": 0,
+  "method": "full target-region clean reconstruction from current-vs-source diff + source-text mask; all Korean effects re-isolated; positive inset/downscale; hard 0-pixel inter-label placement",
+  "rows": [
+    {
+      "key": "long_distance",
+      "source": "Long distance",
+      "korean": "장거리",
+      "source_bbox": [
+        574,
+        29,
+        1120,
+        129
+      ],
+      "old_effect_bbox": [
+        726,
+        30,
+        968,
+        128
+      ],
+      "new_effect_bbox": [
+        743,
+        37,
+        951,
+        121
+      ],
+      "source_size": [
+        546,
+        100
+      ],
+      "new_size": [
+        208,
+        84
+      ],
+      "delta_size": [
+        -338,
+        -16
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 3,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "keep_passing",
+      "source": "Keep passing the cars!",
+      "korean": "계속 차량을 추월하세요!",
+      "source_bbox": [
+        1,
+        143,
+        520,
+        236
+      ],
+      "old_effect_bbox": [
+        1,
+        143,
+        520,
+        236
+      ],
+      "new_effect_bbox": [
+        38,
+        150,
+        484,
+        230
+      ],
+      "source_size": [
+        519,
+        93
+      ],
+      "new_size": [
+        446,
+        80
+      ],
+      "delta_size": [
+        -73,
+        -13
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 3,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "drift",
+      "source": "Drift!",
+      "korean": "드리프트!",
+      "source_bbox": [
+        500,
+        120,
+        720,
+        228
+      ],
+      "old_effect_bbox": [
+        500,
+        120,
+        720,
+        228
+      ],
+      "new_effect_bbox": [
+        516,
+        128,
+        705,
+        221
+      ],
+      "source_size": [
+        220,
+        108
+      ],
+      "new_size": [
+        189,
+        93
+      ],
+      "delta_size": [
+        -31,
+        -15
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 3,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "maximum_speed",
+      "source": "Maximum Speed",
+      "korean": "최고 속도",
+      "source_bbox": [
+        680,
+        120,
+        1137,
+        227
+      ],
+      "old_effect_bbox": [
+        680,
+        120,
+        1137,
+        227
+      ],
+      "new_effect_bbox": [
+        712,
+        128,
+        1105,
+        220
+      ],
+      "source_size": [
+        457,
+        107
+      ],
+      "new_size": [
+        393,
+        92
+      ],
+      "delta_size": [
+        -64,
+        -15
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 3,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "transmission",
+      "source": "Transmission",
+      "korean": "변속기",
+      "source_bbox": [
+        1,
+        200,
+        600,
+        370
+      ],
+      "old_effect_bbox": [
+        1,
+        200,
+        600,
+        370
+      ],
+      "new_effect_bbox": [
+        73,
+        232,
+        528,
+        361
+      ],
+      "source_size": [
+        599,
+        170
+      ],
+      "new_size": [
+        455,
+        129
+      ],
+      "delta_size": [
+        -144,
+        -41
+      ],
+      "scale_from_old": 0.7598959999999999,
+      "positive_inset_px": 5,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "dont_crash",
+      "source": "Don't crash!",
+      "korean": "충돌하지 마세요!",
+      "source_bbox": [
+        550,
+        200,
+        1070,
+        370
+      ],
+      "old_effect_bbox": [
+        550,
+        200,
+        1070,
+        370
+      ],
+      "new_effect_bbox": [
+        600,
+        224,
+        1020,
+        361
+      ],
+      "source_size": [
+        520,
+        170
+      ],
+      "new_size": [
+        420,
+        137
+      ],
+      "delta_size": [
+        -100,
+        -33
+      ],
+      "scale_from_old": 0.8083999999999999,
+      "positive_inset_px": 5,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "go_gate",
+      "source": "Go through the gate!",
+      "korean": "게이트를 통과하세요!",
+      "source_bbox": [
+        1020,
+        200,
+        1590,
+        370
+      ],
+      "old_effect_bbox": [
+        1020,
+        200,
+        1590,
+        370
+      ],
+      "new_effect_bbox": [
+        1074,
+        222,
+        1535,
+        359
+      ],
+      "source_size": [
+        570,
+        170
+      ],
+      "new_size": [
+        461,
+        137
+      ],
+      "delta_size": [
+        -109,
+        -33
+      ],
+      "scale_from_old": 0.8083999999999999,
+      "positive_inset_px": 5,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "for_experts",
+      "source": "For Experts:",
+      "korean": "상급자용:",
+      "source_bbox": [
+        1530,
+        200,
+        1980,
+        370
+      ],
+      "old_effect_bbox": [
+        1575,
+        230,
+        1980,
+        340
+      ],
+      "new_effect_bbox": [
+        1604,
+        238,
+        1952,
+        333
+      ],
+      "source_size": [
+        450,
+        170
+      ],
+      "new_size": [
+        348,
+        95
+      ],
+      "delta_size": [
+        -102,
+        -75
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 5,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "tuned_setting",
+      "source": "Tuned Setting",
+      "korean": "튜닝 / 설정",
+      "source_bbox": [
+        40,
+        1195,
+        245,
+        1305
+      ],
+      "old_effect_bbox": [
+        94,
+        1196,
+        190,
+        1303
+      ],
+      "new_effect_bbox": [
+        100,
+        1204,
+        183,
+        1296
+      ],
+      "source_size": [
+        205,
+        110
+      ],
+      "new_size": [
+        83,
+        92
+      ],
+      "delta_size": [
+        -122,
+        -18
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 3,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "normal_setting",
+      "source": "Normal Setting",
+      "korean": "일반 / 설정",
+      "source_bbox": [
+        381,
+        1195,
+        600,
+        1305
+      ],
+      "old_effect_bbox": [
+        441,
+        1196,
+        540,
+        1303
+      ],
+      "new_effect_bbox": [
+        448,
+        1204,
+        533,
+        1296
+      ],
+      "source_size": [
+        219,
+        110
+      ],
+      "new_size": [
+        85,
+        92
+      ],
+      "delta_size": [
+        -134,
+        -18
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 3,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "new_course_desc",
+      "source": "A brand new course designed for OutRun2: SP.",
+      "korean": "아웃런2 SP용으로 새롭게 / 설계된 코스입니다.",
+      "source_bbox": [
+        242,
+        1394,
+        767,
+        1602
+      ],
+      "old_effect_bbox": [
+        247,
+        1439,
+        761,
+        1557
+      ],
+      "new_effect_bbox": [
+        283,
+        1448,
+        725,
+        1549
+      ],
+      "source_size": [
+        525,
+        208
+      ],
+      "new_size": [
+        442,
+        101
+      ],
+      "delta_size": [
+        -83,
+        -107
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 6,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "original_course_desc",
+      "source": "The course from the original OutRun2.",
+      "korean": "오리지널 아웃런2의 / 코스입니다.",
+      "source_bbox": [
+        830,
+        1394,
+        1305,
+        1609
+      ],
+      "old_effect_bbox": [
+        830,
+        1394,
+        1305,
+        1609
+      ],
+      "new_effect_bbox": [
+        864,
+        1409,
+        1272,
+        1594
+      ],
+      "source_size": [
+        475,
+        215
+      ],
+      "new_size": [
+        408,
+        185
+      ],
+      "delta_size": [
+        -67,
+        -30
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 6,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "conditions",
+      "source": "Conditions:",
+      "korean": "조건:",
+      "source_bbox": [
+        1325,
+        1410,
+        1655,
+        1545
+      ],
+      "old_effect_bbox": [
+        1400,
+        1435,
+        1573,
+        1519
+      ],
+      "new_effect_bbox": [
+        1412,
+        1441,
+        1561,
+        1513
+      ],
+      "source_size": [
+        330,
+        135
+      ],
+      "new_size": [
+        149,
+        72
+      ],
+      "delta_size": [
+        -181,
+        -63
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 4,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "random",
+      "source": "RANDOM",
+      "korean": "무작위",
+      "source_bbox": [
+        1710,
+        1435,
+        2008,
+        1515
+      ],
+      "old_effect_bbox": [
+        1767,
+        1437,
+        1951,
+        1512
+      ],
+      "new_effect_bbox": [
+        1780,
+        1442,
+        1938,
+        1506
+      ],
+      "source_size": [
+        298,
+        80
+      ],
+      "new_size": [
+        158,
+        64
+      ],
+      "delta_size": [
+        -140,
+        -16
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 2,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "normal_balance",
+      "source": "Normal balance",
+      "korean": "일반 밸런스",
+      "source_bbox": [
+        875,
+        1632,
+        1265,
+        1704
+      ],
+      "old_effect_bbox": [
+        952,
+        1647,
+        1182,
+        1693
+      ],
+      "new_effect_bbox": [
+        968,
+        1650,
+        1166,
+        1690
+      ],
+      "source_size": [
+        390,
+        72
+      ],
+      "new_size": [
+        198,
+        40
+      ],
+      "delta_size": [
+        -192,
+        -32
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 2,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "more_bgm_1",
+      "source": "More BGM",
+      "korean": "BGM 더 많이",
+      "source_bbox": [
+        890,
+        1720,
+        1265,
+        1792
+      ],
+      "old_effect_bbox": [
+        938,
+        1728,
+        1212,
+        1777
+      ],
+      "new_effect_bbox": [
+        957,
+        1732,
+        1193,
+        1774
+      ],
+      "source_size": [
+        375,
+        72
+      ],
+      "new_size": [
+        236,
+        42
+      ],
+      "delta_size": [
+        -139,
+        -30
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 2,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    },
+    {
+      "key": "more_bgm_2",
+      "source": "More BGM",
+      "korean": "BGM 더 많이",
+      "source_bbox": [
+        1300,
+        1720,
+        1655,
+        1792
+      ],
+      "old_effect_bbox": [
+        1300,
+        1728,
+        1655,
+        1792
+      ],
+      "new_effect_bbox": [
+        1325,
+        1732,
+        1630,
+        1787
+      ],
+      "source_size": [
+        355,
+        72
+      ],
+      "new_size": [
+        305,
+        55
+      ],
+      "delta_size": [
+        -50,
+        -17
+      ],
+      "scale_from_old": 0.86,
+      "positive_inset_px": 2,
+      "size_ceiling": "PASS",
+      "localized_pair_overlap_pixels": 0,
+      "protected_overlap_pixels": 0,
+      "zero_overlap": "PASS",
+      "style": "existing source-matched localized raster/effects uniformly downscaled; no line-specific restyling"
+    }
+  ],
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "status": "STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
