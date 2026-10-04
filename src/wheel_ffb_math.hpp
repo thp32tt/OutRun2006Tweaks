@@ -365,11 +365,16 @@ namespace WheelFFBMath
     // Treat only the unambiguous all-four / collision-context-zero case as the
     // primary-asphalt false positive. Actual mixed/water contacts remain intact.
     inline bool primary_asphalt_water_false_positive(
+        int uniqueStage,
         int collisionContext,
         const std::array<unsigned, 4>& masks,
         unsigned waterWheelMask)
     {
-        if (collisionContext != 0 || waterWheelMask != 0x0Fu)
+        // Hardware evidence currently proves this false-positive only on
+        // Imperial Avenue (unique stage 14). Keep other water-capable stages
+        // untouched until their own runtime traces establish the same case.
+        if (uniqueStage != 14 ||
+            collisionContext != 0 || waterWheelMask != 0x0Fu)
             return false;
         for (unsigned mask : masks)
             if (mask != PrimaryAsphaltSurfaceMask)
