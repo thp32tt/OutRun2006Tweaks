@@ -7,7 +7,7 @@ from scipy.ndimage import distance_transform_edt
 
 if os.environ.get('OUTRUN_CPU_WORKER')!='github-actions' or os.environ.get('OUTRUN_CPU_ROLE')!='B':
     raise SystemExit('GitHub-hosted localization CPU worker / role B only')
-repo=Path.cwd();run='20261005-B-PRODUCTION31';out=repo/'localization/graphics/role_B'/run;out.mkdir(parents=True,exist_ok=True)
+repo=Path.cwd();run='20261005-B-PRODUCTION32';out=repo/'localization/graphics/role_B'/run;out.mkdir(parents=True,exist_ok=True)
 asset_rel='textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds'
 url='https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds'
 source_sha_expected='4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b'
@@ -87,33 +87,35 @@ def semantic_mask(key, window, seed_kind, component_radius=12):
  return m, {'window':window,'seed_kind':seed_kind,'seed_pixels':int(seed.sum()),'component_count':int(n),'selected_components':sorted(keep),'seed_bbox':[x0+int(sx.min()),y0+int(sy.min()),x0+int(sx.max())+1,y0+int(sy.max())+1]}
 
 mask_discovery={}
-# The top red/orange pair intentionally has touching/overlapping outer effects.  Preserve
-# B_PRODUCTION21's color-seeded ownership split for that pair only; C108 did not return
-# this pair, and a generic connected-component pass merges their touching white/navy rims.
-ty0,ty1=60,210;tx0,tx1=0,770
+# The top red/orange labels have touching white/navy effects but distinct red/orange fills.
+# Assign every nearby source-alpha effect pixel to the nearest fill family instead of
+# clipping at an x boundary. This recovers the full trailing SP while keeping Music Change
+# (farther right) protected.
+ty0,ty1=60,210;tx0,tx1=0,900
 tsub=alpha[ty0:ty1,tx0:tx1];trgb=sa[ty0:ty1,tx0:tx1,:3].astype(np.int16);R,G,B=trgb[:,:,0],trgb[:,:,1],trgb[:,:,2]
 tx=np.indices(tsub.shape)[1]
-red_seed=tsub&(R>=125)&(R>=G+45)&(R>=B+25)&(tx<520)
+red_seed=tsub&(R>=125)&(R>=G+45)&(R>=B+25)&(tx<560)
 orange_seed=tsub&(R>=165)&(G>=55)&(R>=G+32)&(B<=125)&(tx>300)
 if red_seed.sum()<100 or orange_seed.sum()<100: raise RuntimeError(('top seed count',int(red_seed.sum()),int(orange_seed.sum())))
-ry,rx=np.nonzero(red_seed);oy,ox=np.nonzero(orange_seed)
-red_fill_max_x=tx0+int(rx.max()); orange_fill_min_x=tx0+int(ox.min()); top_split=(red_fill_max_x+orange_fill_min_x)//2
-seed_y0=ty0+min(int(ry.min()),int(oy.min())); seed_y1=ty0+max(int(ry.max()),int(oy.max()))+1
-top_band_y0=max(ty0,seed_y0-22); top_band_y1=min(ty1,seed_y1+22)
-if not (340<=top_split<=520 and top_band_y0<top_band_y1): raise RuntimeError(('unexpected top split',red_fill_max_x,orange_fill_min_x,top_split,top_band_y0,top_band_y1))
+dr=distance_transform_edt(~red_seed); do=distance_transform_edt(~orange_seed)
+near=tsub & (np.minimum(dr,do)<=26.0)
+red_local=near & (dr<=do); orange_local=near & (do<dr)
 red=np.zeros((H,W),bool); orange=np.zeros((H,W),bool)
-red[top_band_y0:top_band_y1,0:top_split]=alpha[top_band_y0:top_band_y1,0:top_split]
-orange[top_band_y0:top_band_y1,top_split:770]=alpha[top_band_y0:top_band_y1,top_split:770]
-mask_discovery['for_experts']={'window':[0,ty0,top_split,ty1],'seed_kind':'red','seed_pixels':int(red_seed.sum()),'seed_bbox':[int(rx.min()),ty0+int(ry.min()),int(rx.max())+1,ty0+int(ry.max())+1],'top_split_x':top_split,'top_band_y':[top_band_y0,top_band_y1]}
-mask_discovery['outrun2sp']={'window':[top_split,ty0,770,ty1],'seed_kind':'orange','seed_pixels':int(orange_seed.sum()),'seed_bbox':[int(ox.min()),ty0+int(oy.min()),int(ox.max())+1,ty0+int(oy.max())+1],'top_split_x':top_split,'top_band_y':[top_band_y0,top_band_y1]}
-music,mask_discovery['music_change']=semantic_mask('music_change',(820,45,1500,176),'white',12)
-time,mask_discovery['time_remaining']=semantic_mask('time_remaining',(1050,176,1960,310),'white',14)
+red[ty0:ty1,tx0:tx1]=red_local; orange[ty0:ty1,tx0:tx1]=orange_local
+ry,rx=np.nonzero(red_seed); oy,ox=np.nonzero(orange_seed)
+mask_discovery['for_experts']={'window':[tx0,ty0,tx1,ty1],'seed_kind':'red','seed_pixels':int(red_seed.sum()),'seed_bbox':[tx0+int(rx.min()),ty0+int(ry.min()),tx0+int(rx.max())+1,ty0+int(ry.max())+1],'assignment':'nearest_fill_seed_within_26px'}
+mask_discovery['outrun2sp']={'window':[tx0,ty0,tx1,ty1],'seed_kind':'orange','seed_pixels':int(orange_seed.sum()),'seed_bbox':[tx0+int(ox.min()),ty0+int(oy.min()),tx0+int(ox.max())+1,ty0+int(oy.max())+1],'assignment':'nearest_fill_seed_within_26px'}
+# Start the white-label discovery windows beyond the preserved neighboring labels.
+# B31 controller visual review showed x<900 belonged to OutRun2SP and x<1120 on the
+# lower row belonged to the second preserved Transmission label.
+music,mask_discovery['music_change']=semantic_mask('music_change',(900,45,1500,176),'white',12)
+time,mask_discovery['time_remaining']=semantic_mask('time_remaining',(1120,176,1960,310),'white',14)
 source_masks={'for_experts':red,'outrun2sp':orange,'music_change':music,'time_remaining':time}
 expected={
- 'for_experts':{'x':(0,540),'y':(60,210),'text':'상급자용','source':'For Experts','style':'red_white_navy','slant':0.28},
- 'outrun2sp':{'x':(350,800),'y':(60,210),'text':'아웃런2 SP','source':'OutRun2SP','style':'orange_white_navy','slant':0.25},
- 'music_change':{'x':(820,1500),'y':(45,176),'text':'음악 변경','source':'Music Change','style':'white_shadow','slant':0.20},
- 'time_remaining':{'x':(1050,1960),'y':(176,310),'text':'남은 시간:','source':'Time remaining :','style':'white_navy','slant':0.20},
+ 'for_experts':{'x':(0,600),'y':(60,210),'text':'상급자용','source':'For Experts','style':'red_white_navy','slant':0.28},
+ 'outrun2sp':{'x':(350,900),'y':(60,210),'text':'아웃런2 SP','source':'OutRun2SP','style':'orange_white_navy','slant':0.25},
+ 'music_change':{'x':(900,1500),'y':(45,176),'text':'음악 변경','source':'Music Change','style':'white_shadow','slant':0.20},
+ 'time_remaining':{'x':(1120,1960),'y':(176,310),'text':'남은 시간:','source':'Time remaining :','style':'white_navy','slant':0.20},
 }
 source_bboxes={};source_text=np.zeros((H,W),bool)
 for k,m in source_masks.items():
@@ -196,13 +198,13 @@ if ch!=header or cm!=meta or ImageChops.difference(decoded,final).getbbox() is n
 Image.fromarray((source_text*255).astype(np.uint8),'L').save(out/'788CE557_SOURCE_TEXT_MASK.png');Image.fromarray((allowed*255).astype(np.uint8),'L').save(out/'788CE557_ALLOWED_TEXT_REGION_MASK.png');Image.fromarray(((~allowed)*255).astype(np.uint8),'L').save(out/'788CE557_PROTECTED_MASK.png');Image.fromarray((occupied*255).astype(np.uint8),'L').save(out/'788CE557_TARGET_TEXT_MASK.png');clean.save(out/'788CE557_CLEAN_PLATE.png')
 for k,m in source_masks.items():Image.fromarray((m*255).astype(np.uint8),'L').save(out/f'788CE557_SOURCE_MASK_{k}.png')
 work=Path('/tmp/b21');work.mkdir(exist_ok=True);sp=work/'source.png';cp=work/'clean.png';fp=work/'final.png';src.save(sp);clean.save(cp);decoded.save(fp)
-subprocess.run(['python3',str(repo/'tools/localization/validate_clean_plate.py'),str(sp),str(cp),str(out/'788CE557_SOURCE_TEXT_MASK.png'),'--report',str(out/'B_PRODUCTION31_CLEAN_PLATE_VALIDATION.json')],check=True)
-subprocess.run(['python3',str(repo/'tools/localization/validate_clean_plate.py'),str(sp),str(fp),str(out/'788CE557_ALLOWED_TEXT_REGION_MASK.png'),'--protected-mask',str(out/'788CE557_PROTECTED_MASK.png'),'--report',str(out/'B_PRODUCTION31_FINAL_MASK_VALIDATION.json')],check=True)
+subprocess.run(['python3',str(repo/'tools/localization/validate_clean_plate.py'),str(sp),str(cp),str(out/'788CE557_SOURCE_TEXT_MASK.png'),'--report',str(out/'B_PRODUCTION32_CLEAN_PLATE_VALIDATION.json')],check=True)
+subprocess.run(['python3',str(repo/'tools/localization/validate_clean_plate.py'),str(sp),str(fp),str(out/'788CE557_ALLOWED_TEXT_REGION_MASK.png'),'--protected-mask',str(out/'788CE557_PROTECTED_MASK.png'),'--report',str(out/'B_PRODUCTION32_FINAL_MASK_VALIDATION.json')],check=True)
 # Readable/raw/source-clean-final visual proof.
 def comp(im,bg):z=Image.new('RGBA',im.size,bg);z.alpha_composite(im);return z.convert('RGB')
 def card(label,im,bg=(55,55,55,255)):
  v=comp(im,bg);v.thumbnail((900,480),Image.Resampling.LANCZOS);c=Image.new('RGB',(v.width,v.height+30),'white');c.paste(v,(0,30));ImageDraw.Draw(c).text((5,5),label,fill='black');return c
-cards=[card('SOURCE',src),card('CLEAN',clean),card('FINAL',decoded),card('FINAL_WHITE',decoded,(255,255,255,255))];ww=cards[0].width+cards[1].width+8;hh=cards[0].height+cards[2].height+8;sheet=Image.new('RGB',(ww,hh),'white');sheet.paste(cards[0],(0,0));sheet.paste(cards[1],(cards[0].width+8,0));sheet.paste(cards[2],(0,cards[0].height+8));sheet.paste(cards[3],(cards[2].width+8,cards[1].height+8));sheet.save(out/'B_PRODUCTION31_788CE557_COMPARE.jpg',quality=95)
+cards=[card('SOURCE',src),card('CLEAN',clean),card('FINAL',decoded),card('FINAL_WHITE',decoded,(255,255,255,255))];ww=cards[0].width+cards[1].width+8;hh=cards[0].height+cards[2].height+8;sheet=Image.new('RGB',(ww,hh),'white');sheet.paste(cards[0],(0,0));sheet.paste(cards[1],(cards[0].width+8,0));sheet.paste(cards[2],(0,cards[0].height+8));sheet.paste(cards[3],(cards[2].width+8,cards[1].height+8));sheet.save(out/'B_PRODUCTION32_788CE557_COMPARE.jpg',quality=95)
 contacts=[]
 for rr in rows:
  sb=rr['original_bbox'];pad=34;cr=(max(0,sb[0]-pad),max(0,sb[1]-pad),min(W,sb[2]+pad),min(H,sb[3]+pad));ims=[]
@@ -215,16 +217,16 @@ for rr in rows:
  contacts.append(c)
 CW=max(x.width for x in contacts);CH=sum(x.height for x in contacts)+6*(len(contacts)-1);cs=Image.new('RGB',(CW,CH),'white');y=0
 for c in contacts:cs.paste(c,(0,y));y+=c.height+6
-cs.save(out/'B_PRODUCTION31_788CE557_ROW_CONTACT.jpg',quality=96)
+cs.save(out/'B_PRODUCTION32_788CE557_ROW_CONTACT.jpg',quality=96)
 # Dense top pair 2x for semantic split visual check.
 cr=(0,55,800,195);dense=[]
 for tag,im in [('SOURCE',src),('CLEAN',clean),('FINAL',decoded)]:
  v=comp(im,(55,55,55,255)).crop(cr).resize(((cr[2]-cr[0])*2,(cr[3]-cr[1])*2),Image.Resampling.NEAREST);c=Image.new('RGB',(v.width,v.height+30),'white');c.paste(v,(0,30));ImageDraw.Draw(c).text((5,5),tag,fill='black');dense.append(c)
 dw=max(x.width for x in dense);dh=sum(x.height for x in dense)+12;ds=Image.new('RGB',(dw,dh),'white');y=0
 for c in dense:ds.paste(c,(0,y));y+=c.height+6
-ds.save(out/'B_PRODUCTION31_788CE557_TOP_PAIR_2X.jpg',quality=96)
-raws=src.transpose(Image.Transpose.FLIP_TOP_BOTTOM);rawf=decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM);r1=card('SOURCE_RAW',raws);r2=card('FINAL_RAW',rawf);rs=Image.new('RGB',(r1.width+r2.width+8,max(r1.height,r2.height)),'white');rs.paste(r1,(0,0));rs.paste(r2,(r1.width+8,0));rs.save(out/'B_PRODUCTION31_788CE557_RAW_COMPARE.jpg',quality=94)
-report={'schema_version':1,'role':'B','run':run,'base_head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'queue_index':106,'asset':asset_rel,'source_url':url,'source_sha256':source_sha_expected,'candidate_sha256':candidate_sha,'candidate_path':str(candidate.relative_to(repo)),'readiness_tier':'HOLD_STRICT_RECHECK_RESOLVED_TO_RENDER_READY_AND_COMPLETED_SAME_INVOCATION','structure':{**meta,'header_128_exact':True,'raw_orientation':'mirror_y'},'method':'C108 rework: source-family fill-seeded connected-component masks for all four target labels; transparent clean plate; preserved Transmission/icons exact; fresh native Korean with source-family slant; exact-header DDS','mask_discovery':mask_discovery,'rows':rows,'clean_plate':{'source_text_residue_pixels':residue,'leftover_target_fill_pixels':leftover_fill,'preserved_source_changed_pixels':preserved_clean_exact,'status':'PASS'},'containment':{'elements_total':4,'elements_pass':4,'elements_fail':0,'changed_pixels_outside_exact_source_bboxes':outside,'alpha_changed_outside_exact_source_bboxes':alpha_out,'status':'PASS'},'zero_overlap':{'new_vs_preserved_source_alpha_pixels':protected_overlap,'two_px_guard_vs_preserved_conflicts':guard_conflict,'new_pair_overlap_or_2px_guard_conflicts':pair,'status':'PASS'},'protected_preserved':['Transmission labels','selector arrows','warning icon','vehicle silhouettes','steering wheels','numeric row','all unrelated atlas alpha'],'manual_visual_qa':'PENDING_CONTROLLER_SELF_QA','RUNTIME_VALIDATION':'UNTESTED','status':'B_PRODUCTION31_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C'}
-(out/'B_PRODUCTION31_788CE557_REPORT.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-(out/'B_PRODUCTION31_STATIC_VALIDATION_SUMMARY.json').write_text(json.dumps({'source_sha256':source_sha_expected,'candidate_sha256':candidate_sha,'bbox_and_size_pass':'4/4','changed_outside':outside,'alpha_outside':alpha_out,'source_residue':residue,'leftover_target_fill_pixels':leftover_fill,'preserved_source_changed_pixels':preserved_clean_exact,'protected_overlap':protected_overlap,'two_px_guard_vs_preserved_conflicts':guard_conflict,'new_pair_overlap_or_2px_guard_conflicts':len(pair),'header_128_exact':True,'raw_orientation':'mirror_y','status':'PASS'},indent=2)+'\n')
-print('B_PRODUCTION31_DONE',candidate_sha,'bboxes',source_bboxes,'mask_discovery',mask_discovery)
+ds.save(out/'B_PRODUCTION32_788CE557_TOP_PAIR_2X.jpg',quality=96)
+raws=src.transpose(Image.Transpose.FLIP_TOP_BOTTOM);rawf=decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM);r1=card('SOURCE_RAW',raws);r2=card('FINAL_RAW',rawf);rs=Image.new('RGB',(r1.width+r2.width+8,max(r1.height,r2.height)),'white');rs.paste(r1,(0,0));rs.paste(r2,(r1.width+8,0));rs.save(out/'B_PRODUCTION32_788CE557_RAW_COMPARE.jpg',quality=94)
+report={'schema_version':1,'role':'B','run':run,'base_head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'queue_index':106,'asset':asset_rel,'source_url':url,'source_sha256':source_sha_expected,'candidate_sha256':candidate_sha,'candidate_path':str(candidate.relative_to(repo)),'readiness_tier':'HOLD_STRICT_RECHECK_RESOLVED_TO_RENDER_READY_AND_COMPLETED_SAME_INVOCATION','structure':{**meta,'header_128_exact':True,'raw_orientation':'mirror_y'},'method':'C108 rework: source-family fill-seeded connected-component masks for all four target labels; transparent clean plate; preserved Transmission/icons exact; fresh native Korean with source-family slant; exact-header DDS','mask_discovery':mask_discovery,'rows':rows,'clean_plate':{'source_text_residue_pixels':residue,'leftover_target_fill_pixels':leftover_fill,'preserved_source_changed_pixels':preserved_clean_exact,'status':'PASS'},'containment':{'elements_total':4,'elements_pass':4,'elements_fail':0,'changed_pixels_outside_exact_source_bboxes':outside,'alpha_changed_outside_exact_source_bboxes':alpha_out,'status':'PASS'},'zero_overlap':{'new_vs_preserved_source_alpha_pixels':protected_overlap,'two_px_guard_vs_preserved_conflicts':guard_conflict,'new_pair_overlap_or_2px_guard_conflicts':pair,'status':'PASS'},'protected_preserved':['Transmission labels','selector arrows','warning icon','vehicle silhouettes','steering wheels','numeric row','all unrelated atlas alpha'],'manual_visual_qa':'PENDING_CONTROLLER_SELF_QA','RUNTIME_VALIDATION':'UNTESTED','status':'B_PRODUCTION32_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C'}
+(out/'B_PRODUCTION32_788CE557_REPORT.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+(out/'B_PRODUCTION32_STATIC_VALIDATION_SUMMARY.json').write_text(json.dumps({'source_sha256':source_sha_expected,'candidate_sha256':candidate_sha,'bbox_and_size_pass':'4/4','changed_outside':outside,'alpha_outside':alpha_out,'source_residue':residue,'leftover_target_fill_pixels':leftover_fill,'preserved_source_changed_pixels':preserved_clean_exact,'protected_overlap':protected_overlap,'two_px_guard_vs_preserved_conflicts':guard_conflict,'new_pair_overlap_or_2px_guard_conflicts':len(pair),'header_128_exact':True,'raw_orientation':'mirror_y','status':'PASS'},indent=2)+'\n')
+print('B_PRODUCTION32_DONE',candidate_sha,'bboxes',source_bboxes,'mask_discovery',mask_discovery)
