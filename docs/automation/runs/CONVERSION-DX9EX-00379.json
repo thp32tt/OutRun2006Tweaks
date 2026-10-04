@@ -177,10 +177,14 @@
     "superseding_dx9ex_active_conclusion": "success",
     "state_checkpoint_sha": "f6e79b96512fd313f02ff5fc078010b919a16679",
     "state_checkpoint_gate_run_id": 37226405475,
-    "state_checkpoint_gate_status": "in_progress_at_retry_reconciliation",
+    "state_checkpoint_gate_status": "success",
     "repeated_material_work": false,
     "material_and_validation_bearing_sha_unchanged": true,
     "runtime_validation": "UNTESTED",
-    "note": "Retry E002 did not repeat source work. The explicitly cited cancelled run belonged to source material a6412738 and was superseded by the later verifier-fix material 9ec83f6b, whose exact-SHA DX9Ex Active Validation completed successfully. This retry only reconciles authoritative queue metadata and preserves the already validated material result."
+    "note": "Retry E002 did not repeat source work. The explicitly cited cancelled run belonged to source material a6412738 and was superseded by the later verifier-fix material 9ec83f6b, whose exact-SHA DX9Ex Active Validation completed successfully. This retry only reconciles authoritative queue metadata and preserves the already validated material result.",
+    "state_checkpoint_gate_conclusion": "success",
+    "state_checkpoint_gate_completed": true,
+    "issue14_comment_id": 5983292888,
+    "finalized_at_kst": "2026-10-05T04:03:10+09:00"
   }
 }
