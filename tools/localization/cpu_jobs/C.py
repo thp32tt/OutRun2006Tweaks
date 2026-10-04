@@ -2,169 +2,131 @@
 import os,json,hashlib,struct,urllib.request
 from pathlib import Path
 import numpy as np
-from PIL import Image,ImageDraw,ImageFilter
+from PIL import Image,ImageFilter
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
 repo=Path.cwd()
-run="20261005-C112-53CE"
+run="20261005-C113-FD90"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
-bp=repo/"localization/graphics/role_B/20261005-B-PRODUCTION28"
-rep=json.loads((bp/"B_PRODUCTION28_53CE_REPORT.json").read_text(encoding="utf-8"))
-source_url=rep["source_url"]
-source_sha=rep["source_sha256"]
+ar=repo/"localization/graphics/role_A/20261005-A-RECOVERY13"
+rep=json.loads((ar/"A_RECOVERY13_FD90AA9_REPORT.json").read_text(encoding="utf-8"))
+asset=rep["asset"]
+source=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"/asset
 candidate=repo/rep["candidate_path"]
-source_dds=Path("/tmp/C112_53CE_source.dds")
-urllib.request.urlretrieve(source_url,source_dds)
+old_url="https://raw.githubusercontent.com/thp32tt/OutRun2006Tweaks/dd479022a3554baff84e5ca8ac53f2ab7dff109b/localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+old_path=Path("/tmp/C113_FD90_old.dds")
+urllib.request.urlretrieve(old_url,old_path)
+OLD_SHA=rep["input_candidate_sha256"]
 
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def decode(p):
     b=Path(p).read_bytes()
     if b[:4]!=b"DDS ": raise RuntimeError("not DDS")
     h=struct.unpack_from("<I",b,12)[0]; w=struct.unpack_from("<I",b,16)[0]
-    pitch=struct.unpack_from("<I",b,20)[0]; mips=struct.unpack_from("<I",b,28)[0]
+    pitch=struct.unpack_from("<I",b,20)[0]; depth=struct.unpack_from("<I",b,24)[0]; mips=struct.unpack_from("<I",b,28)[0]
     fourcc=b[84:88]; bpp=struct.unpack_from("<I",b,88)[0]; masks=struct.unpack_from("<IIII",b,92)
-    if not (w==2048 and h==2048 and pitch==w*4 and mips==1 and fourcc==b"\0\0\0\0" and bpp==32 and masks==(0xff,0xff00,0xff0000,0xff000000)):
-        raise RuntimeError(("unexpected DDS",w,h,pitch,mips,fourcc,bpp,masks))
+    if not (w==4096 and h==4096 and pitch==w*4 and depth==1 and mips==1 and fourcc==b"\0\0\0\0" and bpp==32 and masks==(0xff,0xff00,0xff0000,0xff000000)):
+        raise RuntimeError(("unexpected DDS",w,h,pitch,depth,mips,fourcc,bpp,masks))
     raw=Image.frombytes("RGBA",(w,h),b[128:],"raw","RGBA")
     im=raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-    return b,np.asarray(im),{"width":w,"height":h,"pitch":pitch,"mips":mips,"format":"RGBA32","raw_orientation":"mirror_y"}
-def loadmask(p): return np.asarray(Image.open(p).convert("L"))>0
-def bbox(m):
-    yy,xx=np.nonzero(m)
-    return None if not len(xx) else [int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+    return b,np.asarray(im),{"width":w,"height":h,"pitch":pitch,"depth":depth,"mips":mips,"format":"RGBA32","raw_orientation":"mirror_y"}
+def mask(p): return np.asarray(Image.open(p).convert("L"))>0
 def rect(shape,b):
-    h,w=shape; x0,y0,x1,y1=map(int,b); m=np.zeros((h,w),bool); m[y0:y1,x0:x1]=True; return m
+    H,W=shape; x0,y0,x1,y1=map(int,b); m=np.zeros((H,W),bool); m[y0:y1,x0:x1]=True; return m
+def bb(m):
+    y,x=np.nonzero(m)
+    return None if not len(x) else [int(x.min()),int(y.min()),int(x.max()+1),int(y.max()+1)]
 def dil1(m):
     return np.asarray(Image.fromarray((m.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0
 
-sb,src,si=decode(source_dds); cb,cand,ci=decode(candidate)
-if sha(source_dds)!=source_sha: raise RuntimeError("source sha mismatch")
+sb,src,si=decode(source); cb,cand,ci=decode(candidate); ob,old,oi=decode(old_path)
+if sha(source)!=rep["source_sha256"]: raise RuntimeError("source sha mismatch")
 if sha(candidate)!=rep["candidate_sha256"]: raise RuntimeError("candidate sha mismatch")
-clean=np.asarray(Image.open(bp/"53CE39D5_HD_CLEAN_PLATE.png").convert("RGBA"))
-source_mask=loadmask(bp/"53CE39D5_HD_SOURCE_TEXT_MASK.png")
-allowed=loadmask(bp/"53CE39D5_HD_ALLOWED_TEXT_REGION_MASK.png")
-protected=loadmask(bp/"53CE39D5_HD_PROTECTED_MASK.png")
-persisted_target=loadmask(bp/"53CE39D5_HD_TARGET_TEXT_MASK.png")
-if clean.shape!=src.shape or cand.shape!=src.shape: raise RuntimeError("shape mismatch")
+if sha(old_path)!=OLD_SHA: raise RuntimeError(("old candidate sha mismatch",sha(old_path),OLD_SHA))
+if sb[:128]!=cb[:128] or sb[:128]!=ob[:128]: raise RuntimeError("header mismatch")
 
+clean=np.asarray(Image.open(ar/"FD90AA9_CLEAN_PLATE.png").convert("RGBA"))
+source_mask=mask(ar/"FD90AA9_SOURCE_TEXT_MASK.png")
+protected=mask(ar/"FD90AA9_CLEAN_PLATE_PROTECTED_MASK.png")
+final_persist=np.asarray(Image.open(ar/"FD90AA9_FINAL_READABLE.png").convert("RGBA"))
+if not (clean.shape==src.shape==cand.shape==old.shape==final_persist.shape): raise RuntimeError("shape mismatch")
+
+decoded_final_diff=int(np.count_nonzero(np.any(cand!=final_persist,axis=2)))
 clean_diff=np.any(clean!=src,axis=2)
-final_diff=np.any(cand!=src,axis=2)
-target=np.any(cand!=clean,axis=2)
-
-# Independent structural/mask gates.
-header_exact=bool(sb[:128]==cb[:128])
 clean_outside=int(np.count_nonzero(clean_diff & ~source_mask))
+clean_protected=int(np.count_nonzero(clean_diff & protected))
 source_mask_unchanged=int(np.count_nonzero(source_mask & np.all(clean==src,axis=2)))
-final_outside=int(np.count_nonzero(final_diff & ~allowed))
-final_protected=int(np.count_nonzero(final_diff & protected))
-target_xor=int(np.count_nonzero(target ^ persisted_target))
-target_outside=int(np.count_nonzero(target & ~allowed))
 
-rows=[]; row_masks=[]
-for i,r in enumerate(rep["rows"],1):
-    ob=list(map(int,r["original_bbox"]))
-    rm=target & rect(target.shape,ob)
-    lb=bbox(rm)
-    sw,sh=ob[2]-ob[0],ob[3]-ob[1]
-    if lb is None:
-        rows.append({"n":i,"target":r["target"],"line_index":r["line_index"],"original_bbox":ob,"localized_bbox":None,"containment":"FAIL","size_ceiling":"FAIL"})
-        row_masks.append((f'{r["target"]}/{r["line_index"]}',rm))
-        continue
-    lw,lh=lb[2]-lb[0],lb[3]-lb[1]
-    contain=lb[0]>=ob[0] and lb[1]>=ob[1] and lb[2]<=ob[2] and lb[3]<=ob[3]
-    size=lw<=sw and lh<=sh
-    rows.append({"n":i,"target":r["target"],"line_index":r["line_index"],"original_bbox":ob,"localized_bbox":lb,
-      "delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],"delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],
-      "source_size":[sw,sh],"localized_size":[lw,lh],"containment":"PASS" if contain else "FAIL","size_ceiling":"PASS" if size else "FAIL"})
-    row_masks.append((f'{r["target"]}/{r["line_index"]}',rm))
-
-pair_overlap=0; touch=[]
-for i in range(len(row_masks)):
-    for j in range(i+1,len(row_masks)):
-        ov=int(np.count_nonzero(row_masks[i][1] & row_masks[j][1]))
-        near=int(np.count_nonzero(dil1(row_masks[i][1]) & row_masks[j][1]))
-        pair_overlap+=ov
-        if ov or near: touch.append([row_masks[i][0],row_masks[j][0],ov,near])
-
-# Independent clean-plate residue scan for the 18 orange text lines.
-# Each orange source line sits on a smooth light-blue plate. Estimate the plate colour
-# from the semantic cell after excluding all producer-declared text bboxes, then inspect
-# a modestly expanded neighborhood around each source bbox. Any source-effect-looking
-# pixel left byte-identical in CLEAN is a residue candidate, even if the producer mask missed it.
-by_target={}
-for r in rep["rows"]: by_target.setdefault(r["target"],[]).append(r)
-independent_residue={}
-residue_union=np.zeros(target.shape,bool)
+target=np.any(cand!=clean,axis=2)
+allowed=np.zeros(target.shape,bool)
+rows=[]; rmasks=[]
 for r in rep["rows"]:
-    if r["style_kind"]!="orange": continue
-    cell=list(map(int,r["cell"])); x0,y0,x1,y1=cell
-    group=by_target[r["target"]]
-    exclude=np.zeros(target.shape,bool)
-    for g in group:
-        gx0,gy0,gx1,gy1=map(int,g["original_bbox"])
-        gx0=max(x0,gx0-18); gy0=max(y0,gy0-10); gx1=min(x1,gx1+18); gy1=min(y1,gy1+10)
-        exclude[gy0:gy1,gx0:gx1]=True
-    cellmask=np.zeros(target.shape,bool); cellmask[y0:y1,x0:x1]=True
-    sample=src[cellmask & ~exclude & (src[:,:,3]>0)]
-    if len(sample)<100: raise RuntimeError(("insufficient independent plate samples",r["target"],r["line_index"],len(sample)))
-    q=(sample[:,:3]//8).astype(np.uint8)
-    uq,cnt=np.unique(q,axis=0,return_counts=True)
-    mode=uq[int(np.argmax(cnt))]
-    near_mode=np.all(np.abs(q.astype(np.int16)-mode.astype(np.int16))<=1,axis=1)
-    plate=np.median(sample[near_mode],axis=0) if np.any(near_mode) else np.median(sample,axis=0)
-    ob=list(map(int,r["original_bbox"]))
-    ex0=max(x0+4,ob[0]-10); ey0=max(y0+2,ob[1]-8); ex1=min(x1-4,ob[2]+10); ey1=min(y1-2,ob[3]+8)
-    region=np.zeros(target.shape,bool); region[ey0:ey1,ex0:ex1]=True
-    dist=np.max(np.abs(src.astype(np.int16)-plate.astype(np.int16)),axis=2)
-    rr=src[:,:,0].astype(np.int16); gg=src[:,:,1].astype(np.int16); bb=src[:,:,2].astype(np.int16); aa=src[:,:,3]
-    lum=.2126*rr+.7152*gg+.0722*bb
-    orange=(rr>145)&(gg>45)&(gg<225)&(bb<145)&(rr>gg+15)&(gg>bb+10)&(aa>0)
-    shadow=(lum<175)&(aa>0)
-    effect_like=region & ((dist>7) | orange | shadow)
-    unchanged=effect_like & np.all(clean==src,axis=2)
-    n=int(np.count_nonzero(unchanged))
-    independent_residue[f'{r["target"]}/{r["line_index"]}']={
-      "plate_rgba":[int(x) for x in np.round(plate)],
-      "expanded_scan_bbox":[ex0,ey0,ex1,ey1],
-      "source_effect_like_pixels":int(np.count_nonzero(effect_like)),
-      "unchanged_source_effect_like_pixels_in_clean":n,
-      "unchanged_bbox":bbox(unchanged)
-    }
-    residue_union |= unchanged
+    obox=list(map(int,r["original_bbox"])); lbox=list(map(int,r["localized_bbox"]))
+    allowed |= rect(target.shape,obox)
+    rm=target & rect(target.shape,lbox)
+    ab=bb(rm)
+    sw,sh=obox[2]-obox[0],obox[3]-obox[1]
+    if ab is None:
+        rr={"key":r["key"],"original_bbox":obox,"localized_bbox":None,"containment":"FAIL","size_ceiling":"FAIL"}
+    else:
+        lw,lh=ab[2]-ab[0],ab[3]-ab[1]
+        rr={"key":r["key"],"original_bbox":obox,"localized_bbox":ab,
+            "delta_left":ab[0]-obox[0],"delta_right":obox[2]-ab[2],"delta_top":ab[1]-obox[1],"delta_bottom":obox[3]-ab[3],
+            "source_size":[sw,sh],"localized_size":[lw,lh],
+            "containment":"PASS" if ab[0]>=obox[0] and ab[1]>=obox[1] and ab[2]<=obox[2] and ab[3]<=obox[3] else "FAIL",
+            "size_ceiling":"PASS" if lw<=sw and lh<=sh else "FAIL"}
+    rows.append(rr); rmasks.append((r["key"],rm))
 
-# Evidence overlay makes C controller review reproducible.
-base=Image.fromarray(clean.copy(),"RGBA").convert("RGB")
-draw=ImageDraw.Draw(base)
-yy,xx=np.nonzero(residue_union)
-for x,y in zip(xx,yy):
-    draw.rectangle((int(x)-2,int(y)-2,int(x)+2,int(y)+2),outline=(255,0,0),width=1)
-base.resize((1024,1024),Image.Resampling.NEAREST).save(out/"C112_53CE_INDEPENDENT_RESIDUE_OVERLAY.png")
+target_outside=int(np.count_nonzero(target & ~allowed))
+final_diff=np.any(cand!=src,axis=2)
+final_outside=int(np.count_nonzero(final_diff & ~allowed))
 
-independent_residue_pixels=int(np.count_nonzero(residue_union))
-machine_ok=(header_exact and clean_outside==0 and source_mask_unchanged==0 and final_outside==0 and final_protected==0 and
-            target_xor==0 and target_outside==0 and pair_overlap==0 and not touch and
-            all(x["containment"]=="PASS" and x["size_ceiling"]=="PASS" for x in rows) and independent_residue_pixels==0)
+pair=0; touch=[]
+for i in range(len(rmasks)):
+    for j in range(i+1,len(rmasks)):
+        ov=int(np.count_nonzero(rmasks[i][1]&rmasks[j][1]))
+        near=int(np.count_nonzero(dil1(rmasks[i][1])&rmasks[j][1]))
+        pair+=ov
+        if ov or near: touch.append([rmasks[i][0],rmasks[j][0],ov,near])
+
+rework=set(rep["reworked_keys"])
+returned_union=np.zeros(target.shape,bool)
+for r in rep["rows"]:
+    if r["key"] in rework: returned_union |= rect(target.shape,r["original_bbox"])
+new_vs_old=np.any(cand!=old,axis=2)
+changes_vs_old_outside=int(np.count_nonzero(new_vs_old & ~returned_union))
+
+preserved={}
+for r in rep["rows"]:
+    if r["key"] in rework: continue
+    box=list(map(int,r["original_bbox"]))
+    m=rect(target.shape,box)
+    preserved[r["key"]]=int(np.count_nonzero(new_vs_old & m))
+preserved_ok=all(v==0 for v in preserved.values()) and len(preserved)==25
+
+machine_ok=(decoded_final_diff==0 and clean_outside==0 and clean_protected==0 and source_mask_unchanged==0 and
+            target_outside==0 and final_outside==0 and pair==0 and not touch and
+            changes_vs_old_outside==0 and preserved_ok and
+            all(r["containment"]=="PASS" and r["size_ceiling"]=="PASS" for r in rows))
 res={
- "schema_version":1,"role":"C","run":run,"asset":"53CE39D5","producer_run":"B_PRODUCTION28",
- "source_sha256":source_sha,"candidate_sha256":rep["candidate_sha256"],
- "structure":ci,"header_128_exact":header_exact,
- "clean_changed_pixels_outside_producer_source_mask":clean_outside,
- "producer_source_mask_pixels_unchanged_in_clean":source_mask_unchanged,
- "final_changed_pixels_outside_allowed":final_outside,
- "final_changed_pixels_in_protected":final_protected,
- "target_mask_xor_vs_persisted_target_mask":target_xor,
- "target_pixels_outside_allowed":target_outside,
- "localized_pair_overlap_pixels":pair_overlap,"localized_touch_pairs":touch,
+ "schema_version":1,"role":"C","run":run,"asset":"FD90AA9","producer_run":"A_RECOVERY13",
+ "source_sha256":rep["source_sha256"],"prior_candidate_sha256":OLD_SHA,"candidate_sha256":rep["candidate_sha256"],
+ "structure":ci,"header_128_exact":True,
+ "persisted_final_vs_independent_decode_diff_pixels":decoded_final_diff,
+ "clean_changed_pixels_outside_source_mask":clean_outside,
+ "clean_changed_pixels_in_protected_mask":clean_protected,
+ "source_mask_pixels_unchanged_in_clean":source_mask_unchanged,
+ "target_pixels_outside_union_source_bboxes":target_outside,
+ "final_changed_pixels_outside_union_source_bboxes":final_outside,
+ "localized_pair_overlap_pixels":pair,"localized_touch_pairs":touch,
+ "changes_vs_prior_candidate_outside_4_returned_source_bboxes":changes_vs_old_outside,
+ "preserved_25_prior_candidate_pixel_diffs":preserved,"preserved_25_all_zero":preserved_ok,
  "rows":rows,
- "independent_orange_clean_plate_residue_scan":independent_residue,
- "independent_residue_pixels":independent_residue_pixels,
- "independent_residue_bbox":bbox(residue_union),
  "machine_status":"PASS" if machine_ok else "FAIL",
- "controller_visual_qa":"PENDING",
- "runtime_validation":"UNTESTED"
+ "controller_visual_qa":"PENDING","runtime_validation":"UNTESTED"
 }
-(out/"C112_53CE_MACHINE_QA.json").write_text(json.dumps(res,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("C112_53CE",res["machine_status"],"independent_residue_pixels",independent_residue_pixels,rep["candidate_sha256"],flush=True)
+(out/"C113_FD90AA9_MACHINE_QA.json").write_text(json.dumps(res,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+print("C113_FD90",res["machine_status"],rep["candidate_sha256"],"preserved",preserved_ok,"outside",changes_vs_old_outside,flush=True)
