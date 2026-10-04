@@ -1,83 +1,64 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00363",
-  "production_id": "CONVERSION-DXVK-00362",
-  "event_id": "CONVERSION-DXVK-00362-E003",
-  "event_type": "retry",
+  "production_id": "CONVERSION-DX11-00363",
+  "event_id": "CONVERSION-DX11-00363-E002",
+  "event_type": "rollover",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
   "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
-  "base_sha": "85265dcc6876afd0d4aac55078e932cbb02467dc",
+  "base_sha": "e55de3a0ecb443f18a5e51330345070ac9352ff8",
   "result_sha": "PENDING_RESULT_COMMIT_SHA",
   "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
   "result_marker": "[AUTO:CONVERSION-DX11-00363]",
-  "selected_work_item": "DX11_XR_NATIVE_SOURCE_RESOLUTION_AB_LAUNCH_POLICY",
-  "summary": "Add an opt-in DX11 source-resolution A/B launch policy. Desktop remains the default A path; XR_NATIVE_2496X2688 is the bounded B candidate and passes -width 2496 -height 2688 plus MirrorFitDesktop=true so the game internal backbuffer can match the last observed Quest 3/VDXR recommended per-eye target while the PC mirror remains monitor-fitted. This does not promote the policy without HMD A/B evidence and does not activate NativeDrawPath.",
+  "selected_work_item": "DX11_R246_PROGRAMMABLE_CONSTANT_SLOT_BINDING_RECEIPT",
+  "summary": "R246 adds a dormant fail-closed constant-slot binding receipt on top of validated R245 payload upload. It binds the R244-owned/R245-populated constant buffers to VS b0 and PS b0 on the exact immediate D3D11 context, reads the slots back, seals context/generation state, and rejects stale payload snapshots, non-immediate contexts and external slot drift. It does not bind translated shaders, route Draw*, or activate NativeDrawPath.",
   "changed_paths": [
-    "tools/Run-OutRunVRTest.ps1",
-    "tools/test_dx11_xr_source_resolution_policy.py",
-    ".github/workflows/backend-conversion-gate.yml",
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
     "docs/automation/runs/CONVERSION-DX11-00363.json"
   ],
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered GitHub SSOT and required review/automation/regression state. Initial candidate base fc7c19110836c0d94465aef3674145615d038a2e moved concurrently before publication, so CAS correctly aborted with no write. Recovered current authoritative base 85265dcc6876afd0d4aac55078e932cbb02467dc; the intervening PC-fast marker-only change is unrelated. ATTEMPT remains 1/3 because branch movement is not a repair failure. N100 was used read-only for auxiliary source inspection only."
+      "evidence": "Recovered GitHub SSOT vr-dx11-native-r71 at e55de3a0ecb443f18a5e51330345070ac9352ff8. No CONVERSION-DX11-00363 commit or durable run record existed; ATTEMPT remains 1/3 because CHAT_ROLLOVER=2 is not a retry."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
-      "finding": "DX11 plan priority #1 cadence already has automatic XR-native launch settings; remaining smoothness proof is runtime dependent. Priority #2 source-render resolution decoupling is the highest-priority independently executable unit. Existing post-config -width/-height overrides feed Game::screen_resolution before D3D initialization, and MirrorFitDesktop preserves the internal backbuffer while fitting the PC window, so an opt-in launcher A/B boundary avoids risky new device hooks.",
-      "review_lenses": {
-        "architecture": "Change only DX11 test-launch policy/test/Gate; preserve DX9Ex reference and NativeDrawPath dormancy.",
-        "ownership_lifetime": "Reuse existing command-line resolution and mirror-fit hooks; no D3D device/resource lifetime changes.",
-        "stereo_correctness": "B candidate uses the last observed 2496x2688 per-eye target; no visual correctness claim until Quest 3/VDXR A/B evidence.",
-        "performance": "Default Desktop A path is preserved; B is opt-in for frame-time/aliasing/fresh-cached comparison.",
-        "adversarial": "Gate asserts default Desktop, candidate-only 2496x2688 overrides, run identity logging and mirror-fit/internal-backbuffer invariants."
-      }
+      "finding": "Validated R245 stops after exact payload upload and explicitly leaves VS/PS constant-buffer slot binding as the next separate activation boundary. R246 is limited to dormant b0 binding/readback readiness."
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "evidence": "Run-OutRunVRTest.ps1 gains DX11SourceResolution={Desktop,XR_NATIVE_2496X2688}; only B appends -width 2496 -height 2688 -MirrorFitDesktop=true. RUN_OVERRIDES records A/B identity/effective source size. Added a Python contract test and wired it into the DX11 Backend Conversion Gate."
+      "evidence": "Added exact immediate-context VS b0/PS b0 binding/readback receipt APIs, slot-drift detection, idempotence, device-generation invalidation tests and source-graph guards. No shader binding, Draw* routing or NativeDrawPath activation was added."
     },
     "C3_VALIDATE": {
       "status": "PENDING_EXACT_SHA_GATE",
       "automation_validation": "PENDING",
-      "evidence": "Required validation is the exact-SHA Backend Conversion Gate including the new source-resolution policy test plus existing Win32 build/readiness smoke. No HMD/game test has been performed."
+      "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "PENDING_RESULT_SHA",
+      "result_marker": "[AUTO:CONVERSION-DX11-00363]"
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "This task creates an opt-in launch-policy A/B boundary and validation contract; no tester package is required by this controller task."
+      "reason": "Dormant readiness/probe unit only; no runtime package or active draw path change."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "Publish the material result without CI skip, validate that exact SHA with Backend Conversion Gate, append Issue #14 evidence, then persist C3/C4/C6 and branch lane state with RUNTIME_VALIDATION=UNTESTED."
+      "status": "PENDING_EXACT_SHA_GATE",
+      "runtime_validation": "UNTESTED"
     }
   },
-  "regression_assessment": {
-    "runtime_risk_paths_touched": false,
-    "related_review_findings": [
-      "VR_DX11_NATIVE_PLAN_2026_10_04_XR_SOURCE_RESOLUTION"
-    ],
-    "evidence": "Launcher/workflow/test-only change. Default Desktop behavior remains unchanged; candidate behavior is opt-in. No D3D9 hook, renderer, transport, OpenXR host, resource or NativeDrawPath production code is modified."
-  },
   "native_draw_path_activation_changed": false,
-  "controller_dispatch": {
-    "task_id": "CONVERSION-DX11-00363",
-    "production_id": "CONVERSION-DXVK-00362",
-    "event_id": "CONVERSION-DXVK-00362-E003",
-    "event_type": "retry",
-    "attempt": "1/3",
-    "source": "CURRENT_USER_QUEUE"
-  },
-  "exact_next_action": "Publish and exact-SHA validate the opt-in XR_NATIVE_2496X2688 B candidate. Runtime promotion remains blocked on Quest 3/VDXR A/B comparison versus Desktop."
+  "exact_next_action": "Run the exact-SHA Backend Conversion Gate for the material result commit; if successful, persist exact validation evidence while keeping runtime validation UNTESTED until Quest 3/VDXR HMD testing."
 }
