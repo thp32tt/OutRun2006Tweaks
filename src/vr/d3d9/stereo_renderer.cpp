@@ -960,4 +960,19 @@ namespace OutRunVRStereo
 		default: return R9InstallStatusValue::Failed;
 		}
 	}
+
+	inline void R9NoteMainDepthContentWrite() noexcept
+	{
+		++R9MainDepthContentSerial;
+	}
+
+	inline void R9SynchronizeDepthContentSerials() noexcept
+	{
+		std::uint64_t serial = std::max(
+			R9MainDepthContentSerial, R9MonoDepthContentSerial);
+		if (++serial == 0)
+			serial = 1;
+		R9MainDepthContentSerial = serial;
+		R9MonoDepthContentSerial = serial;
+	}
 }
