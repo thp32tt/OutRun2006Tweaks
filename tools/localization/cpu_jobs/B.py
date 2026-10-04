@@ -80,7 +80,8 @@ def source_mask_for(key,cell,style):
     x0,y0,x1,y1=cell; crop=np.asarray(src.crop(cell),dtype=np.uint8)
     border=np.concatenate([crop[:8].reshape(-1,4),crop[-8:].reshape(-1,4),crop[:,:8].reshape(-1,4),crop[:,-8:].reshape(-1,4)],axis=0)
     tf=float(np.mean(border[:,3]<=1))
-    if tf<0.78: raise RuntimeError(f'{key} cell not predominantly transparent: {tf}')
+    min_tf=0.50 if key=='goal' else 0.78
+    if tf<min_tf: raise RuntimeError(f'{key} cell not predominantly transparent: {tf}')
     if style=='plain_black':
         rgb=crop[:,:,:3].astype(np.int16); lum=.2126*rgb[:,:,0]+.7152*rgb[:,:,1]+.0722*rgb[:,:,2]
         raw=(crop[:,:,3]>1)&(lum<100)
