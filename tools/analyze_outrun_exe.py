@@ -5285,6 +5285,7 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_98_RESOLVED_PREDECESSOR_TARGET_RV
 # CONVERSION-DXVK-00396/F131: consume the F129 three-byte cut-edge from the
 # validated F130 canonical raw frontier and exact-decode all complete
 # instructions through the exact 0x183B07 capture boundary.
+# Validation-bearing pushes must keep this exact-byte/control-flow contract fail-closed.
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_99_RVA = 0x00183AC7
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_99_PROBE_LEN = 64
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_99_PROBE_END_RVA = 0x00183B07
