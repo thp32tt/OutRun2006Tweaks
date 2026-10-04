@@ -1,0 +1,26 @@
+{
+  "run": "20261005-A-RECOVERY11",
+  "asset": "BF3EE5C6",
+  "index": 49,
+  "input_candidate_sha256": "30cc2167b1650ab0a7b1c579c7d29118065007f0474f7207ce993ab1b19e45fa",
+  "candidate_sha256": "7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68",
+  "reworked_rows": 11,
+  "preserved_rows": 2,
+  "bbox_pass": "13/13",
+  "size_ceiling": "13/13",
+  "positive_margin": "13/13",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "changed_pixels_outside_original_bboxes": 0,
+  "alpha_changed_pixels_outside_original_bboxes": 0,
+  "protected_visible_pixels_changed": 0,
+  "source_residue_pixels": 0,
+  "changes_vs_input_outside_11_failed_bboxes": 0,
+  "preserved_input_pixel_diffs": {
+    "top_ghost": 0,
+    "goal": 0
+  },
+  "worker_status": "A_RECOVERY11_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261005-A-RECOVERY11/A_RECOVERY11_BF3EE5C6_REPORT.json"
+}
