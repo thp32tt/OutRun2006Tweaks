@@ -794,6 +794,11 @@ req(profiles, '{"ReversalReleaseRate","0.30"}, {"UsePeriodicEffects","false"}', 
 req(build, 'if (migrationModel == WheelFFBMath::Model::ModernDD)\n                    Settings::WheelFFBUsePeriodicEffects = false;', 'early feel migration disables hardware periodics only for Modern DD')
 req(build, 'migratedLegacyModern ||\n                    migrationModel == WheelFFBMath::Model::ModernDD', 'legacy migration preserves Arcade/Hybrid/PS2 periodic ownership')
 req(build, 'Settings::WheelFFBFeelRevision = 6;\n                    WheelFFB_ResetHeadroomStats();', 'current Universal preset stamps the current feel revision')
+req(build, 'void apply_universal_physics_preset()\n    {\n        Settings::WheelFFBEnable = true;\n        // These helpers replace the original F11 button blocks', 'Universal Physics preset helper is the intercepted F11 owner')
+physics_helper = build[build.find('void apply_universal_physics_preset()'):build.find('void apply_universal_natural_preset()')]
+natural_helper = build[build.find('void apply_universal_natural_preset()'):build.find('bool normalize_legacy_preset(')]
+req(physics_helper, 'Settings::WheelFFBModel = 0;', 'Universal Physics preset restores Modern DD model ID')
+req(natural_helper, 'Settings::WheelFFBModel = 0;', 'Universal Natural preset restores Modern DD model ID')
 req(math, 'DeepSlipMechanicalBoost = 1.50f', 'deep-slip mechanical reinforcement is strengthened')
 req(math, 'combined_sat_shape_with_deep_slip_boost(', 'deep-slip reinforcement survives final normalization')
 req(ffb, 'WheelFFBMath::combined_sat_shape_with_deep_slip_boost(', 'runtime consumes non-cancelled deep-slip SAT')
