@@ -59,8 +59,16 @@ c_clean=Image.open(repo/"localization/graphics/role_C/20261004-C-OVERLAP05/39229
 if c_clean.size!=(W,H): raise RuntimeError(("C clean size",c_clean.size))
 
 c_report=json.loads((repo/"localization/graphics/role_C/20261004-C-OVERLAP05/C_OVERLAP05_39229D64_REPORT.json").read_text(encoding="utf-8"))
-rows=c_report["rows"]
-if len(rows)!=15: raise RuntimeError(("row count",len(rows)))
+rows=list(c_report["rows"])
+if len(rows)!=15: raise RuntimeError(("C row count",len(rows)))
+# C_OVERLAP05 tracked one SPECIAL REQUEST occurrence, but the atlas contains a second
+# text-only SPECIAL REQUEST sprite at stock region 29. Treat duplicate on-screen text
+# as a separate localized occurrence rather than leaving visible English in the final.
+alt_cell=[1640,984,2640,1152]
+abb=src.crop(tuple(alt_cell)).getchannel("A").getbbox()
+if not abb: raise RuntimeError("second SPECIAL REQUEST source bbox missing")
+alt_bbox=[alt_cell[0]+abb[0],alt_cell[1]+abb[1],alt_cell[0]+abb[2],alt_cell[1]+abb[3]]
+rows.append({"key":"special_request_alt","source":"SPECIAL REQUEST","korean":"스페셜 요청","source_bbox":alt_bbox})
 row_by_key={r["key"]:r for r in rows}
 
 # Background classes. All non-total-rank targets are transparent text/effect overlays in source.
@@ -83,7 +91,7 @@ def reconstruct_opaque_rowwise(arr, ob):
         good=vals[vals[:,3]>0]
         if len(good):
             dist=np.max(np.abs(good[:,:3].astype(np.int16)-refcol[:3].astype(np.int16)),axis=1)
-            bg=good[dist<90]
+            bg=good[dist<55]
         else:
             bg=good
         fill=np.median(bg,axis=0).astype(np.uint8) if len(bg)>=8 else refcol.astype(np.uint8)
@@ -148,6 +156,7 @@ style_defs={
  "mission_cleared": dict(top=(255,244,170,255), bottom=(248,112,18,255), inner=(255,246,222,255), outer=(24,26,40,255), shadow=(5,5,9,235), ir=.025, orr=.055, sr=.070, shear=.13),
  "total_rank_green":dict(top=(255,255,255,255), bottom=(245,240,237,255), inner=(255,255,255,255), outer=(20,31,76,255), shadow=(8,9,20,190), ir=.012, orr=.055, sr=.045, shear=.10),
  "storing":         dict(top=(255,236,73,255), bottom=(255,178,15,255), inner=(255,250,220,255), outer=(18,25,55,255), shadow=(8,8,15,200), ir=.016, orr=.050, sr=.040, shear=.11),
+ "special_request_alt": dict(top=(255,255,255,255), bottom=(236,232,231,255), inner=(255,255,255,255), outer=(65,63,67,255), shadow=(24,23,28,185), ir=.012, orr=.050, sr=.045, shear=.12),
  "special_request": dict(top=(255,255,255,255), bottom=(236,232,231,255), inner=(255,255,255,255), outer=(65,63,67,255), shadow=(24,23,28,185), ir=.012, orr=.050, sr=.045, shear=.12),
  "target":          dict(top=(230,230,230,255), bottom=(135,135,135,255), inner=(242,242,242,255), outer=(55,55,62,255), shadow=(28,28,31,180), ir=.014, orr=.045, sr=.035, shear=.05),
  "start":           dict(top=(255,248,218,255), bottom=(235,218,176,255), inner=(255,255,248,255), outer=(18,30,75,255), shadow=(8,12,30,220), ir=.018, orr=.060, sr=.065, shear=.04),
@@ -161,7 +170,7 @@ style_defs={
 }
 translations={
  "hearts":"하트","technical_bonus":"테크니컬 보너스","mission_cleared":"미션 성공!",
- "total_rank_green":"종합 랭크","storing":"온라인 기록 저장 중...","special_request":"스페셜 요청",
+ "total_rank_green":"종합 랭크","storing":"온라인 기록 저장 중...","special_request":"스페셜 요청","special_request_alt":"스페셜 요청",
  "target":"목표","start":"시작","goal":"골","hit_ghost":"고스트를 맞히세요!","exit":"종료",
  "collect_stars":"별을 모으세요!","mission_failed":"미션 실패!","total_rank_brown":"종합 랭크","total_rank_pink":"종합 랭크"
 }
@@ -345,9 +354,9 @@ report={
  "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
  "structure":{"dimensions":[W,H],"format":"RGBA32","pitch":pitch,"mipmaps":mips,"bytes":len(sb),"header_128_exact":True,"raw_orientation":"mirror_y"},
  "repair_method":{
-   "clean_plate":"replace full exact source text/effect bbox for all 15 targets; transparent overlays become transparent, three Total Rank labels receive row-wise source-art interior reconstruction",
+   "clean_plate":"replace full exact source text/effect bbox for all 16 target occurrences; transparent overlays become transparent, three Total Rank labels receive row-wise source-art interior reconstruction",
    "korean_layer":"fresh target-specific source-family Korean render; C candidate pixels are not reused, preventing prior black/gray source-layer overdraw from returning",
-   "non_target_art":"source pixels outside exact 15 allowed bboxes remain byte/pixel identical"
+   "non_target_art":"source pixels outside exact 16 allowed bboxes remain byte/pixel identical"
  },
  "clean_plate_validator":clean_rep,"final_mask_validator":final_rep,
  "decoded_changes":{"changed_pixels_total":count(diff),"changed_pixels_outside_original_bboxes":outside,
@@ -355,14 +364,14 @@ report={
    "source_residue_unchanged_pixels_outside_localized_layers":source_residue_unchanged,
    "localized_pair_overlap_pixels":localized_pair_overlap},
  "pair_overlaps":pair_overlaps,"rows":qa_rows,
- "all_15_readable_and_raw_bbox_pass":all_bbox,"all_15_size_ceiling_pass":all_size,"all_15_positive_margin":all_positive,
+ "all_16_readable_and_raw_bbox_pass":all_bbox,"all_16_size_ceiling_pass":all_size,"all_16_positive_margin":all_positive,
  "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"UNTESTED",
  "status":"A_RECOVERY09_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status_ok else "A_RECOVERY09_WORKER_REWORK_REQUIRED"
 }
 (out/"A_RECOVERY09_39229D64_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 summary={"run":run,"asset":"39229D64","index":57,"source_sha256":SOURCE_SHA,"candidate_sha256":cand_sha,
- "rejected_c_candidate_sha256":C_REJECTED_SHA,"target_occurrences":15,"bbox_pass":"15/15" if all_bbox else "FAIL",
- "size_ceiling":"15/15" if all_size else "FAIL","positive_margin":"15/15" if all_positive else "FAIL",
+ "rejected_c_candidate_sha256":C_REJECTED_SHA,"target_occurrences":16,"bbox_pass":"16/16" if all_bbox else "FAIL",
+ "size_ceiling":"16/16" if all_size else "FAIL","positive_margin":"16/16" if all_positive else "FAIL",
  "clean_plate_validator":clean_rep["status"],"final_mask_validator":final_rep["status"],
  "changed_pixels_outside_original_bboxes":outside,"alpha_changed_pixels_outside_original_bboxes":alpha_outside,
  "protected_visible_pixels_changed":protected_changed,"source_residue_unchanged_pixels_outside_localized_layers":source_residue_unchanged,
