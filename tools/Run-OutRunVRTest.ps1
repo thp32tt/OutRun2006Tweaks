@@ -173,7 +173,17 @@ if($backend -eq 'd3d9'){
         '-FrameCadenceTargetHz=0',
         '-DisableDesktopVsync=true',
         '-TargetRefreshRateHz=0',
-        '-SkyGlowFactor=1'
+        '-SkyGlowFactor=1',
+        # HMD A/B candidate: render the game source at the last Quest 3/VDXR
+        # recommended per-eye size instead of the 3440x1440 desktop backbuffer.
+        # The borderless mirror is fitted back to the monitor separately.
+        '-width',
+        '2496',
+        '-height',
+        '2688',
+        '-windowed',
+        '-MirrorFitDesktop=true',
+        '-WindowedBorderless=true'
     )
     $profile=[ordered]@{
         Name=$TestProfile
