@@ -7830,144 +7830,102 @@ bool NativeProgrammableShaderPairCache::validate_indexed_direct_dispatch_snapsho
 }
 
 NativeProgrammableShaderIndexedSourceValueReadiness
-compose_programmable_indexed_source_value_readiness(
+NativeProgrammableShaderPairCache::indexed_source_value_readiness(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken,
     D3DPRIMITIVETYPE primitiveType,
-    const NativeProgrammableShaderIndexedDirectDispatchReadiness& dispatch,
-    const NativeManagedBufferShadow& indexBuffer) noexcept {
+    std::uint64_t topologyBindingSnapshotToken,
+    const NativeManagedBufferShadow& vertexBuffer,
+    std::uint64_t vertexBufferSnapshotToken,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& indexBuffer,
+    std::uint64_t indexBufferSnapshotToken,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset,
+    std::uint64_t indexedGeometryBindingSnapshotToken,
+    UINT primitiveCount,
+    INT baseVertexIndex,
+    UINT minVertexIndex,
+    UINT numVertices,
+    UINT startIndex,
+    std::uint64_t directDispatchSnapshotToken) const noexcept {
 
     NativeProgrammableShaderIndexedSourceValueReadiness out{};
-    out.primitiveType = primitiveType;
+    out.directDispatchSnapshotToken = directDispatchSnapshotToken;
+    out.indexMirrorSnapshotToken = indexBufferSnapshotToken;
+
+    const auto dispatch = indexed_direct_dispatch_readiness(
+        expectedContext, expectedDevice, identity, cacheSnapshotToken,
+        slotSnapshotToken, objectSnapshotToken, layout,
+        inputLayoutSnapshotToken, constantStateSnapshotToken,
+        constantPayloadSnapshotToken, constantBindingSnapshotToken,
+        pipelineBindingSnapshotToken, primitiveType,
+        topologyBindingSnapshotToken, vertexBuffer,
+        vertexBufferSnapshotToken, vertexStride, vertexOffset,
+        indexBuffer, indexBufferSnapshotToken, indexFormat, indexOffset,
+        indexedGeometryBindingSnapshotToken, primitiveCount,
+        baseVertexIndex, minVertexIndex, numVertices, startIndex);
+
+    out.inputValid =
+        expectedContext != nullptr && expectedDevice != nullptr &&
+        directDispatchSnapshotToken != 0 && indexBufferSnapshotToken != 0;
+    out.directDispatchReady = dispatch.ready;
+    out.directDispatchSnapshotMatches =
+        dispatch.ready && dispatch.snapshotToken == directDispatchSnapshotToken;
     out.indexCount = dispatch.indexCount;
     out.minVertexIndex = dispatch.minVertexIndex;
     out.maxVertexIndex = dispatch.maxVertexIndex;
-    out.directDispatchSnapshotToken = dispatch.snapshotToken;
 
-    const std::uint64_t elementBytes =
-        dispatch.indexFormat == DXGI_FORMAT_R16_UINT ? 2ull :
-        dispatch.indexFormat == DXGI_FORMAT_R32_UINT ? 4ull : 0ull;
-    out.sourceIndexFormat =
-        dispatch.indexFormat == DXGI_FORMAT_R16_UINT ? D3DFMT_INDEX16 :
-        dispatch.indexFormat == DXGI_FORMAT_R32_UINT ? D3DFMT_INDEX32 :
-        D3DFMT_UNKNOWN;
-    out.indexFormatExact =
-        elementBytes != 0 &&
-        out.sourceIndexFormat != D3DFMT_UNKNOWN &&
-        static_cast<std::uint64_t>(dispatch.indexElementBytes) ==
-            elementBytes;
-
-    bool directDispatchIntegrityExact = false;
-    if (dispatch.ready &&
-        dispatch.inputValid &&
-        dispatch.geometryBindingReady &&
-        dispatch.geometryBindingSnapshotMatches &&
-        dispatch.primitiveExact &&
-        dispatch.topologyMatchesGeometry &&
-        dispatch.countExact &&
-        dispatch.sourceVertexRangeExact &&
-        dispatch.effectiveVertexRangeExact &&
-        dispatch.indexBufferRangeExact &&
-        dispatch.vertexBufferRangeExact &&
-        dispatch.dispatchArgumentsExact &&
-        dispatch.componentSnapshotsPresent &&
-        dispatch.snapshotToken != 0) {
-        std::uint64_t token = 0xcbf29ce484222325ull;
-        token = mix_readiness_snapshot_token(
-            token, dispatch.geometryBindingSnapshotToken);
-        token = mix_readiness_snapshot_token(
-            token, dispatch.vertexBufferSnapshotToken);
-        token = mix_readiness_snapshot_token(
-            token, dispatch.indexBufferSnapshotToken);
-        token = mix_readiness_snapshot_token(
-            token, static_cast<std::uint32_t>(primitiveType));
-        token = mix_readiness_snapshot_token(
-            token, static_cast<std::uint32_t>(dispatch.topology));
-        token = mix_readiness_snapshot_token(token, dispatch.primitiveCount);
-        token = mix_readiness_snapshot_token(token, dispatch.indexCount);
-        token = mix_readiness_snapshot_token(
-            token, static_cast<std::uint32_t>(dispatch.baseVertexLocation));
-        token = mix_readiness_snapshot_token(token, dispatch.minVertexIndex);
-        token = mix_readiness_snapshot_token(token, dispatch.numVertices);
-        token = mix_readiness_snapshot_token(token, dispatch.maxVertexIndex);
-        token = mix_readiness_snapshot_token(
-            token, dispatch.startIndexLocation);
-        token = mix_readiness_snapshot_token(token, dispatch.vertexStride);
-        token = mix_readiness_snapshot_token(token, dispatch.vertexOffset);
-        token = mix_readiness_snapshot_token(
-            token, dispatch.vertexBufferByteWidth);
-        token = mix_readiness_snapshot_token(
-            token, static_cast<std::uint32_t>(dispatch.indexFormat));
-        token = mix_readiness_snapshot_token(token, dispatch.indexOffset);
-        token = mix_readiness_snapshot_token(
-            token, dispatch.indexElementBytes);
-        token = mix_readiness_snapshot_token(
-            token, dispatch.indexBufferByteWidth);
-        token = mix_readiness_snapshot_token(
-            token, dispatch.dispatchArgumentsExact ? 0x252u : 0u);
-        if (token == 0)
-            token = 1;
-        directDispatchIntegrityExact = token == dispatch.snapshotToken;
-    }
-    out.directDispatchReady = directDispatchIntegrityExact;
-
-    const auto mirror =
-        indexBuffer.mirror_readiness(indexBuffer.mirror_device());
-    out.indexMirrorSnapshotToken = mirror.snapshotToken;
+    const auto mirror = indexBuffer.mirror_readiness(expectedDevice);
     out.indexMirrorReady = mirror.ready;
-    out.mirrorSnapshotMatchesDispatch =
-        mirror.ready &&
-        mirror.snapshotToken != 0 &&
-        mirror.snapshotToken == dispatch.indexBufferSnapshotToken;
+    out.indexMirrorSnapshotMatches =
+        mirror.ready && mirror.snapshotToken == indexBufferSnapshotToken;
 
-    if (out.indexFormatExact &&
-        dispatch.indexElementBytes != 0u &&
-        dispatch.indexOffset % dispatch.indexElementBytes == 0u) {
-        const std::uint64_t shadowBase =
-            static_cast<std::uint64_t>(dispatch.indexOffset) /
-            static_cast<std::uint64_t>(dispatch.indexElementBytes);
-        const std::uint64_t shadowStart =
-            shadowBase +
-            static_cast<std::uint64_t>(dispatch.startIndexLocation);
-        if (shadowStart <=
-            static_cast<std::uint64_t>(
-                (std::numeric_limits<UINT>::max)())) {
-            out.shadowStartIndex = static_cast<UINT>(shadowStart);
-            out.shadowStartIndexExact = true;
-        }
+    out.sourceIndexFormat =
+        indexFormat == DXGI_FORMAT_R16_UINT ? D3DFMT_INDEX16 :
+        indexFormat == DXGI_FORMAT_R32_UINT ? D3DFMT_INDEX32 :
+        D3DFMT_UNKNOWN;
+    out.indexFormatExact = out.sourceIndexFormat != D3DFMT_UNKNOWN;
+
+    bool scanStartExact = false;
+    if (out.indexFormatExact && dispatch.indexElementBytes != 0 &&
+        (indexOffset % dispatch.indexElementBytes) == 0) {
+        const UINT offsetElements = indexOffset / dispatch.indexElementBytes;
+        const UINT maxValue = (std::numeric_limits<UINT>::max)();
+        scanStartExact = startIndex <= maxValue - offsetElements;
+        if (scanStartExact)
+            out.scanStartIndex = offsetElements + startIndex;
     }
 
     NativeManagedIndexRangeReadiness sourceValues{};
-    if (out.directDispatchReady &&
-        out.indexMirrorReady &&
-        out.indexFormatExact &&
-        out.shadowStartIndexExact &&
-        out.mirrorSnapshotMatchesDispatch) {
+    if (scanStartExact && out.indexMirrorSnapshotMatches &&
+        out.directDispatchSnapshotMatches) {
         sourceValues = indexBuffer.index_range_readiness(
-            mirror, out.sourceIndexFormat, out.shadowStartIndex,
-            dispatch.indexCount, dispatch.minVertexIndex,
-            dispatch.maxVertexIndex);
+            mirror, out.sourceIndexFormat, out.scanStartIndex,
+            dispatch.indexCount, dispatch.minVertexIndex, dispatch.maxVertexIndex);
     }
-
-    out.sourceValuesSnapshotToken = sourceValues.snapshotToken;
     out.sourceValuesReady = sourceValues.ready;
-    out.valuesWithinDeclaredRange =
-        sourceValues.valuesWithinDeclaredRange;
+    out.sourceValuesMatchDispatchWindow =
+        sourceValues.startIndex == out.scanStartIndex &&
+        sourceValues.indexCount == dispatch.indexCount;
+    out.sourceValuesMatchDispatchRange =
+        sourceValues.minVertexIndex == dispatch.minVertexIndex &&
+        sourceValues.maxVertexIndex == dispatch.maxVertexIndex;
     out.observedMinIndex = sourceValues.observedMinIndex;
     out.observedMaxIndex = sourceValues.observedMaxIndex;
-    out.contentHash = sourceValues.contentHash;
-    out.sourceValuesMatchDispatch =
-        sourceValues.inputValid &&
-        sourceValues.sourceIndexFormat == out.sourceIndexFormat &&
-        sourceValues.startIndex == out.shadowStartIndex &&
-        sourceValues.indexCount == dispatch.indexCount &&
-        sourceValues.minVertexIndex == dispatch.minVertexIndex &&
-        sourceValues.maxVertexIndex == dispatch.maxVertexIndex &&
-        sourceValues.mirrorSnapshotToken ==
-            dispatch.indexBufferSnapshotToken;
-
-    out.inputValid =
-        dispatch.snapshotToken != 0 &&
-        indexBuffer.ready() &&
-        indexBuffer.shadow_valid();
+    out.sourceValueSnapshotToken = sourceValues.snapshotToken;
+    out.sourceContentHash = sourceValues.contentHash;
     out.componentSnapshotsPresent =
         dispatch.snapshotToken != 0 &&
         mirror.snapshotToken != 0 &&
@@ -7975,13 +7933,13 @@ compose_programmable_indexed_source_value_readiness(
     out.ready =
         out.inputValid &&
         out.directDispatchReady &&
+        out.directDispatchSnapshotMatches &&
         out.indexMirrorReady &&
+        out.indexMirrorSnapshotMatches &&
         out.indexFormatExact &&
-        out.shadowStartIndexExact &&
-        out.mirrorSnapshotMatchesDispatch &&
         out.sourceValuesReady &&
-        out.sourceValuesMatchDispatch &&
-        out.valuesWithinDeclaredRange &&
+        out.sourceValuesMatchDispatchWindow &&
+        out.sourceValuesMatchDispatchRange &&
         out.componentSnapshotsPresent;
 
     if (out.ready) {
@@ -7991,36 +7949,68 @@ compose_programmable_indexed_source_value_readiness(
         token = mix_readiness_snapshot_token(
             token, out.indexMirrorSnapshotToken);
         token = mix_readiness_snapshot_token(
-            token, out.sourceValuesSnapshotToken);
-        token = mix_readiness_snapshot_token(
-            token, static_cast<std::uint32_t>(out.primitiveType));
+            token, out.sourceValueSnapshotToken);
         token = mix_readiness_snapshot_token(
             token, static_cast<std::uint32_t>(out.sourceIndexFormat));
-        token = mix_readiness_snapshot_token(token, out.shadowStartIndex);
+        token = mix_readiness_snapshot_token(token, out.scanStartIndex);
         token = mix_readiness_snapshot_token(token, out.indexCount);
         token = mix_readiness_snapshot_token(token, out.minVertexIndex);
         token = mix_readiness_snapshot_token(token, out.maxVertexIndex);
         token = mix_readiness_snapshot_token(token, out.observedMinIndex);
         token = mix_readiness_snapshot_token(token, out.observedMaxIndex);
-        token = mix_readiness_snapshot_token(token, out.contentHash);
+        token = mix_readiness_snapshot_token(token, out.sourceContentHash);
         token = mix_readiness_snapshot_token(token, 0x253u);
         out.snapshotToken = token == 0 ? 1 : token;
     }
     return out;
 }
 
-bool validate_programmable_indexed_source_value_snapshot(
+bool NativeProgrammableShaderPairCache::validate_indexed_source_value_snapshot(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken,
     D3DPRIMITIVETYPE primitiveType,
-    const NativeProgrammableShaderIndexedDirectDispatchReadiness& dispatch,
+    std::uint64_t topologyBindingSnapshotToken,
+    const NativeManagedBufferShadow& vertexBuffer,
+    std::uint64_t vertexBufferSnapshotToken,
+    UINT vertexStride,
+    UINT vertexOffset,
     const NativeManagedBufferShadow& indexBuffer,
-    std::uint64_t snapshotToken) noexcept {
-
-    if (snapshotToken == 0)
+    std::uint64_t indexBufferSnapshotToken,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset,
+    std::uint64_t indexedGeometryBindingSnapshotToken,
+    UINT primitiveCount,
+    INT baseVertexIndex,
+    UINT minVertexIndex,
+    UINT numVertices,
+    UINT startIndex,
+    std::uint64_t directDispatchSnapshotToken,
+    std::uint64_t sourceValueSnapshotToken) const noexcept {
+    if (sourceValueSnapshotToken == 0)
         return false;
-    const auto current =
-        compose_programmable_indexed_source_value_readiness(
-            primitiveType, dispatch, indexBuffer);
-    return current.ready && current.snapshotToken == snapshotToken;
+    const auto current = indexed_source_value_readiness(
+        expectedContext, expectedDevice, identity, cacheSnapshotToken,
+        slotSnapshotToken, objectSnapshotToken, layout,
+        inputLayoutSnapshotToken, constantStateSnapshotToken,
+        constantPayloadSnapshotToken, constantBindingSnapshotToken,
+        pipelineBindingSnapshotToken, primitiveType,
+        topologyBindingSnapshotToken, vertexBuffer,
+        vertexBufferSnapshotToken, vertexStride, vertexOffset,
+        indexBuffer, indexBufferSnapshotToken, indexFormat, indexOffset,
+        indexedGeometryBindingSnapshotToken, primitiveCount,
+        baseVertexIndex, minVertexIndex, numVertices, startIndex,
+        directDispatchSnapshotToken);
+    return current.ready && current.snapshotToken == sourceValueSnapshotToken;
 }
 
 NativeFixedFunctionIndexedSourceRangeReadiness
