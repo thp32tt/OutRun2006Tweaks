@@ -139,7 +139,13 @@
     "protected_visible_pixels_changed": 0,
     "clean_plate_source_text_residue_pixels": 0
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS",
   "runtime_validation": "UNTESTED",
-  "status": "A_PRODUCTION20_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_PRODUCTION20_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION20/A_PRODUCTION20_CONTACT_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION20/A_PRODUCTION20_SOURCE_CLEAN_FINAL_GRAY.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION20/A_PRODUCTION20_FINAL_RAW_GRAY.jpg"
+  ],
+  "controller_visual_note": "PASS after same-run full-fringe clean-plate rework. SOURCE|CLEAN|FINAL and full/raw mirror_y review show the NOT AVAILABLE glyph/effect footprint fully removed from the flat red plate, 이용 불가 centered in the same heavy white sans family, and no residue, seam, clipping, overlap, alpha halo, protected-art damage, or orientation regression."
 }
