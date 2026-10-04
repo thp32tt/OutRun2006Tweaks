@@ -1,0 +1,19 @@
+{
+  "source": "/tmp/176_source.png",
+  "candidate": "/tmp/176_final.png",
+  "size": [
+    2048,
+    512
+  ],
+  "changed_pixels": 124818,
+  "changed_bbox": [
+    7,
+    145,
+    1850,
+    510
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "status": "PASS"
+}
