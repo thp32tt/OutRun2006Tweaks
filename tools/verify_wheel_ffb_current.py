@@ -793,6 +793,10 @@ req(profiles, '{"EngineIdle","0.20"}, {"SlewRate","0.12"}', 'partial Modern prof
 req(profiles, '{"ReversalReleaseRate","0.30"}, {"UsePeriodicEffects","false"}', 'partial Modern profiles keep current reversal and R3-compatible tactile transport')
 req(build, 'if (migrationModel == WheelFFBMath::Model::ModernDD)\n                    Settings::WheelFFBUsePeriodicEffects = false;', 'early feel migration disables hardware periodics only for Modern DD')
 req(build, 'migratedLegacyModern ||\n                    migrationModel == WheelFFBMath::Model::ModernDD', 'legacy migration preserves Arcade/Hybrid/PS2 periodic ownership')
+if build.count('if (migrationModel == WheelFFBMath::Model::ModernDD)') < 3:
+    raise SystemExit('CURRENT VERIFY FAILED [Modern-only feel migrations are not consistently model-gated]')
+print('OK [revision 1/2/4 feel retunes are gated to Modern DD]')
+req(build, 'migrationModel == WheelFFBMath::Model::ModernDD\n                        ? normalize_legacy_preset(false)\n                        : false;', 'legacy numeric preset normalization cannot rewrite Arcade/Hybrid/PS2 state')
 req(build, 'Settings::WheelFFBFeelRevision = 6;\n                    WheelFFB_ResetHeadroomStats();', 'current Universal preset stamps the current feel revision')
 req(build, 'void apply_universal_physics_preset()\n    {\n        Settings::WheelFFBEnable = true;\n        // These helpers replace the original F11 button blocks', 'Universal Physics preset helper is the intercepted F11 owner')
 physics_helper = build[build.find('void apply_universal_physics_preset()'):build.find('void apply_universal_natural_preset()')]
