@@ -1013,3 +1013,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Controller SOURCE/CLEAN/FINAL, two row contacts and raw-orientation visual review PASS. The B42 one-line style defect is resolved; no visible English residue, clipping, overlap, seam, halo or orientation regression remains.
 - Queue index 112 advanced to b43_self_qa_pass_pending_c. Pending-artwork localize_text becomes 42. RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_B/20261005-B-PRODUCTION43/B_PRODUCTION43_D41_REPORT.json and localization/graphics/role_B/20261005-B-PRODUCTION43/.
+## 2026-10-05T04:24:35+09:00 — C127 D41D0B1 B_PRODUCTION43 final QA
+- Reviewed only the latest unfinished D41D0B1 handoff. B_PRODUCTION42 one-line render is superseded by B_PRODUCTION43 policy-correct two-line result; C126/C125 completed assets were not repeated.
+- Candidate 0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80: hosted C independent DXT5 header/decode PASS; 2/2 line-wise exact source-bbox containment and source-size ceilings PASS with positive margins. Decoded Korean row gap=17px; clean/source residue/outside/alpha/protected/target/overlap/touch gates all 0.
+- Controller SOURCE/CLEAN/FINAL, 2x row-contact and RAW mirror_y review PASS. 여자친구와 함께 / 골에 도착하세요. preserve the source shared two-line white-fill/navy-outline/right-slanted typography without visible residue, clipping, overlap, seam, halo, protected-art damage or orientation regression.
+- D41D0B1 advances to C127_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. Producer REWORK remains 0; pending_artwork localize_text=42.
+- Existing 1A43E9D9 remains HIGH_RISK static PASS pending mandatory in-game validation. 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD.
+- RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261005-C127-D41D0B1/C127_D41D0B1_CONTROLLER_FINAL_QA.json

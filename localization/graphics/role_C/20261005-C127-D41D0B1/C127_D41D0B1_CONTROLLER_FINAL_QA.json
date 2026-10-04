@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C127",
+  "timestamp_kst": "2026-10-05T04:24:35+09:00",
+  "scope": "new/changed unfinished handoff only: latest B_PRODUCTION43 D41D0B1. B_PRODUCTION42 is superseded by B_PRODUCTION43; C126/C125-completed assets were not repeated.",
+  "candidate_changed_by_C": false,
+  "asset": "D41D0B1",
+  "queue_index": 112,
+  "producer_run": "B_PRODUCTION43",
+  "candidate_sha256": "0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION43/B_PRODUCTION43_D41_REPORT.json",
+  "machine_report": "localization/graphics/role_C/20261005-C127-D41D0B1/C127_D41D0B1_MACHINE_QA.json",
+  "machine_status": "PASS",
+  "machine_checks": {
+    "header_128_exact": true,
+    "bbox_and_size": "2/2 PASS",
+    "decoded_row_gap": 17,
+    "clean_changed_pixels_outside_source_mask": 0,
+    "clean_source_mask_alpha_residue_pixels_gt16": 0,
+    "visible_pixels_outside_allowed_alpha_gt16": 0,
+    "alpha_changed_pixels_outside_allowed": 0,
+    "protected_visible_pixels_alpha_gt16": 0,
+    "residual_source_effect_pixels_outside_2px_target_guard_alpha_gt16": 0,
+    "target_visible_pixels_outside_allowed": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_touch_pairs": []
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION43/B_PRODUCTION43_D41_COMPARE.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION43/B_PRODUCTION43_D41_ROW_CONTACT_2X.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION43/B_PRODUCTION43_D41_RAW_COMPARE.jpg"
+  ],
+  "controller_visual_note": "PASS: B_PRODUCTION43 correctly restores the source two-line structure instead of the superseded one-line B42 render. Both Korean lines use the same white-fill/navy-outline/right-slanted source family, remain individually smaller than their corresponding source-line bboxes, have positive margins and a decoded 17px gap, and show no residue, clipping, overlap, seam, halo, protected-art damage, or raw mirror_y regression.",
+  "decision": "C127_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "existing_high_risk_static_pass_assets": [
+    "1A43E9D9"
+  ],
+  "global_rework_remaining": [],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94"
+  ],
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

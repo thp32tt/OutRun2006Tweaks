@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T04:21:49+09:00",
+  "updated_at_kst": "2026-10-05T04:24:35+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B_PRODUCTION43 produced even index 112 D41D0B1 exact-HD two-line DXT5 candidate 0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80: 2/2 source+decoded bbox/size, shared two-line source-family style, 15px decoded row gap, zero overlap/outside/residue/patch escape and controller readable/raw self-QA PASS. Independent C final QA and isolated in-game validation pending; producer REWORK=0; pending_artwork localize_text=42.",
+  "next_checkpoint": "C127 final QA advances latest B_PRODUCTION43 D41D0B1 to pixel/visual policy PASS pending isolated in-game validation; B42 one-line render is superseded. Existing 1A43E9D9 remains static HIGH_RISK edge-touch pending mandatory in-game validation. Producer REWORK=0; strict DXT5 no-candidate HOLD 4F68708E/F6811E94; pending_artwork localize_text=42.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -268,7 +268,7 @@
       "status": "ZERO_PRODUCER_REWORK_REQUIRED",
       "assets": [],
       "remaining": 0,
-      "note": "42E618FD passes C126 machine+controller final static QA. 1A43E9D9 remains HIGH_RISK static PASS pending in-game; 4F68708E/F6811E94 remain strict no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
+      "note": "D41D0B1 latest B_PRODUCTION43 passes C127 machine+controller final static QA. 1A43E9D9 remains HIGH_RISK static PASS pending in-game; 4F68708E/F6811E94 remain strict no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": []
     },
     "latest_d_final_qa": {
@@ -293,14 +293,14 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C126",
-      "report": "localization/graphics/role_C/20261005-C126-42E618FD/C126_42E618FD_CONTROLLER_FINAL_QA.json",
+      "run": "C127",
+      "report": "localization/graphics/role_C/20261005-C127-D41D0B1/C127_D41D0B1_CONTROLLER_FINAL_QA.json",
       "result": "1_PIXEL_VISUAL_PASS_GLOBAL_0_REWORK_REMAIN",
       "candidate_changed_by_C": false,
       "assets_checked": 1,
-      "physical_elements_checked": 1,
+      "physical_elements_checked": 2,
       "pixel_visual_pass_assets": [
-        "42E618FD"
+        "D41D0B1"
       ],
       "high_risk_static_pass_assets_existing": [
         "1A43E9D9"
@@ -312,12 +312,12 @@
         "F6811E94"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 43,
+      "pending_production_localize_text": 42,
       "machine_evidence": {
-        "42E618FD": "localization/graphics/role_C/20261005-C126-42E618FD/C126_42E618FD_MACHINE_QA.json"
+        "D41D0B1": "localization/graphics/role_C/20261005-C127-D41D0B1/C127_D41D0B1_MACHINE_QA.json"
       },
       "controller_visual": {
-        "42E618FD": "PASS"
+        "D41D0B1": "PASS"
       },
       "in_game_validation": "PENDING; 1A43E9D9 remains REQUIRED_BEFORE_FINAL_APPROVAL"
     },
