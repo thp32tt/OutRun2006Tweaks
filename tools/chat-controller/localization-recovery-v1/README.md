@@ -16,7 +16,7 @@ The controller started from the stable historical snapshot. Recovery-specific ch
 - :10 / :40 — B production/self-QA
 - :20 / :50 — C cross-lane final QA
 
-Each lane runs every 30 minutes, staggered by 10 minutes. The minute-to-lane mapping is deterministic, so a skipped or failed send does not rotate the later lanes out of phase. Three persistent chat slots are used. Watchdog is OFF by default. AUTO_SEND is OFF by default.
+Each lane runs every 30 minutes, staggered by 10 minutes. The minute-to-lane mapping is deterministic, so a skipped or failed send does not rotate the later lanes out of phase. Three role-specific chat slots are used. Each slot is recycled into a fresh ChatGPT conversation after 5 successful scheduled sends; if the fifth response is still generating at the next slot time, recycling is deferred rather than interrupting it. Watchdog is OFF by default. AUTO_SEND is OFF by default.
 
 ## Portainer
 
