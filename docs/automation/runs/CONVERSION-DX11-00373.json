@@ -2,7 +2,7 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00373",
   "production_id": "CONVERSION-DX11-00373",
-  "event_id": "CONVERSION-DX11-00373-E004",
+  "event_id": "CONVERSION-DX11-00373-E006",
   "event_type": "rollover",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
@@ -91,7 +91,7 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00373",
     "production_id": "CONVERSION-DX11-00373",
-    "event_id": "CONVERSION-DX11-00373-E004",
+    "event_id": "CONVERSION-DX11-00373-E006",
     "event_type": "rollover",
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE",
@@ -108,7 +108,7 @@
     "validation_comment_id": 5980153335,
     "runtime_validation": "UNTESTED",
     "native_draw_path_activation_changed": false,
-    "chat_rollover": 3,
+    "chat_rollover": 4,
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt",
     "dispatch_source": "CURRENT_USER_QUEUE"
@@ -129,7 +129,7 @@
   "issue14": {
     "implementation_and_validation_comment_id": 5980153335
   },
-  "chat_rollover": 3,
+  "chat_rollover": 4,
   "rollover_is_retry": false,
   "resume_reason": "Retry persisted after one recovery attempt",
   "dispatch_reconciliation": {
@@ -137,10 +137,10 @@
     "authoritative": {
       "task_id": "CONVERSION-DX11-00373",
       "production_id": "CONVERSION-DX11-00373",
-      "event_id": "CONVERSION-DX11-00373-E004",
+      "event_id": "CONVERSION-DX11-00373-E006",
       "event_type": "rollover",
       "attempt": "1/3",
-      "chat_rollover": 3,
+      "chat_rollover": 4,
       "rollover_is_retry": false,
       "resume_reason": "Retry persisted after one recovery attempt",
       "source": "CURRENT_USER_QUEUE",
@@ -154,9 +154,54 @@
         "event_type": "rollover",
         "attempt": "1/3",
         "chat_rollover": 2
+      },
+      {
+        "task_id": "CONVERSION-DX11-00373",
+        "production_id": "CONVERSION-DX11-00373",
+        "event_id": "CONVERSION-DX11-00373-E004",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 3,
+        "rollover_is_retry": false,
+        "resume_reason": "Retry persisted after one recovery attempt",
+        "source": "CURRENT_USER_QUEUE",
+        "dispatch_source": "CURRENT_USER_QUEUE"
       }
     ],
-    "reason": "E004 / CHAT_ROLLOVER=3 is the newest explicit user dispatch. This rollover is not a retry, so ATTEMPT remains 1/3. The completed R250 material/result SHA and exact-SHA Gate evidence remain unchanged.",
+    "reason": "E006 / CHAT_ROLLOVER=4 is the newest explicit user dispatch. This rollover is not a retry, so ATTEMPT remains 1/3. The completed R250 material/result SHA and exact-SHA Gate evidence remain unchanged.",
+    "dispatch_correction_comment_id": 5980154828,
+    "material_and_validation_bearing_sha_unchanged": true
+  },
+  "rollover_metadata_correction": {
+    "task_id": "CONVERSION-DX11-00373",
+    "corrected_from": [
+      {
+        "task_id": "CONVERSION-DX11-00373",
+        "production_id": "CONVERSION-DX11-00373",
+        "event_id": "CONVERSION-DX11-00373-E004",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 3,
+        "rollover_is_retry": false,
+        "resume_reason": "Retry persisted after one recovery attempt",
+        "source": "CURRENT_USER_QUEUE",
+        "dispatch_source": "CURRENT_USER_QUEUE"
+      }
+    ],
+    "corrected_to": {
+      "task_id": "CONVERSION-DX11-00373",
+      "production_id": "CONVERSION-DX11-00373",
+      "event_id": "CONVERSION-DX11-00373-E006",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 4,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_QUEUE",
+      "dispatch_source": "CURRENT_USER_QUEUE"
+    },
+    "reason": "E006 / CHAT_ROLLOVER=4 is the newest explicit user dispatch. This rollover is not a retry, so ATTEMPT remains 1/3. The completed R250 material/result SHA and exact-SHA Gate evidence remain unchanged.",
+    "dispatch_correction_comment_id": 5980154828,
     "material_and_validation_bearing_sha_unchanged": true
   }
 }
