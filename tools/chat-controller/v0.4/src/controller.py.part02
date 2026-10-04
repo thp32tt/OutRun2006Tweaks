@@ -436,12 +436,20 @@ def qa_prompt(active: dict) -> str:
 
 def conversion_prompt(active: dict) -> str:
     context_prefix = (GAME_MOD_CONTEXT + "\n\n")
+    prompt_by_lane = {
+        "A": "conversion_dx11.md",
+        "B": "conversion_dxvk.md",
+        "C": "conversion_dx9ex.md",
+    }
+    prompt_name = prompt_by_lane.get(active["lane"])
+    if not prompt_name:
+        raise ValueError(f"Unsupported conversion lane: {active['lane']}")
     return context_prefix + "\n".join([
         f"LANE={active['lane']}", f"ASSET={active['asset_path']}", "STATE=PRODUCING",
         f"TARGET_BRANCH={active['branch']}", f"BASE_SHA={active['base_sha']}",
         "대상 브랜치의 실제 변경을 commit하고 RESULT_SHA=<40자리 커밋 SHA>를 마지막에 출력해.",
         "실기 검증하지 않았다면 UNTESTED로 기록해. CI-skip 지시어를 넣지 마.",
-    ]) + "\n\n" + read_prompt("conversion_dx11.md" if active["lane"] == "A" else "conversion_dxvk.md")
+    ]) + "\n\n" + read_prompt(prompt_name)
 
 
 
