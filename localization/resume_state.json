@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_RECOVERY13 repaired C109-returned odd index 121 FD90AA9 source slant; candidate c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401 passed A 29/29 exact bbox/size static QA, 4/4 positive margins, zero localized overlap/touch/1px guard conflicts, 0 changes outside the four returned source bboxes, 25/25 preserved localized rows, and SOURCE|OLD|NEW plus readable/raw visual self-QA. Independent C final QA and isolated in-game validation remain pending; RUNTIME_VALIDATION=UNTESTED.",
     "C111 finalized A_RECOVERY12 C075FB49 candidate d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633: independent 17/17 bbox+size machine QA and C dense/full/raw visual QA PASS; C109 slant return is resolved. Static policy state is C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
     "C111 finalized A_RECOVERY11 BF3EE5C6 candidate 7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68: C110 independent 13/13 bbox+size machine QA and C row/full/raw visual QA PASS; C109 slant return is resolved. Static policy state is C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
     "A_RECOVERY09 repaired C_OVERLAP05-returned odd index 57 39229D64; final candidate dbd97d30d1e14df102d5c90c5ef5e339a93a934c4b10b71e2b30fbf76db2b8f8 passed 16/16 exact bbox/size/positive-margin static QA, zero source-residue/label-overlap gates, and controller visual self-QA; independent C final QA plus isolated in-game validation remain pending.",
@@ -173,9 +174,9 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_CONTROLLER_FINAL_QA.json",
+    "latest_hd_rework_batch": "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FD90AA9_REPORT.json",
     "hd_rework_candidates_ready": 15,
-    "hd_rework_remaining": 5,
+    "hd_rework_remaining": 2,
     "hd_partial_rework": {
       "FF2462BB": {
         "status": "C86_PIXEL_VISUAL_PASS_PENDING_INGAME",
@@ -770,7 +771,18 @@
       "result": "STATIC_STRICT_QA_PASS_PENDING_D_INGAME"
     },
     "latest_a_recovery_report": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_C075FB49_REPORT.json",
-    "latest_a_recovery_candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c"
+    "latest_a_recovery_candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
+    "a_recovery13_fd90aa9": {
+      "timestamp_kst": "2026-10-05T01:23:52+09:00",
+      "queue_index": 121,
+      "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "candidate_sha256": "c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401",
+      "status": "A_RECOVERY13_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "report": "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FD90AA9_REPORT.json",
+      "c109_source_slant_return_resolved_by_a": true,
+      "pending_independent_c_final_qa": true,
+      "runtime_validation": "UNTESTED"
+    }
   },
   "runtime_packages": {
     "k1": {
