@@ -14,7 +14,7 @@ services:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "conversion"
       AUTO_SEND: "${AUTO_SEND:-false}"
-      QUEUE_MODE: "true"
+      QUEUE_MODE: "true"\n      CONVERSION_PARALLEL: "true"
       QUEUE_CHECK_SECONDS: "15"
       QUEUE_STABLE_SECONDS: "30"
       QUEUE_RESULT_GRACE_SECONDS: "180"
