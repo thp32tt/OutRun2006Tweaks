@@ -26,10 +26,11 @@ zm=repo/'localization/validation/binary_compare/modified/OutRun2_Korean_GFX_FULL
 with zipfile.ZipFile(zo) as z:ob=z.read(asset)
 with zipfile.ZipFile(zm) as z:hb=z.read(asset)
 old,om=load(ob);hist,hm=load(hb)
-if old.size!=source.size or hist.size!=source.size:raise RuntimeError((source.size,old.size,hist.size))
+if old.size!=hist.size or source.size[0]%old.size[0] or source.size[1]%old.size[1]:raise RuntimeError((source.size,old.size,hist.size))
+scale_x=source.size[0]//old.size[0]; scale_y=source.size[1]//old.size[1]
 oa=np.asarray(old,dtype=np.uint8);ha=np.asarray(hist,dtype=np.uint8)
 diff=np.any(oa!=ha,axis=2)&((oa[:,:,3]>1)|(ha[:,:,3]>1))
-mask=np.asarray(Image.fromarray((diff*255).astype(np.uint8),'L').filter(ImageFilter.MaxFilter(35)))>0
+mask=np.asarray(Image.fromarray((diff*255).astype(np.uint8),'L').filter(ImageFilter.MaxFilter(13)))>0
 H,W=mask.shape;seen=np.zeros_like(mask,bool);comps=[]
 for y in range(H):
   for x in range(W):
@@ -41,6 +42,8 @@ for y in range(H):
         if 0<=nx<W and 0<=ny<H and mask[ny,nx] and not seen[ny,nx]:seen[ny,nx]=1;st.append((nx,ny))
     if len(xs)>500:comps.append([max(0,min(xs)-22),max(0,min(ys)-18),min(W,max(xs)+23),min(H,max(ys)+19),len(xs)])
 comps.sort(key=lambda b:(b[1]//80,b[0],b[1]))
+low_comps=[b[:] for b in comps]
+comps=[[b[0]*scale_x,b[1]*scale_y,b[2]*scale_x,b[3]*scale_y,b[4]] for b in low_comps]
 font=ImageFont.load_default()
 def comp(im):
     b=Image.new('RGBA',im.size,(64,64,64,255));b.alpha_composite(im);return b.convert('RGB')
@@ -50,8 +53,10 @@ for i,b in enumerate(comps,1):
     d.rectangle(tuple(b[:4]),outline=(255,0,255),width=3);d.text((b[0]+3,b[1]+3),str(i),fill=(255,0,255),font=font)
 ov.resize((1024,1024),Image.Resampling.LANCZOS).save(out/'B_PRODUCTION16_53CE_SOURCE_BOX_OVERVIEW.jpg',quality=96)
 rows=[]
-for i,b in enumerate(comps,1):
-    cr=tuple(b[:4]);ims=[old_rgb.crop(cr),hist_rgb.crop(cr),src_rgb.crop(cr)];scale=min(1.0,600/max(1,ims[0].width))
+for i,(lb,b) in enumerate(zip(low_comps,comps),1):
+    cr=tuple(b[:4]); lcr=tuple(lb[:4]); release=src_rgb.crop(cr)
+    oldc=old_rgb.crop(lcr).resize(release.size,Image.Resampling.NEAREST); histc=hist_rgb.crop(lcr).resize(release.size,Image.Resampling.NEAREST)
+    ims=[oldc,histc,release];scale=min(1.0,600/max(1,ims[0].width))
     if scale<1:
         ns=(round(ims[0].width*scale),round(ims[0].height*scale));ims=[q.resize(ns,Image.Resampling.LANCZOS) for q in ims]
     h=max(q.height for q in ims)+30;c=Image.new('RGB',(sum(q.width for q in ims)+12,h),'white');xx=0
