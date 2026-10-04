@@ -1,0 +1,357 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C142-D657C2EB",
+  "queue_index": 220,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+  "producer_run": "20261005-B-PRODUCTION65",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "0b3bdc37870e75da3290f2d5587cebd9cd73655c",
+    "atlas_git_blob_sha1": "4c6af70c683fb6c298e32c289d762a1f7e6a56b5",
+    "source_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc"
+  },
+  "candidate_sha256": "6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5",
+  "candidate_changed_by_C": false,
+  "independent_method": "pinned canonical source+atlas; exact source-alpha per seven atlas cells; exact transparent clean reconstruction; independent DDS/header/bbox/zero-overlap/style validation",
+  "structure": {
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "region_idx": 0,
+      "source": "TIME ATTACK",
+      "korean": "타임 어택",
+      "style_group": "red",
+      "cell": [
+        0,
+        340,
+        1780,
+        172
+      ],
+      "original_bbox": [
+        14,
+        352,
+        1361,
+        500
+      ],
+      "localized_bbox": [
+        16,
+        356,
+        559,
+        496
+      ],
+      "source_size": [
+        1347,
+        148
+      ],
+      "localized_size": [
+        543,
+        140
+      ],
+      "delta_left": 2,
+      "delta_right": 802,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 1,
+      "source": "COAST 2 COAST",
+      "korean": "코스트 2 코스트",
+      "style_group": "gray",
+      "cell": [
+        0,
+        252,
+        1004,
+        88
+      ],
+      "original_bbox": [
+        20,
+        266,
+        626,
+        330
+      ],
+      "localized_bbox": [
+        22,
+        273,
+        397,
+        322
+      ],
+      "source_size": [
+        606,
+        64
+      ],
+      "localized_size": [
+        375,
+        49
+      ],
+      "delta_left": 2,
+      "delta_right": 229,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 2,
+      "source": "HEART ATTACK",
+      "korean": "하트 어택",
+      "style_group": "gray",
+      "cell": [
+        1004,
+        252,
+        800,
+        88
+      ],
+      "original_bbox": [
+        1022,
+        268,
+        1558,
+        330
+      ],
+      "localized_bbox": [
+        1024,
+        270,
+        1244,
+        328
+      ],
+      "source_size": [
+        536,
+        62
+      ],
+      "localized_size": [
+        220,
+        58
+      ],
+      "delta_left": 2,
+      "delta_right": 314,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 3,
+      "source": "TIME ATTACK",
+      "korean": "타임 어택",
+      "style_group": "gray",
+      "cell": [
+        0,
+        164,
+        788,
+        88
+      ],
+      "original_bbox": [
+        17,
+        180,
+        509,
+        242
+      ],
+      "localized_bbox": [
+        19,
+        182,
+        237,
+        240
+      ],
+      "source_size": [
+        492,
+        62
+      ],
+      "localized_size": [
+        218,
+        58
+      ],
+      "delta_left": 2,
+      "delta_right": 272,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 4,
+      "source": "OUTRUN",
+      "korean": "아웃런",
+      "style_group": "gray",
+      "cell": [
+        788,
+        164,
+        668,
+        88
+      ],
+      "original_bbox": [
+        808,
+        180,
+        1097,
+        242
+      ],
+      "localized_bbox": [
+        810,
+        182,
+        965,
+        240
+      ],
+      "source_size": [
+        289,
+        62
+      ],
+      "localized_size": [
+        155,
+        58
+      ],
+      "delta_left": 2,
+      "delta_right": 132,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 5,
+      "source": "SEND GAME INVITE",
+      "korean": "게임 초대 보내기",
+      "style_group": "small",
+      "cell": [
+        0,
+        100,
+        1116,
+        64
+      ],
+      "original_bbox": [
+        3,
+        115,
+        462,
+        153
+      ],
+      "localized_bbox": [
+        5,
+        117,
+        213,
+        151
+      ],
+      "source_size": [
+        459,
+        38
+      ],
+      "localized_size": [
+        208,
+        34
+      ],
+      "delta_left": 2,
+      "delta_right": 249,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "region_idx": 6,
+      "source": "REMOVE FRIEND",
+      "korean": "친구 삭제",
+      "style_group": "small",
+      "cell": [
+        0,
+        36,
+        1116,
+        64
+      ],
+      "original_bbox": [
+        3,
+        51,
+        395,
+        89
+      ],
+      "localized_bbox": [
+        5,
+        53,
+        124,
+        87
+      ],
+      "source_size": [
+        392,
+        38
+      ],
+      "localized_size": [
+        119,
+        34
+      ],
+      "delta_left": 2,
+      "delta_right": 271,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "unclassified_visible_source_pixels": 0,
+    "producer_clean_exact_diff_pixels": 0,
+    "bbox_size_positive_margin": "7/7 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "style": {
+      "0": {
+        "group": "red",
+        "target_pixels": 37774,
+        "source_family_fraction": 1.0
+      },
+      "1": {
+        "group": "gray",
+        "target_pixels": 11324,
+        "source_family_fraction": 1.0
+      },
+      "2": {
+        "group": "gray",
+        "target_pixels": 7798,
+        "source_family_fraction": 1.0
+      },
+      "3": {
+        "group": "gray",
+        "target_pixels": 7897,
+        "source_family_fraction": 1.0
+      },
+      "4": {
+        "group": "gray",
+        "target_pixels": 5949,
+        "source_family_fraction": 1.0
+      },
+      "5": {
+        "group": "small",
+        "target_pixels": 5063,
+        "source_family_fraction": 1.0
+      },
+      "6": {
+        "group": "small",
+        "target_pixels": 2814,
+        "source_family_fraction": 1.0
+      }
+    }
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

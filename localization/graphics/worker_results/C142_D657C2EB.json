@@ -1,0 +1,19 @@
+{
+  "run": "20261005-C142-D657C2EB",
+  "asset": "D657C2EB",
+  "index": 220,
+  "source_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+  "candidate_sha256": "6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5",
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "7/7",
+  "clean_exact_diff_pixels": 0,
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "render_outside_target": 0,
+  "source_residue": 0,
+  "overlap": 0,
+  "touch_pairs": 0,
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_C/20261005-C142-D657C2EB/C142_D657_MACHINE_QA.json"
+}
