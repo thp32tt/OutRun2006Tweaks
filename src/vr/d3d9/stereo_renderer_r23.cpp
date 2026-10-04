@@ -564,7 +564,7 @@ namespace OutRunVRStereo
                     InvalidateTrackedRasterShadow();
                     R23LastStateSampleDrawSerial = 0;
                     R23LastStateSampleEpoch = 0;
-                    R22FailClosedReplayState(
+                    FailClosedTrackedRasterReplay(
                         device, "R23/SetRenderTarget/live-state-capture");
                 }
             }
