@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION40",
+  "queue_index": 98,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "readiness_tier": "RENDER_READY_COMPLETED_SAME_INVOCATION",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+  "candidate_sha256": "86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+  "method": "canonical 2048x128 DXT5 HD source; exact source alpha bbox/effect mask; alpha-zero clean plate with hidden RGB preserved; source-measured white fill/navy outline; fresh right-slanted native Hangul; target color changes only in fully allowed BC3 blocks; source-only cleanup alpha-only; decoded static QA",
+  "structure": {
+    "width": 2048,
+    "height": 128,
+    "format": "DXT5",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "palette": {
+    "white": [
+      255,
+      255,
+      255,
+      255
+    ],
+    "dark": [
+      0,
+      12,
+      57,
+      255
+    ]
+  },
+  "rows": [
+    {
+      "source": "Challenge the course record.",
+      "korean": "코스 기록에 도전하세요.",
+      "original_bbox": [
+        431,
+        6,
+        1674,
+        123
+      ],
+      "localized_bbox": [
+        580,
+        11,
+        1523,
+        116
+      ],
+      "decoded_localized_bbox": [
+        580,
+        11,
+        1524,
+        116
+      ],
+      "source_width": 1243,
+      "source_height": 117,
+      "localized_width": 943,
+      "localized_height": 105,
+      "decoded_localized_width": 944,
+      "decoded_localized_height": 105,
+      "delta_left": 149,
+      "delta_right": 151,
+      "delta_top": 5,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "decoded_containment": "PASS",
+      "decoded_size_ceiling": "PASS",
+      "font_size": 94,
+      "stroke_width": 9,
+      "slant": 0.31,
+      "block_safe_bbox": [
+        432,
+        8,
+        1672,
+        120
+      ]
+    }
+  ],
+  "containment": {
+    "elements_total": 1,
+    "elements_pass": 1,
+    "visible_pixels_outside_original_bbox": 0,
+    "alpha_changed_pixels_outside_original_bbox": 0,
+    "source_residue_pixels_alpha_gt16_outside_target_guard": 0,
+    "status": "PASS"
+  },
+  "compressed_patch": {
+    "target_reencoded_blocks": 4607,
+    "source_only_full_alpha_blocks": 2389,
+    "partial_alpha_only_blocks": 22,
+    "changed_blocks": 7018,
+    "changed_blocks_outside_patch": 0,
+    "source_only_color_bytes_preserved": true,
+    "partial_color_bytes_preserved": true,
+    "status": "PASS"
+  },
+  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_PRODUCTION40_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
