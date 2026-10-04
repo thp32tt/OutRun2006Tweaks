@@ -786,3 +786,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Manual HD SOURCE/CLEAN/FINAL, 1:1 row-contact, and raw-orientation review PASS with no residue, clipping, overlap, seam, opaque patch, protected-art damage, or orientation regression.
 - Current pending_artwork localize_text count after this row is 59. RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_A/20261004-A-PRODUCTION10/.
+
+## 2026-10-04 A production11/12 — throughput continuation
+- After A_PRODUCTION10 completed index 43, A continued the odd shard rather than stopping at one DDS.
+- A_PRODUCTION11 attempted index 55 2EA557B4 against the authoritative Release 2048x256 DXT5 source (SHA-256 b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685). The hosted worker failed closed before candidate output because exact source bbox [1,105,1090,248] is not 4x4 DXT5-block aligned; ordinary block replacement could change decoded transparent RGB outside the exact bbox and violate the current zero-tolerance all-channel gate. No candidate was persisted.
+- A then advanced to odd index 89 43B07A77 (Game Over -> 게임 오버) using authoritative Release DDS SHA-256 906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175. Header proves 2048x256 RGBA32 / 1 mip / raw mirror_y.
+- GitHub-hosted Localization CPU Worker run 37193807896 PASS produced candidate d2311d4c20327363bacf8b336e925e527ef8c5c8f13a385b0a2fb2e25a946cbc.
+- A_PRODUCTION12 static self-QA PASS: clean/final validators PASS; exact readable/raw bbox 1/1 with margins L336/R337/T8/B8; changed pixels outside exact bbox=0, alpha outside=0, protected visible changes=0, clean-plate source-text residue=0.
+- Manual source/clean/final, row-contact and raw-orientation review PASS: Korean lettering is source-family styled and no residue, clipping, overlap, seam, opaque patch or orientation regression is visible.
+- Current pending_artwork localize_text count is 58. RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_A/20261004-A-PRODUCTION12/.

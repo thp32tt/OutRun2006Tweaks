@@ -96,7 +96,8 @@
     "protected_visible_pixels_changed": 0,
     "clean_plate_source_text_residue_pixels": 0
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_ROW_CONTACT_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A_PRODUCTION12_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_PRODUCTION12_HD_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_qa_notes": "Manual SOURCE/CLEAN/FINAL, 1:1 contact, and raw mirror_y review: Korean Game Over is legible and source-family styled with pale peach/orange fill, bright outer line, dark inner line and shadow; no source-English residue, clipping, seam, opaque patch, overlap, protected-art damage, or orientation regression observed."
 }

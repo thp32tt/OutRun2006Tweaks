@@ -1,5 +1,5 @@
 {
-  "schema_version": 56,
+  "schema_version": 57,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_PRODUCTION12 produced odd index 89 43B07A77 from authoritative 2048x256 Release HD source; candidate d2311d4c20327363bacf8b336e925e527ef8c5c8f13a385b0a2fb2e25a946cbc passed A static/visual self-QA and awaits independent C final QA plus isolated in-game validation.",
+    "A_PRODUCTION11 index 55 2EA557B4 failed closed before candidate output because exact bbox [1,105,1090,248] is not DXT5-block aligned; use constrained DXT5 reconstruction or another exact-safe method, not ordinary block splice.",
     "A_PRODUCTION10 rebuilt index 43 455717B2 from authoritative 2048x2048 Release HD source; candidate 50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f passed A static/visual self-QA and is pending independent C final QA plus isolated in-game validation.",
     "A_RECOVERY08 repaired C92-returned FD90AA9; candidate 0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b passed A static + controller visual self-QA and is pending independent C final QA plus isolated in-game validation.",
     "C92 strict checkpoint remains authoritative until C revalidates A_RECOVERY08; FD90AA9 is the only C92-returned REWORK asset.",
@@ -1966,6 +1968,53 @@
     "final_mask_validator": "PASS",
     "changed_pixels_outside_original_bboxes": 0,
     "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "controller_visual_qa": "PASS",
+    "runtime_validation": "UNTESTED",
+    "c_final_qa": "PENDING",
+    "in_game_validation": "PENDING"
+  },
+  "a_production11_2ea557b4": {
+    "run": "20261004-A-PRODUCTION11",
+    "status": "FAIL_CLOSED_NO_CANDIDATE_DXT5_EXACT_BBOX_UNALIGNED",
+    "index": 55,
+    "asset": "textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+    "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+    "source_dimensions": [
+      2048,
+      256
+    ],
+    "source_format": "DXT5",
+    "exact_source_bbox": [
+      1,
+      105,
+      1090,
+      248
+    ],
+    "candidate_persisted": false,
+    "blocker": "exact bbox is not 4x4 DXT5-block aligned; ordinary block replacement can change decoded transparent RGB outside exact bbox and violate current zero-tolerance all-channel policy",
+    "next_method": "constrained DXT5 reconstruction or alternate exact-safe method",
+    "runtime_validation": "UNTESTED"
+  },
+  "a_production12_43b07a77": {
+    "run": "20261004-A-PRODUCTION12",
+    "status": "A_PRODUCTION12_HD_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "index": 89,
+    "asset": "textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+    "source_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+    "source_dimensions": [
+      2048,
+      256
+    ],
+    "source_format": "RGBA32",
+    "candidate_sha256": "d2311d4c20327363bacf8b336e925e527ef8c5c8f13a385b0a2fb2e25a946cbc",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+    "report": "localization/graphics/role_A/20261004-A-PRODUCTION12/A_PRODUCTION12_43B07A77_REPORT.json",
+    "bbox_pass": "1/1 readable + raw positive margins",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_pixels_outside_original_bbox": 0,
+    "alpha_changed_pixels_outside_original_bbox": 0,
     "protected_visible_pixels_changed": 0,
     "controller_visual_qa": "PASS",
     "runtime_validation": "UNTESTED",
