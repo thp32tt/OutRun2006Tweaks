@@ -155,11 +155,13 @@ for r in rows:
     cc=c_clean.crop(nb); cn=c_new.crop(nb)
     lm=changed_mask(cc,cn)
     if not lm.getbbox(): raise RuntimeError(("empty localized delta",key))
-    global_m=Image.new("L",(W,H),0); global_m.paste(lm,(x1,y1))
+    shift_y=12 if key=="for_experts" else 0
+    dx,dy=x1,y1+shift_y
+    global_m=Image.new("L",(W,H),0); global_m.paste(lm,(dx,dy))
     localized_masks[key]=global_m
-    final.paste(cn,(x1,y1),lm)
+    final.paste(cn,(dx,dy),lm)
     lb=lm.getbbox()
-    loc=[x1+lb[0],y1+lb[1],x1+lb[2],y1+lb[3]]
+    loc=[dx+lb[0],dy+lb[1],dx+lb[2],dy+lb[3]]
     ob=list(map(int,r["source_bbox"]))
     ok=loc[0]>=ob[0] and loc[1]>=ob[1] and loc[2]<=ob[2] and loc[3]<=ob[3]
     size_ok=(loc[2]-loc[0])<=(ob[2]-ob[0]) and (loc[3]-loc[1])<=(ob[3]-ob[1])
@@ -176,7 +178,8 @@ for r in rows:
       "raw_original_bbox":[ob[0],H-ob[3],ob[2],H-ob[1]],
       "raw_localized_bbox":[loc[0],H-loc[3],loc[2],H-loc[1]],
       "raw_containment":"PASS" if ok else "FAIL",
-      "construction":"C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate",
+      "construction":"C_OVERLAP05 localized raster delta composited onto A_RECOVERY10 corrected clean plate; For Experts shifted +12px Y to preserve 1P source label",
+      "placement_adjustment":{"shift_y":shift_y},
       "rework_status":"A_RECOVERY10_TOP_CLEAN_REBUILD" if key in top_keys else "A_RECOVERY10_C_PLACEMENT_REUSED"
     })
 
