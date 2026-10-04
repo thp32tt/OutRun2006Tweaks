@@ -7,7 +7,8 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "A_RECOVERY13 repaired C109-returned odd index 121 FD90AA9 source slant; candidate c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401 passed A 29/29 exact bbox/size static QA, 4/4 positive margins, zero localized overlap/touch/1px guard conflicts, 0 changes outside the four returned source bboxes, 25/25 preserved localized rows, and SOURCE|OLD|NEW plus readable/raw visual self-QA. Independent C final QA and isolated in-game validation remain pending; RUNTIME_VALIDATION=UNTESTED.",
+    "C112/C114 returned B_PRODUCTION28 53CE39D5 candidate 29cdba2ab03746f6e41d145d3dfc568cd1634f7cfc4dcb92a42a425cb2de5925 to producer REWORK: 19/19 bbox+size and structural gates pass, but exact CLEAN plate visual QA shows repeated short dark dash/source-shadow residue in localized selector plates. Zero-residue visual gate FAIL; RUNTIME_VALIDATION=UNTESTED.",
+    "C114 finalized A_RECOVERY13 FD90AA9 candidate c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401: scoped independent machine QA PASS 29/29 bbox+size, zero outside/protected/overlap/touch/collateral outside four returned regions, 25 preserved localized layers exact outside returned regions, and C SOURCE|OLD|NEW/full/raw visual QA PASS. C109 source-slant return resolved; RUNTIME_VALIDATION=UNTESTED.",
     "C111 finalized A_RECOVERY12 C075FB49 candidate d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633: independent 17/17 bbox+size machine QA and C dense/full/raw visual QA PASS; C109 slant return is resolved. Static policy state is C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
     "C111 finalized A_RECOVERY11 BF3EE5C6 candidate 7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68: C110 independent 13/13 bbox+size machine QA and C row/full/raw visual QA PASS; C109 slant return is resolved. Static policy state is C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
     "A_RECOVERY09 repaired C_OVERLAP05-returned odd index 57 39229D64; final candidate dbd97d30d1e14df102d5c90c5ef5e339a93a934c4b10b71e2b30fbf76db2b8f8 passed 16/16 exact bbox/size/positive-margin static QA, zero source-residue/label-overlap gates, and controller visual self-QA; independent C final QA plus isolated in-game validation remain pending.",
@@ -110,9 +111,9 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-05T01:01:11+09:00",
+      "updated_at_kst": "2026-10-05T01:40:30+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20261005-C111-C075-FINAL/C111_CROSS_LANE_FINAL_QA.json",
+      "report": "localization/graphics/role_C/20261005-C114-FINAL/C114_CROSS_LANE_FINAL_QA.json",
       "direct_queue_scope": 126,
       "current_candidates_scanned": 18,
       "elements_scanned": 234,
@@ -142,26 +143,28 @@
         "AD720950",
         "2B0863D6",
         "BF3EE5C6",
-        "C075FB49"
+        "C075FB49",
+        "FD90AA9"
       ],
       "rework_required_assets": [
         "53CE39D5",
-        "788CE557",
-        "FD90AA9"
+        "788CE557"
       ],
-      "failed_elements": 3,
+      "failed_elements": 2,
       "pending_production_localize_text": 50,
       "hold_strict_recheck_zoom_review": 47,
       "promotion_hold_for_pixel_pass": true,
-      "promotion_hold_reason": "53CE39D5, 788CE557 and FD90AA9 remain producer REWORK under current zero-residue/source-style policy",
+      "promotion_hold_reason": "53CE39D5 and 788CE557 require producer zero-residue clean-plate reconstruction",
       "user_approved_locked": 0,
-      "failed_assets": 3,
+      "failed_assets": 2,
       "latest_c_revalidated_assets": [
-        "BF3EE5C6",
-        "C075FB49"
+        "53CE39D5",
+        "FD90AA9"
       ],
-      "latest_c_revalidated_physical_elements": 30,
-      "runtime_validation": "UNTESTED"
+      "latest_c_revalidated_physical_elements": 48,
+      "runtime_validation": "UNTESTED",
+      "current_run_assets_scanned": 2,
+      "current_run_physical_elements_scanned": 48
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {

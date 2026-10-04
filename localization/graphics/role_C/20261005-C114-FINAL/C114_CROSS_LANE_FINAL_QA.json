@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C114",
+  "timestamp_kst": "2026-10-05T01:40:30+09:00",
+  "scope": "new/changed unfinished A/B candidates only; completed C111 assets not repeated",
+  "candidate_changed_by_C": false,
+  "assets": {
+    "FD90AA9": {
+      "queue_index": 121,
+      "producer_run": "A_RECOVERY13",
+      "candidate_sha256": "c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401",
+      "producer_report": "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FD90AA9_REPORT.json",
+      "machine_qa_report": "localization/graphics/role_C/20261005-C114-FD90-SCOPED/C114_FD90AA9_SCOPED_MACHINE_QA.json",
+      "machine_qa": "PASS",
+      "machine_checks": {
+        "bbox_and_size": "29/29 PASS",
+        "persisted_final_decode_diff_pixels": 0,
+        "clean_outside_source_mask": 0,
+        "clean_protected_pixels": 0,
+        "target_outside_source_bboxes": 0,
+        "final_outside_source_bboxes": 0,
+        "localized_pair_overlap_pixels": 0,
+        "localized_touch_pairs": [],
+        "changes_vs_prior_candidate_outside_4_returned_source_bboxes": 0,
+        "preserved_25_localized_layers_outside_returned_regions": "25/25 exact"
+      },
+      "scope_note": "Recovery08 source mask has clean-plate-specific semantics, so its 823 byte-identical mask pixels are not a residue gate; C114 correctly uses zero collateral outside the four C109-returned source bboxes plus exact preserved localized layers.",
+      "controller_visual_qa": "PASS",
+      "visual_evidence": [
+        "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_STYLE_RETURN_CONTACT_SOURCE_OLD_NEW.jpg",
+        "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FINAL_READABLE_GRAY_QA.jpg",
+        "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FINAL_RAW_GRAY_QA.jpg"
+      ],
+      "visual_notes": "SOURCE|OLD|NEW review confirms More Engine Sound, experts-long, For Experts and Normal difficult Korean layers now materially reproduce the source right-leaning/italic family while keeping existing fill/outline effects. Full readable and raw mirror_y views show no new clipping, overlap, orientation regression, or changed collateral outside the four returned regions.",
+      "decision": "C114_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    },
+    "53CE39D5": {
+      "queue_index": 100,
+      "producer_run": "B_PRODUCTION28",
+      "candidate_sha256": "29cdba2ab03746f6e41d145d3dfc568cd1634f7cfc4dcb92a42a425cb2de5925",
+      "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION28/B_PRODUCTION28_53CE_REPORT.json",
+      "machine_qa_report": "localization/graphics/role_C/20261005-C112-53CE/C112_53CE_MACHINE_QA.json",
+      "structural_checks": {
+        "header_128_exact": true,
+        "bbox_and_size": "19/19 PASS",
+        "clean_outside_producer_mask": 0,
+        "final_outside_allowed": 0,
+        "final_protected_pixels": 0,
+        "target_outside_allowed": 0,
+        "localized_pair_overlap_pixels": 0,
+        "localized_touch_pairs": []
+      },
+      "controller_visual_qa": "FAIL",
+      "visual_evidence": [
+        "localization/graphics/role_B/20261005-B-PRODUCTION28/53CE39D5_HD_CLEAN_PLATE.png",
+        "localization/graphics/role_B/20261005-B-PRODUCTION28/B_PRODUCTION28_53CE_COMPARE.jpg",
+        "localization/graphics/role_B/20261005-B-PRODUCTION28/B_PRODUCTION28_53CE_ROW_CONTACT.jpg",
+        "localization/graphics/role_B/20261005-B-PRODUCTION28/B_PRODUCTION28_53CE_RAW_COMPARE.jpg"
+      ],
+      "visual_notes": "Exact CLEAN plate still visibly contains repeated short dark dash/source-shadow remnants inside multiple localized selector plates. This violates the zero source-residue gate even though containment/protected/overlap checks pass.",
+      "c112_heuristic_note": "C112 exploratory independent orange-plate residue classifier was deliberately broader than the semantic glyph mask and over-counted structural plate pixels; its 52,438 count is not used as an authoritative residue count. The exact CLEAN PNG visual defect is the decisive fail evidence.",
+      "decision": "C112_REWORK_REQUIRED_VISUAL_CLEAN_PLATE_RESIDUE"
+    }
+  },
+  "unchanged_existing_rework": {
+    "788CE557": "C108 REWORK_REQUIRED remains authoritative; no new producer candidate was completed, so C did not repeat its prior QA."
+  },
+  "global_rework_remaining": [
+    "53CE39D5",
+    "788CE557"
+  ],
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

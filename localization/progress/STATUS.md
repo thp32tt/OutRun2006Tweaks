@@ -945,3 +945,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Controller SOURCE|OLD|NEW contact, full readable, and raw `mirror_y` visual self-QA PASS. The returned Korean rows now reproduce the source right-leaning slant without new residue, clipping, overlap, seam, halo, protected-art damage, or orientation regression.
 - Independent C final QA and isolated DDS_ONLY in-game validation remain pending. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FD90AA9_REPORT.json`, `localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_STYLE_RETURN_CONTACT_SOURCE_OLD_NEW.jpg`, and readable/raw QA images.
+## 2026-10-05T01:40:30+09:00 — C114 FD90AA9 final PASS + 53CE39D5 residue return
+- Checked only new/changed unfinished handoffs; completed C111 assets were not repeated.
+- FD90AA9 A_RECOVERY13 c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401: C114 scoped independent machine PASS (29/29 bbox+size, decoded final exact, outside/protected/overlap/touch=0, changes outside four returned source bboxes=0, preserved 25 localized layers exact outside returned regions). Controller SOURCE|OLD|NEW + full readable/raw visual QA PASS; C109 source-slant return resolved.
+- 53CE39D5 B_PRODUCTION28 29cdba2ab03746f6e41d145d3dfc568cd1634f7cfc4dcb92a42a425cb2de5925: structural/header/19-of-19 bbox+size/outside/protected/overlap gates pass, but exact CLEAN plate visibly retains repeated dark dash/source-shadow remnants in multiple localized selector plates. C returns REWORK_REQUIRED under zero-residue visual policy. C112 exploratory residue count was overinclusive and is not treated as an exact pixel defect count.
+- 788CE557 remains C108 REWORK_REQUIRED; no new producer candidate, so prior QA was not repeated.
+- Global producer REWORK remaining: 53CE39D5, 788CE557. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261005-C114-FINAL/C114_CROSS_LANE_FINAL_QA.json
