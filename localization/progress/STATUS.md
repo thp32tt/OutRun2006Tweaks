@@ -1087,3 +1087,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Queue index 140 advanced to `b58_self_qa_pass_pending_c`; pending_artwork localize_text=37. Independent C final QA and isolated in-game validation remain pending.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION58/B58_31C_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION58/B58_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION58/B58_FINAL_VALIDATION.json`.
+
+## 2026-10-05 08:01:30 KST — C140 31C58963 B58 corrective final PASS
+- Reviewed only the new B_PRODUCTION58 index 140 `31C58963_512x256.dds`; C139-and-earlier completed PASS assets were not repeated.
+- Independent pinned canonical source/atlas QA discovered a concrete B58 mask defect: region4 is exactly three connected alpha groups, `PRESS [162,318,365,382]`, protected Enter icon `[376,318,443,382]`, and `KEY [457,319,583,381]`. B58's right word range began at x462, leaving 298 canonical KEY outline/antialias pixels in `[457,319,462,381]`.
+- C140 applied a small corrective rework only to those 298 source-residue pixels, restoring exact transparent clean background; Korean target pixels and the Enter-key icon changed by 0 pixels. Final candidate `ecc7efdde172f410c85207ecdc5bbfd5bac95c753341763ad6afb9a6a7f1b3f2` supersedes B58 input `b6d8bcc2f2cc05d45d4af3fbfab30f0a71e8fa68a89dee4c78b6f8a6aeca4cd3`.
+- Hosted C machine revalidation PASS: exact 2048x1024 RGBA32 header/raw `mirror_y`; 6/6 bbox+size+positive margins; changes outside C fix mask=0; final outside/alpha-outside/protected/icon/render-outside-target/source-residue/overlap/touch all 0.
+- Controller SOURCE/B58/CLEAN/C140 FINAL, 2x row-contact and raw mirror_y visual QA PASS. `스테이지 선택 / 레이스 선택 / 모드 선택 / 쇼룸 / 누르세요 [Enter icon] 키` retain the heavy white and yellow/black source families with no visible English residue, clipping, overlap, seam, halo, icon damage or orientation regression.
+- Decision: `C140_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Producer REWORK remains 0; pending_artwork localize_text=37. `1A43E9D9` remains HIGH_RISK pending mandatory in-game; `4F68708E`/`F6811E94` remain strict HOLD.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C140-31C58963/C140_31C_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C140-31C58963/C140_31C_MACHINE_QA.json`.

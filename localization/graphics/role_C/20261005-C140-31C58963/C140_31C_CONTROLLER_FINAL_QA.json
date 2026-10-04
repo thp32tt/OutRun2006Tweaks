@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C140-31C58963",
+  "timestamp_kst": "2026-10-05T08:01:30+09:00",
+  "queue_index": 140,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+  "scope": "new B_PRODUCTION58 handoff only; completed C139-and-earlier PASS assets not repeated",
+  "producer_run": "20261005-B-PRODUCTION58",
+  "source_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+  "input_candidate_sha256": "b6d8bcc2f2cc05d45d4af3fbfab30f0a71e8fa68a89dee4c78b6f8a6aeca4cd3",
+  "candidate_sha256": "ecc7efdde172f410c85207ecdc5bbfd5bac95c753341763ad6afb9a6a7f1b3f2",
+  "candidate_changed_by_C": true,
+  "producer_defect": {
+    "type": "SOURCE_TEXT_MASK_CLIPPED_KEY_LEFT_FRINGE",
+    "exact_key_source_bbox": [
+      457,
+      319,
+      583,
+      381
+    ],
+    "producer_key_source_bbox": [
+      462,
+      319,
+      583,
+      381
+    ],
+    "residual_pixels": 298,
+    "residual_bbox": [
+      457,
+      319,
+      462,
+      381
+    ],
+    "reason": "B58 right_range began at x462, omitting the canonical KEY outline/antialias fringe at x457..461"
+  },
+  "c_small_corrective_rework": {
+    "changed_pixels": 298,
+    "changes_outside_fix_mask": 0,
+    "method": "restore omitted canonical KEY source-effect pixels to exact transparent clean background; Korean target and Enter-key icon unchanged"
+  },
+  "independent_machine_qa": {
+    "report": "localization/graphics/role_C/20261005-C140-31C58963/C140_31C_MACHINE_QA.json",
+    "status": "PASS_AFTER_C_SMALL_CORRECTION",
+    "header_128_exact": true,
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "bbox_size_positive_margin": "6/6 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "enter_icon_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "compound_target_icon_1px_near_pixels": {
+      "press_word": 0,
+      "key_word": 0
+    }
+  },
+  "controller_visual_qa": {
+    "source_input_clean_fixed_final": "PASS",
+    "row_contact_2x": "PASS",
+    "raw_mirror_y": "PASS",
+    "strings": [
+      "스테이지 선택",
+      "레이스 선택",
+      "모드 선택",
+      "쇼룸",
+      "누르세요",
+      "키"
+    ],
+    "protected_enter_icon": "PASS_UNCHANGED",
+    "source_style": "PASS_HEAVY_WHITE_ROWS_AND_YELLOW_BLACK_COMPOUND_FAMILY",
+    "english_source_residue": "NONE_VISIBLE_AFTER_C140_FIX",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "seam_or_halo": "NONE_VISIBLE",
+    "orientation_regression": "NONE_VISIBLE"
+  },
+  "decision": "C140_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "producer_rework_remaining": 0,
+  "pending_artwork_localize_text": 37,
+  "high_risk_static_pass_assets_existing": [
+    "1A43E9D9"
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94"
+  ],
+  "in_game_validation": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
