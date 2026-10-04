@@ -244,7 +244,13 @@
     "alpha_changed_pixels_outside_source_bboxes": 0,
     "protected_visible_pixels_changed": 0
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS",
   "runtime_validation": "UNTESTED",
-  "status": "A_PRODUCTION21_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_PRODUCTION21_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_CONTACT_SOURCE_CLEAN_FINAL.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_SOURCE_CLEAN_FINAL_GRAY.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_FINAL_RAW_GRAY.jpg"
+  ],
+  "controller_visual_note": "PASS after same-run source-weight correction. Both Loading occurrences are fully removed in CLEAN; final 로딩 labels use the actual Noto Sans CJK Bold face, same-color 2px fill reinforcement, the measured dark outline/shadow family and centered source footprints. SOURCE|CLEAN|FINAL/full/raw mirror_y review shows no residue, clipping, overlap, seam, halo, protected-art damage, or orientation regression."
 }
