@@ -1,0 +1,56 @@
+{
+  "status": "PREFLIGHT_DIAGNOSTIC_NEEDS_NINTH_REGION_RESOLUTION",
+  "region_count": 8,
+  "regions": [
+    [
+      426,
+      89,
+      512,
+      115
+    ],
+    [
+      0,
+      105,
+      98,
+      129
+    ],
+    [
+      160,
+      105,
+      261,
+      129
+    ],
+    [
+      326,
+      220,
+      481,
+      252
+    ],
+    [
+      164,
+      256,
+      258,
+      295
+    ],
+    [
+      4,
+      291,
+      194,
+      324
+    ],
+    [
+      454,
+      292,
+      512,
+      324
+    ],
+    [
+      0,
+      341,
+      166,
+      371
+    ]
+  ],
+  "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+  "candidate_written": false
+}
