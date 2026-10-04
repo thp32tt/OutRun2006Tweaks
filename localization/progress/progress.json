@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T07:02:38+09:00",
+  "updated_at_kst": "2026-10-05T07:21:30+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C138 returns 1F5FE6E9 to REWORK_REQUIRED because exact source glyph/effect masks remain ambiguous after B51+C diagnostics; producer REWORK=1, pending_artwork localize_text=38. 1A43E9D9 remains HIGH_RISK pending mandatory in-game validation; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "B_PRODUCTION55 resolved C138's 1F5FE6E9 exact-mask REWORK and produced candidate e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be: 4/4 exact source bbox+size PASS, zero outside/alpha-outside/source-residue/overlap/touch, controller SOURCE/CLEAN/FINAL/row/raw self-QA PASS. Index 132 is pending independent C final QA; producer REWORK=0 and pending_artwork localize_text=37. 1A43E9D9 remains HIGH_RISK pending mandatory in-game validation; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,13 +265,15 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "REWORK_REQUIRED",
+      "status": "B_SELF_QA_PASS_PENDING_C",
       "assets": [
         "1F5FE6E9"
       ],
-      "remaining": 1,
-      "note": "1F5FE6E9 requires exact per-row source alpha/effect mask reconstruction before any candidate can be approved; C138 fail-closed evidence is authoritative.",
-      "pending_c": []
+      "remaining": 0,
+      "note": "B_PRODUCTION55 candidate e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be resolves C138 exact source-mask ambiguity; independent C final QA is pending.",
+      "pending_c": [
+        "1F5FE6E9"
+      ]
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -326,25 +328,17 @@
       "in_game_validation": "NOT_APPLICABLE_TO_FAILED_STATIC_QA; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
-      "run": "B_RECOVERY04_05",
-      "worker_run_id": 37185351672,
-      "worker_output_commit": "e8af6aff7704ae364cfd0d2e92b5de4aa8cbf318",
-      "result": "TWO_B_CANDIDATES_SELF_QA_PASS_PENDING_C_INGAME",
+      "run": "B_PRODUCTION55",
+      "worker_run_id": 37239602871,
+      "worker_output_commit": "220de60b5ea9b29aca18de374f4537f274282d23",
+      "result": "ONE_REWORK_CANDIDATE_SELF_QA_PASS_PENDING_C_INGAME",
       "assets": {
-        "19CEDB9": {
-          "queue_index": 44,
-          "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
-          "candidate_sha256": "3090f2664bab3065502b10a98f93d17e92a64a3725dc1b7a4bb790648a5da6e7",
-          "status": "B_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_AND_INGAME",
-          "report": "localization/graphics/role_B/20261004-B-RECOVERY04/B_RECOVERY04_19CEDB9_REPORT.json"
-        },
-        "2DA43E41": {
-          "queue_index": 94,
-          "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
-          "superseded_c88_return_sha256": "9f48c04586fe8d7d446760d47345f010bc279ef21f618db44f73c3a548660fcf",
-          "candidate_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
-          "status": "B_CANONICAL_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
-          "report": "localization/graphics/role_B/20261004-B-RECOVERY05/B_RECOVERY05_2DA43E41_REPORT.json"
+        "1F5FE6E9": {
+          "queue_index": 132,
+          "source_sha256": "3656adbd699b7852cb5fcf4bb01fc4f1f65bbd9d7d39e12e7a1c2ac5a49fef1d",
+          "candidate_sha256": "e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be",
+          "status": "B_PRODUCTION55_SELF_QA_PASS_PENDING_C_AND_INGAME",
+          "report": "localization/graphics/role_B/20261005-B-PRODUCTION55/B55_1F5_REPORT.json"
         }
       },
       "runtime_validation": "UNTESTED"
@@ -596,6 +590,25 @@
       "controller_visual_qa": "PASS",
       "runtime_validation": "UNTESTED",
       "report": "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_EBEF6D20_REPORT.json"
+    },
+    "b55_1f5fe6e9": {
+      "queue_index": 132,
+      "candidate_sha256": "e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+      "status": "B_PRODUCTION55_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "source_mask_method": "canonical alpha glyph components + proven 24px periodicity; row4 prefix row3+24 intersect canonical source alpha",
+      "bbox_pass": "4/4",
+      "zero_pixel_gates": {
+        "outside": 0,
+        "alpha_outside": 0,
+        "target_out": 0,
+        "source_residue": 0,
+        "overlap": 0,
+        "touch_pairs": 0
+      },
+      "controller_visual_qa": "PASS",
+      "report": "localization/graphics/role_B/20261005-B-PRODUCTION55/B55_1F5_REPORT.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
