@@ -1,0 +1,1206 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-1820-C93",
+  "base_head": "cca7f8e6170448744b1a0ef350a7fa8fbcf1cf59",
+  "scope": "new/changed A_RECOVERY08 FD90AA9 and B_RECOVERY07 B1696633 only; completed C90-C92 assets not repeated",
+  "assets": [
+    {
+      "asset": "FD90AA9",
+      "producer": "A_RECOVERY08",
+      "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "candidate_sha256": "0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b",
+      "structure": {
+        "width": 4096,
+        "height": 4096,
+        "pitch": 16384,
+        "depth": 1,
+        "mips": 1,
+        "pf_flags": 65,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "bytes": 67108992,
+        "header_128_exact_to_source": true,
+        "raw_orientation": "mirror_y"
+      },
+      "clean_plate_gate": {
+        "changed_pixels": 1538245,
+        "changed_bbox": [
+          0,
+          374,
+          4034,
+          2573
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "final_gate": {
+        "changed_pixels": 2145458,
+        "changed_bbox": [
+          0,
+          374,
+          4034,
+          2573
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "return_scope_gate": {
+        "changed_pixels_vs_A07_outside_four_return_bboxes": 0,
+        "alpha_changed_pixels_outside_four_return_bboxes": 0,
+        "status": "PASS"
+      },
+      "bbox_gate": {
+        "elements": 29,
+        "pass": 29,
+        "fail": 0,
+        "edge_touch_keys": [
+          "versus_mode"
+        ],
+        "rows": [
+          {
+            "key": "outsp_course",
+            "original_bbox": [
+              1126,
+              374,
+              1678,
+              449
+            ],
+            "localized_bbox": [
+              1194,
+              376,
+              1622,
+              443
+            ],
+            "derived_final_vs_clean_bbox": [
+              1194,
+              376,
+              1622,
+              443
+            ],
+            "delta_left": 68,
+            "delta_right": 56,
+            "delta_top": 2,
+            "delta_bottom": 6,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "out2_course",
+            "original_bbox": [
+              1776,
+              374,
+              2232,
+              449
+            ],
+            "localized_bbox": [
+              1828,
+              376,
+              2178,
+              446
+            ],
+            "derived_final_vs_clean_bbox": [
+              1828,
+              376,
+              2178,
+              446
+            ],
+            "delta_left": 52,
+            "delta_right": 54,
+            "delta_top": 2,
+            "delta_bottom": 3,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "more_engine",
+            "original_bbox": [
+              2772,
+              376,
+              3187,
+              448
+            ],
+            "localized_bbox": [
+              2851,
+              385,
+              3086,
+              438
+            ],
+            "derived_final_vs_clean_bbox": [
+              2851,
+              385,
+              3086,
+              438
+            ],
+            "delta_left": 79,
+            "delta_right": 101,
+            "delta_top": 9,
+            "delta_bottom": 10,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY08_FRESH_RECONSTRUCTION"
+          },
+          {
+            "key": "you",
+            "original_bbox": [
+              3169,
+              376,
+              3334,
+              445
+            ],
+            "localized_bbox": [
+              3237,
+              378,
+              3294,
+              438
+            ],
+            "derived_final_vs_clean_bbox": [
+              3237,
+              378,
+              3294,
+              438
+            ],
+            "delta_left": 68,
+            "delta_right": 40,
+            "delta_top": 2,
+            "delta_bottom": 7,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "gas_pedal",
+            "original_bbox": [
+              3490,
+              391,
+              3748,
+              440
+            ],
+            "localized_bbox": [
+              3530,
+              393,
+              3708,
+              438
+            ],
+            "derived_final_vs_clean_bbox": [
+              3530,
+              393,
+              3708,
+              438
+            ],
+            "delta_left": 40,
+            "delta_right": 40,
+            "delta_top": 2,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "run15",
+            "original_bbox": [
+              0,
+              517,
+              934,
+              620
+            ],
+            "localized_bbox": [
+              62,
+              533,
+              864,
+              604
+            ],
+            "derived_final_vs_clean_bbox": [
+              62,
+              533,
+              864,
+              604
+            ],
+            "delta_left": 62,
+            "delta_right": 70,
+            "delta_top": 16,
+            "delta_bottom": 16,
+            "containment": "PASS",
+            "rework_status": "PRIOR_C85_PASS_PRESERVED"
+          },
+          {
+            "key": "maximum_speed",
+            "original_bbox": [
+              922,
+              499,
+              1408,
+              620
+            ],
+            "localized_bbox": [
+              995,
+              518,
+              1327,
+              600
+            ],
+            "derived_final_vs_clean_bbox": [
+              995,
+              518,
+              1327,
+              600
+            ],
+            "delta_left": 73,
+            "delta_right": 81,
+            "delta_top": 19,
+            "delta_bottom": 20,
+            "containment": "PASS",
+            "rework_status": "PRIOR_C85_PASS_PRESERVED"
+          },
+          {
+            "key": "enter_selection",
+            "original_bbox": [
+              3456,
+              517,
+              3893,
+              627
+            ],
+            "localized_bbox": [
+              3550,
+              532,
+              3828,
+              611
+            ],
+            "derived_final_vs_clean_bbox": [
+              3550,
+              532,
+              3828,
+              611
+            ],
+            "delta_left": 94,
+            "delta_right": 65,
+            "delta_top": 15,
+            "delta_bottom": 16,
+            "containment": "PASS",
+            "rework_status": "PRIOR_C85_PASS_PRESERVED"
+          },
+          {
+            "key": "same_conditions",
+            "original_bbox": [
+              14,
+              614,
+              1894,
+              730
+            ],
+            "localized_bbox": [
+              193,
+              631,
+              1691,
+              712
+            ],
+            "derived_final_vs_clean_bbox": [
+              193,
+              631,
+              1691,
+              712
+            ],
+            "delta_left": 179,
+            "delta_right": 203,
+            "delta_top": 17,
+            "delta_bottom": 18,
+            "containment": "PASS",
+            "rework_status": "PRIOR_C85_PASS_PRESERVED"
+          },
+          {
+            "key": "transmission2",
+            "original_bbox": [
+              1221,
+              722,
+              1805,
+              843
+            ],
+            "localized_bbox": [
+              1385,
+              748,
+              1789,
+              841
+            ],
+            "derived_final_vs_clean_bbox": [
+              1385,
+              748,
+              1789,
+              841
+            ],
+            "delta_left": 164,
+            "delta_right": 16,
+            "delta_top": 26,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "experts_long",
+            "original_bbox": [
+              1907,
+              602,
+              3406,
+              781
+            ],
+            "localized_bbox": [
+              2335,
+              625,
+              2985,
+              693
+            ],
+            "derived_final_vs_clean_bbox": [
+              2335,
+              625,
+              2985,
+              693
+            ],
+            "delta_left": 428,
+            "delta_right": 421,
+            "delta_top": 23,
+            "delta_bottom": 88,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY08_FRESH_RECONSTRUCTION"
+          },
+          {
+            "key": "view_choices",
+            "original_bbox": [
+              3525,
+              614,
+              3882,
+              730
+            ],
+            "localized_bbox": [
+              3563,
+              632,
+              3855,
+              712
+            ],
+            "derived_final_vs_clean_bbox": [
+              3563,
+              632,
+              3855,
+              712
+            ],
+            "delta_left": 38,
+            "delta_right": 27,
+            "delta_top": 18,
+            "delta_bottom": 18,
+            "containment": "PASS",
+            "rework_status": "PRIOR_C85_PASS_PRESERVED"
+          },
+          {
+            "key": "for_experts",
+            "original_bbox": [
+              1766,
+              704,
+              2304,
+              896
+            ],
+            "localized_bbox": [
+              1948,
+              788,
+              2151,
+              847
+            ],
+            "derived_final_vs_clean_bbox": [
+              1776,
+              775,
+              2304,
+              896
+            ],
+            "delta_left": 182,
+            "delta_right": 153,
+            "delta_top": 84,
+            "delta_bottom": 49,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY08_FRESH_RECONSTRUCTION"
+          },
+          {
+            "key": "normal_difficult",
+            "original_bbox": [
+              2547,
+              704,
+              3354,
+              896
+            ],
+            "localized_bbox": [
+              2801,
+              793,
+              3108,
+              861
+            ],
+            "derived_final_vs_clean_bbox": [
+              2801,
+              793,
+              3108,
+              861
+            ],
+            "delta_left": 254,
+            "delta_right": 246,
+            "delta_top": 89,
+            "delta_bottom": 35,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY08_FRESH_RECONSTRUCTION"
+          },
+          {
+            "key": "select_game_mode",
+            "original_bbox": [
+              166,
+              819,
+              1166,
+              973
+            ],
+            "localized_bbox": [
+              347,
+              846,
+              1037,
+              971
+            ],
+            "derived_final_vs_clean_bbox": [
+              347,
+              846,
+              1037,
+              971
+            ],
+            "delta_left": 181,
+            "delta_right": 129,
+            "delta_top": 27,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "select_car",
+            "original_bbox": [
+              243,
+              947,
+              1156,
+              1111
+            ],
+            "localized_bbox": [
+              487,
+              981,
+              954,
+              1092
+            ],
+            "derived_final_vs_clean_bbox": [
+              402,
+              947,
+              1037,
+              1111
+            ],
+            "delta_left": 244,
+            "delta_right": 202,
+            "delta_top": 34,
+            "delta_bottom": 19,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "select_course",
+            "original_bbox": [
+              302,
+              1062,
+              1085,
+              1213
+            ],
+            "localized_bbox": [
+              386,
+              1097,
+              893,
+              1211
+            ],
+            "derived_final_vs_clean_bbox": [
+              386,
+              1062,
+              1085,
+              1213
+            ],
+            "delta_left": 84,
+            "delta_right": 192,
+            "delta_top": 35,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "select_music",
+            "original_bbox": [
+              1549,
+              819,
+              2571,
+              990
+            ],
+            "localized_bbox": [
+              1892,
+              857,
+              2358,
+              970
+            ],
+            "derived_final_vs_clean_bbox": [
+              1619,
+              819,
+              2430,
+              990
+            ],
+            "delta_left": 343,
+            "delta_right": 213,
+            "delta_top": 38,
+            "delta_bottom": 20,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "select_transmission",
+            "original_bbox": [
+              1563,
+              947,
+              2589,
+              1092
+            ],
+            "localized_bbox": [
+              1737,
+              975,
+              2436,
+              1090
+            ],
+            "derived_final_vs_clean_bbox": [
+              1737,
+              947,
+              2436,
+              1090
+            ],
+            "delta_left": 174,
+            "delta_right": 153,
+            "delta_top": 28,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "shortcut_features",
+            "original_bbox": [
+              1587,
+              1062,
+              2611,
+              1213
+            ],
+            "localized_bbox": [
+              1770,
+              1097,
+              2400,
+              1211
+            ],
+            "derived_final_vs_clean_bbox": [
+              1587,
+              1062,
+              2436,
+              1213
+            ],
+            "delta_left": 183,
+            "delta_right": 211,
+            "delta_top": 35,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "selected_sp",
+            "original_bbox": [
+              63,
+              1183,
+              2227,
+              1348
+            ],
+            "localized_bbox": [
+              971,
+              1199,
+              1662,
+              1319
+            ],
+            "derived_final_vs_clean_bbox": [
+              247,
+              1183,
+              2194,
+              1348
+            ],
+            "delta_left": 908,
+            "delta_right": 565,
+            "delta_top": 16,
+            "delta_bottom": 29,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "selected_out2",
+            "original_bbox": [
+              90,
+              1306,
+              2125,
+              1484
+            ],
+            "localized_bbox": [
+              222,
+              1336,
+              2016,
+              1477
+            ],
+            "derived_final_vs_clean_bbox": [
+              222,
+              1306,
+              2016,
+              1477
+            ],
+            "delta_left": 132,
+            "delta_right": 109,
+            "delta_top": 30,
+            "delta_bottom": 7,
+            "containment": "PASS",
+            "rework_status": "PRIOR_C85_PASS_PRESERVED"
+          },
+          {
+            "key": "select_car_setting",
+            "original_bbox": [
+              2419,
+              1183,
+              3394,
+              1367
+            ],
+            "localized_bbox": [
+              2770,
+              1194,
+              3343,
+              1356
+            ],
+            "derived_final_vs_clean_bbox": [
+              2419,
+              1194,
+              3343,
+              1367
+            ],
+            "delta_left": 351,
+            "delta_right": 51,
+            "delta_top": 11,
+            "delta_bottom": 11,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "versus_mode",
+            "original_bbox": [
+              2226,
+              1306,
+              2995,
+              1486
+            ],
+            "localized_bbox": [
+              2311,
+              1306,
+              2767,
+              1475
+            ],
+            "derived_final_vs_clean_bbox": [
+              2311,
+              1306,
+              2995,
+              1475
+            ],
+            "delta_left": 85,
+            "delta_right": 228,
+            "delta_top": 0,
+            "delta_bottom": 11,
+            "containment": "PASS",
+            "rework_status": "PRIOR_C85_PASS_PRESERVED"
+          },
+          {
+            "key": "gear_change",
+            "original_bbox": [
+              3587,
+              1304,
+              4034,
+              1501
+            ],
+            "localized_bbox": [
+              3648,
+              1330,
+              4022,
+              1499
+            ],
+            "derived_final_vs_clean_bbox": [
+              3587,
+              1330,
+              4022,
+              1501
+            ],
+            "delta_left": 61,
+            "delta_right": 12,
+            "delta_top": 26,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "player_battle_desc",
+            "original_bbox": [
+              3093,
+              1446,
+              3994,
+              1668
+            ],
+            "localized_bbox": [
+              3095,
+              1454,
+              3633,
+              1632
+            ],
+            "derived_final_vs_clean_bbox": [
+              3093,
+              1446,
+              3994,
+              1668
+            ],
+            "delta_left": 2,
+            "delta_right": 361,
+            "delta_top": 8,
+            "delta_bottom": 36,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "new_course_desc",
+            "original_bbox": [
+              3008,
+              1587,
+              3828,
+              1827
+            ],
+            "localized_bbox": [
+              3010,
+              1654,
+              3826,
+              1790
+            ],
+            "derived_final_vs_clean_bbox": [
+              3010,
+              1587,
+              3826,
+              1827
+            ],
+            "delta_left": 2,
+            "delta_right": 2,
+            "delta_top": 67,
+            "delta_bottom": 37,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "orig_course_desc",
+            "original_bbox": [
+              3008,
+              1754,
+              3662,
+              1995
+            ],
+            "localized_bbox": [
+              3010,
+              1822,
+              3660,
+              1975
+            ],
+            "derived_final_vs_clean_bbox": [
+              3010,
+              1754,
+              3662,
+              1975
+            ],
+            "delta_left": 2,
+            "delta_right": 2,
+            "delta_top": 68,
+            "delta_bottom": 20,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          },
+          {
+            "key": "random_music",
+            "original_bbox": [
+              1741,
+              2360,
+              2720,
+              2573
+            ],
+            "localized_bbox": [
+              1957,
+              2362,
+              2530,
+              2544
+            ],
+            "derived_final_vs_clean_bbox": [
+              1957,
+              2362,
+              2530,
+              2544
+            ],
+            "delta_left": 216,
+            "delta_right": 190,
+            "delta_top": 2,
+            "delta_bottom": 29,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY07_REWORKED"
+          }
+        ],
+        "status": "PASS"
+      },
+      "visual_evidence": {
+        "full_compare": "localization/graphics/role_C/20261004-1820-C93/C93_FD90AA9_FULL_COMPARE.jpg",
+        "rework_rows": "localization/graphics/role_C/20261004-1820-C93/C93_FD90AA9_REWORK_ROWS.jpg",
+        "controller_visual_qa": "PENDING"
+      },
+      "runtime_validation": "UNTESTED",
+      "status": "C93_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+    },
+    {
+      "asset": "B1696633",
+      "producer": "B_RECOVERY07",
+      "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+      "candidate_sha256": "13405cbc781820119e0f0295b3315c562cc2aeed301c4e6351da681f8a25ed09",
+      "source_provenance": {
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "mode": "pinned_upstream_fallback_if_not_repo_committed"
+      },
+      "structure": {
+        "width": 2048,
+        "height": 2048,
+        "pitch": 8192,
+        "depth": 1,
+        "mips": 1,
+        "pf_flags": 65,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "bytes": 16777344,
+        "header_128_exact_to_source": true,
+        "raw_orientation": "mirror_y"
+      },
+      "clean_plate_gate": {
+        "changed_pixels": 283505,
+        "changed_bbox": [
+          51,
+          770,
+          1877,
+          2043
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "final_gate": {
+        "changed_pixels": 293901,
+        "changed_bbox": [
+          51,
+          770,
+          1877,
+          2043
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "bbox_gate": {
+        "elements": 9,
+        "pass": 9,
+        "fail": 0,
+        "edge_touch_keys": [],
+        "rows": [
+          {
+            "key": "name",
+            "source": "NAME",
+            "korean": "이름",
+            "original_bbox": [
+              74,
+              769,
+              205,
+              805
+            ],
+            "localized_bbox": [
+              110,
+              770,
+              169,
+              804
+            ],
+            "derived_final_vs_clean_bbox": [
+              110,
+              770,
+              169,
+              804
+            ],
+            "delta_left": 36,
+            "delta_right": 36,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "status",
+            "source": "STATUS",
+            "korean": "상태",
+            "original_bbox": [
+              1648,
+              769,
+              1800,
+              781
+            ],
+            "localized_bbox": [
+              1717,
+              770,
+              1731,
+              780
+            ],
+            "derived_final_vs_clean_bbox": [
+              1717,
+              774,
+              1724,
+              779
+            ],
+            "delta_left": 69,
+            "delta_right": 69,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "stage",
+            "source": "Stage",
+            "korean": "스테이지",
+            "original_bbox": [
+              1090,
+              835,
+              1214,
+              899
+            ],
+            "localized_bbox": [
+              1092,
+              849,
+              1212,
+              884
+            ],
+            "derived_final_vs_clean_bbox": [
+              1092,
+              849,
+              1212,
+              884
+            ],
+            "delta_left": 2,
+            "delta_right": 2,
+            "delta_top": 14,
+            "delta_bottom": 15,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "next_stage",
+            "source": "Next Stage",
+            "korean": "다음 스테이지",
+            "original_bbox": [
+              1331,
+              909,
+              1619,
+              976
+            ],
+            "localized_bbox": [
+              1334,
+              916,
+              1615,
+              968
+            ],
+            "derived_final_vs_clean_bbox": [
+              1334,
+              916,
+              1615,
+              968
+            ],
+            "delta_left": 3,
+            "delta_right": 4,
+            "delta_top": 7,
+            "delta_bottom": 8,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "ghost",
+            "source": "Ghost",
+            "korean": "고스트",
+            "original_bbox": [
+              1668,
+              909,
+              1824,
+              978
+            ],
+            "localized_bbox": [
+              1669,
+              919,
+              1822,
+              968
+            ],
+            "derived_final_vs_clean_bbox": [
+              1669,
+              919,
+              1822,
+              968
+            ],
+            "delta_left": 1,
+            "delta_right": 2,
+            "delta_top": 10,
+            "delta_bottom": 10,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "total_time",
+            "source": "Total Time",
+            "korean": "총 시간",
+            "original_bbox": [
+              51,
+              1698,
+              841,
+              1841
+            ],
+            "localized_bbox": [
+              245,
+              1700,
+              647,
+              1838
+            ],
+            "derived_final_vs_clean_bbox": [
+              245,
+              1700,
+              647,
+              1838
+            ],
+            "delta_left": 194,
+            "delta_right": 194,
+            "delta_top": 2,
+            "delta_bottom": 3,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "slipstream",
+            "source": "Slipstream",
+            "korean": "슬립스트림",
+            "original_bbox": [
+              889,
+              1718,
+              1388,
+              1825
+            ],
+            "localized_bbox": [
+              912,
+              1719,
+              1365,
+              1823
+            ],
+            "derived_final_vs_clean_bbox": [
+              912,
+              1719,
+              1365,
+              1823
+            ],
+            "delta_left": 23,
+            "delta_right": 23,
+            "delta_top": 1,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "new_record",
+            "source": "NEW Record!!",
+            "korean": "신기록!!",
+            "original_bbox": [
+              1618,
+              1732,
+              1877,
+              1841
+            ],
+            "localized_bbox": [
+              1619,
+              1746,
+              1876,
+              1826
+            ],
+            "derived_final_vs_clean_bbox": [
+              1619,
+              1746,
+              1876,
+              1826
+            ],
+            "delta_left": 1,
+            "delta_right": 1,
+            "delta_top": 14,
+            "delta_bottom": 15,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "extend_time",
+            "source": "Extend Time",
+            "korean": "시간 연장",
+            "original_bbox": [
+              834,
+              1899,
+              1777,
+              2043
+            ],
+            "localized_bbox": [
+              1040,
+              1901,
+              1570,
+              2040
+            ],
+            "derived_final_vs_clean_bbox": [
+              1040,
+              1901,
+              1570,
+              2040
+            ],
+            "delta_left": 206,
+            "delta_right": 207,
+            "delta_top": 2,
+            "delta_bottom": 3,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          }
+        ],
+        "status": "PASS"
+      },
+      "visual_evidence": {
+        "full_compare": "localization/graphics/role_C/20261004-1820-C93/C93_B1696633_FULL_COMPARE.jpg",
+        "row_contact": "localization/graphics/role_C/20261004-1820-C93/C93_B1696633_ROW_CONTACT.jpg",
+        "controller_visual_qa": "PENDING"
+      },
+      "runtime_validation": "UNTESTED",
+      "status": "C93_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+    }
+  ],
+  "summary": {
+    "assets_checked": 2,
+    "static_machine_pass": 2,
+    "static_machine_fail": 0,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changes": false
+  }
+}
