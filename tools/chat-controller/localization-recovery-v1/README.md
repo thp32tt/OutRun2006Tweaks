@@ -8,15 +8,15 @@ Purpose: run the compact 2026-09-28 localization workflow on a fresh ChatGPT acc
 - Localization branch: `korean-localization-recovery-20260928`
 - Localization baseline: `11631c5f12037bcd01cda1af57ec9bc564af4bcf`
 
-The controller Python source is copied byte-for-byte from the stable historical controller snapshot. Only the packaging, target branch and prompts are isolated here.
+The controller started from the stable historical snapshot. Recovery-specific changes are kept minimal: isolated packaging/prompts plus deterministic A/B/C schedule mapping; no queue or state-machine expansion is added.
 
 ## Schedule
 
-- :00 — A production/self-QA
-- :20 — B production/self-QA
-- :40 — C cross-lane final QA
+- :00 / :30 — A production/self-QA
+- :10 / :40 — B production/self-QA
+- :20 / :50 — C cross-lane final QA
 
-Three persistent chat slots are used. Watchdog is OFF by default. AUTO_SEND is OFF by default.
+Each lane runs every 30 minutes, staggered by 10 minutes. The minute-to-lane mapping is deterministic, so a skipped or failed send does not rotate the later lanes out of phase. Three persistent chat slots are used. Watchdog is OFF by default. AUTO_SEND is OFF by default.
 
 ## Portainer
 

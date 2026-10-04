@@ -415,7 +415,7 @@ async def watchdog_cycle(context: BrowserContext, pages: dict[str, Page]):
         log.info("watchdog resumed slot=%s stale_min=%.1f busy=%s", slot.name, stale_min, busy)
 
 
-async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
+async def run_cycle(context: BrowserContext, pages: dict[str, Page], scheduled_minute: Optional[int] = None):
     now = datetime.now(TZ)
     reg = load_registry(now)
 
@@ -428,6 +428,13 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page]):
             rate_limit_until=reg.rate_limit_until,
         )
         return
+
+    # Localization uses fixed lane timing so a skipped/failed run cannot rotate A/B/C out of phase.
+    # :00/:30=A, :10/:40=B, :20/:50=C. Manual --once keeps the registry next_slot behavior.
+    if CONTROLLER_MODE == "localization" and scheduled_minute is not None and len(reg.slots) >= 3:
+        scheduled_slot = {0: 0, 10: 1, 20: 2}.get(scheduled_minute % 30)
+        if scheduled_slot is not None:
+            reg.next_slot = scheduled_slot
 
     slot = reg.slots[reg.next_slot]
     if FRESH_CHAT_EACH_RUN:

@@ -14,7 +14,7 @@ services:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
       AUTO_SEND: "${AUTO_SEND:-false}"
-      SCHEDULE_MINUTES: "0,20,40"
+      SCHEDULE_MINUTES: "0,10,20,30,40,50"
       CHAT_SLOTS: "3"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"

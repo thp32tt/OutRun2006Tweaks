@@ -53,7 +53,7 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
             did_scheduled = True
             write_runtime(last_tick=tick, status="running")
             try:
-                await run_cycle(context, pages)
+                await run_cycle(context, pages, scheduled_minute=now.minute)
             except Exception as e:
                 log.exception("scheduled cycle failed")
                 write_runtime(status="error", last_error=repr(e))
