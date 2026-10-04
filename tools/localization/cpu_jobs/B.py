@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("B hosted worker only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION33"
+run="20261005-B-PRODUCTION34"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -43,12 +43,16 @@ if np.count_nonzero(alpha)==0: raise RuntimeError("source alpha empty")
 # bboxes from non-transparent source pixels instead of scaling the historical draft.
 row_counts=np.count_nonzero(alpha,axis=1)
 active=[i for i,n in enumerate(row_counts) if n>0]
-groups=[]
-for y in active:
-    if not groups or y-groups[-1][-1]>3: groups.append([y])
-    else: groups[-1].append(y)
-groups=[g for g in groups if len(g)>=4]
-if len(groups)!=2: raise RuntimeError(("expected_two_lines",[(g[0],g[-1],len(g)) for g in groups]))
+if not active: raise RuntimeError("no_active_rows")
+# BC3 alpha fringe bridges the small inter-line gap, so split the two source lines at
+# the minimum-alpha valley near the middle instead of requiring a zero-alpha row.
+lo,hi=active[0],active[-1]+1
+span=hi-lo
+ss=lo+max(4,int(span*.30)); ee=lo+min(span-4,int(span*.70))
+if ee<=ss: raise RuntimeError(("split_window",lo,hi,ss,ee))
+split=ss+int(np.argmin(row_counts[ss:ee]))
+groups=[list(range(lo,split+1)),list(range(split+1,hi))]
+if min(len(g) for g in groups)<4: raise RuntimeError(("bad_split",lo,hi,split))
 texts=["아웃런 모드","15코스 연속"]
 sources=["OutRun Mode","15 continuous course"]
 rows=[]
@@ -230,8 +234,8 @@ clean_png=out/"1A43E9D9_CLEAN_PLATE.png"; clean.save(clean_png)
 src_png=Path("/tmp/1A43_source.png"); final_png=Path("/tmp/1A43_final.png")
 src.save(src_png); dec.save(final_png)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(src_png),str(clean_png),str(source_mask_png),"--report",str(out/"B_PRODUCTION33_CLEAN_PLATE_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(src_png),str(final_png),str(allowed_png),"--protected-mask",str(protected_png),"--report",str(out/"B_PRODUCTION33_FINAL_MASK_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(src_png),str(clean_png),str(source_mask_png),"--report",str(out/"B_PRODUCTION34_CLEAN_PLATE_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(src_png),str(final_png),str(allowed_png),"--protected-mask",str(protected_png),"--report",str(out/"B_PRODUCTION34_FINAL_MASK_VALIDATION.json")],check=True)
 
 # Source/clean/final evidence.
 def comp(im,bg):
@@ -241,7 +245,7 @@ def card(label,im):
 cards=[card("SOURCE",src),card("CLEAN",clean),card("FINAL",dec)]
 sheet=Image.new("RGB",(W,H*3+84),"white")
 for i,c in enumerate(cards): sheet.paste(c,(0,i*(H+28)))
-sheet.save(out/"B_PRODUCTION33_1A43_SOURCE_CLEAN_FINAL.jpg",quality=96)
+sheet.save(out/"B_PRODUCTION34_1A43_SOURCE_CLEAN_FINAL.jpg",quality=96)
 # 2x row contact.
 contacts=[]
 for row in rows:
@@ -254,7 +258,7 @@ for row in rows:
     ImageDraw.Draw(c).text((4,4),row["source"]+" -> "+row["korean"],fill="black"); contacts.append(c)
 cs=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in contacts)+4),"white"); yy=0
 for c in contacts: cs.paste(c,(0,yy)); yy+=c.height+4
-cs.save(out/"B_PRODUCTION33_1A43_ROW_CONTACT_2X.jpg",quality=96)
+cs.save(out/"B_PRODUCTION34_1A43_ROW_CONTACT_2X.jpg",quality=96)
 
 changed_blocks=0; outside_patch=0; patch=full_blocks|partial_blocks
 for by in range(bh):
@@ -276,9 +280,9 @@ report={
  "containment":{"elements_total":2,"elements_pass":2,"localized_overlap_pixels":0,"visible_pixels_outside_original_bboxes":visible_out,"alpha_changed_pixels_outside_original_bboxes":alpha_out,"source_residue_pixels_outside_target":residue,"status":"PASS"},
  "compressed_patch":{"full_blocks":len(full_blocks),"partial_alpha_only_blocks":len(partial_blocks),"changed_blocks":changed_blocks,"changed_blocks_outside_patch":outside_patch,"partial_color_bytes_preserved":True,"status":"PASS"},
  "manual_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"B_PRODUCTION33_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B_PRODUCTION34_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"B_PRODUCTION33_1A43_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-summary={"run":run,"asset":"1A43E9D9","index":92,"candidate_sha256":cand_sha,"bbox_size_pass":"2/2","visible_outside":visible_out,"alpha_outside":alpha_out,"source_residue":residue,"changed_blocks_outside_patch":outside_patch,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_B/20261005-B-PRODUCTION33/B_PRODUCTION33_1A43_REPORT.json"}
-(wr/"B_PRODUCTION33_1A43E9D9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"B_PRODUCTION34_1A43_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+summary={"run":run,"asset":"1A43E9D9","index":92,"candidate_sha256":cand_sha,"bbox_size_pass":"2/2","visible_outside":visible_out,"alpha_outside":alpha_out,"source_residue":residue,"changed_blocks_outside_patch":outside_patch,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_B/20261005-B-PRODUCTION34/B_PRODUCTION34_1A43_REPORT.json"}
+(wr/"B_PRODUCTION34_1A43E9D9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False))
