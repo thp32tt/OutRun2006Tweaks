@@ -59,7 +59,7 @@
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
     "production_id": "CONVERSION-DXVK-00390",
-    "event_id": "CONVERSION-DXVK-00390-E002",
+    "event_id": "CONVERSION-DXVK-00390-E004",
     "event_type": "rollover",
     "dxvk_disassembly_evidence_run_id": 37238129844,
     "dxvk_disassembly_evidence_job_id": 111541248889,
@@ -69,10 +69,10 @@
     "controller_dispatch": {
       "task_id": "CONVERSION-DXVK-00390",
       "production_id": "CONVERSION-DXVK-00390",
-      "event_id": "CONVERSION-DXVK-00390-E002",
+      "event_id": "CONVERSION-DXVK-00390-E004",
       "event_type": "rollover",
       "attempt": "1/3",
-      "chat_rollover": 2,
+      "chat_rollover": 3,
       "rollover_is_retry": false,
       "resume_reason": "Retry persisted after one recovery attempt",
       "source": "CURRENT_USER_ROLLOVER",
@@ -80,7 +80,7 @@
       "validation_bearing_result_sha": "eb11ad636cd9fa322c55f5d55f50647ff92c1f39",
       "runtime_validation": "UNTESTED"
     },
-    "chat_rollover": 2,
+    "chat_rollover": 3,
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt"
   },
@@ -190,7 +190,10 @@
     "next_window_length": 64,
     "next_action_kind": "CAPTURE_CANONICAL_64_BYTE_OVERLAP_FRONTIER_FROM_F129_CUT_EDGE",
     "runtime_validation": "UNTESTED",
-    "exact_next_action": "Capture and fail-close the exact canonical 64-byte overlap frontier 0x00183AC7..0x00183B07 starting with inherited cut-edge bytes 83 A4 88. Preserve unresolved targets [0x00183B60,0x00183B6E,0x00183B6F], re-run raw inbound/outbound rel32 census, and do not promote function/call/render/HUD/runtime semantics without exact evidence."
+    "exact_next_action": "Capture and fail-close the exact canonical 64-byte overlap frontier 0x00183AC7..0x00183B07 starting with inherited cut-edge bytes 83 A4 88. Preserve unresolved targets [0x00183B60,0x00183B6E,0x00183B6F], re-run raw inbound/outbound rel32 census, and do not promote function/call/render/HUD/runtime semantics without exact evidence.",
+    "predecessor_exact": true,
+    "provenance_status": "EXACT_EXE_183AC7_TO_183B07_RAW_FRONTIER_OBSERVED",
+    "overlap_bytes": "83 a4 88"
   },
   "supplemental_completed_static_units": [
     {
@@ -5565,10 +5568,10 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DXVK-00390",
     "production_id": "CONVERSION-DXVK-00390",
-    "event_id": "CONVERSION-DXVK-00390-E002",
+    "event_id": "CONVERSION-DXVK-00390-E004",
     "event_type": "rollover",
     "attempt": "1/3",
-    "chat_rollover": 2,
+    "chat_rollover": 3,
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt",
     "source": "CURRENT_USER_ROLLOVER",
@@ -5605,20 +5608,6 @@
   "current_dispatch_metadata_correction": {
     "corrected_from": {
       "task_id": "CONVERSION-DXVK-00390",
-      "production_id": "CONVERSION-DX11-00389",
-      "event_id": "CONVERSION-DX11-00389-E008",
-      "event_type": "rollover",
-      "attempt": "1/3",
-      "chat_rollover": null,
-      "rollover_is_retry": false,
-      "resume_reason": null,
-      "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH",
-      "material_result_sha": "eb11ad636cd9fa322c55f5d55f50647ff92c1f39",
-      "validation_bearing_result_sha": "eb11ad636cd9fa322c55f5d55f50647ff92c1f39",
-      "runtime_validation": "UNTESTED"
-    },
-    "corrected_to": {
-      "task_id": "CONVERSION-DXVK-00390",
       "production_id": "CONVERSION-DXVK-00390",
       "event_id": "CONVERSION-DXVK-00390-E002",
       "event_type": "rollover",
@@ -5631,7 +5620,22 @@
       "validation_bearing_result_sha": "eb11ad636cd9fa322c55f5d55f50647ff92c1f39",
       "runtime_validation": "UNTESTED"
     },
-    "reason": "The active conversation explicitly supplies CONVERSION-DXVK-00390-E002 / CHAT_ROLLOVER=2. That user-supplied rollover metadata has higher precedence than later automatic queue bookkeeping (including CONVERSION-DX11-00389-E008). Rollover is not a retry; ATTEMPT remains 1/3. Material/result SHA, exact-SHA validation evidence and RUNTIME_VALIDATION=UNTESTED are unchanged.",
-    "material_and_validation_bearing_sha_unchanged": true
+    "corrected_to": {
+      "task_id": "CONVERSION-DXVK-00390",
+      "production_id": "CONVERSION-DXVK-00390",
+      "event_id": "CONVERSION-DXVK-00390-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_ROLLOVER",
+      "material_result_sha": "eb11ad636cd9fa322c55f5d55f50647ff92c1f39",
+      "validation_bearing_result_sha": "eb11ad636cd9fa322c55f5d55f50647ff92c1f39",
+      "runtime_validation": "UNTESTED"
+    },
+    "reason": "The newest explicit user rollover metadata is CONVERSION-DXVK-00390-E004 / CHAT_ROLLOVER=3. It supersedes stale E002/E008 bookkeeping. Rollover is not a retry; ATTEMPT remains 1/3. Material/result SHA, exact-SHA validation evidence and RUNTIME_VALIDATION=UNTESTED are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true,
+    "reconciled_at_kst": "2026-10-05T07:08:54+09:00"
   }
 }
