@@ -90,6 +90,17 @@ When a RENDER_READY or ONE_STAGE_TO_RENDER item exists, do not open unrelated pr
 - Persist each completed batch and machine-readable QA evidence to Git so the next invocation can resume from repository state alone.
 - Do not require Docker/controller configuration changes for workflow-rule changes; modify this Git contract/state instead.
 
+
+## Compute placement policy
+- N100 is the controller/orchestration host, not the preferred heavy image-processing host. Keep N100 work to Git synchronization, queue/state inspection, hashes, short metadata transforms, browser/controller duties, local-only source access, and runtime/in-game operations.
+- Do **not** run full-resolution DDS/Pillow/NumPy rendering, compression/decompression, whole-atlas pixel scans, clean-plate generation, or equivalent CPU-heavy static QA on N100 when the required inputs already exist in this Git branch.
+- If a computation does not need to write large repository binaries, prefer the ChatGPT native sandbox.
+- If a CPU-heavy computation must read/write repository-backed DDS/PNG evidence, use the GitHub-hosted worker in `.github/workflows/localization-cpu-worker.yml`: write/replace the deterministic role slot `tools/localization/cpu_jobs/A.py`, `B.py`, or `C.py` and push it. The workflow runs the script on `ubuntu-latest` and may commit only candidate/evidence paths under `localization/graphics/hd_candidates/`, `localization/graphics/role_A/`, `localization/graphics/role_B/`, `localization/graphics/role_C/`, or `localization/graphics/worker_results/`.
+- CPU worker scripts MUST NOT mutate shared controller state (`asset_queue.csv`, `resume_state.json`, `progress/`, `WORKLOG.md`) or source/runtime code. After the worker output commit lands, fetch latest Git and perform semantic reconciliation plus shared-state updates in the role/controller step.
+- Do not duplicate the same heavy computation on N100 after dispatch. Until the worker output is present, report it as compute-pending rather than candidate-complete. A later role invocation consumes the Git result first.
+- N100 heavy-Python fallback is allowed only when required input exists only on N100, the hosted worker is unavailable/failed, or runtime-local access is intrinsically required. Record the fallback reason in the role report.
+- This compute handoff does not change the authoritative work queue, role parity, approval rules, or completion semantics; it is execution placement only.
+
 ## State and completion
 Do not repeat completed work. Resume from current Git progress/resume state. Each completed batch updates its machine-readable report, localization/WORKLOG.md and localization/progress/STATUS.md as applicable.
 Before approval inspect raw DDS and readable/game orientation; use in-game screenshot validation when available.

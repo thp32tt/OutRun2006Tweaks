@@ -708,3 +708,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - 2DA43E41: 11/11 bbox PASS, all 7 former C85 failures fixed, 4/4 prior-PASS localized bboxes exact, exact-source final mask validator PASS. C proved the producer SOURCE and FINAL working PNGs are exact red/blue-channel swaps of the decode implied by the preserved DDS pixel masks. Producer visual PASS therefore inspected a non-canonical decode; header-aware final decode shows dark/blackened localized text/effects and style corruption. Returned as **REWORK_REQUIRED_CANONICAL_DECODE_VISUAL_CORRUPTION**.
 - C88 modified no DDS. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_C/20261004-1529-C88/C88_RECOVERY_FINAL_QA.json.
+
+
+## 2026-10-04 16:04 KST — CPU compute offload policy
+- Reassigned N100 to orchestration-first duty. Full-resolution DDS/Pillow/NumPy rendering and static pixel QA are off-host by default when repository inputs are available.
+- Added GitHub-hosted `Localization CPU Worker` execution for deterministic A/B/C role scripts under `tools/localization/cpu_jobs/`; worker outputs are restricted to candidate/evidence paths and cannot update shared controller state.
+- ChatGPT native sandbox remains preferred for analysis/compute that does not require large binary write-back. N100 heavy-Python is fallback-only for local-only/runtime inputs or hosted-worker failure.
+- Execution placement only; queue parity, quality gates, VR/FFB/DX11/DXVK exclusions, and runtime-validation semantics are unchanged.

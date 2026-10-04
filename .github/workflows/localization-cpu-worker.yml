@@ -1,0 +1,113 @@
+name: Localization CPU Worker
+
+on:
+  push:
+    branches:
+      - korean-localization-recovery-20260928
+    paths:
+      - 'tools/localization/cpu_jobs/A.py'
+      - 'tools/localization/cpu_jobs/B.py'
+      - 'tools/localization/cpu_jobs/C.py'
+      - '.github/workflows/localization-cpu-worker.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localization-cpu-worker-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  run-cpu-jobs:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout triggering revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install localization compute dependencies
+        run: python -m pip install --disable-pip-version-check pillow numpy
+
+      - name: Select changed role jobs
+        id: select
+        shell: bash
+        run: |
+          set -euo pipefail
+          before="${{ github.event.before }}"
+          after="${{ github.sha }}"
+          if [[ "$before" =~ ^0+$ ]]; then
+            git show --pretty='' --name-only "$after"
+          else
+            git diff --name-only "$before" "$after"
+          fi | grep -E '^tools/localization/cpu_jobs/[ABC]\.py$' | while read -r p; do
+            test -f "$p" && echo "$p"
+          done | sort -u > /tmp/localization_cpu_jobs.txt
+          if [ -s /tmp/localization_cpu_jobs.txt ]; then
+            echo "has_jobs=true" >> "$GITHUB_OUTPUT"
+            cat /tmp/localization_cpu_jobs.txt
+          else
+            echo "has_jobs=false" >> "$GITHUB_OUTPUT"
+            echo "No changed role job script."
+          fi
+
+      - name: Run heavy localization compute off N100
+        if: steps.select.outputs.has_jobs == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r job; do
+            role="$(basename "$job" .py)"
+            echo "::group::CPU role $role"
+            OUTRUN_CPU_WORKER=github-actions OUTRUN_CPU_ROLE="$role" python "$job"
+            echo "::endgroup::"
+          done < /tmp/localization_cpu_jobs.txt
+
+      - name: Enforce worker write boundary
+        if: steps.select.outputs.has_jobs == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            git diff --name-only
+            git ls-files --others --exclude-standard
+          } | sort -u > /tmp/localization_cpu_changed.txt
+          cat /tmp/localization_cpu_changed.txt
+          bad=0
+          while IFS= read -r p; do
+            [ -z "$p" ] && continue
+            case "$p" in
+              localization/graphics/hd_candidates/*|              localization/graphics/role_A/*|              localization/graphics/role_B/*|              localization/graphics/role_C/*|              localization/graphics/worker_results/*)
+                ;;
+              *)
+                echo "::error::CPU worker attempted forbidden write: $p"
+                bad=1
+                ;;
+            esac
+          done < /tmp/localization_cpu_changed.txt
+          test "$bad" -eq 0
+
+      - name: Commit worker outputs
+        if: steps.select.outputs.has_jobs == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A             localization/graphics/hd_candidates             localization/graphics/role_A             localization/graphics/role_B             localization/graphics/role_C             localization/graphics/worker_results 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Worker produced no repository output."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          roles="$(awk -F/ '{print $NF}' /tmp/localization_cpu_jobs.txt | sed 's/\.py$//' | paste -sd, -)"
+          git commit -m "localization(cpu): worker output [$roles]"
+          git fetch origin korean-localization-recovery-20260928
+          git rebase origin/korean-localization-recovery-20260928
+          git push origin HEAD:korean-localization-recovery-20260928

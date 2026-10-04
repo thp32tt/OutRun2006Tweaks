@@ -30,6 +30,14 @@ Each command means:
 - Work scope comes from `localization/graphics/asset_queue.csv`, never from the count of DDS binaries currently committed.
 - Rules must be changed in Git, not duplicated into Docker prompts.
 
+
+## Compute placement
+
+- N100 is orchestration-first. Heavy repository-backed DDS/Pillow/NumPy work follows the compute placement policy in `docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md`.
+- Use ChatGPT native sandbox for compute that does not require large binary write-back.
+- Use `.github/workflows/localization-cpu-worker.yml` plus the role slot in `tools/localization/cpu_jobs/` for heavy repo-backed candidate/evidence generation.
+- N100 heavy-Python execution is fallback-only and must record why off-host compute was not usable.
+
 ## Scheduler mapping
 
 - :00 -> `OutRun 한글화 A 실행`
