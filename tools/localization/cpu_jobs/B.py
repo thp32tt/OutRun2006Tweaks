@@ -100,8 +100,46 @@ while len(boxes)>9:
     _,i,j=best; A=boxes[i];B=boxes[j]
     M=[min(A[0],B[0]),min(A[1],B[1]),max(A[2],B[2]),max(A[3],B[3]),A[4]+B[4]]
     boxes=[v for k,v in enumerate(boxes) if k not in (i,j)]+[M]
+# If dilation merged vertically stacked one-line labels, split them using the undilated historical diff row gaps.
+if len(boxes)<9:
+    refined=[]
+    for A in boxes:
+        x0,y0,x1,y1,_=A
+        sub=diff[y0:y1,x0:x1]>0
+        active=np.any(sub,axis=1)
+        bands=[]; st=None
+        for yy,on in enumerate(active):
+            if on and st is None: st=yy
+            if st is not None and (not on or yy==len(active)-1):
+                en=yy if not on else yy+1
+                if en-st>=2: bands.append((st,en))
+                st=None
+        # Only treat clearly separated multiple source/draft rows as independent labels.
+        if len(bands)>1:
+            for by0,by1 in bands:
+                pts=np.argwhere(sub[by0:by1])
+                if pts.size==0: continue
+                yymin,xxmin=pts.min(axis=0); yymax,xxmax=pts.max(axis=0)
+                pad=6
+                rx0=max(0,x0+int(xxmin)-pad); ry0=max(0,y0+by0+int(yymin)-pad)
+                rx1=min(W,x0+int(xxmax)+1+pad); ry1=min(H,y0+by0+int(yymax)+1+pad)
+                refined.append([rx0,ry0,rx1,ry1,int(np.count_nonzero(sub[by0:by1]))])
+        else:
+            refined.append(A)
+    if len(refined)>=len(boxes): boxes=refined
+# If the row-gap split creates more than nine fragments, merge nearest same-line fragments deterministically.
+while len(boxes)>9:
+    best=None
+    for i in range(len(boxes)):
+        for j in range(i+1,len(boxes)):
+            s=gap_score(boxes[i],boxes[j])
+            if best is None or s<best[0]: best=(s,i,j)
+    if best is None or best[0]>45: break
+    _,i,j=best; A=boxes[i];B=boxes[j]
+    M=[min(A[0],B[0]),min(A[1],B[1]),max(A[2],B[2]),max(A[3],B[3]),A[4]+B[4]]
+    boxes=[v for k,v in enumerate(boxes) if k not in (i,j)]+[M]
 if len(boxes)!=9:
-    raise RuntimeError(f'historical discovery did not resolve exactly 9 regions: {len(boxes)} {boxes}')
+    raise RuntimeError(f'historical discovery did not resolve exactly 9 regions after row split: {len(boxes)} {boxes}')
 boxes=sorted(boxes,key=lambda r:(r[1]//12,r[0],r[1]))
 # Discovery regions are expanded slightly before exact-HD source-alpha measurement.
 _,src,info=load_rgba_dds(source); header=Path(source).read_bytes()[:128]
