@@ -72,7 +72,7 @@ LOCALIZATION_SLOT_DEDUP_SECONDS = max(0, int(os.getenv("LOCALIZATION_SLOT_DEDUP_
 GITHUB_REPO = os.getenv("GITHUB_REPO", "thp32tt/OutRun2006Tweaks").strip()
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 SCHEDULE_MINUTES = sorted({int(x.strip()) for x in os.getenv("SCHEDULE_MINUTES", "7,17,27,37,47,57").split(",") if x.strip()})
-CHAT_SLOTS = 3 if CONTROLLER_MODE == "localization" else 2
+CHAT_SLOTS = 3
 STATUS_PORT = int(os.getenv("STATUS_PORT", "8787"))
 NOVNC_PUBLIC_URL = os.getenv("NOVNC_PUBLIC_URL", "").strip()
 WATCHDOG_ENABLED = os.getenv("WATCHDOG_ENABLED", "true").lower() == "true"
@@ -230,7 +230,7 @@ LOCALIZATION_BRANCH = "korean-localization-clean"
 ASSET_QUEUE_PATH = "localization/graphics/asset_queue.csv"
 ARTIFACT_ROOT = "localization/graphics/controller_assets"
 QA_ROOT = "localization/graphics/controller_qa"
-MAX_ACTIVE_LANES = 2
+MAX_ACTIVE_LANES = 2 if CONTROLLER_MODE == "localization" else 3
 registry_lock = threading.RLock()
 runtime = {
     "started_at": datetime.now(TZ).isoformat(),
@@ -297,7 +297,12 @@ def load_registry(now: datetime) -> Registry:
         values["slots"] = [Slot(**s) for s in raw["slots"]]
         reg = Registry(**values)
         # Asset ownership survives midnight, process restart and container rebuild.
-        if {s.name for s in reg.slots} != {chr(ord('A') + i) for i in range(CHAT_SLOTS)}:
+        expected_slots = {chr(ord('A') + i) for i in range(CHAT_SLOTS)}
+        current_slots = {s.name for s in reg.slots}
+        if CONTROLLER_MODE == "conversion" and current_slots == {"A", "B"} and expected_slots == {"A", "B", "C"}:
+            reg.slots.append(Slot(name="C"))
+            log.info("migrated conversion registry slots A/B -> A/B/C for DX9Ex lane")
+        elif current_slots != expected_slots:
             raise ValueError("Registry belongs to another controller mode; use its isolated volume")
         return reg
 
