@@ -3855,6 +3855,108 @@ int main()
     const auto firstR253SourceValueSnapshot =
         r253SourceValuesReady.snapshotToken;
 
+    const auto r254LiveIndexReady =
+        programmableCache.indexed_live_index_binding_readiness(
+            d3d.context, d3d.device,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            r253SourceValuesReady, firstR253SourceValueSnapshot);
+    require(
+        r254LiveIndexReady.inputValid &&
+        r254LiveIndexReady.sourceValueReady &&
+        r254LiveIndexReady.sourceValueSnapshotMatches &&
+        r254LiveIndexReady.sourceValueFormatMatches &&
+        r254LiveIndexReady.indexMirrorReady &&
+        r254LiveIndexReady.indexMirrorSnapshotMatches &&
+        r254LiveIndexReady.contextDeviceMatches &&
+        r254LiveIndexReady.liveIndexBufferMatches &&
+        r254LiveIndexReady.liveIndexFormatMatches &&
+        r254LiveIndexReady.liveIndexOffsetMatches &&
+        r254LiveIndexReady.componentSnapshotsPresent &&
+        r254LiveIndexReady.ready &&
+        r254LiveIndexReady.expectedIndexFormat == DXGI_FORMAT_R16_UINT &&
+        r254LiveIndexReady.observedIndexFormat == DXGI_FORMAT_R16_UINT &&
+        r254LiveIndexReady.expectedIndexOffset == geometryIndexOffset &&
+        r254LiveIndexReady.observedIndexOffset == geometryIndexOffset &&
+        r254LiveIndexReady.expectedIndexBufferIdentity != 0 &&
+        r254LiveIndexReady.expectedIndexBufferIdentity ==
+            r254LiveIndexReady.observedIndexBufferIdentity &&
+        r254LiveIndexReady.snapshotToken != 0 &&
+        programmableCache.validate_indexed_live_index_binding_snapshot(
+            d3d.context, d3d.device,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            r253SourceValuesReady, firstR253SourceValueSnapshot,
+            r254LiveIndexReady.snapshotToken),
+        "R254 seals fresh live IA index buffer format and offset after R253");
+    const auto firstR254LiveIndexSnapshot = r254LiveIndexReady.snapshotToken;
+
+    d3d.context->IASetIndexBuffer(
+        nullptr, DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+    const auto r254MissingLiveIndex =
+        programmableCache.indexed_live_index_binding_readiness(
+            d3d.context, d3d.device,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            r253SourceValuesReady, firstR253SourceValueSnapshot);
+    require(
+        r254MissingLiveIndex.sourceValueSnapshotMatches &&
+        !r254MissingLiveIndex.liveIndexBufferMatches &&
+        !r254MissingLiveIndex.ready &&
+        r254MissingLiveIndex.snapshotToken == 0 &&
+        !programmableCache.validate_indexed_live_index_binding_snapshot(
+            d3d.context, d3d.device,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            r253SourceValuesReady, firstR253SourceValueSnapshot,
+            firstR254LiveIndexSnapshot),
+        "R254 rejects live IA index-buffer identity drift");
+
+    d3d.context->IASetIndexBuffer(
+        managedIndexBuffer.mirror_buffer(),
+        DXGI_FORMAT_R32_UINT, geometryIndexOffset);
+    const auto r254FormatDrift =
+        programmableCache.indexed_live_index_binding_readiness(
+            d3d.context, d3d.device,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            r253SourceValuesReady, firstR253SourceValueSnapshot);
+    require(
+        r254FormatDrift.liveIndexBufferMatches &&
+        !r254FormatDrift.liveIndexFormatMatches &&
+        !r254FormatDrift.ready &&
+        r254FormatDrift.snapshotToken == 0,
+        "R254 rejects live IA index-format drift");
+
+    d3d.context->IASetIndexBuffer(
+        managedIndexBuffer.mirror_buffer(),
+        DXGI_FORMAT_R16_UINT, geometryIndexOffset + 2u);
+    const auto r254OffsetDrift =
+        programmableCache.indexed_live_index_binding_readiness(
+            d3d.context, d3d.device,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            r253SourceValuesReady, firstR253SourceValueSnapshot);
+    require(
+        r254OffsetDrift.liveIndexBufferMatches &&
+        r254OffsetDrift.liveIndexFormatMatches &&
+        !r254OffsetDrift.liveIndexOffsetMatches &&
+        !r254OffsetDrift.ready &&
+        r254OffsetDrift.snapshotToken == 0,
+        "R254 rejects live IA index-offset drift");
+
+    d3d.context->IASetIndexBuffer(
+        managedIndexBuffer.mirror_buffer(),
+        DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+    require(
+        programmableCache.validate_indexed_live_index_binding_snapshot(
+            d3d.context, d3d.device,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            r253SourceValuesReady, firstR253SourceValueSnapshot,
+            firstR254LiveIndexSnapshot),
+        "R254 fresh live IA receipt revalidates after exact binding restore");
+
     const auto r252DeclaredRangeExcludesZero =
         programmableCache.indexed_direct_dispatch_readiness(
             d3d.context, d3d.device, programmablePair,

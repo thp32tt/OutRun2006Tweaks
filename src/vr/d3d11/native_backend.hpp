@@ -1600,6 +1600,34 @@ struct NativeProgrammableShaderIndexedSourceValueReadiness {
     std::uint64_t snapshotToken{};
 };
 
+// R254 reobserves the live IA index-buffer binding after the sealed R253
+// source-value receipt. This creates an explicit pre-Draw freshness proof for
+// buffer identity, DXGI index format and byte offset without issuing DrawIndexed
+// or activating NativeDrawPath.
+struct NativeProgrammableShaderIndexedLiveIndexBindingReadiness {
+    bool inputValid{};
+    bool sourceValueReady{};
+    bool sourceValueSnapshotMatches{};
+    bool sourceValueFormatMatches{};
+    bool indexMirrorReady{};
+    bool indexMirrorSnapshotMatches{};
+    bool contextDeviceMatches{};
+    bool liveIndexBufferMatches{};
+    bool liveIndexFormatMatches{};
+    bool liveIndexOffsetMatches{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    DXGI_FORMAT expectedIndexFormat = DXGI_FORMAT_UNKNOWN;
+    DXGI_FORMAT observedIndexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT expectedIndexOffset{};
+    UINT observedIndexOffset{};
+    std::uint64_t expectedIndexBufferIdentity{};
+    std::uint64_t observedIndexBufferIdentity{};
+    std::uint64_t sourceValueSnapshotToken{};
+    std::uint64_t indexMirrorSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;
@@ -2157,6 +2185,26 @@ public:
         UINT startIndex,
         std::uint64_t directDispatchSnapshotToken,
         std::uint64_t sourceValueSnapshotToken) const noexcept;
+    [[nodiscard]] NativeProgrammableShaderIndexedLiveIndexBindingReadiness
+    indexed_live_index_binding_readiness(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const NativeManagedBufferShadow& indexBuffer,
+        std::uint64_t indexBufferSnapshotToken,
+        DXGI_FORMAT indexFormat,
+        UINT indexOffset,
+        const NativeProgrammableShaderIndexedSourceValueReadiness& sourceValues,
+        std::uint64_t sourceValueSnapshotToken) const noexcept;
+    [[nodiscard]] bool validate_indexed_live_index_binding_snapshot(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const NativeManagedBufferShadow& indexBuffer,
+        std::uint64_t indexBufferSnapshotToken,
+        DXGI_FORMAT indexFormat,
+        UINT indexOffset,
+        const NativeProgrammableShaderIndexedSourceValueReadiness& sourceValues,
+        std::uint64_t sourceValueSnapshotToken,
+        std::uint64_t liveIndexBindingSnapshotToken) const noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {

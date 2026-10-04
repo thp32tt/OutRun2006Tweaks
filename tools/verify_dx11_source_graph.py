@@ -10018,6 +10018,41 @@ def main() -> None:
             + ", ".join(missing_r253_programmable_indexed_source_value)
         )
 
+    r254_programmable_live_index_binding_contract = [
+        ("struct NativeProgrammableShaderIndexedLiveIndexBindingReadiness",
+         NATIVE_BACKEND_HPP, "R254 programmable live IA index-binding readiness type"),
+        ("indexed_live_index_binding_readiness(",
+         NATIVE_BACKEND_HPP, "R254 live IA index-binding readiness declaration"),
+        ("validate_indexed_live_index_binding_snapshot(",
+         NATIVE_BACKEND_HPP, "R254 live IA snapshot validator"),
+        ("expectedContext->IAGetIndexBuffer(",
+         NATIVE_BACKEND_CPP, "R254 fresh live IA index-buffer reobservation"),
+        ("out.liveIndexBufferMatches =",
+         NATIVE_BACKEND_CPP, "R254 exact live index-buffer identity"),
+        ("out.liveIndexFormatMatches =",
+         NATIVE_BACKEND_CPP, "R254 exact live index-format identity"),
+        ("out.liveIndexOffsetMatches =",
+         NATIVE_BACKEND_CPP, "R254 exact live index-offset identity"),
+        ("R254 seals fresh live IA index buffer format and offset after R253",
+         CONSTANT_BUFFER_PROBE, "R254 positive fresh IA receipt regression"),
+        ("R254 rejects live IA index-buffer identity drift",
+         CONSTANT_BUFFER_PROBE, "R254 live index-buffer drift regression"),
+        ("R254 rejects live IA index-format drift",
+         CONSTANT_BUFFER_PROBE, "R254 live index-format drift regression"),
+        ("R254 rejects live IA index-offset drift",
+         CONSTANT_BUFFER_PROBE, "R254 live index-offset drift regression"),
+    ]
+    missing_r254_programmable_live_index_binding = [
+        meaning for token, source, meaning
+        in r254_programmable_live_index_binding_contract
+        if token not in source
+    ]
+    if missing_r254_programmable_live_index_binding:
+        raise SystemExit(
+            "DX11 R254 programmable live index-binding drift: "
+            + ", ".join(missing_r254_programmable_live_index_binding)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

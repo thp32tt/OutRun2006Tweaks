@@ -8013,6 +8013,159 @@ bool NativeProgrammableShaderPairCache::validate_indexed_source_value_snapshot(
     return current.ready && current.snapshotToken == sourceValueSnapshotToken;
 }
 
+NativeProgrammableShaderIndexedLiveIndexBindingReadiness
+NativeProgrammableShaderPairCache::indexed_live_index_binding_readiness(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const NativeManagedBufferShadow& indexBuffer,
+    std::uint64_t indexBufferSnapshotToken,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset,
+    const NativeProgrammableShaderIndexedSourceValueReadiness& sourceValues,
+    std::uint64_t sourceValueSnapshotToken) const noexcept {
+
+    NativeProgrammableShaderIndexedLiveIndexBindingReadiness out{};
+    out.expectedIndexFormat = indexFormat;
+    out.expectedIndexOffset = indexOffset;
+    out.sourceValueSnapshotToken = sourceValueSnapshotToken;
+    out.indexMirrorSnapshotToken = indexBufferSnapshotToken;
+    out.expectedIndexBufferIdentity = static_cast<std::uint64_t>(
+        reinterpret_cast<std::uintptr_t>(indexBuffer.mirror_buffer()));
+
+    const UINT indexElementBytes =
+        indexFormat == DXGI_FORMAT_R16_UINT ? 2u :
+        indexFormat == DXGI_FORMAT_R32_UINT ? 4u : 0u;
+    const D3DFORMAT sourceIndexFormat =
+        indexFormat == DXGI_FORMAT_R16_UINT ? D3DFMT_INDEX16 :
+        indexFormat == DXGI_FORMAT_R32_UINT ? D3DFMT_INDEX32 :
+        D3DFMT_UNKNOWN;
+    out.inputValid =
+        expectedContext != nullptr && expectedDevice != nullptr &&
+        indexBufferSnapshotToken != 0 && sourceValueSnapshotToken != 0 &&
+        indexElementBytes != 0 &&
+        (indexOffset % indexElementBytes) == 0 &&
+        out.expectedIndexBufferIdentity != 0;
+
+    out.sourceValueReady = sourceValues.ready;
+    std::uint64_t sealedSourceValueToken = 0;
+    if (sourceValues.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, sourceValues.directDispatchSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, sourceValues.indexMirrorSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, sourceValues.sourceValueSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(sourceValues.sourceIndexFormat));
+        token = mix_readiness_snapshot_token(token, sourceValues.scanStartIndex);
+        token = mix_readiness_snapshot_token(token, sourceValues.indexCount);
+        token = mix_readiness_snapshot_token(token, sourceValues.minVertexIndex);
+        token = mix_readiness_snapshot_token(token, sourceValues.maxVertexIndex);
+        token = mix_readiness_snapshot_token(token, sourceValues.observedMinIndex);
+        token = mix_readiness_snapshot_token(token, sourceValues.observedMaxIndex);
+        token = mix_readiness_snapshot_token(token, sourceValues.sourceContentHash);
+        token = mix_readiness_snapshot_token(token, 0x253u);
+        sealedSourceValueToken = token == 0 ? 1 : token;
+    }
+    out.sourceValueSnapshotMatches =
+        sourceValues.ready &&
+        sourceValues.snapshotToken == sourceValueSnapshotToken &&
+        sealedSourceValueToken == sourceValueSnapshotToken;
+    out.sourceValueFormatMatches =
+        sourceIndexFormat != D3DFMT_UNKNOWN &&
+        sourceValues.sourceIndexFormat == sourceIndexFormat;
+
+    const auto mirror = indexBuffer.mirror_readiness(expectedDevice);
+    out.indexMirrorReady = mirror.ready && mirror.role == ResourceRole::Index;
+    out.indexMirrorSnapshotMatches =
+        out.indexMirrorReady &&
+        mirror.snapshotToken == indexBufferSnapshotToken &&
+        sourceValues.indexMirrorSnapshotToken == indexBufferSnapshotToken;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    if (expectedContext)
+        expectedContext->GetDevice(contextDevice.ReleaseAndGetAddressOf());
+    out.contextDeviceMatches =
+        contextDevice.Get() != nullptr &&
+        contextDevice.Get() == expectedDevice;
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer> observedIndex;
+    DXGI_FORMAT observedIndexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT observedIndexOffset = 0;
+    if (expectedContext) {
+        expectedContext->IAGetIndexBuffer(
+            observedIndex.ReleaseAndGetAddressOf(),
+            &observedIndexFormat, &observedIndexOffset);
+    }
+    out.observedIndexFormat = observedIndexFormat;
+    out.observedIndexOffset = observedIndexOffset;
+    out.observedIndexBufferIdentity = static_cast<std::uint64_t>(
+        reinterpret_cast<std::uintptr_t>(observedIndex.Get()));
+    out.liveIndexBufferMatches =
+        observedIndex.Get() != nullptr &&
+        observedIndex.Get() == indexBuffer.mirror_buffer();
+    out.liveIndexFormatMatches = observedIndexFormat == indexFormat;
+    out.liveIndexOffsetMatches = observedIndexOffset == indexOffset;
+    out.componentSnapshotsPresent =
+        sourceValueSnapshotToken != 0 &&
+        mirror.snapshotToken != 0;
+    out.ready =
+        out.inputValid &&
+        out.sourceValueReady &&
+        out.sourceValueSnapshotMatches &&
+        out.sourceValueFormatMatches &&
+        out.indexMirrorReady &&
+        out.indexMirrorSnapshotMatches &&
+        out.contextDeviceMatches &&
+        out.liveIndexBufferMatches &&
+        out.liveIndexFormatMatches &&
+        out.liveIndexOffsetMatches &&
+        out.componentSnapshotsPresent;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, out.sourceValueSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.indexMirrorSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.expectedIndexBufferIdentity);
+        token = mix_readiness_snapshot_token(
+            token, out.observedIndexBufferIdentity);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.expectedIndexFormat));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.observedIndexFormat));
+        token = mix_readiness_snapshot_token(token, out.expectedIndexOffset);
+        token = mix_readiness_snapshot_token(token, out.observedIndexOffset);
+        token = mix_readiness_snapshot_token(token, 0x254u);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeProgrammableShaderPairCache::
+validate_indexed_live_index_binding_snapshot(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const NativeManagedBufferShadow& indexBuffer,
+    std::uint64_t indexBufferSnapshotToken,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset,
+    const NativeProgrammableShaderIndexedSourceValueReadiness& sourceValues,
+    std::uint64_t sourceValueSnapshotToken,
+    std::uint64_t liveIndexBindingSnapshotToken) const noexcept {
+    if (liveIndexBindingSnapshotToken == 0)
+        return false;
+    const auto current = indexed_live_index_binding_readiness(
+        expectedContext, expectedDevice, indexBuffer,
+        indexBufferSnapshotToken, indexFormat, indexOffset,
+        sourceValues, sourceValueSnapshotToken);
+    return current.ready &&
+           current.snapshotToken == liveIndexBindingSnapshotToken;
+}
+
 NativeFixedFunctionIndexedSourceRangeReadiness
 compose_fixed_function_indexed_source_range_readiness(
     D3DPRIMITIVETYPE primitive,
