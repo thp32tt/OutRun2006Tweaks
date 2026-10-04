@@ -20,7 +20,9 @@
     "top_ghost": 0,
     "goal": 0
   },
-  "worker_status": "A_RECOVERY11_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "worker_status": "A_RECOVERY11_SLANT_SELF_QA_PASS_PENDING_C_AND_INGAME",
   "runtime_validation": "UNTESTED",
-  "report": "localization/graphics/role_A/20261005-A-RECOVERY11/A_RECOVERY11_BF3EE5C6_REPORT.json"
+  "report": "localization/graphics/role_A/20261005-A-RECOVERY11/A_RECOVERY11_BF3EE5C6_REPORT.json",
+  "controller_visual_qa": "PASS_SOURCE_OLD_NEW_FULL_RAW",
+  "c110_independent_machine_qa": "PASS_PENDING_C_CONTROLLER_VISUAL"
 }

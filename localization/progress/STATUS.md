@@ -910,3 +910,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Global producer REWORK is now BF3EE5C6, 53CE39D5, 788CE557, C075FB49, FD90AA9. Remaining localize_text pending-C approvals = 0; pending_artwork = 50. Queue sanity remains 137 rows = 79 localize_text + 47 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve.
 - RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_MACHINE_QA.json and localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_CONTROLLER_FINAL_QA.json.
+
+## 2026-10-05 00:30 KST — A recovery11 BF3EE5C6 source-slant rework reconciliation
+- Consumed the already-landed hosted A_RECOVERY11 worker output instead of repeating C109-returned index 49 BF3EE5C6. Superseded candidate 30cc2167b1650ab0a7b1c579c7d29118065007f0474f7207ce993ab1b19e45fa; current candidate 7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68.
+- Reworked the 11 physical occurrences C109 rejected for missing source italic/slant geometry. TOP Ghost Car!! and GOAL! remain pixel-identical to the prior style-accepted localized result.
+- A static QA PASS: 13/13 readable+raw exact bbox, 13/13 source-size ceiling, 13/13 positive margins, clean/final validators PASS, source residue=0, changed/alpha/protected outside exact bboxes=0, and no changes vs input outside the 11 C109-failed bboxes.
+- Controller SOURCE | OLD | NEW, full-atlas and raw-orientation visual review PASS: Korean labels now visibly reproduce the source right-leaning italic/slant family while retaining the original fill/outline/shadow treatment. No residue, clipping, overlap, seam, halo, protected-art damage or orientation regression observed.
+- Independent C110 machine report already present on this SHA also PASSes exact header, 13/13 bbox+size, source removal, protected/outside gates and localized pair overlap/touch=0. C controller visual/final decision remains pending.
+- Current pending_artwork localize_text count: 50; localize_text queue rows still carrying producer REWORK/HOLD statuses: 4 (100,106,111,121). RUNTIME_VALIDATION=UNTESTED; no VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_A/20261005-A-RECOVERY11/ and localization/graphics/role_C/20261005-C110-NEW-AB/C110_BF3EE5C6_MACHINE_QA.json.

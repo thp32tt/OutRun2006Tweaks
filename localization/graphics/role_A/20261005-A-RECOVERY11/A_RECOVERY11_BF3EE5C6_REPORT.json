@@ -749,7 +749,10 @@
     "clean_plate_source_text_residue_pixels": 0,
     "changes_vs_input_outside_11_failed_bboxes": 0
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_OLD_NEW_FULL_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A_RECOVERY11_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_RECOVERY11_SLANT_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_qa_notes": "Manual SOURCE|OLD|NEW row-contact, full SOURCE/OLD/FINAL, and raw mirror_y review PASS. The 11 C109-returned source families now visibly retain the source right-leaning italic/slant geometry while preserving their prior fill/outline/shadow families. TOP Ghost Car!! and GOAL! were left pixel-identical to the prior C109 style-accepted candidate. No source residue, clipping, overlap, seam, halo, protected-art damage, or orientation regression is visible.",
+  "c110_independent_machine_qa": "PASS_PENDING_C_CONTROLLER_VISUAL",
+  "c110_machine_report": "localization/graphics/role_C/20261005-C110-NEW-AB/C110_BF3EE5C6_MACHINE_QA.json"
 }

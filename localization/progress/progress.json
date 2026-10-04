@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T00:01:26+09:00",
+  "updated_at_kst": "2026-10-05T00:30:26+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C109 finalized AD720950 and 2B0863D6 as static pixel+visual PASS pending in-game. BF3EE5C6, C075FB49 and FD90AA9 were returned for source-style slant/italic mismatch; existing 53CE39D5 and 788CE557 source-residue REWORK remain. No localize_text pending-C approvals remain; pending_artwork remains 50.",
+  "next_checkpoint": "A_RECOVERY11 resolved BF3EE5C6 C109 slant mismatch with candidate 7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68; A static/visual self-QA PASS and C110 independent machine QA PASS pending C controller visual/final QA. Remaining producer REWORK includes C075FB49/FD90AA9 source slant plus even-lane 53CE39D5/788CE557 source residue; pending_artwork localize_text remains 50.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -267,15 +267,13 @@
     "next_hd_rework": {
       "status": "SOURCE_STYLE_OR_ZERO_RESIDUE_REWORK_REQUIRED",
       "assets": [
-        "BF3EE5C6",
         "53CE39D5",
         "788CE557",
         "C075FB49",
         "FD90AA9"
       ],
-      "remaining": 5,
-      "failed_assets": 5,
-      "report": "localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_CONTROLLER_FINAL_QA.json"
+      "remaining": 4,
+      "note": "BF3EE5C6 moved to A_RECOVERY11 self-QA PASS pending C controller visual/final QA."
     },
     "latest_d_final_qa": {
       "run": "D85",
