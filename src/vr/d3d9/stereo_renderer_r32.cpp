@@ -1379,16 +1379,16 @@ namespace OutRunVRStereo
             {
                 const auto r31 = R31InstallStatus();
                 const auto r22 = R22InstallStatus();
-                const auto r13 = R13InstallState.load(std::memory_order_acquire);
+                const auto r13 = R13InstallStatus();
                 if (r31 == State::Failed || r22 == State::Failed ||
-                    r13 == R13InstallFailed)
+                    r13 == State::Failed)
                 {
                     R32InstallState.store(State::Failed, std::memory_order_release);
                     HookManager::ReportAsyncResult("OpenXRVRStereoR32Review", false);
                     return 0;
                 }
                 if (r31 == State::Ready && r22 == State::Ready &&
-                    r13 == R13InstallReady)
+                    r13 == State::Ready)
                 {
                     const auto disabled = safetyhook::InlineHook::StartDisabled;
                     R32ResetR22Hook = safetyhook::create_inline(
