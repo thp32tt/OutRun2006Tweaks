@@ -1124,7 +1124,13 @@
     "random_music": 0
   },
   "preserved_25_all_zero": true,
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS",
   "runtime_validation": "UNTESTED",
-  "status": "A_RECOVERY13_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_RECOVERY13_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_evidence": [
+    "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_STYLE_RETURN_CONTACT_SOURCE_OLD_NEW.jpg",
+    "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FINAL_READABLE_GRAY_QA.jpg",
+    "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FINAL_RAW_GRAY_QA.jpg"
+  ],
+  "controller_visual_note": "PASS. SOURCE|OLD|NEW contact review confirms the four C109-returned Korean layers now reproduce the source right-leaning italic/slant family while retaining the accepted fill/outline/effect treatment. Full readable and raw mirror_y review shows no new residue, clipping, overlap, seam, halo, protected-art damage, or orientation regression."
 }
