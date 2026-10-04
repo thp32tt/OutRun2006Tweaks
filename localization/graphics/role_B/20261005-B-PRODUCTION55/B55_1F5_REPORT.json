@@ -51,7 +51,7 @@
       "source_effect_pixels": 1149,
       "source_alpha_min": 5,
       "source_alpha_max": 255,
-      "source_alpha_median": 255.0,
+      "source_alpha_median": 255,
       "clean_background_rgba": [
         101,
         97,
@@ -121,7 +121,7 @@
       "source_effect_pixels": 2233,
       "source_alpha_min": 1,
       "source_alpha_max": 255,
-      "source_alpha_median": 255.0,
+      "source_alpha_median": 255,
       "clean_background_rgba": [
         101,
         97,
@@ -191,7 +191,7 @@
       "source_effect_pixels": 2278,
       "source_alpha_min": 1,
       "source_alpha_max": 255,
-      "source_alpha_median": 255.0,
+      "source_alpha_median": 255,
       "clean_background_rgba": [
         101,
         97,
@@ -259,7 +259,7 @@
       "source_effect_pixels": 2286,
       "source_alpha_min": 1,
       "source_alpha_max": 255,
-      "source_alpha_median": 255.0,
+      "source_alpha_median": 255,
       "clean_background_rgba": [
         101,
         97,
@@ -321,7 +321,8 @@
     "stage_names": "not_applicable",
     "multi_line": "not_applicable"
   },
-  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "manual_visual_qa": "PASS_CONTROLLER_SOURCE_CLEAN_FINAL_ROW_RAW",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_PRODUCTION55_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B_PRODUCTION55_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_self_qa_report": "localization/graphics/role_B/20261005-B-PRODUCTION55/B55_CONTROLLER_SELF_QA.json"
 }
