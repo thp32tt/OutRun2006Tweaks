@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "111c99a0cae97580a35036862980f76a0b24b21b",
+  "state_parent_head": "6bd9305265fd2179251dc14f8d2e7705c0beb18f",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -58,9 +58,9 @@
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
-    "production_id": "CONVERSION-DX11-00351",
-    "event_id": "CONVERSION-DX11-00351-E001",
-    "event_type": "retry",
+    "production_id": "CONVERSION-DXVK-00352",
+    "event_id": "CONVERSION-DXVK-00352-E002",
+    "event_type": "rollover",
     "dxvk_disassembly_evidence_run_id": 37179754850,
     "dxvk_disassembly_evidence_job_id": 111369744325,
     "backend_conversion_gate_run_id": 37179754832,
@@ -68,10 +68,45 @@
     "runtime_test_performed": false,
     "issue14_validation_comment_id": 5976939735,
     "controller_dispatch": {
+      "production_id": "CONVERSION-DXVK-00352",
+      "event_id": "CONVERSION-DXVK-00352-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "prior_controller_dispatch": {
       "production_id": "CONVERSION-DX11-00351",
       "event_id": "CONVERSION-DX11-00351-E001",
       "event_type": "retry",
       "attempt": "1/3"
+    },
+    "material_origin_dispatch": {
+      "production_id": "CONVERSION-DX11-00351",
+      "event_id": "CONVERSION-DX11-00351-E001",
+      "event_type": "retry",
+      "attempt": "1/3"
+    },
+    "dispatch_metadata_correction": {
+      "reason": "The current user-issued rollover dispatch is authoritative: TASK/PRODUCTION CONVERSION-DXVK-00352, EVENT CONVERSION-DXVK-00352-E002, CHAT_ROLLOVER=2. The earlier C6 writer persisted the material-origin retry dispatch CONVERSION-DX11-00351-E001. This rollover is not a retry, so ATTEMPT remains 1/3. Material result, validation-bearing SHA, exact-SHA gate evidence, RUNTIME_VALIDATION and next frontier are unchanged.",
+      "corrected_to": {
+        "production_id": "CONVERSION-DXVK-00352",
+        "event_id": "CONVERSION-DXVK-00352-E002",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 2,
+        "rollover_is_retry": false,
+        "resume_reason": "Retry persisted after one recovery attempt"
+      },
+      "attempt_incremented": false,
+      "material_result_unchanged": true,
+      "validation_bearing_result_unchanged": true,
+      "automation_validation_unchanged": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
+      "runtime_validation_unchanged": "UNTESTED"
     }
   },
   "latest_static_evidence": {
