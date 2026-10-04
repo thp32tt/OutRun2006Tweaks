@@ -64,7 +64,7 @@ if len(rows)!=15: raise RuntimeError(("C row count",len(rows)))
 # C_OVERLAP05 tracked one SPECIAL REQUEST occurrence, but the atlas contains a second
 # text-only SPECIAL REQUEST sprite at stock region 29. Treat duplicate on-screen text
 # as a separate localized occurrence rather than leaving visible English in the final.
-alt_cell=[1640,984,2640,1152]
+alt_cell=[2276,352,3276,520]
 abb=src.crop(tuple(alt_cell)).getchannel("A").getbbox()
 if not abb: raise RuntimeError("second SPECIAL REQUEST source bbox missing")
 alt_bbox=[alt_cell[0]+abb[0],alt_cell[1]+abb[1],alt_cell[0]+abb[2],alt_cell[1]+abb[3]]
