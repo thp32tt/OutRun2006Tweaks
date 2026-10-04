@@ -218,7 +218,23 @@ def render_target(key,text,bb,slant,bg_kind):
         grad=Image.fromarray(arr,'RGBA'); tile.paste(grad,(0,0),fillmask)
         tile=shear(tile,slant); gb=tile.getchannel('A').getbbox(); tile=tile.crop(gb)
         if tile.width>W-2 or tile.height>H-2: continue
-        layer=Image.new('RGBA',src.size,(0,0,0,0)); px=x0+(W-tile.width)//2; py=y0+(H-tile.height)//2; layer.alpha_composite(tile,(px,py)); lb=layer.getchannel('A').getbbox()
+        layer=Image.new('RGBA',src.size,(0,0,0,0)); px=x0+(W-tile.width)//2; py=y0+(H-tile.height)//2; layer.alpha_composite(tile,(px,py))
+        if key=='slipstream':
+            # Reproduce the source speed-streak effect behind the localized lettering.
+            fx=Image.new('RGBA',src.size,(0,0,0,0)); fd=ImageDraw.Draw(fx); cy=(y0+y1)//2
+            for off,aa in [(-18,35),(-12,50),(-6,65),(0,80),(6,65),(12,50),(18,35)]:
+                yy=cy+off
+                if y0+2<=yy<y1-2: fd.line((x0+3,yy,x1-4,yy),fill=(24,116,148,aa),width=1)
+            fx.alpha_composite(layer); layer=fx
+        elif key=='new_record':
+            # Source artwork has a soft yellow halo/cloud around NEW Record!!. Rebuild the same
+            # effect around the Korean glyphs rather than dropping the source glow entirely.
+            local_a=layer.getchannel('A').crop((x0,y0,x1,y1)).filter(ImageFilter.GaussianBlur(radius=max(4,int(round(fs*.09)))))
+            local_a=local_a.point(lambda v: min(120,int(v*.55)) if v>5 else 0)
+            ld=ImageDraw.Draw(local_a); ld.rectangle((0,0,W-1,1),fill=0); ld.rectangle((0,H-2,W-1,H-1),fill=0); ld.rectangle((0,0,1,H-1),fill=0); ld.rectangle((W-2,0,W-1,H-1),fill=0)
+            glow=Image.new('RGBA',(W,H),(255,222,72,0)); glow.putalpha(local_a)
+            fx=Image.new('RGBA',src.size,(0,0,0,0)); fx.alpha_composite(glow,(x0,y0)); fx.alpha_composite(layer); layer=fx
+        lb=layer.getchannel('A').getbbox()
         if lb and lb[0]>=x0 and lb[1]>=y0 and lb[2]<=x1 and lb[3]<=y1: return layer,fs,sw,lb,{'top':top,'bottom':bottom,'outline':outline}
     raise RuntimeError(f'cannot fit {text} in {bb}')
 
