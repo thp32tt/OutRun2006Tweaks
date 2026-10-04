@@ -815,9 +815,13 @@ namespace
 
             if (revision < 2)
             {
-                // Road/slip tactile transport is standardized across wheel
-                // models. Hardware Spring/Damper remain capability-driven.
-                Settings::WheelFFBUsePeriodicEffects = false;
+                // Modern DD defaults to the R3-compatible ConstantForce tactile
+                // transport. Original-model shortcuts own their verified
+                // periodic transports and must not be disabled by migration.
+                const auto migrationModel = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                if (migrationModel == WheelFFBMath::Model::ModernDD)
+                    Settings::WheelFFBUsePeriodicEffects = false;
                 Settings::WheelFFBFeelRevision = 2;
                 revision = 2;
                 changed = true;
@@ -863,11 +867,18 @@ namespace
 
             if (revision < 5)
             {
-                // Old F11 presets used a different response envelope and could
-                // undo v0.2 tuning. Migrate only their exact signatures; all
-                // other manual values remain untouched.
-                normalize_legacy_preset(false);
-                Settings::WheelFFBUsePeriodicEffects = false;
+                // Old Modern F11 presets used a different response envelope and
+                // could undo v0.2 tuning. Migrate only their exact signatures.
+                // Do not globally force Periodic OFF: Arcade/Hybrid/PS2 modes
+                // deliberately own Sine/Triangle transports.
+                const bool migratedLegacyModern = normalize_legacy_preset(false);
+                const auto migrationModel = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                if (migratedLegacyModern ||
+                    migrationModel == WheelFFBMath::Model::ModernDD)
+                {
+                    Settings::WheelFFBUsePeriodicEffects = false;
+                }
                 Settings::WheelFFBFeelRevision = 5;
                 revision = 5;
                 changed = true;
@@ -1011,7 +1022,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_physics_preset();
-                    Settings::WheelFFBFeelRevision = 5;
+                    Settings::WheelFFBFeelRevision = 6;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
@@ -1027,7 +1038,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_natural_preset();
-                    Settings::WheelFFBFeelRevision = 5;
+                    Settings::WheelFFBFeelRevision = 6;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
