@@ -131,7 +131,7 @@ index,path,action,artwork_status,transcription_status,notes
 228,textures/load/spr_sprani_sumo_fe_cvt_Exst/E7F6E9B7_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass11 transcription saved
 230,textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass11 transcription saved
 231,textures/load/spr_sprani_sumo_fe_cvt_Exst/EBE401C8_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
-232,textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
+232,textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds,localize_text,pending_artwork,transcribed_reviewed,B_PRODUCTION48 controller visual FAIL: historical-diff discovery missed large blue JOIN GAME/CREATE GAME occurrences and fresh Hangul showed tofu; rejected candidate removed; requires full exact-source physical-occurrence discovery + verified Korean font coverage; RUNTIME_VALIDATION=UNTESTED
 236,textures/load/spr_sprani_sumo_fe_cvt_Exst/FEF70E85_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 237,textures/load/spr_sprani_sumo_fe_cvt_Exst/FF514CEB_512x512.dds,localize_text,pending_artwork,transcribed_reviewed,pass1 transcription saved
 238,textures/load/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.dds,zoom_review,blocked_review,needs_zoom_review,

@@ -149,7 +149,12 @@
     "source_effect_alpha_remaining": 0,
     "status": "PASS"
   },
-  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "manual_visual_qa": "FAIL",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_PRODUCTION48_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B_PRODUCTION48_REWORK_REQUIRED_CONTROLLER_VISUAL_FAIL",
+  "controller_visual_failures": [
+    "historical-diff discovery captured only two small JOIN/CREATE labels while exact source also contains large blue JOIN GAME / CREATE GAME physical occurrences",
+    "fresh Hangul render visibly produced tofu/missing-glyph boxes; font coverage gate failed",
+    "candidate rejected and removed; no completion credit"
+  ]
 }

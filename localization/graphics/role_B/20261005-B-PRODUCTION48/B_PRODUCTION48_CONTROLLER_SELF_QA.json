@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION48",
+  "queue_index": 232,
+  "asset": "EBFC709F",
+  "candidate_sha256": "818de8a051cdab193a1d4cf46940b654c5108d52405199cc35ec59ea676b7963",
+  "machine_static": "PASS_2_OF_2_DISCOVERED_REGIONS_ONLY",
+  "controller_visual_qa": "FAIL",
+  "decision": "REWORK_REQUIRED",
+  "candidate_retained": false,
+  "failures": [
+    "historical-diff discovery captured only two small JOIN/CREATE labels while exact source also contains large blue JOIN GAME / CREATE GAME physical occurrences",
+    "fresh Hangul render visibly produced tofu/missing-glyph boxes; font coverage gate failed",
+    "candidate rejected and removed; no completion credit"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
