@@ -7,12 +7,12 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "status": "IN_PROGRESS_REPAIR_1_AWAITING_EXACT_SHA_GATE",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
   "base_sha": "e43981f939e0f67ac98500e52f91166d62c1f33d",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "PENDING_REPAIR_RESULT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_REPAIR_RESULT_COMMIT_SHA",
   "result_marker": "[AUTO:CONVERSION-DX11-00349]",
   "selected_work_item": "DX11_R238_PROGRAMMABLE_SHADER_PAIR_INVENTORY",
   "summary": "R238 extracts a dedicated current programmable VS/PS bytecode-pair inventory from existing detailed DX11 census signatures and keeps coverage fail-closed when signature detail/hash caps or shader introspection gaps make the inventory incomplete.",
@@ -43,13 +43,19 @@
       "evidence": "Parse the existing R85 shader identity block, dedupe complete programmable VS/PS bytecode pairs across current signature records, export pair metadata and signature references, and fail pair-coverage completeness closed on detail/hash caps, missing shader blocks, introspection failure or mixed pairs. Added positive dedupe and detail-cap regressions plus source-graph drift guards."
     },
     "C3_VALIDATE": {
-      "status": "PENDING_EXACT_SHA_GATE",
+      "status": "REPAIR_1_PENDING_EXACT_SHA_GATE",
       "automation_validation": "PENDING",
-      "evidence": "Local auxiliary validation will run analyzer regressions and source-graph checks before publication; the required exact-SHA Backend Conversion Gate remains authoritative for Win32 build/binary and DX11 readiness smoke. No Quest 3/VDXR runtime test performed."
+      "failed_result_sha": "db1f0ef43e9f1d0d9d688c9193ddb8806258f267",
+      "failed_run_id": 37176002720,
+      "failed_job_id": 111358609972,
+      "failure": "Gate #1926 failed at Verify one-click structure contract because transport of the validated analyzer file accidentally inserted Remote Desktop Commander response footer text into the published blob. The auxiliary validation export itself remained clean and had passed analyzer regressions/source-graph validation.",
+      "repair": "Republish the already-validated R238 files with chunk framing/footer stripped and verify each GitHub blob SHA against git hash-object before moving the branch ref.",
+      "runtime_validation": "UNTESTED"
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "REPAIR_1_PENDING_RESULT_SHA_PUBLICATION",
+      "failed_material_result_sha": "db1f0ef43e9f1d0d9d688c9193ddb8806258f267",
+      "validation_bearing_result_sha": "PENDING_REPAIR_RESULT_COMMIT_SHA"
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
@@ -81,7 +87,9 @@
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE"
   },
-  "exact_next_action": "Publish the R238 material result without CI skip and require its exact-SHA Backend Conversion Gate."
+  "exact_next_action": "Publish repair result with exact byte-for-byte blob verification and require its exact-SHA Backend Conversion Gate.",
+  "failed_validation_bearing_sha": "db1f0ef43e9f1d0d9d688c9193ddb8806258f267",
+  "failed_validation_run_id": 37176002720,
+  "failed_validation_job_id": 111358609972,
+  "repair_count": 1
 }
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]

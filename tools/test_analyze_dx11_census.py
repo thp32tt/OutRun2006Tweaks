@@ -998,8 +998,7 @@ def main() -> int:
         "AllSourceLogsHaveStartupAndBootstrapOutcome": True,
         "DiagnosticOnly": True,
         "ActivationProof": False,
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]    }
+    }
 
 
     r232_latest_startup_summary_pairing = run_cases(
@@ -1839,5 +1838,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]

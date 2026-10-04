@@ -998,8 +998,7 @@ def main() -> None:
         ("DX11 fixed-function D3DTOP_DOTPRODUCT3 support R193: PASS",
          FIXED_FUNCTION_PIPELINE_PROBE,
          "R193 hosted probe completion"),
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]    ]
+    ]
     missing_r193_d3dtop_dotproduct3 = [
         meaning
         for token, source, meaning in r193_d3dtop_dotproduct3_contract
@@ -1999,8 +1998,7 @@ def main() -> None:
     }
     missing_surface_mirror_contract += [
         meaning
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]        for token, meaning in probe_contract.items()
+        for token, meaning in probe_contract.items()
         if token not in SURFACE_MIRROR_PROBE
     ]
 
@@ -3000,8 +2998,7 @@ def main() -> None:
         (
             "boundInputLayout.Get() == input_layout_.Get()",
             NATIVE_BACKEND_CPP,
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]            "R134 exact IA input-layout identity gate",
+            "R134 exact IA input-layout identity gate",
         ),
         (
             "boundVertexShader.Get() == vertex_shader_.Get()",
@@ -4001,8 +3998,7 @@ def main() -> None:
             NATIVE_BACKEND_CPP,
             "R150 primitive-derived element-count lineage equality",
         ),
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]        (
+        (
             "validate_fixed_function_indexed_direct_dispatch_snapshot(",
             NATIVE_BACKEND_CPP,
             "R150 stale indexed lineage validator",
@@ -5002,8 +4998,7 @@ def main() -> None:
             "DX11 R85 compiler probe requires d3dcompiler.lib in the checked-in CMake graph"
         )
 
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]    r89_link_contract = {
+    r89_link_contract = {
         "target_link_libraries(dx11_input_signature_semantics PUBLIC":
             "R89 input-signature smoke target link block",
         "dxguid.lib":
@@ -6004,7 +5999,6 @@ def main() -> None:
                 "DX11 R99 texture-view source drift: " + meaning
             )
 
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
     for token, meaning in {
         "D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT":
             "SRV-slot fail-closed bound",
@@ -7004,8 +6998,7 @@ def main() -> None:
             "R111 stage readiness descriptor gate",
     }.items():
         if token not in NATIVE_BACKEND_CPP:
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]            raise SystemExit(
+            raise SystemExit(
                 "DX11 R111 managed-mirror descriptor source drift: " + meaning
             )
 
@@ -8005,8 +7998,7 @@ def main() -> None:
             missing_r126_fan_index.append(meaning)
     if missing_r126_fan_index:
         raise SystemExit(
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]            "DX11 R126 generated triangle-fan index-buffer contract drift: "
+            "DX11 R126 generated triangle-fan index-buffer contract drift: "
             + ", ".join(missing_r126_fan_index)
         )
 
@@ -9006,8 +8998,7 @@ def main() -> None:
         )
 
     r228_multi_log_startup_bootstrap_coverage_contract = [
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]        ("latest_startup_by_log: dict[str, dict] = {}",
+        ("latest_startup_by_log: dict[str, dict] = {}",
          DX11_CENSUS_ANALYZER, "R228 per-log latest startup map"),
         ("latest_bootstrap_by_log: dict[str, dict] = {}",
          DX11_CENSUS_ANALYZER, "R228 per-log latest bootstrap map"),
@@ -9347,5 +9338,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
