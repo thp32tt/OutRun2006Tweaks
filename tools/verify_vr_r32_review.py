@@ -260,7 +260,6 @@ r33_guard = require(
     "SetExternalSafetyBlock(!healthy)",
     "R33SynchronizeResetReplayGuardState(",
     "R33ReportInstallResult(",
-    "OpenXRVRStereoR34ResetGuard",
     "Present/pre",
     "R33PresentR32Hook.stdcall<HRESULT>",
 )
@@ -269,13 +268,13 @@ if r33_guard.find("Present/pre") > r33_guard.find("R33PresentR32Hook.stdcall<HRE
 r34_path = ROOT / "src/vr/d3d9/stereo_renderer_r34.cpp"
 if r34_path.exists():
     raise SystemExit("retired R34 source shim reappeared")
-for marker in (
-        "class VRStereoR34ResetGuardHook final : public Hook",
-        'return "OpenXRVRStereoR34ResetGuard";',
-        "const auto r33 = R33InstallStatus();"):
-    if marker not in r33_guard:
+for banned in (
+        "class VRStereoR34ResetGuardHook",
+        "OpenXRVRStereoR34ResetGuard",
+        "R33InstallStatus()"):
+    if banned in r33_guard:
         raise SystemExit(
-            f"R33 final dispatcher missing folded R34 compatibility registration: {marker}")
+            f"R33 retained retired R34 compatibility observer/status alias: {banned}")
 
 r31 = load("src/vr/d3d9/stereo_renderer_r31.cpp")
 end_enable = r31.find(
