@@ -29,6 +29,7 @@ r32 = text("src/vr/d3d9/stereo_renderer_r32.cpp")
 r33 = text("src/vr/d3d9/stereo_renderer_r33.cpp")
 r34 = text("src/vr/d3d9/stereo_renderer_r34.cpp")
 cmake = text("CMakeLists.txt")
+cmake_toml = text("cmake.toml")
 renderer_r29 = text("src/vr/game/outrun_renderer_r29.cpp")
 draw_class = text("src/vr/render/draw_class.hpp")
 raster = text("src/vr/state/d3d9_raster_state.hpp")
@@ -741,6 +742,47 @@ for option in (
         errors.append(f"CMake comparison block must disable R33 final owner: {option}")
     if "src/vr/d3d9/stereo_renderer_r34.cpp" in block:
         errors.append(f"CMake comparison block still toggles obsolete R34 shim owner: {option}")
+
+# CMakeLists.txt is generated from cmake.toml. Guard the generator source too
+# so cmkr cannot silently restore R34 as the compiled stereo owner.
+generator_post_review = re.search(
+    r"set\(OUTRUN_VR_POST_REVIEW_FINAL_TUS(?P<body>.*?)\)",
+    cmake_toml, re.DOTALL)
+if not generator_post_review:
+    errors.append("cmake.toml post-review final-TU list missing")
+else:
+    body = generator_post_review.group("body")
+    if "src/vr/d3d9/stereo_renderer_r33.cpp" not in body:
+        errors.append("cmake.toml full-chain final TU must terminate directly at R33")
+    if "src/vr/d3d9/stereo_renderer_r34.cpp" in body:
+        errors.append("cmake.toml retained R34 shim as post-review compiled final TU")
+if not re.search(
+    r"set_source_files_properties\(\s*src/vr/d3d9/ex_device_upgrade_r14\.cpp\s*"
+    r"src/vr/d3d9/stereo_renderer_r34\.cpp\s*PROPERTIES HEADER_FILE_ONLY TRUE\)",
+    cmake_toml, re.DOTALL):
+    errors.append("cmake.toml must keep R34 shim HEADER_FILE_ONLY in the normal graph")
+generator_owners = re.search(
+    r"set\(_vr_stereo_owner_candidates(?P<body>.*?)\)", cmake_toml, re.DOTALL)
+if not generator_owners:
+    errors.append("cmake.toml stereo-owner candidate list missing")
+else:
+    body = generator_owners.group("body")
+    if "src/vr/d3d9/stereo_renderer_r33.cpp" not in body:
+        errors.append("cmake.toml stereo-owner candidates missing R33 final dispatcher")
+    if "src/vr/d3d9/stereo_renderer_r34.cpp" in body:
+        errors.append("cmake.toml stereo-owner candidates still include R34 shim")
+for option in ("OUTRUN_VR_SAFE_DRAW_COMPARE", "OUTRUN_VR_R26_HUD_COMPARE",
+               "OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE"):
+    start = cmake_toml.find(f"if({option})")
+    end = cmake_toml.find("endif()", start)
+    if start < 0 or end <= start:
+        errors.append(f"cmake.toml comparison block missing: {option}")
+        continue
+    owner_block = cmake_toml[start:end]
+    if "src/vr/d3d9/stereo_renderer_r33.cpp" not in owner_block:
+        errors.append(f"cmake.toml comparison block must disable R33 final owner: {option}")
+    if "src/vr/d3d9/stereo_renderer_r34.cpp" in owner_block:
+        errors.append(f"cmake.toml comparison block still toggles obsolete R34 shim owner: {option}")
 
 for banned in ("R22FailClosedEligibility();", "R22ResetBaselineTracking();"):
     if banned in r33:
