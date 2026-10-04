@@ -249,7 +249,15 @@
           1350,
           1100
         ]
-      }
+      },
+      "source_width": 699,
+      "source_height": 73,
+      "localized_width": 261,
+      "localized_height": 65,
+      "size_delta_width": -438,
+      "size_delta_height": -8,
+      "size_ceiling": "PASS",
+      "multi_line_style_consistency": "NOT_APPLICABLE"
     },
     {
       "key": "players",
@@ -392,7 +400,15 @@
           2300,
           1105
         ]
-      }
+      },
+      "source_width": 374,
+      "source_height": 73,
+      "localized_width": 246,
+      "localized_height": 65,
+      "size_delta_width": -128,
+      "size_delta_height": -8,
+      "size_ceiling": "PASS",
+      "multi_line_style_consistency": "NOT_APPLICABLE"
     },
     {
       "key": "your_friends",
@@ -605,7 +621,15 @@
           3260,
           1105
         ]
-      }
+      },
+      "source_width": 576,
+      "source_height": 69,
+      "localized_width": 188,
+      "localized_height": 61,
+      "size_delta_width": -388,
+      "size_delta_height": -8,
+      "size_ceiling": "PASS",
+      "multi_line_style_consistency": "NOT_APPLICABLE"
     },
     {
       "key": "please_wait",
@@ -768,7 +792,15 @@
           2700,
           1248
         ]
-      }
+      },
+      "source_width": 732,
+      "source_height": 100,
+      "localized_width": 345,
+      "localized_height": 88,
+      "size_delta_width": -387,
+      "size_delta_height": -12,
+      "size_ceiling": "PASS",
+      "multi_line_style_consistency": "NOT_APPLICABLE"
     },
     {
       "key": "time_over",
@@ -851,7 +883,15 @@
           1800,
           1520
         ]
-      }
+      },
+      "source_width": 1369,
+      "source_height": 241,
+      "localized_width": 885,
+      "localized_height": 230,
+      "size_delta_width": -484,
+      "size_delta_height": -11,
+      "size_ceiling": "PASS",
+      "multi_line_style_consistency": "NOT_APPLICABLE"
     },
     {
       "key": "game_over",
@@ -934,7 +974,15 @@
           3414,
           1545
         ]
-      }
+      },
+      "source_width": 1494,
+      "source_height": 238,
+      "localized_width": 874,
+      "localized_height": 228,
+      "size_delta_width": -620,
+      "size_delta_height": -10,
+      "size_ceiling": "PASS",
+      "multi_line_style_consistency": "NOT_APPLICABLE"
     },
     {
       "key": "goal",
@@ -1037,10 +1085,47 @@
           2840,
           2030
         ]
-      }
+      },
+      "source_width": 1194,
+      "source_height": 364,
+      "localized_width": 321,
+      "localized_height": 333,
+      "size_delta_width": -873,
+      "size_delta_height": -31,
+      "size_ceiling": "PASS",
+      "multi_line_style_consistency": "NOT_APPLICABLE"
     }
   ],
-  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "manual_visual_qa": "PASS",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_RECOVERY08_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B_RECOVERY08_CANDIDATE_SELFQA_PASS_PENDING_C_CONTROLLER_VISUAL_AND_INGAME",
+  "worker_run_id": 37194951704,
+  "worker_trigger_head": "9a0945f7c064a04371f7a647016310b9586ab8a0",
+  "worker_output_commit": "f6d56f66feadce2ba55a821d87ceb53c9fd305c3",
+  "policy_revision": "2026-10-04 exact source bbox/size ceiling + per-line style + naming/song preserve policy",
+  "visual_qa": {
+    "source_clean_final_readable": "PASS",
+    "white_background_alpha_review": "PASS",
+    "raw_mirror_y_orientation": "PASS",
+    "row_contact_7_of_7": "PASS",
+    "source_text_residue": "NONE_OBSERVED",
+    "clipping_or_bbox_escape": "NONE",
+    "protected_artwork_damage": "NONE_OBSERVED",
+    "new_overlap": "NONE_OBSERVED",
+    "style_fidelity": "PASS_SOURCE_FAMILY_FILL_GRADIENT_OUTLINE_SLANT_AND_ALIGNMENT",
+    "exact_source_size_ceiling": "PASS_7_OF_7",
+    "multi_line_style_gate": "NOT_APPLICABLE_ALL_LOCALIZED_LABELS_SINGLE_LINE",
+    "stage_naming_policy": "NOT_APPLICABLE_NO_STAGE_NAMES",
+    "song_credit_preservation": "PASS_NO_TARGETED_SONG_OR_CREDIT_PIXELS"
+  },
+  "c99_machine_qa": {
+    "status": "PASS",
+    "candidate_sha256": "ecc4cbb6cdc064d2c7ccccfc378569f1dc7fc8339c46330ec68ec81c8f899df1",
+    "report": "localization/graphics/role_C/20261004-1920-C99/C99_EXACT_SIZE_POLICY_QA.json",
+    "rows_checked": 7,
+    "exact_size_pass": 7,
+    "rework_required": 0,
+    "hold_strict_recheck": 0,
+    "controller_visual_qa": "PENDING"
+  }
 }

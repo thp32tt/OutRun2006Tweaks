@@ -2020,5 +2020,43 @@
     "runtime_validation": "UNTESTED",
     "c_final_qa": "PENDING",
     "in_game_validation": "PENDING"
+  },
+  "b_recovery08_cbf8ecbf": {
+    "run": "20261004-B-RECOVERY08",
+    "queue_index": 50,
+    "status": "B_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_CONTROLLER_VISUAL_AND_INGAME",
+    "worker_run_id": 37194951704,
+    "worker_trigger_head": "9a0945f7c064a04371f7a647016310b9586ab8a0",
+    "worker_output_commit": "f6d56f66feadce2ba55a821d87ceb53c9fd305c3",
+    "source_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+    "candidate_sha256": "ecc4cbb6cdc064d2c7ccccfc378569f1dc7fc8339c46330ec68ec81c8f899df1",
+    "native_rerenders": 7,
+    "all_7_bbox_pass": true,
+    "all_7_exact_size_pass": true,
+    "format": "RGBA32",
+    "dimensions": [
+      4096,
+      2048
+    ],
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "production_report": "localization/graphics/role_B/20261004-B-RECOVERY08/B_RECOVERY08_CBF8ECBF_REPORT.json",
+    "clean_plate_report": "localization/graphics/role_B/20261004-B-RECOVERY08/B_RECOVERY08_CLEAN_PLATE_VALIDATION.json",
+    "final_mask_report": "localization/graphics/role_B/20261004-B-RECOVERY08/B_RECOVERY08_FINAL_MASK_VALIDATION.json",
+    "visual_compare": "localization/graphics/role_B/20261004-B-RECOVERY08/B_RECOVERY08_CBF8ECBF_COMPARE.jpg",
+    "row_contact": "localization/graphics/role_B/20261004-B-RECOVERY08/B_RECOVERY08_CBF8ECBF_ROW_CONTACT.jpg",
+    "raw_compare": "localization/graphics/role_B/20261004-B-RECOVERY08/B_RECOVERY08_CBF8ECBF_RAW_COMPARE.jpg",
+    "c99_exact_size_machine_qa": {
+      "status": "PASS",
+      "report": "localization/graphics/role_C/20261004-1920-C99/C99_EXACT_SIZE_POLICY_QA.json",
+      "candidate_sha256": "ecc4cbb6cdc064d2c7ccccfc378569f1dc7fc8339c46330ec68ec81c8f899df1",
+      "controller_visual_qa": "PENDING"
+    },
+    "runtime_validation": "UNTESTED",
+    "next_b_target_hint": {
+      "index": 86,
+      "asset": "C598919A",
+      "status": "pending_artwork"
+    }
   }
 }

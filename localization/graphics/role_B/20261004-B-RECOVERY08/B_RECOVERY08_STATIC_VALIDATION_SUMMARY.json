@@ -10,5 +10,12 @@
   "target_overlap_pairs": 0,
   "header_128_exact": true,
   "raw_orientation": "mirror_y",
-  "status": "PASS"
+  "status": "SELF_QA_PASS_PENDING_C_CONTROLLER_VISUAL_AND_INGAME",
+  "worker_run_id": 37194951704,
+  "worker_output_commit": "f6d56f66feadce2ba55a821d87ceb53c9fd305c3",
+  "exact_source_size_ceiling": "7/7 PASS",
+  "manual_visual_qa": "PASS",
+  "c99_exact_size_machine_qa": "PASS",
+  "c99_controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
 }
