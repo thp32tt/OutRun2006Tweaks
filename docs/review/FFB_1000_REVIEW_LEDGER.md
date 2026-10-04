@@ -115,3 +115,28 @@ Implemented in R7:
 - C0137 high-volume telemetry is reduced to 5 Hz summary + 1 Hz deep detail.
 
 Research-gated and intentionally unchanged: C0046 physical road-wheel lock mapping, Arcade physical left/right polarity, exact per-contact collisionIndex production gating, exact material-to-Lindbergh event-code equivalence, and unresolved PS2 raw-period/non-zero ConstantForce caller semantics.
+
+
+## R8 test-prep consistency fixes — 2026-10-04
+
+Branch: `ffb-r8-test-prep-20261004`
+
+Before the next MOZA R3 hardware run, two configuration-state issues were
+corrected without adding another force-feel retune:
+
+- **FFB-R0149-F01:** the deterministic baseline for older/partial Model 0
+  profiles still used historical raw `Setting<>` defaults. It now matches the
+  current Universal Physics preset (spring/saturation, SAT trail/lead,
+  weight-transfer, slew/reversal, road/slip/gear and Modern periodic default),
+  so missing keys cannot silently resurrect pre-v0.2 values.
+- **FFB-R0150-F01:** old feel-revision migration steps could force
+  `UsePeriodicEffects=false` regardless of active model. Migration is now
+  model-aware: Modern DD retains the R3-compatible ConstantForce tactile
+  default, while Arcade Original/Hybrid and PS2 Original retain their
+  model-owned Sine/Triangle transports.
+- Current Universal preset buttons stamp feel revision 6 immediately, avoiding
+  an unnecessary revision-only migration on the next launch.
+- Structural verifier guards pin all three contracts.
+
+No RoadWheelLock, Arcade physical polarity, collisionIndex production gate or
+PS2 evidence-gated value is changed in R8.
