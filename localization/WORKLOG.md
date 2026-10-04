@@ -1344,3 +1344,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Candidate `e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be` is unchanged by C and advances to `C139_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. C138 exact-source-mask ambiguity is resolved; producer REWORK remains 0; pending_artwork localize_text=37.
 - Existing `1A43E9D9` remains HIGH_RISK pending mandatory in-game validation; `4F68708E`/`F6811E94` remain strict DXT5 no-candidate HOLD. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_MACHINE_QA.json`.
+
+## 2026-10-05 07:49:35 KST — B58 31C58963 exact-HD candidate self-QA PASS
+- Refreshed the current even shard after C139 finalized 1F5FE6E9; completed PASS assets were not repeated. Selected index 140 `31C58963_512x256.dds` as ONE_STAGE_TO_RENDER: authoritative HD source and 5 atlas cells were known, while semantic binding remained.
+- B56 readable-source inspection proved the cell order `SELECT STAGE / SELECT RACE / SELECT MODE / SHOWROOM / PRESS [Enter-key icon] KEY` and corrected the stale `PRESS START` transcription. The original Enter-key icon is protected and byte/pixel preserved.
+- B57 first candidate passed machine gates but producer visual QA rejected the four white Korean rows as too thin versus the heavy source family. Same invocation B58 reworked them with NotoSansCJK-Bold plus 2px same-color weight; yellow/black `누르세요 | [icon] | 키` retains the source compound style.
+- Final candidate `b6d8bcc2f2cc05d45d4af3fbfab30f0a71e8fa68a89dee4c78b6f8a6aeca4cd3` from source `ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd`: exact 2048x1024 RGBA32 mip1 header/raw `mirror_y`; 6/6 exact bbox+size+positive-margin PASS; clean/final validators PASS; source residue=0, outside=0, alpha-outside=0, protected=0, localized overlap=0, touch=0.
+- Controller SOURCE/CLEAN/FINAL, 2x row-contact and raw mirror_y visual self-QA PASS. No visible English residue, clipping, overlap, seam, halo, protected-icon damage or orientation regression.
+- Queue index 140 advanced to `b58_self_qa_pass_pending_c`; pending_artwork localize_text=37. Independent C final QA and isolated in-game validation remain pending.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION58/B58_31C_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION58/B58_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION58/B58_FINAL_VALIDATION.json`.
