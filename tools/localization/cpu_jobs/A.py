@@ -320,6 +320,7 @@ for row in line_rows:
         "raw_containment":"PASS" if ok else "FAIL",
         "rework_status":"A_PRODUCTION16_NEW_HD_CANDIDATE"
     })
+    rows.append(row)
 
 # Whole-block gate in addition to per-line gates.
 block_delta=changed_mask(clean.crop(tuple(block_g)),decoded.crop(tuple(block_g)))
