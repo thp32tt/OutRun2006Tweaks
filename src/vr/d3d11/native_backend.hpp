@@ -1570,49 +1570,35 @@ struct NativeProgrammableShaderIndexedDirectDispatchReadiness {
     std::uint64_t snapshotToken{};
 };
 
-// R253 binds R252's exact programmable indexed dispatch receipt to the actual
-// values in the current MANAGED source-index CPU shadow. The IA byte offset is
-// converted to a shadow element offset before scanning, so non-zero aligned
-// index offsets cannot silently validate the wrong source indices. This is
-// dormant readiness evidence only and never issues DrawIndexed.
+// R253 seals the actual MANAGED source-index values consumed by the R252
+// indexed direct-dispatch tuple. It reuses the R152 CPU-shadow scanner, binds
+// that content proof to the exact R252 receipt and current R119 mirror identity,
+// and remains dormant: no DrawIndexed call is issued and NativeDrawPath stays off.
 struct NativeProgrammableShaderIndexedSourceValueReadiness {
     bool inputValid{};
     bool directDispatchReady{};
+    bool directDispatchSnapshotMatches{};
     bool indexMirrorReady{};
+    bool indexMirrorSnapshotMatches{};
     bool indexFormatExact{};
-    bool shadowStartIndexExact{};
-    bool mirrorSnapshotMatchesDispatch{};
     bool sourceValuesReady{};
-    bool sourceValuesMatchDispatch{};
-    bool valuesWithinDeclaredRange{};
+    bool sourceValuesMatchDispatchWindow{};
+    bool sourceValuesMatchDispatchRange{};
     bool componentSnapshotsPresent{};
     bool ready{};
-    D3DPRIMITIVETYPE primitiveType = D3DPT_FORCE_DWORD;
     D3DFORMAT sourceIndexFormat = D3DFMT_UNKNOWN;
-    UINT shadowStartIndex{};
+    UINT scanStartIndex{};
     UINT indexCount{};
     UINT minVertexIndex{};
     UINT maxVertexIndex{};
     UINT observedMinIndex{};
     UINT observedMaxIndex{};
-    std::uint64_t contentHash{};
     std::uint64_t directDispatchSnapshotToken{};
     std::uint64_t indexMirrorSnapshotToken{};
-    std::uint64_t sourceValuesSnapshotToken{};
+    std::uint64_t sourceValueSnapshotToken{};
+    std::uint64_t sourceContentHash{};
     std::uint64_t snapshotToken{};
 };
-
-[[nodiscard]] NativeProgrammableShaderIndexedSourceValueReadiness
-compose_programmable_indexed_source_value_readiness(
-    D3DPRIMITIVETYPE primitiveType,
-    const NativeProgrammableShaderIndexedDirectDispatchReadiness& dispatch,
-    const NativeManagedBufferShadow& indexBuffer) noexcept;
-
-[[nodiscard]] bool validate_programmable_indexed_source_value_snapshot(
-    D3DPRIMITIVETYPE primitiveType,
-    const NativeProgrammableShaderIndexedDirectDispatchReadiness& dispatch,
-    const NativeManagedBufferShadow& indexBuffer,
-    std::uint64_t snapshotToken) noexcept;
 
 class NativeProgrammableShaderPairCache final {
 public:
@@ -2109,6 +2095,68 @@ public:
         UINT numVertices,
         UINT startIndex,
         std::uint64_t directDispatchSnapshotToken) const noexcept;
+    [[nodiscard]] NativeProgrammableShaderIndexedSourceValueReadiness
+    indexed_source_value_readiness(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken,
+        std::uint64_t constantPayloadSnapshotToken,
+        std::uint64_t constantBindingSnapshotToken,
+        std::uint64_t pipelineBindingSnapshotToken,
+        D3DPRIMITIVETYPE primitiveType,
+        std::uint64_t topologyBindingSnapshotToken,
+        const NativeManagedBufferShadow& vertexBuffer,
+        std::uint64_t vertexBufferSnapshotToken,
+        UINT vertexStride,
+        UINT vertexOffset,
+        const NativeManagedBufferShadow& indexBuffer,
+        std::uint64_t indexBufferSnapshotToken,
+        DXGI_FORMAT indexFormat,
+        UINT indexOffset,
+        std::uint64_t indexedGeometryBindingSnapshotToken,
+        UINT primitiveCount,
+        INT baseVertexIndex,
+        UINT minVertexIndex,
+        UINT numVertices,
+        UINT startIndex,
+        std::uint64_t directDispatchSnapshotToken) const noexcept;
+    [[nodiscard]] bool validate_indexed_source_value_snapshot(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken,
+        std::uint64_t constantPayloadSnapshotToken,
+        std::uint64_t constantBindingSnapshotToken,
+        std::uint64_t pipelineBindingSnapshotToken,
+        D3DPRIMITIVETYPE primitiveType,
+        std::uint64_t topologyBindingSnapshotToken,
+        const NativeManagedBufferShadow& vertexBuffer,
+        std::uint64_t vertexBufferSnapshotToken,
+        UINT vertexStride,
+        UINT vertexOffset,
+        const NativeManagedBufferShadow& indexBuffer,
+        std::uint64_t indexBufferSnapshotToken,
+        DXGI_FORMAT indexFormat,
+        UINT indexOffset,
+        std::uint64_t indexedGeometryBindingSnapshotToken,
+        UINT primitiveCount,
+        INT baseVertexIndex,
+        UINT minVertexIndex,
+        UINT numVertices,
+        UINT startIndex,
+        std::uint64_t directDispatchSnapshotToken,
+        std::uint64_t sourceValueSnapshotToken) const noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
