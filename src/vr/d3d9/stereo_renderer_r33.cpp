@@ -1,10 +1,11 @@
 // R33 final dispatch + post-review hot-path hardening.
 //
-// R32 owns reset/direct-transport review-2 safety. R33 remains the final
-// game-side callback boundary and owns depth/stencil write-state caching plus
-// exact single-count draw dispatch. Reset now simply chains through R32, whose
-// trampoline is installed above R22, so R22 is authoritative in both the R32
-// fallback and the final R33 path.
+// R32 owns reset/direct-transport review-2 safety. R33 is the final physical
+// game-side callback boundary and owns depth/stencil write-state caching,
+// exact single-count draw dispatch, final raster replay preservation, and the
+// ResetEx replay-health guard previously implemented by a separate R34 hook
+// layer. R34 is now only a readiness/state-sync ledger and installs no D3D9
+// detours.
 //
 // R33 is also the final top-level draw boundary: when telemetry is disabled,
 // route accounting and diagnostic counter writes are skipped so the steady
@@ -14,8 +15,16 @@
 #include "../state/state_block_recovery.hpp"
 #include "../state/state_block_tracker.hpp"
 
+namespace OutRunVRD3D9ExUpgradeR13
+{
+    bool IsCompatDevice(IDirect3DDevice9* device) noexcept;
+    bool LastResetStateReplaySucceeded() noexcept;
+}
+
 namespace OutRunVRStereo
 {
+    inline void FailClosedDepthStencilState() noexcept;
+
     namespace
     {
         SafetyHookInline R33ResetR32Hook{};
@@ -58,6 +67,14 @@ namespace OutRunVRStereo
         bool R33FirstDepthStencilCacheLogged = false;
         bool R33FirstResetLifecycleLogged = false;
 
+        std::atomic<bool> R33ResetReplayBlocked{false};
+        std::uint64_t R33ReplayBlocks = 0;
+        std::uint64_t R33RasterGuardDraws = 0;
+        std::uint64_t R33LostDeviceBypasses = 0;
+        bool R33FirstReplayBlockLogged = false;
+        bool R33FirstLostDeviceBypassLogged = false;
+        bool R33FirstRasterGuardLogged = false;
+
         struct R33PerfSnapshot
         {
             ULONGLONG lastLogMs = 0;
@@ -73,6 +90,82 @@ namespace OutRunVRStereo
         inline bool R33TelemetryEnabled() noexcept
         {
             return Settings::VRTelemetry;
+        }
+
+        void R33ForceResetReplayFailClosed(IDirect3DDevice9* device,
+            const char* site) noexcept
+        {
+            if (!device || !IsGameDevice(device))
+                return;
+
+            OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
+            FailClosedResetBaselineState();
+            FailClosedDepthStencilState();
+            ArmStereoRecoverySafety();
+
+            if (!R33FirstReplayBlockLogged)
+            {
+                R33FirstReplayBlockLogged = true;
+                spdlog::error(
+                    "VR R33 RESET REPLAY: classic D3D9 state replay is unhealthy at {}; stereo remains fail-closed until a later clean ResetEx replay",
+                    site ? site : "unknown");
+            }
+        }
+
+        void R33SetResetReplayGuardState(IDirect3DDevice9* device,
+            bool healthy, const char* site, bool countBlock) noexcept
+        {
+            if (!device || !IsGameDevice(device))
+                return;
+
+            if (!OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device))
+            {
+                R33ResetReplayBlocked.store(false, std::memory_order_release);
+                OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(false);
+                return;
+            }
+
+            R33ResetReplayBlocked.store(!healthy, std::memory_order_release);
+            OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(!healthy);
+            if (!healthy)
+            {
+                if (countBlock)
+                    ++R33ReplayBlocks;
+                R33ForceResetReplayFailClosed(device, site);
+            }
+        }
+
+        template <typename DrawCall>
+        HRESULT R33GuardStereoRasterState(IDirect3DDevice9* device,
+            DrawCall&& drawCall, const char* site) noexcept
+        {
+            const auto drawSemanticValue =
+                (device && IsGameDevice(device) && !InternalStereoPass)
+                ? OutRunVR::GameSemantic::ConsumeForDraw()
+                : OutRunVR::GameSemantic::CurrentScope;
+            OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
+                drawSemanticValue);
+
+            if (!device || !IsGameDevice(device) || InternalStereoPass ||
+                OutRunVR::State::StateBlockTracker::Recording() ||
+                !StereoWanted() || !TargetIsBackBuffer())
+            {
+                return drawCall();
+            }
+
+            OutRunVR::State::StateBlockRecovery::FlushPendingResync(device);
+            R22RasterReplayGuard replay(device, site);
+            if (!replay.StateValid())
+                return drawCall();
+
+            ++R33RasterGuardDraws;
+            if (!R33FirstRasterGuardLogged)
+            {
+                R33FirstRasterGuardLogged = true;
+                spdlog::info(
+                    "VR R33 RASTER GUARD: final physical draw boundary preserves viewport/scissor across fast, HUD and R29 fallback eye-target switches");
+            }
+            return drawCall();
         }
 
         void R33InvalidateDepthStencilCache() noexcept
@@ -660,15 +753,24 @@ namespace OutRunVRStereo
         HRESULT __stdcall DrawPrimitiveDestR33(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
-            auto actual = [&]() {
-                return DrawPrimitiveHook.stdcall<HRESULT>(
+            auto call = [&]() {
+                const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                     device, type, startVertex, primitiveCount);
+                if (xyzrhw != E_NOTIMPL)
+                    return xyzrhw;
+
+                auto actual = [&]() {
+                    return DrawPrimitiveHook.stdcall<HRESULT>(
+                        device, type, startVertex, primitiveCount);
+                };
+                auto lower = [&]() {
+                    return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
+                        device, type, startVertex, primitiveCount);
+                };
+                return R33Dispatch(device, actual, lower, "R33/DrawPrimitive");
             };
-            auto lower = [&]() {
-                return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
-                    device, type, startVertex, primitiveCount);
-            };
-            return R33Dispatch(device, actual, lower, "R33/DrawPrimitive");
+            return R33GuardStereoRasterState(
+                device, call, "R33/DrawPrimitive/raster-state");
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveDestR33(
@@ -676,33 +778,52 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
-                    baseVertexIndex, minVertexIndex, numVertices, startIndex,
-                    primitiveCount);
+            auto call = [&]() {
+                const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
+                    device, type, baseVertexIndex, minVertexIndex,
+                    numVertices, startIndex, primitiveCount);
+                if (xyzrhw != E_NOTIMPL)
+                    return xyzrhw;
+
+                auto actual = [&]() {
+                    return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
+                        baseVertexIndex, minVertexIndex, numVertices, startIndex,
+                        primitiveCount);
+                };
+                auto lower = [&]() {
+                    return R30DrawIndexedPrimitiveR29Hook.stdcall<HRESULT>(device,
+                        type, baseVertexIndex, minVertexIndex, numVertices,
+                        startIndex, primitiveCount);
+                };
+                return R33Dispatch(device, actual, lower,
+                    "R33/DrawIndexedPrimitive");
             };
-            auto lower = [&]() {
-                return R30DrawIndexedPrimitiveR29Hook.stdcall<HRESULT>(device,
-                    type, baseVertexIndex, minVertexIndex, numVertices,
-                    startIndex, primitiveCount);
-            };
-            return R33Dispatch(device, actual, lower,
-                "R33/DrawIndexedPrimitive");
+            return R33GuardStereoRasterState(
+                device, call, "R33/DrawIndexedPrimitive/raster-state");
         }
 
         HRESULT __stdcall DrawPrimitiveUPDestR33(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
             UINT stride)
         {
-            auto actual = [&]() {
-                return DrawPrimitiveUPHook.stdcall<HRESULT>(
+            auto call = [&]() {
+                const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                     device, type, primitiveCount, data, stride);
+                if (xyzrhw != E_NOTIMPL)
+                    return xyzrhw;
+
+                auto actual = [&]() {
+                    return DrawPrimitiveUPHook.stdcall<HRESULT>(
+                        device, type, primitiveCount, data, stride);
+                };
+                auto lower = [&]() {
+                    return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
+                        device, type, primitiveCount, data, stride);
+                };
+                return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP");
             };
-            auto lower = [&]() {
-                return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
-                    device, type, primitiveCount, data, stride);
-            };
-            return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP");
+            return R33GuardStereoRasterState(
+                device, call, "R33/DrawPrimitiveUP/raster-state");
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveUPDestR33(
@@ -711,18 +832,28 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
-            auto actual = [&]() {
-                return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
-                    minVertexIndex, numVertices, primitiveCount, indexData,
-                    indexFormat, vertexData, stride);
-            };
-            auto lower = [&]() {
-                return R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>(device,
-                    type, minVertexIndex, numVertices, primitiveCount,
+            auto call = [&]() {
+                const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
+                    device, type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride);
+                if (xyzrhw != E_NOTIMPL)
+                    return xyzrhw;
+
+                auto actual = [&]() {
+                    return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
+                        minVertexIndex, numVertices, primitiveCount, indexData,
+                        indexFormat, vertexData, stride);
+                };
+                auto lower = [&]() {
+                    return R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>(device,
+                        type, minVertexIndex, numVertices, primitiveCount,
+                        indexData, indexFormat, vertexData, stride);
+                };
+                return R33Dispatch(device, actual, lower,
+                    "R33/DrawIndexedPrimitiveUP");
             };
-            return R33Dispatch(device, actual, lower,
-                "R33/DrawIndexedPrimitiveUP");
+            return R33GuardStereoRasterState(
+                device, call, "R33/DrawIndexedPrimitiveUP/raster-state");
         }
 
         HRESULT __stdcall ResetDestR33(IDirect3DDevice9* device,
@@ -745,6 +876,11 @@ namespace OutRunVRStereo
                     spdlog::info(
                         "VR R33 RESET: chained R33 -> R32 -> R22; R22 owns fail-close/baseline and R32 rearms caches only after successful Reset");
                 }
+
+                const bool healthy = SUCCEEDED(hr) &&
+                    OutRunVRD3D9ExUpgradeR13::LastResetStateReplaySucceeded();
+                R33SetResetReplayGuardState(
+                    device, healthy, "Reset", true);
             }
             return hr;
         }
@@ -790,10 +926,42 @@ namespace OutRunVRStereo
             const RECT* sourceRect, const RECT* destRect,
             HWND destWindowOverride, const RGNDATA* dirtyRegion)
         {
+            if (device && IsGameDevice(device))
+            {
+                const HRESULT cooperative = device->TestCooperativeLevel();
+                if (cooperative == D3DERR_DEVICELOST ||
+                    cooperative == D3DERR_DEVICENOTRESET)
+                {
+                    ++R33LostDeviceBypasses;
+                    R33ResetReplayBlocked.store(
+                        true, std::memory_order_release);
+                    OutRunVR::RuntimeEligibility::SetExternalSafetyBlock(true);
+                    ArmStereoRecoverySafety();
+                    if (!R33FirstLostDeviceBypassLogged)
+                    {
+                        R33FirstLostDeviceBypassLogged = true;
+                        spdlog::warn(
+                            "VR R33 DEVICE LOST: TestCooperativeLevel=0x{:08x}; skipping VR D3D work and forwarding raw Present until Reset restores the device",
+                            static_cast<unsigned>(cooperative));
+                    }
+                    return PresentHook.stdcall<HRESULT>(
+                        device, sourceRect, destRect,
+                        destWindowOverride, dirtyRegion);
+                }
+            }
+
+            const bool blocked = IsGameDevice(device) &&
+                R33ResetReplayBlocked.load(std::memory_order_acquire);
+            if (blocked)
+                R33ForceResetReplayFailClosed(device, "Present/pre");
+
             const HRESULT hr = R33PresentR32Hook.stdcall<HRESULT>(device,
                 sourceRect, destRect, destWindowOverride, dirtyRegion);
             if (IsGameDevice(device))
                 R33LogPerfWindow();
+
+            if (blocked)
+                R33ForceResetReplayFailClosed(device, "Present/post");
             return hr;
         }
 
@@ -923,6 +1091,19 @@ namespace OutRunVRStereo
     R33InstallStatus() noexcept
     {
         return R33InstallState.load(std::memory_order_acquire);
+    }
+
+    inline void R33SynchronizeResetReplayGuardState(
+        IDirect3DDevice9* device) noexcept
+    {
+        if (!device || !IsGameDevice(device))
+            return;
+
+        const bool healthy =
+            !OutRunVRD3D9ExUpgradeR13::IsCompatDevice(device) ||
+            OutRunVRD3D9ExUpgradeR13::LastResetStateReplaySucceeded();
+        R33SetResetReplayGuardState(
+            device, healthy, "Install/state-sync", false);
     }
 
     inline void FailClosedDepthStencilState() noexcept
