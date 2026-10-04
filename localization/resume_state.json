@@ -1,5 +1,5 @@
 {
-  "schema_version": 68,
+  "schema_version": 69,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C133 finalized 1762489B: B46 input cd066bd26952f6b9d20cf604919baa38ac1f0e74492d9f75ee6001e908b37d89 had correct mirror_y orientation/semantics and 5/5 machine containment, but controller visual QA found OUTRUN2SP COURSE alone had spurious slant 0.32 despite a shared upright four-row source family. C133 corrected only row4 to upright; final 324f677c4afc482ef3dbcf0cd226514a68847ee872d1eeda75b9311a9cb7a871 passes 5/5 bbox+size/positive-margin, zero source residue/outside/alpha/protected/overlap/touch, changes vs B46 outside row4=0, and SOURCE/B46/C133/full/raw visual QA. B_PRODUCTION47 fail-closed NameError produced no candidate and is superseded. C133_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
     "C132 corrective final QA resolved C130-returned 12519155: input 29a10497efcd82ebe6be7101ea9a4e0c830044992e7ffb9ac567d08dd9c444c8, final 14bc44a69775206c5771023408d0752ee925542fda48359c14c4e5b2f767119d. Historical-diff source bboxes were proven incomplete by C130 visual residue; C132 remeasured all seven exact source alpha/effect bboxes, cleared 47,185 source-effect pixels, preserved exact RGBA32 header/raw mirror_y, passed 7/7 bbox+size with positive margins and zero clean/source-residue/outside/alpha/overlap/touch, canonical stage naming, and controller SOURCE/CLEAN/FINAL/row/raw visual QA. C132_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
     "C127 finalized latest B_PRODUCTION43 D41D0B1 0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80: hosted independent DXT5 header/decode + 2/2 per-line exact bbox/size PASS, positive margins, decoded row gap 17px, zero residue/outside/alpha/protected/overlap/touch, and controller two-line/readable/raw visual PASS. B42 one-line candidate superseded. RUNTIME_VALIDATION=UNTESTED.",
     "C126 finalized B_PRODUCTION40 42E618FD candidate 86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a: hosted independent DXT5 header/decode + 1/1 exact bbox/size PASS with positive margins, zero clean/source-residue/outside/alpha/protected/target failures, and controller source/clean/final/row visual PASS. Static state C126_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
@@ -115,12 +116,12 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-05T05:32:27+09:00",
+      "updated_at_kst": "2026-10-05T06:01:25+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20261005-C132-12519155/C132_12519155_CONTROLLER_FINAL_QA.json",
+      "report": "localization/graphics/role_C/20261005-C133-1762489B/C133_176_CONTROLLER_FINAL_QA.json",
       "direct_queue_scope": 126,
-      "current_candidates_scanned": 27,
-      "elements_scanned": 274,
+      "current_candidates_scanned": 28,
+      "elements_scanned": 279,
       "pixel_visual_pass_assets": [
         "FF2462BB",
         "C4A2937B",
@@ -156,23 +157,24 @@
         "EBEF6D20",
         "42E618FD",
         "D41D0B1",
-        "12519155"
+        "12519155",
+        "1762489B"
       ],
       "rework_required_assets": [],
       "failed_elements": 0,
-      "pending_production_localize_text": 41,
+      "pending_production_localize_text": 40,
       "hold_strict_recheck_zoom_review": 47,
       "promotion_hold_for_pixel_pass": true,
       "promotion_hold_reason": "1A43E9D9 remains static PASS but HIGH_RISK edge-touch and requires in-game validation before final approval; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD; unfinished queue rows remain.",
       "user_approved_locked": 0,
       "failed_assets": 0,
       "latest_c_revalidated_assets": [
-        "12519155"
+        "1762489B"
       ],
-      "latest_c_revalidated_physical_elements": 7,
+      "latest_c_revalidated_physical_elements": 5,
       "runtime_validation": "UNTESTED",
       "current_run_assets_scanned": 1,
-      "current_run_physical_elements_scanned": 7,
+      "current_run_physical_elements_scanned": 5,
       "high_risk_static_pass_assets": [
         "1A43E9D9"
       ]
@@ -637,6 +639,25 @@
         "c132_outside": 0,
         "c132_orientation": "mirror_y",
         "c132_candidate_changed": true
+      },
+      "1762489B": {
+        "status": "C133_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+        "candidate_sha256": "324f677c4afc482ef3dbcf0cd226514a68847ee872d1eeda75b9311a9cb7a871",
+        "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+        "completed_transcription_entries": 5,
+        "localized_regions": 5,
+        "remaining_segments": 0,
+        "report": "localization/graphics/role_C/20261005-C133-1762489B/C133_176_CONTROLLER_FINAL_QA.json",
+        "c_strict_qa_report": "localization/graphics/role_C/20261005-C133-1762489B/C133_176_CONTROLLER_FINAL_QA.json",
+        "in_game_validation": "PENDING",
+        "runtime_validation": "UNTESTED",
+        "c133_bbox_pass": "5/5",
+        "c133_positive_margin_pass": "5/5",
+        "c133_source_residue": 0,
+        "c133_outside": 0,
+        "c133_orientation": "mirror_y",
+        "c133_candidate_changed": true,
+        "c133_style_fix": "row4 slant 0.32 -> 0.00"
       }
     },
     "a76_ff2462bb": {

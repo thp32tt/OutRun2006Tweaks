@@ -1030,3 +1030,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Decision: `C132_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Producer REWORK=0; pending_artwork localize_text=41. Existing 1A43E9D9 remains HIGH_RISK pending mandatory in-game validation; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C132-12519155/C132_12519155_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C132-12519155/C132_12519155_MACHINE_QA.json`.
+
+## 2026-10-05 06:01:25 KST — C133 1762489B final PASS
+- Reviewed only the latest unfinished index 130 `1762489B_512x128.dds`; completed C132/C127 and earlier PASS assets were not repeated.
+- B46 resolved the earlier orientation/semantic-placement ambiguity: exact 2048x512 RGBA32 source is readable under raw `mirror_y`, with MIX 1 / MIX 2 / OUTRUN2 / OUTRUN2SP / AVERAGE RANK bound correctly. C machine preflight independently confirmed its containment/protected gates.
+- Controller visual QA found one concrete style defect: B46 rendered `OUTRUN2SP COURSE -> 아웃런2 SP 코스` with a spurious 0.32 right slant while the four large source course labels share the same upright family. C133 small corrective rework changed only that row to upright.
+- Final candidate `324f677c4afc482ef3dbcf0cd226514a68847ee872d1eeda75b9311a9cb7a871` (B46 input `cd066bd26952f6b9d20cf604919baa38ac1f0e74492d9f75ee6001e908b37d89`): exact header/raw mirror_y preserved; 5/5 bbox+size PASS with positive margins; source residue/outside/alpha/protected/overlap/touch all 0; changes vs B46 outside row4 bbox=0.
+- SOURCE/B46/C133 full, row4 2x and raw visual QA PASS. B_PRODUCTION47 later fail-closed on a script NameError before candidate output and is superseded by C133.
+- Decision: `C133_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Producer REWORK=0; pending_artwork localize_text=40. 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94 remain strict HOLD.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C133-1762489B/C133_176_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C133-1762489B/C133_176_MACHINE_QA.json`.
