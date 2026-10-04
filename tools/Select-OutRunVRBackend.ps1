@@ -220,6 +220,10 @@ if (Test-Path $ini) {
         $text = Set-IniSectionValue $text "VR" "PreferD3D9Ex" "true"
         $text = Set-IniSectionValue $text "VR" "DirectGpuOnly" "true"
         $text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "false"
+        # VDXR source-resolution HMD A/B: keep the internal VR backbuffer at
+        # 2496x2688 while fitting the borderless PC mirror to the monitor.
+        $text = Set-IniSectionValue $text "VR" "MirrorFitDesktop" "true"
+        $text = Set-IniSectionValue $text "Window" "WindowedBorderless" "true"
     } else {
         $value = switch ($Backend) {
             "dxvk" { "2" }
