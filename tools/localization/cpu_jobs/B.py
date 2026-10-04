@@ -2,11 +2,24 @@
 import os, subprocess
 from pathlib import Path
 
-FONT_BLACK=Path('/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc')
-FONT_BOLD=Path('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc')
-if not (FONT_BLACK.exists() and FONT_BOLD.exists()):
-    subprocess.run(['sudo','apt-get','update','-qq'],check=True)
-    subprocess.run(['sudo','apt-get','install','-y','-qq','fonts-noto-cjk'],check=True)
+def _resolve_noto(style):
+    pattern=f'Noto Sans CJK KR:style={style}'
+    try:
+        fp=subprocess.check_output(['fc-match','-f','%{file}',pattern],text=True).strip()
+    except Exception:
+        fp=''
+    if not fp or not Path(fp).exists() or 'NotoSansCJK' not in Path(fp).name:
+        subprocess.run(['sudo','apt-get','update','-qq'],check=True)
+        subprocess.run(['sudo','apt-get','install','-y','-qq','fonts-noto-cjk'],check=True)
+        fp=subprocess.check_output(['fc-match','-f','%{file}',pattern],text=True).strip()
+    if not fp or not Path(fp).exists():
+        raise RuntimeError(f'cannot resolve Noto CJK font for {style}: {fp}')
+    return Path(fp)
+
+FONT_BLACK=_resolve_noto('Black')
+FONT_BOLD=_resolve_noto('Bold')
+print('FONT_BLACK',FONT_BLACK)
+print('FONT_BOLD',FONT_BOLD)
 
 
 # ===== 19CEDB9 producer =====
@@ -22,7 +35,7 @@ outdir.mkdir(parents=True,exist_ok=True)
 srcp=repo/'localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds'
 cand=repo/'localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds'
 cand.parent.mkdir(parents=True,exist_ok=True)
-font_path='/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc'
+font_path=str(FONT_BLACK)
 
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def load_dds(p):
@@ -175,7 +188,7 @@ srcpng=work/'source_readable.png'; finalpng=work/'final_readable.png'; cleanpng=
 subprocess.run(['python3',str(repo/'tools/localization/validate_clean_plate.py'),str(srcpng),str(cleanpng),str(outdir/'19CEDB9_SOURCE_TEXT_MASK.png'),'--report',str(outdir/'B_RECOVERY04_CLEAN_PLATE_VALIDATION.json')],check=True)
 subprocess.run(['python3',str(repo/'tools/localization/validate_clean_plate.py'),str(srcpng),str(finalpng),str(outdir/'19CEDB9_ALLOWED_TEXT_REGION_MASK.png'),'--protected-mask',str(outdir/'19CEDB9_PROTECTED_MASK.png'),'--report',str(outdir/'B_RECOVERY04_FINAL_MASK_VALIDATION.json')],check=True)
 # Contact sheet: source / clean / final on dark and final on white, top and middle-label crops.
-font=ImageFont.truetype('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc',22)
+font=ImageFont.truetype(str(FONT_BOLD),22)
 def composite(im,bg):
     z=Image.new('RGBA',im.size,bg); z.alpha_composite(im); return z.convert('RGB')
 def card(label,im,crop,bg):
@@ -222,7 +235,7 @@ run='20261004-B-RECOVERY05'; outdir=repo/'localization/graphics/role_B'/run; out
 srcp=repo/'localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds'
 priorp=work/'2DA_BEFORE_BREC03.dds'; priorp.write_bytes(subprocess.check_output(['git','show','c0e0bd4b79dc0eead4b4a0ed432e48ae76d7f20a:localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds'])); cand=repo/'localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds'
 c85p=repo/'localization/graphics/role_C/20260928-1000-C85/C85_CROSS_LANE_FINAL_QA.json'
-font_bold='/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc'; font_black='/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc'
+font_bold=str(FONT_BOLD); font_black=str(FONT_BLACK)
 
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 def load(p):
