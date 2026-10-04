@@ -27,6 +27,14 @@ class Continuation88RawProvenanceTests(unittest.TestCase):
             'GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_88_OVERLAP_BYTES = bytes.fromhex("83 25 44 bc 98")',
             SOURCE,
         )
+        self.assertIn(
+            "GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_88_EXPECTED_BYTES = bytes.fromhex(",
+            SOURCE,
+        )
+        self.assertIn(
+            '"eb 12 8b 54 24 04 2b 50 0c 81 fa 00 00 10 00 72"',
+            SOURCE,
+        )
 
     def test_predecessor_empty_debt_is_inherited_fail_closed(self):
         self.assertIn(
@@ -63,6 +71,9 @@ class Continuation88RawProvenanceTests(unittest.TestCase):
             "guarded_gf_target_c_helper_1_third_callee_continuation_88_provenance=FAILED",
             SOURCE,
         )
+        self.assertIn("exact_bytes_match = probe == expected_probe", SOURCE)
+        self.assertIn("and exact_bytes_match", SOURCE)
+        self.assertIn('"exact_bytes_match": exact_bytes_match', SOURCE)
 
 
 if __name__ == "__main__":

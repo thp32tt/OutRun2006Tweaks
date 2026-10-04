@@ -4667,6 +4667,12 @@ GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_88_RVA = 0x00183810
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_88_PROBE_LEN = 64
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_88_PROBE_END_RVA = 0x00183850
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_88_OVERLAP_BYTES = bytes.fromhex("83 25 44 bc 98")
+GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_88_EXPECTED_BYTES = bytes.fromhex(
+    "83 25 44 bc 98 00 00 a3 50 bc 98 00 33 c0 89 0d "
+    "4c bc 98 00 c7 05 54 bc 98 00 10 00 00 00 40 c3 "
+    "a1 44 bc 98 00 8d 0c 80 a1 48 bc 98 00 8d 0c 88 "
+    "eb 12 8b 54 24 04 2b 50 0c 81 fa 00 00 10 00 72"
+)
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_88_INHERITED_FORWARD_TARGETS = ()
 
 GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_82_INSTRUCTIONS = (
@@ -29769,8 +29775,10 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_88_provenance
         pe, target_rva, GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_88_PROBE_LEN
     )
     overlap = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_88_OVERLAP_BYTES
+    expected_probe = GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_88_EXPECTED_BYTES
     overlap_actual = probe[: len(overlap)]
     overlap_matches = overlap_actual == overlap
+    exact_bytes_match = probe == expected_probe
     predecessor_overlap_matches = (
         predecessor["incomplete_expected_bytes"] == overlap.hex(" ")
         and predecessor["incomplete_actual_bytes"] == overlap.hex(" ")
@@ -29795,6 +29803,7 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_88_provenance
         and len(probe) == GF_TARGET_C_HELPER_1_THIRD_CALLEE_CONTINUATION_88_PROBE_LEN
         and probe_end_matches
         and overlap_matches
+        and exact_bytes_match
         and predecessor_overlap_matches
         and predecessor["unresolved_forward_targets"] == inherited_targets
     )
@@ -29816,6 +29825,8 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_88_provenance
         "first_16_bytes": probe[:16].hex(" "),
         "last_16_bytes": probe[-16:].hex(" "),
         "bytes": probe.hex(" "),
+        "expected_bytes": expected_probe.hex(" "),
+        "exact_bytes_match": exact_bytes_match,
         "raw_inbound_rel32_candidates": inbound,
         "raw_outbound_rel32_candidates": outbound,
         "status": (
@@ -36715,6 +36726,7 @@ def main() -> int:
         f"probe_len={helper_1_third_cont_88['probe_len']} "
         f"probe_end=0x{helper_1_third_cont_88['probe_end_rva']:08X}:"
         f"match={helper_1_third_cont_88['probe_end_matches']} "
+        f"bytes_match={helper_1_third_cont_88['exact_bytes_match']} "
         f"first16={helper_1_third_cont_88['first_16_bytes']} "
         f"last16={helper_1_third_cont_88['last_16_bytes']} "
         f"raw_inbound={len(helper_1_third_cont_88['raw_inbound_rel32_candidates'])} "
