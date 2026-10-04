@@ -1325,12 +1325,11 @@ namespace OutRunVRStereo
                 return false;
 
             // R45: R30 is the outer draw hook and R23 increments its top-level
-            // serial only after this classifier calls down into R26/R23. R44
-            // compared against R23GameDrawSerial directly, so the immediate
-            // draw after a c64 upload had age=0 and every owner test failed.
-            // At this boundary the draw being classified is serial + 1.
+            // serial only after this classifier calls down into R26/R23. The
+            // active HUD path therefore queries R23 through the neutral owner
+            // API and classifies the current outer draw as serial + 1.
             const std::uint64_t currentOuterDrawSerial =
-                R23GameDrawSerial + 1u;
+                TopLevelDrawSerial() + 1u;
             if (currentOuterDrawSerial <= writeDrawSerial)
                 return false;
             const std::uint64_t age =
