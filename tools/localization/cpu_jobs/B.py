@@ -109,7 +109,7 @@ for key,en,ko,cell,slant in T:
     mask_meta[key]={'cell':list(cell),'source_bbox':bb,'cell_margins':margins,'alpha_pixels':int(np.count_nonzero(mask)),'bbox_density':density,'hint_pixels':int(np.count_nonzero(local_hint))}
 if failures:
     (outdir/'B_RECOVERY09_MASK_PREFLIGHT_FAILURE.json').write_text(json.dumps({'failures':failures,'mask_meta':mask_meta},ensure_ascii=False,indent=2)+'\n')
-    raise RuntimeError('mask preflight '+repr(failures[:8]))
+    raise RuntimeError('mask preflight '+repr(failures))
 keys=list(bboxes)
 for i in range(len(keys)):
     for j in range(i+1,len(keys)):
