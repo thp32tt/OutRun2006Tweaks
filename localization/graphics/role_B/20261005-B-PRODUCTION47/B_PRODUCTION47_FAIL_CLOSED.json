@@ -1,0 +1,9 @@
+{
+  "run": "20261005-B-PRODUCTION47",
+  "asset": "1762489B",
+  "index": 130,
+  "status": "FAIL_CLOSED_DIAGNOSTIC",
+  "exception": "NameError(\"name 'measured_ss' is not defined\")",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 342, in <module>\n    try: main()\n         ^^^^^^\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 252, in main\n    \"slant\":ss,\"measured_slant_before_style_group_override\":measured_ss,\n                                                            ^^^^^^^^^^^\nNameError: name 'measured_ss' is not defined\n",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
