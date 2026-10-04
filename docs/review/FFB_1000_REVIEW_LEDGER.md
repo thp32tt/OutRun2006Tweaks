@@ -141,6 +141,12 @@ corrected without adding another force-feel retune:
   Arcade Original/Hybrid or PS2 could apply Modern-looking values while leaving
   the previous model's output semantics active.
 - Structural verifier guards pin all four contracts.
+- **FFB-R0152-F01:** revisions 1 and 4 were still global Modern retunes. An
+  older config that already had Arcade Original/Hybrid or PS2 selected could
+  therefore have its reference Spring/Road/Gear or Modern-backbone values
+  rewritten before testing. Revision 1/2/4 retunes and revision-5 numeric
+  legacy-preset normalization are now explicitly gated to Modern DD; original
+  models advance the revision marker without changing their reference feel.
 
 No RoadWheelLock, Arcade physical polarity, collisionIndex production gate or
 PS2 evidence-gated value is changed in R8.
