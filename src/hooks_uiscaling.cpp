@@ -62,6 +62,16 @@ class UIScaling : public Hook
 	// is redirected on its own rather than hooking either function.
 	static constexpr int RankMarker_SpraniCalls[] = { 0xBB0FB, 0xBB133, 0xBB16C, 0xBB1A5 };
 	static constexpr int RankMarker_ClipSpriteCalls[] = { 0xBB21F, 0xBB241, 0xBB271, 0xBB2BC, 0xBB2D0 };
+	static constexpr int OptionArrow_ClipSpriteCalls[] = {
+		0xE358B, 0xE35A3, 0xE35CC, 0xE35F7,
+		0xE481B, 0xE4833, 0xE485C, 0xE4887,
+		0xEC24C, 0xEC277, 0xED4D4, 0xED7A3
+	};
+	static constexpr int ExactScreenHud_ClipSpriteCalls[] = {
+		0x460F1, 0x463D6, 0x46410, 0x97BB7, 0x97DA7
+	};
+	static constexpr int RivalMarker_SpraniCall = 0xBB796;
+	static constexpr int TextGlyph_PutSpriteCalls[] = { 0x2C808, 0x2C9DB };
 
 	// D3DXMatrixTransformation2D hook allows us to change draw_sprite_custom
 	static inline SafetyHookInline D3DXMatrixTransformation2D = {};
@@ -289,6 +299,93 @@ class UIScaling : public Hook
 		return result;
 	}
 
+
+	static void TagAppendedNodes(
+		const std::array<SpriteNode*, Game::SpritePriorityCount>& before,
+		OutRunVR::GameSemantic::RenderScope scope)
+	{
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+			if (!root || !tailAfter || tailAfter == before[prio])
+				continue;
+
+			SpriteNode* node = before[prio]
+				? before[prio]->next_0 : root->next_0;
+			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
+			{
+				OutRunVR::GameSemantic::RegisterSpriteNodeScope(node, scope);
+				if (node == tailAfter)
+					break;
+				node = node->next_0;
+			}
+		}
+	}
+
+	static int __cdecl ExactScreenHud_putClipSprite(
+		int xstnum, int x, int y, uint32_t flags,
+		float priority, uint32_t color)
+	{
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
+		const int result = Game::put_clip_sprite(
+			xstnum, x, y, flags, priority, color);
+
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != tailBefore)
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		return result;
+	}
+
+	static int __cdecl RivalMarker_sprani(
+		uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
+	{
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			before[prio] = root ? root->tail_4 : nullptr;
+		}
+
+		const int result = Game::sprani_play_ae_auth_alpha(
+			spriteId, x, y, a4, a5, alpha);
+		// R71 HMD evidence binds this exact 0xBB796 producer to the
+		// vehicle-relative rival marker. The refactor semantic model no longer
+		// carries the old projected-marker payload, so preserve its spatial
+		// ownership as WORLD_BILLBOARD and let R30's strict world gates decide.
+		TagAppendedNodes(
+			before, OutRunVR::GameSemantic::RenderScope::WorldBillboard);
+		return result;
+	}
+
+	using TextGlyphPutSpriteFn = int(__cdecl*)(SPRARGS*, float);
+	static int __cdecl TextGlyph_putSprite(SPRARGS* args, float priority)
+	{
+		auto original = reinterpret_cast<TextGlyphPutSpriteFn>(
+			Module::exe_ptr(0x2CFE0));
+		int prio = int(priority);
+		prio = prio < 0 ? 0 :
+			(prio >= Game::SpritePriorityCount ? Game::SpritePriorityCount - 1 : prio);
+		SpriteNode* root = Game::sprite_prio_root[prio];
+		SpriteNode* tailBefore = root ? root->tail_4 : nullptr;
+
+		const int result = original(args, priority);
+
+		root = Game::sprite_prio_root[prio];
+		SpriteNode* node = root ? root->tail_4 : nullptr;
+		if (node && node != tailBefore)
+			OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+				node, OutRunVR::GameSemantic::RenderScope::ScreenHud);
+		return result;
+	}
+
 	enum SpriteScaleType
 	{
 		Disabled = 0,
@@ -476,6 +573,12 @@ class UIScaling : public Hook
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), false);
 	}
+	static void TimeRecord_AdjustPositionAndHud(safetyhook::Context& ctx)
+	{
+		AddSpriteSpacing((int*)(ctx.esp + 4), false);
+		OutRunVR::GameSemantic::ArmNextDraw(
+			OutRunVR::GameSemantic::RenderScope::ScreenHud);
+	}
 	static void put_scroll_AdjustPositionLeft(safetyhook::Context& ctx)
 	{
 		AddSpriteSpacing((int*)(ctx.esp + 4), true);
@@ -631,6 +734,24 @@ public:
 			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_sprani, Memory::HookType::Call);
 		for (int addr : RankMarker_ClipSpriteCalls)
 			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_putClipSprite, Memory::HookType::Call);
+		for (int addr : OptionArrow_ClipSpriteCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), ExactScreenHud_putClipSprite,
+				Memory::HookType::Call);
+		for (int addr : ExactScreenHud_ClipSpriteCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), ExactScreenHud_putClipSprite,
+				Memory::HookType::Call);
+		Memory::VP::InjectHook(
+			Module::exe_ptr(RivalMarker_SpraniCall),
+			RivalMarker_sprani, Memory::HookType::Call);
+		for (int addr : TextGlyph_PutSpriteCalls)
+			Memory::VP::InjectHook(
+				Module::exe_ptr(addr), TextGlyph_putSprite,
+				Memory::HookType::Call);
+
+		spdlog::info(
+			"VR HUD RESTORE: exact option arrows/result clips/text glyphs -> SCREEN_HUD; 0xBB796 rival marker -> WORLD_BILLBOARD");
 
 		NaviPub_Disp_SpriteSpacingEnable_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable_Addr), SpriteSpacingEnable);
 		NaviPub_Disp_SpriteSpacingEnable2_hk = safetyhook::create_mid(Module::exe_ptr(NaviPub_Disp_SpriteScaleEnable2_Addr), SpriteSpacingEnable);
@@ -668,21 +789,21 @@ public:
 		DispTimeAttack2D_SpriteScalingForceLeft_hk = safetyhook::create_mid((void*)0x4BE4E7, SpriteSpacingForceLeft);
 		DispTimeAttack2D_SpriteScalingForceEnable_hk = safetyhook::create_mid((void*)0x4BE575, SpriteSpacingEnable);
 
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BE5CD, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BE603, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BE633, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4BE66D, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4BE690, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BE6B5, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BE6D5, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BE8D8, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk9 = safetyhook::create_mid((void*)0x4BE915, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk10 = safetyhook::create_mid((void*)0x4BE94A, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk11 = safetyhook::create_mid((void*)0x4BE97A, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk12 = safetyhook::create_mid((void*)0x4BE9A3, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk13 = safetyhook::create_mid((void*)0x4BE7E8, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, put_scroll_AdjustPositionRight);
-		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, put_scroll_AdjustPositionRight);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk = safetyhook::create_mid((void*)0x4BE5CD, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4BE603, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk3 = safetyhook::create_mid((void*)0x4BE633, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk4 = safetyhook::create_mid((void*)0x4BE66D, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk5 = safetyhook::create_mid((void*)0x4BE690, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk6 = safetyhook::create_mid((void*)0x4BE6B5, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk7 = safetyhook::create_mid((void*)0x4BE6D5, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk8 = safetyhook::create_mid((void*)0x4BE8D8, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk9 = safetyhook::create_mid((void*)0x4BE915, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk10 = safetyhook::create_mid((void*)0x4BE94A, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk11 = safetyhook::create_mid((void*)0x4BE97A, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk12 = safetyhook::create_mid((void*)0x4BE9A3, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk13 = safetyhook::create_mid((void*)0x4BE7E8, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk14 = safetyhook::create_mid((void*)0x4BE802, TimeRecord_AdjustPositionAndHud);
+		DispTimeAttack2D_put_scroll_AdjustPosition_hk15 = safetyhook::create_mid((void*)0x4BE81C, TimeRecord_AdjustPositionAndHud);
 
 		DispRank_put_scroll_AdjustPosition_hk1 = safetyhook::create_mid((void*)0x4B9F3A, put_scroll_AdjustPositionRight);
 		DispRank_put_scroll_AdjustPosition_hk2 = safetyhook::create_mid((void*)0x4B9F5E, put_scroll_AdjustPositionRight);

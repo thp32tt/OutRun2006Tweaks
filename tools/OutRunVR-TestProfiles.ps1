@@ -253,15 +253,15 @@ function Get-OutRunVRTestProfile {
         default {
             return [ordered]@{
                 Name='CORRECTNESS'
-                Description='Default daily Quest/VDXR test. Correctness fixes enabled; risky performance experiments remain opt-in.'
+                Description='Default daily Quest/VDXR test. XR cadence follows the headset refresh; conservative visual ownership stays enabled.'
                 Arguments=@(
-                    '-FramerateLimit=60',
+                    '-FramerateLimit=0',
                     '-FramerateFastLoad=0',
-                    '-FramerateInterpolation=false',
-                    '-FramerateUnlockExperimental=false',
-                    '-FrameCadenceMode=0',
+                    '-FramerateInterpolation=true',
+                    '-FramerateUnlockExperimental=true',
+                    '-FrameCadenceMode=1',
                     '-FrameCadenceTargetHz=0',
-                    '-DisableDesktopVsync=false'
+                    '-DisableDesktopVsync=true'
                 ) + $visualSafeVr
                 Environment=[ordered]@{
                     OUTRUN_VR_TEST_PROFILE='CORRECTNESS'

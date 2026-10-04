@@ -126,3 +126,29 @@ Quest 3 / VDXR should specifically check:
 5. frame pacing above 60 FPS.
 
 A build PASS is not runtime proof. `RUNTIME_VALIDATION=UNTESTED` until HMD evidence is supplied.
+
+
+## VR-REGRESSION-DIVERGED-HUD-CADENCE-20261005
+
+**Status:** FIX_CANDIDATE / BUILD_PENDING / NEED_HMD_TEST  
+**Evidence:** user runtime package from source `36f0f3949bd18993cba3f46585659874e3d7a89f`  
+
+### Proven regression
+
+- The tested binary was not stale: runtime/source SHA matched `36f0f394...`.
+- The refactor line diverged from the previously HMD-tested HUD line at merge base `2c1d7877180d3ee6d89af8e1f5031e287d466a16`; R65-R74 producer bridges were not carried forward.
+- Runtime HUD coverage reported all tracked exact semantics as NOT_OBSERVED and 2097 UNKNOWN rows.
+- R30 telemetry showed generic `SCREEN_OVERLAY_2D` traffic but zero accepted exact ScreenHud/WorldBillboard ownership.
+- `CURRENT_FOCUS / CORRECTNESS` forced a 60-Hz source with interpolation/unlock disabled while the OpenXR runtime was 90 Hz, causing repeated cached frames and visible cadence judder.
+
+### Candidate restoration
+
+- CORRECTNESS now uses unlocked interpolation + XR cadence mode 1; CONTROL remains the explicit 60-Hz baseline.
+- Restore exact proven menu/option arrow and result clip callsites as ScreenHud.
+- Restore exact font glyph callsites `0x2C808/0x2C9DB` as ScreenHud.
+- Restore 15 original UIScaling TimeAttack callsites with ScreenHud handoff.
+- Restore exact gameplay rival marker producer `0xBB796` as WorldBillboard under current strict R30 world gates.
+- Keep generic queue fallback as ScreenOverlay2D; no blanket queue->ScreenHud promotion.
+- SkyGlow and lens-flare ownership are unchanged in this candidate.
+
+`RUNTIME_VALIDATION=UNTESTED` until Quest 3 / VDXR confirmation.
