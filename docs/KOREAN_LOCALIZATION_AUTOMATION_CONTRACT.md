@@ -43,19 +43,47 @@ The controller prompt may be intentionally minimal. The following commands are s
 On any of those commands, first fetch the latest `korean-localization-recovery-20260928`, read this contract and all required state/policy files named at the top of this document, resolve the requested role below, perform the work, update Git state, commit/push when changed, and verify the resulting SHA. The Docker/controller prompt must not duplicate the detailed rules from this file.
 
 ## Dual-production lane schedule
-- A (:00): PRODUCTION LANE A + self-QA. Create/rework actual localization assets continuously from A's queue shard. Run zero-pixel-overflow QA on every touched element and immediately fix failures in the same run. Do not spend the run only reviewing when producible work remains.
-- B (:20): PRODUCTION LANE B + self-QA. B is no longer review-only. Create/rework actual localization assets continuously from B's queue shard, including promoting positively identified `zoom_review` text assets into production. Run the same zero-pixel-overflow QA and immediately fix failures in the same run.
-- C (:40): CROSS-LANE FINAL QA + approval + Git synchronization. Revalidate new/changed A and B results plus approval candidates. Only exact containment PASS results may advance. C may immediately perform small corrective rework it discovers and revalidate it; larger failures return to `REWORK_REQUIRED` for the next A/B production cycle.
+- A (:00 / :30): PRODUCTION LANE A + self-QA. Create/rework actual localization assets continuously from A's queue shard. Run zero-pixel-overflow QA on every touched element and immediately fix failures in the same run. Do not spend the run only reviewing when producible work remains.
+- B (:10 / :40): PRODUCTION LANE B + self-QA. B is no longer review-only. Create/rework actual localization assets continuously from B's queue shard, including promoting positively identified `zoom_review` text assets into production. Run the same zero-pixel-overflow QA and immediately fix failures in the same run.
+- C (:20 / :50): CROSS-LANE FINAL QA + approval + Git synchronization. Revalidate new/changed A and B results plus approval candidates. Only exact containment PASS results may advance. C may immediately perform small corrective rework it discovers and revalidate it; larger failures return to `REWORK_REQUIRED` for the next A/B production cycle.
 
 ## A/B work sharding and anti-duplication
 - Use the stable numeric `index` column in `localization/graphics/asset_queue.csv` to avoid A/B producing the same DDS.
 - A primary shard: rows with an ODD numeric `index`.
 - B primary shard: rows with an EVEN numeric `index`.
-- Each role prioritizes in this order inside its shard: `REWORK_REQUIRED` -> unfinished `localize_text` -> unresolved `zoom_review` that contains localizable text -> other role-specific pending work.
+- Within the shard, apply the candidate-completion-first readiness order below before generic queue-category order. Do not choose unrelated preflight work while a directly repairable or renderable candidate exists.
 - A/B must refresh branch HEAD and queue state immediately before selecting work and again before commit. If an item is already completed or changed by the other role, skip it rather than redo it.
 - A/B must not wait for the other lane merely because that lane owns a different index parity. When a primary shard has no actionable production work, the role may work-steal the oldest actionable item from the other shard only after refreshing Git and confirming that item has no newer production result/state change in the current cycle. Record `work_stolen_from_lane` in the role report.
 - B must not re-QA all of A's output as its default job; C owns cross-lane final QA. B should maximize new production throughput.
 - C does not use parity sharding and reviews both lanes.
+
+## Candidate-completion-first production
+This recovery branch restores the production methodology without restoring the later queue/state-machine architecture. The purpose is to convert accepted preparation evidence into actual Korean DDS candidates instead of accumulating masks, work orders or preflight-only commits.
+
+### Readiness tiers
+Classify unfinished A/B work from current Git evidence:
+1. **RENDER_READY** — exact canonical source, removal/protected geometry, verified CLEAN_PLATE and safe lettering region are known, with no unresolved semantic blocker. Missing baseline/slant/style measurement is not a reason to stop; measure it and render in the same invocation.
+2. **ONE_STAGE_TO_RENDER** — one deterministic preparation stage remains before RENDER_READY. Complete that stage and continue through Korean rendering in the same invocation whenever the inputs are safe.
+3. **PREFLIGHT_ONLY** — source identity, semantic binding, effect geometry or another prerequisite still requires broader investigation before candidate construction can safely begin.
+
+### Mandatory producer order
+A/B select work in this order within their shard:
+1. directly repairable C-returned `REWORK_REQUIRED`;
+2. `RENDER_READY` assets without a current acceptable Korean candidate;
+3. `ONE_STAGE_TO_RENDER` assets;
+4. existing candidate DDS needing material rework;
+5. only when 1-4 are exhausted, new `PREFLIGHT_ONLY` work.
+
+When a RENDER_READY or ONE_STAGE_TO_RENDER item exists, do not open unrelated preflight/work-order work merely to record progress.
+
+### Same-invocation completion rule
+- No artificial task boundary is allowed after the last deterministic prerequisite becomes ready. If the current A/B run creates or verifies the final source/mask/CLEAN_PLATE/safe-bbox/style prerequisite, continue in the same run through Korean render, DDS encode, decoded-final self-QA and candidate persistence.
+- The normal production path is: exact canonical HD source -> verified CLEAN_PLATE -> source typography/baseline/slant measurement -> native-resolution Korean render -> measure/refit loop -> exact DDS encode -> decoded-final static self-QA -> English-source-vs-Korean-candidate evidence.
+- If baseline/slant/style is the only missing information, measure it and render in the same task; do not create a separate successful preflight-only result.
+- If the first ready asset becomes fail-closed during rendering, record the precise blocker and try the next ready item in the same shard before opening new preflight work.
+- A/B should produce at least one new or materially reworked Korean DDS candidate whenever a RENDER_READY or ONE_STAGE_TO_RENDER item is safely runnable. Candidate output, not mask/work-order/commit count, is the primary production metric.
+- A zero-candidate producer run is acceptable only when current evidence shows that no RENDER_READY or ONE_STAGE_TO_RENDER item can safely advance. In that case, perform at most one new preflight-only batch before the next candidate-completion attempt.
+- This methodology is a Git workflow rule only. It MUST NOT add Production/Event IDs, task queues, rollover state machines, C0-C6 orchestration, Actions-gate bookkeeping or controller-side work-state engines.
 
 ## Throughput rule
 - Continue producing multiple assets in one run while tool/runtime budget allows; do not stop after a single DDS when additional independent queue items are actionable.
