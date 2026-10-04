@@ -1061,7 +1061,7 @@ namespace OutRunVRStereo
                     OutRunVR::State::StateBlockTracker::SetEventConsumerReady(false);
                     OutRunVR::State::StateBlockTracker::ResetCoverageLoss();
                     OutRunVR::State::StateBlockRecovery::Configure(
-                        &R31ResynchronizeShaderEpoch, &R22PrimeShadowState);
+                        &R31ResynchronizeShaderEpoch, &PrimeTrackedRasterShadow);
                     OutRunVR::State::StateBlockEvents::Configure(
                         &R31OnStateBlockBegin,
                         &R31OnStateBlockEnd,
