@@ -9348,13 +9348,13 @@ def main() -> None:
          PIPELINE_TRANSLATION_CPP,
          "R239 PS stage-tagged cache-key identity"),
         ("!programmablePair.translationImplemented",
-         DX11_SHADER_OBJECT_PROBE,
+         SHADER_OBJECT_PROBE,
          "R239 identity readiness must not claim translation"),
         ("programmablePairRepeat.cacheKey == programmablePair.cacheKey",
-         DX11_SHADER_OBJECT_PROBE,
+         SHADER_OBJECT_PROBE,
          "R239 deterministic cache-key regression"),
         ("ProgrammableShaderPairIdentityUnsupportedMixedPair",
-         DX11_SHADER_OBJECT_PROBE,
+         SHADER_OBJECT_PROBE,
          "R239 mixed-pair fail-closed regression"),
     ]
     missing_r239_programmable_shader_pair_cache_identity = [

@@ -62,7 +62,7 @@
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "evidence": "Added ProgrammableShaderFunctionIdentity, fail-closed ProgrammableShaderPairCacheIdentity and deterministic stage-tagged cache-key sealing; extended dx11_shader_object_probe with positive/determinism/hash-sensitivity and negative boundary cases; added source-graph drift guards."
+      "evidence": "Added ProgrammableShaderFunctionIdentity, fail-closed ProgrammableShaderPairCacheIdentity and deterministic stage-tagged cache-key sealing; extended dx11_shader_object_probe with positive/determinism/hash-sensitivity and negative boundary cases; added source-graph drift guards. Pre-gate source-graph reread corrected the R239 guard to use the existing SHADER_OBJECT_PROBE symbol before canonical exact-SHA validation."
     },
     "C3_VALIDATE": {
       "status": "PENDING_EXACT_SHA_GATE",
@@ -120,5 +120,7 @@
       "artifact_digest": "sha256:d42d93681de7b725993573f5cabb5d373621da7ec379968d8ac2c90a5eab0132"
     }
   },
-  "exact_next_action": "Publish R239 as the E007 attempt-2 material result, validate its exact SHA, then finalize C3/C4/C6 without conflating CI with HMD runtime proof."
+  "exact_next_action": "Validate the corrected descendant material SHA with Backend Conversion Gate; use that exact SHA as validation_bearing_result_sha.",
+  "pre_gate_superseded_material_sha": "c539dcbe7b5e29ac89bef54bdf4eeb956b4e5e9e",
+  "pre_gate_supersede_reason": "Source-graph verifier symbol typo found before canonical Gate completion; descendant commit corrects verifier only. Any older cancelled run is SUPERSEDED, not task failure."
 }
