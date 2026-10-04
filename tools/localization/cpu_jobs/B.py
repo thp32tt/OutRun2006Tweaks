@@ -108,6 +108,31 @@ def main():
                     continue
             merged.append(b)
         best=merged
+    merge_note=None
+    if len(best)==8:
+        # C128 small corrective rework: one long bottom label can split into
+        # two horizontally adjacent discovery components. Merge only one
+        # unambiguous same-band pair with a small horizontal gap.
+        pairs=[]
+        for i in range(len(best)-1):
+            a=best[i]
+            for j in range(i+1,len(best)):
+                bb=best[j]
+                ov=max(0,min(a[3],bb[3])-max(a[1],bb[1]))
+                mh=min(a[3]-a[1],bb[3]-bb[1])
+                if mh<=0 or ov/mh < 0.80:
+                    continue
+                left,right=(a,bb) if a[0] <= bb[0] else (bb,a)
+                gap=right[0]-left[2]
+                if 0 <= gap <= 12:
+                    pairs.append((gap,i,j))
+        if len(pairs)==1:
+            gap,i,j=pairs[0]
+            a,bb=best[i],best[j]
+            merged=[min(a[0],bb[0]),min(a[1],bb[1]),max(a[2],bb[2]),max(a[3],bb[3]),a[4]+bb[4]]
+            best=[x for n,x in enumerate(best) if n not in (i,j)] + [merged]
+            best.sort(key=lambda x:(x[1],x[0]))
+            merge_note={"pair":[i,j],"gap":gap,"merged_bbox":merged}
     if len(best)!=7:
         (out/"B_PRODUCTION44_DISCOVERY_FAIL.json").write_text(json.dumps({"counts":{k:len(v) for k,v in tries.items()},"boxes":tries,"post_row_merge":best},indent=2)+"\n")
         raise RuntimeError(("expected_7_regions",len(best)))
