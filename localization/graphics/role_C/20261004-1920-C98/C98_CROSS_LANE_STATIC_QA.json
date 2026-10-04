@@ -1,0 +1,595 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-1920-C98",
+  "base_head": "3921759190bfd146fc70600f504b46fded3f23c1",
+  "scope": "new pending C candidates only: A_PRODUCTION10 455717B2, A_PRODUCTION12 43B07A77, B_RECOVERY08 CBF8ECBF; C96-finalized FD90AA9/B1696633 are not recomputed",
+  "assets": [
+    {
+      "asset": "455717B2",
+      "producer": "A_PRODUCTION10",
+      "producer_report": "localization/graphics/role_A/20261004-A-PRODUCTION10/A_PRODUCTION10_455717B2_REPORT.json",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+      "source_sha256": "ce5d3610eac8945d76a559bb7f7201f9b1efb409c965bd20ed0a26164ed7f356",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+      "candidate_sha256": "50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f",
+      "candidate_changed_by_C": false,
+      "structure": {
+        "width": 2048,
+        "height": 2048,
+        "pitch": 8192,
+        "depth": 1,
+        "mips": 1,
+        "pf_flags": 65,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "bytes": 16777344,
+        "header_128_exact_to_source": true,
+        "raw_orientation": "mirror_y"
+      },
+      "clean_plate_gate": {
+        "changed_pixels": 776190,
+        "changed_bbox": [
+          4,
+          256,
+          2024,
+          1026
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "final_gate": {
+        "changed_pixels": 803738,
+        "changed_bbox": [
+          4,
+          256,
+          2024,
+          1026
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "mask_consistency": {
+        "source_text_protected": 0,
+        "allowed_protected": 0,
+        "allowed_pixels_outside_union_of_original_bboxes": 0,
+        "status": "PASS"
+      },
+      "bbox_gate": {
+        "elements": 4,
+        "pass": 4,
+        "fail": 0,
+        "edge_touch_keys": [],
+        "rows": [
+          {
+            "key": "continue",
+            "source": "CONTINUE",
+            "korean": "계속하기",
+            "original_bbox": [
+              4,
+              256,
+              558,
+              351
+            ],
+            "localized_bbox": [
+              140,
+              260,
+              421,
+              347
+            ],
+            "derived_final_vs_clean_bbox": [
+              140,
+              260,
+              421,
+              347
+            ],
+            "delta_left": 136,
+            "delta_right": 137,
+            "delta_top": 4,
+            "delta_bottom": 4,
+            "containment": "PASS",
+            "rework_status": "A_PRODUCTION10_HD_REBUILD"
+          },
+          {
+            "key": "perfect",
+            "source": "PERFECT!",
+            "korean": "완벽!",
+            "original_bbox": [
+              113,
+              352,
+              1302,
+              560
+            ],
+            "localized_bbox": [
+              509,
+              358,
+              905,
+              553
+            ],
+            "derived_final_vs_clean_bbox": [
+              509,
+              358,
+              905,
+              553
+            ],
+            "delta_left": 396,
+            "delta_right": 397,
+            "delta_top": 6,
+            "delta_bottom": 7,
+            "containment": "PASS",
+            "rework_status": "A_PRODUCTION10_HD_REBUILD"
+          },
+          {
+            "key": "congratulations",
+            "source": "CONGRATULATIONS!",
+            "korean": "축하합니다!",
+            "original_bbox": [
+              6,
+              560,
+              2024,
+              788
+            ],
+            "localized_bbox": [
+              593,
+              580,
+              1437,
+              768
+            ],
+            "derived_final_vs_clean_bbox": [
+              593,
+              580,
+              1437,
+              768
+            ],
+            "delta_left": 587,
+            "delta_right": 587,
+            "delta_top": 20,
+            "delta_bottom": 20,
+            "containment": "PASS",
+            "rework_status": "A_PRODUCTION10_HD_REBUILD"
+          },
+          {
+            "key": "passed",
+            "source": "PASSED!",
+            "korean": "통과!",
+            "original_bbox": [
+              44,
+              788,
+              1579,
+              1026
+            ],
+            "localized_bbox": [
+              613,
+              809,
+              1010,
+              1004
+            ],
+            "derived_final_vs_clean_bbox": [
+              613,
+              809,
+              1010,
+              1004
+            ],
+            "delta_left": 569,
+            "delta_right": 569,
+            "delta_top": 21,
+            "delta_bottom": 22,
+            "containment": "PASS",
+            "rework_status": "A_PRODUCTION10_HD_REBUILD"
+          }
+        ],
+        "status": "PASS"
+      },
+      "visual_evidence": {
+        "full_compare": "localization/graphics/role_C/20261004-1920-C98/C98_455717B2_FULL_COMPARE.jpg",
+        "row_contact": "localization/graphics/role_C/20261004-1920-C98/C98_455717B2_ROW_CONTACT.jpg",
+        "controller_visual_qa": "PENDING"
+      },
+      "runtime_validation": "UNTESTED",
+      "status": "C98_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+    },
+    {
+      "asset": "43B07A77",
+      "producer": "A_PRODUCTION12",
+      "producer_report": "localization/graphics/role_A/20261004-A-PRODUCTION12/A_PRODUCTION12_43B07A77_REPORT.json",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+      "source_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_route_cvt_Exst/43B07A77_512x64.dds",
+      "candidate_sha256": "d2311d4c20327363bacf8b336e925e527ef8c5c8f13a385b0a2fb2e25a946cbc",
+      "candidate_changed_by_C": false,
+      "structure": {
+        "width": 2048,
+        "height": 256,
+        "pitch": 8192,
+        "depth": 1,
+        "mips": 1,
+        "pf_flags": 65,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "bytes": 2097280,
+        "header_128_exact_to_source": true,
+        "raw_orientation": "mirror_y"
+      },
+      "clean_plate_gate": {
+        "changed_pixels": 233748,
+        "changed_bbox": [
+          1,
+          13,
+          1494,
+          251
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "final_gate": {
+        "changed_pixels": 264296,
+        "changed_bbox": [
+          1,
+          13,
+          1494,
+          251
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "mask_consistency": {
+        "source_text_protected": 0,
+        "allowed_protected": 0,
+        "allowed_pixels_outside_union_of_original_bboxes": 0,
+        "status": "PASS"
+      },
+      "bbox_gate": {
+        "elements": 1,
+        "pass": 1,
+        "fail": 0,
+        "edge_touch_keys": [],
+        "rows": [
+          {
+            "key": "game_over",
+            "source": "Game Over",
+            "korean": "게임 오버",
+            "original_bbox": [
+              1,
+              13,
+              1494,
+              251
+            ],
+            "localized_bbox": [
+              337,
+              21,
+              1157,
+              243
+            ],
+            "derived_final_vs_clean_bbox": [
+              337,
+              21,
+              1157,
+              243
+            ],
+            "delta_left": 336,
+            "delta_right": 337,
+            "delta_top": 8,
+            "delta_bottom": 8,
+            "containment": "PASS",
+            "rework_status": "A_PRODUCTION12_HD_REBUILD"
+          }
+        ],
+        "status": "PASS"
+      },
+      "visual_evidence": {
+        "full_compare": "localization/graphics/role_C/20261004-1920-C98/C98_43B07A77_FULL_COMPARE.jpg",
+        "row_contact": "localization/graphics/role_C/20261004-1920-C98/C98_43B07A77_ROW_CONTACT.jpg",
+        "controller_visual_qa": "PENDING"
+      },
+      "runtime_validation": "UNTESTED",
+      "status": "C98_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+    },
+    {
+      "asset": "CBF8ECBF",
+      "producer": "B_RECOVERY08",
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY08/B_RECOVERY08_CBF8ECBF_REPORT.json",
+      "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+      "source_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+      "candidate_sha256": "ecc4cbb6cdc064d2c7ccccfc378569f1dc7fc8339c46330ec68ec81c8f899df1",
+      "candidate_changed_by_C": false,
+      "structure": {
+        "width": 4096,
+        "height": 2048,
+        "pitch": 16384,
+        "depth": 1,
+        "mips": 1,
+        "pf_flags": 65,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "bytes": 33554560,
+        "header_128_exact_to_source": true,
+        "raw_orientation": "mirror_y"
+      },
+      "clean_plate_gate": {
+        "changed_pixels": 857018,
+        "changed_bbox": [
+          241,
+          1017,
+          3409,
+          2024
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "final_gate": {
+        "changed_pixels": 939084,
+        "changed_bbox": [
+          241,
+          1017,
+          3409,
+          2024
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "mask_consistency": {
+        "source_text_protected": 0,
+        "allowed_protected": 0,
+        "allowed_pixels_outside_union_of_original_bboxes": 0,
+        "status": "PASS"
+      },
+      "bbox_gate": {
+        "elements": 7,
+        "pass": 7,
+        "fail": 0,
+        "edge_touch_keys": [],
+        "rows": [
+          {
+            "key": "friend_request",
+            "source": "FRIEND REQUEST",
+            "korean": "친구 요청",
+            "original_bbox": [
+              646,
+              1017,
+              1345,
+              1090
+            ],
+            "localized_bbox": [
+              865,
+              1021,
+              1126,
+              1086
+            ],
+            "derived_final_vs_clean_bbox": [
+              865,
+              1021,
+              1126,
+              1086
+            ],
+            "delta_left": 219,
+            "delta_right": 219,
+            "delta_top": 4,
+            "delta_bottom": 4,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "players",
+            "source": "PLAYERS",
+            "korean": "플레이어",
+            "original_bbox": [
+              1647,
+              1017,
+              2021,
+              1090
+            ],
+            "localized_bbox": [
+              1711,
+              1021,
+              1957,
+              1086
+            ],
+            "derived_final_vs_clean_bbox": [
+              1711,
+              1021,
+              1957,
+              1086
+            ],
+            "delta_left": 64,
+            "delta_right": 64,
+            "delta_top": 4,
+            "delta_bottom": 4,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "your_friends",
+            "source": "YOUR FRIENDS",
+            "korean": "내 친구",
+            "original_bbox": [
+              2668,
+              1023,
+              3244,
+              1092
+            ],
+            "localized_bbox": [
+              2862,
+              1027,
+              3050,
+              1088
+            ],
+            "derived_final_vs_clean_bbox": [
+              2862,
+              1027,
+              3050,
+              1088
+            ],
+            "delta_left": 194,
+            "delta_right": 194,
+            "delta_top": 4,
+            "delta_bottom": 4,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "please_wait",
+            "source": "PLEASE WAIT",
+            "korean": "잠시만요",
+            "original_bbox": [
+              1928,
+              1124,
+              2660,
+              1224
+            ],
+            "localized_bbox": [
+              2121,
+              1130,
+              2466,
+              1218
+            ],
+            "derived_final_vs_clean_bbox": [
+              2121,
+              1130,
+              2466,
+              1218
+            ],
+            "delta_left": 193,
+            "delta_right": 194,
+            "delta_top": 6,
+            "delta_bottom": 6,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "time_over",
+            "source": "Time Over",
+            "korean": "시간 종료",
+            "original_bbox": [
+              241,
+              1274,
+              1610,
+              1515
+            ],
+            "localized_bbox": [
+              483,
+              1279,
+              1368,
+              1509
+            ],
+            "derived_final_vs_clean_bbox": [
+              483,
+              1279,
+              1368,
+              1509
+            ],
+            "delta_left": 242,
+            "delta_right": 242,
+            "delta_top": 5,
+            "delta_bottom": 6,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "game_over",
+            "source": "Game Over",
+            "korean": "게임 오버",
+            "original_bbox": [
+              1915,
+              1287,
+              3409,
+              1525
+            ],
+            "localized_bbox": [
+              2225,
+              1292,
+              3099,
+              1520
+            ],
+            "derived_final_vs_clean_bbox": [
+              2225,
+              1292,
+              3099,
+              1520
+            ],
+            "delta_left": 310,
+            "delta_right": 310,
+            "delta_top": 5,
+            "delta_bottom": 5,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "goal",
+            "source": "GOAL",
+            "korean": "골",
+            "original_bbox": [
+              1620,
+              1660,
+              2814,
+              2024
+            ],
+            "localized_bbox": [
+              2056,
+              1675,
+              2377,
+              2008
+            ],
+            "derived_final_vs_clean_bbox": [
+              2056,
+              1675,
+              2377,
+              2008
+            ],
+            "delta_left": 436,
+            "delta_right": 437,
+            "delta_top": 15,
+            "delta_bottom": 16,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          }
+        ],
+        "status": "PASS"
+      },
+      "visual_evidence": {
+        "full_compare": "localization/graphics/role_C/20261004-1920-C98/C98_CBF8ECBF_FULL_COMPARE.jpg",
+        "row_contact": "localization/graphics/role_C/20261004-1920-C98/C98_CBF8ECBF_ROW_CONTACT.jpg",
+        "controller_visual_qa": "PENDING"
+      },
+      "runtime_validation": "UNTESTED",
+      "status": "C98_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+    }
+  ],
+  "summary": {
+    "assets_checked": 3,
+    "static_machine_pass": 3,
+    "static_machine_fail": 0,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changes": false
+  }
+}
