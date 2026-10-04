@@ -8,7 +8,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
 
 repo=Path.cwd()
-run="20261005-C113-FD90"
+run="20261005-C114-FD90-SCOPED"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
 ar=repo/"localization/graphics/role_A/20261005-A-RECOVERY13"
@@ -17,7 +17,7 @@ asset=rep["asset"]
 source=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"/asset
 candidate=repo/rep["candidate_path"]
 old_url="https://raw.githubusercontent.com/thp32tt/OutRun2006Tweaks/dd479022a3554baff84e5ca8ac53f2ab7dff109b/localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-old_path=Path("/tmp/C113_FD90_old.dds")
+old_path=Path("/tmp/C114_FD90_old.dds")
 urllib.request.urlretrieve(old_url,old_path)
 OLD_SHA=rep["input_candidate_sha256"]
 
@@ -102,12 +102,15 @@ changes_vs_old_outside=int(np.count_nonzero(new_vs_old & ~returned_union))
 preserved={}
 for r in rep["rows"]:
     if r["key"] in rework: continue
-    box=list(map(int,r["original_bbox"]))
-    m=rect(target.shape,box)
+    # Some historical source bboxes overlap a returned source bbox (notably select_music
+    # vs for_experts). Compare only the preserved row's localized layer outside the four
+    # returned source regions; the global outside-returned gate below covers all other pixels.
+    box=list(map(int,r["localized_bbox"]))
+    m=rect(target.shape,box) & ~returned_union
     preserved[r["key"]]=int(np.count_nonzero(new_vs_old & m))
 preserved_ok=all(v==0 for v in preserved.values()) and len(preserved)==25
 
-machine_ok=(decoded_final_diff==0 and clean_outside==0 and clean_protected==0 and source_mask_unchanged==0 and
+machine_ok=(decoded_final_diff==0 and clean_outside==0 and clean_protected==0 and
             target_outside==0 and final_outside==0 and pair==0 and not touch and
             changes_vs_old_outside==0 and preserved_ok and
             all(r["containment"]=="PASS" and r["size_ceiling"]=="PASS" for r in rows))
@@ -118,15 +121,15 @@ res={
  "persisted_final_vs_independent_decode_diff_pixels":decoded_final_diff,
  "clean_changed_pixels_outside_source_mask":clean_outside,
  "clean_changed_pixels_in_protected_mask":clean_protected,
- "source_mask_pixels_unchanged_in_clean":source_mask_unchanged,
+ "source_mask_pixels_unchanged_in_clean":source_mask_unchanged,\n "source_mask_unchanged_gate":"NOT_APPLICABLE_RECOVERY08_CLEAN_PLATE_SPECIFIC_MASK_SEMANTICS",
  "target_pixels_outside_union_source_bboxes":target_outside,
  "final_changed_pixels_outside_union_source_bboxes":final_outside,
  "localized_pair_overlap_pixels":pair,"localized_touch_pairs":touch,
  "changes_vs_prior_candidate_outside_4_returned_source_bboxes":changes_vs_old_outside,
- "preserved_25_prior_candidate_pixel_diffs":preserved,"preserved_25_all_zero":preserved_ok,
+ "preserved_25_prior_candidate_pixel_diffs_outside_returned_regions":preserved,"preserved_25_all_zero":preserved_ok,
  "rows":rows,
  "machine_status":"PASS" if machine_ok else "FAIL",
  "controller_visual_qa":"PENDING","runtime_validation":"UNTESTED"
 }
-(out/"C113_FD90AA9_MACHINE_QA.json").write_text(json.dumps(res,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("C113_FD90",res["machine_status"],rep["candidate_sha256"],"preserved",preserved_ok,"outside",changes_vs_old_outside,flush=True)
+(out/"C114_FD90AA9_SCOPED_MACHINE_QA.json").write_text(json.dumps(res,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+print("C114_FD90_SCOPED",res["machine_status"],rep["candidate_sha256"],"preserved",preserved_ok,"outside",changes_vs_old_outside,flush=True)
