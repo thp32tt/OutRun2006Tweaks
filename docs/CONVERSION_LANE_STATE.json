@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
+  "state_parent_head": "9604cdc394cb711e37adc57a73a631eac8344e3d",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -83,9 +83,9 @@
     "chat_rollover": 4,
     "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
   },
-  "runtime_blocker": "CONVERSION-DX11-00377/R252 is automation-complete but has no Quest 3/VDXR runtime evidence; it remains dormant pre-Draw readiness and makes no runtime claim. Existing runtime-only A/B items remain separately UNTESTED.",
-  "runtime_next_action": "Keep NativeDrawPath inactive. R252 needs no runtime claim for static/CI completion; any future activation or HMD promotion must be validated separately.",
-  "independent_static_next_action": "Preserve validated R239-R252 programmable ownership/readiness. Under a new TASK_ID, review only the next bounded actual managed source-index value validation against the declared indexed range; keep Draw*/NativeDrawPath dormant until separately validated.",
+  "runtime_blocker": "CONVERSION-DX11-00380/R253 is static/CI work only and has no Quest 3/VDXR runtime evidence. It makes no runtime-normality claim.",
+  "runtime_next_action": "Keep NativeDrawPath inactive. R253 requires exact-SHA automation validation for static completion; any future Draw activation or HMD promotion requires separate matching runtime evidence.",
+  "independent_static_next_action": "After exact-SHA validation, preserve R239-R253 readiness. Under a new TASK_ID, seal R253 against a fresh live IA index-buffer/format/offset reobservation before any Draw*/NativeDrawPath activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -2896,29 +2896,15 @@
     }
   ],
   "controller_dispatch": {
-    "task_id": "CONVERSION-DX11-00377",
-    "production_id": "CONVERSION-DX11-00377",
-    "event_id": "CONVERSION-DX11-00377-E003",
-    "event_type": "rollover",
+    "task_id": "CONVERSION-DX11-00380",
+    "production_id": "CONVERSION-DX9EX-00379",
+    "event_id": "CONVERSION-DX9EX-00379-E002",
+    "event_type": "retry",
     "attempt": "1/3",
-    "chat_rollover": 4,
-    "rollover_is_retry": false,
-    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
-    "source": "CURRENT_USER_ROLLOVER",
+    "source": "CURRENT_USER_QUEUE",
     "runtime_validation": "UNTESTED",
     "native_draw_path_activation_changed": false,
-    "material_result_sha": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
-    "source_implementation_sha": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
-    "validation_bearing_result_sha": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
-    "validation_run_id": 37223558242,
-    "validation_run_attempt": 1,
-    "validation_job_id": 111498511882,
-    "readiness_smoke_job_id": 111499460549,
-    "artifact_id": 11311002163,
-    "artifact_digest": "sha256:3b86956b90f55991c18f391dc037db5fb35906be20ab9337bc20e8b99430f5a6",
-    "implementation_comment_id": 5983004697,
-    "validation_comment_id": 5983004697,
-    "dispatch_source": "CURRENT_USER_ROLLOVER"
+    "dispatch_source": "CURRENT_USER_QUEUE"
   },
   "rollover_metadata_correction": {
     "task_id": "CONVERSION-DX11-00371",
@@ -3038,81 +3024,31 @@
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_dispatch_reconciliation": {
-    "task_id": "CONVERSION-DX11-00377",
+    "task_id": "CONVERSION-DX11-00380",
     "authoritative": {
-      "task_id": "CONVERSION-DX11-00377",
-      "production_id": "CONVERSION-DX11-00377",
-      "event_id": "CONVERSION-DX11-00377-E003",
-      "event_type": "rollover",
+      "task_id": "CONVERSION-DX11-00380",
+      "production_id": "CONVERSION-DX9EX-00379",
+      "event_id": "CONVERSION-DX9EX-00379-E002",
+      "event_type": "retry",
       "attempt": "1/3",
-      "chat_rollover": 4,
-      "rollover_is_retry": false,
-      "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
-      "source": "CURRENT_USER_ROLLOVER",
+      "source": "CURRENT_USER_QUEUE",
       "runtime_validation": "UNTESTED",
       "native_draw_path_activation_changed": false,
-      "material_result_sha": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
-      "source_implementation_sha": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
-      "validation_bearing_result_sha": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
-      "validation_run_id": 37223558242,
-      "validation_run_attempt": 1,
-      "validation_job_id": 111498511882,
-      "readiness_smoke_job_id": 111499460549,
-      "artifact_id": 11311002163,
-      "artifact_digest": "sha256:3b86956b90f55991c18f391dc037db5fb35906be20ab9337bc20e8b99430f5a6",
-      "implementation_comment_id": 5983004697,
-      "validation_comment_id": 5983004697,
-      "dispatch_source": "CURRENT_USER_ROLLOVER"
+      "dispatch_source": "CURRENT_USER_QUEUE"
     },
-    "superseded": [
-      {
-        "task_id": "CONVERSION-DX11-00377",
-        "production_id": "CONVERSION-DXVK-00375",
-        "event_id": "CONVERSION-DXVK-00375-E003",
-        "event_type": "rollover",
-        "attempt": "1/3",
-        "source": "CURRENT_USER_QUEUE",
-        "runtime_validation": "UNTESTED",
-        "native_draw_path_activation_changed": false,
-        "rollover_is_retry": false,
-        "material_result_sha": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
-        "source_implementation_sha": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
-        "validation_bearing_result_sha": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
-        "validation_run_id": 37223558242,
-        "validation_run_attempt": 1,
-        "validation_job_id": 111498511882,
-        "readiness_smoke_job_id": 111499460549,
-        "artifact_id": 11311002163,
-        "artifact_digest": "sha256:3b86956b90f55991c18f391dc037db5fb35906be20ab9337bc20e8b99430f5a6",
-        "implementation_comment_id": 5983004697,
-        "validation_comment_id": 5983004697,
-        "dispatch_source": "CURRENT_USER_QUEUE"
-      },
-      {
-        "task_id": "CONVERSION-DX11-00377",
-        "production_id": "CONVERSION-DX11-00377",
-        "event_id": "CONVERSION-DX11-00377-E001",
-        "event_type": "rollover",
-        "attempt": "1/3",
-        "chat_rollover": 2,
-        "rollover_is_retry": false,
-        "source": "CURRENT_USER_ROLLOVER",
-        "dispatch_source": "CURRENT_USER_QUEUE"
-      }
-    ],
-    "reason": "CONVERSION-DX11-00377-E003 / CHAT_ROLLOVER=4 is the latest explicit rollover. ATTEMPT stays 1/3; the validated R252 material/result SHA and exact-SHA Gate evidence remain unchanged.",
-    "material_and_validation_bearing_sha_unchanged": true
+    "superseded": [],
+    "reason": "CONVERSION-DX11-00380 is the current explicit DX11 controller task. Its upstream event is retry metadata from CONVERSION-DX9EX-00379-E002; the controller-specified ATTEMPT remains 1/3.",
+    "material_and_validation_bearing_sha_unchanged": false
   },
   "current_task": {
-    "status": "COMPLETE",
-    "task_id": "CONVERSION-DX11-00377",
-    "selected_work_item": "DX11_R252_PROGRAMMABLE_INDEXED_DIRECT_DISPATCH_SOURCE_RANGE_READINESS",
-    "base_sha": "bca92b71b9a47149ebe581a95e74796d2e387014",
-    "result_sha": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
-    "material_result_sha": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
-    "validation_bearing_result_sha": "ebc894fb2e23245a5370b2876990126c4dd07d5c",
-    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R252_PROGRAMMABLE_INDEXED_DIRECT_DISPATCH_SOURCE_RANGE_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
-    "runtime_validation": "UNTESTED",
-    "validation_run_id": 37223558242
+    "status": "IMPLEMENTED_PENDING_VALIDATION",
+    "task_id": "CONVERSION-DX11-00380",
+    "selected_work_item": "DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS",
+    "base_sha": "9604cdc394cb711e37adc57a73a631eac8344e3d",
+    "result_sha": null,
+    "material_result_sha": null,
+    "validation_bearing_result_sha": null,
+    "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "runtime_validation": "UNTESTED"
   }
 }

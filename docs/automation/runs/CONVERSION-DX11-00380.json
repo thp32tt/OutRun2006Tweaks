@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00380",
+  "production_id": "CONVERSION-DX9EX-00379",
+  "event_id": "CONVERSION-DX9EX-00379-E002",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "VALIDATING",
+  "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "9604cdc394cb711e37adc57a73a631eac8344e3d",
+  "result_sha": null,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_marker": "[AUTO:CONVERSION-DX11-00380]",
+  "selected_work_item": "DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS",
+  "summary": "R253 binds R252 programmable indexed dispatch readiness to the actual current MANAGED index-buffer CPU-shadow values. It converts the live IA byte offset plus StartIndex into an exact shadow element start, scans the exact 16/32-bit index window, and fails closed when any source index falls outside the declared D3D9 MinVertexIndex..MaxVertexIndex range. No DrawIndexed or NativeDrawPath activation is added.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00380.json",
+    "docs/CONVERSION_LANE_STATE.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT vr-dx11-native-r71 at 9604cdc394cb711e37adc57a73a631eac8344e3d. Read VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, prior 00377 run record, VR_AUTODEV/VR_RUN/VR_REVIEW/VR_REGRESSION/VR_PROBLEM history, and Issue #14. R252 is durable and its exact next action selects actual MANAGED source-index value validation."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R252 proves numeric D3D9 indexed arguments and byte windows but does not inspect the actual index values fetched from the current MANAGED IB shadow. Existing NativeManagedIndexRangeReadiness already provides exact generation-bound shadow scanning, and fixed-function R152 proves the pattern. The smallest successor is a programmable R253 receipt that binds those actual values to the R252 snapshot without activating DrawIndexed.",
+      "review_lenses": {
+        "architecture": "Reuse NativeManagedIndexRangeReadiness and add one programmable source-value receipt/validator; do not duplicate a second CPU-shadow implementation.",
+        "ownership_lifetime": "Require the current managed IB mirror snapshot to equal R252 indexBufferSnapshotToken and bind its source-value snapshot/content hash into R253.",
+        "stereo_correctness": "No WVP/projection/HUD/surface/OpenXR semantics change; runtime remains UNTESTED.",
+        "performance": "Dormant readiness scan/probe only; no production draw routing or per-frame activation path is enabled.",
+        "adversarial": "Fail closed on stale/tampered R252 snapshot fields, unsupported index format, unaligned/overflowed IA index offset translation, managed mirror identity drift, and any actual index outside MinVertexIndex..MaxVertexIndex."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderIndexedSourceValueReadiness, compose/validate helpers, exact R252 snapshot-integrity reconstruction, IA indexOffset+StartIndex to MANAGED-shadow element translation, exact NativeManagedIndexRangeReadiness scan, positive hosted-probe coverage, and an R252-ready-but-actual-index-out-of-range fail-closed regression. Source-graph RED was observed before implementation and GREEN after implementation."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING_EXACT_SHA_CI",
+      "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_MATERIAL_COMMIT",
+      "result_marker": "[AUTO:CONVERSION-DX11-00380]"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant programmable indexed source-value readiness/probe only; no runtime package, HMD binary distribution, selector, or NativeDrawPath activation changes."
+    },
+    "C6_STATE": {
+      "status": "PENDING_VALIDATION",
+      "state_persisted": false,
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "After exact-SHA validation, persist R253 as durable. A successor may seal the R253 source-value receipt against a fresh live IA index-buffer/format/offset reobservation before any Draw*/NativeDrawPath activation."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS",
+      "VR_BACKEND_SET05_F23_SAMPLE_EXACT_NOT_ACTIVATION_GATE"
+    ],
+    "evidence": "Regression/history documents were checked before implementation. The change remains dormant DX11 readiness and hosted-probe code; no known protected runtime-visible path is activated."
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00380",
+    "production_id": "CONVERSION-DX9EX-00379",
+    "event_id": "CONVERSION-DX9EX-00379-E002",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "dispatch_source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Validate the material SHA with Backend Conversion Gate, then persist C3/C4/C6 without changing validation-bearing identity."
+}

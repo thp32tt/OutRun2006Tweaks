@@ -1570,6 +1570,50 @@ struct NativeProgrammableShaderIndexedDirectDispatchReadiness {
     std::uint64_t snapshotToken{};
 };
 
+// R253 binds R252's exact programmable indexed dispatch receipt to the actual
+// values in the current MANAGED source-index CPU shadow. The IA byte offset is
+// converted to a shadow element offset before scanning, so non-zero aligned
+// index offsets cannot silently validate the wrong source indices. This is
+// dormant readiness evidence only and never issues DrawIndexed.
+struct NativeProgrammableShaderIndexedSourceValueReadiness {
+    bool inputValid{};
+    bool directDispatchReady{};
+    bool indexMirrorReady{};
+    bool indexFormatExact{};
+    bool shadowStartIndexExact{};
+    bool mirrorSnapshotMatchesDispatch{};
+    bool sourceValuesReady{};
+    bool sourceValuesMatchDispatch{};
+    bool valuesWithinDeclaredRange{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    D3DPRIMITIVETYPE primitiveType = D3DPT_FORCE_DWORD;
+    D3DFORMAT sourceIndexFormat = D3DFMT_UNKNOWN;
+    UINT shadowStartIndex{};
+    UINT indexCount{};
+    UINT minVertexIndex{};
+    UINT maxVertexIndex{};
+    UINT observedMinIndex{};
+    UINT observedMaxIndex{};
+    std::uint64_t contentHash{};
+    std::uint64_t directDispatchSnapshotToken{};
+    std::uint64_t indexMirrorSnapshotToken{};
+    std::uint64_t sourceValuesSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderIndexedSourceValueReadiness
+compose_programmable_indexed_source_value_readiness(
+    D3DPRIMITIVETYPE primitiveType,
+    const NativeProgrammableShaderIndexedDirectDispatchReadiness& dispatch,
+    const NativeManagedBufferShadow& indexBuffer) noexcept;
+
+[[nodiscard]] bool validate_programmable_indexed_source_value_snapshot(
+    D3DPRIMITIVETYPE primitiveType,
+    const NativeProgrammableShaderIndexedDirectDispatchReadiness& dispatch,
+    const NativeManagedBufferShadow& indexBuffer,
+    std::uint64_t snapshotToken) noexcept;
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;

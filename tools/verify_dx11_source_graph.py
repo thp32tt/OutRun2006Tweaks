@@ -9987,6 +9987,33 @@ def main() -> None:
             + ", ".join(missing_r252_programmable_indexed_direct_dispatch)
         )
 
+    r253_programmable_indexed_source_value_contract = [
+        ("struct NativeProgrammableShaderIndexedSourceValueReadiness",
+         NATIVE_BACKEND_HPP, "R253 programmable indexed source-value readiness type"),
+        ("compose_programmable_indexed_source_value_readiness(",
+         NATIVE_BACKEND_HPP, "R253 indexed source-value readiness declaration"),
+        ("validate_programmable_indexed_source_value_snapshot(",
+         NATIVE_BACKEND_HPP, "R253 indexed source-value snapshot validator"),
+        ("shadowStartIndexExact",
+         NATIVE_BACKEND_CPP, "R253 exact IA index-offset to managed-shadow start conversion"),
+        ("valuesWithinDeclaredRange",
+         NATIVE_BACKEND_CPP, "R253 actual managed index-value range gate"),
+        ("R253 exact programmable indexed source values",
+         CONSTANT_BUFFER_PROBE, "R253 exact source-value regression"),
+        ("R253 source values outside declared range fail closed",
+         CONSTANT_BUFFER_PROBE, "R253 out-of-range source-value regression"),
+    ]
+    missing_r253_programmable_indexed_source_value = [
+        meaning for token, source, meaning
+        in r253_programmable_indexed_source_value_contract
+        if token not in source
+    ]
+    if missing_r253_programmable_indexed_source_value:
+        raise SystemExit(
+            "DX11 R253 programmable indexed source-value drift: " +
+            ", ".join(missing_r253_programmable_indexed_source_value)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
