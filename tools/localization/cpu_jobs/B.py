@@ -60,11 +60,26 @@ def mode_rgba(pix):
     # Quantized mode suppresses tiny antialias variation.
     q=[tuple((int(c)//8)*8 for c in p) for p in pix]
     return Counter(q).most_common(1)[0][0]
-def text_mask_for_cell(cell):
+def text_mask_for_cell(cell,key):
     crop=np.asarray(src.crop(cell),dtype=np.int16); h,w,_=crop.shape; bw=max(3,min(12,min(h,w)//12))
     border=np.concatenate([crop[:bw].reshape(-1,4),crop[-bw:].reshape(-1,4),crop[:, :bw].reshape(-1,4),crop[:, -bw:].reshape(-1,4)],axis=0)
     transparent=float(np.mean(border[:,3]<8))
-    if transparent>=0.60:
+    if key in ('name','status'):
+        # Header labels are dark gray glyphs on an opaque light-gray bar. Segment by Otsu luminance, not alpha.
+        rgb=crop[:,:,:3].astype(np.float32); lum=(0.2126*rgb[:,:,0]+0.7152*rgb[:,:,1]+0.0722*rgb[:,:,2]); vals=lum[crop[:,:,3]>200].astype(np.uint8)
+        hist=np.bincount(vals,minlength=256).astype(np.float64); total=hist.sum(); sum_total=np.dot(np.arange(256),hist); w0=0.0; s0=0.0; best=-1.0; thr=128
+        for t in range(256):
+            w0+=hist[t]
+            if w0==0: continue
+            w1=total-w0
+            if w1==0: break
+            s0+=t*hist[t]; m0=s0/w0; m1=(sum_total-s0)/w1; between=w0*w1*(m0-m1)*(m0-m1)
+            if between>best: best=between; thr=t
+        mask=(lum<=thr)&(crop[:,:,3]>200)
+        bgpix=crop[(lum>thr)&(crop[:,:,3]>200)]
+        if bgpix.size==0: raise RuntimeError(f'header background segmentation failed {key}')
+        bg=tuple(int(x) for x in np.median(bgpix,axis=0)); bg_type='opaque_flat_header'; variance=float(np.percentile(np.max(np.abs(bgpix.astype(np.int16)-np.array(bg,dtype=np.int16)),axis=1),90))
+    elif transparent>=0.60:
         mask=(crop[:,:,3]>2); bg=(0,0,0,0); bg_type='transparent'; variance=0.0
     else:
         allpix=crop.reshape(-1,4); bg=mode_rgba(allpix.tolist()); bgv=np.array(bg,dtype=np.int16)
@@ -93,7 +108,7 @@ def text_mask_for_cell(cell):
 
 rows=[];masks={};bboxes={};bg_meta={}; source_text_mask=Image.new('L',src.size,0)
 for key,english,korean,lc,slant in spec:
-    cell=tuple(v*scale for v in lc);m,bb,bg,bgt,var=text_mask_for_cell(cell);masks[key]=m;bboxes[key]=bb;source_text_mask=ImageChops.lighter(source_text_mask,m);bg_meta[key]=(bg,bgt,var,cell)
+    cell=tuple(v*scale for v in lc);m,bb,bg,bgt,var=text_mask_for_cell(cell,key);masks[key]=m;bboxes[key]=bb;source_text_mask=ImageChops.lighter(source_text_mask,m);bg_meta[key]=(bg,bgt,var,cell)
     rows.append({'key':key,'source':english,'korean':korean,'logical_cell':list(lc),'hd_cell':list(cell),'original_bbox':list(bb),'clean_background_rgba':list(bg),'background_type':bgt,'background_variance_p90':var,'slant':slant})
 allowed=rectmask(src.size,list(bboxes.values()));protected=ImageChops.invert(allowed)
 # Build clean plate per element: exact transparent restore for transparent cells; local flat background reconstruction for opaque header strips.
