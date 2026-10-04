@@ -8950,7 +8950,7 @@ def main() -> None:
          DX11_CENSUS_ANALYZER, "R226 summary source-log provenance"),
         ("latest_summaries_by_log: dict[str, dict] = {}",
          DX11_CENSUS_ANALYZER, "R226 per-log latest summary map"),
-        ('"AllSourceLogsHavePeriodicSummary": all_source_logs_have_summary',
+        ('"AllSourceLogsHavePeriodicSummary": all_source_logs_have_periodic_summary',
          DX11_CENSUS_ANALYZER, "R226 summary completeness evidence"),
         ('elif not all_source_logs_have_summary:',
          DX11_CENSUS_ANALYZER, "R226 partial-summary fail-closed status"),
