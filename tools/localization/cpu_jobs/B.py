@@ -8,24 +8,23 @@ from scipy import ndimage
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("B hosted worker only")
 
-RUN="20261005-B-PRODUCTION45"
+RUN="20261005-B-PRODUCTION46"
 ASSET="textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds"
 INDEX=130
-# Sorted readable-layout order after the exact raw rotate-180 transform:
-# three stacked course rows, then bottom-left average-rank and bottom-right SP course.
+# Exact readable-layout order under the raw mirror-Y transform.
 LABELS=[
  ("MIX 1 COURSE","믹스 1 코스"),
  ("MIX 2 COURSE","믹스 2 코스"),
  ("OUTRUN2 COURSE","아웃런2 코스"),
- ("AVERAGE RANK:","평균 랭크:"),
  ("OUTRUN2SP COURSE","아웃런2 SP 코스"),
+ ("AVERAGE RANK:","평균 랭크:"),
 ]
 
 def main():
     repo=Path.cwd(); out=repo/"localization/graphics/role_B"/RUN
     out.mkdir(parents=True,exist_ok=True)
     wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
-    for p in (out/"B_PRODUCTION45_FAIL_CLOSED.json",wr/"B_PRODUCTION45_1762489B_FAIL.json"):
+    for p in (out/"B_PRODUCTION46_FAIL_CLOSED.json",wr/"B_PRODUCTION46_1762489B_FAIL.json"):
         if p.exists(): p.unlink()
 
     source_zip=repo/"localization/validation/binary_compare/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip"
@@ -50,13 +49,13 @@ def main():
     if (W,H)!=(2048,512): raise RuntimeError(("dimensions",W,H))
     if sb[:128]!=hb[:128]: raise RuntimeError("historical header mismatch")
 
-    # Controller visual inspection of exact source proved the five target labels are
-    # stored rotate-180 in raw DDS. Work in true readable orientation, then restore
-    # that exact raw transform at encode time.
+    # B45 controller visual comparison across mirror-X and rotate-180 attempts proves
+    # the five target labels are stored mirror-Y in raw DDS. FLIP_TOP_BOTTOM is the
+    # only transform that makes the exact English source readable without mirroring.
     src_raw=Image.frombytes("RGBA",(W,H),sb[128:],"raw","RGBA")
     hist_raw=Image.frombytes("RGBA",(W,H),hb[128:],"raw","RGBA")
-    src=src_raw.transpose(Image.Transpose.ROTATE_180)
-    hist=hist_raw.transpose(Image.Transpose.ROTATE_180)
+    src=src_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+    hist=hist_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
     sa=np.asarray(src,dtype=np.uint8); ha=np.asarray(hist,dtype=np.uint8)
     src_alpha=sa[:,:,3]>0
     base_diff=np.any(sa!=ha,axis=2)
@@ -114,7 +113,7 @@ def main():
         if cur is not None: anchors.append(cur)
     best=sorted(anchors,key=lambda b:(b[1],b[0]))
     if len(best)!=5:
-        (out/"B_PRODUCTION45_DISCOVERY_DIAGNOSTIC.json").write_text(json.dumps({"raw_k7":raw,"bands":bands,"post_row_merge":best},indent=2)+"\n")
+        (out/"B_PRODUCTION46_DISCOVERY_DIAGNOSTIC.json").write_text(json.dumps({"raw_k7":raw,"bands":bands,"post_row_merge":best},indent=2)+"\n")
         raise RuntimeError(("expected 5 target regions after row merge",len(best)))
 
     # Exact source-effect mask: for each historical-diff anchor, include complete
@@ -249,11 +248,11 @@ def main():
 
     target=np.zeros((H,W),bool)
     for m in target_masks: target|=m
-    final_raw=final.transpose(Image.Transpose.ROTATE_180)
+    final_raw=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
     payload=sb[:128]+final_raw.tobytes("raw","RGBA")
     candidate.write_bytes(payload); cand_sha=sha(payload)
     cb=candidate.read_bytes(); _,_,_=meta(cb)
-    dec_raw=Image.frombytes("RGBA",(W,H),cb[128:],"raw","RGBA"); dec=dec_raw.transpose(Image.Transpose.ROTATE_180)
+    dec_raw=Image.frombytes("RGBA",(W,H),cb[128:],"raw","RGBA"); dec=dec_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
     if cb[:128]!=sb[:128] or ImageChops.difference(final,dec).getbbox() is not None: raise RuntimeError("DDS roundtrip/header")
     da=np.asarray(dec,dtype=np.uint8)
 
@@ -284,8 +283,8 @@ def main():
     clean.save(out/"1762489B_CLEAN_PLATE.png")
     sp=Path("/tmp/176_source.png"); fp=Path("/tmp/176_final.png"); src.save(sp); dec.save(fp)
     validator=repo/"tools/localization/validate_clean_plate.py"
-    subprocess.run(["python3",str(validator),str(sp),str(out/"1762489B_CLEAN_PLATE.png"),str(out/"1762489B_SOURCE_TEXT_MASK.png"),"--report",str(out/"B_PRODUCTION45_CLEAN_VALIDATION.json")],check=True)
-    subprocess.run(["python3",str(validator),str(sp),str(fp),str(out/"1762489B_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(out/"1762489B_PROTECTED_MASK.png"),"--report",str(out/"B_PRODUCTION45_FINAL_VALIDATION.json")],check=True)
+    subprocess.run(["python3",str(validator),str(sp),str(out/"1762489B_CLEAN_PLATE.png"),str(out/"1762489B_SOURCE_TEXT_MASK.png"),"--report",str(out/"B_PRODUCTION46_CLEAN_VALIDATION.json")],check=True)
+    subprocess.run(["python3",str(validator),str(sp),str(fp),str(out/"1762489B_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(out/"1762489B_PROTECTED_MASK.png"),"--report",str(out/"B_PRODUCTION46_FINAL_VALIDATION.json")],check=True)
 
     def comp(im,bg=(64,64,64,255)):
         z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
@@ -294,7 +293,7 @@ def main():
     cards=[card("SOURCE_READABLE",src),card("CLEAN",clean),card("FINAL",dec),card("FINAL_WHITE",dec,(255,255,255,255))]
     sh=Image.new("RGB",(W*2,(H+25)*2),"white")
     sh.paste(cards[0],(0,0));sh.paste(cards[1],(W,0));sh.paste(cards[2],(0,H+25));sh.paste(cards[3],(W,H+25))
-    sh.thumbnail((1900,1200),Image.Resampling.LANCZOS);sh.save(out/"B_PRODUCTION45_176_COMPARE.jpg",quality=96)
+    sh.thumbnail((1900,1200),Image.Resampling.LANCZOS);sh.save(out/"B_PRODUCTION46_176_COMPARE.jpg",quality=96)
 
     contacts=[]; sr=comp(src); cl=comp(clean); fi=comp(dec)
     for row in rows:
@@ -305,17 +304,17 @@ def main():
         ImageDraw.Draw(c).text((4,4),f'{row["n"]} {row["source"]} -> {row["korean"]}',fill="black");contacts.append(c)
     rs=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in contacts)+4*(len(contacts)-1)),"white");yy=0
     for c in contacts:rs.paste(c,(0,yy));yy+=c.height+4
-    rs.save(out/"B_PRODUCTION45_176_ROW_CONTACT_2X.jpg",quality=96)
+    rs.save(out/"B_PRODUCTION46_176_ROW_CONTACT_2X.jpg",quality=96)
 
-    raws=[card("SOURCE_RAW_ROTATE_180",src_raw),card("FINAL_RAW_ROTATE_180",dec_raw)]
-    rr=Image.new("RGB",(W,(H+25)*2),"white");rr.paste(raws[0],(0,0));rr.paste(raws[1],(0,H+25));rr.thumbnail((1600,1000),Image.Resampling.LANCZOS);rr.save(out/"B_PRODUCTION45_176_RAW_COMPARE.jpg",quality=96)
+    raws=[card("SOURCE_RAW_MIRROR_Y",src_raw),card("FINAL_RAW_MIRROR_Y",dec_raw)]
+    rr=Image.new("RGB",(W,(H+25)*2),"white");rr.paste(raws[0],(0,0));rr.paste(raws[1],(0,H+25));rr.thumbnail((1600,1000),Image.Resampling.LANCZOS);rr.save(out/"B_PRODUCTION46_176_RAW_COMPARE.jpg",quality=96)
 
     report={"schema_version":1,"role":"B","run":RUN,"queue_index":INDEX,"asset":ASSET,
       "readiness_tier":"RENDER_READY_COMPLETED_SAME_INVOCATION","source_sha256":source_sha,
       "historical_discovery_sha256":hist_sha,"historical_discovery_only":True,"historical_localized_pixels_reused":False,
       "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
-      "method":"exact 2048x512 RGBA32 source; historical candidate only as target-region hint; exact connected source-alpha/effect component masks; alpha-only clean plate; fresh Hangul render; exact-header rotate-180 DDS; decoded static QA",
-      "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":mips,"header_128_exact":True,"raw_orientation":"rotate_180"},
+      "method":"exact 2048x512 RGBA32 source; historical candidate only as target-region hint; exact connected source-alpha/effect component masks; alpha-only clean plate; fresh Hangul render; exact-header mirror-Y DDS; decoded static QA",
+      "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
       "segments_total":5,"preserved_original":["numeric rank marker","unrelated artwork"],"rows":rows,
       "containment":{"elements_total":5,"elements_pass":5,"changed_pixels_outside_original_bboxes":outside,
         "alpha_changed_pixels_outside_original_bboxes":alpha_out,"target_pixels_outside_original_bboxes":target_out,
@@ -324,12 +323,12 @@ def main():
       "clean_plate":{"changed_pixels_outside_source_effect":clean_out,"source_effect_alpha_remaining":clean_residue,"rgb_changed_pixels":0,"status":"PASS"},
       "policy":{"stage_names":"not_applicable","song_titles_credits":"not_targeted","multi_line":"not_applicable"},
       "manual_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
-      "status":"B_PRODUCTION45_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-    (out/"B_PRODUCTION45_176_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+      "status":"B_PRODUCTION46_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+    (out/"B_PRODUCTION46_176_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     summary={"run":RUN,"asset":"1762489B","index":INDEX,"candidate_sha256":cand_sha,"bbox_size_pass":"5/5",
       "outside":outside,"alpha_outside":alpha_out,"source_residue":residue,"overlap":overlap,"touch_pairs":len(touches),
-      "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{RUN}/B_PRODUCTION45_176_REPORT.json"}
-    (wr/"B_PRODUCTION45_1762489B.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+      "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{RUN}/B_PRODUCTION46_176_REPORT.json"}
+    (wr/"B_PRODUCTION46_1762489B.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps(summary,ensure_ascii=False),flush=True)
 
 if __name__=="__main__":
@@ -338,6 +337,6 @@ if __name__=="__main__":
         repo=Path.cwd(); out=repo/"localization/graphics/role_B"/RUN; out.mkdir(parents=True,exist_ok=True)
         wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
         fail={"run":RUN,"asset":"1762489B","index":INDEX,"status":"FAIL_CLOSED_DIAGNOSTIC","exception":repr(e),"traceback":traceback.format_exc(),"RUNTIME_VALIDATION":"UNTESTED"}
-        (out/"B_PRODUCTION45_FAIL_CLOSED.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-        (wr/"B_PRODUCTION45_1762489B_FAIL.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+        (out/"B_PRODUCTION46_FAIL_CLOSED.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+        (wr/"B_PRODUCTION46_1762489B_FAIL.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
         print(json.dumps(fail,ensure_ascii=False),flush=True)
