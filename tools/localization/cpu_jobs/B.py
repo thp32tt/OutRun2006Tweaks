@@ -194,25 +194,26 @@ for spec in TARGETS:
         if not len(xs):raise RuntimeError(("empty_core",spec["key"],li))
         abs_core=np.zeros((2048,2048),bool)
         abs_core[y0+gy0:y0+gy1,x0:x1]=core[gy0:gy1]
-        dil=np.asarray(Image.fromarray((abs_core*255).astype(np.uint8),"L").filter(ImageFilter.MaxFilter(9)))>0
+        dil=np.asarray(Image.fromarray((abs_core*255).astype(np.uint8),"L").filter(ImageFilter.MaxFilter(13)))>0
         zone_top=max(0,(groups[gi-1][1]+gy0)//2) if gi>0 else max(0,gy0-8)
         zone_bottom=min(y1-y0,(gy1+groups[gi+1][0])//2) if gi+1<len(groups) else min(y1-y0,gy1+8)
         cellmask=np.zeros((2048,2048),bool);cellmask[y0+zone_top:y0+zone_bottom,x0:x1]=True
         dil &= cellmask
 
-        # Estimate panel/background colour from a ring around the source core, then select
-        # the complete visible glyph/effect footprint (fill + dark outline/shadow + AA fringe).
-        cx0=x0+int(xs.min());cx1=x0+int(xs.max())+1
-        cy0=y0+gy0;cy1=y0+gy1
-        rx0=max(x0,cx0-14);rx1=min(x1,cx1+14);ry0=max(y0,cy0-10);ry1=min(y1,cy1+10)
-        ring=np.zeros((2048,2048),bool)
-        ring[ry0:ry1,rx0:rx1]=True
-        ring &= ~dil
-        rp=arr[ring]
-        if len(rp)<20:raise RuntimeError(("insufficient_ring",spec["key"],li))
-        bg=np.median(rp,axis=0)
+        # Estimate the dominant local panel colour from opaque non-core pixels in this
+        # semantic line zone.  A tiny ring can be contaminated by the outline itself; the
+        # dominant quantized panel colour is more robust and lets us retain the complete
+        # dark outline/shadow + antialias fringe without swallowing the blue plate.
+        sample_sel=cellmask & ~dil & (arr[:,:,3]>16)
+        rp=arr[sample_sel]
+        if len(rp)<40:raise RuntimeError(("insufficient_panel_samples",spec["key"],li,len(rp)))
+        q=(rp[:,:3]//16).astype(np.uint8)
+        uq,cnt=np.unique(q,axis=0,return_counts=True)
+        modeq=uq[int(np.argmax(cnt))]
+        same=np.all(q==modeq,axis=1)
+        bg=np.median(rp[same],axis=0) if np.any(same) else np.median(rp,axis=0)
         dist=np.max(np.abs(arr.astype(np.int16)-bg.astype(np.int16)),axis=2)
-        effect=dil & (dist>22)
+        effect=dil & (dist>8) & (arr[:,:,3]>0)
         effect |= abs_core
         ey,ex=np.nonzero(effect)
         if not len(ex):raise RuntimeError(("empty_effect",spec["key"],li))
@@ -369,7 +370,7 @@ report={
  "readiness_tier":"ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
  "source_url":source_url,"source_sha256":source_sha_expected,"candidate_sha256":cand_sha,
  "candidate_path":str(candidate.relative_to(repo)),
- "method":"exact 2048x2048 RGBA32 HD source -> colour-core source glyph discovery inside isolated target cells -> source-effect mask -> per-row panel interpolation clean plate -> fresh native Hangul lettering -> exact-header DDS -> decoded all-channel static QA",
+ "method":"exact 2048x2048 RGBA32 HD source -> colour-core semantic line discovery -> dominant-panel colour separation of complete source effects -> per-row panel interpolation clean plate -> fresh native Hangul lettering -> exact-header DDS -> decoded all-channel static QA",
  "structure":{**info,"header_128_exact":True,"raw_orientation":"mirror_y"},
  "semantic_targets":7,"physical_lines":len(rows),
  "translations":[{"source":t["source"],"korean":" / ".join(t["korean"])} for t in TARGETS],
