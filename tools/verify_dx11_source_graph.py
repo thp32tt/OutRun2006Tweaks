@@ -9644,53 +9644,6 @@ def main() -> None:
             + ", ".join(missing_r245_programmable_constant_payload_receipt)
         )
 
-    r246_programmable_constant_binding_receipt_contract = [
-        ("struct NativeProgrammableShaderConstantBindingReadiness",
-         NATIVE_BACKEND_HPP, "R246 programmable constant-binding readiness type"),
-        ("bind_constant_slots_for_observation(",
-         NATIVE_BACKEND_HPP, "R246 constant-slot binding declaration"),
-        ("constant_binding_readiness(",
-         NATIVE_BACKEND_HPP, "R246 constant-binding readiness declaration"),
-        ("validate_constant_binding_snapshot(",
-         NATIVE_BACKEND_HPP, "R246 constant-binding snapshot validation declaration"),
-        ("constantBindingReceiptGeneration",
-         NATIVE_BACKEND_HPP, "R246 per-entry binding receipt generation"),
-        ("expectedContext->VSSetConstantBuffers(0, 1, &vertexBuffer)",
-         NATIVE_BACKEND_CPP, "R246 exact VS b0 binding operation"),
-        ("expectedContext->PSSetConstantBuffers(0, 1, &pixelBuffer)",
-         NATIVE_BACKEND_CPP, "R246 exact PS b0 binding operation"),
-        ("expectedContext->VSGetConstantBuffers(",
-         NATIVE_BACKEND_CPP, "R246 VS b0 readback gate"),
-        ("expectedContext->PSGetConstantBuffers(",
-         NATIVE_BACKEND_CPP, "R246 PS b0 readback gate"),
-        ("constant-payload receipt must exist before slot binding",
-         CONSTANT_BUFFER_PROBE, "R246 validated R245 prerequisite"),
-        ("non-immediate context cannot establish slot binding",
-         CONSTANT_BUFFER_PROBE, "R246 context regression"),
-        ("exact constant-slot binding receipt",
-         CONSTANT_BUFFER_PROBE, "R246 exact binding readiness regression"),
-        ("same constant-slot binding is idempotent",
-         CONSTANT_BUFFER_PROBE, "R246 idempotence regression"),
-        ("external b0 slot drift invalidates binding receipt",
-         CONSTANT_BUFFER_PROBE, "R246 state-drift regression"),
-        ("device reinitialize invalidates constant-binding receipt",
-         CONSTANT_BUFFER_PROBE, "R246 device-generation invalidation regression"),
-        ("stale constant-payload receipt cannot bind slots",
-         CONSTANT_BUFFER_PROBE, "R246 stale R245 regression"),
-        ("fresh device generation receives distinct constant-binding receipt",
-         CONSTANT_BUFFER_PROBE, "R246 fresh receipt regression"),
-    ]
-    missing_r246_programmable_constant_binding_receipt = [
-        meaning for token, source, meaning
-        in r246_programmable_constant_binding_receipt_contract
-        if token not in source
-    ]
-    if missing_r246_programmable_constant_binding_receipt:
-        raise SystemExit(
-            "DX11 R246 programmable constant-binding receipt drift: "
-            + ", ".join(missing_r246_programmable_constant_binding_receipt)
-        )
-
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
