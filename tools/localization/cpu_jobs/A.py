@@ -48,10 +48,10 @@ if sb[:4]!=b"DDS ": raise RuntimeError("not DDS")
 H,W,pitch,depth,mips=struct.unpack_from("<5I",sb,12)
 pf=struct.unpack_from("<8I",sb,76)
 if (W,H,pitch,depth,mips)!=(1024,128,4096,0,1): raise RuntimeError((W,H,pitch,depth,mips))
-if pf[1:]!=(65,0,32,0xff,0xff00,0xff0000,0xff000000): raise RuntimeError(("pixel format",pf))
+if pf[1:]!=(65,0,32,0xff0000,0xff00,0xff,0xff000000): raise RuntimeError(("pixel format",pf))
 if len(sb)!=128+W*H*4: raise RuntimeError(("byte size",len(sb)))
 
-raw_src=Image.frombytes("RGBA",(W,H),sb[128:],"raw","RGBA")
+raw_src=Image.frombytes("RGBA",(W,H),sb[128:],"raw","BGRA")
 src=raw_src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 aj=json.loads(atlas.read_text())
 regions={r["idx"]:r for r in aj["regions"]}
@@ -211,10 +211,10 @@ size_ok=contain and loc[2]-loc[0]<=ob[2]-ob[0] and loc[3]-loc[1]<=ob[3]-ob[1]
 positive=contain and loc[0]>ob[0] and loc[1]>ob[1] and loc[2]<ob[2] and loc[3]<ob[3]
 
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-candidate.write_bytes(sb[:128]+raw_final.tobytes("raw","RGBA"))
+candidate.write_bytes(sb[:128]+raw_final.tobytes("raw","BGRA"))
 CANDIDATE_SHA=sha256(candidate)
 if candidate.read_bytes()[:128]!=sb[:128]: raise RuntimeError("header changed")
-decoded_raw=Image.frombytes("RGBA",(W,H),candidate.read_bytes()[128:],"raw","RGBA")
+decoded_raw=Image.frombytes("RGBA",(W,H),candidate.read_bytes()[128:],"raw","BGRA")
 decoded=decoded_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(decoded,final).getbbox() is not None: raise RuntimeError("RGBA roundtrip mismatch")
 dp=out/"9CE4E175_HD_FINAL_DECODED_READABLE.png"; decoded.save(dp)
