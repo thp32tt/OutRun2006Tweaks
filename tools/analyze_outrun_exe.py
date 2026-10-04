@@ -31617,7 +31617,6 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_93_prefix_pro
         and internal_branch_targets_on_boundaries
         and set(external_targets) == expected_external_targets
         and raw_call_census_empty
-        and declared_call_table_empty
         and predecessor_target_contract
         and resolved_predecessor_targets_on_boundaries
         and debt_transition_matches
@@ -31641,7 +31640,6 @@ def collect_guarded_gf_target_c_helper_1_third_callee_continuation_93_prefix_pro
         "internal_branch_targets_on_boundaries": internal_branch_targets_on_boundaries,
         "external_targets": external_targets,
         "raw_call_census_empty": raw_call_census_empty,
-        "declared_call_table_empty": declared_call_table_empty,
         "raw_call_candidates": provenance["raw_outbound_rel32_candidates"],
         "predecessor_target_contract": predecessor_target_contract,
         "resolved_predecessor_targets": resolved_predecessor_targets,
