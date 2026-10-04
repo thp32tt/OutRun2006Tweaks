@@ -3,13 +3,13 @@
   "role": "A",
   "run": "20261004-A-RECOVERY10",
   "worker": "github-actions",
-  "base_head": "8fa0925ccffb49c6f7a1245357edba3a769339f0",
+  "base_head": "fcb3338609a59123cb7ab43fa34865aa751718f3",
   "index": 111,
   "asset": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
   "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
   "fallback_before_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
   "c_overlap05_rejected_sha256": "3e950422775def2508ea42118f41c7a1f7463e2a7106cdcfcfb907b705890c91",
-  "candidate_sha256": "61d3334614be867e5dba66a674a6b0105a81116159c43b2f8728f72f8b8cc51b",
+  "candidate_sha256": "661d27cb28002355e7fea4fa398c2520a02630ba3a1783351e19ff4b9c531498",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
   "structure": {
     "dimensions": [
@@ -32,6 +32,12 @@
     "long_distance",
     "maximum_speed",
     "transmission"
+  ],
+  "top_restore_rect": [
+    0,
+    0,
+    2048,
+    368
   ],
   "preserved_source_labels": {
     "OutRun2SP": [
@@ -65,7 +71,7 @@
       2048,
       2048
     ],
-    "changed_pixels": 430884,
+    "changed_pixels": 432291,
     "changed_bbox": [
       1,
       29,
@@ -84,7 +90,7 @@
       2048,
       2048
     ],
-    "changed_pixels": 582897,
+    "changed_pixels": 584304,
     "changed_bbox": [
       1,
       29,
@@ -101,7 +107,7 @@
   "localized_pair_overlap_pixels": 0,
   "localized_pair_overlaps": {},
   "decoded_changes": {
-    "changed_pixels_total": 582897,
+    "changed_pixels_total": 584304,
     "changed_pixels_outside_original_bboxes": 0,
     "alpha_changed_pixels_outside_original_bboxes": 0,
     "protected_visible_pixels_changed": 0
