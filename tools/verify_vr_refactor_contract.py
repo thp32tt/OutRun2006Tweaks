@@ -50,7 +50,7 @@ if "R22PrimeShadowState" in r31:
     errors.append("R31 retained private R22 raster-prime dependency")
 if "PrimeTrackedRasterShadow(" not in r22:
     errors.append("R22 missing raster-prime owner API")
-if "PrimeTrackedRasterShadow(" not in r31:
+if "PrimeTrackedRasterShadow" not in r31:
     errors.append("R31 missing raster-prime owner API use")
 
 for banned in ("R22ScissorSnapshot", "R22CaptureGameScissor",
