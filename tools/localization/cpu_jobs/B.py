@@ -178,7 +178,7 @@ def render_target(key,text,bb,slant,bg_kind):
         srcp=np.asarray(src,dtype=np.uint8)[np.asarray(source_masks[key])>0]
         lum=.2126*srcp[:,0]+.7152*srcp[:,1]+.0722*srcp[:,2]
         dark=srcp[lum<=np.percentile(lum,55)]; fill=tuple(int(v) for v in np.median(dark,axis=0))
-        for fs in range(min(130,int(H*.95)),9,-1):
+        for fs in range(min(130,int(H*.95)),5,-1):
             font=ImageFont.truetype(FONT_BOLD,fs); tb=dummy.textbbox((0,0),text,font=font); tw=tb[2]-tb[0]; th=tb[3]-tb[1]
             if tw>W-2 or th>H-2: continue
             g=Image.new('RGBA',(tw+6,th+6),(0,0,0,0)); ImageDraw.Draw(g).text((3-tb[0],3-tb[1]),text,font=font,fill=fill)
