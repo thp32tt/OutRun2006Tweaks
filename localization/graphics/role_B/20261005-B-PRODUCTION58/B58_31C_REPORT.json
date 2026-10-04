@@ -353,7 +353,14 @@
   },
   "candidate_sha256": "b6d8bcc2f2cc05d45d4af3fbfab30f0a71e8fa68a89dee4c78b6f8a6aeca4cd3",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
-  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_ROW_RAW",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_PRODUCTION58_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B_PRODUCTION58_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "supersedes_candidate_sha256": "8e5639642409fbbba8478a61025971bd611f89ea5711cf5a4127f5201583c968",
+  "producer_visual_rework": {
+    "rejected_run": "20261005-B-PRODUCTION57",
+    "reason": "SOURCE_STYLE_WEIGHT_TOO_THIN",
+    "correction": "NotoSansCJK-Bold + 2px same-color weight stroke for the four white rows; source-like yellow/black compound style retained"
+  },
+  "controller_self_qa_report": "localization/graphics/role_B/20261005-B-PRODUCTION58/B58_CONTROLLER_SELF_QA.json"
 }
