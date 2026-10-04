@@ -7,12 +7,12 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R231_LATEST_STARTUP_BOOTSTRAP_PAIRING_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
   "base_sha": "310b77c74cb9156ec5d205748b0bfffbf49bbf4b",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
+  "validation_bearing_result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
   "result_marker": "[AUTO:CONVERSION-DX11-00335]",
   "selected_work_item": "DX11_R231_LATEST_STARTUP_BOOTSTRAP_PAIRING",
   "summary": "R231 prevents an older bootstrap probe/skip outcome in an accumulated source log from being attributed to a newer startup epoch. Historical latest bootstrap outcome remains visible, while LatestStartupBootstrapOutcomeByLog contains only outcomes observed after the latest startup.",
@@ -43,22 +43,35 @@
       "evidence": "Added per-log latest startup/outcome line positions, LatestStartupBootstrapOutcomeByLog, missing-current-outcome logs, current coverage count/boolean, regression fixtures, and source-graph drift guards. Existing historical Bootstrap/BootstrapSkipped/LatestBootstrapOutcomeByLog and diagnostic-only activation policy are preserved."
     },
     "C3_VALIDATE": {
-      "status": "PENDING_EXACT_SHA_GATE",
-      "automation_validation": "PENDING",
-      "evidence": "Material commit will rely on required exact-SHA Backend Conversion Gate for Python syntax, one-click structure, source graph, dormant activation, census regression, Win32 build/binary and readiness smoke. No runtime/HMD validation performed."
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R231_LATEST_STARTUP_BOOTSTRAP_PAIRING_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1902 run 37165628064 completed success for 67b0793beab541d4875cac5f8981700acc03e497. validate job 111327817163 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, session regression, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R231 census analyzer checks, then configured/built Win32, verified the binary and uploaded artifact 11289462817. DX11 readiness smoke job 111328512673 also completed success. No Quest 3/VDXR runtime test was performed."
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "COMPLETE",
+      "material_result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
+      "validation_bearing_result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
+      "result_marker": "[AUTO:CONVERSION-DX11-00335]",
+      "implementation_commits": [
+        "67b0793beab541d4875cac5f8981700acc03e497"
+      ],
+      "source_implementation_sha": "67b0793beab541d4875cac5f8981700acc03e497"
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
       "reason": "Offline census evidence-integrity/reporting change only; no runtime package is required."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "After exact-SHA Backend Conversion Gate PASS, persist task/lane bookkeeping separately and keep RUNTIME_VALIDATION=UNTESTED."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37165628064,
+      "validation_job_id": 111327817163,
+      "readiness_smoke_job_id": 111328512673,
+      "artifact_id": 11289462817,
+      "artifact_digest": "sha256:3e3e83902260d136ac0d4260e3bedc72ad02308d623b02c04bb8a82fb8b6b516",
+      "implementation_comment_id": 5975067591,
+      "exact_next_action": "Preserve R225-R231 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate."
     }
   },
   "regression_assessment": {
@@ -79,5 +92,17 @@
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE"
   },
-  "exact_next_action": "Publish R231 material result after the preceding exact-SHA gate is no longer in progress, then require the R231 exact-SHA Backend Conversion Gate."
+  "exact_next_action": "Preserve R225-R231 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37165628064,
+      "run_number": 1902,
+      "result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
+      "conclusion": "success",
+      "validate_job_id": 111327817163,
+      "readiness_smoke_job_id": 111328512673,
+      "artifact_id": 11289462817,
+      "artifact_digest": "sha256:3e3e83902260d136ac0d4260e3bedc72ad02308d623b02c04bb8a82fb8b6b516"
+    }
+  }
 }
