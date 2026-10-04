@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00349",
-  "production_id": "CONVERSION-DXVK-00348",
-  "event_id": "CONVERSION-DXVK-00348-E005",
-  "event_type": "retry",
+  "production_id": "CONVERSION-DX11-00349",
+  "event_id": "CONVERSION-DX11-00349-E004",
+  "event_type": "rollover",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
@@ -97,11 +97,14 @@
   "runtime_claim": "NONE",
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00349",
-    "production_id": "CONVERSION-DXVK-00348",
-    "event_id": "CONVERSION-DXVK-00348-E005",
-    "event_type": "retry",
+    "production_id": "CONVERSION-DX11-00349",
+    "event_id": "CONVERSION-DX11-00349-E004",
+    "event_type": "rollover",
     "attempt": "1/3",
-    "source": "CURRENT_USER_QUEUE"
+    "source": "CURRENT_USER_QUEUE",
+    "chat_rollover": 3,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt"
   },
   "exact_next_action": "Release CONVERSION-DX11-00349 as complete. Preserve R238 programmable shader-pair inventory and fail-closed evidence, keep NativeDrawPath dormant, and continue with one small programmable-shader translation/object-cache/input-linkage/constants unit from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
   "failed_validation_bearing_sha": "db1f0ef43e9f1d0d9d688c9193ddb8806258f267",
@@ -139,5 +142,26 @@
     "implementation_comment_id": 5976405348,
     "repair_comment_id": 5976450333,
     "validation_comment_id": 5976517110
+  },
+  "chat_rollover": 3,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "rollover_metadata_correction": {
+    "corrected_from": {
+      "production_id": "CONVERSION-DXVK-00348",
+      "event_id": "CONVERSION-DXVK-00348-E005",
+      "event_type": "retry",
+      "attempt": "1/3"
+    },
+    "corrected_to": {
+      "production_id": "CONVERSION-DX11-00349",
+      "event_id": "CONVERSION-DX11-00349-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false
+    },
+    "reason": "The current user-supplied rollover dispatch is authoritative. This rollover is not a retry and does not increment ATTEMPT. Material result 47e5eb443fb39365058988337fd8e69cafbd7616, exact-SHA Backend Conversion Gate #1927 evidence, C0-C6 completion and RUNTIME_VALIDATION=UNTESTED are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
   }
 }
