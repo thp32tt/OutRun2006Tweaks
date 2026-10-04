@@ -66,3 +66,26 @@ For the rank-marker case, exact callsite WORLD_BILLBOARD tags were also insuffic
 
 Protected R51 baseline remains unchanged. The failed candidate is evidence only and must not be integrated.
 
+
+
+## VR-F11-OVERLAY-DIPLOPIA-001 — F11 Tweaks overlay doubles only in gameplay
+
+**Status:** BUILD_VERIFIED / NEED_HMD_TEST  
+**Observed:** 2026-10-04 KST  
+**Fix candidate:** `338b534b8f4c72f28b70b864ad87149f0d7f9901`
+
+### Runtime symptom
+
+User reports the F11 OutRun2006Tweaks/ImGui menu is normal in the front-end menus, but after entering gameplay the same F11 menu appears as two images.
+
+### Bounded cause and fix
+
+The overlay is submitted from the plugin EndScene hook through `ImGui_ImplDX9_RenderDrawData`. It is external UI rather than an OutRun sprite producer, so it had no explicit game render semantic. In the active R26+R30 HUD path, untagged XYZRHW UI can fall below the R30 `SCREEN_OVERLAY_2D` owner instead of receiving the existing binocular common-ray/FOV correction. Because it shares the same D3D9 hooks, an external draw could also consume a pending game `NextDrawScope` token.
+
+Verifier-only SHA `245bb082652ad50b46ab69e9d8b939a8a4fa8e9f` failed exactly on the missing external-overlay guard and semantic scope. Candidate `338b534b8f4c72f28b70b864ad87149f0d7f9901` adds a gameplay-only `ScopedExternalOverlaySemantic(ScreenOverlay2D)` around the open F11 ImGui submission and makes `ConsumeForDraw()` preserve pending game semantics while that external scope is active. Front-end/menu rendering stays on the old path.
+
+### Validation
+
+DX9Ex Active Validation run `37180295864` passed policy, host, active game, full-chain compile and package. Domain Isolation Guard and HUD Inspector also passed. Artifact `11295123103` was uploaded; inner package SHA256 is `A9719897662BD5BF5EDE74724C1F74BEDDA95F051213FE586932BD22BDC1AA65`.
+
+This is not runtime proof. `RUNTIME_VALIDATION=UNTESTED` until Quest 3/VDXR confirms F11 remains single in menus and is binocularly single during gameplay without world/HUD/frame-pacing regression.

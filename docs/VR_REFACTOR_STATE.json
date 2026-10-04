@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-04T13:50:11+09:00",
+  "updatedKst": "2026-10-04T14:41:18+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -59,7 +59,7 @@
     "VR-REFACTOR-STATE-0004T-FIX00",
     "VR-REFACTOR-STATE-0004U"
   ],
-  "next": "Continue from cycle 910 by reviewing R29 telemetry/counter ownership still exposed to R31/R32/R33 and the remaining R9/R13 cross-layer state that can be encapsulated without adding hot-path work. 90 cycles remain to the 1000-cycle structural target.",
+  "next": "Runtime-test exact source 338b534b8f4c72f28b70b864ad87149f0d7f9901: verify F11 is single in front-end/menu and binocularly single in gameplay. After consuming that Quest3/VDXR result, resume the structural plan from cycle 910; 90 structural cycles remain to 1000.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -112,11 +112,15 @@
     "Cycle 900->910 completed as 2 bounded review batches x 5 distinct lenses = exactly 10 structural review checks. The reviewed surface covered 7,123 lines across R9/R20/R23/R29/R31/R32/R33 and the refactor verifier.",
     "VR-REFACTOR-STATE-0004U encapsulates R9 depth-content serial ownership. RED verifier SHA 8854e06a failed on direct R9MainDepthContentSerial/R9MonoDepthContentSerial access in R20/R23/R29/R31/R32/R33. R9 now owns R9SynchronizeDepthContentSerials() and R9NoteMainDepthContentWrite().",
     "R20/R23 preserve the previous max(main,mono)+1 nonzero synchronization exactly through R9SynchronizeDepthContentSerials(). R29/R31/R32/R33 preserve the previous main-depth serial increment points exactly through R9NoteMainDepthContentWrite(); no D3D getter, extra branch, wait, or new hot-path synchronization was added.",
-    "Exact source a76f177898e1a3a8f08fc22d888da31d90ef1d5e passed DX9Ex Active Validation 37177901037 (policy/host/game/full-chain-compile/package SUCCESS), Domain Isolation 37177901118 SUCCESS, and HUD Inspector 37177901029 SUCCESS. Runtime remains UNTESTED."
+    "Exact source a76f177898e1a3a8f08fc22d888da31d90ef1d5e passed DX9Ex Active Validation 37177901037 (policy/host/game/full-chain-compile/package SUCCESS), Domain Isolation 37177901118 SUCCESS, and HUD Inspector 37177901029 SUCCESS. Runtime remains UNTESTED.",
+    "VR-F11-OVERLAY-DIPLOPIA-001 user runtime evidence: F11 Tweaks/ImGui overlay is normal in menus but doubled after entering gameplay.",
+    "RED verifier SHA 245bb082652ad50b46ab69e9d8b939a8a4fa8e9f failed exactly on missing external-overlay semantic isolation and missing explicit SCREEN_OVERLAY_2D ownership.",
+    "Fix source 338b534b8f4c72f28b70b864ad87149f0d7f9901 scopes only open gameplay F11 ImGui submission as SCREEN_OVERLAY_2D and prevents external UI draws from consuming pending game NextDrawScope. Menu/front-end path is unchanged.",
+    "Exact source 338b534b passed DX9Ex Active Validation 37180295864 plus Domain Isolation and HUD Inspector. Runtime result is still UNTESTED; structural cycle remains 910."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0004U_BUILD_VERIFIED_CYCLE_910",
-  "validatedSourceSha": "a76f177898e1a3a8f08fc22d888da31d90ef1d5e",
-  "validationRunId": 37177901037,
+  "batchStatus": "VR-F11-OVERLAY-DIPLOPIA-001_BUILD_VERIFIED_CYCLE_910",
+  "validatedSourceSha": "338b534b8f4c72f28b70b864ad87149f0d7f9901",
+  "validationRunId": 37180295864,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -129,13 +133,13 @@
     "staticExeAnalysis": "SUCCESS"
   },
   "testCandidate": {
-    "sourceSha": "a76f177898e1a3a8f08fc22d888da31d90ef1d5e",
-    "workflowRunId": 37177901037,
-    "artifactId": 11293169298,
-    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-a76f177898e1a3a8f08fc22d888da31d90ef1d5e",
-    "artifactSizeBytes": 2729236,
-    "artifactDigestSha256": "e35f5522324480bf0aac973bc698e79e084addd78b83744670c11ba7e52189b5",
-    "innerPackageSha256": "a5420bdcb983f6524795a48bb264e3722c8dc320149f8207b17b7c0fb9923705",
+    "sourceSha": "338b534b8f4c72f28b70b864ad87149f0d7f9901",
+    "workflowRunId": 37180295864,
+    "artifactId": 11295123103,
+    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-338b534b8f4c72f28b70b864ad87149f0d7f9901",
+    "artifactSizeBytes": 2729108,
+    "artifactDigestSha256": "4ddf370d1de7b3aaf62141e25832f305bc798e3dad2df226fe058560ae2b51aa",
+    "innerPackageSha256": "a9719897662bd5bf5ede74724c1f74bedda95f051213fe586932bd22bdc1aa65",
     "defaultProfile": "CORRECTNESS",
     "userRuntimeVerified": false
   }

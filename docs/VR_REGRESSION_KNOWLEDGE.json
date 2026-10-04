@@ -370,6 +370,63 @@
         "result": "vehicle rank labels remain detached from vehicles, move with headset, and affected rank/position elements are doubled",
         "telemetry": "R30 screen worldBillboard counter remained 0 while r44 spatial reached 5154"
       }
+    },
+    {
+      "key": "VR-F11-OVERLAY-DIPLOPIA-001",
+      "title": "F11 Tweaks ImGui overlay doubles after entering gameplay",
+      "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+      "severity": "visual-correctness",
+      "firstKnownWindowKst": "2026-10-04",
+      "lastObservedKst": "2026-10-04",
+      "evidenceLevel": "USER_RUNTIME_VERIFIED_FAILURE_BUILD_VERIFIED_FIX_CANDIDATE",
+      "symptomFingerprint": {
+        "primary": "F11 OutRun2006Tweaks overlay is normal/single in menus but becomes two images after entering gameplay",
+        "boundary": "front-end/menu rendering is correct; defect begins only when gameplay VR stereo ownership is active"
+      },
+      "hypothesis": "The EndScene ImGui overlay is external UI with no game producer semantic. In the active R26+R30 HUD build, untagged XYZRHW UI can fail the semantic owner gate and fall back below R30 instead of using the established SCREEN_OVERLAY_2D binocular convergence path. It can also consume a pending game NextDrawScope token because it shares the game D3D9 draw hooks.",
+      "constraints": [
+        "leave front-end/menu F11 rendering unchanged",
+        "scope only the open F11 gameplay ImGui submission as SCREEN_OVERLAY_2D",
+        "external UI must not consume pending game semantic tokens",
+        "preserve protected road/background/vehicle stereo and frame stability"
+      ],
+      "recurrenceCount": 0,
+      "testLevel": 1,
+      "riskPaths": [
+        "src/overlay/hooks_overlay.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp"
+      ],
+      "revalidationTriggers": [
+        "changes to ImGui/EndScene overlay submission",
+        "changes to external-overlay semantic scoping or ConsumeForDraw token ownership",
+        "changes to SCREEN_OVERLAY_2D XYZRHW/HUD convergence",
+        "changes to R26/R30 draw ownership that can broaden UI semantics into world draws"
+      ],
+      "verifier": {
+        "static": [
+          "require ScopedExternalOverlaySemantic and ExternalOverlaySemanticDepth in render_semantics",
+          "require gameplay F11 ImGui submission to use RenderScope::ScreenOverlay2D",
+          "require external overlay draws to bypass NextDrawScope consumption while retaining CurrentScope",
+          "verify active R26+R30 path still has semanticOverlay2D/CorroboratesScreenOverlay2D owner route",
+          "build active Win32 DX9Ex game, full-chain compile gate and x64 host"
+        ],
+        "runtime": [
+          "Quest3/VDXR: open F11 in front-end/menu and confirm the already-good single overlay remains unchanged",
+          "enter gameplay, open F11 and confirm one binocularly fused overlay instead of two images",
+          "close/reopen F11 while driving and confirm ordinary HUD, road/background/vehicles and frame pacing remain unchanged"
+        ]
+      },
+      "fixCandidate": {
+        "redVerifierSha": "245bb082652ad50b46ab69e9d8b939a8a4fa8e9f",
+        "sourceSha": "338b534b8f4c72f28b70b864ad87149f0d7f9901",
+        "validationRunId": 37180295864,
+        "artifactId": 11295123103,
+        "artifactDigestSha256": "4ddf370d1de7b3aaf62141e25832f305bc798e3dad2df226fe058560ae2b51aa",
+        "innerPackageSha256": "a9719897662bd5bf5ede74724c1f74bedda95f051213fe586932bd22bdc1aa65"
+      },
+      "nextAction": "Quest3/VDXR test exact source 338b534b with CORRECTNESS: F11 must remain single in menus and become binocularly single in gameplay. Do not mark DONE until matching user runtime evidence passes."
     }
   ],
   "userRuntimeVerifiedBaseline": {
