@@ -39,6 +39,13 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('resized chat slots from %s to %s while preserving state', SOURCE)
         self.assertTrue((ROOT / 'conversion_dx9ex.md').stat().st_size > 0)
 
+    def test_dx9ex_structural_refactor_is_priority_zero(self):
+        prompt = (ROOT / 'conversion_dx9ex.md').read_text()
+        self.assertIn('0순위는 현재 진행 중인 DX9Ex 구조 개선/리팩터링 작업이다', prompt)
+        self.assertIn('docs/VR_REFACTOR_STATE.json', prompt)
+        self.assertIn('R33 final dispatcher', prompt)
+        self.assertIn('구조 개선이 현재 Git 상태에서 명시적으로 완료되었거나', prompt)
+
     def test_vr_compose_pins_v2_and_three_slots(self):
         compose = (ROOT / 'docker-compose.portainer-vr.yml').read_text()
         self.assertIn('dockerfile: Dockerfile.portainer-vr', compose)
