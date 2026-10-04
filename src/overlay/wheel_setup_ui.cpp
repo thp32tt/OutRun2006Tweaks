@@ -2086,7 +2086,7 @@ namespace
                 Settings::WheelFFBReversalReleaseRate = 0.12f;
                 Settings::WheelFFBRoadTexture = 0.30f;
                 Settings::WheelFFBTireSlip = 0.20f;
-                Settings::WheelFFBWallImpact = 0.38f;
+                Settings::WheelFFBWallImpact = 0.55f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
                 // R3 compatibility default: prefer ConstantForce road/slip
@@ -2129,7 +2129,7 @@ namespace
                 Settings::WheelFFBReversalReleaseRate = 0.12f;
                 Settings::WheelFFBRoadTexture = 0.30f;
                 Settings::WheelFFBTireSlip = 0.20f;
-                Settings::WheelFFBWallImpact = 0.38f;
+                Settings::WheelFFBWallImpact = 0.55f;
                 Settings::WheelFFBUseHardwareSpring = true;
                 Settings::WheelFFBUseHardwareDamper = true;
                 // R3 compatibility default: prefer ConstantForce road/slip
