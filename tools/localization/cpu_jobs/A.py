@@ -221,8 +221,11 @@ for r in rows0:
     key=r["key"]
     if key in rework_keys:
         continue
-    ob=tuple(map(int,r["original_bbox"]))
-    unaffected_diffs[key]=count(dmask(old.crop(ob),final.crop(ob)))
+    # Source bboxes overlap semantically adjacent rows in this atlas, so preservation
+    # is measured on the accepted localized layer bbox itself. Global confinement to
+    # the four returned source bboxes is checked separately below.
+    lb=tuple(map(int,r["localized_bbox"]))
+    unaffected_diffs[key]=count(dmask(old.crop(lb),final.crop(lb)))
 
 pair_overlap={}
 touch_pairs=[]
