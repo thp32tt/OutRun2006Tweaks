@@ -1,5 +1,3 @@
-[Reading 1000 lines from start (total: 1389 lines, 389 remaining)]
-
 #!/usr/bin/env python3
 """Regression tests for R72-R85 compatibility plus R106/R107/R113/R114 exhaustive evidence."""
 
@@ -1000,5 +998,392 @@ def main() -> int:
         "VR DX11 R72 census: samples=64 exact=0 fixedFn=64 programmable=0 "
         "topologyUnsupported=0 signatures=0 declSamples=0 indexedSamples=0 "
         "texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,indexUnsupported=0,"
+        "textureUnsupported=0,colorUnsupported=0,depthUnsupported=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r113_pending["Status"] == "TRANSLATION_EXACTNESS_PENDING"
+    assert r113_pending["UnsupportedTotalLatest"] == 0
+    assert r113_pending["ActivationEvidence"]["CensusExactness"]["Samples"] == 64
+    assert r113_pending["ActivationEvidence"]["CensusExactness"]["ExactSamples"] == 0
+    assert r113_pending["ActivationEvidence"]["CensusExactness"]["AllSampledExact"] is False
+    assert r113_pending["ActivationEvidence"]["CensusExactness"]["DiagnosticOnly"] is True
+    assert r113_pending["ActivationEvidence"]["CensusExactness"]["ExhaustiveDrawCoverage"] is False
+    assert r113_pending["ActivationEvidence"]["CensusExactness"]["ActivationProof"] is False
+    assert r113_pending["NativeDrawPathActivationAllowed"] is False
 
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
+    r114_saturated = run_case(
+        "VR DX11 R114 census: samples=64 exact=64 fixedFn=64 programmable=0 "
+        "topologyUnsupported=0 signatures=512 "
+        "sampling[drawsSeen=4096,stride=64,scheme=1] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=3,detailCap=64,detailSkipped=448] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,indexUnsupported=0,"
+        "textureUnsupported=0,colorUnsupported=0,depthUnsupported=0] "
+        "ffpShaderCompile[succeeded=64,failed=0,skippedCap=3] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert (
+        r114_saturated["Status"]
+        == "OBSERVED_SAMPLED_TRANSLATION_EXACT_COVERAGE_SATURATED"
+    )
+    assert r114_saturated["ActivationEvidence"]["CensusExactness"]["AllSampledExact"] is True
+    r114_coverage = r114_saturated["ActivationEvidence"]["SamplingCoverage"]
+    assert r114_coverage["DrawsSeen"] == 4096
+    assert r114_coverage["Samples"] == 64
+    assert r114_coverage["Stride"] == 64
+    assert r114_coverage["SchemeId"] == 1
+    assert r114_coverage["Scheme"] == "HASHED_ORDINAL_V1"
+    assert r114_coverage["SignatureHashCap"] == 512
+    assert r114_coverage["SignatureHashCapHitSamples"] == 3
+    assert r114_coverage["DetailedSignatureLogCap"] == 64
+    assert r114_coverage["DetailedSignatureLogSkippedSignatures"] == 448
+    assert r114_coverage["SignatureHashCapSaturated"] is True
+    assert r114_coverage["DetailedSignatureLogCapSaturated"] is True
+    assert r114_coverage["ShaderCompileSkippedSignatureCap"] == 3
+    assert r114_coverage["ShaderCompileCoverageComplete"] is False
+    assert r114_coverage["NonExhaustive"] is True
+    assert r114_coverage["ActivationProof"] is False
+    assert r114_saturated["NativeDrawPathActivationAllowed"] is False
+
+    exhaustive = run_case(
+        "VR DX11 R120 census: samples=4 exact=4 fixedFn=4 programmable=0 "
+        "topologyUnsupported=0 signatures=4 "
+        "sampling[drawsSeen=4,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert (
+        exhaustive["Status"]
+        == "OBSERVED_EXHAUSTIVE_TRANSLATION_EXACT_DIAGNOSTIC_ONLY"
+    )
+    exhaustive_exactness = exhaustive["ActivationEvidence"]["CensusExactness"]
+    exhaustive_coverage = exhaustive["ActivationEvidence"]["SamplingCoverage"]
+    assert exhaustive_exactness["AllSampledExact"] is True
+    assert exhaustive_exactness["ExhaustiveDrawCoverage"] is True
+    assert exhaustive_exactness["ActivationProof"] is False
+    assert exhaustive_coverage["DrawsSeen"] == 4
+    assert exhaustive_coverage["Samples"] == 4
+    assert exhaustive_coverage["Stride"] == 1
+    assert exhaustive_coverage["SchemeId"] == 2
+    assert exhaustive_coverage["Scheme"] == "EXHAUSTIVE_V1"
+    assert exhaustive_coverage["NonExhaustive"] is False
+    assert exhaustive_coverage["ExhaustiveDrawCoverage"] is True
+    assert exhaustive_coverage["ShaderCompileSkippedSignatureCap"] == 0
+    assert exhaustive_coverage["ShaderCompileCoverageComplete"] is True
+    assert exhaustive_coverage["ActivationProof"] is False
+    exhaustive_dual_source = exhaustive["ActivationEvidence"]["DualSourceBlend"]
+    assert exhaustive_dual_source["AnySamples"] == 0
+    assert exhaustive_dual_source["ExhaustiveNoUsageObserved"] is True
+    assert exhaustive_dual_source["TranslationStillFailClosed"] is True
+    assert exhaustive_dual_source["ActivationProof"] is False
+    assert exhaustive["NativeDrawPathActivationAllowed"] is False
+
+    src1_demand = run_case(
+        "VR DX11 R120 census: samples=4 exact=2 fixedFn=4 programmable=0 "
+        "topologyUnsupported=0 signatures=4 "
+        "sampling[drawsSeen=4,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "dualSourceBlend[any=2,rgbSrc=1,rgbDst=0,alphaSrc=1,alphaDst=1] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=2,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert src1_demand["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    src1_evidence = src1_demand["ActivationEvidence"]["DualSourceBlend"]
+    assert src1_evidence["AnySamples"] == 2
+    assert src1_evidence["RgbSourceSamples"] == 1
+    assert src1_evidence["RgbDestSamples"] == 0
+    assert src1_evidence["AlphaSourceSamples"] == 1
+    assert src1_evidence["AlphaDestSamples"] == 1
+    assert src1_evidence["ExhaustiveNoUsageObserved"] is False
+    assert src1_evidence["TranslationStillFailClosed"] is True
+    assert src1_evidence["ActivationProof"] is False
+    assert src1_demand["NativeDrawPathActivationAllowed"] is False
+
+    extended_unsupported = run_case(
+        "VR DX11 R120 census: samples=4 exact=0 fixedFn=4 programmable=0 "
+        "topologyUnsupported=0 signatures=4 "
+        "sampling[drawsSeen=4,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0,dualSource=2,shadeMode=3,clipping=4,"
+        "depthBias=5,vertexBlend=6,dither=7,texCoordWrap=0,"
+        "mrtColorWrite=0,specular=8]\n"
+    )
+    assert extended_unsupported["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert extended_unsupported["UnsupportedTotalLatest"] == 35
+    assert extended_unsupported["LatestSummary"]["dualSource"] == 2
+    assert extended_unsupported["LatestSummary"]["shadeMode"] == 3
+    assert extended_unsupported["LatestSummary"]["clipping"] == 4
+    assert extended_unsupported["LatestSummary"]["depthBias"] == 5
+    assert extended_unsupported["LatestSummary"]["vertexBlend"] == 6
+    assert extended_unsupported["LatestSummary"]["dither"] == 7
+    assert extended_unsupported["LatestSummary"]["texCoordWrap"] == 0
+    assert extended_unsupported["LatestSummary"]["mrtColorWrite"] == 0
+    assert extended_unsupported["LatestSummary"]["specular"] == 8
+    assert extended_unsupported["NativeDrawPathActivationAllowed"] is False
+
+    r174_source_mrt = run_case(
+        "VR DX11 R120 census: samples=4 exact=2 fixedFn=4 programmable=0 "
+        "topologyUnsupported=0 signatures=4 "
+        "sampling[drawsSeen=4,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0,auxRenderTargetUnsupported=2] "
+        "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r174_source_mrt["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert r174_source_mrt["UnsupportedTotalLatest"] == 2
+    assert r174_source_mrt["LatestSummary"]["auxRenderTargetUnsupported"] == 2
+    assert r174_source_mrt["NativeDrawPathActivationAllowed"] is False
+
+    r170_wrap = run_case(
+        "VR DX11 R120 census: samples=4 exact=0 fixedFn=4 programmable=0 "
+        "topologyUnsupported=0 signatures=4 "
+        "sampling[drawsSeen=4,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0,dualSource=0,shadeMode=0,clipping=0,"
+        "depthBias=0,vertexBlend=0,dither=0,texCoordWrap=8]\n"
+    )
+    assert r170_wrap["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert r170_wrap["UnsupportedTotalLatest"] == 8
+    assert r170_wrap["LatestSummary"]["texCoordWrap"] == 8
+    assert r170_wrap["LatestSummary"]["mrtColorWrite"] == 0
+    assert r170_wrap["NativeDrawPathActivationAllowed"] is False
+
+    mrt_color_write = run_case(
+        "VR DX11 R120 census: samples=4 exact=0 fixedFn=4 programmable=0 "
+        "topologyUnsupported=0 signatures=4 "
+        "sampling[drawsSeen=4,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0,auxRenderTargetUnsupported=0] "
+        "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0,dualSource=0,shadeMode=0,clipping=0,"
+        "depthBias=0,vertexBlend=0,dither=0,texCoordWrap=0,"
+        "mrtColorWrite=9]\n"
+    )
+    assert mrt_color_write["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert mrt_color_write["UnsupportedTotalLatest"] == 9
+    assert mrt_color_write["LatestSummary"]["mrtColorWrite"] == 9
+    assert mrt_color_write["NativeDrawPathActivationAllowed"] is False
+
+    r72 = run_case(
+        "VR DX11 R72 signature#1: primitive=4 fixedFn=1\n"
+        "VR DX11 R72 census: samples=64 exact=64 fixedFn=64 programmable=0 "
+        "topologyUnsupported=0 signatures=1 declSamples=0 indexedSamples=0 "
+        "texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,indexUnsupported=0,"
+        "textureUnsupported=0,colorUnsupported=0,depthUnsupported=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r72["Status"] == "OBSERVED_SAMPLED_TRANSLATION_EXACT_DIAGNOSTIC_ONLY"
+    assert r72["ActivationEvidence"]["CensusExactness"]["AllSampledExact"] is True
+    assert r72["ActivationEvidence"]["CensusExactness"]["DiagnosticOnly"] is True
+    assert r72["ActivationEvidence"]["CensusExactness"]["ExhaustiveDrawCoverage"] is False
+    assert r72["ActivationEvidence"]["CensusExactness"]["ActivationProof"] is False
+    assert r72["NativeDrawPathActivationAllowed"] is False
+    assert r72["LatestSummary"]["behaviorUnsupported"] == 0
+    assert r72["LatestSummary"]["mutationTelemetryRequired"] == 0
+    assert r72["LatestSummary"]["managedShadowRequired"] == 0
+
+    r194_arg0 = run_case(
+        "VR DX11 R72 signature#9: primitive=4 fixedFn=1\n"
+        "VR DX11 R194 ffp signature#9 stage#0: "
+        "color[op=25,arg0=0x00000002,arg1=0x00000000,arg2=0x00000003] "
+        "alpha[op=25,arg0=0x00000001,arg1=0x00000002,arg2=0x00000000] "
+        "resultArg=0x00000001 texCoord=0x00000000 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+    )
+    assert r194_arg0["SourceLogs"] == ["OutRun2006Tweaks.log"]
+    assert r194_arg0["UniqueSignaturesCaptured"] == 1
+    r194_stage = r194_arg0["Signatures"][0]["fixed_function_stages"][0]
+    assert r194_stage["colorOp"] == 25
+    assert r194_stage["colorArg0"] == 0x00000002
+    assert r194_stage["colorArg0_hex"] == "0x00000002"
+    assert r194_stage["colorArg1"] == 0x00000000
+    assert r194_stage["colorArg2"] == 0x00000003
+    assert r194_stage["alphaArg0"] == 0x00000001
+    assert r194_stage["alphaArg0_hex"] == "0x00000001"
+    assert r194_stage["alphaArg1"] == 0x00000002
+    assert r194_stage["alphaArg2"] == 0x00000000
+    assert r194_stage["resultArg"] == 0x00000001
+    assert r194_arg0["NativeDrawPathActivationAllowed"] is False
+
+    r197_stage_constant = run_case(
+        "VR DX11 R72 signature#10: primitive=4 fixedFn=1\n"
+        "VR DX11 R197 ffp signature#10 stage#3: "
+        "color[op=2,arg0=0x00000001,arg1=0x00000006,arg2=0x00000001] "
+        "alpha[op=2,arg0=0x00000001,arg1=0x00000006,arg2=0x00000001] "
+        "constant=0x80402010 resultArg=0x00000001 "
+        "texCoord=0x00000003 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+    )
+    assert r197_stage_constant["SourceLogs"] == ["OutRun2006Tweaks.log"]
+    assert r197_stage_constant["UniqueSignaturesCaptured"] == 1
+    r197_stage = r197_stage_constant["Signatures"][0]["fixed_function_stages"][0]
+    assert r197_stage["stage"] == 3
+    assert r197_stage["stageConstant"] == 0x80402010
+    assert r197_stage["stageConstant_hex"] == "0x80402010"
+    assert r197_stage["colorArg1"] == 0x00000006
+    assert r197_stage["alphaArg1"] == 0x00000006
+    assert r197_stage_constant["NativeDrawPathActivationAllowed"] is False
+
+    r191_texture_factor = run_case(
+        "VR DX11 R72 signature#7: primitive=4 fixedFn=1\n"
+        "VR DX11 R191 ffp texture-factor state#7: observed=1 argb=0x80402010\n"
+    )
+    assert r191_texture_factor["SourceLogs"] == ["OutRun2006Tweaks.log"]
+    assert r191_texture_factor["UniqueSignaturesCaptured"] == 1
+    assert r191_texture_factor["Signatures"][0]["id"] == 7
+    assert r191_texture_factor["Signatures"][0]["fixed_function_texture_factor"] == {
+        "observed": True,
+        "argb": 0x80402010,
+        "argb_hex": "0x80402010",
+    }
+    assert r191_texture_factor["NativeDrawPathActivationAllowed"] is False
+
+
+    r198_unsupported_demand = run_case(
+        "VR DX11 R72 signature#11: primitive=4 fixedFn=1\n"
+        "VR DX11 R197 ffp signature#11 stage#0: "
+        "color[op=22,arg0=0x00000001,arg1=0x00000002,arg2=0x00000001] "
+        "alpha[op=18,arg0=0x00000001,arg1=0x00000002,arg2=0x00000001] "
+        "constant=0xFFFFFFFF resultArg=0x00000005 "
+        "texCoord=0x00000000 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+        "VR DX11 R197 ffp signature#11 stage#0: "
+        "color[op=22,arg0=0x00000001,arg1=0x00000002,arg2=0x00000001] "
+        "alpha[op=18,arg0=0x00000001,arg1=0x00000002,arg2=0x00000001] "
+        "constant=0xFFFFFFFF resultArg=0x00000005 "
+        "texCoord=0x00000000 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+        "VR DX11 R197 ffp signature#11 stage#1: "
+        "color[op=25,arg0=0x00000004,arg1=0x00000001,arg2=0x00000002] "
+        "alpha[op=2,arg0=0x00000001,arg1=0x00000005,arg2=0x00000001] "
+        "constant=0xFFFFFFFF resultArg=0x00000001 "
+        "texCoord=0x00000001 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+        "VR DX11 R197 ffp signature#11 stage#2: "
+        "color[op=2,arg0=0x00000001,arg1=0x00000007,arg2=0x00000001] "
+        "alpha[op=2,arg0=0x00000001,arg1=0x00000001,arg2=0x00000001] "
+        "constant=0xFFFFFFFF resultArg=0x00000000 "
+        "texCoord=0x00000002 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+        "VR DX11 R197 ffp signature#11 stage#2: "
+        "color[op=2,arg0=0x00000001,arg1=0x00000007,arg2=0x00000001] "
+        "alpha[op=2,arg0=0x00000001,arg1=0x00000001,arg2=0x00000001] "
+        "constant=0xFFFFFFFF resultArg=0x00000000 "
+        "texCoord=0x00000002 texTransform=0x00000000 "
+        "sampler[min=1,mag=1,mip=0,u=1,v=1,border=0x00000000,srgb=0]\n"
+    )
+    r198_demand = r198_unsupported_demand["ActivationEvidence"][
+        "FixedFunctionDetailedStageDemand"
+    ]
+    assert r198_demand["DetailedStages"] == 3
+    assert r198_demand["DuplicateDetailedStageRecordsDropped"] == 2
+    assert r198_demand["UnsupportedColorOps"] == [
+        {"value": 22, "name": "BUMPENVMAP", "count": 1}
+    ]
+    assert r198_demand["UnsupportedAlphaOps"] == [
+        {"value": 18, "name": "MODULATEALPHA_ADDCOLOR", "count": 1}
+    ]
+    assert r198_demand["UnsupportedArgumentSelectors"] == [
+        {"value": 7, "name": "UNKNOWN", "count": 1},
+    ]
+    assert r198_demand["UnsupportedArgumentValues"] == [
+        {
+            "value": 7,
+            "value_hex": "0x00000007",
+            "selector": 7,
+            "selector_name": "UNKNOWN",
+            "count": 1,
+        },
+    ]
+    assert r198_demand["NonCurrentResultArgs"] == [
+        {"value": 0, "name": "DIFFUSE", "count": 1},
+        {"value": 5, "name": "TEMP", "count": 1},
+    ]
+    assert r198_demand["UnsupportedResultArgs"] == [
+        {"value": 0, "name": "DIFFUSE", "count": 1}
+    ]
+    assert r198_demand["HasUnsupportedObservedSemantics"] is True
+    assert r198_demand["CoverageLimitedByDetailCap"] is False
+    assert r198_demand["DiagnosticOnly"] is True
+    assert r198_demand["ActivationProof"] is False
+    assert r198_unsupported_demand["NativeDrawPathActivationAllowed"] is False
+
+    print("DX11 census analyzer regression R120/SRC1/R191/R194/R197/R198/R199/R200 demand: PASS")
+    r211_raster_semantics = run_case(
+        "VR DX11 R120 census: samples=3 exact=1 fixedFn=3 programmable=0 "
+        "topologyUnsupported=0 "
+        "rasterSemantics[pointUnsupported=1,lineUnsupported=1] signatures=3 "
+        "sampling[drawsSeen=3,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "dualSourceBlend[any=0,rgbSrc=0,rgbDst=0,alphaSrc=0,alphaDst=0] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    assert r211_raster_semantics["Status"] == "UNSUPPORTED_BEHAVIOR_OBSERVED"
+    assert r211_raster_semantics["LatestSummary"]["pointRasterUnsupported"] == 1
+    assert r211_raster_semantics["LatestSummary"]["lineRasterUnsupported"] == 1
+    assert r211_raster_semantics["UnsupportedTotalLatest"] == 2
+    assert r211_raster_semantics["NativeDrawPathActivationAllowed"] is False
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

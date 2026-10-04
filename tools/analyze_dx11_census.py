@@ -1,5 +1,3 @@
-[Reading 995 lines from start (total: 995 lines, 0 remaining)]
-
 #!/usr/bin/env python3
 """Extract DX11 native-backend census evidence from one OutRun VR session."""
 
@@ -995,5 +993,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]

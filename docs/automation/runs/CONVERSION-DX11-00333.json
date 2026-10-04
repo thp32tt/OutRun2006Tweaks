@@ -1,5 +1,3 @@
-[Reading 83 lines from start (total: 83 lines, 0 remaining)]
-
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00333",
@@ -83,5 +81,3 @@
   },
   "exact_next_action": "Publish the R230 latest bootstrap-outcome ordering material result without CI skip and require its exact-SHA Backend Conversion Gate."
 }
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
