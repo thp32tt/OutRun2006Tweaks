@@ -34,6 +34,17 @@ state_block_recovery = text("src/vr/state/state_block_recovery.hpp")
 state_block_events = text("src/vr/state/state_block_events.hpp")
 text("tools/verify_vr_hook_graph.py")
 
+for banned in ("R22ScissorSnapshot", "R22CaptureGameScissor",
+               "R22GameClearCoversBackbuffer"):
+    if banned in r23:
+        errors.append(
+            f"R23 retained private R22 raster helper dependency: {banned}")
+for marker in ("CaptureTrackedRasterState(", "TrackedGameClearCoversBackbuffer("):
+    if marker not in r22:
+        errors.append(f"R22 missing raster owner API: {marker}")
+    if marker not in r23:
+        errors.append(f"R23 missing raster owner API use: {marker}")
+
 for banned in ("R22ShadowState", "R22StateBlockTrackingReliable"):
     if banned in r23:
         errors.append(f"R23 regained direct lower-layer state dependency: {banned}")
