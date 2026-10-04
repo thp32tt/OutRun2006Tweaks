@@ -76,12 +76,18 @@ def components(mask,min_pixels=4):
                 for xx,yy in pts:keep[yy,xx]=1
     return keep,meta
 
-def source_mask_for(key,cell):
+def source_mask_for(key,cell,style):
     x0,y0,x1,y1=cell; crop=np.asarray(src.crop(cell),dtype=np.uint8)
     border=np.concatenate([crop[:8].reshape(-1,4),crop[-8:].reshape(-1,4),crop[:,:8].reshape(-1,4),crop[:,-8:].reshape(-1,4)],axis=0)
     tf=float(np.mean(border[:,3]<=1))
     if tf<0.78: raise RuntimeError(f'{key} cell not predominantly transparent: {tf}')
-    keep,cm=components(crop[:,:,3]>1)
+    if style=='plain_black':
+        rgb=crop[:,:,:3].astype(np.int16); lum=.2126*rgb[:,:,0]+.7152*rgb[:,:,1]+.0722*rgb[:,:,2]
+        raw=(crop[:,:,3]>1)&(lum<100)
+        raw=np.asarray(Image.fromarray((raw*255).astype(np.uint8),'L').filter(ImageFilter.MaxFilter(3)))>0
+    else:
+        raw=(crop[:,:,3]>1)
+    keep,cm=components(raw)
     if any(x['edge_touch'] and x['pixels']>50 for x in cm):
         raise RuntimeError(f'{key} cell clips source component: {cm}')
     full=Image.new('L',src.size,0); full.paste(Image.fromarray((keep*255).astype(np.uint8),'L'),(x0,y0)); bb=full.getbbox()
@@ -144,7 +150,7 @@ def render_target(key,text,bb,style,slant):
 header,src,info=load_dds(source)
 source_masks={};source_bboxes={};mask_meta={};source_text=Image.new('L',src.size,0)
 for key,en,ko,cell,style,slant in spec:
-    m,bb,meta=source_mask_for(key,cell);source_masks[key]=m;source_bboxes[key]=bb;mask_meta[key]=meta;source_text=ImageChops.lighter(source_text,m)
+    m,bb,meta=source_mask_for(key,cell,style);source_masks[key]=m;source_bboxes[key]=bb;mask_meta[key]=meta;source_text=ImageChops.lighter(source_text,m)
 allowed=rect_mask(src.size,list(source_bboxes.values()));protected=ImageChops.invert(allowed)
 clean=src.copy();a=np.asarray(clean).copy();m=np.asarray(source_text)>0;a[m]=(0,0,0,0);clean=Image.fromarray(a,'RGBA')
 final=clean.copy();layers={};render_meta={}
