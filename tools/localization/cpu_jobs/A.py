@@ -6,7 +6,7 @@ from PIL import Image, ImageChops, ImageOps, ImageDraw
 if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "A":
     raise SystemExit("This deterministic job must run in the GitHub-hosted localization CPU worker as role A.")
 
-RETRY_MARKER = "20261004-A-RECOVERY07-current-controller-retry"
+RETRY_MARKER = "20261004-A-RECOVERY07-owned-region-retry"
 
 repo = Path.cwd()
 run = "20261004-A-RECOVERY07"
@@ -186,8 +186,15 @@ for r in rows:
     ob = r["original_bbox"]
     region = own_rect(r, rows)
     if key in fail_keys:
-        layer,bb,scale,identified = fit_overlay(before,src,region,ob,2)
-        status = "REWORKED_UNIFORM_SCALE_OR_REPOSITION"
+        # Placement is constrained to this row's midpoint-owned atlas region as well
+        # as its exact source bbox. This prevents a repaired layer from overwriting
+        # an already-PASS neighbor in physically overlapping sprite cells.
+        placement = [max(ob[0],region[0]), max(ob[1],region[1]), min(ob[2],region[2]), min(ob[3],region[3])]
+        if placement[0] >= placement[2] or placement[1] >= placement[3]:
+            placement = list(ob)
+        layer,bb,scale,identified = fit_overlay(before,src,region,placement,2)
+        assert halfopen_contains(ob,bb),(key,ob,bb)
+        status = "REWORKED_OWNED_REGION_SCALE_OR_REPOSITION"
     else:
         x0,y0,x1,y1 = region
         cc = before.crop((x0,y0,x1,y1))
