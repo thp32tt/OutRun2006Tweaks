@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION58",
+  "timestamp_kst": "2026-10-05T07:49:35+09:00",
+  "index": 140,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+  "source_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+  "candidate_sha256": "b6d8bcc2f2cc05d45d4af3fbfab30f0a71e8fa68a89dee4c78b6f8a6aeca4cd3",
+  "semantic_binding": {
+    "canonical": [
+      "SELECT STAGE",
+      "SELECT RACE",
+      "SELECT MODE",
+      "SHOWROOM",
+      "PRESS [Enter-key icon] KEY"
+    ],
+    "correction": "stale PRESS START transcription corrected from canonical HD readable source",
+    "compound_render": "누르세요 | preserved Enter-key icon | 키"
+  },
+  "same_invocation_rework": {
+    "rejected_candidate_sha256": "8e5639642409fbbba8478a61025971bd611f89ea5711cf5a4127f5201583c968",
+    "rejected_run": "B_PRODUCTION57",
+    "failure": "controller visual QA: four white Korean rows were materially thinner than the heavy source family",
+    "corrected_run": "B_PRODUCTION58",
+    "correction": "NotoSansCJK-Bold.ttc + 2px same-color weight stroke; compound yellow/black source style retained"
+  },
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "bbox_size_positive_margin": "6/6 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "source_mask_residue": 0,
+    "changed_pixels_outside_source_bboxes": 0,
+    "alpha_changed_outside_source_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": 0,
+    "protected_enter_icon_pixels": 3959
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact_2x": "PASS",
+    "raw_mirror_y": "PASS",
+    "observations": [
+      "B58 white Korean rows now use a heavy source-like weight rather than the B57 thin draft.",
+      "Yellow/black 누르세요 and 키 preserve the source compound color/outline family and remain separated from the original Enter-key icon.",
+      "No visible English residue, clipping, overlap, seam, halo, protected-icon damage, or orientation regression."
+    ]
+  },
+  "decision": "B_PRODUCTION58_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
