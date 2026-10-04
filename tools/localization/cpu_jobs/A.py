@@ -146,9 +146,13 @@ if source_mask_unchanged!=0:
     raise RuntimeError(("source effect unchanged in clean",source_mask_unchanged))
 
 def resolve_font():
-    pats=["Noto Sans CJK KR:style=Black","Noto Sans CJK KR:style=Bold","Noto Sans CJK KR"]
     def pick():
-        for pat in pats:
+        specs=[
+          ("Noto Sans CJK KR:style=Bold","Bold"),
+          ("Noto Sans CJK KR:style=Regular","Regular"),
+          ("Noto Sans CJK KR","")
+        ]
+        for pat,want in specs:
             try:
                 spec=subprocess.check_output(["fc-match","-f","%{file}|%{index}",pat],text=True).strip()
             except Exception:
@@ -158,7 +162,8 @@ def resolve_font():
             fp,idx=spec.rsplit("|",1)
             try: idx=int(idx or "0")
             except Exception: idx=0
-            if fp and Path(fp).exists() and "NotoSansCJK" in Path(fp).name:
+            name=Path(fp).name
+            if fp and Path(fp).exists() and "NotoSansCJK" in name and (not want or want in name):
                 return fp,idx,pat
         return None
     got=pick()
@@ -201,20 +206,26 @@ shadow_dy=max(0,int(round(statistics.median([max(0,m["bottom"]-m["top"]) for m i
 shadow_dx=min(shadow_dx,12); shadow_dy=min(shadow_dy,12)
 stroke_guess=min(stroke_guess,10)
 
+WEIGHT_STROKE=2
+
 def render_loading(text,ob):
     aw,ah=ob[2]-ob[0],ob[3]-ob[1]
     for fs in range(max(24,int(ah*1.2)),16,-1):
         font=ImageFont.truetype(FONT,fs,index=FONT_INDEX)
         d=ImageDraw.Draw(Image.new("L",(8,8),0))
-        tb=d.textbbox((0,0),text,font=font,stroke_width=stroke_guess)
-        pad=stroke_guess+max(shadow_dx,shadow_dy)+8
+        outer=stroke_guess+WEIGHT_STROKE
+        tb=d.textbbox((0,0),text,font=font,stroke_width=outer)
+        pad=outer+max(shadow_dx,shadow_dy)+8
         layer=Image.new("RGBA",(tb[2]-tb[0]+pad*2+shadow_dx,tb[3]-tb[1]+pad*2+shadow_dy),(0,0,0,0))
         ld=ImageDraw.Draw(layer)
         anchor=(pad-tb[0],pad-tb[1])
         if shadow_dx or shadow_dy:
             ld.text((anchor[0]+shadow_dx,anchor[1]+shadow_dy),text,font=font,fill=dark_color,
-                    stroke_width=stroke_guess,stroke_fill=dark_color)
-        ld.text(anchor,text,font=font,fill=fill_color,stroke_width=stroke_guess,stroke_fill=dark_color)
+                    stroke_width=outer,stroke_fill=dark_color)
+        # Dark source-family outline first, then same-color fill reinforcement so
+        # the Hangul body matches the source's heavy white weight.
+        ld.text(anchor,text,font=font,fill=dark_color,stroke_width=outer,stroke_fill=dark_color)
+        ld.text(anchor,text,font=font,fill=fill_color,stroke_width=WEIGHT_STROKE,stroke_fill=fill_color)
         bb=layer.getchannel("A").getbbox()
         if not bb:
             continue
@@ -255,7 +266,7 @@ for r0 in rows0:
       "raw_localized_bbox":[loc[0],H-loc[3],loc[2],H-loc[1]],
       "raw_containment":"PASS" if contain else "FAIL",
       "font_file":FONT,"font_face_index":FONT_INDEX,"font_pattern":FONT_PATTERN,
-      "font_size":fs,"stroke_width":stroke_guess,"shadow_offset":[shadow_dx,shadow_dy],
+      "font_size":fs,"stroke_width":stroke_guess,"same_color_weight_stroke":WEIGHT_STROKE,"shadow_offset":[shadow_dx,shadow_dy],
       "rework_status":"A_PRODUCTION21_NEW_EXACT_HD_CANDIDATE"
     })
 
@@ -337,7 +348,7 @@ report={
  "source_style":{"fill_median":fill_color,"dark_effect_median":dark_color,
    "family":"upright heavy white Loading text with dark outline/shadow",
    "font_file":FONT,"font_face_index":FONT_INDEX,"font_pattern":FONT_PATTERN,
-   "derived_stroke_width":stroke_guess,"derived_shadow_offset":[shadow_dx,shadow_dy],
+   "derived_stroke_width":stroke_guess,"same_color_weight_stroke":WEIGHT_STROKE,"derived_shadow_offset":[shadow_dx,shadow_dy],
    "source_margin_samples":style_margins},
  "clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
  "source_mask_pixels_unchanged_in_clean":source_mask_unchanged,
