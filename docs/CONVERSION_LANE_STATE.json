@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "ae7a41cca51fc9548c64b2b28db125733d3ecc14",
+  "state_parent_head": "5e600f227e37e139128055d4b306e462316682ef",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -54,13 +54,13 @@
     "task_id": "CONVERSION-DXVK-00346",
     "result_sha": "5431fbe6a3bf9b161091934f00de5b9aa037f396",
     "validation_bearing_result_sha": "5431fbe6a3bf9b161091934f00de5b9aa037f396",
-    "run_record_commit_sha": "ae7a41cca51fc9548c64b2b28db125733d3ecc14",
+    "run_record_commit_sha": "5e600f227e37e139128055d4b306e462316682ef",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
     "production_id": "CONVERSION-DXVK-00346",
-    "event_id": "CONVERSION-DXVK-00346-E006",
+    "event_id": "CONVERSION-DXVK-00346-E002",
     "event_type": "rollover",
     "dxvk_disassembly_evidence_run_id": 37173790800,
     "dxvk_disassembly_evidence_job_id": 111352064017,
@@ -70,13 +70,30 @@
     "issue14_material_comment_id": 5976119023,
     "issue14_validation_comment_id": 5976149753,
     "rollover_is_retry": false,
-    "chat_rollover": 4,
+    "chat_rollover": 2,
     "resume_reason": "Retry persisted after one recovery attempt",
     "material_origin_dispatch": {
       "production_id": "CONVERSION-DX11-00345",
       "event_id": "CONVERSION-DX11-00345-E002",
       "event_type": "rollover",
       "attempt": "1/3"
+    },
+    "prior_controller_dispatch": {
+      "production_id": "CONVERSION-DXVK-00346",
+      "event_id": "CONVERSION-DXVK-00346-E006",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 4,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "dispatch_metadata_correction": {
+      "authoritative_event_id": "CONVERSION-DXVK-00346-E002",
+      "authoritative_chat_rollover": 2,
+      "attempt_incremented": false,
+      "material_result_unchanged": true,
+      "validation_bearing_result_unchanged": true,
+      "runtime_validation_unchanged": "UNTESTED"
     }
   },
   "latest_static_evidence": {
