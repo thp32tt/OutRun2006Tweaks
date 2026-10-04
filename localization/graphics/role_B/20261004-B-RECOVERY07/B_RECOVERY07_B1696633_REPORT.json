@@ -2,7 +2,7 @@
   "schema_version": 1,
   "role": "B",
   "run": "20261004-B-RECOVERY07",
-  "base_head": "5b296e46e79ab4d292399373af242f8557b5baa9",
+  "base_head": "dd188aa0bed8ae9a52b2db1a205d212571031dd6",
   "queue_index": 48,
   "asset": "textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
   "readiness_tier": "RENDER_READY_AFTER_PERSISTED_HD_GRID_DIAGNOSTIC",
@@ -10,7 +10,7 @@
   "source_upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
   "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
   "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
-  "candidate_sha256": "13405cbc781820119e0f0295b3315c562cc2aeed301c4e6351da681f8a25ed09",
+  "candidate_sha256": "45bf5ee4f7b18bee4a926f6811c4234192fd540b59c22a52ae0f3bf6e10cbae9",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds",
   "method": "pinned exact HD source -> nine source glyph/effect masks -> protected mask -> transparent/row-reconstructed clean plate -> fresh native-resolution Korean lettering with measured source palette/slant -> exact source-header RGBA32 DDS -> decoded final QA",
   "historical_full_draft_note": "used only as discovery evidence; no historical localized raster pixels reused or upscaled",
@@ -101,10 +101,14 @@
         ]
       },
       "source_mask_meta": {
-        "type": "opaque_or_semitransparent_row_reconstruct",
+        "type": "opaque_header_dominant_reconstruct",
         "border_transparent_fraction": 0.416,
-        "color_diff_threshold": 10,
-        "alpha_diff_threshold": 10
+        "dominant_background_rgb": [
+          167,
+          167,
+          167
+        ],
+        "color_diff_threshold": 10
       },
       "historical_localized_raster_reused": false
     },
@@ -119,24 +123,24 @@
         812
       ],
       "original_bbox": [
-        1648,
-        769,
-        1800,
-        781
+        1639,
+        768,
+        1803,
+        805
       ],
       "localized_bbox": [
-        1717,
-        770,
-        1731,
-        780
+        1690,
+        769,
+        1752,
+        804
       ],
-      "delta_left": 69,
-      "delta_right": 69,
+      "delta_left": 51,
+      "delta_right": 51,
       "delta_top": 1,
       "delta_bottom": 1,
       "containment": "PASS",
       "rework_status": "NEW_CANDIDATE",
-      "native_font_size": 8,
+      "native_font_size": 35,
       "stroke_width": 0,
       "palette": {
         "top": [
@@ -159,10 +163,14 @@
         ]
       },
       "source_mask_meta": {
-        "type": "opaque_or_semitransparent_row_reconstruct",
+        "type": "opaque_header_dominant_reconstruct",
         "border_transparent_fraction": 0.4186046511627907,
-        "color_diff_threshold": 10,
-        "alpha_diff_threshold": 10
+        "dominant_background_rgb": [
+          167,
+          167,
+          167
+        ],
+        "color_diff_threshold": 10
       },
       "historical_localized_raster_reused": false
     },
