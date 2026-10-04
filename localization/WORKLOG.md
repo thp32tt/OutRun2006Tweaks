@@ -977,3 +977,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Added GitHub-hosted `Localization CPU Worker` execution for deterministic A/B/C role scripts under `tools/localization/cpu_jobs/`; worker outputs are restricted to candidate/evidence paths and cannot update shared controller state.
 - ChatGPT native sandbox remains preferred for analysis/compute that does not require large binary write-back. N100 heavy-Python is fallback-only for local-only/runtime inputs or hosted-worker failure.
 - Execution placement only; queue parity, quality gates, VR/FFB/DX11/DXVK exclusions, and runtime-validation semantics are unchanged.
+
+
+### CPU worker smoke verification
+- GitHub Actions run `37184959349` completed **SUCCESS** from trigger commit `10aa51fe3d46ba229be29b60dfd66937d8353ed8`.
+- Hosted worker identified itself as `github-actions` on Azure Linux with 4 logical CPUs; Python dependencies loaded successfully and a 4096x4096 NumPy/Pillow smoke transform completed.
+- Worker output was committed back to the recovery branch as `96da1ec2354261de5ac1374240875a0ff7396411`; evidence: `localization/graphics/worker_results/CPU_WORKER_SMOKE_20261004.json`.
+- This verifies the off-N100 compute/write-back path end to end. Existing role invocations already in progress before the policy change may finish on N100; subsequent runs must use the new placement policy.
