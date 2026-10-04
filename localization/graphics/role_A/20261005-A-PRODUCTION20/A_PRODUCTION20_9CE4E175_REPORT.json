@@ -3,7 +3,7 @@
   "role": "A",
   "run": "20261005-A-PRODUCTION20",
   "worker": "github-actions",
-  "base_head": "4c62749c62fa46c910e1d096ca809789223793e4",
+  "base_head": "2a64a32803ef1cf078ee33771ce4e940444dd8f7",
   "index": 195,
   "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
   "source_provenance": {
@@ -15,7 +15,7 @@
     "classification": "authoritative high-resolution source; DDS header 1024x128 RGBA32"
   },
   "source_sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
-  "candidate_sha256": "4250de8d63f2d5acd7916a25e87a9b4920d4b50df4a38a1c3a87b02474da2902",
+  "candidate_sha256": "cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9CE4E175_256x32.dds",
   "structure": {
     "dimensions": [
@@ -60,22 +60,22 @@
   ],
   "original_bbox": [
     95,
-    81,
+    80,
     490,
     121
   ],
   "localized_bbox": [
-    224,
-    83,
-    360,
+    221,
+    82,
+    363,
     119
   ],
   "source_width": 395,
-  "source_height": 40,
-  "localized_width": 136,
-  "localized_height": 36,
-  "delta_left": 129,
-  "delta_right": 130,
+  "source_height": 41,
+  "localized_width": 142,
+  "localized_height": 37,
+  "delta_left": 126,
+  "delta_right": 127,
   "delta_top": 2,
   "delta_bottom": 2,
   "containment": "PASS",
@@ -85,13 +85,13 @@
     95,
     7,
     490,
-    47
+    48
   ],
   "raw_localized_bbox": [
-    224,
+    221,
     9,
-    360,
-    45
+    363,
+    46
   ],
   "raw_containment": "PASS",
   "clean_plate_validator": {
@@ -101,10 +101,10 @@
       1024,
       128
     ],
-    "changed_pixels": 7565,
+    "changed_pixels": 8042,
     "changed_bbox": [
       95,
-      81,
+      80,
       490,
       121
     ],
@@ -120,10 +120,10 @@
       1024,
       128
     ],
-    "changed_pixels": 8257,
+    "changed_pixels": 8838,
     "changed_bbox": [
       95,
-      81,
+      80,
       490,
       121
     ],
@@ -133,7 +133,7 @@
     "status": "PASS"
   },
   "decoded_changes": {
-    "changed_pixels_total": 8257,
+    "changed_pixels_total": 8838,
     "changed_pixels_outside_source_bbox": 0,
     "alpha_changed_pixels_outside_source_bbox": 0,
     "protected_visible_pixels_changed": 0,
