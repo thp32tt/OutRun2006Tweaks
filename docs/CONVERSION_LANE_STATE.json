@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7",
+  "state_parent_head": "518db8efe987af98521ef5d66e8390859c228e0c",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -51,41 +51,38 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DX11-00373",
+    "task_id": "CONVERSION-DX11-00374",
     "production_id": "CONVERSION-DX11-00373",
-    "event_id": "CONVERSION-DX11-00373-E006",
-    "event_type": "rollover",
+    "event_id": "CONVERSION-DX11-00373-E008",
+    "event_type": "retry",
     "attempt": "1/3",
     "dispatch_source": "CURRENT_USER_QUEUE",
-    "selected_work_item": "DX11_R250_PROGRAMMABLE_NONINDEXED_IA_GEOMETRY_BINDING_RECEIPT",
-    "result_sha": "03b8dc06f483b985bfe2df74103093c6c3977330",
-    "source_implementation_sha": "03b8dc06f483b985bfe2df74103093c6c3977330",
-    "material_result_sha": "03b8dc06f483b985bfe2df74103093c6c3977330",
-    "validation_bearing_sha": "03b8dc06f483b985bfe2df74103093c6c3977330",
-    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R250_PROGRAMMABLE_NONINDEXED_IA_GEOMETRY_BINDING_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+    "selected_work_item": "DX11_R251_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS",
+    "result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "source_implementation_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "material_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "validation_bearing_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R251_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "validation_run_id": 37203246583,
+    "validation_run_id": 37220153246,
     "validation_run_attempt": 1,
-    "validation_job_id": 111439049164,
-    "readiness_smoke_job_id": 111439978545,
-    "artifact_id": 11303667230,
-    "artifact_digest": "sha256:563bc666618183197fd75ea15010868dae2eea03e7fc8691a278f4e39e6e8b5f",
-    "run_record_path": "docs/automation/runs/CONVERSION-DX11-00373.json",
+    "validation_job_id": 111488678722,
+    "readiness_smoke_job_id": 111489677604,
+    "artifact_id": 11310351741,
+    "artifact_digest": "sha256:bf8d4872a65781ede12130c2a9a4b994b84ad1f16015c5acbf9d259ccb9001fa",
+    "run_record_path": "docs/automation/runs/CONVERSION-DX11-00374.json",
     "implementation_commits": [
-      "03b8dc06f483b985bfe2df74103093c6c3977330"
+      "518db8efe987af98521ef5d66e8390859c228e0c"
     ],
-    "implementation_comment_id": 5980153335,
-    "validation_comment_id": 5980153335,
+    "implementation_comment_id": 5982586235,
+    "validation_comment_id": 5982586235,
     "native_draw_path_activation_changed": false,
-    "source": "CURRENT_USER_QUEUE",
-    "chat_rollover": 4,
-    "rollover_is_retry": false,
-    "resume_reason": "Retry persisted after one recovery attempt"
+    "source": "CURRENT_USER_QUEUE"
   },
-  "runtime_blocker": "CONVERSION-DX11-00373/R250 is automation-complete but has no Quest 3/VDXR runtime evidence; it remains dormant and makes no runtime claim. Independently, the XR source-resolution Desktop versus XR_NATIVE_2496X2688 A/B from CONVERSION-DX11-00363 still requires HMD comparison before promotion.",
-  "runtime_next_action": "Keep Desktop as the default source-resolution policy and NativeDrawPath inactive. Runtime work, when performed, should compare Desktop versus XR_NATIVE_2496X2688 aliasing/frame-time/fresh-cached cadence; R250 itself requires no runtime promotion claim from CI.",
-  "independent_static_next_action": "Preserve validated R239-R250 programmable ownership/readiness. Under a new TASK_ID, review and implement only the next bounded programmable pre-Draw readiness boundary; keep Draw*/NativeDrawPath dormant until that separate unit is validated.",
+  "runtime_blocker": "CONVERSION-DX11-00374/R251 is automation-complete but has no Quest 3/VDXR runtime evidence. R251 is dormant pre-Draw argument readiness and makes no runtime behavior claim.",
+  "runtime_next_action": "Keep NativeDrawPath inactive. R251 requires no runtime promotion claim from CI; real HMD/game validation remains separate from automatic readiness evidence.",
+  "independent_static_next_action": "Preserve validated R239-R251 programmable ownership/readiness. Under a new TASK_ID, add indexed programmable dispatch/source-range readiness as one separate bounded unit; continue to stop before issuing Draw* or activating NativeDrawPath.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -2825,6 +2822,34 @@
       "chat_rollover": 3,
       "rollover_is_retry": false,
       "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    {
+      "unit_id": "DX11_R251_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS",
+      "task_id": "CONVERSION-DX11-00374",
+      "production_id": "CONVERSION-DX11-00373",
+      "event_id": "CONVERSION-DX11-00373-E008",
+      "event_type": "retry",
+      "attempt": "1/3",
+      "base_sha": "dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7",
+      "implementation_commits": [
+        "518db8efe987af98521ef5d66e8390859c228e0c"
+      ],
+      "source_implementation_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "material_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "validation_bearing_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R251_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS_ONLY",
+      "validation_run_id": 37220153246,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111488678722,
+      "readiness_smoke_job_id": 111489677604,
+      "artifact_id": 11310351741,
+      "artifact_digest": "sha256:bf8d4872a65781ede12130c2a9a4b994b84ad1f16015c5acbf9d259ccb9001fa",
+      "implementation_comment_id": 5982586235,
+      "validation_comment_id": 5982586235
     }
   ],
   "controller_dispatch": {
@@ -2836,7 +2861,18 @@
     "source": "CURRENT_USER_QUEUE",
     "runtime_validation": "UNTESTED",
     "native_draw_path_activation_changed": false,
-    "dispatch_source": "CURRENT_USER_QUEUE"
+    "dispatch_source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "source_implementation_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "validation_bearing_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "validation_run_id": 37220153246,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111488678722,
+    "readiness_smoke_job_id": 111489677604,
+    "artifact_id": 11310351741,
+    "artifact_digest": "sha256:bf8d4872a65781ede12130c2a9a4b994b84ad1f16015c5acbf9d259ccb9001fa",
+    "implementation_comment_id": 5982586235,
+    "validation_comment_id": 5982586235
   },
   "rollover_metadata_correction": {
     "task_id": "CONVERSION-DX11-00371",
@@ -2966,65 +3002,39 @@
       "source": "CURRENT_USER_QUEUE",
       "runtime_validation": "UNTESTED",
       "native_draw_path_activation_changed": false,
-      "dispatch_source": "CURRENT_USER_QUEUE"
+      "dispatch_source": "CURRENT_USER_QUEUE",
+      "material_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "source_implementation_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "validation_bearing_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+      "validation_run_id": 37220153246,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111488678722,
+      "readiness_smoke_job_id": 111489677604,
+      "artifact_id": 11310351741,
+      "artifact_digest": "sha256:bf8d4872a65781ede12130c2a9a4b994b84ad1f16015c5acbf9d259ccb9001fa",
+      "implementation_comment_id": 5982586235,
+      "validation_comment_id": 5982586235
     },
     "superseded": [
       {
         "task_id": "CONVERSION-DX11-00373",
         "production_id": "CONVERSION-DX11-00373",
-        "event_id": "CONVERSION-DX11-00373-E002",
-        "event_type": "rollover",
-        "attempt": "1/3",
-        "chat_rollover": 2
-      },
-      {
-        "task_id": "CONVERSION-DX11-00373",
-        "production_id": "CONVERSION-DX11-00373",
-        "event_id": "CONVERSION-DX11-00373-E004",
-        "event_type": "rollover",
-        "attempt": "1/3",
-        "chat_rollover": 3,
-        "rollover_is_retry": false,
-        "resume_reason": "Retry persisted after one recovery attempt",
-        "source": "CURRENT_USER_QUEUE",
-        "dispatch_source": "CURRENT_USER_QUEUE"
-      },
-      {
-        "task_id": "CONVERSION-DX11-00373",
-        "production_id": "CONVERSION-DX11-00373",
         "event_id": "CONVERSION-DX11-00373-E008",
         "event_type": "retry",
-        "attempt": "2/3",
-        "source": "CURRENT_USER_QUEUE",
-        "runtime_validation": "UNTESTED",
-        "native_draw_path_activation_changed": false,
-        "rollover_is_retry": true,
-        "resume_reason": "No authoritative Backend Conversion Gate run was created for result SHA 1e12ad88f58eb8260d246654c00ea47062aa929b after 15296s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
-        "dispatch_source": "CURRENT_USER_QUEUE"
+        "attempt": "2/3"
       }
     ],
-    "reason": "CONVERSION-DX11-00374 is the newest explicit controller task. It consumes the completed 00373/E008 repair as predecessor evidence and starts a new ATTEMPT=1/3 for R251.",
-    "material_and_validation_bearing_sha_unchanged": false
-  },
-  "current_retry": {
-    "status": "VALIDATING_REPAIR",
-    "base_sha": "b81c2281fc9b25e2c3d437baa1131714bf3c39ac",
-    "selected_work_item": "DX11_R250_QUEUE_GATE_DISCOVERY_RECOVERY",
-    "failure_sha": "1e12ad88f58eb8260d246654c00ea47062aa929b",
-    "recovered_gate_run_id": 37203955314,
-    "recovered_gate_conclusion": "success",
-    "result_sha": null,
-    "validation_bearing_result_sha": null,
-    "runtime_validation": "UNTESTED"
+    "reason": "CONVERSION-DX11-00374 is the newest explicit task. It started at ATTEMPT=1/3, consumed the completed 00373/E008 automation repair as predecessor evidence, and completed R251 on its own exact validation-bearing SHA.",
+    "material_and_validation_bearing_sha_unchanged": true
   },
   "current_task": {
-    "status": "VALIDATING",
+    "status": "COMPLETE",
     "task_id": "CONVERSION-DX11-00374",
     "selected_work_item": "DX11_R251_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS",
     "base_sha": "dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7",
-    "result_sha": null,
-    "validation_bearing_result_sha": null,
-    "automation_validation": "PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "validation_bearing_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R251_PROGRAMMABLE_NONINDEXED_DIRECT_DISPATCH_ARGUMENT_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED"
   }
 }
