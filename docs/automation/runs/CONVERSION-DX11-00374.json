@@ -2,7 +2,7 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00374",
   "production_id": "CONVERSION-DX11-00374",
-  "event_id": "CONVERSION-DX11-00374-E001",
+  "event_id": "CONVERSION-DX11-00374-E002",
   "event_type": "rollover",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
@@ -37,7 +37,7 @@
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered GitHub SSOT at dc2acf14fca4ee615ab2eeec6be5cb07c6a0d4e7. No prior 00374 material result existed at rollover recovery. Predecessor exact-SHA Backend Conversion Gate #37219099066 completed success. ATTEMPT remained 1/3 because E001 is a rollover, not a retry."
+      "evidence": "Recovered GitHub SSOT and preserved completed R251 material/validation evidence. CONVERSION-DX11-00374-E002 / CHAT_ROLLOVER=3 is the latest explicit rollover; it is not a retry, so ATTEMPT remains 1/3. Material SHA 518db8efe987af98521ef5d66e8390859c228e0c and exact-SHA Backend Conversion Gate 37220153246 remain unchanged."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
@@ -98,18 +98,26 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00374",
     "production_id": "CONVERSION-DX11-00374",
-    "event_id": "CONVERSION-DX11-00374-E001",
+    "event_id": "CONVERSION-DX11-00374-E002",
     "event_type": "rollover",
     "attempt": "1/3",
-    "source": "CURRENT_USER_QUEUE",
-    "material_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
-    "validation_bearing_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
-    "validation_run_id": 37220153246,
-    "runtime_validation": "UNTESTED",
-    "native_draw_path_activation_changed": false,
-    "chat_rollover": 2,
+    "chat_rollover": 3,
     "rollover_is_retry": false,
     "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "source": "CURRENT_USER_QUEUE",
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false,
+    "material_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "source_implementation_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "validation_bearing_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
+    "validation_run_id": 37220153246,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111488678722,
+    "readiness_smoke_job_id": 111489677604,
+    "artifact_id": 11310351741,
+    "artifact_digest": "sha256:bf8d4872a65781ede12130c2a9a4b994b84ad1f16015c5acbf9d259ccb9001fa",
+    "implementation_comment_id": 5982586235,
+    "validation_comment_id": 5982586235,
     "dispatch_source": "CURRENT_USER_QUEUE"
   },
   "exact_next_action": "Preserve validated R239-R251 programmable ownership/readiness. Under a new TASK_ID, review only the next bounded indexed programmable dispatch/source-range readiness unit; keep Draw*/NativeDrawPath dormant.",
@@ -132,14 +140,16 @@
     "task_id": "CONVERSION-DX11-00374",
     "authoritative": {
       "task_id": "CONVERSION-DX11-00374",
-      "production_id": "CONVERSION-DX11-00373",
-      "event_id": "CONVERSION-DX11-00373-E008",
-      "event_type": "retry",
+      "production_id": "CONVERSION-DX11-00374",
+      "event_id": "CONVERSION-DX11-00374-E002",
+      "event_type": "rollover",
       "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false,
+      "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
       "source": "CURRENT_USER_QUEUE",
       "runtime_validation": "UNTESTED",
       "native_draw_path_activation_changed": false,
-      "dispatch_source": "CURRENT_USER_QUEUE",
       "material_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
       "source_implementation_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
       "validation_bearing_result_sha": "518db8efe987af98521ef5d66e8390859c228e0c",
@@ -150,7 +160,8 @@
       "artifact_id": 11310351741,
       "artifact_digest": "sha256:bf8d4872a65781ede12130c2a9a4b994b84ad1f16015c5acbf9d259ccb9001fa",
       "implementation_comment_id": 5982586235,
-      "validation_comment_id": 5982586235
+      "validation_comment_id": 5982586235,
+      "dispatch_source": "CURRENT_USER_QUEUE"
     },
     "superseded": [
       {
@@ -159,12 +170,24 @@
         "event_id": "CONVERSION-DX11-00373-E008",
         "event_type": "retry",
         "attempt": "2/3"
+      },
+      {
+        "task_id": "CONVERSION-DX11-00374",
+        "production_id": "CONVERSION-DX11-00374",
+        "event_id": "CONVERSION-DX11-00374-E001",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 2,
+        "rollover_is_retry": false,
+        "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+        "source": "CURRENT_USER_QUEUE",
+        "dispatch_source": "CURRENT_USER_QUEUE"
       }
     ],
-    "reason": "CONVERSION-DX11-00374 is the newest explicit task. It started at ATTEMPT=1/3, consumed the completed 00373/E008 automation repair as predecessor evidence, and completed R251 on its own exact validation-bearing SHA.",
+    "reason": "CONVERSION-DX11-00374-E002 / CHAT_ROLLOVER=3 is the newest explicit controller rollover. It is not a retry, so ATTEMPT remains 1/3. The already-completed R251 material and exact-SHA validation-bearing result are unchanged.",
     "material_and_validation_bearing_sha_unchanged": true
   },
-  "chat_rollover": 2,
+  "chat_rollover": 3,
   "rollover_is_retry": false,
   "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
 }
