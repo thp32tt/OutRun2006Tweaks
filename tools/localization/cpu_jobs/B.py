@@ -87,8 +87,25 @@ def semantic_mask(key, window, seed_kind, component_radius=12):
  return m, {'window':window,'seed_kind':seed_kind,'seed_pixels':int(seed.sum()),'component_count':int(n),'selected_components':sorted(keep),'seed_bbox':[x0+int(sx.min()),y0+int(sy.min()),x0+int(sx.max())+1,y0+int(sy.max())+1]}
 
 mask_discovery={}
-red,mask_discovery['for_experts']=semantic_mask('for_experts',(0,60,540,210),'red',14)
-orange,mask_discovery['outrun2sp']=semantic_mask('outrun2sp',(350,60,900,210),'orange',14)
+# The top red/orange pair intentionally has touching/overlapping outer effects.  Preserve
+# B_PRODUCTION21's color-seeded ownership split for that pair only; C108 did not return
+# this pair, and a generic connected-component pass merges their touching white/navy rims.
+ty0,ty1=60,210;tx0,tx1=0,900
+tsub=alpha[ty0:ty1,tx0:tx1];trgb=sa[ty0:ty1,tx0:tx1,:3].astype(np.int16);R,G,B=trgb[:,:,0],trgb[:,:,1],trgb[:,:,2]
+tx=np.indices(tsub.shape)[1]
+red_seed=tsub&(R>=125)&(R>=G+45)&(R>=B+25)&(tx<520)
+orange_seed=tsub&(R>=165)&(G>=55)&(R>=G+32)&(B<=125)&(tx>300)
+if red_seed.sum()<100 or orange_seed.sum()<100: raise RuntimeError(('top seed count',int(red_seed.sum()),int(orange_seed.sum())))
+ry,rx=np.nonzero(red_seed);oy,ox=np.nonzero(orange_seed)
+red_fill_max_x=tx0+int(rx.max()); orange_fill_min_x=tx0+int(ox.min()); top_split=(red_fill_max_x+orange_fill_min_x)//2
+seed_y0=ty0+min(int(ry.min()),int(oy.min())); seed_y1=ty0+max(int(ry.max()),int(oy.max()))+1
+top_band_y0=max(ty0,seed_y0-22); top_band_y1=min(ty1,seed_y1+22)
+if not (340<=top_split<=520 and top_band_y0<top_band_y1): raise RuntimeError(('unexpected top split',red_fill_max_x,orange_fill_min_x,top_split,top_band_y0,top_band_y1))
+red=np.zeros((H,W),bool); orange=np.zeros((H,W),bool)
+red[top_band_y0:top_band_y1,0:top_split]=alpha[top_band_y0:top_band_y1,0:top_split]
+orange[top_band_y0:top_band_y1,top_split:900]=alpha[top_band_y0:top_band_y1,top_split:900]
+mask_discovery['for_experts']={'window':[0,ty0,top_split,ty1],'seed_kind':'red','seed_pixels':int(red_seed.sum()),'seed_bbox':[int(rx.min()),ty0+int(ry.min()),int(rx.max())+1,ty0+int(ry.max())+1],'top_split_x':top_split,'top_band_y':[top_band_y0,top_band_y1]}
+mask_discovery['outrun2sp']={'window':[top_split,ty0,900,ty1],'seed_kind':'orange','seed_pixels':int(orange_seed.sum()),'seed_bbox':[int(ox.min()),ty0+int(oy.min()),int(ox.max())+1,ty0+int(oy.max())+1],'top_split_x':top_split,'top_band_y':[top_band_y0,top_band_y1]}
 music,mask_discovery['music_change']=semantic_mask('music_change',(820,45,1500,180),'white',12)
 time,mask_discovery['time_remaining']=semantic_mask('time_remaining',(1050,145,1960,310),'white',14)
 source_masks={'for_experts':red,'outrun2sp':orange,'music_change':music,'time_remaining':time}
