@@ -3,6 +3,11 @@ import os, json, hashlib, struct, subprocess, math
 from pathlib import Path
 from PIL import Image, ImageChops, ImageOps, ImageDraw
 
+if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "A":
+    raise SystemExit("This deterministic job must run in the GitHub-hosted localization CPU worker as role A.")
+
+RETRY_MARKER = "20261004-A-RECOVERY07-current-controller-retry"
+
 repo = Path.cwd()
 run = "20261004-A-RECOVERY07"
 out = repo / "localization/graphics/role_A" / run
