@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C133-1762489B",
+  "asset": "1762489B",
+  "queue_index": 130,
+  "producer_run": "B_PRODUCTION46",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION46/B_PRODUCTION46_176_REPORT.json",
+  "input_candidate_sha256": "cd066bd26952f6b9d20cf604919baa38ac1f0e74492d9f75ee6001e908b37d89",
+  "candidate_sha256": "324f677c4afc482ef3dbcf0cd226514a68847ee872d1eeda75b9311a9cb7a871",
+  "candidate_changed_by_C": true,
+  "corrective_scope": "row 4 style only: remove spurious B46 0.32 slant; preserve mirror-y orientation, semantics, source masks, clean plate, other four localized rows and protected artwork",
+  "source_sha256": "c64baefa65663bc247c33f2f7a72c4ea49990e2a0edb409f186b090dfd3460ac",
+  "structure": {
+    "width": 2048,
+    "height": 512,
+    "mipmaps": 1,
+    "format": "RGBA32",
+    "raw_orientation": "mirror_y"
+  },
+  "header_128_exact": true,
+  "machine_checks": {
+    "bbox_and_size": "5/5 PASS with positive margins",
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_changed_pixels": 0,
+    "target_pixels_outside_original_bboxes": 0,
+    "target_mask_pixels_invisible_in_candidate": 0,
+    "source_residue_pixels_outside_2px_target_guard": 0,
+    "localized_pair_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "changes_vs_B46_outside_row4_bbox": 0
+  },
+  "rows": [
+    {
+      "n": 1,
+      "source": "MIX 1 COURSE",
+      "korean": "믹스 1 코스",
+      "original_bbox": [
+        9,
+        145,
+        614,
+        218
+      ],
+      "localized_bbox": [
+        154,
+        146,
+        469,
+        216
+      ],
+      "source_size": [
+        605,
+        73
+      ],
+      "localized_size": [
+        315,
+        70
+      ],
+      "delta_left": 145,
+      "delta_right": 145,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "slant": 0.0,
+      "rework_status": "C133_PRESERVED_B46"
+    },
+    {
+      "n": 2,
+      "source": "MIX 2 COURSE",
+      "korean": "믹스 2 코스",
+      "original_bbox": [
+        9,
+        241,
+        612,
+        314
+      ],
+      "localized_bbox": [
+        153,
+        242,
+        468,
+        312
+      ],
+      "source_size": [
+        603,
+        73
+      ],
+      "localized_size": [
+        315,
+        70
+      ],
+      "delta_left": 144,
+      "delta_right": 144,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "slant": 0.0,
+      "rework_status": "C133_PRESERVED_B46"
+    },
+    {
+      "n": 3,
+      "source": "OUTRUN2 COURSE",
+      "korean": "아웃런2 코스",
+      "original_bbox": [
+        7,
+        333,
+        785,
+        406
+      ],
+      "localized_bbox": [
+        214,
+        334,
+        577,
+        404
+      ],
+      "source_size": [
+        778,
+        73
+      ],
+      "localized_size": [
+        363,
+        70
+      ],
+      "delta_left": 207,
+      "delta_right": 208,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "slant": 0.0,
+      "rework_status": "C133_PRESERVED_B46"
+    },
+    {
+      "n": 4,
+      "source": "OUTRUN2SP COURSE",
+      "korean": "아웃런2 SP 코스",
+      "original_bbox": [
+        7,
+        429,
+        899,
+        502
+      ],
+      "localized_bbox": [
+        220,
+        430,
+        685,
+        500
+      ],
+      "source_size": [
+        892,
+        73
+      ],
+      "localized_size": [
+        465,
+        70
+      ],
+      "delta_left": 213,
+      "delta_right": 214,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "slant": 0.0,
+      "rework_status": "C133_ROW4_UPRIGHT_STYLE_CORRECTION"
+    },
+    {
+      "n": 5,
+      "source": "AVERAGE RANK:",
+      "korean": "평균 랭크:",
+      "original_bbox": [
+        1435,
+        466,
+        1850,
+        510
+      ],
+      "localized_bbox": [
+        1560,
+        467,
+        1725,
+        508
+      ],
+      "source_size": [
+        415,
+        44
+      ],
+      "localized_size": [
+        165,
+        41
+      ],
+      "delta_left": 125,
+      "delta_right": 125,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "slant": 0.0,
+      "rework_status": "C133_PRESERVED_B46"
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}

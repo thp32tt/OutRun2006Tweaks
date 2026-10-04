@@ -1,0 +1,20 @@
+{
+  "run": "20261005-C133-1762489B",
+  "asset": "1762489B",
+  "index": 130,
+  "input_candidate_sha256": "cd066bd26952f6b9d20cf604919baa38ac1f0e74492d9f75ee6001e908b37d89",
+  "candidate_sha256": "324f677c4afc482ef3dbcf0cd226514a68847ee872d1eeda75b9311a9cb7a871",
+  "candidate_changed_by_C": true,
+  "machine_status": "PASS",
+  "bbox_size_pass": "5/5",
+  "positive_margin_pass": "5/5",
+  "outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "source_residue": 0,
+  "overlap": 0,
+  "touch_pairs": 0,
+  "changes_vs_B46_outside_row4_bbox": 0,
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_C/20261005-C133-1762489B/C133_176_MACHINE_QA.json"
+}
