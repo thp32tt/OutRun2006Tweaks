@@ -173,6 +173,32 @@ switch ([string]$target.RendererTarget) {
             '$text = Set-IniSectionValue $text "VR" "DisableDesktopDuplication" "true"')) {
             throw 'DX11 selector must not globally disable Desktop Duplication; menus still require mono capture.'
         }
+
+        # Quest 3/VDXR runtime evidence showed that the old DX11 test launcher
+        # forced 60 Hz rendering into a 90 Hz XR stream, yielding repeated
+        # frames despite a nominal 90 fps compositor rate. Guard the new
+        # primary DX11 policy: XR-native phase lock + render interpolation,
+        # while the game simulation remains 60 Hz.
+        $runnerText = Get-Content (Join-Path $toolsRoot 'Run-OutRunVRTest.ps1') -Raw
+        $dx11RunnerMatch = [regex]::Match(
+            $runnerText,
+            "(?s)elseif\(\$backend -eq 'dx11'\)\{(?<body>.*?)\r?\n\}else\{")
+        if (!$dx11RunnerMatch.Success) {
+            throw 'DX11 runtime cadence policy block could not be isolated.'
+        }
+        $dx11RunnerBody = $dx11RunnerMatch.Groups['body'].Value
+        foreach ($requiredText in @(
+            "'-FramerateLimit=0'",
+            "'-FramerateInterpolation=true'",
+            "'-FramerateUnlockExperimental=true'",
+            "'-FrameCadenceMode=1'",
+            "'-FrameCadenceTargetHz=0'",
+            "'-DisableDesktopVsync=true'"
+        )) {
+            if ($dx11RunnerBody -notmatch [regex]::Escape($requiredText)) {
+                throw "DX11 XR cadence performance policy missing: $requiredText"
+            }
+        }
         foreach ($requiredText in @(
             'OUTRUN_VR_DX11_CENSUS',
             "RendererTarget -eq 'dx11-native'"
