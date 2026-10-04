@@ -1,0 +1,32 @@
+{
+  "run": "20261004-A-PRODUCTION16",
+  "asset": "841E796B",
+  "index": 107,
+  "source_sha256": "112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e",
+  "candidate_sha256": "6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad",
+  "source_dimensions": [
+    2048,
+    512
+  ],
+  "format": "RGBA32",
+  "localized_label": "No Handicap -> 핸디캡 없음",
+  "line_bbox_pass": "2/2 + whole block",
+  "size_ceiling": "2/2 + whole block",
+  "positive_margin": "2/2",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "changed_pixels_outside_source_line_bboxes": 0,
+  "alpha_changed_pixels_outside_source_line_bboxes": 0,
+  "protected_visible_pixels_changed": 0,
+  "other_vehicle_model_card_pixels_changed": 0,
+  "zero_overlap_status": "PASS",
+  "localized_label_overlap_pixels": 0,
+  "localized_label_touch_pixels": 0,
+  "localized_protected_foreground_overlap_pixels": 0,
+  "localized_protected_foreground_touch_pixels": 0,
+  "localized_preserved_source_text_overlap_pixels": 0,
+  "source_text_residue_pixels": 0,
+  "worker_status": "A_PRODUCTION16_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261004-A-PRODUCTION16/A_PRODUCTION16_841E796B_REPORT.json"
+}

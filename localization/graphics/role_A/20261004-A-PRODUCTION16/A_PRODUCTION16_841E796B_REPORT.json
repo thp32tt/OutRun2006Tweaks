@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261004-A-PRODUCTION16",
+  "worker": "github-actions",
+  "base_head": "a89c6931a7913416e613ca0661339677191df00f",
+  "retry_context": "prior hosted worker run cancelled by concurrent branch push after job fix; retry on latest HEAD",
+  "index": 107,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "ec97eb9ea50bc6f54356e9238353045842c80e79",
+    "sha256": "112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e",
+    "path": "Release/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+    "classification": "authoritative high-resolution source; stale filename suffix, DDS header 2048x512 RGBA32"
+  },
+  "source_sha256": "112f47e7b16ecf21f722738f7fc9053d1a9852d66da9ef9d29fd25dadf2f567e",
+  "candidate_sha256": "6dd78959851274898ccc237932c5fe6ad3bae9c9e92b6d45fd935317468ec2ad",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/841E796B_512x128.dds",
+  "structure": {
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "RGBA32",
+    "pitch": 8192,
+    "mipmaps": 1,
+    "bytes": 4194432,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "translation": {
+    "catalog": "No Handicap -> 핸디캡 없음",
+    "raster_line_mapping": [
+      {
+        "source": "No",
+        "korean": "없음"
+      },
+      {
+        "source": "Handicap",
+        "korean": "핸디캡"
+      }
+    ],
+    "reason": "preserve source two-line semantics and intentional upper-small/lower-large typography"
+  },
+  "protected_content": "all nine Ferrari vehicle/model cards, names, pictograms, blue card art and non-target pixels",
+  "source_effect_bbox": [
+    1534,
+    258,
+    1768,
+    353
+  ],
+  "source_line_bboxes": {
+    "No": [
+      1534,
+      258,
+      1602,
+      300
+    ],
+    "Handicap": [
+      1548,
+      303,
+      1768,
+      353
+    ]
+  },
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION16/841E796B_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION16/841E796B_HD_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      512
+    ],
+    "changed_pixels": 7232,
+    "changed_bbox": [
+      1534,
+      258,
+      1768,
+      353
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION16/841E796B_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION16/841E796B_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      512
+    ],
+    "changed_pixels": 8616,
+    "changed_bbox": [
+      1534,
+      258,
+      1768,
+      353
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_total": 8616,
+    "changed_pixels_outside_source_line_bboxes": 0,
+    "alpha_changed_pixels_outside_source_line_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "other_vehicle_model_card_pixels_changed": 0,
+    "source_text_residue_pixels": 0
+  },
+  "zero_overlap_gate": {
+    "localized_label_overlap_pixels": 0,
+    "localized_label_touch_pixels": 0,
+    "localized_protected_foreground_overlap_pixels": 0,
+    "localized_protected_foreground_touch_pixels": 0,
+    "localized_preserved_source_text_overlap_pixels": 0,
+    "source_text_residue_pixels": 0,
+    "status": "PASS"
+  },
+  "rows": [
+    {
+      "key": "no",
+      "source": "No",
+      "korean": "없음",
+      "original_bbox": [
+        1534,
+        258,
+        1602,
+        300
+      ],
+      "preencode_bbox": [
+        1545,
+        263,
+        1601,
+        295
+      ],
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 30,
+      "style": "source-matched orange italic fill + dark lower-right shadow",
+      "shadow_offset": [
+        2,
+        2
+      ],
+      "localized_bbox": [
+        1545,
+        263,
+        1601,
+        295
+      ],
+      "source_width": 68,
+      "source_height": 42,
+      "localized_width": 56,
+      "localized_height": 32,
+      "delta_left": 11,
+      "delta_right": 1,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1534,
+        212,
+        1602,
+        254
+      ],
+      "raw_localized_bbox": [
+        1545,
+        217,
+        1601,
+        249
+      ],
+      "raw_containment": "PASS",
+      "rework_status": "A_PRODUCTION16_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "handicap",
+      "source": "Handicap",
+      "korean": "핸디캡",
+      "original_bbox": [
+        1548,
+        303,
+        1768,
+        353
+      ],
+      "preencode_bbox": [
+        1590,
+        304,
+        1725,
+        352
+      ],
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 48,
+      "style": "source-matched orange italic fill + dark lower-right shadow",
+      "shadow_offset": [
+        3,
+        3
+      ],
+      "localized_bbox": [
+        1590,
+        304,
+        1725,
+        352
+      ],
+      "source_width": 220,
+      "source_height": 50,
+      "localized_width": 135,
+      "localized_height": 48,
+      "delta_left": 42,
+      "delta_right": 43,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1548,
+        159,
+        1768,
+        209
+      ],
+      "raw_localized_bbox": [
+        1590,
+        160,
+        1725,
+        208
+      ],
+      "raw_containment": "PASS",
+      "rework_status": "A_PRODUCTION16_NEW_HD_CANDIDATE"
+    }
+  ],
+  "whole_block": {
+    "original_bbox": [
+      1534,
+      258,
+      1768,
+      353
+    ],
+    "localized_bbox": [
+      1545,
+      263,
+      1725,
+      352
+    ],
+    "containment": "PASS",
+    "size_ceiling": "PASS"
+  },
+  "all_2_lines_plus_block_readable_and_raw_bbox_pass": true,
+  "all_2_lines_plus_block_size_ceiling_pass": true,
+  "all_2_lines_positive_margin": true,
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A_PRODUCTION16_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
