@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C141-4D38BBB0",
+  "timestamp_kst": "2026-10-05T08:23:59+09:00",
+  "queue_index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "scope": "new B_PRODUCTION60 handoff only; C140-and-earlier completed PASS assets not repeated",
+  "producer_run": "20261005-B-PRODUCTION60",
+  "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+  "candidate_sha256": "c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a",
+  "candidate_changed_by_C": false,
+  "semantic_binding": {
+    "physical_regions": 8,
+    "labels": [
+      "새 라이선스 만들기",
+      "라이선스 선택",
+      "싱글 플레이",
+      "기본 라이선스",
+      "멀티플레이",
+      "싱글 플레이",
+      "쇼룸",
+      "멀티플레이"
+    ],
+    "protected_ferrari_artwork_regions": [
+      0,
+      1
+    ]
+  },
+  "independent_machine_qa": {
+    "report": "localization/graphics/role_C/20261005-C141-4D38BBB0/C141_4D38_MACHINE_QA.json",
+    "status": "PASS",
+    "dimensions": [
+      4096,
+      1024
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "producer_clean_exact_diff_pixels": 0,
+    "bbox_size_positive_margin": "8/8 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "artwork_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": []
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact": "PASS",
+    "raw_mirror_y": "PASS",
+    "red_family": "PASS_SHARED_HEAVY_RED_SOURCE_STYLE",
+    "gray_family": "PASS_SHARED_SMALL_GRAY_SOURCE_STYLE",
+    "ferrari_artwork": "PASS_UNCHANGED",
+    "english_source_residue": "NONE_VISIBLE",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "seam_or_halo": "NONE_VISIBLE",
+    "orientation_regression": "NONE_VISIBLE"
+  },
+  "decision": "C141_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "producer_rework_remaining": 0,
+  "pending_artwork_localize_text": 36,
+  "high_risk_static_pass_assets_existing": [
+    "1A43E9D9"
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94"
+  ],
+  "in_game_validation": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T08:15:09+09:00",
+  "updated_at_kst": "2026-10-05T08:23:59+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B_PRODUCTION60 produced even index 154 4D38BBB0 candidate c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a from authoritative 4096x1024 RGBA32 HD source. B59 canonical binding identified 8 physical text regions and corrected stale transcription by adding SHOWROOM plus duplicate SINGLE PLAYER/MULTIPLAYER occurrences. Ferrari artwork regions 0/1 are protected. 8/8 exact bbox+size+positive margins, clean/final validators and zero residue/outside/alpha/protected/artwork/overlap/touch PASS; controller SOURCE/CLEAN/FINAL/raw mirror_y self-QA PASS. pending_artwork localize_text=36; independent C final QA and in-game validation pending. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C141 independently finalizes B_PRODUCTION60 4D38BBB0 candidate c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a: canonical clean reconstruction diff=0, 8/8 bbox+size+positive margins and zero outside/alpha/protected/Ferrari-artwork/render/residue/overlap/touch PASS; controller source/clean/final/row/raw mirror_y visual PASS. Producer REWORK=0; pending_artwork localize_text=36. 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94 remain strict HOLD. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -268,7 +268,7 @@
       "status": "ZERO_PRODUCER_REWORK_REQUIRED",
       "assets": [],
       "remaining": 0,
-      "note": "31C58963 B58 input b6d8bcc2f2cc05d45d4af3fbfab30f0a71e8fa68a89dee4c78b6f8a6aeca4cd3 corrected by C140 to ecc7efdde172f410c85207ecdc5bbfd5bac95c753341763ad6afb9a6a7f1b3f2; static PASS. 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94 remain strict no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
+      "note": "4D38BBB0 B60 candidate c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a passes C141 independent static final QA. 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94 remain strict no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
       "pending_c": []
     },
     "latest_d_final_qa": {
@@ -293,14 +293,14 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C140",
-      "report": "localization/graphics/role_C/20261005-C140-31C58963/C140_31C_CONTROLLER_FINAL_QA.json",
-      "result": "1_PIXEL_VISUAL_PASS_AFTER_C_SMALL_CORRECTION_GLOBAL_0_REWORK_REMAIN",
-      "candidate_changed_by_C": true,
+      "run": "C141",
+      "report": "localization/graphics/role_C/20261005-C141-4D38BBB0/C141_4D38_CONTROLLER_FINAL_QA.json",
+      "result": "1_PIXEL_VISUAL_PASS_GLOBAL_0_REWORK_REMAIN",
+      "candidate_changed_by_C": false,
       "assets_checked": 1,
-      "physical_elements_checked": 6,
+      "physical_elements_checked": 8,
       "pixel_visual_pass_assets": [
-        "31C58963"
+        "4D38BBB0"
       ],
       "high_risk_static_pass_assets_existing": [
         "1A43E9D9"
@@ -312,14 +312,14 @@
         "F6811E94"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 37,
+      "pending_production_localize_text": 36,
       "machine_evidence": {
-        "31C58963": "localization/graphics/role_C/20261005-C140-31C58963/C140_31C_MACHINE_QA.json"
+        "4D38BBB0": "localization/graphics/role_C/20261005-C141-4D38BBB0/C141_4D38_MACHINE_QA.json"
       },
       "controller_visual": {
-        "31C58963": "PASS_AFTER_298PX_SOURCE_FRINGE_FIX"
+        "4D38BBB0": "PASS"
       },
-      "in_game_validation": "PENDING; 1A43E9D9 remains REQUIRED_BEFORE_FINAL_APPROVAL; C140 RUNTIME_VALIDATION=UNTESTED"
+      "in_game_validation": "PENDING; 1A43E9D9 remains REQUIRED_BEFORE_FINAL_APPROVAL; C141 RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION60",
@@ -540,7 +540,7 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 37,
+    "current_pending_artwork_localize_text": 36,
     "current_producer_rework_remaining": 0,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T02:45:00+09:00",
@@ -639,7 +639,7 @@
       "queue_index": 154,
       "candidate_sha256": "c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
-      "status": "B_PRODUCTION60_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "status": "C141_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
       "bbox_size_positive_margin": "8/8",
       "zero_pixel_gates": {
         "source_residue": 0,
@@ -652,7 +652,10 @@
       },
       "controller_visual_qa": "PASS",
       "report": "localization/graphics/role_B/20261005-B-PRODUCTION60/B60_4D38_REPORT.json",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "c_final_qa": "PASS",
+      "c_machine_report": "localization/graphics/role_C/20261005-C141-4D38BBB0/C141_4D38_MACHINE_QA.json",
+      "c_controller_report": "localization/graphics/role_C/20261005-C141-4D38BBB0/C141_4D38_CONTROLLER_FINAL_QA.json"
     }
   },
   "data_build": {

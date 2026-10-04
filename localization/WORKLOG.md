@@ -1373,3 +1373,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Queue index 154 advanced to `b60_self_qa_pass_pending_c`; pending_artwork localize_text=36. Independent C final QA and isolated in-game validation remain pending.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION60/B60_4D38_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION60/B60_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION60/B60_FINAL_VALIDATION.json`.
+
+## 2026-10-05 08:23:59 KST — C141 4D38BBB0 B60 final PASS
+- Reviewed only the new B_PRODUCTION60 index 154 `4D38BBB0_1024x256.dds`; C140-and-earlier completed PASS assets were not repeated.
+- Hosted C independent QA downloaded the pinned canonical 4096x1024 RGBA32 source and atlas, re-derived all eight physical text cells/masks, and reconstructed the exact transparent clean plate independently. B60 CLEAN differs from this reconstruction by 0 pixels.
+- Candidate `c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a`: exact source header/raw `mirror_y`; 8/8 source bbox containment, source-size ceilings and positive margins PASS. Final outside=0, alpha-outside=0, protected visible=0, Ferrari artwork changed=0, render-outside-target=0, source residue=0, localized overlap=0, touch=0.
+- Controller SOURCE/CLEAN/FINAL, per-row contact and raw mirror_y visual QA PASS. Red labels and small gray labels retain their shared source color/weight families; Ferrari artwork is unchanged; no visible English residue, clipping, overlap, seam, halo or orientation regression.
+- Decision: `C141_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Candidate unchanged by C. Producer REWORK remains 0; pending_artwork localize_text=36.
+- Existing `1A43E9D9` remains HIGH_RISK pending mandatory in-game validation; `4F68708E`/`F6811E94` remain strict DXT5 no-candidate HOLD.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C141-4D38BBB0/C141_4D38_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C141-4D38BBB0/C141_4D38_MACHINE_QA.json`.
