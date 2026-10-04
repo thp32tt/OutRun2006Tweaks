@@ -1,15 +1,12 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX9EX-00382",
-  "production_id": "CONVERSION-DX9EX-00382",
-  "event_id": "CONVERSION-DX9EX-00382-E004",
-  "event_type": "rollover",
+  "production_id": "CONVERSION-DXVK-00381",
+  "event_id": "CONVERSION-DXVK-00381-E002",
+  "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "chat_rollover": 3,
-  "resume_reason": "Retry persisted after one recovery attempt",
-  "rollover_is_retry": false,
   "status": "COMPLETE",
   "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_POLICY",
   "runtime_validation": "UNTESTED",
@@ -107,27 +104,55 @@
   "next_action": "Do not repeat CONVERSION-DX9EX-00382. Preserve R33 as the compatibility registration/terminal readiness owner and R34 as an include-only final-TU shim. Select only the next bounded post-1000 successor supported by current source/static evidence. Runtime visual/stability claims remain gated on Quest3/VDXR evidence.",
   "controller_dispatch": {
     "task_id": "CONVERSION-DX9EX-00382",
-    "production_id": "CONVERSION-DX9EX-00382",
-    "event_id": "CONVERSION-DX9EX-00382-E004",
-    "event_type": "rollover",
+    "production_id": "CONVERSION-DXVK-00381",
+    "event_id": "CONVERSION-DXVK-00381-E002",
+    "event_type": "retry",
     "attempt": "1/3",
-    "chat_rollover": 3,
     "source": "CURRENT_USER_QUEUE",
-    "resume_reason": "Retry persisted after one recovery attempt",
-    "rollover_is_retry": false,
     "material_result_sha": "f189d27a76e161eb00f52107e668690a91380475",
     "validation_bearing_result_sha": "f189d27a76e161eb00f52107e668690a91380475",
     "runtime_validation": "UNTESTED"
   },
-  "rollover_reconciliation": {
-    "event_id": "CONVERSION-DX9EX-00382-E004",
-    "attempt": "1/3",
-    "classification": "RECOVERED_PERSISTED_MATERIAL_NO_RETRY_INCREMENT",
-    "resumed_from": "C3_VALIDATE",
-    "persisted_material_sha": "f189d27a76e161eb00f52107e668690a91380475",
-    "repeated_material_work": false,
-    "runtime_validation": "UNTESTED",
-    "note": "The material commit pre-existed this rollover after one recovery attempt. E004 only recovered, validated, and persisted authoritative state; ATTEMPT remains 1/3."
-  },
-  "validated_at_kst": "2026-10-05T04:58:39+09:00"
+  "validated_at_kst": "2026-10-05T04:58:39+09:00",
+  "dispatch_reconciliation": {
+    "authoritative": {
+      "task_id": "CONVERSION-DX9EX-00382",
+      "production_id": "CONVERSION-DXVK-00381",
+      "event_id": "CONVERSION-DXVK-00381-E002",
+      "event_type": "retry",
+      "attempt": "1/3",
+      "source": "CURRENT_USER_QUEUE",
+      "material_result_sha": "f189d27a76e161eb00f52107e668690a91380475",
+      "validation_bearing_result_sha": "f189d27a76e161eb00f52107e668690a91380475",
+      "runtime_validation": "UNTESTED"
+    },
+    "superseded": [
+      {
+        "task_id": "CONVERSION-DX9EX-00382",
+        "production_id": "CONVERSION-DX9EX-00382",
+        "event_id": "CONVERSION-DX9EX-00382-E004",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 3,
+        "resume_reason": "Retry persisted after one recovery attempt",
+        "controller_dispatch": {
+          "task_id": "CONVERSION-DX9EX-00382",
+          "production_id": "CONVERSION-DX9EX-00382",
+          "event_id": "CONVERSION-DX9EX-00382-E004",
+          "event_type": "rollover",
+          "attempt": "1/3",
+          "chat_rollover": 3,
+          "source": "CURRENT_USER_QUEUE",
+          "resume_reason": "Retry persisted after one recovery attempt",
+          "rollover_is_retry": false,
+          "material_result_sha": "f189d27a76e161eb00f52107e668690a91380475",
+          "validation_bearing_result_sha": "f189d27a76e161eb00f52107e668690a91380475",
+          "runtime_validation": "UNTESTED"
+        }
+      }
+    ],
+    "reason": "The current explicit queue dispatch CONVERSION-DXVK-00381-E002/retry/ATTEMPT 1/3 supersedes concurrent rollover E004 bookkeeping metadata only. Material implementation and exact-SHA validation are already complete and are not repeated.",
+    "material_and_validation_bearing_sha_unchanged": true,
+    "repeated_material_work": false
+  }
 }
