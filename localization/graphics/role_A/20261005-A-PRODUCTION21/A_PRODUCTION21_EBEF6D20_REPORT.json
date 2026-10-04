@@ -3,7 +3,7 @@
   "role": "A",
   "run": "20261005-A-PRODUCTION21",
   "worker": "github-actions",
-  "base_head": "dc590a4f08245c8c7aab1e1a1cf9fc19e69a70fd",
+  "base_head": "3193cba35a30145e59d2e840f52a99015f47cbe1",
   "index": 65,
   "asset": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
   "source_provenance": {
@@ -15,7 +15,7 @@
     "classification": "authoritative high-resolution source; DDS header 2048x2048 32-bit alpha RGB"
   },
   "source_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
-  "candidate_sha256": "6f39d5cd73445513625f082114f3a95ab562f157f63be85c08b4f1f77a861e35",
+  "candidate_sha256": "005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
   "structure": {
     "dimensions": [
@@ -50,10 +50,11 @@
       136
     ],
     "family": "upright heavy white Loading text with dark outline/shadow",
-    "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
     "font_face_index": 1,
-    "font_pattern": "Noto Sans CJK KR:style=Black",
+    "font_pattern": "Noto Sans CJK KR:style=Bold",
     "derived_stroke_width": 2,
+    "same_color_weight_stroke": 2,
     "derived_shadow_offset": [
       11,
       11
@@ -99,7 +100,7 @@
       2048,
       2048
     ],
-    "changed_pixels": 57076,
+    "changed_pixels": 54100,
     "changed_bbox": [
       256,
       441,
@@ -131,17 +132,17 @@
         543
       ],
       "localized_bbox": [
-        381,
+        383,
         443,
-        547,
+        545,
         541
       ],
       "source_width": 416,
       "source_height": 102,
-      "localized_width": 166,
+      "localized_width": 162,
       "localized_height": 98,
-      "delta_left": 125,
-      "delta_right": 125,
+      "delta_left": 127,
+      "delta_right": 127,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -154,17 +155,18 @@
         1607
       ],
       "raw_localized_bbox": [
-        381,
+        383,
         1507,
-        547,
+        545,
         1605
       ],
       "raw_containment": "PASS",
-      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
       "font_face_index": 1,
-      "font_pattern": "Noto Sans CJK KR:style=Black",
-      "font_size": 90,
+      "font_pattern": "Noto Sans CJK KR:style=Bold",
+      "font_size": 84,
       "stroke_width": 2,
+      "same_color_weight_stroke": 2,
       "shadow_offset": [
         11,
         11
@@ -189,17 +191,17 @@
         543
       ],
       "localized_bbox": [
-        1301,
+        1303,
         443,
-        1467,
+        1465,
         541
       ],
       "source_width": 416,
       "source_height": 102,
-      "localized_width": 166,
+      "localized_width": 162,
       "localized_height": 98,
-      "delta_left": 125,
-      "delta_right": 125,
+      "delta_left": 127,
+      "delta_right": 127,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -212,17 +214,18 @@
         1607
       ],
       "raw_localized_bbox": [
-        1301,
+        1303,
         1507,
-        1467,
+        1465,
         1605
       ],
       "raw_containment": "PASS",
-      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
       "font_face_index": 1,
-      "font_pattern": "Noto Sans CJK KR:style=Black",
-      "font_size": 90,
+      "font_pattern": "Noto Sans CJK KR:style=Bold",
+      "font_size": 84,
       "stroke_width": 2,
+      "same_color_weight_stroke": 2,
       "shadow_offset": [
         11,
         11
@@ -236,7 +239,7 @@
   "localized_pair_overlap_pixels": 0,
   "localized_pair_touch_pixels": 0,
   "decoded_changes": {
-    "changed_pixels_total": 57076,
+    "changed_pixels_total": 54100,
     "changed_pixels_outside_source_bboxes": 0,
     "alpha_changed_pixels_outside_source_bboxes": 0,
     "protected_visible_pixels_changed": 0
