@@ -16,7 +16,8 @@
   "protected_visible_pixels_changed": 0,
   "source_residue_unchanged_pixels_outside_localized_layers": 0,
   "localized_pair_overlap_pixels": 0,
-  "worker_status": "A_RECOVERY09_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "worker_status": "A_RECOVERY09_HD_SELF_QA_PASS_PENDING_C_AND_INGAME",
   "runtime_validation": "UNTESTED",
-  "report": "localization/graphics/role_A/20261004-A-RECOVERY09/A_RECOVERY09_39229D64_REPORT.json"
+  "report": "localization/graphics/role_A/20261004-A-RECOVERY09/A_RECOVERY09_39229D64_REPORT.json",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_REPAIR_FINAL_ROW_CONTACT_RAW"
 }

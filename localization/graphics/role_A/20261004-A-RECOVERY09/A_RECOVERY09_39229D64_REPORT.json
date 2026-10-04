@@ -809,7 +809,8 @@
   "all_16_readable_and_raw_bbox_pass": true,
   "all_16_size_ceiling_pass": true,
   "all_16_positive_margin": true,
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_REPAIR_FINAL_ROW_CONTACT_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A_RECOVERY09_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_RECOVERY09_HD_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_qa_notes": "Manual SOURCE / rejected C clean / repaired A09 clean / FINAL, 16-row contact, and raw mirror_y review PASS. All 16 target occurrences are cleanly localized, including both SPECIAL REQUEST sprites. C_OVERLAP05 English/source fragments are removed; Total Rank opaque plates no longer show the earlier source-fragment/strip defects. No visible source-English residue in target regions, clipping, localized-label overlap, seam, opaque patch, alpha halo, protected-art damage, or orientation regression. Non-target names/icons/ordinal text remain preserved."
 }
