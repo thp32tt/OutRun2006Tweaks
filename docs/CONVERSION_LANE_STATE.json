@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "17f28f77b2066e0540dc18208e5b7a96c6b739b3",
+  "state_parent_head": "2c1d0dc2665140349fd7e99523691f05be1c24d8",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -59,8 +59,8 @@
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
     "attempt": "1/3",
-    "production_id": "CONVERSION-DX11-00347",
-    "event_id": "CONVERSION-DX11-00347-E002",
+    "production_id": "CONVERSION-DXVK-00348",
+    "event_id": "CONVERSION-DXVK-00348-E002",
     "event_type": "rollover",
     "dxvk_disassembly_evidence_run_id": 37175141070,
     "dxvk_disassembly_evidence_job_id": 111356102801,
@@ -79,13 +79,42 @@
       "resume_reason": "Retry persisted after one recovery attempt"
     },
     "dispatch_metadata_correction": {
-      "authoritative_production_id": "CONVERSION-DX11-00347",
-      "authoritative_event_id": "CONVERSION-DX11-00347-E002",
+      "reason": "The current user-issued rollover dispatch is authoritative: TASK/PRODUCTION CONVERSION-DXVK-00348, EVENT CONVERSION-DXVK-00348-E002, CHAT_ROLLOVER=2. Earlier bookkeeping inherited CONVERSION-DX11-00347-E002 from the producer and/or CONVERSION-DXVK-00348-E004/chat_rollover=3 from a concurrent C6 writer. This rollover is not a retry, so ATTEMPT remains 1/3. Material result, exact-SHA gate evidence, RUNTIME_VALIDATION and next frontier are unchanged.",
+      "corrected_to": {
+        "production_id": "CONVERSION-DXVK-00348",
+        "event_id": "CONVERSION-DXVK-00348-E002",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 2,
+        "rollover_is_retry": false,
+        "resume_reason": "Retry persisted after one recovery attempt"
+      },
       "attempt_incremented": false,
       "material_result_unchanged": true,
       "validation_bearing_result_unchanged": true,
-      "runtime_validation_unchanged": "UNTESTED"
-    }
+      "automation_validation_unchanged": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
+      "runtime_validation_unchanged": "UNTESTED",
+      "issue14_reconciliation_comment_id": 5976329733
+    },
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "controller_dispatch": {
+      "production_id": "CONVERSION-DXVK-00348",
+      "event_id": "CONVERSION-DXVK-00348-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "material_origin_dispatch": {
+      "production_id": "CONVERSION-DX11-00347",
+      "event_id": "CONVERSION-DX11-00347-E002",
+      "event_type": "rollover",
+      "attempt": "1/3"
+    },
+    "issue14_reconciliation_comment_id": 5976329733
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
