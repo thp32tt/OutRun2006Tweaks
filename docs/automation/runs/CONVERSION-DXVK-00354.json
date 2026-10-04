@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DXVK-00354",
-  "production_id": "CONVERSION-DX11-00353",
-  "event_id": "CONVERSION-DX11-00353-E002",
+  "production_id": "CONVERSION-DXVK-00354",
+  "event_id": "CONVERSION-DXVK-00354-E002",
   "event_type": "rollover",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
@@ -138,11 +138,46 @@
   "exact_next_action": "Capture and fully pin a fresh canonical 64-byte overlap provenance window from 0x001838CE through 0x0018390E. Require overlap byte 0x73 and inherited unresolved forward-target debt exactly [0x00183908, 0x00183926, 0x00183B6F], record raw bytes/rel32 census first, and keep function/render/HUD/runtime semantics unresolved until a following exact-decode unit.",
   "validated_at_kst": "2026-10-04T14:59:15+09:00",
   "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00354",
+    "event_id": "CONVERSION-DXVK-00354-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "rollover_is_retry": false,
+  "run_record_commit_sha": "b01842d9ad6a606a196cad65dcfdbf9b5096b5ad",
+  "chat_rollover": 2,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "prior_controller_dispatch": {
     "production_id": "CONVERSION-DX11-00353",
     "event_id": "CONVERSION-DX11-00353-E002",
     "event_type": "rollover",
     "attempt": "1/3"
   },
-  "rollover_is_retry": false,
-  "run_record_commit_sha": "b01842d9ad6a606a196cad65dcfdbf9b5096b5ad"
+  "material_origin_dispatch": {
+    "production_id": "CONVERSION-DX11-00353",
+    "event_id": "CONVERSION-DX11-00353-E002",
+    "event_type": "rollover",
+    "attempt": "1/3"
+  },
+  "dispatch_metadata_correction": {
+    "reason": "The current user-issued rollover dispatch is authoritative: TASK/PRODUCTION CONVERSION-DXVK-00354, EVENT CONVERSION-DXVK-00354-E002, CHAT_ROLLOVER=2. The initial C6 writer retained the material-origin rollover dispatch CONVERSION-DX11-00353-E002. This rollover is not a retry, so ATTEMPT remains 1/3. Material result, validation-bearing SHA, exact-SHA gate evidence, RUNTIME_VALIDATION and next frontier are unchanged.",
+    "corrected_to": {
+      "production_id": "CONVERSION-DXVK-00354",
+      "event_id": "CONVERSION-DXVK-00354-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "attempt_incremented": false,
+    "material_result_unchanged": true,
+    "validation_bearing_result_unchanged": true,
+    "automation_validation_unchanged": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
+    "runtime_validation_unchanged": "UNTESTED",
+    "run_record_commit_sha": "b01842d9ad6a606a196cad65dcfdbf9b5096b5ad"
+  }
 }
