@@ -9990,18 +9990,22 @@ def main() -> None:
     r253_programmable_indexed_source_value_contract = [
         ("struct NativeProgrammableShaderIndexedSourceValueReadiness",
          NATIVE_BACKEND_HPP, "R253 programmable indexed source-value readiness type"),
-        ("compose_programmable_indexed_source_value_readiness(",
-         NATIVE_BACKEND_HPP, "R253 indexed source-value readiness declaration"),
-        ("validate_programmable_indexed_source_value_snapshot(",
-         NATIVE_BACKEND_HPP, "R253 indexed source-value snapshot validator"),
-        ("shadowStartIndexExact",
-         NATIVE_BACKEND_CPP, "R253 exact IA index-offset to managed-shadow start conversion"),
-        ("valuesWithinDeclaredRange",
-         NATIVE_BACKEND_CPP, "R253 actual managed index-value range gate"),
-        ("R253 exact programmable indexed source values",
-         CONSTANT_BUFFER_PROBE, "R253 exact source-value regression"),
-        ("R253 source values outside declared range fail closed",
-         CONSTANT_BUFFER_PROBE, "R253 out-of-range source-value regression"),
+        ("indexed_source_value_readiness(",
+         NATIVE_BACKEND_HPP, "R253 source-value readiness declaration"),
+        ("validate_indexed_source_value_snapshot(",
+         NATIVE_BACKEND_HPP, "R253 source-value snapshot validator"),
+        ("indexBuffer.index_range_readiness(",
+         NATIVE_BACKEND_CPP, "R253 reuses managed CPU-shadow index scanner"),
+        ("out.sourceValuesMatchDispatchWindow =",
+         NATIVE_BACKEND_CPP, "R253 exact dispatch index-window lineage"),
+        ("out.sourceValuesMatchDispatchRange =",
+         NATIVE_BACKEND_CPP, "R253 exact declared source-range lineage"),
+        ("R253 programmable indexed source values seal exact managed IB contents",
+         CONSTANT_BUFFER_PROBE, "R253 exact managed index-content regression"),
+        ("R253 rejects managed source index outside declared D3D9 vertex range",
+         CONSTANT_BUFFER_PROBE, "R253 declared-range value regression"),
+        ("R253 stale R252 dispatch receipt cannot seal source values",
+         CONSTANT_BUFFER_PROBE, "R253 stale dispatch receipt regression"),
     ]
     missing_r253_programmable_indexed_source_value = [
         meaning for token, source, meaning
@@ -10010,8 +10014,8 @@ def main() -> None:
     ]
     if missing_r253_programmable_indexed_source_value:
         raise SystemExit(
-            "DX11 R253 programmable indexed source-value drift: " +
-            ", ".join(missing_r253_programmable_indexed_source_value)
+            "DX11 R253 programmable indexed source-value drift: "
+            + ", ".join(missing_r253_programmable_indexed_source_value)
         )
 
     verify_dx11_activation_boundary()
