@@ -62,8 +62,8 @@
     "source": "CURRENT_USER_ROLLOVER",
     "runtime_validation": "UNTESTED",
     "native_draw_path_activation_changed": false,
-    "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-    "source_implementation_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+    "material_result_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
+    "source_implementation_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
     "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
     "validation_run_id": 37227872328,
     "validation_run_attempt": 2,
@@ -71,6 +71,8 @@
     "readiness_smoke_job_id": 111512398861,
     "artifact_id": 11312393751,
     "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
+    "implementation_comment_id": 5983593013,
+    "validation_comment_id": 5983593013,
     "dispatch_source": "CURRENT_USER_ROLLOVER",
     "selected_work_item": "DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS",
     "result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
@@ -83,8 +85,7 @@
       "15841c11802b880a62f387509e7a6ec7d894cc6c",
       "0d5a9096435df36d698b4a719bb589d1c1064704",
       "85c1cd7923ea456a3ab2909e63df1498a45cf51e",
-      "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
-      "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa"
+      "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7"
     ]
   },
   "runtime_blocker": "CONVERSION-DX11-00380/R253 is automation-complete but has no Quest 3/VDXR runtime evidence. It remains dormant pre-Draw readiness and makes no runtime-normality claim.",
@@ -2902,7 +2903,7 @@
       "unit_id": "DX11_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS_R253",
       "task_id": "CONVERSION-DX11-00380",
       "production_id": "CONVERSION-DX11-00380",
-      "event_id": "CONVERSION-DX11-00380-E001",
+      "event_id": "CONVERSION-DX11-00380-E002",
       "event_type": "rollover",
       "attempt": "1/3",
       "base_sha": "9604cdc394cb711e37adc57a73a631eac8344e3d",
@@ -2914,8 +2915,8 @@
         "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
         "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa"
       ],
-      "source_implementation_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-      "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+      "source_implementation_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
+      "material_result_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
       "validation_bearing_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
       "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
       "runtime_validation": "UNTESTED",
@@ -2930,7 +2931,7 @@
       "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
       "implementation_comment_id": 5983525887,
       "validation_comment_id": 5983525887,
-      "chat_rollover": 2,
+      "chat_rollover": 3,
       "rollover_is_retry": false,
       "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
     }
@@ -2947,8 +2948,8 @@
     "source": "CURRENT_USER_ROLLOVER",
     "runtime_validation": "UNTESTED",
     "native_draw_path_activation_changed": false,
-    "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-    "source_implementation_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+    "material_result_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
+    "source_implementation_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
     "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
     "validation_run_id": 37227872328,
     "validation_run_attempt": 2,
@@ -2956,6 +2957,8 @@
     "readiness_smoke_job_id": 111512398861,
     "artifact_id": 11312393751,
     "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
+    "implementation_comment_id": 5983593013,
+    "validation_comment_id": 5983593013,
     "dispatch_source": "CURRENT_USER_ROLLOVER"
   },
   "rollover_metadata_correction": {
@@ -3057,7 +3060,7 @@
     "chat_rollover": 3,
     "rollover_is_retry": false,
     "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
-    "reason": "E002 / CHAT_ROLLOVER=3 supersedes E001 rollover metadata only; ATTEMPT remains 1/3 and completed R253 material/validation identity is unchanged."
+    "reason": "E002 / CHAT_ROLLOVER=3 is the authoritative current rollover. It is not a retry; ATTEMPT remains 1/3. Completed R253 material and validation-bearing identities are unchanged."
   },
   "current_dispatch_reconciliation": {
     "task_id": "CONVERSION-DX11-00380",
@@ -3073,8 +3076,8 @@
       "source": "CURRENT_USER_ROLLOVER",
       "runtime_validation": "UNTESTED",
       "native_draw_path_activation_changed": false,
-      "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-      "source_implementation_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+      "material_result_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
+      "source_implementation_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
       "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
       "validation_run_id": 37227872328,
       "validation_run_attempt": 2,
@@ -3082,36 +3085,22 @@
       "readiness_smoke_job_id": 111512398861,
       "artifact_id": 11312393751,
       "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
+      "implementation_comment_id": 5983593013,
+      "validation_comment_id": 5983593013,
       "dispatch_source": "CURRENT_USER_ROLLOVER"
     },
     "superseded": [
       {
         "task_id": "CONVERSION-DX11-00380",
         "production_id": "CONVERSION-DX11-00380",
-        "event_id": "CONVERSION-DX11-00380-E001",
-        "event_type": "rollover",
-        "attempt": "1/3",
-        "chat_rollover": 2,
-        "rollover_is_retry": false,
-        "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
-        "source": "CURRENT_USER_ROLLOVER",
-        "runtime_validation": "UNTESTED",
-        "native_draw_path_activation_changed": false,
-        "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-        "source_implementation_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-        "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-        "validation_run_id": 37227872328,
-        "validation_run_attempt": 2,
-        "validation_job_id": 111511596483,
-        "readiness_smoke_job_id": 111512398861,
-        "artifact_id": 11312393751,
-        "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
-        "implementation_comment_id": 5983525887,
-        "validation_comment_id": 5983525887,
-        "dispatch_source": "CURRENT_USER_ROLLOVER"
+        "event_id": "CONVERSION-DX11-00380-E004",
+        "event_type": "retry",
+        "attempt": "2/3",
+        "source": "CURRENT_USER_QUEUE",
+        "dispatch_source": "CURRENT_USER_QUEUE"
       }
     ],
-    "reason": "CONVERSION-DX11-00380-E002 / CHAT_ROLLOVER=3 is the newest explicit user rollover. It is not a retry, so ATTEMPT remains 1/3. R253 material SHA 7aaa311ede6136e788b79722ed0eb3b2b2ec72aa and exact-SHA validation remain authoritative.",
+    "reason": "The current explicit user rollover E002 / CHAT_ROLLOVER=3 is authoritative over stale/parallel E004 retry metadata. A rollover is not a retry, so ATTEMPT remains 1/3. Material SHA 4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7 and exact-SHA validation-bearing/result 7aaa311ede6136e788b79722ed0eb3b2b2ec72aa remain unchanged.",
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_task": {
@@ -3120,7 +3109,8 @@
     "selected_work_item": "DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS",
     "base_sha": "9604cdc394cb711e37adc57a73a631eac8344e3d",
     "result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-    "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+    "material_result_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
+    "source_implementation_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
     "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
     "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
