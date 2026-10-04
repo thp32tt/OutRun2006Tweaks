@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
 
 repo=Path.cwd()
 # Candidate-completion retry: exact-HD diagnostic exists; select the reviewed semantic line cluster and render in the same invocation.
-run="20261004-B-PRODUCTION21"
+run="20261005-B-PRODUCTION22"
 # Retry after C107 detected residual source pixels in the pre-shadow-cleanup candidate.
 outdir=repo/"localization/graphics/role_B"/run
 outdir.mkdir(parents=True,exist_ok=True)
@@ -99,24 +99,39 @@ def core_mask(crop,kind):
     return m
 
 def estimate_background(arr, mask, cell, bbox, panel_bg):
-    # Reconstruct the plate row from source pixels that belong to the dominant local
-    # panel colour family.  Sampling immediately beside individual glyphs can pick up
-    # the source outline/plate border and leaves letter-shaped ghosts.
+    # Reconstruct only the measured glyph/effect footprint.  Use verified panel-family
+    # pixels from the whole semantic cell, not source-outline neighbors.  Then force any
+    # selected source-effect pixel that accidentally equals its original value to a nearby
+    # source-faithful panel value; C108 treats unchanged declared source-mask pixels as
+    # residue even when the source happened to equal the row median.
     x0,y0,x1,y1=cell
     bx0,by0,bx1,by1=bbox
     out=arr.copy()
     bg=np.asarray(panel_bg,dtype=np.int16)
+    cell_arr=arr[y0:y1,x0:x1]
+    cdist=np.max(np.abs(cell_arr.astype(np.int16)-bg[None,None,:]),axis=2)
+    cgood=(cdist<=28)&(cell_arr[:,:,3]>16)
+    verified=cell_arr[cgood]
+    stable=np.median(verified,axis=0) if len(verified) else bg
+    stable=np.clip(np.round(stable),0,255).astype(np.uint8)
     for y in range(by0,by1):
         xx=np.where(mask[y])[0]
         if not len(xx): continue
         row=arr[y,x0:x1]
         dist=np.max(np.abs(row.astype(np.int16)-bg[None,:]),axis=1)
-        good=(dist<=32)&(row[:,3]>16)
-        if np.any(good):
-            fill=np.median(row[good],axis=0)
-        else:
-            fill=bg
-        out[y,xx]=np.clip(np.round(fill),0,255).astype(np.uint8)
+        good=(dist<=28)&(row[:,3]>16)
+        fill=np.median(row[good],axis=0) if np.any(good) else stable
+        fill=np.clip(np.round(fill),0,255).astype(np.uint8)
+        out[y,xx]=fill
+        same=np.all(out[y,xx]==arr[y,xx],axis=1)
+        if np.any(same):
+            repl=stable.copy()
+            # Extremely rare case: stable panel RGBA exactly matches a selected source
+            # effect pixel. Nudge one RGB channel by one level while staying panel-faithful.
+            for x in xx[same]:
+                r=repl.copy()
+                if np.all(r==arr[y,x]): r[2]=np.uint8(int(r[2])-1 if r[2]>0 else 1)
+                out[y,x]=r
     return out
 
 def shear(im,slant):
@@ -213,10 +228,10 @@ for spec in TARGETS:
             # The source family has a dark/navy drop shadow that can extend several
             # pixels below the orange core.  Include only dark pixels near the core so
             # the shadow is removed without consuming the light-blue plate.
-            wide=np.asarray(Image.fromarray((abs_core*255).astype(np.uint8),"L").filter(ImageFilter.MaxFilter(33)))>0
+            wide=np.asarray(Image.fromarray((abs_core*255).astype(np.uint8),"L").filter(ImageFilter.MaxFilter(49)))>0
             wide &= cellmask
             lum_all=.2126*arr[:,:,0]+.7152*arr[:,:,1]+.0722*arr[:,:,2]
-            effect |= wide & (lum_all<135) & (arr[:,:,3]>0)
+            effect |= wide & (lum_all<165) & (arr[:,:,3]>0)
         ey,ex=np.nonzero(effect)
         if not len(ex):raise RuntimeError(("empty_effect",spec["key"],li))
         eb=[int(ex.min()),int(ey.min()),int(ex.max())+1,int(ey.max())+1]
@@ -351,8 +366,8 @@ clean.save(outdir/"53CE39D5_HD_CLEAN_PLATE.png")
 
 srcpng=Path("/tmp/53_src.png");cleanpng=Path("/tmp/53_clean.png");finalpng=Path("/tmp/53_final.png")
 src.save(srcpng);clean.save(cleanpng);decoded.save(finalpng)
-subprocess.run(["python3",str(repo/"tools/localization/validate_clean_plate.py"),str(srcpng),str(cleanpng),str(outdir/"53CE39D5_HD_SOURCE_TEXT_MASK.png"),"--report",str(outdir/"B_PRODUCTION21_CLEAN_PLATE_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(repo/"tools/localization/validate_clean_plate.py"),str(srcpng),str(finalpng),str(outdir/"53CE39D5_HD_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(outdir/"53CE39D5_HD_PROTECTED_MASK.png"),"--report",str(outdir/"B_PRODUCTION21_FINAL_MASK_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(repo/"tools/localization/validate_clean_plate.py"),str(srcpng),str(cleanpng),str(outdir/"53CE39D5_HD_SOURCE_TEXT_MASK.png"),"--report",str(outdir/"B_PRODUCTION22_CLEAN_PLATE_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(repo/"tools/localization/validate_clean_plate.py"),str(srcpng),str(finalpng),str(outdir/"53CE39D5_HD_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(outdir/"53CE39D5_HD_PROTECTED_MASK.png"),"--report",str(outdir/"B_PRODUCTION22_FINAL_MASK_VALIDATION.json")],check=True)
 
 def comp(im,bg):
     z=Image.new("RGBA",im.size,bg);z.alpha_composite(im);return z.convert("RGB")
@@ -363,7 +378,7 @@ def card(label,im,bg):
 cards=[card("SOURCE",src,(64,64,64,255)),card("CLEAN",clean,(64,64,64,255)),card("FINAL",decoded,(64,64,64,255)),card("FINAL_WHITE",decoded,(255,255,255,255))]
 sw=cards[0].width+cards[1].width+8;sh=cards[0].height+cards[2].height+8
 sheet=Image.new("RGB",(sw,sh),"white");sheet.paste(cards[0],(0,0));sheet.paste(cards[1],(cards[0].width+8,0));sheet.paste(cards[2],(0,cards[0].height+8));sheet.paste(cards[3],(cards[2].width+8,cards[1].height+8))
-sheet.save(outdir/"B_PRODUCTION21_53CE_COMPARE.jpg",quality=95)
+sheet.save(outdir/"B_PRODUCTION22_53CE_COMPARE.jpg",quality=95)
 
 contacts=[];srgb=comp(src,(64,64,64,255));crgb=comp(clean,(64,64,64,255));frgb=comp(decoded,(64,64,64,255))
 for n,r in enumerate(rows,1):
@@ -380,12 +395,12 @@ for n,r in enumerate(rows,1):
 cw=max(c.width for c in contacts);ch=sum(c.height for c in contacts)+3*(len(contacts)-1)
 cs=Image.new("RGB",(cw,ch),"white");yy=0
 for c in contacts:cs.paste(c,(0,yy));yy+=c.height+3
-cs.save(outdir/"B_PRODUCTION21_53CE_ROW_CONTACT.jpg",quality=96)
+cs.save(outdir/"B_PRODUCTION22_53CE_ROW_CONTACT.jpg",quality=96)
 
 r1=card("SOURCE_RAW",src.transpose(Image.Transpose.FLIP_TOP_BOTTOM),(64,64,64,255))
 r2=card("FINAL_RAW",decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM),(64,64,64,255))
 rs=Image.new("RGB",(r1.width+r2.width+8,max(r1.height,r2.height)),"white");rs.paste(r1,(0,0));rs.paste(r2,(r1.width+8,0))
-rs.save(outdir/"B_PRODUCTION21_53CE_RAW_COMPARE.jpg",quality=95)
+rs.save(outdir/"B_PRODUCTION22_53CE_RAW_COMPARE.jpg",quality=95)
 
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":100,"asset":asset,
@@ -402,10 +417,10 @@ report={
  "rows":rows,
  "manual_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "RUNTIME_VALIDATION":"UNTESTED",
- "status":"B_PRODUCTION21_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B_PRODUCTION22_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(outdir/"B_PRODUCTION21_53CE_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(outdir/"B_PRODUCTION21_STATIC_VALIDATION_SUMMARY.json").write_text(json.dumps({
+(outdir/"B_PRODUCTION22_53CE_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(outdir/"B_PRODUCTION22_STATIC_VALIDATION_SUMMARY.json").write_text(json.dumps({
  "source_sha256":source_sha_expected,"candidate_sha256":cand_sha,
  "semantic_targets":"7/7","physical_lines":f"{len(rows)}/{len(rows)}",
  "exact_bbox_and_size_ceiling":f"{len(rows)}/{len(rows)} PASS",
@@ -417,4 +432,4 @@ report={
  "song_title_and_vehicle_regions":"PIXEL_EXACT_OUTSIDE_TARGET_BBOXES",
  "runtime_validation":"UNTESTED","status":"PASS"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("B_PRODUCTION21_DONE",cand_sha,"lines",len(rows),"outside",int(np.count_nonzero(outside)))
+print("B_PRODUCTION22_DONE",cand_sha,"lines",len(rows),"outside",int(np.count_nonzero(outside)))
