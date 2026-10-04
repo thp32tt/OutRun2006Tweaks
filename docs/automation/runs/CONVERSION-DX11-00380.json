@@ -2,11 +2,11 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00380",
   "production_id": "CONVERSION-DX11-00380",
-  "event_id": "CONVERSION-DX11-00380-E004",
-  "event_type": "retry",
+  "event_id": "CONVERSION-DX11-00380-E002",
+  "event_type": "rollover",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "2/3",
+  "attempt": "1/3",
   "status": "COMPLETE",
   "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
@@ -38,7 +38,7 @@
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Retry E004 recovered GitHub SSOT after the prior exact-SHA run 37227676771 was cancelled during Configure Win32. Inspection showed no source/test failure. Concurrent same-task commits then advanced the branch to the R253 material chain ending at 7aaa311ede6136e788b79722ed0eb3b2b2ec72aa; completed work was not repeated."
+      "evidence": "E002 / CHAT_ROLLOVER=3 recovered the already-progressed 00380 R253 work from GitHub SSOT. This rollover is not a retry, completed work was not repeated, and ATTEMPT remains 1/3."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
@@ -59,13 +59,14 @@
       "status": "COMPLETE",
       "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
       "runtime_validation": "UNTESTED",
+      "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
       "validation_run_id": 37227872328,
       "validation_run_attempt": 2,
       "validation_job_id": 111511596483,
       "readiness_smoke_job_id": 111512398861,
       "artifact_id": 11312393751,
       "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
-      "evidence": "Exact SHA 7aaa311ede6136e788b79722ed0eb3b2b2ec72aa passed the Backend Conversion Gate validate job and the complete DX11 readiness smoke suite. Source graph, dormant activation, Win32 Release build/binary and the R253 constant-buffer probe all passed."
+      "evidence": "Exact SHA 7aaa311ede6136e788b79722ed0eb3b2b2ec72aa passed Backend Conversion Gate run 37227872328 attempt 2: source graph, dormant activation boundary, Win32 Release build/binary/artifact validation, and the complete DX11 readiness smoke suite including the R253 constant-buffer probe."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
@@ -73,11 +74,18 @@
       "material_result_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
       "source_implementation_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
       "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
-      "result_marker": "[AUTO:CONVERSION-DX11-00380]"
+      "result_marker": "[AUTO:CONVERSION-DX11-00380]",
+      "implementation_commits": [
+        "f31c90d8928f07dbca10074fd64dbc97aca76477",
+        "15841c11802b880a62f387509e7a6ec7d894cc6c",
+        "0d5a9096435df36d698b4a719bb589d1c1064704",
+        "85c1cd7923ea456a3ab2909e63df1498a45cf51e",
+        "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7"
+      ]
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant programmable indexed source-value readiness/probe only; no runtime package, HMD binary distribution, selector, DrawIndexed routing or NativeDrawPath activation changed."
+      "reason": "Dormant programmable indexed source-value readiness/probe only; no runtime package, HMD binary distribution, selector, or NativeDrawPath activation changes."
     },
     "C6_STATE": {
       "status": "COMPLETE",
@@ -99,11 +107,14 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00380",
     "production_id": "CONVERSION-DX11-00380",
-    "event_id": "CONVERSION-DX11-00380-E004",
-    "event_type": "retry",
-    "attempt": "2/3",
-    "source": "CURRENT_USER_QUEUE",
-    "dispatch_source": "CURRENT_USER_QUEUE",
+    "event_id": "CONVERSION-DX11-00380-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 3,
+    "rollover_is_retry": false,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "source": "CURRENT_USER_ROLLOVER",
+    "dispatch_source": "CURRENT_USER_ROLLOVER",
     "runtime_validation": "UNTESTED",
     "native_draw_path_activation_changed": false,
     "material_result_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
@@ -145,23 +156,48 @@
     "authoritative": {
       "task_id": "CONVERSION-DX11-00380",
       "production_id": "CONVERSION-DX11-00380",
-      "event_id": "CONVERSION-DX11-00380-E004",
-      "event_type": "retry",
-      "attempt": "2/3",
-      "source": "CURRENT_USER_QUEUE",
-      "dispatch_source": "CURRENT_USER_QUEUE"
+      "event_id": "CONVERSION-DX11-00380-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false,
+      "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+      "source": "CURRENT_USER_ROLLOVER",
+      "dispatch_source": "CURRENT_USER_ROLLOVER",
+      "runtime_validation": "UNTESTED",
+      "native_draw_path_activation_changed": false,
+      "material_result_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
+      "source_implementation_sha": "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
+      "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+      "validation_run_id": 37227872328,
+      "validation_run_attempt": 2,
+      "validation_job_id": 111511596483,
+      "readiness_smoke_job_id": 111512398861,
+      "artifact_id": 11312393751,
+      "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
+      "implementation_comment_id": 5983593013,
+      "validation_comment_id": 5983593013
     },
     "superseded": [
       {
         "task_id": "CONVERSION-DX11-00380",
-        "production_id": "CONVERSION-DX9EX-00379",
-        "event_id": "CONVERSION-DX9EX-00379-E002",
+        "production_id": "CONVERSION-DX11-00380",
+        "event_id": "CONVERSION-DX11-00380-E004",
         "event_type": "retry",
-        "attempt": "1/3"
+        "attempt": "2/3",
+        "source": "CURRENT_USER_QUEUE",
+        "dispatch_source": "CURRENT_USER_QUEUE"
       }
     ],
-    "reason": "E004 is the latest explicit retry. ATTEMPT is therefore 2/3. Validation-bearing result identity is the exact SHA that passed Backend Conversion Gate run 37227872328 attempt 2.",
-    "material_and_validation_bearing_sha_unchanged": false
+    "reason": "The current explicit user rollover E002 / CHAT_ROLLOVER=3 is authoritative over stale/parallel E004 retry metadata. A rollover is not a retry, so ATTEMPT remains 1/3. Material SHA 4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7 and exact-SHA validation-bearing/result 7aaa311ede6136e788b79722ed0eb3b2b2ec72aa remain unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
   },
-  "exact_next_action": "Task complete. Preserve validated R253 exact MANAGED source-index value seal and keep Draw*/NativeDrawPath dormant. RUNTIME_VALIDATION remains UNTESTED."
+  "exact_next_action": "Preserve validated R239-R253 programmable ownership/readiness. Under a new TASK_ID, seal R253 against a fresh live IA index-buffer/format/offset reobservation before any Draw*/NativeDrawPath activation.",
+  "rollover_is_retry": false,
+  "validation_run_id": 37227872328,
+  "validation_run_attempt": 2,
+  "validation_job_id": 111511596483,
+  "readiness_smoke_job_id": 111512398861,
+  "artifact_id": 11312393751,
+  "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37"
 }
