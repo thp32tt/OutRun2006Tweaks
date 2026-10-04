@@ -1,0 +1,247 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION21",
+  "worker": "github-actions",
+  "base_head": "dc590a4f08245c8c7aab1e1a1cf9fc19e69a70fd",
+  "index": 65,
+  "asset": "textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "f05e35654433b4ce010d119d4a705f505cdd80c2",
+    "sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+    "path": "Release/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+    "classification": "authoritative high-resolution source; DDS header 2048x2048 32-bit alpha RGB"
+  },
+  "source_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+  "candidate_sha256": "6f39d5cd73445513625f082114f3a95ab562f157f63be85c08b4f1f77a861e35",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/EBEF6D20_512x512.dds",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "pixel_raw_mode": "RGBA",
+    "pitch": 8192,
+    "depth": 1,
+    "mipmaps": 1,
+    "bytes": 16777344,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "translation": {
+    "source": "Loading",
+    "korean": "로딩",
+    "physical_occurrences": 2
+  },
+  "source_style": {
+    "fill_median": [
+      255,
+      255,
+      255,
+      255
+    ],
+    "dark_effect_median": [
+      55,
+      55,
+      55,
+      136
+    ],
+    "family": "upright heavy white Loading text with dark outline/shadow",
+    "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "font_face_index": 1,
+    "font_pattern": "Noto Sans CJK KR:style=Black",
+    "derived_stroke_width": 2,
+    "derived_shadow_offset": [
+      11,
+      11
+    ],
+    "source_margin_samples": [
+      {
+        "left": 1,
+        "right": 12,
+        "top": 1,
+        "bottom": 12
+      },
+      {
+        "left": 1,
+        "right": 12,
+        "top": 1,
+        "bottom": 12
+      }
+    ]
+  },
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION21/EBEF6D20_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION21/EBEF6D20_HD_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 54274,
+    "changed_bbox": [
+      256,
+      441,
+      1592,
+      543
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION21/EBEF6D20_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261005-A-PRODUCTION21/EBEF6D20_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 57076,
+    "changed_bbox": [
+      256,
+      441,
+      1592,
+      543
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "source_mask_pixels_unchanged_in_clean": 0,
+  "rows": [
+    {
+      "key": "loading_left",
+      "source": "Loading",
+      "korean": "로딩",
+      "region_idx": 5,
+      "cell": [
+        0,
+        424,
+        920,
+        120
+      ],
+      "original_bbox": [
+        256,
+        441,
+        672,
+        543
+      ],
+      "localized_bbox": [
+        381,
+        443,
+        547,
+        541
+      ],
+      "source_width": 416,
+      "source_height": 102,
+      "localized_width": 166,
+      "localized_height": 98,
+      "delta_left": 125,
+      "delta_right": 125,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        256,
+        1505,
+        672,
+        1607
+      ],
+      "raw_localized_bbox": [
+        381,
+        1507,
+        547,
+        1605
+      ],
+      "raw_containment": "PASS",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 90,
+      "stroke_width": 2,
+      "shadow_offset": [
+        11,
+        11
+      ],
+      "rework_status": "A_PRODUCTION21_NEW_EXACT_HD_CANDIDATE"
+    },
+    {
+      "key": "loading_right",
+      "source": "Loading",
+      "korean": "로딩",
+      "region_idx": 6,
+      "cell": [
+        920,
+        424,
+        920,
+        120
+      ],
+      "original_bbox": [
+        1176,
+        441,
+        1592,
+        543
+      ],
+      "localized_bbox": [
+        1301,
+        443,
+        1467,
+        541
+      ],
+      "source_width": 416,
+      "source_height": 102,
+      "localized_width": 166,
+      "localized_height": 98,
+      "delta_left": 125,
+      "delta_right": 125,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1176,
+        1505,
+        1592,
+        1607
+      ],
+      "raw_localized_bbox": [
+        1301,
+        1507,
+        1467,
+        1605
+      ],
+      "raw_containment": "PASS",
+      "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "font_face_index": 1,
+      "font_pattern": "Noto Sans CJK KR:style=Black",
+      "font_size": 90,
+      "stroke_width": 2,
+      "shadow_offset": [
+        11,
+        11
+      ],
+      "rework_status": "A_PRODUCTION21_NEW_EXACT_HD_CANDIDATE"
+    }
+  ],
+  "all_2_readable_and_raw_bbox_pass": true,
+  "all_2_size_ceiling_pass": true,
+  "all_2_positive_margin": true,
+  "localized_pair_overlap_pixels": 0,
+  "localized_pair_touch_pixels": 0,
+  "decoded_changes": {
+    "changed_pixels_total": 57076,
+    "changed_pixels_outside_source_bboxes": 0,
+    "alpha_changed_pixels_outside_source_bboxes": 0,
+    "protected_visible_pixels_changed": 0
+  },
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A_PRODUCTION21_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}

@@ -1,0 +1,27 @@
+{
+  "run": "20261005-A-PRODUCTION21",
+  "asset": "EBEF6D20",
+  "index": 65,
+  "source_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+  "candidate_sha256": "6f39d5cd73445513625f082114f3a95ab562f157f63be85c08b4f1f77a861e35",
+  "source_dimensions": [
+    2048,
+    2048
+  ],
+  "format": "RGBA32",
+  "pixel_raw_mode": "RGBA",
+  "bbox_pass": "2/2",
+  "size_ceiling": "2/2",
+  "positive_margin": "2/2",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "source_mask_pixels_unchanged_in_clean": 0,
+  "localized_pair_overlap_pixels": 0,
+  "localized_pair_touch_pixels": 0,
+  "changed_pixels_outside_source_bboxes": 0,
+  "alpha_changed_pixels_outside_source_bboxes": 0,
+  "protected_visible_pixels_changed": 0,
+  "worker_status": "A_PRODUCTION21_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_EBEF6D20_REPORT.json"
+}
