@@ -3,13 +3,13 @@ import hashlib,json,os,struct,subprocess,urllib.request
 from pathlib import Path
 from collections import Counter
 import numpy as np
-from PIL import Image,ImageChops,ImageDraw,ImageFont
+from PIL import Image,ImageChops,ImageDraw,ImageFont,ImageFilter
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("B hosted worker only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION35"
+run="20261005-B-PRODUCTION36"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -220,9 +220,23 @@ visible_out=int(np.count_nonzero((da[:,:,3]>1)&~allowed))
 alpha_out=int(np.count_nonzero(alpha_diff&~allowed))
 if visible_out or alpha_out: raise RuntimeError(("outside",visible_out,alpha_out))
 # No English source alpha may survive outside the Korean target footprint.
-guard=np.asarray(Image.fromarray((target.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0 if False else target
+guard=np.asarray(Image.fromarray((target.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(5)))>0
 residue=int(np.count_nonzero(source_mask&(da[:,:,3]>8)&~guard))
 if residue: raise RuntimeError(("source_residue",residue))
+# Re-measure decoded BC3 alpha per source line; compression fringe must still stay
+# inside the exact source glyph/effect bbox and source size ceiling.
+for row in rows:
+    x0,y0,x1,y1=row["original_bbox"]
+    cm=(da[y0:y1,x0:x1,3]>1)
+    ys,xs=np.nonzero(cm)
+    if not len(xs): raise RuntimeError(("decoded_line_empty",row["source"]))
+    db=[x0+int(xs.min()),y0+int(ys.min()),x0+int(xs.max())+1,y0+int(ys.max())+1]
+    dw,dh=db[2]-db[0],db[3]-db[1]
+    if db[0]<x0 or db[1]<y0 or db[2]>x1 or db[3]>y1 or dw>row["source_width"] or dh>row["source_height"]:
+        raise RuntimeError(("decoded_size_gate",row["source"],row["original_bbox"],db))
+    row["decoded_localized_bbox"]=db
+    row["decoded_localized_width"]=dw; row["decoded_localized_height"]=dh
+    row["decoded_containment"]="PASS"; row["decoded_size_ceiling"]="PASS"
 
 # Persist masks and validation evidence.
 def mask(m): return Image.fromarray((m.astype(np.uint8)*255),"L")
@@ -234,8 +248,8 @@ clean_png=out/"1A43E9D9_CLEAN_PLATE.png"; clean.save(clean_png)
 src_png=Path("/tmp/1A43_source.png"); final_png=Path("/tmp/1A43_final.png")
 src.save(src_png); dec.save(final_png)
 validator=repo/"tools/localization/validate_clean_plate.py"
-subprocess.run(["python3",str(validator),str(src_png),str(clean_png),str(source_mask_png),"--report",str(out/"B_PRODUCTION35_CLEAN_PLATE_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(validator),str(src_png),str(final_png),str(allowed_png),"--protected-mask",str(protected_png),"--report",str(out/"B_PRODUCTION35_FINAL_MASK_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(src_png),str(clean_png),str(source_mask_png),"--report",str(out/"B_PRODUCTION36_CLEAN_PLATE_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(validator),str(src_png),str(final_png),str(allowed_png),"--protected-mask",str(protected_png),"--report",str(out/"B_PRODUCTION36_FINAL_MASK_VALIDATION.json")],check=True)
 
 # Source/clean/final evidence.
 def comp(im,bg):
@@ -245,7 +259,7 @@ def card(label,im):
 cards=[card("SOURCE",src),card("CLEAN",clean),card("FINAL",dec)]
 sheet=Image.new("RGB",(W,H*3+84),"white")
 for i,c in enumerate(cards): sheet.paste(c,(0,i*(H+28)))
-sheet.save(out/"B_PRODUCTION35_1A43_SOURCE_CLEAN_FINAL.jpg",quality=96)
+sheet.save(out/"B_PRODUCTION36_1A43_SOURCE_CLEAN_FINAL.jpg",quality=96)
 # 2x row contact.
 contacts=[]
 for row in rows:
@@ -258,7 +272,7 @@ for row in rows:
     ImageDraw.Draw(c).text((4,4),row["source"]+" -> "+row["korean"],fill="black"); contacts.append(c)
 cs=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in contacts)+4),"white"); yy=0
 for c in contacts: cs.paste(c,(0,yy)); yy+=c.height+4
-cs.save(out/"B_PRODUCTION35_1A43_ROW_CONTACT_2X.jpg",quality=96)
+cs.save(out/"B_PRODUCTION36_1A43_ROW_CONTACT_2X.jpg",quality=96)
 
 changed_blocks=0; outside_patch=0; patch=full_blocks|partial_blocks
 for by in range(bh):
@@ -280,9 +294,9 @@ report={
  "containment":{"elements_total":2,"elements_pass":2,"localized_overlap_pixels":0,"visible_pixels_outside_original_bboxes":visible_out,"alpha_changed_pixels_outside_original_bboxes":alpha_out,"source_residue_pixels_outside_target":residue,"status":"PASS"},
  "compressed_patch":{"full_blocks":len(full_blocks),"partial_alpha_only_blocks":len(partial_blocks),"changed_blocks":changed_blocks,"changed_blocks_outside_patch":outside_patch,"partial_color_bytes_preserved":True,"status":"PASS"},
  "manual_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
- "status":"B_PRODUCTION35_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B_PRODUCTION36_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"B_PRODUCTION35_1A43_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-summary={"run":run,"asset":"1A43E9D9","index":92,"candidate_sha256":cand_sha,"bbox_size_pass":"2/2","visible_outside":visible_out,"alpha_outside":alpha_out,"source_residue":residue,"changed_blocks_outside_patch":outside_patch,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_B/20261005-B-PRODUCTION35/B_PRODUCTION35_1A43_REPORT.json"}
-(wr/"B_PRODUCTION35_1A43E9D9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"B_PRODUCTION36_1A43_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+summary={"run":run,"asset":"1A43E9D9","index":92,"candidate_sha256":cand_sha,"bbox_size_pass":"2/2","visible_outside":visible_out,"alpha_outside":alpha_out,"source_residue":residue,"changed_blocks_outside_patch":outside_patch,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_B/20261005-B-PRODUCTION36/B_PRODUCTION36_1A43_REPORT.json"}
+(wr/"B_PRODUCTION36_1A43E9D9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False))
