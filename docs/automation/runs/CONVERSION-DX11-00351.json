@@ -7,12 +7,12 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R240_PROGRAMMABLE_SHADER_PAIR_DEVICE_CACHE_OWNER_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
   "base_sha": "88b9e7afcbbb49f4e6ba739fce5d509e29bf48dd",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2",
+  "validation_bearing_result_sha": "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2",
   "result_marker": "[AUTO:CONVERSION-DX11-00351]",
   "selected_work_item": "DX11_R240_PROGRAMMABLE_SHADER_PAIR_DEVICE_CACHE_OWNER",
   "summary": "R240 consumes the R239 stage-typed programmable VS/PS identity in a dormant per-D3D11-device cache owner. It deduplicates exact identities, fails closed on forged cache-key collisions and incomplete/translated-state claims, clears entries across device reinitialization, and binds readiness snapshots to owner/device generation. It does not translate D3D9 bytecode, create/bind programmable D3D11 shaders, or activate NativeDrawPath.",
@@ -44,22 +44,42 @@
       "evidence": "Added NativeProgrammableShaderPairCache with per-device generation ownership, exact metadata collision checks, readiness/snapshot validation and fail-closed translated-state rejection; extended dx11_constant_buffer_probe with WARP-hosted positive, dedupe, collision, incomplete-identity and device-generation regressions; added source-graph drift guards."
     },
     "C3_VALIDATE": {
-      "status": "PENDING_EXACT_SHA_GATE",
-      "automation_validation": "PENDING",
-      "evidence": "Required Backend Conversion Gate must validate the exact material result SHA, including Win32 build and DX11 readiness smoke/constant-buffer probe. No Quest 3/VDXR runtime test performed."
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R240_PROGRAMMABLE_SHADER_PAIR_DEVICE_CACHE_OWNER_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1933 run 37178853852 completed success for 3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2. validate job 111367100284 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, VR session regressions, DX11 native transport, dual-source, static-surface, source-graph including R240 cache-owner guards, dormant activation, census analyzer, Win32 configure/build, binary verification and artifact upload. DX11 readiness smoke job 111367848305 passed every probe; specifically Build/Run DX11 constant buffer probe both succeeded with the R240 WARP device-cache dedupe/collision/device-generation regressions. Artifact 11294806139 digest sha256:dd788316fa8a5d1d22d23c8928bff6b280ff3890cf05fc25e085ce87dd524c9d. No Quest 3/VDXR runtime test was performed.",
+      "validation_run_id": 37178853852,
+      "validation_job_id": 111367100284,
+      "readiness_smoke_job_id": 111367848305,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11294806139,
+      "artifact_digest": "sha256:dd788316fa8a5d1d22d23c8928bff6b280ff3890cf05fc25e085ce87dd524c9d"
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "COMPLETE",
+      "material_result_sha": "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2",
+      "validation_bearing_result_sha": "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2",
+      "source_implementation_sha": "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2",
+      "result_marker": "[AUTO:CONVERSION-DX11-00351]",
+      "implementation_commits": [
+        "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2"
+      ]
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant programmable identity cache/readiness infrastructure only; no runtime distributable identity or native draw activation is promoted."
+      "reason": "R240 is dormant programmable shader identity-cache/readiness infrastructure only. It adds no runtime-distributable shader translation, no D3D11 programmable shader binding and no NativeDrawPath activation."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "Publish R240 material result without CI skip, require its exact-SHA Backend Conversion Gate, then persist final run/lane state while keeping RUNTIME_VALIDATION=UNTESTED and NativeDrawPath dormant."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37178853852,
+      "validation_job_id": 111367100284,
+      "readiness_smoke_job_id": 111367848305,
+      "artifact_id": 11294806139,
+      "artifact_digest": "sha256:dd788316fa8a5d1d22d23c8928bff6b280ff3890cf05fc25e085ce87dd524c9d",
+      "implementation_comment_id": 5976793695,
+      "validation_comment_id": 5976847216,
+      "exact_next_action": "Release CONVERSION-DX11-00351 as complete. Preserve R239 stage-typed identity plus R240 per-device cache generation/collision semantics and keep NativeDrawPath dormant. The next independent programmable-shader unit should define a fail-closed translation/object-slot ownership boundary keyed by R240 readiness before input linkage and constant propagation are promoted."
     }
   },
   "regression_assessment": {
@@ -80,5 +100,22 @@
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE"
   },
-  "exact_next_action": "Publish R240 as the material result, validate its exact SHA, then finalize C3/C4/C6 without conflating CI with HMD runtime proof."
+  "exact_next_action": "Release CONVERSION-DX11-00351 as complete. Preserve R239 stage-typed identity plus R240 per-device cache generation/collision semantics and keep NativeDrawPath dormant. The next independent programmable-shader unit should define a fail-closed translation/object-slot ownership boundary keyed by R240 readiness before input linkage and constant propagation are promoted.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37178853852,
+      "run_number": 1933,
+      "result_sha": "3101a3333c2dc4ab7b3caa1f5605e1d28cde16a2",
+      "conclusion": "success",
+      "validate_job_id": 111367100284,
+      "readiness_smoke_job_id": 111367848305,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11294806139,
+      "artifact_digest": "sha256:dd788316fa8a5d1d22d23c8928bff6b280ff3890cf05fc25e085ce87dd524c9d"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5976793695,
+    "validation_comment_id": 5976847216
+  }
 }
