@@ -658,3 +658,14 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
 - Next A REWORK priority: odd index 111 `C075FB49`.
 - Evidence: `localization/graphics/role_A/20261004-A-RECOVERY04/`.
+
+## K4 Korean runtime checkpoint — 2026-10-04 14:44 KST
+
+- Runtime source commit: c9c4fbe983cca889c351d4c281944841fd4fa6c9.
+- Unicode display path: runtime_ko.tsv UTF-8 -> D3D9 ImGui overlay.
+- Win32 Release build: PASS, Actions run 37180600018.
+- Artifact: 11295163177, SHA-256 1c76c03f4dc06b1dd967fdafd3ee0a47683411c29b185e05692e123f0fa59145.
+- Format safety: stock/Korean printf signatures must match; literal percent is escaped; %n is rejected; unsafe rows fall back to stock English.
+- Duplicate source-string safety: ambiguous content fallback is disabled when duplicate English strings map to different Korean translations.
+- Translation table static gate: 1,355 rows / 1,355 unique IDs / 41 percent-format rows / 0 %n rows.
+- RUNTIME_VALIDATION=UNTESTED; in-game startup/menu/race, dynamic %d/%s, 4:3/widescreen, no-double-draw and crash validation remain mandatory.

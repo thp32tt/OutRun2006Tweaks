@@ -919,3 +919,15 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
 - Next A REWORK priority: odd index 111 `C075FB49`.
 - Evidence: `localization/graphics/role_A/20261004-A-RECOVERY04/`.
+
+## K4 Korean runtime hardening — 2026-10-04 14:44 KST
+
+- Recovery branch runtime source hardened at c9c4fbe983cca889c351d4c281944841fd4fa6c9.
+- Restored the Windows Win32 Release build workflow; GitHub Actions run 37180600018 completed PASS.
+- Build artifact 11295163177, digest sha256:1c76c03f4dc06b1dd967fdafd3ee0a47683411c29b185e05692e123f0fa59145.
+- Korean runtime table revalidated: 1,355 unique non-null IDs; 41 rows contain percent-format text; %n rows = 0.
+- Runtime formatting now compares stock/Korean printf signatures before consuming x86 varargs, escapes literal percent text, rejects %n, and falls back to stock English on mismatch instead of risking invalid argument reads.
+- Duplicate English stock strings with differing Korean translations are no longer resolved through ambiguous content-only fallback; exact resolver pointer identity remains authoritative.
+- LOCALIZATION_STATE_OK and Domain Isolation checks passed.
+- Actual game execution was not performed on the Linux N100 build/QA host: RUNTIME_VALIDATION=UNTESTED.
+- Machine report: localization/runtime/K4_RUNTIME_HARDENING_20261004.json.

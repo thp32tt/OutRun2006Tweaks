@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "timestamp_kst": "2026-10-04T14:44:57+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "source_commit": "c9c4fbe983cca889c351d4c281944841fd4fa6c9",
+  "status": "BUILD_PASS_PENDING_INGAME",
+  "implementation": {
+    "path": "src/hooks_localization.cpp",
+    "renderer": "D3D9 ImGui UTF-8 overlay",
+    "translation_table": "localization/text/runtime_ko.tsv",
+    "translation_rows": 1355,
+    "changes": [
+      "compare stock and Korean printf argument signatures before formatting",
+      "escape literal percent text before printf formatting",
+      "reject %n memory-write conversion",
+      "keep stock English text when format signatures are unsafe or mismatched",
+      "mark duplicate stock-string fallback ambiguous when Korean translations differ",
+      "prefer exact stock text pointer identity for txet ID resolution"
+    ]
+  },
+  "static_validation": {
+    "localization_state": "PASS",
+    "domain_isolation": "PASS",
+    "runtime_tsv_rows": 1355,
+    "runtime_tsv_unique_ids": 1355,
+    "runtime_tsv_percent_rows": 41,
+    "runtime_tsv_percent_n_rows": 0
+  },
+  "build_validation": {
+    "workflow": ".github/workflows/build.yml",
+    "workflow_restored": true,
+    "platform": "windows-2022",
+    "arch": "Win32",
+    "configuration": "Release",
+    "github_actions_run_id": 37180600018,
+    "conclusion": "success",
+    "artifact_id": 11295163177,
+    "artifact_name": "outrun2006tweaks-c9c4fbe983cca889c351d4c281944841fd4fa6c9",
+    "artifact_digest_sha256": "1c76c03f4dc06b1dd967fdafd3ee0a47683411c29b185e05692e123f0fa59145"
+  },
+  "runtime_validation": "UNTESTED",
+  "release_ready": false,
+  "remaining_runtime_gates": [
+    "launch canonical OR2006C2C.exe with the built DLL and runtime_ko.tsv",
+    "verify startup/menu/race/mode transitions do not crash",
+    "verify Korean glyphs render with a Korean-capable Windows system font",
+    "verify English is not double-drawn under Korean",
+    "verify 4:3 and widescreen alignment",
+    "exercise translated %d/%s strings and collect logs/screenshots"
+  ]
+}

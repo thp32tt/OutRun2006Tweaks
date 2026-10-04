@@ -22,9 +22,9 @@
   "deployment": {
     "ready": false,
     "blockers": [
-      "clean K1 runtime evidence",
-      "K2 Unicode-safe path",
-      "K3 Hangul glyph proof"
+      "K4 Korean text runtime in-game no-crash/double-draw validation",
+      "K4 Korean text runtime 4:3/widescreen and dynamic-format validation",
+      "graphics full-queue completion plus isolated DDS in-game validation"
     ]
   },
   "graphics_checkpoint": {
@@ -1370,5 +1370,20 @@
       "asset": "C075FB49",
       "status": "rework_required_zero_pixel_or_artifact"
     }
+  },
+  "runtime_overlay_checkpoint": {
+    "updated_at_kst": "2026-10-04T14:44:57+09:00",
+    "status": "BUILD_PASS_PENDING_INGAME",
+    "source_commit": "c9c4fbe983cca889c351d4c281944841fd4fa6c9",
+    "workflow_run_id": 37180600018,
+    "artifact_id": 11295163177,
+    "artifact_digest_sha256": "1c76c03f4dc06b1dd967fdafd3ee0a47683411c29b185e05692e123f0fa59145",
+    "translation_rows": 1355,
+    "unicode_path": "UTF-8 translation table -> D3D9 ImGui overlay",
+    "format_safety": "stock/Korean printf signatures must match; unsafe mismatch falls back to stock English",
+    "duplicate_text_safety": "ambiguous duplicate English strings do not use content-only fallback",
+    "native_k3_path_status": "RESEARCH_ONLY_NOT_REQUIRED_FOR_K4_OVERLAY_PATH",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/runtime/K4_RUNTIME_HARDENING_20261004.json"
   }
 }

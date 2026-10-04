@@ -82,3 +82,17 @@ Generated: 2026-09-26
 - Release readiness: NOT YET.
 
 The mandatory containment rule remains unchanged: Korean text/glyph artwork must stay inside the original text region or sprite cell. Spill, clipping, overlap, double-draw, unrelated artwork damage, or residual source text in a promoted localized cell is a hard failure.
+
+## Recovery-branch runtime hardening — 2026-10-04
+
+- Branch: korean-localization-recovery-20260928.
+- Source commit: c9c4fbe983cca889c351d4c281944841fd4fa6c9.
+- GitHub Actions Win32 Release run: 37180600018 — PASS.
+- Artifact id: 11295163177.
+- Artifact digest: sha256:1c76c03f4dc06b1dd967fdafd3ee0a47683411c29b185e05692e123f0fa59145.
+- The build workflow was restored from the last known-good K4 build pipeline after a graphics-recovery workflow had temporarily replaced it.
+- Runtime formatting now derives a printf argument signature from both the stock format string and Korean translation. The overlay consumes the original x86 varargs only when the signatures match.
+- Bare percent text is escaped for formatting, %n is refused, and any unsafe/mismatched string is left in stock English rather than suppressing it.
+- Duplicate English strings are resolved by exact stock pointer first. Content-only fallback is disabled for ambiguous duplicates whose Korean translations differ.
+- Static state, domain isolation and the 1,355-row runtime table pass current checks.
+- RUNTIME_VALIDATION=UNTESTED: this commit was compiled but not executed inside the game. The mandatory in-game gates above still apply.
