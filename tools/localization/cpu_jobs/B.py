@@ -77,25 +77,31 @@ def main():
         # Expand hint modestly to include original English fringe, not neighboring panels.
         cx0,cy0,cx1,cy1=cell; x0=max(0,cx0-14); y0=max(0,cy0-8); x1=min(W,cx1+14); y1=min(H,cy1+8)
         roi=sa[y0:y1,x0:x1].astype(np.float32)
-        # Estimate flat/near-flat dark panel background from outer border.
         h,w=roi.shape[:2]
-        border=np.zeros((h,w),bool); border[:4,:]=1;border[-4:,:]=1;border[:,:4]=1;border[:,-4:]=1
-        bp=roi[border]
-        # robust background RGB/alpha median; colored panel line at row edge cannot dominate border.
-        bg=np.median(bp,axis=0)
+        # Dominant quantized RGBA bin is the dark menu-panel background. This is
+        # more robust than border sampling because the source panel has thin colored rules.
+        q=(roi.astype(np.uint8)//8).reshape(-1,4)
+        uq,cnt=np.unique(q,axis=0,return_counts=True); mode=uq[int(np.argmax(cnt))]
+        sel=np.all(q==mode,axis=1).reshape(h,w)
+        bg=np.median(roi[sel],axis=0) if np.any(sel) else np.median(roi.reshape(-1,4),axis=0)
         dist=np.sqrt(np.sum((roi[:,:,:3]-bg[:3])**2,axis=2))
-        # Text core = clear color deviation away from the dark panel; exclude cell edges and very low alpha.
-        core=(dist>18)&(roi[:,:,3]>max(8,bg[3]*0.25))
-        core[:3,:]=0;core[-3:,:]=0;core[:,:3]=0;core[:,-3:]=0
-        # Keep connected components consistent with glyph fragments, reject broad artwork/panel blocks.
+        core=(dist>14)&(roi[:,:,3]>max(8,bg[3]*0.20))
+        core[:2,:]=0;core[-2:,:]=0;core[:,:2]=0;core[:,-2:]=0
         ll,nn=ndimage.label(core,np.ones((3,3),dtype=np.uint8)); kept=np.zeros_like(core)
         for j in range(1,nn+1):
             yy,xx=np.nonzero(ll==j)
-            if 2<=len(xx)<=1200 and (xx.max()-xx.min()+1)<=max(80,w//2) and (yy.max()-yy.min()+1)<=max(36,h-4):
-                kept[yy,xx]=1
-        # Recover antialias/effect fringe at lower color-distance threshold around kept core.
-        near=np.asarray(Image.fromarray((kept.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(5)))>0
-        sm_local=near & (dist>5) & (roi[:,:,3]>3)
+            if not (2<=len(xx)<=1600): continue
+            cw=int(xx.max()-xx.min()+1); ch=int(yy.max()-yy.min()+1)
+            # Reject the tall panel edge and broad horizontal separator rules; retain glyph fragments.
+            if ch<3 or cw<2: continue
+            if ch>22 and ch>1.8*cw: continue
+            if ch<=4 and cw>max(24,w//3): continue
+            if cw>int(w*.88): continue
+            kept[yy,xx]=1
+        # Join adjacent glyph fragments before recovering antialias/effect fringe.
+        joined=np.asarray(Image.fromarray((kept.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0
+        near=np.asarray(Image.fromarray((joined.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(5)))>0
+        sm_local=near & (dist>4) & (roi[:,:,3]>3)
         yy,xx=np.nonzero(sm_local)
         if len(xx)<30: raise RuntimeError(("source text mask too small",idx,cell,int(len(xx)),bg.tolist()))
         bb=[x0+int(xx.min()),y0+int(yy.min()),x0+int(xx.max())+1,y0+int(yy.max())+1]
