@@ -6,7 +6,7 @@ from PIL import Image, ImageChops, ImageOps, ImageDraw
 if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "A":
     raise SystemExit("This deterministic job must run in the GitHub-hosted localization CPU worker as role A.")
 
-RETRY_MARKER = "20261004-A-RECOVERY07-owned-region-retry"
+RETRY_MARKER = "20261004-A-RECOVERY07-owned-region-retry-1732"
 
 repo = Path.cwd()
 run = "20261004-A-RECOVERY07"
