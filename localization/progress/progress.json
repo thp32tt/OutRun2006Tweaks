@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T08:23:59+09:00",
+  "updated_at_kst": "2026-10-05T08:52:54+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C141 independently finalizes B_PRODUCTION60 4D38BBB0 candidate c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a: canonical clean reconstruction diff=0, 8/8 bbox+size+positive margins and zero outside/alpha/protected/Ferrari-artwork/render/residue/overlap/touch PASS; controller source/clean/final/row/raw mirror_y visual PASS. Producer REWORK=0; pending_artwork localize_text=36. 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94 remain strict HOLD. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "B_PRODUCTION65 produced even index 220 D657C2EB candidate 6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5: authoritative 2048x512 RGBA32 BGRA source, B64 canonical binding of 7 physical occurrences including duplicate TIME ATTACK, 7/7 exact bbox+size+positive margins, clean/final validators and zero residue/outside/alpha/overlap/touch, controller SOURCE/CLEAN/FINAL/row/raw self-QA PASS. Earlier index 152 49BB5FE5 was fail-closed as HOLD_STRICT_RECHECK after correct DXT5 decode because constrained block splice still changed 1,388 decoded pixels outside exact source text bboxes; no candidate persisted. pending_artwork localize_text=34. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -322,22 +322,26 @@
       "in_game_validation": "PENDING; 1A43E9D9 remains REQUIRED_BEFORE_FINAL_APPROVAL; C141 RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
-      "run": "B_PRODUCTION60",
-      "worker_run_id": 37242986847,
-      "worker_output_commit": "a4b1cb78c7791e69dad58a2bea21dcc585bef5c5",
-      "result": "ONE_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_INGAME",
+      "run": "B_PRODUCTION65",
+      "worker_run_id": 37245263306,
+      "worker_output_commit": "18b35cec1b58edca017934acf021657f4d5459e3",
+      "result": "ONE_NEW_CANDIDATE_SELF_QA_PASS_PLUS_ONE_DXT5_HOLD",
       "assets": {
-        "4D38BBB0": {
-          "queue_index": 154,
-          "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
-          "candidate_sha256": "c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a",
-          "status": "B_PRODUCTION60_SELF_QA_PASS_PENDING_C_AND_INGAME",
-          "report": "localization/graphics/role_B/20261005-B-PRODUCTION60/B60_4D38_REPORT.json",
-          "physical_elements": 8,
-          "protected_artwork_regions": [
-            0,
-            1
-          ]
+        "D657C2EB": {
+          "queue_index": 220,
+          "source_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+          "candidate_sha256": "6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5",
+          "status": "B_PRODUCTION65_SELF_QA_PASS_PENDING_C_AND_INGAME",
+          "report": "localization/graphics/role_B/20261005-B-PRODUCTION65/B65_D657_REPORT.json",
+          "physical_elements": 7
+        },
+        "49BB5FE5": {
+          "queue_index": 152,
+          "source_sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+          "status": "HOLD_STRICT_RECHECK_DXT5_DECODED_PIXEL_GATE",
+          "candidate_written": false,
+          "decoded_outside": 1388,
+          "report": "localization/graphics/role_B/20261005-B-PRODUCTION63/B63_DXT5_FAIL_CLOSED.json"
         }
       },
       "runtime_validation": "UNTESTED"
@@ -656,6 +660,34 @@
       "c_final_qa": "PASS",
       "c_machine_report": "localization/graphics/role_C/20261005-C141-4D38BBB0/C141_4D38_MACHINE_QA.json",
       "c_controller_report": "localization/graphics/role_C/20261005-C141-4D38BBB0/C141_4D38_CONTROLLER_FINAL_QA.json"
+    },
+    "b65_d657c2eb": {
+      "queue_index": 220,
+      "candidate_sha256": "6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+      "status": "B_PRODUCTION65_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "bbox_size_positive_margin": "7/7",
+      "zero_pixel_gates": {
+        "source_residue": 0,
+        "outside": 0,
+        "alpha_outside": 0,
+        "overlap": 0,
+        "touch_pairs": 0
+      },
+      "controller_visual_qa": "PASS",
+      "report": "localization/graphics/role_B/20261005-B-PRODUCTION65/B65_D657_REPORT.json",
+      "runtime_validation": "UNTESTED"
+    },
+    "b63_49bb5fe5": {
+      "queue_index": 152,
+      "status": "HOLD_STRICT_RECHECK_DXT5_DECODED_PIXEL_GATE",
+      "source_sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+      "candidate_written": false,
+      "decoded_outside_exact_bbox": 1388,
+      "preserve_year_badge_changed_pixels": 0,
+      "exact_source_residue": 0,
+      "report": "localization/graphics/role_B/20261005-B-PRODUCTION63/B63_DXT5_FAIL_CLOSED.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
