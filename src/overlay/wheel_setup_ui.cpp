@@ -1790,7 +1790,7 @@ namespace
                 ImGui::EndCombo();
             }
             ImGui::TextDisabled(
-                "R9: changing FFB Model applies the complete test baseline automatically. Modern uses Reverse Force+Spring ON; Arcade/Hybrid/PS2 use both OFF.");
+                "R10: model polarity is runtime-owned. Modern uses Reverse Force+Spring ON; Arcade/Hybrid/PS2 use both OFF, including profile/manual transition paths.");
 
             const int activeFfbModel = std::clamp(int(Settings::WheelFFBModel), 0, 3);
             if (activeFfbModel == 0)
@@ -1978,11 +1978,13 @@ namespace
 
             track_ffb_change(ImGui::Checkbox("Diagnostic logging", Settings::WheelFFBDebugLog.ptr()));
             track_ffb_change(ImGui::Checkbox("Record driving telemetry (5 Hz + 1 Hz detail)", Settings::WheelFFBTelemetry.ptr()));
-            track_ffb_change(ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr()));
+            ImGui::BeginDisabled();
+            ImGui::Checkbox("Reverse SAT / ConstantForce", Settings::WheelFFBInvertForce.ptr());
             ImGui::SameLine();
-            track_ffb_change(ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr()));
-            if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Use Reverse Spring only if the wheel pushes farther away from centre. ConstantForce direction is independent.");
+            ImGui::Checkbox("Reverse Spring", Settings::WheelFFBInvertSpring.ptr());
+            ImGui::EndDisabled();
+            ImGui::TextDisabled(
+                "R10 hardware-test branch: polarity follows the selected FFB model automatically and cannot remain stale after a profile/model switch.");
 
             if (ffbDirty_)
                 ImGui::TextDisabled("Unsaved FFB changes are active now but will be lost after restart.");
