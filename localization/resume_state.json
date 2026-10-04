@@ -1,5 +1,5 @@
 {
-  "schema_version": 55,
+  "schema_version": 56,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_PRODUCTION10 rebuilt index 43 455717B2 from authoritative 2048x2048 Release HD source; candidate 50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f passed A static/visual self-QA and is pending independent C final QA plus isolated in-game validation.",
     "A_RECOVERY08 repaired C92-returned FD90AA9; candidate 0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b passed A static + controller visual self-QA and is pending independent C final QA plus isolated in-game validation.",
     "C92 strict checkpoint remains authoritative until C revalidates A_RECOVERY08; FD90AA9 is the only C92-returned REWORK asset.",
     "A_RECOVERY06 repaired 39229D64; candidate 67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a is pending independent C final QA and isolated in-game validation.",
@@ -1943,5 +1944,32 @@
       "asset": "CBF8ECBF",
       "status": "pending_artwork"
     }
+  },
+  "a_production10_455717b2": {
+    "run": "20261004-A-PRODUCTION10",
+    "status": "A_PRODUCTION10_HD_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "index": 43,
+    "asset": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+    "source_path": "Sonic-TV/OR2006Sprites@3ce344e7 Release/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+    "source_sha256": "ce5d3610eac8945d76a559bb7f7201f9b1efb409c965bd20ed0a26164ed7f356",
+    "source_dimensions": [
+      2048,
+      2048
+    ],
+    "source_format": "RGBA32",
+    "candidate_sha256": "50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+    "report": "localization/graphics/role_A/20261004-A-PRODUCTION10/A_PRODUCTION10_455717B2_REPORT.json",
+    "supersedes_a_production09": "wrong 512x512 stock DXT5 fallback and C97 transparent-RGB exact-bbox return",
+    "bbox_pass": "4/4 readable + raw positive margins",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "controller_visual_qa": "PASS",
+    "runtime_validation": "UNTESTED",
+    "c_final_qa": "PENDING",
+    "in_game_validation": "PENDING"
   }
 }

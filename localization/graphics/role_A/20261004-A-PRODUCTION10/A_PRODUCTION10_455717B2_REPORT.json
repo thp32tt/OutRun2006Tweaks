@@ -303,7 +303,8 @@
   ],
   "all_4_readable_and_raw_bbox_pass": true,
   "all_4_positive_margin": true,
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_HD_SOURCE_CLEAN_FINAL_ROW_CONTACT_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A_PRODUCTION10_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_PRODUCTION10_HD_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_qa_notes": "Manual review of HD SOURCE/CLEAN/FINAL, 1:1 row-contact, and raw mirror_y evidence: all four Korean labels are clean, legible, source-family styled; no source-English residue, clipping, overlap, seam, opaque patch, protected artwork damage, or orientation regression observed."
 }

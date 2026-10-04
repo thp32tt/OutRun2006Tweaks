@@ -1039,3 +1039,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - B self-QA PASS: exact header/RGBA32 2048x2048/1 mip/raw mirror_y; 9/9 exact source-bbox containment; clean/final outside-protected-alpha changes 0; source residue 0; target overlap 0; readable dark/white, 9-row contact and raw-orientation visual review found no clipping, source-English residue, new overlap, protected-art damage, seam or alpha halo.
 - Concurrent C95 independently checked this exact candidate SHA and reports static machine PASS (9/9 bbox, clean/final/mask PASS) but C controller visual QA remains pending. `RUNTIME_VALIDATION=UNTESTED`; no in-game approval claimed.
 - Next B even-shard hint after refresh: index 50 `CBF8ECBF` pending artwork. Evidence: `localization/graphics/role_B/20261004-B-RECOVERY07/`. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-04 A production10 — 455717B2 exact-HD rebuild
+- Refreshed current queue and selected odd index 43. Initial A_PRODUCTION09 used the 512x512 stock Tweaks dump and was rejected by C97 under the exact-bbox policy; C's provenance check exposed the authoritative Release DDS under the same stale filename suffix.
+- Rebuilt from Sonic-TV/OR2006Sprites@3ce344e7 Release DDS blob 92a3cb717afb6ea10aa76df23941353fd0a04148, SHA-256 ce5d3610eac8945d76a559bb7f7201f9b1efb409c965bd20ed0a26164ed7f356. Header proves 2048x2048 RGBA32 / 1 mip; raw orientation remains mirror_y.
+- Produced 계속하기 / 완벽! / 축하합니다! / 통과! natively at HD resolution. Candidate SHA-256 50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f.
+- Self-QA PASS: clean plate PASS; final exact-bbox/protected validator PASS; readable+raw 4/4 containment with positive margins; changed pixels outside exact source bboxes=0, alpha outside=0, protected visible changes=0, source-text residue=0.
+- Manual HD SOURCE/CLEAN/FINAL, 1:1 row-contact, and raw-orientation review PASS with no residue, clipping, overlap, seam, opaque patch, protected-art damage, or orientation regression.
+- Current pending_artwork localize_text count after this row is 59. RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_A/20261004-A-PRODUCTION10/.
