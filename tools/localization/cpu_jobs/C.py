@@ -7,7 +7,7 @@ from scipy import ndimage
 
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="C":
     raise SystemExit("GitHub-hosted localization CPU worker / role C only")
-repo=Path.cwd(); run="20261005-C136-1F5FE6E9-DIAG"
+repo=Path.cwd(); run="20261005-C137-1F5FE6E9-DIAG"
 out=repo/"localization/graphics/role_C"/run; out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds"
@@ -40,7 +40,7 @@ for n,(en,ko,box) in enumerate(hints,1):
     dist=np.sqrt(np.sum((roi[:,:,:3]-bg[:3])**2,axis=2))
     trials={}
     for th in (4,6,8,10,12,16,20):
-        m=(dist>th)&(roi[:,:,3]>3)
+        m=(dist>th)
         # Remove components that are horizontal/vertical panel lines.
         lab,num=ndimage.label(m,np.ones((3,3),dtype=np.uint8))
         comps=[]
@@ -63,8 +63,8 @@ for n,(en,ko,box) in enumerate(hints,1):
 report={"schema_version":1,"role":"C","run":run,"asset":"1F5FE6E9","queue_index":132,
         "structure":{"width":W,"height":H,"format":"RGBA32","raw_orientation":"mirror_y"},
         "rows":rows,"status":"SOURCE_ROW_COLOR_DIAGNOSTIC","runtime_validation":"UNTESTED"}
-(out/"C136_1F5_SOURCE_ROW_DIAGNOSTIC.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-vis.convert("RGB").save(out/"C136_1F5_SOURCE_HINTS.jpg",quality=96)
-summary={"run":run,"asset":"1F5FE6E9","index":132,"status":"SOURCE_ROW_COLOR_DIAGNOSTIC","report":f"localization/graphics/role_C/{run}/C136_1F5_SOURCE_ROW_DIAGNOSTIC.json","runtime_validation":"UNTESTED"}
-(wr/"C136_1F5FE6E9_DIAG.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"C137_1F5_SOURCE_ROW_DIAGNOSTIC.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+vis.convert("RGB").save(out/"C137_1F5_SOURCE_HINTS.jpg",quality=96)
+summary={"run":run,"asset":"1F5FE6E9","index":132,"status":"SOURCE_ROW_COLOR_DIAGNOSTIC","report":f"localization/graphics/role_C/{run}/C137_1F5_SOURCE_ROW_DIAGNOSTIC.json","runtime_validation":"UNTESTED"}
+(wr/"C137_1F5FE6E9_DIAG.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False),flush=True)
