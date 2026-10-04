@@ -71,6 +71,9 @@ def main():
     if len(merged)!=4:
         (out/"B51_DISCOVERY_FAIL.json").write_text(json.dumps({"components":comps[:20],"merged":merged},indent=2)+"\n")
         raise RuntimeError(("expected four historical row hints",len(merged)))
+    # C137 exact-source diagnostic: colored panel begins at readable y=232;
+    # SPECIAL REQUEST 3 text is in the transparent dark band above it.
+    merged[3][3]=min(merged[3][3],232)
 
     rows=[]; sms=[]; full=np.zeros((H,W),bool)
     for idx,(cell,(en,ko)) in enumerate(zip(merged,LABELS),1):
@@ -85,7 +88,10 @@ def main():
         sel=np.all(q==mode,axis=1).reshape(h,w)
         bg=np.median(roi[sel],axis=0) if np.any(sel) else np.median(roi.reshape(-1,4),axis=0)
         dist=np.sqrt(np.sum((roi[:,:,:3]-bg[:3])**2,axis=2))
-        core=(dist>14)
+        adist=np.abs(roi[:,:,3]-bg[3])
+        # This source uses same hidden RGB for glyph/background in transparent rows;
+        # glyph visibility is encoded primarily in alpha. Accept either RGB or alpha effect.
+        core=(dist>14)|(adist>4)
         core[:2,:]=0;core[-2:,:]=0;core[:,:2]=0;core[:,-2:]=0
         ll,nn=ndimage.label(core,np.ones((3,3),dtype=np.uint8)); kept=np.zeros_like(core)
         for j in range(1,nn+1):
@@ -101,7 +107,7 @@ def main():
         # Join adjacent glyph fragments before recovering antialias/effect fringe.
         joined=np.asarray(Image.fromarray((kept.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(3)))>0
         near=np.asarray(Image.fromarray((joined.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(5)))>0
-        sm_local=near & (dist>4)
+        sm_local=near & ((dist>4)|(adist>1))
         yy,xx=np.nonzero(sm_local)
         if len(xx)<30: raise RuntimeError(("source text mask too small",idx,cell,int(len(xx)),bg.tolist()))
         bb=[x0+int(xx.min()),y0+int(yy.min()),x0+int(xx.max())+1,y0+int(yy.max())+1]
