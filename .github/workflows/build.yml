@@ -23,6 +23,11 @@ jobs:
           p.write_bytes(new)
           PY
           git checkout 203185a294cc54de4ff044c5cc4645736c51dfb5 -- .github/workflows/build.yml
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/build.yml')
+          p.write_text('\n'.join(x.rstrip() for x in p.read_text().splitlines())+'\n')
+          PY
           rm -rf .a392
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
