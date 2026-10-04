@@ -1128,7 +1128,7 @@ def main() -> int:
         for signature in r234_current_startup_signature_scope["CurrentSignatures"]
     ] == [2]
     assert r234_current_startup_signature_scope["LatestStartupEpochByLog"] == {
-        "runtime.log": 2
+        "OutRun2006Tweaks.log": 2
     }
     assert (
         r234_current_startup_signature_scope["ActivationEvidence"][
