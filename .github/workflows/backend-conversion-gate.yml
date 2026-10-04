@@ -67,6 +67,19 @@ jobs:
         shell: pwsh
         run: python tools/dx11_native_static_surface_contract_check.py src/vr/d3d11/resource_translation.cpp src/vr/d3d11/surface_mirror.cpp
 
+      - name: Verify DX11 source hygiene
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: |
+          $matches = git grep -n -F -- '[executed on device:' -- src/vr/d3d11 tools/verify_dx11_source_graph.py tools/verify_dx11_activation_boundary.py tools/dx11_constant_buffer_probe.cpp
+          if ($LASTEXITCODE -eq 0) {
+            $matches | Write-Host
+            throw "DX11 source contains a remote execution transcript marker"
+          }
+          if ($LASTEXITCODE -ne 1) {
+            throw "git grep failed while checking DX11 source hygiene (exit $LASTEXITCODE)"
+          }
+
       - name: Verify DX11 source graph
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py
