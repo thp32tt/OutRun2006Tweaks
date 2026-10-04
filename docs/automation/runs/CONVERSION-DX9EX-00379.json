@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX9EX-00379",
-  "production_id": "CONVERSION-DXVK-00378",
-  "event_id": "CONVERSION-DXVK-00378-E003",
-  "event_type": "rollover",
+  "production_id": "CONVERSION-DX9EX-00379",
+  "event_id": "CONVERSION-DX9EX-00379-E002",
+  "event_type": "retry",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "status": "COMPLETE",
   "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_POLICY",
   "runtime_validation": "UNTESTED",
@@ -105,12 +105,11 @@
   "next_action": "Do not repeat CONVERSION-DX9EX-00379. Preserve R33 as the terminal readiness/replay-health owner and R34 as a zero-worker, zero-physical-hook compatibility observer. Select only the next bounded post-1000 successor supported by current source evidence. Runtime visual/stability claims remain gated on Quest3/VDXR evidence.",
   "controller_dispatch": {
     "task_id": "CONVERSION-DX9EX-00379",
-    "production_id": "CONVERSION-DXVK-00378",
-    "event_id": "CONVERSION-DXVK-00378-E003",
-    "event_type": "rollover",
-    "attempt": "1/3",
+    "production_id": "CONVERSION-DX9EX-00379",
+    "event_id": "CONVERSION-DX9EX-00379-E002",
+    "event_type": "retry",
+    "attempt": "2/3",
     "source": "CURRENT_USER_QUEUE",
-    "rollover_is_retry": false,
     "material_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
     "validation_bearing_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
     "runtime_validation": "UNTESTED"
@@ -119,12 +118,11 @@
   "dispatch_reconciliation": {
     "authoritative": {
       "task_id": "CONVERSION-DX9EX-00379",
-      "production_id": "CONVERSION-DXVK-00378",
-      "event_id": "CONVERSION-DXVK-00378-E003",
-      "event_type": "rollover",
-      "attempt": "1/3",
+      "production_id": "CONVERSION-DX9EX-00379",
+      "event_id": "CONVERSION-DX9EX-00379-E002",
+      "event_type": "retry",
+      "attempt": "2/3",
       "source": "CURRENT_USER_QUEUE",
-      "rollover_is_retry": false,
       "material_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
       "validation_bearing_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
       "runtime_validation": "UNTESTED"
@@ -149,9 +147,40 @@
           "runtime_validation": "UNTESTED",
           "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
         }
+      },
+      {
+        "task_id": "CONVERSION-DX9EX-00379",
+        "production_id": "CONVERSION-DXVK-00378",
+        "event_id": "CONVERSION-DXVK-00378-E003",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "source": "CURRENT_USER_QUEUE",
+        "rollover_is_retry": false,
+        "material_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+        "validation_bearing_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+        "runtime_validation": "UNTESTED"
       }
     ],
-    "reason": "Current explicit user queue metadata CONVERSION-DXVK-00378-E003 supersedes the earlier internal E001 bookkeeping only. Rollover is not a retry; ATTEMPT remains 1/3. Material and validation-bearing SHAs and exact-SHA gate evidence are unchanged.",
+    "reason": "Current explicit retry E002 supersedes prior rollover bookkeeping metadata only. No material work is repeated; validation-bearing SHA 9ec83f6b1269e3438e6430fa6a6efb2076103182 and its successful exact-SHA gate remain authoritative.",
     "material_and_validation_bearing_sha_unchanged": true
+  },
+  "retry_reconciliation": {
+    "event_id": "CONVERSION-DX9EX-00379-E002",
+    "attempt": "2/3",
+    "failure_context_run_id": 37225633103,
+    "failure_context_head_sha": "a641273826b164cb49b17dac11a6d2bc3c5af3d9",
+    "failure_context_conclusion": "cancelled",
+    "classification": "SUPERSEDED_BY_NEWER_SAME_BRANCH_COMMIT_NOT_CODE_FAILURE",
+    "resumed_from": "C3_VALIDATE",
+    "superseding_validation_bearing_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+    "superseding_dx9ex_active_run_id": 37225909401,
+    "superseding_dx9ex_active_conclusion": "success",
+    "state_checkpoint_sha": "f6e79b96512fd313f02ff5fc078010b919a16679",
+    "state_checkpoint_gate_run_id": 37226405475,
+    "state_checkpoint_gate_status": "in_progress_at_retry_reconciliation",
+    "repeated_material_work": false,
+    "material_and_validation_bearing_sha_unchanged": true,
+    "runtime_validation": "UNTESTED",
+    "note": "Retry E002 did not repeat source work. The explicitly cited cancelled run belonged to source material a6412738 and was superseded by the later verifier-fix material 9ec83f6b, whose exact-SHA DX9Ex Active Validation completed successfully. This retry only reconciles authoritative queue metadata and preserves the already validated material result."
   }
 }
