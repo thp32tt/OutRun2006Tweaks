@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-1840-C97",
+  "base_head": "4a5c089a821f07a41f9926b16e6737118855545b",
+  "asset": "455717B2",
+  "scope": "independent C final QA of new A_PRODUCTION09 result only; completed FD90/B169 checks not repeated",
+  "producer_report": "localization/graphics/role_A/20261004-A-PRODUCTION09/A_PRODUCTION09_455717B2_REPORT.json",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "classification": "stock fallback; no HD entry for key"
+  },
+  "source_sha256": "645536f60208d35274cc7bd4b8edc041eda81a761a34603ed1e8be9af20583eb",
+  "candidate_sha256": "9dadee3c300bd0500940fcfe304bb640e7b458329210ce2b134c8ce06c65eac4",
+  "candidate_changed_by_C": false,
+  "structure": {
+    "width": 512,
+    "height": 512,
+    "mips": 0,
+    "fourcc": "DXT5",
+    "bytes": 262272,
+    "header_128_exact_to_source": true,
+    "raw_orientation": "mirror_y"
+  },
+  "clean_plate_gate": {
+    "changed_pixels": 50795,
+    "changed_bbox": [
+      0,
+      64,
+      507,
+      258
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "visible_changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "status": "PASS"
+  },
+  "dxt5_block_gate": {
+    "changed_pixels": 53799,
+    "changed_bbox": [
+      0,
+      64,
+      507,
+      258
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "visible_changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "status": "PASS"
+  },
+  "strict_exact_bbox_gate": {
+    "changed_pixels": 53799,
+    "changed_bbox": [
+      0,
+      64,
+      507,
+      258
+    ],
+    "changed_pixels_outside_edit_mask": 1028,
+    "visible_changed_pixels_outside_edit_mask": 0,
+    "alpha_changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "transparent_rgb_only_changed_pixels_outside_exact_bboxes": 1028,
+    "policy_decision": "REWORK_REQUIRED_TRANSPARENT_RGB_OUTSIDE_EXACT_BBOX",
+    "status": "REWORK_REQUIRED"
+  },
+  "bbox_gate": {
+    "elements": 4,
+    "pass": 4,
+    "fail": 0,
+    "edge_touch_keys": [],
+    "rows": [
+      {
+        "key": "continue",
+        "source": "CONTINUE",
+        "korean": "계속하기",
+        "original_bbox": [
+          0,
+          64,
+          142,
+          88
+        ],
+        "localized_bbox": [
+          37,
+          65,
+          104,
+          87
+        ],
+        "delta_left": 37,
+        "delta_right": 38,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS"
+      },
+      {
+        "key": "perfect",
+        "source": "PERFECT!",
+        "korean": "완벽!",
+        "original_bbox": [
+          27,
+          88,
+          324,
+          140
+        ],
+        "localized_bbox": [
+          126,
+          89,
+          223,
+          138
+        ],
+        "delta_left": 99,
+        "delta_right": 101,
+        "delta_top": 1,
+        "delta_bottom": 2,
+        "containment": "PASS"
+      },
+      {
+        "key": "congratulations",
+        "source": "CONGRATULATIONS!",
+        "korean": "축하합니다!",
+        "original_bbox": [
+          4,
+          148,
+          507,
+          197
+        ],
+        "localized_bbox": [
+          151,
+          149,
+          358,
+          196
+        ],
+        "delta_left": 147,
+        "delta_right": 149,
+        "delta_top": 1,
+        "delta_bottom": 1,
+        "containment": "PASS"
+      },
+      {
+        "key": "passed",
+        "source": "PASSED!",
+        "korean": "통과!",
+        "original_bbox": [
+          83,
+          206,
+          342,
+          258
+        ],
+        "localized_bbox": [
+          163,
+          207,
+          261,
+          256
+        ],
+        "delta_left": 80,
+        "delta_right": 81,
+        "delta_top": 1,
+        "delta_bottom": 2,
+        "containment": "PASS"
+      }
+    ],
+    "status": "PASS"
+  },
+  "visual_evidence": {
+    "full_compare": "localization/graphics/role_C/20261004-1840-C97/C97_455717B2_FULL_COMPARE.jpg",
+    "row_contact": "localization/graphics/role_C/20261004-1840-C97/C97_455717B2_ROW_CONTACT.jpg",
+    "controller_visual_qa": "PENDING"
+  },
+  "c_decision": "REWORK_REQUIRED_TRANSPARENT_RGB_OUTSIDE_EXACT_BBOX",
+  "decision_reason": "Decoded visible and alpha overflow are zero, but 1028 decoded all-channel pixels outside the union of exact source bboxes differ due DXT5 boundary blocks. Current zero-tolerance policy explicitly requires changed_pixels_outside_source_region=0; block-level allowance cannot override the exact-bbox gate.",
+  "runtime_validation": "UNTESTED",
+  "status": "C97_REWORK_REQUIRED_TRANSPARENT_RGB_OUTSIDE_EXACT_BBOX",
+  "vr_ffb_dx11_dxvk_changes": false
+}
