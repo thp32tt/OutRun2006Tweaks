@@ -975,3 +975,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - 4F68708E/F6811E94 remain strict no-candidate DXT5 exact-safe HOLD; normal pending artwork remains unfinished.
 - RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_C/20261005-C118-788CE557/C118_788CE557_CONTROLLER_FINAL_QA.json
+
+## 2026-10-05 02:45 KST — A production20/21 — 9CE4E175 + EBEF6D20
+- Odd-shard production advanced two pending-artwork rows without repeating completed C118/C117 work.
+- `9CE4E175`: `NOT AVAILABLE -> 이용 불가`, final candidate `cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2`. Full-fringe clean-plate correction removed the source antialias residue found by A visual QA. Final 1/1 exact bbox/size/positive-margin and zero outside/alpha/protected/residue gates PASS.
+- `EBEF6D20`: two `Loading -> 로딩` occurrences, final candidate `005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2`. Same-run source-weight correction uses actual NotoSansCJK-Bold with measured outline/shadow. Final 2/2 exact bbox/size/positive-margin, overlap/touch=0 and zero outside/alpha/protected gates PASS.
+- A controller SOURCE|CLEAN|FINAL/full/raw visual self-QA PASS for both assets. Independent C final QA and isolated in-game validation remain pending; `RUNTIME_VALIDATION=UNTESTED`.
+- pending_artwork localize_text = 45; producer REWORK = 0; strict no-candidate DXT5 HOLD remains `4F68708E` / `F6811E94`. No VR/FFB/DX11/DXVK work.
