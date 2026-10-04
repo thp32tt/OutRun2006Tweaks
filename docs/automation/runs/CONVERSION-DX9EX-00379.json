@@ -1,13 +1,12 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX9EX-00379",
-  "production_id": "CONVERSION-DX9EX-00379",
-  "event_id": "CONVERSION-DX9EX-00379-E001",
+  "production_id": "CONVERSION-DXVK-00378",
+  "event_id": "CONVERSION-DXVK-00378-E003",
   "event_type": "rollover",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
-  "chat_rollover": 2,
   "status": "COMPLETE",
   "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_POLICY",
   "runtime_validation": "UNTESTED",
@@ -106,15 +105,53 @@
   "next_action": "Do not repeat CONVERSION-DX9EX-00379. Preserve R33 as the terminal readiness/replay-health owner and R34 as a zero-worker, zero-physical-hook compatibility observer. Select only the next bounded post-1000 successor supported by current source evidence. Runtime visual/stability claims remain gated on Quest3/VDXR evidence.",
   "controller_dispatch": {
     "task_id": "CONVERSION-DX9EX-00379",
-    "production_id": "CONVERSION-DX9EX-00379",
-    "event_id": "CONVERSION-DX9EX-00379-E001",
+    "production_id": "CONVERSION-DXVK-00378",
+    "event_id": "CONVERSION-DXVK-00378-E003",
     "event_type": "rollover",
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE",
+    "rollover_is_retry": false,
     "material_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
     "validation_bearing_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
-    "runtime_validation": "UNTESTED",
-    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
+    "runtime_validation": "UNTESTED"
   },
-  "validated_at_kst": "2026-10-05T03:55:25+09:00"
+  "validated_at_kst": "2026-10-05T03:55:25+09:00",
+  "dispatch_reconciliation": {
+    "authoritative": {
+      "task_id": "CONVERSION-DX9EX-00379",
+      "production_id": "CONVERSION-DXVK-00378",
+      "event_id": "CONVERSION-DXVK-00378-E003",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "source": "CURRENT_USER_QUEUE",
+      "rollover_is_retry": false,
+      "material_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+      "validation_bearing_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+      "runtime_validation": "UNTESTED"
+    },
+    "superseded": [
+      {
+        "task_id": "CONVERSION-DX9EX-00379",
+        "production_id": "CONVERSION-DX9EX-00379",
+        "event_id": "CONVERSION-DX9EX-00379-E001",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 2,
+        "controller_dispatch": {
+          "task_id": "CONVERSION-DX9EX-00379",
+          "production_id": "CONVERSION-DX9EX-00379",
+          "event_id": "CONVERSION-DX9EX-00379-E001",
+          "event_type": "rollover",
+          "attempt": "1/3",
+          "source": "CURRENT_USER_QUEUE",
+          "material_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+          "validation_bearing_result_sha": "9ec83f6b1269e3438e6430fa6a6efb2076103182",
+          "runtime_validation": "UNTESTED",
+          "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
+        }
+      }
+    ],
+    "reason": "Current explicit user queue metadata CONVERSION-DXVK-00378-E003 supersedes the earlier internal E001 bookkeeping only. Rollover is not a retry; ATTEMPT remains 1/3. Material and validation-bearing SHAs and exact-SHA gate evidence are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
+  }
 }
