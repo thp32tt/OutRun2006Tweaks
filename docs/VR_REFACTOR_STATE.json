@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-04T17:50:06+09:00",
+  "updatedKst": "2026-10-05T03:00:47+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
@@ -61,9 +61,10 @@
     "VR-REFACTOR-STATE-0004V",
     "VR-REFACTOR-STATE-0004W",
     "VR-REFACTOR-STATE-0004X",
-    "VR-REFACTOR-CI-0003"
+    "VR-REFACTOR-CI-0003",
+    "VR-REFACTOR-POST1000-R34-READINESS-OWNERSHIP-0001"
   ],
-  "next": "The 1000-cycle DX9Ex structural review target is complete. Preserve exact source 245c35ca3ce07b304526312eab14d6f4c1f09ecd as the build-verified structural checkpoint. Runtime remains UNTESTED: next consume Quest3/VDXR evidence for the F11 gameplay overlay candidate and other open visual defects; do not treat build success as visual proof. Further DX9Ex work should be explicit maintenance/regression work, while normal autonomous backend implementation priority returns to DX11 Native and DXVK per AGENTS.md.",
+  "next": "The original 0..1000 structural target remains complete at checkpoint 245c35ca3ce07b304526312eab14d6f4c1f09ecd and must not be repeated. Post-1000 maintenance CONVERSION-DX9EX-00376 removed R34 duplicate install-state ownership and pins R34 physical SafetyHookInline growth at zero; exact material d0991bfc2966cbc353d5c25c6bc0d72a4eb1ff04 is automation/build verified but Quest3/VDXR runtime remains UNTESTED. Continue only a new bounded successor supported by current source/static evidence; otherwise return to explicit runtime/general DX9Ex maintenance.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -128,7 +129,8 @@
     "VR-REFACTOR-CI-0003: verifier commit 245c35ca3ce07b304526312eab14d6f4c1f09ecd fixes an exact-token false positive where R9MainDepthGenerationValue() contained the guarded legacy identifier as a substring; the guard now matches the standalone private token only.",
     "Exact HEAD 245c35ca3ce07b304526312eab14d6f4c1f09ecd passed DX9Ex Active Validation 37189796899: policy, host, game, full-chain-compile and package SUCCESS. Domain Isolation Guard 37189796896 SUCCESS. Artifact 11299085399 uploaded; artifact digest e48745a951872e9bf32a5cce5c61b52bd080265ea8795d496cb069e779c78c96; inner package SHA256 b2888e906933ea34ec4741b2f34f9fc4e14cf344c8bc5fa76f670a0893054bdb.",
     "No projection, eye transform, HUD/world semantic classification, Present ownership, wait, allocation, D3D getter, or hot-path synchronization was added by cycle 910->1000 owner cleanup. Shared frame/transport fields whose extraction could alter Present/interop behavior were intentionally deferred rather than mechanically moved.",
-    "F11 gameplay overlay fix remains included in the latest package, but Quest3/VDXR runtime validation is still required before VR-F11-OVERLAY-DIPLOPIA-001 can be marked fixed."
+    "F11 gameplay overlay fix remains included in the latest package, but Quest3/VDXR runtime validation is still required before VR-F11-OVERLAY-DIPLOPIA-001 can be marked fixed.",
+    "Post-1000 maintenance VR-REFACTOR-POST1000-R34-READINESS-OWNERSHIP-0001: material d0991bfc2966cbc353d5c25c6bc0d72a4eb1ff04 removes R34InstallState duplicate ownership after R34 physical detours were folded into R33, preserves R34 as a compatibility async readiness observer, tightens the R34 hook-graph ceiling to zero, and guards against duplicate install-state ownership returning. DX9Ex Active Validation 37222316846 policy/full-chain/host/game/package SUCCESS; Domain Isolation 37222316862 SUCCESS; HUD Inspector 37222316810 SUCCESS. Runtime remains UNTESTED."
   ],
   "batchStatus": "VR-REFACTOR-1000_BUILD_VERIFIED",
   "validatedSourceSha": "245c35ca3ce07b304526312eab14d6f4c1f09ecd",
@@ -152,5 +154,29 @@
     "innerPackageSha256": "b2888e906933ea34ec4741b2f34f9fc4e14cf344c8bc5fa76f670a0893054bdb",
     "defaultProfile": "CORRECTNESS",
     "userRuntimeVerified": false
+  },
+  "post1000Maintenance": {
+    "taskId": "CONVERSION-DX9EX-00376",
+    "item": "VR-REFACTOR-POST1000-R34-READINESS-OWNERSHIP-0001",
+    "baseSha": "0c3b01ca385782d8ec79bf6c51a121b0b0f29faf",
+    "materialResultSha": "d0991bfc2966cbc353d5c25c6bc0d72a4eb1ff04",
+    "validationBearingResultSha": "d0991bfc2966cbc353d5c25c6bc0d72a4eb1ff04",
+    "automationValidation": "PASS",
+    "runtimeValidation": "UNTESTED",
+    "validation": {
+      "dx9exActiveRunId": 37222316846,
+      "jobs": {
+        "policy": 111494981161,
+        "fullChainCompile": 111495048090,
+        "host": 111495048107,
+        "game": 111495048124,
+        "package": 111495832640
+      },
+      "domainIsolationRunId": 37222316862,
+      "hudInspectorRunId": 37222316810,
+      "packageArtifactId": 11310757093,
+      "packageArtifactDigest": "sha256:abf3528063ed1bb8b3ca816bc83d85fc77924c2b986a28549064f501ec1e6a79"
+    },
+    "issue14CommentId": 5982836930
   }
 }
