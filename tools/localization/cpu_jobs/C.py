@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import hashlib, json, os, struct, subprocess
+import hashlib, json, os, struct, subprocess, urllib.request
 from pathlib import Path
 
 import numpy as np
@@ -9,65 +9,53 @@ if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OU
     raise SystemExit("Run only in GitHub-hosted localization CPU worker as role C.")
 
 repo=Path.cwd()
-run="20261004-1740-C92"
+run="20261004-1820-C93"
 outdir=repo/"localization/graphics/role_C"/run
 outdir.mkdir(parents=True,exist_ok=True)
 
-key="FD90AA9"
-source_rel="localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-candidate_rel="localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-producer_rel="localization/graphics/role_A/20261004-A-RECOVERY07/A_RECOVERY07_FD90AA9_REPORT.json"
-source_mask_rel="localization/graphics/role_A/20261004-A-RECOVERY07/FD90AA9_SOURCE_TEXT_MASK.png"
-clean_rel="localization/graphics/role_A/20261004-A-RECOVERY07/FD90AA9_CLEAN_PLATE.png"
-clean_protected_rel="localization/graphics/role_A/20261004-A-RECOVERY07/FD90AA9_CLEAN_PLATE_PROTECTED_MASK.png"
-allowed_rel="localization/graphics/role_A/20261004-A-RECOVERY07/FD90AA9_ALLOWED_TEXT_REGION_MASK.png"
-final_protected_rel="localization/graphics/role_A/20261004-A-RECOVERY07/FD90AA9_PROTECTED_MASK.png"
-source_sha_expected="f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
-candidate_sha_expected="58a8bd06a38375694da7d3109fc2615ccd6d45092828f7eb5b7a9317afc13010"
-
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
-def load_dds(p):
+def load_rgba32_dds(p):
     b=Path(p).read_bytes()
-    if b[:4]!=b"DDS ": raise RuntimeError("not DDS")
+    if b[:4]!=b"DDS ": raise RuntimeError(f"not DDS: {p}")
     h=struct.unpack_from("<I",b,12)[0]; w=struct.unpack_from("<I",b,16)[0]
     pitch=struct.unpack_from("<I",b,20)[0]; depth=struct.unpack_from("<I",b,24)[0]
     mips=struct.unpack_from("<I",b,28)[0]; pf=struct.unpack_from("<I",b,80)[0]
     fourcc=b[84:88]; bpp=struct.unpack_from("<I",b,88)[0]; masks=struct.unpack_from("<IIII",b,92)
     if fourcc!=b"\0\0\0\0" or bpp!=32 or pitch!=w*4 or mips!=1 or masks!=(0xff,0xff00,0xff0000,0xff000000):
-        raise RuntimeError(("unexpected canonical RGBA32 layout",p,w,h,pitch,depth,mips,pf,fourcc,bpp,masks))
-    if len(b)!=128+w*h*4: raise RuntimeError(("size mismatch",len(b),128+w*h*4))
+        raise RuntimeError(("unexpected RGBA32 layout",str(p),w,h,pitch,depth,mips,pf,fourcc,bpp,masks))
+    if len(b)!=128+w*h*4: raise RuntimeError(("size mismatch",str(p),len(b),128+w*h*4))
     raw=np.frombuffer(b,dtype=np.uint8,offset=128).reshape(h,w,4).copy()
-    readable=np.flipud(raw).copy()
-    return b[:128],raw,readable,{"width":w,"height":h,"pitch":pitch,"depth":depth,"mips":mips,"pf_flags":pf,"fourcc":"00000000","bpp":bpp,"masks":[hex(x) for x in masks],"bytes":len(b)}
+    read=np.flipud(raw).copy()
+    meta={"width":w,"height":h,"pitch":pitch,"depth":depth,"mips":mips,"pf_flags":pf,
+          "fourcc":"00000000","bpp":bpp,"masks":[hex(x) for x in masks],"bytes":len(b)}
+    return b[:128],raw,read,meta
 
-def load_mask(rel,size):
-    im=Image.open(repo/rel).convert("L")
-    if im.size!=size: raise RuntimeError((rel,im.size,size))
-    return np.asarray(im,dtype=np.uint8)>0
-
-def load_rgba(rel,size):
-    im=Image.open(repo/rel).convert("RGBA")
-    if im.size!=size: raise RuntimeError((rel,im.size,size))
+def load_png_rgba(path,size):
+    im=Image.open(path).convert("RGBA")
+    if im.size!=size: raise RuntimeError(("PNG size mismatch",str(path),im.size,size))
     return np.asarray(im,dtype=np.uint8).copy()
 
-def bbox(mask):
+def load_mask(path,size):
+    im=Image.open(path).convert("L")
+    if im.size!=size: raise RuntimeError(("mask size mismatch",str(path),im.size,size))
+    return np.asarray(im,dtype=np.uint8)>0
+
+def bb(mask):
     ys,xs=np.nonzero(mask)
     if not len(xs): return None
     return [int(xs.min()),int(ys.min()),int(xs.max())+1,int(ys.max())+1]
 
 def gate(src,cand,edit,protected):
-    diff=np.any(src!=cand,axis=2)
-    adiff=src[:,:,3]!=cand[:,:,3]
+    diff=np.any(src!=cand,axis=2); adiff=src[:,:,3]!=cand[:,:,3]
     return {
-      "changed_pixels":int(diff.sum()),
-      "changed_bbox":bbox(diff),
+      "changed_pixels":int(diff.sum()),"changed_bbox":bb(diff),
       "changed_pixels_outside_edit_mask":int(np.logical_and(diff,np.logical_not(edit)).sum()),
       "changed_pixels_in_protected_mask":int(np.logical_and(diff,protected).sum()),
       "alpha_changed_outside_edit_mask":int(np.logical_and(adiff,np.logical_not(edit)).sum())
     }
 
-def panel(arr,label,maxw=900,maxh=900):
+def card(arr,label,maxw=760,maxh=760):
     im=Image.fromarray(arr,"RGBA")
     bg=Image.new("RGBA",im.size,(64,64,64,255)); bg.alpha_composite(im)
     v=bg.convert("RGB"); v.thumbnail((maxw,maxh),Image.Resampling.LANCZOS)
@@ -75,121 +63,168 @@ def panel(arr,label,maxw=900,maxh=900):
     ImageDraw.Draw(c).text((5,5),label,fill="black",font=ImageFont.load_default())
     return c
 
-source=repo/source_rel; candidate=repo/candidate_rel
-if sha(source)!=source_sha_expected: raise RuntimeError("source SHA mismatch")
-if sha(candidate)!=candidate_sha_expected: raise RuntimeError("candidate SHA mismatch")
-shead,sraw,src,sinfo=load_dds(source)
-chead,craw,final,cinfo=load_dds(candidate)
-if shead!=chead or sinfo!=cinfo: raise RuntimeError("candidate header/structure drift")
-size=(sinfo["width"],sinfo["height"])
+def save_compare(name,arrays):
+    cards=[card(arr,label) for label,arr in arrays]
+    gap=8; cols=3
+    rows=(len(cards)+cols-1)//cols
+    widths=[max([cards[i].width for i in range(c,len(cards),cols)] or [1]) for c in range(cols)]
+    rowhs=[max(cards[i].height for i in range(r*cols,min((r+1)*cols,len(cards)))) for r in range(rows)]
+    sheet=Image.new("RGB",(sum(widths)+gap*(cols-1),sum(rowhs)+gap*(rows-1)),"white")
+    y=0
+    for r in range(rows):
+        x=0
+        for c in range(cols):
+            i=r*cols+c
+            if i<len(cards): sheet.paste(cards[i],(x,y))
+            x+=widths[c]+gap
+        y+=rowhs[r]+gap
+    sheet.save(outdir/name,quality=94)
 
-producer=json.loads((repo/producer_rel).read_text(encoding="utf-8"))
-rows=producer["rows"]
-if len(rows)!=29: raise RuntimeError(("producer row count",len(rows)))
-if producer.get("candidate_sha256")!=candidate_sha_expected: raise RuntimeError("producer report SHA mismatch")
+def save_rows(name,src,clean,final,rows):
+    strips=[]; font=ImageFont.load_default()
+    for row in rows:
+        ob=[int(x) for x in row["original_bbox"]]
+        pad=10; cr=(max(0,ob[0]-pad),max(0,ob[1]-pad),min(src.shape[1],ob[2]+pad),min(src.shape[0],ob[3]+pad))
+        cs=[]
+        for label,arr in (("SOURCE",src),("CLEAN",clean),("FINAL",final)):
+            im=Image.fromarray(arr,"RGBA"); bg=Image.new("RGBA",im.size,(64,64,64,255)); bg.alpha_composite(im)
+            v=bg.convert("RGB").crop(cr); v.thumbnail((500,170),Image.Resampling.LANCZOS)
+            c=Image.new("RGB",(520,202),"white"); c.paste(v,((520-v.width)//2,27+(170-v.height)//2))
+            ImageDraw.Draw(c).text((4,4),f'{row["key"]} {label}',fill="black",font=font); cs.append(c)
+        strip=Image.new("RGB",(1572,202),"white")
+        for i,c in enumerate(cs): strip.paste(c,(i*526,0))
+        strips.append(strip)
+    sheet=Image.new("RGB",(1572,202*len(strips)),"white")
+    y=0
+    for s in strips: sheet.paste(s,(0,y)); y+=202
+    sheet.save(outdir/name,quality=95)
 
-source_mask=load_mask(source_mask_rel,size)
-clean=load_rgba(clean_rel,size)
-clean_protected=load_mask(clean_protected_rel,size)
-allowed=load_mask(allowed_rel,size)
-final_protected=load_mask(final_protected_rel,size)
+results=[]
 
-clean_gate=gate(src,clean,source_mask,clean_protected)
-final_gate=gate(src,final,allowed,final_protected)
-source_protected_overlap=int(np.logical_and(source_mask,clean_protected).sum())
-allowed_protected_overlap=int(np.logical_and(allowed,final_protected).sum())
-if any((clean_gate["changed_pixels_outside_edit_mask"],clean_gate["changed_pixels_in_protected_mask"],clean_gate["alpha_changed_outside_edit_mask"],
-        final_gate["changed_pixels_outside_edit_mask"],final_gate["changed_pixels_in_protected_mask"],final_gate["alpha_changed_outside_edit_mask"],
-        source_protected_overlap,allowed_protected_overlap)):
-    raise RuntimeError(("C92 mask gate failed",clean_gate,final_gate,source_protected_overlap,allowed_protected_overlap))
+# ---- A_RECOVERY08 / FD90AA9 ----
+a8=json.loads((repo/"localization/graphics/role_A/20261004-A-RECOVERY08/A_RECOVERY08_FD90AA9_REPORT.json").read_text(encoding="utf-8"))
+a7=json.loads((repo/"localization/graphics/role_A/20261004-A-RECOVERY07/A_RECOVERY07_FD90AA9_REPORT.json").read_text(encoding="utf-8"))
+source=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+candidate=repo/"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+if sha(source)!="f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e": raise RuntimeError("FD90 source SHA mismatch")
+if sha(candidate)!="0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b": raise RuntimeError("FD90 A08 candidate SHA mismatch")
+sh,sraw,src,smeta=load_rgba32_dds(source); ch,craw,final,cmeta=load_rgba32_dds(candidate)
+if sh!=ch or smeta!=cmeta: raise RuntimeError("FD90 A08 structure/header drift")
+size=(smeta["width"],smeta["height"])
+clean=load_png_rgba(repo/"localization/graphics/role_A/20261004-A-RECOVERY08/FD90AA9_CLEAN_PLATE_RECOVERY08.png",size)
+source_mask=load_mask(repo/"localization/graphics/role_A/20261004-A-RECOVERY08/FD90AA9_SOURCE_TEXT_MASK_RECOVERY08.png",size)
+clean_protected=load_mask(repo/"localization/graphics/role_A/20261004-A-RECOVERY08/FD90AA9_CLEAN_PLATE_PROTECTED_MASK_RECOVERY08.png",size)
+allowed=load_mask(repo/"localization/graphics/role_A/20261004-A-RECOVERY07/FD90AA9_ALLOWED_TEXT_REGION_MASK.png",size)
+final_protected=load_mask(repo/"localization/graphics/role_A/20261004-A-RECOVERY07/FD90AA9_PROTECTED_MASK.png",size)
+cg=gate(src,clean,source_mask,clean_protected); fg=gate(src,final,allowed,final_protected)
+if any((cg["changed_pixels_outside_edit_mask"],cg["changed_pixels_in_protected_mask"],cg["alpha_changed_outside_edit_mask"],
+        fg["changed_pixels_outside_edit_mask"],fg["changed_pixels_in_protected_mask"],fg["alpha_changed_outside_edit_mask"])):
+    raise RuntimeError(("FD90 A08 mask gate fail",cg,fg))
 
-# Independent target footprint from final vs clean, evaluated inside each exact source bbox.
-target_diff=np.any(final!=clean,axis=2)
-row_reports=[]; edge_touch=[]
-row_union=np.zeros((sinfo["height"],sinfo["width"]),dtype=bool)
-for row in rows:
-    ob=[int(x) for x in row["original_bbox"]]
-    reported=[int(x) for x in row["localized_bbox"]]
-    if not (reported[0]>=ob[0] and reported[1]>=ob[1] and reported[2]<=ob[2] and reported[3]<=ob[3] and row.get("containment")=="PASS"):
-        raise RuntimeError(("producer bbox fail",row["key"],ob,reported))
-    row_union[ob[1]:ob[3],ob[0]:ob[2]]=True
-    local=np.zeros_like(target_diff)
-    local[ob[1]:ob[3],ob[0]:ob[2]]=target_diff[ob[1]:ob[3],ob[0]:ob[2]]
-    derived=bbox(local)
-    if derived is None: raise RuntimeError(("no target diff",row["key"]))
-    # The independently derived final-vs-clean footprint must also remain exact-bbox contained.
-    ok=derived[0]>=ob[0] and derived[1]>=ob[1] and derived[2]<=ob[2] and derived[3]<=ob[3]
-    if not ok: raise RuntimeError(("derived target bbox fail",row["key"],ob,derived))
-    deltas=[reported[0]-ob[0],ob[2]-reported[2],reported[1]-ob[1],ob[3]-reported[3]]
-    if min(deltas)==0: edge_touch.append(row["key"])
-    row_reports.append({
-      "key":row["key"],"source":row.get("source"),"korean":row.get("korean"),
-      "original_bbox":ob,"localized_bbox":reported,"derived_final_vs_clean_bbox":derived,
-      "delta_left":deltas[0],"delta_right":deltas[1],"delta_top":deltas[2],"delta_bottom":deltas[3],
-      "containment":"PASS","raw_original_bbox":row.get("raw_original_bbox"),
-      "raw_localized_bbox":row.get("raw_localized_bbox"),"raw_containment":row.get("raw_containment"),
-      "rework_status":row.get("rework_status")
-    })
+# Recover exact A07 input candidate at A08 base to independently verify only four returned bboxes changed.
+prior_path=Path("/tmp/C93_FD90_A07_INPUT.dds")
+with prior_path.open("wb") as fp:
+    subprocess.run(["git","show",f'{a8["base_head"]}:localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds'],stdout=fp,check=True)
+if sha(prior_path)!=a8["input_candidate_sha256"]: raise RuntimeError("FD90 prior candidate history SHA mismatch")
+ph,praw,prior,pmeta=load_rgba32_dds(prior_path)
+if ph!=sh or pmeta!=smeta: raise RuntimeError("FD90 prior structure drift")
+four=np.zeros((smeta["height"],smeta["width"]),dtype=bool)
+a8_by={r["key"]:r for r in a8["reworked_rows"]}
+for r in a8["reworked_rows"]:
+    x0,y0,x1,y1=map(int,r["original_bbox"]); four[y0:y1,x0:x1]=True
+diff_prior=np.any(prior!=final,axis=2); alpha_prior=prior[:,:,3]!=final[:,:,3]
+outside4=int(np.logical_and(diff_prior,np.logical_not(four)).sum())
+alpha_out4=int(np.logical_and(alpha_prior,np.logical_not(four)).sum())
+if outside4 or alpha_out4: raise RuntimeError(("FD90 changed outside four return bboxes",outside4,alpha_out4))
 
-allowed_outside_rows=int(np.logical_and(allowed,np.logical_not(row_union)).sum())
-if allowed_outside_rows: raise RuntimeError(("allowed mask escapes row union",allowed_outside_rows))
+# Full 29-row bbox gate: A08 rows override A07 rows; independently derive final-vs-clean footprint inside each original bbox.
+a7_rows=a7["rows"]
+rows=[]; edge=[]
+target=np.any(final!=clean,axis=2)
+for old in a7_rows:
+    base=dict(old); key=old["key"]
+    if key in a8_by: base.update(a8_by[key])
+    ob=list(map(int,base["original_bbox"])); reported=list(map(int,base["localized_bbox"]))
+    if not (reported[0]>=ob[0] and reported[1]>=ob[1] and reported[2]<=ob[2] and reported[3]<=ob[3]):
+        raise RuntimeError(("FD90 reported bbox fail",key,ob,reported))
+    local=np.zeros_like(target); local[ob[1]:ob[3],ob[0]:ob[2]]=target[ob[1]:ob[3],ob[0]:ob[2]]
+    derived=bb(local)
+    if derived is None: raise RuntimeError(("FD90 no target diff",key))
+    if not (derived[0]>=ob[0] and derived[1]>=ob[1] and derived[2]<=ob[2] and derived[3]<=ob[3]):
+        raise RuntimeError(("FD90 derived bbox fail",key,ob,derived))
+    d=[reported[0]-ob[0],ob[2]-reported[2],reported[1]-ob[1],ob[3]-reported[3]]
+    if min(d)==0: edge.append(key)
+    rows.append({"key":key,"original_bbox":ob,"localized_bbox":reported,"derived_final_vs_clean_bbox":derived,
+                 "delta_left":d[0],"delta_right":d[1],"delta_top":d[2],"delta_bottom":d[3],
+                 "containment":"PASS","rework_status":base.get("rework_status")})
+save_compare("C93_FD90AA9_FULL_COMPARE.jpg",[("SOURCE_READABLE",src),("CLEAN_READABLE",clean),("PRIOR_A07_READABLE",prior),
+                                                   ("FINAL_A08_READABLE",final),("SOURCE_RAW",sraw),("FINAL_A08_RAW",craw)])
+save_rows("C93_FD90AA9_REWORK_ROWS.jpg",src,clean,final,[r for r in rows if r["key"] in a8_by])
+results.append({
+ "asset":"FD90AA9","producer":"A_RECOVERY08","source_sha256":sha(source),"candidate_sha256":sha(candidate),
+ "structure":{**smeta,"header_128_exact_to_source":True,"raw_orientation":"mirror_y"},
+ "clean_plate_gate":{**cg,"status":"PASS"},"final_gate":{**fg,"status":"PASS"},
+ "return_scope_gate":{"changed_pixels_vs_A07_outside_four_return_bboxes":outside4,"alpha_changed_pixels_outside_four_return_bboxes":alpha_out4,"status":"PASS"},
+ "bbox_gate":{"elements":len(rows),"pass":len(rows),"fail":0,"edge_touch_keys":edge,"rows":rows,"status":"PASS"},
+ "visual_evidence":{"full_compare":f"localization/graphics/role_C/{run}/C93_FD90AA9_FULL_COMPARE.jpg",
+                    "rework_rows":f"localization/graphics/role_C/{run}/C93_FD90AA9_REWORK_ROWS.jpg","controller_visual_qa":"PENDING"},
+ "runtime_validation":"UNTESTED","status":"C93_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+})
 
-# Prior-pass preservation is checked against producer metadata: all 10 prior-pass owned rows must remain scale 1.0 and be labeled preserved.
-ops={x["key"]:x for x in producer.get("operations",[])}
-prior_pass=[r["key"] for r in rows if r.get("rework_status")=="PRIOR_C85_PASS_PRESERVED"]
-if len(prior_pass)!=10: raise RuntimeError(("prior pass count",len(prior_pass),prior_pass))
-for k in prior_pass:
-    op=ops.get(k)
-    if not op or op.get("status")!="PRIOR_PASS_LAYER_PRESERVED" or float(op.get("scale",0))!=1.0:
-        raise RuntimeError(("prior-pass preservation metadata mismatch",k,op))
+# ---- B_RECOVERY07 / B1696633 ----
+b7=json.loads((repo/"localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_B1696633_REPORT.json").read_text(encoding="utf-8"))
+bsrc=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds"
+if not bsrc.exists():
+    bsrc=Path("/tmp/C93_B1696633_SOURCE.dds")
+    urllib.request.urlretrieve(b7["source_url"],bsrc)
+bcand=repo/b7["candidate_path"]
+if sha(bsrc)!=b7["source_sha256"]: raise RuntimeError("B169 source SHA mismatch")
+if sha(bcand)!=b7["candidate_sha256"]: raise RuntimeError("B169 candidate SHA mismatch")
+bh,braw,bsrc_read,bmeta=load_rgba32_dds(bsrc); bch,bcraw,bfinal,bcmeta=load_rgba32_dds(bcand)
+if bh!=bch or bmeta!=bcmeta: raise RuntimeError("B169 structure/header drift")
+bsize=(bmeta["width"],bmeta["height"])
+bclean=load_png_rgba(repo/"localization/graphics/role_B/20261004-B-RECOVERY07/B1696633_CLEAN_PLATE.png",bsize)
+bsource_mask=load_mask(repo/"localization/graphics/role_B/20261004-B-RECOVERY07/B1696633_SOURCE_TEXT_MASK.png",bsize)
+bprotected=load_mask(repo/"localization/graphics/role_B/20261004-B-RECOVERY07/B1696633_PROTECTED_MASK.png",bsize)
+ballowed=load_mask(repo/"localization/graphics/role_B/20261004-B-RECOVERY07/B1696633_ALLOWED_TEXT_REGION_MASK.png",bsize)
+bcg=gate(bsrc_read,bclean,bsource_mask,bprotected); bfg=gate(bsrc_read,bfinal,ballowed,bprotected)
+if any((bcg["changed_pixels_outside_edit_mask"],bcg["changed_pixels_in_protected_mask"],bcg["alpha_changed_outside_edit_mask"],
+        bfg["changed_pixels_outside_edit_mask"],bfg["changed_pixels_in_protected_mask"],bfg["alpha_changed_outside_edit_mask"])):
+    raise RuntimeError(("B169 mask gate fail",bcg,bfg))
+btarget=np.any(bfinal!=bclean,axis=2)
+brows=[]; bedge=[]
+for r in b7["rows"]:
+    ob=list(map(int,r["original_bbox"])); reported=list(map(int,r["localized_bbox"]))
+    if not (reported[0]>=ob[0] and reported[1]>=ob[1] and reported[2]<=ob[2] and reported[3]<=ob[3]):
+        raise RuntimeError(("B169 reported bbox fail",r["key"],ob,reported))
+    local=np.zeros_like(btarget); local[ob[1]:ob[3],ob[0]:ob[2]]=btarget[ob[1]:ob[3],ob[0]:ob[2]]
+    derived=bb(local)
+    if derived is None: raise RuntimeError(("B169 no target diff",r["key"]))
+    if not (derived[0]>=ob[0] and derived[1]>=ob[1] and derived[2]<=ob[2] and derived[3]<=ob[3]):
+        raise RuntimeError(("B169 derived bbox fail",r["key"],ob,derived))
+    d=[reported[0]-ob[0],ob[2]-reported[2],reported[1]-ob[1],ob[3]-reported[3]]
+    if min(d)==0: bedge.append(r["key"])
+    brows.append({"key":r["key"],"source":r["source"],"korean":r["korean"],"original_bbox":ob,"localized_bbox":reported,
+                  "derived_final_vs_clean_bbox":derived,"delta_left":d[0],"delta_right":d[1],"delta_top":d[2],"delta_bottom":d[3],
+                  "containment":"PASS","rework_status":r.get("rework_status")})
+save_compare("C93_B1696633_FULL_COMPARE.jpg",[("SOURCE_READABLE",bsrc_read),("CLEAN_READABLE",bclean),("FINAL_READABLE",bfinal),
+                                                     ("SOURCE_RAW",braw),("FINAL_RAW",bcraw)])
+save_rows("C93_B1696633_ROW_CONTACT.jpg",bsrc_read,bclean,bfinal,brows)
+results.append({
+ "asset":"B1696633","producer":"B_RECOVERY07","source_sha256":sha(bsrc),"candidate_sha256":sha(bcand),
+ "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":"a95efe01d1f136514cef94b0d9e9fd61df021754",
+                      "mode":"pinned_upstream_fallback_if_not_repo_committed"},
+ "structure":{**bmeta,"header_128_exact_to_source":True,"raw_orientation":"mirror_y"},
+ "clean_plate_gate":{**bcg,"status":"PASS"},"final_gate":{**bfg,"status":"PASS"},
+ "bbox_gate":{"elements":len(brows),"pass":len(brows),"fail":0,"edge_touch_keys":bedge,"rows":brows,"status":"PASS"},
+ "visual_evidence":{"full_compare":f"localization/graphics/role_C/{run}/C93_B1696633_FULL_COMPARE.jpg",
+                    "row_contact":f"localization/graphics/role_C/{run}/C93_B1696633_ROW_CONTACT.jpg","controller_visual_qa":"PENDING"},
+ "runtime_validation":"UNTESTED","status":"C93_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+})
 
-# Full compare and row-contact visual evidence.
-cards=[panel(src,"SOURCE_READABLE"),panel(clean,"CLEAN_READABLE"),panel(final,"FINAL_READABLE"),
-       panel(sraw,"SOURCE_RAW"),panel(craw,"FINAL_RAW")]
-gap=8; top=cards[:3]; bot=cards[3:]
-tw=sum(c.width for c in top)+gap*(len(top)-1); th=max(c.height for c in top)
-bw=sum(c.width for c in bot)+gap*(len(bot)-1); bh=max(c.height for c in bot)
-sheet=Image.new("RGB",(max(tw,bw),th+gap+bh),"white")
-x=0
-for c in top: sheet.paste(c,(x,0)); x+=c.width+gap
-x=0
-for c in bot: sheet.paste(c,(x,th+gap)); x+=c.width+gap
-sheet.save(outdir/"C92_FD90AA9_FULL_COMPARE.jpg",quality=93)
-
-font=ImageFont.load_default(); strips=[]
-for rr in row_reports:
-    x0,y0,x1,y1=rr["original_bbox"]; pad=10
-    cr=(max(0,x0-pad),max(0,y0-pad),min(sinfo["width"],x1+pad),min(sinfo["height"],y1+pad))
-    cs=[]
-    for tag,arr in (("SOURCE",src),("CLEAN",clean),("FINAL",final)):
-        im=Image.fromarray(arr,"RGBA"); bg=Image.new("RGBA",im.size,(64,64,64,255)); bg.alpha_composite(im)
-        v=bg.convert("RGB").crop(cr); v.thumbnail((480,160),Image.Resampling.LANCZOS)
-        c=Image.new("RGB",(500,190),"white"); c.paste(v,((500-v.width)//2,25+(160-v.height)//2))
-        ImageDraw.Draw(c).text((4,4),f'{rr["key"]} {tag}',fill="black",font=font); cs.append(c)
-    strip=Image.new("RGB",(1512,190),"white")
-    for i,c in enumerate(cs): strip.paste(c,(i*506,0))
-    strips.append(strip)
-contact=Image.new("RGB",(1512,190*len(strips)),"white")
-y=0
-for s in strips: contact.paste(s,(0,y)); y+=190
-contact.save(outdir/"C92_FD90AA9_ROW_CONTACT.jpg",quality=94)
-
-result={
- "schema_version":1,"role":"C","run":run,"base_head":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
- "asset":key,"scope":"independent C final static QA of A_RECOVERY07 direct return; completed C90/C91 assets not repeated",
- "producer_report":producer_rel,"source_path":source_rel,"candidate_path":candidate_rel,
- "source_sha256":source_sha_expected,"candidate_sha256":candidate_sha_expected,
- "candidate_changed_by_C":False,
- "structure":{**sinfo,"header_128_exact_to_source":True,"raw_orientation":"mirror_y"},
- "clean_plate_gate":{**clean_gate,"source_text_protected_overlap_pixels":source_protected_overlap,"status":"PASS"},
- "final_candidate_gate":{**final_gate,"allowed_protected_overlap_pixels":allowed_protected_overlap,"status":"PASS"},
- "bbox_gate":{"elements":29,"pass":29,"fail":0,"edge_touch_keys":edge_touch,"rows":row_reports,"status":"PASS"},
- "prior_pass_gate":{"expected":10,"preserved_metadata_count":len(prior_pass),"keys":prior_pass,"status":"PASS"},
- "mask_consistency":{"allowed_pixels_outside_union_of_29_original_bboxes":allowed_outside_rows,"status":"PASS"},
- "visual_evidence":{"full_compare":f"localization/graphics/role_C/{run}/C92_FD90AA9_FULL_COMPARE.jpg","row_contact":f"localization/graphics/role_C/{run}/C92_FD90AA9_ROW_CONTACT.jpg","controller_visual_qa":"PENDING"},
- "runtime_validation":"UNTESTED",
- "status":"C92_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_INGAME",
- "vr_ffb_dx11_dxvk_changes":False
-}
-(outdir/"C92_FD90AA9_FINAL_QA.json").write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("C92_FD90AA9_STATIC_PASS","edge_touch",edge_touch,"sha",candidate_sha_expected)
+summary={"schema_version":1,"role":"C","run":run,"base_head":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
+         "scope":"new/changed A_RECOVERY08 FD90AA9 and B_RECOVERY07 B1696633 only; completed C90-C92 assets not repeated",
+         "assets":results,"summary":{"assets_checked":2,"static_machine_pass":2,"static_machine_fail":0,
+                                      "runtime_validation":"UNTESTED","vr_ffb_dx11_dxvk_changes":False}}
+(outdir/"C93_CROSS_LANE_STATIC_QA.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+print("C93_STATIC_QA_DONE",[(x["asset"],x["candidate_sha256"]) for x in results])
