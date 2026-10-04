@@ -10102,4 +10102,3 @@ bool NativeBackend::create_color_target(
 
 } // namespace outrun::vr::dx11
 
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
