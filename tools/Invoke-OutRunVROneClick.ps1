@@ -85,9 +85,10 @@ if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
 $oldDx11Census = $env:OUTRUN_VR_DX11_CENSUS
 $oldDx11CensusExhaustive = $env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE
 if ($target -and [string]$target.RendererTarget -eq 'dx11-native') {
-    # HMD diagnostic candidate: observe every source draw while native routing stays disabled.
+    # Smoothness candidate: keep low-cost census evidence but remove exhaustive
+    # per-draw instrumentation from the performance path.
     $env:OUTRUN_VR_DX11_CENSUS = '1'
-    $env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE = '1'
+    $env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE = $null
 } else {
     $env:OUTRUN_VR_DX11_CENSUS = $null
     $env:OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE = $null
