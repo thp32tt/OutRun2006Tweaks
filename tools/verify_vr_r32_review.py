@@ -254,15 +254,22 @@ if min(query_error, fault_generation, fast_gate) < 0:
 if not (query_error < fault_generation < fast_gate):
     raise SystemExit("R32 host ACK fault must be recorded before the fast-submit generation gate")
 
-r34 = require(
-    "src/vr/d3d9/stereo_renderer_r34.cpp",
+r33_guard = require(
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
     "SetExternalSafetyBlock(true)",
     "SetExternalSafetyBlock(!healthy)",
-    "Install/state-sync",
+    "R33SynchronizeResetReplayGuardState(",
     "Present/pre",
+    "R33PresentR32Hook.stdcall<HRESULT>",
 )
-if r34.find("Present/pre") > r34.find("R34PresentR33Hook.stdcall<HRESULT>"):
-    raise SystemExit("R34 must reassert Reset replay fail-close before lower Present work")
+if r33_guard.find("Present/pre") > r33_guard.find("R33PresentR32Hook.stdcall<HRESULT>"):
+    raise SystemExit("R33 must reassert Reset replay fail-close before lower Present work")
+require(
+    "src/vr/d3d9/stereo_renderer_r34.cpp",
+    "R33SynchronizeResetReplayGuardState(installedDevice)",
+    "R33InstallStatus()",
+    "no R34 D3D9 detours installed",
+)
 
 r31 = load("src/vr/d3d9/stereo_renderer_r31.cpp")
 state_enable = r31.find("const bool stateHooks =")

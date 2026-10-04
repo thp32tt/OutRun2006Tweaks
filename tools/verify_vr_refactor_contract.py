@@ -522,25 +522,24 @@ for marker in (
 if "TryGetEffectTelemetrySnapshot(effect)" not in r32:
     errors.append("R32 workload telemetry missing R29 owner snapshot API")
 
-if "R22ShadowState =" in r34:
-    errors.append("R34 retained direct R22 raster-shadow mutation")
+if "R22ShadowState =" in r33:
+    errors.append("R33 final dispatcher retained direct R22 raster-shadow mutation")
 
 for banned in ("R22ReplayScope", "R22FailClosedReplayState"):
-    if banned in r34:
+    if banned in r33:
         errors.append(
-            f"R34 retained private R22 raster-replay dependency: {banned}")
+            f"R33 final dispatcher retained private R22 raster-replay dependency: {banned}")
 if "class R22RasterReplayGuard" not in r22:
     errors.append("R22 missing public raster-replay owner guard")
-if "R22RasterReplayGuard replay(" not in r34:
-    errors.append("R34 missing R22 raster-replay owner guard")
+if "R22RasterReplayGuard replay(" not in r33:
+    errors.append("R33 final dispatcher missing R22 raster-replay owner guard")
 
-for rel, source in (("R33", r33), ("R34", r34)):
-    if "R29ArmMonoSafety(" in source:
-        errors.append(
-            f"{rel} retained private R29 mono-safety helper dependency")
-    if "ArmStereoRecoverySafety(" not in source:
-        errors.append(
-            f"{rel} missing R29 owner stereo-recovery safety API")
+if "R29ArmMonoSafety(" in r33:
+    errors.append("R33 retained private R29 mono-safety helper dependency")
+if "ArmStereoRecoverySafety(" not in r33:
+    errors.append("R33 missing R29 owner stereo-recovery safety API")
+if "R29ArmMonoSafety(" in r34:
+    errors.append("R34 thin readiness layer retained private R29 helper dependency")
 
 for banned in ("R29ArmMonoSafety(", "R29MonoSafetyThroughEpoch"):
     if banned in r32:
@@ -658,21 +657,21 @@ if "R33InstallStatus()" not in r34:
     errors.append("R34 missing R33 install-state owner query")
 
 for banned in ("R22FailClosedEligibility();", "R22ResetBaselineTracking();"):
-    if banned in r34:
-        errors.append(f"R34 retained direct R22 reset fail-close primitive: {banned}")
-if "FailClosedResetBaselineState();" not in r34:
-    errors.append("R34 missing consolidated R22 reset fail-close owner API")
+    if banned in r33:
+        errors.append(f"R33 retained direct R22 reset fail-close primitive: {banned}")
+if "FailClosedResetBaselineState();" not in r33:
+    errors.append("R33 missing consolidated R22 reset fail-close owner API")
 
 for banned in (
-    "R33InvalidateDepthStencilCache();",
+    "R33DepthStencilState.valid = false;",
     "RightDepthSynchronized = false;",
     "RightStencilSynchronized = false;",
 ):
     if banned in r34:
         errors.append(
-            f"R34 retained direct R33 depth/stencil fail-close state: {banned}")
-if "FailClosedDepthStencilState();" not in r34:
-    errors.append("R34 missing consolidated R33 depth/stencil owner API")
+            f"R34 thin readiness layer retained R33 depth/stencil implementation state: {banned}")
+if "FailClosedDepthStencilState();" not in r33:
+    errors.append("R33 final dispatcher missing consolidated depth/stencil owner API")
 
 fail_closed_depth = re.search(
     r"inline void FailClosedDepthStencilState\(\) noexcept\s*\{(?P<body>.*?)\n    \}",
@@ -710,13 +709,12 @@ else:
         errors.append(
             "R22 reset fail-close owner API must preserve eligibility/baseline/raster order")
 
-for rel, source in (("R33", r33), ("R34", r34)):
-    if "R31FlushPendingStateBlockResync" in source:
-        errors.append(
-            f"{rel} regained R31 StateBlock resync execution dependency")
-    if "StateBlockRecovery::FlushPendingResync(device)" not in source:
-        errors.append(
-            f"{rel} missing neutral StateBlock recovery boundary")
+if "R31FlushPendingStateBlockResync" in r33:
+    errors.append("R33 regained R31 StateBlock resync execution dependency")
+if "StateBlockRecovery::FlushPendingResync(device)" not in r33:
+    errors.append("R33 missing neutral StateBlock recovery boundary")
+if "R31FlushPendingStateBlockResync" in r34 or         "StateBlockRecovery::FlushPendingResync(device)" in r34:
+    errors.append("R34 thin readiness layer must not execute draw-time StateBlock recovery")
 
 if "StateBlockRecovery::Configure(" not in r31:
     errors.append("R31 missing neutral StateBlock recovery callback registration")

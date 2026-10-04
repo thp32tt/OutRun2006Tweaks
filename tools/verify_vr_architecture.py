@@ -269,7 +269,7 @@ require(
     "src/vr/d3d9/stereo_renderer_r23.cpp",
     "#include \"stereo_renderer_r22.cpp\"",
     "R23InstallState",
-    "IsFailed(R22InstallState)",
+    "R22InstallStatus() == State::Failed",
     "R23RecoveryNeedsBaseline",
     "R23CaptureActualGameState",
     "R23GameDrawSerial",
