@@ -912,6 +912,17 @@ namespace OutRunVRStereo
         R22ReplayScope replay_;
     };
 
+    inline bool PrimeTrackedRasterShadow(IDirect3DDevice9* device) noexcept
+    {
+        return R22PrimeShadowState(device);
+    }
+
+    inline void FailClosedTrackedRasterReplay(IDirect3DDevice9* device,
+        const char* site) noexcept
+    {
+        R22FailClosedReplayState(device, site);
+    }
+
     inline bool CaptureTrackedRasterState(IDirect3DDevice9* device,
         OutRunVR::State::D3D9RasterSnapshot& out) noexcept
     {
