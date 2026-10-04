@@ -208,6 +208,7 @@ async def replace_with_fresh_slot_page(context: BrowserContext, pages: dict[str,
     page = await context.new_page()
     pages[slot.name] = page
     slot.url = None
+    slot.runs = 0
     slot.last_assistant_hash = None
     slot.last_assistant_change_at = None
     slot.last_watchdog_at = None
@@ -467,8 +468,39 @@ async def run_cycle(context: BrowserContext, pages: dict[str, Page], scheduled_m
             slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
         )
     else:
-        page = await slot_page(context, pages, slot)
-        is_new = not slot.url
+        previous_page = pages.get(slot.name)
+        if CHAT_RECYCLE_RUNS > 0 and slot.runs >= CHAT_RECYCLE_RUNS:
+            if previous_page is not None and not previous_page.is_closed():
+                try:
+                    if await detect_busy(previous_page):
+                        slot.last_result = "chat_recycle_deferred_busy"
+                        save_registry(reg)
+                        write_runtime(
+                            status="chat_recycle_deferred_busy",
+                            last_action=f"Slot {slot.name} reached {CHAT_RECYCLE_RUNS} runs but is still generating; recycle deferred",
+                            active_slot=slot.name,
+                            active_url=slot.url or previous_page.url,
+                        )
+                        return
+                except Exception:
+                    log.exception("failed to check slot before bounded chat recycle slot=%s", slot.name)
+                    slot.last_result = "chat_recycle_busy_check_failed"
+                    save_registry(reg)
+                    return
+            page = await replace_with_fresh_slot_page(context, pages, slot)
+            is_new = True
+            save_registry(reg)
+            write_runtime(
+                status="chat_recycled",
+                last_action=f"Opened a fresh ChatGPT chat for slot {slot.name} after {CHAT_RECYCLE_RUNS} successful sends",
+                active_slot=slot.name,
+                tab_mode="recycle_after_runs",
+                tab_count=len([p for p in pages.values() if not p.is_closed()]),
+                slot_tabs={name: p.url for name, p in pages.items() if not p.is_closed()},
+            )
+        else:
+            page = await slot_page(context, pages, slot)
+            is_new = not slot.url
 
     if is_new:
         if not await ensure_logged_in(page):
