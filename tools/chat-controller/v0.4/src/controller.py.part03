@@ -120,7 +120,7 @@ async def dispatch_lane(context, pages, reg: Registry, active: dict) -> bool:
     if result != "sent":
         block_lane(reg, active, "Send outcome uncertain: " + result)
         return False
-    active["state"] = "VERIFYING" if active["lane"] == "C" else "PRODUCING"
+    active["state"] = "VERIFYING" if CONTROLLER_MODE == "localization" and active["lane"] == "C" else "PRODUCING"
     slot.runs += 1
     slot.last_sent_at = now.isoformat()
     note_successful_request(reg, now, slot.name)
