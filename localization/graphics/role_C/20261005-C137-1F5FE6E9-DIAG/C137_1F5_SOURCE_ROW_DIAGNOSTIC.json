@@ -1,0 +1,352 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C137-1F5FE6E9-DIAG",
+  "asset": "1F5FE6E9",
+  "queue_index": 132,
+  "structure": {
+    "width": 1024,
+    "height": 512,
+    "format": "RGBA32",
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "n": 1,
+      "source": "REQUEST",
+      "korean": "요청",
+      "hint_bbox": [
+        649,
+        148,
+        756,
+        171
+      ],
+      "background_rgba": [
+        101.0,
+        97.0,
+        79.0,
+        0.0
+      ],
+      "trials": {
+        "4": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "6": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "8": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "10": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "12": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "16": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "20": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        }
+      }
+    },
+    {
+      "n": 2,
+      "source": "SPECIAL REQUEST 1",
+      "korean": "스페셜 요청 1",
+      "hint_bbox": [
+        649,
+        172,
+        873,
+        195
+      ],
+      "background_rgba": [
+        101.0,
+        97.0,
+        79.0,
+        0.0
+      ],
+      "trials": {
+        "4": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "6": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "8": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "10": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "12": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "16": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "20": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        }
+      }
+    },
+    {
+      "n": 3,
+      "source": "SPECIAL REQUEST 2",
+      "korean": "스페셜 요청 2",
+      "hint_bbox": [
+        649,
+        196,
+        877,
+        219
+      ],
+      "background_rgba": [
+        101.0,
+        97.0,
+        79.0,
+        0.0
+      ],
+      "trials": {
+        "4": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "6": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "8": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "10": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "12": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "16": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        },
+        "20": {
+          "pixels": 0,
+          "bbox": null,
+          "components": []
+        }
+      }
+    },
+    {
+      "n": 4,
+      "source": "SPECIAL REQUEST 3",
+      "korean": "스페셜 요청 3",
+      "hint_bbox": [
+        649,
+        219,
+        877,
+        243
+      ],
+      "background_rgba": [
+        101.0,
+        97.0,
+        79.0,
+        229.0
+      ],
+      "trials": {
+        "4": {
+          "pixels": 2508,
+          "bbox": [
+            649,
+            232,
+            877,
+            243
+          ],
+          "components": [
+            {
+              "area": 2508,
+              "bbox": [
+                649,
+                232,
+                877,
+                243
+              ],
+              "w": 228,
+              "h": 11
+            }
+          ]
+        },
+        "6": {
+          "pixels": 2508,
+          "bbox": [
+            649,
+            232,
+            877,
+            243
+          ],
+          "components": [
+            {
+              "area": 2508,
+              "bbox": [
+                649,
+                232,
+                877,
+                243
+              ],
+              "w": 228,
+              "h": 11
+            }
+          ]
+        },
+        "8": {
+          "pixels": 2508,
+          "bbox": [
+            649,
+            232,
+            877,
+            243
+          ],
+          "components": [
+            {
+              "area": 2508,
+              "bbox": [
+                649,
+                232,
+                877,
+                243
+              ],
+              "w": 228,
+              "h": 11
+            }
+          ]
+        },
+        "10": {
+          "pixels": 2508,
+          "bbox": [
+            649,
+            232,
+            877,
+            243
+          ],
+          "components": [
+            {
+              "area": 2508,
+              "bbox": [
+                649,
+                232,
+                877,
+                243
+              ],
+              "w": 228,
+              "h": 11
+            }
+          ]
+        },
+        "12": {
+          "pixels": 2508,
+          "bbox": [
+            649,
+            232,
+            877,
+            243
+          ],
+          "components": [
+            {
+              "area": 2508,
+              "bbox": [
+                649,
+                232,
+                877,
+                243
+              ],
+              "w": 228,
+              "h": 11
+            }
+          ]
+        },
+        "16": {
+          "pixels": 2508,
+          "bbox": [
+            649,
+            232,
+            877,
+            243
+          ],
+          "components": [
+            {
+              "area": 2508,
+              "bbox": [
+                649,
+                232,
+                877,
+                243
+              ],
+              "w": 228,
+              "h": 11
+            }
+          ]
+        },
+        "20": {
+          "pixels": 2508,
+          "bbox": [
+            649,
+            232,
+            877,
+            243
+          ],
+          "components": [
+            {
+              "area": 2508,
+              "bbox": [
+                649,
+                232,
+                877,
+                243
+              ],
+              "w": 228,
+              "h": 11
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "status": "SOURCE_ROW_COLOR_DIAGNOSTIC",
+  "runtime_validation": "UNTESTED"
+}
