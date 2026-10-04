@@ -1173,6 +1173,24 @@ struct NativeProgrammableShaderPairCacheReadiness {
     std::uint64_t snapshotToken{};
 };
 
+// R241 reserves a device/generation-owned slot for a future programmable
+// translation result. Ownership readiness is intentionally distinct from
+// shader-object readiness: R241 never creates or binds D3D11 shader objects.
+struct NativeProgrammableShaderTranslationSlotReadiness {
+    bool inputValid{};
+    bool cacheReady{};
+    bool deviceMatches{};
+    bool cacheSnapshotMatches{};
+    bool slotReserved{};
+    bool translationObjectsPresent{};
+    bool ownershipReady{};
+    std::uint64_t ownerGeneration{};
+    std::uint64_t slotGeneration{};
+    std::uint64_t cacheKey{};
+    std::uint64_t cacheSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;
@@ -1192,6 +1210,20 @@ public:
         ID3D11Device* expectedDevice,
         const ProgrammableShaderPairCacheIdentity& identity,
         std::uint64_t snapshotToken) const noexcept;
+    bool reserve_translation_slot_for_observation(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken) noexcept;
+    [[nodiscard]] NativeProgrammableShaderTranslationSlotReadiness
+    translation_slot_ownership_readiness(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken) const noexcept;
+    [[nodiscard]] bool validate_translation_slot_snapshot(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken) const noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
@@ -1215,11 +1247,13 @@ private:
         UINT pixelByteSize{};
         DWORD pixelVersionToken{};
         std::uint64_t pixelBytecodeHash{};
+        std::uint64_t translationSlotGeneration{};
     };
 
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
     std::unordered_map<std::uint64_t, Entry> entries_;
     std::uint64_t owner_generation_ = 0;
+    std::uint64_t translation_slot_generation_counter_ = 0;
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88

@@ -346,6 +346,61 @@ int main()
             programmableReady.snapshotToken),
         "R240 programmable cache readiness seals exact device identity");
 
+    const auto unreservedProgrammableSlot =
+        programmableCache.translation_slot_ownership_readiness(
+            d3d.device, programmablePair,
+            programmableReady.snapshotToken);
+    require(
+        unreservedProgrammableSlot.inputValid &&
+        unreservedProgrammableSlot.cacheReady &&
+        unreservedProgrammableSlot.deviceMatches &&
+        unreservedProgrammableSlot.cacheSnapshotMatches &&
+        !unreservedProgrammableSlot.slotReserved &&
+        !unreservedProgrammableSlot.translationObjectsPresent &&
+        !unreservedProgrammableSlot.ownershipReady &&
+        unreservedProgrammableSlot.slotGeneration == 0 &&
+        unreservedProgrammableSlot.snapshotToken == 0,
+        "R241 cached pair starts without a translation object slot");
+    require(
+        programmableCache.reserve_translation_slot_for_observation(
+            d3d.device, programmablePair,
+            programmableReady.snapshotToken),
+        "R241 reserve translation slot from exact R240 cache snapshot");
+    const auto programmableSlot =
+        programmableCache.translation_slot_ownership_readiness(
+            d3d.device, programmablePair,
+            programmableReady.snapshotToken);
+    require(
+        programmableSlot.inputValid &&
+        programmableSlot.cacheReady &&
+        programmableSlot.deviceMatches &&
+        programmableSlot.cacheSnapshotMatches &&
+        programmableSlot.slotReserved &&
+        !programmableSlot.translationObjectsPresent &&
+        programmableSlot.ownershipReady &&
+        programmableSlot.ownerGeneration == firstCacheGeneration &&
+        programmableSlot.slotGeneration != 0 &&
+        programmableSlot.cacheKey == programmablePair.cacheKey &&
+        programmableSlot.cacheSnapshotToken ==
+            programmableReady.snapshotToken &&
+        programmableSlot.snapshotToken != 0 &&
+        programmableCache.validate_translation_slot_snapshot(
+            d3d.device, programmablePair,
+            programmableReady.snapshotToken,
+            programmableSlot.snapshotToken),
+        "R241 translation slot ownership seals device and cache generation");
+    const auto firstTranslationSlotGeneration =
+        programmableSlot.slotGeneration;
+    require(
+        programmableCache.reserve_translation_slot_for_observation(
+            d3d.device, programmablePair,
+            programmableReady.snapshotToken) &&
+        programmableCache.translation_slot_ownership_readiness(
+            d3d.device, programmablePair,
+            programmableReady.snapshotToken).snapshotToken ==
+            programmableSlot.snapshotToken,
+        "R241 duplicate slot reservation is idempotent");
+
     require(
         programmableCache.cache_for_observation(programmablePair) &&
         programmableCache.entry_count() == 1,
@@ -380,6 +435,11 @@ int main()
         forgedCollision.exact_identity() &&
         !programmableCache.cache_for_observation(forgedCollision),
         "R240 forged cache-key collision fails closed");
+    require(
+        !programmableCache.reserve_translation_slot_for_observation(
+            d3d.device, forgedCollision,
+            programmableReady.snapshotToken),
+        "R241 forged cache-key collision cannot reserve translation slot");
     const auto collisionReady =
         programmableCache.readiness(d3d.device, forgedCollision);
     require(
@@ -401,6 +461,12 @@ int main()
         !programmableCache.cache_for_observation(incompletePair),
         "R240 incomplete programmable identity cannot enter cache");
 
+    require(
+        !programmableCache.reserve_translation_slot_for_observation(
+            d3d.device, incompletePair,
+            programmableReady.snapshotToken),
+        "R241 incomplete identity cannot reserve translation slot");
+
     DevicePair secondDevice = create_warp_device();
     require(
         programmableCache.initialize(secondDevice.device) &&
@@ -418,6 +484,51 @@ int main()
         programmableCache.readiness(
             secondDevice.device, programmablePair).ready,
         "R240 exact pair can be re-cached on the new device generation");
+    const auto secondProgrammableReady =
+        programmableCache.readiness(
+            secondDevice.device, programmablePair);
+    require(
+        secondProgrammableReady.ready &&
+        !programmableCache.validate_translation_slot_snapshot(
+            secondDevice.device, programmablePair,
+            secondProgrammableReady.snapshotToken,
+            programmableSlot.snapshotToken),
+        "R241 device generation change invalidates prior slot snapshot");
+    const auto secondUnreservedSlot =
+        programmableCache.translation_slot_ownership_readiness(
+            secondDevice.device, programmablePair,
+            secondProgrammableReady.snapshotToken);
+    require(
+        secondUnreservedSlot.cacheReady &&
+        secondUnreservedSlot.cacheSnapshotMatches &&
+        !secondUnreservedSlot.slotReserved &&
+        !secondUnreservedSlot.ownershipReady,
+        "R241 re-cached pair requires a fresh device-generation slot");
+    require(
+        !programmableCache.reserve_translation_slot_for_observation(
+            secondDevice.device, programmablePair,
+            programmableReady.snapshotToken) &&
+        programmableCache.reserve_translation_slot_for_observation(
+            secondDevice.device, programmablePair,
+            secondProgrammableReady.snapshotToken),
+        "R241 stale cache snapshot rejected before fresh slot reservation");
+    const auto secondProgrammableSlot =
+        programmableCache.translation_slot_ownership_readiness(
+            secondDevice.device, programmablePair,
+            secondProgrammableReady.snapshotToken);
+    require(
+        secondProgrammableSlot.ownershipReady &&
+        !secondProgrammableSlot.translationObjectsPresent &&
+        secondProgrammableSlot.slotGeneration != 0 &&
+        secondProgrammableSlot.slotGeneration !=
+            firstTranslationSlotGeneration &&
+        secondProgrammableSlot.snapshotToken !=
+            programmableSlot.snapshotToken &&
+        programmableCache.validate_translation_slot_snapshot(
+            secondDevice.device, programmablePair,
+            secondProgrammableReady.snapshotToken,
+            secondProgrammableSlot.snapshotToken),
+        "R241 fresh device generation receives a distinct translation slot");
     secondDevice.context->Release();
     secondDevice.device->Release();
 

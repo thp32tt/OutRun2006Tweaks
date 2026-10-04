@@ -9408,6 +9408,46 @@ def main() -> None:
             )
         )
 
+    r241_programmable_translation_slot_ownership_contract = [
+        ("struct NativeProgrammableShaderTranslationSlotReadiness",
+         NATIVE_BACKEND_HPP,
+         "R241 translation slot ownership readiness type"),
+        ("reserve_translation_slot_for_observation(",
+         NATIVE_BACKEND_HPP,
+         "R241 translation slot reservation declaration"),
+        ("translationObjectsPresent = false",
+         NATIVE_BACKEND_CPP,
+         "R241 slot ownership must not claim shader objects"),
+        ("cache.snapshotToken == cacheSnapshotToken",
+         NATIVE_BACKEND_CPP,
+         "R241 reservation remains keyed to exact R240 cache snapshot"),
+        ("translationSlotGeneration",
+         NATIVE_BACKEND_HPP,
+         "R241 per-entry translation slot generation"),
+        ("cached pair starts without a translation object slot",
+         CONSTANT_BUFFER_PROBE,
+         "R241 no-implicit-slot regression"),
+        ("forged cache-key collision cannot reserve translation slot",
+         CONSTANT_BUFFER_PROBE,
+         "R241 collision fail-closed regression"),
+        ("stale cache snapshot rejected before fresh slot reservation",
+         CONSTANT_BUFFER_PROBE,
+         "R241 device-generation/cache-snapshot isolation regression"),
+    ]
+    missing_r241_programmable_translation_slot_ownership = [
+        meaning
+        for token, source, meaning
+        in r241_programmable_translation_slot_ownership_contract
+        if token not in source
+    ]
+    if missing_r241_programmable_translation_slot_ownership:
+        raise SystemExit(
+            "DX11 R241 programmable translation slot ownership drift: "
+            + ", ".join(
+                missing_r241_programmable_translation_slot_ownership
+            )
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

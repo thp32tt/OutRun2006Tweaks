@@ -2289,6 +2289,109 @@ bool NativeProgrammableShaderPairCache::validate_snapshot(
     return current.ready && current.snapshotToken == snapshotToken;
 }
 
+bool NativeProgrammableShaderPairCache::reserve_translation_slot_for_observation(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken) noexcept {
+    if (!expectedDevice ||
+        cacheSnapshotToken == 0 ||
+        !validate_snapshot(expectedDevice, identity, cacheSnapshotToken))
+        return false;
+
+    const auto found = entries_.find(identity.cacheKey);
+    if (found == entries_.end())
+        return false;
+
+    auto& entry = found->second;
+    if (entry.translationSlotGeneration != 0)
+        return true;
+
+    ++translation_slot_generation_counter_;
+    if (translation_slot_generation_counter_ == 0)
+        ++translation_slot_generation_counter_;
+    entry.translationSlotGeneration = translation_slot_generation_counter_;
+    return true;
+}
+
+NativeProgrammableShaderTranslationSlotReadiness
+NativeProgrammableShaderPairCache::translation_slot_ownership_readiness(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken) const noexcept {
+    NativeProgrammableShaderTranslationSlotReadiness out{};
+    out.ownerGeneration = owner_generation_;
+    out.cacheKey = identity.cacheKey;
+    out.cacheSnapshotToken = cacheSnapshotToken;
+    out.translationObjectsPresent = false;
+    out.inputValid =
+        expectedDevice != nullptr &&
+        cacheSnapshotToken != 0 &&
+        identity.exact_identity() &&
+        !identity.translationImplemented;
+
+    const auto cache = readiness(expectedDevice, identity);
+    out.cacheReady = cache.ready;
+    out.deviceMatches =
+        cache.ownerReady &&
+        expectedDevice != nullptr &&
+        device_.Get() == expectedDevice;
+    out.cacheSnapshotMatches =
+        cache.ready && cache.snapshotToken == cacheSnapshotToken;
+
+    if (out.inputValid &&
+        out.cacheReady &&
+        out.deviceMatches &&
+        out.cacheSnapshotMatches) {
+        const auto found = entries_.find(identity.cacheKey);
+        if (found != entries_.end()) {
+            out.slotGeneration = found->second.translationSlotGeneration;
+            out.slotReserved = out.slotGeneration != 0;
+        }
+    }
+
+    out.ownershipReady =
+        out.inputValid &&
+        out.cacheReady &&
+        out.deviceMatches &&
+        out.cacheSnapshotMatches &&
+        out.slotReserved &&
+        !out.translationObjectsPresent &&
+        out.ownerGeneration != 0 &&
+        out.slotGeneration != 0 &&
+        out.cacheKey != 0;
+
+    if (out.ownershipReady) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(this)));
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedDevice)));
+        token = mix_readiness_snapshot_token(token, out.ownerGeneration);
+        token = mix_readiness_snapshot_token(token, out.slotGeneration);
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(token, out.cacheSnapshotToken);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeProgrammableShaderPairCache::validate_translation_slot_snapshot(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken) const noexcept {
+    if (slotSnapshotToken == 0)
+        return false;
+    const auto current = translation_slot_ownership_readiness(
+        expectedDevice, identity, cacheSnapshotToken);
+    return current.ownershipReady &&
+           current.snapshotToken == slotSnapshotToken;
+}
+
 void NativeProgrammableShaderPairCache::shutdown() noexcept {
     entries_.clear();
     device_.Reset();
