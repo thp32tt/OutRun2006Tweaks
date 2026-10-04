@@ -25,6 +25,7 @@ namespace OutRunVR::GameSemantic
 
     inline thread_local RenderScope CurrentScope = RenderScope::None;
     inline thread_local RenderScope NextDrawScope = RenderScope::None;
+    inline thread_local unsigned ExternalOverlaySemanticDepth = 0;
 
     inline const char* Name(RenderScope scope) noexcept
     {
@@ -58,6 +59,26 @@ namespace OutRunVR::GameSemantic
         ScopedRenderSemantic& operator=(const ScopedRenderSemantic&) = delete;
     };
 
+    class ScopedExternalOverlaySemantic
+    {
+        RenderScope previous_ = RenderScope::None;
+    public:
+        explicit ScopedExternalOverlaySemantic(RenderScope scope) noexcept
+            : previous_(CurrentScope)
+        {
+            ++ExternalOverlaySemanticDepth;
+            CurrentScope = scope;
+        }
+        ~ScopedExternalOverlaySemantic()
+        {
+            if (ExternalOverlaySemanticDepth != 0)
+                --ExternalOverlaySemanticDepth;
+            CurrentScope = previous_;
+        }
+        ScopedExternalOverlaySemantic(const ScopedExternalOverlaySemantic&) = delete;
+        ScopedExternalOverlaySemantic& operator=(const ScopedExternalOverlaySemantic&) = delete;
+    };
+
     inline void ArmNextDraw(RenderScope scope) noexcept
     {
         NextDrawScope = scope;
@@ -65,6 +86,10 @@ namespace OutRunVR::GameSemantic
 
     inline RenderScope ConsumeForDraw() noexcept
     {
+        // External UI such as the F11 ImGui overlay is not a game producer.
+        // Never let it consume a pending game semantic token.
+        if (ExternalOverlaySemanticDepth != 0)
+            return CurrentScope;
         if (NextDrawScope != RenderScope::None)
         {
             const RenderScope scope = NextDrawScope;

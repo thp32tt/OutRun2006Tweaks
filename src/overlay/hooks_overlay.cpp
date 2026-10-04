@@ -8,6 +8,7 @@
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx9.h>
 #include "overlay.hpp"
+#include "vr/game/render_semantics.hpp"
 
 namespace Settings
 {
@@ -212,7 +213,22 @@ class D3DHooks : public Hook
 			ImGui_ImplWin32_NewFrame();
 			overlayActive = Overlay::render();
 			ImGui::Render();
-			ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+
+			// In gameplay the VR draw hooks own main-backbuffer 2D placement.
+			// The F11 Tweaks shell is external ImGui UI, not a game sprite producer:
+			// give it explicit SCREEN_OVERLAY_2D ownership so R30 applies the
+			// established binocular common-ray/FOV correction. Keep front-end/menu
+			// rendering untouched, where the user-observed overlay is already correct.
+			if (overlayActive && Game::is_in_game())
+			{
+				OutRunVR::GameSemantic::ScopedExternalOverlaySemantic semantic(
+					OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D);
+				ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+			}
+			else
+			{
+				ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+			}
 		}
 	}
 
