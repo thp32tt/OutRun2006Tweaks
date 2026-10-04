@@ -399,6 +399,10 @@ namespace
     void apply_universal_physics_preset()
     {
         Settings::WheelFFBEnable = true;
+        // These helpers replace the original F11 button blocks, so they must
+        // restore the model ID as well as the feel values. Otherwise switching
+        // back from Arcade/PS2 leaves the previous output semantics active.
+        Settings::WheelFFBModel = 0;
         Settings::WheelFFBPhysicsSat = true;
         Settings::WheelFFBGlobalStrength = 0.70f;
         Settings::WheelFFBSpringStrength = 0.22f;
@@ -429,6 +433,7 @@ namespace
     void apply_universal_natural_preset()
     {
         Settings::WheelFFBEnable = true;
+        Settings::WheelFFBModel = 0;
         Settings::WheelFFBPhysicsSat = false;
         Settings::WheelFFBGlobalStrength = 0.70f;
         Settings::WheelFFBSpringStrength = 0.22f;
