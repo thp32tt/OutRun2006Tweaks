@@ -97,7 +97,7 @@ namespace OutRunVRStereo
             if (!TrackedDepthStencil)
             {
                 next.valid = true;
-                next.depthGeneration = R9MainDepthGeneration;
+                next.depthGeneration = R9MainDepthGenerationValue();
                 next.stateBlockRecordings = OutRunVR::State::StateBlockTracker::RecordingGeneration();
                 next.stateBlockApplies = OutRunVR::State::StateBlockTracker::ApplyGeneration();
                 R33DepthStencilState = next;
@@ -144,7 +144,7 @@ namespace OutRunVRStereo
             }
 
             next.valid = true;
-            next.depthGeneration = R9MainDepthGeneration;
+            next.depthGeneration = R9MainDepthGenerationValue();
             next.stateBlockRecordings = OutRunVR::State::StateBlockTracker::RecordingGeneration();
             next.stateBlockApplies = OutRunVR::State::StateBlockTracker::ApplyGeneration();
             R33DepthStencilState = next;
@@ -162,7 +162,7 @@ namespace OutRunVRStereo
         bool R33DepthStencilCacheCurrent() noexcept
         {
             return R33DepthStencilState.valid &&
-                R33DepthStencilState.depthGeneration == R9MainDepthGeneration &&
+                R33DepthStencilState.depthGeneration == R9MainDepthGenerationValue() &&
                 R33DepthStencilState.stateBlockRecordings ==
                     OutRunVR::State::StateBlockTracker::RecordingGeneration() &&
                 R33DepthStencilState.stateBlockApplies == OutRunVR::State::StateBlockTracker::ApplyGeneration();

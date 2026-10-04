@@ -60,14 +60,14 @@ namespace OutRunVRStereo
             if ((depthFlags & D3DCLEAR_ZBUFFER) != 0)
             {
                 R20DepthClearEpoch = PresentEpoch;
-                R20DepthClearDrawSerial = R9DrawCalls;
-                R20DepthClearGeneration = R9MainDepthGeneration;
+                R20DepthClearDrawSerial = R9DrawCallCount();
+                R20DepthClearGeneration = R9MainDepthGenerationValue();
             }
             if ((depthFlags & D3DCLEAR_STENCIL) != 0)
             {
                 R20StencilClearEpoch = PresentEpoch;
-                R20StencilClearDrawSerial = R9DrawCalls;
-                R20StencilClearGeneration = R9MainDepthGeneration;
+                R20StencilClearDrawSerial = R9DrawCallCount();
+                R20StencilClearGeneration = R9MainDepthGenerationValue();
             }
         }
 
@@ -78,8 +78,8 @@ namespace OutRunVRStereo
 
             const bool depthSafe =
                 R20DepthClearEpoch == PresentEpoch &&
-                R20DepthClearDrawSerial == R9DrawCalls &&
-                R20DepthClearGeneration == R9MainDepthGeneration &&
+                R20DepthClearDrawSerial == R9DrawCallCount() &&
+                R20DepthClearGeneration == R9MainDepthGenerationValue() &&
                 R9MonoDepth != nullptr;
 
             bool stencilSafe = true;
@@ -87,8 +87,8 @@ namespace OutRunVRStereo
             {
                 stencilSafe =
                     R20StencilClearEpoch == PresentEpoch &&
-                    R20StencilClearDrawSerial == R9DrawCalls &&
-                    R20StencilClearGeneration == R9MainDepthGeneration;
+                    R20StencilClearDrawSerial == R9DrawCallCount() &&
+                    R20StencilClearGeneration == R9MainDepthGenerationValue();
             }
 
             const bool safe = depthSafe && stencilSafe;

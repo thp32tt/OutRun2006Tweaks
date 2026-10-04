@@ -2490,7 +2490,7 @@ namespace OutRunVRStereo
             R9NoteStereoDrawWithoutMonoBackup();
             if (LeftDrawMayWriteDepth(device) ||
                 LeftDrawMayWriteStencil(device))
-                ++R9MainDepthContentSerial;
+                R9NoteMainDepthContentWrite();
 
             const HRESULT leftHr = leftDraw();
             if (FAILED(leftHr))
@@ -3384,7 +3384,7 @@ namespace OutRunVRStereo
             R9NoteStereoDrawWithoutMonoBackup();
             if (LeftDrawMayWriteDepth(device) ||
                 LeftDrawMayWriteStencil(device))
-                ++R9MainDepthContentSerial;
+                R9NoteMainDepthContentWrite();
 
             bool leftWvpOk = false;
             {
@@ -3406,7 +3406,7 @@ namespace OutRunVRStereo
                     R30ArmSafeFallback();
                     return E_FAIL;
                 }
-                --R9DrawCalls;
+                R9UndoStereoDrawCount();
                 return E_NOTIMPL;
             }
 

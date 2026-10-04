@@ -162,14 +162,14 @@ namespace OutRunVRStereo
             {
                 R23DepthClearEpoch = PresentEpoch;
                 R23DepthClearGameDrawSerial = R23GameDrawSerial;
-                R23DepthClearGeneration = R9MainDepthGeneration;
+                R23DepthClearGeneration = R9MainDepthGenerationValue();
                 R23DepthClearZ = z;
             }
             if ((flags & D3DCLEAR_STENCIL) != 0)
             {
                 R23StencilClearEpoch = PresentEpoch;
                 R23StencilClearGameDrawSerial = R23GameDrawSerial;
-                R23StencilClearGeneration = R9MainDepthGeneration;
+                R23StencilClearGeneration = R9MainDepthGenerationValue();
                 R23StencilClearValue = stencil;
             }
         }
@@ -186,7 +186,7 @@ namespace OutRunVRStereo
             const bool depthSafe =
                 R23DepthClearEpoch == PresentEpoch &&
                 R23DepthClearGameDrawSerial == R23GameDrawSerial &&
-                R23DepthClearGeneration == R9MainDepthGeneration;
+                R23DepthClearGeneration == R9MainDepthGenerationValue();
             if (!depthSafe)
                 return false;
 
@@ -195,7 +195,7 @@ namespace OutRunVRStereo
                 stencilSafe =
                     R23StencilClearEpoch == PresentEpoch &&
                     R23StencilClearGameDrawSerial == R23GameDrawSerial &&
-                    R23StencilClearGeneration == R9MainDepthGeneration;
+                    R23StencilClearGeneration == R9MainDepthGenerationValue();
                 if (StencilTestActive(device) && !stencilSafe)
                     return false;
             }
@@ -469,7 +469,7 @@ namespace OutRunVRStereo
                     R23FirstWarmupArmedLogged = true;
                     spdlog::info(
                         "VR R23/R25 BASELINE: passive candidate recorded epoch={} gameDrawSerial={} depthGeneration={}; next Present will arm pose warmup, not stereo",
-                        PresentEpoch, R23GameDrawSerial, R9MainDepthGeneration);
+                        PresentEpoch, R23GameDrawSerial, R9MainDepthGenerationValue());
                 }
                 return hr;
             }
