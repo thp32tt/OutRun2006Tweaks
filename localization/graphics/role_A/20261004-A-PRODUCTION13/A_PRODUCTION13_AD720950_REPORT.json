@@ -745,7 +745,8 @@
   "all_14_readable_and_raw_bbox_pass": true,
   "all_14_size_ceiling_pass": true,
   "all_14_positive_margin": true,
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_ROW_CONTACT_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A_PRODUCTION13_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_PRODUCTION13_HD_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_qa_notes": "Manual readable SOURCE/CLEAN/FINAL, 14-row 1:1 contact, and raw mirror_y review PASS. Korean labels use the same heavy plain-white source treatment; no source-English residue, clipping, overlap, seam, opaque patch, alpha halo, protected character-glyph damage, or orientation regression is visible. Shift and all non-target keyboard glyph rows remain source pixels."
 }

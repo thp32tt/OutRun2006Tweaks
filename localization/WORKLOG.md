@@ -1075,3 +1075,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Readable, white-background, raw-orientation and seven-row contact evidence visually pass for clipping, residue, seams, opaque patches, protected-art damage, orientation and source-family typography/gradient/outline/slant. All localized labels are single-line; stage-name and multi-line gates are not applicable, and no song/music-credit pixels were targeted.
 - C99 independently reports the same SHA as exact-size machine PASS 7/7; C controller visual/final QA is still pending. `RUNTIME_VALIDATION=UNTESTED`; no in-game PASS claimed.
 - Next B even-shard target: index 86 `C598919A`. Evidence: `localization/graphics/role_B/20261004-B-RECOVERY08/`. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-04 A production13 — AD720950 exact-HD keyboard-label candidate
+- Refreshed the odd shard and selected index 47 AD720950. The authoritative Release DDS keeps the stale _1024x256 name but its header is 4096x1024 RGBA32 / 1 mip / raw mirror_y; source SHA-256 141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f.
+- Hosted-worker retries failed closed while tightening target discovery to the exact HD sprite cells; no failed attempt persisted a candidate. Successful worker run 37196498979 produced candidate 6dad37489e7027b8f546c38b3729167697965fc8e33fcabff46f09aba1677955.
+- Localized 14 actual occurrences: Symbols -> 기호, Caps Lock -> 대문자 고정, five Backspace -> 지우기, Accents -> 악센트, Done -> 완료, and five Space -> 공백. Shift remains unchanged by the translation plan and was preserved pixel-identical; all digits/letters/accent/symbol/emoticon glyph rows were protected for separate name-entry/Hangul work.
+- Static self-QA PASS: 14/14 readable+raw exact-bbox containment, 14/14 exact source width/height ceiling, 14/14 positive margins, clean/final validators PASS, changed/alpha/protected pixels outside exact bboxes = 0, clean-plate source residue = 0, Shift pixel diff = 0.
+- Manual SOURCE/CLEAN/FINAL, 14-row contact and raw-orientation review PASS after matching the source's heavy plain-white lettering weight. No residue, clipping, overlap, seam, opaque patch, alpha halo, protected glyph damage or orientation regression observed.
+- Pending-artwork direct-localize count after this row: 56. RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_A/20261004-A-PRODUCTION13/.
