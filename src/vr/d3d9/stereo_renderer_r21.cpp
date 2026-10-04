@@ -223,11 +223,13 @@ namespace OutRunVRStereo
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const std::uint32_t r9 = R9InstallState.load(std::memory_order_acquire);
-                const std::uint32_t r13 = R13InstallState.load(std::memory_order_acquire);
+                const auto r9 = R9InstallStatus();
+                const auto r13 = R13InstallStatus();
+                const auto r20 = R20InstallStatus();
 
-                if (r9 == R9InstallFailed || r13 == R13InstallFailed ||
-                    OutRunVR::RuntimeEligibility::IsFailed(R20InstallState))
+                if (r9 == R9InstallStatusValue::Failed ||
+                    r13 == R13InstallStatusValue::Failed ||
+                    r20 == State::Failed)
                 {
                     R21InstallState.store(State::Failed, std::memory_order_release);
                     spdlog::error(
@@ -235,8 +237,9 @@ namespace OutRunVRStereo
                     return 0;
                 }
 
-                if (r9 == R9InstallReady && r13 == R13InstallReady &&
-                    OutRunVR::RuntimeEligibility::IsReady(R20InstallState))
+                if (r9 == R9InstallStatusValue::Ready &&
+                    r13 == R13InstallStatusValue::Ready &&
+                    r20 == State::Ready)
                 {
                     R21PresentR9Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&PresentDestR9), PresentDestR21,
@@ -298,5 +301,11 @@ namespace OutRunVRStereo
         };
 
         VRHostDeathFailClosedR21Hook VRHostDeathFailClosedR21Hook::instance;
+    }
+
+    inline OutRunVR::RuntimeEligibility::InstallState
+    R21InstallStatus() noexcept
+    {
+        return R21InstallState.load(std::memory_order_acquire);
     }
 }
