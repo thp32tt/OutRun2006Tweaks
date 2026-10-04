@@ -7,12 +7,12 @@
   "attempt": "1/3",
   "event_id": "CONVERSION-DXVK-00330-E001",
   "event_type": "retry",
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R229_BOOTSTRAP_SKIP_OUTCOME_PROVENANCE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
   "base_sha": "0094fa2723ccb4a1ec1210b5191c95f1c82b6d04",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "fd43c98a4c39a5e1b7a1bb713168e430474b5522",
+  "validation_bearing_result_sha": "fd43c98a4c39a5e1b7a1bb713168e430474b5522",
   "result_marker": "[AUTO:CONVERSION-DX11-00331]",
   "selected_work_item": "DX11_R229_BOOTSTRAP_SKIP_OUTCOME_PROVENANCE",
   "summary": "R229 preserves explicit R72 bootstrap-probe skip telemetry in the offline DX11 census analyzer. Per-log reports now distinguish a fail-closed bootstrap skip caused by compatibility/adapter-LUID gating from genuinely missing or truncated bootstrap evidence, while keeping NativeDrawPath dormant and all evidence diagnostic-only.",
@@ -43,22 +43,36 @@
       "evidence": "Added BOOTSTRAP_SKIP_RE; BootstrapSkipped and LatestBootstrapSkipByLog provenance; LogsWithBootstrapSkip/LogsWithBootstrapOutcome and explicit outcome-completeness flags; regression fixture for one ready and one explicitly skipped log; source-graph drift guards. Existing AllSourceLogsHaveBootstrap remains false for a skipped probe, DiagnosticOnly remains true, ActivationProof remains false, and NativeDrawPathActivationAllowed remains false."
     },
     "C3_VALIDATE": {
-      "status": "LOCAL_STATIC_PASS_EXACT_SHA_GATE_PENDING",
-      "automation_validation": "LOCAL_STATIC_PASS_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
-      "evidence": "TDD RED on the base analyzer showed no BootstrapSkipped or LatestBootstrapSkipByLog keys and treated the explicit skip as missing bootstrap evidence. GREEN local validation passed py_compile, test_analyze_dx11_census.py, verify_dx11_source_graph.py, verify_dx11_activation_boundary.py, verify_dx11_dual_source_contract.py, verify_dx11_native_transport_contract.py, verify_vr_backend_disasm_contract.py, test_dx11_static_surface_contract.py, dx11_native_static_surface_contract_check.py with CI-equivalent paths, verify_vr_proven_baseline.py (44 guards), custom R229 two-log fixture, and git diff --check."
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R229_BOOTSTRAP_SKIP_OUTCOME_PROVENANCE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1895 run 37163356290 completed success for fd43c98a4c39a5e1b7a1bb713168e430474b5522. validate job 111321207835 passed queue/baseline/structure/disassembly/session, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R229 census-analyzer checks, then configured/built Win32, verified the binary and uploaded artifact 11288601499. DX11 readiness smoke job 111322040281 passed fixed-function shader, input-layout/signature, object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan generated-index and fixed-function pipeline handoff probes. Artifact digest sha256:28507754c46fa1be652f52274c38cdf2de75bc3a8d7853be5cd0b254436d993e. No Quest 3/VDXR runtime test was performed."
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "COMPLETE",
+      "material_result_sha": "fd43c98a4c39a5e1b7a1bb713168e430474b5522",
+      "validation_bearing_result_sha": "fd43c98a4c39a5e1b7a1bb713168e430474b5522",
+      "result_marker": "[AUTO:CONVERSION-DX11-00331]",
+      "implementation_commits": [
+        "fd43c98a4c39a5e1b7a1bb713168e430474b5522"
+      ],
+      "source_implementation_sha": "fd43c98a4c39a5e1b7a1bb713168e430474b5522"
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
       "reason": "Offline census analyzer evidence-integrity/reporting change only; no runtime binary behavior or distributable package identity change intended."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "Publish the R229 material result without CI skip, require its exact-SHA Backend Conversion Gate, then persist PASS task/lane bookkeeping separately while keeping RUNTIME_VALIDATION=UNTESTED."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37163356290,
+      "validation_job_id": 111321207835,
+      "readiness_smoke_job_id": 111322040281,
+      "artifact_id": 11288601499,
+      "artifact_digest": "sha256:28507754c46fa1be652f52274c38cdf2de75bc3a8d7853be5cd0b254436d993e",
+      "implementation_comment_id": 5974783042,
+      "validation_comment_id": 5974846679,
+      "exact_next_action": "Preserve R225 per-log signature isolation, R226 per-log summary aggregation, R227 startup/bootstrap provenance, R228 startup/bootstrap coverage and R229 explicit bootstrap-skip outcome provenance; keep NativeDrawPath dormant and inspect the next independent DX11 source/static gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate."
     }
   },
   "regression_assessment": {
@@ -78,5 +92,17 @@
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE"
   },
-  "exact_next_action": "Publish the R229 bootstrap-skip outcome provenance material result without CI skip and require its exact-SHA Backend Conversion Gate."
+  "exact_next_action": "Preserve R225 per-log signature isolation, R226 per-log summary aggregation, R227 startup/bootstrap provenance, R228 startup/bootstrap coverage and R229 explicit bootstrap-skip outcome provenance; keep NativeDrawPath dormant and inspect the next independent DX11 source/static gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37163356290,
+      "run_number": 1895,
+      "result_sha": "fd43c98a4c39a5e1b7a1bb713168e430474b5522",
+      "conclusion": "success",
+      "validate_job_id": 111321207835,
+      "readiness_smoke_job_id": 111322040281,
+      "artifact_id": 11288601499,
+      "artifact_digest": "sha256:28507754c46fa1be652f52274c38cdf2de75bc3a8d7853be5cd0b254436d993e"
+    }
+  }
 }
