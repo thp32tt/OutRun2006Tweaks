@@ -82,7 +82,11 @@ def extract_hd_bbox(stock_bbox, margin=16):
         raise RuntimeError(("empty HD search zone",stock_bbox,zone))
     gb=[zx1+bb[0],zy1+bb[1],zx1+bb[2],zy1+bb[3]]
     # A touching search boundary would mean the discovery window was too small/ambiguous.
-    if gb[0]<=zx1 or gb[1]<=zy1 or gb[2]>=zx2 or gb[3]>=zy2:
+    bad_left = gb[0] <= zx1 and zx1 > 0
+    bad_top = gb[1] <= zy1 and zy1 > 0
+    bad_right = gb[2] >= zx2 and zx2 < W
+    bad_bottom = gb[3] >= zy2 and zy2 < H
+    if bad_left or bad_top or bad_right or bad_bottom:
         raise RuntimeError(("HD bbox touches search boundary",stock_bbox,zone,gb))
     return gb
 
@@ -99,7 +103,7 @@ line_specs = [
 ]
 preserved_shift_bbox=None
 for key,src,kor,idx,stock_box in line_specs:
-    gb=extract_hd_bbox(stock_box)
+    gb=extract_hd_bbox(stock_box, margin=20)
     if key=="shift":
         preserved_shift_bbox=gb
     else:
@@ -118,7 +122,7 @@ occurrences = [
     ("space_r6",6,"Space","공백",[780,240,814,254]),
 ]
 for key,idx,src,kor,stock_box in occurrences:
-    targets.append({"key":key,"source":src,"korean":kor,"region_idx":idx,"stock_discovery_bbox":stock_box,"original_bbox":extract_hd_bbox(stock_box)})
+    targets.append({"key":key,"source":src,"korean":kor,"region_idx":idx,"stock_discovery_bbox":stock_box,"original_bbox":extract_hd_bbox(stock_box, margin=64)})
 
 if len(targets) != 14 or preserved_shift_bbox is None:
     raise RuntimeError(("target count",len(targets),preserved_shift_bbox))
