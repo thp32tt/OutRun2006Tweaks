@@ -1,0 +1,19 @@
+{
+  "source": "/tmp/ebfc_src.png",
+  "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION48/EBFC709F_CLEAN_PLATE.png",
+  "size": [
+    2048,
+    1024
+  ],
+  "changed_pixels": 16699,
+  "changed_bbox": [
+    14,
+    287,
+    1420,
+    408
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "status": "PASS"
+}

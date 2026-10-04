@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION48",
+  "queue_index": 232,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "readiness_tier": "RENDER_READY_COMPLETED_SAME_INVOCATION",
+  "source_sha256": "ad7a1c21be17d1fa93463201a26a85a21899dbe1162d5c2748ddeb6136a4f9a0",
+  "historical_discovery_sha256": "46d652b457b6316bd51d2d9f77113318a3397576793346b466c8dc8ffdd92aa5",
+  "historical_discovery_only": true,
+  "historical_localized_pixels_reused": false,
+  "candidate_sha256": "818de8a051cdab193a1d4cf46940b654c5108d52405199cc35ec59ea676b7963",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds",
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "n": 1,
+      "source": "JOIN GAME",
+      "korean": "게임 참가",
+      "discovery_anchor": [
+        16,
+        289,
+        421,
+        372
+      ],
+      "measurement_cell": [
+        0,
+        253,
+        457,
+        330
+      ],
+      "original_bbox": [
+        14,
+        287,
+        416,
+        330
+      ],
+      "source_effect_pixels": 9341,
+      "source_mask_density": 0.5403794978595395,
+      "localized_bbox": [
+        160,
+        289,
+        269,
+        327
+      ],
+      "source_width": 402,
+      "source_height": 43,
+      "localized_width": 109,
+      "localized_height": 38,
+      "delta_left": 146,
+      "delta_right": 147,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "font_size": 39,
+      "stroke_width": 2,
+      "fill": [
+        74,
+        71,
+        63,
+        255
+      ],
+      "outline": [
+        74,
+        71,
+        63,
+        255
+      ],
+      "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
+    },
+    {
+      "n": 2,
+      "source": "CREATE GAME",
+      "korean": "게임 만들기",
+      "discovery_anchor": [
+        901,
+        289,
+        1423,
+        372
+      ],
+      "measurement_cell": [
+        865,
+        330,
+        1459,
+        408
+      ],
+      "original_bbox": [
+        898,
+        330,
+        1420,
+        408
+      ],
+      "source_effect_pixels": 7358,
+      "source_mask_density": 0.18071519795657726,
+      "localized_bbox": [
+        1037,
+        333,
+        1280,
+        405
+      ],
+      "source_width": 522,
+      "source_height": 78,
+      "localized_width": 243,
+      "localized_height": 72,
+      "delta_left": 139,
+      "delta_right": 140,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "font_size": 72,
+      "stroke_width": 4,
+      "fill": [
+        74,
+        71,
+        63,
+        255
+      ],
+      "outline": [
+        74,
+        71,
+        63,
+        255
+      ],
+      "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
+    }
+  ],
+  "containment": {
+    "elements_total": 2,
+    "elements_pass": 2,
+    "outside": 0,
+    "alpha_outside": 0,
+    "target_out": 0,
+    "source_residue": 0,
+    "overlap": 0,
+    "touch": 0,
+    "status": "PASS"
+  },
+  "clean_plate": {
+    "rgb_changed_pixels": 0,
+    "source_effect_alpha_remaining": 0,
+    "status": "PASS"
+  },
+  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_PRODUCTION48_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
