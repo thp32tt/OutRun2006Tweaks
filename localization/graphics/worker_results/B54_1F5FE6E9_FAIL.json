@@ -1,0 +1,9 @@
+{
+  "run": "20261005-B-PRODUCTION54",
+  "asset": "1F5FE6E9",
+  "index": 132,
+  "status": "FAIL_CLOSED_DIAGNOSTIC",
+  "exception": "TypeError('can only concatenate list (not \"tuple\") to list')",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 345, in <module>\n    main()\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 246, in main\n    \"font_basename\":Path(FONT).name,\"fill_rgba\":list(fill_rgb)+(fill_alpha,),\n                                                ~~~~~~~~~~~~~~^~~~~~~~~~~~~~\nTypeError: can only concatenate list (not \"tuple\") to list\n",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
