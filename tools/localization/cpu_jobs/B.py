@@ -115,11 +115,38 @@ def main():
 
     # Exact source-effect mask: for each historical-diff anchor, include complete
     # connected source-alpha components that intersect a small diff-neighborhood.
+    # Vertical row bands are hard-separated at the midpoint between adjacent rows so
+    # source effects from neighboring semantic labels can never enter the same mask.
+    anchor_groups=[]
+    for idx,a in enumerate(best):
+        placed=False
+        for g in anchor_groups:
+            b=best[g[0]]
+            ov=max(0,min(a[3],b[3])-max(a[1],b[1])); mh=min(a[3]-a[1],b[3]-b[1])
+            if mh>0 and ov/mh>=0.70:
+                g.append(idx); placed=True; break
+        if not placed: anchor_groups.append([idx])
+    row_bounds=[]
+    for gi,g in enumerate(anchor_groups):
+        top=min(best[i][1] for i in g); bottom=max(best[i][3] for i in g)
+        if gi==0: ylo=0
+        else:
+            pg=anchor_groups[gi-1]; prev_bottom=max(best[i][3] for i in pg)
+            ylo=(prev_bottom+top)//2
+        if gi==len(anchor_groups)-1: yhi=H
+        else:
+            ng=anchor_groups[gi+1]; next_top=min(best[i][1] for i in ng)
+            yhi=(bottom+next_top)//2
+        for i in g: row_bounds.append((i,ylo,yhi))
+    bound_by_index={i:(y0,y1) for i,y0,y1 in row_bounds}
+
     rows=[]; source_masks=[]; full_source=np.zeros((H,W),bool)
     structure=np.ones((3,3),dtype=np.uint8)
-    for n,(anchor,(en,ko)) in enumerate(zip(best,LABELS),1):
+    for idx,(anchor,(en,ko)) in enumerate(zip(best,LABELS)):
+        n=idx+1
         ax0,ay0,ax1,ay1,_=anchor
-        pad=28; x0=max(0,ax0-pad); y0=max(0,ay0-pad); x1=min(W,ax1+pad); y1=min(H,ay1+pad)
+        ry0,ry1=bound_by_index[idx]
+        pad=28; x0=max(0,ax0-pad); y0=max(ry0,ay0-pad); x1=min(W,ax1+pad); y1=min(ry1,ay1+pad)
         la=src_alpha[y0:y1,x0:x1]
         seed=diff[y0:y1,x0:x1]
         seed_near=np.asarray(Image.fromarray((seed.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(11)))>0
@@ -135,7 +162,7 @@ def main():
             raise RuntimeError(("source scope ambiguous",n,anchor,bb,dens))
         sm=np.zeros((H,W),bool); sm[y0:y1,x0:x1]=sm_local
         source_masks.append(sm); full_source|=sm
-        rows.append({"n":n,"source":en,"korean":ko,"discovery_anchor":anchor[:4],"original_bbox":bb,
+        rows.append({"n":n,"source":en,"korean":ko,"discovery_anchor":anchor[:4],"measurement_cell":[x0,y0,x1,y1],"original_bbox":bb,
                      "source_effect_pixels":int(np.count_nonzero(sm)),"source_mask_density":dens})
 
     for i in range(5):
