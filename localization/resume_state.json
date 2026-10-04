@@ -1314,5 +1314,38 @@
     "pre_a_changes_outside_failed_sprite_cells": 0,
     "visual_qa": "PASS",
     "runtime_validation": "UNTESTED"
+  },
+  "b_recovery01_fa7bbb13": {
+    "run": "20261004-B-RECOVERY01",
+    "status": "B_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
+    "reworked_elements": 10,
+    "prior_pass_elements_preserved_exact": 7,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "clean_plate_report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_CLEAN_PLATE_VALIDATION.json",
+    "final_mask_report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_FINAL_MASK_VALIDATION.json",
+    "production_report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_FA7BBB13_REPORT.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "b_recovery02_a064fdfc": {
+    "run": "20261004-B-RECOVERY02",
+    "status": "B_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
+    "reworked_elements": 6,
+    "lossless_integer_repositions": 2,
+    "native_rerenders": 4,
+    "prior_pass_elements_preserved_exact": 15,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "clean_plate_report": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_CLEAN_PLATE_VALIDATION.json",
+    "final_mask_report": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_FINAL_MASK_VALIDATION.json",
+    "production_report": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json",
+    "runtime_validation": "UNTESTED",
+    "next_b_target": {
+      "index": 94,
+      "asset": "2DA43E41",
+      "status": "rework_required_zero_pixel_or_artifact"
+    }
   }
 }

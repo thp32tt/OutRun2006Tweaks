@@ -343,12 +343,12 @@
       "in_game_validation": "PENDING_ISOLATED_DDS_ONLY"
     },
     "latest_b_first_qa": {
-      "run": "B_RECOVERY01",
-      "report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_FA7BBB13_REPORT.json",
-      "result": "FA7BBB13_REWORK_SELF_QA_PASS_PENDING_C_INGAME",
+      "run": "B_RECOVERY02",
+      "report": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json",
+      "result": "A064FDFC_REWORK_SELF_QA_PASS_PENDING_C_INGAME",
       "assets": {
-        "FA7BBB13": {
-          "candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
+        "A064FDFC": {
+          "candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
           "candidate_changed_by_B": true,
           "status": "B_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME"
         }
@@ -522,6 +522,20 @@
       "target_overlap_pairs": 0,
       "runtime_validation": "UNTESTED",
       "report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_FA7BBB13_REPORT.json"
+    },
+    "b_recovery02_a064fdfc": {
+      "timestamp_kst": "2026-10-04T12:56:57+09:00",
+      "candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
+      "reworked_elements": 6,
+      "lossless_integer_repositions": 2,
+      "native_rerenders": 4,
+      "prior_pass_elements_preserved_exact": 15,
+      "clean_plate_validator": "PASS",
+      "final_mask_validator": "PASS",
+      "preexisting_pass_overlap_pairs": 3,
+      "new_overlap_pairs": 0,
+      "runtime_validation": "UNTESTED",
+      "report": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json"
     }
   },
   "data_build": {

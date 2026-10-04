@@ -638,3 +638,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Manual decoded contact-sheet visual review: **PASS**; no shrink/resampling ragged-stroke regression observed.
 - C decision: C86_PIXEL_VISUAL_PASS_PENDING_INGAME. RUNTIME_VALIDATION=UNTESTED; isolated in-game validation remains required before final approval.
 - Evidence: localization/graphics/role_C/20261004-1245-C86/C86_FF2462BB_FINAL_QA.json and localization/graphics/role_C/20261004-1245-C86/C86_FF2462BB_VISUAL_CONTACT.png.
+## 2026-10-04 B recovery — A064FDFC clean-plate rework
+- Current remote HEAD `bdf19fc` was refreshed before work. Index 54 `FA7BBB13` was not repeated because its B_RECOVERY01 candidate/evidence remained present and hash-valid; its queue/resume marker, accidentally regressed by the subsequent A bootstrap state update, was reconciled.
+- B even-shard priority index 60 `A064FDFC` reworked from the exact HD source. Six C84 bbox failures were fixed: `dumped_big` and `rank_table` by lossless integer-pixel repositioning; `dumped_white`, `target_top`, `stage_clear`, and `easy` by native-resolution Korean rerendering. No localized raster scaling.
+- RGBA32 4096x2048 / 1 mip, raw `mirror_y` orientation, and exact 128-byte source header preserved.
+- Self-QA: former failures 6/6 PASS, all 21/21 containment PASS, untouched PASS elements 15/15 exact-pixel preserved, clean-plate validator PASS, final protected-mask validator PASS, newly introduced target overlaps 0. Three pre-existing PASS/PASS atlas-overlap pairs are unchanged.
+- Readable comparison self-QA PASS for clipping, residue, new overlap, and source-family styling. Candidate SHA-256: `15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f`.
+- `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
+- Next B REWORK priority: even index 94 `2DA43E41`.
+- Evidence: `localization/graphics/role_B/20261004-B-RECOVERY02/`.
