@@ -620,8 +620,9 @@ if "R32InstallStatus()" not in r33:
     errors.append("R33 missing R32 install-state owner query")
 
 # Post-1000 hook-chain flattening: R34 must no longer add another physical
-# Reset/Present/draw detour layer above R33. Its compatibility responsibilities
-# are folded into the R33 final dispatcher; R34 becomes a thin readiness ledger.
+# Reset/Present/draw detour layer above R33. Runtime responsibilities and the
+# historical R34 compatibility Hook registration are owned by R33; R34 is only
+# the final-TU include shim selected by existing build matrices.
 for banned in (
     "SafetyHookInline R34",
     "safetyhook::create_inline(",
@@ -663,10 +664,24 @@ for banned in (
     if banned in r34:
         errors.append(
             f"R34 passive readiness observer regained worker/state ownership: {banned}")
-if "R33InstallStatus()" not in r34:
-    errors.append("R34 missing R33 install-state owner query")
-if '"OpenXRVRStereoR34ResetGuard"' not in r33:
-    errors.append("R33 missing R34 compatibility terminal-status publication")
+if "R33InstallStatus()" in r34:
+    errors.append("R34 final-TU shim retained R33 install-state observer logic")
+for marker in (
+    "class VRStereoR34ResetGuardHook final : public Hook",
+    'return "OpenXRVRStereoR34ResetGuard";',
+    "const auto r33 = R33InstallStatus();",
+):
+    if marker not in r33:
+        errors.append(
+            f"R33 missing folded R34 compatibility registration: {marker}")
+for banned in (
+    "class VRStereoR34ResetGuardHook",
+    "OpenXRVRStereoR34ResetGuard",
+    "namespace OutRunVRStereo",
+):
+    if banned in r34:
+        errors.append(
+            f"R34 final-TU shim retained compatibility Hook ownership: {banned}")
 
 for banned in ("R22FailClosedEligibility();", "R22ResetBaselineTracking();"):
     if banned in r33:

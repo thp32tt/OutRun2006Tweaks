@@ -266,16 +266,24 @@ r33_guard = require(
 )
 if r33_guard.find("Present/pre") > r33_guard.find("R33PresentR32Hook.stdcall<HRESULT>"):
     raise SystemExit("R33 must reassert Reset replay fail-close before lower Present work")
-r34_observer = require(
+r34_shim = require(
     "src/vr/d3d9/stereo_renderer_r34.cpp",
-    "R33InstallStatus()",
-    "no R34 worker or D3D9 detours",
+    '#include "stereo_renderer_r33.cpp"',
+    "Do not add Hook objects, install state, polling, workers, or D3D9 detours here.",
 )
-for banned in ("R34InstallThread", "CreateThread(", "Sleep(",
-               "R33SynchronizeResetReplayGuardState(", "ReportAsyncResult("):
-    if banned in r34_observer:
+for marker in (
+        "class VRStereoR34ResetGuardHook final : public Hook",
+        'return "OpenXRVRStereoR34ResetGuard";',
+        "const auto r33 = R33InstallStatus();"):
+    if marker not in r33_guard:
         raise SystemExit(
-            f"R34 compatibility observer regained worker/state ownership: {banned}")
+            f"R33 final dispatcher missing folded R34 compatibility registration: {marker}")
+for banned in ("class VRStereoR34ResetGuardHook", "OpenXRVRStereoR34ResetGuard",
+               "R33InstallStatus()", "R34InstallThread", "CreateThread(", "Sleep(",
+               "R33SynchronizeResetReplayGuardState(", "ReportAsyncResult("):
+    if banned in r34_shim:
+        raise SystemExit(
+            f"R34 final-TU shim regained compatibility/runtime ownership: {banned}")
 
 r31 = load("src/vr/d3d9/stereo_renderer_r31.cpp")
 end_enable = r31.find(
