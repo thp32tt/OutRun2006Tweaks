@@ -47,7 +47,7 @@ SOURCE_SHA=hashlib.sha256(sb).hexdigest()
 if sb[:4]!=b"DDS ": raise RuntimeError("not DDS")
 H,W,pitch,depth,mips=struct.unpack_from("<5I",sb,12)
 pf=struct.unpack_from("<8I",sb,76)
-if (W,H,pitch,depth,mips)!=(1024,128,4096,1,1): raise RuntimeError((W,H,pitch,depth,mips))
+if (W,H,pitch,depth,mips)!=(1024,128,4096,0,1): raise RuntimeError((W,H,pitch,depth,mips))
 if pf[1:]!=(65,0,32,0xff,0xff00,0xff0000,0xff000000): raise RuntimeError(("pixel format",pf))
 if len(sb)!=128+W*H*4: raise RuntimeError(("byte size",len(sb)))
 
