@@ -60,7 +60,8 @@ WAIT_ACTIONS_STALE_SECONDS = max(GITHUB_BOUND_RUN_POLL_SECONDS, int(os.getenv("W
 WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS = max(GITHUB_POLL_SECONDS, int(os.getenv("WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS", "600")))
 QUEUE_NEXT_TASK_DELAY_SECONDS = max(0, int(os.getenv("QUEUE_NEXT_TASK_DELAY_SECONDS", "15")))
 QUEUE_IDLE_REARM_SECONDS = max(30, int(os.getenv("QUEUE_IDLE_REARM_SECONDS", "90")))
-LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "true"\nCONVERSION_PARALLEL = os.getenv("CONVERSION_PARALLEL", "true").lower() == "true"
+LOCALIZATION_PARALLEL = os.getenv("LOCALIZATION_PARALLEL", "false").lower() == "true"
+CONVERSION_PARALLEL = os.getenv("CONVERSION_PARALLEL", "true").lower() == "true"
 PARALLEL_LANE_STAGGER_SECONDS = max(0, int(os.getenv("PARALLEL_LANE_STAGGER_SECONDS", "15")))
 PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS = max(0, int(os.getenv("PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS", "15")))
 HEARTBEAT_SECONDS = max(5, int(os.getenv("HEARTBEAT_SECONDS", "15")))
@@ -255,7 +256,8 @@ runtime = {
     "github_token_configured": bool(GITHUB_TOKEN),
     "queue_next_task_delay_seconds": QUEUE_NEXT_TASK_DELAY_SECONDS,
     "queue_idle_rearm_seconds": QUEUE_IDLE_REARM_SECONDS,
-    "localization_parallel": LOCALIZATION_PARALLEL,\n    "conversion_parallel": CONVERSION_PARALLEL,
+    "localization_parallel": LOCALIZATION_PARALLEL,
+    "conversion_parallel": CONVERSION_PARALLEL,
     "parallel_lane_stagger_seconds": PARALLEL_LANE_STAGGER_SECONDS,
     "parallel_distinct_slot_send_gap_seconds": PARALLEL_DISTINCT_SLOT_SEND_GAP_SECONDS,
     "heartbeat_seconds": HEARTBEAT_SECONDS,
