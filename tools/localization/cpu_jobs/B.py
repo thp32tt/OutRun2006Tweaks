@@ -106,14 +106,14 @@ red[top_band_y0:top_band_y1,0:top_split]=alpha[top_band_y0:top_band_y1,0:top_spl
 orange[top_band_y0:top_band_y1,top_split:770]=alpha[top_band_y0:top_band_y1,top_split:770]
 mask_discovery['for_experts']={'window':[0,ty0,top_split,ty1],'seed_kind':'red','seed_pixels':int(red_seed.sum()),'seed_bbox':[int(rx.min()),ty0+int(ry.min()),int(rx.max())+1,ty0+int(ry.max())+1],'top_split_x':top_split,'top_band_y':[top_band_y0,top_band_y1]}
 mask_discovery['outrun2sp']={'window':[top_split,ty0,770,ty1],'seed_kind':'orange','seed_pixels':int(orange_seed.sum()),'seed_bbox':[int(ox.min()),ty0+int(oy.min()),int(ox.max())+1,ty0+int(oy.max())+1],'top_split_x':top_split,'top_band_y':[top_band_y0,top_band_y1]}
-music,mask_discovery['music_change']=semantic_mask('music_change',(820,45,1500,180),'white',12)
-time,mask_discovery['time_remaining']=semantic_mask('time_remaining',(1050,145,1960,310),'white',14)
+music,mask_discovery['music_change']=semantic_mask('music_change',(820,45,1500,176),'white',12)
+time,mask_discovery['time_remaining']=semantic_mask('time_remaining',(1050,176,1960,310),'white',14)
 source_masks={'for_experts':red,'outrun2sp':orange,'music_change':music,'time_remaining':time}
 expected={
  'for_experts':{'x':(0,540),'y':(60,210),'text':'상급자용','source':'For Experts','style':'red_white_navy','slant':0.28},
  'outrun2sp':{'x':(350,800),'y':(60,210),'text':'아웃런2 SP','source':'OutRun2SP','style':'orange_white_navy','slant':0.25},
- 'music_change':{'x':(820,1500),'y':(45,180),'text':'음악 변경','source':'Music Change','style':'white_shadow','slant':0.20},
- 'time_remaining':{'x':(1050,1960),'y':(145,310),'text':'남은 시간:','source':'Time remaining :','style':'white_navy','slant':0.20},
+ 'music_change':{'x':(820,1500),'y':(45,176),'text':'음악 변경','source':'Music Change','style':'white_shadow','slant':0.20},
+ 'time_remaining':{'x':(1050,1960),'y':(176,310),'text':'남은 시간:','source':'Time remaining :','style':'white_navy','slant':0.20},
 }
 source_bboxes={};source_text=np.zeros((H,W),bool)
 for k,m in source_masks.items():
