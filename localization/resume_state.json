@@ -1,5 +1,5 @@
 {
-  "schema_version": 72,
+  "schema_version": 73,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B_PRODUCTION58 completed even index 140 31C58963. Authoritative HD source ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd is 2048x1024 RGBA32/raw mirror_y. B56 readable binding corrected stale PRESS START to PRESS [Enter-key icon] KEY; B58 candidate b6d8bcc2f2cc05d45d4af3fbfab30f0a71e8fa68a89dee4c78b6f8a6aeca4cd3 localizes 누르세요 | preserved Enter-key icon | 키 plus 쇼룸/모드 선택/레이스 선택/스테이지 선택. B57 thin draft was rejected and reworked same invocation to Bold source-like weight. 6/6 exact bbox+size+positive-margin PASS; residue/outside/alpha/protected/overlap/touch=0; controller SOURCE/CLEAN/FINAL/row/raw self-QA PASS. Pending independent C and in-game. RUNTIME_VALIDATION=UNTESTED.",
     "B_PRODUCTION55 resolved C138-returned index 132 1F5FE6E9. Canonical source-alpha analysis proved four physical glyph/effect rows at [641,140,744,160], [641,164,861,184], [641,188,865,208], [641,211,865,232]; rows 2/3 prove exact 24px SPECIAL REQUEST periodicity and row4 panel-connected prefix is recovered only by row3+24 intersected with canonical source alpha. Candidate e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be preserves 1024x512 RGBA32 mip1 header/raw mirror_y, passes 4/4 bbox+size, outside/alpha/source-residue/overlap/touch=0, and controller SOURCE/CLEAN/FINAL/row/raw visual self-QA. B55_SELF_QA_PASS_PENDING_C_AND_INGAME; RUNTIME_VALIDATION=UNTESTED.",
     "C135 finalized EBFC709F after B48/B49/B50 failures: C134 exact-source line scan identified 4 physical occurrences (small JOIN/CREATE plus large blue CREATE/JOIN), and C135 rendered all four with verified Noto CJK while preserving explanatory English sentences. Final 7404fa227035e2fa003f4fa13f1bd348a050317757d7761c9d638f5fc1a01da4 preserves exact RGBA32 header/raw mirror_y, passes 4/4 bbox+size with positive margins and zero source residue/outside/alpha/protected/target/overlap/touch, and controller SOURCE/CLEAN/FINAL/row/raw visual QA. C135_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
     "C133 finalized 1762489B: B46 input cd066bd26952f6b9d20cf604919baa38ac1f0e74492d9f75ee6001e908b37d89 had correct mirror_y orientation/semantics and 5/5 machine containment, but controller visual QA found OUTRUN2SP COURSE alone had spurious slant 0.32 despite a shared upright four-row source family. C133 corrected only row4 to upright; final 324f677c4afc482ef3dbcf0cd226514a68847ee872d1eeda75b9311a9cb7a871 passes 5/5 bbox+size/positive-margin, zero source residue/outside/alpha/protected/overlap/touch, changes vs B46 outside row4=0, and SOURCE/B46/C133/full/raw visual QA. B_PRODUCTION47 fail-closed NameError produced no candidate and is superseded. C133_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
@@ -193,7 +194,7 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_B/20261005-B-PRODUCTION55/B55_1F5_REPORT.json",
+    "latest_hd_rework_batch": "localization/graphics/role_B/20261005-B-PRODUCTION58/B58_31C_REPORT.json",
     "hd_rework_candidates_ready": 16,
     "hd_rework_remaining": 0,
     "hd_partial_rework": {
@@ -2742,6 +2743,31 @@
     "pending_production_localize_text": 37,
     "machine_report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_MACHINE_QA.json",
     "report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_CONTROLLER_FINAL_QA.json",
+    "runtime_validation": "UNTESTED"
+  },
+  "b_production58_31c58963": {
+    "timestamp_kst": "2026-10-05T07:49:35+09:00",
+    "run": "20261005-B-PRODUCTION58",
+    "queue_index": 140,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+    "source_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+    "candidate_sha256": "b6d8bcc2f2cc05d45d4af3fbfab30f0a71e8fa68a89dee4c78b6f8a6aeca4cd3",
+    "supersedes_candidate_sha256": "8e5639642409fbbba8478a61025971bd611f89ea5711cf5a4127f5201583c968",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+    "semantic_correction": "PRESS START -> PRESS [Enter-key icon] KEY",
+    "physical_elements": 6,
+    "bbox_size_positive_margin": "6/6",
+    "source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "protected": 0,
+    "overlap": 0,
+    "touch_pairs": 0,
+    "controller_visual_qa": "PASS",
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION58/B58_31C_REPORT.json",
+    "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION58/B58_CONTROLLER_SELF_QA.json",
+    "c_final_qa": "PENDING",
+    "in_game_validation": "PENDING",
     "runtime_validation": "UNTESTED"
   }
 }
