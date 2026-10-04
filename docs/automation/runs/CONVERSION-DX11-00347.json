@@ -7,12 +7,12 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R237_EXHAUSTIVE_STATUS_SIGNATURE_EVIDENCE_FAIL_CLOSED_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
   "base_sha": "dca19b139bdf23aa311882627fb7dcc0c3671a0f",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "854bf2b442da55412b9157df90cd4c67b738a6b2",
+  "validation_bearing_result_sha": "854bf2b442da55412b9157df90cd4c67b738a6b2",
   "result_marker": "[AUTO:CONVERSION-DX11-00347]",
   "selected_work_item": "DX11_R237_EXHAUSTIVE_STATUS_SIGNATURE_EVIDENCE_FAIL_CLOSED",
   "summary": "R237 prevents an exhaustive draw census from advertising the clean exhaustive-translation-exact headline when current signature evidence is incomplete or hash-cap saturated. A complete unsaturated signature universe retains the existing diagnostic-only exhaustive exact status.",
@@ -43,22 +43,36 @@
       "evidence": "Gate the clean exhaustive exact headline on all_current_signature_evidence_coverage_complete; emit an explicit exhaustive signature-evidence-incomplete diagnostic status otherwise; make the positive exhaustive fixture include all four declared signatures; add negative/positive regression guards and source-graph drift checks."
     },
     "C3_VALIDATE": {
-      "status": "PENDING_EXACT_SHA_GATE",
-      "automation_validation": "PENDING",
-      "evidence": "Required exact-SHA Backend Conversion Gate will validate R237 analyzer regressions, source graph, dormant activation, Win32 build/binary and DX11 readiness smoke. No Quest 3/VDXR runtime test performed."
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R237_EXHAUSTIVE_STATUS_SIGNATURE_EVIDENCE_FAIL_CLOSED_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1917 run 37174254459 completed success for 854bf2b442da55412b9157df90cd4c67b738a6b2. validate job 111353463048 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, session regression, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R237 census analyzer regressions, then configured/built Win32, verified the binary and uploaded artifact 11292249073. DX11 readiness smoke job 111354214950 passed fixed-function shader, input-layout/signature, object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and fixed-function pipeline probes. Artifact digest sha256:6c4c0b7bcbb101c478b041310faa152e933be3b847f85f1fa48cba6c0fafa8bf. No Quest 3/VDXR runtime test was performed."
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "COMPLETE",
+      "material_result_sha": "854bf2b442da55412b9157df90cd4c67b738a6b2",
+      "validation_bearing_result_sha": "854bf2b442da55412b9157df90cd4c67b738a6b2",
+      "result_marker": "[AUTO:CONVERSION-DX11-00347]",
+      "implementation_commits": [
+        "854bf2b442da55412b9157df90cd4c67b738a6b2"
+      ],
+      "source_implementation_sha": "854bf2b442da55412b9157df90cd4c67b738a6b2"
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Offline census analyzer/status semantic change only; no runtime distributable identity change intended."
+      "reason": "Offline census analyzer/status semantic change only; no runtime distributable identity change."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "Require the exact-SHA Backend Conversion Gate on the R237 material result; after PASS, finalize run/lane bookkeeping while preserving RUNTIME_VALIDATION=UNTESTED."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37174254459,
+      "validation_job_id": 111353463048,
+      "readiness_smoke_job_id": 111354214950,
+      "artifact_id": 11292249073,
+      "artifact_digest": "sha256:6c4c0b7bcbb101c478b041310faa152e933be3b847f85f1fa48cba6c0fafa8bf",
+      "implementation_comment_id": 5976176199,
+      "validation_comment_id": 5976228781,
+      "exact_next_action": "Preserve R225-R237 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate."
     }
   },
   "regression_assessment": {
@@ -80,5 +94,21 @@
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE"
   },
-  "exact_next_action": "Publish the R237 material result without CI skip and require its exact-SHA Backend Conversion Gate."
+  "exact_next_action": "Release CONVERSION-DX11-00347 as complete; do not repeat R237. The next controller task may select the next independent DX11 source/static exactness gap. Quest 3/VDXR runtime proof remains separate.",
+  "issue14": {
+    "implementation_comment_id": 5976176199,
+    "validation_comment_id": 5976228781
+  },
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37174254459,
+      "run_number": 1917,
+      "result_sha": "854bf2b442da55412b9157df90cd4c67b738a6b2",
+      "conclusion": "success",
+      "validate_job_id": 111353463048,
+      "readiness_smoke_job_id": 111354214950,
+      "artifact_id": 11292249073,
+      "artifact_digest": "sha256:6c4c0b7bcbb101c478b041310faa152e933be3b847f85f1fa48cba6c0fafa8bf"
+    }
+  }
 }
