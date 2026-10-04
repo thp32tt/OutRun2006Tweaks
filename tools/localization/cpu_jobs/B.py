@@ -42,9 +42,14 @@ def load_rgba_dds_bytes(b):
     if b[:4]!=b'DDS ': raise RuntimeError('not DDS')
     h=struct.unpack_from('<I',b,12)[0]; w=struct.unpack_from('<I',b,16)[0]; pitch=struct.unpack_from('<I',b,20)[0]; mips=struct.unpack_from('<I',b,28)[0]
     fourcc=b[84:88]; bpp=struct.unpack_from('<I',b,88)[0]; masks=struct.unpack_from('<IIII',b,92); pf=struct.unpack_from('<I',b,80)[0]
-    if not(fourcc==b'\0\0\0\0' and bpp==32 and masks==(0xff,0xff00,0xff0000,0xff000000) and pitch==w*4 and mips==1 and len(b)==128+w*h*4):
+    if not(fourcc==b'\0\0\0\0' and bpp==32 and pitch==w*4 and mips==1 and len(b)==128+w*h*4):
         raise RuntimeError((h,w,pitch,mips,fourcc,bpp,masks,len(b)))
-    raw=Image.frombytes('RGBA',(w,h),b[128:],'raw','RGBA')
+    if masks==(0xff,0xff00,0xff0000,0xff000000):
+        raw=Image.frombytes('RGBA',(w,h),b[128:],'raw','RGBA')
+    elif masks==(0xff0000,0xff00,0xff,0xff000000):
+        raw=Image.frombytes('RGBA',(w,h),b[128:],'raw','BGRA')
+    else:
+        raise RuntimeError(('unsupported masks',masks))
     return b[:128],raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM),{'width':w,'height':h,'pitch':pitch,'mips':mips,'pf_flags':pf,'fourcc':'00000000','bpp':bpp,'masks':[hex(x) for x in masks]}
 def load_rgba_dds(p): return load_rgba_dds_bytes(Path(p).read_bytes())
 def write_dds(srcp, readable, outp):
