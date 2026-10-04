@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T08:01:30+09:00",
+  "updated_at_kst": "2026-10-05T08:15:09+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C140 finalizes 31C58963 after independently finding and correcting B58's 298-pixel KEY source-fringe residue at x457..461. Final ecc7efdde172f410c85207ecdc5bbfd5bac95c753341763ad6afb9a6a7f1b3f2: 6/6 bbox+size+positive margins and all outside/alpha/protected/icon/residue/overlap gates PASS; controller visual/raw mirror_y PASS. Producer REWORK=0; pending_artwork localize_text=37. 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94 remain strict HOLD. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "B_PRODUCTION60 produced even index 154 4D38BBB0 candidate c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a from authoritative 4096x1024 RGBA32 HD source. B59 canonical binding identified 8 physical text regions and corrected stale transcription by adding SHOWROOM plus duplicate SINGLE PLAYER/MULTIPLAYER occurrences. Ferrari artwork regions 0/1 are protected. 8/8 exact bbox+size+positive margins, clean/final validators and zero residue/outside/alpha/protected/artwork/overlap/touch PASS; controller SOURCE/CLEAN/FINAL/raw mirror_y self-QA PASS. pending_artwork localize_text=36; independent C final QA and in-game validation pending. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -322,19 +322,22 @@
       "in_game_validation": "PENDING; 1A43E9D9 remains REQUIRED_BEFORE_FINAL_APPROVAL; C140 RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
-      "run": "B_PRODUCTION58",
-      "worker_run_id": 37241376759,
-      "worker_output_commit": "b77203b2209b9a8b6ffc803def36d70ad30b74b2",
+      "run": "B_PRODUCTION60",
+      "worker_run_id": 37242986847,
+      "worker_output_commit": "a4b1cb78c7791e69dad58a2bea21dcc585bef5c5",
       "result": "ONE_NEW_CANDIDATE_SELF_QA_PASS_PENDING_C_INGAME",
       "assets": {
-        "31C58963": {
-          "queue_index": 140,
-          "source_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
-          "candidate_sha256": "b6d8bcc2f2cc05d45d4af3fbfab30f0a71e8fa68a89dee4c78b6f8a6aeca4cd3",
-          "status": "B_PRODUCTION58_SELF_QA_PASS_PENDING_C_AND_INGAME",
-          "report": "localization/graphics/role_B/20261005-B-PRODUCTION58/B58_31C_REPORT.json",
-          "physical_elements": 6,
-          "semantic_correction": "PRESS START -> PRESS [Enter-key icon] KEY"
+        "4D38BBB0": {
+          "queue_index": 154,
+          "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+          "candidate_sha256": "c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a",
+          "status": "B_PRODUCTION60_SELF_QA_PASS_PENDING_C_AND_INGAME",
+          "report": "localization/graphics/role_B/20261005-B-PRODUCTION60/B60_4D38_REPORT.json",
+          "physical_elements": 8,
+          "protected_artwork_regions": [
+            0,
+            1
+          ]
         }
       },
       "runtime_validation": "UNTESTED"
@@ -631,6 +634,25 @@
       "c_corrected_source_residue_pixels": 298,
       "c_machine_report": "localization/graphics/role_C/20261005-C140-31C58963/C140_31C_MACHINE_QA.json",
       "c_controller_report": "localization/graphics/role_C/20261005-C140-31C58963/C140_31C_CONTROLLER_FINAL_QA.json"
+    },
+    "b60_4d38bbb0": {
+      "queue_index": 154,
+      "candidate_sha256": "c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+      "status": "B_PRODUCTION60_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "bbox_size_positive_margin": "8/8",
+      "zero_pixel_gates": {
+        "source_residue": 0,
+        "outside": 0,
+        "alpha_outside": 0,
+        "protected": 0,
+        "artwork_changed": 0,
+        "overlap": 0,
+        "touch_pairs": 0
+      },
+      "controller_visual_qa": "PASS",
+      "report": "localization/graphics/role_B/20261005-B-PRODUCTION60/B60_4D38_REPORT.json",
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
