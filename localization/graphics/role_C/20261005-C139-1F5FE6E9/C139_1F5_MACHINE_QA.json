@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C139-1F5FE6E9",
+  "queue_index": 132,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+  "source_sha256": "3656adbd699b7852cb5fcf4bb01fc4f1f65bbd9d7d39e12e7a1c2ac5a49fef1d",
+  "candidate_sha256": "e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be",
+  "candidate_changed_by_C": false,
+  "producer_run": "20261005-B-PRODUCTION55",
+  "independent_source_mask_method": "canonical source nonzero-alpha pixels inside each producer-measured exact glyph/effect bbox; exact bbox equality and complete producer-mask equality required",
+  "structure": {
+    "width": 1024,
+    "height": 512,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "n": 1,
+      "source": "REQUEST",
+      "korean": "요청",
+      "original_bbox": [
+        641,
+        140,
+        744,
+        160
+      ],
+      "localized_bbox": [
+        642,
+        141,
+        672,
+        158
+      ],
+      "source_size": [
+        103,
+        20
+      ],
+      "localized_size": [
+        30,
+        17
+      ],
+      "delta_left": 1,
+      "delta_right": 72,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "n": 2,
+      "source": "SPECIAL REQUEST 1",
+      "korean": "스페셜 요청 1",
+      "original_bbox": [
+        641,
+        164,
+        861,
+        184
+      ],
+      "localized_bbox": [
+        642,
+        165,
+        737,
+        182
+      ],
+      "source_size": [
+        220,
+        20
+      ],
+      "localized_size": [
+        95,
+        17
+      ],
+      "delta_left": 1,
+      "delta_right": 124,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "n": 3,
+      "source": "SPECIAL REQUEST 2",
+      "korean": "스페셜 요청 2",
+      "original_bbox": [
+        641,
+        188,
+        865,
+        208
+      ],
+      "localized_bbox": [
+        642,
+        189,
+        738,
+        206
+      ],
+      "source_size": [
+        224,
+        20
+      ],
+      "localized_size": [
+        96,
+        17
+      ],
+      "delta_left": 1,
+      "delta_right": 127,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "n": 4,
+      "source": "SPECIAL REQUEST 3",
+      "korean": "스페셜 요청 3",
+      "original_bbox": [
+        641,
+        211,
+        865,
+        232
+      ],
+      "localized_bbox": [
+        642,
+        213,
+        738,
+        230
+      ],
+      "source_size": [
+        224,
+        21
+      ],
+      "localized_size": [
+        96,
+        17
+      ],
+      "delta_left": 1,
+      "delta_right": 127,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "machine_checks": {
+    "source_effect_pixels": 7946,
+    "source_mask_unchanged_in_clean": 0,
+    "clean_changed_outside_source_mask": 0,
+    "final_changed_outside_allowed": 0,
+    "alpha_changed_outside_allowed": 0,
+    "protected_changed": 0,
+    "render_changed_outside_target": 0,
+    "target_outside_allowed": 0,
+    "target_pixels": 2711,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": [],
+    "source_row_gaps": [
+      4,
+      4,
+      3
+    ]
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

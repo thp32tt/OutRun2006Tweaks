@@ -1,0 +1,19 @@
+{
+  "run": "20261005-C139-1F5FE6E9",
+  "asset": "1F5FE6E9",
+  "index": 132,
+  "source_sha256": "3656adbd699b7852cb5fcf4bb01fc4f1f65bbd9d7d39e12e7a1c2ac5a49fef1d",
+  "candidate_sha256": "e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be",
+  "machine_status": "PASS",
+  "bbox_size_positive_margin": "4/4",
+  "clean_source_residue": 0,
+  "clean_outside": 0,
+  "final_outside": 0,
+  "alpha_outside": 0,
+  "protected_changed": 0,
+  "render_outside_target": 0,
+  "overlap": 0,
+  "touch_pairs": 0,
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_MACHINE_QA.json"
+}
