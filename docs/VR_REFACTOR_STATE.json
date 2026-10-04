@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-04T11:32:00+09:00",
+  "updatedKst": "2026-10-04T13:50:11+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 900,
+  "cycle": 910,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -56,9 +56,10 @@
     "VR-REFACTOR-STATE-0004R",
     "VR-REFACTOR-STATE-0004S",
     "VR-REFACTOR-STATE-0004T",
-    "VR-REFACTOR-STATE-0004T-FIX00"
+    "VR-REFACTOR-STATE-0004T-FIX00",
+    "VR-REFACTOR-STATE-0004U"
   ],
-  "next": "Continue from cycle 900 by reviewing the remaining R9 depth-content ownership exposed to R20/R23/R29/R31/R32/R33 and R29 telemetry/counter ownership exposed to upper layers. Prefer small owner snapshot/note APIs only when they preserve hot-path cost and exact runtime semantics. 1000-cycle plan has 100 cycles remaining.",
+  "next": "Continue from cycle 910 by reviewing R29 telemetry/counter ownership still exposed to R31/R32/R33 and the remaining R9/R13 cross-layer state that can be encapsulated without adding hot-path work. 90 cycles remain to the 1000-cycle structural target.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -107,11 +108,15 @@
     "VR-REFACTOR-STATE-0004S removes R23's private dependence on R22ScissorSnapshot, R22CaptureGameScissor, and R22GameClearCoversBackbuffer. RED verifier SHA 8a9e2d61 failed exactly on these dependencies. R22 now exposes neutral D3D9RasterSnapshot owner APIs CaptureTrackedRasterState and TrackedGameClearCoversBackbuffer; R23 consumes them without changing its 16-draw live-validation window, StateBlock reliability shortcut, clear coverage, or baseline semantics.",
     "VR-REFACTOR-STATE-0004T resolves all three targeted findings from the 138-cycle review: R23 SetRenderTarget failure uses FailClosedTrackedRasterReplay instead of private R22FailClosedReplayState; R29 uses inline TopLevelDrawSerial() instead of direct R23GameDrawSerial at all six sites while retaining the 64-draw freshness bound; R31 registers PrimeTrackedRasterShadow instead of private R22PrimeShadowState for StateBlockRecovery.",
     "VR-REFACTOR-STATE-0004T-FIX00 updates stale deterministic verifier literals to the already-migrated owner contracts: verify_vr_architecture expects R20InstallStatus in R21, verify_vr_r32_review expects SetStereoRecoverySafetyThroughEpoch/RearmMonoSafetyEpoch, and the refactor verifier accepts PrimeTrackedRasterShadow as a callback symbol. No runtime source behavior changed in FIX00.",
-    "Final exact-SHA 640b0d5cbed5fd5fb36336d65509da4f8d62d514 passed DX9Ex Active Validation 37171033051: policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation Guard 37171033032 SUCCESS. Package artifact 11291113243 was validated and uploaded. Runtime remains UNTESTED."
+    "Final exact-SHA 640b0d5cbed5fd5fb36336d65509da4f8d62d514 passed DX9Ex Active Validation 37171033051: policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation Guard 37171033032 SUCCESS. Package artifact 11291113243 was validated and uploaded. Runtime remains UNTESTED.",
+    "Cycle 900->910 completed as 2 bounded review batches x 5 distinct lenses = exactly 10 structural review checks. The reviewed surface covered 7,123 lines across R9/R20/R23/R29/R31/R32/R33 and the refactor verifier.",
+    "VR-REFACTOR-STATE-0004U encapsulates R9 depth-content serial ownership. RED verifier SHA 8854e06a failed on direct R9MainDepthContentSerial/R9MonoDepthContentSerial access in R20/R23/R29/R31/R32/R33. R9 now owns R9SynchronizeDepthContentSerials() and R9NoteMainDepthContentWrite().",
+    "R20/R23 preserve the previous max(main,mono)+1 nonzero synchronization exactly through R9SynchronizeDepthContentSerials(). R29/R31/R32/R33 preserve the previous main-depth serial increment points exactly through R9NoteMainDepthContentWrite(); no D3D getter, extra branch, wait, or new hot-path synchronization was added.",
+    "Exact source a76f177898e1a3a8f08fc22d888da31d90ef1d5e passed DX9Ex Active Validation 37177901037 (policy/host/game/full-chain-compile/package SUCCESS), Domain Isolation 37177901118 SUCCESS, and HUD Inspector 37177901029 SUCCESS. Runtime remains UNTESTED."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0004T_FIX00_BUILD_VERIFIED_CYCLE_900",
-  "validatedSourceSha": "640b0d5cbed5fd5fb36336d65509da4f8d62d514",
-  "validationRunId": 37171033051,
+  "batchStatus": "VR-REFACTOR-STATE-0004U_BUILD_VERIFIED_CYCLE_910",
+  "validatedSourceSha": "a76f177898e1a3a8f08fc22d888da31d90ef1d5e",
+  "validationRunId": 37177901037,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -119,17 +124,18 @@
     "game": "SUCCESS",
     "fullChainCompile": "SUCCESS",
     "package": "SUCCESS",
-    "domainIsolation": "SUCCESS"
+    "domainIsolation": "SUCCESS",
+    "hudInspector": "SUCCESS",
+    "staticExeAnalysis": "SUCCESS"
   },
   "testCandidate": {
-    "sourceSha": "640b0d5cbed5fd5fb36336d65509da4f8d62d514",
-    "runtimeSourceChangeSha": "f3f67e342fa45c5f5caaaa5fca4ee31ac2bc265c",
-    "workflowRunId": 37171033051,
-    "artifactId": 11291113243,
-    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-640b0d5cbed5fd5fb36336d65509da4f8d62d514",
-    "artifactSizeBytes": 2729229,
-    "artifactDigestSha256": "8dd5b687e377808f9320852ed16a90140bfffa8ac97661e243d138ab10f90631",
-    "innerPackageSha256": "fb0dce3b1f0b1d64752776b8d6abaa659adf643b313619dbd7b81ef9b0eda744",
+    "sourceSha": "a76f177898e1a3a8f08fc22d888da31d90ef1d5e",
+    "workflowRunId": 37177901037,
+    "artifactId": 11293169298,
+    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-a76f177898e1a3a8f08fc22d888da31d90ef1d5e",
+    "artifactSizeBytes": 2729236,
+    "artifactDigestSha256": "e35f5522324480bf0aac973bc698e79e084addd78b83744670c11ba7e52189b5",
+    "innerPackageSha256": "a5420bdcb983f6524795a48bb264e3722c8dc320149f8207b17b7c0fb9923705",
     "defaultProfile": "CORRECTNESS",
     "userRuntimeVerified": false
   }
