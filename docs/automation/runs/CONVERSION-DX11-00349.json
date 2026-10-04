@@ -7,12 +7,12 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "status": "IN_PROGRESS_REPAIR_1_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R238_PROGRAMMABLE_SHADER_PAIR_INVENTORY_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
   "base_sha": "e43981f939e0f67ac98500e52f91166d62c1f33d",
-  "result_sha": "PENDING_REPAIR_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_REPAIR_RESULT_COMMIT_SHA",
+  "result_sha": "47e5eb443fb39365058988337fd8e69cafbd7616",
+  "validation_bearing_result_sha": "47e5eb443fb39365058988337fd8e69cafbd7616",
   "result_marker": "[AUTO:CONVERSION-DX11-00349]",
   "selected_work_item": "DX11_R238_PROGRAMMABLE_SHADER_PAIR_INVENTORY",
   "summary": "R238 extracts a dedicated current programmable VS/PS bytecode-pair inventory from existing detailed DX11 census signatures and keeps coverage fail-closed when signature detail/hash caps or shader introspection gaps make the inventory incomplete.",
@@ -43,28 +43,44 @@
       "evidence": "Parse the existing R85 shader identity block, dedupe complete programmable VS/PS bytecode pairs across current signature records, export pair metadata and signature references, and fail pair-coverage completeness closed on detail/hash caps, missing shader blocks, introspection failure or mixed pairs. Added positive dedupe and detail-cap regressions plus source-graph drift guards."
     },
     "C3_VALIDATE": {
-      "status": "REPAIR_1_PENDING_EXACT_SHA_GATE",
-      "automation_validation": "PENDING",
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R238_PROGRAMMABLE_SHADER_PAIR_INVENTORY_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Repair exact-SHA Backend Conversion Gate #1927 run 37176221784 completed success for 47e5eb443fb39365058988337fd8e69cafbd7616. validate job 111359261265 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, VR session regressions, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R238 census analyzer regressions; it configured/built Win32, verified dinput8.dll and uploaded artifact 11293786625. DX11 readiness smoke job 111360027023 passed fixed-function shader, input-layout/signature, shader object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and fixed-function pipeline probes. Artifact digest sha256:d42d93681de7b725993573f5cabb5d373621da7ec379968d8ac2c90a5eab0132. N100 auxiliary exact-SHA archive validation also passed Python syntax, analyzer regressions and source graph. No Quest 3/VDXR runtime test was performed.",
       "failed_result_sha": "db1f0ef43e9f1d0d9d688c9193ddb8806258f267",
       "failed_run_id": 37176002720,
       "failed_job_id": 111358609972,
-      "failure": "Gate #1926 failed at Verify one-click structure contract because transport of the validated analyzer file accidentally inserted Remote Desktop Commander response footer text into the published blob. The auxiliary validation export itself remained clean and had passed analyzer regressions/source-graph validation.",
-      "repair": "Republish the already-validated R238 files with chunk framing/footer stripped and verify each GitHub blob SHA against git hash-object before moving the branch ref.",
-      "runtime_validation": "UNTESTED"
+      "repair_count": 1
     },
     "C4_COMMIT": {
-      "status": "REPAIR_1_PENDING_RESULT_SHA_PUBLICATION",
+      "status": "COMPLETE",
+      "material_result_sha": "47e5eb443fb39365058988337fd8e69cafbd7616",
+      "validation_bearing_result_sha": "47e5eb443fb39365058988337fd8e69cafbd7616",
+      "result_marker": "[AUTO:CONVERSION-DX11-00349]",
+      "implementation_commits": [
+        "db1f0ef43e9f1d0d9d688c9193ddb8806258f267",
+        "47e5eb443fb39365058988337fd8e69cafbd7616"
+      ],
+      "source_implementation_sha": "47e5eb443fb39365058988337fd8e69cafbd7616",
       "failed_material_result_sha": "db1f0ef43e9f1d0d9d688c9193ddb8806258f267",
-      "validation_bearing_result_sha": "PENDING_REPAIR_RESULT_COMMIT_SHA"
+      "repair_count": 1
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
       "reason": "Offline census analyzer/evidence shaping only; no runtime distributable identity change."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "Publish the R238 material result without CI skip and require its exact-SHA Backend Conversion Gate; after PASS, finalize run/lane bookkeeping while preserving RUNTIME_VALIDATION=UNTESTED."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37176221784,
+      "validation_job_id": 111359261265,
+      "readiness_smoke_job_id": 111360027023,
+      "artifact_id": 11293786625,
+      "artifact_digest": "sha256:d42d93681de7b725993573f5cabb5d373621da7ec379968d8ac2c90a5eab0132",
+      "implementation_comment_id": 5976405348,
+      "repair_comment_id": 5976450333,
+      "validation_comment_id": 5976517110,
+      "exact_next_action": "Release CONVERSION-DX11-00349 as complete. Preserve R238 programmable shader-pair inventory and fail-closed evidence, keep NativeDrawPath dormant, and continue with one small programmable-shader translation/object-cache/input-linkage/constants unit from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate."
     }
   },
   "regression_assessment": {
@@ -87,9 +103,41 @@
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE"
   },
-  "exact_next_action": "Publish repair result with exact byte-for-byte blob verification and require its exact-SHA Backend Conversion Gate.",
+  "exact_next_action": "Release CONVERSION-DX11-00349 as complete. Preserve R238 programmable shader-pair inventory and fail-closed evidence, keep NativeDrawPath dormant, and continue with one small programmable-shader translation/object-cache/input-linkage/constants unit from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
   "failed_validation_bearing_sha": "db1f0ef43e9f1d0d9d688c9193ddb8806258f267",
   "failed_validation_run_id": 37176002720,
   "failed_validation_job_id": 111358609972,
-  "repair_count": 1
+  "repair_count": 1,
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37176221784,
+      "run_number": 1927,
+      "result_sha": "47e5eb443fb39365058988337fd8e69cafbd7616",
+      "conclusion": "success",
+      "validate_job_id": 111359261265,
+      "readiness_smoke_job_id": 111360027023,
+      "artifact_id": 11293786625,
+      "artifact_digest": "sha256:d42d93681de7b725993573f5cabb5d373621da7ec379968d8ac2c90a5eab0132"
+    },
+    "failed_gate": {
+      "result_sha": "db1f0ef43e9f1d0d9d688c9193ddb8806258f267",
+      "run_id": 37176002720,
+      "job_id": 111358609972,
+      "reason": "transport-corrupted analyzer blob; repaired by byte-exact Base64 publication"
+    },
+    "n100_exact_sha_static_validation": {
+      "result_sha": "47e5eb443fb39365058988337fd8e69cafbd7616",
+      "conclusion": "success",
+      "scope": [
+        "python_compile",
+        "test_analyze_dx11_census",
+        "verify_dx11_source_graph"
+      ]
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5976405348,
+    "repair_comment_id": 5976450333,
+    "validation_comment_id": 5976517110
+  }
 }
