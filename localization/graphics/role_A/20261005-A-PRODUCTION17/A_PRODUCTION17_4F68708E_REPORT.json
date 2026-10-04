@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION17",
+  "worker": "github-actions",
+  "worker_run_id": 37217762269,
+  "index": 99,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8",
+    "sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "path": "Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "classification": "authoritative high-resolution source; DDS header 2048x256 DXT5"
+  },
+  "source_effect_bboxes": [
+    [
+      537,
+      41,
+      1350,
+      126
+    ],
+    [
+      517,
+      126,
+      1610,
+      213
+    ]
+  ],
+  "source_effect_bboxes_block_aligned": false,
+  "decision": "FAIL_CLOSED: exact source glyph/effect bboxes are not 4x4 DXT5-block aligned; ordinary block splice would modify decoded pixels outside the exact source text bounds",
+  "next_method": "constrained DXT5 reconstruction with exact decoded-pixel proof, or another exact-safe method",
+  "candidate_written": false,
+  "runtime_validation": "UNTESTED",
+  "status": "A_PRODUCTION17_HOLD_STRICT_RECHECK_DXT5_EXACT_BBOX"
+}
