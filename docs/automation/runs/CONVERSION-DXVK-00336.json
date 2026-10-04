@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DXVK-00336",
+  "production_id": "CONVERSION-DXVK-00336",
+  "event_id": "CONVERSION-DXVK-00336-E002",
+  "event_type": "rollover",
+  "lane": "DXVK",
+  "target_branch": "vr-dxvk-r71-disasm",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "status": "VALIDATION_PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "work_item": "DXVK_F104_RAW_PROVENANCE_0x183799_TO_0x1837D9",
+  "summary": "Captured the next canonical 64-byte raw provenance window from the mandatory 0x39 overlap at 0x00183799, bound fail-closed to the validated F103 capture edge and preserved semantics as unresolved until exact decode.",
+  "evidence": {
+    "changed_paths": [
+      "tools/analyze_outrun_exe.py",
+      "tools/test_dxvk_continuation_86_raw_provenance.py"
+    ],
+    "material_commit_message": "dxvk: capture canonical 0x183799 overlap provenance [AUTO:CONVERSION-DXVK-00336]",
+    "material_result_sha": null,
+    "local_reference_commit": "83bbe89f6b37b88253a316429d3d640f5a4bcd70",
+    "analyzer_blob_sha": "0850d66771f33d092270d3bb0ace7c3faacdce97",
+    "test_blob_sha": "61d751b5e3d9005454e02023d7684e26e7db20bb",
+    "start_rva": "0x00183799",
+    "end_rva_exclusive": "0x001837D9",
+    "probe_len": 64,
+    "overlap_bytes": "39",
+    "predecessor_status": "EXACT_18375A_TO_183799_CONTROL_FLOW_CAPTURE_EDGE_PROVEN",
+    "semantic_promotion": "NONE",
+    "ownership_effect": "NONE",
+    "local_validation": [
+      "python3 -m py_compile tools/analyze_outrun_exe.py tools/test_dxvk_continuation_86_raw_provenance.py",
+      "python3 -m unittest tools.test_dxvk_continuation_86_raw_provenance",
+      "python3 tools/verify_vr_backend_disasm_contract.py",
+      "git diff --check"
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub branch content plus isolated N100 worktree; rollover kept ATTEMPT=1/3. Prior durable 00334 state was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Selected the exact next frontier from 00334: mandatory-overlap raw capture beginning at 0x00183799; no matching riskPath/history entry for tools/analyze_outrun_exe.py was found."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added continuation_86 raw-provenance collector, report/CLI fail-closed wiring, and dedicated static regression tests."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "evidence": "Local py_compile, dedicated unittest and backend disassembly contract passed. Exact GitHub material SHA is being recovered from this checkpoint parent before hosted exact-SHA validation."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "evidence": "Material source/test blobs are present on the target GitHub branch and match the locally validated material commit contents."
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Static canonical disassembly/provenance analyzer evidence only; no runtime payload, selector, deployment or packaged backend content changed."
+    },
+    "C6_STATE": {
+      "status": "IN_PROGRESS",
+      "state_persisted": true,
+      "evidence": "Validation-pending durable checkpoint; final record will replace material SHA and hosted validation evidence."
+    }
+  },
+  "blocker": null,
+  "exact_next_action": "Recover the material SHA as the parent of this checkpoint, validate that exact SHA with DXVK Canonical Disassembly Evidence and Backend Conversion Gate, then finalize C6 while keeping RUNTIME_VALIDATION=UNTESTED.",
+  "rollover_is_retry": false
+}
