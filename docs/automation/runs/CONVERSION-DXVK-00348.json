@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DXVK-00348",
-  "production_id": "CONVERSION-DXVK-00348",
-  "event_id": "CONVERSION-DXVK-00348-E004",
+  "production_id": "CONVERSION-DX11-00347",
+  "event_id": "CONVERSION-DX11-00347-E002",
   "event_type": "rollover",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
@@ -53,14 +53,16 @@
     "last_16_bytes": "8d 8c 01 44 01 00 00 89 4d f0 8b 0e 49 f6 c1 01",
     "local_aux_validation": {
       "exact_sha": "2d8b2b69f20baa4f0ec955f57924e251728a3f9a",
+      "red_test": "expected failure before F110 source implementation",
       "py_compile": "success",
-      "targeted_raw_provenance_unittest_86_to_89": "12/12 pass",
+      "continuation_87_88_89_unittest": "15/15 pass",
       "canonical_exe_sha256_verified": true,
-      "canonical_frontier_window": "0x0018384F..0x0018388F exact 64 bytes",
       "canonical_analyzer_rc": 0,
       "canonical_provenance_status": "EXACT_EXE_18384F_TO_18388F_PROVENANCE_CAPTURED",
+      "exact_bytes_match": true,
       "backend_disassembly_contract": "success",
-      "git_diff_check": "success"
+      "git_diff_check": "success",
+      "mutation_test": "RVA 0x00183860 one-byte mutation -> analyzer RC=202, exact_bytes_match=false"
     },
     "dxvk_canonical_disassembly_evidence": {
       "run_id": 37175141070,
@@ -84,7 +86,9 @@
       "artifact_digest": "sha256:405310f99978b3c9f057e6d9ce56632af00fb508b385127399fc28f1054552bb"
     },
     "semantic_promotion": "RAW_CANONICAL_PROVENANCE_ONLY",
-    "ownership_effect": "NONE"
+    "ownership_effect": "NONE",
+    "issue14_material_comment_id": 5976290223,
+    "issue14_validation_comment_id": 5976323337
   },
   "pipeline": {
     "C0_RECOVER": {
@@ -118,10 +122,17 @@
     }
   },
   "blocker": null,
-  "next_action": "Exact-decode complete canonical instructions from the fully pinned continuation_89 window 0x0018384F..0x0018388F, require inherited target 0x00183854 to resolve only from exact bytes/control flow, preserve any trailing partial instruction as the next mandatory overlap, and keep function/render/HUD/runtime semantics unresolved until separately proven.",
-  "exact_next_action": "Exact-decode complete canonical instructions from the fully pinned continuation_89 window 0x0018384F..0x0018388F, require inherited target 0x00183854 to resolve only from exact bytes/control flow, preserve any trailing partial instruction as the next mandatory overlap, and keep function/render/HUD/runtime semantics unresolved until separately proven.",
+  "next_action": "Exact-decode the 25 complete canonical instructions in the validated 0x0018384F..0x0018388F capture. Resolve inherited target 0x00183854 on an exact instruction boundary, prove branches 0x0018384F->0x0018385A and 0x00183856->0x00183842 only from exact bytes, and keep function/render/HUD/runtime semantics unresolved.",
+  "exact_next_action": "Exact-decode the 25 complete canonical instructions in the validated 0x0018384F..0x0018388F capture. Resolve inherited target 0x00183854 on an exact instruction boundary, prove branches 0x0018384F->0x0018385A and 0x00183856->0x00183842 only from exact bytes, and keep function/render/HUD/runtime semantics unresolved.",
   "validated_at_kst": "2026-10-04T12:54:57+09:00",
   "controller_dispatch": {
+    "production_id": "CONVERSION-DX11-00347",
+    "event_id": "CONVERSION-DX11-00347-E002",
+    "event_type": "rollover",
+    "attempt": "1/3"
+  },
+  "rollover_is_retry": false,
+  "prior_controller_dispatch": {
     "production_id": "CONVERSION-DXVK-00348",
     "event_id": "CONVERSION-DXVK-00348-E004",
     "event_type": "rollover",
@@ -130,7 +141,14 @@
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt"
   },
-  "rollover_is_retry": false,
-  "chat_rollover": 3,
-  "resume_reason": "Retry persisted after one recovery attempt"
+  "dispatch_metadata_correction": {
+    "reason": "The current controller-issued CONVERSION-DX11-00347-E002 rollover dispatch is authoritative. A concurrent C6 writer persisted CONVERSION-DXVK-00348-E004/chat_rollover=3 after the same validated material result. Only dispatch metadata and auxiliary-validation detail are corrected; material result, exact-SHA validation, runtime status and next frontier remain unchanged.",
+    "authoritative_production_id": "CONVERSION-DX11-00347",
+    "authoritative_event_id": "CONVERSION-DX11-00347-E002",
+    "attempt_incremented": false,
+    "material_result_unchanged": true,
+    "validation_bearing_result_unchanged": true,
+    "automation_validation_unchanged": "PASS_EXACT_SHA_CANONICAL_STATIC_AND_BACKEND_CONVERSION_GATE",
+    "runtime_validation_unchanged": "UNTESTED"
+  }
 }
