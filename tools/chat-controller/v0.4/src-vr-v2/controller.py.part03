@@ -1185,6 +1185,448 @@ def reconcile_legacy_conversion_blocked(q: dict) -> bool:
     return bool(recovered)
 
 
+async def conversion_send_lane_task(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    q: dict,
+    slot_name: str,
+) -> bool:
+    """Dispatch one conversion lane without blocking the other conversion lanes."""
+    now = datetime.now(TZ)
+    reg = load_registry(now)
+    slot = next((item for item in reg.slots if item.name == slot_name), None)
+    if slot is None:
+        return False
+
+    guard = send_guard_reason(reg, slot, now)
+    if guard:
+        write_runtime(
+            status="conversion_parallel_dispatch_wait",
+            last_action=f"Conversion lane {slot_name} waiting for {guard}",
+            queue=q,
+        )
+        return False
+
+    target = queue_target_for_slot(slot_name)
+    base_sha = github_branch_head(target["branch"])
+    if not base_sha:
+        write_runtime(
+            status="queue_github_unavailable",
+            last_action=f"Could not read branch {target['branch']} for conversion lane {slot_name}",
+            queue=q,
+        )
+        return False
+
+    page = await slot_page(context, pages, slot)
+    if slot.url and not is_project_scoped_chat_url(slot.url):
+        slot.url = None
+        save_registry(reg)
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+
+    if await detect_busy(page):
+        write_runtime(
+            status="conversion_parallel_dispatch_wait",
+            last_action=f"Conversion lane {slot_name} previous chat is still busy",
+            queue=q,
+        )
+        return False
+
+    if slot.url and await detect_conversation_limit(page):
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+
+    if await first_visible(page, RETRY_SELECTORS, total_wait_ms=500) is not None:
+        page = await replace_with_fresh_slot_page(context, pages, slot)
+
+    if not await ensure_logged_in(page):
+        write_runtime(status="login_required", last_action=f"Conversion lane {slot_name}: login required", queue=q)
+        return False
+
+    if await first_visible(page, INPUT_SELECTORS, total_wait_ms=1500) is None:
+        page = await recover_slot_composer(context, pages, slot, page)
+        if await first_visible(page, INPUT_SELECTORS, total_wait_ms=3000) is None:
+            write_runtime(
+                status="ui_changed",
+                last_action=f"Conversion lane {slot_name}: composer unavailable",
+                queue=q,
+            )
+            return False
+
+    if await detect_rate_limit(page):
+        mark_rate_limit(reg, datetime.now(TZ), f"conversion-parallel-dispatch:{slot_name}")
+        return False
+    if await detect_limit(page):
+        write_runtime(
+            status="limit_detected",
+            last_action=f"Conversion lane {slot_name}: usage limit detected",
+            queue=q,
+        )
+        return False
+
+    minimum_next = queue_lane_minimum_next(q, target["lane"])
+    production_id = allocate_lane_production_id(reg, target["lane"], "CONVERSION", minimum_next)
+    draft = {
+        "task_id": production_id,
+        "production_id": production_id,
+        "attempt": 1,
+        "retry_count": 0,
+        "rollover_count": 0,
+        "chat_rollovers": 0,
+    }
+    event = append_task_event(reg, draft, "dispatch")
+    runtime["queue_task_id"] = production_id
+    runtime["queue_production_id"] = production_id
+    runtime["queue_event_id"] = event.event_id
+    runtime["queue_event_type"] = event.event_type
+    runtime["queue_lane"] = target["lane"]
+    runtime["queue_branch"] = target["branch"]
+    runtime["queue_attempt"] = 1
+    runtime["queue_wave_id"] = None
+    runtime["queue_failure_context"] = ""
+    runtime["queue_qa_batch"] = []
+
+    if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
+        write_runtime(
+            status="thinking_level_blocked",
+            last_action=f"Conversion lane {slot_name}: {PREFERRED_THINKING_LEVEL} not verified",
+            queue=q,
+        )
+        return False
+
+    result = await send_message(page, prompt_for_slot(slot, "parallel"))
+    if result != "sent":
+        write_runtime(
+            status="ui_changed",
+            last_action=f"Conversion lane {slot_name}: send failed at {result}",
+            queue=q,
+        )
+        return False
+
+    sent_at = datetime.now(TZ)
+    if not slot.url:
+        new_url = await wait_for_chat_url(page, timeout_sec=8)
+        if new_url:
+            slot.url = new_url
+
+    if await detect_rate_limit(page):
+        slot.last_sent_at = sent_at.isoformat()
+        slot.last_result = "rate_limited_after_send"
+        save_registry(reg)
+        mark_rate_limit(reg, sent_at, f"conversion-parallel-send:{slot_name}")
+        return False
+
+    note_successful_request(reg, sent_at, slot.name)
+    slot.runs += 1
+    slot.watchdog_resumes_since_schedule = 0
+    slot.last_assistant_hash = None
+    slot.last_assistant_change_at = sent_at.isoformat()
+    slot.last_sent_at = sent_at.isoformat()
+    slot.last_result = "conversion_parallel_sent"
+    reg.next_slot = (reg.slots.index(slot) + 1) % len(reg.slots)
+    save_registry(reg)
+
+    production_number = int(production_id.rsplit("-", 1)[-1])
+    q["counter"] = max(int(q.get("counter", 0)), production_number)
+    q.setdefault("active_by_lane", {})[slot_name] = {
+        "task_id": production_id,
+        "production_id": production_id,
+        "event_id": event.event_id,
+        "event_type": event.event_type,
+        "slot": slot_name,
+        "lane": target["lane"],
+        "branch": target["branch"],
+        "workflow": target["workflow"],
+        "base_sha": base_sha,
+        "result_sha": None,
+        "attempt": 1,
+        "retry_count": 0,
+        "rollover_count": 0,
+        "chat_rollovers": 0,
+        "previous_chat_urls": [],
+        "active_chat_url": slot.url,
+        "phase": "WAIT_CHAT",
+        "status": "WAIT_CHAT",
+        "terminal": None,
+        "sent_at": sent_at.isoformat(),
+        "last_hash": None,
+        "last_hash_changed_at": sent_at.isoformat(),
+        "last_gate_poll_at": None,
+        "failure_context": "",
+    }
+    save_queue_state(q)
+    write_runtime(
+        status="conversion_parallel_running",
+        last_action=f"Sent conversion lane {slot_name} as {production_id} event={event.event_id}",
+        queue=q,
+    )
+    return True
+
+
+async def conversion_process_lane(
+    context: BrowserContext,
+    pages: dict[str, Page],
+    q: dict,
+    lane_key: str,
+) -> None:
+    """Advance one independent DX11/DXVK/DX9Ex task without serializing the other lanes."""
+    active = q.get("active_by_lane", {}).get(lane_key)
+    if not active or active.get("phase") == "DONE":
+        return
+
+    now = datetime.now(TZ)
+    reg = load_registry(now)
+    slot = next((item for item in reg.slots if item.name == active["slot"]), None)
+    if slot is None:
+        active["failure_context"] = "slot_missing"
+        active["phase"] = "BLOCKED"
+    else:
+        page = await slot_page(context, pages, slot)
+
+        if active["phase"] == "WAIT_CHAT":
+            task_commit = github_find_task_commit(active["branch"], active["task_id"])
+            if task_commit:
+                active["result_sha"] = task_commit["sha"]
+                active["result_message"] = task_commit["message"]
+                active["phase"] = "WAIT_ACTIONS"
+                active["wait_actions_started_at"] = now.isoformat()
+                active["last_gate_poll_at"] = None
+                save_queue_state(q)
+                return
+
+            if await queue_handle_retry_surface(page, reg, slot, active, q, context, pages):
+                return
+            if not slot.url or not is_project_scoped_chat_url(slot.url):
+                reason = "Active conversion lane chat URL is missing or outside the configured project."
+                if await queue_rollover_chat(context, pages, active, reason):
+                    save_queue_state(q)
+                return
+            if await detect_conversation_limit(page):
+                reason = "ChatGPT reported that the current conversion lane conversation reached its length limit."
+                if await queue_rollover_chat(context, pages, active, reason):
+                    save_queue_state(q)
+                return
+            if await detect_busy(page):
+                return
+
+            response = await last_assistant_text(page)
+            if not response:
+                sent_at = _parse_iso(active.get("sent_at")) or now
+                if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
+                    return
+                reason = (
+                    "No assistant response was detected before the queue result grace period expired; "
+                    "the conversion lane chat may be stale, hidden, or failed before generation started."
+                )
+                if await queue_rollover_chat(context, pages, active, reason):
+                    save_queue_state(q)
+                return
+
+            clear_rate_limit_after_response(reg)
+            active["last_retry_backoff_at"] = None
+            active["last_retry_click_at"] = None
+            digest = stable_hash(response)
+            changed_at = _parse_iso(active.get("last_hash_changed_at")) or now
+            if digest != active.get("last_hash"):
+                active["last_hash"] = digest
+                active["last_hash_changed_at"] = now.isoformat()
+                save_queue_state(q)
+                return
+            if (now - changed_at).total_seconds() < QUEUE_STABLE_SECONDS:
+                return
+
+            task_commit = github_find_task_commit(active["branch"], active["task_id"])
+            if not task_commit:
+                sent_at = _parse_iso(active.get("sent_at")) or now
+                if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
+                    return
+                reason = "Chat response stabilized but no durable commit carrying the exact [AUTO:TASK_ID] marker was found."
+                if active["attempt"] < MAX_TASK_ATTEMPTS:
+                    previous_attempt = active["attempt"]
+                    active["attempt"] = previous_attempt + 1
+                    if await queue_send_retry(context, pages, active, reason):
+                        save_queue_state(q)
+                    else:
+                        active["attempt"] = previous_attempt
+                        save_queue_state(q)
+                    return
+                active["failure_context"] = reason
+                active["phase"] = "BLOCKED"
+            else:
+                active["result_sha"] = task_commit["sha"]
+                active["result_message"] = task_commit["message"]
+                active["phase"] = "WAIT_ACTIONS"
+                active["wait_actions_started_at"] = now.isoformat()
+                active["last_gate_poll_at"] = None
+                if github_actions_skip_directive(active["result_message"]):
+                    recovery = await recover_missing_gate_run(context, pages, active, now)
+                    save_queue_state(q)
+                    if recovery:
+                        action, reason = recovery
+                        write_runtime(
+                            status="conversion_parallel_missing_gate_recovery",
+                            last_action=f"{active['task_id']} {action}: {reason}",
+                            queue=q,
+                        )
+                    return
+                save_queue_state(q)
+                return
+
+        if active["phase"] == "WAIT_ACTIONS":
+            rebound = refresh_wait_actions_task_binding(
+                active,
+                force_refresh=bool(active.get("startup_reconcile_pending")),
+            )
+            if rebound:
+                save_queue_state(q)
+
+            bound_run_id = (active.get("gate_run") or {}).get("id")
+            poll_seconds = GITHUB_BOUND_RUN_POLL_SECONDS if bound_run_id else GITHUB_POLL_SECONDS
+            last_poll = _parse_iso(active.get("last_gate_poll_at"))
+            if last_poll and (now - last_poll).total_seconds() < poll_seconds:
+                return
+
+            active["last_gate_poll_at"] = now.isoformat()
+            run = github_gate_run(
+                active["branch"],
+                active["result_sha"],
+                active["workflow"],
+                run_id=bound_run_id,
+                force_discovery=not bool(bound_run_id),
+            )
+            save_queue_state(q)
+            if run is None:
+                recovery = await recover_missing_gate_run(context, pages, active, now)
+                if recovery:
+                    action, reason = recovery
+                    save_queue_state(q)
+                    write_runtime(
+                        status="conversion_parallel_missing_gate_recovery",
+                        last_action=f"{active['task_id']} {action}: {reason}",
+                        queue=q,
+                    )
+                    return
+                save_queue_state(q)
+                return
+
+            active["gate_run"] = run
+            status_key = f"{run.get('status')}:{run.get('conclusion')}"
+            if status_key != active.get("last_gate_status"):
+                active["last_gate_status"] = status_key
+                active["last_gate_status_changed_at"] = now.isoformat()
+
+            if run["status"] != "completed":
+                changed_at = _parse_iso(active.get("last_gate_status_changed_at")) or now
+                last_jobs = _parse_iso(active.get("last_jobs_refresh_at"))
+                if (
+                    (now - changed_at).total_seconds() >= WAIT_ACTIONS_STALE_SECONDS
+                    and (not last_jobs or (now - last_jobs).total_seconds() >= WAIT_ACTIONS_STALE_SECONDS)
+                ):
+                    active["gate_jobs"] = github_action_jobs_summary(run["id"])
+                    active["last_jobs_refresh_at"] = now.isoformat()
+                save_queue_state(q)
+                return
+
+            if run.get("conclusion") == "success":
+                active["automation_validation"] = "PASS"
+                active["runtime_validation"] = "UNTESTED"
+                active["completed_at"] = now.isoformat()
+                active["terminal"] = "PASS"
+                active["phase"] = "DONE"
+                q["completed"] = (q.get("completed", []) + [dict(active)])[-100:]
+                save_queue_state(q)
+                write_runtime(
+                    status="conversion_parallel_pass",
+                    last_action=f"{active['task_id']} automation PASS; other conversion lanes continue independently",
+                    last_completed=dict(active),
+                    queue=q,
+                )
+                return
+
+            active["gate_jobs"] = github_action_jobs_summary(run["id"])
+            reason = (
+                f"{active['workflow']} exact run {run.get('id')} concluded {run.get('conclusion')}; "
+                f"inspect {run.get('html_url')}"
+            )
+            if active["attempt"] < MAX_TASK_ATTEMPTS:
+                previous_attempt = active["attempt"]
+                active["attempt"] = previous_attempt + 1
+                if await queue_send_retry(context, pages, active, reason):
+                    save_queue_state(q)
+                else:
+                    active["attempt"] = previous_attempt
+                    save_queue_state(q)
+                return
+            active["failure_context"] = reason
+            active["phase"] = "BLOCKED"
+
+    if active.get("phase") == "BLOCKED":
+        active["automation_validation"] = "FAIL"
+        active["runtime_validation"] = "UNTESTED"
+        active["blocked_at"] = now.isoformat()
+        active["terminal"] = "BLOCKED"
+        active["phase"] = "DONE"
+        q["blocked"] = (q.get("blocked", []) + [dict(active)])[-100:]
+        save_queue_state(q)
+
+
+async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
+    """Keep DX11, DXVK and DX9Ex independently active; one stalled lane must not block the others."""
+    now = datetime.now(TZ)
+    q = load_queue_state()
+    reconcile_legacy_conversion_blocked(q)
+    q = load_queue_state()
+    active_by_lane = q.setdefault("active_by_lane", {})
+
+    legacy = q.get("active")
+    if isinstance(legacy, dict):
+        legacy_slot = str(legacy.get("slot") or "")
+        if legacy_slot in {"A", "B", "C"} and legacy_slot not in active_by_lane:
+            active_by_lane[legacy_slot] = legacy
+        elif legacy_slot in {"A", "B", "C"}:
+            q.setdefault("blocked", []).append({
+                **legacy,
+                "failure_context": "parallel migration found duplicate active task for slot",
+                "automation_validation": "FAIL",
+                "runtime_validation": "UNTESTED",
+                "blocked_at": now.isoformat(),
+            })
+        q["active"] = None
+        q.pop("next_task_not_before", None)
+        save_queue_state(q)
+
+    for lane_key in ("A", "B", "C"):
+        if lane_key in active_by_lane:
+            await conversion_process_lane(context, pages, q, lane_key)
+
+    for lane_key in list(active_by_lane):
+        task = active_by_lane.get(lane_key)
+        if task and task.get("phase") == "DONE":
+            active_by_lane.pop(lane_key, None)
+    save_queue_state(q)
+
+    if rate_limit_active(load_registry(datetime.now(TZ)), datetime.now(TZ)):
+        return
+
+    # DX9Ex is considered first when opening a missing lane so its priority-zero
+    # structural-refactor chain starts before ordinary conversion work after redeploy.
+    for lane_key in ("C", "A", "B"):
+        if lane_key in active_by_lane:
+            continue
+        if await conversion_send_lane_task(context, pages, q, lane_key):
+            break
+
+    write_runtime(
+        status="conversion_parallel_running",
+        last_action=(
+            "Independent conversion lanes active: "
+            + ", ".join(
+                f"{key}={value.get('task_id')}:{value.get('phase')}"
+                for key, value in sorted(q.get("active_by_lane", {}).items())
+            )
+        ),
+        queue=q,
+    )
+
+
 async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
     now = datetime.now(TZ)
     q = load_queue_state()
@@ -1618,7 +2060,9 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
         startup_reconcile_queue_state()
     if once:
         if QUEUE_MODE:
-            if CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL:
+            if CONTROLLER_MODE == "conversion" and CONVERSION_PARALLEL:
+                await conversion_parallel_cycle(context, pages)
+            elif CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL:
                 await localization_parallel_cycle(context, pages)
             else:
                 await queue_cycle(context, pages)
@@ -1643,7 +2087,9 @@ async def scheduler_loop(context: BrowserContext, pages: dict[str, Page], once: 
             last_queue_check = mono
             did_work = True
             try:
-                if CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL:
+                if CONTROLLER_MODE == "conversion" and CONVERSION_PARALLEL:
+                    await conversion_parallel_cycle(context, pages)
+                elif CONTROLLER_MODE == "localization" and LOCALIZATION_PARALLEL:
                     await localization_parallel_cycle(context, pages)
                 else:
                     await queue_cycle(context, pages)
