@@ -1264,3 +1264,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/CLEAN/FINAL and 2x row-contact visual review PASS; direct raw source/final DDS review confirms both share intentional mirror_y storage. No visible English residue, clipping, overlap, seam, halo or orientation regression; Korean keeps the source white-fill/navy-outline/right-slanted family.
 - Queue index 98 advanced to b40_self_qa_pass_pending_c. RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. Pending-artwork localize_text count becomes 43. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_B/20261005-B-PRODUCTION40/B_PRODUCTION40_42E_REPORT.json and localization/graphics/role_B/20261005-B-PRODUCTION40/.
+## 2026-10-05T03:54:27+09:00 — C126 42E618FD B_PRODUCTION40 final QA
+- Reviewed only the new B_PRODUCTION40 42E618FD handoff; previously completed C125/C118/C117 assets were not repeated.
+- Candidate 86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a: hosted C independent DXT5 header/decode PASS; 1/1 exact source-bbox containment and source-size ceiling PASS with positive margins L149/R151/T5/B7. Clean changed outside source mask=0, source-mask unchanged in CLEAN=0, visible/alpha outside allowed=0, protected visible=0, residual visible source-effect outside 2px Korean guard at alpha>16=0, target visible outside allowed=0.
+- Controller SOURCE/CLEAN/FINAL and 2x row-contact review PASS: Korean 코스 기록에 도전하세요. retains the source white-fill/navy-outline/right-slanted family with no visible residue, clipping, overlap, seam, halo or orientation regression. Producer direct raw review and DDS metadata both preserve mirror_y.
+- 42E618FD advances to C126_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. Producer REWORK remains 0.
+- Existing 1A43E9D9 stays HIGH_RISK static PASS pending mandatory in-game validation; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD. pending_artwork localize_text=43.
+- RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261005-C126-42E618FD/C126_42E618FD_CONTROLLER_FINAL_QA.json

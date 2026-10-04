@@ -7,7 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
-    "B_PRODUCTION40 produced even index 98 42E618FD candidate 86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a: hosted 1/1 exact/decoded bbox+size and zero outside/residue/patch escape PASS; controller source/clean/final/row plus direct raw mirror_y self-QA PASS. Independent C final QA and isolated in-game validation remain pending; pending_artwork localize_text=43; RUNTIME_VALIDATION=UNTESTED.",
+    "C126 finalized B_PRODUCTION40 42E618FD candidate 86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a: hosted independent DXT5 header/decode + 1/1 exact bbox/size PASS with positive margins, zero clean/source-residue/outside/alpha/protected/target failures, and controller source/clean/final/row visual PASS. Static state C126_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
     "C125 finalized A_PRODUCTION20 9CE4E175 cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2 and A_PRODUCTION21 EBEF6D20 005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2 as static pixel/visual PASS pending in-game. Latest B_PRODUCTION39 1A43E9D9 601be9747c0cf03e89740786fe0782ec1e71f0e480ceb5e3d740637d048043b3 passes independent C124 machine + C high-zoom/readable/raw static QA but row1 has delta_top=0 edge touch; classify HIGH_RISK static PASS and require actual in-game validation before final approval. Producer REWORK remains 0. RUNTIME_VALIDATION=UNTESTED.",
     "C118 finalized B_PRODUCTION32 788CE557 candidate cc6727baac1b6946ae92cf5bc5568145c1d3ced2248f1fc134e9cc79c5f17149: direct SHA/header and 4/4 exact bbox+size arithmetic PASS, producer zero-residue/outside/protected/overlap/guard gates PASS, and C SOURCE/CLEAN/FINAL/row/TOP_PAIR/raw visual QA PASS. C108/B31 source residue is resolved; producer REWORK remaining=0. RUNTIME_VALIDATION=UNTESTED.",
     "C117 finalized B_PRODUCTION30 53CE39D5 candidate 08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1: independent 19/19 exact bbox+size/header/mask QA PASS and C source/clean/final/row/raw visual PASS; C114 visible dash/shadow residue return is resolved. RUNTIME_VALIDATION=UNTESTED.",
@@ -114,12 +114,12 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-05T03:24:49+09:00",
+      "updated_at_kst": "2026-10-05T03:54:27+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20261005-C125-FINAL/C125_CROSS_LANE_FINAL_QA.json",
+      "report": "localization/graphics/role_C/20261005-C126-42E618FD/C126_42E618FD_CONTROLLER_FINAL_QA.json",
       "direct_queue_scope": 126,
-      "current_candidates_scanned": 24,
-      "elements_scanned": 264,
+      "current_candidates_scanned": 25,
+      "elements_scanned": 265,
       "pixel_visual_pass_assets": [
         "FF2462BB",
         "C4A2937B",
@@ -152,25 +152,24 @@
         "313DB8CB",
         "788CE557",
         "9CE4E175",
-        "EBEF6D20"
+        "EBEF6D20",
+        "42E618FD"
       ],
       "rework_required_assets": [],
       "failed_elements": 0,
       "pending_production_localize_text": 43,
       "hold_strict_recheck_zoom_review": 47,
       "promotion_hold_for_pixel_pass": true,
-      "promotion_hold_reason": "1A43E9D9 is static PASS but HIGH_RISK edge-touch and requires in-game validation before final approval; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD; unfinished queue rows remain.",
+      "promotion_hold_reason": "1A43E9D9 remains static PASS but HIGH_RISK edge-touch and requires in-game validation before final approval; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD; unfinished queue rows remain.",
       "user_approved_locked": 0,
       "failed_assets": 0,
       "latest_c_revalidated_assets": [
-        "9CE4E175",
-        "EBEF6D20",
-        "1A43E9D9"
+        "42E618FD"
       ],
-      "latest_c_revalidated_physical_elements": 5,
+      "latest_c_revalidated_physical_elements": 1,
       "runtime_validation": "UNTESTED",
-      "current_run_assets_scanned": 3,
-      "current_run_physical_elements_scanned": 5,
+      "current_run_assets_scanned": 1,
+      "current_run_physical_elements_scanned": 1,
       "high_risk_static_pass_assets": [
         "1A43E9D9"
       ]

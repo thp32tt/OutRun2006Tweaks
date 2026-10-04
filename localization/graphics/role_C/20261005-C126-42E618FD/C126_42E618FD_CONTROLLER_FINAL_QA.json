@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C126",
+  "timestamp_kst": "2026-10-05T03:54:27+09:00",
+  "scope": "new/changed unfinished handoff only: B_PRODUCTION40 42E618FD; C125/C118/C117-completed assets not repeated",
+  "candidate_changed_by_C": false,
+  "asset": "42E618FD",
+  "queue_index": 98,
+  "producer_run": "B_PRODUCTION40",
+  "candidate_sha256": "86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION40/B_PRODUCTION40_42E_REPORT.json",
+  "machine_report": "localization/graphics/role_C/20261005-C126-42E618FD/C126_42E618FD_MACHINE_QA.json",
+  "machine_status": "PASS",
+  "machine_checks": {
+    "header_128_exact": true,
+    "bbox_and_size": "1/1 PASS",
+    "clean_changed_pixels_outside_source_mask": 0,
+    "source_mask_pixels_unchanged_in_clean": 0,
+    "visible_pixels_outside_allowed_mask_alpha_gt16": 0,
+    "alpha_changed_pixels_outside_allowed_mask": 0,
+    "protected_visible_pixels_alpha_gt16": 0,
+    "residual_visible_pixels_outside_2px_target_guard_alpha_gt16": 0,
+    "target_visible_pixels_outside_allowed": 0,
+    "edge_touch_high_risk": false
+  },
+  "controller_visual_qa": "PASS",
+  "controller_visual_evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION40/B_PRODUCTION40_42E_COMPARE.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION40/B_PRODUCTION40_42E_ROW_CONTACT_2X.jpg"
+  ],
+  "controller_visual_note": "PASS: Challenge the course record. source lettering is fully removed in CLEAN and the Korean 코스 기록에 도전하세요. reproduces the white-fill/navy-outline/right-slanted source family. The decoded localized bbox has positive margins on all four sides, no clipping/overlap/seam/halo/source residue is visible, and source/final preserve the same raw mirror_y orientation.",
+  "decision": "C126_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "existing_high_risk_static_pass_assets": [
+    "1A43E9D9"
+  ],
+  "global_rework_remaining": [],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94"
+  ],
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
