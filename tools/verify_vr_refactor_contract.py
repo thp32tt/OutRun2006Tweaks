@@ -34,6 +34,25 @@ state_block_recovery = text("src/vr/state/state_block_recovery.hpp")
 state_block_events = text("src/vr/state/state_block_events.hpp")
 text("tools/verify_vr_hook_graph.py")
 
+if "R22FailClosedReplayState" in r23:
+    errors.append("R23 retained private R22 fail-closed replay dependency")
+if "FailClosedTrackedRasterReplay(" not in r22:
+    errors.append("R22 missing fail-closed raster owner API")
+if "FailClosedTrackedRasterReplay(" not in r23:
+    errors.append("R23 missing fail-closed raster owner API use")
+
+if "R23GameDrawSerial" in r29:
+    errors.append("R29 retained direct R23 draw-serial state dependency")
+if "TopLevelDrawSerial()" not in r29:
+    errors.append("R29 missing R23 draw-serial owner query")
+
+if "R22PrimeShadowState" in r31:
+    errors.append("R31 retained private R22 raster-prime dependency")
+if "PrimeTrackedRasterShadow(" not in r22:
+    errors.append("R22 missing raster-prime owner API")
+if "PrimeTrackedRasterShadow(" not in r31:
+    errors.append("R31 missing raster-prime owner API use")
+
 for banned in ("R22ScissorSnapshot", "R22CaptureGameScissor",
                "R22GameClearCoversBackbuffer"):
     if banned in r23:
