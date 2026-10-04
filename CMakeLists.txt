@@ -76,11 +76,12 @@ endforeach()
 unset(_vr_source)
 unset(_vr_header_only)
 
-# R15/R34 are post-review correctness overlays. They include the complete R14
-# and R33 chains respectively, so the former final wrappers become include-only.
+# R15 remains the post-review device correctness overlay. The stereo full
+# chain now terminates directly at the R33 final dispatcher; R34 remains only an
+# include-only compatibility shim and is never a compiled stereo owner.
 set(OUTRUN_VR_POST_REVIEW_FINAL_TUS
     src/vr/d3d9/ex_device_upgrade_r15.cpp
-    src/vr/d3d9/stereo_renderer_r34.cpp)
+    src/vr/d3d9/stereo_renderer_r33.cpp)
 foreach(_vr_source IN LISTS OUTRUN_VR_POST_REVIEW_FINAL_TUS)
     if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_vr_source}")
         message(FATAL_ERROR "VR post-review final TU missing: ${_vr_source}")
@@ -88,7 +89,7 @@ foreach(_vr_source IN LISTS OUTRUN_VR_POST_REVIEW_FINAL_TUS)
 endforeach()
 set_source_files_properties(
     src/vr/d3d9/ex_device_upgrade_r14.cpp
-    src/vr/d3d9/stereo_renderer_r33.cpp
+    src/vr/d3d9/stereo_renderer_r34.cpp
     PROPERTIES HEADER_FILE_ONLY TRUE)
 unset(_vr_source)
 
@@ -105,7 +106,7 @@ set_source_files_properties(
 option(OUTRUN_VR_R26_HUD_COMPARE "Build R26-safe world path with R30 HUD/XYZRHW/SkyGlow overlay" OFF)
 if(OUTRUN_VR_SAFE_DRAW_COMPARE)
     set_source_files_properties(
-        src/vr/d3d9/stereo_renderer_r34.cpp
+        src/vr/d3d9/stereo_renderer_r33.cpp
         PROPERTIES HEADER_FILE_ONLY TRUE)
     set_source_files_properties(
         src/vr/d3d9/stereo_renderer_r26_compare.cpp
@@ -152,7 +153,7 @@ unset(_vr_option)
 
 if(OUTRUN_VR_R26_HUD_COMPARE)
     set_source_files_properties(
-        src/vr/d3d9/stereo_renderer_r34.cpp
+        src/vr/d3d9/stereo_renderer_r33.cpp
         src/vr/d3d9/stereo_renderer_r26_compare.cpp
         PROPERTIES HEADER_FILE_ONLY TRUE)
     set_source_files_properties(
@@ -170,7 +171,7 @@ endif()
 
 if(OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
     set_source_files_properties(
-        src/vr/d3d9/stereo_renderer_r34.cpp
+        src/vr/d3d9/stereo_renderer_r33.cpp
         PROPERTIES HEADER_FILE_ONLY TRUE)
     add_compile_definitions(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE=1)
 endif()
@@ -193,7 +194,7 @@ endif()
 # HEADER_FILE_ONLY. The configured graph must compile exactly one stereo owner
 # and exactly one renderer owner.
 set(_vr_stereo_owner_candidates
-    src/vr/d3d9/stereo_renderer_r34.cpp
+    src/vr/d3d9/stereo_renderer_r33.cpp
     src/vr/d3d9/stereo_renderer_r26_compare.cpp
     src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp
     src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp
