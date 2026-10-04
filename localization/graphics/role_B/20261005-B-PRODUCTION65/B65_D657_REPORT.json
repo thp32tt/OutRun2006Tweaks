@@ -434,7 +434,8 @@
     "overlap": 0,
     "touch_pairs": []
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
-  "status": "B_PRODUCTION65_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
-  "RUNTIME_VALIDATION": "UNTESTED"
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_ROW_RAW",
+  "status": "B_PRODUCTION65_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "controller_self_qa_report": "localization/graphics/role_B/20261005-B-PRODUCTION65/B65_CONTROLLER_SELF_QA.json"
 }
