@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261005-A-PRODUCTION18",
+  "index": 119,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/F6811E94_512x64.dds",
+  "source_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+  "source_bbox": [
+    390,
+    54,
+    1632,
+    200
+  ],
+  "status": "A_PRODUCTION18_FAIL_CLOSED_DXT5_EXACT_BBOX_NOT_BLOCK_ALIGNED",
+  "runtime_validation": "UNTESTED"
+}
