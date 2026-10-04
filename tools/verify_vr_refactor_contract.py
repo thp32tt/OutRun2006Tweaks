@@ -16,7 +16,10 @@ def text(rel: str) -> str:
 
 r22 = text("src/vr/d3d9/stereo_renderer_r22.cpp")
 r23 = text("src/vr/d3d9/stereo_renderer_r23.cpp")
+r9 = text("src/vr/d3d9/stereo_renderer.cpp")
 r13 = text("src/vr/d3d9/stereo_renderer_r13.cpp")
+r20 = text("src/vr/d3d9/stereo_renderer_r20.cpp")
+r21 = text("src/vr/d3d9/stereo_renderer_r21.cpp")
 r29 = text("src/vr/d3d9/stereo_renderer_r29.cpp")
 r26 = text("src/vr/d3d9/stereo_renderer_r26.cpp")
 r31 = text("src/vr/d3d9/stereo_renderer_r31.cpp")
@@ -388,6 +391,34 @@ for marker in (
             f"R32 missing R29 recovery-safety owner API: {marker}")
 if "SetStereoRecoverySafetyThroughEpoch(" not in r29:
     errors.append("R29 missing exact-epoch recovery-safety owner API")
+
+for marker, source, owner in (
+    ("R9InstallStatus()", r9, "R9"),
+    ("R13InstallStatus()", r13, "R13"),
+    ("R20InstallStatus()", r20, "R20"),
+    ("R21InstallStatus()", r21, "R21"),
+):
+    if marker not in source:
+        errors.append(f"{owner} missing install-state owner query API: {marker}")
+
+for rel, source in (("R20", r20), ("R21", r21), ("R23", r23)):
+    for banned in ("R9InstallState", "R9InstallReady", "R9InstallFailed",
+                   "R13InstallState", "R13InstallReady", "R13InstallFailed"):
+        if banned in source:
+            errors.append(
+                f"{rel} retained direct lower install-state dependency: {banned}")
+for rel, source in (("R21", r21), ("R23", r23)):
+    if "R20InstallState" in source:
+        errors.append(f"{rel} retained direct R20 install-state dependency")
+if "R21InstallState" in r23:
+    errors.append("R23 retained direct R21 install-state dependency")
+if "R22InstallState" in r23:
+    errors.append("R23 retained direct R22 install-state dependency")
+
+for marker in ("R9InstallStatus()", "R13InstallStatus()",
+               "R20InstallStatus()", "R21InstallStatus()", "R22InstallStatus()"):
+    if marker not in r23:
+        errors.append(f"R23 missing prerequisite install owner query: {marker}")
 
 for banned in ("R13InstallState", "R13InstallReady", "R13InstallFailed"):
     if banned in r32:
