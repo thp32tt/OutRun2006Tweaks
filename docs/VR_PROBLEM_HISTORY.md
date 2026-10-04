@@ -96,3 +96,6 @@ This is not runtime proof. `RUNTIME_VALIDATION=UNTESTED` until Quest 3/VDXR conf
 - Source baseline before build trigger: `44322402216fde565ccf99fd257153a0f1d0a369`.
 - Runtime focus: verify the folded R34 guards in the R33 dispatcher and the matching final-dispatch regression guard under real HMD/gameplay execution.
 - Expected build: protected DX9Ex PC-fast package plus DX9Ex Active Validation package; user runtime validation remains pending.
+
+
+<!-- DX9Ex hosted runtime-package CI trigger for 2026-10-04 22:27 KST; no production code delta. -->
