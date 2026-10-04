@@ -85,7 +85,9 @@
       "attempt": "1/3",
       "chat_rollover": 2,
       "rollover_is_retry": false
-    }
+    },
+    "run_record_commit_sha": "d5b9e1fc6c407b2b07f7549b93e5322802b49852",
+    "issue14_implementation_validation_comment_id": 5978509879
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
@@ -132,7 +134,8 @@
     "continuation_status": "EXACT_CONTROL_FLOW_CAPTURE_BOUNDARY_PROVEN",
     "semantic_promotion": "BOUNDED_CONTROL_FLOW_ONLY",
     "ownership_effect": "NONE",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "issue14_implementation_validation_comment_id": 5978509879
   },
   "runtime_blocker": "No runtime acceptance claim exists; F119 is exact canonical static control-flow/build evidence only.",
   "runtime_next_action": "Quest 3/VDXR runtime validation remains a separate later hardware gate for runtime-visible behavior; this static disassembly unit does not claim runtime correctness.",
