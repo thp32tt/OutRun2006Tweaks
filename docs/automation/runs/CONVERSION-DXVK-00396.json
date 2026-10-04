@@ -1,15 +1,12 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DXVK-00396",
-  "production_id": "CONVERSION-DXVK-00396",
-  "event_id": "CONVERSION-DXVK-00396-E004",
-  "event_type": "rollover",
+  "production_id": "CONVERSION-DX11-00395",
+  "event_id": "CONVERSION-DX11-00395-E007",
+  "event_type": "retry",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
   "attempt": "1/3",
-  "chat_rollover": 3,
-  "rollover_is_retry": false,
-  "resume_reason": "Retry persisted after one recovery attempt",
   "status": "COMPLETE",
   "checkpoint": "C6_STATE",
   "base_sha": "1ab34d85dd4503e0dae8933730d8a8101c2c692b",
@@ -69,7 +66,7 @@
     "canonical_analyzer_proof_status": "EXACT_183AC7_TO_183B07_CONTROL_FLOW_BOUNDARY_PROVEN"
   },
   "validation": {
-    "automation_validation": "PASS_EXACT_SHA_STATIC_ANALYSIS_AND_BACKEND_DISASM_CONTRACT",
+    "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
     "exact_sha": "cc6077d7d15af5bbfa5396de4ea040adf6990d6e",
     "hud_inspector_run_id": 37244717994,
     "static_exe_analysis_job_id": 111560236461,
@@ -79,10 +76,24 @@
     "build_run_id": 37244717946,
     "build_job_id": 111560223385,
     "backend_disassembly_contract_step": "SUCCESS",
-    "full_build_status_at_state_write": "IN_PROGRESS_NOT_REQUIRED_FOR_STATIC_C3",
-    "dedicated_dxvk_disassembly_workflow_dispatch": "NOT_VISIBLE_THROUGH_COMMIT_ASSOCIATION_QUERY",
-    "dedicated_backend_conversion_gate_workflow_dispatch": "NOT_VISIBLE_THROUGH_COMMIT_ASSOCIATION_QUERY",
-    "runtime_validation": "UNTESTED"
+    "full_build_status_at_state_write": "SUCCESS_EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "dedicated_dxvk_disassembly_workflow_dispatch": "SUCCESS_EXACT_SHA",
+    "dedicated_backend_conversion_gate_workflow_dispatch": "SUCCESS_EXACT_SHA",
+    "runtime_validation": "UNTESTED",
+    "dxvk_canonical_disassembly_evidence_run_id": 37244713828,
+    "dxvk_canonical_disassembly_evidence_job_id": 111560196411,
+    "dxvk_canonical_disassembly_evidence_conclusion": "success",
+    "dxvk_canonical_disassembly_evidence_artifact_id": 11318861305,
+    "dxvk_canonical_disassembly_evidence_artifact_digest": "sha256:27b5c270e75a95c816b14863a1f8aa40956b660b078eedbcc877a60b663481dc",
+    "backend_conversion_gate_run_id": 37244713820,
+    "backend_conversion_gate_job_id": 111560196413,
+    "backend_conversion_gate_conclusion": "success",
+    "backend_conversion_gate_win32_configure": "success",
+    "backend_conversion_gate_win32_build": "success",
+    "backend_conversion_gate_binary_verification": "success",
+    "backend_conversion_gate_artifact_upload": "success",
+    "backend_conversion_gate_artifact_id": 11318177849,
+    "backend_conversion_gate_artifact_digest": "sha256:c8e32a93eb8984db63f45a0ceec2a1f3f968e2babd21c6d0f59ef3a466970c19"
   },
   "pipeline": {
     "C0_RECOVER": {
@@ -99,7 +110,7 @@
     },
     "C3_VALIDATE": {
       "status": "COMPLETE",
-      "evidence": "N100 exact-SHA canonical analyzer and unit regressions PASS; GitHub exact-SHA HUD static analysis SUCCESS and Build backend disassembly contract step SUCCESS."
+      "evidence": "N100 exact-SHA auxiliary py_compile, 13/13 continuation regressions and backend disassembly verifier passed. Exact-SHA DXVK Canonical Disassembly Evidence 37244713828/111560196411 SUCCESS and Backend Conversion Gate 37244713820/111560196413 SUCCESS including Win32 configure/build, binary verification and artifact upload. No game/HMD runtime test was performed."
     },
     "C4_COMMIT": {
       "status": "COMPLETE",
@@ -112,7 +123,7 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "evidence": "This run record and branch-local lane state persist the validated F131 result and F132 next frontier."
+      "evidence": "This run record and branch-local lane state persist validation-bearing SHA cc6077d7d15af5bbfa5396de4ea040adf6990d6e, the current automatic-queue dispatch metadata, exact-SHA gate evidence, RUNTIME_VALIDATION=UNTESTED and F132 next frontier 0x00183B07..0x00183B47."
     }
   },
   "package": "NOT_REQUIRED_STATIC_DISASSEMBLY_PROOF_ONLY",
@@ -120,18 +131,45 @@
   "runtime_validation": "UNTESTED",
   "controller_dispatch": {
     "task_id": "CONVERSION-DXVK-00396",
-    "production_id": "CONVERSION-DXVK-00396",
-    "event_id": "CONVERSION-DXVK-00396-E004",
-    "event_type": "rollover",
+    "production_id": "CONVERSION-DX11-00395",
+    "event_id": "CONVERSION-DX11-00395-E007",
+    "event_type": "retry",
     "attempt": "1/3",
-    "chat_rollover": 3,
-    "rollover_is_retry": false,
-    "resume_reason": "Retry persisted after one recovery attempt",
-    "source": "CURRENT_USER_ROLLOVER",
+    "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH",
     "material_result_sha": "7f7d0d8eb0cec95d527262fec2682b0372826b41",
     "validation_bearing_result_sha": "cc6077d7d15af5bbfa5396de4ea040adf6990d6e",
     "runtime_validation": "UNTESTED"
   },
   "exact_next_action": "Capture the next exact canonical 64-byte raw provenance window from the validated F131 instruction boundary 0x00183B07..0x00183B47, preserve unresolved forward-target debt [0x00183B60,0x00183B6E,0x00183B6F] fail-closed, census raw rel32 candidates exactly, and make no function/render/HUD/runtime semantic promotion.",
-  "recorded_at_kst": "2026-10-05T08:47:41+09:00"
+  "recorded_at_kst": "2026-10-05T08:47:48+09:00",
+  "current_dispatch_metadata_correction": {
+    "corrected_from": {
+      "task_id": "CONVERSION-DXVK-00396",
+      "production_id": "CONVERSION-DXVK-00396",
+      "event_id": "CONVERSION-DXVK-00396-E004",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "source": "CURRENT_USER_ROLLOVER",
+      "material_result_sha": "7f7d0d8eb0cec95d527262fec2682b0372826b41",
+      "validation_bearing_result_sha": "cc6077d7d15af5bbfa5396de4ea040adf6990d6e",
+      "runtime_validation": "UNTESTED"
+    },
+    "corrected_to": {
+      "task_id": "CONVERSION-DXVK-00396",
+      "production_id": "CONVERSION-DX11-00395",
+      "event_id": "CONVERSION-DX11-00395-E007",
+      "event_type": "retry",
+      "attempt": "1/3",
+      "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH",
+      "material_result_sha": "7f7d0d8eb0cec95d527262fec2682b0372826b41",
+      "validation_bearing_result_sha": "cc6077d7d15af5bbfa5396de4ea040adf6990d6e",
+      "runtime_validation": "UNTESTED"
+    },
+    "reason": "The newest explicit user automatic-queue dispatch is CONVERSION-DXVK-00396 with PRODUCTION_ID=CONVERSION-DX11-00395, EVENT_ID=CONVERSION-DX11-00395-E007, EVENT_TYPE=retry and ATTEMPT=1/3. It supersedes stale same-task rollover bookkeeping while preserving the already validated material/result SHAs and RUNTIME_VALIDATION=UNTESTED.",
+    "material_and_validation_bearing_sha_unchanged": true,
+    "reconciled_at_kst": "2026-10-05T08:47:48+09:00"
+  }
 }
