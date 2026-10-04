@@ -2748,6 +2748,244 @@ bool NativeProgrammableShaderPairCache::validate_input_layout_snapshot(
            current.snapshotToken == inputLayoutSnapshotToken;
 }
 
+
+bool NativeProgrammableShaderPairCache::attach_constant_state_for_observation(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    ID3D11Buffer* vertexConstantBuffer,
+    UINT vertexConstantBytes,
+    ID3D11Buffer* pixelConstantBuffer,
+    UINT pixelConstantBytes) noexcept {
+    if (!expectedDevice || !vertexConstantBuffer || !pixelConstantBuffer ||
+        vertexConstantBytes == 0 || pixelConstantBytes == 0 ||
+        (vertexConstantBytes & 15u) != 0 ||
+        (pixelConstantBytes & 15u) != 0 ||
+        !validate_input_layout_snapshot(
+            expectedDevice, identity, cacheSnapshotToken, slotSnapshotToken,
+            objectSnapshotToken, layout, inputLayoutSnapshotToken))
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> vertexConstantDevice;
+    Microsoft::WRL::ComPtr<ID3D11Device> pixelConstantDevice;
+    vertexConstantBuffer->GetDevice(vertexConstantDevice.GetAddressOf());
+    pixelConstantBuffer->GetDevice(pixelConstantDevice.GetAddressOf());
+    if (vertexConstantDevice.Get() != expectedDevice ||
+        pixelConstantDevice.Get() != expectedDevice)
+        return false;
+
+    D3D11_BUFFER_DESC vertexDesc{};
+    D3D11_BUFFER_DESC pixelDesc{};
+    vertexConstantBuffer->GetDesc(&vertexDesc);
+    pixelConstantBuffer->GetDesc(&pixelDesc);
+    const auto descriptor_exact = [](const D3D11_BUFFER_DESC& desc,
+                                     UINT expectedBytes) noexcept {
+        return desc.ByteWidth == expectedBytes &&
+               desc.Usage == D3D11_USAGE_DEFAULT &&
+               desc.BindFlags == D3D11_BIND_CONSTANT_BUFFER &&
+               desc.CPUAccessFlags == 0 &&
+               desc.MiscFlags == 0 &&
+               desc.StructureByteStride == 0;
+    };
+    if (!descriptor_exact(vertexDesc, vertexConstantBytes) ||
+        !descriptor_exact(pixelDesc, pixelConstantBytes))
+        return false;
+
+    const auto found = entries_.find(identity.cacheKey);
+    if (found == entries_.end())
+        return false;
+    auto& entry = found->second;
+    if (!entry.translatedInputLayout ||
+        entry.inputLayoutIdentity == 0 ||
+        entry.inputLayoutReceiptGeneration == 0)
+        return false;
+
+    const bool attachmentStarted =
+        entry.translatedVertexConstantBuffer ||
+        entry.translatedPixelConstantBuffer ||
+        entry.vertexConstantBytes != 0 ||
+        entry.pixelConstantBytes != 0 ||
+        entry.constantStateReceiptGeneration != 0;
+    if (attachmentStarted) {
+        return entry.translatedVertexConstantBuffer.Get() == vertexConstantBuffer &&
+               entry.translatedPixelConstantBuffer.Get() == pixelConstantBuffer &&
+               entry.vertexConstantBytes == vertexConstantBytes &&
+               entry.pixelConstantBytes == pixelConstantBytes &&
+               entry.constantStateReceiptGeneration != 0;
+    }
+
+    entry.translatedVertexConstantBuffer = vertexConstantBuffer;
+    entry.translatedPixelConstantBuffer = pixelConstantBuffer;
+    entry.vertexConstantBytes = vertexConstantBytes;
+    entry.pixelConstantBytes = pixelConstantBytes;
+    ++constant_state_receipt_generation_counter_;
+    if (constant_state_receipt_generation_counter_ == 0)
+        ++constant_state_receipt_generation_counter_;
+    entry.constantStateReceiptGeneration =
+        constant_state_receipt_generation_counter_;
+    return true;
+}
+
+NativeProgrammableShaderConstantStateReadiness
+NativeProgrammableShaderPairCache::constant_state_readiness(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken) const noexcept {
+    NativeProgrammableShaderConstantStateReadiness out{};
+    out.ownerGeneration = owner_generation_;
+    out.cacheKey = identity.cacheKey;
+    out.cacheSnapshotToken = cacheSnapshotToken;
+    out.slotSnapshotToken = slotSnapshotToken;
+    out.objectSnapshotToken = objectSnapshotToken;
+    out.inputLayoutSnapshotToken = inputLayoutSnapshotToken;
+    out.inputLayoutIdentity = hash_pipeline_input_layout_identity(layout);
+    out.inputValid =
+        expectedDevice != nullptr && cacheSnapshotToken != 0 &&
+        slotSnapshotToken != 0 && objectSnapshotToken != 0 &&
+        inputLayoutSnapshotToken != 0 && out.inputLayoutIdentity != 0 &&
+        identity.exact_identity() && !identity.translationImplemented;
+
+    const auto inputLayout = input_layout_readiness(
+        expectedDevice, identity, cacheSnapshotToken, slotSnapshotToken,
+        objectSnapshotToken, layout);
+    out.inputLayoutReceiptReady = inputLayout.attachmentReady;
+    out.deviceMatches =
+        inputLayout.deviceMatches && inputLayout.inputLayoutDeviceMatches;
+    out.inputLayoutSnapshotMatches =
+        inputLayout.attachmentReady &&
+        inputLayout.snapshotToken == inputLayoutSnapshotToken;
+    out.slotGeneration = inputLayout.slotGeneration;
+    out.translationObjectReceiptGeneration =
+        inputLayout.translationObjectReceiptGeneration;
+    out.inputLayoutReceiptGeneration =
+        inputLayout.inputLayoutReceiptGeneration;
+
+    if (out.inputValid && out.inputLayoutReceiptReady &&
+        out.deviceMatches && out.inputLayoutSnapshotMatches) {
+        const auto found = entries_.find(identity.cacheKey);
+        if (found != entries_.end()) {
+            const auto& entry = found->second;
+            out.constantStateReceiptGeneration =
+                entry.constantStateReceiptGeneration;
+            out.vertexConstantBytes = entry.vertexConstantBytes;
+            out.pixelConstantBytes = entry.pixelConstantBytes;
+            out.constantBuffersAttached =
+                entry.translatedVertexConstantBuffer &&
+                entry.translatedPixelConstantBuffer &&
+                out.vertexConstantBytes != 0 &&
+                out.pixelConstantBytes != 0 &&
+                out.constantStateReceiptGeneration != 0;
+            if (out.constantBuffersAttached) {
+                Microsoft::WRL::ComPtr<ID3D11Device> vertexConstantDevice;
+                Microsoft::WRL::ComPtr<ID3D11Device> pixelConstantDevice;
+                entry.translatedVertexConstantBuffer->GetDevice(
+                    vertexConstantDevice.GetAddressOf());
+                entry.translatedPixelConstantBuffer->GetDevice(
+                    pixelConstantDevice.GetAddressOf());
+                out.constantBufferDevicesMatch =
+                    vertexConstantDevice.Get() == expectedDevice &&
+                    pixelConstantDevice.Get() == expectedDevice;
+                D3D11_BUFFER_DESC vertexDesc{};
+                D3D11_BUFFER_DESC pixelDesc{};
+                entry.translatedVertexConstantBuffer->GetDesc(&vertexDesc);
+                entry.translatedPixelConstantBuffer->GetDesc(&pixelDesc);
+                const auto descriptor_exact =
+                    [](const D3D11_BUFFER_DESC& desc,
+                       UINT expectedBytes) noexcept {
+                        return desc.ByteWidth == expectedBytes &&
+                               desc.Usage == D3D11_USAGE_DEFAULT &&
+                               desc.BindFlags == D3D11_BIND_CONSTANT_BUFFER &&
+                               desc.CPUAccessFlags == 0 &&
+                               desc.MiscFlags == 0 &&
+                               desc.StructureByteStride == 0;
+                    };
+                out.constantBufferDescriptorsExact =
+                    descriptor_exact(vertexDesc, out.vertexConstantBytes) &&
+                    descriptor_exact(pixelDesc, out.pixelConstantBytes);
+            }
+        }
+    }
+
+    out.attachmentReady =
+        out.inputValid && out.inputLayoutReceiptReady &&
+        out.deviceMatches && out.inputLayoutSnapshotMatches &&
+        out.constantBuffersAttached && out.constantBufferDevicesMatch &&
+        out.constantBufferDescriptorsExact &&
+        out.ownerGeneration != 0 && out.slotGeneration != 0 &&
+        out.translationObjectReceiptGeneration != 0 &&
+        out.inputLayoutReceiptGeneration != 0 &&
+        out.constantStateReceiptGeneration != 0 &&
+        out.cacheKey != 0 && out.inputLayoutIdentity != 0 &&
+        out.vertexConstantBytes != 0 && out.pixelConstantBytes != 0;
+
+    if (out.attachmentReady) {
+        const auto found = entries_.find(identity.cacheKey);
+        if (found == entries_.end())
+            return {};
+        const auto& entry = found->second;
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(this)));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedDevice)));
+        token = mix_readiness_snapshot_token(token, out.ownerGeneration);
+        token = mix_readiness_snapshot_token(token, out.slotGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.translationObjectReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.inputLayoutReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.constantStateReceiptGeneration);
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(token, out.inputLayoutIdentity);
+        token = mix_readiness_snapshot_token(token, out.vertexConstantBytes);
+        token = mix_readiness_snapshot_token(token, out.pixelConstantBytes);
+        token = mix_readiness_snapshot_token(token, out.cacheSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.slotSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.objectSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.inputLayoutSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(
+                    entry.translatedVertexConstantBuffer.Get())));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(
+                    entry.translatedPixelConstantBuffer.Get())));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeProgrammableShaderPairCache::validate_constant_state_snapshot(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken) const noexcept {
+    if (constantStateSnapshotToken == 0)
+        return false;
+    const auto current = constant_state_readiness(
+        expectedDevice, identity, cacheSnapshotToken, slotSnapshotToken,
+        objectSnapshotToken, layout, inputLayoutSnapshotToken);
+    return current.attachmentReady &&
+           current.snapshotToken == constantStateSnapshotToken;
+}
+
 void NativeProgrammableShaderPairCache::shutdown() noexcept {
     entries_.clear();
     device_.Reset();

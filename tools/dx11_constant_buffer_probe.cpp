@@ -179,6 +179,25 @@ void main(point GSIn input[1], inout PointStream<GSOut> outputStream)
             "D3DCompile R147 isolation geometry shader");
         return bytecode;
     }
+    ID3D11Buffer* create_constant_buffer(
+        ID3D11Device* device, UINT byteWidth)
+    {
+        require(
+            device != nullptr && byteWidth != 0 &&
+            (byteWidth & 15u) == 0,
+            "R244 constant-buffer descriptor prerequisite");
+        D3D11_BUFFER_DESC desc{};
+        desc.ByteWidth = byteWidth;
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        ID3D11Buffer* buffer = nullptr;
+        require(
+            SUCCEEDED(device->CreateBuffer(&desc, nullptr, &buffer)) &&
+            buffer != nullptr,
+            "R244 D3D11 constant-buffer creation");
+        return buffer;
+    }
+
 }
 
 int main()
@@ -2861,6 +2880,141 @@ int main()
         "R243 different input layout object cannot replace sealed receipt");
     r243ReplacementInputLayout->Release();
 
+    constexpr UINT r244ConstantBytes = 64u;
+    ID3D11Buffer* r244VertexConstants =
+        create_constant_buffer(d3d.device, r244ConstantBytes);
+    ID3D11Buffer* r244PixelConstants =
+        create_constant_buffer(d3d.device, r244ConstantBytes);
+    const auto r244UnattachedConstantState =
+        programmableCache.constant_state_readiness(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout,
+            r243InputLayoutReady.snapshotToken);
+    require(
+        r244UnattachedConstantState.inputValid &&
+        r244UnattachedConstantState.inputLayoutReceiptReady &&
+        r244UnattachedConstantState.deviceMatches &&
+        r244UnattachedConstantState.inputLayoutSnapshotMatches &&
+        !r244UnattachedConstantState.constantBuffersAttached &&
+        !r244UnattachedConstantState.attachmentReady &&
+        r244UnattachedConstantState.constantStateReceiptGeneration == 0 &&
+        r244UnattachedConstantState.snapshotToken == 0 &&
+        !programmableCache.attach_constant_state_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, 0,
+            r244VertexConstants, r244ConstantBytes,
+            r244PixelConstants, r244ConstantBytes),
+        "R244 input layout receipt must exist before constant state attaches");
+
+    DevicePair r244ForeignDevice = create_warp_device();
+    ID3D11Buffer* r244ForeignVertexConstants =
+        create_constant_buffer(r244ForeignDevice.device, r244ConstantBytes);
+    ID3D11Buffer* r244ForeignPixelConstants =
+        create_constant_buffer(r244ForeignDevice.device, r244ConstantBytes);
+    require(
+        !programmableCache.attach_constant_state_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ForeignVertexConstants, r244ConstantBytes,
+            r244ForeignPixelConstants, r244ConstantBytes),
+        "R244 foreign-device constant buffers fail closed");
+    r244ForeignVertexConstants->Release();
+    r244ForeignPixelConstants->Release();
+    r244ForeignDevice.context->Release();
+    r244ForeignDevice.device->Release();
+
+    require(
+        programmableCache.attach_constant_state_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244VertexConstants, r244ConstantBytes,
+            r244PixelConstants, r244ConstantBytes),
+        "R244 attach exact constant state to R243 input layout receipt");
+    const auto r244ConstantStateReady =
+        programmableCache.constant_state_readiness(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken);
+    require(
+        r244ConstantStateReady.inputValid &&
+        r244ConstantStateReady.inputLayoutReceiptReady &&
+        r244ConstantStateReady.deviceMatches &&
+        r244ConstantStateReady.inputLayoutSnapshotMatches &&
+        r244ConstantStateReady.constantBuffersAttached &&
+        r244ConstantStateReady.constantBufferDevicesMatch &&
+        r244ConstantStateReady.constantBufferDescriptorsExact &&
+        r244ConstantStateReady.attachmentReady &&
+        r244ConstantStateReady.constantStateReceiptGeneration != 0 &&
+        r244ConstantStateReady.vertexConstantBytes == r244ConstantBytes &&
+        r244ConstantStateReady.pixelConstantBytes == r244ConstantBytes &&
+        r244ConstantStateReady.snapshotToken != 0 &&
+        programmableCache.validate_constant_state_snapshot(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken),
+        "R244 constant-state receipt seals exact R243 ownership and descriptors");
+    const auto firstR244ReceiptGeneration =
+        r244ConstantStateReady.constantStateReceiptGeneration;
+    const auto firstR244ConstantStateSnapshot =
+        r244ConstantStateReady.snapshotToken;
+    require(
+        programmableCache.attach_constant_state_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244VertexConstants, r244ConstantBytes,
+            r244PixelConstants, r244ConstantBytes) &&
+        programmableCache.constant_state_readiness(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken).snapshotToken ==
+            firstR244ConstantStateSnapshot,
+        "R244 same constant-state attachment is idempotent");
+    require(
+        !programmableCache.attach_constant_state_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244VertexConstants, r244ConstantBytes + 16u,
+            r244PixelConstants, r244ConstantBytes),
+        "R244 changed constant metadata cannot reuse sealed receipt");
+    ID3D11Buffer* r244ReplacementVertexConstants =
+        create_constant_buffer(d3d.device, r244ConstantBytes);
+    require(
+        !programmableCache.attach_constant_state_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ReplacementVertexConstants, r244ConstantBytes,
+            r244PixelConstants, r244ConstantBytes),
+        "R244 different constant buffer object cannot replace sealed receipt");
+    r244ReplacementVertexConstants->Release();
+
     const std::string r242AlternateVertexSource = R"(
 struct VSInput { float4 position : POSITION0; };
 struct VSOutput { float4 position : SV_Position; };
@@ -2937,6 +3091,16 @@ VSOutput main(VSInput input)
             inputLayout,
             firstR243InputLayoutSnapshot),
         "R243 device reinitialize invalidates input layout receipt");
+    require(
+        !programmableCache.validate_constant_state_snapshot(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            firstR242ObjectSnapshot,
+            inputLayout,
+            firstR243InputLayoutSnapshot,
+            firstR244ConstantStateSnapshot),
+        "R244 device reinitialize invalidates constant-state receipt");
     require(
         programmableCache.cache_for_observation(programmablePair),
         "R242 fresh cache generation prerequisite");
@@ -3021,6 +3185,51 @@ VSOutput main(VSInput input)
             inputLayout,
             r243FreshInputLayoutReady.snapshotToken),
         "R243 fresh device generation receives distinct input layout receipt");
+    require(
+        !programmableCache.attach_constant_state_for_observation(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, firstR243InputLayoutSnapshot,
+            r244VertexConstants, r244ConstantBytes,
+            r244PixelConstants, r244ConstantBytes),
+        "R244 stale input-layout receipt cannot attach constant state");
+    require(
+        programmableCache.attach_constant_state_for_observation(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244VertexConstants, r244ConstantBytes,
+            r244PixelConstants, r244ConstantBytes),
+        "R244 fresh R243 receipt accepts constant state");
+    const auto r244FreshConstantStateReady =
+        programmableCache.constant_state_readiness(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken);
+    require(
+        r244FreshConstantStateReady.attachmentReady &&
+        r244FreshConstantStateReady.constantBufferDevicesMatch &&
+        r244FreshConstantStateReady.constantBufferDescriptorsExact &&
+        r244FreshConstantStateReady.constantStateReceiptGeneration !=
+            firstR244ReceiptGeneration &&
+        r244FreshConstantStateReady.snapshotToken !=
+            firstR244ConstantStateSnapshot &&
+        programmableCache.validate_constant_state_snapshot(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken),
+        "R244 fresh device generation receives distinct constant-state receipt");
+    r244VertexConstants->Release();
+    r244PixelConstants->Release();
 
     require(
         pipelineBundle.upload_transform_for_observation(d3d.context, transform),

@@ -1237,6 +1237,36 @@ struct NativeProgrammableShaderInputLayoutReadiness {
     std::uint64_t snapshotToken{};
 };
 
+    
+// R244 attaches an exact same-device VS/PS constant-buffer pair to a validated
+// R243 input-layout receipt. It seals ownership and exact constant-buffer
+// descriptors only; it does not upload constants, bind VS/PS slots, or route
+// programmable draws.
+struct NativeProgrammableShaderConstantStateReadiness {
+    bool inputValid{};
+    bool inputLayoutReceiptReady{};
+    bool deviceMatches{};
+    bool inputLayoutSnapshotMatches{};
+    bool constantBuffersAttached{};
+    bool constantBufferDevicesMatch{};
+    bool constantBufferDescriptorsExact{};
+    bool attachmentReady{};
+    std::uint64_t ownerGeneration{};
+    std::uint64_t slotGeneration{};
+    std::uint64_t translationObjectReceiptGeneration{};
+    std::uint64_t inputLayoutReceiptGeneration{};
+    std::uint64_t constantStateReceiptGeneration{};
+    std::uint64_t cacheKey{};
+    std::uint64_t inputLayoutIdentity{};
+    UINT vertexConstantBytes{};
+    UINT pixelConstantBytes{};
+    std::uint64_t cacheSnapshotToken{};
+    std::uint64_t slotSnapshotToken{};
+    std::uint64_t objectSnapshotToken{};
+    std::uint64_t inputLayoutSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;
@@ -1313,6 +1343,36 @@ public:
         std::uint64_t objectSnapshotToken,
         const VertexInputLayoutTranslation& layout,
         std::uint64_t inputLayoutSnapshotToken) const noexcept;
+    bool attach_constant_state_for_observation(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        ID3D11Buffer* vertexConstantBuffer,
+        UINT vertexConstantBytes,
+        ID3D11Buffer* pixelConstantBuffer,
+        UINT pixelConstantBytes) noexcept;
+    [[nodiscard]] NativeProgrammableShaderConstantStateReadiness
+    constant_state_readiness(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken) const noexcept;
+    [[nodiscard]] bool validate_constant_state_snapshot(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken) const noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
@@ -1343,6 +1403,11 @@ private:
         Microsoft::WRL::ComPtr<ID3D11InputLayout> translatedInputLayout;
         std::uint64_t inputLayoutIdentity{};
         std::uint64_t inputLayoutReceiptGeneration{};
+        Microsoft::WRL::ComPtr<ID3D11Buffer> translatedVertexConstantBuffer;
+        Microsoft::WRL::ComPtr<ID3D11Buffer> translatedPixelConstantBuffer;
+        UINT vertexConstantBytes{};
+        UINT pixelConstantBytes{};
+        std::uint64_t constantStateReceiptGeneration{};
     };
 
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
@@ -1351,6 +1416,7 @@ private:
     std::uint64_t translation_slot_generation_counter_ = 0;
     std::uint64_t translation_object_receipt_generation_counter_ = 0;
     std::uint64_t input_layout_receipt_generation_counter_ = 0;
+    std::uint64_t constant_state_receipt_generation_counter_ = 0;
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88

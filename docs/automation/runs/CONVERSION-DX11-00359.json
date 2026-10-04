@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00359",
+  "production_id": "CONVERSION-DXVK-00358",
+  "event_id": "CONVERSION-DXVK-00358-E002",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "94da651d8333634320bc3f2c31ded701deea5b16",
+  "result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX11-00359]",
+  "selected_work_item": "DX11_R244_PROGRAMMABLE_CONSTANT_STATE_RECEIPT",
+  "summary": "R244 adds a dormant fail-closed programmable constant-state ownership receipt on top of a validated R243 input-layout receipt. It owns one exact same-device VS/PS D3D11 constant-buffer pair and seals exact DEFAULT/CONSTANT_BUFFER descriptors plus byte widths. It does not upload payloads, bind constant-buffer slots, route Draw*, or claim programmable translation/runtime parity.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00359.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT vr-dx11-native-r71 at 94da651d8333634320bc3f2c31ded701deea5b16. Read review index/Set05, AGENTS, queue contract, lane state, VR automation state, regression/history and Issue #14. R243 is complete and the lane selects a bounded programmable constant-state ownership/readiness boundary. No prior CONVERSION-DX11-00359 record existed."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Set05 F21 remains HIGH_ACTIVATION because shader translation/constant usage is not an exact activation gate. R243 proves input-layout ownership but not programmable constant-state ownership.",
+      "review_lenses": {
+        "architecture": "Extend only the dormant programmable cache; no translator/binding/draw caller.",
+        "ownership_lifetime": "Own exact same-device VS/PS constant buffers and bind the receipt to R240/R241/R242/R243 snapshots.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effect/recenter semantics change.",
+        "performance": "No production hot path; dormant metadata plus WARP probe only.",
+        "adversarial": "Reject missing/stale R243, foreign-device buffers, descriptor/width mismatch, replacements and device-generation reuse."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added R244 constant-state readiness/attach/snapshot APIs, per-entry owned VS/PS constant buffers, exact descriptor/byte-width checks and monotonic receipt generation; extended WARP probe and source-graph guards for prerequisite, same-device exactness, idempotence and fail-closed stale/replacement/foreign-device paths."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING_EXACT_SHA_GATE",
+      "automation_validation": "PENDING",
+      "local_auxiliary_validation": "PENDING",
+      "evidence": "Exact-SHA Backend Conversion Gate including DX11 readiness smoke/constant-buffer probe is required. No Quest 3/VDXR runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA_PUBLICATION",
+      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant ownership/descriptor receipt only; no production upload/binding/shader translation/Draw*/transport/runtime distributable behavior."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false,
+      "exact_next_action": "Publish the R244 result without CI skip, require exact-SHA Backend Conversion Gate including readiness smoke, append Issue #14 evidence, then persist C3/C4/C6 with RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "Dormant native_backend ownership plus hosted WARP probe only; no D3D9 hook/stereo renderer/transport/OpenXR/NativeDrawPath caller changes."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00359",
+    "production_id": "CONVERSION-DXVK-00358",
+    "event_id": "CONVERSION-DXVK-00358-E002",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Publish R244 as validation-bearing material result, validate that exact SHA, then finalize C3/C4/C6 without conflating automated validation with HMD runtime proof."
+}

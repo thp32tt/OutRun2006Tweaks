@@ -9550,6 +9550,51 @@ def main() -> None:
             + ", ".join(missing_r243_programmable_input_layout_receipt)
         )
 
+    r244_programmable_constant_state_receipt_contract = [
+        ("struct NativeProgrammableShaderConstantStateReadiness",
+         NATIVE_BACKEND_HPP, "R244 programmable constant-state readiness type"),
+        ("attach_constant_state_for_observation(",
+         NATIVE_BACKEND_HPP, "R244 constant-state attachment declaration"),
+        ("constant_state_readiness(",
+         NATIVE_BACKEND_HPP, "R244 constant-state readiness declaration"),
+        ("validate_constant_state_snapshot(",
+         NATIVE_BACKEND_HPP, "R244 constant-state snapshot validation declaration"),
+        ("constantStateReceiptGeneration",
+         NATIVE_BACKEND_HPP, "R244 per-entry receipt generation"),
+        ("vertexConstantBuffer->GetDevice(",
+         NATIVE_BACKEND_CPP, "R244 vertex constant exact-device ownership"),
+        ("pixelConstantBuffer->GetDevice(",
+         NATIVE_BACKEND_CPP, "R244 pixel constant exact-device ownership"),
+        ("desc.BindFlags == D3D11_BIND_CONSTANT_BUFFER",
+         NATIVE_BACKEND_CPP, "R244 exact constant-buffer descriptor guard"),
+        ("input layout receipt must exist before constant state attaches",
+         CONSTANT_BUFFER_PROBE, "R244 validated R243 prerequisite"),
+        ("foreign-device constant buffers fail closed",
+         CONSTANT_BUFFER_PROBE, "R244 foreign-device regression"),
+        ("same constant-state attachment is idempotent",
+         CONSTANT_BUFFER_PROBE, "R244 idempotence regression"),
+        ("changed constant metadata cannot reuse sealed receipt",
+         CONSTANT_BUFFER_PROBE, "R244 metadata mismatch regression"),
+        ("different constant buffer object cannot replace sealed receipt",
+         CONSTANT_BUFFER_PROBE, "R244 replacement-object regression"),
+        ("device reinitialize invalidates constant-state receipt",
+         CONSTANT_BUFFER_PROBE, "R244 device-generation invalidation regression"),
+        ("stale input-layout receipt cannot attach constant state",
+         CONSTANT_BUFFER_PROBE, "R244 stale R243 regression"),
+        ("fresh device generation receives distinct constant-state receipt",
+         CONSTANT_BUFFER_PROBE, "R244 fresh receipt regression"),
+    ]
+    missing_r244_programmable_constant_state_receipt = [
+        meaning for token, source, meaning
+        in r244_programmable_constant_state_receipt_contract
+        if token not in source
+    ]
+    if missing_r244_programmable_constant_state_receipt:
+        raise SystemExit(
+            "DX11 R244 programmable constant-state receipt drift: "
+            + ", ".join(missing_r244_programmable_constant_state_receipt)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
