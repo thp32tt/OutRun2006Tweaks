@@ -108,9 +108,9 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-04T17:43:11+09:00",
+      "updated_at_kst": "2026-10-04T21:05:25+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20261004-1740-C92/C92_FD90AA9_FINAL_QA.json",
+      "report": "localization/graphics/role_C/20261004-C-OVERLAP05/C_OVERLAP05_CONTROLLER_FINAL_QA.json",
       "direct_queue_scope": 126,
       "current_candidates_scanned": 18,
       "elements_scanned": 234,
@@ -120,28 +120,28 @@
         "9F060EC1",
         "D6DC1380",
         "48DEBE77",
-        "A064FDFC",
         "411827E",
         "FA7BBB13",
-        "C075FB49",
         "568D3696",
         "AA04D779",
         "19CEDB9",
         "2DA43E41",
-        "39229D64",
         "571E78F3",
         "62BEBF33",
         "E3FD08BE"
       ],
       "rework_required_assets": [
-        "FD90AA9"
+        "39229D64",
+        "C075FB49",
+        "A064FDFC"
       ],
-      "failed_elements": 19,
+      "failed_elements": 3,
       "pending_production_localize_text": 61,
       "hold_strict_recheck_zoom_review": 47,
       "promotion_hold_for_pixel_pass": true,
-      "promotion_hold_reason": "isolated DDS_ONLY in-game validation required",
-      "user_approved_locked": 0
+      "promotion_hold_reason": "C_OVERLAP05 zero-overlap visual/no-safe-placement failures require producer reconstruction",
+      "user_approved_locked": 0,
+      "failed_assets": 3
     },
     "batch65_b_report": "localization/graphics/BATCH65_B_ACTUAL_P0_GRAPHICS_REWORK_REPORT.json",
     "batch65_b_candidates": {
@@ -154,9 +154,9 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_C/20261004-1740-C92/C92_FD90AA9_FINAL_QA.json",
+    "latest_hd_rework_batch": "localization/graphics/role_C/20261004-C-OVERLAP05/C_OVERLAP05_CONTROLLER_FINAL_QA.json",
     "hd_rework_candidates_ready": 15,
-    "hd_rework_remaining": 1,
+    "hd_rework_remaining": 3,
     "hd_partial_rework": {
       "FF2462BB": {
         "status": "C86_PIXEL_VISUAL_PASS_PENDING_INGAME",
@@ -606,7 +606,7 @@
       "status": "PENDING_B_C_D_STRICT_QA"
     },
     "latest_d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json",
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261004-1740-C92/C92_FD90AA9_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261004-C-OVERLAP05/C_OVERLAP05_CONTROLLER_FINAL_QA.json",
     "c77_fa7bbb13": {
       "timestamp_kst": "2026-09-27T14:05:02+09:00",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
@@ -2163,5 +2163,52 @@
     "runtime_validation": "UNTESTED",
     "c_final_qa": "PENDING",
     "in_game_validation": "PENDING"
+  },
+  "c_overlap05_zero_overlap_final": {
+    "timestamp_kst": "2026-10-04T21:05:25+09:00",
+    "report": "localization/graphics/role_C/20261004-C-OVERLAP05/C_OVERLAP05_CONTROLLER_FINAL_QA.json",
+    "worker_summary": "localization/graphics/role_C/20261004-C-OVERLAP05/C_OVERLAP05_SUMMARY.json",
+    "worker_run_id": 37200318678,
+    "worker_output_commit": "ddfc5afbff650bfefe6e7de55d39f20a1f109450",
+    "results": {
+      "39229D64": {
+        "rejected_c_candidate_sha256": "dfa2c39fba8c397191af804767ede25fef35f92b5b21f583130190b701bdb9a4",
+        "restored_candidate_sha256": "67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a",
+        "restored_from_git_ref": "c17c80dec76440497dd8b5b223121fc58976e884",
+        "visual_failures": [
+          "CLEAN view retains/reconstructs visible English/source lettering fragments across target regions",
+          "NEW view still shows source English fragments/layers behind or through Korean text, including the large mission/result groups",
+          "machine 0-overlap placement is insufficient because source-script residue behind localized lettering is an explicit zero-overlap FAIL"
+        ],
+        "decision": "REWORK_REQUIRED_VISUAL_SOURCE_RESIDUE_AND_LAYER_OVERLAP"
+      },
+      "C075FB49": {
+        "rejected_c_candidate_sha256": "3e950422775def2508ea42118f41c7a1f7463e2a7106cdcfcfb907b705890c91",
+        "restored_candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
+        "restored_from_git_ref": "c17c80dec76440497dd8b5b223121fc58976e884",
+        "visual_failures": [
+          "CLEAN view retains fragmented source labels and destructive residue in the dense top text group",
+          "NEW view contains visible overlapping/residual source fragments around Keep passing / Drift / Maximum Speed / Transmission area",
+          "multi-label visual readability and source-clean separation fail despite machine bbox/placement counts"
+        ],
+        "decision": "REWORK_REQUIRED_VISUAL_SOURCE_RESIDUE_AND_LABEL_OVERLAP"
+      },
+      "A064FDFC": {
+        "candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
+        "candidate_changed_by_C": false,
+        "blocking_rows": [
+          "rank",
+          "dumped_white"
+        ],
+        "decision": "REWORK_REQUIRED_ZERO_OVERLAP_NO_SAFE_PLACEMENT"
+      }
+    },
+    "rework_required_assets": [
+      "39229D64",
+      "C075FB49",
+      "A064FDFC"
+    ],
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changes": false
   }
 }

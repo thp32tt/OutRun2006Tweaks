@@ -838,3 +838,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Manual SOURCE/CLEAN/FINAL, 10-row contact and raw-orientation review PASS: no source-English residue, clipping, overlap, seam, opaque patch, alpha halo, protected-art damage or orientation regression.
 - Pending-artwork direct-localize count after this row: 54. RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_A/20261004-A-PRODUCTION15/.
+
+## 2026-10-04 21:05 KST — C_OVERLAP05 zero-overlap final QA
+- Continued the user-requested review 2/5/6 retry only; unrelated completed C assets were not repeated.
+- GitHub-hosted C worker run 37200318678 completed machine reconstruction for 39229D64 and C075FB49 and fail-closed A064FDFC. Worker output commit: ddfc5afbff650bfefe6e7de55d39f20a1f109450.
+- 39229D64: machine size/placement gate 15/15 and reported overlap counts 0, but controller SOURCE/OLD/CLEAN/NEW review FAIL. The CLEAN/NEW views retain visible English/source fragments through major mission/result groups, which is explicitly a zero-overlap/source-residue failure. C's dfa2c39f... rebuild is rejected; pre-overlap C90 candidate 67d3fab3... is restored only as a coherent fallback pending producer reconstruction.
+- C075FB49: machine size/placement gate 17/17 and reported overlap counts 0, but controller visual QA FAIL. Dense top labels retain fragmented source lettering/residue and visible source/Korean overlap. C's 3e950422... rebuild is rejected; pre-overlap A_RECOVERY05 candidate 1c460375... is restored only as fallback pending producer reconstruction.
+- A064FDFC: FAIL-CLOSED. Full target-group clean reconstruction still cannot place rank safely under exact-source bbox, protected-art clearance and positive inter-label spacing; an earlier strict attempt also blocked dumped_white. Candidate 15b5970d... remains unchanged and returns to B producer reconstruction.
+- Final decision: 0 PASS / 3 REWORK_REQUIRED. RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261004-C-OVERLAP05/C_OVERLAP05_SUMMARY.json and localization/graphics/role_C/20261004-C-OVERLAP05/C_OVERLAP05_CONTROLLER_FINAL_QA.json.

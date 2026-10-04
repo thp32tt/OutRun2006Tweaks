@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-04T19:43:27+09:00",
+  "updated_at_kst": "2026-10-04T21:05:25+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B_RECOVERY08 CBF8ECBF producer self-QA PASS and C99 same-SHA exact-size machine PASS; C controller visual/final QA and isolated in-game validation remain pending. Next B even-shard production target: index 86 C598919A pending_artwork. Preserve concurrent A/C state; RUNTIME_VALIDATION remains UNTESTED.",
+  "next_checkpoint": "C_OVERLAP05 returned 39229D64, C075FB49 and A064FDFC to producer REWORK under the new 0px-overlap rule. 39229D64/C075FB49 machine placement passed but controller visual QA found source residue/overlap and their rejected C rebuilds are being reverted to coherent pre-overlap fallbacks; A064FDFC has no safe zero-overlap placement in the dense label group. A/B must reconstruct these groups with separable target masks before C re-QA.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,31 +265,15 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "VISUAL_SOURCE_RESIDUE_LAYER_OVERDRAW_REWORK_REQUIRED",
+      "status": "ZERO_OVERLAP_REWORK_REQUIRED",
       "assets": [
-        "FD90AA9"
-      ],
-      "remaining": 1,
-      "failed_elements": 19,
-      "pixel_visual_pass_pending_ingame": [
-        "FF2462BB",
-        "C4A2937B",
-        "9F060EC1",
-        "D6DC1380",
-        "48DEBE77",
-        "A064FDFC",
-        "411827E",
-        "FA7BBB13",
-        "C075FB49",
-        "568D3696",
-        "AA04D779",
-        "19CEDB9",
-        "2DA43E41",
         "39229D64",
-        "571E78F3",
-        "62BEBF33",
-        "E3FD08BE"
-      ]
+        "C075FB49",
+        "A064FDFC"
+      ],
+      "remaining": 3,
+      "failed_assets": 3,
+      "report": "localization/graphics/role_C/20261004-C-OVERLAP05/C_OVERLAP05_CONTROLLER_FINAL_QA.json"
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -313,24 +297,22 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C92",
-      "report": "localization/graphics/role_C/20261004-1740-C92/C92_FD90AA9_FINAL_QA.json",
-      "result": "1_MACHINE_PASS_VISUAL_REWORK_REQUIRED_0_FINAL_APPROVED",
-      "candidate_changed_by_C": false,
-      "assets_checked": 1,
-      "elements_checked": 29,
+      "run": "C_OVERLAP05",
+      "report": "localization/graphics/role_C/20261004-C-OVERLAP05/C_OVERLAP05_CONTROLLER_FINAL_QA.json",
+      "result": "0_PASS_3_REWORK_REQUIRED_ZERO_OVERLAP_POLICY",
+      "candidate_changed_by_C": true,
+      "assets_checked": 3,
       "pixel_visual_pass_assets": [],
       "rework_required_assets": [
-        "FD90AA9"
+        "39229D64",
+        "C075FB49",
+        "A064FDFC"
       ],
-      "visual_failures": [
-        "more_engine",
-        "experts_long",
-        "for_experts",
-        "normal_difficult"
-      ],
-      "approved_dds_count": 0,
-      "in_game_validation": "NOT_RUN_STATIC_VISUAL_FAIL"
+      "restored_fallback_candidates": {
+        "39229D64": "67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a",
+        "C075FB49": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c"
+      },
+      "in_game_validation": "NOT_RUN_STATIC_REWORK_REQUIRED"
     },
     "latest_b_first_qa": {
       "run": "B_RECOVERY04_05",

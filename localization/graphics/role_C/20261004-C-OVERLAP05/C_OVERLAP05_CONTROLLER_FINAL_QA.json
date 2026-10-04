@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-C-OVERLAP05",
+  "timestamp_kst": "2026-10-04T21:05:25+09:00",
+  "scope": "user-requested zero-overlap re-QA/rework for review items 2, 5, and 6 only; completed unrelated assets were not repeated",
+  "worker_run_id": 37200318678,
+  "worker_output_commit": "ddfc5afbff650bfefe6e7de55d39f20a1f109450",
+  "worker_summary": "localization/graphics/role_C/20261004-C-OVERLAP05/C_OVERLAP05_SUMMARY.json",
+  "policy": {
+    "zero_overlap": "1px localized-to-localized, localized-to-preserved foreground, or source residue behind localized lettering is FAIL",
+    "source_bbox_size_ceiling": "localized width/height may not exceed exact source glyph/effect bbox",
+    "visual_gate": "machine masks/bboxes do not override controller readable-orientation visual failure"
+  },
+  "results": [
+    {
+      "asset": "39229D64",
+      "review_number": 2,
+      "machine_gate": "PASS_15_OF_15_ZERO_OVERLAP_COUNTS",
+      "controller_visual_qa": "FAIL",
+      "candidate_restore": {
+        "rejected_c_candidate_sha256": "dfa2c39fba8c397191af804767ede25fef35f92b5b21f583130190b701bdb9a4",
+        "restored_candidate_sha256": "67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a",
+        "restored_from_git_ref": "c17c80dec76440497dd8b5b223121fc58976e884",
+        "visual_failures": [
+          "CLEAN view retains/reconstructs visible English/source lettering fragments across target regions",
+          "NEW view still shows source English fragments/layers behind or through Korean text, including the large mission/result groups",
+          "machine 0-overlap placement is insufficient because source-script residue behind localized lettering is an explicit zero-overlap FAIL"
+        ],
+        "decision": "REWORK_REQUIRED_VISUAL_SOURCE_RESIDUE_AND_LAYER_OVERLAP"
+      },
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "C075FB49",
+      "review_number": 5,
+      "machine_gate": "PASS_17_OF_17_ZERO_OVERLAP_COUNTS",
+      "controller_visual_qa": "FAIL",
+      "candidate_restore": {
+        "rejected_c_candidate_sha256": "3e950422775def2508ea42118f41c7a1f7463e2a7106cdcfcfb907b705890c91",
+        "restored_candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
+        "restored_from_git_ref": "c17c80dec76440497dd8b5b223121fc58976e884",
+        "visual_failures": [
+          "CLEAN view retains fragmented source labels and destructive residue in the dense top text group",
+          "NEW view contains visible overlapping/residual source fragments around Keep passing / Drift / Maximum Speed / Transmission area",
+          "multi-label visual readability and source-clean separation fail despite machine bbox/placement counts"
+        ],
+        "decision": "REWORK_REQUIRED_VISUAL_SOURCE_RESIDUE_AND_LABEL_OVERLAP"
+      },
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "A064FDFC",
+      "review_number": 6,
+      "machine_gate": "FAIL_CLOSED_NO_SAFE_PLACEMENT",
+      "controller_visual_qa": "NOT_RUN_AFTER_MACHINE_FAIL",
+      "candidate_restore": {
+        "candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
+        "candidate_changed_by_C": false,
+        "blocking_rows": [
+          "rank",
+          "dumped_white"
+        ],
+        "decision": "REWORK_REQUIRED_ZERO_OVERLAP_NO_SAFE_PLACEMENT"
+      },
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "summary": {
+    "assets_checked": 3,
+    "pixel_visual_pass_assets": [],
+    "rework_required_assets": [
+      "39229D64",
+      "C075FB49",
+      "A064FDFC"
+    ],
+    "restored_rejected_c_candidates": [
+      "39229D64",
+      "C075FB49"
+    ],
+    "candidate_changed_by_C_final_state": true,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changes": false
+  }
+}
