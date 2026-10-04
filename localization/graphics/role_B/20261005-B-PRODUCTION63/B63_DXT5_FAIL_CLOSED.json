@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION63",
+  "index": 152,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/49BB5FE5_128x32.dds",
+  "source_sha256": "de306cb464b93f6bc3ec63dc9b35b23089ce7d557d1d67fa42d6bba00556fd77",
+  "status": "HOLD_STRICT_RECHECK_DXT5_DECODED_PIXEL_GATE",
+  "diagnostic": {
+    "outside": 1388,
+    "alpha_outside": 0,
+    "exact_source_residue": 0,
+    "preserve_year_badge_changed_pixels": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "edited_dxt5_blocks": 774
+  },
+  "reason": "DXT5 re-encoding/splice cannot satisfy exact decoded-pixel containment/residue gate without altering pixels outside exact source text bbox; candidate not persisted",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

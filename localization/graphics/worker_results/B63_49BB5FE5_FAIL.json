@@ -1,0 +1,16 @@
+{
+  "run": "20261005-B-PRODUCTION63",
+  "index": 152,
+  "status": "HOLD_STRICT_RECHECK_DXT5_DECODED_PIXEL_GATE",
+  "diagnostic": {
+    "outside": 1388,
+    "alpha_outside": 0,
+    "exact_source_residue": 0,
+    "preserve_year_badge_changed_pixels": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "edited_dxt5_blocks": 774
+  },
+  "candidate_written": false,
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
