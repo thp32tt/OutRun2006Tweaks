@@ -1097,3 +1097,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Decision: `C140_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Producer REWORK remains 0; pending_artwork localize_text=37. `1A43E9D9` remains HIGH_RISK pending mandatory in-game; `4F68708E`/`F6811E94` remain strict HOLD.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C140-31C58963/C140_31C_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C140-31C58963/C140_31C_MACHINE_QA.json`.
+
+## 2026-10-05 08:15:09 KST — B60 4D38BBB0 exact-HD candidate self-QA PASS
+- Refreshed latest Git/queue after C140; completed 31C58963 was not repeated. Selected pending even index 154 `4D38BBB0_1024x256.dds` as ONE_STAGE_TO_RENDER and completed binding -> render -> DDS -> self-QA in this invocation.
+- B59 canonical readable-source binding found 8 physical text regions: CREATE NEW LICENSE, SELECT LICENSE, SINGLE PLAYER x2, DEFAULT LICENSE, MULTIPLAYER x2, SHOWROOM. It corrected the stale transcription that omitted SHOWROOM and physical duplicates. Ferrari artwork regions 0/1 are protected.
+- Final candidate `c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a` from source `15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf`: exact 4096x1024 RGBA32 mip1/header/raw `mirror_y`; 8/8 exact bbox+size+positive-margin PASS; clean/final validators PASS; exact source residue=0, outside=0, alpha-outside=0, protected=0, artwork_changed=0, overlap=0, touch=0.
+- Controller SOURCE/CLEAN/FINAL and raw mirror_y visual self-QA PASS. Red and small gray source-style groups remain distinct; no visible English residue, clipping, overlap, seam, halo, artwork damage, or orientation regression.
+- Queue index 154 advanced to `b60_self_qa_pass_pending_c`; pending_artwork localize_text=36. Independent C final QA and isolated in-game validation remain pending.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION60/B60_4D38_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION60/B60_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION60/B60_FINAL_VALIDATION.json`.
