@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION59-PREFLIGHT",
+  "index": 154,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_SEMANTIC_BINDING",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "d06a7ea1d9e9c940788be244963fcb0146fe2498",
+    "sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+    "path": "Release/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds"
+  },
+  "structure": {
+    "dimensions": [
+      4096,
+      1024
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "bytes": 16777344,
+    "header_128_preservable": true,
+    "raw_orientation": "mirror_y"
+  },
+  "atlas": {
+    "git_blob_sha1": "11f58c46008eb6ca355cd9b0d64f1fe268695838",
+    "regions": [
+      {
+        "region_idx": 0,
+        "name": "sprite_4",
+        "cell": [
+          0,
+          704,
+          2044,
+          320
+        ],
+        "source_alpha_bbox": [
+          0,
+          704,
+          2044,
+          1024
+        ],
+        "alpha_pixels": 654080
+      },
+      {
+        "region_idx": 1,
+        "name": "sprite_5",
+        "cell": [
+          2044,
+          704,
+          516,
+          320
+        ],
+        "source_alpha_bbox": [
+          2044,
+          704,
+          2560,
+          1024
+        ],
+        "alpha_pixels": 165120
+      },
+      {
+        "region_idx": 2,
+        "name": "sprite_6",
+        "cell": [
+          0,
+          532,
+          2000,
+          172
+        ],
+        "source_alpha_bbox": [
+          13,
+          548,
+          1954,
+          696
+        ],
+        "alpha_pixels": 142103
+      },
+      {
+        "region_idx": 3,
+        "name": "sprite_7",
+        "cell": [
+          2000,
+          532,
+          1944,
+          172
+        ],
+        "source_alpha_bbox": [
+          2007,
+          541,
+          3468,
+          689
+        ],
+        "alpha_pixels": 105320
+      },
+      {
+        "region_idx": 4,
+        "name": "sprite_8",
+        "cell": [
+          0,
+          360,
+          1760,
+          172
+        ],
+        "source_alpha_bbox": [
+          12,
+          374,
+          1388,
+          522
+        ],
+        "alpha_pixels": 98927
+      },
+      {
+        "region_idx": 5,
+        "name": "sprite_9",
+        "cell": [
+          1760,
+          360,
+          1688,
+          172
+        ],
+        "source_alpha_bbox": [
+          1772,
+          374,
+          3316,
+          522
+        ],
+        "alpha_pixels": 115127
+      },
+      {
+        "region_idx": 6,
+        "name": "sprite_10",
+        "cell": [
+          0,
+          188,
+          1604,
+          172
+        ],
+        "source_alpha_bbox": [
+          15,
+          203,
+          1235,
+          347
+        ],
+        "alpha_pixels": 90633
+      },
+      {
+        "region_idx": 7,
+        "name": "sprite_11",
+        "cell": [
+          1604,
+          272,
+          1056,
+          88
+        ],
+        "source_alpha_bbox": [
+          1610,
+          286,
+          2197,
+          350
+        ],
+        "alpha_pixels": 19100
+      },
+      {
+        "region_idx": 8,
+        "name": "sprite_12",
+        "cell": [
+          2660,
+          272,
+          812,
+          88
+        ],
+        "source_alpha_bbox": [
+          2674,
+          288,
+          3094,
+          350
+        ],
+        "alpha_pixels": 15231
+      },
+      {
+        "region_idx": 9,
+        "name": "sprite_13",
+        "cell": [
+          2560,
+          936,
+          812,
+          88
+        ],
+        "source_alpha_bbox": [
+          2566,
+          952,
+          3086,
+          1014
+        ],
+        "alpha_pixels": 17402
+      }
+    ]
+  },
+  "expected_semantics": [
+    "MULTIPLAYER",
+    "SINGLE PLAYER",
+    "DEFAULT LICENSE",
+    "CREATE NEW LICENSE",
+    "SELECT LICENSE"
+  ],
+  "semantic_binding": "PENDING_CONTROLLER_VISUAL_BINDING_FROM_REGION_CONTACT",
+  "candidate_written": false,
+  "next_same_invocation": "bind source labels to exact region indices and continue through candidate render/self-QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B59_ONE_STAGE_TO_RENDER_DIAGNOSTIC_COMPLETE"
+}
