@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-C109-PENDING-AND-C075",
+  "timestamp_kst": "2026-10-05T00:01:26+09:00",
+  "scope": "Cross-lane final QA of the current unfinished approval set only: AD720950, BF3EE5C6, 2B0863D6, latest A_RECOVERY10 C075FB49, and A_RECOVERY08 FD90AA9. C108-completed assets and unchanged producer-REWORK assets were not repeated.",
+  "policy": "exact source glyph/effect bbox and size ceiling + zero overlap + exhaustive source removal + source typography fidelity including slant/italic angle + readable/raw controller review",
+  "worker_run_id": 37211026495,
+  "worker_output_commit": "454101ced298d9fc2cdc95e964642fdd0acc2d2b",
+  "assets": [
+    {
+      "asset": "AD720950",
+      "queue_index": 47,
+      "candidate_sha256": "6dad37489e7027b8f546c38b3729167697965fc8e33fcabff46f09aba1677955",
+      "machine_report": "localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_AD720950_MACHINE_QA.json",
+      "machine_status": "PASS",
+      "controller_visual_qa": "PASS",
+      "controller_visual_evidence": [
+        "localization/graphics/role_A/20261004-A-PRODUCTION13/A_PRODUCTION13_SOURCE_CLEAN_FINAL_GRAY.jpg",
+        "localization/graphics/role_A/20261004-A-PRODUCTION13/A_PRODUCTION13_ROW_CONTACT.jpg",
+        "localization/graphics/role_A/20261004-A-PRODUCTION13/A_PRODUCTION13_FINAL_RAW_GRAY.jpg"
+      ],
+      "controller_visual_note": "PASS. Source keyboard labels are plain heavy white sans text; Korean replacements preserve that family, weight, alignment intent and spacing. Shift and character-glyph rows remain source pixels. No source residue, clipping, overlap, seam, halo or protected-art damage is visible.",
+      "decision": "C109_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "2B0863D6",
+      "queue_index": 135,
+      "candidate_sha256": "2f3e99f468367e056ee3c6edfdb412b1fe5f10f27387a463472b07aeaa335fbb",
+      "machine_report": "localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_2B0863D6_MACHINE_QA.json",
+      "machine_status": "PASS",
+      "controller_visual_qa": "PASS",
+      "controller_visual_evidence": [
+        "localization/graphics/role_A/20261004-A-PRODUCTION15/A_PRODUCTION15_SOURCE_CLEAN_FINAL_GRAY.jpg",
+        "localization/graphics/role_A/20261004-A-PRODUCTION15/A_PRODUCTION15_ROW_CONTACT.jpg",
+        "localization/graphics/role_A/20261004-A-PRODUCTION15/A_PRODUCTION15_FINAL_RAW_GRAY.jpg"
+      ],
+      "controller_visual_note": "PASS. Source class/stat labels are upright heavy gray sans text and the CLASS badge is upright white-on-red; Korean final reproduces those corresponding families without invented slant. Clean/final comparison shows no English residue, clipping, overlap, seam or protected-art damage.",
+      "decision": "C109_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "BF3EE5C6",
+      "queue_index": 49,
+      "candidate_sha256": "30cc2167b1650ab0a7b1c579c7d29118065007f0474f7207ce993ab1b19e45fa",
+      "machine_report": "localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_BF3EE5C6_MACHINE_QA.json",
+      "machine_status": "PASS",
+      "controller_visual_qa": "FAIL",
+      "controller_visual_evidence": [
+        "localization/graphics/role_A/20261004-A-PRODUCTION14/A_PRODUCTION14_ROW_CONTACT.jpg",
+        "localization/graphics/role_A/20261004-A-PRODUCTION14/A_PRODUCTION14_SOURCE_CLEAN_FINAL_GRAY.jpg"
+      ],
+      "controller_visual_note": "FAIL under the current source-style rule. Pixel containment/zero-overlap gates pass, but source labels are strongly italic/slanted across Rank for this stage, NORMAL/TUNED, Double/Strike/Spare, Shift up, Rank, Turkey and Go while the Korean replacements are predominantly upright. Fill/outline families are approximated, but the missing source slant/italic geometry is a material style mismatch requiring producer rerender.",
+      "decision": "C109_REWORK_REQUIRED_SOURCE_STYLE_SLANT",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "C075FB49",
+      "queue_index": 111,
+      "candidate_sha256": "fc75a1a1b267dbc43f240483ffc1ec67e3d3dddd05061e504ab4c0c4ca2efacd",
+      "machine_report": "localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_C075FB49_MACHINE_QA.json",
+      "machine_status": "PASS",
+      "controller_visual_qa": "FAIL",
+      "controller_visual_evidence": [
+        "localization/graphics/role_A/20261004-A-RECOVERY10/A_RECOVERY10_TOP_SOURCE_CLEAN_REJECTED_FINAL.jpg",
+        "localization/graphics/role_A/20261004-A-RECOVERY10/A_RECOVERY10_SOURCE_CLEAN_REJECTED_FINAL.jpg",
+        "localization/graphics/role_A/20261004-A-RECOVERY10/A_RECOVERY10_FINAL_RAW_GRAY.jpg"
+      ],
+      "controller_visual_note": "FAIL on source-style fidelity after the residue repair. The latest native rerender fixes dense-top source residue and C109 confirms 17/17 bbox/size, zero overlap and clean top residue=0. However Long distance, Maximum Speed, Transmission, For Experts and the yellow mission labels are visibly strongly italic/slanted in source while the corresponding Korean top labels remain largely upright/block-like. Current policy requires matching source slant/proportions, so this is returned for producer typography rerender rather than approved.",
+      "decision": "C109_REWORK_REQUIRED_SOURCE_STYLE_SLANT",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "FD90AA9",
+      "queue_index": 121,
+      "candidate_sha256": "0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b",
+      "machine_report": "localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_FD90AA9_MACHINE_QA.json",
+      "machine_status": "SCOPED_RECOVERY_STATIC_PASS_GENERIC_MASK_COUNTERS_NOT_FINAL_SEMANTICS",
+      "machine_note": "The generic C109 full-final protected/source-residue counters are not valid final gates for A_RECOVERY08 because FD90AA9_CLEAN_PLATE_PROTECTED_MASK_RECOVERY08 is a clean-plate preservation mask, not a final-candidate protected mask, and the recovery source-text mask intentionally contains retained background/effect pixels. Valid independent scoped checks pass: 29/29 bbox+size, target outside source/localized bboxes=0, pair overlap/touch=0, changes vs input outside the four repaired source bboxes=0, and all 25 unaffected producer layer diffs=0.",
+      "controller_visual_qa": "FAIL",
+      "controller_visual_evidence": [
+        "localization/graphics/role_A/20261004-A-RECOVERY08/A_RECOVERY08_C92_RETURN_CONTACT_COMPARE.jpg",
+        "localization/graphics/role_A/20261004-A-RECOVERY08/A_RECOVERY08_FINAL_READABLE_GRAY_QA.jpg",
+        "localization/graphics/role_A/20261004-A-RECOVERY08/A_RECOVERY08_FINAL_RAW_GRAY_QA.jpg"
+      ],
+      "controller_visual_note": "FAIL under the current source-style rule. Recovery08 removes the former C92 source residue/layer collisions, but More Engine Sound and the experts/normal-difficult source rows are conspicuously italic/slanted while their Korean rerenders are substantially upright. Because this candidate predates the later mandatory slant/style policy and is now pending C approval, it must be rerendered rather than grandfathered.",
+      "decision": "C109_REWORK_REQUIRED_SOURCE_STYLE_SLANT",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "summary": {
+    "assets_checked": 5,
+    "pixel_visual_policy_pass": 2,
+    "rework_required_in_this_scope": 3,
+    "pixel_visual_pass_assets": [
+      "AD720950",
+      "2B0863D6"
+    ],
+    "rework_required_assets": [
+      "BF3EE5C6",
+      "C075FB49",
+      "FD90AA9"
+    ],
+    "global_rework_remaining": [
+      "BF3EE5C6",
+      "53CE39D5",
+      "788CE557",
+      "C075FB49",
+      "FD90AA9"
+    ],
+    "pending_c_localize_text_after_reconcile": 0,
+    "candidate_changed_by_C": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changes": false
+  }
+}

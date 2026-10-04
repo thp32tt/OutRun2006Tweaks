@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-04T23:25:51+09:00",
+  "updated_at_kst": "2026-10-05T00:01:26+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C108 finalized 39229D64 and 5B65E08C as static pixel+visual PASS pending in-game. 788CE557 returned for incomplete source-effect masking and 53CE39D5 returned for 242 source-mask pixels surviving clean plate. Global producer REWORK: C075FB49, 788CE557, 53CE39D5. Remaining localize_text pending-C approvals: 4; pending_artwork: 50.",
+  "next_checkpoint": "C109 finalized AD720950 and 2B0863D6 as static pixel+visual PASS pending in-game. BF3EE5C6, C075FB49 and FD90AA9 were returned for source-style slant/italic mismatch; existing 53CE39D5 and 788CE557 source-residue REWORK remain. No localize_text pending-C approvals remain; pending_artwork remains 50.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,15 +265,17 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "ZERO_OVERLAP_REWORK_REQUIRED",
+      "status": "SOURCE_STYLE_OR_ZERO_RESIDUE_REWORK_REQUIRED",
       "assets": [
-        "C075FB49",
+        "BF3EE5C6",
+        "53CE39D5",
         "788CE557",
-        "53CE39D5"
+        "C075FB49",
+        "FD90AA9"
       ],
-      "remaining": 3,
-      "failed_assets": 3,
-      "report": "localization/graphics/role_C/20261004-C108-LATEST-REWORK/C108_CONTROLLER_FINAL_QA.json"
+      "remaining": 5,
+      "failed_assets": 5,
+      "report": "localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_CONTROLLER_FINAL_QA.json"
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -297,25 +299,28 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C108",
-      "report": "localization/graphics/role_C/20261004-C108-LATEST-REWORK/C108_CONTROLLER_FINAL_QA.json",
-      "result": "2_PIXEL_VISUAL_PASS_2_SCOPE_REWORK_GLOBAL_3_REWORK_REMAIN",
+      "run": "C109",
+      "report": "localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_CONTROLLER_FINAL_QA.json",
+      "result": "2_PIXEL_VISUAL_PASS_3_SCOPE_REWORK_GLOBAL_5_REWORK_REMAIN",
       "candidate_changed_by_C": false,
-      "assets_checked": 4,
+      "assets_checked": 5,
       "pixel_visual_pass_assets": [
-        "39229D64",
-        "5B65E08C"
+        "AD720950",
+        "2B0863D6"
       ],
       "rework_required_assets": [
-        "788CE557",
-        "53CE39D5"
+        "BF3EE5C6",
+        "C075FB49",
+        "FD90AA9"
       ],
       "global_rework_remaining": [
-        "C075FB49",
+        "BF3EE5C6",
+        "53CE39D5",
         "788CE557",
-        "53CE39D5"
+        "C075FB49",
+        "FD90AA9"
       ],
-      "pending_c_localize_text": 4,
+      "pending_c_localize_text": 0,
       "pending_production_localize_text": 50,
       "in_game_validation": "PENDING_ISOLATED_DDS_ONLY"
     },
