@@ -729,16 +729,21 @@ namespace OutRunVRStereo
         VRStereoR13HardeningHook VRStereoR13HardeningHook::instance;
     }
 
-    inline OutRunVR::RuntimeEligibility::InstallState
-    R13InstallStatus() noexcept
+    enum class R13InstallStatusValue : std::uint8_t
     {
-        using State = OutRunVR::RuntimeEligibility::InstallState;
+        Pending,
+        Ready,
+        Failed
+    };
+
+    inline R13InstallStatusValue R13InstallStatus() noexcept
+    {
         switch (R13InstallState.load(std::memory_order_acquire))
         {
-        case R13InstallPending: return State::Pending;
-        case R13InstallReady: return State::Ready;
-        case R13InstallFailed: return State::Failed;
-        default: return State::Failed;
+        case R13InstallPending: return R13InstallStatusValue::Pending;
+        case R13InstallReady: return R13InstallStatusValue::Ready;
+        case R13InstallFailed: return R13InstallStatusValue::Failed;
+        default: return R13InstallStatusValue::Failed;
         }
     }
 
