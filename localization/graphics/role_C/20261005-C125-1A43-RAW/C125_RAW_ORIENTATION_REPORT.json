@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C125-1A43-RAW",
+  "asset": "1A43E9D9",
+  "producer_run": "B_PRODUCTION39",
+  "candidate_sha256": "601be9747c0cf03e89740786fe0782ec1e71f0e480ceb5e3d740637d048043b3",
+  "dimensions": [
+    2048,
+    256
+  ],
+  "format": "DXT5",
+  "raw_orientation": "mirror_y",
+  "raw_proof": "localization/graphics/role_C/20261005-C125-1A43-RAW/C125_B39_RAW_MIRROR_Y_QA.png",
+  "readable_proof": "localization/graphics/role_C/20261005-C125-1A43-RAW/C125_B39_READABLE_QA.png",
+  "runtime_validation": "UNTESTED"
+}
