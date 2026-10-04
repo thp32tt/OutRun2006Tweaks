@@ -52,6 +52,8 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('async def conversion_send_lane_task', SOURCE)
         self.assertIn('CONTROLLER_MODE == "conversion" and CONVERSION_PARALLEL', SOURCE)
         self.assertIn('q.setdefault("active_by_lane", {})', SOURCE)
+        self.assertIn('conversion_parallel_schema_version', SOURCE)
+        self.assertIn('stale pre-independent-conversion active_by_lane state', SOURCE)
         self.assertIn('for lane_key in ("C", "A", "B")', SOURCE)
 
     def test_vr_compose_pins_v2_and_three_slots(self):
