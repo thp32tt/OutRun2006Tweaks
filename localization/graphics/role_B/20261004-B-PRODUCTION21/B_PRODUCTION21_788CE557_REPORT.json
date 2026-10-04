@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261004-B-PRODUCTION21",
+  "base_head": "0b9cf9cece3f656467b95b97133777535c107a0d",
+  "queue_index": 106,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+  "source_sha256": "4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b",
+  "candidate_sha256": "4943eb7e348f44b96ea77d41041f29b2e18a30f16352714ec78b3efc50d67d29",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+  "readiness_tier": "HOLD_STRICT_RECHECK_RESOLVED_TO_RENDER_READY_AND_COMPLETED_SAME_INVOCATION",
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "mips": 1,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "method": "B_PRODUCTION17/18 hold resolved using color-seeded nearest semantic assignment for overlapping-x For Experts/OutRun2SP effects; exact alpha masks for unambiguous Music Change/Time remaining; transparent clean plate; fresh native Korean; exact header DDS",
+  "source_mask_seed_counts": {
+    "red": 8864,
+    "orange": 6112
+  },
+  "semantic_split": {
+    "red_fill_max_x": 420,
+    "orange_fill_min_x": 458,
+    "top_split_x": 439,
+    "top_band_y": [
+      89,
+      184
+    ]
+  },
+  "rows": [
+    {
+      "key": "for_experts",
+      "source": "For Experts",
+      "korean": "상급자용",
+      "original_bbox": [
+        3,
+        92,
+        439,
+        184
+      ],
+      "localized_bbox": [
+        65,
+        94,
+        376,
+        182
+      ],
+      "source_size": [
+        436,
+        92
+      ],
+      "localized_size": [
+        311,
+        88
+      ],
+      "delta_left": 62,
+      "delta_right": 63,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "zero_overlap": "PASS",
+      "positive_separation_px": 2,
+      "native_font": "Noto Sans CJK KR Black",
+      "native_font_size": 83,
+      "outer_stroke": 6,
+      "inner_stroke": 3,
+      "slant": 0.13,
+      "style": "red_white_navy",
+      "native_raster_resampled": false,
+      "rework_status": "HOLD_RESOLVED_NEW_CANDIDATE"
+    },
+    {
+      "key": "outrun2sp",
+      "source": "OutRun2SP",
+      "korean": "아웃런2 SP",
+      "original_bbox": [
+        439,
+        104,
+        770,
+        184
+      ],
+      "localized_bbox": [
+        442,
+        108,
+        767,
+        180
+      ],
+      "source_size": [
+        331,
+        80
+      ],
+      "localized_size": [
+        325,
+        72
+      ],
+      "delta_left": 3,
+      "delta_right": 3,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "zero_overlap": "PASS",
+      "positive_separation_px": 2,
+      "native_font": "Noto Sans CJK KR Black",
+      "native_font_size": 67,
+      "outer_stroke": 5,
+      "inner_stroke": 2,
+      "slant": 0.12,
+      "style": "orange_white_navy",
+      "native_raster_resampled": false,
+      "rework_status": "HOLD_RESOLVED_NEW_CANDIDATE"
+    },
+    {
+      "key": "music_change",
+      "source": "Music Change",
+      "korean": "음악 변경",
+      "original_bbox": [
+        770,
+        104,
+        1140,
+        174
+      ],
+      "localized_bbox": [
+        831,
+        106,
+        1079,
+        172
+      ],
+      "source_size": [
+        370,
+        70
+      ],
+      "localized_size": [
+        248,
+        66
+      ],
+      "delta_left": 61,
+      "delta_right": 61,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "zero_overlap": "PASS",
+      "positive_separation_px": 2,
+      "native_font": "Noto Sans CJK KR Black",
+      "native_font_size": 64,
+      "outer_stroke": 4,
+      "inner_stroke": 2,
+      "slant": 0.1,
+      "style": "white_shadow",
+      "native_raster_resampled": false,
+      "rework_status": "HOLD_RESOLVED_NEW_CANDIDATE"
+    },
+    {
+      "key": "time_remaining",
+      "source": "Time remaining :",
+      "korean": "남은 시간:",
+      "original_bbox": [
+        930,
+        180,
+        1600,
+        286
+      ],
+      "localized_bbox": [
+        1064,
+        182,
+        1466,
+        284
+      ],
+      "source_size": [
+        670,
+        106
+      ],
+      "localized_size": [
+        402,
+        102
+      ],
+      "delta_left": 134,
+      "delta_right": 134,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "zero_overlap": "PASS",
+      "positive_separation_px": 2,
+      "native_font": "Noto Sans CJK KR Black",
+      "native_font_size": 96,
+      "outer_stroke": 7,
+      "inner_stroke": 3,
+      "slant": 0.1,
+      "style": "white_navy",
+      "native_raster_resampled": false,
+      "rework_status": "HOLD_RESOLVED_NEW_CANDIDATE"
+    }
+  ],
+  "clean_plate": {
+    "source_text_residue_pixels": 0,
+    "status": "PASS"
+  },
+  "containment": {
+    "elements_total": 4,
+    "elements_pass": 4,
+    "elements_fail": 0,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "status": "PASS"
+  },
+  "zero_overlap": {
+    "new_vs_preserved_source_alpha_pixels": 0,
+    "two_px_guard_vs_preserved_conflicts": 0,
+    "new_pair_overlap_or_2px_guard_conflicts": [],
+    "status": "PASS"
+  },
+  "protected_preserved": [
+    "Transmission labels",
+    "selector arrows",
+    "warning icon",
+    "vehicle silhouettes",
+    "steering wheels",
+    "numeric row",
+    "all unrelated atlas alpha"
+  ],
+  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_PRODUCTION21_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
