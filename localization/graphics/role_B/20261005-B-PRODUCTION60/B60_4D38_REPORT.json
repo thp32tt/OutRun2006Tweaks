@@ -492,7 +492,8 @@
   },
   "candidate_sha256": "c92e095672a69a26191a635b509aa2f6a25be41836128b2d5f44163c3dc2908a",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
-  "controller_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "controller_visual_qa": "PASS_SOURCE_CLEAN_FINAL_AND_RAW",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_PRODUCTION60_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B_PRODUCTION60_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_self_qa_report": "localization/graphics/role_B/20261005-B-PRODUCTION60/B60_CONTROLLER_SELF_QA.json"
 }
