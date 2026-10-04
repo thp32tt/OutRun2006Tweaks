@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-04T10:00:00+09:00",
+  "updatedKst": "2026-10-04T10:09:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 744,
+  "cycle": 762,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -52,9 +52,10 @@
     "VR-REFACTOR-STATE-0004N",
     "VR-REFACTOR-STATE-0004O",
     "VR-REFACTOR-STATE-0004P",
-    "VR-REFACTOR-STATE-0004Q"
+    "VR-REFACTOR-STATE-0004Q",
+    "VR-REFACTOR-STATE-0004R"
   ],
-  "next": "Continue from validated 0004Q with R23 prerequisite install-state ownership. R23 still reads R9/R13/R20/R21/R22 install storage directly; migrate those reads to owner query APIs without changing fail-fast ordering or the R22-ready activation gate. Then continue the 1000-cycle structural plan with exact-SHA CI.",
+  "next": "Continue from validated 0004R by removing R23's remaining private R22 raster-helper dependencies (R22ScissorSnapshot/R22CaptureGameScissor/R22GameClearCoversBackbuffer) behind owner/neutral raster APIs while preserving clear coverage and live-state capture semantics. Continue 1000-cycle plan from cycle 762.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -95,11 +96,14 @@
     "684->720 reconciliation: 12 previously landed commits after the frozen test candidate represent 36 structural cycles under the established 3-cycles-per-commit accounting. 0004M owns exact recovery-safety epoch mutation in R29; 0004N routes R22/R31 install status through owner queries; 0004O extends install-status owner queries through R32/R33 consumers.",
     "VR-REFACTOR-STATE-0004P removes R32 direct access to R13InstallState/R13InstallReady/R13InstallFailed. RED verifier SHA 987e21c3 failed on the direct dependency. Initial implementation e2bdf2b8 exposed an invalid dependency on the later RuntimeEligibility type and failed Win32 game/full-chain compilation; corrected owner-local enum/API commits e227ba82 + 62624070 restored green exact-SHA validation before proceeding.",
     "VR-REFACTOR-STATE-0004Q hides R22ReplayScope and R22FailClosedReplayState behind public R22RasterReplayGuard. RED verifier SHA 15470165 failed exactly on the private R22 dependencies and missing owner guard. Final source b554eda1 preserves FlushPendingResync -> replay-scope construction -> fail-closed-on-invalid -> draw -> RAII restore ordering.",
-    "Current bounded continuation added 8 commits after b7431cfe = 24 cycles (720 -> 744). Exact source b554eda10afa46c814b92de795e41d14e9a9b360 passed DX9Ex Active Validation 37166334049 and Domain Isolation/HUD Inspector gates; runtime remains UNTESTED."
+    "Current bounded continuation added 8 commits after b7431cfe = 24 cycles (720 -> 744). Exact source b554eda10afa46c814b92de795e41d14e9a9b360 passed DX9Ex Active Validation 37166334049 and Domain Isolation/HUD Inspector gates; runtime remains UNTESTED.",
+    "VR-REFACTOR-STATE-0004R completes prerequisite install-state ownership through R9/R13/R20/R21/R22 -> R23. RED verifier SHA ddf9c46b enumerated the direct atomic/constant dependencies. R9 now exposes an owner-local status enum/query; R20 and R21 expose InstallState queries and consume lower owner APIs; R23 preserves the original fail-fast prerequisite order and R22-ready activation gate through owner queries.",
+    "0004R source sequence: 27d7e49f R9 owner query; 2112db17 R20 owner query/consumer; 93deced6 R21 owner query/consumer; 49464b2e restores exact R21 short-circuit read ordering; 426a48a7 R23 owner-query consumption. Exact source 426a48a7 passed DX9Ex Active Validation 37166819681 and Domain Isolation 37166819692.",
+    "Current continuation added 6 commits after the 744-cycle checkpoint = 18 cycles, advancing durable structural progress to 762. Runtime behavior remains UNTESTED on Quest 3/VDXR."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0004Q_BUILD_VERIFIED",
-  "validatedSourceSha": "b554eda10afa46c814b92de795e41d14e9a9b360",
-  "validationRunId": 37166334049,
+  "batchStatus": "VR-REFACTOR-STATE-0004R_BUILD_VERIFIED",
+  "validatedSourceSha": "426a48a7c1a803dc990b437383bb4ad650346a73",
+  "validationRunId": 37166819681,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -107,18 +111,16 @@
     "game": "SUCCESS",
     "fullChainCompile": "SUCCESS",
     "package": "SUCCESS",
-    "domainIsolation": "SUCCESS",
-    "hudInspector": "SUCCESS",
-    "staticExeAnalysis": "SUCCESS"
+    "domainIsolation": "SUCCESS"
   },
   "testCandidate": {
-    "sourceSha": "b554eda10afa46c814b92de795e41d14e9a9b360",
-    "workflowRunId": 37166334049,
-    "artifactId": 11288809657,
-    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-b554eda10afa46c814b92de795e41d14e9a9b360",
-    "artifactSizeBytes": 2728965,
-    "artifactDigestSha256": "b7f2d38cd48b2fa98d4d4b69534fe856753392ad16434b2910e6c77e8a97b82f",
-    "innerPackageSha256": "5abf6305c6acd370016502dc4b82674fbeddbf3d3f7c4153ca62df8b0db3b443",
+    "sourceSha": "426a48a7c1a803dc990b437383bb4ad650346a73",
+    "workflowRunId": 37166819681,
+    "artifactId": 11289701128,
+    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-426a48a7c1a803dc990b437383bb4ad650346a73",
+    "artifactSizeBytes": 2729382,
+    "artifactDigestSha256": "1c11b7868df28489982a28f172e59a871df2bb9787791ac5f5beba6199bc7903",
+    "innerPackageSha256": "3caefa1f2b8e0da6dacb6b7a86cfed16a0c60cbeaaec553dd69d1527ffadd908",
     "defaultProfile": "CORRECTNESS",
     "userRuntimeVerified": false
   }
