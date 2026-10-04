@@ -1,0 +1,1133 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION28",
+  "queue_index": 100,
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+  "source_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+  "candidate_sha256": "29cdba2ab03746f6e41d145d3dfc568cd1634f7cfc4dcb92a42a425cb2de5925",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+  "method": "exact 2048x2048 RGBA32 HD source -> colour-core semantic line discovery -> dominant-panel colour separation of complete source effects -> dominant-panel row reconstruction clean plate -> fresh native Hangul lettering -> exact-header DDS -> decoded all-channel static QA",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "semantic_targets": 7,
+  "physical_lines": 19,
+  "translations": [
+    {
+      "source": "RANDOM",
+      "korean": "무작위"
+    },
+    {
+      "source": "TimeAttack Mode OutRun2",
+      "korean": "타임 어택 / 모드 / 아웃런2"
+    },
+    {
+      "source": "HeartAttack Mode OutRun2",
+      "korean": "하트 어택 / 모드 / 아웃런2"
+    },
+    {
+      "source": "OutRun Mode OutRun2",
+      "korean": "아웃런 / 모드 / 아웃런2"
+    },
+    {
+      "source": "TimeAttack Mode SPECIAL TOURS",
+      "korean": "타임 어택 / 모드 / 스페셜 투어"
+    },
+    {
+      "source": "HeartAttack Mode SPECIAL TOURS",
+      "korean": "하트 어택 / 모드 / 스페셜 투어"
+    },
+    {
+      "source": "OutRun Mode SPECIAL TOURS",
+      "korean": "아웃런 / 모드 / 스페셜 투어"
+    }
+  ],
+  "protected_original": [
+    "all song titles/music credits",
+    "Ferrari/model names",
+    "vehicle images",
+    "OutRun/OutRun2 logos",
+    "music-note icons",
+    "non-target selector artwork"
+  ],
+  "clean_plate": {
+    "changed_pixels_outside_source_text_mask": 0,
+    "residual_cleanup_pixels": 6,
+    "source_text_mask_pixels_unchanged_in_clean_plate": 0,
+    "visual_residue_suspects": {
+      "time_attack_or2_1": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "time_attack_or2_2": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "time_attack_or2_3": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "heart_attack_or2_1": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "heart_attack_or2_2": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "heart_attack_or2_3": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "outrun_or2_1": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "outrun_or2_2": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "outrun_or2_3": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "time_attack_special_1": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "time_attack_special_2": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "time_attack_special_3": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "heart_attack_special_1": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "heart_attack_special_2": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "heart_attack_special_3": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "outrun_special_1": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "outrun_special_2": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      },
+      "outrun_special_3": {
+        "source_color_like": 0,
+        "row_outliers_gt4": 0
+      }
+    },
+    "status": "PASS"
+  },
+  "containment": {
+    "lines_total": 19,
+    "lines_pass": 19,
+    "lines_fail": 0,
+    "all_channel_changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_pixels_outside_exact_source_bboxes": 0,
+    "localized_overlap_pixels": 0,
+    "target_2px_guard_vs_protected_conflicts": 0,
+    "status": "PASS"
+  },
+  "rows": [
+    {
+      "target": "random",
+      "source": "RANDOM",
+      "line_index": 1,
+      "korean": "무작위",
+      "cell": [
+        1110,
+        0,
+        1490,
+        125
+      ],
+      "original_bbox": [
+        1145,
+        12,
+        1455,
+        106
+      ],
+      "localized_bbox": [
+        1177,
+        14,
+        1422,
+        104
+      ],
+      "source_width": 310,
+      "source_height": 94,
+      "localized_width": 245,
+      "localized_height": 90,
+      "delta_left": 32,
+      "delta_right": 33,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "white",
+      "font_size": 89,
+      "stroke_width": 4,
+      "shadow": 2,
+      "fill": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "outline": [
+        0,
+        28,
+        50,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "time_attack_or2",
+      "source": "TimeAttack Mode OutRun2",
+      "line_index": 1,
+      "korean": "타임 어택",
+      "cell": [
+        0,
+        1620,
+        365,
+        1845
+      ],
+      "original_bbox": [
+        45,
+        1673,
+        338,
+        1719
+      ],
+      "localized_bbox": [
+        113,
+        1675,
+        269,
+        1717
+      ],
+      "source_width": 293,
+      "source_height": 46,
+      "localized_width": 156,
+      "localized_height": 42,
+      "delta_left": 68,
+      "delta_right": 69,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 40,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "time_attack_or2",
+      "source": "TimeAttack Mode OutRun2",
+      "line_index": 2,
+      "korean": "모드",
+      "cell": [
+        0,
+        1620,
+        365,
+        1845
+      ],
+      "original_bbox": [
+        30,
+        1719,
+        163,
+        1760
+      ],
+      "localized_bbox": [
+        58,
+        1723,
+        134,
+        1756
+      ],
+      "source_width": 133,
+      "source_height": 41,
+      "localized_width": 76,
+      "localized_height": 33,
+      "delta_left": 28,
+      "delta_right": 29,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 40,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "time_attack_or2",
+      "source": "TimeAttack Mode OutRun2",
+      "line_index": 3,
+      "korean": "아웃런2",
+      "cell": [
+        0,
+        1620,
+        365,
+        1845
+      ],
+      "original_bbox": [
+        95,
+        1760,
+        325,
+        1807
+      ],
+      "localized_bbox": [
+        141,
+        1762,
+        278,
+        1805
+      ],
+      "source_width": 230,
+      "source_height": 47,
+      "localized_width": 137,
+      "localized_height": 43,
+      "delta_left": 46,
+      "delta_right": 47,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 41,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "heart_attack_or2",
+      "source": "HeartAttack Mode OutRun2",
+      "line_index": 1,
+      "korean": "하트 어택",
+      "cell": [
+        375,
+        1620,
+        740,
+        1845
+      ],
+      "original_bbox": [
+        413,
+        1673,
+        710,
+        1719
+      ],
+      "localized_bbox": [
+        483,
+        1675,
+        639,
+        1717
+      ],
+      "source_width": 297,
+      "source_height": 46,
+      "localized_width": 156,
+      "localized_height": 42,
+      "delta_left": 70,
+      "delta_right": 71,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 40,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "heart_attack_or2",
+      "source": "HeartAttack Mode OutRun2",
+      "line_index": 2,
+      "korean": "모드",
+      "cell": [
+        375,
+        1620,
+        740,
+        1845
+      ],
+      "original_bbox": [
+        399,
+        1719,
+        539,
+        1760
+      ],
+      "localized_bbox": [
+        431,
+        1723,
+        507,
+        1756
+      ],
+      "source_width": 140,
+      "source_height": 41,
+      "localized_width": 76,
+      "localized_height": 33,
+      "delta_left": 32,
+      "delta_right": 32,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 40,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "heart_attack_or2",
+      "source": "HeartAttack Mode OutRun2",
+      "line_index": 3,
+      "korean": "아웃런2",
+      "cell": [
+        375,
+        1620,
+        740,
+        1845
+      ],
+      "original_bbox": [
+        463,
+        1760,
+        693,
+        1807
+      ],
+      "localized_bbox": [
+        509,
+        1762,
+        646,
+        1805
+      ],
+      "source_width": 230,
+      "source_height": 47,
+      "localized_width": 137,
+      "localized_height": 43,
+      "delta_left": 46,
+      "delta_right": 47,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 41,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "outrun_or2",
+      "source": "OutRun Mode OutRun2",
+      "line_index": 1,
+      "korean": "아웃런",
+      "cell": [
+        750,
+        1610,
+        1095,
+        1845
+      ],
+      "original_bbox": [
+        781,
+        1641,
+        991,
+        1687
+      ],
+      "localized_bbox": [
+        830,
+        1643,
+        941,
+        1685
+      ],
+      "source_width": 210,
+      "source_height": 46,
+      "localized_width": 111,
+      "localized_height": 42,
+      "delta_left": 49,
+      "delta_right": 50,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 40,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "outrun_or2",
+      "source": "OutRun Mode OutRun2",
+      "line_index": 2,
+      "korean": "모드",
+      "cell": [
+        750,
+        1610,
+        1095,
+        1845
+      ],
+      "original_bbox": [
+        774,
+        1687,
+        913,
+        1728
+      ],
+      "localized_bbox": [
+        805,
+        1691,
+        881,
+        1724
+      ],
+      "source_width": 139,
+      "source_height": 41,
+      "localized_width": 76,
+      "localized_height": 33,
+      "delta_left": 31,
+      "delta_right": 32,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 40,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "outrun_or2",
+      "source": "OutRun Mode OutRun2",
+      "line_index": 3,
+      "korean": "아웃런2",
+      "cell": [
+        750,
+        1610,
+        1095,
+        1845
+      ],
+      "original_bbox": [
+        831,
+        1728,
+        1061,
+        1775
+      ],
+      "localized_bbox": [
+        877,
+        1730,
+        1014,
+        1773
+      ],
+      "source_width": 230,
+      "source_height": 47,
+      "localized_width": 137,
+      "localized_height": 43,
+      "delta_left": 46,
+      "delta_right": 47,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 41,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "time_attack_special",
+      "source": "TimeAttack Mode SPECIAL TOURS",
+      "line_index": 1,
+      "korean": "타임 어택",
+      "cell": [
+        1110,
+        1460,
+        1470,
+        1705
+      ],
+      "original_bbox": [
+        1149,
+        1561,
+        1442,
+        1607
+      ],
+      "localized_bbox": [
+        1217,
+        1563,
+        1373,
+        1605
+      ],
+      "source_width": 293,
+      "source_height": 46,
+      "localized_width": 156,
+      "localized_height": 42,
+      "delta_left": 68,
+      "delta_right": 69,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 40,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "time_attack_special",
+      "source": "TimeAttack Mode SPECIAL TOURS",
+      "line_index": 2,
+      "korean": "모드",
+      "cell": [
+        1110,
+        1460,
+        1470,
+        1705
+      ],
+      "original_bbox": [
+        1134,
+        1607,
+        1267,
+        1648
+      ],
+      "localized_bbox": [
+        1162,
+        1611,
+        1238,
+        1644
+      ],
+      "source_width": 133,
+      "source_height": 41,
+      "localized_width": 76,
+      "localized_height": 33,
+      "delta_left": 28,
+      "delta_right": 29,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 40,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "time_attack_special",
+      "source": "TimeAttack Mode SPECIAL TOURS",
+      "line_index": 3,
+      "korean": "스페셜 투어",
+      "cell": [
+        1110,
+        1460,
+        1470,
+        1705
+      ],
+      "original_bbox": [
+        1134,
+        1648,
+        1429,
+        1695
+      ],
+      "localized_bbox": [
+        1182,
+        1650,
+        1381,
+        1693
+      ],
+      "source_width": 295,
+      "source_height": 47,
+      "localized_width": 199,
+      "localized_height": 43,
+      "delta_left": 48,
+      "delta_right": 48,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 41,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "heart_attack_special",
+      "source": "HeartAttack Mode SPECIAL TOURS",
+      "line_index": 1,
+      "korean": "하트 어택",
+      "cell": [
+        1470,
+        1460,
+        1840,
+        1710
+      ],
+      "original_bbox": [
+        1517,
+        1513,
+        1814,
+        1559
+      ],
+      "localized_bbox": [
+        1587,
+        1515,
+        1743,
+        1557
+      ],
+      "source_width": 297,
+      "source_height": 46,
+      "localized_width": 156,
+      "localized_height": 42,
+      "delta_left": 70,
+      "delta_right": 71,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 40,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "heart_attack_special",
+      "source": "HeartAttack Mode SPECIAL TOURS",
+      "line_index": 2,
+      "korean": "모드",
+      "cell": [
+        1470,
+        1460,
+        1840,
+        1710
+      ],
+      "original_bbox": [
+        1502,
+        1559,
+        1643,
+        1600
+      ],
+      "localized_bbox": [
+        1534,
+        1563,
+        1610,
+        1596
+      ],
+      "source_width": 141,
+      "source_height": 41,
+      "localized_width": 76,
+      "localized_height": 33,
+      "delta_left": 32,
+      "delta_right": 33,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 40,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "heart_attack_special",
+      "source": "HeartAttack Mode SPECIAL TOURS",
+      "line_index": 3,
+      "korean": "스페셜 투어",
+      "cell": [
+        1470,
+        1460,
+        1840,
+        1710
+      ],
+      "original_bbox": [
+        1494,
+        1600,
+        1797,
+        1647
+      ],
+      "localized_bbox": [
+        1546,
+        1602,
+        1745,
+        1645
+      ],
+      "source_width": 303,
+      "source_height": 47,
+      "localized_width": 199,
+      "localized_height": 43,
+      "delta_left": 52,
+      "delta_right": 52,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 41,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "outrun_special",
+      "source": "OutRun Mode SPECIAL TOURS",
+      "line_index": 1,
+      "korean": "아웃런",
+      "cell": [
+        1030,
+        1790,
+        1405,
+        2048
+      ],
+      "original_bbox": [
+        1054,
+        1849,
+        1263,
+        1895
+      ],
+      "localized_bbox": [
+        1103,
+        1851,
+        1214,
+        1893
+      ],
+      "source_width": 209,
+      "source_height": 46,
+      "localized_width": 111,
+      "localized_height": 42,
+      "delta_left": 49,
+      "delta_right": 49,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 40,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "outrun_special",
+      "source": "OutRun Mode SPECIAL TOURS",
+      "line_index": 2,
+      "korean": "모드",
+      "cell": [
+        1030,
+        1790,
+        1405,
+        2048
+      ],
+      "original_bbox": [
+        1054,
+        1895,
+        1185,
+        1936
+      ],
+      "localized_bbox": [
+        1081,
+        1899,
+        1157,
+        1932
+      ],
+      "source_width": 131,
+      "source_height": 41,
+      "localized_width": 76,
+      "localized_height": 33,
+      "delta_left": 27,
+      "delta_right": 28,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 40,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    },
+    {
+      "target": "outrun_special",
+      "source": "OutRun Mode SPECIAL TOURS",
+      "line_index": 3,
+      "korean": "스페셜 투어",
+      "cell": [
+        1030,
+        1790,
+        1405,
+        2048
+      ],
+      "original_bbox": [
+        1054,
+        1936,
+        1333,
+        1983
+      ],
+      "localized_bbox": [
+        1094,
+        1938,
+        1293,
+        1981
+      ],
+      "source_width": 279,
+      "source_height": 47,
+      "localized_width": 199,
+      "localized_height": 43,
+      "delta_left": 40,
+      "delta_right": 40,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "style_kind": "orange",
+      "font_size": 41,
+      "stroke_width": 2,
+      "shadow": 1,
+      "fill": [
+        255,
+        150,
+        0,
+        255
+      ],
+      "outline": [
+        19,
+        28,
+        38,
+        255
+      ],
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+    }
+  ],
+  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_PRODUCTION28_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
