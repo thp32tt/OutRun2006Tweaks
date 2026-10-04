@@ -107,4 +107,4 @@ res={
 }
 (out/"C120_1A43E9D9_MACHINE_QA.json").write_text(json.dumps(res,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print("C120_1A43E9D9",res["machine_status"],rep["candidate_sha256"],flush=True)
-if not ok: raise SystemExit(2)
+print(json.dumps(res,ensure_ascii=False),flush=True)\nif not ok: raise SystemExit(2)
