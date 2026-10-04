@@ -1,0 +1,53 @@
+{
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+  "source_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+  "source_structure": [
+    2048,
+    2048,
+    "00000000",
+    32
+  ],
+  "historical_original_sha256": "3bfea3882b73ec133cd8badca8f9be67c130d4f4b277c52bbc6d2b1c4014efa5",
+  "historical_candidate_sha256": "4c4fca0a6612b4ad77c204fbc87139ea0cbf4d147e3def0e86c1ff318d276c47",
+  "components": [
+    {
+      "id": 1,
+      "bbox": [
+        1092,
+        0,
+        1668,
+        356
+      ]
+    },
+    {
+      "id": 2,
+      "bbox": [
+        0,
+        1504,
+        456,
+        1932
+      ]
+    },
+    {
+      "id": 3,
+      "bbox": [
+        276,
+        1504,
+        1468,
+        2048
+      ]
+    },
+    {
+      "id": 4,
+      "bbox": [
+        1012,
+        1280,
+        2004,
+        1716
+      ]
+    }
+  ],
+  "candidate_written": false,
+  "status": "DIAGNOSTIC_READY_FOR_SAME_INVOCATION_RENDER"
+}
