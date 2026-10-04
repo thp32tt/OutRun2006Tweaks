@@ -135,11 +135,11 @@
 {"id":134,"source_hash":"3b71ec53d8bdf8d9","korean":"클라우디 하이랜드","status":"reviewed"}
 {"id":135,"source_hash":"53c0787c03a1596f","korean":"캐슬 월","status":"reviewed"}
 {"id":136,"source_hash":"2dded7b50bab0b8e","korean":"고스트 포레스트","status":"reviewed"}
-{"id":137,"source_hash":"55b84b3820b7b920","korean":"침엽수림","status":"reviewed"}
-{"id":138,"source_hash":"11b5f092f04b97ef","korean":"사막","status":"reviewed"}
+{"id":137,"source_hash":"55b84b3820b7b920","korean":"코니퍼러스 포레스트","status":"reviewed"}
+{"id":138,"source_hash":"11b5f092f04b97ef","korean":"데저트","status":"reviewed"}
 {"id":139,"source_hash":"9180063b4425337e","korean":"튤립 가든","status":"reviewed"}
 {"id":140,"source_hash":"e23d8affe7aa3a59","korean":"메트로폴리스","status":"reviewed"}
-{"id":141,"source_hash":"4f7eaace3f4dd66a","korean":"고대 유적","status":"reviewed"}
+{"id":141,"source_hash":"4f7eaace3f4dd66a","korean":"에인션트 루인스","status":"reviewed"}
 {"id":142,"source_hash":"c526b581d8e4d0c2","korean":"케이프 웨이","status":"reviewed"}
 {"id":143,"source_hash":"95b2f91cc852c7fe","korean":"임페리얼 애비뉴","status":"reviewed"}
 {"id":144,"source_hash":"c5cd3e625ea911f4","korean":"비치","status":"reviewed"}
@@ -165,11 +165,11 @@
 {"id":164,"source_hash":"0156760ec3d7a547","korean":"클라우디 하이랜드 (역방향)","status":"reviewed"}
 {"id":165,"source_hash":"7259ca5f04865bf7","korean":"캐슬 월 (역방향)","status":"reviewed"}
 {"id":166,"source_hash":"f03838be3bf8a591","korean":"고스트 포레스트 (역방향)","status":"reviewed"}
-{"id":167,"source_hash":"57a457e2ee44e97c","korean":"침엽수림 (역방향)","status":"reviewed"}
-{"id":168,"source_hash":"7457c02c709cb114","korean":"사막 (역방향)","status":"reviewed"}
+{"id":167,"source_hash":"57a457e2ee44e97c","korean":"코니퍼러스 포레스트 (역방향)","status":"reviewed"}
+{"id":168,"source_hash":"7457c02c709cb114","korean":"데저트 (역방향)","status":"reviewed"}
 {"id":169,"source_hash":"f6d892d7a6ca6742","korean":"튤립 가든 (역방향)","status":"reviewed"}
 {"id":170,"source_hash":"75ff01c8f88a3d1f","korean":"메트로폴리스 (역방향)","status":"reviewed"}
-{"id":171,"source_hash":"3e1959ddde699cfc","korean":"고대 유적 (역방향)","status":"reviewed"}
+{"id":171,"source_hash":"3e1959ddde699cfc","korean":"에인션트 루인스 (역방향)","status":"reviewed"}
 {"id":172,"source_hash":"cff9516d877c4e24","korean":"케이프 웨이 (역방향)","status":"reviewed"}
 {"id":173,"source_hash":"3c6350958de6bd36","korean":"임페리얼 애비뉴 (역방향)","status":"reviewed"}
 {"id":174,"source_hash":"de5a9e9cc0aeced5","korean":"비치 (역방향)","status":"reviewed"}
@@ -321,11 +321,11 @@
 {"id":320,"source_hash":"3b71ec53d8bdf8d9","korean":"클라우디 하이랜드","status":"reviewed","notes":"propagated from identical source string"}
 {"id":321,"source_hash":"53c0787c03a1596f","korean":"캐슬 월","status":"reviewed","notes":"propagated from identical source string"}
 {"id":322,"source_hash":"2dded7b50bab0b8e","korean":"고스트 포레스트","status":"reviewed","notes":"propagated from identical source string"}
-{"id":323,"source_hash":"55b84b3820b7b920","korean":"침엽수림","status":"reviewed","notes":"propagated from identical source string"}
-{"id":324,"source_hash":"11b5f092f04b97ef","korean":"사막","status":"reviewed","notes":"propagated from identical source string"}
+{"id":323,"source_hash":"55b84b3820b7b920","korean":"코니퍼러스 포레스트","status":"reviewed","notes":"propagated from identical source string"}
+{"id":324,"source_hash":"11b5f092f04b97ef","korean":"데저트","status":"reviewed","notes":"propagated from identical source string"}
 {"id":325,"source_hash":"9180063b4425337e","korean":"튤립 가든","status":"reviewed","notes":"propagated from identical source string"}
 {"id":326,"source_hash":"e23d8affe7aa3a59","korean":"메트로폴리스","status":"reviewed","notes":"propagated from identical source string"}
-{"id":327,"source_hash":"4f7eaace3f4dd66a","korean":"고대 유적","status":"reviewed","notes":"propagated from identical source string"}
+{"id":327,"source_hash":"4f7eaace3f4dd66a","korean":"에인션트 루인스","status":"reviewed","notes":"propagated from identical source string"}
 {"id":328,"source_hash":"c526b581d8e4d0c2","korean":"케이프 웨이","status":"reviewed","notes":"propagated from identical source string"}
 {"id":329,"source_hash":"95b2f91cc852c7fe","korean":"임페리얼 애비뉴","status":"reviewed","notes":"propagated from identical source string"}
 {"id":330,"source_hash":"c5cd3e625ea911f4","korean":"비치","status":"reviewed","notes":"propagated from identical source string"}
@@ -351,11 +351,11 @@
 {"id":350,"source_hash":"0156760ec3d7a547","korean":"클라우디 하이랜드 (역방향)","status":"reviewed"}
 {"id":351,"source_hash":"7259ca5f04865bf7","korean":"캐슬 월 (역방향)","status":"reviewed"}
 {"id":352,"source_hash":"f03838be3bf8a591","korean":"고스트 포레스트 (역방향)","status":"reviewed"}
-{"id":353,"source_hash":"57a457e2ee44e97c","korean":"침엽수림 (역방향)","status":"reviewed"}
-{"id":354,"source_hash":"7457c02c709cb114","korean":"사막 (역방향)","status":"reviewed"}
+{"id":353,"source_hash":"57a457e2ee44e97c","korean":"코니퍼러스 포레스트 (역방향)","status":"reviewed"}
+{"id":354,"source_hash":"7457c02c709cb114","korean":"데저트 (역방향)","status":"reviewed"}
 {"id":355,"source_hash":"f6d892d7a6ca6742","korean":"튤립 가든 (역방향)","status":"reviewed"}
 {"id":356,"source_hash":"75ff01c8f88a3d1f","korean":"메트로폴리스 (역방향)","status":"reviewed"}
-{"id":357,"source_hash":"3e1959ddde699cfc","korean":"고대 유적 (역방향)","status":"reviewed"}
+{"id":357,"source_hash":"3e1959ddde699cfc","korean":"에인션트 루인스 (역방향)","status":"reviewed"}
 {"id":358,"source_hash":"cff9516d877c4e24","korean":"케이프 웨이 (역방향)","status":"reviewed"}
 {"id":359,"source_hash":"3c6350958de6bd36","korean":"임페리얼 애비뉴 (역방향)","status":"reviewed"}
 {"id":360,"source_hash":"de5a9e9cc0aeced5","korean":"비치 (역방향)","status":"reviewed"}

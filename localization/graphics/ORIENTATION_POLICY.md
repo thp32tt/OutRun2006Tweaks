@@ -31,6 +31,8 @@ The following embedded text is preserved exactly as original artwork and is excl
 
 When a selector tile contains a vehicle picture plus vehicle/model name, preserve the original picture **and** original vehicle/model-name artwork, including its raw DDS orientation.
 
+Stage-name spelling and song-title handling are additionally governed by `TRANSLATION_NAMING_POLICY.md`. Stage names use phonetic Hangul transliteration only. Song titles/music credits stay as original English pixels and must be included in protected masks.
+
 ## Orientation rule
 
 For every localizable text/image segment:
@@ -146,7 +148,7 @@ Effective 2026-09-26 22:46 KST:
 Effective 2026-09-28:
 
 - The allowed overflow is **0 pixels**. If any Korean glyph/text pixel extends even **1 pixel** outside the original source text region or sprite cell, classify the asset as **REWORK_REQUIRED**.
-- A candidate bbox must be a subset of the original source bbox/cell on all four sides. Width/height growth is allowed only when the result still remains fully contained in the original source region.
+- A candidate bbox must be a subset of the exact original source glyph/effect bbox on all four sides. In addition, localized bbox width and height must each be less than or equal to the exact source text bbox width and height. **Any 1-pixel growth in width or height is FAIL**, even if a surrounding plate/cell has unused room.
 - `changed_pixels_outside_source_region` must be `0` and `introduced_alpha_outside_source_region` must be `0`.
 - A zero-margin edge touch is not an automatic failure, but must be recorded as a high-risk condition and checked at high zoom and in game. Any clipping or escape fails the gate.
 - For DXT5/BC3 assets, 4x4 block confinement alone is not sufficient for final approval when exact decoded-pixel evidence is unavailable. Keep such evidence on hold/recheck; never infer PASS from compression-block containment alone.
@@ -191,6 +193,8 @@ Do not place Korean lettering until the clean plate has:
 ### 4. Fit and font gate before pixels are committed
 - Verify that the selected font contains every required Hangul/symbol glyph; tofu/fallback mixing is FAIL.
 - Measure source typography height, scale, alignment and effects first.
+- Measure multi-line source styling per line. Equal source-line styles require equal Korean-line font/weight/fill/outline/shadow/slant/scale; intentional source-line differences must be mapped to the corresponding Korean lines.
+- Treat the exact source glyph/effect bbox as the maximum render dimensions, not the plate or sprite-cell bounds.
 - Measure the Korean glyph/effect footprint before final rendering.
 - If it does not fit, try source-faithful spacing/line break, then smaller source-faithful size, then an approved shorter translation.
 - Do not distort glyphs or add generic outline/shadow/glow merely to make text readable.

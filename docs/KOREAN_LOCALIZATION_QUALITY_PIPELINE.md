@@ -30,6 +30,12 @@ The clean plate must pass visual/static checks before lettering:
 ### Korean lettering
 Measure source typography and target Korean glyphs before final rendering. Verify font coverage. Reproduce only effects that exist in the source. Fit without crossing the original permitted region.
 
+Apply `localization/graphics/TRANSLATION_NAMING_POLICY.md` before rasterization: stage names use canonical phonetic transliteration, while song titles/music credits remain untouched original English artwork.
+
+The exact source glyph/effect bbox is a hard size ceiling. The localized bbox must be contained and must satisfy `localized_width <= source_width` and `localized_height <= source_height`; a 1-pixel growth in either dimension is FAIL even when the larger sprite cell or empty plate has room. For multi-line labels, compare both the complete text block and each reliably separable corresponding line.
+
+Measure source style per line: fill/gradient, weight, outline, shadow/glow, slant, baseline, alignment, line spacing and relative scale. If source lines share a style, Korean lines must share it too. If source lines intentionally differ, preserve those corresponding differences. Source-unjustified style differences between Korean lines are FAIL.
+
 If a source-faithful result cannot be produced safely, stop as `MANUAL_RECONSTRUCTION_REQUIRED` rather than generating a weak candidate.
 
 ## QA
@@ -46,7 +52,10 @@ Final QA includes:
 - no clipping or new overlap;
 - no source-text residue;
 - orientation correctness;
-- style fidelity;
+- style fidelity, including per-line multi-line consistency against the corresponding source lines;
+- exact source-size ceiling (`localized_width <= source_width` and `localized_height <= source_height`, with 1-pixel growth = FAIL);
+- canonical stage-name transliteration;
+- byte/pixel preservation of song titles and music credits;
 - DDS dimensions/format/mips preservation.
 
 Use `tools/localization/validate_clean_plate.py` where decoded RGBA source/candidate/masks are available.
