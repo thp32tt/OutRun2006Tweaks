@@ -1,0 +1,1322 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-1740-C92",
+  "base_head": "852b3e93f6598630da7bacaf9c8e015bd5a79ec9",
+  "asset": "FD90AA9",
+  "scope": "independent C final static QA of A_RECOVERY07 direct return; completed C90/C91 assets not repeated",
+  "producer_report": "localization/graphics/role_A/20261004-A-RECOVERY07/A_RECOVERY07_FD90AA9_REPORT.json",
+  "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+  "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+  "candidate_sha256": "58a8bd06a38375694da7d3109fc2615ccd6d45092828f7eb5b7a9317afc13010",
+  "candidate_changed_by_C": false,
+  "structure": {
+    "width": 4096,
+    "height": 4096,
+    "pitch": 16384,
+    "depth": 1,
+    "mips": 1,
+    "pf_flags": 65,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "bytes": 67108992,
+    "header_128_exact_to_source": true,
+    "raw_orientation": "mirror_y"
+  },
+  "clean_plate_gate": {
+    "changed_pixels": 1524425,
+    "changed_bbox": [
+      0,
+      374,
+      4034,
+      2573
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "source_text_protected_overlap_pixels": 0,
+    "status": "PASS"
+  },
+  "final_candidate_gate": {
+    "changed_pixels": 2164486,
+    "changed_bbox": [
+      0,
+      374,
+      4034,
+      2573
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "allowed_protected_overlap_pixels": 0,
+    "status": "PASS"
+  },
+  "bbox_gate": {
+    "elements": 29,
+    "pass": 29,
+    "fail": 0,
+    "edge_touch_keys": [
+      "experts_long",
+      "for_experts",
+      "normal_difficult",
+      "versus_mode"
+    ],
+    "rows": [
+      {
+        "key": "outsp_course",
+        "source": "OutRun2SP Course",
+        "korean": "아웃런2 SP 코스",
+        "original_bbox": [
+          1126,
+          374,
+          1678,
+          449
+        ],
+        "localized_bbox": [
+          1194,
+          376,
+          1622,
+          443
+        ],
+        "derived_final_vs_clean_bbox": [
+          1194,
+          376,
+          1622,
+          443
+        ],
+        "delta_left": 68,
+        "delta_right": 56,
+        "delta_top": 2,
+        "delta_bottom": 6,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          1126,
+          3647,
+          1678,
+          3722
+        ],
+        "raw_localized_bbox": [
+          1194,
+          3653,
+          1622,
+          3720
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "out2_course",
+        "source": "OutRun2 Course",
+        "korean": "아웃런2 코스",
+        "original_bbox": [
+          1776,
+          374,
+          2232,
+          449
+        ],
+        "localized_bbox": [
+          1828,
+          376,
+          2178,
+          446
+        ],
+        "derived_final_vs_clean_bbox": [
+          1828,
+          376,
+          2178,
+          446
+        ],
+        "delta_left": 52,
+        "delta_right": 54,
+        "delta_top": 2,
+        "delta_bottom": 3,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          1776,
+          3647,
+          2232,
+          3722
+        ],
+        "raw_localized_bbox": [
+          1828,
+          3650,
+          2178,
+          3720
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "more_engine",
+        "source": "More Engine sound",
+        "korean": "엔진음 크게",
+        "original_bbox": [
+          2772,
+          376,
+          3187,
+          448
+        ],
+        "localized_bbox": [
+          2811,
+          378,
+          3141,
+          441
+        ],
+        "derived_final_vs_clean_bbox": [
+          2811,
+          378,
+          3141,
+          441
+        ],
+        "delta_left": 39,
+        "delta_right": 46,
+        "delta_top": 2,
+        "delta_bottom": 7,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          2772,
+          3648,
+          3187,
+          3720
+        ],
+        "raw_localized_bbox": [
+          2811,
+          3655,
+          3141,
+          3718
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "you",
+        "source": "You",
+        "korean": "나",
+        "original_bbox": [
+          3169,
+          376,
+          3334,
+          445
+        ],
+        "localized_bbox": [
+          3237,
+          378,
+          3294,
+          438
+        ],
+        "derived_final_vs_clean_bbox": [
+          3237,
+          378,
+          3294,
+          438
+        ],
+        "delta_left": 68,
+        "delta_right": 40,
+        "delta_top": 2,
+        "delta_bottom": 7,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          3169,
+          3651,
+          3334,
+          3720
+        ],
+        "raw_localized_bbox": [
+          3237,
+          3658,
+          3294,
+          3718
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "gas_pedal",
+        "source": "Gas Pedal :",
+        "korean": "가속 페달:",
+        "original_bbox": [
+          3490,
+          391,
+          3748,
+          440
+        ],
+        "localized_bbox": [
+          3530,
+          393,
+          3708,
+          438
+        ],
+        "derived_final_vs_clean_bbox": [
+          3530,
+          393,
+          3708,
+          438
+        ],
+        "delta_left": 40,
+        "delta_right": 40,
+        "delta_top": 2,
+        "delta_bottom": 2,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          3490,
+          3656,
+          3748,
+          3705
+        ],
+        "raw_localized_bbox": [
+          3530,
+          3658,
+          3708,
+          3703
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "run15",
+        "source": "You will run 15 courses continuously.",
+        "korean": "15코스를 연속으로 달립니다.",
+        "original_bbox": [
+          0,
+          517,
+          934,
+          620
+        ],
+        "localized_bbox": [
+          62,
+          533,
+          864,
+          604
+        ],
+        "derived_final_vs_clean_bbox": [
+          62,
+          533,
+          864,
+          604
+        ],
+        "delta_left": 62,
+        "delta_right": 70,
+        "delta_top": 16,
+        "delta_bottom": 16,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          0,
+          3476,
+          934,
+          3579
+        ],
+        "raw_localized_bbox": [
+          62,
+          3492,
+          864,
+          3563
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "PRIOR_C85_PASS_PRESERVED"
+      },
+      {
+        "key": "maximum_speed",
+        "source": "Maximum Speed",
+        "korean": "최고 속도",
+        "original_bbox": [
+          922,
+          499,
+          1408,
+          620
+        ],
+        "localized_bbox": [
+          995,
+          518,
+          1327,
+          600
+        ],
+        "derived_final_vs_clean_bbox": [
+          995,
+          518,
+          1327,
+          600
+        ],
+        "delta_left": 73,
+        "delta_right": 81,
+        "delta_top": 19,
+        "delta_bottom": 20,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          922,
+          3476,
+          1408,
+          3597
+        ],
+        "raw_localized_bbox": [
+          995,
+          3496,
+          1327,
+          3578
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "PRIOR_C85_PASS_PRESERVED"
+      },
+      {
+        "key": "enter_selection",
+        "source": "Enter Selection",
+        "korean": "선택 확정",
+        "original_bbox": [
+          3456,
+          517,
+          3893,
+          627
+        ],
+        "localized_bbox": [
+          3550,
+          532,
+          3828,
+          611
+        ],
+        "derived_final_vs_clean_bbox": [
+          3550,
+          532,
+          3828,
+          611
+        ],
+        "delta_left": 94,
+        "delta_right": 65,
+        "delta_top": 15,
+        "delta_bottom": 16,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          3456,
+          3469,
+          3893,
+          3579
+        ],
+        "raw_localized_bbox": [
+          3550,
+          3485,
+          3828,
+          3564
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "PRIOR_C85_PASS_PRESERVED"
+      },
+      {
+        "key": "same_conditions",
+        "source": "Do you want to set up under the same conditions as your former race?",
+        "korean": "이전 레이스와 같은 조건으로 설정하시겠습니까?",
+        "original_bbox": [
+          14,
+          614,
+          1894,
+          730
+        ],
+        "localized_bbox": [
+          193,
+          631,
+          1691,
+          712
+        ],
+        "derived_final_vs_clean_bbox": [
+          193,
+          631,
+          1691,
+          712
+        ],
+        "delta_left": 179,
+        "delta_right": 203,
+        "delta_top": 17,
+        "delta_bottom": 18,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          14,
+          3366,
+          1894,
+          3482
+        ],
+        "raw_localized_bbox": [
+          193,
+          3384,
+          1691,
+          3465
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "PRIOR_C85_PASS_PRESERVED"
+      },
+      {
+        "key": "transmission2",
+        "source": "Transmission",
+        "korean": "변속기",
+        "original_bbox": [
+          1221,
+          722,
+          1805,
+          843
+        ],
+        "localized_bbox": [
+          1385,
+          748,
+          1789,
+          841
+        ],
+        "derived_final_vs_clean_bbox": [
+          1385,
+          748,
+          1789,
+          841
+        ],
+        "delta_left": 164,
+        "delta_right": 16,
+        "delta_top": 26,
+        "delta_bottom": 2,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          1221,
+          3253,
+          1805,
+          3374
+        ],
+        "raw_localized_bbox": [
+          1385,
+          3255,
+          1789,
+          3348
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "experts_long",
+        "source": "For Experts & Long distance to the goal",
+        "korean": "상급자용 · 골까지 장거리",
+        "original_bbox": [
+          1907,
+          602,
+          3406,
+          781
+        ],
+        "localized_bbox": [
+          2330,
+          624,
+          2787,
+          781
+        ],
+        "derived_final_vs_clean_bbox": [
+          1907,
+          624,
+          3314,
+          781
+        ],
+        "delta_left": 423,
+        "delta_right": 619,
+        "delta_top": 22,
+        "delta_bottom": 0,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          1907,
+          3315,
+          3406,
+          3494
+        ],
+        "raw_localized_bbox": [
+          2330,
+          3315,
+          2787,
+          3472
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "PRIOR_C85_PASS_PRESERVED"
+      },
+      {
+        "key": "view_choices",
+        "source": "View Choices",
+        "korean": "선택 보기",
+        "original_bbox": [
+          3525,
+          614,
+          3882,
+          730
+        ],
+        "localized_bbox": [
+          3563,
+          632,
+          3855,
+          712
+        ],
+        "derived_final_vs_clean_bbox": [
+          3563,
+          632,
+          3855,
+          712
+        ],
+        "delta_left": 38,
+        "delta_right": 27,
+        "delta_top": 18,
+        "delta_bottom": 18,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          3525,
+          3366,
+          3882,
+          3482
+        ],
+        "raw_localized_bbox": [
+          3563,
+          3384,
+          3855,
+          3464
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "PRIOR_C85_PASS_PRESERVED"
+      },
+      {
+        "key": "for_experts",
+        "source": "For Experts",
+        "korean": "상급자용",
+        "original_bbox": [
+          1766,
+          704,
+          2304,
+          896
+        ],
+        "localized_bbox": [
+          1819,
+          704,
+          2304,
+          854
+        ],
+        "derived_final_vs_clean_bbox": [
+          1776,
+          704,
+          2304,
+          896
+        ],
+        "delta_left": 53,
+        "delta_right": 0,
+        "delta_top": 0,
+        "delta_bottom": 42,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          1766,
+          3200,
+          2304,
+          3392
+        ],
+        "raw_localized_bbox": [
+          1819,
+          3242,
+          2304,
+          3392
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "PRIOR_C85_PASS_PRESERVED"
+      },
+      {
+        "key": "normal_difficult",
+        "source": "Normal difficult",
+        "korean": "보통 난이도",
+        "original_bbox": [
+          2547,
+          704,
+          3354,
+          896
+        ],
+        "localized_bbox": [
+          2787,
+          704,
+          3314,
+          871
+        ],
+        "derived_final_vs_clean_bbox": [
+          2613,
+          704,
+          3314,
+          871
+        ],
+        "delta_left": 240,
+        "delta_right": 40,
+        "delta_top": 0,
+        "delta_bottom": 25,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          2547,
+          3200,
+          3354,
+          3392
+        ],
+        "raw_localized_bbox": [
+          2787,
+          3225,
+          3314,
+          3392
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "PRIOR_C85_PASS_PRESERVED"
+      },
+      {
+        "key": "select_game_mode",
+        "source": "Select Game Mode",
+        "korean": "게임 모드 선택",
+        "original_bbox": [
+          166,
+          819,
+          1166,
+          973
+        ],
+        "localized_bbox": [
+          347,
+          846,
+          1037,
+          971
+        ],
+        "derived_final_vs_clean_bbox": [
+          347,
+          846,
+          1037,
+          971
+        ],
+        "delta_left": 181,
+        "delta_right": 129,
+        "delta_top": 27,
+        "delta_bottom": 2,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          166,
+          3123,
+          1166,
+          3277
+        ],
+        "raw_localized_bbox": [
+          347,
+          3125,
+          1037,
+          3250
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "select_car",
+        "source": "Select your car",
+        "korean": "차량 선택",
+        "original_bbox": [
+          243,
+          947,
+          1156,
+          1111
+        ],
+        "localized_bbox": [
+          487,
+          981,
+          954,
+          1092
+        ],
+        "derived_final_vs_clean_bbox": [
+          402,
+          947,
+          1037,
+          1111
+        ],
+        "delta_left": 244,
+        "delta_right": 202,
+        "delta_top": 34,
+        "delta_bottom": 19,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          243,
+          2985,
+          1156,
+          3149
+        ],
+        "raw_localized_bbox": [
+          487,
+          3004,
+          954,
+          3115
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "select_course",
+        "source": "Select Course",
+        "korean": "코스 선택",
+        "original_bbox": [
+          302,
+          1062,
+          1085,
+          1213
+        ],
+        "localized_bbox": [
+          386,
+          1097,
+          893,
+          1211
+        ],
+        "derived_final_vs_clean_bbox": [
+          386,
+          1062,
+          1085,
+          1213
+        ],
+        "delta_left": 84,
+        "delta_right": 192,
+        "delta_top": 35,
+        "delta_bottom": 2,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          302,
+          2883,
+          1085,
+          3034
+        ],
+        "raw_localized_bbox": [
+          386,
+          2885,
+          893,
+          2999
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "select_music",
+        "source": "Select your music",
+        "korean": "음악 선택",
+        "original_bbox": [
+          1549,
+          819,
+          2571,
+          990
+        ],
+        "localized_bbox": [
+          1892,
+          857,
+          2358,
+          970
+        ],
+        "derived_final_vs_clean_bbox": [
+          1619,
+          819,
+          2430,
+          990
+        ],
+        "delta_left": 343,
+        "delta_right": 213,
+        "delta_top": 38,
+        "delta_bottom": 20,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          1549,
+          3106,
+          2571,
+          3277
+        ],
+        "raw_localized_bbox": [
+          1892,
+          3126,
+          2358,
+          3239
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "select_transmission",
+        "source": "Select Transmission",
+        "korean": "변속 방식 선택",
+        "original_bbox": [
+          1563,
+          947,
+          2589,
+          1092
+        ],
+        "localized_bbox": [
+          1737,
+          975,
+          2436,
+          1090
+        ],
+        "derived_final_vs_clean_bbox": [
+          1737,
+          947,
+          2436,
+          1090
+        ],
+        "delta_left": 174,
+        "delta_right": 153,
+        "delta_top": 28,
+        "delta_bottom": 2,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          1563,
+          3004,
+          2589,
+          3149
+        ],
+        "raw_localized_bbox": [
+          1737,
+          3006,
+          2436,
+          3121
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "shortcut_features",
+        "source": "Shortcut Features",
+        "korean": "바로가기 기능",
+        "original_bbox": [
+          1587,
+          1062,
+          2611,
+          1213
+        ],
+        "localized_bbox": [
+          1770,
+          1097,
+          2400,
+          1211
+        ],
+        "derived_final_vs_clean_bbox": [
+          1587,
+          1062,
+          2436,
+          1213
+        ],
+        "delta_left": 183,
+        "delta_right": 211,
+        "delta_top": 35,
+        "delta_bottom": 2,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          1587,
+          2883,
+          2611,
+          3034
+        ],
+        "raw_localized_bbox": [
+          1770,
+          2885,
+          2400,
+          2999
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "selected_sp",
+        "source": "Outrun2: SP Course has been selected.",
+        "korean": "아웃런2 SP 코스가 선택되었습니다.",
+        "original_bbox": [
+          63,
+          1183,
+          2227,
+          1348
+        ],
+        "localized_bbox": [
+          971,
+          1199,
+          1662,
+          1319
+        ],
+        "derived_final_vs_clean_bbox": [
+          247,
+          1183,
+          2194,
+          1348
+        ],
+        "delta_left": 908,
+        "delta_right": 565,
+        "delta_top": 16,
+        "delta_bottom": 29,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          63,
+          2748,
+          2227,
+          2913
+        ],
+        "raw_localized_bbox": [
+          971,
+          2777,
+          1662,
+          2897
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "selected_out2",
+        "source": "Outrun2 Course has been selected.",
+        "korean": "아웃런2 코스가 선택되었습니다.",
+        "original_bbox": [
+          90,
+          1306,
+          2125,
+          1484
+        ],
+        "localized_bbox": [
+          222,
+          1336,
+          2016,
+          1477
+        ],
+        "derived_final_vs_clean_bbox": [
+          222,
+          1306,
+          2016,
+          1477
+        ],
+        "delta_left": 132,
+        "delta_right": 109,
+        "delta_top": 30,
+        "delta_bottom": 7,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          90,
+          2612,
+          2125,
+          2790
+        ],
+        "raw_localized_bbox": [
+          222,
+          2619,
+          2016,
+          2760
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "PRIOR_C85_PASS_PRESERVED"
+      },
+      {
+        "key": "select_car_setting",
+        "source": "Select car setting",
+        "korean": "차량 설정 선택",
+        "original_bbox": [
+          2419,
+          1183,
+          3394,
+          1367
+        ],
+        "localized_bbox": [
+          2770,
+          1194,
+          3343,
+          1356
+        ],
+        "derived_final_vs_clean_bbox": [
+          2419,
+          1194,
+          3343,
+          1367
+        ],
+        "delta_left": 351,
+        "delta_right": 51,
+        "delta_top": 11,
+        "delta_bottom": 11,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          2419,
+          2729,
+          3394,
+          2913
+        ],
+        "raw_localized_bbox": [
+          2770,
+          2740,
+          3343,
+          2902
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "versus_mode",
+        "source": "Versus Mode.",
+        "korean": "대전 모드",
+        "original_bbox": [
+          2226,
+          1306,
+          2995,
+          1486
+        ],
+        "localized_bbox": [
+          2311,
+          1306,
+          2767,
+          1475
+        ],
+        "derived_final_vs_clean_bbox": [
+          2311,
+          1306,
+          2995,
+          1475
+        ],
+        "delta_left": 85,
+        "delta_right": 228,
+        "delta_top": 0,
+        "delta_bottom": 11,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          2226,
+          2610,
+          2995,
+          2790
+        ],
+        "raw_localized_bbox": [
+          2311,
+          2621,
+          2767,
+          2790
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "PRIOR_C85_PASS_PRESERVED"
+      },
+      {
+        "key": "gear_change",
+        "source": "Gear change",
+        "korean": "기어 변속",
+        "original_bbox": [
+          3587,
+          1304,
+          4034,
+          1501
+        ],
+        "localized_bbox": [
+          3648,
+          1330,
+          4022,
+          1499
+        ],
+        "derived_final_vs_clean_bbox": [
+          3587,
+          1330,
+          4022,
+          1501
+        ],
+        "delta_left": 61,
+        "delta_right": 12,
+        "delta_top": 26,
+        "delta_bottom": 2,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          3587,
+          2595,
+          4034,
+          2792
+        ],
+        "raw_localized_bbox": [
+          3648,
+          2597,
+          4022,
+          2766
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "player_battle_desc",
+        "source": "A course designed for player battle.",
+        "korean": "플레이어 대전을 위해 / 설계된 코스입니다.",
+        "original_bbox": [
+          3093,
+          1446,
+          3994,
+          1668
+        ],
+        "localized_bbox": [
+          3095,
+          1454,
+          3633,
+          1632
+        ],
+        "derived_final_vs_clean_bbox": [
+          3093,
+          1446,
+          3994,
+          1668
+        ],
+        "delta_left": 2,
+        "delta_right": 361,
+        "delta_top": 8,
+        "delta_bottom": 36,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          3093,
+          2428,
+          3994,
+          2650
+        ],
+        "raw_localized_bbox": [
+          3095,
+          2464,
+          3633,
+          2642
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "new_course_desc",
+        "source": "A brand new course designed for OutRun2: SP.",
+        "korean": "아웃런2 SP용으로 새롭게 / 설계된 코스입니다.",
+        "original_bbox": [
+          3008,
+          1587,
+          3828,
+          1827
+        ],
+        "localized_bbox": [
+          3010,
+          1654,
+          3826,
+          1790
+        ],
+        "derived_final_vs_clean_bbox": [
+          3010,
+          1587,
+          3826,
+          1827
+        ],
+        "delta_left": 2,
+        "delta_right": 2,
+        "delta_top": 67,
+        "delta_bottom": 37,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          3008,
+          2269,
+          3828,
+          2509
+        ],
+        "raw_localized_bbox": [
+          3010,
+          2306,
+          3826,
+          2442
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "orig_course_desc",
+        "source": "The course from the original OutRun2.",
+        "korean": "오리지널 아웃런2의 / 코스입니다.",
+        "original_bbox": [
+          3008,
+          1754,
+          3662,
+          1995
+        ],
+        "localized_bbox": [
+          3010,
+          1822,
+          3660,
+          1975
+        ],
+        "derived_final_vs_clean_bbox": [
+          3010,
+          1754,
+          3662,
+          1975
+        ],
+        "delta_left": 2,
+        "delta_right": 2,
+        "delta_top": 68,
+        "delta_bottom": 20,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          3008,
+          2101,
+          3662,
+          2342
+        ],
+        "raw_localized_bbox": [
+          3010,
+          2121,
+          3660,
+          2274
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      },
+      {
+        "key": "random_music",
+        "source": "Music will be Randomly Selected.",
+        "korean": "음악이 무작위로 / 선택됩니다.",
+        "original_bbox": [
+          1741,
+          2360,
+          2720,
+          2573
+        ],
+        "localized_bbox": [
+          1957,
+          2362,
+          2530,
+          2544
+        ],
+        "derived_final_vs_clean_bbox": [
+          1957,
+          2362,
+          2530,
+          2544
+        ],
+        "delta_left": 216,
+        "delta_right": 190,
+        "delta_top": 2,
+        "delta_bottom": 29,
+        "containment": "PASS",
+        "raw_original_bbox": [
+          1741,
+          1523,
+          2720,
+          1736
+        ],
+        "raw_localized_bbox": [
+          1957,
+          1552,
+          2530,
+          1734
+        ],
+        "raw_containment": "PASS",
+        "rework_status": "A_RECOVERY07_REWORKED"
+      }
+    ],
+    "status": "PASS"
+  },
+  "prior_pass_gate": {
+    "expected": 10,
+    "preserved_metadata_count": 10,
+    "keys": [
+      "run15",
+      "maximum_speed",
+      "enter_selection",
+      "same_conditions",
+      "experts_long",
+      "view_choices",
+      "for_experts",
+      "normal_difficult",
+      "selected_out2",
+      "versus_mode"
+    ],
+    "status": "PASS"
+  },
+  "mask_consistency": {
+    "allowed_pixels_outside_union_of_29_original_bboxes": 0,
+    "status": "PASS"
+  },
+  "visual_evidence": {
+    "full_compare": "localization/graphics/role_C/20261004-1740-C92/C92_FD90AA9_FULL_COMPARE.jpg",
+    "row_contact": "localization/graphics/role_C/20261004-1740-C92/C92_FD90AA9_ROW_CONTACT.jpg",
+    "controller_visual_qa": "PENDING"
+  },
+  "runtime_validation": "UNTESTED",
+  "status": "C92_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_INGAME",
+  "vr_ffb_dx11_dxvk_changes": false
+}
