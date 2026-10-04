@@ -729,6 +729,19 @@ namespace OutRunVRStereo
         VRStereoR13HardeningHook VRStereoR13HardeningHook::instance;
     }
 
+    inline OutRunVR::RuntimeEligibility::InstallState
+    R13InstallStatus() noexcept
+    {
+        using State = OutRunVR::RuntimeEligibility::InstallState;
+        switch (R13InstallState.load(std::memory_order_acquire))
+        {
+        case R13InstallPending: return State::Pending;
+        case R13InstallReady: return State::Ready;
+        case R13InstallFailed: return State::Failed;
+        default: return State::Failed;
+        }
+    }
+
     PoseInjectionSnapshot CurrentPoseInjectionSnapshot() noexcept
     {
         // Sample all mutable D3D9 pass signals exactly once. The legacy invariant is
