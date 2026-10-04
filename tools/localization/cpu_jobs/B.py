@@ -208,6 +208,14 @@ for spec in TARGETS:
         dist=np.max(np.abs(arr.astype(np.int16)-bg.astype(np.int16)),axis=2)
         effect=dil & (dist>8) & (arr[:,:,3]>0)
         effect |= abs_core
+        if spec["kind"]=="orange":
+            # The source family has a dark/navy drop shadow that can extend several
+            # pixels below the orange core.  Include only dark pixels near the core so
+            # the shadow is removed without consuming the light-blue plate.
+            wide=np.asarray(Image.fromarray((abs_core*255).astype(np.uint8),"L").filter(ImageFilter.MaxFilter(21)))>0
+            wide &= cellmask
+            lum_all=.2126*arr[:,:,0]+.7152*arr[:,:,1]+.0722*arr[:,:,2]
+            effect |= wide & (lum_all<115) & (arr[:,:,3]>0)
         ey,ex=np.nonzero(effect)
         if not len(ex):raise RuntimeError(("empty_effect",spec["key"],li))
         eb=[int(ex.min()),int(ey.min()),int(ex.max())+1,int(ey.max())+1]
@@ -230,6 +238,17 @@ for spec in TARGETS:
             "korean":ko,"cell":spec["cell"],"source_bbox":eb,"fill":fill,
             "outline":outline,"slant":spec["slant"],"kind":spec["kind"],"background":tuple(int(v) for v in bg)
         })
+
+# All orange selector labels in this atlas use the same source family. Enforce a shared
+# measured Korean palette so a contaminated line sample cannot invent a different style.
+orange=[ld for ld in line_defs if ld["kind"]=="orange"]
+reliable=[ld for ld in orange if (.2126*ld["outline"][0]+.7152*ld["outline"][1]+.0722*ld["outline"][2]) < 100]
+if not reliable: raise RuntimeError("no reliable orange source outline sample")
+shared_fill=tuple(int(v) for v in np.median(np.array([ld["fill"] for ld in reliable]),axis=0))
+shared_outline=tuple(int(v) for v in np.median(np.array([ld["outline"] for ld in reliable]),axis=0))
+for ld in orange:
+    ld["fill"]=shared_fill
+    ld["outline"]=shared_outline
 
 # Clean-plate reconstruction, line by line, only on actual source glyph/effect pixels.
 for ld in line_defs:
@@ -262,7 +281,7 @@ for ld in line_defs:
         "containment":"PASS","size_ceiling":"PASS","style_kind":ld["kind"],
         "font_size":fs,"stroke_width":sw,"shadow":shadow,
         "fill":list(ld["fill"]),"outline":list(ld["outline"]),
-        "multi_line_style_consistency":"PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+        "multi_line_style_consistency":"PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     })
 
 target_mask=np.zeros((2048,2048),bool)
