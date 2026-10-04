@@ -7,10 +7,10 @@ from PIL import Image, ImageDraw, ImageFont
 if os.environ.get("OUTRUN_CPU_WORKER") != "github-actions" or os.environ.get("OUTRUN_CPU_ROLE") != "C":
     raise SystemExit("Run only in GitHub-hosted localization CPU worker as role C.")
 
-repo=Path.cwd(); run="20261004-1828-C94"; outdir=repo/"localization/graphics/role_C"/run; outdir.mkdir(parents=True,exist_ok=True)
+repo=Path.cwd(); run="20261004-1833-C95"; outdir=repo/"localization/graphics/role_C"/run; outdir.mkdir(parents=True,exist_ok=True)
 report_path=repo/"localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_B1696633_REPORT.json"
 b=json.loads(report_path.read_text(encoding="utf-8"))
-expected="45bf5ee4f7b18bee4a926f6811c4234192fd540b59c22a52ae0f3bf6e10cbae9"
+expected="448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21"
 if b["candidate_sha256"]!=expected: raise RuntimeError(("B169 report advanced again",b["candidate_sha256"],expected))
 
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -49,7 +49,7 @@ def card(arr,label,maxw=900,maxh=900):
 
 source=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/B1696633_512x512.dds"
 if not source.exists():
-    source=Path("/tmp/C94_B1696633_SOURCE.dds"); urllib.request.urlretrieve(b["source_url"],source)
+    source=Path("/tmp/C95_B1696633_SOURCE.dds"); urllib.request.urlretrieve(b["source_url"],source)
 candidate=repo/b["candidate_path"]
 if sha(source)!=b["source_sha256"]: raise RuntimeError("source SHA mismatch")
 if sha(candidate)!=expected: raise RuntimeError(("candidate SHA mismatch",sha(candidate),expected))
@@ -85,7 +85,7 @@ x=0
 for q in top: sheet.paste(q,(x,0)); x+=q.width+gap
 y=max(x.height for x in top)+gap; x=0
 for q in bot: sheet.paste(q,(x,y)); x+=q.width+gap
-sheet.save(outdir/"C94_B1696633_FULL_COMPARE.jpg",quality=94)
+sheet.save(outdir/"C95_B1696633_FULL_COMPARE.jpg",quality=94)
 font=ImageFont.load_default(); strips=[]
 for rr in rows:
     ob=rr["original_bbox"]; cr=(max(0,ob[0]-10),max(0,ob[1]-10),min(smeta["width"],ob[2]+10),min(smeta["height"],ob[3]+10))
@@ -98,16 +98,16 @@ for rr in rows:
     strips.append(strip)
 contact=Image.new("RGB",(1572,202*len(strips)),"white"); y=0
 for q in strips: contact.paste(q,(0,y)); y+=202
-contact.save(outdir/"C94_B1696633_ROW_CONTACT.jpg",quality=95)
+contact.save(outdir/"C95_B1696633_ROW_CONTACT.jpg",quality=95)
 result={"schema_version":1,"role":"C","run":run,"base_head":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
-        "asset":"B1696633","scope":"revalidate latest B_RECOVERY07 candidate that advanced after C93 dispatch; FD90AA9 C93 result not repeated",
+        "asset":"B1696633","scope":"revalidate newest B_RECOVERY07 worker output that superseded C94; FD90AA9 C93 result and stale B C94 result not repeated",
         "producer_report":"localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_B1696633_REPORT.json",
         "source_sha256":sha(source),"candidate_sha256":sha(candidate),"candidate_changed_by_C":False,
         "structure":{**smeta,"header_128_exact_to_source":True,"raw_orientation":"mirror_y"},
         "clean_plate_gate":{**cg,"status":"PASS"},"final_gate":{**fg,"status":"PASS"},
         "bbox_gate":{"elements":9,"pass":9,"fail":0,"edge_touch_keys":edge,"rows":rows,"status":"PASS"},
         "mask_consistency":{"source_text_protected_overlap":0,"allowed_protected_overlap":0,"status":"PASS"},
-        "visual_evidence":{"full_compare":f"localization/graphics/role_C/{run}/C94_B1696633_FULL_COMPARE.jpg","row_contact":f"localization/graphics/role_C/{run}/C94_B1696633_ROW_CONTACT.jpg","controller_visual_qa":"PENDING"},
-        "runtime_validation":"UNTESTED","status":"C94_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA","vr_ffb_dx11_dxvk_changes":False}
-(outdir/"C94_B1696633_FINAL_QA.json").write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("C94_B1696633_STATIC_PASS",sha(candidate),edge)
+        "visual_evidence":{"full_compare":f"localization/graphics/role_C/{run}/C95_B1696633_FULL_COMPARE.jpg","row_contact":f"localization/graphics/role_C/{run}/C95_B1696633_ROW_CONTACT.jpg","controller_visual_qa":"PENDING"},
+        "runtime_validation":"UNTESTED","status":"C95_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA","vr_ffb_dx11_dxvk_changes":False}
+(outdir/"C95_B1696633_FINAL_QA.json").write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+print("C95_B1696633_STATIC_PASS",sha(candidate),edge)
