@@ -942,4 +942,22 @@ namespace OutRunVRStereo
 
 		VRFinalTestR9Hook VRFinalTestR9Hook::instance;
 	}
+
+	enum class R9InstallStatusValue : std::uint8_t
+	{
+		Pending,
+		Ready,
+		Failed
+	};
+
+	inline R9InstallStatusValue R9InstallStatus() noexcept
+	{
+		switch (R9InstallState.load(std::memory_order_acquire))
+		{
+		case R9InstallPending: return R9InstallStatusValue::Pending;
+		case R9InstallReady: return R9InstallStatusValue::Ready;
+		case R9InstallFailed: return R9InstallStatusValue::Failed;
+		default: return R9InstallStatusValue::Failed;
+		}
+	}
 }
