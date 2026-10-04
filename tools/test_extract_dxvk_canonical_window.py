@@ -235,5 +235,50 @@ class FrontierDiscoveryTests(unittest.TestCase):
             )
 
 
+    def test_f130_contract_metadata_is_pinned(self):
+        self.assertEqual(sut._F130_FRONTIER_CONTINUATION_ID, 98)
+        self.assertEqual(sut._F130_START_RVA, 0x00183AC7)
+        self.assertEqual(sut._F130_END_RVA, 0x00183B07)
+        self.assertEqual(sut._F130_OVERLAP_BYTES, bytes.fromhex("83 a4 88"))
+        self.assertEqual(len(sut._F130_EXPECTED_BYTES), 64)
+        self.assertEqual(
+            sut._F130_INHERITED_FORWARD_TARGETS,
+            [0x00183B60, 0x00183B6E, 0x00183B6F],
+        )
+        self.assertEqual(
+            sut._F130_PREDECESSOR_STATUS,
+            "EXACT_183A8A_TO_183AC7_CONTROL_FLOW_WITH_183AC7_CUT_EDGE_PROVEN",
+        )
+
+    def test_f130_nonmatching_frontier_is_not_promoted(self):
+        result = sut.validate_f130_frontier_contract(
+            frontier={"continuation_id": 97, "rva": 0x00183A8A},
+            payload={},
+            exe_path=Path("unused"),
+            source_path=Path("unused"),
+            length=64,
+        )
+        self.assertEqual(result, {})
+
+    def test_f130_mismatched_payload_fails_closed_before_analyzer_load(self):
+        with self.assertRaisesRegex(ValueError, "F130 canonical frontier contract mismatch"):
+            sut.validate_f130_frontier_contract(
+                frontier={"continuation_id": 98, "rva": 0x00183AC7},
+                payload={
+                    "rva_start": "0x00183AC7",
+                    "rva_end_exclusive": "0x00183B07",
+                    "section": ".text",
+                    "bytes_hex": "83 a4 88",
+                },
+                exe_path=Path("unused"),
+                source_path=Path("unused"),
+                length=64,
+            )
+
+    def test_f130_validator_is_wired_into_frontier_main(self):
+        self.assertIn("validate_f130_frontier_contract", sut.main.__code__.co_names)
+
+
+
 if __name__ == "__main__":
     unittest.main()

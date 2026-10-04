@@ -70,6 +70,23 @@ _F128_PREDECESSOR_STATUS = "EXACT_183A4A_TO_183A8A_CONTROL_FLOW_BOUNDARY_PROVEN"
 _F128_CAPTURE_STATUS = "EXACT_EXE_183A8A_TO_183ACA_PROVENANCE_CAPTURED"
 
 
+# CONVERSION-DXVK-00393/F130: bind the next raw frontier to the F129
+# mandatory trailing three-byte cut-edge without promoting runtime semantics.
+_F130_FRONTIER_CONTINUATION_ID = 98
+_F130_START_RVA = 0x00183AC7
+_F130_END_RVA = 0x00183B07
+_F130_OVERLAP_BYTES = bytes.fromhex("83 a4 88")
+_F130_EXPECTED_BYTES = bytes.fromhex(
+    "83 a4 88 c4 00 00 00 00 a1 40 bc 98 00 8b 40 10 "
+    "fe 48 43 a1 40 bc 98 00 8b 48 10 80 79 43 00 75 "
+    "09 83 60 04 fe a1 40 bc 98 00 83 78 08 ff 75 69 "
+    "53 6a 00 ff 70 0c ff d6 a1 40 bc 98 00 ff 70 10"
+)
+_F130_INHERITED_FORWARD_TARGETS = [0x00183B60, 0x00183B6E, 0x00183B6F]
+_F130_PREDECESSOR_STATUS = "EXACT_183A8A_TO_183AC7_CONTROL_FLOW_WITH_183AC7_CUT_EDGE_PROVEN"
+_F130_CAPTURE_STATUS = "EXACT_EXE_183AC7_TO_183B07_PROVENANCE_CAPTURED"
+
+
 def discover_frontier_rva(source_path: Path) -> dict:
     """Discover the next raw frontier from the latest exact continuation proof."""
 
@@ -418,6 +435,65 @@ def validate_f128_frontier_contract(
     }
 
 
+def validate_f130_frontier_contract(
+    *, frontier: dict, payload: dict, exe_path: Path, source_path: Path, length: int
+) -> dict:
+    """Fail closed on F130 overlap provenance from the exact F129 cut edge."""
+    if frontier.get("continuation_id") != _F130_FRONTIER_CONTINUATION_ID:
+        return {}
+    actual = bytes.fromhex(payload.get("bytes_hex", ""))
+    if (
+        frontier.get("rva") != _F130_START_RVA
+        or length != len(_F130_EXPECTED_BYTES)
+        or payload.get("rva_start") != f"0x{_F130_START_RVA:08X}"
+        or payload.get("rva_end_exclusive") != f"0x{_F130_END_RVA:08X}"
+        or payload.get("section") != ".text"
+        or not actual.startswith(_F130_OVERLAP_BYTES)
+        or actual != _F130_EXPECTED_BYTES
+    ):
+        raise ValueError("F130 canonical frontier contract mismatch")
+
+    analyzer = _load_frontier_analyzer(source_path)
+    pe = analyzer.parse_pe(exe_path.read_bytes())
+    predecessor = analyzer.collect_guarded_gf_target_c_helper_1_third_callee_continuation_98_prefix_proof(pe)
+    if (
+        predecessor.get("status") != _F130_PREDECESSOR_STATUS
+        or predecessor.get("prefix_end_rva") != _F130_START_RVA
+        or predecessor.get("incomplete_rva") != _F130_START_RVA
+        or predecessor.get("incomplete_expected_bytes") != _F130_OVERLAP_BYTES.hex(" ")
+        or predecessor.get("incomplete_actual_bytes") != _F130_OVERLAP_BYTES.hex(" ")
+        or not predecessor.get("incomplete_matches")
+        or not predecessor.get("capture_edge_matches")
+        or predecessor.get("unresolved_forward_targets") != _F130_INHERITED_FORWARD_TARGETS
+        or predecessor.get("continuation_status")
+        != "COMPLETE_INSTRUCTIONS_END_AT_183AC7_TRAILING_83A488_REQUIRES_OVERLAP"
+    ):
+        raise ValueError("F130 predecessor proof/debt mismatch")
+
+    inbound = analyzer.collect_raw_inbound_rel32_candidates(pe, _F130_START_RVA)
+    outbound = analyzer.collect_raw_rel32_call_candidates(pe, _F130_START_RVA, length)
+    if inbound or outbound:
+        raise ValueError("F130 raw rel32 census is not empty")
+
+    return {
+        "frontier_contract_status": _F130_CAPTURE_STATUS,
+        "frontier_predecessor_status": predecessor["status"],
+        "frontier_start_boundary_status": "F129_EXACT_183AC7_MANDATORY_OVERLAP",
+        "frontier_overlap_bytes": _F130_OVERLAP_BYTES.hex(" "),
+        "frontier_overlap_matches": True,
+        "frontier_exact_bytes_match": True,
+        "frontier_inherited_unresolved_forward_targets": [
+            f"0x{rva:08X}" for rva in _F130_INHERITED_FORWARD_TARGETS
+        ],
+        "frontier_raw_inbound_rel32_count": 0,
+        "frontier_raw_outbound_rel32_count": 0,
+        "frontier_semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+        "frontier_call_semantics": "UNRESOLVED",
+        "frontier_ownership_effect": "NONE",
+        "frontier_runtime_validation": "UNTESTED",
+    }
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--exe", type=Path, required=True)
@@ -451,6 +527,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             validate_f124_frontier_contract,
             validate_f126_frontier_contract,
             validate_f128_frontier_contract,
+            validate_f130_frontier_contract,
         ):
             payload.update(
                 validator(
