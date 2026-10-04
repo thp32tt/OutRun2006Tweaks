@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-C108-LATEST-REWORK",
+  "timestamp_kst": "2026-10-04T23:25:51+09:00",
+  "scope": "Final controller reconciliation of current unfinished C work only: latest 39229D64 recovery, 5B65E08C pending controller visual gate, new 788CE557 candidate, and latest 53CE39D5 retry. Previously completed C assets were not repeated.",
+  "policy": "exact source glyph/effect bbox + size ceiling + zero localized/protected/source overlap + exhaustive clean-plate source removal + readable/raw controller visual review",
+  "assets": [
+    {
+      "asset": "39229D64",
+      "queue_index": 57,
+      "candidate_sha256": "dbd97d30d1e14df102d5c90c5ef5e339a93a934c4b10b71e2b30fbf76db2b8f8",
+      "machine_report": "localization/graphics/role_C/20261004-C108-LATEST-REWORK/C108_39229D64_MACHINE_QA.json",
+      "machine_status": "PASS",
+      "controller_visual_qa": "PASS",
+      "controller_visual_evidence": [
+        "localization/graphics/role_A/20261004-A-RECOVERY09/A_RECOVERY09_SOURCE_CLEAN_REPAIR_FINAL.jpg",
+        "localization/graphics/role_A/20261004-A-RECOVERY09/A_RECOVERY09_ROW_CONTACT.jpg",
+        "localization/graphics/role_A/20261004-A-RECOVERY09/A_RECOVERY09_FINAL_RAW_GRAY.jpg"
+      ],
+      "controller_visual_note": "Independent readable/source-clean-final and row-contact review PASS. All 16 target occurrences are cleanly replaced, including the alternate SPECIAL REQUEST occurrence; no English/source residue, Korean/Korean overlap, clipping, seam, or protected-art damage is visible. Preserved score/vehicle/character/ALBERTO artwork remains intact.",
+      "decision": "C108_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "5B65E08C",
+      "queue_index": 164,
+      "candidate_sha256": "33da77625f6b6af22cab72db30394b6b8c0bdd78e9f9a6166f273d6fab4da609",
+      "machine_report": "localization/graphics/role_C/20261004-C106-5B65E08C/C106_5B65E08C_MACHINE_QA.json",
+      "machine_status": "PASS",
+      "controller_visual_qa": "PASS",
+      "controller_visual_evidence": [
+        "localization/graphics/role_B/20261004-B-PRODUCTION20/B_PRODUCTION20_5B65E08C_COMPARE.jpg",
+        "localization/graphics/role_B/20261004-B-PRODUCTION20/B_PRODUCTION20_5B65E08C_ROW_CONTACT.jpg",
+        "localization/graphics/role_B/20261004-B-PRODUCTION20/B_PRODUCTION20_5B65E08C_RAW_COMPARE.jpg"
+      ],
+      "controller_visual_note": "Readable CLEAN/FINAL, row-contact and raw mirror_y review PASS. SELECT LICENSE source text is fully removed; Korean 라이선스 선택 stays inside the exact source bbox with source-family heavy white weight, no overlap, clipping, seam, halo, or red-panel damage.",
+      "decision": "C108_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "788CE557",
+      "queue_index": 106,
+      "candidate_sha256": "4943eb7e348f44b96ea77d41041f29b2e18a30f16352714ec78b3efc50d67d29",
+      "machine_report": "localization/graphics/role_C/20261004-C107-NEW-B/C107_788CE557_MACHINE_QA.json",
+      "machine_status": "PASS",
+      "controller_visual_qa": "FAIL",
+      "controller_visual_evidence": [
+        "localization/graphics/role_B/20261004-B-PRODUCTION21/B_PRODUCTION21_788CE557_COMPARE.jpg",
+        "localization/graphics/role_B/20261004-B-PRODUCTION21/B_PRODUCTION21_788CE557_TOP_PAIR_2X.jpg",
+        "localization/graphics/role_B/20261004-B-PRODUCTION21/B_PRODUCTION21_788CE557_ROW_CONTACT.jpg",
+        "localization/graphics/role_B/20261004-B-PRODUCTION21/B_PRODUCTION21_788CE557_RAW_COMPARE.jpg"
+      ],
+      "controller_visual_note": "FAIL despite mask machine PASS. CLEAN and FINAL visibly retain source fragments from Music Change / Transmission / Time remaining (for example visible trailing “hange”, “Transmis…”, and “…ning :” fragments). This proves the producer source-text mask under-covered the complete glyph/effect footprint. Source-language residue adjacent to/behind localized text violates the zero-overlap policy.",
+      "decision": "C108_REWORK_REQUIRED_INCOMPLETE_SOURCE_EFFECT_MASK",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "53CE39D5",
+      "queue_index": 100,
+      "candidate_sha256": "ed4a95fcf004650221a87a9c025c2a983aecf60f3d896d2ffb1bc7d2f571bbc7",
+      "machine_report": "localization/graphics/role_C/20261004-C108-LATEST-REWORK/C108_53CE39D5_MACHINE_QA.json",
+      "machine_status": "FAIL",
+      "controller_visual_qa": "FAIL",
+      "controller_visual_evidence": [
+        "localization/graphics/role_B/20261004-B-PRODUCTION21/B_PRODUCTION21_53CE_COMPARE.jpg",
+        "localization/graphics/role_B/20261004-B-PRODUCTION21/B_PRODUCTION21_53CE_ROW_CONTACT.jpg",
+        "localization/graphics/role_B/20261004-B-PRODUCTION21/B_PRODUCTION21_53CE_RAW_COMPARE.jpg"
+      ],
+      "controller_visual_note": "FAIL. C108 independently finds 242 pixels inside the declared source-text mask unchanged in CLEAN, so the clean-plate source-removal gate is not exhaustive. Row-contact evidence also shows residual source-effect specks/lines in cleaned target rows. Exact bbox/size and protected-overlap checks pass, but source residue is a hard failure.",
+      "decision": "C108_REWORK_REQUIRED_SOURCE_RESIDUE_242PX",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "summary": {
+    "assets_checked": 4,
+    "pixel_visual_policy_pass": 2,
+    "rework_required_in_this_scope": 2,
+    "pixel_visual_pass_assets": [
+      "39229D64",
+      "5B65E08C"
+    ],
+    "rework_required_assets": [
+      "788CE557",
+      "53CE39D5"
+    ],
+    "global_rework_remaining": [
+      "C075FB49",
+      "788CE557",
+      "53CE39D5"
+    ],
+    "candidate_changed_by_C": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changes": false
+  }
+}

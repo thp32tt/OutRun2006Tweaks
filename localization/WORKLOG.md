@@ -1145,3 +1145,13 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller SOURCE/CLEAN/FINAL, 16-row contact and raw-orientation visual QA PASS. No target English residue, clipping, overlap, seam, opaque patch, alpha halo, protected-art damage or orientation regression remains. Non-target names/icons/ordinal text are preserved.
 - `RUNTIME_VALIDATION=UNTESTED`; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_A/20261004-A-RECOVERY09/`.
+
+## 2026-10-04 23:25 KST — C108 cross-lane final QA
+- Revalidated only current unfinished C work; completed C104 assets were not repeated. Scope: A_RECOVERY09 39229D64, B_PRODUCTION20 5B65E08C, B_PRODUCTION21 788CE557, and latest B_PRODUCTION21 53CE39D5.
+- 39229D64 candidate dbd97d30...: independent C108 machine PASS (16/16 exact bbox+size ceiling, clean source residue=0, outside/protected=0, localized pair overlap=0, 2px conflicts=0). Controller source/clean/final + row-contact + raw review PASS including the second SPECIAL REQUEST occurrence. Advanced to C108_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME.
+- 5B65E08C candidate 33da7762...: C106 machine PASS plus C108 controller readable/row/raw visual PASS. SELECT LICENSE source is fully removed; 라이선스 선택 remains source-size-contained and source-family heavy white. Advanced to C108_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME.
+- 788CE557 candidate 4943eb7e...: C107 numeric mask/bbox gate PASS but controller visual QA FAIL. CLEAN/FINAL visibly retain source fragments from Music Change, Transmission, and Time remaining (including trailing hange / Transmis... / ...ning : fragments), proving incomplete full-effect source masks. Returned REWORK_REQUIRED.
+- 53CE39D5 candidate ed4a95fc...: C108 exact bbox/size/protected gates PASS, but clean-plate gate FAIL because 242 declared source-text-mask pixels remain unchanged; row-contact evidence also shows source-effect remnants. Returned REWORK_REQUIRED.
+- Current global producer REWORK: C075FB49, 788CE557, 53CE39D5. Remaining localize_text pending-C approvals: 4; pending_artwork: 50. Queue sanity remains 137 rows = 79 localize_text + 47 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve.
+- RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261004-C108-LATEST-REWORK/C108_CONTROLLER_FINAL_QA.json, localization/graphics/role_C/20261004-C108-LATEST-REWORK/C108_39229D64_MACHINE_QA.json, localization/graphics/role_C/20261004-C108-LATEST-REWORK/C108_53CE39D5_MACHINE_QA.json, localization/graphics/role_C/20261004-C107-NEW-B/C107_788CE557_MACHINE_QA.json, localization/graphics/role_C/20261004-C106-5B65E08C/C106_5B65E08C_MACHINE_QA.json.
