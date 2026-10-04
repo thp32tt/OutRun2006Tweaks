@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T07:21:30+09:00",
+  "updated_at_kst": "2026-10-05T07:28:31+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B_PRODUCTION55 resolved C138's 1F5FE6E9 exact-mask REWORK and produced candidate e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be: 4/4 exact source bbox+size PASS, zero outside/alpha-outside/source-residue/overlap/touch, controller SOURCE/CLEAN/FINAL/row/raw self-QA PASS. Index 132 is pending independent C final QA; producer REWORK=0 and pending_artwork localize_text=37. 1A43E9D9 remains HIGH_RISK pending mandatory in-game validation; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C139 independently finalizes B55 1F5FE6E9 candidate e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be: canonical-source mask equality, 4/4 bbox+size+positive margins and all zero-pixel/protected/overlap gates PASS; controller SOURCE/CLEAN/FINAL/row/raw mirror_y visual QA PASS. Producer REWORK=0; pending_artwork localize_text=37. 1A43E9D9 remains HIGH_RISK pending mandatory in-game validation; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,15 +265,11 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "B_SELF_QA_PASS_PENDING_C",
-      "assets": [
-        "1F5FE6E9"
-      ],
+      "status": "ZERO_PRODUCER_REWORK_REQUIRED",
+      "assets": [],
       "remaining": 0,
-      "note": "B_PRODUCTION55 candidate e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be resolves C138 exact source-mask ambiguity; independent C final QA is pending.",
-      "pending_c": [
-        "1F5FE6E9"
-      ]
+      "note": "1F5FE6E9 B55 candidate e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be passes C139 independent static final QA. 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94 remain strict no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": []
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -297,35 +293,33 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C138",
-      "report": "localization/graphics/role_C/20261005-C138-1F5FE6E9/C138_1F5_CONTROLLER_FINAL_QA.json",
-      "result": "1_REWORK_REQUIRED_NO_APPROVED_CANDIDATE",
+      "run": "C139",
+      "report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_CONTROLLER_FINAL_QA.json",
+      "result": "1_PIXEL_VISUAL_PASS_GLOBAL_0_REWORK_REMAIN",
       "candidate_changed_by_C": false,
       "assets_checked": 1,
       "physical_elements_checked": 4,
-      "pixel_visual_pass_assets": [],
+      "pixel_visual_pass_assets": [
+        "1F5FE6E9"
+      ],
       "high_risk_static_pass_assets_existing": [
         "1A43E9D9"
       ],
-      "rework_required_assets": [
-        "1F5FE6E9"
-      ],
-      "global_rework_remaining": [
-        "1F5FE6E9"
-      ],
+      "rework_required_assets": [],
+      "global_rework_remaining": [],
       "strict_hold_no_candidate": [
         "4F68708E",
         "F6811E94"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 38,
+      "pending_production_localize_text": 37,
       "machine_evidence": {
-        "1F5FE6E9": "C138 FAIL_CLOSED; exact source masks unresolved"
+        "1F5FE6E9": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_MACHINE_QA.json"
       },
       "controller_visual": {
-        "1F5FE6E9": "NOT_APPROVABLE"
+        "1F5FE6E9": "PASS"
       },
-      "in_game_validation": "NOT_APPLICABLE_TO_FAILED_STATIC_QA; RUNTIME_VALIDATION=UNTESTED"
+      "in_game_validation": "PENDING; 1A43E9D9 remains REQUIRED_BEFORE_FINAL_APPROVAL; C139 RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_PRODUCTION55",
@@ -541,7 +535,7 @@
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 45,
+    "current_pending_artwork_localize_text": 37,
     "current_producer_rework_remaining": 0,
     "latest_a_production_batch": {
       "timestamp_kst": "2026-10-05T02:45:00+09:00",
@@ -595,7 +589,7 @@
       "queue_index": 132,
       "candidate_sha256": "e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be",
       "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
-      "status": "B_PRODUCTION55_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "status": "C139_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
       "source_mask_method": "canonical alpha glyph components + proven 24px periodicity; row4 prefix row3+24 intersect canonical source alpha",
       "bbox_pass": "4/4",
       "zero_pixel_gates": {
@@ -608,7 +602,10 @@
       },
       "controller_visual_qa": "PASS",
       "report": "localization/graphics/role_B/20261005-B-PRODUCTION55/B55_1F5_REPORT.json",
-      "runtime_validation": "UNTESTED"
+      "runtime_validation": "UNTESTED",
+      "c_final_qa": "PASS",
+      "c_machine_report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_MACHINE_QA.json",
+      "c_controller_report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_CONTROLLER_FINAL_QA.json"
     }
   },
   "data_build": {

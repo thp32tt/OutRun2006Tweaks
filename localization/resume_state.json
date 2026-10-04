@@ -117,9 +117,9 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-05T07:02:38+09:00",
+      "updated_at_kst": "2026-10-05T07:28:31+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20261005-C138-1F5FE6E9/C138_1F5_CONTROLLER_FINAL_QA.json",
+      "report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_CONTROLLER_FINAL_QA.json",
       "direct_queue_scope": 126,
       "current_candidates_scanned": 30,
       "elements_scanned": 287,
@@ -160,18 +160,17 @@
         "D41D0B1",
         "12519155",
         "1762489B",
-        "EBFC709F"
-      ],
-      "rework_required_assets": [
+        "EBFC709F",
         "1F5FE6E9"
       ],
-      "failed_elements": 4,
-      "pending_production_localize_text": 38,
+      "rework_required_assets": [],
+      "failed_elements": 0,
+      "pending_production_localize_text": 37,
       "hold_strict_recheck_zoom_review": 47,
       "promotion_hold_for_pixel_pass": true,
-      "promotion_hold_reason": "1F5FE6E9 is REWORK_REQUIRED with unresolved exact source masks; 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94 remain strict HOLD.",
+      "promotion_hold_reason": "1F5FE6E9 now passes C139 static pixel/visual QA; 1A43E9D9 remains HIGH_RISK edge-touch pending mandatory in-game validation; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD; unfinished queue rows remain.",
       "user_approved_locked": 0,
-      "failed_assets": 1,
+      "failed_assets": 0,
       "latest_c_revalidated_assets": [
         "1F5FE6E9"
       ],
@@ -195,7 +194,7 @@
       }
     },
     "latest_hd_rework_batch": "localization/graphics/role_B/20261005-B-PRODUCTION55/B55_1F5_REPORT.json",
-    "hd_rework_candidates_ready": 15,
+    "hd_rework_candidates_ready": 16,
     "hd_rework_remaining": 0,
     "hd_partial_rework": {
       "12519155": {
@@ -684,19 +683,36 @@
         "c135_font_coverage": "PASS_VERIFIED_NOTO_CJK"
       },
       "1F5FE6E9": {
-        "status": "C138_REWORK_REQUIRED_EXACT_SOURCE_MASK_AMBIGUITY",
-        "candidate_path": null,
-        "candidate_sha256": null,
+        "status": "C139_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+        "candidate_sha256": "e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be",
+        "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
         "completed_transcription_entries": 4,
-        "localized_regions": 0,
-        "remaining_segments": 4,
-        "report": "localization/graphics/role_C/20261005-C138-1F5FE6E9/C138_1F5_CONTROLLER_FINAL_QA.json",
-        "b51_fail_report": "localization/graphics/role_B/20261005-B-PRODUCTION51/B51_FAIL_CLOSED.json",
-        "c136_report": "localization/graphics/role_C/20261005-C136-1F5FE6E9-DIAG/C136_1F5_SOURCE_ROW_DIAGNOSTIC.json",
-        "c137_report": "localization/graphics/role_C/20261005-C137-1F5FE6E9-DIAG/C137_1F5_SOURCE_ROW_DIAGNOSTIC.json",
-        "in_game_validation": "NOT_READY",
+        "localized_regions": 4,
+        "remaining_segments": 0,
+        "report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_CONTROLLER_FINAL_QA.json",
+        "c_strict_qa_report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_CONTROLLER_FINAL_QA.json",
+        "c139_machine_report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_MACHINE_QA.json",
+        "b55_report": "localization/graphics/role_B/20261005-B-PRODUCTION55/B55_1F5_REPORT.json",
+        "in_game_validation": "PENDING",
         "runtime_validation": "UNTESTED",
-        "blocker": "exact canonical-source glyph/effect masks cannot yet be separated from adjacent row/panel alpha effects"
+        "c139_bbox_pass": "4/4",
+        "c139_positive_margin_pass": "4/4",
+        "c139_source_row_gaps_px": [
+          4,
+          4,
+          3
+        ],
+        "c139_clean_source_residue": 0,
+        "c139_clean_outside": 0,
+        "c139_final_outside": 0,
+        "c139_alpha_outside": 0,
+        "c139_protected_changed": 0,
+        "c139_render_outside_target": 0,
+        "c139_overlap": 0,
+        "c139_touch_pairs": 0,
+        "c139_orientation": "mirror_y",
+        "c139_candidate_changed": false,
+        "c138_return_resolved": true
       }
     },
     "a76_ff2462bb": {
@@ -878,7 +894,7 @@
       "pending_independent_c_final_qa": true,
       "runtime_validation": "UNTESTED"
     },
-    "current_pending_artwork_localize_text": 45,
+    "current_pending_artwork_localize_text": 37,
     "current_producer_rework_remaining": 0,
     "latest_a_production_batch": "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_EBEF6D20_REPORT.json",
     "a_production20_9ce4e175": {
@@ -2688,8 +2704,44 @@
     "controller_visual_qa": "PASS",
     "report": "localization/graphics/role_B/20261005-B-PRODUCTION55/B55_1F5_REPORT.json",
     "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION55/B55_CONTROLLER_SELF_QA.json",
-    "c_final_qa": "PENDING",
+    "c_final_qa": "C139_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
     "in_game_validation": "PENDING",
+    "runtime_validation": "UNTESTED",
+    "c_machine_report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_MACHINE_QA.json",
+    "c_controller_report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_CONTROLLER_FINAL_QA.json"
+  },
+  "c139_controller_final_qa": {
+    "timestamp_kst": "2026-10-05T07:28:31+09:00",
+    "run": "20261005-C139-1F5FE6E9",
+    "queue_index": 132,
+    "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+    "source_sha256": "3656adbd699b7852cb5fcf4bb01fc4f1f65bbd9d7d39e12e7a1c2ac5a49fef1d",
+    "candidate_sha256": "e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be",
+    "candidate_changed_by_C": false,
+    "machine_status": "PASS",
+    "bbox_size_positive_margin": "4/4 PASS",
+    "source_row_gaps_px": [
+      4,
+      4,
+      3
+    ],
+    "zero_pixel_gates": {
+      "clean_source_residue": 0,
+      "clean_outside": 0,
+      "final_outside": 0,
+      "alpha_outside": 0,
+      "protected_changed": 0,
+      "render_outside_target": 0,
+      "target_outside": 0,
+      "overlap": 0,
+      "touch_pairs": 0
+    },
+    "controller_visual_qa": "PASS",
+    "decision": "C139_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+    "producer_rework_remaining": 0,
+    "pending_production_localize_text": 37,
+    "machine_report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_MACHINE_QA.json",
+    "report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_CONTROLLER_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
   }
 }

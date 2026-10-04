@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C139-1F5FE6E9",
+  "timestamp_kst": "2026-10-05T07:28:31+09:00",
+  "queue_index": 132,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds",
+  "scope": "new/changed unfinished B_PRODUCTION55 handoff only; completed C135-and-earlier PASS assets not repeated",
+  "producer_run": "20261005-B-PRODUCTION55",
+  "source_sha256": "3656adbd699b7852cb5fcf4bb01fc4f1f65bbd9d7d39e12e7a1c2ac5a49fef1d",
+  "candidate_sha256": "e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be",
+  "candidate_changed_by_C": false,
+  "independent_machine_qa": {
+    "report": "localization/graphics/role_C/20261005-C139-1F5FE6E9/C139_1F5_MACHINE_QA.json",
+    "status": "PASS",
+    "header_128_exact": true,
+    "format": "RGBA32",
+    "dimensions": [
+      1024,
+      512
+    ],
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "exact_canonical_source_mask_match": true,
+    "bbox_size_positive_margin": "4/4 PASS",
+    "source_row_gaps_px": [
+      4,
+      4,
+      3
+    ],
+    "source_mask_unchanged_in_clean": 0,
+    "clean_changed_outside_source_mask": 0,
+    "final_changed_outside_allowed": 0,
+    "alpha_changed_outside_allowed": 0,
+    "protected_changed": 0,
+    "render_changed_outside_target": 0,
+    "target_outside_allowed": 0,
+    "localized_overlap_pixels": 0,
+    "localized_touch_pairs": []
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact_4x": "PASS",
+    "raw_mirror_y": "PASS",
+    "strings": [
+      "요청",
+      "스페셜 요청 1",
+      "스페셜 요청 2",
+      "스페셜 요청 3"
+    ],
+    "source_style": "PASS_SHARED_UPRIGHT_OLIVE_MENU_FAMILY",
+    "english_source_residue": "NONE_VISIBLE",
+    "clipping": "NONE_VISIBLE",
+    "overlap": "NONE_VISIBLE",
+    "seam_or_halo": "NONE_VISIBLE",
+    "protected_colored_panel_damage": "NONE_VISIBLE",
+    "orientation_regression": "NONE_VISIBLE"
+  },
+  "decision": "C139_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "producer_rework_remaining": 0,
+  "pending_artwork_localize_text": 37,
+  "high_risk_static_pass_assets_existing": [
+    "1A43E9D9"
+  ],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94"
+  ],
+  "in_game_validation": "PENDING",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}
