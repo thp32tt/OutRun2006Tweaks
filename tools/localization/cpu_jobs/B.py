@@ -97,32 +97,25 @@ def core_mask(crop,kind):
         m=(r>178)&(g>178)&(b>178)&((mx.astype(int)-mn.astype(int))<75)
     return m
 
-def estimate_background(arr, mask, cell, bbox):
+def estimate_background(arr, mask, cell, bbox, panel_bg):
+    # Reconstruct the plate row from source pixels that belong to the dominant local
+    # panel colour family.  Sampling immediately beside individual glyphs can pick up
+    # the source outline/plate border and leaves letter-shaped ghosts.
     x0,y0,x1,y1=cell
     bx0,by0,bx1,by1=bbox
     out=arr.copy()
+    bg=np.asarray(panel_bg,dtype=np.int16)
     for y in range(by0,by1):
-        xs=np.where(mask[y,bx0:bx1])[0]
-        if not len(xs): continue
-        lo=bx0+int(xs.min()); hi=bx0+int(xs.max())
-        ll=max(x0,lo-12); lr=max(x0,lo-4)
-        rl=min(x1,hi+5); rr=min(x1,hi+13)
-        left=arr[y,ll:lr] if lr>ll else np.empty((0,4),dtype=np.uint8)
-        right=arr[y,rl:rr] if rr>rl else np.empty((0,4),dtype=np.uint8)
-        if len(left) and len(right):
-            lc=np.median(left,axis=0); rc=np.median(right,axis=0)
-            den=max(1,hi-lo)
-            for x in range(lo,hi+1):
-                if not mask[y,x]: continue
-                t=(x-lo)/den
-                out[y,x]=np.clip(np.round(lc*(1-t)+rc*t),0,255).astype(np.uint8)
+        xx=np.where(mask[y])[0]
+        if not len(xx): continue
+        row=arr[y,x0:x1]
+        dist=np.max(np.abs(row.astype(np.int16)-bg[None,:]),axis=1)
+        good=(dist<=32)&(row[:,3]>16)
+        if np.any(good):
+            fill=np.median(row[good],axis=0)
         else:
-            uy=max(y0,by0-8); dy=min(y1,by1+8)
-            ring=np.concatenate([arr[uy:by0,bx0:bx1].reshape(-1,4),arr[by1:dy,bx0:bx1].reshape(-1,4)],axis=0)
-            if not len(ring): raise RuntimeError(("no_background_samples",cell,bbox,y))
-            med=np.median(ring,axis=0).astype(np.uint8)
-            xx=np.where(mask[y])[0]
-            out[y,xx]=med
+            fill=bg
+        out[y,xx]=np.clip(np.round(fill),0,255).astype(np.uint8)
     return out
 
 def shear(im,slant):
@@ -235,7 +228,7 @@ for spec in TARGETS:
         line_defs.append({
             "target":spec["key"],"source_label":spec["source"],"line_index":li,
             "korean":ko,"cell":spec["cell"],"source_bbox":eb,"fill":fill,
-            "outline":outline,"slant":spec["slant"],"kind":spec["kind"]
+            "outline":outline,"slant":spec["slant"],"kind":spec["kind"],"background":tuple(int(v) for v in bg)
         })
 
 # Clean-plate reconstruction, line by line, only on actual source glyph/effect pixels.
@@ -243,7 +236,7 @@ for ld in line_defs:
     mask=np.zeros((2048,2048),bool)
     x0,y0,x1,y1=ld["source_bbox"]
     mask[y0:y1,x0:x1]=all_source_mask[y0:y1,x0:x1]
-    clean_arr=estimate_background(clean_arr,mask,ld["cell"],ld["source_bbox"])
+    clean_arr=estimate_background(clean_arr,mask,ld["cell"],ld["source_bbox"],ld["background"])
 clean=Image.fromarray(clean_arr,"RGBA")
 
 # Fresh native-resolution Korean lettering.
@@ -370,7 +363,7 @@ report={
  "readiness_tier":"ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
  "source_url":source_url,"source_sha256":source_sha_expected,"candidate_sha256":cand_sha,
  "candidate_path":str(candidate.relative_to(repo)),
- "method":"exact 2048x2048 RGBA32 HD source -> colour-core semantic line discovery -> dominant-panel colour separation of complete source effects -> per-row panel interpolation clean plate -> fresh native Hangul lettering -> exact-header DDS -> decoded all-channel static QA",
+ "method":"exact 2048x2048 RGBA32 HD source -> colour-core semantic line discovery -> dominant-panel colour separation of complete source effects -> dominant-panel row reconstruction clean plate -> fresh native Hangul lettering -> exact-header DDS -> decoded all-channel static QA",
  "structure":{**info,"header_128_exact":True,"raw_orientation":"mirror_y"},
  "semantic_targets":7,"physical_lines":len(rows),
  "translations":[{"source":t["source"],"korean":" / ".join(t["korean"])} for t in TARGETS],
