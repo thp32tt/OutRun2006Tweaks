@@ -1070,6 +1070,41 @@ def main() -> int:
         is False
     )
 
+    r233_accumulated_log_signature_epoch = run_case(
+        "VR DX11 R71 census: observed=1 size=1280x720 sourceFormat=21 "
+        "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+        "VR DX11 R85 signature#1: primitive=4 fixedFn=1 fvf=0x000001C4\n"
+        "VR DX11 R72 decl signature#1 elem#0: stream=0 offset=0 type=2 "
+        "method=0 usage=0 usageIndex=0\n"
+        "VR DX11 R85 ffp shader compile#1: attempted=1 succeeded=1 "
+        "hr=0x00000000 bytecodeHash=0xAAAAAAAAAAAAAAAA bytecodeBytes=512 "
+        "diagnosticsHash=0x0000000000000000 diagnosticsBytes=0 profile=ps_4_0\n"
+        "VR DX11 R71 census: observed=1 size=1920x1080 sourceFormat=22 "
+        "nativeFormat=29 msaa=0 bootstrapCompatible=1\n"
+        "VR DX11 R85 signature#1: primitive=5 fixedFn=1 fvf=0x000002C4\n"
+        "VR DX11 R72 decl signature#1 elem#0: stream=1 offset=16 type=3 "
+        "method=0 usage=3 usageIndex=1\n"
+        "VR DX11 R85 ffp shader compile#1: attempted=1 succeeded=1 "
+        "hr=0x00000000 bytecodeHash=0xBBBBBBBBBBBBBBBB bytecodeBytes=768 "
+        "diagnosticsHash=0x0000000000000000 diagnosticsBytes=0 profile=ps_4_0\n"
+    )
+    assert r233_accumulated_log_signature_epoch["UniqueSignaturesCaptured"] == 2
+    r233_signatures = r233_accumulated_log_signature_epoch["Signatures"]
+    assert [signature["startup_epoch"] for signature in r233_signatures] == [1, 2]
+    assert [signature["id"] for signature in r233_signatures] == [1, 1]
+    assert r233_signatures[0]["declaration"][0]["stream"] == 0
+    assert r233_signatures[0]["declaration"][0]["offset"] == 0
+    assert r233_signatures[1]["declaration"][0]["stream"] == 1
+    assert r233_signatures[1]["declaration"][0]["offset"] == 16
+    assert (
+        r233_signatures[0]["fixed_function_shader_compile"]["bytecode_hash_hex"]
+        == "0xAAAAAAAAAAAAAAAA"
+    )
+    assert (
+        r233_signatures[1]["fixed_function_shader_compile"]["bytecode_hash_hex"]
+        == "0xBBBBBBBBBBBBBBBB"
+    )
+
     r106 = run_case(
         "VR DX11 R85 signature#1: primitive=4 fixedFn=1\n"
         "VR DX11 R85 texture signature#1 stage#0: observed=1 type=3 pool=1 "

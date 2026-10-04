@@ -239,7 +239,7 @@ FFP_OP_NAMES = {
     25: "MULTIPLYADD",
     26: "LERP",
 }
-SignatureKey = tuple[str, int]
+SignatureKey = tuple[str, int, int]
 
 
 FFP_ARGUMENT_NAMES = {
@@ -275,9 +275,10 @@ def summarize_fixed_function_detailed_stage_demand(
     unsupported_result_args: Counter[int] = Counter()
     detailed_stages = 0
     duplicate_stage_records = 0
-    # R199/R225: detail lines may repeat, but runtime signature ids are local
-    # to one process/log. Drop true duplicates only inside the same source-log
-    # namespace; never merge unrelated signature#N records across sessions.
+    # R199/R225/R233: detail lines may repeat, but runtime signature ids are
+    # local to one process epoch. Drop true duplicates only inside the same
+    # source-log/startup-epoch namespace; never merge unrelated signature#N
+    # records across sessions or accumulated process restarts.
     seen_stage_records: set[
         tuple[SignatureKey, tuple[tuple[str, int], ...]]
     ] = set()
@@ -389,9 +390,10 @@ def main() -> int:
     bootstrap_skipped: list[dict] = []
     bootstrap_outcomes: list[dict] = []
     summaries: list[dict] = []
-    # R225: runtime signature ids are insertion-order ordinals and restart for
-    # every process. Scope every detail/evidence record by source log so two
-    # separate sessions' signature#1 records can never overwrite each other.
+    # R225/R233: runtime signature ids are insertion-order ordinals and restart
+    # for every process. Scope every detail/evidence record by source log and
+    # startup epoch so separate files and accumulated process restarts cannot
+    # overwrite an unrelated signature#N record.
     signatures: dict[SignatureKey, dict] = {}
     declarations: dict[SignatureKey, list[dict]] = {}
     fixed_function: dict[SignatureKey, list[dict]] = {}
@@ -429,10 +431,12 @@ def main() -> int:
             continue
         source_logs.append(log_path.name)
         source_log = log_path.name
+        startup_epoch = 0
 
         for line_number, line in enumerate(text.splitlines(), start=1):
             match = STARTUP_RE.search(line)
             if match:
+                startup_epoch += 1
                 startup_entry = int_fields(match)
                 startup_entry["source_log"] = source_log
                 startup.append(startup_entry)
@@ -480,11 +484,12 @@ def main() -> int:
             match = SIGNATURE_RE.search(line)
             if match:
                 signature_id = int(match.group("id"))
-                signature_key = (source_log, signature_id)
+                signature_key = (source_log, startup_epoch, signature_id)
                 signatures.setdefault(
                     signature_key,
                     {
                         "source_log": source_log,
+                        "startup_epoch": startup_epoch,
                         "id": signature_id,
                         "raw": match.group("body"),
                     },
@@ -495,7 +500,7 @@ def main() -> int:
             if match:
                 data = int_fields(match)
                 signature_id = data.pop("signature")
-                signature_key = (source_log, signature_id)
+                signature_key = (source_log, startup_epoch, signature_id)
                 declarations.setdefault(signature_key, []).append(data)
                 continue
 
@@ -503,7 +508,7 @@ def main() -> int:
             if match:
                 data = match.groupdict()
                 signature_id = int(data.pop("signature"))
-                signature_key = (source_log, signature_id)
+                signature_key = (source_log, startup_epoch, signature_id)
                 fixed_function_shader_compiles[signature_key] = {
                     "attempted": bool(int(data["attempted"])),
                     "succeeded": bool(int(data["succeeded"])),
@@ -523,7 +528,7 @@ def main() -> int:
             if match:
                 data = match.groupdict()
                 signature_id = int(data.pop("signature"))
-                signature_key = (source_log, signature_id)
+                signature_key = (source_log, startup_epoch, signature_id)
                 fixed_function_vertex_shader_compiles[signature_key] = {
                     "attempted": bool(int(data["attempted"])),
                     "succeeded": bool(int(data["succeeded"])),
@@ -543,7 +548,7 @@ def main() -> int:
             if match:
                 data = match.groupdict()
                 signature_id = int(data.pop("signature"))
-                signature_key = (source_log, signature_id)
+                signature_key = (source_log, startup_epoch, signature_id)
                 fixed_function_shader_prototypes[signature_key] = {
                     "generated": bool(int(data["generated"])),
                     "unsupported_mask": int(data["mask"], 16),
@@ -559,7 +564,7 @@ def main() -> int:
             if match:
                 data = match.groupdict()
                 signature_id = int(data["signature"])
-                signature_key = (source_log, signature_id)
+                signature_key = (source_log, startup_epoch, signature_id)
                 fixed_function_texture_factors[signature_key] = {
                     "observed": bool(int(data["observed"])),
                     "argb": int(data["argb"], 16),
@@ -571,7 +576,7 @@ def main() -> int:
             if match:
                 data = match.groupdict()
                 signature_id = int(data.pop("signature"))
-                signature_key = (source_log, signature_id)
+                signature_key = (source_log, startup_epoch, signature_id)
                 stage = int(data.pop("stage"))
                 parsed = {"stage": stage}
                 for key, value in data.items():
@@ -589,7 +594,7 @@ def main() -> int:
             if match:
                 data = match.groupdict()
                 signature_id = int(data.pop("signature"))
-                signature_key = (source_log, signature_id)
+                signature_key = (source_log, startup_epoch, signature_id)
                 stage = int(data.pop("stage"))
                 parsed = {"stage": stage}
                 for key, value in data.items():

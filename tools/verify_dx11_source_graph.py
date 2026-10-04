@@ -8922,10 +8922,10 @@ def main() -> None:
         )
 
     r225_multi_log_signature_namespace_contract = [
-        ("SignatureKey = tuple[str, int]",
-         DX11_CENSUS_ANALYZER, "R225 source-log signature namespace type"),
-        ("signature_key = (source_log, signature_id)",
-         DX11_CENSUS_ANALYZER, "R225 per-log signature key"),
+        ("SignatureKey = tuple[str, int, int]",
+         DX11_CENSUS_ANALYZER, "R225/R233 source-log and startup-epoch signature namespace type"),
+        ("signature_key = (source_log, startup_epoch, signature_id)",
+         DX11_CENSUS_ANALYZER, "R225/R233 per-log startup-epoch signature key"),
         ('"source_log": source_log',
          DX11_CENSUS_ANALYZER, "R225 report provenance field"),
         ("r225_multi_log = run_cases(",
@@ -9150,6 +9150,35 @@ def main() -> None:
         raise SystemExit(
             "DX11 R232 latest startup/summary pairing drift: "
             + ", ".join(missing_r232_latest_startup_summary_pairing)
+        )
+
+    r233_accumulated_log_signature_epoch_contract = [
+        ("startup_epoch = 0",
+         DX11_CENSUS_ANALYZER, "R233 per-log legacy/startup epoch baseline"),
+        ("startup_epoch += 1",
+         DX11_CENSUS_ANALYZER, "R233 startup epoch advance"),
+        ("SignatureKey = tuple[str, int, int]",
+         DX11_CENSUS_ANALYZER, "R233 epoch-scoped signature namespace type"),
+        ("signature_key = (source_log, startup_epoch, signature_id)",
+         DX11_CENSUS_ANALYZER, "R233 epoch-scoped detail/evidence key"),
+        ('"startup_epoch": startup_epoch',
+         DX11_CENSUS_ANALYZER, "R233 signature epoch provenance export"),
+        ("r233_accumulated_log_signature_epoch = run_case(",
+         DX11_CENSUS_ANALYZER_TEST, "R233 accumulated-log collision regression fixture"),
+        ('["startup_epoch"] for signature in r233_signatures] == [1, 2]',
+         DX11_CENSUS_ANALYZER_TEST, "R233 repeated signature id epoch isolation assertion"),
+        ('== "0xBBBBBBBBBBBBBBBB"',
+         DX11_CENSUS_ANALYZER_TEST, "R233 latest-epoch compile evidence isolation assertion"),
+    ]
+    missing_r233_accumulated_log_signature_epoch = [
+        meaning
+        for token, source, meaning in r233_accumulated_log_signature_epoch_contract
+        if token not in source
+    ]
+    if missing_r233_accumulated_log_signature_epoch:
+        raise SystemExit(
+            "DX11 R233 accumulated-log signature epoch drift: "
+            + ", ".join(missing_r233_accumulated_log_signature_epoch)
         )
 
     verify_dx11_activation_boundary()
