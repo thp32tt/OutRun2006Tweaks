@@ -168,7 +168,7 @@ namespace OutRunVRStereo
 
             if (LeftDrawMayWriteDepth(device) ||
                 LeftDrawMayWriteStencil(device))
-                ++R9MainDepthContentSerial;
+                R9NoteMainDepthContentWrite();
 
             std::uintptr_t savedIdentity = 0;
             if (zeroDisparity)

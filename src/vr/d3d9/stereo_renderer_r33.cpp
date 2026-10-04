@@ -370,7 +370,7 @@ namespace OutRunVRStereo
             ++R9DrawCalls;
             R9MonoBackupGap = true;
             if (mayWriteDepth || mayWriteStencil)
-                ++R9MainDepthContentSerial;
+                R9NoteMainDepthContentWrite();
 
             R31OwnedResult result{ true, actualDraw() };
             if (FAILED(result.hr))
@@ -537,7 +537,7 @@ namespace OutRunVRStereo
             ++R9DrawCalls;
             R9MonoBackupGap = true;
             if (mayWriteDepth || mayWriteStencil)
-                ++R9MainDepthContentSerial;
+                R9NoteMainDepthContentWrite();
 
             R31OwnedResult result{ true, actualDraw() };
             if (FAILED(result.hr))

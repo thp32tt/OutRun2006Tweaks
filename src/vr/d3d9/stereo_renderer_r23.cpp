@@ -349,12 +349,7 @@ namespace OutRunVRStereo
 
             if (TrackedDepthStencil)
             {
-                std::uint64_t serial = std::max(
-                    R9MainDepthContentSerial, R9MonoDepthContentSerial);
-                if (++serial == 0)
-                    serial = 1;
-                R9MainDepthContentSerial = serial;
-                R9MonoDepthContentSerial = serial;
+                R9SynchronizeDepthContentSerials();
                 RightDepthSynchronized = true;
                 RightStencilSynchronized =
                     !SurfaceHasStencil(TrackedDepthStencil) || stencilSafe;
