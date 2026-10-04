@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - test/dx11-exhaustive-census-20261004
+      - test/dx11-xr-cadence-performance-20261004
   workflow_dispatch:
 
 concurrency:
