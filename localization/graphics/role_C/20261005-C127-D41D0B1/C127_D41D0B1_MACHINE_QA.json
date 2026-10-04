@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C127-D41D0B1",
+  "asset": "D41D0B1",
+  "queue_index": 112,
+  "producer_run": "B_PRODUCTION43",
+  "source_sha256": "524de4c0db3dbb69c6cda484ace71a9213a378e3e4895a035199ced0ac0a3617",
+  "candidate_sha256": "0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80",
+  "structure": {
+    "width": 2048,
+    "height": 256,
+    "linear_size": 524288,
+    "depth": 1,
+    "mips": 1,
+    "format": "DXT5",
+    "raw_orientation": "mirror_y"
+  },
+  "header_128_exact": true,
+  "clean_changed_pixels_outside_source_mask": 0,
+  "clean_source_mask_alpha_residue_pixels_gt16": 0,
+  "visible_pixels_outside_allowed_alpha_gt16": 0,
+  "alpha_changed_pixels_outside_allowed": 0,
+  "protected_visible_pixels_alpha_gt16": 0,
+  "residual_source_effect_pixels_outside_2px_target_guard_alpha_gt16": 0,
+  "residual_max_alpha": 0,
+  "target_visible_pixels_outside_allowed": 0,
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_pairs": [],
+  "decoded_row_gap": 17,
+  "multi_line_style_consistency_from_producer": "PASS_SHARED_SOURCE_FAMILY",
+  "rows": [
+    {
+      "n": 1,
+      "source": "Try to reach the goal",
+      "korean": "여자친구와 함께",
+      "original_bbox": [
+        435,
+        19,
+        1346,
+        122
+      ],
+      "localized_bbox": [
+        605,
+        23,
+        1174,
+        117
+      ],
+      "producer_decoded_localized_bbox": [
+        604,
+        23,
+        1176,
+        117
+      ],
+      "source_size": [
+        911,
+        103
+      ],
+      "localized_size": [
+        569,
+        94
+      ],
+      "delta_left": 170,
+      "delta_right": 172,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false
+    },
+    {
+      "n": 2,
+      "source": "with your girlfriend.",
+      "korean": "골에 도착하세요.",
+      "original_bbox": [
+        499,
+        122,
+        1357,
+        238
+      ],
+      "localized_bbox": [
+        638,
+        134,
+        1218,
+        226
+      ],
+      "producer_decoded_localized_bbox": [
+        638,
+        132,
+        1218,
+        228
+      ],
+      "source_size": [
+        858,
+        116
+      ],
+      "localized_size": [
+        580,
+        92
+      ],
+      "delta_left": 139,
+      "delta_right": 139,
+      "delta_top": 12,
+      "delta_bottom": 12,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}
