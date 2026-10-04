@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-04T14:41:18+09:00",
+  "updatedKst": "2026-10-04T17:50:06+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 910,
+  "cycle": 1000,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -57,9 +57,13 @@
     "VR-REFACTOR-STATE-0004S",
     "VR-REFACTOR-STATE-0004T",
     "VR-REFACTOR-STATE-0004T-FIX00",
-    "VR-REFACTOR-STATE-0004U"
+    "VR-REFACTOR-STATE-0004U",
+    "VR-REFACTOR-STATE-0004V",
+    "VR-REFACTOR-STATE-0004W",
+    "VR-REFACTOR-STATE-0004X",
+    "VR-REFACTOR-CI-0003"
   ],
-  "next": "Runtime-test exact source 338b534b8f4c72f28b70b864ad87149f0d7f9901: verify F11 is single in front-end/menu and binocularly single in gameplay. After consuming that Quest3/VDXR result, resume the structural plan from cycle 910; 90 structural cycles remain to 1000.",
+  "next": "The 1000-cycle DX9Ex structural review target is complete. Preserve exact source 245c35ca3ce07b304526312eab14d6f4c1f09ecd as the build-verified structural checkpoint. Runtime remains UNTESTED: next consume Quest3/VDXR evidence for the F11 gameplay overlay candidate and other open visual defects; do not treat build success as visual proof. Further DX9Ex work should be explicit maintenance/regression work, while normal autonomous backend implementation priority returns to DX11 Native and DXVK per AGENTS.md.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -116,11 +120,19 @@
     "VR-F11-OVERLAY-DIPLOPIA-001 user runtime evidence: F11 Tweaks/ImGui overlay is normal in menus but doubled after entering gameplay.",
     "RED verifier SHA 245bb082652ad50b46ab69e9d8b939a8a4fa8e9f failed exactly on missing external-overlay semantic isolation and missing explicit SCREEN_OVERLAY_2D ownership.",
     "Fix source 338b534b8f4c72f28b70b864ad87149f0d7f9901 scopes only open gameplay F11 ImGui submission as SCREEN_OVERLAY_2D and prevents external UI draws from consuming pending game NextDrawScope. Menu/front-end path is unchanged.",
-    "Exact source 338b534b passed DX9Ex Active Validation 37180295864 plus Domain Isolation and HUD Inspector. Runtime result is still UNTESTED; structural cycle remains 910."
+    "Exact source 338b534b passed DX9Ex Active Validation 37180295864 plus Domain Isolation and HUD Inspector. Runtime result is still UNTESTED; structural cycle remains 910.",
+    "Cycle 910->1000 completed as 18 bounded review batches (RB91..RB108) x 5 distinct lenses = exactly 90 structural review checks. Final exact-source audit on 245c35ca passed 90/90.",
+    "VR-REFACTOR-STATE-0004V: RED verifier bf5cc0b29dee724f4e8e2f44bc03037072f7fe24 exposed direct R29/R30 telemetry writes in R31-R33, repeated R9 draw/mono-gap accounting in R29-R33/R30-safe, and direct R13 DirectGPU readiness/ACK ownership in R32. Source 2e8b009669441bd4a775d30ae55120d1a75d802b moved those operations behind lower-layer owner APIs without changing classification, WVP math, or branch conditions.",
+    "VR-REFACTOR-STATE-0004W: RED verifier bc8fe03aafe9472f770c6d07a471b3106b83d450 found the active R26+R30 HUD path still reading R23GameDrawSerial directly. Source a238a63c3aa2d7de56ecf2162f96b911744b6b4e preserves the exact outer-draw serial+1 age rule through TopLevelDrawSerial().",
+    "VR-REFACTOR-STATE-0004X: RED verifier 4029551664dc60f5b6170f2dc74a43f24f456d40 found remaining safe-to-encapsulate R9 reads/rollback: main-depth generation in R20/R23/R33, draw-count reads in R20, depth-content increments and fallback draw-count rollback in R30/full-chain and R30-safe. Source 0eb45dfc197a46e0be453579f3cb270d765e62af routes them through R9MainDepthGenerationValue(), R9DrawCallCount(), R9NoteMainDepthContentWrite(), and R9UndoStereoDrawCount().",
+    "VR-REFACTOR-CI-0003: verifier commit 245c35ca3ce07b304526312eab14d6f4c1f09ecd fixes an exact-token false positive where R9MainDepthGenerationValue() contained the guarded legacy identifier as a substring; the guard now matches the standalone private token only.",
+    "Exact HEAD 245c35ca3ce07b304526312eab14d6f4c1f09ecd passed DX9Ex Active Validation 37189796899: policy, host, game, full-chain-compile and package SUCCESS. Domain Isolation Guard 37189796896 SUCCESS. Artifact 11299085399 uploaded; artifact digest e48745a951872e9bf32a5cce5c61b52bd080265ea8795d496cb069e779c78c96; inner package SHA256 b2888e906933ea34ec4741b2f34f9fc4e14cf344c8bc5fa76f670a0893054bdb.",
+    "No projection, eye transform, HUD/world semantic classification, Present ownership, wait, allocation, D3D getter, or hot-path synchronization was added by cycle 910->1000 owner cleanup. Shared frame/transport fields whose extraction could alter Present/interop behavior were intentionally deferred rather than mechanically moved.",
+    "F11 gameplay overlay fix remains included in the latest package, but Quest3/VDXR runtime validation is still required before VR-F11-OVERLAY-DIPLOPIA-001 can be marked fixed."
   ],
-  "batchStatus": "VR-F11-OVERLAY-DIPLOPIA-001_BUILD_VERIFIED_CYCLE_910",
-  "validatedSourceSha": "338b534b8f4c72f28b70b864ad87149f0d7f9901",
-  "validationRunId": 37180295864,
+  "batchStatus": "VR-REFACTOR-1000_BUILD_VERIFIED",
+  "validatedSourceSha": "245c35ca3ce07b304526312eab14d6f4c1f09ecd",
+  "validationRunId": 37189796899,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -128,18 +140,16 @@
     "game": "SUCCESS",
     "fullChainCompile": "SUCCESS",
     "package": "SUCCESS",
-    "domainIsolation": "SUCCESS",
-    "hudInspector": "SUCCESS",
-    "staticExeAnalysis": "SUCCESS"
+    "domainIsolation": "SUCCESS"
   },
   "testCandidate": {
-    "sourceSha": "338b534b8f4c72f28b70b864ad87149f0d7f9901",
-    "workflowRunId": 37180295864,
-    "artifactId": 11295123103,
-    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-338b534b8f4c72f28b70b864ad87149f0d7f9901",
-    "artifactSizeBytes": 2729108,
-    "artifactDigestSha256": "4ddf370d1de7b3aaf62141e25832f305bc798e3dad2df226fe058560ae2b51aa",
-    "innerPackageSha256": "a9719897662bd5bf5ede74724c1f74bedda95f051213fe586932bd22bdc1aa65",
+    "sourceSha": "245c35ca3ce07b304526312eab14d6f4c1f09ecd",
+    "workflowRunId": 37189796899,
+    "artifactId": 11299085399,
+    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-245c35ca3ce07b304526312eab14d6f4c1f09ecd",
+    "artifactSizeBytes": 2729309,
+    "artifactDigestSha256": "e48745a951872e9bf32a5cce5c61b52bd080265ea8795d496cb069e779c78c96",
+    "innerPackageSha256": "b2888e906933ea34ec4741b2f34f9fc4e14cf344c8bc5fa76f670a0893054bdb",
     "defaultProfile": "CORRECTNESS",
     "userRuntimeVerified": false
   }
