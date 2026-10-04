@@ -181,8 +181,8 @@ req(ffb, 'DI_FFNOMINALMAX', 'nominal DirectInput device gain')
 req(ffb, 'WheelFFB: scheduling DirectInput device reinitialization', 'device recovery path')
 req(ffb, 'SnowIceRoadTextureScale = 0.04f', 'snow/ice periodic attenuation')
 req(ffb, 'std::isfinite', 'non-finite input/output guards')
-req(wheel_ui, 'Settings::WheelFFBInvertForce = false;', 'R3 ConstantForce direction baseline is Reverse OFF')
-req(wheel_ui, 'Settings::WheelFFBInvertSpring = false;', 'R3 Spring direction baseline')
+req(wheel_ui, 'Settings::WheelFFBInvertForce = true;', 'R9 Modern R3 baseline restores Reverse ConstantForce ON')
+req(wheel_ui, 'Settings::WheelFFBInvertSpring = true;', 'R9 Modern R3 baseline restores Reverse Spring ON')
 req(wheel_ui, 'Settings::VibrationMode = 0;', 'R3 preset disables gamepad rumble')
 req(ffb, 'load={:.2f} slide={:.2f} scrub={:.2f}', 'separated load/slide/scrub diagnostics')
 req(ffb, 'step={:.5f} spdLen={:.5f} spdCorr={:.2f}', 'velocity diagnostic telemetry')
@@ -584,35 +584,33 @@ req(wrapper_block, 'Do not rewrite WheelFFBUsePeriodicEffects here.', 'wrapper d
 req(wheel_ui, 'Arcade Original (Lindbergh-derived)', 'F11 exposes Arcade Original model')
 req(wheel_ui, 'Arcade + Modern Hybrid', 'F11 exposes Arcade Hybrid model')
 req(wheel_ui, 'PS2 Original topology (Experimental)', 'F11 exposes PS2 experimental model')
-req(wheel_ui, '// Arcade Original\'s verified rough-surface path is periodic.', 'Arcade shortcut documents hardware periodic ownership')
-req(wheel_ui, '// The retail PS2 binary has explicit periodic download/update', 'PS2 shortcut documents verified periodic ownership')
+req(wheel_ui, 'auto apply_ffb_model_test_baseline = [&](int modelIndex)', 'FFB model selector owns complete R9 baselines')
+req(wheel_ui, 'FFB model + complete R9 test baseline applied:', 'model change reports complete baseline application')
+req(wheel_ui, 'Arcade/Hybrid/PS2 no longer require separate shortcut buttons', 'obsolete duplicate original-mode shortcut UI is removed')
+forbid(wheel_ui, 'ImGui::Button("Use Arcade Original")', 'Arcade model no longer depends on a second shortcut button')
+forbid(wheel_ui, 'ImGui::Button("Use Arcade Hybrid")', 'Hybrid model no longer depends on a second shortcut button')
+forbid(wheel_ui, 'ImGui::Button("Use PS2 Original (Experimental)")', 'PS2 model no longer depends on a second shortcut button')
+model_baseline = wheel_ui[wheel_ui.find('auto apply_ffb_model_test_baseline'):wheel_ui.find('static constexpr const char* FfbModelNames')]
+req(model_baseline, 'Settings::WheelFFBModel = 0;', 'Modern baseline is complete')
+req(model_baseline, 'Settings::WheelFFBInvertForce = true;', 'Modern baseline uses hardware-tested ConstantForce polarity')
+req(model_baseline, 'Settings::WheelFFBInvertSpring = true;', 'Modern baseline uses hardware-tested Spring polarity')
+req(model_baseline, 'Settings::WheelFFBModel = 1;', 'Arcade Original baseline is complete')
+req(model_baseline, 'Settings::WheelFFBModel = 2;', 'Arcade Hybrid baseline is complete')
+req(model_baseline, 'Settings::WheelFFBModel = 3;', 'PS2 baseline is complete')
+if model_baseline.count('Settings::WheelFFBInvertForce = false;') < 3 or model_baseline.count('Settings::WheelFFBInvertSpring = false;') < 3:
+    raise SystemExit('CURRENT VERIFY FAILED [Arcade/Hybrid/PS2 polarity baselines must all be Reverse OFF]')
+if model_baseline.count('Settings::WheelFFBUsePeriodicEffects = false;') < 4:
+    raise SystemExit('CURRENT VERIFY FAILED [all R9 model baselines must prefer reliable ConstantForce tactile fallback on R3]')
+req(model_baseline, 'Settings::WheelFFBSpringStrength = 0.50f;', 'Arcade Original preserves OutRun2Real spring baseline')
+req(model_baseline, 'Settings::WheelFFBWallImpact = 1.0f;', 'Arcade modes preserve one-to-one wall host scale')
+req(model_baseline, 'Settings::WheelFFBPS2HostGain = 2.0f;', 'PS2 baseline retains DD host compensation')
+req(model_baseline, 'Settings::WheelFFBWallImpact = 0.75f;', 'PS2 baseline enables shared host collision tactile assist')
 physics_preset = wheel_ui[wheel_ui.find('if (ImGui::Button("Load MOZA R3 Physics SAT"))'):wheel_ui.find('if (ImGui::Button("Load MOZA R3 Natural SAT"))')]
-natural_preset = wheel_ui[wheel_ui.find('if (ImGui::Button("Load MOZA R3 Natural SAT"))'):wheel_ui.find('if (ImGui::Button("Use Arcade Original"))')]
-req(physics_preset, 'Settings::WheelFFBUsePeriodicEffects = false;', 'MOZA R3 Physics SAT keeps ConstantForce tactile compatibility default')
-req(natural_preset, 'Settings::WheelFFBUsePeriodicEffects = false;', 'MOZA R3 Natural SAT keeps ConstantForce tactile compatibility default')
-forbid(physics_preset, 'Settings::WheelFFBUsePeriodicEffects = true;', 'Modern R3 Physics preset cannot silently re-enable weak hardware Sine path')
-forbid(natural_preset, 'Settings::WheelFFBUsePeriodicEffects = true;', 'Modern R3 Natural preset cannot silently re-enable weak hardware Sine path')
-original_shortcut = wheel_ui[wheel_ui.find('if (ImGui::Button("Use Arcade Original"))'):wheel_ui.find('if (ImGui::Button("Use Arcade Hybrid"))')]
-hybrid_shortcut = wheel_ui[wheel_ui.find('if (ImGui::Button("Use Arcade Hybrid"))'):wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))')]
-ps2_shortcut_start = wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))')
-ps2_shortcut_end = wheel_ui.find('if (!Settings::UseNewInput)', ps2_shortcut_start)
-ps2_shortcut = wheel_ui[ps2_shortcut_start:ps2_shortcut_end]
-for block, label in (
-    (original_shortcut, 'Arcade Original shortcut'),
-    (hybrid_shortcut, 'Arcade Hybrid shortcut'),
-    (ps2_shortcut, 'PS2 Original shortcut'),
-):
-    req(block, 'Settings::WheelFFBUsePeriodicEffects = true;', label + ' enables hardware periodic path')
-    forbid(block, 'Settings::WheelFFBUsePeriodicEffects = false;', label + ' never disables verified periodic path')
-    if label != 'PS2 Original shortcut':
-        req(block, 'Settings::WheelFFBGearShift = 1.0f;', label + ' restores observed Arcade gear Sine amplitude')
-        req(block, 'Settings::WheelFFBRoadTexture = 1.0f;', label + ' restores one-to-one Arcade road/surface host scaling')
-        req(block, 'Settings::WheelFFBWallImpact = 1.0f;', label + ' restores one-to-one Arcade wall host scaling')
-req(original_shortcut, 'Settings::WheelFFBSpringStrength = 0.50f;', 'Arcade Original shortcut restores OutRun2Real 50% SpringStrength')
-req(original_shortcut, 'Settings::WheelFFBSpringSaturation = 1.00f;', 'Arcade Original shortcut restores Springi 0.50 saturation behavior')
-req(original_shortcut, 'Settings::WheelFFBDamperStrength = 0.0f;', 'Arcade Original shortcut restores OutRun2Real no-damper baseline')
-req(original_shortcut, 'Settings::WheelFFBUseHardwareDamper = false;', 'Arcade Original shortcut does not leave stale hardware Damper active')
-forbid(hybrid_shortcut, 'Settings::WheelFFBSpringStrength = 0.50f;', 'Arcade Hybrid does not inherit Original condition baseline')
+natural_preset = wheel_ui[wheel_ui.find('if (ImGui::Button("Load MOZA R3 Natural SAT"))'):wheel_ui.find('Arcade/Hybrid/PS2 no longer require separate shortcut buttons')]
+req(physics_preset, 'Settings::WheelFFBUsePeriodicEffects = false;', 'Modern Physics preset keeps reliable ConstantForce tactile transport')
+req(natural_preset, 'Settings::WheelFFBUsePeriodicEffects = false;', 'Modern Natural preset keeps reliable ConstantForce tactile transport')
+req(physics_preset, 'Settings::WheelFFBInvertForce = true;', 'Modern Physics preset polarity matches R3 hardware run')
+req(physics_preset, 'Settings::WheelFFBInvertSpring = true;', 'Modern Physics Spring polarity matches R3 hardware run')
 req(ps2, 'speedRaw / 0.875f', 'PS2 retail drive factor recovered from SLPM')
 req(ps2, 'RetailSpringSaturationBase = 15', 'PS2 retail spring saturation base')
 req(ps2, 'RetailSpringSaturationSpan = 45', 'PS2 retail spring saturation speed span')
@@ -666,9 +664,9 @@ req(ffb, 'WheelFFBPS2::damper_coefficient_norm(ps2DriveFactor)', 'PS2 runtime us
 ps2_event_start = ffb.find('else if (ps2Original)')
 ps2_event_end = ffb.find('else\n                    {', ps2_event_start)
 ps2_event_block = ffb[ps2_event_start:ps2_event_end]
-req(ps2_event_block, 'no verified non-zero retail ConstantForce caller', 'PS2 collision path documents the missing retail non-zero caller')
-req(ps2_event_block, 'event output suppressed', 'PS2 C2C collision is diagnostic-only until retail evidence exists')
-forbid(ps2_event_block, 'result +=', 'PS2 Original does not synthesize an unverified C2C collision ConstantForce')
+req(ps2_event_block, 'retail directional ConstantForce remains suppressed', 'PS2 keeps unverified retail directional collision output disabled')
+req(ps2_event_block, 'shared host tactile pulse active', 'PS2 reports the explicit PC/DD collision tactile assist')
+forbid(ps2_event_block, 'crashImpactDirection_', 'PS2 host collision assist cannot masquerade as an unverified retail directional force')
 forbid(ps2_event_block, 'translatedSeverity', 'removed provisional PS2 collision magnitude translation cannot return')
 req(ffb, ': (arcadeOriginal || ps2Original\n                    ? false\n                    : crashImpulseTimer_ > CrashCooldownFrames);', 'PS2 Original and Arcade Original condition backbones are not suppressed by Modern collision interaction')
 forbid(ffb, 'crashImpulseForce_ * 0.45f', 'arbitrary PS2 collision multiplier removed')
@@ -676,8 +674,8 @@ forbid(ffb, '(ps2Original ? 0.12f : 0.20f)', 'unsupported PS2 gear thunk removed
 req(ffb, 'else if (!ps2Original)', 'PS2 original mode emits no unverified generic gear-shift thunk')
 req(wheel_ui, 'PS2 Original: gear-shift FFB stays disabled until a retail PS2 effect caller is verified.', 'F11 marks PS2 gear effect unavailable pending retail evidence')
 req(wheel_ui, 'Arcade: Road Detail / Collision / Gear Shift at 1.00 preserve reconstructed source amplitude', 'F11 documents Arcade host-scaler semantics')
-req(wheel_ui, 'const bool modelUsesCollisionEvent = activeFfbModel != 3;', 'F11 disables Collision control in PS2 Original')
-req(wheel_ui, 'collision ConstantForce stays disabled until a non-zero retail event caller is verified.', 'F11 explains why PS2 Collision is disabled')
+req(wheel_ui, 'controls the shared PC/DD collision tactile pulse.', 'F11 labels PS2 Collision as a host tactile assist')
+req(wheel_ui, 'Retail directional ConstantForce remains disabled', 'F11 preserves the PS2 retail evidence boundary')
 req(ffb, 'GUID_Triangle', 'PS2 retail Type 4 is translated to DirectInput Triangle')
 req(ps2, 'float triangle_wave(float phaseCycles)', 'PS2 software fallback uses an explicit Triangle waveform')
 req(ffb, 'synth_ps2_triangle_fallback(', 'PS2 Triangle remains Triangle when hardware periodic is unavailable')
@@ -734,9 +732,7 @@ req(profiles, 'inspect_regular_file(backup, backupExists, "the profile backup")'
 forbid(profiles, 'if (!finalExists && std::filesystem::is_regular_file(backup, ec) && !ec)', 'backup probe no longer treats missing backup as filesystem failure')
 
 
-# r4-arcade-wall-ps2-caster regression guards
-req(ffb, '"WheelFFB", "InvertForce", false', 'clean-install ConstantForce direction baseline is Reverse OFF')
-req(wheel_ui, 'Settings::WheelFFBInvertForce = false;', 'reference presets explicitly restore Reverse OFF')
+# R9 hardware-log polarity / model-isolation guards
 req(ffb, 'Setting<float> WheelFFBPS2HostGain', 'PS2 has an independent host-side DD compensation gain')
 req(ffb, 'const float modelOutputStrength =', 'PS2 host gain is applied at the host/output boundary')
 req(wheel_ui, '"PS2 Host Gain"', 'F11 exposes PS2 host gain separately from recovered retail formulas')
@@ -747,38 +743,16 @@ req(ffb, 'car->field_coli_281, car->field_282, car->field_283', 'runtime samples
 req(ffb, '"WheelFFB: course/wall collision edge timer={}', 'dedicated course/wall edge is diagnostic and testable')
 req(stage_map, 'field_283', 'stage/collision map records the dedicated course-collision timer witness')
 req(read('docs/reverse/LINDBERGH_FFB_MAP.md'), 'ffwall = 0x08273FAC', 'Fake ffwall evidence is documented without promoting it as a force signal')
-
-# r5 live preset-isolation guards
-arcade_original_start = wheel_ui.find('if (ImGui::Button("Use Arcade Original"))')
-arcade_hybrid_start = wheel_ui.find('if (ImGui::Button("Use Arcade Hybrid"))')
-ps2_original_start = wheel_ui.find('if (ImGui::Button("Use PS2 Original (Experimental)"))')
-req(str(arcade_original_start), '', 'Arcade Original shortcut location evaluated')
-if min(arcade_original_start, arcade_hybrid_start, ps2_original_start) < 0:
-    raise AssertionError('reference preset shortcut block missing')
-arcade_original_block = wheel_ui[arcade_original_start:arcade_hybrid_start]
-arcade_hybrid_block = wheel_ui[arcade_hybrid_start:ps2_original_start]
-ps2_original_block = wheel_ui[ps2_original_start:wheel_ui.find('if (!Settings::UseNewInput)', ps2_original_start)]
-req(arcade_original_block, 'Settings::WheelFFBInvertSpring = false;', 'Arcade Original restores safe spring polarity')
-req(ps2_original_block, 'Settings::WheelFFBInvertSpring = false;', 'PS2 Original restores safe spring polarity')
-req(arcade_hybrid_block, 'Settings::WheelFFBUseHardwareSpring = true;', 'Hybrid restores Modern hardware spring ownership')
-req(arcade_hybrid_block, 'Settings::WheelFFBUseHardwareDamper = true;', 'Hybrid restores Modern hardware damper ownership')
-req(arcade_hybrid_block, 'Settings::WheelFFBSpringStrength = 0.65f;', 'Hybrid cannot inherit Arcade Original 0.50 spring')
-req(arcade_hybrid_block, 'Settings::WheelFFBSpringSaturation = 0.95f;', 'Hybrid cannot inherit Original/PS2 spring saturation')
-req(arcade_hybrid_block, 'Settings::WheelFFBDamperStrength = 0.28f;', 'Hybrid cannot inherit Arcade Original zero damper')
-req(arcade_hybrid_block, 'Settings::WheelFFBMechanicalTrail = 0.25f;', 'Hybrid restores Modern mechanical/caster baseline')
-req(arcade_hybrid_block, 'Settings::WheelFFBTireSlip = 0.20f;', 'Hybrid restores Modern tire-slip baseline')
-req(arcade_hybrid_block, 'Settings::WheelFFBInvertForce = false;', 'Hybrid restores ConstantForce polarity')
-req(arcade_hybrid_block, 'Settings::WheelFFBInvertSpring = false;', 'Hybrid restores spring polarity')
-req(ffb, 'const bool arcadeOriginal =', 'runtime distinguishes Arcade Original from Hybrid for condition-force coexistence')
-req(ffb, 'const bool arcadeHybrid =', 'runtime distinguishes Arcade Hybrid from Original for impact unloading')
+req(ffb, 'const bool arcadeOriginal =', 'runtime distinguishes Arcade Original from Hybrid')
+req(ffb, 'const bool arcadeHybrid =', 'runtime distinguishes Arcade Hybrid from Original')
 req(ffb, 'arcadeOriginal || ps2Original\n                    ? false', 'Arcade Original and PS2 keep condition backbone during impact events')
 req(ffb, 'OutRun2Real keeps its infinite Spring and Constant effects in\n            // separate SDL effect slots.', 'source-faithful Arcade Original effect coexistence is documented in code')
-print('OK [R5 preset isolation + Arcade Original spring coexistence + R4 guards]')
+print('OK [R9 model polarity + original-mode isolation + course collision guards]')
 
 # r7 review100 fixes
 forbid(build, 'normalize_legacy_preset(true);', 'legacy numeric signature migration cannot run every physics tick')
-req(build, 'Range<int>{ 0, 6 }', 'feel revision records the R7 migration boundary')
-forbid(build, 'Settings::WheelFFBInvertForce = true;', 'legacy migration cannot reintroduce reversed ConstantForce')
+req(build, 'Range<int>{ 0, 7 }', 'feel revision records the R9 hardware migration boundary')
+req(build, 'Settings::WheelFFBInvertForce = modern;', 'R9 migration derives ConstantForce polarity from active model')
 req(profiles, 'Version = 2', 'named FFB profiles use deterministic-baseline schema version')
 req(profiles, 'canonical_ffb_profile_default(', 'partial FFB profiles start from deterministic canonical baseline')
 req(profiles, 'canonical_ffb_profile_default(\n        std::string_view key, int model)', 'canonical FFB baseline is model-aware')
@@ -797,13 +771,13 @@ if build.count('if (migrationModel == WheelFFBMath::Model::ModernDD)') < 3:
     raise SystemExit('CURRENT VERIFY FAILED [Modern-only feel migrations are not consistently model-gated]')
 print('OK [revision 1/2/4 feel retunes are gated to Modern DD]')
 req(build, 'migrationModel == WheelFFBMath::Model::ModernDD\n                        ? normalize_legacy_preset(false)\n                        : false;', 'legacy numeric preset normalization cannot rewrite Arcade/Hybrid/PS2 state')
-req(build, 'Settings::WheelFFBFeelRevision = 6;\n                    WheelFFB_ResetHeadroomStats();', 'current Universal preset stamps the current feel revision')
+req(build, 'Settings::WheelFFBFeelRevision = 7;\n                    WheelFFB_ResetHeadroomStats();', 'current Universal preset stamps the R9 feel revision')
 req(build, 'void apply_universal_physics_preset()\n    {\n        Settings::WheelFFBEnable = true;\n        // These helpers replace the original F11 button blocks', 'Universal Physics preset helper is the intercepted F11 owner')
 physics_helper = build[build.find('void apply_universal_physics_preset()'):build.find('void apply_universal_natural_preset()')]
 natural_helper = build[build.find('void apply_universal_natural_preset()'):build.find('bool normalize_legacy_preset(')]
 req(physics_helper, 'Settings::WheelFFBModel = 0;', 'Universal Physics preset restores Modern DD model ID')
 req(natural_helper, 'Settings::WheelFFBModel = 0;', 'Universal Natural preset restores Modern DD model ID')
-req(math, 'DeepSlipMechanicalBoost = 1.50f', 'deep-slip mechanical reinforcement is strengthened')
+req(math, 'DeepSlipMechanicalBoost = 1.70f', 'R9 deep-slip mechanical reinforcement is strengthened')
 req(math, 'combined_sat_shape_with_deep_slip_boost(', 'deep-slip reinforcement survives final normalization')
 req(ffb, 'WheelFFBMath::combined_sat_shape_with_deep_slip_boost(', 'runtime consumes non-cancelled deep-slip SAT')
 req(math, 'impact_direction_from_lateral(', 'neutral head-on collision direction helper exists')
@@ -818,6 +792,16 @@ req(ffb, 'if (!tireSlipEffect_)', 'slip hardware/fallback transport is channel-i
 req(ffb, 'hardware periodic set is partial', 'partial periodic hardware support is retained')
 req(ffb, 'only this channel falls back to ConstantForce', 'runtime periodic failure releases only the failed channel')
 req(ffb, 'zero-output probe failed', 'condition/periodic compatibility uses real zero-output probes')
+req(math, 'primary_asphalt_water_false_positive(', 'Imperial Avenue primary-asphalt false-water classifier exists')
+req(math, 'uniqueStage != 14', 'false-water correction is evidence-scoped to Imperial Avenue')
+req(ffb, 'contact_tactile_envelope(', 'runtime preserves per-wheel tactile coverage')
+req(ffb, 'common_contact_tactile_amplitude(', 'runtime converts contact coverage to bounded tactile amplitude')
+req(ffb, 'roadAmp = std::max(roadAmp, commonContactTactile);', 'common tactile fills silent Arcade/PS2 curb cases without replacing stronger native effects')
+req(math, '0.28f * std::clamp(contactEnvelope', 'common contact tactile is capped and normalized')
+req(math, 'collision_tactile_pulse(', 'direction-independent collision tactile helper exists')
+req(ffb, 'Always provide a short alternating collision texture.', 'all models receive shared wall-impact tactile texture')
+req(ffb, 'shared host tactile pulse active', 'PS2 collision compatibility assist remains explicitly non-retail')
+
 req(ffb, 'telemetryNow - lastTelemetryTick_ >= 200', 'high-volume telemetry is reduced to 5Hz')
 req(ffb, 'telemetryNow - lastTelemetryDetailTick_ >= 1000', 'deep telemetry detail is limited to 1Hz')
 print('OK [R7 review100 correctness/compatibility guards]')
