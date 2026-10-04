@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00337",
+  "production_id": "CONVERSION-DXVK-00336",
+  "event_id": "CONVERSION-DXVK-00336-E005",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "9e56431ea950237f91e08b33b776e7d7d0769158",
+  "result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX11-00337]",
+  "selected_work_item": "DX11_R232_LATEST_STARTUP_SUMMARY_PAIRING",
+  "summary": "R232 prevents a periodic census summary from an older process epoch in an accumulated source log from being used as current translation-exactness evidence after a newer startup. Historical LatestSummariesByLog remains available, while CurrentSummariesByLog and LatestStartupSummaryByLog fail closed when the latest startup has no subsequent summary.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00337.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 HEAD 9e56431ea950237f91e08b33b776e7d7d0769158. Read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md and Set05, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_AUTODEV_STATE.json, VR_RUN_STATE.md, VR_REGRESSION_KNOWLEDGE.json and VR_PROBLEM_HISTORY.md. R225-R231 durable work is preserved and was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R226 chooses the latest periodic summary independently per source log, but an accumulated log ending startupA/summaryA/startupB still exposes summaryA as current exactness evidence. R231 already binds bootstrap outcomes to the latest startup epoch; periodic summaries need the same fail-closed epoch pairing.",
+      "review_lenses": {
+        "architecture": "Offline DX11 census analyzer/test/verifier only; vr-d3d9ex-focus and runtime renderer routing remain untouched.",
+        "ownership_lifetime": "No D3D9/D3D11 COM, resource generation, Reset, fence or consumer-ACK lifetime changes.",
+        "stereo_correctness": "No WVP, projection, HUD, sky/effects, recenter or eye-rendering changes.",
+        "performance": "Offline log parsing/report aggregation only; runtime hot path unchanged.",
+        "adversarial": "Accumulated-log fixture proves an older exact summary is retained historically but excluded from current exactness after a newer startup; a second log with a post-startup summary remains current."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added per-log latest summary line positions; LatestStartupSummaryByLog and CurrentSummariesByLog; current-summary missing/completeness diagnostics; exactness aggregation now consumes only current summaries for logs with startup epochs while legacy logs without startup markers retain their latest summary; added R232 regression fixture and source-graph drift guards."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING_EXACT_SHA_GATE",
+      "automation_validation": "PENDING",
+      "evidence": "Required exact-SHA Backend Conversion Gate will validate Python syntax/regressions, source graph, dormant activation, Win32 build/binary and DX11 readiness smoke. No HMD/game runtime validation performed."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA_PUBLICATION",
+      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census evidence-integrity/reporting change only; no runtime distributable identity change intended."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false,
+      "exact_next_action": "After exact-SHA Backend Conversion Gate PASS, persist task/lane bookkeeping separately while keeping RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "regression_assessment": {
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "runtime_risk_paths_touched": false,
+    "evidence": "Changed paths are offline analyzer/test/verifier plus task bookkeeping only. No direct runtime regression riskPath is modified; NativeDrawPath remains dormant."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00337",
+    "production_id": "CONVERSION-DXVK-00336",
+    "event_id": "CONVERSION-DXVK-00336-E005",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Publish the R232 material result without CI skip and require its exact-SHA Backend Conversion Gate."
+}

@@ -403,6 +403,7 @@ def main() -> int:
     source_logs: list[str] = []
     latest_startup_line_by_log: dict[str, int] = {}
     latest_bootstrap_outcome_line_by_log: dict[str, int] = {}
+    latest_summary_line_by_log: dict[str, int] = {}
 
     for log_path in log_files:
         try:
@@ -473,6 +474,7 @@ def main() -> int:
                 summary = int_fields(match)
                 summary["source_log"] = source_log
                 summaries.append(summary)
+                latest_summary_line_by_log[source_log] = line_number
                 continue
 
             match = SIGNATURE_RE.search(line)
@@ -634,9 +636,10 @@ def main() -> int:
         for source_log in source_logs
         if source_log in latest_summaries_by_log
     ]
-    all_source_logs_have_summary = bool(source_logs) and (
+    all_source_logs_have_periodic_summary = bool(source_logs) and (
         len(latest_summaries) == len(source_logs)
     )
+    all_source_logs_have_summary = all_source_logs_have_periodic_summary
     latest = latest_summaries[-1] if latest_summaries else None
 
     # R228: R227 made startup/bootstrap entries attributable, but callers still
@@ -695,6 +698,48 @@ def main() -> int:
     all_source_logs_latest_startup_has_bootstrap_outcome = bool(source_logs) and (
         len(latest_startup_bootstrap_outcome_by_log) == len(source_logs)
     )
+    # R232: R226 isolates the latest periodic summary per source log, but an
+    # accumulated log may append a newer startup after that summary. Preserve
+    # historical LatestSummariesByLog for provenance while excluding a summary
+    # that predates the latest startup from current exactness aggregation.
+    latest_startup_summary_by_log = {
+        source_log: latest_summaries_by_log[source_log]
+        for source_log in source_logs
+        if source_log in latest_startup_line_by_log
+        and source_log in latest_summary_line_by_log
+        and latest_summary_line_by_log[source_log] > latest_startup_line_by_log[source_log]
+    }
+    latest_startup_missing_summary_logs = sorted(
+        set(latest_startup_by_log) - set(latest_startup_summary_by_log)
+    )
+    all_logs_with_startup_have_latest_summary = (
+        len(latest_startup_summary_by_log) == len(latest_startup_by_log)
+    )
+    current_summaries_by_log = {
+        source_log: latest_summaries_by_log[source_log]
+        for source_log in source_logs
+        if source_log in latest_summaries_by_log
+        and (
+            source_log not in latest_startup_line_by_log
+            or (
+                source_log in latest_summary_line_by_log
+                and latest_summary_line_by_log[source_log]
+                > latest_startup_line_by_log[source_log]
+            )
+        )
+    }
+    current_summary_missing_logs = sorted(
+        set(source_logs) - set(current_summaries_by_log)
+    )
+    latest_summaries = [
+        current_summaries_by_log[source_log]
+        for source_log in source_logs
+        if source_log in current_summaries_by_log
+    ]
+    all_source_logs_have_summary = bool(source_logs) and (
+        len(latest_summaries) == len(source_logs)
+    )
+    latest = latest_summaries[-1] if latest_summaries else None
     all_source_logs_have_startup = bool(source_logs) and (
         len(latest_startup_by_log) == len(source_logs)
     )
@@ -899,7 +944,13 @@ def main() -> int:
     summary_coverage = {
         "SourceLogs": len(source_logs),
         "LogsWithPeriodicSummary": len(latest_summaries_by_log),
-        "AllSourceLogsHavePeriodicSummary": all_source_logs_have_summary,
+        "AllSourceLogsHavePeriodicSummary": all_source_logs_have_periodic_summary,
+        "LogsWithCurrentPeriodicSummary": len(current_summaries_by_log),
+        "CurrentSummaryMissingLogs": current_summary_missing_logs,
+        "AllSourceLogsHaveCurrentPeriodicSummary": all_source_logs_have_summary,
+        "LogsWithLatestStartupSummary": len(latest_startup_summary_by_log),
+        "LatestStartupMissingSummaryLogs": latest_startup_missing_summary_logs,
+        "AllLogsWithStartupHaveLatestSummary": all_logs_with_startup_have_latest_summary,
     }
 
     fixed_function_detailed_stage_demand = summarize_fixed_function_detailed_stage_demand(
@@ -915,7 +966,7 @@ def main() -> int:
         status = "NO_DX11_CENSUS_LOG"
     elif not summaries:
         status = "CENSUS_ACTIVE_NO_PERIODIC_SUMMARY"
-    elif unsupported_total != 0:
+    elif latest_summaries and unsupported_total != 0:
         status = "UNSUPPORTED_BEHAVIOR_OBSERVED"
     elif not all_source_logs_have_summary:
         status = "TRANSLATION_EXACTNESS_PENDING"
@@ -1009,6 +1060,8 @@ def main() -> int:
         "StartupBootstrapCoverage": startup_bootstrap_coverage,
         "LatestSummary": latest,
         "LatestSummariesByLog": latest_summaries_by_log,
+        "CurrentSummariesByLog": current_summaries_by_log,
+        "LatestStartupSummaryByLog": latest_startup_summary_by_log,
         "SummaryCoverage": summary_coverage,
         "AllSummaries": summaries,
         "UnsupportedTotalLatest": unsupported_total,

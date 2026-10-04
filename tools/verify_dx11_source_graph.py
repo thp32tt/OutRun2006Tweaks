@@ -9120,6 +9120,38 @@ def main() -> None:
             + ", ".join(missing_r231_latest_startup_bootstrap_pairing)
         )
 
+
+    r232_latest_startup_summary_pairing_contract = [
+        ("latest_summary_line_by_log: dict[str, int] = {}",
+         DX11_CENSUS_ANALYZER, "R232 latest summary position map"),
+        ("latest_startup_summary_by_log = {",
+         DX11_CENSUS_ANALYZER, "R232 latest startup/summary pairing map"),
+        ("current_summaries_by_log = {",
+         DX11_CENSUS_ANALYZER, "R232 current summary exactness source"),
+        ('"LogsWithCurrentPeriodicSummary": len(current_summaries_by_log)',
+         DX11_CENSUS_ANALYZER, "R232 current summary coverage count"),
+        ('"AllSourceLogsHaveCurrentPeriodicSummary": all_source_logs_have_summary',
+         DX11_CENSUS_ANALYZER, "R232 fail-closed current summary coverage"),
+        ('"LatestStartupSummaryByLog": latest_startup_summary_by_log',
+         DX11_CENSUS_ANALYZER, "R232 current startup/summary report export"),
+        ("r232_latest_startup_summary_pairing = run_cases(",
+         DX11_CENSUS_ANALYZER_TEST, "R232 accumulated-log regression fixture"),
+        ('"session-a-stale-summary.log"',
+         DX11_CENSUS_ANALYZER_TEST, "R232 stale summary rejection fixture"),
+        ('"AllSourceLogsHaveCurrentPeriodicSummary": False',
+         DX11_CENSUS_ANALYZER_TEST, "R232 latest-startup fail-closed assertion"),
+    ]
+    missing_r232_latest_startup_summary_pairing = [
+        meaning
+        for token, source, meaning in r232_latest_startup_summary_pairing_contract
+        if token not in source
+    ]
+    if missing_r232_latest_startup_summary_pairing:
+        raise SystemExit(
+            "DX11 R232 latest startup/summary pairing drift: "
+            + ", ".join(missing_r232_latest_startup_summary_pairing)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

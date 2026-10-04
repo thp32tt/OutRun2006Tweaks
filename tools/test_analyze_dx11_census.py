@@ -684,6 +684,12 @@ def main() -> int:
         "SourceLogs": 2,
         "LogsWithPeriodicSummary": 2,
         "AllSourceLogsHavePeriodicSummary": True,
+        "LogsWithCurrentPeriodicSummary": 2,
+        "CurrentSummaryMissingLogs": [],
+        "AllSourceLogsHaveCurrentPeriodicSummary": True,
+        "LogsWithLatestStartupSummary": 0,
+        "LatestStartupMissingSummaryLogs": [],
+        "AllLogsWithStartupHaveLatestSummary": True,
     }
     assert set(r226_multi_log_summary["LatestSummariesByLog"]) == {
         "session-a-unsupported.log",
@@ -730,6 +736,12 @@ def main() -> int:
         "SourceLogs": 2,
         "LogsWithPeriodicSummary": 1,
         "AllSourceLogsHavePeriodicSummary": False,
+        "LogsWithCurrentPeriodicSummary": 1,
+        "CurrentSummaryMissingLogs": ["session-a-no-summary.log"],
+        "AllSourceLogsHaveCurrentPeriodicSummary": False,
+        "LogsWithLatestStartupSummary": 0,
+        "LatestStartupMissingSummaryLogs": [],
+        "AllLogsWithStartupHaveLatestSummary": True,
     }
 
     r227_multi_log_startup_bootstrap = run_cases(
@@ -987,6 +999,76 @@ def main() -> int:
         "DiagnosticOnly": True,
         "ActivationProof": False,
     }
+
+
+    r232_latest_startup_summary_pairing = run_cases(
+        {
+            "session-a-stale-summary.log": (
+                "VR DX11 R71 census: observed=1 size=1280x720 sourceFormat=21 "
+                "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+                "VR DX11 R73 census: samples=4 exact=4 fixedFn=4 programmable=0 "
+                "topologyUnsupported=0 signatures=1 declSamples=0 indexedSamples=0 "
+                "texturedSamples=0 "
+                "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+                "mutationTelemetryRequired=0,managedShadowRequired=0,"
+                "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+                "depthUnsupported=0] "
+                "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+                "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+                "depthCmp=0,cull=0]\n"
+                "VR DX11 R71 census: observed=1 size=1920x1080 sourceFormat=22 "
+                "nativeFormat=29 msaa=0 bootstrapCompatible=1\n"
+            ),
+            "session-b-current-summary.log": (
+                "VR DX11 R71 census: observed=1 size=1280x720 sourceFormat=21 "
+                "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+                "VR DX11 R73 census: samples=4 exact=4 fixedFn=4 programmable=0 "
+                "topologyUnsupported=0 signatures=1 declSamples=0 indexedSamples=0 "
+                "texturedSamples=0 "
+                "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+                "mutationTelemetryRequired=0,managedShadowRequired=0,"
+                "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+                "depthUnsupported=0] "
+                "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+                "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+                "depthCmp=0,cull=0]\n"
+            ),
+        }
+    )
+    assert set(r232_latest_startup_summary_pairing["LatestSummariesByLog"]) == {
+        "session-a-stale-summary.log",
+        "session-b-current-summary.log",
+    }
+    assert set(r232_latest_startup_summary_pairing["CurrentSummariesByLog"]) == {
+        "session-b-current-summary.log",
+    }
+    assert set(r232_latest_startup_summary_pairing["LatestStartupSummaryByLog"]) == {
+        "session-b-current-summary.log",
+    }
+    assert r232_latest_startup_summary_pairing["SummaryCoverage"] == {
+        "SourceLogs": 2,
+        "LogsWithPeriodicSummary": 2,
+        "AllSourceLogsHavePeriodicSummary": True,
+        "LogsWithCurrentPeriodicSummary": 1,
+        "CurrentSummaryMissingLogs": ["session-a-stale-summary.log"],
+        "AllSourceLogsHaveCurrentPeriodicSummary": False,
+        "LogsWithLatestStartupSummary": 1,
+        "LatestStartupMissingSummaryLogs": ["session-a-stale-summary.log"],
+        "AllLogsWithStartupHaveLatestSummary": False,
+    }
+    assert r232_latest_startup_summary_pairing["Status"] == "TRANSLATION_EXACTNESS_PENDING"
+    assert (
+        r232_latest_startup_summary_pairing["ActivationEvidence"]["CensusExactness"][
+            "Samples"
+        ]
+        == 4
+    )
+    assert (
+        r232_latest_startup_summary_pairing["ActivationEvidence"]["CensusExactness"][
+            "AllSampledExact"
+        ]
+        is False
+    )
 
     r106 = run_case(
         "VR DX11 R85 signature#1: primitive=4 fixedFn=1\n"
