@@ -7,15 +7,15 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "b64803806c5a9252aaf343449518be6faac74bc8",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "material_result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "0616da4d1a1a79b1eb0f6e512b9b16d73464f64f",
+  "material_result_sha": "0616da4d1a1a79b1eb0f6e512b9b16d73464f64f",
+  "validation_bearing_result_sha": "0616da4d1a1a79b1eb0f6e512b9b16d73464f64f",
   "result_marker": "[AUTO:CONVERSION-DX11-00365]",
   "selected_work_item": "DX11_R246_PROGRAMMABLE_CONSTANT_SLOT_BINDING_RECEIPT",
   "summary": "R246 adds a dormant fail-closed programmable constant-slot binding receipt on top of validated R245 payload upload. It binds the R244-owned/R245-populated constant buffers to VS b0 and PS b0 on the exact immediate D3D11 context, reads both slots back, seals context/generation state, and rejects stale payload snapshots, non-immediate contexts and external slot drift. It does not bind translated shaders, route Draw*, or activate NativeDrawPath.",
@@ -47,24 +47,48 @@
       "evidence": "Added NativeProgrammableShaderConstantBindingReadiness, exact immediate-context VS/PS b0 binding/readback APIs, binding snapshot validation, per-entry binding context/generation ownership, probe coverage for prerequisite/deferred/idempotence/slot-drift/stale/device-generation cases, and source-graph drift guards. No shader object binding, Draw* routing or NativeDrawPath activation is introduced."
     },
     "C3_VALIDATE": {
-      "status": "PENDING_EXACT_SHA_GATE",
-      "automation_validation": "PENDING",
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
       "runtime_validation": "UNTESTED",
-      "evidence": "Required validation is the exact-SHA Backend Conversion Gate including source graph, Win32 build/binary and DX11 readiness smoke/constant-buffer probe."
+      "exact_sha": "0616da4d1a1a79b1eb0f6e512b9b16d73464f64f",
+      "backend_conversion_gate": {
+        "run_number": 1962,
+        "run_id": 37192114758,
+        "run_attempt": 1,
+        "conclusion": "success",
+        "validate_job_id": 111406318423,
+        "validate_conclusion": "success",
+        "readiness_smoke_job_id": 111407199273,
+        "readiness_smoke_conclusion": "success",
+        "constant_buffer_probe": "build_success/run_success",
+        "artifact_id": 11299815382,
+        "artifact_digest": "sha256:318220b8845f7aac407fe5de5c8a7d4ca463efd3f1fc3a3aa343ea6f6307bea9"
+      },
+      "evidence": "Exact-SHA Backend Conversion Gate #1962 on 0616da4d1a1a79b1eb0f6e512b9b16d73464f64f SUCCESS. Validate job 111406318423 SUCCESS including queue/proven-baseline/one-click contracts, DX11 source graph, dormant activation boundary, Win32 configure/build/binary verification. DX11 readiness smoke job 111407199273 SUCCESS; the R246 constant-buffer probe build/run passed before common native-transport/surface-mirror/triangle-fan/fixed-function handoff probes also passed. No Quest 3/VDXR runtime test was performed."
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "result_marker": "[AUTO:CONVERSION-DX11-00365]"
+      "status": "COMPLETE",
+      "material_result_sha": "0616da4d1a1a79b1eb0f6e512b9b16d73464f64f",
+      "validation_bearing_result_sha": "0616da4d1a1a79b1eb0f6e512b9b16d73464f64f",
+      "result_marker": "[AUTO:CONVERSION-DX11-00365]",
+      "evidence": "Material commit dx11: add programmable constant slot binding receipt [AUTO:CONVERSION-DX11-00365] was published without CI-skip and exact-SHA validated by Backend Conversion Gate #1962."
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant programmable constant-slot readiness/probe unit only; no activated runtime path or tester package change."
+      "reason": "R246 is a dormant programmable constant-slot readiness/probe unit and changes no activated runtime path, selector, transport payload or tester package."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
+      "status": "COMPLETE",
+      "state_persisted": true,
       "runtime_validation": "UNTESTED",
-      "exact_next_action": "Publish the material commit without CI-skip, validate that exact SHA with Backend Conversion Gate, append Issue #14 production evidence, then persist exact validation-bearing SHA and branch lane state."
+      "validation_run_id": 37192114758,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111406318423,
+      "readiness_smoke_job_id": 111407199273,
+      "artifact_id": 11299815382,
+      "artifact_digest": "sha256:318220b8845f7aac407fe5de5c8a7d4ca463efd3f1fc3a3aa343ea6f6307bea9",
+      "issue14_comment_id": 5978569632,
+      "exact_next_action": "Release CONVERSION-DX11-00365 as automation-complete. Preserve R239-R246 programmable receipts and NativeDrawPath dormancy. A later programmable live binding unit must separately bind/read back translated VS/PS objects plus the validated input layout before any Draw* routing, while Quest 3/VDXR runtime claims remain separate."
     }
   },
   "regression_assessment": {
@@ -81,7 +105,36 @@
     "event_id": "CONVERSION-DXVK-00364-E005",
     "event_type": "retry",
     "attempt": "1/3",
-    "source": "CURRENT_USER_QUEUE"
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "0616da4d1a1a79b1eb0f6e512b9b16d73464f64f",
+    "source_implementation_sha": "0616da4d1a1a79b1eb0f6e512b9b16d73464f64f",
+    "validation_bearing_result_sha": "0616da4d1a1a79b1eb0f6e512b9b16d73464f64f",
+    "validation_run_id": 37192114758,
+    "validation_run_attempt": 1,
+    "validation_job_id": 111406318423,
+    "readiness_smoke_job_id": 111407199273,
+    "artifact_id": 11299815382,
+    "artifact_digest": "sha256:318220b8845f7aac407fe5de5c8a7d4ca463efd3f1fc3a3aa343ea6f6307bea9",
+    "issue14_comment_id": 5978569632,
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false
   },
-  "exact_next_action": "Run exact-SHA Backend Conversion Gate for the material result. If PASS, persist C3/C4/C6 with RUNTIME_VALIDATION=UNTESTED and keep translated shader binding/Draw* routing outside this task."
+  "exact_next_action": "Automation work is complete. Preserve exact R246 VS/PS b0 binding receipt and keep NativeDrawPath dormant. If DX11 programmable work continues, make translated VS/PS + input-layout live binding/readback readiness a separate bounded task before Draw* routing.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37192114758,
+      "run_number": 1962,
+      "run_attempt": 1,
+      "result_sha": "0616da4d1a1a79b1eb0f6e512b9b16d73464f64f",
+      "conclusion": "success",
+      "validate_job_id": 111406318423,
+      "readiness_smoke_job_id": 111407199273,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11299815382,
+      "artifact_digest": "sha256:318220b8845f7aac407fe5de5c8a7d4ca463efd3f1fc3a3aa343ea6f6307bea9"
+    }
+  },
+  "issue14": {
+    "implementation_and_validation_comment_id": 5978569632
+  }
 }
