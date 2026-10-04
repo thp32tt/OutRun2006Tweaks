@@ -89,5 +89,3 @@ class Continuation91RawProvenanceTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
