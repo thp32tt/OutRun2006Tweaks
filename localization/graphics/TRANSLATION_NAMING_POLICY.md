@@ -63,6 +63,10 @@ A localized result that is even **1 pixel wider or 1 pixel taller** than the cor
 
 For multi-line text, apply the size ceiling to the whole block and, where source lines can be isolated reliably, to each corresponding line.
 
+## Zero-overlap requirement
+
+Localized glyph/effect masks must have **0 overlapping pixels** with other localized labels, preserved source text, icons, decorative foreground, and protected artwork. A 1-pixel overlap is `REWORK_REQUIRED`. Source-language residue visible under/behind a Korean label is also `REWORK_REQUIRED`. Where the source layout has visible spacing, retain positive spacing rather than merely touching adjacent elements. QA must record mask-overlap counts and also perform a readable-orientation visual inspection.
+
 ## Source-style fidelity
 
 Korean lettering must be generated as close to the source typography as the available Hangul glyphs allow. Measure and reproduce source fill/gradient, font weight, outline count and thickness, shadow/glow, slant/italic angle, baseline, alignment, line spacing, proportions and relative scale before rendering.

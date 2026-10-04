@@ -126,7 +126,7 @@ This gate is mandatory for every translated sprite or text segment.
    - reduce font size,
    - use a shorter translation/abbreviation,
    - or leave/reset to the original.
-5. Reject the candidate if any glyph is clipped, overlaps another element, or crosses the source region boundary.
+5. Reject the candidate if any glyph is clipped, overlaps another element, or crosses the source region boundary. **Any 1-pixel text-to-text, localized-to-preserved-text, localized-to-icon/decorative/protected-artwork overlap is FAIL.** Source text visible beneath or behind localized lettering is treated as overlap/residue and is also FAIL.
 6. Check containment both in raw DDS orientation and in the readable/game-orientation preview.
 
 

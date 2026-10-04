@@ -50,6 +50,7 @@ Final QA includes:
 - protected-mask integrity;
 - alpha integrity;
 - no clipping or new overlap;
+- zero localized-text overlap: 0 pixels against every other localized label and against preserved source text/icon/decorative/protected foreground; source-script residue behind a localized glyph is also FAIL;
 - no source-text residue;
 - orientation correctness;
 - style fidelity, including per-line multi-line consistency against the corresponding source lines;

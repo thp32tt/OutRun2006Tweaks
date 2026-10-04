@@ -14,6 +14,7 @@ This is the canonical contract for the N100 A/B/C localization controller. Every
 - Preserve non-text artwork/background wherever possible and modify only intended text regions.
 - Preserve source style: fill/gradient, outline, shadow/glow, proportions, alignment, scale and spacing.
 - Reject seams, black lines, erasure residue, opaque boxes, alpha halos, clipping, overlap and unintended artwork changes.
+- **Zero-overlap rule:** localized glyph/effect pixels may not overlap any other localized label, preserved source text, icon, decorative foreground, or protected artwork by even 1 pixel. Source-text residue beneath/behind Korean lettering also counts as overlap and is FAIL. Generation must leave positive separation whenever the source layout provides it; QA must use pixel masks plus controller visual review, not bbox containment alone.
 - Stage names are proper names and MUST use the canonical phonetic Hangul transliterations in `localization/graphics/TRANSLATION_NAMING_POLICY.md`; semantic stage-name translations or mixed semantic/phonetic naming are forbidden.
 - Song titles/music credits MUST remain original English artwork and are protected from clean-plate removal or Korean redraw.
 - Before rendering, measure the exact source glyph/effect bbox. Localized width and height may never exceed source width/height by even 1 pixel, regardless of plate/cell headroom.
