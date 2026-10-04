@@ -89,3 +89,10 @@ Verifier-only SHA `245bb082652ad50b46ab69e9d8b939a8a4fa8e9f` failed exactly on t
 DX9Ex Active Validation run `37180295864` passed policy, host, active game, full-chain compile and package. Domain Isolation Guard and HUD Inspector also passed. Artifact `11295123103` was uploaded; inner package SHA256 is `A9719897662BD5BF5EDE74724C1F74BEDDA95F051213FE586932BD22BDC1AA65`.
 
 This is not runtime proof. `RUNTIME_VALIDATION=UNTESTED` until Quest 3/VDXR confirms F11 remains single in menus and is binocularly single during gameplay without world/HUD/frame-pacing regression.
+
+
+## 2026-10-04 22:27 KST — DX9Ex runtime test build request
+
+- Source baseline before build trigger: `44322402216fde565ccf99fd257153a0f1d0a369`.
+- Runtime focus: verify the folded R34 guards in the R33 dispatcher and the matching final-dispatch regression guard under real HMD/gameplay execution.
+- Expected build: protected DX9Ex PC-fast package plus DX9Ex Active Validation package; user runtime validation remains pending.
