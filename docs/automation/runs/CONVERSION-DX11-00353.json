@@ -8,12 +8,12 @@
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
   "rollover_is_retry": false,
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R241_PROGRAMMABLE_TRANSLATION_SLOT_OWNERSHIP_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
   "base_sha": "1edba4aaded69692246a63daecdd9561e7367917",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "11e4be9e0c3fa86e18f97ec8697bdc03a1e9ea0f",
+  "validation_bearing_result_sha": "11e4be9e0c3fa86e18f97ec8697bdc03a1e9ea0f",
   "result_marker": "[AUTO:CONVERSION-DX11-00353]",
   "selected_work_item": "DX11_R241_PROGRAMMABLE_TRANSLATION_SLOT_OWNERSHIP",
   "summary": "R241 adds a fail-closed device/generation-owned translation-slot boundary on top of R240 programmable shader-pair cache readiness. A slot can be reserved only from an exact current R240 cache snapshot; duplicate reservation is idempotent, collision/incomplete/stale snapshots are rejected, and device reinitialization requires a distinct fresh slot. No D3D11 programmable shader objects are created or bound and NativeDrawPath stays dormant.",
@@ -45,22 +45,42 @@
       "evidence": "Added NativeProgrammableShaderTranslationSlotReadiness plus reserve/readiness/snapshot APIs to the R240 per-device owner, per-entry slot generation metadata and monotonic owner-local slot generation counter; extended WARP constant-buffer probe and source-graph guards for unreserved, exact, duplicate, collision, incomplete, stale-snapshot and device-generation cases."
     },
     "C3_VALIDATE": {
-      "status": "PENDING_EXACT_SHA_GATE",
-      "automation_validation": "PENDING",
-      "evidence": "Backend Conversion Gate must validate the exact material SHA, including Win32 build and readiness smoke constant-buffer probe. No Quest 3/VDXR runtime test performed."
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R241_PROGRAMMABLE_TRANSLATION_SLOT_OWNERSHIP_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1935 run 37180254975 completed success for 11e4be9e0c3fa86e18f97ec8697bdc03a1e9ea0f. validate job 111371217693 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, VR session regressions, DX11 native transport, dual-source, static-surface, source-graph including R241 guards, dormant activation, census analyzer, Win32 configure/build, binary verification and artifact upload. DX11 readiness smoke job 111371751579 passed every probe; Build/Run DX11 constant buffer probe both succeeded with R241 unreserved/exact/idempotent/collision/incomplete/stale-cache/device-generation slot-ownership regressions. Artifact 11295082918 digest sha256:93121a32957cc52b6428218daa4f4136ae7e14bcc306a0f9910530ebe39ff20c. No Quest 3/VDXR runtime test was performed.",
+      "validation_run_id": 37180254975,
+      "validation_job_id": 111371217693,
+      "readiness_smoke_job_id": 111371751579,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11295082918,
+      "artifact_digest": "sha256:93121a32957cc52b6428218daa4f4136ae7e14bcc306a0f9910530ebe39ff20c"
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "COMPLETE",
+      "material_result_sha": "11e4be9e0c3fa86e18f97ec8697bdc03a1e9ea0f",
+      "validation_bearing_result_sha": "11e4be9e0c3fa86e18f97ec8697bdc03a1e9ea0f",
+      "source_implementation_sha": "11e4be9e0c3fa86e18f97ec8697bdc03a1e9ea0f",
+      "result_marker": "[AUTO:CONVERSION-DX11-00353]",
+      "implementation_commits": [
+        "11e4be9e0c3fa86e18f97ec8697bdc03a1e9ea0f"
+      ]
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Dormant metadata ownership/readiness boundary only; no translated shader objects, runtime draw path or distributable runtime behavior is promoted."
+      "reason": "R241 is dormant programmable translation-slot ownership/readiness metadata only. It creates/binds no D3D11 programmable shader objects, routes no game draws and changes no runtime distributable behavior."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "Publish R241 material result without CI skip, require exact-SHA Backend Conversion Gate, then persist final run/lane state while keeping RUNTIME_VALIDATION=UNTESTED and NativeDrawPath dormant."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37180254975,
+      "validation_job_id": 111371217693,
+      "readiness_smoke_job_id": 111371751579,
+      "artifact_id": 11295082918,
+      "artifact_digest": "sha256:93121a32957cc52b6428218daa4f4136ae7e14bcc306a0f9910530ebe39ff20c",
+      "implementation_comment_id": 5976969775,
+      "validation_comment_id": 5977011442,
+      "exact_next_action": "Release CONVERSION-DX11-00353 as complete. Preserve R239 identity, R240 per-device cache and R241 translation-slot ownership semantics; keep NativeDrawPath dormant. The next independent programmable-shader unit may add one fail-closed translated-object receipt/attachment boundary to a validated R241 slot, without draw routing; input linkage/constants remain subsequent bounded units."
     }
   },
   "regression_assessment": {
@@ -82,5 +102,22 @@
     "rollover_is_retry": false,
     "source": "CURRENT_USER_QUEUE"
   },
-  "exact_next_action": "Publish R241 as the validation-bearing material result, validate its exact SHA, then finalize C3/C4/C6 without conflating automated validation with HMD runtime proof."
+  "exact_next_action": "Release CONVERSION-DX11-00353 as complete. Preserve R239 identity, R240 per-device cache and R241 translation-slot ownership semantics; keep NativeDrawPath dormant. The next independent programmable-shader unit may add one fail-closed translated-object receipt/attachment boundary to a validated R241 slot, without draw routing; input linkage/constants remain subsequent bounded units.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37180254975,
+      "run_number": 1935,
+      "result_sha": "11e4be9e0c3fa86e18f97ec8697bdc03a1e9ea0f",
+      "conclusion": "success",
+      "validate_job_id": 111371217693,
+      "readiness_smoke_job_id": 111371751579,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11295082918,
+      "artifact_digest": "sha256:93121a32957cc52b6428218daa4f4136ae7e14bcc306a0f9910530ebe39ff20c"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5976969775,
+    "validation_comment_id": 5977011442
+  }
 }
