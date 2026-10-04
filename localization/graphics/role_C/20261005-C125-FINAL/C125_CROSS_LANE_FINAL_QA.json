@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C125",
+  "timestamp_kst": "2026-10-05T03:24:49+09:00",
+  "scope": "new/changed unfinished cross-lane handoffs only: A_PRODUCTION20 9CE4E175, A_PRODUCTION21 EBEF6D20, and latest B_PRODUCTION39 1A43E9D9. C118/C117-completed assets were not repeated.",
+  "candidate_changed_by_C": false,
+  "assets": {
+    "9CE4E175": {
+      "queue_index": 195,
+      "producer_run": "A_PRODUCTION20",
+      "candidate_sha256": "cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2",
+      "machine_report": "localization/graphics/role_C/20261005-C119-NEW-A/C119_NEW_A_MACHINE_QA.json",
+      "machine_status": "PASS",
+      "controller_visual_qa": "PASS",
+      "machine_checks": {
+        "bbox_and_size": "1/1 PASS",
+        "header_128_exact": true,
+        "source_decode_diff": 0,
+        "final_decode_diff": 0,
+        "clean_outside": 0,
+        "source_mask_unchanged": 0,
+        "final_outside": 0,
+        "alpha_outside": 0,
+        "protected_changed": 0,
+        "target_outside": 0,
+        "overlap": 0,
+        "touch_pairs": []
+      },
+      "visual_evidence": [
+        "localization/graphics/role_A/20261005-A-PRODUCTION20/A_PRODUCTION20_CONTACT_SOURCE_CLEAN_FINAL.jpg",
+        "localization/graphics/role_A/20261005-A-PRODUCTION20/A_PRODUCTION20_SOURCE_CLEAN_FINAL_GRAY.jpg",
+        "localization/graphics/role_A/20261005-A-PRODUCTION20/A_PRODUCTION20_FINAL_RAW_GRAY.jpg"
+      ],
+      "visual_note": "PASS: faint NOT AVAILABLE fringe is gone; 이용 불가 is centered, source-family heavy white, smaller than source footprint, and clean in readable/raw mirror_y views.",
+      "decision": "C125_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    },
+    "EBEF6D20": {
+      "queue_index": 65,
+      "producer_run": "A_PRODUCTION21",
+      "candidate_sha256": "005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2",
+      "machine_report": "localization/graphics/role_C/20261005-C119-NEW-A/C119_NEW_A_MACHINE_QA.json",
+      "machine_status": "PASS",
+      "controller_visual_qa": "PASS",
+      "machine_checks": {
+        "bbox_and_size": "2/2 PASS",
+        "header_128_exact": true,
+        "source_decode_diff": 0,
+        "final_decode_diff": 0,
+        "clean_outside": 0,
+        "source_mask_unchanged": 0,
+        "final_outside": 0,
+        "alpha_outside": 0,
+        "protected_changed": 0,
+        "target_outside": 0,
+        "overlap": 0,
+        "touch_pairs": []
+      },
+      "visual_evidence": [
+        "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_CONTACT_SOURCE_CLEAN_FINAL.jpg",
+        "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_SOURCE_CLEAN_FINAL_GRAY.jpg",
+        "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_FINAL_RAW_GRAY.jpg"
+      ],
+      "visual_note": "PASS: both 로딩 occurrences share corrected bold white source weight and measured dark outline/shadow; no residue, clipping, overlap, seam, halo, protected-art damage or orientation regression.",
+      "decision": "C125_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    },
+    "1A43E9D9": {
+      "queue_index": 92,
+      "producer_run": "B_PRODUCTION39",
+      "candidate_sha256": "601be9747c0cf03e89740786fe0782ec1e71f0e480ceb5e3d740637d048043b3",
+      "machine_report": "localization/graphics/role_C/20261005-C124-1A43E9D9/C124_1A43E9D9_MACHINE_QA.json",
+      "raw_orientation_report": "localization/graphics/role_C/20261005-C125-1A43-RAW/C125_RAW_ORIENTATION_REPORT.json",
+      "machine_status": "PASS",
+      "controller_visual_qa": "PASS_HIGH_RISK_EDGE_TOUCH",
+      "machine_checks": {
+        "bbox_and_size": "2/2 PASS",
+        "header_128_exact": true,
+        "clean_outside": 0,
+        "source_mask_unchanged": 0,
+        "final_outside": 0,
+        "alpha_outside": 0,
+        "protected_changed": 0,
+        "visible_localized_outside": 0,
+        "overlap": 0,
+        "touch_pairs": [],
+        "bc3_fringe_pixels": 1086,
+        "bc3_fringe_max_alpha": 17,
+        "bc3_fringe_alpha_ge8": 35,
+        "bc3_fringe_alpha_ge32": 0
+      },
+      "visual_evidence": [
+        "localization/graphics/role_B/20261005-B-PRODUCTION39/B_PRODUCTION39_1A43_SOURCE_CLEAN_FINAL.jpg",
+        "localization/graphics/role_B/20261005-B-PRODUCTION39/B_PRODUCTION39_1A43_ROW_CONTACT_2X.jpg",
+        "localization/graphics/role_C/20261005-C124-1A43E9D9/C124_B39_RESIDUAL_OVERLAY_2X.png",
+        "localization/graphics/role_C/20261005-C125-1A43-RAW/C125_B39_RAW_MIRROR_Y_QA.png",
+        "localization/graphics/role_C/20261005-C125-1A43-RAW/C125_B39_READABLE_QA.png"
+      ],
+      "visual_note": "PASS static/high-zoom/readable/raw review. The sparse decoded BC3 fringe is low-alpha compression fringe (max alpha 17; no pixels >=32), not legible source-script residue. Korean orange/navy/white outline family and right slant match source. Row 1 decoded visible bbox touches the source top boundary (delta_top=0), so the contract marks it HIGH_RISK and requires actual in-game validation before final approval.",
+      "decision": "C125_STATIC_PASS_HIGH_RISK_EDGE_TOUCH_PENDING_INGAME"
+    }
+  },
+  "pixel_visual_pass_assets": [
+    "9CE4E175",
+    "EBEF6D20"
+  ],
+  "high_risk_static_pass_assets": [
+    "1A43E9D9"
+  ],
+  "rework_required_assets": [],
+  "global_rework_remaining": [],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94"
+  ],
+  "runtime_validation": "UNTESTED",
+  "in_game_required_before_final_approval": [
+    "1A43E9D9"
+  ],
+  "no_vr_ffb_dx11_dxvk_work": true
+}

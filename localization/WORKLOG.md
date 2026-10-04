@@ -1249,3 +1249,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Both candidates await independent C final QA and isolated in-game validation. `RUNTIME_VALIDATION=UNTESTED`.
 - Current direct-localize pending_artwork count: 45. Producer REWORK remains 0. Strict no-candidate DXT5 HOLD remains 4F68708E/F6811E94. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_A/20261005-A-PRODUCTION20/` and `localization/graphics/role_A/20261005-A-PRODUCTION21/`.
+## 2026-10-05T03:24:49+09:00 — C125 9CE4E175 + EBEF6D20 + 1A43E9D9 cross-lane QA
+- Reviewed only new/changed unfinished handoffs; C118/C117-completed assets were not repeated.
+- 9CE4E175 A_PRODUCTION20 cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2: C119 hosted independent decode/header and 1/1 bbox+size PASS; clean/source-residue/outside/alpha/protected/target/overlap/touch=0. Controller SOURCE/CLEAN/FINAL/full/raw PASS. Advances to static pixel/visual PASS pending in-game.
+- EBEF6D20 A_PRODUCTION21 005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2: C119 hosted independent decode/header and 2/2 bbox+size PASS; source-mask unchanged/outside/alpha/protected/target/overlap/touch=0. Controller row/full/raw PASS with corrected bold-white source weight/shadow. Advances to static pixel/visual PASS pending in-game.
+- 1A43E9D9 latest B_PRODUCTION39 601be9747c0cf03e89740786fe0782ec1e71f0e480ceb5e3d740637d048043b3: C124 machine PASS 2/2 bbox+size, header/outside/protected/overlap/touch all PASS/0. Decoded BC3 fringe is sparse low-alpha compression fringe (max 17; 35 pixels >=8; none >=32), not legible source residue. C high-zoom readable and C125 raw mirror_y review PASS. Row1 has delta_top=0 edge touch, so it is HIGH_RISK static PASS and actual in-game validation is required before final approval.
+- Producer REWORK remains 0. Strict no-candidate DXT5 HOLD remains 4F68708E/F6811E94. pending_artwork localize_text=44.
+- RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261005-C125-FINAL/C125_CROSS_LANE_FINAL_QA.json
