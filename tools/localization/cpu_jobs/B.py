@@ -102,9 +102,9 @@ assert (info['width'],info['height'])==(2048,2048)
 isolation={
  'sector4':(190,330,385,410),
  'palm_beach':(140,410,390,555), 'coniferous_forest':(140,570,480,710), 'snow_mountain':(140,720,460,860), 'ancient_ruins':(138,870,450,1015), 'bay_area':(140,1020,440,1155), 'big_forest':(305,1190,645,1325),
- 'castle_wall':(643,570,940,710), 'industrial_complex':(643,720,970,870), 'metropolis':(643,870,975,1015), 'sunny_beach':(643,1020,930,1155), 'water_falls':(808,1180,1045,1340),
+ 'castle_wall':(643,570,940,710), 'industrial_complex':(643,720,970,870), 'metropolis':(643,870,975,1015), 'sunny_beach':(643,1020,930,1180), 'water_falls':(808,1180,1045,1340),
  'alpine':(1146,570,1400,710), 'cloudy_highland':(1146,720,1480,870), 'tulip_garden':(1146,870,1430,1015), 'cape_way':(1146,1020,1510,1155), 'national_park':(1315,1180,1620,1340),
- 'deep_lake':(1652,570,2000,710), 'desert':(1652,720,1940,850), 'ghost_forest':(1652,870,1970,1015), 'imperial_avenue':(1652,1020,1985,1155)
+ 'deep_lake':(1652,570,2000,710), 'desert':(1652,720,1940,850), 'ghost_forest':(1652,870,1970,1015), 'imperial_avenue':(1652,1020,1985,1180)
 }
 source_alpha=bin_alpha(src); source_masks={}; source_bboxes={}
 for key,cell in isolation.items():
