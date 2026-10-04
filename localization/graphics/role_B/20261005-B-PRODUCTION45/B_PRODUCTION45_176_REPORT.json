@@ -9,16 +9,16 @@
   "historical_discovery_sha256": "56ffba4bb666542d1218a1e8d721c6e9129268eae8f2e2b87229c6aa83a6874d",
   "historical_discovery_only": true,
   "historical_localized_pixels_reused": false,
-  "candidate_sha256": "250f6345fec8b00b11c0b5f8544ccf50c8f94d46d43c9cee8dca0f95635d667c",
+  "candidate_sha256": "041b2ee59f36a3eb03f6c871daeaf227f3acd22e783632a65a7b586f4f883409",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
-  "method": "exact 2048x512 RGBA32 source; historical candidate only as target-region hint; exact connected source-alpha/effect component masks; alpha-only clean plate; fresh Hangul render; exact-header mirror-X DDS; decoded static QA",
+  "method": "exact 2048x512 RGBA32 source; historical candidate only as target-region hint; exact connected source-alpha/effect component masks; alpha-only clean plate; fresh Hangul render; exact-header rotate-180 DDS; decoded static QA",
   "structure": {
     "width": 2048,
     "height": 512,
     "format": "RGBA32",
     "mipmaps": 1,
     "header_128_exact": true,
-    "raw_orientation": "mirror_x"
+    "raw_orientation": "rotate_180"
   },
   "segments_total": 5,
   "preserved_original": [
@@ -31,153 +31,37 @@
       "source": "MIX 1 COURSE",
       "korean": "믹스 1 코스",
       "discovery_anchor": [
-        195,
-        0,
-        609,
-        81
+        1431,
+        147,
+        2038,
+        229
       ],
       "measurement_cell": [
-        167,
-        0,
-        637,
-        88
-      ],
-      "original_bbox": [
-        198,
-        2,
-        613,
-        46
-      ],
-      "source_effect_pixels": 9599,
-      "source_mask_density": 0.5256845564074479,
-      "localized_bbox": [
-        314,
-        3,
-        497,
-        45
-      ],
-      "source_width": 415,
-      "source_height": 44,
-      "localized_width": 183,
-      "localized_height": 42,
-      "delta_left": 116,
-      "delta_right": 116,
-      "delta_top": 1,
-      "delta_bottom": 1,
-      "containment": "PASS",
-      "size_ceiling": "PASS",
-      "edge_touch_high_risk": false,
-      "font_size": 39,
-      "stroke_width": 2,
-      "slant": 0.11135306553911099,
-      "fill": [
-        74,
-        71,
-        63,
-        255
-      ],
-      "outline": [
-        74,
-        71,
-        63,
-        255
-      ],
-      "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
-    },
-    {
-      "n": 2,
-      "source": "MIX 2 COURSE",
-      "korean": "믹스 2 코스",
-      "discovery_anchor": [
-        1146,
-        0,
-        2039,
-        81
-      ],
-      "measurement_cell": [
-        1118,
-        0,
+        1403,
+        119,
         2048,
-        88
+        236
       ],
       "original_bbox": [
-        1149,
-        10,
-        2041,
-        83
+        1434,
+        145,
+        2039,
+        218
       ],
-      "source_effect_pixels": 33430,
-      "source_mask_density": 0.5133914859635113,
+      "source_effect_pixels": 21870,
+      "source_mask_density": 0.4951884976791577,
       "localized_bbox": [
-        1437,
-        11,
-        1752,
-        81
+        1579,
+        146,
+        1894,
+        216
       ],
-      "source_width": 892,
+      "source_width": 605,
       "source_height": 73,
       "localized_width": 315,
       "localized_height": 70,
-      "delta_left": 288,
-      "delta_right": 289,
-      "delta_top": 1,
-      "delta_bottom": 2,
-      "containment": "PASS",
-      "size_ceiling": "PASS",
-      "edge_touch_high_risk": false,
-      "font_size": 67,
-      "stroke_width": 3,
-      "slant": 0.00527582376897529,
-      "fill": [
-        101,
-        97,
-        79,
-        255
-      ],
-      "outline": [
-        101,
-        97,
-        79,
-        255
-      ],
-      "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
-    },
-    {
-      "n": 3,
-      "source": "OUTRUN2 COURSE",
-      "korean": "아웃런2 코스",
-      "discovery_anchor": [
-        1260,
-        95,
-        2039,
-        178
-      ],
-      "measurement_cell": [
-        1232,
-        88,
-        2048,
-        182
-      ],
-      "original_bbox": [
-        1263,
-        106,
-        2041,
-        179
-      ],
-      "source_effect_pixels": 29283,
-      "source_mask_density": 0.515600239461915,
-      "localized_bbox": [
-        1470,
-        107,
-        1833,
-        177
-      ],
-      "source_width": 778,
-      "source_height": 73,
-      "localized_width": 363,
-      "localized_height": 70,
-      "delta_left": 207,
-      "delta_right": 208,
+      "delta_left": 145,
+      "delta_right": 145,
       "delta_top": 1,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -201,41 +85,41 @@
       "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
     },
     {
-      "n": 4,
-      "source": "OUTRUN2SP COURSE",
-      "korean": "아웃런2 SP 코스",
+      "n": 2,
+      "source": "MIX 2 COURSE",
+      "korean": "믹스 2 코스",
       "discovery_anchor": [
         1433,
-        187,
+        243,
         2038,
-        269
+        325
       ],
       "measurement_cell": [
         1405,
-        182,
+        236,
         2048,
-        276
+        329
       ],
       "original_bbox": [
         1436,
-        198,
+        241,
         2039,
-        271
+        314
       ],
       "source_effect_pixels": 22430,
       "source_mask_density": 0.5095526931552284,
       "localized_bbox": [
-        1505,
-        199,
-        1969,
-        269
+        1580,
+        242,
+        1895,
+        312
       ],
       "source_width": 603,
       "source_height": 73,
-      "localized_width": 464,
+      "localized_width": 315,
       "localized_height": 70,
-      "delta_left": 69,
-      "delta_right": 70,
+      "delta_left": 144,
+      "delta_right": 144,
       "delta_top": 1,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -243,7 +127,7 @@
       "edge_touch_high_risk": false,
       "font_size": 67,
       "stroke_width": 3,
-      "slant": 0.051526625506463544,
+      "slant": 0.0,
       "fill": [
         101,
         97,
@@ -259,49 +143,165 @@
       "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
     },
     {
-      "n": 5,
-      "source": "AVERAGE RANK:",
-      "korean": "평균 랭크:",
+      "n": 3,
+      "source": "OUTRUN2 COURSE",
+      "korean": "아웃런2 코스",
       "discovery_anchor": [
-        1431,
-        283,
-        2038,
-        365
+        1260,
+        334,
+        2039,
+        417
       ],
       "measurement_cell": [
-        1403,
-        276,
+        1232,
+        329,
         2048,
-        393
+        424
       ],
       "original_bbox": [
-        1434,
-        294,
-        2039,
-        367
+        1263,
+        333,
+        2041,
+        406
       ],
-      "source_effect_pixels": 21870,
-      "source_mask_density": 0.4951884976791577,
+      "source_effect_pixels": 29283,
+      "source_mask_density": 0.515600239461915,
       "localized_bbox": [
-        1595,
-        296,
-        1878,
-        365
+        1470,
+        334,
+        1833,
+        404
       ],
-      "source_width": 605,
+      "source_width": 778,
       "source_height": 73,
-      "localized_width": 283,
-      "localized_height": 69,
-      "delta_left": 161,
-      "delta_right": 161,
-      "delta_top": 2,
+      "localized_width": 363,
+      "localized_height": 70,
+      "delta_left": 207,
+      "delta_right": 208,
+      "delta_top": 1,
       "delta_bottom": 2,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "edge_touch_high_risk": false,
       "font_size": 67,
       "stroke_width": 3,
-      "slant": 0.023754743070293894,
+      "slant": 0.32,
+      "fill": [
+        101,
+        97,
+        79,
+        255
+      ],
+      "outline": [
+        101,
+        97,
+        79,
+        255
+      ],
+      "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
+    },
+    {
+      "n": 4,
+      "source": "AVERAGE RANK:",
+      "korean": "평균 랭크:",
+      "discovery_anchor": [
+        195,
+        431,
+        609,
+        512
+      ],
+      "measurement_cell": [
+        167,
+        424,
+        637,
+        512
+      ],
+      "original_bbox": [
+        198,
+        466,
+        613,
+        510
+      ],
+      "source_effect_pixels": 9599,
+      "source_mask_density": 0.5256845564074479,
+      "localized_bbox": [
+        323,
+        467,
+        488,
+        508
+      ],
+      "source_width": 415,
+      "source_height": 44,
+      "localized_width": 165,
+      "localized_height": 41,
+      "delta_left": 125,
+      "delta_right": 125,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "font_size": 39,
+      "stroke_width": 2,
+      "slant": 0.0,
+      "fill": [
+        74,
+        71,
+        63,
+        255
+      ],
+      "outline": [
+        74,
+        71,
+        63,
+        255
+      ],
+      "rework_status": "NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"
+    },
+    {
+      "n": 5,
+      "source": "OUTRUN2SP COURSE",
+      "korean": "아웃런2 SP 코스",
+      "discovery_anchor": [
+        1146,
+        431,
+        2039,
+        512
+      ],
+      "measurement_cell": [
+        1118,
+        424,
+        2048,
+        512
+      ],
+      "original_bbox": [
+        1149,
+        429,
+        2041,
+        502
+      ],
+      "source_effect_pixels": 33430,
+      "source_mask_density": 0.5133914859635113,
+      "localized_bbox": [
+        1362,
+        430,
+        1827,
+        500
+      ],
+      "source_width": 892,
+      "source_height": 73,
+      "localized_width": 465,
+      "localized_height": 70,
+      "delta_left": 213,
+      "delta_right": 214,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "font_size": 67,
+      "stroke_width": 3,
+      "slant": 0.0,
       "fill": [
         101,
         97,
