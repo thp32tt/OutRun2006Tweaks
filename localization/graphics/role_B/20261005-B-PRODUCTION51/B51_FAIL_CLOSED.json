@@ -3,7 +3,7 @@
   "asset": "1F5FE6E9",
   "index": 132,
   "status": "FAIL_CLOSED_DIAGNOSTIC",
-  "exception": "RuntimeError(('expected four historical row hints', 3))",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 219, in <module>\n    try:main()\n        ^^^^^^\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 64, in main\n    raise RuntimeError((\"expected four historical row hints\",len(merged)))\nRuntimeError: ('expected four historical row hints', 3)\n",
+  "exception": "RuntimeError(('ambiguous source mask', 1, [649, 148, 756, 171], [636, 141, 640, 178], 1.0))",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 228, in <module>\n    try:main()\n        ^^^^^^\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 103, in main\n    if dens>0.55 or bb[0]<=x0+1 or bb[2]>=x1-1: raise RuntimeError((\"ambiguous source mask\",idx,cell,bb,dens))\n                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: ('ambiguous source mask', 1, [649, 148, 756, 171], [636, 141, 640, 178], 1.0)\n",
   "RUNTIME_VALIDATION": "UNTESTED"
 }
