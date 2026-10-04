@@ -1,0 +1,692 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-C104-PENDING-VISUAL",
+  "scope": "pending-C approval candidates with existing exact-size QA: 455717B2, 43B07A77, B1696633, CBF8ECBF. C103-completed assets and current producer REWORK were not repeated.",
+  "policy": "new zero-overlap pixel-mask supplement to existing exact-source bbox/size QA; controller readable/raw visual gate remains separate",
+  "results": [
+    {
+      "asset": "455717B2",
+      "producer_report": "localization/graphics/role_A/20261004-A-PRODUCTION10/A_PRODUCTION10_455717B2_REPORT.json",
+      "candidate_sha256": "50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f",
+      "candidate_matches_producer_sha": true,
+      "target_pixels": 243459,
+      "target_pixels_outside_allowed_mask": 0,
+      "target_protected_overlap_pixels": 0,
+      "localized_pair_overlap_pixels": 0,
+      "localized_touch_or_overlap_pairs": [],
+      "rows": [
+        {
+          "key": "continue",
+          "original_bbox": [
+            4,
+            256,
+            558,
+            351
+          ],
+          "localized_bbox": [
+            140,
+            260,
+            421,
+            347
+          ],
+          "delta_left": 136,
+          "delta_right": 137,
+          "delta_top": 4,
+          "delta_bottom": 4,
+          "source_size": [
+            554,
+            95
+          ],
+          "localized_size": [
+            281,
+            87
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "perfect",
+          "original_bbox": [
+            113,
+            352,
+            1302,
+            560
+          ],
+          "localized_bbox": [
+            509,
+            358,
+            905,
+            553
+          ],
+          "delta_left": 396,
+          "delta_right": 397,
+          "delta_top": 6,
+          "delta_bottom": 7,
+          "source_size": [
+            1189,
+            208
+          ],
+          "localized_size": [
+            396,
+            195
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "congratulations",
+          "original_bbox": [
+            6,
+            560,
+            2024,
+            788
+          ],
+          "localized_bbox": [
+            593,
+            580,
+            1437,
+            768
+          ],
+          "delta_left": 587,
+          "delta_right": 587,
+          "delta_top": 20,
+          "delta_bottom": 20,
+          "source_size": [
+            2018,
+            228
+          ],
+          "localized_size": [
+            844,
+            188
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "passed",
+          "original_bbox": [
+            44,
+            788,
+            1579,
+            1026
+          ],
+          "localized_bbox": [
+            613,
+            809,
+            1010,
+            1004
+          ],
+          "delta_left": 569,
+          "delta_right": 569,
+          "delta_top": 21,
+          "delta_bottom": 22,
+          "source_size": [
+            1535,
+            238
+          ],
+          "localized_size": [
+            397,
+            195
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "machine_status": "PASS",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "43B07A77",
+      "producer_report": "localization/graphics/role_A/20261004-A-PRODUCTION12/A_PRODUCTION12_43B07A77_REPORT.json",
+      "candidate_sha256": "d2311d4c20327363bacf8b336e925e527ef8c5c8f13a385b0a2fb2e25a946cbc",
+      "candidate_matches_producer_sha": true,
+      "target_pixels": 116466,
+      "target_pixels_outside_allowed_mask": 0,
+      "target_protected_overlap_pixels": 0,
+      "localized_pair_overlap_pixels": 0,
+      "localized_touch_or_overlap_pairs": [],
+      "rows": [
+        {
+          "key": "game_over",
+          "original_bbox": [
+            1,
+            13,
+            1494,
+            251
+          ],
+          "localized_bbox": [
+            337,
+            21,
+            1157,
+            243
+          ],
+          "delta_left": 336,
+          "delta_right": 337,
+          "delta_top": 8,
+          "delta_bottom": 8,
+          "source_size": [
+            1493,
+            238
+          ],
+          "localized_size": [
+            820,
+            222
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "machine_status": "PASS",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "B1696633",
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_B1696633_REPORT.json",
+      "candidate_sha256": "448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21",
+      "candidate_matches_producer_sha": true,
+      "target_pixels": 167130,
+      "target_pixels_outside_allowed_mask": 0,
+      "target_protected_overlap_pixels": 0,
+      "localized_pair_overlap_pixels": 0,
+      "localized_touch_or_overlap_pairs": [],
+      "rows": [
+        {
+          "key": "name",
+          "original_bbox": [
+            74,
+            769,
+            205,
+            805
+          ],
+          "localized_bbox": [
+            110,
+            770,
+            169,
+            804
+          ],
+          "delta_left": 36,
+          "delta_right": 36,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "source_size": [
+            131,
+            36
+          ],
+          "localized_size": [
+            59,
+            34
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "status",
+          "original_bbox": [
+            1639,
+            768,
+            1803,
+            805
+          ],
+          "localized_bbox": [
+            1690,
+            769,
+            1752,
+            804
+          ],
+          "delta_left": 51,
+          "delta_right": 51,
+          "delta_top": 1,
+          "delta_bottom": 1,
+          "source_size": [
+            164,
+            37
+          ],
+          "localized_size": [
+            62,
+            35
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "stage",
+          "original_bbox": [
+            1090,
+            835,
+            1214,
+            899
+          ],
+          "localized_bbox": [
+            1092,
+            849,
+            1212,
+            884
+          ],
+          "delta_left": 2,
+          "delta_right": 2,
+          "delta_top": 14,
+          "delta_bottom": 15,
+          "source_size": [
+            124,
+            64
+          ],
+          "localized_size": [
+            120,
+            35
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "next_stage",
+          "original_bbox": [
+            1331,
+            909,
+            1619,
+            976
+          ],
+          "localized_bbox": [
+            1334,
+            916,
+            1615,
+            968
+          ],
+          "delta_left": 3,
+          "delta_right": 4,
+          "delta_top": 7,
+          "delta_bottom": 8,
+          "source_size": [
+            288,
+            67
+          ],
+          "localized_size": [
+            281,
+            52
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "ghost",
+          "original_bbox": [
+            1668,
+            909,
+            1824,
+            978
+          ],
+          "localized_bbox": [
+            1669,
+            919,
+            1822,
+            968
+          ],
+          "delta_left": 1,
+          "delta_right": 2,
+          "delta_top": 10,
+          "delta_bottom": 10,
+          "source_size": [
+            156,
+            69
+          ],
+          "localized_size": [
+            153,
+            49
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "total_time",
+          "original_bbox": [
+            51,
+            1698,
+            841,
+            1841
+          ],
+          "localized_bbox": [
+            245,
+            1700,
+            647,
+            1838
+          ],
+          "delta_left": 194,
+          "delta_right": 194,
+          "delta_top": 2,
+          "delta_bottom": 3,
+          "source_size": [
+            790,
+            143
+          ],
+          "localized_size": [
+            402,
+            138
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "slipstream",
+          "original_bbox": [
+            889,
+            1718,
+            1388,
+            1825
+          ],
+          "localized_bbox": [
+            892,
+            1719,
+            1385,
+            1823
+          ],
+          "delta_left": 3,
+          "delta_right": 3,
+          "delta_top": 1,
+          "delta_bottom": 2,
+          "source_size": [
+            499,
+            107
+          ],
+          "localized_size": [
+            493,
+            104
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "new_record",
+          "original_bbox": [
+            1618,
+            1732,
+            1877,
+            1841
+          ],
+          "localized_bbox": [
+            1619,
+            1734,
+            1876,
+            1839
+          ],
+          "delta_left": 1,
+          "delta_right": 1,
+          "delta_top": 2,
+          "delta_bottom": 2,
+          "source_size": [
+            259,
+            109
+          ],
+          "localized_size": [
+            257,
+            105
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "extend_time",
+          "original_bbox": [
+            834,
+            1899,
+            1777,
+            2043
+          ],
+          "localized_bbox": [
+            1040,
+            1901,
+            1570,
+            2040
+          ],
+          "delta_left": 206,
+          "delta_right": 207,
+          "delta_top": 2,
+          "delta_bottom": 3,
+          "source_size": [
+            943,
+            144
+          ],
+          "localized_size": [
+            530,
+            139
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "machine_status": "PASS",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "CBF8ECBF",
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY08/B_RECOVERY08_CBF8ECBF_REPORT.json",
+      "candidate_sha256": "ecc4cbb6cdc064d2c7ccccfc378569f1dc7fc8339c46330ec68ec81c8f899df1",
+      "candidate_matches_producer_sha": true,
+      "target_pixels": 358500,
+      "target_pixels_outside_allowed_mask": 0,
+      "target_protected_overlap_pixels": 0,
+      "localized_pair_overlap_pixels": 0,
+      "localized_touch_or_overlap_pairs": [],
+      "rows": [
+        {
+          "key": "friend_request",
+          "original_bbox": [
+            646,
+            1017,
+            1345,
+            1090
+          ],
+          "localized_bbox": [
+            865,
+            1021,
+            1126,
+            1086
+          ],
+          "delta_left": 219,
+          "delta_right": 219,
+          "delta_top": 4,
+          "delta_bottom": 4,
+          "source_size": [
+            699,
+            73
+          ],
+          "localized_size": [
+            261,
+            65
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "players",
+          "original_bbox": [
+            1647,
+            1017,
+            2021,
+            1090
+          ],
+          "localized_bbox": [
+            1711,
+            1021,
+            1957,
+            1086
+          ],
+          "delta_left": 64,
+          "delta_right": 64,
+          "delta_top": 4,
+          "delta_bottom": 4,
+          "source_size": [
+            374,
+            73
+          ],
+          "localized_size": [
+            246,
+            65
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "your_friends",
+          "original_bbox": [
+            2668,
+            1023,
+            3244,
+            1092
+          ],
+          "localized_bbox": [
+            2862,
+            1027,
+            3050,
+            1088
+          ],
+          "delta_left": 194,
+          "delta_right": 194,
+          "delta_top": 4,
+          "delta_bottom": 4,
+          "source_size": [
+            576,
+            69
+          ],
+          "localized_size": [
+            188,
+            61
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "please_wait",
+          "original_bbox": [
+            1928,
+            1124,
+            2660,
+            1224
+          ],
+          "localized_bbox": [
+            2121,
+            1130,
+            2466,
+            1218
+          ],
+          "delta_left": 193,
+          "delta_right": 194,
+          "delta_top": 6,
+          "delta_bottom": 6,
+          "source_size": [
+            732,
+            100
+          ],
+          "localized_size": [
+            345,
+            88
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "time_over",
+          "original_bbox": [
+            241,
+            1274,
+            1610,
+            1515
+          ],
+          "localized_bbox": [
+            483,
+            1279,
+            1368,
+            1509
+          ],
+          "delta_left": 242,
+          "delta_right": 242,
+          "delta_top": 5,
+          "delta_bottom": 6,
+          "source_size": [
+            1369,
+            241
+          ],
+          "localized_size": [
+            885,
+            230
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "game_over",
+          "original_bbox": [
+            1915,
+            1287,
+            3409,
+            1525
+          ],
+          "localized_bbox": [
+            2225,
+            1292,
+            3099,
+            1520
+          ],
+          "delta_left": 310,
+          "delta_right": 310,
+          "delta_top": 5,
+          "delta_bottom": 5,
+          "source_size": [
+            1494,
+            238
+          ],
+          "localized_size": [
+            874,
+            228
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        },
+        {
+          "key": "goal",
+          "original_bbox": [
+            1620,
+            1660,
+            2814,
+            2024
+          ],
+          "localized_bbox": [
+            2056,
+            1675,
+            2377,
+            2008
+          ],
+          "delta_left": 436,
+          "delta_right": 437,
+          "delta_top": 15,
+          "delta_bottom": 16,
+          "source_size": [
+            1194,
+            364
+          ],
+          "localized_size": [
+            321,
+            333
+          ],
+          "containment": "PASS",
+          "size_ceiling": "PASS"
+        }
+      ],
+      "machine_status": "PASS",
+      "controller_visual_qa": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "machine_pass_assets": [
+    "455717B2",
+    "43B07A77",
+    "B1696633",
+    "CBF8ECBF"
+  ],
+  "machine_fail_assets": [],
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "vr_ffb_dx11_dxvk_changes": false
+}

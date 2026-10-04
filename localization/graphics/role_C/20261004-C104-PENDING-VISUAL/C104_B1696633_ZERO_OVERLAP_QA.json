@@ -1,0 +1,277 @@
+{
+  "asset": "B1696633",
+  "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY07/B_RECOVERY07_B1696633_REPORT.json",
+  "candidate_sha256": "448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21",
+  "candidate_matches_producer_sha": true,
+  "target_pixels": 167130,
+  "target_pixels_outside_allowed_mask": 0,
+  "target_protected_overlap_pixels": 0,
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_or_overlap_pairs": [],
+  "rows": [
+    {
+      "key": "name",
+      "original_bbox": [
+        74,
+        769,
+        205,
+        805
+      ],
+      "localized_bbox": [
+        110,
+        770,
+        169,
+        804
+      ],
+      "delta_left": 36,
+      "delta_right": 36,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "source_size": [
+        131,
+        36
+      ],
+      "localized_size": [
+        59,
+        34
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "status",
+      "original_bbox": [
+        1639,
+        768,
+        1803,
+        805
+      ],
+      "localized_bbox": [
+        1690,
+        769,
+        1752,
+        804
+      ],
+      "delta_left": 51,
+      "delta_right": 51,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "source_size": [
+        164,
+        37
+      ],
+      "localized_size": [
+        62,
+        35
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "stage",
+      "original_bbox": [
+        1090,
+        835,
+        1214,
+        899
+      ],
+      "localized_bbox": [
+        1092,
+        849,
+        1212,
+        884
+      ],
+      "delta_left": 2,
+      "delta_right": 2,
+      "delta_top": 14,
+      "delta_bottom": 15,
+      "source_size": [
+        124,
+        64
+      ],
+      "localized_size": [
+        120,
+        35
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "next_stage",
+      "original_bbox": [
+        1331,
+        909,
+        1619,
+        976
+      ],
+      "localized_bbox": [
+        1334,
+        916,
+        1615,
+        968
+      ],
+      "delta_left": 3,
+      "delta_right": 4,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "source_size": [
+        288,
+        67
+      ],
+      "localized_size": [
+        281,
+        52
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "ghost",
+      "original_bbox": [
+        1668,
+        909,
+        1824,
+        978
+      ],
+      "localized_bbox": [
+        1669,
+        919,
+        1822,
+        968
+      ],
+      "delta_left": 1,
+      "delta_right": 2,
+      "delta_top": 10,
+      "delta_bottom": 10,
+      "source_size": [
+        156,
+        69
+      ],
+      "localized_size": [
+        153,
+        49
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "total_time",
+      "original_bbox": [
+        51,
+        1698,
+        841,
+        1841
+      ],
+      "localized_bbox": [
+        245,
+        1700,
+        647,
+        1838
+      ],
+      "delta_left": 194,
+      "delta_right": 194,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "source_size": [
+        790,
+        143
+      ],
+      "localized_size": [
+        402,
+        138
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "slipstream",
+      "original_bbox": [
+        889,
+        1718,
+        1388,
+        1825
+      ],
+      "localized_bbox": [
+        892,
+        1719,
+        1385,
+        1823
+      ],
+      "delta_left": 3,
+      "delta_right": 3,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "source_size": [
+        499,
+        107
+      ],
+      "localized_size": [
+        493,
+        104
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "new_record",
+      "original_bbox": [
+        1618,
+        1732,
+        1877,
+        1841
+      ],
+      "localized_bbox": [
+        1619,
+        1734,
+        1876,
+        1839
+      ],
+      "delta_left": 1,
+      "delta_right": 1,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        259,
+        109
+      ],
+      "localized_size": [
+        257,
+        105
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "extend_time",
+      "original_bbox": [
+        834,
+        1899,
+        1777,
+        2043
+      ],
+      "localized_bbox": [
+        1040,
+        1901,
+        1570,
+        2040
+      ],
+      "delta_left": 206,
+      "delta_right": 207,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "source_size": [
+        943,
+        144
+      ],
+      "localized_size": [
+        530,
+        139
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}

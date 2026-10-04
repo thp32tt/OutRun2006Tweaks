@@ -1,0 +1,132 @@
+{
+  "asset": "455717B2",
+  "producer_report": "localization/graphics/role_A/20261004-A-PRODUCTION10/A_PRODUCTION10_455717B2_REPORT.json",
+  "candidate_sha256": "50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f",
+  "candidate_matches_producer_sha": true,
+  "target_pixels": 243459,
+  "target_pixels_outside_allowed_mask": 0,
+  "target_protected_overlap_pixels": 0,
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_or_overlap_pairs": [],
+  "rows": [
+    {
+      "key": "continue",
+      "original_bbox": [
+        4,
+        256,
+        558,
+        351
+      ],
+      "localized_bbox": [
+        140,
+        260,
+        421,
+        347
+      ],
+      "delta_left": 136,
+      "delta_right": 137,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        554,
+        95
+      ],
+      "localized_size": [
+        281,
+        87
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "perfect",
+      "original_bbox": [
+        113,
+        352,
+        1302,
+        560
+      ],
+      "localized_bbox": [
+        509,
+        358,
+        905,
+        553
+      ],
+      "delta_left": 396,
+      "delta_right": 397,
+      "delta_top": 6,
+      "delta_bottom": 7,
+      "source_size": [
+        1189,
+        208
+      ],
+      "localized_size": [
+        396,
+        195
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "congratulations",
+      "original_bbox": [
+        6,
+        560,
+        2024,
+        788
+      ],
+      "localized_bbox": [
+        593,
+        580,
+        1437,
+        768
+      ],
+      "delta_left": 587,
+      "delta_right": 587,
+      "delta_top": 20,
+      "delta_bottom": 20,
+      "source_size": [
+        2018,
+        228
+      ],
+      "localized_size": [
+        844,
+        188
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "passed",
+      "original_bbox": [
+        44,
+        788,
+        1579,
+        1026
+      ],
+      "localized_bbox": [
+        613,
+        809,
+        1010,
+        1004
+      ],
+      "delta_left": 569,
+      "delta_right": 569,
+      "delta_top": 21,
+      "delta_bottom": 22,
+      "source_size": [
+        1535,
+        238
+      ],
+      "localized_size": [
+        397,
+        195
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}

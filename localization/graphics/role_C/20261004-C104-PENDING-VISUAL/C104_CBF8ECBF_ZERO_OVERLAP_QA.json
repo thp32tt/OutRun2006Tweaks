@@ -1,0 +1,219 @@
+{
+  "asset": "CBF8ECBF",
+  "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY08/B_RECOVERY08_CBF8ECBF_REPORT.json",
+  "candidate_sha256": "ecc4cbb6cdc064d2c7ccccfc378569f1dc7fc8339c46330ec68ec81c8f899df1",
+  "candidate_matches_producer_sha": true,
+  "target_pixels": 358500,
+  "target_pixels_outside_allowed_mask": 0,
+  "target_protected_overlap_pixels": 0,
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_or_overlap_pairs": [],
+  "rows": [
+    {
+      "key": "friend_request",
+      "original_bbox": [
+        646,
+        1017,
+        1345,
+        1090
+      ],
+      "localized_bbox": [
+        865,
+        1021,
+        1126,
+        1086
+      ],
+      "delta_left": 219,
+      "delta_right": 219,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        699,
+        73
+      ],
+      "localized_size": [
+        261,
+        65
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "players",
+      "original_bbox": [
+        1647,
+        1017,
+        2021,
+        1090
+      ],
+      "localized_bbox": [
+        1711,
+        1021,
+        1957,
+        1086
+      ],
+      "delta_left": 64,
+      "delta_right": 64,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        374,
+        73
+      ],
+      "localized_size": [
+        246,
+        65
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "your_friends",
+      "original_bbox": [
+        2668,
+        1023,
+        3244,
+        1092
+      ],
+      "localized_bbox": [
+        2862,
+        1027,
+        3050,
+        1088
+      ],
+      "delta_left": 194,
+      "delta_right": 194,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        576,
+        69
+      ],
+      "localized_size": [
+        188,
+        61
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "please_wait",
+      "original_bbox": [
+        1928,
+        1124,
+        2660,
+        1224
+      ],
+      "localized_bbox": [
+        2121,
+        1130,
+        2466,
+        1218
+      ],
+      "delta_left": 193,
+      "delta_right": 194,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "source_size": [
+        732,
+        100
+      ],
+      "localized_size": [
+        345,
+        88
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_over",
+      "original_bbox": [
+        241,
+        1274,
+        1610,
+        1515
+      ],
+      "localized_bbox": [
+        483,
+        1279,
+        1368,
+        1509
+      ],
+      "delta_left": 242,
+      "delta_right": 242,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "source_size": [
+        1369,
+        241
+      ],
+      "localized_size": [
+        885,
+        230
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "game_over",
+      "original_bbox": [
+        1915,
+        1287,
+        3409,
+        1525
+      ],
+      "localized_bbox": [
+        2225,
+        1292,
+        3099,
+        1520
+      ],
+      "delta_left": 310,
+      "delta_right": 310,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "source_size": [
+        1494,
+        238
+      ],
+      "localized_size": [
+        874,
+        228
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "goal",
+      "original_bbox": [
+        1620,
+        1660,
+        2814,
+        2024
+      ],
+      "localized_bbox": [
+        2056,
+        1675,
+        2377,
+        2008
+      ],
+      "delta_left": 436,
+      "delta_right": 437,
+      "delta_top": 15,
+      "delta_bottom": 16,
+      "source_size": [
+        1194,
+        364
+      ],
+      "localized_size": [
+        321,
+        333
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}
