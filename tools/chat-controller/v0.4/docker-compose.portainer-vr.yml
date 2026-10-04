@@ -31,7 +31,7 @@ services:
       GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
       SCHEDULE_MINUTES: "10,30,50"
-      CHAT_SLOTS: "2"
+      CHAT_SLOTS: "3"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
       CHATGPT_PROJECT_URL: "${VR_PROJECT_URL:-}"
