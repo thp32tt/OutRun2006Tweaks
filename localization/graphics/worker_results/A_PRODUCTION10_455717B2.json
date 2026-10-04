@@ -1,0 +1,23 @@
+{
+  "run": "20261004-A-PRODUCTION10",
+  "asset": "455717B2",
+  "index": 43,
+  "source_sha256": "ce5d3610eac8945d76a559bb7f7201f9b1efb409c965bd20ed0a26164ed7f356",
+  "candidate_sha256": "50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f",
+  "source_dimensions": [
+    2048,
+    2048
+  ],
+  "format": "RGBA32",
+  "bbox_pass": "4/4",
+  "positive_margin": "4/4",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "changed_pixels_outside_original_bboxes": 0,
+  "alpha_changed_pixels_outside_original_bboxes": 0,
+  "protected_visible_pixels_changed": 0,
+  "clean_plate_source_text_residue_pixels": 0,
+  "worker_status": "A_PRODUCTION10_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261004-A-PRODUCTION10/A_PRODUCTION10_455717B2_REPORT.json"
+}

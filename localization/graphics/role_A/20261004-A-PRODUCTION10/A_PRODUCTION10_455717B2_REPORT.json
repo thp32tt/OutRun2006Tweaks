@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261004-A-PRODUCTION10",
+  "worker": "github-actions",
+  "base_head": "3805a99bf828775a2998630d8902e2f46b866730",
+  "index": 43,
+  "asset": "textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+  "supersedes": {
+    "run": "20261004-A-PRODUCTION09",
+    "candidate_sha256": "9dadee3c300bd0500940fcfe304bb640e7b458329210ce2b134c8ce06c65eac4",
+    "reason": "wrong stock-resolution fallback; C97 preflight exposed authoritative 2048x2048 Release DDS source"
+  },
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "92a3cb717afb6ea10aa76df23941353fd0a04148",
+    "sha256": "ce5d3610eac8945d76a559bb7f7201f9b1efb409c965bd20ed0a26164ed7f356",
+    "path": "Release/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+    "classification": "authoritative available high-resolution source; filename suffix is stale, DDS header is 2048x2048 RGBA32"
+  },
+  "method": "exact 2048x2048 HD RGBA32 source -> 4x atlas text regions -> exact source-alpha text mask -> transparent clean plate -> native-HD source-family Korean render -> exact source-header RGBA32 raw mirror_y encode -> decoded static QA",
+  "translations": [
+    {
+      "source": "CONTINUE",
+      "korean": "계속하기"
+    },
+    {
+      "source": "PERFECT!",
+      "korean": "완벽!"
+    },
+    {
+      "source": "CONGRATULATIONS!",
+      "korean": "축하합니다!"
+    },
+    {
+      "source": "PASSED!",
+      "korean": "통과!"
+    }
+  ],
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "pitch": 8192,
+    "mipmaps": 1,
+    "source_bytes": 16777344,
+    "candidate_bytes": 16777344,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "source_sha256": "ce5d3610eac8945d76a559bb7f7201f9b1efb409c965bd20ed0a26164ed7f356",
+  "candidate_sha256": "50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds",
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION10/455717B2_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION10/455717B2_HD_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 776190,
+    "changed_bbox": [
+      4,
+      256,
+      2024,
+      1026
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION10/455717B2_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION10/455717B2_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 803738,
+    "changed_bbox": [
+      4,
+      256,
+      2024,
+      1026
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_total": 803738,
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "clean_plate_source_text_residue_pixels": 0
+  },
+  "rows": [
+    {
+      "key": "continue",
+      "source": "CONTINUE",
+      "korean": "계속하기",
+      "sprite_cell": [
+        0,
+        252,
+        700,
+        352
+      ],
+      "original_bbox": [
+        4,
+        256,
+        558,
+        351
+      ],
+      "localized_bbox": [
+        140,
+        260,
+        421,
+        347
+      ],
+      "delta_left": 136,
+      "delta_right": 137,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        4,
+        1697,
+        558,
+        1792
+      ],
+      "raw_localized_bbox": [
+        140,
+        1701,
+        421,
+        1788
+      ],
+      "raw_delta_left": 136,
+      "raw_delta_right": 137,
+      "raw_delta_top": 4,
+      "raw_delta_bottom": 4,
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 73,
+      "style": "continue",
+      "rework_status": "A_PRODUCTION10_HD_REBUILD"
+    },
+    {
+      "key": "perfect",
+      "source": "PERFECT!",
+      "korean": "완벽!",
+      "sprite_cell": [
+        0,
+        352,
+        1412,
+        560
+      ],
+      "original_bbox": [
+        113,
+        352,
+        1302,
+        560
+      ],
+      "localized_bbox": [
+        509,
+        358,
+        905,
+        553
+      ],
+      "delta_left": 396,
+      "delta_right": 397,
+      "delta_top": 6,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        113,
+        1488,
+        1302,
+        1696
+      ],
+      "raw_localized_bbox": [
+        509,
+        1495,
+        905,
+        1690
+      ],
+      "raw_delta_left": 396,
+      "raw_delta_right": 397,
+      "raw_delta_top": 7,
+      "raw_delta_bottom": 6,
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 176,
+      "style": "green",
+      "rework_status": "A_PRODUCTION10_HD_REBUILD"
+    },
+    {
+      "key": "congratulations",
+      "source": "CONGRATULATIONS!",
+      "korean": "축하합니다!",
+      "sprite_cell": [
+        0,
+        560,
+        2028,
+        788
+      ],
+      "original_bbox": [
+        6,
+        560,
+        2024,
+        788
+      ],
+      "localized_bbox": [
+        593,
+        580,
+        1437,
+        768
+      ],
+      "delta_left": 587,
+      "delta_right": 587,
+      "delta_top": 20,
+      "delta_bottom": 20,
+      "containment": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        6,
+        1260,
+        2024,
+        1488
+      ],
+      "raw_localized_bbox": [
+        593,
+        1280,
+        1437,
+        1468
+      ],
+      "raw_delta_left": 587,
+      "raw_delta_right": 587,
+      "raw_delta_top": 20,
+      "raw_delta_bottom": 20,
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 168,
+      "style": "gold",
+      "rework_status": "A_PRODUCTION10_HD_REBUILD"
+    },
+    {
+      "key": "passed",
+      "source": "PASSED!",
+      "korean": "통과!",
+      "sprite_cell": [
+        0,
+        788,
+        1700,
+        1032
+      ],
+      "original_bbox": [
+        44,
+        788,
+        1579,
+        1026
+      ],
+      "localized_bbox": [
+        613,
+        809,
+        1010,
+        1004
+      ],
+      "delta_left": 569,
+      "delta_right": 569,
+      "delta_top": 21,
+      "delta_bottom": 22,
+      "containment": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        44,
+        1022,
+        1579,
+        1260
+      ],
+      "raw_localized_bbox": [
+        613,
+        1044,
+        1010,
+        1239
+      ],
+      "raw_delta_left": 569,
+      "raw_delta_right": 569,
+      "raw_delta_top": 22,
+      "raw_delta_bottom": 21,
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 176,
+      "style": "green",
+      "rework_status": "A_PRODUCTION10_HD_REBUILD"
+    }
+  ],
+  "all_4_readable_and_raw_bbox_pass": true,
+  "all_4_positive_margin": true,
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A_PRODUCTION10_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
