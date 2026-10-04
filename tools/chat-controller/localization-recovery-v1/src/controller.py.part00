@@ -49,6 +49,7 @@ if not RATE_LIMIT_BACKOFF_SECONDS:
 MIN_SEND_GAP_SECONDS = max(0, int(os.getenv("MIN_SEND_GAP_SECONDS", "45")))
 SLOT_DEDUP_SECONDS = max(0, int(os.getenv("SLOT_DEDUP_SECONDS", "120")))
 FRESH_CHAT_EACH_RUN = os.getenv("FRESH_CHAT_EACH_RUN", "true").lower() == "true"
+CHAT_RECYCLE_RUNS = max(0, int(os.getenv("CHAT_RECYCLE_RUNS", "0")))
 RETRY_BUTTON_COOLDOWN_SECONDS = max(10, int(os.getenv("RETRY_BUTTON_COOLDOWN_SECONDS", "45")))
 PREFERRED_THINKING_LEVEL = os.getenv("PREFERRED_THINKING_LEVEL", "High").strip()
 STRICT_THINKING_LEVEL = os.getenv("STRICT_THINKING_LEVEL", "true").lower() == "true"
@@ -182,6 +183,7 @@ runtime = {
     "min_send_gap_seconds": MIN_SEND_GAP_SECONDS,
     "slot_dedup_seconds": SLOT_DEDUP_SECONDS,
     "fresh_chat_each_run": FRESH_CHAT_EACH_RUN,
+    "chat_recycle_runs": CHAT_RECYCLE_RUNS,
     "retry_button_cooldown_seconds": RETRY_BUTTON_COOLDOWN_SECONDS,
     "rate_limit_attempts": 0,
     "rate_limit_until": None,
