@@ -9,16 +9,16 @@
   "historical_discovery_sha256": "c66b8a0b1294a5ada7f28ebb0023bb461c26aac4b99da4c5da60894dce8a3f83",
   "historical_discovery_only": true,
   "historical_localized_pixels_reused": false,
-  "candidate_sha256": "023dbc3331adc14501a7ce67f5aa23fa820cf310ca0be0a61c5a271cded957fe",
+  "candidate_sha256": "29a10497efcd82ebe6be7101ea9a4e0c830044992e7ffb9ac567d08dd9c444c8",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds",
-  "method": "exact original 1024x1024 RGBA32 source -> historical candidate only as region-discovery hint -> source-alpha/effect mask -> alpha-only transparent clean plate with hidden RGB preserved -> fresh native Hangul render -> exact-header raw rotate-180 DDS -> decoded static QA",
+  "method": "exact original 1024x1024 RGBA32 source -> historical candidate only as region-discovery hint -> source-alpha/effect mask -> alpha-only transparent clean plate with hidden RGB preserved -> fresh native Hangul render -> exact-header raw mirror-Y DDS -> decoded static QA",
   "structure": {
     "width": 1024,
     "height": 1024,
     "format": "RGBA32",
     "mipmaps": 1,
     "header_128_exact": true,
-    "raw_orientation": "rotate_180"
+    "raw_orientation": "mirror_y"
   },
   "segments_total": 7,
   "rows": [
@@ -28,23 +28,23 @@
       "korean": "타임 어택 모드 / 15코스",
       "stage_name": false,
       "discovery_bbox": [
-        366,
+        3,
         504,
-        1021,
+        658,
         577
       ],
       "original_bbox": [
-        376,
+        11,
         512,
-        1013,
+        648,
         558
       ],
       "source_mask_density": 0.44996928537301206,
       "source_alpha_density": 0.45034468636953107,
       "localized_bbox": [
-        502,
+        137,
         513,
-        886,
+        521,
         557
       ],
       "source_width": 637,
@@ -59,7 +59,7 @@
       "size_ceiling": "PASS",
       "font_size": 39,
       "stroke_width": 2,
-      "slant": 0.10310206598828293,
+      "slant": 0.0,
       "palette": {
         "fill_top": [
           57,
@@ -88,23 +88,23 @@
       "korean": "알파인",
       "stage_name": true,
       "discovery_bbox": [
-        849,
+        1,
         577,
-        1023,
+        175,
         659
       ],
       "original_bbox": [
-        859,
+        9,
         585,
-        1015,
+        165,
         640
       ],
       "source_mask_density": 0.4398601398601399,
       "source_alpha_density": 0.4438228438228438,
       "localized_bbox": [
-        869,
+        19,
         586,
-        1004,
+        154,
         639
       ],
       "source_width": 156,
@@ -148,23 +148,23 @@
       "korean": "에인션트 루인스",
       "stage_name": true,
       "discovery_bbox": [
-        652,
+        2,
         656,
-        1022,
+        372,
         727
       ],
       "original_bbox": [
-        662,
+        10,
         664,
-        1014,
+        362,
         708
       ],
       "source_mask_density": 0.49328512396694213,
       "source_alpha_density": 0.49548037190082644,
       "localized_bbox": [
-        707,
+        55,
         665,
-        969,
+        317,
         707
       ],
       "source_width": 352,
@@ -179,7 +179,7 @@
       "size_ceiling": "PASS",
       "font_size": 39,
       "stroke_width": 2,
-      "slant": 0.32,
+      "slant": 0.0,
       "palette": {
         "fill_top": [
           57,
@@ -208,23 +208,23 @@
       "korean": "베이 에어리어",
       "stage_name": true,
       "discovery_bbox": [
-        781,
+        1,
         732,
-        1023,
+        243,
         807
       ],
       "original_bbox": [
-        792,
+        9,
         740,
-        1015,
+        232,
         794
       ],
       "source_mask_density": 0.41762165753197145,
       "source_alpha_density": 0.41762165753197145,
       "localized_bbox": [
-        795,
+        12,
         746,
-        1012,
+        229,
         787
       ],
       "source_width": 223,
@@ -268,23 +268,23 @@
       "korean": "빅 포레스트",
       "stage_name": true,
       "discovery_bbox": [
-        754,
+        1,
         805,
-        1023,
+        270,
         886
       ],
       "original_bbox": [
-        768,
+        9,
         813,
-        1015,
+        256,
         868
       ],
       "source_mask_density": 0.4230401177769599,
       "source_alpha_density": 0.4305483989694516,
       "localized_bbox": [
-        773,
+        14,
         814,
-        1010,
+        251,
         867
       ],
       "source_width": 247,
@@ -328,38 +328,38 @@
       "korean": "캐니언",
       "stage_name": true,
       "discovery_bbox": [
-        823,
+        1,
         881,
-        1023,
+        201,
         963
       ],
       "original_bbox": [
-        833,
+        9,
         889,
-        1015,
+        191,
         944
       ],
       "source_mask_density": 0.4117882117882118,
       "source_alpha_density": 0.42337662337662335,
       "localized_bbox": [
-        850,
+        32,
         890,
-        997,
+        168,
         943
       ],
       "source_width": 182,
       "source_height": 55,
-      "localized_width": 147,
+      "localized_width": 136,
       "localized_height": 53,
-      "delta_left": 17,
-      "delta_right": 18,
+      "delta_left": 23,
+      "delta_right": 23,
       "delta_top": 1,
       "delta_bottom": 1,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "font_size": 49,
       "stroke_width": 3,
-      "slant": 0.32,
+      "slant": 0.0,
       "palette": {
         "fill_top": [
           57,
@@ -388,38 +388,38 @@
       "korean": "케이프 웨이",
       "stage_name": true,
       "discovery_bbox": [
-        756,
+        1,
         957,
-        1023,
+        268,
         1024
       ],
       "original_bbox": [
-        766,
+        9,
         965,
-        1015,
+        258,
         1020
       ],
       "source_mask_density": 0.4150419861263235,
       "source_alpha_density": 0.41861993428258487,
       "localized_bbox": [
-        767,
+        15,
         966,
-        1014,
+        251,
         1019
       ],
       "source_width": 249,
       "source_height": 55,
-      "localized_width": 247,
+      "localized_width": 236,
       "localized_height": 53,
-      "delta_left": 1,
-      "delta_right": 1,
+      "delta_left": 6,
+      "delta_right": 7,
       "delta_top": 1,
       "delta_bottom": 1,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "font_size": 49,
       "stroke_width": 3,
-      "slant": 0.32,
+      "slant": 0.0,
       "palette": {
         "fill_top": [
           57,
