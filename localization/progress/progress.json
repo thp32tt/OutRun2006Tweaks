@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T03:54:27+09:00",
+  "updated_at_kst": "2026-10-05T04:21:49+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C126 final QA advances B_PRODUCTION40 42E618FD to pixel/visual policy PASS pending isolated in-game validation. Existing 1A43E9D9 remains static HIGH_RISK edge-touch pending mandatory in-game validation. Producer REWORK=0; strict DXT5 no-candidate HOLD 4F68708E/F6811E94; pending_artwork localize_text=43.",
+  "next_checkpoint": "B_PRODUCTION43 produced even index 112 D41D0B1 exact-HD two-line DXT5 candidate 0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80: 2/2 source+decoded bbox/size, shared two-line source-family style, 15px decoded row gap, zero overlap/outside/residue/patch escape and controller readable/raw self-QA PASS. Independent C final QA and isolated in-game validation pending; producer REWORK=0; pending_artwork localize_text=42.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,

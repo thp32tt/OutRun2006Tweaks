@@ -1,5 +1,5 @@
 {
-  "schema_version": 66,
+  "schema_version": 67,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B_PRODUCTION43 produced even index 112 D41D0B1 candidate 0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80: initial format mismatch fail-closed and B42 one-line visual self-QA failure were corrected in the same invocation; final two-line candidate passes 2/2 exact/decoded bbox+size, shared source-family style, decoded 15px row gap, zero overlap/outside/residue/patch escape and controller readable/raw mirror_y QA. Independent C final QA and isolated in-game validation remain pending; pending_artwork localize_text=42; RUNTIME_VALIDATION=UNTESTED.",
     "C126 finalized B_PRODUCTION40 42E618FD candidate 86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a: hosted independent DXT5 header/decode + 1/1 exact bbox/size PASS with positive margins, zero clean/source-residue/outside/alpha/protected/target failures, and controller source/clean/final/row visual PASS. Static state C126_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME; RUNTIME_VALIDATION=UNTESTED.",
     "C125 finalized A_PRODUCTION20 9CE4E175 cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2 and A_PRODUCTION21 EBEF6D20 005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2 as static pixel/visual PASS pending in-game. Latest B_PRODUCTION39 1A43E9D9 601be9747c0cf03e89740786fe0782ec1e71f0e480ceb5e3d740637d048043b3 passes independent C124 machine + C high-zoom/readable/raw static QA but row1 has delta_top=0 edge touch; classify HIGH_RISK static PASS and require actual in-game validation before final approval. Producer REWORK remains 0. RUNTIME_VALIDATION=UNTESTED.",
     "C118 finalized B_PRODUCTION32 788CE557 candidate cc6727baac1b6946ae92cf5bc5568145c1d3ced2248f1fc134e9cc79c5f17149: direct SHA/header and 4/4 exact bbox+size arithmetic PASS, producer zero-residue/outside/protected/overlap/guard gates PASS, and C SOURCE/CLEAN/FINAL/row/TOP_PAIR/raw visual QA PASS. C108/B31 source residue is resolved; producer REWORK remaining=0. RUNTIME_VALIDATION=UNTESTED.",
@@ -23,8 +24,7 @@
     "A_PRODUCTION10 rebuilt index 43 455717B2 from authoritative 2048x2048 Release HD source; candidate 50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f passed A static/visual self-QA and is pending independent C final QA plus isolated in-game validation.",
     "A_RECOVERY08 repaired C92-returned FD90AA9; candidate 0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b passed A static + controller visual self-QA and is pending independent C final QA plus isolated in-game validation.",
     "C92 strict checkpoint remains authoritative until C revalidates A_RECOVERY08; FD90AA9 is the only C92-returned REWORK asset.",
-    "C85: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77 pass current exact pixel+visual static QA but remain pending isolated DDS_ONLY in-game; approved lock count 0.",
-    "B91 staged attempts were independently re-decoded by C; only C4A2937B was promoted to canonical candidate."
+    "C85: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77 pass current exact pixel+visual static QA but remain pending isolated DDS_ONLY in-game; approved lock count 0."
   ],
   "prototype_history": {
     "branch": "korean-localization-prototype",
@@ -157,7 +157,7 @@
       ],
       "rework_required_assets": [],
       "failed_elements": 0,
-      "pending_production_localize_text": 43,
+      "pending_production_localize_text": 42,
       "hold_strict_recheck_zoom_review": 47,
       "promotion_hold_for_pixel_pass": true,
       "promotion_hold_reason": "1A43E9D9 remains static PASS but HIGH_RISK edge-touch and requires in-game validation before final approval; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD; unfinished queue rows remain.",
@@ -817,11 +817,11 @@
       "runtime_validation": "UNTESTED"
     },
     "latest_b_production": {
-      "run": "B_PRODUCTION40",
-      "asset": "42E618FD",
-      "queue_index": 98,
-      "candidate_sha256": "86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a",
-      "report": "localization/graphics/role_B/20261005-B-PRODUCTION40/B_PRODUCTION40_42E_REPORT.json",
+      "run": "B_PRODUCTION43",
+      "asset": "D41D0B1",
+      "queue_index": 112,
+      "candidate_sha256": "0ac0b2d326914d88f13689eb9be3df6b06111582dd1ba19d2849e7f1be8a8a80",
+      "report": "localization/graphics/role_B/20261005-B-PRODUCTION43/B_PRODUCTION43_D41_REPORT.json",
       "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
       "runtime_validation": "UNTESTED"
     }

@@ -157,7 +157,23 @@
     "partial_color_bytes_preserved": true,
     "status": "PASS"
   },
-  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "manual_visual_qa": "PASS_CONTROLLER_SOURCE_CLEAN_FINAL_TWO_ROW_CONTACT_AND_RAW: source two-line structure preserved as two Korean lines; shared font size/stroke/fill/outline/slant; no visible English residue, clipping, overlap, seam, halo or orientation regression",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_PRODUCTION43_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B_PRODUCTION43_CONTROLLER_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_qa": {
+    "status": "PASS",
+    "reviewed_at_kst": "2026-10-05T04:21:49+09:00",
+    "views": [
+      "B_PRODUCTION43_D41_COMPARE.jpg",
+      "B_PRODUCTION43_D41_ROW_CONTACT_2X.jpg",
+      "B_PRODUCTION43_D41_RAW_COMPARE.jpg"
+    ],
+    "source_line_count": 2,
+    "localized_line_count": 2,
+    "multi_line_style_consistency": "PASS_SHARED_FONT_SIZE_STROKE_FILL_OUTLINE_SLANT",
+    "decoded_row_gap_pixels": 15,
+    "source_residue": "NONE_VISIBLE",
+    "clipping_overlap_seam_halo": "NONE_VISIBLE",
+    "orientation": "PASS_RAW_MIRROR_Y"
+  }
 }
