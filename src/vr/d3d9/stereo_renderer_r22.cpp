@@ -912,6 +912,19 @@ namespace OutRunVRStereo
         R22ReplayScope replay_;
     };
 
+    inline bool CaptureTrackedRasterState(IDirect3DDevice9* device,
+        OutRunVR::State::D3D9RasterSnapshot& out) noexcept
+    {
+        return R22CaptureGameScissor(device, out);
+    }
+
+    inline bool TrackedGameClearCoversBackbuffer(DWORD count,
+        const D3DRECT* rects,
+        const OutRunVR::State::D3D9RasterSnapshot& state) noexcept
+    {
+        return R22GameClearCoversBackbuffer(count, rects, state);
+    }
+
     inline OutRunVR::RuntimeEligibility::InstallState
     R22InstallStatus() noexcept
     {
