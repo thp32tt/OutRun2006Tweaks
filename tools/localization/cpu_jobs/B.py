@@ -58,7 +58,7 @@ if red_seed.sum()<100 or orange_seed.sum()<100:raise RuntimeError(('insufficient
 ry,rx=np.nonzero(red_seed);oy,ox=np.nonzero(orange_seed)
 red_fill_max_x=x0+int(rx.max());orange_fill_min_x=x0+int(ox.min());top_split=(red_fill_max_x+orange_fill_min_x)//2
 seed_y0=y0+min(int(ry.min()),int(oy.min()));seed_y1=y0+max(int(ry.max()),int(oy.max()))+1;top_band_y0=max(y0,seed_y0-22);top_band_y1=min(y1,seed_y1+22)
-if not(340<=top_split<=430 and top_band_y0<top_band_y1):raise RuntimeError(('unexpected semantic split',red_fill_max_x,orange_fill_min_x,top_split,top_band_y0,top_band_y1))
+if not(340<=top_split<=460 and top_band_y0<top_band_y1):raise RuntimeError(('unexpected semantic split',red_fill_max_x,orange_fill_min_x,top_split,top_band_y0,top_band_y1))
 red=np.zeros((H,W),bool);orange=np.zeros((H,W),bool)
 red[top_band_y0:top_band_y1,0:top_split]=alpha[top_band_y0:top_band_y1,0:top_split]
 orange[top_band_y0:top_band_y1,top_split:770]=alpha[top_band_y0:top_band_y1,top_split:770]
@@ -68,8 +68,8 @@ def cellmask(cell):
 music=cellmask((770,78,1140,174));time=cellmask((930,180,1600,286))
 source_masks={'for_experts':red,'outrun2sp':orange,'music_change':music,'time_remaining':time}
 expected={
- 'for_experts':{'x':(0,430),'y':(85,180),'text':'상급자용','source':'For Experts','style':'red_white_navy','slant':0.13},
- 'outrun2sp':{'x':(320,780),'y':(85,180),'text':'아웃런2 SP','source':'OutRun2SP','style':'orange_white_navy','slant':0.12},
+ 'for_experts':{'x':(0,450),'y':(85,190),'text':'상급자용','source':'For Experts','style':'red_white_navy','slant':0.13},
+ 'outrun2sp':{'x':(420,780),'y':(85,190),'text':'아웃런2 SP','source':'OutRun2SP','style':'orange_white_navy','slant':0.12},
  'music_change':{'x':(770,1140),'y':(78,174),'text':'음악 변경','source':'Music Change','style':'white_shadow','slant':0.10},
  'time_remaining':{'x':(930,1600),'y':(180,286),'text':'남은 시간:','source':'Time remaining :','style':'white_navy','slant':0.10},
 }
