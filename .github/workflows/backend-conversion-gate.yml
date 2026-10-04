@@ -26,8 +26,7 @@ jobs:
 
       - name: Verify queue automation contract
         shell: pwsh
-        run: |
-          if (-not (Test-Path docs/automation/QUEUE_CONTROLLER_CONTRACT.md)) { throw "queue automation contract missing" }
+        run: python tools/verify_queue_controller_contract.py
 
       - name: Verify HMD-proven baseline
         shell: pwsh
