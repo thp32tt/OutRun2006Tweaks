@@ -7,7 +7,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted localization CPU worker / role B only")
 
 repo=Path.cwd()
-run="20261005-B-PRODUCTION57"
+run="20261005-B-PRODUCTION58"
 out=repo/"localization/graphics/role_B"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
@@ -141,45 +141,52 @@ smp=out/"31C_SOURCE_TEXT_MASK.png"; ap=out/"31C_ALLOWED_BBOX_MASK.png"; pp=out/"
 src.save(sp); clean.save(cpout); source_text_mask.save(smp); allowed.save(ap); protected.save(pp)
 clean_protected.save(out/"31C_CLEAN_PROTECTED_VISIBLE_MASK.png")
 subprocess.run(["python3",str(validator),str(sp),str(cpout),str(smp),"--protected-mask",
-                str(out/"31C_CLEAN_PROTECTED_VISIBLE_MASK.png"),"--report",str(out/"B57_CLEAN_VALIDATION.json")],
+                str(out/"31C_CLEAN_PROTECTED_VISIBLE_MASK.png"),"--report",str(out/"B58_CLEAN_VALIDATION.json")],
                check=True)
-cleanrep=json.loads((out/"B57_CLEAN_VALIDATION.json").read_text())
+cleanrep=json.loads((out/"B58_CLEAN_VALIDATION.json").read_text())
 if cleanrep["status"]!="PASS": raise RuntimeError(("clean validator",cleanrep))
 source_unchanged=count(ImageChops.multiply(source_text_mask,ImageOps.invert(dmask(src,clean))))
 if source_unchanged: raise RuntimeError(("source residue in clean",source_unchanged))
 
 def resolve_font():
-    def pick(patterns):
-        for pat in patterns:
+    def pick():
+        for pat,want in [
+            ("Noto Sans CJK KR:style=Bold","Bold"),
+            ("Noto Sans CJK KR:style=Black","Bold"),
+            ("Noto Sans CJK KR","Bold"),
+        ]:
             try: spec=subprocess.check_output(["fc-match","-f","%{file}|%{index}",pat],text=True).strip()
             except Exception: spec=""
-            if "|" in spec:
-                fp,idx=spec.rsplit("|",1)
-                if fp and Path(fp).exists() and "NotoSansCJK" in Path(fp).name:
-                    return fp,int(idx or 0),pat
+            if "|" not in spec: continue
+            fp,idx=spec.rsplit("|",1)
+            if fp and Path(fp).exists() and "NotoSansCJK" in Path(fp).name and want in Path(fp).name:
+                return fp,int(idx or 0),pat
         return None
-    got=pick(["Noto Sans CJK KR:style=Black","Noto Sans CJK KR:style=Bold","Noto Sans CJK KR"])
+    got=pick()
     if got: return got
     subprocess.run(["sudo","apt-get","update","-qq"],check=True)
     subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
-    got=pick(["Noto Sans CJK KR:style=Black","Noto Sans CJK KR:style=Bold","Noto Sans CJK KR"])
-    if not got: raise RuntimeError("Noto CJK unavailable")
+    got=pick()
+    if not got: raise RuntimeError("Noto CJK Bold unavailable")
     return got
 FONT,FONT_INDEX,FONT_PATTERN=resolve_font()
+PLAIN_WEIGHT_STROKE=2
 
 def render_plain(text,ob):
     aw,ah=ob[2]-ob[0],ob[3]-ob[1]
     for fs in range(min(120,int(ah*1.15)),20,-1):
         font=ImageFont.truetype(FONT,fs,index=FONT_INDEX)
-        d=ImageDraw.Draw(Image.new("L",(8,8),0)); tb=d.textbbox((0,0),text,font=font)
-        pad=4
+        d=ImageDraw.Draw(Image.new("L",(8,8),0))
+        tb=d.textbbox((0,0),text,font=font,stroke_width=PLAIN_WEIGHT_STROKE)
+        pad=PLAIN_WEIGHT_STROKE+4
         lay=Image.new("RGBA",(tb[2]-tb[0]+pad*2,tb[3]-tb[1]+pad*2),(0,0,0,0))
-        ImageDraw.Draw(lay).text((pad-tb[0],pad-tb[1]),text,font=font,fill=WHITE)
+        ImageDraw.Draw(lay).text((pad-tb[0],pad-tb[1]),text,font=font,fill=WHITE,
+                                 stroke_width=PLAIN_WEIGHT_STROKE,stroke_fill=WHITE)
         bb=lay.getchannel("A").getbbox()
         if not bb: continue
         lay=lay.crop(bb)
         if lay.width<=aw-4 and lay.height<=ah-4:
-            return lay,(ob[0]+2,ob[1]+(ah-lay.height)//2),fs,0
+            return lay,(ob[0]+2,ob[1]+(ah-lay.height)//2),fs,PLAIN_WEIGHT_STROKE
     raise RuntimeError(("plain fit",text,ob))
 
 # Estimate the yellow source outline width from alpha-vs-yellow-fill margins.
@@ -235,7 +242,7 @@ for spec in source_rows+word_specs:
       "containment":"PASS","size_ceiling":"PASS","positive_margin":"PASS",
       "font_file":Path(FONT).name,"font_face_index":FONT_INDEX,"font_pattern":FONT_PATTERN,
       "font_size":fs,"stroke_width":sw,
-      "rework_status":"B57_NEW_EXACT_HD_CANDIDATE"})
+      "rework_status":"B58_NEW_EXACT_HD_CANDIDATE"})
 
 # Zero overlap/touch among localized labels and positive separation from preserved icon/artwork.
 overlap=0; touch=[]
@@ -263,8 +270,8 @@ if ImageChops.difference(decoded,final).getbbox(): raise RuntimeError("roundtrip
 fp=out/"31C_HD_FINAL_DECODED_READABLE.png"; decoded.save(fp)
 
 subprocess.run(["python3",str(validator),str(sp),str(fp),str(ap),"--protected-mask",str(pp),
-                "--report",str(out/"B57_FINAL_VALIDATION.json")],check=True)
-finalrep=json.loads((out/"B57_FINAL_VALIDATION.json").read_text())
+                "--report",str(out/"B58_FINAL_VALIDATION.json")],check=True)
+finalrep=json.loads((out/"B58_FINAL_VALIDATION.json").read_text())
 if finalrep["status"]!="PASS": raise RuntimeError(("final validator",finalrep))
 
 diff=dmask(src,decoded)
@@ -283,7 +290,7 @@ for label,im in [("SOURCE",src),("CLEAN",clean),("FINAL",decoded)]:
     c=Image.new("RGB",(1024,540),"white"); c.paste(z,(0,28)); ImageDraw.Draw(c).text((5,5),label,fill="black"); cards.append(c)
 sheet=Image.new("RGB",(1024,1620),"white")
 for i,c in enumerate(cards): sheet.paste(c,(0,i*540))
-sheet.save(out/"B57_31C_SOURCE_CLEAN_FINAL.jpg",quality=96)
+sheet.save(out/"B58_31C_SOURCE_CLEAN_FINAL.jpg",quality=96)
 
 contacts=[]
 for r in rows:
@@ -300,13 +307,13 @@ for r in rows:
 rs=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in contacts)+4*(len(contacts)-1)),"white")
 yy=0
 for c in contacts: rs.paste(c,(0,yy)); yy+=c.height+4
-rs.save(out/"B57_31C_ROW_CONTACT_2X.jpg",quality=96)
+rs.save(out/"B58_31C_ROW_CONTACT_2X.jpg",quality=96)
 
 rawsheet=Image.new("RGB",(1024,1080),"white")
 for i,(label,im) in enumerate([("SOURCE_RAW_MIRROR_Y",raw_src),("FINAL_RAW_MIRROR_Y",decoded_raw)]):
     z=comp(im).resize((1024,512),Image.Resampling.LANCZOS)
     rawsheet.paste(z,(0,i*540+28)); ImageDraw.Draw(rawsheet).text((5,i*540+5),label,fill="black")
-rawsheet.save(out/"B57_31C_RAW_COMPARE.jpg",quality=96)
+rawsheet.save(out/"B58_31C_RAW_COMPARE.jpg",quality=96)
 
 report={
  "schema_version":1,"role":"B","run":run,"index":index,"asset":asset,
@@ -317,7 +324,7 @@ report={
    "localized_physical_words":{"PRESS":"누르세요","KEY":"키"},"preserved_icon":"Enter-key icon"},
  "structure":{"dimensions":[W,H],"format":"RGBA32","raw_mode":RAWMODE,"mipmaps":mips,"bytes":len(sb),
    "header_128_exact":True,"raw_orientation":"mirror_y"},
- "source_style":{"plain_white_fill_rgba":WHITE,"compound_yellow_fill_rgba":YELLOW,
+ "source_style":{"plain_white_fill_rgba":WHITE,"plain_same_color_weight_stroke":PLAIN_WEIGHT_STROKE,"compound_yellow_fill_rgba":YELLOW,
    "compound_dark_outline_rgba":DARK,"compound_stroke_width":stroke},
  "rows":rows,"protected_enter_icon_pixels":icon_pixels,
  "clean_plate_validator":cleanrep,"final_mask_validator":finalrep,
@@ -328,13 +335,13 @@ report={
  "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
  "controller_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "RUNTIME_VALIDATION":"UNTESTED",
- "status":"B_PRODUCTION57_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B_PRODUCTION58_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(out/"B57_31C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"B58_31C_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 summary={"run":run,"asset":"31C58963","index":index,"source_sha256":sha256b(sb),"candidate_sha256":cand_sha,
  "bbox_size_positive_margin":"6/6","clean_plate_validator":cleanrep["status"],"final_mask_validator":finalrep["status"],
  "source_mask_residue":source_unchanged,"outside":outside,"alpha_outside":alpha_out,"protected_changed":prot,
  "overlap":overlap,"touch_pairs":len(touch),"worker_status":report["status"],"runtime_validation":"UNTESTED",
- "report":"localization/graphics/role_B/20261005-B-PRODUCTION57/B57_31C_REPORT.json"}
-(wr/"B57_31C58963.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+ "report":"localization/graphics/role_B/20261005-B-PRODUCTION58/B58_31C_REPORT.json"}
+(wr/"B58_31C58963.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False))
