@@ -70,77 +70,55 @@ def changed_mask(a,b):
         m = ImageChops.lighter(m,z)
     return m.point(lambda v:255 if v else 0)
 
-def y_bands(alpha):
-    w,h = alpha.size
-    bands=[]
-    on=False
-    start=0
-    for yy in range(h):
-        hist = alpha.crop((0,yy,w,yy+1)).histogram()
-        active = sum(hist[1:]) > 0
-        if active and not on:
-            start=yy; on=True
-        if on and (not active or yy == h-1):
-            end = yy if not active else yy+1
-            bands.append((start,end))
-            on=False
-    return bands
-
-def bbox_in_zone(alpha, zone):
-    x1,y1,x2,y2 = zone
-    bb = alpha.crop(zone).getbbox()
+def extract_hd_bbox(stock_bbox, margin=16):
+    # Stock 1x boxes are discovery hints only. Measure the actual permitted bbox
+    # from nonzero alpha in the authoritative 4x HD DDS inside a safely isolated zone.
+    sx1,sy1,sx2,sy2 = stock_bbox
+    zx1=max(0,sx1*4-margin); zy1=max(0,sy1*4-margin)
+    zx2=min(W,sx2*4+margin); zy2=min(H,sy2*4+margin)
+    zone=(zx1,zy1,zx2,zy2)
+    bb=source_readable.crop(zone).getchannel("A").getbbox()
     if not bb:
-        return None
-    return [x1+bb[0],y1+bb[1],x1+bb[2],y1+bb[3]]
+        raise RuntimeError(("empty HD search zone",stock_bbox,zone))
+    gb=[zx1+bb[0],zy1+bb[1],zx1+bb[2],zy1+bb[3]]
+    # A touching search boundary would mean the discovery window was too small/ambiguous.
+    if gb[0]<=zx1 or gb[1]<=zy1 or gb[2]>=zx2 or gb[3]>=zy2:
+        raise RuntimeError(("HD bbox touches search boundary",stock_bbox,zone,gb))
+    return gb
 
 targets=[]
 
-# Region 4 is a dedicated vertical label sprite:
-# Symbols / Shift / Caps Lock / Accents / Done. Shift is intentionally unchanged.
-r4 = regions[4]
-x,y,w,h = r4["rect"]
-a4 = source_readable.crop((x,y,x+w,y+h)).getchannel("A")
-bands = y_bands(a4)
-if len(bands) != 5:
-    raise RuntimeError(("region4 bands",bands))
+# Exact low-resolution source glyph/effect bboxes are used only to isolate each label.
+# The final permitted boxes below are re-measured from authoritative HD source alpha.
 line_specs = [
-    ("symbols","Symbols","기호",0),
-    ("shift","Shift","Shift",1),
-    ("caps_lock","Caps Lock","대문자 고정",2),
-    ("accents","Accents","악센트",3),
-    ("done","Done","완료",4),
+    ("symbols","Symbols","기호",4,[940,18,989,32]),
+    ("shift","Shift","Shift",4,[940,44,968,55]),
+    ("caps_lock","Caps Lock","대문자 고정",4,[940,69,1000,83]),
+    ("accents","Accents","악센트",4,[940,94,986,105]),
+    ("done","Done","완료",4,[940,119,969,130]),
 ]
 preserved_shift_bbox=None
-for key,src,kor,bi in line_specs:
-    y1,y2=bands[bi]
-    bb=a4.crop((0,y1,w,y2)).getbbox()
-    if not bb:
-        raise RuntimeError(("empty r4 line",key))
-    gb=[x+bb[0], y+y1+bb[1], x+bb[2], y+y1+bb[3]]
+for key,src,kor,idx,stock_box in line_specs:
+    gb=extract_hd_bbox(stock_box)
     if key=="shift":
         preserved_shift_bbox=gb
     else:
-        targets.append({"key":key,"source":src,"korean":kor,"region_idx":4,"original_bbox":gb})
+        targets.append({"key":key,"source":src,"korean":kor,"region_idx":idx,"stock_discovery_bbox":stock_box,"original_bbox":gb})
 
-# Five character-set sprites each contain a target Backspace in the second-last text row
-# and a target Space in the bottom row. Other digits/letters/symbols are protected.
-for idx in [1,2,3,5,6]:
-    r=regions[idx]
-    x,y,w,h=r["rect"]
-    alpha=source_readable.crop((x,y,x+w,y+h)).getchannel("A")
-    bands=y_bands(alpha)
-    if len(bands) != 5:
-        raise RuntimeError(("bands",idx,bands))
-    by1,by2=bands[-2]
-    sy1,sy2=bands[-1]
-    b_local=bbox_in_zone(alpha,(int(w*0.60),by1,w,by2))
-    s_local=bbox_in_zone(alpha,(0,sy1,int(w*0.60),sy2))
-    if not b_local or not s_local:
-        raise RuntimeError(("target extraction",idx,b_local,s_local))
-    bb=[x+b_local[0],y+b_local[1],x+b_local[2],y+b_local[3]]
-    sbx=[x+s_local[0],y+s_local[1],x+s_local[2],y+s_local[3]]
-    targets.append({"key":f"backspace_r{idx}","source":"Backspace","korean":"지우기","region_idx":idx,"original_bbox":bb})
-    targets.append({"key":f"space_r{idx}","source":"Space","korean":"공백","region_idx":idx,"original_bbox":sbx})
+occurrences = [
+    ("backspace_r1",1,"Backspace","지우기",[216,94,276,107]),
+    ("space_r1",1,"Space","공백",[66,118,100,132]),
+    ("backspace_r2",2,"Backspace","지우기",[526,94,586,107]),
+    ("space_r2",2,"Space","공백",[376,118,410,132]),
+    ("backspace_r3",3,"Backspace","지우기",[836,94,896,107]),
+    ("space_r3",3,"Space","공백",[686,118,720,132]),
+    ("backspace_r5",5,"Backspace","지우기",[620,216,680,229]),
+    ("space_r5",5,"Space","공백",[470,240,504,254]),
+    ("backspace_r6",6,"Backspace","지우기",[930,216,990,229]),
+    ("space_r6",6,"Space","공백",[780,240,814,254]),
+]
+for key,idx,src,kor,stock_box in occurrences:
+    targets.append({"key":key,"source":src,"korean":kor,"region_idx":idx,"stock_discovery_bbox":stock_box,"original_bbox":extract_hd_bbox(stock_box)})
 
 if len(targets) != 14 or preserved_shift_bbox is None:
     raise RuntimeError(("target count",len(targets),preserved_shift_bbox))
