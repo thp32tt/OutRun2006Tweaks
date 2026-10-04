@@ -7,16 +7,16 @@ from PIL import Image,ImageChops,ImageDraw,ImageFont,ImageFilter
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("B hosted worker only")
 
-RUN="20261005-B-PRODUCTION49"
+RUN="20261005-B-PRODUCTION50"
 ASSET="textures/load/spr_sprani_sumo_fe_cvt_Exst/EBFC709F_512x256.dds"
 INDEX=232
 # Direct exact-source readable cells established by B48 controller visual evidence.
 # Order is semantic/physical: small JOIN, small CREATE, large CREATE, large JOIN.
 TARGETS=[
- ("join_small","JOIN GAME","게임 참가",(0,270,520,390),"small"),
- ("create_small","CREATE GAME","게임 만들기",(820,270,1510,390),"small"),
- ("create_large","CREATE GAME","게임 만들기",(0,650,1450,890),"large_blue"),
- ("join_large","JOIN GAME","게임 참가",(0,865,1250,1024),"large_blue"),
+ ("join_small","JOIN GAME","게임 참가",(0,275,300,360),"small"),
+ ("create_small","CREATE GAME","게임 만들기",(870,275,1480,360),"small"),
+ ("create_large","CREATE GAME","게임 만들기",(0,690,1350,875),"large_blue"),
+ ("join_large","JOIN GAME","게임 참가",(0,875,1120,1024),"large_blue"),
 ]
 
 def main():
@@ -112,12 +112,12 @@ def main():
     def mi(m):return Image.fromarray((m.astype(np.uint8)*255),"L")
     mi(full).save(out/"EBFC709F_SOURCE_TEXT_MASK.png");mi(allowed).save(out/"EBFC709F_ALLOWED_TEXT_REGION_MASK.png");mi(~allowed).save(out/"EBFC709F_PROTECTED_MASK.png");mi(target).save(out/"EBFC709F_TARGET_TEXT_MASK.png");clean.save(out/"EBFC709F_CLEAN_PLATE.png")
     sp=Path("/tmp/b49src.png");fp=Path("/tmp/b49fin.png");src.save(sp);dec.save(fp);v=repo/"tools/localization/validate_clean_plate.py"
-    subprocess.run(["python3",str(v),str(sp),str(out/"EBFC709F_CLEAN_PLATE.png"),str(out/"EBFC709F_SOURCE_TEXT_MASK.png"),"--report",str(out/"B_PRODUCTION49_CLEAN_VALIDATION.json")],check=True)
-    subprocess.run(["python3",str(v),str(sp),str(fp),str(out/"EBFC709F_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(out/"EBFC709F_PROTECTED_MASK.png"),"--report",str(out/"B_PRODUCTION49_FINAL_VALIDATION.json")],check=True)
+    subprocess.run(["python3",str(v),str(sp),str(out/"EBFC709F_CLEAN_PLATE.png"),str(out/"EBFC709F_SOURCE_TEXT_MASK.png"),"--report",str(out/"B_PRODUCTION50_CLEAN_VALIDATION.json")],check=True)
+    subprocess.run(["python3",str(v),str(sp),str(fp),str(out/"EBFC709F_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(out/"EBFC709F_PROTECTED_MASK.png"),"--report",str(out/"B_PRODUCTION50_FINAL_VALIDATION.json")],check=True)
     def comp(im,bg=(64,64,64,255)):z=Image.new("RGBA",im.size,bg);z.alpha_composite(im);return z.convert("RGB")
     def card(lbl,im,bg=(64,64,64,255)):z=comp(im,bg);c=Image.new("RGB",(W,H+25),"white");c.paste(z,(0,25));ImageDraw.Draw(c).text((5,4),lbl,fill="black");return c
     cs=[card("SOURCE_READABLE",src),card("CLEAN",clean),card("FINAL",dec),card("FINAL_WHITE",dec,(255,255,255,255))]
-    sh=Image.new("RGB",(W*2,(H+25)*2),"white");sh.paste(cs[0],(0,0));sh.paste(cs[1],(W,0));sh.paste(cs[2],(0,H+25));sh.paste(cs[3],(W,H+25));sh.thumbnail((1900,1500),Image.Resampling.LANCZOS);sh.save(out/"B_PRODUCTION49_EBFC_COMPARE.jpg",quality=96)
+    sh=Image.new("RGB",(W*2,(H+25)*2),"white");sh.paste(cs[0],(0,0));sh.paste(cs[1],(W,0));sh.paste(cs[2],(0,H+25));sh.paste(cs[3],(W,H+25));sh.thumbnail((1900,1500),Image.Resampling.LANCZOS);sh.save(out/"B_PRODUCTION50_EBFC_COMPARE.jpg",quality=96)
     contacts=[];sr=comp(src);cl=comp(clean);fi=comp(dec)
     for r in rows:
         x0,y0,x1,y1=r["original_bbox"];p=12;cr=(max(0,x0-p),max(0,y0-p),min(W,x1+p),min(H,y1+p));ims=[z.crop(cr) for z in (sr,cl,fi)];ims=[z.resize((z.width*2,z.height*2),Image.Resampling.NEAREST) for z in ims]
@@ -126,20 +126,20 @@ def main():
         ImageDraw.Draw(c).text((4,4),f'{r["n"]} {r["key"]}: {r["source"]} -> {r["korean"]}',fill="black");contacts.append(c)
     rs=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in contacts)+4*(len(contacts)-1)),"white");yy=0
     for c in contacts:rs.paste(c,(0,yy));yy+=c.height+4
-    rs.save(out/"B_PRODUCTION49_EBFC_ROW_CONTACT_2X.jpg",quality=96)
-    rr=Image.new("RGB",(W,(H+25)*2),"white");rr.paste(card("SOURCE_RAW_MIRROR_Y",raw_src),(0,0));rr.paste(card("FINAL_RAW_MIRROR_Y",raw_dec),(0,H+25));rr.thumbnail((1600,1400),Image.Resampling.LANCZOS);rr.save(out/"B_PRODUCTION49_EBFC_RAW_COMPARE.jpg",quality=96)
+    rs.save(out/"B_PRODUCTION50_EBFC_ROW_CONTACT_2X.jpg",quality=96)
+    rr=Image.new("RGB",(W,(H+25)*2),"white");rr.paste(card("SOURCE_RAW_MIRROR_Y",raw_src),(0,0));rr.paste(card("FINAL_RAW_MIRROR_Y",raw_dec),(0,H+25));rr.thumbnail((1600,1400),Image.Resampling.LANCZOS);rr.save(out/"B_PRODUCTION50_EBFC_RAW_COMPARE.jpg",quality=96)
     report={"schema_version":1,"role":"B","run":RUN,"queue_index":INDEX,"asset":ASSET,"readiness_tier":"REWORK_REQUIRED_FIXED_SAME_INVOCATION",
       "source_sha256":expected,"candidate_sha256":csha,"candidate_path":str(cand.relative_to(repo)),"structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
       "physical_occurrences":4,"semantic_labels":2,"rows":rows,"font_coverage":"PASS_VERIFIED_NOTO_CJK",
       "containment":{"elements_total":4,"elements_pass":4,"outside":outside,"alpha_outside":alpha_out,"target_out":target_out,"source_residue":residue,"overlap":overlap,"touch_pairs":touch,"status":"PASS"},
-      "clean_plate":{"rgb_changed_pixels":0,"source_effect_alpha_remaining":0,"status":"PASS"},"manual_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED","status":"B_PRODUCTION49_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-    (out/"B_PRODUCTION49_EBFC_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
-    summary={"run":RUN,"asset":"EBFC709F","index":INDEX,"candidate_sha256":csha,"physical_occurrences":"4/4","bbox_size_pass":"4/4","outside":outside,"alpha_outside":alpha_out,"source_residue":residue,"overlap":overlap,"touch_pairs":len(touch),"worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{RUN}/B_PRODUCTION49_EBFC_REPORT.json"}
-    (wr/"B_PRODUCTION49_EBFC709F.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n");print(json.dumps(summary,ensure_ascii=False),flush=True)
+      "clean_plate":{"rgb_changed_pixels":0,"source_effect_alpha_remaining":0,"status":"PASS"},"manual_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED","status":"B_PRODUCTION50_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+    (out/"B_PRODUCTION50_EBFC_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+    summary={"run":RUN,"asset":"EBFC709F","index":INDEX,"candidate_sha256":csha,"physical_occurrences":"4/4","bbox_size_pass":"4/4","outside":outside,"alpha_outside":alpha_out,"source_residue":residue,"overlap":overlap,"touch_pairs":len(touch),"worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{RUN}/B_PRODUCTION50_EBFC_REPORT.json"}
+    (wr/"B_PRODUCTION50_EBFC709F.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n");print(json.dumps(summary,ensure_ascii=False),flush=True)
 
 if __name__=="__main__":
     try:main()
     except Exception as e:
         repo=Path.cwd();out=repo/"localization/graphics/role_B"/RUN;out.mkdir(parents=True,exist_ok=True);wr=repo/"localization/graphics/worker_results";wr.mkdir(parents=True,exist_ok=True)
         fail={"run":RUN,"asset":"EBFC709F","index":INDEX,"status":"FAIL_CLOSED_DIAGNOSTIC","exception":repr(e),"traceback":traceback.format_exc(),"RUNTIME_VALIDATION":"UNTESTED"}
-        (out/"B_PRODUCTION49_FAIL_CLOSED.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n");(wr/"B_PRODUCTION49_EBFC709F_FAIL.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n");print(json.dumps(fail,ensure_ascii=False),flush=True)
+        (out/"B_PRODUCTION50_FAIL_CLOSED.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n");(wr/"B_PRODUCTION50_EBFC709F_FAIL.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n");print(json.dumps(fail,ensure_ascii=False),flush=True)
