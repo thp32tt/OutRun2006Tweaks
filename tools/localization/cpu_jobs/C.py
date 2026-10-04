@@ -42,18 +42,20 @@ def decode_pillow_dds(b):
 specs=[
  {'asset':'2EA557B4','report':'localization/graphics/role_A/20261005-A-PRODUCTION17/A_PRODUCTION17_2EA557B4_REPORT.json',
   'dir':'localization/graphics/role_A/20261005-A-PRODUCTION17',
+  'source_url':'https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds',
   'candidate':'localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds',
   'source_png':'2EA557B4_HD_SOURCE_READABLE.png','clean':'2EA557B4_HD_CLEAN_PLATE.png','final':'2EA557B4_HD_FINAL_DECODED_READABLE.png',
   'source_mask':'2EA557B4_HD_SOURCE_TEXT_MASK.png','allowed':'2EA557B4_HD_ALLOWED_TEXT_REGION_MASK.png','protected':'2EA557B4_HD_PROTECTED_VISIBLE_MASK.png',
   'kind':'dxt5'},
  {'asset':'BF3EE5C6','report':'localization/graphics/role_A/20261005-A-RECOVERY11/A_RECOVERY11_BF3EE5C6_REPORT.json',
   'dir':'localization/graphics/role_A/20261005-A-RECOVERY11',
+  'source_url':'https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds',
   'candidate':'localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds',
   'source_png':'BF3EE5C6_HD_SOURCE_READABLE.png','clean':'BF3EE5C6_HD_CLEAN_PLATE.png','final':'BF3EE5C6_HD_FINAL_DECODED_READABLE.png',
   'source_mask':'BF3EE5C6_HD_SOURCE_TEXT_MASK.png','allowed':'BF3EE5C6_HD_ALLOWED_TEXT_REGION_MASK.png','protected':'BF3EE5C6_HD_PROTECTED_VISIBLE_MASK.png',
   'kind':'rgba32'},
- {'asset':'53CE39D5','report':'localization/graphics/role_B/20261005-B-PRODUCTION22/B_PRODUCTION22_53CE_REPORT.json',
-  'dir':'localization/graphics/role_B/20261005-B-PRODUCTION22',
+ {'asset':'53CE39D5','report':'localization/graphics/role_B/20261005-B-PRODUCTION23/B_PRODUCTION23_53CE_REPORT.json',
+  'dir':'localization/graphics/role_B/20261005-B-PRODUCTION23',
   'candidate':'localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds',
   'clean':'53CE39D5_HD_CLEAN_PLATE.png','source_mask':'53CE39D5_HD_SOURCE_TEXT_MASK.png',
   'allowed':'53CE39D5_HD_ALLOWED_TEXT_REGION_MASK.png','protected':'53CE39D5_HD_PROTECTED_MASK.png',
@@ -63,8 +65,8 @@ results=[]
 for s in specs:
     rep=json.loads((repo/s['report']).read_text(encoding='utf-8')); d=repo/s['dir']
     cb=(repo/s['candidate']).read_bytes()
-    if s['asset']=='53CE39D5': source_url=rep['source_url']
-    else:
+    source_url=s.get('source_url') or rep.get('source_url')
+    if not source_url:
         sp=rep['source_provenance']; source_url=f"https://raw.githubusercontent.com/{sp['repository']}/{sp['commit']}/{sp['path']}"
     sb=fetch(source_url)
     if sha_bytes(sb)!=rep['source_sha256']: raise RuntimeError((s['asset'],'source sha mismatch',sha_bytes(sb),rep['source_sha256']))
