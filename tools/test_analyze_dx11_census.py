@@ -1143,6 +1143,70 @@ def main() -> int:
         is True
     )
 
+    r235_current_signature_evidence_reconciliation = run_cases(
+        {
+            "session-a-incomplete.log": (
+                "VR DX11 R71 census: observed=1 size=1280x720 sourceFormat=21 "
+                "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+                "VR DX11 R85 signature#1: primitive=4 fixedFn=1 fvf=0x000001C4\n"
+                "VR DX11 R120 census: samples=4 exact=4 fixedFn=4 programmable=0 "
+                "topologyUnsupported=0 signatures=2 "
+                "sampling[drawsSeen=4,stride=1,scheme=2] "
+                "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+                "declSamples=0 indexedSamples=0 texturedSamples=0 "
+                "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+                "mutationTelemetryRequired=0,managedShadowRequired=0,"
+                "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+                "depthUnsupported=0] "
+                "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+                "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+                "depthCmp=0,cull=0]\n"
+            ),
+            "session-b-accounted.log": (
+                "VR DX11 R71 census: observed=1 size=1920x1080 sourceFormat=22 "
+                "nativeFormat=29 msaa=0 bootstrapCompatible=1\n"
+                "VR DX11 R85 signature#1: primitive=5 fixedFn=1 fvf=0x000002C4\n"
+                "VR DX11 R120 census: samples=4 exact=4 fixedFn=4 programmable=0 "
+                "topologyUnsupported=0 signatures=2 "
+                "sampling[drawsSeen=4,stride=1,scheme=2] "
+                "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=1,detailSkipped=1] "
+                "declSamples=0 indexedSamples=0 texturedSamples=0 "
+                "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+                "mutationTelemetryRequired=0,managedShadowRequired=0,"
+                "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+                "depthUnsupported=0] "
+                "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+                "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+                "depthCmp=0,cull=0]\n"
+            ),
+        }
+    )
+    r235_coverage = r235_current_signature_evidence_reconciliation["SignatureCoverage"]
+    assert r235_coverage["CurrentSignatureEvidenceMissingLogs"] == [
+        "session-a-incomplete.log"
+    ]
+    assert r235_coverage["CurrentSignatureEvidenceOvercountLogs"] == []
+    assert r235_coverage["AllCurrentSignatureEvidenceAccounted"] is False
+    assert r235_coverage["CurrentSignatureEvidenceByLog"]["session-a-incomplete.log"] == {
+        "ExpectedSignatures": 2,
+        "CapturedSignatures": 1,
+        "DetailSkippedSignatures": 0,
+        "AccountedSignatures": 1,
+        "Complete": False,
+    }
+    assert r235_coverage["CurrentSignatureEvidenceByLog"]["session-b-accounted.log"] == {
+        "ExpectedSignatures": 2,
+        "CapturedSignatures": 1,
+        "DetailSkippedSignatures": 1,
+        "AccountedSignatures": 2,
+        "Complete": True,
+    }
+    assert (
+        r235_current_signature_evidence_reconciliation["ActivationEvidence"]
+        ["SignatureEvidenceCoverage"]["AllCurrentSignatureEvidenceAccounted"]
+        is False
+    )
+
     r106 = run_case(
         "VR DX11 R85 signature#1: primitive=4 fixedFn=1\n"
         "VR DX11 R85 texture signature#1 stage#0: observed=1 type=3 pool=1 "

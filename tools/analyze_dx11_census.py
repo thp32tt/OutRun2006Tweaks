@@ -772,6 +772,44 @@ def main() -> int:
         len(latest_summaries) == len(source_logs)
     )
     latest = latest_summaries[-1] if latest_summaries else None
+
+    # R235: reconcile the current startup's emitted signature headers with the
+    # current periodic summary. A detail-cap skip is explicit evidence, while a
+    # silently missing header is not. Keep this diagnostic-only, but make
+    # incomplete or internally inconsistent per-log evidence directly visible.
+    current_signature_evidence_by_log: dict[str, dict] = {}
+    for source_log in source_logs:
+        summary = current_summaries_by_log.get(source_log)
+        if summary is None:
+            continue
+        expected = int(summary.get("signatures", 0))
+        captured = len(current_signatures_by_log.get(source_log, []))
+        detail_skipped = int(summary.get("signatureDetailSkipped", 0))
+        accounted = captured + detail_skipped
+        current_signature_evidence_by_log[source_log] = {
+            "ExpectedSignatures": expected,
+            "CapturedSignatures": captured,
+            "DetailSkippedSignatures": detail_skipped,
+            "AccountedSignatures": accounted,
+            "Complete": accounted == expected,
+        }
+    current_signature_evidence_missing_logs = sorted(
+        source_log
+        for source_log, evidence in current_signature_evidence_by_log.items()
+        if evidence["AccountedSignatures"] < evidence["ExpectedSignatures"]
+    )
+    current_signature_evidence_overcount_logs = sorted(
+        source_log
+        for source_log, evidence in current_signature_evidence_by_log.items()
+        if evidence["AccountedSignatures"] > evidence["ExpectedSignatures"]
+    )
+    all_current_signature_evidence_accounted = bool(source_logs) and (
+        all_source_logs_have_summary
+        and len(current_signature_evidence_by_log) == len(source_logs)
+        and not current_signature_evidence_missing_logs
+        and not current_signature_evidence_overcount_logs
+    )
+
     all_source_logs_have_startup = bool(source_logs) and (
         len(latest_startup_by_log) == len(source_logs)
     )
@@ -1055,6 +1093,26 @@ def main() -> int:
         "ActivationProof": False,
     }
 
+    signature_coverage = {
+        "HistoricalUniqueSignatures": len(signatures),
+        "CurrentUniqueSignatures": len(current_signatures),
+        "LogsWithCurrentSignatures": sum(
+            1 for entries in current_signatures_by_log.values() if entries
+        ),
+        "CurrentSignatureEvidenceByLog": current_signature_evidence_by_log,
+        "CurrentSignatureEvidenceMissingLogs": (
+            current_signature_evidence_missing_logs
+        ),
+        "CurrentSignatureEvidenceOvercountLogs": (
+            current_signature_evidence_overcount_logs
+        ),
+        "AllCurrentSignatureEvidenceAccounted": (
+            all_current_signature_evidence_accounted
+        ),
+        "DiagnosticOnly": True,
+        "ActivationProof": False,
+    }
+
     report = {
         "SchemaVersion": 2,
         "Status": status,
@@ -1062,6 +1120,7 @@ def main() -> int:
         "ActivationEvidence": {
             "CensusExactness": sampled_exactness,
             "SamplingCoverage": sampling_coverage,
+            "SignatureEvidenceCoverage": signature_coverage,
             "StartupBootstrapCoverage": startup_bootstrap_coverage,
             "ManagedTextureShadow": managed_texture_shadow_evidence,
             "DualSourceBlend": dual_source_blend_evidence,
@@ -1101,15 +1160,7 @@ def main() -> int:
         "SummaryCoverage": summary_coverage,
         "AllSummaries": summaries,
         "UnsupportedTotalLatest": unsupported_total,
-        "SignatureCoverage": {
-            "HistoricalUniqueSignatures": len(signatures),
-            "CurrentUniqueSignatures": len(current_signatures),
-            "LogsWithCurrentSignatures": sum(
-                1 for entries in current_signatures_by_log.values() if entries
-            ),
-            "DiagnosticOnly": True,
-            "ActivationProof": False,
-        },
+        "SignatureCoverage": signature_coverage,
         "UniqueSignaturesCaptured": len(signatures),
         "CurrentUniqueSignaturesCaptured": len(current_signatures),
         "CurrentSignaturesByLog": current_signatures_by_log,

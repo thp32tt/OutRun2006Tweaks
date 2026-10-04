@@ -9212,6 +9212,37 @@ def main() -> None:
             + ", ".join(missing_r234_current_startup_signature_scope)
         )
 
+    r235_current_signature_evidence_reconciliation_contract = [
+        ("current_signature_evidence_by_log: dict[str, dict] = {}",
+         DX11_CENSUS_ANALYZER, "R235 per-log current signature reconciliation"),
+        ('"AccountedSignatures": accounted',
+         DX11_CENSUS_ANALYZER, "R235 accounted signature evidence export"),
+        ("current_signature_evidence_missing_logs = sorted(",
+         DX11_CENSUS_ANALYZER, "R235 missing current signature evidence detection"),
+        ("current_signature_evidence_overcount_logs = sorted(",
+         DX11_CENSUS_ANALYZER, "R235 inconsistent current signature evidence detection"),
+        ("all_current_signature_evidence_accounted = bool(source_logs)",
+         DX11_CENSUS_ANALYZER, "R235 all-log reconciliation gate"),
+        ('"SignatureEvidenceCoverage": signature_coverage',
+         DX11_CENSUS_ANALYZER, "R235 activation-evidence coverage export"),
+        ("r235_current_signature_evidence_reconciliation = run_cases(",
+         DX11_CENSUS_ANALYZER_TEST, "R235 multi-log reconciliation regression fixture"),
+        ('["CurrentSignatureEvidenceMissingLogs"] == [',
+         DX11_CENSUS_ANALYZER_TEST, "R235 missing-log assertion"),
+        ('["AllCurrentSignatureEvidenceAccounted"] is False',
+         DX11_CENSUS_ANALYZER_TEST, "R235 fail-closed reconciliation assertion"),
+    ]
+    missing_r235_current_signature_evidence_reconciliation = [
+        meaning
+        for token, source, meaning in r235_current_signature_evidence_reconciliation_contract
+        if token not in source
+    ]
+    if missing_r235_current_signature_evidence_reconciliation:
+        raise SystemExit(
+            "DX11 R235 current signature evidence reconciliation drift: "
+            + ", ".join(missing_r235_current_signature_evidence_reconciliation)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
