@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00371",
+  "production_id": "CONVERSION-DXVK-00370",
+  "event_id": "CONVERSION-DXVK-00370-E001",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "21281bdfab433fd926f6f7b9b43ab2fb3565b2c5",
+  "result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "material_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX11-00371]",
+  "selected_work_item": "DX11_R249_PROGRAMMABLE_INDEXED_IA_GEOMETRY_BINDING_RECEIPT",
+  "summary": "R249 adds a dormant fail-closed indexed IA geometry binding/readback receipt after validated R248 topology ownership. It binds exact managed slot-0 vertex and index mirrors with sealed stride/offset/index-format identity, rejects stale mirror/topology/context state and live IA drift, and remains strictly before Draw* routing or NativeDrawPath activation.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00371.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT vr-dx11-native-r71 at 21281bdfab433fd926f6f7b9b43ab2fb3565b2c5. Read VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, branch conversion state, inherited VR automation/state, durable regression knowledge/history and Issue #14. R248 is complete; its durable next action selects exact programmable IA vertex/index geometry binding/readback after the topology receipt."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R248 seals directly translated IA topology but leaves vertex/index buffer ownership unsealed. Existing R119 managed buffer mirror snapshots provide exact device/generation/resource identity and can be consumed without touching live D3D9 or the protected DX9Ex branch.",
+      "review_lenses": {
+        "architecture": "Extend only dormant NativeProgrammableShaderPairCache plus hosted source-graph/WARP probe; do not modify vr-d3d9ex-focus or live Draw* routing.",
+        "ownership_lifetime": "Consume exact R248 snapshot and R119 managed VB/IB mirror snapshots on the same immediate context; seal stride, offsets and index format plus monotonic receipt generation.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effect/recenter/presentation semantics change; runtime remains UNTESTED.",
+        "performance": "No production hot path and no Draw* call. IASet/IAGet operations are reachable only through dormant observation/probe code.",
+        "adversarial": "Reject stale R248 receipt, stale VB/IB mirror snapshots, deferred context, unsupported/misaligned index format, live VB stride/offset drift, live IB drift and cache generation replacement."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderIndexedGeometryBindingReadiness, exact managed VB/IB bind/readback/snapshot APIs, per-entry context/resource/parameter receipt ownership, WARP probe regressions and source-graph drift guards. R249 never changes topology and never issues Draw* or activates NativeDrawPath."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING_EXACT_SHA_GATE",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Required validation is the exact-SHA Backend Conversion Gate including source graph, dormant activation boundary, Win32 build/binary and DX11 readiness smoke/constant-buffer probe."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA_PUBLICATION",
+      "result_marker": "[AUTO:CONVERSION-DX11-00371]"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant programmable indexed IA geometry readiness/probe unit only; no runtime selector, transport, deployable package or HMD candidate change."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false,
+      "runtime_validation": "UNTESTED",
+      "exact_next_action": "Publish the material result without CI-skip, validate that exact SHA with Backend Conversion Gate, append Issue #14 evidence, then persist C3/C4/C6 and branch lane state."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "Dormant DX11 programmable cache and hosted probe only; no production draw/renderer/transport/OpenXR path is activated or changed."
+  },
+  "native_draw_path_activation_changed": false,
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00371",
+    "production_id": "CONVERSION-DXVK-00370",
+    "event_id": "CONVERSION-DXVK-00370-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Run exact-SHA Backend Conversion Gate for the material result. If PASS, persist C3/C4/C6 with RUNTIME_VALIDATION=UNTESTED and keep Draw* routing outside this task."
+}

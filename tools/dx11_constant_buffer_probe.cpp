@@ -3552,6 +3552,296 @@ int main()
             firstR248BindingSnapshot,
         "R248 same primitive topology binding is idempotent");
 
+    const auto r249UnboundGeometry =
+        programmableCache.indexed_geometry_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+    require(
+        r249UnboundGeometry.inputValid &&
+        r249UnboundGeometry.topologyBindingReceiptReady &&
+        r249UnboundGeometry.topologyBindingSnapshotMatches &&
+        r249UnboundGeometry.vertexBufferCurrent &&
+        r249UnboundGeometry.indexBufferCurrent &&
+        !r249UnboundGeometry.geometryReceiptPresent &&
+        !r249UnboundGeometry.bindingReady &&
+        r249UnboundGeometry.indexedGeometryBindingReceiptGeneration == 0 &&
+        r249UnboundGeometry.snapshotToken == 0 &&
+        !programmableCache.bind_indexed_geometry_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST, 0,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset),
+        "R249 topology-binding receipt must exist before indexed geometry binding");
+
+    require(
+        !programmableCache.bind_indexed_geometry_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken ^ 1ull,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset) &&
+        !programmableCache.bind_indexed_geometry_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken ^ 1ull,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset),
+        "R249 stale managed mirror snapshots cannot bind indexed geometry");
+
+    ID3D11DeviceContext* r249DeferredBeforeBinding = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateDeferredContext(
+            0, &r249DeferredBeforeBinding)) &&
+        r249DeferredBeforeBinding != nullptr &&
+        !programmableCache.bind_indexed_geometry_for_observation(
+            r249DeferredBeforeBinding, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset),
+        "R249 non-immediate context cannot establish indexed geometry binding");
+    r249DeferredBeforeBinding->Release();
+
+    require(
+        programmableCache.bind_indexed_geometry_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset),
+        "R249 exact programmable indexed IA geometry binding");
+    const auto r249GeometryReady =
+        programmableCache.indexed_geometry_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+    require(
+        r249GeometryReady.bindingReady &&
+        r249GeometryReady.geometryReceiptPresent &&
+        r249GeometryReady.vertexBufferMatches &&
+        r249GeometryReady.indexBufferMatches &&
+        r249GeometryReady.indexedGeometryBindingReceiptGeneration != 0 &&
+        r249GeometryReady.snapshotToken != 0 &&
+        programmableCache.validate_indexed_geometry_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            r249GeometryReady.snapshotToken),
+        "R249 exact programmable indexed geometry binding receipt");
+    const auto firstR249ReceiptGeneration =
+        r249GeometryReady.indexedGeometryBindingReceiptGeneration;
+    const auto firstR249BindingSnapshot = r249GeometryReady.snapshotToken;
+    require(
+        programmableCache.bind_indexed_geometry_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset) &&
+        programmableCache.indexed_geometry_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset).snapshotToken ==
+            firstR249BindingSnapshot,
+        "R249 same indexed geometry binding is idempotent");
+
+    ID3D11Buffer* r249Vertex = managedVertexBuffer.mirror_buffer();
+    const UINT r249DriftedStride = geometryVertexStride + 4u;
+    d3d.context->IASetVertexBuffers(
+        0, 1, &r249Vertex, &r249DriftedStride, &geometryVertexOffset);
+    const auto r249VertexDrift =
+        programmableCache.indexed_geometry_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+    require(
+        r249VertexDrift.geometryReceiptPresent &&
+        !r249VertexDrift.vertexBufferMatches &&
+        r249VertexDrift.indexBufferMatches &&
+        !r249VertexDrift.bindingReady &&
+        !programmableCache.validate_indexed_geometry_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            firstR249BindingSnapshot),
+        "R249 external vertex stride drift invalidates indexed geometry receipt");
+    d3d.context->IASetVertexBuffers(
+        0, 1, &r249Vertex, &geometryVertexStride, &geometryVertexOffset);
+
+    d3d.context->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+    const auto r249IndexDrift =
+        programmableCache.indexed_geometry_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+    require(
+        r249IndexDrift.geometryReceiptPresent &&
+        r249IndexDrift.vertexBufferMatches &&
+        !r249IndexDrift.indexBufferMatches &&
+        !r249IndexDrift.bindingReady,
+        "R249 external index binding drift invalidates indexed geometry receipt");
+    d3d.context->IASetIndexBuffer(
+        managedIndexBuffer.mirror_buffer(),
+        DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+
     d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
     const auto r248DriftedTopology =
         programmableCache.primitive_topology_binding_readiness(
@@ -3582,6 +3872,26 @@ int main()
             D3DPT_TRIANGLELIST,
             firstR248BindingSnapshot),
         "R248 external topology drift invalidates topology binding receipt");
+    require(
+        !programmableCache.validate_indexed_geometry_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            firstR248BindingSnapshot,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            firstR249BindingSnapshot),
+        "R249 upstream topology drift invalidates indexed geometry receipt");
     d3d.context->IASetPrimitiveTopology(
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -3778,6 +4088,27 @@ VSOutput main(VSInput input)
             D3DPT_TRIANGLELIST,
             firstR248BindingSnapshot),
         "R248 device reinitialize invalidates topology-binding receipt");
+    require(
+        !programmableCache.validate_indexed_geometry_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            firstR242ObjectSnapshot,
+            inputLayout,
+            firstR243InputLayoutSnapshot,
+            firstR244ConstantStateSnapshot,
+            firstR245PayloadSnapshot,
+            firstR246BindingSnapshot,
+            firstR247BindingSnapshot,
+            D3DPT_TRIANGLELIST,
+            firstR248BindingSnapshot,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            firstR249BindingSnapshot),
+        "R249 device reinitialize invalidates indexed geometry receipt");
     require(
         programmableCache.cache_for_observation(programmablePair),
         "R242 fresh cache generation prerequisite");
@@ -4111,6 +4442,89 @@ VSOutput main(VSInput input)
             r248FreshTopologyReady.snapshotToken),
         "R248 fresh device generation receives distinct topology-binding receipt");
     require(
+        !programmableCache.bind_indexed_geometry_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            r246FreshBindingReady.snapshotToken,
+            r247FreshPipelineReady.snapshotToken,
+            D3DPT_TRIANGLESTRIP,
+            firstR248BindingSnapshot,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset),
+        "R249 stale topology receipt cannot bind indexed geometry");
+    require(
+        programmableCache.bind_indexed_geometry_for_observation(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            r246FreshBindingReady.snapshotToken,
+            r247FreshPipelineReady.snapshotToken,
+            D3DPT_TRIANGLESTRIP,
+            r248FreshTopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset),
+        "R249 fresh R248 receipt binds exact indexed geometry");
+    const auto r249FreshGeometryReady =
+        programmableCache.indexed_geometry_binding_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            r246FreshBindingReady.snapshotToken,
+            r247FreshPipelineReady.snapshotToken,
+            D3DPT_TRIANGLESTRIP,
+            r248FreshTopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset);
+    require(
+        r249FreshGeometryReady.bindingReady &&
+        r249FreshGeometryReady.geometryReceiptPresent &&
+        r249FreshGeometryReady.vertexBufferMatches &&
+        r249FreshGeometryReady.indexBufferMatches &&
+        r249FreshGeometryReady.indexedGeometryBindingReceiptGeneration !=
+            firstR249ReceiptGeneration &&
+        r249FreshGeometryReady.snapshotToken != firstR249BindingSnapshot &&
+        programmableCache.validate_indexed_geometry_binding_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout, r243FreshInputLayoutReady.snapshotToken,
+            r244FreshConstantStateReady.snapshotToken,
+            r245FreshPayloadReady.snapshotToken,
+            r246FreshBindingReady.snapshotToken,
+            r247FreshPipelineReady.snapshotToken,
+            D3DPT_TRIANGLESTRIP,
+            r248FreshTopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            r249FreshGeometryReady.snapshotToken),
+        "R249 fresh device generation receives distinct indexed geometry receipt");
+    require(
         outrun::vr::dx11::bind_fixed_function_geometry_for_observation(
             d3d.context, indexedGeometryReady, managedVertexBuffer,
             geometryVertexStride, geometryVertexOffset,
@@ -4120,7 +4534,7 @@ VSOutput main(VSInput input)
             geometryVertexStride, geometryVertexOffset,
             &managedIndexBuffer, DXGI_FORMAT_R16_UINT, geometryIndexOffset,
             indexedGeometryBinding.snapshotToken),
-        "R248 restores prior fixed-function IA geometry after topology probe");
+        "R248 restores prior fixed-function IA geometry after topology probe; R249 restores prior fixed-function IA geometry after indexed geometry probe");
     r244VertexConstants->Release();
     r244PixelConstants->Release();
 

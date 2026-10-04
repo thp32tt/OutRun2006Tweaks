@@ -9791,6 +9791,61 @@ def main() -> None:
             + ", ".join(missing_r248_programmable_topology_binding_receipt)
         )
 
+    r249_programmable_indexed_geometry_binding_receipt_contract = [
+        ("struct NativeProgrammableShaderIndexedGeometryBindingReadiness",
+         NATIVE_BACKEND_HPP, "R249 programmable indexed geometry readiness type"),
+        ("bind_indexed_geometry_for_observation(",
+         NATIVE_BACKEND_HPP, "R249 indexed geometry binding declaration"),
+        ("indexed_geometry_binding_readiness(",
+         NATIVE_BACKEND_HPP, "R249 indexed geometry readiness declaration"),
+        ("validate_indexed_geometry_binding_snapshot(",
+         NATIVE_BACKEND_HPP, "R249 indexed geometry snapshot validator"),
+        ("indexedGeometryBindingReceiptGeneration",
+         NATIVE_BACKEND_HPP, "R249 per-entry indexed geometry receipt generation"),
+        ("expectedContext->IASetVertexBuffers(",
+         NATIVE_BACKEND_CPP, "R249 exact slot-0 vertex-buffer binding"),
+        ("expectedContext->IASetIndexBuffer(",
+         NATIVE_BACKEND_CPP, "R249 exact index-buffer binding"),
+        ("expectedContext->IAGetVertexBuffers(",
+         NATIVE_BACKEND_CPP, "R249 vertex-buffer readback gate"),
+        ("expectedContext->IAGetIndexBuffer(",
+         NATIVE_BACKEND_CPP, "R249 index-buffer readback gate"),
+        ("topology-binding receipt must exist before indexed geometry binding",
+         CONSTANT_BUFFER_PROBE, "R249 validated R248 prerequisite"),
+        ("stale managed mirror snapshots cannot bind indexed geometry",
+         CONSTANT_BUFFER_PROBE, "R249 managed mirror generation regression"),
+        ("non-immediate context cannot establish indexed geometry binding",
+         CONSTANT_BUFFER_PROBE, "R249 context regression"),
+        ("exact programmable indexed geometry binding receipt",
+         CONSTANT_BUFFER_PROBE, "R249 exact binding regression"),
+        ("same indexed geometry binding is idempotent",
+         CONSTANT_BUFFER_PROBE, "R249 idempotence regression"),
+        ("external vertex stride drift invalidates indexed geometry receipt",
+         CONSTANT_BUFFER_PROBE, "R249 live vertex binding drift regression"),
+        ("external index binding drift invalidates indexed geometry receipt",
+         CONSTANT_BUFFER_PROBE, "R249 live index binding drift regression"),
+        ("upstream topology drift invalidates indexed geometry receipt",
+         CONSTANT_BUFFER_PROBE, "R249 upstream topology drift regression"),
+        ("device reinitialize invalidates indexed geometry receipt",
+         CONSTANT_BUFFER_PROBE, "R249 device-generation invalidation regression"),
+        ("stale topology receipt cannot bind indexed geometry",
+         CONSTANT_BUFFER_PROBE, "R249 stale R248 regression"),
+        ("fresh device generation receives distinct indexed geometry receipt",
+         CONSTANT_BUFFER_PROBE, "R249 fresh receipt regression"),
+        ("R249 restores prior fixed-function IA geometry after indexed geometry probe",
+         CONSTANT_BUFFER_PROBE, "R249 probe-state restoration regression"),
+    ]
+    missing_r249_programmable_indexed_geometry_binding_receipt = [
+        meaning for token, source, meaning
+        in r249_programmable_indexed_geometry_binding_receipt_contract
+        if token not in source
+    ]
+    if missing_r249_programmable_indexed_geometry_binding_receipt:
+        raise SystemExit(
+            "DX11 R249 programmable indexed geometry-binding receipt drift: "
+            + ", ".join(missing_r249_programmable_indexed_geometry_binding_receipt)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

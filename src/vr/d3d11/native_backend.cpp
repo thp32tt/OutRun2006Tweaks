@@ -4014,6 +4014,411 @@ validate_primitive_topology_binding_snapshot(
            current.snapshotToken == topologyBindingSnapshotToken;
 }
 
+bool NativeProgrammableShaderPairCache::bind_indexed_geometry_for_observation(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken,
+    D3DPRIMITIVETYPE primitiveType,
+    std::uint64_t topologyBindingSnapshotToken,
+    const NativeManagedBufferShadow& vertexBuffer,
+    std::uint64_t vertexBufferSnapshotToken,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& indexBuffer,
+    std::uint64_t indexBufferSnapshotToken,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset) noexcept {
+    const UINT indexElementBytes =
+        indexFormat == DXGI_FORMAT_R16_UINT ? 2u :
+        indexFormat == DXGI_FORMAT_R32_UINT ? 4u : 0u;
+    if (!expectedContext || !expectedDevice ||
+        vertexStride == 0 || indexElementBytes == 0 ||
+        (indexOffset % indexElementBytes) != 0 ||
+        vertexBufferSnapshotToken == 0 || indexBufferSnapshotToken == 0 ||
+        !validate_primitive_topology_binding_snapshot(
+            expectedContext, expectedDevice, identity, cacheSnapshotToken,
+            slotSnapshotToken, objectSnapshotToken, layout,
+            inputLayoutSnapshotToken, constantStateSnapshotToken,
+            constantPayloadSnapshotToken, constantBindingSnapshotToken,
+            pipelineBindingSnapshotToken, primitiveType,
+            topologyBindingSnapshotToken))
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> contextDevice;
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext> immediateContext;
+    expectedContext->GetDevice(contextDevice.GetAddressOf());
+    expectedDevice->GetImmediateContext(immediateContext.GetAddressOf());
+    if (contextDevice.Get() != expectedDevice ||
+        immediateContext.Get() != expectedContext ||
+        vertexBuffer.mirror_device() != expectedDevice ||
+        indexBuffer.mirror_device() != expectedDevice)
+        return false;
+
+    const auto currentVertex = vertexBuffer.mirror_readiness(expectedDevice);
+    const auto currentIndex = indexBuffer.mirror_readiness(expectedDevice);
+    if (!currentVertex.ready ||
+        currentVertex.role != ResourceRole::Vertex ||
+        currentVertex.snapshotToken != vertexBufferSnapshotToken ||
+        !currentIndex.ready ||
+        currentIndex.role != ResourceRole::Index ||
+        currentIndex.snapshotToken != indexBufferSnapshotToken)
+        return false;
+
+    const auto found = entries_.find(identity.cacheKey);
+    if (found == entries_.end())
+        return false;
+    auto& entry = found->second;
+    if (!entry.topologyBindingContext ||
+        entry.topologyBindingContext.Get() != expectedContext ||
+        entry.topologyBindingReceiptGeneration == 0)
+        return false;
+
+    const bool bindingStarted =
+        entry.indexedGeometryBindingContext ||
+        entry.indexedGeometryVertexBuffer ||
+        entry.indexedGeometryIndexBuffer ||
+        entry.indexedGeometryBindingReceiptGeneration != 0;
+    if (bindingStarted) {
+        return indexed_geometry_binding_readiness(
+            expectedContext, expectedDevice, identity, cacheSnapshotToken,
+            slotSnapshotToken, objectSnapshotToken, layout,
+            inputLayoutSnapshotToken, constantStateSnapshotToken,
+            constantPayloadSnapshotToken, constantBindingSnapshotToken,
+            pipelineBindingSnapshotToken, primitiveType,
+            topologyBindingSnapshotToken, vertexBuffer,
+            vertexBufferSnapshotToken, vertexStride, vertexOffset,
+            indexBuffer, indexBufferSnapshotToken, indexFormat,
+            indexOffset).bindingReady;
+    }
+
+    ID3D11Buffer* vertex = vertexBuffer.mirror_buffer();
+    expectedContext->IASetVertexBuffers(
+        0, 1, &vertex, &vertexStride, &vertexOffset);
+    expectedContext->IASetIndexBuffer(
+        indexBuffer.mirror_buffer(), indexFormat, indexOffset);
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer> observedVertex;
+    UINT observedStride = 0;
+    UINT observedVertexOffset = 0;
+    expectedContext->IAGetVertexBuffers(
+        0, 1, observedVertex.ReleaseAndGetAddressOf(),
+        &observedStride, &observedVertexOffset);
+    Microsoft::WRL::ComPtr<ID3D11Buffer> observedIndex;
+    DXGI_FORMAT observedIndexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT observedIndexOffset = 0;
+    expectedContext->IAGetIndexBuffer(
+        observedIndex.ReleaseAndGetAddressOf(),
+        &observedIndexFormat, &observedIndexOffset);
+    D3D11_PRIMITIVE_TOPOLOGY observedTopology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    expectedContext->IAGetPrimitiveTopology(&observedTopology);
+    const auto translatedTopology = translate_primitive(primitiveType);
+    if (observedVertex.Get() != vertexBuffer.mirror_buffer() ||
+        observedStride != vertexStride ||
+        observedVertexOffset != vertexOffset ||
+        observedIndex.Get() != indexBuffer.mirror_buffer() ||
+        observedIndexFormat != indexFormat ||
+        observedIndexOffset != indexOffset ||
+        !translatedTopology.exact ||
+        observedTopology != translatedTopology.value)
+        return false;
+
+    entry.indexedGeometryBindingContext = expectedContext;
+    entry.indexedGeometryVertexBuffer = vertexBuffer.mirror_buffer();
+    entry.indexedGeometryIndexBuffer = indexBuffer.mirror_buffer();
+    entry.indexedGeometryVertexBufferSnapshotToken = vertexBufferSnapshotToken;
+    entry.indexedGeometryIndexBufferSnapshotToken = indexBufferSnapshotToken;
+    entry.indexedGeometryVertexStride = vertexStride;
+    entry.indexedGeometryVertexOffset = vertexOffset;
+    entry.indexedGeometryIndexFormat = indexFormat;
+    entry.indexedGeometryIndexOffset = indexOffset;
+    ++indexed_geometry_binding_receipt_generation_counter_;
+    if (indexed_geometry_binding_receipt_generation_counter_ == 0)
+        ++indexed_geometry_binding_receipt_generation_counter_;
+    entry.indexedGeometryBindingReceiptGeneration =
+        indexed_geometry_binding_receipt_generation_counter_;
+    return true;
+}
+
+NativeProgrammableShaderIndexedGeometryBindingReadiness
+NativeProgrammableShaderPairCache::indexed_geometry_binding_readiness(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken,
+    D3DPRIMITIVETYPE primitiveType,
+    std::uint64_t topologyBindingSnapshotToken,
+    const NativeManagedBufferShadow& vertexBuffer,
+    std::uint64_t vertexBufferSnapshotToken,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& indexBuffer,
+    std::uint64_t indexBufferSnapshotToken,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset) const noexcept {
+    NativeProgrammableShaderIndexedGeometryBindingReadiness out{};
+    out.cacheKey = identity.cacheKey;
+    out.inputLayoutIdentity = hash_pipeline_input_layout_identity(layout);
+    out.vertexStride = vertexStride;
+    out.vertexOffset = vertexOffset;
+    out.indexFormat = indexFormat;
+    out.indexOffset = indexOffset;
+    out.cacheSnapshotToken = cacheSnapshotToken;
+    out.slotSnapshotToken = slotSnapshotToken;
+    out.objectSnapshotToken = objectSnapshotToken;
+    out.inputLayoutSnapshotToken = inputLayoutSnapshotToken;
+    out.constantStateSnapshotToken = constantStateSnapshotToken;
+    out.constantPayloadSnapshotToken = constantPayloadSnapshotToken;
+    out.constantBindingSnapshotToken = constantBindingSnapshotToken;
+    out.pipelineBindingSnapshotToken = pipelineBindingSnapshotToken;
+    out.topologyBindingSnapshotToken = topologyBindingSnapshotToken;
+    out.vertexBufferSnapshotToken = vertexBufferSnapshotToken;
+    out.indexBufferSnapshotToken = indexBufferSnapshotToken;
+
+    const UINT indexElementBytes =
+        indexFormat == DXGI_FORMAT_R16_UINT ? 2u :
+        indexFormat == DXGI_FORMAT_R32_UINT ? 4u : 0u;
+    out.inputValid =
+        expectedContext != nullptr && expectedDevice != nullptr &&
+        topologyBindingSnapshotToken != 0 &&
+        vertexBufferSnapshotToken != 0 &&
+        indexBufferSnapshotToken != 0 &&
+        vertexStride != 0 &&
+        indexElementBytes != 0 &&
+        (indexOffset % indexElementBytes) == 0 &&
+        out.inputLayoutIdentity != 0 &&
+        identity.exact_identity() && !identity.translationImplemented;
+
+    const auto topology = primitive_topology_binding_readiness(
+        expectedContext, expectedDevice, identity, cacheSnapshotToken,
+        slotSnapshotToken, objectSnapshotToken, layout,
+        inputLayoutSnapshotToken, constantStateSnapshotToken,
+        constantPayloadSnapshotToken, constantBindingSnapshotToken,
+        pipelineBindingSnapshotToken, primitiveType);
+    out.topologyBindingReceiptReady = topology.bindingReady;
+    out.topologyBindingSnapshotMatches =
+        topology.bindingReady &&
+        topology.snapshotToken == topologyBindingSnapshotToken;
+    out.ownerGeneration = topology.ownerGeneration;
+    out.slotGeneration = topology.slotGeneration;
+    out.translationObjectReceiptGeneration =
+        topology.translationObjectReceiptGeneration;
+    out.inputLayoutReceiptGeneration =
+        topology.inputLayoutReceiptGeneration;
+    out.constantStateReceiptGeneration =
+        topology.constantStateReceiptGeneration;
+    out.constantPayloadReceiptGeneration =
+        topology.constantPayloadReceiptGeneration;
+    out.constantBindingReceiptGeneration =
+        topology.constantBindingReceiptGeneration;
+    out.pipelineBindingReceiptGeneration =
+        topology.pipelineBindingReceiptGeneration;
+    out.topologyBindingReceiptGeneration =
+        topology.topologyBindingReceiptGeneration;
+    out.translatedTopology = topology.translatedTopology;
+    out.contextDeviceMatches = topology.contextDeviceMatches;
+
+    const auto currentVertex = vertexBuffer.mirror_readiness(expectedDevice);
+    const auto currentIndex = indexBuffer.mirror_readiness(expectedDevice);
+    out.vertexBufferCurrent =
+        currentVertex.ready &&
+        currentVertex.role == ResourceRole::Vertex &&
+        currentVertex.snapshotToken == vertexBufferSnapshotToken;
+    out.indexBufferCurrent =
+        currentIndex.ready &&
+        currentIndex.role == ResourceRole::Index &&
+        currentIndex.snapshotToken == indexBufferSnapshotToken;
+    out.deviceMatches =
+        topology.deviceMatches &&
+        vertexBuffer.mirror_device() == expectedDevice &&
+        indexBuffer.mirror_device() == expectedDevice;
+
+    if (out.inputValid && out.topologyBindingReceiptReady &&
+        out.topologyBindingSnapshotMatches && out.deviceMatches &&
+        out.contextDeviceMatches && out.vertexBufferCurrent &&
+        out.indexBufferCurrent) {
+        const auto found = entries_.find(identity.cacheKey);
+        if (found != entries_.end()) {
+            const auto& entry = found->second;
+            out.indexedGeometryBindingReceiptGeneration =
+                entry.indexedGeometryBindingReceiptGeneration;
+            out.geometryReceiptPresent =
+                entry.indexedGeometryBindingContext &&
+                entry.indexedGeometryBindingContext.Get() == expectedContext &&
+                out.indexedGeometryBindingReceiptGeneration != 0;
+
+            Microsoft::WRL::ComPtr<ID3D11Buffer> observedVertex;
+            UINT observedStride = 0;
+            UINT observedVertexOffset = 0;
+            expectedContext->IAGetVertexBuffers(
+                0, 1, observedVertex.ReleaseAndGetAddressOf(),
+                &observedStride, &observedVertexOffset);
+            Microsoft::WRL::ComPtr<ID3D11Buffer> observedIndex;
+            DXGI_FORMAT observedIndexFormat = DXGI_FORMAT_UNKNOWN;
+            UINT observedIndexOffset = 0;
+            expectedContext->IAGetIndexBuffer(
+                observedIndex.ReleaseAndGetAddressOf(),
+                &observedIndexFormat, &observedIndexOffset);
+
+            out.vertexBufferMatches =
+                entry.indexedGeometryVertexBuffer.Get() ==
+                    vertexBuffer.mirror_buffer() &&
+                entry.indexedGeometryVertexBufferSnapshotToken ==
+                    vertexBufferSnapshotToken &&
+                entry.indexedGeometryVertexStride == vertexStride &&
+                entry.indexedGeometryVertexOffset == vertexOffset &&
+                observedVertex.Get() == vertexBuffer.mirror_buffer() &&
+                observedStride == vertexStride &&
+                observedVertexOffset == vertexOffset;
+            out.indexBufferMatches =
+                entry.indexedGeometryIndexBuffer.Get() ==
+                    indexBuffer.mirror_buffer() &&
+                entry.indexedGeometryIndexBufferSnapshotToken ==
+                    indexBufferSnapshotToken &&
+                entry.indexedGeometryIndexFormat == indexFormat &&
+                entry.indexedGeometryIndexOffset == indexOffset &&
+                observedIndex.Get() == indexBuffer.mirror_buffer() &&
+                observedIndexFormat == indexFormat &&
+                observedIndexOffset == indexOffset;
+        }
+    }
+
+    out.bindingReady =
+        out.inputValid && out.topologyBindingReceiptReady &&
+        out.topologyBindingSnapshotMatches &&
+        out.deviceMatches && out.contextDeviceMatches &&
+        out.vertexBufferCurrent && out.indexBufferCurrent &&
+        out.geometryReceiptPresent &&
+        out.vertexBufferMatches && out.indexBufferMatches &&
+        out.ownerGeneration != 0 && out.slotGeneration != 0 &&
+        out.translationObjectReceiptGeneration != 0 &&
+        out.inputLayoutReceiptGeneration != 0 &&
+        out.constantStateReceiptGeneration != 0 &&
+        out.constantPayloadReceiptGeneration != 0 &&
+        out.constantBindingReceiptGeneration != 0 &&
+        out.pipelineBindingReceiptGeneration != 0 &&
+        out.topologyBindingReceiptGeneration != 0 &&
+        out.indexedGeometryBindingReceiptGeneration != 0 &&
+        out.cacheKey != 0 && out.inputLayoutIdentity != 0;
+
+    if (out.bindingReady) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(this)));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedContext)));
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedDevice)));
+        token = mix_readiness_snapshot_token(token, out.ownerGeneration);
+        token = mix_readiness_snapshot_token(token, out.slotGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.translationObjectReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.inputLayoutReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.constantStateReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.constantPayloadReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.constantBindingReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.pipelineBindingReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.topologyBindingReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.indexedGeometryBindingReceiptGeneration);
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(token, out.inputLayoutIdentity);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.translatedTopology));
+        token = mix_readiness_snapshot_token(token, out.cacheSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.slotSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.objectSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.inputLayoutSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.constantStateSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.constantPayloadSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.constantBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.pipelineBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.topologyBindingSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.vertexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.indexBufferSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.vertexStride);
+        token = mix_readiness_snapshot_token(token, out.vertexOffset);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.indexFormat));
+        token = mix_readiness_snapshot_token(token, out.indexOffset);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeProgrammableShaderPairCache::validate_indexed_geometry_binding_snapshot(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken,
+    D3DPRIMITIVETYPE primitiveType,
+    std::uint64_t topologyBindingSnapshotToken,
+    const NativeManagedBufferShadow& vertexBuffer,
+    std::uint64_t vertexBufferSnapshotToken,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& indexBuffer,
+    std::uint64_t indexBufferSnapshotToken,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset,
+    std::uint64_t indexedGeometryBindingSnapshotToken) const noexcept {
+    if (indexedGeometryBindingSnapshotToken == 0)
+        return false;
+    const auto current = indexed_geometry_binding_readiness(
+        expectedContext, expectedDevice, identity, cacheSnapshotToken,
+        slotSnapshotToken, objectSnapshotToken, layout,
+        inputLayoutSnapshotToken, constantStateSnapshotToken,
+        constantPayloadSnapshotToken, constantBindingSnapshotToken,
+        pipelineBindingSnapshotToken, primitiveType,
+        topologyBindingSnapshotToken, vertexBuffer,
+        vertexBufferSnapshotToken, vertexStride, vertexOffset,
+        indexBuffer, indexBufferSnapshotToken, indexFormat, indexOffset);
+    return current.bindingReady &&
+           current.snapshotToken == indexedGeometryBindingSnapshotToken;
+}
+
 void NativeProgrammableShaderPairCache::shutdown() noexcept {
     entries_.clear();
     device_.Reset();
