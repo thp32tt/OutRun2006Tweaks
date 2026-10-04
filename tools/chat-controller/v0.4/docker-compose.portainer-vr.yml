@@ -2,7 +2,7 @@ services:
   outrun-chat-controller-vr:
     build:
       context: .
-      dockerfile: Dockerfile.portainer
+      dockerfile: Dockerfile.portainer-vr
     container_name: outrun-chat-controller-vr
     restart: unless-stopped
     init: true
@@ -28,6 +28,8 @@ services:
       MAX_TASK_ATTEMPTS: "3"
       CONVERSATION_ROLLOVER_ENABLED: "true"
       MAX_CHAT_ROLLOVERS_PER_TASK: "5"
+      TASK_EVENT_MODEL: "v2"
+      PRODUCTION_COUNTER_MODE: "lane"
       GITHUB_REPO: "thp32tt/OutRun2006Tweaks"
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
       SCHEDULE_MINUTES: "10,30,50"
