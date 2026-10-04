@@ -107,11 +107,13 @@ Both existing Portainer compose paths now run the GitHub-gated queue engine.
 
 ### Conversion stack
 The existing `docker-compose.portainer-vr.yml` path is retained for compatibility, but its controller mode is now `conversion`.
+The VR compose uses `Dockerfile.portainer-vr`, which pins the proven Controller v2 TASK_ID/event queue independently from localization controller changes. Existing A/B state is preserved and slot C is appended when `CHAT_SLOTS=3`.
 
 - lane A: DX11 -> `vr-dx11-native-r71`
 - lane B: DXVK -> `vr-dxvk-r71-disasm`
 - lane C: DX9Ex improvement -> `vr-d3d9ex-focus`
-- required workflow: `Backend Conversion Gate`
+- DX11/DXVK required workflow: `Backend Conversion Gate`
+- DX9Ex required workflow: `DX9Ex Active Validation`
 - up to three independent conversion/improvement lanes may be active at once
 - successful automatic validation advances immediately to the next independent lane
 - runtime/HMD validation remains `UNTESTED` unless separately proven
