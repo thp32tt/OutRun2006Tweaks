@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dxvk-r71-disasm",
   "lane": "DXVK",
-  "state_parent_head": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+  "state_parent_head": "664b1b97a8654c44601ff2dfa03449809815b6c7",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -51,93 +51,75 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DXVK-00368",
-    "result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
-    "validation_bearing_result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+    "task_id": "CONVERSION-DXVK-00370",
+    "result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+    "validation_bearing_result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
     "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "attempt": "2/3",
-    "production_id": "CONVERSION-DXVK-00368",
-    "event_id": "CONVERSION-DXVK-00368-E004",
+    "attempt": "1/3",
+    "production_id": "CONVERSION-DX11-00369",
+    "event_id": "CONVERSION-DX11-00369-E003",
     "event_type": "retry",
-    "dxvk_disassembly_evidence_run_id": 37194452649,
-    "dxvk_disassembly_evidence_job_id": 111413293550,
-    "backend_conversion_gate_run_id": 37194452597,
-    "backend_conversion_gate_job_id": 111413293538,
+    "dxvk_disassembly_evidence_run_id": 37199931166,
+    "dxvk_disassembly_evidence_job_id": 111429354149,
+    "backend_conversion_gate_run_id": 37199931190,
+    "backend_conversion_gate_job_id": 111429354163,
     "runtime_test_performed": false,
-    "issue14_implementation_validation_comment_id": 5978936164,
+    "issue14_implementation_validation_comment_id": 5979639433,
     "controller_dispatch": {
-      "task_id": "CONVERSION-DXVK-00368",
-      "production_id": "CONVERSION-DXVK-00368",
-      "event_id": "CONVERSION-DXVK-00368-E004",
+      "task_id": "CONVERSION-DXVK-00370",
+      "production_id": "CONVERSION-DX11-00369",
+      "event_id": "CONVERSION-DX11-00369-E003",
       "event_type": "retry",
-      "attempt": "2/3",
+      "attempt": "1/3",
       "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH"
     },
-    "run_record_commit_sha": "67670cceb1518f3b7f3c8575ec50b7862d7ccba5",
-    "chat_rollover": 2,
-    "rollover_is_retry": false,
-    "resume_reason": "Retry persisted after one recovery attempt",
-    "retry_resume": {
-      "status": "CLOSED_ALREADY_REPAIRED",
-      "failure_context_run_id": 37194340957,
-      "failed_exact_sha": "02cf191c3357124ed769412520d97be49349bf78",
-      "repair_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
-      "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
-      "runtime_validation": "UNTESTED"
-    }
+    "run_record_commit_sha": null
   },
   "latest_static_evidence": {
     "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
-    "material_result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
-    "validation_bearing_result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
-    "proof_status": "EXACT_18398E_TO_1839CD_CONTROL_FLOW_WITH_1839CD_OVERLAP_PROVEN",
-    "predecessor_status": "EXACT_EXE_18398E_TO_1839CE_PROVENANCE_CAPTURED",
-    "start_rva": "0x0018398E",
-    "complete_instruction_end_rva": "0x001839CD",
-    "capture_end_rva": "0x001839CE",
-    "instruction_count": 21,
-    "internal_branch_targets": [
-      "0x001839B5"
-    ],
-    "resolved_predecessor_targets": [
-      "0x0018399B",
-      "0x001839B5"
-    ],
-    "unresolved_forward_targets": [
+    "material_result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+    "validation_bearing_result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+    "proof_status": "EXACT_EXE_1839CD_TO_183A0D_PROVENANCE_CAPTURED",
+    "predecessor_status": "EXACT_18398E_TO_1839CD_CONTROL_FLOW_WITH_1839CD_OVERLAP_PROVEN",
+    "start_rva": "0x001839CD",
+    "capture_end_rva": "0x00183A0D",
+    "probe_len": 64,
+    "inherited_unresolved_forward_targets": [
       "0x001839CD",
       "0x001839D2",
       "0x00183B6F"
     ],
-    "direct_rel32_call_count": 0,
-    "incomplete_cut_edge": {
+    "raw_inbound_rel32_count": 0,
+    "raw_outbound_rel32_count": 0,
+    "overlap": {
       "rva": "0x001839CD",
       "bytes": "8b",
-      "incomplete_matches": true,
-      "capture_edge_matches": true
+      "overlap_matches": true,
+      "predecessor_overlap_matches": true
     },
-    "material_tree_sha": "178d53c2211d8beced8e018cb4d05088474d8077",
-    "analyzer_blob_sha": "865df83f6e1c64b811feec790aac175a538279d6",
-    "test_blob_sha": "4487734d7ccc17d9771e8cf216983af85263600e",
-    "dxvk_disassembly_evidence_run_id": 37194452649,
-    "dxvk_disassembly_evidence_job_id": 111413293550,
-    "dxvk_disassembly_evidence_artifact_id": 11300053730,
-    "dxvk_disassembly_evidence_artifact_digest": "sha256:490186bad899d92a1a312c29e1704c841f71d7757a21d427dc7fc15825990efc",
-    "backend_conversion_gate_run_id": 37194452597,
-    "backend_conversion_gate_job_id": 111413293538,
+    "material_tree_sha": "8fc73bca381180f9baf1a8b37259f87dc8974dad",
+    "analyzer_blob_sha": "3a4c83483b5357d6f1cb59b51b3579f26d273949",
+    "test_blob_sha": "ff3b65581ab45773d556aa715ddd3921172c6d83",
+    "dxvk_disassembly_evidence_run_id": 37199931166,
+    "dxvk_disassembly_evidence_job_id": 111429354149,
+    "dxvk_disassembly_evidence_artifact_id": 11302777245,
+    "dxvk_disassembly_evidence_artifact_digest": "sha256:fbb214165ca7daf41dd370cec8962beca72abd8733b6d4a62d4f919ad8e9579d",
+    "backend_conversion_gate_run_id": 37199931190,
+    "backend_conversion_gate_job_id": 111429354163,
     "backend_conversion_gate_status": "SUCCESS",
-    "backend_conversion_gate_artifact_id": 11300760473,
-    "backend_conversion_gate_artifact_digest": "sha256:3e765b7842f69f455896ded954e1bbef0941445faa9978c66ce1744751cb7e65",
-    "continuation_status": "COMPLETE_INSTRUCTIONS_END_AT_1839CD_TRAILING_8B_REQUIRES_OVERLAP",
-    "semantic_promotion": "BOUNDED_CONTROL_FLOW_ONLY",
+    "backend_conversion_gate_artifact_id": 11302618313,
+    "backend_conversion_gate_artifact_digest": "sha256:537dd395cd42c6f06b57b4768450197253be0e4c03e211c79babefdd32e4d1b5",
+    "continuation_status": "RAW_CAPTURE_REQUIRES_EXACT_DECODE",
+    "semantic_promotion": "NONE",
     "ownership_effect": "NONE",
     "runtime_validation": "UNTESTED",
-    "issue14_implementation_validation_comment_id": 5978936164
+    "issue14_implementation_validation_comment_id": 5979639433
   },
-  "runtime_blocker": "No runtime acceptance claim exists; F121 is exact canonical control-flow/static-build evidence only.",
+  "runtime_blocker": "No runtime acceptance claim exists; F122 is exact canonical raw provenance/static-build evidence only.",
   "runtime_next_action": "Quest 3/VDXR runtime validation remains a separate later hardware gate for runtime-visible behavior.",
-  "independent_static_next_action": "Capture the next canonical raw frontier starting at 0x001839CD with mandatory overlap byte 0x8B inherited from F121. Require overlap equality, carry unresolved target debt [0x001839CD,0x001839D2,0x00183B6F] fail-closed, record exact bytes/raw rel32 census only, and do not promote function/render/HUD/runtime semantics.",
+  "independent_static_next_action": "Exact-decode only complete canonical instructions from validated F122 raw window 0x001839CD..0x00183A0D. Resolve inherited targets [0x001839CD,0x001839D2,0x00183B6F] only on exact instruction boundaries, preserve any trailing partial bytes for mandatory overlap, carry newly observed branch/call debt fail-closed, and do not promote function/render/HUD/runtime semantics.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -184,29 +166,27 @@
     "next_task_rule": "AFTER_FULL_PIPELINE_GATE_PASS_DISPATCH_NEXT_INDEPENDENT_WORK_IMMEDIATELY"
   },
   "follow_on_frontier": {
-    "result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
-    "validation_bearing_result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
-    "proof_status": "EXACT_18398E_TO_1839CD_CONTROL_FLOW_WITH_1839CD_OVERLAP_PROVEN",
-    "validated_start_rva": "0x0018398E",
-    "complete_instruction_end_rva": "0x001839CD",
-    "capture_end_rva": "0x001839CE",
-    "unresolved_forward_targets": [
+    "result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+    "validation_bearing_result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+    "proof_status": "EXACT_EXE_1839CD_TO_183A0D_PROVENANCE_CAPTURED",
+    "validated_start_rva": "0x001839CD",
+    "capture_end_rva": "0x00183A0D",
+    "probe_len": 64,
+    "inherited_unresolved_forward_targets": [
       "0x001839CD",
       "0x001839D2",
       "0x00183B6F"
     ],
-    "incomplete_cut_edge": {
+    "predecessor_overlap": {
       "rva": "0x001839CD",
       "bytes": "8b",
-      "status": "MANDATORY_OVERLAP_REQUIRED"
+      "status": "EXACT_THREE_WAY_OVERLAP_PROVEN"
     },
-    "next_action_kind": "CAPTURE_NEXT_CANONICAL_RAW_FRONTIER_WITH_OVERLAP",
-    "next_probe_start_rva": "0x001839CD",
-    "next_probe_end_rva_exclusive": "0x00183A0D",
-    "probe_len": 64,
-    "required_overlap_bytes": "8b",
+    "raw_inbound_rel32_count": 0,
+    "raw_outbound_rel32_count": 0,
+    "next_action_kind": "EXACT_DECODE_VALIDATED_RAW_FRONTIER",
     "runtime_validation": "UNTESTED",
-    "exact_next_action": "Capture the next canonical raw frontier starting at 0x001839CD with mandatory overlap byte 0x8B inherited from F121. Require overlap equality, carry unresolved target debt [0x001839CD,0x001839D2,0x00183B6F] fail-closed, record exact bytes/raw rel32 census only, and do not promote function/render/HUD/runtime semantics."
+    "exact_next_action": "Exact-decode only complete canonical instructions from validated F122 raw window 0x001839CD..0x00183A0D. Resolve inherited targets [0x001839CD,0x001839D2,0x00183B6F] only on exact instruction boundaries, preserve any trailing partial bytes for mandatory overlap, carry newly observed branch/call debt fail-closed, and do not promote function/render/HUD/runtime semantics."
   },
   "supplemental_completed_static_units": [
     {
@@ -5579,14 +5559,14 @@
     }
   ],
   "controller_dispatch": {
-    "task_id": "CONVERSION-DXVK-00368",
-    "production_id": "CONVERSION-DXVK-00368",
-    "event_id": "CONVERSION-DXVK-00368-E004",
+    "task_id": "CONVERSION-DXVK-00370",
+    "production_id": "CONVERSION-DX11-00369",
+    "event_id": "CONVERSION-DX11-00369-E003",
     "event_type": "retry",
-    "attempt": "2/3",
+    "attempt": "1/3",
     "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH",
-    "material_result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
-    "validation_bearing_result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+    "material_result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
+    "validation_bearing_result_sha": "664b1b97a8654c44601ff2dfa03449809815b6c7",
     "runtime_validation": "UNTESTED"
   },
   "dispatch_metadata_correction": {
@@ -5648,31 +5628,5 @@
     },
     "reason": "Newest explicit user rollover metadata supersedes stale retry dispatch bookkeeping; no material or validation SHA changed.",
     "material_and_validation_bearing_sha_unchanged": true
-  },
-  "current_retry_resolution": {
-    "task_id": "CONVERSION-DXVK-00368",
-    "event_id": "CONVERSION-DXVK-00368-E004",
-    "attempt": "2/3",
-    "failure_context": {
-      "failure_context_run_id": 37194340957,
-      "failure_context_job_id": 111412953606,
-      "failed_exact_sha": "02cf191c3357124ed769412520d97be49349bf78",
-      "failure_step": "Verify backend disassembly contract",
-      "failure_signature": "DXVK continuation 94 has no cut edge but proof end 0x001839CD != capture end 0x001839CE",
-      "root_cause": "The trailing canonical byte 0x8B at 0x001839CD was modeled with custom OVERLAP_* names, so the repository modern continuation verifier did not recognize it as the mandatory incomplete cut edge.",
-      "repair_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
-      "repair_scope": [
-        "tools/analyze_outrun_exe.py",
-        "tools/test_dxvk_continuation_94_control_flow.py"
-      ],
-      "repair_contract": "INCOMPLETE_RVA/INCOMPLETE_BYTES + incomplete_matches + capture_edge_matches",
-      "canonical_evidence_run_id": 37194452649,
-      "canonical_evidence_conclusion": "success",
-      "backend_conversion_gate_run_id": 37194452597,
-      "backend_conversion_gate_conclusion": "success",
-      "disposition": "SUPERSEDED_REPAIRED_AND_VALIDATED",
-      "repeated_material_work": false
-    },
-    "next_action_preserved": "Capture the next canonical raw frontier starting at 0x001839CD with mandatory overlap byte 0x8B inherited from F121. Require overlap equality, carry unresolved target debt [0x001839CD,0x001839D2,0x00183B6F] fail-closed, record exact bytes/raw rel32 census only, and do not promote function/render/HUD/runtime semantics."
   }
 }
