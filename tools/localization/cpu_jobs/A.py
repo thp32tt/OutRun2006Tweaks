@@ -77,15 +77,37 @@ for idx,key,src,kor,style in specs:
         local_mask=binary_alpha(cell)
     else:
         pix=cell.load()
-        local_mask=Image.new("L",(w,h),0); mp=local_mask.load()
+        obvious=[]
         for yy in range(h):
             for xx in range(w):
                 r,g,b,a=pix[xx,yy]
-                # CLASS lettering is neutral near-white. Red badge/background is intentionally excluded.
                 if a>0 and min(r,g,b)>=105 and max(r,g,b)-min(r,g,b)<=70:
+                    obvious.append((xx,yy))
+        if not obvious:
+            raise RuntimeError("CLASS seed mask missing")
+        bx1=max(0,min(q[0] for q in obvious)-4)
+        by1=max(0,min(q[1] for q in obvious)-4)
+        bx2=min(w,max(q[0] for q in obvious)+5)
+        by2=min(h,max(q[1] for q in obvious)+5)
+        local_mask=Image.new("L",(w,h),0); mp=local_mask.load()
+        # Reconstruct the expected red badge row color from untouched red pixels, then
+        # classify every deviating pixel inside the seeded glyph neighborhood as source text.
+        # This captures blended antialias fringe without erasing the pill border/background.
+        for yy in range(by1,by2):
+            reds=[]
+            for xx in range(w):
+                r,g,b,a=pix[xx,yy]
+                seed=(a>0 and min(r,g,b)>=105 and max(r,g,b)-min(r,g,b)<=70)
+                if a>0 and not seed and r>120 and r>g*1.35 and r>b*1.25:
+                    reds.append((r,g,b,a))
+            fill=tuple(int(median([v[k] for v in reds])) for k in range(4)) if reds else (204,55,65,255)
+            for xx in range(bx1,bx2):
+                r,g,b,a=pix[xx,yy]
+                if a<=0:
+                    continue
+                delta=max(abs(r-fill[0]),abs(g-fill[1]),abs(b-fill[2]),abs(a-fill[3]))
+                if delta>6:
                     mp[xx,yy]=255
-        # Small dilation catches the antialias fringe while staying far from the pill edge.
-        local_mask=local_mask.filter(ImageFilter.MaxFilter(3)) if False else local_mask
     bb=local_mask.getbbox()
     if not bb: raise RuntimeError(("empty source mask",idx,key))
     gb=[x+bb[0],y+bb[1],x+bb[2],y+bb[3]]
