@@ -2,15 +2,15 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DXVK-00368",
   "production_id": "CONVERSION-DXVK-00368",
-  "event_id": "CONVERSION-DXVK-00368-E002",
-  "event_type": "rollover",
+  "event_id": "CONVERSION-DXVK-00368-E004",
+  "event_type": "retry",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
   "base_sha": "79f701d008ca5667db2d29d980348eab89a241d2",
   "initial_material_sha": "02cf191c3357124ed769412520d97be49349bf78",
   "result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
   "validation_bearing_result_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "status": "COMPLETE",
   "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
   "runtime_validation": "UNTESTED",
@@ -145,7 +145,7 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "evidence": "This schema-2 run record and branch-local conversion state persist validation-bearing SHA, repair history, exact-SHA gates, RUNTIME_VALIDATION=UNTESTED and exact next raw-frontier action. Run-record creation commit is 67670cceb1518f3b7f3c8575ec50b7862d7ccba5."
+      "evidence": "Schema-2 durable record remains COMPLETE. Retry E004/ATTEMPT 2/3 inspected failure-context Backend Conversion Gate 37194340957 and confirmed it belongs to superseded initial SHA 02cf191c. Repair/result SHA 334a7537 already passes exact-SHA Canonical Evidence 37194452649 and Backend Conversion Gate 37194452597. No material work was repeated; RUNTIME_VALIDATION=UNTESTED remains."
     }
   },
   "blocker": null,
@@ -155,13 +155,10 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DXVK-00368",
     "production_id": "CONVERSION-DXVK-00368",
-    "event_id": "CONVERSION-DXVK-00368-E002",
-    "event_type": "rollover",
-    "attempt": "1/3",
-    "chat_rollover": 2,
-    "rollover_is_retry": false,
-    "resume_reason": "Retry persisted after one recovery attempt",
-    "source": "CURRENT_USER_ROLLOVER"
+    "event_id": "CONVERSION-DXVK-00368-E004",
+    "event_type": "retry",
+    "attempt": "2/3",
+    "source": "CURRENT_USER_AUTOMATIC_QUEUE_DISPATCH"
   },
   "run_record_commit_sha": "67670cceb1518f3b7f3c8575ec50b7862d7ccba5",
   "chat_rollover": 2,
@@ -193,5 +190,46 @@
     },
     "reason": "Newest explicit user rollover metadata supersedes the earlier automatic queue-dispatch bookkeeping. Rollover is not a retry; ATTEMPT remains 1/3. Material and validation-bearing result SHA remain unchanged.",
     "material_and_validation_bearing_sha_unchanged": true
-  }
+  },
+  "retry_resume": {
+    "attempt": "2/3",
+    "event_id": "CONVERSION-DXVK-00368-E004",
+    "resumed_from": "FAILURE_CONTEXT",
+    "resolution": {
+      "failure_context_run_id": 37194340957,
+      "failure_context_job_id": 111412953606,
+      "failed_exact_sha": "02cf191c3357124ed769412520d97be49349bf78",
+      "failure_step": "Verify backend disassembly contract",
+      "failure_signature": "DXVK continuation 94 has no cut edge but proof end 0x001839CD != capture end 0x001839CE",
+      "root_cause": "The trailing canonical byte 0x8B at 0x001839CD was modeled with custom OVERLAP_* names, so the repository modern continuation verifier did not recognize it as the mandatory incomplete cut edge.",
+      "repair_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+      "repair_scope": [
+        "tools/analyze_outrun_exe.py",
+        "tools/test_dxvk_continuation_94_control_flow.py"
+      ],
+      "repair_contract": "INCOMPLETE_RVA/INCOMPLETE_BYTES + incomplete_matches + capture_edge_matches",
+      "canonical_evidence_run_id": 37194452649,
+      "canonical_evidence_conclusion": "success",
+      "backend_conversion_gate_run_id": 37194452597,
+      "backend_conversion_gate_conclusion": "success",
+      "disposition": "SUPERSEDED_REPAIRED_AND_VALIDATED",
+      "repeated_material_work": false
+    },
+    "result_sha_unchanged": true,
+    "validation_bearing_result_sha_unchanged": true,
+    "runtime_validation": "UNTESTED"
+  },
+  "retry_history": [
+    {
+      "event_id": "CONVERSION-DXVK-00368-E004",
+      "event_type": "retry",
+      "attempt": "2/3",
+      "status": "CLOSED_ALREADY_REPAIRED",
+      "failure_context_run_id": 37194340957,
+      "failed_sha": "02cf191c3357124ed769412520d97be49349bf78",
+      "repair_sha": "334a7537fdd86cfbddeb6f85aaccb6956c7abb42",
+      "automation_validation": "PASS_EXACT_SHA_CANONICAL_AND_BACKEND_CONVERSION_GATE",
+      "runtime_validation": "UNTESTED"
+    }
+  ]
 }
