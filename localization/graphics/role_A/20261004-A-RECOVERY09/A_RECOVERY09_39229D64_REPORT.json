@@ -3,7 +3,7 @@
   "role": "A",
   "run": "20261004-A-RECOVERY09",
   "worker": "github-actions",
-  "base_head": "f037cbedee4cdc085461c830b26b17e06018e3b8",
+  "base_head": "f5762c8639d598b19892a3426a1dcee972cabeb5",
   "index": 57,
   "asset": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
   "return_reason": "C_OVERLAP05 controller visual FAIL: source-English residue/layer overlap despite machine 15/15 placement",
@@ -18,7 +18,7 @@
   "source_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
   "rejected_c_candidate_sha256": "dfa2c39fba8c397191af804767ede25fef35f92b5b21f583130190b701bdb9a4",
   "rejected_c_worker_commit": "ddfc5afbff650bfefe6e7de55d39f20a1f109450",
-  "candidate_sha256": "5e4ef9f45e073301e38020558ec55e3517cca8c9e6cef227d2368870f2707d58",
+  "candidate_sha256": "dbd97d30d1e14df102d5c90c5ef5e339a93a934c4b10b71e2b30fbf76db2b8f8",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
   "structure": {
     "dimensions": [
@@ -33,9 +33,9 @@
     "raw_orientation": "mirror_y"
   },
   "repair_method": {
-    "clean_plate": "replace full exact source text/effect bbox for all 15 targets; transparent overlays become transparent, three Total Rank labels receive row-wise source-art interior reconstruction",
+    "clean_plate": "replace full exact source text/effect bbox for all 16 target occurrences; transparent overlays become transparent, three Total Rank labels receive row-wise source-art interior reconstruction",
     "korean_layer": "fresh target-specific source-family Korean render; C candidate pixels are not reused, preventing prior black/gray source-layer overdraw from returning",
-    "non_target_art": "source pixels outside exact 15 allowed bboxes remain byte/pixel identical"
+    "non_target_art": "source pixels outside exact 16 allowed bboxes remain byte/pixel identical"
   },
   "clean_plate_validator": {
     "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-RECOVERY09/39229D64_HD_SOURCE_READABLE.png",
@@ -44,7 +44,7 @@
       4096,
       4096
     ],
-    "changed_pixels": 2250420,
+    "changed_pixels": 2401475,
     "changed_bbox": [
       128,
       5,
@@ -63,7 +63,7 @@
       4096,
       4096
     ],
-    "changed_pixels": 2357812,
+    "changed_pixels": 2502883,
     "changed_bbox": [
       128,
       5,
@@ -76,7 +76,7 @@
     "status": "PASS"
   },
   "decoded_changes": {
-    "changed_pixels_total": 2357812,
+    "changed_pixels_total": 2502883,
     "changed_pixels_outside_original_bboxes": 0,
     "alpha_changed_pixels_outside_original_bboxes": 0,
     "protected_visible_pixels_changed": 0,
@@ -759,11 +759,56 @@
       "font_size": 158,
       "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
+    },
+    {
+      "key": "special_request_alt",
+      "source": "SPECIAL REQUEST",
+      "korean": "스페셜 요청",
+      "original_bbox": [
+        2280,
+        361,
+        3269,
+        514
+      ],
+      "localized_bbox": [
+        2447,
+        365,
+        3102,
+        510
+      ],
+      "source_width": 989,
+      "source_height": 153,
+      "localized_width": 655,
+      "localized_height": 145,
+      "delta_left": 167,
+      "delta_right": 167,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        2280,
+        3582,
+        3269,
+        3735
+      ],
+      "raw_localized_bbox": [
+        2447,
+        3586,
+        3102,
+        3731
+      ],
+      "raw_containment": "PASS",
+      "layer_pixels": 61134,
+      "font_size": 136,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
+      "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     }
   ],
-  "all_15_readable_and_raw_bbox_pass": true,
-  "all_15_size_ceiling_pass": true,
-  "all_15_positive_margin": true,
+  "all_16_readable_and_raw_bbox_pass": true,
+  "all_16_size_ceiling_pass": true,
+  "all_16_positive_margin": true,
   "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
   "runtime_validation": "UNTESTED",
   "status": "A_RECOVERY09_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
