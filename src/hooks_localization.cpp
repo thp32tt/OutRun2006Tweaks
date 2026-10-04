@@ -82,6 +82,7 @@ namespace KoreanRuntime
     inline static bool TranslationsLoaded = false;
     inline static std::unordered_map<const char*, uint32_t> PointerToId{};
     inline static std::unordered_map<std::string, uint32_t> TextToId{};
+    inline static std::bitset<TextEntryCount> FormatMismatchLogged{};
     inline static std::mutex StateMutex{};
     inline static std::vector<DrawCommand> DrawQueue{};
 
@@ -191,7 +192,17 @@ namespace KoreanRuntime
 
         std::scoped_lock lock(StateMutex);
         PointerToId[text] = id;
-        TextToId.emplace(std::string(text), id);
+
+        // Pointer identity is authoritative. A string-content fallback is only
+        // safe when duplicate stock strings share the same Korean translation.
+        const std::string key(text);
+        const auto [it, inserted] = TextToId.emplace(key, id);
+        if (!inserted && it->second != id)
+        {
+            const uint32_t prior = it->second;
+            if (prior >= TextEntryCount || Translations[prior] != Translations[id])
+                it->second = static_cast<uint32_t>(TextEntryCount);
+        }
     }
 
     static bool ResolveTextId(const char* text, uint32_t& id)
@@ -216,24 +227,201 @@ namespace KoreanRuntime
         return false;
     }
 
-    static std::string FormatTranslation(const std::string& format, uintptr_t firstArgAddress)
+    struct PrintfFormatInfo
     {
-        if (format.find('%') == std::string::npos)
-            return format;
+        std::string safeFormat;
+        std::vector<std::string> signature;
+        bool valid = true;
+    };
 
-        char buffer[MaxFormattedBytes]{};
+    static bool IsPrintfConversion(char ch)
+    {
+        switch (ch)
+        {
+        case 'd': case 'i': case 'u': case 'o': case 'x': case 'X':
+        case 'f': case 'F': case 'e': case 'E': case 'g': case 'G':
+        case 'a': case 'A': case 'c': case 'C': case 's': case 'S':
+        case 'p':
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    static PrintfFormatInfo AnalyzePrintfFormat(const std::string& format)
+    {
+        PrintfFormatInfo info;
+        info.safeFormat.reserve(format.size() + 8);
+
+        for (size_t i = 0; i < format.size();)
+        {
+            if (format[i] != '%')
+            {
+                info.safeFormat.push_back(format[i++]);
+                continue;
+            }
+
+            if (i + 1 < format.size() && format[i + 1] == '%')
+            {
+                info.safeFormat.append("%%");
+                i += 2;
+                continue;
+            }
+
+            size_t p = i + 1;
+            while (p < format.size() && std::strchr("-+ #0'", format[p]))
+                ++p;
+
+            if (p < format.size() && format[p] == '*')
+            {
+                info.signature.emplace_back("*width");
+                ++p;
+            }
+            else
+            {
+                while (p < format.size() && format[p] >= '0' && format[p] <= '9')
+                    ++p;
+            }
+
+            if (p < format.size() && format[p] == '.')
+            {
+                ++p;
+                if (p < format.size() && format[p] == '*')
+                {
+                    info.signature.emplace_back("*precision");
+                    ++p;
+                }
+                else
+                {
+                    while (p < format.size() && format[p] >= '0' && format[p] <= '9')
+                        ++p;
+                }
+            }
+
+            std::string length;
+            if (p + 2 < format.size() && format.compare(p, 3, "I64") == 0)
+            {
+                length = "I64";
+                p += 3;
+            }
+            else if (p + 2 < format.size() && format.compare(p, 3, "I32") == 0)
+            {
+                length = "I32";
+                p += 3;
+            }
+            else if (p < format.size() && std::strchr("hljztL", format[p]))
+            {
+                length.push_back(format[p++]);
+                if (p < format.size() &&
+                    (length[0] == 'h' || length[0] == 'l') &&
+                    format[p] == length[0])
+                {
+                    length.push_back(format[p++]);
+                }
+            }
+
+            if (p < format.size() && format[p] == 'n')
+            {
+                info.valid = false; // Never permit printf's memory-write conversion.
+                return info;
+            }
+
+            if (p < format.size() && IsPrintfConversion(format[p]))
+            {
+                info.safeFormat.append(format, i, (p - i) + 1);
+                info.signature.emplace_back(length + format[p]);
+                i = p + 1;
+                continue;
+            }
+
+            // A bare/unknown percent is visible text (for example 100%).
+            // Escape it before passing the translation to printf.
+            info.safeFormat.append("%%");
+            ++i;
+        }
+
+        return info;
+    }
+
+    static std::string CollapseEscapedPercents(const std::string& format)
+    {
+        std::string out;
+        out.reserve(format.size());
+        for (size_t i = 0; i < format.size(); ++i)
+        {
+            if (format[i] == '%' && i + 1 < format.size() && format[i + 1] == '%')
+            {
+                out.push_back('%');
+                ++i;
+            }
+            else
+            {
+                out.push_back(format[i]);
+            }
+        }
+        return out;
+    }
+
+    static void LogFormatMismatchOnce(
+        uint32_t id,
+        const PrintfFormatInfo& original,
+        const PrintfFormatInfo& translated)
+    {
+        std::scoped_lock lock(StateMutex);
+        if (id >= TextEntryCount || FormatMismatchLogged.test(id))
+            return;
+
+        FormatMismatchLogged.set(id);
+        spdlog::warn(
+            "KoreanTextOverlayTest: text_id={} printf signature mismatch/unsafe "
+            "(stock_args={}, korean_args={}, stock_valid={}, korean_valid={}); "
+            "keeping stock English text for this draw",
+            id,
+            original.signature.size(),
+            translated.signature.size(),
+            original.valid,
+            translated.valid);
+    }
+
+    static bool FormatTranslation(
+        uint32_t id,
+        const char* originalFormat,
+        uintptr_t firstArgAddress,
+        std::string& formatted)
+    {
+        if (!originalFormat || id >= TextEntryCount)
+            return false;
+
+        const PrintfFormatInfo original = AnalyzePrintfFormat(originalFormat);
+        const PrintfFormatInfo translated = AnalyzePrintfFormat(Translations[id]);
+        if (!original.valid || !translated.valid || original.signature != translated.signature)
+        {
+            LogFormatMismatchOnce(id, original, translated);
+            return false;
+        }
+
+        if (translated.signature.empty())
+        {
+            formatted = CollapseEscapedPercents(Translations[id]);
+            return true;
+        }
+
 #if defined(_M_IX86)
+        char buffer[MaxFormattedBytes]{};
         va_list args = reinterpret_cast<va_list>(firstArgAddress);
         const int result = _vsnprintf_s(
             buffer,
             sizeof(buffer),
             _TRUNCATE,
-            format.c_str(),
+            translated.safeFormat.c_str(),
             args);
         if (result >= 0 || buffer[0] != '\0')
-            return std::string(buffer);
+        {
+            formatted.assign(buffer);
+            return true;
+        }
 #endif
-        return format;
+        return false;
     }
 
     static std::string BuildHiddenLayout(const std::string& utf8)
@@ -270,13 +458,13 @@ namespace KoreanRuntime
         return hidden;
     }
 
-    static void Queue(uint32_t id, uintptr_t firstArgAddress)
+    static void Queue(std::string formatted)
     {
-        if (id >= TextEntryCount || Translations[id].empty())
+        if (formatted.empty())
             return;
 
         DrawCommand cmd;
-        cmd.text = FormatTranslation(Translations[id], firstArgAddress);
+        cmd.text = std::move(formatted);
         cmd.x = *Module::exe_ptr<int16_t>(0x556BB8);
         cmd.y = *Module::exe_ptr<int16_t>(0x556BBA);
         cmd.cellHeight = *Module::exe_ptr<int16_t>(0x556BBE);
@@ -305,11 +493,14 @@ namespace KoreanRuntime
         if (!ResolveTextId(*formatSlot, id))
             return;
 
-        Queue(id, stack + 8);
+        std::string formatted;
+        if (!FormatTranslation(id, *formatSlot, stack + 8, formatted))
+            return;
+
+        Queue(formatted);
 
         thread_local std::string hiddenLayout;
-        hiddenLayout = BuildHiddenLayout(
-            FormatTranslation(Translations[id], stack + 8));
+        hiddenLayout = BuildHiddenLayout(formatted);
 
         // Preserve newlines/layout progression while ensuring the stock 7-bit
         // glyph path has no visible English characters to draw.
