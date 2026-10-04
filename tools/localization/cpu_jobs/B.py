@@ -13,6 +13,8 @@ def main():
     out=repo/"localization/graphics/role_B"/run
     out.mkdir(parents=True,exist_ok=True)
     wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
+    for stale in [out/"B_PRODUCTION44_DISCOVERY_FAIL.json", out/"B_PRODUCTION44_FAIL_CLOSED.json", wr/"B_PRODUCTION44_12519155_FAIL.json"]:
+        if stale.exists(): stale.unlink()
 
     asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/12519155_256x256.dds"
     source_zip=repo/"localization/validation/binary_compare/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip"
@@ -46,11 +48,12 @@ def main():
     W,H,mips=rgba_meta(sb)
     if (W,H)!=(1024,1024): raise RuntimeError(("dimensions",W,H))
     if hb[:128]!=sb[:128]: raise RuntimeError("historical header differs")
-    # This atlas is stored mirror-X in raw DDS. Work in readable orientation, then flip back.
+    # Direct raw-element inspection shows these seven text rows are identity-oriented.
+    # Do not inherit the stale historical Batch4 mirror-X note; per-element raw source wins.
     src_raw=Image.frombytes("RGBA",(W,H),sb[128:],"raw","RGBA")
     hist_raw=Image.frombytes("RGBA",(W,H),hb[128:],"raw","RGBA")
-    src=src_raw.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
-    hist=hist_raw.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+    src=src_raw.copy()
+    hist=hist_raw.copy()
     sa=np.asarray(src,dtype=np.uint8); ha=np.asarray(hist,dtype=np.uint8)
 
     # Historical candidate is discovery-only. It supplies no final pixels.
@@ -241,15 +244,15 @@ def main():
                     "stroke_width":sw,"slant":sl,"palette":pal,
                     "rework_status":"NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"})
 
-    # Exact-header raw mirror-X write.
-    final_raw=final.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+    # Exact-header raw identity write.
+    final_raw=final.copy()
     payload=sb[:128]+final_raw.tobytes("raw","RGBA")
     candidate.write_bytes(payload)
     cand_sha=sha_bytes(payload)
     cb=candidate.read_bytes()
     if cb[:128]!=sb[:128] or len(cb)!=len(sb): raise RuntimeError("structure mismatch")
     decoded_raw=Image.frombytes("RGBA",(W,H),cb[128:],"raw","RGBA")
-    decoded=decoded_raw.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+    decoded=decoded_raw.copy()
     if ImageChops.difference(final,decoded).getbbox() is not None: raise RuntimeError("roundtrip mismatch")
     da=np.asarray(decoded,dtype=np.uint8)
 
@@ -306,7 +309,7 @@ def main():
     for c in contacts: cs.paste(c,(0,yy)); yy+=c.height+4
     cs.save(out/"B_PRODUCTION44_125_ROW_CONTACT_2X.jpg",quality=96)
 
-    raws=[card("SOURCE_RAW_MIRROR_X",src_raw),card("FINAL_RAW_MIRROR_X",decoded_raw)]
+    raws=[card("SOURCE_RAW_IDENTITY",src_raw),card("FINAL_RAW_IDENTITY",decoded_raw)]
     rs=Image.new("RGB",(W,(H+26)*2),"white"); rs.paste(raws[0],(0,0)); rs.paste(raws[1],(0,H+26))
     rs.thumbnail((1200,1800),Image.Resampling.LANCZOS); rs.save(out/"B_PRODUCTION44_125_RAW_COMPARE.jpg",quality=96)
 
@@ -315,8 +318,8 @@ def main():
      "source_sha256":source_sha_expected,"historical_discovery_sha256":hist_sha_expected,
      "historical_discovery_only":True,"historical_localized_pixels_reused":False,
      "candidate_sha256":cand_sha,"candidate_path":str(candidate.relative_to(repo)),
-     "method":"exact original 1024x1024 RGBA32 source -> historical candidate only as region-discovery hint -> source-alpha/effect mask -> alpha-only transparent clean plate with hidden RGB preserved -> fresh native Hangul render -> exact-header raw mirror-X DDS -> decoded static QA",
-     "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_x"},
+     "method":"exact original 1024x1024 RGBA32 source -> historical candidate only as region-discovery hint -> source-alpha/effect mask -> alpha-only transparent clean plate with hidden RGB preserved -> fresh native Hangul render -> exact-header raw identity DDS -> decoded static QA",
+     "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":mips,"header_128_exact":True,"raw_orientation":"identity"},
      "segments_total":7,"rows":rows,
      "policy":{"stage_names":"canonical_phonetic_hangul","song_credit_preserved":"not_applicable","multi_line":"not_applicable"},
      "containment":{"elements_total":7,"elements_pass":7,"changed_pixels_outside_exact_source_bboxes":outside,
