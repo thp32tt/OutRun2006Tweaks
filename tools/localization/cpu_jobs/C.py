@@ -153,23 +153,27 @@ for i in range(1, num + 1):
         "bbox": [int(xx.min()), int(yy.min()), int(xx.max()) + 1, int(yy.max()) + 1],
         "pixels": int(len(xx)),
     })
-if len(comps) < 5:
+if len(comps) < 3:
     raise RuntimeError(("too_few_compound_components", len(comps), comps))
 comps.sort(key=lambda c: (c["bbox"][0], c["bbox"][1]))
-gaps = []
-for i in range(len(comps)-1):
-    gap = comps[i+1]["bbox"][0] - comps[i]["bbox"][2]
-    gaps.append((int(gap), i))
-cut_points = sorted([i for _, i in sorted(gaps, reverse=True)[:2]])
-groups = []
-start = 0
-for cp in cut_points + [len(comps)-1]:
-    end = cp + 1
-    groups.append(comps[start:end])
-    start = end
+if len(comps) == 3:
+    # Canonical source already joins each outlined word/icon into one component.
+    groups = [[comps[0]], [comps[1]], [comps[2]]]
+    cut_points = [0, 1]
+else:
+    gaps = []
+    for i in range(len(comps)-1):
+        gap = comps[i+1]["bbox"][0] - comps[i]["bbox"][2]
+        gaps.append((int(gap), i))
+    cut_points = sorted([i for _, i in sorted(gaps, reverse=True)[:2]])
+    groups = []
+    start = 0
+    for cp in cut_points + [len(comps)-1]:
+        end = cp + 1
+        groups.append(comps[start:end])
+        start = end
 if len(groups) != 3 or any(not g for g in groups):
     raise RuntimeError(("compound_grouping", cut_points, groups))
-
 group_masks = []
 group_bboxes = []
 for g in groups:
