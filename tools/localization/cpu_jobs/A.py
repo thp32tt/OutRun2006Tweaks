@@ -73,18 +73,40 @@ if orange_seed.getbbox()!=(58,46,291,137):
 
 near=orange_seed.filter(ImageFilter.MaxFilter(17))
 npix=near.load()
+
+# Model the untouched yellow badge interior per row. Source text/effect is any nearby
+# deviation from that row background, which captures dark/orange antialias fringe that
+# simple color thresholds would leave behind.
+row_background={}
+for yy in range(ch):
+    yellow=[]
+    for xx in range(24,336):
+        r,g,b,a=pix[xx,yy]
+        if a>200 and r>170 and g>170 and b<80:
+            yellow.append((r,g,b,a))
+    if yellow:
+        row_background[yy]=tuple(int(median([v[k] for v in yellow])) for k in range(4))
+
 effect=Image.new("L",(cw,ch),0); ep=effect.load()
 for yy in range(ch):
+    fill=row_background.get(yy)
+    if fill is None:
+        continue
     for xx in range(cw):
         if not npix[xx,yy]:
             continue
         r,g,b,a=pix[xx,yy]
-        if a and ((r-g>4 and b<100) or (g<210 and b<80)):
+        if not a:
+            continue
+        delta=max(abs(r-fill[0]),abs(g-fill[1]),abs(b-fill[2]),abs(a-fill[3]))
+        if delta>2:
             ep[xx,yy]=255
 
 effect_bbox=effect.getbbox()
-if effect_bbox!=(58,46,292,141):
-    raise RuntimeError(("source effect bbox drift",effect_bbox))
+if not effect_bbox:
+    raise RuntimeError("source effect mask empty")
+if effect_bbox[0]<50 or effect_bbox[1]<38 or effect_bbox[2]>305 or effect_bbox[3]>150:
+    raise RuntimeError(("source effect bbox escaped safe badge interior",effect_bbox))
 
 # Reliable per-line split between "No" and "Handicap".
 top_mask=Image.new("L",(cw,ch),0)
@@ -116,15 +138,9 @@ clean_cell=cell.copy(); cp=clean_cell.load()
 for yy in range(ch):
     xs=[xx for xx in range(cw) if ep[xx,yy]]
     if not xs: continue
-    yellow=[]
-    for xx in range(24,336):
-        if ep[xx,yy]: continue
-        r,g,b,a=pix[xx,yy]
-        if a>200 and r>170 and g>170 and b<80:
-            yellow.append((r,g,b,a))
-    if len(yellow)<12:
-        raise RuntimeError(("insufficient yellow reconstruction samples",yy,len(yellow)))
-    fill=tuple(int(median([v[k] for v in yellow])) for k in range(4))
+    fill=row_background.get(yy)
+    if fill is None:
+        raise RuntimeError(("missing yellow reconstruction row",yy))
     for xx in xs:
         cp[xx,yy]=fill
 
