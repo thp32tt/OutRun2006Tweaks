@@ -1668,6 +1668,101 @@ namespace
             ImGui::SeparatorText("Force Feedback Model");
             track_ffb_change(ImGui::Checkbox("Enable Force Feedback", Settings::WheelFFBEnable.ptr()));
 
+            auto apply_ffb_model_test_baseline = [&](int modelIndex)
+            {
+                Settings::WheelFFBEnable = true;
+                Settings::WheelFFBGlobalStrength = 0.70f;
+                Settings::WheelFFBEngineVibration = false;
+                Settings::VibrationMode = 0;
+
+                if (modelIndex == 0)
+                {
+                    // R9 MOZA R3 hardware baseline. The user's physical wheel
+                    // requires both DirectInput polarities reversed for correct
+                    // SAT/centering direction.
+                    Settings::WheelFFBModel = 0;
+                    Settings::WheelFFBPhysicsSat = true;
+                    Settings::WheelFFBSpringStrength = 0.22f;
+                    Settings::WheelFFBSpringSaturation = 0.55f;
+                    Settings::WheelFFBDamperStrength = 0.28f;
+                    Settings::WheelFFBUseHardwareSpring = true;
+                    Settings::WheelFFBUseHardwareDamper = true;
+                    Settings::WheelFFBSteeringWeight = 1.60f;
+                    Settings::WheelFFBMechanicalTrail = 0.30f;
+                    Settings::WheelFFBTrailResponseLead = 0.40f;
+                    Settings::WheelFFBGripLoss = 0.65f;
+                    Settings::WheelFFBWeightTransfer = 0.15f;
+                    Settings::WheelFFBSlewRate = 0.12f;
+                    Settings::WheelFFBReversalReleaseRate = 0.30f;
+                    Settings::WheelFFBRoadTexture = 0.60f;
+                    Settings::WheelFFBTireSlip = 0.04f;
+                    Settings::WheelFFBWallImpact = 0.55f;
+                    Settings::WheelFFBGearShift = 0.60f;
+                    Settings::WheelFFBUsePeriodicEffects = false;
+                    Settings::WheelFFBInvertForce = true;
+                    Settings::WheelFFBInvertSpring = true;
+                }
+                else if (modelIndex == 1)
+                {
+                    Settings::WheelFFBModel = 1;
+                    Settings::WheelFFBUseHardwareSpring = true;
+                    Settings::WheelFFBSpringStrength = 0.50f;
+                    Settings::WheelFFBSpringSaturation = 1.00f;
+                    Settings::WheelFFBDamperStrength = 0.0f;
+                    Settings::WheelFFBUseHardwareDamper = false;
+                    Settings::WheelFFBRoadTexture = 1.0f;
+                    Settings::WheelFFBWallImpact = 1.0f;
+                    Settings::WheelFFBGearShift = 1.0f;
+                    // R3 reports GUID_Sine support but the hardware path was
+                    // weak in the supplied run. Keep Arcade timing/waveforms,
+                    // transport them through the audible ConstantForce fallback.
+                    Settings::WheelFFBUsePeriodicEffects = false;
+                    Settings::WheelFFBInvertForce = false;
+                    Settings::WheelFFBInvertSpring = false;
+                }
+                else if (modelIndex == 2)
+                {
+                    Settings::WheelFFBModel = 2;
+                    Settings::WheelFFBPhysicsSat = true;
+                    Settings::WheelFFBUseHardwareSpring = true;
+                    Settings::WheelFFBUseHardwareDamper = true;
+                    Settings::WheelFFBSpringStrength = 0.22f;
+                    Settings::WheelFFBSpringSaturation = 0.55f;
+                    Settings::WheelFFBDamperStrength = 0.28f;
+                    Settings::WheelFFBSteeringWeight = 1.60f;
+                    Settings::WheelFFBMechanicalTrail = 0.30f;
+                    Settings::WheelFFBTrailResponseLead = 0.40f;
+                    Settings::WheelFFBGripLoss = 0.65f;
+                    Settings::WheelFFBWeightTransfer = 0.15f;
+                    Settings::WheelFFBSlewRate = 0.12f;
+                    Settings::WheelFFBReversalReleaseRate = 0.30f;
+                    Settings::WheelFFBTireSlip = 0.04f;
+                    Settings::WheelFFBRoadTexture = 1.0f;
+                    Settings::WheelFFBWallImpact = 1.0f;
+                    Settings::WheelFFBGearShift = 1.0f;
+                    Settings::WheelFFBUsePeriodicEffects = false;
+                    Settings::WheelFFBInvertForce = false;
+                    Settings::WheelFFBInvertSpring = false;
+                }
+                else
+                {
+                    Settings::WheelFFBModel = 3;
+                    Settings::WheelFFBPS2HostGain = 2.0f;
+                    Settings::WheelFFBUseHardwareSpring = true;
+                    Settings::WheelFFBUseHardwareDamper = true;
+                    Settings::WheelFFBSpringStrength = 0.65f;
+                    Settings::WheelFFBSpringSaturation = 0.775f;
+                    Settings::WheelFFBDamperStrength = 0.30f;
+                    Settings::WheelFFBRoadTexture = 1.0f;
+                    // This controls the R9 shared PC collision tactile assist;
+                    // the unverified retail directional ConstantForce remains off.
+                    Settings::WheelFFBWallImpact = 0.75f;
+                    Settings::WheelFFBUsePeriodicEffects = false;
+                    Settings::WheelFFBInvertForce = false;
+                    Settings::WheelFFBInvertSpring = false;
+                }
+            };
+
             static constexpr const char* FfbModelNames[] = {
                 "Modern DD Physics",
                 "Arcade Original (Lindbergh-derived)",
@@ -1682,10 +1777,11 @@ namespace
                     const bool selected = selectedFfbModel == modelIndex;
                     if (ImGui::Selectable(FfbModelNames[modelIndex], selected))
                     {
-                        Settings::WheelFFBModel = modelIndex;
+                        apply_ffb_model_test_baseline(modelIndex);
                         track_ffb_change(true);
+                        WheelFFB_ResetHeadroomStats();
                         WheelFFB_RequestSettingsTransition();
-                        status_ = std::string("FFB model changed live: ") +
+                        status_ = std::string("FFB model + complete R9 test baseline applied: ") +
                             FfbModelNames[modelIndex] + ". Save Force Feedback to persist it.";
                     }
                     if (selected)
@@ -1693,6 +1789,8 @@ namespace
                 }
                 ImGui::EndCombo();
             }
+            ImGui::TextDisabled(
+                "R9: changing FFB Model applies the complete test baseline automatically. Modern uses Reverse Force+Spring ON; Arcade/Hybrid/PS2 use both OFF.");
 
             const int activeFfbModel = std::clamp(int(Settings::WheelFFBModel), 0, 3);
             if (activeFfbModel == 0)
@@ -1784,12 +1882,9 @@ namespace
             track_ffb_change(ImGui::SliderFloat("Tire Slip", Settings::WheelFFBTireSlip.ptr(), 0.0f, 0.50f, "%.2f"));
             if (!modelUsesModernTireSlip) ImGui::EndDisabled();
 
-            const bool modelUsesCollisionEvent = activeFfbModel != 3;
-            if (!modelUsesCollisionEvent) ImGui::BeginDisabled();
             track_ffb_change(ImGui::SliderFloat("Collision", Settings::WheelFFBWallImpact.ptr(), 0.0f, 1.0f, "%.2f"));
-            if (!modelUsesCollisionEvent) ImGui::EndDisabled();
-            if (!modelUsesCollisionEvent && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
-                ImGui::SetTooltip("PS2 Original: collision ConstantForce stays disabled until a non-zero retail event caller is verified.");
+            if (activeFfbModel == 3 && ImGui::IsItemHovered())
+                ImGui::SetTooltip("PS2: controls the shared PC/DD collision tactile pulse. Retail directional ConstantForce remains disabled until a non-zero original caller is verified.");
 
             const bool modelUsesEngineHaptics = activeFfbModel == 0;
             if (!modelUsesEngineHaptics) ImGui::BeginDisabled();
@@ -1997,8 +2092,8 @@ namespace
                 // R3 compatibility default: prefer ConstantForce road/slip
                 // fallback because reported Sine support can be physically weak.
                 Settings::WheelFFBUsePeriodicEffects = false;
-                Settings::WheelFFBInvertForce = false;
-                Settings::WheelFFBInvertSpring = false;
+                Settings::WheelFFBInvertForce = true;
+                Settings::WheelFFBInvertSpring = true;
                 Settings::WheelFFBDebugLog = true;
                 Settings::VibrationMode = 0;
                 WheelFFB_RequestSettingsTransition();
@@ -2040,8 +2135,8 @@ namespace
                 // R3 compatibility default: prefer ConstantForce road/slip
                 // fallback because reported Sine support can be physically weak.
                 Settings::WheelFFBUsePeriodicEffects = false;
-                Settings::WheelFFBInvertForce = false;
-                Settings::WheelFFBInvertSpring = false;
+                Settings::WheelFFBInvertForce = true;
+                Settings::WheelFFBInvertSpring = true;
                 Settings::VibrationMode = 0;
                 WheelFFB_RequestSettingsTransition();
                 if (Settings::write(Module::UserIniPath))
@@ -2057,106 +2152,8 @@ namespace
                 }
             }
 
-            ImGui::SeparatorText("Original / Arcade model shortcuts");
-            if (ImGui::Button("Use Arcade Original"))
-            {
-                Settings::WheelFFBEnable = true;
-                Settings::WheelFFBModel = 1;
-                Settings::WheelFFBUseHardwareSpring = true;
-                // OutRun2Real profile: SpringStrength=50. TriggerSpringEffectInfinite
-                // maps that to coefficient 0.50 and saturation 1.00 before host gain.
-                Settings::WheelFFBSpringStrength = 0.50f;
-                Settings::WheelFFBSpringSaturation = 1.00f;
-                // OutRun2Real profile: EnableDamper=0. Keep damping available as
-                // an explicit F11 override, but restore zero for the reference shortcut.
-                Settings::WheelFFBDamperStrength = 0.0f;
-                Settings::WheelFFBUseHardwareDamper = false;
-                Settings::WheelFFBEngineVibration = false;
-                // Arcade Original's verified rough-surface path is periodic.
-                // Prefer the wheel driver's hardware periodic effect. The
-                // observed road Sine uses a 70 ms period (~14.286 Hz).
-                Settings::WheelFFBUsePeriodicEffects = true;
-                // Host scalers: 1.00 preserves OutRun2Real's SpeedStrength
-                // amplitude for road/directional/wall requests.
-                Settings::WheelFFBRoadTexture = 1.0f;
-                Settings::WheelFFBWallImpact = 1.0f;
-                // Host scaler: 1.00 preserves OutRun2Real's 0.10 gear Sine.
-                Settings::WheelFFBGearShift = 1.0f;
-                Settings::WheelFFBInvertForce = false;
-                Settings::WheelFFBInvertSpring = false;
-                Settings::VibrationMode = 0;
-                track_ffb_change(true);
-                WheelFFB_RequestSettingsTransition();
-                status_ = "Arcade Original enabled: isolated Lindbergh-derived 50% servo-style spring / no-damper baseline plus reconstructed constant/surface/gear events; both force and spring Reverse are OFF. Save Force Feedback to persist.";
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Use Arcade Hybrid"))
-            {
-                Settings::WheelFFBEnable = true;
-                Settings::WheelFFBModel = 2;
-                Settings::WheelFFBPhysicsSat = true;
-
-                // Hybrid is a complete reference preset, not a delta from the
-                // previously selected model. Restore the Modern DD structural
-                // backbone explicitly so Arcade Original / PS2 condition values
-                // cannot leak into Hybrid when switching live in F11.
-                Settings::WheelFFBUseHardwareSpring = true;
-                Settings::WheelFFBUseHardwareDamper = true;
-                Settings::WheelFFBSpringStrength = 0.65f;
-                Settings::WheelFFBSpringSaturation = 0.95f;
-                Settings::WheelFFBDamperStrength = 0.28f;
-                Settings::WheelFFBSteeringWeight = 1.45f;
-                Settings::WheelFFBMechanicalTrail = 0.25f;
-                Settings::WheelFFBTrailResponseLead = 0.25f;
-                Settings::WheelFFBGripLoss = 0.65f;
-                Settings::WheelFFBWeightTransfer = 0.15f;
-                Settings::WheelFFBSlewRate = 0.040f;
-                Settings::WheelFFBReversalReleaseRate = 0.12f;
-                Settings::WheelFFBTireSlip = 0.20f;
-
-                Settings::WheelFFBEngineVibration = false;
-                Settings::WheelFFBUsePeriodicEffects = true;
-                // Arcade event/surface host scalers. 1.00 preserves the
-                // reconstructed SpeedStrength amplitude before Overall Strength.
-                Settings::WheelFFBRoadTexture = 1.0f;
-                Settings::WheelFFBWallImpact = 1.0f;
-                // Host scaler: 1.00 preserves OutRun2Real's 0.10 gear Sine.
-                Settings::WheelFFBGearShift = 1.0f;
-                Settings::WheelFFBInvertForce = false;
-                Settings::WheelFFBInvertSpring = false;
-                Settings::VibrationMode = 0;
-                track_ffb_change(true);
-                WheelFFB_RequestSettingsTransition();
-                status_ = "Arcade + Modern Hybrid enabled: isolated Modern DD structural baseline plus Lindbergh-derived arcade events; both force and spring Reverse are OFF. Save Force Feedback to persist.";
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Use PS2 Original (Experimental)"))
-            {
-                Settings::WheelFFBEnable = true;
-                Settings::WheelFFBModel = 3;
-                Settings::WheelFFBPS2HostGain = 2.0f;
-                Settings::WheelFFBUseHardwareSpring = true;
-                Settings::WheelFFBUseHardwareDamper = true;
-                // These shipped control values are defined as 1.00x scaling
-                // around the recovered retail PS2 condition parameters.
-                Settings::WheelFFBSpringStrength = 0.65f;
-                Settings::WheelFFBSpringSaturation = 0.775f;
-                Settings::WheelFFBDamperStrength = 0.30f;
-                // PS2 Road Detail is a host scaler around the recovered retail
-                // Type-4 magnitude envelope. 1.00 = one-to-one before Overall
-                // Strength / response correction / DirectInput safety limits.
-                Settings::WheelFFBRoadTexture = 1.0f;
-                Settings::WheelFFBEngineVibration = false;
-                // The retail PS2 binary has explicit periodic download/update
-                // paths; never inherit a previous model's disabled state.
-                Settings::WheelFFBUsePeriodicEffects = true;
-                Settings::WheelFFBInvertForce = false;
-                Settings::WheelFFBInvertSpring = false;
-                Settings::VibrationMode = 0;
-                track_ffb_change(true);
-                WheelFFB_RequestSettingsTransition();
-                status_ = "PS2 Original enabled (experimental): recovered retail Spring/Damper/Type-4 road envelope with 2.00x DD host compensation; 1.00x remains the retail-reference translation.";
-            }
+            ImGui::TextDisabled(
+                "Arcade/Hybrid/PS2 no longer require separate shortcut buttons; selecting the model above applies its tested baseline, polarity and tactile transport.");
 
             if (!Settings::UseNewInput)
             {
