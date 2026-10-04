@@ -117,14 +117,18 @@ clean_protected=protected.copy()
 
 source_png=out/"39229D64_HD_SOURCE_READABLE.png"
 clean_png=out/"39229D64_REPAIRED_CLEAN_PLATE.png"
+allowed_png=out/"39229D64_ALLOWED_TEXT_REGION_MASK.png"
+source_text_mask_png=out/"39229D64_SOURCE_TEXT_EFFECT_MASK.png"
+protected_png=out/"39229D64_PROTECTED_VISIBLE_MASK.png"
+clean_protected_png=out/"39229D64_CLEAN_PROTECTED_VISIBLE_MASK.png"
 src.save(source_png); clean.save(clean_png)
-allowed.save(out/"39229D64_ALLOWED_TEXT_REGION_MASK.png")
-source_text_mask.save(out/"39229D64_SOURCE_TEXT_EFFECT_MASK.png")
-protected.save(out/"39229D64_PROTECTED_VISIBLE_MASK.png")
-clean_protected.save(out/"39229D64_CLEAN_PROTECTED_VISIBLE_MASK.png")
+allowed.save(allowed_png)
+source_text_mask.save(source_text_mask_png)
+protected.save(protected_png)
+clean_protected.save(clean_protected_png)
 
-subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(source_text_mask),
-                "--protected-mask",str(clean_protected),
+subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(source_text_mask_png),
+                "--protected-mask",str(clean_protected_png),
                 "--report",str(out/"A_RECOVERY09_CLEAN_PLATE_VALIDATION.json")],check=True)
 clean_rep=json.loads((out/"A_RECOVERY09_CLEAN_PLATE_VALIDATION.json").read_text())
 if clean_rep["status"]!="PASS": raise RuntimeError(("clean validator",clean_rep))
@@ -161,8 +165,8 @@ dec=dec_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 if ImageChops.difference(dec,final).getbbox() is not None: raise RuntimeError("RGBA roundtrip mismatch")
 dec_png=out/"39229D64_FINAL_DECODED_READABLE.png"; dec.save(dec_png)
 
-subprocess.run(["python3",str(validator),str(source_png),str(dec_png),str(allowed),
-                "--protected-mask",str(protected),
+subprocess.run(["python3",str(validator),str(source_png),str(dec_png),str(allowed_png),
+                "--protected-mask",str(protected_png),
                 "--report",str(out/"A_RECOVERY09_FINAL_MASK_VALIDATION.json")],check=True)
 final_rep=json.loads((out/"A_RECOVERY09_FINAL_MASK_VALIDATION.json").read_text())
 if final_rep["status"]!="PASS": raise RuntimeError(("final validator",final_rep))
