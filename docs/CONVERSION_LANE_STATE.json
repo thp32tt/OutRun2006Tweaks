@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
+  "state_parent_head": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -51,38 +51,39 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DX11-00367",
-    "production_id": "CONVERSION-DXVK-00366",
-    "event_id": "CONVERSION-DXVK-00366-E001",
+    "task_id": "CONVERSION-DX11-00369",
+    "production_id": "CONVERSION-DX11-00369",
+    "event_id": "CONVERSION-DX11-00369-E003",
     "event_type": "retry",
-    "attempt": "1/3",
+    "attempt": "3/3",
     "dispatch_source": "CURRENT_USER_QUEUE",
-    "selected_work_item": "DX11_R247_PROGRAMMABLE_PIPELINE_OBJECT_BINDING_RECEIPT",
-    "result_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
-    "source_implementation_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
-    "validation_bearing_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
-    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R247_PROGRAMMABLE_PIPELINE_OBJECT_BINDING_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+    "selected_work_item": "DX11_R248_PROGRAMMABLE_PRIMITIVE_TOPOLOGY_BINDING_RECEIPT",
+    "result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+    "source_implementation_sha": "1694e4e6f436f83454d0589e271a860313cf5f73",
+    "material_result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+    "validation_bearing_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R248_PROGRAMMABLE_PRIMITIVE_TOPOLOGY_BINDING_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "validation_run_id": 37193568418,
+    "validation_run_id": 37198921847,
     "validation_run_attempt": 1,
-    "validation_job_id": 111410641901,
-    "readiness_smoke_job_id": 111411435222,
-    "artifact_id": 11300410338,
-    "artifact_digest": "sha256:7a21e12d5ea0698096766101a50d918045a62d901750325424470e887bbbbe85",
-    "run_record_path": "docs/automation/runs/CONVERSION-DX11-00367.json",
+    "validation_job_id": 111426405015,
+    "readiness_smoke_job_id": 111427262863,
+    "artifact_id": 11302097530,
+    "artifact_digest": "sha256:6ad4b7e0e2b148ed7964eda4eca3a230ea439ac02585b1a71ff6438d309c78b1",
+    "run_record_path": "docs/automation/runs/CONVERSION-DX11-00369.json",
     "implementation_commits": [
-      "f2bd299a1d40b276cb8d4b213415f6e57f6aed76"
+      "1694e4e6f436f83454d0589e271a860313cf5f73",
+      "d0d918c0b1cfde8f1648913ced259f14ac3c1334"
     ],
-    "implementation_comment_id": 5978801752,
-    "validation_comment_id": 5978801752,
+    "implementation_comment_id": 5979539856,
+    "validation_comment_id": 5979539856,
     "native_draw_path_activation_changed": false,
-    "source": "CURRENT_USER_QUEUE",
-    "dispatch_correction_comment_id": 5978821650
+    "source": "CURRENT_USER_QUEUE"
   },
-  "runtime_blocker": "CONVERSION-DX11-00367/R247 is automation-complete but has no Quest 3/VDXR runtime evidence; it remains dormant and makes no runtime claim. Independently, the XR source-resolution Desktop versus XR_NATIVE_2496X2688 A/B from CONVERSION-DX11-00363 still requires HMD comparison before promotion.",
-  "runtime_next_action": "Keep Desktop as the default source-resolution policy and NativeDrawPath inactive. Runtime work, when performed, should compare Desktop versus XR_NATIVE_2496X2688 aliasing/frame-time/fresh-cached cadence; R247 itself requires no promotion claim from CI.",
-  "independent_static_next_action": "Preserve validated R239-R247 programmable ownership/readiness chain. The next independent programmable unit, if selected under a new TASK_ID, should bind/read back the exact translated primitive topology on the same immediate context after the R247 pipeline receipt, fail closed on topology/context/generation drift, and still stop before Draw* routing or NativeDrawPath activation.",
+  "runtime_blocker": "CONVERSION-DX11-00369/R248 is automation-complete but has no Quest 3/VDXR runtime evidence; it remains dormant and makes no runtime claim. Independently, the XR source-resolution Desktop versus XR_NATIVE_2496X2688 A/B from CONVERSION-DX11-00363 still requires HMD comparison before promotion.",
+  "runtime_next_action": "Keep Desktop as the default source-resolution policy and NativeDrawPath inactive. Runtime work, when performed, should compare Desktop versus XR_NATIVE_2496X2688 aliasing/frame-time/fresh-cached cadence; R248 itself requires no runtime promotion claim from CI.",
+  "independent_static_next_action": "Preserve validated R239-R248 programmable ownership/readiness chain. The next independent programmable unit, if selected under a new TASK_ID, should bind/read back exact programmable IA vertex/index geometry ownership after the R248 topology receipt, fail closed on context/resource/generation drift, and still stop before Draw* routing or NativeDrawPath activation.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -2729,27 +2730,57 @@
       "implementation_comment_id": 5978801752,
       "validation_comment_id": 5978801752,
       "dispatch_correction_comment_id": 5978821650
+    },
+    {
+      "unit_id": "DX11_R248_PROGRAMMABLE_PRIMITIVE_TOPOLOGY_BINDING_RECEIPT",
+      "task_id": "CONVERSION-DX11-00369",
+      "production_id": "CONVERSION-DX11-00369",
+      "event_id": "CONVERSION-DX11-00369-E003",
+      "event_type": "retry",
+      "attempt": "3/3",
+      "base_sha": "6a21989a7f75cfffb2ab52bd8d27176e2c869d56",
+      "implementation_commits": [
+        "1694e4e6f436f83454d0589e271a860313cf5f73",
+        "d0d918c0b1cfde8f1648913ced259f14ac3c1334"
+      ],
+      "source_implementation_sha": "1694e4e6f436f83454d0589e271a860313cf5f73",
+      "material_result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+      "validation_bearing_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R248_PROGRAMMABLE_PRIMITIVE_TOPOLOGY_BINDING_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_PROGRAMMABLE_PRIMITIVE_TOPOLOGY_BINDING_RECEIPT_ONLY",
+      "validation_run_id": 37198921847,
+      "validation_run_attempt": 1,
+      "validation_job_id": 111426405015,
+      "readiness_smoke_job_id": 111427262863,
+      "artifact_id": 11302097530,
+      "artifact_digest": "sha256:6ad4b7e0e2b148ed7964eda4eca3a230ea439ac02585b1a71ff6438d309c78b1",
+      "implementation_comment_id": 5979539856,
+      "validation_comment_id": 5979539856,
+      "initial_failed_result_sha": "1694e4e6f436f83454d0589e271a860313cf5f73",
+      "initial_failed_validation_run_id": 37198228411
     }
   ],
   "controller_dispatch": {
-    "task_id": "CONVERSION-DX11-00367",
-    "production_id": "CONVERSION-DXVK-00366",
-    "event_id": "CONVERSION-DXVK-00366-E001",
+    "task_id": "CONVERSION-DX11-00369",
+    "production_id": "CONVERSION-DX11-00369",
+    "event_id": "CONVERSION-DX11-00369-E003",
     "event_type": "retry",
-    "attempt": "1/3",
+    "attempt": "3/3",
     "source": "CURRENT_USER_QUEUE",
-    "material_result_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
-    "source_implementation_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
-    "validation_bearing_result_sha": "f2bd299a1d40b276cb8d4b213415f6e57f6aed76",
-    "validation_run_id": 37193568418,
+    "material_result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+    "source_implementation_sha": "1694e4e6f436f83454d0589e271a860313cf5f73",
+    "validation_bearing_result_sha": "d0d918c0b1cfde8f1648913ced259f14ac3c1334",
+    "validation_run_id": 37198921847,
     "validation_run_attempt": 1,
-    "validation_job_id": 111410641901,
-    "readiness_smoke_job_id": 111411435222,
-    "artifact_id": 11300410338,
-    "artifact_digest": "sha256:7a21e12d5ea0698096766101a50d918045a62d901750325424470e887bbbbe85",
-    "implementation_comment_id": 5978801752,
-    "validation_comment_id": 5978801752,
-    "dispatch_correction_comment_id": 5978821650,
+    "validation_job_id": 111426405015,
+    "readiness_smoke_job_id": 111427262863,
+    "artifact_id": 11302097530,
+    "artifact_digest": "sha256:6ad4b7e0e2b148ed7964eda4eca3a230ea439ac02585b1a71ff6438d309c78b1",
+    "implementation_comment_id": 5979539856,
+    "validation_comment_id": 5979539856,
     "runtime_validation": "UNTESTED",
     "native_draw_path_activation_changed": false
   },
@@ -2790,30 +2821,27 @@
     "material_and_validation_bearing_sha_unchanged": true
   },
   "dispatch_reconciliation": {
-    "task_id": "CONVERSION-DX11-00367",
+    "task_id": "CONVERSION-DX11-00369",
     "authoritative": {
-      "task_id": "CONVERSION-DX11-00367",
-      "production_id": "CONVERSION-DX11-00367",
-      "event_id": "CONVERSION-DX11-00367-E002",
-      "event_type": "rollover",
-      "attempt": "1/3",
-      "chat_rollover": 2,
-      "rollover_is_retry": false,
+      "task_id": "CONVERSION-DX11-00369",
+      "production_id": "CONVERSION-DX11-00369",
+      "event_id": "CONVERSION-DX11-00369-E003",
+      "event_type": "retry",
+      "attempt": "3/3",
       "source": "CURRENT_USER_QUEUE",
-      "resume_reason": "Retry persisted after one recovery attempt",
       "dispatch_source": "CURRENT_USER_QUEUE"
     },
     "superseded": [
       {
-        "task_id": "CONVERSION-DX11-00367",
-        "production_id": "CONVERSION-DXVK-00366",
-        "event_id": "CONVERSION-DXVK-00366-E001",
+        "task_id": "CONVERSION-DX11-00369",
+        "production_id": "CONVERSION-DX11-00369",
+        "event_id": "CONVERSION-DX11-00369-E002",
         "event_type": "retry",
-        "attempt": "1/3"
+        "attempt": "2/3"
       }
     ],
-    "reason": "Newest explicit user rollover metadata is authoritative. Rollover is not retry, so ATTEMPT remains 1/3. Material/result SHA and exact-SHA validation evidence are unchanged.",
-    "dispatch_correction_comment_id": 5978801166,
+    "reason": "Newest explicit queue dispatch E003 is authoritative. The E002 repair result and exact-SHA Gate remain the final material/validation-bearing evidence; E003 does not duplicate the repair.",
+    "dispatch_correction_comment_id": 5979539856,
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_task_metadata_correction": {
@@ -2880,30 +2908,27 @@
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_dispatch_reconciliation": {
-    "task_id": "CONVERSION-DX11-00367",
+    "task_id": "CONVERSION-DX11-00369",
     "authoritative": {
-      "task_id": "CONVERSION-DX11-00367",
-      "production_id": "CONVERSION-DXVK-00366",
-      "event_id": "CONVERSION-DXVK-00366-E001",
+      "task_id": "CONVERSION-DX11-00369",
+      "production_id": "CONVERSION-DX11-00369",
+      "event_id": "CONVERSION-DX11-00369-E003",
       "event_type": "retry",
-      "attempt": "1/3",
+      "attempt": "3/3",
       "source": "CURRENT_USER_QUEUE",
       "dispatch_source": "CURRENT_USER_QUEUE"
     },
     "superseded": [
       {
-        "task_id": "CONVERSION-DX11-00367",
-        "production_id": "CONVERSION-DX11-00367",
-        "event_id": "CONVERSION-DX11-00367-E002",
-        "event_type": "rollover",
-        "attempt": "1/3",
-        "chat_rollover": 2,
-        "rollover_is_retry": false,
-        "resume_reason": "Retry persisted after one recovery attempt"
+        "task_id": "CONVERSION-DX11-00369",
+        "production_id": "CONVERSION-DX11-00369",
+        "event_id": "CONVERSION-DX11-00369-E002",
+        "event_type": "retry",
+        "attempt": "2/3"
       }
     ],
-    "reason": "Newest explicit queue dispatch in the current user message wins. Retry remains ATTEMPT 1/3. Material/result SHA and exact-SHA Gate #1968 evidence are unchanged.",
-    "dispatch_correction_comment_id": 5978821650,
+    "reason": "Newest explicit queue dispatch E003 is authoritative. The E002 repair result and exact-SHA Gate remain the final material/validation-bearing evidence; E003 does not duplicate the repair.",
+    "dispatch_correction_comment_id": 5979539856,
     "material_and_validation_bearing_sha_unchanged": true
   }
 }
