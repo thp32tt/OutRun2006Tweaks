@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C121-1A43E9D9",
+  "asset": "1A43E9D9",
+  "queue_index": 92,
+  "producer_run": "B_PRODUCTION38",
+  "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+  "source_sha_matches_producer": true,
+  "candidate_sha256": "5bba2b0e6717559132bdf5768bdd0430879c07418cb259762d3463f2bbdd8a36",
+  "candidate_sha_matches_producer": true,
+  "structure": {
+    "width": 2048,
+    "height": 256,
+    "linear_size": 524288,
+    "depth": 1,
+    "mips": 1,
+    "format": "DXT5",
+    "raw_orientation": "mirror_y"
+  },
+  "header_128_exact": true,
+  "clean_changed_pixels_outside_source_mask": 0,
+  "source_mask_pixels_unchanged_in_clean": 0,
+  "final_changed_pixels_outside_allowed_mask": 0,
+  "alpha_changed_pixels_outside_allowed_mask": 0,
+  "final_changed_pixels_in_protected_mask": 0,
+  "visible_localized_pixels_outside_allowed_mask": 0,
+  "visible_target_pixels_missing_from_persisted_target_mask": 1233,
+  "persisted_target_mask_only_pixels": 160,
+  "target_mask_note": "Visible alpha over transparent CLEAN is authoritative for decoded DXT5 glyph bbox; whole-byte candidate-vs-clean differences are invalid because BC3 recompression changes transparent RGB.",
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_pairs": [],
+  "rows": [
+    {
+      "n": 1,
+      "source": "OutRun Mode",
+      "korean": "아웃런 모드",
+      "original_bbox": [
+        387,
+        13,
+        1318,
+        132
+      ],
+      "localized_bbox": [
+        456,
+        13,
+        1096,
+        129
+      ],
+      "producer_decoded_localized_bbox": [
+        608,
+        19,
+        1096,
+        129
+      ],
+      "localized_bbox_matches_producer": false,
+      "delta_left": 69,
+      "delta_right": 222,
+      "delta_top": 0,
+      "delta_bottom": 3,
+      "source_size": [
+        931,
+        119
+      ],
+      "localized_size": [
+        640,
+        116
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "n": 2,
+      "source": "15 continuous course",
+      "korean": "15코스 연속",
+      "original_bbox": [
+        519,
+        132,
+        1589,
+        245
+      ],
+      "localized_bbox": [
+        802,
+        134,
+        1305,
+        244
+      ],
+      "producer_decoded_localized_bbox": [
+        802,
+        134,
+        1305,
+        242
+      ],
+      "localized_bbox_matches_producer": false,
+      "delta_left": 283,
+      "delta_right": 284,
+      "delta_top": 2,
+      "delta_bottom": 1,
+      "source_size": [
+        1070,
+        113
+      ],
+      "localized_size": [
+        503,
+        110
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "machine_status": "FAIL",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "supersedes": "20261005-C120-1A43E9D9 whole-byte target derivation"
+}
