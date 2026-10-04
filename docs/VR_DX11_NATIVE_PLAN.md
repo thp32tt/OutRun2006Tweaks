@@ -121,15 +121,23 @@ Revised development priority:
 1. Stabilize XR-native 72/80/90/120 Hz render cadence and eliminate repeated-frame
    micro-judder. Track fresh/cached projection ratios and frame-time spikes, not
    the Virtual Desktop fps counter alone.
-2. Prioritize programmable vertex/pixel shader fingerprint translation, object
+2. Decouple the VR source-render resolution from the PC mirror resolution.
+   Quest 3/VDXR runtime evidence showed a 3440x1440 desktop backbuffer being
+   stretched into the runtime-recommended 2496x2688 per-eye transport target.
+   A dedicated A/B candidate must render the game backbuffer directly at the
+   runtime-recommended per-eye size (using the last observed 2496x2688 as the
+   first bounded candidate) while `MirrorFitDesktop=true` keeps the PC mirror
+   fitted to the monitor. Compare aliasing, frame time and fresh/cached cadence
+   against the desktop-resolution source before promoting this policy.
+3. Prioritize programmable vertex/pixel shader fingerprint translation, object
    creation, input linkage, constant propagation and cache ownership.
-3. Complete D3D9-to-D3D11 MSAA/backbuffer compatibility and resource
+4. Complete D3D9-to-D3D11 MSAA/backbuffer compatibility and resource
    mutation/lifetime exactness required by the dominant programmable path.
-4. Close remaining fixed-function/render-state exactness gaps that are actually
+5. Close remaining fixed-function/render-state exactness gaps that are actually
    observed by census or visual parity tests.
-5. Keep `NativeDrawPathActive=false` until the activation gate has exact
+6. Keep `NativeDrawPathActive=false` until the activation gate has exact
    resource/shader/state coverage and repeated Quest 3/VDXR parity evidence.
-6. Treat DX9Ex as the regression/reference and compatibility backend. Do not
+7. Treat DX9Ex as the regression/reference and compatibility backend. Do not
    spend primary optimization effort trying to make its current stall profile
    match the DX11 development path unless a DX11 regression requires it.
 
