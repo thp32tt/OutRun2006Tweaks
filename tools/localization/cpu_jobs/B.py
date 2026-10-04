@@ -103,7 +103,19 @@ def source_mask_for(key,cell,bg_kind):
     bw=max(2,min(10,min(h,w)//10))
     border=np.concatenate([crop[:bw].reshape(-1,4),crop[-bw:].reshape(-1,4),crop[:,:bw].reshape(-1,4),crop[:,-bw:].reshape(-1,4)],axis=0)
     transparent_fraction=float(np.mean(border[:,3]<=1))
-    if transparent_fraction>=0.55:
+    if bg_kind=='opaque_header':
+        # The STATUS glyphs occupy >50% of several scanlines, so a per-row median mistakes
+        # them for background.  Use the dominant opaque panel color instead; the full-width
+        # header border becomes an edge-touch component and is rejected below.
+        rgb=crop[:,:,:3].astype(np.int16); alpha=crop[:,:,3].astype(np.int16)
+        opaque=[tuple(map(int,v)) for v in crop[:,:,:3][crop[:,:,3]>200]]
+        if not opaque: raise RuntimeError(f'no opaque header background samples {key}')
+        bg_rgb=np.array(Counter(opaque).most_common(1)[0][0],dtype=np.int16)
+        color_diff=np.max(np.abs(rgb-bg_rgb[None,None,:]),axis=2)
+        rawmask=(color_diff>10)&(crop[:,:,3]>1)
+        mode='opaque_header_dominant_reconstruct'
+        bg_meta={'type':mode,'border_transparent_fraction':transparent_fraction,'dominant_background_rgb':[int(x) for x in bg_rgb],'color_diff_threshold':10}
+    elif transparent_fraction>=0.55:
         rawmask=(crop[:,:,3]>1)
         mode='transparent'
         bg_meta={'type':mode,'border_transparent_fraction':transparent_fraction}
