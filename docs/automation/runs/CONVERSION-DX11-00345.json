@@ -1,18 +1,21 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00345",
-  "production_id": "CONVERSION-DXVK-00344",
-  "event_id": "CONVERSION-DXVK-00344-E006",
+  "production_id": "CONVERSION-DX11-00345",
+  "event_id": "CONVERSION-DX11-00345-E002",
   "event_type": "rollover",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "PENDING",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R236_CURRENT_SIGNATURE_HASH_CAP_COVERAGE_BOUNDARY_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
   "base_sha": "3dedb688f9f5cd8fb9c0142d100a982ec55f7013",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "78d816d5e10d7672464fb05ff7d413713707d46a",
+  "validation_bearing_result_sha": "78d816d5e10d7672464fb05ff7d413713707d46a",
   "result_marker": "[AUTO:CONVERSION-DX11-00345]",
   "selected_work_item": "DX11_R236_CURRENT_SIGNATURE_HASH_CAP_COVERAGE_BOUNDARY",
   "summary": "R236 separates per-log signature count reconciliation from hash-universe coverage so a current log that exactly accounts for its reported signatures still fails coverage-complete evidence when signatureHashCapHitSamples is nonzero.",
@@ -25,7 +28,7 @@
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 HEAD 3dedb688f9f5cd8fb9c0142d100a982ec55f7013; read AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md and Set05, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, docs/VR_AUTODEV_STATE.json, docs/VR_RUN_STATE.md, docs/VR_REGRESSION_KNOWLEDGE.json, docs/VR_PROBLEM_HISTORY.md and Issue #14. R235 is complete and not repeated."
+      "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 from 3dedb688f9f5cd8fb9c0142d100a982ec55f7013 and, after chat rollover, re-read current GitHub HEAD plus the durable 00345 record. R235 is complete and was not repeated. The rollover is not a retry and ATTEMPT remains 1/3."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
@@ -35,30 +38,42 @@
         "ownership_lifetime": "No COM/resource/reset/fence lifetime changes.",
         "stereo_correctness": "No WVP/projection/HUD/sky/effects/recenter changes.",
         "performance": "Offline report construction only; runtime hot path unchanged.",
-        "adversarial": "A log with one captured signature, signatures=1 and hashCapHitSamples=3 must remain count-accounted while failing signature-universe coverage completeness."
+        "adversarial": "A log with one captured signature, signatures=1 and hashCapHitSamples=3 remains count-accounted while signature-universe coverage is fail-closed."
       }
     },
     "C2_IMPLEMENT": {
       "status": "COMPLETE",
-      "evidence": "Add per-log HashCapHitSamples/HashCapSaturated plus AccountedComplete/CoverageComplete, aggregate CurrentSignatureHashCapSaturatedLogs and AllCurrentSignatureEvidenceCoverageComplete, and add an accounted-but-saturated multi-log regression with source-graph drift guards."
+      "evidence": "Added per-log HashCapHitSamples/HashCapSaturated plus AccountedComplete/CoverageComplete, aggregate CurrentSignatureHashCapSaturatedLogs and AllCurrentSignatureEvidenceCoverageComplete, and an accounted-but-saturated multi-log regression with source-graph drift guards."
     },
     "C3_VALIDATE": {
-      "status": "PENDING_EXACT_SHA_GATE",
-      "automation_validation": "PENDING",
-      "evidence": "Required exact-SHA Backend Conversion Gate will validate analyzer regressions, source graph, dormant activation, Win32 build/binary and DX11 readiness smoke. No Quest 3/VDXR runtime test performed."
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R236_CURRENT_SIGNATURE_HASH_CAP_COVERAGE_BOUNDARY_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1915 run 37172840640 completed success for 78d816d5e10d7672464fb05ff7d413713707d46a. validate job 111349168197 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, session regression, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R236 census analyzer regressions; it then configured/built Win32, verified the binary and uploaded artifact 11291903001. DX11 readiness smoke job 111350027958 passed fixed-function shader, input-layout/signature, object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and fixed-function pipeline probes. Artifact digest sha256:4d9bd184e03fb1d4f6590ff62cb5e3405ad98c5654b7bd3a58110a2975b92af0. No Quest 3/VDXR runtime test was performed."
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "COMPLETE",
+      "material_result_sha": "78d816d5e10d7672464fb05ff7d413713707d46a",
+      "validation_bearing_result_sha": "78d816d5e10d7672464fb05ff7d413713707d46a",
+      "result_marker": "[AUTO:CONVERSION-DX11-00345]",
+      "implementation_commits": [
+        "78d816d5e10d7672464fb05ff7d413713707d46a"
+      ],
+      "source_implementation_sha": "78d816d5e10d7672464fb05ff7d413713707d46a"
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
-      "reason": "Offline census evidence-integrity/reporting change only; no runtime distributable identity change intended."
+      "reason": "Offline census evidence-integrity/reporting change only; no runtime distributable identity change."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "Require the exact-SHA Backend Conversion Gate on the R236 material result. After PASS, persist task/lane bookkeeping separately while keeping RUNTIME_VALIDATION=UNTESTED."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37172840640,
+      "validation_job_id": 111349168197,
+      "readiness_smoke_job_id": 111350027958,
+      "artifact_id": 11291903001,
+      "artifact_digest": "sha256:4d9bd184e03fb1d4f6590ff62cb5e3405ad98c5654b7bd3a58110a2975b92af0",
+      "exact_next_action": "Preserve R225-R236 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate."
     }
   },
   "regression_assessment": {
@@ -74,11 +89,52 @@
   "runtime_claim": "NONE",
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00345",
+    "production_id": "CONVERSION-DX11-00345",
+    "event_id": "CONVERSION-DX11-00345-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "original_controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00345",
     "production_id": "CONVERSION-DXVK-00344",
     "event_id": "CONVERSION-DXVK-00344-E006",
     "event_type": "rollover",
     "attempt": "1/3",
-    "source": "CURRENT_USER_QUEUE"
+    "source": "PRE_ROLLOVER_CHAT"
   },
-  "exact_next_action": "Publish the R236 material result without CI skip and require its exact-SHA Backend Conversion Gate."
+  "rollover_metadata_correction": {
+    "corrected_from": {
+      "production_id": "CONVERSION-DXVK-00344",
+      "event_id": "CONVERSION-DXVK-00344-E006",
+      "event_type": "rollover",
+      "attempt": "1/3"
+    },
+    "corrected_to": {
+      "production_id": "CONVERSION-DX11-00345",
+      "event_id": "CONVERSION-DX11-00345-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false
+    },
+    "reason": "The current user-supplied rollover dispatch is authoritative. This rollover is not a retry and does not increment ATTEMPT; material result, validation-bearing SHA and exact-SHA Gate evidence are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
+  },
+  "exact_next_action": "Release CONVERSION-DX11-00345 as complete; do not repeat R236. The next controller task may select the next independent DX11 source/static exactness gap. Quest 3/VDXR runtime proof remains separate.",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37172840640,
+      "run_number": 1915,
+      "result_sha": "78d816d5e10d7672464fb05ff7d413713707d46a",
+      "conclusion": "success",
+      "validate_job_id": 111349168197,
+      "readiness_smoke_job_id": 111350027958,
+      "artifact_id": 11291903001,
+      "artifact_digest": "sha256:4d9bd184e03fb1d4f6590ff62cb5e3405ad98c5654b7bd3a58110a2975b92af0"
+    }
+  }
 }
