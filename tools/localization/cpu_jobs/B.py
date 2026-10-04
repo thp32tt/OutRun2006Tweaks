@@ -17,9 +17,9 @@ source_url='https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f
 source_sha_expected='3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe'
 # readable-orientation cells derived from the persisted exact-HD grid/strip diagnostic.
 spec=[
- ('friend_request','FRIEND REQUEST','친구 요청',(630,1015,1230,1120),'plain_white',0.00),
- ('players','PLAYERS','플레이어',(1420,1015,1790,1120),'plain_white',0.00),
- ('your_friends','YOUR FRIENDS','내 친구',(2280,1015,2860,1120),'plain_white',0.00),
+ ('friend_request','FRIEND REQUEST','친구 요청',(630,1015,1270,1105),'plain_white',0.00),
+ ('players','PLAYERS','플레이어',(1420,1015,1790,1105),'plain_white',0.00),
+ ('your_friends','YOUR FRIENDS','내 친구',(2280,1015,2860,1105),'plain_white',0.00),
  ('please_wait','PLEASE WAIT','잠시만요',(1640,1115,2350,1248),'plain_black',0.00),
  ('time_over','Time Over','시간 종료',(140,1250,1590,1540),'gradient',0.12),
  ('game_over','Game Over','게임 오버',(1830,1250,3370,1545),'gradient',0.12),
