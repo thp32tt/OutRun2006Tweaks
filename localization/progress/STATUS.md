@@ -919,3 +919,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Independent C110 machine report already present on this SHA also PASSes exact header, 13/13 bbox+size, source removal, protected/outside gates and localized pair overlap/touch=0. C controller visual/final decision remains pending.
 - Current pending_artwork localize_text count: 50; localize_text queue rows still carrying producer REWORK/HOLD statuses: 4 (100,106,111,121). RUNTIME_VALIDATION=UNTESTED; no VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_A/20261005-A-RECOVERY11/ and localization/graphics/role_C/20261005-C110-NEW-AB/C110_BF3EE5C6_MACHINE_QA.json.
+
+## 2026-10-05 00:44 KST — A recovery12 C075FB49 source-slant rework
+- Continued candidate-completion-first after A_RECOVERY11 and selected the remaining odd C109-returned REWORK index 111 C075FB49; completed work was not repeated.
+- Input A_RECOVERY10 candidate fc75a1a1b267dbc43f240483ffc1ec67e3d3dddd05061e504ab4c0c4ca2efacd already resolved dense-top source residue/overlap but C109 rejected its mostly upright Korean typography. Hosted worker run 37214065094 produced final candidate d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633.
+- Materially right-slanted only the eight C109-returned dense-top Korean raster/effect layers: Long distance/장거리, Keep passing/계속 차량을 추월하세요!, Drift/드리프트!, Maximum Speed/최고 속도, Transmission/변속기, Don't crash/충돌하지 마세요!, Go through the gate/게이트를 통과하세요!, For Experts/상급자용:. The lower nine localized rows remain pixel-identical to A_RECOVERY10.
+- Static self-QA PASS: 17/17 readable+raw exact bbox, 17/17 source-size ceiling, 17/17 positive margins, clean/final validators PASS, top source residue=0, localized pair overlap=0, 1px-touch pairs=0, changed/alpha/protected pixels outside exact bboxes=0, and changes vs input outside the eight C109-returned bboxes=0. OutRun2SP/OutRun2/1P source labels are pixel-identical.
+- Controller dense-top SOURCE|OLD|NEW, native-width top band, full SOURCE/OLD/FINAL and raw-orientation review PASS. The Korean labels now visibly reproduce the source right-leaning italic/slant geometry without new residue, clipping, overlap, seam, halo, protected-art damage or orientation regression.
+- Current pending_artwork localize_text count: 50; localize_text rows still carrying producer REWORK/HOLD status: 3 (100,106,121). RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_A/20261005-A-RECOVERY12/.

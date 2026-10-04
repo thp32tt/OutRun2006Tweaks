@@ -853,7 +853,8 @@
     "OutRun2": 0,
     "1P": 0
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_SOURCE_OLD_NEW_DENSE_FULL_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A_RECOVERY12_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_RECOVERY12_SLANT_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_qa_notes": "Manual dense-top SOURCE|OLD|NEW contact, native-width top-band, full SOURCE/OLD/FINAL, and raw mirror_y review PASS. The eight C109-returned dense-top labels now visibly reproduce the corresponding source right-leaning italic/slant geometry while retaining A_RECOVERY10 fill/outline/shadow families. The lower nine localized rows are pixel-identical to A_RECOVERY10. OutRun2SP/OutRun2/1P remain source-identical. No source residue, clipping, localized-label overlap/touch, seam, halo, protected-art damage, or orientation regression is visible."
 }

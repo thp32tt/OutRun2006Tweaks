@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T00:30:26+09:00",
+  "updated_at_kst": "2026-10-05T00:44:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A_RECOVERY11 resolved BF3EE5C6 C109 slant mismatch with candidate 7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68; A static/visual self-QA PASS and C110 independent machine QA PASS pending C controller visual/final QA. Remaining producer REWORK includes C075FB49/FD90AA9 source slant plus even-lane 53CE39D5/788CE557 source residue; pending_artwork localize_text remains 50.",
+  "next_checkpoint": "A_RECOVERY11 BF3EE5C6 and A_RECOVERY12 C075FB49 now resolve C109 source-slant returns with A static/visual self-QA PASS. BF3EE5C6 also has C110 independent machine PASS pending C controller visual/final QA; C075FB49 changed SHA d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633 awaits independent C final QA. Remaining producer REWORK is FD90AA9 source slant plus even-lane 53CE39D5/788CE557 source residue; pending_artwork localize_text remains 50.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -269,11 +269,10 @@
       "assets": [
         "53CE39D5",
         "788CE557",
-        "C075FB49",
         "FD90AA9"
       ],
-      "remaining": 4,
-      "note": "BF3EE5C6 moved to A_RECOVERY11 self-QA PASS pending C controller visual/final QA."
+      "remaining": 3,
+      "note": "BF3EE5C6 and C075FB49 moved to A self-QA PASS pending C final QA."
     },
     "latest_d_final_qa": {
       "run": "D85",
