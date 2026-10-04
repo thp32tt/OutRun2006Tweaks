@@ -125,7 +125,7 @@ for rel, source in (("R30", r30), ("R30_SAFE", r30_safe)):
         errors.append(f"{rel} missing R9 main-depth write owner API")
 
 for rel, source in (("R20", r20), ("R23", r23), ("R33", r33)):
-    if "R9MainDepthGeneration" in source:
+    if re.search(r"\\bR9MainDepthGeneration\\b", source):
         errors.append(
             f"{rel} retained direct R9 main-depth generation dependency")
     if "R9MainDepthGenerationValue()" not in source:
