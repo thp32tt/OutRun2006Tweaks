@@ -10,6 +10,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
 repo=Path.cwd()
 # Candidate-completion retry: exact-HD diagnostic exists; select the reviewed semantic line cluster and render in the same invocation.
 run="20261004-B-PRODUCTION21"
+# Retry after C107 detected residual source pixels in the pre-shadow-cleanup candidate.
 outdir=repo/"localization/graphics/role_B"/run
 outdir.mkdir(parents=True,exist_ok=True)
 asset="textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds"
