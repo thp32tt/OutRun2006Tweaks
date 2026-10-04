@@ -8574,6 +8574,182 @@ bool validate_programmable_dormant_pre_activation_snapshot(
     return current.ready && current.snapshotToken == preActivationSnapshotToken;
 }
 
+namespace {
+
+template <typename SourceReceipt>
+NativeProgrammableShaderDormantSourceRevalidationReadiness
+compose_programmable_dormant_source_revalidation_readiness(
+    const SourceReceipt& sourceReceipt,
+    std::uint64_t candidateSnapshotToken,
+    std::uint64_t preActivationSnapshotToken) noexcept {
+    NativeProgrammableShaderDormantSourceRevalidationReadiness out{};
+    out.inputValid =
+        candidateSnapshotToken != 0 && preActivationSnapshotToken != 0;
+    out.sourceReceiptReady = sourceReceipt.ready;
+    out.sourceReceiptSnapshotPresent = sourceReceipt.snapshotToken != 0;
+    out.currentSourceReceiptSnapshotToken = sourceReceipt.snapshotToken;
+    out.candidateSnapshotToken = candidateSnapshotToken;
+    out.preActivationSnapshotToken = preActivationSnapshotToken;
+
+    const auto candidate = compose_programmable_draw_candidate_readiness(
+        sourceReceipt, sourceReceipt.snapshotToken);
+    out.kind = candidate.kind;
+    out.indexed = candidate.indexed;
+    out.elementCount = candidate.elementCount;
+    out.startLocation = candidate.startLocation;
+    out.indexFormat = candidate.indexFormat;
+    out.indexOffset = candidate.indexOffset;
+    out.candidateReady = candidate.ready;
+    out.candidateSnapshotMatches =
+        candidate.ready && candidate.snapshotToken == candidateSnapshotToken;
+    out.sourceLineageMatches =
+        candidate.ready &&
+        candidate.sourceReceiptSnapshotToken == sourceReceipt.snapshotToken;
+
+    const auto preActivation =
+        compose_programmable_dormant_pre_activation_readiness(
+            candidate, candidate.snapshotToken);
+    out.preActivationReady = preActivation.ready;
+    out.preActivationSnapshotMatches =
+        preActivation.ready &&
+        preActivation.snapshotToken == preActivationSnapshotToken;
+    out.candidateLineageMatches =
+        preActivation.ready &&
+        preActivation.candidateSnapshotToken == candidate.snapshotToken;
+    out.boundaryPreserved =
+        preActivation.boundaryPreserved &&
+        preActivation.diagnosticOnly &&
+        !preActivation.activationProofPresent &&
+        !preActivation.nativeDrawPathActivationAllowed &&
+        !preActivation.drawDispatchAuthorized;
+    out.ready =
+        out.inputValid &&
+        out.sourceReceiptReady &&
+        out.sourceReceiptSnapshotPresent &&
+        out.candidateReady &&
+        out.candidateSnapshotMatches &&
+        out.preActivationReady &&
+        out.preActivationSnapshotMatches &&
+        out.sourceLineageMatches &&
+        out.candidateLineageMatches &&
+        out.boundaryPreserved;
+
+    if (out.ready) {
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.kind));
+        token = mix_readiness_snapshot_token(token, out.indexed ? 1u : 0u);
+        token = mix_readiness_snapshot_token(
+            token, out.currentSourceReceiptSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.candidateSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token, out.preActivationSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.elementCount);
+        token = mix_readiness_snapshot_token(token, out.startLocation);
+        token = mix_readiness_snapshot_token(
+            token, static_cast<std::uint32_t>(out.indexFormat));
+        token = mix_readiness_snapshot_token(token, out.indexOffset);
+        token = mix_readiness_snapshot_token(token, 0x258u);
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+} // namespace
+
+NativeProgrammableShaderDormantSourceRevalidationReadiness
+NativeProgrammableShaderPairCache::
+nonindexed_dormant_source_revalidation_readiness(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken,
+    D3DPRIMITIVETYPE primitiveType,
+    std::uint64_t topologyBindingSnapshotToken,
+    const NativeManagedBufferShadow& vertexBuffer,
+    std::uint64_t vertexBufferSnapshotToken,
+    UINT vertexStride,
+    UINT vertexOffset,
+    std::uint64_t nonIndexedGeometryBindingSnapshotToken,
+    UINT primitiveCount,
+    UINT startVertexLocation,
+    std::uint64_t candidateSnapshotToken,
+    std::uint64_t preActivationSnapshotToken) const noexcept {
+    const auto currentSource = nonindexed_direct_dispatch_readiness(
+        expectedContext, expectedDevice, identity, cacheSnapshotToken,
+        slotSnapshotToken, objectSnapshotToken, layout,
+        inputLayoutSnapshotToken, constantStateSnapshotToken,
+        constantPayloadSnapshotToken, constantBindingSnapshotToken,
+        pipelineBindingSnapshotToken, primitiveType,
+        topologyBindingSnapshotToken, vertexBuffer,
+        vertexBufferSnapshotToken, vertexStride, vertexOffset,
+        nonIndexedGeometryBindingSnapshotToken, primitiveCount,
+        startVertexLocation);
+    return compose_programmable_dormant_source_revalidation_readiness(
+        currentSource, candidateSnapshotToken, preActivationSnapshotToken);
+}
+
+NativeProgrammableShaderDormantSourceRevalidationReadiness
+NativeProgrammableShaderPairCache::
+indexed_dormant_source_revalidation_readiness(
+    ID3D11DeviceContext* expectedContext,
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken,
+    std::uint64_t constantStateSnapshotToken,
+    std::uint64_t constantPayloadSnapshotToken,
+    std::uint64_t constantBindingSnapshotToken,
+    std::uint64_t pipelineBindingSnapshotToken,
+    D3DPRIMITIVETYPE primitiveType,
+    std::uint64_t topologyBindingSnapshotToken,
+    const NativeManagedBufferShadow& vertexBuffer,
+    std::uint64_t vertexBufferSnapshotToken,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& indexBuffer,
+    std::uint64_t indexBufferSnapshotToken,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset,
+    std::uint64_t indexedGeometryBindingSnapshotToken,
+    UINT primitiveCount,
+    INT baseVertexIndex,
+    UINT minVertexIndex,
+    UINT numVertices,
+    UINT startIndex,
+    std::uint64_t directDispatchSnapshotToken,
+    std::uint64_t sourceValueSnapshotToken,
+    std::uint64_t liveIndexBindingSnapshotToken,
+    std::uint64_t candidateSnapshotToken,
+    std::uint64_t preActivationSnapshotToken) const noexcept {
+    const auto currentSource = indexed_pre_draw_readiness(
+        expectedContext, expectedDevice, identity, cacheSnapshotToken,
+        slotSnapshotToken, objectSnapshotToken, layout,
+        inputLayoutSnapshotToken, constantStateSnapshotToken,
+        constantPayloadSnapshotToken, constantBindingSnapshotToken,
+        pipelineBindingSnapshotToken, primitiveType,
+        topologyBindingSnapshotToken, vertexBuffer,
+        vertexBufferSnapshotToken, vertexStride, vertexOffset,
+        indexBuffer, indexBufferSnapshotToken, indexFormat, indexOffset,
+        indexedGeometryBindingSnapshotToken, primitiveCount,
+        baseVertexIndex, minVertexIndex, numVertices, startIndex,
+        directDispatchSnapshotToken, sourceValueSnapshotToken,
+        liveIndexBindingSnapshotToken);
+    return compose_programmable_dormant_source_revalidation_readiness(
+        currentSource, candidateSnapshotToken, preActivationSnapshotToken);
+}
+
 NativeFixedFunctionIndexedSourceRangeReadiness
 compose_fixed_function_indexed_source_range_readiness(
     D3DPRIMITIVETYPE primitive,
@@ -9925,3 +10101,5 @@ bool NativeBackend::create_color_target(
 }
 
 } // namespace outrun::vr::dx11
+
+[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]

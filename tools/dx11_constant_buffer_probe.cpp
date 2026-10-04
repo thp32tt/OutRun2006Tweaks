@@ -4182,6 +4182,87 @@ int main()
         r257IndexedTampered.snapshotToken == 0,
         "R257 rejects payload drift hidden behind an unchanged R256 indexed snapshot token");
 
+    const auto r258IndexedSourceRevalidation =
+        programmableCache.indexed_dormant_source_revalidation_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            firstR249BindingSnapshot,
+            1u, 0, 0u, 4u, 0u,
+            firstR252DispatchSnapshot,
+            firstR253SourceValueSnapshot,
+            firstR254LiveIndexSnapshot,
+            r256IndexedCandidate.snapshotToken,
+            r257IndexedPreActivation.snapshotToken);
+    require(
+        r258IndexedSourceRevalidation.inputValid &&
+        r258IndexedSourceRevalidation.sourceReceiptReady &&
+        r258IndexedSourceRevalidation.sourceReceiptSnapshotPresent &&
+        r258IndexedSourceRevalidation.candidateReady &&
+        r258IndexedSourceRevalidation.candidateSnapshotMatches &&
+        r258IndexedSourceRevalidation.preActivationReady &&
+        r258IndexedSourceRevalidation.preActivationSnapshotMatches &&
+        r258IndexedSourceRevalidation.sourceLineageMatches &&
+        r258IndexedSourceRevalidation.candidateLineageMatches &&
+        r258IndexedSourceRevalidation.boundaryPreserved &&
+        r258IndexedSourceRevalidation.ready &&
+        r258IndexedSourceRevalidation.kind ==
+            outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::Indexed &&
+        r258IndexedSourceRevalidation.indexed &&
+        r258IndexedSourceRevalidation.currentSourceReceiptSnapshotToken ==
+            firstR255PreDrawSnapshot &&
+        r258IndexedSourceRevalidation.candidateSnapshotToken ==
+            r256IndexedCandidate.snapshotToken &&
+        r258IndexedSourceRevalidation.preActivationSnapshotToken ==
+            r257IndexedPreActivation.snapshotToken &&
+        r258IndexedSourceRevalidation.snapshotToken != 0,
+        "R258 indexed final dormant handoff revalidates current R255 source state");
+
+    const auto r258IndexedSourceDrift =
+        programmableCache.indexed_dormant_source_revalidation_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            firstR249BindingSnapshot,
+            1u, 0, 0u, 4u, 1u,
+            firstR252DispatchSnapshot,
+            firstR253SourceValueSnapshot,
+            firstR254LiveIndexSnapshot,
+            r256IndexedCandidate.snapshotToken,
+            r257IndexedPreActivation.snapshotToken);
+    require(
+        !r258IndexedSourceDrift.sourceReceiptReady &&
+        !r258IndexedSourceDrift.candidateReady &&
+        !r258IndexedSourceDrift.ready &&
+        r258IndexedSourceDrift.snapshotToken == 0,
+        "R258 indexed final dormant handoff rejects current source-state drift");
+
     const auto r252DeclaredRangeExcludesZero =
         programmableCache.indexed_direct_dispatch_readiness(
             d3d.context, d3d.device, programmablePair,
@@ -4934,6 +5015,79 @@ int main()
         !r257NonIndexedMalformed.ready &&
         r257NonIndexedMalformed.snapshotToken == 0,
         "R257 rejects non-indexed R256 branch-tag mismatch");
+
+    const auto r258NonIndexedSourceRevalidation =
+        programmableCache.nonindexed_dormant_source_revalidation_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            firstR250BindingSnapshot,
+            1u, 0u,
+            r256NonIndexedCandidate.snapshotToken,
+            r257NonIndexedPreActivation.snapshotToken);
+    require(
+        r258NonIndexedSourceRevalidation.inputValid &&
+        r258NonIndexedSourceRevalidation.sourceReceiptReady &&
+        r258NonIndexedSourceRevalidation.sourceReceiptSnapshotPresent &&
+        r258NonIndexedSourceRevalidation.candidateReady &&
+        r258NonIndexedSourceRevalidation.candidateSnapshotMatches &&
+        r258NonIndexedSourceRevalidation.preActivationReady &&
+        r258NonIndexedSourceRevalidation.preActivationSnapshotMatches &&
+        r258NonIndexedSourceRevalidation.sourceLineageMatches &&
+        r258NonIndexedSourceRevalidation.candidateLineageMatches &&
+        r258NonIndexedSourceRevalidation.boundaryPreserved &&
+        r258NonIndexedSourceRevalidation.ready &&
+        r258NonIndexedSourceRevalidation.kind ==
+            outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::NonIndexed &&
+        !r258NonIndexedSourceRevalidation.indexed &&
+        r258NonIndexedSourceRevalidation.currentSourceReceiptSnapshotToken ==
+            firstR251DispatchSnapshot &&
+        r258NonIndexedSourceRevalidation.candidateSnapshotToken ==
+            r256NonIndexedCandidate.snapshotToken &&
+        r258NonIndexedSourceRevalidation.preActivationSnapshotToken ==
+            r257NonIndexedPreActivation.snapshotToken &&
+        r258NonIndexedSourceRevalidation.snapshotToken != 0,
+        "R258 non-indexed final dormant handoff revalidates current R251 source state");
+
+    const auto r258NonIndexedSourceDrift =
+        programmableCache.nonindexed_dormant_source_revalidation_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            firstR250BindingSnapshot,
+            0u, 0u,
+            r256NonIndexedCandidate.snapshotToken,
+            r257NonIndexedPreActivation.snapshotToken);
+    require(
+        r258NonIndexedSourceDrift.sourceReceiptReady &&
+        r258NonIndexedSourceDrift.candidateReady &&
+        !r258NonIndexedSourceDrift.candidateSnapshotMatches &&
+        !r258NonIndexedSourceDrift.preActivationSnapshotMatches &&
+        !r258NonIndexedSourceDrift.ready &&
+        r258NonIndexedSourceDrift.snapshotToken == 0,
+        "R258 non-indexed final dormant handoff rejects fresh source identity drift");
 
     const auto r251StaleGeometry =
         programmableCache.nonindexed_direct_dispatch_readiness(
@@ -9530,3 +9684,5 @@ VSOutput main(VSInput input)
     std::cout << "DX11 dynamic output-state readiness R124: PASS\n";
     return 0;
 }
+
+[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
