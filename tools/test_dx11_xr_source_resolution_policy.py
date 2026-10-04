@@ -21,6 +21,7 @@ vr_settings = read("src/vr/settings.cpp")
 graphics = read("src/hooks_graphics.cpp")
 ui_scaling = read("src/hooks_uiscaling.cpp")
 r30_safe = read("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
+r30_full = read("src/vr/d3d9/stereo_renderer_r30.cpp")
 ini = read("OutRun2006Tweaks.ini")
 
 require(
@@ -110,16 +111,27 @@ for literal, meaning in (
 
 contain_start = "        void R30HudContainScale("
 contain_end = "        enum class R30ScreenSpaceKind"
-require(r30_safe, contain_start, "VR HUD contain transform")
-start = r30_safe.index(contain_start)
-end = r30_safe.index(contain_end, start)
-contain = r30_safe[start:end]
-if "R30HudAspectCompensation(" in contain:
-    raise SystemExit("VR HUD contain path must not add a second automatic aspect correction")
+for renderer, label in (
+    (r30_safe, "R26-safe"),
+    (r30_full, "full R30"),
+):
+    require(renderer, contain_start, f"{label} VR HUD contain transform")
+    start = renderer.index(contain_start)
+    end = renderer.index(contain_end, start)
+    contain = renderer[start:end]
+    if "R30HudAspectCompensation(" in contain:
+        raise SystemExit(
+            f"{label} VR HUD contain path must not add a second automatic aspect correction"
+        )
 require(
-    contain,
+    r30_safe,
     "already-scaled game UI coordinates remain the layout SSOT",
-    "explicit game UI layout ownership contract",
+    "explicit safe-path game UI layout ownership contract",
+)
+require(
+    r30_full,
+    "Do not \"contain\" it",
+    "explicit full-path game UI layout ownership contract",
 )
 
 print("DX11 XR source-resolution + UI-scaling SSOT policy: PASS")

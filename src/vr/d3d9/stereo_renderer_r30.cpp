@@ -1244,9 +1244,10 @@ namespace OutRunVRStereo
             return hr;
         }
 
-        // User-adjustable projection-space HUD scale. The per-eye FOV affine
-        // remains automatic; this value is only a common-centre size trim after
-        // the headset-specific mapping.
+        // Optional final VR HUD size trim. hooks_uiscaling.cpp already owns the
+        // canonical 640x480 -> game-canvas layout; production default 1.0
+        // preserves those positions before world-lock/per-eye projection.
+        // Values below 1.0 are explicit user overrides that shrink about centre.
         float R30HudScaleValue() noexcept
         {
             return std::clamp(Settings::VRHudScale.get(), 0.30f, 1.20f);
@@ -1337,26 +1338,16 @@ namespace OutRunVRStereo
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
             float& scaleX, float& scaleY) noexcept
         {
+            (void)stereo;
             const float userScale = R30HudScaleValue();
-            const float sourceOverTarget =
-                R30HudAspectCompensation(stereo);
 
-            // "Contain" the original desktop HUD canvas inside one eye before
-            // applying the user scale. The old "cover" mapping multiplied X by
-            // source/target aspect; on 3440x1440 -> Quest eye targets that could
-            // make HudScale=0.55 wider than the visible eye and push rank/time
-            // elements off-screen. Contain preserves sprite pixel aspect while
-            // guaranteeing the whole common-centre HUD stays inside the eye.
-            if (sourceOverTarget >= 1.0f)
-            {
-                scaleX = userScale;
-                scaleY = userScale / sourceOverTarget;
-            }
-            else
-            {
-                scaleX = userScale * sourceOverTarget;
-                scaleY = userScale;
-            }
+            // The game's UI Scaling hook has already resolved the canonical
+            // 640x480 layout into the active game canvas. Do not "contain" it
+            // again against the per-eye OpenXR pixel aspect: that second aspect
+            // transform changes menu/HUD placement and sprite proportions.
+            // World-lock and asymmetric eye projection happen after this point.
+            scaleX = userScale;
+            scaleY = userScale;
         }
 
         bool R30TransformHudScissor(
