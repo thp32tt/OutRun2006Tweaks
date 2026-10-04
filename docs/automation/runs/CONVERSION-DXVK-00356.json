@@ -149,7 +149,7 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "evidence": "Schema-2 durable run record and branch-local lane state are persisted in a post-validation bookkeeping commit; validation-bearing result SHA remains 8db6716f and RUNTIME_VALIDATION remains UNTESTED."
+      "evidence": "Schema-2 retry E006 run record first persisted at 2ff3ecf5b5d5e8382adec7c1d62b54a731f0cb53; validation-bearing result remains 8db6716f14f033801c7489bba75c7630b19a79b9 and RUNTIME_VALIDATION remains UNTESTED."
     }
   },
   "blocker": null,
@@ -173,5 +173,5 @@
     "runtime_validation": "UNTESTED",
     "run_record_commit_sha": "ef9f6188ea6cea336498c9460ac02e3e4d3a1c4a"
   },
-  "run_record_commit_sha": null
+  "run_record_commit_sha": "2ff3ecf5b5d5e8382adec7c1d62b54a731f0cb53"
 }
