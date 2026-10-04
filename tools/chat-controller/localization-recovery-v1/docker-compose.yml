@@ -23,6 +23,7 @@ services:
       PREFERRED_THINKING_LEVEL: "High"
       STRICT_THINKING_LEVEL: "false"
       FRESH_CHAT_EACH_RUN: "false"
+      CHAT_RECYCLE_RUNS: "5"
       RETRY_BUTTON_COOLDOWN_SECONDS: "60"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
       STATUS_PORT: "8787"
