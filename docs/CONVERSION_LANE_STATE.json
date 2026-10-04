@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "fbed6fd60999134963f01db9b4b087144c6bb8f5",
+  "state_parent_head": "10b31af774b8ef1472d63869a72abf726bfd63c3",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -51,38 +51,35 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DX11-00355",
-    "production_id": "CONVERSION-DX11-00355",
-    "event_id": "CONVERSION-DX11-00355-E010",
-    "event_type": "rollover",
+    "task_id": "CONVERSION-DX11-00357",
+    "production_id": "CONVERSION-DXVK-00356",
+    "event_id": "CONVERSION-DXVK-00356-E006",
+    "event_type": "retry",
     "attempt": "1/3",
-    "rollover_is_retry": false,
     "dispatch_source": "CURRENT_USER_QUEUE",
-    "selected_work_item": "DX11_R242_PROGRAMMABLE_TRANSLATED_OBJECT_ATTACHMENT_RECEIPT",
-    "result_sha": "fbed6fd60999134963f01db9b4b087144c6bb8f5",
-    "source_implementation_sha": "fbed6fd60999134963f01db9b4b087144c6bb8f5",
-    "validation_bearing_sha": "fbed6fd60999134963f01db9b4b087144c6bb8f5",
-    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R242_PROGRAMMABLE_TRANSLATED_OBJECT_ATTACHMENT_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+    "selected_work_item": "DX11_R243_PROGRAMMABLE_INPUT_LAYOUT_RECEIPT",
+    "result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+    "source_implementation_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+    "validation_bearing_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R243_PROGRAMMABLE_INPUT_LAYOUT_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "validation_run_id": 37182644163,
-    "validation_job_id": 111378131664,
-    "readiness_smoke_job_id": 111378875843,
-    "artifact_id": 11295907202,
-    "artifact_digest": "sha256:8b743b94fc63a68bf0d15fa10aff2c244b4f8649b4d5c4ebef4ecf3f45122191",
-    "run_record_path": "docs/automation/runs/CONVERSION-DX11-00355.json",
+    "validation_run_id": 37185242813,
+    "validation_job_id": 111385693555,
+    "readiness_smoke_job_id": 111386277798,
+    "artifact_id": 11296882293,
+    "artifact_digest": "sha256:076c5e923210ccd3cb406b6d9fb02f24ce230be638eafa4404337850cb0a6ff0",
+    "run_record_path": "docs/automation/runs/CONVERSION-DX11-00357.json",
     "implementation_commits": [
-      "fbed6fd60999134963f01db9b4b087144c6bb8f5"
+      "10b31af774b8ef1472d63869a72abf726bfd63c3"
     ],
-    "implementation_comment_id": 5977281422,
-    "validation_comment_id": 5977332786,
-    "native_draw_path_activation_changed": false,
-    "chat_rollover": 6,
-    "resume_reason": "Retry persisted after one recovery attempt"
+    "implementation_comment_id": 5977627098,
+    "validation_comment_id": 5977678511,
+    "native_draw_path_activation_changed": false
   },
-  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00355/R242. Exact-SHA Backend Conversion Gate #1938 passed for fbed6fd60999134963f01db9b4b087144c6bb8f5, including R242 source-graph guards, Win32 build/binary and readiness smoke with the WARP constant-buffer probe exercising exact-slot translated-object attachment receipt, same-pair idempotence, replacement/foreign-device/stale-slot rejection and device-generation invalidation. This is automated/offline evidence, not in-game/HMD proof.",
-  "runtime_next_action": "Keep NativeDrawPathActive disabled. Use the XR-native cadence/interpolation DX11 path as the primary Quest 3/VDXR performance test; measure fresh-vs-cached projection cadence and frame-time spikes rather than compositor fps alone. Native draw activation still requires exact shader/resource/state coverage and repeated parity evidence.",
-  "independent_static_next_action": "Preserve R238 inventory, R239 stage-typed identity, R240 per-device cache generation/collision semantics, R241 translation-slot ownership and R242 translated-object receipt ownership. Next add one bounded fail-closed programmable input-linkage/input-layout ownership contract keyed to a validated R242 receipt; keep NativeDrawPath dormant and do not claim shader translation parity. Programmable constants remain a later bounded unit.",
+  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00357/R243. Exact-SHA Backend Conversion Gate #1944 passed for 10b31af774b8ef1472d63869a72abf726bfd63c3, including R243 source-graph guards, Win32 build/binary and readiness smoke with the WARP constant-buffer probe exercising exact R242 receipt dependence, exact input-layout metadata identity, same-device input-layout ownership, idempotence, replacement/foreign-device/stale-object rejection and device-generation invalidation/fresh receipt. This is automated/offline evidence, not in-game/HMD proof.",
+  "runtime_next_action": "Keep NativeDrawPathActive disabled. R243 is dormant programmable ownership evidence only and does not authorize IA binding, programmable draw routing or a shader-translation/runtime parity claim.",
+  "independent_static_next_action": "Preserve R239 stage-typed programmable identity, R240 per-device cache generation/collision semantics, R241 translation-slot ownership, R242 exact translated-object receipt and R243 exact input-layout receipt. Next add one bounded fail-closed programmable constant-state ownership/readiness boundary consuming validated R243 evidence; keep NativeDrawPath dormant.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -2543,30 +2540,54 @@
       "artifact_digest": "sha256:8b743b94fc63a68bf0d15fa10aff2c244b4f8649b4d5c4ebef4ecf3f45122191",
       "implementation_comment_id": 5977281422,
       "validation_comment_id": 5977332786
+    },
+    {
+      "unit_id": "DX11_R243_PROGRAMMABLE_INPUT_LAYOUT_RECEIPT",
+      "task_id": "CONVERSION-DX11-00357",
+      "production_id": "CONVERSION-DXVK-00356",
+      "event_id": "CONVERSION-DXVK-00356-E006",
+      "event_type": "retry",
+      "attempt": "1/3",
+      "base_sha": "616a66d73de36e2b3c7efa7dc91efcae85d4f30d",
+      "implementation_commits": [
+        "10b31af774b8ef1472d63869a72abf726bfd63c3"
+      ],
+      "source_implementation_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+      "material_result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+      "validation_bearing_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R243_PROGRAMMABLE_INPUT_LAYOUT_RECEIPT_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_DORMANT_PROGRAMMABLE_INPUT_LAYOUT_RECEIPT_ONLY",
+      "validation_run_id": 37185242813,
+      "validation_job_id": 111385693555,
+      "readiness_smoke_job_id": 111386277798,
+      "artifact_id": 11296882293,
+      "artifact_digest": "sha256:076c5e923210ccd3cb406b6d9fb02f24ce230be638eafa4404337850cb0a6ff0",
+      "implementation_comment_id": 5977627098,
+      "validation_comment_id": 5977678511
     }
   ],
   "controller_dispatch": {
-    "task_id": "CONVERSION-DX11-00355",
-    "production_id": "CONVERSION-DX11-00355",
-    "event_id": "CONVERSION-DX11-00355-E010",
-    "event_type": "rollover",
+    "task_id": "CONVERSION-DX11-00357",
+    "production_id": "CONVERSION-DXVK-00356",
+    "event_id": "CONVERSION-DXVK-00356-E006",
+    "event_type": "retry",
     "attempt": "1/3",
-    "rollover_is_retry": false,
     "source": "CURRENT_USER_QUEUE",
-    "material_result_sha": "fbed6fd60999134963f01db9b4b087144c6bb8f5",
-    "source_implementation_sha": "fbed6fd60999134963f01db9b4b087144c6bb8f5",
-    "validation_bearing_result_sha": "fbed6fd60999134963f01db9b4b087144c6bb8f5",
-    "validation_run_id": 37182644163,
-    "validation_job_id": 111378131664,
-    "readiness_smoke_job_id": 111378875843,
-    "artifact_id": 11295907202,
-    "artifact_digest": "sha256:8b743b94fc63a68bf0d15fa10aff2c244b4f8649b4d5c4ebef4ecf3f45122191",
-    "implementation_comment_id": 5977281422,
-    "validation_comment_id": 5977332786,
+    "material_result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+    "source_implementation_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+    "validation_bearing_result_sha": "10b31af774b8ef1472d63869a72abf726bfd63c3",
+    "validation_run_id": 37185242813,
+    "validation_job_id": 111385693555,
+    "readiness_smoke_job_id": 111386277798,
+    "artifact_id": 11296882293,
+    "artifact_digest": "sha256:076c5e923210ccd3cb406b6d9fb02f24ce230be638eafa4404337850cb0a6ff0",
+    "implementation_comment_id": 5977627098,
+    "validation_comment_id": 5977678511,
     "runtime_validation": "UNTESTED",
-    "native_draw_path_activation_changed": false,
-    "chat_rollover": 6,
-    "resume_reason": "Retry persisted after one recovery attempt"
+    "native_draw_path_activation_changed": false
   },
   "rollover_metadata_correction": {
     "task_id": "CONVERSION-DX11-00355",
@@ -2591,5 +2612,21 @@
       "resume_reason": "Retry persisted after one recovery attempt"
     },
     "reason": "Current user-issued E010 / CHAT_ROLLOVER=6 dispatch is authoritative; chat rollover does not increment ATTEMPT. Existing R242 material/result SHA, exact-SHA Gate #1938 evidence, C0-C6 completion and RUNTIME_VALIDATION=UNTESTED remain authoritative and unchanged."
+  },
+  "dispatch_reconciliation": {
+    "task_id": "CONVERSION-DX11-00357",
+    "authoritative": {
+      "production_id": "CONVERSION-DXVK-00356",
+      "event_id": "CONVERSION-DXVK-00356-E006",
+      "event_type": "retry",
+      "attempt": "1/3"
+    },
+    "superseded_concurrent_metadata": {
+      "production_id": "CONVERSION-DX11-00357",
+      "event_id": "CONVERSION-DX11-00357-E002",
+      "event_type": "rollover",
+      "chat_rollover": 2
+    },
+    "reason": "Current controller queue dispatch is authoritative; concurrent stale rollover bookkeeping does not alter R243 material/result SHA or Gate #1944 evidence."
   }
 }
