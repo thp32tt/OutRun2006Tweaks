@@ -53,7 +53,7 @@
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00349",
     "production_id": "CONVERSION-DX11-00349",
-    "event_id": "CONVERSION-DX11-00349-E004",
+    "event_id": "CONVERSION-DX11-00349-E006",
     "event_type": "rollover",
     "attempt": "1/3",
     "dispatch_source": "CURRENT_USER_QUEUE",
@@ -69,7 +69,7 @@
     "artifact_id": 11293786625,
     "artifact_digest": "sha256:d42d93681de7b725993573f5cabb5d373621da7ec379968d8ac2c90a5eab0132",
     "run_record_path": "docs/automation/runs/CONVERSION-DX11-00349.json",
-    "run_record_commit": "cc93d3923e845e28bdb876c94a3cd018948d162c",
+    "run_record_commit": "1292a2a156b7851af53538d4a885803c671f7f13",
     "implementation_commits": [
       "db1f0ef43e9f1d0d9d688c9193ddb8806258f267",
       "47e5eb443fb39365058988337fd8e69cafbd7616"
@@ -77,14 +77,34 @@
     "implementation_comment_id": 5976405348,
     "repair_comment_id": 5976450333,
     "validation_comment_id": 5976517110,
-    "chat_rollover": 3,
+    "chat_rollover": 4,
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt",
     "dispatch_reconciliation": {
-      "corrected_from": "CONVERSION-DXVK-00348/CONVERSION-DXVK-00348-E005 retry",
-      "corrected_to": "CONVERSION-DX11-00349/CONVERSION-DX11-00349-E004 rollover",
+      "corrected_from": "CONVERSION-DX11-00349/CONVERSION-DX11-00349-E004 rollover chat=3",
+      "corrected_to": "CONVERSION-DX11-00349/CONVERSION-DX11-00349-E006 rollover chat=4",
       "attempt_unchanged": "1/3",
       "material_result_sha_unchanged": "47e5eb443fb39365058988337fd8e69cafbd7616"
+    },
+    "rollover_metadata_correction": {
+      "corrected_from": {
+        "production_id": "CONVERSION-DX11-00349",
+        "event_id": "CONVERSION-DX11-00349-E004",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 3
+      },
+      "corrected_to": {
+        "production_id": "CONVERSION-DX11-00349",
+        "event_id": "CONVERSION-DX11-00349-E006",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 4,
+        "rollover_is_retry": false,
+        "resume_reason": "Retry persisted after one recovery attempt"
+      },
+      "reason": "Latest GitHub durable run record for CONVERSION-DX11-00349 is authoritative. E006 is a chat rollover, not a retry; ATTEMPT remains 1/3 and R238 material/validation-bearing SHA 47e5eb443fb39365058988337fd8e69cafbd7616 plus Gate #1927 evidence remain unchanged.",
+      "material_and_validation_bearing_sha_unchanged": true
     }
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00349. Exact-SHA Backend Conversion Gate #1927 passed for R238 result 47e5eb443fb39365058988337fd8e69cafbd7616, including R238 programmable shader-pair inventory regressions, source-graph/dormant-activation/census checks, Win32 build/binary and DX11 readiness smoke. This is offline/hosted evidence, not in-game/HMD proof.",
@@ -2366,10 +2386,10 @@
       "unit_id": "DX11_R238_PROGRAMMABLE_SHADER_PAIR_INVENTORY",
       "task_id": "CONVERSION-DX11-00349",
       "production_id": "CONVERSION-DX11-00349",
-      "event_id": "CONVERSION-DX11-00349-E004",
+      "event_id": "CONVERSION-DX11-00349-E006",
       "event_type": "rollover",
       "attempt": "1/3",
-      "chat_rollover": 3,
+      "chat_rollover": 4,
       "rollover_is_retry": false,
       "base_sha": "e43981f939e0f67ac98500e52f91166d62c1f33d",
       "implementation_commits": [
@@ -2393,7 +2413,7 @@
       "readiness_smoke_job_id": 111360027023,
       "artifact_id": 11293786625,
       "artifact_digest": "sha256:d42d93681de7b725993573f5cabb5d373621da7ec379968d8ac2c90a5eab0132",
-      "run_record_commit": "cc93d3923e845e28bdb876c94a3cd018948d162c",
+      "run_record_commit": "1292a2a156b7851af53538d4a885803c671f7f13",
       "implementation_comment_id": 5976405348,
       "repair_comment_id": 5976450333,
       "validation_comment_id": 5976517110,
@@ -2415,13 +2435,33 @@
         },
         "reason": "The current user-supplied rollover dispatch is authoritative. This rollover is not a retry and does not increment ATTEMPT. Material result 47e5eb443fb39365058988337fd8e69cafbd7616, exact-SHA Backend Conversion Gate #1927 evidence, C0-C6 completion and RUNTIME_VALIDATION=UNTESTED are unchanged.",
         "material_and_validation_bearing_sha_unchanged": true
+      },
+      "rollover_metadata_correction": {
+        "corrected_from": {
+          "production_id": "CONVERSION-DX11-00349",
+          "event_id": "CONVERSION-DX11-00349-E004",
+          "event_type": "rollover",
+          "attempt": "1/3",
+          "chat_rollover": 3
+        },
+        "corrected_to": {
+          "production_id": "CONVERSION-DX11-00349",
+          "event_id": "CONVERSION-DX11-00349-E006",
+          "event_type": "rollover",
+          "attempt": "1/3",
+          "chat_rollover": 4,
+          "rollover_is_retry": false,
+          "resume_reason": "Retry persisted after one recovery attempt"
+        },
+        "reason": "Latest GitHub durable run record for CONVERSION-DX11-00349 is authoritative. E006 is a chat rollover, not a retry; ATTEMPT remains 1/3 and R238 material/validation-bearing SHA 47e5eb443fb39365058988337fd8e69cafbd7616 plus Gate #1927 evidence remain unchanged.",
+        "material_and_validation_bearing_sha_unchanged": true
       }
     }
   ],
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00349",
     "production_id": "CONVERSION-DX11-00349",
-    "event_id": "CONVERSION-DX11-00349-E004",
+    "event_id": "CONVERSION-DX11-00349-E006",
     "event_type": "rollover",
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE",
@@ -2433,12 +2473,32 @@
     "readiness_smoke_job_id": 111360027023,
     "artifact_id": 11293786625,
     "artifact_digest": "sha256:d42d93681de7b725993573f5cabb5d373621da7ec379968d8ac2c90a5eab0132",
-    "run_record_commit": "cc93d3923e845e28bdb876c94a3cd018948d162c",
+    "run_record_commit": "1292a2a156b7851af53538d4a885803c671f7f13",
     "implementation_comment_id": 5976405348,
     "repair_comment_id": 5976450333,
     "validation_comment_id": 5976517110,
-    "chat_rollover": 3,
+    "chat_rollover": 4,
     "rollover_is_retry": false,
-    "resume_reason": "Retry persisted after one recovery attempt"
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "rollover_metadata_correction": {
+      "corrected_from": {
+        "production_id": "CONVERSION-DX11-00349",
+        "event_id": "CONVERSION-DX11-00349-E004",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 3
+      },
+      "corrected_to": {
+        "production_id": "CONVERSION-DX11-00349",
+        "event_id": "CONVERSION-DX11-00349-E006",
+        "event_type": "rollover",
+        "attempt": "1/3",
+        "chat_rollover": 4,
+        "rollover_is_retry": false,
+        "resume_reason": "Retry persisted after one recovery attempt"
+      },
+      "reason": "Latest GitHub durable run record for CONVERSION-DX11-00349 is authoritative. E006 is a chat rollover, not a retry; ATTEMPT remains 1/3 and R238 material/validation-bearing SHA 47e5eb443fb39365058988337fd8e69cafbd7616 plus Gate #1927 evidence remain unchanged.",
+      "material_and_validation_bearing_sha_unchanged": true
+    }
   }
 }
