@@ -53,7 +53,7 @@ def card(arr,label,maxw=760,maxh=760):
     c=Image.new("RGB",(v.width,v.height+24),"white"); c.paste(v,(0,24)); ImageDraw.Draw(c).text((4,4),label,fill="black",font=ImageFont.load_default()); return c
 
 source=Path("/tmp/C97_455717B2_SOURCE.dds")
-url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds"
+url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_congrats_cvt_Exst/455717B2_512x512.dds"
 urllib.request.urlretrieve(url,source)
 candidate=repo/p["candidate_path"]
 if sha(source)!=p["source_sha256"]: raise RuntimeError(("source SHA",sha(source),p["source_sha256"]))
