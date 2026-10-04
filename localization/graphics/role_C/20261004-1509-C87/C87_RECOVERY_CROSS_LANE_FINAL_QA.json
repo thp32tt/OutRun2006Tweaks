@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "run": "20261004-1509-C87",
+  "role": "C",
+  "timestamp_kst": "2026-10-04T15:09:35+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "base_head_at_scan": "cedeacaee6c9b4074304fcef06b0cd37d6b2ec09",
+  "prior_c_commit": "6bd588d",
+  "scope": {
+    "reason": "Cross-lane final QA of new A/B graphics results after C86; completed work was not repeated.",
+    "assets": [
+      "39229D64",
+      "A064FDFC",
+      "411827E"
+    ]
+  },
+  "assets": [
+    {
+      "asset": "39229D64",
+      "queue_index": 57,
+      "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+      "source_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "input_candidate_sha256": "a63dcfea0642c9bcb4cb5b41d168923404157d9b65409a3affcf72662343d2b6",
+      "candidate_sha256": "a63dcfea0642c9bcb4cb5b41d168923404157d9b65409a3affcf72662343d2b6",
+      "source_report": "localization/graphics/role_A/20261004-A-RECOVERY03/A_RECOVERY03_39229D64_REPORT.json",
+      "decoded_bbox_gate": "PASS_15_OF_15",
+      "prior_pass_preservation": "PASS_8_OF_8",
+      "source_bbox_matches_c85": true,
+      "structure_before_c": {
+        "header_128_exact": false,
+        "defect": "Candidate DDS had R/B bitmasks swapped and source mip/depth header fields were not preserved.",
+        "status": "REWORK_REQUIRED"
+      },
+      "c_corrective_rework": {
+        "persisted_to_candidate": false,
+        "scratch_proof": "lossless_dds_header_and_channel_layout_restore",
+        "scratch_decoded_rgba_pixel_exact_to_input_candidate": true,
+        "scratch_decoded_rgba_sha256": "ad7195b1a9f72a00db09d0506293e25857a0ad1623cd46a38b83465d4e6e0b1b",
+        "scratch_normalized_sha256": "972ab49831aeeaad8c3d8f97af326bf114448306d07fbe7c941cfa4fcd26b4a1",
+        "reason_not_persisted": "Candidate still fails mandatory clean-plate evidence gate; keep canonical rework candidate unchanged and return the whole asset to A/B."
+      },
+      "quality_pipeline_evidence": {
+        "source_text_mask_persisted": false,
+        "protected_mask_persisted": false,
+        "clean_plate_persisted": false,
+        "clean_plate_validation_persisted": false,
+        "final_mask_validation_persisted": false
+      },
+      "c_decision": "REWORK_REQUIRED_DDS_STRUCTURE_AND_CLEAN_PLATE_EVIDENCE",
+      "decision_reason": "Exact-bbox gate passes, but canonical candidate does not preserve the exact source DDS header/channel layout and the material rework lacks mandatory persisted clean-plate/protected-mask/two-stage validation evidence.",
+      "required_next": "Rebuild/re-encode from exact HD source through the clean-plate pipeline, preserve exact source DDS header/channel layout, persist masks and both validator reports, then resubmit to C.",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "A064FDFC",
+      "queue_index": 60,
+      "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+      "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "candidate_sha256": "15b5970daf2e85818e99efbe37e980564188ebeaaf48a40592b3e561765dfa3f",
+      "source_report": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json",
+      "structure": {
+        "header_128_exact": true,
+        "dimensions": [
+          4096,
+          2048
+        ],
+        "format": "RGBA32"
+      },
+      "decoded_bbox_gate": "PASS_21_OF_21",
+      "c85_reworked_bbox_gate": "PASS_6_OF_6",
+      "prior_pass_preservation": "PASS_15_OF_15",
+      "new_overlap_pairs": 0,
+      "c_clean_plate_recheck": {
+        "status": "PASS",
+        "changed_pixels": 1398408,
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0
+      },
+      "c_final_recheck": {
+        "status": "PASS",
+        "changed_pixels": 1585265,
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0
+      },
+      "visual_qa": {
+        "status": "PASS",
+        "evidence": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_COMPARE.png",
+        "note": "Manual review found no clipping, residue, seam, protected-artwork damage, or obvious style regression."
+      },
+      "candidate_changed_by_c": false,
+      "c_decision": "C87_PIXEL_VISUAL_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "411827E",
+      "queue_index": 97,
+      "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+      "source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+      "candidate_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
+      "source_report": "localization/graphics/role_A/20261004-A-RECOVERY04/A_RECOVERY04_411827E_REPORT.json",
+      "structure": {
+        "header_128_exact": true,
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32"
+      },
+      "decoded_bbox_gate": "PASS_7_OF_7",
+      "c85_reworked_bbox_gate": "PASS_4_OF_4",
+      "prior_pass_visible_preservation": "PASS_3_OF_3",
+      "c_clean_plate_recheck": {
+        "status": "PASS_SCOPED_REWORK_CONTEXT",
+        "note": "A clean-plate validator intentionally compares the four-cell rework context, not the whole canonical source.",
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0
+      },
+      "c_final_recheck": {
+        "status": "PASS",
+        "changed_pixels": 163289,
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0
+      },
+      "collateral_vs_pre_rework": {
+        "visible_changed_pixels_outside_four_failed_cells": 0,
+        "alpha_changed_pixels_outside_four_failed_cells": 0
+      },
+      "visual_qa": {
+        "status": "PASS",
+        "evidence": "localization/graphics/role_A/20261004-A-RECOVERY04/A_RECOVERY04_411827E_COMPARE.png",
+        "note": "SOURCE/BEFORE/CLEAN/FINAL review shows clean removal and source-faithful badge preservation with no clipping or patch seam."
+      },
+      "candidate_changed_by_c": false,
+      "c_decision": "C87_PIXEL_VISUAL_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "summary": {
+    "static_pixel_visual_pass_pending_ingame": 2,
+    "hold_strict_recheck": 1,
+    "candidates_changed_by_c": 0,
+    "runtime_validation": "UNTESTED",
+    "in_game_claimed": false,
+    "vr_ffb_dx11_dxvk_changes": false
+  }
+}

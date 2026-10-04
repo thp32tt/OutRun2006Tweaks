@@ -669,3 +669,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Duplicate source-string safety: ambiguous content fallback is disabled when duplicate English strings map to different Korean translations.
 - Translation table static gate: 1,355 rows / 1,355 unique IDs / 41 percent-format rows / 0 %n rows.
 - RUNTIME_VALIDATION=UNTESTED; in-game startup/menu/race, dynamic %d/%s, 4:3/widescreen, no-double-draw and crash validation remain mandatory.
+
+## 2026-10-04 15:09 KST — C87 recovery cross-lane final QA
+- Revalidated only new A/B graphics results since C86: 39229D64, A064FDFC, 411827E; previously completed C assets were not repeated.
+- A064FDFC: C87_PIXEL_VISUAL_PASS_PENDING_INGAME. 21/21 exact-bbox PASS; former C85 failures 6/6 fixed; 15/15 prior PASS exact. C reran exact-HD clean-plate/final validators: outside edit/protected masks = 0; visual QA PASS.
+- 411827E: C87_PIXEL_VISUAL_PASS_PENDING_INGAME. 7/7 exact-bbox PASS; former C85 failures 4/4 fixed; 3/3 prior visible PASS preserved. Exact-HD final validator outside/protected = 0; scoped four-cell clean-plate validator and visual QA PASS.
+- 39229D64: 15/15 bbox PASS and 8/8 prior PASS exact, but C found a canonical DDS structural regression (R/B bitmasks plus mip/depth header fields differ from source) and Recovery03 lacks mandatory clean-plate/protected-mask/two-stage validator evidence. A scratch normalization proved the header/layout can be restored with decoded RGBA pixel identity, but C deliberately did not persist that partial fix; the whole asset is REWORK_REQUIRED_DDS_STRUCTURE_AND_CLEAN_PLATE_EVIDENCE and must return through A/B.
+- RUNTIME_VALIDATION=UNTESTED for all three. No in-game approval claimed. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261004-1509-C87/C87_RECOVERY_CROSS_LANE_FINAL_QA.json.
