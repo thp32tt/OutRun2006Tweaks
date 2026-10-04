@@ -93,7 +93,9 @@
     "user_approved_locked": [],
     "user_approved_exact_dds_commit": "b2fd5fcf5b6edae90479af89577e9a403704bdfc",
     "user_approved_report": "localization/graphics/BATCH64_USER_APPROVAL_P0_IMPORT_REPORT.json",
-    "approved_dds_root": "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst",
+    "approved_dds_root": null,
+    "historical_approved_dds_root": "localization/graphics/approved_dds/textures/load/spr_sprani_selector_cvt_Exst",
+    "approved_dds_root_note": "No current approved DDS; former BATCH64 approvals were reopened for canonical HD rework in BATCH69.",
     "remaining_p0_rework": [
       "EBEF6D20",
       "841E796B"
