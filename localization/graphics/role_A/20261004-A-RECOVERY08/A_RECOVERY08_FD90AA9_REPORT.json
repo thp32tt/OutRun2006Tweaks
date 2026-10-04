@@ -9,7 +9,7 @@
   "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
   "input_candidate_sha256": "58a8bd06a38375694da7d3109fc2615ccd6d45092828f7eb5b7a9317afc13010",
   "candidate_sha256": "0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b",
-  "method": "C92 visual-return repair on GitHub-hosted worker: preserve 25 A07 layers exact; remove four returned A07 layers to clean plate; expand More Engine glyph/effect cleanup with high-frequency source mask clipped away from You; harmonic RGBA inpaint; fresh native Korean rerender; physically isolate three overlapping expert labels into non-overlapping vertical atlas bands; exact source-header RGBA32 encode; decoded static QA",
+  "method": "C92 visual-return repair on GitHub-hosted worker: preserve 25 A07 layers exact; remove four returned A07 layers to clean plate; reconstruct the complete More Engine source-text bounding band by per-column RGBA interpolation clipped before the You neighbor; fresh native Korean rerender; physically isolate the three overlapping expert labels into non-overlapping vertical atlas bands; exact source-header RGBA32 encode; decoded static QA",
   "structure": {
     "dimensions": [
       4096,
@@ -48,7 +48,7 @@
     ],
     "mask_pixels": 28584,
     "mask_overlap_with_you_localized_pixels": 0,
-    "method": "source high-frequency glyph/effect mask + A07 prior source mask + harmonic RGBA inpaint"
+    "method": "full exact source text bounding-band per-column RGBA interpolation, clipped at x=3169 before the You neighbor"
   },
   "reworked_rows": [
     {
@@ -308,7 +308,8 @@
     "status": "PASS"
   },
   "fresh_layer_overlap_pairs": [],
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS_C92_RETURN_CONTACT_READABLE_AND_RAW",
   "runtime_validation": "UNTESTED",
-  "status": "A_RECOVERY08_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_RECOVERY08_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_qa_notes": "Manual review of SOURCE/CLEAN08/BEFORE_C92_FAIL/FINAL08 contact evidence plus full readable/raw views: More Engine English residue is removed; engine banner remains continuous with no opaque patch; experts_long/for_experts/normal_difficult are reduced and vertically isolated so the C92 blocking shared-layer overdraw is removed; no new clipping, seam, orientation error, or protected-art damage observed."
 }

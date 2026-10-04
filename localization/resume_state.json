@@ -1,5 +1,5 @@
 {
-  "schema_version": 54,
+  "schema_version": 55,
   "branch": "korean-localization-recovery-20260928",
   "upstream_base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -7,10 +7,10 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A_RECOVERY08 repaired C92-returned FD90AA9; candidate 0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b passed A static + controller visual self-QA and is pending independent C final QA plus isolated in-game validation.",
+    "C92 strict checkpoint remains authoritative until C revalidates A_RECOVERY08; FD90AA9 is the only C92-returned REWORK asset.",
     "A_RECOVERY06 repaired 39229D64; candidate 67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a is pending independent C final QA and isolated in-game validation.",
     "C85: C4A2937B, 9F060EC1, D6DC1380, 48DEBE77 pass current exact pixel+visual static QA but remain pending isolated DDS_ONLY in-game; approved lock count 0.",
-    "REWORK 12 current candidates: FF2462BB, 568D3696, FA7BBB13, 39229D64, A064FDFC, 2DA43E41, 411827E, 571E78F3, 62BEBF33, E3FD08BE, C075FB49, FD90AA9.",
-    "Full queue remains active: 63 additional localize_text rows pending production and 47 zoom_review rows HOLD_STRICT_RECHECK.",
     "B91 staged attempts were independently re-decoded by C; only C4A2937B was promoted to canonical candidate.",
     "Never approve on cell-only or reported bbox evidence when current DDS re-decode or visual artifact checks disagree."
   ],
@@ -1877,5 +1877,31 @@
     "c92_result": "REWORK_REQUIRED_VISUAL_SOURCE_RESIDUE_AND_LAYER_OVERDRAW",
     "c92_report": "localization/graphics/role_C/20261004-1740-C92/C92_FD90AA9_FINAL_QA.json",
     "runtime_validation": "UNTESTED"
+  },
+  "a_recovery08_fd90aa9": {
+    "run": "20261004-A-RECOVERY08",
+    "status": "A_RECOVERY08_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "asset": "textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "input_candidate_sha256": "58a8bd06a38375694da7d3109fc2615ccd6d45092828f7eb5b7a9317afc13010",
+    "candidate_sha256": "0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b",
+    "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
+    "report": "localization/graphics/role_A/20261004-A-RECOVERY08/A_RECOVERY08_FD90AA9_REPORT.json",
+    "c92_return_report": "localization/graphics/role_C/20261004-1740-C92/C92_FD90AA9_FINAL_QA.json",
+    "c92_blocking_failures_repaired": [
+      "more_engine",
+      "experts_long",
+      "for_experts",
+      "normal_difficult"
+    ],
+    "reworked_bbox_pass": "4/4",
+    "unaffected_localized_layers_preserved_exact": "25/25",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "changes_vs_a07_outside_four_source_bboxes": 0,
+    "controller_visual_qa": "PASS_C92_RETURN_CONTACT_READABLE_AND_RAW",
+    "runtime_validation": "UNTESTED",
+    "in_game_validation": "PENDING",
+    "c_final_qa": "PENDING"
   }
 }

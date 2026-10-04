@@ -12,6 +12,7 @@
   "final_mask_validator": "PASS",
   "changes_vs_a07_outside_four_source_bboxes": 0,
   "runtime_validation": "UNTESTED",
-  "status": "A_RECOVERY08_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
-  "report": "localization/graphics/role_A/20261004-A-RECOVERY08/A_RECOVERY08_FD90AA9_REPORT.json"
+  "status": "A_RECOVERY08_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "report": "localization/graphics/role_A/20261004-A-RECOVERY08/A_RECOVERY08_FD90AA9_REPORT.json",
+  "controller_visual_qa": "PASS_C92_RETURN_CONTACT_READABLE_AND_RAW"
 }
