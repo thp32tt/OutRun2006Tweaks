@@ -90,7 +90,7 @@ mask_discovery={}
 # The top red/orange pair intentionally has touching/overlapping outer effects.  Preserve
 # B_PRODUCTION21's color-seeded ownership split for that pair only; C108 did not return
 # this pair, and a generic connected-component pass merges their touching white/navy rims.
-ty0,ty1=60,210;tx0,tx1=0,900
+ty0,ty1=60,210;tx0,tx1=0,770
 tsub=alpha[ty0:ty1,tx0:tx1];trgb=sa[ty0:ty1,tx0:tx1,:3].astype(np.int16);R,G,B=trgb[:,:,0],trgb[:,:,1],trgb[:,:,2]
 tx=np.indices(tsub.shape)[1]
 red_seed=tsub&(R>=125)&(R>=G+45)&(R>=B+25)&(tx<520)
@@ -103,15 +103,15 @@ top_band_y0=max(ty0,seed_y0-22); top_band_y1=min(ty1,seed_y1+22)
 if not (340<=top_split<=520 and top_band_y0<top_band_y1): raise RuntimeError(('unexpected top split',red_fill_max_x,orange_fill_min_x,top_split,top_band_y0,top_band_y1))
 red=np.zeros((H,W),bool); orange=np.zeros((H,W),bool)
 red[top_band_y0:top_band_y1,0:top_split]=alpha[top_band_y0:top_band_y1,0:top_split]
-orange[top_band_y0:top_band_y1,top_split:900]=alpha[top_band_y0:top_band_y1,top_split:900]
+orange[top_band_y0:top_band_y1,top_split:770]=alpha[top_band_y0:top_band_y1,top_split:770]
 mask_discovery['for_experts']={'window':[0,ty0,top_split,ty1],'seed_kind':'red','seed_pixels':int(red_seed.sum()),'seed_bbox':[int(rx.min()),ty0+int(ry.min()),int(rx.max())+1,ty0+int(ry.max())+1],'top_split_x':top_split,'top_band_y':[top_band_y0,top_band_y1]}
-mask_discovery['outrun2sp']={'window':[top_split,ty0,900,ty1],'seed_kind':'orange','seed_pixels':int(orange_seed.sum()),'seed_bbox':[int(ox.min()),ty0+int(oy.min()),int(ox.max())+1,ty0+int(oy.max())+1],'top_split_x':top_split,'top_band_y':[top_band_y0,top_band_y1]}
+mask_discovery['outrun2sp']={'window':[top_split,ty0,770,ty1],'seed_kind':'orange','seed_pixels':int(orange_seed.sum()),'seed_bbox':[int(ox.min()),ty0+int(oy.min()),int(ox.max())+1,ty0+int(oy.max())+1],'top_split_x':top_split,'top_band_y':[top_band_y0,top_band_y1]}
 music,mask_discovery['music_change']=semantic_mask('music_change',(820,45,1500,180),'white',12)
 time,mask_discovery['time_remaining']=semantic_mask('time_remaining',(1050,145,1960,310),'white',14)
 source_masks={'for_experts':red,'outrun2sp':orange,'music_change':music,'time_remaining':time}
 expected={
  'for_experts':{'x':(0,540),'y':(60,210),'text':'상급자용','source':'For Experts','style':'red_white_navy','slant':0.28},
- 'outrun2sp':{'x':(350,900),'y':(60,210),'text':'아웃런2 SP','source':'OutRun2SP','style':'orange_white_navy','slant':0.25},
+ 'outrun2sp':{'x':(350,800),'y':(60,210),'text':'아웃런2 SP','source':'OutRun2SP','style':'orange_white_navy','slant':0.25},
  'music_change':{'x':(820,1500),'y':(45,180),'text':'음악 변경','source':'Music Change','style':'white_shadow','slant':0.20},
  'time_remaining':{'x':(1050,1960),'y':(145,310),'text':'남은 시간:','source':'Time remaining :','style':'white_navy','slant':0.20},
 }
