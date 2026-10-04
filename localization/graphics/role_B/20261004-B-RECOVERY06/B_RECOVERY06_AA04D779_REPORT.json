@@ -1,0 +1,659 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261004-B-RECOVERY06",
+  "base_head": "80cb8489cbfea9cfc40704fb2e7579016d8053ca",
+  "queue_index": 46,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER",
+  "source_upstream_repo": "Sonic-TV/OR2006Sprites",
+  "source_upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+  "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+  "candidate_sha256": "6f64736a53589379a00dc831e8605f0f8f140ffd52837f951e0a24fcd9d89c8a",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+  "method": "pinned exact HD source -> isolated source-alpha glyph/effect masks -> protected mask -> transparent clean plate -> 21 fresh native-resolution Korean labels -> exact source-header RGBA32 DDS -> decoded final QA",
+  "structure": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "pf_flags": 65,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "channel_layout": "RGBA masks preserved"
+  },
+  "segments_total": 21,
+  "segments_rendered": 21,
+  "preserved_original": [
+    "REV",
+    "TOP",
+    "You",
+    "player-number labels",
+    "icons",
+    "course symbols",
+    "gray control labels",
+    "decorative/numeric art"
+  ],
+  "clean_plate": {
+    "changed_pixels_outside_source_text_mask": 0,
+    "source_text_residue_pixels": 0,
+    "status": "PASS"
+  },
+  "containment": {
+    "elements_total": 21,
+    "elements_pass": 21,
+    "elements_fail": 0,
+    "changed_pixels_outside_permitted_source_bboxes": 0,
+    "alpha_changed_outside_permitted_source_bboxes": 0,
+    "protected_changes": 0,
+    "target_overlap_pairs": [],
+    "status": "PASS"
+  },
+  "rows": [
+    {
+      "key": "sector4",
+      "source": "Sector4",
+      "korean": "섹터 4",
+      "render_lines": [
+        "섹터 4"
+      ],
+      "original_bbox": [
+        196,
+        340,
+        377,
+        400
+      ],
+      "localized_bbox": [
+        216,
+        341,
+        356,
+        399
+      ],
+      "delta_left": 20,
+      "delta_right": 21,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 51,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "palm_beach",
+      "source": "Palm Beach",
+      "korean": "팜 비치",
+      "render_lines": [
+        "팜 비치"
+      ],
+      "original_bbox": [
+        146,
+        422,
+        361,
+        549
+      ],
+      "localized_bbox": [
+        153,
+        447,
+        353,
+        523
+      ],
+      "delta_left": 7,
+      "delta_right": 8,
+      "delta_top": 25,
+      "delta_bottom": 26,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 66,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "coniferous_forest",
+      "source": "Coniferous Forest",
+      "korean": "침엽수림",
+      "render_lines": [
+        "침엽수림"
+      ],
+      "original_bbox": [
+        143,
+        573,
+        467,
+        701
+      ],
+      "localized_bbox": [
+        153,
+        591,
+        457,
+        682
+      ],
+      "delta_left": 10,
+      "delta_right": 10,
+      "delta_top": 18,
+      "delta_bottom": 19,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 83,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "snow_mountain",
+      "source": "Snow Mountain",
+      "korean": "스노 마운틴",
+      "render_lines": [
+        "스노",
+        "마운틴"
+      ],
+      "original_bbox": [
+        143,
+        725,
+        426,
+        853
+      ],
+      "localized_bbox": [
+        205,
+        727,
+        364,
+        851
+      ],
+      "delta_left": 62,
+      "delta_right": 62,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 56,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "ancient_ruins",
+      "source": "Ancient Ruins",
+      "korean": "고대 유적",
+      "render_lines": [
+        "고대 유적"
+      ],
+      "original_bbox": [
+        140,
+        878,
+        412,
+        1004
+      ],
+      "localized_bbox": [
+        147,
+        903,
+        404,
+        978
+      ],
+      "delta_left": 7,
+      "delta_right": 8,
+      "delta_top": 25,
+      "delta_bottom": 26,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 65,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "bay_area",
+      "source": "Bay Area",
+      "korean": "베이 에어리어",
+      "render_lines": [
+        "베이 에어리어"
+      ],
+      "original_bbox": [
+        146,
+        1058,
+        429,
+        1140
+      ],
+      "localized_bbox": [
+        152,
+        1070,
+        422,
+        1128
+      ],
+      "delta_left": 6,
+      "delta_right": 7,
+      "delta_top": 12,
+      "delta_bottom": 12,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 46,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "big_forest",
+      "source": "Big Forest",
+      "korean": "빅 포레스트",
+      "render_lines": [
+        "빅 포레스트"
+      ],
+      "original_bbox": [
+        314,
+        1226,
+        632,
+        1308
+      ],
+      "localized_bbox": [
+        321,
+        1231,
+        625,
+        1303
+      ],
+      "delta_left": 7,
+      "delta_right": 7,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 62,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "castle_wall",
+      "source": "Castle Wall",
+      "korean": "캐슬 월",
+      "render_lines": [
+        "캐슬 월"
+      ],
+      "original_bbox": [
+        646,
+        573,
+        872,
+        701
+      ],
+      "localized_bbox": [
+        652,
+        597,
+        866,
+        676
+      ],
+      "delta_left": 6,
+      "delta_right": 6,
+      "delta_top": 24,
+      "delta_bottom": 25,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 70,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "industrial_complex",
+      "source": "Industrial Complex",
+      "korean": "인더스트리얼 컴플렉스",
+      "render_lines": [
+        "인더스트리얼",
+        "컴플렉스"
+      ],
+      "original_bbox": [
+        647,
+        726,
+        925,
+        863
+      ],
+      "localized_bbox": [
+        653,
+        734,
+        919,
+        854
+      ],
+      "delta_left": 6,
+      "delta_right": 6,
+      "delta_top": 8,
+      "delta_bottom": 9,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 47,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "metropolis",
+      "source": "Metropolis",
+      "korean": "메트로폴리스",
+      "render_lines": [
+        "메트로폴리스"
+      ],
+      "original_bbox": [
+        651,
+        906,
+        963,
+        988
+      ],
+      "localized_bbox": [
+        656,
+        915,
+        957,
+        979
+      ],
+      "delta_left": 5,
+      "delta_right": 6,
+      "delta_top": 9,
+      "delta_bottom": 9,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 53,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "sunny_beach",
+      "source": "Sunny Beach",
+      "korean": "서니 비치",
+      "render_lines": [
+        "서니 비치"
+      ],
+      "original_bbox": [
+        647,
+        1029,
+        871,
+        1157
+      ],
+      "localized_bbox": [
+        653,
+        1061,
+        865,
+        1125
+      ],
+      "delta_left": 6,
+      "delta_right": 6,
+      "delta_top": 32,
+      "delta_bottom": 32,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 53,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "water_falls",
+      "source": "Water Falls",
+      "korean": "워터폴스",
+      "render_lines": [
+        "워터폴스"
+      ],
+      "original_bbox": [
+        814,
+        1198,
+        1022,
+        1325
+      ],
+      "localized_bbox": [
+        817,
+        1230,
+        1019,
+        1293
+      ],
+      "delta_left": 3,
+      "delta_right": 3,
+      "delta_top": 32,
+      "delta_bottom": 32,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 52,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "alpine",
+      "source": "Alpine",
+      "korean": "알파인",
+      "render_lines": [
+        "알파인"
+      ],
+      "original_bbox": [
+        1149,
+        602,
+        1376,
+        683
+      ],
+      "localized_bbox": [
+        1164,
+        603,
+        1361,
+        682
+      ],
+      "delta_left": 15,
+      "delta_right": 15,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 70,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "cloudy_highland",
+      "source": "Cloudy Highland",
+      "korean": "클라우디 하이랜드",
+      "render_lines": [
+        "클라우디",
+        "하이랜드"
+      ],
+      "original_bbox": [
+        1152,
+        725,
+        1421,
+        864
+      ],
+      "localized_bbox": [
+        1178,
+        726,
+        1394,
+        862
+      ],
+      "delta_left": 26,
+      "delta_right": 27,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 56,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "tulip_garden",
+      "source": "Tulip Garden",
+      "korean": "튤립 가든",
+      "render_lines": [
+        "튤립 가든"
+      ],
+      "original_bbox": [
+        1150,
+        879,
+        1403,
+        1006
+      ],
+      "localized_bbox": [
+        1155,
+        907,
+        1398,
+        977
+      ],
+      "delta_left": 5,
+      "delta_right": 5,
+      "delta_top": 28,
+      "delta_bottom": 29,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 60,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "cape_way",
+      "source": "Cape Way",
+      "korean": "케이프 웨이",
+      "render_lines": [
+        "케이프 웨이"
+      ],
+      "original_bbox": [
+        1151,
+        1057,
+        1503,
+        1140
+      ],
+      "localized_bbox": [
+        1159,
+        1059,
+        1494,
+        1137
+      ],
+      "delta_left": 8,
+      "delta_right": 9,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 69,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "national_park",
+      "source": "National Park",
+      "korean": "내셔널 파크",
+      "render_lines": [
+        "내셔널 파크"
+      ],
+      "original_bbox": [
+        1322,
+        1198,
+        1606,
+        1325
+      ],
+      "localized_bbox": [
+        1328,
+        1228,
+        1600,
+        1294
+      ],
+      "delta_left": 6,
+      "delta_right": 6,
+      "delta_top": 30,
+      "delta_bottom": 31,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 55,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "deep_lake",
+      "source": "Deep Lake",
+      "korean": "딥 레이크",
+      "render_lines": [
+        "딥 레이크"
+      ],
+      "original_bbox": [
+        1657,
+        602,
+        1985,
+        683
+      ],
+      "localized_bbox": [
+        1682,
+        603,
+        1959,
+        682
+      ],
+      "delta_left": 25,
+      "delta_right": 26,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 70,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "desert",
+      "source": "Desert",
+      "korean": "사막",
+      "render_lines": [
+        "사막"
+      ],
+      "original_bbox": [
+        1657,
+        753,
+        1892,
+        826
+      ],
+      "localized_bbox": [
+        1713,
+        754,
+        1835,
+        825
+      ],
+      "delta_left": 56,
+      "delta_right": 57,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 61,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "ghost_forest",
+      "source": "Ghost Forest",
+      "korean": "고스트 포레스트",
+      "render_lines": [
+        "고스트",
+        "포레스트"
+      ],
+      "original_bbox": [
+        1657,
+        878,
+        1882,
+        1006
+      ],
+      "localized_bbox": [
+        1661,
+        880,
+        1877,
+        1004
+      ],
+      "delta_left": 4,
+      "delta_right": 5,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 56,
+      "prior_localized_raster_resampled": false
+    },
+    {
+      "key": "imperial_avenue",
+      "source": "Imperial Avenue",
+      "korean": "임페리얼 애비뉴",
+      "render_lines": [
+        "임페리얼",
+        "애비뉴"
+      ],
+      "original_bbox": [
+        1654,
+        1029,
+        1937,
+        1156
+      ],
+      "localized_bbox": [
+        1700,
+        1030,
+        1891,
+        1154
+      ],
+      "delta_left": 46,
+      "delta_right": 46,
+      "delta_top": 1,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "native_font_size": 50,
+      "prior_localized_raster_resampled": false
+    }
+  ],
+  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_RECOVERY06_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
