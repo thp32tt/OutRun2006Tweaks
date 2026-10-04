@@ -132,7 +132,7 @@ for b in hb[1:3]:
     score=ImageChops.lighter(score,b)
 # Low threshold, then dilation, captures fill/outline/shadow but remains clipped to the
 # original text bbox and away from the You neighbor.
-local_hf=score.point(lambda v:255 if v>=11 else 0)
+local_hf=score.point(lambda v:255 if v>=45 else 0)
 clip=Image.new("L",source_patch.size,0)
 cd=ImageDraw.Draw(clip)
 cd.rectangle((engine_safe[0]-px0,engine_safe[1]-py0,engine_safe[2]-px0-1,engine_safe[3]-py0-1),fill=255)
@@ -147,7 +147,7 @@ emb=engine_mask.getbbox()
 assert emb and contains(engine_safe,emb),(engine_safe,emb)
 engine_mask_pixels=count(engine_mask)
 safe_area=(engine_safe[2]-engine_safe[0])*(engine_safe[3]-engine_safe[1])
-assert 1500 < engine_mask_pixels < int(safe_area*0.72),(engine_mask_pixels,safe_area)
+assert 800 < engine_mask_pixels < int(safe_area*0.55),(engine_mask_pixels,safe_area)
 
 # Harmonic-ish inpaint using a blurred initialization and repeated 4-neighbor relaxation.
 arr=np.asarray(source_patch).astype(np.float32)
