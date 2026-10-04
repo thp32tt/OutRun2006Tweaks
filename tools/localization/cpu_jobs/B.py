@@ -22,7 +22,7 @@ spec=[
  ('your_friends','YOUR FRIENDS','내 친구',(2660,1015,3260,1105),'plain_white',0.00),
  ('please_wait','PLEASE WAIT','잠시만요',(1640,1115,2700,1248),'plain_black',0.00),
  ('time_over','Time Over','시간 종료',(140,1250,1800,1520),'gradient',0.12),
- ('game_over','Game Over','게임 오버',(1830,1250,3370,1545),'gradient',0.12),
+ ('game_over','Game Over','게임 오버',(1830,1250,3400,1545),'gradient',0.12),
  ('goal','GOAL','골',(1360,1500,2860,2020),'gradient',0.10),
 ]
 
