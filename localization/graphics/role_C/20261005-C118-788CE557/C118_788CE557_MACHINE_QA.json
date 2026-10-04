@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C118-788CE557",
+  "timestamp_kst": "2026-10-05T02:29:57+09:00",
+  "asset": "788CE557",
+  "queue_index": 106,
+  "producer_run": "B_PRODUCTION32",
+  "candidate_sha256": "cc6727baac1b6946ae92cf5bc5568145c1d3ced2248f1fc134e9cc79c5f17149",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION32/B_PRODUCTION32_788CE557_REPORT.json",
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "mips": 1,
+    "format": "RGBA32",
+    "header_128_direct_check": "PASS",
+    "raw_orientation": "mirror_y"
+  },
+  "rows": [
+    {
+      "key": "for_experts",
+      "original_bbox": [
+        3,
+        92,
+        567,
+        196
+      ],
+      "localized_bbox": [
+        110,
+        94,
+        460,
+        194
+      ],
+      "delta_left": 107,
+      "delta_right": 107,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun2sp",
+      "original_bbox": [
+        544,
+        104,
+        845,
+        192
+      ],
+      "localized_bbox": [
+        546,
+        115,
+        842,
+        180
+      ],
+      "delta_left": 2,
+      "delta_right": 3,
+      "delta_top": 11,
+      "delta_bottom": 12,
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "music_change",
+      "original_bbox": [
+        962,
+        126,
+        1281,
+        176
+      ],
+      "localized_bbox": [
+        1038,
+        128,
+        1205,
+        174
+      ],
+      "delta_left": 76,
+      "delta_right": 76,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_remaining",
+      "original_bbox": [
+        1147,
+        176,
+        1819,
+        304
+      ],
+      "localized_bbox": [
+        1236,
+        178,
+        1730,
+        302
+      ],
+      "delta_left": 89,
+      "delta_right": 89,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "bbox_and_size_pass": "4/4",
+  "producer_static_crosscheck": {
+    "source_text_residue_pixels": 0,
+    "leftover_target_fill_pixels": {
+      "for_experts": 0,
+      "outrun2sp": 0,
+      "music_change": 0,
+      "time_remaining": 0
+    },
+    "preserved_source_changed_pixels": 0,
+    "changed_pixels_outside_exact_source_bboxes": 0,
+    "alpha_changed_outside_exact_source_bboxes": 0,
+    "new_vs_preserved_source_alpha_pixels": 0,
+    "two_px_guard_vs_preserved_conflicts": 0,
+    "new_pair_overlap_or_2px_guard_conflicts": []
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PASS",
+  "runtime_validation": "UNTESTED",
+  "note": "Direct C candidate SHA/header/per-row containment arithmetic PASS; producer clean/final pixel validators are all zero-failure and consistent with the reviewed evidence."
+}

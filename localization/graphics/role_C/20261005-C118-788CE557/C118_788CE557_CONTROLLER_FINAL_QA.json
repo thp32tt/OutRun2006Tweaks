@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C118",
+  "timestamp_kst": "2026-10-05T02:29:57+09:00",
+  "scope": "new/changed unfinished handoff only: B_PRODUCTION32 788CE557; C117-completed assets not repeated",
+  "candidate_changed_by_C": false,
+  "asset": "788CE557",
+  "queue_index": 106,
+  "candidate_sha256": "cc6727baac1b6946ae92cf5bc5568145c1d3ced2248f1fc134e9cc79c5f17149",
+  "machine_report": "localization/graphics/role_C/20261005-C118-788CE557/C118_788CE557_MACHINE_QA.json",
+  "machine_status": "PASS",
+  "controller_visual_qa": "PASS",
+  "controller_visual_evidence": [
+    "localization/graphics/role_B/20261005-B-PRODUCTION32/B_PRODUCTION32_788CE557_COMPARE.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION32/B_PRODUCTION32_788CE557_ROW_CONTACT.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION32/B_PRODUCTION32_788CE557_TOP_PAIR_2X.jpg",
+    "localization/graphics/role_B/20261005-B-PRODUCTION32/B_PRODUCTION32_788CE557_RAW_COMPARE.jpg"
+  ],
+  "controller_visual_note": "PASS: B_PRODUCTION32 removes the C108/B31 source residue from For Experts, OutRun2SP, Music Change and Time remaining while preserving both Transmission labels and the non-target icons/art. SOURCE/CLEAN/FINAL, per-row, top-pair 2x and raw mirror_y review show no source-script residue, clipping, Korean/Korean overlap, protected-art damage, seam or orientation regression. Korean fill/outline/shadow and right-slant families remain source-faithful and each localized footprint is smaller than its measured source footprint.",
+  "decision": "C118_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+  "global_rework_remaining": [],
+  "strict_hold_no_candidate": [
+    "4F68708E",
+    "F6811E94"
+  ],
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

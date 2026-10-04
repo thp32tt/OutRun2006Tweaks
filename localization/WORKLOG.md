@@ -1232,3 +1232,11 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - 4F68708E and F6811E94 remain strict no-candidate HOLD: authoritative DXT5 source text bounds are non-4x4-aligned and require constrained exact-safe reconstruction.
 - RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_C/20261005-C117-FINAL/C117_CROSS_LANE_FINAL_QA.json
+## 2026-10-05T02:29:57+09:00 — C118 788CE557 B_PRODUCTION32 final PASS
+- Reviewed only the new B_PRODUCTION32 788CE557 handoff; C117-completed 313DB8CB/53CE39D5 and earlier approvals were not repeated.
+- Candidate cc6727baac1b6946ae92cf5bc5568145c1d3ced2248f1fc134e9cc79c5f17149 direct C SHA/header check PASS; 4/4 original/localized bbox containment and source-size ceilings independently recomputed PASS. Producer clean/final validators report source residue/fill leftovers/outside/protected/overlap/2px-guard = 0.
+- Controller SOURCE/CLEAN/FINAL, 4-row contact, TOP_PAIR 2x and RAW mirror_y review PASS. B_PRODUCTION32 fully removes the C108/B31 target remnants from For Experts, OutRun2SP, Music Change and Time remaining, preserves both Transmission labels/non-target artwork, and retains source-family fill/outline/shadow/right-slant styling without clipping, overlap, seam or orientation regression.
+- 788CE557 advances to C118_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. Producer REWORK remaining is now 0.
+- 4F68708E/F6811E94 remain strict no-candidate DXT5 exact-safe HOLD; normal pending artwork remains unfinished.
+- RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261005-C118-788CE557/C118_788CE557_CONTROLLER_FINAL_QA.json
