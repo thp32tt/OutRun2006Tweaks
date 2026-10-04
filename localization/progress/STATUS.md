@@ -935,3 +935,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Both advance to C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. Remaining producer REWORK is 53CE39D5, 788CE557 and FD90AA9. B_PRODUCTION25 53CE39D5 was not consumed because the producer had already started a newer residual-shadow reconstruction on the current branch.
 - RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_C/20261005-C111-C075-FINAL/C111_CROSS_LANE_FINAL_QA.json
+
+## 2026-10-05 01:23 KST — A recovery13 FD90AA9 source-slant rework
+- Consumed the remaining odd-shard C109 producer return, index 121 `FD90AA9_1024x1024.dds`; completed BF3EE5C6/C075FB49 work was not repeated.
+- Exact installed-HD source: 4096x4096 RGBA32 / 1 mip / raw `mirror_y`, SHA-256 `f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e`. Input A_RECOVERY08 candidate: `0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b`.
+- Reworked only the four C109 style-returned Korean layers: More Engine Sound / `엔진음 크게`, For Experts & Long distance to the goal / `상급자용 · 골까지 장거리`, For Experts / `상급자용`, Normal difficult / `보통 난이도`. Existing accepted fill/outline/effects were retained and materially right-slanted to match the source italic family.
+- Hosted A worker run 37215989738 completed successfully. Final candidate SHA-256: `c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401`.
+- Static self-QA PASS: clean-plate validator PASS; 29/29 exact source-bbox containment and source-size ceiling; four reworked rows 4/4 positive margins; localized overlap=0; 1px touch=0; reworked-vs-preserved 1px guard conflicts=0; changes outside the four returned source bboxes=0; all other 25 localized rows pixel-exact preserved.
+- Controller SOURCE|OLD|NEW contact, full readable, and raw `mirror_y` visual self-QA PASS. The returned Korean rows now reproduce the source right-leaning slant without new residue, clipping, overlap, seam, halo, protected-art damage, or orientation regression.
+- Independent C final QA and isolated DDS_ONLY in-game validation remain pending. `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FD90AA9_REPORT.json`, `localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_STYLE_RETURN_CONTACT_SOURCE_OLD_NEW.jpg`, and readable/raw QA images.
