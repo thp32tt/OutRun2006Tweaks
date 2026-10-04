@@ -82,7 +82,7 @@ a064_rework={
 (out/'C_OVERLAP05_A064FDFC_REWORK.json').write_text(json.dumps(a064_rework,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 results.append(a064_rework)
 for cfg in assets:
- aid=cfg['id'];print('BEGIN',aid,flush=True);src=rd(repo/cfg['source']);old=rd(repo/cfg['candidate']);report=json.loads((repo/cfg['report']).read_text(encoding='utf-8'));rows=report['rows'];allowed=np.asarray(Image.open(repo/cfg['allowed']).convert('L'))>0;protected0=np.asarray(Image.open(repo/cfg['protected']).convert('L'))>0;source_text=np.asarray(Image.open(repo/cfg['source_text']).convert('L'))>0
+ aid=cfg['id'];print('BEGIN',aid,flush=True);src=rd(repo/cfg['source']);old=rd(repo/cfg['candidate']);report=json.loads((repo/cfg['report']).read_text(encoding='utf-8'));rows=report['rows'];allowed=np.asarray(Image.open(repo/cfg['allowed']).convert('L'))>0;protected0=np.asarray(Image.open(repo/cfg['protected']).convert('L'))>0;source_text=np.asarray(Image.open(repo/cfg['source_text']).convert('L'))>0; regions=np.zeros_like(allowed); [regions.__setitem__((slice(int(r['original_bbox'][1]),int(r['original_bbox'][3])),slice(int(r['original_bbox'][0]),int(r['original_bbox'][2]))),True) for r in rows]; allowed=(allowed|regions)
  clean,erase=fresh_clean(src,old,rows,allowed,protected0,source_text);clean.save(out/f'{aid}_FULL_CLEAN.png');Image.fromarray((erase*255).astype(np.uint8),'L').save(out/f'{aid}_FULL_ERASE_MASK.png')
  # Stale protected masks may contain source-text pixels. Exclude source text and the exact allowed target pixels from protected collision proof only where the canonical target region explicitly authorizes edits.
  effective_protected=dil(protected0 & ~source_text & ~allowed,1)
@@ -108,4 +108,4 @@ for cfg in assets:
  del src,old,clean,final,allowed,protected0,source_text,erase;gc.collect()
 summary={'schema_version':1,'run':run,'retry':'same user-requested review 2/5/6 zero-overlap task; previous worker outputs were not committed because A064 aborted the job','policy':'user zero-overlap revision: any 1px text-text or text-preserved foreground overlap FAIL; source bbox size ceiling; positive spacing; no source residue behind localized lettering','assets':['39229D64','C075FB49','A064FDFC'],'results':results,'machine_pass_assets':[x['asset'] for x in results if x.get('status')=='STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA'],'rework_required_assets':[x['asset'] for x in results if str(x.get('status','')).startswith('REWORK_REQUIRED')],'machine_status':'PASS_WITH_REWORK_RETURN','controller_visual_qa':'PENDING','runtime_validation':'UNTESTED'};(out/'C_OVERLAP05_SUMMARY.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');print('C_OVERLAP05_DONE',flush=True)
 
-# dispatch nonce: zero-overlap review 2/5/6 retry with authoritative source-bbox interior as safe text region
+# dispatch nonce: zero-overlap review 2/5/6 using authoritative source bbox union as allowed region
