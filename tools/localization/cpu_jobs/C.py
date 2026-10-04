@@ -56,7 +56,7 @@ def dds_meta(p):
  mips=struct.unpack_from("<I",b,28)[0]; fourcc=b[84:88]
  if fourcc!=b"DXT5": raise RuntimeError(("expected DXT5",p,fourcc))
  need=128+((w+3)//4)*((h+3)//4)*16
- if mips!=1 or len(b)!=need: raise RuntimeError(("unexpected DXT5 layout",p,w,h,mips,len(b),need))
+ if mips not in (0,1) or len(b)!=need: raise RuntimeError(("unexpected DXT5 layout",p,w,h,mips,len(b),need))
  return b,{"width":w,"height":h,"mips":mips,"fourcc":"DXT5","bytes":len(b)}
 
 def decode_readable(p):
