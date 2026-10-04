@@ -2,7 +2,7 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DXVK-00375",
   "production_id": "CONVERSION-DXVK-00375",
-  "event_id": "CONVERSION-DXVK-00375-E002",
+  "event_id": "CONVERSION-DXVK-00375-E003",
   "event_type": "rollover",
   "lane": "DXVK",
   "target_branch": "vr-dxvk-r71-disasm",
@@ -81,7 +81,7 @@
       "artifact_id": 11310750987,
       "artifact_digest": "sha256:c52e5d48b1b9469c0ce3df808b6482c80a6eb1f8f236dc83fc4eeff83adcb332"
     },
-    "issue14_implementation_validation_comment_id": 5982743797
+    "issue14_implementation_validation_comment_id": 5982758621
   },
   "pipeline": {
     "C0_RECOVER": {
@@ -121,10 +121,10 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DXVK-00375",
     "production_id": "CONVERSION-DXVK-00375",
-    "event_id": "CONVERSION-DXVK-00375-E002",
+    "event_id": "CONVERSION-DXVK-00375-E003",
     "event_type": "rollover",
     "attempt": "1/3",
-    "chat_rollover": 3,
+    "chat_rollover": 4,
     "rollover_is_retry": false,
     "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
     "source": "CURRENT_USER_ROLLOVER",
@@ -132,26 +132,12 @@
     "validation_bearing_result_sha": "d6a8841d62e3d4fd9d851a047243a84ca83aae7c",
     "runtime_validation": "UNTESTED"
   },
-  "chat_rollover": 3,
+  "chat_rollover": 4,
   "rollover_is_retry": false,
   "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
   "run_record_commit_sha": "959fd94ff891792b6b98951562a09fbb669a522c",
   "current_dispatch_metadata_correction": {
     "corrected_from": {
-      "task_id": "CONVERSION-DXVK-00375",
-      "production_id": "CONVERSION-DXVK-00375",
-      "event_id": "CONVERSION-DXVK-00375-E001",
-      "event_type": "rollover",
-      "attempt": "1/3",
-      "chat_rollover": 2,
-      "rollover_is_retry": false,
-      "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
-      "source": "CURRENT_USER_ROLLOVER",
-      "material_result_sha": "d6a8841d62e3d4fd9d851a047243a84ca83aae7c",
-      "validation_bearing_result_sha": "d6a8841d62e3d4fd9d851a047243a84ca83aae7c",
-      "runtime_validation": "UNTESTED"
-    },
-    "corrected_to": {
       "task_id": "CONVERSION-DXVK-00375",
       "production_id": "CONVERSION-DXVK-00375",
       "event_id": "CONVERSION-DXVK-00375-E002",
@@ -165,7 +151,21 @@
       "validation_bearing_result_sha": "d6a8841d62e3d4fd9d851a047243a84ca83aae7c",
       "runtime_validation": "UNTESTED"
     },
-    "reason": "Newest explicit user rollover metadata E002 supersedes E001 bookkeeping. Rollover is not a retry; ATTEMPT remains 1/3. Material/result SHA, exact-SHA validation evidence and RUNTIME_VALIDATION=UNTESTED are unchanged.",
+    "corrected_to": {
+      "task_id": "CONVERSION-DXVK-00375",
+      "production_id": "CONVERSION-DXVK-00375",
+      "event_id": "CONVERSION-DXVK-00375-E003",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 4,
+      "rollover_is_retry": false,
+      "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+      "source": "CURRENT_USER_ROLLOVER",
+      "material_result_sha": "d6a8841d62e3d4fd9d851a047243a84ca83aae7c",
+      "validation_bearing_result_sha": "d6a8841d62e3d4fd9d851a047243a84ca83aae7c",
+      "runtime_validation": "UNTESTED"
+    },
+    "reason": "Newest explicit user rollover metadata E003 / CHAT_ROLLOVER=4 supersedes the later-arriving E002 / CHAT_ROLLOVER=3 bookkeeping. Rollover is not a retry; ATTEMPT remains 1/3. Material SHA, validation-bearing SHA, exact-SHA gate evidence and RUNTIME_VALIDATION=UNTESTED are unchanged.",
     "material_and_validation_bearing_sha_unchanged": true
   },
   "reconciled_at_kst": "2026-10-05T02:52:00+09:00"
