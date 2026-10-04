@@ -22,7 +22,7 @@ spec=[
  ('status','STATUS','상태',(1628,744,1818,812),0.00,'opaque_header'),
  ('stage','Stage','스테이지',(1080,796,1248,876),0.10,'transparent'),
  ('next_stage','Next Stage','다음 스테이지',(1310,866,1635,974),0.10,'transparent'),
- ('ghost','Ghost','고스트',(1640,866,1840,974),0.10,'transparent'),
+ ('ghost','Ghost','고스트',(1640,866,1840,990),0.10,'transparent'),
  ('total_time','Total Time','총 시간',(36,1640,820,1840),0.10,'transparent'),
  ('slipstream','Slipstream','슬립스트림',(950,1660,1368,1835),0.08,'transparent'),
  ('new_record','NEW Record!!','신기록!!',(1628,1638,1905,1840),0.08,'transparent'),
