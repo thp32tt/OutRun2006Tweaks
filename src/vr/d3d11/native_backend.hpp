@@ -1212,6 +1212,31 @@ struct NativeProgrammableShaderTranslationObjectReadiness {
     std::uint64_t snapshotToken{};
 };
 
+// R243 attaches one exact translated D3D11 input-layout object to a validated
+// R242 shader-object receipt. It seals ownership of the already-created layout
+// plus exact descriptor metadata; it does not bind IA state or claim that
+// programmable shader translation/constants are complete.
+struct NativeProgrammableShaderInputLayoutReadiness {
+    bool inputValid{};
+    bool objectReceiptReady{};
+    bool deviceMatches{};
+    bool objectSnapshotMatches{};
+    bool layoutIdentityExact{};
+    bool inputLayoutAttached{};
+    bool inputLayoutDeviceMatches{};
+    bool attachmentReady{};
+    std::uint64_t ownerGeneration{};
+    std::uint64_t slotGeneration{};
+    std::uint64_t translationObjectReceiptGeneration{};
+    std::uint64_t inputLayoutReceiptGeneration{};
+    std::uint64_t cacheKey{};
+    std::uint64_t inputLayoutIdentity{};
+    std::uint64_t cacheSnapshotToken{};
+    std::uint64_t slotSnapshotToken{};
+    std::uint64_t objectSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;
@@ -1264,6 +1289,30 @@ public:
         std::uint64_t cacheSnapshotToken,
         std::uint64_t slotSnapshotToken,
         std::uint64_t objectSnapshotToken) const noexcept;
+    bool attach_input_layout_for_observation(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        ID3D11InputLayout* inputLayout) noexcept;
+    [[nodiscard]] NativeProgrammableShaderInputLayoutReadiness
+    input_layout_readiness(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout) const noexcept;
+    [[nodiscard]] bool validate_input_layout_snapshot(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken) const noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
@@ -1291,6 +1340,9 @@ private:
         Microsoft::WRL::ComPtr<ID3D11VertexShader> translatedVertexShader;
         Microsoft::WRL::ComPtr<ID3D11PixelShader> translatedPixelShader;
         std::uint64_t translationObjectReceiptGeneration{};
+        Microsoft::WRL::ComPtr<ID3D11InputLayout> translatedInputLayout;
+        std::uint64_t inputLayoutIdentity{};
+        std::uint64_t inputLayoutReceiptGeneration{};
     };
 
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
@@ -1298,6 +1350,7 @@ private:
     std::uint64_t owner_generation_ = 0;
     std::uint64_t translation_slot_generation_counter_ = 0;
     std::uint64_t translation_object_receipt_generation_counter_ = 0;
+    std::uint64_t input_layout_receipt_generation_counter_ = 0;
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88

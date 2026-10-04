@@ -2738,6 +2738,129 @@ int main()
             firstR242ObjectSnapshot,
         "R242 same translated object pair attachment is idempotent");
 
+    const auto r243UnattachedInputLayout =
+        programmableCache.input_layout_readiness(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout);
+    require(
+        r243UnattachedInputLayout.inputValid &&
+        r243UnattachedInputLayout.objectReceiptReady &&
+        r243UnattachedInputLayout.deviceMatches &&
+        r243UnattachedInputLayout.objectSnapshotMatches &&
+        r243UnattachedInputLayout.layoutIdentityExact &&
+        !r243UnattachedInputLayout.inputLayoutAttached &&
+        !r243UnattachedInputLayout.inputLayoutDeviceMatches &&
+        !r243UnattachedInputLayout.attachmentReady &&
+        r243UnattachedInputLayout.inputLayoutReceiptGeneration == 0 &&
+        r243UnattachedInputLayout.snapshotToken == 0 &&
+        !programmableCache.attach_input_layout_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            0,
+            inputLayout,
+            pipelineBundle.input_layout()),
+        "R243 translated objects must exist before input layout attaches");
+    require(
+        programmableCache.attach_input_layout_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout,
+            pipelineBundle.input_layout()),
+        "R243 attach input layout to exact R242 object receipt");
+    const auto r243InputLayoutReady =
+        programmableCache.input_layout_readiness(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout);
+    require(
+        r243InputLayoutReady.inputValid &&
+        r243InputLayoutReady.objectReceiptReady &&
+        r243InputLayoutReady.deviceMatches &&
+        r243InputLayoutReady.objectSnapshotMatches &&
+        r243InputLayoutReady.layoutIdentityExact &&
+        r243InputLayoutReady.inputLayoutAttached &&
+        r243InputLayoutReady.inputLayoutDeviceMatches &&
+        r243InputLayoutReady.attachmentReady &&
+        r243InputLayoutReady.ownerGeneration != 0 &&
+        r243InputLayoutReady.slotGeneration != 0 &&
+        r243InputLayoutReady.translationObjectReceiptGeneration != 0 &&
+        r243InputLayoutReady.inputLayoutReceiptGeneration != 0 &&
+        r243InputLayoutReady.inputLayoutIdentity != 0 &&
+        r243InputLayoutReady.snapshotToken != 0 &&
+        programmableCache.validate_input_layout_snapshot(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout,
+            r243InputLayoutReady.snapshotToken),
+        "R243 input-layout receipt seals exact R242 object receipt and metadata");
+    const auto firstR243ReceiptGeneration =
+        r243InputLayoutReady.inputLayoutReceiptGeneration;
+    const auto firstR243InputLayoutSnapshot =
+        r243InputLayoutReady.snapshotToken;
+    require(
+        programmableCache.attach_input_layout_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout,
+            pipelineBundle.input_layout()) &&
+        programmableCache.input_layout_readiness(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout).snapshotToken ==
+            firstR243InputLayoutSnapshot,
+        "R243 same input layout attachment is idempotent");
+    auto r243MismatchedLayoutMetadata = inputLayout;
+    ++r243MismatchedLayoutMetadata.stream0Stride;
+    require(
+        !programmableCache.attach_input_layout_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            r243MismatchedLayoutMetadata,
+            pipelineBundle.input_layout()) &&
+        !programmableCache.input_layout_readiness(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            r243MismatchedLayoutMetadata).attachmentReady,
+        "R243 changed input layout metadata cannot reuse sealed receipt");
+
+    ID3D11InputLayout* r243ReplacementInputLayout = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateInputLayout(
+            inputLayout.elements.data(),
+            inputLayout.elementCount,
+            vertexBytecode->GetBufferPointer(),
+            vertexBytecode->GetBufferSize(),
+            &r243ReplacementInputLayout)) &&
+        r243ReplacementInputLayout != nullptr &&
+        r243ReplacementInputLayout != pipelineBundle.input_layout() &&
+        !programmableCache.attach_input_layout_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout,
+            r243ReplacementInputLayout),
+        "R243 different input layout object cannot replace sealed receipt");
+    r243ReplacementInputLayout->Release();
+
     const std::string r242AlternateVertexSource = R"(
 struct VSInput { float4 position : POSITION0; };
 struct VSOutput { float4 position : SV_Position; };
@@ -2784,6 +2907,15 @@ VSOutput main(VSInput input)
             r242ForeignPipeline.vertex_shader(),
             r242ForeignPipeline.pixel_shader()),
         "R242 foreign-device translated object pair fails closed");
+    require(
+        !programmableCache.attach_input_layout_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout,
+            r242ForeignPipeline.input_layout()),
+        "R243 foreign-device input layout fails closed");
     r242ForeignPipeline.shutdown();
     r242ForeignDevice.context->Release();
     r242ForeignDevice.device->Release();
@@ -2796,6 +2928,15 @@ VSOutput main(VSInput input)
             r242SlotReady.snapshotToken,
             firstR242ObjectSnapshot),
         "R242 device reinitialize invalidates translated object receipt");
+    require(
+        !programmableCache.validate_input_layout_snapshot(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            firstR242ObjectSnapshot,
+            inputLayout,
+            firstR243InputLayoutSnapshot),
+        "R243 device reinitialize invalidates input layout receipt");
     require(
         programmableCache.cache_for_observation(programmablePair),
         "R242 fresh cache generation prerequisite");
@@ -2840,6 +2981,46 @@ VSOutput main(VSInput input)
         r242FreshObjectReady.snapshotToken !=
             firstR242ObjectSnapshot,
         "R242 fresh device generation receives a distinct object receipt");
+    require(
+        !programmableCache.attach_input_layout_for_observation(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            firstR242ObjectSnapshot,
+            inputLayout,
+            pipelineBundle.input_layout()),
+        "R243 stale object receipt cannot attach input layout");
+    require(
+        programmableCache.attach_input_layout_for_observation(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout,
+            pipelineBundle.input_layout()),
+        "R243 fresh object receipt accepts input layout");
+    const auto r243FreshInputLayoutReady =
+        programmableCache.input_layout_readiness(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout);
+    require(
+        r243FreshInputLayoutReady.attachmentReady &&
+        r243FreshInputLayoutReady.inputLayoutDeviceMatches &&
+        r243FreshInputLayoutReady.inputLayoutReceiptGeneration !=
+            firstR243ReceiptGeneration &&
+        r243FreshInputLayoutReady.snapshotToken !=
+            firstR243InputLayoutSnapshot &&
+        programmableCache.validate_input_layout_snapshot(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            r242FreshObjectReady.snapshotToken,
+            inputLayout,
+            r243FreshInputLayoutReady.snapshotToken),
+        "R243 fresh device generation receives distinct input layout receipt");
 
     require(
         pipelineBundle.upload_transform_for_observation(d3d.context, transform),

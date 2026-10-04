@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00357",
+  "production_id": "CONVERSION-DXVK-00356",
+  "event_id": "CONVERSION-DXVK-00356-E006",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "616a66d73de36e2b3c7efa7dc91efcae85d4f30d",
+  "result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX11-00357]",
+  "selected_work_item": "DX11_R243_PROGRAMMABLE_INPUT_LAYOUT_RECEIPT",
+  "summary": "R243 adds a fail-closed programmable input-layout ownership receipt on top of an exact validated R242 translated-object receipt. Attachment requires exact input-layout metadata plus a same-device ID3D11InputLayout and the current R240/R241/R242 snapshots; identical reattachment is idempotent while replacement, foreign-device layouts, stale object receipts and device-generation reuse fail closed. The unit does not bind IA state, route Draw*, or claim programmable shader translation/constants completeness.",
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00357.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub SSOT vr-dx11-native-r71 at 616a66d73de36e2b3c7efa7dc91efcae85d4f30d. Read VR_BACKEND_100_REVIEW_INDEX/Set05, AGENTS.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR automation state and regression/history documents. R242 is complete and branch-local independent_static_next_action selects a bounded programmable input-linkage/input-layout ownership contract keyed to the validated R242 receipt. No existing CONVERSION-DX11-00357 run record was present."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R242 seals exact same-device translated VS/PS object ownership but has no separate receipt for the IA input-layout object and exact descriptor metadata. Set05 F19/F21 require input-layout/shader readiness to remain an independent fail-closed activation boundary.",
+      "review_lenses": {
+        "architecture": "Extend the dormant per-device programmable cache owner with a separate R243 input-layout receipt; do not create a production translator or draw caller.",
+        "ownership_lifetime": "Bind the layout receipt to current R240 cache, R241 slot and R242 object snapshots plus same-device ID3D11InputLayout identity; clear automatically with entry/device reinitialize.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effect/recenter or draw routing semantics change.",
+        "performance": "No production hot-path caller; only dormant per-entry ComPtr/identity/receipt metadata and hosted probe work.",
+        "adversarial": "Reject missing/stale R242 receipts, same-metadata replacement COM objects, foreign-device layouts and prior device generations; prove same-object idempotence and fresh receipt after reset."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added NativeProgrammableShaderInputLayoutReadiness, attach/readiness/snapshot APIs, per-entry owned ID3D11InputLayout plus exact descriptor identity and monotonic receipt generation. Extended WARP constant-buffer probe and source-graph guards for R242 prerequisite, exact attachment, idempotence, replacement rejection, foreign-device rejection, stale-object rejection and device-generation invalidation. TDD RED was observed from verify_dx11_source_graph.py before implementation; source graph is GREEN after implementation."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING_EXACT_SHA_GATE",
+      "automation_validation": "PENDING",
+      "local_auxiliary_validation": "PASS_WITH_PREEXISTING_UNRELATED_GUARD_DRIFT",
+      "evidence": "PASS: diff --check; py_compile; backend disassembly contract; DX11 native transport contract; dual-source contract; dormant activation boundary; static-surface contract; fixed-function ownership contract; dormant activation regression; R243 source graph. Two legacy tests that inspect unchanged AGENTS.md text fail on the branch baseline because expected phrases are absent (R132 input-layout contract and native activation boundary guard); they are unrelated to the R243 changed paths and the authoritative exact-SHA Backend Conversion Gate remains required. No Quest 3/VDXR runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA_PUBLICATION",
+      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R243 is a dormant input-layout ownership/receipt boundary. It adds no production shader translation, IA binding, Draw* routing, transport change or runtime distributable behavior."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false,
+      "exact_next_action": "Publish the R243 material result without CI skip, require exact-SHA Backend Conversion Gate including DX11 readiness smoke/constant-buffer probe, append Issue #14 implementation/validation evidence, then persist final run/lane state with RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "regression_assessment": {
+    "runtime_risk_paths_touched": false,
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F19_INPUT_LAYOUT_READINESS",
+      "VR_BACKEND_SET05_F21_SHADER_TRANSLATION_READINESS"
+    ],
+    "evidence": "Dormant native_backend ownership plus hosted WARP probe only; no D3D9 hook, stereo renderer, transport, OpenXR submission or production NativeDrawPath caller changes."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00357",
+    "production_id": "CONVERSION-DXVK-00356",
+    "event_id": "CONVERSION-DXVK-00356-E006",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Publish R243 as validation-bearing material result, validate that exact SHA, then finalize C3/C4/C6 without conflating automated validation with HMD runtime proof."
+}

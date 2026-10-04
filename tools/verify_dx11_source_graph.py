@@ -9500,6 +9500,56 @@ def main() -> None:
             )
         )
 
+    r243_programmable_input_layout_receipt_contract = [
+        ("struct NativeProgrammableShaderInputLayoutReadiness",
+         NATIVE_BACKEND_HPP,
+         "R243 programmable input-layout receipt readiness type"),
+        ("attach_input_layout_for_observation(",
+         NATIVE_BACKEND_HPP,
+         "R243 programmable input-layout attachment declaration"),
+        ("input_layout_readiness(",
+         NATIVE_BACKEND_HPP,
+         "R243 programmable input-layout readiness declaration"),
+        ("validate_input_layout_snapshot(",
+         NATIVE_BACKEND_HPP,
+         "R243 programmable input-layout snapshot validation declaration"),
+        ("inputLayoutReceiptGeneration",
+         NATIVE_BACKEND_HPP,
+         "R243 per-entry input-layout receipt generation"),
+        ("hash_pipeline_input_layout_identity(layout)",
+         NATIVE_BACKEND_CPP,
+         "R243 exact input-layout metadata identity"),
+        ("inputLayout->GetDevice(",
+         NATIVE_BACKEND_CPP,
+         "R243 exact-device input-layout ownership check"),
+        ("translated objects must exist before input layout attaches",
+         CONSTANT_BUFFER_PROBE,
+         "R243 requires validated R242 object receipt"),
+        ("different input layout object cannot replace sealed receipt",
+         CONSTANT_BUFFER_PROBE,
+         "R243 input-layout replacement fail-closed regression"),
+        ("changed input layout metadata cannot reuse sealed receipt",
+         CONSTANT_BUFFER_PROBE,
+         "R243 input-layout metadata replacement fail-closed regression"),
+        ("stale object receipt cannot attach input layout",
+         CONSTANT_BUFFER_PROBE,
+         "R243 stale R242 receipt fail-closed regression"),
+        ("device reinitialize invalidates input layout receipt",
+         CONSTANT_BUFFER_PROBE,
+         "R243 device-generation receipt invalidation regression"),
+    ]
+    missing_r243_programmable_input_layout_receipt = [
+        meaning
+        for token, source, meaning
+        in r243_programmable_input_layout_receipt_contract
+        if token not in source
+    ]
+    if missing_r243_programmable_input_layout_receipt:
+        raise SystemExit(
+            "DX11 R243 programmable input-layout receipt drift: "
+            + ", ".join(missing_r243_programmable_input_layout_receipt)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

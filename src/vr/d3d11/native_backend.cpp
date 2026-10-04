@@ -2559,6 +2559,195 @@ bool NativeProgrammableShaderPairCache::validate_translation_object_snapshot(
            current.snapshotToken == objectSnapshotToken;
 }
 
+bool NativeProgrammableShaderPairCache::attach_input_layout_for_observation(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    ID3D11InputLayout* inputLayout) noexcept {
+    const auto inputLayoutIdentity =
+        hash_pipeline_input_layout_identity(layout);
+    if (!expectedDevice ||
+        !inputLayout ||
+        inputLayoutIdentity == 0 ||
+        !validate_translation_object_snapshot(
+            expectedDevice,
+            identity,
+            cacheSnapshotToken,
+            slotSnapshotToken,
+            objectSnapshotToken))
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> inputLayoutDevice;
+    inputLayout->GetDevice(inputLayoutDevice.GetAddressOf());
+    if (inputLayoutDevice.Get() != expectedDevice)
+        return false;
+
+    const auto found = entries_.find(identity.cacheKey);
+    if (found == entries_.end())
+        return false;
+
+    auto& entry = found->second;
+    if (!entry.translatedVertexShader ||
+        !entry.translatedPixelShader ||
+        entry.translationObjectReceiptGeneration == 0)
+        return false;
+
+    const bool attachmentStarted =
+        entry.translatedInputLayout ||
+        entry.inputLayoutIdentity != 0 ||
+        entry.inputLayoutReceiptGeneration != 0;
+    if (attachmentStarted) {
+        return entry.translatedInputLayout.Get() == inputLayout &&
+               entry.inputLayoutIdentity == inputLayoutIdentity &&
+               entry.inputLayoutReceiptGeneration != 0;
+    }
+
+    entry.translatedInputLayout = inputLayout;
+    entry.inputLayoutIdentity = inputLayoutIdentity;
+    ++input_layout_receipt_generation_counter_;
+    if (input_layout_receipt_generation_counter_ == 0)
+        ++input_layout_receipt_generation_counter_;
+    entry.inputLayoutReceiptGeneration =
+        input_layout_receipt_generation_counter_;
+    return true;
+}
+
+NativeProgrammableShaderInputLayoutReadiness
+NativeProgrammableShaderPairCache::input_layout_readiness(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout) const noexcept {
+    NativeProgrammableShaderInputLayoutReadiness out{};
+    out.ownerGeneration = owner_generation_;
+    out.cacheKey = identity.cacheKey;
+    out.cacheSnapshotToken = cacheSnapshotToken;
+    out.slotSnapshotToken = slotSnapshotToken;
+    out.objectSnapshotToken = objectSnapshotToken;
+    out.inputLayoutIdentity =
+        hash_pipeline_input_layout_identity(layout);
+    out.layoutIdentityExact = out.inputLayoutIdentity != 0;
+    out.inputValid =
+        expectedDevice != nullptr &&
+        cacheSnapshotToken != 0 &&
+        slotSnapshotToken != 0 &&
+        objectSnapshotToken != 0 &&
+        out.layoutIdentityExact &&
+        identity.exact_identity() &&
+        !identity.translationImplemented;
+
+    const auto objects = translation_object_readiness(
+        expectedDevice, identity, cacheSnapshotToken, slotSnapshotToken);
+    out.objectReceiptReady = objects.attachmentReady;
+    out.deviceMatches =
+        objects.deviceMatches && objects.objectDevicesMatch;
+    out.objectSnapshotMatches =
+        objects.attachmentReady &&
+        objects.snapshotToken == objectSnapshotToken;
+    out.slotGeneration = objects.slotGeneration;
+    out.translationObjectReceiptGeneration =
+        objects.translationObjectReceiptGeneration;
+
+    if (out.inputValid &&
+        out.objectReceiptReady &&
+        out.deviceMatches &&
+        out.objectSnapshotMatches) {
+        const auto found = entries_.find(identity.cacheKey);
+        if (found != entries_.end()) {
+            const auto& entry = found->second;
+            out.inputLayoutReceiptGeneration =
+                entry.inputLayoutReceiptGeneration;
+            out.inputLayoutAttached =
+                entry.translatedInputLayout &&
+                entry.inputLayoutIdentity == out.inputLayoutIdentity &&
+                out.inputLayoutReceiptGeneration != 0;
+            if (out.inputLayoutAttached) {
+                Microsoft::WRL::ComPtr<ID3D11Device> inputLayoutDevice;
+                entry.translatedInputLayout->GetDevice(
+                    inputLayoutDevice.GetAddressOf());
+                out.inputLayoutDeviceMatches =
+                    inputLayoutDevice.Get() == expectedDevice;
+            }
+        }
+    }
+
+    out.attachmentReady =
+        out.inputValid &&
+        out.objectReceiptReady &&
+        out.deviceMatches &&
+        out.objectSnapshotMatches &&
+        out.layoutIdentityExact &&
+        out.inputLayoutAttached &&
+        out.inputLayoutDeviceMatches &&
+        out.ownerGeneration != 0 &&
+        out.slotGeneration != 0 &&
+        out.translationObjectReceiptGeneration != 0 &&
+        out.inputLayoutReceiptGeneration != 0 &&
+        out.cacheKey != 0 &&
+        out.inputLayoutIdentity != 0;
+
+    if (out.attachmentReady) {
+        const auto found = entries_.find(identity.cacheKey);
+        if (found == entries_.end())
+            return {};
+        const auto& entry = found->second;
+
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(this)));
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedDevice)));
+        token = mix_readiness_snapshot_token(token, out.ownerGeneration);
+        token = mix_readiness_snapshot_token(token, out.slotGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.translationObjectReceiptGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.inputLayoutReceiptGeneration);
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(token, out.inputLayoutIdentity);
+        token = mix_readiness_snapshot_token(token, out.cacheSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.slotSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.objectSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(
+                    entry.translatedInputLayout.Get())));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeProgrammableShaderPairCache::validate_input_layout_snapshot(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken,
+    const VertexInputLayoutTranslation& layout,
+    std::uint64_t inputLayoutSnapshotToken) const noexcept {
+    if (inputLayoutSnapshotToken == 0)
+        return false;
+    const auto current = input_layout_readiness(
+        expectedDevice,
+        identity,
+        cacheSnapshotToken,
+        slotSnapshotToken,
+        objectSnapshotToken,
+        layout);
+    return current.attachmentReady &&
+           current.snapshotToken == inputLayoutSnapshotToken;
+}
+
 void NativeProgrammableShaderPairCache::shutdown() noexcept {
     entries_.clear();
     device_.Reset();
