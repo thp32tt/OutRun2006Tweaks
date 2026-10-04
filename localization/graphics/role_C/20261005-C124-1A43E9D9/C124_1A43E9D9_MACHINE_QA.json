@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C124-1A43E9D9",
+  "asset": "1A43E9D9",
+  "queue_index": 92,
+  "producer_run": "B_PRODUCTION39",
+  "source_sha256": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+  "candidate_sha256": "601be9747c0cf03e89740786fe0782ec1e71f0e480ceb5e3d740637d048043b3",
+  "header_128_exact": true,
+  "structure": {
+    "width": 2048,
+    "height": 256,
+    "linear_size": 524288,
+    "depth": 1,
+    "mips": 1,
+    "format": "DXT5",
+    "raw_orientation": "mirror_y"
+  },
+  "clean_changed_pixels_outside_source_mask": 0,
+  "source_mask_pixels_unchanged_in_clean": 0,
+  "final_changed_pixels_outside_allowed_mask": 0,
+  "alpha_changed_pixels_outside_allowed_mask": 0,
+  "final_changed_pixels_in_protected_mask": 0,
+  "visible_localized_pixels_outside_allowed_mask": 0,
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_pairs": [],
+  "rows": [
+    {
+      "n": 1,
+      "source": "OutRun Mode",
+      "korean": "아웃런 모드",
+      "original_bbox": [
+        387,
+        13,
+        1318,
+        132
+      ],
+      "localized_bbox": [
+        456,
+        13,
+        1096,
+        129
+      ],
+      "delta_left": 69,
+      "delta_right": 222,
+      "delta_top": 0,
+      "delta_bottom": 3,
+      "source_size": [
+        931,
+        119
+      ],
+      "localized_size": [
+        640,
+        116
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": true
+    },
+    {
+      "n": 2,
+      "source": "15 continuous course",
+      "korean": "15코스 연속",
+      "original_bbox": [
+        519,
+        132,
+        1589,
+        245
+      ],
+      "localized_bbox": [
+        802,
+        134,
+        1305,
+        244
+      ],
+      "delta_left": 283,
+      "delta_right": 284,
+      "delta_top": 2,
+      "delta_bottom": 1,
+      "source_size": [
+        1070,
+        113
+      ],
+      "localized_size": [
+        503,
+        110
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false
+    }
+  ],
+  "dxt5_compression_fringe": {
+    "pixels_outside_precompression_target_mask": 1086,
+    "max_alpha": 17,
+    "alpha_ge8_pixels": 35,
+    "alpha_ge32_pixels": 0,
+    "classification": "PASS_LOW_ALPHA_BC3_EDGE_FRINGE_NOT_SOURCE_RESIDUE"
+  },
+  "clean_plate_source_removal_gate": "PASS",
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "supersedes": [
+    "C120 whole-byte DXT derivation",
+    "C121 precompression-target exactness gate",
+    "C122 B38 residual diagnostic",
+    "C123 zero-fringe gate"
+  ]
+}
