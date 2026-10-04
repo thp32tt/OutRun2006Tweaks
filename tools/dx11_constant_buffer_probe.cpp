@@ -3790,37 +3790,72 @@ int main()
         "R252 exact programmable indexed dispatch and source range");
     const auto firstR252DispatchSnapshot = r252DispatchReady.snapshotToken;
 
-    const auto r253SourceValues =
-        outrun::vr::dx11::compose_programmable_indexed_source_value_readiness(
-            D3DPT_TRIANGLELIST, r252DispatchReady, managedIndexBuffer);
+    const auto r253SourceValuesReady =
+        programmableCache.indexed_source_value_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            firstR249BindingSnapshot,
+            1u, 0, 0u, 4u, 0u, firstR252DispatchSnapshot);
     require(
-        r253SourceValues.inputValid &&
-        r253SourceValues.directDispatchReady &&
-        r253SourceValues.indexMirrorReady &&
-        r253SourceValues.indexFormatExact &&
-        r253SourceValues.shadowStartIndexExact &&
-        r253SourceValues.mirrorSnapshotMatchesDispatch &&
-        r253SourceValues.sourceValuesReady &&
-        r253SourceValues.sourceValuesMatchDispatch &&
-        r253SourceValues.valuesWithinDeclaredRange &&
-        r253SourceValues.componentSnapshotsPresent &&
-        r253SourceValues.ready &&
-        r253SourceValues.sourceIndexFormat == D3DFMT_INDEX16 &&
-        r253SourceValues.shadowStartIndex == 0u &&
-        r253SourceValues.indexCount == 3u &&
-        r253SourceValues.observedMinIndex == 0u &&
-        r253SourceValues.observedMaxIndex == 2u &&
-        r253SourceValues.contentHash != 0 &&
-        r253SourceValues.snapshotToken != 0 &&
-        outrun::vr::dx11::
-            validate_programmable_indexed_source_value_snapshot(
-                D3DPT_TRIANGLELIST, r252DispatchReady, managedIndexBuffer,
-                r253SourceValues.snapshotToken),
-        "R253 exact programmable indexed source values");
+        r253SourceValuesReady.inputValid &&
+        r253SourceValuesReady.directDispatchReady &&
+        r253SourceValuesReady.directDispatchSnapshotMatches &&
+        r253SourceValuesReady.indexMirrorReady &&
+        r253SourceValuesReady.indexMirrorSnapshotMatches &&
+        r253SourceValuesReady.indexFormatExact &&
+        r253SourceValuesReady.sourceValuesReady &&
+        r253SourceValuesReady.sourceValuesMatchDispatchWindow &&
+        r253SourceValuesReady.sourceValuesMatchDispatchRange &&
+        r253SourceValuesReady.componentSnapshotsPresent &&
+        r253SourceValuesReady.ready &&
+        r253SourceValuesReady.sourceIndexFormat == D3DFMT_INDEX16 &&
+        r253SourceValuesReady.scanStartIndex == 0u &&
+        r253SourceValuesReady.indexCount == 3u &&
+        r253SourceValuesReady.minVertexIndex == 0u &&
+        r253SourceValuesReady.maxVertexIndex == 3u &&
+        r253SourceValuesReady.observedMinIndex == 0u &&
+        r253SourceValuesReady.observedMaxIndex == 2u &&
+        r253SourceValuesReady.sourceContentHash != 0 &&
+        r253SourceValuesReady.snapshotToken != 0 &&
+        programmableCache.validate_indexed_source_value_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            firstR249BindingSnapshot,
+            1u, 0, 0u, 4u, 0u, firstR252DispatchSnapshot,
+            r253SourceValuesReady.snapshotToken),
+        "R253 programmable indexed source values seal exact managed IB contents");
     const auto firstR253SourceValueSnapshot =
-        r253SourceValues.snapshotToken;
+        r253SourceValuesReady.snapshotToken;
 
-    const auto r252NarrowDeclaredRange =
+    const auto r252DeclaredRangeExcludesZero =
         programmableCache.indexed_direct_dispatch_readiness(
             d3d.context, d3d.device, programmablePair,
             r242CacheReady.snapshotToken,
@@ -3841,32 +3876,66 @@ int main()
             firstR249BindingSnapshot,
             1u, 0, 1u, 3u, 0u);
     require(
-        r252NarrowDeclaredRange.ready &&
-        r252NarrowDeclaredRange.minVertexIndex == 1u &&
-        r252NarrowDeclaredRange.maxVertexIndex == 3u,
-        "R253 narrow numeric source range remains R252-ready");
-    const auto r253SourceValuesOutOfRange =
-        outrun::vr::dx11::compose_programmable_indexed_source_value_readiness(
-            D3DPT_TRIANGLELIST, r252NarrowDeclaredRange,
-            managedIndexBuffer);
+        r252DeclaredRangeExcludesZero.ready &&
+        r252DeclaredRangeExcludesZero.snapshotToken != 0,
+        "R253 setup keeps R252 numeric range valid while excluding source index zero");
+    const auto r253DeclaredRangeViolation =
+        programmableCache.indexed_source_value_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            firstR249BindingSnapshot,
+            1u, 0, 1u, 3u, 0u,
+            r252DeclaredRangeExcludesZero.snapshotToken);
     require(
-        r253SourceValuesOutOfRange.inputValid &&
-        r253SourceValuesOutOfRange.directDispatchReady &&
-        r253SourceValuesOutOfRange.indexMirrorReady &&
-        r253SourceValuesOutOfRange.indexFormatExact &&
-        r253SourceValuesOutOfRange.shadowStartIndexExact &&
-        r253SourceValuesOutOfRange.mirrorSnapshotMatchesDispatch &&
-        !r253SourceValuesOutOfRange.sourceValuesReady &&
-        r253SourceValuesOutOfRange.sourceValuesMatchDispatch &&
-        !r253SourceValuesOutOfRange.valuesWithinDeclaredRange &&
-        !r253SourceValuesOutOfRange.componentSnapshotsPresent &&
-        !r253SourceValuesOutOfRange.ready &&
-        r253SourceValuesOutOfRange.snapshotToken == 0 &&
-        !outrun::vr::dx11::
-            validate_programmable_indexed_source_value_snapshot(
-                D3DPT_TRIANGLELIST, r252NarrowDeclaredRange,
-                managedIndexBuffer, firstR253SourceValueSnapshot),
-        "R253 source values outside declared range fail closed");
+        r253DeclaredRangeViolation.directDispatchReady &&
+        r253DeclaredRangeViolation.directDispatchSnapshotMatches &&
+        r253DeclaredRangeViolation.indexMirrorSnapshotMatches &&
+        !r253DeclaredRangeViolation.sourceValuesReady &&
+        !r253DeclaredRangeViolation.ready &&
+        r253DeclaredRangeViolation.snapshotToken == 0,
+        "R253 rejects managed source index outside declared D3D9 vertex range");
+
+    const auto r253StaleR252 =
+        programmableCache.indexed_source_value_readiness(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            firstR249BindingSnapshot,
+            1u, 0, 0u, 4u, 0u, firstR252DispatchSnapshot ^ 1ull);
+    require(
+        r253StaleR252.directDispatchReady &&
+        !r253StaleR252.directDispatchSnapshotMatches &&
+        !r253StaleR252.sourceValuesReady &&
+        !r253StaleR252.ready &&
+        r253StaleR252.snapshotToken == 0,
+        "R253 stale R252 dispatch receipt cannot seal source values");
 
     const auto r252StaleGeometry =
         programmableCache.indexed_direct_dispatch_readiness(
@@ -4166,6 +4235,26 @@ int main()
         !r252LiveGeometryDrift.geometryBindingReady &&
         !r252LiveGeometryDrift.geometryBindingSnapshotMatches &&
         !r252LiveGeometryDrift.ready &&
+        !programmableCache.validate_indexed_source_value_snapshot(
+            d3d.context, d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken,
+            inputLayout, r243InputLayoutReady.snapshotToken,
+            r244ConstantStateReady.snapshotToken,
+            r245PayloadReady.snapshotToken,
+            r246BindingReady.snapshotToken,
+            r247PipelineReady.snapshotToken,
+            D3DPT_TRIANGLELIST,
+            r248TopologyReady.snapshotToken,
+            managedVertexBuffer,
+            managedVertexPostResetReady.snapshotToken,
+            geometryVertexStride, geometryVertexOffset,
+            managedIndexBuffer, managedIndexReady.snapshotToken,
+            DXGI_FORMAT_R16_UINT, geometryIndexOffset,
+            firstR249BindingSnapshot,
+            1u, 0, 0u, 4u, 0u, firstR252DispatchSnapshot,
+            firstR253SourceValueSnapshot) &&
         !programmableCache.validate_indexed_direct_dispatch_snapshot(
             d3d.context, d3d.device, programmablePair,
             r242CacheReady.snapshotToken,
