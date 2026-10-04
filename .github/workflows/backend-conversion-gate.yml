@@ -37,6 +37,11 @@ jobs:
         shell: pwsh
         run: ./tools/Test-VROneClickContract.ps1
 
+      - name: Test DX11 XR source-resolution A/B policy
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_xr_source_resolution_policy.py
+
       - name: Verify backend disassembly contract
         shell: pwsh
         run: python tools/verify_vr_backend_disasm_contract.py

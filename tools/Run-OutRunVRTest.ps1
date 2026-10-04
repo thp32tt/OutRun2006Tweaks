@@ -1,7 +1,9 @@
 param(
     [string]$GameExe = 'OR2006C2C.EXE',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
-    [string]$TestProfile = 'CORRECTNESS'
+    [string]$TestProfile = 'CORRECTNESS',
+    [ValidateSet('Desktop','XR_NATIVE_2496X2688')]
+    [string]$DX11SourceResolution = 'Desktop'
 )
 
 $ErrorActionPreference='Stop'
@@ -155,6 +157,10 @@ Write-Host "Starting test session: $($state.SessionId)"
 Write-Host "Backend: $backend"
 Write-Host "Profile: $TestProfile"
 
+$dx11SourceResolutionProfile='N/A'
+$dx11SourceWidth=0
+$dx11SourceHeight=0
+
 if($backend -eq 'd3d9'){
     $profile=Get-OutRunVRTestProfile -Name $TestProfile
     $gameArgs=@($profile.Arguments)
@@ -175,6 +181,18 @@ if($backend -eq 'd3d9'){
         '-TargetRefreshRateHz=0',
         '-SkyGlowFactor=1'
     )
+    $dx11SourceResolutionProfile=$DX11SourceResolution
+    if($DX11SourceResolution -eq 'XR_NATIVE_2496X2688'){
+        # B candidate only. Preserve Desktop as the default A path until
+        # Quest 3/VDXR A/B evidence justifies promotion.
+        $dx11SourceWidth=2496
+        $dx11SourceHeight=2688
+        $gameArgs += @(
+            '-width','2496',
+            '-height','2688',
+            '-MirrorFitDesktop=true'
+        )
+    }
     $profile=[ordered]@{
         Name=$TestProfile
         Description='DX11 primary path: XR-native cadence with 60 Hz simulation and interpolated render frames'
@@ -243,6 +261,9 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
 @(
     "backend=$backend"
     "profile=$TestProfile"
+    "dx11SourceResolutionProfile=$dx11SourceResolutionProfile"
+    "dx11SourceWidth=$dx11SourceWidth"
+    "dx11SourceHeight=$dx11SourceHeight"
     "forceVrDisabled=$($backend -eq '2d')"
     "arguments=$($gameArgs -join ' ')"
     "exeSha256=$exeSha256"
