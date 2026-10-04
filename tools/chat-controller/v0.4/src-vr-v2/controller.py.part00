@@ -496,7 +496,8 @@ def load_queue_state() -> dict:
             "completed": [],
             "blocked": [],
             "last_github_poll_at": None,
-            "conversion_blocked_reconcile_version": 0,\n            "conversion_parallel_schema_version": 0,
+            "conversion_blocked_reconcile_version": 0,
+            "conversion_parallel_schema_version": 0,
         }
         save_queue_state(state)
         return state
@@ -518,7 +519,8 @@ def load_queue_state() -> dict:
         raw.setdefault("completed", [])
         raw.setdefault("blocked", [])
         raw.setdefault("last_github_poll_at", None)
-        raw.setdefault("conversion_blocked_reconcile_version", 0)\n        raw.setdefault("conversion_parallel_schema_version", 0)
+        raw.setdefault("conversion_blocked_reconcile_version", 0)
+        raw.setdefault("conversion_parallel_schema_version", 0)
         return raw
     except Exception:
         # Never overwrite a damaged checkpoint with an empty queue and duplicate work.
