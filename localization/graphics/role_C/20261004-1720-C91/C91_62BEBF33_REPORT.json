@@ -97,7 +97,10 @@
   },
   "nvcompress_mae_raw_rgba": 0.9461212158203125,
   "nvcompress_mae_if_flipped": 16.162135124206543,
-  "manual_visual_qa": "PENDING_CONTROLLER_VISUAL_QA",
+  "manual_visual_qa": "PASS",
   "runtime_validation": "UNTESTED",
-  "status": "C91_WORKER_CORRECTIVE_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_INGAME"
+  "status": "C91_PIXEL_VISUAL_PASS_PENDING_INGAME",
+  "controller_visual_note": "Readable/raw comparison PASS after corrective downscale/recenter. Source-family orange/navy/white-glow styling remains intact; no English residue, clipping, overlap, seam or alpha halo observed. Final bbox retains 4px top/bottom margin.",
+  "worker_run_id": 37189128301,
+  "worker_output_commit": "da99bcbe1594051926daaf557391c33f4c18e0e5"
 }

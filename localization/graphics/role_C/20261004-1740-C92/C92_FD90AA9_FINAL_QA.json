@@ -1314,9 +1314,45 @@
   "visual_evidence": {
     "full_compare": "localization/graphics/role_C/20261004-1740-C92/C92_FD90AA9_FULL_COMPARE.jpg",
     "row_contact": "localization/graphics/role_C/20261004-1740-C92/C92_FD90AA9_ROW_CONTACT.jpg",
-    "controller_visual_qa": "PENDING"
+    "controller_visual_qa": "FAIL",
+    "controller_visual_note": "High-zoom row-contact review rejects the candidate despite machine containment PASS. more_engine visibly retains the source English \"More Engine Sound\" through/behind the Korean replacement. Additional shared-layer overdraw/collisions are visible in experts_long / for_experts / normal_difficult. These defects are visible in the persisted row-contact evidence and require producer-lane reconstruction, not a C micro-adjustment."
   },
   "runtime_validation": "UNTESTED",
-  "status": "C92_STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_INGAME",
-  "vr_ffb_dx11_dxvk_changes": false
+  "status": "C92_REWORK_REQUIRED_VISUAL_SOURCE_RESIDUE_AND_LAYER_OVERDRAW",
+  "vr_ffb_dx11_dxvk_changes": false,
+  "visual_failures": [
+    {
+      "key": "more_engine",
+      "failure": "SOURCE_LANGUAGE_RESIDUE_AND_OVERDRAW",
+      "severity": "BLOCKING",
+      "evidence": "C92_FD90AA9_ROW_CONTACT.jpg row 3 (0-based report row index 2)"
+    },
+    {
+      "key": "experts_long",
+      "failure": "VISIBLE_SHARED_LAYER_OVERDRAW",
+      "severity": "BLOCKING",
+      "evidence": "C92_FD90AA9_ROW_CONTACT.jpg report row index 10"
+    },
+    {
+      "key": "for_experts",
+      "failure": "VISIBLE_SHARED_LAYER_OVERDRAW",
+      "severity": "BLOCKING",
+      "evidence": "C92_FD90AA9_ROW_CONTACT.jpg report row index 12"
+    },
+    {
+      "key": "normal_difficult",
+      "failure": "VISIBLE_SHARED_LAYER_OVERDRAW",
+      "severity": "BLOCKING",
+      "evidence": "C92_FD90AA9_ROW_CONTACT.jpg report row index 13"
+    }
+  ],
+  "c_decision": "REWORK_REQUIRED_VISUAL_SOURCE_RESIDUE_AND_LAYER_OVERDRAW",
+  "worker_run_id": 37189587528,
+  "worker_output_commit": "48311f31ab8ffffd09a3d8907745c16515dd5cf3",
+  "controller_visual_qa": {
+    "status": "FAIL",
+    "blocking_failures": 4,
+    "machine_static_gate": "PASS",
+    "candidate_changed_by_C": false
+  }
 }

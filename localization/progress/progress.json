@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-04T17:03:00+09:00",
+  "updated_at_kst": "2026-10-04T17:43:11+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,7 +50,7 @@
       "total": 243
     },
     "graphics_localization": {
-      "status": "static_qa_active_pending_ingame",
+      "status": "static_qa_active_rework_required",
       "transcription_percent": 100,
       "draft_artwork_percent": 100,
       "final_artwork_percent": 0,
@@ -110,7 +110,7 @@
       "blocked_context_indices": []
     },
     "graphics_artwork": {
-      "status": "static_qa_active_pending_ingame",
+      "status": "static_qa_active_rework_required",
       "final_artwork_percent": 0,
       "draft_percent": 100,
       "completed": 0,
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C90: 14 current/produced HD candidates are static pixel+visual PASS pending isolated DDS_ONLY in-game; 4 legacy/current candidates remain REWORK_REQUIRED; 61 additional localize_text rows remain pending production; 47 zoom_review rows remain HOLD_STRICT_RECHECK. 39229D64 is high-risk edge-touch and requires in-game validation before final approval.",
+  "next_checkpoint": "C91 repaired 571E78F3/62BEBF33/E3FD08BE to strict pixel+visual PASS pending isolated DDS_ONLY in-game. C92 independently checked A_RECOVERY07 FD90AA9: machine gates and 29/29 exact-bbox pass, but high-zoom visual QA rejects visible source-English residue in more_engine plus shared-layer overdraw. FD90AA9 remains the sole C85 REWORK asset (19 producer-owned failed elements). 61 additional localize_text rows remain pending production; 47 zoom_review rows remain HOLD_STRICT_RECHECK.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,14 +265,12 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "ZERO_PIXEL_OR_ARTIFACT_REWORK_REQUIRED",
+      "status": "VISUAL_SOURCE_RESIDUE_LAYER_OVERDRAW_REWORK_REQUIRED",
       "assets": [
-        "571E78F3",
-        "62BEBF33",
-        "E3FD08BE",
         "FD90AA9"
       ],
-      "remaining": 4,
+      "remaining": 1,
+      "failed_elements": 19,
       "pixel_visual_pass_pending_ingame": [
         "FF2462BB",
         "C4A2937B",
@@ -287,7 +285,10 @@
         "AA04D779",
         "19CEDB9",
         "2DA43E41",
-        "39229D64"
+        "39229D64",
+        "571E78F3",
+        "62BEBF33",
+        "E3FD08BE"
       ]
     },
     "latest_d_final_qa": {
@@ -312,23 +313,24 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C90",
-      "report": "localization/graphics/role_C/20261004-1650-C90/C90_HOSTED_STATIC_QA.json",
-      "result": "4_NEW_REVALIDATED_PIXEL_VISUAL_PASS_0_FAIL_0_FINAL_APPROVED",
+      "run": "C92",
+      "report": "localization/graphics/role_C/20261004-1740-C92/C92_FD90AA9_FINAL_QA.json",
+      "result": "1_MACHINE_PASS_VISUAL_REWORK_REQUIRED_0_FINAL_APPROVED",
       "candidate_changed_by_C": false,
-      "assets_checked": 4,
-      "elements_checked": 59,
-      "pixel_visual_pass_assets": [
-        "AA04D779",
-        "19CEDB9",
-        "2DA43E41",
-        "39229D64"
+      "assets_checked": 1,
+      "elements_checked": 29,
+      "pixel_visual_pass_assets": [],
+      "rework_required_assets": [
+        "FD90AA9"
       ],
-      "high_risk_edge_touch_assets": [
-        "39229D64"
+      "visual_failures": [
+        "more_engine",
+        "experts_long",
+        "for_experts",
+        "normal_difficult"
       ],
       "approved_dds_count": 0,
-      "in_game_validation": "PENDING_ISOLATED_DDS_ONLY"
+      "in_game_validation": "NOT_RUN_STATIC_VISUAL_FAIL"
     },
     "latest_b_first_qa": {
       "run": "B_RECOVERY04_05",

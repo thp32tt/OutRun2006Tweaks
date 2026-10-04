@@ -139,7 +139,10 @@
   },
   "nvcompress_mae_raw_rgba": 1.6689825057983398,
   "nvcompress_mae_if_flipped": 66.99380683898926,
-  "manual_visual_qa": "PENDING_CONTROLLER_VISUAL_QA",
+  "manual_visual_qa": "PASS_HIGH_RISK_EDGE_TOUCH",
   "runtime_validation": "UNTESTED",
-  "status": "C91_WORKER_CORRECTIVE_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_INGAME"
+  "status": "C91_PIXEL_VISUAL_PASS_PENDING_INGAME_HIGH_RISK_EDGE_TOUCH",
+  "controller_visual_note": "Readable/raw full compare and high-zoom two-row contact review PASS. Korean outlines/glow remain complete after corrective downscale/recenter; no English residue, seam, overlap, protected-art damage or visible clipping observed. Row 1 touches the exact source bottom edge and row 2 touches the exact source top edge, so isolated in-game validation remains mandatory before approval.",
+  "worker_run_id": 37189128301,
+  "worker_output_commit": "da99bcbe1594051926daaf557391c33f4c18e0e5"
 }
