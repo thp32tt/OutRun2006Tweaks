@@ -779,7 +779,7 @@ namespace
             // and near-full road vibration across the entire stage.  Correct only
             // the unambiguous all-primary / all-water / collision-context-zero case.
             if (WheelFFBMath::primary_asphalt_water_false_positive(
-                    collisionContext, surfaceMasks, waterWheelMask))
+                    uniqueStage, collisionContext, surfaceMasks, waterWheelMask))
             {
                 roughness = 0.25f;
                 waterFlag = 0;
