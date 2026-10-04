@@ -139,7 +139,18 @@ while len(boxes)>9:
     M=[min(A[0],B[0]),min(A[1],B[1]),max(A[2],B[2]),max(A[3],B[3]),A[4]+B[4]]
     boxes=[v for k,v in enumerate(boxes) if k not in (i,j)]+[M]
 if len(boxes)!=9:
-    raise RuntimeError(f'historical discovery did not resolve exactly 9 regions after row split: {len(boxes)} {boxes}')
+    boxes=sorted(boxes,key=lambda r:(r[1]//12,r[0],r[1]))
+    # Persist hosted diagnostic evidence rather than guessing a ninth semantic region. This is intermediate evidence only.
+    def mark(im,title):
+        bg=Image.new('RGBA',im.size,(72,72,72,255)); bg.alpha_composite(im); v=bg.convert('RGB'); d=ImageDraw.Draw(v); f=ImageFont.truetype(FONT_BOLD,14)
+        for n,B in enumerate(boxes,1):
+            d.rectangle(B[:4],outline=(255,0,255),width=2); d.text((B[0]+2,max(0,B[1]-15)),str(n),font=f,fill=(255,0,255))
+        canvas=Image.new('RGB',(v.width,v.height+24),'white'); canvas.paste(v,(0,24)); ImageDraw.Draw(canvas).text((4,2),title,font=f,fill='black'); return canvas
+    A=mark(old_src,'HISTORICAL SOURCE / DISCOVERY BOXES'); B=mark(old_draft,'HISTORICAL DRAFT / DISCOVERY BOXES')
+    diag=Image.new('RGB',(A.width+B.width+8,max(A.height,B.height)),'white');diag.paste(A,(0,0));diag.paste(B,(A.width+8,0));diag.resize((diag.width*2,diag.height*2)).save(outdir/'B_RECOVERY07_B1696633_DISCOVERY_DIAGNOSTIC.jpg',quality=95)
+    (outdir/'B_RECOVERY07_DISCOVERY_DIAGNOSTIC.json').write_text(json.dumps({'status':'PREFLIGHT_DIAGNOSTIC_NEEDS_NINTH_REGION_RESOLUTION','region_count':len(boxes),'regions':[x[:4] for x in boxes],'source_sha256':source_sha_expected,'candidate_written':False},indent=2)+'\n')
+    print('B_RECOVERY07_DIAGNOSTIC_ONLY',len(boxes),boxes)
+    raise SystemExit(0)
 boxes=sorted(boxes,key=lambda r:(r[1]//12,r[0],r[1]))
 # Discovery regions are expanded slightly before exact-HD source-alpha measurement.
 _,src,info=load_rgba_dds(source); header=Path(source).read_bytes()[:128]
