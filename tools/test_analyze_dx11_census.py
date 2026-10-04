@@ -998,7 +998,8 @@ def main() -> int:
         "AllSourceLogsHaveStartupAndBootstrapOutcome": True,
         "DiagnosticOnly": True,
         "ActivationProof": False,
-    }
+
+[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]    }
 
 
     r232_latest_startup_summary_pairing = run_cases(
@@ -1289,6 +1290,85 @@ def main() -> int:
         r237_exhaustive_signature_evidence_status_boundary["Status"]
         == "OBSERVED_EXHAUSTIVE_TRANSLATION_EXACT_SIGNATURE_EVIDENCE_INCOMPLETE"
     )
+
+    r238_programmable_shader_pair_inventory = run_case(
+        "VR DX11 R71 census: observed=1 size=1920x1080 sourceFormat=21 "
+        "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+        "VR DX11 R85 signature#1: primitive=4 fixedFn=0 fvf=0x00000000 "
+        "shader[introspection=1,mixed=0,exact=0,vsPresent=1,vsBytes=128,"
+        "vsVersion=0xFFFE0300,vsHash=0x1111111111111111,psPresent=1,psBytes=96,"
+        "psVersion=0xFFFF0300,psHash=0x2222222222222222]\n"
+        "VR DX11 R85 signature#2: primitive=5 fixedFn=0 fvf=0x00000000 "
+        "shader[introspection=1,mixed=0,exact=0,vsPresent=1,vsBytes=128,"
+        "vsVersion=0xFFFE0300,vsHash=0x1111111111111111,psPresent=1,psBytes=96,"
+        "psVersion=0xFFFF0300,psHash=0x2222222222222222]\n"
+        "VR DX11 R85 signature#3: primitive=4 fixedFn=1 fvf=0x000001C4 "
+        "shader[introspection=1,mixed=0,exact=0,vsPresent=0,vsBytes=0,"
+        "vsVersion=0x00000000,vsHash=0x0000000000000000,psPresent=0,psBytes=0,"
+        "psVersion=0x00000000,psHash=0x0000000000000000]\n"
+        "VR DX11 R120 census: samples=3 exact=0 fixedFn=1 programmable=2 "
+        "topologyUnsupported=0 signatures=3 "
+        "sampling[drawsSeen=3,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=64,detailSkipped=0] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "shaderReadiness[introspectionFailure=0,mixedPair=0,translationExact=0,"
+        "fixedFunctionPending=1,programmablePending=2] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    r238_inventory = r238_programmable_shader_pair_inventory[
+        "ProgrammableShaderInventory"
+    ]
+    assert r238_inventory["CurrentSignatureRecords"] == 3
+    assert r238_inventory["CurrentSignatureRecordsWithShaderIdentity"] == 3
+    assert r238_inventory["CurrentProgrammableSignatures"] == 2
+    assert r238_inventory["CurrentUniqueShaderPairs"] == 1
+    assert r238_inventory["EvidenceLimitedBySignatureDetailCap"] is False
+    assert r238_inventory["EvidenceCoverageComplete"] is True
+    assert r238_inventory["TranslationImplemented"] is False
+    assert r238_inventory["ActivationProof"] is False
+    r238_pair = r238_inventory["Pairs"][0]
+    assert r238_pair["VertexShader"]["ByteSize"] == 128
+    assert r238_pair["VertexShader"]["VersionTokenHex"] == "0xFFFE0300"
+    assert r238_pair["VertexShader"]["HashHex"] == "0x1111111111111111"
+    assert r238_pair["PixelShader"]["ByteSize"] == 96
+    assert r238_pair["PixelShader"]["VersionTokenHex"] == "0xFFFF0300"
+    assert r238_pair["PixelShader"]["HashHex"] == "0x2222222222222222"
+    assert len(r238_pair["SignatureRefs"]) == 2
+
+    r238_programmable_shader_pair_detail_cap = run_case(
+        "VR DX11 R71 census: observed=1 size=1920x1080 sourceFormat=21 "
+        "nativeFormat=28 msaa=0 bootstrapCompatible=1\n"
+        "VR DX11 R85 signature#1: primitive=4 fixedFn=0 fvf=0x00000000 "
+        "shader[introspection=1,mixed=0,exact=0,vsPresent=1,vsBytes=128,"
+        "vsVersion=0xFFFE0300,vsHash=0x1111111111111111,psPresent=1,psBytes=96,"
+        "psVersion=0xFFFF0300,psHash=0x2222222222222222]\n"
+        "VR DX11 R120 census: samples=2 exact=0 fixedFn=0 programmable=2 "
+        "topologyUnsupported=0 signatures=2 "
+        "sampling[drawsSeen=2,stride=1,scheme=2] "
+        "signatureCaps[hashCap=512,hashCapHitSamples=0,detailCap=1,detailSkipped=1] "
+        "declSamples=0 indexedSamples=0 texturedSamples=0 "
+        "resourceExact[introspectionFailure=0,behaviorUnsupported=0,"
+        "mutationTelemetryRequired=0,managedShadowRequired=0,"
+        "indexUnsupported=0,textureUnsupported=0,colorUnsupported=0,"
+        "depthUnsupported=0] "
+        "shaderReadiness[introspectionFailure=0,mixedPair=0,translationExact=0,"
+        "fixedFunctionPending=0,programmablePending=2] "
+        "unsupported[incomplete=0,wbuffer=0,sepAlpha=0,alphaTest=0,"
+        "stencil=0,fog=0,lighting=0,srgb=0,fill=0,blend=0,"
+        "depthCmp=0,cull=0]\n"
+    )
+    r238_limited = r238_programmable_shader_pair_detail_cap[
+        "ActivationEvidence"
+    ]["ProgrammableShaderInventory"]
+    assert r238_limited["CurrentUniqueShaderPairs"] == 1
+    assert r238_limited["EvidenceLimitedBySignatureDetailCap"] is True
+    assert r238_limited["EvidenceCoverageComplete"] is False
 
     r106 = run_case(
         "VR DX11 R85 signature#1: primitive=4 fixedFn=1\n"
@@ -1759,3 +1839,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]

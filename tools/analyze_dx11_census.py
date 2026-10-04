@@ -129,6 +129,16 @@ STARTUP_RE = re.compile(
 )
 
 SIGNATURE_RE = re.compile(r"VR DX11 R(?:7[23456789]|8[012345]) signature#(?P<id>\d+): (?P<body>.*)")
+SIGNATURE_SHADER_RE = re.compile(
+    r"shader\[introspection=(?P<introspection>[01]),mixed=(?P<mixed>[01]),"
+    r"exact=(?P<translationExact>[01]),"
+    r"vsPresent=(?P<vsPresent>[01]),vsBytes=(?P<vsBytes>\d+),"
+    r"vsVersion=0x(?P<vsVersion>[0-9A-Fa-f]+),"
+    r"vsHash=0x(?P<vsHash>[0-9A-Fa-f]+),"
+    r"psPresent=(?P<psPresent>[01]),psBytes=(?P<psBytes>\d+),"
+    r"psVersion=0x(?P<psVersion>[0-9A-Fa-f]+),"
+    r"psHash=0x(?P<psHash>[0-9A-Fa-f]+)\]"
+)
 DECL_RE = re.compile(
     r"VR DX11 R72 decl signature#(?P<signature>\d+) elem#(?P<element>\d+): "
     r"stream=(?P<stream>\d+) offset=(?P<offset>\d+) type=(?P<type>\d+) "
@@ -375,6 +385,116 @@ def int_fields(match: re.Match[str]) -> dict[str, int]:
     }
 
 
+def parse_signature_shader_identity(body: str) -> dict | None:
+    match = SIGNATURE_SHADER_RE.search(body)
+    if not match:
+        return None
+    data = match.groupdict()
+    return {
+        "introspection_complete": bool(int(data["introspection"])),
+        "mixed_pair": bool(int(data["mixed"])),
+        "translation_exact": bool(int(data["translationExact"])),
+        "vs_present": bool(int(data["vsPresent"])),
+        "vs_bytes": int(data["vsBytes"]),
+        "vs_version": int(data["vsVersion"], 16),
+        "vs_version_hex": "0x" + data["vsVersion"].upper(),
+        "vs_hash": int(data["vsHash"], 16),
+        "vs_hash_hex": "0x" + data["vsHash"].upper(),
+        "ps_present": bool(int(data["psPresent"])),
+        "ps_bytes": int(data["psBytes"]),
+        "ps_version": int(data["psVersion"], 16),
+        "ps_version_hex": "0x" + data["psVersion"].upper(),
+        "ps_hash": int(data["psHash"], 16),
+        "ps_hash_hex": "0x" + data["psHash"].upper(),
+    }
+
+
+def summarize_programmable_shader_inventory(
+    signatures: dict[SignatureKey, dict],
+    signature_coverage_complete: bool,
+    detail_cap_saturated: bool,
+) -> dict:
+    pair_map: dict[tuple[int, int, int, int, int, int], dict] = {}
+    identity_missing: list[dict] = []
+    identity_blocking: list[dict] = []
+    records_with_identity = 0
+    programmable_signatures = 0
+
+    for signature_key in sorted(signatures):
+        signature = signatures[signature_key]
+        ref = {
+            "source_log": signature["source_log"],
+            "startup_epoch": signature["startup_epoch"],
+            "id": signature["id"],
+        }
+        shader = signature.get("shader_identity")
+        if shader is None:
+            identity_missing.append(ref)
+            continue
+
+        records_with_identity += 1
+        if not shader["introspection_complete"] or shader["mixed_pair"]:
+            identity_blocking.append(ref)
+            continue
+
+        if not (shader["vs_present"] and shader["ps_present"]):
+            continue
+
+        programmable_signatures += 1
+        if shader["vs_bytes"] < 4 or shader["ps_bytes"] < 4:
+            identity_blocking.append(ref)
+            continue
+
+        pair_key = (
+            shader["vs_bytes"], shader["vs_version"], shader["vs_hash"],
+            shader["ps_bytes"], shader["ps_version"], shader["ps_hash"],
+        )
+        pair = pair_map.setdefault(
+            pair_key,
+            {
+                "VertexShader": {
+                    "ByteSize": shader["vs_bytes"],
+                    "VersionToken": shader["vs_version"],
+                    "VersionTokenHex": shader["vs_version_hex"],
+                    "Hash": shader["vs_hash"],
+                    "HashHex": shader["vs_hash_hex"],
+                },
+                "PixelShader": {
+                    "ByteSize": shader["ps_bytes"],
+                    "VersionToken": shader["ps_version"],
+                    "VersionTokenHex": shader["ps_version_hex"],
+                    "Hash": shader["ps_hash"],
+                    "HashHex": shader["ps_hash_hex"],
+                },
+                "SignatureRefs": [],
+                "TranslationImplemented": False,
+            },
+        )
+        pair["SignatureRefs"].append(ref)
+
+    pairs = [pair_map[key] for key in sorted(pair_map)]
+    evidence_coverage_complete = bool(
+        signature_coverage_complete
+        and not detail_cap_saturated
+        and not identity_missing
+        and not identity_blocking
+    )
+    return {
+        "CurrentSignatureRecords": len(signatures),
+        "CurrentSignatureRecordsWithShaderIdentity": records_with_identity,
+        "CurrentProgrammableSignatures": programmable_signatures,
+        "CurrentUniqueShaderPairs": len(pairs),
+        "ShaderIdentityMissingSignatures": identity_missing,
+        "ShaderIdentityBlockingSignatures": identity_blocking,
+        "EvidenceLimitedBySignatureDetailCap": detail_cap_saturated,
+        "EvidenceCoverageComplete": evidence_coverage_complete,
+        "TranslationImplemented": False,
+        "Pairs": pairs,
+        "DiagnosticOnly": True,
+        "ActivationProof": False,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--session-dir", required=True)
@@ -488,13 +608,15 @@ def main() -> int:
             if match:
                 signature_id = int(match.group("id"))
                 signature_key = (source_log, startup_epoch, signature_id)
+                body = match.group("body")
                 signatures.setdefault(
                     signature_key,
                     {
                         "source_log": source_log,
                         "startup_epoch": startup_epoch,
                         "id": signature_id,
-                        "raw": match.group("body"),
+                        "raw": body,
+                        "shader_identity": parse_signature_shader_identity(body),
                     },
                 )
                 continue
@@ -828,6 +950,21 @@ def main() -> int:
         and not current_signature_hash_cap_saturated_logs
     )
 
+    # R238: the detailed signature log already carries stable D3D9 VS/PS
+    # bytecode identity. Extract a pair inventory for the dominant programmable
+    # path without adding new draw-time instrumentation. Pair coverage is more
+    # strict than signature count accounting: any detailed-signature cap, hash
+    # cap, missing shader block, failed introspection or mixed pair keeps the
+    # inventory explicitly incomplete. This is translation input only.
+    programmable_shader_inventory = summarize_programmable_shader_inventory(
+        current_signatures,
+        all_current_signature_evidence_coverage_complete,
+        any(
+            summary.get("signatureDetailSkipped", 0) > 0
+            for summary in latest_summaries
+        ),
+    )
+
     all_source_logs_have_startup = bool(source_logs) and (
         len(latest_startup_by_log) == len(source_logs)
     )
@@ -861,7 +998,8 @@ def main() -> int:
         "AllSourceLogsHaveStartup": all_source_logs_have_startup,
         "AllSourceLogsHaveBootstrap": all_source_logs_have_bootstrap,
         "AllSourceLogsHaveBootstrapOutcome": all_source_logs_have_bootstrap_outcome,
-        "AllSourceLogsLatestStartupHasBootstrapOutcome": (
+
+[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]        "AllSourceLogsLatestStartupHasBootstrapOutcome": (
             all_source_logs_latest_startup_has_bootstrap_outcome
         ),
         "AllSourceLogsLatestBootstrapOutcomeIsProbe": (
@@ -1157,6 +1295,7 @@ def main() -> int:
             "CensusExactness": sampled_exactness,
             "SamplingCoverage": sampling_coverage,
             "SignatureEvidenceCoverage": signature_coverage,
+            "ProgrammableShaderInventory": programmable_shader_inventory,
             "StartupBootstrapCoverage": startup_bootstrap_coverage,
             "ManagedTextureShadow": managed_texture_shadow_evidence,
             "DualSourceBlend": dual_source_blend_evidence,
@@ -1169,6 +1308,8 @@ def main() -> int:
             "The 64-entry detailed-log cap no longer limits fixed-function D3DCompile probes; "
             "compile coverage is skipped only when the independent signature-hash cap is exceeded. "
             "Signature hash/detail caps remain separate diagnostic-detail evidence. "
+            "R238 extracts programmable VS/PS pair identity from captured detailed signatures; "
+            "any detail/hash cap or shader-introspection gap keeps that pair inventory incomplete. "
             "Even exhaustive exact census remains diagnostic only: ActivationProof and "
             "NativeDrawPathActivationAllowed stay false, and exact-build HMD graphics "
             "parity is still required before native draw routing. "
@@ -1197,6 +1338,7 @@ def main() -> int:
         "AllSummaries": summaries,
         "UnsupportedTotalLatest": unsupported_total,
         "SignatureCoverage": signature_coverage,
+        "ProgrammableShaderInventory": programmable_shader_inventory,
         "UniqueSignaturesCaptured": len(signatures),
         "CurrentUniqueSignaturesCaptured": len(current_signatures),
         "CurrentSignaturesByLog": current_signatures_by_log,
@@ -1220,3 +1362,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
