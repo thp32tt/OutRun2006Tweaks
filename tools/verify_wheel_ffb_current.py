@@ -786,6 +786,23 @@ req(profiles, 'if (model == 1) // Arcade Original', 'partial Arcade Original pro
 req(profiles, 'else if (model == 2) // Arcade + Modern Hybrid', 'partial Hybrid profiles receive Hybrid baseline')
 req(profiles, 'else if (model == 3) // PS2 Original', 'partial PS2 profiles receive PS2 baseline')
 req(profiles, 'key != "MaxTorqueNm" && key != "FeelRevision"', 'internal migration revision is excluded from feel profiles')
+req(profiles, '{"PS2HostGain","1.0"}, {"SpringStrength","0.22"}', 'partial Modern profiles inherit the current Universal spring baseline')
+req(profiles, '{"SteeringWeight","1.60"}, {"MechanicalTrail","0.30"}', 'partial Modern profiles inherit the current Universal SAT baseline')
+req(profiles, '{"GearShift","0.60"}, {"RoadTexture","0.60"}', 'partial Modern profiles inherit the current Universal tactile baseline')
+req(profiles, '{"EngineIdle","0.20"}, {"SlewRate","0.12"}', 'partial Modern profiles inherit the current Universal slew baseline')
+req(profiles, '{"ReversalReleaseRate","0.30"}, {"UsePeriodicEffects","false"}', 'partial Modern profiles keep current reversal and R3-compatible tactile transport')
+req(build, 'if (migrationModel == WheelFFBMath::Model::ModernDD)\n                    Settings::WheelFFBUsePeriodicEffects = false;', 'early feel migration disables hardware periodics only for Modern DD')
+req(build, 'migratedLegacyModern ||\n                    migrationModel == WheelFFBMath::Model::ModernDD', 'legacy migration preserves Arcade/Hybrid/PS2 periodic ownership')
+if build.count('if (migrationModel == WheelFFBMath::Model::ModernDD)') < 3:
+    raise SystemExit('CURRENT VERIFY FAILED [Modern-only feel migrations are not consistently model-gated]')
+print('OK [revision 1/2/4 feel retunes are gated to Modern DD]')
+req(build, 'migrationModel == WheelFFBMath::Model::ModernDD\n                        ? normalize_legacy_preset(false)\n                        : false;', 'legacy numeric preset normalization cannot rewrite Arcade/Hybrid/PS2 state')
+req(build, 'Settings::WheelFFBFeelRevision = 6;\n                    WheelFFB_ResetHeadroomStats();', 'current Universal preset stamps the current feel revision')
+req(build, 'void apply_universal_physics_preset()\n    {\n        Settings::WheelFFBEnable = true;\n        // These helpers replace the original F11 button blocks', 'Universal Physics preset helper is the intercepted F11 owner')
+physics_helper = build[build.find('void apply_universal_physics_preset()'):build.find('void apply_universal_natural_preset()')]
+natural_helper = build[build.find('void apply_universal_natural_preset()'):build.find('bool normalize_legacy_preset(')]
+req(physics_helper, 'Settings::WheelFFBModel = 0;', 'Universal Physics preset restores Modern DD model ID')
+req(natural_helper, 'Settings::WheelFFBModel = 0;', 'Universal Natural preset restores Modern DD model ID')
 req(math, 'DeepSlipMechanicalBoost = 1.50f', 'deep-slip mechanical reinforcement is strengthened')
 req(math, 'combined_sat_shape_with_deep_slip_boost(', 'deep-slip reinforcement survives final normalization')
 req(ffb, 'WheelFFBMath::combined_sat_shape_with_deep_slip_boost(', 'runtime consumes non-cancelled deep-slip SAT')

@@ -542,18 +542,22 @@ namespace WheelProfileStore
         // only settings owned by that model; device routing/calibration and
         // diagnostics are excluded from FFB feel profiles entirely.
         static constexpr std::pair<std::string_view, std::string_view> common[] = {
+            // Modern/model-0 baseline must match the current Universal Physics
+            // preset, not the historical raw Setting<> defaults. Otherwise an
+            // older partial profile can silently resurrect pre-v0.2 steering,
+            // road and slew values for every key that was absent from the file.
             {"Enable","true"}, {"Model","0"}, {"GlobalStrength","0.70"},
-            {"PS2HostGain","1.0"}, {"SpringStrength","0.65"},
-            {"UseHardwareSpring","true"}, {"SpringSaturation","0.775"},
-            {"DamperStrength","0.30"}, {"UseHardwareDamper","true"},
-            {"SteeringWeight","1.45"}, {"MechanicalTrail","0.25"},
-            {"TrailResponseLead","0.25"}, {"PhysicsSAT","true"},
+            {"PS2HostGain","1.0"}, {"SpringStrength","0.22"},
+            {"UseHardwareSpring","true"}, {"SpringSaturation","0.55"},
+            {"DamperStrength","0.28"}, {"UseHardwareDamper","true"},
+            {"SteeringWeight","1.60"}, {"MechanicalTrail","0.30"},
+            {"TrailResponseLead","0.40"}, {"PhysicsSAT","true"},
             {"GripLoss","0.65"}, {"LateralDeadzone","1.5"},
-            {"WeightTransfer","0.60"}, {"WallImpact","0.38"},
-            {"GearShift","0.18"}, {"RoadTexture","0.30"},
-            {"TireSlip","0.20"}, {"EngineVibration","false"},
-            {"EngineIdle","0.20"}, {"SlewRate","0.06"},
-            {"ReversalReleaseRate","0.12"}, {"UsePeriodicEffects","true"},
+            {"WeightTransfer","0.15"}, {"WallImpact","0.38"},
+            {"GearShift","0.60"}, {"RoadTexture","0.60"},
+            {"TireSlip","0.04"}, {"EngineVibration","false"},
+            {"EngineIdle","0.20"}, {"SlewRate","0.12"},
+            {"ReversalReleaseRate","0.30"}, {"UsePeriodicEffects","false"},
             {"InvertForce","false"}, {"InvertSpring","false"},
         };
 

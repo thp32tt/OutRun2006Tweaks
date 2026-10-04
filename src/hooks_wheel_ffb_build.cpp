@@ -399,6 +399,10 @@ namespace
     void apply_universal_physics_preset()
     {
         Settings::WheelFFBEnable = true;
+        // These helpers replace the original F11 button blocks, so they must
+        // restore the model ID as well as the feel values. Otherwise switching
+        // back from Arcade/PS2 leaves the previous output semantics active.
+        Settings::WheelFFBModel = 0;
         Settings::WheelFFBPhysicsSat = true;
         Settings::WheelFFBGlobalStrength = 0.70f;
         Settings::WheelFFBSpringStrength = 0.22f;
@@ -429,6 +433,7 @@ namespace
     void apply_universal_natural_preset()
     {
         Settings::WheelFFBEnable = true;
+        Settings::WheelFFBModel = 0;
         Settings::WheelFFBPhysicsSat = false;
         Settings::WheelFFBGlobalStrength = 0.70f;
         Settings::WheelFFBSpringStrength = 0.22f;
@@ -799,15 +804,21 @@ namespace
 
             if (revision < 1)
             {
-                // Baseline feel is universal. Preserve SAT/trail gains, reduce
-                // the low-speed centre spring, make real surface roughness easier
-                // to feel, suppress normal-cornering scrub buzz, and retain an
-                // unmistakable but short gear-change thunk.
-                Settings::WheelFFBSpringStrength = 0.22f;
-                Settings::WheelFFBSpringSaturation = 0.55f;
-                Settings::WheelFFBRoadTexture = 0.60f;
-                Settings::WheelFFBTireSlip = 0.04f;
-                Settings::WheelFFBGearShift = 0.60f;
+                // Revision 1 predates the selectable original-model lanes.
+                // Its retune belongs to Modern DD only. Applying these values
+                // while Arcade/Hybrid/PS2 is already selected would overwrite
+                // their reference Spring/Road/Gear settings before a hardware
+                // test, so original-model state advances the marker unchanged.
+                const auto migrationModel = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                if (migrationModel == WheelFFBMath::Model::ModernDD)
+                {
+                    Settings::WheelFFBSpringStrength = 0.22f;
+                    Settings::WheelFFBSpringSaturation = 0.55f;
+                    Settings::WheelFFBRoadTexture = 0.60f;
+                    Settings::WheelFFBTireSlip = 0.04f;
+                    Settings::WheelFFBGearShift = 0.60f;
+                }
                 Settings::WheelFFBFeelRevision = 1;
                 revision = 1;
                 changed = true;
@@ -815,9 +826,13 @@ namespace
 
             if (revision < 2)
             {
-                // Road/slip tactile transport is standardized across wheel
-                // models. Hardware Spring/Damper remain capability-driven.
-                Settings::WheelFFBUsePeriodicEffects = false;
+                // Modern DD defaults to the R3-compatible ConstantForce tactile
+                // transport. Original-model shortcuts own their verified
+                // periodic transports and must not be disabled by migration.
+                const auto migrationModel = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                if (migrationModel == WheelFFBMath::Model::ModernDD)
+                    Settings::WheelFFBUsePeriodicEffects = false;
                 Settings::WheelFFBFeelRevision = 2;
                 revision = 2;
                 changed = true;
@@ -840,21 +855,27 @@ namespace
 
             if (revision < 4)
             {
-                // v0.2 response retune for every wheel. Only values still equal
-                // to v0.1 defaults are migrated; manual tuning is kept.
-                const auto migrate_default = [](auto& setting, float oldValue, float newValue)
+                // v0.2 response retune is a Modern DD migration. Hybrid keeps
+                // its explicit Modern-backbone reference values, while Arcade
+                // Original and PS2 own different condition/effect semantics.
+                const auto migrationModel = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                if (migrationModel == WheelFFBMath::Model::ModernDD)
                 {
-                    const float current = static_cast<float>(setting);
-                    if (std::isfinite(current) &&
-                        std::abs(current - oldValue) <= 0.0005f)
-                        setting = newValue;
-                };
+                    const auto migrate_default = [](auto& setting, float oldValue, float newValue)
+                    {
+                        const float current = static_cast<float>(setting);
+                        if (std::isfinite(current) &&
+                            std::abs(current - oldValue) <= 0.0005f)
+                            setting = newValue;
+                    };
 
-                migrate_default(Settings::WheelFFBSlewRate, 0.06f, 0.12f);
-                migrate_default(Settings::WheelFFBReversalReleaseRate, 0.12f, 0.30f);
-                migrate_default(Settings::WheelFFBTrailResponseLead, 0.25f, 0.40f);
-                migrate_default(Settings::WheelFFBSteeringWeight, 1.45f, 1.60f);
-                migrate_default(Settings::WheelFFBMechanicalTrail, 0.25f, 0.30f);
+                    migrate_default(Settings::WheelFFBSlewRate, 0.06f, 0.12f);
+                    migrate_default(Settings::WheelFFBReversalReleaseRate, 0.12f, 0.30f);
+                    migrate_default(Settings::WheelFFBTrailResponseLead, 0.25f, 0.40f);
+                    migrate_default(Settings::WheelFFBSteeringWeight, 1.45f, 1.60f);
+                    migrate_default(Settings::WheelFFBMechanicalTrail, 0.25f, 0.30f);
+                }
 
                 Settings::WheelFFBFeelRevision = 4;
                 revision = 4;
@@ -863,11 +884,21 @@ namespace
 
             if (revision < 5)
             {
-                // Old F11 presets used a different response envelope and could
-                // undo v0.2 tuning. Migrate only their exact signatures; all
-                // other manual values remain untouched.
-                normalize_legacy_preset(false);
-                Settings::WheelFFBUsePeriodicEffects = false;
+                // Old Modern F11 presets used a different response envelope and
+                // could undo v0.2 tuning. Migrate only their exact signatures.
+                // Do not globally force Periodic OFF: Arcade/Hybrid/PS2 modes
+                // deliberately own Sine/Triangle transports.
+                const auto migrationModel = WheelFFBMath::sanitize_model(
+                    static_cast<int>(Settings::WheelFFBModel));
+                const bool migratedLegacyModern =
+                    migrationModel == WheelFFBMath::Model::ModernDD
+                        ? normalize_legacy_preset(false)
+                        : false;
+                if (migratedLegacyModern ||
+                    migrationModel == WheelFFBMath::Model::ModernDD)
+                {
+                    Settings::WheelFFBUsePeriodicEffects = false;
+                }
                 Settings::WheelFFBFeelRevision = 5;
                 revision = 5;
                 changed = true;
@@ -1011,7 +1042,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_physics_preset();
-                    Settings::WheelFFBFeelRevision = 5;
+                    Settings::WheelFFBFeelRevision = 6;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
@@ -1027,7 +1058,7 @@ namespace
                 if (clicked)
                 {
                     apply_universal_natural_preset();
-                    Settings::WheelFFBFeelRevision = 5;
+                    Settings::WheelFFBFeelRevision = 6;
                     WheelFFB_ResetHeadroomStats();
                     WheelFFB_RequestSettingsTransition();
                     if (!Settings::write(Module::UserIniPath))
