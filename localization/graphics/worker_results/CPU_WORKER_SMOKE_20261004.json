@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "worker": "github-actions",
+  "role": "B",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "cpu_count": 4,
+  "numpy_version": "2.5.3",
+  "pillow_version": "12.3.0",
+  "array_shape": [
+    4096,
+    4096
+  ],
+  "checksum": 140737479966720,
+  "bbox": [
+    1,
+    0,
+    4096,
+    4096
+  ],
+  "elapsed_seconds": 0.04125595600001475
+}
