@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T02:07:52+09:00",
+  "updated_at_kst": "2026-10-05T02:13:25+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "B_PRODUCTION30 resolves C114-returned 53CE39D5 with candidate 08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1: hosted 19/19 exact bbox+size/zero-residue containment PASS plus controller source/clean/final/row/raw visual self-QA PASS and source-family right slant. 53CE39D5 is pending independent C final QA; remaining producer REWORK is 788CE557. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C117 final QA advances 53CE39D5 and 313DB8CB to pixel/visual policy PASS pending isolated in-game validation. C114 53CE clean-plate residue return is resolved. Remaining producer REWORK is 788CE557; strict DXT5 no-candidate HOLD remains 4F68708E/F6811E94; pending_artwork localize_text=47.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,15 +265,13 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "ONE_PRODUCER_REWORK_ONE_PENDING_C",
+      "status": "ONE_PRODUCER_REWORK_REQUIRED",
       "assets": [
         "788CE557"
       ],
       "remaining": 1,
-      "note": "53CE39D5 B_PRODUCTION30 self-QA PASS pending C; 788CE557 remains C108 producer REWORK. RUNTIME_VALIDATION=UNTESTED.",
-      "pending_c": [
-        "53CE39D5"
-      ]
+      "note": "53CE39D5 C117 and 313DB8CB C116/C117 static pixel/visual policy PASS; 788CE557 remains C108 producer REWORK. RUNTIME_VALIDATION=UNTESTED.",
+      "pending_c": []
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -297,30 +295,32 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C114",
-      "report": "localization/graphics/role_C/20261005-C114-FINAL/C114_CROSS_LANE_FINAL_QA.json",
-      "result": "1_PIXEL_VISUAL_PASS_1_REWORK_GLOBAL_2_REWORK_REMAIN",
+      "run": "C117",
+      "report": "localization/graphics/role_C/20261005-C117-FINAL/C117_CROSS_LANE_FINAL_QA.json",
+      "result": "2_PIXEL_VISUAL_PASS_GLOBAL_1_REWORK_REMAIN",
       "candidate_changed_by_C": false,
       "assets_checked": 2,
       "pixel_visual_pass_assets": [
-        "FD90AA9"
-      ],
-      "rework_required_assets": [
+        "313DB8CB",
         "53CE39D5"
       ],
+      "rework_required_assets": [],
       "global_rework_remaining": [
-        "53CE39D5",
         "788CE557"
       ],
+      "strict_hold_no_candidate": [
+        "4F68708E",
+        "F6811E94"
+      ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 50,
+      "pending_production_localize_text": 47,
       "machine_evidence": {
-        "FD90AA9": "localization/graphics/role_C/20261005-C114-FD90-SCOPED/C114_FD90AA9_SCOPED_MACHINE_QA.json",
-        "53CE39D5": "localization/graphics/role_C/20261005-C112-53CE/C112_53CE_MACHINE_QA.json"
+        "313DB8CB": "localization/graphics/role_C/20261005-C116-313DB8CB/C116_313DB8CB_MACHINE_QA.json",
+        "53CE39D5": "localization/graphics/role_C/20261005-C117-53CE39D5/C117_53CE39D5_MACHINE_QA.json"
       },
       "controller_visual": {
-        "FD90AA9": "PASS",
-        "53CE39D5": "FAIL_CLEAN_PLATE_VISIBLE_RESIDUE"
+        "313DB8CB": "PASS",
+        "53CE39D5": "PASS"
       },
       "in_game_validation": "PENDING_ISOLATED_DDS_ONLY"
     },

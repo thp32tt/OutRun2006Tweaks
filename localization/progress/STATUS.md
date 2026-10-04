@@ -959,3 +959,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Controller SOURCE/CLEAN/FINAL, 19-row contact and raw-orientation visual review PASS. The short dark dash/source-shadow remnants returned by C114 are absent; no clipping, overlap, seam, halo or protected-art damage is visible, and Korean lettering now follows the source right-slanted orange/white families.
 - Queue index 100 advanced to `b30_self_qa_pass_pending_c`. Remaining producer REWORK is even index 106 `788CE557`. `RUNTIME_VALIDATION=UNTESTED`; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION30/B_PRODUCTION30_53CE_REPORT.json` and `localization/graphics/role_B/20261005-B-PRODUCTION30/`.
+## 2026-10-05T02:13:25+09:00 — C117 313DB8CB + 53CE39D5 final QA
+- Revalidated only new/changed unfinished handoffs; completed C114/C111 approvals were not repeated.
+- 313DB8CB A_PRODUCTION19 c44a9ccd62e2b78fb17ec10f7a50a6de32dc1a0f84a44f2595b3e7ffaa0cc0ea: independent C machine QA PASS (2/2 bbox+size, exact header/decode, clean residue/outside/protected/overlap/touch=0) and SOURCE|FINAL/full/raw controller visual PASS after source-weight correction.
+- 53CE39D5 B_PRODUCTION30 08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1: independent C machine QA PASS (19/19 bbox+size, header, zero clean/final/protected/outside/overlap/touch); 10 persisted target-mask-only alpha-edge pixels composite byte-identically to CLEAN and no actual target pixel is missing from the mask. SOURCE/CLEAN/FINAL/row/raw controller visual PASS; former C114 dark dash/source-shadow residue is gone and ~0.30 source-family right slant is retained.
+- 788CE557 remains C108 REWORK_REQUIRED because no newer completed producer candidate was available.
+- 4F68708E and F6811E94 remain strict no-candidate HOLD: authoritative DXT5 source text bounds are non-4x4-aligned and require constrained exact-safe reconstruction.
+- RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261005-C117-FINAL/C117_CROSS_LANE_FINAL_QA.json

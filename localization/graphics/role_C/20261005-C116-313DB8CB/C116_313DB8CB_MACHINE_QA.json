@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C116-313DB8CB-NATIVE-CHECK",
+  "asset": "313DB8CB",
+  "producer_run": "A_PRODUCTION19",
+  "source_sha256": "4c85be80485375876cdcc6be0ebd1e5578032894a194a820b47f01b271fe4786",
+  "candidate_sha256": "c44a9ccd62e2b78fb17ec10f7a50a6de32dc1a0f84a44f2595b3e7ffaa0cc0ea",
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "depth": 1,
+    "mips": 1,
+    "format": "RGBA32",
+    "raw_orientation": "mirror_y"
+  },
+  "header_128_exact": true,
+  "persisted_final_vs_independent_decode_diff_pixels": 0,
+  "clean_changed_pixels_outside_source_mask": 0,
+  "clean_source_text_mask_alpha_residue_pixels": 0,
+  "final_changed_pixels_outside_allowed_source_bboxes": 0,
+  "final_alpha_changed_pixels_outside_allowed_source_bboxes": 0,
+  "final_changed_pixels_in_protected_visible_mask": 0,
+  "target_pixels_outside_allowed_source_bboxes": 0,
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_pairs": [],
+  "rows": [
+    {
+      "key": "tuned",
+      "original_bbox": [
+        1405,
+        982,
+        1544,
+        1018
+      ],
+      "localized_bbox": [
+        1447,
+        984,
+        1502,
+        1016
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "normal",
+      "original_bbox": [
+        1730,
+        981,
+        1904,
+        1017
+      ],
+      "localized_bbox": [
+        1788,
+        983,
+        1846,
+        1015
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PASS",
+  "runtime_validation": "UNTESTED",
+  "execution_note": "independent lightweight stdlib/ImageMagick cross-check on authorized controller host while GitHub-hosted C worker was queued behind producer job",
+  "controller_visual_notes": "SOURCE|FINAL contact plus full readable CLEAN/FINAL and RAW mirror_y review PASS: corrected Korean heavy plain-white sans weight now matches TUNED/NORMAL source family, remains centered and smaller than source footprints, with no residue, clipping, overlap, seam, halo, protected-art damage, or orientation regression."
+}

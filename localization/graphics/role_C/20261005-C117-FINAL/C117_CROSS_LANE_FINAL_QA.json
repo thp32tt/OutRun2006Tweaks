@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C117",
+  "timestamp_kst": "2026-10-05T02:13:25+09:00",
+  "scope": "new/changed unfinished A/B handoffs only; previously completed C114/C111 approvals not repeated",
+  "candidate_changed_by_C": false,
+  "assets": {
+    "313DB8CB": {
+      "queue_index": 139,
+      "producer_run": "A_PRODUCTION19",
+      "candidate_sha256": "c44a9ccd62e2b78fb17ec10f7a50a6de32dc1a0f84a44f2595b3e7ffaa0cc0ea",
+      "producer_report": "localization/graphics/role_A/20261005-A-PRODUCTION19/A_PRODUCTION19_313DB8CB_REPORT.json",
+      "machine_qa_report": "localization/graphics/role_C/20261005-C116-313DB8CB/C116_313DB8CB_MACHINE_QA.json",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PASS",
+      "machine_checks": {
+        "bbox_and_size": "2/2 PASS",
+        "header_128_exact": true,
+        "persisted_final_decode_diff_pixels": 0,
+        "clean_outside_source_mask": 0,
+        "clean_source_residue": 0,
+        "final_outside_source_bboxes": 0,
+        "alpha_outside_source_bboxes": 0,
+        "protected_visible_changed": 0,
+        "overlap_pixels": 0,
+        "touch_pairs": []
+      },
+      "visual_evidence": [
+        "localization/graphics/role_A/20261005-A-PRODUCTION19/A_PRODUCTION19_CONTACT_SOURCE_FINAL.jpg",
+        "localization/graphics/role_A/20261005-A-PRODUCTION19/A_PRODUCTION19_SOURCE_CLEAN_FINAL_GRAY.jpg",
+        "localization/graphics/role_A/20261005-A-PRODUCTION19/A_PRODUCTION19_FINAL_RAW_GRAY.jpg"
+      ],
+      "visual_notes": "PASS after the producer same-run weight correction: 튜닝/일반 now match the heavy plain-white sans source family, remain centered and smaller than TUNED/NORMAL source footprints, and show no residue, clipping, overlap, seam, halo, protected-art damage or raw mirror_y regression.",
+      "decision": "C116_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    },
+    "53CE39D5": {
+      "queue_index": 100,
+      "producer_run": "B_PRODUCTION30",
+      "candidate_sha256": "08467408b4ef087a8e2a5e8408b159e4f635fe0c261ad2ccae76a1499be5ced1",
+      "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION30/B_PRODUCTION30_53CE_REPORT.json",
+      "machine_qa_report": "localization/graphics/role_C/20261005-C117-53CE39D5/C117_53CE39D5_MACHINE_QA.json",
+      "machine_qa": "PASS",
+      "controller_visual_qa": "PASS",
+      "machine_checks": {
+        "bbox_and_size": "19/19 PASS",
+        "header_128_exact": true,
+        "clean_outside_source_mask": 0,
+        "source_mask_unchanged_in_clean": 0,
+        "final_outside_allowed": 0,
+        "alpha_outside_allowed": 0,
+        "protected_changed": 0,
+        "target_outside_allowed": 0,
+        "overlap_pixels": 0,
+        "touch_pairs": []
+      },
+      "target_mask_note": "Persisted producer target mask has 10 alpha-edge pixels that composite byte-identically to CLEAN; actual candidate-vs-clean target pixels missing from persisted mask = 0. This is informational, not a containment failure.",
+      "visual_evidence": [
+        "localization/graphics/role_B/20261005-B-PRODUCTION30/B_PRODUCTION30_53CE_COMPARE.jpg",
+        "localization/graphics/role_B/20261005-B-PRODUCTION30/B_PRODUCTION30_53CE_ROW_CONTACT.jpg",
+        "localization/graphics/role_B/20261005-B-PRODUCTION30/B_PRODUCTION30_53CE_RAW_COMPARE.jpg",
+        "localization/graphics/role_B/20261005-B-PRODUCTION30/53CE39D5_HD_CLEAN_PLATE.png"
+      ],
+      "visual_notes": "PASS: C114-returned short dark dash/source-shadow residue is no longer visible in CLEAN. All 19 localized lines preserve source-family right slant, fill/outline family and multi-line consistency with no clipping, overlap, protected-art damage or raw orientation regression.",
+      "decision": "C117_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    }
+  },
+  "unchanged_producer_rework": {
+    "788CE557": "C108 REWORK_REQUIRED remains authoritative; no newer completed producer candidate was available in this C run."
+  },
+  "strict_hold_no_candidate": {
+    "4F68708E": {
+      "queue_index": 99,
+      "producer_report": "localization/graphics/role_A/20261005-A-PRODUCTION17/A_PRODUCTION17_4F68708E_REPORT.json",
+      "reason": "authoritative DXT5 source effect bboxes are not 4x4-block aligned; no candidate written; constrained exact-safe reconstruction required"
+    },
+    "F6811E94": {
+      "queue_index": 119,
+      "producer_report": "localization/graphics/role_A/20261005-A-PRODUCTION18/A_PRODUCTION18_F6811E94_REPORT.json",
+      "reason": "authoritative DXT5 source bbox is not 4x4-block aligned; no candidate written; constrained exact-safe reconstruction required"
+    }
+  },
+  "global_rework_remaining": [
+    "788CE557"
+  ],
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
