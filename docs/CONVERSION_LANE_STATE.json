@@ -52,9 +52,9 @@
   },
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00337",
-    "production_id": "CONVERSION-DX11-00337",
-    "event_id": "CONVERSION-DX11-00337-E003",
-    "event_type": "rollover",
+    "production_id": "CONVERSION-DXVK-00336",
+    "event_id": "CONVERSION-DXVK-00336-E005",
+    "event_type": "retry",
     "attempt": "1/3",
     "dispatch_source": "CURRENT_USER_QUEUE",
     "result_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
@@ -77,17 +77,8 @@
     "implementation_comment_id": 5975282925,
     "repair_comment_id": 5975292340,
     "validation_comment_id": 5975353204,
-    "chat_rollover": 3,
-    "rollover_is_retry": false,
-    "resume_reason": "Retry persisted after one recovery attempt",
     "dispatch_metadata_correction": {
       "corrected_from": {
-        "production_id": "CONVERSION-DXVK-00336",
-        "event_id": "CONVERSION-DXVK-00336-E005",
-        "event_type": "retry",
-        "attempt": "1/3"
-      },
-      "corrected_to": {
         "production_id": "CONVERSION-DX11-00337",
         "event_id": "CONVERSION-DX11-00337-E003",
         "event_type": "rollover",
@@ -95,9 +86,17 @@
         "chat_rollover": 3,
         "rollover_is_retry": false
       },
-      "reason": "The current controller-issued rollover supplied by the user is authoritative. Rollover is not a retry; the repair material/result SHA, exact-SHA validation evidence, artifact identity and runtime status are unchanged.",
-      "material_and_validation_bearing_sha_unchanged": true
-    }
+      "corrected_to": {
+        "production_id": "CONVERSION-DXVK-00336",
+        "event_id": "CONVERSION-DXVK-00336-E005",
+        "event_type": "retry",
+        "attempt": "1/3"
+      },
+      "reason": "The current user-issued queue event in this chat is authoritative. Concurrent bookkeeping incorrectly rewrote the dispatch as a rollover. This correction changes dispatch metadata only; material/result SHA, exact-SHA Gate #1905 evidence, artifact identity, C0-C6 completion and RUNTIME_VALIDATION are unchanged.",
+      "material_and_validation_bearing_sha_unchanged": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+      "issue14_correction_comment_id": 5975367051
+    },
+    "dispatch_metadata_correction_comment_id": 5975367051
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00337. Exact-SHA Backend Conversion Gate #1905 passed for repaired R232 result 53a5ee95137b0d83dc8d5c79c875e1195ce0eae4, including source-graph/dormant-activation/census checks, Win32 build/binary and DX11 readiness smoke. This is offline/hosted evidence, not in-game/HMD proof.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before native draw activation or visual/runtime correctness claims.",
@@ -2135,12 +2134,10 @@
     {
       "unit_id": "DX11_R232_LATEST_STARTUP_SUMMARY_PAIRING",
       "task_id": "CONVERSION-DX11-00337",
-      "production_id": "CONVERSION-DX11-00337",
-      "event_id": "CONVERSION-DX11-00337-E003",
-      "event_type": "rollover",
+      "production_id": "CONVERSION-DXVK-00336",
+      "event_id": "CONVERSION-DXVK-00336-E005",
+      "event_type": "retry",
       "attempt": "1/3",
-      "chat_rollover": 3,
-      "rollover_is_retry": false,
       "base_sha": "9e56431ea950237f91e08b33b776e7d7d0769158",
       "implementation_commits": [
         "6a892a28871c809f0f72b48a9007dedcead5efdb",
@@ -2167,15 +2164,8 @@
       "implementation_comment_id": 5975282925,
       "repair_comment_id": 5975292340,
       "validation_comment_id": 5975353204,
-      "resume_reason": "Retry persisted after one recovery attempt",
       "dispatch_metadata_correction": {
         "corrected_from": {
-          "production_id": "CONVERSION-DXVK-00336",
-          "event_id": "CONVERSION-DXVK-00336-E005",
-          "event_type": "retry",
-          "attempt": "1/3"
-        },
-        "corrected_to": {
           "production_id": "CONVERSION-DX11-00337",
           "event_id": "CONVERSION-DX11-00337-E003",
           "event_type": "rollover",
@@ -2183,20 +2173,25 @@
           "chat_rollover": 3,
           "rollover_is_retry": false
         },
-        "reason": "The current controller-issued rollover supplied by the user is authoritative. Rollover is not a retry; the repair material/result SHA, exact-SHA validation evidence, artifact identity and runtime status are unchanged.",
-        "material_and_validation_bearing_sha_unchanged": true
-      }
+        "corrected_to": {
+          "production_id": "CONVERSION-DXVK-00336",
+          "event_id": "CONVERSION-DXVK-00336-E005",
+          "event_type": "retry",
+          "attempt": "1/3"
+        },
+        "reason": "The current user-issued queue event in this chat is authoritative. Concurrent bookkeeping incorrectly rewrote the dispatch as a rollover. This correction changes dispatch metadata only; material/result SHA, exact-SHA Gate #1905 evidence, artifact identity, C0-C6 completion and RUNTIME_VALIDATION are unchanged.",
+        "material_and_validation_bearing_sha_unchanged": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+        "issue14_correction_comment_id": 5975367051
+      },
+      "dispatch_metadata_correction_comment_id": 5975367051
     }
   ],
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00337",
-    "production_id": "CONVERSION-DX11-00337",
-    "event_id": "CONVERSION-DX11-00337-E003",
-    "event_type": "rollover",
+    "production_id": "CONVERSION-DXVK-00336",
+    "event_id": "CONVERSION-DXVK-00336-E005",
+    "event_type": "retry",
     "attempt": "1/3",
-    "chat_rollover": 3,
-    "rollover_is_retry": false,
-    "resume_reason": "Retry persisted after one recovery attempt",
     "source": "CURRENT_USER_QUEUE",
     "material_result_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
     "source_implementation_sha": "6a892a28871c809f0f72b48a9007dedcead5efdb",
@@ -2212,12 +2207,6 @@
     "validation_comment_id": 5975353204,
     "dispatch_metadata_correction": {
       "corrected_from": {
-        "production_id": "CONVERSION-DXVK-00336",
-        "event_id": "CONVERSION-DXVK-00336-E005",
-        "event_type": "retry",
-        "attempt": "1/3"
-      },
-      "corrected_to": {
         "production_id": "CONVERSION-DX11-00337",
         "event_id": "CONVERSION-DX11-00337-E003",
         "event_type": "rollover",
@@ -2225,8 +2214,16 @@
         "chat_rollover": 3,
         "rollover_is_retry": false
       },
-      "reason": "The current controller-issued rollover supplied by the user is authoritative. Rollover is not a retry; the repair material/result SHA, exact-SHA validation evidence, artifact identity and runtime status are unchanged.",
-      "material_and_validation_bearing_sha_unchanged": true
-    }
+      "corrected_to": {
+        "production_id": "CONVERSION-DXVK-00336",
+        "event_id": "CONVERSION-DXVK-00336-E005",
+        "event_type": "retry",
+        "attempt": "1/3"
+      },
+      "reason": "The current user-issued queue event in this chat is authoritative. Concurrent bookkeeping incorrectly rewrote the dispatch as a rollover. This correction changes dispatch metadata only; material/result SHA, exact-SHA Gate #1905 evidence, artifact identity, C0-C6 completion and RUNTIME_VALIDATION are unchanged.",
+      "material_and_validation_bearing_sha_unchanged": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+      "issue14_correction_comment_id": 5975367051
+    },
+    "dispatch_metadata_correction_comment_id": 5975367051
   }
 }
