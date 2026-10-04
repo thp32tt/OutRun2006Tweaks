@@ -3,7 +3,7 @@
   "purpose": "BRANCH_LOCAL_CONVERSION_STATE_OVERRIDE",
   "branch": "vr-dx11-native-r71",
   "lane": "DX11",
-  "state_parent_head": "67b0793beab541d4875cac5f8981700acc03e497",
+  "state_parent_head": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
   "precedence": {
     "over_inherited_vr_autodev_state": true,
     "order": [
@@ -51,56 +51,57 @@
     "partial_checkpoint_action": "CONTINUE_SAME_TASK_ID"
   },
   "latest_durable_task": {
-    "task_id": "CONVERSION-DX11-00335",
-    "production_id": "CONVERSION-DX11-00335",
-    "event_id": "CONVERSION-DX11-00335-E002",
+    "task_id": "CONVERSION-DX11-00337",
+    "production_id": "CONVERSION-DX11-00337",
+    "event_id": "CONVERSION-DX11-00337-E003",
     "event_type": "rollover",
     "attempt": "1/3",
     "dispatch_source": "CURRENT_USER_QUEUE",
-    "result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
-    "source_implementation_sha": "67b0793beab541d4875cac5f8981700acc03e497",
-    "validation_bearing_sha": "67b0793beab541d4875cac5f8981700acc03e497",
-    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R231_LATEST_STARTUP_BOOTSTRAP_PAIRING_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+    "result_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+    "source_implementation_sha": "6a892a28871c809f0f72b48a9007dedcead5efdb",
+    "validation_bearing_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+    "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R232_LATEST_STARTUP_SUMMARY_PAIRING_R226_GUARD_REPAIR_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
     "runtime_validation": "UNTESTED",
     "checkpoint": "C6_STATE",
-    "validation_run_id": 37165628064,
-    "validation_job_id": 111327817163,
-    "readiness_smoke_job_id": 111328512673,
-    "artifact_id": 11289462817,
-    "artifact_digest": "sha256:3e3e83902260d136ac0d4260e3bedc72ad02308d623b02c04bb8a82fb8b6b516",
-    "run_record_path": "docs/automation/runs/CONVERSION-DX11-00335.json",
-    "run_record_commit": "64ceef950628a9b77464dcd1645b21523c0d9b96",
+    "validation_run_id": 37167333846,
+    "validation_job_id": 111332904235,
+    "readiness_smoke_job_id": 111333692075,
+    "artifact_id": 11290061062,
+    "artifact_digest": "sha256:67cdc516352f03e884df66af78f0b77ba06ed543999de855df95951ef948dfa2",
+    "run_record_path": "docs/automation/runs/CONVERSION-DX11-00337.json",
+    "run_record_commit": "4b755fcee4c873c4bc3897c925e7d136d2435d4b",
     "implementation_commits": [
-      "67b0793beab541d4875cac5f8981700acc03e497"
+      "6a892a28871c809f0f72b48a9007dedcead5efdb",
+      "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4"
     ],
-    "implementation_comment_id": 5975067591,
-    "chat_rollover": 2,
+    "implementation_comment_id": 5975282925,
+    "repair_comment_id": 5975292340,
+    "validation_comment_id": 5975353204,
+    "chat_rollover": 3,
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt",
     "dispatch_metadata_correction": {
       "corrected_from": {
-        "production_id": "CONVERSION-DXVK-00334",
-        "event_id": "CONVERSION-DXVK-00334-E003",
+        "production_id": "CONVERSION-DXVK-00336",
+        "event_id": "CONVERSION-DXVK-00336-E005",
         "event_type": "retry",
         "attempt": "1/3"
       },
       "corrected_to": {
-        "production_id": "CONVERSION-DX11-00335",
-        "event_id": "CONVERSION-DX11-00335-E002",
+        "production_id": "CONVERSION-DX11-00337",
+        "event_id": "CONVERSION-DX11-00337-E003",
         "event_type": "rollover",
         "attempt": "1/3",
-        "chat_rollover": 2,
+        "chat_rollover": 3,
         "rollover_is_retry": false
       },
-      "reason": "The current user-supplied controller rollover is authoritative. This rollover is not a retry and does not increment ATTEMPT. Material result, validation-bearing SHA, exact-SHA Backend Conversion Gate result, artifact identity and RUNTIME_VALIDATION remain unchanged.",
-      "material_and_validation_bearing_sha_unchanged": true,
-      "issue14_correction_comment_id": 5975101719
-    },
-    "rollover_metadata_correction_comment_id": 5975101719
+      "reason": "The current controller-issued rollover supplied by the user is authoritative. Rollover is not a retry; the repair material/result SHA, exact-SHA validation evidence, artifact identity and runtime status are unchanged.",
+      "material_and_validation_bearing_sha_unchanged": true
+    }
   },
-  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00335. Exact-SHA hosted validation passed for R231 latest-startup/bootstrap pairing, source graph, dormant activation, census analyzer, Win32 build/binary and readiness smoke. This is offline/hosted evidence, not in-game/HMD proof.",
-  "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build Quest 3/VDXR parity remains required before native draw activation or visual/runtime correctness claims.",
-  "independent_static_next_action": "Preserve R225-R231 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+  "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00337. Exact-SHA Backend Conversion Gate #1905 passed for repaired R232 result 53a5ee95137b0d83dc8d5c79c875e1195ce0eae4, including source-graph/dormant-activation/census checks, Win32 build/binary and DX11 readiness smoke. This is offline/hosted evidence, not in-game/HMD proof.",
+  "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before native draw activation or visual/runtime correctness claims.",
+  "independent_static_next_action": "Preserve R225-R232 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
@@ -2130,46 +2131,102 @@
         "issue14_correction_comment_id": 5975101719
       },
       "rollover_metadata_correction_comment_id": 5975101719
+    },
+    {
+      "unit_id": "DX11_R232_LATEST_STARTUP_SUMMARY_PAIRING",
+      "task_id": "CONVERSION-DX11-00337",
+      "production_id": "CONVERSION-DX11-00337",
+      "event_id": "CONVERSION-DX11-00337-E003",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 3,
+      "rollover_is_retry": false,
+      "base_sha": "9e56431ea950237f91e08b33b776e7d7d0769158",
+      "implementation_commits": [
+        "6a892a28871c809f0f72b48a9007dedcead5efdb",
+        "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4"
+      ],
+      "source_implementation_sha": "6a892a28871c809f0f72b48a9007dedcead5efdb",
+      "material_result_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+      "validation_bearing_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+      "failed_validation_bearing_sha": "6a892a28871c809f0f72b48a9007dedcead5efdb",
+      "failed_validation_run_id": 37167255238,
+      "failed_validation_job_id": 111332663424,
+      "repair_count": 1,
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R232_LATEST_STARTUP_SUMMARY_PAIRING_R226_GUARD_REPAIR_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "checkpoint": "C6_STATE",
+      "native_draw_path_activation_changed": false,
+      "packaging_status": "NOT_REQUIRED_OFFLINE_CENSUS_EVIDENCE_INTEGRITY_ONLY",
+      "validation_run_id": 37167333846,
+      "validation_job_id": 111332904235,
+      "readiness_smoke_job_id": 111333692075,
+      "artifact_id": 11290061062,
+      "artifact_digest": "sha256:67cdc516352f03e884df66af78f0b77ba06ed543999de855df95951ef948dfa2",
+      "run_record_commit": "4b755fcee4c873c4bc3897c925e7d136d2435d4b",
+      "implementation_comment_id": 5975282925,
+      "repair_comment_id": 5975292340,
+      "validation_comment_id": 5975353204,
+      "resume_reason": "Retry persisted after one recovery attempt",
+      "dispatch_metadata_correction": {
+        "corrected_from": {
+          "production_id": "CONVERSION-DXVK-00336",
+          "event_id": "CONVERSION-DXVK-00336-E005",
+          "event_type": "retry",
+          "attempt": "1/3"
+        },
+        "corrected_to": {
+          "production_id": "CONVERSION-DX11-00337",
+          "event_id": "CONVERSION-DX11-00337-E003",
+          "event_type": "rollover",
+          "attempt": "1/3",
+          "chat_rollover": 3,
+          "rollover_is_retry": false
+        },
+        "reason": "The current controller-issued rollover supplied by the user is authoritative. Rollover is not a retry; the repair material/result SHA, exact-SHA validation evidence, artifact identity and runtime status are unchanged.",
+        "material_and_validation_bearing_sha_unchanged": true
+      }
     }
   ],
   "controller_dispatch": {
-    "task_id": "CONVERSION-DX11-00335",
-    "production_id": "CONVERSION-DX11-00335",
-    "event_id": "CONVERSION-DX11-00335-E002",
+    "task_id": "CONVERSION-DX11-00337",
+    "production_id": "CONVERSION-DX11-00337",
+    "event_id": "CONVERSION-DX11-00337-E003",
     "event_type": "rollover",
     "attempt": "1/3",
-    "source": "CURRENT_USER_QUEUE",
-    "material_result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
-    "source_implementation_sha": "67b0793beab541d4875cac5f8981700acc03e497",
-    "validation_bearing_result_sha": "67b0793beab541d4875cac5f8981700acc03e497",
-    "validation_run_id": 37165628064,
-    "validation_job_id": 111327817163,
-    "readiness_smoke_job_id": 111328512673,
-    "artifact_id": 11289462817,
-    "artifact_digest": "sha256:3e3e83902260d136ac0d4260e3bedc72ad02308d623b02c04bb8a82fb8b6b516",
-    "implementation_comment_id": 5975067591,
-    "chat_rollover": 2,
+    "chat_rollover": 3,
     "rollover_is_retry": false,
     "resume_reason": "Retry persisted after one recovery attempt",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+    "source_implementation_sha": "6a892a28871c809f0f72b48a9007dedcead5efdb",
+    "validation_bearing_result_sha": "53a5ee95137b0d83dc8d5c79c875e1195ce0eae4",
+    "validation_run_id": 37167333846,
+    "validation_job_id": 111332904235,
+    "readiness_smoke_job_id": 111333692075,
+    "artifact_id": 11290061062,
+    "artifact_digest": "sha256:67cdc516352f03e884df66af78f0b77ba06ed543999de855df95951ef948dfa2",
+    "run_record_commit": "4b755fcee4c873c4bc3897c925e7d136d2435d4b",
+    "implementation_comment_id": 5975282925,
+    "repair_comment_id": 5975292340,
+    "validation_comment_id": 5975353204,
     "dispatch_metadata_correction": {
       "corrected_from": {
-        "production_id": "CONVERSION-DXVK-00334",
-        "event_id": "CONVERSION-DXVK-00334-E003",
+        "production_id": "CONVERSION-DXVK-00336",
+        "event_id": "CONVERSION-DXVK-00336-E005",
         "event_type": "retry",
         "attempt": "1/3"
       },
       "corrected_to": {
-        "production_id": "CONVERSION-DX11-00335",
-        "event_id": "CONVERSION-DX11-00335-E002",
+        "production_id": "CONVERSION-DX11-00337",
+        "event_id": "CONVERSION-DX11-00337-E003",
         "event_type": "rollover",
         "attempt": "1/3",
-        "chat_rollover": 2,
+        "chat_rollover": 3,
         "rollover_is_retry": false
       },
-      "reason": "The current user-supplied controller rollover is authoritative. This rollover is not a retry and does not increment ATTEMPT. Material result, validation-bearing SHA, exact-SHA Backend Conversion Gate result, artifact identity and RUNTIME_VALIDATION remain unchanged.",
-      "material_and_validation_bearing_sha_unchanged": true,
-      "issue14_correction_comment_id": 5975101719
-    },
-    "rollover_metadata_correction_comment_id": 5975101719
+      "reason": "The current controller-issued rollover supplied by the user is authoritative. Rollover is not a retry; the repair material/result SHA, exact-SHA validation evidence, artifact identity and runtime status are unchanged.",
+      "material_and_validation_bearing_sha_unchanged": true
+    }
   }
 }
