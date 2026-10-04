@@ -10164,6 +10164,37 @@ def main() -> None:
             + ", ".join(missing_r257_programmable_dormant_pre_activation)
         )
 
+    r258_programmable_source_revalidation_contract = [
+        ("struct NativeProgrammableShaderDormantSourceRevalidationReadiness",
+         NATIVE_BACKEND_HPP, "R258 current-source revalidation receipt type"),
+        ("nonindexed_dormant_source_revalidation_readiness(",
+         NATIVE_BACKEND_HPP, "R258 non-indexed current-source declaration"),
+        ("indexed_dormant_source_revalidation_readiness(",
+         NATIVE_BACKEND_HPP, "R258 indexed current-source declaration"),
+        ("compose_programmable_dormant_source_revalidation_readiness(",
+         NATIVE_BACKEND_CPP, "R258 common fail-closed composition"),
+        ("token, 0x258u",
+         NATIVE_BACKEND_CPP, "R258 independent snapshot-domain tag"),
+        ("R258 indexed final dormant handoff revalidates current R255 source state",
+         CONSTANT_BUFFER_PROBE, "R258 indexed current-source positive regression"),
+        ("R258 indexed final dormant handoff rejects current source-state drift",
+         CONSTANT_BUFFER_PROBE, "R258 indexed source drift rejection"),
+        ("R258 non-indexed final dormant handoff revalidates current R251 source state",
+         CONSTANT_BUFFER_PROBE, "R258 non-indexed current-source positive regression"),
+        ("R258 non-indexed final dormant handoff rejects fresh source identity drift",
+         CONSTANT_BUFFER_PROBE, "R258 non-indexed source drift rejection"),
+    ]
+    missing_r258_programmable_source_revalidation = [
+        meaning for token, source, meaning
+        in r258_programmable_source_revalidation_contract
+        if token not in source
+    ]
+    if missing_r258_programmable_source_revalidation:
+        raise SystemExit(
+            "DX11 R258 programmable source revalidation drift: "
+            + ", ".join(missing_r258_programmable_source_revalidation)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
@@ -10171,3 +10202,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]

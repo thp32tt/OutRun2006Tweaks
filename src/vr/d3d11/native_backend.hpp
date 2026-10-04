@@ -1741,6 +1741,36 @@ compose_programmable_dormant_pre_activation_readiness(
     std::uint64_t candidateSnapshotToken,
     std::uint64_t preActivationSnapshotToken) noexcept;
 
+// R258 revalidates the selected R256 source branch against current device /
+// context / resource state before carrying the dormant R257 handoff any
+// further. The current R251 or R255 receipt is recomputed by the pair cache;
+// success only means that the old R256/R257 identities are still fresh. It
+// remains diagnostic-only and cannot authorize Draw* or NativeDrawPath.
+struct NativeProgrammableShaderDormantSourceRevalidationReadiness {
+    bool inputValid{};
+    bool sourceReceiptReady{};
+    bool sourceReceiptSnapshotPresent{};
+    bool candidateReady{};
+    bool candidateSnapshotMatches{};
+    bool preActivationReady{};
+    bool preActivationSnapshotMatches{};
+    bool sourceLineageMatches{};
+    bool candidateLineageMatches{};
+    bool boundaryPreserved{};
+    bool ready{};
+    NativeProgrammableShaderDrawCandidateKind kind =
+        NativeProgrammableShaderDrawCandidateKind::None;
+    bool indexed{};
+    UINT elementCount{};
+    UINT startLocation{};
+    DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT indexOffset{};
+    std::uint64_t currentSourceReceiptSnapshotToken{};
+    std::uint64_t candidateSnapshotToken{};
+    std::uint64_t preActivationSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;
@@ -2384,6 +2414,66 @@ public:
         std::uint64_t sourceValueSnapshotToken,
         std::uint64_t liveIndexBindingSnapshotToken,
         std::uint64_t preDrawSnapshotToken) const noexcept;
+    [[nodiscard]] NativeProgrammableShaderDormantSourceRevalidationReadiness
+    nonindexed_dormant_source_revalidation_readiness(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken,
+        std::uint64_t constantPayloadSnapshotToken,
+        std::uint64_t constantBindingSnapshotToken,
+        std::uint64_t pipelineBindingSnapshotToken,
+        D3DPRIMITIVETYPE primitiveType,
+        std::uint64_t topologyBindingSnapshotToken,
+        const NativeManagedBufferShadow& vertexBuffer,
+        std::uint64_t vertexBufferSnapshotToken,
+        UINT vertexStride,
+        UINT vertexOffset,
+        std::uint64_t nonIndexedGeometryBindingSnapshotToken,
+        UINT primitiveCount,
+        UINT startVertexLocation,
+        std::uint64_t candidateSnapshotToken,
+        std::uint64_t preActivationSnapshotToken) const noexcept;
+    [[nodiscard]] NativeProgrammableShaderDormantSourceRevalidationReadiness
+    indexed_dormant_source_revalidation_readiness(
+        ID3D11DeviceContext* expectedContext,
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken,
+        const VertexInputLayoutTranslation& layout,
+        std::uint64_t inputLayoutSnapshotToken,
+        std::uint64_t constantStateSnapshotToken,
+        std::uint64_t constantPayloadSnapshotToken,
+        std::uint64_t constantBindingSnapshotToken,
+        std::uint64_t pipelineBindingSnapshotToken,
+        D3DPRIMITIVETYPE primitiveType,
+        std::uint64_t topologyBindingSnapshotToken,
+        const NativeManagedBufferShadow& vertexBuffer,
+        std::uint64_t vertexBufferSnapshotToken,
+        UINT vertexStride,
+        UINT vertexOffset,
+        const NativeManagedBufferShadow& indexBuffer,
+        std::uint64_t indexBufferSnapshotToken,
+        DXGI_FORMAT indexFormat,
+        UINT indexOffset,
+        std::uint64_t indexedGeometryBindingSnapshotToken,
+        UINT primitiveCount,
+        INT baseVertexIndex,
+        UINT minVertexIndex,
+        UINT numVertices,
+        UINT startIndex,
+        std::uint64_t directDispatchSnapshotToken,
+        std::uint64_t sourceValueSnapshotToken,
+        std::uint64_t liveIndexBindingSnapshotToken,
+        std::uint64_t candidateSnapshotToken,
+        std::uint64_t preActivationSnapshotToken) const noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
@@ -3485,3 +3575,5 @@ private:
 };
 
 } // namespace outrun::vr::dx11
+
+[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
