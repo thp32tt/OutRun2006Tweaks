@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
 
 repo=Path.cwd()
 # Candidate-completion retry: exact-HD diagnostic exists; select the reviewed semantic line cluster and render in the same invocation.
-run="20261005-B-PRODUCTION26"
+run="20261005-B-PRODUCTION27"
 # Retry after C107 detected residual source pixels in the pre-shadow-cleanup candidate.
 outdir=repo/"localization/graphics/role_B"/run
 outdir.mkdir(parents=True,exist_ok=True)
@@ -301,8 +301,10 @@ for ld in line_defs:
         if not np.any(out): continue
         xs=np.where(out)[0]
         fill=np.clip(np.round(med),0,255).astype(np.uint8)
+        changed=np.any(arr[gy,x0+xs] != fill[None,:],axis=1)
         clean_arr[gy,x0+xs]=fill
-        all_source_mask[gy,x0+xs]=True
+        if np.any(changed):
+            all_source_mask[gy,x0+xs[changed]]=True
         residual_cleanup_pixels += int(len(xs))
 clean=Image.fromarray(clean_arr,"RGBA")
 # Orange selector plates are light blue inside these exact text bboxes.  Fail closed if
@@ -421,8 +423,8 @@ clean.save(outdir/"53CE39D5_HD_CLEAN_PLATE.png")
 
 srcpng=Path("/tmp/53_src.png");cleanpng=Path("/tmp/53_clean.png");finalpng=Path("/tmp/53_final.png")
 src.save(srcpng);clean.save(cleanpng);decoded.save(finalpng)
-subprocess.run(["python3",str(repo/"tools/localization/validate_clean_plate.py"),str(srcpng),str(cleanpng),str(outdir/"53CE39D5_HD_SOURCE_TEXT_MASK.png"),"--report",str(outdir/"B_PRODUCTION26_CLEAN_PLATE_VALIDATION.json")],check=True)
-subprocess.run(["python3",str(repo/"tools/localization/validate_clean_plate.py"),str(srcpng),str(finalpng),str(outdir/"53CE39D5_HD_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(outdir/"53CE39D5_HD_PROTECTED_MASK.png"),"--report",str(outdir/"B_PRODUCTION26_FINAL_MASK_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(repo/"tools/localization/validate_clean_plate.py"),str(srcpng),str(cleanpng),str(outdir/"53CE39D5_HD_SOURCE_TEXT_MASK.png"),"--report",str(outdir/"B_PRODUCTION27_CLEAN_PLATE_VALIDATION.json")],check=True)
+subprocess.run(["python3",str(repo/"tools/localization/validate_clean_plate.py"),str(srcpng),str(finalpng),str(outdir/"53CE39D5_HD_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(outdir/"53CE39D5_HD_PROTECTED_MASK.png"),"--report",str(outdir/"B_PRODUCTION27_FINAL_MASK_VALIDATION.json")],check=True)
 
 def comp(im,bg):
     z=Image.new("RGBA",im.size,bg);z.alpha_composite(im);return z.convert("RGB")
@@ -433,7 +435,7 @@ def card(label,im,bg):
 cards=[card("SOURCE",src,(64,64,64,255)),card("CLEAN",clean,(64,64,64,255)),card("FINAL",decoded,(64,64,64,255)),card("FINAL_WHITE",decoded,(255,255,255,255))]
 sw=cards[0].width+cards[1].width+8;sh=cards[0].height+cards[2].height+8
 sheet=Image.new("RGB",(sw,sh),"white");sheet.paste(cards[0],(0,0));sheet.paste(cards[1],(cards[0].width+8,0));sheet.paste(cards[2],(0,cards[0].height+8));sheet.paste(cards[3],(cards[2].width+8,cards[1].height+8))
-sheet.save(outdir/"B_PRODUCTION26_53CE_COMPARE.jpg",quality=95)
+sheet.save(outdir/"B_PRODUCTION27_53CE_COMPARE.jpg",quality=95)
 
 contacts=[];srgb=comp(src,(64,64,64,255));crgb=comp(clean,(64,64,64,255));frgb=comp(decoded,(64,64,64,255))
 for n,r in enumerate(rows,1):
@@ -450,12 +452,12 @@ for n,r in enumerate(rows,1):
 cw=max(c.width for c in contacts);ch=sum(c.height for c in contacts)+3*(len(contacts)-1)
 cs=Image.new("RGB",(cw,ch),"white");yy=0
 for c in contacts:cs.paste(c,(0,yy));yy+=c.height+3
-cs.save(outdir/"B_PRODUCTION26_53CE_ROW_CONTACT.jpg",quality=96)
+cs.save(outdir/"B_PRODUCTION27_53CE_ROW_CONTACT.jpg",quality=96)
 
 r1=card("SOURCE_RAW",src.transpose(Image.Transpose.FLIP_TOP_BOTTOM),(64,64,64,255))
 r2=card("FINAL_RAW",decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM),(64,64,64,255))
 rs=Image.new("RGB",(r1.width+r2.width+8,max(r1.height,r2.height)),"white");rs.paste(r1,(0,0));rs.paste(r2,(r1.width+8,0))
-rs.save(outdir/"B_PRODUCTION26_53CE_RAW_COMPARE.jpg",quality=95)
+rs.save(outdir/"B_PRODUCTION27_53CE_RAW_COMPARE.jpg",quality=95)
 
 report={
  "schema_version":1,"role":"B","run":run,"queue_index":100,"asset":asset,
@@ -472,10 +474,10 @@ report={
  "rows":rows,
  "manual_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "RUNTIME_VALIDATION":"UNTESTED",
- "status":"B_PRODUCTION26_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+ "status":"B_PRODUCTION27_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
 }
-(outdir/"B_PRODUCTION26_53CE_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-(outdir/"B_PRODUCTION26_STATIC_VALIDATION_SUMMARY.json").write_text(json.dumps({
+(outdir/"B_PRODUCTION27_53CE_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(outdir/"B_PRODUCTION27_STATIC_VALIDATION_SUMMARY.json").write_text(json.dumps({
  "source_sha256":source_sha_expected,"candidate_sha256":cand_sha,
  "semantic_targets":"7/7","physical_lines":f"{len(rows)}/{len(rows)}",
  "exact_bbox_and_size_ceiling":f"{len(rows)}/{len(rows)} PASS",
@@ -487,4 +489,4 @@ report={
  "song_title_and_vehicle_regions":"PIXEL_EXACT_OUTSIDE_TARGET_BBOXES",
  "runtime_validation":"UNTESTED","status":"PASS"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-print("B_PRODUCTION26_DONE",cand_sha,"lines",len(rows),"outside",int(np.count_nonzero(outside)))
+print("B_PRODUCTION27_DONE",cand_sha,"lines",len(rows),"outside",int(np.count_nonzero(outside)))
