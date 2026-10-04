@@ -21,6 +21,8 @@ r13 = text("src/vr/d3d9/stereo_renderer_r13.cpp")
 r20 = text("src/vr/d3d9/stereo_renderer_r20.cpp")
 r21 = text("src/vr/d3d9/stereo_renderer_r21.cpp")
 r29 = text("src/vr/d3d9/stereo_renderer_r29.cpp")
+r30 = text("src/vr/d3d9/stereo_renderer_r30.cpp")
+r30_safe = text("src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp")
 r26 = text("src/vr/d3d9/stereo_renderer_r26.cpp")
 r31 = text("src/vr/d3d9/stereo_renderer_r31.cpp")
 r32 = text("src/vr/d3d9/stereo_renderer_r32.cpp")
@@ -317,6 +319,58 @@ else:
         errors.append(
             "StateBlockRecovery must validate callbacks before consuming resync "
             "and preserve shader-resync before shadow-prime ordering")
+
+# Cycle 911-1000 owner-boundary convergence.
+# Upper layers may update lower-layer telemetry only through owner APIs.
+for rel, source in (("R31", r31), ("R32", r32), ("R33", r33), ("R34", r34)):
+    if "++R29StableTwoEyeDraws;" in source:
+        errors.append(
+            f"{rel} retained direct R29 stable-two-eye telemetry mutation")
+    if "++R30ScreenSpaceFovDraws;" in source:
+        errors.append(
+            f"{rel} retained direct R30 screen-space telemetry mutation")
+
+if "R29TelemetryNoteStableTwoEyeDraw()" not in r29:
+    errors.append("R29 missing stable-two-eye telemetry owner API")
+if "R30TelemetryNoteScreenSpaceFovDraw()" not in r30:
+    errors.append("R30 missing screen-space telemetry owner API")
+
+# A duplicated stereo draw without a complete independent mono replay has one
+# R9-owned accounting transition: increment draw calls + mark the mono backup
+# incomplete. Upper layers must not reproduce that state pair themselves.
+for rel, source in (
+    ("R29", r29), ("R30", r30), ("R30_SAFE", r30_safe),
+    ("R31", r31), ("R32", r32), ("R33", r33),
+):
+    for banned in ("++R9DrawCalls;", "R9MonoBackupGap = true;"):
+        if banned in source:
+            errors.append(
+                f"{rel} retained direct R9 stereo-draw accounting mutation: {banned}")
+    if "R9NoteStereoDrawWithoutMonoBackup();" not in source:
+        errors.append(
+            f"{rel} missing R9 stereo-draw accounting owner API use")
+if "R9NoteStereoDrawWithoutMonoBackup()" not in r9:
+    errors.append("R9 missing stereo-draw accounting owner API")
+
+# R32 may consume R13 DirectGPU contracts, but readiness, ACK mapping and R13's
+# safety telemetry remain R13-owned state.
+for banned in (
+    "R13OverlayReady.load(",
+    "R13ReadGpuCompletedFrame(",
+    "++R13SafeAckBackpressure;",
+):
+    if banned in r32:
+        errors.append(
+            f"R32 retained direct R13 DirectGPU owner-state dependency: {banned}")
+for marker in (
+    "R13OverlayReadyForTransport()",
+    "R13TryGetGpuCompletedFrame(",
+    "R13NoteSafeAckBackpressure()",
+):
+    if marker not in r13:
+        errors.append(f"R13 missing DirectGPU owner API: {marker}")
+    if marker not in r32:
+        errors.append(f"R32 missing R13 DirectGPU owner API use: {marker}")
 
 for rel, source in (("R32", r32), ("R33", r33), ("R34", r34)):
     for banned in (
