@@ -472,5 +472,3 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-[executed on device: n100 (532e2e0c-a118-4e4d-bd8d-a52d93661113)]
