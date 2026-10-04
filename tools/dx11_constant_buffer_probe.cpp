@@ -4129,6 +4129,59 @@ int main()
             r256IndexedCandidate.snapshotToken),
         "R256 indexed draw-candidate union rejects stale R255 receipt");
 
+    const auto r257IndexedPreActivation =
+        outrun::vr::dx11::compose_programmable_dormant_pre_activation_readiness(
+            r256IndexedCandidate, r256IndexedCandidate.snapshotToken);
+    require(
+        r257IndexedPreActivation.inputValid &&
+        r257IndexedPreActivation.candidateReady &&
+        r257IndexedPreActivation.candidateSnapshotMatches &&
+        r257IndexedPreActivation.candidatePayloadSnapshotMatches &&
+        r257IndexedPreActivation.candidateKindValid &&
+        r257IndexedPreActivation.diagnosticOnly &&
+        !r257IndexedPreActivation.activationProofPresent &&
+        !r257IndexedPreActivation.nativeDrawPathActivationAllowed &&
+        !r257IndexedPreActivation.drawDispatchAuthorized &&
+        r257IndexedPreActivation.boundaryPreserved &&
+        r257IndexedPreActivation.ready &&
+        r257IndexedPreActivation.kind ==
+            outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::Indexed &&
+        r257IndexedPreActivation.indexed &&
+        r257IndexedPreActivation.candidateSnapshotToken ==
+            r256IndexedCandidate.snapshotToken &&
+        r257IndexedPreActivation.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_programmable_dormant_pre_activation_snapshot(
+            r256IndexedCandidate, r256IndexedCandidate.snapshotToken,
+            r257IndexedPreActivation.snapshotToken),
+        "R257 indexed candidate seals dormant pre-activation review without draw authorization");
+
+    const auto staleR256IndexedSnapshot =
+        r256IndexedCandidate.snapshotToken == 1ull
+            ? 2ull
+            : (r256IndexedCandidate.snapshotToken ^ 1ull);
+    const auto r257IndexedStale =
+        outrun::vr::dx11::compose_programmable_dormant_pre_activation_readiness(
+            r256IndexedCandidate, staleR256IndexedSnapshot);
+    require(
+        r257IndexedStale.candidateReady &&
+        !r257IndexedStale.candidateSnapshotMatches &&
+        !r257IndexedStale.ready &&
+        r257IndexedStale.snapshotToken == 0,
+        "R257 rejects stale R256 indexed candidate token");
+
+    auto tamperedR256IndexedCandidate = r256IndexedCandidate;
+    tamperedR256IndexedCandidate.indexOffset ^= 2u;
+    const auto r257IndexedTampered =
+        outrun::vr::dx11::compose_programmable_dormant_pre_activation_readiness(
+            tamperedR256IndexedCandidate,
+            tamperedR256IndexedCandidate.snapshotToken);
+    require(
+        r257IndexedTampered.candidateSnapshotMatches &&
+        !r257IndexedTampered.candidatePayloadSnapshotMatches &&
+        !r257IndexedTampered.ready &&
+        r257IndexedTampered.snapshotToken == 0,
+        "R257 rejects payload drift hidden behind an unchanged R256 indexed snapshot token");
+
     const auto r252DeclaredRangeExcludesZero =
         programmableCache.indexed_direct_dispatch_readiness(
             d3d.context, d3d.device, programmablePair,
@@ -4841,6 +4894,46 @@ int main()
             r251DispatchReady, staleR251CandidateSource,
             r256NonIndexedCandidate.snapshotToken),
         "R256 non-indexed draw-candidate union rejects stale R251 receipt");
+
+    const auto r257NonIndexedPreActivation =
+        outrun::vr::dx11::compose_programmable_dormant_pre_activation_readiness(
+            r256NonIndexedCandidate, r256NonIndexedCandidate.snapshotToken);
+    require(
+        r257NonIndexedPreActivation.inputValid &&
+        r257NonIndexedPreActivation.candidateReady &&
+        r257NonIndexedPreActivation.candidateSnapshotMatches &&
+        r257NonIndexedPreActivation.candidatePayloadSnapshotMatches &&
+        r257NonIndexedPreActivation.candidateKindValid &&
+        r257NonIndexedPreActivation.diagnosticOnly &&
+        !r257NonIndexedPreActivation.activationProofPresent &&
+        !r257NonIndexedPreActivation.nativeDrawPathActivationAllowed &&
+        !r257NonIndexedPreActivation.drawDispatchAuthorized &&
+        r257NonIndexedPreActivation.boundaryPreserved &&
+        r257NonIndexedPreActivation.ready &&
+        r257NonIndexedPreActivation.kind ==
+            outrun::vr::dx11::NativeProgrammableShaderDrawCandidateKind::NonIndexed &&
+        !r257NonIndexedPreActivation.indexed &&
+        r257NonIndexedPreActivation.candidateSnapshotToken ==
+            r256NonIndexedCandidate.snapshotToken &&
+        r257NonIndexedPreActivation.snapshotToken != 0 &&
+        outrun::vr::dx11::validate_programmable_dormant_pre_activation_snapshot(
+            r256NonIndexedCandidate, r256NonIndexedCandidate.snapshotToken,
+            r257NonIndexedPreActivation.snapshotToken),
+        "R257 non-indexed candidate seals dormant pre-activation review without draw authorization");
+
+    auto malformedR256NonIndexedCandidate = r256NonIndexedCandidate;
+    malformedR256NonIndexedCandidate.indexed = true;
+    const auto r257NonIndexedMalformed =
+        outrun::vr::dx11::compose_programmable_dormant_pre_activation_readiness(
+            malformedR256NonIndexedCandidate,
+            malformedR256NonIndexedCandidate.snapshotToken);
+    require(
+        r257NonIndexedMalformed.candidateSnapshotMatches &&
+        r257NonIndexedMalformed.candidatePayloadSnapshotMatches &&
+        !r257NonIndexedMalformed.candidateKindValid &&
+        !r257NonIndexedMalformed.ready &&
+        r257NonIndexedMalformed.snapshotToken == 0,
+        "R257 rejects non-indexed R256 branch-tag mismatch");
 
     const auto r251StaleGeometry =
         programmableCache.nonindexed_direct_dispatch_readiness(
