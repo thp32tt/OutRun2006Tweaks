@@ -70,24 +70,28 @@ def changed_mask(a,b):
         m = ImageChops.lighter(m,z)
     return m.point(lambda v:255 if v else 0)
 
-def extract_hd_bbox(stock_bbox, margin=16):
+def extract_hd_bbox(stock_bbox, region_idx, margin_x=20, margin_y=12):
     # Stock 1x boxes are discovery hints only. Measure the actual permitted bbox
-    # from nonzero alpha in the authoritative 4x HD DDS inside a safely isolated zone.
+    # from nonzero alpha in the authoritative 4x HD DDS, clipped to its sprite cell.
     sx1,sy1,sx2,sy2 = stock_bbox
-    zx1=max(0,sx1*4-margin); zy1=max(0,sy1*4-margin)
-    zx2=min(W,sx2*4+margin); zy2=min(H,sy2*4+margin)
+    rr=regions[region_idx]
+    rx,ry,rw,rh=rr["rect"]
+    rx2,ry2=rx+rw,ry+rh
+    zx1=max(rx,sx1*4-margin_x); zy1=max(ry,sy1*4-margin_y)
+    zx2=min(rx2,sx2*4+margin_x); zy2=min(ry2,sy2*4+margin_y)
     zone=(zx1,zy1,zx2,zy2)
     bb=source_readable.crop(zone).getchannel("A").getbbox()
     if not bb:
-        raise RuntimeError(("empty HD search zone",stock_bbox,zone))
+        raise RuntimeError(("empty HD search zone",stock_bbox,region_idx,zone))
     gb=[zx1+bb[0],zy1+bb[1],zx1+bb[2],zy1+bb[3]]
-    # A touching search boundary would mean the discovery window was too small/ambiguous.
-    bad_left = gb[0] <= zx1 and zx1 > 0
-    bad_top = gb[1] <= zy1 and zy1 > 0
-    bad_right = gb[2] >= zx2 and zx2 < W
-    bad_bottom = gb[3] >= zy2 and zy2 < H
+    # Touching the artificial search edge means the discovery window is too small;
+    # touching the actual sprite-cell edge is allowed because that is source evidence.
+    bad_left = gb[0] <= zx1 and zx1 > rx
+    bad_top = gb[1] <= zy1 and zy1 > ry
+    bad_right = gb[2] >= zx2 and zx2 < rx2
+    bad_bottom = gb[3] >= zy2 and zy2 < ry2
     if bad_left or bad_top or bad_right or bad_bottom:
-        raise RuntimeError(("HD bbox touches search boundary",stock_bbox,zone,gb))
+        raise RuntimeError(("HD bbox touches search boundary",stock_bbox,region_idx,zone,gb))
     return gb
 
 targets=[]
@@ -103,7 +107,7 @@ line_specs = [
 ]
 preserved_shift_bbox=None
 for key,src,kor,idx,stock_box in line_specs:
-    gb=extract_hd_bbox(stock_box, margin=20)
+    gb=extract_hd_bbox(stock_box, idx, margin_x=24, margin_y=16)
     if key=="shift":
         preserved_shift_bbox=gb
     else:
@@ -122,7 +126,7 @@ occurrences = [
     ("space_r6",6,"Space","공백",[780,240,814,254]),
 ]
 for key,idx,src,kor,stock_box in occurrences:
-    targets.append({"key":key,"source":src,"korean":kor,"region_idx":idx,"stock_discovery_bbox":stock_box,"original_bbox":extract_hd_bbox(stock_box, margin=64)})
+    targets.append({"key":key,"source":src,"korean":kor,"region_idx":idx,"stock_discovery_bbox":stock_box,"original_bbox":extract_hd_bbox(stock_box, idx, margin_x=48, margin_y=20)})
 
 if len(targets) != 14 or preserved_shift_bbox is None:
     raise RuntimeError(("target count",len(targets),preserved_shift_bbox))
