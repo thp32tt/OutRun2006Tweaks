@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, json, hashlib, struct, math, subprocess
+import os, json, hashlib, struct, subprocess, urllib.request, shutil, statistics, math
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageChops, ImageOps, ImageFilter
 
@@ -7,35 +7,32 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
     raise SystemExit("GitHub-hosted role A required")
 
 repo=Path.cwd()
-run="20261005-A-RECOVERY13"
+run="20261005-A-PRODUCTION17"
 out=repo/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
 wr.mkdir(parents=True,exist_ok=True)
 
-asset_rel="textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
-source=repo/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a"/asset_rel
+asset_rel="textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds"
 candidate=repo/"localization/graphics/hd_candidates"/asset_rel
-a8=repo/"localization/graphics/role_A/20261004-A-RECOVERY08"
-a8_report_path=a8/"A_RECOVERY08_FD90AA9_REPORT.json"
-clean_path=a8/"FD90AA9_CLEAN_PLATE_RECOVERY08.png"
-source_mask_path=a8/"FD90AA9_SOURCE_TEXT_MASK_RECOVERY08.png"
-clean_protected_path=a8/"FD90AA9_CLEAN_PLATE_PROTECTED_MASK_RECOVERY08.png"
-c109_path=repo/"localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_FD90AA9_MACHINE_QA.json"
+candidate.parent.mkdir(parents=True,exist_ok=True)
 validator=repo/"tools/localization/validate_clean_plate.py"
 
-SOURCE_SHA="f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
-INPUT_SHA="0b7a3138c140617a90207f63eb580c18e953a241951d4832867e8e3ce184338b"
+work=Path("/tmp/outrun_A_prod17")
+work.mkdir(parents=True,exist_ok=True)
+source=work/"4F68708E_HD.dds"
+atlas=work/"4x_4F68708E_512x64_atlas.json"
 
-rework_keys=["more_engine","experts_long","for_experts","normal_difficult"]
-shear_by_key={
-    "more_engine":0.32,
-    "experts_long":0.26,
-    "for_experts":0.30,
-    "normal_difficult":0.27,
-}
+COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
+SOURCE_BLOB_SHA1="eb8c2ddacf4075ff2c7c1dd7a025ca791008fbc8"
+ATLAS_BLOB_SHA1="bb0c1f6cace28337dbfba90bac149ef2a14681a7"
+BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
+urllib.request.urlretrieve(BASE+"/Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",source)
+urllib.request.urlretrieve(BASE+"/Original%20(PC)/Original%20(Tweaks%20dumps)/spr_sprani_selector_cvt_Exst/4x_4F68708E_512x64_atlas.json",atlas)
 
-def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def sha256(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+def git_blob_sha1(data):
+    return hashlib.sha1(b"blob "+str(len(data)).encode("ascii")+b"\0"+data).hexdigest()
 def count(mask): return sum(mask.histogram()[1:])
 def dmask(a,b):
     d=ImageChops.difference(a,b)
@@ -44,319 +41,416 @@ def dmask(a,b):
     for z in bands[1:]:
         m=ImageChops.lighter(m,z)
     return m.point(lambda v:255 if v else 0)
-def gray(im):
-    bg=Image.new("RGBA",im.size,(72,72,72,255))
-    bg.alpha_composite(im)
-    return bg.convert("RGB")
-def rect_mask(size,box):
-    m=Image.new("L",size,0)
-    d=ImageDraw.Draw(m)
-    d.rectangle((box[0],box[1],box[2]-1,box[3]-1),fill=255)
-    return m
-def shear_rgba(im,s):
-    extra=max(6,int(math.ceil(abs(s)*im.height))+8)
-    canvas=Image.new("RGBA",(im.width+extra*2,im.height),(0,0,0,0))
-    canvas.paste(im,(extra,0),im)
-    coeff=(1,-s,s*canvas.height,0,1,0)
-    z=canvas.transform(canvas.size,Image.Transform.AFFINE,coeff,resample=Image.Resampling.BICUBIC)
-    bb=z.getchannel("A").getbbox()
-    if not bb:
-        raise RuntimeError("empty sheared layer")
-    return z.crop(bb)
-
-if sha(source)!=SOURCE_SHA:
-    raise RuntimeError(("source SHA",sha(source),SOURCE_SHA))
-if sha(candidate)!=INPUT_SHA:
-    raise RuntimeError(("input candidate SHA",sha(candidate),INPUT_SHA))
+def balpha(im): return im.getchannel("A").point(lambda v:255 if v else 0)
+def median_rgba(vals):
+    return tuple(int(round(statistics.median([v[i] for v in vals]))) for i in range(4))
 
 sb=source.read_bytes()
-if sb[:4]!=b"DDS ":
-    raise RuntimeError("not DDS")
-H,W,pitch,depth,mips=struct.unpack_from("<5I",sb,12)
-pf=struct.unpack_from("<8I",sb,76)
-if (W,H,pitch,depth,mips)!=(4096,4096,16384,1,1):
-    raise RuntimeError((W,H,pitch,depth,mips))
-if pf[1:]!=(65,0,32,0xff,0xff00,0xff0000,0xff000000):
-    raise RuntimeError(("pixel format",pf))
-if len(sb)!=128+W*H*4:
-    raise RuntimeError(("byte size",len(sb)))
+if git_blob_sha1(sb)!=SOURCE_BLOB_SHA1:
+    raise RuntimeError(("source git blob mismatch",git_blob_sha1(sb),SOURCE_BLOB_SHA1))
+ab=atlas.read_bytes()
+if git_blob_sha1(ab)!=ATLAS_BLOB_SHA1:
+    raise RuntimeError(("atlas git blob mismatch",git_blob_sha1(ab),ATLAS_BLOB_SHA1))
+SOURCE_SHA=hashlib.sha256(sb).hexdigest()
+if sb[:4]!=b"DDS " or sb[84:88]!=b"DXT5":
+    raise RuntimeError(("not DXT5",sb[:4],sb[84:88]))
+H,W=struct.unpack_from("<2I",sb,12)
+if (W,H)!=(2048,256) or len(sb)!=524416:
+    raise RuntimeError(("structure",W,H,len(sb)))
 
-src_raw=Image.frombytes("RGBA",(W,H),sb[128:],"raw","RGBA")
-src=src_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+raw_source=Image.open(source).convert("RGBA")
+source_readable=raw_source.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+aj=json.loads(atlas.read_text(encoding="utf-8"))
+if aj.get("regions_count")!=1 or aj["regions"][0]["rect"]!=[0,0,2048,256]:
+    raise RuntimeError(("atlas drift",aj.get("regions_count"),aj["regions"][0]["rect"]))
 
-ib=candidate.read_bytes()
-if ib[:128]!=sb[:128]:
-    raise RuntimeError("input header mismatch")
-old_raw=Image.frombytes("RGBA",(W,H),ib[128:],"raw","RGBA")
-old=old_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+pix=source_readable.load()
+alpha=source_readable.getchannel("A")
+panel_bbox=alpha.getbbox()
+if not panel_bbox:
+    raise RuntimeError("empty source")
 
-clean=Image.open(clean_path).convert("RGBA")
-source_mask=Image.open(source_mask_path).convert("L")
-clean_protected=Image.open(clean_protected_path).convert("L")
-if any(im.size!=(W,H) for im in (clean,source_mask,clean_protected)):
-    raise RuntimeError("evidence size mismatch")
+# White/gray source glyph seed; the dark navy plate is excluded.
+seed=Image.new("L",(W,H),0); sp=seed.load()
+for y in range(panel_bbox[1],panel_bbox[3]):
+    for x in range(panel_bbox[0],panel_bbox[2]):
+        r,g,b,a=pix[x,y]
+        if a>32 and min(r,g,b)>=105 and (max(r,g,b)-min(r,g,b))<=85:
+            sp[x,y]=255
+seed_bbox=seed.getbbox()
+if not seed_bbox:
+    raise RuntimeError("source text bright seed missing")
 
-a8_report=json.loads(a8_report_path.read_text(encoding="utf-8"))
-a8_rows={r["key"]:r for r in a8_report["reworked_rows"]}
-if set(a8_rows)!=set(rework_keys):
-    raise RuntimeError(("unexpected A8 rework keys",sorted(a8_rows)))
+active_rows=[]
+for y in range(seed_bbox[1],seed_bbox[3]):
+    if seed.crop((seed_bbox[0],y,seed_bbox[2],y+1)).getbbox():
+        active_rows.append(y)
+if len(active_rows)<10:
+    raise RuntimeError(("too few text rows",len(active_rows)))
+gaps=[(active_rows[i+1]-active_rows[i],active_rows[i],active_rows[i+1]) for i in range(len(active_rows)-1)]
+gap,gy1,gy2=max(gaps)
+if gap<8:
+    raise RuntimeError(("two-line split not proven",gap,gy1,gy2))
+split=(gy1+gy2)//2
 
-c109=json.loads(c109_path.read_text(encoding="utf-8"))
-if c109.get("candidate_sha256")!=INPUT_SHA:
-    raise RuntimeError(("C109 candidate mismatch",c109.get("candidate_sha256"),INPUT_SHA))
-rows0=list(c109["rows"])
-if len(rows0)!=29:
-    raise RuntimeError(("C109 row count",len(rows0)))
-bykey={r["key"]:r for r in rows0}
-for k in rework_keys:
-    if k not in bykey:
-        raise RuntimeError(("missing C109 row",k))
-
-src_png=out/"FD90AA9_SOURCE_READABLE.png"
-clean_png=out/"FD90AA9_CLEAN_PLATE.png"
-mask_png=out/"FD90AA9_SOURCE_TEXT_MASK.png"
-protected_png=out/"FD90AA9_CLEAN_PLATE_PROTECTED_MASK.png"
-src.save(src_png); clean.save(clean_png); source_mask.save(mask_png); clean_protected.save(protected_png)
-subprocess.run([
-    "python3",str(validator),str(src_png),str(clean_png),str(mask_png),
-    "--protected-mask",str(protected_png),
-    "--report",str(out/"A_RECOVERY13_CLEAN_PLATE_VALIDATION.json")
-],check=True)
-clean_rep=json.loads((out/"A_RECOVERY13_CLEAN_PLATE_VALIDATION.json").read_text(encoding="utf-8"))
-if clean_rep["status"]!="PASS":
-    raise RuntimeError(("clean plate validator",clean_rep))
-
-final=old.copy()
-new_masks={}
-new_rows={}
-style_meta={}
-
-for key in rework_keys:
-    a8r=a8_rows[key]
-    oldlb=list(map(int,a8r["localized_bbox"]))
-    zone=list(map(int,a8r["placement_zone"]))
-    ob=list(map(int,a8r["original_bbox"]))
-
-    old_crop=old.crop(tuple(oldlb))
-    clean_crop=clean.crop(tuple(oldlb))
-    dm=dmask(clean_crop,old_crop)
-    db=dm.getbbox()
-    if not db:
-        raise RuntimeError(("empty localized delta",key,oldlb))
-
-    layer=Image.new("RGBA",(db[2]-db[0],db[3]-db[1]),(0,0,0,0))
-    layer.paste(old_crop.crop(db),(0,0),dm.crop(db))
-    slanted=shear_rgba(layer,shear_by_key[key])
-
-    old_actual=[oldlb[0]+db[0],oldlb[1]+db[1],oldlb[0]+db[2],oldlb[1]+db[3]]
-    cx=(old_actual[0]+old_actual[2])/2.0
-    bottom=old_actual[3]
-    tx=int(round(cx-slanted.width/2.0))
-    ty=int(round(bottom-slanted.height))
-
-    inset=2
-    fit=[max(zone[0],ob[0])+inset,max(zone[1],ob[1])+inset,
-         min(zone[2],ob[2])-inset,min(zone[3],ob[3])-inset]
-    maxw=fit[2]-fit[0]; maxh=fit[3]-fit[1]
-    if maxw<=0 or maxh<=0:
-        raise RuntimeError(("invalid fit zone",key,fit))
-    if slanted.width>maxw or slanted.height>maxh:
-        sc=min(maxw/slanted.width,maxh/slanted.height)
-        if sc<=0:
-            raise RuntimeError(("no fit",key,slanted.size,fit))
-        slanted=slanted.resize((max(1,int(slanted.width*sc)),max(1,int(slanted.height*sc))),Image.Resampling.LANCZOS)
-        tx=int(round(cx-slanted.width/2.0))
-        ty=int(round(bottom-slanted.height))
-    tx=min(max(tx,fit[0]),fit[2]-slanted.width)
-    ty=min(max(ty,fit[1]),fit[3]-slanted.height)
-
-    final.paste(clean_crop,(oldlb[0],oldlb[1]))
-    final.alpha_composite(slanted,(tx,ty))
-
-    z=tuple(zone)
-    lm=dmask(clean.crop(z),final.crop(z))
-    bb=lm.getbbox()
-    if not bb:
-        raise RuntimeError(("final localized layer missing",key))
-    loc=[zone[0]+bb[0],zone[1]+bb[1],zone[0]+bb[2],zone[1]+bb[3]]
-    gm=Image.new("L",(W,H),0); gm.paste(lm,(zone[0],zone[1]))
-    new_masks[key]=gm
-
-    contain=loc[0]>=ob[0] and loc[1]>=ob[1] and loc[2]<=ob[2] and loc[3]<=ob[3]
-    size_ok=(loc[2]-loc[0])<=(ob[2]-ob[0]) and (loc[3]-loc[1])<=(ob[3]-ob[1])
-    positive=loc[0]>ob[0] and loc[1]>ob[1] and loc[2]<ob[2] and loc[3]<ob[3]
-    new_rows[key]={
-        "key":key,"source":a8r["source"],"korean":a8r["korean"],
-        "original_bbox":ob,"localized_bbox":loc,
-        "delta_left":loc[0]-ob[0],"delta_right":ob[2]-loc[2],
-        "delta_top":loc[1]-ob[1],"delta_bottom":ob[3]-loc[3],
-        "source_width":ob[2]-ob[0],"source_height":ob[3]-ob[1],
-        "localized_width":loc[2]-loc[0],"localized_height":loc[3]-loc[1],
-        "containment":"PASS" if contain else "FAIL",
-        "size_ceiling":"PASS" if size_ok else "FAIL",
-        "positive_margin":"PASS" if positive else "EDGE_TOUCH_OR_FAIL",
-        "raw_original_bbox":[ob[0],H-ob[3],ob[2],H-ob[1]],
-        "raw_localized_bbox":[loc[0],H-loc[3],loc[2],H-loc[1]],
-        "raw_containment":"PASS" if contain else "FAIL",
-        "placement_zone":zone,"shear":shear_by_key[key],
-        "rework_status":"A_RECOVERY13_SOURCE_SLANT_RERENDER"
-    }
-    style_meta[key]={
-        "shear":shear_by_key[key],
-        "input_actual_bbox":old_actual,
-        "fit_zone":fit,
-        "new_bbox":loc
-    }
-
-four_union=Image.new("L",(W,H),0)
-ud=ImageDraw.Draw(four_union)
-for key in rework_keys:
-    ob=bykey[key]["original_bbox"]
-    ud.rectangle((ob[0],ob[1],ob[2]-1,ob[3]-1),fill=255)
-vs_input=dmask(old,final)
-changes_vs_input_out=count(ImageChops.multiply(vs_input,ImageOps.invert(four_union)))
-
-unaffected_diffs={}
-for r in rows0:
-    key=r["key"]
-    if key in rework_keys:
+# Estimate the exact plate background per row from both side margins and linearly
+# interpolate across x. This removes only the source glyph/effect pixels.
+px1,py1,px2,py2=panel_bbox
+pw=px2-px1
+strip=max(24,min(160,pw//8))
+bg_lr={}
+for y in range(py1,py2):
+    left=[]; right=[]
+    for x in range(px1,min(px2,px1+strip)):
+        v=pix[x,y]
+        if v[3]>0 and not sp[x,y]: left.append(v)
+    for x in range(max(px1,px2-strip),px2):
+        v=pix[x,y]
+        if v[3]>0 and not sp[x,y]: right.append(v)
+    allv=left+right
+    if len(allv)<8:
+        # nearest usable neighboring row will be filled later
         continue
-    # Source bboxes overlap semantically adjacent rows in this atlas, so preservation
-    # is measured on the accepted localized layer bbox itself. Global confinement to
-    # the four returned source bboxes is checked separately below.
-    lb=tuple(map(int,r["localized_bbox"]))
-    unaffected_diffs[key]=count(dmask(old.crop(lb),final.crop(lb)))
+    bg_lr[y]=(median_rgba(left if left else allv),median_rgba(right if right else allv))
+if not bg_lr:
+    raise RuntimeError("background samples missing")
+ys=sorted(bg_lr)
+for y in range(py1,py2):
+    if y in bg_lr: continue
+    nearest=min(ys,key=lambda yy:abs(yy-y))
+    bg_lr[y]=bg_lr[nearest]
 
-pair_overlap={}
-touch_pairs=[]
-for i,k1 in enumerate(rework_keys):
-    for k2 in rework_keys[i+1:]:
-        ov=count(ImageChops.multiply(new_masks[k1],new_masks[k2]))
-        if ov:
-            pair_overlap[f"{k1}|{k2}"]=ov
-        if count(ImageChops.multiply(new_masks[k1].filter(ImageFilter.MaxFilter(3)),new_masks[k2]))>0:
-            touch_pairs.append([k1,k2])
+def expected_bg(x,y):
+    l,r=bg_lr[y]
+    t=0.5 if pw<=1 else max(0.0,min(1.0,(x-px1)/(pw-1)))
+    return tuple(int(round(l[i]*(1-t)+r[i]*t)) for i in range(4))
 
-preserved_guard_conflicts={}
-for key in rework_keys:
-    dil=new_masks[key].filter(ImageFilter.MaxFilter(3))
-    for r in rows0:
-        pk=r["key"]
-        if pk in rework_keys:
+near=seed.filter(ImageFilter.MaxFilter(21))
+np=near.load()
+effect=Image.new("L",(W,H),0); ep=effect.load()
+env_y1=max(py1,seed_bbox[1]-12); env_y2=min(py2,seed_bbox[3]+12)
+for y in range(env_y1,env_y2):
+    for x in range(px1,px2):
+        if not np[x,y]:
             continue
-        pm=rect_mask((W,H),list(map(int,r["localized_bbox"])))
-        c=count(ImageChops.multiply(dil,pm))
-        if c:
-            preserved_guard_conflicts[f"{key}|{pk}"]=c
+        v=pix[x,y]; e=expected_bg(x,y)
+        dist=sum(abs(v[i]-e[i]) for i in range(4))
+        if dist>=18 or sp[x,y]:
+            ep[x,y]=255
 
+def bbox_half(y1,y2):
+    bb=effect.crop((px1,y1,px2,y2)).getbbox()
+    if not bb: return None
+    return [px1+bb[0],y1+bb[1],px1+bb[2],y1+bb[3]]
+
+line1=bbox_half(env_y1,split)
+line2=bbox_half(split,env_y2)
+if not line1 or not line2:
+    raise RuntimeError(("line effect bbox missing",line1,line2))
+if line1[3]>=line2[1]:
+    raise RuntimeError(("line effects overlap",line1,line2))
+source_bboxes=[line1,line2]
+
+# Exact DXT5 block splice is safe only if the exact source effect bboxes align to 4x4 blocks.
+block_aligned=all(v%4==0 for box in source_bboxes for v in box)
+if not block_aligned:
+    report={
+      "schema_version":1,"role":"A","run":run,"index":99,"asset":asset_rel,
+      "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB_SHA1,"sha256":SOURCE_SHA,
+        "path":"Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds","classification":"authoritative HD source; DDS 2048x256 DXT5"},
+      "source_effect_bboxes":source_bboxes,
+      "status":"A_PRODUCTION17_FAIL_CLOSED_DXT5_EXACT_BBOX_NOT_BLOCK_ALIGNED",
+      "runtime_validation":"UNTESTED"
+    }
+    (out/"A_PRODUCTION17_4F68708E_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    (wr/"A_PRODUCTION17_4F68708E.json").write_text(json.dumps({"run":run,"asset":"4F68708E","index":99,"worker_status":report["status"],"runtime_validation":"UNTESTED","report":"localization/graphics/role_A/20261005-A-PRODUCTION17/A_PRODUCTION17_4F68708E_REPORT.json"},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    print(json.dumps(report,ensure_ascii=False,indent=2))
+    raise SystemExit(3)
+
+source_text_mask=effect
+allowed=Image.new("L",(W,H),0); ad=ImageDraw.Draw(allowed)
+for b in source_bboxes:
+    ad.rectangle((b[0],b[1],b[2]-1,b[3]-1),fill=255)
+source_visible=balpha(source_readable)
+protected_visible=ImageChops.multiply(source_visible,ImageOps.invert(allowed))
+clean_protected=ImageChops.multiply(source_visible,ImageOps.invert(source_text_mask))
+
+clean=source_readable.copy(); cp=clean.load()
+for y in range(H):
+    for x in range(W):
+        if ep[x,y]:
+            cp[x,y]=expected_bg(x,y)
+
+source_png=out/"4F68708E_HD_SOURCE_READABLE.png"
+clean_png=out/"4F68708E_HD_CLEAN_PLATE.png"
+mask_png=out/"4F68708E_HD_SOURCE_TEXT_MASK.png"
+allowed_png=out/"4F68708E_HD_ALLOWED_SOURCE_BBOX_MASK.png"
+protected_png=out/"4F68708E_HD_PROTECTED_VISIBLE_MASK.png"
+clean_protected_png=out/"4F68708E_HD_CLEAN_PROTECTED_VISIBLE_MASK.png"
+source_readable.save(source_png); clean.save(clean_png); source_text_mask.save(mask_png); allowed.save(allowed_png); protected_visible.save(protected_png); clean_protected.save(clean_protected_png)
+
+subprocess.run([
+ "python3",str(validator),str(source_png),str(clean_png),str(mask_png),
+ "--protected-mask",str(clean_protected_png),
+ "--report",str(out/"A_PRODUCTION17_CLEAN_PLATE_VALIDATION.json")
+],check=True)
+clean_rep=json.loads((out/"A_PRODUCTION17_CLEAN_PLATE_VALIDATION.json").read_text(encoding="utf-8"))
+if clean_rep["status"]!="PASS":
+    raise RuntimeError(("clean validator",clean_rep))
+source_mask_unchanged=count(ImageChops.multiply(source_text_mask,ImageOps.invert(dmask(source_readable,clean))))
+if source_mask_unchanged!=0:
+    raise RuntimeError(("source effect unchanged in clean",source_mask_unchanged))
+
+def resolve_font():
+    pats=["Noto Sans CJK KR:style=Medium","Noto Sans CJK KR:style=Regular","Noto Sans CJK KR:style=Bold","Noto Sans CJK KR"]
+    for pat in pats:
+        try: fp=subprocess.check_output(["fc-match","-f","%{file}",pat],text=True).strip()
+        except Exception: fp=""
+        if fp and Path(fp).exists() and "NotoSansCJK" in Path(fp).name:
+            return fp
+    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
+    for pat in pats:
+        fp=subprocess.check_output(["fc-match","-f","%{file}",pat],text=True).strip()
+        if fp and Path(fp).exists(): return fp
+    raise RuntimeError("Noto CJK Korean unavailable")
+FONT=resolve_font()
+
+# Source fill median from bright seed.
+seed_vals=[]
+for y in range(seed_bbox[1],seed_bbox[3]):
+    for x in range(seed_bbox[0],seed_bbox[2]):
+        if sp[x,y]: seed_vals.append(pix[x,y])
+fill_color=median_rgba(seed_vals)
+
+# Source has a subtle dark lower-right effect; infer a dark effect color from pixels
+# inside source effect that are darker than the expected plate background.
+dark_vals=[]
+for y in range(env_y1,env_y2):
+    for x in range(px1,px2):
+        if not ep[x,y] or sp[x,y]: continue
+        v=pix[x,y]; e=expected_bg(x,y)
+        lv=v[0]+v[1]+v[2]; le=e[0]+e[1]+e[2]
+        if lv+12<le: dark_vals.append(v)
+shadow_color=median_rgba(dark_vals) if dark_vals else (0,0,0,150)
+shadow_enabled=len(dark_vals)>=20
+
+def shear_mask(m,shear):
+    extra=max(6,int(math.ceil(abs(shear)*m.height))+8)
+    canvas=Image.new("L",(m.width+extra*2,m.height),0)
+    canvas.paste(m,(extra,0))
+    coeff=(1,-shear,shear*canvas.height,0,1,0)
+    z=canvas.transform(canvas.size,Image.Transform.AFFINE,coeff,resample=Image.Resampling.BICUBIC)
+    bb=z.getbbox()
+    return z.crop(bb) if bb else z
+
+def build_line(text,fs):
+    font=ImageFont.truetype(FONT,fs)
+    d=ImageDraw.Draw(Image.new("L",(8,8),0))
+    tb=d.textbbox((0,0),text,font=font,stroke_width=0)
+    pad=max(8,fs//6)
+    m=Image.new("L",(tb[2]-tb[0]+pad*2,tb[3]-tb[1]+pad*2),0)
+    ImageDraw.Draw(m).text((pad-tb[0],pad-tb[1]),text,font=font,fill=255)
+    bb=m.getbbox(); m=m.crop(bb)
+    m=shear_mask(m,0.22)
+    dx=max(2,round(fs*0.045)); dy=max(2,round(fs*0.045))
+    extra_x=dx+4 if shadow_enabled else 2
+    extra_y=dy+4 if shadow_enabled else 2
+    layer=Image.new("RGBA",(m.width+extra_x,m.height+extra_y),(0,0,0,0))
+    if shadow_enabled:
+        sh=Image.new("RGBA",layer.size,(shadow_color[0],shadow_color[1],shadow_color[2],shadow_color[3]))
+        sm=Image.new("L",layer.size,0); sm.paste(m,(dx,dy))
+        layer.paste(sh,(0,0),sm)
+    fill=Image.new("RGBA",layer.size,fill_color)
+    fm=Image.new("L",layer.size,0); fm.paste(m,(0,0))
+    layer.paste(fill,(0,0),fm)
+    bb=layer.getchannel("A").getbbox()
+    return layer.crop(bb),dx,dy
+
+texts=["고스트 카와 달리며","코스 기록에 도전하세요!"]
+max_h=min(b[3]-b[1] for b in source_bboxes)
+chosen=None
+for fs in range(max(18,int(max_h*1.25)),15,-1):
+    built=[build_line(t,fs) for t in texts]
+    ok=True
+    for (layer,dx,dy),ob in zip(built,source_bboxes):
+        if layer.width>=(ob[2]-ob[0])-4 or layer.height>=(ob[3]-ob[1])-4:
+            ok=False; break
+    if ok:
+        chosen=(fs,built); break
+if chosen is None:
+    raise RuntimeError(("Korean fit failed",source_bboxes))
+font_size,built=chosen
+
+final=clean.copy()
+pre_rows=[]
+intended_masks=[]
+for key,src_txt,ko_txt,ob,built_line in zip(
+    ["line1","line2"],
+    ["Drive against the Ghost Car","and challenge for the course record!!"],
+    texts,source_bboxes,built):
+    layer,dx,dy=built_line
+    bw,bh=ob[2]-ob[0],ob[3]-ob[1]
+    tx=ob[0]+(bw-layer.width)//2
+    ty=ob[1]+(bh-layer.height)//2
+    if tx<=ob[0]: tx=ob[0]+2
+    if ty<=ob[1]: ty=ob[1]+2
+    if tx+layer.width>=ob[2]: tx=ob[2]-layer.width-2
+    if ty+layer.height>=ob[3]: ty=ob[3]-layer.height-2
+    final.alpha_composite(layer,(tx,ty))
+    lm=Image.new("L",(W,H),0); lm.paste(layer.getchannel("A").point(lambda v:255 if v else 0),(tx,ty))
+    intended_masks.append((key,lm))
+    pre_rows.append({
+      "key":key,"source":src_txt,"korean":ko_txt,"original_bbox":ob,
+      "preencode_bbox":[tx,ty,tx+layer.width,ty+layer.height],
+      "font":"Noto Sans CJK KR Medium/Regular","font_size":font_size,
+      "style":"shared two-line source family: white/gray italic sans + subtle dark lower-right effect",
+      "shear":0.22,"shadow_enabled":shadow_enabled,"shadow_offset":[dx,dy]
+    })
+
+# DXT5 encode the full raw-oriented frame, then splice only exact source-bbox blocks.
+exe=shutil.which("convert") or shutil.which("magick")
+if not exe:
+    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+    subprocess.run(["sudo","apt-get","install","-y","-qq","imagemagick"],check=True)
+    exe=shutil.which("convert") or shutil.which("magick")
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-outb=sb[:128]+raw_final.tobytes("raw","RGBA")
-candidate.write_bytes(outb)
-csha=sha(candidate)
-decoded_raw=Image.frombytes("RGBA",(W,H),outb[128:],"raw","RGBA")
-decoded=decoded_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-if ImageChops.difference(decoded,final).getbbox() is not None:
-    raise RuntimeError("RGBA roundtrip mismatch")
-if candidate.read_bytes()[:128]!=sb[:128]:
-    raise RuntimeError("final header mismatch")
+png=work/"raw_final.png"; encp=work/"encoded_full.dds"
+raw_final.save(png)
+cmd=[exe]+(["convert"] if Path(exe).name=="magick" else [])+[str(png),"-define","dds:compression=dxt5","-define","dds:mipmaps=0",str(encp)]
+subprocess.run(cmd,check=True)
+enc=encp.read_bytes()
+if len(enc)!=len(sb) or enc[:4]!=b"DDS " or enc[84:88]!=b"DXT5":
+    raise RuntimeError(("DXT5 encode structure",len(enc),enc[:4],enc[84:88]))
 
-outside_four=count(ImageChops.multiply(dmask(old,decoded),ImageOps.invert(four_union)))
+outb=bytearray(sb)
+bw=W//4
+touched=set()
+for ob in source_bboxes:
+    rx1,ry1,rx2,ry2=ob
+    raw_y1=H-ry2; raw_y2=H-ry1
+    for by in range(raw_y1//4,raw_y2//4):
+        for bx in range(rx1//4,rx2//4):
+            touched.add((bx,by))
+for bx,by in touched:
+    p=128+(by*bw+bx)*16
+    outb[p:p+16]=enc[p:p+16]
+candidate.write_bytes(outb)
+CANDIDATE_SHA=sha256(candidate)
+if candidate.read_bytes()[:128]!=sb[:128]:
+    raise RuntimeError("source DDS header changed")
+
+decoded_raw=Image.open(candidate).convert("RGBA")
+decoded=decoded_raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+decoded_png=out/"4F68708E_HD_FINAL_DECODED_READABLE.png"
+decoded.save(decoded_png)
+
+subprocess.run([
+ "python3",str(validator),str(source_png),str(decoded_png),str(allowed_png),
+ "--protected-mask",str(protected_png),
+ "--report",str(out/"A_PRODUCTION17_FINAL_MASK_VALIDATION.json")
+],check=True)
+final_rep=json.loads((out/"A_PRODUCTION17_FINAL_MASK_VALIDATION.json").read_text(encoding="utf-8"))
+if final_rep["status"]!="PASS":
+    raise RuntimeError(("final validator",final_rep))
+
+diff=dmask(source_readable,decoded)
+outside=count(ImageChops.multiply(diff,ImageOps.invert(allowed)))
+alpha_delta=ImageChops.difference(source_readable.getchannel("A"),decoded.getchannel("A")).point(lambda v:255 if v else 0)
+alpha_outside=count(ImageChops.multiply(alpha_delta,ImageOps.invert(allowed)))
+protected_changed=count(ImageChops.multiply(diff,protected_visible))
 
 rows=[]
-for r in rows0:
-    key=r["key"]
-    if key in rework_keys:
-        rows.append(new_rows[key])
-    else:
-        rr=dict(r)
-        rr["rework_status"]="C109_PASS_PRESERVED_PIXEL_EXACT"
-        rows.append(rr)
+for pre,(key,lm) in zip(pre_rows,intended_masks):
+    ob=pre["original_bbox"]
+    bb=lm.getbbox()
+    loc=list(bb) if bb else None
+    ok=loc is not None and loc[0]>=ob[0] and loc[1]>=ob[1] and loc[2]<=ob[2] and loc[3]<=ob[3]
+    size_ok=loc is not None and loc[2]-loc[0]<=ob[2]-ob[0] and loc[3]-loc[1]<=ob[3]-ob[1]
+    positive=loc is not None and loc[0]>ob[0] and loc[1]>ob[1] and loc[2]<ob[2] and loc[3]<ob[3]
+    row=dict(pre)
+    row.update({
+      "localized_bbox":loc,
+      "source_width":ob[2]-ob[0],"source_height":ob[3]-ob[1],
+      "localized_width":loc[2]-loc[0] if loc else None,"localized_height":loc[3]-loc[1] if loc else None,
+      "delta_left":loc[0]-ob[0] if loc else None,"delta_right":ob[2]-loc[2] if loc else None,
+      "delta_top":loc[1]-ob[1] if loc else None,"delta_bottom":ob[3]-loc[3] if loc else None,
+      "containment":"PASS" if ok else "FAIL","size_ceiling":"PASS" if size_ok else "FAIL",
+      "positive_margin":"PASS" if positive else "EDGE_TOUCH_OR_FAIL",
+      "raw_original_bbox":[ob[0],H-ob[3],ob[2],H-ob[1]],
+      "raw_localized_bbox":[loc[0],H-loc[3],loc[2],H-loc[1]] if loc else None,
+      "raw_containment":"PASS" if ok else "FAIL",
+      "rework_status":"A_PRODUCTION17_NEW_EXACT_HD_CANDIDATE"
+    })
+    rows.append(row)
 
-all_bbox=all(r.get("containment")=="PASS" for r in rows)
-all_size=all(r.get("size_ceiling")=="PASS" for r in rows)
-all_changed_positive=all(new_rows[k]["positive_margin"]=="PASS" for k in rework_keys)
-all_unaffected_zero=all(v==0 for v in unaffected_diffs.values())
-pair_overlap_total=sum(pair_overlap.values())
+label_overlap=count(ImageChops.multiply(intended_masks[0][1],intended_masks[1][1]))
+label_touch=count(ImageChops.multiply(intended_masks[0][1].filter(ImageFilter.MaxFilter(3)),intended_masks[1][1]))
+all_bbox=all(r["containment"]=="PASS" and r["raw_containment"]=="PASS" for r in rows)
+all_size=all(r["size_ceiling"]=="PASS" for r in rows)
+all_positive=all(r["positive_margin"]=="PASS" for r in rows)
 
-decoded.save(out/"FD90AA9_FINAL_READABLE.png")
-gray(decoded).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A_RECOVERY13_FINAL_READABLE_GRAY_QA.jpg",quality=95)
-gray(decoded_raw).resize((1024,1024),Image.Resampling.LANCZOS).save(out/"A_RECOVERY13_FINAL_RAW_GRAY_QA.jpg",quality=95)
+# Visual evidence.
+def gray(im):
+    bg=Image.new("RGBA",im.size,(96,96,96,255)); bg.alpha_composite(im); return bg.convert("RGB")
+sheet=Image.new("RGB",(W,H*3),(70,70,70))
+sheet.paste(gray(source_readable),(0,0)); sheet.paste(gray(clean),(0,H)); sheet.paste(gray(decoded),(0,H*2))
+sheet.save(out/"A_PRODUCTION17_SOURCE_CLEAN_FINAL_GRAY.jpg",quality=96)
+gray(decoded_raw).save(out/"A_PRODUCTION17_FINAL_RAW_GRAY.jpg",quality=96)
 
-font=ImageFont.load_default()
 contacts=[]
-for key in rework_keys:
-    ob=list(map(int,bykey[key]["original_bbox"]))
-    m=20
+for r in rows:
+    ob=r["original_bbox"]; m=12
     box=(max(0,ob[0]-m),max(0,ob[1]-m),min(W,ob[2]+m),min(H,ob[3]+m))
-    ims=[gray(x.crop(box)) for x in (src,old,decoded)]
-    total=sum(x.width for x in ims)+24
-    if total>1800:
-        sc=(1800-24)/sum(x.width for x in ims)
-        ims=[x.resize((max(1,int(x.width*sc)),max(1,int(x.height*sc))),Image.Resampling.LANCZOS) for x in ims]
-    row=Image.new("RGB",(sum(x.width for x in ims)+24,max(x.height for x in ims)+24),(235,235,235))
-    xx=0
-    for im in ims:
-        row.paste(im,(xx,24)); xx+=im.width+12
-    ImageDraw.Draw(row).text((3,3),key+" SOURCE | OLD | NEW",font=font,fill=(0,0,0))
-    contacts.append(row)
-cw=max(x.width for x in contacts); ch=sum(x.height for x in contacts)+4*(len(contacts)-1)
-sheet=Image.new("RGB",(cw,ch),(240,240,240)); yy=0
-for x in contacts:
-    sheet.paste(x,(0,yy)); yy+=x.height+4
-sheet.save(out/"A_RECOVERY13_STYLE_RETURN_CONTACT_SOURCE_OLD_NEW.jpg",quality=96)
+    a=gray(source_readable.crop(box)); b=gray(decoded.crop(box))
+    rowim=Image.new("RGB",(a.width+b.width+12,max(a.height,b.height)+24),(235,235,235))
+    rowim.paste(a,(0,24)); rowim.paste(b,(a.width+12,24))
+    ImageDraw.Draw(rowim).text((3,2),r["key"]+" SOURCE | FINAL",fill=(0,0,0))
+    contacts.append(rowim)
+cw=max(x.width for x in contacts); ch=sum(x.height for x in contacts)+4
+cs=Image.new("RGB",(cw,ch),(235,235,235)); yy=0
+for x in contacts: cs.paste(x,(0,yy)); yy+=x.height+4
+cs.save(out/"A_PRODUCTION17_LINE_CONTACT_SOURCE_FINAL.jpg",quality=96)
 
-status=(
-    clean_rep["status"]=="PASS" and all_bbox and all_size and all_changed_positive and
-    all_unaffected_zero and changes_vs_input_out==0 and outside_four==0 and
-    pair_overlap_total==0 and not touch_pairs and not preserved_guard_conflicts
+status_ok=(
+ clean_rep["status"]=="PASS" and final_rep["status"]=="PASS" and source_mask_unchanged==0
+ and all_bbox and all_size and all_positive and label_overlap==0 and label_touch==0
+ and outside==0 and alpha_outside==0 and protected_changed==0
 )
 
 report={
-    "schema_version":1,"role":"A","run":run,"worker":os.environ.get("OUTRUN_CPU_WORKER"),
-    "index":121,"asset":asset_rel,"source_sha256":SOURCE_SHA,
-    "input_candidate_sha256":INPUT_SHA,"candidate_sha256":csha,
-    "candidate_path":str(candidate.relative_to(repo)),
-    "structure":{"dimensions":[W,H],"format":"RGBA32","pitch":pitch,"mipmaps":mips,"header_128_exact_source":True,"raw_orientation":"mirror_y"},
-    "c109_return_reason":"source typography slant/italic mismatch on More Engine Sound and experts/normal-difficult rows",
-    "reworked_keys":rework_keys,"shear_by_key":shear_by_key,
-    "method":"preserve A_RECOVERY08 clean plate and source-family Korean fill/outline/effects; materially right-shear only the four C109-returned Korean layers inside their isolated placement zones; preserve the other 25 localized rows and all unrelated atlas pixels exact",
-    "clean_plate_validator":clean_rep,
-    "style_meta":style_meta,
-    "rows":rows,
-    "all_29_bbox_pass":all_bbox,
-    "all_29_size_ceiling_pass":all_size,
-    "all_4_reworked_positive_margin":all_changed_positive,
-    "localized_pair_overlap_pixels_reworked":pair_overlap_total,
-    "localized_pair_overlaps_reworked":pair_overlap,
-    "localized_touch_pairs_reworked":touch_pairs,
-    "reworked_vs_preserved_1px_guard_conflicts":preserved_guard_conflicts,
-    "changes_vs_input_outside_4_c109_returned_source_bboxes":changes_vs_input_out,
-    "decoded_changes_outside_4_c109_returned_source_bboxes":outside_four,
-    "preserved_25_input_pixel_diffs":unaffected_diffs,
-    "preserved_25_all_zero":all_unaffected_zero,
-    "controller_visual_qa":"PENDING_CONTROLLER_REVIEW",
-    "runtime_validation":"UNTESTED",
-    "status":"A_RECOVERY13_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status else "A_RECOVERY13_WORKER_REWORK_REQUIRED"
+ "schema_version":1,"role":"A","run":run,"worker":os.environ.get("OUTRUN_CPU_WORKER"),"base_head":os.environ.get("GITHUB_SHA"),
+ "index":99,"asset":asset_rel,
+ "source_provenance":{"repository":"Sonic-TV/OR2006Sprites","commit":COMMIT,"git_blob_sha1":SOURCE_BLOB_SHA1,
+   "sha256":SOURCE_SHA,"path":"Release/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+   "classification":"authoritative high-resolution source; DDS header 2048x256 DXT5"},
+ "source_sha256":SOURCE_SHA,"candidate_sha256":CANDIDATE_SHA,"candidate_path":str(candidate.relative_to(repo)),
+ "structure":{"dimensions":[W,H],"compression":"DXT5","bytes":len(sb),"header_128_exact":True,"raw_orientation":"mirror_y","source_effect_bboxes_block_aligned":block_aligned},
+ "translation":{"source":"Drive against the Ghost Car and challenge for the course record!!",
+   "korean":"고스트 카와 달리며 코스 기록에 도전하세요!",
+   "line_mapping":[{"source":"Drive against the Ghost Car","korean":texts[0]},{"source":"and challenge for the course record!!","korean":texts[1]}]},
+ "source_panel_bbox":panel_bbox,"source_seed_bbox":seed_bbox,"source_effect_bboxes":source_bboxes,
+ "source_style":{"fill_median":fill_color,"shadow_enabled":shadow_enabled,"shadow_median":shadow_color,"shared_line_shear":0.22,"shared_font_size":font_size},
+ "clean_plate_validator":clean_rep,"final_mask_validator":final_rep,
+ "source_mask_pixels_unchanged_in_clean":source_mask_unchanged,
+ "rows":rows,"all_2_readable_and_raw_bbox_pass":all_bbox,"all_2_size_ceiling_pass":all_size,"all_2_positive_margin":all_positive,
+ "localized_label_overlap_pixels":label_overlap,"localized_label_touch_pixels":label_touch,
+ "dxt5_touched_blocks":len(touched),
+ "decoded_changes":{"changed_pixels_total":count(diff),"changed_pixels_outside_source_bboxes":outside,
+   "alpha_changed_pixels_outside_source_bboxes":alpha_outside,"protected_visible_pixels_changed":protected_changed},
+ "controller_visual_qa":"PENDING_CONTROLLER_REVIEW","runtime_validation":"UNTESTED",
+ "status":"A_PRODUCTION17_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA" if status_ok else "A_PRODUCTION17_WORKER_REWORK_REQUIRED"
 }
-(out/"A_RECOVERY13_FD90AA9_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"A_PRODUCTION17_4F68708E_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 summary={
-    "run":run,"asset":"FD90AA9","index":121,
-    "input_candidate_sha256":INPUT_SHA,"candidate_sha256":csha,
-    "reworked_rows":4,"preserved_rows":25,
-    "bbox_pass":"29/29" if all_bbox else "FAIL",
-    "size_ceiling":"29/29" if all_size else "FAIL",
-    "reworked_positive_margin":"4/4" if all_changed_positive else "FAIL",
-    "clean_plate_validator":clean_rep["status"],
-    "reworked_pair_overlap_pixels":pair_overlap_total,
-    "reworked_touch_pairs":touch_pairs,
-    "reworked_vs_preserved_1px_guard_conflicts":preserved_guard_conflicts,
-    "changes_vs_input_outside_4_returned_source_bboxes":changes_vs_input_out,
-    "preserved_25_all_zero":all_unaffected_zero,
-    "worker_status":report["status"],
-    "runtime_validation":"UNTESTED",
-    "report":"localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FD90AA9_REPORT.json"
+ "run":run,"asset":"4F68708E","index":99,"source_sha256":SOURCE_SHA,"candidate_sha256":CANDIDATE_SHA,
+ "source_dimensions":[W,H],"compression":"DXT5","bbox_pass":"2/2" if all_bbox else "FAIL","size_ceiling":"2/2" if all_size else "FAIL",
+ "positive_margin":"2/2" if all_positive else "FAIL","clean_plate_validator":clean_rep["status"],"final_mask_validator":final_rep["status"],
+ "source_mask_pixels_unchanged_in_clean":source_mask_unchanged,"localized_label_overlap_pixels":label_overlap,"localized_label_touch_pixels":label_touch,
+ "changed_pixels_outside_source_bboxes":outside,"alpha_changed_pixels_outside_source_bboxes":alpha_outside,"protected_visible_pixels_changed":protected_changed,
+ "worker_status":report["status"],"runtime_validation":"UNTESTED",
+ "report":"localization/graphics/role_A/20261005-A-PRODUCTION17/A_PRODUCTION17_4F68708E_REPORT.json"
 }
-(wr/"A_RECOVERY13_FD90AA9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"A_PRODUCTION17_4F68708E.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False,indent=2))
-if not status:
-    raise SystemExit(2)
+if not status_ok: raise SystemExit(2)
