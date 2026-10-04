@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "run": "20261004-1529-C88",
+  "role": "C",
+  "timestamp_kst": "2026-10-04T15:29:12+09:00",
+  "branch": "korean-localization-recovery-20260928",
+  "initial_head_at_scan": "890ebd143723c9dc20b4e3c1fa1dcff702b0a49b",
+  "head_refreshes": [
+    "c0e0bd4b79dc0eead4b4a0ed432e48ae76d7f20a",
+    "71c3b08176764e5e63a1f4aa6e90321a50a459ca",
+    "a66fd18ed908699322c543976c0b0b3e20fa97df"
+  ],
+  "scope": {
+    "reason": "Continue cross-lane final QA without repeating C87-completed assets. Two concurrent A/B candidates landed during mandatory HEAD refreshes and were included before C persistence.",
+    "assets": [
+      "568D3696",
+      "FA7BBB13",
+      "C075FB49",
+      "2DA43E41"
+    ],
+    "queue_sanity": {
+      "rows": 137,
+      "localize_text": 79,
+      "zoom_review": 47,
+      "font_pipeline": 9,
+      "hangul_name_entry": 1,
+      "preserve_brand_song_credit": 1,
+      "direct_scope": 126
+    }
+  },
+  "assets": [
+    {
+      "asset": "568D3696",
+      "queue_index": 53,
+      "source_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+      "candidate_sha256": "2e18e459005323b37413e404b3adf31501cc92bbc3cd2b994a1c05bbdf3cef4d",
+      "producer_report": "localization/graphics/role_A/20261004-A-RECOVERY02/A_RECOVERY02_568D3696_REPORT.json",
+      "structure": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "DXT5",
+        "mipmaps": 13,
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "semantic_gate": "PASS_14_OF_14_REVIEWED_TRANSCRIPTIONS",
+      "decoded_bbox_gate": "PASS_14_OF_14",
+      "c85_failed_bbox_gate": "PASS_6_OF_6",
+      "prior_pass_localized_bbox_pixel_exact": "PASS_8_OF_8",
+      "c_exact_source_clean_plate_recheck": {
+        "status": "REWORK_REQUIRED",
+        "changed_pixels": 1204480,
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 856,
+        "protected_change_bbox": [
+          545,
+          2160,
+          2446,
+          2165
+        ],
+        "alpha_changed_outside_edit_mask": 0,
+        "source_text_protected_mask_overlap_pixels": 856,
+        "all_protected_changes_inside_mask_overlap": true,
+        "finding": "Persisted clean plate changes 856 pixels marked protected by its own protected mask; manual crop review confirms panel/artwork-edge damage."
+      },
+      "c_exact_source_final_recheck": {
+        "status": "PASS",
+        "changed_pixels": 1556410,
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0
+      },
+      "visual_qa": {
+        "final_candidate": "PASS",
+        "clean_plate": "FAIL_PROTECTED_ARTWORK_BOUNDARY_DAMAGE",
+        "evidence": "localization/graphics/role_A/20261004-A-RECOVERY02/A_RECOVERY02_568D3696_COMPARE.png"
+      },
+      "candidate_changed_by_c": false,
+      "c_decision": "REWORK_REQUIRED_CLEAN_PLATE_PROTECTED_DAMAGE",
+      "required_next": "A must rebuild the clean plate/mask boundary from exact HD source so protected artwork remains untouched, rerun both validators, and resubmit to C.",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "FA7BBB13",
+      "queue_index": 54,
+      "source_sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+      "candidate_sha256": "b5873faa62f4aeb88e8d13712a20092ef95610130d20eb0330e126ad25d2dd68",
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_FA7BBB13_REPORT.json",
+      "structure": {
+        "dimensions": [
+          4096,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "semantic_gate": "PASS_17_OF_17_REVIEWED_TRANSCRIPTIONS",
+      "decoded_bbox_gate": "PASS_17_OF_17",
+      "c85_failed_bbox_gate": "PASS_10_OF_10",
+      "prior_pass_localized_bbox_pixel_exact": "PASS_7_OF_7",
+      "target_overlap_pairs": 0,
+      "c_exact_source_clean_plate_recheck": {
+        "status": "PASS",
+        "changed_pixels": 598897,
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0
+      },
+      "c_exact_source_final_recheck": {
+        "status": "PASS",
+        "changed_pixels": 690421,
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0
+      },
+      "visual_qa": {
+        "status": "PASS",
+        "evidence": "localization/graphics/role_B/20261004-B-RECOVERY01/B_RECOVERY01_FA7BBB13_COMPARE.png",
+        "note": "Source-like yellow/navy/white layered style, readable Hangul, no clipping, residue, seam, protected-artwork damage, or overlap observed."
+      },
+      "candidate_changed_by_c": false,
+      "c_decision": "C88_PIXEL_VISUAL_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "C075FB49",
+      "queue_index": 111,
+      "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+      "prior_candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9",
+      "candidate_sha256": "1c46037543e2e9260bf36c081884fd103543256df1ded8db95b969ee9c654a5c",
+      "producer_report": "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_C075FB49_REPORT.json",
+      "structure": {
+        "dimensions": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "semantic_gate": "PASS_16_REVIEWED_SEMANTIC_ENTRIES_17_PHYSICAL_REGIONS",
+      "decoded_bbox_gate": "PASS_17_OF_17",
+      "raw_bbox_gate": "PASS_17_OF_17",
+      "c85_failed_bbox_gate": "PASS_9_OF_9",
+      "prior_c85_pass_safe_visible_alpha_exact": "PASS_8_OF_8",
+      "c_rebuilt_partial_rework_context": {
+        "construction": "exact decoded HD source plus prior candidate copied only inside original bboxes for the 12 non-native-rerender rows",
+        "prior_candidate_sha256": "9f64a9de61d63c3745fdf45ed7eb36d1514f31a3dfeb880a0e87634263a088b9"
+      },
+      "c_clean_plate_recheck": {
+        "status": "PASS",
+        "changed_pixels": 182910,
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0
+      },
+      "c_exact_source_final_recheck": {
+        "status": "PASS",
+        "changed_pixels": 703562,
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0
+      },
+      "visual_qa": {
+        "status": "PASS",
+        "evidence": [
+          "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_C075FB49_COMPARE.png",
+          "localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_C075FB49_FINAL_READABLE_GRAY_QA.jpg"
+        ],
+        "note": "Source-like red title, yellow instruction, selector badges and random badge preserved; no clipping, source residue, panel damage, or vehicle/model-name alteration."
+      },
+      "candidate_changed_by_c": false,
+      "c_decision": "C88_PIXEL_VISUAL_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "2DA43E41",
+      "queue_index": 94,
+      "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "prior_candidate_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+      "candidate_sha256": "9f48c04586fe8d7d446760d47345f010bc279ef21f618db44f73c3a548660fcf",
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY03/B_RECOVERY03_2DA43E41_REPORT.json",
+      "structure": {
+        "dimensions": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mipmaps": 1,
+        "header_128_exact": true,
+        "raw_orientation": "mirror_y"
+      },
+      "semantic_gate": "PASS_11_OF_11_REVIEWED_TRANSCRIPTIONS",
+      "decoded_bbox_gate": "PASS_11_OF_11",
+      "c85_failed_bbox_gate": "PASS_7_OF_7",
+      "prior_pass_localized_bbox_pixel_exact": "PASS_4_OF_4",
+      "c_exact_source_final_recheck": {
+        "status": "PASS",
+        "changed_pixels": 1184994,
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0
+      },
+      "decoder_consistency_gate": {
+        "status": "FAIL",
+        "producer_source_equals_header_aware_source_with_red_blue_swapped": true,
+        "producer_final_equals_header_aware_final_with_red_blue_swapped": true,
+        "producer_working_decode": "R/B swapped relative to the DDS pixel masks preserved in the exact 128-byte header",
+        "impact": "Producer clean-plate and visual QA were performed in a non-canonical color decode. Header-aware final decode shows corrupted/dark text/effects in localized regions and does not visually match the producer PASS evidence."
+      },
+      "c_clean_plate_recheck_note": "Running the persisted clean plate against the header-aware exact source fails massively because the clean plate was created in the R/B-swapped producer decode; producer clean validator is therefore not accepted as canonical evidence.",
+      "visual_qa": {
+        "status": "FAIL_CANONICAL_HEADER_AWARE_DECODE",
+        "producer_evidence": "localization/graphics/role_B/20261004-B-RECOVERY03/B_RECOVERY03_2DA43E41_COMPARE.jpg",
+        "c_observation": "The producer contact sheet looks acceptable only in its R/B-swapped working decode. Decoding source and candidate according to their preserved DDS channel masks exposes dark/blackened localized lettering/effects and style mismatch."
+      },
+      "candidate_changed_by_c": false,
+      "c_decision": "REWORK_REQUIRED_CANONICAL_DECODE_VISUAL_CORRUPTION",
+      "required_next": "B must rebuild 2DA43E41 using a decoder/encoder whose channel interpretation matches the exact source DDS pixel masks, then rerun clean-plate/final validators and visual QA on the canonical header-aware decode.",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "summary": {
+    "pixel_visual_pass_pending_ingame": 2,
+    "rework_required": 2,
+    "candidates_changed_by_c": 0,
+    "runtime_validation": "UNTESTED",
+    "in_game_claimed": false,
+    "vr_ffb_dx11_dxvk_changes": false
+  },
+  "latest_base_before_persist": "a66fd18ed908699322c543976c0b0b3e20fa97df",
+  "latest_base_note": "Metadata/path-repair-only commits after 2DA43E41; no new DDS candidate was introduced."
+}
