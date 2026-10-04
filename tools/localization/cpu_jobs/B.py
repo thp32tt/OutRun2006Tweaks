@@ -89,8 +89,24 @@ def main():
         b=discover_components(diff,k); tries[str(k)]=b
         if best is None or abs(len(b)-7)<abs(len(best)-7): best=b
         if len(b)==7: best=b; break
+    # A single long bottom label can split into two diff components at a narrow glyph gap.
+    # Merge only components that are on the same physical row, have strong vertical overlap,
+    # and are separated by <= 16 px. This preserves all independent stacked labels.
+    if len(best)>7:
+        merged=[]
+        for b in best:
+            if merged:
+                a=merged[-1]
+                ov=max(0,min(a[3],b[3])-max(a[1],b[1]))
+                minh=min(a[3]-a[1],b[3]-b[1])
+                gap=b[0]-a[2]
+                if minh>0 and ov/minh>=0.80 and 0<=gap<=16:
+                    merged[-1]=[min(a[0],b[0]),min(a[1],b[1]),max(a[2],b[2]),max(a[3],b[3]),a[4]+b[4]]
+                    continue
+            merged.append(b)
+        best=merged
     if len(best)!=7:
-        (out/"B_PRODUCTION44_DISCOVERY_FAIL.json").write_text(json.dumps({"counts":{k:len(v) for k,v in tries.items()},"boxes":tries},indent=2)+"\n")
+        (out/"B_PRODUCTION44_DISCOVERY_FAIL.json").write_text(json.dumps({"counts":{k:len(v) for k,v in tries.items()},"boxes":tries,"post_row_merge":best},indent=2)+"\n")
         raise RuntimeError(("expected_7_regions",len(best)))
 
     # Slightly expand each discovery region only for measuring source effect pixels.
