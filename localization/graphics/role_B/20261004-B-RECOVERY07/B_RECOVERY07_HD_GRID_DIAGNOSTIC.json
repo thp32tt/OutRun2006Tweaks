@@ -1,0 +1,22 @@
+{
+  "status": "PREFLIGHT_DIAGNOSTIC_EXACT_HD_GRID",
+  "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "raw_orientation": "mirror_y",
+  "header_crop": [
+    0,
+    600,
+    2048,
+    960
+  ],
+  "bottom_crop": [
+    0,
+    1400,
+    2048,
+    1980
+  ],
+  "candidate_written": false
+}
