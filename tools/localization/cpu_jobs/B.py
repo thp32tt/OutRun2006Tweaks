@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 from scipy import ndimage
 
-RUN="20261005-B-PRODUCTION52"
+RUN="20261005-B-PRODUCTION54"
 ASSET="textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds"
 INDEX=132
 LABELS=[("REQUEST","요청"),("SPECIAL REQUEST 1","스페셜 요청 1"),("SPECIAL REQUEST 2","스페셜 요청 2"),("SPECIAL REQUEST 3","스페셜 요청 3")]
@@ -45,7 +45,7 @@ def ensure_font():
 
 def main():
     if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions":
-        raise RuntimeError("B53 must run on hosted CPU worker")
+        raise RuntimeError("B54 must run on hosted CPU worker")
     repo=Path.cwd()
     out=repo/"localization/graphics/role_B"/RUN
     out.mkdir(parents=True,exist_ok=True)
@@ -86,9 +86,9 @@ def main():
         w=bb[2]-bb[0]; h=bb[3]-bb[1]; area=len(xx)
         comps.append({"id":cid,"area":int(area),"bbox":bb,"w":w,"h":h,"cx":float(xx.mean()),"cy":float(yy.mean()),"amax":int(alpha[yy,xx].max())})
     comps.sort(key=lambda c:(c["bbox"][1],c["bbox"][0]))
-    (out/"B53_SOURCE_ALPHA_COMPONENTS.json").write_text(json.dumps({"components":comps},indent=2)+"\n")
+    (out/"B54_SOURCE_ALPHA_COMPONENTS.json").write_text(json.dumps({"components":comps},indent=2)+"\n")
 
-    # B53 exact row recovery from source alpha. B52 diagnostics proved the actual glyph
+    # B54 exact row recovery from source alpha. B52 diagnostics proved the actual glyph
     # rows are 24px-spaced at 140/164/188/212, not the historical draft plate tops.
     # Components 2.. are individual glyph/effect components; component 1 is unrelated
     # panel/artwork that touches a few row4 letters. Rows 2 and 3 share the identical
@@ -169,30 +169,27 @@ def main():
     full=np.zeros((H,W),bool)
     for m in row_masks: full|=m
 
-    # Clean plate: local RGBA plane from a 7px ring around each exact source mask.
-    clean=sa.astype(np.float32).copy()
+    # Clean plate for these source rows: all proven text/effect masks sit on the
+    # transparent menu field (canonical background alpha=0). Hidden RGB varies and is
+    # not a visible background signal, so do not fit a visible-color plane to it.
+    # Replace only exact source-effect pixels with the median canonical alpha-zero
+    # background sampled from a 7px ring; protected pixels outside the masks remain byte-identical.
+    clean=sa.copy()
     for row,sm in zip(row_reports,row_masks):
         dil=np.asarray(mask_img(sm).filter(ImageFilter.MaxFilter(15)))>0
-        ring=dil & ~sm & search
+        ring=dil & ~sm & search & (alpha==0)
         yy,xx=np.nonzero(ring)
-        if len(xx)<100: raise RuntimeError(("insufficient clean ring",row["n"],len(xx)))
-        # Exclude any alpha-active source effect from ring so reconstruction uses background only.
-        good=(alpha[yy,xx]==0)
-        yy=yy[good];xx=xx[good]
-        if len(xx)<80: raise RuntimeError(("insufficient transparent background ring",row["n"],len(xx)))
-        A=np.column_stack([np.ones(len(xx)),xx.astype(float),yy.astype(float)])
-        vals=sa[yy,xx].astype(float)
-        coefs=[];pred=np.zeros_like(vals)
-        for ch in range(4):
-            coef=np.linalg.lstsq(A,vals[:,ch],rcond=None)[0]
-            coefs.append(coef); pred[:,ch]=A@coef
-        mae=float(np.mean(np.abs(pred-vals)))
-        if mae>2.5: raise RuntimeError(("background plane not exact/smooth",row["n"],mae))
-        my,mx=np.nonzero(sm); MA=np.column_stack([np.ones(len(mx)),mx.astype(float),my.astype(float)])
-        for ch in range(4): clean[my,mx,ch]=np.clip(MA@coefs[ch],0,255)
-        row["clean_ring_rgba_mae"]=mae
-        row["background_rgba_median"]=[int(v) for v in np.median(vals,axis=0)]
-    clean_a=np.rint(clean).astype(np.uint8)
+        if len(xx)<80:
+            raise RuntimeError(("insufficient canonical transparent background ring",row["n"],len(xx)))
+        vals=sa[yy,xx]
+        bg=np.median(vals,axis=0).astype(np.uint8)
+        bg[3]=0
+        clean[sm]=bg
+        row["clean_background_rgba"]=[int(v) for v in bg]
+        row["clean_background_alpha_zero_samples"]=int(len(xx))
+        if np.any(clean[sm,3]!=0):
+            raise RuntimeError(("clean alpha not zero",row["n"]))
+    clean_a=clean.astype(np.uint8)
     clean_img=Image.fromarray(clean_a,"RGBA")
 
     FONT=ensure_font()
@@ -284,11 +281,11 @@ def main():
     mask_img(~allowed).save(out/"1F5_PROTECTED_MASK.png")
     mask_img(target).save(out/"1F5_TARGET_TEXT_MASK.png")
     clean_img.save(out/"1F5_CLEAN_PLATE.png")
-    sp=Path("/tmp/b53src.png"); fp=Path("/tmp/b53fin.png")
+    sp=Path("/tmp/b54src.png"); fp=Path("/tmp/b54fin.png")
     src.save(sp); dec.save(fp)
     v=repo/"tools/localization/validate_clean_plate.py"
-    subprocess.run(["python3",str(v),str(sp),str(out/"1F5_CLEAN_PLATE.png"),str(out/"1F5_SOURCE_TEXT_MASK.png"),"--report",str(out/"B53_CLEAN_VALIDATION.json")],check=True)
-    subprocess.run(["python3",str(v),str(sp),str(fp),str(out/"1F5_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(out/"1F5_PROTECTED_MASK.png"),"--report",str(out/"B53_FINAL_VALIDATION.json")],check=True)
+    subprocess.run(["python3",str(v),str(sp),str(out/"1F5_CLEAN_PLATE.png"),str(out/"1F5_SOURCE_TEXT_MASK.png"),"--report",str(out/"B54_CLEAN_VALIDATION.json")],check=True)
+    subprocess.run(["python3",str(v),str(sp),str(fp),str(out/"1F5_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(out/"1F5_PROTECTED_MASK.png"),"--report",str(out/"B54_FINAL_VALIDATION.json")],check=True)
 
     def comp(im,bg=(64,64,64,255)):
         z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
@@ -298,7 +295,7 @@ def main():
     cards=[card("SOURCE_READABLE",src),card("CLEAN",clean_img),card("FINAL",dec),card("FINAL_WHITE",dec,(255,255,255,255))]
     sheet=Image.new("RGB",(W*2,(H+26)*2),"white")
     sheet.paste(cards[0],(0,0));sheet.paste(cards[1],(W,0));sheet.paste(cards[2],(0,H+26));sheet.paste(cards[3],(W,H+26))
-    sheet.save(out/"B53_1F5_COMPARE.jpg",quality=96)
+    sheet.save(out/"B54_1F5_COMPARE.jpg",quality=96)
     sr,cl,fi=comp(src),comp(clean_img),comp(dec)
     rowcards=[]
     for r in row_reports:
@@ -314,10 +311,10 @@ def main():
     rs=Image.new("RGB",(max(c.width for c in rowcards),sum(c.height for c in rowcards)+4*(len(rowcards)-1)),"white")
     yy=0
     for c in rowcards: rs.paste(c,(0,yy)); yy+=c.height+4
-    rs.save(out/"B53_1F5_ROW_CONTACT_4X.jpg",quality=96)
+    rs.save(out/"B54_1F5_ROW_CONTACT_4X.jpg",quality=96)
     rr=Image.new("RGB",(W,(H+26)*2),"white")
     rr.paste(card("SOURCE_RAW_MIRROR_Y",raw_src),(0,0)); rr.paste(card("FINAL_RAW_MIRROR_Y",raw_dec),(0,H+26))
-    rr.save(out/"B53_1F5_RAW_COMPARE.jpg",quality=96)
+    rr.save(out/"B54_1F5_RAW_COMPARE.jpg",quality=96)
 
     report={
         "schema_version":1,"role":"B","run":RUN,"queue_index":INDEX,"asset":ASSET,
@@ -333,14 +330,14 @@ def main():
                        "source_residue":residue,"overlap":overlap,"touch_pairs":touch,"status":"PASS"},
         "policy":{"colored_menu_panels_preserved":"YES","song_titles_credits":"not_targeted","stage_names":"not_applicable","multi_line":"not_applicable"},
         "manual_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
-        "status":"B_PRODUCTION53_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+        "status":"B_PRODUCTION54_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
     }
-    (out/"B53_1F5_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+    (out/"B54_1F5_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
     summary={"run":RUN,"asset":"1F5FE6E9","index":INDEX,"candidate_sha256":csha,"bbox_size_pass":"4/4",
              "outside":outside,"alpha_outside":alpha_out,"source_residue":residue,"overlap":overlap,"touch_pairs":len(touch),
              "worker_status":report["status"],"runtime_validation":"UNTESTED",
-             "report":f"localization/graphics/role_B/{RUN}/B53_1F5_REPORT.json"}
-    (wr/"B53_1F5FE6E9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+             "report":f"localization/graphics/role_B/{RUN}/B54_1F5_REPORT.json"}
+    (wr/"B54_1F5FE6E9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
     print(json.dumps(summary,ensure_ascii=False),flush=True)
 
 if __name__=="__main__":
@@ -351,6 +348,6 @@ if __name__=="__main__":
         wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
         fail={"run":RUN,"asset":"1F5FE6E9","index":INDEX,"status":"FAIL_CLOSED_DIAGNOSTIC",
               "exception":repr(e),"traceback":traceback.format_exc(),"RUNTIME_VALIDATION":"UNTESTED"}
-        (out/"B53_FAIL_CLOSED.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n")
-        (wr/"B53_1F5FE6E9_FAIL.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n")
+        (out/"B54_FAIL_CLOSED.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n")
+        (wr/"B54_1F5FE6E9_FAIL.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n")
         print(json.dumps(fail,ensure_ascii=False),flush=True)
