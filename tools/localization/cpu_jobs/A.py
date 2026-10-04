@@ -147,7 +147,7 @@ line1=bbox_half(env_y1,split)
 line2=bbox_half(split,env_y2)
 if not line1 or not line2:
     raise RuntimeError(("line effect bbox missing",line1,line2))
-if line1[3]>=line2[1]:
+if line1[3]>line2[1]:
     raise RuntimeError(("line effects overlap",line1,line2))
 source_bboxes=[line1,line2]
 
