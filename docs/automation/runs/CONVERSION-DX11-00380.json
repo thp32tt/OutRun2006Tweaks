@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00380",
-  "production_id": "CONVERSION-DX11-00380",
-  "event_id": "CONVERSION-DX11-00380-E004",
+  "production_id": "CONVERSION-DX9EX-00379",
+  "event_id": "CONVERSION-DX9EX-00379-E002",
   "event_type": "retry",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "2/3",
+  "attempt": "1/3",
   "status": "COMPLETE",
   "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
   "runtime_validation": "UNTESTED",
@@ -82,7 +82,8 @@
         "15841c11802b880a62f387509e7a6ec7d894cc6c",
         "0d5a9096435df36d698b4a719bb589d1c1064704",
         "85c1cd7923ea456a3ab2909e63df1498a45cf51e",
-        "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7"
+        "4ec3bbdd8bbec5700c7a2a0b4c3330b333632bb7",
+        "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa"
       ]
     },
     "C5_PACKAGE": {
@@ -93,8 +94,8 @@
       "status": "COMPLETE",
       "state_persisted": true,
       "runtime_validation": "UNTESTED",
-      "issue14_comment_id": 5983525887,
-      "exact_next_action": "Preserve validated R239-R253 programmable ownership/readiness. Under a new TASK_ID, seal R253 against a fresh live IA index-buffer/format/offset reobservation before any Draw*/NativeDrawPath activation."
+      "issue14_comment_id": 5983602390,
+      "exact_next_action": "Preserve validated R239-R253 programmable readiness. Under a new TASK_ID, seal R253 against a fresh live IA index-buffer/format/offset reobservation before any Draw*/NativeDrawPath activation."
     }
   },
   "regression_assessment": {
@@ -108,10 +109,10 @@
   "native_draw_path_activation_changed": false,
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00380",
-    "production_id": "CONVERSION-DX11-00380",
-    "event_id": "CONVERSION-DX11-00380-E004",
+    "production_id": "CONVERSION-DX9EX-00379",
+    "event_id": "CONVERSION-DX9EX-00379-E002",
     "event_type": "retry",
-    "attempt": "2/3",
+    "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE",
     "dispatch_source": "CURRENT_USER_QUEUE",
     "runtime_validation": "UNTESTED",
@@ -126,8 +127,7 @@
     "artifact_id": 11312393751,
     "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
     "implementation_comment_id": 5983525887,
-    "validation_comment_id": 5983525887,
-    "dispatch_correction_comment_id": 5983593013
+    "validation_comment_id": 5983602390
   },
   "validation": {
     "backend_conversion_gate": {
@@ -149,17 +149,17 @@
     "note": "The cancelled run showed source/static checks passing and was interrupted during Configure Win32. It is not used as completion evidence."
   },
   "issue14": {
-    "implementation_and_validation_comment_id": 5983525887,
-    "dispatch_correction_comment_id": 5983593013
+    "implementation_comment_id": 5983525887,
+    "validation_and_reconciliation_comment_id": 5983602390
   },
   "dispatch_reconciliation": {
     "task_id": "CONVERSION-DX11-00380",
     "authoritative": {
       "task_id": "CONVERSION-DX11-00380",
-      "production_id": "CONVERSION-DX11-00380",
-      "event_id": "CONVERSION-DX11-00380-E004",
+      "production_id": "CONVERSION-DX9EX-00379",
+      "event_id": "CONVERSION-DX9EX-00379-E002",
       "event_type": "retry",
-      "attempt": "2/3",
+      "attempt": "1/3",
       "source": "CURRENT_USER_QUEUE",
       "dispatch_source": "CURRENT_USER_QUEUE",
       "runtime_validation": "UNTESTED",
@@ -174,10 +174,32 @@
       "artifact_id": 11312393751,
       "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
       "implementation_comment_id": 5983525887,
-      "validation_comment_id": 5983525887,
-      "dispatch_correction_comment_id": 5983593013
+      "validation_comment_id": 5983602390
     },
     "superseded": [
+      {
+        "task_id": "CONVERSION-DX11-00380",
+        "production_id": "CONVERSION-DX11-00380",
+        "event_id": "CONVERSION-DX11-00380-E004",
+        "event_type": "retry",
+        "attempt": "2/3",
+        "source": "CURRENT_USER_QUEUE",
+        "dispatch_source": "CURRENT_USER_QUEUE",
+        "runtime_validation": "UNTESTED",
+        "native_draw_path_activation_changed": false,
+        "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+        "source_implementation_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+        "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+        "validation_run_id": 37227872328,
+        "validation_run_attempt": 2,
+        "validation_job_id": 111511596483,
+        "readiness_smoke_job_id": 111512398861,
+        "artifact_id": 11312393751,
+        "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
+        "implementation_comment_id": 5983525887,
+        "validation_comment_id": 5983525887,
+        "dispatch_correction_comment_id": 5983593013
+      },
       {
         "task_id": "CONVERSION-DX11-00380",
         "production_id": "CONVERSION-DX11-00380",
@@ -204,10 +226,10 @@
         "validation_comment_id": 5983593013
       }
     ],
-    "reason": "CONVERSION-DX11-00380-E004 is the latest explicit user retry and is authoritative. ATTEMPT is 2/3. R253 material/result/validation-bearing exact SHA 7aaa311ede6136e788b79722ed0eb3b2b2ec72aa and Backend Conversion Gate 37227872328 attempt 2 remain unchanged; this reconciliation changes dispatch bookkeeping only.",
+    "reason": "Current explicit automatic queue metadata CONVERSION-DX9EX-00379-E002 / retry / ATTEMPT=1/3 is authoritative. Concurrent CONVERSION-DX11-00380 rollover/E004 metadata is superseded for metadata only. GitHub Actions run attempt 2 does not change controller ATTEMPT. R253 exact-SHA result remains unchanged.",
     "material_and_validation_bearing_sha_unchanged": true
   },
-  "exact_next_action": "Preserve validated R239-R253 programmable ownership/readiness. Under a new TASK_ID, seal R253 against a fresh live IA index-buffer/format/offset reobservation before any Draw*/NativeDrawPath activation.",
+  "exact_next_action": "Preserve validated R239-R253 programmable readiness. Under a new TASK_ID, seal R253 against a fresh live IA index-buffer/format/offset reobservation before any Draw*/NativeDrawPath activation.",
   "rollover_is_retry": false,
   "validation_run_id": 37227872328,
   "validation_run_attempt": 2,

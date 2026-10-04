@@ -52,12 +52,14 @@
   },
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00380",
-    "production_id": "CONVERSION-DX11-00380",
-    "event_id": "CONVERSION-DX11-00380-E004",
+    "production_id": "CONVERSION-DX9EX-00379",
+    "event_id": "CONVERSION-DX9EX-00379-E002",
     "event_type": "retry",
-    "attempt": "2/3",
+    "attempt": "1/3",
     "dispatch_source": "CURRENT_USER_QUEUE",
+    "source": "CURRENT_USER_QUEUE",
     "selected_work_item": "DX11_R253_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS",
+    "base_sha": "9604cdc394cb711e37adc57a73a631eac8344e3d",
     "result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
     "source_implementation_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
     "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
@@ -81,10 +83,8 @@
       "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa"
     ],
     "native_draw_path_activation_changed": false,
-    "source": "CURRENT_USER_QUEUE",
     "implementation_comment_id": 5983525887,
-    "validation_comment_id": 5983525887,
-    "dispatch_correction_comment_id": 5983593013
+    "validation_comment_id": 5983602390
   },
   "runtime_blocker": "CONVERSION-DX11-00380/R253 is automation-complete but has no Quest 3/VDXR runtime evidence. It remains dormant pre-Draw readiness and makes no runtime-normality claim.",
   "runtime_next_action": "Keep NativeDrawPath inactive. R253 needs no runtime claim for static/CI completion; any future Draw activation or HMD promotion requires separate matching runtime evidence.",
@@ -2900,10 +2900,10 @@
     {
       "unit_id": "DX11_PROGRAMMABLE_INDEXED_SOURCE_VALUE_READINESS_R253",
       "task_id": "CONVERSION-DX11-00380",
-      "production_id": "CONVERSION-DX11-00380",
-      "event_id": "CONVERSION-DX11-00380-E004",
+      "production_id": "CONVERSION-DX9EX-00379",
+      "event_id": "CONVERSION-DX9EX-00379-E002",
       "event_type": "retry",
-      "attempt": "2/3",
+      "attempt": "1/3",
       "base_sha": "9604cdc394cb711e37adc57a73a631eac8344e3d",
       "implementation_commits": [
         "f31c90d8928f07dbca10074fd64dbc97aca76477",
@@ -2928,17 +2928,19 @@
       "artifact_id": 11312393751,
       "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
       "implementation_comment_id": 5983525887,
-      "validation_comment_id": 5983525887,
-      "dispatch_correction_comment_id": 5983593013
+      "validation_comment_id": 5983602390,
+      "dispatch_correction_comment_id": 5983602390,
+      "rollover_is_retry": false
     }
   ],
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00380",
-    "production_id": "CONVERSION-DX11-00380",
-    "event_id": "CONVERSION-DX11-00380-E004",
+    "production_id": "CONVERSION-DX9EX-00379",
+    "event_id": "CONVERSION-DX9EX-00379-E002",
     "event_type": "retry",
-    "attempt": "2/3",
+    "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE",
+    "dispatch_source": "CURRENT_USER_QUEUE",
     "runtime_validation": "UNTESTED",
     "native_draw_path_activation_changed": false,
     "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
@@ -2951,9 +2953,7 @@
     "artifact_id": 11312393751,
     "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
     "implementation_comment_id": 5983525887,
-    "validation_comment_id": 5983525887,
-    "dispatch_correction_comment_id": 5983593013,
-    "dispatch_source": "CURRENT_USER_QUEUE"
+    "validation_comment_id": 5983602390
   },
   "rollover_metadata_correction": {
     "task_id": "CONVERSION-DX11-00371",
@@ -3060,11 +3060,12 @@
     "task_id": "CONVERSION-DX11-00380",
     "authoritative": {
       "task_id": "CONVERSION-DX11-00380",
-      "production_id": "CONVERSION-DX11-00380",
-      "event_id": "CONVERSION-DX11-00380-E004",
+      "production_id": "CONVERSION-DX9EX-00379",
+      "event_id": "CONVERSION-DX9EX-00379-E002",
       "event_type": "retry",
-      "attempt": "2/3",
+      "attempt": "1/3",
       "source": "CURRENT_USER_QUEUE",
+      "dispatch_source": "CURRENT_USER_QUEUE",
       "runtime_validation": "UNTESTED",
       "native_draw_path_activation_changed": false,
       "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
@@ -3077,11 +3078,32 @@
       "artifact_id": 11312393751,
       "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
       "implementation_comment_id": 5983525887,
-      "validation_comment_id": 5983525887,
-      "dispatch_correction_comment_id": 5983593013,
-      "dispatch_source": "CURRENT_USER_QUEUE"
+      "validation_comment_id": 5983602390
     },
     "superseded": [
+      {
+        "task_id": "CONVERSION-DX11-00380",
+        "production_id": "CONVERSION-DX11-00380",
+        "event_id": "CONVERSION-DX11-00380-E004",
+        "event_type": "retry",
+        "attempt": "2/3",
+        "source": "CURRENT_USER_QUEUE",
+        "runtime_validation": "UNTESTED",
+        "native_draw_path_activation_changed": false,
+        "material_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+        "source_implementation_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+        "validation_bearing_result_sha": "7aaa311ede6136e788b79722ed0eb3b2b2ec72aa",
+        "validation_run_id": 37227872328,
+        "validation_run_attempt": 2,
+        "validation_job_id": 111511596483,
+        "readiness_smoke_job_id": 111512398861,
+        "artifact_id": 11312393751,
+        "artifact_digest": "sha256:d840af389547aa7fbb9a97044ba147e9f10c2a3a4bcaca6876315e32e2caca37",
+        "implementation_comment_id": 5983525887,
+        "validation_comment_id": 5983525887,
+        "dispatch_correction_comment_id": 5983593013,
+        "dispatch_source": "CURRENT_USER_QUEUE"
+      },
       {
         "task_id": "CONVERSION-DX11-00380",
         "production_id": "CONVERSION-DX11-00380",
@@ -3108,7 +3130,7 @@
         "dispatch_source": "CURRENT_USER_ROLLOVER"
       }
     ],
-    "reason": "CONVERSION-DX11-00380-E004 is the latest explicit retry. ATTEMPT is 2/3. The already validated R253 material/result SHA 7aaa311ede6136e788b79722ed0eb3b2b2ec72aa and Backend Conversion Gate 37227872328 attempt 2 remain unchanged; this commit reconciles controller metadata only.",
+    "reason": "Current explicit automatic queue metadata from CONVERSION-DX9EX-00379-E002 is authoritative. Concurrent same-task rollover/E004 metadata is superseded only; controller ATTEMPT remains 1/3 and validated R253 identity is unchanged.",
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_task": {
