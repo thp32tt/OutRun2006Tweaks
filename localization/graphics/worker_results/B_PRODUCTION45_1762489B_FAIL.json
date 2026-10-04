@@ -1,9 +1,0 @@
-{
-  "run": "20261005-B-PRODUCTION45",
-  "asset": "1762489B",
-  "index": 130,
-  "status": "FAIL_CLOSED_DIAGNOSTIC",
-  "exception": "RuntimeError(('source mask overlap', 2, 3))",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 305, in <module>\n    try: main()\n         ^^^^^^\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 143, in main\n    if np.any(source_masks[i]&source_masks[j]): raise RuntimeError((\"source mask overlap\",i+1,j+1))\n                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: ('source mask overlap', 2, 3)\n",
-  "RUNTIME_VALIDATION": "UNTESTED"
-}
