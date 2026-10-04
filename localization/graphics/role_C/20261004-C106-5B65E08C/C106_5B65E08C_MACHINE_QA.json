@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-C106-5B65E08C",
+  "asset": "5B65E08C",
+  "queue_index": 164,
+  "producer_report": "localization/graphics/role_B/20261004-B-PRODUCTION20/B_PRODUCTION20_5B65E08C_REPORT.json",
+  "source_sha256": "5ca485fc5bcad59ba4d23225a951660a5009c436cac23b590946cb1a64e4634e",
+  "candidate_sha256": "33da77625f6b6af22cab72db30394b6b8c0bdd78e9f9a6166f273d6fab4da609",
+  "source_header_128_exact": true,
+  "structure": {
+    "width": 2048,
+    "height": 1024,
+    "pitch": 8192,
+    "mips": 1,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "raw_orientation": "mirror_y"
+  },
+  "target_pixels_outside_allowed_mask": 0,
+  "target_protected_overlap_pixels": 0,
+  "target_2px_guard_vs_protected_conflicts": 0,
+  "clean_changed_pixels_outside_source_text_mask": 0,
+  "source_text_residue_pixels_in_clean_plate": 0,
+  "row": {
+    "key": "select_license",
+    "original_bbox": [
+      590,
+      565,
+      1493,
+      659
+    ],
+    "localized_bbox": [
+      794,
+      567,
+      1288,
+      657
+    ],
+    "delta_left": 204,
+    "delta_right": 205,
+    "delta_top": 2,
+    "delta_bottom": 2,
+    "source_size": [
+      903,
+      94
+    ],
+    "localized_size": [
+      494,
+      90
+    ],
+    "containment": "PASS",
+    "size_ceiling": "PASS"
+  },
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}
