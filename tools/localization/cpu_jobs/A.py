@@ -64,6 +64,30 @@ def full_mask(size, local, origin):
 def halfopen_contains(ob, bb):
     return bb and bb[0] >= ob[0] and bb[1] >= ob[1] and bb[2] <= ob[2] and bb[3] <= ob[3]
 
+def intersects(a,b):
+    return not (a[2] <= b[0] or b[2] <= a[0] or a[3] <= b[1] or b[3] <= a[1])
+
+def own_rect(row, all_rows):
+    # Partition overlapping semantic localized bboxes at their midpoint so shared atlas
+    # pixels are owned by only one element. This is the proven B91 anti-overlap method.
+    r=list(row["localized_bbox"]); cx=(r[0]+r[2])/2; cy=(r[1]+r[3])/2
+    for q in all_rows:
+        if q is row: continue
+        b=q["localized_bbox"]
+        if not intersects(r,b): continue
+        ox=(b[0]+b[2])/2; oy=(b[1]+b[3])/2
+        if abs(cx-ox) >= abs(cy-oy):
+            mid=(cx+ox)/2
+            if cx < ox: r[2]=min(r[2],math.floor(mid))
+            else: r[0]=max(r[0],math.ceil(mid))
+        else:
+            mid=(cy+oy)/2
+            if cy < oy: r[3]=min(r[3],math.floor(mid))
+            else: r[1]=max(r[1],math.ceil(mid))
+    if r[0] >= r[2] or r[1] >= r[3]:
+        return list(row["localized_bbox"])
+    return r
+
 def raw_box(bb, H):
     return [bb[0], H-bb[3], bb[2], H-bb[1]]
 
@@ -155,7 +179,7 @@ ops = []
 for r in rows:
     key = r["key"]
     ob = r["original_bbox"]
-    region = rec[key]["candidate_alpha_bbox"]
+    region = own_rect(r, rows)
     if key in fail_keys:
         layer,bb,scale,identified = fit_overlay(before,src,region,ob,2)
         status = "REWORKED_UNIFORM_SCALE_OR_REPOSITION"
@@ -317,7 +341,7 @@ report={
     "asset":"textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds",
     "source_sha256":source_sha,"input_candidate_sha256":input_sha,
     "candidate_sha256":candidate_sha,
-    "method":"C85 direct-return rework on GitHub-hosted CPU worker: exact HD source -> source-visible candidate-changed text masks -> transparent clean plate -> preserve 10 prior-PASS A87 render layers -> uniformly downscale/reposition 19 C85-failing localized delta layers into exact source bboxes -> exact canonical RGBA32 DDS encode -> decoded final static QA",
+    "method":"C85 direct-return rework on GitHub-hosted CPU worker: exact HD source -> source-visible candidate-changed text masks -> transparent clean plate -> midpoint-partition overlapping semantic localized bboxes -> preserve 10 prior-PASS owned layers -> uniformly downscale/reposition 19 C85-failing owned localized delta layers into exact source bboxes -> exact canonical RGBA32 DDS encode -> decoded final static QA",
     "structure":{"dimensions":[4096,4096],"format":"RGBA32","mipmaps":1,"raw_orientation":"mirror_y","header_128_exact_source":True,"bytes":tmp_dds.stat().st_size},
     "c85_fail_count":len(fail_keys),"c85_fail_keys":sorted(fail_keys),
     "reworked_count":len(fail_keys),"prior_pass_count":len(rows)-len(fail_keys),
