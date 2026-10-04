@@ -79,34 +79,39 @@ def main():
         boxes.sort(key=lambda b:(b[1],b[0]))
         return boxes
 
-    trials={}
-    best=None
-    for k in (5,7,9,11,13,15,17,21,25,31):
-        b=discover(diff,k); trials[str(k)]=b
-        if best is None or abs(len(b)-5)<abs(len(best)-5): best=b
-        if len(b)==5: best=b; break
-
-    # Merge only split fragments on the same physical row.
-    while len(best)>5:
-        pairs=[]
-        for i,a in enumerate(best):
-            for j in range(i+1,len(best)):
-                b=best[j]
-                ov=max(0,min(a[3],b[3])-max(a[1],b[1])); mh=min(a[3]-a[1],b[3]-b[1])
-                if mh<=0 or ov/mh<0.75: continue
-                left,right=(a,b) if a[0]<=b[0] else (b,a)
-                gap=right[0]-left[2]
-                if 0<=gap<=24: pairs.append((gap,i,j))
-        if not pairs: break
-        _,i,j=min(pairs)
-        a,b=best[i],best[j]
-        m=[min(a[0],b[0]),min(a[1],b[1]),max(a[2],b[2]),max(a[3],b[3]),a[4]+b[4]]
-        best=[x for n,x in enumerate(best) if n not in (i,j)]+[m]
-        best.sort(key=lambda x:(x[1],x[0]))
-
+    # Use the k=7 discovery where individual glyph groups are still separated by row.
+    # Merge glyph fragments only within the same physical row; do not let dilation bridge
+    # vertically adjacent labels. The atlas layout is top-left + top-right, then three
+    # right-side rows = five semantic labels.
+    raw=discover(diff,7)
+    trials={"7":raw}
+    bands=[]
+    for b in raw:
+        placed=False
+        for band in bands:
+            a=band[0]
+            ov=max(0,min(a[3],b[3])-max(a[1],b[1])); mh=min(a[3]-a[1],b[3]-b[1])
+            if mh>0 and ov/mh>=0.70:
+                band.append(b); placed=True; break
+        if not placed: bands.append([b])
+    anchors=[]
+    for band in bands:
+        band=sorted(band,key=lambda x:x[0])
+        cur=None
+        for b in band:
+            if cur is None:
+                cur=b[:]
+                continue
+            gap=b[0]-cur[2]
+            if 0<=gap<=120:
+                cur=[min(cur[0],b[0]),min(cur[1],b[1]),max(cur[2],b[2]),max(cur[3],b[3]),cur[4]+b[4]]
+            else:
+                anchors.append(cur); cur=b[:]
+        if cur is not None: anchors.append(cur)
+    best=sorted(anchors,key=lambda b:(b[1],b[0]))
     if len(best)!=5:
-        (out/"B_PRODUCTION45_DISCOVERY_DIAGNOSTIC.json").write_text(json.dumps({"trial_counts":{k:len(v) for k,v in trials.items()},"trials":trials,"post_merge":best},indent=2)+"\n")
-        raise RuntimeError(("expected 5 target regions",len(best)))
+        (out/"B_PRODUCTION45_DISCOVERY_DIAGNOSTIC.json").write_text(json.dumps({"raw_k7":raw,"bands":bands,"post_row_merge":best},indent=2)+"\n")
+        raise RuntimeError(("expected 5 target regions after row merge",len(best)))
 
     # Exact source-effect mask: for each historical-diff anchor, include complete
     # connected source-alpha components that intersect a small diff-neighborhood.
