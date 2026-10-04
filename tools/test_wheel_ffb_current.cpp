@@ -120,7 +120,7 @@ int main() {
  require(combined_sat_shape(.16f,.25f)<=1.000001f,"combined SAT bounded");
  require(mechanical_sat_shape(.12f,.25f)>0.10f,"mechanical trail acts in normal loaded corner");
  require(std::abs(deep_slip_mechanical_trail_ratio(.12f,.25f)-.25f)<1e-6f,"normal-corner caster ratio is unchanged");
- require(deep_slip_mechanical_trail_ratio(.32f,.25f)>.3749f&&deep_slip_mechanical_trail_ratio(.32f,.25f)<.3751f,"deep-slip caster ratio gains 50 percent");
+ require(deep_slip_mechanical_trail_ratio(.32f,.25f)>.4249f&&deep_slip_mechanical_trail_ratio(.32f,.25f)<.4251f,"deep-slip caster ratio gains 70 percent");
  require(std::abs(deep_slip_mechanical_trail_ratio(-.32f,.25f)-deep_slip_mechanical_trail_ratio(.32f,.25f))<1e-6f,"deep-slip caster boost is symmetric");
  require(deep_slip_mechanical_trail_ratio(.32f,.60f)<=.600001f,"deep-slip caster boost respects mechanical cap");
  require(mechanical_sat_shape(.32f,.25f)>mechanical_sat_shape(.12f,.25f),"mechanical term follows front lateral force");
@@ -136,6 +136,25 @@ int main() {
  require(proven_primary_rough_road_section(10,54)&&proven_primary_rough_road_section(10,70),"Tulip Garden primary rough-road bounds");
  require(proven_primary_rough_road_section(27,510)&&proven_primary_rough_road_section(27,533),"Floral Village primary rough-road bounds");
  require(is_proven_primary_rough_road_contact(27,520,PrimaryRoughRoadSurfaceMask),"Floral primary rough material accepted");
+
+ // R9 hardware-log regressions: Imperial Avenue primary asphalt, per-wheel
+ // tactile coverage, and direction-independent collision pulse.
+ std::array<unsigned,4> asphaltMasks={PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask,PrimaryAsphaltSurfaceMask};
+ require(primary_asphalt_water_false_positive(14,0,asphaltMasks,0x0f),"Imperial Avenue all-primary false water corrected");
+ require(!primary_asphalt_water_false_positive(13,0,asphaltMasks,0x0f),"water correction is evidence-scoped to stage 14");
+ require(!primary_asphalt_water_false_positive(14,1,asphaltMasks,0x0f),"nonzero collision context preserves water classification");
+ std::array<float,4> road4={.25f,.25f,.25f,.25f};
+ std::array<float,4> curb2={.35f,.35f,.25f,.25f};
+ std::array<float,4> curb4={.35f,.35f,.35f,.35f};
+ const float env0=contact_tactile_envelope(road4,0);
+ const float env2=contact_tactile_envelope(curb2,0);
+ const float env4=contact_tactile_envelope(curb4,0);
+ require(env0==0&&env2>0&&env4>env2,"0/2/4 wheel contact envelopes are distinct");
+ const float amp2=common_contact_tactile_amplitude(env2,.7f,.6f,.7f);
+ const float amp4=common_contact_tactile_amplitude(env4,.7f,.6f,.7f);
+ require(amp2>0.08f&&amp4>amp2&&amp4<=.32f,"two-wheel curb is tactile and four-wheel remains capped");
+ require(collision_tactile_pulse(0,1.0f)>0&&collision_tactile_pulse(1,1.0f)<0,"collision tactile alternates independently of direction");
+ require(collision_tactile_pulse(5,1.0f)==0,"collision tactile is short bounded pulse");
  require(!is_proven_primary_rough_road_contact(27,520,PrimaryAsphaltSurfaceMask),"ordinary asphalt is not rough-road material");
  require(std::abs(software_road_tactile_frequency(35.0f)-10.0f)<1e-6f,"software road carrier smoother than old 15Hz fallback");
  require(std::abs(software_slip_tactile_frequency(35.0f)-12.0f)<1e-6f,"software slip carrier remains distinct from road carrier");
@@ -147,7 +166,8 @@ int main() {
  require(soft_saturate(1.0f)>.90f&&soft_saturate(1.0f)<1.0f,"soft clip late knee");
  require(soft_saturate(2.0f)==1.0f&&soft_saturate(-2.0f)==-1.0f,"soft clip cap");
  float clipPrev=0; for(int i=0;i<=2000;++i){float x=i*.001f,y=soft_saturate(x);require(std::isfinite(y)&&y>=clipPrev-1e-6f&&y<=1.000001f,"soft clip monotonic");clipPrev=y;}
- require(physics_return_relief(.15f,-.08f)==.85f,"countersteer relief");
+ require(physics_return_relief(.15f,-.08f)>.89f&&physics_return_relief(.15f,-.08f)<.91f,"normal-corner countersteer relief remains modest");
+ require(physics_return_relief(.32f,-.08f)>.969f,"deep-slip self-countersteer retains nearly all aligning torque");
  require(physics_return_relief(.15f,.08f)==1,"opposing work no relief");
  ResponseLUT linear{}; require(parse_response_lut("0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1",linear),"linear LUT parses");
  require(std::abs(apply_response_lut(.55f,linear)-.55f)<1e-5f,"linear LUT identity");
