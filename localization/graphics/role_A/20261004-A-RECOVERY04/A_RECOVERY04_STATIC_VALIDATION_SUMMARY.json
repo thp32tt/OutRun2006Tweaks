@@ -1,0 +1,360 @@
+{
+  "source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "before_sha256": "c3e89fb3875e1aba79a6a3fc744fde6af91bff5906fdb1827573ca0d2c9a2d74",
+  "candidate_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
+  "dimensions": [
+    2048,
+    2048
+  ],
+  "format": "RGBA32",
+  "mipmaps": 1,
+  "raw_orientation": "mirror_y",
+  "dds_header_128_exact_to_source": true,
+  "failed_keys": [
+    "seconds",
+    "tuned",
+    "normal",
+    "random"
+  ],
+  "reworked_elements": 4,
+  "native_rerendered_elements": [
+    "seconds",
+    "tuned",
+    "normal",
+    "random"
+  ],
+  "prior_pass_elements_preserved_visible_exact": 3,
+  "prior_pass_preservation": {
+    "automatic": {
+      "localized_bbox_changed_pixels": 0,
+      "visible_changed_pixels_in_cell": 0,
+      "transparent_rgb_normalized_pixels": 16362
+    },
+    "engine": {
+      "localized_bbox_changed_pixels": 0,
+      "visible_changed_pixels_in_cell": 0,
+      "transparent_rgb_normalized_pixels": 846
+    },
+    "recommendation": {
+      "localized_bbox_changed_pixels": 0,
+      "visible_changed_pixels_in_cell": 0,
+      "transparent_rgb_normalized_pixels": 0
+    }
+  },
+  "changed_pixels_vs_before_outside_four_failed_cells": 17208,
+  "visible_changed_pixels_vs_before_outside_four_failed_cells": 0,
+  "alpha_changed_pixels_vs_before_outside_four_failed_cells": 0,
+  "all_7_containment_pass": true,
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "runtime_validation": "UNTESTED",
+  "font_path": "/usr/share/fonts/truetype/nanum/NanumSquareRoundEB.ttf",
+  "rows": [
+    {
+      "key": "automatic",
+      "source": "Automatic",
+      "korean": "자동",
+      "original_bbox": [
+        6,
+        178,
+        543,
+        288
+      ],
+      "previous_localized_bbox": [
+        177,
+        178,
+        365,
+        286
+      ],
+      "reworked": false,
+      "new_localized_bbox": [
+        177,
+        178,
+        365,
+        286
+      ],
+      "delta_left": 171,
+      "delta_right": 178,
+      "delta_top": 0,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "mode": "preserved_exact_visible_lettering",
+      "prior_pass_preservation": {
+        "localized_bbox_changed_pixels": 0,
+        "visible_changed_pixels_in_cell": 0,
+        "transparent_rgb_normalized_pixels": 16362
+      },
+      "prior_pass_pixel_exact": "PASS"
+    },
+    {
+      "key": "seconds",
+      "source": "seconds",
+      "korean": "초",
+      "original_bbox": [
+        1237,
+        62,
+        1584,
+        144
+      ],
+      "previous_localized_bbox": [
+        1349,
+        43,
+        1452,
+        142
+      ],
+      "reworked": true,
+      "new_localized_bbox": [
+        1368,
+        63,
+        1452,
+        143
+      ],
+      "delta_left": 131,
+      "delta_right": 132,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "source_text_mask": {
+        "mode": "visible_alpha_exact",
+        "mask_bbox": [
+          1237,
+          62,
+          1584,
+          144
+        ],
+        "mask_pixels": 18318
+      },
+      "mode": "native_render",
+      "font": "NanumSquareRound ExtraBold",
+      "font_size": 79,
+      "localized_bbox": [
+        1368,
+        63,
+        1452,
+        143
+      ],
+      "native_raster_resampled": false
+    },
+    {
+      "key": "engine",
+      "source": "More Engine sound",
+      "korean": "엔진음 크게",
+      "original_bbox": [
+        1492,
+        336,
+        1915,
+        408
+      ],
+      "previous_localized_bbox": [
+        1507,
+        336,
+        1910,
+        398
+      ],
+      "reworked": false,
+      "new_localized_bbox": [
+        1507,
+        336,
+        1910,
+        398
+      ],
+      "delta_left": 15,
+      "delta_right": 5,
+      "delta_top": 0,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "mode": "preserved_exact_visible_lettering",
+      "prior_pass_preservation": {
+        "localized_bbox_changed_pixels": 0,
+        "visible_changed_pixels_in_cell": 0,
+        "transparent_rgb_normalized_pixels": 846
+      },
+      "prior_pass_pixel_exact": "PASS"
+    },
+    {
+      "key": "tuned",
+      "source": "TUNED",
+      "korean": "튜닝",
+      "original_bbox": [
+        843,
+        851,
+        1154,
+        965
+      ],
+      "previous_localized_bbox": [
+        840,
+        850,
+        1146,
+        965
+      ],
+      "reworked": true,
+      "new_localized_bbox": [
+        904,
+        852,
+        1093,
+        964
+      ],
+      "delta_left": 61,
+      "delta_right": 61,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "source_text_mask": {
+        "mode": "orange_fill_seed_plus_8px_effect_footprint",
+        "mask_bbox": [
+          890,
+          867,
+          1123,
+          935
+        ],
+        "mask_pixels": 14976
+      },
+      "mode": "native_render",
+      "font": "NanumSquareRound ExtraBold",
+      "font_size": 106,
+      "localized_bbox": [
+        904,
+        852,
+        1093,
+        964
+      ],
+      "native_raster_resampled": false
+    },
+    {
+      "key": "normal",
+      "source": "NORMAL",
+      "korean": "일반",
+      "original_bbox": [
+        1235,
+        851,
+        1546,
+        965
+      ],
+      "previous_localized_bbox": [
+        1269,
+        850,
+        1508,
+        950
+      ],
+      "reworked": true,
+      "new_localized_bbox": [
+        1292,
+        852,
+        1488,
+        964
+      ],
+      "delta_left": 57,
+      "delta_right": 58,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "source_text_mask": {
+        "mode": "yellow_fill_seed_plus_8px_effect_footprint",
+        "mask_bbox": [
+          1270,
+          867,
+          1511,
+          936
+        ],
+        "mask_pixels": 15328
+      },
+      "mode": "native_render",
+      "font": "NanumSquareRound ExtraBold",
+      "font_size": 106,
+      "localized_bbox": [
+        1292,
+        852,
+        1488,
+        964
+      ],
+      "native_raster_resampled": false
+    },
+    {
+      "key": "random",
+      "source": "RANDOM",
+      "korean": "무작위",
+      "original_bbox": [
+        1627,
+        856,
+        1901,
+        965
+      ],
+      "previous_localized_bbox": [
+        1641,
+        853,
+        1886,
+        965
+      ],
+      "reworked": true,
+      "new_localized_bbox": [
+        1630,
+        857,
+        1898,
+        964
+      ],
+      "delta_left": 3,
+      "delta_right": 3,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "source_text_mask": {
+        "mode": "white_fill_plus_8px_outline_shadow_clamped_between_top_rim_and_ring",
+        "mask_bbox": [
+          1655,
+          863,
+          1889,
+          922
+        ],
+        "mask_pixels": 11819,
+        "inpaint": "tight_mask_harmonic_2d",
+        "harmonic_iterations": 180
+      },
+      "mode": "native_render",
+      "font": "NanumSquareRound ExtraBold",
+      "font_size": 97,
+      "localized_bbox": [
+        1630,
+        857,
+        1898,
+        964
+      ],
+      "native_raster_resampled": false
+    },
+    {
+      "key": "recommendation",
+      "source": "Recommendation",
+      "korean": "추천",
+      "original_bbox": [
+        1565,
+        1710,
+        2012,
+        2030
+      ],
+      "previous_localized_bbox": [
+        1604,
+        1765,
+        1972,
+        1995
+      ],
+      "reworked": false,
+      "new_localized_bbox": [
+        1604,
+        1765,
+        1972,
+        1995
+      ],
+      "delta_left": 39,
+      "delta_right": 40,
+      "delta_top": 55,
+      "delta_bottom": 35,
+      "containment": "PASS",
+      "mode": "preserved_exact_visible_lettering",
+      "prior_pass_preservation": {
+        "localized_bbox_changed_pixels": 0,
+        "visible_changed_pixels_in_cell": 0,
+        "transparent_rgb_normalized_pixels": 0
+      },
+      "prior_pass_pixel_exact": "PASS"
+    }
+  ]
+}

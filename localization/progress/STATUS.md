@@ -647,3 +647,14 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
 - Next B REWORK priority: even index 94 `2DA43E41`.
 - Evidence: `localization/graphics/role_B/20261004-B-RECOVERY02/`.
+
+## 2026-10-04 A recovery04 — 411827E clean-plate rework
+- Started from synchronized local/remote HEAD `7ed5db619c1c77e41776e45d9e569b6334147961`; selected A odd-shard priority index 97 `411827E` and did not repeat completed A recovery03.
+- Reworked C85 failures `seconds`, `TUNED`, `NORMAL`, and `RANDOM`: reset failed sprite cells to exact HD source, built source-text/protected masks, validated clean plate, then rendered fresh native-resolution Korean lettering. No old Korean raster scaling/upscaling was used.
+- RANDOM mask was corrected after visual self-QA to exclude the protected question-mark ring and bright top rim; final clean plate removes the English glyph/shadow footprint while retaining those source graphics.
+- RGBA32 2048x2048 / 1 mip, raw `mirror_y` orientation, and exact 128-byte source header preserved.
+- Self-QA: clean-plate validator PASS; final protected-mask validator PASS; changed pixels outside permitted source bboxes 0; alpha changed outside 0; all 7/7 original-bbox containment PASS. Prior PASS Automatic/engine/Recommendation visible lettering remains exact; only transparent RGB payload outside permitted bboxes was normalized to canonical source.
+- Decoded SOURCE/BEFORE/CLEAN/FINAL visual comparison PASS for residue, clipping, badge borders, adjacent sprites, and RANDOM ring preservation. Candidate SHA-256: `c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e`.
+- `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
+- Next A REWORK priority: odd index 111 `C075FB49`.
+- Evidence: `localization/graphics/role_A/20261004-A-RECOVERY04/`.

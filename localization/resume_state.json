@@ -1347,5 +1347,28 @@
       "asset": "2DA43E41",
       "status": "rework_required_zero_pixel_or_artifact"
     }
+  },
+  "a_recovery04_411827e": {
+    "run": "20261004-A-RECOVERY04",
+    "base_head": "7ed5db619c1c77e41776e45d9e569b6334147961",
+    "status": "A_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "candidate_sha256": "c7f27e948179ac555c3107facd6885df141e9f7aa0b8b2c6450e466e7132981e",
+    "reworked_elements": 4,
+    "native_rerenders": 4,
+    "all_7_bbox_pass": true,
+    "prior_pass_elements_preserved_visible_exact": 3,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "clean_plate_report": "localization/graphics/role_A/20261004-A-RECOVERY04/A_RECOVERY04_CLEAN_PLATE_VALIDATION.json",
+    "final_mask_report": "localization/graphics/role_A/20261004-A-RECOVERY04/A_RECOVERY04_FINAL_MASK_VALIDATION.json",
+    "production_report": "localization/graphics/role_A/20261004-A-RECOVERY04/A_RECOVERY04_411827E_REPORT.json",
+    "visual_compare": "localization/graphics/role_A/20261004-A-RECOVERY04/A_RECOVERY04_411827E_COMPARE.png",
+    "runtime_validation": "UNTESTED",
+    "next_a_target": {
+      "index": 111,
+      "asset": "C075FB49",
+      "status": "rework_required_zero_pixel_or_artifact"
+    }
   }
 }
