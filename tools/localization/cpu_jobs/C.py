@@ -8,7 +8,7 @@ if os.environ.get('OUTRUN_CPU_WORKER')!='github-actions' or os.environ.get('OUTR
     raise SystemExit('GitHub-hosted localization CPU worker / role C only')
 
 repo=Path.cwd()
-run='20261005-C110-LATE-A'
+run='20261005-C111-C075-FINAL'
 out=repo/'localization/graphics/role_C'/run
 out.mkdir(parents=True,exist_ok=True)
 rep_path=repo/'localization/graphics/role_A/20261005-A-RECOVERY12/A_RECOVERY12_C075FB49_REPORT.json'
@@ -92,5 +92,5 @@ res={'schema_version':1,'role':'C','run':run,'asset':'C075FB49',
  'localized_pair_overlap_pixels':pair,'localized_touch_pairs':touch,
  'preserved_lower_and_source_labels_exact':preserved_ok,'rows':rows,
  'machine_status':'PASS' if ok else 'FAIL','controller_visual_qa':'PENDING','runtime_validation':'UNTESTED'}
-(out/'C110_C075FB49_MACHINE_QA.json').write_text(json.dumps(res,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-print('C110_LATE_A',res['machine_status'],res['candidate_sha256'],flush=True)
+(out/'C111_C075FB49_MACHINE_QA.json').write_text(json.dumps(res,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+print('C111_C075_FINAL',res['machine_status'],res['candidate_sha256'],flush=True)
