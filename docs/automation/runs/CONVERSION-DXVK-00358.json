@@ -113,7 +113,7 @@
     "C6_STATE": {
       "status": "COMPLETE",
       "state_persisted": true,
-      "evidence": "Corrected the stale concurrent rollover metadata to the current E005 retry dispatch, removed the serialized Remote Desktop footer from the JSON record, and persisted full exact-SHA gate evidence while keeping the validation-bearing result SHA unchanged."
+      "evidence": "Corrected E005 retry C6 state first persisted at fc68cf3aa1f10c2fada7c244286fc34d5fbe42eb; validation-bearing material result remains a9b64e103fbc23738f05a9ccecdd74d2fe9a00bd and RUNTIME_VALIDATION remains UNTESTED."
     }
   },
   "blocker": null,
@@ -151,6 +151,6 @@
     "material_result_unchanged": true,
     "validation_bearing_result_unchanged": true
   },
-  "run_record_commit_sha": null,
+  "run_record_commit_sha": "fc68cf3aa1f10c2fada7c244286fc34d5fbe42eb",
   "prior_rollover_state_commit_sha": "94afb3f6b94ad0d25f3d371c3afd6bde44b2459b"
 }
