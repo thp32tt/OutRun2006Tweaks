@@ -46,10 +46,19 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn('R33 final dispatcher', prompt)
         self.assertIn('구조 개선이 현재 Git 상태에서 명시적으로 완료되었거나', prompt)
 
+    def test_conversion_lanes_are_independent(self):
+        self.assertIn('async def conversion_parallel_cycle', SOURCE)
+        self.assertIn('async def conversion_process_lane', SOURCE)
+        self.assertIn('async def conversion_send_lane_task', SOURCE)
+        self.assertIn('CONTROLLER_MODE == "conversion" and CONVERSION_PARALLEL', SOURCE)
+        self.assertIn('q.setdefault("active_by_lane", {})', SOURCE)
+        self.assertIn('for lane_key in ("C", "A", "B")', SOURCE)
+
     def test_vr_compose_pins_v2_and_three_slots(self):
         compose = (ROOT / 'docker-compose.portainer-vr.yml').read_text()
         self.assertIn('dockerfile: Dockerfile.portainer-vr', compose)
         self.assertIn('CHAT_SLOTS: "3"', compose)
+        self.assertIn('CONVERSION_PARALLEL: "true"', compose)
         self.assertIn('TASK_EVENT_MODEL: "v2"', compose)
         self.assertIn('PRODUCTION_COUNTER_MODE: "lane"', compose)
         dockerfile = (ROOT / 'Dockerfile.portainer-vr').read_text()
