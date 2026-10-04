@@ -7,7 +7,7 @@
   "readiness_tier": "ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
   "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
   "source_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
-  "candidate_sha256": "e0fc4e372f023e97706a8cee460833eaa0bfbff0164fcffb7406c3a042d4224a",
+  "candidate_sha256": "ed4a95fcf004650221a87a9c025c2a983aecf60f3d896d2ffb1bc7d2f571bbc7",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
   "method": "exact 2048x2048 RGBA32 HD source -> colour-core semantic line discovery -> dominant-panel colour separation of complete source effects -> dominant-panel row reconstruction clean plate -> fresh native Hangul lettering -> exact-header DDS -> decoded all-channel static QA",
   "structure": {
@@ -129,7 +129,7 @@
         50,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "time_attack_or2",
@@ -180,7 +180,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "time_attack_or2",
@@ -231,7 +231,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "time_attack_or2",
@@ -247,27 +247,27 @@
       "original_bbox": [
         118,
         1760,
-        293,
-        1803
+        301,
+        1807
       ],
       "localized_bbox": [
-        143,
+        141,
         1762,
-        267,
-        1801
+        278,
+        1805
       ],
-      "source_width": 175,
-      "source_height": 43,
-      "localized_width": 124,
-      "localized_height": 39,
-      "delta_left": 25,
-      "delta_right": 26,
+      "source_width": 183,
+      "source_height": 47,
+      "localized_width": 137,
+      "localized_height": 43,
+      "delta_left": 23,
+      "delta_right": 23,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "style_kind": "orange",
-      "font_size": 37,
+      "font_size": 41,
       "stroke_width": 2,
       "shadow": 1,
       "fill": [
@@ -282,7 +282,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "heart_attack_or2",
@@ -298,21 +298,21 @@
       "original_bbox": [
         431,
         1675,
-        687,
+        691,
         1719
       ],
       "localized_bbox": [
-        485,
+        487,
         1677,
-        632,
+        634,
         1717
       ],
-      "source_width": 256,
+      "source_width": 260,
       "source_height": 44,
       "localized_width": 147,
       "localized_height": 40,
-      "delta_left": 54,
-      "delta_right": 55,
+      "delta_left": 56,
+      "delta_right": 57,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -328,12 +328,12 @@
         255
       ],
       "outline": [
-        255,
-        150,
-        0,
+        19,
+        28,
+        38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "heart_attack_or2",
@@ -384,7 +384,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "heart_attack_or2",
@@ -400,27 +400,27 @@
       "original_bbox": [
         486,
         1760,
-        661,
-        1803
+        669,
+        1807
       ],
       "localized_bbox": [
-        511,
+        509,
         1762,
-        635,
-        1801
+        646,
+        1805
       ],
-      "source_width": 175,
-      "source_height": 43,
-      "localized_width": 124,
-      "localized_height": 39,
-      "delta_left": 25,
-      "delta_right": 26,
+      "source_width": 183,
+      "source_height": 47,
+      "localized_width": 137,
+      "localized_height": 43,
+      "delta_left": 23,
+      "delta_right": 23,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "style_kind": "orange",
-      "font_size": 37,
+      "font_size": 41,
       "stroke_width": 2,
       "shadow": 1,
       "fill": [
@@ -435,7 +435,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "outrun_or2",
@@ -486,7 +486,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "outrun_or2",
@@ -537,7 +537,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "outrun_or2",
@@ -553,27 +553,27 @@
       "original_bbox": [
         854,
         1728,
-        1029,
-        1771
+        1037,
+        1775
       ],
       "localized_bbox": [
-        879,
+        877,
         1730,
-        1003,
-        1769
+        1014,
+        1773
       ],
-      "source_width": 175,
-      "source_height": 43,
-      "localized_width": 124,
-      "localized_height": 39,
-      "delta_left": 25,
-      "delta_right": 26,
+      "source_width": 183,
+      "source_height": 47,
+      "localized_width": 137,
+      "localized_height": 43,
+      "delta_left": 23,
+      "delta_right": 23,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "style_kind": "orange",
-      "font_size": 37,
+      "font_size": 41,
       "stroke_width": 2,
       "shadow": 1,
       "fill": [
@@ -588,7 +588,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "time_attack_special",
@@ -639,7 +639,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "time_attack_special",
@@ -690,7 +690,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "time_attack_special",
@@ -706,27 +706,27 @@
       "original_bbox": [
         1155,
         1648,
-        1397,
-        1691
+        1405,
+        1693
       ],
       "localized_bbox": [
-        1186,
+        1185,
         1650,
-        1365,
-        1689
+        1374,
+        1691
       ],
-      "source_width": 242,
-      "source_height": 43,
-      "localized_width": 179,
-      "localized_height": 39,
-      "delta_left": 31,
-      "delta_right": 32,
+      "source_width": 250,
+      "source_height": 45,
+      "localized_width": 189,
+      "localized_height": 41,
+      "delta_left": 30,
+      "delta_right": 31,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "style_kind": "orange",
-      "font_size": 37,
+      "font_size": 39,
       "stroke_width": 2,
       "shadow": 1,
       "fill": [
@@ -741,7 +741,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "heart_attack_special",
@@ -757,21 +757,21 @@
       "original_bbox": [
         1535,
         1515,
-        1791,
+        1795,
         1559
       ],
       "localized_bbox": [
-        1589,
+        1591,
         1517,
-        1736,
+        1738,
         1557
       ],
-      "source_width": 256,
+      "source_width": 260,
       "source_height": 44,
       "localized_width": 147,
       "localized_height": 40,
-      "delta_left": 54,
-      "delta_right": 55,
+      "delta_left": 56,
+      "delta_right": 57,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -787,12 +787,12 @@
         255
       ],
       "outline": [
-        255,
-        150,
-        0,
+        19,
+        28,
+        38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "heart_attack_special",
@@ -843,7 +843,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "heart_attack_special",
@@ -859,27 +859,27 @@
       "original_bbox": [
         1523,
         1600,
-        1765,
-        1643
+        1773,
+        1645
       ],
       "localized_bbox": [
-        1554,
+        1553,
         1602,
-        1733,
-        1641
+        1742,
+        1643
       ],
-      "source_width": 242,
-      "source_height": 43,
-      "localized_width": 179,
-      "localized_height": 39,
-      "delta_left": 31,
-      "delta_right": 32,
+      "source_width": 250,
+      "source_height": 45,
+      "localized_width": 189,
+      "localized_height": 41,
+      "delta_left": 30,
+      "delta_right": 31,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "style_kind": "orange",
-      "font_size": 37,
+      "font_size": 39,
       "stroke_width": 2,
       "shadow": 1,
       "fill": [
@@ -894,7 +894,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "outrun_special",
@@ -945,7 +945,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "outrun_special",
@@ -996,7 +996,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     },
     {
       "target": "outrun_special",
@@ -1012,27 +1012,27 @@
       "original_bbox": [
         1059,
         1936,
-        1301,
-        1979
+        1309,
+        1981
       ],
       "localized_bbox": [
-        1090,
+        1089,
         1938,
-        1269,
-        1977
+        1278,
+        1979
       ],
-      "source_width": 242,
-      "source_height": 43,
-      "localized_width": 179,
-      "localized_height": 39,
-      "delta_left": 31,
-      "delta_right": 32,
+      "source_width": 250,
+      "source_height": 45,
+      "localized_width": 189,
+      "localized_height": 41,
+      "delta_left": 30,
+      "delta_right": 31,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "style_kind": "orange",
-      "font_size": 37,
+      "font_size": 39,
       "stroke_width": 2,
       "shadow": 1,
       "fill": [
@@ -1047,7 +1047,7 @@
         38,
         255
       ],
-      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
+      "multi_line_style_consistency": "PASS_SHARED_FONT_WEIGHT_FILL_OUTLINE_EFFECTS_SOURCE_RELATIVE_LINE_SCALE_PRESERVED"
     }
   ],
   "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
