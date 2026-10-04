@@ -1,0 +1,9 @@
+{
+  "run": "20261005-B-PRODUCTION51",
+  "asset": "1F5FE6E9",
+  "index": 132,
+  "status": "FAIL_CLOSED_DIAGNOSTIC",
+  "exception": "RuntimeError(('expected four historical row hints', 3))",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 219, in <module>\n    try:main()\n        ^^^^^^\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 64, in main\n    raise RuntimeError((\"expected four historical row hints\",len(merged)))\nRuntimeError: ('expected four historical row hints', 3)\n",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
