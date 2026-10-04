@@ -1,0 +1,859 @@
+{
+  "schema_version": 1,
+  "role": "A",
+  "run": "20261004-A-PRODUCTION14",
+  "worker": "github-actions",
+  "base_head": "74d5d8d9f081065e137143171b22646101bd5084",
+  "index": 49,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+  "source_provenance": {
+    "repository": "Sonic-TV/OR2006Sprites",
+    "commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha1": "d6cde0c83a157e66e089867ccd616c289eb29c6e",
+    "sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+    "path": "Release/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+    "classification": "authoritative high-resolution source; stale filename suffix, DDS header 2048x2048 RGBA32"
+  },
+  "source_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+  "candidate_sha256": "30cc2167b1650ab0a7b1c579c7d29118065007f0474f7207ce993ab1b19e45fa",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/BF3EE5C6_512x512.dds",
+  "structure": {
+    "dimensions": [
+      2048,
+      2048
+    ],
+    "format": "RGBA32",
+    "pitch": 8192,
+    "mipmaps": 1,
+    "bytes": 16777344,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "translation_policy": {
+    "translated_concepts": 12,
+    "localized_sprite_occurrences": 13,
+    "translations": [
+      {
+        "source": "Rank for this stage",
+        "korean": "이 스테이지 랭크"
+      },
+      {
+        "source": "NORMAL",
+        "korean": "일반"
+      },
+      {
+        "source": "TUNED",
+        "korean": "튜닝"
+      },
+      {
+        "source": "TUNED",
+        "korean": "튜닝"
+      },
+      {
+        "source": "TOP Ghost Car!!",
+        "korean": "최고 고스트 카!!"
+      },
+      {
+        "source": "Double!",
+        "korean": "더블!"
+      },
+      {
+        "source": "Strike!",
+        "korean": "스트라이크!"
+      },
+      {
+        "source": "GOAL!",
+        "korean": "골!"
+      },
+      {
+        "source": "Spare!",
+        "korean": "스페어!"
+      },
+      {
+        "source": "Shift up!!",
+        "korean": "시프트 업!!"
+      },
+      {
+        "source": "Rank",
+        "korean": "랭크"
+      },
+      {
+        "source": "Turkey!",
+        "korean": "터키!"
+      },
+      {
+        "source": "Go!",
+        "korean": "출발!"
+      }
+    ],
+    "protected_non_target_artwork": "all non-target sprite cells preserved pixel-identical"
+  },
+  "clean_plate_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION14/BF3EE5C6_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION14/BF3EE5C6_HD_CLEAN_PLATE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 661577,
+    "changed_bbox": [
+      0,
+      163,
+      2012,
+      1517
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "final_mask_validator": {
+    "source": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION14/BF3EE5C6_HD_SOURCE_READABLE.png",
+    "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_A/20261004-A-PRODUCTION14/BF3EE5C6_HD_FINAL_DECODED_READABLE.png",
+    "size": [
+      2048,
+      2048
+    ],
+    "changed_pixels": 765155,
+    "changed_bbox": [
+      0,
+      163,
+      2012,
+      1517
+    ],
+    "changed_pixels_outside_edit_mask": 0,
+    "changed_pixels_in_protected_mask": 0,
+    "alpha_changed_outside_edit_mask": 0,
+    "status": "PASS"
+  },
+  "decoded_changes": {
+    "changed_pixels_total": 765155,
+    "changed_pixels_outside_original_bboxes": 0,
+    "alpha_changed_pixels_outside_original_bboxes": 0,
+    "protected_visible_pixels_changed": 0,
+    "clean_plate_source_text_residue_pixels": 0
+  },
+  "rows": [
+    {
+      "key": "rank_stage",
+      "region_idx": 7,
+      "source": "Rank for this stage",
+      "korean": "이 스테이지 랭크",
+      "style": "yellow_navy",
+      "cell_rect": [
+        0,
+        152,
+        632,
+        256
+      ],
+      "original_bbox": [
+        12,
+        163,
+        615,
+        245
+      ],
+      "localized_bbox": [
+        70,
+        165,
+        557,
+        243
+      ],
+      "source_width": 603,
+      "source_height": 82,
+      "localized_width": 487,
+      "localized_height": 78,
+      "delta_left": 58,
+      "delta_right": 58,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        12,
+        1803,
+        615,
+        1885
+      ],
+      "raw_localized_bbox": [
+        70,
+        1805,
+        557,
+        1883
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 69,
+      "stroke_outer": 5,
+      "stroke_inner": 2,
+      "shadow_px": 4,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "normal",
+      "region_idx": 18,
+      "source": "NORMAL",
+      "korean": "일반",
+      "style": "green_navy",
+      "cell_rect": [
+        692,
+        184,
+        1052,
+        256
+      ],
+      "original_bbox": [
+        729,
+        192,
+        1012,
+        251
+      ],
+      "localized_bbox": [
+        822,
+        194,
+        919,
+        249
+      ],
+      "source_width": 283,
+      "source_height": 59,
+      "localized_width": 97,
+      "localized_height": 55,
+      "delta_left": 93,
+      "delta_right": 93,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        729,
+        1797,
+        1012,
+        1856
+      ],
+      "raw_localized_bbox": [
+        822,
+        1799,
+        919,
+        1854
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 48,
+      "stroke_outer": 4,
+      "stroke_inner": 0,
+      "shadow_px": 3,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "tuned_a",
+      "region_idx": 19,
+      "source": "TUNED",
+      "korean": "튜닝",
+      "style": "red_navy",
+      "cell_rect": [
+        1052,
+        184,
+        1412,
+        256
+      ],
+      "original_bbox": [
+        1116,
+        193,
+        1342,
+        251
+      ],
+      "localized_bbox": [
+        1183,
+        195,
+        1274,
+        249
+      ],
+      "source_width": 226,
+      "source_height": 58,
+      "localized_width": 91,
+      "localized_height": 54,
+      "delta_left": 67,
+      "delta_right": 68,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1116,
+        1797,
+        1342,
+        1855
+      ],
+      "raw_localized_bbox": [
+        1183,
+        1799,
+        1274,
+        1853
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 46,
+      "stroke_outer": 4,
+      "stroke_inner": 0,
+      "shadow_px": 3,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "tuned_b",
+      "region_idx": 20,
+      "source": "TUNED",
+      "korean": "튜닝",
+      "style": "red_navy",
+      "cell_rect": [
+        1412,
+        184,
+        1772,
+        256
+      ],
+      "original_bbox": [
+        1476,
+        193,
+        1702,
+        251
+      ],
+      "localized_bbox": [
+        1543,
+        195,
+        1634,
+        249
+      ],
+      "source_width": 226,
+      "source_height": 58,
+      "localized_width": 91,
+      "localized_height": 54,
+      "delta_left": 67,
+      "delta_right": 68,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1476,
+        1797,
+        1702,
+        1855
+      ],
+      "raw_localized_bbox": [
+        1543,
+        1799,
+        1634,
+        1853
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 46,
+      "stroke_outer": 4,
+      "stroke_inner": 0,
+      "shadow_px": 3,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "top_ghost",
+      "region_idx": 26,
+      "source": "TOP Ghost Car!!",
+      "korean": "최고 고스트 카!!",
+      "style": "white_red_glow",
+      "cell_rect": [
+        560,
+        272,
+        1400,
+        392
+      ],
+      "original_bbox": [
+        572,
+        272,
+        1374,
+        392
+      ],
+      "localized_bbox": [
+        682,
+        274,
+        1263,
+        390
+      ],
+      "source_width": 802,
+      "source_height": 120,
+      "localized_width": 581,
+      "localized_height": 116,
+      "delta_left": 110,
+      "delta_right": 111,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        572,
+        1656,
+        1374,
+        1776
+      ],
+      "raw_localized_bbox": [
+        682,
+        1658,
+        1263,
+        1774
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 83,
+      "stroke_outer": 8,
+      "stroke_inner": 5,
+      "shadow_px": 0,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "double",
+      "region_idx": 5,
+      "source": "Double!",
+      "korean": "더블!",
+      "style": "gold_navy",
+      "cell_rect": [
+        0,
+        392,
+        504,
+        536
+      ],
+      "original_bbox": [
+        0,
+        400,
+        500,
+        528
+      ],
+      "localized_bbox": [
+        120,
+        402,
+        379,
+        526
+      ],
+      "source_width": 500,
+      "source_height": 128,
+      "localized_width": 259,
+      "localized_height": 124,
+      "delta_left": 120,
+      "delta_right": 121,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        0,
+        1520,
+        500,
+        1648
+      ],
+      "raw_localized_bbox": [
+        120,
+        1522,
+        379,
+        1646
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 111,
+      "stroke_outer": 7,
+      "stroke_inner": 3,
+      "shadow_px": 8,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "strike",
+      "region_idx": 30,
+      "source": "Strike!",
+      "korean": "스트라이크!",
+      "style": "gold_navy",
+      "cell_rect": [
+        504,
+        392,
+        1008,
+        536
+      ],
+      "original_bbox": [
+        548,
+        392,
+        1000,
+        528
+      ],
+      "localized_bbox": [
+        550,
+        410,
+        998,
+        510
+      ],
+      "source_width": 452,
+      "source_height": 136,
+      "localized_width": 448,
+      "localized_height": 100,
+      "delta_left": 2,
+      "delta_right": 2,
+      "delta_top": 18,
+      "delta_bottom": 18,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        548,
+        1520,
+        1000,
+        1656
+      ],
+      "raw_localized_bbox": [
+        550,
+        1538,
+        998,
+        1638
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 89,
+      "stroke_outer": 6,
+      "stroke_inner": 3,
+      "shadow_px": 6,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "goal",
+      "region_idx": 36,
+      "source": "GOAL!",
+      "korean": "골!",
+      "style": "goal_multicolor",
+      "cell_rect": [
+        560,
+        544,
+        1064,
+        688
+      ],
+      "original_bbox": [
+        600,
+        552,
+        1016,
+        680
+      ],
+      "localized_bbox": [
+        728,
+        554,
+        887,
+        678
+      ],
+      "source_width": 416,
+      "source_height": 128,
+      "localized_width": 159,
+      "localized_height": 124,
+      "delta_left": 128,
+      "delta_right": 129,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        600,
+        1368,
+        1016,
+        1496
+      ],
+      "raw_localized_bbox": [
+        728,
+        1370,
+        887,
+        1494
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 114,
+      "stroke_outer": 9,
+      "stroke_inner": 3,
+      "shadow_px": 7,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "spare",
+      "region_idx": 37,
+      "source": "Spare!",
+      "korean": "스페어!",
+      "style": "gold_navy",
+      "cell_rect": [
+        1064,
+        544,
+        1568,
+        688
+      ],
+      "original_bbox": [
+        1104,
+        544,
+        1520,
+        688
+      ],
+      "localized_bbox": [
+        1112,
+        546,
+        1511,
+        686
+      ],
+      "source_width": 416,
+      "source_height": 144,
+      "localized_width": 399,
+      "localized_height": 140,
+      "delta_left": 8,
+      "delta_right": 9,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1104,
+        1360,
+        1520,
+        1504
+      ],
+      "raw_localized_bbox": [
+        1112,
+        1362,
+        1511,
+        1502
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 125,
+      "stroke_outer": 8,
+      "stroke_inner": 4,
+      "shadow_px": 9,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "shift_up",
+      "region_idx": 3,
+      "source": "Shift up!!",
+      "korean": "시프트 업!!",
+      "style": "yellow_white_navy",
+      "cell_rect": [
+        0,
+        688,
+        1064,
+        888
+      ],
+      "original_bbox": [
+        158,
+        710,
+        900,
+        878
+      ],
+      "localized_bbox": [
+        181,
+        712,
+        876,
+        876
+      ],
+      "source_width": 742,
+      "source_height": 168,
+      "localized_width": 695,
+      "localized_height": 164,
+      "delta_left": 23,
+      "delta_right": 24,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        158,
+        1170,
+        900,
+        1338
+      ],
+      "raw_localized_bbox": [
+        181,
+        1172,
+        876,
+        1336
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 150,
+      "stroke_outer": 9,
+      "stroke_inner": 4,
+      "shadow_px": 9,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "rank",
+      "region_idx": 41,
+      "source": "Rank",
+      "korean": "랭크",
+      "style": "white_lavender",
+      "cell_rect": [
+        1064,
+        704,
+        1424,
+        888
+      ],
+      "original_bbox": [
+        1068,
+        756,
+        1413,
+        882
+      ],
+      "localized_bbox": [
+        1131,
+        758,
+        1350,
+        879
+      ],
+      "source_width": 345,
+      "source_height": 126,
+      "localized_width": 219,
+      "localized_height": 121,
+      "delta_left": 63,
+      "delta_right": 63,
+      "delta_top": 2,
+      "delta_bottom": 3,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1068,
+        1166,
+        1413,
+        1292
+      ],
+      "raw_localized_bbox": [
+        1131,
+        1169,
+        1350,
+        1290
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 107,
+      "stroke_outer": 7,
+      "stroke_inner": 3,
+      "shadow_px": 9,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "turkey",
+      "region_idx": 50,
+      "source": "Turkey!",
+      "korean": "터키!",
+      "style": "gold_navy",
+      "cell_rect": [
+        1544,
+        984,
+        2048,
+        1152
+      ],
+      "original_bbox": [
+        1572,
+        992,
+        2012,
+        1140
+      ],
+      "localized_bbox": [
+        1642,
+        994,
+        1942,
+        1138
+      ],
+      "source_width": 440,
+      "source_height": 148,
+      "localized_width": 300,
+      "localized_height": 144,
+      "delta_left": 70,
+      "delta_right": 70,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        1572,
+        908,
+        2012,
+        1056
+      ],
+      "raw_localized_bbox": [
+        1642,
+        910,
+        1942,
+        1054
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 129,
+      "stroke_outer": 8,
+      "stroke_inner": 4,
+      "shadow_px": 9,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    },
+    {
+      "key": "go",
+      "region_idx": 1,
+      "source": "Go!",
+      "korean": "출발!",
+      "style": "go_peach",
+      "cell_rect": [
+        0,
+        1152,
+        840,
+        1528
+      ],
+      "original_bbox": [
+        25,
+        1161,
+        805,
+        1517
+      ],
+      "localized_bbox": [
+        52,
+        1163,
+        778,
+        1515
+      ],
+      "source_width": 780,
+      "source_height": 356,
+      "localized_width": 726,
+      "localized_height": 352,
+      "delta_left": 27,
+      "delta_right": 27,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS",
+      "raw_original_bbox": [
+        25,
+        531,
+        805,
+        887
+      ],
+      "raw_localized_bbox": [
+        52,
+        533,
+        778,
+        885
+      ],
+      "raw_containment": "PASS",
+      "font": "Noto Sans CJK KR Black/Bold",
+      "font_size": 319,
+      "stroke_outer": 21,
+      "stroke_inner": 8,
+      "shadow_px": 21,
+      "rework_status": "A_PRODUCTION14_NEW_HD_CANDIDATE"
+    }
+  ],
+  "all_13_readable_and_raw_bbox_pass": true,
+  "all_13_size_ceiling_pass": true,
+  "all_13_positive_margin": true,
+  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "runtime_validation": "UNTESTED",
+  "status": "A_PRODUCTION14_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+}
