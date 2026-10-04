@@ -1,6 +1,6 @@
 {
   "source_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
-  "candidate_sha256": "bd2d0bb37843747a97cce569a6ef7d4fab62b27e5c0f58365968bcf05bb10050",
+  "candidate_sha256": "e0fc4e372f023e97706a8cee460833eaa0bfbff0164fcffb7406c3a042d4224a",
   "semantic_targets": "7/7",
   "physical_lines": "19/19",
   "exact_bbox_and_size_ceiling": "19/19 PASS",
