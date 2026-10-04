@@ -115,52 +115,36 @@ for k,m in old_masks.items():
 
 # Build an improved clean plate for the More Engine source label.
 # C92 showed source English surviving under the Korean layer. The source bbox slightly
-# overlaps the separate "You" sprite at x>=3169, so clip source cleanup before that
-# neighbor and derive a glyph/effect-shaped high-frequency mask inside the source bbox.
+# overlaps the separate "You" sprite at x>=3169. C92 proved the prior
+# glyph mask was incomplete, so reconstruct the full exact source text bounding band
+# (not the sprite cell) by per-column RGBA interpolation between untouched source
+# rows immediately above/below it. This removes all English residue while preserving
+# the panel's horizontal color/alpha variation and leaves the You neighbor untouched.
 clean08=clean07.copy()
 engine_ob=list(rowmap["more_engine"]["original_bbox"])
 engine_safe=[engine_ob[0],engine_ob[1],min(engine_ob[2],3169),engine_ob[3]]
-pad=8
-px0=max(0,engine_safe[0]-pad); py0=max(0,engine_safe[1]-pad)
-px1=min(W,engine_safe[2]+pad); py1=min(H,engine_safe[3]+pad)
-source_patch=src.crop((px0,py0,px1,py1))
-blur=source_patch.filter(ImageFilter.GaussianBlur(radius=5.0))
-hf=ImageChops.difference(source_patch,blur)
-hb=hf.split()
-score=hb[0]
-for b in hb[1:3]:
-    score=ImageChops.lighter(score,b)
-# Low threshold, then dilation, captures fill/outline/shadow but remains clipped to the
-# original text bbox and away from the You neighbor.
-local_hf=score.point(lambda v:255 if v>=45 else 0)
-clip=Image.new("L",source_patch.size,0)
-cd=ImageDraw.Draw(clip)
-cd.rectangle((engine_safe[0]-px0,engine_safe[1]-py0,engine_safe[2]-px0-1,engine_safe[3]-py0-1),fill=255)
-local_hf=ImageChops.multiply(local_hf,clip).filter(ImageFilter.MaxFilter(7))
-# Union prior A07 source mask for this safe region so all earlier-cleaned English
-# pixels and newly detected residue are reconstructed together.
-prior_local=source_mask07.crop((px0,py0,px1,py1))
-engine_mask_local=ImageChops.lighter(local_hf,prior_local)
-engine_mask_local=ImageChops.multiply(engine_mask_local,clip)
-engine_mask=full_mask(src.size,engine_mask_local,(px0,py0))
+ex0,ey0,ex1,ey1=engine_safe
+engine_mask=Image.new("L",src.size,0)
+ed=ImageDraw.Draw(engine_mask)
+ed.rectangle((ex0,ey0,ex1-1,ey1-1),fill=255)
 emb=engine_mask.getbbox()
-assert emb and contains(engine_safe,emb),(engine_safe,emb)
 engine_mask_pixels=count(engine_mask)
-safe_area=(engine_safe[2]-engine_safe[0])*(engine_safe[3]-engine_safe[1])
-assert 800 < engine_mask_pixels < int(safe_area*0.55),(engine_mask_pixels,safe_area)
-
-# Harmonic-ish inpaint using a blurred initialization and repeated 4-neighbor relaxation.
-arr=np.asarray(source_patch).astype(np.float32)
-mask_np=np.asarray(engine_mask_local)>0
-init=np.asarray(source_patch.filter(ImageFilter.GaussianBlur(radius=9.0))).astype(np.float32)
-work=arr.copy()
-work[mask_np]=init[mask_np]
-for _ in range(180):
-    avg=(np.roll(work,1,0)+np.roll(work,-1,0)+np.roll(work,1,1)+np.roll(work,-1,1))*0.25
-    work[mask_np]=avg[mask_np]
-inp=Image.fromarray(np.clip(work,0,255).astype(np.uint8),"RGBA")
-clean08.paste(inp,(px0,py0),engine_mask_local)
-# Ensure current candidate's old Korean engine layer is cleared to the improved plate.
+safe_area=(ex1-ex0)*(ey1-ey0)
+assert engine_mask_pixels==safe_area and emb==tuple(engine_safe),(engine_mask_pixels,safe_area,emb)
+# Reconstruct only the source text band. Each x column keeps the source panel's
+# own color/alpha endpoints, avoiding a flat patch or opaque backing.
+arr=np.asarray(src).astype(np.float32)
+clean_arr=np.asarray(clean08).copy()
+top=arr[ey0-1,ex0:ex1,:]
+bottom=arr[ey1,ex0:ex1,:]
+h=ey1-ey0
+for yy in range(h):
+    t=(yy+1)/(h+1)
+    row=np.clip(top*(1.0-t)+bottom*t,0,255).astype(np.uint8)
+    clean_arr[ey0+yy,ex0:ex1,:]=row
+clean08=Image.fromarray(clean_arr,"RGBA")
+# Ensure current candidate's old Korean engine layer and all source English in the
+# source bbox are cleared to the reconstructed plate.
 final.paste(clean08,(0,0),ImageChops.lighter(engine_mask,old_masks["more_engine"]))
 
 # The three expert-related cells physically overlap in the atlas. C92 showed the old
