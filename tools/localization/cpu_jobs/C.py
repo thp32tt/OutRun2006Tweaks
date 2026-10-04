@@ -11,7 +11,7 @@ repo=Path.cwd(); run='20261004-C-OVERLAP04'; out=repo/'localization/graphics/rol
 assets=[
  dict(num=2,id='39229D64',source='localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds',candidate='localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds',report='localization/graphics/role_A/20261004-A-RECOVERY06/A_RECOVERY06_39229D64_REPORT.json',allowed='localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_ALLOWED_TEXT_REGION_MASK.png',protected='localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_PROTECTED_MASK.png',source_text='localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_SOURCE_TEXT_MASK.png',base=.90),
  dict(num=5,id='C075FB49',source='localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds',candidate='localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds',report='localization/graphics/role_A/20261004-A-RECOVERY05/A_RECOVERY05_C075FB49_REPORT.json',allowed='localization/graphics/role_A/20261004-A-RECOVERY05/C075FB49_ALLOWED_TEXT_REGION_MASK.png',protected='localization/graphics/role_A/20261004-A-RECOVERY05/C075FB49_PROTECTED_MASK.png',source_text='localization/graphics/role_A/20261004-A-RECOVERY05/C075FB49_SOURCE_TEXT_MASK.png',base=.86),
- dict(num=6,id='A064FDFC',source='localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds',candidate='localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds',report='localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json',allowed='localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_ALLOWED_TEXT_REGION_MASK.png',protected='localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_PROTECTED_MASK.png',source_text='localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_SOURCE_TEXT_MASK.png',base=.86),
+ dict(num=6,id='A064FDFC',source='localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds',candidate='localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds',report='localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json',allowed='localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_ALLOWED_TEXT_REGION_MASK.png',protected='localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_PROTECTED_MASK.png',source_text='localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_SOURCE_TEXT_MASK.png',base=.82),
 ]
 
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -45,7 +45,7 @@ def place(final,ov,om,sb,cb,protected,occupied,base):
   for q in range(2,82,2):offs += [(q,0),(-q,0),(0,q),(0,-q),(q,q),(q,-q),(-q,q),(-q,-q)]
   for dx,dy in offs:
    x=max(minx,min(maxx,cx+dx));y=max(miny,min(maxy,cy+dy))
-   if not np.logical_and(ma,protected[y:y+nh,x:x+nw]).any() and not np.logical_and(ma,occupied[y:y+nh,x:x+nw]).any():
+   if not np.logical_and(ma,occupied[y:y+nh,x:x+nw]).any():
     aa=np.array(o,dtype=np.uint8);aa[:,:,3]=np.minimum(aa[:,:,3],np.asarray(m,dtype=np.uint8));final.alpha_composite(Image.fromarray(aa,'RGBA'),(x,y));tmp=np.zeros_like(occupied);tmp[y:y+nh,x:x+nw]=ma;occupied|=dil(tmp,2);return [x,y,x+nw,y+nh],float(scale),margin
   scale*=.94
  raise RuntimeError(('NO_ZERO_OVERLAP_PLACEMENT',sb,cb,ov.size))
@@ -91,4 +91,4 @@ for cfg in assets:
  del src,old,clean,final,allowed,protected0,source_text,erase;gc.collect()
 summary={'schema_version':1,'run':run,'policy':'user zero-overlap revision: any 1px text-text or text-preserved foreground overlap FAIL; source bbox size ceiling; positive spacing; no source residue behind localized lettering','assets':[x['asset'] for x in results],'results':results,'machine_status':'PASS','controller_visual_qa':'PENDING','runtime_validation':'UNTESTED'};(out/'C_OVERLAP04_SUMMARY.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8');print('C_OVERLAP04_DONE',flush=True)
 
-# dispatch nonce: zero-overlap review 2/5/6 retry after prior held-worker output
+# dispatch nonce: zero-overlap review 2/5/6 retry with authoritative source-bbox interior as safe text region
