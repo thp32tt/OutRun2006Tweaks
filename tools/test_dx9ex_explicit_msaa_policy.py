@@ -28,4 +28,12 @@ if 'lstrcmpiA(backend, "d3d9") == 0' not in source:
 if "D3DSWAPEFFECT_DISCARD" not in block:
     raise SystemExit("DX9Ex MSAA policy must fail safe for non-DISCARD swap effects")
 
+validate_start = source.index("bool validate() override", block_end)
+validate_end = source.index("void declare_settings() override", validate_start)
+validate_block = source[validate_start:validate_end]
+if "IsNativeD3D9ReferenceLaunch()" not in validate_block:
+    raise SystemExit(
+        "DX9Ex explicit MSAA hook must install even when CORRECTNESS keeps default VSync"
+    )
+
 print("DX9Ex explicit 4x->2x MSAA policy: PASS")

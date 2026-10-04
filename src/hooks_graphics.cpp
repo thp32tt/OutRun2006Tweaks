@@ -1730,8 +1730,14 @@ public:
 
 	bool validate() override
 	{
+		// The D3D9 reference path also owns the explicit MSAA selection above.
+		// CORRECTNESS normally keeps desktop VSync at its default, so without
+		// this clause the hook never installed and the runtime silently stayed
+		// on the game's NONMASKABLE AA despite the requested 4x/2x policy.
 		return Settings::VSync != 1 ||
-			(Settings::VREnabled && Settings::VRDisableDesktopVsync);
+			(Settings::VREnabled &&
+				(Settings::VRDisableDesktopVsync ||
+				 IsNativeD3D9ReferenceLaunch()));
 	}
 
 	void declare_settings() override
