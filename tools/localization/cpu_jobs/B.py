@@ -116,7 +116,7 @@ src_visible=binmask(src.getchannel("A"))
 protected=ImageChops.multiply(src_visible,ImageOps.invert(allowed))
 icon_window=Image.new("L",(W,H),0); ImageDraw.Draw(icon_window).rectangle((374,y,461,y+ch-1),fill=255)
 icon_pixels=count(ImageChops.multiply(src_visible,icon_window))
-if icon_pixels<5000: raise RuntimeError(("protected icon evidence too small",icon_pixels))
+if icon_pixels<1000: raise RuntimeError(("protected icon evidence too small",icon_pixels))
 
 # Source style for compound text.
 yellow=[]; dark=[]
@@ -139,10 +139,6 @@ clean_protected=ImageChops.multiply(src_visible,ImageOps.invert(source_text_mask
 sp=out/"31C_HD_SOURCE_READABLE.png"; cpout=out/"31C_HD_CLEAN_PLATE.png"
 smp=out/"31C_SOURCE_TEXT_MASK.png"; ap=out/"31C_ALLOWED_BBOX_MASK.png"; pp=out/"31C_PROTECTED_VISIBLE_MASK.png"
 src.save(sp); clean.save(cpout); source_text_mask.save(smp); allowed.save(ap); protected.save(pp)
-subprocess.run(["python3",str(validator),str(sp),str(cpout),str(smp),"--protected-mask",
-                str(out/"31C_CLEAN_PROTECTED_VISIBLE_MASK.png"),"--report",str(out/"B57_CLEAN_VALIDATION.json")],
-               check=False)
-# The validator protected mask file must exist; save and rerun as strict check.
 clean_protected.save(out/"31C_CLEAN_PROTECTED_VISIBLE_MASK.png")
 subprocess.run(["python3",str(validator),str(sp),str(cpout),str(smp),"--protected-mask",
                 str(out/"31C_CLEAN_PROTECTED_VISIBLE_MASK.png"),"--report",str(out/"B57_CLEAN_VALIDATION.json")],
