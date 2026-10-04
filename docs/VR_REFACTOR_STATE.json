@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "updatedKst": "2026-10-04T10:09:00+09:00",
+  "updatedKst": "2026-10-04T11:32:00+09:00",
   "branch": "vr-d3d9ex-focus",
   "baseHead": "3804abd23da149b0dd3b1b7867e047e4ca05fa59",
   "mode": "CHAT_DIRECT",
   "target": "Flatten R-series runtime hook chain into functional modules and a single dispatcher without changing protected runtime behavior.",
   "protectedBaseline": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
-  "cycle": 762,
+  "cycle": 900,
   "completed": [
     "VR-REFACTOR-HOOKGRAPH-0001",
     "VR-REFACTOR-SEMANTIC-0001",
@@ -53,9 +53,12 @@
     "VR-REFACTOR-STATE-0004O",
     "VR-REFACTOR-STATE-0004P",
     "VR-REFACTOR-STATE-0004Q",
-    "VR-REFACTOR-STATE-0004R"
+    "VR-REFACTOR-STATE-0004R",
+    "VR-REFACTOR-STATE-0004S",
+    "VR-REFACTOR-STATE-0004T",
+    "VR-REFACTOR-STATE-0004T-FIX00"
   ],
-  "next": "Continue from validated 0004R by removing R23's remaining private R22 raster-helper dependencies (R22ScissorSnapshot/R22CaptureGameScissor/R22GameClearCoversBackbuffer) behind owner/neutral raster APIs while preserving clear coverage and live-state capture semantics. Continue 1000-cycle plan from cycle 762.",
+  "next": "Continue from cycle 900 by reviewing the remaining R9 depth-content ownership exposed to R20/R23/R29/R31/R32/R33 and R29 telemetry/counter ownership exposed to upper layers. Prefer small owner snapshot/note APIs only when they preserve hot-path cost and exact runtime semantics. 1000-cycle plan has 100 cycles remaining.",
   "runtimeValidation": "UNTESTED",
   "notes": [
     "Current hook graph is pinned as a ceiling, not as the desired final architecture.",
@@ -99,11 +102,16 @@
     "Current bounded continuation added 8 commits after b7431cfe = 24 cycles (720 -> 744). Exact source b554eda10afa46c814b92de795e41d14e9a9b360 passed DX9Ex Active Validation 37166334049 and Domain Isolation/HUD Inspector gates; runtime remains UNTESTED.",
     "VR-REFACTOR-STATE-0004R completes prerequisite install-state ownership through R9/R13/R20/R21/R22 -> R23. RED verifier SHA ddf9c46b enumerated the direct atomic/constant dependencies. R9 now exposes an owner-local status enum/query; R20 and R21 expose InstallState queries and consume lower owner APIs; R23 preserves the original fail-fast prerequisite order and R22-ready activation gate through owner queries.",
     "0004R source sequence: 27d7e49f R9 owner query; 2112db17 R20 owner query/consumer; 93deced6 R21 owner query/consumer; 49464b2e restores exact R21 short-circuit read ordering; 426a48a7 R23 owner-query consumption. Exact source 426a48a7 passed DX9Ex Active Validation 37166819681 and Domain Isolation 37166819692.",
-    "Current continuation added 6 commits after the 744-cycle checkpoint = 18 cycles, advancing durable structural progress to 762. Runtime behavior remains UNTESTED on Quest 3/VDXR."
+    "Current continuation added 6 commits after the 744-cycle checkpoint = 18 cycles, advancing durable structural progress to 762. Runtime behavior remains UNTESTED on Quest 3/VDXR.",
+    "Cycle 762->900 completed as 27 persistent review batches x 5 lenses plus 3 targeted ownership checks = exactly 138 static review checks. Lenses were architecture/integration, ownership/lifetime, stereo correctness, performance, and adversarial/failure. Edit gates were evaluated at the established three-cycle cadence; no-op gates were not committed.",
+    "VR-REFACTOR-STATE-0004S removes R23's private dependence on R22ScissorSnapshot, R22CaptureGameScissor, and R22GameClearCoversBackbuffer. RED verifier SHA 8a9e2d61 failed exactly on these dependencies. R22 now exposes neutral D3D9RasterSnapshot owner APIs CaptureTrackedRasterState and TrackedGameClearCoversBackbuffer; R23 consumes them without changing its 16-draw live-validation window, StateBlock reliability shortcut, clear coverage, or baseline semantics.",
+    "VR-REFACTOR-STATE-0004T resolves all three targeted findings from the 138-cycle review: R23 SetRenderTarget failure uses FailClosedTrackedRasterReplay instead of private R22FailClosedReplayState; R29 uses inline TopLevelDrawSerial() instead of direct R23GameDrawSerial at all six sites while retaining the 64-draw freshness bound; R31 registers PrimeTrackedRasterShadow instead of private R22PrimeShadowState for StateBlockRecovery.",
+    "VR-REFACTOR-STATE-0004T-FIX00 updates stale deterministic verifier literals to the already-migrated owner contracts: verify_vr_architecture expects R20InstallStatus in R21, verify_vr_r32_review expects SetStereoRecoverySafetyThroughEpoch/RearmMonoSafetyEpoch, and the refactor verifier accepts PrimeTrackedRasterShadow as a callback symbol. No runtime source behavior changed in FIX00.",
+    "Final exact-SHA 640b0d5cbed5fd5fb36336d65509da4f8d62d514 passed DX9Ex Active Validation 37171033051: policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation Guard 37171033032 SUCCESS. Package artifact 11291113243 was validated and uploaded. Runtime remains UNTESTED."
   ],
-  "batchStatus": "VR-REFACTOR-STATE-0004R_BUILD_VERIFIED",
-  "validatedSourceSha": "426a48a7c1a803dc990b437383bb4ad650346a73",
-  "validationRunId": 37166819681,
+  "batchStatus": "VR-REFACTOR-STATE-0004T_FIX00_BUILD_VERIFIED_CYCLE_900",
+  "validatedSourceSha": "640b0d5cbed5fd5fb36336d65509da4f8d62d514",
+  "validationRunId": 37171033051,
   "validationResult": "PASS",
   "validationJobs": {
     "policy": "SUCCESS",
@@ -114,13 +122,14 @@
     "domainIsolation": "SUCCESS"
   },
   "testCandidate": {
-    "sourceSha": "426a48a7c1a803dc990b437383bb4ad650346a73",
-    "workflowRunId": 37166819681,
-    "artifactId": 11289701128,
-    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-426a48a7c1a803dc990b437383bb4ad650346a73",
-    "artifactSizeBytes": 2729382,
-    "artifactDigestSha256": "1c11b7868df28489982a28f172e59a871df2bb9787791ac5f5beba6199bc7903",
-    "innerPackageSha256": "3caefa1f2b8e0da6dacb6b7a86cfed16a0c60cbeaaec553dd69d1527ffadd908",
+    "sourceSha": "640b0d5cbed5fd5fb36336d65509da4f8d62d514",
+    "runtimeSourceChangeSha": "f3f67e342fa45c5f5caaaa5fca4ee31ac2bc265c",
+    "workflowRunId": 37171033051,
+    "artifactId": 11291113243,
+    "artifactName": "OutRun2-VR-DX9EX-ACTIVE-640b0d5cbed5fd5fb36336d65509da4f8d62d514",
+    "artifactSizeBytes": 2729229,
+    "artifactDigestSha256": "8dd5b687e377808f9320852ed16a90140bfffa8ac97661e243d138ab10f90631",
+    "innerPackageSha256": "fb0dce3b1f0b1d64752776b8d6abaa659adf643b313619dbd7b81ef9b0eda744",
     "defaultProfile": "CORRECTNESS",
     "userRuntimeVerified": false
   }
