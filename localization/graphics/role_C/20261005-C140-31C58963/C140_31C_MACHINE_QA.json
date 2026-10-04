@@ -1,0 +1,307 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C140-31C58963",
+  "queue_index": 140,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+  "producer_run": "20261005-B-PRODUCTION58",
+  "source_sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+  "input_candidate_sha256": "b6d8bcc2f2cc05d45d4af3fbfab30f0a71e8fa68a89dee4c78b6f8a6aeca4cd3",
+  "candidate_sha256": "ecc7efdde172f410c85207ecdc5bbfd5bac95c753341763ad6afb9a6a7f1b3f2",
+  "candidate_changed_by_C": true,
+  "corrective_scope": "remove 298 canonical KEY source-effect fringe pixels x457..461 omitted by B58 right_range beginning at x462; no Korean target or protected icon pixels changed",
+  "independent_source_method": "pinned canonical source+atlas; rows0-3 exact cell alpha; region4 exact three 8-connected alpha groups PRESS|Enter icon|KEY",
+  "structure": {
+    "dimensions": [
+      2048,
+      1024
+    ],
+    "format": "RGBA32",
+    "raw_mode": "RGBA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "compound_source_groups": {
+    "press_bbox": [
+      162,
+      318,
+      365,
+      382
+    ],
+    "enter_icon_bbox": [
+      376,
+      318,
+      443,
+      382
+    ],
+    "key_bbox": [
+      457,
+      319,
+      583,
+      381
+    ],
+    "press_pixels": 11830,
+    "enter_icon_pixels": 3661,
+    "key_pixels": 6940
+  },
+  "producer_defect": {
+    "clean_diff_vs_independent_exact_pixels": 298,
+    "clean_diff_bbox": [
+      457,
+      319,
+      462,
+      381
+    ],
+    "input_source_residue_pixels": 298,
+    "input_source_residue_bbox": [
+      457,
+      319,
+      462,
+      381
+    ]
+  },
+  "rows": [
+    {
+      "key": "region_0",
+      "region_idx": 0,
+      "source": "SELECT STAGE",
+      "korean": "스테이지 선택",
+      "original_bbox": [
+        7,
+        905,
+        840,
+        1003
+      ],
+      "localized_bbox": [
+        9,
+        907,
+        548,
+        1001
+      ],
+      "source_size": [
+        833,
+        98
+      ],
+      "localized_size": [
+        539,
+        94
+      ],
+      "delta_left": 2,
+      "delta_right": 292,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "region_1",
+      "region_idx": 1,
+      "source": "SELECT RACE",
+      "korean": "레이스 선택",
+      "original_bbox": [
+        13,
+        749,
+        793,
+        847
+      ],
+      "localized_bbox": [
+        15,
+        751,
+        463,
+        845
+      ],
+      "source_size": [
+        780,
+        98
+      ],
+      "localized_size": [
+        448,
+        94
+      ],
+      "delta_left": 2,
+      "delta_right": 330,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "region_2",
+      "region_idx": 2,
+      "source": "SELECT MODE",
+      "korean": "모드 선택",
+      "original_bbox": [
+        7,
+        589,
+        815,
+        687
+      ],
+      "localized_bbox": [
+        9,
+        591,
+        373,
+        685
+      ],
+      "source_size": [
+        808,
+        98
+      ],
+      "localized_size": [
+        364,
+        94
+      ],
+      "delta_left": 2,
+      "delta_right": 442,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "region_3",
+      "region_idx": 3,
+      "source": "SHOWROOM",
+      "korean": "쇼룸",
+      "original_bbox": [
+        7,
+        432,
+        652,
+        527
+      ],
+      "localized_bbox": [
+        9,
+        434,
+        181,
+        525
+      ],
+      "source_size": [
+        645,
+        95
+      ],
+      "localized_size": [
+        172,
+        91
+      ],
+      "delta_left": 2,
+      "delta_right": 471,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "press_word",
+      "region_idx": 4,
+      "source": "PRESS",
+      "korean": "누르세요",
+      "original_bbox": [
+        162,
+        318,
+        365,
+        382
+      ],
+      "localized_bbox": [
+        167,
+        320,
+        359,
+        380
+      ],
+      "source_size": [
+        203,
+        64
+      ],
+      "localized_size": [
+        192,
+        60
+      ],
+      "delta_left": 5,
+      "delta_right": 6,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    },
+    {
+      "key": "key_word",
+      "region_idx": 4,
+      "source": "KEY",
+      "korean": "키",
+      "original_bbox": [
+        457,
+        319,
+        583,
+        381
+      ],
+      "localized_bbox": [
+        498,
+        321,
+        547,
+        379
+      ],
+      "source_size": [
+        126,
+        62
+      ],
+      "localized_size": [
+        49,
+        58
+      ],
+      "delta_left": 41,
+      "delta_right": 36,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "positive_margin": "PASS"
+    }
+  ],
+  "style_checks": {
+    "region_0": {
+      "near_white_fraction": 1.0
+    },
+    "region_1": {
+      "near_white_fraction": 1.0
+    },
+    "region_2": {
+      "near_white_fraction": 1.0
+    },
+    "region_3": {
+      "near_white_fraction": 1.0
+    },
+    "press_word": {
+      "yellow_pixels": 2966,
+      "dark_outline_pixels": 5574
+    },
+    "key_word": {
+      "yellow_pixels": 645,
+      "dark_outline_pixels": 1540
+    }
+  },
+  "machine_checks": {
+    "fix_changed_pixels": 298,
+    "changes_vs_input_outside_fix_mask": 0,
+    "bbox_size_positive_margin": "6/6 PASS",
+    "final_outside": 0,
+    "alpha_outside": 0,
+    "protected_changed": 0,
+    "enter_icon_changed": 0,
+    "render_outside_target": 0,
+    "source_residue": 0,
+    "overlap": 0,
+    "touch_pairs": [],
+    "compound_target_icon_1px_near_pixels": {
+      "press_word": 0,
+      "key_word": 0
+    }
+  },
+  "machine_status": "PASS_AFTER_C_SMALL_CORRECTION",
+  "controller_visual_qa": "PENDING",
+  "decision": "PENDING_CONTROLLER_VISUAL_QA",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
