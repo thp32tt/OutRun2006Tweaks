@@ -1,0 +1,25 @@
+{
+  "candidate_sha256": "9f48c04586fe8d7d446760d47345f010bc279ef21f618db44f73c3a548660fcf",
+  "bbox_pass": "11/11",
+  "prior_pass_exact": {
+    "course_or2": 0,
+    "wait_other": 0,
+    "handling": 0,
+    "single_play": 0
+  },
+  "outside_all_bboxes": 0,
+  "alpha_outside_all_bboxes": 0,
+  "collateral_outside_reworked": 0,
+  "native_font_sizes": {
+    "course_sp": 96,
+    "wait_now": 90,
+    "acceleration": 66,
+    "max_speed": 47,
+    "view_change": 72,
+    "expert": 92,
+    "special_course": 108
+  },
+  "status": "SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "manual_visual_qa": "PASS",
+  "runtime_validation": "UNTESTED"
+}

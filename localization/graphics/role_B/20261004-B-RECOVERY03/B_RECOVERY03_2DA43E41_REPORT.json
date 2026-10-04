@@ -1,0 +1,380 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261004-B-RECOVERY03",
+  "base_head": "c0e0bd4b79dc0eead4b4a0ed432e48ae76d7f20a",
+  "asset": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+  "queue_index": 94,
+  "method": "exact HD source -> source glyph/effect mask -> protected mask -> clean plate -> exact restore of 4 prior-PASS regions -> 7 fresh native-resolution Korean renders -> RGBA32 DDS -> direct bbox/protected/collateral QA; no localized-raster scaling",
+  "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+  "before_sha256": "02da4680cbb25936aedbb6b61857d7d33b1e10889b5dc427420d4eea7e6e6563",
+  "candidate_sha256": "9f48c04586fe8d7d446760d47345f010bc279ef21f618db44f73c3a548660fcf",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+  "c85_failed_keys": [
+    "course_sp",
+    "wait_now",
+    "acceleration",
+    "max_speed",
+    "view_change",
+    "expert",
+    "special_course"
+  ],
+  "reworked_elements": 7,
+  "prior_pass_elements_preserved_exact": 4,
+  "native_font_sizes": {
+    "course_sp": 96,
+    "wait_now": 90,
+    "acceleration": 66,
+    "max_speed": 47,
+    "view_change": 72,
+    "expert": 92,
+    "special_course": 108
+  },
+  "structure": {
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "containment": {
+    "elements_total": 11,
+    "elements_pass": 11,
+    "elements_fail": 0,
+    "changed_pixels_outside_11_sprite_cells": 0,
+    "alpha_changed_outside_11_sprite_cells": 0
+  },
+  "collateral": {
+    "changes_vs_before_outside_7_reworked_sprite_cells": 0,
+    "prior_pass_pixel_changes": {
+      "course_or2": 0,
+      "wait_other": 0,
+      "handling": 0,
+      "single_play": 0
+    }
+  },
+  "rows": [
+    {
+      "key": "course_or2",
+      "source": "OutRun2 · 15 Continuous Course has been selected.",
+      "korean": "OutRun2 · 15코스 연속이 / 선택되었습니다.",
+      "original_bbox": [
+        115,
+        192,
+        2056,
+        448
+      ],
+      "localized_bbox": [
+        569,
+        207,
+        1645,
+        429
+      ],
+      "delta_left": 454,
+      "delta_right": 411,
+      "delta_top": 15,
+      "delta_bottom": 19,
+      "containment": "PASS",
+      "reworked": false,
+      "mode": "preserved_exact",
+      "prior_pass_pixel_exact": "PASS"
+    },
+    {
+      "key": "course_sp",
+      "source": "OutRun2: SP · 15 Continuous Course has been selected.",
+      "korean": "OutRun2: SP · 15코스 연속이 / 선택되었습니다.",
+      "original_bbox": [
+        132,
+        488,
+        2078,
+        717
+      ],
+      "localized_bbox": [
+        467,
+        498,
+        1738,
+        706
+      ],
+      "delta_left": 335,
+      "delta_right": 340,
+      "delta_top": 10,
+      "delta_bottom": 11,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "native_font_size": 96,
+      "native_raster_resampled": false,
+      "native_rendered_text": "OutRun2: SP · 15코스 연속이\\n선택되었습니다."
+    },
+    {
+      "key": "wait_other",
+      "source": "Waiting for other players. Please stand by.",
+      "korean": "다른 플레이어를 기다리는 중입니다. / 잠시 기다려 주세요.",
+      "original_bbox": [
+        2200,
+        192,
+        3533,
+        448
+      ],
+      "localized_bbox": [
+        2205,
+        206,
+        3519,
+        427
+      ],
+      "delta_left": 5,
+      "delta_right": 14,
+      "delta_top": 14,
+      "delta_bottom": 21,
+      "containment": "PASS",
+      "reworked": false,
+      "mode": "preserved_exact",
+      "prior_pass_pixel_exact": "PASS"
+    },
+    {
+      "key": "wait_now",
+      "source": "Now waiting for other players. Please stand by.",
+      "korean": "현재 다른 플레이어를 기다리는 중입니다. / 잠시 기다려 주세요.",
+      "original_bbox": [
+        2228,
+        461,
+        3776,
+        717
+      ],
+      "localized_bbox": [
+        2240,
+        491,
+        3761,
+        687
+      ],
+      "delta_left": 12,
+      "delta_right": 15,
+      "delta_top": 30,
+      "delta_bottom": 30,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "native_font_size": 90,
+      "native_raster_resampled": false,
+      "native_rendered_text": "현재 다른 플레이어를 기다리는 중입니다.\\n잠시 기다려 주세요."
+    },
+    {
+      "key": "acceleration",
+      "source": "加速度:",
+      "korean": "가속도:",
+      "original_bbox": [
+        3826,
+        247,
+        4016,
+        320
+      ],
+      "localized_bbox": [
+        3831,
+        251,
+        4011,
+        316
+      ],
+      "delta_left": 5,
+      "delta_right": 5,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "native_font_size": 66,
+      "native_raster_resampled": false,
+      "native_rendered_text": "가속도"
+    },
+    {
+      "key": "max_speed",
+      "source": "最高速:",
+      "korean": "최고 속도:",
+      "original_bbox": [
+        3827,
+        319,
+        4018,
+        410
+      ],
+      "localized_bbox": [
+        3832,
+        340,
+        4014,
+        388
+      ],
+      "delta_left": 5,
+      "delta_right": 4,
+      "delta_top": 21,
+      "delta_bottom": 22,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "native_font_size": 47,
+      "native_raster_resampled": false,
+      "native_rendered_text": "최고 속도"
+    },
+    {
+      "key": "handling",
+      "source": "ハンドリング:",
+      "korean": "핸들링:",
+      "original_bbox": [
+        1677,
+        896,
+        2112,
+        1050
+      ],
+      "localized_bbox": [
+        1731,
+        920,
+        2066,
+        1026
+      ],
+      "delta_left": 54,
+      "delta_right": 46,
+      "delta_top": 24,
+      "delta_bottom": 24,
+      "containment": "PASS",
+      "reworked": false,
+      "mode": "preserved_exact",
+      "prior_pass_pixel_exact": "PASS"
+    },
+    {
+      "key": "view_change",
+      "source": "View Change Button :",
+      "korean": "시점 변경 버튼:",
+      "original_bbox": [
+        3430,
+        998,
+        3896,
+        1102
+      ],
+      "localized_bbox": [
+        3433,
+        1010,
+        3890,
+        1089
+      ],
+      "delta_left": 3,
+      "delta_right": 6,
+      "delta_top": 12,
+      "delta_bottom": 13,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "native_font_size": 72,
+      "native_raster_resampled": false,
+      "native_rendered_text": "시점 변경 버튼:"
+    },
+    {
+      "key": "single_play",
+      "source": "Single Play.",
+      "korean": "싱글 플레이",
+      "original_bbox": [
+        1677,
+        1075,
+        2355,
+        1229
+      ],
+      "localized_bbox": [
+        1719,
+        1085,
+        2308,
+        1219
+      ],
+      "delta_left": 42,
+      "delta_right": 47,
+      "delta_top": 10,
+      "delta_bottom": 10,
+      "containment": "PASS",
+      "reworked": false,
+      "mode": "preserved_exact",
+      "prior_pass_pixel_exact": "PASS"
+    },
+    {
+      "key": "expert",
+      "source": "For Expert Drivers",
+      "korean": "상급자용",
+      "original_bbox": [
+        2842,
+        1124,
+        3479,
+        1229
+      ],
+      "localized_bbox": [
+        2985,
+        1125,
+        3334,
+        1228
+      ],
+      "delta_left": 143,
+      "delta_right": 145,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "native_font_size": 92,
+      "native_raster_resampled": false,
+      "native_rendered_text": "상급자용"
+    },
+    {
+      "key": "special_course",
+      "source": "Special Course",
+      "korean": "스페셜 코스",
+      "original_bbox": [
+        3137,
+        1279,
+        3879,
+        1403
+      ],
+      "localized_bbox": [
+        3242,
+        1280,
+        3775,
+        1402
+      ],
+      "delta_left": 105,
+      "delta_right": 104,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "reworked": true,
+      "mode": "native_render",
+      "native_font_size": 108,
+      "native_raster_resampled": false,
+      "native_rendered_text": "스페셜 코스"
+    }
+  ],
+  "clean_plate_validation": "PASS",
+  "final_mask_validation": "PASS",
+  "manual_visual_qa": "PASS",
+  "protected_source_punctuation": {
+    "acceleration_colon": "preserved",
+    "max_speed_colon": "preserved"
+  },
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_RECOVERY03_CLEANPLATE_SELFQA_PASS_PENDING_C_AND_INGAME",
+  "visual_qa": {
+    "decoded_source_before_clean_final_contact": "PASS",
+    "white_background_alpha_review": "PASS",
+    "source_language_residue_in_reworked_cells": "NONE_OBSERVED",
+    "clipping_or_bbox_escape": "NONE",
+    "new_overlap_or_protected_art_damage": "NONE_OBSERVED",
+    "stat_punctuation": "source colons outside the C85 glyph bbox preserved; Korean body rendered without duplicate colon",
+    "source_family_style": "PASS"
+  },
+  "visual_compare": "localization/graphics/role_B/20261004-B-RECOVERY03/B_RECOVERY03_2DA43E41_COMPARE.jpg",
+  "queue_scope_recomputed": {
+    "total": 137,
+    "localize_text": 79,
+    "zoom_review": 47,
+    "font_pipeline": 9,
+    "hangul_name_entry": 1,
+    "preserve_brand_song_credit": 1
+  },
+  "selection_base_head": "cedeacaee6c9b4074304fcef06b0cd37d6b2ec09",
+  "commit_refresh_head": "c0e0bd4b79dc0eead4b4a0ed432e48ae76d7f20a",
+  "remote_refresh_note": "Remote advanced during B work via C87/contract/A_RECOVERY05; 2DA43E41 source/candidate SHA remained unchanged, so B result was reapplied onto latest HEAD without overwriting concurrent state."
+}

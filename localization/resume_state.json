@@ -1475,5 +1475,25 @@
       "source": "C87 concurrent feedback after A_RECOVERY05 selection"
     },
     "integration_head": "c65649e66eb789ea6b2984f324236e5db2b3fc00"
+  },
+  "b_recovery03_2da43e41": {
+    "run": "20261004-B-RECOVERY03",
+    "selection_base_head": "cedeacaee6c9b4074304fcef06b0cd37d6b2ec09",
+    "commit_refresh_head": "c0e0bd4b79dc0eead4b4a0ed432e48ae76d7f20a",
+    "status": "B_REWORK_SELF_QA_PASS_PENDING_C_AND_INGAME",
+    "queue_index": 94,
+    "candidate_sha256": "9f48c04586fe8d7d446760d47345f010bc279ef21f618db44f73c3a548660fcf",
+    "reworked_elements": 7,
+    "native_rerenders": 7,
+    "all_11_bbox_pass": true,
+    "prior_pass_elements_preserved_exact": 4,
+    "format": "RGBA32",
+    "mipmaps": 1,
+    "raw_orientation": "mirror_y",
+    "clean_plate_report": "localization/graphics/role_B/20261004-B-RECOVERY03/B_RECOVERY03_CLEAN_PLATE_VALIDATION.json",
+    "final_mask_report": "localization/graphics/role_B/20261004-B-RECOVERY03/B_RECOVERY03_FINAL_MASK_VALIDATION.json",
+    "production_report": "localization/graphics/role_B/20261004-B-RECOVERY03/B_RECOVERY03_2DA43E41_REPORT.json",
+    "visual_compare": "localization/graphics/role_B/20261004-B-RECOVERY03/B_RECOVERY03_2DA43E41_COMPARE.jpg",
+    "runtime_validation": "UNTESTED"
   }
 }
