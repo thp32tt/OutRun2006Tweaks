@@ -990,3 +990,10 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Producer REWORK remains 0. Strict no-candidate DXT5 HOLD remains 4F68708E/F6811E94. pending_artwork localize_text=44.
 - RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_C/20261005-C125-FINAL/C125_CROSS_LANE_FINAL_QA.json
+## 2026-10-05 03:47 KST — B production40 42E618FD exact-HD candidate
+- Refreshed the latest branch/queue and skipped completed B_PRODUCTION39 1A43E9D9; selected the next actionable even-shard pending artwork, index 98 42E618FD_512x32.dds (Challenge the course record. -> 코스 기록에 도전하세요.).
+- Hosted worker run 37225559158 succeeded and produced DXT5 candidate 86b2de22ae7fa673d85cda4e6c5e0143c32c343177b1ccfc90550b9857fb705a from the canonical 2048x128 HD source. Construction used exact source alpha/effect bbox [431,6,1674,123], transparent clean plate with hidden RGB retained, source-measured white fill/navy outline and right slant, block-safe Korean target compression, and alpha-only source cleanup in edge/source-only BC3 blocks.
+- Static self-QA PASS: 1/1 original and decoded bbox/size ceiling; localized bbox [580,11,1523,116], decoded [580,11,1524,116] versus source 1243x117; visible outside=0, alpha outside=0, source residue(alpha>16 outside target guard)=0, changed BC3 blocks outside patch=0, exact 128-byte header preserved.
+- Controller SOURCE/CLEAN/FINAL and 2x row-contact visual review PASS; direct raw source/final DDS review confirms both share intentional mirror_y storage. No visible English residue, clipping, overlap, seam, halo or orientation regression; Korean keeps the source white-fill/navy-outline/right-slanted family.
+- Queue index 98 advanced to b40_self_qa_pass_pending_c. RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. Pending-artwork localize_text count becomes 43. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_B/20261005-B-PRODUCTION40/B_PRODUCTION40_42E_REPORT.json and localization/graphics/role_B/20261005-B-PRODUCTION40/.

@@ -97,7 +97,20 @@
     "partial_color_bytes_preserved": true,
     "status": "PASS"
   },
-  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "manual_visual_qa": "PASS_CONTROLLER_SOURCE_CLEAN_FINAL_ROW_CONTACT_AND_DIRECT_RAW_DDS: no source residue, clipping, overlap, seam, halo or orientation regression; Korean preserves white-fill/navy-outline right-slanted source family",
   "RUNTIME_VALIDATION": "UNTESTED",
-  "status": "B_PRODUCTION40_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+  "status": "B_PRODUCTION40_CONTROLLER_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_qa": {
+    "status": "PASS",
+    "reviewed_at_kst": "2026-10-05T03:47:20+09:00",
+    "views": [
+      "B_PRODUCTION40_42E_COMPARE.jpg",
+      "B_PRODUCTION40_42E_ROW_CONTACT_2X.jpg"
+    ],
+    "direct_raw_dds_review": "PASS_SOURCE_AND_FINAL_SHARE_RAW_MIRROR_Y",
+    "source_residue": "NONE_VISIBLE",
+    "style": "PASS_WHITE_FILL_NAVY_OUTLINE_RIGHT_SLANT",
+    "clipping_overlap_seam_halo": "NONE_VISIBLE",
+    "orientation": "PASS_RAW_MIRROR_Y"
+  }
 }
