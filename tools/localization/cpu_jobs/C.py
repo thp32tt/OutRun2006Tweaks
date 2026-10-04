@@ -15,8 +15,8 @@ cand=repo/"localization/graphics/hd_candidates"/asset
 bdir=repo/"localization/graphics/role_B/20261005-B-PRODUCTION65"
 
 COMMIT="3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6"
-SOURCE_BLOB_SHA1="3da0baeaad22b2431dc7f85b71d07e22ddece953"
-ATLAS_BLOB_SHA1="c9b597e53f378df83412f316b0b33ef779923141"
+SOURCE_BLOB_SHA1="0b3bdc37870e75da3290f2d5587cebd9cd73655c"
+ATLAS_BLOB_SHA1="4c6af70c683fb6c298e32c289d762a1f7e6a56b5"
 SOURCE_SHA256="439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc"
 CANDIDATE_SHA256="6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5"
 BASE="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/"+COMMIT
