@@ -278,12 +278,15 @@ for banned in ("R34InstallThread", "CreateThread(", "Sleep(",
             f"R34 compatibility observer regained worker/state ownership: {banned}")
 
 r31 = load("src/vr/d3d9/stereo_renderer_r31.cpp")
-state_enable = r31.find("const bool stateHooks =")
-end_enable = r31.find("R31EndStateBlockHook.enable()", state_enable)
-begin_enable = r31.find("R31BeginStateBlockHook.enable()", state_enable)
-create_enable = r31.find("R31CreateStateBlockHook.enable()", state_enable)
-if min(state_enable, end_enable, begin_enable, create_enable) < 0 or         not (end_enable < begin_enable < create_enable):
-    raise SystemExit("R31 StateBlock hooks must arm End before Begin before Create")
+end_enable = r31.find(
+    "fallbackEndArmed = R31EndStateBlockHook.enable().has_value();")
+begin_enable = r31.find(
+    "fallbackBeginArmed = R31BeginStateBlockHook.enable().has_value();")
+create_enable = r31.find(
+    "fallbackCreateArmed = R31CreateStateBlockHook.enable().has_value();")
+if min(end_enable, begin_enable, create_enable) < 0 or not (
+        end_enable < begin_enable < create_enable):
+    raise SystemExit("R31 fallback StateBlock hooks must arm End before Begin before Create")
 
 host_main = require(
     "vrhost/src/main.cpp",
