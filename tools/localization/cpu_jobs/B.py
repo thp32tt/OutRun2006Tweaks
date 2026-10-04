@@ -102,11 +102,10 @@ def source_mask_for(key,cell,bg_kind):
         bg_meta={'type':'transparent','transparent_fraction':float(np.mean(crop[:,:,3]<=1))}
     else:
         rgb=crop[:,:,:3].astype(np.float32); lum=(.2126*rgb[:,:,0]+.7152*rgb[:,:,1]+.0722*rgb[:,:,2])
-        vals=lum[crop[:,:,3]>200]
-        threshold=otsu_threshold(vals)
-        # Header glyphs are the dark class on a light gray opaque strip.
-        rawmask=(lum<=threshold)&(crop[:,:,3]>200)
-        bg_meta={'type':'opaque_header','otsu_luminance_threshold':int(threshold)}
+        # Remove the header strip's horizontal shading per scanline, then select only pixels materially darker than their row background.
+        row_med=np.median(lum,axis=1)[:,None]
+        rawmask=(lum < (row_med-24.0))&(crop[:,:,3]>200)
+        bg_meta={'type':'opaque_header','segmentation':'row_luminance_minus_24','row_median_min':float(row_med.min()),'row_median_max':float(row_med.max())}
     keep=components(rawmask,2)
     full=Image.new('L',src.size,0); full.paste(Image.fromarray((keep*255).astype(np.uint8),'L'),(x0,y0))
     bb=full.getbbox()
