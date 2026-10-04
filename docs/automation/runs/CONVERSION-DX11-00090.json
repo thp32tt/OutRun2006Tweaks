@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00090",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "recorded_kst": "2026-09-30T06:22:00+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "13b5b61649d0ba68a03410875c2e95c4499c4d11",
+  "initial_result_sha": "cd5342f95ac3c97baed271b0a0babe1eb10ad79b",
+  "result_sha": "cd5342f95ac3c97baed271b0a0babe1eb10ad79b",
+  "validation_bearing_result_sha": "cd5342f95ac3c97baed271b0a0babe1eb10ad79b",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13 R119 bounded live adoption of the shared disassembly producer map for the 15 already-proven DispTimeAttack2D HUD callsites.",
+  "summary": "R119 begins live closure of Set04/F13 without broadening HUD heuristics. The existing 15 DispTimeAttack2D callsites preserve their immediate SCREEN_HUD handoff, but each hook now carries its exact caller RVA into a templated callback whose scope is derived through GameSemantic::ClassifyCriticalProducer -> DisasmContract::ClassifyCriticalProducer. A compile-time assertion requires every selected callsite to remain canonical ScreenHud, and the backend disassembly verifier rejects regression to the legacy non-templated hardcoded callback. This is one bounded producer-family adoption only; it does not claim all shared producer ranges are runtime-authoritative.",
+  "source_commits": [
+    "cd5342f95ac3c97baed271b0a0babe1eb10ad79b"
+  ],
+  "changed_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_scope_broadened": false,
+    "affected_producer_family": "DispTimeAttack2D exact callsites only"
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R51-HUD-SEMANTIC-LIFETIME-001"
+    ],
+    "reason": "The common UI hook path changes how an already-exact TimeAttack HUD semantic is sourced, so HUD behavior is runtime-visible risk even though the intended scope is unchanged. No Quest3/VDXR test was performed; hosted CI proves build/contract consistency only. vr-d3d9ex-focus itself was not modified."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36631865143,
+      "conclusion": "success",
+      "validated_sha": "cd5342f95ac3c97baed271b0a0babe1eb10ad79b",
+      "artifact_id": 11062856061,
+      "artifact_digest": "sha256:1123223933c9b8b80c4989994a4be11dec6d8e07355fc6df461118828e78c421",
+      "evidence": "Queue/baseline/one-click checks PASS; R119 backend disassembly contract PASS; DX11 transport/source-graph/census checks PASS; Win32 build PASS; all fixed-function/input-layout/input-signature/object/shader/linkage/constant-buffer/native-transport probes PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36631872215,
+      "conclusion": "success",
+      "validated_sha": "cd5342f95ac3c97baed271b0a0babe1eb10ad79b"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36631872284,
+      "conclusion": "success",
+      "validated_sha": "cd5342f95ac3c97baed271b0a0babe1eb10ad79b",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36631872328,
+      "conclusion": "success",
+      "validated_sha": "cd5342f95ac3c97baed271b0a0babe1eb10ad79b",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "pc_fast": {
+      "run_id": 36631865088,
+      "conclusion": "skipped",
+      "validated_sha": "cd5342f95ac3c97baed271b0a0babe1eb10ad79b"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5899027601,
+    "validation_comment_id": 5899173659,
+    "status": "ATTEMPT_2_IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "prior_attempts": [
+    {
+      "attempt": "1/3",
+      "validation_bearing_result_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "selected_work": "R117/R118 native DX11 transport handoff sealing: require identity-complete FrameAck acknowledgements and expose an immutable exact Published lifetime/slot/frame shared-eye publication snapshot without enabling native draw or host routing.",
+      "validation_runs": {
+        "backend_conversion_gate": {
+          "run_id": 36629779044,
+          "conclusion": "success",
+          "validated_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e",
+          "artifact_id": 11062007673,
+          "artifact_digest": "sha256:84f33e0cc0448421a3d180ab5031fdf014cdeff5ab68d2d8b4f2c5ad24689c8f",
+          "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; Win32 build PASS; fixed-function/input-layout/input-signature semantic smokes PASS; input-layout/shader/linkage/constant-buffer probes PASS; R118 dx11_native_transport_probe build and run PASS; binary verification and artifact upload PASS."
+        },
+        "build": {
+          "run_id": 36629784432,
+          "conclusion": "success",
+          "validated_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e"
+        },
+        "openxr_vr_architecture": {
+          "run_id": 36629784308,
+          "conclusion": "success",
+          "validated_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e",
+          "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+        },
+        "hud_inspector": {
+          "run_id": 36629784651,
+          "conclusion": "success",
+          "validated_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e",
+          "evidence": "static-exe-analysis and build-hud-inspector PASS."
+        },
+        "pc_fast": {
+          "run_id": 36629778935,
+          "conclusion": "skipped",
+          "validated_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e"
+        }
+      },
+      "production_change_ledger": {
+        "issue": 14,
+        "implementation_comment_ids": [
+          5898674287,
+          5898714211
+        ],
+        "validation_comment_id": 5898898161,
+        "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+      }
+    }
+  ],
+  "controller_retry_reconciliation": {
+    "requested_attempt": "2/3",
+    "previous_automatic_failure_run_id": 36629709910,
+    "previous_failure_head_sha": "dcd0fd98cfba67978962e7a3e5250e1d52cac3c9",
+    "previous_failure_conclusion": "cancelled",
+    "root_cause": "Backend Conversion Gate is branch-scoped with cancel-in-progress=true. During attempt 1, dcd0fd98 was an intermediate result and later task commits were pushed before run 36629709910 completed, so GitHub cancelled that run. No deterministic test failure was established by that cancelled run.",
+    "action": "Attempt 2 selected new bounded work rather than repeating R118, created one atomic validation-bearing result commit cd5342f95ac3c97baed271b0a0babe1eb10ad79b, held the branch at that SHA until all required workflows completed, and only then wrote this bookkeeping update.",
+    "cancellation_recurred": false,
+    "prior_attempt_1_validated_sha": "3425a1512c87fa7ecd977b600af0fc2eb828594e",
+    "prior_attempt_1_successful_gate_run_id": 36629779044
+  },
+  "evidence": [
+    "The validation-bearing result commit message contains the exact marker [AUTO:CONVERSION-DX11-00090] and contains no CI-skip directive.",
+    "R119 changes exactly three paths and keeps the fifteen existing DispTimeAttack2D hook addresses unchanged while routing semantic ownership through the shared disassembly classifier.",
+    "Each selected TimeAttack callback is instantiated with its exact RVA and static_asserts that the shared contract still resolves it to ScreenHud.",
+    "The backend disassembly verifier passes and additionally rejects reintroduction of the legacy non-templated TimeRecord_AdjustPositionAndHud callback.",
+    "Backend Conversion Gate, normal Build, HUD Inspector and all six OpenXR architecture jobs pass on the same validation-bearing result SHA.",
+    "The previous cancelled Gate failure did not recur because no later commit was pushed until exact-SHA validation completed.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R119 is automation-validated but runtime-untested. One exact TimeAttack HUD producer family now consumes the shared disassembly producer map at runtime; F13 remains partially open for other exact producer families.",
+  "next_action": "Continue Set04/F13 with the next independently proven producer family, preserving exact-RVA ownership and fail-closed mapping, or address F15 projected semantic expressiveness if review priority makes it the next smaller prerequisite. Do not claim HMD visual correctness or native DX11 activation without exact-build Quest3/VDXR evidence."
+}

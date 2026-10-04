@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00210",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "9282a1690b67f86402f11e6bcda8a986aacef938",
+  "result_sha": "e38ebfe58fb8cafa006339995c94cc4b2d4a73b2",
+  "validation_bearing_result_sha": "e38ebfe58fb8cafa006339995c94cc4b2d4a73b2",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "google_drive_canonical_hd_source_transport": {
+    "approved_by_current_git_head": true,
+    "used": false,
+    "reason": "This bounded task consumes the canonical EXE through the existing GitHub Actions analyzer path; no DDS acquisition is required."
+  },
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R210_18244E_FRESH_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00208 proved complete instructions through 0x0018244D and deliberately left 0x0018244E:DB incomplete at the old capture end; its durable next_action explicitly requests fresh canonical bytes beginning at 0x0018244E before any further decode or semantic claim.",
+  "summary": "ATTEMPT=1 completed. Fresh canonical EXE provenance now covers 0x0018244E..0x001824AD with exact DB overlap against the R208 incomplete opcode and strict extension beyond the old capture end. Exact-SHA HUD Inspector, Build, and OpenXR architecture validation all passed. Runtime renderer source, native DX11 draw activation, function/callee identity, and render/HUD ownership remain unchanged.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00210.json"
+  ],
+  "intermediate_commits": [
+    "37f544b3eca3da0df0bb0dc1bb6a897d91f66d51",
+    "b5f1dc6366565a0df359636ea239b1e5a55dec3d"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false,
+    "hd_source_transport_changed": false
+  },
+  "evidence": [
+    "C0 recovered vr-dx11-native-r71 HEAD 9282a1690b67f86402f11e6bcda8a986aacef938 directly from GitHub.",
+    "AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, durable VR regression/history material, Issue #14, and completed CONVERSION-DX11-00208 were reviewed before implementation.",
+    "CONVERSION-DX11-00208 validation-bearing result 9a0d5d872eaa7d4538c836d686d598c6b0ea7b50 proved EXACT_1823EF_TO_18244E_CONTROL_FLOW_PREFIX_PROVEN and preserved 0x0018244E:DB as an incomplete x87 opcode at the prior capture edge.",
+    "R210 collector starts at 0x0018244E, captures 96 bytes through exclusive 0x001824AE, requires prior prefix proof, exact DB overlap, .text membership, exact probe length/end, and extension beyond prior 0x0018244F capture.",
+    "R210 static contract verifier requires the new constants, collector/report wiring, exact provenance status, unresolved-boundary status and failure gate.",
+    "Pre-result structural comparison from base shows only tools/analyze_outrun_exe.py and tools/verify_vr_backend_disasm_contract.py modified; no runtime source paths changed.",
+    "No N100 clone/worktree, Google Drive DDS transport, Quest 3/VDXR, or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED.",
+    "Exact-SHA HUD Inspector run 36831104376: static-exe-analysis job 110267666128 SUCCESS and build-hud-inspector job 110267665992 SUCCESS.",
+    "Canonical HUD Inspector output proves status EXACT_EXE_18244E_TO_1824AE_PROVENANCE_CAPTURED with predecessor_exact=True, section=.text, probe_len=96, probe_end=0x001824AE, probe_end_match=True, overlap=db, overlap_match=True, extends=True.",
+    "Canonical EXE identity remains SHA-256 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "Fresh 0x0018244E window first16=db 2d fa 60 73 00 74 c0 d9 e0 eb bc e8 8d 64 00; last16=00 00 8b 40 64 3b 05 5c 5e 73 00 74 05 e8 5e 46.",
+    "Fresh window raw inbound rel32 candidates=0; raw outbound rel32 candidates=0x0018245A->0x001888EC, 0x00182494->0x00188877, 0x0018249B->0x00185BEC. These remain raw candidates only.",
+    "HUD Inspector analysis artifact 11147049661 digest sha256:a348629e1b7aa36eeec4096da4697c74cb385c565297f7a3701b1015ec6eabbc; inspector artifact 11147840188 digest sha256:36c3495733a13ff7670e14456c78f02b43dbc07efc3c036dafa7d02055fda4e9.",
+    "Exact-SHA Build run 36831104332 SUCCESS; binary artifact 11148020211 digest sha256:36cc4a426004fc86769461f9ea69e5ee61758ca0e0cfae94526941e1e6d325e3; source artifact 11148025152 digest sha256:f99d9b78da5612283280ed348f5a10be3b2a8be7b91904b6fd91a24e6307134e.",
+    "Exact-SHA OpenXR VR architecture run 36831104355 SUCCESS 6/6 jobs.",
+    "No Quest 3/VDXR or in-game execution was performed; RUNTIME_VALIDATION remains UNTESTED.",
+    "Exact-SHA Backend Conversion Gate run 36831098765 / validate job 110267647113: SUCCESS; artifact 11146339904 digest sha256:fabe7da9d44b07e930541e3bef753fb850a16efd310aa8745676fd76043cd2a8.",
+    "VR PC Fast Test Build run 36831098764: SKIPPED by branch policy and is not runtime validation."
+  ],
+  "proof_contract": {
+    "predecessor_status": "EXACT_1823EF_TO_18244E_CONTROL_FLOW_PREFIX_PROVEN",
+    "start_rva": "0x0018244E",
+    "required_overlap": "0x0018244E: db",
+    "probe_len": 96,
+    "probe_end_rva": "0x001824AE",
+    "prior_probe_end_rva": "0x0018244F",
+    "expected_status": "EXACT_EXE_18244E_TO_1824AE_PROVENANCE_CAPTURED",
+    "start_boundary_status": "RAW_INCOMPLETE_OPCODE_OVERLAP_UNRESOLVED",
+    "function_entry_status": "UNRESOLVED_AT_18244E_AND_DISCOVERED_TARGETS",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "ownership_effect": "NONE",
+    "actual_status": "EXACT_EXE_18244E_TO_1824AE_PROVENANCE_CAPTURED",
+    "predecessor_exact": true,
+    "target_section": ".text",
+    "probe_end_matches": true,
+    "overlap_matches": true,
+    "extends_beyond_predecessor_capture": true,
+    "raw_inbound_rel32_candidates": 0,
+    "raw_outbound_rel32_candidates": [
+      "0x0018245A->0x001888EC",
+      "0x00182494->0x00188877",
+      "0x0018249B->0x00185BEC"
+    ]
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier evidence only; backend routing, provider selection and native draw activation are unchanged.",
+    "ownership": "The new window deliberately does not decode the x87 instruction or assign function/callee/HUD/world ownership.",
+    "stereo_correctness": "No WVP/projection/eye submission/HUD/menu/recenter behavior changes.",
+    "performance": "No runtime draw/copy/wait/Flush/cadence/frame-pacing path changes.",
+    "adversarial": "Capture fails unless the R208 proof is exact, the DB overlap matches, the target is .text, the full 96-byte window exists at the exact end RVA, and it extends beyond the old capture."
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_1823EF_TO_18244E_EXACT_CONTROL_FLOW_PROVEN",
+    "after": "PARTIAL_PLUS_18244E_TO_1824AE_FRESH_PROVENANCE_PROVEN",
+    "runtime_claim": false
+  },
+  "blocker": "None for this bounded provenance capture. Exact instruction decoding from 0x0018244E and semantic interpretation of the three raw outbound rel32 candidates remain intentionally deferred to future independent evidence-driven work.",
+  "next_action": "Future independent F13 work may exact-decode forward from the proven 0x0018244E start using this immutable 96-byte canonical window. Do not promote function/callee/render/HUD semantics from raw rel32 candidates without separate exact instruction-boundary and effect proof.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE",
+  "task_started_kst": "2026-10-01T16:28:00+09:00",
+  "validation_completed_kst": "2026-10-01T16:40:00+09:00",
+  "validation": {
+    "result_sha": "e38ebfe58fb8cafa006339995c94cc4b2d4a73b2",
+    "hud_inspector": {
+      "run_id": 36831104376,
+      "static_job_id": 110267666128,
+      "build_job_id": 110267665992,
+      "conclusion": "SUCCESS",
+      "analysis_artifact_id": 11147049661,
+      "analysis_artifact_digest": "sha256:a348629e1b7aa36eeec4096da4697c74cb385c565297f7a3701b1015ec6eabbc",
+      "inspector_artifact_id": 11147840188,
+      "inspector_artifact_digest": "sha256:36c3495733a13ff7670e14456c78f02b43dbc07efc3c036dafa7d02055fda4e9"
+    },
+    "build": {
+      "run_id": 36831104332,
+      "conclusion": "SUCCESS",
+      "binary_artifact_id": 11148020211,
+      "binary_artifact_digest": "sha256:36cc4a426004fc86769461f9ea69e5ee61758ca0e0cfae94526941e1e6d325e3",
+      "source_artifact_id": 11148025152,
+      "source_artifact_digest": "sha256:f99d9b78da5612283280ed348f5a10be3b2a8be7b91904b6fd91a24e6307134e",
+      "job_id": 110267665815
+    },
+    "openxr_architecture": {
+      "run_id": 36831104355,
+      "conclusion": "SUCCESS",
+      "jobs_success": "6/6"
+    },
+    "backend_conversion_gate": {
+      "run_id": 36831098765,
+      "job_id": 110267647113,
+      "conclusion": "SUCCESS",
+      "artifact_id": 11146339904,
+      "artifact_digest": "sha256:fabe7da9d44b07e930541e3bef753fb850a16efd310aa8745676fd76043cd2a8"
+    },
+    "pc_fast": {
+      "run_id": 36831098764,
+      "conclusion": "SKIPPED",
+      "runtime_validation": false
+    }
+  }
+}

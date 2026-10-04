@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00064",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 2,
+  "recorded_kst": "2026-09-30T00:04:52+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "9c34884862162c48cbb798d042c77e901d0f2171",
+  "implementation_sha": "4ffbab6cd4d37811591a5d6e68731519d631262d",
+  "rollover_checkpoint_sha": "16cdd6c8090dcb3dfe74bc1342cf9d1ae53a692c",
+  "validation_bearing_result_sha": "80e97d60cc822e6a3728f040e92432e4d8537488",
+  "result_sha": "80e97d60cc822e6a3728f040e92432e4d8537488",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R104 dormant MANAGED Texture2D LockRect/UnlockRect transaction bridge into the R102 CPU shadow, plus a source-graph guard that prevents premature production activation.",
+  "summary": "R104 captures only exact single-mip full-subresource writable MANAGED Texture2D LockRect transactions, blocks stale shadow reads/mirror uploads while source memory is mutable, commits final locked bytes into the R102 CPU shadow on matching Unlock, and clears stale pointers on Reset/cancel/shutdown. The live R30 renderer remains census-only for textures; NativeManagedTextureShadow is not constructed, mutated, uploaded or bound from production hooks.",
+  "reconstructed_from": {
+    "prior_validated_sha": "f84b2ce701f1fe947d626060cdf45ed459700321",
+    "prior_run_record": "docs/automation/runs/CONVERSION-DX11-00062.json",
+    "prior_resume_cursor": "Continue Set 05 F18 with a bounded non-routing D3D9 Texture2D LockRect/UnlockRect content bridge into R102 storage."
+  },
+  "changes": [
+    {
+      "path": "src/vr/d3d11/native_backend.hpp",
+      "result": "Added dormant begin_source_lock/commit_source_unlock/cancel_source_lock transaction API, active-lock visibility and pointer/pitch/level lifetime state."
+    },
+    {
+      "path": "src/vr/d3d11/native_backend.cpp",
+      "result": "Fail-closed full level-0 MANAGED LockRect capture; stale mirror release at writable lock begin; active-lock read/write/upload exclusion; matching Unlock copies final rows into R102; Reset/cancel/shutdown clear stale source pointers."
+    },
+    {
+      "path": "tools/dx11_constant_buffer_probe.cpp",
+      "result": "Added R104 rejection/positive-content/reset/cancel/shutdown tests, including final-byte proof and stale-mirror blocking."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added durable R104 header/source/probe guards and explicit dormancy checks preventing NativeManagedTextureShadow activation from both R30 production renderers."
+    }
+  ],
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R104 remains dormant. The existing R30 Texture2D hooks only feed mutation census telemetry; no per-texture NativeManagedTextureShadow production registry, no live begin/commit call, no managed SRV binding, no native game draw routing, and no Quest3/VDXR runtime evidence exists."
+  },
+  "superseded_initial_validation": {
+    "result_sha": "4ffbab6cd4d37811591a5d6e68731519d631262d",
+    "disposition": "SUPERSEDED_BY_DORMANCY_GUARD_RESULT",
+    "reason": "Hosted workflows for the initial R104 implementation were cancelled by branch concurrency when the follow-on dormancy-guard commit advanced the same branch. No deterministic R104 code failure was observed.",
+    "cancelled_runs": {
+      "backend_conversion_gate": 36585465869,
+      "build": 36585475887,
+      "openxr_vr_architecture": 36585475900,
+      "hud_inspector": 36585475876
+    }
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36585991816,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "80e97d60cc822e6a3728f040e92432e4d8537488",
+      "completed_utc": "2026-09-29T15:00:43Z",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; Win32 production build PASS; DX11 semantic/object/linkage/constant-buffer probes PASS, including R104 hosted managed Texture2D LockRect bridge coverage."
+    },
+    "build": {
+      "run_id": 36585998980,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "80e97d60cc822e6a3728f040e92432e4d8537488",
+      "completed_utc": "2026-09-29T15:00:31Z"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36585998976,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "80e97d60cc822e6a3728f040e92432e4d8537488",
+      "completed_utc": "2026-09-29T15:01:12Z",
+      "evidence": "All six jobs PASS: host-x64, game-x86, safe-draw comparison, R26 HUD safe, C1 and C2."
+    },
+    "hud_inspector": {
+      "run_id": 36585998978,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "80e97d60cc822e6a3728f040e92432e4d8537488",
+      "completed_utc": "2026-09-29T14:59:16Z",
+      "evidence": "build-hud-inspector and static-exe-analysis PASS."
+    },
+    "pc_fast": {
+      "run_id": 36585991709,
+      "status": "completed",
+      "conclusion": "skipped",
+      "validated_sha": "80e97d60cc822e6a3728f040e92432e4d8537488",
+      "completed_utc": "2026-09-29T14:53:33Z"
+    }
+  },
+  "evidence": [
+    "Implementation commit 4ffbab6cd4d37811591a5d6e68731519d631262d contains [AUTO:CONVERSION-DX11-00064] and adds the R104 transaction bridge.",
+    "Validation-bearing result commit 80e97d60cc822e6a3728f040e92432e4d8537488 contains [AUTO:CONVERSION-DX11-00064] and no CI-skip directive.",
+    "Backend Conversion Gate 36585991816 PASS on the exact result SHA; Build 36585998980 PASS; OpenXR VR architecture 36585998976 PASS across all six jobs; HUD Inspector 36585998978 PASS across both jobs.",
+    "VR PC Fast Test Build 36585991709 SKIPPED; no N100 workspace, Quest3/VDXR or in-game runtime execution was used."
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5892672939,
+    "validation_comment_id": 5892892989,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN"
+  },
+  "blocker": null,
+  "resume_cursor": "R104 is automation-validated but runtime-untested and deliberately dormant. The next software-only gap is the production lifetime bridge: per-texture managed-shadow registry/Release cleanup/Reset handling plus safe pre-Unlock byte staging with post-Unlock HRESULT commit semantics. Keep SRV binding and native draw routing disabled.",
+  "next_action": "Continue Set 05 F18 with one bounded R105 prerequisite: design and validate a production-safe MANAGED Texture2D registry that can consume the already-proven R30 LockRect/UnlockRect hook observations without exposing stale pointers or committing bytes when the real UnlockRect fails. Do not bind SRVs or enable native draw yet.",
+  "in_task_repairs": 0
+}

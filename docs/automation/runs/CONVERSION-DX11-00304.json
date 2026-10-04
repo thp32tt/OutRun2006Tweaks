@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00304",
+  "production_id": "CONVERSION-DX11-00304",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00304-E001",
+  "event_type": "rollover",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "6d11d27e79fa3d0bf4ebb896b52aae0d082f473d",
+  "source_implementation_sha": "debc28fe34e4e34aca7bfec640d838d8357d45d6",
+  "result_sha": "ea595bfd67529585ea33e43e16d3ea13ec5662bc",
+  "validation_bearing_result_sha": "ea595bfd67529585ea33e43e16d3ea13ec5662bc",
+  "result_marker": "[AUTO:CONVERSION-DX11-00304]",
+  "selected_work_item": "DX11_R215_FIXED_FUNCTION_SHADER_TRANSLATION_EXACTNESS_GATE",
+  "summary": "R215 closes the stale R80 fixed-function shader exactness gap in the diagnostic DX11 census. Fixed-function samples may now set shaderTranslationExact only when shader introspection is complete, the fixed-function pipeline/pixel-shader handoff is exact, the fixed-function vertex-shader prototype is generated, and the WVP transform translation is exact. Programmable D3D9 shaders remain fail-closed and NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "tools/verify_dx11_activation_boundary.py"
+  ],
+  "implementation_commits": [
+    "debc28fe34e4e34aca7bfec640d838d8357d45d6",
+    "3905f611836c90a1e128f7cf4cbfc443144f9eda",
+    "ea595bfd67529585ea33e43e16d3ea13ec5662bc"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authoritative GitHub HEAD 6d11d27e79fa3d0bf4ebb896b52aae0d082f473d and read docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md, AGENTS.md, docs/CONVERSION_LANE_STATE.json, docs/VR_AUTODEV_STATE.json, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, the prior CONVERSION-DX11-00302 durable record, docs/VR_REGRESSION_KNOWLEDGE.json, docs/VR_PROBLEM_HISTORY.md and Issue #14 production ledger."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "The review index keeps DX11 shader readiness in the highest-priority exactness closure. runtime_census.cpp still hard-coded the original R80 shaderTranslationExact=false even though later dormant fixed-function work already provides the same fixed-function pixel/pipeline shader handoff, vertex-shader prototype and WVP transform contracts consumed by native readiness. This made diagnostic ExactSamples unable to recognize the already-modeled fixed-function shader subset.",
+      "review_lenses": {
+        "architecture": "Census/readiness evidence only; vr-d3d9ex-focus and backend selector are untouched.",
+        "ownership_lifetime": "No COM/resource ownership, device generation, reset or synchronization lifetime changes.",
+        "stereo_correctness": "No draw routing or eye submission changes; exactness remains diagnostic and fixed-function-only.",
+        "performance": "Adds one boolean conjunction/counter in the sampled census path; no runtime allocation or GPU binding added.",
+        "adversarial": "Programmable D3D9 shader pairs remain fail-closed; fixed-function promotion requires complete introspection plus exact pixel/pipeline, vertex prototype and transform contracts."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "debc28fe34e4e34aca7bfec640d838d8357d45d6 implements R215 shaderTranslationExact promotion for the narrow fixed-function subset, adds translationExact telemetry/analyzer coverage and a source-graph contract. 3905f611836c90a1e128f7cf4cbfc443144f9eda updates a stale R80 source-graph literal. ea595bfd67529585ea33e43e16d3ea13ec5662bc updates the remaining dormant-activation boundary literal to the R215 predicate."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "evidence": "Exact-SHA Backend Conversion Gate 37138824112 passed on ea595bfd67529585ea33e43e16d3ea13ec5662bc. validate job 111248824299 passed source graph, dormant activation boundary, census analyzer, Win32 configure/build and binary verification. DX11 readiness smoke job 111249755401 passed all probes.",
+      "prior_same_attempt_runs": [
+        {
+          "run_id": 37138570146,
+          "head_sha": "debc28fe34e4e34aca7bfec640d838d8357d45d6",
+          "status": "FAIL",
+          "failure_signature": "Verify DX11 source graph retained the stale R80 local shaderTranslationExact literal.",
+          "correction_commit": "3905f611836c90a1e128f7cf4cbfc443144f9eda"
+        },
+        {
+          "run_id": 37138670652,
+          "head_sha": "3905f611836c90a1e128f7cf4cbfc443144f9eda",
+          "status": "FAIL",
+          "failure_signature": "Dormant activation verifier retained the same stale R80 local shaderTranslationExact literal.",
+          "correction_commit": "ea595bfd67529585ea33e43e16d3ea13ec5662bc"
+        }
+      ]
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_commits": [
+        "debc28fe34e4e34aca7bfec640d838d8357d45d6",
+        "3905f611836c90a1e128f7cf4cbfc443144f9eda",
+        "ea595bfd67529585ea33e43e16d3ea13ec5662bc"
+      ],
+      "validation_bearing_result_sha": "ea595bfd67529585ea33e43e16d3ea13ec5662bc"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R215 changes diagnostic census/readiness and static verification only; no user runtime candidate or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "lane_state_commit": "cedbe23477198f1cf105d155cacd850a2c7bd1e7",
+      "issue14_comment_id": 5971345269,
+      "exact_next_action": "Release CONVERSION-DX11-00304 as automation PASS under the authoritative CONVERSION-DX11-00304 / CONVERSION-DX11-00304-E001 rollover metadata, CHAT_ROLLOVER=2, ATTEMPT=1/3. Keep NativeDrawPathActive disabled and select one new independent dormant DX11 source/static gap from the newest authenticated GitHub HEAD.",
+      "validation_comment_id": 5971452617,
+      "authoritative_metadata_correction_comment_id": 5971490265
+    }
+  },
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37138824112,
+    "head_sha": "ea595bfd67529585ea33e43e16d3ea13ec5662bc",
+    "validate_job_id": 111248824299,
+    "readiness_smoke_job_id": 111249755401,
+    "artifact_id": 11279548211,
+    "artifact_digest": "sha256:3194d8afc85bb2594d254e0d7436a6caf7a1deabc1deb71a696ed22cc3ec6dd7"
+  },
+  "native_draw_path_activation_changed": false,
+  "issue14_comment_id": 5971345269,
+  "exact_next_action": "Continue only with a new independent DX11 source/static conversion task from the newest authenticated GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DX11-00304",
+    "event_id": "CONVERSION-DX11-00304-E001",
+    "event_type": "rollover",
+    "chat_rollover": 2,
+    "attempt": "1/3",
+    "source": "CURRENT_USER_ROLLOVER_DISPATCH",
+    "rollover_is_retry": false,
+    "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+    "superseded_issue_comment_id": 5971449743
+  },
+  "validation_comment_id": 5971452617,
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started.",
+  "authoritative_metadata_correction_comment_id": 5971490265,
+  "issue14_comment_ids": [
+    5971345269,
+    5971449743,
+    5971452617,
+    5971490265
+  ]
+}

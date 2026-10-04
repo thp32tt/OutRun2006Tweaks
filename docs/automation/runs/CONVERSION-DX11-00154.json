@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00154",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "77082c4a4bd5d789f3d4fc101570395be5a33c35",
+  "result_sha": "21de28945d863a6e564b19261afd1a2260a1575d",
+  "validation_bearing_result_sha": "21de28945d863a6e564b19261afd1a2260a1575d",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R154_HELPER_282B0_TERMINAL_PADDING",
+  "selection_reason": "CONVERSION-DX11-00152 captured a fresh exact 96-byte continuation window beginning at 0x2830A and explicitly left instruction decoding for a later bounded task. The smallest runnable HMD-free unit is the complete terminal sequence through RET at 0x28318, seven INT3 padding bytes through 0x2831F, and a three-byte next-code anchor at 0x28320. DXVK-00153 independently selected and hosted-validated the same exact-EXE boundary, but DX11 binds this proof to its own 00152 predecessor and its own result SHA.",
+  "summary": "Completed an independent DX11 fail-closed exact-EXE proof for complete terminal instructions at 0x2830A..0x28318, seven INT3 padding bytes at 0x28319..0x2831F, and the next-code anchor 83 ec 0c at 0x28320. The terminal sequence is contiguous and byte-exact and the predecessor continuation proof is exact. This does not establish that 0x28320 is a function entry, does not resolve full callee or next-code semantics, and does not promote ScreenHud/world/render ownership.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00153",
+    "source_result_sha": "8b89fa39f5946544898602f945b863692c3b3ef8",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE and bounded proof design only. DXVK hosted static analysis already emitted the same terminal/padding/anchor proof; DX11 must independently pass its predecessor chain and exact-result Actions."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00154.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00152 validation-bearing result cb2d0b0ccfa5feab784f0767fe7b094ce798c113 provided exact predecessor continuation provenance beginning at 0x2830A.",
+    "Validation-bearing result 21de28945d863a6e564b19261afd1a2260a1575d contains exact marker [AUTO:CONVERSION-DX11-00154] and no CI-skip directive.",
+    "Exact public EXE SHA256 is 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "HUD Inspector static job 110030796153 PASS proved the contiguous terminal instructions through RET 0x28318, seven INT3 padding bytes through 0x2831F, and next-code anchor 83 ec 0c at 0x28320.",
+    "DXVK-00153 independently passed the same bounded exact-EXE proof on validation-bearing result 8b89fa39f5946544898602f945b863692c3b3ef8.",
+    "Backend Conversion Gate, Build, HUD Inspector and all six OpenXR architecture jobs passed on the exact DX11 result SHA.",
+    "VR PC Fast Test Build was skipped by policy and is not runtime validation.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Keep guarded GF hooks spacing-only and ownership unchanged. Continue only with another bounded exact-EXE proof. Runtime-visible claims still require Quest 3/VDXR evidence.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T03:24:41+09:00",
+  "first_callee_terminal_padding_proof": {
+    "target_rva": "0x0002830A",
+    "predecessor_status": "EXACT_EXE_FIRST_CALLEE_CONTINUATION_PROVENANCE_CAPTURED",
+    "predecessor_exact": true,
+    "target_section": ".text",
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "terminal_ret_rva": "0x00028318",
+    "terminal_end_exclusive_rva": "0x00028319",
+    "padding_start_rva": "0x00028319",
+    "padding_end_exclusive_rva": "0x00028320",
+    "padding_bytes": "cc cc cc cc cc cc cc",
+    "padding_matches": true,
+    "next_code_rva": "0x00028320",
+    "next_code_anchor": "83 ec 0c",
+    "next_code_anchor_matches": true,
+    "status": "EXACT_FIRST_CALLEE_TERMINAL_PADDING_ANCHOR_PROVEN",
+    "semantic_effect": "PARTIAL_TERMINAL_DATAFLOW_ONLY",
+    "full_callee_semantics": "UNRESOLVED",
+    "next_code_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only. Native DX11 renderer/backend activation, selector, transport, host runtime and game draw routing are unchanged.",
+    "ownership": "The proof establishes an exact terminal/padding/anchor boundary only. It does not establish ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world classification, eye submission, rank-marker projection, recenter, menu or stereo behavior changed.",
+    "performance": "No runtime hot path, copy, wait, Flush, cadence, telemetry or frame-pacing behavior changed.",
+    "adversarial": "The proof fails closed if predecessor provenance is lost, any terminal instruction byte changes, RET moves, any of the seven INT3 bytes changes, or the 0x28320 three-byte anchor changes. Padding plus an anchor is not promoted into a function-boundary or semantic claim."
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "Static analyzer/verifier only; no protected runtime renderer risk path was changed and no open visual regression is claimed fixed."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36757330387,
+      "conclusion": "success",
+      "validated_sha": "21de28945d863a6e564b19261afd1a2260a1575d",
+      "artifact_id": 11118055618,
+      "artifact_digest": "sha256:a14d969e40e3ad12ec2fee5c4a16e9ceb735ac5e5f95d89760594deda41f197a"
+    },
+    "build": {
+      "run_id": 36757337695,
+      "conclusion": "success",
+      "validated_sha": "21de28945d863a6e564b19261afd1a2260a1575d",
+      "artifact_id": 11116987753,
+      "artifact_digest": "sha256:567219bdb28fbbf1fca802be2aeb8c991f3addbd87d5f687b1a18391a534f759",
+      "source_snapshot_artifact_id": 11117237535,
+      "source_snapshot_artifact_digest": "sha256:e8edc0cd758cb506ba537a20695984b455716222b007cc01fb8eb2917bfed16d"
+    },
+    "hud_inspector": {
+      "run_id": 36757337740,
+      "conclusion": "success",
+      "validated_sha": "21de28945d863a6e564b19261afd1a2260a1575d",
+      "static_analysis_job_id": 110030796153,
+      "analysis_artifact_id": 11116748842,
+      "analysis_artifact_digest": "sha256:ddfa2e40b8075b63157bc7ff52ada3c9c4568727bd8d9a9c3adc3b9ce10519f5",
+      "game_artifact_id": 11117876450,
+      "game_artifact_digest": "sha256:a7ac3001cbdf430d6e69fcddf53548618fd2608b9997c68c304f2d195ec316e8",
+      "evidence": "Exact EXE emitted gf_target_c_helper_1_first_callee_terminal=0x0002830A status=EXACT_FIRST_CALLEE_TERMINAL_PADDING_ANCHOR_PROVEN predecessor_status=EXACT_EXE_FIRST_CALLEE_CONTINUATION_PROVENANCE_CAPTURED predecessor_exact=True section=.text layout_contiguous=True bytes_match=True ret=0x00028318 terminal_end=0x00028319 padding=0x00028319-0x0002831F:cc cc cc cc cc cc cc padding_matches=True next_code=0x00028320 next_anchor=83 ec 0c next_anchor_matches=True semantic_effect=PARTIAL_TERMINAL_DATAFLOW_ONLY full_semantics=UNRESOLVED next_code_semantics=UNRESOLVED ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36757337560,
+      "conclusion": "success",
+      "validated_sha": "21de28945d863a6e564b19261afd1a2260a1575d",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11117616543,
+      "host_artifact_digest": "sha256:20438a3c12a3fd9b078a6483584cd0e6bc825f0dba16f3638bc1087b475d71e1"
+    },
+    "pc_fast": {
+      "run_id": 36757330474,
+      "conclusion": "skipped",
+      "validated_sha": "21de28945d863a6e564b19261afd1a2260a1575d",
+      "policy": "PC runner authorization disabled; no self-hosted execution used."
+    }
+  },
+  "source_commits": [
+    {
+      "sha": "21de28945d863a6e564b19261afd1a2260a1575d",
+      "message": "dx11: prove target C first callee terminal padding [AUTO:CONVERSION-DX11-00154]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5917079032,
+    "validation_comment_id": 5917210178,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_HELPER_2830A_CONTINUATION_PROVENANCE",
+    "after": "PARTIAL_PLUS_HELPER_2830A_TERMINAL_PADDING_ANCHOR",
+    "runtime_claim": false
+  },
+  "blocker": "The first callee terminal/padding boundary is now exact, but code beginning at 0x28320 has not been independently proven as a function entry or semantically decoded. Full callee semantics, next-code semantics, second callee 0x8BD20, helper 0x28460 continuation, and all ScreenHud/world/render ownership remain unresolved.",
+  "resume_cursor": "Set04/F13 now has target-C call alignment, helper 0x28460 lookup/success call-chain proof, first-callee 0x282B0 slot-scan prefix through 0x28309, fresh 0x2830A provenance, and an exact terminal/padding/next-code anchor through 0x28322. The next independent bounded static unit may establish instruction boundaries for code beginning at 0x28320, analyze 0x8BD20, or continue helper 0x28460 after 0x284DE."
+}

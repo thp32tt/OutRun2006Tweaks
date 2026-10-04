@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00120",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T20:07:44+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "327aa01daf2dd65c9c80fe27f6bf4dde8b2434cd",
+  "result_sha": "c9cc84a52f51c58e273fba48af2ef94a8ea7d401",
+  "validation_bearing_result_sha": "c9cc84a52f51c58e273fba48af2ef94a8ea7d401",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R131_C2CSPEECHBUBBLEGF_INITIAL_SHARED_PRODUCER_MAP_ADOPTION",
+  "summary": "The four exact C2CSpeechBubbleGF initial-position edges at 0xFC9EB, 0xFCA1E, 0xFCA51 and 0xFCB20 now preserve their existing spacing behavior while deriving immediate next-draw ScreenHud ownership from the shared backend-neutral producer map. The first three retain ESP0 AddSpriteSpacing, 0xFCB20 retains ESP4 AddSpriteSpacing. Compile-time assertions require all four exact RVAs to remain canonical ScreenHud, and the backend verifier requires the exact templated bindings while rejecting the legacy spacing-only callbacks. The existing canonical range 0xFC900-0xFCC00 is unchanged.",
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "review_lenses": {
+    "provenance": "0xFC9EB, 0xFCA1E, 0xFCA51 and 0xFCB20 are exact HUD_GF_SPEECH anchors inside the existing canonical C2CSpeechBubbleGF ScreenHud range 0xFC900-0xFCC00. Shared contract, analyzer and hud_semantics agree.",
+    "behavior_preservation": "The original three ESP0 and one ESP4 AddSpriteSpacing corrections remain before semantic handoff.",
+    "scope_control": "Only hk11-hk14 initial-position hooks change; rank emoji/text, later GF speech ranges, GF heart, generic C2CSpeechBubble and unrelated HUD families remain untouched.",
+    "regression_safety": "src/hooks_uiscaling.cpp and src/vr/game/render_semantics.hpp are protected risk paths for R50 world stereo and R51 white-HUD behavior; hosted CI is not HMD proof.",
+    "validation": "Compile-time exact-RVA classification plus backend verifier markers and legacy-binding rejection fail closed on semantic drift."
+  },
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "This is a bounded ownership-source substitution for four already-proven ScreenHud callsites. It preserves their existing position correction and does not widen producer semantics, enable native DX11 draw ownership, alter D3D9 render policy, or alter OpenXR transport. Hosted CI cannot prove Quest3/VDXR visual correctness."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36705987032,
+      "conclusion": "success",
+      "validated_sha": "c9cc84a52f51c58e273fba48af2ef94a8ea7d401",
+      "artifact_id": 11091767983,
+      "artifact_digest": "sha256:87a5bee98bd43d0efb59753d52aebbdd1c55ae1076f9aec86b103d489cf5f31f",
+      "evidence": "Mandatory conversion gate passed, including backend disassembly/source-graph checks, Win32 build path and DX11 semantic/object/linkage/constant-buffer/native-transport probes."
+    },
+    "build": {
+      "run_id": 36705992321,
+      "conclusion": "success",
+      "validated_sha": "c9cc84a52f51c58e273fba48af2ef94a8ea7d401",
+      "evidence": "Generic Win32 Release build completed successfully."
+    },
+    "hud_inspector": {
+      "run_id": 36705992337,
+      "conclusion": "success",
+      "validated_sha": "c9cc84a52f51c58e273fba48af2ef94a8ea7d401",
+      "evidence": "static-exe-analysis and build-hud-inspector both passed."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36705992522,
+      "conclusion": "success",
+      "validated_sha": "c9cc84a52f51c58e273fba48af2ef94a8ea7d401",
+      "evidence": "All six jobs passed: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify and game-x86-c2-r30-hud."
+    },
+    "pc_fast": {
+      "run_id": 36705987059,
+      "conclusion": "skipped",
+      "validated_sha": "c9cc84a52f51c58e273fba48af2ef94a8ea7d401"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5909859983,
+    "validation_comment_id": 5909946357,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit message contains the exact marker [AUTO:CONVERSION-DX11-00120] and contains no CI-skip directive.",
+    "0xFC9EB, 0xFCA1E, 0xFCA51 and 0xFCB20 are exact ScreenHud semantic anchors and are compile-time classified through GameSemantic::ClassifyCriticalProducer.",
+    "The original ESP0 spacing behavior remains on the first three exact edges and the original ESP4 spacing behavior remains on 0xFCB20.",
+    "The backend verifier requires all four C2CSpeechBubbleGFInitial_AdjustPositionAndHud template bindings and rejects restoration of the four legacy spacing-only hook bindings.",
+    "The existing canonical range 0xFC900-0xFCC00 was not added, widened or reclassified.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and all six OpenXR architecture jobs passed on the same result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "Set04/F13 R131 C2CSpeechBubbleGF initial-position shared producer-map adoption is automation-validated on the DX11 branch. Runtime visual behavior remains untested.",
+  "next_action": "Continue Set04/F13 only with another independently proven producer sub-family. Reconfirm exact semantic anchors and direct draw ownership before converting additional hooks; do not widen producer ranges or convert uncertain/no-effect hooks without evidence. Exact-build Quest3/VDXR evidence remains required for visual correctness."
+}

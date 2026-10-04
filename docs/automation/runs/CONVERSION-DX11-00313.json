@@ -1,0 +1,139 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00313",
+  "production_id": "CONVERSION-DX11-00313",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "event_id": "CONVERSION-DX11-00313-E002",
+  "event_type": "retry",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SHADER_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "f971d4b1c0088dc7ef3125a82e2eda7f1c6dd6bc",
+  "result_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+  "validation_bearing_result_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+  "result_marker": "[AUTO:CONVERSION-DX11-00313]",
+  "selected_work_item": "DX11_R220_SHADER_READINESS_EXACT_SAMPLES_SCOPE_GUARD",
+  "summary": "R220 makes the F21 shader activation-readiness boundary explicit in sampled DX11 identity and the final ExactSamples predicate. The currently supported fixed-function shader path must be proven separately from shaderTranslationExact, so a future programmable-shader implementation cannot silently inherit exactness. NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/test_dx11_census_log_contract_r131.py",
+    "docs/automation/runs/CONVERSION-DX11-00313.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated vr-dx11-native-r71 HEAD f971d4b1c0088dc7ef3125a82e2eda7f1c6dd6bc; read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR automation/run state, regression knowledge/history and Issue #14. R219/00311 is durable and was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Set-05 F21 was functionally narrowed by R215, but shaderTranslationExact remains an implementation-oriented field. Without a separate fixed-function-only sampled readiness identity/final gate, a future programmable translator could widen that field and accidentally expand ExactSamples without an explicit activation-scope review.",
+      "review_lenses": {
+        "architecture": "Add a distinct dormant shader-readiness gate without routing any native draw.",
+        "ownership_lifetime": "No resource ownership, Reset, shared-surface or transport lifetime changes.",
+        "stereo_correctness": "No WVP, eye routing, HUD, presentation or OpenXR behavior changes.",
+        "performance": "One sampled boolean, one hash input and one final predicate term; no additional GPU work.",
+        "adversarial": "Future shaderTranslationExact widening alone must not make programmable D3D9 shader draws ExactSamples-eligible."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0 added R220 shaderReadinessExact sampled identity/hash and final ExactSamples gate; 0b4c704f2ce798e15ed75e87811e70e8f028339d aligned only the stale R219 source-graph oracle with that stronger predicate. Native draw routing and runtime semantics were not widened."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SHADER_READINESS_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Initial exact-SHA Backend Conversion Gate 37147082560 on c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0 failed only at Verify DX11 source graph because the R219 static oracle retained the pre-R220 final predicate literal. Fresh exact-SHA Backend Conversion Gate 37147160605 passed on 0b4c704f2ce798e15ed75e87811e70e8f028339d. Validate job 111273377482 passed queue/baseline/backend/static-surface/source-graph/dormant-activation/census checks, Win32 configure/build, binary verification and artifact upload. DX11 readiness smoke job 111274312544 passed all fixed-function shader, input-layout/signature, shader object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and pipeline-handoff probes."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_commits": [
+        "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0",
+        "0b4c704f2ce798e15ed75e87811e70e8f028339d"
+      ],
+      "validation_bearing_result_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+      "issue14_material_comment_id": 5972594143,
+      "issue14_repair_comment_id": 5972604116,
+      "issue14_validation_comment_id": 5972672201
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R220 changes dormant census/static activation-readiness evidence only; no user runtime candidate or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_implementation_comment_id": 5972594143,
+      "issue14_repair_comment_id": 5972604116,
+      "issue14_validation_comment_id": 5972672201,
+      "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Preserve R220 and R213-R219 exactness protections; programmable shader translation and Quest 3/VDXR runtime parity remain separate fail-closed gates.",
+      "dispatch_metadata_correction_comment_id": 5972674428
+    }
+  },
+  "regression_assessment": {
+    "related_key": "VR-STARTUP-WHITE-001_PATH_MATCH_ONLY_TRIGGER_NOT_MET",
+    "evidence": "src/vr/** matches a broad historical risk path, but R220 changes sampled diagnostic/readiness accounting only. Startup/device creation/reset/present, transport/shared resources, host fallback and configuration are unchanged."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DX11-00313",
+    "event_id": "CONVERSION-DX11-00313-E002",
+    "event_type": "retry",
+    "attempt": "2/3",
+    "source": "CURRENT_USER_QUEUE_RETRY",
+    "material_result_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+    "source_implementation_sha": "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0",
+    "validation_bearing_result_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+    "implementation_comment_id": 5972594143,
+    "repair_comment_id": 5972604116,
+    "validation_comment_id": 5972672201,
+    "dispatch_metadata_correction_comment_id": 5972674428
+  },
+  "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion task from the newest authenticated GitHub HEAD; keep programmable shader translation, native draw activation and Quest 3/VDXR runtime claims fail-closed until their own evidence gates pass.",
+  "superseded_failed_gate": {
+    "result_sha": "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0",
+    "run_id": 37147082560,
+    "validate_job_id": 111273151337,
+    "failed_step": "Verify DX11 source graph",
+    "reason": "R219 source-graph oracle retained the pre-R220 final ExactSamples literal; repaired without widening runtime/source semantics."
+  },
+  "source_implementation_sha": "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0",
+  "implementation_commits": [
+    "c8c0e070ec8692d4597f8f8b81ce57f0a00ca4b0",
+    "0b4c704f2ce798e15ed75e87811e70e8f028339d"
+  ],
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37147160605,
+    "head_sha": "0b4c704f2ce798e15ed75e87811e70e8f028339d",
+    "validate_job_id": 111273377482,
+    "readiness_smoke_job_id": 111274312544,
+    "artifact_id": 11282288258,
+    "artifact_digest": "sha256:b98f948fd7e315ed5a724f37c8c431dbc5474a8bf2b6909d93204291f28bb79f"
+  },
+  "issue14_comment_ids": [
+    5972594143,
+    5972604116,
+    5972672201
+  ],
+  "dispatch_metadata_correction": {
+    "authoritative_production_id": "CONVERSION-DX11-00313",
+    "authoritative_event_id": "CONVERSION-DX11-00313-E002",
+    "authoritative_event_type": "retry",
+    "authoritative_attempt": "2/3",
+    "corrected_from": {
+      "production_id": "CONVERSION-DXVK-00312",
+      "event_id": "CONVERSION-DXVK-00312-E001",
+      "event_type": "rollover",
+      "attempt": "1/3"
+    },
+    "evidence_comment_id": 5972674428,
+    "material_and_validation_bearing_sha_unchanged": true
+  }
+}

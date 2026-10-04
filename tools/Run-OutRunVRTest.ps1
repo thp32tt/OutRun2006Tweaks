@@ -158,9 +158,34 @@ Write-Host "Profile: $TestProfile"
 if($backend -eq 'd3d9'){
     $profile=Get-OutRunVRTestProfile -Name $TestProfile
     $gameArgs=@($profile.Arguments)
+}elseif($backend -eq 'dx11'){
+    # 2026-10-04 Quest 3/VDXR evidence: a 90 Hz XR stream fed by a forced
+    # 60 Hz game renderer produced a visible 60->90 3:2 repeat cadence
+    # (roughly fresh=300/cached=150 per 450 XR frames). Make the DX11
+    # development path XR-clock owned: keep simulation at 60 Hz, render on
+    # xrWaitFrame cadence, and interpolate the intermediate render frames.
+    $gameArgs=@(
+        '-FramerateLimit=0',
+        '-FramerateFastLoad=0',
+        '-FramerateInterpolation=true',
+        '-FramerateUnlockExperimental=true',
+        '-FrameCadenceMode=1',
+        '-FrameCadenceTargetHz=0',
+        '-DisableDesktopVsync=true',
+        '-TargetRefreshRateHz=0',
+        '-SkyGlowFactor=1'
+    )
+    $profile=[ordered]@{
+        Name=$TestProfile
+        Description='DX11 primary path: XR-native cadence with 60 Hz simulation and interpolated render frames'
+        Environment=[ordered]@{
+            OUTRUN_VR_TEST_PROFILE=$TestProfile
+            OUTRUN_VR_PERFORMANCE_PROFILE='1'
+        }
+    }
 }else{
-    # Non-DX9Ex backends are retained only for explicit legacy comparison.
-    # Keep them on the conservative startup policy until the DX9Ex reference is accepted.
+    # DXVK and other non-reference backends remain conservative until their
+    # own runtime evidence justifies a cadence policy change.
     $gameArgs=@(
         '-FramerateLimit=60',
         '-FramerateFastLoad=0',
@@ -234,6 +259,8 @@ $dxvkMode = $backend -eq 'dxvk-safe' -or $backend -eq 'dxvk'
 $oldVkDisable = $env:VK_LOADER_LAYERS_DISABLE
 $oldVkInstanceLayers = $env:VK_INSTANCE_LAYERS
 $oldVkDebug = $env:VK_LOADER_DEBUG
+$oldDxvkLogPath = $env:DXVK_LOG_PATH
+$oldDxvkLogLevel = $env:DXVK_LOG_LEVEL
 $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
 $oldTestProfile = $env:OUTRUN_VR_TEST_PROFILE
 $oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
@@ -282,6 +309,8 @@ if($dxvkMode){
     $env:VK_LOADER_LAYERS_DISABLE='~implicit~'
     $env:VK_INSTANCE_LAYERS=$null
     $env:VK_LOADER_DEBUG='error,warn,layer'
+    $env:DXVK_LOG_PATH=$sessionRoot
+    $env:DXVK_LOG_LEVEL='info'
     $bandicam=Get-Process -ErrorAction SilentlyContinue|Where-Object{
         $_.ProcessName -match '^bdcam' -or $_.ProcessName -match 'bandicam'
     }
@@ -290,9 +319,11 @@ if($dxvkMode){
     }
 }
 
+$gameExitCode=0
 try{
     $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
     $p.WaitForExit()
+    $gameExitCode=$p.ExitCode
 } finally {
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
@@ -311,6 +342,8 @@ try{
         $env:VK_LOADER_LAYERS_DISABLE=$oldVkDisable
         $env:VK_INSTANCE_LAYERS=$oldVkInstanceLayers
         $env:VK_LOADER_DEBUG=$oldVkDebug
+        $env:DXVK_LOG_PATH=$oldDxvkLogPath
+        $env:DXVK_LOG_LEVEL=$oldDxvkLogLevel
     }
 }
 
@@ -333,3 +366,8 @@ if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
 
 & $collector
 if($LASTEXITCODE -and $LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+if($gameExitCode -ne 0){
+    Write-Warning ("OR2006C2C.EXE exited with code {0}; diagnostic collection completed before propagating failure." -f $gameExitCode)
+    exit $gameExitCode
+}
+exit 0

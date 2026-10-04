@@ -1,0 +1,2177 @@
+#pragma once
+
+#include "resource_translation.hpp"
+#include "vr/core/d3d9_draw_state.hpp"
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <mutex>
+#include <unordered_map>
+#include <vector>
+#include <d3d9.h>
+#include <d3d11.h>
+#include <wrl/client.h>
+
+namespace outrun::vr::dx11 {
+
+struct FixedFunctionTransformConstants;
+struct FixedFunctionVertexShaderPrototype;
+struct FixedFunctionPixelShaderPrototype;
+struct NativeSurfacePairReadiness;
+class NativeSurfaceMirror;
+class NativeSurfacePairBinding;
+struct NativeTriangleFanIndexBufferReadiness;
+class NativeTriangleFanIndexBuffer;
+struct VertexInputLayoutTranslation;
+struct FixedFunctionStageState;
+struct PipelineTranslation;
+
+struct NativeBackendConfig {
+    std::uint32_t width = 0;
+    std::uint32_t height = 0;
+    DXGI_FORMAT color_format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    bool request_debug_layer = false;
+    bool adapter_luid_valid = false;
+    bool require_adapter_luid = false;
+    LUID adapter_luid{};
+};
+
+// Live binding proof for the R96 transform owner. A snapshot is valid only
+// when the exact translated WVP payload previously uploaded by this owner is
+// still bound at VS b0 on the caller-supplied same-device context. This is
+// dormant observation evidence only and never issues Draw*.
+struct NativeFixedFunctionTransformBindingReadiness {
+    bool inputValid{};
+    bool ownerReady{};
+    bool contextMatches{};
+    bool payloadMatches{};
+    bool boundExact{};
+    bool uploadPresent{};
+    bool ready{};
+    std::uint64_t uploadGeneration{};
+    std::uint64_t payloadHash{};
+    std::uint64_t snapshotToken{};
+};
+
+// R96 dormant owner for the R94/R95 fixed-function transform constant
+// payload. No game draw path constructs this owner yet.
+class NativeFixedFunctionTransformBuffer final {
+public:
+    NativeFixedFunctionTransformBuffer() = default;
+    ~NativeFixedFunctionTransformBuffer() = default;
+    NativeFixedFunctionTransformBuffer(
+        const NativeFixedFunctionTransformBuffer&) = delete;
+    NativeFixedFunctionTransformBuffer& operator=(
+        const NativeFixedFunctionTransformBuffer&) = delete;
+
+    bool initialize(ID3D11Device* device) noexcept;
+    bool upload_and_bind(
+        ID3D11DeviceContext* context,
+        const FixedFunctionTransformConstants& constants) noexcept;
+    [[nodiscard]] NativeFixedFunctionTransformBindingReadiness
+    binding_readiness(
+        ID3D11DeviceContext* context,
+        const FixedFunctionTransformConstants& constants) const noexcept;
+    [[nodiscard]] bool validate_binding_snapshot(
+        ID3D11DeviceContext* context,
+        const FixedFunctionTransformConstants& constants,
+        std::uint64_t snapshotToken) const noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && buffer_;
+    }
+    [[nodiscard]] ID3D11Buffer* buffer() const noexcept {
+        return buffer_.Get();
+    }
+    [[nodiscard]] std::uint64_t upload_generation() const noexcept {
+        return upload_generation_;
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> buffer_;
+    std::uint64_t upload_generation_ = 0;
+    std::uint64_t payload_hash_ = 0;
+};
+
+// R98 dormant owner for one translated fixed-function sampler state.
+// The CONV-DX11 texture-stage binding primitive may bind this immutable object
+// only to an explicitly supplied same-device context; no game Draw* path calls it.
+class NativeFixedFunctionSamplerState final {
+public:
+    NativeFixedFunctionSamplerState() = default;
+    ~NativeFixedFunctionSamplerState() = default;
+    NativeFixedFunctionSamplerState(
+        const NativeFixedFunctionSamplerState&) = delete;
+    NativeFixedFunctionSamplerState& operator=(
+        const NativeFixedFunctionSamplerState&) = delete;
+
+    bool initialize(
+        ID3D11Device* device,
+        const FixedFunctionStageState& stage) noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && sampler_;
+    }
+    [[nodiscard]] ID3D11Device* device() const noexcept {
+        return device_.Get();
+    }
+    [[nodiscard]] ID3D11SamplerState* sampler() const noexcept {
+        return sampler_.Get();
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler_;
+};
+
+// R99 dormant owner for a translated D3D11 Texture2D mirror and its SRV.
+// R101 adds a bounded full-subresource WRITE_DISCARD upload for exact
+// DEFAULT+DYNAMIC source semantics. The CONV-DX11 texture-stage binding
+// primitive may bind the SRV only with a same-device R98 sampler; no production
+// caller or native game Draw* routing is introduced here.
+class NativeFixedFunctionTextureView final {
+public:
+    NativeFixedFunctionTextureView() = default;
+    ~NativeFixedFunctionTextureView() = default;
+    NativeFixedFunctionTextureView(
+        const NativeFixedFunctionTextureView&) = delete;
+    NativeFixedFunctionTextureView& operator=(
+        const NativeFixedFunctionTextureView&) = delete;
+
+    bool initialize(
+        ID3D11Device* device,
+        ID3D11Texture2D* texture,
+        D3DFORMAT sourceFormat,
+        D3DPOOL sourcePool,
+        DWORD sourceUsage) noexcept;
+    bool upload_full_discard(
+        ID3D11DeviceContext* context,
+        const void* source,
+        UINT sourceRowPitch,
+        UINT sourceRows) noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && texture_ && srv_ && source_metadata_valid_;
+    }
+    [[nodiscard]] bool content_ready() const noexcept {
+        return upload_generation_ != 0;
+    }
+    [[nodiscard]] std::uint64_t upload_generation() const noexcept {
+        return upload_generation_;
+    }
+    [[nodiscard]] ID3D11Device* device() const noexcept {
+        return device_.Get();
+    }
+    [[nodiscard]] ID3D11Texture2D* texture() const noexcept {
+        return texture_.Get();
+    }
+    [[nodiscard]] ID3D11ShaderResourceView* srv() const noexcept {
+        return srv_.Get();
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture_;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv_;
+    D3DFORMAT source_format_ = D3DFMT_UNKNOWN;
+    D3DPOOL source_pool_ = D3DPOOL_DEFAULT;
+    DWORD source_usage_ = 0;
+    bool source_metadata_valid_ = false;
+    std::uint64_t upload_generation_ = 0;
+};
+
+// Dormant fixed-function texture-stage binding primitive. Both immutable
+// owners and the supplied context must belong to the same D3D11 device, and
+// the slot must be legal for both PS sampler and SRV namespaces. This helper
+// never dispatches a D3D11 Draw* call and has no production caller.
+[[nodiscard]] bool bind_fixed_function_texture_stage_for_observation(
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture) noexcept;
+
+// R132 observes the exact PS sampler/SRV identity after a dormant binding.
+// The snapshot includes the slot, owner COM identities and texture upload
+// generation so a later mutation/rebind cannot reuse stale readiness.
+struct NativeFixedFunctionTextureStageBindingReadiness {
+    bool inputValid{};
+    bool slotValid{};
+    bool ownersReady{};
+    bool devicesMatch{};
+    bool contextMatches{};
+    bool boundExact{};
+    bool ready{};
+    UINT slot{};
+    std::uint64_t textureUploadGeneration{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionTextureStageBindingReadiness
+observe_fixed_function_texture_stage_binding(
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_texture_stage_binding_snapshot(
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture,
+    std::uint64_t snapshotToken) noexcept;
+
+// R136 aggregates the exact live PS sampler/SRV identity for every fixed-
+// function texture stage required by the sealed draw mask. D3D9 fixed-function
+// texture stages are limited to 0..7. Missing owners, unsupported mask bits, or
+// any stale live binding keep the aggregate fail-closed.
+struct NativeFixedFunctionTextureBindingSetReadiness {
+    bool inputValid{};
+    bool requiredMaskValid{};
+    bool allRequiredBoundExact{};
+    bool ready{};
+    std::uint32_t requiredTextureMask{};
+    std::uint32_t observedTextureMask{};
+    std::array<std::uint64_t, 8> stageSnapshotTokens{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionTextureBindingSetReadiness
+observe_fixed_function_texture_binding_set(
+    ID3D11DeviceContext* context,
+    std::uint32_t requiredTextureMask,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_texture_binding_set_snapshot(
+    ID3D11DeviceContext* context,
+    std::uint32_t requiredTextureMask,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    std::uint64_t snapshotToken) noexcept;
+
+// R136 also makes the aggregate value self-authenticating against accidental
+// copied-struct drift before it can be composed with an R135 sealed draw.
+[[nodiscard]] bool
+validate_fixed_function_texture_binding_set_readiness_integrity(
+    const NativeFixedFunctionTextureBindingSetReadiness& textureBindings) noexcept;
+
+// R119 seals one R113 MANAGED vertex/index buffer mirror into a fail-closed
+// readiness snapshot. The token binds CPU-shadow version, device generation,
+// mirror instance, descriptor and expected-device identity. This is dormant
+// evidence only; it does not route a game Lock/Unlock or Draw* call to D3D11.
+struct NativeManagedBufferMirrorReadiness
+{
+    bool inputValid{};
+    bool shadowValid{};
+    bool resourcesOwned{};
+    bool lifetimeCurrent{};
+    bool deviceMatches{};
+    bool descriptorExact{};
+    bool mutationPlanExact{};
+    bool ready{};
+    ResourceRole role = ResourceRole::Vertex;
+    std::uint64_t deviceGeneration{};
+    std::uint64_t shadowVersion{};
+    std::uint64_t mirrorGeneration{};
+    std::uint64_t mirrorShadowVersion{};
+    std::uint64_t mirrorInstanceGeneration{};
+    std::uint64_t snapshotToken{};
+};
+
+// R152 seals the actual managed source-index values covered by a D3D9
+// DrawIndexedPrimitive source range. Unlike R149's numeric range proof, this
+// snapshot scans the exact current CPU shadow and is tied to the same R119
+// mirror identity used by dormant geometry readiness.
+struct NativeManagedIndexRangeReadiness {
+    bool inputValid{};
+    bool shadowValid{};
+    bool indexFormatExact{};
+    bool mirrorSnapshotExact{};
+    bool byteRangeExact{};
+    bool valuesWithinDeclaredRange{};
+    bool ready{};
+    D3DFORMAT sourceIndexFormat = D3DFMT_UNKNOWN;
+    UINT startIndex{};
+    UINT indexCount{};
+    UINT minVertexIndex{};
+    UINT maxVertexIndex{};
+    UINT observedMinIndex{};
+    UINT observedMaxIndex{};
+    std::uint64_t shadowVersion{};
+    std::uint64_t mirrorSnapshotToken{};
+    std::uint64_t contentHash{};
+    std::uint64_t snapshotToken{};
+};
+
+// R113 dormant CPU shadow plus generation-bound D3D11 mirror for D3D9
+// MANAGED vertex/index buffers. This is readiness infrastructure only: no
+// game Lock/Unlock hook or native draw path routes through it yet.
+class NativeManagedBufferShadow final {
+public:
+    NativeManagedBufferShadow() = default;
+    ~NativeManagedBufferShadow() = default;
+    NativeManagedBufferShadow(const NativeManagedBufferShadow&) = delete;
+    NativeManagedBufferShadow& operator=(const NativeManagedBufferShadow&) = delete;
+
+    bool initialize(
+        ResourceRole role,
+        UINT byteWidth,
+        DWORD sourceUsage) noexcept;
+    bool write_range(
+        UINT offset,
+        const void* source,
+        UINT sourceBytes) noexcept;
+    bool recreate_and_upload_mirror(ID3D11Device* device) noexcept;
+    void observe_device_reset() noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return metadata_valid_ && byte_width_ != 0 &&
+            shadow_.size() == byte_width_;
+    }
+    [[nodiscard]] bool shadow_valid() const noexcept {
+        return lifetime_.cpuShadowValid;
+    }
+    [[nodiscard]] bool mirror_ready() const noexcept {
+        return managed_mirror_ready(lifetime_) &&
+            mirror_device_ && mirror_buffer_;
+    }
+    [[nodiscard]] std::uint64_t shadow_version() const noexcept {
+        return lifetime_.cpuShadowVersion;
+    }
+    [[nodiscard]] std::uint64_t device_generation() const noexcept {
+        return lifetime_.deviceGeneration;
+    }
+    [[nodiscard]] ID3D11Device* mirror_device() const noexcept {
+        return mirror_device_.Get();
+    }
+    [[nodiscard]] ID3D11Buffer* mirror_buffer() const noexcept {
+        return mirror_buffer_.Get();
+    }
+    [[nodiscard]] UINT byte_width() const noexcept {
+        return byte_width_;
+    }
+
+    // R155 hashes the exact indexed triangle-fan expansion implied by the
+    // current MANAGED index CPU shadow. No raw shadow pointer escapes.
+    [[nodiscard]] bool hash_indexed_triangle_fan_window(
+        D3DFORMAT sourceIndexFormat,
+        UINT startIndex,
+        UINT sourceIndexCount,
+        UINT primitiveCount,
+        std::uint64_t expectedShadowVersion,
+        std::uint64_t& expandedContentHash) const noexcept;
+
+    [[nodiscard]] bool mirror_descriptor_exact(
+        ID3D11Device* expectedDevice) const noexcept;
+    [[nodiscard]] NativeManagedBufferMirrorReadiness mirror_readiness(
+        ID3D11Device* expectedDevice) const noexcept;
+    [[nodiscard]] bool validate_mirror_readiness_snapshot(
+        ID3D11Device* expectedDevice,
+        std::uint64_t snapshotToken) const noexcept;
+    [[nodiscard]] NativeManagedIndexRangeReadiness index_range_readiness(
+        const NativeManagedBufferMirrorReadiness& mirror,
+        D3DFORMAT sourceIndexFormat,
+        UINT startIndex,
+        UINT indexCount,
+        UINT minVertexIndex,
+        UINT maxVertexIndex) const noexcept;
+    [[nodiscard]] bool validate_index_range_readiness_snapshot(
+        const NativeManagedBufferMirrorReadiness& mirror,
+        D3DFORMAT sourceIndexFormat,
+        UINT startIndex,
+        UINT indexCount,
+        UINT minVertexIndex,
+        UINT maxVertexIndex,
+        std::uint64_t snapshotToken) const noexcept;
+    [[nodiscard]] std::uint64_t mirror_instance_generation() const noexcept {
+        return mirror_instance_generation_;
+    }
+
+private:
+    void release_mirror() noexcept;
+
+    ResourceRole role_ = ResourceRole::Vertex;
+    DWORD source_usage_ = 0;
+    UINT byte_width_ = 0;
+    bool metadata_valid_ = false;
+    std::vector<std::uint8_t> shadow_;
+    ManagedMirrorLifetimeState lifetime_{};
+    Microsoft::WRL::ComPtr<ID3D11Device> mirror_device_;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> mirror_buffer_;
+    std::uint64_t mirror_instance_generation_ = 0;
+};
+
+// R102 dormant CPU shadow for a single-mip uncompressed D3D9 MANAGED
+// Texture2D. R103 adds concrete generation-bound D3D11 DEFAULT mirror/SRV
+// recreation from the shadow. R104 adds the LockRect source transaction.
+// R105 stages bytes before the real D3D9 UnlockRect and commits them only after
+// that UnlockRect succeeds, so no source pointer survives across the COM call.
+// R108 adds registry-level, non-routing mirror ownership/readiness observation.
+// R109 adds fail-closed per-stage aggregation over those readiness snapshots.
+// R110 adds a stale-snapshot token that changes on every successful mirror
+// recreation and on every generation/shadow-version transition represented by
+// the aggregate. R111 additionally verifies the concrete D3D11 Texture2D/SRV
+// descriptor and view identity before readiness can become true.
+// Native draw/SRV binding remains disabled.
+struct NativeManagedTextureMirrorReadiness {
+    bool registered{};
+    bool shadowValid{};
+    bool resourcesOwned{};
+    bool lifetimeCurrent{};
+    bool deviceMatches{};
+    bool descriptorExact{};
+    bool ready{};
+    std::uint64_t deviceGeneration{};
+    std::uint64_t shadowVersion{};
+    std::uint64_t mirrorGeneration{};
+    std::uint64_t mirrorShadowVersion{};
+};
+
+struct NativeManagedTextureStageReadiness {
+    bool inputValid{};
+    bool allRequiredReady{};
+    std::uint32_t requiredMask{};
+    std::uint32_t registeredMask{};
+    std::uint32_t shadowValidMask{};
+    std::uint32_t resourcesOwnedMask{};
+    std::uint32_t lifetimeCurrentMask{};
+    std::uint32_t deviceMatchesMask{};
+    std::uint32_t descriptorExactMask{};
+    std::uint32_t readyMask{};
+    std::uint32_t pendingMask{};
+    std::uint64_t snapshotToken{};
+};
+
+class NativeManagedTextureShadow final {
+public:
+    NativeManagedTextureShadow() = default;
+    ~NativeManagedTextureShadow() = default;
+    NativeManagedTextureShadow(const NativeManagedTextureShadow&) = delete;
+    NativeManagedTextureShadow& operator=(const NativeManagedTextureShadow&) = delete;
+
+    bool initialize(
+        D3DFORMAT sourceFormat,
+        UINT width,
+        UINT height) noexcept;
+    bool write_full(
+        const void* source,
+        UINT sourceRowPitch,
+        UINT sourceRows) noexcept;
+    bool read_full(
+        void* destination,
+        UINT destinationRowPitch,
+        UINT destinationRows) const noexcept;
+    bool recreate_and_upload_mirror(ID3D11Device* device) noexcept;
+    bool begin_source_lock(
+        UINT level,
+        const RECT* sourceRect,
+        DWORD lockFlags,
+        const D3DLOCKED_RECT& lockedRect) noexcept;
+    bool stage_source_unlock(UINT level) noexcept;
+    bool finish_source_unlock(UINT level, HRESULT unlockResult) noexcept;
+    bool commit_source_unlock(UINT level) noexcept;
+    void cancel_source_lock() noexcept;
+    void note_mirror_uploaded() noexcept;
+    void observe_device_reset() noexcept;
+    bool invalidate_external_mutation() noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return source_format_ != D3DFMT_UNKNOWN &&
+            width_ != 0 && height_ != 0 && row_bytes_ != 0 &&
+            !shadow_.empty();
+    }
+    [[nodiscard]] bool shadow_valid() const noexcept {
+        return lifetime_.cpuShadowValid;
+    }
+    [[nodiscard]] bool mirror_ready() const noexcept {
+        return managed_mirror_ready(lifetime_) &&
+            mirror_device_ && mirror_texture_ && mirror_srv_;
+    }
+    [[nodiscard]] std::uint64_t shadow_version() const noexcept {
+        return lifetime_.cpuShadowVersion;
+    }
+    [[nodiscard]] std::uint64_t device_generation() const noexcept {
+        return lifetime_.deviceGeneration;
+    }
+    [[nodiscard]] bool source_lock_active() const noexcept {
+        return source_lock_active_;
+    }
+    [[nodiscard]] bool source_unlock_staged() const noexcept {
+        return source_unlock_staged_;
+    }
+    [[nodiscard]] ID3D11Device* mirror_device() const noexcept {
+        return mirror_device_.Get();
+    }
+    [[nodiscard]] ID3D11Texture2D* mirror_texture() const noexcept {
+        return mirror_texture_.Get();
+    }
+    [[nodiscard]] ID3D11ShaderResourceView* mirror_srv() const noexcept {
+        return mirror_srv_.Get();
+    }
+    [[nodiscard]] std::uint64_t mirror_instance_generation() const noexcept {
+        return mirror_instance_generation_;
+    }
+    [[nodiscard]] bool mirror_descriptor_exact(
+        ID3D11Device* expectedDevice) const noexcept;
+    [[nodiscard]] const ManagedMirrorLifetimeState&
+    lifetime_state() const noexcept {
+        return lifetime_;
+    }
+
+private:
+    void release_mirror() noexcept;
+    void invalidate_shadow() noexcept;
+    void clear_source_lock() noexcept;
+    void clear_unlock_stage() noexcept;
+
+    D3DFORMAT source_format_ = D3DFMT_UNKNOWN;
+    UINT width_ = 0;
+    UINT height_ = 0;
+    UINT row_bytes_ = 0;
+    std::vector<std::uint8_t> shadow_;
+    ManagedMirrorLifetimeState lifetime_{};
+    const void* source_lock_bits_ = nullptr;
+    UINT source_lock_pitch_ = 0;
+    UINT source_lock_level_ = 0;
+    bool source_lock_active_ = false;
+    std::vector<std::uint8_t> pending_unlock_;
+    UINT source_unlock_level_ = 0;
+    bool source_unlock_staged_ = false;
+    Microsoft::WRL::ComPtr<ID3D11Device> mirror_device_;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> mirror_texture_;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mirror_srv_;
+    std::uint64_t mirror_instance_generation_ = 0;
+};
+
+// R105 census-only per-texture owner. Keys are observed D3D9 texture identities;
+// the registry never AddRefs them, so the R30 Release hook must forget an entry
+// when the real COM refcount reaches zero. It owns CPU shadows and transaction
+// staging only and does not bind D3D11 resources to a game draw.
+class NativeManagedTextureRegistry final {
+public:
+    NativeManagedTextureRegistry() = default;
+    ~NativeManagedTextureRegistry() = default;
+    NativeManagedTextureRegistry(const NativeManagedTextureRegistry&) = delete;
+    NativeManagedTextureRegistry& operator=(const NativeManagedTextureRegistry&) = delete;
+
+    bool register_texture(
+        const void* textureKey,
+        D3DFORMAT sourceFormat,
+        UINT width,
+        UINT height,
+        UINT levels,
+        DWORD usage,
+        D3DPOOL pool) noexcept;
+    bool begin_source_lock(
+        const void* textureKey,
+        UINT level,
+        const RECT* sourceRect,
+        DWORD lockFlags,
+        const D3DLOCKED_RECT& lockedRect) noexcept;
+    bool stage_source_unlock(const void* textureKey, UINT level) noexcept;
+    bool finish_source_unlock(
+        const void* textureKey,
+        UINT level,
+        HRESULT unlockResult) noexcept;
+    bool invalidate_external_mutation(const void* textureKey) noexcept;
+    bool recreate_and_upload_mirror_for_observation(
+        const void* textureKey,
+        ID3D11Device* device) noexcept;
+    [[nodiscard]] NativeManagedTextureMirrorReadiness mirror_readiness(
+        const void* textureKey,
+        ID3D11Device* expectedDevice) const noexcept;
+    [[nodiscard]] NativeManagedTextureStageReadiness
+    mirror_readiness_for_stages(
+        const void* const* textureKeys,
+        std::size_t textureCount,
+        std::uint32_t requiredMask,
+        ID3D11Device* expectedDevice) const noexcept;
+    [[nodiscard]] bool validate_mirror_readiness_snapshot_for_stages(
+        const void* const* textureKeys,
+        std::size_t textureCount,
+        std::uint32_t requiredMask,
+        ID3D11Device* expectedDevice,
+        std::uint64_t snapshotToken) const noexcept;
+    void observe_device_reset() noexcept;
+    void forget_texture(const void* textureKey) noexcept;
+    void clear() noexcept;
+
+    [[nodiscard]] std::size_t size() const noexcept;
+    [[nodiscard]] bool contains(const void* textureKey) const noexcept;
+    [[nodiscard]] bool shadow_valid(const void* textureKey) const noexcept;
+    [[nodiscard]] std::uint64_t shadow_version(
+        const void* textureKey) const noexcept;
+    [[nodiscard]] std::uint64_t device_generation(
+        const void* textureKey) const noexcept;
+    [[nodiscard]] bool source_lock_active(
+        const void* textureKey) const noexcept;
+    [[nodiscard]] bool source_unlock_staged(
+        const void* textureKey) const noexcept;
+    bool read_shadow(
+        const void* textureKey,
+        void* destination,
+        UINT destinationRowPitch,
+        UINT destinationRows) const noexcept;
+
+private:
+    NativeManagedTextureShadow* find_locked(const void* textureKey) noexcept;
+    const NativeManagedTextureShadow* find_locked(
+        const void* textureKey) const noexcept;
+    void advance_membership_generation_locked() noexcept;
+
+    mutable std::mutex mutex_;
+    std::unordered_map<
+        const void*,
+        std::unique_ptr<NativeManagedTextureShadow>> shadows_;
+    std::uint64_t membership_generation_ = 1;
+};
+
+// R116 owns concrete D3D11 blend/depth-stencil/rasterizer objects for one
+// exact PipelineTranslation and seals their immutable translation identity.
+// This remains dormant activation-readiness evidence: it does not bind state
+// or route a game draw.
+struct NativeFixedFunctionRenderStateReadiness {
+    bool inputValid{};
+    bool bundleReady{};
+    bool deviceMatches{};
+    bool translationMatches{};
+    bool ready{};
+    std::uint64_t bundleGeneration{};
+    std::uint64_t translationIdentity{};
+    std::uint64_t snapshotToken{};
+};
+
+class NativeFixedFunctionRenderStateBundle final {
+public:
+    NativeFixedFunctionRenderStateBundle() = default;
+    ~NativeFixedFunctionRenderStateBundle() = default;
+    NativeFixedFunctionRenderStateBundle(
+        const NativeFixedFunctionRenderStateBundle&) = delete;
+    NativeFixedFunctionRenderStateBundle& operator=(
+        const NativeFixedFunctionRenderStateBundle&) = delete;
+
+    bool initialize(
+        ID3D11Device* device,
+        const PipelineTranslation& translation) noexcept;
+    void shutdown() noexcept;
+    [[nodiscard]] NativeFixedFunctionRenderStateReadiness
+    translation_readiness(
+        ID3D11Device* expectedDevice,
+        const PipelineTranslation& translation) const noexcept;
+    [[nodiscard]] bool validate_translation_snapshot(
+        ID3D11Device* expectedDevice,
+        const PipelineTranslation& translation,
+        std::uint64_t snapshotToken) const noexcept;
+    [[nodiscard]] bool validate_readiness_snapshot(
+        ID3D11Device* expectedDevice,
+        const NativeFixedFunctionRenderStateReadiness& readiness) const noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && blend_state_ && depth_stencil_state_ &&
+            rasterizer_state_;
+    }
+    [[nodiscard]] ID3D11Device* device() const noexcept {
+        return device_.Get();
+    }
+    [[nodiscard]] ID3D11BlendState* blend_state() const noexcept {
+        return blend_state_.Get();
+    }
+    [[nodiscard]] ID3D11DepthStencilState* depth_stencil_state() const noexcept {
+        return depth_stencil_state_.Get();
+    }
+    [[nodiscard]] ID3D11RasterizerState* rasterizer_state() const noexcept {
+        return rasterizer_state_.Get();
+    }
+    [[nodiscard]] UINT stencil_ref() const noexcept {
+        return stencil_ref_;
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11BlendState> blend_state_;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depth_stencil_state_;
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizer_state_;
+    UINT stencil_ref_ = 0;
+    std::uint64_t translation_identity_ = 0;
+    std::uint64_t bundle_generation_ = 0;
+};
+
+// R112 seals the exact translation identity of an R97 bundle without routing
+// it into a game draw. A nonzero snapshot is issued only when the live bundle
+// still belongs to the expected D3D11 device and matches the exact input-layout
+// plus R93/R84 shader prototypes used for the activation candidate.
+struct NativeFixedFunctionPipelineReadiness {
+    bool inputValid{};
+    bool bundleReady{};
+    bool deviceMatches{};
+    bool inputLayoutMatches{};
+    bool vertexShaderMatches{};
+    bool pixelShaderMatches{};
+    bool ready{};
+    std::uint64_t bundleGeneration{};
+    std::uint64_t snapshotToken{};
+};
+
+// R134 observes the concrete IA/VS/PS objects after the dormant R132 binder.
+// R147 adds GS/HS/DS isolation, and R148 additionally requires stream-output
+// targets plus draw predication to be clear. Its token is tied to the exact
+// R112 translation snapshot and same-device COM identities. This is
+// observation evidence only and never issues Draw*.
+struct NativeFixedFunctionPipelineBindingReadiness {
+    bool inputValid{};
+    bool bundleReady{};
+    bool contextMatches{};
+    bool translationSnapshotValid{};
+    bool geometryShaderClear{};
+    bool hullShaderClear{};
+    bool domainShaderClear{};
+    bool graphicsStageIsolationReady{};
+    bool streamOutputTargetsClear{};
+    bool predicationClear{};
+    bool drawSideEffectIsolationReady{};
+    bool boundExact{};
+    bool ready{};
+    std::uint64_t pipelineSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+// R115 composes the independently proven R112 pipeline snapshot and R110/R111
+// managed-texture stage snapshot into one fail-closed activation-candidate
+// identity. This is evidence only: it does not bind state or route a game draw.
+struct NativeFixedFunctionActivationReadiness {
+    bool inputValid{};
+    bool pipelineReady{};
+    bool textureStagesReady{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint32_t requiredTextureMask{};
+    std::uint64_t pipelineSnapshotToken{};
+    std::uint64_t textureSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionActivationReadiness
+compose_fixed_function_activation_readiness(
+    const NativeFixedFunctionPipelineReadiness& pipeline,
+    const NativeManagedTextureStageReadiness& textureStages) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_activation_snapshot(
+    const NativeFixedFunctionPipelineReadiness& pipeline,
+    const NativeManagedTextureStageReadiness& textureStages,
+    std::uint64_t snapshotToken) noexcept;
+
+// R122 composes exact R119 managed VB/optional IB snapshots with exact
+// primitive topology. The R121 fan materializer still needs an owned/uploaded
+// generated IB, so triangle fans remain fail-closed at this readiness layer.
+struct NativeFixedFunctionGeometryReadiness {
+    bool inputValid{};
+    bool vertexBufferReady{};
+    bool indexBufferRequired{};
+    bool indexBufferReady{};
+    bool generatedIndexBufferRequired{};
+    bool generatedIndexBufferReady{};
+    bool generatedIndexBufferMatchesDraw{};
+    bool topologyReady{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    D3D11_PRIMITIVE_TOPOLOGY topology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    std::uint64_t vertexBufferSnapshotToken{};
+    std::uint64_t indexBufferSnapshotToken{};
+    std::uint64_t generatedIndexBufferSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionGeometryReadiness
+compose_fixed_function_geometry_readiness(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    bool indexed,
+    const NativeManagedBufferMirrorReadiness& indexBuffer,
+    D3DPRIMITIVETYPE primitive) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_geometry_snapshot(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    bool indexed,
+    const NativeManagedBufferMirrorReadiness& indexBuffer,
+    D3DPRIMITIVETYPE primitive,
+    std::uint64_t snapshotToken) noexcept;
+
+// R139 seals the direct R122 managed-buffer geometry snapshot against copied
+// struct drift, then observes the effective live IA slot-0 VB/optional IB and
+// primitive topology. Generated triangle-fan IBs remain fail-closed here until
+// their owning buffer is wired through the same live-binding contract.
+[[nodiscard]] bool validate_fixed_function_direct_geometry_readiness_integrity(
+    const NativeFixedFunctionGeometryReadiness& geometry) noexcept;
+
+struct NativeFixedFunctionGeometryBindingReadiness {
+    bool inputValid{};
+    bool geometryReady{};
+    bool contextMatches{};
+    bool vertexBufferCurrent{};
+    bool indexBufferCurrent{};
+    bool vertexBufferBoundExact{};
+    bool indexBufferBoundExact{};
+    bool topologyBoundExact{};
+    bool ready{};
+    bool indexed{};
+    UINT vertexStride{};
+    UINT vertexOffset{};
+    DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT indexOffset{};
+    D3D11_PRIMITIVE_TOPOLOGY topology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    std::uint64_t geometrySnapshotToken{};
+    std::uint64_t vertexBufferSnapshotToken{};
+    std::uint64_t indexBufferSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] bool bind_fixed_function_geometry_for_observation(
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset) noexcept;
+
+[[nodiscard]] NativeFixedFunctionGeometryBindingReadiness
+observe_fixed_function_geometry_binding(
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_geometry_binding_snapshot(
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset,
+    std::uint64_t snapshotToken) noexcept;
+
+// R128 consumes an R126 generated IB only for non-indexed D3D9 triangle fans.
+// Indexed fans deliberately remain on the direct R122 fail-closed path until
+// source-index provenance is sealed separately.
+[[nodiscard]] NativeFixedFunctionGeometryReadiness
+compose_fixed_function_nonindexed_triangle_fan_geometry_readiness(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    const NativeTriangleFanIndexBufferReadiness& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_nonindexed_triangle_fan_geometry_snapshot(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    const NativeTriangleFanIndexBufferReadiness& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex,
+    std::uint64_t snapshotToken) noexcept;
+
+// R143 closes the indexed triangle-fan geometry lineage gap without activating
+// Draw*. The generated R126/R129 owner is accepted only when it was built from
+// the exact current source-index mirror snapshot and the same primitive count,
+// index format, StartIndex and source-index extent supplied to this compositor.
+// The source index buffer remains provenance evidence; the generated R32_UINT
+// triangle-list owner is the eventual IA index stream.
+[[nodiscard]] NativeFixedFunctionGeometryReadiness
+compose_fixed_function_indexed_triangle_fan_geometry_readiness(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    const NativeManagedBufferMirrorReadiness& sourceIndexBuffer,
+    const NativeTriangleFanIndexBufferReadiness& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_indexed_triangle_fan_geometry_snapshot(
+    const NativeManagedBufferMirrorReadiness& vertexBuffer,
+    const NativeManagedBufferMirrorReadiness& sourceIndexBuffer,
+    const NativeTriangleFanIndexBufferReadiness& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount,
+    std::uint64_t snapshotToken) noexcept;
+
+// R124 seals D3D9 dynamic output state into a dormant D3D11-ready snapshot.
+// It proves viewport/scissor geometry plus the OM blend factor/sample mask
+// against the current output-surface extent. Nothing here binds RS/OM state.
+struct NativeFixedFunctionOutputStateReadiness {
+    bool inputValid{};
+    bool viewportExact{};
+    bool scissorExact{};
+    bool omDynamicExact{};
+    bool ready{};
+    D3D11_VIEWPORT viewport{};
+    D3D11_RECT scissorRect{};
+    std::array<float, 4> blendFactor{1.0f, 1.0f, 1.0f, 1.0f};
+    UINT sampleMask = 0xFFFFFFFFu;
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionOutputStateReadiness
+compose_fixed_function_output_state_readiness(
+    const OutRunVR::DrawState::RenderStateSnapshot& source,
+    const NativeSurfacePairReadiness& surfacePair) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_output_state_snapshot(
+    const OutRunVR::DrawState::RenderStateSnapshot& source,
+    const NativeSurfacePairReadiness& surfacePair,
+    std::uint64_t snapshotToken) noexcept;
+
+// R137 observes the effective live RS/OM state after the dormant R126 owner
+// has been applied. A token is issued only when every sealed object and
+// dynamic value is still exact on the same D3D11 context device.
+struct NativeFixedFunctionOutputBindingReadiness {
+    bool inputValid{};
+    bool ownerReady{};
+    bool contextMatches{};
+    bool rasterizerMatches{};
+    bool viewportMatches{};
+    bool scissorMatches{};
+    bool blendStateMatches{};
+    bool blendFactorMatches{};
+    bool sampleMaskMatches{};
+    bool depthStencilMatches{};
+    bool stencilRefMatches{};
+    bool ready{};
+    std::uint64_t outputBindingSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+// R126 consumes an exact live R116 translation snapshot plus a freshly
+// recomputed R124 source/surface snapshot into one dormant binding owner.
+// initialize() cross-checks immutable rasterizer scissor enable against the
+// dynamic source state before sealing RS/OM bindings. apply() never Draw*s.
+class NativeFixedFunctionOutputStateBinding final {
+public:
+    NativeFixedFunctionOutputStateBinding() = default;
+    ~NativeFixedFunctionOutputStateBinding() = default;
+    NativeFixedFunctionOutputStateBinding(
+        const NativeFixedFunctionOutputStateBinding&) = delete;
+    NativeFixedFunctionOutputStateBinding& operator=(
+        const NativeFixedFunctionOutputStateBinding&) = delete;
+
+    bool initialize(
+        ID3D11Device* device,
+        const NativeFixedFunctionRenderStateBundle& renderStateBundle,
+        const PipelineTranslation& translation,
+        std::uint64_t renderStateSnapshotToken,
+        const OutRunVR::DrawState::RenderStateSnapshot& source,
+        const NativeSurfacePairReadiness& surfacePair,
+        std::uint64_t outputStateSnapshotToken) noexcept;
+    void shutdown() noexcept;
+    [[nodiscard]] bool apply(ID3D11DeviceContext* context) const noexcept;
+    [[nodiscard]] NativeFixedFunctionOutputBindingReadiness binding_readiness(
+        ID3D11DeviceContext* context) const noexcept;
+    [[nodiscard]] bool validate_binding_snapshot(
+        ID3D11DeviceContext* context,
+        std::uint64_t bindingSnapshotToken) const noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && blend_state_ && depth_stencil_state_ &&
+            rasterizer_state_ && render_state_snapshot_token_ != 0 &&
+            surface_pair_snapshot_token_ != 0 &&
+            output_state_snapshot_token_ != 0 && snapshot_token_ != 0;
+    }
+    [[nodiscard]] std::uint64_t render_state_snapshot_token() const noexcept {
+        return render_state_snapshot_token_;
+    }
+    [[nodiscard]] std::uint64_t surface_pair_snapshot_token() const noexcept {
+        return surface_pair_snapshot_token_;
+    }
+    [[nodiscard]] std::uint64_t output_state_snapshot_token() const noexcept {
+        return output_state_snapshot_token_;
+    }
+    [[nodiscard]] std::uint64_t snapshot_token() const noexcept {
+        return snapshot_token_;
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11BlendState> blend_state_;
+    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depth_stencil_state_;
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizer_state_;
+    D3D11_VIEWPORT viewport_{};
+    D3D11_RECT scissor_rect_{};
+    std::array<float, 4> blend_factor_{1.0f, 1.0f, 1.0f, 1.0f};
+    UINT sample_mask_ = 0xFFFFFFFFu;
+    UINT stencil_ref_ = 0;
+    std::uint64_t render_state_snapshot_token_ = 0;
+    std::uint64_t surface_pair_snapshot_token_ = 0;
+    std::uint64_t output_state_snapshot_token_ = 0;
+    std::uint64_t snapshot_token_ = 0;
+};
+
+// R131 extends the dormant draw-readiness snapshot through the concrete R126
+// RS/OM binding identity. A candidate is not ready unless the binding was built
+// from the same render-state, surface-pair and dynamic-output snapshots carried
+// by the draw candidate. This remains dormant evidence only; no Draw* routing.
+struct NativeFixedFunctionDrawReadiness {
+    bool inputValid{};
+    bool activationReady{};
+    bool renderStateReady{};
+    bool surfacePairReady{};
+    bool outputStateReady{};
+    bool outputBindingReady{};
+    bool geometryReady{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint32_t requiredTextureMask{};
+    std::uint64_t activationSnapshotToken{};
+    std::uint64_t pipelineSnapshotToken{};
+    std::uint64_t renderStateSnapshotToken{};
+    std::uint64_t surfacePairSnapshotToken{};
+    std::uint64_t outputStateSnapshotToken{};
+    std::uint64_t outputBindingSnapshotToken{};
+    std::uint64_t geometrySnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionDrawReadiness
+compose_fixed_function_draw_readiness(
+    const NativeFixedFunctionActivationReadiness& activation,
+    const NativeFixedFunctionRenderStateReadiness& renderState,
+    const NativeSurfacePairReadiness& surfacePair,
+    const NativeFixedFunctionOutputStateReadiness& outputState,
+    const NativeFixedFunctionOutputStateBinding& outputBinding,
+    const NativeFixedFunctionGeometryReadiness& geometry) noexcept;
+
+// R135 validates the self-contained identity carried by a composed draw
+// readiness value. This prevents downstream bind-readiness code from accepting
+// a copied snapshot whose required texture-stage mask was changed afterward.
+[[nodiscard]] bool validate_fixed_function_draw_readiness_integrity(
+    const NativeFixedFunctionDrawReadiness& draw) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_draw_snapshot(
+    const NativeFixedFunctionActivationReadiness& activation,
+    const NativeFixedFunctionRenderStateReadiness& renderState,
+    const NativeSurfacePairReadiness& surfacePair,
+    const NativeFixedFunctionOutputStateReadiness& outputState,
+    const NativeFixedFunctionOutputStateBinding& outputBinding,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    std::uint64_t snapshotToken) noexcept;
+
+// R132 composes the R131 RS/OM-gated draw candidate with the currently
+// observed PS sampler/SRV binding identity. This is readiness evidence only;
+// it does not issue a D3D11 Draw* call.
+struct NativeFixedFunctionTexturedDrawReadiness {
+    bool inputValid{};
+    bool drawReady{};
+    bool textureStageReady{};
+    bool textureMaskMatches{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint32_t requiredTextureMask{};
+    std::uint32_t observedTextureMask{};
+    std::uint64_t drawSnapshotToken{};
+    std::uint64_t textureStageSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionTexturedDrawReadiness
+compose_fixed_function_textured_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_textured_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    UINT slot,
+    const NativeFixedFunctionSamplerState& sampler,
+    const NativeFixedFunctionTextureView& texture,
+    std::uint64_t snapshotToken) noexcept;
+
+// R136 composes a sealed draw with an aggregate of all required live PS
+// sampler/SRV stage identities. The legacy single-stage R133 entrypoint remains
+// fail-closed for multi-stage masks.
+[[nodiscard]] NativeFixedFunctionTexturedDrawReadiness
+compose_fixed_function_multistage_textured_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_multistage_textured_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    std::uint64_t snapshotToken) noexcept;
+
+// R138 composes the existing output/surface/PS/geometry evidence with live
+// exact R97 IA/VS/PS and R137 RS/OM binding observations on the same context.
+// Both live binding identities must still match the snapshots sealed by draw.
+struct NativeFixedFunctionBoundDrawReadiness {
+    bool inputValid{};
+    bool texturedDrawReady{};
+    bool pipelineBindingReady{};
+    bool pipelineBindingMatchesDraw{};
+    bool outputBindingReady{};
+    bool outputBindingMatchesDraw{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t texturedDrawSnapshotToken{};
+    std::uint64_t pipelineBindingSnapshotToken{};
+    std::uint64_t outputBindingSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionBoundDrawReadiness
+compose_fixed_function_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionTexturedDrawReadiness& texturedDraw,
+    const NativeFixedFunctionPipelineBindingReadiness& pipelineBinding,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionTexturedDrawReadiness& texturedDraw,
+    const NativeFixedFunctionPipelineBindingReadiness& pipelineBinding,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    std::uint64_t snapshotToken) noexcept;
+
+// R97 dormant per-device owner for the R93/R84 shader pair, R78/R88
+// input layout, and R96 transform buffer. No game draw path constructs or
+// binds this bundle yet.
+class NativeFixedFunctionPipelineBundle final {
+public:
+    NativeFixedFunctionPipelineBundle() = default;
+    ~NativeFixedFunctionPipelineBundle() = default;
+    NativeFixedFunctionPipelineBundle(
+        const NativeFixedFunctionPipelineBundle&) = delete;
+    NativeFixedFunctionPipelineBundle& operator=(
+        const NativeFixedFunctionPipelineBundle&) = delete;
+
+    bool initialize(
+        ID3D11Device* device,
+        const VertexInputLayoutTranslation& layout,
+        const FixedFunctionVertexShaderPrototype& vertexPrototype,
+        const FixedFunctionPixelShaderPrototype& pixelPrototype) noexcept;
+    void shutdown() noexcept;
+    [[nodiscard]] NativeFixedFunctionPipelineReadiness translation_readiness(
+        ID3D11Device* expectedDevice,
+        const VertexInputLayoutTranslation& layout,
+        const FixedFunctionVertexShaderPrototype& vertexPrototype,
+        const FixedFunctionPixelShaderPrototype& pixelPrototype) const noexcept;
+    [[nodiscard]] bool validate_translation_snapshot(
+        ID3D11Device* expectedDevice,
+        const VertexInputLayoutTranslation& layout,
+        const FixedFunctionVertexShaderPrototype& vertexPrototype,
+        const FixedFunctionPixelShaderPrototype& pixelPrototype,
+        std::uint64_t snapshotToken) const noexcept;
+
+    // Upload and bind the exact translated WVP through the R96 owner without
+    // routing a game draw. The final VS-b0 gate reobserves this binding.
+    bool upload_transform_for_observation(
+        ID3D11DeviceContext* context,
+        const FixedFunctionTransformConstants& constants) noexcept;
+
+    // Dormant exact-device binding primitive for the already-sealed R97
+    // pipeline identity. This binds only IA/VS/PS objects for observation;
+    // it does not upload per-draw constants or issue a Draw* call.
+    [[nodiscard]] bool bind_for_observation(
+        ID3D11DeviceContext* context,
+        const VertexInputLayoutTranslation& layout,
+        const FixedFunctionVertexShaderPrototype& vertexPrototype,
+        const FixedFunctionPixelShaderPrototype& pixelPrototype,
+        std::uint64_t snapshotToken) const noexcept;
+    [[nodiscard]] NativeFixedFunctionPipelineBindingReadiness binding_readiness(
+        ID3D11DeviceContext* context,
+        const VertexInputLayoutTranslation& layout,
+        const FixedFunctionVertexShaderPrototype& vertexPrototype,
+        const FixedFunctionPixelShaderPrototype& pixelPrototype,
+        std::uint64_t pipelineSnapshotToken) const noexcept;
+    [[nodiscard]] bool validate_binding_snapshot(
+        ID3D11DeviceContext* context,
+        const VertexInputLayoutTranslation& layout,
+        const FixedFunctionVertexShaderPrototype& vertexPrototype,
+        const FixedFunctionPixelShaderPrototype& pixelPrototype,
+        std::uint64_t pipelineSnapshotToken,
+        std::uint64_t bindingSnapshotToken) const noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && vertex_shader_ && pixel_shader_ && input_layout_ &&
+            transform_buffer_.ready();
+    }
+    [[nodiscard]] ID3D11Device* device() const noexcept {
+        return device_.Get();
+    }
+    [[nodiscard]] ID3D11VertexShader* vertex_shader() const noexcept {
+        return vertex_shader_.Get();
+    }
+    [[nodiscard]] ID3D11PixelShader* pixel_shader() const noexcept {
+        return pixel_shader_.Get();
+    }
+    [[nodiscard]] ID3D11InputLayout* input_layout() const noexcept {
+        return input_layout_.Get();
+    }
+    [[nodiscard]] const NativeFixedFunctionTransformBuffer&
+    transform_buffer() const noexcept {
+        return transform_buffer_;
+    }
+
+private:
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11VertexShader> vertex_shader_;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shader_;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> input_layout_;
+    NativeFixedFunctionTransformBuffer transform_buffer_;
+    std::uint64_t input_layout_identity_ = 0;
+    std::uint64_t vertex_shader_source_hash_ = 0;
+    std::uint64_t pixel_shader_source_hash_ = 0;
+    std::uint64_t bundle_generation_ = 0;
+};
+
+
+// R139 is the stronger final dormant proof: it reobserves aggregate PS,
+// IA/VS/PS and RS/OM bindings from one caller-supplied D3D11 context before
+// composing R138. Precomputed readiness from another context cannot be
+// injected because this entrypoint owns all live observations. It never Draw*s.
+[[nodiscard]] NativeFixedFunctionBoundDrawReadiness
+compose_fixed_function_same_context_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_same_context_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    std::uint64_t snapshotToken) noexcept;
+
+// R140 closes the remaining direct-geometry observation gap in the final
+// dormant pre-draw proof. R139 reobserves aggregate PS, IA/VS/PS and RS/OM
+// state from one context; R140 additionally requires the exact live slot-0
+// VB/optional IB/stride/offset/topology snapshot sealed by the draw geometry.
+// This remains observation evidence only and never issues Draw*.
+struct NativeFixedFunctionCompleteBoundDrawReadiness {
+    bool inputValid{};
+    bool sameContextBoundDrawReady{};
+    bool geometryBindingReady{};
+    bool geometryBindingMatchesDraw{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t sameContextBoundDrawSnapshotToken{};
+    std::uint64_t geometryBindingSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionCompleteBoundDrawReadiness
+compose_fixed_function_complete_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_complete_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat,
+    UINT indexOffset,
+    std::uint64_t snapshotToken) noexcept;
+
+// R142 extends the complete dormant pre-draw proof to non-indexed D3D9
+// triangle fans. It reconstructs the fan geometry from the current managed
+// vertex mirror plus the generated-index owner, then observes exact slot-0 VB
+// and generated R32_UINT IB/topology state on the same context. No Draw* call
+// is issued and NativeDrawPathActive remains unchanged.
+struct NativeFixedFunctionCompleteFanBoundDrawReadiness {
+    bool inputValid{};
+    bool sameContextBoundDrawReady{};
+    bool geometryReady{};
+    bool geometryMatchesDraw{};
+    bool vertexBufferBoundExact{};
+    bool generatedIndexBindingReady{};
+    bool generatedIndexMatchesGeometry{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t sameContextBoundDrawSnapshotToken{};
+    std::uint64_t geometrySnapshotToken{};
+    std::uint64_t vertexBufferSnapshotToken{};
+    std::uint64_t generatedIndexBindingSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionCompleteFanBoundDrawReadiness
+compose_fixed_function_complete_nonindexed_triangle_fan_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_complete_nonindexed_triangle_fan_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex,
+    std::uint64_t snapshotToken) noexcept;
+
+// R144 closes the indexed triangle-fan final dormant pre-draw gap. It
+// reconstructs R143 geometry from the current VB/source-IB mirrors, reobserves
+// the generated R32_UINT triangle-list binding on the same context, and seals
+// the future DrawIndexed BaseVertexLocation without issuing Draw*.
+struct NativeFixedFunctionCompleteIndexedFanBoundDrawReadiness {
+    bool inputValid{};
+    bool sameContextBoundDrawReady{};
+    bool geometryReady{};
+    bool geometryMatchesDraw{};
+    bool sourceIndexBufferCurrent{};
+    bool vertexBufferBoundExact{};
+    bool generatedIndexBindingReady{};
+    bool generatedIndexMatchesGeometry{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t sameContextBoundDrawSnapshotToken{};
+    std::uint64_t geometrySnapshotToken{};
+    std::uint64_t vertexBufferSnapshotToken{};
+    std::uint64_t sourceIndexBufferSnapshotToken{};
+    std::uint64_t generatedIndexBindingSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionCompleteIndexedFanBoundDrawReadiness
+compose_fixed_function_complete_indexed_triangle_fan_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount,
+    INT baseVertexLocation) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_complete_indexed_triangle_fan_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount,
+    INT baseVertexLocation,
+    std::uint64_t snapshotToken) noexcept;
+
+// Final transform-aware dormant pre-draw proof. R140 already reobserves live
+// pipeline/PS/RS/OM/direct-IA state; this layer additionally requires the
+// exact R96 WVP payload to remain bound at VS b0 on that same context.
+struct NativeFixedFunctionFullyBoundDrawReadiness {
+    bool inputValid{};
+    bool completeBoundDrawReady{};
+    bool transformBindingReady{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t completeBoundDrawSnapshotToken{};
+    std::uint64_t transformBindingSnapshotToken{};
+    std::uint64_t transformPayloadHash{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionFullyBoundDrawReadiness
+compose_fixed_function_fully_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat, UINT indexOffset,
+    const FixedFunctionTransformConstants& transform) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_fully_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat, UINT indexOffset,
+    const FixedFunctionTransformConstants& transform,
+    std::uint64_t snapshotToken) noexcept;
+
+// R145 closes the live OM target gap in the direct-geometry dormant pre-draw
+// proof. The existing fully-bound gate is recomputed from the same context and
+// then paired with an exact R130 surface owner live RTV/DSV snapshot. No Draw*
+// call or NativeDrawPathActive promotion occurs here.
+struct NativeFixedFunctionRenderTargetBoundDrawReadiness {
+    bool inputValid{};
+    bool fullyBoundDrawReady{};
+    bool surfaceTargetBindingReady{};
+    bool surfacePairMatchesDraw{};
+    // R151 seals the exact byte-range metadata behind the live IA binding.
+    bool geometryRangeMetadataExact{};
+    // R158 binds live IA stride to the stride used to validate the translated
+    // D3D9 input layout.
+    bool vertexStrideMatchesInputLayout{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    UINT vertexStride{};
+    UINT inputLayoutStream0Stride{};
+    UINT vertexOffset{};
+    UINT vertexBufferByteWidth{};
+    DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT indexOffset{};
+    UINT indexBufferByteWidth{};
+    std::uint64_t fullyBoundDrawSnapshotToken{};
+    std::uint64_t surfaceTargetBindingSnapshotToken{};
+    std::uint64_t surfacePairSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionRenderTargetBoundDrawReadiness
+compose_fixed_function_render_target_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat, UINT indexOffset,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_render_target_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow* indexBuffer,
+    DXGI_FORMAT indexFormat, UINT indexOffset,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t snapshotToken) noexcept;
+
+// R146 extends the dormant final pre-draw proof to generated triangle fans.
+// R142/R144 already seal current generated-fan IA state; this layer additionally
+// requires the exact live VS-b0/WVP binding and the exact live OM RTV/DSV pair.
+// It remains observation-only and never issues Draw* or enables NativeDrawPathActive.
+struct NativeFixedFunctionFinalFanBoundDrawReadiness {
+    bool inputValid{};
+    bool completeFanBoundDrawReady{};
+    bool transformBindingReady{};
+    bool surfaceTargetBindingReady{};
+    bool surfacePairMatchesDraw{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t completeFanBoundDrawSnapshotToken{};
+    std::uint64_t transformBindingSnapshotToken{};
+    std::uint64_t transformPayloadHash{};
+    std::uint64_t surfaceTargetBindingSnapshotToken{};
+    std::uint64_t surfacePairSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionFinalFanBoundDrawReadiness
+compose_fixed_function_final_nonindexed_triangle_fan_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_final_nonindexed_triangle_fan_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    UINT baseVertex,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t snapshotToken) noexcept;
+
+[[nodiscard]] NativeFixedFunctionFinalFanBoundDrawReadiness
+compose_fixed_function_final_indexed_triangle_fan_bound_draw_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount,
+    INT baseVertexLocation,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_final_indexed_triangle_fan_bound_draw_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride,
+    UINT vertexOffset,
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount,
+    D3DFORMAT sourceIndexFormat,
+    UINT startIndex,
+    UINT sourceIndexCount,
+    INT baseVertexLocation,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t snapshotToken) noexcept;
+
+
+// R147 seals the exact Draw/DrawIndexed argument tuple for direct non-fan
+// geometry after the R145 live-state proof. This is dormant dispatch evidence
+// only: it neither calls Draw* nor changes NativeDrawPathActive.
+struct NativeFixedFunctionDirectDrawDispatchReadiness {
+    bool inputValid{};
+    bool renderTargetBoundDrawReady{};
+    bool geometryReady{};
+    bool geometryMatchesDraw{};
+    bool surfacePairMatchesDraw{};
+    bool topologyMatchesGeometry{};
+    // R155: D3D9 POINTLIST raster behavior depends on point-size/point-sprite
+    // state that is not yet sealed by the dormant DX11 draw snapshot.
+    bool pointRasterSemanticsExact{};
+    // R168: ANTIALIASEDLINEENABLE is captured and translated, but D3D10+
+    // removed D3D9 LASTPIXEL control. Keep direct lines fail-closed until
+    // endpoint coverage is explicitly emulated and sealed.
+    bool lineRasterSemanticsExact{};
+    bool bufferRangeExact{};
+    bool dispatchArgumentsExact{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    bool indexed{};
+    D3D11_PRIMITIVE_TOPOLOGY topology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    UINT primitiveCount{};
+    UINT elementCount{};
+    UINT startVertexLocation{};
+    UINT startIndexLocation{};
+    INT baseVertexLocation{};
+    std::uint64_t renderTargetBoundDrawSnapshotToken{};
+    std::uint64_t drawSnapshotToken{};
+    std::uint64_t geometrySnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] bool
+validate_fixed_function_render_target_bound_draw_readiness_integrity(
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept;
+
+[[nodiscard]] NativeFixedFunctionDirectDrawDispatchReadiness
+compose_fixed_function_direct_draw_dispatch_readiness(
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    bool indexed,
+    UINT startVertexLocation,
+    UINT startIndexLocation,
+    INT baseVertexLocation) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_direct_draw_dispatch_snapshot(
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    const NativeFixedFunctionDrawReadiness& draw,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    bool indexed,
+    UINT startVertexLocation,
+    UINT startIndexLocation,
+    INT baseVertexLocation,
+    std::uint64_t snapshotToken) noexcept;
+
+// R149 preserves the D3D9 DrawIndexedPrimitive source-range arguments before
+// any native DrawIndexed activation. D3D11 drops MinVertexIndex/NumVertices
+// from the dispatch API, so this dormant token keeps BaseVertexIndex,
+// MinVertexIndex, NumVertices, StartIndex and PrimitiveCount stale-resistant.
+// It proves only numeric/range identity; it does not claim source index values
+// have been scanned against the declared vertex range.
+struct NativeFixedFunctionIndexedSourceRangeReadiness {
+    bool inputValid{};
+    bool primitiveExact{};
+    bool vertexRangeExact{};
+    bool indexRangeExact{};
+    bool ready{};
+    D3D11_PRIMITIVE_TOPOLOGY topology =
+        D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+    UINT primitiveCount{};
+    UINT elementCount{};
+    INT baseVertexIndex{};
+    UINT minVertexIndex{};
+    UINT numVertices{};
+    UINT maxVertexIndex{};
+    UINT startIndex{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionIndexedSourceRangeReadiness
+compose_fixed_function_indexed_source_range_readiness(
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    INT baseVertexIndex,
+    UINT minVertexIndex,
+    UINT numVertices,
+    UINT startIndex) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_indexed_source_range_snapshot(
+    D3DPRIMITIVETYPE primitive,
+    UINT primitiveCount,
+    INT baseVertexIndex,
+    UINT minVertexIndex,
+    UINT numVertices,
+    UINT startIndex,
+    std::uint64_t snapshotToken) noexcept;
+
+// R150 joins the exact R147 native DrawIndexed tuple with the R149 D3D9
+// source-range identity. D3D11 drops MinVertexIndex/NumVertices at dispatch,
+// so activation must carry both snapshots and prove their shared arguments
+// still describe the same draw before any native DrawIndexed call.
+struct NativeFixedFunctionIndexedDirectDispatchReadiness {
+    bool inputValid{};
+    bool directDispatchReady{};
+    bool sourceRangeReady{};
+    bool boundDrawReady{};
+    bool dispatchMatchesSourceRange{};
+    bool boundDrawMatchesDispatch{};
+    bool vertexBufferRangeExact{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t directDispatchSnapshotToken{};
+    std::uint64_t sourceRangeSnapshotToken{};
+    std::uint64_t boundDrawSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionIndexedDirectDispatchReadiness
+compose_fixed_function_indexed_direct_dispatch_readiness(
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_indexed_direct_dispatch_snapshot(
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    std::uint64_t snapshotToken) noexcept;
+
+// R152 closes the remaining direct indexed source-range gap by joining the
+// R150 dispatch/source-range lineage to the exact managed IB CPU-shadow values
+// and the R122 geometry snapshot that owns that same IB mirror. This remains
+// dormant readiness evidence only and never issues DrawIndexed.
+struct NativeFixedFunctionIndexedSourceValueReadiness {
+    bool inputValid{};
+    bool directDispatchReady{};
+    bool indexedLineageReady{};
+    bool sourceRangeReady{};
+    bool geometryReady{};
+    bool sourceValuesReady{};
+    bool dispatchMatchesLineage{};
+    bool geometryMatchesSourceValues{};
+    bool sourceValuesMatchRange{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t directDispatchSnapshotToken{};
+    std::uint64_t indexedLineageSnapshotToken{};
+    std::uint64_t sourceRangeSnapshotToken{};
+    std::uint64_t geometrySnapshotToken{};
+    std::uint64_t sourceValuesSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionIndexedSourceValueReadiness
+compose_fixed_function_indexed_source_value_readiness(
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_indexed_source_value_snapshot(
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    std::uint64_t snapshotToken) noexcept;
+
+// R153 seals R152's exact source-index values to the live IA index binding.
+// The managed shadow mirrors the complete D3D9 index buffer, so an exact
+// direct-DIP path must bind that mirror from byte offset zero and use the
+// DXGI index format corresponding to the scanned D3D9 format. This remains
+// dormant evidence only and never issues DrawIndexed.
+struct NativeFixedFunctionIndexedSourceBindingReadiness {
+    bool inputValid{};
+    bool sourceValueLineageReady{};
+    bool boundDrawReady{};
+    bool boundDrawMatchesLineage{};
+    bool indexFormatMatchesSourceValues{};
+    bool indexOffsetExact{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    D3DFORMAT sourceIndexFormat = D3DFMT_UNKNOWN;
+    DXGI_FORMAT boundIndexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT boundIndexOffset{};
+    std::uint64_t sourceValueLineageSnapshotToken{};
+    std::uint64_t indexedLineageSnapshotToken{};
+    std::uint64_t boundDrawSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionIndexedSourceBindingReadiness
+compose_fixed_function_indexed_source_binding_readiness(
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_indexed_source_binding_snapshot(
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    std::uint64_t snapshotToken) noexcept;
+
+// R155 proves that an indexed triangle-fan's generated immutable IB was
+// materialized from the exact current MANAGED source-IB CPU shadow, rather than
+// from an unrelated pointer carrying a borrowed mirror snapshot token. This is
+// dormant provenance evidence only and never issues DrawIndexed.
+struct NativeFixedFunctionIndexedFanSourceContentReadiness {
+    bool inputValid{};
+    bool generatedIndexReady{};
+    bool sourceIndexReady{};
+    bool sourceProvenanceMatches{};
+    bool expandedContentExact{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    std::uint64_t generatedIndexSnapshotToken{};
+    std::uint64_t sourceIndexSnapshotToken{};
+    std::uint64_t expectedExpandedContentHash{};
+    std::uint64_t generatedContentHash{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionIndexedFanSourceContentReadiness
+compose_fixed_function_indexed_fan_source_content_readiness(
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    ID3D11Device* expectedDevice) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_indexed_fan_source_content_snapshot(
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    ID3D11Device* expectedDevice,
+    std::uint64_t snapshotToken) noexcept;
+
+
+// R153 live-revalidation hardening closes the stale-snapshot gap after the
+// source-value/IA-format seal. It reobserves the current IA index buffer on the
+// caller's D3D11 context and requires the exact current R119 managed mirror,
+// format and offset before any future DrawIndexed activation. No Draw* is issued.
+struct NativeFixedFunctionIndexedSourceLiveBindingReadiness {
+    bool inputValid{};
+    bool sourceBindingReady{};
+    bool contextMatchesMirror{};
+    bool indexMirrorCurrent{};
+    bool liveIndexBufferExact{};
+    bool liveIndexFormatExact{};
+    bool liveIndexOffsetExact{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    DXGI_FORMAT observedIndexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT observedIndexOffset{};
+    std::uint64_t sourceBindingSnapshotToken{};
+    std::uint64_t indexMirrorSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionIndexedSourceLiveBindingReadiness
+compose_fixed_function_indexed_source_live_binding_readiness(
+    const NativeFixedFunctionIndexedSourceBindingReadiness& sourceBinding,
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    ID3D11DeviceContext* context,
+    const NativeManagedBufferShadow& indexBuffer) noexcept;
+
+[[nodiscard]] bool validate_fixed_function_indexed_source_live_binding_snapshot(
+    const NativeFixedFunctionIndexedSourceBindingReadiness& sourceBinding,
+    const NativeFixedFunctionIndexedSourceValueReadiness& sourceValueLineage,
+    const NativeFixedFunctionDirectDrawDispatchReadiness& dispatch,
+    const NativeFixedFunctionIndexedDirectDispatchReadiness& indexedLineage,
+    const NativeFixedFunctionIndexedSourceRangeReadiness& sourceRange,
+    const NativeFixedFunctionGeometryReadiness& geometry,
+    const NativeManagedIndexRangeReadiness& sourceValues,
+    const NativeFixedFunctionRenderTargetBoundDrawReadiness& boundDraw,
+    ID3D11DeviceContext* context,
+    const NativeManagedBufferShadow& indexBuffer,
+    std::uint64_t snapshotToken) noexcept;
+
+// R148 seals the eventual DrawIndexed tuple for generated triangle fans after
+// the R146 live IA/VS-b0/OM proof. This remains dormant evidence only and does
+// not issue DrawIndexed or enable NativeDrawPathActive.
+struct NativeFixedFunctionFanDrawDispatchReadiness {
+    bool inputValid{};
+    bool finalFanBoundDrawReady{};
+    bool generatedIndexReady{};
+    bool generatedIndexMatchesDispatch{};
+    // R154 seals the deterministic nonindexed fan source-vertex span against
+    // the exact managed vertex-buffer byte capacity. R156 applies the same
+    // fail-closed capacity proof to indexed fans using exact R155 source
+    // content plus an R152 MANAGED source-index window snapshot.
+    bool vertexBufferRangeExact{};
+    // DX11-FAN-DECLARED-RANGE preserves D3D9 DrawIndexedPrimitive MinVertexIndex/NumVertices for
+    // indexed triangle fans and proves the exact MANAGED source values stay
+    // inside that declared source-vertex interval before D3D11 DrawIndexed.
+    bool sourceDeclaredVertexRangeExact{};
+    bool sourceValuesWithinDeclaredRange{};
+    // R160 separately seals the complete D3D9 declared source-vertex window
+    // against the managed VB capacity. R156 continues to represent the exact
+    // observed source-index fetch capacity.
+    bool sourceDeclaredVertexBufferRangeExact{};
+    bool dispatchArgumentsExact{};
+    bool componentSnapshotsPresent{};
+    bool ready{};
+    bool indexedSource{};
+    UINT primitiveCount{};
+    UINT indexCount{};
+    UINT startIndexLocation{};
+    INT baseVertexLocation{};
+    std::uint64_t finalFanBoundDrawSnapshotToken{};
+    std::uint64_t generatedIndexSnapshotToken{};
+    std::uint64_t sourceIndexSnapshotToken{};
+    std::uint64_t sourceContentSnapshotToken{};
+    // R156 seals the exact source-index values used to derive indexed fan
+    // vertex capacity. Zero for nonindexed fans.
+    UINT sourceObservedMinIndex{};
+    UINT sourceObservedMaxIndex{};
+    UINT sourceMinVertexIndex{};
+    UINT sourceNumVertices{};
+    UINT sourceMaxVertexIndex{};
+    std::uint64_t sourceValueSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeFixedFunctionFanDrawDispatchReadiness
+compose_fixed_function_nonindexed_triangle_fan_draw_dispatch_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount, UINT baseVertex,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_nonindexed_triangle_fan_draw_dispatch_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount, UINT baseVertex,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t snapshotToken) noexcept;
+
+[[nodiscard]] NativeFixedFunctionFanDrawDispatchReadiness
+compose_fixed_function_indexed_triangle_fan_draw_dispatch_readiness(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount, D3DFORMAT sourceIndexFormat,
+    UINT startIndex, UINT sourceIndexCount, INT baseVertexLocation,
+    UINT minVertexIndex, UINT numVertices,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface) noexcept;
+
+[[nodiscard]] bool
+validate_fixed_function_indexed_triangle_fan_draw_dispatch_snapshot(
+    const NativeFixedFunctionDrawReadiness& draw,
+    ID3D11DeviceContext* context,
+    const NativeFixedFunctionOutputStateBinding& outputStateBinding,
+    const NativeFixedFunctionPipelineBundle& pipelineBundle,
+    const VertexInputLayoutTranslation& layout,
+    const FixedFunctionVertexShaderPrototype& vertexPrototype,
+    const FixedFunctionPixelShaderPrototype& pixelPrototype,
+    const std::array<const NativeFixedFunctionSamplerState*, 8>& samplers,
+    const std::array<const NativeFixedFunctionTextureView*, 8>& textures,
+    const NativeManagedBufferShadow& vertexBuffer,
+    UINT vertexStride, UINT vertexOffset,
+    const NativeManagedBufferShadow& sourceIndexBuffer,
+    const NativeTriangleFanIndexBuffer& generatedIndexBuffer,
+    UINT primitiveCount, D3DFORMAT sourceIndexFormat,
+    UINT startIndex, UINT sourceIndexCount, INT baseVertexLocation,
+    UINT minVertexIndex, UINT numVertices,
+    const FixedFunctionTransformConstants& transform,
+    const NativeSurfacePairBinding& surfaceBinding,
+    const NativeSurfaceMirror& colorSurface,
+    const NativeSurfaceMirror& depthSurface,
+    std::uint64_t snapshotToken) noexcept;
+
+
+class NativeBackend final {
+public:
+    NativeBackend() = default;
+    ~NativeBackend() = default;
+    NativeBackend(const NativeBackend&) = delete;
+    NativeBackend& operator=(const NativeBackend&) = delete;
+
+    bool initialize(const NativeBackendConfig& config) noexcept;
+    bool resize(std::uint32_t width, std::uint32_t height) noexcept;
+    void begin_frame(const std::array<float, 4>& clear_color) noexcept;
+    void shutdown() noexcept;
+
+    [[nodiscard]] bool ready() const noexcept {
+        return device_ && context_ && color_texture_ && color_rtv_ && color_srv_;
+    }
+    [[nodiscard]] D3D_FEATURE_LEVEL feature_level() const noexcept { return feature_level_; }
+    [[nodiscard]] const NativeBackendConfig& config() const noexcept { return config_; }
+    [[nodiscard]] ID3D11Device* device() const noexcept { return device_.Get(); }
+    [[nodiscard]] ID3D11DeviceContext* context() const noexcept { return context_.Get(); }
+    [[nodiscard]] ID3D11Texture2D* color_texture() const noexcept { return color_texture_.Get(); }
+    [[nodiscard]] ID3D11RenderTargetView* color_rtv() const noexcept { return color_rtv_.Get(); }
+    [[nodiscard]] ID3D11ShaderResourceView* color_srv() const noexcept { return color_srv_.Get(); }
+    [[nodiscard]] bool selected_adapter_luid_valid() const noexcept {
+        return selected_adapter_luid_valid_;
+    }
+    [[nodiscard]] LUID selected_adapter_luid() const noexcept {
+        return selected_adapter_luid_;
+    }
+
+private:
+    bool create_color_target(std::uint32_t width, std::uint32_t height, DXGI_FORMAT format) noexcept;
+
+    NativeBackendConfig config_{};
+    D3D_FEATURE_LEVEL feature_level_ = D3D_FEATURE_LEVEL_9_1;
+    LUID selected_adapter_luid_{};
+    bool selected_adapter_luid_valid_ = false;
+    Microsoft::WRL::ComPtr<ID3D11Device> device_;
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext> context_;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> color_texture_;
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> color_rtv_;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> color_srv_;
+};
+
+} // namespace outrun::vr::dx11

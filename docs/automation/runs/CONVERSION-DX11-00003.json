@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00003",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "chat_rollover": 5,
+  "continued_from_chat_rollover": 1,
+  "recorded_kst": "2026-09-28T16:36:33+09:00",
+  "base_sha": "971806cade039a61ba64692487ee570660e0a6dc",
+  "code_result_sha": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
+  "result_sha": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "summary": "Continued the bounded R72 native-DX11 passive-census exactness work without repeating completed transport work. Closed review finding F17 by making failed D3D9 resource introspection fail closed, distinguishing legitimately absent depth/texture bindings from failed observation, surfacing introspectionFailure in the analyzer, and binding the exact-sample counter to observation completeness. Added the DX11 source-graph verifier to normal Build CI. NativeDrawPathActivationAllowed remains false; no D3D9 game draw was redirected to the native D3D11 path.",
+  "selected_work": "Close S05/F17 resource-introspection exactness and validate the exact source SHA before advancing to separate R73/R74 activation prerequisites.",
+  "source_commits": [
+    "ad743578b3b5ae530b43410b9e2f7ce8778fc204",
+    "fb759a47ffb6f24135f1108cb96eff16ad72a559",
+    "a46e106324aa49451afc92645c833c4c3a4f146b",
+    "08e0f488f4b2698fd750074f87c9daf889125d0a",
+    "237e5de20cc73afc15b0bbdb0e9a0092d794f74d",
+    "a591f330e2e7342edfdd168fb50b4bd3333dcafe"
+  ],
+  "changes": [
+    {
+      "path": "src/vr/d3d11/runtime_census.cpp",
+      "result": "Resource observation failures now set resourceIntrospectionComplete=false; exact samples start from that flag. Bound textures are tracked independently per stage, absent depth is accepted only for D3DERR_NOTFOUND, failed descriptors fail closed, and an introspection-failure sample counter is logged."
+    },
+    {
+      "path": "tools/analyze_dx11_census.py",
+      "result": "Parses the new introspectionFailure counter while remaining backward-compatible with older census logs, and includes it in unsupported evidence."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Guards the fail-closed observation contract and verifies that exact samples depend on resource observation completeness."
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "result": "Normal Build now executes tools/verify_dx11_source_graph.py before configure/compile."
+    }
+  ],
+  "review_findings": {
+    "F17_resource_introspection_failure": "FIXED_STATIC_BUILD_VERIFIED",
+    "F18_resource_usage_pool_lock_update_semantics": "OPEN_NEXT",
+    "F19_input_layout_readiness": "OPEN_NEXT",
+    "F20_fixed_function_stage_sampler_coverage": "OPEN",
+    "F21_shader_translation_readiness": "OPEN_NEXT",
+    "F22_sampling_signature_saturation": "OPEN",
+    "F23_exact_status_semantics": "MITIGATED_BY_ACTIVATION_DISABLED_AND_ANALYZER_NOTE"
+  },
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "reason": "Resource behavior/lifetime mirrors, input-layout translation, shader/fixed-function translation, exhaustive runtime evidence and Quest 3/OpenXR visual parity remain open."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36391942575,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
+      "dx11_source_graph": "PASS",
+      "win32_build": "PASS",
+      "binary_exists": "PASS"
+    },
+    "build": {
+      "run_id": 36391947299,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
+      "dx11_source_graph": "PASS",
+      "win32_build": "PASS",
+      "pe32_payload_verification": "PASS"
+    },
+    "hud_inspector": {
+      "run_id": 36391947318,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
+      "static_exe_analysis": "PASS",
+      "build_hud_inspector": "PASS"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36391947259,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
+      "host_x64": "PASS",
+      "game_x86": "PASS",
+      "game_x86_r26_hud_safe": "PASS",
+      "game_x86_c1_r29_r28_classify": "PASS",
+      "game_x86_c2_r30_hud": "PASS",
+      "game_x86_safe_draw_compare": "PASS"
+    },
+    "pc_fast": {
+      "run_id": 36391942565,
+      "status": "completed",
+      "conclusion": "skipped",
+      "reason": "No [pc-build] authorization/marker; no PC/N100 runner used."
+    }
+  },
+  "validation_notes": [
+    "Backend Conversion Gate log reports DX11 source graph: OK (7 translation units compiled).",
+    "Backend Conversion Gate produced build-auto/bin/dinput8.dll and emitted AUTOMATION_VALIDATION candidate built from a591f330e2e7342edfdd168fb50b4bd3333dcafe.",
+    "Normal Build produced and verified a PE32 x86 dinput8.dll at the same source SHA.",
+    "OpenXR architecture completed all six jobs successfully; HUD Inspector completed both static analysis and build successfully.",
+    "AUTOMATION_VALIDATION=PASS applies to code_result_sha a591f330e2e7342edfdd168fb50b4bd3333dcafe.",
+    "RUNTIME_VALIDATION=UNTESTED because no Quest 3/HMD/in-game execution was performed.",
+    "No runtime-normality, visual-correctness, crash-free, or frame-pacing claim is made.",
+    "Chat rollover 3 recovered the already-completed task from GitHub HEAD and did not repeat source/CI work.",
+    "Issue #14 comment 5865535111 is the canonical production ledger entry; recovery-created comment 5865540857 was marked SUPERSEDED/DUPLICATE.",
+    "RUNTIME_VALIDATION remains UNTESTED; no Quest 3/HMD/in-game execution was performed in rollover 3.",
+    "Chat rollover 4 independently confirmed that a591f330e2e7342edfdd168fb50b4bd3333dcafe -> 67bffb50ac043b7af081e555223ef9f6873fd58a contains only docs/automation/runs/CONVERSION-DX11-00003.json changes; validated runtime/source inputs are unchanged, so completed source/CI work was not repeated.",
+    "Chat rollover 5 recovered GitHub HEAD 4c2709626fd15a48babba496162071ff01733425. Compare from code_result_sha a591f330e2e7342edfdd168fb50b4bd3333dcafe to recovered HEAD still changes only docs/automation/runs/CONVERSION-DX11-00003.json, so validated DX11 source/config/build inputs are unchanged and completed code/CI work was not repeated."
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "status": "WRITTEN",
+    "comment_id": 5865535111,
+    "record_commit_before_ledger_seal": "d8a549ba54cd502d88314d87c9f8da390e307d42"
+  },
+  "next_action": "Keep NativeDrawPathActivationAllowed=false. Continue one bounded DX11 activation prerequisite at a time. Next, address F18 resource behavior/lifetime evidence and R73 explicit VB/IB/texture/render-target/depth mirror lifetime tables; then F19/F21 input-layout and shader/fixed-function translation readiness. Do not promote native draw ownership before exact-build Quest 3/OpenXR runtime parity.",
+  "finalized_kst": "2026-09-28T16:38:00+09:00",
+  "rollover_3": {
+    "recovered_head_sha": "83105307b2dc2783be7ac342c482ef7a7adfa742",
+    "attempt_preserved": "1/3",
+    "result_sha_unchanged": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
+    "action": "Recovered after concurrent rollover seal; did not repeat completed source or CI work. Verified canonical Issue #14 ledger entry and marked the recovery-created duplicate ledger comment superseded.",
+    "canonical_production_ledger_comment_id": 5865535111,
+    "superseded_duplicate_comment_id": 5865540857,
+    "source_changes": false,
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "n100_used": false
+  },
+  "rollover_4": {
+    "recorded_kst": "2026-09-28T16:41:05+09:00",
+    "recovered_head_sha": "67bffb50ac043b7af081e555223ef9f6873fd58a",
+    "attempt_preserved": "1/3",
+    "task_already_finalized": true,
+    "code_result_sha_unchanged": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
+    "review": "GitHub compare shows four commits after the validated code SHA and the only changed path across that range is this durable automation run record. No production source/config/build input changed after the exact SHA that passed CI.",
+    "action": "Did not repeat completed source edits or CI. Preserved the next queued activation prerequisite (F18/R73 resource behavior/lifetime evidence) for the next bounded DX11 conversion task.",
+    "source_changes": false,
+    "ci_repeated": false,
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "n100_used": false
+  },
+  "rollover_5": {
+    "recorded_kst": "2026-09-28T16:42:00+09:00",
+    "recovered_head_sha": "4c2709626fd15a48babba496162071ff01733425",
+    "attempt_preserved": "1/3",
+    "task_already_finalized": true,
+    "code_result_sha_unchanged": "a591f330e2e7342edfdd168fb50b4bd3333dcafe",
+    "review": "GitHub compare confirms every commit after the validated code SHA changes only this durable task record. No production source, config, workflow or build input changed after the exact SHA that passed automation validation.",
+    "action": "Did not repeat completed source edits, builds or CI. Preserved F18/R73 resource behavior/lifetime evidence as the next bounded DX11 conversion task, rather than expanding finalized CONVERSION-DX11-00003.",
+    "source_changes": false,
+    "ci_repeated": false,
+    "automation_validation": "PASS",
+    "runtime_validation": "UNTESTED",
+    "n100_used": false
+  }
+}

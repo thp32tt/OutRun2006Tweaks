@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00268",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "2/3",
+  "base_sha": "5fec9408235642fc3a4fc2c9a4bd195b77a2f8e3",
+  "result_sha": "576c02954fd8c6bdf4989be16e1054a8869c25a4",
+  "validation_bearing_result_sha": "576c02954fd8c6bdf4989be16e1054a8869c25a4",
+  "source_commits": [
+    "cc73e01fd29dbd42da2f8a782d9598539bed1de3",
+    "30dd0f796f9124114a2450451bad5f12fda59f48",
+    "0ba3f029822801c6c24e90ca776810581c8357b0",
+    "f8a29c8041186354ed8102c19d084fb20330aa11",
+    "9e5ea845bc009f5f587bd11b0ac87ccf3a9c9b8f",
+    "573c27b0c9a22eb5d0228412906d7092fa85e497",
+    "3d7aa0fd74fdddcaa4e4d6c03f3c1e50aa128ae4",
+    "576c02954fd8c6bdf4989be16e1054a8869c25a4"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": true,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "DX11_EXHAUSTIVE_CENSUS_READINESS",
+  "selection_reason": "After 30dd0f796f9124114a2450451bad5f12fda59f48 passed exact-SHA Backend Conversion Gate and Build, the remaining activation-readiness evidence gap was explicitly non-exhaustive source-draw coverage. Added an opt-in exhaustive diagnostic census without enabling native D3D11 Draw* routing.",
+  "summary": "Added OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1 as an opt-in source-draw census mode with stride=1/scheme=2, taught the analyzer and tests to record exhaustive coverage only when every observed source draw is analyzed, and reconciled fail-closed CI contracts. Default runtime behavior remains hashed-ordinal 1/64 sampling. Exhaustive census remains diagnostic-only: ActivationProof=false and NativeDrawPathActivationAllowed=false.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00268.json"
+  ],
+  "conversion_changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": true,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "evidence": [
+    "Recovered target branch and AGENTS.md through the connected GitHub connector; GitHub HEAD remained the SSOT and no N100 clone/worktree was used.",
+    "Original FAILURE_CONTEXT run 36940764751 was cancelled during Build Win32; all preceding DX11 validation steps were successful, so it was not treated as a source-test failure.",
+    "30dd0f796f9124114a2450451bad5f12fda59f48 passed Backend Conversion Gate 36941031399 and Build 36941036801.",
+    "0ba3f029822801c6c24e90ca776810581c8357b0 added explicit opt-in exhaustive source-draw census mode; default remains SampleStride=64 hashed-ordinal sampling.",
+    "f8a29c8041186354ed8102c19d084fb20330aa11 taught analyze_dx11_census.py to recognize scheme=2/stride=1/samples==drawsSeen as exhaustive diagnostic evidence while leaving activation authorization false.",
+    "9e5ea845bc009f5f587bd11b0ac87ccf3a9c9b8f added regression coverage for exhaustive analyzer evidence and preserved ActivationProof=false / NativeDrawPathActivationAllowed=false.",
+    "573c27b0c9a22eb5d0228412906d7092fa85e497 failed Backend Conversion Gate 36942263240 at Verify DX11 source graph because the verifier still required the retired literal fixed SampleStride mask.",
+    "3d7aa0fd74fdddcaa4e4d6c03f3c1e50aa128ae4 fixed the first source-graph drift but Gate 36942420315 exposed a second stale analyzer assertion requiring ExhaustiveDrawCoverage=false unconditionally.",
+    "576c02954fd8c6bdf4989be16e1054a8869c25a4 reconciled that analyzer contract. Backend Conversion Gate 36942534472 completed success, including source graph, activation boundary, analyzer regression, Win32 build and all DX11 semantic/object/transport probes.",
+    "Build workflow 36942540352 for 576c02954fd8c6bdf4989be16e1054a8869c25a4 completed success.",
+    "VR PC Fast Test Build 36942534443 was skipped by policy and was not used as validation."
+  ],
+  "related_finding_or_regression_keys": [
+    "CONVERSION-DX11-00266",
+    "DX11-DRAW-ACTIVATION-SURFACE-001",
+    "DX11-CENSUS-DRAW-FAMILY-COVERAGE-001",
+    "DX11-EXHAUSTIVE-CENSUS-READINESS-001",
+    "DX11-CENSUS-EXHAUSTIVE-GUARD-001"
+  ],
+  "validation": {
+    "backend_conversion_gate": {
+      "run_id": 36942534472,
+      "head_sha": "576c02954fd8c6bdf4989be16e1054a8869c25a4",
+      "conclusion": "success"
+    },
+    "build": {
+      "run_id": 36942540352,
+      "head_sha": "576c02954fd8c6bdf4989be16e1054a8869c25a4",
+      "conclusion": "success"
+    },
+    "openxr_architecture": {
+      "run_id": 36942540190,
+      "head_sha": "576c02954fd8c6bdf4989be16e1054a8869c25a4",
+      "conclusion": "in_progress_at_c6"
+    },
+    "hud_inspector": {
+      "run_id": 36942540197,
+      "head_sha": "576c02954fd8c6bdf4989be16e1054a8869c25a4",
+      "conclusion": "in_progress_at_c6"
+    }
+  },
+  "blocker": "Native DX11 Draw* routing remains deliberately disabled. Exhaustive source-draw coverage has not yet been collected from an exact-build game/HMD runtime session, and exhaustive census evidence alone is not native-rendering parity proof.",
+  "next_action": "In a later exact-build diagnostic runtime session, enable OUTRUN_VR_DX11_CENSUS=1 and OUTRUN_VR_DX11_CENSUS_EXHAUSTIVE=1, collect the census report, and require zero unsupported/pending translation evidence plus Quest 3/VDXR graphics parity before any separate native Draw* activation change is considered.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "runtime_claim": "NONE"
+}

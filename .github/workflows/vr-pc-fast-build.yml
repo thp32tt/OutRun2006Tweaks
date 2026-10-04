@@ -25,12 +25,13 @@ on:
       - vr-nightly-r63-rank-batch-isolate-trace-20260927
       - vr-nightly-r64-text-disprank-20260927
       - vr-r65-one-run-20260927
+      - vr-dx11-native-r71
 
 concurrency:
   # Only real PC builds serialize with each other. Ordinary source pushes that
   # fail the [pc-build] job condition get a SHA-scoped group and can be skipped
   # immediately instead of blocking the self-hosted Windows runner queue.
-  group: ${{ (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[pc-build]')) && 'outrun-pc-fast-test' || format('outrun-pc-fast-skip-{0}', github.sha) }}
+  group: ${{ (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[pc-build]')) && format('outrun-pc-fast-test-{0}', github.ref_name) || format('outrun-pc-fast-skip-{0}', github.sha) }}
   cancel-in-progress: true
 
 jobs:
@@ -87,7 +88,7 @@ jobs:
           "- Source: $(git rev-parse HEAD)" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           "- Local test folder: $drop" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           "- ZIP: $zip" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
-          "- Build policy: incremental by default; canonical R51 CMake contract is enforced by Build-OutRunPCFast.ps1`n          - Final hosted CI: not run by this fast path" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "- Build policy: incremental by default; canonical R66 CMake contract is enforced by Build-OutRunPCFast.ps1`n          - Final hosted CI: not run by this fast path" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
 
       - name: Upload PC fast artifact
         if: ${{ env.OUTRUN_PC_STALE != 'true' && (github.event_name == 'push' || inputs.upload_artifact) }}

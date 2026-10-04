@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00098",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T07:54:15+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "b5141f3de797f265a27f0979ec5b428fa3c546a2",
+  "initial_result_sha": "1bfe8ab5cf0ac8d4723132d9c2ebec71c1b1f3f9",
+  "result_sha": "1bfe8ab5cf0ac8d4723132d9c2ebec71c1b1f3f9",
+  "validation_bearing_result_sha": "1bfe8ab5cf0ac8d4723132d9c2ebec71c1b1f3f9",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13 R122 bounded live adoption of the shared producer map for the single exact C2CTestSlipstream callsite 0xBD32E.",
+  "summary": "R122 preserves the existing right-side sprite-spacing correction at C2CTestSlipstream RVA 0xBD32E while adding an exact fail-closed next-draw ScreenHud handoff sourced from GameSemantic::ClassifyCriticalProducer(CallerRva). The callsite is already classified as C2CTestSlipstream/SCREEN_HUD by disasm_render_contract.hpp, analyze_outrun_exe.py and hud_semantics.hpp. OptionArrow, TextGlyph and DispRank sprani were deliberately excluded because they are outside the current canonical producer ranges.",
+  "source_commits": [
+    "1bfe8ab5cf0ac8d4723132d9c2ebec71c1b1f3f9"
+  ],
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_backend_disasm_contract.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_range_widened": false,
+    "affected_producer_family": "C2CTestSlipstream exact callsite 0xBD32E only",
+    "option_arrow_changed": false,
+    "text_glyph_changed": false,
+    "disp_rank_sprani_0xB9DA6_changed": false
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "src/hooks_uiscaling.cpp and render_semantics.hpp are protected runtime-risk paths. The change does not widen any producer range or infer HUD ownership from D3D state; it activates only one exact already-canonical ScreenHud producer. R51 runtime evidence shows producer ownership can still arrive too late for the c64/WVP boundary, so hosted CI cannot establish visual correctness."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36641662575,
+      "conclusion": "success",
+      "validated_sha": "1bfe8ab5cf0ac8d4723132d9c2ebec71c1b1f3f9",
+      "artifact_id": 11067011870,
+      "artifact_digest": "sha256:e40cac021e650107eaab1ccbcaf8b1dcf937f5a14e9ce813a45d94c5b60c1c81",
+      "evidence": "Queue/baseline/one-click checks PASS; R122 backend disassembly contract PASS; DX11 transport/source-graph/census checks PASS; Win32 build PASS; fixed-function/input-layout/input-signature semantic smokes PASS; input-layout/shader/linkage/constant-buffer/native-transport probes PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36641667120,
+      "conclusion": "success",
+      "validated_sha": "1bfe8ab5cf0ac8d4723132d9c2ebec71c1b1f3f9",
+      "evidence": "Generic Win32 build, wheel/VR payload verification, binary/source uploads PASS."
+    },
+    "hud_inspector": {
+      "run_id": 36641667127,
+      "conclusion": "success",
+      "validated_sha": "1bfe8ab5cf0ac8d4723132d9c2ebec71c1b1f3f9",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36641667109,
+      "conclusion": "success",
+      "validated_sha": "1bfe8ab5cf0ac8d4723132d9c2ebec71c1b1f3f9",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "pc_fast": {
+      "run_id": 36641662604,
+      "conclusion": "skipped",
+      "validated_sha": "1bfe8ab5cf0ac8d4723132d9c2ebec71c1b1f3f9"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5900539152,
+    "validation_comment_id": 5900612265,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "The validation-bearing result commit contains the exact controller marker [AUTO:CONVERSION-DX11-00098] and contains no CI-skip directive.",
+    "The shared producer map, analyzer and hud_semantics already agree that 0xBD32E lies inside the C2CTestSlipstream SCREEN_HUD range 0xBD2E0-0xBD360.",
+    "The R122 callback compile-time requires ScreenHud and the verifier rejects regression to the previous spacing-only hook.",
+    "No producer range was widened and no unrelated producer family was converted.",
+    "Backend Conversion Gate, generic Build, HUD Inspector and OpenXR 6/6 pass on the same validation-bearing result SHA.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R122 is automation-validated but runtime-untested. TimeAttack, DispRank clip, GoalTime and C2CTestSlipstream exact families now consume the shared producer map at runtime. Set04/F13 remains partially open.",
+  "next_action": "Continue Set04/F13 with another independently proven canonical producer family such as a bounded DispGearPosition, C2CDontLoseGF or GhostGap callsite set. Do not widen producer ranges for OptionArrow/TextGlyph/DispRank sprani without separate disassembly provenance. Do not claim HMD visual correctness without exact-build Quest3/VDXR evidence."
+}

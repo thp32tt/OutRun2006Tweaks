@@ -1,0 +1,115 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00309",
+  "production_id": "CONVERSION-DXVK-00308",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00308-E001",
+  "event_type": "rollover",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "ae73a6786c790d65c6d58235d7d2376aae0bb218",
+  "result_sha": "b331efd1e12d52e64e8e2960e53b17f9544ae002",
+  "validation_bearing_result_sha": "b331efd1e12d52e64e8e2960e53b17f9544ae002",
+  "result_marker": "[AUTO:CONVERSION-DX11-00309]",
+  "selected_work_item": "DX11_R218_FFP_READINESS_EXACT_SAMPLES_SCOPE_GUARD",
+  "summary": "R218 makes the final DX11 ExactSamples boundary explicitly require complete fixed-function stage/sampler observation and translation readiness in addition to the existing fixed-function, resource, input-layout, output-state and shader exactness gates. This is diagnostic/activation-readiness hardening only; NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/verify_dx11_activation_boundary.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00309.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated branch HEAD ae73a6786c790d65c6d58235d7d2376aae0bb218, VR_BACKEND_100_REVIEW_INDEX, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_AUTODEV_STATE, VR_RUN_STATE, VR_REVIEW_FINDINGS, Set-05/07/09/10 review evidence, regression knowledge/history, and prior CONVERSION-DX11-00307 durable result."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Set-05 F20/F21 are indirectly coupled today because fixed-function pixel-shader generation consumes translate_fixed_function_readiness(), but the final ExactSamples predicate only names fixedFunction and shaderTranslationExact. Explicitly carrying fixedFunctionStateCoverageExact and fixedFunctionTranslationReady at the final boundary prevents future shader-translation changes from widening diagnostic exactness without the FFP stage/sampler gate.",
+      "review_lenses": {
+        "architecture": "Diagnostic census/activation-readiness boundary only; NativeDrawPathActive remains disabled and no backend ownership changes.",
+        "ownership_lifetime": "No COM/resource lifetime, Reset, transport generation, fence or ACK behavior changes.",
+        "stereo_correctness": "No WVP, eye routing, projection, HUD, shader output or presentation behavior changes.",
+        "performance": "Two boolean conjunctions on the already-sampled diagnostic path only; no new GPU work or allocations.",
+        "adversarial": "A future widening of shaderTranslationExact cannot by itself make incomplete FFP observation/readiness samples count exact."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "b331efd1e12d52e64e8e2960e53b17f9544ae002 adds explicit fixedFunctionStateCoverageExact and fixedFunctionTranslationReady gates to the final ExactSamples predicate and updates the dormant activation/source-graph verifiers to bind that R218 contract."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate 37143199494 passed on b331efd1e12d52e64e8e2960e53b17f9544ae002. Validate job 111261716814 passed queue/baseline/backend/static-surface/source-graph/dormant-activation/census checks, Win32 configure/build, binary verification and artifact upload. DX11 readiness smoke job 111262693641 passed all fixed-function, input-layout/signature, shader, constant-buffer, native-transport, surface-mirror, triangle-fan and pipeline-handoff probes."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_commits": [
+        "b331efd1e12d52e64e8e2960e53b17f9544ae002"
+      ],
+      "validation_bearing_result_sha": "b331efd1e12d52e64e8e2960e53b17f9544ae002",
+      "issue14_material_comment_id": 5972021418,
+      "issue14_validation_comment_id": 5972104997
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R218 changes dormant diagnostic census/static activation-boundary verification only; no user runtime candidate or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_implementation_comment_id": 5972021418,
+      "issue14_validation_comment_id": 5972104997,
+      "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Quest 3/VDXR runtime parity remains a separate activation and visual-correctness gate."
+    }
+  },
+  "regression_assessment": {
+    "related_key": "VR-STARTUP-WHITE-001_PATH_MATCH_ONLY_TRIGGER_NOT_MET",
+    "evidence": "src/vr/** is a broad risk path, but this task changes only sampled diagnostic ExactSamples accounting and static verifier expectations. It does not touch startup/device creation/reset/present, stereo transport, shared resources, host fallback, profiles or configuration."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DX11-00309",
+    "event_id": "CONVERSION-DX11-00309-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "source": "CURRENT_USER_ROLLOVER_DISPATCH"
+  },
+  "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion task from the newest authenticated GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
+  "source_implementation_sha": "b331efd1e12d52e64e8e2960e53b17f9544ae002",
+  "implementation_commits": [
+    "b331efd1e12d52e64e8e2960e53b17f9544ae002"
+  ],
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37143199494,
+    "head_sha": "b331efd1e12d52e64e8e2960e53b17f9544ae002",
+    "validate_job_id": 111261716814,
+    "readiness_smoke_job_id": 111262693641,
+    "artifact_id": 11281281707,
+    "artifact_digest": "sha256:3d2db36ede168c72dc1c67fb62fb317fcb738c8d43fac181cbe9f2b94b3832b3"
+  },
+  "issue14_comment_ids": [
+    5972021418,
+    5972104997
+  ],
+  "completed_at_kst": "2026-10-04T03:19:01+09:00",
+  "prior_implementation_dispatch": {
+    "production_id": "CONVERSION-DXVK-00308",
+    "event_id": "CONVERSION-DXVK-00308-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "PRIOR_QUEUE_DISPATCH",
+    "issue14_comment_id": 5972021418
+  },
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
+}

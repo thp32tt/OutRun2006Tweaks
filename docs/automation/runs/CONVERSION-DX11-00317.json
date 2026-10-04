@@ -1,0 +1,154 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00317",
+  "production_id": "CONVERSION-DXVK-00316",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00316-E001",
+  "event_type": "rollover",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R222_SHADER_COMPILE_EXACT_SAMPLES_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "a4271f8ab2473036ffc508f238b411501c45d753",
+  "result_sha": "32c9bb63e70fee21b217263958b0f214f92842a3",
+  "validation_bearing_result_sha": "32c9bb63e70fee21b217263958b0f214f92842a3",
+  "result_marker": "[AUTO:CONVERSION-DX11-00317]",
+  "selected_work_item": "DX11_R222_FIXED_FUNCTION_SHADER_COMPILE_EXACT_SAMPLES_GATE",
+  "summary": "R222 makes sampled ExactSamples fail closed on the actual D3DCompile result for each tracked fixed-function shader signature. Successful compile signatures are cached by the existing sampled signature hash, repeated signatures reuse only cached success, compile failures/hash-cap skips remain non-exact, and a concurrent repeat observed before the first probe completes is deliberately non-exact. NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "tools/verify_dx11_activation_boundary.py",
+    "docs/automation/runs/CONVERSION-DX11-00317.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated vr-dx11-native-r71 HEAD a4271f8ab2473036ffc508f238b411501c45d753; read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md/Set05, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_AUTODEV_STATE.json, VR_RUN_STATE.md, VR_REGRESSION_KNOWLEDGE.json, VR_PROBLEM_HISTORY.md and Issue #14. R221/00315 is durable and was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R221 guarantees bounded compile-probe coverage for newly tracked fixed-function signatures, but the per-sample ExactSamples boundary still depends on source-generation/shader-readiness flags and does not consume the actual compileProbe.succeeded result. A generated ps_4_0 source that fails D3DCompile can therefore still satisfy the sampled exactness gate.",
+      "review_lenses": {
+        "architecture": "Reuse the existing signature identity and compile probe; add only a successful-compile cache and a final fail-closed gate. No native draw ownership change.",
+        "ownership_lifetime": "The cache is process-local diagnostic state guarded by the existing SignatureMutex; no COM/resource/reset/device-generation ownership changes.",
+        "stereo_correctness": "No WVP, eye routing, HUD, surface, OpenXR or presentation behavior changes.",
+        "performance": "No repeat compilation is added. Existing unique-signature probes remain bounded by SignatureHashCap=512; repeated signatures only perform a guarded set lookup.",
+        "adversarial": "Compile failure, hash-cap overflow, missing prototype, and a racing repeat before first-probe completion all remain non-exact."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Changed note_signature to return per-signature compile readiness, cached only successful fixed-function compile hashes under SignatureMutex, reused cached success for repeats, and added shaderCompileReadinessExact to the final ExactSamples condition. Static source-graph and dormant-activation contracts were extended for R222."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R222_SHADER_COMPILE_EXACT_SAMPLES_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate 37150599919 passed on 32c9bb63e70fee21b217263958b0f214f92842a3. Validate job 111283523162 passed queue/baseline/one-click/disassembly/session/transport/dual-source/static-surface/source-graph/dormant-activation/census checks, Win32 configure/build, binary verification and artifact upload. DX11 readiness smoke job 111284507805 passed all fixed-function shader, input-layout/signature, shader object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and pipeline-handoff probes."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_commits": [
+        "7d5fd2c047f27d78ff4728f358eb99ebf9af473b",
+        "32c9bb63e70fee21b217263958b0f214f92842a3"
+      ],
+      "source_implementation_sha": "7d5fd2c047f27d78ff4728f358eb99ebf9af473b",
+      "validation_bearing_result_sha": "32c9bb63e70fee21b217263958b0f214f92842a3",
+      "issue14_implementation_comment_id": 5973029273,
+      "issue14_repair_comment_id": 5973039586,
+      "issue14_validation_comment_id": 5973119998
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "R222 changes dormant census/readiness accounting and static guards only; no user runtime candidate or package identity changed."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_implementation_comment_id": 5973029273,
+      "issue14_repair_comment_id": 5973039586,
+      "issue14_validation_comment_id": 5973119998,
+      "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Preserve R222 per-signature compile-readiness gating together with R213-R221 exactness protections; programmable shader translation, native draw activation and Quest 3/VDXR runtime parity remain fail-closed until their own evidence gates pass.",
+      "lane_state_commit_sha": "81ff8fc0dccede9274510768eaeab83184d5ba77",
+      "dispatch_metadata_correction_comment_id": 5973121054
+    }
+  },
+  "regression_assessment": {
+    "related_key": "NONE_DIRECT_RUNTIME_PATH_MATCH",
+    "evidence": "R222 changes only src/vr/d3d11/runtime_census.cpp diagnostic readiness accounting and static verifiers. It does not touch the recorded D3D9 startup/HUD/world-stereo risk paths, native draw routing, Reset/Present, transport/shared resources, or OpenXR submission."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00316",
+    "event_id": "CONVERSION-DXVK-00316-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "source": "CURRENT_USER_QUEUE_ROLLOVER",
+    "material_result_sha": "32c9bb63e70fee21b217263958b0f214f92842a3",
+    "source_implementation_sha": "7d5fd2c047f27d78ff4728f358eb99ebf9af473b",
+    "validation_bearing_result_sha": "32c9bb63e70fee21b217263958b0f214f92842a3",
+    "implementation_comment_id": 5973029273,
+    "repair_comment_id": 5973039586,
+    "validation_comment_id": 5973119998,
+    "dispatch_metadata_correction_comment_id": 5973121054,
+    "dispatch_metadata_correction": {
+      "authoritative_production_id": "CONVERSION-DXVK-00316",
+      "authoritative_event_id": "CONVERSION-DXVK-00316-E001",
+      "authoritative_event_type": "rollover",
+      "authoritative_attempt": "1/3",
+      "corrected_from_production_id": "CONVERSION-DX11-00317",
+      "corrected_from_event_id": "CONVERSION-DX11-00317-E001",
+      "material_and_validation_bearing_sha_unchanged": true
+    }
+  },
+  "exact_next_action": "Continue only with a new independent dormant DX11 source/static conversion gap from the newest authenticated vr-dx11-native-r71 HEAD. Preserve R222 per-signature compile-readiness gating together with R213-R221 exactness protections; programmable shader translation, native draw activation and Quest 3/VDXR runtime parity remain fail-closed until their own evidence gates pass.",
+  "source_implementation_sha": "7d5fd2c047f27d78ff4728f358eb99ebf9af473b",
+  "implementation_commits": [
+    "7d5fd2c047f27d78ff4728f358eb99ebf9af473b",
+    "32c9bb63e70fee21b217263958b0f214f92842a3"
+  ],
+  "superseded_failed_gate": {
+    "result_sha": "7d5fd2c047f27d78ff4728f358eb99ebf9af473b",
+    "run_id": 37150509809,
+    "validate_job_id": 111283267587,
+    "reason": "stale R219/R220 resource-observation verifier literal omitted R222 shaderCompileReadinessExact conjunct"
+  },
+  "repair_result_sha": "32c9bb63e70fee21b217263958b0f214f92842a3",
+  "issue14_comment_ids": [
+    5973029273,
+    5973039586,
+    5973119998,
+    5973121054
+  ],
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37150599919,
+    "head_sha": "32c9bb63e70fee21b217263958b0f214f92842a3",
+    "validate_job_id": 111283523162,
+    "readiness_smoke_job_id": 111284507805,
+    "artifact_id": 11284216033,
+    "artifact_name": "backend-autovalidated-vr-dx11-native-r71-32c9bb63e70fee21b217263958b0f214f92842a3",
+    "artifact_digest": "sha256:8f2ed6d925f588da8aa1ed7e0dded28d55cc23ceb78f6818589ac57d8625d035"
+  },
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "dispatch_metadata_correction": {
+    "authoritative_production_id": "CONVERSION-DXVK-00316",
+    "authoritative_event_id": "CONVERSION-DXVK-00316-E001",
+    "authoritative_event_type": "rollover",
+    "authoritative_attempt": "1/3",
+    "corrected_from": {
+      "production_id": "CONVERSION-DX11-00317",
+      "event_id": "CONVERSION-DX11-00317-E001",
+      "event_type": "rollover",
+      "attempt": "1/3"
+    },
+    "material_and_validation_bearing_sha_unchanged": true
+  }
+}

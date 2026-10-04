@@ -1,0 +1,150 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00296",
+  "production_id": "CONVERSION-DX11-00296",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00296-E001",
+  "event_type": "rollover",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "d617ba0b5e6f5bb3b6b0d3e28699ba8c32190033",
+  "source_implementation_sha": "7fde73a717ffe09633378e9c4e25d70cfd33fc60",
+  "result_sha": "350bce608d7283bd5216463d7447b037e5cab252",
+  "validation_bearing_result_sha": "350bce608d7283bd5216463d7447b037e5cab252",
+  "result_marker": "[AUTO:CONVERSION-DX11-00296]",
+  "selected_work_item": "DX11_R205_R211_LINE_IDENTITY_AND_POINT_LINE_RASTER_CENSUS_EXACTNESS",
+  "summary": "Recovered the in-flight R205 line-raster census identity commit, preserved its LASTPIXEL/ANTIALIASEDLINEENABLE signature provenance, then closed the remaining census/readiness mismatch by excluding POINTLIST and line primitives from ExactSamples while their D3D9 raster semantics remain intentionally fail-closed. Added point/line unsupported counters plus analyzer/regression/source-graph parity. NativeDrawPath activation remains disabled.",
+  "changed_paths": [
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "implementation_commits": [
+    "7fde73a717ffe09633378e9c4e25d70cfd33fc60",
+    "350bce608d7283bd5216463d7447b037e5cab252"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered the authenticated GitHub branch and branch-local state, then inspected same-task concurrent progress rather than repeating it. Intermediate material SHA 7fde73a717ffe09633378e9c4e25d70cfd33fc60 had Backend Conversion Gate 37130328766 cancelled only because descendant material SHA 350bce608d7283bd5216463d7447b037e5cab252 was pushed; per QUEUE_CONTROLLER_CONTRACT that run is SUPERSEDED, not a failed attempt. The current user rollover metadata is authoritative, so ATTEMPT remains 1/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R205 correctly sealed D3DRS_LASTPIXEL and D3DRS_ANTIALIASEDLINEENABLE into line-raster census signature identity, but runtime census ExactSamples still accepted POINTLIST/LINELIST/LINESTRIP whenever direct topology translation was exact. Dormant native direct dispatch deliberately rejects POINTLIST until point-size/sprite semantics exist and rejects line primitives until LASTPIXEL endpoint semantics are emulated, so census exactness was looser than the activation/readiness boundary."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "changed_paths": [
+        "src/vr/d3d11/runtime_census.cpp",
+        "tools/analyze_dx11_census.py",
+        "tools/test_analyze_dx11_census.py",
+        "tools/verify_dx11_source_graph.py"
+      ],
+      "commits": [
+        "7fde73a717ffe09633378e9c4e25d70cfd33fc60",
+        "350bce608d7283bd5216463d7447b037e5cab252"
+      ],
+      "summary": "Retained the R205 line-raster identity capture/hash/logging. Added R211 PointRasterUnsupportedSamples and LineRasterUnsupportedSamples, mirrored the dormant dispatch point/line semantic gates in census, excluded those unsupported primitives from ExactSamples, extended the R120 summary with optional backward-compatible analyzer parsing, included the counters in unsupported aggregate status, added an analyzer regression fixture, and added source-graph guards. NativeDrawPath activation was not changed."
+    },
+    "C3_VALIDATE": {
+      "status": "PASS",
+      "validation_bearing_result_sha": "350bce608d7283bd5216463d7447b037e5cab252",
+      "backend_conversion_gate_run_id": 37130573349,
+      "validate_job_id": 111224768198,
+      "readiness_smoke_job_id": 111225759251,
+      "passed_evidence": [
+        "Verify queue automation contract",
+        "Verify HMD-proven baseline",
+        "Verify one-click structure contract",
+        "Verify backend disassembly contract",
+        "Test VR session auto-analysis regressions",
+        "Verify DX11 native transport lifetime contract",
+        "Verify DX11 dual-source blend contract",
+        "Test/verify DX11 static surface contract",
+        "Verify DX11 source graph",
+        "Verify DX11 dormant activation boundary",
+        "Test DX11 census analyzer",
+        "Configure Win32",
+        "Build Win32",
+        "Verify binary exists",
+        "Artifact upload",
+        "Build/Run DX11 fixed-function shader semantic smoke",
+        "Build/Run DX11 input-layout semantic smoke",
+        "Build/Run DX11 input-signature semantic smoke",
+        "Build/Run DX11 input-layout object probe",
+        "Build/Run DX11 shader object probe",
+        "Build/Run DX11 shader linkage probe",
+        "Build/Run DX11 constant buffer probe",
+        "Build/Run DX11 native transport probe",
+        "Build/Run DX11 surface mirror probe",
+        "Build/Run DX11 triangle-fan generated index-buffer probe",
+        "Build/Run DX11 fixed-function pipeline handoff probe"
+      ],
+      "artifact_id": 11276976177,
+      "artifact_name": "backend-autovalidated-vr-dx11-native-r71-350bce608d7283bd5216463d7447b037e5cab252",
+      "artifact_digest": "sha256:695e60cc02f7f2e1bd993f12c05c9e694c543fd41c9c112eeaf27749ea47c912",
+      "runtime_validation": "UNTESTED",
+      "superseded_intermediate_gate": {
+        "run_id": 37130328766,
+        "head_sha": "7fde73a717ffe09633378e9c4e25d70cfd33fc60",
+        "conclusion": "cancelled",
+        "classification": "SUPERSEDED_BY_350bce608d7283bd5216463d7447b037e5cab252"
+      }
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "marker_present": true,
+      "result_commits": [
+        "7fde73a717ffe09633378e9c4e25d70cfd33fc60",
+        "350bce608d7283bd5216463d7447b037e5cab252"
+      ]
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant DX11 census/source-static exactness work only. The hosted Gate artifact is validation evidence, not a Quest 3/VDXR runtime candidate package."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "issue14_comment_id": 5970296784,
+      "exact_next_action": "Release CONVERSION-DX11-00296 as automation PASS under authoritative E001 rollover metadata. Keep NativeDrawPathActive disabled. Preserve R205/R211 point/line raster census exactness and select one new independent dormant DX11 source/static gap from the newest authenticated branch HEAD. Matching Quest 3/VDXR evidence remains mandatory before runtime/visual parity or activation claims.",
+      "lane_state_commit": "7b648ec08b9f011484b394c312c73972a794d264"
+    }
+  },
+  "release_gate": {
+    "required": "EXACT_SHA_BACKEND_CONVERSION_GATE",
+    "status": "PASS",
+    "run_id": 37130573349,
+    "head_sha": "350bce608d7283bd5216463d7447b037e5cab252",
+    "validate_job_id": 111224768198,
+    "readiness_smoke_job_id": 111225759251
+  },
+  "native_draw_path_activation_changed": false,
+  "issue14_comment_id": 5970296784,
+  "issue14_comment_ids": [
+    5970178488,
+    5970214838,
+    5970293757,
+    5970290630,
+    5970313639,
+    5970296784
+  ],
+  "exact_next_action": "Continue only with a new independent DX11 source/static conversion task from the newest authenticated GitHub HEAD; do not treat hosted automation success as Quest 3/VDXR runtime proof.",
+  "controller_resume": {
+    "final_event_id": "CONVERSION-DX11-00296-E001",
+    "final_attempt": "1/3",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "failure_context_run_id": 37130328766,
+    "failure_context_classification": "SUPERSEDED",
+    "note": "The user-supplied E001 rollover is authoritative. The cancelled intermediate-SHA Gate was superseded by the descendant material result and does not consume a retry attempt. Final exact-SHA validation remains PASS on 350bce608d7283bd5216463d7447b037e5cab252."
+  },
+  "retaining_descendant_sha": "b6d05b133292c2a6c251143d1648d6b92c7e994e",
+  "authoritative_metadata_correction_comment_id": 5970313639,
+  "chat_rollover": 2,
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the active chat may be stale, hidden, or failed before generation started."
+}

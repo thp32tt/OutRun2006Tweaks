@@ -116,12 +116,17 @@ forbid("src/hooks_uiscaling.cpp",
        "P5_NO_GLOBAL_PUT_CLIP_PROMOTION")
 
 # PASS 6 — final GOAL/TIME owns only the reverse-proven goal caller edges.
+# R121 keeps the same two exact hook edges/helpers while sourcing SCREEN_HUD
+# ownership from the shared disassembly producer map. Pin the exact caller RVAs
+# and fail closed if this regresses to an unclassified/general helper.
 require_all("src/hooks_uiscaling.cpp", [
     'Module::exe_ptr(0xBEA5A)',
     'Module::exe_ptr(0xBEA5F)',
-    'GoalTime_TagHelper(0xBE020, "BE020")',
-    'GoalTime_TagHelper(0xBE150, "BE150")',
-    'VR R66 GOAL TIME HUD:',
+    'GoalTime_TagHelper<0x000BEA5Au, 0xBE020>("BE020")',
+    'GoalTime_TagHelper<0x000BEA5Fu, 0xBE150>("BE150")',
+    'GameSemantic::ClassifyCriticalProducer(CallerRva)',
+    'producerScope == OutRunVR::GameSemantic::RenderScope::ScreenHud',
+    'VR R121 GOAL TIME HUD: shared producer-map',
 ], "P6_GOAL_TIME_EXACT_OWNER")
 
 # PASS 7 — lens flare stays exact and uses the R26+HUD production path.

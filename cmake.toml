@@ -349,7 +349,9 @@ link-libraries = [
     "Winmm.lib",
     "Setupapi.lib",
     "Crypt32.lib",
-    "d3dcompiler.lib"
+    "d3dcompiler.lib",
+    "d3d11.lib",
+    "dxgi.lib"
 ]
 
 [target.outrun2006tweaks.properties]
@@ -361,3 +363,140 @@ LIBRARY_OUTPUT_DIRECTORY_RELEASE = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 ARCHIVE_OUTPUT_DIRECTORY_RELEASE = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
 ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
+
+[target.dx11_fixed_function_shader_semantics]
+type = "executable"
+sources = [
+    "tools/dx11_fixed_function_shader_semantics.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+[target.dx11_input_layout_semantics]
+type = "executable"
+sources = [
+    "tools/dx11_input_layout_semantics.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+[target.dx11_input_signature_semantics]
+type = "executable"
+sources = [
+    "tools/dx11_input_signature_semantics.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxguid.lib"]
+
+[target.dx11_input_layout_object_probe]
+type = "executable"
+sources = [
+    "tools/dx11_input_layout_object_probe.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+[target.dx11_shader_object_probe]
+type = "executable"
+sources = [
+    "tools/dx11_shader_object_probe.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]
+
+[target.dx11_shader_linkage_probe]
+type = "executable"
+sources = [
+    "tools/dx11_shader_linkage_probe.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxguid.lib"]
+
+[target.dx11_constant_buffer_probe]
+type = "executable"
+sources = [
+    "tools/dx11_constant_buffer_probe.cpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/resource_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib", "dxgi.lib", "dxguid.lib"]
+
+[target.dx11_native_transport_probe]
+type = "executable"
+sources = [
+    "tools/dx11_native_transport_probe.cpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3d11.lib", "dxgi.lib", "dxguid.lib"]
+
+[target.dx11_surface_mirror_probe]
+type = "executable"
+sources = [
+    "tools/dx11_surface_mirror_probe.cpp",
+    "src/vr/d3d11/surface_mirror.cpp",
+    "src/vr/d3d11/resource_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3d11.lib"]
+
+
+[target.dx11_triangle_fan_index_buffer_probe]
+type = "executable"
+sources = [
+    "tools/dx11_triangle_fan_index_buffer_probe.cpp",
+    "src/vr/d3d11/triangle_fan_index_buffer.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3d11.lib"]
+
+[target.dx11_fixed_function_pipeline_probe]
+type = "executable"
+sources = [
+    "tools/dx11_fixed_function_pipeline_probe.cpp",
+    "src/vr/d3d11/fixed_function_pipeline.cpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/state_translation.cpp"
+]
+include-directories = ["src/", "shared/", "include/"]
+compile-options = ["/GS", "/utf-8"]
+compile-features = ["cxx_std_20"]
+link-libraries = ["d3dcompiler.lib", "d3d11.lib"]

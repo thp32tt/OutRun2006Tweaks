@@ -1,0 +1,167 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00341",
+  "production_id": "CONVERSION-DXVK-00340",
+  "event_id": "CONVERSION-DXVK-00340-E003",
+  "event_type": "retry",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R234_CURRENT_STARTUP_SIGNATURE_EVIDENCE_SCOPE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "b1f189725f95036bad6b416d956cb79ad2ce0bf2",
+  "result_sha": "19f73e492c16bea74a6ff90147649ed9f70771f3",
+  "validation_bearing_result_sha": "19f73e492c16bea74a6ff90147649ed9f70771f3",
+  "result_marker": "[AUTO:CONVERSION-DX11-00341]",
+  "selected_work_item": "DX11_R234_CURRENT_STARTUP_SIGNATURE_EVIDENCE_SCOPE",
+  "summary": "R234 separates current-startup signature and fixed-function detailed-demand evidence from historical epochs in accumulated DX11 census logs. R233 collision isolation is preserved, while stale prior-process signature semantics no longer appear in the current ActivationEvidence view.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00341.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 HEAD b1f189725f95036bad6b416d956cb79ad2ce0bf2; read AGENTS.md, docs/reviews/VR_BACKEND_100_REVIEW_INDEX.md and Set05, docs/automation/QUEUE_CONTROLLER_CONTRACT.md, docs/CONVERSION_LANE_STATE.json, docs/VR_RUN_STATE.md, docs/VR_REGRESSION_KNOWLEDGE.json and docs/VR_PROBLEM_HISTORY.md. R225-R233 durable work is preserved and not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R233 scopes signature/detail keys by source log and startup epoch, but the report still exposes all historical Signatures and summarizes fixed_function across every epoch as ActivationEvidence. In an accumulated log, unsupported semantics from an older process can therefore contaminate the current evidence view even though current periodic-summary exactness is already paired to the latest startup by R232.",
+      "review_lenses": {
+        "architecture": "Offline DX11 census analyzer/test/verifier only; vr-d3d9ex-focus and runtime renderer routing remain untouched.",
+        "ownership_lifetime": "No D3D9/D3D11 COM/resource/reset/fence lifetime changes.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effect/recenter changes.",
+        "performance": "Offline parsing/report construction only; runtime hot path unchanged.",
+        "adversarial": "Accumulated-log fixture places an unsupported FFP op in epoch 1 and only supported semantics in epoch 2; current ActivationEvidence must exclude epoch 1 while historical provenance remains visible."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Track latest startup epoch per source log; derive current_signatures/current_fixed_function from that epoch (legacy logs remain epoch 0); export current signature coverage separately; make ActivationEvidence.FixedFunctionDetailedStageDemand current-epoch scoped; preserve historical Signatures and HistoricalFixedFunctionDetailedStageDemand; add regression and source-graph drift guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R234_CURRENT_STARTUP_SIGNATURE_EVIDENCE_SCOPE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "evidence": "Exact-SHA Backend Conversion Gate #1910 run 37169808520 completed success for repair/result SHA 19f73e492c16bea74a6ff90147649ed9f70771f3. validate job 111340259031 passed queue contract, HMD-proven baseline, one-click structure, backend disassembly, session regression, DX11 native transport, dual-source, static-surface, source-graph, dormant-activation and R234 census analyzer regressions, then configured/built Win32, verified the binary and uploaded artifact 11291260648. DX11 readiness smoke job 111341085153 passed fixed-function shader, input-layout/signature, object/linkage, constant-buffer, native-transport, surface-mirror, triangle-fan and fixed-function pipeline probes. Artifact digest sha256:2f44040c831e225429e5112aea91f702e2b6243f5cf93ebc5fb137f6a1602340. Prior Gate #1909 failed only because the new test expected the wrong run_case filename; repair 1 corrected the fixture without changing analyzer production logic. No Quest 3/VDXR runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "material_result_sha": "19f73e492c16bea74a6ff90147649ed9f70771f3",
+      "validation_bearing_result_sha": "19f73e492c16bea74a6ff90147649ed9f70771f3",
+      "result_marker": "[AUTO:CONVERSION-DX11-00341]",
+      "implementation_commits": [
+        "4e09db62ec2f8403185abef233efc5ac05666bc9",
+        "19f73e492c16bea74a6ff90147649ed9f70771f3"
+      ],
+      "source_implementation_sha": "4e09db62ec2f8403185abef233efc5ac05666bc9",
+      "failed_validation_bearing_sha": "4e09db62ec2f8403185abef233efc5ac05666bc9",
+      "failed_validation_run_id": 37169725378,
+      "failed_validation_job_id": 111340023898,
+      "repair_count": 1
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census evidence-integrity/reporting change only; no runtime distributable identity change."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37169808520,
+      "validation_job_id": 111340259031,
+      "readiness_smoke_job_id": 111341085153,
+      "artifact_id": 11291260648,
+      "artifact_digest": "sha256:2f44040c831e225429e5112aea91f702e2b6243f5cf93ebc5fb137f6a1602340",
+      "implementation_comment_id": 5975600302,
+      "repair_comment_id": 5975608847,
+      "validation_comment_id": 5975667075,
+      "exact_next_action": "Preserve R225-R234 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+      "retry_reconciled": true,
+      "retry_event_id": "CONVERSION-DX11-00341-E002",
+      "retry_attempt": "2/3",
+      "retry_resolution": "ALREADY_RESOLVED_BY_REPAIR_1_AND_EXACT_SHA_GATE_1910"
+    }
+  },
+  "regression_assessment": {
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "runtime_risk_paths_touched": false,
+    "evidence": "Changed paths are offline analyzer/test/verifier plus task bookkeeping only. No runtime regression riskPath is modified; NativeDrawPath remains dormant."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00341",
+    "production_id": "CONVERSION-DX11-00341",
+    "event_id": "CONVERSION-DX11-00341-E002",
+    "event_type": "retry",
+    "attempt": "2/3",
+    "source": "CURRENT_USER_QUEUE",
+    "retry_of_completed_task": true,
+    "reconciled_result_sha": "19f73e492c16bea74a6ff90147649ed9f70771f3"
+  },
+  "exact_next_action": "Release CONVERSION-DX11-00341 as complete; do not repeat R234. Next controller task may select the next independent DX11 source/static exactness gap. Quest 3/VDXR runtime proof remains separate.",
+  "repair_history": [
+    {
+      "repair": 1,
+      "failed_result_sha": "4e09db62ec2f8403185abef233efc5ac05666bc9",
+      "run_id": 37169725378,
+      "job_id": 111340023898,
+      "failure": "R234 regression fixture asserted LatestStartupEpochByLog key \"runtime.log\" although run_case() writes \"OutRun2006Tweaks.log\".",
+      "fix": "Align the fixture expectation to the run_case() helper filename; no analyzer production logic changed."
+    }
+  ],
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37169808520,
+      "run_number": 1910,
+      "result_sha": "19f73e492c16bea74a6ff90147649ed9f70771f3",
+      "conclusion": "success",
+      "validate_job_id": 111340259031,
+      "readiness_smoke_job_id": 111341085153,
+      "artifact_id": 11291260648,
+      "artifact_digest": "sha256:2f44040c831e225429e5112aea91f702e2b6243f5cf93ebc5fb137f6a1602340"
+    }
+  },
+  "issue14": {
+    "implementation_comment_id": 5975600302,
+    "repair_comment_id": 5975608847,
+    "validation_comment_id": 5975667075
+  },
+  "original_controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00341",
+    "production_id": "CONVERSION-DXVK-00340",
+    "event_id": "CONVERSION-DXVK-00340-E003",
+    "event_type": "retry",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "retry_reconciliation_history": [
+    {
+      "production_id": "CONVERSION-DX11-00341",
+      "event_id": "CONVERSION-DX11-00341-E002",
+      "event_type": "retry",
+      "attempt": "2/3",
+      "failure_context_run_id": 37169725378,
+      "failure_context_job_id": 111340023898,
+      "failure_context_conclusion": "failure",
+      "failure_step": "Test DX11 census analyzer",
+      "failure_signature": "R234 regression fixture expected LatestStartupEpochByLog[\"runtime.log\"] but run_case() writes OutRun2006Tweaks.log.",
+      "resolution": "ALREADY_RESOLVED_BEFORE_RETRY_EVENT",
+      "repair_result_sha": "19f73e492c16bea74a6ff90147649ed9f70771f3",
+      "successful_validation_run_id": 37169808520,
+      "successful_validation_run_number": 1910,
+      "successful_validation_job_id": 111340259031,
+      "successful_readiness_smoke_job_id": 111341085153,
+      "automation_validation": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R234_CURRENT_STARTUP_SIGNATURE_EVIDENCE_SCOPE_SOURCE_GRAPH_DORMANT_ACTIVATION_CENSUS_ANALYZER_WIN32_BUILD_BINARY_AND_READINESS_SMOKE",
+      "runtime_validation": "UNTESTED",
+      "action_taken": "No source change or Gate rerun. Preserved the already validated material result and recorded the stale retry event only.",
+      "result_sha_unchanged": true
+    }
+  ]
+}

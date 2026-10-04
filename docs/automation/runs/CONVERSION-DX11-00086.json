@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00086",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T05:08:13+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "cffc26eb426fb38304aff234fd100d8d8706501d",
+  "initial_result_sha": "50777e8f77b7381754bfab64dbb9675fecaab11d",
+  "result_sha": "f85e763b8f81e51069636ba01bb66581dde281af",
+  "validation_bearing_result_sha": "f85e763b8f81e51069636ba01bb66581dde281af",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_05 high-activation follow-up R115: compose R112 fixed-function pipeline identity with R110/R111 managed-texture stage readiness into one fail-closed non-routing activation-candidate snapshot.",
+  "summary": "R115 adds a composite DX11 activation-readiness evidence object and deterministic snapshot token that requires both the exact fixed-function pipeline snapshot and all required managed-texture stage snapshots. Untextured candidates are represented explicitly, textured candidates require a nonzero stage snapshot, missing/pending component evidence fails closed, and changing a component identity changes the composite token. This does not enable native draw routing.",
+  "source_commits": [
+    "50777e8f77b7381754bfab64dbb9675fecaab11d",
+    "f85e763b8f81e51069636ba01bb66581dde281af"
+  ],
+  "changed_paths": [
+    "src/vr/d3d11/native_backend.hpp",
+    "src/vr/d3d11/native_backend.cpp",
+    "tools/dx11_constant_buffer_probe.cpp",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "native_game_draw_routing": false,
+    "production_state_binding_added": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "r30_renderer_source_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "risk_review": {
+    "intersected_regression_keys": [],
+    "reason": "No protected DX9Ex renderer/HUD/OpenXR risk path was changed. R115 is confined to dormant DX11 readiness composition plus hosted probe/verifier coverage, so hosted CI cannot establish Quest3/VDXR visual correctness."
+  },
+  "initial_validation_failure": {
+    "run_id": 36622668377,
+    "result_sha": "50777e8f77b7381754bfab64dbb9675fecaab11d",
+    "failed_step": "Build DX11 constant buffer probe",
+    "root_cause": "The R115 probe used NativeManagedTextureStageReadiness plus the two composition helpers inside an anonymous namespace but omitted their outrun::vr::dx11 using-imports.",
+    "repair_sha": "f85e763b8f81e51069636ba01bb66581dde281af",
+    "repair_scope": "Probe namespace imports only; no R115 readiness logic or runtime routing semantics changed."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36623361596,
+      "conclusion": "success",
+      "validated_sha": "f85e763b8f81e51069636ba01bb66581dde281af",
+      "artifact_id": 11059248604,
+      "artifact_digest": "sha256:8d29fc9a9f25a27e854be4e26ac0cc4ad7848ed81ba37011a4c29538f99abdc4",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; Win32 build PASS; fixed-function/input-layout/input-signature semantic smokes PASS; input-layout/shader/linkage probes PASS; R115 dx11_constant_buffer_probe build and run PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36623368016,
+      "conclusion": "success",
+      "validated_sha": "f85e763b8f81e51069636ba01bb66581dde281af"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36623368278,
+      "conclusion": "success",
+      "validated_sha": "f85e763b8f81e51069636ba01bb66581dde281af",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36623368219,
+      "conclusion": "success",
+      "validated_sha": "f85e763b8f81e51069636ba01bb66581dde281af",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "pc_fast": {
+      "run_id": 36623361587,
+      "conclusion": "skipped",
+      "validated_sha": "f85e763b8f81e51069636ba01bb66581dde281af"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5897608676,
+    "validation_comment_id": 5897808860,
+    "status": "IMPLEMENTATION_REPAIR_AND_VALIDATION_RECORDED"
+  },
+  "evidence": [
+    "Both source commits contain the exact controller marker [AUTO:CONVERSION-DX11-00086]; the validation-bearing result commit contains no CI-skip directive.",
+    "R115 requires a ready/nonzero R112 pipeline snapshot and exact required texture-stage readiness; required textured stages also require a nonzero R110/R111 stage snapshot.",
+    "R115 composite snapshot identity mixes the pipeline token, texture-stage token and required-texture mask, so a component identity change produces a different composite token.",
+    "Hosted negative probes confirm missing texture snapshots, pending texture stages and a not-ready pipeline fail closed.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R115 is automation-validated but runtime-untested. Composite readiness evidence now prevents independently valid pipeline/resource snapshots from being treated as a complete activation candidate unless both sides are simultaneously ready. Native draw routing remains dormant.",
+  "next_action": "Continue with the next independent bounded DX11 activation prerequisite or transport-parity gate. Do not promote native draw ownership or claim graphics/runtime correctness before exact-build Quest3/VDXR evidence."
+}

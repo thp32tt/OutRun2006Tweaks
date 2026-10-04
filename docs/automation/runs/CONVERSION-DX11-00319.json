@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00319",
+  "production_id": "CONVERSION-DXVK-00318",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "event_id": "CONVERSION-DXVK-00318-E001",
+  "event_type": "rollover",
+  "status": "IN_PROGRESS_TRANSFER_REPAIR_EXACT_SHA_GATE_PENDING",
+  "automation_validation": "LOCAL_STATIC_PASS_TRANSFER_REPAIR_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "96d4c42ac56626294a44b205c22a417a0545c28b",
+  "result_sha": "PENDING_TRANSFER_REPAIR_RESULT_SHA",
+  "validation_bearing_result_sha": "PENDING_TRANSFER_REPAIR_RESULT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX11-00319]",
+  "selected_work_item": "DX11_R223_FIXED_FUNCTION_VERTEX_SHADER_COMPILE_EXACT_SAMPLES_GATE",
+  "summary": "R223 closes the remaining fixed-function compiler-readiness gap in ExactSamples: the bounded unique-signature probe now requires both the generated R93 vertex shader and R84 pixel shader to compile successfully before a signature can be cached as compiler-exact. NativeDrawPath remains dormant.",
+  "changed_paths": [
+    "src/vr/d3d11/pipeline_translation.hpp",
+    "src/vr/d3d11/pipeline_translation.cpp",
+    "src/vr/d3d11/runtime_census.cpp",
+    "tools/dx11_fixed_function_shader_semantics.cpp",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00319.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated vr-dx11-native-r71 HEAD 96d4c42ac56626294a44b205c22a417a0545c28b; read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md/Set05, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, VR_AUTODEV_STATE.json, VR_RUN_STATE.md, VR_REGRESSION_KNOWLEDGE.json, VR_PROBLEM_HISTORY.md and Issue #14. R222/00317 is durable and was not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R222 makes ExactSamples consume actual fixed-function pixel D3DCompile success, but the per-signature vertex side still stops at generated-source readiness. The R93 vertex source varies with FVF/input semantics, so a generated vertex shader that fails D3DCompile could still be counted exact.",
+      "review_lenses": {
+        "architecture": "Mirror the existing diagnostic-only pixel compiler probe for the R93 vertex source and require pair success; no native draw ownership change.",
+        "ownership_lifetime": "Generated source and bytecode remain temporary diagnostic data; no D3D11 device object, reset, resource generation, shared-surface or transport lifetime changes.",
+        "stereo_correctness": "No WVP values, eye routing, HUD, OpenXR submission or presentation behavior changes.",
+        "performance": "Compile only newly tracked fixed-function signatures under the existing SignatureHashCap=512; repeated signatures reuse the cached pair-success identity.",
+        "adversarial": "Vertex compile failure, pixel compile failure, missing prototype, signature-cap overflow, and a racing repeat before the first pair probe completes remain non-exact."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added a diagnostic R93 vertex D3DCompile probe (vs_4_0), retained generated vertex source in the sampled signature for the bounded unique-signature probe, required VS+PS pair compile success before admitting FixedFunctionShaderCompileExactHashes, and extended hosted semantic/static contracts."
+    },
+    "C3_VALIDATE": {
+      "status": "LOCAL_STATIC_PASS_TRANSFER_REPAIR_EXACT_SHA_GATE_PENDING",
+      "automation_validation": "LOCAL_STATIC_PASS_TRANSFER_REPAIR_PENDING_EXACT_SHA_BACKEND_CONVERSION_GATE",
+      "evidence": "Gate 37153330535 on 0ae024bbf7a46fcff8fc9dad142357bffbdea63e failed at Verify DX11 source graph with SyntaxError because N100 read_file display wrappers were accidentally serialized into runtime_census.cpp and verify_dx11_source_graph.py during Git-data publication. This was a transfer/serialization defect, not an R223 code-contract failure. The next result removes only those wrappers while retaining the validated R223 telemetry repair and verifier guard."
+    },
+    "C4_COMMIT": {
+      "status": "MATERIAL_R223_AND_REPAIRS_COMMITTED_TRANSFER_REPAIR_PENDING_RESULT_SHA",
+      "source_implementation_sha": "08213eb5ceb1498d101e0c88d9df8cc878499114",
+      "material_test_sha": "5e69e22f17abc57b7bdde71bc53fed51da975899",
+      "compiler_telemetry_repair_sha": "0ae024bbf7a46fcff8fc9dad142357bffbdea63e",
+      "validation_bearing_result_sha": "PENDING_TRANSFER_REPAIR_RESULT_SHA"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Dormant compiler-readiness/census evidence only; no runtime candidate or package identity changes."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false,
+      "exact_next_action": "Publish the wrapper-clean transfer repair without CI skip, require its exact-SHA Backend Conversion Gate through Win32 build and DX11 readiness smoke, then persist C6 bookkeeping separately with CI skip."
+    }
+  },
+  "regression_assessment": {
+    "related_key": "NONE_DIRECT_RUNTIME_PATH_MATCH",
+    "evidence": "The change is confined to dormant DX11 diagnostic compiler readiness plus static/smoke verification. It does not touch startup/device creation/reset/present, D3D9 stereo/HUD ownership, transport/shared resources or OpenXR submission."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "production_id": "CONVERSION-DXVK-00318",
+    "event_id": "CONVERSION-DXVK-00318-E001",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_ROLLOVER"
+  },
+  "exact_next_action": "Publish the wrapper-clean transfer repair without CI skip, require its exact-SHA Backend Conversion Gate through Win32 build and DX11 readiness smoke, then persist C6 bookkeeping separately with CI skip.",
+  "source_implementation_sha": "08213eb5ceb1498d101e0c88d9df8cc878499114",
+  "implementation_commits": [
+    "08213eb5ceb1498d101e0c88d9df8cc878499114",
+    "5e69e22f17abc57b7bdde71bc53fed51da975899",
+    "0ae024bbf7a46fcff8fc9dad142357bffbdea63e"
+  ],
+  "superseded_gate_history": [
+    {
+      "result_sha": "08213eb5ceb1498d101e0c88d9df8cc878499114",
+      "run_id": 37152497554,
+      "conclusion": "cancelled_by_same_branch_concurrency_before_complete_build",
+      "task_attempt_incremented": false
+    },
+    {
+      "result_sha": "d8628e148aa65bff22c96bda2727ba3042e23658",
+      "run_id": 37152678339,
+      "conclusion": "cancelled_by_same_branch_concurrency_during_configure",
+      "task_attempt_incremented": false
+    },
+    {
+      "result_sha": "5e69e22f17abc57b7bdde71bc53fed51da975899",
+      "run_id": 37152991657,
+      "validate_job_id": 111290537662,
+      "conclusion": "failure",
+      "reason": "stale runtime_census telemetry identifier compileProbe remained after R223 split into pixelCompileProbe/vertexCompileProbe"
+    },
+    {
+      "result_sha": "0ae024bbf7a46fcff8fc9dad142357bffbdea63e",
+      "run_id": 37153330535,
+      "validate_job_id": 111291509903,
+      "conclusion": "failure",
+      "reason": "N100 read_file display wrappers accidentally serialized into two source files during Git-data transfer; verifier hit SyntaxError before R223 logic validation"
+    }
+  ]
+}

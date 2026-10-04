@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00082",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-30T04:16:48+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "469705dbb1c7ca4f79384012f3feb67b056ff60c",
+  "result_sha": "26c74b588f8836aa1605bd69b135da82f0d9a166",
+  "validation_bearing_result_sha": "26c74b588f8836aa1605bd69b135da82f0d9a166",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_05:F23 R113 sampled census exactness is diagnostic-only.",
+  "summary": "R113 closes the Set 05 F23 semantic ambiguity in the passive DX11 census analyzer. Zero unsupported counters no longer imply an exact result when ExactSamples do not cover nonzero Samples. Fully exact sampled evidence is explicitly labeled diagnostic-only, non-exhaustive and not an activation proof, while NativeDrawPathActivationAllowed remains false.",
+  "source_commits": [
+    "26c74b588f8836aa1605bd69b135da82f0d9a166"
+  ],
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py"
+  ],
+  "scope_guards": {
+    "NativeDrawPathActivationAllowed": false,
+    "runtime_source_changed": false,
+    "native_game_draw_routing": false,
+    "production_shader_or_resource_binding_added": false,
+    "r30_renderer_source_changed": false,
+    "vr_d3d9ex_focus_modified": false
+  },
+  "risk_review": {
+    "intersected_regression_keys": [],
+    "reason": "R113 changes diagnostic analyzer semantics, its regression test and the DX11 source-graph verifier only. No D3D9 renderer, device/reset/present, DirectGPU transport, HUD ownership, selector flow, native D3D11 routing or protected runtime baseline source was modified. Hosted CI cannot establish Quest3/VDXR visual correctness."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36617182870,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T19:14:43Z",
+      "validated_sha": "26c74b588f8836aa1605bd69b135da82f0d9a166",
+      "artifact_id": 11056600792,
+      "artifact_digest": "sha256:a6ef859dca96c31f31ec50b68d641e73055dcea21be5441c0e8a6b4677f2e3c1",
+      "evidence": "Queue/baseline/one-click/disassembly/native-transport/source-graph/census checks PASS; DX11 census analyzer emitted DX11 census analyzer regression R113: PASS; Win32 production build PASS; R87-R92 semantic/object/linkage probes PASS; R95-R112 hosted native-backend probes PASS; binary verification and artifact upload PASS."
+    },
+    "build": {
+      "run_id": 36617189871,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T19:15:06Z",
+      "validated_sha": "26c74b588f8836aa1605bd69b135da82f0d9a166"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36617189959,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T19:16:48Z",
+      "validated_sha": "26c74b588f8836aa1605bd69b135da82f0d9a166",
+      "evidence": "All six jobs PASS: host-x64, game-x86, game-x86-safe-draw-compare, game-x86-r26-hud-safe, game-x86-c1-r29-r28-classify, game-x86-c2-r30-hud."
+    },
+    "hud_inspector": {
+      "run_id": 36617190223,
+      "conclusion": "success",
+      "completed_utc": "2026-09-29T19:13:36Z",
+      "validated_sha": "26c74b588f8836aa1605bd69b135da82f0d9a166",
+      "evidence": "static-exe-analysis and build-hud-inspector PASS."
+    },
+    "pc_fast": {
+      "run_id": 36617183021,
+      "conclusion": "skipped",
+      "completed_utc": "2026-09-29T19:09:07Z",
+      "validated_sha": "26c74b588f8836aa1605bd69b135da82f0d9a166"
+    }
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5896855975,
+    "validation_comment_id": 5896984377,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN"
+  },
+  "evidence": [
+    "The validation-bearing result commit message contains the exact controller marker [AUTO:CONVERSION-DX11-00082] and no CI-skip directive.",
+    "Before R113, unsupportedTotal=0 could produce OBSERVED_SAMPLE_TRANSLATION_EXACT even when ExactSamples was zero. R113 requires nonzero Samples with ExactSamples equal to Samples for the exact sampled diagnostic status.",
+    "CensusExactness explicitly records DiagnosticOnly=true, ExhaustiveDrawCoverage=false and ActivationProof=false, and NativeDrawPathActivationAllowed remains false.",
+    "The source-graph verifier fails if the old ambiguous OBSERVED_SAMPLE_TRANSLATION_EXACT status reappears.",
+    "No N100 clone/worktree, PC fast runner, Quest3/VDXR or in-game execution was used."
+  ],
+  "blocker": null,
+  "resume_cursor": "R113 is automation-validated but runtime-untested. Passive 1/64 census exactness can no longer be interpreted as exhaustive native draw activation evidence.",
+  "next_action": "Continue with the next independent Set 05 exactness/coverage prerequisite, including remaining bounded-sampling/cap coverage if selected. Keep NativeDrawPathActivationAllowed=false and require exact-build Quest3/VDXR evidence before runtime promotion."
+}

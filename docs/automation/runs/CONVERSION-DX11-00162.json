@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00162",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "01571a81a6efca6ef61df4642dec40522e8c3ea2",
+  "result_sha": "60e983694a06318b3cf5093c3310c7283320287e",
+  "validation_bearing_result_sha": "60e983694a06318b3cf5093c3310c7283320287e",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R162_HELPER_2837E_INSTRUCTION_PREFIX",
+  "selection_reason": "CONVERSION-DX11-00160 captured exact 0x2837E continuation provenance with two raw rel32 candidates and explicitly named complete-instruction decoding/alignment proof as the next bounded F13 task. The 96-byte window ends exactly on the instruction boundary at 0x283DE, so the entire capture can be proven without another byte fetch.",
+  "summary": "Completed an independent DX11 fail-closed exact-EXE instruction/control-flow proof for the complete 96-byte continuation window 0x2837E..0x283DD. Every captured byte belongs to a complete instruction and the layout is contiguous/byte-exact. The JE failure edge targets 0x28433, CALL 0x28390 targets 0x8BD20, and CALL 0x2839D targets 0x182194. Function-entry status, both callee semantics and ScreenHud/world/render ownership remain unresolved.",
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00161",
+    "source_result_sha": "57e30439e8adea89f8f2dba750efe8021da3a8ce",
+    "exact_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "reason": "Same exact public EXE and bounded instruction/call-alignment design only. DX11 binds the proof to its own 00160 continuation predecessor and must independently pass exact-result Actions."
+  },
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00162.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "producer_range_added": false,
+    "producer_range_widened": false,
+    "producer_range_reclassified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "CONVERSION-DX11-00160 validation-bearing result 816941d7a62a01a30e4cb69970b8d898c58883aa captured the exact 96-byte continuation window beginning at 0x2837E and recorded raw candidates 0x28390->0x8BD20 and 0x2839D->0x182194.",
+    "Validation-bearing result 60e983694a06318b3cf5093c3310c7283320287e contains exact marker [AUTO:CONVERSION-DX11-00162] and no CI-skip directive.",
+    "Exact public EXE SHA256 is 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "HUD Inspector static job 110059803661 PASS proved the complete 0x2837E..0x283DD instruction window, JE 0x28388->0x28433, CALL 0x28390->0x8BD20 and CALL 0x2839D->0x182194.",
+    "DXVK-00161 independently passed the same bounded exact-EXE instruction/call-alignment proof on validation-bearing result 57e30439e8adea89f8f2dba750efe8021da3a8ce.",
+    "Backend Conversion Gate, Build, HUD Inspector and all six OpenXR architecture jobs passed on the exact DX11 result SHA.",
+    "VR PC Fast Test Build was skipped by policy and is not runtime validation.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "next_action": "Keep guarded GF hooks spacing-only and ownership unchanged. Continue only with another bounded exact-EXE proof. Runtime-visible claims still require Quest 3/VDXR evidence.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T04:35:27+09:00",
+  "next_code_2837e_continuation_prefix_proof": {
+    "target_rva": "0x0002837E",
+    "end_exclusive_rva": "0x000283DE",
+    "predecessor_status": "EXACT_EXE_NEXT_CODE_CONTINUATION_PROVENANCE_CAPTURED",
+    "predecessor_exact": true,
+    "target_section": ".text",
+    "function_start_guess_rva": null,
+    "layout_contiguous": true,
+    "all_instruction_bytes_match": true,
+    "fail_target_rva": "0x00028433",
+    "fail_target_matches": true,
+    "aligned_call_1_rva": "0x00028390",
+    "aligned_call_1_target_rva": "0x0008BD20",
+    "aligned_call_1_target_matches": true,
+    "raw_call_1_candidate_present": true,
+    "aligned_call_2_rva": "0x0002839D",
+    "aligned_call_2_target_rva": "0x00182194",
+    "aligned_call_2_target_matches": true,
+    "raw_call_2_candidate_present": true,
+    "status": "EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN",
+    "function_entry_status": "UNRESOLVED",
+    "semantic_effect": "PARTIAL_CONTROL_FLOW_DATA_SETUP_ONLY",
+    "call_1_semantics": "UNRESOLVED",
+    "call_2_semantics": "UNRESOLVED",
+    "ownership_effect": "NONE"
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only. Native DX11 renderer/backend activation, selector, transport, host runtime and game draw routing are unchanged.",
+    "ownership": "The proof establishes control-flow/call alignment and bounded data-setup instructions only. It does not assign ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP, projection, HUD/world classification, eye submission, rank-marker projection, recenter, menu or stereo behavior changed.",
+    "performance": "No runtime hot path, copy, wait, Flush, cadence, telemetry or frame-pacing behavior changed.",
+    "adversarial": "The proof fails closed on any instruction-byte drift, non-contiguous layout, JE target drift, either rel32 call-target drift, loss of either matching raw call candidate, or if the decoded stream no longer ends exactly at 0x283DE."
+  },
+  "risk_review": {
+    "related_finding_or_regression_keys": [
+      "VR_BACKEND_100_REVIEW_SET_04:F13",
+      "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-WHITE-HUD-DIPLOPIA-001"
+    ],
+    "reason": "Static analyzer/verifier only; no protected runtime renderer risk path was changed and no open visual regression is claimed fixed."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36765873291,
+      "conclusion": "success",
+      "validated_sha": "60e983694a06318b3cf5093c3310c7283320287e",
+      "artifact_id": 11120897018,
+      "artifact_digest": "sha256:594ebf89cc353d72727e06017b8d58d633e8e4950cef7a5f00814d82799d7fda"
+    },
+    "build": {
+      "run_id": 36765881643,
+      "conclusion": "success",
+      "validated_sha": "60e983694a06318b3cf5093c3310c7283320287e",
+      "artifact_id": 11121256438,
+      "artifact_digest": "sha256:9823e53e11ce23fa825bd3633c73812ff656a801b54e15cb0cd2d8e812def705",
+      "source_snapshot_artifact_id": 11121285986,
+      "source_snapshot_artifact_digest": "sha256:100acb0b705b41fc87f37a8d4f3e8a82563f9f3b2814183bf1cf26e52e96d918"
+    },
+    "hud_inspector": {
+      "run_id": 36765881740,
+      "conclusion": "success",
+      "validated_sha": "60e983694a06318b3cf5093c3310c7283320287e",
+      "static_analysis_job_id": 110059803661,
+      "analysis_artifact_id": 11119958482,
+      "analysis_artifact_digest": "sha256:ecbbb3f4baf104a6b51ec4f9c28a7b93f7fe638faed66d48987437aeb132d4dd",
+      "game_artifact_id": 11121660444,
+      "game_artifact_digest": "sha256:5d47afdcb2dbc0f1f6a279b801ee258e2bb93b72930e18ac9924e4d4b003484c",
+      "evidence": "Exact EXE emitted gf_target_c_helper_1_next_code_continuation_prefix=0x0002837E status=EXACT_NEXT_CODE_CONTINUATION_CALLS_PROVEN predecessor_status=EXACT_EXE_NEXT_CODE_CONTINUATION_PROVENANCE_CAPTURED predecessor_exact=True section=.text start_guess=- end=0x000283DE layout_contiguous=True bytes_match=True fail_target=0x00028433 fail_target_match=True call1=0x00028390->0x0008BD20 call1_target=True raw_call1=True call2=0x0002839D->0x00182194 call2_target=True raw_call2=True function_entry=UNRESOLVED semantic_effect=PARTIAL_CONTROL_FLOW_DATA_SETUP_ONLY call1_semantics=UNRESOLVED call2_semantics=UNRESOLVED ownership_effect=NONE."
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36765881891,
+      "conclusion": "success",
+      "validated_sha": "60e983694a06318b3cf5093c3310c7283320287e",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11120916661,
+      "host_artifact_digest": "sha256:7c3f88dc2ce807ed8d9cbc668eb09a98bd0ef48e845d1226c06b72bd594a427a"
+    },
+    "pc_fast": {
+      "run_id": 36765873493,
+      "conclusion": "skipped",
+      "validated_sha": "60e983694a06318b3cf5093c3310c7283320287e",
+      "policy": "PC runner authorization disabled; no self-hosted execution used."
+    }
+  },
+  "source_commits": [
+    {
+      "sha": "60e983694a06318b3cf5093c3310c7283320287e",
+      "message": "dx11: prove target C continuation aligned calls [AUTO:CONVERSION-DX11-00162]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5918187962,
+    "validation_comment_id": 5918302171,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  },
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_HELPER_2837E_CONTINUATION_PROVENANCE",
+    "after": "PARTIAL_PLUS_HELPER_2837E_ALIGNED_CALLS_PREFIX",
+    "runtime_claim": false
+  },
+  "blocker": "The complete 0x2837E..0x283DD instruction window and both aligned calls are now exact, but code beginning at 0x283DE, function-entry status, callee semantics for 0x8BD20 and 0x182194, full helper/callee semantics, and all ScreenHud/world/render ownership remain unresolved.",
+  "resume_cursor": "Set04/F13 now has target-C call alignment, helper 0x28460 lookup/success call-chain proof, first-callee 0x282B0 slot-scan/terminal proof, second code prefix 0x28320..0x2837D, and continuation prefix 0x2837E..0x283DD with aligned calls 0x28390->0x8BD20 and 0x2839D->0x182194. The next independent bounded static unit should capture fresh exact bytes beginning at 0x283DE before decoding further, or analyze either proven callee independently."
+}

@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00196",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "base_sha": "0b9005b8ffc116a74efe71a1eceae0b4a3639dcc",
+  "staged_source_commits": [
+    "deac57526e368ddcf70a1376f92ab371ec462b21",
+    "4c47f2acf50e1dd3beeb405878f74ecb026155eb"
+  ],
+  "result_sha": "f62c2ac243ab80b32ff785257f0fcba0834d82de",
+  "validation_bearing_result_sha": "f62c2ac243ab80b32ff785257f0fcba0834d82de",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_required": false,
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "VR_BACKEND_100_REVIEW_SET_04:F13_R196_182331_FRESH_PROVENANCE",
+  "selection_reason": "CONVERSION-DX11-00194 consumed exact bytes through 0x182330 and explicitly named fresh bytes beginning at 0x182331 as the next independent F13 step. A 96-byte capture reaches exclusive end 0x182391, the other previously decoded forward target, without interpreting either endpoint. DXVK-00195 independently proved the same public-EXE capture shape; DX11 validation remains independent.",
+  "summary": "ATTEMPT=1 complete. Validation-bearing result f62c2ac243ab80b32ff785257f0fcba0834d82de captures 96 fresh canonical-EXE bytes from 0x182331 through exclusive end 0x182391. The capture starts with raw byte 3d, records zero raw inbound rel32 candidates and one raw outbound candidate 0x18238A->0x1888EC, and reaches the previously decoded 0x182391 forward target without interpreting either endpoint as an instruction boundary or function entry. Backend Conversion Gate, Build, HUD Inspector and OpenXR all passed. No runtime source changed and no Quest 3/VDXR or in-game test was performed.",
+  "changed_paths": [
+    "tools/analyze_outrun_exe.py",
+    "tools/verify_vr_backend_disasm_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00196.json"
+  ],
+  "scope_guards": {
+    "runtime_source_changed": false,
+    "native_draw_path_activation_changed": false,
+    "native_game_draw_routing": false,
+    "d3d9_render_policy_changed": false,
+    "openxr_transport_changed": false,
+    "native_dx11_transport_changed": false,
+    "vr_d3d9ex_focus_modified": false,
+    "semantic_ownership_promoted": false
+  },
+  "evidence": [
+    "Validation-bearing result f62c2ac243ab80b32ff785257f0fcba0834d82de contains exact marker [AUTO:CONVERSION-DX11-00196] and has no CI-skip directive.",
+    "Base 0b9005b8ffc116a74efe71a1eceae0b4a3639dcc is the completed CONVERSION-DX11-00194 bookkeeping descendant; validation-bearing ancestor 6dca08a0fc9a5b65ac96fe7526ce886513479cbd proves the predecessor exact decode ends at 0x182331.",
+    "Backend Conversion Gate 36803100944 validate job 110181586978 PASS on exact result SHA. Queue automation/HMD baseline/one-click/backend disassembly/session-regression/DX11 transport/source-graph/census contracts, Win32 build, DX11 semantic/object/linkage/constant-buffer/native-transport probes and binary verification all succeeded.",
+    "Backend Gate artifact 11135739252 digest sha256:274424d3a519ee3e718ea2fdfba7bf4699de5d0527d0ce2090ba4b9f4f673f92.",
+    "HUD Inspector 36803104791 PASS. static job 110181731524 emitted EXACT_EXE_182331_TO_182391_PROVENANCE_CAPTURED with predecessor_exact=True, section=.text, probe_len=96, probe_end=0x00182391, first_byte=3d, first16=3d 00 00 f0 3f 73 2d d9 e8 d8 c1 d9 e8 d8 e2 de, last16=04 d9 eb eb c2 d9 ee eb be e8 5d 65 00 00 eb 1b, inbound_raw=0 and outbound_raw=1.",
+    "The sole raw outbound rel32 candidate is 0x0018238A->0x001888EC. HUD proof preserves start_boundary=UNRESOLVED_RAW_BYTES_ONLY, end_target=REACHED_182391_TARGET_BYTES_NOT_CAPTURED, function_entry=UNRESOLVED_AT_182331_AND_182391, semantic_effect=UNRESOLVED_CONTINUATION_BYTES_ONLY and ownership_effect=NONE.",
+    "Canonical replacement EXE SHA-256 remained 68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3.",
+    "HUD analysis artifact 11136780741 digest sha256:550e0300ecd23e0284c0af2644e35dd03fb4dbcb515b0dc188e812962fc57730; HUD inspector game artifact 11136781274 digest sha256:1a4a6151ec6c0a82a1f57f86565d8a075d7749c75e985416ecd6e9db2f7115fc.",
+    "Build 36803104574 PASS on exact result SHA; binary artifact 11136890918 digest sha256:81340770eec48687c370152e5f70f12422f87f2df758ce822a5588c544864fc2; wheel-source artifact 11137100157 digest sha256:222c696abe93307ae65eedc8bf53823811aa55ac00c4c20bf8afae87f3b89c99.",
+    "OpenXR VR architecture 36803104542 PASS on exact result SHA with all 6/6 jobs successful. Host artifact 11136308223 digest sha256:2c8e66ac92c3d15974a254499e7691bde443519a591b41578c68b7bccf4b869d.",
+    "VR PC Fast Test Build 36803100942 was skipped by branch policy and is not runtime validation.",
+    "Regression/history review found no runtime source change: protected R51 world stereo/HUD paths and Issue #13 runtime problem state are unchanged.",
+    "No N100 clone/worktree, Quest 3/VDXR or in-game execution was used; RUNTIME_VALIDATION remains UNTESTED."
+  ],
+  "reuse_evidence": {
+    "source_lane": "DXVK",
+    "source_task": "CONVERSION-DXVK-00195",
+    "source_result_sha": "30a3d6189075452d469fbf213d0c352e364e5257",
+    "source_validation_state_at_selection": "PASS",
+    "source_proof_target": "EXACT_EXE_182331_TO_182391_PROVENANCE_CAPTURED",
+    "reason": "Reuse only the bounded exact-byte raw provenance capture design on the shared canonical EXE. DX11 depends on its own R194 predecessor and independent exact-result GitHub Actions."
+  },
+  "proof_contract": {
+    "predecessor_status": "EXACT_182314_TO_182331_CAPTURE_END_CONTROL_FLOW_PROVEN",
+    "target_rva": "0x00182331",
+    "probe_len": 96,
+    "probe_end_rva": "0x00182391",
+    "status": "EXACT_EXE_182331_TO_182391_PROVENANCE_CAPTURED",
+    "start_boundary_status": "UNRESOLVED_RAW_BYTES_ONLY",
+    "end_target_status": "REACHED_182391_TARGET_BYTES_NOT_CAPTURED",
+    "function_entry_status": "UNRESOLVED_AT_182331_AND_182391",
+    "semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+    "ownership_effect": "NONE",
+    "continuation_scope": "RAW_BYTES_AND_REL32_CENSUS_ONLY",
+    "first_byte": "3d",
+    "first_16_bytes": "3d 00 00 f0 3f 73 2d d9 e8 d8 c1 d9 e8 d8 e2 de",
+    "last_16_bytes": "04 d9 eb eb c2 d9 ee eb be e8 5d 65 00 00 eb 1b",
+    "raw_inbound_rel32_candidate_count": 0,
+    "raw_outbound_rel32_candidate_count": 1,
+    "raw_outbound_rel32_candidates": [
+      "0x0018238A->0x001888EC"
+    ]
+  },
+  "review_lenses": {
+    "architecture": "Analyzer/verifier/run-record only; no native DX11 renderer activation, game draw routing, transport, provider, selector or package behavior changes.",
+    "ownership": "Fresh raw continuation bytes do not infer ScreenHud/world/render ownership; ownership_effect remains NONE.",
+    "stereo_correctness": "No WVP/projection/eye submission/menu/recenter/stereo behavior changes.",
+    "performance": "No runtime hot path/copy/wait/Flush/cadence/frame-pacing behavior changes.",
+    "adversarial": "Capture fails closed unless R194 remains exact through exclusive end 0x182331, the new probe starts exactly there in .text, all 96 bytes are available, and its exclusive end is exactly 0x182391. Neither endpoint is interpreted as an instruction boundary."
+  },
+  "related_finding_or_regression_keys": [
+    "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "VR-R50-WORLD-STEREO-PRESERVE-001",
+    "VR-R51-WHITE-HUD-DIPLOPIA-001"
+  ],
+  "finding_status": {
+    "key": "VR_BACKEND_100_REVIEW_SET_04:F13",
+    "before": "PARTIAL_PLUS_182314_CAPTURE_END_CONTROL_FLOW_PROVEN",
+    "after": "PARTIAL_PLUS_182331_TO_182391_PROVENANCE_CAPTURED",
+    "runtime_claim": false
+  },
+  "blocker": "Fresh bytes from 0x182331 through 0x182390 are now durable, but 0x182331 is not yet proven as an instruction boundary and target bytes beginning at 0x182391 remain outside this capture. Function identity, 0x1888EC callee semantics and all ScreenHud/world/render ownership remain unresolved.",
+  "next_action": "A future independent F13 task may exact-decode the 0x182331 capture and/or capture fresh exact bytes beginning at 0x182391 before promoting either endpoint to an instruction boundary or function identity. Runtime remains UNTESTED.",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "recorded_kst": "2026-10-01T10:58:40+09:00",
+  "runtime_claim": "NONE",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36803100944,
+      "job_id": 110181586978,
+      "conclusion": "success",
+      "validated_sha": "f62c2ac243ab80b32ff785257f0fcba0834d82de",
+      "artifact_id": 11135739252,
+      "artifact_digest": "sha256:274424d3a519ee3e718ea2fdfba7bf4699de5d0527d0ce2090ba4b9f4f673f92"
+    },
+    "build": {
+      "run_id": 36803104574,
+      "conclusion": "success",
+      "validated_sha": "f62c2ac243ab80b32ff785257f0fcba0834d82de",
+      "artifact_id": 11136890918,
+      "artifact_digest": "sha256:81340770eec48687c370152e5f70f12422f87f2df758ce822a5588c544864fc2",
+      "source_snapshot_artifact_id": 11137100157,
+      "source_snapshot_artifact_digest": "sha256:222c696abe93307ae65eedc8bf53823811aa55ac00c4c20bf8afae87f3b89c99"
+    },
+    "hud_inspector": {
+      "run_id": 36803104791,
+      "conclusion": "success",
+      "validated_sha": "f62c2ac243ab80b32ff785257f0fcba0834d82de",
+      "static_analysis_job_id": 110181731524,
+      "analysis_artifact_id": 11136780741,
+      "analysis_artifact_digest": "sha256:550e0300ecd23e0284c0af2644e35dd03fb4dbcb515b0dc188e812962fc57730",
+      "game_artifact_id": 11136781274,
+      "game_artifact_digest": "sha256:1a4a6151ec6c0a82a1f57f86565d8a075d7749c75e985416ecd6e9db2f7115fc",
+      "proof_status": "EXACT_EXE_182331_TO_182391_PROVENANCE_CAPTURED",
+      "proof_predecessor_status": "EXACT_182314_TO_182331_CAPTURE_END_CONTROL_FLOW_PROVEN",
+      "proof_predecessor_exact": true,
+      "proof_target_rva": "0x00182331",
+      "proof_probe_len": 96,
+      "proof_probe_end_rva": "0x00182391",
+      "proof_probe_end_matches": true,
+      "proof_first_byte": "3d",
+      "proof_first_16_bytes": "3d 00 00 f0 3f 73 2d d9 e8 d8 c1 d9 e8 d8 e2 de",
+      "proof_last_16_bytes": "04 d9 eb eb c2 d9 ee eb be e8 5d 65 00 00 eb 1b",
+      "proof_raw_inbound_count": 0,
+      "proof_raw_outbound_count": 1,
+      "proof_raw_outbound_candidates": [
+        "0x0018238A->0x001888EC"
+      ],
+      "proof_start_boundary_status": "UNRESOLVED_RAW_BYTES_ONLY",
+      "proof_end_target_status": "REACHED_182391_TARGET_BYTES_NOT_CAPTURED",
+      "proof_function_entry_status": "UNRESOLVED_AT_182331_AND_182391",
+      "proof_semantic_effect": "UNRESOLVED_CONTINUATION_BYTES_ONLY",
+      "proof_ownership_effect": "NONE",
+      "proof_scope": "RAW_BYTES_AND_REL32_CENSUS_ONLY"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36803104542,
+      "conclusion": "success",
+      "validated_sha": "f62c2ac243ab80b32ff785257f0fcba0834d82de",
+      "jobs_passed": "6/6",
+      "host_artifact_id": 11136308223,
+      "host_artifact_digest": "sha256:2c8e66ac92c3d15974a254499e7691bde443519a591b41578c68b7bccf4b869d"
+    },
+    "pc_fast": {
+      "run_id": 36803100942,
+      "conclusion": "skipped",
+      "validated_sha": "f62c2ac243ab80b32ff785257f0fcba0834d82de",
+      "policy": "Branch policy skipped PC fast runner; no self-hosted execution used."
+    }
+  },
+  "source_commits": [
+    {
+      "sha": "deac57526e368ddcf70a1376f92ab371ec462b21",
+      "message": "dx11: stage 0x182331 continuation provenance",
+      "role": "source_stage",
+      "validation_bearing": false,
+      "validation_result": "superseded_by_result_gate"
+    },
+    {
+      "sha": "4c47f2acf50e1dd3beeb405878f74ecb026155eb",
+      "message": "dx11: stage 0x182331 provenance verifier",
+      "role": "source_stage",
+      "validation_bearing": false,
+      "validation_result": "superseded_by_result_gate"
+    },
+    {
+      "sha": "f62c2ac243ab80b32ff785257f0fcba0834d82de",
+      "message": "dx11: capture 0x182331 continuation provenance [AUTO:CONVERSION-DX11-00196]",
+      "role": "validation_bearing_result",
+      "validation_bearing": true,
+      "ci_skip": false,
+      "validation_result": "PASS"
+    }
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5923126817,
+    "validation_comment_id": 5923200127,
+    "status": "IMPLEMENTATION_AND_VALIDATION_RECORDED"
+  }
+}

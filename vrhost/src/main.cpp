@@ -1060,8 +1060,9 @@ namespace
 
         bool Initialize()
         {
-            // R37: direct-only is a real transport-isolation mode. Do not
-            // create IDXGIOutputDuplication while measuring DirectGPU cadence.
+            // DirectGpuOnly is a gameplay-source policy. Desktop Duplication is
+            // disabled only by the explicit full-session diagnostic switch so
+            // PresentationTheater/menu can keep a fresh mono capture.
             if (!disableDesktopDuplication_ && !BindCaptureOutput(true))
                 throw std::runtime_error("failed to bind game capture output");
             CreateShaders();
@@ -1074,7 +1075,8 @@ namespace
                 << " per eye; projection " << projection_.width << "x" << projection_.height << "x2 (scale=" << renderScale_
                 << "); theater " << theater_.width << "x" << theater_.height
                 << "; directGPU=" << (directTransportEnabled_ ? "enabled" : "disabled")
-                << "; desktopDuplication=" << (directTransportOnly_ ? "disabled-direct-only" : "enabled")
+                << "; directGameplayClassicFallback=" << (directTransportOnly_ ? "blocked" : "allowed")
+                << "; desktopDuplication=" << (disableDesktopDuplication_ ? "disabled-explicit" : "enabled")
                 << ".\n";
             return true;
         }

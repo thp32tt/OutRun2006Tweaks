@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00052",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T20:27:12+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "4c1f9cd99f65ea37a5bcf2b1d4e3cc539725ed62",
+  "code_result_sha": "5bb3a782a4e8c379ef2d51d3f0d8efcb7eb38655",
+  "validation_bearing_result_sha": "5bb3a782a4e8c379ef2d51d3f0d8efcb7eb38655",
+  "result_sha": "5bb3a782a4e8c379ef2d51d3f0d8efcb7eb38655",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R97 dormant NativeFixedFunctionPipelineBundle per-device shader/input-layout/transform-buffer ownership for Set 05 F21.",
+  "summary": "Added a dormant production-side owner that compiles the already generated R93 vertex and R84 pixel shader prototypes, creates and owns the exact R78/R88 D3D11 input layout, and composes the R96 transform constant-buffer owner on one D3D11 device. Hosted WARP coverage proves dormant start, exact initialization, fail-closed rejection/cleanup for an inexact input layout, reinitialization, and shutdown. The source verifier explicitly rejects any production caller or IA/VS/PS shader binding before a later activation step.",
+  "changes": [
+    {
+      "path": "src/vr/d3d11/native_backend.hpp",
+      "result": "Added NativeFixedFunctionPipelineBundle dormant ownership API and COM-owned VS/PS/input-layout plus R96 transform-buffer composition."
+    },
+    {
+      "path": "src/vr/d3d11/native_backend.cpp",
+      "result": "Added strict HLSL compile/object creation and fail-closed per-device bundle initialize/shutdown with no draw-path binding."
+    },
+    {
+      "path": "tools/dx11_constant_buffer_probe.cpp",
+      "result": "Extended hosted WARP probe with R97 bundle lifecycle, fail-closed reinitialize, recovery and shutdown coverage."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added durable R97 ownership/probe contract and explicit non-routing/runtime-caller guards."
+    }
+  ],
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R97 proves hosted per-device ownership/lifetime for a narrow generated fixed-function shader subset only. It does not bind the bundle from the game draw path, translate all shader/resource semantics, or provide Quest3/VDXR visual evidence."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36561220499,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "5bb3a782a4e8c379ef2d51d3f0d8efcb7eb38655",
+      "evidence": "Queue/baseline/disassembly/native-transport/source-graph/census checks PASS; production Win32 build PASS; all DX11 semantic/object/linkage probes PASS; Build/Run DX11 constant buffer probe PASS including R97 lifecycle."
+    },
+    "build": {
+      "run_id": 36561226507,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "5bb3a782a4e8c379ef2d51d3f0d8efcb7eb38655"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36561226492,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "5bb3a782a4e8c379ef2d51d3f0d8efcb7eb38655",
+      "evidence": "All six architecture jobs PASS."
+    },
+    "hud_inspector": {
+      "run_id": 36561226661,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "5bb3a782a4e8c379ef2d51d3f0d8efcb7eb38655"
+    },
+    "pc_fast": {
+      "run_id": 36561220503,
+      "status": "completed",
+      "conclusion": "skipped",
+      "validated_sha": "5bb3a782a4e8c379ef2d51d3f0d8efcb7eb38655"
+    }
+  },
+  "evidence": [
+    "Validation-bearing result commit 5bb3a782a4e8c379ef2d51d3f0d8efcb7eb38655 contains [AUTO:CONVERSION-DX11-00052] and no CI-skip directive.",
+    "Backend Conversion Gate 36561220499 PASS on exact result SHA, including production Win32 build and Build/Run DX11 constant buffer probe with R97.",
+    "Build 36561226507 PASS on exact result SHA.",
+    "OpenXR VR architecture 36561226492 PASS across all six jobs on exact result SHA.",
+    "HUD Inspector 36561226661 PASS on exact result SHA.",
+    "VR PC Fast Test Build 36561220503 SKIPPED; no self-hosted PC runner was used.",
+    "No N100 workspace, Quest3/VDXR, or in-game runtime execution was used."
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5889237112,
+    "validation_comment_id": 5889324488,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN"
+  },
+  "blocker": null,
+  "resume_cursor": "R97 is automation-validated but runtime-untested. Continue Set 05 F21 only with another bounded non-routing prerequisite; keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false.",
+  "next_action": "Advance one narrow DX11 F21 prerequisite, preferably explicit sampler/texture-resource binding ownership/readiness or another independently evidenced shader semantic gap, without enabling native game draw routing. Quest3/VDXR exact-build evidence remains mandatory before runtime promotion.",
+  "in_task_repairs": 0
+}

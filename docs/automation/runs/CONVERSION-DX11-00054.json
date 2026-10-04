@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX11-00054",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "recorded_kst": "2026-09-29T20:54:00+09:00",
+  "checkpoint": "C6_STATE",
+  "status": "AUTOMATION_PASS_RUNTIME_UNTESTED",
+  "base_sha": "5af4ca661e9b2dd2cfde1fef2d6594a237bc9ee1",
+  "code_result_sha": "88050e3968fa22848f41699fbe299f4befd7d6d5",
+  "validation_bearing_result_sha": "88050e3968fa22848f41699fbe299f4befd7d6d5",
+  "result_sha": "88050e3968fa22848f41699fbe299f4befd7d6d5",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "n100_used": false,
+  "pc_fast_used": false,
+  "selected_work": "R98 dormant fixed-function sampler descriptor translation and NativeFixedFunctionSamplerState ownership for the R84 Texture2D path.",
+  "summary": "Added fail-closed D3D9 fixed-function sampler translation for the conservative point/linear plus wrap/clamp subset and a dormant per-device D3D11 sampler owner. Hosted WARP coverage proves exact point/wrap and linear/clamp descriptor creation, D3DTEXF_NONE MaxLOD handling, unsupported anisotropic rejection, fail-closed cleanup, recovery, and shutdown. Source verification explicitly prevents production callers and PSSetSamplers binding, so native game draw routing remains disabled.",
+  "changes": [
+    {
+      "path": "src/vr/d3d11/pipeline_translation.hpp",
+      "result": "Added FixedFunctionSamplerTranslation and the R98 sampler translation API."
+    },
+    {
+      "path": "src/vr/d3d11/pipeline_translation.cpp",
+      "result": "Added strict D3D9 point/linear and wrap/clamp mapping to D3D11 sampler descriptors with no-mip MaxLOD=0 and fail-closed unsupported-state handling."
+    },
+    {
+      "path": "src/vr/d3d11/native_backend.hpp",
+      "result": "Added dormant NativeFixedFunctionSamplerState COM ownership API."
+    },
+    {
+      "path": "src/vr/d3d11/native_backend.cpp",
+      "result": "Added CreateSamplerState ownership, fail-closed initialize/reinitialize behavior, recovery, and shutdown without runtime binding."
+    },
+    {
+      "path": "tools/dx11_constant_buffer_probe.cpp",
+      "result": "Extended hosted WARP probe with R98 descriptor, object lifetime, negative anisotropic, recovery, and shutdown coverage."
+    },
+    {
+      "path": "tools/verify_dx11_source_graph.py",
+      "result": "Added durable R98 translation/ownership/probe guards and explicit rejection of PSSetSamplers or production callers before activation."
+    }
+  ],
+  "activation_gate": {
+    "NativeDrawPathActivationAllowed": false,
+    "shaderTranslationExact": false,
+    "reason": "R98 proves only a narrow sampler descriptor/object prerequisite for the generated fixed-function Texture2D path. It does not own or bind the source texture/SRV, bind sampler/resource state into the game draw path, prove all shader/resource semantics, or provide Quest3/VDXR visual evidence."
+  },
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 36563936326,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "88050e3968fa22848f41699fbe299f4befd7d6d5",
+      "evidence": "Queue/baseline/disassembly/native-transport/source-graph/census checks PASS; production Win32 build PASS; all DX11 semantic/object/linkage probes PASS; Build/Run DX11 constant buffer probe PASS including R98 sampler translation and ownership lifecycle."
+    },
+    "build": {
+      "run_id": 36563943083,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "88050e3968fa22848f41699fbe299f4befd7d6d5"
+    },
+    "openxr_vr_architecture": {
+      "run_id": 36563943051,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "88050e3968fa22848f41699fbe299f4befd7d6d5",
+      "evidence": "All six architecture jobs PASS."
+    },
+    "hud_inspector": {
+      "run_id": 36563943123,
+      "status": "completed",
+      "conclusion": "success",
+      "validated_sha": "88050e3968fa22848f41699fbe299f4befd7d6d5"
+    },
+    "pc_fast": {
+      "run_id": 36563936398,
+      "status": "completed",
+      "conclusion": "skipped",
+      "validated_sha": "88050e3968fa22848f41699fbe299f4befd7d6d5"
+    }
+  },
+  "evidence": [
+    "Validation-bearing result commit 88050e3968fa22848f41699fbe299f4befd7d6d5 contains [AUTO:CONVERSION-DX11-00054] and no CI-skip directive.",
+    "Backend Conversion Gate 36563936326 PASS on the exact result SHA, including production Win32 build and Build/Run DX11 constant buffer probe with R98.",
+    "Build 36563943083 PASS on the exact result SHA.",
+    "OpenXR VR architecture 36563943051 PASS across all six jobs on the exact result SHA.",
+    "HUD Inspector 36563943123 PASS on the exact result SHA.",
+    "VR PC Fast Test Build 36563936398 SKIPPED; no self-hosted PC runner was used.",
+    "No N100 workspace, Quest3/VDXR, or in-game runtime execution was used."
+  ],
+  "production_change_ledger": {
+    "issue": 14,
+    "implementation_comment_id": 5889635807,
+    "validation_comment_id": 5889731803,
+    "status": "IMPLEMENTATION_AND_VALIDATION_WRITTEN"
+  },
+  "blocker": null,
+  "resume_cursor": "R98 is automation-validated but runtime-untested. Continue only with another bounded non-routing DX11 prerequisite; keep NativeDrawPathActivationAllowed=false and shaderTranslationExact=false.",
+  "next_action": "Advance one narrow Set 05 prerequisite, preferably source texture/SRV ownership/readiness for the R84 t0 path or another independently evidenced resource/shader semantic gap, without enabling native game draw routing. Quest3/VDXR exact-build evidence remains mandatory before runtime promotion.",
+  "in_task_repairs": 0,
+  "bookkeeping_correction": {
+    "corrected_kst": "2026-09-29T20:54:00+09:00",
+    "reason": "Controller task CONVERSION-DX11-00054 was issued as a normal automatic queue task, not a chat rollover. Removed the concurrently-written stale chat_rollover field; ATTEMPT remains 1/3 and validation-bearing result SHA is unchanged."
+  }
+}
