@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-2128-C103",
+  "asset": "A064FDFC",
+  "producer_result": "B_RECOVERY09_v2",
+  "candidate_sha256": "f822c0727e8ce9c8d0b801fe5a39dd870c43a30d872819c42829040e14474665",
+  "producer_candidate_sha256": "f822c0727e8ce9c8d0b801fe5a39dd870c43a30d872819c42829040e14474665",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "source_header_128_exact": true,
+  "structure": {
+    "width": 4096,
+    "height": 2048,
+    "pitch": 16384,
+    "mips": 1,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "raw_orientation": "mirror_y"
+  },
+  "selected_allowed_mask_xor_vs_union_source_bboxes": 0,
+  "selected_source_text_mask_xor_vs_source_alpha_in_union_bboxes": 0,
+  "persisted_clean_plate_diff_vs_independent_exact_source_alpha_clear": 0,
+  "new_target_pixels_outside_selected_source_bboxes": 0,
+  "new_vs_existing_localized_overlap_pixels": 0,
+  "new_vs_existing_2px_guard_conflicts": 0,
+  "new_pair_overlap_pixels": 0,
+  "new_pair_guard_conflicts": [],
+  "unexplained_source_alpha_residue_pixels": 0,
+  "changed_pixels_vs_c_overlap05_fallback_outside_selected_source_bboxes": 0,
+  "rows": [
+    {
+      "key": "ranking",
+      "original_bbox": [
+        120,
+        245,
+        455,
+        350
+      ],
+      "localized_bbox": [
+        204,
+        248,
+        370,
+        346
+      ],
+      "delta_left": 84,
+      "delta_right": 85,
+      "delta_top": 3,
+      "delta_bottom": 4,
+      "source_size": [
+        335,
+        105
+      ],
+      "localized_size": [
+        166,
+        98
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "stage",
+      "original_bbox": [
+        455,
+        245,
+        690,
+        350
+      ],
+      "localized_bbox": [
+        461,
+        249,
+        685,
+        345
+      ],
+      "delta_left": 6,
+      "delta_right": 5,
+      "delta_top": 4,
+      "delta_bottom": 5,
+      "source_size": [
+        235,
+        105
+      ],
+      "localized_size": [
+        224,
+        96
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "rank",
+      "original_bbox": [
+        690,
+        245,
+        875,
+        350
+      ],
+      "localized_bbox": [
+        702,
+        252,
+        862,
+        342
+      ],
+      "delta_left": 12,
+      "delta_right": 13,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "source_size": [
+        185,
+        105
+      ],
+      "localized_size": [
+        160,
+        90
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "dumped_white",
+      "original_bbox": [
+        3169,
+        270,
+        3605,
+        390
+      ],
+      "localized_bbox": [
+        3228,
+        276,
+        3544,
+        358
+      ],
+      "delta_left": 59,
+      "delta_right": 61,
+      "delta_top": 6,
+      "delta_bottom": 32,
+      "source_size": [
+        436,
+        120
+      ],
+      "localized_size": [
+        316,
+        82
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}
