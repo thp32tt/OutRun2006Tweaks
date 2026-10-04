@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T02:29:57+09:00",
+  "updated_at_kst": "2026-10-05T02:45:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C118 final QA advances B_PRODUCTION32 788CE557 candidate cc6727baac1b6946ae92cf5bc5568145c1d3ced2248f1fc134e9cc79c5f17149 to pixel/visual policy PASS pending isolated in-game validation. The former sole producer REWORK is resolved; producer REWORK remaining=0. Strict no-candidate DXT5 HOLD remains 4F68708E/F6811E94; pending_artwork localize_text=47. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "A_PRODUCTION20/21 produced two new odd-shard exact-HD Korean DDS candidates and passed A static/controller visual self-QA: 9CE4E175 NOT AVAILABLE→이용 불가 candidate cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2, and EBEF6D20 two Loading→로딩 occurrences candidate 005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2. Both await independent C final QA and isolated in-game validation. Producer REWORK remains 0; strict no-candidate DXT5 HOLD remains 4F68708E/F6811E94; pending_artwork localize_text=45. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -538,6 +538,56 @@
       "overlap_touch_guard_conflicts": 0,
       "changes_outside_returned_source_bboxes": 0,
       "runtime_validation": "UNTESTED"
+    },
+    "current_pending_artwork_localize_text": 45,
+    "current_producer_rework_remaining": 0,
+    "latest_a_production_batch": {
+      "timestamp_kst": "2026-10-05T02:45:00+09:00",
+      "reports": [
+        "localization/graphics/role_A/20261005-A-PRODUCTION20/A_PRODUCTION20_9CE4E175_REPORT.json",
+        "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_EBEF6D20_REPORT.json"
+      ],
+      "assets": [
+        "9CE4E175",
+        "EBEF6D20"
+      ],
+      "candidates": {
+        "9CE4E175": "cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2",
+        "EBEF6D20": "005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2"
+      },
+      "result": "2_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "pending_artwork_localize_text": 45,
+      "runtime_validation": "UNTESTED"
+    },
+    "a_production20_9ce4e175": {
+      "timestamp_kst": "2026-10-05T02:45:00+09:00",
+      "index": 195,
+      "candidate_sha256": "cdb00269deb765e733a1da9dbc69e51d06f70d8b8f0fef453abbf67f685430b2",
+      "source_sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+      "status": "A_PRODUCTION20_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "bbox_pass": "1/1",
+      "size_ceiling": "1/1",
+      "positive_margin": "1/1",
+      "outside_alpha_protected": 0,
+      "controller_visual_qa": "PASS",
+      "runtime_validation": "UNTESTED",
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION20/A_PRODUCTION20_9CE4E175_REPORT.json"
+    },
+    "a_production21_ebef6d20": {
+      "timestamp_kst": "2026-10-05T02:45:00+09:00",
+      "index": 65,
+      "candidate_sha256": "005130ff808aad8d4586fe026b52b930a320083144f86497b749d08c875325a2",
+      "source_sha256": "8d832df296241c372cf182439d9f44721b07f7555b9ee3b17b0750908194877c",
+      "status": "A_PRODUCTION21_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "physical_occurrences": 2,
+      "bbox_pass": "2/2",
+      "size_ceiling": "2/2",
+      "positive_margin": "2/2",
+      "overlap_touch": 0,
+      "outside_alpha_protected": 0,
+      "controller_visual_qa": "PASS",
+      "runtime_validation": "UNTESTED",
+      "report": "localization/graphics/role_A/20261005-A-PRODUCTION21/A_PRODUCTION21_EBEF6D20_REPORT.json"
     }
   },
   "data_build": {
