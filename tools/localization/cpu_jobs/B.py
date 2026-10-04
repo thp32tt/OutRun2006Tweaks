@@ -17,7 +17,7 @@ with zipfile.ZipFile(zo) as z:ob=z.read(asset)
 with zipfile.ZipFile(zm) as z:mb=z.read(asset)
 orig=load_bytes(ob,'/tmp/orig.dds');hist=load_bytes(mb,'/tmp/hist.dds');a=np.asarray(orig,dtype=np.int16);b=np.asarray(hist,dtype=np.int16);diff=(np.max(np.abs(a-b),axis=2)>5)&((a[:,:,3]>3)|(b[:,:,3]>3));ys,xs=np.nonzero(diff)
 if not len(xs):raise RuntimeError('historical diff empty')
-lb=[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)];hd_base=[x*4 for x in lb];pad=36;cell=[max(0,hd_base[0]-pad),max(0,hd_base[1]-pad),min(w,hd_base[2]+pad),min(h,hd_base[3]+pad)]
+lb=[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)];hd_base=list(lb);pad=36;cell=[max(0,hd_base[0]-pad),max(0,hd_base[1]-pad),min(w,hd_base[2]+pad),min(h,hd_base[3]+pad)]
 # visual proof low-res and HD mapped exact source.
 s=comp(orig).crop((max(0,lb[0]-12),max(0,lb[1]-12),min(orig.width,lb[2]+12),min(orig.height,lb[3]+12))).resize(((lb[2]-lb[0]+24)*3,(lb[3]-lb[1]+24)*3),Image.Resampling.NEAREST);k=comp(hist).crop((max(0,lb[0]-12),max(0,lb[1]-12),min(orig.width,lb[2]+12),min(orig.height,lb[3]+12))).resize(s.size,Image.Resampling.NEAREST);c=Image.new('RGB',(s.width+k.width+8,max(s.height,k.height)+30),'white');c.paste(s,(0,30));c.paste(k,(s.width+8,30));ImageDraw.Draw(c).text((5,5),f'LOWRES SRC | HIST diff={lb}',fill='black');c.save(out/'B_PRODUCTION19_5B65E08C_DISCOVERY_CONTACT.jpg',quality=96)
 v=comp(hd).crop(tuple(cell));scale=min(1,1600/max(1,v.width));
