@@ -651,10 +651,14 @@ for marker in (
     if marker not in r33:
         errors.append(f"R33 missing folded final-dispatch responsibility: {marker}")
 
+if "R34InstallState" in r34:
+    errors.append("R34 passive readiness observer regained duplicate install-state ownership")
 if "R33SynchronizeResetReplayGuardState(" not in r34:
     errors.append("R34 thin readiness layer missing R33 reset-replay sync")
 if "R33InstallStatus()" not in r34:
     errors.append("R34 missing R33 install-state owner query")
+if "ReportAsyncResult(" not in r34:
+    errors.append("R34 passive readiness observer missing compatibility async-result reporting")
 
 for banned in ("R22FailClosedEligibility();", "R22ResetBaselineTracking();"):
     if banned in r33:

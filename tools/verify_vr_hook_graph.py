@@ -39,7 +39,7 @@ MAX_HOOKS = {
     "src/vr/d3d9/stereo_renderer_r31.cpp": 8,
     "src/vr/d3d9/stereo_renderer_r32.cpp": 7,
     "src/vr/d3d9/stereo_renderer_r33.cpp": 7,
-    "src/vr/d3d9/stereo_renderer_r34.cpp": 6,
+    "src/vr/d3d9/stereo_renderer_r34.cpp": 0,
 }
 
 errors = []

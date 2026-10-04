@@ -1,11 +1,10 @@
-// R34 compatibility readiness ledger.
+// R34 compatibility readiness observer.
 //
 // The former R34 Reset/Present/draw detour layer has been folded into the R33
-// final dispatcher. R34 remains only as a durable install/readiness checkpoint
-// for the R15 ResetEx replay-health dependency. It installs no D3D9 hooks.
-//
-// Keeping the readiness object preserves the historical async hook/reporting
-// contract while removing six physical inline detours from the runtime chain.
+// final dispatcher. R33 now owns the functional install state and replay-health
+// synchronization. R34 only preserves the historical async hook/reporting
+// surface by observing R33; it owns no D3D9 hooks and no duplicate install
+// state.
 
 #include "stereo_renderer_r33.cpp"
 
@@ -13,21 +12,15 @@ namespace OutRunVRStereo
 {
     namespace
     {
-        std::atomic<OutRunVR::RuntimeEligibility::InstallState> R34InstallState{
-            OutRunVR::RuntimeEligibility::InstallState::Pending };
-
         DWORD WINAPI R34InstallThread(void*)
         {
             using State = OutRunVR::RuntimeEligibility::InstallState;
-            R34InstallState.store(State::Pending, std::memory_order_release);
 
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
                 const auto r33 = R33InstallStatus();
                 if (r33 == State::Failed)
                 {
-                    R34InstallState.store(State::Failed,
-                        std::memory_order_release);
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR34ResetGuard", false);
                     return 0;
@@ -40,18 +33,15 @@ namespace OutRunVRStereo
                     if (installedDevice)
                         R33SynchronizeResetReplayGuardState(installedDevice);
 
-                    R34InstallState.store(State::Ready,
-                        std::memory_order_release);
                     HookManager::ReportAsyncResult(
                         "OpenXRVRStereoR34ResetGuard", true);
                     spdlog::info(
-                        "VR R34 READY: ResetEx replay-health/raster responsibilities are folded into the R33 final physical dispatcher; no R34 D3D9 detours installed");
+                        "VR R34 OBSERVER: R33 owns ResetEx replay-health/raster readiness; no R34 D3D9 detours or duplicate install state");
                     return 0;
                 }
                 Sleep(25);
             }
 
-            R34InstallState.store(State::Failed, std::memory_order_release);
             HookManager::ReportAsyncResult(
                 "OpenXRVRStereoR34ResetGuard", false);
             return 0;
@@ -70,12 +60,7 @@ namespace OutRunVRStereo
                 HANDLE thread = CreateThread(
                     nullptr, 0, R34InstallThread, nullptr, 0, nullptr);
                 if (!thread)
-                {
-                    R34InstallState.store(
-                        OutRunVR::RuntimeEligibility::InstallState::Failed,
-                        std::memory_order_release);
                     return false;
-                }
                 CloseHandle(thread);
                 return true;
             }
