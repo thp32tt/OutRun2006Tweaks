@@ -22,7 +22,7 @@ class StatusHandler(BaseHTTPRequestHandler):
 <p><b>Next slot:</b> {html.escape(reg.slots[reg.next_slot].name)}</p>
 <h2>Registry</h2><pre>{html.escape(json.dumps({"next_slot": reg.next_slot, "rate_limit_attempts": reg.rate_limit_attempts, "rate_limit_until": reg.rate_limit_until, "last_global_send_at": reg.last_global_send_at, "slots": [asdict(s) for s in reg.slots]}, ensure_ascii=False, indent=2))}</pre>
 <h2>Runtime</h2><pre>{html.escape(json.dumps(runtime, ensure_ascii=False, indent=2))}</pre>
-<p>noVNC: <a href='http://192.168.0.48:6080/vnc.html'>192.168.0.48:6080/vnc.html</a></p>
+<p>noVNC: <a href='http://192.168.0.48:6082/vnc.html'>192.168.0.48:6082/vnc.html</a></p>
 </body></html>""".encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
