@@ -1,0 +1,19 @@
+{
+  "source": "/tmp/b55src.png",
+  "candidate": "/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/localization/graphics/role_B/20261005-B-PRODUCTION55/1F5_CLEAN_PLATE.png",
+  "size": [
+    1024,
+    512
+  ],
+  "changed_pixels": 7946,
+  "changed_bbox": [
+    641,
+    140,
+    865,
+    232
+  ],
+  "changed_pixels_outside_edit_mask": 0,
+  "changed_pixels_in_protected_mask": 0,
+  "alpha_changed_outside_edit_mask": 0,
+  "status": "PASS"
+}
