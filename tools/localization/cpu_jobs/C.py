@@ -9,7 +9,7 @@ if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTR
 
 repo=Path.cwd()
 branch="korean-localization-recovery-20260928"
-run="20261005-C128-12519155"
+run="20261005-C129-12519155"
 out=repo/"localization/graphics/role_C"/run
 out.mkdir(parents=True,exist_ok=True)
 wr=repo/"localization/graphics/worker_results"
@@ -34,7 +34,7 @@ def branch_bytes(path):
 def sha_bytes(b):
     return hashlib.sha256(b).hexdigest()
 
-def rgba_dds(b):
+def rgba_dds(b,orientation):
     if b[:4]!=b"DDS ":
         raise RuntimeError("not DDS")
     h=struct.unpack_from("<I",b,12)[0]
@@ -43,8 +43,17 @@ def rgba_dds(b):
     if len(b)!=128+w*h*4:
         raise RuntimeError(("unexpected_rgba_size",w,h,mips,len(b)))
     raw=Image.frombytes("RGBA",(w,h),b[128:],"raw","RGBA")
-    readable=raw.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
-    return raw,readable,{"width":w,"height":h,"mipmaps":mips,"format":"RGBA32","raw_orientation":"mirror_x"}
+    if orientation=="rotate_180":
+        readable=raw.transpose(Image.Transpose.ROTATE_180)
+    elif orientation=="mirror_x":
+        readable=raw.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+    elif orientation=="mirror_y":
+        readable=raw.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+    elif orientation=="identity":
+        readable=raw.copy()
+    else:
+        raise RuntimeError(("unknown_orientation",orientation))
+    return raw,readable,{"width":w,"height":h,"mipmaps":mips,"format":"RGBA32","raw_orientation":orientation}
 
 def load_rgba(path):
     return Image.open(io.BytesIO(branch_bytes(path))).convert("RGBA")
@@ -80,8 +89,8 @@ except FileNotFoundError:
       "machine_status":"BLOCKED_BY_B_PRODUCTION44","producer_state":fail,
       "controller_visual_qa":"NOT_RUN","runtime_validation":"UNTESTED"
     }
-    (out/"C128_12519155_MACHINE_QA.json").write_text(json.dumps(blocked,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-    (wr/"C128_12519155.json").write_text(json.dumps(blocked,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    (out/"C129_12519155_MACHINE_QA.json").write_text(json.dumps(blocked,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    (wr/"C129_12519155.json").write_text(json.dumps(blocked,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps(blocked,ensure_ascii=False))
     raise SystemExit(0)
 
@@ -94,8 +103,9 @@ if sha_bytes(sb)!=rep["source_sha256"]:
 if sha_bytes(cb)!=rep["candidate_sha256"]:
     raise RuntimeError(("candidate_sha_mismatch",sha_bytes(cb),rep["candidate_sha256"]))
 
-src_raw,src_img,src_meta=rgba_dds(sb)
-cand_raw,cand_img,cand_meta=rgba_dds(cb)
+orientation=rep["structure"]["raw_orientation"]
+src_raw,src_img,src_meta=rgba_dds(sb,orientation)
+cand_raw,cand_img,cand_meta=rgba_dds(cb,orientation)
 if src_meta!=cand_meta or src_meta["width"]!=1024 or src_meta["height"]!=1024:
     raise RuntimeError(("structure",src_meta,cand_meta))
 header_exact=sb[:128]==cb[:128]
@@ -168,7 +178,7 @@ for rr in rep["rows"]:
       "containment":"PASS" if contain else "FAIL",
       "size_ceiling":"PASS" if size_ok else "FAIL",
       "edge_touch_high_risk":edge,
-      "rework_status":"C128_REVALIDATED"
+      "rework_status":"C129_REVALIDATED"
     })
     row_masks.append((str(rr["n"]),rm))
 
@@ -209,7 +219,7 @@ res={
  "controller_visual_qa":"PENDING",
  "runtime_validation":"UNTESTED"
 }
-(out/"C128_12519155_MACHINE_QA.json").write_text(json.dumps(res,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(out/"C129_12519155_MACHINE_QA.json").write_text(json.dumps(res,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 
 def composite(img,bg=(64,64,64,255)):
     z=Image.new("RGBA",img.size,bg)
@@ -228,7 +238,7 @@ sheet=Image.new("RGB",(2048,2100),"white")
 sheet.paste(cards[0],(0,0)); sheet.paste(cards[1],(1024,0))
 sheet.paste(cards[2],(0,1050)); sheet.paste(cards[3],(1024,1050))
 sheet.thumbnail((1800,1800),Image.Resampling.LANCZOS)
-sheet.save(out/"C128_125_COMPARE.jpg",quality=96)
+sheet.save(out/"C129_125_COMPARE.jpg",quality=96)
 
 src_rgb=composite(src_img); clean_rgb=composite(clean_img); fin_rgb=composite(cand_img)
 contacts=[]
@@ -248,13 +258,13 @@ row_sheet=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in 
 yy=0
 for c in contacts:
     row_sheet.paste(c,(0,yy)); yy+=c.height+4
-row_sheet.save(out/"C128_125_ROW_CONTACT_2X.jpg",quality=96)
+row_sheet.save(out/"C129_125_ROW_CONTACT_2X.jpg",quality=96)
 
 raws=[card("SOURCE_RAW_MIRROR_X",src_raw),card("FINAL_RAW_MIRROR_X",cand_raw)]
 raw_sheet=Image.new("RGB",(1024,2100),"white")
 raw_sheet.paste(raws[0],(0,0)); raw_sheet.paste(raws[1],(0,1050))
 raw_sheet.thumbnail((1200,1800),Image.Resampling.LANCZOS)
-raw_sheet.save(out/"C128_125_RAW_COMPARE.jpg",quality=96)
+raw_sheet.save(out/"C129_125_RAW_COMPARE.jpg",quality=96)
 
 summary={
  "run":run,"asset":"12519155","index":128,
@@ -266,7 +276,7 @@ summary={
  "localized_overlap_pixels":pair_overlap,"touch_pairs":len(touch_pairs),
  "stage_naming_policy":res["stage_naming_policy"],
  "runtime_validation":"UNTESTED",
- "report":f"localization/graphics/role_C/{run}/C128_12519155_MACHINE_QA.json"
+ "report":f"localization/graphics/role_C/{run}/C129_12519155_MACHINE_QA.json"
 }
-(wr/"C128_12519155.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+(wr/"C129_12519155.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 print(json.dumps(summary,ensure_ascii=False),flush=True)
