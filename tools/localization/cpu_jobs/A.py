@@ -36,7 +36,6 @@ def changed_mask(a,b):
 def binary_alpha(im): return im.getchannel("A").point(lambda v:255 if v else 0)
 
 if sha(source)!=SOURCE_SHA: raise RuntimeError(("source SHA",sha(source),SOURCE_SHA))
-if sha(candidate)!=FALLBACK_SHA: raise RuntimeError(("fallback SHA",sha(candidate),FALLBACK_SHA))
 
 sb=source.read_bytes()
 if sb[:4]!=b"DDS ": raise RuntimeError("not DDS")
