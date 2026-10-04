@@ -9,7 +9,9 @@
   "source_residue": 0,
   "overlap": 0,
   "touch_pairs": 0,
-  "worker_status": "B_PRODUCTION55_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C",
+  "worker_status": "B_PRODUCTION55_SELF_QA_PASS_PENDING_C_AND_INGAME",
   "runtime_validation": "UNTESTED",
-  "report": "localization/graphics/role_B/20261005-B-PRODUCTION55/B55_1F5_REPORT.json"
+  "report": "localization/graphics/role_B/20261005-B-PRODUCTION55/B55_1F5_REPORT.json",
+  "controller_visual_qa": "PASS",
+  "controller_report": "localization/graphics/role_B/20261005-B-PRODUCTION55/B55_CONTROLLER_SELF_QA.json"
 }
