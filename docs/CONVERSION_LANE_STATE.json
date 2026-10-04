@@ -52,8 +52,8 @@
   },
   "latest_durable_task": {
     "task_id": "CONVERSION-DX11-00353",
-    "production_id": "CONVERSION-DXVK-00352",
-    "event_id": "CONVERSION-DXVK-00352-E004",
+    "production_id": "CONVERSION-DX11-00353",
+    "event_id": "CONVERSION-DX11-00353-E002",
     "event_type": "rollover",
     "attempt": "1/3",
     "rollover_is_retry": false,
@@ -76,7 +76,9 @@
     ],
     "implementation_comment_id": 5976969775,
     "validation_comment_id": 5977011442,
-    "native_draw_path_activation_changed": false
+    "native_draw_path_activation_changed": false,
+    "chat_rollover": 2,
+    "resume_reason": "Retry persisted after one recovery attempt"
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00353/R241. Exact-SHA Backend Conversion Gate #1935 passed for 11e4be9e0c3fa86e18f97ec8697bdc03a1e9ea0f, including R241 source-graph guards, Win32 build/binary and readiness smoke with the WARP constant-buffer probe exercising translation-slot ownership, stale cache-snapshot rejection and device-generation re-reservation. This is automated/offline evidence, not in-game/HMD proof.",
   "runtime_next_action": "Keep NativeDrawPathActive disabled. Use the XR-native cadence/interpolation DX11 path as the primary Quest 3/VDXR performance test; measure fresh-vs-cached projection cadence and frame-time spikes rather than compositor fps alone. Native draw activation still requires exact shader/resource/state coverage and repeated parity evidence.",
@@ -2517,8 +2519,8 @@
   ],
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00353",
-    "production_id": "CONVERSION-DXVK-00352",
-    "event_id": "CONVERSION-DXVK-00352-E004",
+    "production_id": "CONVERSION-DX11-00353",
+    "event_id": "CONVERSION-DX11-00353-E002",
     "event_type": "rollover",
     "attempt": "1/3",
     "rollover_is_retry": false,
@@ -2534,6 +2536,23 @@
     "implementation_comment_id": 5976969775,
     "validation_comment_id": 5977011442,
     "runtime_validation": "UNTESTED",
-    "native_draw_path_activation_changed": false
+    "native_draw_path_activation_changed": false,
+    "chat_rollover": 2,
+    "resume_reason": "Retry persisted after one recovery attempt"
+  },
+  "rollover_metadata_correction": {
+    "task_id": "CONVERSION-DX11-00353",
+    "corrected_to": {
+      "task_id": "CONVERSION-DX11-00353",
+      "production_id": "CONVERSION-DX11-00353",
+      "event_id": "CONVERSION-DX11-00353-E002",
+      "event_type": "rollover",
+      "attempt": "1/3",
+      "chat_rollover": 2,
+      "rollover_is_retry": false,
+      "dispatch_source": "CURRENT_USER_QUEUE",
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "reason": "Current user-issued rollover dispatch is authoritative; chat rollover does not increment ATTEMPT. Existing R241 material/result SHA and validation evidence remain authoritative and unchanged."
   }
 }
