@@ -249,6 +249,58 @@ namespace outrun::vr::dx11
     compile_fixed_function_pixel_shader_prototype(
         const FixedFunctionPixelShaderPrototype& prototype) noexcept;
 
+    // R239 seals the census-observed D3D9 programmable VS/PS identity into a
+    // deterministic stage-typed cache key for a future translator/object
+    // cache. This is identity readiness only: it neither translates bytecode
+    // nor creates/binds D3D11 shaders, and translationImplemented stays false.
+    enum ProgrammableShaderPairIdentityUnsupported : std::uint32_t
+    {
+        ProgrammableShaderPairIdentityUnsupportedNone = 0,
+        ProgrammableShaderPairIdentityUnsupportedIncompleteObservation = 1u << 0,
+        ProgrammableShaderPairIdentityUnsupportedMixedPair = 1u << 1,
+        ProgrammableShaderPairIdentityUnsupportedMissingVertexShader = 1u << 2,
+        ProgrammableShaderPairIdentityUnsupportedMissingPixelShader = 1u << 3,
+        ProgrammableShaderPairIdentityUnsupportedInvalidVertexBytecode = 1u << 4,
+        ProgrammableShaderPairIdentityUnsupportedInvalidPixelBytecode = 1u << 5,
+        ProgrammableShaderPairIdentityUnsupportedInvalidVertexVersion = 1u << 6,
+        ProgrammableShaderPairIdentityUnsupportedInvalidPixelVersion = 1u << 7,
+        ProgrammableShaderPairIdentityUnsupportedMissingVertexHash = 1u << 8,
+        ProgrammableShaderPairIdentityUnsupportedMissingPixelHash = 1u << 9,
+    };
+
+    struct ProgrammableShaderFunctionIdentity
+    {
+        bool present = false;
+        bool observed = false;
+        UINT byteSize = 0;
+        DWORD versionToken = 0;
+        std::uint64_t bytecodeHash = 0;
+    };
+
+    struct ProgrammableShaderPairCacheIdentity
+    {
+        std::uint32_t unsupported =
+            ProgrammableShaderPairIdentityUnsupportedNone;
+        ProgrammableShaderFunctionIdentity vertexShader{};
+        ProgrammableShaderFunctionIdentity pixelShader{};
+        std::uint64_t cacheKey = 0;
+        bool translationImplemented = false;
+
+        [[nodiscard]] bool exact_identity() const noexcept
+        {
+            return unsupported ==
+                       ProgrammableShaderPairIdentityUnsupportedNone &&
+                   cacheKey != 0;
+        }
+    };
+
+    [[nodiscard]] ProgrammableShaderPairCacheIdentity
+    seal_programmable_shader_pair_cache_identity(
+        bool observationComplete,
+        bool mixedPair,
+        const ProgrammableShaderFunctionIdentity& vertexShader,
+        const ProgrammableShaderFunctionIdentity& pixelShader) noexcept;
+
     // R93 emits a diagnostic-only vertex-shader source for the narrow
     // untransformed fixed-function FVF subset that can feed the R84 pixel
     // prototype. It models a future b0 WVP constant-buffer contract but never

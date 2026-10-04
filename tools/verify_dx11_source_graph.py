@@ -9331,6 +9331,46 @@ def main() -> None:
             + ", ".join(missing_r238_programmable_shader_pair_inventory)
         )
 
+    r239_programmable_shader_pair_cache_identity_contract = [
+        ("struct ProgrammableShaderPairCacheIdentity",
+         PIPELINE_TRANSLATION_HPP,
+         "R239 programmable pair cache identity type"),
+        ("seal_programmable_shader_pair_cache_identity(",
+         PIPELINE_TRANSLATION_HPP,
+         "R239 programmable pair cache sealing declaration"),
+        ("ProgrammableShaderPairIdentityUnsupportedInvalidVertexVersion",
+         PIPELINE_TRANSLATION_HPP,
+         "R239 stage-typed shader version fail-closed bit"),
+        ("mix(0x5653000000000000ull)",
+         PIPELINE_TRANSLATION_CPP,
+         "R239 VS stage-tagged cache-key identity"),
+        ("mix(0x5053000000000000ull)",
+         PIPELINE_TRANSLATION_CPP,
+         "R239 PS stage-tagged cache-key identity"),
+        ("!programmablePair.translationImplemented",
+         DX11_SHADER_OBJECT_PROBE,
+         "R239 identity readiness must not claim translation"),
+        ("programmablePairRepeat.cacheKey == programmablePair.cacheKey",
+         DX11_SHADER_OBJECT_PROBE,
+         "R239 deterministic cache-key regression"),
+        ("ProgrammableShaderPairIdentityUnsupportedMixedPair",
+         DX11_SHADER_OBJECT_PROBE,
+         "R239 mixed-pair fail-closed regression"),
+    ]
+    missing_r239_programmable_shader_pair_cache_identity = [
+        meaning
+        for token, source, meaning
+        in r239_programmable_shader_pair_cache_identity_contract
+        if token not in source
+    ]
+    if missing_r239_programmable_shader_pair_cache_identity:
+        raise SystemExit(
+            "DX11 R239 programmable shader pair cache identity drift: "
+            + ", ".join(
+                missing_r239_programmable_shader_pair_cache_identity
+            )
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

@@ -12,7 +12,14 @@ namespace
 {
     using outrun::vr::dx11::FixedFunctionStageState;
     using outrun::vr::dx11::VertexInputLayoutTranslation;
+    using outrun::vr::dx11::ProgrammableShaderFunctionIdentity;
+    using outrun::vr::dx11::ProgrammableShaderPairIdentityUnsupportedIncompleteObservation;
+    using outrun::vr::dx11::ProgrammableShaderPairIdentityUnsupportedInvalidVertexBytecode;
+    using outrun::vr::dx11::ProgrammableShaderPairIdentityUnsupportedInvalidVertexVersion;
+    using outrun::vr::dx11::ProgrammableShaderPairIdentityUnsupportedMissingPixelHash;
+    using outrun::vr::dx11::ProgrammableShaderPairIdentityUnsupportedMixedPair;
     using outrun::vr::dx11::generate_fixed_function_pixel_shader_prototype;
+    using outrun::vr::dx11::seal_programmable_shader_pair_cache_identity;
     using outrun::vr::dx11::translate_vertex_input_layout;
 
     void require(bool condition, const char* message)
@@ -109,6 +116,99 @@ namespace
 
 int main()
 {
+    const ProgrammableShaderFunctionIdentity programmableVs{
+        true,
+        true,
+        128u,
+        D3DVS_VERSION(3, 0),
+        0x1111111111111111ull,
+    };
+    const ProgrammableShaderFunctionIdentity programmablePs{
+        true,
+        true,
+        96u,
+        D3DPS_VERSION(3, 0),
+        0x2222222222222222ull,
+    };
+
+    const auto programmablePair =
+        seal_programmable_shader_pair_cache_identity(
+            true, false, programmableVs, programmablePs);
+    require(
+        programmablePair.exact_identity() &&
+        programmablePair.cacheKey != 0 &&
+        !programmablePair.translationImplemented,
+        "R239 programmable pair identity/cache key prerequisite");
+
+    const auto programmablePairRepeat =
+        seal_programmable_shader_pair_cache_identity(
+            true, false, programmableVs, programmablePs);
+    require(
+        programmablePairRepeat.exact_identity() &&
+        programmablePairRepeat.cacheKey == programmablePair.cacheKey,
+        "R239 programmable pair cache key must be deterministic");
+
+    auto changedProgrammablePs = programmablePs;
+    changedProgrammablePs.bytecodeHash ^= 1ull;
+    const auto changedProgrammablePair =
+        seal_programmable_shader_pair_cache_identity(
+            true, false, programmableVs, changedProgrammablePs);
+    require(
+        changedProgrammablePair.exact_identity() &&
+        changedProgrammablePair.cacheKey != programmablePair.cacheKey,
+        "R239 programmable pair cache key must include PS bytecode identity");
+
+    const auto incompleteProgrammablePair =
+        seal_programmable_shader_pair_cache_identity(
+            false, false, programmableVs, programmablePs);
+    require(
+        !incompleteProgrammablePair.exact_identity() &&
+        (incompleteProgrammablePair.unsupported &
+         ProgrammableShaderPairIdentityUnsupportedIncompleteObservation) != 0,
+        "R239 incomplete programmable observation must fail closed");
+
+    const auto mixedProgrammablePair =
+        seal_programmable_shader_pair_cache_identity(
+            true, true, programmableVs, programmablePs);
+    require(
+        !mixedProgrammablePair.exact_identity() &&
+        (mixedProgrammablePair.unsupported &
+         ProgrammableShaderPairIdentityUnsupportedMixedPair) != 0,
+        "R239 mixed programmable pair must fail closed");
+
+    auto invalidProgrammableVs = programmableVs;
+    invalidProgrammableVs.byteSize = 127u;
+    const auto invalidBytecodePair =
+        seal_programmable_shader_pair_cache_identity(
+            true, false, invalidProgrammableVs, programmablePs);
+    require(
+        !invalidBytecodePair.exact_identity() &&
+        (invalidBytecodePair.unsupported &
+         ProgrammableShaderPairIdentityUnsupportedInvalidVertexBytecode) != 0,
+        "R239 non-DWORD-aligned VS bytecode must fail closed");
+
+    invalidProgrammableVs = programmableVs;
+    invalidProgrammableVs.versionToken = D3DPS_VERSION(3, 0);
+    const auto invalidVersionPair =
+        seal_programmable_shader_pair_cache_identity(
+            true, false, invalidProgrammableVs, programmablePs);
+    require(
+        !invalidVersionPair.exact_identity() &&
+        (invalidVersionPair.unsupported &
+         ProgrammableShaderPairIdentityUnsupportedInvalidVertexVersion) != 0,
+        "R239 stage-mismatched VS version token must fail closed");
+
+    auto missingHashPs = programmablePs;
+    missingHashPs.bytecodeHash = 0;
+    const auto missingHashPair =
+        seal_programmable_shader_pair_cache_identity(
+            true, false, programmableVs, missingHashPs);
+    require(
+        !missingHashPair.exact_identity() &&
+        (missingHashPair.unsupported &
+         ProgrammableShaderPairIdentityUnsupportedMissingPixelHash) != 0,
+        "R239 zero PS bytecode hash must fail closed");
+
     constexpr const char* vertexShaderSource = R"(
 struct VSInput
 {

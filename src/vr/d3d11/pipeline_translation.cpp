@@ -1401,6 +1401,126 @@ namespace outrun::vr::dx11
         return out;
     }
 
+    ProgrammableShaderPairCacheIdentity
+    seal_programmable_shader_pair_cache_identity(
+        bool observationComplete,
+        bool mixedPair,
+        const ProgrammableShaderFunctionIdentity& vertexShader,
+        const ProgrammableShaderFunctionIdentity& pixelShader) noexcept
+    {
+        ProgrammableShaderPairCacheIdentity out{};
+        out.vertexShader = vertexShader;
+        out.pixelShader = pixelShader;
+
+        if (!observationComplete ||
+            !vertexShader.observed ||
+            !pixelShader.observed)
+        {
+            out.unsupported |=
+                ProgrammableShaderPairIdentityUnsupportedIncompleteObservation;
+        }
+        if (mixedPair)
+        {
+            out.unsupported |=
+                ProgrammableShaderPairIdentityUnsupportedMixedPair;
+        }
+        if (!vertexShader.present)
+        {
+            out.unsupported |=
+                ProgrammableShaderPairIdentityUnsupportedMissingVertexShader;
+        }
+        if (!pixelShader.present)
+        {
+            out.unsupported |=
+                ProgrammableShaderPairIdentityUnsupportedMissingPixelShader;
+        }
+
+        const auto valid_bytecode_size = [](UINT byteSize) noexcept
+        {
+            return byteSize >= 8u && (byteSize % sizeof(DWORD)) == 0u;
+        };
+        if (vertexShader.present &&
+            !valid_bytecode_size(vertexShader.byteSize))
+        {
+            out.unsupported |=
+                ProgrammableShaderPairIdentityUnsupportedInvalidVertexBytecode;
+        }
+        if (pixelShader.present &&
+            !valid_bytecode_size(pixelShader.byteSize))
+        {
+            out.unsupported |=
+                ProgrammableShaderPairIdentityUnsupportedInvalidPixelBytecode;
+        }
+
+        const auto valid_vs_version = [](DWORD token) noexcept
+        {
+            return token == D3DVS_VERSION(1, 1) ||
+                   token == D3DVS_VERSION(2, 0) ||
+                   token == D3DVS_VERSION(3, 0);
+        };
+        const auto valid_ps_version = [](DWORD token) noexcept
+        {
+            return token == D3DPS_VERSION(1, 1) ||
+                   token == D3DPS_VERSION(1, 2) ||
+                   token == D3DPS_VERSION(1, 3) ||
+                   token == D3DPS_VERSION(1, 4) ||
+                   token == D3DPS_VERSION(2, 0) ||
+                   token == D3DPS_VERSION(3, 0);
+        };
+        if (vertexShader.present &&
+            !valid_vs_version(vertexShader.versionToken))
+        {
+            out.unsupported |=
+                ProgrammableShaderPairIdentityUnsupportedInvalidVertexVersion;
+        }
+        if (pixelShader.present &&
+            !valid_ps_version(pixelShader.versionToken))
+        {
+            out.unsupported |=
+                ProgrammableShaderPairIdentityUnsupportedInvalidPixelVersion;
+        }
+
+        if (vertexShader.present && vertexShader.bytecodeHash == 0)
+        {
+            out.unsupported |=
+                ProgrammableShaderPairIdentityUnsupportedMissingVertexHash;
+        }
+        if (pixelShader.present && pixelShader.bytecodeHash == 0)
+        {
+            out.unsupported |=
+                ProgrammableShaderPairIdentityUnsupportedMissingPixelHash;
+        }
+
+        if (out.unsupported !=
+            ProgrammableShaderPairIdentityUnsupportedNone)
+        {
+            return out;
+        }
+
+        std::uint64_t key = 1469598103934665603ull;
+        const auto mix = [&key](std::uint64_t value) noexcept
+        {
+            for (UINT byte = 0; byte < sizeof(value); ++byte)
+            {
+                key ^= (value >> (byte * 8u)) & 0xffu;
+                key *= 1099511628211ull;
+            }
+        };
+
+        // Stage tags keep an otherwise identical numeric tuple from aliasing
+        // after accidental VS/PS field reordering.
+        mix(0x5653000000000000ull); // "VS"
+        mix(vertexShader.byteSize);
+        mix(vertexShader.versionToken);
+        mix(vertexShader.bytecodeHash);
+        mix(0x5053000000000000ull); // "PS"
+        mix(pixelShader.byteSize);
+        mix(pixelShader.versionToken);
+        mix(pixelShader.bytecodeHash);
+        out.cacheKey = key == 0 ? 1 : key;
+        return out;
+    }
+
     FixedFunctionTransformConstants
     generate_fixed_function_transform_constants(
         const D3DMATRIX& world,
