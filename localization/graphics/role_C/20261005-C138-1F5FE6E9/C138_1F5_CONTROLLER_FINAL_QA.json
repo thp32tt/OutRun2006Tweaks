@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C138",
+  "timestamp_kst": "2026-10-05T07:02:38+09:00",
+  "scope": "latest unfinished B_PRODUCTION51 1F5FE6E9 only; completed C135 and earlier PASS assets were not repeated",
+  "asset": "1F5FE6E9",
+  "queue_index": 132,
+  "producer_run": "B_PRODUCTION51",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION51/B51_FAIL_CLOSED.json",
+  "candidate_written": false,
+  "candidate_approved": false,
+  "known_structure": {
+    "width": 1024,
+    "height": 512,
+    "format": "RGBA32",
+    "raw_orientation": "mirror_y"
+  },
+  "known_semantics": [
+    "REQUEST -> 요청",
+    "SPECIAL REQUEST 1 -> 스페셜 요청 1",
+    "SPECIAL REQUEST 2 -> 스페셜 요청 2",
+    "SPECIAL REQUEST 3 -> 스페셜 요청 3"
+  ],
+  "evidence": {
+    "b51_latest_fail": "row1 alpha-aware source mask bbox [638,140,770,179] reaches expanded measurement edge; exact source mask remains ambiguous",
+    "c136_report": "localization/graphics/role_C/20261005-C136-1F5FE6E9-DIAG/C136_1F5_SOURCE_ROW_DIAGNOSTIC.json",
+    "c137_report": "localization/graphics/role_C/20261005-C137-1F5FE6E9-DIAG/C137_1F5_SOURCE_ROW_DIAGNOSTIC.json",
+    "c138_hosted_run_id": 37238289961,
+    "c138_fail": "no clean row separator near expected boundary 172; minimum at y=169 still has 87 active alpha pixels"
+  },
+  "policy_reason": "Exact original glyph/effect bbox is unresolved, so zero-pixel-overflow containment cannot be proven. Historical localized plate rectangles are not valid substitutes for exact source glyph/effect bounds.",
+  "machine_status": "FAIL_CLOSED",
+  "controller_visual_qa": "NOT_APPROVABLE",
+  "decision": "REWORK_REQUIRED",
+  "rework_instructions": [
+    "derive exact source effect masks per physical row from canonical source, excluding panel borders and adjacent row alpha effects",
+    "prove four source bboxes independently before Korean render",
+    "after render, require exact bbox/size ceilings, positive separation, zero residue/outside/overlap, and readable/raw mirror_y controller visual QA"
+  ],
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

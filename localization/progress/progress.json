@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T06:28:21+09:00",
+  "updated_at_kst": "2026-10-05T07:02:38+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C135 finalizes EBFC709F with all four physical JOIN/CREATE occurrences localized from exact-source line measurement. Producer REWORK=0; pending_artwork localize_text=39; 1A43E9D9 remains HIGH_RISK pending mandatory in-game validation; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
+  "next_checkpoint": "C138 returns 1F5FE6E9 to REWORK_REQUIRED because exact source glyph/effect masks remain ambiguous after B51+C diagnostics; producer REWORK=1, pending_artwork localize_text=38. 1A43E9D9 remains HIGH_RISK pending mandatory in-game validation; 4F68708E/F6811E94 remain strict DXT5 no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,10 +265,12 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "ZERO_PRODUCER_REWORK_REQUIRED",
-      "assets": [],
-      "remaining": 0,
-      "note": "EBFC709F B48/B49/B50 discovery/font failures resolved by C134/C135 final candidate 7404fa227035e2fa003f4fa13f1bd348a050317757d7761c9d638f5fc1a01da4. 1A43E9D9 remains HIGH_RISK static PASS pending in-game; 4F68708E/F6811E94 remain strict no-candidate HOLD. RUNTIME_VALIDATION=UNTESTED.",
+      "status": "REWORK_REQUIRED",
+      "assets": [
+        "1F5FE6E9"
+      ],
+      "remaining": 1,
+      "note": "1F5FE6E9 requires exact per-row source alpha/effect mask reconstruction before any candidate can be approved; C138 fail-closed evidence is authoritative.",
       "pending_c": []
     },
     "latest_d_final_qa": {
@@ -293,33 +295,35 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C135",
-      "report": "localization/graphics/role_C/20261005-C135-EBFC709F/C135_EBFC_CONTROLLER_FINAL_QA.json",
-      "result": "1_PIXEL_VISUAL_PASS_GLOBAL_0_REWORK_REMAIN",
-      "candidate_changed_by_C": true,
+      "run": "C138",
+      "report": "localization/graphics/role_C/20261005-C138-1F5FE6E9/C138_1F5_CONTROLLER_FINAL_QA.json",
+      "result": "1_REWORK_REQUIRED_NO_APPROVED_CANDIDATE",
+      "candidate_changed_by_C": false,
       "assets_checked": 1,
       "physical_elements_checked": 4,
-      "pixel_visual_pass_assets": [
-        "EBFC709F"
-      ],
+      "pixel_visual_pass_assets": [],
       "high_risk_static_pass_assets_existing": [
         "1A43E9D9"
       ],
-      "rework_required_assets": [],
-      "global_rework_remaining": [],
+      "rework_required_assets": [
+        "1F5FE6E9"
+      ],
+      "global_rework_remaining": [
+        "1F5FE6E9"
+      ],
       "strict_hold_no_candidate": [
         "4F68708E",
         "F6811E94"
       ],
       "pending_c_localize_text": 0,
-      "pending_production_localize_text": 39,
+      "pending_production_localize_text": 38,
       "machine_evidence": {
-        "EBFC709F": "localization/graphics/role_C/20261005-C135-EBFC709F/C135_EBFC_MACHINE_QA.json"
+        "1F5FE6E9": "C138 FAIL_CLOSED; exact source masks unresolved"
       },
       "controller_visual": {
-        "EBFC709F": "PASS"
+        "1F5FE6E9": "NOT_APPROVABLE"
       },
-      "in_game_validation": "PENDING; 1A43E9D9 remains REQUIRED_BEFORE_FINAL_APPROVAL; C135 RUNTIME_VALIDATION=UNTESTED"
+      "in_game_validation": "NOT_APPLICABLE_TO_FAILED_STATIC_QA; RUNTIME_VALIDATION=UNTESTED"
     },
     "latest_b_first_qa": {
       "run": "B_RECOVERY04_05",

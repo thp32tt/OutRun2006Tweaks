@@ -1050,3 +1050,13 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Decision: `C135_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME`. Producer REWORK=0; pending_artwork localize_text=39. 1A43E9D9 remains HIGH_RISK pending in-game; 4F68708E/F6811E94 remain strict HOLD.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C135-EBFC709F/C135_EBFC_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_C/20261005-C135-EBFC709F/C135_EBFC_MACHINE_QA.json`, `localization/graphics/role_C/20261005-C134-EBFC709F-DIAG/C134_EBFC_SOURCE_LINE_DIAGNOSTIC.json`.
+
+## 2026-10-05 07:02:38 KST — C138 1F5FE6E9 RETURN / REWORK_REQUIRED
+- Reviewed only the newest unfinished B_PRODUCTION51 index 132 `1F5FE6E9_1024x512.dds`; completed C135 and earlier PASS assets were not repeated.
+- B51 established raw `mirror_y` and four intended rows, but repeated hosted attempts failed before a safe candidate. Latest alpha-aware attempt measured row1 as `[638,140,770,179]` and hit the expanded measurement edge, so exact source glyph/effect scope remains ambiguous.
+- C136/C137 independently confirmed the historical Korean rectangles are location evidence only, not authoritative source glyph boxes. C138 then tried canonical-source alpha row partitioning; hosted run `37238289961` failed closed because the first expected row separator had no clean gap (minimum y=169 still 87 active alpha pixels).
+- Under the zero-pixel-overflow rule, C cannot substitute plate/cell bounds for exact source glyph/effect bounds. No candidate was approved or promoted.
+- Decision: `C138_REWORK_REQUIRED_EXACT_SOURCE_MASK_AMBIGUITY`. Producer REWORK=1; pending_artwork localize_text=38. Next producer must derive exact per-row canonical source masks and rerun full containment/visual QA.
+- Existing 1A43E9D9 HIGH_RISK in-game requirement and 4F68708E/F6811E94 strict HOLD remain unchanged.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_C/20261005-C138-1F5FE6E9/C138_1F5_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION51/B51_FAIL_CLOSED.json`, `localization/graphics/role_C/20261005-C136-1F5FE6E9-DIAG/C136_1F5_SOURCE_ROW_DIAGNOSTIC.json`, `localization/graphics/role_C/20261005-C137-1F5FE6E9-DIAG/C137_1F5_SOURCE_ROW_DIAGNOSTIC.json`.
