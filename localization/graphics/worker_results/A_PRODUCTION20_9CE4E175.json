@@ -1,0 +1,24 @@
+{
+  "run": "20261005-A-PRODUCTION20",
+  "asset": "9CE4E175",
+  "index": 195,
+  "source_sha256": "6fee06730412c51e8f1e3db19ad1d43a12ce3eb9df8806812a46818715d92b2b",
+  "candidate_sha256": "4250de8d63f2d5acd7916a25e87a9b4920d4b50df4a38a1c3a87b02474da2902",
+  "source_dimensions": [
+    1024,
+    128
+  ],
+  "format": "RGBA32",
+  "bbox_pass": "1/1",
+  "size_ceiling": "1/1",
+  "positive_margin": "1/1",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "changed_pixels_outside_source_bbox": 0,
+  "alpha_changed_pixels_outside_source_bbox": 0,
+  "protected_visible_pixels_changed": 0,
+  "clean_plate_source_text_residue_pixels": 0,
+  "worker_status": "A_PRODUCTION20_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261005-A-PRODUCTION20/A_PRODUCTION20_9CE4E175_REPORT.json"
+}
