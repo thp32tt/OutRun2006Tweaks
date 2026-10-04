@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T00:44:00+09:00",
+  "updated_at_kst": "2026-10-05T01:01:11+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "A_RECOVERY11 BF3EE5C6 and A_RECOVERY12 C075FB49 now resolve C109 source-slant returns with A static/visual self-QA PASS. BF3EE5C6 also has C110 independent machine PASS pending C controller visual/final QA; C075FB49 changed SHA d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633 awaits independent C final QA. Remaining producer REWORK is FD90AA9 source slant plus even-lane 53CE39D5/788CE557 source residue; pending_artwork localize_text remains 50.",
+  "next_checkpoint": "C111 final QA advanced BF3EE5C6 and C075FB49 to pixel/visual policy PASS pending isolated in-game validation. Remaining producer REWORK is 53CE39D5/788CE557 source-residue reconstruction and FD90AA9 source-slant rerender; pending_artwork localize_text remains 50.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -272,7 +272,7 @@
         "FD90AA9"
       ],
       "remaining": 3,
-      "note": "BF3EE5C6 and C075FB49 moved to A self-QA PASS pending C final QA."
+      "note": "C111 independently finalized BF3EE5C6 and C075FB49 static pixel/visual policy PASS; both remain RUNTIME_VALIDATION=UNTESTED."
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -296,29 +296,27 @@
       "A064FDFC": "FINAL_STATIC_QA_PASS_HOLD_PENDING_INGAME"
     },
     "latest_c_strict_qa": {
-      "run": "C109",
-      "report": "localization/graphics/role_C/20261004-C109-PENDING-AND-C075/C109_CONTROLLER_FINAL_QA.json",
-      "result": "2_PIXEL_VISUAL_PASS_3_SCOPE_REWORK_GLOBAL_5_REWORK_REMAIN",
+      "run": "C111",
+      "report": "localization/graphics/role_C/20261005-C111-C075-FINAL/C111_CROSS_LANE_FINAL_QA.json",
+      "result": "2_PIXEL_VISUAL_PASS_GLOBAL_3_REWORK_REMAIN",
       "candidate_changed_by_C": false,
-      "assets_checked": 5,
+      "assets_checked": 2,
       "pixel_visual_pass_assets": [
-        "AD720950",
-        "2B0863D6"
-      ],
-      "rework_required_assets": [
         "BF3EE5C6",
-        "C075FB49",
-        "FD90AA9"
+        "C075FB49"
       ],
+      "rework_required_assets": [],
       "global_rework_remaining": [
-        "BF3EE5C6",
         "53CE39D5",
         "788CE557",
-        "C075FB49",
         "FD90AA9"
       ],
       "pending_c_localize_text": 0,
       "pending_production_localize_text": 50,
+      "machine_evidence": {
+        "BF3EE5C6": "localization/graphics/role_C/20261005-C110-NEW-AB/C110_BF3EE5C6_MACHINE_QA.json",
+        "C075FB49": "localization/graphics/role_C/20261005-C111-C075-FINAL/C111_C075FB49_MACHINE_QA.json"
+      },
       "in_game_validation": "PENDING_ISOLATED_DDS_ONLY"
     },
     "latest_b_first_qa": {

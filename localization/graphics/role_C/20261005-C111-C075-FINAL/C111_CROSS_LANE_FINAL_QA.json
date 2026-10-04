@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "C111",
+  "timestamp_kst": "2026-10-05T01:01:11+09:00",
+  "scope": "cross-lane final QA of unfinished A_RECOVERY11/A_RECOVERY12 approval candidates only",
+  "candidate_changed_by_C": false,
+  "assets": {
+    "BF3EE5C6": {
+      "queue_index": 49,
+      "candidate_sha256": "7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68",
+      "producer_run": "A_RECOVERY11",
+      "machine_qa_report": "localization/graphics/role_C/20261005-C110-NEW-AB/C110_BF3EE5C6_MACHINE_QA.json",
+      "machine_qa": "PASS",
+      "machine_checks": {
+        "bbox_and_size": "13/13 PASS",
+        "source_text_residue_pixels": 0,
+        "outside_allowed_pixels": 0,
+        "protected_overlap_pixels": 0,
+        "localized_pair_overlap_pixels": 0,
+        "localized_touch_pairs": []
+      },
+      "controller_visual_qa": "PASS",
+      "visual_evidence": [
+        "localization/graphics/role_A/20261005-A-RECOVERY11/A_RECOVERY11_ROW_CONTACT_SOURCE_OLD_NEW.jpg",
+        "localization/graphics/role_A/20261005-A-RECOVERY11/A_RECOVERY11_SOURCE_OLD_FINAL_GRAY.jpg",
+        "localization/graphics/role_A/20261005-A-RECOVERY11/A_RECOVERY11_FINAL_RAW_GRAY.jpg"
+      ],
+      "visual_notes": "C controller SOURCE|OLD|NEW row, full-atlas and raw mirror_y review confirms the C109-returned source italic/right-slant geometry is restored while fill/outline/shadow families remain source-faithful. No visible source residue, clipping, localized-label overlap/touch, seam, halo, or protected-art damage.",
+      "decision": "C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    },
+    "C075FB49": {
+      "queue_index": 111,
+      "candidate_sha256": "d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633",
+      "producer_run": "A_RECOVERY12",
+      "machine_qa_report": "localization/graphics/role_C/20261005-C111-C075-FINAL/C111_C075FB49_MACHINE_QA.json",
+      "machine_qa": "PASS",
+      "machine_checks": {
+        "bbox_and_size": "17/17 PASS",
+        "top_source_text_residue_pixels": 0,
+        "outside_allowed_pixels": 0,
+        "protected_overlap_pixels": 0,
+        "localized_pair_overlap_pixels": 0,
+        "localized_touch_pairs": [],
+        "preserved_lower_and_source_labels_exact": true
+      },
+      "controller_visual_qa": "PASS",
+      "visual_evidence": [
+        "localization/graphics/role_A/20261005-A-RECOVERY12/A_RECOVERY12_TOP_ROW_CONTACT_SOURCE_OLD_NEW.jpg",
+        "localization/graphics/role_A/20261005-A-RECOVERY12/A_RECOVERY12_SOURCE_OLD_FINAL_GRAY.jpg",
+        "localization/graphics/role_A/20261005-A-RECOVERY12/A_RECOVERY12_FINAL_RAW_GRAY.jpg"
+      ],
+      "visual_notes": "C controller dense-top SOURCE|OLD|NEW, full-atlas and raw mirror_y review confirms the eight C109-returned labels now follow the source right-slanted families. Lower nine localized rows and OutRun2SP/OutRun2/1P are preserved; no visible source residue, clipping, overlap/touch, seam, halo, or protected-art damage.",
+      "decision": "C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME"
+    }
+  },
+  "deferred_in_flight": {
+    "53CE39D5": "B_PRODUCTION25 worker output is not a completed producer handoff and the latest branch already contains a newer B rework script commit (04887a5) targeting residual shadow pixels; C did not approve or overwrite this in-flight producer result."
+  },
+  "remaining_global_producer_rework": [
+    "53CE39D5",
+    "788CE557",
+    "FD90AA9"
+  ],
+  "runtime_validation": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}

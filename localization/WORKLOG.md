@@ -1193,3 +1193,10 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Controller dense-top SOURCE|OLD|NEW, native-width top band, full SOURCE/OLD/FINAL and raw-orientation review PASS. The Korean labels now visibly reproduce the source right-leaning italic/slant geometry without new residue, clipping, overlap, seam, halo, protected-art damage or orientation regression.
 - Current pending_artwork localize_text count: 50; localize_text rows still carrying producer REWORK/HOLD status: 3 (100,106,121). RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_A/20261005-A-RECOVERY12/.
+## 2026-10-05T01:01:11+09:00 — C111 BF3EE5C6 + C075FB49 cross-lane final QA
+- Reviewed only unfinished C approval candidates from A_RECOVERY11/A_RECOVERY12; previously completed C109/C108 assets were not repeated.
+- BF3EE5C6 candidate 7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68: C110 independent machine QA PASS (13/13 exact bbox+source-size ceiling; source residue/outside/protected/overlap/touch=0). C controller SOURCE|OLD|NEW row, full-atlas and raw mirror_y visual QA PASS; the C109-returned right-slanted source style is restored without clipping, overlap, residue, seam, halo or protected-art damage.
+- C075FB49 candidate d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633: C111 hosted independent machine QA PASS (17/17 exact bbox+source-size ceiling; top source residue=0; outside/protected=0; overlap/touch=0; lower localized rows and OutRun2SP/OutRun2/1P preserved exact). C dense-top/full/raw visual QA PASS; the eight returned source-slant families are restored.
+- Both advance to C111_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME. Remaining producer REWORK is 53CE39D5, 788CE557 and FD90AA9. B_PRODUCTION25 53CE39D5 was not consumed because the producer had already started a newer residual-shadow reconstruction on the current branch.
+- RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261005-C111-C075-FINAL/C111_CROSS_LANE_FINAL_QA.json
