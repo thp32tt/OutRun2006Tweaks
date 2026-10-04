@@ -3,7 +3,7 @@
   "role": "A",
   "run": "20261004-A-RECOVERY09",
   "worker": "github-actions",
-  "base_head": "61cff88a2dbe5c9bddbe326974e445183adcc8ac",
+  "base_head": "f037cbedee4cdc085461c830b26b17e06018e3b8",
   "index": 57,
   "asset": "textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
   "return_reason": "C_OVERLAP05 controller visual FAIL: source-English residue/layer overlap despite machine 15/15 placement",
@@ -18,7 +18,7 @@
   "source_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
   "rejected_c_candidate_sha256": "dfa2c39fba8c397191af804767ede25fef35f92b5b21f583130190b701bdb9a4",
   "rejected_c_worker_commit": "ddfc5afbff650bfefe6e7de55d39f20a1f109450",
-  "candidate_sha256": "9bd826203c31ecfcb5a1b92687e198283782e1a9971cb99345cf361ea54c0752",
+  "candidate_sha256": "5e4ef9f45e073301e38020558ec55e3517cca8c9e6cef227d2368870f2707d58",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
   "structure": {
     "dimensions": [
@@ -34,7 +34,7 @@
   },
   "repair_method": {
     "clean_plate": "replace full exact source text/effect bbox for all 15 targets; transparent overlays become transparent, three Total Rank labels receive row-wise source-art interior reconstruction",
-    "korean_layer": "reuse only C_OVERLAP05 candidate pixels that differ from C_FULL_CLEAN inside each C-validated new_effect_bbox; unchanged English/source residue is intentionally excluded",
+    "korean_layer": "fresh target-specific source-family Korean render; C candidate pixels are not reused, preventing prior black/gray source-layer overdraw from returning",
     "non_target_art": "source pixels outside exact 15 allowed bboxes remain byte/pixel identical"
   },
   "clean_plate_validator": {
@@ -44,7 +44,7 @@
       4096,
       4096
     ],
-    "changed_pixels": 2281344,
+    "changed_pixels": 2250420,
     "changed_bbox": [
       128,
       5,
@@ -63,7 +63,7 @@
       4096,
       4096
     ],
-    "changed_pixels": 2352760,
+    "changed_pixels": 2357812,
     "changed_bbox": [
       128,
       5,
@@ -76,7 +76,7 @@
     "status": "PASS"
   },
   "decoded_changes": {
-    "changed_pixels_total": 2352760,
+    "changed_pixels_total": 2357812,
     "changed_pixels_outside_original_bboxes": 0,
     "alpha_changed_pixels_outside_original_bboxes": 0,
     "protected_visible_pixels_changed": 0,
@@ -96,19 +96,19 @@
         102
       ],
       "localized_bbox": [
-        1814,
-        16,
-        1950,
-        92
+        1802,
+        9,
+        1960,
+        98
       ],
       "source_width": 333,
       "source_height": 97,
-      "localized_width": 136,
-      "localized_height": 76,
-      "delta_left": 99,
-      "delta_right": 98,
-      "delta_top": 11,
-      "delta_bottom": 10,
+      "localized_width": 158,
+      "localized_height": 89,
+      "delta_left": 87,
+      "delta_right": 88,
+      "delta_top": 4,
+      "delta_bottom": 4,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -119,14 +119,15 @@
         4091
       ],
       "raw_localized_bbox": [
-        1814,
-        4004,
-        1950,
-        4080
+        1802,
+        3998,
+        1960,
+        4087
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 8844,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 9624,
+      "font_size": 79,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -140,19 +141,19 @@
         259
       ],
       "localized_bbox": [
-        2509,
-        94,
-        3495,
-        243
+        2444,
+        81,
+        3558,
+        255
       ],
       "source_width": 1217,
       "source_height": 182,
-      "localized_width": 986,
-      "localized_height": 149,
-      "delta_left": 116,
-      "delta_right": 115,
-      "delta_top": 17,
-      "delta_bottom": 16,
+      "localized_width": 1114,
+      "localized_height": 174,
+      "delta_left": 51,
+      "delta_right": 52,
+      "delta_top": 4,
+      "delta_bottom": 4,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -163,14 +164,15 @@
         4019
       ],
       "raw_localized_bbox": [
-        2509,
-        3853,
-        3495,
-        4002
+        2444,
+        3841,
+        3558,
+        4015
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 111942,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 113365,
+      "font_size": 164,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -184,19 +186,19 @@
         787
       ],
       "localized_bbox": [
-        266,
-        306,
-        1450,
-        737
+        134,
+        338,
+        1581,
+        704
       ],
       "source_width": 1459,
       "source_height": 531,
-      "localized_width": 1184,
-      "localized_height": 431,
-      "delta_left": 138,
-      "delta_right": 137,
-      "delta_top": 50,
-      "delta_bottom": 50,
+      "localized_width": 1447,
+      "localized_height": 366,
+      "delta_left": 6,
+      "delta_right": 6,
+      "delta_top": 82,
+      "delta_bottom": 83,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -207,14 +209,15 @@
         3840
       ],
       "raw_localized_bbox": [
-        266,
-        3359,
-        1450,
-        3790
+        134,
+        3392,
+        1581,
+        3758
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 374167,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 352394,
+      "font_size": 336,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -228,19 +231,19 @@
         1075
       ],
       "localized_bbox": [
-        578,
-        920,
-        1033,
-        1050
+        518,
+        908,
+        1095,
+        1062
       ],
       "source_width": 589,
       "source_height": 179,
-      "localized_width": 455,
-      "localized_height": 130,
-      "delta_left": 66,
-      "delta_right": 68,
-      "delta_top": 24,
-      "delta_bottom": 25,
+      "localized_width": 577,
+      "localized_height": 154,
+      "delta_left": 6,
+      "delta_right": 6,
+      "delta_top": 12,
+      "delta_bottom": 13,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -251,14 +254,15 @@
         3200
       ],
       "raw_localized_bbox": [
-        578,
-        3046,
-        1033,
-        3176
+        518,
+        3034,
+        1095,
+        3188
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 50236,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 61954,
+      "font_size": 144,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -272,19 +276,19 @@
         998
       ],
       "localized_bbox": [
-        1776,
-        870,
-        2850,
-        985
+        1755,
+        862,
+        2872,
+        994
       ],
       "source_width": 1323,
       "source_height": 140,
-      "localized_width": 1074,
-      "localized_height": 115,
-      "delta_left": 124,
-      "delta_right": 125,
-      "delta_top": 12,
-      "delta_bottom": 13,
+      "localized_width": 1117,
+      "localized_height": 132,
+      "delta_left": 103,
+      "delta_right": 103,
+      "delta_top": 4,
+      "delta_bottom": 4,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -295,14 +299,15 @@
         3238
       ],
       "raw_localized_bbox": [
-        1776,
-        3111,
-        2850,
-        3226
+        1755,
+        3102,
+        2872,
+        3234
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 119583,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 83793,
+      "font_size": 125,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -316,19 +321,19 @@
         1267
       ],
       "localized_bbox": [
-        1736,
-        1129,
-        2532,
-        1254
+        1806,
+        1118,
+        2461,
+        1263
       ],
       "source_width": 980,
       "source_height": 153,
-      "localized_width": 796,
-      "localized_height": 125,
-      "delta_left": 92,
-      "delta_right": 92,
-      "delta_top": 15,
-      "delta_bottom": 13,
+      "localized_width": 655,
+      "localized_height": 145,
+      "delta_left": 162,
+      "delta_right": 163,
+      "delta_top": 4,
+      "delta_bottom": 4,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -339,14 +344,15 @@
         2982
       ],
       "raw_localized_bbox": [
-        1736,
-        2842,
-        2532,
-        2967
+        1806,
+        2833,
+        2461,
+        2978
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 90196,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 61134,
+      "font_size": 136,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -360,19 +366,19 @@
         640
       ],
       "localized_bbox": [
-        2656,
+        2653,
         559,
-        2788,
-        634
+        2797,
+        636
       ],
       "source_width": 200,
       "source_height": 85,
-      "localized_width": 132,
-      "localized_height": 75,
-      "delta_left": 31,
-      "delta_right": 37,
+      "localized_width": 144,
+      "localized_height": 77,
+      "delta_left": 28,
+      "delta_right": 28,
       "delta_top": 4,
-      "delta_bottom": 6,
+      "delta_bottom": 4,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -383,14 +389,15 @@
         3541
       ],
       "raw_localized_bbox": [
-        2656,
-        3462,
-        2788,
+        2653,
+        3460,
+        2797,
         3537
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 8299,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 7221,
+      "font_size": 76,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -404,19 +411,19 @@
         1085
       ],
       "localized_bbox": [
-        2504,
-        1023,
-        2620,
-        1078
+        2521,
+        1020,
+        2627,
+        1081
       ],
       "source_width": 175,
       "source_height": 69,
-      "localized_width": 116,
-      "localized_height": 55,
-      "delta_left": 17,
-      "delta_right": 42,
-      "delta_top": 7,
-      "delta_bottom": 7,
+      "localized_width": 106,
+      "localized_height": 61,
+      "delta_left": 34,
+      "delta_right": 35,
+      "delta_top": 4,
+      "delta_bottom": 4,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -427,14 +434,15 @@
         3080
       ],
       "raw_localized_bbox": [
-        2504,
-        3018,
-        2620,
-        3073
+        2521,
+        3015,
+        2627,
+        3076
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 5153,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 4028,
+      "font_size": 54,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -448,18 +456,18 @@
         1085
       ],
       "localized_bbox": [
-        3018,
-        1023,
-        3124,
+        3023,
+        1020,
+        3083,
         1080
       ],
       "source_width": 156,
       "source_height": 69,
-      "localized_width": 106,
-      "localized_height": 57,
-      "delta_left": 43,
-      "delta_right": 7,
-      "delta_top": 7,
+      "localized_width": 60,
+      "localized_height": 60,
+      "delta_left": 48,
+      "delta_right": 48,
+      "delta_top": 4,
       "delta_bottom": 5,
       "containment": "PASS",
       "size_ceiling": "PASS",
@@ -471,14 +479,15 @@
         3080
       ],
       "raw_localized_bbox": [
-        3018,
+        3023,
         3016,
-        3124,
-        3073
+        3083,
+        3076
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 3809,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 2843,
+      "font_size": 58,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -492,19 +501,19 @@
         1106
       ],
       "localized_bbox": [
-        3186,
-        1022,
-        3609,
-        1102
+        3168,
+        1029,
+        3628,
+        1093
       ],
       "source_width": 470,
       "source_height": 89,
-      "localized_width": 423,
-      "localized_height": 80,
-      "delta_left": 23,
-      "delta_right": 24,
-      "delta_top": 5,
-      "delta_bottom": 4,
+      "localized_width": 460,
+      "localized_height": 64,
+      "delta_left": 5,
+      "delta_right": 5,
+      "delta_top": 12,
+      "delta_bottom": 13,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -515,14 +524,15 @@
         3079
       ],
       "raw_localized_bbox": [
-        3186,
-        2994,
-        3609,
-        3074
+        3168,
+        3003,
+        3628,
+        3067
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 26492,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 19411,
+      "font_size": 58,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -536,19 +546,19 @@
         1281
       ],
       "localized_bbox": [
-        3104,
-        1150,
-        3474,
-        1274
+        3166,
+        1147,
+        3411,
+        1276
       ],
       "source_width": 411,
       "source_height": 138,
-      "localized_width": 370,
-      "localized_height": 124,
-      "delta_left": 21,
-      "delta_right": 20,
-      "delta_top": 7,
-      "delta_bottom": 7,
+      "localized_width": 245,
+      "localized_height": 129,
+      "delta_left": 83,
+      "delta_right": 83,
+      "delta_top": 4,
+      "delta_bottom": 5,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -559,14 +569,15 @@
         2953
       ],
       "raw_localized_bbox": [
-        3104,
-        2822,
-        3474,
-        2946
+        3166,
+        2820,
+        3411,
+        2949
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 39269,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 24176,
+      "font_size": 124,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -580,19 +591,19 @@
         1267
       ],
       "localized_bbox": [
-        3496,
+        3491,
         1176,
-        3972,
-        1262
+        3976,
+        1263
       ],
       "source_width": 529,
       "source_height": 95,
-      "localized_width": 476,
-      "localized_height": 86,
-      "delta_left": 27,
-      "delta_right": 26,
+      "localized_width": 485,
+      "localized_height": 87,
+      "delta_left": 22,
+      "delta_right": 22,
       "delta_top": 4,
-      "delta_bottom": 5,
+      "delta_bottom": 4,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -603,14 +614,15 @@
         2924
       ],
       "raw_localized_bbox": [
-        3496,
-        2834,
-        3972,
+        3491,
+        2833,
+        3976,
         2920
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 34442,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 28077,
+      "font_size": 80,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -624,19 +636,19 @@
         1792
       ],
       "localized_bbox": [
-        2100,
-        1304,
-        3130,
-        1743
+        1989,
+        1383,
+        3182,
+        1688
       ],
       "source_width": 1203,
       "source_height": 512,
-      "localized_width": 1030,
-      "localized_height": 439,
-      "delta_left": 116,
-      "delta_right": 57,
-      "delta_top": 24,
-      "delta_bottom": 49,
+      "localized_width": 1193,
+      "localized_height": 305,
+      "delta_left": 5,
+      "delta_right": 5,
+      "delta_top": 103,
+      "delta_bottom": 104,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -647,14 +659,15 @@
         2816
       ],
       "raw_localized_bbox": [
-        2100,
-        2353,
-        3130,
-        2792
+        1989,
+        2408,
+        3182,
+        2713
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 280559,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 252434,
+      "font_size": 277,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -668,19 +681,19 @@
         2099
       ],
       "localized_bbox": [
-        783,
-        1940,
-        1250,
-        2073
+        721,
+        1927,
+        1314,
+        2086
       ],
       "source_width": 601,
       "source_height": 184,
-      "localized_width": 467,
-      "localized_height": 133,
-      "delta_left": 66,
-      "delta_right": 68,
-      "delta_top": 25,
-      "delta_bottom": 26,
+      "localized_width": 593,
+      "localized_height": 159,
+      "delta_left": 4,
+      "delta_right": 4,
+      "delta_top": 12,
+      "delta_bottom": 13,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -691,14 +704,15 @@
         2181
       ],
       "raw_localized_bbox": [
-        783,
-        2023,
-        1250,
-        2156
+        721,
+        2010,
+        1314,
+        2169
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 53590,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 65780,
+      "font_size": 148,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     },
     {
@@ -712,19 +726,19 @@
         2099
       ],
       "localized_bbox": [
-        2666,
-        1927,
-        3170,
-        2070
+        2602,
+        1914,
+        3234,
+        2084
       ],
       "source_width": 640,
       "source_height": 199,
-      "localized_width": 504,
-      "localized_height": 143,
-      "delta_left": 68,
-      "delta_right": 68,
-      "delta_top": 27,
-      "delta_bottom": 29,
+      "localized_width": 632,
+      "localized_height": 170,
+      "delta_left": 4,
+      "delta_right": 4,
+      "delta_top": 14,
+      "delta_bottom": 15,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -735,14 +749,15 @@
         2196
       ],
       "raw_localized_bbox": [
-        2666,
-        2026,
-        3170,
-        2169
+        2602,
+        2012,
+        3234,
+        2182
       ],
       "raw_containment": "PASS",
-      "layer_pixels": 61098,
-      "style": "C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels": 75570,
+      "font_size": 158,
+      "style": "fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status": "A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     }
   ],

@@ -3,7 +3,7 @@
   "asset": "39229D64",
   "index": 57,
   "source_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
-  "candidate_sha256": "9bd826203c31ecfcb5a1b92687e198283782e1a9971cb99345cf361ea54c0752",
+  "candidate_sha256": "5e4ef9f45e073301e38020558ec55e3517cca8c9e6cef227d2368870f2707d58",
   "rejected_c_candidate_sha256": "dfa2c39fba8c397191af804767ede25fef35f92b5b21f583130190b701bdb9a4",
   "target_occurrences": 15,
   "bbox_pass": "15/15",
