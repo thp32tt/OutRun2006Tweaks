@@ -1,15 +1,13 @@
 {
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00395",
-  "production_id": "CONVERSION-DX11-00395",
-  "event_id": "CONVERSION-DX11-00395-E002",
+  "production_id": "CONVERSION-DX9EX-00394",
+  "event_id": "CONVERSION-DX9EX-00394-E002",
   "event_type": "rollover",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "chat_rollover": 2,
   "rollover_is_retry": false,
-  "resume_reason": "Retry persisted after one recovery attempt",
   "status": "COMPLETE",
   "automation_validation": "PASS",
   "automation_validation_detail": "PASS_EXACT_SHA_BACKEND_CONVERSION_GATE_DX11_R258_PROGRAMMABLE_DORMANT_SOURCE_REVALIDATION_SOURCE_GRAPH_DORMANT_ACTIVATION_WIN32_BUILD_BINARY_READINESS_SMOKE_CONSTANT_BUFFER_PROBE",
@@ -42,7 +40,7 @@
   "stages": {
     "C0_RECOVER": {
       "status": "COMPLETE",
-      "evidence": "Recovered GitHub vr-dx11-native-r71 and the persisted N100 auto/dx11-00395 worktree after the current CONVERSION-DX11-00395-E002 / CHAT_ROLLOVER=2 rollover. This rollover is not a retry, so ATTEMPT remains 1/3. Existing R258 material was resumed rather than duplicated. The final validated GitHub SHA 1e297b537e2ed8dffd402a535d0bc4e50ce2c008 has tree d9ecbab51f2c6e1d702df93b12ebaa9a5b6cf927, identical to the intended clean N100 R258 tree."
+      "evidence": "Recovered authenticated vr-dx11-native-r71 HEAD 1df8051546cf6ba114f68080d4b9887b020a597b; read AGENTS.md, VR_BACKEND_100_REVIEW_INDEX.md, QUEUE_CONTROLLER_CONTRACT.md, CONVERSION_LANE_STATE.json, Set05, regression/history state, prior CONVERSION-DX11-00392 and Issue #14. The authoritative current automatic-queue dispatch supplied by the user is PRODUCTION_ID=CONVERSION-DX9EX-00394, EVENT_ID=CONVERSION-DX9EX-00394-E002, EVENT_TYPE=rollover, ATTEMPT=1/3. R258 material was implemented once and the final clean exact SHA was validated after removal of four accidental execution-marker lines."
     },
     "C1_REVIEW": {
       "status": "COMPLETE",
@@ -100,10 +98,9 @@
       "issue14_implementation_comment_id": 5985450048,
       "issue14_validation_comment_id": 5985493348,
       "exact_next_action": "Preserve validated R239-R258 programmable readiness. Under a new TASK_ID, aggregate the remaining activation prerequisites identified by the DX11 review (resource-behavior, input-layout and shader-translation proof) into an explicit fail-closed prerequisite handoff without enabling Draw/DrawIndexed or NativeDrawPath. Any actual activation remains a separately scoped gate requiring matching runtime evidence.",
-      "authoritative_event_id": "CONVERSION-DX11-00395-E002",
+      "authoritative_event_id": "CONVERSION-DX9EX-00394-E002",
       "authoritative_event_type": "rollover",
       "authoritative_attempt": "1/3",
-      "chat_rollover": 2,
       "rollover_is_retry": false,
       "rollover_metadata_reconciled": true
     }
@@ -125,15 +122,13 @@
   "native_draw_path_activation_changed": false,
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00395",
-    "production_id": "CONVERSION-DX11-00395",
-    "event_id": "CONVERSION-DX11-00395-E002",
+    "production_id": "CONVERSION-DX9EX-00394",
+    "event_id": "CONVERSION-DX9EX-00394-E002",
     "event_type": "rollover",
     "attempt": "1/3",
-    "chat_rollover": 2,
     "rollover_is_retry": false,
-    "resume_reason": "Retry persisted after one recovery attempt",
-    "source": "CURRENT_USER_ROLLOVER",
-    "dispatch_source": "CURRENT_USER_ROLLOVER",
+    "source": "CURRENT_USER_QUEUE",
+    "dispatch_source": "CURRENT_USER_QUEUE",
     "runtime_validation": "UNTESTED",
     "native_draw_path_activation_changed": false,
     "material_result_sha": "1e297b537e2ed8dffd402a535d0bc4e50ce2c008",
@@ -188,15 +183,13 @@
     "task_id": "CONVERSION-DX11-00395",
     "authoritative": {
       "task_id": "CONVERSION-DX11-00395",
-      "production_id": "CONVERSION-DX11-00395",
-      "event_id": "CONVERSION-DX11-00395-E002",
+      "production_id": "CONVERSION-DX9EX-00394",
+      "event_id": "CONVERSION-DX9EX-00394-E002",
       "event_type": "rollover",
       "attempt": "1/3",
-      "chat_rollover": 2,
       "rollover_is_retry": false,
-      "resume_reason": "Retry persisted after one recovery attempt",
-      "source": "CURRENT_USER_ROLLOVER",
-      "dispatch_source": "CURRENT_USER_ROLLOVER"
+      "source": "CURRENT_USER_QUEUE",
+      "dispatch_source": "CURRENT_USER_QUEUE"
     },
     "superseded": [
       {
@@ -207,10 +200,11 @@
         "attempt": "1/3",
         "chat_rollover": 4,
         "rollover_is_retry": false,
-        "source": "AUTOMATION_CONCURRENT_BOOKKEEPING"
+        "source": "CURRENT_USER_ROLLOVER",
+        "dispatch_source": "CURRENT_USER_ROLLOVER"
       }
     ],
-    "reason": "The current explicit user dispatch CONVERSION-DX11-00395-E002 / CHAT_ROLLOVER=2 is authoritative for this chat. The concurrently persisted E006 / CHAT_ROLLOVER=4 bookkeeping does not represent a new material result or retry. ATTEMPT remains 1/3 and the R258 material/validation-bearing SHA is unchanged.",
+    "reason": "The current user message explicitly supplies PRODUCTION_ID=CONVERSION-DX9EX-00394 and EVENT_ID=CONVERSION-DX9EX-00394-E002 for this automatic-queue task. That metadata is authoritative for bookkeeping. The previously generated CONVERSION-DX11-00395-E006 rollover metadata is superseded only for dispatch bookkeeping; R258 material and exact-SHA validation evidence are unchanged.",
     "material_and_validation_bearing_sha_unchanged": true
   },
   "current_user_metadata_reconciliation": {
