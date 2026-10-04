@@ -87,8 +87,8 @@
     }
   },
   "runtime_blocker": "Quest 3/VDXR runtime parity was not performed for CONVERSION-DX11-00347. Exact-SHA Backend Conversion Gate #1917 passed for R237 result 854bf2b442da55412b9157df90cd4c67b738a6b2, including exhaustive-status/signature-evidence regression, source-graph/dormant-activation/census checks, Win32 build/binary and DX11 readiness smoke. This is offline/hosted evidence, not in-game/HMD proof.",
-  "runtime_next_action": "Keep NativeDrawPathActive disabled. Exact-build exhaustive DX11 census and Quest 3/VDXR parity remain required before native draw activation or visual/runtime correctness claims.",
-  "independent_static_next_action": "Preserve R225-R237 census evidence integrity, keep NativeDrawPath dormant, and inspect the next independent DX11 source/static exactness gap from the newest authenticated branch HEAD. Quest 3/VDXR runtime proof remains separate.",
+  "runtime_next_action": "Keep NativeDrawPathActive disabled. Use the XR-native cadence/interpolation DX11 path as the primary Quest 3/VDXR performance test; measure fresh-vs-cached projection cadence and frame-time spikes rather than compositor fps alone. Native draw activation still requires exact shader/resource/state coverage and repeated parity evidence.",
+  "independent_static_next_action": "Preserve R225-R237 census evidence integrity and keep NativeDrawPath dormant, but prioritize the dominant programmable-shader path next: shader fingerprint translation/object cache/input linkage/constants first, then MSAA and resource mutation/lifetime exactness. Fixed-function work is secondary unless census or parity evidence makes it blocking.",
   "policy": [
     "Do not modify another backend lane.",
     "Do not treat build/CI success as Quest 3/VDXR runtime proof.",
