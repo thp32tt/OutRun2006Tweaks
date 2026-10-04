@@ -1,0 +1,1046 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261004-B-RECOVERY08",
+  "base_head": "c0205af2cfb59cd9ae50f958f8e3ccc2a8f66751",
+  "queue_index": 50,
+  "asset": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+  "readiness_tier": "ONE_STAGE_TO_RENDER_COMPLETED_SAME_INVOCATION",
+  "source_upstream_repo": "Sonic-TV/OR2006Sprites",
+  "source_upstream_commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+  "source_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+  "candidate_sha256": "c94775c7132e32d32bc8ab1c12ffb7fafcdfd5c8aac00e65432e61ab757b4cfb",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+  "method": "pinned exact HD RGBA32 -> transparent source-glyph masks -> clean plate -> native Korean lettering -> exact-header DDS -> decoded final QA",
+  "structure": {
+    "width": 4096,
+    "height": 2048,
+    "pitch": 16384,
+    "mips": 1,
+    "pf_flags": 65,
+    "fourcc": "00000000",
+    "bpp": 32,
+    "masks": [
+      "0xff",
+      "0xff00",
+      "0xff0000",
+      "0xff000000"
+    ],
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y"
+  },
+  "segments_total": 7,
+  "segments_rendered": 7,
+  "clean_plate": {
+    "changed_pixels_outside_source_text_mask": 0,
+    "source_text_residue_pixels": 0,
+    "status": "PASS"
+  },
+  "containment": {
+    "elements_total": 7,
+    "elements_pass": 7,
+    "elements_fail": 0,
+    "changed_pixels_outside_permitted_source_bboxes": 0,
+    "alpha_changed_outside_permitted_source_bboxes": 0,
+    "protected_changes": 0,
+    "target_overlap_pairs": [],
+    "status": "PASS"
+  },
+  "rows": [
+    {
+      "key": "friend_request",
+      "source": "FRIEND REQUEST",
+      "korean": "친구 요청",
+      "cell": [
+        630,
+        1015,
+        1350,
+        1100
+      ],
+      "original_bbox": [
+        646,
+        1017,
+        1345,
+        1090
+      ],
+      "localized_bbox": [
+        865,
+        1021,
+        1126,
+        1086
+      ],
+      "delta_left": 219,
+      "delta_right": 219,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "style": "plain_white",
+      "native_font_size": 70,
+      "stroke_width": 0,
+      "palette": {
+        "top": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "bottom": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "source_mask_meta": {
+        "border_transparent_fraction": 0.8474378881987578,
+        "components": [
+          {
+            "pixels": 1878,
+            "bbox": [
+              619,
+              2,
+              666,
+              71
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2417,
+            "bbox": [
+              453,
+              3,
+              503,
+              75
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 1697,
+            "bbox": [
+              16,
+              4,
+              60,
+              69
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2235,
+            "bbox": [
+              63,
+              4,
+              111,
+              69
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 1270,
+            "bbox": [
+              118,
+              4,
+              144,
+              69
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2064,
+            "bbox": [
+              154,
+              4,
+              200,
+              69
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2247,
+            "bbox": [
+              209,
+              4,
+              256,
+              69
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2244,
+            "bbox": [
+              268,
+              4,
+              313,
+              69
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2235,
+            "bbox": [
+              344,
+              4,
+              392,
+              69
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2064,
+            "bbox": [
+              399,
+              4,
+              445,
+              69
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2102,
+            "bbox": [
+              509,
+              4,
+              556,
+              71
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2064,
+            "bbox": [
+              569,
+              4,
+              615,
+              69
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 1436,
+            "bbox": [
+              667,
+              4,
+              715,
+              69
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 36,
+            "bbox": [
+              0,
+              36,
+              6,
+              47
+            ],
+            "edge_touch": true
+          }
+        ],
+        "cell": [
+          630,
+          1015,
+          1350,
+          1100
+        ]
+      }
+    },
+    {
+      "key": "players",
+      "source": "PLAYERS",
+      "korean": "플레이어",
+      "cell": [
+        1420,
+        1015,
+        2300,
+        1105
+      ],
+      "original_bbox": [
+        1647,
+        1017,
+        2021,
+        1090
+      ],
+      "localized_bbox": [
+        1711,
+        1021,
+        1957,
+        1086
+      ],
+      "delta_left": 64,
+      "delta_right": 64,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "style": "plain_white",
+      "native_font_size": 70,
+      "stroke_width": 0,
+      "palette": {
+        "top": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "bottom": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "source_mask_meta": {
+        "border_transparent_fraction": 0.9369201030927835,
+        "components": [
+          {
+            "pixels": 2147,
+            "bbox": [
+              552,
+              2,
+              601,
+              75
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2096,
+            "bbox": [
+              227,
+              4,
+              276,
+              73
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 3704,
+            "bbox": [
+              281,
+              4,
+              383,
+              73
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 1712,
+            "bbox": [
+              376,
+              4,
+              434,
+              73
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2358,
+            "bbox": [
+              438,
+              4,
+              488,
+              73
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2549,
+            "bbox": [
+              497,
+              4,
+              549,
+              73
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 4,
+            "bbox": [
+              73,
+              88,
+              76,
+              90
+            ],
+            "edge_touch": true
+          },
+          {
+            "pixels": 47,
+            "bbox": [
+              471,
+              88,
+              500,
+              90
+            ],
+            "edge_touch": true
+          }
+        ],
+        "cell": [
+          1420,
+          1015,
+          2300,
+          1105
+        ]
+      }
+    },
+    {
+      "key": "your_friends",
+      "source": "YOUR FRIENDS",
+      "korean": "내 친구",
+      "cell": [
+        2660,
+        1015,
+        3260,
+        1105
+      ],
+      "original_bbox": [
+        2668,
+        1023,
+        3244,
+        1092
+      ],
+      "localized_bbox": [
+        2862,
+        1027,
+        3050,
+        1088
+      ],
+      "delta_left": 194,
+      "delta_right": 194,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "style": "plain_white",
+      "native_font_size": 66,
+      "stroke_width": 0,
+      "palette": {
+        "top": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "bottom": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "outline": [
+          255,
+          255,
+          255,
+          255
+        ]
+      },
+      "source_mask_meta": {
+        "border_transparent_fraction": 0.9884963768115942,
+        "components": [
+          {
+            "pixels": 43,
+            "bbox": [
+              0,
+              1,
+              3,
+              18
+            ],
+            "edge_touch": true
+          },
+          {
+            "pixels": 1878,
+            "bbox": [
+              537,
+              8,
+              584,
+              77
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2139,
+            "bbox": [
+              63,
+              9,
+              107,
+              77
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 1539,
+            "bbox": [
+              8,
+              10,
+              62,
+              75
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2102,
+            "bbox": [
+              119,
+              10,
+              166,
+              77
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2235,
+            "bbox": [
+              179,
+              10,
+              227,
+              75
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 1697,
+            "bbox": [
+              252,
+              10,
+              296,
+              75
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2235,
+            "bbox": [
+              299,
+              10,
+              347,
+              75
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 1270,
+            "bbox": [
+              351,
+              10,
+              377,
+              75
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2064,
+            "bbox": [
+              383,
+              10,
+              429,
+              75
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2247,
+            "bbox": [
+              435,
+              10,
+              482,
+              75
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2244,
+            "bbox": [
+              490,
+              10,
+              535,
+              75
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 11,
+            "bbox": [
+              0,
+              24,
+              2,
+              31
+            ],
+            "edge_touch": true
+          },
+          {
+            "pixels": 40,
+            "bbox": [
+              0,
+              53,
+              3,
+              70
+            ],
+            "edge_touch": true
+          },
+          {
+            "pixels": 14,
+            "bbox": [
+              0,
+              77,
+              3,
+              83
+            ],
+            "edge_touch": true
+          }
+        ],
+        "cell": [
+          2660,
+          1015,
+          3260,
+          1105
+        ]
+      }
+    },
+    {
+      "key": "please_wait",
+      "source": "PLEASE WAIT",
+      "korean": "잠시만요",
+      "cell": [
+        1640,
+        1115,
+        2700,
+        1248
+      ],
+      "original_bbox": [
+        1928,
+        1124,
+        2660,
+        1224
+      ],
+      "localized_bbox": [
+        2121,
+        1130,
+        2466,
+        1218
+      ],
+      "delta_left": 193,
+      "delta_right": 194,
+      "delta_top": 6,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "style": "plain_black",
+      "native_font_size": 96,
+      "stroke_width": 0,
+      "palette": {
+        "top": [
+          0,
+          0,
+          0,
+          255
+        ],
+        "bottom": [
+          0,
+          0,
+          0,
+          255
+        ],
+        "outline": [
+          0,
+          0,
+          0,
+          255
+        ]
+      },
+      "source_mask_meta": {
+        "border_transparent_fraction": 0.9366093880972338,
+        "components": [
+          {
+            "pixels": 4254,
+            "bbox": [
+              572,
+              9,
+              639,
+              109
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2854,
+            "bbox": [
+              910,
+              11,
+              948,
+              106
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 4059,
+            "bbox": [
+              288,
+              12,
+              355,
+              106
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 2962,
+            "bbox": [
+              359,
+              12,
+              422,
+              106
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 4533,
+            "bbox": [
+              424,
+              12,
+              491,
+              106
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 4269,
+            "bbox": [
+              493,
+              12,
+              572,
+              106
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 4533,
+            "bbox": [
+              643,
+              12,
+              710,
+              106
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 6368,
+            "bbox": [
+              726,
+              12,
+              838,
+              106
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 4269,
+            "bbox": [
+              830,
+              12,
+              909,
+              106
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 3222,
+            "bbox": [
+              950,
+              12,
+              1020,
+              106
+            ],
+            "edge_touch": false
+          }
+        ],
+        "cell": [
+          1640,
+          1115,
+          2700,
+          1248
+        ]
+      }
+    },
+    {
+      "key": "time_over",
+      "source": "Time Over",
+      "korean": "시간 종료",
+      "cell": [
+        140,
+        1250,
+        1800,
+        1520
+      ],
+      "original_bbox": [
+        241,
+        1274,
+        1610,
+        1515
+      ],
+      "localized_bbox": [
+        483,
+        1279,
+        1368,
+        1509
+      ],
+      "delta_left": 242,
+      "delta_right": 242,
+      "delta_top": 5,
+      "delta_bottom": 6,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "style": "gradient",
+      "native_font_size": 226,
+      "stroke_width": 12,
+      "palette": {
+        "top": [
+          213,
+          233,
+          248,
+          254
+        ],
+        "bottom": [
+          164,
+          215,
+          244,
+          254
+        ],
+        "outline": [
+          0,
+          0,
+          0,
+          128
+        ]
+      },
+      "source_mask_meta": {
+        "border_transparent_fraction": 0.99375,
+        "components": [
+          {
+            "pixels": 105175,
+            "bbox": [
+              792,
+              24,
+              1470,
+              265
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 111828,
+            "bbox": [
+              101,
+              30,
+              746,
+              264
+            ],
+            "edge_touch": false
+          }
+        ],
+        "cell": [
+          140,
+          1250,
+          1800,
+          1520
+        ]
+      }
+    },
+    {
+      "key": "game_over",
+      "source": "Game Over",
+      "korean": "게임 오버",
+      "cell": [
+        1830,
+        1250,
+        3414,
+        1545
+      ],
+      "original_bbox": [
+        1915,
+        1287,
+        3409,
+        1525
+      ],
+      "localized_bbox": [
+        2225,
+        1292,
+        3099,
+        1520
+      ],
+      "delta_left": 310,
+      "delta_right": 310,
+      "delta_top": 5,
+      "delta_bottom": 5,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "style": "gradient",
+      "native_font_size": 223,
+      "stroke_width": 12,
+      "palette": {
+        "top": [
+          254,
+          231,
+          215,
+          254
+        ],
+        "bottom": [
+          254,
+          216,
+          167,
+          255
+        ],
+        "outline": [
+          0,
+          0,
+          0,
+          128
+        ]
+      },
+      "source_mask_meta": {
+        "border_transparent_fraction": 0.9985031931878658,
+        "components": [
+          {
+            "pixels": 129710,
+            "bbox": [
+              85,
+              37,
+              855,
+              275
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 102733,
+            "bbox": [
+              893,
+              37,
+              1579,
+              275
+            ],
+            "edge_touch": false
+          }
+        ],
+        "cell": [
+          1830,
+          1250,
+          3414,
+          1545
+        ]
+      }
+    },
+    {
+      "key": "goal",
+      "source": "GOAL",
+      "korean": "골",
+      "cell": [
+        1590,
+        1630,
+        2840,
+        2030
+      ],
+      "original_bbox": [
+        1620,
+        1660,
+        2814,
+        2024
+      ],
+      "localized_bbox": [
+        2056,
+        1675,
+        2377,
+        2008
+      ],
+      "delta_left": 436,
+      "delta_right": 437,
+      "delta_top": 15,
+      "delta_bottom": 16,
+      "containment": "PASS",
+      "rework_status": "NEW_CANDIDATE",
+      "style": "gradient",
+      "native_font_size": 342,
+      "stroke_width": 19,
+      "palette": {
+        "top": [
+          254,
+          225,
+          166,
+          254
+        ],
+        "bottom": [
+          255,
+          196,
+          108,
+          255
+        ],
+        "outline": [
+          0,
+          0,
+          0,
+          127
+        ]
+      },
+      "source_mask_meta": {
+        "border_transparent_fraction": 0.9968939393939394,
+        "components": [
+          {
+            "pixels": 91808,
+            "bbox": [
+              30,
+              30,
+              383,
+              394
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 85778,
+            "bbox": [
+              348,
+              31,
+              696,
+              393
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 76441,
+            "bbox": [
+              618,
+              39,
+              958,
+              384
+            ],
+            "edge_touch": false
+          },
+          {
+            "pixels": 54538,
+            "bbox": [
+              959,
+              40,
+              1224,
+              384
+            ],
+            "edge_touch": false
+          }
+        ],
+        "cell": [
+          1590,
+          1630,
+          2840,
+          2030
+        ]
+      }
+    }
+  ],
+  "manual_visual_qa": "PENDING_CONTROLLER_SELF_QA",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "B_RECOVERY08_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+}
