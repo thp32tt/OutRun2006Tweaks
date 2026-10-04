@@ -110,8 +110,9 @@ The existing `docker-compose.portainer-vr.yml` path is retained for compatibilit
 
 - lane A: DX11 -> `vr-dx11-native-r71`
 - lane B: DXVK -> `vr-dxvk-r71-disasm`
+- lane C: DX9Ex improvement -> `vr-d3d9ex-focus`
 - required workflow: `Backend Conversion Gate`
-- only one modifying task is active at a time
+- up to three independent conversion/improvement lanes may be active at once
 - successful automatic validation advances immediately to the next independent lane
 - runtime/HMD validation remains `UNTESTED` unless separately proven
 
