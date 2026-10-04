@@ -70,17 +70,27 @@ def dil(m,px=1):
     return np.asarray(Image.fromarray((m.astype(np.uint8)*255),"L").filter(ImageFilter.MaxFilter(px*2+1)))>0
 
 rows=[]; source_masks=[]; full_source=np.zeros((H,W),bool); allowed=np.zeros((H,W),bool)
-for n,(key,en,ko,bb,family) in enumerate(targets,1):
-    region=rect((H,W),bb)
+for n,(key,en,ko,region_hint,family) in enumerate(targets,1):
+    # C134 line diagnostics provide a coarse per-heading region. Recompute the
+    # exact non-transparent glyph/effect bbox inside that region and use that
+    # smaller bbox as the hard C containment/size ceiling.
+    region=rect((H,W),region_hint)
     sm=region & alpha
     actual=bbox(sm)
-    if actual!=bb:
-        raise RuntimeError(("source_bbox_mismatch",key,actual,bb))
-    source_masks.append(sm); full_source|=sm; allowed|=region
+    if actual is None:
+        raise RuntimeError(("empty_source_heading",key,region_hint))
+    # The exact bbox may be smaller than the line-scan y envelope because another
+    # heading on the same scan line can have a deeper glyph. It may never escape.
+    if not (actual[0]>=region_hint[0] and actual[1]>=region_hint[1] and actual[2]<=region_hint[2] and actual[3]<=region_hint[3]):
+        raise RuntimeError(("source_bbox_escape",key,actual,region_hint))
+    exact_region=rect((H,W),actual)
+    sm=exact_region & alpha
+    source_masks.append(sm); full_source|=sm; allowed|=exact_region
     px=sa[sm]
     med=[int(v) for v in np.median(px,axis=0)]
     rows.append({"n":n,"key":key,"source":en,"korean":ko,"style_family":family,
-                 "original_bbox":bb,"source_effect_pixels":int(np.count_nonzero(sm)),"source_median_rgba":med})
+                 "diagnostic_region":region_hint,"original_bbox":actual,
+                 "source_effect_pixels":int(np.count_nonzero(sm)),"source_median_rgba":med})
 
 # Protected source sentences/artwork must remain outside exact target bboxes.
 for i in range(len(source_masks)):
