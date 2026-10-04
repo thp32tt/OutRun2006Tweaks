@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "role": "B",
+  "run": "20261005-B-PRODUCTION65",
+  "timestamp_kst": "2026-10-05T08:52:54+09:00",
+  "index": 220,
+  "asset": "textures/load/spr_sprani_sumo_fe_cvt_Exst/D657C2EB_512x128.dds",
+  "source_sha256": "439a09cdcaaf000802ce104ebb9e00b22df28e1f4657ff94021b4f92707c6ccc",
+  "candidate_sha256": "6f5c0c5d2ec4998c29f49b5c9de24c08e0e0bfe016f6eae1c4304464048185a5",
+  "semantic_binding": {
+    "physical_occurrences": 7,
+    "regions": {
+      "0": "TIME ATTACK",
+      "1": "COAST 2 COAST",
+      "2": "HEART ATTACK",
+      "3": "TIME ATTACK",
+      "4": "OUTRUN",
+      "5": "SEND GAME INVITE",
+      "6": "REMOVE FRIEND"
+    },
+    "correction": "TIME ATTACK duplicate physical occurrence explicitly covered"
+  },
+  "machine_qa": {
+    "dimensions": [
+      2048,
+      512
+    ],
+    "format": "RGBA32",
+    "raw_mode": "BGRA",
+    "mipmaps": 1,
+    "header_128_exact": true,
+    "raw_orientation": "mirror_y",
+    "bbox_size_positive_margin": "7/7 PASS",
+    "clean_plate_validator": "PASS",
+    "final_mask_validator": "PASS",
+    "exact_source_residue": 0,
+    "outside": 0,
+    "alpha_outside": 0,
+    "overlap": 0,
+    "touch_pairs": 0
+  },
+  "controller_visual_qa": {
+    "source_clean_final": "PASS",
+    "row_contact_2x": "PASS",
+    "raw_mirror_y": "PASS",
+    "observations": [
+      "Red TIME ATTACK and gray/small source families remain visually distinct with source-consistent weight and color.",
+      "All seven physical English labels are removed and replaced with readable Korean without clipping or overlap.",
+      "No visible residue, seam, halo, or raw/readable orientation regression."
+    ]
+  },
+  "preceding_fail_closed": {
+    "index": 152,
+    "run": "B_PRODUCTION63",
+    "status": "HOLD_STRICT_RECHECK_DXT5_DECODED_PIXEL_GATE",
+    "decoded_pixels_outside_exact_bbox": 1388,
+    "candidate_written": false,
+    "report": "localization/graphics/role_B/20261005-B-PRODUCTION63/B63_DXT5_FAIL_CLOSED.json"
+  },
+  "decision": "B_PRODUCTION65_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "no_vr_ffb_dx11_dxvk_work": true
+}
