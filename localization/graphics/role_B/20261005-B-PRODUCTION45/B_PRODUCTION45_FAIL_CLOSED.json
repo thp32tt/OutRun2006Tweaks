@@ -1,0 +1,9 @@
+{
+  "run": "20261005-B-PRODUCTION45",
+  "asset": "1762489B",
+  "index": 130,
+  "status": "FAIL_CLOSED_DIAGNOSTIC",
+  "exception": "RuntimeError(('expected 5 target regions', 4))",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 300, in <module>\n    try: main()\n         ^^^^^^\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 109, in main\n    raise RuntimeError((\"expected 5 target regions\",len(best)))\nRuntimeError: ('expected 5 target regions', 4)\n",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
