@@ -1,0 +1,593 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C110-NEW-AB",
+  "asset": "53CE39D5",
+  "source_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+  "candidate_sha256": "0f1528d9b3841f503d1bb60c897ea9576f48bc759d76fa91dd4e6335065bd05b",
+  "header_128_exact": true,
+  "structure_source": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "format": "RGBA32",
+    "raw_orientation": "mirror_y"
+  },
+  "structure_candidate": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "format": "RGBA32",
+    "raw_orientation": "mirror_y"
+  },
+  "source_png_vs_independent_decode_diff_pixels": null,
+  "persisted_final_vs_independent_decode_diff_pixels": null,
+  "clean_changed_pixels_outside_source_text_mask": 0,
+  "source_text_mask_pixels_unchanged_in_clean_plate": 0,
+  "final_changed_pixels_outside_allowed_mask": 0,
+  "final_changed_pixels_in_protected_mask": 0,
+  "target_mask_xor_vs_persisted_target_mask": 10,
+  "target_pixels_outside_union_source_bboxes": 0,
+  "target_pixels_outside_union_localized_bboxes": 0,
+  "persisted_allowed_mask_xor_vs_union_source_bboxes": 0,
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_pairs": [],
+  "rows": [
+    {
+      "key": "random_1",
+      "original_bbox": [
+        1145,
+        12,
+        1455,
+        106
+      ],
+      "localized_bbox": [
+        1177,
+        14,
+        1422,
+        104
+      ],
+      "delta_left": 32,
+      "delta_right": 33,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        310,
+        94
+      ],
+      "localized_size": [
+        245,
+        90
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_attack_or2_1",
+      "original_bbox": [
+        45,
+        1673,
+        330,
+        1719
+      ],
+      "localized_bbox": [
+        109,
+        1675,
+        265,
+        1717
+      ],
+      "delta_left": 64,
+      "delta_right": 65,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        285,
+        46
+      ],
+      "localized_size": [
+        156,
+        42
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_attack_or2_2",
+      "original_bbox": [
+        30,
+        1719,
+        163,
+        1760
+      ],
+      "localized_bbox": [
+        58,
+        1723,
+        134,
+        1756
+      ],
+      "delta_left": 28,
+      "delta_right": 29,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        133,
+        41
+      ],
+      "localized_size": [
+        76,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_attack_or2_3",
+      "original_bbox": [
+        95,
+        1760,
+        323,
+        1807
+      ],
+      "localized_bbox": [
+        140,
+        1762,
+        277,
+        1805
+      ],
+      "delta_left": 45,
+      "delta_right": 46,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        228,
+        47
+      ],
+      "localized_size": [
+        137,
+        43
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "heart_attack_or2_1",
+      "original_bbox": [
+        413,
+        1673,
+        710,
+        1719
+      ],
+      "localized_bbox": [
+        483,
+        1675,
+        639,
+        1717
+      ],
+      "delta_left": 70,
+      "delta_right": 71,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        297,
+        46
+      ],
+      "localized_size": [
+        156,
+        42
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "heart_attack_or2_2",
+      "original_bbox": [
+        399,
+        1719,
+        539,
+        1760
+      ],
+      "localized_bbox": [
+        431,
+        1723,
+        507,
+        1756
+      ],
+      "delta_left": 32,
+      "delta_right": 32,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        140,
+        41
+      ],
+      "localized_size": [
+        76,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "heart_attack_or2_3",
+      "original_bbox": [
+        463,
+        1760,
+        691,
+        1807
+      ],
+      "localized_bbox": [
+        508,
+        1762,
+        645,
+        1805
+      ],
+      "delta_left": 45,
+      "delta_right": 46,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        228,
+        47
+      ],
+      "localized_size": [
+        137,
+        43
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun_or2_1",
+      "original_bbox": [
+        781,
+        1641,
+        983,
+        1687
+      ],
+      "localized_bbox": [
+        826,
+        1643,
+        937,
+        1685
+      ],
+      "delta_left": 45,
+      "delta_right": 46,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        202,
+        46
+      ],
+      "localized_size": [
+        111,
+        42
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun_or2_2",
+      "original_bbox": [
+        774,
+        1687,
+        913,
+        1728
+      ],
+      "localized_bbox": [
+        805,
+        1691,
+        881,
+        1724
+      ],
+      "delta_left": 31,
+      "delta_right": 32,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        139,
+        41
+      ],
+      "localized_size": [
+        76,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun_or2_3",
+      "original_bbox": [
+        831,
+        1728,
+        1059,
+        1775
+      ],
+      "localized_bbox": [
+        876,
+        1730,
+        1013,
+        1773
+      ],
+      "delta_left": 45,
+      "delta_right": 46,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        228,
+        47
+      ],
+      "localized_size": [
+        137,
+        43
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_attack_special_1",
+      "original_bbox": [
+        1149,
+        1561,
+        1434,
+        1607
+      ],
+      "localized_bbox": [
+        1213,
+        1563,
+        1369,
+        1605
+      ],
+      "delta_left": 64,
+      "delta_right": 65,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        285,
+        46
+      ],
+      "localized_size": [
+        156,
+        42
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_attack_special_2",
+      "original_bbox": [
+        1134,
+        1607,
+        1267,
+        1648
+      ],
+      "localized_bbox": [
+        1162,
+        1611,
+        1238,
+        1644
+      ],
+      "delta_left": 28,
+      "delta_right": 29,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        133,
+        41
+      ],
+      "localized_size": [
+        76,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "time_attack_special_3",
+      "original_bbox": [
+        1134,
+        1648,
+        1427,
+        1695
+      ],
+      "localized_bbox": [
+        1181,
+        1650,
+        1380,
+        1693
+      ],
+      "delta_left": 47,
+      "delta_right": 47,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        293,
+        47
+      ],
+      "localized_size": [
+        199,
+        43
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "heart_attack_special_1",
+      "original_bbox": [
+        1517,
+        1513,
+        1814,
+        1559
+      ],
+      "localized_bbox": [
+        1587,
+        1515,
+        1743,
+        1557
+      ],
+      "delta_left": 70,
+      "delta_right": 71,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        297,
+        46
+      ],
+      "localized_size": [
+        156,
+        42
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "heart_attack_special_2",
+      "original_bbox": [
+        1502,
+        1559,
+        1643,
+        1600
+      ],
+      "localized_bbox": [
+        1534,
+        1563,
+        1610,
+        1596
+      ],
+      "delta_left": 32,
+      "delta_right": 33,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        141,
+        41
+      ],
+      "localized_size": [
+        76,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "heart_attack_special_3",
+      "original_bbox": [
+        1494,
+        1600,
+        1795,
+        1647
+      ],
+      "localized_bbox": [
+        1545,
+        1602,
+        1744,
+        1645
+      ],
+      "delta_left": 51,
+      "delta_right": 51,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        301,
+        47
+      ],
+      "localized_size": [
+        199,
+        43
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun_special_1",
+      "original_bbox": [
+        1054,
+        1849,
+        1255,
+        1895
+      ],
+      "localized_bbox": [
+        1099,
+        1851,
+        1210,
+        1893
+      ],
+      "delta_left": 45,
+      "delta_right": 45,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        201,
+        46
+      ],
+      "localized_size": [
+        111,
+        42
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun_special_2",
+      "original_bbox": [
+        1054,
+        1895,
+        1185,
+        1936
+      ],
+      "localized_bbox": [
+        1081,
+        1899,
+        1157,
+        1932
+      ],
+      "delta_left": 27,
+      "delta_right": 28,
+      "delta_top": 4,
+      "delta_bottom": 4,
+      "source_size": [
+        131,
+        41
+      ],
+      "localized_size": [
+        76,
+        33
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "outrun_special_3",
+      "original_bbox": [
+        1054,
+        1936,
+        1331,
+        1983
+      ],
+      "localized_bbox": [
+        1093,
+        1938,
+        1292,
+        1981
+      ],
+      "delta_left": 39,
+      "delta_right": 39,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        277,
+        47
+      ],
+      "localized_size": [
+        199,
+        43
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "machine_status": "FAIL",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}

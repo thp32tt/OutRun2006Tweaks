@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C110-NEW-AB",
+  "asset": "2EA557B4",
+  "source_sha256": "b2d5b03a8e6cc56fcb60c31f32a485854dd7ea41ed10c7b10ba185625d07a685",
+  "candidate_sha256": "d66a110cfc5bd09201c6f1a806fd3b2fab84663294ff865415fc7fc6532d6beb",
+  "header_128_exact": true,
+  "structure_source": {
+    "width": 2048,
+    "height": 256,
+    "mips": 1,
+    "fourcc": "DXT5",
+    "raw_orientation": "mirror_y"
+  },
+  "structure_candidate": {
+    "width": 2048,
+    "height": 256,
+    "mips": 1,
+    "fourcc": "DXT5",
+    "raw_orientation": "mirror_y"
+  },
+  "source_png_vs_independent_decode_diff_pixels": 0,
+  "persisted_final_vs_independent_decode_diff_pixels": 0,
+  "clean_changed_pixels_outside_source_text_mask": 0,
+  "source_text_mask_pixels_unchanged_in_clean_plate": 0,
+  "final_changed_pixels_outside_allowed_mask": 0,
+  "final_changed_pixels_in_protected_mask": 0,
+  "target_mask_xor_vs_persisted_target_mask": null,
+  "target_pixels_outside_union_source_bboxes": 0,
+  "target_pixels_outside_union_localized_bboxes": 707,
+  "persisted_allowed_mask_xor_vs_union_source_bboxes": 0,
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_pairs": [],
+  "rows": [
+    {
+      "key": "next_round",
+      "original_bbox": [
+        1,
+        105,
+        1090,
+        248
+      ],
+      "localized_bbox": [
+        263,
+        113,
+        828,
+        240
+      ],
+      "delta_left": 262,
+      "delta_right": 262,
+      "delta_top": 8,
+      "delta_bottom": 8,
+      "source_size": [
+        1089,
+        143
+      ],
+      "localized_size": [
+        565,
+        127
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "machine_status": "FAIL",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}

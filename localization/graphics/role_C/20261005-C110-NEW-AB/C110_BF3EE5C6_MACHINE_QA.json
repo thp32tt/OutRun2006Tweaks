@@ -1,0 +1,419 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C110-NEW-AB",
+  "asset": "BF3EE5C6",
+  "source_sha256": "b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887",
+  "candidate_sha256": "7956df939b40013a145abb53c1734508b33070d187466caf891c7953ee40ac68",
+  "header_128_exact": true,
+  "structure_source": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "format": "RGBA32",
+    "raw_orientation": "mirror_y"
+  },
+  "structure_candidate": {
+    "width": 2048,
+    "height": 2048,
+    "pitch": 8192,
+    "mips": 1,
+    "format": "RGBA32",
+    "raw_orientation": "mirror_y"
+  },
+  "source_png_vs_independent_decode_diff_pixels": 0,
+  "persisted_final_vs_independent_decode_diff_pixels": 0,
+  "clean_changed_pixels_outside_source_text_mask": 0,
+  "source_text_mask_pixels_unchanged_in_clean_plate": 0,
+  "final_changed_pixels_outside_allowed_mask": 0,
+  "final_changed_pixels_in_protected_mask": 0,
+  "target_mask_xor_vs_persisted_target_mask": null,
+  "target_pixels_outside_union_source_bboxes": 0,
+  "target_pixels_outside_union_localized_bboxes": 0,
+  "persisted_allowed_mask_xor_vs_union_source_bboxes": 0,
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_pairs": [],
+  "rows": [
+    {
+      "key": "rank_stage",
+      "original_bbox": [
+        12,
+        163,
+        615,
+        245
+      ],
+      "localized_bbox": [
+        74,
+        166,
+        553,
+        242
+      ],
+      "delta_left": 62,
+      "delta_right": 62,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        603,
+        82
+      ],
+      "localized_size": [
+        479,
+        76
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "normal",
+      "original_bbox": [
+        729,
+        192,
+        1012,
+        251
+      ],
+      "localized_bbox": [
+        820,
+        195,
+        920,
+        248
+      ],
+      "delta_left": 91,
+      "delta_right": 92,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        283,
+        59
+      ],
+      "localized_size": [
+        100,
+        53
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "tuned_a",
+      "original_bbox": [
+        1116,
+        193,
+        1342,
+        251
+      ],
+      "localized_bbox": [
+        1183,
+        196,
+        1275,
+        248
+      ],
+      "delta_left": 67,
+      "delta_right": 67,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        226,
+        58
+      ],
+      "localized_size": [
+        92,
+        52
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "tuned_b",
+      "original_bbox": [
+        1476,
+        193,
+        1702,
+        251
+      ],
+      "localized_bbox": [
+        1543,
+        196,
+        1635,
+        248
+      ],
+      "delta_left": 67,
+      "delta_right": 67,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        226,
+        58
+      ],
+      "localized_size": [
+        92,
+        52
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "top_ghost",
+      "original_bbox": [
+        572,
+        272,
+        1374,
+        392
+      ],
+      "localized_bbox": [
+        682,
+        274,
+        1263,
+        390
+      ],
+      "delta_left": 110,
+      "delta_right": 111,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        802,
+        120
+      ],
+      "localized_size": [
+        581,
+        116
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "double",
+      "original_bbox": [
+        0,
+        400,
+        500,
+        528
+      ],
+      "localized_bbox": [
+        117,
+        403,
+        382,
+        525
+      ],
+      "delta_left": 117,
+      "delta_right": 118,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        500,
+        128
+      ],
+      "localized_size": [
+        265,
+        122
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "strike",
+      "original_bbox": [
+        548,
+        392,
+        1000,
+        528
+      ],
+      "localized_bbox": [
+        552,
+        411,
+        996,
+        509
+      ],
+      "delta_left": 4,
+      "delta_right": 4,
+      "delta_top": 19,
+      "delta_bottom": 19,
+      "source_size": [
+        452,
+        136
+      ],
+      "localized_size": [
+        444,
+        98
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "goal",
+      "original_bbox": [
+        600,
+        552,
+        1016,
+        680
+      ],
+      "localized_bbox": [
+        728,
+        554,
+        887,
+        678
+      ],
+      "delta_left": 128,
+      "delta_right": 129,
+      "delta_top": 2,
+      "delta_bottom": 2,
+      "source_size": [
+        416,
+        128
+      ],
+      "localized_size": [
+        159,
+        124
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "spare",
+      "original_bbox": [
+        1104,
+        544,
+        1520,
+        688
+      ],
+      "localized_bbox": [
+        1112,
+        547,
+        1512,
+        685
+      ],
+      "delta_left": 8,
+      "delta_right": 8,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        416,
+        144
+      ],
+      "localized_size": [
+        400,
+        138
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "shift_up",
+      "original_bbox": [
+        158,
+        710,
+        900,
+        878
+      ],
+      "localized_bbox": [
+        184,
+        713,
+        874,
+        875
+      ],
+      "delta_left": 26,
+      "delta_right": 26,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        742,
+        168
+      ],
+      "localized_size": [
+        690,
+        162
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "rank",
+      "original_bbox": [
+        1068,
+        756,
+        1413,
+        882
+      ],
+      "localized_bbox": [
+        1123,
+        759,
+        1357,
+        879
+      ],
+      "delta_left": 55,
+      "delta_right": 56,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        345,
+        126
+      ],
+      "localized_size": [
+        234,
+        120
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "turkey",
+      "original_bbox": [
+        1572,
+        992,
+        2012,
+        1140
+      ],
+      "localized_bbox": [
+        1636,
+        995,
+        1947,
+        1137
+      ],
+      "delta_left": 64,
+      "delta_right": 65,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        440,
+        148
+      ],
+      "localized_size": [
+        311,
+        142
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    },
+    {
+      "key": "go",
+      "original_bbox": [
+        25,
+        1161,
+        805,
+        1517
+      ],
+      "localized_bbox": [
+        39,
+        1164,
+        791,
+        1514
+      ],
+      "delta_left": 14,
+      "delta_right": 14,
+      "delta_top": 3,
+      "delta_bottom": 3,
+      "source_size": [
+        780,
+        356
+      ],
+      "localized_size": [
+        752,
+        350
+      ],
+      "containment": "PASS",
+      "size_ceiling": "PASS"
+    }
+  ],
+  "machine_status": "PASS",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}
