@@ -113,7 +113,10 @@
       "artifact_id": 11312145745,
       "artifact_digest": "sha256:1b9f59d609b9d546d206023aaa102226f58043fc612bd2e4212db9a93a27e96b"
     },
-    "issue14_implementation_validation_comment_id": 5983158744
+    "issue14_implementation_validation_comment_id": 5983158744,
+    "material_tree_sha": "64fd6d5f0bbd32e21732857541cef83c3b5d1acf",
+    "analyzer_blob_sha": "943a85db52eb95e424697731ae1b8bf6c917a5d0",
+    "test_blob_sha": "6bf2821319494bb279ae74f88ebcdd8950674c99"
   },
   "pipeline": {
     "C0_RECOVER": {
@@ -224,7 +227,7 @@
       "validation_bearing_result_sha": "23a8876603aba4aae576c2ddb833dc63c6d323e7",
       "runtime_validation": "UNTESTED"
     },
-    "reason": "A later same-task rollover record E002 was durably written after the initial automatic queue dispatch. Rollover is not a retry; ATTEMPT remains 1/3. Material/result SHA, exact-SHA validation evidence and RUNTIME_VALIDATION=UNTESTED are unchanged.",
+    "reason": "A later same-task rollover record E003 superseded the initial automatic queue-dispatch bookkeeping. Rollover is not a retry; ATTEMPT remains 1/3. Material/result SHA, exact-SHA validation evidence and RUNTIME_VALIDATION=UNTESTED are unchanged.",
     "material_and_validation_bearing_sha_unchanged": true
   }
 }
