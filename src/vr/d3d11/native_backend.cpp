@@ -2392,6 +2392,173 @@ bool NativeProgrammableShaderPairCache::validate_translation_slot_snapshot(
            current.snapshotToken == slotSnapshotToken;
 }
 
+bool NativeProgrammableShaderPairCache::attach_translation_objects_for_observation(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    ID3D11VertexShader* vertexShader,
+    ID3D11PixelShader* pixelShader) noexcept {
+    if (!expectedDevice || !vertexShader || !pixelShader ||
+        !validate_translation_slot_snapshot(
+            expectedDevice, identity, cacheSnapshotToken, slotSnapshotToken))
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Device> vertexDevice;
+    Microsoft::WRL::ComPtr<ID3D11Device> pixelDevice;
+    vertexShader->GetDevice(vertexDevice.GetAddressOf());
+    pixelShader->GetDevice(pixelDevice.GetAddressOf());
+    if (vertexDevice.Get() != expectedDevice ||
+        pixelDevice.Get() != expectedDevice)
+        return false;
+
+    const auto found = entries_.find(identity.cacheKey);
+    if (found == entries_.end())
+        return false;
+
+    auto& entry = found->second;
+    if (entry.translationSlotGeneration == 0)
+        return false;
+
+    const bool attachmentStarted =
+        entry.translatedVertexShader ||
+        entry.translatedPixelShader ||
+        entry.translationObjectReceiptGeneration != 0;
+    if (attachmentStarted) {
+        return entry.translatedVertexShader.Get() == vertexShader &&
+               entry.translatedPixelShader.Get() == pixelShader &&
+               entry.translationObjectReceiptGeneration != 0;
+    }
+
+    entry.translatedVertexShader = vertexShader;
+    entry.translatedPixelShader = pixelShader;
+    ++translation_object_receipt_generation_counter_;
+    if (translation_object_receipt_generation_counter_ == 0)
+        ++translation_object_receipt_generation_counter_;
+    entry.translationObjectReceiptGeneration =
+        translation_object_receipt_generation_counter_;
+    return true;
+}
+
+NativeProgrammableShaderTranslationObjectReadiness
+NativeProgrammableShaderPairCache::translation_object_readiness(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken) const noexcept {
+    NativeProgrammableShaderTranslationObjectReadiness out{};
+    out.ownerGeneration = owner_generation_;
+    out.cacheKey = identity.cacheKey;
+    out.cacheSnapshotToken = cacheSnapshotToken;
+    out.slotSnapshotToken = slotSnapshotToken;
+    out.inputValid =
+        expectedDevice != nullptr &&
+        cacheSnapshotToken != 0 &&
+        slotSnapshotToken != 0 &&
+        identity.exact_identity() &&
+        !identity.translationImplemented;
+
+    const auto slot = translation_slot_ownership_readiness(
+        expectedDevice, identity, cacheSnapshotToken);
+    out.slotReady = slot.ownershipReady;
+    out.deviceMatches = slot.deviceMatches;
+    out.cacheSnapshotMatches = slot.cacheSnapshotMatches;
+    out.slotSnapshotMatches =
+        slot.ownershipReady &&
+        slot.snapshotToken == slotSnapshotToken;
+    out.slotGeneration = slot.slotGeneration;
+
+    if (out.inputValid &&
+        out.slotReady &&
+        out.deviceMatches &&
+        out.cacheSnapshotMatches &&
+        out.slotSnapshotMatches) {
+        const auto found = entries_.find(identity.cacheKey);
+        if (found != entries_.end()) {
+            const auto& entry = found->second;
+            out.translationObjectReceiptGeneration =
+                entry.translationObjectReceiptGeneration;
+            out.objectsAttached =
+                entry.translatedVertexShader &&
+                entry.translatedPixelShader &&
+                out.translationObjectReceiptGeneration != 0;
+            if (out.objectsAttached) {
+                Microsoft::WRL::ComPtr<ID3D11Device> vertexDevice;
+                Microsoft::WRL::ComPtr<ID3D11Device> pixelDevice;
+                entry.translatedVertexShader->GetDevice(
+                    vertexDevice.GetAddressOf());
+                entry.translatedPixelShader->GetDevice(
+                    pixelDevice.GetAddressOf());
+                out.objectDevicesMatch =
+                    vertexDevice.Get() == expectedDevice &&
+                    pixelDevice.Get() == expectedDevice;
+            }
+        }
+    }
+
+    out.attachmentReady =
+        out.inputValid &&
+        out.slotReady &&
+        out.deviceMatches &&
+        out.cacheSnapshotMatches &&
+        out.slotSnapshotMatches &&
+        out.objectsAttached &&
+        out.objectDevicesMatch &&
+        out.ownerGeneration != 0 &&
+        out.slotGeneration != 0 &&
+        out.translationObjectReceiptGeneration != 0 &&
+        out.cacheKey != 0;
+
+    if (out.attachmentReady) {
+        const auto found = entries_.find(identity.cacheKey);
+        if (found == entries_.end())
+            return {};
+        const auto& entry = found->second;
+        std::uint64_t token = 0xcbf29ce484222325ull;
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(this)));
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(expectedDevice)));
+        token = mix_readiness_snapshot_token(token, out.ownerGeneration);
+        token = mix_readiness_snapshot_token(token, out.slotGeneration);
+        token = mix_readiness_snapshot_token(
+            token, out.translationObjectReceiptGeneration);
+        token = mix_readiness_snapshot_token(token, out.cacheKey);
+        token = mix_readiness_snapshot_token(token, out.cacheSnapshotToken);
+        token = mix_readiness_snapshot_token(token, out.slotSnapshotToken);
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(
+                    entry.translatedVertexShader.Get())));
+        token = mix_readiness_snapshot_token(
+            token,
+            static_cast<std::uint64_t>(
+                reinterpret_cast<std::uintptr_t>(
+                    entry.translatedPixelShader.Get())));
+        out.snapshotToken = token == 0 ? 1 : token;
+    }
+    return out;
+}
+
+bool NativeProgrammableShaderPairCache::validate_translation_object_snapshot(
+    ID3D11Device* expectedDevice,
+    const ProgrammableShaderPairCacheIdentity& identity,
+    std::uint64_t cacheSnapshotToken,
+    std::uint64_t slotSnapshotToken,
+    std::uint64_t objectSnapshotToken) const noexcept {
+    if (objectSnapshotToken == 0)
+        return false;
+    const auto current = translation_object_readiness(
+        expectedDevice, identity, cacheSnapshotToken, slotSnapshotToken);
+    return current.attachmentReady &&
+           current.snapshotToken == objectSnapshotToken;
+}
+
 void NativeProgrammableShaderPairCache::shutdown() noexcept {
     entries_.clear();
     device_.Reset();

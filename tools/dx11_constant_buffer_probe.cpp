@@ -2661,6 +2661,187 @@ int main()
         "R112 exact fixed-function pipeline translation identity issues a valid snapshot");
 
     require(
+        programmableCache.initialize(d3d.device) &&
+        programmableCache.cache_for_observation(programmablePair),
+        "R242 programmable object attachment cache prerequisite");
+    const auto r242CacheReady =
+        programmableCache.readiness(d3d.device, programmablePair);
+    require(
+        r242CacheReady.ready &&
+        !programmableCache.attach_translation_objects_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken, 0,
+            pipelineBundle.vertex_shader(),
+            pipelineBundle.pixel_shader()),
+        "R242 translation slot must exist before translated objects attach");
+    require(
+        programmableCache.reserve_translation_slot_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken),
+        "R242 translation slot reservation prerequisite");
+    const auto r242SlotReady =
+        programmableCache.translation_slot_ownership_readiness(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken);
+    require(
+        r242SlotReady.ownershipReady &&
+        r242SlotReady.snapshotToken != 0,
+        "R242 exact R241 translation slot prerequisite");
+    require(
+        programmableCache.attach_translation_objects_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            pipelineBundle.vertex_shader(),
+            pipelineBundle.pixel_shader()),
+        "R242 attach translated object pair to exact slot");
+    const auto r242ObjectReady =
+        programmableCache.translation_object_readiness(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken);
+    require(
+        r242ObjectReady.inputValid &&
+        r242ObjectReady.slotReady &&
+        r242ObjectReady.deviceMatches &&
+        r242ObjectReady.cacheSnapshotMatches &&
+        r242ObjectReady.slotSnapshotMatches &&
+        r242ObjectReady.objectsAttached &&
+        r242ObjectReady.objectDevicesMatch &&
+        r242ObjectReady.attachmentReady &&
+        r242ObjectReady.ownerGeneration != 0 &&
+        r242ObjectReady.slotGeneration != 0 &&
+        r242ObjectReady.translationObjectReceiptGeneration != 0 &&
+        r242ObjectReady.cacheKey == programmablePair.cacheKey &&
+        r242ObjectReady.snapshotToken != 0 &&
+        programmableCache.validate_translation_object_snapshot(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ObjectReady.snapshotToken),
+        "R242 translated object receipt seals device cache and slot ownership");
+    const auto firstR242ReceiptGeneration =
+        r242ObjectReady.translationObjectReceiptGeneration;
+    const auto firstR242ObjectSnapshot =
+        r242ObjectReady.snapshotToken;
+    require(
+        programmableCache.attach_translation_objects_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            pipelineBundle.vertex_shader(),
+            pipelineBundle.pixel_shader()) &&
+        programmableCache.translation_object_readiness(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken).snapshotToken ==
+            firstR242ObjectSnapshot,
+        "R242 same translated object pair attachment is idempotent");
+
+    const std::string r242AlternateVertexSource = R"(
+struct VSInput { float4 position : POSITION0; };
+struct VSOutput { float4 position : SV_Position; };
+VSOutput main(VSInput input)
+{
+    VSOutput output;
+    output.position = input.position;
+    return output;
+}
+)";
+    ID3DBlob* r242AlternateVertexBytecode =
+        compile_vertex_shader(r242AlternateVertexSource);
+    ID3D11VertexShader* r242AlternateVertexShader = nullptr;
+    require(
+        SUCCEEDED(d3d.device->CreateVertexShader(
+            r242AlternateVertexBytecode->GetBufferPointer(),
+            r242AlternateVertexBytecode->GetBufferSize(),
+            nullptr,
+            &r242AlternateVertexShader)) &&
+        r242AlternateVertexShader != nullptr &&
+        r242AlternateVertexShader != pipelineBundle.vertex_shader(),
+        "R242 distinct translated vertex object prerequisite");
+    require(
+        !programmableCache.attach_translation_objects_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242AlternateVertexShader,
+            pipelineBundle.pixel_shader()),
+        "R242 different translated object pair cannot replace sealed receipt");
+    r242AlternateVertexShader->Release();
+    r242AlternateVertexBytecode->Release();
+
+    DevicePair r242ForeignDevice = create_warp_device();
+    NativeFixedFunctionPipelineBundle r242ForeignPipeline;
+    require(
+        r242ForeignPipeline.initialize(
+            r242ForeignDevice.device,
+            inputLayout, vertexPrototype, pixelPrototype) &&
+        !programmableCache.attach_translation_objects_for_observation(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            r242ForeignPipeline.vertex_shader(),
+            r242ForeignPipeline.pixel_shader()),
+        "R242 foreign-device translated object pair fails closed");
+    r242ForeignPipeline.shutdown();
+    r242ForeignDevice.context->Release();
+    r242ForeignDevice.device->Release();
+
+    require(
+        programmableCache.initialize(d3d.device) &&
+        !programmableCache.validate_translation_object_snapshot(
+            d3d.device, programmablePair,
+            r242CacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            firstR242ObjectSnapshot),
+        "R242 device reinitialize invalidates translated object receipt");
+    require(
+        programmableCache.cache_for_observation(programmablePair),
+        "R242 fresh cache generation prerequisite");
+    const auto r242FreshCacheReady =
+        programmableCache.readiness(d3d.device, programmablePair);
+    require(
+        r242FreshCacheReady.ready &&
+        programmableCache.reserve_translation_slot_for_observation(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken),
+        "R242 fresh slot generation prerequisite");
+    const auto r242FreshSlotReady =
+        programmableCache.translation_slot_ownership_readiness(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken);
+    require(
+        r242FreshSlotReady.ownershipReady &&
+        !programmableCache.attach_translation_objects_for_observation(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242SlotReady.snapshotToken,
+            pipelineBundle.vertex_shader(),
+            pipelineBundle.pixel_shader()),
+        "R242 stale slot snapshot cannot attach translated objects");
+    require(
+        programmableCache.attach_translation_objects_for_observation(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken,
+            pipelineBundle.vertex_shader(),
+            pipelineBundle.pixel_shader()),
+        "R242 fresh slot accepts translated object pair");
+    const auto r242FreshObjectReady =
+        programmableCache.translation_object_readiness(
+            d3d.device, programmablePair,
+            r242FreshCacheReady.snapshotToken,
+            r242FreshSlotReady.snapshotToken);
+    require(
+        r242FreshObjectReady.attachmentReady &&
+        r242FreshObjectReady.translationObjectReceiptGeneration !=
+            firstR242ReceiptGeneration &&
+        r242FreshObjectReady.snapshotToken !=
+            firstR242ObjectSnapshot,
+        "R242 fresh device generation receives a distinct object receipt");
+
+    require(
         pipelineBundle.upload_transform_for_observation(d3d.context, transform),
         "final VS b0 transform upload prerequisite");
     const auto pipelineTransformBindingReady =

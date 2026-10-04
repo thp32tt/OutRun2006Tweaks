@@ -1191,6 +1191,27 @@ struct NativeProgrammableShaderTranslationSlotReadiness {
     std::uint64_t snapshotToken{};
 };
 
+// R242 attaches an already-created programmable VS/PS object pair to one
+// exact R241 slot and issues an ownership receipt. It does not translate
+// D3D9 bytecode, create shaders, bind shaders, or participate in draw routing.
+struct NativeProgrammableShaderTranslationObjectReadiness {
+    bool inputValid{};
+    bool slotReady{};
+    bool deviceMatches{};
+    bool cacheSnapshotMatches{};
+    bool slotSnapshotMatches{};
+    bool objectsAttached{};
+    bool objectDevicesMatch{};
+    bool attachmentReady{};
+    std::uint64_t ownerGeneration{};
+    std::uint64_t slotGeneration{};
+    std::uint64_t translationObjectReceiptGeneration{};
+    std::uint64_t cacheKey{};
+    std::uint64_t cacheSnapshotToken{};
+    std::uint64_t slotSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;
@@ -1224,6 +1245,25 @@ public:
         const ProgrammableShaderPairCacheIdentity& identity,
         std::uint64_t cacheSnapshotToken,
         std::uint64_t slotSnapshotToken) const noexcept;
+    bool attach_translation_objects_for_observation(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        ID3D11VertexShader* vertexShader,
+        ID3D11PixelShader* pixelShader) noexcept;
+    [[nodiscard]] NativeProgrammableShaderTranslationObjectReadiness
+    translation_object_readiness(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken) const noexcept;
+    [[nodiscard]] bool validate_translation_object_snapshot(
+        ID3D11Device* expectedDevice,
+        const ProgrammableShaderPairCacheIdentity& identity,
+        std::uint64_t cacheSnapshotToken,
+        std::uint64_t slotSnapshotToken,
+        std::uint64_t objectSnapshotToken) const noexcept;
     void shutdown() noexcept;
 
     [[nodiscard]] bool ready() const noexcept {
@@ -1248,12 +1288,16 @@ private:
         DWORD pixelVersionToken{};
         std::uint64_t pixelBytecodeHash{};
         std::uint64_t translationSlotGeneration{};
+        Microsoft::WRL::ComPtr<ID3D11VertexShader> translatedVertexShader;
+        Microsoft::WRL::ComPtr<ID3D11PixelShader> translatedPixelShader;
+        std::uint64_t translationObjectReceiptGeneration{};
     };
 
     Microsoft::WRL::ComPtr<ID3D11Device> device_;
     std::unordered_map<std::uint64_t, Entry> entries_;
     std::uint64_t owner_generation_ = 0;
     std::uint64_t translation_slot_generation_counter_ = 0;
+    std::uint64_t translation_object_receipt_generation_counter_ = 0;
 };
 
 // R97 dormant per-device owner for the R93/R84 shader pair, R78/R88

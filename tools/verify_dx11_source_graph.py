@@ -9448,6 +9448,58 @@ def main() -> None:
             )
         )
 
+    r242_programmable_translation_object_attachment_contract = [
+        ("struct NativeProgrammableShaderTranslationObjectReadiness",
+         NATIVE_BACKEND_HPP,
+         "R242 translated-object attachment readiness type"),
+        ("attach_translation_objects_for_observation(",
+         NATIVE_BACKEND_HPP,
+         "R242 translated-object attachment declaration"),
+        ("translation_object_readiness(",
+         NATIVE_BACKEND_HPP,
+         "R242 translated-object readiness declaration"),
+        ("validate_translation_object_snapshot(",
+         NATIVE_BACKEND_HPP,
+         "R242 translated-object snapshot validation declaration"),
+        ("translationObjectReceiptGeneration",
+         NATIVE_BACKEND_HPP,
+         "R242 per-entry translated-object receipt generation"),
+        ("vertexShader->GetDevice(",
+         NATIVE_BACKEND_CPP,
+         "R242 vertex object exact-device ownership check"),
+        ("pixelShader->GetDevice(",
+         NATIVE_BACKEND_CPP,
+         "R242 pixel object exact-device ownership check"),
+        ("translation slot must exist before translated objects attach",
+         CONSTANT_BUFFER_PROBE,
+         "R242 no-implicit-slot attachment regression"),
+        ("same translated object pair attachment is idempotent",
+         CONSTANT_BUFFER_PROBE,
+         "R242 duplicate attachment idempotence regression"),
+        ("different translated object pair cannot replace sealed receipt",
+         CONSTANT_BUFFER_PROBE,
+         "R242 object replacement fail-closed regression"),
+        ("stale slot snapshot cannot attach translated objects",
+         CONSTANT_BUFFER_PROBE,
+         "R242 stale slot fail-closed regression"),
+        ("device reinitialize invalidates translated object receipt",
+         CONSTANT_BUFFER_PROBE,
+         "R242 device-generation receipt invalidation regression"),
+    ]
+    missing_r242_programmable_translation_object_attachment = [
+        meaning
+        for token, source, meaning
+        in r242_programmable_translation_object_attachment_contract
+        if token not in source
+    ]
+    if missing_r242_programmable_translation_object_attachment:
+        raise SystemExit(
+            "DX11 R242 programmable translated-object attachment drift: "
+            + ", ".join(
+                missing_r242_programmable_translation_object_attachment
+            )
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
