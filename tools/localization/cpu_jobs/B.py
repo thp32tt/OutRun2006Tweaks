@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 from scipy import ndimage
 
-RUN="20261005-B-PRODUCTION54"
+RUN="20261005-B-PRODUCTION55"
 ASSET="textures/load/spr_sprani_sumo_fe_cvt_Exst/1F5FE6E9_1024x512.dds"
 INDEX=132
 LABELS=[("REQUEST","요청"),("SPECIAL REQUEST 1","스페셜 요청 1"),("SPECIAL REQUEST 2","스페셜 요청 2"),("SPECIAL REQUEST 3","스페셜 요청 3")]
@@ -45,7 +45,7 @@ def ensure_font():
 
 def main():
     if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions":
-        raise RuntimeError("B54 must run on hosted CPU worker")
+        raise RuntimeError("B55 must run on hosted CPU worker")
     repo=Path.cwd()
     out=repo/"localization/graphics/role_B"/RUN
     out.mkdir(parents=True,exist_ok=True)
@@ -86,7 +86,7 @@ def main():
         w=bb[2]-bb[0]; h=bb[3]-bb[1]; area=len(xx)
         comps.append({"id":cid,"area":int(area),"bbox":bb,"w":w,"h":h,"cx":float(xx.mean()),"cy":float(yy.mean()),"amax":int(alpha[yy,xx].max())})
     comps.sort(key=lambda c:(c["bbox"][1],c["bbox"][0]))
-    (out/"B54_SOURCE_ALPHA_COMPONENTS.json").write_text(json.dumps({"components":comps},indent=2)+"\n")
+    (out/"B55_SOURCE_ALPHA_COMPONENTS.json").write_text(json.dumps({"components":comps},indent=2)+"\n")
 
     # B54 exact row recovery from source alpha. B52 diagnostics proved the actual glyph
     # rows are 24px-spaced at 140/164/188/212, not the historical draft plate tops.
@@ -243,7 +243,7 @@ def main():
             "delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],
             "delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],
             "containment":"PASS","size_ceiling":"PASS","font_size":fs,
-            "font_basename":Path(FONT).name,"fill_rgba":list(fill_rgb)+(fill_alpha,),
+            "font_basename":Path(FONT).name,"fill_rgba":list(fill_rgb)+[fill_alpha],
             "shared_source_style":"PASS"
         })
 
@@ -281,11 +281,11 @@ def main():
     mask_img(~allowed).save(out/"1F5_PROTECTED_MASK.png")
     mask_img(target).save(out/"1F5_TARGET_TEXT_MASK.png")
     clean_img.save(out/"1F5_CLEAN_PLATE.png")
-    sp=Path("/tmp/b54src.png"); fp=Path("/tmp/b54fin.png")
+    sp=Path("/tmp/b55src.png"); fp=Path("/tmp/b55fin.png")
     src.save(sp); dec.save(fp)
     v=repo/"tools/localization/validate_clean_plate.py"
-    subprocess.run(["python3",str(v),str(sp),str(out/"1F5_CLEAN_PLATE.png"),str(out/"1F5_SOURCE_TEXT_MASK.png"),"--report",str(out/"B54_CLEAN_VALIDATION.json")],check=True)
-    subprocess.run(["python3",str(v),str(sp),str(fp),str(out/"1F5_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(out/"1F5_PROTECTED_MASK.png"),"--report",str(out/"B54_FINAL_VALIDATION.json")],check=True)
+    subprocess.run(["python3",str(v),str(sp),str(out/"1F5_CLEAN_PLATE.png"),str(out/"1F5_SOURCE_TEXT_MASK.png"),"--report",str(out/"B55_CLEAN_VALIDATION.json")],check=True)
+    subprocess.run(["python3",str(v),str(sp),str(fp),str(out/"1F5_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(out/"1F5_PROTECTED_MASK.png"),"--report",str(out/"B55_FINAL_VALIDATION.json")],check=True)
 
     def comp(im,bg=(64,64,64,255)):
         z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
@@ -295,7 +295,7 @@ def main():
     cards=[card("SOURCE_READABLE",src),card("CLEAN",clean_img),card("FINAL",dec),card("FINAL_WHITE",dec,(255,255,255,255))]
     sheet=Image.new("RGB",(W*2,(H+26)*2),"white")
     sheet.paste(cards[0],(0,0));sheet.paste(cards[1],(W,0));sheet.paste(cards[2],(0,H+26));sheet.paste(cards[3],(W,H+26))
-    sheet.save(out/"B54_1F5_COMPARE.jpg",quality=96)
+    sheet.save(out/"B55_1F5_COMPARE.jpg",quality=96)
     sr,cl,fi=comp(src),comp(clean_img),comp(dec)
     rowcards=[]
     for r in row_reports:
@@ -311,10 +311,10 @@ def main():
     rs=Image.new("RGB",(max(c.width for c in rowcards),sum(c.height for c in rowcards)+4*(len(rowcards)-1)),"white")
     yy=0
     for c in rowcards: rs.paste(c,(0,yy)); yy+=c.height+4
-    rs.save(out/"B54_1F5_ROW_CONTACT_4X.jpg",quality=96)
+    rs.save(out/"B55_1F5_ROW_CONTACT_4X.jpg",quality=96)
     rr=Image.new("RGB",(W,(H+26)*2),"white")
     rr.paste(card("SOURCE_RAW_MIRROR_Y",raw_src),(0,0)); rr.paste(card("FINAL_RAW_MIRROR_Y",raw_dec),(0,H+26))
-    rr.save(out/"B54_1F5_RAW_COMPARE.jpg",quality=96)
+    rr.save(out/"B55_1F5_RAW_COMPARE.jpg",quality=96)
 
     report={
         "schema_version":1,"role":"B","run":RUN,"queue_index":INDEX,"asset":ASSET,
@@ -325,19 +325,19 @@ def main():
         "structure":{"width":W,"height":H,"format":"RGBA32","mipmaps":mips,"header_128_exact":True,"raw_orientation":"mirror_y"},
         "source_mask_method":"source alpha glyph components by proven 24px row periodicity; row4 panel-connected prefix recovered only by row3 +24 template intersected with canonical source alpha",
         "source_row_positive_separation":"PASS","rows":row_reports,
-        "shared_typography":{"font_size":fs,"fill_rgba":list(fill_rgb)+(fill_alpha,),"status":"PASS_SHARED_SOURCE_ALPHA_STYLE"},
+        "shared_typography":{"font_size":fs,"fill_rgba":list(fill_rgb)+[fill_alpha],"status":"PASS_SHARED_SOURCE_ALPHA_STYLE"},
         "containment":{"elements_total":4,"elements_pass":4,"outside":outside,"alpha_outside":alpha_out,"target_out":target_out,
                        "source_residue":residue,"overlap":overlap,"touch_pairs":touch,"status":"PASS"},
         "policy":{"colored_menu_panels_preserved":"YES","song_titles_credits":"not_targeted","stage_names":"not_applicable","multi_line":"not_applicable"},
         "manual_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
-        "status":"B_PRODUCTION54_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
+        "status":"B_PRODUCTION55_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"
     }
-    (out/"B54_1F5_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
+    (out/"B55_1F5_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n")
     summary={"run":RUN,"asset":"1F5FE6E9","index":INDEX,"candidate_sha256":csha,"bbox_size_pass":"4/4",
              "outside":outside,"alpha_outside":alpha_out,"source_residue":residue,"overlap":overlap,"touch_pairs":len(touch),
              "worker_status":report["status"],"runtime_validation":"UNTESTED",
-             "report":f"localization/graphics/role_B/{RUN}/B54_1F5_REPORT.json"}
-    (wr/"B54_1F5FE6E9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
+             "report":f"localization/graphics/role_B/{RUN}/B55_1F5_REPORT.json"}
+    (wr/"B55_1F5FE6E9.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n")
     print(json.dumps(summary,ensure_ascii=False),flush=True)
 
 if __name__=="__main__":
@@ -348,6 +348,6 @@ if __name__=="__main__":
         wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
         fail={"run":RUN,"asset":"1F5FE6E9","index":INDEX,"status":"FAIL_CLOSED_DIAGNOSTIC",
               "exception":repr(e),"traceback":traceback.format_exc(),"RUNTIME_VALIDATION":"UNTESTED"}
-        (out/"B54_FAIL_CLOSED.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n")
-        (wr/"B54_1F5FE6E9_FAIL.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n")
+        (out/"B55_FAIL_CLOSED.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n")
+        (wr/"B55_1F5FE6E9_FAIL.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n")
         print(json.dumps(fail,ensure_ascii=False),flush=True)
