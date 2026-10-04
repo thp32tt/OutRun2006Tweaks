@@ -101,11 +101,15 @@ def source_palette(mask,bb):
     a=np.asarray(src,dtype=np.uint8); m=np.asarray(mask)>0; p=a[m]; coords=np.argwhere(m)
     p=p[p[:,3]>8]
     if len(p)<10:return (255,255,255,255),(255,255,255,255),(0,0,0,255)
-    allp=a[m]; lum=.2126*allp[:,0]+.7152*allp[:,1]+.0722*allp[:,2]; hi=lum>=np.percentile(lum,72); lo=lum<=np.percentile(lum,20); mid=(bb[1]+bb[3])/2
-    top_sel=allp[hi & (coords[:,0]<mid)]; bot_sel=allp[hi & (coords[:,0]>=mid)]
+    allp=a[m]; rgb=allp[:,:3].astype(np.int16); lum=.2126*rgb[:,0]+.7152*rgb[:,1]+.0722*rgb[:,2]
+    chroma=rgb.max(axis=1)-rgb.min(axis=1); colored=(allp[:,3]>24)&(rgb.max(axis=1)>100)&(chroma>25)
+    y0,y1=bb[1],bb[3]; span=max(1,y1-y0); top_band=coords[:,0] <= y0+span*0.42; bot_band=coords[:,0] >= y0+span*0.58
+    top_sel=allp[colored & top_band]; bot_sel=allp[colored & bot_band]
+    if len(top_sel)<20 or len(bot_sel)<20:
+        hi=lum>=np.percentile(lum,72); top_sel=allp[hi & top_band]; bot_sel=allp[hi & bot_band]
     top=tuple(int(v) for v in np.median(top_sel,axis=0)) if len(top_sel) else (255,255,255,255)
     bottom=tuple(int(v) for v in np.median(bot_sel,axis=0)) if len(bot_sel) else top
-    outline=tuple(int(v) for v in np.median(allp[lo],axis=0)) if np.any(lo) else (0,0,0,255)
+    lo=lum<=np.percentile(lum,20); outline=tuple(int(v) for v in np.median(allp[lo],axis=0)) if np.any(lo) else (0,0,0,255)
     return top,bottom,outline
 
 def shear(im,slant):
