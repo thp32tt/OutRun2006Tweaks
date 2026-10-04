@@ -216,7 +216,13 @@
     "protected_visible_pixels_changed": 0,
     "clean_plate_source_text_residue_pixels": 0
   },
-  "controller_visual_qa": "PENDING_CONTROLLER_REVIEW",
+  "controller_visual_qa": "PASS",
   "runtime_validation": "UNTESTED",
-  "status": "A_PRODUCTION19_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA"
+  "status": "A_PRODUCTION19_SELF_QA_PASS_PENDING_C_AND_INGAME",
+  "controller_visual_evidence": [
+    "localization/graphics/role_A/20261005-A-PRODUCTION19/A_PRODUCTION19_CONTACT_SOURCE_FINAL.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION19/A_PRODUCTION19_SOURCE_CLEAN_FINAL_GRAY.jpg",
+    "localization/graphics/role_A/20261005-A-PRODUCTION19/A_PRODUCTION19_FINAL_RAW_GRAY.jpg"
+  ],
+  "controller_visual_note": "PASS after same-run source-weight correction. TUNED/NORMAL source labels use a heavy plain white sans family; the final 튜닝/일반 labels use the resolved Korean Black face plus only a same-color 1px weight reinforcement, remain centered and smaller than the source footprints, and show no source residue, clipping, overlap, seam, halo, protected-art damage, or raw mirror_y orientation regression."
 }
