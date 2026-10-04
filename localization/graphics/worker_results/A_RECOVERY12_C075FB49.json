@@ -1,0 +1,40 @@
+{
+  "run": "20261005-A-RECOVERY12",
+  "asset": "C075FB49",
+  "index": 111,
+  "input_candidate_sha256": "fc75a1a1b267dbc43f240483ffc1ec67e3d3dddd05061e504ab4c0c4ca2efacd",
+  "candidate_sha256": "d5fa574c85c0481bd82793a92d1a98b251005269ff343910c7b329030afd1633",
+  "reworked_rows": 8,
+  "preserved_rows": 9,
+  "bbox_pass": "17/17",
+  "size_ceiling": "17/17",
+  "positive_margin": "17/17",
+  "clean_plate_validator": "PASS",
+  "final_mask_validator": "PASS",
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_pairs": [],
+  "changed_pixels_outside_original_bboxes": 0,
+  "alpha_changed_pixels_outside_original_bboxes": 0,
+  "protected_visible_pixels_changed": 0,
+  "top_clean_source_residue_pixels": 0,
+  "changes_vs_input_outside_8_c109_returned_bboxes": 0,
+  "preserved_lower_input_pixel_diffs": {
+    "tuned_setting": 0,
+    "normal_setting": 0,
+    "new_course_desc": 0,
+    "original_course_desc": 0,
+    "conditions": 0,
+    "random": 0,
+    "normal_balance": 0,
+    "more_bgm_1": 0,
+    "more_bgm_2": 0
+  },
+  "preserved_source_label_pixel_diffs": {
+    "OutRun2SP": 0,
+    "OutRun2": 0,
+    "1P": 0
+  },
+  "worker_status": "A_RECOVERY12_WORKER_STATIC_QA_PASS_PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "report": "localization/graphics/role_A/20261005-A-RECOVERY12/A_RECOVERY12_C075FB49_REPORT.json"
+}
