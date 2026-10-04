@@ -243,10 +243,11 @@ namespace OutRunVRStereo
             R20InstallState.store(State::Pending, std::memory_order_release);
             for (int attempt = 0; attempt < 4800; ++attempt)
             {
-                const std::uint32_t r9 = R9InstallState.load(std::memory_order_acquire);
-                const std::uint32_t r13 = R13InstallState.load(std::memory_order_acquire);
+                const auto r9 = R9InstallStatus();
+                const auto r13 = R13InstallStatus();
 
-                if (r9 == R9InstallFailed || r13 == R13InstallFailed)
+                if (r9 == R9InstallStatusValue::Failed ||
+                    r13 == R13InstallStatusValue::Failed)
                 {
                     R20InstallState.store(State::Failed, std::memory_order_release);
                     spdlog::error(
@@ -254,7 +255,8 @@ namespace OutRunVRStereo
                     return 0;
                 }
 
-                if (r9 == R9InstallReady && r13 == R13InstallReady)
+                if (r9 == R9InstallStatusValue::Ready &&
+                    r13 == R13InstallStatusValue::Ready)
                 {
                     R20ClearR9Hook = safetyhook::create_inline(
                         reinterpret_cast<void*>(&ClearDestR9), ClearDestR20,
@@ -314,5 +316,11 @@ namespace OutRunVRStereo
         };
 
         VRProductionBootstrapR20Hook VRProductionBootstrapR20Hook::instance;
+    }
+
+    inline OutRunVR::RuntimeEligibility::InstallState
+    R20InstallStatus() noexcept
+    {
+        return R20InstallState.load(std::memory_order_acquire);
     }
 }
