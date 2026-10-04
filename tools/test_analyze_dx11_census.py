@@ -1280,6 +1280,16 @@ def main() -> int:
         is False
     )
 
+    # R237: even exhaustive draw sampling must not advertise the clean
+    # exhaustive-exact status when the current signature universe is incomplete.
+    r237_exhaustive_signature_evidence_status_boundary = (
+        r236_current_signature_hash_cap_coverage_boundary
+    )
+    assert (
+        r237_exhaustive_signature_evidence_status_boundary["Status"]
+        == "OBSERVED_EXHAUSTIVE_TRANSLATION_EXACT_SIGNATURE_EVIDENCE_INCOMPLETE"
+    )
+
     r106 = run_case(
         "VR DX11 R85 signature#1: primitive=4 fixedFn=1\n"
         "VR DX11 R85 texture signature#1 stage#0: observed=1 type=3 pool=1 "
@@ -1409,6 +1419,10 @@ def main() -> int:
     assert r114_saturated["NativeDrawPathActivationAllowed"] is False
 
     exhaustive = run_case(
+        "VR DX11 R85 signature#1: primitive=4 fixedFn=1 fvf=0x000001C4\n"
+        "VR DX11 R85 signature#2: primitive=4 fixedFn=1 fvf=0x000001C4\n"
+        "VR DX11 R85 signature#3: primitive=4 fixedFn=1 fvf=0x000001C4\n"
+        "VR DX11 R85 signature#4: primitive=4 fixedFn=1 fvf=0x000001C4\n"
         "VR DX11 R120 census: samples=4 exact=4 fixedFn=4 programmable=0 "
         "topologyUnsupported=0 signatures=4 "
         "sampling[drawsSeen=4,stride=1,scheme=2] "

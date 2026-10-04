@@ -1,0 +1,84 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00347",
+  "production_id": "CONVERSION-DXVK-00346",
+  "event_id": "CONVERSION-DXVK-00346-E006",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "base_sha": "dca19b139bdf23aa311882627fb7dcc0c3671a0f",
+  "result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_marker": "[AUTO:CONVERSION-DX11-00347]",
+  "selected_work_item": "DX11_R237_EXHAUSTIVE_STATUS_SIGNATURE_EVIDENCE_FAIL_CLOSED",
+  "summary": "R237 prevents an exhaustive draw census from advertising the clean exhaustive-translation-exact headline when current signature evidence is incomplete or hash-cap saturated. A complete unsaturated signature universe retains the existing diagnostic-only exhaustive exact status.",
+  "changed_paths": [
+    "tools/analyze_dx11_census.py",
+    "tools/test_analyze_dx11_census.py",
+    "tools/verify_dx11_source_graph.py",
+    "docs/automation/runs/CONVERSION-DX11-00347.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authenticated GitHub vr-dx11-native-r71 HEAD dca19b139bdf23aa311882627fb7dcc0c3671a0f; read AGENTS.md, VR backend review index/Set05, queue controller contract, branch-local conversion state and VR automation/regression history. R236 is complete and not repeated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "R236 correctly separates signature count accounting from hash-universe coverage, but the analyzer evaluates the clean exhaustive exact headline before considering incomplete current signature evidence. Thus scheme=2/stride=1/samples=drawsSeen can still report OBSERVED_EXHAUSTIVE_TRANSLATION_EXACT_DIAGNOSTIC_ONLY while the signature hash cap has saturated or current signature evidence is otherwise incomplete.",
+      "review_lenses": {
+        "architecture": "Offline DX11 census analyzer/test/verifier only; runtime renderer routing and vr-d3d9ex-focus remain untouched.",
+        "ownership_lifetime": "No D3D9/D3D11 COM/resource/reset/fence/consumer-ACK lifetime changes.",
+        "stereo_correctness": "No WVP/projection/HUD/sky/effect/recenter changes.",
+        "performance": "Offline report status classification only; no runtime hot-path change.",
+        "adversarial": "Use R236's exhaustive two-log case where every draw is sampled and exact, all reported signatures are count-accounted, but one log has hashCapHitSamples>0; the clean exhaustive headline must be rejected while a complete unsaturated exhaustive fixture must retain it."
+      }
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Gate the clean exhaustive exact headline on all_current_signature_evidence_coverage_complete; emit an explicit exhaustive signature-evidence-incomplete diagnostic status otherwise; make the positive exhaustive fixture include all four declared signatures; add negative/positive regression guards and source-graph drift checks."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING_EXACT_SHA_GATE",
+      "automation_validation": "PENDING",
+      "evidence": "Required exact-SHA Backend Conversion Gate will validate R237 analyzer regressions, source graph, dormant activation, Win32 build/binary and DX11 readiness smoke. No Quest 3/VDXR runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "PENDING_RESULT_SHA_PUBLICATION",
+      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+    },
+    "C5_PACKAGE": {
+      "status": "NOT_REQUIRED",
+      "reason": "Offline census analyzer/status semantic change only; no runtime distributable identity change intended."
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "state_persisted": false,
+      "exact_next_action": "Require the exact-SHA Backend Conversion Gate on the R237 material result; after PASS, finalize run/lane bookkeeping while preserving RUNTIME_VALIDATION=UNTESTED."
+    }
+  },
+  "regression_assessment": {
+    "related_review_findings": [
+      "VR_BACKEND_SET05_F22_SAMPLING_SIGNATURE_SATURATION",
+      "VR_BACKEND_SET05_F23_CENSUS_EXACTNESS_SEMANTICS"
+    ],
+    "runtime_risk_paths_touched": false,
+    "evidence": "Only offline analyzer/test/verifier and task bookkeeping paths change. Protected runtime renderer/transport risk paths are untouched and NativeDrawPath remains dormant."
+  },
+  "native_draw_path_activation_changed": false,
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX11-00347",
+    "production_id": "CONVERSION-DXVK-00346",
+    "event_id": "CONVERSION-DXVK-00346-E006",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE"
+  },
+  "exact_next_action": "Publish the R237 material result without CI skip and require its exact-SHA Backend Conversion Gate."
+}

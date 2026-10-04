@@ -9270,6 +9270,37 @@ def main() -> None:
             + ", ".join(missing_r236_current_signature_hash_cap_coverage_boundary)
         )
 
+    r237_exhaustive_status_signature_evidence_fail_closed_contract = [
+        ("and not all_current_signature_evidence_coverage_complete",
+         DX11_CENSUS_ANALYZER,
+         "R237 exhaustive headline status must require complete current signature evidence"),
+        ('"SIGNATURE_EVIDENCE_INCOMPLETE"',
+         DX11_CENSUS_ANALYZER,
+         "R237 explicit incomplete-signature exhaustive status"),
+        ("r237_exhaustive_signature_evidence_status_boundary = (",
+         DX11_CENSUS_ANALYZER_TEST,
+         "R237 exhaustive incomplete-signature regression boundary"),
+        ('== "OBSERVED_EXHAUSTIVE_TRANSLATION_EXACT_SIGNATURE_EVIDENCE_INCOMPLETE"',
+         DX11_CENSUS_ANALYZER_TEST,
+         "R237 exhaustive incomplete-signature status assertion"),
+        ('"VR DX11 R85 signature#4: primitive=4 fixedFn=1 fvf=0x000001C4\\n"',
+         DX11_CENSUS_ANALYZER_TEST,
+         "R237 positive exhaustive fixture accounts for its complete signature universe"),
+    ]
+    missing_r237_exhaustive_status_signature_evidence_fail_closed = [
+        meaning
+        for token, source, meaning
+        in r237_exhaustive_status_signature_evidence_fail_closed_contract
+        if token not in source
+    ]
+    if missing_r237_exhaustive_status_signature_evidence_fail_closed:
+        raise SystemExit(
+            "DX11 R237 exhaustive signature-evidence status drift: "
+            + ", ".join(
+                missing_r237_exhaustive_status_signature_evidence_fail_closed
+            )
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")

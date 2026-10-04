@@ -1061,6 +1061,18 @@ def main() -> int:
         status = "UNSUPPORTED_BEHAVIOR_OBSERVED"
     elif not all_source_logs_have_summary:
         status = "TRANSLATION_EXACTNESS_PENDING"
+    # R237: exhaustive source-draw sampling does not imply complete signature
+    # evidence. Keep the headline status fail-closed until the current startup's
+    # signature universe is reconciled and the hash cap has not saturated.
+    elif (
+        sampled_exactness["AllSampledExact"]
+        and exhaustive_draw_coverage
+        and not all_current_signature_evidence_coverage_complete
+    ):
+        status = (
+            "OBSERVED_EXHAUSTIVE_TRANSLATION_EXACT_"
+            "SIGNATURE_EVIDENCE_INCOMPLETE"
+        )
     elif sampled_exactness["AllSampledExact"] and exhaustive_draw_coverage:
         status = "OBSERVED_EXHAUSTIVE_TRANSLATION_EXACT_DIAGNOSTIC_ONLY"
     elif (
