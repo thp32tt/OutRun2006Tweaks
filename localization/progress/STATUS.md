@@ -819,3 +819,12 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Manual SOURCE/CLEAN/FINAL, 14-row contact and raw-orientation review PASS after matching the source's heavy plain-white lettering weight. No residue, clipping, overlap, seam, opaque patch, alpha halo, protected glyph damage or orientation regression observed.
 - Pending-artwork direct-localize count after this row: 56. RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_A/20261004-A-PRODUCTION13/.
+
+## 2026-10-04 A production14 — BF3EE5C6 exact-HD results atlas candidate
+- Refreshed the odd shard and selected index 49 BF3EE5C6. The authoritative Release DDS keeps the stale _512x512 name but its header is 2048x2048 RGBA32 / 1 mip / raw mirror_y; source SHA-256 b5c0a868add94395745af1827c21ddddd178439b5b4614fbadd8f0e4135a9887.
+- GitHub-hosted Localization CPU Worker run 37197527558 PASS produced candidate 30cc2167b1650ab0a7b1c579c7d29118065007f0474f7207ce993ab1b19e45fa.
+- Localized 12 translated concepts across 13 independent sprite occurrences: Rank for this stage -> 이 스테이지 랭크, NORMAL -> 일반, TUNED x2 -> 튜닝, TOP Ghost Car!! -> 최고 고스트 카!!, Double! -> 더블!, Strike! -> 스트라이크!, GOAL! -> 골!, Spare! -> 스페어!, Shift up!! -> 시프트 업!!, Rank -> 랭크, Turkey! -> 터키!, Go! -> 출발!.
+- Static self-QA PASS: 13/13 readable+raw exact-bbox containment, 13/13 exact source width/height ceiling, 13/13 positive margins, clean/final validators PASS, changed/alpha/protected pixels outside exact bboxes = 0, clean-plate source residue = 0.
+- Manual SOURCE/CLEAN/FINAL, 13-row contact and raw-orientation review PASS. Source-family gold/navy, green/navy, red/navy, white/red glow, multicolor GOAL, white/lavender Rank and peach Go treatments were retained without visible residue, clipping, overlap, seam, opaque patch, alpha halo, protected-art damage or orientation regression.
+- Pending-artwork direct-localize count after this row: 55. RUNTIME_VALIDATION=UNTESTED; independent C final QA and isolated in-game validation remain pending. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_A/20261004-A-PRODUCTION14/.
