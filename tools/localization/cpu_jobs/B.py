@@ -213,10 +213,10 @@ for spec in TARGETS:
             # The source family has a dark/navy drop shadow that can extend several
             # pixels below the orange core.  Include only dark pixels near the core so
             # the shadow is removed without consuming the light-blue plate.
-            wide=np.asarray(Image.fromarray((abs_core*255).astype(np.uint8),"L").filter(ImageFilter.MaxFilter(21)))>0
+            wide=np.asarray(Image.fromarray((abs_core*255).astype(np.uint8),"L").filter(ImageFilter.MaxFilter(33)))>0
             wide &= cellmask
             lum_all=.2126*arr[:,:,0]+.7152*arr[:,:,1]+.0722*arr[:,:,2]
-            effect |= wide & (lum_all<115) & (arr[:,:,3]>0)
+            effect |= wide & (lum_all<135) & (arr[:,:,3]>0)
         ey,ex=np.nonzero(effect)
         if not len(ex):raise RuntimeError(("empty_effect",spec["key"],li))
         eb=[int(ex.min()),int(ey.min()),int(ex.max())+1,int(ey.max())+1]
@@ -258,6 +258,12 @@ for ld in line_defs:
     mask[y0:y1,x0:x1]=all_source_mask[y0:y1,x0:x1]
     clean_arr=estimate_background(clean_arr,mask,ld["cell"],ld["source_bbox"],ld["background"])
 clean=Image.fromarray(clean_arr,"RGBA")
+# Mirror C's residue gate in producer self-QA: every selected source-effect pixel must
+# differ from the exact source after clean reconstruction.
+source_same=np.all(clean_arr==arr,axis=2)
+source_mask_unchanged=int(np.count_nonzero(source_same & all_source_mask))
+if source_mask_unchanged:
+    raise RuntimeError(("source_text_mask_pixels_unchanged_in_clean_plate",source_mask_unchanged))
 
 # Fresh native-resolution Korean lettering.
 final=clean.copy()
@@ -291,6 +297,9 @@ allowed=np.zeros((2048,2048),bool)
 for r in rows:
     x0,y0,x1,y1=r["original_bbox"];allowed[y0:y1,x0:x1]=True
 if np.any(target_mask & ~allowed):raise RuntimeError("target outside allowed")
+guard=np.asarray(Image.fromarray((target_mask*255).astype(np.uint8),"L").filter(ImageFilter.MaxFilter(5)))>0
+guard_conflicts=int(np.count_nonzero(guard & ~allowed))
+if guard_conflicts:raise RuntimeError(("target_2px_guard_vs_protected",guard_conflicts))
 # Positive separation between independently localized line masks.
 for i in range(len(layers)):
     for j in range(i+1,len(layers)):
@@ -388,8 +397,8 @@ report={
  "semantic_targets":7,"physical_lines":len(rows),
  "translations":[{"source":t["source"],"korean":" / ".join(t["korean"])} for t in TARGETS],
  "protected_original":["all song titles/music credits","Ferrari/model names","vehicle images","OutRun/OutRun2 logos","music-note icons","non-target selector artwork"],
- "clean_plate":{"changed_pixels_outside_source_text_mask":int(np.count_nonzero(clean_diff & ~all_source_mask)),"status":"PASS"},
- "containment":{"lines_total":len(rows),"lines_pass":len(rows),"lines_fail":0,"all_channel_changed_pixels_outside_exact_source_bboxes":int(np.count_nonzero(outside)),"alpha_changed_pixels_outside_exact_source_bboxes":int(np.count_nonzero(alpha_out)),"localized_overlap_pixels":0,"status":"PASS"},
+ "clean_plate":{"changed_pixels_outside_source_text_mask":int(np.count_nonzero(clean_diff & ~all_source_mask)),"source_text_mask_pixels_unchanged_in_clean_plate":source_mask_unchanged,"status":"PASS"},
+ "containment":{"lines_total":len(rows),"lines_pass":len(rows),"lines_fail":0,"all_channel_changed_pixels_outside_exact_source_bboxes":int(np.count_nonzero(outside)),"alpha_changed_pixels_outside_exact_source_bboxes":int(np.count_nonzero(alpha_out)),"localized_overlap_pixels":0,"target_2px_guard_vs_protected_conflicts":guard_conflicts,"status":"PASS"},
  "rows":rows,
  "manual_visual_qa":"PENDING_CONTROLLER_SELF_QA",
  "RUNTIME_VALIDATION":"UNTESTED",
@@ -401,9 +410,10 @@ report={
  "semantic_targets":"7/7","physical_lines":f"{len(rows)}/{len(rows)}",
  "exact_bbox_and_size_ceiling":f"{len(rows)}/{len(rows)} PASS",
  "clean_outside_source_text_mask":0,
+ "source_text_mask_pixels_unchanged_in_clean_plate":source_mask_unchanged,
  "final_all_channel_outside_exact_bboxes":int(np.count_nonzero(outside)),
  "final_alpha_outside_exact_bboxes":int(np.count_nonzero(alpha_out)),
- "localized_overlap_pixels":0,"header_128_exact":True,"raw_orientation":"mirror_y",
+ "localized_overlap_pixels":0,"target_2px_guard_vs_protected_conflicts":guard_conflicts,"header_128_exact":True,"raw_orientation":"mirror_y",
  "song_title_and_vehicle_regions":"PIXEL_EXACT_OUTSIDE_TARGET_BBOXES",
  "runtime_validation":"UNTESTED","status":"PASS"
 },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
