@@ -867,7 +867,7 @@ namespace OutRunVRStereo
         R23BeforeTopLevelDraw(device);
     }
 
-    std::uint64_t TopLevelDrawSerial() noexcept
+    inline std::uint64_t TopLevelDrawSerial() noexcept
     {
         return R23GameDrawSerial;
     }
