@@ -1,16 +1,16 @@
 {
-  "source": "/tmp/b21/source.png",
-  "candidate": "/tmp/b21/clean.png",
+  "source": "/tmp/53_src.png",
+  "candidate": "/tmp/53_clean.png",
   "size": [
     2048,
-    1024
+    2048
   ],
-  "changed_pixels": 97636,
+  "changed_pixels": 86692,
   "changed_bbox": [
-    3,
-    92,
-    1600,
-    286
+    50,
+    20,
+    1787,
+    1979
   ],
   "changed_pixels_outside_edit_mask": 0,
   "changed_pixels_in_protected_mask": 0,
