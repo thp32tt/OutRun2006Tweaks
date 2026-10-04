@@ -10123,6 +10123,47 @@ def main() -> None:
             + ", ".join(missing_r256_programmable_draw_candidate_union)
         )
 
+    r257_programmable_dormant_pre_activation_contract = [
+        ("struct NativeProgrammableShaderDormantPreActivationReadiness",
+         NATIVE_BACKEND_HPP, "R257 dormant pre-activation receipt type"),
+        ("compose_programmable_dormant_pre_activation_readiness(",
+         NATIVE_BACKEND_HPP, "R257 dormant receipt composition declaration"),
+        ("validate_programmable_dormant_pre_activation_snapshot(",
+         NATIVE_BACKEND_HPP, "R257 dormant receipt snapshot validator"),
+        ("out.candidatePayloadSnapshotMatches =",
+         NATIVE_BACKEND_CPP, "R257 R256 payload self-integrity gate"),
+        ("out.diagnosticOnly = true;",
+         NATIVE_BACKEND_CPP, "R257 F23 diagnostic-only boundary"),
+        ("out.activationProofPresent = false;",
+         NATIVE_BACKEND_CPP, "R257 cannot manufacture activation proof"),
+        ("out.nativeDrawPathActivationAllowed = false;",
+         NATIVE_BACKEND_CPP, "R257 cannot authorize NativeDrawPath"),
+        ("out.drawDispatchAuthorized = false;",
+         NATIVE_BACKEND_CPP, "R257 cannot authorize Draw dispatch"),
+        ("token, 0x257u",
+         NATIVE_BACKEND_CPP, "R257 independent snapshot-domain tag"),
+        ("R257 indexed candidate seals dormant pre-activation review without draw authorization",
+         CONSTANT_BUFFER_PROBE, "R257 indexed positive dormant review regression"),
+        ("R257 rejects stale R256 indexed candidate token",
+         CONSTANT_BUFFER_PROBE, "R257 stale candidate regression"),
+        ("R257 rejects payload drift hidden behind an unchanged R256 indexed snapshot token",
+         CONSTANT_BUFFER_PROBE, "R257 payload-tamper regression"),
+        ("R257 non-indexed candidate seals dormant pre-activation review without draw authorization",
+         CONSTANT_BUFFER_PROBE, "R257 non-indexed positive dormant review regression"),
+        ("R257 rejects non-indexed R256 branch-tag mismatch",
+         CONSTANT_BUFFER_PROBE, "R257 branch-tag mismatch regression"),
+    ]
+    missing_r257_programmable_dormant_pre_activation = [
+        meaning for token, source, meaning
+        in r257_programmable_dormant_pre_activation_contract
+        if token not in source
+    ]
+    if missing_r257_programmable_dormant_pre_activation:
+        raise SystemExit(
+            "DX11 R257 programmable dormant pre-activation drift: "
+            + ", ".join(missing_r257_programmable_dormant_pre_activation)
+        )
+
     verify_dx11_activation_boundary()
 
     print(f"DX11 source graph: OK ({len(cpp_files)} translation units compiled)")
