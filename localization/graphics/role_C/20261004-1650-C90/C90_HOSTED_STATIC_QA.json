@@ -518,10 +518,18 @@
       "visual_evidence": {
         "full_compare": "localization/graphics/role_C/20261004-1650-C90/C90_AA04D779_FULL_COMPARE.jpg",
         "row_contact": "localization/graphics/role_C/20261004-1650-C90/C90_AA04D779_ROW_CONTACT.jpg",
-        "controller_visual_qa": "PENDING"
+        "controller_visual_qa": "PASS",
+        "controller_visual_note": "Full readable SOURCE/CLEAN/FINAL, raw SOURCE/FINAL, and 21-row contact review: no source residue, clipping, overlap, protected-art damage, patch seam, alpha halo, or orientation mismatch observed; white/navy course-label style and yellow/navy Sector 4 style remain source-family faithful."
       },
       "runtime_validation": "UNTESTED",
-      "machine_decision": "STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+      "machine_decision": "STATIC_MACHINE_PASS",
+      "c_decision": "C90_PIXEL_VISUAL_PASS_PENDING_INGAME",
+      "source_provenance": {
+        "mode": "pinned_upstream_fallback_not_repo_committed",
+        "repository": "Sonic-TV/OR2006Sprites",
+        "commit": "a95efe01d1f136514cef94b0d9e9fd61df021754",
+        "sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5"
+      }
     },
     {
       "asset": "19CEDB9",
@@ -847,10 +855,12 @@
       "visual_evidence": {
         "full_compare": "localization/graphics/role_C/20261004-1650-C90/C90_19CEDB9_FULL_COMPARE.jpg",
         "row_contact": "localization/graphics/role_C/20261004-1650-C90/C90_19CEDB9_ROW_CONTACT.jpg",
-        "controller_visual_qa": "PENDING"
+        "controller_visual_qa": "PASS",
+        "controller_visual_note": "Full readable/raw comparison and 12-row contact review: Korean labels are complete and contained; TOP, numeric/player/speed/artwork content remains intact; no residue, clipping, overlap, seam, or channel/color regression observed."
       },
       "runtime_validation": "UNTESTED",
-      "machine_decision": "STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+      "machine_decision": "STATIC_MACHINE_PASS",
+      "c_decision": "C90_PIXEL_VISUAL_PASS_PENDING_INGAME"
     },
     {
       "asset": "2DA43E41",
@@ -1155,10 +1165,12 @@
       "visual_evidence": {
         "full_compare": "localization/graphics/role_C/20261004-1650-C90/C90_2DA43E41_FULL_COMPARE.jpg",
         "row_contact": "localization/graphics/role_C/20261004-1650-C90/C90_2DA43E41_ROW_CONTACT.jpg",
-        "controller_visual_qa": "PENDING"
+        "controller_visual_qa": "PASS",
+        "controller_visual_note": "Canonical RGBA readable/raw comparison resolves the C88 R/B-swapped working-view defect. Full atlas and 11-row contact review show source-family colors/effects, intact punctuation/non-text art, and no residue, clipping, overlap, seam, or dark/black corruption."
       },
       "runtime_validation": "UNTESTED",
-      "machine_decision": "STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+      "machine_decision": "STATIC_MACHINE_PASS",
+      "c_decision": "C90_PIXEL_VISUAL_PASS_PENDING_INGAME"
     },
     {
       "asset": "39229D64",
@@ -1560,10 +1572,12 @@
       "visual_evidence": {
         "full_compare": "localization/graphics/role_C/20261004-1650-C90/C90_39229D64_FULL_COMPARE.jpg",
         "row_contact": "localization/graphics/role_C/20261004-1650-C90/C90_39229D64_ROW_CONTACT.jpg",
-        "controller_visual_qa": "PENDING"
+        "controller_visual_qa": "PASS_HIGH_RISK_EDGE_TOUCH",
+        "controller_visual_note": "Full readable/raw comparison plus 15-row high-zoom contact review shows complete glyph/effect outlines with no visible clipping, source residue, overlap, seam, or protected-art damage. Twelve rows touch at least one original-bbox edge and remain high-risk; isolated in-game validation is mandatory before final approval."
       },
       "runtime_validation": "UNTESTED",
-      "machine_decision": "STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+      "machine_decision": "STATIC_MACHINE_PASS",
+      "c_decision": "C90_PIXEL_VISUAL_PASS_PENDING_INGAME_HIGH_RISK_EDGE_TOUCH"
     }
   ],
   "summary": {
@@ -1571,6 +1585,22 @@
     "machine_pass": 4,
     "machine_fail": 0,
     "runtime_validation": "UNTESTED",
-    "vr_ffb_dx11_dxvk_changes": false
+    "vr_ffb_dx11_dxvk_changes": false,
+    "controller_visual_pass": 4,
+    "pixel_visual_pass_pending_ingame": 4,
+    "high_risk_edge_touch_assets": [
+      "39229D64"
+    ],
+    "status": "C90_4_PIXEL_VISUAL_PASS_PENDING_INGAME",
+    "worker_run_id": 37187481255,
+    "worker_output_commit": "b3a85730fc8c04a23322d97d412eace7ee406fc5"
+  },
+  "controller_visual_qa": {
+    "assets_pass": 4,
+    "assets_fail": 0,
+    "high_risk_edge_touch_assets": [
+      "39229D64"
+    ],
+    "status": "PASS"
   }
 }

@@ -1004,3 +1004,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Self-QA PASS: 21/21 exact source-bbox containment; clean-plate residue 0; clean/final validators outside/protected/alpha = 0; target overlaps 0; readable dark/white and raw-orientation visual review found no clipping, source residue, protected-art damage or new overlap.
 - `RUNTIME_VALIDATION=UNTESTED`; C cross-lane final QA and isolated in-game validation remain pending.
 - Evidence: `localization/graphics/role_B/20261004-B-RECOVERY06/`. No VR/FFB/DX11/DXVK work.
+
+## 2026-10-04 17:03 KST — C90 hosted cross-lane final QA
+- Read the current contract first and followed its compute-placement rule: full-resolution static QA ran on GitHub-hosted Localization CPU Worker run 37187481255; C controller only reconciled state and performed visual review. Completed C88/C89 assets were not repeated.
+- AA04D779: C90_PIXEL_VISUAL_PASS_PENDING_INGAME. Pinned exact-HD source SHA 1a01e19b...; RGBA32 2048x2048 / exact header / raw mirror_y; 21/21 bbox PASS; clean/final outside/protected/alpha = 0; source/protected/allowed/target masks are mutually consistent; readable/raw + 21-row visual QA PASS.
+- 19CEDB9: C90_PIXEL_VISUAL_PASS_PENDING_INGAME. 12/12 bbox PASS; exact header/raw mirror_y; clean/final outside/protected/alpha = 0; full/raw + 12-row visual QA PASS with TOP/numeric/player/speed/non-text art preserved.
+- 2DA43E41: C90_PIXEL_VISUAL_PASS_PENDING_INGAME. C88 canonical-decode corruption return is resolved: canonical raw RGBA path, exact header, 11/11 bbox PASS, clean/final outside/protected/alpha = 0, decoder/mask consistency PASS, readable/raw visual QA PASS with no dark/RB-swapped regression.
+- 39229D64: C90_PIXEL_VISUAL_PASS_PENDING_INGAME_HIGH_RISK_EDGE_TOUCH. C87 structure/evidence return is resolved: exact canonical header/RGBA layout, clean/final outside/protected/alpha = 0, 15/15 bbox PASS. Twelve rows touch at least one source-bbox edge; high-zoom row-contact and raw/readable review found complete glyph/effect outlines with no visible clipping/escape, but isolated in-game validation remains mandatory.
+- C90 changed no DDS. RUNTIME_VALIDATION=UNTESTED; no in-game approval claimed. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261004-1650-C90/.
