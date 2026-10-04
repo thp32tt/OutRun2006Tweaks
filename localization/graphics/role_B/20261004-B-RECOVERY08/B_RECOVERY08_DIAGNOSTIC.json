@@ -1,0 +1,24 @@
+{
+  "status": "PREFLIGHT_DIAGNOSTIC_READY_FOR_SAME_INVOCATION_RENDER",
+  "asset": "CBF8ECBF",
+  "queue_index": 50,
+  "source_url": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/a95efe01d1f136514cef94b0d9e9fd61df021754/Release/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+  "source_sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+  "dimensions": [
+    4096,
+    2048
+  ],
+  "format": "RGBA32",
+  "mips": 1,
+  "raw_orientation_hypothesis": "mirror_y",
+  "candidate_written": false,
+  "required_segments": [
+    "Time Over",
+    "Game Over",
+    "GOAL",
+    "PLEASE WAIT",
+    "PLAYERS",
+    "YOUR FRIENDS",
+    "FRIEND REQUEST"
+  ]
+}
