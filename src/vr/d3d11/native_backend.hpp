@@ -1702,6 +1702,45 @@ compose_programmable_draw_candidate_readiness(
     std::uint64_t preDrawSnapshotToken,
     std::uint64_t candidateSnapshotToken) noexcept;
 
+// R257 creates a dormant pre-activation review receipt from one current R256
+// candidate. "ready" means the candidate is internally coherent and safe to
+// carry to a later activation review; it explicitly does NOT authorize a
+// D3D11 Draw* call or NativeDrawPath activation. This keeps F23's diagnostic
+// evidence separate from any future activation proof.
+struct NativeProgrammableShaderDormantPreActivationReadiness {
+    bool inputValid{};
+    bool candidateReady{};
+    bool candidateSnapshotMatches{};
+    bool candidatePayloadSnapshotMatches{};
+    bool candidateKindValid{};
+    bool diagnosticOnly{};
+    bool activationProofPresent{};
+    bool nativeDrawPathActivationAllowed{};
+    bool drawDispatchAuthorized{};
+    bool boundaryPreserved{};
+    bool ready{};
+    NativeProgrammableShaderDrawCandidateKind kind =
+        NativeProgrammableShaderDrawCandidateKind::None;
+    bool indexed{};
+    UINT elementCount{};
+    UINT startLocation{};
+    DXGI_FORMAT indexFormat = DXGI_FORMAT_UNKNOWN;
+    UINT indexOffset{};
+    std::uint64_t sourceReceiptSnapshotToken{};
+    std::uint64_t candidateSnapshotToken{};
+    std::uint64_t snapshotToken{};
+};
+
+[[nodiscard]] NativeProgrammableShaderDormantPreActivationReadiness
+compose_programmable_dormant_pre_activation_readiness(
+    const NativeProgrammableShaderDrawCandidateReadiness& candidate,
+    std::uint64_t candidateSnapshotToken) noexcept;
+
+[[nodiscard]] bool validate_programmable_dormant_pre_activation_snapshot(
+    const NativeProgrammableShaderDrawCandidateReadiness& candidate,
+    std::uint64_t candidateSnapshotToken,
+    std::uint64_t preActivationSnapshotToken) noexcept;
+
 class NativeProgrammableShaderPairCache final {
 public:
     NativeProgrammableShaderPairCache() = default;
