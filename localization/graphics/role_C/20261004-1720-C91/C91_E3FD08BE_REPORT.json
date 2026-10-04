@@ -1,0 +1,103 @@
+{
+  "asset": "E3FD08BE",
+  "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+  "source_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+  "input_candidate_sha256": "12f5593406a5a3c8d3cd1c025c7ff4dd1e97e265e31ba997fb0f4b89d80eb4bc",
+  "candidate_sha256": "3fbf7b03834549de10277947043ca8dd15d05fd729cd8441174b74581b532c9f",
+  "method": "C91 small corrective rework: exact canonical DXT5 source -> source-alpha clean plate evidence -> accepted current Korean raster downscale (no upscale) + recenter inside exact C85 source bbox -> nvcompress BC3 scratch -> patch only affected BC3 blocks into current exact-header candidate -> decoded strict QA",
+  "structure": {
+    "width": 2048,
+    "height": 256,
+    "mips": 1,
+    "fourcc": "DXT5",
+    "bytes": 524416,
+    "header_128_exact_canonical": true,
+    "raw_orientation": "mirror_y"
+  },
+  "clean_plate_gate": {
+    "changed_pixels": 152208,
+    "changed_bbox": [
+      393,
+      54,
+      1628,
+      200
+    ],
+    "visible_changed_pixels_outside_source_text_mask": 0,
+    "alpha_changed_pixels_outside_source_text_mask": 0,
+    "status": "PASS"
+  },
+  "final_gate": {
+    "changed_pixels": 204173,
+    "changed_bbox": [
+      380,
+      44,
+      1640,
+      208
+    ],
+    "visible_changed_pixels_outside_allowed_bboxes": 0,
+    "alpha_changed_pixels_outside_allowed_bboxes": 0,
+    "status": "PASS"
+  },
+  "compressed_patch_gate": {
+    "patched_blocks": 11433,
+    "changed_blocks_vs_input_candidate": 11433,
+    "changed_blocks_outside_patch_set": 0,
+    "status": "PASS"
+  },
+  "bbox_gate": {
+    "elements": 1,
+    "pass": 1,
+    "fail": 0,
+    "rows": [
+      {
+        "key": "E3FD08BE_1",
+        "korean": "하트 어택 모드",
+        "sprite_cell": [
+          380,
+          44,
+          1640,
+          208
+        ],
+        "original_bbox": [
+          393,
+          54,
+          1628,
+          200
+        ],
+        "input_localized_bbox": [
+          632,
+          53,
+          1388,
+          198
+        ],
+        "localized_bbox": [
+          648,
+          56,
+          1372,
+          196
+        ],
+        "delta_left": 255,
+        "delta_right": 256,
+        "delta_top": 2,
+        "delta_bottom": 4,
+        "containment": "PASS",
+        "rework_status": "C91_SMALL_CORRECTIVE_DOWNSCALE_CENTER",
+        "requested_scale": 0.96,
+        "actual_precompress_scale": 0.9517241379310345,
+        "precompress_bbox": [
+          650,
+          58,
+          1370,
+          196
+        ]
+      }
+    ],
+    "status": "PASS"
+  },
+  "nvcompress_mae_raw_rgba": 1.1320457458496094,
+  "nvcompress_mae_if_flipped": 19.944828033447266,
+  "manual_visual_qa": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "C91_WORKER_CORRECTIVE_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_INGAME"
+}

@@ -1,0 +1,145 @@
+{
+  "asset": "571E78F3",
+  "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+  "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+  "source_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+  "input_candidate_sha256": "0eb421ac34ec47c6b7ef571b3b17f1e53cb91c65cb89e34bcc7f7c35b5bbdba4",
+  "candidate_sha256": "c4f33f3d98b6d5873d8bb6438d5e649fdaa12c114ed8d34d22a7405d448fc186",
+  "method": "C91 small corrective rework: exact canonical DXT5 source -> source-alpha clean plate evidence -> accepted current Korean raster downscale (no upscale) + recenter inside exact C85 source bbox -> nvcompress BC3 scratch -> patch only affected BC3 blocks into current exact-header candidate -> decoded strict QA",
+  "structure": {
+    "width": 2048,
+    "height": 256,
+    "mips": 1,
+    "fourcc": "DXT5",
+    "bytes": 524416,
+    "header_128_exact_canonical": true,
+    "raw_orientation": "mirror_y"
+  },
+  "clean_plate_gate": {
+    "changed_pixels": 194236,
+    "changed_bbox": [
+      395,
+      15,
+      1590,
+      245
+    ],
+    "visible_changed_pixels_outside_source_text_mask": 0,
+    "alpha_changed_pixels_outside_source_text_mask": 0,
+    "status": "PASS"
+  },
+  "final_gate": {
+    "changed_pixels": 252290,
+    "changed_bbox": [
+      380,
+      8,
+      1612,
+      252
+    ],
+    "visible_changed_pixels_outside_allowed_bboxes": 0,
+    "alpha_changed_pixels_outside_allowed_bboxes": 0,
+    "status": "PASS"
+  },
+  "compressed_patch_gate": {
+    "patched_blocks": 14886,
+    "changed_blocks_vs_input_candidate": 14886,
+    "changed_blocks_outside_patch_set": 0,
+    "status": "PASS"
+  },
+  "bbox_gate": {
+    "elements": 2,
+    "pass": 2,
+    "fail": 0,
+    "rows": [
+      {
+        "key": "571E78F3_1",
+        "korean": "타임 어택 모드",
+        "sprite_cell": [
+          380,
+          8,
+          1340,
+          140
+        ],
+        "original_bbox": [
+          395,
+          15,
+          1330,
+          140
+        ],
+        "input_localized_bbox": [
+          541,
+          12,
+          1262,
+          140
+        ],
+        "localized_bbox": [
+          532,
+          16,
+          1246,
+          140
+        ],
+        "delta_left": 137,
+        "delta_right": 84,
+        "delta_top": 1,
+        "delta_bottom": 0,
+        "containment": "PASS",
+        "rework_status": "C91_SMALL_CORRECTIVE_DOWNSCALE_CENTER",
+        "requested_scale": 0.94,
+        "actual_precompress_scale": 0.9140625,
+        "precompress_bbox": [
+          533,
+          19,
+          1192,
+          136
+        ]
+      },
+      {
+        "key": "571E78F3_2",
+        "korean": "15코스 연속",
+        "sprite_cell": [
+          500,
+          132,
+          1612,
+          252
+        ],
+        "original_bbox": [
+          520,
+          132,
+          1590,
+          245
+        ],
+        "input_localized_bbox": [
+          818,
+          136,
+          1293,
+          248
+        ],
+        "localized_bbox": [
+          832,
+          132,
+          1277,
+          241
+        ],
+        "delta_left": 312,
+        "delta_right": 313,
+        "delta_top": 0,
+        "delta_bottom": 4,
+        "containment": "PASS",
+        "rework_status": "C91_SMALL_CORRECTIVE_DOWNSCALE_CENTER",
+        "requested_scale": 0.94,
+        "actual_precompress_scale": 0.9375,
+        "precompress_bbox": [
+          832,
+          136,
+          1277,
+          241
+        ]
+      }
+    ],
+    "status": "PASS"
+  },
+  "nvcompress_mae_raw_rgba": 1.6689825057983398,
+  "nvcompress_mae_if_flipped": 66.99380683898926,
+  "manual_visual_qa": "PENDING_CONTROLLER_VISUAL_QA",
+  "runtime_validation": "UNTESTED",
+  "status": "C91_WORKER_CORRECTIVE_STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA_AND_INGAME"
+}
