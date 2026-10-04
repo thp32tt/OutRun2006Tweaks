@@ -8,7 +8,7 @@ from scipy import ndimage
 if os.environ.get("OUTRUN_CPU_WORKER")!="github-actions" or os.environ.get("OUTRUN_CPU_ROLE")!="B":
     raise SystemExit("B hosted worker only")
 
-RUN="20261005-B-PRODUCTION46"
+RUN="20261005-B-PRODUCTION47"
 ASSET="textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds"
 INDEX=130
 # Exact readable-layout order under the raw mirror-Y transform.
@@ -24,7 +24,7 @@ def main():
     repo=Path.cwd(); out=repo/"localization/graphics/role_B"/RUN
     out.mkdir(parents=True,exist_ok=True)
     wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
-    for p in (out/"B_PRODUCTION46_FAIL_CLOSED.json",wr/"B_PRODUCTION46_1762489B_FAIL.json"):
+    for p in (out/"B_PRODUCTION47_FAIL_CLOSED.json",wr/"B_PRODUCTION47_1762489B_FAIL.json"):
         if p.exists(): p.unlink()
 
     source_zip=repo/"localization/validation/binary_compare/original/OutRun2_ORIGINAL_matching_FULL_DRAFT.zip"
@@ -113,7 +113,7 @@ def main():
         if cur is not None: anchors.append(cur)
     best=sorted(anchors,key=lambda b:(b[1],b[0]))
     if len(best)!=5:
-        (out/"B_PRODUCTION46_DISCOVERY_DIAGNOSTIC.json").write_text(json.dumps({"raw_k7":raw,"bands":bands,"post_row_merge":best},indent=2)+"\n")
+        (out/"B_PRODUCTION47_DISCOVERY_DIAGNOSTIC.json").write_text(json.dumps({"raw_k7":raw,"bands":bands,"post_row_merge":best},indent=2)+"\n")
         raise RuntimeError(("expected 5 target regions after row merge",len(best)))
 
     # Exact source-effect mask: for each historical-diff anchor, include complete
@@ -215,7 +215,12 @@ def main():
 
     def render(row,mask):
         bb=row["original_bbox"]; x0,y0,x1,y1=bb; aw=x1-x0; ah=y1-y0
-        fill,outline=palette(mask); ss=slant(mask,bb); d=ImageDraw.Draw(Image.new("L",(8,8),0))
+        fill,outline=palette(mask); measured_ss=slant(mask,bb)
+        # Controller source-style review: the four course labels are one shared upright
+        # family. Row 4's glyph geometry makes the automatic estimator spuriously hit
+        # 0.32, so preserve the visually measured source family at zero slant.
+        ss=0.0 if row["n"]<=4 else measured_ss
+        d=ImageDraw.Draw(Image.new("L",(8,8),0))
         for fs in range(min(150,max(14,int(ah*.92))),7,-1):
             sw=max(1,round(fs*.05)); f=ImageFont.truetype(FONT,fs)
             tb=d.textbbox((0,0),row["korean"],font=f,stroke_width=sw); pad=sw+4
@@ -244,7 +249,9 @@ def main():
         row.update({"localized_bbox":lb,"source_width":sw0,"source_height":sh0,"localized_width":lw,"localized_height":lh,
                     "delta_left":lb[0]-ob[0],"delta_right":ob[2]-lb[2],"delta_top":lb[1]-ob[1],"delta_bottom":ob[3]-lb[3],
                     "containment":"PASS","size_ceiling":"PASS","edge_touch_high_risk":False,"font_size":fs,"stroke_width":sw,
-                    "slant":ss,"fill":fill,"outline":outline,"rework_status":"NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"})
+                    "slant":ss,"measured_slant_before_style_group_override":measured_ss,
+                    "source_style_group":"COURSE_SHARED_UPRIGHT" if row["n"]<=4 else "AVERAGE_RANK_SMALL_UPRIGHT",
+                    "fill":fill,"outline":outline,"rework_status":"NEW_EXACT_SOURCE_RGBA_NATIVE_RENDER"})
 
     target=np.zeros((H,W),bool)
     for m in target_masks: target|=m
@@ -283,8 +290,8 @@ def main():
     clean.save(out/"1762489B_CLEAN_PLATE.png")
     sp=Path("/tmp/176_source.png"); fp=Path("/tmp/176_final.png"); src.save(sp); dec.save(fp)
     validator=repo/"tools/localization/validate_clean_plate.py"
-    subprocess.run(["python3",str(validator),str(sp),str(out/"1762489B_CLEAN_PLATE.png"),str(out/"1762489B_SOURCE_TEXT_MASK.png"),"--report",str(out/"B_PRODUCTION46_CLEAN_VALIDATION.json")],check=True)
-    subprocess.run(["python3",str(validator),str(sp),str(fp),str(out/"1762489B_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(out/"1762489B_PROTECTED_MASK.png"),"--report",str(out/"B_PRODUCTION46_FINAL_VALIDATION.json")],check=True)
+    subprocess.run(["python3",str(validator),str(sp),str(out/"1762489B_CLEAN_PLATE.png"),str(out/"1762489B_SOURCE_TEXT_MASK.png"),"--report",str(out/"B_PRODUCTION47_CLEAN_VALIDATION.json")],check=True)
+    subprocess.run(["python3",str(validator),str(sp),str(fp),str(out/"1762489B_ALLOWED_TEXT_REGION_MASK.png"),"--protected-mask",str(out/"1762489B_PROTECTED_MASK.png"),"--report",str(out/"B_PRODUCTION47_FINAL_VALIDATION.json")],check=True)
 
     def comp(im,bg=(64,64,64,255)):
         z=Image.new("RGBA",im.size,bg); z.alpha_composite(im); return z.convert("RGB")
@@ -293,7 +300,7 @@ def main():
     cards=[card("SOURCE_READABLE",src),card("CLEAN",clean),card("FINAL",dec),card("FINAL_WHITE",dec,(255,255,255,255))]
     sh=Image.new("RGB",(W*2,(H+25)*2),"white")
     sh.paste(cards[0],(0,0));sh.paste(cards[1],(W,0));sh.paste(cards[2],(0,H+25));sh.paste(cards[3],(W,H+25))
-    sh.thumbnail((1900,1200),Image.Resampling.LANCZOS);sh.save(out/"B_PRODUCTION46_176_COMPARE.jpg",quality=96)
+    sh.thumbnail((1900,1200),Image.Resampling.LANCZOS);sh.save(out/"B_PRODUCTION47_176_COMPARE.jpg",quality=96)
 
     contacts=[]; sr=comp(src); cl=comp(clean); fi=comp(dec)
     for row in rows:
@@ -304,10 +311,10 @@ def main():
         ImageDraw.Draw(c).text((4,4),f'{row["n"]} {row["source"]} -> {row["korean"]}',fill="black");contacts.append(c)
     rs=Image.new("RGB",(max(c.width for c in contacts),sum(c.height for c in contacts)+4*(len(contacts)-1)),"white");yy=0
     for c in contacts:rs.paste(c,(0,yy));yy+=c.height+4
-    rs.save(out/"B_PRODUCTION46_176_ROW_CONTACT_2X.jpg",quality=96)
+    rs.save(out/"B_PRODUCTION47_176_ROW_CONTACT_2X.jpg",quality=96)
 
     raws=[card("SOURCE_RAW_MIRROR_Y",src_raw),card("FINAL_RAW_MIRROR_Y",dec_raw)]
-    rr=Image.new("RGB",(W,(H+25)*2),"white");rr.paste(raws[0],(0,0));rr.paste(raws[1],(0,H+25));rr.thumbnail((1600,1000),Image.Resampling.LANCZOS);rr.save(out/"B_PRODUCTION46_176_RAW_COMPARE.jpg",quality=96)
+    rr=Image.new("RGB",(W,(H+25)*2),"white");rr.paste(raws[0],(0,0));rr.paste(raws[1],(0,H+25));rr.thumbnail((1600,1000),Image.Resampling.LANCZOS);rr.save(out/"B_PRODUCTION47_176_RAW_COMPARE.jpg",quality=96)
 
     report={"schema_version":1,"role":"B","run":RUN,"queue_index":INDEX,"asset":ASSET,
       "readiness_tier":"RENDER_READY_COMPLETED_SAME_INVOCATION","source_sha256":source_sha,
@@ -323,12 +330,12 @@ def main():
       "clean_plate":{"changed_pixels_outside_source_effect":clean_out,"source_effect_alpha_remaining":clean_residue,"rgb_changed_pixels":0,"status":"PASS"},
       "policy":{"stage_names":"not_applicable","song_titles_credits":"not_targeted","multi_line":"not_applicable"},
       "manual_visual_qa":"PENDING_CONTROLLER_SELF_QA","RUNTIME_VALIDATION":"UNTESTED",
-      "status":"B_PRODUCTION46_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
-    (out/"B_PRODUCTION46_176_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+      "status":"B_PRODUCTION47_WORKER_STATIC_PASS_PENDING_CONTROLLER_SELF_QA_AND_C"}
+    (out/"B_PRODUCTION47_176_REPORT.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     summary={"run":RUN,"asset":"1762489B","index":INDEX,"candidate_sha256":cand_sha,"bbox_size_pass":"5/5",
       "outside":outside,"alpha_outside":alpha_out,"source_residue":residue,"overlap":overlap,"touch_pairs":len(touches),
-      "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{RUN}/B_PRODUCTION46_176_REPORT.json"}
-    (wr/"B_PRODUCTION46_1762489B.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+      "worker_status":report["status"],"runtime_validation":"UNTESTED","report":f"localization/graphics/role_B/{RUN}/B_PRODUCTION47_176_REPORT.json"}
+    (wr/"B_PRODUCTION47_1762489B.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps(summary,ensure_ascii=False),flush=True)
 
 if __name__=="__main__":
@@ -337,6 +344,6 @@ if __name__=="__main__":
         repo=Path.cwd(); out=repo/"localization/graphics/role_B"/RUN; out.mkdir(parents=True,exist_ok=True)
         wr=repo/"localization/graphics/worker_results"; wr.mkdir(parents=True,exist_ok=True)
         fail={"run":RUN,"asset":"1762489B","index":INDEX,"status":"FAIL_CLOSED_DIAGNOSTIC","exception":repr(e),"traceback":traceback.format_exc(),"RUNTIME_VALIDATION":"UNTESTED"}
-        (out/"B_PRODUCTION46_FAIL_CLOSED.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-        (wr/"B_PRODUCTION46_1762489B_FAIL.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+        (out/"B_PRODUCTION47_FAIL_CLOSED.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+        (wr/"B_PRODUCTION47_1762489B_FAIL.json").write_text(json.dumps(fail,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
         print(json.dumps(fail,ensure_ascii=False),flush=True)
