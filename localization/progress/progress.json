@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-05T01:01:11+09:00",
+  "updated_at_kst": "2026-10-05T01:23:52+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -135,7 +135,7 @@
       "plan_file": "localization/graphics/artwork_plan.jsonl"
     }
   },
-  "next_checkpoint": "C111 final QA advanced BF3EE5C6 and C075FB49 to pixel/visual policy PASS pending isolated in-game validation. Remaining producer REWORK is 53CE39D5/788CE557 source-residue reconstruction and FD90AA9 source-slant rerender; pending_artwork localize_text remains 50.",
+  "next_checkpoint": "A_RECOVERY13 repaired C109-returned odd index 121 FD90AA9 source slant. Candidate c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401 passed A 29/29 exact bbox/size static QA, 4/4 positive-margin slant rerender checks, zero overlap/touch/guard conflicts, 25/25 preserved localized rows, and controller readable/raw visual self-QA. Independent C final QA plus isolated in-game validation remain pending. Remaining producer REWORK is 53CE39D5/788CE557 source-residue reconstruction; pending_artwork localize_text remains 50.",
   "text": {
     "total_ids": 1356,
     "non_null_ids": 1355,
@@ -265,14 +265,13 @@
       "d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json"
     },
     "next_hd_rework": {
-      "status": "SOURCE_STYLE_OR_ZERO_RESIDUE_REWORK_REQUIRED",
+      "status": "ZERO_RESIDUE_REWORK_REQUIRED",
       "assets": [
         "53CE39D5",
-        "788CE557",
-        "FD90AA9"
+        "788CE557"
       ],
-      "remaining": 3,
-      "note": "C111 independently finalized BF3EE5C6 and C075FB49 static pixel/visual policy PASS; both remain RUNTIME_VALIDATION=UNTESTED."
+      "remaining": 2,
+      "note": "FD90AA9 moved from C109 producer REWORK to A_RECOVERY13 self-QA PASS pending independent C final QA; BF3EE5C6 and C075FB49 are already C111 pixel/visual policy PASS. RUNTIME_VALIDATION=UNTESTED."
     },
     "latest_d_final_qa": {
       "run": "D85",
@@ -525,6 +524,21 @@
       "new_overlap_pairs": 0,
       "runtime_validation": "UNTESTED",
       "report": "localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json"
+    },
+    "a_recovery13_fd90aa9": {
+      "timestamp_kst": "2026-10-05T01:23:52+09:00",
+      "queue_index": 121,
+      "candidate_sha256": "c8b13421e97d81a0d9e874bceaec41134041d5a30ccd51529d74ff456d9ab401",
+      "status": "A_RECOVERY13_SELF_QA_PASS_PENDING_C_AND_INGAME",
+      "report": "localization/graphics/role_A/20261005-A-RECOVERY13/A_RECOVERY13_FD90AA9_REPORT.json",
+      "reworked_rows": 4,
+      "preserved_rows": 25,
+      "bbox_pass": "29/29",
+      "size_ceiling": "29/29",
+      "positive_margin": "4/4",
+      "overlap_touch_guard_conflicts": 0,
+      "changes_outside_returned_source_bboxes": 0,
+      "runtime_validation": "UNTESTED"
     }
   },
   "data_build": {
