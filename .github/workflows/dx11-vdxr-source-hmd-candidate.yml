@@ -1,0 +1,65 @@
+name: DX11 VDXR Source Resolution HMD Candidate
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - test/dx11-vdxr-source-2496x2688-20261004
+  workflow_dispatch:
+
+concurrency:
+  group: dx11-vdxr-source-hmd-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 40
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Verify source-resolution candidate contract
+        shell: pwsh
+        run: |
+          $runner = Get-Content tools/Run-OutRunVRTest.ps1 -Raw
+          foreach ($required in @(
+            "'-width'","'2496'","'-height'","'2688'","'-windowed'",
+            "'-MirrorFitDesktop=true'","'-WindowedBorderless=true'"
+          )) {
+            if ($runner -notmatch [regex]::Escape($required)) {
+              throw "Missing VDXR source-resolution candidate argument: $required"
+            }
+          }
+          $target = Get-Content tools/VR_ONE_CLICK_TARGET.json -Raw | ConvertFrom-Json
+          if ($target.Stage -ne 'R245-HMD-AB-VDXR-source-2496x2688-native-draw-dormant') {
+            throw "Unexpected candidate stage: $($target.Stage)"
+          }
+          if ($target.NativeDrawPathActive) {
+            throw 'NativeDrawPathActive must remain false for this A/B.'
+          }
+
+      - name: Build packaged runtime test ZIP
+        shell: pwsh
+        env:
+          OUTRUN_TEST_DROP_ROOT: ${{ github.workspace }}\out\hosted-drop
+        run: |
+          ./tools/Build-OutRunPCFast.ps1
+          $zip = (Get-Content out/pc-fast/LAST_ZIP_PATH.txt -Raw).Trim()
+          if (-not (Test-Path $zip -PathType Leaf)) { throw "Test ZIP missing: $zip" }
+          "OUTRUN_TEST_ZIP=$zip" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Get-FileHash $zip -Algorithm SHA256
+
+      - name: Upload runtime test ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-DX11-VDXR-SOURCE-2496x2688-${{ github.sha }}
+          path: ${{ env.OUTRUN_TEST_ZIP }}
+          if-no-files-found: error
+          retention-days: 7
