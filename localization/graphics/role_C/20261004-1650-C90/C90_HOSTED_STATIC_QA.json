@@ -1,0 +1,1576 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-1650-C90",
+  "base_head": "bbf19338b99182e790ef21792cfb344583c90c6c",
+  "scope": "new shared-state pending-C candidates only; C88/C89-completed assets not repeated",
+  "assets": [
+    {
+      "asset": "AA04D779",
+      "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY06/B_RECOVERY06_AA04D779_REPORT.json",
+      "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "candidate_sha256": "6f64736a53589379a00dc831e8605f0f8f140ffd52837f951e0a24fcd9d89c8a",
+      "return_context": "new B_RECOVERY06 hosted exact-HD candidate",
+      "structure": {
+        "width": 2048,
+        "height": 2048,
+        "pitch": 8192,
+        "depth": 1,
+        "mips": 1,
+        "pf_flags": 65,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "header_128_exact_to_source": true,
+        "raw_orientation": "mirror_y"
+      },
+      "clean_plate_gate": {
+        "changed_pixels": 471743,
+        "changed_bbox": [
+          140,
+          340,
+          1985,
+          1325
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "final_candidate_gate": {
+        "changed_pixels": 406852,
+        "changed_bbox": [
+          140,
+          340,
+          1985,
+          1325
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "mask_consistency": {
+        "source_text_protected_overlap_pixels": 0,
+        "allowed_protected_overlap_pixels": 0,
+        "allowed_pixels_outside_union_of_original_bboxes": 0,
+        "target_pixels_outside_allowed": 0,
+        "target_pixels_in_protected": 0,
+        "status": "PASS"
+      },
+      "bbox_gate": {
+        "elements": 21,
+        "pass": 21,
+        "fail": 0,
+        "edge_touch_keys": [],
+        "rows": [
+          {
+            "key": "sector4",
+            "original_bbox": [
+              196,
+              340,
+              377,
+              400
+            ],
+            "localized_bbox": [
+              216,
+              341,
+              356,
+              399
+            ],
+            "delta_left": 20,
+            "delta_right": 21,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "palm_beach",
+            "original_bbox": [
+              146,
+              422,
+              361,
+              549
+            ],
+            "localized_bbox": [
+              153,
+              447,
+              353,
+              523
+            ],
+            "delta_left": 7,
+            "delta_right": 8,
+            "delta_top": 25,
+            "delta_bottom": 26,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "coniferous_forest",
+            "original_bbox": [
+              143,
+              573,
+              467,
+              701
+            ],
+            "localized_bbox": [
+              153,
+              591,
+              457,
+              682
+            ],
+            "delta_left": 10,
+            "delta_right": 10,
+            "delta_top": 18,
+            "delta_bottom": 19,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "snow_mountain",
+            "original_bbox": [
+              143,
+              725,
+              426,
+              853
+            ],
+            "localized_bbox": [
+              205,
+              727,
+              364,
+              851
+            ],
+            "delta_left": 62,
+            "delta_right": 62,
+            "delta_top": 2,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "ancient_ruins",
+            "original_bbox": [
+              140,
+              878,
+              412,
+              1004
+            ],
+            "localized_bbox": [
+              147,
+              903,
+              404,
+              978
+            ],
+            "delta_left": 7,
+            "delta_right": 8,
+            "delta_top": 25,
+            "delta_bottom": 26,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "bay_area",
+            "original_bbox": [
+              146,
+              1058,
+              429,
+              1140
+            ],
+            "localized_bbox": [
+              152,
+              1070,
+              422,
+              1128
+            ],
+            "delta_left": 6,
+            "delta_right": 7,
+            "delta_top": 12,
+            "delta_bottom": 12,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "big_forest",
+            "original_bbox": [
+              314,
+              1226,
+              632,
+              1308
+            ],
+            "localized_bbox": [
+              321,
+              1231,
+              625,
+              1303
+            ],
+            "delta_left": 7,
+            "delta_right": 7,
+            "delta_top": 5,
+            "delta_bottom": 5,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "castle_wall",
+            "original_bbox": [
+              646,
+              573,
+              872,
+              701
+            ],
+            "localized_bbox": [
+              652,
+              597,
+              866,
+              676
+            ],
+            "delta_left": 6,
+            "delta_right": 6,
+            "delta_top": 24,
+            "delta_bottom": 25,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "industrial_complex",
+            "original_bbox": [
+              647,
+              726,
+              925,
+              863
+            ],
+            "localized_bbox": [
+              653,
+              734,
+              919,
+              854
+            ],
+            "delta_left": 6,
+            "delta_right": 6,
+            "delta_top": 8,
+            "delta_bottom": 9,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "metropolis",
+            "original_bbox": [
+              651,
+              906,
+              963,
+              988
+            ],
+            "localized_bbox": [
+              656,
+              915,
+              957,
+              979
+            ],
+            "delta_left": 5,
+            "delta_right": 6,
+            "delta_top": 9,
+            "delta_bottom": 9,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "sunny_beach",
+            "original_bbox": [
+              647,
+              1029,
+              871,
+              1157
+            ],
+            "localized_bbox": [
+              653,
+              1061,
+              865,
+              1125
+            ],
+            "delta_left": 6,
+            "delta_right": 6,
+            "delta_top": 32,
+            "delta_bottom": 32,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "water_falls",
+            "original_bbox": [
+              814,
+              1198,
+              1022,
+              1325
+            ],
+            "localized_bbox": [
+              817,
+              1230,
+              1019,
+              1293
+            ],
+            "delta_left": 3,
+            "delta_right": 3,
+            "delta_top": 32,
+            "delta_bottom": 32,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "alpine",
+            "original_bbox": [
+              1149,
+              602,
+              1376,
+              683
+            ],
+            "localized_bbox": [
+              1164,
+              603,
+              1361,
+              682
+            ],
+            "delta_left": 15,
+            "delta_right": 15,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "cloudy_highland",
+            "original_bbox": [
+              1152,
+              725,
+              1421,
+              864
+            ],
+            "localized_bbox": [
+              1178,
+              726,
+              1394,
+              862
+            ],
+            "delta_left": 26,
+            "delta_right": 27,
+            "delta_top": 1,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "tulip_garden",
+            "original_bbox": [
+              1150,
+              879,
+              1403,
+              1006
+            ],
+            "localized_bbox": [
+              1155,
+              907,
+              1398,
+              977
+            ],
+            "delta_left": 5,
+            "delta_right": 5,
+            "delta_top": 28,
+            "delta_bottom": 29,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "cape_way",
+            "original_bbox": [
+              1151,
+              1057,
+              1503,
+              1140
+            ],
+            "localized_bbox": [
+              1159,
+              1059,
+              1494,
+              1137
+            ],
+            "delta_left": 8,
+            "delta_right": 9,
+            "delta_top": 2,
+            "delta_bottom": 3,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "national_park",
+            "original_bbox": [
+              1322,
+              1198,
+              1606,
+              1325
+            ],
+            "localized_bbox": [
+              1328,
+              1228,
+              1600,
+              1294
+            ],
+            "delta_left": 6,
+            "delta_right": 6,
+            "delta_top": 30,
+            "delta_bottom": 31,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "deep_lake",
+            "original_bbox": [
+              1657,
+              602,
+              1985,
+              683
+            ],
+            "localized_bbox": [
+              1682,
+              603,
+              1959,
+              682
+            ],
+            "delta_left": 25,
+            "delta_right": 26,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "desert",
+            "original_bbox": [
+              1657,
+              753,
+              1892,
+              826
+            ],
+            "localized_bbox": [
+              1713,
+              754,
+              1835,
+              825
+            ],
+            "delta_left": 56,
+            "delta_right": 57,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "ghost_forest",
+            "original_bbox": [
+              1657,
+              878,
+              1882,
+              1006
+            ],
+            "localized_bbox": [
+              1661,
+              880,
+              1877,
+              1004
+            ],
+            "delta_left": 4,
+            "delta_right": 5,
+            "delta_top": 2,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          },
+          {
+            "key": "imperial_avenue",
+            "original_bbox": [
+              1654,
+              1029,
+              1937,
+              1156
+            ],
+            "localized_bbox": [
+              1700,
+              1030,
+              1891,
+              1154
+            ],
+            "delta_left": 46,
+            "delta_right": 46,
+            "delta_top": 1,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "NEW_CANDIDATE"
+          }
+        ],
+        "status": "PASS"
+      },
+      "visual_evidence": {
+        "full_compare": "localization/graphics/role_C/20261004-1650-C90/C90_AA04D779_FULL_COMPARE.jpg",
+        "row_contact": "localization/graphics/role_C/20261004-1650-C90/C90_AA04D779_ROW_CONTACT.jpg",
+        "controller_visual_qa": "PENDING"
+      },
+      "runtime_validation": "UNTESTED",
+      "machine_decision": "STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+    },
+    {
+      "asset": "19CEDB9",
+      "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY04/B_RECOVERY04_19CEDB9_REPORT.json",
+      "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+      "candidate_sha256": "3090f2664bab3065502b10a98f93d17e92a64a3725dc1b7a4bb790648a5da6e7",
+      "return_context": "new hosted exact-HD candidate",
+      "structure": {
+        "width": 2048,
+        "height": 2048,
+        "pitch": 8192,
+        "depth": 1,
+        "mips": 1,
+        "pf_flags": 65,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "header_128_exact_to_source": true,
+        "raw_orientation": "mirror_y"
+      },
+      "clean_plate_gate": {
+        "changed_pixels": 109604,
+        "changed_bbox": [
+          8,
+          100,
+          2013,
+          1486
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "final_candidate_gate": {
+        "changed_pixels": 98564,
+        "changed_bbox": [
+          8,
+          100,
+          2013,
+          1486
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "mask_consistency": {
+        "source_text_protected_overlap_pixels": 0,
+        "allowed_protected_overlap_pixels": 0,
+        "allowed_pixels_outside_union_of_original_bboxes": 0,
+        "target_pixels_outside_allowed": 0,
+        "target_pixels_in_protected": 0,
+        "status": "PASS"
+      },
+      "bbox_gate": {
+        "elements": 12,
+        "pass": 12,
+        "fail": 0,
+        "edge_touch_keys": [],
+        "rows": [
+          {
+            "key": "sector2",
+            "original_bbox": [
+              8,
+              100,
+              190,
+              160
+            ],
+            "localized_bbox": [
+              29,
+              101,
+              168,
+              159
+            ],
+            "delta_left": 21,
+            "delta_right": 22,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "sector1",
+            "original_bbox": [
+              208,
+              100,
+              385,
+              160
+            ],
+            "localized_bbox": [
+              227,
+              101,
+              364,
+              159
+            ],
+            "delta_left": 19,
+            "delta_right": 21,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "win",
+            "original_bbox": [
+              418,
+              110,
+              500,
+              151
+            ],
+            "localized_bbox": [
+              428,
+              111,
+              490,
+              150
+            ],
+            "delta_left": 10,
+            "delta_right": 10,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "lose",
+            "original_bbox": [
+              528,
+              109,
+              635,
+              152
+            ],
+            "localized_bbox": [
+              548,
+              110,
+              614,
+              151
+            ],
+            "delta_left": 20,
+            "delta_right": 21,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "result",
+            "original_bbox": [
+              32,
+              180,
+              247,
+              249
+            ],
+            "localized_bbox": [
+              83,
+              181,
+              197,
+              248
+            ],
+            "delta_left": 51,
+            "delta_right": 50,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "ranking",
+            "original_bbox": [
+              289,
+              180,
+              555,
+              259
+            ],
+            "localized_bbox": [
+              357,
+              181,
+              488,
+              258
+            ],
+            "delta_left": 68,
+            "delta_right": 67,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "stage",
+            "original_bbox": [
+              571,
+              179,
+              765,
+              259
+            ],
+            "localized_bbox": [
+              574,
+              189,
+              763,
+              248
+            ],
+            "delta_left": 3,
+            "delta_right": 2,
+            "delta_top": 10,
+            "delta_bottom": 11,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "rank",
+            "original_bbox": [
+              788,
+              180,
+              964,
+              249
+            ],
+            "localized_bbox": [
+              818,
+              181,
+              930,
+              248
+            ],
+            "delta_left": 30,
+            "delta_right": 34,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "you",
+            "original_bbox": [
+              1759,
+              193,
+              1897,
+              260
+            ],
+            "localized_bbox": [
+              1797,
+              194,
+              1858,
+              259
+            ],
+            "delta_left": 38,
+            "delta_right": 39,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "diff",
+            "original_bbox": [
+              1853,
+              312,
+              1975,
+              381
+            ],
+            "localized_bbox": [
+              1856,
+              313,
+              1972,
+              379
+            ],
+            "delta_left": 3,
+            "delta_right": 3,
+            "delta_top": 1,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "sector3",
+            "original_bbox": [
+              1832,
+              1180,
+              2013,
+              1240
+            ],
+            "localized_bbox": [
+              1852,
+              1181,
+              1992,
+              1239
+            ],
+            "delta_left": 20,
+            "delta_right": 21,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "rival",
+            "original_bbox": [
+              498,
+              1412,
+              705,
+              1486
+            ],
+            "localized_bbox": [
+              509,
+              1413,
+              695,
+              1485
+            ],
+            "delta_left": 11,
+            "delta_right": 10,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          }
+        ],
+        "status": "PASS"
+      },
+      "visual_evidence": {
+        "full_compare": "localization/graphics/role_C/20261004-1650-C90/C90_19CEDB9_FULL_COMPARE.jpg",
+        "row_contact": "localization/graphics/role_C/20261004-1650-C90/C90_19CEDB9_ROW_CONTACT.jpg",
+        "controller_visual_qa": "PENDING"
+      },
+      "runtime_validation": "UNTESTED",
+      "machine_decision": "STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+    },
+    {
+      "asset": "2DA43E41",
+      "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+      "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY05/B_RECOVERY05_2DA43E41_REPORT.json",
+      "source_sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+      "candidate_sha256": "dce31f89fa30da614378d7cfd8e3b9e8b6d39bc037369f059249e358897c66ae",
+      "return_context": "C88 canonical-decode visual corruption return repaired by B_RECOVERY05",
+      "structure": {
+        "width": 4096,
+        "height": 4096,
+        "pitch": 16384,
+        "depth": 1,
+        "mips": 1,
+        "pf_flags": 65,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "header_128_exact_to_source": true,
+        "raw_orientation": "mirror_y"
+      },
+      "clean_plate_gate": {
+        "changed_pixels": 482003,
+        "changed_bbox": [
+          132,
+          247,
+          4018,
+          1403
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "final_candidate_gate": {
+        "changed_pixels": 1098238,
+        "changed_bbox": [
+          115,
+          192,
+          4018,
+          1403
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "mask_consistency": {
+        "source_text_protected_overlap_pixels": 0,
+        "allowed_protected_overlap_pixels": 0,
+        "allowed_pixels_outside_union_of_original_bboxes": 0,
+        "target_pixels_outside_allowed": 0,
+        "target_pixels_in_protected": 0,
+        "status": "PASS"
+      },
+      "bbox_gate": {
+        "elements": 11,
+        "pass": 11,
+        "fail": 0,
+        "edge_touch_keys": [],
+        "rows": [
+          {
+            "key": "course_or2",
+            "original_bbox": [
+              115,
+              192,
+              2056,
+              448
+            ],
+            "localized_bbox": [
+              569,
+              207,
+              1645,
+              429
+            ],
+            "delta_left": 454,
+            "delta_right": 411,
+            "delta_top": 15,
+            "delta_bottom": 19,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "course_sp",
+            "original_bbox": [
+              132,
+              488,
+              2078,
+              717
+            ],
+            "localized_bbox": [
+              456,
+              496,
+              1754,
+              709
+            ],
+            "delta_left": 324,
+            "delta_right": 324,
+            "delta_top": 8,
+            "delta_bottom": 8,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "wait_other",
+            "original_bbox": [
+              2200,
+              192,
+              3533,
+              448
+            ],
+            "localized_bbox": [
+              2205,
+              206,
+              3519,
+              427
+            ],
+            "delta_left": 5,
+            "delta_right": 14,
+            "delta_top": 14,
+            "delta_bottom": 21,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "wait_now",
+            "original_bbox": [
+              2228,
+              461,
+              3776,
+              717
+            ],
+            "localized_bbox": [
+              2232,
+              489,
+              3771,
+              688
+            ],
+            "delta_left": 4,
+            "delta_right": 5,
+            "delta_top": 28,
+            "delta_bottom": 29,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "acceleration",
+            "original_bbox": [
+              3826,
+              247,
+              4016,
+              320
+            ],
+            "localized_bbox": [
+              3831,
+              251,
+              4011,
+              316
+            ],
+            "delta_left": 5,
+            "delta_right": 5,
+            "delta_top": 4,
+            "delta_bottom": 4,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "max_speed",
+            "original_bbox": [
+              3827,
+              319,
+              4018,
+              410
+            ],
+            "localized_bbox": [
+              3829,
+              340,
+              4015,
+              388
+            ],
+            "delta_left": 2,
+            "delta_right": 3,
+            "delta_top": 21,
+            "delta_bottom": 22,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "handling",
+            "original_bbox": [
+              1677,
+              896,
+              2112,
+              1050
+            ],
+            "localized_bbox": [
+              1731,
+              920,
+              2066,
+              1026
+            ],
+            "delta_left": 54,
+            "delta_right": 46,
+            "delta_top": 24,
+            "delta_bottom": 24,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "view_change",
+            "original_bbox": [
+              3430,
+              998,
+              3896,
+              1102
+            ],
+            "localized_bbox": [
+              3434,
+              1023,
+              3890,
+              1098
+            ],
+            "delta_left": 4,
+            "delta_right": 6,
+            "delta_top": 25,
+            "delta_bottom": 4,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "single_play",
+            "original_bbox": [
+              1677,
+              1075,
+              2355,
+              1229
+            ],
+            "localized_bbox": [
+              1719,
+              1085,
+              2308,
+              1219
+            ],
+            "delta_left": 42,
+            "delta_right": 47,
+            "delta_top": 10,
+            "delta_bottom": 10,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "expert",
+            "original_bbox": [
+              2842,
+              1124,
+              3479,
+              1229
+            ],
+            "localized_bbox": [
+              2984,
+              1125,
+              3337,
+              1228
+            ],
+            "delta_left": 142,
+            "delta_right": 142,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          },
+          {
+            "key": "special_course",
+            "original_bbox": [
+              3137,
+              1279,
+              3879,
+              1403
+            ],
+            "localized_bbox": [
+              3227,
+              1280,
+              3781,
+              1402
+            ],
+            "delta_left": 90,
+            "delta_right": 98,
+            "delta_top": 1,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "PRODUCER_RESULT_RECHECKED"
+          }
+        ],
+        "status": "PASS"
+      },
+      "visual_evidence": {
+        "full_compare": "localization/graphics/role_C/20261004-1650-C90/C90_2DA43E41_FULL_COMPARE.jpg",
+        "row_contact": "localization/graphics/role_C/20261004-1650-C90/C90_2DA43E41_ROW_CONTACT.jpg",
+        "controller_visual_qa": "PENDING"
+      },
+      "runtime_validation": "UNTESTED",
+      "machine_decision": "STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+    },
+    {
+      "asset": "39229D64",
+      "source_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+      "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+      "producer_report": "localization/graphics/role_A/20261004-A-RECOVERY06/A_RECOVERY06_39229D64_REPORT.json",
+      "source_sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+      "candidate_sha256": "67d3fab3f00db249a89e59016f33f87d349bc7001f6ece865401fa87b50a3f8a",
+      "return_context": "C87 DDS structure + clean-plate evidence return repaired by A_RECOVERY06",
+      "structure": {
+        "width": 4096,
+        "height": 4096,
+        "pitch": 16384,
+        "depth": 1,
+        "mips": 1,
+        "pf_flags": 65,
+        "fourcc": "00000000",
+        "bpp": 32,
+        "masks": [
+          "0xff",
+          "0xff00",
+          "0xff0000",
+          "0xff000000"
+        ],
+        "header_128_exact_to_source": true,
+        "raw_orientation": "mirror_y"
+      },
+      "clean_plate_gate": {
+        "changed_pixels": 133763,
+        "changed_bbox": [
+          1728,
+          5,
+          3998,
+          1281
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "final_candidate_gate": {
+        "changed_pixels": 2285798,
+        "changed_bbox": [
+          128,
+          5,
+          3998,
+          2088
+        ],
+        "changed_pixels_outside_edit_mask": 0,
+        "changed_pixels_in_protected_mask": 0,
+        "alpha_changed_outside_edit_mask": 0,
+        "status": "PASS"
+      },
+      "mask_consistency": {
+        "source_text_protected_overlap_pixels": 0,
+        "allowed_protected_overlap_pixels": 0,
+        "allowed_pixels_outside_union_of_original_bboxes": 0,
+        "target_pixels_outside_allowed": null,
+        "target_pixels_in_protected": null,
+        "status": "PASS"
+      },
+      "bbox_gate": {
+        "elements": 15,
+        "pass": 15,
+        "fail": 0,
+        "edge_touch_keys": [
+          "hearts",
+          "technical_bonus",
+          "mission_cleared",
+          "storing",
+          "special_request",
+          "target",
+          "start",
+          "goal",
+          "hit_ghost",
+          "exit",
+          "collect_stars",
+          "mission_failed"
+        ],
+        "rows": [
+          {
+            "key": "hearts",
+            "original_bbox": [
+              1715,
+              5,
+              2048,
+              102
+            ],
+            "localized_bbox": [
+              1728,
+              5,
+              2015,
+              100
+            ],
+            "delta_left": 13,
+            "delta_right": 33,
+            "delta_top": 0,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+          },
+          {
+            "key": "technical_bonus",
+            "original_bbox": [
+              2393,
+              77,
+              3610,
+              259
+            ],
+            "localized_bbox": [
+              2393,
+              77,
+              3610,
+              259
+            ],
+            "delta_left": 0,
+            "delta_right": 0,
+            "delta_top": 0,
+            "delta_bottom": 0,
+            "containment": "PASS",
+            "rework_status": "PRIOR_PASS_PRESERVED"
+          },
+          {
+            "key": "mission_cleared",
+            "original_bbox": [
+              128,
+              256,
+              1587,
+              787
+            ],
+            "localized_bbox": [
+              128,
+              256,
+              1587,
+              787
+            ],
+            "delta_left": 0,
+            "delta_right": 0,
+            "delta_top": 0,
+            "delta_bottom": 0,
+            "containment": "PASS",
+            "rework_status": "PRIOR_PASS_PRESERVED"
+          },
+          {
+            "key": "total_rank_green",
+            "original_bbox": [
+              512,
+              896,
+              1101,
+              1075
+            ],
+            "localized_bbox": [
+              526,
+              905,
+              1087,
+              1065
+            ],
+            "delta_left": 14,
+            "delta_right": 14,
+            "delta_top": 9,
+            "delta_bottom": 10,
+            "containment": "PASS",
+            "rework_status": "PRIOR_PASS_PRESERVED"
+          },
+          {
+            "key": "storing",
+            "original_bbox": [
+              1652,
+              858,
+              2975,
+              998
+            ],
+            "localized_bbox": [
+              1652,
+              858,
+              2975,
+              998
+            ],
+            "delta_left": 0,
+            "delta_right": 0,
+            "delta_top": 0,
+            "delta_bottom": 0,
+            "containment": "PASS",
+            "rework_status": "PRIOR_PASS_PRESERVED"
+          },
+          {
+            "key": "special_request",
+            "original_bbox": [
+              1644,
+              1114,
+              2624,
+              1267
+            ],
+            "localized_bbox": [
+              1644,
+              1114,
+              2624,
+              1267
+            ],
+            "delta_left": 0,
+            "delta_right": 0,
+            "delta_top": 0,
+            "delta_bottom": 0,
+            "containment": "PASS",
+            "rework_status": "PRIOR_PASS_PRESERVED"
+          },
+          {
+            "key": "target",
+            "original_bbox": [
+              2625,
+              555,
+              2825,
+              640
+            ],
+            "localized_bbox": [
+              2649,
+              555,
+              2796,
+              638
+            ],
+            "delta_left": 24,
+            "delta_right": 29,
+            "delta_top": 0,
+            "delta_bottom": 2,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+          },
+          {
+            "key": "start",
+            "original_bbox": [
+              2487,
+              1016,
+              2662,
+              1085
+            ],
+            "localized_bbox": [
+              2487,
+              1016,
+              2635,
+              1084
+            ],
+            "delta_left": 0,
+            "delta_right": 27,
+            "delta_top": 0,
+            "delta_bottom": 1,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+          },
+          {
+            "key": "goal",
+            "original_bbox": [
+              2975,
+              1016,
+              3131,
+              1085
+            ],
+            "localized_bbox": [
+              2998,
+              1016,
+              3131,
+              1085
+            ],
+            "delta_left": 23,
+            "delta_right": 0,
+            "delta_top": 0,
+            "delta_bottom": 0,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+          },
+          {
+            "key": "hit_ghost",
+            "original_bbox": [
+              3163,
+              1017,
+              3633,
+              1106
+            ],
+            "localized_bbox": [
+              3163,
+              1017,
+              3633,
+              1106
+            ],
+            "delta_left": 0,
+            "delta_right": 0,
+            "delta_top": 0,
+            "delta_bottom": 0,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+          },
+          {
+            "key": "exit",
+            "original_bbox": [
+              3083,
+              1143,
+              3494,
+              1281
+            ],
+            "localized_bbox": [
+              3083,
+              1143,
+              3494,
+              1281
+            ],
+            "delta_left": 0,
+            "delta_right": 0,
+            "delta_top": 0,
+            "delta_bottom": 0,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+          },
+          {
+            "key": "collect_stars",
+            "original_bbox": [
+              3469,
+              1172,
+              3998,
+              1267
+            ],
+            "localized_bbox": [
+              3469,
+              1172,
+              3998,
+              1267
+            ],
+            "delta_left": 0,
+            "delta_right": 0,
+            "delta_top": 0,
+            "delta_bottom": 0,
+            "containment": "PASS",
+            "rework_status": "A_RECOVERY06_SOURCE_RESIDUE_REMOVED"
+          },
+          {
+            "key": "mission_failed",
+            "original_bbox": [
+              1984,
+              1280,
+              3187,
+              1792
+            ],
+            "localized_bbox": [
+              1984,
+              1280,
+              3187,
+              1792
+            ],
+            "delta_left": 0,
+            "delta_right": 0,
+            "delta_top": 0,
+            "delta_bottom": 0,
+            "containment": "PASS",
+            "rework_status": "PRIOR_PASS_PRESERVED"
+          },
+          {
+            "key": "total_rank_brown",
+            "original_bbox": [
+              717,
+              1915,
+              1318,
+              2099
+            ],
+            "localized_bbox": [
+              729,
+              1925,
+              1305,
+              2088
+            ],
+            "delta_left": 12,
+            "delta_right": 13,
+            "delta_top": 10,
+            "delta_bottom": 11,
+            "containment": "PASS",
+            "rework_status": "PRIOR_PASS_PRESERVED"
+          },
+          {
+            "key": "total_rank_pink",
+            "original_bbox": [
+              2598,
+              1900,
+              3238,
+              2099
+            ],
+            "localized_bbox": [
+              2607,
+              1912,
+              3229,
+              2087
+            ],
+            "delta_left": 9,
+            "delta_right": 9,
+            "delta_top": 12,
+            "delta_bottom": 12,
+            "containment": "PASS",
+            "rework_status": "PRIOR_PASS_PRESERVED"
+          }
+        ],
+        "status": "PASS"
+      },
+      "visual_evidence": {
+        "full_compare": "localization/graphics/role_C/20261004-1650-C90/C90_39229D64_FULL_COMPARE.jpg",
+        "row_contact": "localization/graphics/role_C/20261004-1650-C90/C90_39229D64_ROW_CONTACT.jpg",
+        "controller_visual_qa": "PENDING"
+      },
+      "runtime_validation": "UNTESTED",
+      "machine_decision": "STATIC_MACHINE_PASS_PENDING_CONTROLLER_VISUAL_QA"
+    }
+  ],
+  "summary": {
+    "assets_checked": 4,
+    "machine_pass": 4,
+    "machine_fail": 0,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changes": false
+  }
+}
