@@ -855,3 +855,11 @@ Next gate: final pending `37759842_1024x1024.dds` requires exact per-card templa
 - Remaining current zero-overlap REWORK is 39229D64 and C075FB49; no completed asset was reopened. Queue sanity remains 137 rows = 79 localize_text + 47 zoom_review + 9 font_pipeline + 1 hangul_name_entry + 1 preserve; pending_artwork localize_text is now 53.
 - No game execution was performed: RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
 - Evidence: localization/graphics/role_C/20261004-2124-C102/C102_841E796B_MACHINE_QA.json, localization/graphics/role_C/20261004-2128-C103/C103_A064FDFC_MACHINE_QA.json, and localization/graphics/role_C/20261004-2128-C103/C103_CROSS_LANE_FINAL_QA.json.
+
+## 2026-10-04 21:58 KST — C104 pending-C final QA
+- Continued only unfinished approval candidates; C103-completed assets were not repeated. Finalized 455717B2, 43B07A77, B1696633, and CBF8ECBF.
+- Hosted C104 mask QA independently rechecked current candidate hashes and zero-overlap policy: all four have target outside allowed=0, target/protected overlap=0, localized pair overlap=0, and no 1px-touch pairs; every recorded localized bbox is contained and within the exact source-size ceiling.
+- Controller visual review PASS for all four using readable SOURCE/CLEAN/FINAL/row/full/raw evidence. No source-script residue, clipping, localized-label overlap, protected-art damage, seam, or source-style regression observed. B1696633 retains Slipstream streaks and NEW Record halo; CBF8ECBF keeps menu/controller/ranking artwork intact.
+- Remaining current zero-overlap producer REWORK is 39229D64 and C075FB49. Remaining localize_text pending-C approvals are AD720950, BF3EE5C6, FD90AA9, and 2B0863D6. pending_artwork localize_text remains 53.
+- RUNTIME_VALIDATION=UNTESTED. No VR/FFB/DX11/DXVK work.
+- Evidence: localization/graphics/role_C/20261004-C104-PENDING-VISUAL/C104_PENDING_ZERO_OVERLAP_MACHINE_QA.json and localization/graphics/role_C/20261004-C104-PENDING-VISUAL/C104_CONTROLLER_FINAL_QA.json.

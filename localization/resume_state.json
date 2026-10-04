@@ -108,9 +108,9 @@
       "841E796B"
     ],
     "strict_qa_current": {
-      "updated_at_kst": "2026-10-04T21:34:14+09:00",
+      "updated_at_kst": "2026-10-04T21:58:41+09:00",
       "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
-      "report": "localization/graphics/role_C/20261004-2128-C103/C103_CROSS_LANE_FINAL_QA.json",
+      "report": "localization/graphics/role_C/20261004-C104-PENDING-VISUAL/C104_CONTROLLER_FINAL_QA.json",
       "direct_queue_scope": 126,
       "current_candidates_scanned": 18,
       "elements_scanned": 234,
@@ -130,7 +130,11 @@
         "62BEBF33",
         "E3FD08BE",
         "841E796B",
-        "A064FDFC"
+        "A064FDFC",
+        "455717B2",
+        "43B07A77",
+        "B1696633",
+        "CBF8ECBF"
       ],
       "rework_required_assets": [
         "39229D64",
@@ -155,7 +159,7 @@
         "sha256": "978387b9cceb685ff3f4957544beedc9b3193f460a637db43b1aae941dab3922"
       }
     },
-    "latest_hd_rework_batch": "localization/graphics/role_C/20261004-2128-C103/C103_CROSS_LANE_FINAL_QA.json",
+    "latest_hd_rework_batch": "localization/graphics/role_C/20261004-C104-PENDING-VISUAL/C104_CONTROLLER_FINAL_QA.json",
     "hd_rework_candidates_ready": 15,
     "hd_rework_remaining": 2,
     "hd_partial_rework": {
@@ -607,7 +611,7 @@
       "status": "PENDING_B_C_D_STRICT_QA"
     },
     "latest_d_final_qa_report": "localization/graphics/role_D/20260928-0106-D85/D85_FINAL_QA_RECONCILE_REPORT.json",
-    "latest_c_strict_qa_report": "localization/graphics/role_C/20261004-2128-C103/C103_CROSS_LANE_FINAL_QA.json",
+    "latest_c_strict_qa_report": "localization/graphics/role_C/20261004-C104-PENDING-VISUAL/C104_CONTROLLER_FINAL_QA.json",
     "c77_fa7bbb13": {
       "timestamp_kst": "2026-09-27T14:05:02+09:00",
       "candidate_sha256": "3bad5551e36306079a5467cab61744a02dab23bd84dd7ee2d84bb48a6e7c8c7d",
@@ -2233,6 +2237,40 @@
       "39229D64",
       "C075FB49"
     ],
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changes": false
+  },
+  "c104_pending_final_qa": {
+    "timestamp_kst": "2026-10-04T21:58:41+09:00",
+    "report": "localization/graphics/role_C/20261004-C104-PENDING-VISUAL/C104_CONTROLLER_FINAL_QA.json",
+    "machine_report": "localization/graphics/role_C/20261004-C104-PENDING-VISUAL/C104_PENDING_ZERO_OVERLAP_MACHINE_QA.json",
+    "assets": {
+      "455717B2": {
+        "candidate_sha256": "50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f",
+        "decision": "C104_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+        "runtime_validation": "UNTESTED"
+      },
+      "43B07A77": {
+        "candidate_sha256": "d2311d4c20327363bacf8b336e925e527ef8c5c8f13a385b0a2fb2e25a946cbc",
+        "decision": "C104_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+        "runtime_validation": "UNTESTED"
+      },
+      "B1696633": {
+        "candidate_sha256": "448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21",
+        "decision": "C104_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+        "runtime_validation": "UNTESTED"
+      },
+      "CBF8ECBF": {
+        "candidate_sha256": "ecc4cbb6cdc064d2c7ccccfc378569f1dc7fc8339c46330ec68ec81c8f899df1",
+        "decision": "C104_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+        "runtime_validation": "UNTESTED"
+      }
+    },
+    "global_rework_remaining": [
+      "39229D64",
+      "C075FB49"
+    ],
+    "pending_c_localize_text": 4,
     "runtime_validation": "UNTESTED",
     "vr_ffb_dx11_dxvk_changes": false
   }

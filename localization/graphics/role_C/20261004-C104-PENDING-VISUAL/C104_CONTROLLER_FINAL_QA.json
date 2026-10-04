@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261004-C104-PENDING-VISUAL",
+  "timestamp_kst": "2026-10-04T21:58:41+09:00",
+  "scope": "Finalize four pending-C approval candidates that already had exact-size machine QA; C103-completed assets and current producer REWORK assets were not repeated.",
+  "policy": "exact source glyph/effect bbox and size ceiling + zero localized overlap/protected overlap + positive separation/no touching + controller readable/raw visual review",
+  "results": [
+    {
+      "asset": "455717B2",
+      "candidate_sha256": "50bb8b8d0541a090e032d47d1ebc62800b559a48f5ddb22e8982c8b625b1773f",
+      "machine_report": "localization/graphics/role_C/20261004-C104-PENDING-VISUAL/C104_455717B2_ZERO_OVERLAP_QA.json",
+      "exact_size_source": "localization/graphics/role_C/20261004-1920-C99/C99_EXACT_SIZE_POLICY_QA.json",
+      "machine_gate": {
+        "target_pixels_outside_allowed_mask": 0,
+        "target_protected_overlap_pixels": 0,
+        "localized_pair_overlap_pixels": 0,
+        "localized_touch_or_overlap_pairs": [],
+        "rows_pass": "4/4"
+      },
+      "controller_visual_qa": "PASS",
+      "controller_visual_evidence": [
+        "localization/graphics/role_C/20261004-1920-C99/C99_455717B2_EXACT_SIZE_ROWS.jpg",
+        "localization/graphics/role_C/20261004-1920-C99/C99_PENDING_AND_C96_FULL_COMPARE.jpg"
+      ],
+      "controller_visual_note": "SOURCE/CLEAN/FINAL row contact and full-atlas review PASS: clean plate has no readable English residue; four Korean labels retain source-family gradient/outline/slant, remain separated, unclipped, and do not damage the flare/loading/icon artwork.",
+      "decision": "C104_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "43B07A77",
+      "candidate_sha256": "d2311d4c20327363bacf8b336e925e527ef8c5c8f13a385b0a2fb2e25a946cbc",
+      "machine_report": "localization/graphics/role_C/20261004-C104-PENDING-VISUAL/C104_43B07A77_ZERO_OVERLAP_QA.json",
+      "exact_size_source": "localization/graphics/role_C/20261004-1920-C99/C99_EXACT_SIZE_POLICY_QA.json",
+      "machine_gate": {
+        "target_pixels_outside_allowed_mask": 0,
+        "target_protected_overlap_pixels": 0,
+        "localized_pair_overlap_pixels": 0,
+        "localized_touch_or_overlap_pairs": [],
+        "rows_pass": "1/1"
+      },
+      "controller_visual_qa": "PASS",
+      "controller_visual_evidence": [
+        "localization/graphics/role_C/20261004-1920-C99/C99_43B07A77_EXACT_SIZE_ROWS.jpg",
+        "localization/graphics/role_C/20261004-1920-C99/C99_PENDING_AND_C96_FULL_COMPARE.jpg"
+      ],
+      "controller_visual_note": "Readable row/full review PASS: Game Over clean plate is residue-free; Korean result preserves the pale-to-orange face, dark outline/shadow and italic presentation without clipping, overlap or artwork damage.",
+      "decision": "C104_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "B1696633",
+      "candidate_sha256": "448d4cd751461af26731028daad4835ec0a8dfcbdcdd7fb23c194478fe74df21",
+      "machine_report": "localization/graphics/role_C/20261004-C104-PENDING-VISUAL/C104_B1696633_ZERO_OVERLAP_QA.json",
+      "exact_size_source": "localization/graphics/role_C/20261004-1920-C99/C99_EXACT_SIZE_POLICY_QA.json",
+      "machine_gate": {
+        "target_pixels_outside_allowed_mask": 0,
+        "target_protected_overlap_pixels": 0,
+        "localized_pair_overlap_pixels": 0,
+        "localized_touch_or_overlap_pairs": [],
+        "rows_pass": "9/9"
+      },
+      "controller_visual_qa": "PASS",
+      "controller_visual_evidence": [
+        "localization/graphics/role_C/20261004-1833-C95/C95_B1696633_FULL_COMPARE.jpg",
+        "localization/graphics/role_C/20261004-1833-C95/C95_B1696633_ROW_CONTACT.jpg"
+      ],
+      "controller_visual_note": "Readable/full/raw evidence PASS: all nine labels are clear and source-family styled; Slipstream streak effect and NEW Record halo are preserved; NAME/STATUS headers are clean; no source residue, clipping, touching, localized overlap, or adjacent-art regression observed.",
+      "decision": "C104_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "asset": "CBF8ECBF",
+      "candidate_sha256": "ecc4cbb6cdc064d2c7ccccfc378569f1dc7fc8339c46330ec68ec81c8f899df1",
+      "machine_report": "localization/graphics/role_C/20261004-C104-PENDING-VISUAL/C104_CBF8ECBF_ZERO_OVERLAP_QA.json",
+      "exact_size_source": "localization/graphics/role_C/20261004-1920-C99/C99_EXACT_SIZE_POLICY_QA.json",
+      "machine_gate": {
+        "target_pixels_outside_allowed_mask": 0,
+        "target_protected_overlap_pixels": 0,
+        "localized_pair_overlap_pixels": 0,
+        "localized_touch_or_overlap_pairs": [],
+        "rows_pass": "7/7"
+      },
+      "controller_visual_qa": "PASS",
+      "controller_visual_evidence": [
+        "localization/graphics/role_C/20261004-1920-C99/C99_CBF8ECBF_EXACT_SIZE_ROWS.jpg",
+        "localization/graphics/role_B/20261004-B-RECOVERY08/B_RECOVERY08_CBF8ECBF_COMPARE.jpg",
+        "localization/graphics/role_B/20261004-B-RECOVERY08/B_RECOVERY08_CBF8ECBF_RAW_COMPARE.jpg"
+      ],
+      "controller_visual_note": "Readable/full/raw review PASS: seven labels retain corresponding plain/gradient source families and alignment; protected menu text, controller/steering artwork and ranking graphics remain intact; no source residue, clipping, touching or overlap observed.",
+      "decision": "C104_PIXEL_VISUAL_POLICY_PASS_PENDING_INGAME",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "summary": {
+    "assets_checked": 4,
+    "pixel_visual_policy_pass": 4,
+    "rework_required_in_this_scope": 0,
+    "global_rework_remaining": [
+      "39229D64",
+      "C075FB49"
+    ],
+    "candidate_changed_by_C": false,
+    "runtime_validation": "UNTESTED",
+    "vr_ffb_dx11_dxvk_changes": false
+  }
+}
