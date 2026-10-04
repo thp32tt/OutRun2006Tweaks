@@ -15,6 +15,22 @@ outdir.mkdir(parents=True, exist_ok=True)
 
 ASSETS = [
     {
+        "key": "AA04D779",
+        "source": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+        "candidate": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+        "producer_report": "localization/graphics/role_B/20261004-B-RECOVERY06/B_RECOVERY06_AA04D779_REPORT.json",
+        "source_mask": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_SOURCE_TEXT_MASK.png",
+        "clean": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_CLEAN_PLATE.png",
+        "clean_protected": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_PROTECTED_MASK.png",
+        "allowed": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_ALLOWED_TEXT_REGION_MASK.png",
+        "final_protected": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_PROTECTED_MASK.png",
+        "target_mask": "localization/graphics/role_B/20261004-B-RECOVERY06/AA04D779_TARGET_TEXT_MASK.png",
+        "source_sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+        "candidate_sha256": "6f64736a53589379a00dc831e8605f0f8f140ffd52837f951e0a24fcd9d89c8a",
+        "expected_rows": 21,
+        "return_context": "new B_RECOVERY06 hosted exact-HD candidate",
+    },
+    {
         "key": "19CEDB9",
         "source": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
         "candidate": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
