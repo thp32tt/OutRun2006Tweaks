@@ -1327,3 +1327,12 @@ Completed the final two untranslated entries, `GOAL → 골` and `TOP Ghost Car!
 - Existing 1A43E9D9 HIGH_RISK in-game requirement and 4F68708E/F6811E94 strict HOLD remain unchanged.
 - `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
 - Evidence: `localization/graphics/role_C/20261005-C138-1F5FE6E9/C138_1F5_CONTROLLER_FINAL_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION51/B51_FAIL_CLOSED.json`, `localization/graphics/role_C/20261005-C136-1F5FE6E9-DIAG/C136_1F5_SOURCE_ROW_DIAGNOSTIC.json`, `localization/graphics/role_C/20261005-C137-1F5FE6E9-DIAG/C137_1F5_SOURCE_ROW_DIAGNOSTIC.json`.
+
+## 2026-10-05 07:21:30 KST — B55 1F5FE6E9 exact-mask REWORK self-QA PASS
+- Consumed only C138-returned even index 132 `1F5FE6E9_1024x512.dds`; completed PASS assets were not repeated.
+- B52 diagnostics proved canonical glyph rows at y=140/164/188/212 with 24px spacing. B55 uses canonical source-alpha glyph components only; rows 2/3 prove the repeated `SPECIAL REQUEST` prefix exactly under +24px, and row4 panel-connected prefix is recovered only by row3+24 intersected with canonical source alpha. Historical localized pixels were not reused.
+- Candidate `e503bb29d87501453e3f0ba4b7b9528a4cc53a198a148845ea8cdad6c97ec6be`: exact 1024x512 RGBA32 mip1 header/raw `mirror_y`; source bboxes [641,140,744,160], [641,164,861,184], [641,188,865,208], [641,211,865,232]. 4/4 bbox+size PASS; outside=0, alpha-outside=0, target-out=0, source residue=0, overlap=0, touch pairs=0.
+- Controller SOURCE/CLEAN/FINAL, 4x row-contact and raw mirror_y visual self-QA PASS: `요청 / 스페셜 요청 1 / 스페셜 요청 2 / 스페셜 요청 3` has no visible English residue, clipping, overlap, seam, halo, or colored-panel damage.
+- Queue index 132 advanced to `b55_self_qa_pass_pending_c`. Producer REWORK=0; pending_artwork localize_text=37. Independent C final QA and isolated in-game validation remain pending.
+- `RUNTIME_VALIDATION=UNTESTED`. No VR/FFB/DX11/DXVK work.
+- Evidence: `localization/graphics/role_B/20261005-B-PRODUCTION55/B55_1F5_REPORT.json`, `localization/graphics/role_B/20261005-B-PRODUCTION55/B55_CONTROLLER_SELF_QA.json`, `localization/graphics/role_B/20261005-B-PRODUCTION55/B55_FINAL_VALIDATION.json`.
