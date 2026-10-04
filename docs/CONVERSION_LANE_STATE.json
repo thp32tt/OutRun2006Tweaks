@@ -2578,10 +2578,11 @@
     {
       "unit_id": "DX11_R244_PROGRAMMABLE_CONSTANT_STATE_RECEIPT",
       "task_id": "CONVERSION-DX11-00359",
-      "production_id": "CONVERSION-DXVK-00358",
-      "event_id": "CONVERSION-DXVK-00358-E002",
-      "event_type": "retry",
+      "production_id": "CONVERSION-DX11-00359",
+      "event_id": "CONVERSION-DX11-00359-E004",
+      "event_type": "rollover",
       "attempt": "1/3",
+      "rollover_is_retry": false,
       "base_sha": "94da651d8333634320bc3f2c31ded701deea5b16",
       "implementation_commits": [
         "efe3122bc71702a0a23b50038573e85479de950e"
@@ -2600,7 +2601,9 @@
       "artifact_id": 11297300899,
       "artifact_digest": "sha256:0f16c058a0e40b5ed6681ad00027731ad95e296bb7355b384c71e14849fd8bb3",
       "implementation_comment_id": 5977810669,
-      "validation_comment_id": 5977861554
+      "validation_comment_id": 5977859880,
+      "chat_rollover": 3,
+      "resume_reason": "Retry persisted after one recovery attempt"
     }
   ],
   "controller_dispatch": {
