@@ -73,24 +73,20 @@ src_arr=np.asarray(src,dtype=np.uint8)
 
 def reconstruct_opaque_rowwise(arr, ob):
     x1,y1,x2,y2=ob
-    h=y2-y1; w=x2-x1
-    # Sample same-row interior background just outside the exact text/effect bbox.
-    # Wide enough to average antialias/glow noise but still inside the speech/starburst interior.
+    ry1=min(H-1,y2+24); ry2=min(H,y2+120)
+    ref=src_arr[ry1:ry2,x1:x2].reshape(-1,4)
+    ref=ref[ref[:,3]>0]
+    if len(ref)==0: raise RuntimeError(("opaque background reference empty",ob))
+    refcol=np.median(ref,axis=0)
     for yy in range(y1,y2):
-        stripes=[]
-        if x1>=48: stripes.append(src_arr[yy, x1-48:x1-8])
-        if x2+48<=W: stripes.append(src_arr[yy, x2+8:x2+48])
-        vals=np.concatenate(stripes,axis=0) if stripes else np.empty((0,4),dtype=np.uint8)
-        vals=vals[vals[:,3]>0]
-        if len(vals)==0:
-            # fallback: median of nontransparent pixels in the source row inside the box
-            vals=src_arr[yy,x1:x2]
-            vals=vals[vals[:,3]>0]
-        if len(vals)==0:
-            fill=np.array([0,0,0,0],dtype=np.uint8)
+        vals=src_arr[yy,x1:x2]
+        good=vals[vals[:,3]>0]
+        if len(good):
+            dist=np.max(np.abs(good[:,:3].astype(np.int16)-refcol[:3].astype(np.int16)),axis=1)
+            bg=good[dist<90]
         else:
-            # Robust per-row background estimate; source art here is flat/vertical-gradient interior.
-            fill=np.median(vals,axis=0).astype(np.uint8)
+            bg=good
+        fill=np.median(bg,axis=0).astype(np.uint8) if len(bg)>=8 else refcol.astype(np.uint8)
         arr[yy,x1:x2]=fill
 
 for r in rows:
@@ -133,26 +129,92 @@ subprocess.run(["python3",str(validator),str(source_png),str(clean_png),str(sour
 clean_rep=json.loads((out/"A_RECOVERY09_CLEAN_PLATE_VALIDATION.json").read_text())
 if clean_rep["status"]!="PASS": raise RuntimeError(("clean validator",clean_rep))
 
-# Isolate only the Korean layer that C_OVERLAP05 added over its clean plate.
-# This intentionally excludes unchanged source-English residue that caused C's visual rejection.
-c_layer_diff=changed_mask(c_clean,c_new)
-final=clean.copy()
-localized_masks={}
-layer_meta={}
+# Freshly render Korean from the repaired clean plate. Reusing the C candidate's
+# localized delta would also reuse its black/gray overdraw fragments, so this retry
+# measures/fits a new source-family Korean layer for every returned row.
+def resolve_font():
+    for pat in ["Noto Sans CJK KR:style=Black","Noto Sans CJK KR:style=Bold","Noto Sans CJK KR"]:
+        try: fp=subprocess.check_output(["fc-match","-f","%{file}",pat],text=True).strip()
+        except Exception: fp=""
+        if fp and Path(fp).exists() and "NotoSansCJK" in Path(fp).name: return fp
+    subprocess.run(["sudo","apt-get","update","-qq"],check=True)
+    subprocess.run(["sudo","apt-get","install","-y","-qq","fonts-noto-cjk"],check=True)
+    return subprocess.check_output(["fc-match","-f","%{file}","Noto Sans CJK KR:style=Black"],text=True).strip()
+FONT=resolve_font()
+
+style_defs={
+ "hearts":          dict(top=(255,236,74,255), bottom=(244,167,12,255), inner=(255,249,224,255), outer=(16,28,74,255), shadow=(6,9,24,220), ir=.018, orr=.060, sr=.060, shear=.05),
+ "technical_bonus": dict(top=(255,255,255,255), bottom=(231,188,177,255), inner=(250,250,250,255), outer=(55,55,65,255), shadow=(14,13,20,210), ir=.020, orr=.050, sr=.050, shear=.15),
+ "mission_cleared": dict(top=(255,244,170,255), bottom=(248,112,18,255), inner=(255,246,222,255), outer=(24,26,40,255), shadow=(5,5,9,235), ir=.025, orr=.055, sr=.070, shear=.13),
+ "total_rank_green":dict(top=(255,255,255,255), bottom=(245,240,237,255), inner=(255,255,255,255), outer=(20,31,76,255), shadow=(8,9,20,190), ir=.012, orr=.055, sr=.045, shear=.10),
+ "storing":         dict(top=(255,236,73,255), bottom=(255,178,15,255), inner=(255,250,220,255), outer=(18,25,55,255), shadow=(8,8,15,200), ir=.016, orr=.050, sr=.040, shear=.11),
+ "special_request": dict(top=(255,255,255,255), bottom=(236,232,231,255), inner=(255,255,255,255), outer=(65,63,67,255), shadow=(24,23,28,185), ir=.012, orr=.050, sr=.045, shear=.12),
+ "target":          dict(top=(230,230,230,255), bottom=(135,135,135,255), inner=(242,242,242,255), outer=(55,55,62,255), shadow=(28,28,31,180), ir=.014, orr=.045, sr=.035, shear=.05),
+ "start":           dict(top=(255,248,218,255), bottom=(235,218,176,255), inner=(255,255,248,255), outer=(18,30,75,255), shadow=(8,12,30,220), ir=.018, orr=.060, sr=.065, shear=.04),
+ "goal":            dict(top=(255,248,218,255), bottom=(235,218,176,255), inner=(255,255,248,255), outer=(18,30,75,255), shadow=(8,12,30,220), ir=.018, orr=.060, sr=.065, shear=.04),
+ "hit_ghost":       dict(top=(255,244,77,255), bottom=(255,192,16,255), inner=(255,250,229,255), outer=(15,27,70,255), shadow=(7,10,24,220), ir=.018, orr=.055, sr=.050, shear=.05),
+ "exit":            dict(top=(255,239,225,255), bottom=(239,116,145,255), inner=(255,247,240,255), outer=(22,30,72,255), shadow=(7,10,24,225), ir=.022, orr=.060, sr=.060, shear=.14),
+ "collect_stars":   dict(top=(255,242,76,255), bottom=(255,186,16,255), inner=(255,251,228,255), outer=(16,28,70,255), shadow=(7,10,24,220), ir=.018, orr=.055, sr=.050, shear=.04),
+ "mission_failed":  dict(top=(247,252,255,255), bottom=(103,180,242,255), inner=(247,251,255,255), outer=(24,31,70,255), shadow=(6,8,20,225), ir=.022, orr=.060, sr=.065, shear=.12),
+ "total_rank_brown":dict(top=(255,255,255,255), bottom=(245,240,237,255), inner=(255,255,255,255), outer=(20,31,76,255), shadow=(8,9,20,190), ir=.012, orr=.055, sr=.045, shear=.10),
+ "total_rank_pink": dict(top=(255,255,255,255), bottom=(245,240,237,255), inner=(255,255,255,255), outer=(20,31,76,255), shadow=(8,9,20,190), ir=.012, orr=.055, sr=.045, shear=.10),
+}
+translations={
+ "hearts":"하트","technical_bonus":"테크니컬 보너스","mission_cleared":"미션 성공!",
+ "total_rank_green":"종합 랭크","storing":"온라인 기록 저장 중...","special_request":"스페셜 요청",
+ "target":"목표","start":"시작","goal":"골","hit_ghost":"고스트를 맞히세요!","exit":"종료",
+ "collect_stars":"별을 모으세요!","mission_failed":"미션 실패!","total_rank_brown":"종합 랭크","total_rank_pink":"종합 랭크"
+}
+def shear_mask(m,amount):
+    if not amount: return m
+    extra=max(4,int(abs(amount)*m.height)+8)
+    c=Image.new("L",(m.width+extra*2,m.height),0); c.paste(m,(extra,0))
+    z=c.transform(c.size,Image.Transform.AFFINE,(1,-amount,amount*c.height,0,1,0),resample=Image.Resampling.BICUBIC)
+    bb=z.getbbox(); return z.crop(bb) if bb else z
+def gradient(size,top,bottom):
+    w,h=size; im=Image.new("RGBA",size); px=im.load()
+    for yy in range(h):
+        t=yy/max(1,h-1); col=tuple(round(top[k]*(1-t)+bottom[k]*t) for k in range(4))
+        for xx in range(w): px[xx,yy]=col
+    return im
+def render_text(text,key,aw,ah):
+    st=style_defs[key]
+    for fs in range(max(20,int(ah*.98)),13,-1):
+        f=ImageFont.truetype(FONT,fs)
+        outer=max(2,round(fs*st["orr"])); inner=max(0,round(fs*st["ir"])); shadow=max(1,round(fs*st["sr"]))
+        d=ImageDraw.Draw(Image.new("L",(8,8),0)); bb=d.textbbox((0,0),text,font=f,stroke_width=outer)
+        pad=outer+shadow+10; cw=bb[2]-bb[0]+pad*2; ch=bb[3]-bb[1]+pad*2
+        def m(sw):
+            z=Image.new("L",(cw,ch),0); q=ImageDraw.Draw(z)
+            q.text((pad-bb[0],pad-bb[1]),text,font=f,fill=255,stroke_width=sw,stroke_fill=255)
+            return shear_mask(z,st["shear"])
+        fill=m(0); inm=m(inner); outm=m(outer)
+        mw=max(fill.width,inm.width,outm.width); mh=max(fill.height,inm.height,outm.height)
+        def center(z):
+            c=Image.new("L",(mw+shadow+8,mh+shadow+8),0); c.paste(z,((mw-z.width)//2,(mh-z.height)//2)); return c
+        fill,inm,outm=center(fill),center(inm),center(outm)
+        layer=Image.new("RGBA",outm.size,(0,0,0,0))
+        sh=Image.new("L",outm.size,0); sh.paste(outm.crop((0,0,outm.width-shadow,outm.height-shadow)),(shadow,shadow))
+        layer.paste(Image.new("RGBA",layer.size,st["shadow"]),(0,0),sh)
+        layer.paste(Image.new("RGBA",layer.size,st["outer"]),(0,0),outm)
+        if inner: layer.paste(Image.new("RGBA",layer.size,st["inner"]),(0,0),inm)
+        layer.paste(gradient(layer.size,st["top"],st["bottom"]),(0,0),fill)
+        lb=layer.getchannel("A").getbbox()
+        if not lb: continue
+        layer=layer.crop(lb)
+        if layer.width<=aw-8 and layer.height<=ah-8: return layer,fs
+    raise RuntimeError(("fit",key,text,aw,ah))
+final=clean.copy(); localized_masks={}; layer_meta={}
 for r in rows:
-    key=r["key"]; ob=list(map(int,r["source_bbox"])); eb=list(map(int,r["new_effect_bbox"]))
-    x1,y1,x2,y2=eb
-    dm=c_layer_diff.crop((x1,y1,x2,y2))
-    # Keep only nontransparent output pixels from the C machine layer; never reapply erasure/background pixels.
-    ca=c_new.crop((x1,y1,x2,y2)).getchannel("A").point(lambda v:255 if v else 0)
-    lm=ImageChops.multiply(dm,ca)
-    if not lm.getbbox(): raise RuntimeError(("empty localized layer",key))
-    crop=c_new.crop((x1,y1,x2,y2))
-    final.paste(crop,(x1,y1),lm)
-    full=Image.new("L",(W,H),0); full.paste(lm,(x1,y1)); localized_masks[key]=full
-    bb=lm.getbbox()
-    gb=[x1+bb[0],y1+bb[1],x1+bb[2],y1+bb[3]]
-    layer_meta[key]={"localized_bbox":gb,"layer_pixels":count(lm)}
+    key=r["key"]; ob=list(map(int,r["source_bbox"])); x1,y1,x2,y2=ob
+    layer,fs=render_text(translations[key],key,x2-x1,y2-y1)
+    tx=x1+(x2-x1-layer.width)//2; ty=y1+(y2-y1-layer.height)//2
+    tx=max(x1+2,min(tx,x2-layer.width-2)); ty=max(y1+2,min(ty,y2-layer.height-2))
+    final.alpha_composite(layer,(tx,ty))
+    lm=layer.getchannel("A").point(lambda v:255 if v else 0)
+    full=Image.new("L",(W,H),0); full.paste(lm,(tx,ty)); localized_masks[key]=full
+    bb=lm.getbbox(); gb=[tx+bb[0],ty+bb[1],tx+bb[2],ty+bb[3]]
+    layer_meta[key]={"localized_bbox":gb,"layer_pixels":count(lm),"font_size":fs}
 
 # Exact RGBA32 candidate with original header/raw mirror-Y orientation.
 raw_final=final.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
@@ -213,8 +275,8 @@ for r in rows:
       "raw_original_bbox":[ob[0],H-ob[3],ob[2],H-ob[1]],
       "raw_localized_bbox":[loc[0],H-loc[3],loc[2],H-loc[1]],
       "raw_containment":"PASS" if contain else "FAIL",
-      "layer_pixels":layer_meta[key]["layer_pixels"],
-      "style":"C_OVERLAP05 source-matched localized raster/effects reused without source-English pixels",
+      "layer_pixels":layer_meta[key]["layer_pixels"],"font_size":layer_meta[key]["font_size"],
+      "style":"fresh source-family Korean render after full source-text clean; target-specific fill/outline/shadow/slant",
       "rework_status":"A_RECOVERY09_FULL_BBOX_CLEAN_RECONSTRUCTION"
     })
 
@@ -284,7 +346,7 @@ report={
  "structure":{"dimensions":[W,H],"format":"RGBA32","pitch":pitch,"mipmaps":mips,"bytes":len(sb),"header_128_exact":True,"raw_orientation":"mirror_y"},
  "repair_method":{
    "clean_plate":"replace full exact source text/effect bbox for all 15 targets; transparent overlays become transparent, three Total Rank labels receive row-wise source-art interior reconstruction",
-   "korean_layer":"reuse only C_OVERLAP05 candidate pixels that differ from C_FULL_CLEAN inside each C-validated new_effect_bbox; unchanged English/source residue is intentionally excluded",
+   "korean_layer":"fresh target-specific source-family Korean render; C candidate pixels are not reused, preventing prior black/gray source-layer overdraw from returning",
    "non_target_art":"source pixels outside exact 15 allowed bboxes remain byte/pixel identical"
  },
  "clean_plate_validator":clean_rep,"final_mask_validator":final_rep,
