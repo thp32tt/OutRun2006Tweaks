@@ -14,8 +14,8 @@ source=Path('/tmp/788CE557_HD.dds');urllib.request.urlretrieve(source_url,source
 candidate=repo/'localization/graphics/hd_candidates'/asset_rel;candidate.parent.mkdir(parents=True,exist_ok=True)
 # Readable-orientation cells confirmed from B_PRODUCTION17 exact-HD diagnostic.
 spec=[
- ('for_experts','For Experts','상급자용',(0,68,376,170),'red_white_navy',0.15),
- ('outrun2sp','OutRun2SP','아웃런2 SP',(372,68,750,170),'orange_white_navy',0.14),
+ ('for_experts','For Experts','상급자용',(0,68,382,185),'red_white_navy',0.15),
+ ('outrun2sp','OutRun2SP','아웃런2 SP',(382,68,760,185),'orange_white_navy',0.14),
  ('music_change','Music Change','음악 변경',(780,88,1115,174),'white_shadow',0.12),
  ('time_remaining','Time remaining :','남은 시간:',(940,174,1570,276),'white_navy',0.12),
 ]
@@ -55,6 +55,18 @@ def shear(im,s):
  return o
 
 header,src,meta=load_dds(source);sa=np.asarray(src,dtype=np.uint8);H,W=sa.shape[:2];source_alpha=sa[:,:,3]>0
+# Resolve the exact transparent gap between the adjacent For Experts / OutRun2SP labels.
+proj=source_alpha[78:182,330:430].any(axis=0);runs=[];st=None
+for i,v in enumerate(proj.tolist()+[True]):
+    if not v and st is None: st=i
+    elif v and st is not None:
+        runs.append((i-st,st,i));st=None
+if not runs: raise RuntimeError('no transparent split between top labels')
+_,gs,ge=max(runs,key=lambda r:(r[0],-abs(((r[1]+r[2])//2)-50)))
+top_split=330+(gs+ge)//2
+if not 360<=top_split<=405: raise RuntimeError(('unexpected top split',top_split,runs))
+spec[0]=('for_experts','For Experts','상급자용',(0,68,top_split,185),'red_white_navy',0.15)
+spec[1]=('outrun2sp','OutRun2SP','아웃런2 SP',(top_split,68,760,185),'orange_white_navy',0.14)
 source_masks={};source_bboxes={};source_text=np.zeros((H,W),bool)
 for key,en,ko,cell,style,slant in spec:
  x0,y0,x1,y1=cell;sub=source_alpha[y0:y1,x0:x1]
