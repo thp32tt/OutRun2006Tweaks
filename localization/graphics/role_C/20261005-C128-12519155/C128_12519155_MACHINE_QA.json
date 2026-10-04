@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C128-12519155",
+  "asset": "12519155",
+  "queue_index": 128,
+  "producer_run": "B_PRODUCTION44",
+  "producer_report": "localization/graphics/role_B/20261005-B-PRODUCTION44/B_PRODUCTION44_125_REPORT.json",
+  "source_sha256": "ad88efc25b705be8960f373f8a06ea88ce39f086857e68c851595f7c867c14c3",
+  "candidate_sha256": "f16b9d7a2f89beb95c04bd8bcebe5b26abf6b18c4b4e2641f184d8956556d399",
+  "structure": {
+    "width": 1024,
+    "height": 1024,
+    "mipmaps": 1,
+    "format": "RGBA32",
+    "raw_orientation": "mirror_x"
+  },
+  "header_128_exact": true,
+  "clean_changed_pixels_outside_source_mask": 74191,
+  "clean_rgb_changed_pixels": 116524,
+  "clean_source_mask_alpha_remaining": 0,
+  "changed_pixels_outside_original_bboxes": 45921,
+  "alpha_changed_pixels_outside_original_bboxes": 45913,
+  "target_pixels_outside_original_bboxes": 0,
+  "target_mask_pixels_invisible_in_candidate": 37767,
+  "source_residue_pixels_outside_2px_target_guard": 668,
+  "localized_pair_overlap_pixels": 0,
+  "localized_touch_pairs": [],
+  "stage_naming_policy": "PASS",
+  "rows": [
+    {
+      "n": 1,
+      "source": "Time Attack Mode / 15 C.",
+      "korean": "타임 어택 모드 / 15코스",
+      "stage_name": false,
+      "expected_korean": "타임 어택 모드 / 15코스",
+      "translation_policy": "PASS",
+      "original_bbox": [
+        9,
+        4,
+        258,
+        59
+      ],
+      "localized_bbox": [
+        14,
+        18,
+        252,
+        45
+      ],
+      "source_size": [
+        249,
+        55
+      ],
+      "localized_size": [
+        238,
+        27
+      ],
+      "delta_left": 5,
+      "delta_right": 6,
+      "delta_top": 14,
+      "delta_bottom": 14,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "rework_status": "C128_REVALIDATED"
+    },
+    {
+      "n": 2,
+      "source": "Alpine",
+      "korean": "알파인",
+      "stage_name": true,
+      "expected_korean": "알파인",
+      "translation_policy": "PASS",
+      "original_bbox": [
+        9,
+        80,
+        191,
+        135
+      ],
+      "localized_bbox": [
+        27,
+        81,
+        172,
+        134
+      ],
+      "source_size": [
+        182,
+        55
+      ],
+      "localized_size": [
+        145,
+        53
+      ],
+      "delta_left": 18,
+      "delta_right": 19,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "rework_status": "C128_REVALIDATED"
+    },
+    {
+      "n": 3,
+      "source": "Ancient Ruins",
+      "korean": "에인션트 루인스",
+      "stage_name": true,
+      "expected_korean": "에인션트 루인스",
+      "translation_policy": "PASS",
+      "original_bbox": [
+        9,
+        156,
+        256,
+        211
+      ],
+      "localized_bbox": [
+        11,
+        163,
+        254,
+        203
+      ],
+      "source_size": [
+        247,
+        55
+      ],
+      "localized_size": [
+        243,
+        40
+      ],
+      "delta_left": 2,
+      "delta_right": 2,
+      "delta_top": 7,
+      "delta_bottom": 8,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "rework_status": "C128_REVALIDATED"
+    },
+    {
+      "n": 4,
+      "source": "Bay Area",
+      "korean": "베이 에어리어",
+      "stage_name": true,
+      "expected_korean": "베이 에어리어",
+      "translation_policy": "PASS",
+      "original_bbox": [
+        9,
+        230,
+        232,
+        284
+      ],
+      "localized_bbox": [
+        10,
+        237,
+        231,
+        277
+      ],
+      "source_size": [
+        223,
+        54
+      ],
+      "localized_size": [
+        221,
+        40
+      ],
+      "delta_left": 1,
+      "delta_right": 1,
+      "delta_top": 7,
+      "delta_bottom": 7,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "rework_status": "C128_REVALIDATED"
+    },
+    {
+      "n": 5,
+      "source": "Big Forest",
+      "korean": "빅 포레스트",
+      "stage_name": true,
+      "expected_korean": "빅 포레스트",
+      "translation_policy": "PASS",
+      "original_bbox": [
+        10,
+        316,
+        362,
+        360
+      ],
+      "localized_bbox": [
+        91,
+        317,
+        281,
+        359
+      ],
+      "source_size": [
+        352,
+        44
+      ],
+      "localized_size": [
+        190,
+        42
+      ],
+      "delta_left": 81,
+      "delta_right": 81,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "rework_status": "C128_REVALIDATED"
+    },
+    {
+      "n": 6,
+      "source": "Canyon",
+      "korean": "캐니언",
+      "stage_name": true,
+      "expected_korean": "캐니언",
+      "translation_policy": "PASS",
+      "original_bbox": [
+        9,
+        384,
+        165,
+        439
+      ],
+      "localized_bbox": [
+        13,
+        385,
+        160,
+        438
+      ],
+      "source_size": [
+        156,
+        55
+      ],
+      "localized_size": [
+        147,
+        53
+      ],
+      "delta_left": 4,
+      "delta_right": 5,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "rework_status": "C128_REVALIDATED"
+    },
+    {
+      "n": 7,
+      "source": "Cape Way",
+      "korean": "케이프 웨이",
+      "stage_name": true,
+      "expected_korean": "케이프 웨이",
+      "translation_policy": "PASS",
+      "original_bbox": [
+        11,
+        466,
+        648,
+        512
+      ],
+      "localized_bbox": [
+        226,
+        467,
+        432,
+        511
+      ],
+      "source_size": [
+        637,
+        46
+      ],
+      "localized_size": [
+        206,
+        44
+      ],
+      "delta_left": 215,
+      "delta_right": 216,
+      "delta_top": 1,
+      "delta_bottom": 1,
+      "containment": "PASS",
+      "size_ceiling": "PASS",
+      "edge_touch_high_risk": false,
+      "rework_status": "C128_REVALIDATED"
+    }
+  ],
+  "machine_status": "FAIL",
+  "controller_visual_qa": "PENDING",
+  "runtime_validation": "UNTESTED"
+}
