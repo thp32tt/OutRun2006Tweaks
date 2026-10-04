@@ -8,7 +8,7 @@ if os.environ.get('OUTRUN_CPU_WORKER')!='github-actions' or os.environ.get('OUTR
     raise SystemExit('GitHub-hosted localization CPU worker / role C only')
 
 repo=Path.cwd()
-run='20261004-C105-5B65E08C'
+run='20261004-C106-5B65E08C'
 out=repo/'localization/graphics/role_C'/run
 out.mkdir(parents=True,exist_ok=True)
 bdir=repo/'localization/graphics/role_B/20261004-B-PRODUCTION20'
@@ -89,5 +89,5 @@ result={
  'machine_status':'PASS' if passed else 'FAIL',
  'controller_visual_qa':'PENDING','runtime_validation':'UNTESTED'
 }
-(out/'C105_5B65E08C_MACHINE_QA.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-print('C105_DONE',json.dumps({'machine_status':result['machine_status'],'source_residue':source_residue,'guard':guard}),flush=True)
+(out/'C106_5B65E08C_MACHINE_QA.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+print('C106_DONE',json.dumps({'machine_status':result['machine_status'],'source_residue':source_residue,'guard':guard}),flush=True)
