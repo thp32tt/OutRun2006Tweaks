@@ -424,8 +424,8 @@ namespace
         Settings::WheelFFBUseHardwareSpring = true;
         Settings::WheelFFBUseHardwareDamper = true;
         Settings::WheelFFBUsePeriodicEffects = false;
-        Settings::WheelFFBInvertForce = false;
-        Settings::WheelFFBInvertSpring = false;
+        Settings::WheelFFBInvertForce = true;
+        Settings::WheelFFBInvertSpring = true;
         Settings::WheelFFBDebugLog = true;
         Settings::VibrationMode = 0;
     }
@@ -455,8 +455,8 @@ namespace
         Settings::WheelFFBUseHardwareSpring = true;
         Settings::WheelFFBUseHardwareDamper = true;
         Settings::WheelFFBUsePeriodicEffects = false;
-        Settings::WheelFFBInvertForce = false;
-        Settings::WheelFFBInvertSpring = false;
+        Settings::WheelFFBInvertForce = true;
+        Settings::WheelFFBInvertSpring = true;
         Settings::WheelFFBDebugLog = true;
         Settings::VibrationMode = 0;
     }
@@ -535,7 +535,28 @@ void __cdecl WheelFFB_UpdateAfterPhysics(EVWORK_CAR* car)
     // the core and must not be pre-shaped by the Modern DD wrapper.
     if (car && ffbModel == WheelFFBMath::Model::ModernDD)
     {
-        const RoadSurfaceProfile surface = sample_surface_profile(car);
+        RoadSurfaceProfile surface = sample_surface_profile(car);
+        {
+            const std::array<unsigned, 4> masks = {
+                surface.surfaceMask[0], surface.surfaceMask[1],
+                surface.surfaceMask[2], surface.surfaceMask[3]
+            };
+            if (WheelFFBMath::primary_asphalt_water_false_positive(
+                    stage.uniqueStage, surface.collisionContext,
+                    masks, surface.waterWheelMask))
+            {
+                surface.minimum = 0.25f;
+                surface.maximum = 0.25f;
+                surface.spread = 0.0f;
+                surface.nonWaterMinimum = 0.25f;
+                surface.nonWaterMaximum = 0.25f;
+                surface.waterWheelMask = 0;
+                surface.validSamples = 4;
+                surface.nonWaterSamples = 4;
+                for (int i = 0; i < 4; ++i)
+                    surface.wheelRoughness[i] = 0.25f;
+            }
+        }
         const bool rawMixedSurface =
             surface.validSamples >= 2 && surface.spread >= 0.08f;
 
