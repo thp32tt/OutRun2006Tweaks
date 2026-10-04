@@ -2,22 +2,22 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00361",
   "production_id": "CONVERSION-DX11-00361",
-  "event_id": "CONVERSION-DX11-00361-E002",
+  "event_id": "CONVERSION-DX11-00361-E008",
   "event_type": "rollover",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "attempt": "1/3",
-  "chat_rollover": 2,
+  "chat_rollover": 5,
   "rollover_is_retry": false,
   "resume_reason": "Retry persisted after one recovery attempt",
-  "status": "IN_PROGRESS_AWAITING_EXACT_SHA_GATE",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "runtime_test_performed": false,
   "runtime_claim": "NONE",
   "base_sha": "3af3fd37e36a27816a09ca74c21ccbe6b3f2762d",
-  "result_sha": "PENDING_RESULT_COMMIT_SHA",
-  "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA",
+  "result_sha": "fe920d759b347a0a9c0933b7cdd2d65e79d77da2",
+  "validation_bearing_result_sha": "fe920d759b347a0a9c0933b7cdd2d65e79d77da2",
   "result_marker": "[AUTO:CONVERSION-DX11-00361]",
   "selected_work_item": "DX11_R245_PROGRAMMABLE_CONSTANT_PAYLOAD_UPLOAD_RECEIPT",
   "summary": "R245 adds a dormant fail-closed programmable constant-payload upload receipt on top of validated R244 constant-state ownership. It submits one exact-size VS/PS payload pair to the R244-owned DEFAULT constant buffers through one exact same-device D3D11 context, seals source payload hashes/context identity and a monotonic receipt generation, and rejects stale parent snapshots, foreign/replacement contexts and payload changes. It does not bind VS/PS constant-buffer slots, route Draw*, or activate NativeDrawPath.",
@@ -49,23 +49,46 @@
       "evidence": "Added R245 constant-payload upload/readiness/snapshot APIs, exact source-payload hashing, exact context ownership seal and monotonic payload receipt. Extended dx11_constant_buffer_probe for prerequisite, foreign/stale/replacement/mutation/idempotence/fresh-generation cases and extended source-graph drift guards. No VSSetConstantBuffers/PSSetConstantBuffers or Draw* call was added."
     },
     "C3_VALIDATE": {
-      "status": "PENDING_EXACT_SHA_GATE",
-      "automation_validation": "PENDING",
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
       "local_auxiliary_validation": "PASS_WITH_PREEXISTING_UNRELATED_TEST_LIMITATION",
-      "evidence": "git diff --check PASS; python3 -m py_compile tools/verify_dx11_source_graph.py PASS; tools/verify_dx11_source_graph.py PASS including dual-source blend and dormant activation boundary. Existing tests/test_dx11_contract_completeness.py is malformed at the authoritative base SHA with literal \\\\n text and raises SyntaxError before running; it was not modified or waived. Exact-SHA Backend Conversion Gate including Win32 build and DX11 readiness smoke is required. No Quest 3/VDXR runtime test performed."
+      "exact_sha": "fe920d759b347a0a9c0933b7cdd2d65e79d77da2",
+      "backend_conversion_gate": {
+        "run_number": 1950,
+        "run_id": 37188889149,
+        "conclusion": "success",
+        "validate_job_id": 111396694052,
+        "validate_conclusion": "success",
+        "readiness_smoke_job_id": 111397309993,
+        "readiness_smoke_conclusion": "success",
+        "constant_buffer_probe": "build_success/run_success",
+        "artifact_id": 11297834341,
+        "artifact_digest": "sha256:8abb594684b39f1cb806290b95d5d4f6100768469455e5f73111af5c8fca239d"
+      },
+      "evidence": "Exact-SHA Backend Conversion Gate #1950 on fe920d759b347a0a9c0933b7cdd2d65e79d77da2 SUCCESS. validate job 111396694052 SUCCESS; DX11 readiness smoke job 111397309993 SUCCESS; Build/Run DX11 constant buffer probe SUCCESS; artifact 11297834341 digest sha256:8abb594684b39f1cb806290b95d5d4f6100768469455e5f73111af5c8fca239d. Local git diff --check, py_compile and verify_dx11_source_graph.py PASS. Pre-existing malformed tests/test_dx11_contract_completeness.py limitation remains unrelated and was not modified or waived. No Quest 3/VDXR runtime test performed."
     },
     "C4_COMMIT": {
-      "status": "PENDING_RESULT_SHA_PUBLICATION",
-      "validation_bearing_result_sha": "PENDING_RESULT_COMMIT_SHA"
+      "status": "COMPLETE",
+      "material_result_sha": "fe920d759b347a0a9c0933b7cdd2d65e79d77da2",
+      "validation_bearing_result_sha": "fe920d759b347a0a9c0933b7cdd2d65e79d77da2",
+      "result_marker": "[AUTO:CONVERSION-DX11-00361]",
+      "evidence": "Material commit is the direct child of authoritative base 3af3fd37e36a27816a09ca74c21ccbe6b3f2762d and was published to vr-dx11-native-r71 without CI skip."
     },
     "C5_PACKAGE": {
       "status": "NOT_REQUIRED",
       "reason": "R245 is a dormant programmable payload-submission/readiness receipt and changes no runtime package, selector, transport payload or activated draw path."
     },
     "C6_STATE": {
-      "status": "PENDING",
-      "state_persisted": false,
-      "exact_next_action": "Publish the R245 material result without CI skip, require exact-SHA Backend Conversion Gate including DX11 readiness smoke/constant-buffer probe, append Issue #14 evidence, then persist C3/C4/C6 with RUNTIME_VALIDATION=UNTESTED."
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "runtime_validation": "UNTESTED",
+      "validation_run_id": 37188889149,
+      "validation_job_id": 111396694052,
+      "readiness_smoke_job_id": 111397309993,
+      "artifact_id": 11297834341,
+      "artifact_digest": "sha256:8abb594684b39f1cb806290b95d5d4f6100768469455e5f73111af5c8fca239d",
+      "issue14_comment_id": 5978145495,
+      "exact_next_action": "Release CONVERSION-DX11-00361 as complete. Preserve R239-R245 programmable ownership/readiness receipts and keep Draw*/NativeDrawPath dormant. Any later programmable constant-slot binding readiness must be a separate bounded fail-closed unit and must not claim runtime validation until HMD testing exists."
     }
   },
   "regression_assessment": {
@@ -79,13 +102,66 @@
   "controller_dispatch": {
     "task_id": "CONVERSION-DX11-00361",
     "production_id": "CONVERSION-DX11-00361",
-    "event_id": "CONVERSION-DX11-00361-E002",
+    "event_id": "CONVERSION-DX11-00361-E008",
     "event_type": "rollover",
     "attempt": "1/3",
     "source": "CURRENT_USER_QUEUE",
-    "chat_rollover": 2,
+    "chat_rollover": 5,
     "rollover_is_retry": false,
-    "resume_reason": "Retry persisted after one recovery attempt"
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "material_result_sha": "fe920d759b347a0a9c0933b7cdd2d65e79d77da2",
+    "validation_bearing_result_sha": "fe920d759b347a0a9c0933b7cdd2d65e79d77da2",
+    "validation_run_id": 37188889149,
+    "validation_job_id": 111396694052,
+    "readiness_smoke_job_id": 111397309993,
+    "artifact_id": 11297834341,
+    "artifact_digest": "sha256:8abb594684b39f1cb806290b95d5d4f6100768469455e5f73111af5c8fca239d",
+    "issue14_comment_id": 5978145495,
+    "runtime_validation": "UNTESTED",
+    "native_draw_path_activation_changed": false
   },
-  "exact_next_action": "Publish R245 as the validation-bearing material result, validate that exact SHA, then finalize C3/C4/C6 without conflating automated validation with HMD runtime proof."
+  "exact_next_action": "Release CONVERSION-DX11-00361 as complete. Preserve the validated R245 constant-payload receipt; keep VS/PS constant-buffer slot binding, Draw* routing and NativeDrawPath activation outside this unit. If development continues, make constant-slot binding readiness a separate fail-closed unit.",
+  "material_result_sha": "fe920d759b347a0a9c0933b7cdd2d65e79d77da2",
+  "validation": {
+    "exact_sha_backend_conversion_gate": {
+      "run_id": 37188889149,
+      "run_number": 1950,
+      "result_sha": "fe920d759b347a0a9c0933b7cdd2d65e79d77da2",
+      "conclusion": "success",
+      "validate_job_id": 111396694052,
+      "readiness_smoke_job_id": 111397309993,
+      "constant_buffer_probe": "build_success/run_success",
+      "artifact_id": 11297834341,
+      "artifact_digest": "sha256:8abb594684b39f1cb806290b95d5d4f6100768469455e5f73111af5c8fca239d"
+    }
+  },
+  "issue14": {
+    "implementation_and_validation_comment_id": 5978145495
+  },
+  "rollover_metadata_correction": {
+    "corrected_from": [
+      {
+        "event_id": "CONVERSION-DX11-00361-E002",
+        "chat_rollover": 2
+      },
+      {
+        "event_id": "CONVERSION-DX11-00361-E004",
+        "chat_rollover": 3
+      },
+      {
+        "event_id": "CONVERSION-DX11-00361-E006",
+        "chat_rollover": 4
+      }
+    ],
+    "corrected_to": {
+      "event_id": "CONVERSION-DX11-00361-E008",
+      "chat_rollover": 5,
+      "attempt": "1/3",
+      "rollover_is_retry": false,
+      "source": "CURRENT_USER_QUEUE",
+      "resume_reason": "Retry persisted after one recovery attempt"
+    },
+    "reason": "The current user-issued E008 / CHAT_ROLLOVER=5 is authoritative. Chat rollover is not a retry, so ATTEMPT remains 1/3. R245 material/result SHA and exact-SHA validation evidence are unchanged.",
+    "material_and_validation_bearing_sha_unchanged": true
+  }
 }
