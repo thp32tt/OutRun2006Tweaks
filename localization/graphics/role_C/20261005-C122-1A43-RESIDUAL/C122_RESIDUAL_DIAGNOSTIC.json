@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "role": "C",
+  "run": "20261005-C122-1A43-RESIDUAL",
+  "asset": "1A43E9D9",
+  "producer_run": "B_PRODUCTION38",
+  "candidate_sha256": "5bba2b0e6717559132bdf5768bdd0430879c07418cb259762d3463f2bbdd8a36",
+  "residual_definition": "decoded candidate visible alpha over transparent CLEAN, outside producer target mask, inside producer source-text mask",
+  "residual_pixels": 1086,
+  "residual_bbox": [
+    456,
+    13,
+    1304,
+    244
+  ],
+  "residual_source_alpha_overlap_pixels": 1086,
+  "residual_outside_source_visible_alpha_pixels": 0,
+  "candidate_alpha_threshold_counts": {
+    "1": 1086,
+    "2": 589,
+    "4": 196,
+    "8": 35,
+    "16": 2,
+    "32": 0,
+    "64": 0,
+    "96": 0,
+    "128": 0,
+    "160": 0,
+    "192": 0,
+    "224": 0
+  },
+  "source_alpha_threshold_counts_at_residual": {
+    "1": 1086,
+    "8": 1027,
+    "32": 972,
+    "64": 934,
+    "128": 886,
+    "192": 809
+  },
+  "candidate_exactly_equals_source_rgba_pixels": 8,
+  "candidate_alpha_equals_source_alpha_pixels": 14,
+  "rows": [
+    {
+      "n": 1,
+      "source": "OutRun Mode",
+      "residual_pixels": 556,
+      "residual_bbox": [
+        456,
+        13,
+        1036,
+        128
+      ],
+      "alpha_ge_8": 21,
+      "alpha_ge_32": 0,
+      "alpha_ge_128": 0,
+      "source_alpha_overlap": 556
+    },
+    {
+      "n": 2,
+      "source": "15 continuous course",
+      "residual_pixels": 530,
+      "residual_bbox": [
+        804,
+        136,
+        1304,
+        244
+      ],
+      "alpha_ge_8": 14,
+      "alpha_ge_32": 0,
+      "alpha_ge_128": 0,
+      "source_alpha_overlap": 530
+    }
+  ],
+  "policy_interpretation": "Any confirmed source-script/effect alpha residue outside localized target is a zero-residue/zero-overlap failure; controller must inspect overlay before final decision.",
+  "runtime_validation": "UNTESTED"
+}
