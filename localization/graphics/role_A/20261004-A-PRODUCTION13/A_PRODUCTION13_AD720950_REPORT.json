@@ -3,7 +3,7 @@
   "role": "A",
   "run": "20261004-A-PRODUCTION13",
   "worker": "github-actions",
-  "base_head": "7d21cadb5c95e5a7402868779963fc2ab035146e",
+  "base_head": "5012d3468f2dffd65566cad4c4db420448d73443",
   "index": 47,
   "asset": "textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
   "source_provenance": {
@@ -15,7 +15,7 @@
     "classification": "authoritative high-resolution source; stale filename suffix, DDS header 4096x1024 RGBA32"
   },
   "source_sha256": "141e1f0773b82a8eca6ff49cd93d637221b96211566541f97de9ef4fc454d26f",
-  "candidate_sha256": "3d19d75aa02b3f44ff59ee4dbe33a6832f453811142fb734669ef3ff46d68f29",
+  "candidate_sha256": "6dad37489e7027b8f546c38b3729167697965fc8e33fcabff46f09aba1677955",
   "candidate_path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/AD720950_1024x256.dds",
   "structure": {
     "dimensions": [
@@ -77,7 +77,7 @@
       4096,
       1024
     ],
-    "changed_pixels": 70703,
+    "changed_pixels": 71405,
     "changed_bbox": [
       264,
       76,
@@ -90,7 +90,7 @@
     "status": "PASS"
   },
   "decoded_changes": {
-    "changed_pixels_total": 70703,
+    "changed_pixels_total": 71405,
     "changed_pixels_outside_original_bboxes": 0,
     "alpha_changed_pixels_outside_original_bboxes": 0,
     "protected_visible_pixels_changed": 0,
@@ -109,17 +109,17 @@
         131
       ],
       "localized_bbox": [
-        3810,
+        3811,
         78,
-        3904,
+        3902,
         129
       ],
       "source_width": 200,
       "source_height": 55,
-      "localized_width": 94,
+      "localized_width": 91,
       "localized_height": 51,
-      "delta_left": 53,
-      "delta_right": 53,
+      "delta_left": 54,
+      "delta_right": 55,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -132,15 +132,15 @@
         948
       ],
       "raw_localized_bbox": [
-        3810,
+        3811,
         895,
-        3904,
+        3902,
         946
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 54,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 50,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -156,18 +156,18 @@
       ],
       "localized_bbox": [
         3761,
-        280,
+        278,
         3992,
-        327
+        328
       ],
       "source_width": 236,
       "source_height": 55,
       "localized_width": 231,
-      "localized_height": 47,
+      "localized_height": 50,
       "delta_left": 2,
       "delta_right": 3,
-      "delta_top": 4,
-      "delta_bottom": 4,
+      "delta_top": 2,
+      "delta_bottom": 3,
       "containment": "PASS",
       "size_ceiling": "PASS",
       "positive_margin": "PASS",
@@ -179,14 +179,14 @@
       ],
       "raw_localized_bbox": [
         3761,
-        697,
+        696,
         3992,
-        744
+        746
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 50,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 49,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -201,17 +201,17 @@
         421
       ],
       "localized_bbox": [
-        3796,
+        3797,
         379,
-        3908,
+        3906,
         419
       ],
       "source_width": 192,
       "source_height": 44,
-      "localized_width": 112,
+      "localized_width": 109,
       "localized_height": 40,
-      "delta_left": 40,
-      "delta_right": 40,
+      "delta_left": 41,
+      "delta_right": 42,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -224,15 +224,15 @@
         647
       ],
       "raw_localized_bbox": [
-        3796,
+        3797,
         605,
-        3908,
+        3906,
         645
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 42,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 40,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -247,17 +247,17 @@
         518
       ],
       "localized_bbox": [
-        3779,
+        3780,
         476,
-        3856,
+        3854,
         516
       ],
       "source_width": 117,
       "source_height": 44,
-      "localized_width": 77,
+      "localized_width": 74,
       "localized_height": 40,
-      "delta_left": 20,
-      "delta_right": 20,
+      "delta_left": 21,
+      "delta_right": 22,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -270,15 +270,15 @@
         550
       ],
       "raw_localized_bbox": [
-        3779,
+        3780,
         508,
-        3856,
+        3854,
         548
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 44,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 41,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -293,17 +293,17 @@
         431
       ],
       "localized_bbox": [
-        908,
+        911,
         378,
-        1048,
+        1045,
         429
       ],
       "source_width": 231,
       "source_height": 55,
-      "localized_width": 140,
+      "localized_width": 134,
       "localized_height": 51,
-      "delta_left": 45,
-      "delta_right": 46,
+      "delta_left": 48,
+      "delta_right": 49,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -316,15 +316,15 @@
         648
       ],
       "raw_localized_bbox": [
-        908,
+        911,
         595,
-        1048,
+        1045,
         646
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 54,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 50,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -339,17 +339,17 @@
         528
       ],
       "localized_bbox": [
-        284,
+        286,
         475,
-        376,
+        375,
         526
       ],
       "source_width": 133,
       "source_height": 55,
-      "localized_width": 92,
+      "localized_width": 89,
       "localized_height": 51,
-      "delta_left": 20,
-      "delta_right": 21,
+      "delta_left": 22,
+      "delta_right": 22,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -362,15 +362,15 @@
         551
       ],
       "raw_localized_bbox": [
-        284,
+        286,
         498,
-        376,
+        375,
         549
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 54,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 50,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -385,17 +385,17 @@
         431
       ],
       "localized_bbox": [
-        2148,
+        2151,
         378,
-        2288,
+        2285,
         429
       ],
       "source_width": 231,
       "source_height": 55,
-      "localized_width": 140,
+      "localized_width": 134,
       "localized_height": 51,
-      "delta_left": 45,
-      "delta_right": 46,
+      "delta_left": 48,
+      "delta_right": 49,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -408,15 +408,15 @@
         648
       ],
       "raw_localized_bbox": [
-        2148,
+        2151,
         595,
-        2288,
+        2285,
         646
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 54,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 50,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -431,17 +431,17 @@
         528
       ],
       "localized_bbox": [
-        1524,
+        1526,
         475,
-        1616,
+        1615,
         526
       ],
       "source_width": 133,
       "source_height": 55,
-      "localized_width": 92,
+      "localized_width": 89,
       "localized_height": 51,
-      "delta_left": 20,
-      "delta_right": 21,
+      "delta_left": 22,
+      "delta_right": 22,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -454,15 +454,15 @@
         551
       ],
       "raw_localized_bbox": [
-        1524,
+        1526,
         498,
-        1616,
+        1615,
         549
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 54,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 50,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -477,17 +477,17 @@
         431
       ],
       "localized_bbox": [
-        3388,
+        3391,
         378,
-        3528,
+        3525,
         429
       ],
       "source_width": 231,
       "source_height": 55,
-      "localized_width": 140,
+      "localized_width": 134,
       "localized_height": 51,
-      "delta_left": 45,
-      "delta_right": 46,
+      "delta_left": 48,
+      "delta_right": 49,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -500,15 +500,15 @@
         648
       ],
       "raw_localized_bbox": [
-        3388,
+        3391,
         595,
-        3528,
+        3525,
         646
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 54,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 50,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -523,17 +523,17 @@
         528
       ],
       "localized_bbox": [
-        2764,
+        2766,
         475,
-        2856,
+        2855,
         526
       ],
       "source_width": 133,
       "source_height": 55,
-      "localized_width": 92,
+      "localized_width": 89,
       "localized_height": 51,
-      "delta_left": 20,
-      "delta_right": 21,
+      "delta_left": 22,
+      "delta_right": 22,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -546,15 +546,15 @@
         551
       ],
       "raw_localized_bbox": [
-        2764,
+        2766,
         498,
-        2856,
+        2855,
         549
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 54,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 50,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -569,17 +569,17 @@
         919
       ],
       "localized_bbox": [
-        2524,
+        2527,
         866,
-        2664,
+        2661,
         917
       ],
       "source_width": 231,
       "source_height": 55,
-      "localized_width": 140,
+      "localized_width": 134,
       "localized_height": 51,
-      "delta_left": 45,
-      "delta_right": 46,
+      "delta_left": 48,
+      "delta_right": 49,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -592,15 +592,15 @@
         160
       ],
       "raw_localized_bbox": [
-        2524,
+        2527,
         107,
-        2664,
+        2661,
         158
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 54,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 50,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -615,17 +615,17 @@
         1016
       ],
       "localized_bbox": [
-        1900,
+        1902,
         963,
-        1992,
+        1991,
         1014
       ],
       "source_width": 133,
       "source_height": 55,
-      "localized_width": 92,
+      "localized_width": 89,
       "localized_height": 51,
-      "delta_left": 20,
-      "delta_right": 21,
+      "delta_left": 22,
+      "delta_right": 22,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -638,15 +638,15 @@
         63
       ],
       "raw_localized_bbox": [
-        1900,
+        1902,
         10,
-        1992,
+        1991,
         61
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 54,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 50,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -661,17 +661,17 @@
         919
       ],
       "localized_bbox": [
-        3764,
+        3767,
         866,
-        3904,
+        3901,
         917
       ],
       "source_width": 231,
       "source_height": 55,
-      "localized_width": 140,
+      "localized_width": 134,
       "localized_height": 51,
-      "delta_left": 45,
-      "delta_right": 46,
+      "delta_left": 48,
+      "delta_right": 49,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -684,15 +684,15 @@
         160
       ],
       "raw_localized_bbox": [
-        3764,
+        3767,
         107,
-        3904,
+        3901,
         158
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 54,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 50,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     },
     {
@@ -707,17 +707,17 @@
         1016
       ],
       "localized_bbox": [
-        3140,
+        3142,
         963,
-        3232,
+        3231,
         1014
       ],
       "source_width": 133,
       "source_height": 55,
-      "localized_width": 92,
+      "localized_width": 89,
       "localized_height": 51,
-      "delta_left": 20,
-      "delta_right": 21,
+      "delta_left": 22,
+      "delta_right": 22,
       "delta_top": 2,
       "delta_bottom": 2,
       "containment": "PASS",
@@ -730,15 +730,15 @@
         63
       ],
       "raw_localized_bbox": [
-        3140,
+        3142,
         10,
-        3232,
+        3231,
         61
       ],
       "raw_containment": "PASS",
       "font": "Noto Sans CJK KR Black/Bold",
-      "font_size": 54,
-      "style": "source-matched plain white antialiased text; no outline/shadow",
+      "font_size": 50,
+      "style": "source-matched heavy plain white antialiased text; same-color weight stroke only, no contrasting outline/shadow",
       "rework_status": "A_PRODUCTION13_NEW_HD_CANDIDATE"
     }
   ],
