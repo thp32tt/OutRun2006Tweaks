@@ -10,7 +10,6 @@ if os.environ.get('OUTRUN_CPU_WORKER') != 'github-actions' or os.environ.get('OU
 repo=Path.cwd(); run='20261004-C-OVERLAP01'; out=repo/'localization/graphics/role_C'/run; out.mkdir(parents=True,exist_ok=True)
 assets=[
  dict(num=2,id='39229D64', source='localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds', candidate='localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds', clean='localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_CLEAN_PLATE.png', protected='localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_PROTECTED_MASK.png', allowed='localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_ALLOWED_TEXT_REGION_MASK.png', source_text='localization/graphics/role_A/20261004-A-RECOVERY06/39229D64_SOURCE_TEXT_MASK.png', report='localization/graphics/role_A/20261004-A-RECOVERY06/A_RECOVERY06_39229D64_REPORT.json', base_scale=.90),
- dict(num=6,id='A064FDFC', source='localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds', candidate='localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds', clean='localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_CLEAN_PLATE.png', protected='localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_PROTECTED_MASK.png', allowed='localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_ALLOWED_TEXT_REGION_MASK.png', source_text='localization/graphics/role_B/20261004-B-RECOVERY02/A064FDFC_SOURCE_TEXT_MASK.png', report='localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json', base_scale=.88),
 ]
 
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -129,6 +128,23 @@ c075_hold={
 }
 (out/'C_OVERLAP02_C075FB49_HOLD.json').write_text(json.dumps(c075_hold,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 all_results.append(c075_hold)
+# Review 6 / A064FDFC also fails closed after the retry proved no valid
+# zero-overlap placement exists for dumped_white within its exact source bbox
+# while keeping the required protected-artwork clearance.
+a064_candidate=repo/'localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds'
+a064_hold={
+ 'asset':'A064FDFC','review_number':6,'candidate_sha256':sha(a064_candidate),
+ 'producer_report':'localization/graphics/role_B/20261004-B-RECOVERY02/B_RECOVERY02_A064FDFC_REPORT.json',
+ 'blocking_row':'dumped_white','source_bbox':[3169,270,3605,390],
+ 'current_effect_bbox':[3172,274,3603,385],
+ 'evidence':'zero-overlap corrective search found no placement from scale 0.88 down through the fail-closed floor while preserving exact source-bbox containment, protected-artwork clearance, and positive localized-label separation',
+ 'zero_overlap_gate':'HOLD_STRICT_RECHECK',
+ 'required_rework':'producer-lane reconstruction of dumped_white / adjacent protected geometry with explicit separable target masks; do not infer PASS from prior bbox containment',
+ 'candidate_changed_by_C':False,'runtime_validation':'UNTESTED',
+ 'status':'HOLD_STRICT_RECHECK_ZERO_OVERLAP_NO_SAFE_PLACEMENT'
+}
+(out/'C_OVERLAP03_A064FDFC_HOLD.json').write_text(json.dumps(a064_hold,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+all_results.append(a064_hold)
 for cfg in assets:
     aid=cfg['id']; print('BEGIN',aid,flush=True)
     src=readable_dds(repo/cfg['source']); old=readable_dds(repo/cfg['candidate']); clean=Image.open(repo/cfg['clean']).convert('RGBA')
@@ -181,6 +197,6 @@ for cfg in assets:
 WW=max(x.width for x in contact); HH=sum(x.height for x in contact)+14*(len(contact)-1); sheet=Image.new('RGB',(WW,HH),'white'); y=0
 for row in contact: sheet.paste(row,(0,y)); y+=row.height+14
 sheet.save(out/'C_OVERLAP01_2_5_6_SOURCE_OLD_NEW.jpg',quality=95,subsampling=0)
-summary={'schema_version':1,'run':run,'retry':'same review 2/5/6 task after first worker aborted on ambiguous C075 clean layer','policy':'zero-overlap: any 1px localized-to-localized or localized-to-protected/preserved foreground overlap FAIL; exact source bbox size ceiling retained','assets':['39229D64','C075FB49','A064FDFC'],'results':all_results,'machine_pass_assets':[r['asset'] for r in all_results if r.get('status')=='STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA'],'hold_strict_recheck_assets':[r['asset'] for r in all_results if str(r.get('status','')).startswith('HOLD_STRICT_RECHECK')],'machine_status':'PASS_WITH_EXPLICIT_HOLD','controller_visual_qa':'PENDING','runtime_validation':'UNTESTED'}
+summary={'schema_version':1,'run':run,'retry':'same review 2/5/6 task; C075 ambiguous ownership and A064 no-safe-placement are explicit HOLD instead of aborting the successful review-2 corrective path','policy':'zero-overlap: any 1px localized-to-localized or localized-to-protected/preserved foreground overlap FAIL; exact source bbox size ceiling retained','assets':['39229D64','C075FB49','A064FDFC'],'results':all_results,'machine_pass_assets':[r['asset'] for r in all_results if r.get('status')=='STATIC_PASS_PENDING_CONTROLLER_VISUAL_QA'],'hold_strict_recheck_assets':[r['asset'] for r in all_results if str(r.get('status','')).startswith('HOLD_STRICT_RECHECK')],'machine_status':'PASS_WITH_EXPLICIT_HOLD','controller_visual_qa':'PENDING','runtime_validation':'UNTESTED'}
 (out/'C_OVERLAP01_SUMMARY.json').write_text(json.dumps(summary,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-print('C_OVERLAP02_DONE',flush=True)
+print('C_OVERLAP03_DONE',flush=True)
